@@ -1,0 +1,1347 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+:root {
+  --margen: 1rem;
+  --hoja-base: #ffffff;
+  --refuerzo-base: #ffffff;
+  scrollbar-color: color-mix(in oklab, var(--tinta) 55%, transparent) var(--tapa);
+}
+:root[data-theme='dark'] {
+  --hoja-base: #1b1916;
+  --refuerzo-base: #4a453f;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --hoja-base: #1b1916;
+    --refuerzo-base: #4a453f;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--tapa);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  background: var(--tapa);
+  color: var(--sobre-suelo);
+  font-family: var(--f-grotesca);
+  font-size: var(--t-ui);
+  line-height: 1.4;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--sobre-suelo);
+  color: var(--suelo);
+}
+
+:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.solo-lector {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+html:not(.js) .pestanas,
+html:not(.js) .calculadora {
+  display: none;
+}
+
+/* The ground: the open divider of the current section. */
+.suelo {
+  min-width: 0;
+  min-height: calc(100dvh - var(--tira));
+  background: var(--suelo);
+  color: var(--sobre-suelo);
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem var(--margen);
+  min-height: 3.25rem;
+}
+
+.tema {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  margin-inline-end: -0.5rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.tema:hover {
+  background: color-mix(in oklab, var(--sobre-suelo) 12%, transparent);
+}
+
+.otro-idioma {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.25rem var(--margen);
+  background: var(--tinta);
+  color: var(--blanco);
+  font-size: var(--t-pequeno);
+}
+.otro-idioma p {
+  margin: 0;
+  min-width: 0;
+}
+.otro-idioma a {
+  color: inherit;
+}
+.otro-idioma__cerrar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.otro-idioma__cerrar svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: square;
+}
+
+.mesa {
+  --sobre-mesa: calc(var(--tira) + 2.75rem);
+  display: grid;
+  justify-items: center;
+  padding-inline: var(--margen);
+  padding-bottom: 1.5rem;
+}
+
+/* The page's title, printed on the divider above the sheets like a section's running head. It
+   keeps to one line so the first sheet still answers inside 360×640; the lead waits under the
+   calculator until the screen is tall enough to hold both above it. */
+.mesa__cabeza {
+  display: contents;
+}
+.mesa__titulo {
+  inline-size: min(100%, 40rem);
+  margin: 0 0 0.375rem;
+  font-size: 1.375rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.mesa__entrada {
+  order: 1;
+  inline-size: min(100%, 40rem);
+  margin: 1.75rem 0 0;
+  font: 400 var(--t-ayuda) / var(--l-ayuda) var(--f-serif);
+  text-wrap: pretty;
+}
+.mesa > .resultado {
+  order: 2;
+}
+
+/* The calculator owns the first screen, so its thumb bar sits at the bottom of the viewport and
+   scrolls away with it into the explanation below. */
+.calculadora {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  inline-size: 100%;
+  min-block-size: calc(100dvh - var(--sobre-mesa));
+}
+.calculadora:has(.acciones[hidden]) {
+  min-block-size: 0;
+}
+
+/* ---------- Tabs: a strip on the top edge, a rail on the right edge from 60rem ---------- */
+
+.pestanas {
+  background: var(--tapa);
+  min-width: 0;
+}
+
+.pestanas ol {
+  list-style: none;
+  margin: 0;
+  padding: 0.375rem var(--margen) 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  block-size: var(--tira);
+}
+
+.pestanas li {
+  flex: var(--peso, 1) 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+}
+
+.pestana {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  block-size: 1.75rem;
+  padding-inline: 0.375rem;
+  border-radius: 0.75rem 0.75rem 0 0;
+  background: var(--suelo);
+  color: var(--sobre-suelo);
+  font: 600 var(--t-folio) / 1 var(--f-mono);
+  font-stretch: 87.5%;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transform-origin: bottom center;
+}
+
+.pestana::before {
+  content: '';
+  flex: none;
+  inline-size: 0.4375rem;
+  block-size: 0.4375rem;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+}
+
+.pestanas li:has([data-estado='actual']) {
+  flex: 0 0 auto;
+}
+.pestana[data-estado='actual'] {
+  block-size: 2.125rem;
+  padding-inline: 0.625rem;
+}
+.pestana[data-estado='actual']::before {
+  background: currentColor;
+}
+
+/* A stepped stack: the open tab stands tallest, done ones a step lower, pending ones lowest. */
+.pestana[data-estado='hecha'] {
+  block-size: 1.5rem;
+}
+
+/* A section not reached yet hangs loose on its hinge: it is there, but not open. */
+.pestana[data-estado='pendiente'] {
+  block-size: 1.375rem;
+  transform-origin: left bottom;
+  rotate: -4deg;
+  background: color-mix(in oklab, var(--suelo) 50%, var(--tapa));
+  color: var(--blanco);
+}
+[dir='rtl'] .pestana[data-estado='pendiente'] {
+  transform-origin: right bottom;
+  rotate: 4deg;
+}
+.pestana[data-estado='pendiente']::before {
+  border-style: dotted;
+}
+
+.pestana[href]:hover {
+  block-size: 2rem;
+}
+
+.pestana:focus-visible {
+  outline-color: var(--blanco);
+  outline-offset: 2px;
+}
+
+.pestana:not([data-estado='actual']) {
+  overflow: hidden;
+}
+.pestana:not([data-estado='actual'])::before {
+  display: none;
+}
+.pestana:not([data-estado='actual']) .pestana__nombre {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* ---------- The acetate sheet ---------- */
+
+.pila,
+.revision {
+  display: grid;
+  justify-items: center;
+  inline-size: 100%;
+  filter: drop-shadow(0 0.5rem 0.875rem var(--hoja-sombra))
+    drop-shadow(0 0.125rem 0.1875rem var(--hoja-sombra));
+}
+
+.hoja {
+  --hoja-tinta-suave: color-mix(in oklab, var(--hoja-tinta) 74%, var(--suelo));
+  --taladro-cx: var(--taladro-x);
+  --hoja-refuerzo: color-mix(in oklab, var(--suelo) 14%, var(--refuerzo-base));
+  position: relative;
+  inline-size: min(100%, 40rem);
+  min-inline-size: 0;
+  margin: 0;
+  border: 0;
+  padding-block: 1rem 1.25rem;
+  padding-inline: calc(var(--taladro-x) * 2 + 0.375rem) 1rem;
+  border-radius: var(--radio-hoja);
+  color: var(--hoja-tinta);
+  background: color-mix(in oklab, var(--suelo) 12%, var(--hoja-base));
+  background: oklch(
+    from var(--suelo) calc((var(--hoja-objetivo) - (1 - var(--hoja-alfa)) * l) / var(--hoja-alfa))
+      calc(c * var(--hoja-croma)) calc(h + var(--hoja-giro)) / var(--hoja-alfa)
+  );
+  box-shadow: inset 0 0 0 1px var(--hoja-filo);
+  caret-color: currentColor;
+  mask:
+    radial-gradient(
+      circle at var(--taladro-cx) var(--taladro-y),
+      transparent var(--taladro),
+      #000 calc(var(--taladro) + 0.5px)
+    ),
+    radial-gradient(
+      circle at var(--taladro-cx) calc(100% - var(--taladro-y)),
+      transparent var(--taladro),
+      #000 calc(var(--taladro) + 0.5px)
+    );
+  mask-composite: intersect;
+}
+
+[dir='rtl'] .hoja {
+  --taladro-cx: calc(100% - var(--taladro-x));
+}
+
+/* Each punched hole wears a reinforcement ring; the stack's drop shadow falls into the hole. */
+.hoja::before,
+.hoja::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: calc(var(--taladro-x) - var(--taladro) - var(--refuerzo));
+  inline-size: calc((var(--taladro) + var(--refuerzo)) * 2);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    transparent calc(var(--taladro) - 0.5px),
+    color-mix(in oklab, var(--hoja-tinta) 30%, transparent) var(--taladro),
+    var(--hoja-refuerzo) calc(var(--taladro) + 1px)
+  );
+  box-shadow:
+    0 1px 1.5px rgb(0 0 0 / 0.16),
+    inset 0 0 0 0.5px color-mix(in oklab, var(--hoja-tinta) 16%, transparent);
+  pointer-events: none;
+}
+.hoja::before {
+  top: calc(var(--taladro-y) - var(--taladro) - var(--refuerzo));
+}
+.hoja::after {
+  bottom: calc(var(--taladro-y) - var(--taladro) - var(--refuerzo));
+}
+
+.hoja ::selection {
+  background: color-mix(in oklab, var(--suelo) 45%, var(--campo-fondo));
+  color: var(--hoja-tinta);
+}
+
+.hoja :focus-visible {
+  outline-color: var(--hoja-tinta);
+}
+
+/* Turning to a section: two frames on the hinge, nothing eased or faded. */
+.pasa {
+  --giro: -46deg;
+  transform-origin: left center;
+  animation: pasar var(--paso) steps(2, jump-start) both;
+}
+[dir='rtl'] .pasa {
+  --giro: 46deg;
+  transform-origin: right center;
+}
+@keyframes pasar {
+  from {
+    transform: perspective(90rem) rotateY(var(--giro));
+  }
+  to {
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pasa {
+    animation: none;
+  }
+}
+
+/* The article a reading sheet rests on, printed at its foot like a manual's running footer. */
+.folio {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75em;
+  margin: 1.5rem 0 0;
+  padding-top: 0.625rem;
+  border-top: 1px solid color-mix(in oklab, var(--hoja-tinta) 24%, transparent);
+  font: 500 var(--t-folio) / 1 var(--f-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hoja-tinta-suave);
+}
+.folio span {
+  color: var(--hoja-tinta);
+  font-weight: 700;
+}
+
+.pregunta {
+  margin: 0 0 0.5rem;
+  font-size: var(--t-pregunta);
+  font-weight: 750;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.pregunta:focus {
+  outline: none;
+}
+
+.ayuda {
+  max-inline-size: var(--medida);
+  margin: 0 0 1.125rem;
+  font-family: var(--f-serif);
+  font-size: var(--t-ayuda);
+  line-height: var(--l-ayuda);
+  text-wrap: pretty;
+}
+
+.pista {
+  margin: 0;
+  font: 400 0.9375rem / 1.3 var(--f-serif);
+  color: var(--hoja-tinta-suave);
+  text-wrap: pretty;
+}
+
+/* ---------- Fields ---------- */
+
+.campo {
+  display: grid;
+  gap: 0.25rem;
+  min-inline-size: 0;
+  margin: 0 0 1rem;
+}
+
+.campo__etiqueta,
+.grupo legend {
+  font-weight: 620;
+  font-size: var(--t-ui);
+  line-height: 1.25;
+}
+
+.campo__entrada {
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 3rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--campo-borde);
+  border-radius: 0.375rem;
+  background: var(--campo-fondo);
+  color: var(--hoja-tinta);
+  font: 500 1.125rem / 1.2 var(--f-grotesca);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.08);
+}
+.campo__entrada--cifra {
+  font-family: var(--f-mono);
+  font-size: 1rem;
+  font-stretch: 87.5%;
+  font-variant-numeric: tabular-nums;
+}
+.campo__entrada:hover {
+  border-color: color-mix(in oklab, var(--campo-borde) 70%, var(--suelo));
+}
+.campo__entrada:focus-visible {
+  outline-offset: 2px;
+}
+.campo__entrada[aria-invalid='true'] {
+  border-color: var(--errata);
+  border-width: 2px;
+}
+.campo__entrada::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/* Errata slip, pasted under what it corrects. */
+.errata {
+  justify-self: start;
+  margin: 0.375rem 0 0;
+  padding: 0.3125rem 0.625rem;
+  border-radius: 2px;
+  background: var(--errata-tira);
+  color: var(--sobre-errata);
+  font: 620 0.9375rem / 1.3 var(--f-grotesca);
+  transform: rotate(-0.6deg);
+  transform-origin: left center;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+}
+[dir='rtl'] .errata {
+  transform: rotate(0.6deg);
+  transform-origin: right center;
+}
+
+.pareja {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(7.5rem, 100%), 1fr));
+  grid-auto-rows: auto;
+  column-gap: 0.75rem;
+}
+.pareja > .campo {
+  grid-row: span 5;
+  display: grid;
+  grid-template-rows: subgrid;
+  align-items: end;
+}
+.pareja > .campo > .pista {
+  align-self: start;
+}
+
+.grupo {
+  min-inline-size: 0;
+  margin: 0 0 1rem;
+  padding: 0;
+  border: 0;
+}
+.grupo legend {
+  padding: 0;
+  margin-bottom: 0.25rem;
+}
+.grupo .fichas {
+  margin-top: 0.5rem;
+}
+
+input[type='radio'] {
+  appearance: none;
+  flex: none;
+  inline-size: 1.375rem;
+  block-size: 1.375rem;
+  margin: 0;
+  border: 2px solid var(--hoja-tinta);
+  border-radius: 50%;
+  background: var(--campo-fondo);
+  box-shadow: inset 0 2px 3px rgb(0 0 0 / 0.2);
+  cursor: pointer;
+}
+input[type='radio']:checked {
+  background: var(--hoja-tinta);
+  box-shadow: inset 0 0 0 3px var(--campo-fondo);
+}
+input[type='radio'][aria-invalid='true'] {
+  border-color: var(--errata);
+}
+
+.opciones {
+  display: grid;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
+}
+
+.opcion,
+.ficha {
+  position: relative;
+  border: 1px solid color-mix(in oklab, var(--hoja-tinta) 22%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--campo-fondo) 55%, transparent);
+}
+.opcion:hover,
+.ficha:hover {
+  border-color: var(--hoja-tinta);
+}
+.opcion:has(:checked),
+.ficha:has(:checked) {
+  border-color: var(--hoja-tinta);
+  background: color-mix(in oklab, var(--suelo) 22%, var(--campo-fondo));
+}
+.opcion:has(:focus-visible),
+.ficha:has(:focus-visible) {
+  outline: 3px solid var(--hoja-tinta);
+  outline-offset: 2px;
+}
+.opcion input:focus-visible,
+.ficha input:focus-visible {
+  outline: none;
+}
+
+.opcion {
+  display: grid;
+  grid-template-columns: 1.375rem minmax(0, 1fr);
+  column-gap: 0.75rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+}
+.opcion input {
+  grid-row: 1 / span 2;
+}
+.opcion input,
+.ficha input {
+  position: relative;
+  z-index: 1;
+}
+.opcion label {
+  font-weight: 620;
+  cursor: pointer;
+}
+.opcion label::after,
+.ficha label::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.opcion .pista {
+  grid-column: 2;
+}
+
+.fichas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.ficha {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: 2.75rem;
+  padding: 0.375rem 0.875rem 0.375rem 0.625rem;
+}
+.ficha label {
+  font-weight: 560;
+  cursor: pointer;
+}
+
+.casilla {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: 2.75rem;
+}
+.casilla label {
+  font-weight: 560;
+  cursor: pointer;
+}
+.casilla label::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+input[type='checkbox'] {
+  appearance: none;
+  position: relative;
+  z-index: 1;
+  flex: none;
+  inline-size: 1.375rem;
+  block-size: 1.375rem;
+  margin: 0;
+  border: 2px solid var(--hoja-tinta);
+  border-radius: 0.25rem;
+  background: var(--campo-fondo);
+  box-shadow: inset 0 2px 3px rgb(0 0 0 / 0.2);
+  cursor: pointer;
+}
+input[type='checkbox']:checked {
+  background: var(--hoja-tinta);
+  box-shadow: inset 0 0 0 3px var(--campo-fondo);
+}
+.campo__entrada:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cifras {
+  display: grid;
+}
+.campo--fila {
+  grid-template-columns: minmax(0, 1fr) minmax(6.5rem, 9.5rem);
+  grid-template-areas:
+    'etiqueta entrada'
+    'pista entrada'
+    'errata errata';
+  column-gap: 0.75rem;
+  row-gap: 0.125rem;
+  align-items: center;
+  margin: 0;
+  padding-block: 0.375rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--hoja-tinta) 16%, transparent);
+}
+.campo--fila .campo__etiqueta {
+  grid-area: etiqueta;
+  align-self: end;
+}
+.campo--fila .campo__etiqueta {
+  font-size: 1rem;
+}
+.campo--fila:not(:has(.pista)) .campo__etiqueta {
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+.campo--fila .pista {
+  grid-area: pista;
+  align-self: start;
+  font-size: 0.8125rem;
+}
+.campo--fila .campo__entrada {
+  grid-area: entrada;
+  min-block-size: 2.75rem;
+  margin: 0;
+  text-align: end;
+}
+.campo--fila .errata {
+  grid-area: errata;
+}
+
+/* ---------- Thumb bar ---------- */
+
+.acciones {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin-top: auto;
+  margin-inline: calc(var(--margen) * -1);
+  margin-bottom: -1.5rem;
+  padding: 0.75rem var(--margen) calc(0.75rem + env(safe-area-inset-bottom));
+  background: var(--suelo);
+  box-shadow: 0 -1px 0 color-mix(in oklab, var(--sobre-suelo) 20%, transparent);
+}
+.acciones__dentro {
+  display: flex;
+  gap: 0.75rem;
+  max-inline-size: 40rem;
+  margin-inline: auto;
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  min-block-size: 3.25rem;
+  padding: 0.5rem 1.125rem;
+  border: 1.5px solid var(--sobre-suelo);
+  border-radius: 0.5rem;
+  font: 640 1.0625rem / 1.1 var(--f-grotesca);
+  cursor: pointer;
+}
+.boton svg {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: square;
+}
+.boton:focus-visible {
+  outline: 3px solid var(--sobre-suelo);
+  outline-offset: 3px;
+}
+.boton:active {
+  translate: 0 1px;
+}
+/* The arrows point the way the page reads. */
+[dir='rtl'] .boton svg {
+  scale: -1 1;
+}
+.boton--avanza {
+  margin-inline-start: auto;
+  min-inline-size: 9.5rem;
+  justify-content: space-between;
+  background: var(--sobre-suelo);
+  color: var(--suelo);
+}
+.boton--avanza:hover {
+  background: color-mix(in oklab, var(--sobre-suelo) 86%, var(--suelo));
+}
+.boton--atras,
+.boton--reinicio {
+  background: transparent;
+  color: var(--sobre-suelo);
+}
+.boton--atras:hover,
+.boton--reinicio:hover {
+  background: color-mix(in oklab, var(--sobre-suelo) 12%, transparent);
+}
+
+/* ---------- Result ---------- */
+
+.resultado {
+  inline-size: min(100%, 40rem);
+  display: grid;
+  gap: 1.25rem;
+  padding-inline-end: 1.25rem;
+}
+.resultado:focus {
+  outline: none;
+}
+
+.resultado__titulo {
+  margin: 0.25rem 0 0;
+  font-size: var(--t-titulo);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+.resultado__titulo:focus {
+  outline: none;
+}
+.resultado__titulo:focus-visible {
+  outline: 3px solid var(--sobre-suelo);
+  outline-offset: 4px;
+}
+.resultado__entrada {
+  max-inline-size: 46ch;
+  margin: 0.75rem 0 0;
+  font: 400 var(--t-ayuda) / var(--l-ayuda) var(--f-serif);
+}
+
+.revision {
+  gap: 1rem;
+}
+.revision__partidas {
+  display: grid;
+  gap: 1rem;
+  inline-size: 100%;
+}
+
+.partida {
+  position: relative;
+  inline-size: 100%;
+  display: grid;
+}
+.partida > .hoja {
+  inline-size: 100%;
+}
+
+.partida__pestana {
+  position: absolute;
+  right: -1.125rem;
+  top: 1.5rem;
+  width: 1.25rem;
+  min-height: 4.5rem;
+  padding: 0.625rem 0;
+  display: grid;
+  place-items: center;
+  border-radius: 0 0.375rem 0.375rem 0;
+  background: var(--suelo);
+  color: var(--sobre-suelo);
+  font: 700 0.625rem / 1 var(--f-mono);
+  letter-spacing: 0.08em;
+  writing-mode: vertical-rl;
+}
+[dir='rtl'] .partida__pestana {
+  right: auto;
+  left: -1.125rem;
+  border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.partida__titulo {
+  margin: 0 0 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.partida__estado {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin: 0 0 0.875rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.375rem;
+  background: color-mix(in oklab, var(--suelo) 26%, var(--campo-fondo));
+  font-weight: 640;
+  font-size: 1.125rem;
+  line-height: 1.3;
+}
+.partida[data-estado='por_debajo'] .partida__estado,
+.partida[data-estado='descuento_mayor'] .partida__estado {
+  background: var(--hoja-tinta);
+  color: var(--campo-fondo);
+}
+.partida__marca {
+  flex: none;
+  inline-size: 1.375rem;
+  block-size: 1.375rem;
+  margin-top: 0.0625rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.25;
+  stroke-linecap: square;
+}
+.marcas {
+  position: absolute;
+  inline-size: 0;
+  block-size: 0;
+}
+
+.partida__cifras {
+  margin: 0 0 0.875rem;
+}
+.partida__cifras div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+  padding-block: 0.5rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--hoja-tinta) 16%, transparent);
+}
+.partida__cifras dt {
+  font-size: 0.9375rem;
+  color: var(--hoja-tinta-suave);
+}
+.partida__cifras dd {
+  margin: 0;
+  margin-inline-start: auto;
+  font: 560 1rem / 1.3 var(--f-mono);
+  font-stretch: 87.5%;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.partida__cita {
+  margin: -0.25rem 0 0.875rem;
+}
+
+.partida__nota {
+  margin: 0 0 0.875rem;
+  font: 400 0.9375rem / 1.45 var(--f-serif);
+}
+
+.partida__detalle summary {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-block-size: 2.75rem;
+  font-weight: 620;
+  cursor: pointer;
+  list-style: none;
+}
+.partida__detalle summary::-webkit-details-marker {
+  display: none;
+}
+.partida__detalle summary::before {
+  content: '';
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  rotate: -45deg;
+}
+.partida__detalle[open] summary::before {
+  rotate: 45deg;
+}
+[dir='rtl'] .partida__detalle summary::before {
+  rotate: 45deg;
+}
+[dir='rtl'] .partida__detalle[open] summary::before {
+  rotate: -45deg;
+}
+.partida__detalle .ayuda {
+  margin-top: 0.25rem;
+}
+
+.fuentes,
+.fuente {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 500 0.8125rem / 1.5 var(--f-mono);
+  font-stretch: 87.5%;
+}
+.fuentes li + li {
+  margin-top: 0.375rem;
+}
+.fuentes__vigencia {
+  display: block;
+  color: var(--hoja-tinta-suave);
+}
+
+/* An amount never breaks, so «entre X y Y» can only wrap at its words. */
+.revision bdi {
+  white-space: nowrap;
+}
+.fuentes a,
+.fuente a {
+  color: var(--enlace-legal);
+}
+
+.lista {
+  margin: 0;
+  padding-inline-start: 1.125rem;
+  font: 400 var(--t-ayuda) / var(--l-ayuda) var(--f-serif);
+}
+.lista li::marker {
+  color: var(--hoja-tinta-suave);
+}
+
+.reinicio {
+  display: flex;
+  justify-content: center;
+  margin-top: 3.5rem;
+  padding-bottom: 1rem;
+}
+
+.hoja--aviso {
+  margin-top: 1rem;
+}
+
+/* ---------- Other contracts (paro) ---------- */
+
+/* A focused field or a new row never hides behind the sticky thumb bar. */
+html:has(.acciones:not([hidden])) {
+  scroll-padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+}
+.otros__lista {
+  scroll-padding-block: 0.5rem;
+}
+
+.otros {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.875rem;
+}
+/* The list grows inside its own box, so the sheet keeps its place above the thumb bar. */
+.otros__lista {
+  display: grid;
+  gap: 0.5rem;
+  max-block-size: min(17rem, 42dvh);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+  scrollbar-color: color-mix(in oklab, var(--hoja-tinta) 40%, transparent) transparent;
+}
+.otro__grupo {
+  margin: 0;
+  padding: 0.5rem 0 0.25rem;
+  border-top: 1px solid color-mix(in oklab, var(--hoja-tinta) 16%, transparent);
+}
+.otro:first-child .otro__grupo {
+  border-top: 0;
+  padding-top: 0;
+}
+.otro__grupo legend {
+  font-size: 1rem;
+}
+.otro__fechas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 0.75rem;
+}
+.otro__fechas .campo {
+  align-content: start;
+  margin: 0;
+}
+.otro__fechas .campo__etiqueta {
+  font-size: 0.9375rem;
+}
+.otro__fechas .campo__entrada {
+  min-block-size: 2.75rem;
+  padding-inline: 0.5rem;
+}
+.otro__quitar,
+.boton--hoja {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: 2.75rem;
+  color: var(--hoja-tinta);
+  font: 620 0.9375rem / 1.1 var(--f-grotesca);
+  cursor: pointer;
+}
+.otro__quitar {
+  margin-top: 0.125rem;
+  padding: 0 0.5rem 0 0.25rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background: transparent;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+.otro__quitar:hover {
+  background: color-mix(in oklab, var(--hoja-tinta) 10%, transparent);
+}
+.otro__quitar svg,
+.boton--hoja svg {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: square;
+}
+.boton--hoja {
+  justify-self: start;
+  min-block-size: 2.75rem;
+  padding: 0.375rem 0.875rem 0.375rem 0.625rem;
+  border-color: var(--hoja-tinta);
+  background: color-mix(in oklab, var(--campo-fondo) 55%, transparent);
+}
+.boton--hoja:hover {
+  background: color-mix(in oklab, var(--suelo) 22%, var(--campo-fondo));
+}
+.boton--hoja:focus-visible,
+.otro__quitar:focus-visible {
+  outline: 3px solid var(--hoja-tinta);
+  outline-offset: 2px;
+}
+.otros .grupo {
+  margin: 0;
+}
+.ayuda--corta {
+  margin-bottom: 0.375rem;
+}
+.pista--hoja {
+  max-inline-size: var(--medida);
+  margin-bottom: 0.875rem;
+}
+.otro__grupo > .errata {
+  display: block;
+  inline-size: fit-content;
+}
+.otros__vida {
+  margin-top: 0.875rem;
+}
+.otros__vida a,
+.paro__enlace {
+  color: var(--enlace-legal);
+}
+
+/* ---------- Paro sheet ---------- */
+
+.paro__apartado {
+  margin: 1.25rem 0 0.375rem;
+  font-size: var(--t-ui);
+  font-weight: 750;
+  line-height: 1.25;
+}
+.paro__bloques > .ayuda {
+  margin-bottom: 0.5rem;
+}
+.paro__motivo {
+  margin-bottom: 0.5rem;
+}
+.paro[data-estado='no_aplica'] .partida__estado {
+  background: var(--hoja-tinta);
+  color: var(--campo-fondo);
+}
+
+/* Small phones: every sheet must answer inside 360×640 without scrolling. */
+@media (max-width: 59.99rem) {
+  .cabecera {
+    min-height: 2.75rem;
+    padding-block: 0;
+  }
+  .hoja {
+    padding-top: 0.75rem;
+  }
+  .pregunta {
+    font-size: clamp(1.5rem, 1rem + 2.4vw, 2rem);
+  }
+  .ayuda {
+    margin-bottom: 0.875rem;
+  }
+  .opcion {
+    padding: 0.375rem 0.625rem;
+    column-gap: 0.625rem;
+  }
+  .acciones {
+    padding-block: 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
+  }
+  .boton {
+    min-block-size: 3rem;
+  }
+}
+
+/* ---------- Wide screens: the rail moves to the right edge ---------- */
+
+@media (min-width: 60rem) {
+  :root {
+    --margen: 2.5rem;
+  }
+
+  body {
+    grid-template-columns: minmax(0, 1fr) var(--riel);
+  }
+
+  .suelo {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 100dvh;
+  }
+
+  .pestanas {
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: 0;
+    block-size: 100dvh;
+  }
+
+  .pestanas ol {
+    flex-direction: column;
+    align-items: stretch;
+    block-size: 100%;
+    padding: 1.5rem 0;
+  }
+
+  .pestanas li {
+    flex: var(--peso) 1 0;
+    align-items: stretch;
+  }
+
+  .pestana {
+    writing-mode: vertical-rl;
+    flex: none;
+    width: calc(100% - 0.75rem);
+    height: auto;
+    justify-content: flex-start;
+    gap: 0.625rem;
+    padding: 1rem 0;
+    border-radius: 0 0.875rem 0.875rem 0;
+    transform-origin: left top;
+  }
+  .pestanas li:has([data-estado='actual']) {
+    flex: var(--peso) 1 0;
+  }
+  .pestana[data-estado='hecha'] {
+    height: auto;
+    width: calc(100% - 0.5rem);
+  }
+  .pestana[data-estado='actual'] {
+    flex: none;
+    height: auto;
+    width: 100%;
+  }
+  .pestana[href]:hover {
+    height: auto;
+    width: calc(100% - 0.375rem);
+  }
+  .pestana[data-estado='pendiente'] {
+    height: auto;
+    width: calc(100% - 1rem);
+    transform-origin: left top;
+    rotate: 3deg;
+  }
+  /* Right to left, the rail hangs from the left edge: the tabs open towards the left. */
+  [dir='rtl'] .pestana {
+    border-radius: 0.875rem 0 0 0.875rem;
+    transform-origin: right top;
+  }
+  [dir='rtl'] .pestana[data-estado='pendiente'] {
+    transform-origin: right top;
+    rotate: -3deg;
+  }
+  .pestana:not([data-estado='actual'])::before {
+    display: block;
+  }
+  .pestana:not([data-estado='actual']) .pestana__nombre {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .mesa {
+    --sobre-mesa: 4.75rem;
+    padding-top: 0.75rem;
+  }
+
+  .mesa__titulo {
+    margin-bottom: 1rem;
+    font-size: 2.25rem;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+  }
+  /* The lead keeps the body measure inside the sheet's width. */
+  .mesa__entrada {
+    padding-inline-end: calc(40rem - var(--medida));
+  }
+
+  .hoja {
+    padding-block: 1.75rem 2.25rem;
+    padding-inline: calc(var(--taladro-x) * 2 + 1.25rem) 2.5rem;
+  }
+
+  .pareja {
+    grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+  }
+
+  .partida__titulo {
+    font-size: 1.75rem;
+  }
+}
+
+/* Tall enough for the lead above the first sheet as well. */
+@media (min-width: 60rem) and (min-height: 50rem) {
+  .mesa__cabeza {
+    display: block;
+    inline-size: 40rem;
+    max-inline-size: 100%;
+    margin-bottom: 1rem;
+  }
+  .mesa__titulo {
+    margin: 0;
+  }
+  .mesa__entrada {
+    margin-top: 0.5rem;
+  }
+}
+
+/* A short laptop screen: the first sheet gives back some air so it still answers above the bar. */
+@media (min-width: 60rem) and (max-height: 49.99rem) {
+  .pila .hoja {
+    padding-block: 1.25rem 1.5rem;
+  }
+  .pila .pregunta {
+    font-size: clamp(1.625rem, 1.1rem + 2.4vw, 2.25rem);
+  }
+}

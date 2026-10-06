@@ -1,0 +1,59 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    # typescript is pinned ~6.0.3: typescript-eslint's peer caps it below 6.1.0. Drop this once
+    # typescript-eslint and @astrojs/check widen their peers.
+    ignore:
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major', 'version-update:semver-minor']
+    groups:
+      security-npm:
+        applies-to: security-updates
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      # Its own PR: an SDK bump that adds a default property fails the analytics allowlist e2e on
+      # purpose, and must not hold back the framework updates.
+      posthog:
+        patterns:
+          - posthog-js
+      production-dependencies:
+        dependency-type: production
+        exclude-patterns:
+          - posthog-js
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: ci
+      include: scope
+    groups:
+      security-actions:
+        applies-to: security-updates
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch

@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import { t, type Clave } from '../i18n';
+import { enlace } from '../i18n/idiomas';
+
+// GitHub Pages serves this file for any address it doesn't know, so it is never indexed.
+const tx = (clave: Clave) => t('es', clave);
+const paginas = [
+  [
+    'finiquito',
+    'causa',
+    enlace('es', 'finiquito/'),
+    tx('portada.finiquito'),
+    tx('no_encontrada.finiquito_texto'),
+  ],
+  [
+    'portada',
+    'finiquito',
+    enlace('es'),
+    tx('no_encontrada.portada'),
+    tx('no_encontrada.portada_texto'),
+  ],
+] as const;
+---
+
+<Base
+  title={tx('no_encontrada.titulo')}
+  description={tx('no_encontrada.descripcion')}
+  path="/404/"
+  idiomas={['es']}
+  seccion="fechas"
+  noindex
+>
+  <main class="portada" id="contenido">
+    <div class="portada__cabeza">
+      <h1 class="portada__titulo">{tx('no_encontrada.h1')}</h1>
+      <p class="portada__entrada">{tx('no_encontrada.entrada')}</p>
+    </div>
+
+    <ul class="indice" aria-label={tx('no_encontrada.indice')}>
+      {paginas.map(([id, tono, href, nombre, texto]) => (
+        <li class="partida indice__vivo" data-tono={tono}>
+          <section class="hoja" data-tono="fechas" aria-labelledby={`indice-${id}`}>
+            <h2 class="indice__nombre" id={`indice-${id}`}>
+              <a href={href}>{nombre}</a>
+            </h2>
+            <p class="indice__texto">{texto}</p>
+          </section>
+          <span class="partida__pestana" aria-hidden="true"></span>
+        </li>
+      ))}
+    </ul>
+  </main>
+</Base>

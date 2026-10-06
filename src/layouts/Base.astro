@@ -1,0 +1,131 @@
+---
+import { createHash } from 'node:crypto';
+import '@fontsource-variable/golos-text';
+import golosLatin from '@fontsource-variable/golos-text/files/golos-text-latin-wght-normal.woff2?url';
+import serifLatin from '@fontsource-variable/source-serif-4/files/source-serif-4-latin-opsz-normal.woff2?url';
+import '@fontsource-variable/source-serif-4/opsz.css';
+import '@fontsource-variable/martian-mono/standard.css';
+import '@fontsource-variable/noto-kufi-arabic';
+import '@fontsource-variable/noto-naskh-arabic';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/paginas.css';
+import Cabecera from '../components/Cabecera.astro';
+import Pie from '../components/Pie.astro';
+import { t, textosCliente } from '../i18n';
+import { IDIOMAS, enlace, idiomasPublicados, type Idioma } from '../i18n/idiomas';
+import { politicaDeSeguridad } from './csp';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  idioma?: Idioma;
+  // The languages this page exists in; hreflang lists the published ones among them.
+  idiomas?: readonly Idioma[];
+  seccion?: string;
+  // One schema.org node, or several, which go out as a single @graph.
+  datosEstructurados?: object | readonly object[];
+  // A page that must never be indexed, such as the 404.
+  noindex?: boolean;
+}
+const {
+  title,
+  description,
+  path,
+  idioma = 'es',
+  idiomas = idiomasPublicados(),
+  seccion = 'causa',
+  datosEstructurados,
+  noindex = false,
+} = Astro.props;
+const base = import.meta.env.BASE_URL;
+const raiz = base.replace(/\/$/, '');
+const url = (i: Idioma) => new URL(enlace(i, path.replace(/^\//, '')), Astro.site);
+const canonical = url(idioma);
+const { dir, publicado } = IDIOMAS[idioma];
+// An unpublished language (only ar-test, under PRUEBA_RTL=1) and a noindex page (the 404) are
+// never indexed nor announced; the 404 is served at any address, so it names no canonical.
+const indexable = publicado && !noindex;
+const alternos = indexable ? idiomas.filter((i) => IDIOMAS[i].publicado) : [];
+const OG_LOCALE: Partial<Record<Idioma, string>> = { es: 'es_ES' };
+const ogLocale = OG_LOCALE[idioma];
+// The browser scripts' strings, as data: the CSP does not apply to a JSON block.
+const textos = JSON.stringify(textosCliente(idioma)).replace(/</g, '\\u003c');
+const imagenSocial = new URL(`${raiz}/og.png`, Astro.site);
+// A JSON-LD block is data, not script, so the CSP does not apply; `<` is escaped so it can't close the tag.
+const grafo = Array.isArray(datosEstructurados)
+  ? { '@context': 'https://schema.org', '@graph': datosEstructurados }
+  : datosEstructurados;
+const jsonLd = grafo && JSON.stringify(grafo).replace(/</g, '\\u003c');
+
+// Runs before first paint so the stored or system theme never flashes; the CSP allows it by hash.
+const temaInicial = `(()=>{const d=document.documentElement;d.classList.add('js');let t=null;try{t=localStorage.getItem('tema')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.dataset.theme=t})()`;
+const hashTema = `'sha256-${createHash('sha256').update(temaInicial).digest('base64')}'`;
+const csp = politicaDeSeguridad({
+  hashTema,
+  analitica: Boolean(import.meta.env.PUBLIC_POSTHOG_KEY),
+});
+// This page in the other published languages, for the bar that offers the browser's language.
+// Only Spanish is published today, so the list is empty and the bar never shows.
+const otrosIdiomas =
+  idioma === 'es'
+    ? alternos
+        .filter((i) => i !== idioma)
+        .map((i) => ({ codigo: i, nombre: IDIOMAS[i].nombre, url: url(i).pathname }))
+    : [];
+const otros = JSON.stringify(otrosIdiomas).replace(/</g, '\\u003c');
+---
+
+<!doctype html>
+<html lang={idioma} dir={dir}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="Content-Security-Policy" content={csp} />
+    <script is:inline set:html={temaInicial} />
+    <title>{title}</title>
+    {/* The faces of the first screen's headings and text, fetched alongside the HTML rather than after the CSS. */}
+    <link rel="preload" href={golosLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={serifLatin} as="font" type="font/woff2" crossorigin />
+    <meta name="description" content={description} />
+    {!noindex && <link rel="canonical" href={canonical} />}
+    {!indexable && <meta name="robots" content="noindex" />}
+    {alternos.map((i) => (
+      <link rel="alternate" hreflang={i} href={url(i)} />
+    ))}
+    {alternos.length > 0 && <link rel="alternate" hreflang="x-default" href={url('es')} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    {ogLocale && <meta property="og:locale" content={ogLocale} />}
+    <meta property="og:site_name" content="eslojusto.es" />
+    <meta property="og:image" content={imagenSocial} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t(idioma, 'meta.og_imagen_alt')} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <link rel="icon" href={`${base}favicon-32.png`} type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
+    <link rel="sitemap" href={`${base}sitemap-index.xml`} />
+    {jsonLd && <script is:inline type="application/ld+json" set:html={jsonLd} />}
+    <script is:inline id="textos" type="application/json" set:html={textos} />
+    {otrosIdiomas.length > 0 && (
+      <script is:inline id="otros-idiomas" type="application/json" set:html={otros} />
+    )}
+  </head>
+  <body data-seccion={seccion}>
+    <slot name="pestanas" />
+    <div class="suelo">
+      <Cabecera idioma={idioma} />
+      <slot />
+    </div>
+    <Pie idioma={idioma} />
+    <script>
+      import '../scripts/tema';
+      import '../scripts/medicion';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+dist
+.astro
+CHANGELOG.md
+.release-please-manifest.json
+package-lock.json
+playwright-report
+test-results

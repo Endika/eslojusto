@@ -1,0 +1,57 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props {
+  nombre: string;
+  etiqueta: string;
+  pista?: string;
+  tipo?: 'texto' | 'fecha' | 'importe' | 'dias';
+  valor?: string;
+  otrasPistas?: string[];
+  fila?: boolean;
+  atributos?: Record<string, string>;
+}
+const {
+  nombre,
+  etiqueta,
+  pista,
+  tipo = 'texto',
+  valor,
+  otrasPistas = [],
+  fila = false,
+  atributos = {},
+} = Astro.props;
+const pistaId = `pista-${nombre}`;
+const errorId = `error-${nombre}`;
+const describe = [...(pista ? [pistaId] : []), ...otrasPistas, errorId].join(' ');
+const entrada: HTMLAttributes<'input'> =
+  tipo === 'fecha'
+    ? { type: 'date' }
+    : tipo === 'importe'
+      ? { type: 'text', inputmode: 'decimal', autocomplete: 'off', spellcheck: 'false' }
+      : tipo === 'dias'
+        ? { type: 'text', inputmode: 'numeric', autocomplete: 'off', spellcheck: 'false' }
+        : { type: 'text' };
+---
+
+<div class:list={['campo', { 'campo--fila': fila }]} data-campo={nombre} {...atributos}>
+  <label class="campo__etiqueta" for={nombre}>
+    {etiqueta}
+  </label>
+  {pista && (
+    <p class="pista" id={pistaId}>
+      {pista}
+    </p>
+  )}
+  <input
+    class:list={['campo__entrada', { 'campo__entrada--cifra': tipo !== 'texto' }]}
+    id={nombre}
+    name={nombre}
+    value={valor}
+    aria-describedby={describe}
+    dir={tipo === 'texto' ? undefined : 'ltr'}
+    {...entrada}
+  />
+  <slot />
+  <p class="errata" id={errorId} data-error-de={nombre} hidden></p>
+</div>

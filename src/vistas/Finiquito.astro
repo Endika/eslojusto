@@ -1,0 +1,84 @@
+---
+import Base from '../layouts/Base.astro';
+import FormularioFiniquito from '../components/FormularioFiniquito.astro';
+import ResultadoFiniquito from '../components/ResultadoFiniquito.astro';
+import GuiaFiniquito from '../components/GuiaFiniquito.astro';
+import { faqPage } from '../contenido/preguntas';
+import { calculadora } from '../contenido/datos-estructurados';
+import { t, type Clave } from '../i18n';
+import { enlace, type Idioma } from '../i18n/idiomas';
+
+interface Props {
+  idioma: Idioma;
+}
+const { idioma } = Astro.props;
+const tx = (clave: Clave) => t(idioma, clave);
+
+// Each tab's share of the rail follows how many sheets its section holds (the result counts two).
+const secciones = [
+  ['causa', '01', 2],
+  ['fechas', '02', 1],
+  ['salario', '03', 3],
+  ['vacaciones', '04', 3],
+  ['finiquito', '05', 1],
+  ['resultado', '06', 2],
+] as const;
+const portada = new URL(import.meta.env.BASE_URL, Astro.site);
+const pagina = new URL(enlace(idioma, 'finiquito/'), Astro.site);
+---
+
+<Base
+  title={tx('finiquito.titulo')}
+  description={tx('finiquito.descripcion')}
+  path="/finiquito/"
+  idioma={idioma}
+  seccion="causa"
+  datosEstructurados={[calculadora(portada, pagina, idioma), faqPage(idioma)]}
+>
+  <nav class="pestanas" slot="pestanas" aria-label={tx('pestanas.nav')}>
+    <ol>
+      {/* Only a section already reached is a link; one still ahead is plain text until then. */}
+      {secciones.map(([id, numero, peso], i) => (
+        <li style={`--peso: ${peso}`} data-tono={id}>
+          {i === 0 ? (
+            <a
+              class="pestana"
+              data-pestana={id}
+              data-estado="actual"
+              href={`#${id}`}
+              aria-current="step"
+            >
+              <span class="pestana__numero">{numero}</span>
+              <span class="pestana__nombre">{tx(`seccion.${id}`)}</span>
+            </a>
+          ) : (
+            <span class="pestana" data-pestana={id} data-estado="pendiente" aria-disabled="true">
+              <span class="pestana__numero">{numero}</span>
+              <span class="pestana__nombre">{tx(`seccion.${id}`)}</span>
+            </span>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+  <main id="contenido">
+    <div class="mesa">
+      <header class="mesa__cabeza">
+        <h1 class="mesa__titulo">{tx('finiquito.h1')}</h1>
+        <p class="mesa__entrada">{tx('finiquito.entrada')}</p>
+      </header>
+      <noscript>
+        <div class="hoja hoja--aviso">
+          <p class="ayuda">{tx('finiquito.sin_js')}</p>
+        </div>
+      </noscript>
+      <FormularioFiniquito idioma={idioma} />
+      <ResultadoFiniquito idioma={idioma} />
+    </div>
+    <GuiaFiniquito idioma={idioma} />
+  </main>
+</Base>
+
+<script>
+  import '../calculadora/main';
+</script>

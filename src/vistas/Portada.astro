@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import { t, type Clave } from '../i18n';
+import { enlace, type Idioma } from '../i18n/idiomas';
+import { datosPortada } from '../contenido/datos-estructurados';
+
+interface Props {
+  idioma: Idioma;
+}
+const { idioma } = Astro.props;
+const tx = (clave: Clave) => t(idioma, clave);
+const pronto = [
+  ['salario', tx('portada.contrato')],
+  ['finiquito', tx('portada.alquiler')],
+] as const;
+const portada = new URL(import.meta.env.BASE_URL, Astro.site);
+---
+
+<Base
+  title={tx('portada.titulo')}
+  description={tx('portada.descripcion')}
+  path="/"
+  idioma={idioma}
+  seccion="fechas"
+  datosEstructurados={datosPortada(portada, idioma)}
+>
+  <main class="portada" id="contenido">
+    <div class="portada__cabeza">
+      <h1 class="portada__titulo">{tx('portada.h1')}</h1>
+      <p class="portada__entrada">{tx('portada.entrada')}</p>
+      <p class="portada__nota">{tx('portada.nota')}</p>
+    </div>
+
+    <ul class="indice" aria-label={tx('portada.indice')}>
+      <li class="partida indice__vivo" data-tono="causa">
+        <section class="hoja" data-tono="fechas" aria-labelledby="indice-finiquito">
+          <h2 class="indice__nombre" id="indice-finiquito">
+            <a href={enlace(idioma, 'finiquito/')}>{tx('portada.finiquito')}</a>
+          </h2>
+          <p class="indice__texto">{tx('portada.finiquito_texto')}</p>
+          <p class="indice__cita">{tx('portada.finiquito_cita')}</p>
+        </section>
+        <span class="partida__pestana" aria-hidden="true"></span>
+      </li>
+      {pronto.map(([tono, nombre]) => (
+        <li class="partida indice__pronto" data-tono={tono}>
+          <section
+            class="hoja"
+            data-tono="fechas"
+            aria-label={t(idioma, 'portada.proximamente_aria', { nombre })}
+          >
+            <h2 class="indice__nombre">{nombre}</h2>
+            <p class="indice__estado">{tx('portada.proximamente')}</p>
+          </section>
+          <span class="partida__pestana" aria-hidden="true" />
+        </li>
+      ))}
+    </ul>
+  </main>
+</Base>

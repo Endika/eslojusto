@@ -1,0 +1,47 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+permissions: { contents: read }
+concurrency: { group: 'ci-${{ github.ref }}', cancel-in-progress: true }
+jobs:
+  quality:
+    name: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run type:check
+      - run: npm run build
+      - run: npm run test:run
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+        env: { CI: 'true' }
+      - name: rtl layout (ar-test pseudo-locale)
+        run: PRUEBA_RTL=1 npm run build && PRUEBA_RTL=1 npm run test:e2e -- --project=rtl
+        env: { CI: 'true' }
+      - name: measurement (test key, PostHog stubbed)
+        run: npm run test:e2e -- --project=medicion
+        env: { CI: 'true', PRUEBA_MEDICION: '1' }
+  audit:
+    name: audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: npm }
+      # Only what ships to the browser: a dev-only advisory can't reach a visitor.
+      - run: npm audit --omit=dev --audit-level=high
+  all-green:
+    name: all-green
+    needs: [quality, audit]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: every required job must have succeeded
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        run: exit 1

@@ -1,0 +1,485 @@
+/* ---------- Brand ---------- */
+
+.marca {
+  display: flex;
+  align-items: center;
+  min-block-size: 2.75rem;
+  border-radius: 0.25rem;
+  color: inherit;
+}
+
+.logo {
+  display: block;
+  block-size: 1.875rem;
+  inline-size: auto;
+  overflow: visible;
+}
+
+/* On the orange divider the orange tab would vanish into the ground. */
+[data-seccion='causa'] .cabecera .logo__pestana {
+  fill: var(--tinta);
+}
+
+[dir='rtl'] .logo__marca {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scaleX(-1);
+}
+
+/* The lockup with the small «ESLOJUSTO.ES» line where there is room for it. */
+.logo--completo {
+  display: none;
+}
+
+/* Pages without the tab rail span the whole width. */
+@media (min-width: 60rem) {
+  body:not(:has(.pestanas)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .logo--compacto {
+    display: none;
+  }
+  .logo--completo {
+    display: block;
+    block-size: 2.625rem;
+  }
+}
+
+/* ---------- Footer: the back cover ---------- */
+
+.pie {
+  grid-column: 1 / -1;
+  background: var(--tapa);
+  color: var(--sobre-tapa);
+  padding: 2rem var(--margen) calc(2rem + env(safe-area-inset-bottom));
+}
+.pie ::selection {
+  background: var(--sobre-tapa);
+  color: var(--tapa);
+}
+.pie__dentro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 2.5rem;
+  max-inline-size: 72rem;
+  margin-inline: auto;
+}
+.pie__nota {
+  max-inline-size: 52ch;
+  margin: 0;
+  font: 400 0.9375rem / 1.5 var(--f-serif);
+  color: color-mix(in oklab, var(--sobre-tapa) 82%, var(--tapa));
+  text-wrap: pretty;
+}
+.pie__enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pie__enlaces a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.75rem;
+  font-weight: 620;
+}
+.pie a:focus-visible {
+  outline-color: var(--sobre-tapa);
+}
+
+/* ---------- Reading sheets ---------- */
+
+.hoja--texto {
+  inline-size: min(100%, 44rem);
+  font: 400 var(--t-ayuda) / var(--l-ayuda) var(--f-serif);
+}
+.hoja--texto h2,
+.hoja--texto h3 {
+  margin: 0 0 0.75rem;
+  font-family: var(--f-grotesca);
+  font-size: clamp(1.375rem, 1.1rem + 1.2vw, 1.75rem);
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.hoja--texto p,
+.hoja--texto ul,
+.hoja--texto ol {
+  max-inline-size: var(--medida);
+  margin: 0 0 0.875rem;
+  text-wrap: pretty;
+}
+.hoja--texto > :last-child {
+  margin-bottom: 0;
+}
+.hoja--texto > .folio {
+  max-inline-size: none;
+  margin: 1.5rem 0 0;
+}
+.hoja--texto ul {
+  padding-inline-start: 1.125rem;
+}
+.hoja--texto li + li {
+  margin-top: 0.375rem;
+}
+.hoja--texto li::marker {
+  color: var(--hoja-tinta-suave);
+}
+.hoja--texto .fuentes {
+  padding-inline-start: 0;
+}
+.hoja--texto a {
+  color: var(--enlace-legal);
+  text-decoration-thickness: 1px;
+}
+.hoja--texto a:hover,
+.fuentes a:hover,
+.fuente a:hover {
+  color: var(--hoja-tinta);
+  text-decoration-thickness: 2px;
+}
+.hoja--texto .folio {
+  font-stretch: 87.5%;
+}
+
+/* A worked example: the figures in mono, like on a calculation slip. */
+.ejemplo {
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.375rem;
+  background: color-mix(in oklab, var(--suelo) 14%, var(--campo-fondo));
+  font: 500 0.875rem / 1.6 var(--f-mono);
+  font-stretch: 87.5%;
+  font-variant-numeric: tabular-nums;
+}
+.ejemplo__etiqueta {
+  font-family: var(--f-grotesca);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  font-stretch: normal;
+}
+
+.causas {
+  margin: 0 0 1rem;
+}
+.causas div {
+  padding-block: 0.75rem;
+  border-top: 1px solid color-mix(in oklab, var(--hoja-tinta) 18%, transparent);
+}
+.causas div:last-child {
+  border-bottom: 1px solid color-mix(in oklab, var(--hoja-tinta) 18%, transparent);
+}
+.causas h4 {
+  margin: 0;
+  font: 700 1.0625rem / 1.3 var(--f-grotesca);
+  text-wrap: balance;
+}
+.causas p {
+  margin: 0.25rem 0 0;
+}
+.causas .causas__cita {
+  font: 500 0.8125rem / 1.4 var(--f-mono);
+  font-stretch: 87.5%;
+  color: var(--hoja-tinta-suave);
+}
+
+.preguntas {
+  border-top: 1px solid color-mix(in oklab, var(--hoja-tinta) 18%, transparent);
+}
+.pregunta-frecuente {
+  border-bottom: 1px solid color-mix(in oklab, var(--hoja-tinta) 18%, transparent);
+}
+.pregunta-frecuente summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-block-size: 3rem;
+  padding-block: 0.5rem;
+  font: 620 1.0625rem / 1.3 var(--f-grotesca);
+  cursor: pointer;
+  list-style: none;
+}
+.pregunta-frecuente summary::-webkit-details-marker {
+  display: none;
+}
+.pregunta-frecuente summary::after {
+  content: '';
+  flex: none;
+  margin-inline-start: auto;
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  rotate: 45deg;
+  translate: 0 -0.125rem;
+}
+.pregunta-frecuente[open] summary::after {
+  rotate: 225deg;
+  translate: 0 0.125rem;
+}
+.pregunta-frecuente summary:focus-visible {
+  outline-offset: 2px;
+}
+.pregunta-frecuente p {
+  margin: 0 0 1rem;
+}
+
+/* ---------- The explanation under the calculator: the legal divider ---------- */
+
+.guia {
+  display: grid;
+  justify-items: center;
+  gap: 2rem;
+  padding: 3.5rem var(--margen) 4rem;
+  background: var(--suelo);
+  color: var(--sobre-suelo);
+}
+.guia ::selection,
+.documento ::selection {
+  background: var(--sobre-suelo);
+  color: var(--suelo);
+}
+.guia .hoja ::selection,
+.documento .hoja ::selection {
+  background: color-mix(in oklab, var(--suelo) 35%, var(--campo-fondo));
+  color: var(--hoja-tinta);
+}
+.guia__cabeza {
+  inline-size: min(100%, 44rem);
+}
+.guia__titulo {
+  margin: 0 0 0.75rem;
+  font-size: var(--t-titulo);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+.guia__entrada {
+  max-inline-size: 52ch;
+  margin: 0;
+  font: 400 1.1875rem / 1.55 var(--f-serif);
+  text-wrap: pretty;
+}
+/* The colophon: when the guide was last checked and the texts it rests on. */
+.guia__fuentes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 1.25rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in oklab, var(--sobre-suelo) 35%, transparent);
+  font: 500 0.8125rem / 1.5 var(--f-mono);
+  font-stretch: 87.5%;
+}
+.guia__fuentes a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+}
+.guia__fuentes a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.guia__hojas,
+.documento__hojas {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  inline-size: 100%;
+  filter: drop-shadow(0 0.5rem 0.875rem var(--hoja-sombra))
+    drop-shadow(0 0.125rem 0.1875rem var(--hoja-sombra));
+}
+
+/* ---------- Legal pages ---------- */
+
+.documento {
+  display: grid;
+  justify-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem var(--margen) 4rem;
+}
+.documento__cabeza {
+  inline-size: min(100%, 44rem);
+}
+.documento__titulo {
+  margin: 0 0 0.5rem;
+  font-size: var(--t-titulo);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+.documento__fecha {
+  margin: 0;
+  font: 500 0.8125rem / 1.4 var(--f-mono);
+  font-stretch: 87.5%;
+}
+.datos {
+  margin: 0 0 1rem;
+}
+.datos div {
+  padding-block: 0.75rem;
+  border-top: 1px solid color-mix(in oklab, var(--hoja-tinta) 18%, transparent);
+}
+.datos dt {
+  font: 700 1.0625rem / 1.3 var(--f-grotesca);
+}
+.datos dd {
+  margin: 0.25rem 0 0;
+}
+
+/* ---------- Home: the index of the manual ---------- */
+
+.portada {
+  display: grid;
+  gap: 2.5rem;
+  inline-size: min(100%, 76rem);
+  margin-inline: auto;
+  padding: 1.5rem var(--margen) 4.5rem;
+}
+.portada__titulo {
+  margin: 0 0 1.25rem;
+  font-size: clamp(2.75rem, 1.5rem + 5.6vw, 6rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+.portada__entrada {
+  max-inline-size: 40ch;
+  margin: 0 0 1rem;
+  font: 400 1.1875rem / 1.55 var(--f-serif);
+  text-wrap: pretty;
+}
+.portada__nota {
+  max-inline-size: 44ch;
+  margin: 0;
+  font: 400 1rem / 1.5 var(--f-serif);
+  text-wrap: pretty;
+}
+
+.indice {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0 1.25rem 0 0;
+  list-style: none;
+  filter: drop-shadow(0 0.5rem 0.875rem var(--hoja-sombra))
+    drop-shadow(0 0.125rem 0.1875rem var(--hoja-sombra));
+}
+[dir='rtl'] .indice {
+  padding: 0 0 0 1.25rem;
+}
+.indice .hoja {
+  /* Short cards: holes tucked into the corners and text padded clear of them, so they never read as bullets. */
+  --taladro-y: 1.125rem;
+  inline-size: 100%;
+  padding-block: 2.125rem;
+}
+.indice__nombre {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.75rem, 1.3rem + 2vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+.indice__nombre a {
+  text-decoration: none;
+}
+.indice__nombre a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radio-hoja);
+}
+.indice__nombre a:focus-visible {
+  outline: none;
+}
+.indice__nombre a:focus-visible::after {
+  outline: 3px solid var(--hoja-tinta);
+  outline-offset: -6px;
+}
+.indice__texto {
+  max-inline-size: 46ch;
+  margin: 0 0 1rem;
+  font: 400 var(--t-ayuda) / var(--l-ayuda) var(--f-serif);
+  text-wrap: pretty;
+}
+.indice__cita {
+  margin: 0;
+  font: 500 0.8125rem / 1.4 var(--f-mono);
+  font-stretch: 87.5%;
+  color: var(--hoja-tinta-suave);
+}
+.indice__vivo .hoja {
+  transition: translate var(--paso) steps(2);
+}
+.indice__vivo:has(a:hover) .hoja {
+  translate: 0 -3px;
+}
+.indice__vivo:has(a:hover) .indice__nombre a {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.12em;
+}
+
+/* Not open yet: the sheet hangs at half hinge, and its tab is muted. */
+.indice__pronto .hoja {
+  transform: perspective(60rem) rotateY(-14deg);
+  transform-origin: left center;
+}
+[dir='rtl'] .indice__pronto .hoja {
+  transform: perspective(60rem) rotateY(14deg);
+  transform-origin: right center;
+}
+.indice__pronto .indice__nombre {
+  font-size: clamp(1.375rem, 1.1rem + 1.2vw, 1.75rem);
+}
+.indice__pronto .partida__pestana {
+  background: color-mix(in srgb, var(--suelo) 70%, transparent);
+}
+.indice__estado {
+  margin: 0;
+  font: 600 var(--t-folio) / 1 var(--f-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hoja-tinta-suave);
+}
+.indice .partida__pestana {
+  min-height: 3.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indice__vivo .hoja {
+    transition: none;
+  }
+}
+
+@media (min-width: 60rem) {
+  /* The hero shares the footer's 72rem column and sits centred in the first screen. */
+  .portada {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: center;
+    align-content: center;
+    gap: 4rem;
+    inline-size: min(100%, calc(72rem + 2 * var(--margen)));
+    min-block-size: calc(100dvh - 3.25rem);
+    padding-block: 3rem 4rem;
+  }
+  .portada__titulo {
+    margin-bottom: 2.25rem;
+  }
+  .guia {
+    padding-block: 5rem 6rem;
+  }
+  .hoja--texto {
+    padding-block: 1.75rem 2.25rem;
+    padding-inline: calc(var(--taladro-x) * 2 + 1.25rem) 2.5rem;
+  }
+  .documento {
+    padding-top: 3rem;
+  }
+}

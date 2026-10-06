@@ -1,0 +1,198 @@
+:root {
+  color-scheme: light;
+
+  --causa: #e8571e;
+  --fechas: #f6c700;
+  --salario: #3ba935;
+  --vacaciones: #0f8f8f;
+  --finiquito: #2d3fd3;
+  --resultado: #7a3fd1;
+  --legal: #8a4b2a;
+
+  --tinta: #16130f;
+  --blanco: #ffffff;
+  --sobre-causa: var(--tinta);
+  --sobre-fechas: var(--tinta);
+  --sobre-salario: var(--tinta);
+  --sobre-vacaciones: var(--tinta);
+  --sobre-finiquito: var(--blanco);
+  --sobre-resultado: var(--blanco);
+  --sobre-legal: var(--blanco);
+
+  --errata: #e8331c;
+  --errata-tira: #ee4426;
+  --sobre-errata: var(--tinta);
+
+  --tapa: #1c1a18;
+  --tapa-borde: #34302c;
+  --sobre-tapa: #f4f1ec;
+
+  /* Milky acetate: the sheet's lightness is solved against the ground so that,
+     composited at --hoja-alfa, text always lands on the same luminance band. */
+  --hoja-objetivo: 0.95;
+  --hoja-alfa-fria: 0.88;
+  --hoja-croma-fria: 0.18;
+  /* Warm grounds tint milky acetate cream. Their sheet takes a little of the opposite hue instead,
+     which cancels the ground showing through, so it composites to a near-neutral white: the
+     yellow needs the full counter-tint, orange and siena half of it. */
+  --hoja-alfa-calida: 0.92;
+  --hoja-croma-calida: 0.087;
+  --hoja-croma-calida-media: 0.043;
+  --hoja-giro-calido: 180;
+  --hoja-alfa: var(--hoja-alfa-fria);
+  --hoja-croma: var(--hoja-croma-fria);
+  --hoja-giro: 0;
+  --hoja-tinta: var(--tinta);
+  --hoja-filo: rgb(255 255 255 / 0.7);
+  --hoja-sombra: rgb(22 19 15 / 0.22);
+  --campo-fondo: #ffffff;
+  --campo-borde: var(--tinta);
+  --enlace-legal: #8a4b2a;
+
+  --f-grotesca:
+    'Golos Text Variable', 'Noto Kufi Arabic Variable', ui-sans-serif, system-ui, sans-serif;
+  --f-serif: 'Source Serif 4 Variable', 'Noto Naskh Arabic Variable', ui-serif, Georgia, serif;
+  --f-mono:
+    'Martian Mono Variable', 'Noto Kufi Arabic Variable', ui-monospace, 'SFMono-Regular', monospace;
+
+  --t-folio: 0.6875rem;
+  --t-pequeno: 0.9375rem;
+  --t-ui: 1.0625rem;
+  --t-ayuda: 1.0625rem;
+  --l-ayuda: 1.625rem;
+  --t-pregunta: clamp(1.625rem, 1.1rem + 2.4vw, 2.75rem);
+  --t-titulo: clamp(2.25rem, 1.4rem + 4vw, 4.5rem);
+
+  --medida: 62ch;
+  --riel: 3.5rem;
+  --tira: 2.5rem;
+  --barra: 4.75rem;
+  --radio-hoja: 0.875rem;
+  /* Binder holes near the corners, in the sheet's padding, so they never sit on a line of text. */
+  --taladro: 0.5rem;
+  --taladro-x: 1.125rem;
+  --taladro-y: 1.375rem;
+  --refuerzo: 0.25rem;
+
+  --paso: 90ms;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --causa: #c24919;
+  --fechas: #ddb300;
+  --salario: #38a032;
+  --vacaciones: #0c7878;
+  --finiquito: #2534b1;
+  --resultado: #6634af;
+  --legal: #733f23;
+  --sobre-causa: var(--blanco);
+  --sobre-vacaciones: var(--blanco);
+
+  --tapa: #0e0d0c;
+  --tapa-borde: #2a2724;
+
+  /* Smoked acetate: light enough, and chromatic enough, for the section's hue to read through. */
+  --hoja-objetivo: 0.32;
+  --hoja-alfa-fria: 0.86;
+  --hoja-croma-fria: 0.5;
+  --hoja-alfa-calida: 0.86;
+  --hoja-croma-calida: 0.5;
+  --hoja-croma-calida-media: 0.5;
+  --hoja-giro-calido: 0;
+  --hoja-tinta: #f4f1ec;
+  --hoja-filo: rgb(255 255 255 / 0.12);
+  --hoja-sombra: rgb(0 0 0 / 0.45);
+  --campo-fondo: #14120f;
+  --campo-borde: #cfc9c0;
+  --enlace-legal: #d99a74;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --causa: #c24919;
+    --fechas: #ddb300;
+    --salario: #38a032;
+    --vacaciones: #0c7878;
+    --finiquito: #2534b1;
+    --resultado: #6634af;
+    --legal: #733f23;
+    --sobre-causa: var(--blanco);
+    --sobre-vacaciones: var(--blanco);
+    --tapa: #0e0d0c;
+    --tapa-borde: #2a2724;
+    --hoja-objetivo: 0.32;
+    --hoja-alfa-fria: 0.86;
+    --hoja-croma-fria: 0.5;
+    --hoja-alfa-calida: 0.86;
+    --hoja-croma-calida: 0.5;
+    --hoja-croma-calida-media: 0.5;
+    --hoja-giro-calido: 0;
+    --hoja-tinta: #f4f1ec;
+    --hoja-filo: rgb(255 255 255 / 0.12);
+    --hoja-sombra: rgb(0 0 0 / 0.45);
+    --campo-fondo: #14120f;
+    --campo-borde: #cfc9c0;
+    --enlace-legal: #d99a74;
+  }
+}
+
+/* Each section is a divider: its ground and the ink that sits on it. */
+[data-seccion='causa'],
+[data-tono='causa'] {
+  --suelo: var(--causa);
+  --sobre-suelo: var(--sobre-causa);
+}
+[data-seccion='fechas'],
+[data-tono='fechas'] {
+  --suelo: var(--fechas);
+  --sobre-suelo: var(--sobre-fechas);
+}
+[data-seccion='salario'],
+[data-tono='salario'] {
+  --suelo: var(--salario);
+  --sobre-suelo: var(--sobre-salario);
+}
+[data-seccion='vacaciones'],
+[data-tono='vacaciones'] {
+  --suelo: var(--vacaciones);
+  --sobre-suelo: var(--sobre-vacaciones);
+}
+[data-seccion='finiquito'],
+[data-tono='finiquito'] {
+  --suelo: var(--finiquito);
+  --sobre-suelo: var(--sobre-finiquito);
+}
+[data-seccion='resultado'],
+[data-tono='resultado'] {
+  --suelo: var(--resultado);
+  --sobre-suelo: var(--sobre-resultado);
+}
+[data-seccion='legal'],
+[data-tono='legal'] {
+  --suelo: var(--legal);
+  --sobre-suelo: var(--sobre-legal);
+}
+
+/* Every ground sets its own acetate, so a nested sheet never inherits its parent's. */
+[data-seccion],
+[data-tono] {
+  --hoja-alfa: var(--hoja-alfa-fria);
+  --hoja-croma: var(--hoja-croma-fria);
+  --hoja-giro: 0;
+}
+[data-seccion='causa'],
+[data-tono='causa'],
+[data-seccion='fechas'],
+[data-tono='fechas'],
+[data-seccion='legal'],
+[data-tono='legal'] {
+  --hoja-alfa: var(--hoja-alfa-calida);
+  --hoja-croma: var(--hoja-croma-calida-media);
+  --hoja-giro: var(--hoja-giro-calido);
+}
+[data-seccion='fechas'],
+[data-tono='fechas'] {
+  --hoja-croma: var(--hoja-croma-calida);
+}

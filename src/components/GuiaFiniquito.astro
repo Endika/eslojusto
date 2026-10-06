@@ -1,0 +1,437 @@
+---
+import { preguntas } from '../contenido/preguntas';
+import { ET, FUENTES, LGSS } from '../motor/fuentes';
+import { t, type Clave } from '../i18n';
+import { enlace, type Idioma } from '../i18n/idiomas';
+
+interface Props {
+  idioma: Idioma;
+}
+const { idioma } = Astro.props;
+const tx = (clave: Clave) => t(idioma, clave);
+
+// Headings and labels come from the dictionary. The explanatory prose, the rules and the worked
+// examples are Spanish legal text: a language gets its own localized guide once it is reviewed.
+const causas = [
+  {
+    titulo: tx('guia.por_improcedente'),
+    regla: '33 días por año trabajado, con un tope de 24 mensualidades (720 días).',
+    cita: 'Art. 56 ET',
+  },
+  {
+    titulo: tx('guia.por_objetivo'),
+    regla:
+      '20 días por año, con un tope de 12 mensualidades (360 días, STS 651/2026). Además, 15 días de preaviso, y los que la empresa no dé se pagan.',
+    cita: 'Art. 53 ET',
+  },
+  {
+    titulo: tx('guia.por_fin_temporal'),
+    regla:
+      '12 días por año, en proporción a los días trabajados. Si empezó en 2011 o antes, 8 días; en 2012, 9; en 2013, 10; en 2014, 11. Los contratos de sustitución y los formativos no tienen indemnización. Si duró más de un año, 15 días de preaviso.',
+    cita: 'Art. 49.1.c ET y DT 8.ª',
+  },
+  {
+    titulo: tx('guia.por_dimision'),
+    regla:
+      'Sin indemnización. Si tu convenio fija un preaviso y no lo das, la empresa puede descontar los días que falten.',
+    cita: 'Art. 49.1.d ET',
+  },
+  {
+    titulo: tx('guia.por_disciplinario'),
+    regla:
+      'Sin indemnización si se declara procedente. Si se declara improcedente, se calcula como un despido improcedente.',
+    cita: 'Art. 55.7 y 56 ET',
+  },
+];
+
+const noRevisa = [
+  'El neto: las retenciones de IRPF y las cotizaciones.',
+  'Pluses, complementos, horas extra y comisiones de tu convenio o tu contrato.',
+  'Pagas extra además de las dos ordinarias.',
+  'Si la causa del despido está justificada, algo que decide un juzgado.',
+  'Los salarios de tramitación.',
+];
+
+// The same report the result links to.
+const vidaLaboral =
+  'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
+const fuentesParo = [
+  FUENTES.lgss267,
+  FUENTES.lgss268,
+  FUENTES.lgss269,
+  FUENTES.lgss270,
+  FUENTES.sepeCuantias,
+].map(({ norma, url, vigenteDesde }) => ({
+  norma,
+  url,
+  vigencia: t(idioma, 'cli.fuente.vigente', { fecha: vigenteDesde.split('-').reverse().join('-') }),
+}));
+---
+
+<article class="guia" data-tono="legal" aria-labelledby="guia-titulo">
+  <header class="guia__cabeza">
+    <h2 class="guia__titulo" id="guia-titulo">
+      {tx('guia.titulo')}
+    </h2>
+    <p class="guia__entrada">
+      Lo que lleva un finiquito y de dónde sale cada cifra, con su artículo. Los ejemplos usan un
+      salario de 1.500&nbsp;€ brutos al mes y dos pagas extra de 1.500&nbsp;€, que suman
+      21.000&nbsp;€ al año.
+    </p>
+    <p class="guia__fuentes">
+      <span>{tx('guia.actualizado')}</span>
+      <span>
+        {tx('guia.fuentes')}: <a href={ET}>{tx('guia.fuente_et')}</a> ·{' '}
+        <a href={FUENTES.guiaCgpj.url}>{tx('guia.fuente_cgpj')}</a> ·{' '}
+        <a href={LGSS}>{tx('guia.fuente_lgss')}</a> ·{' '}
+        <a href={FUENTES.sepeCuantias.url}>{tx('guia.fuente_sepe')}</a>
+      </span>
+      <a href={enlace('es', 'aviso-legal/')}>{tx('guia.quien')}</a>
+    </p>
+  </header>
+
+  <div class="guia__hojas">
+    <section class="hoja hoja--texto">
+      <h3 id="g-que-lleva">{tx('guia.que_lleva')}</h3>
+      <p>
+        Cuando termina tu contrato, la empresa te entrega una propuesta del documento de liquidación
+        con las cantidades que te debe (art. 49.2 ET). Ese es el finiquito, y recoge lo que ya has
+        ganado y aún no has cobrado:
+      </p>
+      <ul>
+        <li>El salario de los días trabajados del último mes (art. 26 ET).</li>
+        <li>Las vacaciones generadas y no disfrutadas (art. 38 ET).</li>
+        <li>
+          La parte generada de las pagas extra, si no van prorrateadas en la nómina (art. 31 ET).
+        </li>
+        <li>Los días de preaviso que la empresa no haya dado, cuando la ley lo exige.</li>
+      </ul>
+      <p>
+        Si el contrato acaba con derecho a indemnización, el documento de liquidación puede
+        incluirla también, pero legalmente es una cantidad distinta del finiquito, con sus propias
+        reglas y plazos. Todas las cifras son brutas, antes de retenciones y cotizaciones.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-diferencia">{tx('guia.diferencia')}</h3>
+      <p>
+        El finiquito te corresponde siempre que termina el contrato, también si te vas tú, porque es
+        dinero que ya has ganado. La indemnización compensa el fin del contrato y depende de la
+        causa.
+      </p>
+      <p>
+        Una dimisión no genera indemnización (art. 49.1.d ET). Un despido disciplinario declarado
+        procedente, tampoco (art. 55.7 ET); si se declara improcedente, se calcula como un despido
+        improcedente.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 55.7</span> ET
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-salario">{tx('guia.salario')}</h3>
+      <p>
+        Entran los días trabajados del mes en que acaba el contrato. El día puede valer tu salario
+        mensual entre 30 (mes comercial) o entre los días que tiene ese mes (mes natural). La
+        revisión da el margen entre las dos cuentas.
+      </p>
+      <p class="ejemplo">
+        <span class="ejemplo__etiqueta">{tx('guia.ejemplo')}</span> Baja el 15 de octubre:
+        1.500&nbsp;€ × 15/30 = 750,00&nbsp;€, o 1.500&nbsp;€ × 15/31 = 725,81&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>26</span> ET
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-vacaciones">{tx('guia.vacaciones')}</h3>
+      <p>
+        Son como mínimo treinta días naturales al año; tu convenio o tu contrato pueden dar más. Se
+        generan con cada día trabajado, y en el finiquito entran las de este año que no has
+        disfrutado. Muchas empresas las cuentan por meses (2,5 días por mes con 30 al año) en vez de
+        por días, y la revisión da el margen entre las dos cuentas. Cada día se paga entre tu
+        salario mensual / 30 y tu salario anual / 365.
+      </p>
+      <p class="ejemplo">
+        <span class="ejemplo__etiqueta">{tx('guia.ejemplo')}</span> Baja el 15 de octubre de 2026:
+        288 días trabajados en el año. 30 × 288/365 = 23,67 días generados. Si has disfrutado 15,
+        quedan unos 8,67 días: entre (30 × 288/365 − 15) × 1.500&nbsp;€/30 = 433,56&nbsp;€ y (30 ×
+        288/365 − 15) × 21.000&nbsp;€/365 = 498,89&nbsp;€.
+      </p>
+      <p>
+        Si has disfrutado más días de los generados, que proceda o no un descuento depende del
+        convenio.
+      </p>
+      <p class="folio">
+        Art. <span>38</span> ET
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-pagas">{tx('guia.pagas')}</h3>
+      <p>
+        La ley fija dos pagas extra al año, y el convenio su cuantía y cómo se generan. Si van
+        prorrateadas en tu nómina, ya las has cobrado mes a mes. Si no, entra la parte generada
+        desde que empezó su periodo: semestral (de enero a junio y de julio a diciembre) o anual (de
+        julio a junio la de verano, de enero a diciembre la de Navidad). Se puede contar por días o
+        por meses, y la revisión da el margen entre las dos cuentas. Si te vas en el mes en que se
+        cobra una paga (junio o julio la de verano, diciembre la de Navidad), puede ir ya en esa
+        nómina.
+      </p>
+      <p class="ejemplo">
+        <span class="ejemplo__etiqueta">{tx('guia.ejemplo')}</span> Paga de Navidad de 1.500&nbsp;€
+        con periodo semestral y baja el 15 de octubre: del 1 de julio al 15 de octubre van 107 de
+        184 días. 1.500&nbsp;€ × 107/184 = 872,28&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>31</span> ET
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-indemnizacion">{tx('guia.indemnizacion')}</h3>
+      <p>
+        Se cuenta en días de salario. El salario diario es tu salario anual, con las pagas extra,
+        entre 365, como hace la guía del CGPJ. En el ejemplo, 21.000&nbsp;€ / 365 ≈ 57,53&nbsp;€.
+        Los ejemplos multiplican por la cifra exacta, sin redondear. En los despidos, el tiempo
+        trabajado se cuenta en meses, y una fracción de mes cuenta como un mes entero.
+      </p>
+      <div class="causas">
+        {causas.map(({ titulo, regla, cita }) => (
+          <div>
+            <h4>{titulo}</h4>
+            <p>{regla}</p>
+            <p class="causas__cita">{cita}</p>
+          </div>
+        ))}
+      </div>
+      <p class="ejemplo">
+        <span class="ejemplo__etiqueta">Despido improcedente</span> del 3 de mayo de 2018 al 20 de
+        julio de 2026: 98 meses completos y unos días, que cuentan como 99. 33 días por año son 2,75
+        por mes: 99 × 2,75 = 272,25 días. 21.000&nbsp;€ × 272,25 / 365 = 15.663,70&nbsp;€.
+      </p>
+      <p class="ejemplo">
+        <span class="ejemplo__etiqueta">Despido objetivo</span> con las mismas fechas: 99 × 20/12 =
+        165 días. 21.000&nbsp;€ × 165 / 365 = 9.493,15&nbsp;€.
+      </p>
+      <p class="ejemplo">
+        <span class="ejemplo__etiqueta">Fin de un contrato temporal</span> de un año, del 1 de
+        octubre de 2025 al 30 de septiembre de 2026: 365 días × 12/365 = 12 días. 21.000&nbsp;€ × 12
+        / 365 = 690,41&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 53 · 56</span> ET
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-2012">{tx('guia.antes_2012')}</h3>
+      <p>
+        En un despido improcedente de un contrato anterior al 12 de febrero de 2012, la
+        indemnización se calcula en dos tramos:
+      </p>
+      <ul>
+        <li>Hasta el 11 de febrero de 2012: 45 días por año (3,75 por mes).</li>
+        <li>Desde el 12 de febrero de 2012: 33 días por año (2,75 por mes).</li>
+      </ul>
+      <p>
+        El total tiene un tope de 720 días, salvo que el primer tramo ya lo supere. En ese caso
+        cuenta solo el primer tramo, con un máximo de 42 mensualidades (1.260 días).
+      </p>
+      <p class="ejemplo">
+        <span class="ejemplo__etiqueta">{tx('guia.ejemplo')}</span> Del 1 de marzo de 2010 al 15 de
+        septiembre de 2026. Primer tramo: 24 meses × 3,75 = 90 días. Segundo tramo: 176 meses × 2,75
+        = 484 días. Total: 574 días. 21.000&nbsp;€ × 574 / 365 = 33.024,66&nbsp;€.
+      </p>
+      <p class="folio">
+        Disposición transitoria <span>11.ª</span> ET
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-propuesta">{tx('guia.propuesta')}</h3>
+      <p>
+        La empresa entrega una propuesta del documento de liquidación. La ley prevé que la persona
+        trabajadora pueda firmarla en presencia de alguien de la representación legal de la
+        plantilla.
+      </p>
+      <p>
+        Algunas personas firman indicando «recibí no conforme» cuando no están de acuerdo con alguna
+        cantidad. Lo contamos solo como información. Qué hacer en cada caso puede valorarlo un
+        despacho laboralista, un despacho de graduado social o un sindicato.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-plazos">{tx('guia.plazos')}</h3>
+      <p>
+        Para cantidades como el salario pendiente, las vacaciones, las pagas extra o la
+        indemnización por fin de contrato temporal, el plazo es de un año (art. 59.1 ET).
+      </p>
+      <p>
+        En un despido (objetivo, improcedente o disciplinario), el plazo para impugnarlo es de 20
+        días hábiles (art. 59.3 ET). Quien no esté de acuerdo con la indemnización de un despido
+        suele plantearlo por esa misma vía, dentro de esos 20 días.
+      </p>
+      <p>
+        El plazo es corto, y un despacho laboralista, un despacho de graduado social o un sindicato
+        pueden decirte cuál se aplica a tu caso.
+      </p>
+      <p class="folio">
+        Art. <span>59</span> ET
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-no-revisa">{tx('guia.no_revisa')}</h3>
+      <ul>
+        {noRevisa.map((texto) => (
+          <li>{texto}</li>
+        ))}
+      </ul>
+      <p>
+        Las vacaciones y las pagas extra se comparan con el mínimo de la ley, con el margen entre la
+        cuenta por días y la cuenta por meses; tu convenio puede mejorar esas cifras. Solo sale «no
+        se puede comprobar» cuando falta un dato sin el que no hay cifra legal, como el preaviso de
+        una dimisión o los días de vacaciones que has disfrutado.
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h2 id="g-paro">{tx('guia.paro')}</h2>
+      <p>
+        Cuando acaba un contrato, además del finiquito puede haber paro, la prestación contributiva
+        por desempleo. Para cobrarlo, el contrato tiene que terminar en una situación legal de
+        desempleo, y eso depende de la causa:
+      </p>
+      <ul>
+        <li>
+          Un despido objetivo, improcedente o disciplinario sí lo es (art. 267.1.a LGSS). El
+          disciplinario también cuenta aunque se declare procedente o no se impugne (art. 268.4
+          LGSS).
+        </li>
+        <li>
+          El fin de un contrato temporal sí, salvo que lo terminaras tú (art. 267.1.a.6.º LGSS).
+        </li>
+        <li>
+          Una baja voluntaria no (art. 267.2.a LGSS), salvo que te vayas por un traslado, por un
+          cambio sustancial de tus condiciones, por un incumplimiento grave de la empresa, como no
+          pagarte o pagarte tarde una y otra vez, o por violencia de género o sexual (art.
+          267.1.a.5.º LGSS).
+        </li>
+      </ul>
+      <p>
+        Además hacen falta al menos 360 días cotizados por desempleo en los 6 años anteriores que no
+        hayas usado ya para otro paro, y pueden sumar varios trabajos (arts. 266.b y 269 LGSS).
+        También hace falta estar de alta o en situación asimilada, inscribirte como demandante de
+        empleo, suscribir el acuerdo de actividad y no tener la edad de jubilación (art. 266 LGSS).
+      </p>
+      <p class="folio">
+        Arts. <span>266 · 267 · 268.4</span> LGSS
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-paro-cuanto">{tx('guia.paro_cuanto')}</h3>
+      <p>
+        La base es la media de lo cotizado por desempleo en los últimos 180 días, sin las horas
+        extra (art. 270.1 LGSS). Se cobra el 70&nbsp;% de la base los primeros 180 días y el
+        60&nbsp;% desde el día 181 (art. 270.2 LGSS).
+      </p>
+      <p>
+        Cada mes tiene un mínimo y un máximo según tus hijos o hijas a cargo (art. 270.3 LGSS). En
+        2026, con el IPREM en 600&nbsp;€, son estos:
+      </p>
+      <ul>
+        <li>Sin hijos o hijas a cargo, entre 560&nbsp;€ y 1.225&nbsp;€ al mes.</li>
+        <li>Con uno, entre 749&nbsp;€ y 1.400&nbsp;€.</li>
+        <li>Con dos o más, entre 749&nbsp;€ y 1.575&nbsp;€.</li>
+      </ul>
+      <p class="ejemplo">
+        <span class="ejemplo__etiqueta">{tx('guia.ejemplo')}</span> Con 21.000&nbsp;€ al año, la
+        base es 21.000&nbsp;€ / 12 = 1.750&nbsp;€ al mes. El 70&nbsp;% son 1.225&nbsp;€, justo el
+        máximo sin hijos o hijas a cargo, y el 60&nbsp;%, 1.050&nbsp;€.
+      </p>
+      <p>
+        Son cifras brutas. De ahí se descuenta un 4,85&nbsp;% de la base para la Seguridad Social y
+        el IRPF que corresponda. Las cifras de esta guía y de la revisión suponen jornada completa;
+        con jornada parcial son menores.
+      </p>
+      <p class="folio">
+        Art. <span>270</span> LGSS
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-paro-duracion">{tx('guia.paro_duracion')}</h3>
+      <p>
+        Depende de los días cotizados en los últimos 6 años que no se hayan usado para otro paro
+        (art. 269 LGSS):
+      </p>
+      <ul>
+        <li>De 360 a 539 días cotizados, 120 días de paro (4 meses).</li>
+        <li>
+          Cada 180 días cotizados más suman 60 días de paro (2 meses). De 540 a 719 son 180 días; de
+          720 a 899, 240; y así sucesivamente.
+        </li>
+        <li>Desde 2.160 días cotizados, el máximo, 720 días (24 meses).</li>
+      </ul>
+      <p class="ejemplo">
+        <span class="ejemplo__etiqueta">{tx('guia.ejemplo')}</span> Con tres años cotizados, 1.095
+        días, son 360 días de paro (12 meses).
+      </p>
+      <p>
+        Las vacaciones pagadas y no disfrutadas también cuentan como cotizadas (art. 269.4 LGSS).
+        Cada alta, cada baja y los días cotizados salen en el{' '}
+        <a href={vidaLaboral} rel="noopener">
+          {tx('resultado.paro_vida_laboral_enlace')}
+        </a>
+        .
+      </p>
+      <p class="folio">
+        Art. <span>269</span> LGSS
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h3 id="g-paro-plazo">{tx('guia.paro_plazo')}</h3>
+      <p>
+        Se pide en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga
+        vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (art. 268.1 y 268.3
+        LGSS). Pedirlo más tarde resta del paro los días de retraso (art. 268.2 LGSS).
+      </p>
+      <ul class="fuentes">
+        {fuentesParo.map(({ norma, url, vigencia }) => (
+          <li>
+            <a href={url}>{norma}</a>
+            <span class="fuentes__vigencia">{vigencia}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="folio">
+        Art. <span>268</span> LGSS
+      </p>
+    </section>
+
+    <section class="hoja hoja--texto">
+      <h2 id="g-preguntas">{tx('guia.preguntas')}</h2>
+      <div class="preguntas">
+        {preguntas(idioma).map(({ tema, pregunta, respuesta }) => (
+          <details class="pregunta-frecuente" id={tema} data-ayuda>
+            <summary>{pregunta}</summary>
+            <p>{respuesta}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>

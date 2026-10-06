@@ -1,0 +1,76 @@
+---
+import Base from '../../layouts/Base.astro';
+import { t, type Clave } from '../../i18n';
+
+// Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
+const tx = (clave: Clave) => t('es', clave);
+
+const correo = 'hola@eslojusto.es';
+---
+
+<Base
+  title={tx('aviso.titulo')}
+  description={tx('aviso.descripcion')}
+  idiomas={['es']}
+  path="/aviso-legal/"
+  seccion="legal"
+>
+  <main class="documento" id="contenido">
+    <header class="documento__cabeza">
+      <h1 class="documento__titulo">{tx('aviso.h1')}</h1>
+      <p class="documento__fecha">{tx('legal.actualizado')}</p>
+    </header>
+
+    <div class="documento__hojas">
+      <section class="hoja hoja--texto">
+        <h2 id="al-quien">{tx('aviso.quien')}</h2>
+        <p>
+          eslojusto.es es un proyecto de Endika Iglesias. Para cualquier consulta sobre la web,
+          escribe a <a href={`mailto:${correo}`}>{correo}</a>.
+        </p>
+      </section>
+
+      <section class="hoja hoja--texto">
+        <h2 id="al-que-hace">{tx('aviso.que_hace')}</h2>
+        <p>
+          Compara las cifras de tu finiquito con el mínimo que fija la ley, partida por partida. Las
+          fórmulas siguen el Estatuto de los Trabajadores y la guía práctica del CGPJ para el
+          cálculo de indemnizaciones (v0.6, julio de 2026), y cada cifra lleva el artículo del que
+          sale.
+        </p>
+        <p>
+          Cuando una regla admite dos cuentas, da el margen entre ambas. Lo que tu convenio
+          colectivo puede mejorar, como más días de vacaciones u otro devengo de las pagas extra, se
+          compara con el mínimo de la ley y lo avisa. Cuando falta un dato sin el que no hay cifra
+          legal, como el preaviso de una dimisión, lo marca como «no se puede comprobar» en vez de
+          dar una cifra que no puede saber.
+        </p>
+      </section>
+
+      <section class="hoja hoja--texto">
+        <h2 id="al-no-hace">{tx('aviso.no_hace')}</h2>
+        <ul>
+          <li>No es asesoramiento jurídico. Da información general sobre lo que dice la ley.</li>
+          <li>
+            No conoce tu convenio, ni revisa el neto, los pluses, las horas extra o las comisiones.
+          </li>
+          <li>No decide si la causa de un despido está justificada. Eso lo decide un juzgado.</li>
+          <li>No te dice qué hacer con tu finiquito.</li>
+        </ul>
+        <p>
+          No sustituye a un despacho laboralista, un despacho de graduado social o un sindicato, que
+          pueden revisar tu caso con tus documentos y tu convenio.
+        </p>
+      </section>
+
+      <section class="hoja hoja--texto">
+        <h2 id="al-errores">{tx('aviso.errores')}</h2>
+        <p>
+          Las indemnizaciones se contrastan con casos calculados por la calculadora del CGPJ. Si ves
+          una cifra que no cuadra con la ley, puedes escribir a{' '}
+          <a href={`mailto:${correo}`}>{correo}</a>.
+        </p>
+      </section>
+    </div>
+  </main>
+</Base>
