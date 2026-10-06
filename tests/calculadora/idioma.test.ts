@@ -123,6 +123,16 @@ describe('la barra «Esta página también está en …»', () => {
     expect([localStorage.length, sessionStorage.length]).toEqual([0, 0]);
   });
 
+  it.each(['javascript:alert(1)', 'https://otro.example/finiquito/', '//otro.example/x'])(
+    'no enlaza fuera del propio sitio: %s',
+    (url) => {
+      document.body.innerHTML = `<div class="suelo"></div><script id="otros-idiomas" type="application/json">${JSON.stringify(otros.map((o) => ({ ...o, url })))}</script>`;
+      document.documentElement.lang = 'es';
+      mostrarOtroIdioma(document, ['ar'], tr);
+      expect(document.querySelector('.otro-idioma')).toBeNull();
+    },
+  );
+
   it('no aparece sin idiomas alternativos, que es lo que publica hoy la web', () => {
     document.body.innerHTML = '<div class="suelo"></div>';
     mostrarOtroIdioma(document, ['ar'], tr);
