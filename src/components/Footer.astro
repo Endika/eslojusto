@@ -1,0 +1,32 @@
+---
+import { t } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+// The legal pages are long legal prose, published only in Spanish for now.
+const links = [
+  [link('es', 'aviso-legal/'), t(lang, 'footer.legal_notice')],
+  [link('es', 'privacidad/'), t(lang, 'footer.privacy')],
+] as const;
+const current = Astro.url.pathname;
+---
+
+<footer class="footer">
+  <div class="footer__inner">
+    <p class="footer__note">{t(lang, 'footer.note')}</p>
+    <nav aria-label={t(lang, 'footer.nav')}>
+      <ul class="footer__links">
+        {links.map(([href, name]) => (
+          <li>
+            <a href={href} aria-current={current === href ? 'page' : undefined}>
+              {name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</footer>

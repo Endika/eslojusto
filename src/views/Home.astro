@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+import { homeGraph } from '../content/structured-data';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+const comingSoon = [
+  ['salary', tx('home.contract')],
+  ['settlement', tx('home.rent')],
+] as const;
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+---
+
+<Base
+  title={tx('home.title')}
+  description={tx('home.description')}
+  path="/"
+  lang={lang}
+  section="dates"
+  structuredData={homeGraph(home, lang)}
+>
+  <main class="home" id="content">
+    <div class="home__head">
+      <h1 class="home__title">{tx('home.h1')}</h1>
+      <p class="home__lead">{tx('home.lead')}</p>
+      <p class="home__note">{tx('home.note')}</p>
+    </div>
+
+    <ul class="index" aria-label={tx('home.index')}>
+      <li class="item index__live" data-tone="cause">
+        <section class="sheet" data-tone="dates" aria-labelledby="index-final-pay">
+          <h2 class="index__name" id="index-final-pay">
+            <a href={link(lang, 'finiquito/')}>{tx('home.final_pay')}</a>
+          </h2>
+          <p class="index__text">{tx('home.final_pay_text')}</p>
+          <p class="index__citation">{tx('home.final_pay_citation')}</p>
+        </section>
+        <span class="item__tab" aria-hidden="true"></span>
+      </li>
+      {comingSoon.map(([tone, name]) => (
+        <li class="item index__soon" data-tone={tone}>
+          <section
+            class="sheet"
+            data-tone="dates"
+            aria-label={t(lang, 'home.coming_soon_aria', { nombre: name })}
+          >
+            <h2 class="index__name">{name}</h2>
+            <p class="index__status">{tx('home.coming_soon')}</p>
+          </section>
+          <span class="item__tab" aria-hidden="true" />
+        </li>
+      ))}
+    </ul>
+  </main>
+</Base>

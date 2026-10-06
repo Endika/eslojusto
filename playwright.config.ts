@@ -1,10 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// The RTL project needs a PRUEBA_RTL=1 build, so it only exists when that build is asked for.
-const rtl = process.env['PRUEBA_RTL'] === '1';
-// The measurement project needs a build with an analytics key; every other build has none.
-const medicion = process.env['PRUEBA_MEDICION'] === '1';
-const soloPorDefecto = /(rtl|medicion)\.spec\.ts/;
+// The RTL project needs a TEST_RTL=1 build, so it only exists when that build is asked for.
+const rtl = process.env['TEST_RTL'] === '1';
+// The analytics project needs a build with an analytics key; every other build has none.
+const analytics = process.env['TEST_ANALYTICS'] === '1';
+const optInSpecs = /(rtl|analytics)\.spec\.ts/;
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -13,20 +13,20 @@ export default defineConfig({
     command: 'npm run build && npm run preview',
     url: 'http://localhost:4321/',
     reuseExistingServer: !process.env['CI'],
-    ...(medicion ? { env: { PUBLIC_POSTHOG_KEY: 'phc_test' } } : {}),
+    ...(analytics ? { env: { PUBLIC_POSTHOG_KEY: 'phc_test' } } : {}),
   },
   projects: [
-    { name: 'escritorio', use: { ...devices['Desktop Chrome'] }, testIgnore: soloPorDefecto },
-    { name: 'movil', use: { ...devices['Pixel 7'] }, testIgnore: soloPorDefecto },
+    { name: 'desktop', use: { ...devices['Desktop Chrome'] }, testIgnore: optInSpecs },
+    { name: 'mobile', use: { ...devices['Pixel 7'] }, testIgnore: optInSpecs },
     ...(rtl
       ? [{ name: 'rtl', use: { ...devices['Desktop Chrome'] }, testMatch: /rtl\.spec\.ts/ }]
       : []),
-    ...(medicion
+    ...(analytics
       ? [
           {
-            name: 'medicion',
+            name: 'analytics',
             use: { ...devices['Desktop Chrome'] },
-            testMatch: /medicion\.spec\.ts/,
+            testMatch: /analytics\.spec\.ts/,
           },
         ]
       : []),

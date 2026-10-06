@@ -1,0 +1,57 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props {
+  name: string;
+  label: string;
+  hint?: string;
+  kind?: 'text' | 'date' | 'amount' | 'days';
+  value?: string;
+  extraHints?: string[];
+  row?: boolean;
+  attributes?: Record<string, string>;
+}
+const {
+  name,
+  label,
+  hint,
+  kind = 'text',
+  value,
+  extraHints = [],
+  row = false,
+  attributes = {},
+} = Astro.props;
+const hintId = `hint-${name}`;
+const errorId = `error-${name}`;
+const describe = [...(hint ? [hintId] : []), ...extraHints, errorId].join(' ');
+const inputAttributes: HTMLAttributes<'input'> =
+  kind === 'date'
+    ? { type: 'date' }
+    : kind === 'amount'
+      ? { type: 'text', inputmode: 'decimal', autocomplete: 'off', spellcheck: 'false' }
+      : kind === 'days'
+        ? { type: 'text', inputmode: 'numeric', autocomplete: 'off', spellcheck: 'false' }
+        : { type: 'text' };
+---
+
+<div class:list={['field', { 'field--row': row }]} data-field={name} {...attributes}>
+  <label class="field__label" for={name}>
+    {label}
+  </label>
+  {hint && (
+    <p class="hint" id={hintId}>
+      {hint}
+    </p>
+  )}
+  <input
+    class:list={['field__input', { 'field__input--figure': kind !== 'text' }]}
+    id={name}
+    name={name}
+    value={value}
+    aria-describedby={describe}
+    dir={kind === 'text' ? undefined : 'ltr'}
+    {...inputAttributes}
+  />
+  <slot />
+  <p class="errata" id={errorId} data-error-for={name} hidden></p>
+</div>

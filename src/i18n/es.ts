@@ -1,422 +1,425 @@
 // The source of truth for every visible UI string. Another language is a copy of this object
-// that `satisfies Record<Clave, string>`, so a missing key fails the typecheck.
-// Keys under `cli.` are also used by the browser scripts; the page ships them as JSON.
+// that `satisfies Record<Key, string>`, so a missing key fails the typecheck.
+// Keys under `client.` are also used by the browser scripts; the page ships them as JSON.
 export const es = {
-  'meta.og_imagen_alt': 'Logo de eslojusto.es: una hoja con una pestaña naranja.',
+  'meta.og_image_alt': 'Logo de eslojusto.es: una hoja con una pestaña naranja.',
 
-  'pie.nota':
+  'footer.note':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen el Estatuto de los Trabajadores y la guía del CGPJ (v0.6, julio de 2026).',
-  'pie.nav': 'Información legal',
-  'pie.aviso_legal': 'Aviso legal',
-  'pie.privacidad': 'Privacidad',
+  'footer.nav': 'Información legal',
+  'footer.legal_notice': 'Aviso legal',
+  'footer.privacy': 'Privacidad',
 
-  'portada.titulo': 'Calcula tu finiquito y comprueba si es justo · eslojusto.es',
-  'portada.descripcion':
+  'home.title': 'Calcula tu finiquito y comprueba si es justo · eslojusto.es',
+  'home.description':
     'Calcula el mínimo legal de tu finiquito y compáralo con lo que te pagan, partida por partida y con el artículo de cada cifra. Todo en tu dispositivo.',
-  'portada.h1': 'Comprueba si te pagan lo justo',
-  'portada.entrada':
+  'home.h1': 'Comprueba si te pagan lo justo',
+  'home.lead':
     'eslojusto.es compara lo que te pagan o te cobran con lo que marca la ley, cifra a cifra y con el artículo al lado. Por ahora revisa el finiquito.',
-  'portada.nota':
+  'home.note':
     'Todo se calcula en tu dispositivo y lo que escribes no sale de él. Sí se mide qué pasos usas, sin cookies y sin identificarte.',
-  'portada.indice': 'Trámites',
-  'portada.finiquito': 'Finiquito',
-  'portada.finiquito_texto':
+  'home.index': 'Trámites',
+  'home.final_pay': 'Finiquito',
+  'home.final_pay_text':
     'Tu finiquito frente al mínimo legal, partida por partida (salario del último mes, vacaciones, pagas extra, indemnización y preaviso), y una estimación de tu paro.',
-  'portada.finiquito_cita': 'Estatuto de los Trabajadores · guía del CGPJ v0.6',
-  'portada.contrato': 'Contrato de trabajo',
-  'portada.alquiler': 'Alquiler',
-  'portada.proximamente': 'Próximamente',
-  'portada.proximamente_aria': '{nombre}, próximamente',
+  'home.final_pay_citation': 'Estatuto de los Trabajadores · guía del CGPJ v0.6',
+  'home.contract': 'Contrato de trabajo',
+  'home.rent': 'Alquiler',
+  'home.coming_soon': 'Próximamente',
+  'home.coming_soon_aria': '{nombre}, próximamente',
 
-  'finiquito.titulo': 'Calcular finiquito 2026: compáralo con el mínimo legal',
-  'finiquito.descripcion':
+  'final_pay.title': 'Calcular finiquito 2026: compáralo con el mínimo legal',
+  'final_pay.description':
     'Calcula tu finiquito por despido, baja voluntaria o fin de contrato frente al mínimo legal: vacaciones, pagas extra, indemnización y preaviso. Y tu paro.',
-  'finiquito.h1': 'Calcula tu finiquito',
-  'finiquito.entrada':
+  'final_pay.h1': 'Calcula tu finiquito',
+  'final_pay.lead':
     'Calcula el mínimo legal de tu finiquito por despido, baja voluntaria o fin de contrato y compáralo con lo que te ofrece la empresa.',
-  'finiquito.sin_js':
+  'final_pay.no_js':
     'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
-  'pestanas.nav': 'Secciones',
-  'seccion.causa': 'Causa',
-  'seccion.fechas': 'Fechas',
-  'seccion.salario': 'Salario',
-  'seccion.vacaciones': 'Vacaciones y paro',
-  'seccion.finiquito': 'Tu finiquito',
-  'seccion.resultado': 'Resultado',
+  'tabs.nav': 'Secciones',
+  'section.cause': 'Causa',
+  'section.dates': 'Fechas',
+  'section.salary': 'Salario',
+  'section.holidays': 'Vacaciones y paro',
+  'section.settlement': 'Tu finiquito',
+  'section.result': 'Resultado',
 
   'form.aria': 'Revisión del finiquito',
-  'form.atras': 'Atrás',
-  'form.siguiente': 'Siguiente',
-  'form.revisar': 'Revisar',
-  'form.si': 'Sí',
+  'form.back': 'Atrás',
+  'form.next': 'Siguiente',
+  'form.review': 'Revisar',
+  'form.yes': 'Sí',
   'form.no': 'No',
 
-  'causa.pregunta': '¿Cómo terminó tu contrato?',
-  'causa.ayuda': 'Mira la carta de tu empresa.',
-  'causa.dimision': 'Baja voluntaria (dimisión)',
-  'causa.dimision_pista': 'Te vas por decisión propia.',
-  'causa.fin_temporal': 'Fin de contrato temporal',
-  'causa.fin_temporal_pista': 'Llega su fecha de fin.',
-  'causa.objetivo': 'Despido objetivo',
-  'causa.objetivo_pista': 'Causas económicas u otras.',
-  'causa.improcedente': 'Despido improcedente',
-  'causa.improcedente_pista': 'Reconocido o declarado así.',
-  'causa.disciplinario': 'Despido disciplinario',
-  'causa.disciplinario_pista': 'Alegan una falta grave.',
+  'cause.question': '¿Cómo terminó tu contrato?',
+  'cause.help': 'Mira la carta de tu empresa.',
+  'cause.resignation': 'Baja voluntaria (dimisión)',
+  'cause.resignation_hint': 'Te vas por decisión propia.',
+  'cause.fixed_term_end': 'Fin de contrato temporal',
+  'cause.fixed_term_end_hint': 'Llega su fecha de fin.',
+  'cause.objective_dismissal': 'Despido objetivo',
+  'cause.objective_dismissal_hint': 'Causas económicas u otras.',
+  'cause.unfair_dismissal': 'Despido improcedente',
+  'cause.unfair_dismissal_hint': 'Reconocido o declarado así.',
+  'cause.disciplinary_dismissal': 'Despido disciplinario',
+  'cause.disciplinary_dismissal_hint': 'Alegan una falta grave.',
 
-  'temporal.pregunta': '¿Qué tipo de contrato temporal tenías?',
-  'temporal.ayuda': 'Lo pone tu contrato, arriba.',
-  'temporal.circunstancias': 'Eventual',
-  'temporal.circunstancias_pista': 'Por circunstancias de la producción.',
-  'temporal.sustitucion': 'Sustitución',
-  'temporal.sustitucion_pista': 'Para cubrir a otra persona.',
-  'temporal.formativo': 'Formativo',
-  'temporal.formativo_pista': 'De formación o de prácticas.',
+  'fixed_term.question': '¿Qué tipo de contrato temporal tenías?',
+  'fixed_term.help': 'Lo pone tu contrato, arriba.',
+  'fixed_term.production_circumstances': 'Eventual',
+  'fixed_term.production_circumstances_hint': 'Por circunstancias de la producción.',
+  'fixed_term.replacement': 'Sustitución',
+  'fixed_term.replacement_hint': 'Para cubrir a otra persona.',
+  'fixed_term.training': 'Formativo',
+  'fixed_term.training_hint': 'De formación o de prácticas.',
 
-  'fechas.pregunta': '¿Cuándo empezaste y cuándo acabas?',
-  'fechas.ayuda':
+  'dates.question': '¿Cuándo empezaste y cuándo acabas?',
+  'dates.help':
     'Las dos fechas están en tu contrato y en la carta de baja. Si aún no te has ido, pon la prevista.',
-  'fechas.alta': 'Fecha de alta',
-  'fechas.alta_pista': 'Tu primer día en esta empresa.',
-  'fechas.baja': 'Fecha de baja',
-  'fechas.baja_pista': 'Tu último día de trabajo.',
+  'dates.start': 'Fecha de alta',
+  'dates.start_hint': 'Tu primer día en esta empresa.',
+  'dates.end': 'Fecha de baja',
+  'dates.end_hint': 'Tu último día de trabajo.',
 
-  'prorrateo.pregunta': '¿Tus pagas extra van prorrateadas en la nómina?',
-  'prorrateo.ayuda':
+  'prorating.question': '¿Tus pagas extra van prorrateadas en la nómina?',
+  'prorating.help':
     'Si cada nómina trae una parte de las pagas extra, van prorrateadas. Si las cobras aparte, en junio y en diciembre por ejemplo, no.',
-  'salario.pregunta': '¿Cuánto cobras?',
-  'salario.ayuda': 'En tu nómina, el bruto es lo que va antes de descuentos.',
-  'salario.mensual': 'Salario bruto mensual',
-  'salario.mensual_pista_si':
+  'salary.question': '¿Cuánto cobras?',
+  'salary.help': 'En tu nómina, el bruto es lo que va antes de descuentos.',
+  'salary.monthly': 'Salario bruto mensual',
+  'salary.monthly_hint_yes':
     'Lo que pone tu nómina cada mes, con la parte de pagas extra incluida. Por ejemplo, 1.850,00.',
-  'salario.mensual_pista_no': 'Tu bruto mensual sin las pagas extra. Por ejemplo, 1.850,00.',
+  'salary.monthly_hint_no': 'Tu bruto mensual sin las pagas extra. Por ejemplo, 1.850,00.',
 
-  'pagas.pregunta': '¿Cómo son tus pagas extra?',
-  'pagas.ayuda': 'Mira tu nómina de diciembre.',
-  'pagas.numero': 'Número de pagas extra',
-  'pagas.numero_pista': 'Lo normal son 2.',
-  'pagas.importe': 'Importe de cada paga',
-  'pagas.importe_pista': 'En bruto.',
-  'pagas.devengo': '¿Cuándo se generan?',
-  'pagas.devengo_pista': 'Lo dice tu convenio. Si no lo sabes, se miran las dos.',
-  'pagas.anual': 'Anual',
-  'pagas.semestral': 'Semestral',
-  'pagas.no_lo_se': 'No lo sé',
+  'extra_pay.question': '¿Cómo son tus pagas extra?',
+  'extra_pay.help': 'Mira tu nómina de diciembre.',
+  'extra_pay.count': 'Número de pagas extra',
+  'extra_pay.count_hint': 'Lo normal son 2.',
+  'extra_pay.amount': 'Importe de cada paga',
+  'extra_pay.amount_hint': 'En bruto.',
+  'extra_pay.accrual': '¿Cuándo se generan?',
+  'extra_pay.accrual_hint': 'Lo dice tu convenio. Si no lo sabes, se miran las dos.',
+  'extra_pay.annual': 'Anual',
+  'extra_pay.semiannual': 'Semestral',
+  'extra_pay.unknown': 'No lo sé',
 
-  'vacaciones.pregunta': 'Tus vacaciones y tu preaviso',
-  'vacaciones.anuales': 'Vacaciones al año',
-  'vacaciones.anuales_pista': 'Días naturales; 30 es el mínimo.',
-  'vacaciones.disfrutadas': 'Días naturales disfrutados',
-  'vacaciones.disfrutadas_pista': 'Este año. Una semana son 7.',
-  'vacaciones.disfrutadas_no_lo_se': 'No lo sé',
-  'vacaciones.preaviso_recibido': 'Días de preaviso que te dio la empresa',
-  'vacaciones.preaviso_recibido_pista': 'Entre la carta y tu último día; en blanco, 0.',
-  'vacaciones.preaviso_convenio': 'Preaviso del convenio',
-  'vacaciones.preaviso_convenio_pista': 'Días. Si no lo sabes, en blanco.',
-  'vacaciones.preaviso_dado': 'Días que avisaste',
-  'vacaciones.preaviso_dado_pista': 'En blanco cuenta 0.',
-  'vacaciones.sin_preaviso':
-    'Con un despido improcedente o disciplinario no hay preaviso que revisar.',
+  'holidays.question': 'Tus vacaciones y tu preaviso',
+  'holidays.annual': 'Vacaciones al año',
+  'holidays.annual_hint': 'Días naturales; 30 es el mínimo.',
+  'holidays.taken': 'Días naturales disfrutados',
+  'holidays.taken_hint': 'Este año. Una semana son 7.',
+  'holidays.taken_unknown': 'No lo sé',
+  'holidays.notice_received': 'Días de preaviso que te dio la empresa',
+  'holidays.notice_received_hint': 'Entre la carta y tu último día; en blanco, 0.',
+  'holidays.agreement_notice': 'Preaviso del convenio',
+  'holidays.agreement_notice_hint': 'Días. Si no lo sabes, en blanco.',
+  'holidays.notice_given': 'Días que avisaste',
+  'holidays.notice_given_hint': 'En blanco cuenta 0.',
+  'holidays.no_notice': 'Con un despido improcedente o disciplinario no hay preaviso que revisar.',
 
-  'hijos.pregunta': '¿Cuántos hijos o hijas tienes a tu cargo?',
-  'hijos.ayuda': 'Cambia el mínimo y el máximo de tu paro.',
-  'hijos.quien':
+  'children.question': '¿Cuántos hijos o hijas tienes a tu cargo?',
+  'children.help': 'Cambia el mínimo y el máximo de tu paro.',
+  'children.who':
     'Para el SEPE cuentan los menores de 26 años, los mayores con discapacidad y los menores en acogida que viven contigo o dependen de ti y no ingresan más del salario mínimo.',
-  'hijos.ninguno': 'Ninguno',
-  'hijos.uno': '1',
-  'hijos.dos': '2 o más',
-  'hijos.no_dice': 'Prefiero no decirlo',
+  'children.none': 'Ninguno',
+  'children.one': '1',
+  'children.two': '2 o más',
+  'children.not_said': 'Prefiero no decirlo',
 
-  'otros.pregunta': '¿Has trabajado en otros sitios en los últimos 6 años?',
-  'otros.ayuda': 'Es opcional. Con sus fechas, la duración del paro se acerca más a la tuya.',
-  'otros.no': 'No',
-  'otros.si': 'Sí, añadir fechas',
-  'otros.lista': 'Otros trabajos',
-  'otros.alta': 'Alta',
-  'otros.baja': 'Baja',
-  'otros.anadir': 'Añadir otro',
-  'otros.quitar': 'Quitar',
-  'otros.paro': '¿Has cobrado paro después de alguno?',
-  'otros.no_lo_se': 'No lo sé',
-  'otros.vida_laboral': 'Las fechas de alta y baja salen en tu',
-  'otros.vida_laboral_enlace': 'informe de vida laboral (sede de la Seguridad Social)',
+  'other_contracts.question': '¿Has trabajado en otros sitios en los últimos 6 años?',
+  'other_contracts.help':
+    'Es opcional. Con sus fechas, la duración del paro se acerca más a la tuya.',
+  'other_contracts.no': 'No',
+  'other_contracts.yes': 'Sí, añadir fechas',
+  'other_contracts.list': 'Otros trabajos',
+  'other_contracts.start': 'Alta',
+  'other_contracts.end': 'Baja',
+  'other_contracts.add': 'Añadir otro',
+  'other_contracts.remove': 'Quitar',
+  'other_contracts.benefit': '¿Has cobrado paro después de alguno?',
+  'other_contracts.unknown': 'No lo sé',
+  'other_contracts.work_history': 'Las fechas de alta y baja salen en tu',
+  'other_contracts.work_history_link': 'informe de vida laboral (sede de la Seguridad Social)',
 
-  'cifras.pregunta': '¿Qué pone tu finiquito?',
-  'cifras.ayuda': 'Copia cada importe bruto. Si una partida no aparece, en blanco.',
-  'cifras.salario_pendiente': 'Salario del mes de la baja',
-  'cifras.vacaciones': 'Vacaciones no disfrutadas',
-  'cifras.pagas_extra': 'Pagas extra',
-  'cifras.indemnizacion': 'Indemnización',
-  'cifras.preaviso_empresa': 'Falta de preaviso',
-  'cifras.descuento_preaviso': 'Descuento por no preavisar',
+  'figures.question': '¿Qué pone tu finiquito?',
+  'figures.help': 'Copia cada importe bruto. Si una partida no aparece, en blanco.',
+  'figures.pending_salary': 'Salario del mes de la baja',
+  'figures.holiday_pay': 'Vacaciones no disfrutadas',
+  'figures.extra_pay': 'Pagas extra',
+  'figures.severance': 'Indemnización',
+  'figures.employer_notice': 'Falta de preaviso',
+  'figures.notice_deduction': 'Descuento por no preavisar',
 
-  'resultado.titulo': 'Resultado',
-  'resultado.entrada':
+  'result.title': 'Resultado',
+  'result.lead':
     'Una hoja por partida, con lo que pone tu finiquito, el mínimo legal y de dónde sale.',
-  'resultado.no_revisado': 'Lo que esta revisión no comprueba',
-  'resultado.propuesta': 'La propuesta de liquidación',
-  'resultado.propuesta_1':
+  'result.unchecked': 'Lo que esta revisión no comprueba',
+  'result.proposal': 'La propuesta de liquidación',
+  'result.proposal_1':
     'Cuando te comunican el fin del contrato, la empresa tiene que darte una propuesta del documento de liquidación, que es el finiquito con cada partida (art. 49.2 del Estatuto de los Trabajadores).',
-  'resultado.propuesta_2':
+  'result.proposal_2':
     'Puedes pedir que alguien de la representación legal de la plantilla esté presente cuando suscribas el recibo del finiquito.',
-  'resultado.propuesta_3':
+  'result.proposal_3':
     'Un despacho laboralista, un despacho de graduado social o un sindicato pueden revisar tu caso con todos tus documentos.',
-  'resultado.propuesta_fuente': 'Estatuto de los Trabajadores, art. 49',
-  'resultado.en_tu_finiquito': 'En tu finiquito',
-  'resultado.segun_tu_dato': 'Según tu dato.',
-  'resultado.segun_tu_dato_nota':
+  'result.proposal_source': 'Estatuto de los Trabajadores, art. 49',
+  'result.in_your_final_pay': 'En tu finiquito',
+  'result.based_on_your_answer': 'Según tu dato.',
+  'result.based_on_your_answer_note':
     'Esta cifra parte de una respuesta tuya que la revisión no puede comprobar.',
-  'resultado.como_se_calcula': 'Cómo se calcula',
-  'resultado.reiniciar': 'Empezar de nuevo',
-  'resultado.paro': 'Tu paro (estimación)',
-  'resultado.paro_entrada':
+  'result.how_it_is_calculated': 'Cómo se calcula',
+  'result.restart': 'Empezar de nuevo',
+  'result.benefit': 'Tu paro (estimación)',
+  'result.benefit_lead':
     'Una estimación con los datos de esta revisión. La cifra que vale es la que reconozca el SEPE.',
-  'resultado.paro_requisitos':
+  'result.benefit_requirements':
     'Además hace falta estar de alta o en situación asimilada, inscribirte como demandante de empleo, suscribir el acuerdo de actividad y no tener la edad de jubilación (art. 266 LGSS). Esta revisión no lo comprueba.',
-  'resultado.paro_cuanto': 'Cuánto',
-  'resultado.paro_jornada':
+  'result.benefit_amount': 'Cuánto',
+  'result.benefit_full_time':
     'Estas cifras suponen jornada completa; con jornada parcial son menores.',
-  'resultado.paro_cuanto_tiempo': 'Cuánto tiempo',
-  'resultado.paro_cotizado': 'Días cotizados',
-  'resultado.paro_plazo': 'Plazo para pedirlo',
-  'resultado.paro_plazo_texto':
+  'result.benefit_duration': 'Cuánto tiempo',
+  'result.benefit_contributed': 'Días cotizados',
+  'result.benefit_deadline': 'Plazo para pedirlo',
+  'result.benefit_deadline_text':
     'Se pide en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (art. 268 LGSS).',
-  'resultado.paro_vida_laboral':
+  'result.benefit_work_history':
     'Tu vida laboral muestra cada alta y cada baja y los días cotizados:',
-  'resultado.paro_vida_laboral_enlace': 'informe de tu vida laboral (sede de la Seguridad Social)',
-  'resultado.paro_causa_justa':
+  'result.benefit_work_history_link': 'informe de tu vida laboral (sede de la Seguridad Social)',
+  'result.benefit_just_cause':
     'Hay excepciones. Irte por alguno de estos motivos sí es situación legal de desempleo y, si cumples el resto de requisitos, da derecho a paro: un traslado (art. 40 ET), un cambio sustancial de tus condiciones (art. 41.3 ET), un incumplimiento grave de la empresa, como no pagarte o pagarte tarde una y otra vez (art. 50 ET), o la violencia de género o sexual (art. 49.1.m ET). Lo recoge el art. 267.1.a.5.º LGSS. La salida por el art. 50 la suele declarar un juzgado.',
-  'resultado.paro_calculo':
+  'result.benefit_calculation':
     'La base es la media de lo cotizado por desempleo en los últimos 180 días; aquí sale de tu salario bruto anual con las pagas extra, entre 12, dentro de las bases mínima y máxima de 2026. Se cobra el 70 % de la base los primeros 180 días y el 60 % después, con un mínimo y un máximo según tus hijos o hijas a cargo. La duración sigue la escala del art. 269.1: 360 días cotizados en los últimos 6 años dan 120 días de paro, y cada 180 más suman 60, hasta 720.',
 
-  'guia.titulo': 'Cómo se calcula un finiquito',
-  'guia.ejemplo': 'Ejemplo.',
-  'guia.que_lleva': 'Qué lleva el finiquito',
-  'guia.diferencia': 'Finiquito e indemnización no son lo mismo',
-  'guia.salario': 'Salario del mes de la baja',
-  'guia.vacaciones': 'Vacaciones no disfrutadas',
-  'guia.pagas': 'Pagas extra',
-  'guia.indemnizacion': 'Indemnización según la causa',
-  'guia.por_improcedente': 'Finiquito por despido improcedente',
-  'guia.por_objetivo': 'Finiquito por despido objetivo',
-  'guia.por_fin_temporal': 'Finiquito por fin de contrato temporal',
-  'guia.por_dimision': 'Finiquito por baja voluntaria',
-  'guia.por_disciplinario': 'Finiquito por despido disciplinario',
-  'guia.antes_2012': 'Si empezaste antes del 12 de febrero de 2012',
-  'guia.propuesta': 'Firmar el finiquito como «no conforme»',
-  'guia.plazos': 'Plazos',
-  'guia.no_revisa': 'Lo que esta revisión no comprueba',
-  'guia.paro': 'Y el paro',
-  'guia.paro_cuanto': 'Cuánto paro se cobra',
-  'guia.paro_duracion': 'Cuánto dura el paro',
-  'guia.paro_plazo': 'Plazo para pedir el paro',
-  'guia.preguntas': 'Preguntas frecuentes',
-  'guia.actualizado': 'Actualizado: octubre de 2026',
-  'guia.fuentes': 'Fuentes',
-  'guia.fuente_et': 'Estatuto de los Trabajadores (BOE)',
-  'guia.fuente_cgpj': 'guía del CGPJ v0.6',
-  'guia.fuente_lgss': 'Ley General de la Seguridad Social (BOE)',
-  'guia.fuente_sepe': 'cuantías del SEPE',
-  'guia.quien': 'Quién está detrás',
+  'guide.title': 'Cómo se calcula un finiquito',
+  'guide.example': 'Ejemplo.',
+  'guide.what_it_includes': 'Qué lleva el finiquito',
+  'guide.difference': 'Finiquito e indemnización no son lo mismo',
+  'guide.salary': 'Salario del mes de la baja',
+  'guide.holidays': 'Vacaciones no disfrutadas',
+  'guide.extra_pay': 'Pagas extra',
+  'guide.severance': 'Indemnización según la causa',
+  'guide.unfair_dismissal': 'Finiquito por despido improcedente',
+  'guide.objective_dismissal': 'Finiquito por despido objetivo',
+  'guide.fixed_term_end': 'Finiquito por fin de contrato temporal',
+  'guide.resignation': 'Finiquito por baja voluntaria',
+  'guide.disciplinary_dismissal': 'Finiquito por despido disciplinario',
+  'guide.before_2012': 'Si empezaste antes del 12 de febrero de 2012',
+  'guide.proposal': 'Firmar el finiquito como «no conforme»',
+  'guide.deadlines': 'Plazos',
+  'guide.unchecked': 'Lo que esta revisión no comprueba',
+  'guide.benefit': 'Y el paro',
+  'guide.benefit_amount': 'Cuánto paro se cobra',
+  'guide.benefit_duration': 'Cuánto dura el paro',
+  'guide.benefit_deadline': 'Plazo para pedir el paro',
+  'guide.faq': 'Preguntas frecuentes',
+  'guide.updated': 'Actualizado: octubre de 2026',
+  'guide.sources': 'Fuentes',
+  'guide.source_et': 'Estatuto de los Trabajadores (BOE)',
+  'guide.source_cgpj': 'guía del CGPJ v0.6',
+  'guide.source_lgss': 'Ley General de la Seguridad Social (BOE)',
+  'guide.source_sepe': 'cuantías del SEPE',
+  'guide.who': 'Quién está detrás',
 
-  'faq.dimision': '¿Me corresponde finiquito si pido la baja voluntaria?',
-  'faq.dimision_r':
+  'faq.resignation': '¿Me corresponde finiquito si pido la baja voluntaria?',
+  'faq.resignation_answer':
     'Sí. El finiquito recoge lo que ya has ganado y aún no has cobrado, como el salario del último mes, las vacaciones no disfrutadas y la parte generada de las pagas extra. La dimisión no genera indemnización (art. 49.1.d ET).',
-  'faq.improcedente': '¿Cuánto es la indemnización por despido improcedente?',
-  'faq.improcedente_r':
+  'faq.unfair_dismissal': '¿Cuánto es la indemnización por despido improcedente?',
+  'faq.unfair_dismissal_answer':
     'Son 33 días de salario por año trabajado, con un tope de 24 mensualidades (720 días), según el art. 56 ET. Si tu contrato empezó antes del 12 de febrero de 2012, el tiempo hasta el 11 de febrero de 2012 se cuenta a 45 días por año (disposición transitoria 11.ª ET). El tope sigue en 720 días, salvo que ese primer tramo ya lo supere, y nunca más de 1.260.',
-  'faq.objetivo': '¿Cuánto es la indemnización por despido objetivo?',
-  'faq.objetivo_r':
+  'faq.objective_dismissal': '¿Cuánto es la indemnización por despido objetivo?',
+  'faq.objective_dismissal_answer':
     'Son 20 días de salario por año trabajado, con un tope de 12 mensualidades (360 días), y 15 días de preaviso (art. 53 ET). Si la empresa no da el preaviso, los días que falten se pagan.',
-  'faq.salario_diario': '¿Cómo se calcula el salario diario?',
-  'faq.salario_diario_r':
+  'faq.daily_salary': '¿Cómo se calcula el salario diario?',
+  'faq.daily_salary_answer':
     'Es tu salario bruto anual, con las pagas extra, entre 365. Así lo calcula la guía del CGPJ para las indemnizaciones.',
-  'faq.temporal': '¿Hay indemnización al acabar un contrato temporal?',
-  'faq.temporal_r':
+  'faq.fixed_term': '¿Hay indemnización al acabar un contrato temporal?',
+  'faq.fixed_term_answer':
     'Sí, 12 días por año, en proporción a los días trabajados (art. 49.1.c ET). Para contratos que empezaron entre 2011 y 2014 son de 8 a 11 días (disposición transitoria 8.ª ET). Los contratos de sustitución y los formativos no tienen indemnización.',
-  'faq.plazos': '¿Qué plazo tengo para pedir lo que falta en mi finiquito?',
-  'faq.plazos_r':
+  'faq.deadlines': '¿Qué plazo tengo para pedir lo que falta en mi finiquito?',
+  'faq.deadlines_answer':
     'Para cantidades como el salario pendiente, las vacaciones, las pagas extra o la indemnización por fin de contrato temporal, un año (art. 59.1 ET). En un despido (objetivo, improcedente o disciplinario), el plazo para impugnarlo es de 20 días hábiles (art. 59.3 ET), y quien no esté de acuerdo con su indemnización suele plantearlo por esa misma vía. El plazo es corto, y un despacho laboralista, un despacho de graduado social o un sindicato pueden decirte cuál se aplica a tu caso.',
-  'faq.paro': '¿Tengo paro si me despiden o se acaba mi contrato?',
-  'faq.paro_r':
+  'faq.benefit': '¿Tengo paro si me despiden o se acaba mi contrato?',
+  'faq.benefit_answer':
     'Cualquier despido es situación legal de desempleo, también el disciplinario aunque sea procedente, y el fin de un contrato temporal también lo es si no lo terminaste tú (arts. 267.1.a y 268.4 LGSS). Dejar el trabajo por decisión propia no lo es, salvo excepciones como un traslado o impagos graves de la empresa (art. 267 LGSS). Además hacen falta 360 días cotizados en los últimos 6 años, que pueden venir de varios trabajos, e inscribirte como demandante de empleo, entre otros requisitos (arts. 266 y 269.1 LGSS).',
-  'faq.paro_cuanto': '¿Cuánto paro voy a cobrar?',
-  'faq.paro_cuanto_r':
+  'faq.benefit_amount': '¿Cuánto paro voy a cobrar?',
+  'faq.benefit_amount_answer':
     'Depende de lo cotizado por desempleo en los últimos 180 días. Se cobra el 70 % de esa base los primeros 180 días y el 60 % después (art. 270 LGSS), y en 2026 cada mes queda entre 560 € y 1.575 € brutos según tus hijos o hijas a cargo (SEPE). Dura de 120 a 720 días según lo cotizado en los últimos 6 años (art. 269.1 LGSS). La revisión del finiquito lo estima con tus datos, para jornada completa.',
-  'faq.no_conforme': '¿Qué es firmar el finiquito como «no conforme»?',
-  'faq.no_conforme_r':
+  'faq.not_agreed': '¿Qué es firmar el finiquito como «no conforme»?',
+  'faq.not_agreed_answer':
     'Es suscribirlo añadiendo «recibí no conforme» o «no conforme». Algunas personas lo hacen cuando no están de acuerdo con alguna cantidad. La ley prevé además que puedas pedir que esté presente alguien de la representación legal de la plantilla (art. 49.2 ET). Lo contamos solo como información, y qué hacer en cada caso puede valorarlo un despacho laboralista, un despacho de graduado social o un sindicato.',
-  'faq.no_comprobable': '¿Cuándo sale una partida como «no se puede comprobar»?',
-  'faq.no_comprobable_r':
+  'faq.not_checkable': '¿Cuándo sale una partida como «no se puede comprobar»?',
+  'faq.not_checkable_answer':
     'Cuando falta un dato sin el que no hay una cifra legal con la que comparar. Pasa con el preaviso de una dimisión, que fija tu convenio, y con los días de vacaciones que has disfrutado si marcas «No lo sé». Las vacaciones y las pagas extra sí se comparan. Como las empresas las calculan por días o por meses, se da el margen entre las dos cuentas, y tu convenio puede mejorar esas cifras.',
-  'faq.datos': '¿Se envían mis datos a algún sitio?',
-  'faq.datos_r':
+  'faq.data': '¿Se envían mis datos a algún sitio?',
+  'faq.data_answer':
     'Lo que escribes, no. La revisión se calcula entera en tu navegador y no se guarda. Sí se mide qué pasos usas, sin cookies y sin identificarte: qué secciones abres, qué campo no se acepta o en qué tramo queda la diferencia. Nunca tus importes ni tus fechas. El detalle está en la página de privacidad.',
 
-  'legal.actualizado': 'Actualizado el 6 de octubre de 2026',
-  'aviso.titulo': 'Aviso legal · eslojusto.es',
-  'aviso.descripcion':
+  'legal.updated': 'Actualizado el 6 de octubre de 2026',
+  'legal_notice.title': 'Aviso legal · eslojusto.es',
+  'legal_notice.description':
     'Quién está detrás de eslojusto.es y qué hace y qué no hace su revisión del finiquito. Informa sobre la ley y no da asesoramiento jurídico.',
-  'aviso.h1': 'Aviso legal',
-  'aviso.quien': 'Quién está detrás',
-  'aviso.que_hace': 'Qué hace la herramienta',
-  'aviso.no_hace': 'Qué no hace',
-  'aviso.errores': 'Errores en las cifras',
-  'no_encontrada.titulo': 'Página no encontrada · eslojusto.es',
-  'no_encontrada.descripcion':
+  'legal_notice.h1': 'Aviso legal',
+  'legal_notice.who': 'Quién está detrás',
+  'legal_notice.what_it_does': 'Qué hace la herramienta',
+  'legal_notice.what_it_does_not': 'Qué no hace',
+  'legal_notice.errors': 'Errores en las cifras',
+  'not_found.title': 'Página no encontrada · eslojusto.es',
+  'not_found.description':
     'Esta dirección no lleva a ninguna página de eslojusto.es. Desde aquí puedes ir a la revisión del finiquito o a la portada.',
-  'no_encontrada.h1': 'No encontramos esta página',
-  'no_encontrada.entrada':
+  'not_found.h1': 'No encontramos esta página',
+  'not_found.lead':
     'Puede que el enlace esté mal escrito o que la página haya cambiado de dirección.',
-  'no_encontrada.indice': 'Páginas de eslojusto.es',
-  'no_encontrada.finiquito_texto':
+  'not_found.index': 'Páginas de eslojusto.es',
+  'not_found.final_pay_text':
     'Calcula el mínimo legal de tu finiquito y compáralo con lo que te ofrece la empresa.',
-  'no_encontrada.portada': 'Portada',
-  'no_encontrada.portada_texto': 'Qué revisa eslojusto.es y qué llegará después.',
-  'privacidad.titulo': 'Privacidad · eslojusto.es',
-  'privacidad.descripcion':
+  'not_found.home': 'Portada',
+  'not_found.home_text': 'Qué revisa eslojusto.es y qué llegará después.',
+  'privacy.title': 'Privacidad · eslojusto.es',
+  'privacy.description':
     'Lo que escribes al revisar tu finiquito no sale de tu navegador. No hay cookies y los pasos se miden sin identificarte, con PostHog en la Unión Europea.',
-  'privacidad.h1': 'Privacidad',
-  'privacidad.resumen': 'En resumen',
-  'privacidad.datos': 'Qué se guarda y dónde',
-  'privacidad.dato_revision': 'Lo que escribes en la revisión',
-  'privacidad.dato_tema': 'Tu elección de tema (claro u oscuro)',
-  'privacidad.dato_medicion': 'Lo que se mide de tu visita',
-  'privacidad.dato_servidor': 'Los registros del servidor',
-  'privacidad.medicion': 'Qué se mide',
-  'privacidad.quien': 'Quién lo recibe',
-  'privacidad.cookies': 'Sin cookies',
-  'privacidad.base': 'Por qué se mide',
-  'privacidad.responsable': 'Responsable, contacto y derechos',
+  'privacy.h1': 'Privacidad',
+  'privacy.summary': 'En resumen',
+  'privacy.data': 'Qué se guarda y dónde',
+  'privacy.data_review': 'Lo que escribes en la revisión',
+  'privacy.data_theme': 'Tu elección de tema (claro u oscuro)',
+  'privacy.data_analytics': 'Lo que se mide de tu visita',
+  'privacy.data_server': 'Los registros del servidor',
+  'privacy.analytics': 'Qué se mide',
+  'privacy.who': 'Quién lo recibe',
+  'privacy.cookies': 'Sin cookies',
+  'privacy.legal_basis': 'Por qué se mide',
+  'privacy.controller': 'Responsable, contacto y derechos',
 
-  'cli.tema.a_oscuro': 'Tema: pasar a oscuro',
-  'cli.tema.a_claro': 'Tema: pasar a claro',
-  'cli.otro_idioma.aria': 'Otro idioma',
-  'cli.otro_idioma.texto': 'Esta página también está en {idioma}.',
-  'cli.otro_idioma.cerrar': 'Cerrar el aviso de idioma',
+  'client.theme.to_dark': 'Tema: pasar a oscuro',
+  'client.theme.to_light': 'Tema: pasar a claro',
+  'client.other_language.aria': 'Otro idioma',
+  'client.other_language.text': 'Esta página también está en {idioma}.',
+  'client.other_language.close': 'Cerrar el aviso de idioma',
 
-  'cli.estado.por_debajo': 'Por debajo del mínimo legal: faltan {importe}',
-  'cli.estado.coincide': 'Coincide con el mínimo legal',
-  'cli.estado.por_encima': 'Por encima del mínimo legal',
-  'cli.estado.descuento_mayor': 'El descuento supera el máximo: {importe}',
-  'cli.estado.descuento_dentro': 'Descuento dentro del máximo',
-  'cli.estado.no_comprobable': 'No se puede comprobar sin tu convenio',
-  'cli.estado.sin_cifra_empresa': 'No has metido la cifra de tu finiquito',
-  'cli.estado.sin_indemnizacion': 'No te corresponde indemnización por ley en este caso',
-  'cli.estado.sin_indemnizacion_disciplinario':
+  'client.status.below_minimum': 'Por debajo del mínimo legal: faltan {importe}',
+  'client.status.matches': 'Coincide con el mínimo legal',
+  'client.status.above_minimum': 'Por encima del mínimo legal',
+  'client.status.deduction_too_high': 'El descuento supera el máximo: {importe}',
+  'client.status.deduction_within_max': 'Descuento dentro del máximo',
+  'client.status.not_checkable': 'No se puede comprobar sin tu convenio',
+  'client.status.no_employer_figure': 'No has metido la cifra de tu finiquito',
+  'client.status.no_severance': 'No te corresponde indemnización por ley en este caso',
+  'client.status.no_severance_disciplinary':
     'Si el despido es procedente, no hay indemnización (art. 55.7 ET). Si se declarara improcedente, la referencia sería {importe}; el plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
-  'cli.estado.no_comprobable_dias': 'No se puede comprobar sin los días que has disfrutado',
-  'cli.rango.minimo': 'Mínimo legal',
-  'cli.rango.maximo_descuento': 'Máximo que pueden descontarte',
-  'cli.rango.convenio': 'Depende de tu convenio',
-  'cli.rango.dias': 'Depende de los días que has disfrutado',
-  'cli.rango.entre': 'entre {minimo} y {maximo}',
-  'cli.sin_cifra': 'Sin cifra',
-  'cli.convenio_mejora': 'Tu convenio puede mejorar esta cifra (más días, otro devengo).',
-  'cli.fuente.vigente': 'en vigor desde {fecha}',
-  'cli.referencia_improcedente':
+  'client.status.not_checkable_days': 'No se puede comprobar sin los días que has disfrutado',
+  'client.range.minimum': 'Mínimo legal',
+  'client.range.maximum_deduction': 'Máximo que pueden descontarte',
+  'client.range.agreement': 'Depende de tu convenio',
+  'client.range.days': 'Depende de los días que has disfrutado',
+  'client.range.between': 'entre {minimo} y {maximo}',
+  'client.no_figure': 'Sin cifra',
+  'client.agreement_may_improve': 'Tu convenio puede mejorar esta cifra (más días, otro devengo).',
+  'client.source.in_force': 'en vigor desde {fecha}',
+  'client.unfair_reference':
     'Si un juzgado declarase improcedente el despido, la indemnización sería de {importe}.',
 
-  'cli.otros.contrato': 'Otro trabajo {n}',
-  'cli.otros.alta': 'Fecha de alta del trabajo {n}',
-  'cli.otros.baja': 'Fecha de baja del trabajo {n}',
-  'cli.otros.quitar': 'Quitar el otro trabajo {n}',
+  'client.other_contracts.contract': 'Otro trabajo {n}',
+  'client.other_contracts.start': 'Fecha de alta del trabajo {n}',
+  'client.other_contracts.end': 'Fecha de baja del trabajo {n}',
+  'client.other_contracts.remove': 'Quitar el otro trabajo {n}',
 
-  'cli.paro.estado.si': 'Esta causa da derecho a paro si cumples el resto de requisitos',
-  'cli.paro.estado.no': 'No da derecho a paro',
-  'cli.paro.motivo.dimision':
+  'client.unemployment.status.yes':
+    'Esta causa da derecho a paro si cumples el resto de requisitos',
+  'client.unemployment.status.no': 'No da derecho a paro',
+  'client.unemployment.reason.resignation':
     'Dejar el trabajo por decisión propia no es situación legal de desempleo (art. 267.2.a LGSS).',
-  'cli.paro.motivo.fin_temporal':
+  'client.unemployment.reason.fixed_term_end':
     'El fin de un contrato temporal es situación legal de desempleo, salvo que lo terminaras tú (art. 267.1.a.6.º LGSS).',
-  'cli.paro.motivo.objetivo':
+  'client.unemployment.reason.objective_dismissal':
     'El despido objetivo es situación legal de desempleo (art. 267.1.a.4.º LGSS).',
-  'cli.paro.motivo.improcedente':
+  'client.unemployment.reason.unfair_dismissal':
     'El despido es situación legal de desempleo (art. 267.1.a.3.º LGSS).',
-  'cli.paro.motivo.disciplinario':
+  'client.unemployment.reason.disciplinary_dismissal':
     'El despido disciplinario también es situación legal de desempleo, aunque no se impugne (arts. 267.1.a.3.º y 268.4 LGSS).',
-  'cli.paro.unos': 'unos {importe}',
-  'cli.paro.cuantia.dos':
+  'client.unemployment.about': 'unos {importe}',
+  'client.unemployment.amount.two':
     'Serían {tramo1} al mes los primeros 6 meses y {tramo2} después, en bruto.',
-  'cli.paro.cuantia.uno': 'Serían {tramo1} al mes, en bruto.',
-  'cli.paro.cuantia.sin_hijos':
+  'client.unemployment.amount.one': 'Serían {tramo1} al mes, en bruto.',
+  'client.unemployment.amount.children_unknown':
     'Es un margen porque no has dicho cuántos hijos o hijas tienes a tu cargo: el mínimo y el máximo cambian según cuántos tengas.',
-  'cli.paro.descuento':
+  'client.unemployment.deduction':
     'De ahí se descuentan unos {ss} al mes de Seguridad Social y el IRPF que te corresponda, que esta revisión no calcula.',
-  'cli.paro.sin_cifras':
+  'client.unemployment.no_figures':
     'Depende de tus últimas nóminas. La cantidad sale de lo cotizado en los últimos 180 días (art. 270.1 LGSS) y este contrato dura menos, así que entra otro trabajo que esta revisión no conoce.',
-  'cli.paro.sin_cifras_base':
+  'client.unemployment.no_figures_base':
     'Con este salario no podemos estimar la cuantía (puede ser jornada parcial); depende de tus bases de cotización.',
-  'cli.paro.duracion.maximo': 'Unos {dias} días ({meses} meses), el máximo.',
-  'cli.paro.duracion.al_menos':
+  'client.unemployment.duration.maximum': 'Unos {dias} días ({meses} meses), el máximo.',
+  'client.unemployment.duration.at_least':
     'Al menos unos {dias} días ({meses} meses) solo por este trabajo. Si cotizaste en otros trabajos en los últimos 6 años y no los usaste para otro paro, puede ser más; lo ves en tu vida laboral.',
-  'cli.paro.duracion.exacta': 'Unos {dias} días ({meses} meses), con las fechas que has puesto.',
-  'cli.paro.duracion.hasta':
+  'client.unemployment.duration.exact':
+    'Unos {dias} días ({meses} meses), con las fechas que has puesto.',
+  'client.unemployment.duration.up_to':
     'Hasta unos {dias} días ({meses} meses); si cobraste paro después de alguno de estos contratos, esos días ya se usaron y puede ser menos (art. 269.2 LGSS).',
-  'cli.paro.duracion.depende':
+  'client.unemployment.duration.depends':
     'Depende de lo que hayas cotizado en otros trabajos: con lo que sabe esta revisión no se llega a 360 días. Lo ves en tu vida laboral.',
-  'cli.paro.duracion.vacaciones':
+  'client.unemployment.duration.holiday_note':
     'Las vacaciones pagadas y no disfrutadas también cuentan como cotizadas (art. 269.4 LGSS) y aquí no se suman, así que puede salir algo más.',
-  'cli.paro.carencia.este':
+  'client.unemployment.qualifying.this_contract':
     'Solo con este contrato ya tienes los 360 días cotizados que hacen falta en los últimos 6 años (art. 269.1 LGSS).',
-  'cli.paro.carencia.otros':
+  'client.unemployment.qualifying.other_contracts':
     'Con este contrato y los que has añadido sumas {dias} días cotizados; hacen falta 360 en los últimos 6 años (art. 269.1 LGSS).',
-  'cli.paro.carencia.depende':
+  'client.unemployment.qualifying.depends':
     'Con este contrato llevas {dias} días cotizados; hacen falta 360 en los últimos 6 años (art. 269.1 LGSS). Si trabajaste antes, lo ves en tu vida laboral.',
-  'cli.paro.carencia.depende_otros':
+  'client.unemployment.qualifying.depends_other_contracts':
     'Con estos contratos sumas {dias} días cotizados; hacen falta 360 en los últimos 6 años que no hayas usado ya para otro paro (art. 269 LGSS). Lo ves en tu vida laboral.',
 
-  'cli.partida.salario_pendiente': 'Salario del mes de la baja',
-  'cli.partida.vacaciones': 'Vacaciones devengadas y no disfrutadas',
-  'cli.partida.pagas_extra': 'Pagas extra devengadas',
-  'cli.partida.indemnizacion': 'Indemnización',
-  'cli.partida.preaviso_empresa': 'Preaviso no dado por la empresa',
-  'cli.partida.descuento_preaviso': 'Descuento por preaviso no cumplido',
+  'client.item.pending_salary': 'Salario del mes de la baja',
+  'client.item.holiday_pay': 'Vacaciones devengadas y no disfrutadas',
+  'client.item.extra_pay': 'Pagas extra devengadas',
+  'client.item.severance': 'Indemnización',
+  'client.item.employer_notice': 'Preaviso no dado por la empresa',
+  'client.item.notice_deduction': 'Descuento por preaviso no cumplido',
 
-  'cli.no_revisado.neto': 'El neto: retenciones de IRPF y cotizaciones',
-  'cli.no_revisado.pluses':
+  'client.unchecked.net_pay': 'El neto: retenciones de IRPF y cotizaciones',
+  'client.unchecked.bonuses':
     'Pluses, complementos, horas extra y comisiones de tu convenio o contrato',
-  'cli.no_revisado.pagas_adicionales': 'Pagas extra además de las dos ordinarias',
-  'cli.no_revisado.causa_despido':
+  'client.unchecked.additional_extra_pay': 'Pagas extra además de las dos ordinarias',
+  'client.unchecked.dismissal_cause':
     'Si la causa de despido está justificada, algo que decide un juzgado',
-  'cli.no_revisado.salarios_tramitacion': 'Salarios de tramitación',
+  'client.unchecked.processing_wages': 'Salarios de tramitación',
 
-  'cli.error.falta_causa': 'Elige cómo terminó tu contrato',
-  'cli.error.falta_tipoTemporal': 'Elige el tipo de contrato temporal',
-  'cli.error.falta_fechaAlta': 'Escribe la fecha de alta',
-  'cli.error.falta_fechaBaja': 'Escribe la fecha de baja',
-  'cli.error.falta_salarioMensual': 'Escribe tu salario bruto mensual',
-  'cli.error.falta_pagasProrrateadas': 'Elige sí o no',
-  'cli.error.falta_numeroPagas': 'Escribe cuántas pagas extra tienes',
-  'cli.error.falta_importePaga': 'Falta el importe',
-  'cli.error.falta_diasVacacionesAnuales': 'Escribe cuántos días de vacaciones tienes al año',
-  'cli.error.falta_diasVacacionesDisfrutadas':
+  'client.error.missing_cause': 'Elige cómo terminó tu contrato',
+  'client.error.missing_fixedTermType': 'Elige el tipo de contrato temporal',
+  'client.error.missing_startDate': 'Escribe la fecha de alta',
+  'client.error.missing_endDate': 'Escribe la fecha de baja',
+  'client.error.missing_monthlySalary': 'Escribe tu salario bruto mensual',
+  'client.error.missing_extraPayProrated': 'Elige sí o no',
+  'client.error.missing_extraPayCount': 'Escribe cuántas pagas extra tienes',
+  'client.error.missing_extraPayAmount': 'Falta el importe',
+  'client.error.missing_annualHolidayDays': 'Escribe cuántos días de vacaciones tienes al año',
+  'client.error.missing_holidayDaysTaken':
     'Escribe cuántos días has disfrutado este año (0 si ninguno) o marca «No lo sé»',
-  'cli.error.falta_dato': 'Falta este dato',
-  'cli.error.fecha_no_valida': 'La fecha no es válida',
-  'cli.error.cifra_no_valida': 'No se entiende la cifra: escríbela como 1.234,56',
-  'cli.error.fecha_alta_no_valida': 'La fecha de alta no es válida',
-  'cli.error.fecha_baja_no_valida': 'La fecha de baja no es válida',
-  'cli.error.baja_antes_de_alta': 'La fecha de baja es anterior a la de alta',
-  'cli.error.baja_muy_lejana': 'La fecha de baja no puede estar a más de un año en el futuro',
-  'cli.error.salario_fuera_de_rango':
+  'client.error.missing_value': 'Falta este dato',
+  'client.error.invalid_date': 'La fecha no es válida',
+  'client.error.invalid_amount': 'No se entiende la cifra: escríbela como 1.234,56',
+  'client.error.invalid_start_date': 'La fecha de alta no es válida',
+  'client.error.invalid_end_date': 'La fecha de baja no es válida',
+  'client.error.end_before_start': 'La fecha de baja es anterior a la de alta',
+  'client.error.end_too_far_ahead': 'La fecha de baja no puede estar a más de un año en el futuro',
+  'client.error.salary_out_of_range':
     'El salario mensual debe ser mayor que 0 y no pasar de 1.000.000 €',
-  'cli.error.pagas_fuera_de_rango': 'El número de pagas debe estar entre 0 y 6',
-  'cli.error.importe_paga_fuera_de_rango':
+  'client.error.extra_pay_count_out_of_range': 'El número de pagas debe estar entre 0 y 6',
+  'client.error.extra_pay_amount_out_of_range':
     'El importe de la paga extra debe ser mayor que 0 y no pasar de 1.000.000 €',
-  'cli.error.vacaciones_anuales_fuera_de_rango':
+  'client.error.annual_holidays_out_of_range':
     'Los días de vacaciones al año deben estar entre 0 y 60',
-  'cli.error.vacaciones_disfrutadas_fuera_de_rango':
+  'client.error.holidays_taken_out_of_range':
     'Los días de vacaciones disfrutados deben estar entre 0 y 60',
-  'cli.error.preaviso_fuera_de_rango': 'Los días de preaviso deben estar entre 0 y 90',
-  'cli.error.falta_tipo_temporal': 'Indica el tipo de contrato temporal',
-  'cli.error.falta_hijos': 'Elige una opción; «Prefiero no decirlo» también vale',
-  'cli.error.falta_paroCobradoDespues': 'Elige sí, no o «No lo sé»',
-  'cli.error.otro_contrato_fecha_alta_no_valida': 'La fecha de alta de este contrato no es válida',
-  'cli.error.otro_contrato_fecha_baja_no_valida': 'La fecha de baja de este contrato no es válida',
-  'cli.error.otro_contrato_baja_antes_de_alta':
+  'client.error.notice_out_of_range': 'Los días de preaviso deben estar entre 0 y 90',
+  'client.error.missing_fixed_term_type': 'Indica el tipo de contrato temporal',
+  'client.error.missing_children': 'Elige una opción; «Prefiero no decirlo» también vale',
+  'client.error.missing_benefitDrawnSince': 'Elige sí, no o «No lo sé»',
+  'client.error.other_contract_invalid_start_date':
+    'La fecha de alta de este contrato no es válida',
+  'client.error.other_contract_invalid_end_date': 'La fecha de baja de este contrato no es válida',
+  'client.error.other_contract_end_before_start':
     'La fecha de baja de este contrato es anterior a la de alta',
-  'cli.error.otro_contrato_baja_posterior':
+  'client.error.other_contract_ends_after_this_one':
     'La fecha de baja de este contrato es posterior a la del contrato que estás revisando',
 } as const satisfies Record<string, string>;
 
-export type Clave = keyof typeof es;
+export type Key = keyof typeof es;
