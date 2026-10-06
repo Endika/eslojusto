@@ -71,13 +71,15 @@ export function mostrarOtroIdioma(doc: Document, navegador: readonly string[], t
     doc.documentElement.lang,
   );
   if (!sugerido) return;
+  const destino = new URL(sugerido.url, doc.location.href);
+  if (destino.origin !== doc.location.origin) return;
 
   const barra = doc.createElement('aside');
   barra.className = 'otro-idioma';
   barra.setAttribute('aria-label', tr('cli.otro_idioma.aria'));
   const texto = doc.createElement('p');
   const enlace = doc.createElement('a');
-  enlace.href = sugerido.url;
+  enlace.href = destino.pathname;
   enlace.hreflang = sugerido.codigo;
   enlace.lang = sugerido.codigo;
   enlace.textContent = sugerido.nombre;
