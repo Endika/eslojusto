@@ -1,37 +1,37 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { t, type Clave } from '../../i18n';
+import { t, type Key } from '../../i18n';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
-const tx = (clave: Clave) => t('es', clave);
+const tx = (key: Key) => t('es', key);
 
-const correo = 'hola@eslojusto.es';
+const email = 'hola@eslojusto.es';
 ---
 
 <Base
-  title={tx('aviso.titulo')}
-  description={tx('aviso.descripcion')}
-  idiomas={['es']}
+  title={tx('legal_notice.title')}
+  description={tx('legal_notice.description')}
+  langs={['es']}
   path="/aviso-legal/"
-  seccion="legal"
+  section="legal"
 >
-  <main class="documento" id="contenido">
-    <header class="documento__cabeza">
-      <h1 class="documento__titulo">{tx('aviso.h1')}</h1>
-      <p class="documento__fecha">{tx('legal.actualizado')}</p>
+  <main class="document" id="content">
+    <header class="document__head">
+      <h1 class="document__title">{tx('legal_notice.h1')}</h1>
+      <p class="document__date">{tx('legal.updated')}</p>
     </header>
 
-    <div class="documento__hojas">
-      <section class="hoja hoja--texto">
-        <h2 id="al-quien">{tx('aviso.quien')}</h2>
+    <div class="document__sheets">
+      <section class="sheet sheet--text">
+        <h2 id="al-quien">{tx('legal_notice.who')}</h2>
         <p>
           eslojusto.es es un proyecto de Endika Iglesias. Para cualquier consulta sobre la web,
-          escribe a <a href={`mailto:${correo}`}>{correo}</a>.
+          escribe a <a href={`mailto:${email}`}>{email}</a>.
         </p>
       </section>
 
-      <section class="hoja hoja--texto">
-        <h2 id="al-que-hace">{tx('aviso.que_hace')}</h2>
+      <section class="sheet sheet--text">
+        <h2 id="al-que-hace">{tx('legal_notice.what_it_does')}</h2>
         <p>
           Compara las cifras de tu finiquito con el mínimo que fija la ley, partida por partida. Las
           fórmulas siguen el Estatuto de los Trabajadores y la guía práctica del CGPJ para el
@@ -47,8 +47,8 @@ const correo = 'hola@eslojusto.es';
         </p>
       </section>
 
-      <section class="hoja hoja--texto">
-        <h2 id="al-no-hace">{tx('aviso.no_hace')}</h2>
+      <section class="sheet sheet--text">
+        <h2 id="al-no-hace">{tx('legal_notice.what_it_does_not')}</h2>
         <ul>
           <li>No es asesoramiento jurídico. Da información general sobre lo que dice la ley.</li>
           <li>
@@ -63,12 +63,12 @@ const correo = 'hola@eslojusto.es';
         </p>
       </section>
 
-      <section class="hoja hoja--texto">
-        <h2 id="al-errores">{tx('aviso.errores')}</h2>
+      <section class="sheet sheet--text">
+        <h2 id="al-errores">{tx('legal_notice.errors')}</h2>
         <p>
           Las indemnizaciones se contrastan con casos calculados por la calculadora del CGPJ. Si ves
           una cifra que no cuadra con la ley, puedes escribir a{' '}
-          <a href={`mailto:${correo}`}>{correo}</a>.
+          <a href={`mailto:${email}`}>{email}</a>.
         </p>
       </section>
     </div>

@@ -2,19 +2,19 @@
   <a href="https://eslojusto.es"><img src="public/og.png" alt="eslojusto.es" width="600"></a>
 </p>
 
-<h3 align="center">Tu finiquito, partida por partida, frente al mínimo legal.</h3>
+<h3 align="center">Is your final pay fair? Check it against Spanish law, line by line.</h3>
 
-- Metes tus fechas, tu salario y lo que pone tu finiquito.
-- Ves el mínimo legal de cada partida: salario, vacaciones, pagas extra, indemnización y preaviso.
-- Cada cifra lleva su cálculo y su artículo, y lo que depende de tu convenio va marcado.
+- Enter your dates, your salary and what your final pay (finiquito) says.
+- See the legal minimum for each item: salary, holidays, extra pay, severance and notice.
+- Get an estimate of your unemployment benefit (paro), with the article behind every figure.
 
-Todo se calcula en tu navegador. Lo que escribes no se envía a ningún sitio.
+Everything runs in your browser. Nothing you type is sent anywhere.
 
 <h2 align="center"><a href="https://eslojusto.es">eslojusto.es →</a></h2>
 
-Informa sobre la ley y no da asesoramiento jurídico.
+It explains the law; it is not legal advice.
 
-## Para desarrollar
+## Development
 
 ```bash
 npm ci
@@ -22,8 +22,8 @@ npm run dev        # http://localhost:4321
 npm run test:run
 ```
 
-La medición (PostHog en la UE, sin cookies) solo se activa si el build lleva `PUBLIC_POSTHOG_KEY`.
+Analytics (PostHog EU, no cookies) only turn on when the build has `PUBLIC_POSTHOG_KEY`.
 
-## Licencia
+## Licence
 
 [MIT](LICENSE)

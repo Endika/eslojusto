@@ -1,27 +1,27 @@
-import { es, type Clave } from './es';
-import type { Idioma } from './idiomas';
-import { interpolar, type Variables } from './interpolar';
+import { es, type Key } from './es';
+import type { Lang } from './languages';
+import { interpolate, type Variables } from './interpolate';
 
-export type { Clave } from './es';
-export type { Idioma } from './idiomas';
+export type { Key } from './es';
+export type { Lang } from './languages';
 
 // Arabic-script markers around the Spanish text: every string reads right to left, and an
 // untranslated one (a literal left in a component) stands out at a glance.
-const pseudoRtl = (texto: string): string => `ع\u200f ${texto} \u200fع`;
+const pseudoRtl = (text: string): string => `ع\u200f ${text} \u200fع`;
 
-export const DICCIONARIOS: Record<Idioma, Readonly<Record<Clave, string>>> = {
+export const DICTIONARIES: Record<Lang, Readonly<Record<Key, string>>> = {
   es,
   'ar-test': Object.fromEntries(
-    Object.entries(es).map(([clave, texto]) => [clave, pseudoRtl(texto)]),
-  ) as Record<Clave, string>,
+    Object.entries(es).map(([key, text]) => [key, pseudoRtl(text)]),
+  ) as Record<Key, string>,
 };
 
-export function t(idioma: Idioma, clave: Clave, vars?: Variables): string {
-  return interpolar(DICCIONARIOS[idioma][clave], vars);
+export function t(lang: Lang, key: Key, vars?: Variables): string {
+  return interpolate(DICTIONARIES[lang][key], vars);
 }
 
 // The strings the browser scripts need, for the page to ship as JSON.
-export const textosCliente = (idioma: Idioma): Partial<Record<Clave, string>> =>
+export const clientStrings = (lang: Lang): Partial<Record<Key, string>> =>
   Object.fromEntries(
-    Object.entries(DICCIONARIOS[idioma]).filter(([clave]) => clave.startsWith('cli.')),
+    Object.entries(DICTIONARIES[lang]).filter(([key]) => key.startsWith('client.')),
   );

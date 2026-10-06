@@ -1,0 +1,461 @@
+---
+import Field from './Field.astro';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+const causes = [
+  'resignation',
+  'fixed_term_end',
+  'objective_dismissal',
+  'unfair_dismissal',
+  'disciplinary_dismissal',
+] as const;
+const fixedTermTypes = ['production_circumstances', 'replacement', 'training'] as const;
+const accruals = ['annual', 'semiannual', 'unknown'] as const;
+const items = [
+  'pending_salary',
+  'holiday_pay',
+  'extra_pay',
+  'severance',
+  'employer_notice',
+  'notice_deduction',
+] as const;
+
+const children = [
+  ['0', 'children.none'],
+  ['1', 'children.one'],
+  ['2', 'children.two'],
+  ['not_said', 'children.not_said'],
+] as const;
+const benefitSince = [
+  ['yes', 'form.yes'],
+  ['no', 'form.no'],
+  ['unknown', 'other_contracts.unknown'],
+] as const;
+const workHistoryUrl =
+  'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
+
+const arrow = 'M4 12h15m-6-6 6 6-6 6';
+---
+
+<form class="calculator" id="calculator" novalidate aria-label={tx('form.aria')}>
+  <div class="stack">
+    <fieldset class="sheet" id="sheet-causa" data-sheet="causa" aria-labelledby="question-causa">
+      <h2 class="question" id="question-causa" tabindex="-1">
+        {tx('cause.question')}
+      </h2>
+      <p class="help">{tx('cause.help')}</p>
+      <div class="options" data-field="cause">
+        {causes.map((value) => (
+          <div class="option">
+            <input
+              type="radio"
+              name="cause"
+              id={`cause-${value}`}
+              value={value}
+              aria-describedby={`hint-cause-${value} error-cause`}
+            />
+            <label for={`cause-${value}`}>{tx(`cause.${value}`)}</label>
+            <p class="hint" id={`hint-cause-${value}`}>
+              {tx(`cause.${value}_hint`)}
+            </p>
+          </div>
+        ))}
+        <p class="errata" id="error-cause" data-error-for="cause" hidden></p>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-temporal"
+      data-sheet="temporal"
+      aria-labelledby="question-temporal"
+    >
+      <h2 class="question" id="question-temporal" tabindex="-1">
+        {tx('fixed_term.question')}
+      </h2>
+      <p class="help">{tx('fixed_term.help')}</p>
+      <div class="options" data-field="fixedTermType" data-if-cause="fixed_term_end">
+        {fixedTermTypes.map((value) => (
+          <div class="option">
+            <input
+              type="radio"
+              name="fixedTermType"
+              id={`fixed-term-${value}`}
+              value={value}
+              aria-describedby={`hint-fixed-term-${value} error-fixedTermType`}
+              disabled
+            />
+            <label for={`fixed-term-${value}`}>{tx(`fixed_term.${value}`)}</label>
+            <p class="hint" id={`hint-fixed-term-${value}`}>
+              {tx(`fixed_term.${value}_hint`)}
+            </p>
+          </div>
+        ))}
+        <p class="errata" id="error-fixedTermType" data-error-for="fixedTermType" hidden></p>
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-fechas" data-sheet="fechas" aria-labelledby="question-fechas">
+      <h2 class="question" id="question-fechas" tabindex="-1">
+        {tx('dates.question')}
+      </h2>
+      <p class="help">{tx('dates.help')}</p>
+      <Field name="startDate" label={tx('dates.start')} hint={tx('dates.start_hint')} kind="date" />
+      <Field name="endDate" label={tx('dates.end')} hint={tx('dates.end_hint')} kind="date" />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-prorrateo"
+      data-sheet="prorrateo"
+      aria-labelledby="question-prorrateo"
+    >
+      <h2 class="question" id="question-prorrateo" tabindex="-1">
+        {tx('prorating.question')}
+      </h2>
+      <p class="help" id="hint-extraPayProrated">
+        {tx('prorating.help')}
+      </p>
+      <div class="chips" data-field="extraPayProrated">
+        <div class="chip">
+          <input
+            type="radio"
+            name="extraPayProrated"
+            id="prorated-yes"
+            value="yes"
+            aria-describedby="hint-extraPayProrated error-extraPayProrated"
+          />
+          <label for="prorated-yes">{tx('form.yes')}</label>
+        </div>
+        <div class="chip">
+          <input
+            type="radio"
+            name="extraPayProrated"
+            id="prorated-no"
+            value="no"
+            aria-describedby="hint-extraPayProrated error-extraPayProrated"
+          />
+          <label for="prorated-no">{tx('form.no')}</label>
+        </div>
+      </div>
+      <p class="errata" id="error-extraPayProrated" data-error-for="extraPayProrated" hidden></p>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-salario"
+      data-sheet="salario"
+      aria-labelledby="question-salario"
+    >
+      <h2 class="question" id="question-salario" tabindex="-1">
+        {tx('salary.question')}
+      </h2>
+      <p class="help">{tx('salary.help')}</p>
+      <Field
+        name="monthlySalary"
+        label={tx('salary.monthly')}
+        hint={tx('salary.monthly_hint_no')}
+        kind="amount"
+        attributes={{
+          'data-hint-yes': tx('salary.monthly_hint_yes'),
+          'data-hint-no': tx('salary.monthly_hint_no'),
+        }}
+      />
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-pagas" data-sheet="pagas" aria-labelledby="question-pagas">
+      <h2 class="question" id="question-pagas" tabindex="-1">
+        {tx('extra_pay.question')}
+      </h2>
+      <p class="help">{tx('extra_pay.help')}</p>
+      <div class="extra-pay" data-if-prorated="no" hidden>
+        <div class="pair">
+          <Field
+            name="extraPayCount"
+            label={tx('extra_pay.count')}
+            hint={tx('extra_pay.count_hint')}
+            kind="days"
+            value="2"
+          />
+          <Field
+            name="extraPayAmount"
+            label={tx('extra_pay.amount')}
+            hint={tx('extra_pay.amount_hint')}
+            kind="amount"
+          />
+        </div>
+        <fieldset class="group" data-field="extraPayAccrual">
+          <legend>{tx('extra_pay.accrual')}</legend>
+          <p class="hint" id="hint-extraPayAccrual">
+            {tx('extra_pay.accrual_hint')}
+          </p>
+          <div class="chips">
+            {accruals.map((value) => (
+              <div class="chip">
+                <input
+                  type="radio"
+                  name="extraPayAccrual"
+                  id={`accrual-${value}`}
+                  value={value}
+                  checked={value === 'unknown'}
+                  aria-describedby="hint-extraPayAccrual error-extraPayAccrual"
+                />
+                <label for={`accrual-${value}`}>{tx(`extra_pay.${value}`)}</label>
+              </div>
+            ))}
+          </div>
+          <p class="errata" id="error-extraPayAccrual" data-error-for="extraPayAccrual" hidden></p>
+        </fieldset>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-vacaciones"
+      data-sheet="vacaciones"
+      aria-labelledby="question-vacaciones"
+    >
+      <h2 class="question" id="question-vacaciones" tabindex="-1">
+        {tx('holidays.question')}
+      </h2>
+      <div class="pair">
+        <Field
+          name="annualHolidayDays"
+          label={tx('holidays.annual')}
+          hint={tx('holidays.annual_hint')}
+          kind="days"
+          value="30"
+        />
+        <Field
+          name="holidayDaysTaken"
+          label={tx('holidays.taken')}
+          hint={tx('holidays.taken_hint')}
+          kind="days"
+        >
+          <div class="checkbox">
+            <input
+              type="checkbox"
+              name="holidayDaysTakenUnknown"
+              id="holidayDaysTakenUnknown"
+              value="yes"
+              data-unknown-for="holidayDaysTaken"
+            />
+            <label for="holidayDaysTakenUnknown">{tx('holidays.taken_unknown')}</label>
+          </div>
+        </Field>
+      </div>
+      <Field
+        name="noticeDaysReceived"
+        label={tx('holidays.notice_received')}
+        hint={tx('holidays.notice_received_hint')}
+        kind="days"
+        attributes={{ 'data-if-cause': 'objective_dismissal fixed_term_end', hidden: '' }}
+      />
+      <div class="pair" data-if-cause="resignation" hidden>
+        <Field
+          name="agreementNoticeDays"
+          label={tx('holidays.agreement_notice')}
+          hint={tx('holidays.agreement_notice_hint')}
+          kind="days"
+        />
+        <Field
+          name="noticeDaysGiven"
+          label={tx('holidays.notice_given')}
+          hint={tx('holidays.notice_given_hint')}
+          kind="days"
+        />
+      </div>
+      <p class="help help--note" data-if-cause="unfair_dismissal disciplinary_dismissal" hidden>
+        {tx('holidays.no_notice')}
+      </p>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-hijos" data-sheet="hijos" aria-labelledby="question-hijos">
+      <h2 class="question" id="question-hijos" tabindex="-1">
+        {tx('children.question')}
+      </h2>
+      <p class="help help--short">{tx('children.help')}</p>
+      <p class="hint hint--sheet" id="hint-children">
+        {tx('children.who')}
+      </p>
+      <div class="chips" data-field="children">
+        {children.map(([value, key]) => (
+          <div class="chip">
+            <input
+              type="radio"
+              name="children"
+              id={`children-${value}`}
+              value={value}
+              aria-describedby="hint-children error-children"
+            />
+            <label for={`children-${value}`}>{tx(key)}</label>
+          </div>
+        ))}
+      </div>
+      <p class="errata" id="error-children" data-error-for="children" hidden></p>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-otros" data-sheet="otros" aria-labelledby="question-otros">
+      <h2 class="question" id="question-otros" tabindex="-1">
+        {tx('other_contracts.question')}
+      </h2>
+      <p class="help" id="hint-otherContracts">
+        {tx('other_contracts.help')}
+      </p>
+      <div class="chips" data-field="otherContracts">
+        {(['no', 'yes'] as const).map((value) => (
+          <div class="chip">
+            <input
+              type="radio"
+              name="otherContracts"
+              id={`other-contracts-${value}`}
+              value={value}
+              checked={value === 'no'}
+              aria-describedby="hint-otherContracts"
+            />
+            <label for={`other-contracts-${value}`}>{tx(`other_contracts.${value}`)}</label>
+          </div>
+        ))}
+      </div>
+      <div class="other-contracts" data-if-other-contracts="yes" hidden>
+        <fieldset class="group" data-field="benefitDrawnSince">
+          <legend>{tx('other_contracts.benefit')}</legend>
+          <div class="chips">
+            {benefitSince.map(([value, key]) => (
+              <div class="chip">
+                <input
+                  type="radio"
+                  name="benefitDrawnSince"
+                  id={`benefit-since-${value}`}
+                  value={value}
+                  aria-describedby="error-benefitDrawnSince"
+                  disabled
+                />
+                <label for={`benefit-since-${value}`}>{tx(key)}</label>
+              </div>
+            ))}
+          </div>
+          <p
+            class="errata"
+            id="error-benefitDrawnSince"
+            data-error-for="benefitDrawnSince"
+            hidden
+          ></p>
+        </fieldset>
+        <ol
+          class="other-contracts__list"
+          data-other-list
+          aria-label={tx('other_contracts.list')}
+        ></ol>
+        <button class="button button--sheet" type="button" data-other-add>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          {tx('other_contracts.add')}
+        </button>
+      </div>
+      <p class="hint other-contracts__history">
+        {tx('other_contracts.work_history')}{' '}
+        <a href={workHistoryUrl} rel="noopener" target="_blank">
+          {tx('other_contracts.work_history_link')}
+        </a>
+        .
+      </p>
+      <template data-template="other-contract">
+        <li class="other-contract" data-other-contract>
+          <fieldset class="group other-contract__group">
+            <legend data-other-legend></legend>
+            <div class="other-contract__dates">
+              <div class="field">
+                <label class="field__label" data-row-label="startDate">
+                  {tx('other_contracts.start')}
+                </label>
+                <input
+                  class="field__input field__input--figure"
+                  type="date"
+                  dir="ltr"
+                  data-row-field="startDate"
+                />
+              </div>
+              <div class="field">
+                <label class="field__label" data-row-label="endDate">
+                  {tx('other_contracts.end')}
+                </label>
+                <input
+                  class="field__input field__input--figure"
+                  type="date"
+                  dir="ltr"
+                  data-row-field="endDate"
+                />
+              </div>
+            </div>
+            <p class="errata" data-row-error="startDate" hidden></p>
+            <p class="errata" data-row-error="endDate" hidden></p>
+            <button class="other-contract__remove" type="button" data-other-remove>
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                <path d="M6 6l12 12M18 6 6 18"></path>
+              </svg>
+              {tx('other_contracts.remove')}
+            </button>
+          </fieldset>
+        </li>
+      </template>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-finiquito"
+      data-sheet="finiquito"
+      aria-labelledby="question-finiquito"
+    >
+      <h2 class="question" id="question-finiquito" tabindex="-1">
+        {tx('figures.question')}
+      </h2>
+      <p class="help" id="hint-figures">
+        {tx('figures.help')}
+      </p>
+      <div class="figures">
+        {items.map((id) => (
+          <Field
+            name={`figure_${id}`}
+            label={tx(`figures.${id}`)}
+            kind="amount"
+            row
+            extraHints={['hint-figures']}
+            attributes={{ 'data-figure': id }}
+          />
+        ))}
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="actions">
+    <div class="actions__inner">
+      <button class="button button--back" type="button" data-back hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow} transform="rotate(180 12 12)"></path>
+        </svg>
+        {tx('form.back')}
+      </button>
+      <button class="button button--forward" type="button" data-next>
+        {tx('form.next')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+      <button class="button button--forward" type="submit" data-submit hidden>
+        {tx('form.review')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</form>

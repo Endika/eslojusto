@@ -1,20 +1,20 @@
 // The only host the pages may connect to, and only in a build that has an analytics key.
-export const ORIGEN_ANALITICA = 'https://eu.i.posthog.com';
+export const ANALYTICS_ORIGIN = 'https://eu.i.posthog.com';
 
-export const politicaDeSeguridad = ({
-  hashTema,
-  analitica,
+export const contentSecurityPolicy = ({
+  themeHash,
+  analytics,
 }: {
-  hashTema: string;
-  analitica: boolean;
+  themeHash: string;
+  analytics: boolean;
 }): string =>
   [
     "default-src 'self'",
-    `script-src 'self' ${hashTema}`,
+    `script-src 'self' ${themeHash}`,
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
     "img-src 'self' data:",
-    `connect-src ${analitica ? ORIGEN_ANALITICA : "'none'"}`,
+    `connect-src ${analytics ? ANALYTICS_ORIGIN : "'none'"}`,
     "form-action 'none'",
     "base-uri 'self'",
   ].join('; ');

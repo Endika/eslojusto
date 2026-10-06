@@ -1,0 +1,197 @@
+---
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+const workHistoryUrl =
+  'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
+---
+
+<section class="result" id="resultado" aria-labelledby="result-title" hidden>
+  <svg class="marks" aria-hidden="true" focusable="false">
+    <symbol id="mark-below-minimum" viewBox="0 0 24 24">
+      <path d="M4 7h16M4 17h8"></path>
+      <path d="M15 17h5" stroke-dasharray="2 2.5" stroke-linecap="butt"></path>
+    </symbol>
+    <symbol id="mark-matches" viewBox="0 0 24 24">
+      <path d="M4 7h16M4 17h16"></path>
+    </symbol>
+    <symbol id="mark-above-minimum" viewBox="0 0 24 24">
+      <path d="M4 7h12M4 17h16"></path>
+    </symbol>
+    <symbol id="mark-deduction-too-high" viewBox="0 0 24 24">
+      <path d="M12 21V4m-5 5 5-5 5 5M3 14h18"></path>
+    </symbol>
+    <symbol id="mark-deduction-within-max" viewBox="0 0 24 24">
+      <path d="M4 7h16M4 17h16"></path>
+    </symbol>
+    <symbol id="mark-not-checkable" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8" stroke-dasharray="3 3"></circle>
+    </symbol>
+    <symbol id="mark-no-severance" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8"></circle>
+      <path d="M8 12h8"></path>
+    </symbol>
+    <symbol id="mark-benefit-yes" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8"></circle>
+      <path d="M12 8v8M8 12h8"></path>
+    </symbol>
+    <symbol id="mark-no-employer-figure" viewBox="0 0 24 24">
+      <path d="M4 7h16"></path>
+      <path d="M4 17h16" stroke-dasharray="2 2.5" stroke-linecap="butt"></path>
+    </symbol>
+  </svg>
+
+  <header class="result__header">
+    <h2 class="result__title" id="result-title" tabindex="-1">
+      {tx('result.title')}
+    </h2>
+    <p class="result__lead">{tx('result.lead')}</p>
+  </header>
+
+  <div class="review" data-review>
+    <div class="review__items" data-items></div>
+
+    <section class="item benefit" data-benefit data-tone="holidays" aria-labelledby="benefit-title">
+      <span class="item__tab" aria-hidden="true">
+        04
+      </span>
+      <div class="sheet">
+        <h3 class="item__title" id="benefit-title">
+          {tx('result.benefit')}
+        </h3>
+        <p class="item__note" data-benefit-yes>
+          {tx('result.benefit_lead')}
+        </p>
+        <p class="item__status">
+          <svg class="item__mark" data-benefit-mark viewBox="0 0 24 24" aria-hidden="true">
+            <use href="#mark-benefit-yes"></use>
+          </svg>
+          <span data-benefit-status-text></span>
+        </p>
+        <p class="help benefit__reason" data-benefit-reason></p>
+        <p class="help" data-benefit-no>
+          {tx('result.benefit_just_cause')}
+        </p>
+        <div class="benefit__blocks" data-benefit-yes>
+          <p class="help">{tx('result.benefit_requirements')}</p>
+          <h4 class="benefit__subhead">{tx('result.benefit_amount')}</h4>
+          <p class="help" data-benefit-amount></p>
+          <p class="item__note" data-benefit-full-time>
+            {tx('result.benefit_full_time')}
+          </p>
+          <p class="item__note" data-benefit-children-unknown hidden></p>
+          <p class="item__note" data-benefit-deduction></p>
+          <h4 class="benefit__subhead">{tx('result.benefit_duration')}</h4>
+          <p class="help" data-benefit-duration></p>
+          <p class="item__note" data-benefit-duration-note></p>
+          <h4 class="benefit__subhead">{tx('result.benefit_contributed')}</h4>
+          <p class="help" data-benefit-qualifying></p>
+          <p class="item__note">
+            {tx('result.benefit_work_history')}{' '}
+            <a class="benefit__link" href={workHistoryUrl} rel="noopener" target="_blank">
+              {tx('result.benefit_work_history_link')}
+            </a>
+            .
+          </p>
+          <h4 class="benefit__subhead">{tx('result.benefit_deadline')}</h4>
+          <p class="help">{tx('result.benefit_deadline_text')}</p>
+        </div>
+        <details class="item__detail">
+          <summary>{tx('result.how_it_is_calculated')}</summary>
+          <p class="help" data-benefit-yes>
+            {tx('result.benefit_calculation')}
+          </p>
+          <ul class="sources" data-benefit-sources></ul>
+        </details>
+      </div>
+    </section>
+
+    <section class="item" aria-labelledby="unchecked-title">
+      <div class="sheet">
+        <h3 class="item__title" id="unchecked-title">
+          {tx('result.unchecked')}
+        </h3>
+        <ul class="list" data-unchecked></ul>
+      </div>
+    </section>
+
+    <section class="item" data-tone="legal" aria-labelledby="proposal-title">
+      <span class="item__tab" aria-hidden="true">
+        ET
+      </span>
+      <div class="sheet">
+        <h3 class="item__title" id="proposal-title">
+          {tx('result.proposal')}
+        </h3>
+        <p class="help">{tx('result.proposal_1')}</p>
+        <p class="help">{tx('result.proposal_2')}</p>
+        <p class="help">{tx('result.proposal_3')}</p>
+        <p class="source">
+          <a
+            href="https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430#a49"
+            rel="noopener"
+            target="_blank"
+          >
+            {tx('result.proposal_source')}
+          </a>
+        </p>
+      </div>
+    </section>
+
+    <template data-template="item">
+      <section class="item" data-item>
+        <span class="item__tab" aria-hidden="true" data-tab-number></span>
+        <div class="sheet">
+          <h3 class="item__title" data-title></h3>
+          <dl class="item__figures" data-figures>
+            <div>
+              <dt>{tx('result.in_your_final_pay')}</dt>
+              <dd data-employer></dd>
+            </div>
+            <div>
+              <dt data-range-label></dt>
+              <dd data-range></dd>
+            </div>
+          </dl>
+          <p class="item__note item__note--based-on" data-based-on hidden>
+            <strong>{tx('result.based_on_your_answer')}</strong>
+            {tx('result.based_on_your_answer_note')}
+          </p>
+          <p class="item__status">
+            <svg class="item__mark" data-mark viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#mark-matches"></use>
+            </svg>
+            <span data-status-text></span>
+          </p>
+          <p class="source item__citation" data-citation hidden></p>
+          <p class="item__note" data-agreement hidden>
+            {tx('client.agreement_may_improve')}
+          </p>
+          <p class="item__note" data-reference hidden></p>
+          <details class="item__detail" data-detail>
+            <summary>{tx('result.how_it_is_calculated')}</summary>
+            <p class="help" data-calculation></p>
+            <ul class="sources" data-sources></ul>
+          </details>
+        </div>
+      </section>
+    </template>
+    <template data-template="source">
+      <li>
+        <a rel="noopener" target="_blank"></a>
+        <span class="sources__in-force" data-in-force hidden></span>
+      </li>
+    </template>
+  </div>
+
+  <div class="restart">
+    <button class="button button--restart" type="button" data-restart>
+      {tx('result.restart')}
+    </button>
+  </div>
+</section>

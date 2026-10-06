@@ -2,24 +2,24 @@
 import logo from './logo.json';
 
 interface Props {
-  variante?: 'compacto' | 'completo';
+  variant?: 'compact' | 'full';
   class?: string;
 }
-const { variante = 'compacto', class: clase } = Astro.props;
-const v = logo[variante];
-const dominio = 'dominio' in v ? v.dominio : null;
+const { variant = 'compact', class: className } = Astro.props;
+const v = logo[variant];
+const domain = 'domain' in v ? v.domain : null;
 ---
 
 <svg
-  class:list={['logo', clase]}
-  viewBox={`0 0 ${v.ancho} ${v.alto}`}
+  class:list={['logo', className]}
+  viewBox={`0 0 ${v.width} ${v.height}`}
   role="img"
   aria-label="eslojusto.es"
   focusable="false"
 >
-  <g transform={v.marca}>
-    <g class="logo__marca" set:html={logo.marca} />
+  <g transform={v.mark}>
+    <g class="logo__mark" set:html={logo.mark} />
   </g>
-  <path d={v.palabra} fill="currentColor"></path>
-  {dominio && <path d={dominio} fill="currentColor" />}
+  <path d={v.wordmark} fill="currentColor"></path>
+  {domain && <path d={domain} fill="currentColor" />}
 </svg>

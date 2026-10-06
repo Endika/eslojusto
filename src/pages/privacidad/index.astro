@@ -1,98 +1,98 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { t, type Clave } from '../../i18n';
+import { t, type Key } from '../../i18n';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
-const tx = (clave: Clave) => t('es', clave);
+const tx = (key: Key) => t('es', key);
 
-const correo = 'hola@eslojusto.es';
+const email = 'hola@eslojusto.es';
 
 // One entry per thing that is stored or processed; a new tool adds a row here.
-const datos = [
+const stored = [
   {
-    que: tx('privacidad.dato_revision'),
-    donde:
+    what: tx('privacy.data_review'),
+    where:
       'Solo en tu navegador, mientras la página está abierta. El cálculo se hace en tu dispositivo: tus fechas, tu salario, las cifras de tu finiquito, tus hijos o hijas a cargo y tus otros contratos no se envían a ningún servidor ni se guardan. Al cerrar o recargar la página, desaparecen.',
   },
   {
-    que: tx('privacidad.dato_medicion'),
-    donde:
+    what: tx('privacy.data_analytics'),
+    where:
       'Unos avisos cortos con códigos y tramos, que se envían a PostHog mientras usas la página (el detalle, abajo). El identificador de la página vista vive solo en su memoria: no se escribe en tu dispositivo y se pierde al cerrarla o recargarla.',
   },
   {
-    que: tx('privacidad.dato_tema'),
-    donde:
+    what: tx('privacy.data_theme'),
+    where:
       'En el almacenamiento local (localStorage) de tu navegador, y solo si pulsas el botón del tema. Nunca sale de tu dispositivo. Se borra al borrar los datos de este sitio en tu navegador.',
   },
   {
-    que: tx('privacidad.dato_servidor'),
-    donde:
+    what: tx('privacy.data_server'),
+    where:
       'La web está alojada en GitHub Pages. GitHub registra la dirección IP y los datos técnicos de cada visita, como cualquier servidor web.',
   },
 ];
 
-// The allowlist (src/medicion/limpiar.ts) and the event catalogue (src/medicion/eventos.ts), in
-// plain words. Keep all three in step: the measurement e2e asserts the exact keys.
-const medido = [
+// The allowlist (src/analytics/sanitize.ts) and the event catalogue (src/analytics/events.ts), in
+// plain words. Keep all three in step: the analytics e2e asserts the exact keys.
+const tracked = [
   {
-    cuando: 'Con cada aviso',
-    que: 'La fecha y hora de cada aviso y un número al azar que solo existe mientras la página está abierta. La dirección de la página sin parámetros: el dominio, la ruta y la hoja en la que estás. Tu navegador y su versión, y tu sistema (Windows, Android…). El tipo de dispositivo (ordenador, móvil o tableta) y el tamaño de la ventana. El dominio de la web de la que vienes (por ejemplo «www.google.com»), sin la dirección completa. Si llegas desde un enlace de campaña, su origen, su medio y su nombre (utm_source, utm_medium, utm_campaign). Y tres datos técnicos de PostHog: la clave del proyecto de eslojusto.es, la versión de su código y una marca que le pide no crear ningún perfil.',
+    when: 'Con cada aviso',
+    what: 'La fecha y hora de cada aviso y un número al azar que solo existe mientras la página está abierta. La dirección de la página sin parámetros: el dominio, la ruta y la hoja en la que estás. Tu navegador y su versión, y tu sistema (Windows, Android…). El tipo de dispositivo (ordenador, móvil o tableta) y el tamaño de la ventana. El dominio de la web de la que vienes (por ejemplo «www.google.com»), sin la dirección completa. Si llegas desde un enlace de campaña, su origen, su medio y su nombre (utm_source, utm_medium, utm_campaign). Y tres datos técnicos de PostHog: la clave del proyecto de eslojusto.es, la versión de su código y una marca que le pide no crear ningún perfil.',
   },
   {
-    cuando: 'Al abrir una página',
-    que: 'Que la has abierto y el idioma principal de tu navegador, solo la parte general: «ja», no «ja-JP».',
+    when: 'Al abrir una página',
+    what: 'Que la has abierto y el idioma principal de tu navegador, solo la parte general: «ja», no «ja-JP».',
   },
   {
-    cuando: 'Al dejar una página',
-    que: 'Cuánto tiempo estuviste en la página y hasta dónde bajaste.',
+    when: 'Al dejar una página',
+    what: 'Cuánto tiempo estuviste en la página y hasta dónde bajaste.',
   },
   {
-    cuando: 'Si usas el traductor del navegador',
-    que: 'El idioma al que traduces la página, por ejemplo «ar».',
+    when: 'Si usas el traductor del navegador',
+    what: 'El idioma al que traduces la página, por ejemplo «ar».',
   },
   {
-    cuando: 'En cada hoja de la revisión',
-    que: 'Que la abres y, al terminarla, cuánto tardaste en un tramo amplio: menos de 10 segundos, de 10 a 30, de 30 a 60, de 60 a 180 o más de 180. Si vuelves atrás, de qué hoja a cuál.',
+    when: 'En cada hoja de la revisión',
+    what: 'Que la abres y, al terminarla, cuánto tardaste en un tramo amplio: menos de 10 segundos, de 10 a 30, de 30 a 60, de 60 a 180 o más de 180. Si vuelves atrás, de qué hoja a cuál.',
   },
   {
-    cuando: 'Si un dato no se acepta',
-    que: 'El nombre del campo, por ejemplo «fecha de baja». Nunca lo que escribiste en él.',
+    when: 'Si un dato no se acepta',
+    what: 'El nombre del campo, por ejemplo «fecha de baja». Nunca lo que escribiste en él.',
   },
   {
-    cuando: 'Si abres una ayuda',
-    que: 'Qué pregunta frecuente abres, o de qué partida miras «Cómo se calcula».',
+    when: 'Si abres una ayuda',
+    what: 'Qué pregunta frecuente abres, o de qué partida miras «Cómo se calcula».',
   },
   {
-    cuando: 'Al revisar',
-    que: 'La causa del fin del contrato, el tipo de contrato temporal y cómo cobras las pagas extra, tal como los eliges en las opciones. Cuántas partidas llevan la cifra de tu finiquito y cuántas salen por debajo, coinciden, por encima o sin poder comprobarse. Si te descuentan más preaviso del máximo. Si la diferencia es cero, menor de 100 €, de 100 a 500 €, de 500 a 2.000 € o mayor. Cuántas veces has revisado en esta página, cuánto tardaste en tramos y, si revisas otra vez, el nombre de los campos que cambiaste. Del paro, solo si la estimación no se aplica a tu causa, si lleva cifras o si sale sin ellas, y cuántos otros contratos añadiste, en un tramo: 0, 1, 2 o 3 o más. Nunca cuántos hijos o hijas tienes a tu cargo ni ninguna fecha de esos contratos.',
+    when: 'Al revisar',
+    what: 'La causa del fin del contrato, el tipo de contrato temporal y cómo cobras las pagas extra, tal como los eliges en las opciones. Cuántas partidas llevan la cifra de tu finiquito y cuántas salen por debajo, coinciden, por encima o sin poder comprobarse. Si te descuentan más preaviso del máximo. Si la diferencia es cero, menor de 100 €, de 100 a 500 €, de 500 a 2.000 € o mayor. Cuántas veces has revisado en esta página, cuánto tardaste en tramos y, si revisas otra vez, el nombre de los campos que cambiaste. Del paro, solo si la estimación no se aplica a tu causa, si lleva cifras o si sale sin ellas, y cuántos otros contratos añadiste, en un tramo: 0, 1, 2 o 3 o más. Nunca cuántos hijos o hijas tienes a tu cargo ni ninguna fecha de esos contratos.',
   },
   {
-    cuando: 'Al pulsar «Empezar de nuevo»',
-    que: 'Que lo has pulsado.',
+    when: 'Al pulsar «Empezar de nuevo»',
+    what: 'Que lo has pulsado.',
   },
   {
-    cuando: 'Si la página falla',
-    que: 'El tipo de error y en qué archivo y línea del código ocurrió. Nunca el mensaje del error, porque podría citar algo que escribiste.',
+    when: 'Si la página falla',
+    what: 'El tipo de error y en qué archivo y línea del código ocurrió. Nunca el mensaje del error, porque podría citar algo que escribiste.',
   },
 ];
 ---
 
 <Base
-  title={tx('privacidad.titulo')}
-  description={tx('privacidad.descripcion')}
-  idiomas={['es']}
+  title={tx('privacy.title')}
+  description={tx('privacy.description')}
+  langs={['es']}
   path="/privacidad/"
-  seccion="legal"
+  section="legal"
 >
-  <main class="documento" id="contenido">
-    <header class="documento__cabeza">
-      <h1 class="documento__titulo">{tx('privacidad.h1')}</h1>
-      <p class="documento__fecha">{tx('legal.actualizado')}</p>
+  <main class="document" id="content">
+    <header class="document__head">
+      <h1 class="document__title">{tx('privacy.h1')}</h1>
+      <p class="document__date">{tx('legal.updated')}</p>
     </header>
 
-    <div class="documento__hojas">
-      <section class="hoja hoja--texto">
-        <h2 id="pr-resumen">{tx('privacidad.resumen')}</h2>
+    <div class="document__sheets">
+      <section class="sheet sheet--text">
+        <h2 id="pr-resumen">{tx('privacy.summary')}</h2>
         <p>
           Lo que escribes en la revisión no sale de tu dispositivo. Tu finiquito se calcula entero
           en tu navegador y no se guarda. Para saber si la herramienta sirve y en qué paso se atasca
@@ -101,13 +101,13 @@ const medido = [
         </p>
       </section>
 
-      <section class="hoja hoja--texto">
-        <h2 id="pr-datos">{tx('privacidad.datos')}</h2>
-        <dl class="datos">
-          {datos.map(({ que, donde }) => (
+      <section class="sheet sheet--text">
+        <h2 id="pr-datos">{tx('privacy.data')}</h2>
+        <dl class="data-list">
+          {stored.map(({ what, where }) => (
             <div>
-              <dt>{que}</dt>
-              <dd>{donde}</dd>
+              <dt>{what}</dt>
+              <dd>{where}</dd>
             </div>
           ))}
         </dl>
@@ -120,18 +120,18 @@ const medido = [
         </p>
       </section>
 
-      <section class="hoja hoja--texto">
-        <h2 id="pr-medicion">{tx('privacidad.medicion')}</h2>
+      <section class="sheet sheet--text">
+        <h2 id="pr-medicion">{tx('privacy.analytics')}</h2>
         <p>
           Esto es todo lo que se envía. Cada valor sale de una lista cerrada de códigos o de tramos,
           y la página comprueba cada aviso antes de enviarlo: un aviso con cualquier otra cosa no
           sale, y de lo que PostHog añade por su cuenta solo pasa lo que está en esta lista.
         </p>
-        <dl class="datos">
-          {medido.map(({ cuando, que }) => (
+        <dl class="data-list">
+          {tracked.map(({ when, what }) => (
             <div>
-              <dt>{cuando}</dt>
-              <dd>{que}</dd>
+              <dt>{when}</dt>
+              <dd>{what}</dd>
             </div>
           ))}
         </dl>
@@ -144,8 +144,8 @@ const medido = [
         </p>
       </section>
 
-      <section class="hoja hoja--texto">
-        <h2 id="pr-quien">{tx('privacidad.quien')}</h2>
+      <section class="sheet sheet--text">
+        <h2 id="pr-quien">{tx('privacy.who')}</h2>
         <p>
           Lo recibe PostHog Inc., la herramienta de medición, en su{' '}
           <a href="https://posthog.com/blog/posthog-cloud-eu">nube de la Unión Europea</a>, alojada
@@ -167,8 +167,8 @@ const medido = [
         </p>
       </section>
 
-      <section class="hoja hoja--texto">
-        <h2 id="pr-cookies">{tx('privacidad.cookies')}</h2>
+      <section class="sheet sheet--text">
+        <h2 id="pr-cookies">{tx('privacy.cookies')}</h2>
         <p>
           Esta web no usa cookies, y la medición no escribe nada en tu dispositivo, ni en ningún
           otro almacenamiento del navegador, porque todo vive en la memoria de la página. Lo único
@@ -177,8 +177,8 @@ const medido = [
         </p>
       </section>
 
-      <section class="hoja hoja--texto">
-        <h2 id="pr-base">{tx('privacidad.base')}</h2>
+      <section class="sheet sheet--text">
+        <h2 id="pr-base">{tx('privacy.legal_basis')}</h2>
         <p>
           La base jurídica es el interés legítimo (art. 6.1.f del Reglamento General de Protección
           de Datos), que aquí es saber si la herramienta se usa, en qué paso se atasca la gente y
@@ -192,13 +192,13 @@ const medido = [
         </p>
       </section>
 
-      <section class="hoja hoja--texto">
-        <h2 id="pr-responsable">{tx('privacidad.responsable')}</h2>
+      <section class="sheet sheet--text">
+        <h2 id="pr-responsable">{tx('privacy.controller')}</h2>
         <p>
           eslojusto.es es un proyecto de Endika Iglesias, responsable de este tratamiento. Para
-          cualquier pregunta sobre tus datos, escribe a <a href={`mailto:${correo}`}>{correo}</a>.
-          Si has escrito a esa dirección, puedes pedir en ella que se consulten, corrijan o borren
-          los datos de tu correo.
+          cualquier pregunta sobre tus datos, escribe a <a href={`mailto:${email}`}>{email}</a>. Si
+          has escrito a esa dirección, puedes pedir en ella que se consulten, corrijan o borren los
+          datos de tu correo.
         </p>
         <p>
           Lo que se mide no te identifica, así que no hay forma de encontrar tus avisos para

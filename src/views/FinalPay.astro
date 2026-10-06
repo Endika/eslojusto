@@ -1,0 +1,79 @@
+---
+import Base from '../layouts/Base.astro';
+import FinalPayForm from '../components/FinalPayForm.astro';
+import FinalPayResult from '../components/FinalPayResult.astro';
+import FinalPayGuide from '../components/FinalPayGuide.astro';
+import { faqPage } from '../content/faq';
+import { calculatorApp } from '../content/structured-data';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+// Each tab's share of the rail follows how many sheets its section holds (the result counts two).
+// The second column is the section's first step, whose id is its URL fragment.
+const sections = [
+  ['cause', 'causa', '01', 2],
+  ['dates', 'fechas', '02', 1],
+  ['salary', 'salario', '03', 3],
+  ['holidays', 'vacaciones', '04', 3],
+  ['settlement', 'finiquito', '05', 1],
+  ['result', 'resultado', '06', 2],
+] as const;
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const page = new URL(link(lang, 'finiquito/'), Astro.site);
+---
+
+<Base
+  title={tx('final_pay.title')}
+  description={tx('final_pay.description')}
+  path="/finiquito/"
+  lang={lang}
+  section="cause"
+  structuredData={[calculatorApp(home, page, lang), faqPage(lang)]}
+>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
+    <ol>
+      {/* Only a section already reached is a link; one still ahead is plain text until then. */}
+      {sections.map(([id, step, number, weight], i) => (
+        <li style={`--weight: ${weight}`} data-tone={id}>
+          {i === 0 ? (
+            <a class="tab" data-tab={id} data-state="current" href={`#${step}`} aria-current="step">
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`section.${id}`)}</span>
+            </a>
+          ) : (
+            <span class="tab" data-tab={id} data-state="pending" aria-disabled="true">
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`section.${id}`)}</span>
+            </span>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+  <main id="content">
+    <div class="desk">
+      <header class="desk__head">
+        <h1 class="desk__title">{tx('final_pay.h1')}</h1>
+        <p class="desk__lead">{tx('final_pay.lead')}</p>
+      </header>
+      <noscript>
+        <div class="sheet sheet--notice">
+          <p class="help">{tx('final_pay.no_js')}</p>
+        </div>
+      </noscript>
+      <FinalPayForm lang={lang} />
+      <FinalPayResult lang={lang} />
+    </div>
+    <FinalPayGuide lang={lang} />
+  </main>
+</Base>
+
+<script>
+  import '../calculator/main';
+</script>

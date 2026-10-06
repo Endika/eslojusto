@@ -4,93 +4,93 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { create } from 'fontkit';
 import { decompress } from 'wawoff2';
 
-const fuente = async (ruta, ejes) =>
-  create(Buffer.from(await decompress(readFileSync(ruta)))).getVariation(ejes);
+const loadFont = async (path, axes) =>
+  create(Buffer.from(await decompress(readFileSync(path)))).getVariation(axes);
 
-const golos = await fuente(
+const golos = await loadFont(
   'node_modules/@fontsource-variable/golos-text/files/golos-text-latin-wght-normal.woff2',
   { wght: 800 },
 );
-const martian = await fuente(
+const martian = await loadFont(
   'node_modules/@fontsource-variable/martian-mono/files/martian-mono-latin-standard-normal.woff2',
   { wght: 600, wdth: 87.5 },
 );
 
 // The mark on a 64 grid: sheet, orange tab on the right edge, three lines of text.
-const HOJA = { x: 6, y: 8, ancho: 44, alto: 48 };
-const MARCA = [
+const SHEET = { x: 6, y: 8, width: 44, height: 48 };
+const MARK = [
   `<rect x="6" y="8" width="44" height="48" rx="3" fill="#fff"/>`,
-  `<path class="logo__pestana" d="M50 12h4a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4h-4z" fill="#e8571e"/>`,
+  `<path class="logo__tab" d="M50 12h4a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4h-4z" fill="#e8571e"/>`,
   `<path d="M14 18h22v6H14zM14 29h28v6H14zM14 40h16v6H14z" fill="#16130f"/>`,
 ].join('');
-const DERECHA_MARCA = 58;
+const MARK_RIGHT = 58;
 
 const r = (n) => Math.round(n * 100) / 100;
 
-// Lays out `texto` at `tam` units per em from (x, base), with `tracking` in em, and returns
+// Lays out `text` at `size` units per em from (x, base), with `tracking` in em, and returns
 // one SVG path plus the ink box.
-function trazar(fuenteVar, texto, { x, base, tam, tracking }) {
-  const escala = tam / fuenteVar.unitsPerEm;
-  const { glyphs, positions } = fuenteVar.layout(texto);
-  let cursor = x - (glyphs[0]?.bbox.minX ?? 0) * escala;
+function outline(font, text, { x, base, size, tracking }) {
+  const scale = size / font.unitsPerEm;
+  const { glyphs, positions } = font.layout(text);
+  let cursor = x - (glyphs[0]?.bbox.minX ?? 0) * scale;
   let d = '';
-  let derecha = cursor;
+  let right = cursor;
   glyphs.forEach((g, i) => {
     const pos = positions[i];
-    const ox = cursor + pos.xOffset * escala;
-    const oy = base - pos.yOffset * escala;
+    const ox = cursor + pos.xOffset * scale;
+    const oy = base - pos.yOffset * scale;
     for (const c of g.path.commands) {
       const pts = [];
       for (let k = 0; k < c.args.length; k += 2)
-        pts.push(`${r(ox + c.args[k] * escala)} ${r(oy - c.args[k + 1] * escala)}`);
-      const letra = {
+        pts.push(`${r(ox + c.args[k] * scale)} ${r(oy - c.args[k + 1] * scale)}`);
+      const letter = {
         moveTo: 'M',
         lineTo: 'L',
         quadraticCurveTo: 'Q',
         bezierCurveTo: 'C',
         closePath: 'Z',
       }[c.command];
-      d += letra + pts.join(' ');
+      d += letter + pts.join(' ');
     }
-    if (g.path.commands.length) derecha = Math.max(derecha, ox + g.bbox.maxX * escala);
-    cursor += pos.xAdvance * escala + (i < glyphs.length - 1 ? tracking * tam : 0);
+    if (g.path.commands.length) right = Math.max(right, ox + g.bbox.maxX * scale);
+    cursor += pos.xAdvance * scale + (i < glyphs.length - 1 ? tracking * size : 0);
   });
-  return { d, derecha };
+  return { d, right };
 }
 
-// The sheet spans from the top of the ascenders down to `fondo` below the baseline.
-function lockup({ fondo, dominio }) {
-  const tam = 100;
+// The sheet spans from the top of the ascenders down to `bottom` below the baseline.
+function lockup({ bottom, domain }) {
+  const size = 100;
   const asc = 70;
   const base = 74; // leaves room for the dot of the j above the ascender line
-  const k = (asc + fondo) / HOJA.alto;
-  const marca = `translate(${r(-HOJA.x * k)} ${r(base - asc - HOJA.y * k)}) scale(${r(k * 1000) / 1000})`;
-  const inicio = (DERECHA_MARCA - HOJA.x) * k + 30;
-  const palabra = trazar(golos, 'es lo justo', { x: inicio, base, tam, tracking: -0.02 });
-  const salida = { marca, palabra: palabra.d, ancho: r(palabra.derecha), alto: r(base + fondo) };
-  if (dominio) {
-    const linea = trazar(martian, 'ESLOJUSTO.ES', {
-      x: inicio + 1,
-      base: base + fondo,
-      tam: 22,
+  const k = (asc + bottom) / SHEET.height;
+  const mark = `translate(${r(-SHEET.x * k)} ${r(base - asc - SHEET.y * k)}) scale(${r(k * 1000) / 1000})`;
+  const start = (MARK_RIGHT - SHEET.x) * k + 30;
+  const wordmark = outline(golos, 'es lo justo', { x: start, base, size, tracking: -0.02 });
+  const out = { mark, wordmark: wordmark.d, width: r(wordmark.right), height: r(base + bottom) };
+  if (domain) {
+    const line = outline(martian, 'ESLOJUSTO.ES', {
+      x: start + 1,
+      base: base + bottom,
+      size: 22,
       tracking: 0.12,
     });
-    salida.dominio = linea.d;
-    salida.ancho = r(Math.max(palabra.derecha, linea.derecha));
+    out.domain = line.d;
+    out.width = r(Math.max(wordmark.right, line.right));
   }
-  return salida;
+  return out;
 }
 
 const logo = {
-  marca: MARCA,
-  compacto: lockup({ fondo: 21.4, dominio: false }),
-  completo: lockup({ fondo: 50, dominio: true }),
+  mark: MARK,
+  compact: lockup({ bottom: 21.4, domain: false }),
+  full: lockup({ bottom: 50, domain: true }),
 };
 writeFileSync('src/components/logo.json', `${JSON.stringify(logo, null, 2)}\n`);
 console.log(
   'src/components/logo.json',
-  logo.compacto.ancho,
-  logo.compacto.alto,
-  logo.completo.ancho,
-  logo.completo.alto,
+  logo.compact.width,
+  logo.compact.height,
+  logo.full.width,
+  logo.full.height,
 );

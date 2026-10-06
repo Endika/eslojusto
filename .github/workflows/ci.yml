@@ -22,11 +22,11 @@ jobs:
       - run: npm run test:e2e
         env: { CI: 'true' }
       - name: rtl layout (ar-test pseudo-locale)
-        run: PRUEBA_RTL=1 npm run build && PRUEBA_RTL=1 npm run test:e2e -- --project=rtl
+        run: TEST_RTL=1 npm run build && TEST_RTL=1 npm run test:e2e -- --project=rtl
         env: { CI: 'true' }
-      - name: measurement (test key, PostHog stubbed)
-        run: npm run test:e2e -- --project=medicion
-        env: { CI: 'true', PRUEBA_MEDICION: '1' }
+      - name: analytics (test key, PostHog stubbed)
+        run: npm run test:e2e -- --project=analytics
+        env: { CI: 'true', TEST_ANALYTICS: '1' }
   audit:
     name: audit
     runs-on: ubuntu-latest
