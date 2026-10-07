@@ -18,6 +18,8 @@ export interface StoredPass {
   // False once the API refused it and it could not be fetched again: it still unlocks the
   // report and the letter until it expires, but is no longer sent with a read.
   readonly usable?: false;
+  // Set on a pass fetched again after a refusal; a renewed pass gets no second renewal.
+  readonly renewed?: true;
 }
 
 // A payment started from this browser. Once redeemed it stays, with its pass's expiry, so the
@@ -118,6 +120,7 @@ export function createPassStore(store: KeyValueStore, now: () => number = () => 
         expiresAt: v['expiresAt'],
         readsLeft: Number.isInteger(left) ? Math.min(PASS_READS, left as number) : PASS_READS,
         ...(v['usable'] === false ? { usable: false as const } : {}),
+        ...(v['renewed'] === true ? { renewed: true as const } : {}),
       };
     },
     savePass(pass: StoredPass): void {

@@ -271,9 +271,50 @@ describe('the start sheet', () => {
     choose([photo]);
     await submit();
     expect(passCalls).toEqual(['cs_test_1']);
-    expect(passes.pass()).toEqual({ token: fresh, expiresAt: NOW / 1000 + 3600, readsLeft: 9 });
+    expect(passes.pass()).toEqual({
+      token: fresh,
+      expiresAt: NOW / 1000 + 3600,
+      readsLeft: 9,
+      renewed: true,
+    });
     expect(document.querySelector('[data-doc-status]')?.textContent).toBe(
       'Tu pase se ha renovado. Prueba otra vez a leer el documento.',
+    );
+  });
+
+  it('the same token back is no renewal: the pass is retired at once', async () => {
+    const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
+    const { passes } = setUp(
+      { ok: false, code: 'pass_invalid' },
+      { passAgain: { ok: true, pass: token, expiresAt: NOW / 1000 + 3600, readsLeft: 9 } },
+    );
+    passes.savePass({ token, expiresAt: NOW / 1000 + 3600, readsLeft: 5 });
+    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
+    passes.markRedeemed('cs_test_1', NOW / 1000 + 3600);
+    choose([photo]);
+    await submit();
+    expect(passes.pass()?.usable).toBe(false);
+  });
+
+  it('after a refusal, reads are free again within at most one renewal', async () => {
+    const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
+    const fresh = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600, v: 2 });
+    const { passes, passCalls, requests } = setUp(
+      { ok: false, code: 'pass_invalid' },
+      { passAgain: { ok: true, pass: fresh, expiresAt: NOW / 1000 + 3600, readsLeft: 9 } },
+    );
+    passes.savePass({ token, expiresAt: NOW / 1000 + 3600, readsLeft: 5 });
+    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
+    passes.markRedeemed('cs_test_1', NOW / 1000 + 3600);
+    for (let i = 0; i < 3; i++) {
+      choose([photo]);
+      await submit();
+    }
+    expect(passCalls).toEqual(['cs_test_1']);
+    expect(requests.map((r) => r.pass ?? 'free')).toEqual([token, fresh, 'free']);
+    expect(passes.pass()?.usable).toBe(false);
+    expect(document.querySelector('[data-doc-error]')?.textContent).not.toContain(
+      '¿Ya has pagado?',
     );
   });
 
