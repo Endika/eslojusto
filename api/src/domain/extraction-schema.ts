@@ -117,7 +117,11 @@ const PAYSLIP: DocumentSchema = {
       description: 'Whether a prorated extra payment line (prorrata de pagas extra) is printed.',
     },
     extraPayProratedAmount: money('Amount of the prorated extra payment line.'),
-    extraPayAmount: money('Amount of a full extra payment (paga extra) paid in this period.'),
+    extraPayPaid: {
+      type: { type: 'boolean' },
+      description: 'Whether a full extra payment (paga extra) is paid in this period.',
+    },
+    extraPayAmount: money('Amount of that full extra payment.'),
   },
   lists: {
     accruals: amountList('Every gross line (devengo) of the period, one entry per line.'),
