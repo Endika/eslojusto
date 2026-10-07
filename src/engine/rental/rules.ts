@@ -245,12 +245,13 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
     '2023-01-01',
   ),
   term_minimum: rule('term_minimum', 'rdl7_2019', 'LAU, art. 9.1', `${LAU}#a9`, '2019-03-06'),
+  // The 4 and 2 months' notice and the three yearly extensions come from RDL 7/2019, art. 1.5.
   term_tacit: rule(
     'term_tacit',
-    'law12_2023',
+    'rdl7_2019',
     'LAU, art. 10.1',
-    `${LAU}#a10`,
-    '2023-05-26',
+    `${LAU_2019}#a10`,
+    '2019-03-06',
     null,
     'term_rdl28',
   ),

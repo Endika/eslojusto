@@ -155,3 +155,15 @@ describe('no block carries an amount', () => {
     expect(numbersIn(blocks(change))).toEqual([]);
   });
 });
+
+describe('the tacit extension source', () => {
+  it('cites the RDL 7/2019 wording of art. 10.1', () => {
+    const b = find(blocks({ startDate: f('2021-03-20'), agreedMonths: 36 }), 'notice_windows');
+    expect(b.sources[0]).toMatchObject({
+      id: 'term_tacit',
+      citation: 'LAU, art. 10.1 (Real Decreto-ley 7/2019, de 1 de marzo)',
+      url: 'https://www.boe.es/buscar/act.php?id=BOE-A-1994-26003&tn=1&p=20190305#a10',
+      inForceSince: '2019-03-06',
+    });
+  });
+});
