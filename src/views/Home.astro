@@ -46,6 +46,17 @@ const documents = DOCUMENTS !== null;
         </section>
         <span class="item__tab" aria-hidden="true"></span>
       </li>
+      <li class="item index__live" data-tone="holidays">
+        <section class="sheet" data-tone="dates" aria-labelledby="index-benefit">
+          <h2 class="index__name" id="index-benefit">
+            {/* The benefit's pages are Spanish legal prose, published only in Spanish for now. */}
+            <a href={link('es', 'paro/')}>{tx('home.benefit')}</a>
+          </h2>
+          <p class="index__text">{tx('home.benefit_text')}</p>
+          <p class="index__citation">{tx('home.benefit_citation')}</p>
+        </section>
+        <span class="item__tab" aria-hidden="true"></span>
+      </li>
       {comingSoon.map(([tone, name]) => (
         <li class="item index__soon" data-tone={tone}>
           <section
