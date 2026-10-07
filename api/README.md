@@ -6,13 +6,14 @@ Three Lambda functions in **eu-south-2** behind function URLs:
 | ---------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | `extract`  | Reads a pack of employment documents, says what each page is and returns the fields they state | Turnstile, Bedrock (EU profiles), Stripe for pass reads |
 | `checkout` | Starts a Stripe Checkout for the 4,99 € pass                                                   | Turnstile, Stripe                                       |
-| `pass`     | Verifies a finished Checkout Session and issues the signed pass                                | Stripe                                                  |
+| `pass`     | Verifies a finished Checkout Session and issues the signed pass, or verifies a pass            | Stripe                                                  |
 
 Nothing is stored: documents live in the invocation's memory, the server keeps no state, and
 logs carry only `op`, `code`, `latencyMs`, `pages`, `inputTokens`, `outputTokens`,
 `escalated`, `conflicts` (how many fields two documents stated differently) and two flags (`test/http.test.ts` proves it): `underestimated` when Bedrock
 counted more than twice the input the pre-read estimate allowed for, and `countNotSaved` when
-a pass read went through but Stripe did not store its count. The manual calculator never calls this API.
+a pass read went through but Stripe did not store its count; `verify` marks a `pass` request that
+verified a pass. The manual calculator never calls this API.
 
 ```bash
 npm ci
@@ -106,6 +107,15 @@ token is `v1.<payload>.<signature>`, the payload being base64url JSON
 again with the same session and nonce returns the same pass, with the reads it really has left,
 which is how «¿Ya has pagado?» works. A pass with no reads left still unlocks the report and
 the letter until it expires.
+
+**`pass`** `{ "pass": "<token>" }` (verify) → `{ "code": "ok", "expiresAt": <epoch seconds>,
+"readsLeft": <n> }`, or `pass_invalid` (bad signature, not a pass, e.g. a free-read quota token,
+or a session Stripe does not have as paid), `pass_expired`, `pass_revoked` (refund, dispute or
+cancelled payment) and `payment_provider_unavailable`. The site asks before it shows the
+detail of a review or builds the report or the letter. No captcha: it does no Bedrock work and
+the function's reserved concurrency of 2 bounds it. Each container remembers a success for 60 s
+by the token's SHA-256, so a refund can take that long to lock a page again; failures are never
+remembered.
 
 ### Fields and the site's engine
 
@@ -282,7 +292,8 @@ Cheapest first, and nothing that parses what the person sent runs before the cap
   16th read is refused. Two reads racing on the same pass can both count as one
   (read-modify-write, at most the reserved concurrency of 5 at once); a failed write errs in
   the person's favour. Anything in that key other than a small integer counts as spent.
-- **Revocation:** each pass read and each `pass` request retrieves the session with its
+- **Revocation:** each pass read and each `pass` request (issue or verify, outside the 60 s
+  verify memo) retrieves the session with its
   PaymentIntent and latest charge; a refund (even partial), a dispute or a cancelled payment
   answers `pass_revoked`. A 100 % promotion code has no payment to revoke.
 

@@ -10,7 +10,15 @@ import {
   readsUsed,
   toSessionSnapshot,
 } from '../src/adapters/stripe-payments';
-import { issuePass, startCheckout, type PassDeps } from '../src/domain/payments';
+import {
+  createVerifyMemo,
+  issuePass,
+  startCheckout,
+  verifyPass,
+  VERIFY_MEMO_MS,
+  type PassDeps,
+} from '../src/domain/payments';
+import { passClaims } from '../src/domain/allowance';
 import type { SessionSnapshot } from '../src/domain/ports';
 import {
   CREATED,
@@ -200,5 +208,100 @@ describe('Stripe adapter', () => {
     expect(
       isRevoked(session({ payment_intent: null, payment_status: 'no_payment_required' })),
     ).toBe(false);
+  });
+});
+
+describe('verifyPass', () => {
+  const EXPIRY = CREATED + 7 * 86_400;
+  const token = signer.sign(passClaims(paid.id, EXPIRY));
+  const verifyDeps = (session: SessionSnapshot | null, clock = new FakeClock()) => {
+    const payments = new FakePayments(session ? { [session.id]: session } : {});
+    let lookups = 0;
+    const counting = {
+      findSession: (id: string) => {
+        lookups += 1;
+        return payments.findSession(id);
+      },
+      recordReads: payments.recordReads.bind(payments),
+    };
+    return {
+      deps: {
+        ...deps(session, clock),
+        payments: counting,
+        memo: createVerifyMemo(),
+        hash: (t: string) => `h:${t}`,
+      },
+      lookups: () => lookups,
+    };
+  };
+
+  it('a pass the API signed, for a paid session: its expiry and reads left', async () => {
+    const { deps: d } = verifyDeps(paidSession({ readsUsed: 4 }));
+    expect(await verifyPass(token, d)).toEqual({ code: 'ok', expiresAt: EXPIRY, readsLeft: 11 });
+  });
+
+  it('a pass with no reads left still unlocks', async () => {
+    const { deps: d } = verifyDeps(paidSession({ readsUsed: 15 }));
+    expect(await verifyPass(token, d)).toMatchObject({ code: 'ok', readsLeft: 0 });
+  });
+
+  it('a tampered pass is invalid, and Stripe is never asked', async () => {
+    const [v, payload, sig] = token.split('.');
+    const forged = Buffer.from(
+      JSON.stringify({ typ: 'pass', sid: paid.id, exp: EXPIRY + 86_400 * 365 }),
+    ).toString('base64url');
+    const { deps: d, lookups } = verifyDeps(paid);
+    expect(await verifyPass(`${v}.${forged}.${sig}`, d)).toEqual({ code: 'pass_invalid' });
+    expect(await verifyPass(`${v}.${payload}.${sig}x`, d)).toEqual({ code: 'pass_invalid' });
+    expect(await verifyPass('not-a-token', d)).toEqual({ code: 'pass_invalid' });
+    expect(lookups()).toBe(0);
+  });
+
+  it('a free-read quota token is no pass', async () => {
+    const quota = signer.sign({ typ: 'quota', day: '2026-10-07', used: 1 });
+    const { deps: d } = verifyDeps(paid);
+    expect(await verifyPass(quota, d)).toEqual({ code: 'pass_invalid' });
+  });
+
+  it('an expired pass', async () => {
+    const { deps: d } = verifyDeps(paid, new FakeClock(EXPIRY * 1000));
+    expect(await verifyPass(token, d)).toEqual({ code: 'pass_expired' });
+  });
+
+  it('a refunded, disputed or cancelled payment revokes it', async () => {
+    const { deps: d } = verifyDeps(paidSession({ revoked: true }));
+    expect(await verifyPass(token, d)).toEqual({ code: 'pass_revoked' });
+  });
+
+  it('a session Stripe no longer has, or never finished, is invalid', async () => {
+    expect(await verifyPass(token, verifyDeps(null).deps)).toEqual({ code: 'pass_invalid' });
+    expect(
+      await verifyPass(token, verifyDeps(paidSession({ paymentStatus: 'unpaid' })).deps),
+    ).toEqual({ code: 'pass_invalid' });
+  });
+
+  it('Stripe down: the provider is unavailable, never ok', async () => {
+    const d = {
+      ...deps(paid),
+      payments: new FakePayments({}, 'find'),
+      memo: createVerifyMemo(),
+      hash: (t: string) => t,
+    };
+    expect(await verifyPass(token, d)).toEqual({ code: 'payment_provider_unavailable' });
+  });
+
+  it('remembers a success for a minute, and only a success', async () => {
+    const clock = new FakeClock();
+    const { deps: d, lookups } = verifyDeps(paid, clock);
+    await verifyPass(token, d);
+    await verifyPass(token, d);
+    expect(lookups()).toBe(1);
+    clock.ms += VERIFY_MEMO_MS;
+    await verifyPass(token, d);
+    expect(lookups()).toBe(2);
+    const revoked = verifyDeps(paidSession({ revoked: true }));
+    await verifyPass(token, revoked.deps);
+    await verifyPass(token, revoked.deps);
+    expect(revoked.lookups()).toBe(2);
   });
 });
