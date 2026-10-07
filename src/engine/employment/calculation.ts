@@ -52,10 +52,12 @@ export type EmploymentPhraseKey =
   | 'minimum_wage.agreement.within'
   | 'minimum_wage.agreement.below'
   | 'modality.before_reform'
-  | ModalityPhraseKey;
+  | ModalityPhraseKey
+  | ChainingPhraseKey;
 
-// Art. 15.4 ET is quoted, never asserted: «permanent_on_breach» says the article states that, in
-// a case like this one, the person acquires permanent status.
+// Art. 15.4 and 15.5 ET are quoted, never asserted: «permanent_on_breach» and
+// «chaining.permanent» say the article states that, in a case like this one, the person acquires
+// permanent status.
 type ModalityPhraseKey =
   | 'modality.permanent'
   | 'modality.unknown'
@@ -98,6 +100,16 @@ type ModalityPhraseKey =
   | 'modality.discontinuous_stated'
   | 'modality.discontinuous_missing'
   | 'modality.discontinuous_unknown';
+
+type ChainingPhraseKey =
+  | 'chaining.no_history'
+  | 'chaining.within'
+  | 'chaining.near_limit'
+  | 'chaining.exceeds'
+  | 'chaining.permanent'
+  | 'chaining.depends_on_cutoff'
+  | 'chaining.same_group_not_counted'
+  | 'chaining.kind_unknown_not_counted';
 
 export interface EmploymentPhrase {
   readonly key: EmploymentPhraseKey;

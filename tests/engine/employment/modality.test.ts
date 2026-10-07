@@ -446,6 +446,7 @@ describe('reviewModality: dependencies and boundaries', () => {
 describe('temporality copy', () => {
   it.each([
     'src/engine/employment/modality.ts',
+    'src/engine/employment/chaining.ts',
     'src/engine/employment/fixed-term.ts',
     'src/engine/employment/quotes.ts',
     'src/engine/employment/reference.ts',
