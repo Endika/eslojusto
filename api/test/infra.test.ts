@@ -259,6 +259,9 @@ describe('global stack', () => {
     const json = JSON.stringify(policies);
     expect(json).toContain('function:eslojusto-api-');
     expect(json).toContain('iam:PassRole');
-    expect(json).not.toMatch(/iam:Create|iam:Put|iam:Attach|bedrock|budgets/);
+    expect(json).toContain('parameter/cdk-bootstrap/hnb659fds/version');
+    expect(json).not.toMatch(
+      /iam:Create|iam:Put|iam:Attach|bedrock|budgets|ssm:GetParameter"|ssm:\*/,
+    );
   });
 });
