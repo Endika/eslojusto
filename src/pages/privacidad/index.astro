@@ -1,11 +1,15 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { t, type Key } from '../../i18n';
+import { DOCUMENTS } from '../../documents/config';
+import { STORAGE_KEYS } from '../../documents/pass';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
 const tx = (key: Key) => t('es', key);
 
 const email = 'hola@eslojusto.es';
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
 
 // One entry per thing that is stored or processed; a new tool adds a row here.
 const stored = [
@@ -19,6 +23,24 @@ const stored = [
     where:
       'Unos avisos cortos con códigos y tramos, que se envían a PostHog mientras usas la página (el detalle, abajo). El identificador de la página vista vive solo en su memoria: no se escribe en tu dispositivo y se pierde al cerrarla o recargarla.',
   },
+  ...(documents
+    ? [
+        {
+          what: tx('privacy.data_documents'),
+          where:
+            'Solo si eliges subir tu finiquito, tus nóminas o tu vida laboral y das tu consentimiento. Las fotos o el PDF viajan cifrados a un servidor de eslojusto.es en Amazon Web Services, en España (región eu-south-2), que se los pasa a un modelo de IA (Claude, de Anthropic) a través de Amazon Bedrock, dentro de la Unión Europea. El modelo copia los datos que pide el formulario y lo leído vuelve a tu navegador. No se guarda nada: el documento solo existe en la memoria del servidor mientras se lee, y sus registros, que se conservan 14 días, llevan solo el resultado, el número de páginas y el tiempo que tardó, nunca el contenido.',
+        },
+        {
+          what: tx('privacy.data_pass'),
+          where: `En el almacenamiento local (localStorage) de tu navegador, y solo si los usas: un contador firmado de tus lecturas gratis del día («${STORAGE_KEYS.quota}»); si compras el pase, el pase («${STORAGE_KEYS.pass}») y el código del pago con un número al azar que solo conoce tu navegador, para poder recuperar el pase («${STORAGE_KEYS.checkout}»). No llevan tu nombre ni nada de tus documentos, y solo salen de tu dispositivo con la siguiente lectura o para recuperar el pase. Se borran al borrar los datos de este sitio en tu navegador.`,
+        },
+        {
+          what: tx('privacy.data_checkout'),
+          where:
+            'Si pagas, las respuestas de tu revisión se guardan en el almacenamiento de sesión (sessionStorage) de esa pestaña mientras estás en la página de pago, para enseñarte el resultado al volver. No salen de tu dispositivo y se borran al volver o al cerrar la pestaña.',
+        },
+      ]
+    : []),
   {
     what: tx('privacy.data_theme'),
     where:
@@ -70,6 +92,22 @@ const tracked = [
     when: 'Al pulsar «Empezar de nuevo»',
     what: 'Que lo has pulsado.',
   },
+  ...(documents
+    ? [
+        {
+          when: 'Al elegir cómo empezar',
+          what: 'Si eliges subir un documento o rellenar a mano.',
+        },
+        {
+          when: 'Al leer un documento',
+          what: 'Qué tipo de documento eliges (finiquito, nóminas o vida laboral), cuántos archivos subes y si son fotos o un PDF. Al terminar, cuántos datos se rellenaron, en un tramo (0, de 1 a 3, de 4 a 8, o 9 o más), si alguno salió con confianza baja y si las cifras no cuadraban; o, si falla, el código del error. Nunca nada de lo que pone el documento.',
+        },
+        {
+          when: 'Con el pase',
+          what: 'Que empiezas el pago, que el pase se emite al volver del pago o al recuperarlo, o el código del error, y si descargas el informe o la carta. Nunca el código del pago ni el pase.',
+        },
+      ]
+    : []),
   {
     when: 'Si la página falla',
     what: 'El tipo de error y en qué archivo y línea del código ocurrió. Nunca el mensaje del error, porque podría citar algo que escribiste.',
@@ -99,6 +137,13 @@ const tracked = [
           la gente, se mide sin identificarte qué pasos usas. Solo se envían códigos y tramos, nunca
           un importe ni una fecha. No hay cookies ni publicidad.
         </p>
+        {documents && (
+          <p>
+            Si decides subir un documento para rellenar los datos, se lee con IA en la Unión Europea
+            con tu consentimiento y no se guarda. Si compras el pase del informe, el pago lo
+            gestiona Stripe.
+          </p>
+        )}
       </section>
 
       <section class="sheet sheet--text">
@@ -167,14 +212,65 @@ const tracked = [
         </p>
       </section>
 
+      {documents && (
+        <section class="sheet sheet--text">
+          <h2 id="pr-documentos">{tx('privacy.documents')}</h2>
+          <p>
+            Leer un documento es opcional: la revisión funciona igual si escribes los datos. Antes
+            de subirlo te pedimos tu consentimiento explícito, porque una nómina o una vida laboral
+            pueden mostrar datos especialmente protegidos, como la afiliación a un sindicato (por su
+            cuota) o una baja por enfermedad. La base jurídica es ese consentimiento (arts. 6.1.a y
+            9.2.a del Reglamento General de Protección de Datos). Puedes retirarlo cuando quieras no
+            subiendo más documentos: como no se guarda nada, no queda nada que borrar.
+          </p>
+          <p>
+            Los documentos los procesa Amazon Web Services EMEA SARL (Luxemburgo), encargada del
+            tratamiento: el servidor (AWS Lambda) está en España y el modelo de IA se usa a través
+            de Amazon Bedrock con un perfil que solo funciona en regiones de la Unión Europea.
+            Amazon Bedrock no guarda los documentos ni lo que el modelo responde, no los usa para
+            entrenar modelos y no los comparte con Anthropic. El contrato de encargado de AWS
+            incluye las cláusulas contractuales tipo de la Comisión Europea.
+          </p>
+          <p>
+            Para limitar las lecturas gratis a personas, antes de cada lectura la página carga
+            Cloudflare Turnstile, que comprueba que no eres un robot sin usar cookies. Cloudflare,
+            Inc. recibe la dirección IP y datos técnicos de tu navegador para esa comprobación, y
+            solo cuando eliges subir un documento. La base jurídica es el interés legítimo en evitar
+            el abuso del servicio (art. 6.1.f del Reglamento); Cloudflare está adherida al Marco de
+            Privacidad de Datos UE-EE. UU.
+          </p>
+          <p>
+            El pase del informe se paga en la página de Stripe Payments Europe, Ltd. (Irlanda).
+            eslojusto.es no ve ni guarda los datos de tu tarjeta ni de Bizum: solo pregunta a Stripe
+            si el pago se ha hecho y por qué importe. La base jurídica es el contrato de compra
+            (art. 6.1.b) y las obligaciones contables y fiscales (art. 6.1.c). Stripe conserva los
+            datos del pago el tiempo que le exigen esas obligaciones y las normas contra el blanqueo
+            de capitales; lo explica en su{' '}
+            <a href="https://stripe.com/es/privacy">política de privacidad</a>. Las condiciones de
+            la compra están en el{' '}
+            <a href={`${import.meta.env.BASE_URL}aviso-legal/#condiciones`}>aviso legal</a>.
+          </p>
+        </section>
+      )}
+
       <section class="sheet sheet--text">
         <h2 id="pr-cookies">{tx('privacy.cookies')}</h2>
-        <p>
-          Esta web no usa cookies, y la medición no escribe nada en tu dispositivo, ni en ningún
-          otro almacenamiento del navegador, porque todo vive en la memoria de la página. Lo único
-          que se guarda es tu elección de tema, y solo si pulsas su botón. Por eso no ves ningún
-          aviso de cookies.
-        </p>
+        {documents ? (
+          <p>
+            Esta web no usa cookies, y la medición no escribe nada en tu dispositivo, ni en ningún
+            otro almacenamiento del navegador, porque todo vive en la memoria de la página. Solo se
+            guarda lo que tú pides: tu elección de tema, si pulsas su botón, y, si lees documentos o
+            compras el pase, lo que explica «Qué se guarda y dónde». Por eso no ves ningún aviso de
+            cookies.
+          </p>
+        ) : (
+          <p>
+            Esta web no usa cookies, y la medición no escribe nada en tu dispositivo, ni en ningún
+            otro almacenamiento del navegador, porque todo vive en la memoria de la página. Lo único
+            que se guarda es tu elección de tema, y solo si pulsas su botón. Por eso no ves ningún
+            aviso de cookies.
+          </p>
+        )}
       </section>
 
       <section class="sheet sheet--text">

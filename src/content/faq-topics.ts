@@ -13,4 +13,8 @@ export const FAQ_TOPICS = [
   ['not_agreed', 'faq-no_conforme'],
   ['not_checkable', 'faq-no_comprobable'],
   ['data', 'faq-datos'],
+  // Only in a build that reads documents.
+  ['documents', 'faq-documentos'],
 ] as const;
+
+export const DOCUMENT_TOPICS: readonly string[] = ['documents'];

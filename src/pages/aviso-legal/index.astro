@@ -1,11 +1,15 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { t, type Key } from '../../i18n';
+import { DOCUMENTS } from '../../documents/config';
+import { PASS_DAYS, PASS_READS } from '../../documents/contract';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
 const tx = (key: Key) => t('es', key);
 
 const email = 'hola@eslojusto.es';
+// The pass and its conditions exist only in a build with the documents API.
+const documents = DOCUMENTS !== null;
 ---
 
 <Base
@@ -45,6 +49,13 @@ const email = 'hola@eslojusto.es';
           legal, como el preaviso de una dimisión, lo marca como «no se puede comprobar» en vez de
           dar una cifra que no puede saber.
         </p>
+        {documents && (
+          <p>
+            Si subes un documento, un modelo de IA copia sus datos en el formulario. No calcula
+            nada: tú confirmas cada dato antes de revisar, y las cifras las calcula la misma
+            herramienta que cuando los escribes.
+          </p>
+        )}
       </section>
 
       <section class="sheet sheet--text">
@@ -62,6 +73,48 @@ const email = 'hola@eslojusto.es';
           pueden revisar tu caso con tus documentos y tu convenio.
         </p>
       </section>
+
+      {documents && (
+        <section class="sheet sheet--text">
+          <h2 id="condiciones">{tx('legal_notice.conditions')}</h2>
+          <p>
+            Lo vende Endika Iglesias, responsable de eslojusto.es. Para cualquier duda sobre una
+            compra, escribe a <a href={`mailto:${email}`}>{email}</a>.
+          </p>
+          <ul>
+            <li>
+              Qué compras: un pase digital para tu caso, que dura {PASS_DAYS} días desde el pago.
+              Con él descargas, las veces que quieras, un informe en PDF con la revisión de tu
+              finiquito y una plantilla de carta «recibí no conforme» con tus cifras, y puedes leer
+              hasta {PASS_READS} documentos. El informe y la carta se generan en tu dispositivo con
+              los datos de tu revisión.
+            </li>
+            <li>
+              Precio: 4,99 € con el IVA incluido. Un solo pago con tarjeta o Bizum en la página de
+              Stripe, sin suscripción ni cobros posteriores.
+            </li>
+            <li>
+              Entrega: inmediata, al volver del pago. Si no ves las descargas, «¿Ya has pagado?» en
+              el resultado recupera el pase desde el mismo navegador.
+            </li>
+            <li>
+              Desistimiento: es contenido digital que se entrega al momento. Antes de pagar te
+              pedimos que marques que quieres recibirlo ya y que sabes que así pierdes el derecho de
+              desistimiento de 14 días (art. 103.m del texto refundido de la Ley General para la
+              Defensa de los Consumidores y Usuarios).
+            </li>
+            <li>
+              Si algo falla, por ejemplo si no puedes descargar el informe o se te cobra dos veces,
+              escribe a <a href={`mailto:${email}`}>{email}</a> y se devuelve el importe que
+              corresponda.
+            </li>
+            <li>
+              El informe da información general sobre la ley y no es asesoramiento jurídico. La
+              carta es una plantilla: usarla o no es decisión tuya.
+            </li>
+          </ul>
+        </section>
+      )}
 
       <section class="sheet sheet--text">
         <h2 id="al-errores">{tx('legal_notice.errors')}</h2>

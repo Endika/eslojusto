@@ -6,8 +6,9 @@ import { link, type Lang } from '../i18n/languages';
 
 interface Props {
   lang: Lang;
+  documents?: boolean;
 }
-const { lang } = Astro.props;
+const { lang, documents = false } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 
 // Headings and labels come from the dictionary. The explanatory prose, the rules and the worked
@@ -423,7 +424,7 @@ const benefitSources = [
     <section class="sheet sheet--text">
       <h2 id="g-preguntas">{tx('guide.faq')}</h2>
       <div class="faq-list">
-        {faqEntries(lang).map(({ anchor, question, answer }) => (
+        {faqEntries(lang, { documents }).map(({ anchor, question, answer }) => (
           <details class="faq-item" id={anchor} data-help>
             <summary>{question}</summary>
             <p>{answer}</p>
