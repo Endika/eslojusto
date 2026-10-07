@@ -173,15 +173,76 @@ describe('reviewChaining', () => {
     expect(f.calculation[0]?.vars?.contratos).toEqual({ integer: 1 });
   });
 
-  it('two overlapping history periods are one contract', () => {
+  // Reads split by overlap: as one contract, within the limit; as separate contracts, over it.
+  const splitByOverlap = (assessed: Assessed) => {
+    expect(assessed.kind).toBe('readings');
+    if (assessed.kind !== 'readings') return;
+    expect(assessed.question).toBe('chaining_overlap');
+    expect(assessed.readings.map((r) => [r.when, r.finding.status])).toEqual([
+      ['overlap_same_contract', 'within_limit'],
+      ['overlap_separate_contracts', 'review_it'],
+    ]);
+    expect(assessed.readings[1]?.finding.calculation.map((p) => p.key)).toEqual([
+      'chaining.exceeds',
+      'chaining.depends_on_overlap',
+    ]);
+    expect(offerPass([assessed])).toBe(false);
+  };
+
+  it('two overlapping history periods may be one contract or two', () => {
     const input = chained(
       ['2025-09-01', null],
       [period('2024-01-01', '2025-07-31'), period('2024-01-02', '2025-07-30')],
       { modality: 'replacement' },
     );
-    const f = only(review(input));
-    expect(f.status).toBe('within_limit');
-    expect(f.calculation[0]?.vars?.contratos).toEqual({ integer: 1 });
+    splitByOverlap(review(input));
+  });
+
+  it('leaving and rejoining on the same day may be one contract or a 20-month chain', () => {
+    splitByOverlap(
+      review(chained(['2024-12-31', '2025-08-31'], [period('2024-01-01', '2024-12-31')])),
+    );
+  });
+
+  it('a row that holds the current contract and an earlier stretch is never read as within for sure', () => {
+    splitByOverlap(
+      review(chained(['2025-03-01', '2025-05-31'], [period('2023-06-01', '2025-12-31')])),
+    );
+  });
+
+  it('a row holding the current contract, plus an earlier contract, is a chain either way', () => {
+    const input = chained(
+      ['2025-03-01', '2025-05-31'],
+      [period('2023-06-01', '2025-12-31'), period('2023-01-01', '2023-05-31')],
+    );
+    expect(only(review(input)).status).toBe('becomes_permanent');
+  });
+
+  it('a group row bridging two company contracts never merges them', () => {
+    const input = chained(
+      ['2025-01-01', '2025-08-31'],
+      [
+        period('2024-01-01', '2024-08-31'),
+        period('2024-08-15', '2025-01-15', { employer: 'same_group' }),
+      ],
+    );
+    const assessed = review(input);
+    expect(assessed.kind).toBe('readings');
+    if (assessed.kind !== 'readings') return;
+    expect(assessed.question).toBe('chaining_group');
+    expect(
+      assessed.readings.map((r) => [
+        r.when,
+        r.finding.status,
+        r.finding.calculation[0]?.vars?.contratos,
+      ]),
+    ).toEqual([
+      ['group_counted', 'review_it', { integer: 3 }],
+      ['group_not_counted', 'within_limit', { integer: 2 }],
+    ]);
+    expect(assessed.readings[0]?.finding.calculation.map((p) => p.key)).toContain(
+      'chaining.depends_on_group',
+    );
   });
 
   it('a contract ending the day before the next starts is a second contract', () => {

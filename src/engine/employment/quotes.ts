@@ -10,8 +10,9 @@ type QuotedRule = Extract<
   | 'written_form'
 >;
 
-// Verbatim from the consolidated Estatuto in the BOE: art. 15 as worded from 02-01-2025 and art. 8.2
-// as worded from 27-06-2020. A new wording flagged by the monthly review means rereading these.
+// Verbatim from the consolidated Estatuto in the BOE: art. 15 as worded from 02-01-2025 and
+// art. 8.2 as worded from 27-06-2020. A new wording flagged by the monthly review means rereading
+// these.
 export const LAW_QUOTES: Readonly<Record<QuotedRule, LiteralQuote>> = {
   // 15.1, third paragraph.
   fixed_term_presumption: {

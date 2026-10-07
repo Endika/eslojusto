@@ -42,6 +42,9 @@ const OPEN_ENDED: ReadonlySet<Modality> = new Set(['permanent', 'discontinuous']
 
 type Cutoff = ReadingCode<'chaining_cutoff'>;
 
+// Read in this order when choosing which doubt labels the readings.
+const DIMENSIONS = ['chaining_group', 'chaining_overlap', 'chaining_cutoff'] as const;
+
 const SEVERITY: Readonly<Record<Outcome['kind'], number>> = { within: 0, near: 1, exceeds: 2 };
 
 interface Outcome {
@@ -51,54 +54,69 @@ interface Outcome {
   readonly contracts: number;
 }
 
-type Group = ReadingCode<'chaining_group'>;
+type Overlap = ReadingCode<'chaining_overlap'>;
 
-// Whose contracts add up: the same company always; the group and agency placements at the same
-// company only in the reading that counts them, since the person's history may not tell them apart.
-const EMPLOYERS: Readonly<Record<Group, ReadonlySet<EmploymentPeriod['employer']>>> = {
-  group_counted: new Set(['same', 'same_group', 'same_via_agency']),
-  group_not_counted: new Set(['same']),
-};
+// Group and agency placements at the same company only add up in the reading that counts them,
+// since the person's history may not tell them apart; they never merge two company contracts.
+const GROUP_EMPLOYERS: ReadonlySet<EmploymentPeriod['employer']> = new Set([
+  'same_group',
+  'same_via_agency',
+]);
+
+// A history row this close to the current contract at both ends is the current contract.
+const SAME_CONTRACT_DAYS = 3;
 
 const overlap = (a: ContributionPeriod, b: ContributionPeriod): boolean =>
   compareDates(a.startDate, b.endDate) <= 0 && compareDates(b.startDate, a.endDate) <= 0;
 
-// Overlapping periods are pieces of one contract, never two.
-function distinct(periods: readonly ContributionPeriod[]): ContributionPeriod[] {
+const near = (a: CivilDate, b: CivilDate): boolean =>
+  Math.abs(compareDates(a, b)) <= SAME_CONTRACT_DAYS;
+
+// Overlapping periods taken as pieces of one contract.
+function merged(periods: readonly ContributionPeriod[]): ContributionPeriod[] {
   const sorted = [...periods].sort((a, b) => compareDates(a.startDate, b.startDate));
-  const merged: ContributionPeriod[] = [];
+  const out: ContributionPeriod[] = [];
   for (const p of sorted) {
-    const last = merged.at(-1);
+    const last = out.at(-1);
     if (last !== undefined && overlap(last, p)) {
-      merged[merged.length - 1] = {
-        startDate: last.startDate,
-        endDate: max(last.endDate, p.endDate),
-      };
-    } else merged.push(p);
+      out[out.length - 1] = { startDate: last.startDate, endDate: max(last.endDate, p.endDate) };
+    } else out.push(p);
   }
-  return merged;
+  return out;
 }
 
-// The production contracts that add up, the current one included, up to today. A history period
-// with the same company that overlaps the current contract is the current contract.
-function productionContracts(
-  input: EmploymentInput,
-  today: CivilDate,
-  employers: ReadonlySet<EmploymentPeriod['employer']>,
-): ContributionPeriod[] {
-  const current = { startDate: input.startDate, endDate: input.endDate ?? today };
-  const earlier = (input.history ?? []).filter(
-    (p) =>
-      employers.has(p.employer) &&
-      p.kind === 'production' &&
-      !(p.employer === 'same' && overlap(p, current)),
-  );
-  const all = PRODUCTION.has(input.modality) ? [...earlier, current] : earlier;
-  return distinct(
-    all
+interface Contracts {
+  // Same-company contracts, with any other overlap read as one contract or as several.
+  readonly company: Readonly<Record<Overlap, readonly ContributionPeriod[]>>;
+  readonly group: readonly ContributionPeriod[];
+}
+
+// The production contracts that may add up, the current one included, up to today.
+function productionContracts(input: EmploymentInput, today: CivilDate): Contracts {
+  const upToToday = (ps: readonly ContributionPeriod[]) =>
+    ps
       .filter((p) => compareDates(p.startDate, today) <= 0)
-      .map((p) => ({ startDate: p.startDate, endDate: min(p.endDate, today) })),
+      .map((p) => ({ startDate: p.startDate, endDate: min(p.endDate, today) }));
+  const current = { startDate: input.startDate, endDate: input.endDate ?? today };
+  const isProduction = PRODUCTION.has(input.modality);
+  const rows = (input.history ?? []).filter((p) => p.kind === 'production');
+  const company = rows.filter(
+    (p) =>
+      p.employer === 'same' &&
+      !(near(p.startDate, current.startDate) && near(p.endDate, current.endDate)),
   );
+  // As one contract, a cluster holding the current contract is the current contract, counted
+  // only when that is a production contract.
+  const clusters = merged([...company, current]).filter(
+    (c) => isProduction || !overlap(c, current),
+  );
+  return {
+    company: {
+      overlap_same_contract: upToToday(clusters),
+      overlap_separate_contracts: upToToday(isProduction ? [...company, current] : company),
+    },
+    group: upToToday(rows.filter((p) => GROUP_EMPLOYERS.has(p.employer))),
+  };
 }
 
 // Transitional provision 5.ª RDL 32/2021: of the contracts concluded before the cutoff, only the
@@ -149,9 +167,16 @@ function worstWindow(contracts: readonly ContributionPeriod[]): Outcome {
   return worst ?? { kind: 'within', ...widest };
 }
 
-type Doubt = 'cutoff' | 'group' | null;
+type Dimension = (typeof DIMENSIONS)[number];
 
-function draftOf(outcome: Outcome, doubt: Doubt, notes: EmploymentPhrase[]): Draft {
+const DEPENDS_ON = {
+  chaining_group: 'chaining.depends_on_group',
+  chaining_overlap: 'chaining.depends_on_overlap',
+  chaining_cutoff: 'chaining.depends_on_cutoff',
+} as const;
+
+function draftOf(outcome: Outcome, doubts: readonly Dimension[], notes: EmploymentPhrase[]): Draft {
+  const dependsOn = doubts.map((d) => phrase(DEPENDS_ON[d]));
   const figures = {
     dias: { integer: outcome.days },
     limite: { integer: outcome.limit },
@@ -161,7 +186,7 @@ function draftOf(outcome: Outcome, doubt: Doubt, notes: EmploymentPhrase[]): Dra
   switch (outcome.kind) {
     case 'exceeds':
       // Never quoted as permanent while the readings disagree.
-      return doubt === null
+      return doubts.length === 0
         ? {
             ...base,
             status: 'becomes_permanent',
@@ -175,19 +200,13 @@ function draftOf(outcome: Outcome, doubt: Doubt, notes: EmploymentPhrase[]): Dra
         : {
             ...base,
             status: 'review_it',
-            calculation: [
-              phrase('chaining.exceeds', figures),
-              phrase(
-                doubt === 'cutoff' ? 'chaining.depends_on_cutoff' : 'chaining.depends_on_group',
-              ),
-              ...notes,
-            ],
+            calculation: [phrase('chaining.exceeds', figures), ...dependsOn, ...notes],
           };
     case 'near':
       return {
         ...base,
         status: 'review_it',
-        calculation: [phrase('chaining.near_limit', figures), ...notes],
+        calculation: [phrase('chaining.near_limit', figures), ...dependsOn, ...notes],
       };
     case 'within':
       return {
@@ -217,9 +236,9 @@ function leftOut(input: EmploymentInput, groupRead: boolean): EmploymentPhrase[]
 
 // Art. 15.5 ET with the person's work history. Transitional provision 5.ª RDL 32/2021 counts only
 // the contract in force when it took effect, and whether that is 31-12-2021 (the decree) or
-// 30-03-2022 (the new art. 15) is not settled, so both cutoffs are read; when the group or agency
-// placements decide the outcome, they open their own readings. Null when the contract is already
-// open-ended.
+// 30-03-2022 (the new art. 15) is not settled, so both cutoffs are read. Group or agency placements,
+// and overlapping rows that may be one contract or several, open their own readings when they
+// decide the outcome. Null when the contract is already open-ended.
 export function reviewChaining(
   input: EmploymentInput,
   today: CivilDate,
@@ -254,34 +273,63 @@ export function reviewChaining(
     cutoff_2021_12_31: parseDate(norms.rdl32_2021.inForceSince),
     cutoff_2022_03_30: parseDate(RULES.chaining_18_in_24.from),
   };
-  const outcome = (group: Group, cutoff: Cutoff) =>
-    worstWindow(countedFrom(productionContracts(input, today, EMPLOYERS[group]), cutoffs[cutoff]));
-  const grid = READINGS.chaining_group.flatMap((g) =>
-    READINGS.chaining_cutoff.map((c) => outcome(g, c).kind),
-  );
-  const allAgree = new Set(grid).size === 1;
-  const groupMatters = READINGS.chaining_cutoff.some(
-    (c) => outcome('group_counted', c).kind !== outcome('group_not_counted', c).kind,
-  );
-  const notes = leftOut(input, groupMatters);
-  if (!groupMatters) {
-    return assessAcross('chaining_cutoff', READINGS.chaining_cutoff, (cutoff) =>
-      settle(
-        draftOf(outcome('group_not_counted', cutoff), allAgree ? null : 'cutoff', notes),
-        today,
-        norms,
+  const contracts = productionContracts(input, today);
+  const ambiguous =
+    contracts.company.overlap_same_contract.length !==
+    contracts.company.overlap_separate_contracts.length;
+  const worlds = READINGS.chaining_group.flatMap((group) =>
+    READINGS.chaining_overlap
+      .filter((o) => ambiguous || o === 'overlap_same_contract')
+      .flatMap((overlapRead) =>
+        READINGS.chaining_cutoff.map((cutoff) => {
+          const world = {
+            chaining_group: group,
+            chaining_overlap: overlapRead,
+            chaining_cutoff: cutoff,
+          };
+          const counted = [
+            ...contracts.company[overlapRead],
+            ...(group === 'group_counted' ? contracts.group : []),
+          ];
+          return { world, outcome: worstWindow(countedFrom(counted, cutoffs[cutoff])) };
+        }),
       ),
-    );
+  );
+  type Cell = (typeof worlds)[number];
+  // A doubt matters when changing only its answer changes the outcome.
+  const matters = (dim: Dimension, cells: readonly Cell[]): boolean => {
+    const byRest = new Map<string, Set<Outcome['kind']>>();
+    for (const { world, outcome } of cells) {
+      const rest = DIMENSIONS.filter((d) => d !== dim)
+        .map((d) => world[d])
+        .join('|');
+      byRest.set(rest, (byRest.get(rest) ?? new Set()).add(outcome.kind));
+    }
+    return [...byRest.values()].some((kinds) => kinds.size > 1);
+  };
+  const groupMatters = matters('chaining_group', worlds);
+  const notes = leftOut(input, groupMatters);
+  const question = DIMENSIONS.find((d) => matters(d, worlds));
+  if (question === undefined) {
+    return assessAcross('chaining_cutoff', READINGS.chaining_cutoff, (cutoff) => {
+      const cell = worlds.find(
+        (c) => c.world.chaining_cutoff === cutoff && c.world.chaining_group === 'group_not_counted',
+      );
+      if (cell === undefined) throw new RangeError(`no world for ${cutoff}`);
+      return settle(draftOf(cell.outcome, [], notes), today, norms);
+    });
   }
-  // Within each group reading the worse cutoff is shown, and still marked if the cutoff decides it.
-  return assessAcross('chaining_group', READINGS.chaining_group, (group) => {
-    const [first, second] = READINGS.chaining_cutoff.map((c) => outcome(group, c));
-    if (first === undefined || second === undefined) throw new RangeError('two cutoffs expected');
-    const worse = SEVERITY[second.kind] > SEVERITY[first.kind] ? second : first;
-    return settle(
-      draftOf(worse, first.kind === second.kind ? 'group' : 'cutoff', notes),
-      today,
-      norms,
-    );
+  // Each reading shows its worst world, marked with every doubt that still decides it.
+  const answers = [...new Set(worlds.map((c) => c.world[question]))] as ReadingCode<Dimension>[];
+  return assessAcross(question, answers, (answer) => {
+    const cells = worlds.filter((c) => c.world[question] === answer);
+    const worst = cells.reduce((a, b) =>
+      SEVERITY[b.outcome.kind] > SEVERITY[a.outcome.kind] ||
+      (b.outcome.kind === a.outcome.kind && b.outcome.days > a.outcome.days)
+        ? b
+        : a,
+    ).outcome;
+    const doubts = [question, ...DIMENSIONS.filter((d) => d !== question && matters(d, cells))];
+    return settle(draftOf(worst, doubts, notes), today, norms);
   });
 }

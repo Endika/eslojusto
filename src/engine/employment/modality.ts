@@ -433,7 +433,8 @@ function discontinuousEssentials(c: Context): Finding {
 }
 
 // 8.2: training, part-time, fixed-discontinuous, remote and work-or-service contracts, and
-// fixed-term ones of over four weeks, are written; otherwise the contract is presumed open-ended and full-time, «salvo prueba en contrario».
+// fixed-term ones of over four weeks, are written; otherwise the contract is presumed open-ended
+// and full-time, «salvo prueba en contrario».
 function writtenForm(c: Context): readonly Finding[] {
   const { input } = c;
   const { end } = span(c);
