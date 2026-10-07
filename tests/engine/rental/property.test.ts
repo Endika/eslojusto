@@ -130,7 +130,7 @@ function randomInput(g: Rng, today: CivilDate): RentalInput {
           keysReturnedOn: keys,
           returns: Array.from({ length: g.int(0, 2) }, () => ({
             on: g.day(keys, today),
-            amount: g.int(100, rent),
+            amount: g.int(100, g.r() < 0.2 ? 2 * rent : rent),
           })),
           deductions: Array.from({ length: g.int(0, 1) }, () => ({
             kind: g.pick(DEDUCTIONS),
