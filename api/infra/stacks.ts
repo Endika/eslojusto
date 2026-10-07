@@ -27,6 +27,7 @@ import {
   STRIPE_PRICE_ENV,
   foundationModelId,
 } from '../src/config';
+import { addDashboard, DASHBOARD_NAME } from './dashboard';
 
 // CloudFormation in eu-south-2 has no AWS::Budgets::* types; this stack holds only global
 // resources (IAM, Budgets), so the region it is deployed through stores nothing.
@@ -41,7 +42,6 @@ export const DEPLOY_ROLE_NAME = 'eslojusto-github-deploy';
 export const CFN_EXECUTION_POLICY_NAME = 'eslojusto-api-cfn-execution';
 export const DENY_BEDROCK_POLICY_NAME = 'eslojusto-api-deny-bedrock';
 export const BUDGET_NAME = 'eslojusto-api-monthly';
-export const DASHBOARD_NAME = 'eslojusto-api';
 const CDK_QUALIFIER = 'hnb659fds';
 const EXTRACT_RESERVED_CONCURRENCY = 5;
 // Caps how hard checkout and pass can be hammered; each holds a Stripe call, never Bedrock.
@@ -125,6 +125,8 @@ export class ApiStack extends Stack {
       });
       new CfnOutput(this, `${key}Url`, { value: url.url });
     }
+
+    addDashboard(this, { monthlyUsd: MONTHLY_BUDGET_USD, name: BUDGET_NAME });
   }
 }
 

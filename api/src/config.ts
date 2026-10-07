@@ -30,6 +30,15 @@ export const MODEL_SETTINGS: Readonly<Record<string, ModelSettings>> = {
   [SONNET_5_5]: { forcedToolChoice: false, maxTokens: 16000 },
 };
 
+// USD per million tokens through the EU profiles, from the eu-south-2 Price List (07-10-2026).
+// Only the dashboard's cost estimate reads them; a configured model without a price fails synth.
+export const MODEL_PRICES_USD_PER_MTOK: Readonly<
+  Record<string, { readonly input: number; readonly output: number }>
+> = {
+  [HAIKU_4_5]: { input: 1.1, output: 5.5 },
+  [SONNET_4_6]: { input: 3.3, output: 16.5 },
+};
+
 // Where the EU profiles route requests from eu-south-2; IAM must allow the model in each.
 export const EU_PROFILE_DESTINATIONS = [
   'eu-central-1',
