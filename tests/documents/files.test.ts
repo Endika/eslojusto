@@ -21,11 +21,11 @@ const pdf = { type: 'application/pdf', size: 500_000 };
 const photos = (n: number) => Array.from({ length: n }, () => jpeg);
 
 describe('checkSelection', () => {
-  it('wants between one and fifteen images', () => {
+  it('wants between one and twenty-five images', () => {
     expect(checkSelection(0)).toBe('no_files');
     expect(checkSelection(1)).toBeNull();
-    expect(checkSelection(15)).toBeNull();
-    expect(checkSelection(16)).toBe('too_many_files');
+    expect(checkSelection(25)).toBeNull();
+    expect(checkSelection(26)).toBe('too_many_files');
   });
 });
 
@@ -85,6 +85,8 @@ describe('filesBucket', () => {
     [5, '5-9'],
     [10, '10-15'],
     [15, '10-15'],
+    [16, '16-25'],
+    [25, '16-25'],
   ])('puts %i files in %s', (n, bucket) => {
     expect(filesBucket(n)).toBe(bucket);
   });
@@ -132,6 +134,11 @@ describe('the request size', () => {
     const share = photoShare(4096, 15);
     expect(share).toBeGreaterThan(260_000);
     expect(4096 + 15 * encodedSize(share)).toBeLessThanOrEqual(LIMITS.requestBudgetBytes);
+    const full = photoShare(4096, LIMITS.maxImages);
+    expect(full).toBeGreaterThan(170_000);
+    expect(4096 + LIMITS.maxImages * encodedSize(full)).toBeLessThanOrEqual(
+      LIMITS.requestBudgetBytes,
+    );
     expect(photoShare(LIMITS.requestBudgetBytes, 1)).toBe(0);
   });
   it('adds up the encoded files', () => {

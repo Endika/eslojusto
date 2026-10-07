@@ -76,8 +76,14 @@ JSON under 5.8 MB (`requestBudgetBytes` in `src/documents/contract.ts`), shared 
 images: each photo or PDF page is re-encoded as JPEG at falling quality (0.85, 0.75, 0.65, 0.5)
 until it fits its share, and only when no quality does, at 1280 and then 1100 px on the long side
 (`JPEG_QUALITIES` and `LONG_SIDES` in `src/documents/files.ts`). With 15 images that is about
-290 KB each, which a 1568-px document page usually meets by quality 0.65. If the pack still does
-not fit, the browser says the files are too heavy before sending anything.
+290 KB each, which a 1568-px document page usually meets by quality 0.65 and even a photo with
+heavy sensor noise by 0.5; with 25, about 174 KB each, which a clean page or a PDF page still
+meets at 1568 px and a noisy photo at 1280 px (`tests/e2e/documents.spec.ts` sends 25 of them).
+So the long side is shortened by what each page weighs, not by how many there are: a pack of up
+to about 15 keeps 1568 px, and a larger one loses resolution only on the pages that need it.
+1100 px is the floor because a comparison on real packs found phone photos read as accurately
+there as at 1568 px; small print at 1100 px is not proven. If the pack still does not fit, the
+browser says the files are too heavy before sending anything.
 
 `ok` answers:
 
@@ -318,8 +324,9 @@ Cheapest first, and nothing that parses what the person sent runs before the cap
 - **Image tokens grow with the pixels.** A 1176 × 1568 photo is about 2,459 tokens; at 1100 px
   on the long side (825 × 1100) it would be about 1,210. Anthropic documents that Claude scales
   an image down first when it is over about 1,600 tokens (about 1.15 megapixels), so a 1568-px
-  photo is likely read, and billed, at about 1,600; the estimate does not count on that. Whether
-  1568 px reads documents better than about 1100 px is a question for a model evaluation;
+  photo is likely read, and billed, at about 1,600; the estimate does not count on that. On phone
+  photos 1100 px read as accurately as 1568 px; on small print that is still open, so the browser
+  keeps 1568 px whenever the request has room (above, «Payload budget»).
   `MAX_IMAGE_LONG_SIDE` changes both the browser and the API in one line. A PDF page costs the
   same as a photo of it: the browser renders it at the same size.
 
@@ -551,4 +558,5 @@ run at once, and the budget action caps the month.
   suggests, or at its full 2,459.
 - Model accuracy: the Bedrock fixtures are hand-written in Bedrock's response shape, not
   recordings. Choosing the models, how well they sort a mixed pack, and whether 1568 px reads
-  better than about 1100 px still need a comparison on real, anonymised packs.
+  better than about 1100 px on small print still need a comparison on real, anonymised packs
+  (on phone photos the two read alike).

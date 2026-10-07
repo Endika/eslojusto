@@ -463,17 +463,17 @@ describe('the start sheet', () => {
     const b = new File(['bb'], 'nomina.jpg', { type: 'image/jpeg' });
     const c = new File(['c'], 'certificado.jpg', { type: 'image/jpeg' });
     choose([a]);
-    expect(text('[data-doc-files-status]')).toBe('Añadido: carta.jpg. Llevas 1 de 15.');
+    expect(text('[data-doc-files-status]')).toBe('Añadido: carta.jpg. Llevas 1 de 25.');
     pick([b, c]);
     expect(listed()).toHaveLength(3);
-    expect(text('[data-doc-files-status]')).toBe('Añadidos 2 archivos. Llevas 3 de 15.');
+    expect(text('[data-doc-files-status]')).toBe('Añadidos 2 archivos. Llevas 3 de 25.');
     const remove = document.querySelector<HTMLElement>('[data-doc-remove="1"]');
     expect(remove?.getAttribute('aria-label')).toBe('Quitar nomina.jpg');
     remove?.dispatchEvent(new Event('click', { bubbles: true }));
     expect(
       listed().map((t) => t?.startsWith('certificado.jpg') || t?.startsWith('carta.jpg')),
     ).toEqual([true, true]);
-    expect(text('[data-doc-files-status]')).toBe('Quitado: nomina.jpg. Llevas 2 de 15.');
+    expect(text('[data-doc-files-status]')).toBe('Quitado: nomina.jpg. Llevas 2 de 25.');
     expect(document.activeElement?.getAttribute('data-doc-remove')).toBe('1');
     await submit();
     expect(requests[0]?.files.map((f) => f.data)).toEqual([
@@ -492,7 +492,7 @@ describe('the start sheet', () => {
       'carta.pdf, página 2',
       'carta.pdf, página 3',
     ]);
-    expect(text('[data-doc-files-status]')).toBe('Añadido: carta.pdf. Páginas: 3. Llevas 3 de 15.');
+    expect(text('[data-doc-files-status]')).toBe('Añadido: carta.pdf. Páginas: 3. Llevas 3 de 25.');
     await submit();
     expect(requests[0]?.files).toEqual(
       [1, 2, 3].map((n) => ({ mediaType: 'image/jpeg', data: btoa(`carta.pdf#${n}`) })),
@@ -564,13 +564,13 @@ describe('the start sheet', () => {
   it('adds the pages of a PDF that fit, and says which', async () => {
     setUp(settlement);
     choose(
-      Array.from({ length: 13 }, (_, i) => new File(['x'], `f${i}.jpg`, { type: 'image/jpeg' })),
+      Array.from({ length: 23 }, (_, i) => new File(['x'], `f${i}.jpg`, { type: 'image/jpeg' })),
     );
     pick([new File(['20'], 'vida-laboral.pdf', { type: 'application/pdf' })]);
     await flush();
-    expect(listed()).toHaveLength(15);
+    expect(listed()).toHaveLength(25);
     expect(text('[data-doc-files-status]')).toBe(
-      'De vida-laboral.pdf caben las páginas 1 a 2 de 20: como mucho 15 fotos o páginas en total. Llevas 15 de 15.',
+      'De vida-laboral.pdf caben las páginas 1 a 2 de 20: como mucho 25 fotos o páginas en total. Llevas 25 de 25.',
     );
   });
 
@@ -609,20 +609,20 @@ describe('the start sheet', () => {
     ]);
   });
 
-  it('leaves out the 16th image, saying how many and why', async () => {
+  it('leaves out the 26th image, saying how many and why', async () => {
     const { requests } = setUp(settlement);
     choose(
-      Array.from({ length: 16 }, (_, i) => new File(['x'], `f${i}.jpg`, { type: 'image/jpeg' })),
+      Array.from({ length: 26 }, (_, i) => new File(['x'], `f${i}.jpg`, { type: 'image/jpeg' })),
     );
-    expect(listed()).toHaveLength(15);
+    expect(listed()).toHaveLength(25);
     expect(text('[data-doc-files-status]')).toBe(
-      'Añadidos 15 archivos. Llevas 15 de 15. 1 archivo no se ha añadido.',
+      'Añadidos 25 archivos. Llevas 25 de 25. 1 archivo no se ha añadido.',
     );
     expect(text('[data-doc-error-for="files"]')).toBe(
-      'Como mucho 15 fotos o páginas de PDF en total',
+      'Como mucho 25 fotos o páginas de PDF en total',
     );
     await submit();
-    expect(requests[0]?.files).toHaveLength(15);
+    expect(requests[0]?.files).toHaveLength(25);
   });
 
   it('shares the request equally among the photos and the pages of a PDF', async () => {
@@ -820,7 +820,7 @@ describe('the start sheet', () => {
     click('[data-doc-retake]');
     expect(listed()).toEqual(['finiquito.jpg1 KBQuitar']);
     expect(text('[data-doc-files-status]')).toBe(
-      'Quitado: borrosa.jpg, pequena.jpg. Llevas 1 de 15.',
+      'Quitado: borrosa.jpg, pequena.jpg. Llevas 1 de 25.',
     );
     expect(document.activeElement?.id).toBe('document-files');
     expect(requests).toHaveLength(0);

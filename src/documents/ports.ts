@@ -11,7 +11,13 @@ export type { ErrorCode, PageKind, SkipReason } from './contract';
 export type { QualityProblem } from './quality';
 
 export type FilesBucket = ReturnType<typeof filesBucket>;
-export const FILES_BUCKETS = ['1', '2-4', '5-9', '10-15'] as const satisfies readonly FilesBucket[];
+export const FILES_BUCKETS = [
+  '1',
+  '2-4',
+  '5-9',
+  '10-15',
+  '16-25',
+] as const satisfies readonly FilesBucket[];
 
 export const PASS_VIA = ['return', 'recovery'] as const;
 export type PassVia = (typeof PASS_VIA)[number];

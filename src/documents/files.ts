@@ -80,8 +80,8 @@ export function checkSelection(images: number): ErrorCode | null {
 }
 
 // A closed bucket for analytics: never the exact count.
-export function filesBucket(n: number): '1' | '2-4' | '5-9' | '10-15' {
-  return n <= 1 ? '1' : n <= 4 ? '2-4' : n <= 9 ? '5-9' : '10-15';
+export function filesBucket(n: number): '1' | '2-4' | '5-9' | '10-15' | '16-25' {
+  return n <= 1 ? '1' : n <= 4 ? '2-4' : n <= 9 ? '5-9' : n <= 15 ? '10-15' : '16-25';
 }
 
 // The size that keeps the proportions with the long side at most `max`, never enlarged.
