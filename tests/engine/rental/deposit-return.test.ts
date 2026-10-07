@@ -272,7 +272,9 @@ describe('late-payment interest (LAU art. 36.4)', () => {
     expect(singleOf(interest)).toEqual({ status: 'within_limit', amount: null });
   });
 
-  it('a year with no legal interest rate loaded is not checkable', () => {
+  it('a year with no legal interest rate loaded counts up to the last known year', () => {
+    // Interest from 11-12-2026: 21 days of 2026 at 3,25 % on 1.000 = 1,87 (360: 1,90); 2027 has no
+    // rate loaded, so the rest is not checkable.
     const [, interest] = checkDepositReturn(
       contract({
         deposit: 1000,
@@ -282,7 +284,22 @@ describe('late-payment interest (LAU art. 36.4)', () => {
       DEPS,
     );
     if (interest === undefined) throw new Error('expected interest');
-    expect(singleOf(interest).status).toBe('not_checkable');
+    expect(bothBases(interest)).toEqual({ reasons: ['interest_day_count'], low: 1.87, high: 1.9 });
+    if (interest.outcome.kind !== 'depends') throw new Error('expected depends');
+    expect(interest.outcome.low.calculation.at(-1)).toEqual({
+      key: 'deposit.interest_rate_not_loaded',
+      vars: { year: { integer: 2027 } },
+    });
+    const [, unknown] = checkDepositReturn(
+      contract({
+        deposit: 1000,
+        moveOut: { keysReturnedOn: f('2027-01-10'), returns: [], deductions: [] },
+      }),
+      f('2027-06-01'),
+      DEPS,
+    );
+    if (unknown === undefined) throw new Error('expected interest');
+    expect(singleOf(unknown).status).toBe('not_checkable');
   });
 });
 
