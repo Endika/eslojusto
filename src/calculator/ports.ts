@@ -3,10 +3,9 @@ import type { EmployerFigures, Review } from '../engine/review';
 import type { FinalPayInput, ItemId } from '../engine/types';
 import type { BenefitEstimate } from '../engine/unemployment';
 import type { Translate } from '../i18n/client';
-import type { SHEETS } from './form';
+import type { Step } from './steps';
 
-// A step is one sheet or the result. Step ids are also the URL fragments, so they keep their Spanish names.
-export type Step = (typeof SHEETS)[number] | 'resultado';
+export type { Step } from './steps';
 
 export interface CompletedReview {
   readonly review: Review;
