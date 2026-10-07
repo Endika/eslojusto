@@ -46,10 +46,7 @@ describe('pdfInspector', () => {
 
   it('refuses an object defined twice in one revision', async () => {
     const pdf = rawPdf([catalog, onePageTree, page(), onePageTree.replace('Count 1', 'Count 1 ')]);
-    const doubled = new TextDecoder('latin1')
-      .decode(pdf)
-      .replace('4 0 obj', '2 0 obj')
-      .replace('0 5\n', '0 5\n');
+    const doubled = new TextDecoder('latin1').decode(pdf).replace('4 0 obj', '2 0 obj');
     expect(await pdfInspector.inspect(text(doubled))).toBeNull();
   });
 
