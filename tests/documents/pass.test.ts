@@ -83,6 +83,24 @@ describe('createPassStore', () => {
       passes.addCheckout({ nonce: `${i}`.repeat(32), sessionId: `cs_test_${i}` });
     expect(passes.checkouts()).toHaveLength(5);
   });
+  it('keeps a redeemed payment until its pass expires', () => {
+    let now = Date.UTC(2026, 9, 7);
+    const passes = createPassStore(memoryStore(), () => now);
+    passes.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_a' });
+    passes.markRedeemed('cs_test_a', now / 1000 + 60);
+    expect(passes.checkouts()).toEqual([
+      { nonce: 'a'.repeat(32), sessionId: 'cs_test_a', redeemed: true, expiresAt: now / 1000 + 60 },
+    ]);
+    now += 61_000;
+    expect(passes.checkouts()).toEqual([]);
+  });
+  it('a retired pass downloads but reads no more', () => {
+    const passes = createPassStore(memoryStore(), () => NOW * 1000);
+    passes.savePass(pass(9));
+    passes.retirePass();
+    expect(passes.pass()?.usable).toBe(false);
+    expect(passState(passes.pass(), NOW * 1000)).toBe('exhausted');
+  });
   it('reads a payment stored by an earlier version of the page', () => {
     const store = memoryStore();
     store.set(
