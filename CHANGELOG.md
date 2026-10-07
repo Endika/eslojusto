@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.2.0](https://github.com/Endika/eslojusto/compare/v1.1.2...v1.2.0) (2026-10-07)
+
+
+### Features
+
+* **analytics:** add closed events for document reading and the pass ([e79e4c6](https://github.com/Endika/eslojusto/commit/e79e4c6dba0745a1eda15a9a973c01b94772299e))
+* **calculator:** let other parts fill, read and open the form ([da27eca](https://github.com/Endika/eslojusto/commit/da27eca24d22da6c3e3332d69c8c43f2485cdae8))
+* describe document reading, the pass and its conditions of sale only when the API is configured ([6f40287](https://github.com/Endika/eslojusto/commit/6f402874ce16ba400e51560c9fd7c651d371410d))
+* **documents:** build the PDF report and the letter in the browser with the site's fonts ([34a99b7](https://github.com/Endika/eslojusto/commit/34a99b79ff309b5c6b0c48049af0179ce4d1dff5))
+* **documents:** follow the API's pass reads, checkout captcha, 2 MB PDF limit and new codes ([1e8ecdf](https://github.com/Endika/eslojusto/commit/1e8ecdf65d9d1ec890ea834c8a84b1efb9bbb705))
+* **documents:** mirror the API contract with a typed client, pass storage and file checks ([9ab00f3](https://github.com/Endika/eslojusto/commit/9ab00f3ad6c4bae1ca3120ff5ce1dbdacb42e51a))
+* **documents:** offer the pass when an item falls short and recover it after Stripe ([4713972](https://github.com/Endika/eslojusto/commit/47139726d61013236d26a2196c809c9764ee29f9))
+* **documents:** read a document into the form from a new first sheet ([8f280c6](https://github.com/Endika/eslojusto/commit/8f280c6f5d9533591b2979bd1be0b2cfe2c5190d))
+* **documents:** take the API as three function URLs and read extraPayPaid and escalated ([564d506](https://github.com/Endika/eslojusto/commit/564d50686c3c369a9055c19486943801b1a0d57a))
+* **documents:** wire the start sheet, the pass and the PDFs in the composition root ([f0101a0](https://github.com/Endika/eslojusto/commit/f0101a0f163b1808519ed12485bdff9bfd77df64))
+* gate document reading on build-time API settings and open the CSP only to them ([b5cbeb9](https://github.com/Endika/eslojusto/commit/b5cbeb9842d1372b65b0e333ec7154c814a3b6ee))
+* **i18n:** add the Spanish copy for document reading, the pass and the PDFs ([ec19ced](https://github.com/Endika/eslojusto/commit/ec19ced6f5c12cdb60470fc72b3b57442dd37e6f))
+* identify the site's owner in the legal notice ([7f46fb3](https://github.com/Endika/eslojusto/commit/7f46fb30580c8154820b121eb3fa693a3948cd13))
+
+
+### Bug Fixes
+
+* **csp:** open the API and Turnstile origins only on the calculator page ([c890c38](https://github.com/Endika/eslojusto/commit/c890c38e0cfa8db2e7b7bc830570010574f5052a))
+* **documents:** copy a character the PDF font lacks as «?» and keep ToUnicode in UTF-16 ([a820c13](https://github.com/Endika/eslojusto/commit/a820c13073e5e5f1d9a0fa8b66770d544132b728))
+* **documents:** drop a refused pass or quota token so the next read is a free one ([7555ce6](https://github.com/Endika/eslojusto/commit/7555ce6ce504544652f1724fc64ed8fb01e75ad2))
+* **documents:** hold the manual path and back button while a read is on its way ([295ec7a](https://github.com/Endika/eslojusto/commit/295ec7aad6bf7749641960a7beea3a6e874f074c))
+* **documents:** keep every unredeemed payment and redeem it before charging again ([9dd3328](https://github.com/Endika/eslojusto/commit/9dd33281373837fe35ff473c370a4c9a3091be1f))
+* **documents:** keep redeemed payments until their pass expires and fetch a refused pass again ([d9eb112](https://github.com/Endika/eslojusto/commit/d9eb112763ea1593bca365c5cc6f4a97eeb5780b))
+* **documents:** renew a refused pass at most once and stop pointing its message at recovery ([c4a12cb](https://github.com/Endika/eslojusto/commit/c4a12cb7073c5ffe470e81c77a635d1d3b6d55e8))
+* **documents:** restore and delete the kept review on any return from Stripe, cancelled or not ([58578ae](https://github.com/Endika/eslojusto/commit/58578ae61ed23f164bcf10844b7ca2baaea46297))
+* **documents:** show the returned payment's error, prune dead payments and cap pass requests ([e7c953e](https://github.com/Endika/eslojusto/commit/e7c953ee4d48d551bb3e5278073fdde567a01a9e))
+* **documents:** word a throttled or failing service as busy, not as a bad answer ([5d5c792](https://github.com/Endika/eslojusto/commit/5d5c7925d8a4ea862579dd5524699ec348362fdb))
+
+
+### Performance Improvements
+
+* leave the document events and error codes out of builds without the documents API ([6830562](https://github.com/Endika/eslojusto/commit/68305620cc77a206371f0655214eeea103bda4a0))
+* let builds without the documents API drop its configuration too ([e8763bf](https://github.com/Endika/eslojusto/commit/e8763bf26a1c064ea24c533d4fb6d1212e48d5f3))
+
 ## [1.1.2](https://github.com/Endika/eslojusto/compare/v1.1.1...v1.1.2) (2026-10-07)
 
 
