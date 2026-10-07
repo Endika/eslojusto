@@ -842,6 +842,8 @@ export const es = {
   'client.documents.letter.place_date': 'En {lugar}, a {fecha}',
   'client.documents.letter.place_blank': '____________________',
   'client.documents.letter.date_blank': '____ de ____________________ de ________',
+  'client.documents.letter.glyph_warning':
+    'Algunas letras no se pueden escribir en la carta: se deja la línea en blanco para escribirlo a mano.',
   'client.documents.letter.id_warning':
     'No parece un DNI ni un NIE: revísalo. La carta se descarga igualmente.',
   'client.documents.letter.received': 'Recibí no conforme,',

@@ -1,7 +1,7 @@
 import type { CompletedReview } from '../calculator/ports';
 import type { ErrorCode, MediaType, PageKind } from './contract';
 import type { filesBucket } from './files';
-import type { LetterDetails, LetterPrefilled } from './letter';
+import type { LetterDetails, LetterField, LetterPrefilled } from './letter';
 
 export { ERROR_CODES, PAGE_KINDS } from './contract';
 export { LETTER_PREFILLED } from './letter';
@@ -87,6 +87,8 @@ export interface PdfPages {
 export interface PdfMaker {
   report(review: CompletedReview): Promise<Blob>;
   letter(review: CompletedReview, details: LetterDetails): Promise<Blob>;
+  // The fields with a character the letter's fonts can't draw.
+  unprintable(details: Record<LetterField, string>): LetterField[];
 }
 
 export interface Browser {

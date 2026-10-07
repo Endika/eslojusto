@@ -5,7 +5,7 @@ import type { Review } from '../engine/review';
 import type { Translate } from '../i18n/client';
 import { SESSION_ID, type Api, type ErrorCode } from './contract';
 import { CHECKOUT_ORIGIN } from './config';
-import { letterPrefilled, looksLikeDniOrNie, type LetterDetails } from './letter';
+import { letterPrefilled, looksLikeDniOrNie, type LetterDetails, type LetterField } from './letter';
 import { noticeView, warnsOnLeave, type NoticeState } from './notice';
 import { canDownload, newNonce, passState, type PassStore, type PendingCheckout } from './pass';
 import type {
@@ -113,6 +113,10 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     place: letterField('place'),
     date: letterField('date'),
   };
+  const glyphWarning = required(
+    letter.querySelector<HTMLElement>('[data-letter-glyph-warning]'),
+    'glyph warning',
+  );
   const idWarning = required(
     letter.querySelector<HTMLElement>('[data-letter-id-warning]'),
     'id warning',
@@ -353,11 +357,12 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     } catch {
       // A date the browser lets through unfinished keeps its line.
     }
+    const typed = (f: LetterField) => letterInputs[f].value.normalize('NFC');
     return {
-      name: letterInputs.name.value,
-      id: letterInputs.id.value,
-      company: letterInputs.company.value,
-      place: letterInputs.place.value,
+      name: typed('name'),
+      id: typed('id'),
+      company: typed('company'),
+      place: typed('place'),
       date,
     };
   }
@@ -372,6 +377,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
 
   function clearLetter() {
     for (const input of Object.values(letterInputs)) input.value = '';
+    glyphWarning.hidden = true;
     checkId();
   }
 
@@ -381,7 +387,14 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     status.textContent = tr('client.documents.pass.generating');
     try {
       const maker = await deps.pdf();
-      const details = letterDetails();
+      let details = letterDetails();
+      if (which === 'letter') {
+        const blanked = maker.unprintable(details);
+        glyphWarning.hidden = blanked.length === 0;
+        glyphWarning.textContent =
+          blanked.length === 0 ? '' : tr('client.documents.letter.glyph_warning');
+        details = { ...details, ...Object.fromEntries(blanked.map((f) => [f, ''])) };
+      }
       const blob = await (which === 'report'
         ? maker.report(current)
         : maker.letter(current, details));

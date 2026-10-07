@@ -293,6 +293,13 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   await expect(letter.getByLabel('Tu nombre y apellidos')).toHaveAttribute('autocomplete', 'name');
   await expect(letter.getByLabel('Empresa')).toHaveAttribute('autocomplete', 'organization');
   await expect(letter.getByLabel('Localidad')).toHaveAttribute('autocomplete', 'address-level2');
+  for (const [label, max] of [
+    ['Tu nombre y apellidos', '80'],
+    ['DNI o NIE', '12'],
+    ['Empresa', '80'],
+    ['Localidad', '50'],
+  ] as const)
+    await expect(letter.getByLabel(label)).toHaveAttribute('maxlength', max);
   await expect(letter.getByLabel('Fecha')).toHaveValue(/^\d{4}-\d{2}-\d{2}$/);
   await letter.getByLabel('Tu nombre y apellidos').fill('Alex Ejemplo');
   await letter.getByLabel('DNI o NIE').fill('1234');

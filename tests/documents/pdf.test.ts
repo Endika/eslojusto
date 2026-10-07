@@ -1,6 +1,6 @@
 import { inflateSync } from 'node:zlib';
 import { describe, expect, it } from 'vitest';
-import { renderPdf } from '../../src/documents/pdf';
+import { renderPdf, unprintable } from '../../src/documents/pdf';
 import { PdfDocument, pdfString } from '../../src/documents/pdf-writer';
 import { sans } from '../../src/documents/fonts/sans';
 import { serif } from '../../src/documents/fonts/serif';
@@ -84,6 +84,42 @@ describe('the PDF writer', () => {
     expect(text).toContain('12345678Z');
     expect(text).toContain('Empresa Ficticia SL');
     expect(text).toContain('En Logroño, a 7 de octubre de 2026');
+  });
+
+  it('flags only a field with a character neither font can draw', () => {
+    expect(
+      unprintable({
+        name: 'Ñandú Pérez-Gómez',
+        id: 'X1234567L',
+        company: 'Çà SL',
+        place: 'A Coruña',
+      }),
+    ).toEqual([]);
+    expect(
+      unprintable({ name: '王小明', id: '12345678Z', company: 'Empresa', place: 'Ελλάδα' }),
+    ).toEqual(['name', 'place']);
+  });
+
+  it('a long value shrinks to its line instead of crossing the margin', async () => {
+    const long = 'W'.repeat(80);
+    const doc = new PdfDocument({ sans, serif }, 'x');
+    const line = doc.width * 0.7;
+    expect(doc.measure(long, { font: 'sans', size: 10 })).toBeGreaterThan(line);
+    const pdf = latin1(
+      await renderPdf({
+        title: 'x',
+        footer: null,
+        blocks: [{ type: 'blank', label: 'Nombre y apellidos', value: long }],
+      }),
+    );
+    const sizes = streams(pdf).flatMap((st) =>
+      [...st.data.matchAll(/ ([\d.]+) Tf /g)].map((m) => Number(m[1])),
+    );
+    // The label at 8.5, the value at whatever size fits its line.
+    const value = Math.min(...sizes.filter((x) => x !== 8.5));
+    expect(value).toBeLessThan(10);
+    expect(doc.measure(long, { font: 'sans', size: value })).toBeLessThanOrEqual(line);
+    expect(extractText(pdf)).toContain(long);
   });
 
   it('links each source', async () => {

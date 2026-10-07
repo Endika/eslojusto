@@ -256,7 +256,14 @@ export class PdfDocument {
   ): void {
     this.ensure(42);
     this.y += 26;
-    if (value) this.textAt(value, 2, this.y - 5, valueStyle);
+    if (value) {
+      // A long value shrinks to fit on its line rather than cross the margin.
+      const room = width - 4;
+      const measured = this.measure(value, valueStyle);
+      const fitted =
+        measured > room ? { ...valueStyle, size: (valueStyle.size * room) / measured } : valueStyle;
+      this.textAt(value, 2, this.y - 5, fitted);
+    }
     const y = A4.height - this.y;
     this.page.ops.push(
       `${color(SOFT)} RG 0.6 w ${MARGIN.left} ${fmt(y)} m ${fmt(MARGIN.left + width)} ${fmt(y)} l S`,

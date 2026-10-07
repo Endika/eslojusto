@@ -3,6 +3,7 @@ import type { Translate } from '../i18n/client';
 import { sans } from './fonts/sans';
 import { serif } from './fonts/serif';
 import { INK, PdfDocument, SOFT, type Rgb, type TextStyle } from './pdf-writer';
+import { LETTER_FIELDS, type LetterField } from './letter';
 import type { PdfMaker } from './ports';
 import { letterModel, reportModel, type DocumentModel } from './report';
 
@@ -77,11 +78,22 @@ export async function renderPdf(model: DocumentModel): Promise<Uint8Array> {
   return doc.save();
 }
 
+// The letter's own fields whose text has a character neither font can draw; their lines stay blank.
+export function unprintable(details: Record<LetterField, string>): LetterField[] {
+  const drawable = (text: string) =>
+    [...text.normalize('NFC')].every((c) => {
+      const code = String(c.codePointAt(0));
+      return code in sans.glyphs && code in serif.glyphs;
+    });
+  return LETTER_FIELDS.filter((f) => !drawable(details[f]));
+}
+
 const asBlob = (bytes: Uint8Array) => new Blob([bytes as BlobPart], { type: 'application/pdf' });
 
 export function pdfMaker(tr: Translate, today: () => CivilDate): PdfMaker {
   return {
     report: async (r) => asBlob(await renderPdf(reportModel(r, tr, today()))),
     letter: async (r, details) => asBlob(await renderPdf(letterModel(r, tr, details))),
+    unprintable,
   };
 }
