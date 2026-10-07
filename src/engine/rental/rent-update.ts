@@ -3,7 +3,7 @@ import { anniversaryIn } from './anniversary';
 import { round2 } from '../money';
 import { rentalPhrase, type RentalPhrase } from './calculation';
 import { referenceMonth, type IndexId, type ReferenceMonth } from './indices';
-import { normStanding, type NormId, type NormTable } from './norms';
+import type { NormTable } from './norms';
 import {
   outcomeFrom,
   uniqueById,
@@ -14,14 +14,8 @@ import {
   type Outcome,
   type World,
 } from './outcome';
-import {
-  activeRules,
-  ruleSource,
-  RULES,
-  type ActiveRule,
-  type RentalSource,
-  type RuleId,
-} from './rules';
+import { doubtNorm, normDoubtId, ruleHolds } from './rule-worlds';
+import { activeRules, ruleSource, type ActiveRule, type RentalSource, type RuleId } from './rules';
 import type { RentalDeps, RentalInput, RentUpdateInput } from './types';
 
 export type RentUpdateUnchecked =
@@ -116,16 +110,7 @@ const monthIndex = (d: CivilDate): number => d.y * 12 + d.m - 1;
 const monthIso = (i: number): string =>
   `${Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, '0')}`;
 
-const normDoubtId = (norm: NormId): string => `norm:${norm}`;
 const LARGE_LANDLORD = 'large_landlord';
-
-// The norm whose doubt an active rule carries: its own, or the doubtful successor's.
-function doubtNorm(active: ActiveRule, day: string, norms: NormTable): NormId | null {
-  if (active.doubt === null) return null;
-  if (normStanding(norms[active.rule.norm], day) !== 'in_force') return active.rule.norm;
-  const successor = active.rule.supersededBy;
-  return successor === null ? null : RULES[successor].norm;
-}
 
 // Everything about one update that does not depend on the reading.
 interface Frame {
@@ -356,14 +341,7 @@ function allowance(
   if (input.updateClause === 'none')
     return unchanged(rentalPhrase('rent_update.no_clause'), ['update_clause']);
 
-  const holds = (id: RuleId): boolean => {
-    const a = active.get(id);
-    if (a === undefined) return false;
-    const norm = doubtNorm(a, day, norms);
-    if (norm === null) return true;
-    const doubtful = world[normDoubtId(norm)] === true;
-    return norm === a.rule.norm ? doubtful : !doubtful;
-  };
+  const holds = (id: RuleId): boolean => ruleHolds(active, id, world, day, norms);
   const rules: RuleId[] = [];
   const look = (index: IndexId) => {
     if (index === 'igc') rules.push('igc_clamp');
