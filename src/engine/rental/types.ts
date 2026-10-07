@@ -1,5 +1,6 @@
 import type { CivilDate } from '../date';
 import type { IndexTables } from './indices';
+import type { LegalInterestYear } from './legal-interest';
 import type { NormTable } from './norms';
 
 export type ContractType =
@@ -117,6 +118,11 @@ export interface RentalInput {
 export interface RentalDeps {
   readonly norms: NormTable;
   readonly indices: IndexTables;
+}
+
+// Everything a whole review reads.
+export interface ReviewDeps extends RentalDeps {
+  readonly legalInterest: readonly LegalInterestYear[];
 }
 
 // The eight results an item can have.
