@@ -1,6 +1,14 @@
-import { toIso, type CivilDate } from '../date';
-import type { Source } from '../sources';
-import { normStanding, type NormId, type NormStatus, type NormTable } from './norms';
+import type { CivilDate } from '../date';
+import {
+  activeRules as lawActiveRules,
+  ruleSource as lawRuleSource,
+  type ActiveRule as LawActiveRule,
+  type Rule as LawRule,
+} from '../law/rules';
+import type { NormSource } from '../law/sources';
+import type { NormId, NormTable } from './norms';
+
+export type { RuleDoubt } from '../law/rules';
 
 export type RuleId =
   | 'fees_2019'
@@ -37,19 +45,7 @@ export type RuleId =
   | 'deposit_lodging'
   | 'closing_document';
 
-export interface Rule {
-  readonly id: RuleId;
-  // The norm whose validity and status the rule follows.
-  readonly norm: NormId;
-  readonly article: string;
-  readonly url: string;
-  // The days the rule covers, read against whichever date it is checked on (signing day,
-  // anniversary…). A null `until` lasts as long as the norm.
-  readonly from: string;
-  readonly until: string | null;
-  // A later rule that takes its place once that rule is certainly in force.
-  readonly supersededBy: RuleId | null;
-}
+export type Rule = LawRule<RuleId, NormId>;
 
 const LAU = 'https://www.boe.es/buscar/act.php?id=BOE-A-1994-26003';
 const LAU_2019 = `${LAU}&tn=1&p=20190305`;
@@ -269,54 +265,14 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
   ),
 };
 
-export interface RentalSource extends Source {
-  readonly inForceUntil: string | null;
-  readonly endUncertainUntil: string | null;
-  readonly status: NormStatus;
-  readonly statusSince: string | null;
-  readonly statusUrl: string | null;
-}
+export type RentalSource = NormSource;
 
 export function ruleSource(id: RuleId, norms: NormTable): RentalSource {
-  const { article, url, norm: normId } = RULES[id];
-  const norm = norms[normId];
-  return {
-    id,
-    citation: `${article} (${norm.citation})`,
-    url,
-    inForceSince: norm.inForceSince,
-    inForceUntil: norm.inForceUntil,
-    endUncertainUntil: norm.endUncertainUntil ?? null,
-    status: norm.status,
-    statusSince: norm.statusSince,
-    statusUrl: norm.statusUrl,
-  };
+  return lawRuleSource(RULES, id, norms);
 }
 
-export type RuleDoubt = 'pending_validation' | 'repealed_window';
-
-export interface ActiveRule {
-  readonly rule: Rule;
-  // Why the rule may or may not apply that day; a rule displaced by a doubtful successor carries
-  // the successor's doubt.
-  readonly doubt: RuleDoubt | null;
-}
+export type ActiveRule = LawActiveRule<RuleId, NormId>;
 
 export function activeRules(date: CivilDate, norms: NormTable): readonly ActiveRule[] {
-  const day = toIso(date);
-  const standing = (r: Rule) => {
-    if (day < r.from || (r.until !== null && day > r.until)) return 'not_in_force';
-    return normStanding(norms[r.norm], day);
-  };
-  const active: ActiveRule[] = [];
-  for (const r of Object.values(RULES)) {
-    const own = standing(r);
-    if (own === 'not_in_force') continue;
-    const successor = r.supersededBy === null ? 'not_in_force' : standing(RULES[r.supersededBy]);
-    if (successor === 'in_force') continue;
-    const ownDoubt = own === 'in_force' ? null : own;
-    const successorDoubt = successor === 'not_in_force' ? null : successor;
-    active.push({ rule: r, doubt: ownDoubt ?? successorDoubt });
-  }
-  return active;
+  return lawActiveRules(RULES, date, norms);
 }

@@ -11,15 +11,25 @@ const localOnly = (dir) => ({
   regex: `^(?!\\./)|${climbsBack}`,
   message: `src/${dir} imports only from src/${dir}.`,
 });
-// src/engine/rental reaches the rest of the engine one level up, and only its edges (data/, where
-// the norm and index tables live) hold data: the rules take those tables as arguments.
-const rentalOnly = {
+// Each section of the engine (src/engine/<section>) reaches the rest of the engine one level up,
+// never another section, and only its edges (data/, where its tables live) hold data: its rules take
+// those tables as arguments. Sections share the norm model through src/engine/law.
+const SECTIONS = ['rental', 'employment'];
+const sectionOnly = (name) => ({
   regex: `^(?!\\.\\.?/)|${climbsBack}`,
-  message: 'src/engine/rental imports only from src/engine.',
-};
-const noRentalData = {
+  message: `src/engine/${name} imports only from src/engine.`,
+});
+const noSectionData = (name) => ({
   regex: '(^|/)data(/|$)',
-  message: 'Rental rules take the norm and index tables as arguments; they never import them.',
+  message: `src/engine/${name} takes its tables as arguments; only its data/ holds them.`,
+});
+const noOtherSection = (name) => ({
+  regex: `^\\.\\./(${SECTIONS.filter((s) => s !== name).join('|')})(/|$)`,
+  message: `src/engine/${name} shares with other sections only through src/engine/law.`,
+});
+const lawOnly = {
+  regex: `^(?!\\./|\\.\\./(date|money|sources)$)|${climbsBack}`,
+  message: 'src/engine/law imports only from itself and src/engine/{date,money,sources}.',
 };
 const noAnalytics = {
   regex: '(^|/)analytics/',
@@ -105,14 +115,18 @@ export default tseslint.config(
   ...astro.configs.recommended,
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
   boundary(['src/engine/**'], [localOnly('engine')], {
-    ignores: ['src/engine/rental/**'],
+    ignores: ['src/engine/law/**', ...SECTIONS.map((name) => `src/engine/${name}/**`)],
     rules: engineGlobals,
   }),
-  boundary(['src/engine/rental/**'], [rentalOnly, noRentalData], {
-    ignores: ['src/engine/rental/data/**'],
-    rules: engineGlobals,
-  }),
-  boundary(['src/engine/rental/data/**'], [rentalOnly], { rules: engineGlobals }),
+  boundary(['src/engine/law/**'], [lawOnly], { rules: engineGlobals }),
+  ...SECTIONS.flatMap((name) => [
+    boundary(
+      [`src/engine/${name}/**`],
+      [sectionOnly(name), noSectionData(name), noOtherSection(name)],
+      { ignores: [`src/engine/${name}/data/**`], rules: engineGlobals },
+    ),
+    boundary([`src/engine/${name}/data/**`], [sectionOnly(name)], { rules: engineGlobals }),
+  ]),
   boundary(['src/i18n/**'], [localOnly('i18n')]),
   boundary(['src/analytics/**'], [analyticsReach, noPosthogAdapter], {
     ignores: ['src/analytics/posthog.ts'],
