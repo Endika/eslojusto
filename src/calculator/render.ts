@@ -451,12 +451,27 @@ function summaryBenefit(p: BenefitEstimate, tr: Translate): Piece[] {
   });
 }
 
+const DISMISSALS: readonly Cause[] = [
+  'objective_dismissal',
+  'unfair_dismissal',
+  'disciplinary_dismissal',
+];
+
+// The deadlines that run for the person's own case: never behind the pass.
+export function summaryDeadlines(cause: Cause, benefit: BenefitEstimate): ClientKey[] {
+  return [
+    ...(DISMISSALS.includes(cause) ? (['client.summary.dismissal_deadline'] as const) : []),
+    ...(benefit.entitled === 'yes' ? (['client.summary.benefit_deadline'] as const) : []),
+  ];
+}
+
 // The result before the pass: whether money is missing and roughly how much, the holiday days it
-// counted and one line on the benefit. The detail is the pass's.
+// counted, one line on the benefit and the deadlines that apply. The detail is the pass's.
 export function renderSummary(
   container: HTMLElement,
   r: Review,
   benefit: BenefitEstimate,
+  cause: Cause,
   tr: Translate,
 ): void {
   const summary = container.querySelector<HTMLElement>('[data-summary]');
@@ -476,6 +491,14 @@ export function renderSummary(
   const note = setText(summary, '[data-summary-counted]', counted ? phraseText(counted, tr) : '');
   note.hidden = !counted;
   setText(summary, '[data-summary-benefit]', '').replaceChildren(...summaryBenefit(benefit, tr));
+  summary.querySelector('[data-summary-deadlines]')?.replaceChildren(
+    ...summaryDeadlines(cause, benefit).map((key) => {
+      const p = document.createElement('p');
+      p.className = 'item__note';
+      p.textContent = tr(key);
+      return p;
+    }),
+  );
 }
 
 export interface ResultData {
@@ -498,7 +521,7 @@ export function renderResult(root: HTMLElement, d: ResultData, locked: boolean, 
   if (locked) {
     root.querySelector('[data-items]')?.replaceChildren();
     for (const slot of slots) slot.replaceChildren();
-    renderSummary(root, d.review, d.benefit, tr);
+    renderSummary(root, d.review, d.benefit, d.cause, tr);
     return;
   }
   for (const slot of slots) slot.replaceChildren(template(root, slot.dataset['slot'] ?? ''));

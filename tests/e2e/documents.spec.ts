@@ -214,6 +214,10 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   // the page at all, not even hidden.
   const summary = page.getByRole('region', { name: 'En resumen' });
   await expect(summary).toContainText('Indemnización: podrían faltarte unos 440 €.');
+  await expect(summary).toContainText(
+    'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
+  );
+  await expect(summary).toContainText('El paro se pide en los 15 días hábiles');
   const result = page.locator('#resultado');
   await expectNoDetail(result);
 

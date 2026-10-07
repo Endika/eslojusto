@@ -16,6 +16,7 @@ function result(): HTMLElement {
       <ul data-summary-lines></ul>
       <p data-summary-counted hidden></p>
       <p data-summary-benefit></p>
+      <div data-summary-deadlines></div>
     </section>
     <div data-items data-detail></div>
     <section data-benefit data-detail></section>
@@ -25,7 +26,7 @@ function result(): HTMLElement {
 
 function summaryOf(r: ReturnType<typeof completed>) {
   const div = result();
-  renderSummary(div, r.review, r.benefit, tr);
+  renderSummary(div, r.review, r.benefit, r.input.cause, tr);
   const text = (sel: string) => div.querySelector(sel)?.textContent?.replace(/\s/g, ' ') ?? '';
   return {
     div,
@@ -35,6 +36,7 @@ function summaryOf(r: ReturnType<typeof completed>) {
     ),
     counted: text('[data-summary-counted]'),
     benefit: text('[data-summary-benefit]'),
+    deadlines: [...div.querySelectorAll('[data-summary-deadlines] p')].map((p) => p.textContent),
   };
 }
 
@@ -56,7 +58,7 @@ describe('the summary before the pass', () => {
     expect(s.lines).toContain('Indemnización: podrían faltarte unos 440 €.');
     const all = s.div.querySelector('[data-summary]')?.textContent ?? '';
     expect(all).not.toMatch(/entre .* y /);
-    expect(all).not.toContain('ET');
+    expect(all).not.toContain('en vigor desde');
     expect(all).not.toContain('Cómo se calcula');
   });
 
@@ -127,6 +129,7 @@ function page(): HTMLElement {
       <section data-summary hidden>
         <p data-summary-headline></p><ul data-summary-lines></ul>
         <p data-summary-counted hidden></p><p data-summary-benefit></p>
+        <div data-summary-deadlines></div>
       </section>
       <div data-items></div>
       <div data-slot="benefit"></div>
@@ -172,6 +175,27 @@ const data = (r: ReturnType<typeof completed>) => ({
   benefit: r.benefit,
   cause: r.input.cause,
   children: 0 as const,
+});
+
+describe('the deadlines in the summary', () => {
+  it('a dismissal: the 20 days to challenge it and the 15 to ask for the benefit', () => {
+    expect(summaryOf(completed()).deadlines).toEqual([
+      'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
+      'El paro se pide en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (art. 268 LGSS).',
+    ]);
+  });
+  it('the end of a fixed-term contract: only the benefit; a resignation: none', () => {
+    const fixedTerm = completed({
+      ...unfairDismissal,
+      cause: 'fixed_term_end',
+      fixedTermType: 'production_circumstances',
+    });
+    expect(summaryOf(fixedTerm).deadlines).toHaveLength(1);
+    expect(summaryOf(fixedTerm).deadlines[0]).toMatch(/^El paro se pide/);
+    expect(summaryOf(completed({ ...unfairDismissal, cause: 'resignation' })).deadlines).toEqual(
+      [],
+    );
+  });
 });
 
 describe('locked and unlocked result', () => {
