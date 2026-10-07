@@ -96,6 +96,15 @@ export const EMPLOYMENT_NORMS: NormTable = {
     inForceSince: '2026-10-05',
     ...inForce,
   },
+  // Special working-time regimes under arts. 34.7, 36.1 and 37.1 ET: shorter rests between days
+  // and split weekly rests for some activities and for shift changes.
+  rd1561_1995: {
+    id: 'rd1561_1995',
+    citation: 'Real Decreto 1561/1995, de 21 de septiembre, sobre jornadas especiales de trabajo',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-1995-21346',
+    inForceSince: '1995-09-27',
+    ...inForce,
+  },
 };
 
 export const NORM_REVIEW: NormReview = {
@@ -110,4 +119,5 @@ export const NORM_REVIEW: NormReview = {
   rd87_2025: '2026-10-07',
   rd126_2026: '2026-10-07',
   rd723_2026: '2026-10-07',
+  rd1561_1995: '2026-10-07',
 };
