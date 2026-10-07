@@ -6,6 +6,7 @@ import {
   EU_PROFILE_DESTINATIONS,
   EXTRACT_TIMEOUT_SECONDS,
   FUNCTION_NAMES,
+  MODEL_PRICES_USD_PER_MTOK,
   PARAMETER_NAMES,
   PRIMARY_MODEL,
   REGION,
@@ -46,8 +47,9 @@ describe('regional stack', () => {
     for (const region of regions(apiTemplate)) expect(region).toBe(REGION);
   });
 
-  it('holds only functions, their URLs and their log groups: no storage, no IAM', () => {
+  it('holds only functions, their URLs, their log groups and the dashboard: no storage, no IAM', () => {
     expect(types(apiTemplate)).toEqual([
+      'AWS::CloudWatch::Dashboard',
       'AWS::Lambda::Function',
       'AWS::Lambda::Permission',
       'AWS::Lambda::Url',
@@ -104,6 +106,72 @@ describe('regional stack', () => {
 
   it('keeps logs for two weeks', () => {
     apiTemplate.allResourcesProperties('AWS::Logs::LogGroup', { RetentionInDays: 14 });
+  });
+});
+
+describe('dashboard', () => {
+  const dashboards = Object.values(apiTemplate.findResources('AWS::CloudWatch::Dashboard')) as {
+    Properties: { DashboardName: string; DashboardBody: { 'Fn::Join': [string, unknown[]] } };
+  }[];
+  const [dashboard] = dashboards;
+  const body = (dashboard?.Properties.DashboardBody['Fn::Join'][1] ?? [])
+    .map((part) => (typeof part === 'string' ? part : 'TOKEN'))
+    .join('');
+  const widgets = (
+    JSON.parse(body) as { widgets: { type: string; properties: Record<string, unknown> }[] }
+  ).widgets;
+  const queries = widgets.filter((w) => w.type === 'log').map((w) => String(w.properties['query']));
+
+  it('is the one eslojusto-api dashboard, in the regional stack', () => {
+    expect(dashboards).toHaveLength(1);
+    expect(dashboard?.Properties.DashboardName).toBe('eslojusto-api');
+    expect(api.region).toBe(REGION);
+    for (const w of widgets.filter((w) => w.type === 'log'))
+      expect(w.properties['region']).toBe(REGION);
+  });
+
+  it('queries all three log groups inline, with no saved queries', () => {
+    for (const fn of ['extract', 'checkout', 'pass'])
+      expect(queries.join('\n')).toContain(`SOURCE '/aws/lambda/eslojusto-api-${fn}'`);
+    apiTemplate.resourceCountIs('AWS::Logs::QueryDefinition', 0);
+  });
+
+  it('follows Bedrock by model id, whatever the model', () => {
+    expect(body).toContain(`SEARCH('{AWS/Bedrock,ModelId}`);
+  });
+
+  it('prices the configured models from the config', () => {
+    for (const model of [PRIMARY_MODEL, ESCALATION_MODEL]) {
+      const price = MODEL_PRICES_USD_PER_MTOK[model];
+      expect(price).toBeDefined();
+      expect(body).toContain(model);
+      expect(body).toContain(`* ${price?.input}`);
+      expect(body).toContain(`* ${price?.output}`);
+    }
+  });
+
+  it('adds no custom metrics, metric filters or alarms, which would bill monthly', () => {
+    apiTemplate.resourceCountIs('AWS::Logs::MetricFilter', 0);
+    apiTemplate.resourceCountIs('AWS::CloudWatch::Alarm', 0);
+    // A metric row starts with its namespace; an expression names one only inside SEARCH.
+    const namespaces = new Set(
+      widgets.flatMap((w) =>
+        ((w.properties['metrics'] ?? []) as [unknown][]).flatMap(([first]) =>
+          typeof first === 'string'
+            ? [first]
+            : [...String((first as { expression: string }).expression).matchAll(/\{([^,}]+)/g)].map(
+                (m) => m[1],
+              ),
+        ),
+      ),
+    );
+    expect(namespaces).toEqual(new Set(['AWS/Bedrock', 'AWS/Lambda']));
+  });
+
+  it('stays within the free tier of 50 metrics per dashboard, with room for two models', () => {
+    const rows = widgets.flatMap((w) => (w.properties['metrics'] ?? []) as unknown[]);
+    const searches = body.match(/SEARCH\(/g) ?? [];
+    expect(rows.length + searches.length).toBeLessThanOrEqual(50);
   });
 });
 

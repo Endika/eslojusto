@@ -317,9 +317,9 @@ beyond it: 5 for `extract`, 2 each for `checkout` and `pass`); CORS allows only
 **Two stacks.**
 
 - `EslojustoApi` (eu-south-2, deployed by CI): the three functions on `nodejs24.x` (newest GA
-  runtime; Node 26 is in preview) arm64, their URLs and log groups (14 days). No IAM, no
-  storage: tests prove the template holds only Lambda and Logs resources and names no other
-  region.
+  runtime; Node 26 is in preview) arm64, their URLs and log groups (14 days), and the
+  `eslojusto-api` dashboard. No IAM, no storage: tests prove the template holds only Lambda,
+  Logs and that one dashboard, and names no other region.
 - `EslojustoApiGlobal` (deployed by hand, once, through eu-west-1 because CloudFormation in
   eu-south-2 has no `AWS::Budgets::*` types; every resource in it is global): the three
   execution roles, the budget and its action, the GitHub OIDC provider and deploy role, and the
@@ -335,6 +335,19 @@ token key. No function can read the account's full Stripe secret key: it is in n
 the roles reach, and the adapter refuses any key that is not `rk_…`. Each may
 write only to its own log group (`log-group:NAME` and `log-group:NAME:*`). The budget action's
 role can be assumed by Budgets only on behalf of this account (`aws:SourceAccount`).
+
+**Dashboard** `eslojusto-api` (`infra/dashboard.ts`, CloudWatch in eu-south-2, 24 h by
+default): a header with links to Live Tail, the log groups, Lambda monitoring, the budget and
+Cost Explorer, and what «bien» looks like; the last 24 h in figures (reads, Lambda errors,
+throttles, `extract` p95, estimated AI cost); Lambda per function (invocations, errors,
+throttles and 5xx, p50/p95 duration, concurrency against the account's 10); Bedrock through
+`SEARCH` over `{AWS/Bedrock,ModelId}` (the EU profile id, e.g.
+`eu.anthropic.claude-haiku-4-5-20251001-v1:0`), so a new model shows up without a change; and
+Logs Insights widgets over the one-line log: `extract` codes over time and in a table,
+`checkout`/`pass` codes, `escalated`/`underestimated`/`countNotSaved` counts, pages, tokens
+and latency percentiles. The AI cost is tokens × `MODEL_PRICES_USD_PER_MTOK` for the
+configured models; synth fails if a configured model has no price. Only AWS metrics and
+inline queries: no metric filters, custom metrics or alarms.
 
 **Budget**: 10 USD a month on the whole account (Claude on Bedrock is billed through AWS
 Marketplace, so a Bedrock service filter would miss it; Budgets are in USD, and 10 USD stays
@@ -388,10 +401,14 @@ Nothing here has been run. Each step needs an account administrator.
 
 Fixed: about 0 USD a month. Function URLs, idle Lambdas, standard SSM parameters and the first
 two budgets with actions cost nothing; the bootstrap bucket holds about 1 MB; logs are a few
-KB a day.
+KB a day. The dashboard is within CloudWatch's free tier (3 dashboards of up to 50 metrics; a
+test keeps it under 50, and it is the account's only one) and reads only free AWS metrics; its
+Logs Insights widgets bill 0.0057 USD per GB scanned each time the page loads or refreshes, and
+14 days of these logs are well under 1 MB.
 
 Per read, from the eu-south-2 Price List (07-10-2026): Sonnet 4.6 at 3.30 / 16.50 USD per
-million input / output tokens (EU profile); Haiku 4.5, if it reads first again, at 1.10 / 5.50.
+million input / output tokens (EU profile); Haiku 4.5, if it reads first again, at 1.10 / 5.50
+(`MODEL_PRICES_USD_PER_MTOK` in `src/config.ts`, which the dashboard's cost estimate reads).
 `max_tokens` is 5,000 (a full pack records about 1,500–2,500 tokens, a long work history up to
 4,000), and `test/tokens.test.ts` recomputes the bounds below from the constants.
 
@@ -413,6 +430,12 @@ to images of the same size as a photo. Should Bedrock still bill more than twice
 the read is logged with `underestimated`. A free read needs a fresh captcha, at most 5 reads
 run at once, and the budget action caps the month.
 
+**Changing what CI deploys.** The CloudFormation execution policy lists exactly what
+`EslojustoApi` may hold, so a new kind of resource there needs the global stack redeployed
+first (step 5, same command). The dashboard is one: until `eslojusto-api-cfn-execution`
+allows `cloudwatch:PutDashboard`/`GetDashboard`/`DeleteDashboards` on
+`dashboard/eslojusto-api`, the `Deploy API` run fails and rolls back.
+
 ## Unverified
 
 - That a budget action resets by itself at the start of the next month; if not, detach
@@ -426,6 +449,9 @@ run at once, and the budget action caps the month.
   of the deployment confirms both with one test-mode call.
 - `npm audit` (dev): `brace-expansion` bundled inside `aws-cdk-lib` (latest release) has a
   high-severity advisory; it runs only at synth time, never in the Lambdas.
+- The dashboard's Live Tail link: the console's URL format is undocumented, so it may open
+  Live Tail without the log groups selected. The `SEARCH` and cost expressions and the Logs
+  Insights queries were checked against real data with read-only calls.
 - The real latency of an escalated read of a 15-page pack (the 180 s timeout is a guess), and
   whether Bedrock bills a 1568-px photo at about 1,600 tokens, as Anthropic's resizing
   suggests, or at its full 2,459.
