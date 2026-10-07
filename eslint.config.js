@@ -50,12 +50,11 @@ const noPosthogSdk = {
   message: 'Only src/analytics talks to posthog-js.',
 };
 const noPosthogAdapter = {
-  regex: '(^|/)posthog$',
+  regex: `(^|/)posthog(\\.[jt]s)?/?$|${notCanonical}`,
   message: 'Only the composition root (src/scripts) imports the PostHog adapter.',
 };
 const analyticsReach = {
-  regex:
-    '^\\.\\./(?!engine/|content/faq-topics$|i18n/client$|calculator/ports$|documents/ports$|documents/config$)',
+  regex: `^\\.\\./(?!engine/|content/faq-topics$|i18n/client$|calculator/ports$|documents/ports$|documents/config$)|${notCanonical}`,
   message:
     'src/analytics reaches only the engine, the help topics, the translator type, the calculator and documents ports and the documents switch.',
 };
@@ -88,7 +87,20 @@ const engineGlobals = {
       message: 'The engine runs without a browser.',
     })),
     // Every handle on the global object or the host, so no alias can reach a clock through it.
-    ...['global', 'globalThis', 'self', 'process', 'eval', 'Function', 'Temporal'].map((name) => ({
+    ...[
+      'global',
+      'globalThis',
+      'self',
+      'top',
+      'parent',
+      'frames',
+      'opener',
+      'process',
+      'eval',
+      'Function',
+      'Temporal',
+      'Intl',
+    ].map((name) => ({
       name,
       message: 'The engine never reaches the global object or the host: take inputs as parameters.',
     })),
