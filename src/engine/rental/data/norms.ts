@@ -13,6 +13,17 @@ export const NORMS: NormTable = {
     statusSince: null,
     statusUrl: null,
   },
+  // Annex: the IGC used for revisions counts as 0 when negative and 2 % at most.
+  law2_2015: {
+    id: 'law2_2015',
+    citation: 'Ley 2/2015, de 30 de marzo, de desindexación de la economía española',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2015-3443',
+    inForceSince: '2015-04-01',
+    inForceUntil: null,
+    status: 'in_force',
+    statusSince: null,
+    statusUrl: null,
+  },
   // Arts. 9.1, 18.1, 20.1, 20.2 and 36.5 LAU for contracts signed from 06-03-2019.
   rdl7_2019: {
     id: 'rdl7_2019',

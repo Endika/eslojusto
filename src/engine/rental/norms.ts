@@ -4,6 +4,7 @@ export { normStanding, type NormStanding, type NormStatus } from '../law/norms';
 
 export type NormId =
   | 'lau'
+  | 'law2_2015'
   | 'rdl7_2019'
   | 'rdl6_2022'
   | 'rdl11_2022'

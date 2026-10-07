@@ -126,13 +126,15 @@ describe('the cap in force on each anniversary', () => {
           rate: 2.2,
           publishedOn: '2021-05-14',
           flash: false,
+          clampedFrom: null,
         },
       },
     });
   });
 
-  it('31-03-2022 to 2023: the IGC below a CPI clause', () => {
-    // IPC June 2022 10,2 %; IGC May 2022 4,66 % (out 20-07-2022): 900 × 1,0466 = 941,94.
+  it('31-03-2022 to 2023: the IGC, at most 2 %, below a CPI clause', () => {
+    // IPC June 2022 10,2 %; IGC May 2022 4,66 % (out 20-07-2022), which Ley 2/2015 reads as
+    // 2 %: 900 × 1,02 = 918.
     const r = first(
       check(
         contract({
@@ -147,12 +149,16 @@ describe('the cap in force on each anniversary', () => {
     expect(figures(v)).toEqual({
       status: 'paid_over',
       base: 900,
-      maxRent: 941.94,
-      monthly: 49.86,
+      maxRent: 918,
+      monthly: 73.8,
       months: 12,
-      accumulated: 598.32,
+      accumulated: 885.6,
     });
-    expect(v.cap?.rule).toBe('cap_igc_2022_extended');
+    expect(v.cap).toMatchObject({
+      rule: 'cap_igc_2022_extended',
+      rate: { figure: { index: 'igc', month: '2022-05', rate: 2, clampedFrom: 4.66 } },
+    });
+    expect(v.rules).toContain('igc_clamp');
     expect(r.sources.map((s) => s.id)).toContain('cap_igc_2022_extended');
   });
 
@@ -316,8 +322,8 @@ describe('the cap in force on each anniversary', () => {
 });
 
 describe('large landlord', () => {
-  // 25-06-2023: IGC April 2023 4,65 % (out 19-06-2023), IPC May 2023 3,2 %. A 5 % rise agreed
-  // in writing.
+  // 25-06-2023: IGC April 2023 4,65 % (out 19-06-2023), read as 2 % (Ley 2/2015); IPC May 2023
+  // 3,2 %. A 5 % rise agreed in writing.
   const agreed = (largeLandlord: boolean | null, landlordType: 'person' | 'company' = 'person') =>
     first(
       check(
@@ -334,9 +340,9 @@ describe('large landlord', () => {
     );
 
   it('yes: the IGC binds even with a written agreement', () => {
-    // 1.000 × 1,0465 = 1.046,50; 3,50 a month for 12 months.
+    // 1.000 × 1,02 = 1.020; 30 a month for 12 months.
     const v = single(agreed(true));
-    expect(figures(v)).toMatchObject({ status: 'paid_over', maxRent: 1046.5, accumulated: 42 });
+    expect(figures(v)).toMatchObject({ status: 'paid_over', maxRent: 1020, accumulated: 360 });
     expect(v.cap?.rule).toBe('cap_igc_2023');
   });
 
@@ -352,14 +358,14 @@ describe('large landlord', () => {
     const d = depends(r);
     expect(d.reasons).toEqual(['large_landlord_unknown']);
     expect(d.low.status).toBe('not_checkable');
-    expect(d.high.accumulated).toBe(42);
+    expect(d.high.accumulated).toBe(360);
     expect(counted(r)).toBe(0);
     expect(r.companyLandlordHint).toBe(true);
     expect(agreed(null, 'person').companyLandlordHint).toBe(false);
   });
 
   it('«No lo sé» changes nothing without an agreement', () => {
-    // Without agreement the CPI (3,2 %) binds below the 5 % clause: 1.032.
+    // Without agreement the IGC (2 %) binds below the CPI and the 5 % clause: 1.020.
     const r = first(
       check(
         contract({
@@ -373,7 +379,7 @@ describe('large landlord', () => {
         }),
       ),
     );
-    expect(figures(single(r))).toMatchObject({ maxRent: 1032, monthly: 18, accumulated: 216 });
+    expect(figures(single(r))).toMatchObject({ maxRent: 1020, monthly: 30, accumulated: 360 });
     expect(r.companyLandlordHint).toBe(false);
   });
 
@@ -457,7 +463,10 @@ describe('when no rise fits', () => {
       ),
     );
     expect(figures(v)).toMatchObject({ maxRent: 1000, monthly: 10, accumulated: 120 });
-    expect(v.agreed).toMatchObject({ kind: 'index', figure: { index: 'igc', rate: -0.31 } });
+    expect(v.agreed).toMatchObject({
+      kind: 'index',
+      figure: { index: 'igc', rate: 0, clampedFrom: -0.31 },
+    });
   });
 });
 
@@ -525,10 +534,10 @@ describe('when the new rent is due (LAU art. 18.2)', () => {
 describe('several years', () => {
   it('carry the allowed rent, not the charged one, as the next base', () => {
     // 2022: IPC Feb 2022 7,6 % → 1.076,00, charged 1.100 (24/month).
-    // 2023: IPC Feb 2023 6,0 % below IGC Dec 2022 7,19 % → 1.076 × 1,06 = 1.140,56; charged
-    //       1.100 × 1,06 = 1.166 (25,44/month).
-    // 2024: IPC Feb 2024 2,8 % below 3 % → 1.140,56 × 1,028 = 1.172,50; charged
-    //       1.166 × 1,028 = 1.198,65 (26,15/month).
+    // 2023: IGC Dec 2022 7,19 %, read as 2 %, below IPC Feb 2023 6,0 % → 1.076 × 1,02 =
+    //       1.097,52; charged 1.100 × 1,06 = 1.166 (68,48/month).
+    // 2024: IPC Feb 2024 2,8 % below 3 % → 1.097,52 × 1,028 = 1.128,25; charged
+    //       1.166 × 1,028 = 1.198,65 (70,40/month).
     const results = check(
       contract({
         updates: [
@@ -542,8 +551,8 @@ describe('several years', () => {
     expect(results.map((r) => r.index)).toEqual([1, 2, 0]);
     expect(readings.map((v) => [v.base, v.maxRent, v.monthly, v.accumulated])).toEqual([
       [1000, 1076, 24, 288],
-      [1076, 1140.56, 25.44, 305.28],
-      [1140.56, 1172.5, 26.15, 313.8],
+      [1076, 1097.52, 68.48, 821.76],
+      [1097.52, 1128.25, 70.4, 844.8],
     ]);
     expect(readings.map((v) => v.calculation[0]?.key)).toEqual([
       'rent_update.base_initial',
@@ -687,14 +696,14 @@ describe('maximum rent against hand calculations', () => {
   it.each([
     // [anniversary, signed, start, clause, base, rate cited, expected]
     ['2021-05-20', '2019-05-10', '2019-05-20', 'ipc', 800, 'IPC 2021-04 2,2 %', 817.6],
-    ['2022-07-25', '2021-07-20', '2021-07-25', 'ipc', 900, 'IGC 2022-05 4,66 %', 941.94],
+    ['2022-07-25', '2021-07-20', '2021-07-25', 'ipc', 900, 'IGC 2022-05 4,66 % → 2 %', 918],
     ['2024-06-20', '2023-06-15', '2023-06-20', 'ipc', 1000, '3 % (2024)', 1030],
     ['2025-03-20', '2024-03-15', '2024-03-20', 'ipc', 1000, 'IRAV 2025-02 2,08 %', 1020.8],
     ['2025-03-20', '2021-03-15', '2021-03-20', 'ipc', 1000, 'IPC 2025-02 3,0 %', 1030],
     ['2022-03-20', '2021-03-15', '2021-03-20', 'ipc', 1100, 'IPC 2022-02 7,6 %', 1183.6],
-    ['2023-03-20', '2021-03-15', '2021-03-20', 'ipc', 1076, 'IPC 2023-02 6,0 %', 1140.56],
+    ['2023-03-20', '2021-03-15', '2021-03-20', 'ipc', 1076, 'IGC 2022-12 7,19 % → 2 %', 1097.52],
     ['2024-03-20', '2021-03-15', '2021-03-20', 'ipc', 1140.56, 'IPC 2024-02 2,8 %', 1172.5],
-    ['2023-06-25', '2020-06-20', '2020-06-25', 'ipc', 1000, 'IPC 2023-05 3,2 %', 1032],
+    ['2023-06-25', '2020-06-20', '2020-06-25', 'ipc', 1000, 'IGC 2023-04 4,65 % → 2 %', 1020],
   ] as const)(
     '%s, signed %s: %s from %s',
     (anniversary, signed, start, clause, base, _cited, expected) => {

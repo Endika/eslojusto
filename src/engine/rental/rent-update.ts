@@ -36,6 +36,8 @@ export interface IndexFigure {
   readonly publishedOn: string;
   // The CPI flash estimate rather than the definitive figure.
   readonly flash: boolean;
+  // The published IGC rate when Ley 2/2015 brought it into [0, 2] %; null otherwise.
+  readonly clampedFrom: number | null;
 }
 
 export type RateFigure =
@@ -92,6 +94,8 @@ const UPDATE_RULES = new Set<RuleId>([
   'irav_all_contracts',
   ...(Object.keys(EXTRA_CAPS) as RuleId[]),
 ]);
+
+const IGC_CEILING = 2;
 
 const WRITTEN = new Set(['letter', 'burofax', 'receipt_note', 'annex']);
 const ELECTRONIC = new Set(['email', 'messaging']);
@@ -232,10 +236,21 @@ function lookUp(
   day: string,
 ): Looked {
   const latest = world[indexDoubtId(index, day)] === true;
-  const fig = (month: string, rate: number, publishedOn: string, flash: boolean): Looked => ({
-    ok: true,
-    figure: { index, month, rate, publishedOn, flash },
-  });
+  const fig = (month: string, rate: number, publishedOn: string, flash: boolean): Looked => {
+    // Ley 2/2015, annex: a negative IGC counts as 0 and anything above 2 % as 2 %.
+    const used = index === 'igc' ? Math.min(Math.max(rate, 0), IGC_CEILING) : rate;
+    return {
+      ok: true,
+      figure: {
+        index,
+        month,
+        rate: used,
+        publishedOn,
+        flash,
+        clampedFrom: used === rate ? null : rate,
+      },
+    };
+  };
   const definitive = (v: { month: string; rate: number; publishedOn: string | null }) =>
     v.publishedOn === null
       ? ({ ok: false, unchecked: 'index_publication_unknown' } as const)
@@ -359,7 +374,11 @@ function allowance(
     const doubtful = world[normDoubtId(norm)] === true;
     return norm === a.rule.norm ? doubtful : !doubtful;
   };
-  const look = (index: IndexId) => lookUp(index, refs.get(index), world, day);
+  const rules: RuleId[] = [];
+  const look = (index: IndexId) => {
+    if (index === 'igc') rules.push('igc_clamp');
+    return lookUp(index, refs.get(index), world, day);
+  };
   const rate = (r: IndexId | number): Looked | { ok: true; fixed: number } =>
     typeof r === 'number' ? { ok: true, fixed: r } : look(r);
   const toFigure = (
@@ -374,7 +393,6 @@ function allowance(
   // The caps that bind: with a new agreement, only those that bind a large landlord anyway.
   const caps: { rule: RuleId; rate: IndexId | number }[] = [];
   let agreed: RateFigure | null = null;
-  const rules: RuleId[] = [];
   const phrases: RentalPhrase[] = [];
   if (agreedInWriting) {
     const binding = largeLandlord ? extra.filter((id) => EXTRA_CAPS[id]?.largeLandlord) : [];
