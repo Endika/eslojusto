@@ -52,6 +52,40 @@ describe('import boundaries', () => {
     expect(await violations(filePath, code)).toContain('no-restricted-imports');
   });
 
+  it.each([
+    ['src/engine/employment/x.ts', "import { RULES } from '.././rental/rules';"],
+    ['src/engine/employment/x.ts', "import { RULES } from '..//rental/rules';"],
+    ['src/engine/employment/x.ts', "import { RULES } from '../law/./../rental/rules';"],
+    ['src/engine/employment/x.ts', "import { MINIMUM_WAGE } from '././data/minimum-wage';"],
+    ['src/engine/employment/x.ts', "import { MINIMUM_WAGE } from './/data/minimum-wage';"],
+    ['src/engine/employment/data/x.ts', "import type { NormTable } from '.././norms';"],
+    ['src/engine/law/x.ts', "import { toIso } from '..//date';"],
+    ['src/engine/law/x.ts', "import { toIso } from '.././date';"],
+    ['src/engine/x.ts', "import { round2 } from '././money';"],
+    ['src/i18n/x.ts', "import { es } from './/es';"],
+  ])('%s cannot spell a path around them: %s', async (filePath, code) => {
+    expect(await violations(filePath, code)).toContain('no-restricted-imports');
+  });
+
+  it.each([
+    "import { RULES } from './rental/rules';",
+    "export { RULES } from './rental/rules';",
+    "export * from './rental/data/norms';",
+    "export type { NormTable } from './employment/norms';",
+    "export * from './employment';",
+  ])('the engine root cannot reach into a section: %s', async (code) => {
+    expect(await violations('src/engine/x.ts', code)).toContain('no-restricted-imports');
+  });
+
+  it.each([
+    ['src/engine/employment/x.ts', "export type R = typeof import('../rental/rules');"],
+    ['src/engine/x.ts', "export type R = typeof import('./rental/data/norms');"],
+    ['src/calculator/x.ts', "export type P = typeof import('../analytics/posthog');"],
+    ['src/engine/employment/x.ts', "import rules = require('../rental/rules');\nexport { rules };"],
+  ])('%s cannot hide an import in %s', async (filePath, code) => {
+    expect(await violations(filePath, code)).toContain('no-restricted-syntax');
+  });
+
   it('the engine cannot reach the browser or the clock', async () => {
     const fired = await violations(
       'src/engine/x.ts',
@@ -84,6 +118,29 @@ describe('import boundaries', () => {
       'export const now = () => [new globalThis.Date(), globalThis.performance.now()];',
     );
     expect(fired.filter((r) => r === 'no-restricted-properties')).toHaveLength(2);
+  });
+
+  it.each(
+    [
+      'src/engine/x.ts',
+      'src/engine/law/x.ts',
+      'src/engine/rental/x.ts',
+      'src/engine/rental/data/x.ts',
+      'src/engine/employment/x.ts',
+      'src/engine/employment/data/x.ts',
+    ].flatMap((filePath) =>
+      [
+        'export const now = () => new global.Date();',
+        'export const now = () => process.hrtime();',
+        'const g = globalThis;\nexport const now = () => new g.Date();',
+        'const g = self;\nexport const now = () => g.performance.now();',
+        "export const now = () => Function('return new Date()')();",
+        "export const now = () => eval('new Date()');",
+        'export const now = () => Temporal.Now.instant();',
+      ].map((code) => [filePath, code]),
+    ),
+  )('%s cannot reach the global object: %s', async (filePath, code) => {
+    expect(await violations(filePath, code)).toContain('no-restricted-globals');
   });
 
   it('a dynamic import cannot slip past them', async () => {
