@@ -74,8 +74,9 @@ budget action.
 included, and the API refuses a body over 6 MiB. Base64 adds a third, so the browser keeps the
 JSON under 5.8 MB (`requestBudgetBytes` in `src/documents/contract.ts`), shared out among the
 images: each photo or PDF page is re-encoded as JPEG at falling quality (0.85, 0.75, 0.65, 0.5)
-until it fits its share, and only when no quality does, at 1280 and then 1100 px on the long side
-(`JPEG_QUALITIES` and `LONG_SIDES` in `src/documents/files.ts`). With 15 images that is about
+until it fits its share, and only when no quality does, at 1280 and then 1100 px on the long side,
+from 0.65 down (`encodingSteps` in `src/documents/files.ts`: on a page that missed at 0.5, 0.75
+weighs more than a shorter side saves). With 15 images that is about
 290 KB each, which a 1568-px document page usually meets by quality 0.65 and even a photo with
 heavy sensor noise by 0.5; with 25, about 174 KB each, which a clean page or a PDF page still
 meets at 1568 px and a noisy photo at 1280 px (`tests/e2e/documents.spec.ts` sends 25 of them).

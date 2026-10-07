@@ -1,4 +1,4 @@
-import { bytesToBase64, encodingSizes, JPEG_QUALITIES } from '../documents/files';
+import { bytesToBase64, encodingSteps } from '../documents/files';
 import type { EncodedFile } from '../documents/ports';
 
 export function whiteCanvas(width: number, height: number) {
@@ -24,13 +24,12 @@ function scaled(canvas: HTMLCanvasElement, width: number, height: number) {
 // size decides.
 async function fittingJpeg(canvas: HTMLCanvasElement, maxBytes: number): Promise<Blob> {
   let blob: Blob | null = null;
-  for (const { width, height } of encodingSizes(canvas.width, canvas.height)) {
-    const source = scaled(canvas, width, height);
-    for (const quality of JPEG_QUALITIES) {
-      blob = await new Promise<Blob | null>((r) => source.toBlob(r, 'image/jpeg', quality));
-      if (!blob) throw new Error('No JPEG');
-      if (blob.size <= maxBytes) return blob;
-    }
+  let source = canvas;
+  for (const { width, height, quality } of encodingSteps(canvas.width, canvas.height)) {
+    if (width !== source.width || height !== source.height) source = scaled(canvas, width, height);
+    blob = await new Promise<Blob | null>((r) => source.toBlob(r, 'image/jpeg', quality));
+    if (!blob) throw new Error('No JPEG');
+    if (blob.size <= maxBytes) return blob;
   }
   if (!blob) throw new Error('No JPEG');
   return blob;

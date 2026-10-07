@@ -6,7 +6,7 @@ import {
   bytesToBase64,
   checkSelection,
   encodedSize,
-  encodingSizes,
+  encodingSteps,
   filesBucket,
   fitExactly,
   fitWithin,
@@ -109,20 +109,29 @@ describe('fitWithin', () => {
   });
 });
 
-describe('encodingSizes', () => {
-  it('tries the full size first, then 1280 and 1100 px on the long side', () => {
-    expect(encodingSizes(1176, 1568)).toEqual([
-      { width: 1176, height: 1568 },
-      { width: 960, height: 1280 },
-      { width: 825, height: 1100 },
+describe('encodingSteps', () => {
+  const sizes = (w: number, h: number) =>
+    encodingSteps(w, h).map((s) => `${s.width}×${s.height}@${s.quality}`);
+  it('tries every quality at the full size, then 1280 and 1100 px from 0.65 down', () => {
+    expect(sizes(1176, 1568)).toEqual([
+      '1176×1568@0.85',
+      '1176×1568@0.75',
+      '1176×1568@0.65',
+      '1176×1568@0.5',
+      '960×1280@0.65',
+      '960×1280@0.5',
+      '825×1100@0.65',
+      '825×1100@0.5',
     ]);
   });
   it('tries each size once and never enlarges a small image', () => {
-    expect(encodingSizes(1200, 900)).toEqual([
-      { width: 1200, height: 900 },
-      { width: 1100, height: 825 },
+    expect(sizes(1200, 900).slice(4)).toEqual(['1100×825@0.65', '1100×825@0.5']);
+    expect(sizes(800, 600)).toEqual([
+      '800×600@0.85',
+      '800×600@0.75',
+      '800×600@0.65',
+      '800×600@0.5',
     ]);
-    expect(encodingSizes(800, 600)).toEqual([{ width: 800, height: 600 }]);
   });
 });
 
