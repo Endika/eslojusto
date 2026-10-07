@@ -113,14 +113,11 @@ test('the page opens on the choice, and the CSP names only the three function UR
   await page.goto('finiquito/');
   await expect(page.getByRole('heading', { name: '¿Cómo quieres empezar?' })).toBeVisible();
   await expect(page.locator('#calculator')).toBeHidden();
-  await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveAttribute(
-    'content',
-    new RegExp(
-      `connect-src ${[...API_ORIGINS, 'https://challenges.cloudflare.com'].join(' ')}; frame-src https://challenges.cloudflare.com;`.replace(
-        /\./g,
-        '\\.',
-      ),
-    ),
+  const csp = await page
+    .locator('meta[http-equiv="Content-Security-Policy"]')
+    .getAttribute('content');
+  expect(csp).toContain(
+    `connect-src ${[...API_ORIGINS, 'https://challenges.cloudflare.com'].join(' ')}; frame-src https://challenges.cloudflare.com;`,
   );
 });
 
