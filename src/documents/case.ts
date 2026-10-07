@@ -1,6 +1,6 @@
 import type { CompletedReview } from '../calculator/ports';
 import type { Review } from '../engine/review';
-import { letterKind } from './letter';
+import type { LetterKind } from './letter';
 import type { PaidReview } from './ports';
 import { letterModel, reportModel } from './report';
 
@@ -8,6 +8,16 @@ import { letterModel, reportModel } from './report';
 // deduction above its maximum.
 export const hasShortfall = (r: Review): boolean =>
   r.items.some((i) => i.status === 'below_minimum' || i.status === 'deduction_too_high');
+
+// With something short, the letter lists it with its figures; with nothing short, it says only
+// that the proposal is received without agreeing to it.
+export const letterKind = (r: Review): LetterKind =>
+  r.items.some(
+    (i) =>
+      i.item.range !== null && (i.status === 'below_minimum' || i.status === 'deduction_too_high'),
+  )
+    ? 'items'
+    : 'general';
 
 // A final pay review has one letter, which lists what falls short or, with nothing short, only
 // acknowledges the proposal.

@@ -3,12 +3,11 @@ import type { EmployerFigures, Review } from '../engine/review';
 import type { FinalPayInput, ItemId } from '../engine/types';
 import type { BenefitEstimate } from '../engine/unemployment';
 import type { Translate } from '../i18n/client';
+import type { Detail } from './flow';
 import type { Step } from './steps';
 
+export type { Detail } from './flow';
 export type { Step } from './steps';
-
-// Whether the result shows its detail: locked until a pass unlocks it, where a pass exists.
-export type Detail = 'locked' | 'unlocked';
 
 export interface CompletedReview {
   readonly review: Review;

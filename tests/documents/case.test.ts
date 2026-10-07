@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { finalPayCase, hasShortfall } from '../../src/documents/case';
-import { letterKind, type LetterDetails } from '../../src/documents/letter';
+import { finalPayCase, hasShortfall, letterKind } from '../../src/documents/case';
+import type { LetterDetails } from '../../src/documents/letter';
 import { letterModel, reportModel } from '../../src/documents/report';
 import { completed, today, tr, unfairDismissal } from './fixtures';
 
