@@ -125,14 +125,23 @@ describe('other labelled clauses', () => {
     );
   });
 
-  it('mandatory overtime is checked like the overtime pact', () => {
-    expect(
-      only(
-        assessOne(clause({ label: 'mandatory_overtime' }), {
-          overtimeAgreed: { hoursPerYear: 'as_needed' },
-        }),
-      ),
-    ).toMatchObject({ id: 'overtime_cap_80', status: 'over_legal_limit' });
+  it('mandatory overtime with its hours is checked once, in the working time', () => {
+    const [listed] = assessClauses(
+      contract({
+        clauses: [clause({ label: 'mandatory_overtime' })],
+        overtimeAgreed: { hoursPerYear: 'as_needed', paidInMoney: null },
+      }),
+      EMPLOYMENT_NORMS,
+    );
+    expect(listed).toEqual({
+      index: 0,
+      label: 'mandatory_overtime',
+      assessed: null,
+      checkedIn: { item: 'working_time', id: 'overtime_cap_80' },
+    });
+  });
+
+  it('mandatory overtime without its hours is to review', () => {
     expect(
       only(assessOne(clause({ label: 'mandatory_overtime' }), { overtimeAgreed: null })).status,
     ).toBe('review_it');
@@ -176,7 +185,7 @@ describe('other labelled clauses', () => {
 
   it('an unlabelled clause is listed with no verdict', () => {
     const [listed] = assessClauses(contract({ clauses: [clause({})] }), EMPLOYMENT_NORMS);
-    expect(listed).toEqual({ index: 0, label: 'other', assessed: null });
+    expect(listed).toEqual({ index: 0, label: 'other', assessed: null, checkedIn: null });
   });
 });
 

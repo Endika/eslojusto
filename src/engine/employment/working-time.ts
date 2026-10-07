@@ -202,7 +202,15 @@ function noOvertimeRule(input: EmploymentInput): EmploymentRuleId | null {
   return null;
 }
 
-// The overtime the contract makes compulsory (art. 35.4 ET), against art. 35.2 ET.
+// The rule an overtime pact is checked against, or null without one.
+export function overtimePactRule(input: EmploymentInput): EmploymentRuleId | null {
+  if (input.overtimeAgreed === null) return null;
+  return noOvertimeRule(input) ?? 'overtime_cap_80';
+}
+
+// The overtime the contract makes compulsory, which art. 35.4 ET allows «dentro de los límites del
+// apartado 2». Art. 35.2 ET does not count hours compensated with rest within four months, so only
+// hours paid in money can be over its cap for sure.
 export function assessOvertimePact(input: EmploymentInput, norms: NormTable): Assessed | null {
   const pact = input.overtimeAgreed;
   if (pact === null) return null;
@@ -220,7 +228,7 @@ export function assessOvertimePact(input: EmploymentInput, norms: NormTable): As
       finding(
         'overtime_cap_80',
         {
-          status: 'over_legal_limit',
+          status: 'review_it',
           calculation: [phrase('working_time.overtime_as_needed', { cap: OVERTIME_MAX_HOURS })],
           alsoCites: ['overtime_voluntary'],
         },
@@ -231,12 +239,17 @@ export function assessOvertimePact(input: EmploymentInput, norms: NormTable): As
   const fullTime = input.fullTimeHours ?? WEEKLY_MAX_HOURS;
   const share = weekly === null ? 1 : Math.min(1, weekly / fullTime);
   const cap = round2(OVERTIME_MAX_HOURS * share);
+  const over = pact.hoursPerYear > cap;
+  const sure = over && pact.paidInMoney === true;
   return single(
     finding(
       'overtime_cap_80',
       {
-        status: pact.hoursPerYear > cap ? 'over_legal_limit' : 'within_limit',
-        calculation: [phrase('working_time.overtime_hours', { hours: pact.hoursPerYear, cap })],
+        status: sure ? 'over_legal_limit' : over ? 'review_it' : 'within_limit',
+        calculation: [
+          phrase('working_time.overtime_hours', { hours: pact.hoursPerYear, cap }),
+          ...(over && !sure ? [phrase('working_time.overtime_rest_not_counted')] : []),
+        ],
         alsoCites: ['overtime_voluntary'],
       },
       norms,

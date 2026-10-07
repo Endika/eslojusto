@@ -213,7 +213,11 @@ export interface EmploymentInput {
   readonly shifts: boolean;
   readonly nightWorker: boolean | null;
   readonly irregular: boolean;
-  readonly overtimeAgreed: { readonly hoursPerYear: number | 'as_needed' } | null;
+  // `paidInMoney`: the contract pays the overtime in money rather than with rest (art. 35.1 ET).
+  readonly overtimeAgreed: {
+    readonly hoursPerYear: number | 'as_needed';
+    readonly paidInMoney: boolean | null;
+  } | null;
   readonly partTime: PartTime | null;
   readonly remoteShare: number | null;
   readonly realWeeklyHours: number | null;

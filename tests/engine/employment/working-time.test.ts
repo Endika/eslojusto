@@ -178,7 +178,11 @@ describe('night work (art. 36.1 ET)', () => {
 
   it('an overtime pact for a night worker is to review', () => {
     const finding = findingFor(
-      { schedule: null, nightWorker: true, overtimeAgreed: { hoursPerYear: 20 } },
+      {
+        schedule: null,
+        nightWorker: true,
+        overtimeAgreed: { hoursPerYear: 20, paidInMoney: null },
+      },
       'night_limits',
     );
     expect(finding.calculation).toContainEqual(phrase('working_time.night_overtime'));
@@ -207,23 +211,39 @@ describe('overtime pacts (art. 35 ET)', () => {
     return assessed.finding;
   };
 
-  it('«as needed» is over the legal cap of 80 hours', () => {
-    expect(pact({ overtimeAgreed: { hoursPerYear: 'as_needed' } })).toMatchObject({
-      id: 'overtime_cap_80',
-      status: 'over_legal_limit',
-    });
+  it('«as needed» is to review: art. 35.4 allows mandatory overtime within the cap', () => {
+    const finding = pact({ overtimeAgreed: { hoursPerYear: 'as_needed', paidInMoney: true } });
+    expect(finding).toMatchObject({ id: 'overtime_cap_80', status: 'review_it' });
+    expect(offerPass([{ kind: 'single', finding }])).toBe(false);
   });
 
-  it('100 hours a year is over the cap, 60 within it', () => {
-    expect(pact({ overtimeAgreed: { hoursPerYear: 100 } }).status).toBe('over_legal_limit');
-    expect(pact({ overtimeAgreed: { hoursPerYear: 60 } }).status).toBe('within_limit');
+  it('100 hours a year paid in money is over the cap, 60 within it', () => {
+    expect(pact({ overtimeAgreed: { hoursPerYear: 100, paidInMoney: true } }).status).toBe(
+      'over_legal_limit',
+    );
+    expect(pact({ overtimeAgreed: { hoursPerYear: 60, paidInMoney: true } }).status).toBe(
+      'within_limit',
+    );
   });
+
+  it.each([false, null])(
+    '100 hours a year not known to be paid in money (%s) is to review: rested hours do not count',
+    (paidInMoney) => {
+      expect(pact({ overtimeAgreed: { hoursPerYear: 100, paidInMoney } })).toMatchObject({
+        status: 'review_it',
+        calculation: [
+          phrase('working_time.overtime_hours', { hours: 100, cap: 80 }),
+          phrase('working_time.overtime_rest_not_counted'),
+        ],
+      });
+    },
+  );
 
   it('the cap shrinks with a shorter working week', () => {
     // 30 of 40 hours: 60 hours a year.
     const finding = pact({
       contractHours: { weekly: 30, annual: null },
-      overtimeAgreed: { hoursPerYear: 70 },
+      overtimeAgreed: { hoursPerYear: 70, paidInMoney: true },
     });
     expect(finding).toMatchObject({
       status: 'over_legal_limit',
@@ -247,7 +267,7 @@ describe('overtime pacts (art. 35 ET)', () => {
     ['alternance training', { modality: 'training_alternance' }, 'training_alternance_no_overtime'],
     ['practice training', { modality: 'training_practice' }, 'training_practice_no_overtime'],
   ] as const)('a pact in %s is void', (_, change, id) => {
-    const finding = pact({ ...change, overtimeAgreed: { hoursPerYear: 10 } });
+    const finding = pact({ ...change, overtimeAgreed: { hoursPerYear: 10, paidInMoney: null } });
     expect(finding).toMatchObject({ id, status: 'clause_void' });
     expect(finding.sources.map((s) => s.id)).toContain('partial_nullity');
   });
