@@ -309,7 +309,7 @@ export function readBenefitSheets(
   return errors.length > 0 ? { errors } : { data };
 }
 
-export function sheetErrors(form: HTMLFormElement, sheet: Sheet, today?: CivilDate): FieldError[] {
+export function sheetErrors(form: HTMLFormElement, sheet: Sheet, today: CivilDate): FieldError[] {
   if (sheet === 'hijos' || sheet === 'otros') {
     const fields = SHEET_FIELDS[sheet];
     return readBenefitAnswers(form).errors.filter((e) => fields.includes(baseField(e.field)));

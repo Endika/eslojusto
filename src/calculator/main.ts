@@ -13,6 +13,7 @@ import { track } from '../analytics/posthog';
 import { estimateBenefit } from '../engine/unemployment';
 import { reviewFinalPay } from '../engine/review';
 import type { ItemId } from '../engine/types';
+import { localToday } from '../scripts/clock';
 import {
   SHEETS,
   ITEM_IDS,
@@ -165,7 +166,7 @@ function applyConditions() {
 
 // Asks for the employer's figure only for the items this case produces.
 function prepareFigures() {
-  const r = reviewFinalPay(provisionalInput(form), {});
+  const r = reviewFinalPay(provisionalInput(form), {}, localToday());
   const ids = new Set(r.ok ? r.review.items.map((p) => p.item.id) : []);
   for (const id of ITEM_IDS) {
     const box = required(form.querySelector<HTMLElement>(`[data-figure="${id}"]`), id);
@@ -257,7 +258,7 @@ function focusError(errors: readonly FieldError[]) {
 function advance() {
   const sheet = SHEETS[current];
   if (!sheet) return;
-  const errors = sheetErrors(form, sheet);
+  const errors = sheetErrors(form, sheet, localToday());
   renderErrors(form, errors, tr);
   if (errors.length > 0) {
     trackErrors(errors);
@@ -282,7 +283,7 @@ function goToError(errors: readonly FieldError[]) {
 function submitReview() {
   const parsed = readForm(form);
   if ('errors' in parsed) return goToError(parsed.errors);
-  const r = reviewFinalPay(parsed.input, parsed.figures);
+  const r = reviewFinalPay(parsed.input, parsed.figures, localToday());
   if (!r.ok) return goToError(r.errors);
   const benefit = readBenefitSheets(form);
   if ('errors' in benefit) return goToError(benefit.errors);
@@ -323,7 +324,7 @@ function goBack(i: number, options: Parameters<typeof show>[1]) {
 
 // The furthest sheet a visitor may open: every sheet before it answers cleanly.
 function firstIncomplete(): number {
-  const i = SHEETS.findIndex((h, j) => applies(j) && sheetErrors(form, h).length > 0);
+  const i = SHEETS.findIndex((h, j) => applies(j) && sheetErrors(form, h, localToday()).length > 0);
   return i < 0 ? LAST_SHEET : i;
 }
 

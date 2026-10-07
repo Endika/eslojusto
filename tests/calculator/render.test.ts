@@ -369,13 +369,13 @@ describe('the benefit sheets', () => {
   }
 
   it('unanswered children is an error on its sheet; «Prefiero no decirlo» is fine', () => {
-    expect(sheetErrors(buildForm(''), 'hijos')).toEqual([
+    expect(sheetErrors(buildForm(''), 'hijos', today)).toEqual([
       { field: 'children', code: 'missing_children' },
     ]);
     const notSaid = buildForm(
       '<input name="children" value="not_said"><input name="otherContracts" value="no">',
     );
-    expect(sheetErrors(notSaid, 'hijos')).toEqual([]);
+    expect(sheetErrors(notSaid, 'hijos', today)).toEqual([]);
     expect(readBenefitSheets(notSaid)).toEqual({
       data: { children: null, others: { contracts: [], benefitDrawnSince: null } },
     });
@@ -385,7 +385,7 @@ describe('the benefit sheets', () => {
     const f = buildForm(
       '<input name="otherContracts" value="yes"><input name="benefitDrawnSince" value="no">',
     );
-    expect(sheetErrors(f, 'otros')).toEqual([
+    expect(sheetErrors(f, 'otros', today)).toEqual([
       { field: 'otherContracts.1.endDate', code: 'other_contract_ends_after_this_one' },
     ]);
   });
@@ -404,7 +404,9 @@ describe('the benefit sheets', () => {
 
   it('with «Sí» the benefit-since question must be answered', () => {
     const f = buildForm('<input name="otherContracts" value="yes">');
-    expect(sheetErrors(f, 'otros').map((e) => e.code)).toContain('missing_benefitDrawnSince');
+    expect(sheetErrors(f, 'otros', today).map((e) => e.code)).toContain(
+      'missing_benefitDrawnSince',
+    );
   });
 
   it('the engine error goes back to its row even when an earlier row cannot be read', () => {
@@ -413,7 +415,7 @@ describe('the benefit sheets', () => {
     );
     const start0 = f.querySelector<HTMLInputElement>('[name="otherContracts.0.startDate"]');
     if (start0) start0.value = '';
-    expect(sheetErrors(f, 'otros')).toEqual([
+    expect(sheetErrors(f, 'otros', today)).toEqual([
       { field: 'otherContracts.0.startDate', code: 'missing_value' },
       { field: 'otherContracts.1.endDate', code: 'other_contract_ends_after_this_one' },
     ]);
@@ -423,7 +425,7 @@ describe('the benefit sheets', () => {
     const f = buildForm('<input name="otherContracts" value="yes">');
     const end0 = f.querySelector<HTMLInputElement>('[name="otherContracts.0.endDate"]');
     if (end0) end0.value = '';
-    expect(sheetErrors(f, 'otros').map((e) => e.field)).toEqual([
+    expect(sheetErrors(f, 'otros', today).map((e) => e.field)).toEqual([
       'benefitDrawnSince',
       'otherContracts.0.endDate',
       'otherContracts.1.endDate',
