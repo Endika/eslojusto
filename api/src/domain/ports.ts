@@ -1,18 +1,14 @@
 import type { DocumentFile, DocumentKind } from './documents';
 import type { ResultCode } from './results';
 
-export type ModelRead =
-  | {
-      readonly outcome: 'read';
-      // The tool input exactly as the model produced it, or null if it produced none.
-      readonly toolInput: unknown;
-      readonly inputTokens: number;
-      readonly outputTokens: number;
-    }
-  // The provider refused the document itself (corrupt, encrypted, unsupported).
-  | { readonly outcome: 'rejected' };
+export interface ModelRead {
+  // The tool input exactly as the model produced it, or null if it produced none.
+  readonly toolInput: unknown;
+  readonly inputTokens: number;
+  readonly outputTokens: number;
+}
 
-// Throws when the model provider is unavailable.
+// Throws whenever the model provider does not answer, whatever the reason.
 export interface DocumentReader {
   read(request: {
     readonly model: string;
@@ -21,9 +17,15 @@ export interface DocumentReader {
   }): Promise<ModelRead>;
 }
 
+export interface PdfFacts {
+  readonly pages: number;
+  // Bytes of text the model would read from the PDF's text layer.
+  readonly textBytes: number;
+}
+
 export interface PdfInspector {
-  // null when the bytes are not a PDF it can open.
-  countPages(bytes: Uint8Array): Promise<number | null>;
+  // null when the PDF can't be read unambiguously.
+  inspect(bytes: Uint8Array): Promise<PdfFacts | null>;
 }
 
 export interface CaptchaVerifier {
@@ -75,6 +77,10 @@ export interface SessionSnapshot {
   // Epoch seconds.
   readonly created: number;
   readonly amountSubtotal: number | null;
+  // Reads already made with this pass, as recorded in the session's metadata.
+  readonly readsUsed: number;
+  // Refunded or disputed.
+  readonly revoked: boolean;
   readonly lineItems: readonly {
     readonly priceId: string | null;
     readonly unitAmount: number | null;
@@ -82,7 +88,10 @@ export interface SessionSnapshot {
   }[];
 }
 
+// Stripe is the only record of a pass: its session holds the read count.
 export interface PaymentVerifier {
   // null when no such session exists; throws when the provider is unavailable.
   findSession(sessionId: string): Promise<SessionSnapshot | null>;
+  // Throws when the provider is unavailable.
+  recordReads(sessionId: string, readsUsed: number): Promise<void>;
 }

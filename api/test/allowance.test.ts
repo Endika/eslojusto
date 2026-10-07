@@ -6,14 +6,17 @@ import {
   PASS_READS,
   passClaims,
   passExpiry,
+  passSessionProblem,
+  readsLeft,
 } from '../src/domain/allowance';
+import { CREATED, paidSession } from './support/fakes';
 
 const signer = createHmacSigner('test-key-that-is-long-enough-for-hmac-sha256');
 const now = Date.UTC(2026, 9, 7, 23, 30);
 const exp = Date.UTC(2026, 9, 14, 10) / 1000;
 
 const next = (check: ReturnType<typeof checkAllowance>) => {
-  if (!check.ok) throw new Error(check.code);
+  if (!check.ok || check.type !== 'free') throw new Error('not a free read');
   return signer.verify(check.next());
 };
 
@@ -22,7 +25,7 @@ describe('free reads', () => {
     let token: string | null = null;
     for (let used = 1; used <= FREE_READS_PER_DAY; used += 1) {
       const check = checkAllowance({ type: 'free', token }, signer, now);
-      if (!check.ok) throw new Error(check.code);
+      if (!check.ok || check.type !== 'free') throw new Error('not a free read');
       token = check.next();
       expect(signer.verify(token)).toEqual({ typ: 'quota', day: '2026-10-07', used });
     }
@@ -44,30 +47,24 @@ describe('free reads', () => {
 
   it('refuse a forged or foreign token', () => {
     const forged = signer.sign({ typ: 'quota', day: '2026-10-07', used: 0 }).replace(/.$/, 'A');
-    const pass = signer.sign(passClaims('cs_test_a', exp, 0));
+    const pass = signer.sign(passClaims('cs_test_a', exp));
     for (const token of [forged, pass, 'garbage'])
       expect(checkAllowance({ type: 'free', token }, signer, now).ok).toBe(false);
   });
 });
 
 describe('passes', () => {
-  it('count reads up to the limit and keep their expiry', () => {
-    const token = signer.sign(passClaims('cs_test_a', exp, PASS_READS - 1));
-    expect(next(checkAllowance({ type: 'pass', token }, signer, now))).toEqual({
-      typ: 'pass',
-      sid: 'cs_test_a',
-      exp,
-      used: PASS_READS,
-    });
-    const spent = signer.sign(passClaims('cs_test_a', exp, PASS_READS));
-    expect(checkAllowance({ type: 'pass', token: spent }, signer, now)).toEqual({
-      ok: false,
-      code: 'pass_exhausted',
+  it('carry only their session and expiry; the count lives in Stripe', () => {
+    const token = signer.sign(passClaims('cs_test_a', exp));
+    expect(checkAllowance({ type: 'pass', token }, signer, now)).toEqual({
+      ok: true,
+      type: 'pass',
+      sessionId: 'cs_test_a',
     });
   });
 
   it('expire', () => {
-    const token = signer.sign(passClaims('cs_test_a', exp, 0));
+    const token = signer.sign(passClaims('cs_test_a', exp));
     expect(checkAllowance({ type: 'pass', token }, signer, exp * 1000)).toEqual({
       ok: false,
       code: 'pass_expired',
@@ -76,13 +73,13 @@ describe('passes', () => {
 
   it('refuse a quota token, a tampered pass or another key’s pass', () => {
     const quota = signer.sign({ typ: 'quota', day: '2026-10-07', used: 0 });
-    const genuine = signer.sign(passClaims('cs_test_a', exp, 0));
+    const genuine = signer.sign(passClaims('cs_test_a', exp));
     const [v, payload, sig] = genuine.split('.');
     const richer = Buffer.from(
-      JSON.stringify(passClaims('cs_test_a', exp + 86_400 * 365, 0)),
+      JSON.stringify(passClaims('cs_test_a', exp + 86_400 * 365)),
     ).toString('base64url');
     const other = createHmacSigner('another-key-that-is-long-enough-for-hmac').sign(
-      passClaims('cs_test_a', exp, 0),
+      passClaims('cs_test_a', exp),
     );
     for (const token of [quota, `${v}.${richer}.${sig}`, `${v}.${payload}.${sig}x`, other])
       expect(checkAllowance({ type: 'pass', token }, signer, now)).toEqual({
@@ -93,5 +90,31 @@ describe('passes', () => {
 
   it('last seven days from the payment', () => {
     expect(passExpiry(1_000)).toBe(1_000 + 7 * 86_400);
+  });
+});
+
+describe('pass sessions', () => {
+  const nowMs = (CREATED + 3600) * 1000;
+
+  it('are fine when paid, complete and recent', () => {
+    expect(passSessionProblem(paidSession(), nowMs)).toBeNull();
+    expect(
+      passSessionProblem(paidSession({ paymentStatus: 'no_payment_required' }), nowMs),
+    ).toBeNull();
+  });
+
+  it.each([
+    ['refunded or disputed', { revoked: true }, 'pass_revoked'],
+    ['still open', { status: 'open' }, 'payment_not_complete'],
+    ['unpaid', { paymentStatus: 'unpaid' }, 'payment_not_complete'],
+    ['a subscription', { mode: 'subscription' }, 'payment_not_complete'],
+    ['over a week old', { created: CREATED - 8 * 86_400 }, 'pass_expired'],
+  ] as const)('are refused when %s', (_, change, code) => {
+    expect(passSessionProblem(paidSession(change), nowMs)).toBe(code);
+  });
+
+  it('count the reads left', () => {
+    expect(readsLeft(paidSession({ readsUsed: 4 }))).toBe(PASS_READS - 4);
+    expect(readsLeft(paidSession({ readsUsed: 99 }))).toBe(0);
   });
 });

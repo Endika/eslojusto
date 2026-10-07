@@ -44,12 +44,16 @@ function extractDeps(toolInput: unknown = coherentSettlement()) {
     pdf: pdfInspector,
     captcha: new FakeCaptcha(),
     signer,
+    payments: new FakePayments({}),
     clock: new FakeClock(),
     models: { primary: PRIMARY, escalation: ESCALATION },
     logger,
   };
   return { deps, logger, reader };
 }
+
+const oversizedPdf = new Uint8Array(2 * 1024 * 1024 + 1).fill(0x20);
+oversizedPdf.set(new TextEncoder().encode('%PDF-1.7\n'));
 
 const json = (r: { body: string }) => JSON.parse(r.body) as Record<string, unknown>;
 
@@ -151,9 +155,10 @@ describe('logs', () => {
 
   it('never contain extracted values, document content, tokens or identifiers', async () => {
     const lines: string[] = [];
-    vi.spyOn(console, 'log').mockImplementation((line: unknown) => {
-      lines.push(String(line));
-    });
+    for (const method of ['log', 'warn', 'error', 'info', 'debug'] as const)
+      vi.spyOn(console, method).mockImplementation((...args: unknown[]) => {
+        lines.push(args.map(String).join(' '));
+      });
     const sentinels = {
       document: 'SENTINEL-DOCUMENT-TEXT',
       captcha: 'SENTINEL-CAPTCHA-TOKEN',
@@ -181,8 +186,24 @@ describe('logs', () => {
     );
     const next = json(extracted)['allowance'] as string;
 
-    await handleCheckout(post({ nonce: sentinels.nonce }), {
+    // pdf-lib complains on the console about a malformed PDF; none of it may reach the logs.
+    const malformed = new TextEncoder().encode(
+      `%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 10 10]>>endobj\n4 0 obj << /Name (${sentinels.document}) ) >> garbage endobj\ntrailer<</Root 1 0 R>>\n%%EOF`,
+    );
+    const refused = await handleExtract(
+      post(
+        extractBody({
+          files: [{ mediaType: 'application/pdf', data: b64(malformed) }],
+          captchaToken: sentinels.captcha,
+        }),
+      ),
+      { ...deps, logger: consoleLogger },
+    );
+    expect(json(refused)).toEqual({ code: 'pdf_unreadable' });
+
+    await handleCheckout(post({ nonce: sentinels.nonce, captchaToken: sentinels.captcha }), {
       checkout: new FakeCheckout(),
+      captcha: new FakeCaptcha(),
       logger: consoleLogger,
       clock: new FakeClock(),
     });
@@ -195,7 +216,7 @@ describe('logs', () => {
     });
     expect(json(pass)).toEqual({ code: 'session_not_found' });
 
-    expect(lines).toHaveLength(3);
+    expect(lines).toHaveLength(4);
     const allowed = [
       'op',
       'code',
@@ -223,13 +244,14 @@ describe('logs', () => {
 describe('payment handlers', () => {
   const deps = () => ({
     checkout: new FakeCheckout(),
+    captcha: new FakeCaptcha(),
     logger: new MemoryLogger(),
     clock: new FakeClock(),
   });
 
-  it('starts a checkout for a well-formed nonce', async () => {
+  it('starts a checkout for a well-formed nonce and captcha token', async () => {
     const response = await handleCheckout(
-      post({ nonce: 'n0nce-generated-by-the-browser' }),
+      post({ nonce: 'n0nce-generated-by-the-browser', captchaToken: 'turnstile-token' }),
       deps(),
     );
     expect(response.statusCode).toBe(200);
@@ -239,12 +261,14 @@ describe('payment handlers', () => {
     });
   });
 
-  it.each([{}, { nonce: 'short' }, { nonce: 'has spaces in it and is long enough' }])(
-    'refuses a malformed nonce %j',
-    async (body) => {
-      expect(json(await handleCheckout(post(body), deps()))).toEqual({ code: 'invalid_request' });
-    },
-  );
+  it.each([
+    { captchaToken: 't' },
+    { nonce: 'short', captchaToken: 't' },
+    { nonce: 'has spaces in it and is long enough', captchaToken: 't' },
+    { nonce: 'n0nce-generated-by-the-browser' },
+  ])('refuses a malformed request %j', async (body) => {
+    expect(json(await handleCheckout(post(body), deps()))).toEqual({ code: 'invalid_request' });
+  });
 
   it('refuses a malformed session id', async () => {
     const response = await handlePass(
