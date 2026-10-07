@@ -46,6 +46,8 @@ export interface FinalPayInput {
   readonly extraPayAmount: number;
   readonly extraPayAccrual: Accrual;
   readonly holidayUnit: HolidayUnit;
+  // Days worked a week, 1 to 7, for holidays in working days; 5 when not given.
+  readonly workDaysPerWeek?: number;
   // Both in `holidayUnit`.
   readonly annualHolidayDays: number;
   readonly holidayDaysTaken: number | null;

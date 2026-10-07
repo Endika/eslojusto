@@ -103,16 +103,23 @@ export const es = {
   'extra_pay.semiannual': 'Semestral',
   'extra_pay.unknown': 'No lo sé',
 
-  'holidays.question': 'Tus vacaciones y tu preaviso',
+  'holidays.question': 'Tus vacaciones',
+  'notice.question': 'Tu preaviso',
   'holidays.annual': 'Vacaciones al año',
   'holidays.unit': '¿Cómo cuentas los días de vacaciones?',
-  'holidays.unit_working': 'Laborables',
-  'holidays.unit_calendar': 'Naturales',
-  'holidays.annual_hint_working': '22 es el mínimo.',
-  'holidays.annual_hint_calendar': '30 es el mínimo.',
+  'holidays.unit_working': 'Días laborables',
+  'holidays.unit_calendar': 'Días naturales',
+  'holidays.week': '¿Cuántos días a la semana trabajas?',
+  'holidays.week_5': '5 (de lunes a viernes)',
+  'holidays.week_6': '6 (de lunes a sábado)',
+  'holidays.week_other': 'Otro',
+  'holidays.week_other_days': 'Días a la semana',
+  'holidays.annual_hint_working':
+    '22 laborables equivalen a los 30 naturales de la ley; 26 si trabajas de lunes a sábado.',
+  'holidays.annual_hint_calendar': '30 es el mínimo de la ley.',
   'holidays.taken': 'Disfrutados este año',
-  'holidays.taken_hint_working': '5 por semana.',
-  'holidays.taken_hint_calendar': '7 por semana.',
+  'holidays.taken_hint_working': 'Este año, en días laborables.',
+  'holidays.taken_hint_calendar': 'Este año. Una semana son 7.',
   'holidays.taken_unknown': 'No lo sé',
   'holidays.notice_received': 'Días de preaviso que te dio la empresa',
   'holidays.notice_received_hint': 'Entre la carta y tu último día; en blanco, 0.',
@@ -120,7 +127,6 @@ export const es = {
   'holidays.agreement_notice_hint': 'Días. Si no lo sabes, en blanco.',
   'holidays.notice_given': 'Días que avisaste',
   'holidays.notice_given_hint': 'En blanco cuenta 0.',
-  'holidays.no_notice': 'Con un despido improcedente o disciplinario no hay preaviso que revisar.',
 
   'children.question': '¿Cuántos hijos o hijas tienes a tu cargo?',
   'children.help': 'Cambia el mínimo y el máximo de tu paro.',
@@ -506,10 +512,10 @@ export const es = {
   'client.calculation.holiday_pay.pending':
     '{devengo}, menos {disfrutados} disfrutados = entre {minimo} y {maximo} días naturales pendientes × {diario_mensual} (salario mensual / 30) o {diario_anual} (salario anual / 365) al día.',
   'client.calculation.holiday_pay.pending_working':
-    '{devengo}, menos {disfrutados} disfrutados = entre {minimo} y {maximo} días laborables pendientes. 22 días laborables equivalen a 30 naturales, así que son entre {minimo_naturales} y {maximo_naturales} días naturales × {diario_mensual} (salario mensual / 30) o {diario_anual} (salario anual / 365) al día.',
+    '{devengo}, menos {disfrutados} disfrutados = entre {minimo} y {maximo} días laborables pendientes. {minimo_laborables} días laborables equivalen a 30 naturales, así que son entre {minimo_naturales} y {maximo_naturales} días naturales × {diario_mensual} (salario mensual / 30) o {diario_anual} (salario anual / 365) al día.',
   'client.calculation.holiday_pay.counted':
     'Hemos contado {disfrutados} días {unidad} disfrutados de {anuales} al año.',
-  'client.calculation.holiday_pay.unit.working': 'laborables',
+  'client.calculation.holiday_pay.unit.working': 'laborables ({dias_semana} por semana)',
   'client.calculation.holiday_pay.unit.calendar': 'naturales',
   'client.calculation.methods.two_counts':
     'Las empresas lo calculan por días naturales o por meses (meses enteros más los días del mes en curso / 30); se muestran las dos cuentas.',
@@ -598,9 +604,10 @@ export const es = {
   'client.error.holidays_taken_out_of_range':
     'Los días naturales disfrutados deben estar entre 0 y 60',
   'client.error.annual_working_holidays_out_of_range':
-    'Los días laborables de vacaciones al año deben estar entre 0 y 44',
+    'Los días laborables de vacaciones al año no pueden pasar del doble del mínimo de la ley',
   'client.error.working_holidays_taken_out_of_range':
-    'Los días laborables disfrutados deben estar entre 0 y 44',
+    'Los días laborables disfrutados no pueden pasar del doble del mínimo de la ley',
+  'client.error.work_week_out_of_range': 'Escribe cuántos días trabajas a la semana, de 1 a 7',
   'client.error.notice_out_of_range': 'Los días de preaviso deben estar entre 0 y 90',
   'client.error.missing_fixed_term_type': 'Indica el tipo de contrato temporal',
   'client.error.missing_children': 'Elige una opción; «Prefiero no decirlo» también vale',

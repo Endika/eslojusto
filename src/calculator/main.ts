@@ -1,6 +1,6 @@
 import { estimateBenefit } from '../engine/unemployment';
 import { reviewFinalPay } from '../engine/review';
-import { applyConditions, firstIncomplete, followHolidayUnit, stepFrom } from './conditions';
+import { applyConditions, firstIncomplete, followHolidayDefault, stepFrom } from './conditions';
 import { watchDisclosures } from './disclosures';
 import { required } from './dom';
 import { formEntries, rowsNeeded, setEntry, type FormEntries } from './fill';
@@ -145,9 +145,9 @@ export function setUpCalculator(
     nav.goBack(stepFrom(form, nav.current, -1), { history: 'push', focus: true }),
   );
 
-  form.addEventListener('change', (e) => {
-    followHolidayUnit(form, e.target);
+  form.addEventListener('change', () => {
     conditions();
+    followHolidayDefault(form);
   });
   form.addEventListener('input', () => {
     if (nav.reached === RESULT_STEP) {

@@ -15,12 +15,22 @@ import type { Accrual, FinalPayInput, HolidayUnit, Item } from './types';
 
 const NOTICE_DAYS = 15;
 
-// The legal minimum is 30 calendar days a year (art. 38 ET), which case law reads as 22 working
-// days. Accrual and days taken stay in the person's unit; only the days left are turned into
-// calendar days, the unit the daily pay is for, at that same 30 to 22.
-export const MINIMUM_HOLIDAYS: Record<HolidayUnit, number> = { working: 22, calendar: 30 };
-export const calendarDaysPer = (unit: HolidayUnit): number =>
-  MINIMUM_HOLIDAYS.calendar / MINIMUM_HOLIDAYS[unit];
+export const CALENDAR_MINIMUM = 30;
+export const DEFAULT_WORK_WEEK = 5;
+
+// The legal minimum is 30 calendar days a year (art. 38 ET). In working days that is 22 for a
+// Monday-to-Friday week, the usual equivalence, and 26 for a Monday-to-Saturday one, as six-day
+// agreements state it; any other week gets 30 × days / 7, rounded. Accrual and days taken stay in
+// the person's unit; only the days left are turned into calendar days, the unit the daily pay is
+// for, at 30 to that minimum.
+export function minimumHolidays(unit: HolidayUnit, workDaysPerWeek = DEFAULT_WORK_WEEK): number {
+  if (unit === 'calendar') return CALENDAR_MINIMUM;
+  if (workDaysPerWeek === 5) return 22;
+  if (workDaysPerWeek === 6) return 26;
+  return Math.round((CALENDAR_MINIMUM * workDaysPerWeek) / 7);
+}
+export const calendarDaysPer = (unit: HolidayUnit, workDaysPerWeek?: number): number =>
+  CALENDAR_MINIMUM / minimumHolidays(unit, workDaysPerWeek);
 
 export function annualSalary(e: FinalPayInput): number {
   return e.extraPayProrated
@@ -77,13 +87,18 @@ export function holidayPayItem(e: FinalPayInput): Item {
   const byMonths = (e.annualHolidayDays * months) / 12;
   const byMonthsFromStart = (e.annualHolidayDays * monthsFromStart) / 12;
   const unit = e.holidayUnit;
-  const unitWord = phrase(`holiday_pay.unit.${unit}`);
+  const week = e.workDaysPerWeek ?? DEFAULT_WORK_WEEK;
+  const minimum = minimumHolidays(unit, week);
+  const unitWord =
+    unit === 'calendar'
+      ? phrase('holiday_pay.unit.calendar')
+      : phrase('holiday_pay.unit.working', { dias_semana: week });
   const taken = e.holidayDaysTaken;
   const base = {
     id: 'holiday_pay',
     direction: 'credit',
     dependsOnAgreement: true,
-    basedOnYourAnswer: e.annualHolidayDays > MINIMUM_HOLIDAYS[unit],
+    basedOnYourAnswer: e.annualHolidayDays > minimum,
     sources: [SOURCES.et38],
     ...(taken === null
       ? {}
@@ -134,7 +149,7 @@ export function holidayPayItem(e: FinalPayInput): Item {
   const low = Math.max(0, Math.min(...pending));
   const monthly = e.monthlySalary / 30;
   const annual = annualSalary(e) / 365;
-  const toCalendar = calendarDaysPer(unit);
+  const toCalendar = CALENDAR_MINIMUM / minimum;
   const vars = {
     devengo: accrual,
     disfrutados: { days: taken },
@@ -154,6 +169,7 @@ export function holidayPayItem(e: FinalPayInput): Item {
         ? phrase('holiday_pay.pending', vars)
         : phrase('holiday_pay.pending_working', {
             ...vars,
+            minimo_laborables: minimum,
             minimo_naturales: { days: low * toCalendar },
             maximo_naturales: { days: high * toCalendar },
           }),

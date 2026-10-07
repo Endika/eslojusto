@@ -209,6 +209,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
     fixed_term_type: 'not_applicable',
     extra_pay: 'prorated',
     holiday_unit: 'working',
+    work_week: '5',
     figures_entered: 1,
     result: expect.stringMatching(/^(shortfall|all_match)$/),
     attempt: '1',
@@ -228,6 +229,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
       'fixed_term_type',
       'extra_pay',
       'holiday_unit',
+      'work_week',
       'figures_entered',
       'below_minimum',
       'matching',
@@ -330,6 +332,7 @@ test("a full run writes nothing to the browser's storage", async ({ page, contex
   await next();
   await page.getByRole('checkbox', { name: 'No lo sé' }).check();
   await next();
+  await next();
   await page.getByLabel('Prefiero no decirlo').check();
   await next();
   await next();
@@ -351,6 +354,7 @@ test("a full run writes nothing to the browser's storage", async ({ page, contex
     'vacaciones',
     'pagas',
     'vacaciones',
+    'preaviso',
     'hijos',
     'otros',
     'finiquito',
@@ -385,10 +389,12 @@ test('a repeated review counts the attempt and names only what changed', async (
   await next();
   await page.getByLabel('Disfrutados este año').fill('0');
   await next();
+  await next();
   await page.getByRole('button', { name: 'Revisar' }).click();
   await page.getByRole('link', { name: /Salario/ }).click();
   await next(); // the Salario tab opens on the prorating sheet, already answered
   await page.getByLabel('Salario bruto mensual').fill('1.600');
+  await next();
   await next();
   await next();
   await page.getByRole('button', { name: 'Revisar' }).click();

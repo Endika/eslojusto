@@ -33,7 +33,7 @@ describe('reviewFinalPay', () => {
     expect(p?.difference).toBe(7178.08);
   });
 
-  it('holiday days are bounded per unit: 60 calendar, 44 working', () => {
+  it('holiday days are bounded at twice the minimum: 60 calendar, 44 or 52 working', () => {
     const errors = (o: Partial<FinalPayInput>) => {
       const r = reviewFinalPay(withInput(o), {}, TODAY);
       return r.ok ? [] : r.errors;
@@ -48,6 +48,13 @@ describe('reviewFinalPay', () => {
         { field: 'holidayDaysTaken', code: 'working_holidays_taken_out_of_range' },
       ],
     );
+    expect(errors({ holidayUnit: 'working', workDaysPerWeek: 6, annualHolidayDays: 52 })).toEqual(
+      [],
+    );
+    expect(errors({ holidayUnit: 'working', workDaysPerWeek: 8 })).toContainEqual({
+      field: 'workDaysPerWeek',
+      code: 'work_week_out_of_range',
+    });
     expect(errors({ annualHolidayDays: 61 })).toEqual([
       { field: 'annualHolidayDays', code: 'annual_holidays_out_of_range' },
     ]);

@@ -416,6 +416,7 @@ describe('review_completed', () => {
       fixed_term_type: 'production_circumstances',
       extra_pay: 'semiannual',
       holiday_unit: 'calendar',
+      work_week: 'not_applicable',
       figures_entered: 5,
       below_minimum: 2,
       matching: 1,
@@ -452,6 +453,10 @@ describe('review_completed', () => {
     expect(withInput({ extraPayAccrual: 'annual' }).extra_pay).toBe('annual');
     expect(withInput({ extraPayAccrual: 'unknown' }).extra_pay).toBe('unknown');
     expect(withInput({ cause: 'resignation' }).fixed_term_type).toBe('not_applicable');
+    expect(withInput({}).work_week).toBe('not_applicable');
+    expect(withInput({ holidayUnit: 'working' }).work_week).toBe('5');
+    expect(withInput({ holidayUnit: 'working', workDaysPerWeek: 6 }).work_week).toBe('6');
+    expect(withInput({ holidayUnit: 'working', workDaysPerWeek: 3 }).work_week).toBe('other');
   });
 
   it('unknown holiday days taken (null) show as a change, without their value', () => {

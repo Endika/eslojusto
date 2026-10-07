@@ -114,7 +114,9 @@ describe('renderReview', () => {
     );
     const counted = c.querySelector<HTMLElement>('[data-item="holiday_pay"] [data-counted]');
     expect(counted?.hidden).toBe(false);
-    expect(counted?.textContent).toBe('Hemos contado 20 días laborables disfrutados de 22 al año.');
+    expect(counted?.textContent).toBe(
+      'Hemos contado 20 días laborables (5 por semana) disfrutados de 22 al año.',
+    );
     expect(c.querySelector<HTMLElement>('[data-item="severance"] [data-counted]')?.hidden).toBe(
       true,
     );

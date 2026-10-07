@@ -187,7 +187,12 @@ function dataRows({ input: e }: CompletedReview, tr: Translate): Block[] {
         importe: formatEuros(e.extraPayAmount),
       });
   const anuales = formatDays(e.annualHolidayDays);
-  const unidad = tr(`client.calculation.holiday_pay.unit.${e.holidayUnit}`);
+  const unidad =
+    e.holidayUnit === 'calendar'
+      ? tr('client.calculation.holiday_pay.unit.calendar')
+      : tr('client.calculation.holiday_pay.unit.working', {
+          dias_semana: e.workDaysPerWeek ?? 5,
+        });
   const holidays =
     e.holidayDaysTaken === null
       ? tr('client.documents.report.holidays_unknown', { anuales, unidad })

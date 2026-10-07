@@ -9,15 +9,22 @@ import {
   provisionalInput,
   sheetErrors,
 } from './form';
+import { minimumHolidays } from '../engine/settlement';
+import type { HolidayUnit } from '../engine/types';
+import { parseAmount } from './number';
 import { LAST_SHEET, RESULT_STEP, STEPS } from './steps';
 
+// An unfair or disciplinary dismissal has no notice to check.
+const NOTICE_CAUSES: readonly string[] = ['objective_dismissal', 'fixed_term_end', 'resignation'];
+
 // Conditional sheets: the fixed-term type only for a fixed-term contract, extra pay only when
-// it is not already spread over the monthly payslip, and the benefit questions only when the
-// cause can give a right to the benefit.
+// it is not already spread over the monthly payslip, the notice only for a cause that has one,
+// and the benefit questions only when the cause can give a right to the benefit.
 export function applies(form: HTMLFormElement, i: number): boolean {
   const data = new FormData(form);
   if (STEPS[i] === 'temporal') return data.get('cause') === 'fixed_term_end';
   if (STEPS[i] === 'pagas') return data.get('extraPayProrated') === 'no';
+  if (STEPS[i] === 'preaviso') return NOTICE_CAUSES.includes(String(data.get('cause') ?? ''));
   if (STEPS[i] === 'hijos' || STEPS[i] === 'otros')
     return asksAboutBenefit(data.get('cause') as string | null);
   return true;
@@ -58,7 +65,14 @@ export function applyConditions(form: HTMLFormElement) {
     const text = el.dataset[prorating === 'yes' ? 'hintYes' : 'hintNo'];
     if (hint && text) hint.textContent = text;
   }
-  const unit = data.get('holidayUnit') === 'calendar' ? 'hintCalendar' : 'hintWorking';
+  const holidayUnit = String(data.get('holidayUnit') ?? '');
+  for (const el of form.querySelectorAll<HTMLElement>('[data-if-holiday-unit]'))
+    setActive(el, el.dataset['ifHolidayUnit'] === holidayUnit);
+  // Read again: the week's answer exists only while its group is active.
+  const workWeek = String(new FormData(form).get('workDaysPerWeek') ?? '');
+  for (const el of form.querySelectorAll<HTMLElement>('[data-if-work-week]'))
+    setActive(el, el.dataset['ifWorkWeek'] === workWeek);
+  const unit = holidayUnit === 'calendar' ? 'hintCalendar' : 'hintWorking';
   for (const el of form.querySelectorAll<HTMLElement>('[data-hint-working]')) {
     const hint = el.querySelector('.hint');
     const text = el.dataset[unit];
@@ -87,15 +101,20 @@ export function prepareFigures(form: HTMLFormElement, today: CivilDate) {
   }
 }
 
-// A change of holiday unit carries the yearly days along while they still hold the other unit's
-// default, so a figure the person typed is never rewritten.
-export function followHolidayUnit(form: HTMLFormElement, changed: EventTarget | null) {
-  if (!(changed instanceof HTMLInputElement) || changed.name !== 'holidayUnit') return;
+// The yearly days follow the unit and the week while they still hold the default last put there,
+// so a figure the person typed is never rewritten.
+export function followHolidayDefault(form: HTMLFormElement) {
   const annual = form.querySelector<HTMLInputElement>('[name="annualHolidayDays"]');
-  const other = [...form.querySelectorAll<HTMLInputElement>('[name="holidayUnit"]')].find(
-    (el) => el !== changed,
-  );
-  const from = other?.dataset['defaultDays'];
-  const to = changed.dataset['defaultDays'];
-  if (annual && from && to && annual.value.trim() === from) annual.value = to;
+  if (!annual) return;
+  const data = new FormData(form);
+  const unit: HolidayUnit = data.get('holidayUnit') === 'calendar' ? 'calendar' : 'working';
+  const week = data.get('workDaysPerWeek');
+  const days =
+    week === 'other' ? parseAmount(String(data.get('workDaysPerWeekOther') ?? '')) : Number(week);
+  const valid = typeof days === 'number' && Number.isInteger(days) && days >= 1 && days <= 7;
+  if (unit === 'working' && week !== null && !valid) return;
+  const wanted = String(minimumHolidays(unit, unit === 'working' && valid ? days : undefined));
+  const last = annual.dataset['autoDefault'] ?? annual.defaultValue;
+  if (annual.value.trim() === last) annual.value = wanted;
+  if (annual.value === wanted) annual.dataset['autoDefault'] = wanted;
 }
