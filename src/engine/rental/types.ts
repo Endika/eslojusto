@@ -125,8 +125,8 @@ export interface ReviewDeps extends RentalDeps {
   readonly legalInterest: readonly LegalInterestYear[];
 }
 
-// The results an item can have: the spec's eight, and a balance the landlord still has time to
-// return (LAU art. 36.4 gives a month from the keys).
+// The results an item can have. `not_yet_due` is a balance the landlord still has time to return
+// (LAU art. 36.4 gives a month from the keys).
 export type ItemStatus =
   | 'paid_over'
   | 'owed'
