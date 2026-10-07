@@ -17,6 +17,8 @@ export type EmploymentRuleId =
   | 'smi_in_kind_cap'
   | 'smi_temporary_120'
   | 'smi_absorption'
+  | 'smi_monthly'
+  | 'agreement_salary'
   | 'fixed_term_presumption'
   | 'production_6_months'
   | 'production_1_year'
@@ -122,6 +124,10 @@ export const RULES: Readonly<Record<EmploymentRuleId, Rule>> = {
   smi_temporary_120: et('smi_temporary_120', '27.1', 'a27'),
   // 27.1, last paragraph: the minimum wage is compared yearly and absorbs higher professional pay.
   smi_absorption: et('smi_absorption', '27.1', 'a27'),
+  // 27.1, read month by month against the monthly amount of art. 1 of each year's decree.
+  smi_monthly: et('smi_monthly', '27.1', 'a27'),
+  // 82.3: the collective agreement binds every employer and worker within its scope.
+  agreement_salary: et('agreement_salary', '82.3', 'a82'),
   // 15.1: a contract is presumed open-ended; fixed term only for production or replacement.
   fixed_term_presumption: reform('fixed_term_presumption', '15.1', 'a15'),
   // 15.2: production contracts last up to six months…

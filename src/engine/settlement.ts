@@ -32,7 +32,9 @@ export function minimumHolidays(unit: HolidayUnit, workDaysPerWeek = DEFAULT_WOR
 export const calendarDaysPer = (unit: HolidayUnit, workDaysPerWeek?: number): number =>
   CALENDAR_MINIMUM / minimumHolidays(unit, workDaysPerWeek);
 
-export function annualSalary(e: FinalPayInput): number {
+export function annualSalary(
+  e: Pick<FinalPayInput, 'monthlySalary' | 'extraPayProrated' | 'extraPayCount' | 'extraPayAmount'>,
+): number {
   return e.extraPayProrated
     ? e.monthlySalary * 12
     : e.monthlySalary * 12 + e.extraPayAmount * e.extraPayCount;
