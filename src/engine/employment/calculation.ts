@@ -51,7 +51,53 @@ export type EmploymentPhraseKey =
   | 'minimum_wage.in_kind_rate'
   | 'minimum_wage.agreement.within'
   | 'minimum_wage.agreement.below'
-  | 'modality.before_reform';
+  | 'modality.before_reform'
+  | ModalityPhraseKey;
+
+// Art. 15.4 ET is quoted, never asserted: «permanent_on_breach» says the article states that, in
+// a case like this one, the person acquires permanent status.
+type ModalityPhraseKey =
+  | 'modality.permanent'
+  | 'modality.unknown'
+  | 'modality.abolished'
+  | 'modality.outdated_label'
+  | 'modality.permanent_on_breach'
+  | 'modality.rule_in_doubt'
+  | 'modality.cause_stated'
+  | 'modality.cause_missing'
+  | 'modality.cause_unknown'
+  | 'modality.duration'
+  | 'modality.duration_so_far'
+  | 'modality.no_end_date'
+  | 'modality.production_within'
+  | 'modality.production_agreement_year'
+  | 'modality.production_over_year'
+  | 'modality.extensions'
+  | 'modality.occasional_days'
+  | 'modality.occasional_agrifood'
+  | 'modality.replacement_stated'
+  | 'modality.replacement_missing'
+  | 'modality.replacement_unknown'
+  | 'modality.selection_within'
+  | 'modality.selection_over'
+  | 'modality.training_too_short'
+  | 'modality.training_too_long'
+  | 'modality.training_within'
+  | 'modality.training_max_disability'
+  | 'modality.practice_window'
+  | 'modality.practice_window_disability_unknown'
+  | 'modality.effective_work'
+  | 'modality.effective_work_unknown'
+  | 'modality.alternance_shifts_or_night'
+  | 'modality.plan_attached'
+  | 'modality.plan_missing'
+  | 'modality.plan_unknown'
+  | 'modality.studies_end_unknown'
+  | 'modality.written_missing'
+  | 'modality.written_unknown'
+  | 'modality.discontinuous_stated'
+  | 'modality.discontinuous_missing'
+  | 'modality.discontinuous_unknown';
 
 export interface EmploymentPhrase {
   readonly key: EmploymentPhraseKey;

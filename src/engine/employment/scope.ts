@@ -1,6 +1,10 @@
-import { compareDates, min, parseDate } from '../date';
+import { compareDates, min, parseDate, type CivilDate } from '../date';
 import { RULES } from './rules';
 import type { EmploymentInput, Scope } from './types';
+
+// The day the contract was concluded: the earlier of signing and start.
+export const concludedOn = (input: Pick<EmploymentInput, 'signedOn' | 'startDate'>): CivilDate =>
+  input.signedOn === null ? input.startDate : min(input.signedOn, input.startDate);
 
 // The day the reformed art. 15 ET starts applying; DT 4.ª RDL 32/2021 keeps contracts concluded
 // before it under the earlier rules, so the earlier of signing and start decides.
@@ -15,9 +19,7 @@ export function scope(input: EmploymentInput): Scope {
   if (input.viaTempAgency) return { inScope: false, reason: 'temp_agency' };
   if (input.relief) return { inScope: false, reason: 'relief' };
   if (input.under18) return { inScope: false, reason: 'minor' };
-  const concluded =
-    input.signedOn === null ? input.startDate : min(input.signedOn, input.startDate);
-  if (compareDates(concluded, REFORM_DAY) < 0)
+  if (compareDates(concludedOn(input), REFORM_DAY) < 0)
     return { inScope: true, partial: true, reason: 'before_reform' };
   return { inScope: true, partial: false };
 }
