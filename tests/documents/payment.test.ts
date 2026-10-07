@@ -16,7 +16,7 @@ function setUp(
   checkoutUrl = 'https://checkout.stripe.com/c/pay/1',
 ) {
   document.body.innerHTML = OFFER;
-  const passes = createPassStore(memoryStore());
+  const passes = createPassStore(memoryStore(), () => NOW);
   const events = recordingEvents();
   const calls: string[] = [];
   const saved: string[] = [];
@@ -121,7 +121,9 @@ describe('the pass offer', () => {
     await click('[data-pass-pay]');
     expect(calls).toEqual(['pass cs_test_old n']);
     expect(redirects).toEqual([]);
-    expect(passes.checkouts()).toEqual([]);
+    expect(passes.checkouts()).toEqual([
+      { nonce: 'n'.repeat(32), sessionId: 'cs_test_old', redeemed: true, expiresAt: EXPIRES },
+    ]);
     expect(events.log).toEqual([['passIssued', 'recovery']]);
     expect($('[data-pass-downloads]').hidden).toBe(false);
   });
@@ -159,7 +161,27 @@ describe('the pass offer', () => {
       'pass cs_test_b b',
       'pass cs_test_a a',
     ]);
-    expect(passes.checkouts().map((c) => c.sessionId)).toEqual(['cs_test_b']);
+    expect(passes.checkouts().map((c) => [c.sessionId, c.redeemed ?? false])).toEqual([
+      ['cs_test_b', false],
+      ['cs_test_a', true],
+    ]);
+  });
+
+  it('a redeemed payment stays until its pass expires, so a lost pass can be fetched again', async () => {
+    const { payment, passes, calls } = setUp([
+      { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
+      { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 14 },
+    ]);
+    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
+    payment.show(completed());
+    expect(await payment.returned('cs_test_1')).toBe(true);
+    passes.forgetPass();
+    payment.show(completed());
+    $<HTMLInputElement>('#pass-session').value = 'cs_test_1';
+    await click('[data-pass-recover-button]');
+    expect(calls).toEqual(['pass cs_test_1 n', 'pass cs_test_1 n']);
+    expect(passes.pass()?.readsLeft).toBe(14);
+    expect($('[data-pass-downloads]').hidden).toBe(false);
   });
 
   it('never follows a checkout address outside Stripe', async () => {

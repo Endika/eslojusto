@@ -12,7 +12,7 @@ import {
   type ErrorCode,
 } from './contract';
 import { checkSelection, mediaOf, requestBytes } from './files';
-import { passState, type PassStore } from './pass';
+import { passClaims, passState, type PassStore } from './pass';
 import type { Captcha, DocumentEvents, EncodedFile, FileEncoder } from './ports';
 import { hasLowConfidence, prefillFrom, prefilledCount, type Prefill } from './prefill';
 
@@ -199,6 +199,21 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     return { kind, files };
   }
 
+  // A paid pass the API refuses (its signing key may have changed) is asked for once more with
+  // the payment it came from; true when that gave a fresh one.
+  async function fetchPassAgain(token: string): Promise<boolean> {
+    const claims = passClaims(token);
+    const checkout = passes
+      .checkouts()
+      .find((c) => c.redeemed && c.sessionId === claims?.sessionId);
+    if (!checkout) return false;
+    const again = await api.pass(checkout.sessionId, checkout.nonce);
+    if (!again.ok) return false;
+    passes.savePass({ token: again.pass, expiresAt: again.expiresAt, readsLeft: again.readsLeft });
+    passes.markRedeemed(checkout.sessionId, again.expiresAt);
+    return true;
+  }
+
   async function read(kind: DocumentKind, files: File[]) {
     setBusy(true, tr('client.documents.status.preparing'));
     const fail = (code: ErrorCode) => {
@@ -237,8 +252,15 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       // The server has the last word on what was sent: a pass it no longer honours is dropped, so
       // the next read is a free one, and so is a quota token it refuses.
       if (usePass && result.code === 'pass_exhausted') passes.updateReads(0);
-      if (usePass && ['pass_revoked', 'pass_invalid', 'pass_expired'].includes(result.code))
-        passes.forgetPass();
+      if (usePass && result.code === 'pass_invalid') {
+        if (await fetchPassAgain(stored.token)) {
+          events.extractionFailed(kind, result.code);
+          setBusy(false, tr('client.documents.pass.renewed'));
+          return;
+        }
+        passes.retirePass();
+      }
+      if (usePass && ['pass_revoked', 'pass_expired'].includes(result.code)) passes.forgetPass();
       if (!usePass && result.code === 'invalid_request' && passes.quota() !== null)
         passes.forgetQuota();
       return fail(result.code);

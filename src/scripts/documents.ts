@@ -173,7 +173,10 @@ export function wireDocuments(
 
   const tr = pageTranslator();
   const api = createApi(config.endpoints, (url, init) => fetch(url, init));
-  const passes = createPassStore(storage(() => localStorage));
+  const passes = createPassStore(
+    storage(() => localStorage),
+    browser.now,
+  );
   const session = storage(() => sessionStorage);
   const events = documentsAnalytics(track);
 

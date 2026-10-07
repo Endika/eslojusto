@@ -122,14 +122,17 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
           expiresAt: result.expiresAt,
           readsLeft: result.readsLeft,
         });
-        passes.removeCheckout(candidate.sessionId);
+        passes.markRedeemed(candidate.sessionId, result.expiresAt);
         events.passIssued(via);
         status.textContent = tr('client.documents.pass.issued');
         render();
         return true;
       }
       last = result.code;
-      if (result.code === 'pass_revoked') passes.forgetPass();
+      if (result.code === 'pass_revoked') {
+        passes.forgetPass();
+        passes.removeCheckout(candidate.sessionId);
+      }
     }
     status.textContent = '';
     if (!quiet) {

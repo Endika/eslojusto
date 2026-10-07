@@ -1,8 +1,8 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it } from 'vitest';
 import { formEntries, setEntry } from '../../src/calculator/fill';
-import type { Api, ExtractRequest, ExtractResult } from '../../src/documents/contract';
-import { createPassStore } from '../../src/documents/pass';
+import type { Api, ExtractRequest, ExtractResult, PassResult } from '../../src/documents/contract';
+import { canDownload, createPassStore, passState } from '../../src/documents/pass';
 import { setUpUpload } from '../../src/documents/upload';
 import { START, flush, recordingEvents } from './dom';
 import { memoryStore, passToken, tr } from './fixtures';
@@ -12,10 +12,14 @@ const NOW = Date.UTC(2026, 9, 7);
 // A read the test answers by hand, to look at the page while it is on its way.
 const pending: { next: Promise<ExtractResult> | null } = { next: null };
 
-function setUp(result: ExtractResult, options: { captchaFails?: boolean } = {}) {
+function setUp(
+  result: ExtractResult,
+  options: { captchaFails?: boolean; passAgain?: PassResult } = {},
+) {
   document.body.innerHTML = START;
   const store = memoryStore();
-  const passes = createPassStore(store);
+  const passes = createPassStore(store, () => NOW);
+  const passCalls: string[] = [];
   const events = recordingEvents();
   const requests: ExtractRequest[] = [];
   const opened: number[] = [];
@@ -28,7 +32,10 @@ function setUp(result: ExtractResult, options: { captchaFails?: boolean } = {}) 
       return answer;
     },
     checkout: async () => ({ ok: false, code: 'service_unavailable' }),
-    pass: async () => ({ ok: false, code: 'service_unavailable' }),
+    pass: async (sessionId) => {
+      passCalls.push(sessionId);
+      return options.passAgain ?? { ok: false, code: 'service_unavailable' };
+    },
   };
   const upload = setUpUpload(document.querySelector('[data-documents-start]') as HTMLElement, {
     api,
@@ -52,7 +59,7 @@ function setUp(result: ExtractResult, options: { captchaFails?: boolean } = {}) 
     tabs: document.querySelector('.tabs'),
   });
   upload.showStart();
-  return { upload, store, passes, events, requests, opened, form };
+  return { upload, store, passes, events, requests, opened, form, passCalls };
 }
 
 const click = (selector: string) =>
@@ -237,19 +244,54 @@ describe('the start sheet', () => {
     expect(events.log.filter(([e]) => e === 'startChosen')).toEqual([['startChosen', 'upload']]);
   });
 
-  it('an invalid or expired pass is forgotten, so the next read is a free one', async () => {
+  it('an expired or revoked pass is forgotten, so the next read is a free one', async () => {
     const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
-    for (const code of ['pass_invalid', 'pass_expired'] as const) {
+    for (const code of ['pass_expired', 'pass_revoked'] as const) {
       const { passes, requests } = setUp({ ok: false, code });
       passes.savePass({ token, expiresAt: NOW / 1000 + 3600, readsLeft: 5 });
       choose([photo]);
       await submit();
       expect(passes.pass(), code).toBeNull();
-      expect(document.querySelector('[data-doc-error]')?.textContent).toContain('lectura gratis');
       choose([photo]);
       await submit();
       expect(requests[1], code).toHaveProperty('quota', null);
     }
+  });
+
+  it('a refused pass is fetched again from the payment it came from', async () => {
+    const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
+    const fresh = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600, v: 2 });
+    const { passes, passCalls } = setUp(
+      { ok: false, code: 'pass_invalid' },
+      { passAgain: { ok: true, pass: fresh, expiresAt: NOW / 1000 + 3600, readsLeft: 9 } },
+    );
+    passes.savePass({ token, expiresAt: NOW / 1000 + 3600, readsLeft: 5 });
+    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
+    passes.markRedeemed('cs_test_1', NOW / 1000 + 3600);
+    choose([photo]);
+    await submit();
+    expect(passCalls).toEqual(['cs_test_1']);
+    expect(passes.pass()).toEqual({ token: fresh, expiresAt: NOW / 1000 + 3600, readsLeft: 9 });
+    expect(document.querySelector('[data-doc-status]')?.textContent).toBe(
+      'Tu pase se ha renovado. Prueba otra vez a leer el documento.',
+    );
+  });
+
+  it('a refused pass that cannot be fetched again keeps the downloads but reads no more', async () => {
+    const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
+    const { passes, requests } = setUp({ ok: false, code: 'pass_invalid' });
+    passes.savePass({ token, expiresAt: NOW / 1000 + 3600, readsLeft: 5 });
+    choose([photo]);
+    await submit();
+    const stored = passes.pass();
+    expect(stored?.usable).toBe(false);
+    expect(canDownload(passState(stored, NOW))).toBe(true);
+    expect(document.querySelector('[data-doc-error]')?.textContent).toContain(
+      'el informe y la carta siguen disponibles',
+    );
+    choose([photo]);
+    await submit();
+    expect(requests[1]).toHaveProperty('quota', null);
   });
 
   it('a quota token the API refuses is forgotten', async () => {
