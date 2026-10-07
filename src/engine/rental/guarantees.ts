@@ -64,6 +64,10 @@ function moneyItem(input: RentalInput, frame: Frame): ItemReading {
     return itemReading('not_applicable_to_date', null, [...phrases, frame.longContract], rules);
   const cap = round2(CAP_MONTHS * rent);
   phrases.push(p('guarantees.money', { money: { euros: money }, cap: { euros: cap } }));
+  // A bank guarantee, an insurance or another kind may count within the same cap; only the money
+  // handed over is compared here, and each of those is its own item.
+  if (input.guarantees.some((g) => g.kind !== 'cash'))
+    phrases.push(p('guarantees.only_money_compared'));
   const over = round2(money - cap);
   if (over > TOLERANCE)
     return itemReading(
