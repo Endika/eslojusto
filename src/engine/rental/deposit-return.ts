@@ -88,19 +88,18 @@ function interestIn(
   const commercial = world[DAY_COUNT.id] === true;
   const phrases: RentalPhrase[] = [];
   let total = 0;
+  // A year with no rate loaded: what came before it is counted, the rest is not checkable.
+  let missingYear: number | null = null;
   for (const s of stretches) {
     let from = s.from;
     while (compareDates(from, s.until) < 0) {
       const yearEnd: CivilDate = { y: from.y + 1, m: 1, d: 1 };
       const to = compareDates(yearEnd, s.until) < 0 ? yearEnd : s.until;
       const rate = rates.find((r) => r.year === from.y)?.rate;
-      if (rate === undefined)
-        return itemReading(
-          'not_checkable',
-          null,
-          [p('deposit.interest_rate_not_loaded', { year: { integer: from.y } })],
-          INTEREST_RULES,
-        );
+      if (rate === undefined) {
+        missingYear = Math.min(missingYear ?? from.y, from.y);
+        break;
+      }
       const days = ordinal(to) - ordinal(from);
       const yearDays = commercial ? 360 : daysInYear(from.y);
       const interest = (s.amount * rate * days) / (100 * yearDays);
@@ -124,6 +123,10 @@ function interestIn(
     p('deposit.interest_day_count'),
     p('deposit.interest_total', { total: { euros: total } }),
   );
+  if (missingYear !== null)
+    phrases.push(p('deposit.interest_rate_not_loaded', { year: { integer: missingYear } }));
+  if (missingYear !== null && total < TOLERANCE)
+    return itemReading('not_checkable', null, phrases, INTEREST_RULES);
   return total >= TOLERANCE
     ? itemReading('owed', total, phrases, INTEREST_RULES)
     : itemReading('within_limit', null, phrases, INTEREST_RULES);
