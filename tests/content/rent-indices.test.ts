@@ -78,3 +78,18 @@ describe('the monthly rent indices', () => {
     expect(normsReviewDue('2026-11-12', '2026-10-07')).toBe(true);
   });
 });
+
+// Run by hand with `RENT_INDICES_REVIEW=1 npm run rent-indices:review`: it reads today's date,
+// which CI never does.
+describe.runIf(process.env['RENT_INDICES_REVIEW'] === '1')('monthly review (by hand)', () => {
+  it('the norms on the rent indices page were checked in the last 35 days', () => {
+    const now = new Date();
+    const today = [now.getFullYear(), now.getMonth() + 1, now.getDate()]
+      .map((n) => String(n).padStart(2, '0'))
+      .join('-');
+    expect(
+      normsReviewDue(today),
+      `Read RDL 29/2026, RDL 28/2026 and the LAU in the BOE again, then move NORMS_CHECKED_ON (${NORMS_CHECKED_ON}).`,
+    ).toBe(false);
+  });
+});
