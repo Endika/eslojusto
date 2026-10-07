@@ -1,6 +1,8 @@
 import { gunzipSync } from 'node:zlib';
 import { test, expect, type Page, type Request } from '@playwright/test';
 
+const ORIGIN = `http://localhost:${process.env['E2E_PORT'] ?? 4321}`;
+
 // Runs only against a build with PUBLIC_POSTHOG_KEY=phc_test (TEST_ANALYTICS=1).
 
 const POSTHOG = 'https://eu.i.posthog.com';
@@ -110,7 +112,7 @@ async function spyOn(page: Page) {
   const external: string[] = [];
   page.on('request', (r) => {
     const { origin } = new URL(r.url());
-    if (origin !== 'http://localhost:4321' && origin !== POSTHOG) external.push(r.url());
+    if (origin !== ORIGIN && origin !== POSTHOG) external.push(r.url());
   });
   await page.route(`${POSTHOG}/**`, async (route) => {
     bodies.push(decode(route.request()));
@@ -289,7 +291,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
       expect(body, forbidden).not.toContain(forbidden);
   const urls = spy.events().map((e) => String(e.properties['$current_url']));
   expect(urls.length).toBeGreaterThan(0);
-  for (const url of urls) expect(url).toMatch(/^http:\/\/localhost:4321\/finiquito\/(#[a-z]+)?$/);
+  for (const url of urls) expect(url).toMatch(new RegExp(`^${ORIGIN}/finiquito/(#[a-z]+)?$`));
   expect(spy.external).toEqual([]);
   expect(blocked).toEqual([]);
   expect(await context.cookies()).toEqual([]);

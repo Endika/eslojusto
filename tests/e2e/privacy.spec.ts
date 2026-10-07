@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+
+const ORIGIN = `http://localhost:${process.env['E2E_PORT'] ?? 4321}`;
 test('reviewing a final pay makes no request and leaves no cookies', async ({ page, context }) => {
   const requests: string[] = [];
   await page.goto('finiquito/');
@@ -28,7 +30,7 @@ test('no page loads resources from another origin', async ({ page }) => {
   for (const path of ['./', 'finiquito/', 'aviso-legal/', 'privacidad/']) {
     const external: string[] = [];
     page.on('request', (r) => {
-      if (!r.url().startsWith('http://localhost:4321/')) external.push(r.url());
+      if (!r.url().startsWith(`${ORIGIN}/`)) external.push(r.url());
     });
     await page.goto(path);
     await page.waitForLoadState('networkidle');
