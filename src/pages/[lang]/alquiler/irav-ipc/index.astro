@@ -1,0 +1,11 @@
+---
+import type { GetStaticPaths } from 'astro';
+import RentIndices from '../../../../views/RentIndices.astro';
+import { langPaths, type Lang } from '../../../../i18n/languages';
+
+export const getStaticPaths = langPaths satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+---
+
+<RentIndices lang={lang} />

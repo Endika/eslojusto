@@ -1,0 +1,345 @@
+---
+import Base from '../layouts/Base.astro';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+import type { Variables } from '../i18n/interpolate';
+import {
+  CAPS,
+  COLUMNS,
+  DECREE,
+  DECREE_CAP,
+  FIRST_MONTH,
+  IGC_CLAMP,
+  NORMS_CHECKED_ON,
+  PATH,
+  REPEALED,
+  SERIES,
+  capSources,
+  checkedOn,
+  example,
+  formatDay,
+  formatEuros,
+  formatLongDay,
+  formatMonth,
+  formatRate,
+  inePage,
+  lastPublished,
+  latest,
+  monthRows,
+} from '../content/rent-indices';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key, vars?: Variables) => t(lang, key, vars);
+
+const rows = monthRows();
+const irav = latest('irav', rows);
+const ipc = latest('ipc', rows);
+const flash = latest('ipcFlash', rows);
+const igc = latest('igc', rows);
+if (!irav || !ipc) throw new Error('The rent indices page needs a published IRAV and CPI.');
+const ex = example();
+const nextIravMonth = rows.findLast((r) => r.irav === null && r.month > irav.month)?.month;
+
+const decreeName = 'RDL 29/2026';
+const decreeLive = DECREE.status !== 'repealed';
+const [rdl8, rdl26] = REPEALED;
+const status = tx(`rent_indices.status.${DECREE.status}`, {
+  fecha: formatLongDay(NORMS_CHECKED_ON),
+  norma: decreeName,
+  desde: formatLongDay(DECREE.inForceSince),
+  estado: DECREE.statusSince ? formatDay(DECREE.statusSince) : '',
+});
+const percent = (n: number) => `${n}\u00a0%`;
+
+const latestItems = [
+  ['latest_irav', irav, 'irav'],
+  ['latest_ipc', ipc, 'ipc'],
+  ['latest_flash', flash && flash.month > ipc.month ? flash : null, 'ipcFlash'],
+  ['latest_igc', igc, 'igc'],
+] as const;
+
+const faq = (
+  [
+    ['what_is_irav', {}],
+    [
+      'which_month',
+      {
+        dia: formatLongDay(ex.anniversary),
+        mes: formatMonth(ex.month),
+        publicado: formatLongDay(ex.figure.publishedOn),
+      },
+    ],
+    ['irav_or_ipc', { estado: tx(`rent_indices.status_short.${DECREE.status}`) }],
+    ['flash', {}],
+    ['no_clause', {}],
+    ['igc_negative', {}],
+  ] as const
+).map(([id, vars]) => ({
+  anchor: `faq-${id.replaceAll('_', '-')}`,
+  question: tx(`rent_indices.faq.${id}`),
+  answer: tx(`rent_indices.faq.${id}_answer`, vars),
+}));
+
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const page = new URL(link(lang, PATH.slice(1)), Astro.site);
+const variable = (name: string, description: string) => ({
+  '@type': 'PropertyValue',
+  name,
+  description,
+  unitText: '%',
+});
+const structuredData = [
+  {
+    '@type': 'Dataset',
+    '@id': `${page.href}#datos`,
+    name: tx('rent_indices.dataset_name'),
+    description: tx('rent_indices.dataset_description'),
+    url: page.href,
+    inLanguage: lang,
+    isAccessibleForFree: true,
+    temporalCoverage: `${FIRST_MONTH}/${rows[0]?.month ?? FIRST_MONTH}`,
+    dateModified: lastPublished(rows),
+    creator: {
+      '@type': 'Organization',
+      name: 'Instituto Nacional de Estadística (INE)',
+      url: 'https://www.ine.es/',
+    },
+    publisher: { '@type': 'Organization', name: 'eslojusto.es', url: home.href },
+    isBasedOn: [SERIES.irav, SERIES.ipc, SERIES.igc].map(inePage),
+    variableMeasured: [
+      variable('IRAV', SERIES.irav.citation),
+      variable('IPC', SERIES.ipc.citation),
+      variable('IGC', SERIES.igc.citation),
+    ],
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: tx('rent_indices.home'), item: home.href },
+      { '@type': 'ListItem', position: 2, name: tx('rent_indices.h1'), item: page.href },
+    ],
+  },
+  {
+    '@type': 'FAQPage',
+    mainEntity: faq.map(({ question, answer }) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: { '@type': 'Answer', text: answer },
+    })),
+  },
+];
+---
+
+<Base
+  title={tx('rent_indices.title', { mes: formatMonth(irav.month).replace(' de ', ' ') })}
+  description={tx('rent_indices.description', {
+    mes: formatMonth(irav.month),
+    irav: formatRate(irav.figure.rate, 'irav'),
+    ipc: formatRate(ipc.figure.rate, 'ipc'),
+  })}
+  path={PATH}
+  lang={lang}
+  section="settlement"
+  structuredData={structuredData}
+>
+  <main class="document rent" id="content">
+    <nav class="crumbs" aria-label={tx('rent_indices.breadcrumb')}>
+      <ol>
+        <li>
+          <a href={link(lang)}>{tx('rent_indices.home')}</a>
+        </li>
+        <li>
+          <span aria-current="page">{tx('rent_indices.h1')}</span>
+        </li>
+      </ol>
+    </nav>
+    <header class="document__head">
+      <h1 class="document__title">{tx('rent_indices.h1')}</h1>
+      <p class="guide__lead">{tx('rent_indices.lead')}</p>
+      <p class="guide__sources">
+        <span>{tx('rent_indices.checked', { fecha: formatDay(checkedOn()) })}</span>
+        <span>
+          {tx('rent_indices.sources')}:{' '}
+          <a href={inePage(SERIES.irav)}>{tx('rent_indices.source_irav')}</a> ·{' '}
+          <a href={inePage(SERIES.ipc)}>{tx('rent_indices.source_ipc')}</a> ·{' '}
+          <a href={inePage(SERIES.igc)}>{tx('rent_indices.source_igc')}</a>
+        </span>
+        <a href={link('es', 'aviso-legal/')}>{tx('rent_indices.who')}</a>
+      </p>
+    </header>
+
+    <div class="document__sheets">
+      <section class="sheet sheet--text" aria-labelledby="ultimo">
+        <h2 id="ultimo">{tx('rent_indices.latest', { mes: formatMonth(irav.month) })}</h2>
+        <dl class="data-list latest">
+          {latestItems.map(
+            ([key, item, column]) =>
+              item && (
+                <div>
+                  <dt>{tx(`rent_indices.${key}`, { mes: formatMonth(item.month) })}</dt>
+                  <dd>
+                    <span class="latest__rate">{formatRate(item.figure.rate, column)}</span>
+                    <a class="latest__date" href={item.figure.url}>
+                      {tx('rent_indices.published_on', {
+                        fecha: formatDay(item.figure.publishedOn),
+                      })}
+                    </a>
+                  </dd>
+                </div>
+              ),
+          )}
+        </dl>
+        {nextIravMonth && <p>{tx('rent_indices.next', { mes: formatMonth(nextIravMonth) })}</p>}
+      </section>
+
+      <section class="sheet sheet--text" aria-labelledby="cada-mes">
+        <h2 id="cada-mes">{tx('rent_indices.table_title')}</h2>
+        <p>{tx('rent_indices.table_lead')}</p>
+        <div class="table-scroll" role="region" aria-labelledby="tabla-indices" tabindex="0">
+          <table class="rates">
+            <caption id="tabla-indices" class="visually-hidden">
+              {tx('rent_indices.caption')}
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">{tx('rent_indices.col_month')}</th>
+                {COLUMNS.map((c) => (
+                  <th scope="col" aria-describedby={c === 'igc' ? 'nota-igc' : undefined}>
+                    {tx(`rent_indices.col_${c}`)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr data-month={row.month}>
+                  <th scope="row">
+                    <time datetime={row.month}>{formatMonth(row.month)}</time>
+                  </th>
+                  {COLUMNS.map((c) => {
+                    const f = row[c];
+                    return f ? (
+                      <td>
+                        <span class="rates__rate">{formatRate(f.rate, c)}</span>
+                        <a class="rates__date" href={f.url}>
+                          <span class="visually-hidden">{tx('rent_indices.cell_published')} </span>
+                          <time datetime={f.publishedOn}>{formatDay(f.publishedOn)}</time>
+                        </a>
+                      </td>
+                    ) : (
+                      <td class="rates__pending">{tx('rent_indices.cell_pending')}</td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>{tx('rent_indices.note_flash')}</p>
+        <p id="nota-igc">
+          {tx('rent_indices.note_igc', {
+            min: percent(IGC_CLAMP.min),
+            max: percent(IGC_CLAMP.max),
+          })}{' '}
+          <a href={IGC_CLAMP.url}>{tx('rent_indices.note_igc_law')}</a>
+        </p>
+      </section>
+
+      <section class="sheet sheet--text" aria-labelledby="topes">
+        <h2 id="topes">{tx('rent_indices.caps_title')}</h2>
+        <p>{tx('rent_indices.caps_lead')}</p>
+        <dl class="data-list caps">
+          {CAPS.map(({ id, rules }) => (
+            <div>
+              <dt>{tx(`rent_indices.cap.${id}.when`)}</dt>
+              <dd>
+                <p>{tx(`rent_indices.cap.${id}.rule`)}</p>
+                <ul class="sources">
+                  {capSources(rules).map((s) => (
+                    <li>
+                      <a href={s.url}>{s.citation}</a>
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p class="status" role="note">
+          {status}
+        </p>
+        {decreeLive && (
+          <p>
+            {tx('rent_indices.now', {
+              irav: formatRate(irav.figure.rate, 'irav'),
+              norma: decreeName,
+              tope:
+                irav.figure.rate > DECREE_CAP
+                  ? percent(DECREE_CAP)
+                  : formatRate(irav.figure.rate, 'irav'),
+            })}
+          </p>
+        )}
+        {rdl8 && rdl26 && (
+          <p>
+            {tx('rent_indices.repealed', {
+              norma1: 'RDL 8/2026',
+              desde1: formatDay(rdl8.inForceSince),
+              hasta1: formatDay(rdl8.inForceUntil ?? rdl8.inForceSince),
+              norma2: 'RDL 26/2026',
+              desde2: formatDay(rdl26.inForceSince),
+            })}
+          </p>
+        )}
+        <p>{tx('rent_indices.notice')}</p>
+        <p class="folio">
+          Art. <span>18</span> LAU
+        </p>
+      </section>
+
+      <section class="sheet sheet--text" aria-labelledby="ejemplo">
+        <h2 id="ejemplo">{tx('rent_indices.example_title')}</h2>
+        <p class="example">
+          <span class="example__label">{tx('rent_indices.example_label')}</span>{' '}
+          {tx('rent_indices.example', {
+            renta: formatEuros(ex.rent),
+            dia: formatLongDay(ex.anniversary),
+            mes: formatMonth(ex.month),
+            irav: formatRate(ex.figure.rate, 'irav'),
+            publicado: formatDay(ex.figure.publishedOn),
+            maximo: formatEuros(ex.maxRent),
+          })}
+        </p>
+        {decreeLive && (
+          <p class="example">
+            {tx('rent_indices.example_later', {
+              dia: formatLongDay(ex.later),
+              norma: decreeName,
+              maximo: formatEuros(ex.maxRentLater),
+            })}
+          </p>
+        )}
+      </section>
+
+      <section class="sheet sheet--text" aria-labelledby="proximamente">
+        <h2 id="proximamente">{tx('rent_indices.soon_title')}</h2>
+        <p>{tx('rent_indices.soon')}</p>
+      </section>
+
+      <section class="sheet sheet--text" aria-labelledby="preguntas">
+        <h2 id="preguntas">{tx('rent_indices.faq')}</h2>
+        <div class="faq-list">
+          {faq.map(({ anchor, question, answer }) => (
+            <details class="faq-item" id={anchor}>
+              <summary>{question}</summary>
+              <p>{answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+    </div>
+  </main>
+</Base>
