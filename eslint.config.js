@@ -9,6 +9,16 @@ const localOnly = (dir) => ({
   regex: '^(?!\\./)',
   message: `src/${dir} imports only from src/${dir}.`,
 });
+// src/engine/rental reaches the rest of the engine one level up, and only its edges (data/, where
+// the norm and index tables live) hold data: the rules take those tables as arguments.
+const rentalOnly = {
+  regex: '^(?!\\.\\.?/)|^\\.\\./\\.\\./',
+  message: 'src/engine/rental imports only from src/engine.',
+};
+const noRentalData = {
+  regex: '(^|/)data/',
+  message: 'Rental rules take the norm and index tables as arguments; they never import them.',
+};
 const noAnalytics = {
   regex: '(^|/)analytics/',
   message: 'Only src/analytics and the composition root (src/scripts) import src/analytics.',
@@ -44,6 +54,19 @@ const boundary = (files, patterns, { ignores, rules } = {}) => ({
     ...rules,
   },
 });
+const engineGlobals = {
+  'no-restricted-globals': [
+    'error',
+    ...['Date', 'performance'].map((name) => ({
+      name,
+      message: 'The engine never reads the clock: take today as a parameter.',
+    })),
+    ...['window', 'document', 'navigator', 'location', 'history', 'localStorage'].map((name) => ({
+      name,
+      message: 'The engine runs without a browser.',
+    })),
+  ],
+};
 const AREAS = [
   'src/engine/**',
   'src/i18n/**',
@@ -70,19 +93,14 @@ export default tseslint.config(
   ...astro.configs.recommended,
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
   boundary(['src/engine/**'], [localOnly('engine')], {
-    rules: {
-      'no-restricted-globals': [
-        'error',
-        ...['Date', 'performance'].map((name) => ({
-          name,
-          message: 'The engine never reads the clock: take today as a parameter.',
-        })),
-        ...['window', 'document', 'navigator', 'location', 'history', 'localStorage'].map(
-          (name) => ({ name, message: 'The engine runs without a browser.' }),
-        ),
-      ],
-    },
+    ignores: ['src/engine/rental/**'],
+    rules: engineGlobals,
   }),
+  boundary(['src/engine/rental/**'], [rentalOnly, noRentalData], {
+    ignores: ['src/engine/rental/data/**'],
+    rules: engineGlobals,
+  }),
+  boundary(['src/engine/rental/data/**'], [rentalOnly], { rules: engineGlobals }),
   boundary(['src/i18n/**'], [localOnly('i18n')]),
   boundary(['src/analytics/**'], [analyticsReach, noPosthogAdapter], {
     ignores: ['src/analytics/posthog.ts'],
