@@ -1,0 +1,50 @@
+name: Uptime
+
+# A failed scheduled run emails the repository owner: that is the alert.
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Site and API answer
+        env:
+          EXTRACT_URL: ${{ vars.PUBLIC_API_EXTRACT_URL }}
+          CHECKOUT_URL: ${{ vars.PUBLIC_API_CHECKOUT_URL }}
+          PASS_URL: ${{ vars.PUBLIC_API_PASS_URL }}
+        run: |
+          set -u
+          failed=0
+          # Three tries a minute apart, so one slow answer is not an alert.
+          check() {
+            local what="$1"; shift
+            for attempt in 1 2 3; do
+              if "$@"; then echo "ok: $what"; return 0; fi
+              [ "$attempt" -lt 3 ] && sleep 60
+            done
+            echo "::error::$what is not answering"
+            failed=1
+          }
+          page() { curl -fsS --max-time 20 "$1" | grep -q "$2"; }
+          preflight() {
+            [ "$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 -X OPTIONS \
+              -H 'Origin: https://eslojusto.es' -H 'Access-Control-Request-Method: POST' "$1")" = 200 ]
+          }
+          check "home page" page https://eslojusto.es/ 'href="/finiquito/"'
+          check "final pay page" page https://eslojusto.es/finiquito/ 'id="calculator"'
+          if [ -n "$EXTRACT_URL" ]; then
+            check "extract API" preflight "$EXTRACT_URL"
+            check "checkout API" preflight "$CHECKOUT_URL"
+            check "pass API" preflight "$PASS_URL"
+          fi
+          exit "$failed"
