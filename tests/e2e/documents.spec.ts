@@ -53,6 +53,8 @@ interface Fake {
 async function fakeServices(
   page: Page,
   extract: { status: number; body: object } = { status: 200, body: SETTLEMENT },
+  // Where Stripe sends the person: back with the session id, or, cancelling, without it.
+  stripeBack = `${ORIGIN}/finiquito/?session_id=cs_test_e2e`,
 ): Promise<Fake> {
   const fake: Fake = { extract: [], checkout: [], pass: [], other: [] };
   await page.route('https://challenges.cloudflare.com/**', (route) =>
@@ -73,12 +75,8 @@ async function fakeServices(
     fake.pass.push(route.request());
     return route.fulfill({ json: { code: 'ok', pass: PASS, expiresAt, readsLeft: 15 } });
   });
-  // Stripe takes the payment and sends the person back with the session id.
   await page.route('https://checkout.stripe.com/**', (route) =>
-    route.fulfill({
-      status: 302,
-      headers: { location: `${ORIGIN}/finiquito/?session_id=cs_test_e2e` },
-    }),
+    route.fulfill({ status: 302, headers: { location: stripeBack } }),
   );
   page.on('request', (r) => {
     const { origin } = new URL(r.url());
@@ -224,6 +222,46 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
     expect(bytes.subarray(0, 8).toString('latin1')).toBe('%PDF-1.7');
   }
   expect(fake.other).toEqual([]);
+});
+
+// The read values, confirmed sheet by sheet with the answers a document can't give.
+async function confirmToResult(page: Page) {
+  await page.getByRole('button', { name: 'Revisar los datos' }).click();
+  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  await next();
+  await next();
+  await page.locator('#prorated-yes').check();
+  await next();
+  await next();
+  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await next();
+  await page.getByLabel('Ninguno').check();
+  await next();
+  await next();
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  await expect(page.getByRole('region', { name: 'Indemnización' })).toContainText(
+    'Por debajo del mínimo legal',
+  );
+}
+
+test('cancelling at Stripe brings the review back and keeps nothing in the tab', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page, undefined, `${ORIGIN}/finiquito/`);
+  await page.goto('finiquito/');
+  await uploadSettlement(page);
+  await confirmToResult(page);
+  const offer = page.getByRole('region', { name: /Informe en PDF/ });
+  await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
+  await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
+  await page.waitForURL(`${ORIGIN}/finiquito/#resultado`);
+  await expect(page.getByRole('heading', { name: /Resultado/ })).toBeFocused();
+  await expect(page.getByRole('region', { name: 'Indemnización' })).toContainText(
+    'Por debajo del mínimo legal',
+  );
+  await expect(offer.getByRole('button', { name: 'Pagar 4,99 €' })).toBeVisible();
+  expect(await page.evaluate(() => sessionStorage.length)).toBe(0);
+  expect(fake.pass).toHaveLength(0);
 });
 
 test('an API error is worded and the manual path is still there', async ({ page }) => {

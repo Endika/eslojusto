@@ -201,37 +201,36 @@ export function wireDocuments(
   hooks.onReview((r) => payment.show(r));
   hooks.onRestart(() => payment.hide());
 
-  const sessionId = new URLSearchParams(arrival.search).get('session_id');
-  if (sessionId !== null) {
-    history.replaceState(null, '', `${location.pathname}${location.hash}`);
-    void comeBack(sessionId);
-    return;
+  // The answers kept for the trip to Stripe come back on any return, paid or not (cancelling or
+  // the browser's back button arrive without a session id), and are deleted at once.
+  let saved: unknown = null;
+  try {
+    saved = JSON.parse(session.get(REVIEW_KEY) ?? 'null');
+  } catch {
+    // A damaged entry is dropped below like any other.
   }
-  const step = arrival.hash.replace(/^#/, '');
-  if ((STEPS as readonly string[]).includes(step)) upload.showCalculator(false);
+  session.remove(REVIEW_KEY);
+  const review = isEntries(saved) ? saved : null;
+
+  const sessionId = new URLSearchParams(arrival.search).get('session_id');
+  if (sessionId !== null) history.replaceState(null, '', `${location.pathname}${location.hash}`);
+
+  if (review) {
+    calculator.fill(review);
+    upload.showCalculator(false);
+    calculator.review();
+  } else if (sessionId === null && (STEPS as readonly string[]).includes(arrival.hash.slice(1)))
+    upload.showCalculator(false);
   else upload.showStart();
 
-  // Back from Stripe: the answers kept before leaving are put back and reviewed again, then the
-  // pass is asked for, so the result shows the downloads.
-  async function comeBack(id: string) {
-    let saved: unknown;
-    try {
-      saved = JSON.parse(session.get(REVIEW_KEY) ?? 'null');
-    } catch {
-      saved = null;
-    }
-    session.remove(REVIEW_KEY);
-    if (isEntries(saved)) {
-      calculator.fill(saved);
-      upload.showCalculator(false);
-      calculator.review();
-    } else upload.showStart();
-    const outcome = await payment.returned(id);
-    if (!isEntries(saved))
-      upload.notice(
-        outcome === true
-          ? tr('client.documents.pass.lost')
-          : tr(`client.documents.error.${outcome}`),
-      );
-  }
+  // Back from Stripe with a session id: the pass is asked for, so the result shows the downloads.
+  if (sessionId !== null)
+    void payment.returned(sessionId).then((outcome) => {
+      if (!review)
+        upload.notice(
+          outcome === true
+            ? tr('client.documents.pass.lost')
+            : tr(`client.documents.error.${outcome}`),
+        );
+    });
 }
