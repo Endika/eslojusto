@@ -29,7 +29,7 @@ function setUp(
       return { ok: true, sessionId: 'cs_test_1', url: checkoutUrl };
     },
     pass: async (sessionId, nonce) => {
-      calls.push(`pass ${sessionId} ${nonce.length}`);
+      calls.push(`pass ${sessionId} ${nonce[0]}`);
       return passResults.shift() ?? { ok: false, code: 'service_unavailable' };
     },
   };
@@ -97,10 +97,69 @@ describe('the pass offer', () => {
     $<HTMLInputElement>('#pass-waiver').checked = true;
     await click('[data-pass-pay]');
     expect(calls).toEqual(['checkout 32 checkout-token']);
-    expect(passes.checkout()).toEqual({ nonce: 'H'.repeat(32), sessionId: 'cs_test_1' });
+    expect(passes.checkouts()).toEqual([{ nonce: 'H'.repeat(32), sessionId: 'cs_test_1' }]);
     expect(kept()).toBe(1);
     expect(redirects).toEqual(['https://checkout.stripe.com/c/pay/1']);
     expect(events.log).toEqual([['checkoutStarted']]);
+  });
+
+  it('a checkout that fails keeps no nonce', async () => {
+    const { payment, passes } = setUp([], 'https://evil.example/pay');
+    payment.show(completed());
+    $<HTMLInputElement>('#pass-waiver').checked = true;
+    await click('[data-pass-pay]');
+    expect(passes.checkouts()).toEqual([]);
+  });
+
+  it('an earlier payment that was paid is redeemed instead of charging again', async () => {
+    const { payment, passes, calls, redirects, events } = setUp([
+      { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
+    ]);
+    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_old' });
+    payment.show(completed());
+    $<HTMLInputElement>('#pass-waiver').checked = true;
+    await click('[data-pass-pay]');
+    expect(calls).toEqual(['pass cs_test_old n']);
+    expect(redirects).toEqual([]);
+    expect(passes.checkouts()).toEqual([]);
+    expect(events.log).toEqual([['passIssued', 'recovery']]);
+    expect($('[data-pass-downloads]').hidden).toBe(false);
+  });
+
+  it('an earlier payment left unpaid stays redeemable after a new one starts', async () => {
+    const { payment, passes, calls, redirects } = setUp([
+      { ok: false, code: 'payment_not_complete' },
+    ]);
+    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_old' });
+    payment.show(completed());
+    $<HTMLInputElement>('#pass-waiver').checked = true;
+    await click('[data-pass-pay]');
+    expect(calls).toEqual(['pass cs_test_old n', 'checkout 32 checkout-token']);
+    expect(redirects).toHaveLength(1);
+    expect(passes.checkouts().map((c) => c.sessionId)).toEqual(['cs_test_1', 'cs_test_old']);
+    expect($('[data-pass-error]').hidden).toBe(true);
+  });
+
+  it('«¿Ya has pagado?» tries every pending payment until one gives a pass', async () => {
+    const { payment, passes, calls } = setUp([
+      { ok: false, code: 'payment_not_complete' },
+      { ok: false, code: 'payment_not_complete' },
+      { ok: false, code: 'payment_not_complete' },
+      { ok: false, code: 'payment_not_complete' },
+      { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
+    ]);
+    passes.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_a' });
+    passes.addCheckout({ nonce: 'b'.repeat(32), sessionId: 'cs_test_b' });
+    payment.show(completed());
+    await click('[data-pass-recover-button]');
+    expect(calls).toEqual([
+      'pass cs_test_b b',
+      'pass cs_test_b b',
+      'pass cs_test_b b',
+      'pass cs_test_b b',
+      'pass cs_test_a a',
+    ]);
+    expect(passes.checkouts().map((c) => c.sessionId)).toEqual(['cs_test_b']);
   });
 
   it('never follows a checkout address outside Stripe', async () => {
@@ -117,10 +176,10 @@ describe('the pass offer', () => {
       { ok: false, code: 'payment_not_complete' },
       { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
     ]);
-    passes.saveCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
+    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
     payment.show(completed());
     expect(await payment.returned('cs_test_1')).toBe(true);
-    expect(calls).toEqual(['pass cs_test_1 32', 'pass cs_test_1 32']);
+    expect(calls).toEqual(['pass cs_test_1 n', 'pass cs_test_1 n']);
     expect(passes.pass()).toEqual({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
     expect($('[data-pass-downloads]').hidden).toBe(false);
     expect($('[data-pass-buy]').hidden).toBe(true);
@@ -146,10 +205,10 @@ describe('the pass offer', () => {
     const { payment, passes, calls, events } = setUp([
       { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
     ]);
-    passes.saveCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
+    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
     payment.show(completed());
     await click('[data-pass-recover-button]');
-    expect(calls).toEqual(['pass cs_test_1 32']);
+    expect(calls).toEqual(['pass cs_test_1 n']);
     expect(events.log).toEqual([['passIssued', 'recovery']]);
     expect($('[data-pass-downloads]').hidden).toBe(false);
   });

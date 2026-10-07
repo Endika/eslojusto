@@ -66,11 +66,38 @@ describe('createPassStore', () => {
     const passes = createPassStore(store);
     passes.savePass(pass(1));
     passes.saveQuota('v1.q.s');
-    passes.saveCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_abc' });
+    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_abc' });
     expect([...store.data.keys()].toSorted()).toEqual(Object.values(STORAGE_KEYS).toSorted());
     expect(passes.pass()).toEqual(pass(1));
     expect(passes.quota()).toBe('v1.q.s');
-    expect(passes.checkout()).toEqual({ nonce: 'n'.repeat(32), sessionId: 'cs_test_abc' });
+    expect(passes.checkouts()).toEqual([{ nonce: 'n'.repeat(32), sessionId: 'cs_test_abc' }]);
+  });
+  it('keeps every unredeemed payment, newest first, and drops one once redeemed', () => {
+    const passes = createPassStore(memoryStore());
+    passes.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_a' });
+    passes.addCheckout({ nonce: 'b'.repeat(32), sessionId: 'cs_test_b' });
+    expect(passes.checkouts().map((c) => c.sessionId)).toEqual(['cs_test_b', 'cs_test_a']);
+    passes.removeCheckout('cs_test_b');
+    expect(passes.checkouts().map((c) => c.sessionId)).toEqual(['cs_test_a']);
+    for (let i = 0; i < 8; i++)
+      passes.addCheckout({ nonce: `${i}`.repeat(32), sessionId: `cs_test_${i}` });
+    expect(passes.checkouts()).toHaveLength(5);
+  });
+  it('reads a payment stored by an earlier version of the page', () => {
+    const store = memoryStore();
+    store.set(
+      STORAGE_KEYS.checkout,
+      JSON.stringify({ nonce: 'n'.repeat(32), sessionId: 'cs_test_x' }),
+    );
+    expect(createPassStore(store).checkouts()).toEqual([
+      { nonce: 'n'.repeat(32), sessionId: 'cs_test_x' },
+    ]);
+  });
+  it('forgets the quota', () => {
+    const passes = createPassStore(memoryStore());
+    passes.saveQuota('q');
+    passes.forgetQuota();
+    expect(passes.quota()).toBeNull();
   });
   it('reads damaged or foreign values as nothing', () => {
     const store = memoryStore();
@@ -78,9 +105,14 @@ describe('createPassStore', () => {
     store.set(STORAGE_KEYS.pass, '{');
     store.set(STORAGE_KEYS.checkout, JSON.stringify({ nonce: 'short', sessionId: 'x' }));
     expect(passes.pass()).toBeNull();
-    expect(passes.checkout()).toBeNull();
-    store.set(STORAGE_KEYS.checkout, JSON.stringify({ nonce: 'n'.repeat(32), sessionId: 'evil' }));
-    expect(passes.checkout()).toEqual({ nonce: 'n'.repeat(32), sessionId: null });
+    expect(passes.checkouts()).toEqual([]);
+    store.set(
+      STORAGE_KEYS.checkout,
+      JSON.stringify([{ nonce: 'n'.repeat(32), sessionId: 'evil' }]),
+    );
+    expect(passes.checkouts()).toEqual([]);
+    store.set(STORAGE_KEYS.checkout, '{');
+    expect(passes.checkouts()).toEqual([]);
   });
 });
 
