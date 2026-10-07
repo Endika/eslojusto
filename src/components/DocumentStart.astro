@@ -387,6 +387,20 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
   .pass .field {
     margin-top: 0.5rem;
   }
+  .pass-notice .sheet {
+    border: 2px solid var(--sheet-ink);
+  }
+  .pass-notice__text {
+    margin: 0;
+    font: 620 var(--t-ui) / 1.4 var(--f-grotesque);
+  }
+  .pass-notice[data-view='done'] .pass-notice__text {
+    font-weight: 400;
+  }
+  .pass-notice:focus-visible {
+    outline: 3px solid var(--sheet-ink);
+    outline-offset: 4px;
+  }
   .pass__letter {
     margin: 1.25rem 0 0;
   }

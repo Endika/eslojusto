@@ -53,6 +53,15 @@ export const START = `
 </form>
 <nav class="tabs" hidden></nav>`;
 
+export const NOTICE = `
+<section data-pass-notice tabindex="-1" hidden>
+  <p data-notice-text></p>
+  <div data-notice-full>
+    <button data-download="report">Report</button>
+    <button data-download="letter" data-notice-letter>Letter</button>
+  </div>
+</section>`;
+
 export const OFFER = `
 <section data-pass-offer hidden>
   <div data-pass-buy>

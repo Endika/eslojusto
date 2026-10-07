@@ -1,0 +1,36 @@
+---
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+
+// After a payment made in this page: download now, the review is kept nowhere else. Shown and
+// worded by src/documents/payment.ts; DocumentStart carries the pass styles.
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+---
+
+<section
+  class="item pass-notice"
+  data-pass-notice
+  role="status"
+  tabindex="-1"
+  aria-labelledby="pass-notice-text"
+  hidden
+>
+  <div class="sheet">
+    <p class="pass-notice__text" id="pass-notice-text" data-notice-text></p>
+    <div class="pass__actions" data-notice-full>
+      <button class="button button--sheet" type="button" data-download="report">
+        {tx('documents.pass.download_report')}
+      </button>
+      <button class="button button--sheet" type="button" data-download="letter" data-notice-letter>
+        {tx('documents.pass.download_letter')}
+      </button>
+    </div>
+    <p class="item__note" data-notice-full data-notice-letter>
+      {tx('documents.notice.letter_details')}
+    </p>
+  </div>
+</section>

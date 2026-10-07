@@ -1,6 +1,7 @@
 ---
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
+import PassNotice from './PassNotice.astro';
 import PassOffer from './PassOffer.astro';
 
 interface Props {
@@ -58,6 +59,7 @@ const workHistoryUrl =
   </header>
 
   <div class="review" data-review>
+    {documents && <PassNotice lang={lang} />}
     <section class="item summary" data-summary hidden aria-labelledby="summary-title">
       <div class="sheet">
         <h3 class="item__title" id="summary-title">

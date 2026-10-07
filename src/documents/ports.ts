@@ -95,4 +95,6 @@ export interface Browser {
   redirect(url: string): void;
   save(blob: Blob, filename: string): void;
   randomBytes(count: number): Uint8Array;
+  // Asks the browser to warn before the page is left, or stops asking.
+  warnBeforeLeaving(on: boolean): void;
 }

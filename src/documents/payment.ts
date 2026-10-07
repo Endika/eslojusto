@@ -6,6 +6,7 @@ import type { Translate } from '../i18n/client';
 import { SESSION_ID, type Api, type ErrorCode } from './contract';
 import { CHECKOUT_ORIGIN } from './config';
 import { letterPrefilled, looksLikeDniOrNie, type LetterDetails } from './letter';
+import { noticeView, warnsOnLeave, type NoticeState } from './notice';
 import { canDownload, newNonce, passState, type PassStore, type PendingCheckout } from './pass';
 import type {
   Browser,
@@ -69,6 +70,8 @@ export interface PaymentDeps {
   readonly keepReview: () => void;
   // The letter's date starts at today, in the person's own calendar.
   readonly today: () => CivilDate;
+  // Above the result: the notice after a payment, with its own download buttons.
+  readonly notice?: HTMLElement | null;
   // Told whenever the pass is verified or dropped, so the result can be shown again.
   readonly passChanged: () => void;
   readonly wait?: (ms: number) => Promise<void>;
@@ -122,6 +125,9 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   let busy = false;
   // The pass the API confirmed during this page's life. Kept in memory only: a reload asks again.
   let verifiedToken: string | null = null;
+  let fresh = false;
+  const downloaded = new Set<Download>();
+  const notice = deps.notice ?? null;
   let verifying: Promise<boolean> | null = null;
 
   function setError(code: ErrorCode | null) {
@@ -169,7 +175,13 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       if (dead) {
         passes.forgetPass();
         errorSlip.hidden = false;
-        errorSlip.textContent = tr(`client.documents.verify.${r.code as keyof typeof DEAD_PASS}`);
+        // «¿Ya has pagado?» can only issue it again with a payment this browser started.
+        const recoverable = r.code === 'pass_invalid' && passes.checkouts().some((c) => c.redeemed);
+        errorSlip.textContent = tr(
+          recoverable
+            ? 'client.documents.verify.pass_invalid_recoverable'
+            : `client.documents.verify.${r.code as keyof typeof DEAD_PASS}`,
+        );
       } else {
         errorSlip.hidden = false;
         errorSlip.textContent = tr('client.documents.verify.unavailable');
@@ -183,7 +195,38 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     return verifying;
   }
 
+  function renderNotice() {
+    if (!notice) return;
+    const state: NoticeState = {
+      fresh: fresh && current !== null,
+      letter: current !== null && hasShortfall(current.review),
+      downloaded,
+    };
+    const view = noticeView(state);
+    notice.hidden = view === 'hidden';
+    notice.dataset['view'] = view;
+    for (const el of notice.querySelectorAll<HTMLElement>('[data-notice-full]'))
+      el.hidden = view !== 'full';
+    for (const el of notice.querySelectorAll<HTMLElement>('[data-notice-done]'))
+      el.hidden = view !== 'done';
+    for (const el of notice.querySelectorAll<HTMLElement>('[data-notice-letter]'))
+      el.hidden = !state.letter;
+    const text = notice.querySelector<HTMLElement>('[data-notice-text]');
+    if (text)
+      text.textContent = tr(
+        view === 'done'
+          ? state.letter
+            ? 'client.documents.notice.done'
+            : 'client.documents.notice.done_report'
+          : state.letter
+            ? 'client.documents.notice.full'
+            : 'client.documents.notice.full_report',
+      );
+    browser.warnBeforeLeaving(warnsOnLeave({ ...state, fresh }));
+  }
+
   function render() {
+    renderNotice();
     if (!current) {
       section.hidden = true;
       return;
@@ -245,8 +288,10 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
         passes.markRedeemed(candidate.sessionId, result.expiresAt);
         events.passIssued(via);
         status.textContent = tr('client.documents.pass.issued');
+        if (via === 'return') fresh = true;
         // Just issued by the API from the payment itself: as verified as a verify would make it.
         settle(result.pass);
+        if (via === 'return' && notice && !notice.hidden) notice.focus();
         return true;
       }
       failures.push({ code: result.code, matches });
@@ -343,6 +388,8 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       browser.save(blob, tr(`client.documents.${FILENAMES[which]}.filename`));
       if (which === 'letter') events.downloaded(which, letterPrefilled(details));
       else events.downloaded(which);
+      downloaded.add(which);
+      renderNotice();
       status.textContent = tr('client.documents.pass.generated');
     } catch {
       status.textContent = '';
@@ -382,7 +429,10 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       await fetchPass(typed || null, 'recovery');
     }),
   );
-  for (const button of section.querySelectorAll<HTMLButtonElement>('[data-download]'))
+  for (const button of [
+    ...section.querySelectorAll<HTMLButtonElement>('[data-download]'),
+    ...(notice?.querySelectorAll<HTMLButtonElement>('[data-download]') ?? []),
+  ])
     button.addEventListener(
       'click',
       guard(() => download(button.dataset['download'] === 'letter' ? 'letter' : 'report')),

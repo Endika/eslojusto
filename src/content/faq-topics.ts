@@ -15,6 +15,7 @@ export const FAQ_TOPICS = [
   ['data', 'faq-datos'],
   // Only in a build that reads documents.
   ['documents', 'faq-documentos'],
+  ['pass', 'faq-pase'],
 ] as const;
 
-export const DOCUMENT_TOPICS: readonly string[] = ['documents'];
+export const DOCUMENT_TOPICS: readonly string[] = ['documents', 'pass'];

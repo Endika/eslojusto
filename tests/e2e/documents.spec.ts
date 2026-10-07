@@ -220,6 +220,9 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   // The pass: the waiver first, then Stripe, then back with the session id.
   const offer = page.getByRole('region', { name: /Informe en PDF/ });
   await expect(offer).toContainText('4,99 € con IVA incluido');
+  await expect(offer).toContainText(
+    'El pase dura 7 días y solo vale en este navegador: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a descargar el informe y la carta sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
+  );
   await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
   await expect(offer.getByText('Marca la casilla para seguir')).toBeVisible();
   await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
@@ -247,17 +250,36 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   await expect(result.locator('[data-range]:visible').first()).toBeVisible();
   // Issued by the API from the payment just made, the pass needs no second check.
   expect(fake.verify).toHaveLength(0);
+
+  // Above the result, a notice to download now, with its own buttons; leaving warns until then.
+  const notice = page.getByRole('status').filter({ hasText: 'Descarga ahora tu informe' });
+  await expect(notice.locator('[data-notice-text]')).toHaveText(
+    'Descarga ahora tu informe y tu carta y guárdalos: no guardamos tu revisión en ningún sitio. Durante 7 días, en este navegador, puedes corregir tus datos y volver a descargarlos sin pagar otra vez.',
+  );
+  await expect(page.locator('[data-pass-notice]')).toBeFocused();
+  const holdsLeave = () =>
+    page.evaluate(() => {
+      const e = new Event('beforeunload', { cancelable: true });
+      window.dispatchEvent(e);
+      return e.defaultPrevented;
+    });
+  expect(await holdsLeave()).toBe(true);
   for (const [button, name] of [
     ['Descargar el informe (PDF)', 'eslojusto-informe-finiquito.pdf'],
     ['Descargar la carta (PDF)', 'eslojusto-recibi-no-conforme.pdf'],
   ] as const) {
     const download = page.waitForEvent('download');
-    await page.getByRole('button', { name: button }).click();
+    await page.locator('[data-pass-notice]').getByRole('button', { name: button }).click();
     const file = await download;
     expect(file.suggestedFilename()).toBe(name);
     const bytes = readFileSync(await file.path());
     expect(bytes.subarray(0, 8).toString('latin1')).toBe('%PDF-1.7');
+    expect(await holdsLeave()).toBe(false);
   }
+  await expect(page.locator('[data-notice-text]')).toHaveText(
+    'Informe y carta descargados. Guárdalos: no guardamos tu revisión.',
+  );
+  await expect(page.locator('[data-pass-notice]').getByRole('button')).toHaveCount(0);
 
   // The letter's own details: optional, dated today, and never sent or kept anywhere.
   const letter = page.getByRole('group', { name: 'Tus datos para la carta (opcional)' });
@@ -473,6 +495,9 @@ test('the privacy page and the legal notice describe documents and the pass', as
   await expect(page.locator('#condiciones')).toContainText('Condiciones de venta del pase');
   await expect(page.locator('main')).toContainText('art. 103.m');
   await expect(page.locator('section:has(#condiciones)')).toContainText(
+    'En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
+  );
+  await expect(page.locator('section:has(#condiciones)')).toContainText(
     'Lo vende Endika Iglesias, con NIF',
   );
   await expect(page.locator('section:has(#condiciones)')).toContainText(
@@ -480,6 +505,7 @@ test('the privacy page and the legal notice describe documents and the pass', as
   );
   await page.goto('finiquito/');
   await expect(page.locator('#faq-documentos')).toContainText('¿Qué pasa con mis documentos?');
+  await expect(page.locator('#faq-pase')).toContainText('¿Qué incluye el pase de 4,99 €?');
 });
 
 test('files add up across picks, each can be removed, and only the rest are read', async ({
