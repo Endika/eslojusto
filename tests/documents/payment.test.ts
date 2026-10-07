@@ -97,7 +97,9 @@ describe('the pass offer', () => {
     $<HTMLInputElement>('#pass-waiver').checked = true;
     await click('[data-pass-pay]');
     expect(calls).toEqual(['checkout 32 checkout-token']);
-    expect(passes.checkouts()).toEqual([{ nonce: 'H'.repeat(32), sessionId: 'cs_test_1' }]);
+    expect(passes.checkouts()).toEqual([
+      { nonce: 'H'.repeat(32), sessionId: 'cs_test_1', startedAt: NOW / 1000 },
+    ]);
     expect(kept()).toBe(1);
     expect(redirects).toEqual(['https://checkout.stripe.com/c/pay/1']);
     expect(events.log).toEqual([['checkoutStarted']]);
@@ -122,7 +124,13 @@ describe('the pass offer', () => {
     expect(calls).toEqual(['pass cs_test_old n']);
     expect(redirects).toEqual([]);
     expect(passes.checkouts()).toEqual([
-      { nonce: 'n'.repeat(32), sessionId: 'cs_test_old', redeemed: true, expiresAt: EXPIRES },
+      {
+        nonce: 'n'.repeat(32),
+        sessionId: 'cs_test_old',
+        startedAt: NOW / 1000,
+        redeemed: true,
+        expiresAt: EXPIRES,
+      },
     ]);
     expect(events.log).toEqual([['passIssued', 'recovery']]);
     expect($('[data-pass-downloads]').hidden).toBe(false);
@@ -145,22 +153,13 @@ describe('the pass offer', () => {
   it('«¿Ya has pagado?» tries every pending payment until one gives a pass', async () => {
     const { payment, passes, calls } = setUp([
       { ok: false, code: 'payment_not_complete' },
-      { ok: false, code: 'payment_not_complete' },
-      { ok: false, code: 'payment_not_complete' },
-      { ok: false, code: 'payment_not_complete' },
       { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
     ]);
     passes.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_a' });
     passes.addCheckout({ nonce: 'b'.repeat(32), sessionId: 'cs_test_b' });
     payment.show(completed());
     await click('[data-pass-recover-button]');
-    expect(calls).toEqual([
-      'pass cs_test_b b',
-      'pass cs_test_b b',
-      'pass cs_test_b b',
-      'pass cs_test_b b',
-      'pass cs_test_a a',
-    ]);
+    expect(calls).toEqual(['pass cs_test_b b', 'pass cs_test_a a']);
     expect(passes.checkouts().map((c) => [c.sessionId, c.redeemed ?? false])).toEqual([
       ['cs_test_b', false],
       ['cs_test_a', true],
@@ -182,6 +181,47 @@ describe('the pass offer', () => {
     expect(calls).toEqual(['pass cs_test_1 n', 'pass cs_test_1 n']);
     expect(passes.pass()?.readsLeft).toBe(14);
     expect($('[data-pass-downloads]').hidden).toBe(false);
+  });
+
+  it('back from Stripe, the error shown is about that payment, not an older one', async () => {
+    const { payment, passes } = setUp([
+      { ok: false, code: 'payment_not_complete' },
+      { ok: false, code: 'payment_not_complete' },
+      { ok: false, code: 'payment_not_complete' },
+      { ok: false, code: 'payment_not_complete' },
+      { ok: false, code: 'session_mismatch' },
+    ]);
+    passes.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_old' });
+    passes.addCheckout({ nonce: 'b'.repeat(32), sessionId: 'cs_test_new' });
+    payment.show(completed());
+    expect(await payment.returned('cs_test_new')).toBe('payment_not_complete');
+    expect($('[data-pass-error]').textContent).toContain('El pago aún no está completo');
+  });
+
+  it('a payment that can never give a pass is dropped, and so is one abandoned for a week', async () => {
+    let now = NOW;
+    const passes = createPassStore(memoryStore(), () => now);
+    passes.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_old' });
+    now += 8 * 86_400_000;
+    expect(passes.checkouts()).toEqual([]);
+    const { payment, passes: own } = setUp([
+      { ok: false, code: 'session_not_found' },
+      { ok: false, code: 'price_mismatch' },
+    ]);
+    own.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_a' });
+    own.addCheckout({ nonce: 'b'.repeat(32), sessionId: 'cs_test_b' });
+    payment.show(completed());
+    await click('[data-pass-recover-button]');
+    expect(own.checkouts()).toEqual([]);
+  });
+
+  it('asks about a few payments at most', async () => {
+    const { payment, passes, calls } = setUp();
+    for (const id of ['a', 'b', 'c', 'd'])
+      passes.addCheckout({ nonce: id.repeat(32), sessionId: `cs_test_${id}` });
+    payment.show(completed());
+    await click('[data-pass-recover-button]');
+    expect(calls).toEqual(['pass cs_test_d d', 'pass cs_test_c c']);
   });
 
   it('never follows a checkout address outside Stripe', async () => {

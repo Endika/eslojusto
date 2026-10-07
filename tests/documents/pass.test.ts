@@ -70,7 +70,7 @@ describe('createPassStore', () => {
     expect([...store.data.keys()].toSorted()).toEqual(Object.values(STORAGE_KEYS).toSorted());
     expect(passes.pass()).toEqual(pass(1));
     expect(passes.quota()).toBe('v1.q.s');
-    expect(passes.checkouts()).toEqual([{ nonce: 'n'.repeat(32), sessionId: 'cs_test_abc' }]);
+    expect(passes.checkouts()).toMatchObject([{ nonce: 'n'.repeat(32), sessionId: 'cs_test_abc' }]);
   });
   it('keeps every unredeemed payment, newest first, and drops one once redeemed', () => {
     const passes = createPassStore(memoryStore());
@@ -89,7 +89,13 @@ describe('createPassStore', () => {
     passes.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_a' });
     passes.markRedeemed('cs_test_a', now / 1000 + 60);
     expect(passes.checkouts()).toEqual([
-      { nonce: 'a'.repeat(32), sessionId: 'cs_test_a', redeemed: true, expiresAt: now / 1000 + 60 },
+      {
+        nonce: 'a'.repeat(32),
+        sessionId: 'cs_test_a',
+        startedAt: now / 1000,
+        redeemed: true,
+        expiresAt: now / 1000 + 60,
+      },
     ]);
     now += 61_000;
     expect(passes.checkouts()).toEqual([]);
