@@ -28,6 +28,15 @@ export const START = `
     <div data-captcha></div>
     <p data-doc-status></p>
     <p data-doc-error hidden></p>
+    <div data-doc-review hidden>
+      <p data-doc-review-lead></p>
+      <ul data-doc-review-list></ul>
+      <p data-doc-review-ask></p>
+      <div data-doc-review-actions>
+        <button type="button" data-doc-retake>Retake</button>
+        <button type="button" data-doc-send-anyway>Send anyway</button>
+      </div>
+    </div>
     <button type="button" data-start-back>Back</button>
     <button type="button" data-start-manual>Manual</button>
     <button type="submit" data-start-send>Send</button>
@@ -107,6 +116,9 @@ export function recordingEvents(): DocumentEvents & { log: Recorded[] } {
     uploadStarted: record('uploadStarted'),
     extractionCompleted: record('extractionCompleted'),
     extractionFailed: record('extractionFailed'),
+    nothingRead: record('nothingRead'),
+    qualityWarned: record('qualityWarned'),
+    qualityOverridden: record('qualityOverridden'),
     checkoutStarted: record('checkoutStarted'),
     passIssued: record('passIssued'),
     passFailed: record('passFailed'),

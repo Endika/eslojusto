@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { devices, test, expect, type Locator, type Page, type Request } from '@playwright/test';
 import { pdfBomb, syntheticPdf } from '../support/synthetic-pdf';
+import { syntheticPhoto } from '../support/synthetic-photo';
 
 // Runs only against a TEST_DOCUMENTS=1 build, whose API is three fake origins: every request to them,
 // to Turnstile and to Stripe is answered here. The documents are synthetic.
@@ -15,11 +16,11 @@ const API = {
 const API_ORIGINS = Object.values(API).map((url) => new URL(url).origin);
 const STRIPE = 'https://checkout.stripe.com/c/pay/cs_test_e2e';
 
-// A 40×30 red PNG: the browser decodes it and sends it on as a JPEG.
-const PHOTO = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAACgAAAAeCAIAAADRv8uKAAAALElEQVR4nO3NMQ0AAAgDsClBBP4FIAsZcDTp30zXiYjFYrFYLBaLxWKx+G+8uBAgzDALZFoAAAAASUVORK5CYII=',
-  'base64',
-);
+// A sharp, well-lit synthetic page: the browser decodes it, finds nothing to warn about and
+// sends it on as a JPEG.
+const PHOTO = syntheticPhoto();
+// The same page in shadow.
+const DARK_PHOTO = syntheticPhoto({ paper: 40, ink: 5 });
 
 const b64url = (v: object) => Buffer.from(JSON.stringify(v)).toString('base64url');
 const expiresAt = Math.floor(Date.now() / 1000) + 7 * 86400;
@@ -33,7 +34,15 @@ const from = (source: string, value: string | number, confidence = 'high') => ({
 const SETTLEMENT = {
   code: 'ok',
   extraction: {
-    pages: [{ page: 1, kind: 'settlement_proposal', document: 1, confidence: 'high' }],
+    pages: [
+      {
+        page: 1,
+        kind: 'settlement_proposal',
+        document: 1,
+        readability: { value: 'ok', confidence: 'high' },
+        confidence: 'high',
+      },
+    ],
     documents: [{ kind: 'settlement_proposal', pages: [1] }],
     fields: {
       cause: from('settlement_proposal', 'unfair_dismissal'),
@@ -507,6 +516,95 @@ test('an API error is worded and the manual path is still there', async ({ page 
     .getByRole('button', { name: 'Rellenar a mano' })
     .click();
   await expect(page.getByRole('heading', { name: '¿Cómo terminó tu contrato?' })).toBeFocused();
+});
+
+test('a read that finds nothing says why for each file, spends no read and keeps the files', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page, {
+    status: 422,
+    body: {
+      code: 'nothing_read',
+      pages: [
+        { page: 1, kind: 'payslip', readability: { value: 'blurry', confidence: 'high' } },
+        {
+          page: 2,
+          kind: 'other',
+          readability: { value: 'foreign_jurisdiction', confidence: 'high' },
+        },
+      ],
+    },
+  });
+  await page.goto('finiquito/');
+  await openUpload(page);
+  await page
+    .getByLabel('Elegir fotos o PDF')
+    .setInputFiles([photo('nomina-movida.png'), photo('contrato-lisboa.png')]);
+  await page.getByLabel(/Doy mi consentimiento explícito/).check();
+  await page.getByRole('button', { name: 'Leer los documentos' }).click();
+  await expect(
+    page.getByText('No se ha leído ningún dato, así que esta lectura no cuenta.'),
+  ).toBeFocused();
+  await expect(
+    page.getByText('nomina-movida.png: sale borrosa. Prueba con más luz y el móvil quieto.'),
+  ).toBeVisible();
+  await expect(
+    page.getByText('contrato-lisboa.png: es de otro país. Esta revisión aplica la ley española.'),
+  ).toBeVisible();
+  expect(fake.extract).toHaveLength(1);
+  expect(await page.evaluate(() => localStorage.getItem('eslojusto-lecturas'))).toBeNull();
+  await expect(
+    page.getByRole('list', { name: 'Archivos elegidos' }).getByRole('listitem'),
+  ).toHaveCount(2);
+  await page
+    .locator('[data-start-panel="upload"]')
+    .getByRole('button', { name: 'Rellenar a mano' })
+    .click();
+  await expect(page.getByRole('heading', { name: '¿Cómo terminó tu contrato?' })).toBeFocused();
+});
+
+test('a dark photo is flagged before sending, and goes anyway if asked to', async ({ page }) => {
+  const fake = await fakeServices(page);
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto('finiquito/');
+  await openUpload(page);
+  await page
+    .getByLabel('Elegir fotos o PDF')
+    .setInputFiles([
+      photo('finiquito-sintetico.png'),
+      { name: 'nomina-a-oscuras.png', mimeType: 'image/png', buffer: DARK_PHOTO },
+    ]);
+  await page.getByLabel(/Doy mi consentimiento explícito/).check();
+  await page.getByRole('button', { name: 'Leer los documentos' }).click();
+  await expect(page.getByText('nomina-a-oscuras.png se ve muy oscura.')).toBeVisible();
+  await expect(page.getByText('¿La repites?')).toBeFocused();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    ),
+  ).toBeLessThanOrEqual(0);
+  expect(fake.extract).toHaveLength(0);
+  await page.getByRole('button', { name: 'Enviar igualmente' }).click();
+  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
+  expect(fake.extract).toHaveLength(1);
+  expect((fake.extract[0]?.postDataJSON() as { files: unknown[] }).files).toHaveLength(2);
+});
+
+test('«Repetir» takes a dark photo out of the list so another can take its place', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page);
+  await page.goto('finiquito/');
+  await openUpload(page);
+  await page
+    .getByLabel('Elegir fotos o PDF')
+    .setInputFiles([{ name: 'nomina-a-oscuras.png', mimeType: 'image/png', buffer: DARK_PHOTO }]);
+  await page.getByLabel(/Doy mi consentimiento explícito/).check();
+  await page.getByRole('button', { name: 'Leer los documentos' }).click();
+  await page.getByRole('button', { name: 'Repetir' }).click();
+  await expect(page.getByText('Quitado: nomina-a-oscuras.png. Llevas 0 de 15.')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Archivos elegidos' })).toBeHidden();
+  expect(fake.extract).toHaveLength(0);
 });
 
 test('the start sheet works by keyboard and fits 360 px in both themes', async ({ page }) => {

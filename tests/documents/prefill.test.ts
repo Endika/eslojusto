@@ -16,6 +16,7 @@ const p = (value: string | number | boolean, confidence: 'high' | 'medium' | 'lo
   f(value, confidence, 'payslip');
 
 const extraction = (fields: Extraction['fields'], contracts: Extraction['contracts'] = []) => ({
+  pages: [],
   documents: [],
   fields,
   contracts,

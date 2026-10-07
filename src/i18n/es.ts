@@ -296,6 +296,8 @@ export const es = {
   'documents.upload.send': 'Leer los documentos',
   'documents.upload.back': 'Volver',
   'documents.upload.selected': 'Archivos elegidos',
+  'documents.upload.retake': 'Repetir',
+  'documents.upload.send_anyway': 'Enviar igualmente',
   'documents.done.question': 'Datos leídos',
   'documents.done.continue': 'Revisar los datos',
   'documents.done.another': 'Subir más documentos',
@@ -700,6 +702,26 @@ export const es = {
     'La prorrata de pagas extra leída es mayor que el total: revisa el salario.',
   'client.documents.check.contract_end_before_start':
     'Algún contrato de la vida laboral termina antes de empezar: revisa sus fechas.',
+  'client.documents.nothing_read':
+    'No se ha leído ningún dato, así que esta lectura no cuenta. Puedes cambiar las fotos o páginas que fallan y volver a probar, o rellenar a mano.',
+  'client.documents.skipped.line': '{nombre}: {motivo}',
+  'client.documents.skipped.done': 'Se ha saltado {nombre}: {motivo}',
+  'client.documents.skipped.blurry': 'sale borrosa. Prueba con más luz y el móvil quieto.',
+  'client.documents.skipped.dark': 'sale muy oscura. Prueba con más luz.',
+  'client.documents.skipped.cropped': 'sale cortada. Prueba a que se vea la hoja entera.',
+  'client.documents.skipped.handwritten':
+    'parece escrito a mano. Es mejor que escribas los datos tú.',
+  'client.documents.skipped.not_labour_document': 'no parece un documento laboral.',
+  'client.documents.skipped.foreign_jurisdiction':
+    'es de otro país. Esta revisión aplica la ley española.',
+  'client.documents.skipped.unknown_format': 'es un tipo de documento que no se reconoce.',
+  'client.documents.skipped.no_data': 'no trae datos que use esta revisión.',
+  'client.documents.skipped.unread': 'no se ha podido leer.',
+  'client.documents.quality.dark': '{nombre} se ve muy oscura.',
+  'client.documents.quality.blurry': '{nombre} se ve borrosa.',
+  'client.documents.quality.small': '{nombre} es muy pequeña: puede que la letra no se lea.',
+  'client.documents.quality.ask_one': '¿La repites?',
+  'client.documents.quality.ask_many': '¿Las repites?',
   'client.documents.error.consent_missing': 'Para leer los documentos hace falta tu consentimiento',
   'client.documents.error.method_not_allowed':
     'No se ha podido leer el documento. Prueba otra vez o rellena a mano.',

@@ -120,6 +120,19 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
     <div class="start__captcha" data-captcha></div>
     <p class="start__status" role="status" aria-live="polite" data-doc-status></p>
     <p class="errata" role="alert" data-doc-error hidden></p>
+    <div class="start__review" data-doc-review hidden>
+      <p class="start__review-lead" tabindex="-1" data-doc-review-lead></p>
+      <ul class="list start__notes" data-doc-review-list></ul>
+      <p class="start__review-lead" tabindex="-1" data-doc-review-ask></p>
+      <div class="start__actions" data-doc-review-actions>
+        <button class="button start__secondary" type="button" data-doc-retake>
+          {tx('documents.upload.retake')}
+        </button>
+        <button class="button" type="button" data-doc-send-anyway>
+          {tx('documents.upload.send_anyway')}
+        </button>
+      </div>
+    </div>
     <div class="start__actions">
       <button class="button start__back" type="button" data-start-back>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
@@ -352,6 +365,21 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
   }
   .start__notes {
     margin-bottom: 0.5rem;
+  }
+  .start__review {
+    margin: 0 0 0.75rem;
+    padding: 0.75rem 0.875rem;
+    border-inline-start: 3px solid var(--sheet-ink);
+  }
+  .start__review-lead {
+    margin: 0 0 0.5rem;
+    font: 400 0.9375rem / 1.4 var(--f-serif);
+  }
+  .start__review-lead:empty {
+    display: none;
+  }
+  .start__review .start__actions {
+    margin-top: 0.5rem;
   }
   .read-mark {
     display: block;

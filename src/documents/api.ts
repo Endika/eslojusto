@@ -3,7 +3,9 @@ import {
   COHERENCE_CHECKS,
   CONFIDENCES,
   EXTRACTED_FIELDS,
+  LIMITS,
   PAGE_KINDS,
+  READABILITY,
   type Api,
   type CoherenceCheck,
   type Conflict,
@@ -12,6 +14,7 @@ import {
   type ExtractedRow,
   type Extraction,
   type Failure,
+  type ReadPage,
   type RecognisedDocument,
   type SourceKind,
   type SourcedField,
@@ -65,6 +68,22 @@ function parseDocument(v: unknown): RecognisedDocument | null {
   };
 }
 
+// A page's number, kind and readability; the API sends the readability with its confidence.
+function parsePage(v: unknown): ReadPage | null {
+  if (!isRecord(v) || !isPageKind(v['kind']) || !isRecord(v['readability'])) return null;
+  const { page } = v;
+  const readability = v['readability']['value'];
+  if (!Number.isInteger(page) || (page as number) < 1 || (page as number) > LIMITS.maxImages)
+    return null;
+  if (typeof readability !== 'string' || !(READABILITY as readonly string[]).includes(readability))
+    return null;
+  return {
+    page: page as number,
+    kind: v['kind'],
+    readability: readability as ReadPage['readability'],
+  };
+}
+
 function parseConflict(v: unknown): Conflict | null {
   if (!isRecord(v) || !isFieldName(v['field']) || !Array.isArray(v['sources'])) return null;
   const sources = v['sources'].filter(isSource);
@@ -84,6 +103,7 @@ export function parseExtraction(v: unknown): Extraction | null {
   }
   const lists = isRecord(v['lists']) ? v['lists'] : {};
   return {
+    pages: list(v['pages']).map(parsePage).filter(present),
     documents: list(v['documents']).map(parseDocument).filter(present),
     fields,
     contracts: list(lists['contracts']).map(parseRow).filter(present),
@@ -140,7 +160,7 @@ export function createApi(
       return withoutCode();
     }
     if (!isRecord(json)) return withoutCode();
-    if (json['code'] === 'ok') return json;
+    if (json['code'] === 'ok' || json['code'] === 'nothing_read') return json;
     return isApiError(json['code']) ? fail(json['code']) : withoutCode();
   }
   const failed = (r: Record<string, unknown> | Failure): r is Failure => r['ok'] === false;
@@ -153,6 +173,12 @@ export function createApi(
         ...(pass === undefined ? { quota: quota ?? null } : { pass }),
       });
       if (failed(r)) return r;
+      if (r['code'] === 'nothing_read')
+        return {
+          ok: false,
+          code: 'nothing_read',
+          pages: list(r['pages']).map(parsePage).filter(present),
+        };
       const extraction = parseExtraction(r['extraction']);
       const checks = Array.isArray(r['failedChecks']) ? r['failedChecks'] : [];
       const allowance = isToken(r['allowance']) ? r['allowance'] : null;
