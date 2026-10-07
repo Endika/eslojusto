@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { createHmacSigner } from '../src/adapters/hmac-signer';
 import {
   checkoutParams,
+  createStripeCheckout,
+  createStripeSessions,
+  isRestrictedKey,
   isRevoked,
   readsUsed,
   toSessionSnapshot,
@@ -122,6 +125,16 @@ describe('startCheckout', () => {
 });
 
 describe('Stripe adapter', () => {
+  it('accepts only a restricted key, never the full secret key', () => {
+    expect(isRestrictedKey('rk_test_51Abc')).toBe(true);
+    expect(isRestrictedKey('rk_live_51Abc')).toBe(true);
+    for (const key of ['sk_test_51Abc', 'sk_live_51Abc', 'pk_live_51Abc', 'rk_test_', ''])
+      expect(isRestrictedKey(key)).toBe(false);
+    expect(() => createStripeSessions('sk_live_51Abc')).toThrow();
+    expect(() => createStripeCheckout('sk_live_51Abc', PRICE)).toThrow();
+    expect(() => createStripeSessions('rk_test_51Abc')).not.toThrow();
+  });
+
   it('creates a one-off card or Bizum payment for the configured price', () => {
     const [params, options] = checkoutParams(NONCE, PRICE);
     expect(params).toMatchObject({

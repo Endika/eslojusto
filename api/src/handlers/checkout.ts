@@ -9,14 +9,14 @@ import type { HttpEvent, HttpResponse } from '../http/common';
 
 let deps: ReturnType<typeof load> | undefined;
 const load = async () => {
-  const { stripeSecretKey, turnstileSecretKey } = await loadParameters({
-    stripeSecretKey: PARAMETER_NAMES.stripeSecretKey,
+  const { stripeRestrictedKey, turnstileSecretKey } = await loadParameters({
+    stripeRestrictedKey: PARAMETER_NAMES.stripeRestrictedKey,
     turnstileSecretKey: PARAMETER_NAMES.turnstileSecretKey,
   });
   const priceId = process.env[STRIPE_PRICE_ENV];
   if (!priceId) throw new Error('Missing Stripe price id');
   return {
-    checkout: createStripeCheckout(stripeSecretKey, priceId),
+    checkout: createStripeCheckout(stripeRestrictedKey, priceId),
     captcha: createTurnstileVerifier(turnstileSecretKey, 'checkout'),
   };
 };

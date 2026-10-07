@@ -64,11 +64,18 @@ export function checkoutParams(
   ];
 }
 
-const client = (secretKey: string): Stripe =>
-  new Stripe(secretKey, { maxNetworkRetries: 1, timeout: 8000 });
+// Only a restricted key, never the account's full secret key, may reach a Lambda.
+export function isRestrictedKey(key: string): boolean {
+  return /^rk_(test|live)_[A-Za-z0-9]+$/.test(key);
+}
 
-export function createStripeCheckout(secretKey: string, priceId: string): CheckoutCreator {
-  const stripe = client(secretKey);
+const client = (restrictedKey: string): Stripe => {
+  if (!isRestrictedKey(restrictedKey)) throw new Error('Not a Stripe restricted key');
+  return new Stripe(restrictedKey, { maxNetworkRetries: 1, timeout: 8000 });
+};
+
+export function createStripeCheckout(restrictedKey: string, priceId: string): CheckoutCreator {
+  const stripe = client(restrictedKey);
   return {
     async create(nonce) {
       const session = await stripe.checkout.sessions.create(...checkoutParams(nonce, priceId));
@@ -78,8 +85,8 @@ export function createStripeCheckout(secretKey: string, priceId: string): Checko
   };
 }
 
-export function createStripeSessions(secretKey: string): PaymentVerifier {
-  const stripe = client(secretKey);
+export function createStripeSessions(restrictedKey: string): PaymentVerifier {
+  const stripe = client(restrictedKey);
   return {
     async findSession(sessionId) {
       try {

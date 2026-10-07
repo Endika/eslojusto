@@ -177,7 +177,7 @@ export class GlobalStack extends Stack {
           parameter(PARAMETER_NAMES.tokenKey),
           parameter(PARAMETER_NAMES.turnstileSecretKey),
           // Passes count their reads in the Checkout Session's metadata.
-          parameter(PARAMETER_NAMES.stripeSecretKey),
+          parameter(PARAMETER_NAMES.stripeRestrictedKey),
         ],
       }),
     ]);
@@ -185,7 +185,7 @@ export class GlobalStack extends Stack {
       new iam.PolicyStatement({
         actions: ['ssm:GetParameter'],
         resources: [
-          parameter(PARAMETER_NAMES.stripeSecretKey),
+          parameter(PARAMETER_NAMES.stripeRestrictedKey),
           parameter(PARAMETER_NAMES.turnstileSecretKey),
         ],
       }),
@@ -194,7 +194,7 @@ export class GlobalStack extends Stack {
       new iam.PolicyStatement({
         actions: ['ssm:GetParameter'],
         resources: [
-          parameter(PARAMETER_NAMES.stripeSecretKey),
+          parameter(PARAMETER_NAMES.stripeRestrictedKey),
           parameter(PARAMETER_NAMES.tokenKey),
         ],
       }),

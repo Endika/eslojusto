@@ -14,15 +14,15 @@ const reader = createBedrockReader(bedrockInvoke());
 
 let deps: ReturnType<typeof load> | undefined;
 const load = async () => {
-  const { tokenKey, turnstileSecretKey, stripeSecretKey } = await loadParameters({
+  const { tokenKey, turnstileSecretKey, stripeRestrictedKey } = await loadParameters({
     tokenKey: PARAMETER_NAMES.tokenKey,
     turnstileSecretKey: PARAMETER_NAMES.turnstileSecretKey,
-    stripeSecretKey: PARAMETER_NAMES.stripeSecretKey,
+    stripeRestrictedKey: PARAMETER_NAMES.stripeRestrictedKey,
   });
   return {
     captcha: createTurnstileVerifier(turnstileSecretKey, 'extract'),
     signer: createHmacSigner(tokenKey),
-    payments: createStripeSessions(stripeSecretKey),
+    payments: createStripeSessions(stripeRestrictedKey),
   };
 };
 

@@ -134,11 +134,11 @@ describe('global stack', () => {
       [
         PARAMETER_NAMES.tokenKey,
         PARAMETER_NAMES.turnstileSecretKey,
-        PARAMETER_NAMES.stripeSecretKey,
+        PARAMETER_NAMES.stripeRestrictedKey,
       ],
     ],
-    ['checkout', [PARAMETER_NAMES.stripeSecretKey, PARAMETER_NAMES.turnstileSecretKey]],
-    ['pass', [PARAMETER_NAMES.stripeSecretKey, PARAMETER_NAMES.tokenKey]],
+    ['checkout', [PARAMETER_NAMES.stripeRestrictedKey, PARAMETER_NAMES.turnstileSecretKey]],
+    ['pass', [PARAMETER_NAMES.stripeRestrictedKey, PARAMETER_NAMES.tokenKey]],
   ])('lets %s read only its parameters, and never Bedrock elsewhere', (fn, params) => {
     const all = statements(globalTemplate, `eslojusto-api-${fn}`);
     const ssm = all.filter((s) => String(s['Action']).startsWith('ssm:'));
@@ -159,6 +159,15 @@ describe('global stack', () => {
     expect(json).toContain(`log-group:/aws/lambda/eslojusto-api-${fn}"`);
     expect(json).toContain(`log-group:/aws/lambda/eslojusto-api-${fn}:*"`);
     expect(json.match(/log-group:/g)).toHaveLength(2);
+  });
+
+  it('hands every function the restricted Stripe key and none the full secret key', () => {
+    const json = JSON.stringify(globalTemplate.toJSON());
+    expect(json).not.toMatch(/stripe-secret-key/);
+    for (const fn of ['extract', 'checkout', 'pass'])
+      expect(JSON.stringify(statements(globalTemplate, `eslojusto-api-${fn}`))).toContain(
+        `parameter${PARAMETER_NAMES.stripeRestrictedKey}`,
+      );
   });
 
   it('budgets 10 USD a month with alerts at 50, 80 and 100%', () => {
