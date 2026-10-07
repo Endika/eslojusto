@@ -27,6 +27,7 @@ import {
   STRIPE_PRICE_ENV,
   foundationModelId,
 } from '../src/config';
+import { addAlarms, ALARM_PREFIX, ALERTS_TOPIC_NAME } from './alarms';
 import { addDashboard, DASHBOARD_NAME } from './dashboard';
 
 // CloudFormation in eu-south-2 has no AWS::Budgets::* types; this stack holds only global
@@ -74,6 +75,8 @@ export interface ApiStackProps extends StackProps {
   // Off only while the account's concurrency quota is too low to reserve anything; the
   // account-wide limit then caps every function instead.
   readonly reserveConcurrency?: boolean;
+  // Subscribed to the alerts topic; without it the topic has no subscribers.
+  readonly alertEmail?: string;
 }
 
 // Everything regional, in eu-south-2. No IAM: the roles live in the global stack, so the CI
@@ -82,6 +85,7 @@ export class ApiStack extends Stack {
   constructor(scope: Construct, id: string, props: ApiStackProps) {
     super(scope, id, { ...props, env: { ...props.env, region: REGION } });
 
+    const logGroups = {} as Record<FunctionKey, logs.LogGroup>;
     for (const key of Object.keys(FUNCTIONS) as FunctionKey[]) {
       const settings = FUNCTIONS[key];
       const functionName = FUNCTION_NAMES[key];
@@ -90,6 +94,7 @@ export class ApiStack extends Stack {
         retention: logs.RetentionDays.TWO_WEEKS,
         removalPolicy: RemovalPolicy.DESTROY,
       });
+      logGroups[key] = logGroup;
       const fn = new NodejsFunction(this, key, {
         functionName,
         entry: entry(key),
@@ -126,7 +131,8 @@ export class ApiStack extends Stack {
       new CfnOutput(this, `${key}Url`, { value: url.url });
     }
 
-    addDashboard(this, { monthlyUsd: MONTHLY_BUDGET_USD, name: BUDGET_NAME });
+    const alarms = addAlarms(this, logGroups.extract, props.alertEmail);
+    addDashboard(this, { monthlyUsd: MONTHLY_BUDGET_USD, name: BUDGET_NAME }, alarms);
   }
 }
 
@@ -308,6 +314,7 @@ export class GlobalStack extends Stack {
     const functionArns = Object.values(FUNCTION_NAMES).map((n) =>
       regional('lambda', `function:${n}`),
     );
+    const alertsTopic = regional('sns', ALERTS_TOPIC_NAME);
     const cfnExecution = new iam.ManagedPolicy(this, 'CfnExecutionPolicy', {
       managedPolicyName: CFN_EXECUTION_POLICY_NAME,
       statements: [
@@ -343,6 +350,41 @@ export class GlobalStack extends Stack {
           conditions: { StringEquals: { 'iam:PassedToService': 'lambda.amazonaws.com' } },
         }),
         new iam.PolicyStatement({
+          actions: [
+            'sns:CreateTopic',
+            'sns:DeleteTopic',
+            'sns:GetTopicAttributes',
+            'sns:SetTopicAttributes',
+            'sns:ListSubscriptionsByTopic',
+            'sns:Subscribe',
+            'sns:GetDataProtectionPolicy',
+            'sns:PutDataProtectionPolicy',
+            'sns:TagResource',
+            'sns:UntagResource',
+            'sns:ListTagsForResource',
+          ],
+          resources: [alertsTopic],
+        }),
+        new iam.PolicyStatement({
+          actions: [
+            'sns:Unsubscribe',
+            'sns:GetSubscriptionAttributes',
+            'sns:SetSubscriptionAttributes',
+          ],
+          resources: [`${alertsTopic}:*`],
+        }),
+        new iam.PolicyStatement({
+          actions: [
+            'cloudwatch:PutMetricAlarm',
+            'cloudwatch:DeleteAlarms',
+            'cloudwatch:DescribeAlarms',
+            'cloudwatch:TagResource',
+            'cloudwatch:UntagResource',
+            'cloudwatch:ListTagsForResource',
+          ],
+          resources: [regional('cloudwatch', `alarm:${ALARM_PREFIX}*`)],
+        }),
+        new iam.PolicyStatement({
           actions: ['s3:GetObject'],
           resources: [`arn:aws:s3:::cdk-${CDK_QUALIFIER}-assets-${account}-${REGION}/*`],
         }),
@@ -356,7 +398,7 @@ export class GlobalStack extends Stack {
 
 export interface AppConfig {
   readonly stripePriceId: string;
-  // Only for the hand-run deployment of the global stack; CI deploys never see it.
+  // Budget and alarm emails; the hand-run deployment needs it to build the global stack.
   readonly alertEmail?: string;
   readonly reserveConcurrency?: boolean;
 }
@@ -365,6 +407,7 @@ export function buildApp(config: AppConfig, app = new App()) {
   const api = new ApiStack(app, 'EslojustoApi', {
     stripePriceId: config.stripePriceId,
     ...(config.reserveConcurrency === false && { reserveConcurrency: false }),
+    ...(config.alertEmail !== undefined && { alertEmail: config.alertEmail }),
     analyticsReporting: false,
   });
   const global =
