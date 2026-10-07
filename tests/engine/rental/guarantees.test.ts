@@ -75,6 +75,29 @@ describe('deposit and extra guarantees in money', () => {
 });
 
 describe('guarantees that are not money', () => {
+  it('make the money item say that only money was compared', () => {
+    const results = checkGuarantees(
+      input({
+        deposit: RENT,
+        guarantees: [cash(2 * RENT), { kind: 'bank_guarantee', amount: 6000 }],
+      }),
+      NORMS,
+    );
+    const moneyItem = results.find((r) => r.kind === 'guarantees');
+    if (moneyItem?.outcome.kind !== 'single') throw new Error('expected single');
+    expect(moneyItem.outcome.value.status).toBe('within_limit');
+    expect(moneyItem.outcome.value.calculation.map((x) => x.key)).toEqual([
+      'guarantees.money',
+      'guarantees.only_money_compared',
+      'guarantees.within_cap',
+    ]);
+    const plain = checkGuarantees(input({ guarantees: [cash(RENT)] }), NORMS)[0];
+    if (plain?.outcome.kind !== 'single') throw new Error('expected single');
+    expect(plain.outcome.value.calculation.map((x) => x.key)).not.toContain(
+      'guarantees.only_money_compared',
+    );
+  });
+
   it('a bank guarantee is left to look at, with no figure; past the capped years, not applicable', () => {
     const [aval] = others({ guarantees: [{ kind: 'bank_guarantee', amount: 5000 }] });
     expect(singleOf(aval)).toEqual({ status: 'review_it', amount: null });

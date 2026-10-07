@@ -52,6 +52,7 @@ export type RentalPhraseKey =
   | 'guarantees.within_cap'
   | 'guarantees.long_contract'
   | 'guarantees.not_money'
+  | 'guarantees.only_money_compared'
   | 'guarantees.insurance_banned'
   | 'guarantees.insurance_before_ban'
   | 'advance.over_cap'
