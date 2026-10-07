@@ -7,8 +7,10 @@ import PassOffer from './PassOffer.astro';
 interface Props {
   lang: Lang;
   documents?: boolean;
+  // On a page about the benefit, its estimate comes before the final pay items.
+  benefitFirst?: boolean;
 }
-const { lang, documents = false } = Astro.props;
+const { lang, documents = false, benefitFirst = false } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 const workHistoryUrl =
   'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
@@ -72,10 +74,11 @@ const workHistoryUrl =
         <div data-summary-deadlines></div>
       </div>
     </section>
+    {benefitFirst && <div class="review__slot" data-slot="benefit" />}
     <div class="review__items" data-items></div>
     {documents && <PassOffer lang={lang} />}
 
-    <div class="review__slot" data-slot="benefit"></div>
+    {!benefitFirst && <div class="review__slot" data-slot="benefit" />}
 
     <section class="item" aria-labelledby="unchecked-title">
       <div class="sheet">

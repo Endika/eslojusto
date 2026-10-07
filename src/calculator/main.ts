@@ -4,7 +4,15 @@ import { applyConditions, followHolidayDefault } from './conditions';
 import { watchDisclosures } from './disclosures';
 import { required } from './dom';
 import { formEntries, rowsNeeded, setEntry, type FormEntries } from './fill';
-import { firstIncomplete, indexOfHash, lastSheet, resultStep, stepAt, stepFrom } from './flow';
+import {
+  firstIncomplete,
+  indexOfHash,
+  lastSheet,
+  resultStep,
+  startStep,
+  stepAt,
+  stepFrom,
+} from './flow';
 import {
   SHEETS,
   baseField,
@@ -20,17 +28,13 @@ import type { CalculatorDeps } from './ports';
 import { renderErrors, renderResult, type ResultData } from './render';
 import { FINAL_PAY_FLOW } from './steps';
 
-const flow = FINAL_PAY_FLOW;
-const LAST_SHEET = lastSheet(flow);
-const RESULT_STEP = resultStep(flow);
-
 // What the page's other parts can do with the calculator: set or read its answers, and open it.
 export interface Calculator {
   readonly form: HTMLFormElement;
   // Sets the answers and returns the names it could not set.
   fill(entries: FormEntries): string[];
   entries(): FormEntries;
-  // Shows the first sheet, as if the visit started there.
+  // Shows the sheet a visit opens on, as if it started there.
   open(): void;
   // Reviews the answers as the «Revisar» button does; false when a sheet still needs an answer.
   review(): boolean;
@@ -40,8 +44,10 @@ export interface Calculator {
 
 export function setUpCalculator(
   root: HTMLElement,
-  { events, today, tr, detail = () => 'unlocked' }: CalculatorDeps,
+  { events, today, tr, detail = () => 'unlocked', flow = FINAL_PAY_FLOW }: CalculatorDeps,
 ): Calculator {
+  const LAST_SHEET = lastSheet(flow);
+  const RESULT_STEP = resultStep(flow);
   const form = required(root.querySelector<HTMLFormElement>('#calculator'), 'the form');
   const result = required(root.querySelector<HTMLElement>('#resultado'), 'the result');
   // The last review shown, to show it again when its detail is unlocked or locked.
@@ -182,15 +188,18 @@ export function setUpCalculator(
       otherContracts.reset();
       renderErrors(form, [], tr);
       conditions();
-      nav.reached = 0;
-      nav.show(0, { history: 'push', focus: true });
+      nav.reached = startStep(flow, form);
+      nav.show(nav.reached, { history: 'push', focus: true });
     },
   );
 
   const otherContracts = setUpOtherContracts(form, tr, conditions);
   conditions();
   nav.reached = firstIncomplete(flow, form, today());
-  nav.show(Math.min(indexOfHash(flow, location.hash), nav.reached), { history: 'replace' });
+  const arrival = (flow.steps as readonly string[]).includes(location.hash.slice(1))
+    ? indexOfHash(flow, location.hash)
+    : startStep(flow, form);
+  nav.show(Math.min(arrival, nav.reached), { history: 'replace' });
 
   return {
     form,
@@ -205,8 +214,8 @@ export function setUpCalculator(
     },
     entries: () => formEntries(form),
     open() {
-      nav.reached = 0;
-      nav.show(0, { history: 'replace', focus: true });
+      nav.reached = startStep(flow, form);
+      nav.show(nav.reached, { history: 'replace', focus: true });
     },
     review: () => {
       nav.reached = LAST_SHEET;

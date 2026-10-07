@@ -2,6 +2,7 @@ import { calculatorAnalytics } from '../analytics/calculator';
 import { track } from '../analytics/posthog';
 import { setUpCalculator } from '../calculator/main';
 import type { CalculatorEvents, CompletedReview, Detail } from '../calculator/ports';
+import { FINAL_PAY_FLOW, presetCauseFlow } from '../calculator/steps';
 import { pageTranslator } from '../i18n/client';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import { localToday } from './clock';
@@ -39,11 +40,15 @@ const events: CalculatorEvents = documentsBuild
     }
   : analytics;
 
+// A page about one cause marks it on the form, and the visit opens past it.
+const preset = document.querySelector<HTMLFormElement>('#calculator')?.dataset['presetCause'];
+
 const calculator = setUpCalculator(document.body, {
   events,
   today: localToday,
   tr: pageTranslator(),
   detail: () => detail(),
+  flow: preset ? presetCauseFlow(preset) : FINAL_PAY_FLOW,
 });
 
 if (documentsBuild) {
