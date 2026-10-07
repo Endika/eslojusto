@@ -4,13 +4,48 @@ import type { Review } from '../engine/review';
 import type { Translate } from '../i18n/client';
 import { SESSION_ID, type Api, type ErrorCode } from './contract';
 import { CHECKOUT_ORIGIN } from './config';
-import { canDownload, newNonce, passState, type PassStore } from './pass';
+import { canDownload, newNonce, passState, type PassStore, type PendingCheckout } from './pass';
 import type { Browser, Captcha, DocumentEvents, Download, PdfMaker } from './ports';
 
 // The pass is offered only when the review finds money missing: an item below its minimum or a
 // deduction above its maximum.
 export const hasShortfall = (r: Review): boolean =>
   r.items.some((i) => i.status === 'below_minimum' || i.status === 'deduction_too_high');
+
+// Answers after which a payment can never give a pass, so it is no longer kept.
+const DEAD_CHECKOUT: ReadonlySet<ErrorCode> = new Set([
+  'session_not_found',
+  'price_mismatch',
+  'pass_expired',
+  'pass_revoked',
+]);
+
+// Which payments to ask about, a few calls at most: the one whose session came back from Stripe
+// or was typed, the newest redeemed one (its pass can be fetched again), and the two newest not
+// yet redeemed.
+export function passCandidates(
+  checkouts: readonly PendingCheckout[],
+  sessionId: string | null,
+): PendingCheckout[] {
+  const chosen = [
+    ...checkouts.filter((c) => c.sessionId === sessionId),
+    ...checkouts.filter((c) => c.redeemed).slice(0, 1),
+    ...checkouts.filter((c) => !c.redeemed).slice(0, 2),
+  ];
+  return chosen.filter((c, i) => chosen.findIndex((d) => d.nonce === c.nonce) === i);
+}
+
+// The answer worth showing: the one about the session the person came back with or typed;
+// otherwise a payment still settling says more than one made from another browser.
+const RANK: Partial<Record<ErrorCode, number>> = { payment_not_complete: 2, session_mismatch: 0 };
+export function reportedFailure(failures: readonly { code: ErrorCode; matches: boolean }[]) {
+  const matching = failures.find((f) => f.matches);
+  if (matching) return matching.code;
+  return failures.reduce<ErrorCode>(
+    (best, f) => ((RANK[f.code] ?? 1) > (RANK[best] ?? 1) ? f.code : best),
+    failures[0]?.code ?? 'no_checkout',
+  );
+}
 
 export interface PaymentDeps {
   readonly api: Api;
@@ -85,16 +120,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     via: 'return' | 'recovery',
     { quiet = false }: { quiet?: boolean } = {},
   ): Promise<true | ErrorCode> {
-    const pending = passes.checkouts();
-    const candidates =
-      sessionId === null
-        ? pending
-        : [
-            ...pending.filter((c) => c.sessionId === sessionId),
-            ...pending
-              .filter((c) => c.sessionId !== sessionId)
-              .map((c) => ({ nonce: c.nonce, sessionId })),
-          ];
+    const candidates = passCandidates(passes.checkouts(), sessionId);
     if (candidates.length === 0) {
       if (!quiet) {
         events.passFailed('no_checkout');
@@ -104,13 +130,14 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     }
     status.textContent = tr('client.documents.pass.checking');
     setError(null);
-    let last: ErrorCode = 'no_checkout';
+    const failures: { code: ErrorCode; matches: boolean }[] = [];
     for (const candidate of candidates) {
+      const matches = candidate.sessionId === sessionId;
       let result = await api.pass(candidate.sessionId, candidate.nonce);
       // A payment can take a moment to settle after the return from Stripe.
       for (
         let i = 0;
-        !quiet && !result.ok && result.code === 'payment_not_complete' && i < 3;
+        matches && !quiet && !result.ok && result.code === 'payment_not_complete' && i < 3;
         i++
       ) {
         await wait(2000);
@@ -128,18 +155,17 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
         render();
         return true;
       }
-      last = result.code;
-      if (result.code === 'pass_revoked') {
-        passes.forgetPass();
-        passes.removeCheckout(candidate.sessionId);
-      }
+      failures.push({ code: result.code, matches });
+      if (result.code === 'pass_revoked') passes.forgetPass();
+      if (DEAD_CHECKOUT.has(result.code)) passes.removeCheckout(candidate.sessionId);
     }
+    const code = reportedFailure(failures);
     status.textContent = '';
     if (!quiet) {
-      events.passFailed(last);
-      setError(last);
+      events.passFailed(code);
+      setError(code);
     }
-    return last;
+    return code;
   }
 
   async function pay() {

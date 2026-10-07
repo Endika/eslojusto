@@ -25,22 +25,26 @@ export interface StoredPass {
 export interface PendingCheckout {
   readonly nonce: string;
   readonly sessionId: string;
+  // Epoch seconds when the payment started; one never finished is forgotten after a week.
+  readonly startedAt?: number;
   readonly redeemed?: true;
   // Epoch seconds; set once redeemed.
   readonly expiresAt?: number;
 }
 
 const MAX_PENDING_CHECKOUTS = 5;
+const ABANDONED_AFTER_SECONDS = 7 * 86_400;
 
 function isPendingCheckout(v: unknown): v is PendingCheckout {
   if (typeof v !== 'object' || v === null) return false;
-  const { nonce, sessionId, redeemed, expiresAt } = v as Record<string, unknown>;
+  const { nonce, sessionId, redeemed, expiresAt, startedAt } = v as Record<string, unknown>;
   return (
     typeof nonce === 'string' &&
     NONCE.test(nonce) &&
     typeof sessionId === 'string' &&
     SESSION_ID.test(sessionId) &&
-    (redeemed === undefined || (redeemed === true && Number.isInteger(expiresAt)))
+    (redeemed === undefined || (redeemed === true && Number.isInteger(expiresAt))) &&
+    (startedAt === undefined || Number.isInteger(startedAt))
   );
 }
 
@@ -155,11 +159,16 @@ export function createPassStore(store: KeyValueStore, now: () => number = () => 
       const nowSeconds = now() / 1000;
       return (Array.isArray(list) ? list : [list])
         .filter(isPendingCheckout)
-        .filter((c) => !c.redeemed || (c.expiresAt ?? 0) > nowSeconds);
+        .filter((c) =>
+          c.redeemed
+            ? (c.expiresAt ?? 0) > nowSeconds
+            : nowSeconds - (c.startedAt ?? nowSeconds) <= ABANDONED_AFTER_SECONDS,
+        );
     },
     addCheckout(checkout: PendingCheckout): void {
       const rest = this.checkouts().filter((c) => c.nonce !== checkout.nonce);
-      write([checkout, ...rest].slice(0, MAX_PENDING_CHECKOUTS));
+      const started = { startedAt: Math.floor(now() / 1000), ...checkout };
+      write([started, ...rest].slice(0, MAX_PENDING_CHECKOUTS));
     },
     markRedeemed(sessionId: string, expiresAt: number): void {
       write(
