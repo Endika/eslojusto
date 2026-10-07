@@ -15,7 +15,10 @@ import {
   snapshot,
   reviewProps,
   outcomeOf,
+  fieldsBucket,
+  type Track,
 } from '../../src/analytics/events';
+import { documentsAnalytics } from '../../src/analytics/documents';
 import { cleanEvent } from '../../src/analytics/sanitize';
 import { POSTHOG_OPTIONS } from '../../src/analytics/posthog';
 import type { Status, ItemResult } from '../../src/engine/compare';
@@ -182,8 +185,103 @@ describe('the catalogue guard', () => {
         'review_completed',
         'section_completed',
         'section_viewed',
+        'start_chosen',
+        'upload_started',
+        'extraction_completed',
+        'extraction_failed',
+        'checkout_started',
+        'pass_issued',
+        'pass_failed',
+        'report_downloaded',
       ].toSorted(),
     );
+  });
+});
+
+describe('document and pass events', () => {
+  it('accept kinds, codes and buckets', () => {
+    expect(isValidEvent('start_chosen', { path: 'upload' })).toBe(true);
+    expect(isValidEvent('upload_started', { doc_type: 'payslip', files: 4, media: 'image' })).toBe(
+      true,
+    );
+    expect(
+      isValidEvent('extraction_completed', {
+        doc_type: 'settlement',
+        fields_bucket: '4-8',
+        low_confidence: false,
+        failed_checks: true,
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('extraction_failed', { doc_type: 'work_history', code: 'network_error' }),
+    ).toBe(true);
+    expect(isValidEvent('checkout_started', {})).toBe(true);
+    expect(isValidEvent('pass_issued', { via: 'recovery' })).toBe(true);
+    expect(isValidEvent('pass_failed', { code: 'session_mismatch' })).toBe(true);
+    expect(isValidEvent('report_downloaded', { document: 'letter' })).toBe(true);
+  });
+  it('refuse anything read from a document or a payment', () => {
+    expect(isValidEvent('upload_started', { doc_type: 'nómina', files: 1, media: 'image' })).toBe(
+      false,
+    );
+    expect(isValidEvent('upload_started', { doc_type: 'payslip', files: 5, media: 'image' })).toBe(
+      false,
+    );
+    expect(
+      isValidEvent('extraction_completed', {
+        doc_type: 'settlement',
+        fields_bucket: '7',
+        low_confidence: false,
+        failed_checks: false,
+      }),
+    ).toBe(false);
+    expect(isValidEvent('extraction_failed', { doc_type: 'payslip', code: '1.850,00' })).toBe(
+      false,
+    );
+    expect(isValidEvent('pass_issued', { via: 'cs_test_123' })).toBe(false);
+    expect(isValidEvent('checkout_started', { session: 'cs_test_123' })).toBe(false);
+  });
+  it('fields_bucket', () => {
+    expect([0, 1, 3, 4, 8, 9, 40].map(fieldsBucket)).toEqual([
+      '0',
+      '1-3',
+      '1-3',
+      '4-8',
+      '4-8',
+      '9+',
+      '9+',
+    ]);
+  });
+  it('documentsAnalytics names each event as the catalogue does', () => {
+    const sent: [string, unknown][] = [];
+    const events = documentsAnalytics(((name: string, props: unknown) => {
+      expect(isValidEvent(name, props), name).toBe(true);
+      sent.push([name, props]);
+    }) as Track);
+    events.startChosen('manual');
+    events.uploadStarted('settlement', 2, 'image');
+    events.extractionCompleted('payslip', 5, true, false);
+    events.extractionFailed('settlement', 'captcha_failed');
+    events.checkoutStarted();
+    events.passIssued('return');
+    events.passFailed('price_mismatch');
+    events.downloaded('report');
+    expect(sent.map(([n]) => n)).toEqual([
+      'start_chosen',
+      'upload_started',
+      'extraction_completed',
+      'extraction_failed',
+      'checkout_started',
+      'pass_issued',
+      'pass_failed',
+      'report_downloaded',
+    ]);
+    expect(sent[2]?.[1]).toEqual({
+      doc_type: 'payslip',
+      fields_bucket: '4-8',
+      low_confidence: true,
+      failed_checks: false,
+    });
   });
 });
 

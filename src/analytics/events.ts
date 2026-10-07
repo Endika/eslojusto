@@ -2,6 +2,7 @@ import { BENEFIT_STATES, benefitState, type BenefitEstimate } from '../engine/un
 import type { EmployerFigures, Review } from '../engine/review';
 import type { Cause, FinalPayInput, ItemId, FixedTermType } from '../engine/types';
 import { FAQ_TOPICS } from '../content/faq-topics';
+import { DOCUMENT_KINDS, DOWNLOADS, ERROR_CODES, PASS_VIA } from '../documents/ports';
 
 // Every property is a code from a closed list, a small count or a bucket: nothing a person
 // types can fit in one. `isValidEvent` enforces it at runtime before anything is sent.
@@ -123,6 +124,9 @@ export const sectionSecondsBucket = (s: number) => bucket(s, [10, 30, 60, 180], 
 export const reviewSecondsBucket = (s: number) => bucket(s, [60, 180, 600], REVIEW_SECONDS);
 export const differenceBucket = (euros: number) =>
   euros <= 0 ? '0' : bucket(euros, [100, 500, 2000], DIFFERENCE_BUCKETS.slice(1));
+export const FIELD_BUCKETS = ['0', '1-3', '4-8', '9+'] as const;
+export const fieldsBucket = (n: number) =>
+  n <= 0 ? '0' : n <= 3 ? '1-3' : n <= 8 ? '4-8' : ('9+' as const);
 export const attemptBucket = (n: number) => (n <= 1 ? '1' : n === 2 ? '2' : '3+');
 export const otherContractsBucket = (n: number) =>
   n <= 0 ? '0' : n === 1 ? '1' : n === 2 ? '2' : '3+';
@@ -173,6 +177,25 @@ export const CATALOGUE = {
   detail_opened: { item: oneOf(ITEM_IDS) },
   started_over: {},
   js_error: { kind: oneOf(ERROR_TYPES), source: SOURCE_RULE },
+  // Reading documents and the pass: only in a build with the documents API. Never a value read
+  // from a document, only its kind, how many fields it filled and how sure the reading was.
+  start_chosen: { path: oneOf(['upload', 'manual']) },
+  upload_started: {
+    doc_type: oneOf(DOCUMENT_KINDS),
+    files: { intRange: [1, 4] },
+    media: oneOf(['image', 'pdf']),
+  },
+  extraction_completed: {
+    doc_type: oneOf(DOCUMENT_KINDS),
+    fields_bucket: oneOf(FIELD_BUCKETS),
+    low_confidence: { boolean: true },
+    failed_checks: { boolean: true },
+  },
+  extraction_failed: { doc_type: oneOf(DOCUMENT_KINDS), code: oneOf(ERROR_CODES) },
+  checkout_started: {},
+  pass_issued: { via: oneOf(PASS_VIA) },
+  pass_failed: { code: oneOf(ERROR_CODES) },
+  report_downloaded: { document: oneOf(DOWNLOADS) },
 } as const satisfies Record<string, Record<string, Rule>>;
 
 export type EventName = keyof typeof CATALOGUE;
