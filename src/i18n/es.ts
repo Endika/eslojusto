@@ -417,6 +417,10 @@ export const es = {
   'client.summary.benefit_yes_no_figures':
     'Esta causa da derecho a paro si sumas al menos 360 días cotizados en los últimos 6 años; la cuantía depende de tus últimas nóminas.',
   'client.summary.benefit_no': 'Esta causa no da derecho a paro.',
+  'client.summary.dismissal_deadline':
+    'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
+  'client.summary.benefit_deadline':
+    'El paro se pide en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (art. 268 LGSS).',
 
   'client.status.below_minimum': 'Por debajo del mínimo legal: faltan {importe}',
   'client.status.matches': 'Coincide con el mínimo legal',
