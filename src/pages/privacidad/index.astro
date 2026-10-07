@@ -32,7 +32,7 @@ const stored = [
         },
         {
           what: tx('privacy.data_pass'),
-          where: `En el almacenamiento local (localStorage) de tu navegador, y solo si los usas: un contador firmado de tus lecturas gratis del día («${STORAGE_KEYS.quota}»); si compras el pase, el pase («${STORAGE_KEYS.pass}») y el código del pago con un número al azar que solo conoce tu navegador, para poder recuperar el pase («${STORAGE_KEYS.checkout}»). No llevan tu nombre ni nada de tus documentos, y solo salen de tu dispositivo con la siguiente lectura o para recuperar el pase. Se borran al borrar los datos de este sitio en tu navegador.`,
+          where: `En el almacenamiento local (localStorage) de tu navegador, y solo si los usas: un contador firmado de tus lecturas gratis del día («${STORAGE_KEYS.quota}»); si compras el pase, el pase y las lecturas que le quedan («${STORAGE_KEYS.pass}») y el código del pago con un número al azar que solo conoce tu navegador, para poder recuperar el pase («${STORAGE_KEYS.checkout}»). No llevan tu nombre ni nada de tus documentos, y solo salen de tu dispositivo con la siguiente lectura o para recuperar el pase. Se borran al borrar los datos de este sitio en tu navegador.`,
         },
         {
           what: tx('privacy.data_checkout'),
@@ -232,17 +232,18 @@ const tracked = [
             incluye las cláusulas contractuales tipo de la Comisión Europea.
           </p>
           <p>
-            Para limitar las lecturas gratis a personas, antes de cada lectura la página carga
-            Cloudflare Turnstile, que comprueba que no eres un robot sin usar cookies. Cloudflare,
-            Inc. recibe la dirección IP y datos técnicos de tu navegador para esa comprobación, y
-            solo cuando eliges subir un documento. La base jurídica es el interés legítimo en evitar
-            el abuso del servicio (art. 6.1.f del Reglamento); Cloudflare está adherida al Marco de
-            Privacidad de Datos UE-EE. UU.
+            Para que las lecturas y los pagos los hagan personas, antes de cada lectura y de cada
+            pago la página carga Cloudflare Turnstile, que comprueba que no eres un robot sin usar
+            cookies. Cloudflare, Inc. recibe la dirección IP y datos técnicos de tu navegador para
+            esa comprobación, y solo cuando eliges subir un documento o pagar el pase. La base
+            jurídica es el interés legítimo en evitar el abuso del servicio (art. 6.1.f del
+            Reglamento); Cloudflare está adherida al Marco de Privacidad de Datos UE-EE. UU.
           </p>
           <p>
             El pase del informe se paga en la página de Stripe Payments Europe, Ltd. (Irlanda).
             eslojusto.es no ve ni guarda los datos de tu tarjeta ni de Bizum: solo pregunta a Stripe
-            si el pago se ha hecho y por qué importe. La base jurídica es el contrato de compra
+            si el pago se ha hecho y por qué importe, y anota junto al pago cuántas lecturas has
+            hecho con el pase, sin nada de lo que leyeron. La base jurídica es el contrato de compra
             (art. 6.1.b) y las obligaciones contables y fiscales (art. 6.1.c). Stripe conserva los
             datos del pago el tiempo que le exigen esas obligaciones y las normas contra el blanqueo
             de capitales; lo explica en su{' '}

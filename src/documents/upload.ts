@@ -230,9 +230,14 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       captchaToken,
       ...(usePass ? { pass: stored.token } : { quota: passes.quota() }),
     });
-    if (!result.ok) return fail(result.code);
-    if (usePass) passes.savePass({ token: result.allowance, expiresAt: stored.expiresAt });
-    else passes.saveQuota(result.allowance);
+    if (!result.ok) {
+      // The pass's state is the server's to tell: no reads left, or a refunded payment.
+      if (usePass && result.code === 'pass_exhausted') passes.updateReads(0);
+      if (usePass && result.code === 'pass_revoked') passes.forgetPass();
+      return fail(result.code);
+    }
+    if (usePass && result.readsLeft !== null) passes.updateReads(result.readsLeft);
+    if (!usePass && result.allowance !== null) passes.saveQuota(result.allowance);
 
     const current = Object.fromEntries(calculator.entries());
     const prefill = prefillFrom(result.extraction, {

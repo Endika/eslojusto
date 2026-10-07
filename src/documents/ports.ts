@@ -38,6 +38,9 @@ export interface Captcha {
   token(): Promise<string>;
 }
 
+// The Turnstile action each operation's token is checked against.
+export type CaptchaAction = 'extract' | 'checkout';
+
 export interface EncodedFile {
   readonly mediaType: MediaType;
   readonly data: string;

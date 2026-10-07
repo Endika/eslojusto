@@ -13,6 +13,8 @@ export interface StoredPass {
   readonly token: string;
   // Epoch seconds, as the API returns it.
   readonly expiresAt: number;
+  // What the API last said the pass has left; Stripe keeps the real count.
+  readonly readsLeft: number;
 }
 
 export interface PendingCheckout {
@@ -23,7 +25,6 @@ export interface PendingCheckout {
 export interface PassClaims {
   readonly sessionId: string;
   readonly expiresAt: number;
-  readonly used: number;
 }
 
 function base64UrlJson(part: string): unknown {
@@ -45,10 +46,9 @@ export function passClaims(token: string): PassClaims | null {
   if (version !== 'v1' || !payload || !signature || rest.length > 0) return null;
   const c = base64UrlJson(payload);
   if (typeof c !== 'object' || c === null) return null;
-  const { typ, sid, exp, used } = c as Record<string, unknown>;
-  if (typ !== 'pass' || typeof sid !== 'string') return null;
-  if (!Number.isInteger(exp) || !Number.isInteger(used)) return null;
-  return { sessionId: sid, expiresAt: exp as number, used: used as number };
+  const { typ, sid, exp } = c as Record<string, unknown>;
+  if (typ !== 'pass' || typeof sid !== 'string' || !Number.isInteger(exp)) return null;
+  return { sessionId: sid, expiresAt: exp as number };
 }
 
 export type PassState = 'none' | 'valid' | 'exhausted' | 'expired';
@@ -58,7 +58,7 @@ export function passState(stored: StoredPass | null, nowMs: number): PassState {
   const claims = passClaims(stored.token);
   if (!claims) return 'none';
   if (nowMs >= Math.min(claims.expiresAt, stored.expiresAt) * 1000) return 'expired';
-  return claims.used >= PASS_READS ? 'exhausted' : 'valid';
+  return stored.readsLeft > 0 ? 'valid' : 'exhausted';
 }
 
 // A report or letter needs an unexpired pass; reads also need uses left.
@@ -81,12 +81,21 @@ export function createPassStore(store: KeyValueStore) {
   return {
     pass(): StoredPass | null {
       const v = readJson(store, STORAGE_KEYS.pass);
-      return v && typeof v['token'] === 'string' && typeof v['expiresAt'] === 'number'
-        ? { token: v['token'], expiresAt: v['expiresAt'] }
-        : null;
+      if (!v || typeof v['token'] !== 'string' || typeof v['expiresAt'] !== 'number') return null;
+      const left = v['readsLeft'];
+      return {
+        token: v['token'],
+        expiresAt: v['expiresAt'],
+        readsLeft: Number.isInteger(left) ? Math.min(PASS_READS, left as number) : PASS_READS,
+      };
     },
     savePass(pass: StoredPass): void {
       store.set(STORAGE_KEYS.pass, JSON.stringify(pass));
+    },
+    // Records what the API says is left, or forgets a pass it no longer honours.
+    updateReads(readsLeft: number): void {
+      const current = this.pass();
+      if (current) this.savePass({ ...current, readsLeft });
     },
     forgetPass(): void {
       store.remove(STORAGE_KEYS.pass);

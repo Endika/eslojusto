@@ -212,8 +212,14 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
     margin: 0 0 0.75rem;
     font: 400 var(--t-small) / 1.4 var(--f-serif);
   }
-  .start__captcha:empty {
+  .start__captcha:empty,
+  .pass__captcha:empty {
     display: none;
+  }
+  .pass__captcha {
+    margin-top: 0.75rem;
+    max-inline-size: 100%;
+    overflow: hidden;
   }
   .start__captcha {
     margin: 0 0 0.75rem;

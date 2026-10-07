@@ -84,6 +84,7 @@ const settlement: ExtractResult = {
   },
   failedChecks: ['items_do_not_sum'],
   allowance: 'v1.quota.next',
+  readsLeft: null,
 };
 
 describe('the start sheet', () => {
@@ -178,17 +179,34 @@ describe('the start sheet', () => {
     expect(form.querySelectorAll('[data-read-mark]')).toHaveLength(2);
   });
 
-  it('with a valid pass, the read goes on the pass and its next token is kept', async () => {
-    const { requests, passes } = setUp(settlement);
-    const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600, used: 2 });
-    passes.savePass({ token, expiresAt: NOW / 1000 + 3600 });
+  it('with a valid pass, the read goes on the pass and its reads left are kept', async () => {
+    const { requests, passes } = setUp({ ...settlement, allowance: null, readsLeft: 11 });
+    const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
+    passes.savePass({ token, expiresAt: NOW / 1000 + 3600, readsLeft: 12 });
     passes.saveQuota('old-quota');
     choose([photo]);
     await submit();
     expect(requests[0]?.pass).toBe(token);
     expect(requests[0]).not.toHaveProperty('quota');
-    expect(passes.pass()).toEqual({ token: 'v1.quota.next', expiresAt: NOW / 1000 + 3600 });
+    expect(passes.pass()).toEqual({ token, expiresAt: NOW / 1000 + 3600, readsLeft: 11 });
     expect(passes.quota()).toBe('old-quota');
+  });
+
+  it('a refunded pass is forgotten; a used-up one falls back to free reads next time', async () => {
+    const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
+    const revoked = setUp({ ok: false, code: 'pass_revoked' });
+    revoked.passes.savePass({ token, expiresAt: NOW / 1000 + 3600, readsLeft: 5 });
+    choose([photo]);
+    await submit();
+    expect(revoked.passes.pass()).toBeNull();
+    const used = setUp({ ok: false, code: 'pass_exhausted' });
+    used.passes.savePass({ token, expiresAt: NOW / 1000 + 3600, readsLeft: 5 });
+    choose([photo]);
+    await submit();
+    expect(used.passes.pass()?.readsLeft).toBe(0);
+    choose([photo]);
+    await submit();
+    expect(used.requests[1]).toHaveProperty('quota', null);
   });
 
   it('an API error is worded, and the manual path stays one click away', async () => {

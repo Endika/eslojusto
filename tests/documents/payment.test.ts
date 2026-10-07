@@ -9,7 +9,7 @@ import { completed, memoryStore, passToken, tr, unfairDismissal } from './fixtur
 
 const NOW = Date.UTC(2026, 9, 7);
 const EXPIRES = NOW / 1000 + 7 * 86400;
-const validPass = passToken({ typ: 'pass', sid: 'cs_test_1', exp: EXPIRES, used: 0 });
+const validPass = passToken({ typ: 'pass', sid: 'cs_test_1', exp: EXPIRES });
 
 function setUp(
   passResults: PassResult[] = [],
@@ -24,8 +24,8 @@ function setUp(
   let kept = 0;
   const api: Api = {
     extract: async () => ({ ok: false, code: 'service_unavailable' }),
-    checkout: async (nonce) => {
-      calls.push(`checkout ${nonce.length}`);
+    checkout: async (nonce, captchaToken) => {
+      calls.push(`checkout ${nonce.length} ${captchaToken}`);
       return { ok: true, sessionId: 'cs_test_1', url: checkoutUrl };
     },
     pass: async (sessionId, nonce) => {
@@ -42,6 +42,7 @@ function setUp(
   const section = document.querySelector('[data-pass-offer]') as HTMLElement;
   const payment = setUpPayment(section, {
     api,
+    captcha: { token: async () => 'checkout-token' },
     passes,
     events,
     browser,
@@ -95,7 +96,7 @@ describe('the pass offer', () => {
     payment.show(completed());
     $<HTMLInputElement>('#pass-waiver').checked = true;
     await click('[data-pass-pay]');
-    expect(calls).toEqual(['checkout 32']);
+    expect(calls).toEqual(['checkout 32 checkout-token']);
     expect(passes.checkout()).toEqual({ nonce: 'H'.repeat(32), sessionId: 'cs_test_1' });
     expect(kept()).toBe(1);
     expect(redirects).toEqual(['https://checkout.stripe.com/c/pay/1']);
@@ -114,13 +115,13 @@ describe('the pass offer', () => {
   it('back from Stripe: asks for the pass, waits out a payment still settling, then offers downloads', async () => {
     const { payment, passes, calls, events } = setUp([
       { ok: false, code: 'payment_not_complete' },
-      { ok: true, pass: validPass, expiresAt: EXPIRES },
+      { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
     ]);
     passes.saveCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
     payment.show(completed());
     expect(await payment.returned('cs_test_1')).toBe(true);
     expect(calls).toEqual(['pass cs_test_1 32', 'pass cs_test_1 32']);
-    expect(passes.pass()).toEqual({ token: validPass, expiresAt: EXPIRES });
+    expect(passes.pass()).toEqual({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
     expect($('[data-pass-downloads]').hidden).toBe(false);
     expect($('[data-pass-buy]').hidden).toBe(true);
     expect($('[data-pass-validity]').textContent).toBe(
@@ -143,7 +144,7 @@ describe('the pass offer', () => {
 
   it('«¿Ya has pagado?» recovers the pass of the last payment', async () => {
     const { payment, passes, calls, events } = setUp([
-      { ok: true, pass: validPass, expiresAt: EXPIRES },
+      { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
     ]);
     passes.saveCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
     payment.show(completed());
@@ -155,7 +156,7 @@ describe('the pass offer', () => {
 
   it('with a pass, downloads the report and the letter', async () => {
     const { payment, passes, saved, events } = setUp();
-    passes.savePass({ token: validPass, expiresAt: EXPIRES });
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
     payment.show(completed());
     await click('[data-download="report"]');
     await click('[data-download="letter"]');
@@ -168,7 +169,7 @@ describe('the pass offer', () => {
 
   it('with a pass and nothing short, only the report', () => {
     const { payment, passes, section } = setUp();
-    passes.savePass({ token: validPass, expiresAt: EXPIRES });
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
     payment.show(completed(unfairDismissal, { severance: 41000 }));
     expect(section.hidden).toBe(false);
     expect($('[data-download="letter"]').hidden).toBe(true);
@@ -176,8 +177,8 @@ describe('the pass offer', () => {
 
   it('an expired pass downloads nothing and offers the pass again', async () => {
     const { payment, passes, saved } = setUp();
-    const old = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 - 1, used: 0 });
-    passes.savePass({ token: old, expiresAt: NOW / 1000 - 1 });
+    const old = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 - 1 });
+    passes.savePass({ token: old, expiresAt: NOW / 1000 - 1, readsLeft: 15 });
     payment.show(completed());
     expect($('[data-pass-buy]').hidden).toBe(false);
     await click('[data-download="report"]');

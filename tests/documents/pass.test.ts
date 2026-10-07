@@ -11,9 +11,10 @@ import { NONCE } from '../../src/documents/contract';
 import { memoryStore, passToken } from './fixtures';
 
 const NOW = Date.UTC(2026, 9, 7) / 1000;
-const pass = (used: number, exp = NOW + 3600) => ({
-  token: passToken({ typ: 'pass', sid: 'cs_test_a', exp, used }),
+const pass = (readsLeft: number, exp = NOW + 3600) => ({
+  token: passToken({ typ: 'pass', sid: 'cs_test_a', exp }),
   expiresAt: exp,
+  readsLeft,
 });
 
 describe('passClaims', () => {
@@ -21,7 +22,6 @@ describe('passClaims', () => {
     expect(passClaims(pass(3).token)).toEqual({
       sessionId: 'cs_test_a',
       expiresAt: NOW + 3600,
-      used: 3,
     });
   });
   it('refuses anything else', () => {
@@ -35,11 +35,22 @@ describe('passClaims', () => {
 describe('passState', () => {
   const now = NOW * 1000;
   it('valid, used up, expired or none', () => {
-    expect(passState(pass(0), now)).toBe('valid');
-    expect(passState(pass(15), now)).toBe('exhausted');
-    expect(passState(pass(0, NOW - 1), now)).toBe('expired');
+    expect(passState(pass(15), now)).toBe('valid');
+    expect(passState(pass(0), now)).toBe('exhausted');
+    expect(passState(pass(15, NOW - 1), now)).toBe('expired');
     expect(passState(null, now)).toBe('none');
-    expect(passState({ token: 'garbage', expiresAt: NOW + 10 }, now)).toBe('none');
+    expect(passState({ token: 'garbage', expiresAt: NOW + 10, readsLeft: 15 }, now)).toBe('none');
+  });
+  it('records the reads the API reports, and reads an old entry as a full pass', () => {
+    const store = memoryStore();
+    const passes = createPassStore(store);
+    passes.savePass(pass(15));
+    passes.updateReads(4);
+    expect(passes.pass()?.readsLeft).toBe(4);
+    store.set(STORAGE_KEYS.pass, JSON.stringify({ token: 't', expiresAt: NOW }));
+    expect(passes.pass()?.readsLeft).toBe(15);
+    passes.forgetPass();
+    expect(passes.pass()).toBeNull();
   });
   it('a used-up pass still downloads; an expired one does not', () => {
     expect(canDownload('valid')).toBe(true);

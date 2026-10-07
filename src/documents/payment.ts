@@ -5,7 +5,7 @@ import type { Translate } from '../i18n/client';
 import { SESSION_ID, type Api, type ErrorCode } from './contract';
 import { CHECKOUT_ORIGIN } from './config';
 import { canDownload, newNonce, passState, type PassStore } from './pass';
-import type { Browser, DocumentEvents, Download, PdfMaker } from './ports';
+import type { Browser, Captcha, DocumentEvents, Download, PdfMaker } from './ports';
 
 // The pass is offered only when the review finds money missing: an item below its minimum or a
 // deduction above its maximum.
@@ -14,6 +14,8 @@ export const hasShortfall = (r: Review): boolean =>
 
 export interface PaymentDeps {
   readonly api: Api;
+  // A Turnstile widget with the action «checkout».
+  readonly captcha: Captcha;
   readonly passes: PassStore;
   readonly events: DocumentEvents;
   readonly browser: Browser;
@@ -98,9 +100,14 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       status.textContent = '';
       events.passFailed(result.code);
       setError(result.code);
+      if (result.code === 'pass_revoked') passes.forgetPass();
       return result.code;
     }
-    passes.savePass({ token: result.pass, expiresAt: result.expiresAt });
+    passes.savePass({
+      token: result.pass,
+      expiresAt: result.expiresAt,
+      readsLeft: result.readsLeft,
+    });
     passes.saveCheckout({ nonce: checkout.nonce, sessionId });
     events.passIssued(via);
     status.textContent = tr('client.documents.pass.issued');
@@ -120,8 +127,17 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     const nonce = newNonce((n) => browser.randomBytes(n));
     passes.saveCheckout({ nonce, sessionId: null });
     events.checkoutStarted();
+    status.textContent = tr('client.documents.status.captcha');
+    let captchaToken: string;
+    try {
+      captchaToken = await deps.captcha.token();
+    } catch {
+      status.textContent = '';
+      setError('captcha_unavailable');
+      return;
+    }
     status.textContent = tr('client.documents.pass.redirecting');
-    const result = await api.checkout(nonce);
+    const result = await api.checkout(nonce, captchaToken);
     if (!result.ok || !result.url.startsWith(`${CHECKOUT_ORIGIN}/`)) {
       status.textContent = '';
       setError(result.ok ? 'checkout_unavailable' : result.code);
