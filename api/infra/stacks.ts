@@ -68,6 +68,9 @@ const TSCONFIG = fileURLToPath(new URL('../tsconfig.json', import.meta.url));
 
 export interface ApiStackProps extends StackProps {
   readonly stripePriceId: string;
+  // Off only while the account's concurrency quota is too low to reserve anything; the
+  // account-wide limit then caps every function instead.
+  readonly reserveConcurrency?: boolean;
 }
 
 // Everything regional, in eu-south-2. No IAM: the roles live in the global stack, so the CI
@@ -94,7 +97,8 @@ export class ApiStack extends Stack {
         timeout: settings.timeout,
         role: iam.Role.fromRoleName(this, `${key}Role`, ROLE_NAMES[key], { mutable: false }),
         logGroup,
-        reservedConcurrentExecutions: settings.reserved,
+        reservedConcurrentExecutions:
+          props.reserveConcurrency === false ? undefined : settings.reserved,
         environment: key === 'extract' ? {} : { [STRIPE_PRICE_ENV]: props.stripePriceId },
         bundling: {
           format: OutputFormat.ESM,
@@ -330,11 +334,13 @@ export interface AppConfig {
   readonly stripePriceId: string;
   // Only for the hand-run deployment of the global stack; CI deploys never see it.
   readonly alertEmail?: string;
+  readonly reserveConcurrency?: boolean;
 }
 
 export function buildApp(config: AppConfig, app = new App()) {
   const api = new ApiStack(app, 'EslojustoApi', {
     stripePriceId: config.stripePriceId,
+    ...(config.reserveConcurrency === false && { reserveConcurrency: false }),
     analyticsReporting: false,
   });
   const global =

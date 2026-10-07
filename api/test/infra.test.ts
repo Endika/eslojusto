@@ -74,6 +74,16 @@ describe('regional stack', () => {
       });
   });
 
+  it('reserves nothing when told the account quota is too low', () => {
+    const unreserved = Template.fromStack(
+      buildApp({ stripePriceId: 'price_test', reserveConcurrency: false }, new App()).api,
+    );
+    unreserved.resourceCountIs('AWS::Lambda::Function', 3);
+    unreserved.allResourcesProperties('AWS::Lambda::Function', {
+      ReservedConcurrentExecutions: Match.absent(),
+    });
+  });
+
   it('opens each function URL to the site only, for POST', () => {
     apiTemplate.resourceCountIs('AWS::Lambda::Url', 3);
     apiTemplate.allResourcesProperties('AWS::Lambda::Url', {
