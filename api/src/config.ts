@@ -39,7 +39,8 @@ export const EU_PROFILE_DESTINATIONS = [
 export const foundationModelId = (profileId: string): string => profileId.replace(/^eu\./, '');
 
 export const PARAMETER_NAMES = {
-  stripeSecretKey: '/eslojusto/api/stripe-secret-key',
+  // A restricted key: Checkout Sessions write, PaymentIntents and Charges read.
+  stripeRestrictedKey: '/eslojusto/api/stripe-restricted-key',
   tokenKey: '/eslojusto/api/token-hmac-key',
   turnstileSecretKey: '/eslojusto/api/turnstile-secret-key',
 } as const;
