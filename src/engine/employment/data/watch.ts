@@ -24,6 +24,8 @@ export const ARTICLE_WATCH: ArticleWatch = {
     et('a31', '2015-11-13', ET_ID),
     et('a21', '2015-11-13', ET_ID),
     et('a26', '2015-11-13', ET_ID),
+    et('a16', '2022-03-30', 'BOE-A-2021-21788'),
+    et('a8', '2020-06-27', 'BOE-A-2020-6838'),
     {
       norm: 'rd723_2026',
       block: 'a3',
