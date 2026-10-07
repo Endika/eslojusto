@@ -2,7 +2,7 @@ import { calendarDays, compareDates, daysInYear, max, min, toIso, type CivilDate
 import type { Figure } from '../calculation';
 import type { NormSource } from '../law/sources';
 import { exact, round2 } from '../money';
-import { annualSalary } from '../settlement';
+import { annualSalary, DEFAULT_WORK_WEEK, minimumHolidays } from '../settlement';
 import { phrase, type EmploymentPhrase } from './calculation';
 import type { EmploymentNormId, NormTable } from './norms';
 import { assessAcross } from './readings';
@@ -79,6 +79,12 @@ const MONTHS_IN_YEAR = 12;
 // stated with the result.
 const DAYS_FOR_DAY_RATE = 365;
 const WEEKS_FOR_HOUR_RATE = 52;
+// Art. 37.2 ET: at most fourteen paid public holidays a year.
+const PUBLIC_HOLIDAYS = 14;
+// Yearly effective hours leave out paid rest: thirty calendar days of holidays (art. 38.1 ET), as
+// working days of a five-day week, and the public holidays. Used only as a labelled reading.
+const PAID_REST_WORKING_DAYS = minimumHolidays('working') + PUBLIC_HOLIDAYS;
+const WORKING_DAYS_IN_YEAR = WEEKS_FOR_HOUR_RATE * DEFAULT_WORK_WEEK;
 
 export interface MinimumWageDeps {
   readonly norms: NormTable;
@@ -86,6 +92,16 @@ export interface MinimumWageDeps {
 }
 
 type ComplementWorld = ReadingCode<'complement_kind'>;
+type HoursWorld = ReadingCode<'paid_hours'>;
+
+// One answer to each doubt about the pay.
+export interface PayWorld {
+  readonly complement: ComplementWorld;
+  readonly hours: HoursWorld;
+}
+
+// The reading most favourable to the pay: a shortfall in it holds in every reading.
+const FAVOURABLE: PayWorld = { complement: 'complement_fixed', hours: 'with_paid_rest' };
 
 // Base pay and fixed complements always count. Whether a complement marked variable or unknown can
 // be compared with the minimum wage is not settled in the law itself, so it opens two readings.
@@ -97,15 +113,36 @@ const COUNTED: Readonly<Record<ComplementWorld, ReadonlySet<SalaryComponentKind>
 const euros = (n: number): Figure => ({ euros: round2(n) });
 const integer = (n: number): Figure => ({ integer: n });
 
-// Money per salary period that counts in one world; a breakdown, when given, replaces the total.
+// What a breakdown leaves of the total unexplained.
+const breakdownGap = (salary: Salary): number =>
+  salary.breakdown.length === 0
+    ? 0
+    : Math.max(0, round2(salary.amount - salary.breakdown.reduce((t, c) => t + c.amount, 0)));
+
+// Money per salary period that counts in one world. A breakdown, when given, replaces the total,
+// and the part of the total it leaves unexplained is a complement of unknown kind.
 function periodPay(salary: Salary, world: ComplementWorld): { counted: number; excluded: number } {
   if (salary.breakdown.length === 0) return { counted: salary.amount, excluded: 0 };
+  const components = [
+    ...salary.breakdown,
+    { kind: 'unknown' as const, amount: breakdownGap(salary) },
+  ];
   const sum = (counted: boolean) =>
-    salary.breakdown
+    components
       .filter((c) => COUNTED[world].has(c.kind) === counted)
       .reduce((total, c) => total + c.amount, 0);
   return { counted: sum(true), excluded: sum(false) };
 }
+
+const complementInDoubt = (salary: Salary): boolean =>
+  breakdownGap(salary) > 0 ||
+  salary.breakdown.some((c) => !COUNTED.complement_variable.has(c.kind));
+
+// An hour rate with only yearly hours: those may be effective hours, without the paid rest.
+const hoursInDoubt = (input: EmploymentInput): boolean =>
+  input.salary.period === 'hour' &&
+  input.contractHours.weekly === null &&
+  input.contractHours.annual !== null;
 
 const extraPaysOf = (salary: Salary): number => Math.max(0, salary.payments - MONTHS_IN_YEAR);
 
@@ -117,7 +154,7 @@ interface AnnualPay {
 }
 
 // The contract's money carried to a year; null for an hour rate without its hours.
-function annualPay(input: EmploymentInput, rate: number): AnnualPay | null {
+function annualPay(input: EmploymentInput, rate: number, hoursWorld: HoursWorld): AnnualPay | null {
   const { salary } = input;
   const extraPays = extraPaysOf(salary);
   const extraPaysUnknown = !salary.prorated && extraPays > 0;
@@ -156,7 +193,19 @@ function annualPay(input: EmploymentInput, rate: number): AnnualPay | null {
     }
     case 'hour': {
       const { annual: hours, weekly } = input.contractHours;
-      if (hours !== null) {
+      // A week is carried over 52 weeks, as the decree's full-time year is.
+      if (weekly !== null) {
+        const annual = rate * weekly * WEEKS_FOR_HOUR_RATE;
+        const how = phrase('minimum_wage.pay.hour_weekly', {
+          hourly: euros(rate),
+          weekly,
+          weeks: integer(WEEKS_FOR_HOUR_RATE),
+          annual: euros(annual),
+        });
+        return { annual, extraPaysUnknown, how };
+      }
+      if (hours === null) return null;
+      if (hoursWorld === 'effective_hours') {
         const annual = rate * hours;
         const how = phrase('minimum_wage.pay.hour', {
           hourly: euros(rate),
@@ -165,12 +214,15 @@ function annualPay(input: EmploymentInput, rate: number): AnnualPay | null {
         });
         return { annual, extraPaysUnknown, how };
       }
-      if (weekly === null) return null;
-      const annual = rate * weekly * WEEKS_FOR_HOUR_RATE;
-      const how = phrase('minimum_wage.pay.hour_weekly', {
+      const paidHours = round2(
+        (hours * WORKING_DAYS_IN_YEAR) / (WORKING_DAYS_IN_YEAR - PAID_REST_WORKING_DAYS),
+      );
+      const annual = rate * paidHours;
+      const how = phrase('minimum_wage.pay.hour_with_paid_rest', {
         hourly: euros(rate),
-        weekly,
-        weeks: integer(WEEKS_FOR_HOUR_RATE),
+        hours,
+        restDays: { days: PAID_REST_WORKING_DAYS },
+        paidHours,
         annual: euros(annual),
       });
       return { annual, extraPaysUnknown, how };
@@ -277,10 +329,10 @@ export function compareByYear(
   input: EmploymentInput,
   today: CivilDate,
   table: MinimumWageTable,
-  world: ComplementWorld = 'complement_fixed',
+  world: PayWorld = FAVOURABLE,
 ): readonly YearComparison[] {
-  const rate = periodPay(input.salary, world).counted;
-  const pay = annualPay(input, rate);
+  const rate = periodPay(input.salary, world.complement).counted;
+  const pay = annualPay(input, rate, world.hours);
   const coefficient = partTimeCoefficient(input);
   const short = isShortTemporary(input);
   const until = short ? (input.endDate ?? today) : min(input.endDate ?? today, today);
@@ -302,7 +354,8 @@ export function compareByYear(
     const days = daysInside(year, input.startDate, until);
     const verdict = verdictOf(input, shortfall, {
       hoursKnown: coefficient !== null && (short || pay !== null),
-      extraPaysUnknown: !short && (pay?.extraPaysUnknown ?? false),
+      // Art. 4.1: the floor per working day already holds the share of the extra payments.
+      extraPaysUnknown: pay?.extraPaysUnknown ?? false,
       effectsVerified: row.retroactiveVerified || toIso(input.startDate) >= row.publishedOn,
     });
     const accrued =
@@ -325,7 +378,16 @@ export function compareByYear(
   return years;
 }
 
-export type PayslipVerdict = ComparisonVerdict | 'not_compared' | 'not_published' | 'not_loaded';
+export type PayslipVerdict =
+  | ComparisonVerdict
+  // Extra payments paid apart: arts. 3.1 and 3.2 of each decree compare the year, so the month is
+  // only a guide.
+  | 'annual_decides'
+  // Some extra payments are prorated into the month, but not how many.
+  | 'prorated_count_unknown'
+  | 'not_compared'
+  | 'not_published'
+  | 'not_loaded';
 
 export interface PayslipComparison {
   // 'YYYY-MM'
@@ -346,13 +408,23 @@ const yearAndMonth = (month: string): { year: number; month: number } => ({
   month: Number(month.slice(5, 7)),
 });
 
+// How many extra payments the contract spreads over the months; null when it does not say.
+function proratedExtraCount(input: EmploymentInput): number | null {
+  if (input.extraPays?.prorated === true) return input.extraPays.count;
+  if (!input.salary.prorated) return null;
+  const count = input.extraPays?.count ?? extraPaysOf(input.salary);
+  return count > 0 ? count : null;
+}
+
 // Each payslip of a whole month without incidents against that month's minimum: the monthly
-// amount with fourteen payments, or the yearly one over twelve with the extra payments prorated.
+// amount plus a twelfth of it for each extra payment prorated into the month, up to the two the
+// yearly minimum holds.
 export function comparePayslips(
   input: EmploymentInput,
   table: MinimumWageTable,
 ): readonly PayslipComparison[] {
   const coefficient = partTimeCoefficient(input);
+  const proratedCount = proratedExtraCount(input);
   const sorted = [...input.payslips].sort((a, b) => a.month.localeCompare(b.month));
   return sorted.map((p): PayslipComparison => {
     const prorated = p.proratedExtraPay > 0;
@@ -368,16 +440,30 @@ export function comparePayslips(
       return { month: p.month, verdict: 'not_published', row: lookup.reference, ...unmatched };
     }
     const { row } = lookup;
-    const monthly = prorated ? row.annual / MONTHS_IN_YEAR : row.monthly;
-    const minimum = round2(monthly * (coefficient ?? 1));
+    const factor = coefficient ?? 1;
     const paid = round2(p.salaryInMoney + p.proratedExtraPay);
-    const shortfall = Math.max(0, round2(minimum - paid));
-    const verdict = verdictOf(input, shortfall, {
+    const decreeExtras = Math.round((row.annual - row.monthly * MONTHS_IN_YEAR) / row.monthly);
+    const withExtras = (count: number) =>
+      round2(
+        (row.monthly + (row.monthly * Math.min(count, decreeExtras)) / MONTHS_IN_YEAR) * factor,
+      );
+    const doubts = {
       hoursKnown: coefficient !== null,
       extraPaysUnknown: false,
       effectsVerified: row.retroactiveVerified || `${p.month}-01` >= row.publishedOn,
-    });
-    return { month: p.month, verdict, row, minimum, paid, shortfall, prorated };
+    };
+    const compare = (minimum: number, ifShort: PayslipVerdict | null): PayslipComparison => {
+      const shortfall = Math.max(0, round2(minimum - paid));
+      const certain = verdictOf(input, shortfall, doubts);
+      const verdict = certain === 'below' && ifShort !== null ? ifShort : certain;
+      return { month: p.month, verdict, row, minimum, paid, shortfall, prorated };
+    };
+    if (!prorated) return compare(withExtras(0), 'annual_decides');
+    if (proratedCount !== null) return compare(withExtras(proratedCount), null);
+    // Unknown count: certain below the bare monthly amount, within at all the extras prorated.
+    const lowest = withExtras(0);
+    if (paid < lowest) return compare(lowest, null);
+    return compare(withExtras(decreeExtras), 'prorated_count_unknown');
   });
 }
 
@@ -478,13 +564,14 @@ function contractFinding(
   input: EmploymentInput,
   today: CivilDate,
   deps: MinimumWageDeps,
-  world: ComplementWorld,
+  world: PayWorld,
 ): Finding {
   const { salary } = input;
   const short = isShortTemporary(input);
   const coefficient = partTimeCoefficient(input);
-  const { counted, excluded } = periodPay(salary, world);
-  const pay = annualPay(input, counted);
+  const { counted, excluded } = periodPay(salary, world.complement);
+  const pay = annualPay(input, counted, world.hours);
+  const gap = breakdownGap(salary);
   const years = compareByYear(input, today, deps.minimumWage, world);
   const compared = years.flatMap((y) => (y.kind === 'compared' ? [y] : []));
   const below = compared.filter((y) => y.verdict === 'below');
@@ -498,14 +585,13 @@ function contractFinding(
       : 'smi_annual';
 
   const calculation: EmploymentPhrase[] = [];
-  if (!short) {
-    calculation.push(pay?.how ?? phrase('minimum_wage.pay.hours_unknown'));
-    if (pay?.extraPaysUnknown === true) {
-      calculation.push(
-        phrase('minimum_wage.pay.extra_pays_unknown', { count: integer(extraPaysOf(salary)) }),
-      );
-    }
+  if (!short) calculation.push(pay?.how ?? phrase('minimum_wage.pay.hours_unknown'));
+  if (pay?.extraPaysUnknown === true) {
+    calculation.push(
+      phrase('minimum_wage.pay.extra_pays_unknown', { count: integer(extraPaysOf(salary)) }),
+    );
   }
+  if (gap > 0) calculation.push(phrase('minimum_wage.breakdown_gap', { gap: euros(gap) }));
   if (excluded > 0)
     calculation.push(phrase('minimum_wage.excluded', { excluded: euros(excluded) }));
   if ((salary.inKind ?? 0) > 0) calculation.push(phrase('minimum_wage.in_kind_not_counted'));
@@ -549,18 +635,36 @@ function contractFinding(
 const sameAmount = (a: Finding, b: Finding): boolean =>
   a.amount?.min === b.amount?.min && a.amount?.max === b.amount?.max;
 
-// A complement marked variable or unknown is left out in one reading and counted in the other; the
-// readings show only when they change the result.
+// Each doubt about the pay opens two readings that show only when they change the result; the
+// complement's kind comes first, read with the hours most favourable to the pay.
 function assessContract(input: EmploymentInput, today: CivilDate, deps: MinimumWageDeps): Assessed {
-  const strict = contractFinding(input, today, deps, 'complement_variable');
-  const doubtful = input.salary.breakdown.some((c) => !COUNTED.complement_variable.has(c.kind));
-  if (!doubtful) return { kind: 'single', finding: strict };
-  const counted = contractFinding(input, today, deps, 'complement_fixed');
-  if (strict.status === counted.status && sameAmount(strict, counted)) {
-    return { kind: 'single', finding: strict };
+  const findingIn = (world: Partial<PayWorld>): Finding =>
+    contractFinding(input, today, deps, { ...FAVOURABLE, ...world });
+  if (complementInDoubt(input.salary)) {
+    return readingsOf('complement_kind', 'complement_variable', (complement) =>
+      findingIn({ complement }),
+    );
   }
-  return assessAcross('complement_kind', READINGS.complement_kind, (world) => ({
-    ...(world === 'complement_fixed' ? counted : strict),
+  if (hoursInDoubt(input)) {
+    return readingsOf('paid_hours', 'effective_hours', (hours) => findingIn({ hours }));
+  }
+  return { kind: 'single', finding: findingIn({}) };
+}
+
+function readingsOf<Q extends 'complement_kind' | 'paid_hours'>(
+  question: Q,
+  strictest: ReadingCode<Q>,
+  findingIn: (world: ReadingCode<Q>) => Finding,
+): Assessed {
+  const worlds: readonly ReadingCode<Q>[] = READINGS[question];
+  const strict = findingIn(strictest);
+  const agree = worlds.every((w) => {
+    const f = findingIn(w);
+    return f.status === strict.status && sameAmount(f, strict);
+  });
+  if (agree) return { kind: 'single', finding: strict };
+  return assessAcross(question, worlds, (world) => ({
+    ...findingIn(world),
     basedOnYourAnswer: true,
   }));
 }
@@ -591,10 +695,6 @@ function payslipFinding(input: EmploymentInput, deps: MinimumWageDeps): Finding 
   const below = compared.filter((c) => c.verdict === 'below');
   const total = sumOf(below.map((c) => c.shortfall));
   const calculation = compared.map(payslipPhrase);
-  // With extra payments paid apart, a month alone says little: the yearly comparison decides.
-  if (compared.some((c) => c.minimum !== null && !c.prorated)) {
-    calculation.push(phrase('minimum_wage.payslip.annual_rules'));
-  }
   if (below.length > 1) calculation.push(phrase('minimum_wage.total', { total: euros(total) }));
   const rows = compared.flatMap((c) => (c.row === null ? [] : [c.row]));
   const sources = uniqueSources([
@@ -608,28 +708,41 @@ function payslipFinding(input: EmploymentInput, deps: MinimumWageDeps): Finding 
   });
 }
 
-// Art. 26.1 ET: the share of pay in kind, with no amount.
+// Art. 26.1 ET: the share of pay in kind over a year, with no amount. Pay in kind is reckoned
+// over the twelve months and money over all its payments; a day or hour rate gives no year.
 function inKindFinding(input: EmploymentInput, deps: MinimumWageDeps): Finding | null {
-  const inKind = input.salary.inKind ?? 0;
+  const { salary } = input;
+  const inKind = salary.inKind ?? 0;
   if (inKind <= 0) return null;
-  const money = input.salary.amount;
-  const share = inKind / (inKind + money);
+  const sources = [ruleSource('smi_in_kind_cap', deps.norms)];
+  const pay =
+    salary.period === 'year' || salary.period === 'month'
+      ? annualPay(input, salary.amount, 'with_paid_rest')
+      : null;
+  if (pay === null) {
+    return finding('smi_in_kind_cap', 'review_it', {
+      calculation: [phrase('minimum_wage.in_kind_rate', { inKind: euros(inKind) })],
+      sources,
+    });
+  }
+  const yearlyInKind = salary.period === 'year' ? inKind : inKind * MONTHS_IN_YEAR;
+  const share = yearlyInKind / (yearlyInKind + pay.annual);
   return finding('smi_in_kind_cap', share > IN_KIND_CAP ? 'over_legal_limit' : 'within_limit', {
     calculation: [
       phrase('minimum_wage.in_kind', {
-        inKind: euros(inKind),
-        money: euros(money),
+        inKind: euros(yearlyInKind),
+        money: euros(pay.annual),
         percent: round2(share * 100),
       }),
     ],
-    sources: [ruleSource('smi_in_kind_cap', deps.norms)],
+    sources,
   });
 }
 
 // The agreement's category salary as the person gave it: never a legal verdict, never in the total.
 function agreementFinding(input: EmploymentInput, deps: MinimumWageDeps): Finding | null {
   const category = input.agreement.categoryAnnualSalary;
-  const pay = annualPay(input, input.salary.amount);
+  const pay = annualPay(input, input.salary.amount, FAVOURABLE.hours);
   if (category === null || pay === null) return null;
   const minimum = round2(category * (partTimeCoefficient(input) ?? 1));
   const annual = round2(pay.annual);
