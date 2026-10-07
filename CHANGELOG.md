@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.11.0](https://github.com/Endika/eslojusto/compare/v1.10.0...v1.11.0) (2026-10-07)
+
+
+### Features
+
+* **content:** compose the monthly rent indices from the engine tables ([295a820](https://github.com/Endika/eslojusto/commit/295a820f25fc372148a8645b812797cf475095ac))
+* **engine:** compare contract and payslip pay against the minimum wage of each year ([5687843](https://github.com/Endika/eslojusto/commit/5687843f726d6f892bf4b571a7285d29b6ef5ea6))
+* **engine:** warn when a salary breakdown falls short of the total ([370529e](https://github.com/Endika/eslojusto/commit/370529efd65b68fb0d4c45f13d537889e07a7afd))
+* **rental:** publish the monthly IRAV and CPI page and link it from the home page ([ac46822](https://github.com/Endika/eslojusto/commit/ac4682229bfc3ffbb01e00931c0635cc63cc0668))
+
+
+### Bug Fixes
+
+* **content:** add the CPI cap, large landlords and decree status to the rent caps ([517288c](https://github.com/Endika/eslojusto/commit/517288c2670f2f636f4456b2dfd17507d1b3f019))
+* **content:** scope the rent caps to stressed zones and the 2015 wording ([d23174b](https://github.com/Endika/eslojusto/commit/d23174b6fbf6d71100e707b11c1df49027830e6e))
+* **documents:** take a read mark away by its container, whatever the rows' numbering ([4ce9460](https://github.com/Endika/eslojusto/commit/4ce94608104ca0e0e5e9a3c1c7f4a2d26248829f))
+* **engine:** keep doubtful minimum wage readings from opening the pass ([808f91a](https://github.com/Endika/eslojusto/commit/808f91a7ef138d5595cabd7d0ebc129bfdaa0566))
+* **engine:** never read a payslip with doubtful prorated extras as a sure shortfall ([4658a11](https://github.com/Endika/eslojusto/commit/4658a11c656a6496003a06064455967b1cd09ace))
+
 ## [1.10.0](https://github.com/Endika/eslojusto/compare/v1.9.0...v1.10.0) (2026-10-07)
 
 
