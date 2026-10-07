@@ -16,28 +16,7 @@ import {
 } from '../calculator/render';
 import type { Translate } from '../i18n/client';
 import { letterKind, NO_DETAILS, type LetterDetails } from './letter';
-
-// What a PDF says, block by block, before any layout: the report and the letter are built from
-// the review the person confirmed and the page's dictionary, never from anything else.
-export type Block =
-  | { readonly type: 'title'; readonly text: string }
-  | { readonly type: 'meta'; readonly text: string }
-  | { readonly type: 'heading'; readonly text: string }
-  | { readonly type: 'subheading'; readonly text: string }
-  | { readonly type: 'text'; readonly text: string }
-  | { readonly type: 'note'; readonly text: string }
-  | { readonly type: 'row'; readonly label: string; readonly value: string }
-  | { readonly type: 'bullet'; readonly text: string }
-  | { readonly type: 'source'; readonly text: string; readonly url: string }
-  // A line to write on, with the value already on it when the person gave one.
-  | { readonly type: 'blank'; readonly label: string; readonly value?: string }
-  | { readonly type: 'rule' };
-
-export interface DocumentModel {
-  readonly title: string;
-  readonly footer: string | null;
-  readonly blocks: readonly Block[];
-}
+import type { Block, DocumentModel } from './ports';
 
 // «2026-10-07» → «07-10-2026», as the site writes dates.
 const shortDate = (d: CivilDate) => sourceDate(toIso(d));

@@ -1,7 +1,5 @@
-import type { Calculator } from '../calculator/main';
-import type { FormEntries } from '../calculator/fill';
 import { required } from '../calculator/dom';
-import { formatEuros, formatInteger } from '../calculator/number';
+import { formatInteger } from '../calculator/number';
 import type { Translate } from '../i18n/client';
 import {
   LIMITS,
@@ -19,23 +17,22 @@ import { reasonsOf, skippedLines, skippedPages } from './skipped';
 import type {
   Captcha,
   DocumentEvents,
+  DocumentReading,
   EncodedFile,
   FileEncoder,
   OpenedPdf,
   PdfPages,
   PdfProblem,
+  ReadMark,
+  ReadPrefill,
+  ReviewForm,
 } from './ports';
-import {
-  hasHolidayDays,
-  hasLowConfidence,
-  prefillFrom,
-  prefilledCount,
-  type Prefill,
-} from './prefill';
-import { conflictLines, recognisedLine } from './summary';
+import { recognisedLine } from './summary';
 
-export interface UploadDeps {
-  readonly api: Api;
+export interface UploadDeps<F extends string, L extends string> {
+  readonly api: Api<F, L>;
+  // How the section's form takes what was read.
+  readonly reading: DocumentReading<F, L>;
   readonly captcha: Captcha;
   readonly encoder: FileEncoder;
   // Loads pdf.js the first time a PDF is picked.
@@ -46,7 +43,7 @@ export interface UploadDeps {
   readonly outage: OutageMemory;
   readonly now: () => number;
   readonly tr: Translate;
-  readonly calculator: Pick<Calculator, 'form' | 'fill' | 'open' | 'entries'>;
+  readonly calculator: Pick<ReviewForm, 'form' | 'fill' | 'open' | 'entries'>;
   // The section tabs, hidden while the start sheet is open.
   readonly tabs: HTMLElement | null;
 }
@@ -61,19 +58,6 @@ const sizeText = (bytes: number) =>
   bytes < KIB * KIB
     ? `${formatInteger(Math.max(1, Math.round(bytes / KIB)))} KB`
     : `${(bytes / KIB / KIB).toLocaleString('es-ES', { maximumFractionDigits: 1 })} MB`;
-
-// The prefill as form answers. «Otros trabajos» rows take the place of any typed before.
-export function prefillEntries(p: Prefill): FormEntries {
-  const entries: [string, string][] = p.fields.map((f) => [f.name, f.value]);
-  if (p.otherContracts && p.otherContracts.length > 0) {
-    entries.push(['otherContracts', 'yes']);
-    p.otherContracts.forEach((c, i) => {
-      entries.push([`otherContracts.${i}.startDate`, c.startDate]);
-      entries.push([`otherContracts.${i}.endDate`, c.endDate]);
-    });
-  }
-  return entries;
-}
 
 // «Leído del documento · confianza alta» under a field, also read out with it.
 function addMark(container: HTMLElement, id: string, text: string, confidence: Confidence) {
@@ -102,7 +86,10 @@ function removeMark(mark: Element) {
   mark.remove();
 }
 
-export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
+export function setUpUpload<F extends string, L extends string>(
+  start: HTMLElement,
+  deps: UploadDeps<F, L>,
+) {
   const { api, captcha, encoder, passes, events, outage, tr, calculator } = deps;
   const { form } = calculator;
   const panels = {
@@ -151,8 +138,6 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
   let photos = 0;
   // The photos the last quality warning was about, for «Repetir».
   let flagged: Picked[] = [];
-  // What an uploaded agreement offers as severance, from the last read, until the form restarts.
-  let agreementOffer: number | null = null;
 
   function show(panel: Panel, focus = true) {
     for (const [name, el] of Object.entries(panels)) el.hidden = name !== panel;
@@ -396,25 +381,21 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     fileStatus.textContent = '';
   }
 
-  function markForm(p: Prefill) {
+  function markForm(marks: readonly ReadMark[]) {
     const label = (c: Confidence, derived = false) =>
       tr(derived ? 'client.documents.mark_derived' : 'client.documents.mark', {
         nivel: tr(`client.documents.confidence.${c}`),
       }) + (c === 'low' ? tr('client.documents.mark_low') : '');
-    for (const f of p.fields) {
-      const container = form.querySelector<HTMLElement>(`[data-field="${f.name}"]`);
-      if (container) addMark(container, f.name, label(f.confidence, f.derived), f.confidence);
+    for (const m of marks) {
+      const container = form.querySelector<HTMLElement>(m.container);
+      if (container) addMark(container, m.id, label(m.confidence, m.derived), m.confidence);
     }
-    p.otherContracts?.forEach((c, i) => {
-      const row = form.querySelector<HTMLElement>(`[data-other-contract="${i}"] fieldset`);
-      if (row) addMark(row, `otherContracts.${i}`, label(c.confidence), c.confidence);
-    });
   }
 
   function showDone(
-    p: Prefill,
+    p: ReadPrefill,
     checks: readonly CoherenceCheck[],
-    e: Extraction,
+    e: Extraction<F, L>,
     skipped: readonly string[],
   ) {
     const line = recognisedLine(e.documents, tr);
@@ -422,16 +403,10 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       recognised.hidden = line === '';
       recognised.textContent = line;
     }
-    const n = prefilledCount(p);
+    const n = p.count;
     summary.textContent =
       n === 0 ? tr('client.documents.done_none') : tr('client.documents.done', { n });
-    const lines = [
-      ...skipped,
-      ...conflictLines(e.conflicts, tr),
-      ...(hasLowConfidence(p) ? [tr('client.documents.done_low')] : []),
-      ...(hasHolidayDays(p) ? [tr('client.documents.holiday_unit')] : []),
-      ...checks.map((c) => tr(`client.documents.check.${c}`)),
-    ];
+    const lines = [...skipped, ...p.notes, ...checks.map((c) => tr(`client.documents.check.${c}`))];
     notes.hidden = lines.length === 0;
     notes.replaceChildren(
       ...lines.map((text) => {
@@ -613,20 +588,17 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     if (usePass && result.readsLeft !== null) passes.updateReads(result.readsLeft);
     if (!usePass && result.allowance !== null) passes.saveQuota(result.allowance);
 
-    const current = Object.fromEntries(calculator.entries());
-    const prefill = prefillFrom(result.extraction, {
-      ...(current['startDate'] ? { startDate: current['startDate'] } : {}),
-      ...(current['endDate'] ? { endDate: current['endDate'] } : {}),
-    });
-    calculator.fill(prefillEntries(prefill));
-    markForm(prefill);
-    const offer = result.extraction.fields.agreementSeveranceTotal;
-    agreementOffer = offer && typeof offer.value === 'number' ? offer.value : null;
+    const prefill = deps.reading.prefill(
+      result.extraction,
+      Object.fromEntries(calculator.entries()),
+    );
+    calculator.fill(prefill.entries);
+    markForm(prefill.marks);
     const skipped = skippedPages(result.extraction.pages, pages.length, false);
     events.extractionCompleted({
       kinds: [...new Set(result.extraction.documents.map((d) => d.kind))],
-      fields: prefilledCount(prefill),
-      lowConfidence: hasLowConfidence(prefill),
+      fields: prefill.count,
+      lowConfidence: prefill.lowConfidence,
       failedChecks: result.failedChecks.length > 0,
       conflicts: result.extraction.conflicts.length > 0,
       escalated: result.escalated,
@@ -736,36 +708,20 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
   const unmark = (e: Event) => {
     const input = e.target instanceof HTMLInputElement ? e.target : null;
     if (!input) return;
-    const container = input.closest('[data-field], [data-other-contract] fieldset');
-    for (const mark of container?.querySelectorAll(':scope > [data-read-mark]') ?? [])
-      removeMark(mark);
+    const describedBy = (input.getAttribute('aria-describedby') ?? '').split(' ');
+    for (const mark of form.querySelectorAll('[data-read-mark]'))
+      if (describedBy.includes(mark.id)) removeMark(mark);
   };
   form.addEventListener('input', unmark);
   form.addEventListener('change', unmark);
   form.addEventListener('reset', () => {
     for (const mark of form.querySelectorAll('[data-read-mark]')) removeMark(mark);
-    agreementOffer = null;
   });
 
   const startStatus = panels.choose.querySelector<HTMLElement>('[data-start-status]');
 
   return {
     showCalculator,
-    // Beside the severance of a result: what the uploaded agreement offers, as a figure only.
-    showAgreementOffer(result: ParentNode) {
-      const sheet = result.querySelector('[data-item="severance"]');
-      sheet?.querySelector('[data-agreement-offer]')?.remove();
-      if (!sheet || agreementOffer === null) return;
-      const note = document.createElement('p');
-      note.className = 'item__note';
-      note.dataset['agreementOffer'] = '';
-      note.textContent = tr('client.documents.agreement_offer', {
-        importe: formatEuros(agreementOffer),
-      });
-      const reference = sheet.querySelector('[data-reference]');
-      if (reference) reference.after(note);
-      else sheet.append(note);
-    },
     // A message on the start sheet, such as the outcome of a payment with no review to show.
     notice(text: string) {
       if (startStatus) startStatus.textContent = text;
