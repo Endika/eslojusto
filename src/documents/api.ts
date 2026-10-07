@@ -2,21 +2,29 @@ import {
   API_ERROR_CODES,
   COHERENCE_CHECKS,
   CONFIDENCES,
-  DOCUMENT_KINDS,
-  EXTRACTION_SHAPE,
+  EXTRACTED_FIELDS,
+  PAGE_KINDS,
   type Api,
   type CoherenceCheck,
+  type Conflict,
   type ErrorCode,
-  type ExtractedField,
+  type ExtractedFieldName,
   type ExtractedRow,
   type Extraction,
   type Failure,
+  type RecognisedDocument,
+  type SourceKind,
+  type SourcedField,
 } from './contract';
 import type { Operation } from './config';
 
 const CHECKS_SET: ReadonlySet<unknown> = new Set(COHERENCE_CHECKS);
 
 export type Fetch = (url: string, init: RequestInit) => Promise<Response>;
+
+// Longer than the extract function's 180 s by a minute for the upload, so the browser never
+// gives up on a read the API is still able to answer.
+export const API_TIMEOUT_MS = 240_000;
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -27,9 +35,15 @@ const isScalar = (v: unknown): v is string | number | boolean =>
 const isConfidence = (v: unknown) =>
   typeof v === 'string' && (CONFIDENCES as readonly string[]).includes(v);
 
-function parseField(v: unknown): ExtractedField | null {
+const isPageKind = (v: unknown): v is RecognisedDocument['kind'] =>
+  typeof v === 'string' && (PAGE_KINDS as readonly string[]).includes(v);
+const isSource = (v: unknown): v is SourceKind => isPageKind(v) && v !== 'other';
+const isFieldName = (v: unknown): v is ExtractedFieldName =>
+  typeof v === 'string' && (EXTRACTED_FIELDS as readonly string[]).includes(v);
+
+function parseField(v: unknown): SourcedField | null {
   if (!isRecord(v) || !isScalar(v['value']) || !isConfidence(v['confidence'])) return null;
-  return v as unknown as ExtractedField;
+  return isSource(v['source']) ? (v as unknown as SourcedField) : null;
 }
 
 function parseRow(v: unknown): ExtractedRow | null {
@@ -37,22 +51,42 @@ function parseRow(v: unknown): ExtractedRow | null {
   return Object.values(v['values']).every(isScalar) ? (v as unknown as ExtractedRow) : null;
 }
 
+function parseDocument(v: unknown): RecognisedDocument | null {
+  if (!isRecord(v) || !isPageKind(v['kind']) || !Array.isArray(v['pages'])) return null;
+  const pages = v['pages'].length;
+  if (pages === 0) return null;
+  const month = v['month'];
+  return {
+    kind: v['kind'],
+    pages,
+    ...(typeof month === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(month) && { month }),
+  };
+}
+
+function parseConflict(v: unknown): Conflict | null {
+  if (!isRecord(v) || !isFieldName(v['field']) || !Array.isArray(v['sources'])) return null;
+  const sources = v['sources'].filter(isSource);
+  return sources.length > 0 ? { field: v['field'], sources } : null;
+}
+
+const present = <T>(v: T | null): v is T => v !== null;
+const list = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
+
 // Keeps what has the contract's shape; anything else in the answer is left out, never guessed at.
 export function parseExtraction(v: unknown): Extraction | null {
-  if (!isRecord(v) || !(DOCUMENT_KINDS as readonly unknown[]).includes(v['kind'])) return null;
-  const fields: Record<string, ExtractedField> = {};
-  const lists: Record<string, ExtractedRow[]> = {};
-  const shape = EXTRACTION_SHAPE[v['kind'] as Extraction['kind']];
-  const known = (names: readonly string[], name: string) => names.includes(name);
-  for (const [name, raw] of Object.entries(isRecord(v['fields']) ? v['fields'] : {})) {
+  if (!isRecord(v) || !isRecord(v['fields'])) return null;
+  const fields: Partial<Record<ExtractedFieldName, SourcedField>> = {};
+  for (const [name, raw] of Object.entries(v['fields'])) {
     const field = parseField(raw);
-    if (field && known(shape.fields, name)) fields[name] = field;
+    if (field && isFieldName(name)) fields[name] = field;
   }
-  for (const [name, raw] of Object.entries(isRecord(v['lists']) ? v['lists'] : {})) {
-    if (!Array.isArray(raw) || !known(shape.lists, name)) continue;
-    lists[name] = raw.map(parseRow).filter((r): r is ExtractedRow => r !== null);
-  }
-  return { kind: v['kind'] as Extraction['kind'], fields, lists };
+  const lists = isRecord(v['lists']) ? v['lists'] : {};
+  return {
+    documents: list(v['documents']).map(parseDocument).filter(present),
+    fields,
+    contracts: list(lists['contracts']).map(parseRow).filter(present),
+    conflicts: list(v['conflicts']).map(parseConflict).filter(present),
+  };
 }
 
 const fail = (code: ErrorCode): Failure => ({ ok: false, code });
@@ -67,7 +101,7 @@ const isCount = (v: unknown): v is number => Number.isInteger(v) && (v as number
 export function createApi(
   endpoints: Readonly<Record<Operation, string>>,
   fetchFn: Fetch,
-  timeoutMs = 120_000,
+  timeoutMs = API_TIMEOUT_MS,
 ): Api {
   async function post(op: Operation, body: object): Promise<Record<string, unknown> | Failure> {
     let response: Response;
@@ -106,9 +140,8 @@ export function createApi(
   const failed = (r: Record<string, unknown> | Failure): r is Failure => r['ok'] === false;
 
   return {
-    async extract({ kind, files, captchaToken, pass, quota }) {
+    async extract({ files, captchaToken, pass, quota }) {
       const r = await post('extract', {
-        kind,
         files,
         captchaToken,
         ...(pass === undefined ? { quota: quota ?? null } : { pass }),

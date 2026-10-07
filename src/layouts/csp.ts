@@ -21,9 +21,12 @@ export const contentSecurityPolicy = ({
     `script-src 'self' ${themeHash}${documents ? ` ${TURNSTILE_ORIGIN}` : ''}`,
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
-    "img-src 'self' data:",
+    // The thumbnails of the files chosen to read are blob: URLs.
+    `img-src 'self' data:${documents ? ' blob:' : ''}`,
     `connect-src ${connect.length > 0 ? connect.join(' ') : "'none'"}`,
     ...(documents ? [`frame-src ${TURNSTILE_ORIGIN}`] : []),
+    // pdf.js draws a PDF's pages in a worker served from this site.
+    ...(documents ? ["worker-src 'self'"] : []),
     "form-action 'none'",
     "base-uri 'self'",
   ].join('; ');

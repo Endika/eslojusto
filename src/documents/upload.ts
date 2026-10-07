@@ -1,27 +1,41 @@
 import type { Calculator } from '../calculator/main';
 import type { FormEntries } from '../calculator/fill';
 import { required } from '../calculator/dom';
-import { formatInteger } from '../calculator/number';
+import { formatEuros, formatInteger } from '../calculator/number';
 import type { Translate } from '../i18n/client';
 import {
   LIMITS,
   type Api,
   type CoherenceCheck,
   type Confidence,
-  type DocumentKind,
   type ErrorCode,
+  type Extraction,
 } from './contract';
-import { checkSelection, mediaOf, requestBytes } from './files';
+import { admit, checkSelection, filesBucket, photoShare, requestBytes } from './files';
+import type { OutageMemory } from './outage';
 import { passClaims, passState, type PassStore, type StoredPass } from './pass';
-import type { Captcha, DocumentEvents, EncodedFile, FileEncoder } from './ports';
+import type {
+  Captcha,
+  DocumentEvents,
+  EncodedFile,
+  FileEncoder,
+  OpenedPdf,
+  PdfPages,
+  PdfProblem,
+} from './ports';
 import { hasLowConfidence, prefillFrom, prefilledCount, type Prefill } from './prefill';
+import { conflictLines, recognisedLine } from './summary';
 
 export interface UploadDeps {
   readonly api: Api;
   readonly captcha: Captcha;
   readonly encoder: FileEncoder;
+  // Loads pdf.js the first time a PDF is picked.
+  readonly pdfs: PdfPages;
   readonly passes: PassStore;
   readonly events: DocumentEvents;
+  // Remembers, for an hour, that reading answered `model_unavailable`.
+  readonly outage: OutageMemory;
   readonly now: () => number;
   readonly tr: Translate;
   readonly calculator: Pick<Calculator, 'form' | 'fill' | 'open' | 'entries'>;
@@ -30,7 +44,7 @@ export interface UploadDeps {
 }
 
 type Panel = 'choose' | 'upload' | 'done';
-type LocalError = 'kind_missing' | 'consent_missing';
+type LocalError = 'consent_missing';
 
 const KIB = 1024;
 const sizeText = (bytes: number) =>
@@ -79,7 +93,7 @@ function removeMark(mark: Element) {
 }
 
 export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
-  const { api, captcha, encoder, passes, events, tr, calculator } = deps;
+  const { api, captcha, encoder, passes, events, outage, tr, calculator } = deps;
   const { form } = calculator;
   const panels = {
     choose: required(start.querySelector<HTMLElement>('[data-start-panel="choose"]'), 'choose'),
@@ -88,17 +102,50 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
   };
   const upload = panels.upload;
   const fileInput = required(upload.querySelector<HTMLInputElement>('#document-files'), 'files');
+  const cameraInput = upload.querySelector<HTMLInputElement>('#document-camera');
   const fileList = required(upload.querySelector<HTMLElement>('[data-doc-files]'), 'file list');
+  const fileStatus = required(
+    upload.querySelector<HTMLElement>('[data-doc-files-status]'),
+    'file status',
+  );
   const consent = required(upload.querySelector<HTMLInputElement>('#document-consent'), 'consent');
   const status = required(upload.querySelector<HTMLElement>('[data-doc-status]'), 'status');
   const errorSlip = required(upload.querySelector<HTMLElement>('[data-doc-error]'), 'error');
+  const recognised = panels.done.querySelector<HTMLElement>('[data-done-documents]');
   const summary = required(panels.done.querySelector<HTMLElement>('[data-done-summary]'), 'sum');
   const notes = required(panels.done.querySelector<HTMLElement>('[data-done-notes]'), 'notes');
+  const uploadChoice = panels.choose.querySelector<HTMLElement>('[data-start-upload]');
+  const unavailableNote = panels.choose.querySelector<HTMLElement>('[data-start-unavailable]');
   let busy = false;
+  // While files are opened, drawn and encoded, nothing has left the page yet: «Rellenar a mano»
+  // stays usable and abandons the work, whose late results are then dropped.
+  let preparing = false;
+  let generation = 0;
+
+  // The pages chosen so far, in the order they were added: each pick, drop or photo adds to them,
+  // and a PDF adds one entry per page.
+  interface Picked {
+    readonly file: File;
+    readonly name: string;
+    readonly thumbnail: string | null;
+    readonly pdf?: { readonly opened: OpenedPdf; readonly page: number };
+  }
+  let picked: Picked[] = [];
+  const encodedPages = new Map<Picked, EncodedFile>();
+  let photos = 0;
+  // What an uploaded agreement offers as severance, from the last read, until the form restarts.
+  let agreementOffer: number | null = null;
 
   function show(panel: Panel, focus = true) {
     for (const [name, el] of Object.entries(panels)) el.hidden = name !== panel;
     if (focus) panels[panel].querySelector<HTMLElement>('.question')?.focus();
+  }
+
+  // While reading is known to be down, the start sheet offers only the manual path.
+  function applyOutage() {
+    const down = outage.active();
+    if (uploadChoice) uploadChoice.hidden = down;
+    if (unavailableNote) unavailableNote.hidden = !down;
   }
 
   // Leaves the start sheet for the calculator; `open` starts it at its first sheet.
@@ -109,7 +156,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     if (open) calculator.open();
   }
 
-  function fieldError(field: 'kind' | 'files' | 'consent', code: ErrorCode | LocalError | null) {
+  function fieldError(field: 'files' | 'consent', code: ErrorCode | LocalError | null) {
     const slip = upload.querySelector<HTMLElement>(`[data-doc-error-for="${field}"]`);
     if (!slip) return;
     slip.hidden = code === null;
@@ -125,29 +172,186 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     errorSlip.textContent = code === null ? '' : tr(`client.documents.error.${code}`);
   }
 
-  function setBusy(on: boolean, message: string) {
+  function setBusy(on: boolean, message: string, preparation = false) {
     busy = on;
+    preparing = on && preparation;
     status.textContent = message;
-    // While a read is on its way, leaving for the form would let a late answer overwrite it.
+    // While a read is on its way, leaving for the form would let a late answer overwrite it, and
+    // changing the files would make the answer about other ones.
     for (const button of upload.querySelectorAll(
-      '[data-start-send], [data-start-manual], [data-start-back]',
+      '[data-start-send], [data-start-back], [data-doc-remove]',
     ))
       button.setAttribute('aria-disabled', String(on));
+    for (const button of upload.querySelectorAll('[data-start-manual]'))
+      button.setAttribute('aria-disabled', String(on && !preparing));
+    for (const input of [fileInput, cameraInput]) if (input) input.disabled = on;
     upload.setAttribute('aria-busy', String(on));
   }
 
-  function listFiles() {
-    const files = [...(fileInput.files ?? [])];
-    fileList.hidden = files.length === 0;
-    fileList.replaceChildren(
-      ...files.map((f) => {
-        const li = document.createElement('li');
-        li.textContent = tr('client.documents.file', { nombre: f.name, tamano: sizeText(f.size) });
-        return li;
-      }),
-    );
+  function fileItem(p: Picked, index: number): HTMLLIElement {
+    const li = document.createElement('li');
+    li.className = 'start__file';
+    if (p.thumbnail) {
+      const img = document.createElement('img');
+      img.className = 'start__thumb';
+      img.alt = '';
+      img.src = p.thumbnail;
+      // A photo the browser can't show (HEIC in most) keeps an empty square.
+      img.addEventListener('error', () => img.replaceWith(placeholder()), { once: true });
+      li.append(img);
+    } else li.append(placeholder(p.pdf ? 'PDF' : ''));
+    const text = document.createElement('span');
+    const name = document.createElement('span');
+    name.className = 'start__file-name';
+    name.textContent = p.name;
+    const size = document.createElement('span');
+    size.className = 'start__file-size';
+    size.textContent = p.pdf
+      ? tr('client.documents.pdf_page_detail', { n: p.pdf.page, total: p.pdf.opened.pages })
+      : sizeText(p.file.size);
+    text.append(name, size);
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'button start__remove';
+    remove.dataset['docRemove'] = String(index);
+    remove.textContent = tr('client.documents.remove');
+    remove.setAttribute('aria-label', tr('client.documents.remove_label', { nombre: p.name }));
+    li.append(text, remove);
+    return li;
+  }
+
+  function placeholder(label = ''): HTMLElement {
+    const span = document.createElement('span');
+    span.className = 'start__thumb';
+    span.setAttribute('aria-hidden', 'true');
+    span.textContent = label;
+    return span;
+  }
+
+  function renderFiles() {
+    fileList.hidden = picked.length === 0;
+    fileList.replaceChildren(...picked.map(fileItem));
+  }
+
+  const count = () => ({ n: picked.length });
+
+  // Opens each PDF and adds its pages while places are left, saying which pages fit.
+  async function addPdfs(
+    files: readonly File[],
+    said: string[],
+    started: number,
+  ): Promise<ErrorCode | null> {
+    let problem: ErrorCode | null = null;
+    for (const file of files) {
+      const free = LIMITS.maxImages - picked.length;
+      let opened: OpenedPdf | PdfProblem;
+      try {
+        opened = await deps.pdfs.open(file);
+      } catch {
+        opened = 'pdf_unreadable';
+      }
+      // Abandoned for the manual path: what arrives late is let go.
+      if (started !== generation) {
+        if (typeof opened !== 'string') opened.close();
+        return null;
+      }
+      if (typeof opened === 'string') {
+        problem ??= opened;
+        continue;
+      }
+      const fit = Math.min(opened.pages, free);
+      if (fit === 0) opened.close();
+      for (let page = 1; page <= fit; page += 1)
+        picked.push({
+          file,
+          name: tr('client.documents.pdf_page', { nombre: file.name, n: page }),
+          thumbnail: null,
+          pdf: { opened, page },
+        });
+      said.push(
+        fit < opened.pages
+          ? tr('client.documents.pdf_pages_fit', { nombre: file.name, k: fit, total: opened.pages })
+          : tr('client.documents.pdf_added', { nombre: file.name, total: opened.pages }),
+      );
+      if (fit < opened.pages) problem ??= 'too_many_files';
+    }
+    return problem;
+  }
+
+  async function addFiles(files: readonly File[], fromCamera = false) {
+    if (busy || files.length === 0) return;
+    setError(null);
+    const {
+      photos: images,
+      pdfs,
+      refused,
+      problem,
+      duplicates,
+    } = admit([...new Set(picked.map((p) => p.file))], LIMITS.maxImages - picked.length, files);
+    const names = new Map<File, string>();
+    for (const file of images) {
+      const name = fromCamera ? tr('client.documents.photo', { n: (photos += 1) }) : file.name;
+      names.set(file, name);
+      const thumbnail =
+        typeof URL.createObjectURL === 'function' ? URL.createObjectURL(file) : null;
+      picked.push({ file, name, thumbnail });
+    }
+    const said: string[] = [];
+    let pdfProblem: ErrorCode | null = null;
+    if (pdfs.length > 0) {
+      renderFiles();
+      const started = generation;
+      setBusy(true, tr('client.documents.status.opening'), true);
+      pdfProblem = await addPdfs(pdfs, said, started);
+      if (started !== generation) return;
+      setBusy(false, '');
+    }
+    const first = images[0];
+    if (images.length === 1 && first)
+      said.unshift(
+        tr('client.documents.added_one', { nombre: names.get(first) ?? '', ...count() }),
+      );
+    else if (images.length > 1)
+      said.unshift(tr('client.documents.added_many', { k: images.length, ...count() }));
+    else if (pdfs.length > 0) said.push(tr('client.documents.count', count()));
+    renderFiles();
+    for (const file of duplicates)
+      said.push(tr('client.documents.already_added', { nombre: file.name }));
+    if (refused === 1) said.push(tr('client.documents.left_out_one'));
+    else if (refused > 1) said.push(tr('client.documents.left_out_many', { k: refused }));
+    fileStatus.textContent = said.join(' ');
+    fieldError('files', problem ?? pdfProblem);
+  }
+
+  // Closes the PDFs no entry draws from any more.
+  function closeUnused(candidates: Iterable<OpenedPdf>) {
+    for (const opened of new Set(candidates))
+      if (!picked.some((p) => p.pdf?.opened === opened)) opened.close();
+  }
+
+  function removeFile(index: number) {
+    const [gone] = picked.splice(index, 1);
+    if (!gone) return;
+    if (gone.thumbnail) URL.revokeObjectURL(gone.thumbnail);
+    encodedPages.delete(gone);
+    if (gone.pdf) closeUnused([gone.pdf.opened]);
+    renderFiles();
+    fileStatus.textContent = tr('client.documents.removed', { nombre: gone.name, ...count() });
     fieldError('files', null);
     setError(null);
+    // Focus stays in the list: on the file that took its place, the one before, or the picker.
+    const buttons = fileList.querySelectorAll<HTMLElement>('[data-doc-remove]');
+    (buttons[Math.min(index, buttons.length - 1)] ?? fileInput).focus();
+  }
+
+  function clearFiles() {
+    for (const p of picked) if (p.thumbnail) URL.revokeObjectURL(p.thumbnail);
+    const opened = picked.flatMap((p) => (p.pdf ? [p.pdf.opened] : []));
+    picked = [];
+    encodedPages.clear();
+    closeUnused(opened);
+    renderFiles();
+    fileStatus.textContent = '';
   }
 
   function markForm(p: Prefill) {
@@ -165,38 +369,38 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     });
   }
 
-  function showDone(p: Prefill, checks: readonly CoherenceCheck[]) {
+  function showDone(p: Prefill, checks: readonly CoherenceCheck[], e: Extraction) {
+    const line = recognisedLine(e.documents, tr);
+    if (recognised) {
+      recognised.hidden = line === '';
+      recognised.textContent = line;
+    }
     const n = prefilledCount(p);
     summary.textContent =
       n === 0 ? tr('client.documents.done_none') : tr('client.documents.done', { n });
     const lines = [
+      ...conflictLines(e.conflicts, tr),
       ...(hasLowConfidence(p) ? [tr('client.documents.done_low')] : []),
       ...checks.map((c) => tr(`client.documents.check.${c}`)),
     ];
     notes.hidden = lines.length === 0;
     notes.replaceChildren(
-      ...lines.map((line) => {
+      ...lines.map((text) => {
         const li = document.createElement('li');
-        li.textContent = line;
+        li.textContent = text;
         return li;
       }),
     );
     show('done');
   }
 
-  function validate(): { kind: DocumentKind; files: File[] } | null {
-    const kind = new FormData(upload).get('documentKind') as DocumentKind | null;
-    const files = [...(fileInput.files ?? [])];
-    const fileProblem = checkSelection(files);
-    fieldError('kind', kind ? null : 'kind_missing');
+  function validate(): readonly Picked[] | null {
+    const fileProblem = checkSelection(picked.length);
     fieldError('files', fileProblem);
     fieldError('consent', consent.checked ? null : 'consent_missing');
-    const invalid = upload.querySelector<HTMLInputElement>('[aria-invalid="true"]');
-    if (invalid || !kind) {
-      invalid?.focus();
-      return null;
-    }
-    return { kind, files };
+    if (fileProblem !== null) fileInput.focus();
+    else if (!consent.checked) consent.focus();
+    return fileProblem === null && consent.checked ? [...picked] : null;
   }
 
   // A paid pass the API refuses (its signing key may have changed) is asked for once more with
@@ -221,36 +425,72 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     return true;
   }
 
-  async function read(kind: DocumentKind, files: File[]) {
-    setBusy(true, tr('client.documents.status.preparing'));
+  // Encodes the pages in their order, sharing what the request may weigh among them. A PDF's
+  // pages are kept once drawn, and the document closed, so a second try needs no reader.
+  async function encodeAll(
+    pages: readonly Picked[],
+    started: number,
+  ): Promise<EncodedFile[] | { readonly tooSlow: OpenedPdf } | null> {
+    const encoded: EncodedFile[] = [];
+    for (const [i, p] of pages.entries()) {
+      const share = photoShare(requestBytes(encoded), pages.length - i);
+      const kept = encodedPages.get(p);
+      const image =
+        kept ??
+        (await (p.pdf ? p.pdf.opened.render(p.pdf.page, share) : encoder.encode(p.file, share)));
+      if (started !== generation) return null;
+      if (image === 'pdf_too_slow') return p.pdf ? { tooSlow: p.pdf.opened } : null;
+      if (p.pdf) encodedPages.set(p, image);
+      encoded.push(image);
+    }
+    for (const opened of new Set(pages.flatMap((p) => (p.pdf ? [p.pdf.opened] : []))))
+      opened.close();
+    return encoded;
+  }
+
+  async function read(pages: readonly Picked[]) {
+    const started = generation;
+    setBusy(true, tr('client.documents.status.preparing'), true);
     const fail = (code: ErrorCode) => {
-      events.extractionFailed(kind, code);
+      events.extractionFailed(code);
+      if (code === 'model_unavailable') outage.remember();
       setBusy(false, '');
       setError(code);
     };
-    let encoded: EncodedFile[];
+    let encoded: EncodedFile[] | { readonly tooSlow: OpenedPdf } | null;
     try {
-      encoded = [];
-      for (const file of files) encoded.push(await encoder.encode(file));
+      encoded = await encodeAll(pages, started);
     } catch {
+      if (started !== generation) return;
       return fail('image_unreadable');
     }
-    if (requestBytes(encoded) > LIMITS.maxPayloadBytes) return fail('payload_too_large');
+    if (encoded === null) return;
+    if (!Array.isArray(encoded)) {
+      // A PDF that won't draw in time leaves the list, so the next try is not stuck on it too.
+      const slow = encoded.tooSlow;
+      picked = picked.filter((p) => p.pdf?.opened !== slow);
+      slow.close();
+      renderFiles();
+      return fail('pdf_too_slow');
+    }
+    if (requestBytes(encoded) > LIMITS.requestBudgetBytes) return fail('payload_too_large');
 
-    setBusy(true, tr('client.documents.status.captcha'));
+    setBusy(true, tr('client.documents.status.captcha'), true);
     let captchaToken: string;
     try {
       captchaToken = await captcha.token();
     } catch {
+      if (started !== generation) return;
       return fail('captcha_unavailable');
     }
+    if (started !== generation) return;
 
     const stored = passes.pass();
     const usePass = stored !== null && passState(stored, deps.now()) === 'valid';
-    events.uploadStarted(kind, files.length, mediaOf(files));
+    const pdfsPicked = new Set(pages.filter((p) => p.pdf).map((p) => p.file)).size;
+    events.uploadStarted(filesBucket(pages.length), pdfsPicked);
     setBusy(true, tr('client.documents.status.reading'));
     const result = await api.extract({
-      kind,
       files: encoded.map(({ mediaType, data }) => ({ mediaType, data })),
       captchaToken,
       ...(usePass ? { pass: stored.token } : { quota: passes.quota() }),
@@ -261,7 +501,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       if (usePass && result.code === 'pass_exhausted') passes.updateReads(0);
       if (usePass && result.code === 'pass_invalid') {
         if (await fetchPassAgain(stored)) {
-          events.extractionFailed(kind, result.code);
+          events.extractionFailed(result.code);
           setBusy(false, tr('client.documents.pass.renewed'));
           return;
         }
@@ -282,17 +522,21 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     });
     calculator.fill(prefillEntries(prefill));
     markForm(prefill);
-    events.extractionCompleted(
-      kind,
-      prefilledCount(prefill),
-      hasLowConfidence(prefill),
-      result.failedChecks.length > 0,
-      result.escalated,
-    );
+    const offer = result.extraction.fields.agreementSeveranceTotal;
+    agreementOffer = offer && typeof offer.value === 'number' ? offer.value : null;
+    events.extractionCompleted({
+      kinds: [...new Set(result.extraction.documents.map((d) => d.kind))],
+      fields: prefilledCount(prefill),
+      lowConfidence: hasLowConfidence(prefill),
+      failedChecks: result.failedChecks.length > 0,
+      conflicts: result.extraction.conflicts.length > 0,
+      escalated: result.escalated,
+    });
     setBusy(false, '');
     upload.reset();
-    listFiles();
-    showDone(prefill, result.failedChecks);
+    clearFiles();
+    fieldError('files', null);
+    showDone(prefill, result.failedChecks, result.extraction);
   }
 
   upload.addEventListener('submit', (e) => {
@@ -300,9 +544,19 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     if (busy) return;
     setError(null);
     const valid = validate();
-    if (valid) void read(valid.kind, valid.files);
+    if (valid) void read(valid);
   });
-  fileInput.addEventListener('change', listFiles);
+  for (const input of [fileInput, cameraInput])
+    input?.addEventListener('change', () => {
+      void addFiles([...(input.files ?? [])], input === cameraInput);
+      // Cleared, so choosing the same file again still counts as a change.
+      input.value = '';
+    });
+  fileList.addEventListener('click', (e) => {
+    const button = e.target instanceof Element ? e.target.closest('[data-doc-remove]') : null;
+    if (!(button instanceof HTMLElement) || busy) return;
+    removeFile(Number(button.dataset['docRemove']));
+  });
   const drop = required(upload.querySelector<HTMLElement>('[data-doc-drop]'), 'drop zone');
   const carriesFiles = (e: DragEvent) => e.dataTransfer?.types.includes('Files') ?? false;
   // A file dropped beside the zone would make the browser open it and leave the page.
@@ -323,14 +577,9 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     delete drop.dataset['over'];
     const dropped = e.dataTransfer?.files;
     if (busy || !dropped || dropped.length === 0) return;
-    fileInput.files = dropped;
-    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    void addFiles([...dropped]);
   });
   consent.addEventListener('change', () => fieldError('consent', null));
-  upload.addEventListener('change', (e) => {
-    if (e.target instanceof HTMLInputElement && e.target.name === 'documentKind')
-      fieldError('kind', null);
-  });
 
   for (const button of start.querySelectorAll('[data-start-upload]'))
     button.addEventListener('click', () => {
@@ -339,13 +588,19 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     });
   for (const button of start.querySelectorAll('[data-start-manual]'))
     button.addEventListener('click', () => {
-      if (busy) return;
+      if (busy && !preparing) return;
+      if (preparing) {
+        generation += 1;
+        setBusy(false, '');
+      }
       events.startChosen('manual');
       showCalculator(true);
     });
-  start
-    .querySelector('[data-start-back]')
-    ?.addEventListener('click', () => !busy && show('choose'));
+  start.querySelector('[data-start-back]')?.addEventListener('click', () => {
+    if (busy) return;
+    applyOutage();
+    show('choose');
+  });
   start
     .querySelector('[data-start-continue]')
     ?.addEventListener('click', () => showCalculator(true));
@@ -362,12 +617,28 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
   form.addEventListener('change', unmark);
   form.addEventListener('reset', () => {
     for (const mark of form.querySelectorAll('[data-read-mark]')) removeMark(mark);
+    agreementOffer = null;
   });
 
   const startStatus = panels.choose.querySelector<HTMLElement>('[data-start-status]');
 
   return {
     showCalculator,
+    // Beside the severance of a result: what the uploaded agreement offers, as a figure only.
+    showAgreementOffer(result: ParentNode) {
+      const sheet = result.querySelector('[data-item="severance"]');
+      sheet?.querySelector('[data-agreement-offer]')?.remove();
+      if (!sheet || agreementOffer === null) return;
+      const note = document.createElement('p');
+      note.className = 'item__note';
+      note.dataset['agreementOffer'] = '';
+      note.textContent = tr('client.documents.agreement_offer', {
+        importe: formatEuros(agreementOffer),
+      });
+      const reference = sheet.querySelector('[data-reference]');
+      if (reference) reference.after(note);
+      else sheet.append(note);
+    },
     // A message on the start sheet, such as the outcome of a payment with no review to show.
     notice(text: string) {
       if (startStatus) startStatus.textContent = text;
@@ -377,6 +648,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       start.hidden = false;
       form.hidden = true;
       if (deps.tabs) deps.tabs.hidden = true;
+      applyOutage();
       show('choose', focus);
     },
   };

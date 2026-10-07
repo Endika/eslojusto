@@ -3,7 +3,7 @@ import type { EmployerFigures, Review } from '../engine/review';
 import type { Cause, FinalPayInput, ItemId, FixedTermType } from '../engine/types';
 import { FAQ_TOPICS } from '../content/faq-topics';
 import { DOCUMENTS_BUILD } from '../documents/config';
-import { DOCUMENT_KINDS, DOWNLOADS, ERROR_CODES, PASS_VIA } from '../documents/ports';
+import { DOWNLOADS, ERROR_CODES, FILES_BUCKETS, PAGE_KINDS, PASS_VIA } from '../documents/ports';
 
 // Every property is a code from a closed list, a small count or a bucket: nothing a person
 // types can fit in one. `isValidEvent` enforces it at runtime before anything is sent.
@@ -182,23 +182,25 @@ const BASE_CATALOGUE = {
   js_error: { kind: oneOf(ERROR_TYPES), source: SOURCE_RULE },
 } as const satisfies Record<string, Record<string, Rule>>;
 
-// Reading documents and the pass: never a value read from a document, only its kind, how many
-// fields it filled and how sure the reading was.
+// Reading documents and the pass: never a value read from a document, only the kinds found, how
+// many fields they filled and how sure the reading was.
 const DOCUMENT_CATALOGUE = {
   start_chosen: { path: oneOf(['upload', 'manual']) },
   upload_started: {
-    doc_type: oneOf(DOCUMENT_KINDS),
-    files: { intRange: [1, 4] },
-    media: oneOf(['image', 'pdf']),
+    files_bucket: oneOf(FILES_BUCKETS),
+    // PDFs picked; their pages leave as images.
+    pdfs: { intRange: [0, 15] },
   },
   extraction_completed: {
-    doc_type: oneOf(DOCUMENT_KINDS),
+    // The kinds of document recognised in the pack, each once.
+    doc_types: { list: PAGE_KINDS },
     fields_bucket: oneOf(FIELD_BUCKETS),
     low_confidence: { boolean: true },
     failed_checks: { boolean: true },
+    conflicts: { boolean: true },
     escalated: oneOf(['yes', 'no', 'unknown']),
   },
-  extraction_failed: { doc_type: oneOf(DOCUMENT_KINDS), code: oneOf(ERROR_CODES) },
+  extraction_failed: { code: oneOf(ERROR_CODES) },
   checkout_started: {},
   pass_issued: { via: oneOf(PASS_VIA) },
   pass_failed: { code: oneOf(ERROR_CODES) },

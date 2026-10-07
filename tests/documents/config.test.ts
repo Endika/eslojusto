@@ -56,7 +56,7 @@ describe('documentsConfig', () => {
 describe('the CSP of a build that reads documents', () => {
   const directive = (csp: string, name: string) =>
     csp.split('; ').find((d) => d.startsWith(`${name} `));
-  it('adds the API and Turnstile, and nothing else', () => {
+  it('adds the API, Turnstile and the thumbnails’ blob: images, and nothing else', () => {
     const csp = contentSecurityPolicy({
       themeHash: "'sha256-x'",
       analytics: false,
@@ -69,8 +69,12 @@ describe('the CSP of a build that reads documents', () => {
       "script-src 'self' 'sha256-x' https://challenges.cloudflare.com",
     );
     expect(directive(csp, 'frame-src')).toBe('frame-src https://challenges.cloudflare.com');
-    expect(directive(csp, 'img-src')).toBe("img-src 'self' data:");
+    expect(directive(csp, 'img-src')).toBe("img-src 'self' data: blob:");
+    expect(directive(csp, 'worker-src')).toBe("worker-src 'self'");
     expect(directive(csp, 'form-action')).toBe("form-action 'none'");
+    const off = contentSecurityPolicy({ themeHash: "'sha256-x'", analytics: false });
+    expect(directive(off, 'img-src')).toBe("img-src 'self' data:");
+    expect(directive(off, 'worker-src')).toBeUndefined();
   });
   it('keeps PostHog alongside when analytics are on', () => {
     const csp = contentSecurityPolicy({

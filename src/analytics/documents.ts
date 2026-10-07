@@ -7,20 +7,21 @@ export function documentsAnalytics(track: Track): DocumentEvents {
     startChosen(path) {
       track('start_chosen', { path });
     },
-    uploadStarted(kind, files, media) {
-      track('upload_started', { doc_type: kind, files, media });
+    uploadStarted(files, pdfs) {
+      track('upload_started', { files_bucket: files, pdfs });
     },
-    extractionCompleted(kind, fields, lowConfidence, failedChecks, escalated) {
+    extractionCompleted({ kinds, fields, lowConfidence, failedChecks, conflicts, escalated }) {
       track('extraction_completed', {
-        doc_type: kind,
+        doc_types: kinds,
         fields_bucket: fieldsBucket(fields),
         low_confidence: lowConfidence,
         failed_checks: failedChecks,
+        conflicts,
         escalated: escalated === null ? 'unknown' : escalated ? 'yes' : 'no',
       });
     },
-    extractionFailed(kind, code) {
-      track('extraction_failed', { doc_type: kind, code });
+    extractionFailed(code) {
+      track('extraction_failed', { code });
     },
     checkoutStarted() {
       track('checkout_started', {});
