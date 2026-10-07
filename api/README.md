@@ -2,15 +2,15 @@
 
 Three Lambda functions in **eu-south-2** behind function URLs:
 
-| Function   | Does                                                                                     | Calls                                                   |
-| ---------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `extract`  | Reads a settlement proposal, payslips or a work history and returns the fields it states | Turnstile, Bedrock (EU profiles), Stripe for pass reads |
-| `checkout` | Starts a Stripe Checkout for the 4,99 € pass                                             | Turnstile, Stripe                                       |
-| `pass`     | Verifies a finished Checkout Session and issues the signed pass                          | Stripe                                                  |
+| Function   | Does                                                                                           | Calls                                                   |
+| ---------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `extract`  | Reads a pack of employment documents, says what each page is and returns the fields they state | Turnstile, Bedrock (EU profiles), Stripe for pass reads |
+| `checkout` | Starts a Stripe Checkout for the 4,99 € pass                                                   | Turnstile, Stripe                                       |
+| `pass`     | Verifies a finished Checkout Session and issues the signed pass                                | Stripe                                                  |
 
 Nothing is stored: documents live in the invocation's memory, the server keeps no state, and
 logs carry only `op`, `code`, `latencyMs`, `pages`, `inputTokens`, `outputTokens`,
-`escalated` and two flags (`test/http.test.ts` proves it): `underestimated` when Bedrock
+`escalated`, `conflicts` (how many fields two documents stated differently) and two flags (`test/http.test.ts` proves it): `underestimated` when Bedrock
 counted more than twice the input the pre-read estimate allowed for, and `countNotSaved` when
 a pass read went through but Stripe did not store its count. The manual calculator never calls this API.
 
@@ -29,26 +29,58 @@ API never returns prose. All requests are `POST` with a JSON body.
 
 ```jsonc
 {
-  "kind": "settlement" | "payslip" | "work_history",
-  "files": [{ "mediaType": "image/jpeg" | "image/webp" | "application/pdf", "data": "<base64>" }],
+  "files": [{ "mediaType": "image/jpeg" | "image/webp", "data": "<base64>" }],
   "captchaToken": "<Turnstile token, widget action 'extract'>",
   "quota": "<token from the last free read, or null>", // free read
   "pass": "<pass token>" // or a pass read
 }
 ```
 
-Up to 4 JPEG/WebP images (long side ≤ 1568 px, checked from the image header) or 1 PDF of up
-to 4 pages and 2 MB, 6 MB per request. The browser downsizes photos before sending, and turns
-a PDF the API refuses (`pdf_too_large`, `pdf_unreadable`: scanned, encrypted or ambiguous)
-into page images. `ok` answers:
+The person never says what they upload: a read takes the whole pack (dismissal letter,
+settlement notification, payslips, company certificate, agreement, work history, and pages
+that matter to none of it) and the model sorts it. **Images only**, one per page, up to 15, in
+any order: JPEG/WebP with the long side at most `MAX_IMAGE_LONG_SIDE`
+(`src/domain/image-limit.ts`, 1568 px, checked from the image header). The browser renders a
+PDF's pages to images with pdf.js before sending, so the API never parses a PDF and a read's
+cost depends only on pixels it can measure; `application/pdf` is answered with
+`unsupported_media_type`. One read is one free read or one pass read, whatever it holds. Codes:
+`too_many_files` (16 images), `image_unreadable`, `image_too_large`, `document_too_dense`
+(a guard: no accepted pack reaches it).
+`model_unavailable` (every model call failed, as when the budget action denies Bedrock) spends
+neither a free read nor a pass read; the site then offers only the manual path for an hour.
+
+**Payload budget.** Lambda takes at most 6 MB per synchronous request, event envelope
+included, and the API refuses a body over 6 MiB. Base64 adds a third, so the browser keeps the
+JSON under 5.8 MB (`requestBudgetBytes` in `src/documents/contract.ts`), shared out among the
+images: each photo or PDF page is re-encoded as JPEG at falling quality (0.85, 0.75, 0.65, 0.5)
+until it fits its share. With 15 images that is about 290 KB each, which a 1568-px document
+page usually meets by quality 0.65. If the pack still does not fit, the browser says the files
+are too heavy before sending anything.
+
+`ok` answers:
 
 ```jsonc
 {
   "code": "ok",
   "extraction": {
-    "kind": "settlement",
-    "fields": { "endDate": { "value": "2026-09-15", "confidence": "high" } },
-    "lists": { "otherAccruals": [{ "values": { "amount": 12.5 }, "confidence": "medium" }] },
+    // Every page the model classified, by number (1-based, in the order sent).
+    "pages": [{ "page": 1, "kind": "dismissal_letter", "document": 1, "confidence": "high" }],
+    // Consecutive pages of one document, grouped; `month` only for payslips.
+    "documents": [
+      { "kind": "dismissal_letter", "pages": [1, 2] },
+      { "kind": "payslip", "pages": [3], "month": "2026-08" },
+      { "kind": "other", "pages": [4] },
+    ],
+    "fields": {
+      "endDate": { "value": "2026-09-15", "confidence": "high", "source": "settlement_proposal" },
+    },
+    "lists": {
+      "contracts": [
+        { "values": { "startDate": "2019-01-07" }, "confidence": "high", "source": "work_history" },
+      ],
+    },
+    // Fields two documents state differently: the first source is the one kept.
+    "conflicts": [{ "field": "endDate", "sources": ["settlement_proposal", "dismissal_letter"] }],
   },
   "failedChecks": [], // coherence checks still failing after any escalation
   "escalated": false, // whether the escalation model read it too
@@ -56,6 +88,10 @@ into page images. `ok` answers:
   "readsLeft": 11, // pass reads: what Stripe has left on the pass
 }
 ```
+
+Page kinds: `settlement_proposal`, `payslip`, `dismissal_letter`, `company_certificate`,
+`settlement_agreement`, `work_history`, `other` (for instance an IRPF withholding
+certificate). A field's `source` is any of them but `other`.
 
 **`checkout`** `{ "nonce": "<22–64 url-safe random chars, kept in the browser>",
 "captchaToken": "<Turnstile, action 'checkout'>" }` →
@@ -73,29 +109,72 @@ the letter until it expires.
 
 ### Fields and the site's engine
 
-Names match `src/engine/types.ts` so the form can be prefilled; `test/engine-contract.test.ts`
-fails the type check if the engine drifts.
+The model transcribes each kind of document into its own section of the tool input
+(`src/domain/extraction-schema.ts`), so every value keeps the document it came from; the domain
+then merges them (`src/domain/merge.ts`), taking each field from the first source that states it:
 
-| Document     | Fields                                                                                                                                  | Lists                              | Fills                                                                                      |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------ |
-| settlement   | `startDate`, `endDate`, `cause`, `fixedTermType`, `monthlySalary`                                                                       |                                    | `FinalPayInput`                                                                            |
-|              | `pending_salary`, `holiday_pay`, `extra_pay`, `severance`, `employer_notice`, `notice_deduction`                                        |                                    | `EmployerFigures` by `ItemId`                                                              |
-|              | `totalAccrued`                                                                                                                          | `otherAccruals[].amount`           | coherence check only                                                                       |
-| payslip      | `periodStart`, `periodEnd`, `startDate`, `totalAccrued`, `extraPayProrated`, `extraPayProratedAmount`, `extraPayPaid`, `extraPayAmount` | `accruals[].amount`                | `monthlySalary`, proposed only for a payslip covering one whole calendar month (see below) |
-| work_history |                                                                                                                                         | `contracts[].startDate`, `endDate` | `OtherContracts.contracts` (`ContributionPeriod`)                                          |
+| Field                                                                                                                                           | Sources, preferred first                                                                                                                              | Fills                                             |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `startDate`                                                                                                                                     | settlement proposal, final payslip, monthly payslip, company certificate                                                                              | `FinalPayInput`                                   |
+| `endDate`                                                                                                                                       | settlement proposal, dismissal letter, company certificate, agreement                                                                                 | `FinalPayInput`                                   |
+| `cause`                                                                                                                                         | agreement (it can acknowledge a dismissal as unfair), settlement proposal, dismissal letter, company certificate                                      | `FinalPayInput`                                   |
+| `fixedTermType`                                                                                                                                 | settlement proposal, company certificate, dismissal letter                                                                                            | `FinalPayInput`                                   |
+| `monthlySalary`                                                                                                                                 | settlement proposal, only if printed as such                                                                                                          | `FinalPayInput`                                   |
+| `pending_salary`                                                                                                                                | final payslip (sum of its salary lines), settlement proposal, dismissal letter                                                                        | `EmployerFigures` by `ItemId`                     |
+| `holiday_pay`, `extra_pay`, `employer_notice`, `notice_deduction`                                                                               | settlement proposal, final payslip (nómina de liquidación), dismissal letter                                                                          | `EmployerFigures` by `ItemId`                     |
+| `severance`                                                                                                                                     | the same                                                                                                                                              | `EmployerFigures`                                 |
+| `agreementSeveranceTotal`                                                                                                                       | agreement, only if it states the total severance as one figure                                                                                        | shown beside the unfair-dismissal reference       |
+| `annualHolidayDays`, `holidayDaysTaken`                                                                                                         | settlement proposal, final payslip, only if printed                                                                                                   | `FinalPayInput`                                   |
+| `noticeDaysReceived`                                                                                                                            | dismissal letter: days of notice actually given before the end date (0 when the dismissal takes effect the day it is notified and the notice is paid) | `FinalPayInput`                                   |
+| `noticeDaysPaid`                                                                                                                                | dismissal letter: days of notice paid instead of given                                                                                                | not prefilled                                     |
+| `payslipPeriodStart`, `payslipPeriodEnd`, `payslipTotalAccrued`, `extraPayProrated`, `extraPayProratedAmount`, `extraPayPaid`, `extraPayAmount` | the latest ordinary payslip of one whole calendar month                                                                                               | `monthlySalary` and the extra-pay answers (below) |
+| `contracts[].startDate`, `endDate` (a list)                                                                                                     | work history                                                                                                                                          | `OtherContracts.contracts` (`ContributionPeriod`) |
+
+**Payslips are copied line by line.** For each earnings line the model copies the concept as
+printed, its amount and what it pays for: `salary` (base salary, pluses and allowances for the
+days of the period, prorated extra pay, teleworking or transport paid as earnings),
+`notice_compensation`, `severance`, `holiday_pay`, `extra_pay` (a full extra payment),
+`one_off` (bonus, study aid, backpay) or `other`. The code then adds them up, in cents: on the
+final liquidation payslip, `pending_salary` is the sum of the `salary` lines, and
+`employer_notice`, `severance`, `holiday_pay` and `extra_pay` the sums of their categories; on
+the monthly payslip, `extraPayPaid` and `extraPayAmount` come from its `extra_pay` lines. A
+settlement proposal still comes first wherever it prints the amount, except for
+`pending_salary`: the final payslip's salary lines win, because a settlement notification often
+names the month's salary without an amount of its own (the model then borrowed a one-off line's
+amount, or wrote 0). A settlement is asked for each item's own printed amount only, and for its
+totals as `totalGross` and `totalNet`; the items are checked against a gross total only, since a
+net one has deductions off and may hold tax-exempt severance. The model never adds
+anything up: asked for the salary pending, it had returned the base salary alone, a one-off
+line, a total with notice in it, or 0. The lines stay inside the API; the response carries only
+the merged fields.
+
+A section counts only if a page of its kind backs it (either payslip section needs a `payslip`
+page); one that does not is dropped and counts as a doubt, so an agreement «read» from a pack
+whose pages are all `other` never reaches the form.
+
+A losing value that is less than sure of itself (`medium` or `low`) is no conflict: it is dropped
+and counts as a doubt, so a stray amount the model copied without conviction never shows the
+person a disagreement that does not exist.
+
+Two sources of different kinds that state different values (amounts more than 1 € apart) make a conflict: the
+preferred value stays and the response lists the field with its sources, preferred first; the
+log line counts them and says nothing else. Two payslips that disagree are no conflict: the
+person would read «los documentos no dicen lo mismo» about a single kind of document. A conflict is not a doubt: documents can disagree
+and both be read right, so it never escalates. Totals and gross lines feed the coherence checks
+only. What an agreement offers is never taken as the final pay's severance: it travels as
+`agreementSeveranceTotal`, and the site shows it next to the unfair-dismissal reference with no
+verdict.
 
 The engine's `monthlySalary` includes the prorated share of extra payments when they are
-prorated. So, for a payslip whose `periodStart` and `periodEnd` are the first and last day of
-the same month, the UI proposes:
+prorated. So, for a payslip whose `payslipPeriodStart` and `payslipPeriodEnd` are the first and
+last day of the same month, the UI proposes:
 
-- `extraPayProrated` true: `monthlySalary` = `totalAccrued`;
-- otherwise: `totalAccrued` minus `extraPayAmount` when `extraPayPaid` is true (a full extra
-  payment paid that month), or `totalAccrued` alone.
+- `extraPayProrated` true: `monthlySalary` = `payslipTotalAccrued`;
+- otherwise: `payslipTotalAccrued` minus `extraPayAmount` when `extraPayPaid` is true (a full
+  extra payment paid that month), or `payslipTotalAccrued` alone.
 
-For any other period it proposes no salary.
-
-Every kind also returns `detectedKind`. The model never calculates: a derived value is the UI's
-proposal, confirmed by the person.
+For any other period it proposes no salary, and a printed `monthlySalary` comes first. The
+model never calculates: a derived value is the UI's proposal, confirmed by the person.
 
 ## Architecture
 
@@ -104,7 +183,7 @@ src/
   config.ts       region, models, names: shared by code and infrastructure
   domain/         schemas, validation, coherence, escalation, allowance and pass rules, ports
   http/           function-URL events to use cases and back; logging
-  adapters/       Bedrock, Stripe, Turnstile, HMAC, SSM, pdf-lib, clock, console logger
+  adapters/       Bedrock, Stripe, Turnstile, HMAC, SSM, clock, console logger
   handlers/       one composition root per function
 infra/            CDK app: ApiStack (eu-south-2) and GlobalStack (IAM, Budgets)
 test/             vitest; synthetic documents, fakes, Bedrock-shaped response fixtures
@@ -116,30 +195,47 @@ domain, adapters never reach `http/` or `handlers/`, and the infrastructure read
 
 ### Extraction
 
-- **InvokeModel with the Messages body, not Converse.** Converse sends a PDF's text layer only
-  unless citations are on, and scanned payslips have none. Same SDK
-  (`@aws-sdk/client-bedrock-runtime`), same `bedrock:InvokeModel` permission.
-- One tool per document kind with a closed JSON schema (`additionalProperties: false` at every
-  level), forced with `tool_choice` where the model allows it. A fixed system prompt treats the
-  document as data, never instructions, and forbids recording union dues, sick leave or third
-  parties. The person's request contributes only the file bytes and the document kind.
+- **InvokeModel with the Messages body**, through `@aws-sdk/client-bedrock-runtime` and the
+  `bedrock:InvokeModel` permission.
+- One tool with a closed JSON schema (`additionalProperties: false` at every level), forced
+  with `tool_choice` where the model allows it: the kind and document number of every page,
+  then one optional section per kind of document. A fixed system prompt treats the documents
+  as data, never instructions, and forbids recording union dues, sick leave or third parties.
+  The person's request contributes only the image bytes; the request numbers each image as a
+  page before it («Page 3:»).
 - The output is validated in the domain (hand-written, because the domain imports nothing):
   any field or row with an invalid value, an unknown confidence or an extra key is dropped and
   counted, never repaired. Keys outside the schema are ignored.
-- **Escalation by doubt**: a `low` confidence anywhere, a dropped field, no
-  tool output, or a failed coherence check (items not adding up to `totalAccrued` within 1 €,
-  impossible or inverted dates, proration above the total) re-reads the document with
-  `ESCALATION_MODEL`, whose read wins. Same path with or without a pass. Equal constants mean
-  no escalation. A confident "this is another kind of document" is answered as
-  `document_kind_mismatch` without escalating or returning data.
+- **Escalation by doubt**: a `low` confidence anywhere (a page's kind included), a dropped
+  page, field or row, a page left unclassified, no tool output, or a failed coherence check
+  (items not adding up to the total within 1 €, impossible or inverted dates, also between two
+  documents, proration above the total) re-reads the pack with `ESCALATION_MODEL`, whose read
+  wins. Also when the pack falls short of what it should give: a dismissal letter or a final
+  payslip present but no settlement figure and no salary line read; payslip lines without
+  `extraPayProrated`; or any page set aside as `other` in a pack with a dismissal letter,
+  no settlement and no final payslip beside it (a cheap re-check, since that page may be the
+  settlement itself; an IRPF certificate beside a complete pack triggers nothing). Same path with or without a pass. Equal constants mean no escalation. A pack with
+  nothing useful in it is an answer: `ok` with its pages as `other` and no fields.
 - **Provider errors.** Every Bedrock error throws, a `ValidationException` included: the request
   is fixed, so it means a retired, disabled or misconfigured model, never a bad document. A
   failed primary read goes to the escalation model; if that fails too, the answer is
   `model_unavailable`. An escalated read replaces the primary only if it recorded something.
-- Models (`src/config.ts`): `PRIMARY_MODEL` = Haiku 4.5, `ESCALATION_MODEL` = Sonnet 4.6.
-  Sonnet 5.5 is one line away (`ESCALATION_MODEL = SONNET_5_5`); its settings already use
+- Models (`src/config.ts`): every read is **Sonnet 4.6 alone**: `PRIMARY_MODEL` and
+  `ESCALATION_MODEL` are both `SONNET_4_6`, and equal constants turn escalation off. The
+  escalation path and its tests stay: `PRIMARY_MODEL = HAIKU_4_5` brings back Haiku first and
+  Sonnet for doubtful reads, and the IAM scope follows whichever models the two constants name.
+  Sonnet 5.5 is one line away (`SONNET_5_5`, unpriced here); its settings already use
   `tool_choice: auto` and more output room, because it rejects forced tool use and thinking is
   on by default there. No request sends `temperature`, which Sonnet 5.5 rejects.
+
+- **Time.** The function has 180 s (`EXTRACT_TIMEOUT_SECONDS`). Every Bedrock call carries an
+  abort signal that fires 160 s after the request started, retries included (the client makes
+  at most one retry), and a second read never starts after 90 s, since it can take as long as
+  the first. That leaves 20 s to count a pass read and answer. A pass read is counted only once
+  the answer is ready, so a read that fails or runs out of time costs nothing. The browser
+  waits 240 s, a minute more than the function, for the upload; if it gives up anyway (an
+  uplink slower than about 100 KB/s with a full 5.8 MB pack), a read the API finished is still
+  counted, and the person sees an error with one pass read fewer.
 
 ### Order of checks
 
@@ -149,32 +245,31 @@ Cheapest first, and nothing that parses what the person sent runs before the cap
 2. **Turnstile.** Siteverify refuses a token it has seen and must report hostname
    `eslojusto.es` and the endpoint's action, so every read and every checkout costs a fresh
    challenge.
-3. Image headers; the PDF inspection; the input-token estimate.
+3. Image headers and the input-token estimate.
 4. For a pass, the Checkout Session in Stripe (paid, not refunded or disputed, reads left).
 5. The model reads.
 
 ### Bounding the cost of a read
 
-- **PDF pages are counted the way every reader would count them, or not at all.** The inspector
-  refuses bytes after the last `%%EOF`, an object defined twice within one revision (later
-  revisions may redefine objects, as signatures do), more than 5,000 objects, anything pdf-lib
-  reports on the console or as an invalid object, encryption, and any disagreement between the
-  page tree's `/Count`, the pages pdf-lib finds, and every page tree and page object a
-  sequential scan finds. Text-bearing streams may only use Flate, ASCII85 or ASCIIHex filters,
-  and decode to 8 MB at most. Measured on 25 real PDFs on the dev machine: all accepted with
-  the right page count.
-- **Input tokens are estimated before the first read** (Bedrock's CountTokens does not serve
-  Claude models offered only through cross-Region profiles, and the mantle alternative would
-  send the document to eu-west-1 through a hand-signed request): 3,000 for the prompt and
-  schema, Claude's 28-px patch formula for each image, 1,600 per PDF page plus one token per two
-  bytes of text in its streams. Real documents land around 1,200–1,700 text tokens per dense
-  page. Above **32,000** the answer is `document_too_dense`; four dense pages estimate at about
-  27,000.
-- **No escalation above 25,000 real input tokens** (Bedrock's own count from the primary read),
-  nor, when the primary read failed, above that estimate. Real four-page documents need about
-  20,000.
-- **PDFs are capped at 2 MB**: digital payslips and work histories weigh tens of kilobytes; a
-  heavier file is a scan, better sent as page images.
+- **The input is known before any call.** Every image is priced by its pixels, at
+  w × h / 750 tokens (Anthropic's formula) or one per 28 × 28 patch if that is more, and the
+  prompt and schema at 13,000 (about 24,500 characters at two per token;
+  `test/tokens.test.ts` keeps it honest). Bedrock's CountTokens does not serve Claude models
+  offered only through cross-Region profiles, so this is computed, not asked. The largest pack
+  the API accepts, fifteen 1568 × 1568 images, comes to 13,000 + 15 × 3,279 = 62,185; above
+  **65,000** the answer would be `document_too_dense`. Nothing in an image can add tokens
+  beyond its pixels, which is why PDFs are rendered in the browser instead of read here: a PDF
+  can hide text from any measure short of a full reader.
+- **With Haiku reading first** (not the default), no escalation above 43,000 real input tokens
+  (Bedrock's own count from the primary read), nor, when the primary read failed, above that
+  estimate.
+- **Image tokens grow with the pixels.** A 1176 × 1568 photo is about 2,459 tokens; at 1100 px
+  on the long side (825 × 1100) it would be about 1,210. Anthropic documents that Claude scales
+  an image down first when it is over about 1,600 tokens (about 1.15 megapixels), so a 1568-px
+  photo is likely read, and billed, at about 1,600; the estimate does not count on that. Whether
+  1568 px reads documents better than about 1100 px is a question for a model evaluation;
+  `MAX_IMAGE_LONG_SIDE` changes both the browser and the API in one line. A PDF page costs the
+  same as a photo of it: the browser renders it at the same size.
 
 ### Limits without storage
 
@@ -214,8 +309,8 @@ the function bundles, never user data).
 
 **Function URLs, not HTTP API.** Function URLs exist in eu-south-2 (the regional endpoint
 `*.lambda-url.eu-south-2.on.aws` resolves; it does not for regions without them), cost
-nothing, and their timeout is the function's. HTTP API cuts at 30 s, too close for a primary
-read plus an escalated read of a 4-page PDF. Throttling comes from reserved concurrency (429
+nothing, and their timeout is the function's. HTTP API cuts at 30 s, far too close for a primary
+read plus an escalated read of a 15-page pack (the function's timeout is 180 s). Throttling comes from reserved concurrency (429
 beyond it: 5 for `extract`, 2 each for `checkout` and `pass`); CORS allows only
 `https://eslojusto.es`.
 
@@ -231,8 +326,8 @@ beyond it: 5 for `extract`, 2 each for `checkout` and `pass`); CORS allows only
   CloudFormation execution policy. Keeping IAM here means CI can neither create roles nor widen
   them.
 
-Execution roles: `extract` may `bedrock:InvokeModel` on the two EU inference profiles and on
-their foundation models in the six EU regions the profiles route to, only through those
+Execution roles: `extract` may `bedrock:InvokeModel` on the EU inference profiles of the
+configured models (today only Sonnet 4.6) and on their foundation models in the six EU regions the profiles route to, only through those
 profiles (`bedrock:InferenceProfileArn` condition), plus `ssm:GetParameter` on the token key,
 the Turnstile secret and the Stripe restricted key (passes count their reads in Stripe).
 `checkout` reads the restricted key and the Turnstile secret; `pass` the restricted key and the
@@ -261,7 +356,7 @@ Nothing here has been run. Each step needs an account administrator.
    `aws bedrock put-account-data-retention --mode none --region eu-south-2`, then check
    `aws bedrock get-account-data-retention --region eu-south-2`. Model invocation logging must
    stay off: `aws bedrock get-model-invocation-logging-configuration --region eu-south-2`
-   prints nothing (true on 07-10-2026). Invoke Haiku 4.5 and Sonnet 4.6 once from the console
+   prints nothing (true on 07-10-2026). Invoke Sonnet 4.6 (and Haiku 4.5 if it goes back to reading first) once from the console
    playground so the Marketplace subscription exists; the execution role has no Marketplace
    permissions.
 3. **Stripe restricted key** (Dashboard → Developers → API keys → Create restricted key), with
@@ -295,22 +390,28 @@ Fixed: about 0 USD a month. Function URLs, idle Lambdas, standard SSM parameters
 two budgets with actions cost nothing; the bootstrap bucket holds about 1 MB; logs are a few
 KB a day.
 
-Per read, from the eu-south-2 Price List (07-10-2026): Haiku 4.5 at 1.10 / 5.50 USD per
-million input / output tokens, Sonnet 4.6 at 3.30 / 16.50 (EU profiles).
+Per read, from the eu-south-2 Price List (07-10-2026): Sonnet 4.6 at 3.30 / 16.50 USD per
+million input / output tokens (EU profile); Haiku 4.5, if it reads first again, at 1.10 / 5.50.
+`max_tokens` is 5,000 (a full pack records about 1,500–2,500 tokens, a long work history up to
+4,000), and `test/tokens.test.ts` recomputes the bounds below from the constants.
 
-| Read                                           | Input tokens    | Output tokens        | Cost                         |
-| ---------------------------------------------- | --------------- | -------------------- | ---------------------------- |
-| Typical (3 photos or a 2-page PDF), Haiku only | 6,000–10,600    | ~1,500               | 0.015–0.02 USD               |
-| Worst case, Haiku only (estimate at the cap)   | 32,000          | 4,096 (`max_tokens`) | 0.058 USD                    |
-| Worst case escalated, Haiku + Sonnet 4.6       | 25,000 + 25,000 | 4,096 + 4,096        | 0.050 + 0.150 = **0.20 USD** |
-| Estimate fooled, Haiku only                    | up to 200,000   | 4,096                | 0.22 + 0.02 = **0.25 USD**   |
+| Read, Sonnet 4.6 alone                    | Input tokens    | Output tokens        | Cost                         |
+| ----------------------------------------- | --------------- | -------------------- | ---------------------------- |
+| Typical, 8 photos                         | ~20,000         | ~1,500               | 0.066 + 0.025 = **0.09 USD** |
+| Full pack, 15 photos                      | ~31,000         | ~2,000               | 0.102 + 0.033 = **0.13 USD** |
+| Largest pack accepted, 15 × 1568 × 1568   | 62,185          | 5,000 (`max_tokens`) | 0.205 + 0.083 = **0.29 USD** |
+| Were Haiku to read first: worst escalated | 43,000 + 43,000 | 5,000 + 5,000        | 0.075 + 0.225 = 0.30 USD     |
 
-**Honest worst case: about 0.25 USD per read when a document fools the pre-read estimate,
-0.20 USD otherwise.** Fooling it means text the inspector does not count (for instance behind
-duplicate objects inside compressed object streams); the read can then take Haiku's whole
-200,000-token context, but it never escalates, because Bedrock's real count is far over the
-25,000 escalation cap. Such a read is logged with `underestimated`, so it shows up. Either way a
-free read needs a fresh captcha, and at most 5 reads run at once.
+"Typical" counts 1,600 tokens per photo, as if Claude scales them down (above), plus about
+7,500 for the prompt and schema; were every pixel billed, 15 phone photos (1568 × 1176) would
+be about 44,400 in, 0.18 USD.
+
+**Worst case: 0.29 USD per read** (62,185 × 3.30 USD/M + 5,000 × 16.50 USD/M = 0.288), for any
+input: the API takes images only, priced by their pixels, and refuses anything above 65,000
+estimated tokens (0.30 USD) before a call. A PDF never reaches it; the browser renders its pages
+to images of the same size as a photo. Should Bedrock still bill more than twice the estimate,
+the read is logged with `underestimated`. A free read needs a fresh captcha, at most 5 reads
+run at once, and the budget action caps the month.
 
 ## Unverified
 
@@ -323,11 +424,11 @@ free read needs a fresh captcha, and at most 5 reads run at once.
   restricted-key permissions are enough. The API reference lists `metadata` among the update
   parameters without the "while the session is active" restriction it puts on others; step 9
   of the deployment confirms both with one test-mode call.
-- That a PDF hiding pages behind duplicate objects _inside compressed object streams_
-  (invisible to the raw scan) is caught; the token estimate and the escalation cap still bound
-  its cost.
 - `npm audit` (dev): `brace-expansion` bundled inside `aws-cdk-lib` (latest release) has a
   high-severity advisory; it runs only at synth time, never in the Lambdas.
-- The real latency of an escalated read of a 4-page PDF (the 120 s timeout is a guess).
+- The real latency of an escalated read of a 15-page pack (the 180 s timeout is a guess), and
+  whether Bedrock bills a 1568-px photo at about 1,600 tokens, as Anthropic's resizing
+  suggests, or at its full 2,459.
 - Model accuracy: the Bedrock fixtures are hand-written in Bedrock's response shape, not
-  recordings. Choosing the models still needs a comparison on real, anonymised documents.
+  recordings. Choosing the models, how well they sort a mixed pack, and whether 1568 px reads
+  better than about 1100 px still need a comparison on real, anonymised packs.

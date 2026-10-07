@@ -3,23 +3,15 @@ import { checkFileShapes, imageSizes, LIMITS, type DocumentFile } from '../src/d
 import { jpeg, webpLossy } from './support/synthetic';
 
 const img = (w = 1000, h = 1400): DocumentFile => ({ mediaType: 'image/jpeg', bytes: jpeg(w, h) });
-const pdf = (bytes = 9): DocumentFile => ({
-  mediaType: 'application/pdf',
-  bytes: new TextEncoder().encode('%PDF-1.7\n'.padEnd(bytes, ' ')),
-});
 
 describe('checkFileShapes', () => {
-  it('accepts up to four images or one PDF', () => {
-    expect(checkFileShapes([img(), img(), img(), img()])).toBeNull();
-    expect(checkFileShapes([pdf()])).toBeNull();
+  it('accepts up to fifteen images', () => {
+    expect(checkFileShapes(Array.from({ length: LIMITS.maxImages }, () => img()))).toBeNull();
   });
 
   it.each([
     ['no files', [], 'no_files'],
-    ['five images', [img(), img(), img(), img(), img()], 'too_many_files'],
-    ['two PDFs', [pdf(), pdf()], 'too_many_files'],
-    ['a PDF with an image', [pdf(), img()], 'mixed_files'],
-    ['a PDF over 2 MB', [pdf(LIMITS.maxPdfBytes + 1)], 'pdf_too_large'],
+    ['sixteen images', Array.from({ length: 16 }, () => img()), 'too_many_files'],
     [
       'WebP bytes labelled JPEG',
       [{ mediaType: 'image/jpeg', bytes: webpLossy(800, 600) }],
@@ -29,11 +21,6 @@ describe('checkFileShapes', () => {
       'bytes that are no image',
       [{ mediaType: 'image/webp', bytes: new TextEncoder().encode('hello') }],
       'image_unreadable',
-    ],
-    [
-      'a "PDF" without the PDF header',
-      [{ mediaType: 'application/pdf', bytes: new TextEncoder().encode('<html>') }],
-      'pdf_unreadable',
     ],
   ] as const)('rejects %s', (_, files, code) => {
     expect(checkFileShapes(files as readonly DocumentFile[])).toBe(code);

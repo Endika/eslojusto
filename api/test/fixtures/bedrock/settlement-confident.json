@@ -9,41 +9,47 @@
       "id": "toolu_bdrk_01FICTITIOUS",
       "name": "record_extraction",
       "input": {
-        "detectedKind": {
-          "value": "settlement",
-          "confidence": "high"
-        },
-        "startDate": {
-          "value": "2022-03-01",
-          "confidence": "high"
-        },
-        "endDate": {
-          "value": "2026-09-15",
-          "confidence": "high"
-        },
-        "cause": {
-          "value": "fixed_term_end",
-          "confidence": "high"
-        },
-        "fixedTermType": {
-          "value": "production_circumstances",
-          "confidence": "medium"
-        },
-        "pending_salary": {
-          "value": 1250,
-          "confidence": "high"
-        },
-        "holiday_pay": {
-          "value": 640.5,
-          "confidence": "high"
-        },
-        "extra_pay": {
-          "value": 980,
-          "confidence": "high"
-        },
-        "totalAccrued": {
-          "value": 2870.5,
-          "confidence": "high"
+        "pages": [
+          {
+            "page": 1,
+            "kind": "settlement_proposal",
+            "document": 1,
+            "confidence": "high"
+          }
+        ],
+        "settlement_proposal": {
+          "startDate": {
+            "value": "2022-03-01",
+            "confidence": "high"
+          },
+          "endDate": {
+            "value": "2026-09-15",
+            "confidence": "high"
+          },
+          "cause": {
+            "value": "fixed_term_end",
+            "confidence": "high"
+          },
+          "fixedTermType": {
+            "value": "production_circumstances",
+            "confidence": "medium"
+          },
+          "pending_salary": {
+            "value": 1250,
+            "confidence": "high"
+          },
+          "holiday_pay": {
+            "value": 640.5,
+            "confidence": "high"
+          },
+          "extra_pay": {
+            "value": 980,
+            "confidence": "high"
+          },
+          "totalGross": {
+            "value": 2870.5,
+            "confidence": "high"
+          }
         }
       }
     }

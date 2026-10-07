@@ -1,7 +1,6 @@
 import { ESCALATION_MODEL, PARAMETER_NAMES, PRIMARY_MODEL } from '../config';
 import { bedrockInvoke, createBedrockReader } from '../adapters/bedrock-reader';
 import { createHmacSigner } from '../adapters/hmac-signer';
-import { pdfInspector } from '../adapters/pdf-inspector';
 import { consoleLogger, systemClock } from '../adapters/runtime';
 import { loadParameters } from '../adapters/ssm-parameters';
 import { createStripeSessions } from '../adapters/stripe-payments';
@@ -37,7 +36,6 @@ export async function handler(event: HttpEvent): Promise<HttpResponse> {
   return handleExtract(event, {
     ...loaded,
     reader,
-    pdf: pdfInspector,
     clock: systemClock,
     logger: consoleLogger,
     models: { primary: PRIMARY_MODEL, escalation: ESCALATION_MODEL },

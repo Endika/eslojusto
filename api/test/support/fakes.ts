@@ -1,4 +1,3 @@
-import type { DocumentFile, DocumentKind } from '../../src/domain/documents';
 import type {
   CaptchaVerifier,
   CheckoutCreator,
@@ -17,10 +16,15 @@ export const ESCALATION = 'escalation-model';
 type Answer = ModelRead | Error;
 
 export class FakeReader implements DocumentReader {
-  readonly calls: { model: string; kind: DocumentKind; files: readonly DocumentFile[] }[] = [];
-  constructor(private readonly answers: Readonly<Record<string, Answer>>) {}
-  async read(request: { model: string; kind: DocumentKind; files: readonly DocumentFile[] }) {
+  readonly calls: Parameters<DocumentReader['read']>[0][] = [];
+  constructor(
+    private readonly answers: Readonly<Record<string, Answer>>,
+    // Runs as each read starts, for a test that needs time to pass during it.
+    private readonly during: () => void = () => {},
+  ) {}
+  async read(request: Parameters<DocumentReader['read']>[0]) {
     this.calls.push(request);
+    this.during();
     const answer = this.answers[request.model];
     if (answer === undefined) throw new Error(`No answer for ${request.model}`);
     if (answer instanceof Error) throw answer;

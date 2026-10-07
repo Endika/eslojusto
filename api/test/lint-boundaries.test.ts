@@ -15,14 +15,14 @@ describe('api import boundaries', () => {
     ['src/domain/x.ts', "import { REGION } from '../config';"],
     ['src/domain/x.ts', "import { createHash } from 'node:crypto';"],
     ['src/domain/x.ts', "import Stripe from 'stripe';"],
-    ['src/domain/x.ts', "import { pdfInspector } from '../adapters/pdf-inspector';"],
-    ['src/http/x.ts', "import { pdfInspector } from '../adapters/pdf-inspector';"],
+    ['src/domain/x.ts', "import { createTurnstileVerifier } from '../adapters/turnstile';"],
+    ['src/http/x.ts', "import { createTurnstileVerifier } from '../adapters/turnstile';"],
     ['src/http/x.ts', "import { REGION } from '../config';"],
     ['src/http/x.ts', "import Stripe from 'stripe';"],
     ['src/adapters/x.ts', "import { handleExtract } from '../http/extract';"],
     ['src/adapters/x.ts', "import { handler } from '../handlers/extract';"],
     ['src/config.ts', "import { LIMITS } from './domain/documents';"],
-    ['infra/x.ts', "import { pdfInspector } from '../src/adapters/pdf-inspector';"],
+    ['infra/x.ts', "import { createTurnstileVerifier } from '../src/adapters/turnstile';"],
   ])('%s cannot %s', async (filePath, code) => {
     expect(await violations(filePath, code)).toContain('no-restricted-imports');
   });
@@ -49,7 +49,7 @@ describe('api import boundaries', () => {
     ['src/http/x.ts', "import { extract } from '../domain/extract';"],
     ['src/adapters/x.ts', "import { REGION } from '../config';"],
     ['src/adapters/x.ts', "import type { Clock } from '../domain/ports';"],
-    ['src/handlers/x.ts', "import { pdfInspector } from '../adapters/pdf-inspector';"],
+    ['src/handlers/x.ts', "import { createTurnstileVerifier } from '../adapters/turnstile';"],
     ['infra/x.ts', "import { REGION } from '../src/config';"],
   ])('%s may %s', async (filePath, code) => {
     expect(await violations(filePath, code)).not.toContain('no-restricted-imports');

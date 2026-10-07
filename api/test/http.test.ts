@@ -1,13 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createHmacSigner } from '../src/adapters/hmac-signer';
 import { passClaims } from '../src/domain/allowance';
-import { pdfInspector } from '../src/adapters/pdf-inspector';
 import { consoleLogger } from '../src/adapters/runtime';
 import type { ExtractDeps } from '../src/domain/extract';
 import type { HttpEvent } from '../src/http/common';
 import { handleExtract } from '../src/http/extract';
 import { handleCheckout, handlePass } from '../src/http/payments';
-import { coherentSettlement, f } from './support/fields';
+import { coherentSettlement, f, page, proposal } from './support/fields';
 import {
   ESCALATION,
   FakeCaptcha,
@@ -32,7 +31,6 @@ const post = (body: unknown, method = 'POST'): HttpEvent => ({
 });
 
 const extractBody = (overrides: Record<string, unknown> = {}) => ({
-  kind: 'settlement',
   files: [{ mediaType: 'image/jpeg', data: b64(jpeg(1000, 1400)) }],
   captchaToken: 'turnstile-token',
   ...overrides,
@@ -43,7 +41,6 @@ function extractDeps(toolInput: unknown = coherentSettlement()) {
   const reader = new FakeReader({ [PRIMARY]: read(toolInput), [ESCALATION]: read(toolInput) });
   const deps: ExtractDeps & { logger: MemoryLogger } = {
     reader,
-    pdf: pdfInspector,
     captcha: new FakeCaptcha(),
     signer,
     payments: new FakePayments({}),
@@ -67,7 +64,11 @@ describe('handleExtract', () => {
     expect(response.headers['cache-control']).toBe('no-store');
     const body = json(response);
     expect(body).toMatchObject({ code: 'ok', failedChecks: [] });
-    expect(body['extraction']).toMatchObject({ kind: 'settlement', fields: { extra_pay: f(980) } });
+    expect(body['extraction']).toMatchObject({
+      documents: [{ kind: 'settlement_proposal', pages: [1] }],
+      fields: { extra_pay: { ...f(980), source: 'settlement_proposal' } },
+      conflicts: [],
+    });
     expect(signer.verify(body['allowance'] as string)).toMatchObject({ typ: 'quota', used: 1 });
     expect(reader.calls[0]?.files[0]?.bytes).toEqual(jpeg(1000, 1400));
   });
@@ -104,10 +105,16 @@ describe('handleExtract', () => {
 
   it.each([
     ['a GET', post(extractBody(), 'GET'), 405, 'method_not_allowed'],
-    ['broken JSON', post('{"kind":'), 400, 'invalid_request'],
+    ['broken JSON', post('{"files":'), 400, 'invalid_request'],
     ['a JSON array', post('[]'), 400, 'invalid_request'],
-    ['an unknown kind', post(extractBody({ kind: 'contract' })), 400, 'invalid_request'],
+    ['files that are not a list', post(extractBody({ files: 'x' })), 400, 'invalid_request'],
     ['no captcha token', post(extractBody({ captchaToken: '' })), 400, 'invalid_request'],
+    [
+      'a PDF, which the browser sends as page images',
+      post(extractBody({ files: [{ mediaType: 'application/pdf', data: '' }] })),
+      415,
+      'unsupported_media_type',
+    ],
     [
       'a PNG',
       post(extractBody({ files: [{ mediaType: 'image/png', data: '' }] })),
@@ -121,8 +128,8 @@ describe('handleExtract', () => {
       'invalid_request',
     ],
     [
-      'five files',
-      post(extractBody({ files: Array(5).fill({ mediaType: 'image/jpeg', data: '' }) })),
+      'sixteen files',
+      post(extractBody({ files: Array(16).fill({ mediaType: 'image/jpeg', data: '' }) })),
       422,
       'too_many_files',
     ],
@@ -167,6 +174,7 @@ describe('handleExtract', () => {
         inputTokens: 2000,
         outputTokens: 400,
         escalated: true,
+        conflicts: 0,
       },
     ]);
   });
@@ -190,6 +198,7 @@ describe('flags in the log line', () => {
         inputTokens: 1000,
         outputTokens: 200,
         escalated: false,
+        conflicts: 0,
         countNotSaved: true,
       },
     ]);
@@ -213,17 +222,26 @@ describe('logs', () => {
       nonce: 'SENTINEL-nonce-0123456789',
       session: 'cs_test_SENTINELSESSION',
     };
+    // Two documents that disagree: the log may say that they do, never on what.
     const { deps } = extractDeps({
       ...coherentSettlement(),
-      endDate: f(sentinels.date),
-      severance: f(sentinels.amount),
-      note: f('SENTINEL-INJECTED-FIELD'),
+      settlement_proposal: {
+        ...proposal(),
+        endDate: f(sentinels.date),
+        severance: f(sentinels.amount),
+        note: f('SENTINEL-INJECTED-FIELD'),
+      },
+      pages: [page(1, 'settlement_proposal'), page(2, 'dismissal_letter')],
+      dismissal_letter: { endDate: f('2031-07-20'), severance: f(1) },
     });
     const quota = signer.sign({ typ: 'quota', day: '2026-10-07', used: 0 });
     const extracted = await handleExtract(
       post(
         extractBody({
-          files: [{ mediaType: 'image/jpeg', data: b64(jpeg(1000, 1400, sentinels.document)) }],
+          files: [
+            { mediaType: 'image/jpeg', data: b64(jpeg(1000, 1400, sentinels.document)) },
+            { mediaType: 'image/jpeg', data: b64(jpeg(1000, 1400)) },
+          ],
           captchaToken: sentinels.captcha,
           quota,
         }),
@@ -231,21 +249,25 @@ describe('logs', () => {
       { ...deps, logger: consoleLogger },
     );
     const next = json(extracted)['allowance'] as string;
+    expect(json(extracted)['extraction']).toMatchObject({
+      conflicts: [
+        { field: 'endDate', sources: ['settlement_proposal', 'dismissal_letter'] },
+        { field: 'severance', sources: ['settlement_proposal', 'dismissal_letter'] },
+      ],
+    });
 
-    // pdf-lib complains on the console about a malformed PDF; none of it may reach the logs.
-    const malformed = new TextEncoder().encode(
-      `%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 10 10]>>endobj\n4 0 obj << /Name (${sentinels.document}) ) >> garbage endobj\ntrailer<</Root 1 0 R>>\n%%EOF`,
-    );
+    // A PDF is refused before anything reads it: the browser sends its pages as images.
+    const pdfBytes = new TextEncoder().encode(`%PDF-1.7\n(${sentinels.document})\n%%EOF`);
     const refused = await handleExtract(
       post(
         extractBody({
-          files: [{ mediaType: 'application/pdf', data: b64(malformed) }],
+          files: [{ mediaType: 'application/pdf', data: b64(pdfBytes) }],
           captchaToken: sentinels.captcha,
         }),
       ),
       { ...deps, logger: consoleLogger },
     );
-    expect(json(refused)).toEqual({ code: 'pdf_unreadable' });
+    expect(json(refused)).toEqual({ code: 'unsupported_media_type' });
 
     await handleCheckout(post({ nonce: sentinels.nonce, captchaToken: sentinels.captcha }), {
       checkout: new FakeCheckout(),
@@ -271,6 +293,7 @@ describe('logs', () => {
       'inputTokens',
       'outputTokens',
       'escalated',
+      'conflicts',
     ];
     for (const line of lines) {
       for (const key of Object.keys(JSON.parse(line) as object)) expect(allowed).toContain(key);

@@ -1,12 +1,5 @@
 import type { Allowance } from '../domain/allowance';
-import {
-  DOCUMENT_KINDS,
-  LIMITS,
-  MEDIA_TYPES,
-  type DocumentFile,
-  type DocumentKind,
-  type MediaType,
-} from '../domain/documents';
+import { LIMITS, MEDIA_TYPES, type DocumentFile, type MediaType } from '../domain/documents';
 import { extract, type ExtractDeps, type ExtractRequest } from '../domain/extract';
 import type { Clock, Logger } from '../domain/ports';
 import type { ErrorCode } from '../domain/results';
@@ -15,16 +8,14 @@ import { handle, type HttpEvent, type HttpResponse } from './common';
 const BASE64 = /^[A-Za-z0-9+/]*={0,2}$/;
 const MAX_TOKEN_LENGTH = 2048;
 
-const isKind = (v: unknown): v is DocumentKind =>
-  typeof v === 'string' && (DOCUMENT_KINDS as readonly string[]).includes(v);
 const isMediaType = (v: unknown): v is MediaType =>
   typeof v === 'string' && (MEDIA_TYPES as readonly string[]).includes(v);
 const isToken = (v: unknown): v is string =>
   typeof v === 'string' && v.length > 0 && v.length <= MAX_TOKEN_LENGTH;
 
 function toRequest(body: Record<string, unknown>): ExtractRequest | ErrorCode {
-  const { kind, files, captchaToken, pass, quota } = body;
-  if (!isKind(kind) || !Array.isArray(files) || !isToken(captchaToken)) return 'invalid_request';
+  const { files, captchaToken, pass, quota } = body;
+  if (!Array.isArray(files) || !isToken(captchaToken)) return 'invalid_request';
   if (files.length > LIMITS.maxImages) return 'too_many_files';
 
   let allowance: Allowance;
@@ -45,7 +36,7 @@ function toRequest(body: Record<string, unknown>): ExtractRequest | ErrorCode {
       return 'invalid_request';
     decoded.push({ mediaType, bytes: new Uint8Array(Buffer.from(data, 'base64')) });
   }
-  return { kind, files: decoded, captchaToken, allowance };
+  return { files: decoded, captchaToken, allowance };
 }
 
 export function handleExtract(

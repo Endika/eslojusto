@@ -1,19 +1,19 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createHmacSigner } from '../src/adapters/hmac-signer';
-import { pdfInspector } from '../src/adapters/pdf-inspector';
 import { HAIKU_4_5, SONNET_4_6 } from '../src/config';
 import { passClaims } from '../src/domain/allowance';
 import type { DocumentFile } from '../src/domain/documents';
 import {
   extract,
+  NO_ESCALATION_AFTER_MS,
+  READ_DEADLINE_MS,
   type ExtractDeps,
   type ExtractMetrics,
   type ExtractRequest,
 } from '../src/domain/extract';
-import type { PdfInspector, SessionSnapshot } from '../src/domain/ports';
+import type { SessionSnapshot } from '../src/domain/ports';
 import { MAX_ESCALATION_INPUT_TOKENS } from '../src/domain/tokens';
-import { coherentSettlement, f } from './support/fields';
+import { coherentSettlement, f, page, proposal } from './support/fields';
 import {
   ESCALATION,
   FakeCaptcha,
@@ -25,7 +25,7 @@ import {
   read,
 } from './support/fakes';
 import { recordedReader } from './support/recorded';
-import { INJECTION, jpeg, settlementPdf } from './support/synthetic';
+import { INJECTION, jpeg } from './support/synthetic';
 
 const signer = createHmacSigner('test-key-that-is-long-enough-for-hmac-sha256');
 const photo: DocumentFile = {
@@ -35,21 +35,11 @@ const photo: DocumentFile = {
 const PASS_EXP = Date.UTC(2026, 9, 13, 12) / 1000;
 const passToken = (sid = 'cs_test_paid') => signer.sign(passClaims(sid, PASS_EXP));
 
-class CountingInspector implements PdfInspector {
-  calls = 0;
-  constructor(private readonly facts: Awaited<ReturnType<PdfInspector['inspect']>>) {}
-  async inspect() {
-    this.calls += 1;
-    return this.facts;
-  }
-}
-
 function setup(
   answers: ConstructorParameters<typeof FakeReader>[0],
   options: {
     captchaOk?: boolean;
     sessions?: Record<string, SessionSnapshot>;
-    pdf?: PdfInspector;
   } = {},
 ) {
   const reader = new FakeReader(answers);
@@ -57,7 +47,6 @@ function setup(
   const payments = new FakePayments(options.sessions ?? { cs_test_paid: paidSession() });
   const deps: ExtractDeps = {
     reader,
-    pdf: options.pdf ?? pdfInspector,
     captcha,
     signer,
     payments,
@@ -68,11 +57,15 @@ function setup(
 }
 
 const request = (overrides: Partial<ExtractRequest> = {}): ExtractRequest => ({
-  kind: 'settlement',
   files: [photo],
   captchaToken: 'turnstile-token',
   allowance: { type: 'free', token: null },
   ...overrides,
+});
+
+const withProposal = (fields: Record<string, unknown>) => ({
+  ...coherentSettlement(),
+  settlement_proposal: { ...proposal(), ...fields },
 });
 
 describe('extract', () => {
@@ -82,29 +75,52 @@ describe('extract', () => {
     const response = await extract(request(), deps, metrics);
     expect(response.code).toBe('ok');
     if (response.code !== 'ok') return;
-    expect(response.extraction.fields['totalAccrued']).toEqual(f(2870.5));
+    expect(response.extraction.fields.holiday_pay).toEqual({
+      ...f(640.5),
+      source: 'settlement_proposal',
+    });
+    expect(response.extraction.documents).toEqual([{ kind: 'settlement_proposal', pages: [1] }]);
     expect(response.failedChecks).toEqual([]);
     expect(reader.calls.map((c) => c.model)).toEqual([PRIMARY]);
-    expect(metrics).toEqual({ pages: 1, inputTokens: 1000, outputTokens: 200, escalated: false });
+    expect(metrics).toEqual({
+      pages: 1,
+      inputTokens: 1000,
+      outputTokens: 200,
+      escalated: false,
+      conflicts: 0,
+    });
   });
 
   it.each([
     ['a low-confidence field', coherentSettlement('low')],
-    ['items that do not add up', { ...coherentSettlement(), totalAccrued: f(9000) }],
-    ['an impossible date', { ...coherentSettlement(), endDate: f('2026-02-30') }],
-    ['an end date before the start', { ...coherentSettlement(), endDate: f('2020-01-01') }],
+    ['items that do not add up', withProposal({ totalGross: f(9000) })],
+    ['an impossible date', withProposal({ endDate: f('2026-02-30') })],
+    ['an end date before the start', withProposal({ endDate: f('2020-01-01') })],
     ['no tool output', null],
-    ['no detected kind', { startDate: f('2022-03-01') }],
+    ['a page left unclassified', { settlement_proposal: proposal() }],
+    ['a page of low confidence', { ...coherentSettlement(), pages: [page(1, 'other', 1, 'low')] }],
+    [
+      'documents that put the end before the start between them',
+      {
+        pages: [page(1, 'company_certificate')],
+        settlement_proposal: { startDate: f('2022-03-01') },
+        company_certificate: { endDate: f('2020-01-01') },
+      },
+    ],
   ])('escalates on %s and the escalation read wins', async (_, primaryInput) => {
     const { reader, deps } = setup({
       [PRIMARY]: read(primaryInput),
-      [ESCALATION]: read({ ...coherentSettlement(), severance: f(321) }, 2000, 300),
+      [ESCALATION]: read(withProposal({ severance: f(321) }), 2000, 300),
     });
     const metrics: ExtractMetrics = {};
     const response = await extract(request(), deps, metrics);
     expect(reader.calls.map((c) => c.model)).toEqual([PRIMARY, ESCALATION]);
     expect(response.code).toBe('ok');
-    if (response.code === 'ok') expect(response.extraction.fields['severance']).toEqual(f(321));
+    if (response.code === 'ok')
+      expect(response.extraction.fields.severance).toEqual({
+        ...f(321),
+        source: 'settlement_proposal',
+      });
     expect(metrics.escalated).toBe(true);
     expect(metrics.inputTokens).toBe(3000);
   });
@@ -115,18 +131,37 @@ describe('extract', () => {
       [ESCALATION]: read(null),
     });
     const response = await extract(request(), deps, {});
-    expect(response.code === 'ok' && response.extraction.fields['startDate']).toEqual(
-      f('2022-03-01', 'low'),
-    );
+    expect(response.code === 'ok' && response.extraction.fields.startDate).toEqual({
+      ...f('2022-03-01', 'low'),
+      source: 'settlement_proposal',
+    });
   });
 
   it('keeps the escalated read even when it is still doubtful', async () => {
     const { deps } = setup({
       [PRIMARY]: read(coherentSettlement('low')),
-      [ESCALATION]: read({ ...coherentSettlement(), totalAccrued: f(1) }),
+      [ESCALATION]: read(withProposal({ totalGross: f(1) })),
     });
     const response = await extract(request(), deps, {});
     expect(response.code === 'ok' && response.failedChecks).toEqual(['items_do_not_sum']);
+  });
+
+  it('gives every read the deadline, and starts no second read after 90 s', async () => {
+    const clock = new FakeClock();
+    const started = clock.ms;
+    const slow = new FakeReader(
+      { [PRIMARY]: read(coherentSettlement('low')), [ESCALATION]: read(coherentSettlement()) },
+      () => {
+        clock.ms += NO_ESCALATION_AFTER_MS;
+      },
+    );
+    const { deps } = setup({});
+    const metrics: ExtractMetrics = {};
+    const response = await extract(request(), { ...deps, reader: slow, clock }, metrics);
+    expect(response.code).toBe('ok');
+    expect(slow.calls.map((c) => c.model)).toEqual([PRIMARY]);
+    expect(slow.calls[0]?.deadline).toBe(started + READ_DEADLINE_MS);
+    expect(metrics.escalated).toBe(false);
   });
 
   it('does not escalate when both constants name the same model', async () => {
@@ -154,12 +189,12 @@ describe('extract', () => {
   });
 
   it('flags a read that cost more than twice its estimate', async () => {
-    // One 1176 × 1568 photo: 3,000 + 42 × 56 = 5,352 estimated tokens.
-    const fooled = setup({ [PRIMARY]: read(coherentSettlement(), 10_705) });
+    // One 1176 × 1568 photo: 13,000 + 1176 × 1568 / 750 = 15,459 estimated tokens.
+    const fooled = setup({ [PRIMARY]: read(coherentSettlement(), 30_919) });
     const metrics: ExtractMetrics = {};
     await extract(request(), fooled.deps, metrics);
     expect(metrics.underestimated).toBe(true);
-    const honest = setup({ [PRIMARY]: read(coherentSettlement(), 10_704) });
+    const honest = setup({ [PRIMARY]: read(coherentSettlement(), 30_918) });
     const fine: ExtractMetrics = {};
     await extract(request(), honest.deps, fine);
     expect(fine.underestimated).toBeUndefined();
@@ -171,9 +206,10 @@ describe('extract', () => {
       [ESCALATION]: new Error('throttled'),
     });
     const response = await extract(request(), deps, {});
-    expect(response.code === 'ok' && response.extraction.fields['startDate']).toEqual(
-      f('2022-03-01', 'low'),
-    );
+    expect(response.code === 'ok' && response.extraction.fields.startDate).toEqual({
+      ...f('2022-03-01', 'low'),
+      source: 'settlement_proposal',
+    });
   });
 
   it('tries the escalation model when the primary model fails', async () => {
@@ -192,21 +228,104 @@ describe('extract', () => {
     expect(await extract(request(), deps, {})).toEqual({ code: 'model_unavailable' });
   });
 
-  it('answers a confident wrong kind of document without escalating or returning data', async () => {
-    const { reader, deps } = setup({
-      [PRIMARY]: read({ detectedKind: f('payslip'), totalAccrued: f(1980) }),
+  it('answers a pack with nothing useful in it without escalating', async () => {
+    const { reader, deps } = setup({ [PRIMARY]: read({ pages: [page(1, 'other')] }) });
+    const response = await extract(request(), deps, {});
+    expect(response).toMatchObject({
+      code: 'ok',
+      extraction: { documents: [{ kind: 'other', pages: [1] }], fields: {}, conflicts: [] },
     });
-    expect(await extract(request(), deps, {})).toEqual({ code: 'document_kind_mismatch' });
     expect(reader.calls).toHaveLength(1);
   });
 
-  it('escalates an unsure wrong kind', async () => {
-    const { reader, deps } = setup({
-      [PRIMARY]: read({ detectedKind: f('payslip', 'low') }),
-      [ESCALATION]: read(coherentSettlement()),
-    });
+  it.each([
+    [
+      'a dismissal letter that yielded no figure',
+      { pages: [page(1, 'dismissal_letter')], dismissal_letter: { endDate: f('2026-06-30') } },
+    ],
+    [
+      'a final payslip without salary lines or items',
+      { pages: [page(1, 'payslip')], final_payslip: { periodStart: f('2026-09-01') } },
+    ],
+    [
+      'payslip lines without saying whether extra pay is prorated',
+      {
+        pages: [page(1, 'payslip')],
+        monthly_payslip: {
+          lines: [
+            { concept: 'SALARIO BASE', amount: 1500, category: 'salary', confidence: 'high' },
+          ],
+        },
+      },
+    ],
+    [
+      'a page set aside in a pack with a letter but no settlement or final payslip',
+      {
+        pages: [page(1, 'dismissal_letter'), page(2, 'other')],
+        dismissal_letter: { severance: f(900) },
+      },
+    ],
+  ])('takes a second look at %s', async (_, input) => {
+    const pages = input.pages.length;
+    const { reader, deps } = setup({ [PRIMARY]: read(input), [ESCALATION]: read(input) });
+    const files = Array.from({ length: pages }, () => photo);
+    expect((await extract(request({ files }), deps, {})).code).toBe('ok');
+    expect(reader.calls.map((c) => c.model)).toEqual([PRIMARY, ESCALATION]);
+  });
+
+  it('takes a second look when a value lost to a preferred source without being sure', async () => {
+    const input = {
+      pages: [page(1, 'settlement_proposal'), page(2, 'payslip')],
+      settlement_proposal: { ...proposal(), pending_salary: f(150, 'medium') },
+      final_payslip: {
+        lines: [{ concept: 'SALARIO BASE', amount: 1250, category: 'salary', confidence: 'high' }],
+      },
+    };
+    const { reader, deps } = setup({ [PRIMARY]: read(input), [ESCALATION]: read(input) });
+    const response = await extract(request({ files: [photo, photo] }), deps, {});
+    expect(reader.calls.map((c) => c.model)).toEqual([PRIMARY, ESCALATION]);
+    expect(response).toMatchObject({ code: 'ok', extraction: { conflicts: [] } });
+    expect(response).not.toHaveProperty(['extraction', 'discarded']);
+  });
+
+  it('does not look again at a tax certificate set aside beside a letter and its settlement', async () => {
+    const input = {
+      ...coherentSettlement(),
+      pages: [page(1, 'dismissal_letter'), page(2, 'settlement_proposal'), page(3, 'other')],
+      dismissal_letter: { severance: f(900) },
+    };
+    const { reader, deps } = setup({ [PRIMARY]: read(input) });
+    const files = [photo, photo, photo];
+    expect((await extract(request({ files }), deps, {})).code).toBe('ok');
+    expect(reader.calls).toHaveLength(1);
+  });
+
+  it('does not look again at payslip lines that say the extra pay is prorated', async () => {
+    const input = {
+      pages: [page(1, 'payslip')],
+      monthly_payslip: {
+        extraPayProrated: f(true),
+        lines: [
+          { concept: 'SALARIO BASE', amount: 1500, category: 'salary', confidence: 'high' },
+          { concept: 'PP PAGAS EXTRAS', amount: 250, category: 'salary', confidence: 'high' },
+        ],
+      },
+    };
+    const { reader, deps } = setup({ [PRIMARY]: read(input) });
     expect((await extract(request(), deps, {})).code).toBe('ok');
-    expect(reader.calls).toHaveLength(2);
+    expect(reader.calls).toHaveLength(1);
+  });
+
+  it('reads each image as one page', async () => {
+    const { reader, deps } = setup({
+      [PRIMARY]: read({ pages: [1, 2, 3].map((n) => page(n, 'other')) }),
+    });
+    const metrics: ExtractMetrics = {};
+    expect((await extract(request({ files: [photo, photo, photo] }), deps, metrics)).code).toBe(
+      'ok',
+    );
+    expect(reader.calls[0]?.files).toHaveLength(3);
+    expect(metrics.pages).toBe(3);
   });
 
   it('reports an unreadable document when neither model records anything', async () => {
@@ -224,16 +343,10 @@ describe('extract', () => {
     expect(reader.calls).toEqual([]);
   });
 
-  it('verifies the captcha before parsing any image or PDF', async () => {
-    const inspector = new CountingInspector({ pages: 1, textBytes: 0 });
-    const pdf: DocumentFile = { mediaType: 'application/pdf', bytes: await settlementPdf(1) };
-    const rejecting = setup({}, { captchaOk: false, pdf: inspector });
-    expect(await extract(request({ files: [pdf] }), rejecting.deps, {})).toEqual({
-      code: 'captcha_failed',
-    });
-    expect(inspector.calls).toBe(0);
+  it('verifies the captcha before parsing any image', async () => {
     // An oversized image is only noticed once the captcha has passed.
     const huge: DocumentFile = { mediaType: 'image/jpeg', bytes: jpeg(4000, 3000) };
+    const rejecting = setup({}, { captchaOk: false });
     expect((await extract(request({ files: [huge] }), rejecting.deps, {})).code).toBe(
       'captcha_failed',
     );
@@ -243,40 +356,17 @@ describe('extract', () => {
     );
   });
 
-  it('counts PDF pages and refuses more than four', async () => {
+  it('reads fifteen of the largest images and refuses a sixteenth', async () => {
     const { reader, deps } = setup({ [PRIMARY]: read(coherentSettlement()) });
-    const four: DocumentFile = { mediaType: 'application/pdf', bytes: await settlementPdf(4) };
-    const five: DocumentFile = { mediaType: 'application/pdf', bytes: await settlementPdf(5) };
+    const largest: DocumentFile = { mediaType: 'image/jpeg', bytes: jpeg(1568, 1568) };
     const metrics: ExtractMetrics = {};
-    expect((await extract(request({ files: [four] }), deps, metrics)).code).toBe('ok');
-    expect(metrics.pages).toBe(4);
-    expect(await extract(request({ files: [five] }), deps, {})).toEqual({
-      code: 'pdf_too_many_pages',
+    const fifteen = Array.from({ length: 15 }, () => largest);
+    expect((await extract(request({ files: fifteen }), deps, metrics)).code).toBe('ok');
+    expect(metrics.pages).toBe(15);
+    expect(await extract(request({ files: [...fifteen, largest] }), deps, {})).toEqual({
+      code: 'too_many_files',
     });
-    expect(reader.calls).toHaveLength(1);
-  });
-
-  it('refuses the PDF that hides four of its five pages from a sequential parser', async () => {
-    const { reader, deps } = setup({ [PRIMARY]: read(coherentSettlement()) });
-    const bytes = new Uint8Array(
-      readFileSync(new URL('fixtures/pdf/five-pages-counted-as-one.pdf', import.meta.url)),
-    );
-    expect(
-      await extract(request({ files: [{ mediaType: 'application/pdf', bytes }] }), deps, {}),
-    ).toEqual({ code: 'pdf_unreadable' });
-    expect(reader.calls).toEqual([]);
-  });
-
-  it('refuses a document too dense to read at a bounded cost', async () => {
-    const pdf: DocumentFile = { mediaType: 'application/pdf', bytes: await settlementPdf(4) };
-    const { reader, deps } = setup(
-      { [PRIMARY]: read(coherentSettlement()) },
-      { pdf: new CountingInspector({ pages: 4, textBytes: 60_000 }) },
-    );
-    expect(await extract(request({ files: [pdf] }), deps, {})).toEqual({
-      code: 'document_too_dense',
-    });
-    expect(reader.calls).toEqual([]);
+    expect(reader.calls.filter((c) => c.model === PRIMARY)).toHaveLength(1);
   });
 
   it('hands back a quota token counting the read', async () => {
@@ -302,12 +392,16 @@ describe('extract', () => {
     expect(third).toEqual({ code: 'daily_limit_reached' });
   });
 
-  it('does not count a read that failed', async () => {
+  it('does not count a read that found the models unavailable', async () => {
     const { deps } = setup({ [PRIMARY]: new Error('down'), [ESCALATION]: new Error('down') });
     const token = signer.sign({ typ: 'quota', day: '2026-10-07', used: 1 });
-    expect((await extract(request({ allowance: { type: 'free', token } }), deps, {})).code).toBe(
-      'model_unavailable',
-    );
+    const allowance = { type: 'free' as const, token };
+    expect(await extract(request({ allowance }), deps, {})).toEqual({ code: 'model_unavailable' });
+    // The same token still has its second read of the day.
+    const back = setup({ [PRIMARY]: read(coherentSettlement()) });
+    const next = await extract(request({ allowance }), back.deps, {});
+    if (next.code !== 'ok' || !next.allowanceToken) throw new Error(next.code);
+    expect(signer.verify(next.allowanceToken)).toMatchObject({ used: 2 });
   });
 });
 
@@ -366,6 +460,17 @@ describe('extract with a pass', () => {
     ).toEqual({ code: 'payment_provider_unavailable' });
   });
 
+  it('does not spend a pass read when the models are unavailable', async () => {
+    const { payments, deps } = setup(
+      { [PRIMARY]: new Error('denied'), [ESCALATION]: new Error('denied') },
+      { sessions: { cs_test_paid: paidSession({ readsUsed: 3 }) } },
+    );
+    expect(
+      await extract(request({ allowance: { type: 'pass', token: passToken() } }), deps, {}),
+    ).toEqual({ code: 'model_unavailable' });
+    expect(payments.recorded).toEqual([]);
+  });
+
   it('still answers when Stripe fails to store the count, and flags it', async () => {
     const { deps } = pass({ cs_test_paid: paidSession() });
     const flaky = {
@@ -386,7 +491,6 @@ describe('extract with recorded Bedrock responses', () => {
   const models = { primary: HAIKU_4_5, escalation: SONNET_4_6 };
   const base = (reader: ExtractDeps['reader']): ExtractDeps => ({
     reader,
-    pdf: pdfInspector,
     captcha: new FakeCaptcha(),
     signer,
     payments: new FakePayments({}),
@@ -397,7 +501,7 @@ describe('extract with recorded Bedrock responses', () => {
   it('reads a confident settlement with Haiku only', async () => {
     const { reader, requests } = recordedReader({ [HAIKU_4_5]: 'settlement-confident' });
     const response = await extract(request(), base(reader), {});
-    expect(response.code === 'ok' && response.extraction.fields['holiday_pay']).toEqual(f(640.5));
+    expect(response.code === 'ok' && response.extraction.fields.holiday_pay?.value).toBe(640.5);
     expect(requests.map((r) => r.modelId)).toEqual([HAIKU_4_5]);
   });
 
@@ -409,38 +513,71 @@ describe('extract with recorded Bedrock responses', () => {
     const metrics: ExtractMetrics = {};
     const response = await extract(request(), base(reader), metrics);
     expect(requests.map((r) => r.modelId)).toEqual([HAIKU_4_5, SONNET_4_6]);
-    expect(response.code === 'ok' && response.extraction.fields['holiday_pay']).toEqual(f(640.5));
+    expect(response.code === 'ok' && response.extraction.fields.holiday_pay?.value).toBe(640.5);
     expect(metrics).toMatchObject({ escalated: true, inputTokens: 12240, outputTokens: 930 });
   });
 
   it('reads a payslip and a work history', async () => {
     const payslip = recordedReader({ [HAIKU_4_5]: 'payslip' });
-    const p = await extract(request({ kind: 'payslip' }), base(payslip.reader), {});
-    expect(p.code === 'ok' && p.extraction.lists['accruals']).toHaveLength(3);
+    const p = await extract(request(), base(payslip.reader), {});
+    expect(p.code === 'ok' && p.extraction.fields).toMatchObject({
+      payslipTotalAccrued: { value: 1980, source: 'payslip' },
+      extraPayProrated: { value: true, source: 'payslip' },
+    });
+    expect(p.code === 'ok' && p.extraction.documents).toEqual([
+      { kind: 'payslip', pages: [1], month: '2026-08' },
+    ]);
     const history = recordedReader({ [HAIKU_4_5]: 'work-history' });
-    const h = await extract(request({ kind: 'work_history' }), base(history.reader), {});
-    expect(h.code === 'ok' && h.extraction.lists['contracts']?.[2]).toEqual({
+    const h = await extract(request(), base(history.reader), {});
+    expect(h.code === 'ok' && h.extraction.lists.contracts?.[2]).toEqual({
       values: { startDate: '2022-03-01' },
       confidence: 'medium',
+      source: 'work_history',
     });
   });
 
+  it('reads a mixed pack into one result and flags where its documents disagree', async () => {
+    // Its page 4 is set aside as other, but the pack has its settlement: no second look.
+    const { reader, requests } = recordedReader({ [HAIKU_4_5]: 'pack', [SONNET_4_6]: 'pack' });
+    const metrics: ExtractMetrics = {};
+    const response = await extract(
+      request({ files: Array.from({ length: 5 }, () => photo) }),
+      base(reader),
+      metrics,
+    );
+    if (response.code !== 'ok') throw new Error(response.code);
+    expect(response.extraction.documents).toEqual([
+      { kind: 'dismissal_letter', pages: [1, 2] },
+      { kind: 'payslip', pages: [3], month: '2026-08' },
+      { kind: 'other', pages: [4] },
+      { kind: 'settlement_proposal', pages: [5] },
+    ]);
+    expect(response.extraction.fields).toMatchObject({
+      endDate: { value: '2026-09-15', source: 'settlement_proposal' },
+      cause: { value: 'objective_dismissal', source: 'dismissal_letter' },
+      noticeDaysReceived: { value: 15, source: 'dismissal_letter' },
+      severance: { value: 5000, source: 'settlement_proposal' },
+      payslipTotalAccrued: { value: 1980, source: 'payslip' },
+    });
+    expect(response.extraction.conflicts).toEqual([
+      { field: 'endDate', sources: ['settlement_proposal', 'dismissal_letter'] },
+    ]);
+    expect(metrics).toMatchObject({ pages: 5, escalated: false, conflicts: 1 });
+    expect(requests.map((r) => r.modelId)).toEqual([HAIKU_4_5]);
+  });
+
   it('ignores whatever an injected document made the model add', async () => {
-    const pdf: DocumentFile = {
-      mediaType: 'application/pdf',
-      bytes: await settlementPdf(1, INJECTION),
-    };
+    const injected: DocumentFile = { mediaType: 'image/jpeg', bytes: jpeg(1000, 1400, INJECTION) };
     const injectedOnly = recordedReader({ [HAIKU_4_5]: 'injected' });
     const alone = await extract(
-      request({ files: [pdf] }),
+      request({ files: [injected] }),
       { ...base(injectedOnly.reader), models: { primary: HAIKU_4_5, escalation: HAIKU_4_5 } },
       {},
     );
     if (alone.code !== 'ok') throw new Error(alone.code);
-    expect(Object.keys(alone.extraction.fields).sort()).toEqual(
-      ['detectedKind', 'endDate', 'startDate'].sort(),
-    );
-    expect(alone.extraction.lists['otherAccruals']).toEqual([]);
+    expect(Object.keys(alone.extraction.fields).sort()).toEqual(['endDate', 'startDate']);
+    // The page given twice, the second time with a key of its own, is read once.
+    expect(alone.extraction.pages).toEqual([page(1, 'settlement_proposal')]);
     expect(JSON.stringify(alone)).not.toMatch(/99999|SYSTEM PROMPT|admin|exfiltrate/);
 
     // Dropped fields are a doubt, so the document gets a second, clean read.
@@ -448,8 +585,8 @@ describe('extract with recorded Bedrock responses', () => {
       [HAIKU_4_5]: 'injected',
       [SONNET_4_6]: 'settlement-escalated',
     });
-    const escalated = await extract(request({ files: [pdf] }), base(reader), {});
-    expect(escalated.code === 'ok' && escalated.extraction.fields['severance']).toBeUndefined();
+    const escalated = await extract(request({ files: [injected] }), base(reader), {});
+    expect(escalated.code === 'ok' && escalated.extraction.fields.severance).toBeUndefined();
   });
 
   it.each(['max-tokens', 'refusal', 'text-only'] as const)(

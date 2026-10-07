@@ -9,48 +9,61 @@
       "id": "toolu_bdrk_01FICTITIOUS",
       "name": "record_extraction",
       "input": {
-        "detectedKind": {
-          "value": "payslip",
-          "confidence": "high"
-        },
-        "periodStart": {
-          "value": "2026-08-01",
-          "confidence": "high"
-        },
-        "periodEnd": {
-          "value": "2026-08-31",
-          "confidence": "high"
-        },
-        "startDate": {
-          "value": "2022-03-01",
-          "confidence": "high"
-        },
-        "totalAccrued": {
-          "value": 1980,
-          "confidence": "high"
-        },
-        "extraPayProrated": {
-          "value": true,
-          "confidence": "high"
-        },
-        "extraPayProratedAmount": {
-          "value": 280,
-          "confidence": "high"
-        },
-        "accruals": [
+        "pages": [
           {
-            "amount": 1500,
-            "confidence": "high"
-          },
-          {
-            "amount": 200,
-            "confidence": "high"
-          },
-          {
-            "amount": 280,
-            "confidence": "high"
+            "page": 1,
+            "kind": "payslip",
+            "document": 1,
+            "confidence": "high",
+            "month": "2026-08"
           }
-        ]
+        ],
+        "monthly_payslip": {
+          "periodStart": {
+            "value": "2026-08-01",
+            "confidence": "high"
+          },
+          "periodEnd": {
+            "value": "2026-08-31",
+            "confidence": "high"
+          },
+          "startDate": {
+            "value": "2022-03-01",
+            "confidence": "high"
+          },
+          "totalAccrued": {
+            "value": 1980,
+            "confidence": "high"
+          },
+          "extraPayProrated": {
+            "value": true,
+            "confidence": "high"
+          },
+          "extraPayProratedAmount": {
+            "value": 280,
+            "confidence": "high"
+          },
+          "lines": [
+            {
+              "concept": "SALARIO BASE",
+              "amount": 1500,
+              "category": "salary",
+              "confidence": "high"
+            },
+            {
+              "concept": "PLUS CONVENIO",
+              "amount": 200,
+              "category": "salary",
+              "confidence": "high"
+            },
+            {
+              "concept": "PP PAGAS EXTRAS",
+              "amount": 280,
+              "category": "salary",
+              "confidence": "high"
+            }
+          ]
+        }
       }
     }
   ],
