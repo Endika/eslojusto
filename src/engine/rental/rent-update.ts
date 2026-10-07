@@ -88,9 +88,11 @@ const EXTRA_CAPS: Partial<Record<RuleId, ExtraCap>> = {
 
 const UPDATE_RULES = new Set<RuleId>([
   'update_clause',
+  'update_clause_rdl26',
   'update_clause_rdl29',
   'cap_ipc',
   'cap_irav',
+  'irav_all_contracts_rdl26',
   'irav_all_contracts',
   ...(Object.keys(EXTRA_CAPS) as RuleId[]),
 ]);
@@ -201,12 +203,13 @@ function frameOf(
     if (clause === 'ipc' || clause === 'irav' || clause === 'igc') needed.add(clause);
     if (clause === 'unspecified_index') {
       if (active.has('update_clause')) needed.add('igc');
-      if (active.has('update_clause_rdl29')) needed.add('irav');
+      if (active.has('update_clause_rdl26') || active.has('update_clause_rdl29'))
+        needed.add('irav');
     }
     const signedAfterLaw12 = toIso(input.signedOn) >= norms.law12_2023.inForceSince;
-    if (active.has('cap_irav') && (signedAfterLaw12 || active.has('irav_all_contracts')))
-      needed.add('irav');
-    if (active.has('cap_ipc') && (!signedAfterLaw12 || !active.has('cap_irav'))) needed.add('ipc');
+    const iravForAll = active.has('irav_all_contracts') || active.has('irav_all_contracts_rdl26');
+    if (active.has('cap_irav') && (signedAfterLaw12 || iravForAll)) needed.add('irav');
+    if (active.has('cap_ipc')) needed.add('ipc');
     for (const id of active.keys()) if (EXTRA_CAPS[id]?.rate === 'igc') needed.add('igc');
     for (const id of needed) {
       const ref = referenceMonth(indices[id], update.anniversary);
@@ -403,10 +406,12 @@ function allowance(
     phrases.push(rentalPhrase('rent_update.large_landlord_cap'));
   } else {
     const clause = input.updateClause;
+    // The RDL 26 and 29/2026 wording of art. 18.1: the IRAV for a clause naming no index and as
+    // the cap, in place of the IGC and the CPI.
+    const rewording = (['update_clause_rdl29', 'update_clause_rdl26'] as const).find(holds);
     if (clause === 'unspecified_index') {
-      const rdl29 = holds('update_clause_rdl29');
-      rules.push(rdl29 ? 'update_clause_rdl29' : 'update_clause');
-      const r = look(rdl29 ? 'irav' : 'igc');
+      rules.push(rewording ?? 'update_clause');
+      const r = look(rewording ? 'irav' : 'igc');
       if (!r.ok) return { ok: false, unchecked: r.unchecked, rules };
       agreed = toFigure(r);
     } else {
@@ -419,12 +424,15 @@ function allowance(
       }
     }
     const signedAfterLaw12 = toIso(input.signedOn) >= norms.law12_2023.inForceSince;
-    // LAU art. 18.1 and DA 11.ª: the IRAV caps contracts signed from 26-05-2023, and every
-    // contract where RDL 29/2026 holds; the CPI caps the rest.
-    if (holds('cap_irav') && (signedAfterLaw12 || holds('irav_all_contracts'))) {
+    const iravForAll = (['irav_all_contracts', 'irav_all_contracts_rdl26'] as const).find(holds);
+    // LAU DA 11.ª: the IRAV caps contracts signed from 26-05-2023, and every contract where the
+    // RDL 26 or 29/2026 wording of DT 4.ª holds. Art. 18.1 keeps the CPI cap «en todo caso»
+    // until reworded, so the lower of both binds.
+    if (holds('cap_irav') && (signedAfterLaw12 || iravForAll)) {
       caps.push({ rule: 'cap_irav', rate: 'irav' });
-      if (!signedAfterLaw12) rules.push('irav_all_contracts');
-    } else if (holds('cap_ipc')) caps.push({ rule: 'cap_ipc', rate: 'ipc' });
+      if (!signedAfterLaw12 && iravForAll) rules.push(iravForAll);
+    }
+    if (holds('cap_ipc') && !rewording) caps.push({ rule: 'cap_ipc', rate: 'ipc' });
     for (const id of extra) caps.push({ rule: id, rate: EXTRA_CAPS[id]?.rate ?? 0 });
   }
 
