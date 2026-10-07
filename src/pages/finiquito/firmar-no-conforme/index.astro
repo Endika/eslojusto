@@ -1,0 +1,76 @@
+---
+import CasePage from '../../../views/CasePage.astro';
+import { OFFERED_HOLIDAYS, itemRange, notAgreed } from '../../../content/examples';
+import { euroRange, euros } from '../../../content/format';
+
+const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
+const range = itemRange(notAgreed, 'holiday_pay');
+if (!holidays || !range || holidays.difference === null) throw new Error('Incomplete example');
+---
+
+<CasePage id="not_agreed">
+  <section class="sheet sheet--text">
+    <h3 id="nc-que-es">Qué significa</h3>
+    <p>
+      Al terminar el contrato, la empresa te entrega una propuesta del documento de liquidación con
+      las cantidades que te debe (art. 49.2 ET). Algunas personas, cuando no están de acuerdo con
+      alguna cantidad, la firman añadiendo «recibí no conforme» o «no conforme».
+    </p>
+    <p>
+      Esa nota no cambia lo que te paga la empresa: deja escrito que no estás de acuerdo con alguna
+      cifra. Lo contamos solo como información. Qué hacer en tu caso puede valorarlo un despacho
+      laboralista, un despacho de graduado social o un sindicato.
+    </p>
+    <p class="folio">
+      Art. <span>49.2</span> ET
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="nc-representante">Con alguien de la plantilla delante</h3>
+    <p>
+      Puedes pedir que esté presente un representante legal de la plantilla cuando vayas a firmar el
+      finiquito. El documento hace constar si lo firmas en su presencia o si no has usado esa
+      posibilidad (art. 49.2 ET).
+    </p>
+    <p class="folio">
+      Art. <span>49.2</span> ET
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="nc-ejemplo">Ejemplo: comparar antes de firmar</h3>
+    <p>
+      Una persona con 1.500&nbsp;€ brutos al mes y dos pagas extra de 1.500&nbsp;€ se va por baja
+      voluntaria el 15 de octubre de 2026, tras trabajar desde el 1 de marzo de 2023. Ha disfrutado
+      10 de sus 22 días laborables de vacaciones y ha dado los 15 días de preaviso de su convenio.
+      La propuesta le paga {euros(OFFERED_HOLIDAYS)} de vacaciones.
+    </p>
+    <p class="example">
+      <span class="example__label">Vacaciones</span> El mínimo legal sale {euroRange(range)}, según
+      se cuente por días o por meses. Frente a {euros(OFFERED_HOLIDAYS)}, faltan al menos{' '}
+      {euros(holidays.difference)}.
+    </p>
+    <p>
+      La calculadora hace lo mismo con cada partida: escribe lo que pone la propuesta en la hoja «Tu
+      finiquito» y verás qué cuadra con el mínimo legal y qué no.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="nc-plazos">Los plazos siguen corriendo</h3>
+    <p>
+      Para el salario pendiente, las vacaciones, las pagas extra o la indemnización por fin de
+      contrato temporal, el plazo es de un año (art. 59.1 ET).
+    </p>
+    <p>
+      En un despido, el plazo para impugnarlo es de 20 días hábiles (art. 59.3 ET). Ese plazo se
+      interrumpe al presentar la solicitud de conciliación ante el servicio público de mediación,
+      arbitraje y conciliación que corresponda. Es corto, y un despacho laboralista, un despacho de
+      graduado social o un sindicato pueden decirte cuál se aplica a tu caso.
+    </p>
+    <p class="folio">
+      Art. <span>59</span> ET
+    </p>
+  </section>
+</CasePage>

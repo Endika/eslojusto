@@ -1,0 +1,118 @@
+---
+import FigureTable from '../../components/FigureTable.astro';
+import CasePage from '../../views/CasePage.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitBySalary } from '../../content/examples';
+import { euros, wholeEuros } from '../../content/format';
+import { BENEFIT_2026 } from '../../engine/unemployment';
+
+const { minCap, maxCap } = BENEFIT_2026;
+const [, mid, high] = benefitBySalary;
+if (!mid || !high) throw new Error('Incomplete example');
+type Row = (typeof benefitBySalary)[number];
+const stretch = (b: Row, n: 0 | 1 | 2) => b.children[n] ?? { c1: 0, c2: 0 };
+// One row per figure, one column per salary, so the table fits a phone.
+const rows: readonly (readonly [string, (b: Row) => number])[] = [
+  ['Base reguladora', (b) => b.base],
+  ['Primeros 180 días, sin hijos o hijas', (b) => stretch(b, 0).c1],
+  ['Primeros 180 días, con uno', (b) => stretch(b, 1).c1],
+  ['Primeros 180 días, con dos o más', (b) => stretch(b, 2).c1],
+  ['Desde el día 181, sin hijos o hijas', (b) => stretch(b, 0).c2],
+];
+---
+
+<CasePage id="benefit">
+  <section class="sheet sheet--text">
+    <h3 id="p-cuanto">El 70&nbsp;% y después el 60&nbsp;%</h3>
+    <p>
+      El paro, la prestación contributiva por desempleo, se calcula sobre tu base reguladora: la
+      media de lo cotizado por desempleo en los últimos 180 días, sin las horas extra (art. 270.1
+      LGSS). Se cobra el 70&nbsp;% de esa base los primeros 180 días y el 60&nbsp;% desde el día 181
+      (art. 270.2 LGSS).
+    </p>
+    <p>
+      Cada mes tiene un mínimo y un máximo según tus hijos o hijas a cargo (art. 270.3 LGSS). En
+      2026, con el IPREM en {wholeEuros(BENEFIT_2026.monthlyIprem)}, son estos:
+    </p>
+    <ul>
+      <li>
+        Sin hijos o hijas a cargo, entre {wholeEuros(minCap[0])} y {wholeEuros(maxCap[0])} al mes.
+      </li>
+      <li>
+        Con uno, entre {wholeEuros(minCap[1])} y {wholeEuros(maxCap[1])}.
+      </li>
+      <li>
+        Con dos o más, entre {wholeEuros(minCap[1])} y {wholeEuros(maxCap[2])}.
+      </li>
+    </ul>
+    <p class="folio">
+      Art. <span>270</span> LGSS
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="p-tabla">Cuánto se cobra de paro con una nómina de 1.300, 1.500 o 1.800&nbsp;€</h3>
+    <FigureTable id="p-tabla-titulo">
+      <Fragment slot="caption">
+        Paro bruto al mes con un salario en 14 pagas iguales y jornada completa, en 2026, redondeado
+        al euro como en la calculadora.
+      </Fragment>
+      <thead>
+        <tr>
+          <th scope="col">Salario bruto al mes</th>
+          {benefitBySalary.map(({ salary }) => (
+            <th scope="col">{wholeEuros(salary)}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map(([label, value]) => (
+          <tr>
+            <th scope="row">{label}</th>
+            {benefitBySalary.map((b) => (
+              <td>{wholeEuros(value(b))}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </FigureTable>
+    <p>
+      La base sale del salario anual, con las pagas extra, entre 12: con 1.500&nbsp;€ en 14 pagas,
+      21.000&nbsp;€ / 12 = {euros(mid.base)}, y su 70&nbsp;% es justo el máximo sin hijos o hijas a
+      cargo. Con 1.800&nbsp;€ la base es {euros(high.base)} y su 70&nbsp;% pasa de los máximos sin
+      hijos o hijas y con uno, así que ahí se cobra el máximo.
+    </p>
+    <p>
+      Son cifras brutas. De ahí se descuenta un 4,85&nbsp;% de la base para la Seguridad Social y el
+      IRPF que corresponda. Con jornada parcial las cifras son menores, y la calculadora no las da.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="p-requisitos">Quién puede cobrarlo</h3>
+    <p>
+      El contrato tiene que terminar en una situación legal de desempleo: un despido o el fin de un
+      contrato temporal que no terminaste tú, por ejemplo (art. 267 LGSS). Además hacen falta al
+      menos 360 días cotizados en los últimos 6 años, inscribirte como demandante de empleo y
+      suscribir el acuerdo de actividad, entre otros requisitos (art. 266 LGSS).
+    </p>
+    <ul>
+      <li>
+        Cuánto dura según lo cotizado: <CaseLink id="benefit_duration" />.
+      </li>
+      <li>
+        Si te vas tú: <CaseLink id="benefit_resignation" />
+      </li>
+      <li>
+        Si te despiden por una falta: <CaseLink id="benefit_disciplinary" />.
+      </li>
+    </ul>
+    <p>
+      Se pide en los 15 días hábiles siguientes al fin del contrato, o al fin de las vacaciones no
+      disfrutadas que te pague el finiquito (art. 268 LGSS).
+    </p>
+    <p class="folio">
+      Arts. <span>266 · 267 · 268</span> LGSS
+    </p>
+  </section>
+</CasePage>

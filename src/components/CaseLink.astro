@@ -1,0 +1,12 @@
+---
+import { LANDINGS, type LandingId } from '../content/landings';
+import { link } from '../i18n/languages';
+
+// A link to a case page, always with that page's own name as its text.
+interface Props {
+  id: LandingId;
+}
+const { path, name } = LANDINGS[Astro.props.id];
+---
+
+<a href={link('es', path.replace(/^\//, ''))}>{name}</a>

@@ -15,11 +15,14 @@ export const faqEntries = (
   }));
 
 // A node for the page's @graph; Base adds the @context.
-export const faqPage = (lang: Lang, options: { documents?: boolean } = {}) => ({
+export const faqNode = (entries: readonly { question: string; answer: string }[]) => ({
   '@type': 'FAQPage',
-  mainEntity: faqEntries(lang, options).map(({ question, answer }) => ({
+  mainEntity: entries.map(({ question, answer }) => ({
     '@type': 'Question',
     name: question,
     acceptedAnswer: { '@type': 'Answer', text: answer },
   })),
 });
+
+export const faqPage = (lang: Lang, options: { documents?: boolean } = {}) =>
+  faqNode(faqEntries(lang, options));

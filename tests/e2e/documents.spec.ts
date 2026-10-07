@@ -960,3 +960,21 @@ test.describe('on a phone', () => {
     ).toBeLessThanOrEqual(0);
   });
 });
+
+test('a case page offers the same start, and the manual path opens past its marked cause', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page);
+  await page.goto('finiquito/despido-objetivo/');
+  await expect(page.getByRole('heading', { name: '¿Cómo quieres empezar?' })).toBeVisible();
+  const csp = await page
+    .locator('meta[http-equiv="Content-Security-Policy"]')
+    .getAttribute('content');
+  expect(csp).toContain(
+    `connect-src ${[...API_ORIGINS, 'https://challenges.cloudflare.com'].join(' ')};`,
+  );
+  await page.getByRole('button', { name: /Rellenar a mano/ }).click();
+  await expect(page.getByRole('heading', { name: /¿Cuándo empezaste/ })).toBeFocused();
+  await expect(page.locator('#cause-objective_dismissal')).toBeChecked();
+  expect(fake.extract).toHaveLength(0);
+});

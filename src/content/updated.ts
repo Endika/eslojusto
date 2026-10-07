@@ -9,4 +9,13 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/privacidad/': '2026-10-07',
   // Moves with the INE's newest figure on the page and with each check of its norms.
   [RENT_INDICES]: lastChanged(),
+  '/finiquito/baja-voluntaria/': '2026-10-07',
+  '/finiquito/despido-improcedente/': '2026-10-07',
+  '/finiquito/fin-de-contrato/': '2026-10-07',
+  '/finiquito/firmar-no-conforme/': '2026-10-07',
+  '/finiquito/despido-objetivo/': '2026-10-07',
+  '/paro/': '2026-10-07',
+  '/paro/por-tiempo-trabajado/': '2026-10-07',
+  '/paro/baja-voluntaria/': '2026-10-07',
+  '/paro/despido-disciplinario/': '2026-10-07',
 };
