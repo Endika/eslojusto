@@ -43,7 +43,7 @@ function severanceItem(e: FinalPayInput): Item {
     id: 'severance',
     direction: 'credit',
     range: r.range,
-    calculation: r.detail,
+    calculation: r.calculation,
     dependsOnAgreement: false,
     basedOnYourAnswer: false,
     sources: r.sources,

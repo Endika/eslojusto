@@ -40,6 +40,7 @@ describe.skipIf(!existsSync('dist'))('published copy', () => {
 
 const sources = [
   'src/calculator/render.ts',
+  'src/i18n/es.ts',
   ...readdirSync('src/engine')
     .filter((n) => n.endsWith('.ts'))
     .map((n) => join('src/engine', n)),

@@ -45,7 +45,7 @@ function review(...statuses: [ItemId, Status, number | null, number | null][]): 
       id,
       direction: id === 'notice_deduction' ? 'deduction' : 'credit',
       range: status === 'not_checkable' ? null : { min: 1, max: 1 },
-      calculation: '',
+      calculation: [],
       dependsOnAgreement: false,
       basedOnYourAnswer: false,
       sources: [],

@@ -1,5 +1,6 @@
 import { SOURCES } from './sources';
-import { days, between, num } from './money';
+import { between } from './money';
+import { phrase, type Phrase, type PhraseKey } from './calculation';
 import {
   compareDates,
   daysInYear,
@@ -10,7 +11,7 @@ import {
   accrualMonths,
   type CivilDate,
 } from './date';
-import type { FinalPayInput, Item } from './types';
+import type { Accrual, FinalPayInput, Item } from './types';
 
 const NOTICE_DAYS = 15;
 
@@ -19,8 +20,6 @@ export function annualSalary(e: FinalPayInput): number {
     ? e.monthlySalary * 12
     : e.monthlySalary * 12 + e.extraPayAmount * e.extraPayCount;
 }
-
-const eur = (n: number) => `${num(n)} €`;
 
 export function pendingSalaryItem(e: FinalPayInput): Item {
   const { y, m } = e.endDate;
@@ -33,7 +32,15 @@ export function pendingSalaryItem(e: FinalPayInput): Item {
     id: 'pending_salary',
     direction: 'credit',
     range: between(low, high),
-    calculation: `${eur(e.monthlySalary)} × ${d} días trabajados del mes, entre ${num(30, 0)} días (mes comercial) y ${monthDays} días (mes natural): de ${eur(Math.min(low, high))} a ${eur(Math.max(low, high))}.`,
+    calculation: [
+      phrase('pending_salary', {
+        salario: { euros: e.monthlySalary },
+        dias: d,
+        dias_mes: monthDays,
+        desde: { euros: Math.min(low, high) },
+        hasta: { euros: Math.max(low, high) },
+      }),
+    ],
     dependsOnAgreement: false,
     basedOnYourAnswer: false,
     sources: [SOURCES.et26],
@@ -47,10 +54,8 @@ const METHODS: readonly Method[] = ['days', 'months', 'anniversary'];
 const countsFromStart = (start: CivilDate, startDate: CivilDate): boolean =>
   compareDates(startDate, start) > 0 && startDate.d !== 1;
 
-const methodsNote = (fromStart: boolean): string =>
-  fromStart
-    ? ' Las empresas lo calculan por días naturales o por meses (meses enteros más los días sueltos / 30), contando los meses por calendario o desde tu fecha de alta; se muestran las tres cuentas.'
-    : ' Las empresas lo calculan por días naturales o por meses (meses enteros más los días del mes en curso / 30); se muestran las dos cuentas.';
+const methodsNote = (fromStart: boolean): Phrase =>
+  phrase(fromStart ? 'methods.three_counts' : 'methods.two_counts');
 
 export function holidayPayItem(e: FinalPayInput): Item {
   const { y } = e.endDate;
@@ -71,17 +76,29 @@ export function holidayPayItem(e: FinalPayInput): Item {
     basedOnYourAnswer: e.annualHolidayDays > 30,
     sources: [SOURCES.et38],
   } as const;
-  let accrual = `${days(e.annualHolidayDays)} días al año: por días, × ${d}/${yearLength} días trabajados en ${y} = ${days(byDays)} días devengados; por meses, × ${days(months)}/12 = ${days(byMonths)} días devengados`;
-  if (fromStart) {
-    accrual += `; por meses desde el alta, × ${days(monthsFromStart)}/12 = ${days(byMonthsFromStart)} días devengados`;
-  }
+  const accrualVars = {
+    anuales: { days: e.annualHolidayDays },
+    dias: d,
+    dias_ejercicio: yearLength,
+    ejercicio: y,
+    por_dias: { days: byDays },
+    meses: { days: months },
+    por_meses: { days: byMonths },
+  };
+  const accrual = fromStart
+    ? phrase('holiday_pay.accrual_from_start', {
+        ...accrualVars,
+        meses_alta: { days: monthsFromStart },
+        por_meses_alta: { days: byMonthsFromStart },
+      })
+    : phrase('holiday_pay.accrual', accrualVars);
   const taken = e.holidayDaysTaken;
   if (taken === null) {
     return {
       ...base,
       range: null,
       missingAnswer: 'days_taken',
-      calculation: `${accrual}. Sin saber cuántos días has disfrutado este año no se puede comprobar.`,
+      calculation: [phrase('holiday_pay.days_unknown', { devengo: accrual })],
     };
   }
   const pending = [byDays, byMonths, byMonthsFromStart].map((x) => x - taken);
@@ -90,7 +107,9 @@ export function holidayPayItem(e: FinalPayInput): Item {
     return {
       ...base,
       range: null,
-      calculation: `${accrual}, menos ${days(taken)} disfrutados: has disfrutado más días de los devengados. Que proceda o no un descuento por los días disfrutados de más depende del convenio.`,
+      calculation: [
+        phrase('holiday_pay.over_taken', { devengo: accrual, disfrutados: { days: taken } }),
+      ],
     };
   }
   const low = Math.max(0, Math.min(...pending));
@@ -99,7 +118,17 @@ export function holidayPayItem(e: FinalPayInput): Item {
   return {
     ...base,
     range: between(low * Math.min(monthly, annual), high * Math.max(monthly, annual)),
-    calculation: `${accrual}, menos ${days(taken)} disfrutados = entre ${days(low)} y ${days(high)} días pendientes × ${eur(monthly)} (salario mensual / 30) o ${eur(annual)} (salario anual / 365) al día.${methodsNote(fromStart)}`,
+    calculation: [
+      phrase('holiday_pay.pending', {
+        devengo: accrual,
+        disfrutados: { days: taken },
+        minimo: { days: low },
+        maximo: { days: high },
+        diario_mensual: { euros: monthly },
+        diario_anual: { euros: annual },
+      }),
+      methodsNote(fromStart),
+    ],
   };
 }
 
@@ -144,7 +173,7 @@ interface Share {
   readonly alreadyPaid: boolean;
   readonly fromStart: boolean;
   readonly amount: Record<Method, number>;
-  readonly text: string;
+  readonly text: Phrase;
 }
 
 function accrued(e: FinalPayInput, accrual: Scheme): Share[] {
@@ -162,10 +191,22 @@ function accrued(e: FinalPayInput, accrual: Scheme): Share[] {
       months: (e.extraPayAmount * months) / periodMonths,
       anniversary: (e.extraPayAmount * monthsFromStart) / periodMonths,
     };
-    let text = `${eur(e.extraPayAmount)} × ${d}/${total} días = ${eur(amount.days)} o × ${days(months)}/${periodMonths} meses = ${eur(amount.months)}`;
-    if (fromStart) {
-      text += ` o × ${days(monthsFromStart)}/${periodMonths} meses desde el alta = ${eur(amount.anniversary)}`;
-    }
+    const vars = {
+      importe: { euros: e.extraPayAmount },
+      dias: d,
+      total,
+      por_dias: { euros: amount.days },
+      meses: { days: months },
+      meses_periodo: periodMonths,
+      por_meses: { euros: amount.months },
+    };
+    const text = fromStart
+      ? phrase('extra_pay.share_from_start', {
+          ...vars,
+          meses_alta: { days: monthsFromStart },
+          por_meses_alta: { euros: amount.anniversary },
+        })
+      : phrase('extra_pay.share', vars);
     return {
       payment: p.payment,
       alreadyPaid: PAYMENT_MONTHS[p.payment].includes(e.endDate.m),
@@ -194,15 +235,22 @@ function scenarios(shares: readonly Share[], single: boolean): Bounds[] {
   });
 }
 
-// The accrual as the calculation text names it.
-const ACCRUAL_WORD: Record<Scheme, string> = { annual: 'anual', semiannual: 'semestral' };
-
-const ALREADY_PAID_NOTE: Record<ExtraPayment, string> = {
-  summer:
-    ' La paga de verano se suele cobrar en junio o julio: puede ir ya en la nómina de ese mes, así que el mínimo de esa paga parte de 0 €.',
-  christmas:
-    ' La paga de Navidad se suele cobrar en diciembre: puede ir ya en la nómina de ese mes, así que el mínimo de esa paga parte de 0 €.',
+const ALREADY_PAID_NOTE: Record<ExtraPayment, PhraseKey> = {
+  summer: 'extra_pay.summer_in_last_payslip',
+  christmas: 'extra_pay.christmas_in_last_payslip',
 };
+
+// The annual accrual has a summer and a Christmas share, in that order; the semiannual one, a single share.
+function accrualPhrase(accrual: Accrual, accruals: readonly (readonly Share[])[]): Phrase {
+  const [first = [], second = []] = accruals.map((shares) => shares.map((p) => p.text));
+  const [a, b] = first;
+  const [c] = second;
+  if (accrual === 'unknown' && a && b && c)
+    return phrase('extra_pay.unknown', { verano: a, navidad: b, paga: c });
+  if (accrual === 'annual' && a && b) return phrase('extra_pay.annual', { verano: a, navidad: b });
+  if (accrual === 'semiannual' && a) return phrase('extra_pay.semiannual', { paga: a });
+  throw new Error(`No shares for the ${accrual} accrual`);
+}
 
 export function extraPayItem(e: FinalPayInput): Item | null {
   if (e.extraPayProrated || e.extraPayCount <= 0) return null;
@@ -216,26 +264,18 @@ export function extraPayItem(e: FinalPayInput): Item | null {
     Math.max(...options.map((o) => o.high)),
   );
   const shares = accruals.flat();
-  const detail = accruals.map((r) => r.map((p) => p.text).join(' + ')).join('; o bien ');
-  let calculation =
-    e.extraPayAccrual === 'unknown'
-      ? `Sin saber cómo se devengan las pagas, entre el devengo semestral y el anual (${detail}).`
-      : `Devengo ${ACCRUAL_WORD[e.extraPayAccrual]}: ${detail}, suponiendo que no se ha cobrado nada del periodo abierto.`;
-  calculation += methodsNote(shares.some((p) => p.fromStart));
+  const calculation: Phrase[] = [
+    accrualPhrase(e.extraPayAccrual, accruals),
+    methodsNote(shares.some((p) => p.fromStart)),
+  ];
   if (!single && accruals.some((r) => r.length > 1)) {
-    calculation += ' Cada cuenta se aplica igual a las dos pagas.';
+    calculation.push(phrase('extra_pay.same_count_for_both'));
   }
   for (const payment of new Set(shares.filter((p) => p.alreadyPaid).map((p) => p.payment))) {
-    calculation += ALREADY_PAID_NOTE[payment];
+    calculation.push(phrase(ALREADY_PAID_NOTE[payment]));
   }
-  if (single) {
-    calculation +=
-      ' Con una sola paga extra no se sabe cuál es (verano o Navidad), por lo que se muestra el rango entre ambas.';
-  }
-  if (e.extraPayCount > 2) {
-    calculation +=
-      ' Solo se calculan las dos pagas habituales (verano y Navidad); las demás dependen del convenio.';
-  }
+  if (single) calculation.push(phrase('extra_pay.single'));
+  if (e.extraPayCount > 2) calculation.push(phrase('extra_pay.over_two'));
   return {
     id: 'extra_pay',
     direction: 'credit',
@@ -259,7 +299,15 @@ export function employerNoticeItem(e: FinalPayInput): Item | null {
     id: 'employer_notice',
     direction: 'credit',
     range: between(missingDays * dayMin, missingDays * dayMax),
-    calculation: `${NOTICE_DAYS} días de preaviso − ${received} recibidos = ${missingDays} días × entre ${eur(dayMin)} y ${eur(dayMax)} al día.`,
+    calculation: [
+      phrase('employer_notice', {
+        preaviso: NOTICE_DAYS,
+        recibidos: received,
+        faltan: missingDays,
+        minimo: { euros: dayMin },
+        maximo: { euros: dayMax },
+      }),
+    ],
     dependsOnAgreement: false,
     basedOnYourAnswer: false,
     sources: [objective ? SOURCES.et53 : SOURCES.et49],
@@ -277,8 +325,7 @@ export function noticeDeductionItem(e: FinalPayInput): Item | null {
     return {
       ...base,
       range: null,
-      calculation:
-        'El plazo de preaviso de una dimisión lo fija el convenio; sin ese dato no se puede comprobar el descuento.',
+      calculation: [phrase('notice_deduction.agreement_unknown')],
       dependsOnAgreement: true,
       basedOnYourAnswer: false,
     };
@@ -289,7 +336,14 @@ export function noticeDeductionItem(e: FinalPayInput): Item | null {
   return {
     ...base,
     range: between(0, missingDays * daily),
-    calculation: `${e.agreementNoticeDays} días de preaviso del convenio − ${given} dados = ${missingDays} días × ${eur(daily)} al día como máximo.`,
+    calculation: [
+      phrase('notice_deduction', {
+        convenio: e.agreementNoticeDays,
+        dados: given,
+        faltan: missingDays,
+        diario: { euros: daily },
+      }),
+    ],
     dependsOnAgreement: false,
     basedOnYourAnswer: true,
   };
