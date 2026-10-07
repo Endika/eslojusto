@@ -59,7 +59,7 @@ export interface RentUpdateInput {
   // The contract anniversary the rise is for.
   readonly anniversary: CivilDate;
   // The day the rise took effect, as the landlord applied it: on the anniversary, later, or
-  // (not allowed) before it.
+  // early, when the months before the anniversary are paid over in full.
   readonly effectiveOn: CivilDate;
   readonly previousRent: number;
   readonly newRent: number;

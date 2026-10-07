@@ -104,8 +104,8 @@ export function validateRental(e: RentalInput, today: CivilDate): readonly Renta
     if (startOk) {
       if (!isAnniversary(e.startDate, u.anniversary)) err('updates', 'not_an_anniversary', i);
       else {
-        // A rise belongs to the contract year that starts on its anniversary; one applied early
-        // still falls after the anniversary before.
+        // A rise is its anniversary's update even when applied early or late, so it must fall
+        // after the anniversary before and before the next one.
         const year = u.anniversary.y;
         const opens = year - 1 > e.startDate.y ? anniversaryIn(e.startDate, year - 1) : e.startDate;
         if (

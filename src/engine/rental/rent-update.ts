@@ -61,7 +61,8 @@ export interface RentUpdateReading {
   readonly monthly: number;
   readonly accumulated: number;
   readonly months: number;
-  // Months charged at the new rent before it was due (LAU art. 18.2).
+  // Months charged at the new rent before it was due: before the anniversary month or before the
+  // month after written notice (LAU art. 18).
   readonly monthsBeforeDue: number;
   readonly calculation: readonly RentalPhrase[];
   readonly rules: readonly RuleId[];
@@ -131,8 +132,8 @@ interface Frame {
   readonly index: number;
   readonly update: RentUpdateInput;
   readonly day: string;
-  // A rise before the anniversary, or a second one in the same contract year, allows nothing.
-  readonly rise: 'valid' | 'early' | 'second';
+  // A second rise in the same contract year allows nothing.
+  readonly rise: 'valid' | 'second';
   readonly active: ReadonlyMap<RuleId, ActiveRule>;
   readonly refs: ReadonlyMap<IndexId, ReferenceMonth>;
   readonly doubts: readonly Doubt[];
@@ -157,11 +158,9 @@ function frameOf(
   const day = toIso(update.anniversary);
   const previousEntry = sorted[k - 1]?.update;
   const rise =
-    compareDates(update.effectiveOn, update.anniversary) < 0
-      ? 'early'
-      : previousEntry && compareDates(previousEntry.anniversary, update.anniversary) === 0
-        ? 'second'
-        : 'valid';
+    previousEntry && compareDates(previousEntry.anniversary, update.anniversary) === 0
+      ? 'second'
+      : 'valid';
   const ids = { agreement: `agreement:${day}`, notice: `notice:${day}` };
   const firstYear = update.anniversary.y === start.y + 1;
 
@@ -352,8 +351,6 @@ function allowance(
   });
   // LAU art. 18.1: the rent is updated once a year, from the anniversary, and only as agreed.
   const when = { anniversary: { date: day }, date: { date: toIso(update.effectiveOn) } };
-  if (frame.rise === 'early')
-    return unchanged(rentalPhrase('rent_update.before_anniversary', when), ['update_clause']);
   if (frame.rise === 'second')
     return unchanged(rentalPhrase('rent_update.second_rise', when), ['update_clause']);
   if (input.updateClause === 'none')
@@ -513,9 +510,12 @@ function readUpdate(
     };
   const { allowed } = a;
 
-  // LAU art. 18.2: the updated rent is due from the month after written notice; until then each
-  // month charged above the base is paid over in full.
-  const effectiveMonth = monthIndex(update.effectiveOn);
+  // LAU art. 18.1 and 18.2: the updated rent is due from the anniversary and the month after
+  // written notice; until then each month charged above the base is paid over in full. A rise
+  // applied early is still that anniversary's update: only the months before the anniversary
+  // month are paid over (rent is checked by the month, so the anniversary month counts whole).
+  const annMonth = monthIndex(update.anniversary);
+  const effectiveMonth = Math.max(monthIndex(update.effectiveOn), annMonth);
   const written =
     WRITTEN.has(update.notice) ||
     (ELECTRONIC.has(update.notice) && world[frame.ids.notice] === true);
@@ -527,10 +527,13 @@ function readUpdate(
   let accumulated = 0;
   let months = 0;
   let monthsBeforeDue = 0;
+  let monthsEarly = 0;
+  const rose = allowed.maxRent > base.rent && update.newRent > base.rent;
   for (let m = first; m <= frame.endMonth; m++) {
     months++;
     const allowedRent = m >= dueFrom ? allowed.maxRent : base.rent;
-    if (m < dueFrom && allowed.maxRent > base.rent && update.newRent > base.rent) monthsBeforeDue++;
+    if (rose && m < annMonth) monthsEarly++;
+    else if (rose && m < dueFrom) monthsBeforeDue++;
     const over = round2(update.newRent - allowedRent);
     if (over > TOLERANCE) accumulated += over;
   }
@@ -540,6 +543,14 @@ function readUpdate(
 
   const withinBound = allowed.upperBoundOnly && monthly === 0 && accumulated === 0;
   const phrases = [basePhrase, ...allowed.phrases];
+  if (monthsEarly > 0)
+    phrases.push(
+      rentalPhrase('rent_update.before_anniversary', {
+        months: { integer: monthsEarly },
+        anniversary: { date: frame.day },
+        base: { euros: base.rent },
+      }),
+    );
   if (monthsBeforeDue > 0)
     phrases.push(
       rentalPhrase(
@@ -579,7 +590,7 @@ function readUpdate(
       monthly,
       accumulated,
       months,
-      monthsBeforeDue,
+      monthsBeforeDue: monthsEarly + monthsBeforeDue,
       calculation: phrases,
       rules: [...allowed.rules, 'update_notice'],
     },

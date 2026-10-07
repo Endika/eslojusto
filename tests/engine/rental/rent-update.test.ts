@@ -503,18 +503,52 @@ describe('when no rise fits', () => {
     expect(v.calculation.map((p) => p.key)).toContain('rent_update.no_clause');
   });
 
-  it('a rise applied before the anniversary is paid over in full', () => {
-    const v = single(
-      first(
-        check(
-          contract({
-            updates: [update('2022-03-20', 1000, 1020, { effectiveOn: f('2022-03-01') })],
-          }),
+  describe('a rise applied before the anniversary is still that anniversary’s update', () => {
+    // 20-03-2025, contract from 2024: IRAV February 2,08 % allows 1.020,80; notice in February.
+    const early = (effectiveOn: string) =>
+      single(
+        first(
+          check(
+            contract({
+              signedOn: f('2024-03-15'),
+              startDate: f('2024-03-20'),
+              updateClause: 'irav',
+              updates: [
+                update('2025-03-20', 1000, 1020.8, {
+                  effectiveOn: f(effectiveOn),
+                  chargedFrom: f(effectiveOn),
+                  noticeOn: f('2025-02-10'),
+                }),
+              ],
+            }),
+          ),
         ),
-      ),
-    );
-    expect(figures(v)).toMatchObject({ maxRent: 1000, monthly: 20, months: 12, accumulated: 240 });
-    expect(v.calculation.map((p) => p.key)).toContain('rent_update.before_anniversary');
+      );
+
+    it('applied from the 1st of the anniversary month, it matches applying it on the day', () => {
+      // Checked by the month, March is the anniversary month: nothing above 1.020,80, never the
+      // whole year (12 × 20,80 = 249,60).
+      const first1 = early('2025-03-01');
+      const onDay = early('2025-03-20');
+      expect(figures(first1)).toEqual(figures(onDay));
+      expect(figures(first1)).toMatchObject({ status: 'within_limit', maxRent: 1020.8 });
+      expect(first1.accumulated).toBeLessThanOrEqual(20.8);
+      expect(first1.cap?.rule).toBe('cap_irav');
+    });
+
+    it('months charged before the anniversary month are paid over in full', () => {
+      // February 2025 at 1.020,80 over a 1.000 base: 20,80; March on, within the cap.
+      const v = early('2025-02-01');
+      expect(figures(v)).toMatchObject({
+        status: 'paid_over',
+        maxRent: 1020.8,
+        monthly: 0,
+        months: 13,
+        accumulated: 20.8,
+      });
+      expect(v.monthsBeforeDue).toBe(1);
+      expect(v.calculation.map((p) => p.key)).toContain('rent_update.before_anniversary');
+    });
   });
 
   it('a rise applied after the anniversary is that year’s update, due per art. 18.2', () => {
@@ -580,8 +614,8 @@ describe('when no rise fits', () => {
     expect(on28.reasons).toEqual(['index_month_doubtful']);
     expect(on28.low.maxRent).toBe(703.5);
     expect(on28.high.maxRent).toBe(700);
-    const early = single(first(check(input('2021-02-28', '2021-02-27'))));
-    expect(early.calculation.map((p) => p.key)).toContain('rent_update.before_anniversary');
+    // Applied a day early, it is still the update of 28-02-2021.
+    expect(depends(first(check(input('2021-02-28', '2021-02-27')))).reasons).toEqual(on28.reasons);
     // On 29-02-2024 the February flash came out that same day.
     const leap = depends(first(check(input('2024-02-29'))));
     for (const { value } of leap.readings)
