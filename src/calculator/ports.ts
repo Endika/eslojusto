@@ -3,7 +3,7 @@ import type { EmployerFigures, Review } from '../engine/review';
 import type { FinalPayInput, ItemId } from '../engine/types';
 import type { BenefitEstimate } from '../engine/unemployment';
 import type { Translate } from '../i18n/client';
-import type { Detail } from './flow';
+import type { Detail, Flow } from './flow';
 import type { Step } from './steps';
 
 export type { Detail } from './flow';
@@ -36,4 +36,6 @@ export interface CalculatorDeps {
   readonly tr: Translate;
   // How the result is shown when a review completes; unlocked unless told otherwise.
   readonly detail?: () => Detail;
+  // The walk through the sheets; the final pay's own unless the page brings another.
+  readonly flow?: Flow<Step>;
 }

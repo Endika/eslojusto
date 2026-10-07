@@ -16,6 +16,8 @@ export interface Flow<S extends string> {
   complete(form: HTMLFormElement, step: S, today: CivilDate): boolean;
   // Readies the last sheet each time it is shown.
   prepareLastSheet?(form: HTMLFormElement, today: CivilDate): void;
+  // The sheet a visit opens on when its address names no step; the first one if absent.
+  opensOn?(form: HTMLFormElement): S;
 }
 
 export const resultStep = <S extends string>(flow: Flow<S>): number => flow.steps.length - 1;
@@ -27,6 +29,11 @@ export const stepAt = <S extends string>(flow: Flow<S>, i: number): S =>
 export function indexOfHash<S extends string>(flow: Flow<S>, hash: string): number {
   const i = flow.steps.indexOf(hash.replace(/^#/, '') as S);
   return i < 0 ? 0 : i;
+}
+
+export function startStep<S extends string>(flow: Flow<S>, form: HTMLFormElement): number {
+  const step = flow.opensOn?.(form);
+  return step === undefined ? 0 : Math.max(0, flow.steps.indexOf(step));
 }
 
 // The next sheet asked in `direction`, or the result going forward.

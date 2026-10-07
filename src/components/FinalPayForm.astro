@@ -3,12 +3,15 @@ import Field from './Field.astro';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
 import { minimumHolidays } from '../engine/settlement';
+import type { Cause } from '../engine/types';
 
 interface Props {
   lang: Lang;
   hidden?: boolean;
+  // A page about one cause comes with it marked, in the HTML itself.
+  cause?: Cause | undefined;
 }
-const { lang, hidden = false } = Astro.props;
+const { lang, hidden = false, cause } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 
 const causes = [
@@ -48,7 +51,14 @@ const workHistoryUrl =
 const arrow = 'M4 12h15m-6-6 6 6-6 6';
 ---
 
-<form class="calculator" id="calculator" novalidate aria-label={tx('form.aria')} hidden={hidden}>
+<form
+  class="calculator"
+  id="calculator"
+  novalidate
+  aria-label={tx('form.aria')}
+  hidden={hidden}
+  data-preset-cause={cause}
+>
   <div class="stack">
     <fieldset class="sheet" id="sheet-causa" data-sheet="causa" aria-labelledby="question-causa">
       <h2 class="question" id="question-causa" tabindex="-1">
@@ -63,6 +73,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
               name="cause"
               id={`cause-${value}`}
               value={value}
+              checked={value === cause}
               aria-describedby={`hint-cause-${value} error-cause`}
             />
             <label for={`cause-${value}`}>{tx(`cause.${value}`)}</label>
