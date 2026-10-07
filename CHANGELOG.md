@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.5.0](https://github.com/Endika/eslojusto/compare/v1.4.0...v1.5.0) (2026-10-07)
+
+
+### Features
+
+* **api:** add the eslojusto-api CloudWatch dashboard ([4fea9f4](https://github.com/Endika/eslojusto/commit/4fea9f45fd01e449e51c9acb0a6232fce231a665))
+* **api:** email alerts when the API fails repeatedly ([15f5ce1](https://github.com/Endika/eslojusto/commit/15f5ce1ba6b2f236519bbe2ddbf1736c46c61e1f))
+* **api:** let CloudFormation manage the API dashboard ([cc32415](https://github.com/Endika/eslojusto/commit/cc32415b0551ab5364e3ff6b543628df800edaf7))
+
 ## [1.4.0](https://github.com/Endika/eslojusto/compare/v1.3.0...v1.4.0) (2026-10-07)
 
 
