@@ -107,10 +107,9 @@ describe('reviewChaining', () => {
     expect(f.calculation[0]?.key).toBe('chaining.near_limit');
   });
 
-  it('contracts with another company or the group never add up', () => {
+  it('contracts with another company, of another kind or of unknown kind never add up', () => {
     const history = [
       period('2023-01-01', '2023-09-30', { employer: 'other' }),
-      period('2023-01-01', '2023-09-30', { employer: 'same_group' }),
       period('2023-01-01', '2023-09-30', { kind: 'unknown' }),
       period('2022-06-01', '2022-12-31', { kind: 'replacement' }),
     ];
@@ -121,9 +120,75 @@ describe('reviewChaining', () => {
         key: 'chaining.within',
         vars: { dias: { integer: 305 }, limite: { integer: 547 }, contratos: { integer: 1 } },
       },
-      { key: 'chaining.same_group_not_counted', vars: { contratos: { integer: 1 } } },
       { key: 'chaining.kind_unknown_not_counted', vars: { contratos: { integer: 1 } } },
     ]);
+  });
+
+  it.each<EmploymentPeriod['employer']>(['same_group', 'same_via_agency'])(
+    'when a %s contract decides it, each reading is labelled and none is permanent',
+    (employer) => {
+      const input = chained(
+        ['2023-11-01', '2024-08-31'],
+        [period('2023-01-01', '2023-09-30', { employer })],
+      );
+      const assessed = review(input);
+      expect(assessed.kind).toBe('readings');
+      if (assessed.kind !== 'readings') return;
+      expect(assessed.question).toBe('chaining_group');
+      expect(assessed.readings.map((r) => [r.when, r.finding.status])).toEqual([
+        ['group_counted', 'review_it'],
+        ['group_not_counted', 'within_limit'],
+      ]);
+      expect(assessed.readings[0]?.finding.calculation.map((p) => p.key)).toEqual([
+        'chaining.exceeds',
+        'chaining.depends_on_group',
+      ]);
+      expect(offerPass([assessed])).toBe(false);
+    },
+  );
+
+  it('a group contract that changes nothing is only noted', () => {
+    const input = chained(
+      ['2023-11-01', '2024-08-31'],
+      [
+        period('2023-01-01', '2023-09-30'),
+        period('2022-01-10', '2022-02-28', { employer: 'same_group' }),
+      ],
+    );
+    const f = only(review(input));
+    expect(f.status).toBe('becomes_permanent');
+    expect(f.calculation.at(-1)).toEqual({
+      key: 'chaining.same_group_not_counted',
+      vars: { contratos: { integer: 1 } },
+    });
+  });
+
+  it.each([
+    ['starts two days later', '2024-01-03', '2025-07-31'],
+    ['ends two days earlier', '2024-01-01', '2025-07-29'],
+    ['starts a day earlier', '2023-12-31', '2025-07-31'],
+  ])('a history period that %s than the current contract is the same contract', (_, start, end) => {
+    const f = only(review(chained(['2024-01-01', '2025-07-31'], [period(start, end)])));
+    expect(f.status).toBe('within_limit');
+    expect(f.calculation[0]?.vars?.contratos).toEqual({ integer: 1 });
+  });
+
+  it('two overlapping history periods are one contract', () => {
+    const input = chained(
+      ['2025-09-01', null],
+      [period('2024-01-01', '2025-07-31'), period('2024-01-02', '2025-07-30')],
+      { modality: 'replacement' },
+    );
+    const f = only(review(input));
+    expect(f.status).toBe('within_limit');
+    expect(f.calculation[0]?.vars?.contratos).toEqual({ integer: 1 });
+  });
+
+  it('a contract ending the day before the next starts is a second contract', () => {
+    const input = chained(['2024-01-01', '2024-08-31'], [period('2023-01-01', '2023-12-31')]);
+    const f = only(review(input));
+    expect(f.status).toBe('becomes_permanent');
+    expect(f.calculation[0]?.vars?.contratos).toEqual({ integer: 2 });
   });
 
   it('of the 2021 contracts only the one in force on the cutoff counts', () => {
