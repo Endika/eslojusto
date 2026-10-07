@@ -231,9 +231,13 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       ...(usePass ? { pass: stored.token } : { quota: passes.quota() }),
     });
     if (!result.ok) {
-      // The pass's state is the server's to tell: no reads left, or a refunded payment.
+      // The server has the last word on what was sent: a pass it no longer honours is dropped, so
+      // the next read is a free one, and so is a quota token it refuses.
       if (usePass && result.code === 'pass_exhausted') passes.updateReads(0);
-      if (usePass && result.code === 'pass_revoked') passes.forgetPass();
+      if (usePass && ['pass_revoked', 'pass_invalid', 'pass_expired'].includes(result.code))
+        passes.forgetPass();
+      if (!usePass && result.code === 'invalid_request' && passes.quota() !== null)
+        passes.forgetQuota();
       return fail(result.code);
     }
     if (usePass && result.readsLeft !== null) passes.updateReads(result.readsLeft);

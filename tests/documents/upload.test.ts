@@ -210,6 +210,30 @@ describe('the start sheet', () => {
     expect(used.requests[1]).toHaveProperty('quota', null);
   });
 
+  it('an invalid or expired pass is forgotten, so the next read is a free one', async () => {
+    const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
+    for (const code of ['pass_invalid', 'pass_expired'] as const) {
+      const { passes, requests } = setUp({ ok: false, code });
+      passes.savePass({ token, expiresAt: NOW / 1000 + 3600, readsLeft: 5 });
+      choose([photo]);
+      await submit();
+      expect(passes.pass(), code).toBeNull();
+      expect(document.querySelector('[data-doc-error]')?.textContent).toContain('lectura gratis');
+      choose([photo]);
+      await submit();
+      expect(requests[1], code).toHaveProperty('quota', null);
+    }
+  });
+
+  it('a quota token the API refuses is forgotten', async () => {
+    const { passes, requests } = setUp({ ok: false, code: 'invalid_request' });
+    passes.saveQuota('v1.stale.quota');
+    choose([photo]);
+    await submit();
+    expect(requests[0]).toHaveProperty('quota', 'v1.stale.quota');
+    expect(passes.quota()).toBeNull();
+  });
+
   it('an API error is worded, and the manual path stays one click away', async () => {
     const { events, form } = setUp({ ok: false, code: 'daily_limit_reached' });
     choose([photo]);
