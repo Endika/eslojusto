@@ -46,7 +46,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: 24, cache: npm, cache-dependency-path: api/package-lock.json }
-      - run: npm ci
+      # The deploy job's install path: no install scripts; esbuild ships its binary as a package.
+      - run: npm ci --ignore-scripts
       - run: npm run format:check
       - run: npm run lint
       - run: npm run type:check
