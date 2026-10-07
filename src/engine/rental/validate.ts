@@ -20,7 +20,9 @@ export type RentalInputErrorCode =
   | 'notice_in_future'
   | 'year_out_of_range'
   | 'keys_before_start'
-  | 'keys_in_future';
+  | 'keys_in_future'
+  | 'return_before_keys'
+  | 'return_in_future';
 
 // The UI words each `code` through the dictionary; `index` points into a list field.
 export interface RentalInputError {
@@ -140,8 +142,12 @@ export function validateRental(e: RentalInput, today: CivilDate): readonly Renta
     else if (startOk && compareDates(keysReturnedOn, e.startDate) < 0)
       err('moveOut', 'keys_before_start');
     else if (compareDates(keysReturnedOn, today) > 0) err('moveOut', 'keys_in_future');
+    const keysOk = isValidDate(keysReturnedOn);
     returns.forEach((r, i) => {
       if (!isValidDate(r.on)) err('moveOut', 'invalid_date', i);
+      else if (compareDates(r.on, today) > 0) err('moveOut', 'return_in_future', i);
+      else if (keysOk && compareDates(r.on, keysReturnedOn) < 0)
+        err('moveOut', 'return_before_keys', i);
       amount('moveOut', r.amount, i);
     });
     deductions.forEach((d, i) => amount('moveOut', d.amount, i));
