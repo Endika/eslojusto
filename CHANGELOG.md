@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.9.0](https://github.com/Endika/eslojusto/compare/v1.8.0...v1.9.0) (2026-10-07)
+
+
+### Features
+
+* **engine:** add IRAV, CPI, IGC and legal interest tables with their sources ([8181606](https://github.com/Endika/eslojusto/commit/81816066d310716a1f363c1dcb261047e3890fb6))
+* **engine:** add rental norms with validity windows and status ([7074aaf](https://github.com/Endika/eslojusto/commit/7074aaf76fa1ea665d386cedc9e28ec041a96d90))
+* **engine:** load the CPI flash estimates and weigh them against the definitive figure ([31ccaf7](https://github.com/Endika/eslojusto/commit/31ccaf77bde3b1c0a54f0eafa278c8fcc1d3f338))
+* **engine:** load the CPI flash estimates from April 2022 to November 2024 ([412dea8](https://github.com/Endika/eslojusto/commit/412dea8d474710ffefbb0e0c473ded3f13cd40f3))
+
+
+### Bug Fixes
+
+* **engine:** carry RDL 29/2026 and 28/2026 doubts to the update clause and tacit renewal ([7e473f3](https://github.com/Endika/eslojusto/commit/7e473f3db5fc571b5c6ae1077754c642bba8f2eb))
+
 ## [1.8.0](https://github.com/Endika/eslojusto/compare/v1.7.0...v1.8.0) (2026-10-07)
 
 
