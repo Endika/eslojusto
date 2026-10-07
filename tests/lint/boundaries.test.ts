@@ -24,6 +24,9 @@ describe('import boundaries', () => {
     ['src/layouts/csp.ts', "import { track } from '../analytics/posthog';"],
     ['src/views/X.astro', "---\nimport { track } from '../analytics/posthog';\n---\n"],
     ['src/views/X.astro', "<script>\n  import '../analytics/events';\n</script>\n"],
+    ['src/documents/x.ts', "import { track } from '../analytics/posthog';"],
+    ['src/documents/x.ts', "import { localToday } from '../scripts/clock';"],
+    ['src/analytics/x.ts', "import { setUpUpload } from '../documents/upload';"],
   ])('%s cannot %s', async (filePath, code) => {
     expect(await violations(filePath, code)).toContain('no-restricted-imports');
   });
@@ -40,6 +43,9 @@ describe('import boundaries', () => {
     expect(
       await violations('src/calculator/x.ts', "export const a = import('../analytics/posthog');"),
     ).toContain('no-restricted-syntax');
+    expect(await violations('src/documents/x.ts', "export const a = import('./pdf');")).toContain(
+      'no-restricted-syntax',
+    );
   });
 
   it.each([
@@ -47,6 +53,9 @@ describe('import boundaries', () => {
     ['src/analytics/x.ts', "import type { CalculatorEvents } from '../calculator/ports';"],
     ['src/layouts/csp.ts', "import { ANALYTICS_ORIGIN } from '../analytics/config';"],
     ['src/calculator/x.ts', "import { reviewFinalPay } from '../engine/review';"],
+    ['src/analytics/x.ts', "import type { DocumentEvents } from '../documents/ports';"],
+    ['src/layouts/csp.ts', "import { TURNSTILE_ORIGIN } from '../documents/config';"],
+    ['src/scripts/x.ts', "export const pdf = () => import('../documents/pdf');"],
   ])('%s may %s', async (filePath, code) => {
     expect(await violations(filePath, code)).not.toContain('no-restricted-imports');
   });
