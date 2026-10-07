@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import {
   App,
-  BootstraplessSynthesizer,
+  LegacyStackSynthesizer,
   CfnOutput,
   Duration,
   RemovalPolicy,
@@ -135,7 +135,8 @@ export class GlobalStack extends Stack {
     super(scope, id, {
       ...props,
       env: { ...props.env, region: GLOBAL_STACK_REGION },
-      synthesizer: new BootstraplessSynthesizer(),
+      // Deployed by hand with the caller's own credentials: no bootstrap roles in that region.
+      synthesizer: new LegacyStackSynthesizer(),
     });
     const account = Stack.of(this).account;
     const regional = (service: string, resource: string): string =>
