@@ -190,9 +190,17 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
     'Leído del documento · confianza baja: compruébalo',
   );
   await page.getByRole('button', { name: 'Revisar' }).click();
-  await expect(page.getByRole('region', { name: 'Indemnización' })).toContainText(
-    'Por debajo del mínimo legal',
-  );
+
+  // Before the pass, the summary: what falls short and roughly how much, without the detail.
+  const summary = page.getByRole('region', { name: 'En resumen' });
+  await expect(summary).toContainText('Indemnización: podrían faltarte unos 440 €.');
+  await expect(page.getByRole('region', { name: 'Indemnización' })).toHaveCount(0);
+  const result = page.locator('#resultado');
+  await expect(
+    result.getByText('Cómo se calcula', { exact: true }).filter({ visible: true }),
+  ).toHaveCount(0);
+  await expect(result.locator('a[href*="boe.es"]:visible')).toHaveCount(0);
+  await expect(result.locator('[data-range]:visible')).toHaveCount(0);
 
   // The pass: the waiver first, then Stripe, then back with the session id.
   const offer = page.getByRole('region', { name: /Informe en PDF/ });
@@ -212,10 +220,16 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   expect(asked['nonce']).toMatch(/^[A-Za-z0-9_-]{32}$/);
   expect(await page.evaluate(() => sessionStorage.length)).toBe(0);
 
-  // The review came back with the person, so the downloads sit in its result.
+  // The review came back with the person, now with the detail and the downloads.
   await expect(page.getByRole('region', { name: 'Indemnización' })).toContainText(
     'Por debajo del mínimo legal',
   );
+  await expect(page.getByRole('region', { name: 'En resumen' })).toHaveCount(0);
+  await expect(result.locator('summary:visible', { hasText: 'Cómo se calcula' })).not.toHaveCount(
+    0,
+  );
+  await expect(result.locator('a[href*="boe.es"]').first()).toBeAttached();
+  await expect(result.locator('[data-range]:visible').first()).toBeVisible();
   for (const [button, name] of [
     ['Descargar el informe (PDF)', 'eslojusto-informe-finiquito.pdf'],
     ['Descargar la carta (PDF)', 'eslojusto-recibi-no-conforme.pdf'],
@@ -270,8 +284,8 @@ async function confirmToResult(page: Page) {
   await next();
   await next();
   await page.getByRole('button', { name: 'Revisar' }).click();
-  await expect(page.getByRole('region', { name: 'Indemnización' })).toContainText(
-    'Por debajo del mínimo legal',
+  await expect(page.getByRole('region', { name: 'En resumen' })).toContainText(
+    'Indemnización: podrían faltarte unos 440 €.',
   );
 }
 
@@ -287,8 +301,8 @@ test('cancelling at Stripe brings the review back and keeps nothing in the tab',
   await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
   await page.waitForURL(`${ORIGIN}/finiquito/#resultado`);
   await expect(page.getByRole('heading', { name: /Resultado/ })).toBeFocused();
-  await expect(page.getByRole('region', { name: 'Indemnización' })).toContainText(
-    'Por debajo del mínimo legal',
+  await expect(page.getByRole('region', { name: 'En resumen' })).toContainText(
+    'Indemnización: podrían faltarte unos 440 €.',
   );
   await expect(offer.getByRole('button', { name: 'Pagar 4,99 €' })).toBeVisible();
   expect(await page.evaluate(() => sessionStorage.length)).toBe(0);
@@ -587,6 +601,11 @@ test('an objective dismissal with an agreement: the reference and the offer, sid
   await page.getByLabel('Ninguno').check();
   await next();
   await next();
+  // Both are the pass's detail.
+  await page.evaluate(
+    (pass) => localStorage.setItem('eslojusto-pase', pass),
+    JSON.stringify({ token: PASS, expiresAt, readsLeft: 15 }),
+  );
   await page.getByRole('button', { name: 'Revisar' }).click();
   const severance = page.getByRole('region', { name: 'Indemnización' });
   await expect(severance).toContainText(

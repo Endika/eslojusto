@@ -16,7 +16,7 @@ import {
 import { createNavigation } from './navigation';
 import { setUpOtherContracts } from './other-contracts';
 import type { CalculatorDeps } from './ports';
-import { renderErrors, renderBenefit, renderReview } from './render';
+import { renderErrors, renderBenefit, renderReview, renderSummary } from './render';
 import { LAST_SHEET, RESULT_STEP, indexOfHash, stepAt } from './steps';
 
 // What the page's other parts can do with the calculator: set or read its answers, and open it.
@@ -33,7 +33,7 @@ export interface Calculator {
 
 export function setUpCalculator(
   root: HTMLElement,
-  { events, today, tr }: CalculatorDeps,
+  { events, today, tr, detail = () => 'unlocked' }: CalculatorDeps,
 ): Calculator {
   const form = required(root.querySelector<HTMLFormElement>('#calculator'), 'the form');
   const result = required(root.querySelector<HTMLElement>('#resultado'), 'the result');
@@ -119,6 +119,7 @@ export function setUpCalculator(
     renderErrors(form, [], tr);
     renderReview(reviewContainer, r.review, tr);
     renderBenefit(benefitSheet, estimate, parsed.input.cause, benefit.data?.children ?? null, tr);
+    renderSummary(reviewContainer, r.review, estimate, tr);
     events.stepCompleted(stepAt(nav.current));
     events.reviewCompleted({
       review: r.review,
@@ -126,6 +127,7 @@ export function setUpCalculator(
       figures: parsed.figures,
       benefit: estimate,
       otherContracts: benefit.data?.others.contracts.length ?? 0,
+      detail: detail(),
     });
     nav.reached = RESULT_STEP;
     nav.show(RESULT_STEP, { history: 'push', focus: true });

@@ -1,6 +1,7 @@
 import { BENEFIT_STATES, benefitState, type BenefitEstimate } from '../engine/unemployment';
 import type { EmployerFigures, Review } from '../engine/review';
 import type { Cause, FinalPayInput, HolidayUnit, ItemId, FixedTermType } from '../engine/types';
+import type { Detail } from '../calculator/ports';
 import { FAQ_TOPICS } from '../content/faq-topics';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import {
@@ -186,6 +187,8 @@ const BASE_CATALOGUE = {
     other_contracts: oneOf(OTHER_CONTRACT_BUCKETS),
     // Whether the result showed what an unfair dismissal would pay, never the figure.
     unfair_reference: oneOf(['shown', 'none']),
+    // Whether the result showed only its summary or the detail a pass unlocks.
+    detail: oneOf(['locked', 'unlocked']),
   },
   detail_opened: { item: oneOf(ITEM_IDS) },
   started_over: {},
@@ -321,6 +324,7 @@ export function reviewProps(data: {
   seconds: number;
   benefit: BenefitEstimate;
   otherContracts: number;
+  detail: Detail;
 }): Props<'review_completed'> {
   const { review, input: e } = data;
   const countOf = (status: string) => review.items.filter((p) => p.status === status).length;
@@ -351,5 +355,6 @@ export function reviewProps(data: {
     benefit: benefitState(data.benefit),
     other_contracts: otherContractsBucket(data.otherContracts),
     unfair_reference: review.unfairReference === null ? 'none' : 'shown',
+    detail: data.detail,
   };
 }

@@ -35,6 +35,7 @@ export function completed(
     figures,
     benefit: estimateBenefit(input, 0, { contracts: [], benefitDrawnSince: null }),
     otherContracts: 0,
+    detail: 'unlocked',
   };
 }
 

@@ -1,5 +1,6 @@
 import type { CompletedReview } from '../calculator/ports';
 import { required } from '../calculator/dom';
+import { setDetail } from '../calculator/render';
 import { parseDate, toIso, type CivilDate } from '../engine/date';
 import type { Review } from '../engine/review';
 import type { Translate } from '../i18n/client';
@@ -113,6 +114,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     }
     const stored = passes.pass();
     const paid = canDownload(passState(stored, browser.now()));
+    setDetail(section.closest('#resultado') ?? document, !paid);
     const shortfall = hasShortfall(current.review);
     section.hidden = !paid && !shortfall;
     buy.hidden = paid;

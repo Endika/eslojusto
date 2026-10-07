@@ -159,6 +159,7 @@ export const es = {
   'result.lead':
     'Una hoja por partida, con lo que pone tu finiquito, el mínimo legal y de dónde sale.',
   'result.unchecked': 'Lo que esta revisión no comprueba',
+  'result.summary': 'En resumen',
   'result.proposal': 'La propuesta de liquidación',
   'result.proposal_1':
     'Cuando te comunican el fin del contrato, la empresa tiene que darte una propuesta del documento de liquidación, que es el finiquito con cada partida (art. 49.2 del Estatuto de los Trabajadores).',
@@ -295,7 +296,7 @@ export const es = {
 
   'documents.pass.title': 'Informe en PDF y carta «recibí no conforme»',
   'documents.pass.text':
-    'Con lo que sale de esta revisión: un informe con cada partida, su mínimo legal, sus fuentes y lo que no se ha comprobado, y una plantilla de carta «recibí no conforme» con tus cifras. Los dos se generan en tu dispositivo.',
+    'Descarga el informe completo con el cálculo paso a paso, las fuentes legales y la carta «recibí no conforme» por 4,99 €. Se generan en tu dispositivo.',
   'documents.pass.price':
     '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días: en ese tiempo puedes volver a descargar el informe y la carta y hacer hasta 15 lecturas de documentos.',
   'documents.pass.waiver':
@@ -386,6 +387,24 @@ export const es = {
   'client.other_language.aria': 'Otro idioma',
   'client.other_language.text': 'Esta página también está en {idioma}.',
   'client.other_language.close': 'Cerrar el aviso de idioma',
+
+  'client.summary.shortfall':
+    'Con las cifras que has metido, a tu finiquito le podría faltar dinero:',
+  'client.summary.all_match':
+    'Tu finiquito coincide con el mínimo legal en todas las partidas que se pueden comprobar.',
+  'client.summary.nothing_short':
+    'Ninguna de las cifras que has metido está por debajo del mínimo legal.',
+  'client.summary.no_figures':
+    'Sin las cifras de tu finiquito no hay nada que comparar; puedes meterlas en la hoja «Tu finiquito».',
+  'client.summary.missing': '{partida}: podrían faltarte unos {importe}.',
+  'client.summary.missing_little': '{partida}: podrían faltarte menos de 10 €.',
+  'client.summary.deduction': '{partida}: el descuento podría pasarse en unos {importe}.',
+  'client.summary.deduction_little': '{partida}: el descuento podría pasarse en menos de 10 €.',
+  'client.summary.benefit_yes':
+    'Esta causa da derecho a paro: {cuantia} al mes en bruto los primeros 6 meses, si sumas al menos 360 días cotizados en los últimos 6 años.',
+  'client.summary.benefit_yes_no_figures':
+    'Esta causa da derecho a paro si sumas al menos 360 días cotizados en los últimos 6 años; la cuantía depende de tus últimas nóminas.',
+  'client.summary.benefit_no': 'Esta causa no da derecho a paro.',
 
   'client.status.below_minimum': 'Por debajo del mínimo legal: faltan {importe}',
   'client.status.matches': 'Coincide con el mínimo legal',

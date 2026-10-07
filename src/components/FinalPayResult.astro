@@ -52,14 +52,33 @@ const workHistoryUrl =
     <h2 class="result__title" id="result-title" tabindex="-1">
       {tx('result.title')}
     </h2>
-    <p class="result__lead">{tx('result.lead')}</p>
+    <p class="result__lead" data-detail>
+      {tx('result.lead')}
+    </p>
   </header>
 
   <div class="review" data-review>
-    <div class="review__items" data-items></div>
+    <section class="item summary" data-summary hidden aria-labelledby="summary-title">
+      <div class="sheet">
+        <h3 class="item__title" id="summary-title">
+          {tx('result.summary')}
+        </h3>
+        <p class="help" data-summary-headline></p>
+        <ul class="list" data-summary-lines></ul>
+        <p class="item__note" data-summary-counted hidden></p>
+        <p class="help" data-summary-benefit></p>
+      </div>
+    </section>
+    <div class="review__items" data-items data-detail></div>
     {documents && <PassOffer lang={lang} />}
 
-    <section class="item benefit" data-benefit data-tone="holidays" aria-labelledby="benefit-title">
+    <section
+      class="item benefit"
+      data-benefit
+      data-detail
+      data-tone="holidays"
+      aria-labelledby="benefit-title"
+    >
       <span class="item__tab" aria-hidden="true">
         04
       </span>
@@ -123,7 +142,7 @@ const workHistoryUrl =
       </div>
     </section>
 
-    <section class="item" data-tone="legal" aria-labelledby="proposal-title">
+    <section class="item" data-tone="legal" data-detail aria-labelledby="proposal-title">
       <span class="item__tab" aria-hidden="true">
         ET
       </span>

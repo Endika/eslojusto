@@ -392,3 +392,90 @@ export function renderErrors(
       el.setAttribute('aria-invalid', 'true');
   }
 }
+
+// An approximate amount for the summary: to the nearest 10 €.
+export const roundToTens = (n: number): number => Math.round(n / 10) * 10;
+
+const SETTLED: ReadonlySet<VisibleStatus> = new Set([
+  'matches',
+  'above_minimum',
+  'deduction_within_max',
+  'not_checkable',
+  'no_severance',
+]);
+const COMPARED: ReadonlySet<VisibleStatus> = new Set([
+  'matches',
+  'above_minimum',
+  'deduction_within_max',
+]);
+
+export type SummaryHeadline = 'shortfall' | 'all_match' | 'nothing_short' | 'no_figures';
+
+export function summaryHeadline(r: Review): SummaryHeadline {
+  const statuses = r.items.map(visibleStatus);
+  if (statuses.some((s) => s === 'below_minimum' || s === 'deduction_too_high')) return 'shortfall';
+  if (statuses.every((s) => SETTLED.has(s)) && statuses.some((s) => COMPARED.has(s)))
+    return 'all_match';
+  return r.items.every((p) => p.employerFigure === null) ? 'no_figures' : 'nothing_short';
+}
+
+// One line per item that falls short: its name and roughly how much, never the range or the method.
+export function shortfallLine(r: ItemResult, tr: Translate): Piece[] | null {
+  const deduction = r.status === 'deduction_too_high';
+  if (r.status !== 'below_minimum' && !deduction) return null;
+  const amount = roundToTens(r.difference ?? 0);
+  const partida = [tr(`client.item.${r.item.id}`)];
+  if (amount < 10)
+    return piecesWithAmounts(
+      tr(deduction ? 'client.summary.deduction_little' : 'client.summary.missing_little'),
+      { partida },
+    );
+  return piecesWithAmounts(
+    tr(deduction ? 'client.summary.deduction' : 'client.summary.missing'),
+    { partida, importe: amount },
+    formatWholeEuros,
+  );
+}
+
+function summaryBenefit(p: BenefitEstimate, tr: Translate): Piece[] {
+  if (p.entitled === 'no') return [tr('client.summary.benefit_no')];
+  if (p.figures === null) return [tr('client.summary.benefit_yes_no_figures')];
+  const { min, max } = p.figures.firstStretch;
+  return piecesWithAmounts(tr('client.summary.benefit_yes'), {
+    cuantia: approximate({ min: roundToTens(min), max: roundToTens(max) }, tr),
+  });
+}
+
+// The result before the pass: whether money is missing and roughly how much, the holiday days it
+// counted and one line on the benefit. The detail is the pass's.
+export function renderSummary(
+  container: HTMLElement,
+  r: Review,
+  benefit: BenefitEstimate,
+  tr: Translate,
+): void {
+  const summary = container.querySelector<HTMLElement>('[data-summary]');
+  if (!summary) return;
+  setText(summary, '[data-summary-headline]', tr(`client.summary.${summaryHeadline(r)}`));
+  const lines = summary.querySelector('[data-summary-lines]');
+  lines?.replaceChildren(
+    ...r.items.flatMap((p) => {
+      const line = shortfallLine(p, tr);
+      if (!line) return [];
+      const li = document.createElement('li');
+      li.replaceChildren(...line);
+      return [li];
+    }),
+  );
+  const counted = r.items.find((p) => p.item.counted)?.item.counted;
+  const note = setText(summary, '[data-summary-counted]', counted ? phraseText(counted, tr) : '');
+  note.hidden = !counted;
+  setText(summary, '[data-summary-benefit]', '').replaceChildren(...summaryBenefit(benefit, tr));
+}
+
+// Locked, the result shows the summary; unlocked, by a pass or in a build without one, the detail.
+export function setDetail(container: ParentNode, locked: boolean): void {
+  const summary = container.querySelector<HTMLElement>('[data-summary]');
+  if (summary) summary.hidden = !locked;
+  for (const el of container.querySelectorAll<HTMLElement>('[data-detail]')) el.hidden = locked;
+}

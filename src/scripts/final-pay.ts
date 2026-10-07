@@ -1,7 +1,7 @@
 import { calculatorAnalytics } from '../analytics/calculator';
 import { track } from '../analytics/posthog';
 import { setUpCalculator } from '../calculator/main';
-import type { CalculatorEvents, CompletedReview } from '../calculator/ports';
+import type { CalculatorEvents, CompletedReview, Detail } from '../calculator/ports';
 import { pageTranslator } from '../i18n/client';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import { localToday } from './clock';
@@ -19,6 +19,8 @@ const documentsBuild =
     import.meta.env.PUBLIC_API_PASS_URL &&
     import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
   ) && DOCUMENTS_BUILD;
+// Until the document module says whether a pass is there, the result shows its detail.
+let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedReview) => void)[] = [];
 const restarted: (() => void)[] = [];
 
@@ -41,6 +43,7 @@ const calculator = setUpCalculator(document.body, {
   events,
   today: localToday,
   tr: pageTranslator(),
+  detail: () => detail(),
 });
 
 if (documentsBuild) {
@@ -51,6 +54,7 @@ if (documentsBuild) {
         {
           onReview: (listener) => reviewed.push(listener),
           onRestart: (listener) => restarted.push(listener),
+          detail: (state) => (detail = state),
         },
         arrival,
       ),

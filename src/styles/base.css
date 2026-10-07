@@ -1035,6 +1035,9 @@ input[type='checkbox']:checked {
 .list li::marker {
   color: var(--sheet-ink-soft);
 }
+.summary .list:not(:empty) {
+  margin-block: 0.25rem 0.75rem;
+}
 
 .restart {
   display: flex;
