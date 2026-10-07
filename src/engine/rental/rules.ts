@@ -11,6 +11,7 @@ export type RuleId =
   | 'insurance_ban'
   | 'advance_cap'
   | 'update_clause'
+  | 'update_clause_rdl29'
   | 'update_notice'
   | 'cap_ipc'
   | 'cap_igc_2022'
@@ -102,12 +103,28 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
   insurance_ban: rule(
     'insurance_ban',
     'rdl29_2026',
-    'art. 3, que reforma el art. 36.5 de la LAU',
+    'art. 3.Diecisiete, que reforma el art. 36.5 de la LAU',
     RDL29_2026,
     '2026-10-08',
   ),
   advance_cap: rule('advance_cap', 'lau', 'LAU, art. 17.2', `${LAU}#a17`, '1995-01-01'),
-  update_clause: rule('update_clause', 'rdl7_2019', 'LAU, art. 18.1', `${LAU}#a18`, '2019-03-06'),
+  update_clause: rule(
+    'update_clause',
+    'rdl7_2019',
+    'LAU, art. 18.1',
+    `${LAU}#a18`,
+    '2019-03-06',
+    null,
+    'update_clause_rdl29',
+  ),
+  // A clause naming no index follows the IRAV instead of the IGC.
+  update_clause_rdl29: rule(
+    'update_clause_rdl29',
+    'rdl29_2026',
+    'art. 3.Once, que reforma el art. 18.1 de la LAU',
+    RDL29_2026,
+    '2026-10-08',
+  ),
   update_notice: rule('update_notice', 'lau', 'LAU, art. 18.2', `${LAU}#a18`, '1995-01-01'),
   cap_ipc: rule(
     'cap_ipc',
@@ -161,7 +178,7 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
   cap_2_rdl26: rule(
     'cap_2_rdl26',
     'rdl26_2026',
-    'tope extraordinario del 2 % de la actualización anual',
+    'disposición final 6.ª',
     RDL26_2026,
     '2026-10-01',
     '2027-12-31',
@@ -206,7 +223,15 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
     '2023-01-01',
   ),
   term_minimum: rule('term_minimum', 'rdl7_2019', 'LAU, art. 9.1', `${LAU}#a9`, '2019-03-06'),
-  term_tacit: rule('term_tacit', 'law12_2023', 'LAU, art. 10.1', `${LAU}#a10`, '2023-05-26'),
+  term_tacit: rule(
+    'term_tacit',
+    'law12_2023',
+    'LAU, art. 10.1',
+    `${LAU}#a10`,
+    '2023-05-26',
+    null,
+    'term_rdl28',
+  ),
   term_rdl28: rule(
     'term_rdl28',
     'rdl28_2026',
@@ -238,7 +263,7 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
   closing_document: rule(
     'closing_document',
     'rdl29_2026',
-    'art. 3, que añade el art. 36.7 a la LAU',
+    'art. 3.Dieciocho, que añade el art. 36.7 a la LAU',
     RDL29_2026,
     '2026-10-08',
   ),
