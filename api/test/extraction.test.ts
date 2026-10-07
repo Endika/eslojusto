@@ -72,6 +72,28 @@ describe('parseExtraction', () => {
   });
 });
 
+describe('payslip fields for the monthly salary', () => {
+  it('keeps the period, whether an extra payment was paid and its amount', () => {
+    const e = parseExtraction('payslip', {
+      detectedKind: f('payslip'),
+      periodStart: f('2026-06-01'),
+      periodEnd: f('2026-06-30'),
+      totalAccrued: f(3500),
+      extraPayProrated: f(false),
+      extraPayPaid: f(true),
+      extraPayAmount: f(1500),
+    });
+    expect(e.dropped).toBe(0);
+    expect(e.fields).toMatchObject({
+      periodStart: f('2026-06-01'),
+      periodEnd: f('2026-06-30'),
+      extraPayProrated: f(false),
+      extraPayPaid: f(true),
+      extraPayAmount: f(1500),
+    });
+  });
+});
+
 describe('failedChecks', () => {
   it('passes a settlement whose items add up to the total', () => {
     expect(failedChecks(parseExtraction('settlement', coherentSettlement()))).toEqual([]);
