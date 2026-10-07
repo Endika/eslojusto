@@ -43,6 +43,10 @@ describe.skipIf(!keylessBuild)('a keyless build tracks nothing', () => {
       expect(js, p).not.toContain('eu.i.posthog.com');
       // The SDK's own event name; our allowlist only names `$pageview_id`.
       expect(js, p).not.toMatch(/["'`]\$pageview["'`]/);
+      // Nor the document events, their error codes or Turnstile, which only a build with the
+      // documents API ships.
+      for (const word of ['extraction_completed', 'pass_revoked', 'challenges.cloudflare.com'])
+        expect(js, p).not.toContain(word);
     }
   });
 });
