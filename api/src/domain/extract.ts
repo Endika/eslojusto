@@ -35,6 +35,7 @@ import {
   MAX_ESTIMATED_INPUT_TOKENS,
   pdfTokens,
   PROMPT_TOKENS,
+  UNDERESTIMATE_FACTOR,
 } from './tokens';
 
 export interface ExtractDeps {
@@ -70,6 +71,8 @@ export interface ExtractMetrics {
   inputTokens?: number;
   outputTokens?: number;
   escalated?: boolean;
+  underestimated?: boolean;
+  countNotSaved?: boolean;
 }
 
 interface Assessment {
@@ -166,6 +169,8 @@ export async function extract(
   let result: Assessment | null = null;
   const primary = await readWith(primaryModel);
   if (primary !== null) result = assess(request.kind, primary);
+  if (primary !== null && primary.inputTokens > UNDERESTIMATE_FACTOR * measured.tokens)
+    metrics.underestimated = true;
 
   // A failed primary (model retired, not enabled, throttled) or a doubtful read goes to the
   // escalation model, unless the document is too big to be worth a dearer second read. A
@@ -193,6 +198,7 @@ export async function extract(
     await deps.payments.recordReads(allowance.sessionId, used);
   } catch {
     // The person got their read; a counter Stripe failed to store errs in their favour.
+    metrics.countNotSaved = true;
   }
   return { ...ok, readsLeft: Math.max(0, PASS_READS - used) };
 }

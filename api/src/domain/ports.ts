@@ -56,6 +56,10 @@ export interface LogEvent {
   readonly inputTokens?: number;
   readonly outputTokens?: number;
   readonly escalated?: boolean;
+  // Bedrock counted more than twice the input the pre-read estimate allowed for.
+  readonly underestimated?: boolean;
+  // A pass read went through but Stripe did not store its count.
+  readonly countNotSaved?: boolean;
 }
 
 export interface Logger {
