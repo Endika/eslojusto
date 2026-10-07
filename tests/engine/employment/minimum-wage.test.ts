@@ -471,18 +471,28 @@ describe('payslips', () => {
     });
   });
 
+  it('asks to review a month showing less prorated than the contract implies', () => {
+    // Two extra payments prorated would be 203,50 € on 1.221 €; the month shows 101,75 €.
+    const input = proratedTwo(payslip({ salaryInMoney: 1221, proratedExtraPay: 101.75 }));
+    expect(comparePayslips(input, MINIMUM_WAGE)[0]).toMatchObject({
+      verdict: 'prorated_count_unknown',
+    });
+    expect(single(byId(review(input, '2026-10-31'), 'smi_monthly')).status).toBe('review_it');
+  });
+
   it('asks to review when it is unknown how many extra payments are prorated', () => {
     const between = withPayslips(payslip({ salaryInMoney: 1221, proratedExtraPay: 101.75 }));
     expect(comparePayslips(between, MINIMUM_WAGE)[0]).toMatchObject({
       verdict: 'prorated_count_unknown',
       minimum: 1424.5,
     });
-    const under = withPayslips(payslip({ salaryInMoney: 1100, proratedExtraPay: 100 }));
+    // Even under the bare monthly amount the month is not a sure shortfall.
+    const under = withPayslips(payslip({ salaryInMoney: 1100, proratedExtraPay: 101.75 }));
+    const assessed = review(under, '2026-10-31');
     expect(comparePayslips(under, MINIMUM_WAGE)[0]).toMatchObject({
-      verdict: 'below',
-      minimum: 1221,
-      shortfall: 21,
+      verdict: 'prorated_count_unknown',
     });
+    expect(single(byId(assessed, 'smi_monthly')).status).toBe('review_it');
     const over = withPayslips(payslip({ salaryInMoney: 1250, proratedExtraPay: 200 }));
     expect(comparePayslips(over, MINIMUM_WAGE)[0]).toMatchObject({ verdict: 'within' });
   });

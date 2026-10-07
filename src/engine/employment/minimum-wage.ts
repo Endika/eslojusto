@@ -75,6 +75,8 @@ const IN_KIND_CAP = 0.3;
 // Art. 4.1 of each decree: fixed-term services of up to 120 days to one company.
 const SHORT_TEMPORARY_DAYS = 120;
 const MONTHS_IN_YEAR = 12;
+// Rounding allowance when matching amounts read from a payslip.
+const CENT = 0.01;
 // A day rate is carried to a year over every calendar day, an hour rate over 52 weeks; both are
 // stated with the result.
 const DAYS_FOR_DAY_RATE = 365;
@@ -459,10 +461,14 @@ export function comparePayslips(
       return { month: p.month, verdict, row, minimum, paid, shortfall, prorated };
     };
     if (!prorated) return compare(withExtras(0), 'annual_decides');
-    if (proratedCount !== null) return compare(withExtras(proratedCount), null);
-    // Unknown count: certain below the bare monthly amount, within at all the extras prorated.
-    const lowest = withExtras(0);
-    if (paid < lowest) return compare(lowest, null);
+    // The month shows less prorated than the contract's count implies: some may be paid apart.
+    const proratedShort =
+      proratedCount !== null &&
+      p.proratedExtraPay < (p.salaryInMoney * proratedCount) / MONTHS_IN_YEAR - CENT;
+    if (proratedCount !== null && !proratedShort) {
+      return compare(withExtras(proratedCount), null);
+    }
+    // Unknown or doubtful count: only the yearly count can tell.
     return compare(withExtras(decreeExtras), 'prorated_count_unknown');
   });
 }
