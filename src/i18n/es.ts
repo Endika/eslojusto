@@ -811,6 +811,8 @@ export const es = {
     '{dato}: los documentos no dicen lo mismo. Se ha usado lo que pone {fuente}; compáralo con los demás.',
   'client.documents.done':
     'Se han leído {n} datos. Pasa por cada hoja y confírmalos antes de revisar: los leídos llevan la marca «Leído del documento».',
+  'client.documents.done_one':
+    'Se ha leído 1 dato. Pasa por cada hoja y confírmalo antes de revisar: lleva la marca «Leído del documento».',
   'client.documents.done_none':
     'No se ha leído ningún dato que sirva para el formulario. Puedes subir otros documentos o rellenar a mano.',
   'client.documents.holiday_unit':
