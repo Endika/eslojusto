@@ -108,6 +108,7 @@ type ChainingPhraseKey =
   | 'chaining.exceeds'
   | 'chaining.permanent'
   | 'chaining.depends_on_cutoff'
+  | 'chaining.depends_on_group'
   | 'chaining.same_group_not_counted'
   | 'chaining.kind_unknown_not_counted';
 

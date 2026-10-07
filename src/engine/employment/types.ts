@@ -164,7 +164,8 @@ export type InfoElement = (typeof INFO_ELEMENTS)[number];
 export type InfoPresence = 'present' | 'by_reference' | 'absent' | 'unknown';
 
 export interface EmploymentPeriod extends ContributionPeriod {
-  readonly employer: 'same' | 'same_group' | 'other';
+  // `same_via_agency`: placed at the same company by a temporary work agency.
+  readonly employer: 'same' | 'same_group' | 'same_via_agency' | 'other';
   readonly kind: 'production' | 'replacement' | 'training' | 'permanent' | 'unknown';
 }
 
@@ -277,6 +278,7 @@ export const READINGS = {
   technical: ['technical', 'not_technical'],
   small_company: ['under_25_staff', 'from_25_staff'],
   chaining_cutoff: ['cutoff_2021_12_31', 'cutoff_2022_03_30'],
+  chaining_group: ['group_counted', 'group_not_counted'],
   complement_kind: ['complement_fixed', 'complement_variable'],
   paid_hours: ['effective_hours', 'with_paid_rest'],
 } as const;
