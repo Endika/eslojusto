@@ -19,6 +19,7 @@ export type RuleId =
   | 'insurance_ban'
   | 'advance_cap'
   | 'update_clause'
+  | 'update_clause_rdl26'
   | 'update_clause_rdl29'
   | 'update_notice'
   | 'cap_ipc'
@@ -31,6 +32,7 @@ export type RuleId =
   | 'cap_2_rdl8'
   | 'cap_2_rdl26'
   | 'cap_2_rdl29'
+  | 'irav_all_contracts_rdl26'
   | 'irav_all_contracts'
   | 'charges_pact'
   | 'charges_increase'
@@ -114,7 +116,15 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
     null,
     'update_clause_rdl29',
   ),
-  // A clause naming no index follows the IRAV instead of the IGC.
+  // A clause naming no index follows the IRAV instead of the IGC, and the IRAV replaces the CPI
+  // as the cap; RDL 26/2026 said the same on its one day in force.
+  update_clause_rdl26: rule(
+    'update_clause_rdl26',
+    'rdl26_2026',
+    'art. 3.Once, que reforma el art. 18.1 de la LAU',
+    RDL26_2026,
+    '2026-10-01',
+  ),
   update_clause_rdl29: rule(
     'update_clause_rdl29',
     'rdl29_2026',
@@ -195,6 +205,13 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
     RDL29_2026,
     '2026-10-08',
     '2027-12-31',
+  ),
+  irav_all_contracts_rdl26: rule(
+    'irav_all_contracts_rdl26',
+    'rdl26_2026',
+    'art. 4.Dos, que reforma la disposición transitoria 4.ª de la Ley 12/2023',
+    RDL26_2026,
+    '2026-10-01',
   ),
   irav_all_contracts: rule(
     'irav_all_contracts',

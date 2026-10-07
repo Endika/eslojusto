@@ -81,7 +81,15 @@ const FUTURE: IndexTables = {
     ],
     '2028-12-31',
   ),
-  ipc: extend(IPC, [['2026-09', 4.9, '2026-10-15']], '2026-12-31'),
+  ipc: extend(
+    IPC,
+    [
+      ['2026-09', 4.9, '2026-10-15'],
+      ['2027-03', 3, '2027-04-14'],
+      ['2028-02', 2.9, '2028-03-14'],
+    ],
+    '2028-12-31',
+  ),
   igc: IGC,
 };
 const FUTURE_DEPS: RentalDeps = { norms: NORMS, indices: FUTURE };
@@ -244,6 +252,80 @@ describe('the cap in force on each anniversary', () => {
     expect(d.reasons).toEqual(['repealed_window']);
     expect(figures(d.high)).toMatchObject({ maxRent: 1020, months: 3, accumulated: 14.1 });
     expect(counted(r)).toBe(0);
+  });
+
+  it('01-10-2026: RDL 26/2026 also read a clause naming no index as the IRAV', () => {
+    // With RDL 26/2026: IRAV August 2,47 %, capped at 2 %, allows 1.020. Without it: IGC July
+    // −0,33 %, read as 0 %, allows no rise. October to December 2026: 3 months × 20.
+    const r = first(
+      check(
+        contract({
+          signedOn: f('2024-09-25'),
+          startDate: f('2024-10-01'),
+          updateClause: 'unspecified_index',
+          updates: [update('2026-10-01', 1000, 1020)],
+        }),
+        f('2026-12-20'),
+      ),
+    );
+    const d = depends(r);
+    expect(d.reasons).toEqual(['repealed_window']);
+    expect(d.low).toMatchObject({ status: 'within_limit', maxRent: 1020 });
+    expect(d.low.rules).toContain('update_clause_rdl26');
+    expect(d.high).toMatchObject({ maxRent: 1000, monthly: 20, accumulated: 60 });
+    expect(counted(r)).toBe(0);
+    expect(letterAmount(r.outcome, rentUpdateAmount)).toBeNull();
+  });
+
+  it('01-10-2026: under RDL 26/2026 the IRAV caps a contract from 2021 too', () => {
+    // IPC: August 4,3 % and the September flash 4,9 % (out 29-09-2026), both above the 3 % clause;
+    // with RDL 26/2026, the IRAV (2,47 %) and 2 %.
+    const r = first(
+      check(
+        contract({
+          signedOn: f('2021-09-25'),
+          startDate: f('2021-10-01'),
+          updateClause: 'fixed_percent',
+          fixedPercent: 3,
+          updates: [update('2026-10-01', 1000, 1030)],
+        }),
+        f('2026-12-20'),
+      ),
+    );
+    const d = depends(r);
+    expect(d.reasons).toEqual(['repealed_window']);
+    expect(d.low).toMatchObject({ status: 'within_limit', maxRent: 1030 });
+    expect(d.high).toMatchObject({ maxRent: 1020, accumulated: 30 });
+    expect(d.high.rules).toContain('irav_all_contracts_rdl26');
+  });
+
+  it('until RDL 26 and 29/2026, a contract from 26-05-2023 is capped by the lower of IRAV and CPI', () => {
+    // Synthetic CPI February 2025 of 1,50 %, below the IRAV (2,08 %): 1.000 × 1,015 = 1.015.
+    const lowCpi: RentalDeps = {
+      norms: NORMS,
+      indices: {
+        ...INDICES,
+        ipc: {
+          ...IPC,
+          values: IPC.values.map((v) => (v.month === '2025-02' ? { ...v, rate: 1.5 } : v)),
+        },
+      },
+    };
+    const v = single(
+      first(
+        check(
+          contract({
+            signedOn: f('2024-03-15'),
+            startDate: f('2024-03-20'),
+            updates: [update('2025-03-20', 1000, 1030)],
+          }),
+          TODAY,
+          lowCpi,
+        ),
+      ),
+    );
+    expect(v.cap?.rule).toBe('cap_ipc');
+    expect(v.maxRent).toBe(1015);
   });
 
   describe('20-10-2026, under RDL 29/2026 pending validation', () => {
