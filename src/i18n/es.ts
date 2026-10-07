@@ -53,22 +53,24 @@ export const es = {
 
   'rent_indices.caps_title': 'Cuánto puede subir tu alquiler cada año',
   'rent_indices.caps_lead':
-    'Tu alquiler solo puede subir si tu contrato lo dice, y una vez al año: el día en que se cumple cada año de contrato. Sube según el índice que pacta el contrato, sin pasar del tope legal de ese momento. Estos son los topes de los contratos de vivienda desde el 6 de marzo de 2019:',
+    'Si tu contrato es del 1 de abril de 2015 o posterior, tu alquiler solo puede subir si el contrato lo dice, y una vez al año: el día en que se cumple cada año de contrato. Sube según el índice que pacta el contrato, sin pasar del tope legal de ese momento. Estos son los topes de los contratos de vivienda desde el 6 de marzo de 2019:',
   'rent_indices.cap.ipc.when': 'Del 06-03-2019 al 30-03-2022',
   'rent_indices.cap.ipc.rule': 'El IPC.',
   'rent_indices.cap.igc.when': 'Del 31-03-2022 al 31-12-2023',
   'rent_indices.cap.igc.rule':
-    'El IGC (como mucho un 2 %), o el IPC si es más bajo. Un nuevo pacto podía cambiar el IGC por otra subida, nunca por encima del IPC. Si tu casero es gran tenedor (más de diez inmuebles de vivienda o más de 1.500 m²), el IGC se aplica aunque pactarais otra subida.',
+    'El IGC (como mucho un 2 %), o el IPC si es más bajo. Un nuevo pacto podía cambiar el IGC por otra subida, nunca por encima del IPC. Si tu casero es gran tenedor (más de diez inmuebles de uso residencial o más de 1.500 m² de uso residencial), la subida no puede pasar del IGC aunque pactarais otra subida.',
   'rent_indices.cap.three.when': 'En 2024',
   'rent_indices.cap.three.rule':
-    'Un 3 %, o el IPC si es más bajo. Un nuevo pacto podía cambiar el 3 % por otra subida, nunca por encima del IPC. Si tu casero es gran tenedor, el 3 % se aplica aunque pactarais otra subida.',
+    'Un 3 %, o el IPC si es más bajo. Un nuevo pacto podía cambiar el 3 % por otra subida, nunca por encima del IPC. Si tu casero es gran tenedor, la subida no puede pasar del 3 % aunque pactarais otra subida. Desde el 26-05-2023 es gran tenedor quien tiene más de diez inmuebles de uso residencial o más de 1.500 m² de uso residencial, y en una zona de mercado tensionado declarada la comunidad autónoma puede bajarlo a cinco o más inmuebles de uso residencial en esa zona.',
   'rent_indices.cap.irav.when': 'Desde el 01-01-2025',
   'rent_indices.cap.irav.when_until': 'Del 01-01-2025 al {hasta}',
   'rent_indices.cap.irav.rule':
     'En los contratos desde el 26-05-2023, el IRAV o el IPC, el más bajo; en los anteriores, el IPC.',
   'rent_indices.cap.two.when': 'Desde el {desde}',
   'rent_indices.cap.two.rule':
-    'El IRAV en todos los contratos. Y hasta el 31-12-2027, sin nuevo pacto, como mucho un 2 %; si tu renta supera el límite del sistema estatal de índices de precios de referencia, ninguna subida.',
+    'El IRAV en todos los contratos. Y hasta el 31-12-2027, sin nuevo pacto, como mucho un 2 %. Si tu vivienda está en una zona de mercado tensionado y tu renta supera el límite de precio que fija allí el sistema de índices de referencia, no cabe ninguna subida.',
+  'rent_indices.large_landlord_source':
+    'art. 3.k (Ley 12/2023, de 24 de mayo, por el derecho a la vivienda)',
   'rent_indices.reference_index':
     'Sistema Estatal de Referencia del Precio del Alquiler de Vivienda (Ministerio de Vivienda)',
   'rent_indices.status.pending_validation':
@@ -81,7 +83,7 @@ export const es = {
   'rent_indices.status_short.in_force': 'convalidado por el Congreso',
   'rent_indices.status_short.repealed': 'derogado por el Congreso',
   'rent_indices.now':
-    'Con el último IRAV ({irav}) y mientras rija el {norma}, el tope sin nuevo pacto es el {tope}: el más bajo de los dos. Si tu renta supera el límite del sistema estatal de índices de precios de referencia, no cabe ninguna subida.',
+    'Con el último IRAV ({irav}) y mientras rija el {norma}, el tope sin nuevo pacto es el {tope}: el más bajo de los dos. Si tu vivienda está en una zona de mercado tensionado y tu renta supera el límite de precio que fija allí el sistema de índices de referencia, no cabe ninguna subida.',
   'rent_indices.repealed':
     'Decretos con el mismo tope del 2 % que el Congreso derogó: {lista}. Una subida de esos días es un caso dudoso.',
   'rent_indices.repealed_item': 'el {norma}, que rigió {periodo}',
@@ -98,7 +100,7 @@ export const es = {
   'rent_indices.example':
     'Pagas {renta} al mes por un contrato de 2024 que se actualiza con el IRAV. El {dia} se cumple un año más de contrato, y ese día el último IRAV publicado es el de {mes}: {irav}, publicado el {publicado}. Tu renta puede pasar a {maximo} como mucho.',
   'rent_indices.example_later':
-    'Si se cumpliera el {dia}, sin nuevo pacto el tope sería el 2 %, o el IRAV si fuera más bajo, mientras rija el {norma}: {maximo} como mucho. Y si esos {renta} superaran el límite del sistema estatal de índices de precios de referencia, la renta no podría subir.',
+    'Si se cumpliera el {dia}, sin nuevo pacto el tope sería el 2 %, o el IRAV si fuera más bajo, mientras rija el {norma}: {maximo} como mucho. Y si tu vivienda estuviera en una zona de mercado tensionado y esos {renta} superaran el límite de precio que fija allí el sistema de índices de referencia, la renta no podría subir.',
 
   'rent_indices.soon_title': 'Próximamente: comprueba tu subida',
   'rent_indices.soon':
@@ -123,7 +125,7 @@ export const es = {
     'El INE da una estimación del IPC al final de cada mes y el dato definitivo unas dos semanas después. La ley habla del último índice publicado sin aclarar si el adelantado cuenta, por eso aquí ves los dos. El IRAV no tiene adelantado: sale con el IPC definitivo.',
   'rent_indices.faq.no_clause': '¿Me pueden subir el alquiler si el contrato no dice nada?',
   'rent_indices.faq.no_clause_answer':
-    'No, si tu contrato es del 6 de marzo de 2019 o posterior: sin una cláusula de actualización, la renta no se actualiza (art. 18.1 LAU). Si la cláusula dice que se actualiza pero no con qué índice, se usa el IGC, salvo mientras rige un decreto que pone el IRAV: {decretos}. En los contratos anteriores al 1 de abril de 2015, con la redacción de 1994 o la de la Ley 4/2013, la ley actualiza la renta con el IPC aunque el contrato no lo diga.',
+    'No, si tu contrato es del 1 de abril de 2015 o posterior: sin una cláusula de actualización, la renta no se actualiza (art. 18.1 LAU). Si la cláusula dice que se actualiza pero no con qué índice, se usa el IGC, salvo mientras rige un decreto que pone el IRAV: {decretos}. En los contratos anteriores al 1 de abril de 2015, con la redacción de 1994 o la de la Ley 4/2013, la ley actualiza la renta con el IPC aunque el contrato no lo diga.',
   'rent_indices.faq.no_clause_item': 'el {norma} {periodo}, {estado}',
   'rent_indices.faq.igc_negative': '¿Por qué el IGC sale negativo?',
   'rent_indices.faq.igc_negative_answer':

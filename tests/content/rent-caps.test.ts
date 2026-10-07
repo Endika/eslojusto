@@ -34,7 +34,7 @@ describe('the cap copy while RDL 29/2026 awaits validation', () => {
     expect(ids(NORMS)).toEqual(['ipc', 'igc', 'three', 'irav', 'two']);
     const two = copy.rows.at(-1);
     expect(two?.when).toBe('Desde el 08-10-2026');
-    expect(two?.rule).toContain('sistema estatal de índices de precios de referencia');
+    expect(two?.rule).toContain('zona de mercado tensionado');
     expect(two?.sources.map((s) => s.url)).toContain(REFERENCE_INDEX_URL);
     expect(copy.rows.find((r) => r.id === 'irav')?.when).toBe('Del 01-01-2025 al 07-10-2026');
   });
