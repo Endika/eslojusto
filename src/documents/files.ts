@@ -9,8 +9,7 @@ const isPdf = (f: Selected) => f.type === 'application/pdf';
 // Any photo the browser can decode is re-encoded to JPEG before it leaves, so HEIC or PNG work too.
 const isImage = (f: Selected) => f.type.startsWith('image/');
 
-// A PDF goes as it is, and its base64 grows by a third inside a 6 MB request.
-export const MAX_PDF_BYTES = Math.floor(((LIMITS.maxPayloadBytes - 64 * 1024) * 3) / 4);
+export const MAX_PDF_BYTES = LIMITS.maxPdfBytes;
 
 // The checks the API makes that the browser can make first, so a bad choice costs no request.
 export function checkSelection(files: readonly Selected[]): ErrorCode | null {
@@ -19,7 +18,7 @@ export function checkSelection(files: readonly Selected[]): ErrorCode | null {
   const pdfs = files.filter(isPdf).length;
   if (pdfs > 0 && pdfs !== files.length) return 'mixed_files';
   if (pdfs > LIMITS.maxPdfFiles || files.length > LIMITS.maxImages) return 'too_many_files';
-  if (pdfs === 1 && (files[0]?.size ?? 0) > MAX_PDF_BYTES) return 'file_too_large';
+  if (pdfs === 1 && (files[0]?.size ?? 0) > MAX_PDF_BYTES) return 'pdf_too_large';
   return null;
 }
 

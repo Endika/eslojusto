@@ -9,7 +9,13 @@ import { DOCUMENTS, TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/
 import { bytesToBase64, fitWithin } from '../documents/files';
 import { createPassStore } from '../documents/pass';
 import { setUpPayment } from '../documents/payment';
-import type { Browser, Captcha, FileEncoder, KeyValueStore } from '../documents/ports';
+import type {
+  Browser,
+  Captcha,
+  CaptchaAction,
+  FileEncoder,
+  KeyValueStore,
+} from '../documents/ports';
 import { setUpUpload } from '../documents/upload';
 import { pageTranslator } from '../i18n/client';
 import { localToday } from './clock';
@@ -51,29 +57,31 @@ interface Turnstile {
   remove(widget: string): void;
 }
 
-// Turnstile loads only when a document is about to be read, and each read gets a fresh token.
-function turnstileCaptcha(siteKey: string, container: HTMLElement): Captcha {
-  let api: Promise<Turnstile> | null = null;
+// Turnstile loads only when a document is about to be read or the pass paid for, and each of
+// those gets a fresh token.
+let turnstileApi: Promise<Turnstile> | null = null;
+const loadTurnstile = () =>
+  (turnstileApi ??= new Promise<Turnstile>((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = TURNSTILE_SCRIPT;
+    script.async = true;
+    script.onload = () => {
+      const t = (window as unknown as { turnstile?: Turnstile }).turnstile;
+      if (t) resolve(t);
+      else reject(new Error('Turnstile missing'));
+    };
+    script.onerror = () => {
+      turnstileApi = null;
+      reject(new Error('Turnstile unavailable'));
+    };
+    document.head.append(script);
+  }));
+
+function turnstileCaptcha(siteKey: string, container: HTMLElement, action: CaptchaAction): Captcha {
   let widget: string | null = null;
-  const load = () =>
-    (api ??= new Promise<Turnstile>((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = TURNSTILE_SCRIPT;
-      script.async = true;
-      script.onload = () => {
-        const t = (window as unknown as { turnstile?: Turnstile }).turnstile;
-        if (t) resolve(t);
-        else reject(new Error('Turnstile missing'));
-      };
-      script.onerror = () => {
-        api = null;
-        reject(new Error('Turnstile unavailable'));
-      };
-      document.head.append(script);
-    }));
   return {
     async token() {
-      const turnstile = await load();
+      const turnstile = await loadTurnstile();
       if (widget !== null) turnstile.remove(widget);
       return new Promise<string>((resolve, reject) => {
         const timer = setTimeout(() => reject(new Error('Turnstile timeout')), CAPTCHA_TIMEOUT_MS);
@@ -83,7 +91,7 @@ function turnstileCaptcha(siteKey: string, container: HTMLElement): Captcha {
         };
         widget = turnstile.render(container, {
           sitekey: siteKey,
-          action: 'extract',
+          action,
           appearance: 'interaction-only',
           language: document.documentElement.lang === 'es' ? 'es' : 'auto',
           callback: (token: string) => done(() => resolve(token))(),
@@ -160,7 +168,8 @@ export function wireDocuments(
   const start = document.querySelector<HTMLElement>('[data-documents-start]');
   const offer = document.querySelector<HTMLElement>('[data-pass-offer]');
   const captchaBox = start?.querySelector<HTMLElement>('[data-captcha]');
-  if (!config || !start || !offer || !captchaBox) return;
+  const checkoutCaptchaBox = offer?.querySelector<HTMLElement>('[data-pass-captcha]');
+  if (!config || !start || !offer || !captchaBox || !checkoutCaptchaBox) return;
 
   const tr = pageTranslator();
   const api = createApi(config.apiUrl, (url, init) => fetch(url, init));
@@ -170,7 +179,7 @@ export function wireDocuments(
 
   const upload = setUpUpload(start, {
     api,
-    captcha: turnstileCaptcha(config.turnstileSiteKey, captchaBox),
+    captcha: turnstileCaptcha(config.turnstileSiteKey, captchaBox, 'extract'),
     encoder: canvasEncoder,
     passes,
     events,
@@ -181,6 +190,7 @@ export function wireDocuments(
   });
   const payment = setUpPayment(offer, {
     api,
+    captcha: turnstileCaptcha(config.turnstileSiteKey, checkoutCaptchaBox, 'checkout'),
     passes,
     events,
     browser,

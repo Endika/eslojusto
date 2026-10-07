@@ -42,12 +42,25 @@ describe('extract', () => {
       extraction,
       failedChecks: ['items_do_not_sum'],
       allowance: 'v1.q.s',
+      readsLeft: null,
     });
   });
   it('sends a pass instead of the quota when it has one', async () => {
-    const fetch = fakeFetch(200, { code: 'ok', extraction, failedChecks: [], allowance: 'p2' });
+    const fetch = fakeFetch(200, { code: 'ok', extraction, failedChecks: [], readsLeft: 11 });
     await createApi('https://api.test', fetch).extract({ ...request, pass: 'p1', quota: 'q' });
     expect(fetch.calls[0]?.body).toEqual({ ...request, pass: 'p1' });
+  });
+  it('a pass read without its reads left, or a free read without a quota, is unexpected', async () => {
+    const free = fakeFetch(200, { code: 'ok', extraction, failedChecks: [], readsLeft: 3 });
+    expect(await createApi('https://api.test', free).extract(request)).toEqual({
+      ok: false,
+      code: 'unexpected_response',
+    });
+    const paid = fakeFetch(200, { code: 'ok', extraction, failedChecks: [], allowance: 'q' });
+    expect(await createApi('https://api.test', paid).extract({ ...request, pass: 'p' })).toEqual({
+      ok: false,
+      code: 'unexpected_response',
+    });
   });
   it('turns every API code into a failure', async () => {
     const fetch = fakeFetch(429, { code: 'daily_limit_reached' });
@@ -102,22 +115,30 @@ describe('checkout and pass', () => {
       sessionId: 'cs_test_1',
       url: 'https://checkout.stripe.com/c/1',
     });
-    expect(await createApi('https://api.test', fetch).checkout('n'.repeat(32))).toEqual({
+    expect(
+      await createApi('https://api.test', fetch).checkout('n'.repeat(32), 'turnstile'),
+    ).toEqual({
       ok: true,
       sessionId: 'cs_test_1',
       url: 'https://checkout.stripe.com/c/1',
     });
     expect(fetch.calls[0]).toEqual({
       url: 'https://api.test/checkout',
-      body: { nonce: 'n'.repeat(32) },
+      body: { nonce: 'n'.repeat(32), captchaToken: 'turnstile' },
     });
   });
   it('asks for the pass with the session and the nonce', async () => {
-    const fetch = fakeFetch(200, { code: 'ok', pass: 'v1.p.s', expiresAt: 1_800_000_000 });
+    const fetch = fakeFetch(200, {
+      code: 'ok',
+      pass: 'v1.p.s',
+      expiresAt: 1_800_000_000,
+      readsLeft: 15,
+    });
     expect(await createApi('https://api.test', fetch).pass('cs_test_1', 'n'.repeat(32))).toEqual({
       ok: true,
       pass: 'v1.p.s',
       expiresAt: 1_800_000_000,
+      readsLeft: 15,
     });
     expect(fetch.calls[0]?.body).toEqual({ sessionId: 'cs_test_1', nonce: 'n'.repeat(32) });
   });

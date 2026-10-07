@@ -597,9 +597,13 @@ export const es = {
   'client.documents.error.image_too_large':
     'Alguna foto es demasiado grande. Prueba otra vez; se reduce antes de enviarla.',
   'client.documents.error.pdf_unreadable':
-    'El PDF no se puede abrir. Puede estar dañado o protegido con contraseña.',
+    'Este PDF no se puede leer tal cual: puede ser un escaneo o estar protegido con contraseña. Sube fotos de sus páginas.',
+  'client.documents.error.pdf_too_large':
+    'El PDF pesa más de 2 MB, como suele pasar con un escaneo. Sube fotos de sus páginas.',
   'client.documents.error.pdf_too_many_pages':
     'El PDF tiene más de 4 páginas. Sube solo las páginas con los datos.',
+  'client.documents.error.document_too_dense':
+    'El documento tiene demasiado texto para leerlo de una vez. Sube solo las páginas con los datos.',
   'client.documents.error.captcha_failed':
     'No se ha podido comprobar que no eres un robot. Prueba otra vez.',
   'client.documents.error.daily_limit_reached':
@@ -608,7 +612,9 @@ export const es = {
     'Tu pase no es válido. Puedes recuperarlo en «¿Ya has pagado?» o rellenar a mano.',
   'client.documents.error.pass_expired': 'Tu pase ha caducado. Puedes rellenar a mano.',
   'client.documents.error.pass_exhausted':
-    'Ya has usado las 15 lecturas de tu pase. Puedes rellenar a mano.',
+    'Ya has usado las 15 lecturas de tu pase. Puedes rellenar a mano; el informe y la carta siguen disponibles.',
+  'client.documents.error.pass_revoked':
+    'Este pase ya no vale porque su pago se devolvió o se anuló. Puedes rellenar a mano.',
   'client.documents.error.document_kind_mismatch':
     'Parece otro tipo de documento. Comprueba qué documento has elegido.',
   'client.documents.error.document_unreadable':
@@ -633,7 +639,6 @@ export const es = {
   'client.documents.error.captcha_unavailable':
     'No se ha podido cargar la comprobación de que no eres un robot. Prueba otra vez o rellena a mano.',
   'client.documents.error.file_type': 'Sube fotos o un PDF',
-  'client.documents.error.file_too_large': 'El PDF ocupa demasiado: como mucho 4 MB.',
   'client.documents.error.checkout_unavailable':
     'No se ha podido abrir el pago. Prueba otra vez en un momento.',
   'client.documents.error.no_checkout':

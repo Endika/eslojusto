@@ -11,6 +11,8 @@ export const LIMITS = {
   maxImages: 4,
   maxPdfFiles: 1,
   maxPdfPages: 4,
+  // A heavier PDF is almost always a scan; photos of its pages read better.
+  maxPdfBytes: 2 * 1024 * 1024,
   maxImageLongSide: 1568,
   maxPayloadBytes: 6 * 1024 * 1024,
 } as const;
@@ -31,12 +33,15 @@ export const API_ERROR_CODES = [
   'image_unreadable',
   'image_too_large',
   'pdf_unreadable',
+  'pdf_too_large',
   'pdf_too_many_pages',
+  'document_too_dense',
   'captcha_failed',
   'daily_limit_reached',
   'pass_invalid',
   'pass_expired',
   'pass_exhausted',
+  'pass_revoked',
   'document_kind_mismatch',
   'document_unreadable',
   'model_unavailable',
@@ -55,7 +60,6 @@ export const CLIENT_ERROR_CODES = [
   'unexpected_response',
   'captcha_unavailable',
   'file_type',
-  'file_too_large',
   'checkout_unavailable',
   'no_checkout',
 ] as const;
@@ -117,8 +121,9 @@ export type ExtractResult =
       readonly ok: true;
       readonly extraction: Extraction;
       readonly failedChecks: readonly CoherenceCheck[];
-      // The quota or pass token to send next time.
-      readonly allowance: string;
+      // A free read returns the quota token to send next time; a pass read, the reads it has left.
+      readonly allowance: string | null;
+      readonly readsLeft: number | null;
     }
   | Failure;
 
@@ -126,11 +131,18 @@ export type CheckoutResult =
   { readonly ok: true; readonly sessionId: string; readonly url: string } | Failure;
 
 export type PassResult =
-  { readonly ok: true; readonly pass: string; readonly expiresAt: number } | Failure;
+  | {
+      readonly ok: true;
+      readonly pass: string;
+      readonly expiresAt: number;
+      readonly readsLeft: number;
+    }
+  | Failure;
 
 export interface Api {
   extract(request: ExtractRequest): Promise<ExtractResult>;
-  checkout(nonce: string): Promise<CheckoutResult>;
+  // The captcha token comes from a Turnstile widget with the action «checkout».
+  checkout(nonce: string, captchaToken: string): Promise<CheckoutResult>;
   pass(sessionId: string, nonce: string): Promise<PassResult>;
 }
 

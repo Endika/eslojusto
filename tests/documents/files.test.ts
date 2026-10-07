@@ -24,7 +24,7 @@ describe('checkSelection', () => {
     expect(checkSelection([pdf, pdf])).toBe('too_many_files');
     expect(checkSelection([pdf, jpeg])).toBe('mixed_files');
     expect(checkSelection([{ type: 'text/plain', size: 10 }])).toBe('file_type');
-    expect(checkSelection([{ ...pdf, size: MAX_PDF_BYTES + 1 }])).toBe('file_too_large');
+    expect(checkSelection([{ ...pdf, size: 2 * 1024 * 1024 + 1 }])).toBe('pdf_too_large');
   });
   it('tells photos from a PDF', () => {
     expect(mediaOf([jpeg])).toBe('image');
@@ -43,7 +43,7 @@ describe('fitWithin', () => {
 });
 
 describe('the request size', () => {
-  it('a PDF at the limit still fits in 6 MB once in base64', () => {
+  it('a PDF at its 2 MB limit fits in a 6 MB request once in base64', () => {
     expect(Math.ceil(MAX_PDF_BYTES / 3) * 4).toBeLessThan(6 * 1024 * 1024);
   });
   it('adds up the encoded files', () => {

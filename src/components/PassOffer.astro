@@ -33,6 +33,7 @@ const tx = (key: Key) => t(lang, key);
       <p class="source">
         <a href={`${link('es', 'aviso-legal/')}#condiciones`}>{tx('documents.pass.conditions')}</a>
       </p>
+      <div class="pass__captcha" data-pass-captcha></div>
       <div class="pass__actions">
         <button class="button button--sheet" type="button" data-pass-pay>
           {tx('documents.pass.pay')}

@@ -57,6 +57,7 @@ const isApiError = (v: unknown): v is ErrorCode =>
   typeof v === 'string' && (API_ERROR_CODES as readonly string[]).includes(v);
 
 const isToken = (v: unknown): v is string => typeof v === 'string' && v.length > 0;
+const isCount = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0;
 
 // One HTTP client per operation path; every failure becomes a code the page can word.
 export function createApi(baseUrl: string, fetchFn: Fetch, timeoutMs = 120_000): Api {
@@ -98,16 +99,21 @@ export function createApi(baseUrl: string, fetchFn: Fetch, timeoutMs = 120_000):
       if (failed(r)) return r;
       const extraction = parseExtraction(r['extraction']);
       const checks = Array.isArray(r['failedChecks']) ? r['failedChecks'] : [];
-      if (!extraction || !isToken(r['allowance'])) return fail('unexpected_response');
+      const allowance = isToken(r['allowance']) ? r['allowance'] : null;
+      const readsLeft = isCount(r['readsLeft']) ? r['readsLeft'] : null;
+      // A free read must hand back its quota token; a pass read, what the pass has left.
+      if (!extraction || (pass === undefined ? allowance === null : readsLeft === null))
+        return fail('unexpected_response');
       return {
         ok: true,
         extraction,
         failedChecks: checks.filter((c): c is CoherenceCheck => CHECKS_SET.has(c)),
-        allowance: r['allowance'],
+        allowance,
+        readsLeft,
       };
     },
-    async checkout(nonce) {
-      const r = await post('checkout', { nonce });
+    async checkout(nonce, captchaToken) {
+      const r = await post('checkout', { nonce, captchaToken });
       if (failed(r)) return r;
       const { sessionId, url } = r;
       if (!isToken(sessionId) || !isToken(url)) return fail('unexpected_response');
@@ -116,9 +122,10 @@ export function createApi(baseUrl: string, fetchFn: Fetch, timeoutMs = 120_000):
     async pass(sessionId, nonce) {
       const r = await post('pass', { sessionId, nonce });
       if (failed(r)) return r;
-      const { pass, expiresAt } = r;
-      if (!isToken(pass) || typeof expiresAt !== 'number') return fail('unexpected_response');
-      return { ok: true, pass, expiresAt };
+      const { pass, expiresAt, readsLeft } = r;
+      if (!isToken(pass) || !isCount(expiresAt) || !isCount(readsLeft))
+        return fail('unexpected_response');
+      return { ok: true, pass, expiresAt, readsLeft };
     },
   };
 }
