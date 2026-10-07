@@ -61,6 +61,7 @@ export default tseslint.config(
       'playwright-report',
       'test-results',
       '.superpowers',
+      'api',
     ],
   },
   js.configs.recommended,
