@@ -98,17 +98,28 @@ export function fitWithin(width: number, height: number, max: number = LIMITS.ma
 // about fifteen pages never needs and a larger one of noisy photos may.
 export const JPEG_QUALITIES = [0.85, 0.75, 0.65, 0.5] as const;
 export const LONG_SIDES = [LIMITS.maxImageLongSide, 1280, 1100] as const;
+// On a page that missed at 0.5, 0.75 weighs about 1.7 times as much, more than a shorter side
+// takes off (a third of the pixels at most), so a shorter side starts at 0.65.
+const SHORTER_SIDE_QUALITIES = [0.65, 0.5] as const;
 
-// The sizes an image of `width` × `height` is encoded at in turn, each once: one that is already
-// short is never enlarged, so it may have a single size.
-export function encodingSizes(width: number, height: number) {
-  const sizes: { width: number; height: number }[] = [];
+export interface EncodingStep {
+  readonly width: number;
+  readonly height: number;
+  readonly quality: number;
+}
+
+// The sizes and qualities an image of `width` × `height` is encoded at in turn, each size once:
+// one that is already short is never enlarged, so it may have a single size.
+export function encodingSteps(width: number, height: number): EncodingStep[] {
+  const steps: EncodingStep[] = [];
   for (const side of LONG_SIDES) {
     const size = fitWithin(width, height, side);
-    const last = sizes.at(-1);
-    if (last?.width !== size.width || last.height !== size.height) sizes.push(size);
+    const last = steps.at(-1);
+    if (last?.width === size.width && last.height === size.height) continue;
+    for (const quality of last ? SHORTER_SIDE_QUALITIES : JPEG_QUALITIES)
+      steps.push({ ...size, quality });
   }
-  return sizes;
+  return steps;
 }
 
 // The size that brings the long side to exactly `max`: a PDF page is drawn, not resampled, so
