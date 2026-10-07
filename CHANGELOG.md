@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/Endika/eslojusto/compare/v1.1.1...v1.1.2) (2026-10-07)
+
+
+### Bug Fixes
+
+* **infra:** let CloudFormation read the bootstrap version and the log groups' streams ([438a86a](https://github.com/Endika/eslojusto/commit/438a86ae46cb588c296d6038cdb1a52700afc949))
+
 ## [1.1.1](https://github.com/Endika/eslojusto/compare/v1.1.0...v1.1.1) (2026-10-07)
 
 
