@@ -43,7 +43,6 @@ function review(...statuses: [ItemId, Status, number | null, number | null][]): 
   const items: ItemResult[] = statuses.map(([id, status, employerFigure, difference]) => ({
     item: {
       id,
-      title: id,
       direction: id === 'notice_deduction' ? 'deduction' : 'credit',
       range: status === 'not_checkable' ? null : { min: 1, max: 1 },
       calculation: '',
@@ -55,7 +54,7 @@ function review(...statuses: [ItemId, Status, number | null, number | null][]): 
     status,
     difference,
   }));
-  return { items, unfairReference: null, unchecked: [], uncheckedCodes: [] };
+  return { items, unfairReference: null, uncheckedCodes: [] };
 }
 
 describe('buckets', () => {

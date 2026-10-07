@@ -4,7 +4,6 @@ import type { Item } from '../../src/engine/types';
 
 const credit = (min: number, max: number): Item => ({
   id: 'holiday_pay',
-  title: 'Vacaciones',
   direction: 'credit',
   range: { min, max },
   calculation: '',

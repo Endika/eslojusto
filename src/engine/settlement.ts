@@ -31,7 +31,6 @@ export function pendingSalaryItem(e: FinalPayInput): Item {
   const high = (e.monthlySalary * d) / monthDays;
   return {
     id: 'pending_salary',
-    title: 'Salario del mes de la baja',
     direction: 'credit',
     range: between(low, high),
     calculation: `${eur(e.monthlySalary)} × ${d} días trabajados del mes, entre ${num(30, 0)} días (mes comercial) y ${monthDays} días (mes natural): de ${eur(Math.min(low, high))} a ${eur(Math.max(low, high))}.`,
@@ -67,7 +66,6 @@ export function holidayPayItem(e: FinalPayInput): Item {
   const byMonthsFromStart = (e.annualHolidayDays * monthsFromStart) / 12;
   const base = {
     id: 'holiday_pay',
-    title: 'Vacaciones devengadas y no disfrutadas',
     direction: 'credit',
     dependsOnAgreement: true,
     basedOnYourAnswer: e.annualHolidayDays > 30,
@@ -240,7 +238,6 @@ export function extraPayItem(e: FinalPayInput): Item | null {
   }
   return {
     id: 'extra_pay',
-    title: 'Pagas extra devengadas',
     direction: 'credit',
     range,
     calculation,
@@ -260,7 +257,6 @@ export function employerNoticeItem(e: FinalPayInput): Item | null {
   const dayMax = annualSalary(e) / 365;
   return {
     id: 'employer_notice',
-    title: 'Preaviso no dado por la empresa',
     direction: 'credit',
     range: between(missingDays * dayMin, missingDays * dayMax),
     calculation: `${NOTICE_DAYS} días de preaviso − ${received} recibidos = ${missingDays} días × entre ${eur(dayMin)} y ${eur(dayMax)} al día.`,
@@ -274,7 +270,6 @@ export function noticeDeductionItem(e: FinalPayInput): Item | null {
   if (e.cause !== 'resignation') return null;
   const base = {
     id: 'notice_deduction',
-    title: 'Descuento por preaviso no cumplido',
     direction: 'deduction',
     sources: [SOURCES.et49],
   } as const;

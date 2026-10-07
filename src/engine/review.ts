@@ -17,19 +17,9 @@ export type EmployerFigures = Partial<Record<ItemId, number>>;
 export type UncheckedCode =
   'net_pay' | 'bonuses' | 'additional_extra_pay' | 'dismissal_cause' | 'processing_wages';
 
-const UNCHECKED: Record<UncheckedCode, string> = {
-  net_pay: 'El neto: retenciones de IRPF y cotizaciones',
-  bonuses: 'Pluses, complementos, horas extra y comisiones de tu convenio o contrato',
-  additional_extra_pay: 'Pagas extra además de las dos ordinarias',
-  dismissal_cause: 'Si la causa de despido está justificada, algo que decide un juzgado',
-  processing_wages: 'Salarios de tramitación',
-};
-
 export interface Review {
   readonly items: readonly ItemResult[];
   readonly unfairReference: number | null;
-  readonly unchecked: readonly string[];
-  // The same list as codes, for the UI to translate.
   readonly uncheckedCodes: readonly UncheckedCode[];
 }
 
@@ -51,7 +41,6 @@ function severanceItem(e: FinalPayInput): Item {
   });
   return {
     id: 'severance',
-    title: 'Indemnización',
     direction: 'credit',
     range: r.range,
     calculation: r.detail,
@@ -98,10 +87,9 @@ export function reviewFinalPay(
     'dismissal_cause',
     'processing_wages',
   ];
-  const unchecked = uncheckedCodes.map((c) => UNCHECKED[c]);
 
   return {
     ok: true,
-    review: { items, unfairReference, unchecked, uncheckedCodes },
+    review: { items, unfairReference, uncheckedCodes },
   };
 }
