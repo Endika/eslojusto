@@ -16,6 +16,7 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import type { Construct } from 'constructs';
 import {
   ESCALATION_MODEL,
+  EXTRACT_TIMEOUT_SECONDS,
   EU_PROFILE_DESTINATIONS,
   FUNCTION_NAMES,
   PARAMETER_NAMES,
@@ -50,10 +51,9 @@ type FunctionKey = keyof typeof FUNCTION_NAMES;
 const FUNCTIONS: Readonly<
   Record<FunctionKey, { memorySize: number; timeout: Duration; reserved?: number }>
 > = {
-  // Room for a primary read plus an escalated one on a 4-page PDF.
   extract: {
     memorySize: 512,
-    timeout: Duration.seconds(120),
+    timeout: Duration.seconds(EXTRACT_TIMEOUT_SECONDS),
     reserved: EXTRACT_RESERVED_CONCURRENCY,
   },
   checkout: {

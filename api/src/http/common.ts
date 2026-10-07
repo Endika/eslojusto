@@ -22,13 +22,9 @@ const STATUS: Readonly<Record<ResultCode, number>> = {
   payload_too_large: 413,
   no_files: 422,
   too_many_files: 422,
-  mixed_files: 422,
   unsupported_media_type: 415,
   image_unreadable: 422,
   image_too_large: 422,
-  pdf_unreadable: 422,
-  pdf_too_large: 413,
-  pdf_too_many_pages: 422,
   document_too_dense: 422,
   captcha_failed: 403,
   daily_limit_reached: 429,
@@ -36,7 +32,6 @@ const STATUS: Readonly<Record<ResultCode, number>> = {
   pass_expired: 403,
   pass_exhausted: 429,
   pass_revoked: 403,
-  document_kind_mismatch: 422,
   document_unreadable: 422,
   model_unavailable: 503,
   session_not_found: 404,
@@ -54,6 +49,7 @@ export interface Metrics {
   inputTokens?: number;
   outputTokens?: number;
   escalated?: boolean;
+  conflicts?: number;
   underestimated?: boolean;
   countNotSaved?: boolean;
 }

@@ -1,4 +1,4 @@
-import { DOCUMENT_KINDS, type DocumentKind } from './documents';
+import { LIMITS, PAGE_KINDS, type SourceKind } from './documents';
 
 // Mirrors of the site's engine unions (src/engine/types.ts); test/engine-contract.test.ts keeps them equal.
 export const CAUSES = [
@@ -30,7 +30,9 @@ export type Confidence = (typeof CONFIDENCES)[number];
 
 export type FieldType =
   | { readonly type: 'date' }
+  | { readonly type: 'text'; readonly maxLength: number }
   | { readonly type: 'money' }
+  | { readonly type: 'days' }
   | { readonly type: 'boolean' }
   | { readonly type: 'enum'; readonly values: readonly string[] };
 
@@ -46,16 +48,55 @@ export interface ListSpec {
   readonly required: readonly string[];
 }
 
-export interface DocumentSchema {
+export interface SectionSchema {
   readonly description: string;
+  // The kind of document the section's values come from.
+  readonly source: SourceKind;
   readonly fields: Readonly<Record<string, FieldSpec>>;
   readonly lists: Readonly<Record<string, ListSpec>>;
 }
 
 const date = (description: string): FieldSpec => ({ type: { type: 'date' }, description });
 const money = (description: string): FieldSpec => ({ type: { type: 'money' }, description });
+const days = (description: string): FieldSpec => ({ type: { type: 'days' }, description });
+const flag = (description: string): FieldSpec => ({ type: { type: 'boolean' }, description });
 
 export const MAX_MONEY = 1_000_000;
+export const MAX_DAYS = 366;
+
+// What each earnings line of a payslip pays for. Only `salary` lines make up the salary of the
+// period; the items of a liquidation come from the other categories, added up in code.
+export const LINE_CATEGORIES = [
+  'salary',
+  'notice_compensation',
+  'severance',
+  'holiday_pay',
+  'extra_pay',
+  'one_off',
+  'other',
+] as const;
+export type LineCategory = (typeof LINE_CATEGORIES)[number];
+
+export const MAX_CONCEPT_LENGTH = 80;
+
+const payslipLines: ListSpec = {
+  description:
+    'Every earnings line (devengo) of the payslip, one entry per line, in the order printed. Never deductions (IRPF, Seguridad Social, anticipos).',
+  maxItems: 30,
+  item: {
+    concept: {
+      type: { type: 'text', maxLength: MAX_CONCEPT_LENGTH },
+      description: 'The concept exactly as printed, for example «PLUS TRANSPORTE».',
+    },
+    amount: money('Amount of the line, in euros.'),
+    category: {
+      type: { type: 'enum', values: LINE_CATEGORIES },
+      description:
+        'salary: base salary, pluses and allowances paid for the days of the period, prorated extra pay (PP PAGAS EXTRAS, prorrata pagas extra), teleworking or transport if paid as earnings. notice_compensation: falta de preaviso, indemnización por falta de preaviso. severance: indemnización por despido o fin de contrato. holiday_pay: vacaciones no disfrutadas, vacaciones pendientes. extra_pay: a full extra payment or its liquidation (paga extra de verano, de Navidad, liquidación pagas extras). one_off: a payment that is not for the period, such as a bonus, study aid (ayuda estudios) or backpay (atrasos). other: anything else.',
+    },
+  },
+  required: ['concept', 'amount', 'category'],
+};
 
 const amountList = (description: string): ListSpec => ({
   description,
@@ -64,91 +105,164 @@ const amountList = (description: string): ListSpec => ({
   required: ['amount'],
 });
 
-const DETECTED_KIND: FieldSpec = {
-  type: { type: 'enum', values: [...DOCUMENT_KINDS, 'other'] },
+const START = date('Employment start or seniority date (fecha de alta, antigüedad).');
+const END = date('Employment end date (fecha de baja, fecha de efectos del despido o del cese).');
+const CAUSE: FieldSpec = {
+  type: { type: 'enum', values: CAUSES },
   description:
-    'What the document actually is: settlement (propuesta de liquidación, finiquito), payslip (nómina), work_history (informe de vida laboral) or other.',
+    'Termination cause only if the document states it: resignation (baja voluntaria), fixed_term_end (fin de contrato), objective_dismissal (despido objetivo), unfair_dismissal (despido improcedente, also when the company acknowledges it), disciplinary_dismissal (despido disciplinario).',
+};
+const FIXED_TERM: FieldSpec = {
+  type: { type: 'enum', values: FIXED_TERM_TYPES },
+  description:
+    'Type of fixed-term contract only if stated: production_circumstances (circunstancias de la producción), replacement (sustitución), training (formativo).',
+};
+const ITEMS: Readonly<Record<(typeof ITEM_IDS)[number], FieldSpec>> = {
+  pending_salary: money('Salary for the days worked in the last month (salario pendiente).'),
+  holiday_pay: money('Untaken holidays paid out (vacaciones no disfrutadas).'),
+  extra_pay: money('Accrued share of extra payments (parte proporcional de pagas extra).'),
+  severance: money('Severance pay (indemnización por fin de contrato o despido).'),
+  employer_notice: money('Pay in lieu of notice owed by the employer (falta de preaviso).'),
+  notice_deduction: money('Deduction for notice the worker did not give (descuento por preaviso).'),
+};
+// A settlement often names a concept without its amount, or prints only a net total: an amount
+// borrowed from the next line, or a total, is worse than none.
+const OWN_AMOUNT =
+  ' Only the amount printed next to this very concept; leave the field out when the concept has no amount of its own. Never another line’s amount, never a total.';
+const PRINTED_ITEMS = Object.fromEntries(
+  Object.entries(ITEMS).map(([id, spec]) => [
+    id,
+    { ...spec, description: spec.description + OWN_AMOUNT },
+  ]),
+) as typeof ITEMS;
+
+const HOLIDAYS = {
+  annualHolidayDays: days('Holiday days per year, only if printed (días de vacaciones al año).'),
+  holidayDaysTaken: days('Holiday days already taken this year, only if printed.'),
+};
+const PERIOD = {
+  periodStart: date('First day of the pay period (periodo de liquidación).'),
+  periodEnd: date('Last day of the pay period.'),
 };
 
-const SETTLEMENT: DocumentSchema = {
-  description: 'Settlement proposal (propuesta de liquidación / finiquito).',
-  fields: {
-    detectedKind: DETECTED_KIND,
-    startDate: date('Employment start or seniority date (fecha de alta, antigüedad).'),
-    endDate: date('Employment end date (fecha de baja, fecha de efectos).'),
-    cause: {
-      type: { type: 'enum', values: CAUSES },
-      description:
-        'Termination cause only if the document states it: resignation (baja voluntaria), fixed_term_end (fin de contrato), objective_dismissal (despido objetivo), unfair_dismissal (despido improcedente), disciplinary_dismissal (despido disciplinario).',
+// One section per kind of document; a document of each kind is transcribed into its section, so
+// every value keeps the document it came from. Which one wins is decided after the read.
+export const SECTIONS = {
+  settlement_proposal: {
+    description:
+      'Settlement proposal or notification (propuesta o notificación de finiquito, «liquidación, saldo y finiquito»), with or without amounts per concept.',
+    source: 'settlement_proposal',
+    fields: {
+      startDate: START,
+      endDate: END,
+      cause: CAUSE,
+      fixedTermType: FIXED_TERM,
+      monthlySalary: money('Gross monthly salary, only if printed as such.'),
+      ...PRINTED_ITEMS,
+      ...HOLIDAYS,
+      totalGross: money(
+        'Total GROSS amount, before deductions (total devengado, total bruto), only if printed as such.',
+      ),
+      totalNet: money(
+        'Total NET amount to be paid, after deductions (líquido a percibir, total neto, a percibir).',
+      ),
     },
-    fixedTermType: {
-      type: { type: 'enum', values: FIXED_TERM_TYPES },
-      description:
-        'Type of fixed-term contract only if stated: production_circumstances (circunstancias de la producción), replacement (sustitución), training (formativo).',
+    lists: {
+      otherAccruals: amountList(
+        'Every other gross line (devengo) not recorded in an item field above, one entry per line.',
+      ),
     },
-    monthlySalary: money('Gross monthly salary, only if printed as such.'),
-    pending_salary: money('Salary for the days worked in the last month (salario pendiente).'),
-    holiday_pay: money('Untaken holidays paid out (vacaciones no disfrutadas).'),
-    extra_pay: money('Accrued share of extra payments (parte proporcional de pagas extra).'),
-    severance: money('Severance pay (indemnización por fin de contrato o despido).'),
-    employer_notice: money('Pay in lieu of notice owed by the employer (falta de preaviso).'),
-    notice_deduction: money(
-      'Deduction for notice the worker did not give (descuento por preaviso).',
-    ),
-    totalAccrued: money('Total gross amount (total devengado, total bruto).'),
   },
-  lists: {
-    otherAccruals: amountList(
-      'Every other gross line (devengo) not recorded in an item field above, one entry per line.',
-    ),
-  },
-};
-
-const PAYSLIP: DocumentSchema = {
-  description: 'Payslip (nómina). If several payslips are attached, record the most recent one.',
-  fields: {
-    detectedKind: DETECTED_KIND,
-    periodStart: date('First day of the pay period (periodo de liquidación).'),
-    periodEnd: date('Last day of the pay period.'),
-    startDate: date('Seniority date (fecha de antigüedad).'),
-    totalAccrued: money('Total gross amount of the period (total devengado).'),
-    extraPayProrated: {
-      type: { type: 'boolean' },
-      description: 'Whether a prorated extra payment line (prorrata de pagas extra) is printed.',
+  final_payslip: {
+    description:
+      'The final payslip that settles the employment (nómina de liquidación, nómina del finiquito): its items are worked out from its lines.',
+    source: 'payslip',
+    fields: {
+      ...PERIOD,
+      startDate: date('Seniority date (fecha de antigüedad).'),
+      ...HOLIDAYS,
+      totalAccrued: money('Total gross amount (total devengado).'),
     },
-    extraPayProratedAmount: money('Amount of the prorated extra payment line.'),
-    extraPayPaid: {
-      type: { type: 'boolean' },
-      description: 'Whether a full extra payment (paga extra) is paid in this period.',
+    lists: { lines: payslipLines },
+  },
+  monthly_payslip: {
+    description:
+      'The most recent ordinary payslip (nómina) whose period is one whole calendar month, from its first to its last day.',
+    source: 'payslip',
+    fields: {
+      ...PERIOD,
+      startDate: date('Seniority date (fecha de antigüedad).'),
+      totalAccrued: money('Total gross amount of the period (total devengado).'),
+      extraPayProrated: flag(
+        'true when a line prorates the extra payments, such as «PP PAGAS EXTRAS», «P.P. EXTRAS» or «prorrata pagas extra»; false when the payslip has no such line. Required whenever the payslip has lines.',
+      ),
+      extraPayProratedAmount: money('Amount of that prorated extra payment line.'),
     },
-    extraPayAmount: money('Amount of that full extra payment.'),
+    lists: { lines: payslipLines },
   },
-  lists: {
-    accruals: amountList('Every gross line (devengo) of the period, one entry per line.'),
+  dismissal_letter: {
+    description: 'Dismissal letter or termination notice (carta de despido, comunicación de cese).',
+    source: 'dismissal_letter',
+    fields: {
+      endDate: END,
+      cause: CAUSE,
+      fixedTermType: FIXED_TERM,
+      severance: ITEMS.severance,
+      employer_notice: ITEMS.employer_notice,
+      noticeDaysReceived: days(
+        'Days of notice actually GIVEN: days the worker kept working between being notified and the end date (fecha de efectos). 0 when the dismissal takes effect the same day as the notification and the notice is paid instead. Never the days of notice paid as compensation.',
+      ),
+      noticeDaysPaid: days(
+        'Days of notice PAID instead of given (indemnización por falta de preaviso, «se le abonan 15 días de preaviso»), only if stated as a number of days.',
+      ),
+    },
+    lists: {},
   },
-};
-
-const WORK_HISTORY: DocumentSchema = {
-  description: 'Social Security work history report (informe de vida laboral).',
-  fields: { detectedKind: DETECTED_KIND },
-  lists: {
-    contracts: {
-      description: 'Every employment period listed, one entry per row.',
-      maxItems: 60,
-      item: {
-        startDate: date('Start date of the period (fecha de alta).'),
-        endDate: date('End date of the period (fecha de baja); omit while still active.'),
+  company_certificate: {
+    description:
+      'Company certificate for the public employment service (certificado de empresa, SEPE header, bases de cotización de los últimos 180 días).',
+    source: 'company_certificate',
+    fields: { startDate: START, endDate: END, cause: CAUSE, fixedTermType: FIXED_TERM },
+    lists: {},
+  },
+  settlement_agreement: {
+    description:
+      'Agreement or conciliation record ending the dispute (acuerdo, acta de conciliación).',
+    source: 'settlement_agreement',
+    fields: {
+      endDate: END,
+      cause: CAUSE,
+      severanceTotal: money(
+        'Total amount the agreement gives as severance (indemnización total pactada), only if stated as one figure.',
+      ),
+    },
+    lists: {},
+  },
+  work_history: {
+    description: 'Social Security work history report (informe de vida laboral).',
+    source: 'work_history',
+    fields: {},
+    lists: {
+      contracts: {
+        description: 'Every employment period listed, one entry per row.',
+        maxItems: 60,
+        item: {
+          startDate: date('Start date of the period (fecha de alta).'),
+          endDate: date('End date of the period (fecha de baja); omit while still active.'),
+        },
+        required: ['startDate'],
       },
-      required: ['startDate'],
     },
   },
-};
+} as const satisfies Readonly<Record<string, SectionSchema>>;
 
-export const SCHEMAS: Readonly<Record<DocumentKind, DocumentSchema>> = {
-  settlement: SETTLEMENT,
-  payslip: PAYSLIP,
-  work_history: WORK_HISTORY,
-};
+export type SectionKind = keyof typeof SECTIONS;
+export const SECTION_KINDS = Object.keys(SECTIONS) as readonly SectionKind[];
+
+export const PAGES_DESCRIPTION =
+  'One entry per attached page, in order: its kind and the number of its document.';
+export const PAGE_KIND_DESCRIPTION =
+  'settlement_proposal: a settlement proposal or notification (propuesta o notificación de finiquito, «liquidación, saldo y finiquito»), listing the liquidation concepts (salario del mes, vacaciones, partes proporcionales, indemnización, preaviso), with or without amounts, and a total, often net. payslip: a nómina with the earnings and deductions of a pay period, the final liquidation payslip included. dismissal_letter: a dismissal letter or termination notice (carta de despido). company_certificate: the company certificate for the public employment service (certificado de empresa): a Ministerio de Trabajo or SEPE header and a table of «bases de cotización de los últimos 180 días»; never a payslip, despite its monthly amounts. settlement_agreement: an agreement or conciliation record (acuerdo, acta de conciliación). work_history: the Social Security work history (vida laboral). other: anything else, such as a tax withholding certificate (certificado de retenciones del IRPF).';
 
 export const TOOL_NAME = 'record_extraction';
 
@@ -158,8 +272,12 @@ function valueSchema(type: FieldType): JsonSchema {
   switch (type.type) {
     case 'date':
       return { type: 'string', pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' };
+    case 'text':
+      return { type: 'string', minLength: 1, maxLength: type.maxLength };
     case 'money':
       return { type: 'number', minimum: 0, maximum: MAX_MONEY };
+    case 'days':
+      return { type: 'integer', minimum: 0, maximum: MAX_DAYS };
     case 'boolean':
       return { type: 'boolean' };
     case 'enum':
@@ -169,9 +287,7 @@ function valueSchema(type: FieldType): JsonSchema {
 
 const confidenceSchema: JsonSchema = { type: 'string', enum: CONFIDENCES };
 
-// The closed JSON schema of the tool input for one document kind.
-export function toolInputSchema(kind: DocumentKind): JsonSchema {
-  const schema = SCHEMAS[kind];
+function sectionSchema(schema: SectionSchema): JsonSchema {
   const properties: Record<string, JsonSchema> = {};
   for (const [name, spec] of Object.entries(schema.fields)) {
     properties[name] = {
@@ -201,9 +317,51 @@ export function toolInputSchema(kind: DocumentKind): JsonSchema {
   }
   return {
     type: 'object',
-    description: schema.description,
+    description: `${schema.description} Leave the section out when no attached document is one.`,
     properties,
-    required: ['detectedKind'],
+    additionalProperties: false,
+  };
+}
+
+// The closed JSON schema of the tool input: every page's kind, then one section per document kind.
+export function toolInputSchema(): JsonSchema {
+  const page = {
+    type: 'integer',
+    minimum: 1,
+    maximum: LIMITS.maxImages,
+  };
+  const properties: Record<string, JsonSchema> = {
+    pages: {
+      type: 'array',
+      description: PAGES_DESCRIPTION,
+      maxItems: LIMITS.maxImages,
+      items: {
+        type: 'object',
+        properties: {
+          page: { ...page, description: 'The number given before the page.' },
+          kind: { type: 'string', enum: PAGE_KINDS, description: PAGE_KIND_DESCRIPTION },
+          document: {
+            ...page,
+            description:
+              'Number the documents in order of appearance; all pages of one document get the same number.',
+          },
+          month: {
+            type: 'string',
+            pattern: '^[0-9]{4}-[0-9]{2}$',
+            description: 'For a payslip page only: the month of its pay period, as YYYY-MM.',
+          },
+          confidence: confidenceSchema,
+        },
+        required: ['page', 'kind', 'document', 'confidence'],
+        additionalProperties: false,
+      },
+    },
+  };
+  for (const kind of SECTION_KINDS) properties[kind] = sectionSchema(SECTIONS[kind]);
+  return {
+    type: 'object',
+    properties,
+    required: ['pages'],
     additionalProperties: false,
   };
 }

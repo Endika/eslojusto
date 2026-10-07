@@ -7,6 +7,7 @@ export type Recording =
   | 'settlement-escalated'
   | 'payslip'
   | 'work-history'
+  | 'pack'
   | 'injected'
   | 'max-tokens'
   | 'refusal'

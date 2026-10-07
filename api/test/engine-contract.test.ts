@@ -6,7 +6,8 @@ import type {
   FixedTermType,
   ItemId,
 } from '../../src/engine/types';
-import { CAUSES, FIXED_TERM_TYPES, ITEM_IDS, SCHEMAS } from '../src/domain/extraction-schema';
+import { CAUSES, FIXED_TERM_TYPES, ITEM_IDS, SECTIONS } from '../src/domain/extraction-schema';
+import { MERGED_FIELDS } from '../src/domain/merge';
 
 // The site prefills its form from these names; type:check fails if the engine drifts.
 describe('engine contract', () => {
@@ -16,23 +17,34 @@ describe('engine contract', () => {
     expectTypeOf<(typeof ITEM_IDS)[number]>().toEqualTypeOf<ItemId>();
   });
 
-  it('names settlement fields after FinalPayInput keys or item ids', () => {
+  it('names merged fields after FinalPayInput keys, item ids or the payslip they come from', () => {
     const inputKeys: readonly (keyof FinalPayInput)[] = [
       'startDate',
       'endDate',
       'cause',
       'fixedTermType',
       'monthlySalary',
+      'annualHolidayDays',
+      'holidayDaysTaken',
+      'noticeDaysReceived',
+      'extraPayProrated',
+      'extraPayAmount',
     ];
-    const own = ['detectedKind', 'totalAccrued'];
-    expect(Object.keys(SCHEMAS.settlement.fields).sort()).toEqual(
-      [...inputKeys, ...ITEM_IDS, ...own].sort(),
-    );
+    const payslip = [
+      'payslipPeriodStart',
+      'payslipPeriodEnd',
+      'payslipTotalAccrued',
+      'extraPayProratedAmount',
+      'extraPayPaid',
+      'agreementSeveranceTotal',
+      'noticeDaysPaid',
+    ];
+    expect([...MERGED_FIELDS].sort()).toEqual([...inputKeys, ...ITEM_IDS, ...payslip].sort());
   });
 
   it('names work-history rows after ContributionPeriod', () => {
     const keys: readonly (keyof ContributionPeriod)[] = ['startDate', 'endDate'];
-    expect(Object.keys(SCHEMAS.work_history.lists['contracts']?.item ?? {}).sort()).toEqual(
+    expect(Object.keys(SECTIONS.work_history.lists.contracts.item).sort()).toEqual(
       [...keys].sort(),
     );
   });

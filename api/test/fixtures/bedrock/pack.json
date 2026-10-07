@@ -1,0 +1,124 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-haiku-4-5-20251001",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "dismissal_letter",
+            "document": 1,
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "dismissal_letter",
+            "document": 1,
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "payslip",
+            "document": 2,
+            "confidence": "high",
+            "month": "2026-08"
+          },
+          {
+            "page": 4,
+            "kind": "other",
+            "document": 3,
+            "confidence": "high"
+          },
+          {
+            "page": 5,
+            "kind": "settlement_proposal",
+            "document": 4,
+            "confidence": "high"
+          }
+        ],
+        "dismissal_letter": {
+          "endDate": {
+            "value": "2026-09-14",
+            "confidence": "high"
+          },
+          "cause": {
+            "value": "objective_dismissal",
+            "confidence": "high"
+          },
+          "severance": {
+            "value": 5000,
+            "confidence": "high"
+          },
+          "noticeDaysReceived": {
+            "value": 15,
+            "confidence": "high"
+          }
+        },
+        "monthly_payslip": {
+          "periodStart": {
+            "value": "2026-08-01",
+            "confidence": "high"
+          },
+          "periodEnd": {
+            "value": "2026-08-31",
+            "confidence": "high"
+          },
+          "startDate": {
+            "value": "2022-03-01",
+            "confidence": "high"
+          },
+          "totalAccrued": {
+            "value": 1980,
+            "confidence": "high"
+          },
+          "extraPayProrated": {
+            "value": true,
+            "confidence": "high"
+          },
+          "extraPayProratedAmount": {
+            "value": 280,
+            "confidence": "high"
+          }
+        },
+        "settlement_proposal": {
+          "startDate": {
+            "value": "2022-03-01",
+            "confidence": "high"
+          },
+          "endDate": {
+            "value": "2026-09-15",
+            "confidence": "high"
+          },
+          "pending_salary": {
+            "value": 1250,
+            "confidence": "high"
+          },
+          "holiday_pay": {
+            "value": 640.5,
+            "confidence": "high"
+          },
+          "severance": {
+            "value": 5000,
+            "confidence": "high"
+          },
+          "totalGross": {
+            "value": 6890.5,
+            "confidence": "high"
+          }
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 14200,
+    "output_tokens": 720
+  }
+}

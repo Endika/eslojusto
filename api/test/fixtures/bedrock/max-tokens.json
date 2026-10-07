@@ -9,13 +9,19 @@
       "id": "toolu_bdrk_01FICTITIOUS",
       "name": "record_extraction",
       "input": {
-        "detectedKind": {
-          "value": "settlement",
-          "confidence": "high"
-        },
-        "startDate": {
-          "value": "2022-03-01",
-          "confidence": "high"
+        "pages": [
+          {
+            "page": 1,
+            "kind": "settlement_proposal",
+            "document": 1,
+            "confidence": "high"
+          }
+        ],
+        "settlement_proposal": {
+          "startDate": {
+            "value": "2022-03-01",
+            "confidence": "high"
+          }
         }
       }
     }

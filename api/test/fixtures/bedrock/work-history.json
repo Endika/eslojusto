@@ -9,26 +9,32 @@
       "id": "toolu_bdrk_01FICTITIOUS",
       "name": "record_extraction",
       "input": {
-        "detectedKind": {
-          "value": "work_history",
-          "confidence": "high"
-        },
-        "contracts": [
+        "pages": [
           {
-            "startDate": "2019-01-07",
-            "endDate": "2019-06-30",
+            "page": 1,
+            "kind": "work_history",
+            "document": 1,
             "confidence": "high"
-          },
-          {
-            "startDate": "2020-02-01",
-            "endDate": "2021-12-31",
-            "confidence": "high"
-          },
-          {
-            "startDate": "2022-03-01",
-            "confidence": "medium"
           }
-        ]
+        ],
+        "work_history": {
+          "contracts": [
+            {
+              "startDate": "2019-01-07",
+              "endDate": "2019-06-30",
+              "confidence": "high"
+            },
+            {
+              "startDate": "2020-02-01",
+              "endDate": "2021-12-31",
+              "confidence": "high"
+            },
+            {
+              "startDate": "2022-03-01",
+              "confidence": "medium"
+            }
+          ]
+        }
       }
     }
   ],

@@ -4,11 +4,14 @@ import { describe, expect, it } from 'vitest';
 import {
   ESCALATION_MODEL,
   EU_PROFILE_DESTINATIONS,
+  EXTRACT_TIMEOUT_SECONDS,
+  FUNCTION_NAMES,
   PARAMETER_NAMES,
   PRIMARY_MODEL,
   REGION,
 } from '../src/config';
 import { buildApp, GLOBAL_STACK_REGION } from '../infra/stacks';
+import { NO_ESCALATION_AFTER_MS, READ_DEADLINE_MS } from '../src/domain/extract';
 
 const { api, global } = buildApp(
   { stripePriceId: 'price_test', alertEmail: 'alerts@example.com' },
@@ -122,12 +125,22 @@ describe('global stack', () => {
     ]);
   });
 
+  it('gives extract the time its reads may take, and room to answer after them', () => {
+    const functions = Object.values(apiTemplate.findResources('AWS::Lambda::Function')) as {
+      Properties: { FunctionName: string; Timeout: number };
+    }[];
+    const extract = functions.find((f) => f.Properties.FunctionName === FUNCTION_NAMES.extract);
+    expect(extract?.Properties.Timeout).toBe(EXTRACT_TIMEOUT_SECONDS);
+    expect(EXTRACT_TIMEOUT_SECONDS * 1000).toBeGreaterThanOrEqual(READ_DEADLINE_MS + 15_000);
+    expect(NO_ESCALATION_AFTER_MS).toBeLessThan(READ_DEADLINE_MS);
+  });
+
   it('points only at EU regions', () => {
     for (const region of regions(globalTemplate))
       expect([...EU_PROFILE_DESTINATIONS, GLOBAL_STACK_REGION]).toContain(region);
   });
 
-  it('lets the extractor invoke only the two EU profiles and their models through them', () => {
+  it('lets the extractor invoke only the configured EU profiles and their models through them', () => {
     const bedrock = statements(globalTemplate, 'eslojusto-api-extract').filter((s) =>
       String(s['Action']).startsWith('bedrock:'),
     );
@@ -139,6 +152,8 @@ describe('global stack', () => {
         expect(json).toContain(`arn:aws:bedrock:${region}::foundation-model/${model.slice(3)}`);
     }
     expect(json).not.toMatch(/"\*"|global\.|us\.|apac\./);
+    // Sonnet reads alone, so the role reaches no other model.
+    expect(json).not.toContain('haiku');
     expect(bedrock[1]?.['Condition']).toHaveProperty([
       'StringEquals',
       'bedrock:InferenceProfileArn',

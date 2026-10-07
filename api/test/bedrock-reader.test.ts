@@ -14,9 +14,9 @@ import {
   SONNET_4_6,
   SONNET_5_5,
 } from '../src/config';
-import { DOCUMENT_KINDS, type DocumentFile } from '../src/domain/documents';
+import type { DocumentFile } from '../src/domain/documents';
 import { recording } from './support/recorded';
-import { INJECTION, jpeg, settlementPdf } from './support/synthetic';
+import { INJECTION, jpeg } from './support/synthetic';
 
 const photo: DocumentFile = { mediaType: 'image/jpeg', bytes: jpeg(1000, 1400) };
 
@@ -28,55 +28,49 @@ describe('buildRequestBody', () => {
 
   it('forces the tool where the model allows it and names it otherwise', () => {
     for (const model of [HAIKU_4_5, SONNET_4_6])
-      expect(buildRequestBody(model, 'payslip', [photo])['tool_choice']).toEqual({
+      expect(buildRequestBody(model, [photo])['tool_choice']).toEqual({
         type: 'tool',
         name: 'record_extraction',
       });
-    expect(buildRequestBody(SONNET_5_5, 'payslip', [photo])['tool_choice']).toEqual({
+    expect(buildRequestBody(SONNET_5_5, [photo])['tool_choice']).toEqual({
       type: 'auto',
     });
   });
 
   it('sends no sampling parameters, which Sonnet 5.5 rejects', () => {
-    const body = buildRequestBody(SONNET_5_5, 'settlement', [photo]);
+    const body = buildRequestBody(SONNET_5_5, [photo]);
     expect(body).not.toHaveProperty('temperature');
     expect(body).not.toHaveProperty('top_p');
   });
 
-  it('sends images as image blocks and a PDF as a document block', async () => {
-    const pdf: DocumentFile = { mediaType: 'application/pdf', bytes: await settlementPdf(1) };
-    const imageContent = (
-      buildRequestBody(HAIKU_4_5, 'settlement', [photo, photo])['messages'] as {
-        content: { type: string; source?: { media_type: string } }[];
+  it('sends images only, each after its page number', () => {
+    const content = (
+      buildRequestBody(HAIKU_4_5, [photo, photo, photo])['messages'] as {
+        content: { type: string; text?: string; source?: { media_type: string } }[];
       }[]
     )[0]?.content;
-    expect(imageContent?.map((b) => b.type)).toEqual(['image', 'image', 'text']);
-    const pdfContent = (
-      buildRequestBody(HAIKU_4_5, 'settlement', [pdf])['messages'] as {
-        content: { type: string; source?: { media_type: string } }[];
-      }[]
-    )[0]?.content;
-    expect(pdfContent?.[0]).toMatchObject({
-      type: 'document',
-      source: { type: 'base64', media_type: 'application/pdf' },
-    });
+    expect(content?.map((b) => b.text ?? b.type)).toEqual([
+      'Page 1:',
+      'image',
+      'Page 2:',
+      'image',
+      'Page 3:',
+      'image',
+      'That is all 3 pages. Call record_extraction with what they state.',
+    ]);
+    expect(content?.[1]).toMatchObject({ source: { type: 'base64', media_type: 'image/jpeg' } });
   });
 
-  it('keeps everything but the file data identical whatever the document says', async () => {
-    const clean: DocumentFile = { mediaType: 'application/pdf', bytes: await settlementPdf(1) };
-    const injected: DocumentFile = {
-      mediaType: 'application/pdf',
-      bytes: await settlementPdf(1, INJECTION),
-    };
+  it('keeps everything but the image data identical whatever the document says', () => {
+    const clean: DocumentFile = { mediaType: 'image/jpeg', bytes: jpeg(1000, 1400) };
+    const injected: DocumentFile = { mediaType: 'image/jpeg', bytes: jpeg(1000, 1400, INJECTION) };
     const strip = (body: Record<string, unknown>) =>
       JSON.parse(JSON.stringify(body).replace(/"data":"[^"]*"/g, '"data":""')) as unknown;
-    for (const kind of DOCUMENT_KINDS) {
-      const a = buildRequestBody(HAIKU_4_5, kind, [clean]);
-      const b = buildRequestBody(HAIKU_4_5, kind, [injected]);
-      expect(strip(b)).toEqual(strip(a));
-      expect(b['system']).toBe(SYSTEM_PROMPT);
-      expect(JSON.stringify(b)).not.toContain('IGNORE ALL PREVIOUS');
-    }
+    const a = buildRequestBody(HAIKU_4_5, [clean]);
+    const b = buildRequestBody(HAIKU_4_5, [injected]);
+    expect(strip(b)).toEqual(strip(a));
+    expect(b['system']).toBe(SYSTEM_PROMPT);
+    expect(JSON.stringify(b)).not.toContain('IGNORE ALL PREVIOUS');
   });
 
   it('tells the model the document is data, never instructions', () => {
@@ -85,7 +79,7 @@ describe('buildRequestBody', () => {
   });
 
   it('refuses a model without settings', () => {
-    expect(() => buildRequestBody('eu.anthropic.unknown', 'settlement', [photo])).toThrow();
+    expect(() => buildRequestBody('eu.anthropic.unknown', [photo])).toThrow();
   });
 });
 
@@ -94,7 +88,9 @@ describe('parseResponseBody', () => {
     const read = parseResponseBody(JSON.parse(recording('payslip')));
     expect(read.inputTokens).toBe(6120);
     expect(read.outputTokens).toBe(410);
-    expect(read.toolInput).toMatchObject({ totalAccrued: { value: 1980, confidence: 'high' } });
+    expect(read.toolInput).toMatchObject({
+      monthly_payslip: { totalAccrued: { value: 1980, confidence: 'high' } },
+    });
   });
 
   it.each(['max-tokens', 'refusal', 'text-only'] as const)('returns no input for %s', (name) => {
@@ -111,6 +107,23 @@ describe('parseResponseBody', () => {
 });
 
 describe('createBedrockReader', () => {
+  it('hands every call an abort signal that fires at the read’s deadline', async () => {
+    const signals: AbortSignal[] = [];
+    const reader = createBedrockReader(async (_model, _body, signal) => {
+      signals.push(signal);
+      return recording('payslip');
+    });
+    await reader.read({
+      model: HAIKU_4_5,
+      files: [photo],
+      deadline: Date.now() + 60_000,
+    });
+    await reader.read({ model: HAIKU_4_5, files: [photo], deadline: Date.now() - 1 });
+    await new Promise((r) => setTimeout(r, 5));
+    expect(signals[0]?.aborted).toBe(false);
+    expect(signals[1]?.aborted).toBe(true);
+  });
+
   // With fixed requests, a validation error means a retired, disabled or misconfigured model;
   // the domain then tries the escalation model or answers model_unavailable.
   it.each([
@@ -124,7 +137,7 @@ describe('createBedrockReader', () => {
       throw error;
     });
     await expect(
-      reader.read({ model: HAIKU_4_5, kind: 'settlement', files: [photo] }),
+      reader.read({ model: HAIKU_4_5, files: [photo], deadline: Date.now() + 60_000 }),
     ).rejects.toBe(error);
   });
 });

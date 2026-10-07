@@ -19,7 +19,6 @@
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.1147.0",
     "@aws-sdk/client-ssm": "^3.1147.0",
-    "pdf-lib": "^1.17.1",
     "stripe": "^23.0.0"
   },
   "devDependencies": {

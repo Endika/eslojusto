@@ -1,4 +1,4 @@
-import type { DocumentFile, DocumentKind } from './documents';
+import type { DocumentFile } from './documents';
 import type { ResultCode } from './results';
 
 export interface ModelRead {
@@ -12,20 +12,10 @@ export interface ModelRead {
 export interface DocumentReader {
   read(request: {
     readonly model: string;
-    readonly kind: DocumentKind;
     readonly files: readonly DocumentFile[];
+    // Epoch milliseconds by which the read must be over, retries included, or abandoned.
+    readonly deadline: number;
   }): Promise<ModelRead>;
-}
-
-export interface PdfFacts {
-  readonly pages: number;
-  // Bytes of text the model would read from the PDF's text layer.
-  readonly textBytes: number;
-}
-
-export interface PdfInspector {
-  // null when the PDF can't be read unambiguously.
-  inspect(bytes: Uint8Array): Promise<PdfFacts | null>;
 }
 
 export interface CaptchaVerifier {
@@ -56,6 +46,8 @@ export interface LogEvent {
   readonly inputTokens?: number;
   readonly outputTokens?: number;
   readonly escalated?: boolean;
+  // How many fields two documents stated differently.
+  readonly conflicts?: number;
   // Bedrock counted more than twice the input the pre-read estimate allowed for.
   readonly underestimated?: boolean;
   // A pass read went through but Stripe did not store its count.
