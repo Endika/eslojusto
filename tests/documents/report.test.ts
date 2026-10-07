@@ -37,6 +37,24 @@ describe('the report', () => {
   });
 });
 
+describe('the report of an objective dismissal', () => {
+  it('carries the unfair-dismissal reference as a note under severance', () => {
+    const r = completed({
+      ...unfairDismissal,
+      cause: 'objective_dismissal',
+      startDate: { y: 2024, m: 1, d: 1 },
+      endDate: { y: 2026, m: 6, d: 30 },
+      monthlySalary: 3000,
+      noticeDaysReceived: 15,
+    });
+    const notes = reportModel(r, tr, today).blocks.filter((b) => b.type === 'note');
+    expect(notes).toContainEqual({
+      type: 'note',
+      text: expect.stringMatching(/^Referencia: .* sería de 8\.136,99\s€ \(33 días/),
+    });
+  });
+});
+
 describe('the letter', () => {
   it('lists only what falls short, with both figures and the difference', () => {
     const bullets = letterModel(completed(), tr).blocks.filter((b) => b.type === 'bullet');

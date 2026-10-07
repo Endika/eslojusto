@@ -355,6 +355,22 @@ describe('review_completed', () => {
     ).toBe('no_figures');
   });
 
+  it('says whether the unfair-dismissal reference was shown, never its figure', () => {
+    const props = (unfairReference: number | null) =>
+      reviewProps({
+        review: { ...review(['severance', 'matches', 1000, null]), unfairReference },
+        input,
+        attempt: 1,
+        changedFields: [],
+        seconds: 30,
+        benefit,
+        otherContracts: 0,
+      });
+    expect(props(8136.99).unfair_reference).toBe('shown');
+    expect(props(null).unfair_reference).toBe('none');
+    expect(JSON.stringify(props(8136.99))).not.toContain('8136');
+  });
+
   it('counts statuses and adds up only the shortfall', () => {
     const props = reviewProps({
       review: review(
@@ -389,6 +405,7 @@ describe('review_completed', () => {
       seconds: '180-600',
       benefit: 'with_figures',
       other_contracts: '0',
+      unfair_reference: 'none',
     });
     expect(isValidEvent('review_completed', props)).toBe(true);
   });

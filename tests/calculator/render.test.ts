@@ -134,6 +134,34 @@ describe('renderReview', () => {
     expect(sheet?.querySelector('[data-status-text]')?.textContent).toContain('referencia sería');
     expect(sheet?.querySelector<HTMLElement>('[data-reference]')?.hidden).toBe(true);
   });
+
+  it('objective: the unfair reference below, as information, with its figure', () => {
+    const c = container();
+    renderReview(
+      c,
+      review({
+        cause: 'objective_dismissal',
+        startDate: { y: 2024, m: 1, d: 1 },
+        endDate: { y: 2026, m: 6, d: 30 },
+        monthlySalary: 3000,
+        noticeDaysReceived: 15,
+      }),
+      trV,
+    );
+    const note = c.querySelector<HTMLElement>('[data-item="severance"] [data-reference]');
+    expect(note?.hidden).toBe(false);
+    expect(note?.textContent?.replace(/\s/g, ' ')).toBe(
+      'Referencia: si un juzgado declarase improcedente el despido, la indemnización sería de 8.136,99 € (33 días de salario por año trabajado, 45 por el tiempo anterior al 12 de febrero de 2012, con sus topes). Es la cifra con la que suelen compararse los acuerdos de mejora.',
+    );
+  });
+
+  it('no reference for an unfair dismissal, whose minimum is already that figure', () => {
+    const c = container();
+    renderReview(c, review({ cause: 'unfair_dismissal' }), trV);
+    expect(c.querySelector<HTMLElement>('[data-item="severance"] [data-reference]')?.hidden).toBe(
+      true,
+    );
+  });
 });
 
 describe('readForm: «No lo sé» for the holiday days taken', () => {

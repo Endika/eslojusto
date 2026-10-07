@@ -55,6 +55,30 @@ describe('reviewFinalPay', () => {
     expect(severance?.item.sources[0]?.id).toBe('et55');
   });
 
+  it('(d2) objective dismissal: the unfair reference at 33 days a year, with its caps', () => {
+    const rev = review(
+      withInput({
+        cause: 'objective_dismissal',
+        startDate: f('2024-01-01'),
+        endDate: f('2026-06-30'),
+        monthlySalary: 3000,
+        extraPayProrated: true,
+        noticeDaysReceived: 15,
+      }),
+    );
+    // 30 months × 2.75 = 82.5 days × 36,000 / 365 = 8,136.986…, rounded to the cent.
+    expect(rev.unfairReference).toBe(8136.99);
+  });
+
+  it('(d3) no unfair reference for a cause that is not a dismissal the court could reclassify', () => {
+    for (const o of [
+      { cause: 'unfair_dismissal' },
+      { cause: 'resignation' },
+      { cause: 'fixed_term_end', fixedTermType: 'production_circumstances' },
+    ] as const)
+      expect(review(withInput(o)).unfairReference, o.cause).toBeNull();
+  });
+
   it.each([
     [{ cause: 'resignation' }, 'resignation', 'et49_1d'],
     [{ cause: 'fixed_term_end', fixedTermType: 'replacement' }, 'replacement', 'et49_1c'],
