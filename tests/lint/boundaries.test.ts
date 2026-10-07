@@ -48,6 +48,9 @@ describe('import boundaries', () => {
     ['src/engine/law/x.ts', "import type { Phrase } from '../calculation';"],
     ['src/engine/law/x.ts', "import { t } from '../../i18n';"],
     ['src/engine/law/x.ts', "import { t } from './../../i18n';"],
+    ['src/calculator/navigation.ts', "import { STEPS } from './steps';"],
+    ['src/calculator/tabs.ts', "import { applies } from './conditions';"],
+    ['src/calculator/flow.ts', "import { reviewFinalPay } from '../engine/review';"],
   ])('%s cannot %s', async (filePath, code) => {
     expect(await violations(filePath, code)).toContain('no-restricted-imports');
   });
@@ -194,6 +197,8 @@ describe('import boundaries', () => {
     ['src/engine/law/x.ts', "import { round2 } from '../money';"],
     ['src/engine/law/x.ts', "import type { Source } from '../sources';"],
     ['src/engine/law/x.ts', "import type { NormStatus } from './norms';"],
+    ['src/calculator/navigation.ts', "import { stepFrom, type Flow } from './flow';"],
+    ['src/calculator/steps.ts', "import { applies } from './conditions';"],
   ])('%s may %s', async (filePath, code) => {
     expect(await violations(filePath, code)).not.toContain('no-restricted-imports');
   });

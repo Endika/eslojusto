@@ -58,6 +58,12 @@ const analyticsReach = {
   message:
     'src/analytics reaches only the engine, the help topics, the translator type, the calculator and documents ports and the documents switch.',
 };
+// Every review section walks its sheets on the same navigation and tabs, which learn a section's
+// steps from the Flow they are given, so a new section plugs in without touching them.
+const flowOnly = {
+  regex: `^\\./(?!flow$|tabs$)|^\\.\\./(?!engine/date$)|${notCanonical}`,
+  message: 'Navigation and tabs serve every section: its specifics come in through a Flow.',
+};
 const hiddenImports = [
   ['ImportExpression', 'Dynamic imports'],
   ['TSImportType', 'Type imports (`typeof import(…)`)'],
@@ -168,4 +174,8 @@ export default tseslint.config(
   ),
   boundary(['src/**/*.ts'], [noAnalytics, noRoot, noPosthogSdk], { ignores: AREAS }),
   boundary(['src/**/*.astro', 'src/**/*.astro/**'], [noAnalytics, noPosthogSdk]),
+  boundary(
+    ['src/calculator/{flow,navigation,tabs}.ts'],
+    [noAnalytics, noRoot, noPosthogSdk, flowOnly],
+  ),
 );

@@ -1,18 +1,11 @@
 import type { CivilDate } from '../engine/date';
 import { reviewFinalPay } from '../engine/review';
 import { required } from './dom';
-import {
-  ITEM_IDS,
-  SHEETS,
-  asksAboutBenefit,
-  figureField,
-  provisionalInput,
-  sheetErrors,
-} from './form';
+import { ITEM_IDS, asksAboutBenefit, figureField, provisionalInput } from './form';
 import { minimumHolidays } from '../engine/settlement';
 import type { HolidayUnit } from '../engine/types';
 import { parseAmount } from './number';
-import { LAST_SHEET, RESULT_STEP, STEPS } from './steps';
+import type { Step } from './steps';
 
 // An unfair or disciplinary dismissal has no notice to check.
 const NOTICE_CAUSES: readonly string[] = ['objective_dismissal', 'fixed_term_end', 'resignation'];
@@ -20,26 +13,14 @@ const NOTICE_CAUSES: readonly string[] = ['objective_dismissal', 'fixed_term_end
 // Conditional sheets: the fixed-term type only for a fixed-term contract, extra pay only when
 // it is not already spread over the monthly payslip, the notice only for a cause that has one,
 // and the benefit questions only when the cause can give a right to the benefit.
-export function applies(form: HTMLFormElement, i: number): boolean {
+export function applies(form: HTMLFormElement, step: Step): boolean {
   const data = new FormData(form);
-  if (STEPS[i] === 'temporal') return data.get('cause') === 'fixed_term_end';
-  if (STEPS[i] === 'pagas') return data.get('extraPayProrated') === 'no';
-  if (STEPS[i] === 'preaviso') return NOTICE_CAUSES.includes(String(data.get('cause') ?? ''));
-  if (STEPS[i] === 'hijos' || STEPS[i] === 'otros')
+  if (step === 'temporal') return data.get('cause') === 'fixed_term_end';
+  if (step === 'pagas') return data.get('extraPayProrated') === 'no';
+  if (step === 'preaviso') return NOTICE_CAUSES.includes(String(data.get('cause') ?? ''));
+  if (step === 'hijos' || step === 'otros')
     return asksAboutBenefit(data.get('cause') as string | null);
   return true;
-}
-
-export function stepFrom(form: HTMLFormElement, from: number, direction: 1 | -1): number {
-  let i = from + direction;
-  while (i > 0 && i < RESULT_STEP && !applies(form, i)) i += direction;
-  return i;
-}
-
-// The furthest sheet a visitor may open: every sheet before it answers cleanly.
-export function firstIncomplete(form: HTMLFormElement, today: CivilDate): number {
-  const i = SHEETS.findIndex((h, j) => applies(form, j) && sheetErrors(form, h, today).length > 0);
-  return i < 0 ? LAST_SHEET : i;
 }
 
 function setActive(container: HTMLElement, active: boolean) {

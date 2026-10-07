@@ -1,9 +1,10 @@
 import { estimateBenefit } from '../engine/unemployment';
 import { reviewFinalPay } from '../engine/review';
-import { applyConditions, firstIncomplete, followHolidayDefault, stepFrom } from './conditions';
+import { applyConditions, followHolidayDefault } from './conditions';
 import { watchDisclosures } from './disclosures';
 import { required } from './dom';
 import { formEntries, rowsNeeded, setEntry, type FormEntries } from './fill';
+import { firstIncomplete, indexOfHash, lastSheet, resultStep, stepAt, stepFrom } from './flow';
 import {
   SHEETS,
   baseField,
@@ -17,7 +18,11 @@ import { createNavigation } from './navigation';
 import { setUpOtherContracts } from './other-contracts';
 import type { CalculatorDeps } from './ports';
 import { renderErrors, renderResult, type ResultData } from './render';
-import { LAST_SHEET, RESULT_STEP, indexOfHash, stepAt } from './steps';
+import { FINAL_PAY_FLOW } from './steps';
+
+const flow = FINAL_PAY_FLOW;
+const LAST_SHEET = lastSheet(flow);
+const RESULT_STEP = resultStep(flow);
 
 // What the page's other parts can do with the calculator: set or read its answers, and open it.
 export interface Calculator {
@@ -59,6 +64,7 @@ export function setUpCalculator(
     },
     events,
     today,
+    flow,
   );
   const conditions = () => applyConditions(form);
 
@@ -84,7 +90,7 @@ export function setUpCalculator(
       focusError(errors);
       return;
     }
-    const next = stepFrom(form, nav.current, 1);
+    const next = stepFrom(flow, form, nav.current, 1);
     events.stepCompleted(sheet);
     nav.reached = Math.max(nav.reached, next);
     nav.show(next, { history: 'push', focus: true });
@@ -121,7 +127,7 @@ export function setUpCalculator(
     };
     const state = detail();
     renderResult(result, shown, state === 'locked', tr);
-    events.stepCompleted(stepAt(nav.current));
+    events.stepCompleted(stepAt(flow, nav.current));
     events.reviewCompleted({
       review: r.review,
       input: parsed.input,
@@ -142,7 +148,7 @@ export function setUpCalculator(
   });
   nextButton.addEventListener('click', advance);
   backButton.addEventListener('click', () =>
-    nav.goBack(stepFrom(form, nav.current, -1), { history: 'push', focus: true }),
+    nav.goBack(stepFrom(flow, form, nav.current, -1), { history: 'push', focus: true }),
   );
 
   form.addEventListener('change', () => {
@@ -160,10 +166,10 @@ export function setUpCalculator(
     const a = e.target instanceof Element && e.target.closest('a[data-tab]');
     if (!(a instanceof HTMLAnchorElement)) return;
     e.preventDefault();
-    nav.goBack(indexOfHash(a.hash), { history: 'push', focus: true });
+    nav.goBack(indexOfHash(flow, a.hash), { history: 'push', focus: true });
   });
 
-  window.addEventListener('popstate', () => nav.goBack(indexOfHash(location.hash), {}));
+  window.addEventListener('popstate', () => nav.goBack(indexOfHash(flow, location.hash), {}));
 
   watchDisclosures(root, events);
 
@@ -183,8 +189,8 @@ export function setUpCalculator(
 
   const otherContracts = setUpOtherContracts(form, tr, conditions);
   conditions();
-  nav.reached = firstIncomplete(form, today());
-  nav.show(Math.min(indexOfHash(location.hash), nav.reached), { history: 'replace' });
+  nav.reached = firstIncomplete(flow, form, today());
+  nav.show(Math.min(indexOfHash(flow, location.hash), nav.reached), { history: 'replace' });
 
   return {
     form,
