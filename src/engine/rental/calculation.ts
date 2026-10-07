@@ -83,6 +83,8 @@ export type RentalPhraseKey =
   | 'deposit.not_yet_due'
   | 'deposit.returned_in_full'
   | 'deposit.returned_on_time'
+  | 'deposit.returned_after_month'
+  | 'deposit.late_part_above_month'
   | 'deposit.interest_not_yet'
   | 'deposit.interest_deposit_only'
   | 'deposit.interest_stretch'

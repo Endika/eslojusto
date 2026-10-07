@@ -286,6 +286,80 @@ describe('late-payment interest (LAU art. 36.4)', () => {
   });
 });
 
+describe('a deposit taken as at least what came back and was kept', () => {
+  const lastKey = (r: ItemResult) =>
+    r.outcome.kind === 'single' ? r.outcome.value.calculation.at(-1)?.key : undefined;
+
+  it('with no deposit entered, 2.000 back accrue on one month only', () => {
+    // Rent 1.000; keys 10-06-2025; 2.000 back on 01-09-2025: 1.000 accrue from 11-07-2025 for 52
+    // days: 1.000 × 0,0325 × 52 / 365 = 4,63.
+    const { interest } = check(
+      null,
+      {
+        keysReturnedOn: f('2025-06-10'),
+        returns: [{ on: f('2025-09-01'), amount: 2000 }],
+        deductions: [],
+      },
+      f('2026-06-01'),
+    );
+    expect(bothBases(interest).low).toBe(4.63);
+  });
+
+  it('with no deposit entered, a late 500 under 1.500 kept accrues nothing and opens no pass', () => {
+    const moveOut: MoveOut = {
+      keysReturnedOn: f('2025-06-10'),
+      returns: [{ on: f('2025-09-01'), amount: 500 }],
+      deductions: [{ kind: 'damage', amount: 1500 }],
+    };
+    const { interest } = check(null, moveOut, f('2026-06-01'));
+    expect(singleOf(interest)).toEqual({ status: 'within_limit', amount: null });
+    expect(lastKey(interest)).toBe('deposit.late_part_above_month');
+    const r = reviewRental(contract({ deposit: null, moveOut }), f('2026-06-01'), RENTAL_TABLES);
+    expect(r.ok && r.review.offerPass).toBe(false);
+  });
+
+  it('more back than the deposit entered still accrues on one month only', () => {
+    // Deposit entered 1.000 = rent, 1.500 back late on 10-07-2025: 1.000 accrue for 149 days.
+    const { interest } = check(1000, {
+      keysReturnedOn: f('2025-01-10'),
+      returns: [{ on: f('2025-07-10'), amount: 1500 }],
+      deductions: [],
+    });
+    expect(bothBases(interest).low).toBe(13.27);
+  });
+
+  it('says the late money was the part above one month when it accrues nothing', () => {
+    const { interest } = check(2000, {
+      keysReturnedOn: f('2025-01-10'),
+      returns: [
+        { on: f('2025-01-20'), amount: 1000 },
+        { on: f('2025-07-10'), amount: 1000 },
+      ],
+      deductions: [],
+    });
+    expect(lastKey(interest)).toBe('deposit.late_part_above_month');
+  });
+
+  it('with no deposit and nothing back, has nothing entered', () => {
+    const { interest } = check(null, {
+      keysReturnedOn: f('2025-06-10'),
+      returns: [],
+      deductions: [],
+    });
+    expect(singleOf(interest).status).toBe('not_entered');
+  });
+
+  it('a return the day after the month accrues no day yet and is not called on time', () => {
+    const { interest } = check(1000, {
+      keysReturnedOn: f('2026-01-10'),
+      returns: [{ on: f('2026-02-11'), amount: 1000 }],
+      deductions: [],
+    });
+    expect(singleOf(interest)).toEqual({ status: 'within_limit', amount: null });
+    expect(lastKey(interest)).toBe('deposit.returned_after_month');
+  });
+});
+
 describe('the part of the deposit above one month', () => {
   // mulberry32: small, seeded and deterministic.
   function prng(seed: number) {
@@ -320,11 +394,13 @@ describe('the part of the deposit above one month', () => {
     const rent = 1000;
     let checked = 0;
     for (let k = 0; k < 150; k++) {
-      const deposit = g.int(1000, 3000);
+      // A deposit not entered, or one below what comes back, as people misremember it.
+      const entered = g.r() < 0.2 ? null : g.int(1000, 3000);
+      const overReturn = g.r() < 0.25 ? 1500 : 0;
       const keys = fromOrdinal(ordinal(f('2023-01-01')) + g.int(0, 1200));
       const span = ordinal(TODAY) - ordinal(keys);
       const returns: { on: CivilDate; amount: number }[] = [];
-      let left = deposit;
+      let left = (entered ?? 2000) + overReturn;
       for (let n = g.int(0, 3); n > 0 && left > 0; n--) {
         const amount = g.int(1, left);
         returns.push({ on: fromOrdinal(ordinal(keys) + g.int(0, span)), amount });
@@ -333,11 +409,13 @@ describe('the part of the deposit above one month', () => {
       const deducted = left > 0 && g.r() < 0.4 ? g.int(1, left) : 0;
       const deductions = deducted > 0 ? [{ kind: 'other' as const, amount: deducted }] : [];
       const out: MoveOut = { keysReturnedOn: keys, returns, deductions };
-      const { interest } = check(deposit, out);
+      const { interest } = check(entered, out);
       const counted = countedAmount(interest.outcome, itemAmount);
 
       // Every piece of money with how long it would accrue; the above-month part is split at random.
-      const pending = deposit - returns.reduce((s, r) => s + r.amount, 0) - deducted;
+      const back = returns.reduce((s, r) => s + r.amount, 0) + deducted;
+      const pending = entered === null ? 0 : entered - back;
+      const deposit = Math.max(entered ?? 0, back);
       const pieces = [
         ...returns.map((r) => ({ amount: r.amount, until: r.on })),
         ...(pending > 0 ? [{ amount: pending, until: TODAY }] : []),
@@ -360,6 +438,6 @@ describe('the part of the deposit above one month', () => {
         checked++;
       }
     }
-    expect(checked).toBeGreaterThan(500);
+    expect(checked).toBeGreaterThan(400);
   });
 });

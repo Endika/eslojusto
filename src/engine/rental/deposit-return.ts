@@ -130,9 +130,10 @@ function interestIn(
 }
 
 // LAU art. 36.1 and 36.4: the deposit is one month's rent and only it accrues; what was paid above
-// it is an extra guarantee. Which money it was is not known, so it is taken as the money that
-// would accrue longest: the balance still out, then late returns from the latest back. That gives
-// the lowest interest any split could.
+// it is an extra guarantee. The deposit is at least what came back and what was kept, whatever was
+// entered, so anything past one month's rent of that is taken as the money that would accrue
+// longest: the balance still out, then late returns from the latest back. That gives the lowest
+// interest any split could.
 function interestItem(
   deposit: number | null,
   rent: number,
@@ -144,7 +145,9 @@ function interestItem(
   // from the day after it.
   const from = addDays(addMonthsClamped(out.keysReturnedOn, 1), 1);
   const late = (until: CivilDate) => compareDates(until, from) > 0;
-  let notAccruing = deposit === null ? 0 : Math.max(0, round2(deposit - rent));
+  const atLeast = round2(sum(out.returns) + sum(out.deductions));
+  const effective = Math.max(deposit ?? 0, atLeast);
+  let notAccruing = Math.max(0, round2(effective - rent));
   const aboveMonth = notAccruing;
   const accruing = (amount: number): number => {
     const kept = Math.min(amount, notAccruing);
@@ -154,7 +157,9 @@ function interestItem(
   const stretches: Stretch[] = [];
   const pending = pendingOf(deposit, out);
   const stillOwed = pending !== null && pending > TOLERANCE;
+  let lateMoney = false;
   if (stillOwed && late(today)) {
+    lateMoney = true;
     const amount = accruing(pending);
     if (amount > TOLERANCE) stretches.push({ amount, from, until: today });
   }
@@ -162,6 +167,7 @@ function interestItem(
     .filter((r) => late(r.on))
     .sort((a, b) => compareDates(b.on, a.on));
   for (const r of lateReturns) {
+    lateMoney = true;
     const amount = accruing(r.amount);
     if (amount > 0) stretches.push({ amount, from, until: r.on });
   }
@@ -172,9 +178,15 @@ function interestItem(
       const r = interestIn(stretches, rates, world);
       return { ...r, calculation: [...capPhrase, ...r.calculation] };
     });
-  const why = stillOwed
-    ? p('deposit.interest_not_yet', { from: { date: toIso(from) } })
-    : p('deposit.returned_on_time', { from: { date: toIso(from) } });
+  if (deposit === null && out.returns.length === 0) return single(notEntered(INTEREST_RULES));
+  const fromDate = { from: { date: toIso(from) } };
+  const why = lateMoney
+    ? p('deposit.late_part_above_month', { rent: { euros: rent } })
+    : stillOwed
+      ? p('deposit.interest_not_yet', fromDate)
+      : out.returns.some((r) => compareDates(r.on, from) >= 0)
+        ? p('deposit.returned_after_month', fromDate)
+        : p('deposit.returned_on_time', fromDate);
   return single(itemReading('within_limit', null, [...capPhrase, why], INTEREST_RULES));
 }
 
