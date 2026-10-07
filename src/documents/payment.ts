@@ -202,7 +202,8 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   function renderNotice() {
     if (!notice) return;
     const state: NoticeState = {
-      fresh: fresh && current !== null,
+      fresh,
+      showing: current !== null && verified(),
       letter: current !== null && hasShortfall(current.review),
       downloaded,
     };
@@ -226,7 +227,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
             ? 'client.documents.notice.full'
             : 'client.documents.notice.full_report',
       );
-    browser.warnBeforeLeaving(warnsOnLeave({ ...state, fresh }));
+    browser.warnBeforeLeaving(warnsOnLeave(state));
   }
 
   function render() {
@@ -464,6 +465,8 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     verified,
     hide() {
       current = null;
+      // The notice belongs to the review that was paid for; starting over ends it.
+      fresh = false;
       clearLetter();
       render();
     },
