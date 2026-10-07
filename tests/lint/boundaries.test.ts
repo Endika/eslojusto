@@ -27,6 +27,11 @@ describe('import boundaries', () => {
     ['src/documents/x.ts', "import { track } from '../analytics/posthog';"],
     ['src/documents/x.ts', "import { localToday } from '../scripts/clock';"],
     ['src/analytics/x.ts', "import { setUpUpload } from '../documents/upload';"],
+    ['src/engine/rental/x.ts', "import { t } from '../../i18n';"],
+    ['src/engine/rental/x.ts', "import { track } from '../../analytics/posthog';"],
+    ['src/engine/rental/x.ts', "import posthog from 'posthog-js';"],
+    ['src/engine/rental/x.ts', "import { NORMS } from './data/norms';"],
+    ['src/engine/rental/data/x.ts', "import { t } from '../../../i18n';"],
   ])('%s cannot %s', async (filePath, code) => {
     expect(await violations(filePath, code)).toContain('no-restricted-imports');
   });
@@ -38,6 +43,15 @@ describe('import boundaries', () => {
     );
     expect(fired.filter((r) => r === 'no-restricted-globals')).toHaveLength(3);
   });
+
+  it.each(['src/engine/rental/x.ts', 'src/engine/rental/data/x.ts'])(
+    '%s cannot read the clock',
+    async (filePath) => {
+      expect(await violations(filePath, 'export const now = () => new Date();')).toContain(
+        'no-restricted-globals',
+      );
+    },
+  );
 
   it('a dynamic import cannot slip past them', async () => {
     expect(
@@ -56,6 +70,9 @@ describe('import boundaries', () => {
     ['src/analytics/x.ts', "import type { DocumentEvents } from '../documents/ports';"],
     ['src/layouts/csp.ts', "import { TURNSTILE_ORIGIN } from '../documents/config';"],
     ['src/scripts/x.ts', "export const pdf = () => import('../documents/pdf');"],
+    ['src/engine/rental/x.ts', "import { round2 } from '../money';"],
+    ['src/engine/rental/x.ts', "import type { NormTable } from './norms';"],
+    ['src/engine/rental/data/x.ts', "import type { NormTable } from '../norms';"],
   ])('%s may %s', async (filePath, code) => {
     expect(await violations(filePath, code)).not.toContain('no-restricted-imports');
   });
