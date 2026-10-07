@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.12.0](https://github.com/Endika/eslojusto/compare/v1.11.0...v1.12.0) (2026-10-07)
+
+
+### Features
+
+* **engine:** check chained fixed-term contracts against the 18-in-24-month limit ([db20b2f](https://github.com/Endika/eslojusto/commit/db20b2f2189f774f2a6e02947c60b93650e7c539))
+* **engine:** check contract modality and fixed-term limits after the 2021 reform ([20a064e](https://github.com/Endika/eslojusto/commit/20a064eb3ac923ba2efcdf7be22be75f7ff8d4a3))
+
+
+### Bug Fixes
+
+* **documents:** say one field read in the singular ([504fba7](https://github.com/Endika/eslojusto/commit/504fba78c10bbad6941fe934a9c4a3300725e279))
+* **engine:** check old-named contracts as their current modality and widen the written form ([67a9136](https://github.com/Endika/eslojusto/commit/67a9136ac0785a0a5c8c4f5c07e6674ed1138e00))
+* **engine:** count overlapping periods as one contract and read group contracts as a chaining doubt ([aba1ffe](https://github.com/Endika/eslojusto/commit/aba1ffed0bd5b48b7d91da87a173866620bd492a))
+* **engine:** read overlapping same-company rows as a chaining doubt and keep group rows apart ([3c457d7](https://github.com/Endika/eslojusto/commit/3c457d73290dcfcee3b72e6fb797eb1520f932f0))
+
 ## [1.11.0](https://github.com/Endika/eslojusto/compare/v1.10.0...v1.11.0) (2026-10-07)
 
 
