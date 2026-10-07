@@ -24,6 +24,10 @@ npm run test:run
 
 Analytics (PostHog EU, no cookies) only turn on when the build has `PUBLIC_POSTHOG_KEY`.
 
+Document reading and the paid report only turn on when the build has all of
+`PUBLIC_API_EXTRACT_URL`, `PUBLIC_API_CHECKOUT_URL` and `PUBLIC_API_PASS_URL` (the API stack's
+outputs `extractUrl`, `checkoutUrl` and `passUrl`) plus `PUBLIC_TURNSTILE_SITE_KEY`; without them the site is the calculator alone.
+
 ## Licence
 
 [MIT](LICENSE)

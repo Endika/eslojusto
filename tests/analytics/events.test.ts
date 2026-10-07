@@ -210,6 +210,7 @@ describe('document and pass events', () => {
         fields_bucket: '4-8',
         low_confidence: false,
         failed_checks: true,
+        escalated: 'yes',
       }),
     ).toBe(true);
     expect(
@@ -233,6 +234,16 @@ describe('document and pass events', () => {
         fields_bucket: '7',
         low_confidence: false,
         failed_checks: false,
+        escalated: 'no',
+      }),
+    ).toBe(false);
+    expect(
+      isValidEvent('extraction_completed', {
+        doc_type: 'settlement',
+        fields_bucket: '1-3',
+        low_confidence: false,
+        failed_checks: false,
+        escalated: true,
       }),
     ).toBe(false);
     expect(isValidEvent('extraction_failed', { doc_type: 'payslip', code: '1.850,00' })).toBe(
@@ -260,7 +271,8 @@ describe('document and pass events', () => {
     }) as Track);
     events.startChosen('manual');
     events.uploadStarted('settlement', 2, 'image');
-    events.extractionCompleted('payslip', 5, true, false);
+    events.extractionCompleted('payslip', 5, true, false, null);
+    events.extractionCompleted('settlement', 2, false, false, true);
     events.extractionFailed('settlement', 'captcha_failed');
     events.checkoutStarted();
     events.passIssued('return');
@@ -269,6 +281,7 @@ describe('document and pass events', () => {
     expect(sent.map(([n]) => n)).toEqual([
       'start_chosen',
       'upload_started',
+      'extraction_completed',
       'extraction_completed',
       'extraction_failed',
       'checkout_started',
@@ -281,7 +294,9 @@ describe('document and pass events', () => {
       fields_bucket: '4-8',
       low_confidence: true,
       failed_checks: false,
+      escalated: 'unknown',
     });
+    expect(sent[3]?.[1]).toMatchObject({ escalated: 'yes' });
   });
 });
 

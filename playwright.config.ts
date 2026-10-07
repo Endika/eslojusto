@@ -8,12 +8,16 @@ const analytics = process.env['TEST_ANALYTICS'] === '1';
 const documents = process.env['TEST_DOCUMENTS'] === '1';
 const optInSpecs = /(rtl|analytics|documents)\.spec\.ts/;
 const port = Number(process.env['E2E_PORT'] ?? 4321);
-const DOCUMENTS_API = 'https://api.eslojusto.test';
 
 const buildEnv = {
   ...(analytics ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
-    ? { PUBLIC_API_URL: DOCUMENTS_API, PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA' }
+    ? {
+        PUBLIC_API_EXTRACT_URL: 'https://extract.api.eslojusto.test/',
+        PUBLIC_API_CHECKOUT_URL: 'https://checkout.api.eslojusto.test/',
+        PUBLIC_API_PASS_URL: 'https://pass.api.eslojusto.test/',
+        PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
+      }
     : {}),
 };
 

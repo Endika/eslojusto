@@ -118,13 +118,24 @@ function payslip(e: Extraction): PrefilledField[] {
       confidence: extra.confidence,
     });
 
-  // The form's salary: with proration it is the month's total; without it, the total less any
-  // full extra payment paid that month. The person sees it as worked out and confirms it.
+  // The form's salary, only for a payslip of one whole calendar month: with proration, the
+  // month's total; without it, the total less the full extra payment when one was paid that
+  // month, and the total otherwise. The person sees it as worked out and confirms it.
   const total = fields['totalAccrued'];
   const totalAmount = money(total);
+  const paid = fields['extraPayPaid'];
+  const extraPaid = paid && typeof paid.value === 'boolean' ? paid.value : false;
   const period = [text(fields['periodStart']), text(fields['periodEnd'])] as const;
-  if (total && totalAmount !== null && prorated && isProrated !== null && wholeMonth(...period)) {
-    const minus = isProrated ? 0 : (extraAmount ?? 0);
+  const known = isProrated === true || !extraPaid || extraAmount !== null;
+  if (
+    total &&
+    totalAmount !== null &&
+    prorated &&
+    isProrated !== null &&
+    known &&
+    wholeMonth(...period)
+  ) {
+    const minus = !isProrated && extraPaid ? (extraAmount ?? 0) : 0;
     const salary = Math.round((totalAmount - minus) * 100) / 100;
     if (salary > 0)
       out.push({
@@ -133,6 +144,7 @@ function payslip(e: Extraction): PrefilledField[] {
         confidence: lowest(
           total.confidence,
           prorated.confidence,
+          ...(!isProrated && paid ? [paid.confidence] : []),
           ...(minus > 0 && extra ? [extra.confidence] : []),
         ),
         derived: true,

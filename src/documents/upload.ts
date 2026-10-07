@@ -251,6 +251,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       prefilledCount(prefill),
       hasLowConfidence(prefill),
       result.failedChecks.length > 0,
+      result.escalated,
     );
     setBusy(false, '');
     upload.reset();

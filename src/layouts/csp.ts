@@ -1,8 +1,8 @@
 import { ANALYTICS_ORIGIN } from '../analytics/config';
 import { TURNSTILE_ORIGIN } from '../documents/config';
 
-// `documents` is the API origin of a build that reads documents; Turnstile's script, frame and
-// requests come with it, as Cloudflare documents for a CSP.
+// `documents` are the API origins of a build that reads documents; Turnstile's script, frame and
+// requests come with them, as Cloudflare documents for a CSP.
 export const contentSecurityPolicy = ({
   themeHash,
   analytics,
@@ -10,11 +10,11 @@ export const contentSecurityPolicy = ({
 }: {
   themeHash: string;
   analytics: boolean;
-  documents?: string | null;
+  documents?: readonly string[] | null;
 }): string => {
   const connect = [
     ...(analytics ? [ANALYTICS_ORIGIN] : []),
-    ...(documents ? [documents, TURNSTILE_ORIGIN] : []),
+    ...(documents ? [...documents, TURNSTILE_ORIGIN] : []),
   ];
   return [
     "default-src 'self'",

@@ -18,6 +18,7 @@ export interface DocumentEvents {
     fields: number,
     lowConfidence: boolean,
     failedChecks: boolean,
+    escalated: boolean | null,
   ): void;
   extractionFailed(kind: DocumentKind, code: ErrorCode): void;
   checkoutStarted(): void;

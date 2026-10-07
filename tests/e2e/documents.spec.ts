@@ -1,11 +1,17 @@
 import { readFileSync } from 'node:fs';
 import { test, expect, type Page, type Request } from '@playwright/test';
 
-// Runs only against a TEST_DOCUMENTS=1 build, whose API is a fake origin: every request to it,
+// Runs only against a TEST_DOCUMENTS=1 build, whose API is three fake origins: every request to them,
 // to Turnstile and to Stripe is answered here. The documents are synthetic.
 
 const ORIGIN = `http://localhost:${process.env['E2E_PORT'] ?? 4321}`;
-const API = 'https://api.eslojusto.test';
+// One function URL per operation, as playwright.config.ts builds the site with.
+const API = {
+  extract: 'https://extract.api.eslojusto.test/',
+  checkout: 'https://checkout.api.eslojusto.test/',
+  pass: 'https://pass.api.eslojusto.test/',
+};
+const API_ORIGINS = Object.values(API).map((url) => new URL(url).origin);
 const STRIPE = 'https://checkout.stripe.com/c/pay/cs_test_e2e';
 
 // A 40×30 red PNG: the browser decodes it and sends it on as a JPEG.
@@ -55,15 +61,15 @@ async function fakeServices(
       body: `window.turnstile = { render(el, o) { setTimeout(() => o.callback(o.action + '-token')); return 'w'; }, remove() {} };`,
     }),
   );
-  await page.route(`${API}/extract`, (route) => {
+  await page.route(API.extract, (route) => {
     fake.extract.push(route.request());
     return route.fulfill({ status: extract.status, json: extract.body });
   });
-  await page.route(`${API}/checkout`, (route) => {
+  await page.route(API.checkout, (route) => {
     fake.checkout.push(route.request());
     return route.fulfill({ json: { code: 'ok', sessionId: 'cs_test_e2e', url: STRIPE } });
   });
-  await page.route(`${API}/pass`, (route) => {
+  await page.route(API.pass, (route) => {
     fake.pass.push(route.request());
     return route.fulfill({ json: { code: 'ok', pass: PASS, expiresAt, readsLeft: 15 } });
   });
@@ -77,9 +83,12 @@ async function fakeServices(
   page.on('request', (r) => {
     const { origin } = new URL(r.url());
     if (
-      ![ORIGIN, API, 'https://challenges.cloudflare.com', 'https://checkout.stripe.com'].includes(
-        origin,
-      )
+      ![
+        ORIGIN,
+        ...API_ORIGINS,
+        'https://challenges.cloudflare.com',
+        'https://checkout.stripe.com',
+      ].includes(origin)
     )
       fake.other.push(r.url());
   });
@@ -100,7 +109,7 @@ async function uploadSettlement(page: Page, { read = true } = {}) {
   if (read) await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
 }
 
-test('the page opens on the choice, and the CSP names only the API and Turnstile', async ({
+test('the page opens on the choice, and the CSP names only the three function URLs and Turnstile', async ({
   page,
 }) => {
   await page.goto('finiquito/');
@@ -108,7 +117,12 @@ test('the page opens on the choice, and the CSP names only the API and Turnstile
   await expect(page.locator('#calculator')).toBeHidden();
   await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveAttribute(
     'content',
-    /connect-src https:\/\/api\.eslojusto\.test https:\/\/challenges\.cloudflare\.com; frame-src https:\/\/challenges\.cloudflare\.com;/,
+    new RegExp(
+      `connect-src ${[...API_ORIGINS, 'https://challenges.cloudflare.com'].join(' ')}; frame-src https://challenges.cloudflare.com;`.replace(
+        /\./g,
+        '\\.',
+      ),
+    ),
   );
 });
 

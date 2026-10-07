@@ -83,6 +83,47 @@ export interface ExtractedRow {
   readonly confidence: Confidence;
 }
 
+// The fields and lists each kind can return (api/src/domain/extraction-schema.ts). For a payslip,
+// `extraPayAmount` is the full extra payment paid in the period, when `extraPayPaid` is true.
+export const EXTRACTION_SHAPE = {
+  settlement: {
+    fields: [
+      'detectedKind',
+      'startDate',
+      'endDate',
+      'cause',
+      'fixedTermType',
+      'monthlySalary',
+      'pending_salary',
+      'holiday_pay',
+      'extra_pay',
+      'severance',
+      'employer_notice',
+      'notice_deduction',
+      'totalAccrued',
+    ],
+    lists: ['otherAccruals'],
+  },
+  payslip: {
+    fields: [
+      'detectedKind',
+      'periodStart',
+      'periodEnd',
+      'startDate',
+      'totalAccrued',
+      'extraPayProrated',
+      'extraPayProratedAmount',
+      'extraPayPaid',
+      'extraPayAmount',
+    ],
+    lists: ['accruals'],
+  },
+  work_history: { fields: ['detectedKind'], lists: ['contracts'] },
+} as const satisfies Record<
+  DocumentKind,
+  { readonly fields: readonly string[]; readonly lists: readonly string[] }
+>;
+
 export interface Extraction {
   readonly kind: DocumentKind;
   readonly fields: Readonly<Record<string, ExtractedField>>;
@@ -124,6 +165,8 @@ export type ExtractResult =
       // A free read returns the quota token to send next time; a pass read, the reads it has left.
       readonly allowance: string | null;
       readonly readsLeft: number | null;
+      // Whether the reading was repeated with the stronger model; null when the API doesn't say.
+      readonly escalated: boolean | null;
     }
   | Failure;
 
