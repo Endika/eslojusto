@@ -78,41 +78,65 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     }
   }
 
+  // Asks for a pass with each payment this browser started that could match, newest first: the
+  // session is known on the way back from Stripe, typed by hand, or any pending one.
   async function fetchPass(
-    sessionId: string,
+    sessionId: string | null,
     via: 'return' | 'recovery',
+    { quiet = false }: { quiet?: boolean } = {},
   ): Promise<true | ErrorCode> {
-    const checkout = passes.checkout();
-    if (!checkout) {
-      events.passFailed('no_checkout');
-      setError('no_checkout');
+    const pending = passes.checkouts();
+    const candidates =
+      sessionId === null
+        ? pending
+        : [
+            ...pending.filter((c) => c.sessionId === sessionId),
+            ...pending
+              .filter((c) => c.sessionId !== sessionId)
+              .map((c) => ({ nonce: c.nonce, sessionId })),
+          ];
+    if (candidates.length === 0) {
+      if (!quiet) {
+        events.passFailed('no_checkout');
+        setError('no_checkout');
+      }
       return 'no_checkout';
     }
     status.textContent = tr('client.documents.pass.checking');
     setError(null);
-    let result = await api.pass(sessionId, checkout.nonce);
-    // A payment can take a moment to settle after the return from Stripe.
-    for (let i = 0; !result.ok && result.code === 'payment_not_complete' && i < 3; i++) {
-      await wait(2000);
-      result = await api.pass(sessionId, checkout.nonce);
-    }
-    if (!result.ok) {
-      status.textContent = '';
-      events.passFailed(result.code);
-      setError(result.code);
+    let last: ErrorCode = 'no_checkout';
+    for (const candidate of candidates) {
+      let result = await api.pass(candidate.sessionId, candidate.nonce);
+      // A payment can take a moment to settle after the return from Stripe.
+      for (
+        let i = 0;
+        !quiet && !result.ok && result.code === 'payment_not_complete' && i < 3;
+        i++
+      ) {
+        await wait(2000);
+        result = await api.pass(candidate.sessionId, candidate.nonce);
+      }
+      if (result.ok) {
+        passes.savePass({
+          token: result.pass,
+          expiresAt: result.expiresAt,
+          readsLeft: result.readsLeft,
+        });
+        passes.removeCheckout(candidate.sessionId);
+        events.passIssued(via);
+        status.textContent = tr('client.documents.pass.issued');
+        render();
+        return true;
+      }
+      last = result.code;
       if (result.code === 'pass_revoked') passes.forgetPass();
-      return result.code;
     }
-    passes.savePass({
-      token: result.pass,
-      expiresAt: result.expiresAt,
-      readsLeft: result.readsLeft,
-    });
-    passes.saveCheckout({ nonce: checkout.nonce, sessionId });
-    events.passIssued(via);
-    status.textContent = tr('client.documents.pass.issued');
-    render();
-    return true;
+    status.textContent = '';
+    if (!quiet) {
+      events.passFailed(last);
+      setError(last);
+    }
+    return last;
   }
 
   async function pay() {
@@ -124,8 +148,13 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       return;
     }
     setError(null);
-    const nonce = newNonce((n) => browser.randomBytes(n));
-    passes.saveCheckout({ nonce, sessionId: null });
+    // An earlier payment from this browser may be paid and not yet redeemed: redeem it rather
+    // than charge again.
+    if (
+      passes.checkouts().length > 0 &&
+      (await fetchPass(null, 'recovery', { quiet: true })) === true
+    )
+      return;
     events.checkoutStarted();
     status.textContent = tr('client.documents.status.captcha');
     let captchaToken: string;
@@ -137,13 +166,14 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       return;
     }
     status.textContent = tr('client.documents.pass.redirecting');
+    const nonce = newNonce((n) => browser.randomBytes(n));
     const result = await api.checkout(nonce, captchaToken);
     if (!result.ok || !result.url.startsWith(`${CHECKOUT_ORIGIN}/`)) {
       status.textContent = '';
       setError(result.ok ? 'checkout_unavailable' : result.code);
       return;
     }
-    passes.saveCheckout({ nonce, sessionId: result.sessionId });
+    passes.addCheckout({ nonce, sessionId: result.sessionId });
     deps.keepReview();
     browser.redirect(result.url);
   }
@@ -183,12 +213,11 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     'click',
     guard(async () => {
       const typed = session.value.trim();
-      const sessionId = typed || passes.checkout()?.sessionId || '';
-      if (!SESSION_ID.test(sessionId)) {
-        setError(typed ? 'session_not_found' : 'no_checkout');
+      if (typed && !SESSION_ID.test(typed)) {
+        setError('session_not_found');
         return;
       }
-      await fetchPass(sessionId, 'recovery');
+      await fetchPass(typed || null, 'recovery');
     }),
   );
   for (const button of section.querySelectorAll<HTMLButtonElement>('[data-download]'))

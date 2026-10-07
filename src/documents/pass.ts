@@ -19,7 +19,20 @@ export interface StoredPass {
 
 export interface PendingCheckout {
   readonly nonce: string;
-  readonly sessionId: string | null;
+  readonly sessionId: string;
+}
+
+const MAX_PENDING_CHECKOUTS = 5;
+
+function isPendingCheckout(v: unknown): v is PendingCheckout {
+  if (typeof v !== 'object' || v === null) return false;
+  const { nonce, sessionId } = v as Record<string, unknown>;
+  return (
+    typeof nonce === 'string' &&
+    NONCE.test(nonce) &&
+    typeof sessionId === 'string' &&
+    SESSION_ID.test(sessionId)
+  );
 }
 
 export interface PassClaims {
@@ -100,23 +113,38 @@ export function createPassStore(store: KeyValueStore) {
     forgetPass(): void {
       store.remove(STORAGE_KEYS.pass);
     },
+    forgetQuota(): void {
+      store.remove(STORAGE_KEYS.quota);
+    },
     quota(): string | null {
       return store.get(STORAGE_KEYS.quota);
     },
     saveQuota(token: string): void {
       store.set(STORAGE_KEYS.quota, token);
     },
-    checkout(): PendingCheckout | null {
-      const v = readJson(store, STORAGE_KEYS.checkout);
-      if (!v || typeof v['nonce'] !== 'string' || !NONCE.test(v['nonce'])) return null;
-      const sid = v['sessionId'];
-      return {
-        nonce: v['nonce'],
-        sessionId: typeof sid === 'string' && SESSION_ID.test(sid) ? sid : null,
-      };
+    // Payments started from this browser and not yet turned into a pass, newest first. Each keeps
+    // its own nonce, so starting a new payment never loses the way to redeem an earlier one.
+    checkouts(): PendingCheckout[] {
+      const raw = store.get(STORAGE_KEYS.checkout);
+      let list: unknown;
+      try {
+        list = raw === null ? [] : JSON.parse(raw);
+      } catch {
+        return [];
+      }
+      return (Array.isArray(list) ? list : [list]).filter(isPendingCheckout);
     },
-    saveCheckout(checkout: PendingCheckout): void {
-      store.set(STORAGE_KEYS.checkout, JSON.stringify(checkout));
+    addCheckout(checkout: PendingCheckout): void {
+      const rest = this.checkouts().filter((c) => c.nonce !== checkout.nonce);
+      store.set(
+        STORAGE_KEYS.checkout,
+        JSON.stringify([checkout, ...rest].slice(0, MAX_PENDING_CHECKOUTS)),
+      );
+    },
+    removeCheckout(sessionId: string): void {
+      const rest = this.checkouts().filter((c) => c.sessionId !== sessionId);
+      if (rest.length > 0) store.set(STORAGE_KEYS.checkout, JSON.stringify(rest));
+      else store.remove(STORAGE_KEYS.checkout);
     },
   };
 }
