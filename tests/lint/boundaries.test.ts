@@ -1,0 +1,53 @@
+import { ESLint } from 'eslint';
+import { describe, expect, it } from 'vitest';
+
+const eslint = new ESLint();
+
+// The rules that fired on `code` as if it lived at `filePath`; nothing is written to disk.
+async function violations(filePath: string, code: string): Promise<string[]> {
+  const [result] = await eslint.lintText(code, { filePath });
+  return (result?.messages ?? []).map((m) => m.ruleId ?? m.message);
+}
+
+describe('import boundaries', () => {
+  it.each([
+    ['src/engine/x.ts', "import { track } from '../analytics/posthog';"],
+    ['src/engine/x.ts', "import { t } from '../i18n';"],
+    ['src/engine/x.ts', "import posthog from 'posthog-js';"],
+    ['src/i18n/x.ts', "import type { Cause } from '../engine/types';"],
+    ['src/calculator/x.ts', "import { track } from '../analytics/posthog';"],
+    ['src/calculator/x.ts', "import { snapshot } from '../analytics/events';"],
+    ['src/calculator/x.ts', "import { localToday } from '../scripts/clock';"],
+    ['src/content/x.ts', "import posthog from 'posthog-js';"],
+    ['src/analytics/x.ts', "import { track } from './posthog';"],
+    ['src/analytics/x.ts', "import { setUpCalculator } from '../calculator/main';"],
+    ['src/layouts/csp.ts', "import { track } from '../analytics/posthog';"],
+    ['src/views/X.astro', "---\nimport { track } from '../analytics/posthog';\n---\n"],
+    ['src/views/X.astro', "<script>\n  import '../analytics/events';\n</script>\n"],
+  ])('%s cannot %s', async (filePath, code) => {
+    expect(await violations(filePath, code)).toContain('no-restricted-imports');
+  });
+
+  it('the engine cannot reach the browser or the clock', async () => {
+    const fired = await violations(
+      'src/engine/x.ts',
+      'export const now = () => [new Date(), document.title, performance.now()];',
+    );
+    expect(fired.filter((r) => r === 'no-restricted-globals')).toHaveLength(3);
+  });
+
+  it('a dynamic import cannot slip past them', async () => {
+    expect(
+      await violations('src/calculator/x.ts', "export const a = import('../analytics/posthog');"),
+    ).toContain('no-restricted-syntax');
+  });
+
+  it.each([
+    ['src/scripts/x.ts', "import { track } from '../analytics/posthog';"],
+    ['src/analytics/x.ts', "import type { CalculatorEvents } from '../calculator/ports';"],
+    ['src/layouts/csp.ts', "import { ANALYTICS_ORIGIN } from '../analytics/config';"],
+    ['src/calculator/x.ts', "import { reviewFinalPay } from '../engine/review';"],
+  ])('%s may %s', async (filePath, code) => {
+    expect(await violations(filePath, code)).not.toContain('no-restricted-imports');
+  });
+});

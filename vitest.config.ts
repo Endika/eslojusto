@@ -5,6 +5,7 @@ export default defineConfig({
       'tests/engine/**/*.test.ts',
       'tests/calculator/**/*.test.ts',
       'tests/analytics/**/*.test.ts',
+      'tests/lint/**/*.test.ts',
     ],
   },
 });
