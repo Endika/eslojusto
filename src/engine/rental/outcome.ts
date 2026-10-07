@@ -12,7 +12,9 @@ export type DoubtReason =
   // «No lo sé» on whether the update was agreed in writing.
   | 'agreement_unknown'
   // Notice by email or messaging: whether it counts as written (LAU art. 18.2) is not settled.
-  | 'notice_form_doubtful';
+  | 'notice_form_doubtful'
+  // No norm says whether the legal interest year has 365 (366) or 360 days.
+  | 'interest_day_count';
 
 const REASON_ORDER: readonly DoubtReason[] = [
   'pending_validation',
@@ -21,6 +23,7 @@ const REASON_ORDER: readonly DoubtReason[] = [
   'index_month_doubtful',
   'agreement_unknown',
   'notice_form_doubtful',
+  'interest_day_count',
 ];
 
 export interface Doubt {
@@ -142,7 +145,14 @@ export function evaluateAcross<T>(
 // adds nothing: both readings are shown and neither is summed.
 export function countedAmount<T>(outcome: Outcome<T>, amount: (value: T) => number): number {
   if (outcome.kind === 'single') return amount(outcome.value);
-  return outcome.reasons.includes('repealed_window') ? 0 : amount(outcome.low);
+  if (outcome.reasons.includes('repealed_window')) return 0;
+  return Math.min(amount(outcome.low), ...outcome.readings.map((r) => amount(r.value)));
+}
+
+// The most any reading gives, a repealed window included: the «y hasta» of a result.
+export function highestAmount<T>(outcome: Outcome<T>, amount: (value: T) => number): number {
+  if (outcome.kind === 'single') return amount(outcome.value);
+  return Math.max(amount(outcome.high), ...outcome.readings.map((r) => amount(r.value)));
 }
 
 // A letter asks only for what holds in every reading, and never for a repealed window.

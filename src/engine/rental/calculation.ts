@@ -37,7 +37,25 @@ export type RentalPhraseKey =
   | 'rent_update.index_publication_unknown'
   | 'rent_update.index_none_published'
   | 'rent_update.flash_not_loaded'
-  | 'rent_update.too_many_readings';
+  | 'rent_update.too_many_readings'
+  | 'item.not_entered'
+  | 'fees.company_landlord'
+  | 'fees.person_landlord'
+  | 'fees.landlord_pays'
+  | 'fees.any_name'
+  | 'fees.other_name'
+  | 'fees.requested_in_writing'
+  | 'fees.paid_over'
+  | 'guarantees.deposit_excess'
+  | 'guarantees.money'
+  | 'guarantees.over_cap'
+  | 'guarantees.within_cap'
+  | 'guarantees.long_contract'
+  | 'guarantees.not_money'
+  | 'guarantees.insurance_banned'
+  | 'guarantees.insurance_before_ban'
+  | 'advance.over_cap'
+  | 'advance.within_cap';
 
 // The UI words a phrase through the dictionary key `client.rental.calculation.<key>`.
 export interface RentalPhrase {

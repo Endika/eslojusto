@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   countedAmount,
   evaluateAcross,
+  highestAmount,
   letterAmount,
   worldsFor,
   type Doubt,
@@ -154,5 +155,14 @@ describe('what the total and the letter count', () => {
       readings: [],
     };
     expect(letterAmount(outcome, id)).toBeNull();
+  });
+});
+
+describe('the most any reading gives', () => {
+  it('is the higher reading, a repealed window included', () => {
+    const outcome = evaluateAcross([REPEALED], (w) => (w[REPEALED.id] === true ? 30 : 10), euros);
+    expect(highestAmount(outcome, id)).toBe(30);
+    expect(countedAmount(outcome, id)).toBe(0);
+    expect(highestAmount({ kind: 'single', value: 75 }, id)).toBe(75);
   });
 });
