@@ -279,6 +279,7 @@ export const es = {
   'documents.upload.work_history_hint':
     'El informe de la Seguridad Social, para tus otros trabajos.',
   'documents.upload.files': 'Fotos o PDF',
+  'documents.upload.drop': 'Arrastra aquí tus fotos o el PDF, o elígelos con el botón.',
   'documents.upload.files_hint':
     'Hasta 4 fotos o un PDF de hasta 4 páginas. Las fotos se reducen en tu dispositivo antes de enviarse.',
   'documents.upload.consent':
