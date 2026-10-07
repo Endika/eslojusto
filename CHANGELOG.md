@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.1](https://github.com/Endika/eslojusto/compare/v1.12.0...v1.12.1) (2026-10-07)
+
+
+### Bug Fixes
+
+* **lint:** let a documents subfolder reach only the PDF writer ([99caf95](https://github.com/Endika/eslojusto/commit/99caf95b8d8a0c75ee436ad716e1855a9c935743))
+
 ## [1.12.0](https://github.com/Endika/eslojusto/compare/v1.11.0...v1.12.0) (2026-10-07)
 
 
