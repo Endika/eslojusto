@@ -82,6 +82,13 @@ describe('regional stack', () => {
     });
   });
 
+  it('exposes each function URL as its own output', () => {
+    const outputs = apiTemplate.toJSON()['Outputs'] as Record<string, { Value: unknown }>;
+    expect(Object.keys(outputs).sort()).toEqual(['checkoutUrl', 'extractUrl', 'passUrl']);
+    for (const fn of ['extract', 'checkout', 'pass'])
+      expect(JSON.stringify(outputs[`${fn}Url`]?.Value)).toMatch(new RegExp(`${fn}FunctionUrl`));
+  });
+
   it('keeps logs for two weeks', () => {
     apiTemplate.allResourcesProperties('AWS::Logs::LogGroup', { RetentionInDays: 14 });
   });
