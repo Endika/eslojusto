@@ -12,6 +12,9 @@ const FIXED_TERM: ReadonlySet<Modality> = new Set([
   'interim',
 ]);
 
+// Weeks in a year of 365 days, to spread yearly hours or pay over weeks.
+export const WEEKS_PER_YEAR = 365 / 7;
+
 export const isFixedTerm = (modality: Modality): boolean => FIXED_TERM.has(modality);
 
 // Open-ended modalities; `unknown` is neither.

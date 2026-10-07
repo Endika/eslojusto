@@ -1,9 +1,8 @@
 import { round2 } from '../money';
 import { CALENDAR_MINIMUM, calendarDaysPer } from '../settlement';
 import { phrase } from './calculation';
-import { findingOf, single, type Verdict } from './finding';
+import { findingsFor, single } from './finding';
 import type { NormTable } from './norms';
-import type { EmploymentRuleId } from './rules';
 import { agreedDays, isFixedTerm } from './term';
 import type { Assessed, EmploymentInput, Finding, Holidays } from './types';
 
@@ -13,8 +12,7 @@ const SHORT_TEMPORARY_DAYS = 120;
 // Art. 31 ET: two extraordinary payments a year.
 const EXTRA_PAYS = 2;
 
-const finding = (id: EmploymentRuleId, verdict: Verdict, norms: NormTable): Finding =>
-  findingOf(id, 'holidays_pay', norms, verdict);
+const finding = findingsFor('holidays_pay');
 
 const isShortTemporary = (input: EmploymentInput): boolean => {
   const days = agreedDays(input);
