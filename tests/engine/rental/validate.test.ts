@@ -111,7 +111,7 @@ describe('rental input validation', () => {
     ]);
   });
 
-  it('wants each update after the start, not after today and only once', () => {
+  it('wants each rise tied to an anniversary, within its contract year, by today, once', () => {
     expect(
       codes(
         contract({
@@ -119,16 +119,39 @@ describe('rental input validation', () => {
             update('2021-03-20', 1000, 1010),
             update('2022-03-20', 1000, 1020),
             update('2022-03-20', 1000, 1020),
-            update('2026-10-08', 1020, 1040, { noticeOn: f('2026-10-09') }),
+            update('2022-03-21', 1000, 1020),
+            update('2023-03-20', 1020, 1040, { effectiveOn: f('2024-03-20') }),
+            update('2023-03-20', 1020, 1040, { effectiveOn: f('2022-03-20') }),
+            update('2026-03-20', 1020, 1040, {
+              effectiveOn: f('2026-10-08'),
+              noticeOn: f('2026-10-09'),
+            }),
           ],
         }),
       ),
     ).toEqual([
-      ['updates', 0, 'update_before_start'],
+      ['updates', 0, 'not_an_anniversary'],
       ['updates', 2, 'update_repeated'],
-      ['updates', 3, 'update_in_future'],
-      ['updates', 3, 'notice_in_future'],
+      ['updates', 3, 'not_an_anniversary'],
+      ['updates', 4, 'effective_outside_year'],
+      ['updates', 5, 'effective_outside_year'],
+      ['updates', 6, 'update_in_future'],
+      ['updates', 6, 'notice_in_future'],
     ]);
+  });
+
+  it('takes a rise applied before or after its anniversary, and a second one that year', () => {
+    expect(
+      codes(
+        contract({
+          updates: [
+            update('2022-03-20', 1000, 1020, { effectiveOn: f('2022-03-01') }),
+            update('2023-03-20', 1020, 1040, { effectiveOn: f('2023-04-01') }),
+            update('2023-03-20', 1040, 1060, { effectiveOn: f('2023-09-01') }),
+          ],
+        }),
+      ),
+    ).toEqual([]);
   });
 
   it('wants the notice date for a notice given in writing or electronically', () => {

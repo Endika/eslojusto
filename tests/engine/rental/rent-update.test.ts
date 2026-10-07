@@ -503,31 +503,89 @@ describe('when no rise fits', () => {
     expect(v.calculation.map((p) => p.key)).toContain('rent_update.no_clause');
   });
 
-  it('a rise on a day that is not the anniversary is paid over', () => {
-    const v = single(first(check(contract({ updates: [update('2022-04-01', 1000, 1020)] }))));
-    expect(figures(v)).toMatchObject({ maxRent: 1000, monthly: 20 });
-    expect(v.calculation.map((p) => p.key)).toContain('rent_update.not_anniversary');
+  it('a rise applied before the anniversary is paid over in full', () => {
+    const v = single(
+      first(
+        check(
+          contract({
+            updates: [update('2022-03-20', 1000, 1020, { effectiveOn: f('2022-03-01') })],
+          }),
+        ),
+      ),
+    );
+    expect(figures(v)).toMatchObject({ maxRent: 1000, monthly: 20, months: 12, accumulated: 240 });
+    expect(v.calculation.map((p) => p.key)).toContain('rent_update.before_anniversary');
+  });
+
+  it('a rise applied after the anniversary is that year’s update, due per art. 18.2', () => {
+    // IPC February 2022 7,6 % on the anniversary 20-03-2022: 1.076. Applied from 01-04-2022 and
+    // notified in March: April 2022 to February 2023, 11 months × 24.
+    const v = single(
+      first(
+        check(
+          contract({
+            updates: [
+              update('2022-03-20', 1000, 1100, {
+                effectiveOn: f('2022-04-01'),
+                chargedFrom: f('2022-04-01'),
+                noticeOn: f('2022-03-01'),
+              }),
+            ],
+          }),
+        ),
+      ),
+    );
+    expect(figures(v)).toMatchObject({ maxRent: 1076, monthly: 24, months: 11, accumulated: 264 });
+    expect(v.monthsBeforeDue).toBe(0);
+    expect(v.cap?.rule).toBe('cap_ipc');
+  });
+
+  it('a second rise in the same contract year is paid over in full', () => {
+    // The first, within 1.076, runs March to August; the second, from September to February.
+    const results = check(
+      contract({
+        updates: [
+          update('2022-03-20', 1076, 1100, {
+            effectiveOn: f('2022-09-01'),
+            chargedFrom: f('2022-09-01'),
+            noticeOn: f('2022-08-01'),
+          }),
+          update('2022-03-20', 1000, 1076),
+        ],
+      }),
+    );
+    const [rise, second] = results.map(single);
+    expect(results.map((r) => r.index)).toEqual([1, 0]);
+    expect(rise && figures(rise)).toMatchObject({ status: 'within_limit', months: 6 });
+    expect(second && figures(second)).toMatchObject({
+      base: 1076,
+      maxRent: 1076,
+      monthly: 24,
+      months: 6,
+      accumulated: 144,
+    });
+    expect(second?.calculation.map((p) => p.key)).toContain('rent_update.second_rise');
   });
 
   it('a 29 February start has its anniversary on 28 February in other years', () => {
-    const input = (day: string) =>
+    const input = (day: string, effectiveOn = day) =>
       contract({
         signedOn: f('2020-02-20'),
         startDate: f('2020-02-29'),
         initialRent: 700,
-        updates: [update(day, 700, 703.5)],
+        updates: [update(day, 700, 703.5, { effectiveOn: f(effectiveOn) })],
       });
     // On 28-02-2021 the IPC January 0,5 % was out, and the February flash (0,0 %) too.
     const on28 = depends(first(check(input('2021-02-28'))));
     expect(on28.reasons).toEqual(['index_month_doubtful']);
     expect(on28.low.maxRent).toBe(703.5);
     expect(on28.high.maxRent).toBe(700);
-    const on01 = single(first(check(input('2021-03-01'))));
-    expect(on01.calculation.map((p) => p.key)).toContain('rent_update.not_anniversary');
+    const early = single(first(check(input('2021-02-28', '2021-02-27'))));
+    expect(early.calculation.map((p) => p.key)).toContain('rent_update.before_anniversary');
     // On 29-02-2024 the February flash came out that same day.
     const leap = depends(first(check(input('2024-02-29'))));
     for (const { value } of leap.readings)
-      expect(value.calculation.map((p) => p.key)).not.toContain('rent_update.not_anniversary');
+      expect(value.calculation.map((p) => p.key)).not.toContain('rent_update.before_anniversary');
   });
 
   it('a negative IGC under a clause naming no index allows no rise', () => {
@@ -806,4 +864,66 @@ describe('maximum rent against hand calculations', () => {
       expect(Math.abs((v.maxRent ?? 0) - expected)).toBeLessThanOrEqual(0.01);
     },
   );
+});
+
+describe('work bound', () => {
+  it('eight years with every doubt open finish fast and never throw', () => {
+    // An anniversary at the end of March falls inside the CPI flash window most years.
+    const anniversaries = Array.from({ length: 8 }, (_, i) => `${2020 + i}-03-28`);
+    let rent = 900;
+    const input = contract({
+      signedOn: f('2019-03-20'),
+      startDate: f('2019-03-28'),
+      landlordType: 'company',
+      largeLandlord: null,
+      updateClause: 'ipc',
+      initialRent: rent,
+      updates: anniversaries.map((day) => {
+        const u = update(day, rent, rent + 30, {
+          notice: 'email',
+          agreedInWriting: null,
+        });
+        rent += 30;
+        return u;
+      }),
+    });
+    const startedAt = performance.now();
+    const results = check(input, f('2027-06-10'), FUTURE_DEPS);
+    const elapsed = performance.now() - startedAt;
+    expect(results).toHaveLength(8);
+    expect(elapsed).toBeLessThan(200);
+    const reasons = new Set(
+      results.flatMap((r) => (r.outcome.kind === 'depends' ? r.outcome.reasons : [])),
+    );
+    expect([...reasons].sort()).toEqual([
+      'agreement_unknown',
+      'index_month_doubtful',
+      'large_landlord_unknown',
+      'notice_form_doubtful',
+      'pending_validation',
+      'repealed_window',
+    ]);
+  });
+
+  it('says an update cannot be checked rather than run past the bound', () => {
+    // 2021-02-28 opens the flash doubt, the agreement and the email notice: 8 readings.
+    const input = contract({
+      signedOn: f('2020-02-20'),
+      startDate: f('2020-02-29'),
+      initialRent: 700,
+      updates: [
+        update('2021-02-28', 700, 710, { notice: 'email', agreedInWriting: null }),
+        update('2022-02-28', 710, 720),
+      ],
+    });
+    const [bounded, next] = checkRentUpdates(input, TODAY, DEPS, { maxReadings: 4 });
+    expect(bounded && single(bounded)).toMatchObject({
+      status: 'not_checkable',
+      unchecked: 'too_many_readings',
+    });
+    // The year after starts again from the rent the person gave.
+    const after = next?.outcome.kind === 'depends' ? next.outcome.low : next?.outcome.value;
+    expect(after?.calculation[0]?.key).toBe('rent_update.base_from_answer');
+    expect(depends(first(checkRentUpdates(input, TODAY, DEPS))).reasons.length).toBe(3);
+  });
 });
