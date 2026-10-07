@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import type { Api, PassResult } from '../../src/documents/contract';
 import { createPassStore } from '../../src/documents/pass';
 import { setUpPayment } from '../../src/documents/payment';
+import type { LetterDetails } from '../../src/documents/letter';
 import type { Browser } from '../../src/documents/ports';
 import { OFFER, flush, recordingEvents } from './dom';
 import { completed, memoryStore, passToken, tr, unfairDismissal } from './fixtures';
@@ -21,6 +22,7 @@ function setUp(
   const calls: string[] = [];
   const saved: string[] = [];
   const redirects: string[] = [];
+  const letters: LetterDetails[] = [];
   let kept = 0;
   const api: Api = {
     extract: async () => ({ ok: false, code: 'service_unavailable' }),
@@ -49,12 +51,16 @@ function setUp(
     tr,
     pdf: async () => ({
       report: async () => new Blob(['%PDF']),
-      letter: async () => new Blob(['%PDF']),
+      letter: async (_review, details) => {
+        letters.push(details);
+        return new Blob(['%PDF']);
+      },
     }),
     keepReview: () => void (kept += 1),
+    today: () => ({ y: 2026, m: 10, d: 7 }),
     wait: async () => {},
   });
-  return { payment, section, passes, events, calls, saved, redirects, kept: () => kept };
+  return { payment, section, passes, events, calls, saved, redirects, letters, kept: () => kept };
 }
 
 const $ = <T extends HTMLElement>(s: string) => document.querySelector(s) as T;
@@ -284,8 +290,54 @@ describe('the pass offer', () => {
     expect(saved).toEqual(['eslojusto-informe-finiquito.pdf', 'eslojusto-recibi-no-conforme.pdf']);
     expect(events.log).toEqual([
       ['downloaded', 'report'],
-      ['downloaded', 'letter'],
+      ['downloaded', 'letter', 'none'],
     ]);
+  });
+
+  it('the letter takes what the person adds, dated today unless changed', async () => {
+    const { payment, passes, letters, events } = setUp();
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
+    payment.show(completed());
+    expect($<HTMLInputElement>('[data-letter-field="date"]').value).toBe('2026-10-07');
+    $<HTMLInputElement>('[data-letter-field="name"]').value = 'Alex Ejemplo';
+    $<HTMLInputElement>('[data-letter-field="company"]').value = 'Empresa Ficticia SL';
+    await click('[data-download="letter"]');
+    expect(letters).toEqual([
+      {
+        name: 'Alex Ejemplo',
+        id: '',
+        company: 'Empresa Ficticia SL',
+        place: '',
+        date: { y: 2026, m: 10, d: 7 },
+      },
+    ]);
+    expect(events.log).toEqual([['downloaded', 'letter', 'some']]);
+  });
+
+  it('warns about an ID that is no DNI or NIE, and downloads the letter anyway', async () => {
+    const { payment, passes, saved } = setUp();
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
+    payment.show(completed());
+    const id = $<HTMLInputElement>('[data-letter-field="id"]');
+    id.value = '1234';
+    id.dispatchEvent(new Event('change'));
+    expect($('[data-letter-id-warning]').hidden).toBe(false);
+    expect($('[data-letter-id-warning]').textContent).toContain('No parece un DNI ni un NIE');
+    await click('[data-download="letter"]');
+    expect(saved).toEqual(['eslojusto-recibi-no-conforme.pdf']);
+    id.value = '12345678Z';
+    id.dispatchEvent(new Event('input'));
+    expect($('[data-letter-id-warning]').hidden).toBe(true);
+  });
+
+  it('starting over forgets what was typed for the letter', () => {
+    const { payment, passes } = setUp();
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
+    payment.show(completed());
+    $<HTMLInputElement>('[data-letter-field="name"]').value = 'Alex Ejemplo';
+    payment.hide();
+    expect($<HTMLInputElement>('[data-letter-field="name"]').value).toBe('');
+    expect($<HTMLInputElement>('[data-letter-field="date"]').value).toBe('');
   });
 
   it('with a pass and nothing short, only the report', () => {
@@ -293,7 +345,7 @@ describe('the pass offer', () => {
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
     payment.show(completed(unfairDismissal, { severance: 41000 }));
     expect(section.hidden).toBe(false);
-    expect($('[data-download="letter"]').hidden).toBe(true);
+    expect($('[data-letter]').hidden).toBe(true);
   });
 
   it('an expired pass downloads nothing and offers the pass again', async () => {

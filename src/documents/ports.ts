@@ -1,8 +1,10 @@
 import type { CompletedReview } from '../calculator/ports';
 import type { ErrorCode, MediaType, PageKind } from './contract';
 import type { filesBucket } from './files';
+import type { LetterDetails, LetterPrefilled } from './letter';
 
 export { ERROR_CODES, PAGE_KINDS } from './contract';
+export { LETTER_PREFILLED } from './letter';
 export type { ErrorCode, PageKind } from './contract';
 
 export type FilesBucket = ReturnType<typeof filesBucket>;
@@ -30,7 +32,8 @@ export interface DocumentEvents {
   checkoutStarted(): void;
   passIssued(via: PassVia): void;
   passFailed(code: ErrorCode): void;
-  downloaded(document: Download): void;
+  // For the letter, how many of its optional fields were filled; never what they say.
+  downloaded(document: Download, letterPrefilled?: LetterPrefilled): void;
 }
 
 // localStorage or sessionStorage; a store that throws or is missing behaves as empty.
@@ -79,7 +82,7 @@ export interface PdfPages {
 
 export interface PdfMaker {
   report(review: CompletedReview): Promise<Blob>;
-  letter(review: CompletedReview): Promise<Blob>;
+  letter(review: CompletedReview, details: LetterDetails): Promise<Blob>;
 }
 
 export interface Browser {

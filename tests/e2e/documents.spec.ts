@@ -227,6 +227,31 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
     const bytes = readFileSync(await file.path());
     expect(bytes.subarray(0, 8).toString('latin1')).toBe('%PDF-1.7');
   }
+
+  // The letter's own details: optional, dated today, and never sent or kept anywhere.
+  const letter = page.getByRole('group', { name: 'Tus datos para la carta (opcional)' });
+  await expect(letter).toContainText(
+    'Estos datos solo se usan para rellenar la carta en tu dispositivo; no se envían ni se guardan.',
+  );
+  await expect(letter.getByLabel('Tu nombre y apellidos')).toHaveAttribute('autocomplete', 'name');
+  await expect(letter.getByLabel('Empresa')).toHaveAttribute('autocomplete', 'organization');
+  await expect(letter.getByLabel('Localidad')).toHaveAttribute('autocomplete', 'address-level2');
+  await expect(letter.getByLabel('Fecha')).toHaveValue(/^\d{4}-\d{2}-\d{2}$/);
+  await letter.getByLabel('Tu nombre y apellidos').fill('Alex Ejemplo');
+  await letter.getByLabel('DNI o NIE').fill('1234');
+  await letter.getByLabel('Empresa').fill('Empresa Ficticia SL');
+  await letter.getByLabel('Localidad').fill('Logroño');
+  await letter.getByLabel('Localidad').press('Tab');
+  await expect(letter.getByText('No parece un DNI ni un NIE')).toBeVisible();
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Descargar la carta (PDF)' }).click();
+  const filled = readFileSync(await (await download).path());
+  expect(filled.subarray(0, 8).toString('latin1')).toBe('%PDF-1.7');
+  const kept = await page.evaluate(() =>
+    JSON.stringify([{ ...localStorage }, { ...sessionStorage }]),
+  );
+  for (const typed of ['Alex Ejemplo', 'Empresa Ficticia', 'Logroño', '1234'])
+    expect(kept).not.toContain(typed);
   expect(fake.other).toEqual([]);
 });
 

@@ -194,6 +194,7 @@ export function wireDocuments(
     tr,
     pdf: () => import('../documents/pdf').then((m) => m.pdfMaker(tr, localToday)),
     keepReview: () => session.set(REVIEW_KEY, JSON.stringify(calculator.entries())),
+    today: localToday,
   });
   hooks.onReview((r) => {
     payment.show(r);

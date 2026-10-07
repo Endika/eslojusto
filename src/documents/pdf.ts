@@ -67,7 +67,7 @@ export async function renderPdf(model: DocumentModel): Promise<Uint8Array> {
         doc.paragraph(block.text, STYLES.source, { after: 2, link: block.url });
         break;
       case 'blank':
-        doc.blank(block.label, STYLES.label, doc.width * 0.7);
+        doc.blank(block.label, STYLES.label, doc.width * 0.7, block.value, STYLES.row);
         break;
       case 'rule':
         doc.rule(VIOLET, 1.5, 12);
@@ -82,6 +82,6 @@ const asBlob = (bytes: Uint8Array) => new Blob([bytes as BlobPart], { type: 'app
 export function pdfMaker(tr: Translate, today: () => CivilDate): PdfMaker {
   return {
     report: async (r) => asBlob(await renderPdf(reportModel(r, tr, today()))),
-    letter: async (r) => asBlob(await renderPdf(letterModel(r, tr))),
+    letter: async (r, details) => asBlob(await renderPdf(letterModel(r, tr, details))),
   };
 }

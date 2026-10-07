@@ -67,6 +67,25 @@ describe('the PDF writer', () => {
     expect(text).toContain('30 días naturales al año');
   });
 
+  it('writes the letter details the person added on their lines', async () => {
+    const pdf = latin1(
+      await renderPdf(
+        letterModel(completed(), tr, {
+          name: 'Alex Ejemplo Núñez',
+          id: '12345678Z',
+          company: 'Empresa Ficticia SL',
+          place: 'Logroño',
+          date: { y: 2026, m: 10, d: 7 },
+        }),
+      ),
+    );
+    const text = extractText(pdf);
+    expect(text).toContain('Alex Ejemplo Núñez');
+    expect(text).toContain('12345678Z');
+    expect(text).toContain('Empresa Ficticia SL');
+    expect(text).toContain('En Logroño, a 7 de octubre de 2026');
+  });
+
   it('links each source', async () => {
     const pdf = latin1(await renderPdf(reportModel(completed(), tr, today)));
     expect(pdf).toContain('/URI (https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430#a56)');

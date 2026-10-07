@@ -311,6 +311,15 @@ export const es = {
   'documents.pass.recover': 'Recuperar el pase',
   'documents.pass.download_report': 'Descargar el informe (PDF)',
   'documents.pass.download_letter': 'Descargar la carta (PDF)',
+  'documents.letter.legend': 'Tus datos para la carta (opcional)',
+  'documents.letter.hint': 'Lo que dejes en blanco queda como una línea para escribirlo a mano.',
+  'documents.letter.name': 'Tu nombre y apellidos',
+  'documents.letter.id': 'DNI o NIE',
+  'documents.letter.company': 'Empresa',
+  'documents.letter.place': 'Localidad',
+  'documents.letter.date': 'Fecha',
+  'documents.letter.privacy':
+    'Estos datos solo se usan para rellenar la carta en tu dispositivo; no se envían ni se guardan.',
   'documents.pass.letter_note':
     'La carta es una plantilla con tus cifras. Usarla o no, y cómo, es decisión tuya.',
 
@@ -777,8 +786,11 @@ export const es = {
     '{partida}: la propuesta descuenta {empresa} y el máximo legal es {maximo}; sobran {diferencia}.',
   'client.documents.letter.closing':
     'Este recibí deja constancia de que he recibido el documento, no de que esté de acuerdo con sus cantidades.',
-  'client.documents.letter.place_date':
-    'En ____________________, a ____ de ____________________ de ________',
+  'client.documents.letter.place_date': 'En {lugar}, a {fecha}',
+  'client.documents.letter.place_blank': '____________________',
+  'client.documents.letter.date_blank': '____ de ____________________ de ________',
+  'client.documents.letter.id_warning':
+    'No parece un DNI ni un NIE: revísalo. La carta se descarga igualmente.',
   'client.documents.letter.received': 'Recibí no conforme,',
   'client.documents.letter.filename': 'eslojusto-recibi-no-conforme.pdf',
 } as const satisfies Record<string, string>;
