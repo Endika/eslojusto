@@ -123,6 +123,7 @@ test('a figure with a decimal comma and thousands dots reads in Spanish format',
   await next();
   await page.getByLabel('Disfrutados este año').fill('0');
   await next();
+  await next();
   await page.getByLabel('Descuento por no preavisar').fill('1,234.56');
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByLabel('Descuento por no preavisar')).toHaveAttribute(
@@ -174,7 +175,7 @@ test('without prorating, extra pay gets its own sheet and fits in 360×640', asy
   expect(last && bar && last.y + last.height <= bar.y).toBe(true);
   await expect(next).toBeInViewport();
   await next.click();
-  await expect(page.getByRole('heading', { name: 'Tus vacaciones y tu preaviso' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Tus vacaciones' })).toBeVisible();
   await page.getByRole('button', { name: 'Atrás' }).click();
   await expect(page.getByLabel('Importe de cada paga')).toHaveValue('1.850,00');
 });
@@ -232,13 +233,16 @@ test('fixed-term end: every sheet fits in 360×640, the conditional ones too', a
   await expect(page.getByLabel('Disfrutados este año')).toBeDisabled();
   await fitsAboveBar(page);
   await next();
+  await expect(page.getByRole('heading', { name: 'Tu preaviso' })).toBeVisible();
+  await fitsAboveBar(page);
+  await next();
   await page.getByLabel('Ninguno').check();
   await fitsAboveBar(page);
   await next();
   await fitsAboveBar(page);
   await next();
   await fitsAboveBar(page);
-  for (let i = 0; i < 8; i++) await page.getByRole('button', { name: 'Atrás' }).click();
+  for (let i = 0; i < 9; i++) await page.getByRole('button', { name: 'Atrás' }).click();
   await expect(page.getByLabel('Eventual')).toBeChecked();
 });
 
@@ -262,6 +266,7 @@ test('whoever is paid exactly the legal minimum sees «Coincide» on every item'
   await page.getByLabel('Importe de cada paga').fill('1.500,00');
   await next();
   await page.getByLabel('Disfrutados este año').fill('7');
+  await next();
   await page.getByLabel('Días de preaviso que te dio la empresa').fill('5');
   await next();
   await page.getByLabel('Prefiero no decirlo').check();
@@ -340,12 +345,24 @@ test('holidays count in working days by default; the yearly figure follows the u
   await next();
   await page.getByLabel('Salario bruto mensual').fill('4.300,00');
   await next();
-  await expect(page.getByLabel('Laborables', { exact: true })).toBeChecked();
+  await expect(page.getByLabel('Días laborables', { exact: true })).toBeChecked();
+  await expect(page.getByLabel('5 (de lunes a viernes)')).toBeChecked();
   await expect(page.getByLabel('Vacaciones al año')).toHaveValue('22');
-  await page.getByLabel('Naturales', { exact: true }).check();
+  await expect(
+    page.getByText(
+      '22 laborables equivalen a los 30 naturales de la ley; 26 si trabajas de lunes a sábado.',
+    ),
+  ).toBeVisible();
+  await page.getByLabel('6 (de lunes a sábado)').check();
+  await expect(page.getByLabel('Vacaciones al año')).toHaveValue('26');
+  await page.getByLabel('Días naturales', { exact: true }).check();
   await expect(page.getByLabel('Vacaciones al año')).toHaveValue('30');
-  await expect(page.getByText('7 por semana.')).toBeVisible();
-  await page.getByLabel('Laborables', { exact: true }).check();
+  await expect(
+    page.getByRole('group', { name: '¿Cuántos días a la semana trabajas?' }),
+  ).toBeHidden();
+  await expect(page.getByText('Este año. Una semana son 7.')).toBeVisible();
+  await page.getByLabel('Días laborables', { exact: true }).check();
+  await page.getByLabel('5 (de lunes a viernes)').check();
   await expect(page.getByLabel('Vacaciones al año')).toHaveValue('22');
   await page.getByLabel('Disfrutados este año').fill('20');
   await next();
@@ -355,6 +372,8 @@ test('holidays count in working days by default; the yearly figure follows the u
   await page.getByLabel('Vacaciones no disfrutadas').fill('0');
   await page.getByRole('button', { name: 'Revisar' }).click();
   const card = page.locator('[data-item="holiday_pay"]');
-  await expect(card).toContainText('Hemos contado 20 días laborables disfrutados de 22 al año.');
+  await expect(card).toContainText(
+    'Hemos contado 20 días laborables (5 por semana) disfrutados de 22 al año.',
+  );
   await expect(card).not.toContainText('Por debajo del mínimo legal');
 });

@@ -2,7 +2,7 @@
 import Field from './Field.astro';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
-import { MINIMUM_HOLIDAYS } from '../engine/settlement';
+import { minimumHolidays } from '../engine/settlement';
 
 interface Props {
   lang: Lang;
@@ -21,6 +21,7 @@ const causes = [
 const fixedTermTypes = ['production_circumstances', 'replacement', 'training'] as const;
 const accruals = ['annual', 'semiannual', 'unknown'] as const;
 const holidayUnits = ['working', 'calendar'] as const;
+const workWeeks = ['5', '6', 'other'] as const;
 const items = [
   'pending_salary',
   'holiday_pay',
@@ -229,7 +230,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         {tx('holidays.question')}
       </h2>
       <fieldset class="group" data-field="holidayUnit">
-        <legend class="visually-hidden">{tx('holidays.unit')}</legend>
+        <legend>{tx('holidays.unit')}</legend>
         <div class="chips chips--pair">
           {holidayUnits.map((value) => (
             <div class="chip">
@@ -239,8 +240,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
                 id={`holiday-unit-${value}`}
                 value={value}
                 checked={value === 'working'}
-                data-default-days={String(MINIMUM_HOLIDAYS[value])}
-                aria-describedby="hint-annualHolidayDays error-holidayUnit"
+                aria-describedby="error-holidayUnit"
               />
               <label for={`holiday-unit-${value}`}>{tx(`holidays.unit_${value}`)}</label>
             </div>
@@ -248,13 +248,48 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         </div>
         <p class="errata" id="error-holidayUnit" data-error-for="holidayUnit" hidden></p>
       </fieldset>
+      <fieldset class="group" data-field="workDaysPerWeek" data-if-holiday-unit="working">
+        <legend>{tx('holidays.week')}</legend>
+        <div class="chips">
+          {workWeeks.map((value) => (
+            <div class="chip">
+              <input
+                type="radio"
+                name="workDaysPerWeek"
+                id={`work-week-${value}`}
+                value={value}
+                checked={value === '5'}
+                aria-describedby="error-workDaysPerWeek"
+              />
+              <label for={`work-week-${value}`}>{tx(`holidays.week_${value}`)}</label>
+            </div>
+          ))}
+        </div>
+        <div class="field field--inline" data-if-work-week="other" hidden>
+          <label class="field__label" for="workDaysPerWeekOther">
+            {tx('holidays.week_other_days')}
+          </label>
+          <input
+            class="field__input field__input--figure"
+            id="workDaysPerWeekOther"
+            name="workDaysPerWeekOther"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            spellcheck="false"
+            dir="ltr"
+            aria-describedby="error-workDaysPerWeek"
+          />
+        </div>
+        <p class="errata" id="error-workDaysPerWeek" data-error-for="workDaysPerWeek" hidden></p>
+      </fieldset>
       <div class="pair">
         <Field
           name="annualHolidayDays"
           label={tx('holidays.annual')}
           hint={tx('holidays.annual_hint_working')}
           kind="days"
-          value={String(MINIMUM_HOLIDAYS.working)}
+          value={String(minimumHolidays('working'))}
           attributes={{
             'data-hint-working': tx('holidays.annual_hint_working'),
             'data-hint-calendar': tx('holidays.annual_hint_calendar'),
@@ -282,6 +317,17 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           </div>
         </Field>
       </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-preaviso"
+      data-sheet="preaviso"
+      aria-labelledby="question-preaviso"
+    >
+      <h2 class="question" id="question-preaviso" tabindex="-1">
+        {tx('notice.question')}
+      </h2>
       <Field
         name="noticeDaysReceived"
         label={tx('holidays.notice_received')}
@@ -303,9 +349,6 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           kind="days"
         />
       </div>
-      <p class="help help--note" data-if-cause="unfair_dismissal disciplinary_dismissal" hidden>
-        {tx('holidays.no_notice')}
-      </p>
     </fieldset>
 
     <fieldset class="sheet" id="sheet-hijos" data-sheet="hijos" aria-labelledby="question-hijos">

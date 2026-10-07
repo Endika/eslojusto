@@ -2,7 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 
 const next = (page: Page) => page.getByRole('button', { name: 'Siguiente' }).click();
 
-// From the cause to the sheet after holidays, with prorated extra pay and no days taken.
+// From the cause to the sheet after holidays and notice, with prorated extra pay and no days taken.
 async function toHolidays(page: Page, cause: string, startDate: string, endDate: string) {
   await page.goto('finiquito/');
   await page.getByLabel(cause).check();
@@ -19,6 +19,8 @@ async function toHolidays(page: Page, cause: string, startDate: string, endDate:
   await next(page);
   await page.getByLabel('Disfrutados este año').fill('0');
   await next(page);
+  // An unfair or disciplinary dismissal has no notice sheet.
+  if (!/improcedente|disciplinario/i.test(cause)) await next(page);
 }
 
 const benefit = (page: Page) => page.getByRole('region', { name: 'Tu paro (estimación)' });
@@ -97,7 +99,7 @@ test('resignation: no benefit sheets and «No da derecho a paro»', async ({ pag
   await toHolidays(page, 'Baja voluntaria (dimisión)', '2022-01-10', '2026-09-15');
   await expect(page.getByRole('heading', { name: '¿Qué pone tu finiquito?' })).toBeVisible();
   await page.getByRole('button', { name: 'Atrás' }).click();
-  await expect(page.getByRole('heading', { name: 'Tus vacaciones y tu preaviso' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Tu preaviso' })).toBeVisible();
   await next(page);
   await page.getByRole('button', { name: 'Revisar' }).click();
 
@@ -128,6 +130,7 @@ test('three more contracts lengthen the duration against this one alone', async 
     .getByRole('navigation', { name: 'Secciones' })
     .getByRole('link', { name: /Vacaciones/ })
     .click();
+  await next(page);
   await next(page);
   await next(page);
   await page.getByLabel('Sí, añadir fechas').check();

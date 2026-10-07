@@ -705,6 +705,7 @@ test('an objective dismissal with an agreement: the reference and the offer, sid
   await next();
   await page.getByLabel('Disfrutados este año').fill('0');
   await next();
+  await next();
   await page.getByLabel('Ninguno').check();
   await next();
   await next();

@@ -15,6 +15,7 @@ async function toTheResult(page: Page) {
   await next();
   await page.locator('#holidayDaysTaken').fill('0');
   await next();
+  await next();
   await page.locator('#figure_pending_salary').fill('1.234,56');
   await page.locator('[data-submit]').click();
   await expect(page.locator('#resultado')).toBeVisible();

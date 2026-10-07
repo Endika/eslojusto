@@ -58,6 +58,7 @@ export const SHEETS = [
   'salario',
   'pagas',
   'vacaciones',
+  'preaviso',
   'hijos',
   'otros',
   'finiquito',
@@ -82,14 +83,8 @@ export const SHEET_FIELDS: Record<Sheet, readonly string[]> = {
   prorrateo: ['extraPayProrated'],
   salario: ['monthlySalary'],
   pagas: ['extraPayCount', 'extraPayAmount', 'extraPayAccrual'],
-  vacaciones: [
-    'holidayUnit',
-    'annualHolidayDays',
-    'holidayDaysTaken',
-    'noticeDaysReceived',
-    'agreementNoticeDays',
-    'noticeDaysGiven',
-  ],
+  vacaciones: ['holidayUnit', 'workDaysPerWeek', 'annualHolidayDays', 'holidayDaysTaken'],
+  preaviso: ['noticeDaysReceived', 'agreementNoticeDays', 'noticeDaysGiven'],
   hijos: ['children'],
   otros: ['otherContracts', 'benefitDrawnSince'],
   finiquito: ITEM_IDS.map(figureField),
@@ -179,6 +174,16 @@ function read(form: HTMLFormElement): Reading {
   const unit = text('holidayUnit');
   if (unit === 'working' || unit === 'calendar') partial.holidayUnit = unit satisfies HolidayUnit;
   else missing('holidayUnit');
+
+  // Asked only with working days: 5, 6 or another number of days a week.
+  const week = text('workDaysPerWeek');
+  if (week === '5' || week === '6') partial.workDaysPerWeek = Number(week);
+  else if (week === 'other') {
+    const n = parseAmount(text('workDaysPerWeekOther') ?? '');
+    if (n === null || Number.isNaN(n))
+      errors.push({ field: 'workDaysPerWeek', code: 'work_week_out_of_range' });
+    else partial.workDaysPerWeek = n;
+  }
 
   // «No lo sé» disables the number, so the engine gets null and marks the item as not checkable.
   const holidaysUnknown = text('holidayDaysTakenUnknown') === 'yes';

@@ -94,7 +94,7 @@ describe('holiday pay in working days', () => {
   it('says the unit and turns the days left into calendar days', () => {
     const p = holidayPayItem(working({ annualHolidayDays: 22, holidayDaysTaken: 10 }));
     const said = text(p.calculation);
-    expect(said).toContain('22 días laborables al año');
+    expect(said).toContain('22 días laborables (5 por semana) al año');
     expect(said).toContain('días laborables pendientes');
     expect(said).toContain('22 días laborables equivalen a 30 naturales');
     expect(text(holidayPayItem(base).calculation)).toContain('30 días naturales al año');
@@ -103,9 +103,35 @@ describe('holiday pay in working days', () => {
   it('says how many days it counted as taken, and in which unit', () => {
     const p = holidayPayItem(working({ annualHolidayDays: 22, holidayDaysTaken: 20 }));
     expect(p.counted && text([p.counted])).toBe(
-      'Hemos contado 20 días laborables disfrutados de 22 al año.',
+      'Hemos contado 20 días laborables (5 por semana) disfrutados de 22 al año.',
     );
     expect(holidayPayItem(working({ holidayDaysTaken: null })).counted).toBeUndefined();
+  });
+
+  it('a six-day week: 26 working days are the 30 calendar days, and no false shortfall', () => {
+    const six = (o: Partial<FinalPayInput>) => working({ workDaysPerWeek: 6, ...o });
+    expect(holidayPayItem(six({ annualHolidayDays: 26 })).range).toEqual(
+      holidayPayItem(base).range,
+    );
+    expect(holidayPayItem(six({ annualHolidayDays: 26 })).basedOnYourAnswer).toBe(false);
+    // Synthetic: 26 a year, 10 taken, an employer paying the calendar-day minimum.
+    const asCalendar = holidayPayItem(withInput({ holidayDaysTaken: (10 * 30) / 26 }));
+    const paid = asCalendar.range?.min ?? 0;
+    const asSix = holidayPayItem(six({ annualHolidayDays: 26, holidayDaysTaken: 10 }));
+    expect(compareItem(asSix, paid).status).not.toBe('below_minimum');
+    // Read as a five-day week, the same answer would have looked short.
+    const asFive = holidayPayItem(working({ annualHolidayDays: 26, holidayDaysTaken: 10 }));
+    expect(compareItem(asFive, paid).status).toBe('below_minimum');
+    expect(text(asSix.calculation)).toContain('26 días laborables equivalen a 30 naturales');
+  });
+
+  it('another week: 30 × days / 7, rounded', () => {
+    expect(
+      holidayPayItem(working({ workDaysPerWeek: 3, annualHolidayDays: 13 })).basedOnYourAnswer,
+    ).toBe(false);
+    expect(
+      holidayPayItem(working({ workDaysPerWeek: 3, annualHolidayDays: 14 })).basedOnYourAnswer,
+    ).toBe(true);
   });
 
   // Synthetic figures: 22 working days a year and 20 taken by late September. Typed as calendar

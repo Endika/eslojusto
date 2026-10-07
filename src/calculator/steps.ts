@@ -12,6 +12,7 @@ export const SECTION_OF_STEP: Record<Step, string> = {
   salario: 'salary',
   pagas: 'salary',
   vacaciones: 'holidays',
+  preaviso: 'holidays',
   hijos: 'holidays',
   otros: 'holidays',
   finiquito: 'settlement',

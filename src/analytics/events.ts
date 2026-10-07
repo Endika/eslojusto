@@ -27,6 +27,7 @@ export const SECTIONS = [
   'salario',
   'pagas',
   'vacaciones',
+  'preaviso',
   'hijos',
   'otros',
   'finiquito',
@@ -54,6 +55,7 @@ const INPUT_FIELDS = [
   'extraPayAmount',
   'extraPayAccrual',
   'holidayUnit',
+  'workDaysPerWeek',
   'annualHolidayDays',
   'holidayDaysTaken',
   'noticeDaysReceived',
@@ -173,6 +175,8 @@ const BASE_CATALOGUE = {
     fixed_term_type: oneOf(FIXED_TERM_TYPES),
     extra_pay: oneOf(EXTRA_PAY),
     holiday_unit: oneOf(HOLIDAY_UNITS),
+    // Days worked a week, asked only with working days.
+    work_week: oneOf(['5', '6', 'other', 'not_applicable']),
     figures_entered: count,
     below_minimum: count,
     matching: count,
@@ -343,6 +347,14 @@ export function reviewProps(data: {
         ? 'no_extra_pay'
         : e.extraPayAccrual,
     holiday_unit: e.holidayUnit,
+    work_week:
+      e.holidayUnit === 'calendar'
+        ? 'not_applicable'
+        : e.workDaysPerWeek === undefined || e.workDaysPerWeek === 5
+          ? '5'
+          : e.workDaysPerWeek === 6
+            ? '6'
+            : 'other',
     figures_entered: review.items.filter((p) => p.employerFigure !== null).length,
     below_minimum: countOf('below_minimum'),
     matching: countOf('matches'),
