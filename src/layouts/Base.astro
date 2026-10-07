@@ -68,7 +68,8 @@ const themeHash = `'sha256-${createHash('sha256').update(initialTheme).digest('b
 const csp = contentSecurityPolicy({
   themeHash,
   analytics: Boolean(import.meta.env.PUBLIC_POSTHOG_KEY),
-  documents: DOCUMENTS?.origins ?? null,
+  // Only the calculator talks to the documents API and Turnstile; every other page stays closed.
+  documents: path === '/finiquito/' ? (DOCUMENTS?.origins ?? null) : null,
 });
 // This page in the other published languages, for the bar that offers the browser's language.
 // Only Spanish is published today, so the list is empty and the bar never shows.

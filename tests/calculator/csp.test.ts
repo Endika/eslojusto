@@ -26,9 +26,12 @@ const files = (dir: string): string[] =>
   });
 
 // The last build may have had the test key (the analytics e2e) or the documents API (the
-// documents e2e); the home page tells which.
-const home = existsSync('dist/index.html') ? readFileSync('dist/index.html', 'utf8') : null;
-const keylessBuild = home !== null && !home.includes('posthog') && !home.includes('cloudflare');
+// documents e2e); the home page and the calculator tell which.
+const read = (p: string) => (existsSync(p) ? readFileSync(p, 'utf8') : null);
+const home = read('dist/index.html');
+const calculator = read('dist/finiquito/index.html');
+const keylessBuild =
+  home !== null && !home.includes('posthog') && !(calculator ?? '').includes('cloudflare');
 
 describe.skipIf(!keylessBuild)('a keyless build tracks nothing', () => {
   const all = keylessBuild ? files('dist') : [];

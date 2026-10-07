@@ -300,6 +300,10 @@ test('the start sheet works by keyboard and fits 360 px in both themes', async (
 
 test('the privacy page and the legal notice describe documents and the pass', async ({ page }) => {
   await page.goto('privacidad/');
+  await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveAttribute(
+    'content',
+    /connect-src 'none';/,
+  );
   const privacy = page.locator('main');
   await expect(privacy).toContainText('Documentos y pagos');
   await expect(privacy).toContainText('arts. 6.1.a y 9.2.a');
