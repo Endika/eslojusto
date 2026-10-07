@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.4.0](https://github.com/Endika/eslojusto/compare/v1.3.0...v1.4.0) (2026-10-07)
+
+
+### Features
+
+* **api:** read a whole pack of page images and merge what it states ([bbbf413](https://github.com/Endika/eslojusto/commit/bbbf41358a888b58ce65e890f015f1dee36085c3))
+* **documents:** read a whole pack: camera, files that add up, PDFs drawn as page images ([e4d5651](https://github.com/Endika/eslojusto/commit/e4d5651b45ebcb316f17dbc0664c800f524499b8))
+* **engine:** give objective dismissals the unfair-dismissal reference ([ad94a7f](https://github.com/Endika/eslojusto/commit/ad94a7f44fe32fa4bc055fe37d79f40406cc75f9))
+
 ## [1.3.0](https://github.com/Endika/eslojusto/compare/v1.2.0...v1.3.0) (2026-10-07)
 
 
