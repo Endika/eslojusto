@@ -279,4 +279,30 @@ describe('global stack', () => {
       /iam:Create|iam:Put|iam:Attach|bedrock|budgets|ssm:GetParameter"|ssm:\*/,
     );
   });
+
+  it('lets CloudFormation manage the API dashboard and no other', () => {
+    const [policy] = Object.values(
+      globalTemplate.findResources('AWS::IAM::ManagedPolicy', {
+        Properties: { ManagedPolicyName: 'eslojusto-api-cfn-execution' },
+      }),
+    ) as { Properties: { PolicyDocument: { Statement: Record<string, unknown>[] } } }[];
+    const cloudwatch = (policy?.Properties.PolicyDocument.Statement ?? []).filter((s) =>
+      JSON.stringify(s['Action']).includes('cloudwatch:'),
+    );
+    expect(cloudwatch).toHaveLength(1);
+    expect(cloudwatch[0]?.['Action']).toEqual([
+      'cloudwatch:PutDashboard',
+      'cloudwatch:GetDashboard',
+      'cloudwatch:DeleteDashboards',
+      'cloudwatch:TagResource',
+      'cloudwatch:UntagResource',
+      'cloudwatch:ListTagsForResource',
+    ]);
+    expect(cloudwatch[0]?.['Resource']).toEqual({
+      'Fn::Join': [
+        '',
+        ['arn:aws:cloudwatch::', { Ref: 'AWS::AccountId' }, ':dashboard/eslojusto-api'],
+      ],
+    });
+  });
 });

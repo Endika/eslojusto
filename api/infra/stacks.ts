@@ -41,6 +41,7 @@ export const DEPLOY_ROLE_NAME = 'eslojusto-github-deploy';
 export const CFN_EXECUTION_POLICY_NAME = 'eslojusto-api-cfn-execution';
 export const DENY_BEDROCK_POLICY_NAME = 'eslojusto-api-deny-bedrock';
 export const BUDGET_NAME = 'eslojusto-api-monthly';
+export const DASHBOARD_NAME = 'eslojusto-api';
 const CDK_QUALIFIER = 'hnb659fds';
 const EXTRACT_RESERVED_CONCURRENCY = 5;
 // Caps how hard checkout and pass can be hammered; each holds a Stripe call, never Bedrock.
@@ -317,6 +318,18 @@ export class GlobalStack extends Stack {
           ]),
         }),
         new iam.PolicyStatement({ actions: ['logs:DescribeLogGroups'], resources: ['*'] }),
+        // Dashboards are global resources: their ARN has no region.
+        new iam.PolicyStatement({
+          actions: [
+            'cloudwatch:PutDashboard',
+            'cloudwatch:GetDashboard',
+            'cloudwatch:DeleteDashboards',
+            'cloudwatch:TagResource',
+            'cloudwatch:UntagResource',
+            'cloudwatch:ListTagsForResource',
+          ],
+          resources: [`arn:aws:cloudwatch::${account}:dashboard/${DASHBOARD_NAME}`],
+        }),
         // The synthesized template checks the bootstrap version through this parameter.
         new iam.PolicyStatement({
           actions: ['ssm:GetParameters'],
