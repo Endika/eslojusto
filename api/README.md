@@ -9,8 +9,10 @@ Three Lambda functions in **eu-south-2** behind function URLs:
 | `pass`     | Verifies a finished Checkout Session and issues the signed pass                          | Stripe                                                  |
 
 Nothing is stored: documents live in the invocation's memory, the server keeps no state, and
-logs carry only `op`, `code`, `latencyMs`, `pages`, `inputTokens`, `outputTokens` and
-`escalated` (`test/http.test.ts` proves it). The manual calculator never calls this API.
+logs carry only `op`, `code`, `latencyMs`, `pages`, `inputTokens`, `outputTokens`,
+`escalated` and two flags (`test/http.test.ts` proves it): `underestimated` when Bedrock
+counted more than twice the input the pre-read estimate allowed for, and `countNotSaved` when
+a pass read went through but Stripe did not store its count. The manual calculator never calls this API.
 
 ```bash
 npm ci
@@ -219,8 +221,10 @@ beyond it: 5 for `extract`, 2 each for `checkout` and `pass`); CORS allows only
 Execution roles: `extract` may `bedrock:InvokeModel` on the two EU inference profiles and on
 their foundation models in the six EU regions the profiles route to, only through those
 profiles (`bedrock:InferenceProfileArn` condition), plus `ssm:GetParameter` on the token key,
-the Turnstile secret and the Stripe key (passes count their reads in Stripe). `checkout` reads
-the Stripe key and the Turnstile secret; `pass` the Stripe key and the token key. Each may
+the Turnstile secret and the Stripe restricted key (passes count their reads in Stripe).
+`checkout` reads the restricted key and the Turnstile secret; `pass` the restricted key and the
+token key. No function can read the account's full Stripe secret key: it is in no parameter
+the roles reach, and the adapter refuses any key that is not `rk_…`. Each may
 write only to its own log group (`log-group:NAME` and `log-group:NAME:*`). The budget action's
 role can be assumed by Budgets only on behalf of this account (`aws:SourceAccount`).
 
@@ -245,19 +249,29 @@ Nothing here has been run. Each step needs an account administrator.
    prints nothing (true on 07-10-2026). Invoke Haiku 4.5 and Sonnet 4.6 once from the console
    playground so the Marketplace subscription exists; the execution role has no Marketplace
    permissions.
-3. **Parameters** (SecureString, default `aws/ssm` key, eu-south-2):
-   `/eslojusto/api/stripe-secret-key`, `/eslojusto/api/token-hmac-key` (at least 32 random
-   bytes, e.g. `openssl rand -base64 48`), `/eslojusto/api/turnstile-secret-key`.
-4. **Global stack:** `npx cdk deploy EslojustoApiGlobal -c stripePriceId=price_… -c alertEmail=<you>`.
+3. **Stripe restricted key** (Dashboard → Developers → API keys → Create restricted key), with
+   exactly: **Checkout Sessions: Write** (create, retrieve with line items, update metadata),
+   **PaymentIntents: Read** and **Charges: Read** (refund and dispute checks); everything else
+   None. One key serves all three functions; the full secret key never leaves the Dashboard.
+4. **Parameters** (SecureString, default `aws/ssm` key, eu-south-2):
+   `/eslojusto/api/stripe-restricted-key`, `/eslojusto/api/token-hmac-key` (at least 32
+   random bytes, e.g. `openssl rand -base64 48`), `/eslojusto/api/turnstile-secret-key`.
+5. **Global stack:** `npx cdk deploy EslojustoApiGlobal -c stripePriceId=price_… -c alertEmail=<you>`.
    Accept the budget-alert subscription email.
-5. **Bootstrap eu-south-2** with the policy from step 4 as CloudFormation's only permission:
+6. **Bootstrap eu-south-2** with the policy from step 5 as CloudFormation's only permission:
    `npx cdk bootstrap aws://<account>/eu-south-2 --cloudformation-execution-policies <CfnExecutionPolicyArn>`.
-6. **GitHub:** create the `production` environment with yourself as required reviewer and
-   deployments limited to `main`; set the variables `AWS_DEPLOY_ROLE_ARN` (step 4 output) and
+7. **GitHub:** create the `production` environment with yourself as required reviewer and
+   deployments limited to `main`; set the variables `AWS_DEPLOY_ROLE_ARN` (step 5 output) and
    `STRIPE_PRICE_ID`. The deploy role trusts only
    `repo:Endika/eslojusto:environment:production`.
-7. **Approve** the `Deploy API` run, then give the three function URLs (stack outputs) and the
+8. **Approve** the `Deploy API` run, then give the three function URLs (stack outputs) and the
    Turnstile site key to the site.
+9. **Before going live, in Stripe test mode with the restricted key:** create a session through
+   `checkout`, pay it with `4242 4242 4242 4242`, redeem it through `pass`, and make one pass
+   read. Then check in the Dashboard that the session's metadata reads `reads_used: 1`. That
+   single call confirms both that Stripe accepts a metadata update on a `complete` session and
+   that the restricted key's permissions are enough (if creating the session fails, add
+   **Prices: Read**). If the log shows `countNotSaved`, passes are not being counted.
 
 ## Cost
 
@@ -273,9 +287,14 @@ million input / output tokens, Sonnet 4.6 at 3.30 / 16.50 (EU profiles).
 | Typical (3 photos or a 2-page PDF), Haiku only | 6,000–10,600    | ~1,500               | 0.015–0.02 USD               |
 | Worst case, Haiku only (estimate at the cap)   | 32,000          | 4,096 (`max_tokens`) | 0.058 USD                    |
 | Worst case escalated, Haiku + Sonnet 4.6       | 25,000 + 25,000 | 4,096 + 4,096        | 0.050 + 0.150 = **0.20 USD** |
+| Estimate fooled, Haiku only                    | up to 200,000   | 4,096                | 0.22 + 0.02 = **0.25 USD**   |
 
-The worst case needs a document the estimate let through at the escalation cap and a doubtful
-first read; a free read also needs a fresh captcha, and at most 5 run at once.
+**Honest worst case: about 0.25 USD per read when a document fools the pre-read estimate,
+0.20 USD otherwise.** Fooling it means text the inspector does not count (for instance behind
+duplicate objects inside compressed object streams); the read can then take Haiku's whole
+200,000-token context, but it never escalates, because Bedrock's real count is far over the
+25,000 escalation cap. Such a read is logged with `underestimated`, so it shows up. Either way a
+free read needs a fresh captcha, and at most 5 reads run at once.
 
 ## Unverified
 
@@ -284,9 +303,10 @@ first read; a free read also needs a fresh captcha, and at most 5 run at once.
 - That `iam:AttachRolePolicy`/`DetachRolePolicy` on the one role is all the budget action needs.
 - That `data_retention_mode: none` set in eu-south-2 also governs requests the EU profile
   routes to other EU regions.
-- That Stripe accepts a metadata update on a `complete` Checkout Session. The API reference
-  lists `metadata` among the update parameters without the "while the session is active"
-  restriction it puts on others; confirm with one test-mode call before going live.
+- That Stripe accepts a metadata update on a `complete` Checkout Session, and that the three
+  restricted-key permissions are enough. The API reference lists `metadata` among the update
+  parameters without the "while the session is active" restriction it puts on others; step 9
+  of the deployment confirms both with one test-mode call.
 - That a PDF hiding pages behind duplicate objects _inside compressed object streams_
   (invisible to the raw scan) is caught; the token estimate and the escalation cap still bound
   its cost.
