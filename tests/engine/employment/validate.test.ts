@@ -193,6 +193,20 @@ describe('validate', () => {
   });
 });
 
+describe('validate holidays', () => {
+  const withDays = (days: number): Partial<EmploymentInput> => ({
+    holidays: { days, unit: 'calendar', workDaysPerWeek: null, includedInSalary: false },
+  });
+
+  it.each([0, 8.22, 366])('accepts %s holiday days', (days) => {
+    expect(errorsOf(withDays(days))).toEqual([]);
+  });
+
+  it.each([-1, 367, Number.NaN])('rejects %s holiday days', (days) => {
+    expect(errorsOf(withDays(days))).toEqual([['holidays.days', null, 'count_range']]);
+  });
+});
+
 describe('validationWarnings', () => {
   const withBreakdown = (amount: number, base: number) =>
     contract({

@@ -213,7 +213,7 @@ export function validate(input: EmploymentInput, today: CivilDate): readonly Val
   weekly('realWeeklyHours', input.realWeeklyHours);
 
   if (input.holidays !== null) {
-    if (!positiveUpTo(input.holidays.days, MAX_DAYS_IN_YEAR)) fail('holidays.days', 'count_range');
+    if (!inRange(input.holidays.days, 0, MAX_DAYS_IN_YEAR)) fail('holidays.days', 'count_range');
     const perWeek = input.holidays.workDaysPerWeek;
     if (perWeek !== null && (!isCount(perWeek, 7) || perWeek < 1))
       fail('holidays.workDaysPerWeek', 'count_range');
