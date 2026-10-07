@@ -69,6 +69,7 @@ export type RentalPhraseKey =
   | 'charges.tax_outside_cap'
   | 'charges.tax_banned'
   | 'charges.waste_may_be_tax'
+  | 'charges.other_kind'
   | 'deposit.pending'
   | 'deposit.deduction.damage'
   | 'deposit.deduction.cleaning'
