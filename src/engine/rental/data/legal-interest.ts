@@ -1,9 +1,9 @@
 import type { LegalInterestYear } from '../legal-interest';
 
-// Banco de España table, checked on 07-10-2026. Since 2024 the 3,25 % of the 2023 budget law
+// Banco de España table, checked on 08-10-2026. Since 2024 the 3,25 % of the 2023 budget law
 // (Ley 31/2022, DA 42.ª) still applies because that budget stays extended (art. 134.4 CE).
 const BDE_TABLE =
-  'https://clientebancario.bde.es/pcb/es/menu-horizontal/productosservici/relacionados/tiposinteres/guia-textual/tiposinteresrefe/Tabla_tipos_de_interes_legal.html';
+  'https://clientebancario.bde.es/pcb/es/menu-horizontal/podemosayudarte/tiposinteres/guia_textual/tiposinteresreferenciaotrostiposfrecuentes/Tabla_tipos_de_interes_legal.html';
 
 export const LEGAL_INTEREST: readonly LegalInterestYear[] = [
   { year: 2016, rate: 3, url: BDE_TABLE },
