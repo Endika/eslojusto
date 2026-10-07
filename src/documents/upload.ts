@@ -405,7 +405,11 @@ export function setUpUpload<F extends string, L extends string>(
     }
     const n = p.count;
     summary.textContent =
-      n === 0 ? tr('client.documents.done_none') : tr('client.documents.done', { n });
+      n === 0
+        ? tr('client.documents.done_none')
+        : n === 1
+          ? tr('client.documents.done_one')
+          : tr('client.documents.done', { n });
     const lines = [...skipped, ...p.notes, ...checks.map((c) => tr(`client.documents.check.${c}`))];
     notes.hidden = lines.length === 0;
     notes.replaceChildren(
