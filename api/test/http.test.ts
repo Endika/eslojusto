@@ -72,6 +72,26 @@ describe('handleExtract', () => {
     expect(reader.calls[0]?.files[0]?.bytes).toEqual(jpeg(1000, 1400));
   });
 
+  it('says whether the read escalated, which carries nothing about the person', async () => {
+    const confident = extractDeps();
+    expect(json(await handleExtract(post(extractBody()), confident.deps))).toMatchObject({
+      code: 'ok',
+      escalated: false,
+    });
+    const doubtful = extractDeps(coherentSettlement('low'));
+    expect(json(await handleExtract(post(extractBody()), doubtful.deps))).toMatchObject({
+      code: 'ok',
+      escalated: true,
+    });
+  });
+
+  it('keeps escalated out of error answers', async () => {
+    const { deps } = extractDeps();
+    expect(json(await handleExtract(post(extractBody({ captchaToken: '' })), deps))).toEqual({
+      code: 'invalid_request',
+    });
+  });
+
   it('accepts a base64-encoded event body', async () => {
     const { deps } = extractDeps();
     const event = {
