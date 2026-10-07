@@ -3,6 +3,7 @@ import type { Range } from '../engine/money';
 import type { Source } from '../engine/sources';
 import {
   BENEFIT_2026,
+  benefitState,
   type BenefitDuration,
   type BenefitEstimate,
   type Children,
@@ -10,7 +11,6 @@ import {
 import type { Review } from '../engine/review';
 import type { Cause, Item, ItemId } from '../engine/types';
 import type { ClientKey, Translate } from '../i18n/client';
-import { benefitState } from '../analytics/events';
 import type { FieldError } from './form';
 import { formatInteger, formatEuros, formatWholeEuros } from './number';
 

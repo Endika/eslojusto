@@ -1,4 +1,4 @@
-import type { BenefitEstimate } from '../engine/unemployment';
+import { BENEFIT_STATES, benefitState, type BenefitEstimate } from '../engine/unemployment';
 import type { EmployerFigures, Review } from '../engine/review';
 import type { Cause, FinalPayInput, ItemId, FixedTermType } from '../engine/types';
 import { FAQ_TOPICS } from '../content/faq-topics';
@@ -85,13 +85,7 @@ const FIXED_TERM_TYPES = [
 ] as const satisfies readonly (FixedTermType | 'not_applicable')[];
 const EXTRA_PAY = ['prorated', 'annual', 'semiannual', 'unknown', 'no_extra_pay'] as const;
 const OUTCOMES = ['shortfall', 'all_match', 'only_not_checkable', 'no_figures'] as const;
-// Whether the benefit sheet showed amounts; never the children, the dates or the amounts.
-const BENEFIT_STATES = ['not_applicable', 'with_figures', 'no_figures'] as const;
 const OTHER_CONTRACT_BUCKETS = ['0', '1', '2', '3+'] as const;
-export type BenefitState = (typeof BENEFIT_STATES)[number];
-
-export const benefitState = (p: BenefitEstimate): BenefitState =>
-  p.entitled === 'no' ? 'not_applicable' : p.figures === null ? 'no_figures' : 'with_figures';
 export type Outcome = (typeof OUTCOMES)[number];
 
 export const ERROR_TYPES = [

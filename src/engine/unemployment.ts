@@ -91,6 +91,13 @@ export type BenefitEstimate =
 
 export type NoFiguresReason = 'short_contract' | 'base_below_minimum';
 
+// Whether the benefit sheet shows amounts; never the children, the dates or the amounts.
+export const BENEFIT_STATES = ['not_applicable', 'with_figures', 'no_figures'] as const;
+export type BenefitState = (typeof BENEFIT_STATES)[number];
+
+export const benefitState = (p: BenefitEstimate): BenefitState =>
+  p.entitled === 'no' ? 'not_applicable' : p.figures === null ? 'no_figures' : 'with_figures';
+
 // Truncates to cents like the SEPE simulator; the epsilon absorbs float noise such as 1750 × 0.7.
 export const trunc2 = (x: number): number => Math.floor(x * 100 + 1e-6) / 100;
 
