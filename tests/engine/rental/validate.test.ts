@@ -206,4 +206,20 @@ describe('rental input validation', () => {
       ['moveOut', 'keys_in_future'],
     ]);
   });
+
+  it('wants each return between the keys and today', () => {
+    const moveOut = (on: string) => ({
+      keysReturnedOn: f('2026-06-30'),
+      returns: [{ on: f(on), amount: 500 }],
+      deductions: [],
+    });
+    expect(codes(contract({ moveOut: moveOut('2026-06-30') }))).toEqual([]);
+    expect(codes(contract({ moveOut: moveOut('2026-10-07') }))).toEqual([]);
+    expect(codes(contract({ moveOut: moveOut('2026-06-29') }))).toEqual([
+      ['moveOut', 0, 'return_before_keys'],
+    ]);
+    expect(codes(contract({ moveOut: moveOut('2026-10-08') }))).toEqual([
+      ['moveOut', 0, 'return_in_future'],
+    ]);
+  });
 });
