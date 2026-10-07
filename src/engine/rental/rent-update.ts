@@ -295,6 +295,8 @@ const BASE_PHRASE = {
 
 // The rent the update allows in one reading, and the rules behind it.
 interface Allowed {
+  // The rise applied, in %: the lower of the agreed rate and the cap, never below 0.
+  readonly rate: number;
   readonly maxRent: number;
   // The rent from which the next anniversary updates; null when only an upper bound is known.
   readonly carried: number | null;
@@ -325,6 +327,7 @@ function allowance(
   const unchanged = (phrase: RentalPhrase, rules: readonly RuleId[]): Allowance => ({
     ok: true,
     allowed: {
+      rate: 0,
       maxRent: base,
       carried: base,
       agreed: null,
@@ -435,6 +438,7 @@ function allowance(
   return {
     ok: true,
     allowed: {
+      rate: effective,
       maxRent,
       carried: upperBoundOnly
         ? agreedInWriting
@@ -590,6 +594,66 @@ const measure: Measure<RentUpdateReading> = {
 };
 
 export const rentUpdateAmount = measure.amount;
+
+export type RiseRate =
+  | {
+      readonly ok: true;
+      // % the rent may rise; with an `other` clause, only its upper bound.
+      readonly rate: number;
+      readonly upperBoundOnly: boolean;
+      readonly rules: readonly RuleId[];
+    }
+  | {
+      readonly ok: false;
+      readonly unchecked: RentUpdateUnchecked;
+      readonly rules: readonly RuleId[];
+    };
+
+export interface AllowedRise {
+  // The doubts the rise opens; the same ids as a rent update on that anniversary.
+  readonly doubts: readonly Doubt[];
+  readonly rateIn: (world: World) => RiseRate;
+}
+
+// The rise the rent may take on an anniversary under its clause and the cap in force, with no new
+// agreement (LAU art. 18.1), whether or not the landlord applied one.
+export function allowedRise(
+  input: RentalInput,
+  anniversary: CivilDate,
+  deps: RentalDeps,
+): AllowedRise {
+  const update: RentUpdateInput = {
+    anniversary,
+    effectiveOn: anniversary,
+    previousRent: input.initialRent,
+    newRent: input.initialRent,
+    chargedFrom: anniversary,
+    notice: 'letter',
+    noticeOn: anniversary,
+    agreedInWriting: false,
+  };
+  const frame = frameOf(
+    { ...input, updates: [update] },
+    [{ index: 0, update }],
+    0,
+    anniversary,
+    deps,
+  );
+  return {
+    doubts: frame.doubts,
+    rateIn: (world) => {
+      const a = allowance(input, frame, input.initialRent, world, deps.norms);
+      return a.ok
+        ? {
+            ok: true,
+            rate: a.allowed.rate,
+            upperBoundOnly: a.allowed.upperBoundOnly,
+            rules: a.allowed.rules,
+          }
+        : { ok: false, unchecked: a.unchecked, rules: a.rules };
+    },
+  };
+}
 
 // Each reading of an update is worked out once per open doubt combination and carried base;
 // past this many, the update says it cannot be checked rather than run on.
