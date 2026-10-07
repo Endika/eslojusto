@@ -74,17 +74,28 @@ budget action.
 included, and the API refuses a body over 6 MiB. Base64 adds a third, so the browser keeps the
 JSON under 5.8 MB (`requestBudgetBytes` in `src/documents/contract.ts`), shared out among the
 images: each photo or PDF page is re-encoded as JPEG at falling quality (0.85, 0.75, 0.65, 0.5)
-until it fits its share, and only when no quality does, at 1280 and then 1100 px on the long side,
-from 0.65 down (`encodingSteps` in `src/documents/files.ts`: on a page that missed at 0.5, 0.75
-weighs more than a shorter side saves). With 15 images that is about
-290 KB each, which a 1568-px document page usually meets by quality 0.65 and even a photo with
-heavy sensor noise by 0.5; with 25, about 174 KB each, which a clean page or a PDF page still
-meets at 1568 px and a noisy photo at 1280 px (`tests/e2e/documents.spec.ts` sends 25 of them).
-So the long side is shortened by what each page weighs, not by how many there are: a pack of up
-to about 15 keeps 1568 px, and a larger one loses resolution only on the pages that need it.
-1100 px is the floor because a comparison on real packs found phone photos read as accurately
-there as at 1568 px; small print at 1100 px is not proven. If the pack still does not fit, the
-browser says the files are too heavy before sending anything.
+until it fits its share, and only when no quality does, at 1280 px (0.65, 0.5) and then 1100 px
+(0.65 down to 0.3) on the long side (`encodingSteps` in `src/documents/files.ts`: on a page that
+missed at 0.5, 0.75 weighs more than a shorter side saves). Measured in Chrome on synthetic pages:
+
+| Page (long side 1568 px)            | 1568 px, 0.5 | 1280 px, 0.5 | 1100 px, 0.5 / 0.4 / 0.3 |
+| ----------------------------------- | ------------ | ------------ | ------------------------ |
+| Letter, 18-px text every 40 px      | 214 KB       | 160 KB       | 137 / 122 / 104 KB       |
+| Dense, 18-px text every 28 px       | 322 KB       | 219 KB       | 181 / 159 / 136 KB       |
+| Dense photo with heavy sensor noise | 529 KB       | 295 KB       | 230 / 197 / 162 KB       |
+
+With 15 images the share is about 290 KB, so a letter keeps 1568 px (251 KB at 0.65) and only a
+dense or noisy page drops to 1280. With 25 it is about 174 KB: a letter drops to 1280, a dense
+page to 1100 at 0.4, and a noisy photo to 1100 at 0.3 (`tests/e2e/documents.spec.ts` checks that 25
+noisy synthetic photos fit one request). So the long side is shortened by what each page weighs, not by how many there are,
+and only on the pages that need it. 1100 px is the floor because a comparison on real packs found
+phone photos read as accurately there as at 1568 px (small print at 1100 px is not proven); at
+1100 px, 0.4 and 0.3 read as well as 0.5 by eye on 18-px and 13-px text, because the resize costs
+far more than the quality. While it encodes, the browser says how far it got («Preparando 7 de
+25…», at most every 500 ms), and it stops with `payload_too_large` as soon as what is left can't
+fit even at the lighter of the last page's size and 40 KB (`cannotFit`), with a hint to remove a
+photo or send a document as PDF, whose pages weigh less. If the pack still does not fit at the
+end, the browser says the files are too heavy before sending anything.
 
 `ok` answers:
 
