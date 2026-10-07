@@ -322,6 +322,8 @@ function allowance(
   base: number,
   world: World,
   norms: NormTable,
+  // Whether the extraordinary caps (RDL 6/2022 art. 46 and those after it) bind as well as art. 18.1.
+  extraordinary = true,
 ): Allowance {
   const { update, day, active, refs } = frame;
   const unchanged = (phrase: RentalPhrase, rules: readonly RuleId[]): Allowance => ({
@@ -359,7 +361,9 @@ function allowance(
 
   const agreedInWriting = update.agreedInWriting ?? world[frame.ids.agreement] === true;
   const largeLandlord = input.largeLandlord ?? world[LARGE_LANDLORD] === true;
-  const extra = [...active.keys()].filter((id) => EXTRA_CAPS[id] !== undefined && holds(id));
+  const extra = extraordinary
+    ? [...active.keys()].filter((id) => EXTRA_CAPS[id] !== undefined && holds(id))
+    : [];
 
   // The caps that bind: with a new agreement, only those that bind a large landlord anyway.
   const caps: { rule: RuleId; rate: IndexId | number }[] = [];
@@ -615,6 +619,11 @@ export interface AllowedRise {
   readonly rateIn: (world: World) => RiseRate;
 }
 
+// LAU art. 20.2 limits charges by the rise «conforme a lo dispuesto en el apartado 1 del artículo
+// 18»; whether that takes in the extraordinary caps is not settled, so both readings are worked
+// out. One doubt for every anniversary: the reading is the same each year.
+const EXTRAORDINARY_CAPS: Doubt = { id: 'extraordinary_caps', reason: 'extraordinary_cap_reach' };
+
 // The rise the rent may take on an anniversary under its clause and the cap in force, with no new
 // agreement (LAU art. 18.1), whether or not the landlord applied one.
 export function allowedRise(
@@ -639,10 +648,18 @@ export function allowedRise(
     anniversary,
     deps,
   );
+  const extraordinary = [...frame.active.keys()].some((id) => EXTRA_CAPS[id] !== undefined);
   return {
-    doubts: frame.doubts,
+    doubts: extraordinary ? [...frame.doubts, EXTRAORDINARY_CAPS] : frame.doubts,
     rateIn: (world) => {
-      const a = allowance(input, frame, input.initialRent, world, deps.norms);
+      const a = allowance(
+        input,
+        frame,
+        input.initialRent,
+        world,
+        deps.norms,
+        world[EXTRAORDINARY_CAPS.id] === true,
+      );
       return a.ok
         ? {
             ok: true,

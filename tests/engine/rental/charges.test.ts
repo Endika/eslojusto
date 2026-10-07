@@ -109,8 +109,9 @@ describe('a charge agreed with its yearly amount', () => {
   });
 
   it('a rise still pending validation gives both readings and counts the lower', () => {
-    // Anniversary 20-10-2026, synthetic IRAV September 2026 2,5 %. Under RDL 29/2026 the 2 % cap
-    // with no new agreement: 600 × 1,04 = 624; without it 600 × 1,05 = 630. 640 charged.
+    // Anniversary 20-10-2026, synthetic IRAV September 2026 2,5 %. Where RDL 29/2026 holds and
+    // its 2 % cap (DF 6.ª) counts for charges: 600 × 1,04 = 624; otherwise 600 × 1,05 = 630.
+    // 640 charged.
     const [r] = checkCharges(
       input([community({ charged: [{ year: 2026, amount: 640 }] })], {
         signedOn: f('2025-10-15'),
@@ -119,7 +120,7 @@ describe('a charge agreed with its yearly amount', () => {
       FUTURE,
     );
     if (r?.outcome.kind !== 'depends') throw new Error('expected depends');
-    expect(r.outcome.reasons).toEqual(['pending_validation']);
+    expect(r.outcome.reasons).toEqual(['pending_validation', 'extraordinary_cap_reach']);
     expect(countedAmount(r.outcome, itemAmount)).toBe(10);
     expect(highestAmount(r.outcome, itemAmount)).toBe(16);
   });
@@ -133,6 +134,28 @@ describe('a charge agreed with its yearly amount', () => {
       DEPS,
     );
     expect(singleOf(r).status).toBe('not_checkable');
+  });
+});
+
+describe('the extraordinary caps', () => {
+  it('count for charges only in one reading, so the RDL 6/2022 IGC cap adds nothing to the total', () => {
+    // Anniversary 01-06-2022: the CPI clause and art. 18.1 allow a rise far above 640 / 600, while
+    // the IGC cap of RDL 6/2022 (at most 2 %) gives 600 × 1,04 = 624 at most.
+    for (const largeLandlord of [false, true, null]) {
+      const [r] = checkCharges(
+        input([community({ charged: [{ year: 2022, amount: 640 }] })], {
+          signedOn: f('2021-06-01'),
+          startDate: f('2021-06-01'),
+          updateClause: 'ipc',
+          largeLandlord,
+        }),
+        DEPS,
+      );
+      if (r?.outcome.kind !== 'depends') throw new Error('expected depends');
+      expect(r.outcome.reasons).toContain('extraordinary_cap_reach');
+      expect(r.outcome.readings.map((x) => x.value.status)).toContain('paid_over');
+      expect(countedAmount(r.outcome, itemAmount)).toBe(0);
+    }
   });
 });
 

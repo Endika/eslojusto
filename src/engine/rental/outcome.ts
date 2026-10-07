@@ -14,7 +14,10 @@ export type DoubtReason =
   // Notice by email or messaging: whether it counts as written (LAU art. 18.2) is not settled.
   | 'notice_form_doubtful'
   // No norm says whether the legal interest year has 365 (366) or 360 days.
-  | 'interest_day_count';
+  | 'interest_day_count'
+  // Whether the limit on service charges (LAU art. 20.2), which points to art. 18.1, takes in the
+  // extraordinary caps on rent updates.
+  | 'extraordinary_cap_reach';
 
 const REASON_ORDER: readonly DoubtReason[] = [
   'pending_validation',
@@ -24,6 +27,7 @@ const REASON_ORDER: readonly DoubtReason[] = [
   'agreement_unknown',
   'notice_form_doubtful',
   'interest_day_count',
+  'extraordinary_cap_reach',
 ];
 
 export interface Doubt {
