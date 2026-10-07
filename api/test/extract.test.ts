@@ -153,6 +153,18 @@ describe('extract', () => {
     expect(response.code).toBe('ok');
   });
 
+  it('flags a read that cost more than twice its estimate', async () => {
+    // One 1176 × 1568 photo: 3,000 + 42 × 56 = 5,352 estimated tokens.
+    const fooled = setup({ [PRIMARY]: read(coherentSettlement(), 10_705) });
+    const metrics: ExtractMetrics = {};
+    await extract(request(), fooled.deps, metrics);
+    expect(metrics.underestimated).toBe(true);
+    const honest = setup({ [PRIMARY]: read(coherentSettlement(), 10_704) });
+    const fine: ExtractMetrics = {};
+    await extract(request(), honest.deps, fine);
+    expect(fine.underestimated).toBeUndefined();
+  });
+
   it('falls back to the primary read if the escalation call fails', async () => {
     const { deps } = setup({
       [PRIMARY]: read(coherentSettlement('low')),
@@ -354,15 +366,19 @@ describe('extract with a pass', () => {
     ).toEqual({ code: 'payment_provider_unavailable' });
   });
 
-  it('still answers when Stripe fails to store the count', async () => {
+  it('still answers when Stripe fails to store the count, and flags it', async () => {
     const { deps } = pass({ cs_test_paid: paidSession() });
     const flaky = {
       ...deps,
       payments: new FakePayments({ cs_test_paid: paidSession() }, 'record'),
     };
-    expect(
-      (await extract(request({ allowance: { type: 'pass', token: passToken() } }), flaky, {})).code,
-    ).toBe('ok');
+    const metrics: ExtractMetrics = {};
+    const allowance = { type: 'pass' as const, token: passToken() };
+    expect((await extract(request({ allowance }), flaky, metrics)).code).toBe('ok');
+    expect(metrics.countNotSaved).toBe(true);
+    const saved: ExtractMetrics = {};
+    await extract(request({ allowance }), deps, saved);
+    expect(saved.countNotSaved).toBeUndefined();
   });
 });
 

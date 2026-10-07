@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createHmacSigner } from '../src/adapters/hmac-signer';
+import { passClaims } from '../src/domain/allowance';
 import { pdfInspector } from '../src/adapters/pdf-inspector';
 import { consoleLogger } from '../src/adapters/runtime';
 import type { ExtractDeps } from '../src/domain/extract';
@@ -15,6 +16,7 @@ import {
   FakePayments,
   FakeReader,
   MemoryLogger,
+  paidSession,
   PRIMARY,
   read,
 } from './support/fakes';
@@ -145,6 +147,30 @@ describe('handleExtract', () => {
         inputTokens: 2000,
         outputTokens: 400,
         escalated: true,
+      },
+    ]);
+  });
+});
+
+describe('flags in the log line', () => {
+  it('marks a pass read whose count Stripe failed to store, with nothing about the person', async () => {
+    const { deps, logger } = extractDeps();
+    const pass = signer.sign(passClaims('cs_test_paid', Date.UTC(2026, 9, 13) / 1000));
+    const response = await handleExtract(post(extractBody({ pass })), {
+      ...deps,
+      payments: new FakePayments({ cs_test_paid: paidSession() }, 'record'),
+    });
+    expect(json(response)).toMatchObject({ code: 'ok', readsLeft: 14 });
+    expect(logger.events).toEqual([
+      {
+        op: 'extract',
+        code: 'ok',
+        latencyMs: 0,
+        pages: 1,
+        inputTokens: 1000,
+        outputTokens: 200,
+        escalated: false,
+        countNotSaved: true,
       },
     ]);
   });

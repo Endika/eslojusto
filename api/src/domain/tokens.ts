@@ -18,6 +18,9 @@ export const MAX_ESTIMATED_INPUT_TOKENS = 32_000;
 // and above it a second, dearer read is never worth it.
 export const MAX_ESCALATION_INPUT_TOKENS = 25_000;
 
+// A read that costs more than this many times its estimate means the estimator was fooled.
+export const UNDERESTIMATE_FACTOR = 2;
+
 // Claude's own formula: one token per 28 × 28 patch.
 export const imageTokens = ({ width, height }: ImageSize): number =>
   Math.ceil(width / 28) * Math.ceil(height / 28);

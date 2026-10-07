@@ -54,6 +54,8 @@ export interface Metrics {
   inputTokens?: number;
   outputTokens?: number;
   escalated?: boolean;
+  underestimated?: boolean;
+  countNotSaved?: boolean;
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
