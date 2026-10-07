@@ -632,6 +632,7 @@ export const es = {
   'client.documents.confidence.medium': 'media',
   'client.documents.confidence.low': 'baja',
   'client.documents.status.preparing': 'Preparando los archivos…',
+  'client.documents.status.preparing_n': 'Preparando {k} de {total}…',
   'client.documents.status.captcha': 'Comprobando que no eres un robot…',
   'client.documents.status.reading':
     'Leyendo los documentos. Puede tardar hasta dos minutos si son muchas páginas.',
@@ -728,7 +729,7 @@ export const es = {
   'client.documents.error.invalid_request':
     'No se ha podido leer el documento. Prueba otra vez o rellena a mano.',
   'client.documents.error.payload_too_large':
-    'Los archivos ocupan demasiado. Quita alguna foto o algún PDF y prueba otra vez.',
+    'Los archivos ocupan demasiado para enviarlos juntos. Quita alguna foto y prueba otra vez. Si tienes algún documento en PDF, súbelo en PDF y no en foto: sus páginas pesan menos.',
   'client.documents.error.no_files': 'Añade al menos una foto o un PDF',
   'client.documents.error.too_many_files': 'Como mucho 25 fotos o páginas de PDF en total',
   'client.documents.error.unsupported_media_type':

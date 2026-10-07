@@ -732,7 +732,7 @@ test.describe('a PDF that would take minutes to draw', () => {
     ).toHaveCount(1);
     await page.getByLabel(/Doy mi consentimiento explícito/).check();
     await page.getByRole('button', { name: 'Leer los documentos' }).click();
-    await expect(page.getByText('Preparando los archivos…')).toBeVisible();
+    await expect(page.getByText('Preparando 1 de 1…')).toBeVisible();
   }
 
   test('«Rellenar a mano» leaves while it is being drawn', async ({ page }) => {
@@ -784,7 +784,7 @@ test('the 26th file is left out with a message, and 25 go in one read', async ({
   await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
   const sent = fake.extract[0]?.postDataJSON() as { files: { data: string }[] };
   expect(sent.files).toHaveLength(25);
-  // Clean pages fit their share at the full size.
+  // Light pages fit their share at the full size.
   expect(new Set(longSides(sent.files))).toEqual(new Set([1568]));
 });
 
@@ -803,6 +803,7 @@ test('25 noisy photos fit one request, a shorter side only where the share needs
   );
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
+  await expect(page.locator('[data-doc-status]')).toHaveText(/^Preparando \d+ de 25…$/);
   // Each noisy page is encoded several times before one fits.
   await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused({
     timeout: 60_000,

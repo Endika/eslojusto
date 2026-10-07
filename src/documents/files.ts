@@ -94,13 +94,15 @@ export function fitWithin(width: number, height: number, max: number = LIMITS.ma
 }
 
 // Tried in turn until an image fits its share of the request (api/README.md, «Payload budget»):
-// every quality at the full size first, and only then a shorter long side, which a pack of up to
-// about fifteen pages never needs and a larger one of noisy photos may.
-export const JPEG_QUALITIES = [0.85, 0.75, 0.65, 0.5] as const;
-export const LONG_SIDES = [LIMITS.maxImageLongSide, 1280, 1100] as const;
-// On a page that missed at 0.5, 0.75 weighs about 1.7 times as much, more than a shorter side
-// takes off (a third of the pixels at most), so a shorter side starts at 0.65.
-const SHORTER_SIDE_QUALITIES = [0.65, 0.5] as const;
+// every quality at the full size first, and only then a shorter long side. On a page that missed
+// at 0.5, 0.75 weighs about 1.7 times as much, more than a shorter side takes off, so a shorter
+// side starts at 0.65. At 1100 px, 0.4 and 0.3 still read as well as 0.5, since the resize costs
+// far more than the quality, and they bring a dense or noisy page under a full pack's share.
+const ENCODING_LADDER = [
+  { side: LIMITS.maxImageLongSide, qualities: [0.85, 0.75, 0.65, 0.5] },
+  { side: 1280, qualities: [0.65, 0.5] },
+  { side: 1100, qualities: [0.65, 0.5, 0.4, 0.3] },
+] as const;
 
 export interface EncodingStep {
   readonly width: number;
@@ -108,16 +110,19 @@ export interface EncodingStep {
   readonly quality: number;
 }
 
-// The sizes and qualities an image of `width` × `height` is encoded at in turn, each size once:
+// The sizes and qualities an image of `width` × `height` is encoded at in turn, each pair once:
 // one that is already short is never enlarged, so it may have a single size.
 export function encodingSteps(width: number, height: number): EncodingStep[] {
   const steps: EncodingStep[] = [];
-  for (const side of LONG_SIDES) {
+  for (const { side, qualities } of ENCODING_LADDER) {
     const size = fitWithin(width, height, side);
-    const last = steps.at(-1);
-    if (last?.width === size.width && last.height === size.height) continue;
-    for (const quality of last ? SHORTER_SIDE_QUALITIES : JPEG_QUALITIES)
-      steps.push({ ...size, quality });
+    for (const quality of qualities)
+      if (
+        !steps.some(
+          (s) => s.width === size.width && s.height === size.height && s.quality === quality,
+        )
+      )
+        steps.push({ ...size, quality });
   }
   return steps;
 }
@@ -148,6 +153,18 @@ export const encodedSize = (bytes: number) => Math.ceil(bytes / 3) * 4 + FILE_OV
 export function photoShare(usedBytes: number, photosLeft: number): number {
   const left = LIMITS.requestBudgetBytes - usedBytes - photosLeft * FILE_OVERHEAD;
   return Math.max(0, Math.floor(left / Math.max(1, photosLeft) / 4) * 3);
+}
+
+// What a page weighs at least once encoded at its last step: a sparse page at 1100 px and quality
+// 0.3 is about 47 KB, and only a nearly blank one is lighter.
+export const LIGHTEST_PAGE_BYTES = 40_000;
+
+// Whether the images still to encode can't fit what the budget has left, even each at the lighter
+// of the last image's size and LIGHTEST_PAGE_BYTES: reading would end in `payload_too_large`, so
+// it can stop now.
+export function cannotFit(usedBytes: number, imagesLeft: number, lastBytes: number): boolean {
+  const lightest = encodedSize(Math.min(lastBytes, LIGHTEST_PAGE_BYTES));
+  return usedBytes + imagesLeft * lightest > LIMITS.requestBudgetBytes;
 }
 
 export function bytesToBase64(bytes: Uint8Array): string {

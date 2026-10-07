@@ -11,7 +11,7 @@ import {
   type ErrorCode,
   type Extraction,
 } from './contract';
-import { admit, checkSelection, filesBucket, photoShare, requestBytes } from './files';
+import { admit, cannotFit, checkSelection, filesBucket, photoShare, requestBytes } from './files';
 import type { OutageMemory } from './outage';
 import { passClaims, passState, type PassStore, type StoredPass } from './pass';
 import { qualityProblem, type QualityProblem } from './quality';
@@ -52,6 +52,8 @@ export interface UploadDeps {
 }
 
 type Panel = 'choose' | 'upload' | 'done';
+// How often, at most, preparing the files says how far it got.
+const PROGRESS_MS = 500;
 type LocalError = 'consent_missing';
 
 const KIB = 1024;
@@ -472,14 +474,23 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     return true;
   }
 
-  // Encodes the pages in their order, sharing what the request may weigh among them. A PDF's
-  // pages are kept once drawn, and the document closed, so a second try needs no reader.
+  // Encodes the pages in their order, sharing what the request may weigh among them, and says how
+  // far it got at most every PROGRESS_MS. A PDF's pages are kept once drawn, and the document
+  // closed, so a second try needs no reader. Gives up as soon as the rest can't fit.
   async function encodeAll(
     pages: readonly Picked[],
     started: number,
-  ): Promise<EncodedFile[] | { readonly tooSlow: OpenedPdf } | null> {
+  ): Promise<EncodedFile[] | { readonly tooSlow: OpenedPdf } | 'payload_too_large' | null> {
     const encoded: EncodedFile[] = [];
+    let said = -Infinity;
     for (const [i, p] of pages.entries()) {
+      if (deps.now() - said >= PROGRESS_MS) {
+        said = deps.now();
+        status.textContent = tr('client.documents.status.preparing_n', {
+          k: i + 1,
+          total: pages.length,
+        });
+      }
       const share = photoShare(requestBytes(encoded), pages.length - i);
       const kept = encodedPages.get(p);
       const image =
@@ -489,6 +500,8 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       if (image === 'pdf_too_slow') return p.pdf ? { tooSlow: p.pdf.opened } : null;
       if (p.pdf) encodedPages.set(p, image);
       encoded.push(image);
+      if (cannotFit(requestBytes(encoded), pages.length - i - 1, image.bytes))
+        return 'payload_too_large';
     }
     for (const opened of new Set(pages.flatMap((p) => (p.pdf ? [p.pdf.opened] : []))))
       opened.close();
@@ -527,7 +540,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       setBusy(false, '');
       setError(code);
     };
-    let encoded: EncodedFile[] | { readonly tooSlow: OpenedPdf } | null;
+    let encoded: Awaited<ReturnType<typeof encodeAll>>;
     try {
       encoded = await encodeAll(pages, started);
     } catch {
@@ -535,6 +548,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       return fail('image_unreadable');
     }
     if (encoded === null) return;
+    if (encoded === 'payload_too_large') return fail(encoded);
     if (!Array.isArray(encoded)) {
       // A PDF that won't draw in time leaves the list, so the next try is not stuck on it too.
       const slow = encoded.tooSlow;
