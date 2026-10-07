@@ -148,6 +148,10 @@ export const es = {
   'home.final_pay_text':
     'Tu finiquito frente al mínimo legal, partida por partida (salario del último mes, vacaciones, pagas extra, indemnización y preaviso), y una estimación de tu paro.',
   'home.final_pay_citation': 'Estatuto de los Trabajadores · guía del CGPJ v0.6',
+  'home.benefit': 'Paro',
+  'home.benefit_text':
+    'Cuánto paro cobrarías al mes y durante cuánto tiempo, con las fechas de tu contrato, tu salario y tus hijos o hijas a cargo.',
+  'home.benefit_citation': 'Ley General de la Seguridad Social · cuantías del SEPE 2026',
   'home.contract': 'Contrato de trabajo',
   'home.rent': 'Alquiler',
   'home.coming_soon': 'Próximamente',
@@ -349,6 +353,8 @@ export const es = {
   'guide.benefit_duration': 'Cuánto dura el paro',
   'guide.benefit_deadline': 'Plazo para pedir el paro',
   'guide.faq': 'Preguntas frecuentes',
+  'guide.cases': 'El finiquito según la causa',
+  'guide.by_seniority': 'Cuánto es el finiquito según el tiempo trabajado',
   'guide.updated': 'Actualizado: octubre de 2026',
   'guide.sources': 'Fuentes',
   'guide.source_et': 'Estatuto de los Trabajadores (BOE)',

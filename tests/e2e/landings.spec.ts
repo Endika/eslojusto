@@ -157,6 +157,26 @@ for (const c of CASES) {
   });
 }
 
+test('the final pay page links each case page and shows the table by seniority', async ({
+  page,
+}) => {
+  await page.goto('finiquito/');
+  const guide = page.getByRole('article');
+  for (const c of CASES.filter((x) => x.path.startsWith('finiquito/')))
+    await expect(guide.locator(`a[href="/${c.path}"]`).first()).toBeVisible();
+  await expect(guide.locator('a[href="/paro/"]').first()).toBeVisible();
+  const table = guide.getByRole('table', { name: /30 de septiembre de 2026/ });
+  await expect(table.getByRole('row')).toHaveCount(5);
+  // A contract for production circumstances can't last three years: no figure, and a note why.
+  await expect(
+    table
+      .getByRole('row', { name: /^3 años/ })
+      .getByRole('cell')
+      .nth(1),
+  ).toHaveText(/^—\s*2$/);
+  await expect(guide.getByText('puede ser indefinido (art. 15.4 ET)')).toBeVisible();
+});
+
 test('the fixed-term examples stay within the legal maximum and say when they may not', async ({
   page,
 }) => {
@@ -177,6 +197,11 @@ test('leaving over a substantial change counts only when it harms you', async ({
       'Una modificación sustancial de tus condiciones que te perjudique (art. 41.3 ET).',
     ),
   ).toBeVisible();
+});
+
+test('the home page links the benefit calculator', async ({ page }) => {
+  await page.goto('./');
+  await expect(page.getByRole('link', { name: 'Paro' })).toHaveAttribute('href', '/paro/');
 });
 
 test('a case page with a preset cause can still go back and change it', async ({ page }) => {

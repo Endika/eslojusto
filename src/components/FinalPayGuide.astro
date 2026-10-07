@@ -1,5 +1,10 @@
 ---
+import FigureTable from './FigureTable.astro';
+import CaseLink from './CaseLink.astro';
 import { faqEntries } from '../content/faq';
+import { bySeniority } from '../content/examples';
+import { wholeEuroRange, wholeEuros } from '../content/format';
+import { LANDINGS, type LandingId } from '../content/landings';
 import { ET, SOURCES, LGSS } from '../engine/sources';
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
@@ -13,26 +18,30 @@ const tx = (key: Key) => t(lang, key);
 
 // Headings and labels come from the dictionary. The explanatory prose, the rules and the worked
 // examples are Spanish legal text: a language gets its own localized guide once it is reviewed.
-const causes = [
+const causes: { title: string; rule: string; citation: string; page?: LandingId }[] = [
   {
     title: tx('guide.unfair_dismissal'),
     rule: '33 días por año trabajado, con un tope de 24 mensualidades (720 días).',
     citation: 'Art. 56 ET',
+    page: 'unfair_dismissal',
   },
   {
     title: tx('guide.objective_dismissal'),
     rule: '20 días por año, con un tope de 12 mensualidades (360 días, STS 651/2026). Además, 15 días de preaviso, y los que la empresa no dé se pagan.',
     citation: 'Art. 53 ET',
+    page: 'objective_dismissal',
   },
   {
     title: tx('guide.fixed_term_end'),
     rule: '12 días por año, en proporción a los días trabajados. Si empezó en 2011 o antes, 8 días; en 2012, 9; en 2013, 10; en 2014, 11. Los contratos de sustitución y los formativos no tienen indemnización. Si duró más de un año, 15 días de preaviso.',
     citation: 'Art. 49.1.c ET y DT 8.ª',
+    page: 'fixed_term_end',
   },
   {
     title: tx('guide.resignation'),
     rule: 'Sin indemnización. Si tu convenio fija un preaviso y no lo das, la empresa puede descontar los días que falten.',
     citation: 'Art. 49.1.d ET',
+    page: 'resignation',
   },
   {
     title: tx('guide.disciplinary_dismissal'),
@@ -47,6 +56,15 @@ const unchecked = [
   'Pagas extra además de las dos ordinarias.',
   'Si la causa del despido está justificada, algo que decide un juzgado.',
   'Los salarios de tramitación.',
+];
+
+// The case pages, in the order of the map: the finiquito ones, then the pages on the benefit.
+const caseLinks: readonly LandingId[] = [
+  'resignation',
+  'unfair_dismissal',
+  'objective_dismissal',
+  'fixed_term_end',
+  'not_agreed',
 ];
 
 // The same report the result links to.
@@ -133,6 +151,21 @@ const benefitSources = [
     </section>
 
     <section class="sheet sheet--text">
+      <h3 id="g-casos">{tx('guide.cases')}</h3>
+      <p>Cada causa tiene sus propias reglas. Las explicamos con un ejemplo resuelto:</p>
+      <ul>
+        {caseLinks.map((id) => (
+          <li>
+            <CaseLink id={id} />
+          </li>
+        ))}
+      </ul>
+      <p>
+        Y para el paro, con su propia página: <CaseLink id="benefit" />.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
       <h3 id="g-salario">{tx('guide.salary')}</h3>
       <p>
         Entran los días trabajados del mes en que acaba el contrato. El día puede valer tu salario
@@ -202,9 +235,9 @@ const benefitSources = [
         trabajado se cuenta en meses, y una fracción de mes cuenta como un mes entero.
       </p>
       <div class="causes">
-        {causes.map(({ title, rule, citation }) => (
+        {causes.map(({ title, rule, citation, page }) => (
           <div>
-            <h4>{title}</h4>
+            <h4>{page ? <a href={link('es', LANDINGS[page].path.slice(1))}>{title}</a> : title}</h4>
             <p>{rule}</p>
             <p class="causes__citation">{citation}</p>
           </div>
@@ -254,6 +287,60 @@ const benefitSources = [
     </section>
 
     <section class="sheet sheet--text">
+      <h3 id="g-antiguedad">{tx('guide.by_seniority')}</h3>
+      <p>
+        El finiquito es lo generado en el año y en el último mes, así que a partir de un año de
+        contrato deja de crecer. La indemnización, en cambio, crece con cada mes trabajado y depende
+        de la causa.
+      </p>
+      <FigureTable id="g-antiguedad-tabla">
+        <Fragment slot="caption">
+          Contratos que acaban el 30 de septiembre de 2026, con 1.500&nbsp;€ brutos al mes, dos
+          pagas extra de 1.500&nbsp;€ por semestres y ningún día de vacaciones disfrutado.
+          Redondeado al euro.
+        </Fragment>
+        <thead>
+          <tr>
+            <th scope="col">Tiempo trabajado</th>
+            <th scope="col">Finiquito</th>
+            <th scope="col">Fin de temporal (12 días)</th>
+            <th scope="col">Improcedente (33 días)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {bySeniority.map(({ label, finalPay, fixedTermLimit, fixedTerm, unfair }) => (
+            <tr>
+              <th scope="row">{label}</th>
+              <td>{wholeEuroRange(finalPay)}</td>
+              <td>
+                {fixedTerm === null ? '—' : wholeEuros(fixedTerm)}
+                {fixedTermLimit === 'sector_agreement' && <sup>1</sup>}
+                {fixedTermLimit === 'over' && <sup>2</sup>}
+              </td>
+              <td>{wholeEuros(unfair)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </FigureTable>
+      <p>
+        El finiquito suma el salario de septiembre, las vacaciones y la paga de Navidad generada,
+        con el margen entre contar por días o por meses. Las otras dos columnas son la indemnización
+        de cada causa, que va aparte.
+      </p>
+      <p class="table-notes">
+        <sup>1</sup> Un contrato por circunstancias de la producción dura como mucho 6 meses. Llega
+        a un año solo si tu convenio sectorial lo amplía (art. 15.2 ET), o en un contrato de obra o
+        servicio firmado antes del 31 de diciembre de 2021 (disposición transitoria 3.ª del Real
+        Decreto-ley 32/2021).
+      </p>
+      <p class="table-notes">
+        <sup>2</sup> Solo un contrato de obra o servicio firmado antes del 31 de diciembre de 2021
+        podía durar tanto. Un contrato temporal que pasa de su duración máxima puede ser indefinido
+        (art. 15.4 ET), y entonces su fin sería un despido. Si el tuyo duró más, revísalo.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
       <h3 id="g-propuesta">{tx('guide.proposal')}</h3>
       <p>
         La empresa entrega una propuesta del documento de liquidación. La ley prevé que la persona
@@ -264,6 +351,9 @@ const benefitSources = [
         Algunas personas firman indicando «recibí no conforme» cuando no están de acuerdo con alguna
         cantidad. Lo contamos solo como información. Qué hacer en cada caso puede valorarlo un
         despacho laboralista, un despacho de graduado social o un sindicato.
+      </p>
+      <p>
+        Lo que cambia y lo que no: <CaseLink id="not_agreed" />.
       </p>
       <p class="folio">
         Art. <span>49.2</span> ET
@@ -333,6 +423,9 @@ const benefitSources = [
         hayas usado ya para otro paro, y pueden sumar varios trabajos (arts. 266.b y 269 LGSS).
         También hace falta estar de alta o en situación asimilada, inscribirte como demandante de
         empleo, suscribir el acuerdo de actividad y no tener la edad de jubilación (art. 266 LGSS).
+      </p>
+      <p>
+        Para calcularlo con tus datos y ver la escala completa: <CaseLink id="benefit" />.
       </p>
       <p class="folio">
         Arts. <span>266 · 267 · 268.4</span> LGSS
@@ -434,3 +527,9 @@ const benefitSources = [
     </section>
   </div>
 </article>
+
+<style>
+  .sheet--text .table-notes {
+    font-size: 0.875rem;
+  }
+</style>
