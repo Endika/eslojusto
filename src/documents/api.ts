@@ -84,15 +84,24 @@ export function createApi(
     } catch {
       return fail('network_error');
     }
+    // Throttling (429) and failures in front of the function (5xx) may come without a code.
+    const withoutCode = (): Failure =>
+      fail(
+        response.status === 413
+          ? 'payload_too_large'
+          : response.status === 429 || response.status >= 500
+            ? 'service_unavailable'
+            : 'unexpected_response',
+      );
     let json: unknown;
     try {
       json = await response.json();
     } catch {
-      return fail(response.status === 413 ? 'payload_too_large' : 'unexpected_response');
+      return withoutCode();
     }
-    if (!isRecord(json)) return fail('unexpected_response');
+    if (!isRecord(json)) return withoutCode();
     if (json['code'] === 'ok') return json;
-    return fail(isApiError(json['code']) ? json['code'] : 'unexpected_response');
+    return isApiError(json['code']) ? fail(json['code']) : withoutCode();
   }
   const failed = (r: Record<string, unknown> | Failure): r is Failure => r['ok'] === false;
 
