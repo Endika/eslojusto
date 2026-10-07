@@ -15,6 +15,7 @@ export default defineConfig({
       'tests/analytics/**/*.test.ts',
       'tests/lint/**/*.test.ts',
       'tests/documents/**/*.test.ts',
+      'tests/rental/**/*.test.ts',
     ],
   },
 });
