@@ -5,10 +5,11 @@ import globals from 'globals';
 
 // Import boundaries: the engine is the core and depends on nothing; the UI reaches analytics only
 // through the calculator ports, which the composition root (src/scripts) wires to PostHog.
-// A `..` segment after the leading one (`./../x`, `../a/../../x`) would climb out unseen.
-const climbsBack = '^\\.\\.?/(.*/)?\\.\\.(/|$)';
+// Only canonical relative paths pass: a `.` or `..` segment after the leading one (`./../x`,
+// `.././x`, `../a/../../x`) or an empty one (`..//x`) would spell a path around the patterns below.
+const notCanonical = '^\\.\\.?/(.*/)?\\.\\.?(/|$)|//';
 const localOnly = (dir) => ({
-  regex: `^(?!\\./)|${climbsBack}`,
+  regex: `^(?!\\./)|${notCanonical}`,
   message: `src/${dir} imports only from src/${dir}.`,
 });
 // Each section of the engine (src/engine/<section>) reaches the rest of the engine one level up,
@@ -16,7 +17,7 @@ const localOnly = (dir) => ({
 // those tables as arguments. Sections share the norm model through src/engine/law.
 const SECTIONS = ['rental', 'employment'];
 const sectionOnly = (name) => ({
-  regex: `^(?!\\.\\.?/)|${climbsBack}`,
+  regex: `^(?!\\.\\.?/)|${notCanonical}`,
   message: `src/engine/${name} imports only from src/engine.`,
 });
 const noSectionData = (name) => ({
@@ -27,8 +28,13 @@ const noOtherSection = (name) => ({
   regex: `^\\.\\./(${SECTIONS.filter((s) => s !== name).join('|')})(/|$)`,
   message: `src/engine/${name} shares with other sections only through src/engine/law.`,
 });
+// A root file re-exporting a section would be a barrel around the section boundaries.
+const noSectionFromRoot = {
+  regex: `^\\./(${SECTIONS.join('|')})(/|$)`,
+  message: 'Only a section imports itself; the rest of the engine never reaches into one.',
+};
 const lawOnly = {
-  regex: `^(?!\\./|\\.\\./(date|money|sources)$)|${climbsBack}`,
+  regex: `^(?!\\./|\\.\\./(date|money|sources)$)|${notCanonical}`,
   message: 'src/engine/law imports only from itself and src/engine/{date,money,sources}.',
 };
 const noAnalytics = {
@@ -53,16 +59,20 @@ const analyticsReach = {
   message:
     'src/analytics reaches only the engine, the help topics, the translator type, the calculator and documents ports and the documents switch.',
 };
-const noDynamicImport = {
-  selector: 'ImportExpression',
-  message: 'Dynamic imports would slip past the import boundaries.',
-};
+const hiddenImports = [
+  ['ImportExpression', 'Dynamic imports'],
+  ['TSImportType', 'Type imports (`typeof import(…)`)'],
+  ['TSExternalModuleReference', 'Imports through `import x = require(…)`'],
+].map(([selector, what]) => ({
+  selector,
+  message: `${what} would slip past the import boundaries.`,
+}));
 const boundary = (files, patterns, { ignores, rules } = {}) => ({
   files,
   ...(ignores ? { ignores } : {}),
   rules: {
     'no-restricted-imports': ['error', { patterns }],
-    'no-restricted-syntax': ['error', noDynamicImport],
+    'no-restricted-syntax': ['error', ...hiddenImports],
     ...rules,
   },
 });
@@ -76,6 +86,11 @@ const engineGlobals = {
     ...['window', 'document', 'navigator', 'location', 'history', 'localStorage'].map((name) => ({
       name,
       message: 'The engine runs without a browser.',
+    })),
+    // Every handle on the global object or the host, so no alias can reach a clock through it.
+    ...['global', 'globalThis', 'self', 'process', 'eval', 'Function', 'Temporal'].map((name) => ({
+      name,
+      message: 'The engine never reaches the global object or the host: take inputs as parameters.',
     })),
   ],
   'no-restricted-properties': [
@@ -114,7 +129,7 @@ export default tseslint.config(
   ...tseslint.configs.strict,
   ...astro.configs.recommended,
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
-  boundary(['src/engine/**'], [localOnly('engine')], {
+  boundary(['src/engine/**'], [localOnly('engine'), noSectionFromRoot], {
     ignores: ['src/engine/law/**', ...SECTIONS.map((name) => `src/engine/${name}/**`)],
     rules: engineGlobals,
   }),
