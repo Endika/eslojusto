@@ -368,6 +368,20 @@ describe('holidays (art. 38.1 ET)', () => {
         expect(all.find((f) => f.id === 'holidays_not_paid_out')?.status).toBe('review_it');
       });
 
+      it.each(['eventual', 'replacement', 'unknown'] as const)(
+        'a %s contract without an end date may last 120 days: both findings are to review',
+        (modality) => {
+          const all = findings({
+            modality,
+            startDate: parseDate('2024-03-01'),
+            endDate: null,
+            ...holidays({ days: 0, includedInSalary: true }),
+          });
+          expect(all.find((f) => f.id === 'holidays_30')?.status).toBe('review_it');
+          expect(all.find((f) => f.id === 'holidays_not_paid_out')?.status).toBe('review_it');
+        },
+      );
+
       it('an unknown modality over 120 days may not', () => {
         expect(
           findingFor(
