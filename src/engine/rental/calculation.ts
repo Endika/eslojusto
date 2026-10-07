@@ -68,7 +68,23 @@ export type RentalPhraseKey =
   | 'charges.past_first_years'
   | 'charges.tax_outside_cap'
   | 'charges.tax_banned'
-  | 'charges.waste_may_be_tax';
+  | 'charges.waste_may_be_tax'
+  | 'deposit.pending'
+  | 'deposit.deduction.damage'
+  | 'deposit.deduction.cleaning'
+  | 'deposit.deduction.unpaid_rent'
+  | 'deposit.deduction.unpaid_bills'
+  | 'deposit.deduction.wear'
+  | 'deposit.deduction.other'
+  | 'deposit.deductions_not_judged'
+  | 'deposit.owed'
+  | 'deposit.returned_in_full'
+  | 'deposit.returned_on_time'
+  | 'deposit.interest_not_yet'
+  | 'deposit.interest_stretch'
+  | 'deposit.interest_day_count'
+  | 'deposit.interest_total'
+  | 'deposit.interest_rate_not_loaded';
 
 // The UI words a phrase through the dictionary key `client.rental.calculation.<key>`.
 export interface RentalPhrase {
