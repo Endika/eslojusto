@@ -17,7 +17,7 @@ async function toHolidays(page: Page, cause: string, startDate: string, endDate:
   await next(page);
   await page.getByLabel('Salario bruto mensual').fill('2.000,00');
   await next(page);
-  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await page.getByLabel('Disfrutados este año').fill('0');
   await next(page);
 }
 

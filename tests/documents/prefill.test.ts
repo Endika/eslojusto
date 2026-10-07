@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { hasLowConfidence, prefillFrom, prefilledCount } from '../../src/documents/prefill';
+import {
+  hasHolidayDays,
+  hasLowConfidence,
+  prefillFrom,
+  prefilledCount,
+} from '../../src/documents/prefill';
 import type { Extraction, SourceKind } from '../../src/documents/contract';
 
 const f = (
@@ -37,8 +42,8 @@ describe('what the documents state', () => {
       { name: 'cause', value: 'fixed_term_end', confidence: 'high' },
       { name: 'fixedTermType', value: 'replacement', confidence: 'medium' },
       { name: 'monthlySalary', value: '1.850,00', confidence: 'high' },
-      { name: 'annualHolidayDays', value: '30', confidence: 'high' },
-      { name: 'holidayDaysTaken', value: '12', confidence: 'medium' },
+      { name: 'annualHolidayDays', value: '30', confidence: 'low' },
+      { name: 'holidayDaysTaken', value: '12', confidence: 'low' },
       { name: 'noticeDaysReceived', value: '15', confidence: 'high' },
       { name: 'figure_holiday_pay', value: '1.234,56', confidence: 'high' },
       { name: 'figure_severance', value: '40.000,50', confidence: 'low' },
@@ -48,6 +53,13 @@ describe('what the documents state', () => {
     const filled = prefillFrom(e);
     expect(prefilledCount(filled)).toBe(10);
     expect(hasLowConfidence(filled)).toBe(true);
+  });
+  it('holiday days come without a unit, so they are always to check', () => {
+    expect(hasHolidayDays(prefillFrom(e))).toBe(true);
+    const { annualHolidayDays, holidayDaysTaken, ...rest } = e.fields;
+    void annualHolidayDays;
+    void holidayDaysTaken;
+    expect(hasHolidayDays(prefillFrom({ ...e, fields: rest }))).toBe(false);
   });
   it('a contract type only goes with a fixed-term end', () => {
     const filled = prefillFrom({ ...e, fields: { ...e.fields, cause: f('resignation') } });

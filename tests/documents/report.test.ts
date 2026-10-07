@@ -22,6 +22,24 @@ describe('the report', () => {
     expect(all).toContain('Tu paro (estimación)');
     expect(all).toContain('720 días');
   });
+  it('says the holiday unit in the data and under the holiday item', () => {
+    expect(all).toContain('30 días naturales al año; 0 disfrutados');
+    expect(all).toContain('Hemos contado 0 días naturales disfrutados de 30 al año.');
+    const working = text(
+      reportModel(
+        completed({
+          ...unfairDismissal,
+          holidayUnit: 'working',
+          annualHolidayDays: 22,
+          holidayDaysTaken: 5,
+        }),
+        tr,
+        today,
+      ).blocks,
+    );
+    expect(working).toContain('22 días laborables al año; 5 disfrutados');
+    expect(working).toContain('22 días laborables equivalen a 30 naturales');
+  });
   it('cites every source with its link and the date it is in force from', () => {
     const sources = model.blocks.filter((b) => b.type === 'source');
     expect(sources.length).toBeGreaterThan(5);

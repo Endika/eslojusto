@@ -36,6 +36,7 @@ const base: FinalPayInput = {
   extraPayCount: 2,
   extraPayAmount: 2000,
   extraPayAccrual: 'annual',
+  holidayUnit: 'calendar',
   annualHolidayDays: 30,
   holidayDaysTaken: 0,
 };

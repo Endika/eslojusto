@@ -19,7 +19,7 @@ test('reviewing a final pay makes no request and leaves no cookies', async ({ pa
   await next();
   await page.getByLabel('Salario bruto mensual').fill('1500');
   await next();
-  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: /Resultado/ })).toBeVisible();

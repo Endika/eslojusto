@@ -180,7 +180,7 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   await next();
   await expect(page.getByLabel('Salario bruto mensual')).toHaveValue('2.142,86');
   await next();
-  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await page.getByLabel('Ninguno').check();
   await next();
@@ -239,7 +239,7 @@ async function confirmToResult(page: Page) {
   await page.locator('#prorated-yes').check();
   await next();
   await next();
-  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await page.getByLabel('Ninguno').check();
   await next();
@@ -557,7 +557,7 @@ test('an objective dismissal with an agreement: the reference and the offer, sid
   await page.locator('#prorated-yes').check();
   await next();
   await next();
-  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await page.getByLabel('Ninguno').check();
   await next();

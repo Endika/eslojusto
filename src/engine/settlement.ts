@@ -11,9 +11,16 @@ import {
   accrualMonths,
   type CivilDate,
 } from './date';
-import type { Accrual, FinalPayInput, Item } from './types';
+import type { Accrual, FinalPayInput, HolidayUnit, Item } from './types';
 
 const NOTICE_DAYS = 15;
+
+// The legal minimum is 30 calendar days a year (art. 38 ET), which case law reads as 22 working
+// days. Accrual and days taken stay in the person's unit; only the days left are turned into
+// calendar days, the unit the daily pay is for, at that same 30 to 22.
+export const MINIMUM_HOLIDAYS: Record<HolidayUnit, number> = { working: 22, calendar: 30 };
+export const calendarDaysPer = (unit: HolidayUnit): number =>
+  MINIMUM_HOLIDAYS.calendar / MINIMUM_HOLIDAYS[unit];
 
 export function annualSalary(e: FinalPayInput): number {
   return e.extraPayProrated
@@ -69,15 +76,28 @@ export function holidayPayItem(e: FinalPayInput): Item {
   const byDays = (e.annualHolidayDays * d) / yearLength;
   const byMonths = (e.annualHolidayDays * months) / 12;
   const byMonthsFromStart = (e.annualHolidayDays * monthsFromStart) / 12;
+  const unit = e.holidayUnit;
+  const unitWord = phrase(`holiday_pay.unit.${unit}`);
+  const taken = e.holidayDaysTaken;
   const base = {
     id: 'holiday_pay',
     direction: 'credit',
     dependsOnAgreement: true,
-    basedOnYourAnswer: e.annualHolidayDays > 30,
+    basedOnYourAnswer: e.annualHolidayDays > MINIMUM_HOLIDAYS[unit],
     sources: [SOURCES.et38],
+    ...(taken === null
+      ? {}
+      : {
+          counted: phrase('holiday_pay.counted', {
+            disfrutados: { days: taken },
+            unidad: unitWord,
+            anuales: { days: e.annualHolidayDays },
+          }),
+        }),
   } as const;
   const accrualVars = {
     anuales: { days: e.annualHolidayDays },
+    unidad: unitWord,
     dias: d,
     dias_ejercicio: yearLength,
     ejercicio: y,
@@ -92,7 +112,6 @@ export function holidayPayItem(e: FinalPayInput): Item {
         por_meses_alta: { days: byMonthsFromStart },
       })
     : phrase('holiday_pay.accrual', accrualVars);
-  const taken = e.holidayDaysTaken;
   if (taken === null) {
     return {
       ...base,
@@ -115,18 +134,29 @@ export function holidayPayItem(e: FinalPayInput): Item {
   const low = Math.max(0, Math.min(...pending));
   const monthly = e.monthlySalary / 30;
   const annual = annualSalary(e) / 365;
+  const toCalendar = calendarDaysPer(unit);
+  const vars = {
+    devengo: accrual,
+    disfrutados: { days: taken },
+    minimo: { days: low },
+    maximo: { days: high },
+    diario_mensual: { euros: monthly },
+    diario_anual: { euros: annual },
+  };
   return {
     ...base,
-    range: between(low * Math.min(monthly, annual), high * Math.max(monthly, annual)),
+    range: between(
+      low * toCalendar * Math.min(monthly, annual),
+      high * toCalendar * Math.max(monthly, annual),
+    ),
     calculation: [
-      phrase('holiday_pay.pending', {
-        devengo: accrual,
-        disfrutados: { days: taken },
-        minimo: { days: low },
-        maximo: { days: high },
-        diario_mensual: { euros: monthly },
-        diario_anual: { euros: annual },
-      }),
+      unit === 'calendar'
+        ? phrase('holiday_pay.pending', vars)
+        : phrase('holiday_pay.pending_working', {
+            ...vars,
+            minimo_naturales: { days: low * toCalendar },
+            maximo_naturales: { days: high * toCalendar },
+          }),
       methodsNote(fromStart),
     ],
   };

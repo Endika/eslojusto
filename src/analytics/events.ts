@@ -1,6 +1,6 @@
 import { BENEFIT_STATES, benefitState, type BenefitEstimate } from '../engine/unemployment';
 import type { EmployerFigures, Review } from '../engine/review';
-import type { Cause, FinalPayInput, ItemId, FixedTermType } from '../engine/types';
+import type { Cause, FinalPayInput, HolidayUnit, ItemId, FixedTermType } from '../engine/types';
 import { FAQ_TOPICS } from '../content/faq-topics';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import { DOWNLOADS, ERROR_CODES, FILES_BUCKETS, PAGE_KINDS, PASS_VIA } from '../documents/ports';
@@ -44,6 +44,7 @@ const INPUT_FIELDS = [
   'extraPayCount',
   'extraPayAmount',
   'extraPayAccrual',
+  'holidayUnit',
   'annualHolidayDays',
   'holidayDaysTaken',
   'noticeDaysReceived',
@@ -85,6 +86,7 @@ const FIXED_TERM_TYPES = [
   'training',
   'not_applicable',
 ] as const satisfies readonly (FixedTermType | 'not_applicable')[];
+const HOLIDAY_UNITS = ['working', 'calendar'] as const satisfies readonly HolidayUnit[];
 const EXTRA_PAY = ['prorated', 'annual', 'semiannual', 'unknown', 'no_extra_pay'] as const;
 const OUTCOMES = ['shortfall', 'all_match', 'only_not_checkable', 'no_figures'] as const;
 const OTHER_CONTRACT_BUCKETS = ['0', '1', '2', '3+'] as const;
@@ -161,6 +163,7 @@ const BASE_CATALOGUE = {
     cause: oneOf(CAUSES),
     fixed_term_type: oneOf(FIXED_TERM_TYPES),
     extra_pay: oneOf(EXTRA_PAY),
+    holiday_unit: oneOf(HOLIDAY_UNITS),
     figures_entered: count,
     below_minimum: count,
     matching: count,
@@ -321,6 +324,7 @@ export function reviewProps(data: {
       : e.extraPayCount === 0
         ? 'no_extra_pay'
         : e.extraPayAccrual,
+    holiday_unit: e.holidayUnit,
     figures_entered: review.items.filter((p) => p.employerFigure !== null).length,
     below_minimum: countOf('below_minimum'),
     matching: countOf('matches'),

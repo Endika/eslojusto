@@ -32,6 +32,8 @@ const ITEM_IDS = [
   'notice_deduction',
 ] as const;
 
+const HOLIDAY_FIELDS = ['annualHolidayDays', 'holidayDaysTaken'] as const;
+
 const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
 export const lowest = (...cs: Confidence[]): Confidence =>
   cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
@@ -89,12 +91,21 @@ function stated(fields: Fields): PrefilledField[] {
       value: formatAmountInput(salaryAmount),
       confidence: salary.confidence,
     });
-  for (const name of ['annualHolidayDays', 'holidayDaysTaken', 'noticeDaysReceived'] as const) {
+  for (const name of HOLIDAY_FIELDS) {
     const f = fields[name];
     const v = num(f);
+    // The reading gives no unit, and the form's one may not be the document's: always checked.
     if (f && v !== null && Number.isInteger(v))
-      out.push({ name, value: String(v), confidence: f.confidence });
+      out.push({ name, value: String(v), confidence: 'low' });
   }
+  const notice = fields.noticeDaysReceived;
+  const noticeDays = num(notice);
+  if (notice && noticeDays !== null && Number.isInteger(noticeDays))
+    out.push({
+      name: 'noticeDaysReceived',
+      value: String(noticeDays),
+      confidence: notice.confidence,
+    });
   for (const id of ITEM_IDS) {
     const f = fields[id];
     const v = num(f);
@@ -206,6 +217,9 @@ export function prefillFrom(
 
 export const prefilledCount = (p: Prefill): number =>
   p.fields.length + (p.otherContracts?.length ?? 0);
+
+export const hasHolidayDays = (p: Prefill): boolean =>
+  p.fields.some((f) => (HOLIDAY_FIELDS as readonly string[]).includes(f.name));
 
 export const hasLowConfidence = (p: Prefill): boolean =>
   [...p.fields, ...(p.otherContracts ?? [])].some((f) => f.confidence === 'low');

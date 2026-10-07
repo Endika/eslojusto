@@ -105,9 +105,14 @@ export const es = {
 
   'holidays.question': 'Tus vacaciones y tu preaviso',
   'holidays.annual': 'Vacaciones al año',
-  'holidays.annual_hint': 'Días naturales; 30 es el mínimo.',
-  'holidays.taken': 'Días naturales disfrutados',
-  'holidays.taken_hint': 'Este año. Una semana son 7.',
+  'holidays.unit': '¿Cómo cuentas los días de vacaciones?',
+  'holidays.unit_working': 'Laborables',
+  'holidays.unit_calendar': 'Naturales',
+  'holidays.annual_hint_working': '22 es el mínimo.',
+  'holidays.annual_hint_calendar': '30 es el mínimo.',
+  'holidays.taken': 'Disfrutados este año',
+  'holidays.taken_hint_working': '5 por semana.',
+  'holidays.taken_hint_calendar': '7 por semana.',
   'holidays.taken_unknown': 'No lo sé',
   'holidays.notice_received': 'Días de preaviso que te dio la empresa',
   'holidays.notice_received_hint': 'Entre la carta y tu último día; en blanco, 0.',
@@ -457,15 +462,21 @@ export const es = {
   'client.calculation.pending_salary':
     '{salario} × {dias} días trabajados del mes, entre 30 días (mes comercial) y {dias_mes} días (mes natural): de {desde} a {hasta}.',
   'client.calculation.holiday_pay.accrual':
-    '{anuales} días al año: por días, × {dias}/{dias_ejercicio} días trabajados en {ejercicio} = {por_dias} días devengados; por meses, × {meses}/12 = {por_meses} días devengados',
+    '{anuales} días {unidad} al año: por días, × {dias}/{dias_ejercicio} días trabajados en {ejercicio} = {por_dias} días devengados; por meses, × {meses}/12 = {por_meses} días devengados',
   'client.calculation.holiday_pay.accrual_from_start':
-    '{anuales} días al año: por días, × {dias}/{dias_ejercicio} días trabajados en {ejercicio} = {por_dias} días devengados; por meses, × {meses}/12 = {por_meses} días devengados; por meses desde el alta, × {meses_alta}/12 = {por_meses_alta} días devengados',
+    '{anuales} días {unidad} al año: por días, × {dias}/{dias_ejercicio} días trabajados en {ejercicio} = {por_dias} días devengados; por meses, × {meses}/12 = {por_meses} días devengados; por meses desde el alta, × {meses_alta}/12 = {por_meses_alta} días devengados',
   'client.calculation.holiday_pay.days_unknown':
     '{devengo}. Sin saber cuántos días has disfrutado este año no se puede comprobar.',
   'client.calculation.holiday_pay.over_taken':
     '{devengo}, menos {disfrutados} disfrutados: has disfrutado más días de los devengados. Que proceda o no un descuento por los días disfrutados de más depende del convenio.',
   'client.calculation.holiday_pay.pending':
-    '{devengo}, menos {disfrutados} disfrutados = entre {minimo} y {maximo} días pendientes × {diario_mensual} (salario mensual / 30) o {diario_anual} (salario anual / 365) al día.',
+    '{devengo}, menos {disfrutados} disfrutados = entre {minimo} y {maximo} días naturales pendientes × {diario_mensual} (salario mensual / 30) o {diario_anual} (salario anual / 365) al día.',
+  'client.calculation.holiday_pay.pending_working':
+    '{devengo}, menos {disfrutados} disfrutados = entre {minimo} y {maximo} días laborables pendientes. 22 días laborables equivalen a 30 naturales, así que son entre {minimo_naturales} y {maximo_naturales} días naturales × {diario_mensual} (salario mensual / 30) o {diario_anual} (salario anual / 365) al día.',
+  'client.calculation.holiday_pay.counted':
+    'Hemos contado {disfrutados} días {unidad} disfrutados de {anuales} al año.',
+  'client.calculation.holiday_pay.unit.working': 'laborables',
+  'client.calculation.holiday_pay.unit.calendar': 'naturales',
   'client.calculation.methods.two_counts':
     'Las empresas lo calculan por días naturales o por meses (meses enteros más los días del mes en curso / 30); se muestran las dos cuentas.',
   'client.calculation.methods.three_counts':
@@ -549,9 +560,13 @@ export const es = {
   'client.error.extra_pay_amount_out_of_range':
     'El importe de la paga extra debe ser mayor que 0 y no pasar de 1.000.000 €',
   'client.error.annual_holidays_out_of_range':
-    'Los días de vacaciones al año deben estar entre 0 y 60',
+    'Los días naturales de vacaciones al año deben estar entre 0 y 60',
   'client.error.holidays_taken_out_of_range':
-    'Los días de vacaciones disfrutados deben estar entre 0 y 60',
+    'Los días naturales disfrutados deben estar entre 0 y 60',
+  'client.error.annual_working_holidays_out_of_range':
+    'Los días laborables de vacaciones al año deben estar entre 0 y 44',
+  'client.error.working_holidays_taken_out_of_range':
+    'Los días laborables disfrutados deben estar entre 0 y 44',
   'client.error.notice_out_of_range': 'Los días de preaviso deben estar entre 0 y 90',
   'client.error.missing_fixed_term_type': 'Indica el tipo de contrato temporal',
   'client.error.missing_children': 'Elige una opción; «Prefiero no decirlo» también vale',
@@ -624,6 +639,8 @@ export const es = {
     'Se han leído {n} datos. Pasa por cada hoja y confírmalos antes de revisar: los leídos llevan la marca «Leído del documento».',
   'client.documents.done_none':
     'No se ha leído ningún dato que sirva para el formulario. Puedes subir otros documentos o rellenar a mano.',
+  'client.documents.holiday_unit':
+    'Los documentos no siempre dicen si los días de vacaciones son laborables o naturales: compruébalo en la hoja de vacaciones.',
   'client.documents.done_low':
     'Algún dato se ha leído con confianza baja: compáralo con tus documentos.',
   'client.documents.check.end_before_start':
@@ -725,8 +742,10 @@ export const es = {
   'client.documents.report.extra_pay_prorated': 'Prorrateadas en la nómina',
   'client.documents.report.extra_pay_apart': '{n} pagas de {importe}',
   'client.documents.report.holidays': 'Vacaciones',
-  'client.documents.report.holidays_text': '{anuales} días al año; {disfrutados} disfrutados',
-  'client.documents.report.holidays_unknown': '{anuales} días al año; disfrutados, sin dato',
+  'client.documents.report.holidays_text':
+    '{anuales} días {unidad} al año; {disfrutados} disfrutados',
+  'client.documents.report.holidays_unknown':
+    '{anuales} días {unidad} al año; disfrutados, sin dato',
   'client.documents.report.cause.resignation': 'Baja voluntaria (dimisión)',
   'client.documents.report.cause.fixed_term_end': 'Fin de contrato temporal',
   'client.documents.report.cause.objective_dismissal': 'Despido objetivo',

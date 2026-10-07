@@ -1,5 +1,5 @@
 import { compareDates, daysInMonth, addDays, type CivilDate } from './date';
-import type { FinalPayInput, ContributionPeriod } from './types';
+import type { FinalPayInput, ContributionPeriod, HolidayUnit } from './types';
 
 export type InputErrorCode =
   | 'invalid_start_date'
@@ -11,6 +11,8 @@ export type InputErrorCode =
   | 'extra_pay_amount_out_of_range'
   | 'annual_holidays_out_of_range'
   | 'holidays_taken_out_of_range'
+  | 'annual_working_holidays_out_of_range'
+  | 'working_holidays_taken_out_of_range'
   | 'notice_out_of_range'
   | 'missing_fixed_term_type';
 
@@ -22,6 +24,8 @@ export type InputError = {
 
 const MAX_SALARY = 1_000_000;
 const MAX_DAYS_AHEAD = 365;
+// 60 calendar days, and the same at 22 working days for every 30 calendar ones.
+const MAX_HOLIDAY_DAYS: Record<HolidayUnit, number> = { calendar: 60, working: 44 };
 
 const isValidDate = (f: CivilDate): boolean =>
   Number.isInteger(f.y) &&
@@ -59,11 +63,23 @@ export function validate(e: FinalPayInput, today: CivilDate): readonly InputErro
   )
     err('extraPayAmount', 'extra_pay_amount_out_of_range');
 
-  if (!Number.isFinite(e.annualHolidayDays) || e.annualHolidayDays < 0 || e.annualHolidayDays > 60)
-    err('annualHolidayDays', 'annual_holidays_out_of_range');
+  const working = e.holidayUnit === 'working';
+  const maxHolidays = MAX_HOLIDAY_DAYS[e.holidayUnit];
+  if (
+    !Number.isFinite(e.annualHolidayDays) ||
+    e.annualHolidayDays < 0 ||
+    e.annualHolidayDays > maxHolidays
+  )
+    err(
+      'annualHolidayDays',
+      working ? 'annual_working_holidays_out_of_range' : 'annual_holidays_out_of_range',
+    );
   const taken = e.holidayDaysTaken;
-  if (taken !== null && (!Number.isFinite(taken) || taken < 0 || taken > 60))
-    err('holidayDaysTaken', 'holidays_taken_out_of_range');
+  if (taken !== null && (!Number.isFinite(taken) || taken < 0 || taken > maxHolidays))
+    err(
+      'holidayDaysTaken',
+      working ? 'working_holidays_taken_out_of_range' : 'holidays_taken_out_of_range',
+    );
 
   const notice = [
     ['noticeDaysReceived', e.noticeDaysReceived],

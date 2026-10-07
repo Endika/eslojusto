@@ -23,7 +23,13 @@ import type {
   PdfPages,
   PdfProblem,
 } from './ports';
-import { hasLowConfidence, prefillFrom, prefilledCount, type Prefill } from './prefill';
+import {
+  hasHolidayDays,
+  hasLowConfidence,
+  prefillFrom,
+  prefilledCount,
+  type Prefill,
+} from './prefill';
 import { conflictLines, recognisedLine } from './summary';
 
 export interface UploadDeps {
@@ -381,6 +387,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     const lines = [
       ...conflictLines(e.conflicts, tr),
       ...(hasLowConfidence(p) ? [tr('client.documents.done_low')] : []),
+      ...(hasHolidayDays(p) ? [tr('client.documents.holiday_unit')] : []),
       ...checks.map((c) => tr(`client.documents.check.${c}`)),
     ];
     notes.hidden = lines.length === 0;

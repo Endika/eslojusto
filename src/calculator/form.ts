@@ -4,6 +4,7 @@ import type { EmployerFigures } from '../engine/review';
 import type {
   Cause,
   Accrual,
+  HolidayUnit,
   FinalPayInput,
   OtherContracts,
   ItemId,
@@ -82,6 +83,7 @@ export const SHEET_FIELDS: Record<Sheet, readonly string[]> = {
   salario: ['monthlySalary'],
   pagas: ['extraPayCount', 'extraPayAmount', 'extraPayAccrual'],
   vacaciones: [
+    'holidayUnit',
     'annualHolidayDays',
     'holidayDaysTaken',
     'noticeDaysReceived',
@@ -114,7 +116,8 @@ const DEFAULTS: FinalPayInput = {
   extraPayCount: 2,
   extraPayAmount: 0,
   extraPayAccrual: 'unknown',
-  annualHolidayDays: 30,
+  holidayUnit: 'working',
+  annualHolidayDays: 22,
   holidayDaysTaken: null,
 };
 
@@ -172,6 +175,10 @@ function read(form: HTMLFormElement): Reading {
   const prorating = text('extraPayProrated');
   if (prorating === 'yes' || prorating === 'no') partial.extraPayProrated = prorating === 'yes';
   else missing('extraPayProrated');
+
+  const unit = text('holidayUnit');
+  if (unit === 'working' || unit === 'calendar') partial.holidayUnit = unit satisfies HolidayUnit;
+  else missing('holidayUnit');
 
   // «No lo sé» disables the number, so the engine gets null and marks the item as not checkable.
   const holidaysUnknown = text('holidayDaysTakenUnknown') === 'yes';
