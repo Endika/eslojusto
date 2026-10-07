@@ -25,9 +25,10 @@ const files = (dir: string): string[] =>
     return statSync(p).isDirectory() ? files(p) : [p];
   });
 
-// The last build may have had the test key (the analytics e2e); the home page tells which.
-const keylessBuild =
-  existsSync('dist/index.html') && !readFileSync('dist/index.html', 'utf8').includes('posthog');
+// The last build may have had the test key (the analytics e2e) or the documents API (the
+// documents e2e); the home page tells which.
+const home = existsSync('dist/index.html') ? readFileSync('dist/index.html', 'utf8') : null;
+const keylessBuild = home !== null && !home.includes('posthog') && !home.includes('cloudflare');
 
 describe.skipIf(!keylessBuild)('a keyless build tracks nothing', () => {
   const all = keylessBuild ? files('dist') : [];

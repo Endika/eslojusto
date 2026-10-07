@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { es, type Key } from '../../src/i18n/es';
-import { DICTIONARIES, t } from '../../src/i18n';
+import { DICTIONARIES, clientStrings, t } from '../../src/i18n';
 import { LANGS, builtLangs, type Lang } from '../../src/i18n/languages';
 import { translator } from '../../src/i18n/client';
 import { statusText } from '../../src/calculator/render';
@@ -168,5 +168,14 @@ describe.skipIf(!normalBuild)('a normal build does not publish ar-test', () => {
         : ['es', 'x-default'];
       expect(links.toSorted(), p).toEqual(expected);
     }
+  });
+});
+
+describe('client strings', () => {
+  it('a build without the documents API ships none of their strings', () => {
+    const keys = Object.keys(clientStrings('es'));
+    expect(keys.length).toBeGreaterThan(100);
+    expect(keys.every((k) => k.startsWith('client.'))).toBe(true);
+    expect(keys.some((k) => k.startsWith('client.documents.'))).toBe(false);
   });
 });

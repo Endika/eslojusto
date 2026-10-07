@@ -20,8 +20,14 @@ export function t(lang: Lang, key: Key, vars?: Variables): string {
   return interpolate(DICTIONARIES[lang][key], vars);
 }
 
-// The strings the browser scripts need, for the page to ship as JSON.
-export const clientStrings = (lang: Lang): Partial<Record<Key, string>> =>
+// The strings the browser scripts need, for the page to ship as JSON. Those of document reading
+// and the pass ship only in a build that has them.
+export const clientStrings = (
+  lang: Lang,
+  { documents = false }: { documents?: boolean } = {},
+): Partial<Record<Key, string>> =>
   Object.fromEntries(
-    Object.entries(DICTIONARIES[lang]).filter(([key]) => key.startsWith('client.')),
+    Object.entries(DICTIONARIES[lang]).filter(
+      ([key]) => key.startsWith('client.') && (documents || !key.startsWith('client.documents.')),
+    ),
   );
