@@ -92,12 +92,12 @@ describe('a contract end to end', () => {
 
   it('counts only what holds in every reading', () => {
     // Paid over: the agency fee, 500; the community fee 650 over 600 with no rent rise, 50.
-    // Owed: 300 of deposit, and interest from 30-07-2026 on 600 to 15-09 (47 days) and on 300 to
-    // today (69 days) at 3,25 %: 4,35 on 365 days a year, 4,41 on 360.
+    // Owed: 300 of deposit, and interest from 31-07-2026 on 600 to 15-09 (46 days) and on 300 to
+    // today (68 days) at 3,25 %: 4,27 on 365 days a year, 4,33 on 360.
     // Over the cap: 2.700 − 2 × 900 = 900 of guarantees; (2 − 1) × 900 = 900 of advance.
     expect(r.totals).toEqual({
       paidOver: { counted: 550, upTo: 550 },
-      owed: { counted: 304.35, upTo: 304.41 },
+      owed: { counted: 304.27, upTo: 304.33 },
       overCap: { counted: 1800, upTo: 1800 },
     });
     expect(r.offerPass).toBe(true);

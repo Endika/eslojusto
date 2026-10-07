@@ -73,10 +73,10 @@ describe('what is still owed of the deposit', () => {
 
 describe('late-payment interest (LAU art. 36.4)', () => {
   it('keys 15-11-2022, 900 € back on 20-03-2023: two yearly stretches, both day counts', () => {
-    // From 15-12-2022, a month after the keys, to 19-03-2023.
-    // 2022: 17 days at 3,00 %; 2023: 78 days at 3,25 %.
-    // 365: 900 × 0,03 × 17 / 365 + 900 × 0,0325 × 78 / 365 = 1,2575 + 6,2507 = 7,51.
-    // 360: 900 × 0,03 × 17 / 360 + 900 × 0,0325 × 78 / 360 = 1,2750 + 6,3375 = 7,61.
+    // The month runs date to date to 15-12-2022; interest from 16-12-2022 to 19-03-2023.
+    // 2022: 16 days at 3,00 %; 2023: 78 days at 3,25 %.
+    // 365: 900 × 0,03 × 16 / 365 + 900 × 0,0325 × 78 / 365 = 1,1836 + 6,2507 = 7,43.
+    // 360: 900 × 0,03 × 16 / 360 + 900 × 0,0325 × 78 / 360 = 1,2000 + 6,3375 = 7,54.
     const { returned, interest } = check(
       900,
       {
@@ -87,10 +87,10 @@ describe('late-payment interest (LAU art. 36.4)', () => {
       f('2023-06-01'),
     );
     expect(singleOf(returned)).toEqual({ status: 'within_limit', amount: null });
-    expect(bothBases(interest)).toEqual({ reasons: ['interest_day_count'], low: 7.51, high: 7.61 });
-    expect(countedAmount(interest.outcome, itemAmount)).toBe(7.51);
-    expect(letterAmount(interest.outcome, itemAmount)).toBe(7.51);
-    expect(highestAmount(interest.outcome, itemAmount)).toBe(7.61);
+    expect(bothBases(interest)).toEqual({ reasons: ['interest_day_count'], low: 7.43, high: 7.54 });
+    expect(countedAmount(interest.outcome, itemAmount)).toBe(7.43);
+    expect(letterAmount(interest.outcome, itemAmount)).toBe(7.43);
+    expect(highestAmount(interest.outcome, itemAmount)).toBe(7.54);
     if (interest.outcome.kind !== 'depends') throw new Error('expected depends');
     expect(
       interest.outcome.low.calculation.filter((x) => x.key === 'deposit.interest_stretch'),
@@ -99,12 +99,12 @@ describe('late-payment interest (LAU art. 36.4)', () => {
         key: 'deposit.interest_stretch',
         vars: {
           amount: { euros: 900 },
-          from: { date: '2022-12-15' },
+          from: { date: '2022-12-16' },
           to: { date: '2022-12-31' },
-          days: { days: 17 },
+          days: { days: 16 },
           rate: { percent: 3 },
           yearDays: { integer: 365 },
-          interest: { euros: 1.26 },
+          interest: { euros: 1.18 },
         },
       },
       {
@@ -124,7 +124,7 @@ describe('late-payment interest (LAU art. 36.4)', () => {
 
   it('accrues on one month of deposit only: two months returned late accrue on one', () => {
     // Rent 1.000 (the fixture's), deposit 2.000 back on 10-07-2025, keys 10-01-2025: 1.000 accrues
-    // from 10-02-2025 for 150 days at 3,25 %: 1.000 × 0,0325 × 150 / 365 = 13,36 (360: 13,54).
+    // from 11-02-2025 for 149 days at 3,25 %: 1.000 × 0,0325 × 149 / 365 = 13,27 (360: 13,45).
     const { interest } = check(2000, {
       keysReturnedOn: f('2025-01-10'),
       returns: [{ on: f('2025-07-10'), amount: 2000 }],
@@ -132,15 +132,15 @@ describe('late-payment interest (LAU art. 36.4)', () => {
     });
     expect(bothBases(interest)).toEqual({
       reasons: ['interest_day_count'],
-      low: 13.36,
-      high: 13.54,
+      low: 13.27,
+      high: 13.45,
     });
   });
 
   it('takes the part above the month as kept or returned first', () => {
     // Deposit 1.500 of a 1.000 rent; 300 kept, then 400 back on time, 800 back late. The 500 above
     // the month go first: 300 kept, 200 of the 400. The late 800 accrue in full: 800 × 0,0325 ×
-    // 30 / 365 = 2,14 from 10-02-2025 to 11-03-2025.
+    // 29 / 365 = 2,07 from 11-02-2025 to 11-03-2025.
     const { interest } = check(1500, {
       keysReturnedOn: f('2025-01-10'),
       returns: [
@@ -149,11 +149,11 @@ describe('late-payment interest (LAU art. 36.4)', () => {
       ],
       deductions: [{ kind: 'cleaning', amount: 300 }],
     });
-    expect(bothBases(interest).low).toBe(2.14);
+    expect(bothBases(interest).low).toBe(2.07);
   });
 
   it('a 2024 stretch counts 366 days a year', () => {
-    // 1.000 × 0,0325 × 60 / 366 = 5,33 (360: 5,42), from 01-03-2024 to 29-04-2024.
+    // 1.000 × 0,0325 × 59 / 366 = 5,24 (360: 5,33), from 02-03-2024 to 29-04-2024.
     const { interest } = check(
       1000,
       {
@@ -163,7 +163,7 @@ describe('late-payment interest (LAU art. 36.4)', () => {
       },
       f('2024-06-01'),
     );
-    expect(bothBases(interest)).toEqual({ reasons: ['interest_day_count'], low: 5.33, high: 5.42 });
+    expect(bothBases(interest)).toEqual({ reasons: ['interest_day_count'], low: 5.24, high: 5.33 });
   });
 
   it('a return within the month accrues nothing', () => {
@@ -177,17 +177,17 @@ describe('late-payment interest (LAU art. 36.4)', () => {
   });
 
   it('a partial late return and a balance still out are two items: the balance and the interest', () => {
-    // Keys 10-01-2026; interest from 10-02-2026 at 3,25 %.
-    // 600 back on 01-03-2026: 19 days. 400 still out on 07-10-2026: 239 days.
-    // 365: 600 × 0,0325 × 19 / 365 + 400 × 0,0325 × 239 / 365 = 1,0151 + 8,5123 = 9,53.
-    // 360: 1,0292 + 8,6306 = 9,66.
+    // Keys 10-01-2026; interest from 11-02-2026 at 3,25 %.
+    // 600 back on 01-03-2026: 18 days. 400 still out on 07-10-2026: 238 days.
+    // 365: 600 × 0,0325 × 18 / 365 + 400 × 0,0325 × 238 / 365 = 0,9616 + 8,4767 = 9,44.
+    // 360: 0,9750 + 8,5944 = 9,57.
     const { returned, interest } = check(1000, {
       keysReturnedOn: f('2026-01-10'),
       returns: [{ on: f('2026-03-01'), amount: 600 }],
       deductions: [],
     });
     expect(singleOf(returned)).toEqual({ status: 'owed', amount: 400 });
-    expect(bothBases(interest)).toEqual({ reasons: ['interest_day_count'], low: 9.53, high: 9.66 });
+    expect(bothBases(interest)).toEqual({ reasons: ['interest_day_count'], low: 9.44, high: 9.57 });
   });
 
   it('a balance still within its month is not due yet and accrues nothing', () => {
@@ -197,16 +197,37 @@ describe('late-payment interest (LAU art. 36.4)', () => {
       deductions: [],
     });
     expect(singleOf(returned)).toEqual({ status: 'not_yet_due', amount: null });
+    expect(singleOf(interest)).toEqual({ status: 'within_limit', amount: null });
     expect(returned.outcome.kind === 'single' && returned.outcome.value.calculation.at(-1)).toEqual(
       { key: 'deposit.not_yet_due', vars: { due: { date: '2026-10-20' } } },
     );
-    // On the day the month runs out, it is owed.
-    const late = check(
+    // On the day the month runs out it is still not due; the day after, it is owed.
+    const lastDay = check(
       1000,
       { keysReturnedOn: f('2026-09-20'), returns: [], deductions: [] },
       f('2026-10-20'),
     );
+    expect(singleOf(lastDay.returned).status).toBe('not_yet_due');
+    const late = check(
+      1000,
+      { keysReturnedOn: f('2026-09-20'), returns: [], deductions: [] },
+      f('2026-10-21'),
+    );
     expect(singleOf(late.returned)).toEqual({ status: 'owed', amount: 1000 });
+  });
+
+  it.each([
+    ['2026-09-07', '2026-10-07', 'not_yet_due'],
+    ['2026-09-07', '2026-10-08', 'owed'],
+    ['2026-01-31', '2026-02-28', 'not_yet_due'],
+    ['2026-01-31', '2026-03-01', 'owed'],
+  ] as const)('keys on %s, today %s: %s', (keys, today, status) => {
+    const { returned, interest } = check(
+      1000,
+      { keysReturnedOn: f(keys), returns: [], deductions: [] },
+      f(today),
+    );
+    expect(singleOf(returned).status).toBe(status);
     expect(singleOf(interest)).toEqual({ status: 'within_limit', amount: null });
   });
 
