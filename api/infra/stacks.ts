@@ -32,7 +32,9 @@ import {
 export const GLOBAL_STACK_REGION = 'eu-west-1';
 export const MONTHLY_BUDGET_USD = 10;
 export const BUDGET_ALERT_PERCENTAGES = [50, 80, 100] as const;
-export const GITHUB_REPOSITORY = 'Endika/eslojusto';
+// The repository signs its OIDC subject with immutable owner and repository ids (GitHub's
+// `use_immutable_subject`), so a renamed or recreated repository can never match.
+export const GITHUB_SUBJECT_PREFIX = 'repo:Endika@568585/eslojusto@1407967362';
 export const GITHUB_ENVIRONMENT = 'production';
 export const DEPLOY_ROLE_NAME = 'eslojusto-github-deploy';
 export const CFN_EXECUTION_POLICY_NAME = 'eslojusto-api-cfn-execution';
@@ -280,7 +282,7 @@ export class GlobalStack extends Stack {
       assumedBy: new iam.WebIdentityPrincipal(github.attrArn, {
         StringEquals: {
           'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
-          'token.actions.githubusercontent.com:sub': `repo:${GITHUB_REPOSITORY}:environment:${GITHUB_ENVIRONMENT}`,
+          'token.actions.githubusercontent.com:sub': `${GITHUB_SUBJECT_PREFIX}:environment:${GITHUB_ENVIRONMENT}`,
         },
       }),
       inlinePolicies: {

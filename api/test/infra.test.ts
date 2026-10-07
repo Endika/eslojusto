@@ -240,7 +240,7 @@ describe('global stack', () => {
               StringEquals: {
                 'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
                 'token.actions.githubusercontent.com:sub':
-                  'repo:Endika/eslojusto:environment:production',
+                  'repo:Endika@568585/eslojusto@1407967362:environment:production',
               },
             },
           }),
