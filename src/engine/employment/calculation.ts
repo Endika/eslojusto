@@ -57,7 +57,8 @@ export type EmploymentPhraseKey =
   | 'clause.partial_nullity'
   | TrialPhraseKey
   | WorkingTimePhraseKey
-  | PartTimePhraseKey;
+  | PartTimePhraseKey
+  | HolidaysPayPhraseKey;
 
 export interface EmploymentPhrase {
   readonly key: EmploymentPhraseKey;
@@ -170,3 +171,15 @@ type PartTimePhraseKey =
   | 'part_time.complementary_notice'
   | 'part_time.voluntary_percent'
   | 'part_time.voluntary_needs_open_ended';
+
+type HolidaysPayPhraseKey =
+  | 'holidays.calendar_days'
+  | 'holidays.working_days'
+  | 'holidays.working_days_equivalent'
+  | 'holidays.counted_in_calendar_days'
+  | 'holidays.under_your_agreement'
+  | 'holidays.included_in_salary'
+  | 'holidays.short_temporary_exception'
+  | 'extra_pays.count'
+  | 'extra_pays.amount_by_agreement'
+  | 'extra_pays.prorated_by_agreement';
