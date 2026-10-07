@@ -55,6 +55,11 @@ const documents = DOCUMENTS !== null;
           >
             <h2 class="index__name">{name}</h2>
             <p class="index__status">{tx('home.coming_soon')}</p>
+            {tone === 'settlement' && (
+              <p class="index__more">
+                <a href={link(lang, 'alquiler/irav-ipc/')}>{tx('home.rent_indices')}</a>
+              </p>
+            )}
           </section>
           <span class="item__tab" aria-hidden="true" />
         </li>

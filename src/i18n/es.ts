@@ -10,6 +10,115 @@ export const es = {
   'footer.legal_notice': 'Aviso legal',
   'footer.privacy': 'Privacidad',
 
+  'rent_indices.title': 'IRAV e IPC para el alquiler: {mes}',
+  'rent_indices.description':
+    'El IRAV de {mes} es del {irav} y el IPC, del {ipc}. Cada mes desde noviembre de 2024, con su día de publicación y el enlace al INE.',
+  'rent_indices.breadcrumb': 'Ruta',
+  'rent_indices.home': 'Portada',
+  'rent_indices.h1': 'IRAV e IPC de cada mes',
+  'rent_indices.lead':
+    'Los índices que marcan cuánto puede subir tu alquiler cada año, con el día en que el INE publicó cada cifra. El IRAV sale cada mes junto con el IPC definitivo.',
+  'rent_indices.checked': 'Cifras comprobadas el {fecha}',
+  'rent_indices.sources': 'Fuentes',
+  'rent_indices.source_irav': 'IRAV (INE)',
+  'rent_indices.source_ipc': 'IPC (INE)',
+  'rent_indices.source_igc': 'IGC (INE)',
+  'rent_indices.who': 'Quién está detrás',
+
+  'rent_indices.latest': 'Último dato: IRAV e IPC de {mes}',
+  'rent_indices.latest_irav': 'IRAV de {mes}',
+  'rent_indices.latest_ipc': 'IPC de {mes}, definitivo',
+  'rent_indices.latest_flash': 'IPC de {mes}, adelantado',
+  'rent_indices.latest_igc': 'IGC de {mes}',
+  'rent_indices.published_on': 'Publicado el {fecha}',
+  'rent_indices.next':
+    'El IRAV de {mes} saldrá con el IPC definitivo de ese mes, normalmente hacia mediados del mes siguiente.',
+
+  'rent_indices.table_title': 'Cada mes desde noviembre de 2024',
+  'rent_indices.table_lead':
+    'Variación anual de cada índice. Debajo de cada cifra, el día en que la publicó el INE, con el enlace a la fuente.',
+  'rent_indices.caption':
+    'IRAV, IPC e IGC por mes, en variación anual, con el día en que el INE publicó cada cifra',
+  'rent_indices.col_month': 'Mes',
+  'rent_indices.col_irav': 'IRAV',
+  'rent_indices.col_ipcFlash': 'IPC adelantado',
+  'rent_indices.col_ipc': 'IPC definitivo',
+  'rent_indices.col_igc': 'IGC',
+  'rent_indices.cell_published': 'publicado el',
+  'rent_indices.cell_pending': 'Pendiente',
+  'rent_indices.note_flash':
+    'El IPC adelantado es una estimación que el INE da al final de cada mes; el definitivo llega unas dos semanas después y a veces cambia una décima. El IRAV no tiene adelantado.',
+  'rent_indices.note_igc':
+    'El INE publica el IGC tal como sale de su fórmula, y a menudo es negativo. Para revisar un precio con él, la Ley 2/2015 lo deja entre el {min} y el {max}: si es negativo, la revisión es del {min}, y si pasa del {max}, se toma el {max}.',
+  'rent_indices.note_igc_law': 'Ley 2/2015, anexo (BOE)',
+
+  'rent_indices.caps_title': 'Cuánto puede subir tu alquiler cada año',
+  'rent_indices.caps_lead':
+    'Tu alquiler solo puede subir si tu contrato lo dice, y una vez al año: el día en que se cumple cada año de contrato. Sube según el índice que pacta el contrato, sin pasar del tope legal de ese momento. Estos son los topes de los contratos de vivienda desde el 6 de marzo de 2019:',
+  'rent_indices.cap.ipc.when': 'Del 06-03-2019 al 30-03-2022',
+  'rent_indices.cap.ipc.rule': 'El IPC.',
+  'rent_indices.cap.igc.when': 'Del 31-03-2022 al 31-12-2023',
+  'rent_indices.cap.igc.rule':
+    'El IGC, salvo que pactarais otra subida. Como la ley lo deja entre el 0 % y el 2 %, fue como mucho un 2 %.',
+  'rent_indices.cap.three.when': 'En 2024',
+  'rent_indices.cap.three.rule': 'Un 3 %, salvo que pactarais otra subida.',
+  'rent_indices.cap.irav.when': 'Desde el 01-01-2025',
+  'rent_indices.cap.irav.rule':
+    'El IRAV en los contratos desde el 26-05-2023; el IPC en los anteriores.',
+  'rent_indices.cap.two.when': 'Desde el 08-10-2026',
+  'rent_indices.cap.two.rule':
+    'El IRAV en todos los contratos y, hasta el 31-12-2027, como mucho un 2 % salvo que pactéis otra subida.',
+  'rent_indices.status.pending_validation':
+    'Estado a {fecha}: el {norma} rige desde el {desde} y está pendiente de convalidación. El Congreso tiene que votarlo en los 30 días siguientes a su promulgación; si no lo convalida, queda derogado.',
+  'rent_indices.status.in_force':
+    'Estado a {fecha}: el Congreso convalidó el {norma}; el acuerdo se publicó el {estado}.',
+  'rent_indices.status.repealed':
+    'Estado a {fecha}: el Congreso derogó el {norma}; el acuerdo se publicó el {estado}. Su tope del 2 % ya no se aplica.',
+  'rent_indices.status_short.pending_validation': 'pendiente de que el Congreso lo convalide',
+  'rent_indices.status_short.in_force': 'convalidado por el Congreso',
+  'rent_indices.status_short.repealed': 'derogado después por el Congreso',
+  'rent_indices.now':
+    'Con el último IRAV ({irav}) y mientras rija el {norma}, el tope sin nuevo pacto es el {tope}: el más bajo de los dos.',
+  'rent_indices.repealed':
+    'Antes hubo dos decretos con el mismo tope del 2 % que el Congreso derogó: el {norma1}, que rigió del {desde1} al {hasta1}, y el {norma2}, que rigió el {desde2}. Una subida de esos días es un caso dudoso.',
+  'rent_indices.notice':
+    'La renta nueva se paga desde el mes siguiente a que te avisen por escrito (art. 18.2 LAU).',
+
+  'rent_indices.example_title': 'Un ejemplo',
+  'rent_indices.example_label': 'Ejemplo.',
+  'rent_indices.example':
+    'Pagas {renta} al mes por un contrato de 2024 que se actualiza con el IRAV. El {dia} se cumple un año más de contrato, y ese día el último IRAV publicado es el de {mes}: {irav}, publicado el {publicado}. Tu renta puede pasar a {maximo} como mucho.',
+  'rent_indices.example_later':
+    'Si se cumpliera el {dia}, sin nuevo pacto el tope sería el 2 %, o el IRAV si fuera más bajo, mientras rija el {norma}: {maximo} como mucho.',
+
+  'rent_indices.soon_title': 'Próximamente: comprueba tu subida',
+  'rent_indices.soon':
+    'Estamos preparando una calculadora que compruebe tu subida con la fecha de tu contrato y el índice de cada mes. Aún no está disponible.',
+
+  'rent_indices.faq': 'Preguntas frecuentes',
+  'rent_indices.faq.what_is_irav': '¿Qué es el IRAV?',
+  'rent_indices.faq.what_is_irav_answer':
+    'Es el índice que el INE publica cada mes para limitar la subida anual del alquiler de vivienda (disposición adicional 11.ª de la LAU). Es el valor más bajo entre el IPC, el IPC subyacente y una media que acerca el resultado al 2 %. Sirve de tope desde el 1 de enero de 2025.',
+  'rent_indices.faq.which_month': '¿Qué mes cuenta para subir mi alquiler?',
+  'rent_indices.faq.which_month_answer':
+    'El último publicado el día en que se cumple cada año de contrato, no el del mes de ese día (art. 18.1 LAU). Si tu contrato cumple años el {dia}, cuenta el IRAV de {mes}, publicado el {publicado}.',
+  'rent_indices.faq.irav_or_ipc': '¿Me toca el IRAV o el IPC?',
+  'rent_indices.faq.irav_or_ipc_answer':
+    'Depende de cuándo empezó tu contrato y de cuándo se cumple el año. Desde 2025, el IRAV es el tope de los contratos desde el 26 de mayo de 2023, y el IPC el de los anteriores. Desde el 8 de octubre de 2026, el RDL 29/2026 pone el IRAV para todos ({estado}).',
+  'rent_indices.faq.flash': '¿Cuenta el IPC adelantado?',
+  'rent_indices.faq.flash_answer':
+    'El INE da una estimación del IPC al final de cada mes y el dato definitivo unas dos semanas después. La ley habla del último índice publicado sin aclarar si el adelantado cuenta, por eso aquí ves los dos. El IRAV no tiene adelantado: sale con el IPC definitivo.',
+  'rent_indices.faq.no_clause': '¿Me pueden subir el alquiler si el contrato no dice nada?',
+  'rent_indices.faq.no_clause_answer':
+    'No. Sin una cláusula de actualización, la renta no se actualiza (art. 18.1 LAU). Si la cláusula dice que se actualiza pero no con qué índice, se usa el IGC hasta el 7 de octubre de 2026 y el IRAV desde el 8, por el RDL 29/2026.',
+  'rent_indices.faq.igc_negative': '¿Por qué el IGC sale negativo?',
+  'rent_indices.faq.igc_negative_answer':
+    'El INE publica el IGC tal como sale de su fórmula, que compara los precios de España con los de la zona euro. Para revisar un precio con él, la Ley 2/2015 lo deja entre el 0 % y el 2 %: si es negativo, la revisión es del 0 %.',
+
+  'rent_indices.dataset_name': 'IRAV, IPC e IGC de cada mes',
+  'rent_indices.dataset_description':
+    'Variación anual del Índice de Referencia de Arrendamientos de Vivienda (IRAV), del Índice de Precios de Consumo (IPC, adelantado y definitivo) y del Índice de Garantía de Competitividad (IGC) de cada mes desde noviembre de 2024, con el día en que el INE publicó cada cifra.',
+
   'home.title': 'Calcula tu finiquito y comprueba si es justo · eslojusto.es',
   'home.description':
     'Calcula el mínimo legal de tu finiquito y compáralo con lo que te pagan, partida por partida y con el artículo de cada cifra. Todo en tu dispositivo.',
@@ -27,6 +136,7 @@ export const es = {
   'home.rent': 'Alquiler',
   'home.coming_soon': 'Próximamente',
   'home.coming_soon_aria': '{nombre}, próximamente',
+  'home.rent_indices': 'IRAV e IPC de cada mes',
 
   'final_pay.title': 'Calcular finiquito 2026: compáralo con el mínimo legal',
   'final_pay.description':
