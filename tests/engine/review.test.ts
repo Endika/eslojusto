@@ -36,13 +36,7 @@ describe('reviewFinalPay', () => {
     const r = reviewFinalPay(withInput({ endDate: f('2009-01-01') }), {}, TODAY);
     expect(r.ok).toBe(false);
     if (!r.ok) {
-      expect(r.errors).toEqual([
-        {
-          field: 'endDate',
-          code: 'end_before_start',
-          message: 'La fecha de baja es anterior a la de alta',
-        },
-      ]);
+      expect(r.errors).toEqual([{ field: 'endDate', code: 'end_before_start' }]);
     }
   });
 
@@ -108,15 +102,14 @@ describe('reviewFinalPay', () => {
 
   it('(f) unchecked always includes net pay', () => {
     for (const e of [base, withInput({ cause: 'resignation' })]) {
-      expect(review(e).unchecked).toContain('El neto: retenciones de IRPF y cotizaciones');
+      expect(review(e).uncheckedCodes).toContain('net_pay');
     }
   });
 
   it('additional extra payments only when there are more than two', () => {
-    const line = 'Pagas extra además de las dos ordinarias';
-    expect(review(base).unchecked).not.toContain(line);
+    expect(review(base).uncheckedCodes).not.toContain('additional_extra_pay');
     const e = withInput({ extraPayProrated: false, extraPayCount: 3, extraPayAmount: 2500 });
-    expect(review(e).unchecked).toContain(line);
+    expect(review(e).uncheckedCodes).toContain('additional_extra_pay');
   });
 
   it('rejects an end date more than a year ahead', () => {

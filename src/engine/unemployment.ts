@@ -2,7 +2,7 @@ import { between, exact, type Range } from './money';
 import { calendarDays, max, ordinal, addDays, addMonthsClamped, type CivilDate } from './date';
 import { SOURCES, type Source } from './sources';
 import { annualSalary } from './settlement';
-import type { Cause, FinalPayInput, OtherContracts, ContributionPeriod } from './types';
+import type { FinalPayInput, OtherContracts, ContributionPeriod } from './types';
 
 // 2026 figures. Review every 1 January and whenever new PGE are passed.
 export const BENEFIT_2026 = {
@@ -62,17 +62,15 @@ export interface BenefitFigures {
 export type BenefitDuration =
   | { readonly kind: 'at_least'; readonly days: number }
   | { readonly kind: 'exact'; readonly days: number }
-  | { readonly kind: 'up_to'; readonly days: number; readonly reason: string };
+  | { readonly kind: 'up_to'; readonly days: number };
 
 export type BenefitEstimate =
   | {
       readonly entitled: 'no';
-      readonly reason: string;
       readonly sources: readonly Source[];
     }
   | {
       readonly entitled: 'yes';
-      readonly reason: string;
       readonly qualifying:
         'met_by_this_contract' | 'met_with_other_contracts' | 'depends_on_work_history';
       // This contract alone, inside the 6-year window.
@@ -102,20 +100,6 @@ export const benefitState = (p: BenefitEstimate): BenefitState =>
 export const trunc2 = (x: number): number => Math.floor(x * 100 + 1e-6) / 100;
 
 const clamp = (x: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, x));
-
-const REASON: Record<Cause, string> = {
-  resignation: 'El cese voluntario no es situación legal de desempleo (art. 267.2.a LGSS).',
-  fixed_term_end:
-    'El fin del contrato temporal es situación legal de desempleo si no lo terminó el trabajador (art. 267.1.a.6.º LGSS).',
-  objective_dismissal:
-    'El despido objetivo es situación legal de desempleo (art. 267.1.a.4.º LGSS).',
-  unfair_dismissal: 'El despido es situación legal de desempleo (art. 267.1.a.3.º LGSS).',
-  disciplinary_dismissal:
-    'El despido disciplinario es situación legal de desempleo aunque no se impugne (arts. 267.1.a.3.º y 268.4 LGSS).',
-};
-
-const UP_TO_REASON =
-  'Si cobraste paro después de alguno de estos contratos, esos días ya se usaron y puede ser menos (art. 269.2 LGSS).';
 
 const windowStart = (endDate: CivilDate): CivilDate => addDays(addMonthsClamped(endDate, -72), 1);
 
@@ -190,8 +174,7 @@ export function estimateBenefit(
   children: Children,
   others?: OtherContracts,
 ): BenefitEstimate {
-  if (e.cause === 'resignation')
-    return { entitled: 'no', reason: REASON.resignation, sources: [SOURCES.lgss267] };
+  if (e.cause === 'resignation') return { entitled: 'no', sources: [SOURCES.lgss267] };
 
   const d = contractContributedDays(e.startDate, e.endDate);
   const rows = others?.contracts ?? [];
@@ -205,7 +188,7 @@ export function estimateBenefit(
       ? { kind: 'at_least', days: durationForDays(d) }
       : noBenefitSince
         ? { kind: 'exact', days: durationForDays(total) }
-        : { kind: 'up_to', days: durationForDays(total), reason: UP_TO_REASON };
+        : { kind: 'up_to', days: durationForDays(total) };
   const noFigures: NoFiguresReason | null =
     d < P.baseDays
       ? 'short_contract'
@@ -214,7 +197,6 @@ export function estimateBenefit(
         : null;
   return {
     entitled: 'yes',
-    reason: REASON[e.cause],
     qualifying:
       d >= P.qualifyingDays
         ? 'met_by_this_contract'

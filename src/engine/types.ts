@@ -54,7 +54,6 @@ export type ZeroReason = 'resignation' | 'disciplinary_dismissal' | 'replacement
 
 export interface Item {
   readonly id: ItemId;
-  readonly title: string;
   readonly direction: 'credit' | 'deduction';
   readonly range: Range | null;
   readonly calculation: string;
