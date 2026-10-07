@@ -282,6 +282,8 @@ export const READINGS = {
   chaining_overlap: ['overlap_same_contract', 'overlap_separate_contracts'],
   complement_kind: ['complement_fixed', 'complement_variable'],
   paid_hours: ['effective_hours', 'with_paid_rest'],
+  // Both «technical» and «small company» unknown: staff size only matters for non-technicians.
+  technical_and_staff: ['technical', 'not_technical_under_25_staff', 'not_technical_from_25_staff'],
 } as const;
 export type DoubtQuestion = keyof typeof READINGS;
 export type ReadingCode<Q extends DoubtQuestion = DoubtQuestion> = (typeof READINGS)[Q][number];

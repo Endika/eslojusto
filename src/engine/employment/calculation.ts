@@ -53,7 +53,9 @@ export type EmploymentPhraseKey =
   | 'minimum_wage.agreement.below'
   | 'modality.before_reform'
   | ModalityPhraseKey
-  | ChainingPhraseKey;
+  | ChainingPhraseKey
+  | 'clause.partial_nullity'
+  | TrialPhraseKey;
 
 // Art. 15.4 and 15.5 ET are quoted, never asserted: «permanent_on_breach» and
 // «chaining.permanent» say the article states that, in a case like this one, the person acquires
@@ -112,6 +114,20 @@ type ChainingPhraseKey =
   | 'chaining.depends_on_overlap'
   | 'chaining.same_group_not_counted'
   | 'chaining.kind_unknown_not_counted';
+
+type TrialPhraseKey =
+  | 'trial.amount_days'
+  | 'trial.amount_weeks'
+  | 'trial.amount_months'
+  | 'trial.within_legal_limit'
+  | 'trial.over_legal_limit'
+  | 'trial.within_your_agreement'
+  | 'trial.over_your_agreement'
+  | 'trial.temporary_end_unknown'
+  | 'trial.void_alternance'
+  | 'trial.void_after_training'
+  | 'trial.void_same_duties'
+  | 'trial.not_in_writing';
 
 export interface EmploymentPhrase {
   readonly key: EmploymentPhraseKey;
