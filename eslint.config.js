@@ -5,18 +5,20 @@ import globals from 'globals';
 
 // Import boundaries: the engine is the core and depends on nothing; the UI reaches analytics only
 // through the calculator ports, which the composition root (src/scripts) wires to PostHog.
+// A `..` segment after the leading one (`./../x`, `../a/../../x`) would climb out unseen.
+const climbsBack = '^\\.\\.?/(.*/)?\\.\\.(/|$)';
 const localOnly = (dir) => ({
-  regex: '^(?!\\./)',
+  regex: `^(?!\\./)|${climbsBack}`,
   message: `src/${dir} imports only from src/${dir}.`,
 });
 // src/engine/rental reaches the rest of the engine one level up, and only its edges (data/, where
 // the norm and index tables live) hold data: the rules take those tables as arguments.
 const rentalOnly = {
-  regex: '^(?!\\.\\.?/)|^\\.\\./\\.\\./',
+  regex: `^(?!\\.\\.?/)|${climbsBack}`,
   message: 'src/engine/rental imports only from src/engine.',
 };
 const noRentalData = {
-  regex: '(^|/)data/',
+  regex: '(^|/)data(/|$)',
   message: 'Rental rules take the norm and index tables as arguments; they never import them.',
 };
 const noAnalytics = {
@@ -65,6 +67,16 @@ const engineGlobals = {
       name,
       message: 'The engine runs without a browser.',
     })),
+  ],
+  'no-restricted-properties': [
+    'error',
+    ...['globalThis', 'self'].flatMap((object) =>
+      ['Date', 'performance'].map((property) => ({
+        object,
+        property,
+        message: 'The engine never reads the clock: take today as a parameter.',
+      })),
+    ),
   ],
 };
 const AREAS = [
