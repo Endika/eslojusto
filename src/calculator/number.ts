@@ -46,6 +46,9 @@ const DECIMAL = new Intl.NumberFormat('es-ES', {
   useGrouping: 'always',
 });
 
+// An amount as the form takes it back: «1.850,00».
+export const formatAmountInput = (n: number): string => DECIMAL.format(n);
+
 // The calculation text writes euros with a plain space: «725,81 €».
 export function formatCalculationEuros(n: number): string {
   return `${DECIMAL.format(n)} €`;

@@ -80,6 +80,13 @@ export function setUpOtherContracts(form: HTMLFormElement, tr: Translate, onChan
     for (const row of rows()) row.remove();
     addRow();
   }
+
+  // Exactly `n` rows, at least one, so values can be set by their names.
+  function setRows(n: number) {
+    for (const row of rows().slice(Math.max(1, n))) row.remove();
+    while (rows().length < n) addRow();
+    renumber();
+  }
   reset();
-  return { reset };
+  return { reset, setRows };
 }

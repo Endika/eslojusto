@@ -3,6 +3,7 @@ import { reviewFinalPay } from '../engine/review';
 import { applyConditions, firstIncomplete, stepFrom } from './conditions';
 import { watchDisclosures } from './disclosures';
 import { required } from './dom';
+import { formEntries, rowsNeeded, setEntry, type FormEntries } from './fill';
 import {
   SHEETS,
   baseField,
@@ -18,7 +19,22 @@ import type { CalculatorDeps } from './ports';
 import { renderErrors, renderBenefit, renderReview } from './render';
 import { LAST_SHEET, RESULT_STEP, indexOfHash, stepAt } from './steps';
 
-export function setUpCalculator(root: HTMLElement, { events, today, tr }: CalculatorDeps): void {
+// What the page's other parts can do with the calculator: set or read its answers, and open it.
+export interface Calculator {
+  readonly form: HTMLFormElement;
+  // Sets the answers and returns the names it could not set.
+  fill(entries: FormEntries): string[];
+  entries(): FormEntries;
+  // Shows the first sheet, as if the visit started there.
+  open(): void;
+  // Reviews the answers as the «Revisar» button does; false when a sheet still needs an answer.
+  review(): boolean;
+}
+
+export function setUpCalculator(
+  root: HTMLElement,
+  { events, today, tr }: CalculatorDeps,
+): Calculator {
   const form = required(root.querySelector<HTMLFormElement>('#calculator'), 'the form');
   const result = required(root.querySelector<HTMLElement>('#resultado'), 'the result');
   const reviewContainer = required(
@@ -78,16 +94,17 @@ export function setUpCalculator(root: HTMLElement, { events, today, tr }: Calcul
     nav.show(next, { history: 'push', focus: true });
   }
 
-  function goToError(errors: readonly FieldError[]) {
+  function goToError(errors: readonly FieldError[]): false {
     trackErrors(errors);
     renderErrors(form, errors, tr);
     const first = errors[0];
-    if (!first) return;
+    if (!first) return false;
     nav.show(SHEETS.indexOf(sheetOfField(first.field)), { history: 'push' });
     focusError(errors);
+    return false;
   }
 
-  function submitReview() {
+  function submitReview(): boolean {
     const parsed = readForm(form);
     if ('errors' in parsed) return goToError(parsed.errors);
     const r = reviewFinalPay(parsed.input, parsed.figures, today());
@@ -112,12 +129,13 @@ export function setUpCalculator(root: HTMLElement, { events, today, tr }: Calcul
     });
     nav.reached = RESULT_STEP;
     nav.show(RESULT_STEP, { history: 'push', focus: true });
+    return true;
   }
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (nav.current < LAST_SHEET) advance();
-    else submitReview();
+    else void submitReview();
   });
   nextButton.addEventListener('click', advance);
   backButton.addEventListener('click', () =>
@@ -160,4 +178,26 @@ export function setUpCalculator(root: HTMLElement, { events, today, tr }: Calcul
   conditions();
   nav.reached = firstIncomplete(form, today());
   nav.show(Math.min(indexOfHash(location.hash), nav.reached), { history: 'replace' });
+
+  return {
+    form,
+    fill(entries) {
+      const rows = rowsNeeded(entries);
+      if (rows > 0) otherContracts.setRows(rows);
+      // A sheet's conditions decide which controls are enabled, so they follow every answer.
+      const missed = entries.filter(([name, value]) => !setEntry(form, name, value));
+      conditions();
+      renderErrors(form, [], tr);
+      return missed.map(([name]) => name);
+    },
+    entries: () => formEntries(form),
+    open() {
+      nav.reached = 0;
+      nav.show(0, { history: 'replace', focus: true });
+    },
+    review: () => {
+      nav.reached = LAST_SHEET;
+      return submitReview();
+    },
+  };
 }
