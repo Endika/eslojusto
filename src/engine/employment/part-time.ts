@@ -1,14 +1,12 @@
 import { round2 } from '../money';
 import { phrase, type EmploymentPhrase } from './calculation';
-import { findingOf, single, type Verdict } from './finding';
+import { findingsFor, single } from './finding';
 import type { NormTable } from './norms';
-import type { EmploymentRuleId } from './rules';
-import { isOpenEnded } from './term';
+import { isOpenEnded, WEEKS_PER_YEAR } from './term';
 import type { Assessed, EmploymentInput, Finding, FindingStatus, PartTime } from './types';
 
 // Art. 12.5.b and g ET: complementary hours only with at least ten hours a week, counted over the year.
 const MIN_WEEKLY_HOURS = 10;
-const WEEKS_PER_YEAR = 365 / 7;
 // Art. 12.5.c ET: agreed complementary hours up to 30 % of the ordinary ones; the agreement may
 // set between 30 % and 60 %.
 const AGREED_PERCENT = 30;
@@ -19,8 +17,7 @@ const NOTICE_DAYS = 3;
 const VOLUNTARY_PERCENT = 15;
 const VOLUNTARY_PERCENT_AGREEMENT_MAX = 30;
 
-const finding = (id: EmploymentRuleId, verdict: Verdict, norms: NormTable): Finding =>
-  findingOf(id, 'part_time', norms, verdict);
+const finding = findingsFor('part_time');
 
 const weeklyHours = (input: EmploymentInput): number | null => {
   const { weekly, annual } = input.contractHours;

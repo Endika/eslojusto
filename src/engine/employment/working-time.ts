@@ -1,7 +1,7 @@
 import type { NormSource } from '../law/sources';
 import { round2 } from '../money';
 import { phrase, type EmploymentPhrase, type EmploymentPhraseKey } from './calculation';
-import { findingOf, single, type Verdict } from './finding';
+import { findingsFor, single } from './finding';
 import type { NormTable } from './norms';
 import { ruleSource, type EmploymentRuleId } from './rules';
 import { workWeek, type WorkWeek } from './schedule';
@@ -26,8 +26,7 @@ const OVERTIME_MAX_HOURS = 80;
 
 const hours = (minutes: number): number => round2(minutes / 60);
 
-const finding = (id: EmploymentRuleId, verdict: Verdict, norms: NormTable): Finding =>
-  findingOf(id, 'working_time', norms, verdict);
+const finding = findingsFor('working_time');
 
 function weeklyHours(
   input: EmploymentInput,
@@ -272,8 +271,6 @@ export function workingTimeNotes(
   });
   return [
     note('working_time.time_record', 'time_record'),
-    ...(input.partTime === null
-      ? []
-      : [note('part_time.monthly_summary', 'part_time_no_overtime')]),
+    ...(input.partTime === null ? [] : [note('part_time.monthly_summary', 'part_time_record')]),
   ];
 }

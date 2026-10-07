@@ -61,6 +61,7 @@ export type EmploymentRuleId =
   | 'special_working_time'
   | 'part_time_contents'
   | 'part_time_no_overtime'
+  | 'part_time_record'
   | 'complementary_hours'
   | 'voluntary_complementary'
   | 'holidays_30'
@@ -225,12 +226,13 @@ export const RULES: Readonly<Record<EmploymentRuleId, Rule>> = {
     `${ET}#a34`,
     '2019-05-12',
   ),
-  // RD 1561/1995, arts. 19 and 32 and chapter II: some activities, shift changes and night work
-  // may shorten the rest between days, split the weekly rest or average night hours over longer.
+  // RD 1561/1995: some activities (arts. 2 to 10 bis, 20 and 21), shift changes (art. 19) and night
+  // work (art. 32) may lengthen the working day, shorten the rest between days, split the weekly
+  // rest or average night hours over longer.
   special_working_time: rule(
     'special_working_time',
     'rd1561_1995',
-    'arts. 19 y 32',
+    'arts. 2 a 10 bis, 19 a 21 y 32',
     'https://www.boe.es/buscar/act.php?id=BOE-A-1995-21346#a19',
     '1995-09-27',
   ),
@@ -238,6 +240,8 @@ export const RULES: Readonly<Record<EmploymentRuleId, Rule>> = {
   part_time_contents: et('part_time_contents', '12.4.a', 'a12'),
   // 12.4.c: part-time workers do no overtime except in the cases of art. 35.3.
   part_time_no_overtime: et('part_time_no_overtime', '12.4.c', 'a12'),
+  // 12.4.c: part-time hours recorded day by day, with a monthly summary handed over with the payslip.
+  part_time_record: et('part_time_record', '12.4.c', 'a12'),
   // 12.5.b, c and d: complementary hours, agreed in writing, within their cap and notice.
   complementary_hours: et('complementary_hours', '12.5', 'a12'),
   // 12.5.g: voluntary complementary hours offered by the company.

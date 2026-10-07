@@ -160,8 +160,7 @@ type WorkingTimePhraseKey =
   | 'working_time.overtime_not_allowed'
   | 'working_time.overtime_as_needed'
   | 'working_time.overtime_hours'
-  | 'working_time.time_record'
-  | 'part_time.monthly_summary';
+  | 'working_time.time_record';
 
 type PartTimePhraseKey =
   | 'part_time.hours_missing'
@@ -171,7 +170,8 @@ type PartTimePhraseKey =
   | 'part_time.complementary_percent'
   | 'part_time.complementary_notice'
   | 'part_time.voluntary_percent'
-  | 'part_time.voluntary_needs_open_ended';
+  | 'part_time.voluntary_needs_open_ended'
+  | 'part_time.monthly_summary';
 
 type HolidaysPayPhraseKey =
   | 'holidays.calendar_days'

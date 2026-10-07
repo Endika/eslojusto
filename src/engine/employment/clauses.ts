@@ -1,9 +1,10 @@
 import { round2 } from '../money';
 import { phrase, type EmploymentPhraseKey } from './calculation';
-import { findingOf, single, type Verdict } from './finding';
+import { findingsFor, single } from './finding';
 import type { NormTable } from './norms';
 import { assessAcross, worldsOf } from './readings';
 import type { EmploymentRuleId } from './rules';
+import { WEEKS_PER_YEAR } from './term';
 import { assessOvertimePact } from './working-time';
 import type { Assessed, Clause, ClauseLabel, EmploymentInput, Finding, Salary } from './types';
 
@@ -14,7 +15,6 @@ const NON_COMPETE_OTHERS_MONTHS = 6;
 const RETENTION_MONTHS = 24;
 // Ley 10/2021, art. 1: remote work is regular from 30 % of the working time over three months.
 const REGULAR_REMOTE_PERCENT = 30;
-const WEEKS_PER_YEAR = 365 / 7;
 const DAYS_PER_YEAR = 365;
 
 // The person confirms each clause's label; the engine reads only its objective fields, never its words.
@@ -26,8 +26,7 @@ export interface ClauseAssessment {
   readonly assessed: Assessed | null;
 }
 
-const finding = (id: EmploymentRuleId, verdict: Verdict, norms: NormTable): Finding =>
-  findingOf(id, 'clauses', norms, verdict);
+const finding = findingsFor('clauses');
 
 const reviewIt = (id: EmploymentRuleId, key: EmploymentPhraseKey, norms: NormTable): Finding =>
   finding(id, { status: 'review_it', calculation: [phrase(key)] }, norms);

@@ -250,5 +250,6 @@ describe('working time notes', () => {
       'part_time.monthly_summary',
     ]);
     expect(notes[0]?.sources[0]?.inForceSince).toBe('2019-03-13');
+    expect(notes[1]?.sources.map((source) => source.id)).toEqual(['part_time_record']);
   });
 });
