@@ -278,6 +278,7 @@ export const READINGS = {
   small_company: ['under_25_staff', 'from_25_staff'],
   chaining_cutoff: ['cutoff_2021_12_31', 'cutoff_2022_03_30'],
   complement_kind: ['complement_fixed', 'complement_variable'],
+  paid_hours: ['effective_hours', 'with_paid_rest'],
 } as const;
 export type DoubtQuestion = keyof typeof READINGS;
 export type ReadingCode<Q extends DoubtQuestion = DoubtQuestion> = (typeof READINGS)[Q][number];
