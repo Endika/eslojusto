@@ -40,6 +40,8 @@ export const DENY_BEDROCK_POLICY_NAME = 'eslojusto-api-deny-bedrock';
 export const BUDGET_NAME = 'eslojusto-api-monthly';
 const CDK_QUALIFIER = 'hnb659fds';
 const EXTRACT_RESERVED_CONCURRENCY = 5;
+// Caps how hard checkout and pass can be hammered; each holds a Stripe call, never Bedrock.
+const PAYMENT_RESERVED_CONCURRENCY = 2;
 
 type FunctionKey = keyof typeof FUNCTION_NAMES;
 
@@ -52,8 +54,12 @@ const FUNCTIONS: Readonly<
     timeout: Duration.seconds(120),
     reserved: EXTRACT_RESERVED_CONCURRENCY,
   },
-  checkout: { memorySize: 256, timeout: Duration.seconds(15) },
-  pass: { memorySize: 256, timeout: Duration.seconds(15) },
+  checkout: {
+    memorySize: 256,
+    timeout: Duration.seconds(15),
+    reserved: PAYMENT_RESERVED_CONCURRENCY,
+  },
+  pass: { memorySize: 256, timeout: Duration.seconds(15), reserved: PAYMENT_RESERVED_CONCURRENCY },
 };
 
 const entry = (key: FunctionKey): string =>
@@ -130,8 +136,8 @@ export class GlobalStack extends Stack {
     const account = Stack.of(this).account;
     const regional = (service: string, resource: string): string =>
       `arn:aws:${service}:${REGION}:${account}:${resource}`;
-    const logStreams = (key: FunctionKey): string =>
-      regional('logs', `log-group:/aws/lambda/${FUNCTION_NAMES[key]}:*`);
+    const logGroup = (key: FunctionKey): string =>
+      regional('logs', `log-group:/aws/lambda/${FUNCTION_NAMES[key]}`);
     const parameter = (name: string): string => regional('ssm', `parameter${name}`);
 
     const lambdaRole = (key: FunctionKey, statements: iam.PolicyStatement[]): iam.Role =>
@@ -143,7 +149,7 @@ export class GlobalStack extends Stack {
             statements: [
               new iam.PolicyStatement({
                 actions: ['logs:CreateLogStream', 'logs:PutLogEvents'],
-                resources: [logStreams(key)],
+                resources: [logGroup(key), `${logGroup(key)}:*`],
               }),
               ...statements,
             ],
@@ -170,13 +176,18 @@ export class GlobalStack extends Stack {
         resources: [
           parameter(PARAMETER_NAMES.tokenKey),
           parameter(PARAMETER_NAMES.turnstileSecretKey),
+          // Passes count their reads in the Checkout Session's metadata.
+          parameter(PARAMETER_NAMES.stripeSecretKey),
         ],
       }),
     ]);
     const checkoutRole = lambdaRole('checkout', [
       new iam.PolicyStatement({
         actions: ['ssm:GetParameter'],
-        resources: [parameter(PARAMETER_NAMES.stripeSecretKey)],
+        resources: [
+          parameter(PARAMETER_NAMES.stripeSecretKey),
+          parameter(PARAMETER_NAMES.turnstileSecretKey),
+        ],
       }),
     ]);
     const passRole = lambdaRole('pass', [
@@ -203,7 +214,9 @@ export class GlobalStack extends Stack {
     });
     const budgetActionRole = new iam.Role(this, 'BudgetActionRole', {
       roleName: 'eslojusto-api-budget-action',
-      assumedBy: new iam.ServicePrincipal('budgets.amazonaws.com'),
+      assumedBy: new iam.ServicePrincipal('budgets.amazonaws.com').withConditions({
+        StringEquals: { 'aws:SourceAccount': account },
+      }),
       inlinePolicies: {
         attachDeny: new iam.PolicyDocument({
           statements: [
