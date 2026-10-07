@@ -11,9 +11,11 @@ import {
   type MonthlyReviewDeps,
 } from '../../../src/engine/employment/monthly-review';
 import type { NormReview } from '../../../src/engine/employment/norms';
+import { RULES } from '../../../src/engine/employment/rules';
 
 // Run by hand with `EMPLOYMENT_REVIEW=1 npm run employment:review`; with
-// `EMPLOYMENT_REVIEW_FETCH=1` as well it asks the BOE open data API for each watched article.
+// `EMPLOYMENT_REVIEW_FETCH=1` as well it asks the BOE open data API for each watched article and
+// reads each BOE page a rule links to, once, to find the rule's anchor.
 // CI runs only the checks on an injected day.
 const LIVE = process.env['EMPLOYMENT_REVIEW'] === '1';
 const FETCH = LIVE && process.env['EMPLOYMENT_REVIEW_FETCH'] === '1';
@@ -40,6 +42,22 @@ const describeItem = (item: ChecklistItem): string => {
     case 'matter':
       return `WATCH ${item.id} — ${item.url}`;
   }
+};
+
+// The provision a rule's anchor must lead to: `Artículo N` for «art. N.x», or the provision named.
+const expectedHeading = (article: string): string => {
+  const number = /\bart\. (\d+)/.exec(article);
+  if (number !== null) return `Artículo ${number[1]}.`;
+  return article.charAt(0).toUpperCase() + article.slice(1);
+};
+const headingAfter = (page: string, anchor: string): string | null => {
+  const at = page.indexOf(`id="${anchor}"`);
+  if (at < 0) return null;
+  const text = page
+    .slice(at, at + 2000)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ');
+  return /(Artículo \d+\.|Disposición [a-zé]+ [a-zé]+)/.exec(text)?.[1] ?? '';
 };
 
 const realToday = (): CivilDate => {
@@ -134,6 +152,25 @@ describe.runIf(LIVE)('monthly review of employment norms (by hand)', () => {
           );
       }
       expect(changed).toEqual([]);
+    },
+    120_000,
+  );
+
+  it.runIf(FETCH)(
+    'finds the anchor of every rule on its BOE page',
+    async () => {
+      const pages = new Map<string, string>();
+      const wrong: string[] = [];
+      for (const rule of Object.values(RULES)) {
+        const [page, anchor] = rule.url.split('#');
+        if (page === undefined || anchor === undefined) continue;
+        if (!pages.has(page)) pages.set(page, await (await fetch(page)).text());
+        const heading = headingAfter(pages.get(page) ?? '', anchor);
+        const expected = expectedHeading(rule.article);
+        if (heading === null || !expected.startsWith(heading))
+          wrong.push(`${rule.id}: #${anchor} leads to ${heading ?? 'nothing'}, not ${expected}`);
+      }
+      expect(wrong).toEqual([]);
     },
     120_000,
   );

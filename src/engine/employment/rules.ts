@@ -243,7 +243,7 @@ export const RULES: Readonly<Record<EmploymentRuleId, Rule>> = {
   // 9.1: a void clause is replaced by the legal rule and the rest of the contract stands.
   partial_nullity: et('partial_nullity', '9.1', 'a9'),
   // 12.1: the company bears the costs of regular remote work.
-  remote_costs: rule('remote_costs', 'law10_2021', 'art. 12.1', `${LAW10_2021}#a12`, '2021-07-11'),
+  remote_costs: rule('remote_costs', 'law10_2021', 'art. 12.1', `${LAW10_2021}#a1-4`, '2021-07-11'),
   // 3.2: the essential elements the company must give in writing.
   info_elements: rd723('info_elements', 'art. 3.2', 'a3'),
   // 7.1: before the employment relationship starts.

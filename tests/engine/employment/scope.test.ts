@@ -12,8 +12,23 @@ describe('scope', () => {
   it.each([
     ['2022-03-29', { inScope: true, partial: true, reason: 'before_reform' }],
     ['2022-03-30', { inScope: true, partial: false }],
-  ])('a contract started on %s', (day, expected) => {
-    expect(scope(contract({ startDate: parseDate(day) }))).toEqual(expected);
+  ])('a contract signed and started on %s', (day, expected) => {
+    expect(scope(contract({ signedOn: parseDate(day), startDate: parseDate(day) }))).toEqual(
+      expected,
+    );
+  });
+
+  it('a contract signed before the reform but started after it is reviewed in part', () => {
+    expect(
+      scope(contract({ signedOn: parseDate('2022-03-20'), startDate: parseDate('2022-04-01') })),
+    ).toEqual({ inScope: true, partial: true, reason: 'before_reform' });
+  });
+
+  it('without a signing day the start decides', () => {
+    expect(scope(contract({ signedOn: null, startDate: parseDate('2022-03-30') }))).toEqual({
+      inScope: true,
+      partial: false,
+    });
   });
 
   it.each<Relationship>([
