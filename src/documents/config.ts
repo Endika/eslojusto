@@ -47,6 +47,7 @@ export function documentsConfig(env: Env): DocumentsConfig | null {
   };
 }
 
-export const DOCUMENTS = documentsConfig(import.meta.env);
+// Pure, so a bundle that only imports DOCUMENTS_BUILD behind a folded condition drops it.
+export const DOCUMENTS = /* @__PURE__ */ documentsConfig(import.meta.env);
 
 export const DOCUMENTS_BUILD = DOCUMENTS !== null;

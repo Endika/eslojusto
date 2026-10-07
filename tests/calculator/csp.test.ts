@@ -48,7 +48,12 @@ describe.skipIf(!keylessBuild)('a keyless build tracks nothing', () => {
       expect(js, p).not.toMatch(/["'`]\$pageview["'`]/);
       // Nor the document events, their error codes or Turnstile, which only a build with the
       // documents API ships.
-      for (const word of ['extraction_completed', 'pass_revoked', 'challenges.cloudflare.com'])
+      for (const word of [
+        'extraction_completed',
+        'pass_revoked',
+        'challenges.cloudflare.com',
+        'PUBLIC_API_',
+      ])
         expect(js, p).not.toContain(word);
     }
   });
