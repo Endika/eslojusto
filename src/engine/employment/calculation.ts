@@ -109,6 +109,7 @@ type ChainingPhraseKey =
   | 'chaining.permanent'
   | 'chaining.depends_on_cutoff'
   | 'chaining.depends_on_group'
+  | 'chaining.depends_on_overlap'
   | 'chaining.same_group_not_counted'
   | 'chaining.kind_unknown_not_counted';
 

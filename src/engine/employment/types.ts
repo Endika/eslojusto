@@ -279,6 +279,7 @@ export const READINGS = {
   small_company: ['under_25_staff', 'from_25_staff'],
   chaining_cutoff: ['cutoff_2021_12_31', 'cutoff_2022_03_30'],
   chaining_group: ['group_counted', 'group_not_counted'],
+  chaining_overlap: ['overlap_same_contract', 'overlap_separate_contracts'],
   complement_kind: ['complement_fixed', 'complement_variable'],
   paid_hours: ['effective_hours', 'with_paid_rest'],
 } as const;
