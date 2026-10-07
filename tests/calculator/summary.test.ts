@@ -1,9 +1,9 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest';
 import {
+  renderResult,
   renderSummary,
   roundToTens,
-  setDetail,
   summaryHeadline,
 } from '../../src/calculator/render';
 import { completed, tr, unfairDismissal } from '../documents/fixtures';
@@ -118,17 +118,95 @@ describe('the summary before the pass', () => {
   });
 });
 
-describe('locked and unlocked detail', () => {
-  it('locked shows the summary only; unlocked, the detail only', () => {
-    const div = result();
-    setDetail(div, true);
-    expect(div.querySelector<HTMLElement>('[data-summary]')?.hidden).toBe(false);
-    for (const el of div.querySelectorAll<HTMLElement>('[data-detail]'))
-      expect(el.hidden).toBe(true);
-    expect(div.querySelector<HTMLElement>('[data-unchecked-section]')?.hidden).toBe(false);
-    setDetail(div, false);
-    expect(div.querySelector<HTMLElement>('[data-summary]')?.hidden).toBe(true);
-    for (const el of div.querySelectorAll<HTMLElement>('[data-detail]'))
-      expect(el.hidden).toBe(false);
+// The result as FinalPayResult.astro lays it out: the detail only in its templates.
+function page(): HTMLElement {
+  const root = document.createElement('section');
+  root.innerHTML = `
+    <p data-lead>Una hoja por partida</p>
+    <div data-review>
+      <section data-summary hidden>
+        <p data-summary-headline></p><ul data-summary-lines></ul>
+        <p data-summary-counted hidden></p><p data-summary-benefit></p>
+      </section>
+      <div data-items></div>
+      <div data-slot="benefit"></div>
+      <ul data-unchecked></ul>
+      <div data-slot="proposal"></div>
+      <template data-template="benefit">
+        <section data-benefit>
+          <p><svg data-benefit-mark><use></use></svg><span data-benefit-status-text></span></p>
+          <p data-benefit-reason></p><p data-benefit-no>just cause</p>
+          <div data-benefit-yes>
+            <p data-benefit-amount></p><p data-benefit-full-time>full time</p>
+            <p data-benefit-children-unknown hidden></p><p data-benefit-deduction></p>
+            <p data-benefit-duration></p><p data-benefit-duration-note></p>
+            <p data-benefit-qualifying></p>
+          </div>
+          <details><summary>Cómo se calcula</summary><ul data-benefit-sources></ul></details>
+        </section>
+      </template>
+      <template data-template="proposal">
+        <section><a href="https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430#a49">art. 49</a></section>
+      </template>
+      <template data-template="item">
+        <section data-item>
+          <span data-tab-number></span><h3 data-title></h3>
+          <p><svg data-mark><use></use></svg><span data-status-text></span></p>
+          <p data-citation hidden></p>
+          <dl data-figures><dt data-range-label></dt><dd data-range></dd><dd data-employer></dd></dl>
+          <p data-counted hidden></p><p data-based-on hidden></p>
+          <p data-agreement hidden>agreement</p><p data-reference hidden></p>
+          <details data-detail><summary>Cómo se calcula</summary>
+            <p data-calculation></p><ul data-sources></ul></details>
+        </section>
+      </template>
+      <template data-template="source">
+        <li><a></a><span data-in-force hidden></span></li>
+      </template>
+    </div>`;
+  return root;
+}
+
+const data = (r: ReturnType<typeof completed>) => ({
+  review: r.review,
+  benefit: r.benefit,
+  cause: r.input.cause,
+  children: 0 as const,
+});
+
+describe('locked and unlocked result', () => {
+  it('locked, the page holds no detail at all: no calculation, no source, no range', () => {
+    const root = page();
+    const r = completed({ ...unfairDismissal, cause: 'objective_dismissal' }, { severance: 100 });
+    renderResult(root, data(r), true, tr);
+    const text = root.textContent ?? '';
+    expect(text).toContain('Indemnización: podrían faltarte');
+    for (const detail of [
+      'Cómo se calcula',
+      'días devengados',
+      'meses ×',
+      'Mínimo legal',
+      'Referencia',
+      'en vigor desde',
+      'Estatuto de los Trabajadores',
+      'entre ',
+    ])
+      expect(text).not.toContain(detail);
+    expect(root.querySelectorAll('a[href*="boe.es"]')).toHaveLength(0);
+    expect(root.querySelectorAll('[data-item], [data-benefit], [data-range]')).toHaveLength(0);
+    expect(root.querySelector<HTMLElement>('[data-lead]')?.hidden).toBe(true);
+  });
+
+  it('unlocked, the detail is cloned in and filled; locked again, it is taken out', () => {
+    const root = page();
+    const d = data(completed());
+    renderResult(root, d, false, tr);
+    expect(root.querySelector<HTMLElement>('[data-summary]')?.hidden).toBe(true);
+    expect(root.querySelectorAll('[data-item]').length).toBeGreaterThan(2);
+    expect(root.textContent).toContain('Cómo se calcula');
+    expect(root.querySelector('a[href*="boe.es"]')).not.toBeNull();
+    expect(root.querySelector('[data-benefit-status-text]')?.textContent).not.toBe('');
+    renderResult(root, d, true, tr);
+    expect(root.querySelectorAll('[data-item], [data-benefit], a[href*="boe.es"]')).toHaveLength(0);
   });
 });

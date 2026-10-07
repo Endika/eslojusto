@@ -1,6 +1,5 @@
 import type { CompletedReview } from '../calculator/ports';
 import { required } from '../calculator/dom';
-import { setDetail } from '../calculator/render';
 import { parseDate, toIso, type CivilDate } from '../engine/date';
 import type { Review } from '../engine/review';
 import type { Translate } from '../i18n/client';
@@ -8,7 +7,14 @@ import { SESSION_ID, type Api, type ErrorCode } from './contract';
 import { CHECKOUT_ORIGIN } from './config';
 import { letterPrefilled, looksLikeDniOrNie, type LetterDetails } from './letter';
 import { canDownload, newNonce, passState, type PassStore, type PendingCheckout } from './pass';
-import type { Browser, Captcha, DocumentEvents, Download, PdfMaker } from './ports';
+import type {
+  Browser,
+  Captcha,
+  DocumentEvents,
+  Download,
+  PassVerifyResult,
+  PdfMaker,
+} from './ports';
 
 // The pass is offered only when the review finds money missing: an item below its minimum or a
 // deduction above its maximum.
@@ -63,8 +69,17 @@ export interface PaymentDeps {
   readonly keepReview: () => void;
   // The letter's date starts at today, in the person's own calendar.
   readonly today: () => CivilDate;
+  // Told whenever the pass is verified or dropped, so the result can be shown again.
+  readonly passChanged: () => void;
   readonly wait?: (ms: number) => Promise<void>;
 }
+
+// Answers after which the pass in this browser is useless, so it is forgotten.
+const DEAD_PASS = {
+  pass_invalid: 'invalid',
+  pass_expired: 'expired',
+  pass_revoked: 'revoked',
+} as const satisfies Partial<Record<ErrorCode, PassVerifyResult>>;
 
 const FILENAMES: Record<Download, 'report' | 'letter'> = { report: 'report', letter: 'letter' };
 
@@ -99,12 +114,73 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     letter.querySelector<HTMLElement>('[data-letter-id-warning]'),
     'id warning',
   );
+  const retry = required(
+    section.querySelector<HTMLButtonElement>('[data-pass-verify-retry]'),
+    'retry',
+  );
   let current: CompletedReview | null = null;
   let busy = false;
+  // The pass the API confirmed during this page's life. Kept in memory only: a reload asks again.
+  let verifiedToken: string | null = null;
+  let verifying: Promise<boolean> | null = null;
 
   function setError(code: ErrorCode | null) {
     errorSlip.hidden = code === null;
     errorSlip.textContent = code === null ? '' : tr(`client.documents.error.${code}`);
+  }
+
+  // A pass this browser holds that has not run out by its own dates; only the API can say it is good.
+  const heldPass = () => {
+    const stored = passes.pass();
+    return stored && canDownload(passState(stored, browser.now())) ? stored : null;
+  };
+  const verified = () => {
+    const held = heldPass();
+    return held !== null && held.token === verifiedToken;
+  };
+
+  function settle(token: string | null) {
+    const before = verified();
+    verifiedToken = token;
+    render();
+    if (verified() !== before) deps.passChanged();
+  }
+
+  // Asks the API whether the pass still holds: signature, expiry and the payment behind it. Until
+  // it says yes, nothing a pass pays for is shown or built.
+  function verify(): Promise<boolean> {
+    if (verified()) return Promise.resolve(true);
+    const held = heldPass();
+    if (!held) return Promise.resolve(false);
+    verifying ??= (async () => {
+      retry.hidden = true;
+      setError(null);
+      status.textContent = tr('client.documents.verify.checking');
+      const r = await api.verify(held.token);
+      status.textContent = '';
+      if (r.ok) {
+        passes.savePass({ ...held, expiresAt: r.expiresAt, readsLeft: r.readsLeft });
+        events.passVerified('ok');
+        settle(held.token);
+        return true;
+      }
+      const dead = r.code in DEAD_PASS ? DEAD_PASS[r.code as keyof typeof DEAD_PASS] : null;
+      events.passVerified(dead ?? 'unavailable');
+      if (dead) {
+        passes.forgetPass();
+        errorSlip.hidden = false;
+        errorSlip.textContent = tr(`client.documents.verify.${r.code as keyof typeof DEAD_PASS}`);
+      } else {
+        errorSlip.hidden = false;
+        errorSlip.textContent = tr('client.documents.verify.unavailable');
+        retry.hidden = false;
+      }
+      settle(null);
+      return false;
+    })().finally(() => {
+      verifying = null;
+    });
+    return verifying;
   }
 
   function render() {
@@ -113,11 +189,11 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       return;
     }
     const stored = passes.pass();
-    const paid = canDownload(passState(stored, browser.now()));
-    setDetail(section.closest('#resultado') ?? document, !paid);
+    const held = heldPass() !== null;
+    const paid = verified();
     const shortfall = hasShortfall(current.review);
-    section.hidden = !paid && !shortfall;
-    buy.hidden = paid;
+    section.hidden = !held && !shortfall;
+    buy.hidden = held;
     downloads.hidden = !paid;
     letter.hidden = !shortfall;
     if (paid && stored) {
@@ -169,7 +245,8 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
         passes.markRedeemed(candidate.sessionId, result.expiresAt);
         events.passIssued(via);
         status.textContent = tr('client.documents.pass.issued');
-        render();
+        // Just issued by the API from the payment itself: as verified as a verify would make it.
+        settle(result.pass);
         return true;
       }
       failures.push({ code: result.code, matches });
@@ -254,7 +331,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   }
 
   async function download(which: Download) {
-    if (!current || !canDownload(passState(passes.pass(), browser.now()))) return render();
+    if (!current || !(await verify())) return render();
     setError(null);
     status.textContent = tr('client.documents.pass.generating');
     try {
@@ -283,6 +360,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     }
   };
 
+  retry.addEventListener('click', guard(verify));
   letterInputs.id.addEventListener('change', checkId);
   letterInputs.id.addEventListener('input', () => {
     if (!idWarning.hidden) checkId();
@@ -317,7 +395,10 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       status.textContent = '';
       setError(null);
       render();
+      if (heldPass() && !verified()) void verify();
     },
+    // Whether the pass in this browser was confirmed by the API during this page's life.
+    verified,
     hide() {
       current = null;
       clearLetter();

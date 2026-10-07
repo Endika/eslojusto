@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { devices, test, expect, type Page, type Request } from '@playwright/test';
+import { devices, test, expect, type Locator, type Page, type Request } from '@playwright/test';
 import { pdfBomb, syntheticPdf } from '../support/synthetic-pdf';
 
 // Runs only against a TEST_DOCUMENTS=1 build, whose API is three fake origins: every request to them,
@@ -53,7 +53,10 @@ interface Fake {
   readonly extract: Request[];
   readonly checkout: Request[];
   readonly pass: Request[];
+  readonly verify: Request[];
   readonly other: string[];
+  // What the pass function answers to the next verifies, in order; then «ok».
+  readonly verifyAnswers: { status: number; body: object }[];
 }
 
 // Turnstile answers at once; the API answers as given; anything else off-site is recorded.
@@ -63,7 +66,14 @@ async function fakeServices(
   // Where Stripe sends the person: back with the session id, or, cancelling, without it.
   stripeBack = `${ORIGIN}/finiquito/?session_id=cs_test_e2e`,
 ): Promise<Fake> {
-  const fake: Fake = { extract: [], checkout: [], pass: [], other: [] };
+  const fake: Fake = {
+    extract: [],
+    checkout: [],
+    pass: [],
+    verify: [],
+    other: [],
+    verifyAnswers: [],
+  };
   await page.route('https://challenges.cloudflare.com/**', (route) =>
     route.fulfill({
       contentType: 'text/javascript',
@@ -79,6 +89,15 @@ async function fakeServices(
     return route.fulfill({ json: { code: 'ok', sessionId: 'cs_test_e2e', url: STRIPE } });
   });
   await page.route(API.pass, (route) => {
+    const body = route.request().postDataJSON() as Record<string, unknown>;
+    if ('pass' in body) {
+      fake.verify.push(route.request());
+      const answer = fake.verifyAnswers.shift() ?? {
+        status: 200,
+        body: { code: 'ok', expiresAt, readsLeft: 15 },
+      };
+      return route.fulfill({ status: answer.status, json: answer.body });
+    }
     fake.pass.push(route.request());
     return route.fulfill({ json: { code: 'ok', pass: PASS, expiresAt, readsLeft: 15 } });
   });
@@ -191,16 +210,12 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   );
   await page.getByRole('button', { name: 'Revisar' }).click();
 
-  // Before the pass, the summary: what falls short and roughly how much, without the detail.
+  // Before the pass, the summary: what falls short and roughly how much. The detail is not in
+  // the page at all, not even hidden.
   const summary = page.getByRole('region', { name: 'En resumen' });
   await expect(summary).toContainText('Indemnización: podrían faltarte unos 440 €.');
-  await expect(page.getByRole('region', { name: 'Indemnización' })).toHaveCount(0);
   const result = page.locator('#resultado');
-  await expect(
-    result.getByText('Cómo se calcula', { exact: true }).filter({ visible: true }),
-  ).toHaveCount(0);
-  await expect(result.locator('a[href*="boe.es"]:visible')).toHaveCount(0);
-  await expect(result.locator('[data-range]:visible')).toHaveCount(0);
+  await expectNoDetail(result);
 
   // The pass: the waiver first, then Stripe, then back with the session id.
   const offer = page.getByRole('region', { name: /Informe en PDF/ });
@@ -230,6 +245,8 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   );
   await expect(result.locator('a[href*="boe.es"]').first()).toBeAttached();
   await expect(result.locator('[data-range]:visible').first()).toBeVisible();
+  // Issued by the API from the payment just made, the pass needs no second check.
+  expect(fake.verify).toHaveLength(0);
   for (const [button, name] of [
     ['Descargar el informe (PDF)', 'eslojusto-informe-finiquito.pdf'],
     ['Descargar la carta (PDF)', 'eslojusto-recibi-no-conforme.pdf'],
@@ -269,6 +286,23 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   expect(fake.other).toEqual([]);
 });
 
+// No calculation, source, range or detail section anywhere in the result's DOM; templates aside,
+// which hold no person's figures and are not part of its text.
+async function expectNoDetail(result: Locator) {
+  const text = (await result.textContent()) ?? '';
+  for (const detail of [
+    'Cómo se calcula',
+    'días devengados',
+    'Mínimo legal',
+    'en vigor desde',
+    'Estatuto de los Trabajadores',
+    '40.438,41',
+  ])
+    expect(text).not.toContain(detail);
+  await expect(result.locator('a[href*="boe.es"]')).toHaveCount(0);
+  await expect(result.locator('[data-item], [data-benefit], [data-range]')).toHaveCount(0);
+}
+
 // The read values, confirmed sheet by sheet with the answers a document can't give.
 async function confirmToResult(page: Page) {
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
@@ -307,6 +341,53 @@ test('cancelling at Stripe brings the review back and keeps nothing in the tab',
   await expect(offer.getByRole('button', { name: 'Pagar 4,99 €' })).toBeVisible();
   expect(await page.evaluate(() => sessionStorage.length)).toBe(0);
   expect(fake.pass).toHaveLength(0);
+});
+
+const forgedPass = `v1.${b64url({ typ: 'pass', sid: 'cs_test_forged', exp: expiresAt })}.Zm9yZ2Vk`;
+
+test('a forged pass in localStorage never unlocks the detail', async ({ page }) => {
+  const fake = await fakeServices(page);
+  fake.verifyAnswers.push({ status: 403, body: { code: 'pass_invalid' } });
+  await page.goto('finiquito/');
+  await uploadSettlement(page);
+  await page.evaluate(
+    (pass) => localStorage.setItem('eslojusto-pase', pass),
+    JSON.stringify({ token: forgedPass, expiresAt, readsLeft: 15 }),
+  );
+  await confirmToResult(page);
+  const offer = page.getByRole('region', { name: /Informe en PDF/ });
+  await expect(offer.getByRole('alert')).toContainText('Este pase no es válido');
+  expect(fake.verify).toHaveLength(1);
+  expect(fake.verify[0]?.postDataJSON()).toEqual({ pass: forgedPass });
+  await expectNoDetail(page.locator('#resultado'));
+  await expect(offer.getByRole('button', { name: 'Pagar 4,99 €' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Descargar el informe (PDF)' })).toBeHidden();
+  expect(await page.evaluate(() => localStorage.getItem('eslojusto-pase'))).toBeNull();
+});
+
+test('with the API out of reach the pass stays locked until a retry gets through', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page);
+  fake.verifyAnswers.push({ status: 503, body: { code: 'payment_provider_unavailable' } });
+  await page.goto('finiquito/');
+  await uploadSettlement(page);
+  await page.evaluate(
+    (pass) => localStorage.setItem('eslojusto-pase', pass),
+    JSON.stringify({ token: PASS, expiresAt, readsLeft: 15 }),
+  );
+  await confirmToResult(page);
+  const offer = page.getByRole('region', { name: /Informe en PDF/ });
+  await expect(offer.getByRole('alert')).toHaveText(
+    'No hemos podido comprobar tu pase ahora mismo. Prueba otra vez en un momento.',
+  );
+  await expectNoDetail(page.locator('#resultado'));
+  await offer.getByRole('button', { name: 'Comprobar otra vez' }).click();
+  await expect(page.getByRole('region', { name: 'Indemnización' })).toContainText(
+    'Por debajo del mínimo legal',
+  );
+  await expect(page.getByRole('button', { name: 'Descargar el informe (PDF)' })).toBeVisible();
+  expect(fake.verify).toHaveLength(2);
 });
 
 test('files dropped on the zone are listed like chosen ones', async ({ page }) => {

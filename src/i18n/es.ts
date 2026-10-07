@@ -321,6 +321,7 @@ export const es = {
   'documents.letter.date': 'Fecha',
   'documents.letter.privacy':
     'Estos datos solo se usan para rellenar la carta en tu dispositivo; no se envían ni se guardan.',
+  'documents.pass.verify_retry': 'Comprobar otra vez',
   'documents.pass.letter_note':
     'La carta es una plantilla con tus cifras. Usarla o no, y cómo, es decisión tuya.',
 
@@ -754,6 +755,14 @@ export const es = {
   'client.documents.pass.renewed': 'Tu pase se ha renovado. Prueba otra vez a leer los documentos.',
   'client.documents.pass.generating': 'Preparando el PDF…',
   'client.documents.pass.generated': 'PDF listo.',
+  'client.documents.verify.checking': 'Comprobando tu pase…',
+  'client.documents.verify.unavailable':
+    'No hemos podido comprobar tu pase ahora mismo. Prueba otra vez en un momento.',
+  'client.documents.verify.pass_invalid':
+    'Este pase no es válido y se ha quitado de este navegador. Si pagaste, recupéralo en «¿Ya has pagado?».',
+  'client.documents.verify.pass_expired': 'Tu pase ha caducado y se ha quitado de este navegador.',
+  'client.documents.verify.pass_revoked':
+    'Este pase ya no vale porque su pago se devolvió o se anuló, y se ha quitado de este navegador.',
   'client.documents.pass.lost':
     'Hemos vuelto del pago, pero la revisión no se ha podido recuperar. Repítela y aparecerán las descargas.',
 

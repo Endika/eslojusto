@@ -80,6 +80,7 @@ export const OFFER = `
   </div>
   <p data-pass-status></p>
   <p data-pass-error hidden></p>
+  <button data-pass-verify-retry hidden>Retry</button>
 </section>`;
 
 export type Recorded = [keyof DocumentEvents, ...unknown[]];
@@ -99,6 +100,7 @@ export function recordingEvents(): DocumentEvents & { log: Recorded[] } {
     checkoutStarted: record('checkoutStarted'),
     passIssued: record('passIssued'),
     passFailed: record('passFailed'),
+    passVerified: record('passVerified'),
     downloaded: record('downloaded'),
   };
 }

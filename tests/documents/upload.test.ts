@@ -47,6 +47,7 @@ function setUp(
       passCalls.push(sessionId);
       return options.passAgain ?? { ok: false, code: 'service_unavailable' };
     },
+    verify: async () => ({ ok: false, code: 'service_unavailable' }),
   };
   const upload = setUpUpload(document.querySelector('[data-documents-start]') as HTMLElement, {
     api,

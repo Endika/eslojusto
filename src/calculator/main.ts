@@ -16,7 +16,7 @@ import {
 import { createNavigation } from './navigation';
 import { setUpOtherContracts } from './other-contracts';
 import type { CalculatorDeps } from './ports';
-import { renderErrors, renderBenefit, renderReview, renderSummary } from './render';
+import { renderErrors, renderResult, type ResultData } from './render';
 import { LAST_SHEET, RESULT_STEP, indexOfHash, stepAt } from './steps';
 
 // What the page's other parts can do with the calculator: set or read its answers, and open it.
@@ -29,6 +29,8 @@ export interface Calculator {
   open(): void;
   // Reviews the answers as the «Revisar» button does; false when a sheet still needs an answer.
   review(): boolean;
+  // Shows the last review again, locked or with its detail as `detail` now says.
+  refreshResult(): void;
 }
 
 export function setUpCalculator(
@@ -37,14 +39,8 @@ export function setUpCalculator(
 ): Calculator {
   const form = required(root.querySelector<HTMLFormElement>('#calculator'), 'the form');
   const result = required(root.querySelector<HTMLElement>('#resultado'), 'the result');
-  const reviewContainer = required(
-    result.querySelector<HTMLElement>('[data-review]'),
-    'the review',
-  );
-  const benefitSheet = required(
-    result.querySelector<HTMLElement>('[data-benefit]'),
-    'the benefit sheet',
-  );
+  // The last review shown, to show it again when its detail is unlocked or locked.
+  let shown: ResultData | null = null;
   const backButton = required(form.querySelector<HTMLButtonElement>('[data-back]'), 'Back');
   const nextButton = required(form.querySelector<HTMLButtonElement>('[data-next]'), 'Next');
   const nav = createNavigation(
@@ -117,9 +113,14 @@ export function setUpCalculator(
       benefit.data?.others,
     );
     renderErrors(form, [], tr);
-    renderReview(reviewContainer, r.review, tr);
-    renderBenefit(benefitSheet, estimate, parsed.input.cause, benefit.data?.children ?? null, tr);
-    renderSummary(reviewContainer, r.review, estimate, tr);
+    shown = {
+      review: r.review,
+      benefit: estimate,
+      cause: parsed.input.cause,
+      children: benefit.data?.children ?? null,
+    };
+    const state = detail();
+    renderResult(result, shown, state === 'locked', tr);
     events.stepCompleted(stepAt(nav.current));
     events.reviewCompleted({
       review: r.review,
@@ -127,7 +128,7 @@ export function setUpCalculator(
       figures: parsed.figures,
       benefit: estimate,
       otherContracts: benefit.data?.others.contracts.length ?? 0,
-      detail: detail(),
+      detail: state,
     });
     nav.reached = RESULT_STEP;
     nav.show(RESULT_STEP, { history: 'push', focus: true });
@@ -170,6 +171,7 @@ export function setUpCalculator(
     'click',
     () => {
       events.startedOver();
+      shown = null;
       form.reset();
       otherContracts.reset();
       renderErrors(form, [], tr);
@@ -203,6 +205,9 @@ export function setUpCalculator(
     review: () => {
       nav.reached = LAST_SHEET;
       return submitReview();
+    },
+    refreshResult() {
+      if (shown) renderResult(result, shown, detail() === 'locked', tr);
     },
   };
 }

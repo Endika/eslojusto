@@ -52,7 +52,7 @@ const workHistoryUrl =
     <h2 class="result__title" id="result-title" tabindex="-1">
       {tx('result.title')}
     </h2>
-    <p class="result__lead" data-detail>
+    <p class="result__lead" data-lead>
       {tx('result.lead')}
     </p>
   </header>
@@ -69,69 +69,10 @@ const workHistoryUrl =
         <p class="help" data-summary-benefit></p>
       </div>
     </section>
-    <div class="review__items" data-items data-detail></div>
+    <div class="review__items" data-items></div>
     {documents && <PassOffer lang={lang} />}
 
-    <section
-      class="item benefit"
-      data-benefit
-      data-detail
-      data-tone="holidays"
-      aria-labelledby="benefit-title"
-    >
-      <span class="item__tab" aria-hidden="true">
-        04
-      </span>
-      <div class="sheet">
-        <h3 class="item__title" id="benefit-title">
-          {tx('result.benefit')}
-        </h3>
-        <p class="item__note" data-benefit-yes>
-          {tx('result.benefit_lead')}
-        </p>
-        <p class="item__status">
-          <svg class="item__mark" data-benefit-mark viewBox="0 0 24 24" aria-hidden="true">
-            <use href="#mark-benefit-yes"></use>
-          </svg>
-          <span data-benefit-status-text></span>
-        </p>
-        <p class="help benefit__reason" data-benefit-reason></p>
-        <p class="help" data-benefit-no>
-          {tx('result.benefit_just_cause')}
-        </p>
-        <div class="benefit__blocks" data-benefit-yes>
-          <p class="help">{tx('result.benefit_requirements')}</p>
-          <h4 class="benefit__subhead">{tx('result.benefit_amount')}</h4>
-          <p class="help" data-benefit-amount></p>
-          <p class="item__note" data-benefit-full-time>
-            {tx('result.benefit_full_time')}
-          </p>
-          <p class="item__note" data-benefit-children-unknown hidden></p>
-          <p class="item__note" data-benefit-deduction></p>
-          <h4 class="benefit__subhead">{tx('result.benefit_duration')}</h4>
-          <p class="help" data-benefit-duration></p>
-          <p class="item__note" data-benefit-duration-note></p>
-          <h4 class="benefit__subhead">{tx('result.benefit_contributed')}</h4>
-          <p class="help" data-benefit-qualifying></p>
-          <p class="item__note">
-            {tx('result.benefit_work_history')}{' '}
-            <a class="benefit__link" href={workHistoryUrl} rel="noopener" target="_blank">
-              {tx('result.benefit_work_history_link')}
-            </a>
-            .
-          </p>
-          <h4 class="benefit__subhead">{tx('result.benefit_deadline')}</h4>
-          <p class="help">{tx('result.benefit_deadline_text')}</p>
-        </div>
-        <details class="item__detail">
-          <summary>{tx('result.how_it_is_calculated')}</summary>
-          <p class="help" data-benefit-yes>
-            {tx('result.benefit_calculation')}
-          </p>
-          <ul class="sources" data-benefit-sources></ul>
-        </details>
-      </div>
-    </section>
+    <div class="review__slot" data-slot="benefit"></div>
 
     <section class="item" aria-labelledby="unchecked-title">
       <div class="sheet">
@@ -142,29 +83,94 @@ const workHistoryUrl =
       </div>
     </section>
 
-    <section class="item" data-tone="legal" data-detail aria-labelledby="proposal-title">
-      <span class="item__tab" aria-hidden="true">
-        ET
-      </span>
-      <div class="sheet">
-        <h3 class="item__title" id="proposal-title">
-          {tx('result.proposal')}
-        </h3>
-        <p class="help">{tx('result.proposal_1')}</p>
-        <p class="help">{tx('result.proposal_2')}</p>
-        <p class="help">{tx('result.proposal_3')}</p>
-        <p class="source">
-          <a
-            href="https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430#a49"
-            rel="noopener"
-            target="_blank"
-          >
-            {tx('result.proposal_source')}
-          </a>
-        </p>
-      </div>
-    </section>
+    <div class="review__slot" data-slot="proposal"></div>
 
+    {/* The detail is cloned in only once it may be shown: never present, even hidden, before. */}
+    <template data-template="benefit">
+      <section
+        class="item benefit"
+        data-benefit
+        data-tone="holidays"
+        aria-labelledby="benefit-title"
+      >
+        <span class="item__tab" aria-hidden="true">
+          04
+        </span>
+        <div class="sheet">
+          <h3 class="item__title" id="benefit-title">
+            {tx('result.benefit')}
+          </h3>
+          <p class="item__note" data-benefit-yes>
+            {tx('result.benefit_lead')}
+          </p>
+          <p class="item__status">
+            <svg class="item__mark" data-benefit-mark viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#mark-benefit-yes"></use>
+            </svg>
+            <span data-benefit-status-text></span>
+          </p>
+          <p class="help benefit__reason" data-benefit-reason></p>
+          <p class="help" data-benefit-no>
+            {tx('result.benefit_just_cause')}
+          </p>
+          <div class="benefit__blocks" data-benefit-yes>
+            <p class="help">{tx('result.benefit_requirements')}</p>
+            <h4 class="benefit__subhead">{tx('result.benefit_amount')}</h4>
+            <p class="help" data-benefit-amount></p>
+            <p class="item__note" data-benefit-full-time>
+              {tx('result.benefit_full_time')}
+            </p>
+            <p class="item__note" data-benefit-children-unknown hidden></p>
+            <p class="item__note" data-benefit-deduction></p>
+            <h4 class="benefit__subhead">{tx('result.benefit_duration')}</h4>
+            <p class="help" data-benefit-duration></p>
+            <p class="item__note" data-benefit-duration-note></p>
+            <h4 class="benefit__subhead">{tx('result.benefit_contributed')}</h4>
+            <p class="help" data-benefit-qualifying></p>
+            <p class="item__note">
+              {tx('result.benefit_work_history')}{' '}
+              <a class="benefit__link" href={workHistoryUrl} rel="noopener" target="_blank">
+                {tx('result.benefit_work_history_link')}
+              </a>
+              .
+            </p>
+            <h4 class="benefit__subhead">{tx('result.benefit_deadline')}</h4>
+            <p class="help">{tx('result.benefit_deadline_text')}</p>
+          </div>
+          <details class="item__detail">
+            <summary>{tx('result.how_it_is_calculated')}</summary>
+            <p class="help" data-benefit-yes>
+              {tx('result.benefit_calculation')}
+            </p>
+            <ul class="sources" data-benefit-sources></ul>
+          </details>
+        </div>
+      </section>
+    </template>
+    <template data-template="proposal">
+      <section class="item" data-tone="legal" aria-labelledby="proposal-title">
+        <span class="item__tab" aria-hidden="true">
+          ET
+        </span>
+        <div class="sheet">
+          <h3 class="item__title" id="proposal-title">
+            {tx('result.proposal')}
+          </h3>
+          <p class="help">{tx('result.proposal_1')}</p>
+          <p class="help">{tx('result.proposal_2')}</p>
+          <p class="help">{tx('result.proposal_3')}</p>
+          <p class="source">
+            <a
+              href="https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430#a49"
+              rel="noopener"
+              target="_blank"
+            >
+              {tx('result.proposal_source')}
+            </a>
+          </p>
+        </div>
+      </section>
+    </template>
     <template data-template="item">
       <section class="item" data-item>
         <span class="item__tab" aria-hidden="true" data-tab-number></span>

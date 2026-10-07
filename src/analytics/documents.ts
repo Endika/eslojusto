@@ -32,6 +32,9 @@ export function documentsAnalytics(track: Track): DocumentEvents {
     passFailed(code) {
       track('pass_failed', { code });
     },
+    passVerified(result) {
+      track('pass_verified', { result });
+    },
     downloaded(document, letterPrefilled) {
       track('report_downloaded', {
         document,

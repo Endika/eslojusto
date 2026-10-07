@@ -227,3 +227,30 @@ describe('checkout and pass', () => {
     });
   });
 });
+
+describe('verify', () => {
+  it('posts only the pass to the pass function and returns its expiry and reads left', async () => {
+    const fetch = fakeFetch(200, { code: 'ok', expiresAt: 1_800_000_000, readsLeft: 3 });
+    expect(await createApi(ENDPOINTS, fetch).verify('v1.p.s')).toEqual({
+      ok: true,
+      expiresAt: 1_800_000_000,
+      readsLeft: 3,
+    });
+    expect(fetch.calls[0]).toEqual({ url: 'https://pass.api.test/', body: { pass: 'v1.p.s' } });
+  });
+  it.each(['pass_invalid', 'pass_expired', 'pass_revoked'])(
+    '%s comes back as such',
+    async (code) => {
+      expect(await createApi(ENDPOINTS, fakeFetch(403, { code })).verify('v1.p.s')).toEqual({
+        ok: false,
+        code,
+      });
+    },
+  );
+  it('an answer without its figures is never a yes', async () => {
+    expect(await createApi(ENDPOINTS, fakeFetch(200, { code: 'ok' })).verify('v1.p.s')).toEqual({
+      ok: false,
+      code: 'unexpected_response',
+    });
+  });
+});
