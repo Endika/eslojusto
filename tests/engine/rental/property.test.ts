@@ -11,7 +11,9 @@ import { round2 } from '../../../src/engine/money';
 import { anniversaryIn } from '../../../src/engine/rental/anniversary';
 import { RENTAL_TABLES } from '../../../src/engine/rental/data/tables';
 import type { NormId, NormTable } from '../../../src/engine/rental/norms';
-import type { Outcome } from '../../../src/engine/rental/outcome';
+import { countedAmount, type Outcome } from '../../../src/engine/rental/outcome';
+import { itemAmount } from '../../../src/engine/rental/item';
+import { rentUpdateAmount } from '../../../src/engine/rental/rent-update';
 import {
   reviewRental,
   type RentalItemResult,
@@ -204,6 +206,38 @@ function restsOn(item: RentalItemResult, id: NormId, norms: NormTable): boolean 
 const keyOf = (item: RentalItemResult) =>
   `${item.kind}:${item.index}:${'year' in item ? item.year : ''}`;
 
+// Each reading's status and euros, read straight from the item: a rent update's are its
+// accumulated difference when paid over; any other item's, its amount when it carries one.
+function readingsOf(item: RentalItemResult): { status: string; amount: number }[] {
+  const values: { status: string; amount?: number | null; accumulated?: number }[] =
+    item.outcome.kind === 'single'
+      ? [item.outcome.value]
+      : item.outcome.readings.map((r) => r.value);
+  return values.map((v) => ({
+    status: v.status,
+    amount:
+      item.kind === 'rent_update'
+        ? v.status === 'paid_over'
+          ? (v.accumulated ?? 0)
+          : 0
+        : ['paid_over', 'owed', 'over_cap'].includes(v.status)
+          ? (v.amount ?? 0)
+          : 0,
+  }));
+}
+
+// Paid over, owed or over the cap in every reading, outside any repealed window.
+const holdsEverywhere = (item: RentalItemResult, status: string): boolean =>
+  !(item.outcome.kind === 'depends' && item.outcome.reasons.includes('repealed_window')) &&
+  readingsOf(item).every((r) => r.status === status && r.amount > 0);
+
+const expectedCounted = (review: RentalReview, status: string): number =>
+  round2(
+    review.items
+      .filter((i) => holdsEverywhere(i, status))
+      .reduce((sum, i) => sum + Math.min(...readingsOf(i).map((r) => r.amount)), 0),
+  );
+
 describe('a rental review, over random contracts', () => {
   it('never counts more than any reading gives nor less than nothing', () => {
     const g = prng(20261007);
@@ -217,11 +251,35 @@ describe('a rental review, over random contracts', () => {
         expect(total.counted).toBeGreaterThanOrEqual(0);
         expect(total.counted).toBeLessThanOrEqual(total.upTo);
       }
+      expect(review.totals.paidOver.counted).toBe(expectedCounted(review, 'paid_over'));
+      expect(review.totals.owed.counted).toBe(expectedCounted(review, 'owed'));
+      expect(review.totals.overCap.counted).toBe(expectedCounted(review, 'over_cap'));
       expect(review.offerPass).toBe(
-        review.totals.paidOver.counted > 0 || review.totals.owed.counted > 0,
+        review.items.some((i) => holdsEverywhere(i, 'paid_over') || holdsEverywhere(i, 'owed')),
       );
     }
     expect(reviewed).toBeGreaterThan(CASES / 2);
+  });
+
+  it('an item with any reading at zero counts nothing', () => {
+    const g = prng(7102026);
+    let zeroed = 0;
+    for (let k = 0; k < CASES; k++) {
+      const today = g.pick(TODAYS);
+      const review = reviewOf(randomInput(g, today), today, RENTAL_TABLES);
+      if (review === null) continue;
+      for (const item of review.items) {
+        const amounts = readingsOf(item).map((r) => r.amount);
+        if (!amounts.includes(0)) continue;
+        zeroed++;
+        const counted =
+          item.kind === 'rent_update'
+            ? countedAmount(item.outcome, rentUpdateAmount)
+            : countedAmount(item.outcome, itemAmount);
+        expect(counted, keyOf(item)).toBe(0);
+      }
+    }
+    expect(zeroed).toBeGreaterThan(CASES);
   });
 
   it('a change of norm status moves only the items that rest on that norm', () => {
