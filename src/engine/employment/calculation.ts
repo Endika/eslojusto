@@ -56,7 +56,8 @@ export type EmploymentPhraseKey =
   | ChainingPhraseKey
   | 'clause.partial_nullity'
   | TrialPhraseKey
-  | WorkingTimePhraseKey;
+  | WorkingTimePhraseKey
+  | PartTimePhraseKey;
 
 export interface EmploymentPhrase {
   readonly key: EmploymentPhraseKey;
@@ -159,3 +160,13 @@ type WorkingTimePhraseKey =
   | 'working_time.overtime_hours'
   | 'working_time.time_record'
   | 'part_time.monthly_summary';
+
+type PartTimePhraseKey =
+  | 'part_time.hours_missing'
+  | 'part_time.distribution_missing'
+  | 'part_time.full_time_presumed'
+  | 'part_time.complementary_under_10_hours'
+  | 'part_time.complementary_percent'
+  | 'part_time.complementary_notice'
+  | 'part_time.voluntary_percent'
+  | 'part_time.voluntary_needs_open_ended';
