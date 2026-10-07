@@ -311,11 +311,17 @@ export class GlobalStack extends Stack {
         new iam.PolicyStatement({ actions: ['lambda:*'], resources: functionArns }),
         new iam.PolicyStatement({
           actions: ['logs:*'],
-          resources: Object.values(FUNCTION_NAMES).map((n) =>
+          resources: Object.values(FUNCTION_NAMES).flatMap((n) => [
             regional('logs', `log-group:/aws/lambda/${n}`),
-          ),
+            regional('logs', `log-group:/aws/lambda/${n}:*`),
+          ]),
         }),
         new iam.PolicyStatement({ actions: ['logs:DescribeLogGroups'], resources: ['*'] }),
+        // The synthesized template checks the bootstrap version through this parameter.
+        new iam.PolicyStatement({
+          actions: ['ssm:GetParameters'],
+          resources: [regional('ssm', `parameter/cdk-bootstrap/${CDK_QUALIFIER}/version`)],
+        }),
         new iam.PolicyStatement({
           actions: ['iam:PassRole'],
           resources: [extractRole.roleArn, checkoutRole.roleArn, passRole.roleArn],
