@@ -1,5 +1,5 @@
 import type { PostHogConfig } from 'posthog-js';
-import { ANALYTICS_ORIGIN } from '../layouts/csp';
+import { ANALYTICS_ORIGIN } from './config';
 import { isValidEvent, type EventName, type Props } from './events';
 import { cleanEvent } from './sanitize';
 
