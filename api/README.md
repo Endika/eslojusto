@@ -252,7 +252,9 @@ Nothing here has been run. Each step needs an account administrator.
 
 1. **Lambda concurrency quota.** The account allows 10 concurrent executions, and Lambda keeps
    100 unreserved. The functions reserve 5 + 2 + 2 = 9, so the deployment fails until the quota
-   is at least 109. Request it in Service Quotas (`L-B99A9384`, eu-south-2).
+   is at least 109. Request it in Service Quotas (`L-B99A9384`, eu-south-2). Until it is
+   granted, set the repository variable `RESERVE_CONCURRENCY=false`: nothing is reserved and
+   the account-wide limit of 10 caps all three functions instead.
 2. **Bedrock, eu-south-2.** Submit Anthropic's use-case form once in the console. Set data
    retention to none (on 07-10-2026 it reads `inherit`), so a model that would retain data is
    blocked instead:

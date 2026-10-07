@@ -45,6 +45,7 @@ jobs:
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: eu-south-2
-      - run: npx cdk deploy EslojustoApi --require-approval never -c stripePriceId="$STRIPE_PRICE_ID"
+      - run: npx cdk deploy EslojustoApi --require-approval never -c stripePriceId="$STRIPE_PRICE_ID" -c reserveConcurrency="$RESERVE_CONCURRENCY"
         env:
           STRIPE_PRICE_ID: ${{ vars.STRIPE_PRICE_ID }}
+          RESERVE_CONCURRENCY: ${{ vars.RESERVE_CONCURRENCY || 'true' }}
