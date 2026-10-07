@@ -1,0 +1,41 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-haiku-4-5-20251001",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "detectedKind": {
+          "value": "work_history",
+          "confidence": "high"
+        },
+        "contracts": [
+          {
+            "startDate": "2019-01-07",
+            "endDate": "2019-06-30",
+            "confidence": "high"
+          },
+          {
+            "startDate": "2020-02-01",
+            "endDate": "2021-12-31",
+            "confidence": "high"
+          },
+          {
+            "startDate": "2022-03-01",
+            "confidence": "medium"
+          }
+        ]
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 6120,
+    "output_tokens": 410
+  }
+}

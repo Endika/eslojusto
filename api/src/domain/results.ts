@@ -1,0 +1,30 @@
+// Every code the API answers with; the site translates them, the API never returns prose.
+export type ResultCode =
+  | 'ok'
+  | 'method_not_allowed'
+  | 'invalid_request'
+  | 'payload_too_large'
+  | 'no_files'
+  | 'too_many_files'
+  | 'mixed_files'
+  | 'unsupported_media_type'
+  | 'image_unreadable'
+  | 'image_too_large'
+  | 'pdf_unreadable'
+  | 'pdf_too_many_pages'
+  | 'captcha_failed'
+  | 'daily_limit_reached'
+  | 'pass_invalid'
+  | 'pass_expired'
+  | 'pass_exhausted'
+  | 'document_kind_mismatch'
+  | 'document_unreadable'
+  | 'model_unavailable'
+  | 'session_not_found'
+  | 'session_mismatch'
+  | 'payment_not_complete'
+  | 'price_mismatch'
+  | 'payment_provider_unavailable'
+  | 'service_unavailable';
+
+export type ErrorCode = Exclude<ResultCode, 'ok'>;

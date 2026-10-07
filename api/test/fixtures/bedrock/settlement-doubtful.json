@@ -1,0 +1,49 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-haiku-4-5-20251001",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "detectedKind": {
+          "value": "settlement",
+          "confidence": "high"
+        },
+        "startDate": {
+          "value": "2022-03-01",
+          "confidence": "high"
+        },
+        "endDate": {
+          "value": "2026-09-15",
+          "confidence": "high"
+        },
+        "pending_salary": {
+          "value": 1250,
+          "confidence": "high"
+        },
+        "holiday_pay": {
+          "value": 604.5,
+          "confidence": "low"
+        },
+        "extra_pay": {
+          "value": 980,
+          "confidence": "high"
+        },
+        "totalAccrued": {
+          "value": 2870.5,
+          "confidence": "high"
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 6120,
+    "output_tokens": 410
+  }
+}
