@@ -12,7 +12,7 @@ import {
   type ErrorCode,
 } from './contract';
 import { checkSelection, mediaOf, requestBytes } from './files';
-import { passClaims, passState, type PassStore } from './pass';
+import { passClaims, passState, type PassStore, type StoredPass } from './pass';
 import type { Captcha, DocumentEvents, EncodedFile, FileEncoder } from './ports';
 import { hasLowConfidence, prefillFrom, prefilledCount, type Prefill } from './prefill';
 
@@ -200,16 +200,23 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
   }
 
   // A paid pass the API refuses (its signing key may have changed) is asked for once more with
-  // the payment it came from; true when that gave a fresh one.
-  async function fetchPassAgain(token: string): Promise<boolean> {
-    const claims = passClaims(token);
+  // the payment it came from; true when that gave a different one. Only once per pass.
+  async function fetchPassAgain(refused: StoredPass): Promise<boolean> {
+    if (refused.renewed) return false;
+    const claims = passClaims(refused.token);
     const checkout = passes
       .checkouts()
       .find((c) => c.redeemed && c.sessionId === claims?.sessionId);
     if (!checkout) return false;
     const again = await api.pass(checkout.sessionId, checkout.nonce);
-    if (!again.ok) return false;
-    passes.savePass({ token: again.pass, expiresAt: again.expiresAt, readsLeft: again.readsLeft });
+    // The same token back would only be refused again.
+    if (!again.ok || again.pass === refused.token) return false;
+    passes.savePass({
+      token: again.pass,
+      expiresAt: again.expiresAt,
+      readsLeft: again.readsLeft,
+      renewed: true,
+    });
     passes.markRedeemed(checkout.sessionId, again.expiresAt);
     return true;
   }
@@ -253,7 +260,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       // the next read is a free one, and so is a quota token it refuses.
       if (usePass && result.code === 'pass_exhausted') passes.updateReads(0);
       if (usePass && result.code === 'pass_invalid') {
-        if (await fetchPassAgain(stored.token)) {
+        if (await fetchPassAgain(stored)) {
           events.extractionFailed(kind, result.code);
           setBusy(false, tr('client.documents.pass.renewed'));
           return;

@@ -609,7 +609,7 @@ export const es = {
   'client.documents.error.daily_limit_reached':
     'Ya has usado las 2 lecturas gratis de hoy en este navegador. Puedes rellenar a mano o volver mañana.',
   'client.documents.error.pass_invalid':
-    'Tu pase ya no sirve para leer documentos en este navegador; el informe y la carta siguen disponibles hasta que caduque. Prueba otra vez con una lectura gratis, recupéralo en «¿Ya has pagado?» o rellena a mano.',
+    'Tu pase ya no sirve para leer documentos en este navegador; el informe y la carta siguen disponibles hasta que caduque. Prueba otra vez con una lectura gratis o rellena a mano.',
   'client.documents.error.pass_expired':
     'Tu pase ha caducado y se ha quitado de este navegador. Prueba otra vez con una lectura gratis o rellena a mano.',
   'client.documents.error.pass_exhausted':
