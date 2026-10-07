@@ -22,6 +22,7 @@ export type RuleId =
   | 'update_clause_rdl29'
   | 'update_notice'
   | 'cap_ipc'
+  | 'igc_clamp'
   | 'cap_igc_2022'
   | 'cap_igc_2022_extended'
   | 'cap_igc_2023'
@@ -130,6 +131,14 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
     '2019-03-06',
     null,
     'irav_all_contracts',
+  ),
+  // The IGC rate a revision uses is never below 0 nor above 2 %.
+  igc_clamp: rule(
+    'igc_clamp',
+    'law2_2015',
+    'anexo',
+    'https://www.boe.es/buscar/act.php?id=BOE-A-2015-3443#an',
+    '2015-04-01',
   ),
   cap_igc_2022: rule(
     'cap_igc_2022',
