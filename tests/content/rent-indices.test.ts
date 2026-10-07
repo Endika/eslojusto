@@ -7,7 +7,10 @@ import {
   figures,
   formatMonth,
   formatRate,
+  NORMS_CHECKED_ON,
+  lastChanged,
   lastPublished,
+  normsReviewDue,
   latest,
   monthRows,
 } from '../../src/content/rent-indices';
@@ -40,13 +43,15 @@ describe('the monthly rent indices', () => {
     }
   });
 
-  it('dates the sitemap entry with the newest publication shown', () => {
+  it('dates the sitemap entry with the newest figure or the last check of the norms', () => {
     const newest = figures(rows)
       .map((f) => f.publishedOn)
       .toSorted()
       .at(-1);
     expect(lastPublished(rows)).toBe(newest);
-    expect(LAST_UPDATED[PATH]).toBe(newest);
+    const later = [newest, NORMS_CHECKED_ON].toSorted().at(-1);
+    expect(lastChanged(rows)).toBe(later);
+    expect(LAST_UPDATED[PATH]).toBe(later);
   });
 
   it('finds the latest figure of each column', () => {
@@ -66,5 +71,10 @@ describe('the monthly rent indices', () => {
     expect(ex.figure.publishedOn <= ex.anniversary).toBe(true);
     expect(ex.maxRent).toBe(Math.round(ex.rent * (100 + ex.figure.rate)) / 100);
     expect(ex.maxRentLater).toBe(ex.rent * 1.02);
+  });
+
+  it('flags the norms for review once their check is more than 35 days old', () => {
+    expect(normsReviewDue('2026-11-11', '2026-10-07')).toBe(false);
+    expect(normsReviewDue('2026-11-12', '2026-10-07')).toBe(true);
   });
 });

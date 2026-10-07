@@ -4,17 +4,11 @@ import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
 import type { Variables } from '../i18n/interpolate';
 import {
-  CAPS,
   COLUMNS,
-  DECREE,
-  DECREE_CAP,
   FIRST_MONTH,
-  IGC_CLAMP,
   NORMS_CHECKED_ON,
   PATH,
-  REPEALED,
   SERIES,
-  capSources,
   checkedOn,
   example,
   formatDay,
@@ -23,10 +17,12 @@ import {
   formatMonth,
   formatRate,
   inePage,
-  lastPublished,
+  lastChanged,
   latest,
   monthRows,
 } from '../content/rent-indices';
+import { capsCopy } from '../content/rent-caps';
+import { NORMS } from '../engine/rental/data/norms';
 
 interface Props {
   lang: Lang;
@@ -43,14 +39,10 @@ if (!irav || !ipc) throw new Error('The rent indices page needs a published IRAV
 const ex = example();
 const nextIravMonth = rows.findLast((r) => r.irav === null && r.month > irav.month)?.month;
 
-const decreeName = 'RDL 29/2026';
-const decreeLive = DECREE.status !== 'repealed';
-const [rdl8, rdl26] = REPEALED;
-const status = tx(`rent_indices.status.${DECREE.status}`, {
-  fecha: formatLongDay(NORMS_CHECKED_ON),
-  norma: decreeName,
-  desde: formatLongDay(DECREE.inForceSince),
-  estado: DECREE.statusSince ? formatDay(DECREE.statusSince) : '',
+const caps = capsCopy(lang, NORMS, {
+  checkedOn: NORMS_CHECKED_ON,
+  iravRate: irav.figure.rate,
+  example: ex,
 });
 const percent = (n: number) => `${n}\u00a0%`;
 
@@ -72,9 +64,9 @@ const faq = (
         publicado: formatLongDay(ex.figure.publishedOn),
       },
     ],
-    ['irav_or_ipc', { estado: tx(`rent_indices.status_short.${DECREE.status}`) }],
+    ['irav_or_ipc', { decreto: caps.faqIravOrIpc }],
     ['flash', {}],
-    ['no_clause', {}],
+    ['no_clause', { decretos: caps.faqNoClause }],
     ['igc_negative', {}],
   ] as const
 ).map(([id, vars]) => ({
@@ -101,7 +93,7 @@ const structuredData = [
     inLanguage: lang,
     isAccessibleForFree: true,
     temporalCoverage: `${FIRST_MONTH}/${rows[0]?.month ?? FIRST_MONTH}`,
-    dateModified: lastPublished(rows),
+    dateModified: lastChanged(rows),
     creator: {
       '@type': 'Organization',
       name: 'Instituto Nacional de Estadística (INE)',
@@ -241,10 +233,10 @@ const structuredData = [
         <p>{tx('rent_indices.note_flash')}</p>
         <p id="nota-igc">
           {tx('rent_indices.note_igc', {
-            min: percent(IGC_CLAMP.min),
-            max: percent(IGC_CLAMP.max),
+            min: percent(0),
+            max: percent(2),
           })}{' '}
-          <a href={IGC_CLAMP.url}>{tx('rent_indices.note_igc_law')}</a>
+          <a href={caps.igcClamp.url}>{caps.igcClamp.citation}</a>
         </p>
       </section>
 
@@ -252,13 +244,13 @@ const structuredData = [
         <h2 id="topes">{tx('rent_indices.caps_title')}</h2>
         <p>{tx('rent_indices.caps_lead')}</p>
         <dl class="data-list caps">
-          {CAPS.map(({ id, rules }) => (
-            <div>
-              <dt>{tx(`rent_indices.cap.${id}.when`)}</dt>
+          {caps.rows.map(({ id, when, rule, sources }) => (
+            <div data-cap={id}>
+              <dt>{when}</dt>
               <dd>
-                <p>{tx(`rent_indices.cap.${id}.rule`)}</p>
+                <p>{rule}</p>
                 <ul class="sources">
-                  {capSources(rules).map((s) => (
+                  {sources.map((s) => (
                     <li>
                       <a href={s.url}>{s.citation}</a>
                     </li>
@@ -269,31 +261,10 @@ const structuredData = [
           ))}
         </dl>
         <p class="status" role="note">
-          {status}
+          {caps.status}
         </p>
-        {decreeLive && (
-          <p>
-            {tx('rent_indices.now', {
-              irav: formatRate(irav.figure.rate, 'irav'),
-              norma: decreeName,
-              tope:
-                irav.figure.rate > DECREE_CAP
-                  ? percent(DECREE_CAP)
-                  : formatRate(irav.figure.rate, 'irav'),
-            })}
-          </p>
-        )}
-        {rdl8 && rdl26 && (
-          <p>
-            {tx('rent_indices.repealed', {
-              norma1: 'RDL 8/2026',
-              desde1: formatDay(rdl8.inForceSince),
-              hasta1: formatDay(rdl8.inForceUntil ?? rdl8.inForceSince),
-              norma2: 'RDL 26/2026',
-              desde2: formatDay(rdl26.inForceSince),
-            })}
-          </p>
-        )}
+        {caps.now && <p>{caps.now}</p>}
+        {caps.repealed && <p>{caps.repealed}</p>}
         <p>{tx('rent_indices.notice')}</p>
         <p class="folio">
           Art. <span>18</span> LAU
@@ -313,15 +284,7 @@ const structuredData = [
             maximo: formatEuros(ex.maxRent),
           })}
         </p>
-        {decreeLive && (
-          <p class="example">
-            {tx('rent_indices.example_later', {
-              dia: formatLongDay(ex.later),
-              norma: decreeName,
-              maximo: formatEuros(ex.maxRentLater),
-            })}
-          </p>
-        )}
+        {caps.exampleLater && <p class="example">{caps.exampleLater}</p>}
       </section>
 
       <section class="sheet sheet--text" aria-labelledby="proximamente">

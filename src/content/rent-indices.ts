@@ -1,11 +1,9 @@
-import { parseDate } from '../engine/date';
+import { ordinal, parseDate } from '../engine/date';
 import { round2 } from '../engine/money';
 import { referenceMonth, type IndexSeries } from '../engine/rental/indices';
-import { ruleSource, type RentalSource, type RuleId } from '../engine/rental/rules';
 import { IGC } from '../engine/rental/data/igc';
 import { IPC } from '../engine/rental/data/ipc';
 import { IRAV } from '../engine/rental/data/irav';
-import { NORMS } from '../engine/rental/data/norms';
 
 // The monthly page of the rent indices, read from the engine's tables at build time.
 
@@ -17,12 +15,11 @@ export const FIRST_MONTH = '2024-11';
 // The day the norms' status on this page was last checked against the BOE.
 export const NORMS_CHECKED_ON = '2026-10-07';
 
-// Ley 2/2015, annex: an IGC below 0 % revises by 0 %, one above 2 % by 2 %.
-export const IGC_CLAMP = {
-  min: 0,
-  max: 2,
-  url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2015-3443#an',
-} as const;
+// Each month the norms are read again; a check older than this is due.
+export const NORMS_REVIEW_DAYS = 35;
+
+export const normsReviewDue = (today: string, checkedOn: string = NORMS_CHECKED_ON): boolean =>
+  ordinal(parseDate(today)) - ordinal(parseDate(checkedOn)) > NORMS_REVIEW_DAYS;
 
 export interface Figure {
   readonly rate: number;
@@ -90,6 +87,12 @@ export const lastPublished = (rows: readonly MonthRow[] = monthRows()): string =
     .map((f) => f.publishedOn)
     .reduce((a, b) => (a > b ? a : b));
 
+// The sitemap's lastmod: the newest figure, or the last check of the norms if later.
+export const lastChanged = (rows: readonly MonthRow[] = monthRows()): string => {
+  const published = lastPublished(rows);
+  return published > NORMS_CHECKED_ON ? published : NORMS_CHECKED_ON;
+};
+
 // The last day every table is known to be complete.
 export const checkedOn = (): string =>
   [IRAV, IPC, IGC].map((s) => s.coveredUntil).reduce((a, b) => (a < b ? a : b));
@@ -106,24 +109,6 @@ export const latest = (column: Column, rows: readonly MonthRow[] = monthRows()):
 };
 
 export const SERIES = { irav: IRAV, ipc: IPC, igc: IGC } as const;
-
-// The legal cap on the yearly update by anniversary, oldest first. The texts live in the
-// dictionary under `rent_indices.cap.<id>`.
-export const CAPS = [
-  { id: 'ipc', rules: ['cap_ipc'] },
-  { id: 'igc', rules: ['cap_igc_2022', 'cap_igc_2022_extended', 'cap_igc_2023'] },
-  { id: 'three', rules: ['cap_3_2024'] },
-  { id: 'irav', rules: ['cap_irav'] },
-  { id: 'two', rules: ['cap_2_rdl29', 'irav_all_contracts'] },
-] as const satisfies readonly { id: string; rules: readonly RuleId[] }[];
-
-export const capSources = (rules: readonly RuleId[]): RentalSource[] =>
-  rules.map((id) => ruleSource(id, NORMS));
-
-export const DECREE = NORMS.rdl29_2026;
-
-// The decrees with the same 2 % cap that the Congress repealed.
-export const REPEALED = [NORMS.rdl8_2026, NORMS.rdl26_2026];
 
 // The 2 % of RDL 29/2026, DF 6.ª.
 export const DECREE_CAP = 2;
