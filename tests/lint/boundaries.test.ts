@@ -32,6 +32,12 @@ describe('import boundaries', () => {
     ['src/engine/rental/x.ts', "import posthog from 'posthog-js';"],
     ['src/engine/rental/x.ts', "import { NORMS } from './data/norms';"],
     ['src/engine/rental/data/x.ts', "import { t } from '../../../i18n';"],
+    ['src/engine/rental/x.ts', "import { t } from './../../i18n';"],
+    ['src/engine/rental/x.ts', "import { t } from '../a/../../i18n';"],
+    ['src/engine/rental/x.ts', "import { NORMS } from './data';"],
+    ['src/engine/rental/x.ts', "import { NORMS } from './data/index';"],
+    ['src/engine/x.ts', "import { t } from './../i18n';"],
+    ['src/engine/x.ts', "import { t } from './a/../../i18n';"],
   ])('%s cannot %s', async (filePath, code) => {
     expect(await violations(filePath, code)).toContain('no-restricted-imports');
   });
@@ -50,6 +56,17 @@ describe('import boundaries', () => {
       expect(await violations(filePath, 'export const now = () => new Date();')).toContain(
         'no-restricted-globals',
       );
+    },
+  );
+
+  it.each(['src/engine/x.ts', 'src/engine/rental/x.ts', 'src/engine/rental/data/x.ts'])(
+    '%s cannot reach the clock through globalThis',
+    async (filePath) => {
+      const fired = await violations(
+        filePath,
+        'export const now = () => [new globalThis.Date(), globalThis.performance.now()];',
+      );
+      expect(fired.filter((r) => r === 'no-restricted-properties')).toHaveLength(2);
     },
   );
 
