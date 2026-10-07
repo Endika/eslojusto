@@ -20,13 +20,13 @@ const ROUNDING_DAYS = 1;
 
 const finding = findingsFor('holidays_pay');
 
-// A contract of unknown modality may be such a fixed-term one.
+// A contract of unknown modality may be such a fixed-term one, and one without an end date may last
+// no longer.
 const mayPayHolidaysInSalary = (input: EmploymentInput): boolean => {
   const days = agreedDays(input);
   return (
     (isFixedTerm(input.modality) || input.modality === 'unknown') &&
-    days !== null &&
-    days <= SHORT_TEMPORARY_DAYS
+    (days === null || days <= SHORT_TEMPORARY_DAYS)
   );
 };
 
