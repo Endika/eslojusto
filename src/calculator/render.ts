@@ -59,7 +59,7 @@ export function statusText(r: ItemResult, tr: Translate, reference: number | nul
 }
 
 // «2015-11-13» → «13-11-2015».
-const sourceDate = (iso: string) => iso.split('-').reverse().join('-');
+export const sourceDate = (iso: string) => iso.split('-').reverse().join('-');
 
 // An amount keeps its Spanish format and reads left to right, also inside right-to-left text.
 function amountEl(n: number, format: (n: number) => string = formatEuros): HTMLElement {
@@ -323,22 +323,25 @@ export function renderBenefit(
     tr('client.unemployment.duration.holiday_note'),
   ).hidden = !withHolidayNote(duration);
 
-  const withOtherContracts = duration.kind !== 'at_least';
-  setText(
-    sheet,
-    '[data-benefit-qualifying]',
-    p.qualifying === 'met_by_this_contract'
-      ? tr('client.unemployment.qualifying.this_contract')
-      : p.qualifying === 'met_with_other_contracts'
-        ? tr('client.unemployment.qualifying.other_contracts', {
-            dias: formatInteger(p.contributedDays),
-          })
-        : withOtherContracts
-          ? tr('client.unemployment.qualifying.depends_other_contracts', {
-              dias: formatInteger(p.contributedDays),
-            })
-          : tr('client.unemployment.qualifying.depends', { dias: formatInteger(p.contractDays) }),
-  );
+  setText(sheet, '[data-benefit-qualifying]', qualifyingText(p, tr));
+}
+
+// Whether the days contributed reach the 360 the benefit needs, in words.
+export function qualifyingText(
+  p: Extract<BenefitEstimate, { entitled: 'yes' }>,
+  tr: Translate,
+): string {
+  if (p.qualifying === 'met_by_this_contract')
+    return tr('client.unemployment.qualifying.this_contract');
+  if (p.qualifying === 'met_with_other_contracts')
+    return tr('client.unemployment.qualifying.other_contracts', {
+      dias: formatInteger(p.contributedDays),
+    });
+  return p.duration.kind !== 'at_least'
+    ? tr('client.unemployment.qualifying.depends_other_contracts', {
+        dias: formatInteger(p.contributedDays),
+      })
+    : tr('client.unemployment.qualifying.depends', { dias: formatInteger(p.contractDays) });
 }
 
 export function renderReview(container: HTMLElement, r: Review, tr: Translate): void {
