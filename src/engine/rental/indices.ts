@@ -38,6 +38,8 @@ export interface IndexSeries {
   readonly pendingFlash: IndexFlash | null;
 }
 
+export type IndexTables = Readonly<Record<IndexId, IndexSeries>>;
+
 export type ReferenceMonth =
   | { readonly kind: 'ok'; readonly value: IndexValue }
   // On the day a definitive figure comes out, the reading published until that morning (the
