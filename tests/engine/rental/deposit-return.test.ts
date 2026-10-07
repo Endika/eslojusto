@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { parseDate as f, type CivilDate } from '../../../src/engine/date';
+import {
+  addDays,
+  addMonthsClamped,
+  compareDates,
+  daysInYear,
+  fromOrdinal,
+  ordinal,
+  parseDate as f,
+  type CivilDate,
+} from '../../../src/engine/date';
+import { RENTAL_TABLES } from '../../../src/engine/rental/data/tables';
+import { reviewRental } from '../../../src/engine/rental/review';
 import { LEGAL_INTEREST } from '../../../src/engine/rental/data/legal-interest';
 import { NORMS } from '../../../src/engine/rental/data/norms';
 import { checkDepositReturn } from '../../../src/engine/rental/deposit-return';
@@ -137,10 +148,10 @@ describe('late-payment interest (LAU art. 36.4)', () => {
     });
   });
 
-  it('takes the part above the month as kept or returned first', () => {
-    // Deposit 1.500 of a 1.000 rent; 300 kept, then 400 back on time, 800 back late. The 500 above
-    // the month go first: 300 kept, 200 of the 400. The late 800 accrue in full: 800 × 0,0325 ×
-    // 29 / 365 = 2,07 from 11-02-2025 to 11-03-2025.
+  it('takes the part above the month as the money that would accrue longest', () => {
+    // Deposit 1.500 of a 1.000 rent; 300 kept, 400 back on time, 800 back late on 12-03-2025. The
+    // 500 above the month go on the late 800 first, so 300 accrue from 11-02-2025 to 11-03-2025:
+    // 300 × 0,0325 × 29 / 365 = 0,77.
     const { interest } = check(1500, {
       keysReturnedOn: f('2025-01-10'),
       returns: [
@@ -149,7 +160,37 @@ describe('late-payment interest (LAU art. 36.4)', () => {
       ],
       deductions: [{ kind: 'cleaning', amount: 300 }],
     });
-    expect(bothBases(interest).low).toBe(2.07);
+    expect(bothBases(interest).low).toBe(0.77);
+  });
+
+  it('two months back, one on time and one late, accrue nothing and open no pass', () => {
+    const input = contract({
+      deposit: 2000,
+      moveOut: {
+        keysReturnedOn: f('2025-01-10'),
+        returns: [
+          { on: f('2025-01-20'), amount: 1000 },
+          { on: f('2025-07-10'), amount: 1000 },
+        ],
+        deductions: [],
+      },
+    });
+    const [, interest] = checkDepositReturn(input, TODAY, DEPS);
+    if (interest === undefined) throw new Error('expected interest');
+    expect(singleOf(interest)).toEqual({ status: 'within_limit', amount: null });
+    const r = reviewRental(input, TODAY, RENTAL_TABLES);
+    expect(r.ok && r.review.offerPass).toBe(false);
+  });
+
+  it('a deduction leaves the part above the month on the late return', () => {
+    // Deposit 1.500 of a 1.000 rent, 500 kept, 1.000 back on 10-07-2025: 500 accrue from
+    // 11-02-2025 for 149 days: 500 × 0,0325 × 149 / 365 = 6,63.
+    const { interest } = check(1500, {
+      keysReturnedOn: f('2025-01-10'),
+      returns: [{ on: f('2025-07-10'), amount: 1000 }],
+      deductions: [{ kind: 'damage', amount: 500 }],
+    });
+    expect(bothBases(interest).low).toBe(6.63);
   });
 
   it('a 2024 stretch counts 366 days a year', () => {
@@ -242,5 +283,83 @@ describe('late-payment interest (LAU art. 36.4)', () => {
     );
     if (interest === undefined) throw new Error('expected interest');
     expect(singleOf(interest).status).toBe('not_checkable');
+  });
+});
+
+describe('the part of the deposit above one month', () => {
+  // mulberry32: small, seeded and deterministic.
+  function prng(seed: number) {
+    let a = seed;
+    const r = () => {
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const int = (lo: number, hi: number) => lo + Math.floor(r() * (hi - lo + 1));
+    return { r, int };
+  }
+
+  // Interest on 365 (366) days a year on `amount` from the day after the month to `until`,
+  // counted day by day, independent of the engine.
+  const accrued = (amount: number, keys: CivilDate, until: CivilDate): number => {
+    let total = 0;
+    for (
+      let d = addDays(addMonthsClamped(keys, 1), 1);
+      compareDates(d, until) < 0;
+      d = addDays(d, 1)
+    ) {
+      const rate = LEGAL_INTEREST.find((y) => y.year === d.y)?.rate ?? NaN;
+      total += (amount * rate) / 100 / daysInYear(d.y);
+    }
+    return total;
+  };
+
+  it('is never put where another split would give less interest', () => {
+    const g = prng(36042026);
+    const rent = 1000;
+    let checked = 0;
+    for (let k = 0; k < 150; k++) {
+      const deposit = g.int(1000, 3000);
+      const keys = fromOrdinal(ordinal(f('2023-01-01')) + g.int(0, 1200));
+      const span = ordinal(TODAY) - ordinal(keys);
+      const returns: { on: CivilDate; amount: number }[] = [];
+      let left = deposit;
+      for (let n = g.int(0, 3); n > 0 && left > 0; n--) {
+        const amount = g.int(1, left);
+        returns.push({ on: fromOrdinal(ordinal(keys) + g.int(0, span)), amount });
+        left -= amount;
+      }
+      const deducted = left > 0 && g.r() < 0.4 ? g.int(1, left) : 0;
+      const deductions = deducted > 0 ? [{ kind: 'other' as const, amount: deducted }] : [];
+      const out: MoveOut = { keysReturnedOn: keys, returns, deductions };
+      const { interest } = check(deposit, out);
+      const counted = countedAmount(interest.outcome, itemAmount);
+
+      // Every piece of money with how long it would accrue; the above-month part is split at random.
+      const pending = deposit - returns.reduce((s, r) => s + r.amount, 0) - deducted;
+      const pieces = [
+        ...returns.map((r) => ({ amount: r.amount, until: r.on })),
+        ...(pending > 0 ? [{ amount: pending, until: TODAY }] : []),
+        ...(deducted > 0 ? [{ amount: deducted, until: keys }] : []),
+      ];
+      for (let t = 0; t < 20; t++) {
+        let above = Math.max(0, deposit - rent);
+        const order = pieces.map((p, i) => ({ p, key: g.r(), i })).sort((a, b) => a.key - b.key);
+        let other = 0;
+        for (const { p } of order) {
+          const kept = Math.min(p.amount, above, g.r() < 0.5 ? p.amount : g.int(0, p.amount));
+          above -= kept;
+          other += accrued(p.amount - kept, keys, p.until);
+        }
+        // Whatever is left of the part above the month goes on the remaining money, in turn.
+        if (above > 0) continue;
+        expect(counted, JSON.stringify(out)).toBeLessThanOrEqual(
+          Math.round(other * 100) / 100 + 0.01,
+        );
+        checked++;
+      }
+    }
+    expect(checked).toBeGreaterThan(500);
   });
 });
