@@ -123,6 +123,12 @@ const pdfPages: PdfPages = {
   open: (file) => import('./pdf-pages').then((m) => m.pdfPages.open(file)),
 };
 
+function holdLeave(e: BeforeUnloadEvent) {
+  e.preventDefault();
+  // Older browsers show the dialog only when returnValue is set.
+  e.returnValue = '';
+}
+
 const browser: Browser = {
   now: () => Date.now(),
   redirect: (url) => location.assign(url),
@@ -137,6 +143,10 @@ const browser: Browser = {
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
   },
   randomBytes: (count) => crypto.getRandomValues(new Uint8Array(count)),
+  warnBeforeLeaving(on) {
+    if (on) window.addEventListener('beforeunload', holdLeave);
+    else window.removeEventListener('beforeunload', holdLeave);
+  },
 };
 
 export interface CalculatorHooks {
@@ -188,6 +198,7 @@ export function wireDocuments(
     tabs: document.querySelector<HTMLElement>('.tabs'),
   });
   const payment = setUpPayment(offer, {
+    notice: document.querySelector<HTMLElement>('[data-pass-notice]'),
     api,
     captcha: turnstileCaptcha(config.turnstileSiteKey, checkoutCaptchaBox, 'checkout'),
     passes,

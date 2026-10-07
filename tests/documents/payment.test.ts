@@ -5,7 +5,7 @@ import { createPassStore } from '../../src/documents/pass';
 import { setUpPayment } from '../../src/documents/payment';
 import type { LetterDetails } from '../../src/documents/letter';
 import type { Browser } from '../../src/documents/ports';
-import { OFFER, flush, recordingEvents } from './dom';
+import { NOTICE, OFFER, flush, recordingEvents } from './dom';
 import { completed, memoryStore, passToken, tr, unfairDismissal } from './fixtures';
 
 const NOW = Date.UTC(2026, 9, 7);
@@ -17,7 +17,7 @@ function setUp(
   checkoutUrl = 'https://checkout.stripe.com/c/pay/1',
   verifyResults: VerifyResult[] = [],
 ) {
-  document.body.innerHTML = OFFER;
+  document.body.innerHTML = NOTICE + OFFER;
   const passes = createPassStore(memoryStore(), () => NOW);
   const events = recordingEvents();
   const calls: string[] = [];
@@ -46,9 +46,12 @@ function setUp(
     redirect: (url) => void redirects.push(url),
     save: (_blob, name) => void saved.push(name),
     randomBytes: (n) => new Uint8Array(n).fill(7),
+    warnBeforeLeaving: (on) => void (leaving = on),
   };
+  let leaving = false;
   const section = document.querySelector('[data-pass-offer]') as HTMLElement;
   const payment = setUpPayment(section, {
+    notice: document.querySelector<HTMLElement>('[data-pass-notice]'),
     api,
     captcha: { token: async () => 'checkout-token' },
     passes,
@@ -78,6 +81,7 @@ function setUp(
     letters,
     kept: () => kept,
     changes: () => changes,
+    leaving: () => leaving,
   };
 }
 
@@ -466,5 +470,56 @@ describe('the pass offer', () => {
     expect($('[data-pass-buy]').hidden).toBe(false);
     await click('[data-download="report"]');
     expect(saved).toEqual([]);
+  });
+});
+
+describe('the notice after paying', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  async function paid() {
+    const t = setUp([{ ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 }]);
+    t.passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
+    t.payment.show(completed());
+    await t.payment.returned('cs_test_1');
+    return t;
+  }
+
+  it('back from Stripe: says to download now, takes the focus and warns before leaving', async () => {
+    const { leaving } = await paid();
+    const notice = $('[data-pass-notice]');
+    expect(notice.hidden).toBe(false);
+    expect(document.activeElement).toBe(notice);
+    expect($('[data-notice-text]').textContent).toBe(
+      'Descarga ahora tu informe y tu carta y guárdalos: no guardamos tu revisión en ningún sitio. Durante 7 días, en este navegador, puedes corregir tus datos y volver a descargarlos sin pagar otra vez.',
+    );
+    expect(leaving()).toBe(true);
+  });
+
+  it('the first download stops the warning; both shrink the notice to one line', async () => {
+    const { leaving, saved } = await paid();
+    await click('[data-pass-notice] [data-download="report"]');
+    expect(leaving()).toBe(false);
+    expect($('[data-notice-full]').hidden).toBe(false);
+    await click('[data-pass-notice] [data-download="letter"]');
+    expect(saved).toEqual(['eslojusto-informe-finiquito.pdf', 'eslojusto-recibi-no-conforme.pdf']);
+    expect($('[data-notice-full]').hidden).toBe(true);
+    expect($('[data-notice-text]').textContent).toBe(
+      'Informe y carta descargados. Guárdalos: no guardamos tu revisión.',
+    );
+    expect(leaving()).toBe(false);
+  });
+
+  it('a pass recovered by hand or one already held shows no notice and never warns', async () => {
+    const { payment, passes, leaving } = setUp([
+      { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
+    ]);
+    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
+    payment.show(completed());
+    await click('[data-pass-recover-button]');
+    expect(payment.verified()).toBe(true);
+    expect($('[data-pass-notice]').hidden).toBe(true);
+    expect(leaving()).toBe(false);
   });
 });

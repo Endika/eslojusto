@@ -298,14 +298,14 @@ export const es = {
   'documents.pass.text':
     'Descarga el informe completo con el cálculo paso a paso, las fuentes legales y la carta «recibí no conforme» por 4,99 €. Se generan en tu dispositivo.',
   'documents.pass.price':
-    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días: en ese tiempo puedes volver a descargar el informe y la carta y hacer hasta 15 lecturas de documentos.',
+    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a descargar el informe y la carta sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
   'documents.pass.waiver':
     'Quiero el informe ahora. Sé que, al ser contenido digital que se entrega al momento, pierdo el derecho de desistimiento (art. 103.m de la Ley General para la Defensa de los Consumidores y Usuarios).',
   'documents.pass.conditions': 'Condiciones de venta',
   'documents.pass.pay': 'Pagar 4,99 €',
   'documents.pass.paid_question': '¿Ya has pagado?',
   'documents.pass.paid_help':
-    'Si pagaste desde este navegador y no ves la descarga, recupera tu pase. Si pagaste desde otro, escribe a hola@eslojusto.es con el justificante de Stripe.',
+    'Si pagaste desde este navegador y no ves la descarga, recupera aquí tu pase. Solo funciona en el navegador con el que pagaste.',
   'documents.pass.session': 'Código del pago',
   'documents.pass.session_hint':
     'Empieza por «cs_» y está en la dirección a la que volviste tras pagar. En blanco, se usa el último pago de este navegador.',
@@ -321,10 +321,15 @@ export const es = {
   'documents.letter.date': 'Fecha',
   'documents.letter.privacy':
     'Estos datos solo se usan para rellenar la carta en tu dispositivo; no se envían ni se guardan.',
+  'documents.notice.letter_details':
+    'Más abajo puedes poner tu nombre y otros datos en la carta y descargarla otra vez.',
   'documents.pass.verify_retry': 'Comprobar otra vez',
   'documents.pass.letter_note':
     'La carta es una plantilla con tus cifras. Usarla o no, y cómo, es decisión tuya.',
 
+  'faq.pass': '¿Qué incluye el pase de 4,99 €?',
+  'faq.pass_answer':
+    'Durante 7 días, y solo en el navegador con el que pagas, puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a descargar el informe y la carta sin pagar otra vez. No guardamos tu revisión en ningún sitio, así que conviene descargar el informe y la carta en cuanto pagas. El pase vive solo en ese navegador: en otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde, y «¿Ya has pagado?» solo lo recupera en el navegador con el que pagaste.',
   'faq.documents': '¿Qué pasa con mis documentos?',
   'faq.documents_answer':
     'Si subes tus documentos (la carta de despido, el finiquito, tus nóminas, el certificado de empresa o tu vida laboral), se envían cifrados a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo indica qué es cada página, copia solo los datos que necesita el formulario y no calcula nada. Ni el servidor ni el modelo guardan el documento: se procesa en memoria y se descarta. Antes de subirlo te pedimos tu consentimiento, porque una nómina puede mostrar datos sensibles. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
@@ -727,7 +732,7 @@ export const es = {
     'La lectura no está disponible ahora mismo. Prueba más tarde o rellena a mano.',
   'client.documents.error.session_not_found': 'No encontramos ese pago. Revisa el código.',
   'client.documents.error.session_mismatch':
-    'Ese pago no se hizo desde este navegador. Escribe a hola@eslojusto.es con el justificante.',
+    'Ese pago no se hizo desde este navegador, y el pase solo se recupera en el navegador con el que se pagó.',
   'client.documents.error.payment_not_complete':
     'El pago aún no está completo. Si acabas de pagar, prueba en un momento.',
   'client.documents.error.price_mismatch':
@@ -746,7 +751,7 @@ export const es = {
   'client.documents.error.checkout_unavailable':
     'No se ha podido abrir el pago. Prueba otra vez en un momento.',
   'client.documents.error.no_checkout':
-    'No hay ningún pago hecho desde este navegador. Si pagaste desde otro, escribe a hola@eslojusto.es con el justificante.',
+    'No hay ningún pago hecho desde este navegador. El pase solo se recupera en el navegador con el que se pagó.',
   'client.documents.pass.waiver_missing': 'Marca la casilla para seguir',
   'client.documents.pass.redirecting': 'Abriendo el pago de Stripe…',
   'client.documents.pass.checking': 'Comprobando el pago…',
@@ -759,10 +764,19 @@ export const es = {
   'client.documents.verify.unavailable':
     'No hemos podido comprobar tu pase ahora mismo. Prueba otra vez en un momento.',
   'client.documents.verify.pass_invalid':
-    'Este pase no es válido y se ha quitado de este navegador. Si pagaste, recupéralo en «¿Ya has pagado?».',
+    'Este pase no es válido y se ha quitado de este navegador.',
+  'client.documents.verify.pass_invalid_recoverable':
+    'Este pase no es válido y se ha quitado de este navegador. Como pagaste desde aquí, puedes recuperarlo en «¿Ya has pagado?».',
   'client.documents.verify.pass_expired': 'Tu pase ha caducado y se ha quitado de este navegador.',
   'client.documents.verify.pass_revoked':
     'Este pase ya no vale porque su pago se devolvió o se anuló, y se ha quitado de este navegador.',
+  'client.documents.notice.full':
+    'Descarga ahora tu informe y tu carta y guárdalos: no guardamos tu revisión en ningún sitio. Durante 7 días, en este navegador, puedes corregir tus datos y volver a descargarlos sin pagar otra vez.',
+  'client.documents.notice.full_report':
+    'Descarga ahora tu informe y guárdalo: no guardamos tu revisión en ningún sitio. Durante 7 días, en este navegador, puedes corregir tus datos y volver a descargarlo sin pagar otra vez.',
+  'client.documents.notice.done':
+    'Informe y carta descargados. Guárdalos: no guardamos tu revisión.',
+  'client.documents.notice.done_report': 'Informe descargado. Guárdalo: no guardamos tu revisión.',
   'client.documents.pass.lost':
     'Hemos vuelto del pago, pero la revisión no se ha podido recuperar. Repítela y aparecerán las descargas.',
 
