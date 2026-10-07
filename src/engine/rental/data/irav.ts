@@ -18,6 +18,7 @@ export const IRAV: IndexSeries = {
   table: 72975,
   series: 'IRAV1',
   coveredUntil: '2026-10-07',
+  loadedFromStart: true,
   values: [
     month('2024-11', 2.2, '2025-01-02'),
     month('2024-12', 2.28, '2025-01-15'),
@@ -42,4 +43,5 @@ export const IRAV: IndexSeries = {
     month('2026-07', 2.49, '2026-08-13'),
     month('2026-08', 2.47, '2026-09-15'),
   ],
+  pendingFlash: null,
 };

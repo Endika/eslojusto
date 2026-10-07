@@ -18,6 +18,7 @@ export const IGC: IndexSeries = {
   table: 10802,
   series: 'IGC1',
   coveredUntil: '2026-10-07',
+  loadedFromStart: false,
   values: [
     month('2018-12', -1.21, '2019-02-25'),
     month('2019-01', -1.37, '2019-03-18'),
@@ -112,4 +113,5 @@ export const IGC: IndexSeries = {
     month('2026-06', -0.76, '2026-08-20'),
     month('2026-07', -0.33, '2026-09-18'),
   ],
+  pendingFlash: null,
 };
