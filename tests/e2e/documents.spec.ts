@@ -315,6 +315,12 @@ test('the privacy page and the legal notice describe documents and the pass', as
   await page.goto('aviso-legal/');
   await expect(page.locator('#condiciones')).toContainText('Condiciones de venta del pase');
   await expect(page.locator('main')).toContainText('art. 103.m');
+  await expect(page.locator('section:has(#condiciones)')).toContainText(
+    'Lo vende Endika Iglesias, con NIF',
+  );
+  await expect(page.locator('section:has(#condiciones)')).toContainText(
+    'Su domicilio es Calle Barranco del Novillo 26',
+  );
   await page.goto('finiquito/');
   await expect(page.locator('#faq-documentos')).toContainText('¿Qué pasa con mis documentos?');
 });
