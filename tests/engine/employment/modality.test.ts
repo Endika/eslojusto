@@ -91,12 +91,17 @@ describe('reviewModality: abolished modalities', () => {
     expect(findings(input).map((f) => f.status)).toEqual(['not_reviewed_in_this_version']);
   });
 
-  it('«eventual» without any cause written is quoted under art. 15.4', () => {
-    const f = byId(
-      temporary('eventual', '2023-01-09', '2023-04-08', { causeStated: false }),
-      'abolished_modalities',
+  it('«eventual» without any cause written is asked to review, like a production contract', () => {
+    const input = temporary('eventual', '2023-01-09', '2023-04-08', { causeStated: false });
+    expect(findings(input).map((f) => [f.id, f.status])).toEqual([
+      ['abolished_modalities', 'review_it'],
+      ['fixed_term_presumption', 'review_it'],
+      ['production_6_months', 'within_limit'],
+    ]);
+    expect(byId(input, 'fixed_term_presumption').literal).toEqual(
+      LAW_QUOTES.fixed_term_presumption,
     );
-    expect(f.status).toBe('becomes_permanent');
+    expect(offerPass(reviewModality(input, TODAY, deps))).toBe(false);
   });
 
   it('«eventual» with its production cause is read as a production contract', () => {
@@ -110,7 +115,7 @@ describe('reviewModality: abolished modalities', () => {
 
   it('«eventual» with the cause unknown only asks to review it', () => {
     const all = findings(temporary('eventual', '2023-01-09', '2023-04-08', { causeStated: null }));
-    expect(all.map((f) => f.status)).toEqual(['review_it']);
+    expect(all.map((f) => f.status)).toEqual(['review_it', 'not_entered', 'within_limit']);
   });
 
   it('«interinidad» naming the person and the cause is read as a replacement', () => {
@@ -126,15 +131,16 @@ describe('reviewModality: abolished modalities', () => {
     ]);
   });
 
-  it('«interinidad» without the person named is quoted under art. 15.4', () => {
-    const f = byId(
-      temporary('interim', '2023-01-09', null, {
-        replacedPersonNamed: false,
-        replacementCauseStated: true,
-      }),
-      'abolished_modalities',
-    );
-    expect(f.status).toBe('becomes_permanent');
+  it('«interinidad» without the person named misses art. 15.3, like a replacement', () => {
+    const input = temporary('interim', '2023-01-09', null, {
+      replacedPersonNamed: false,
+      replacementCauseStated: true,
+    });
+    expect(findings(input).map((f) => [f.id, f.status])).toEqual([
+      ['abolished_modalities', 'review_it'],
+      ['replacement_name_cause', 'missing_requirement'],
+    ]);
+    expect(offerPass(reviewModality(input, TODAY, deps))).toBe(false);
   });
 });
 
@@ -316,7 +322,7 @@ describe('reviewModality: training', () => {
     );
   });
 
-  it('a practice contract of four months is below the six-month minimum', () => {
+  it('a practice contract of four months is only asked to review: it may have ended early', () => {
     const input = temporary('training_practice', '2025-02-03', '2025-06-02', {
       training: {
         studiesEndedOn: parseDate('2024-06-30'),
@@ -325,7 +331,9 @@ describe('reviewModality: training', () => {
         effectiveWorkPercent: { year1: null, year2: null },
       },
     });
-    expect(byId(input, 'training_practice_duration').status).toBe('below_minimum');
+    const f = byId(input, 'training_practice_duration');
+    expect(f.status).toBe('review_it');
+    expect(keys(f)).toContain('modality.training_too_short');
   });
 
   it('a training contract over its maximum is only asked to review', () => {
@@ -379,6 +387,24 @@ describe('reviewModality: written form and fixed-discontinuous', () => {
     ).toBe(false);
     expect(
       findings(contract({ writtenContract: false })).some((f) => f.id === 'written_form'),
+    ).toBe(false);
+  });
+
+  it('a work-or-service contract of any length needs writing', () => {
+    const input = temporary('work_or_service', '2023-05-02', '2023-05-19', {
+      writtenContract: false,
+    });
+    expect(byId(input, 'written_form').status).toBe('missing_requirement');
+  });
+
+  it('regular remote work from 30 % needs writing; under it does not', () => {
+    expect(byId(contract({ writtenContract: false, remoteShare: 30 }), 'written_form').status).toBe(
+      'missing_requirement',
+    );
+    expect(
+      findings(contract({ writtenContract: false, remoteShare: 29 })).some(
+        (f) => f.id === 'written_form',
+      ),
     ).toBe(false);
   });
 

@@ -47,6 +47,8 @@ const PRACTICE_WINDOW_MONTHS = 36;
 const PRACTICE_WINDOW_DISABILITY_MONTHS = 60;
 // 8.2: fixed-term contracts of over four weeks are written.
 const WRITTEN_OVER_DAYS = 28;
+// Ley 10/2021 art. 1: remote work is regular from 30 % of the working time.
+const REGULAR_REMOTE_PERCENT = 30;
 // 34.1: the legal full-time week, when the agreement's is not known.
 const LEGAL_WEEK_HOURS = 40;
 
@@ -297,10 +299,11 @@ function trainingDuration(
       calculation: [duration, phrase('modality.no_end_date')],
     });
   }
+  // Under the minimum is only asked to review too: the end day may be an early termination.
   if (shorterThan(start, end, minMonths)) {
     return modalityFinding(c, {
       id,
-      status: 'below_minimum',
+      status: 'review_it',
       calculation: [duration, phrase('modality.training_too_short', limits)],
     });
   }
@@ -429,8 +432,8 @@ function discontinuousEssentials(c: Context): Finding {
   });
 }
 
-// 8.2: training, part-time, fixed-discontinuous and fixed-term contracts of over four weeks are
-// written; otherwise the contract is presumed open-ended and full-time, «salvo prueba en contrario».
+// 8.2: training, part-time, fixed-discontinuous, remote and work-or-service contracts, and
+// fixed-term ones of over four weeks, are written; otherwise the contract is presumed open-ended and full-time, «salvo prueba en contrario».
 function writtenForm(c: Context): readonly Finding[] {
   const { input } = c;
   const { end } = span(c);
@@ -441,6 +444,8 @@ function writtenForm(c: Context): readonly Finding[] {
   const required =
     TRAINING.has(input.modality) ||
     input.modality === 'discontinuous' ||
+    input.modality === 'work_or_service' ||
+    (input.remoteShare !== null && input.remoteShare >= REGULAR_REMOTE_PERCENT) ||
     partTime ||
     (TEMPORARY.has(input.modality) && calendarDays(input.startDate, end) > WRITTEN_OVER_DAYS);
   if (!required || input.writtenContract === true) return [];
@@ -474,12 +479,12 @@ const abolished = (c: Context): Finding =>
     ...onBreach,
   });
 
-// An earlier name used for a contract that meets the requirements of a current modality.
-const outdatedLabel = (c: Context, extra: EmploymentPhrase[] = []): Finding =>
+// A name from before the reform, for a contract then checked as its current modality.
+const outdatedLabel = (c: Context): Finding =>
   modalityFinding(c, {
     id: 'abolished_modalities',
     status: 'review_it',
-    calculation: [phrase('modality.outdated_label'), ...extra],
+    calculation: [phrase('modality.outdated_label')],
   });
 
 const production = (c: Context): readonly Finding[] => [
@@ -510,21 +515,12 @@ function byModality(c: Context): readonly Finding[] {
       return [discontinuousEssentials(c)];
     case 'work_or_service':
       return [abolished(c)];
-    // «Eventual» named the production contract before the reform: with a production cause written
-    // it is read as one; without any cause nothing makes it a current modality.
+    // «Eventual» and «interinidad» named the production and replacement contracts before the
+    // reform; the old name alone decides nothing, so each is checked as its current modality.
     case 'eventual':
-      if (c.input.causeStated === false) return [abolished(c)];
-      if (c.input.causeStated === null)
-        return [outdatedLabel(c, [phrase('modality.cause_unknown')])];
       return [outdatedLabel(c), ...production(c)];
-    // «Interinidad» became «sustitución»: with the person and the cause named it is read as one.
-    case 'interim': {
-      const { replacedPersonNamed: named, replacementCauseStated: cause } = c.input;
-      if (named === false || cause === false) return [abolished(c)];
-      if (named === null || cause === null)
-        return [outdatedLabel(c, [phrase('modality.replacement_unknown')])];
+    case 'interim':
       return [outdatedLabel(c), replacementStated(c)];
-    }
     case 'production':
       return production(c);
     case 'production_occasional':
