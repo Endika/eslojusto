@@ -48,3 +48,5 @@ export function documentsConfig(env: Env): DocumentsConfig | null {
 }
 
 export const DOCUMENTS = documentsConfig(import.meta.env);
+
+export const DOCUMENTS_BUILD = DOCUMENTS !== null;

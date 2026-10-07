@@ -2,6 +2,7 @@ import { BENEFIT_STATES, benefitState, type BenefitEstimate } from '../engine/un
 import type { EmployerFigures, Review } from '../engine/review';
 import type { Cause, FinalPayInput, ItemId, FixedTermType } from '../engine/types';
 import { FAQ_TOPICS } from '../content/faq-topics';
+import { DOCUMENTS_BUILD } from '../documents/config';
 import { DOCUMENT_KINDS, DOWNLOADS, ERROR_CODES, PASS_VIA } from '../documents/ports';
 
 // Every property is a code from a closed list, a small count or a bucket: nothing a person
@@ -148,7 +149,7 @@ const LANGUAGE_RULE = { pattern: /^(?:[a-z]{2,3}|unknown)$/ } as const;
 export const SCRIPT_SOURCE = /^[\w.-]*[a-z][\w.-]*\.(?:m?js|html):\d{1,6}$/i;
 const SOURCE_RULE = { pattern: new RegExp(`${SCRIPT_SOURCE.source}|^unknown$`, 'i') } as const;
 
-export const CATALOGUE = {
+const BASE_CATALOGUE = {
   browser_language: { lang: LANGUAGE_RULE },
   page_translated: { lang: LANGUAGE_RULE },
   section_viewed: { section },
@@ -177,8 +178,11 @@ export const CATALOGUE = {
   detail_opened: { item: oneOf(ITEM_IDS) },
   started_over: {},
   js_error: { kind: oneOf(ERROR_TYPES), source: SOURCE_RULE },
-  // Reading documents and the pass: only in a build with the documents API. Never a value read
-  // from a document, only its kind, how many fields it filled and how sure the reading was.
+} as const satisfies Record<string, Record<string, Rule>>;
+
+// Reading documents and the pass: never a value read from a document, only its kind, how many
+// fields it filled and how sure the reading was.
+const DOCUMENT_CATALOGUE = {
   start_chosen: { path: oneOf(['upload', 'manual']) },
   upload_started: {
     doc_type: oneOf(DOCUMENT_KINDS),
@@ -198,6 +202,21 @@ export const CATALOGUE = {
   pass_failed: { code: oneOf(ERROR_CODES) },
   report_downloaded: { document: oneOf(DOWNLOADS) },
 } as const satisfies Record<string, Record<string, Rule>>;
+
+// The document events exist only in a build with the documents API; elsewhere they are dropped
+// from the bundle (the variables are read inline so the bundler can fold them) and refused like
+// any unknown event.
+export const CATALOGUE = {
+  ...BASE_CATALOGUE,
+  ...(!!(
+    import.meta.env.PUBLIC_API_EXTRACT_URL &&
+    import.meta.env.PUBLIC_API_CHECKOUT_URL &&
+    import.meta.env.PUBLIC_API_PASS_URL &&
+    import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
+  ) && DOCUMENTS_BUILD
+    ? DOCUMENT_CATALOGUE
+    : {}),
+} as typeof BASE_CATALOGUE & typeof DOCUMENT_CATALOGUE;
 
 export type EventName = keyof typeof CATALOGUE;
 

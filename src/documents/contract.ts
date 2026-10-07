@@ -66,7 +66,10 @@ export const CLIENT_ERROR_CODES = [
 export type ClientErrorCode = (typeof CLIENT_ERROR_CODES)[number];
 
 export type ErrorCode = ApiErrorCode | ClientErrorCode;
-export const ERROR_CODES: readonly ErrorCode[] = [...API_ERROR_CODES, ...CLIENT_ERROR_CODES];
+// Marked pure so a build without the documents API can drop it with the events that use it.
+export const ERROR_CODES: readonly ErrorCode[] = /* @__PURE__ */ (
+  API_ERROR_CODES as readonly ErrorCode[]
+).concat(CLIENT_ERROR_CODES);
 
 export const CONFIDENCES = ['high', 'medium', 'low'] as const;
 export type Confidence = (typeof CONFIDENCES)[number];

@@ -26,9 +26,10 @@ const noPosthogAdapter = {
   message: 'Only the composition root (src/scripts) imports the PostHog adapter.',
 };
 const analyticsReach = {
-  regex: '^\\.\\./(?!engine/|content/faq-topics$|i18n/client$|calculator/ports$|documents/ports$)',
+  regex:
+    '^\\.\\./(?!engine/|content/faq-topics$|i18n/client$|calculator/ports$|documents/ports$|documents/config$)',
   message:
-    'src/analytics reaches only the engine, the help topics, the translator type and the calculator and documents ports.',
+    'src/analytics reaches only the engine, the help topics, the translator type, the calculator and documents ports and the documents switch.',
 };
 const noDynamicImport = {
   selector: 'ImportExpression',

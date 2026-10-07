@@ -3,18 +3,22 @@ import { track } from '../analytics/posthog';
 import { setUpCalculator } from '../calculator/main';
 import type { CalculatorEvents, CompletedReview } from '../calculator/ports';
 import { pageTranslator } from '../i18n/client';
+import { DOCUMENTS_BUILD } from '../documents/config';
 import { localToday } from './clock';
 
 const analytics = calculatorAnalytics(track, () => performance.now());
 // The calculator rewrites the fragment as it opens, so the address it arrived at is kept first.
 const arrival = { hash: location.hash, search: location.search };
-// Inlined at build time, so a build without the API drops every document branch below.
-const documentsBuild = !!(
-  import.meta.env.PUBLIC_API_EXTRACT_URL &&
-  import.meta.env.PUBLIC_API_CHECKOUT_URL &&
-  import.meta.env.PUBLIC_API_PASS_URL &&
-  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
-);
+
+// The variables are read inline so a build without them folds this to false and drops every
+// document branch below; with them, the same check as the pages make.
+const documentsBuild =
+  !!(
+    import.meta.env.PUBLIC_API_EXTRACT_URL &&
+    import.meta.env.PUBLIC_API_CHECKOUT_URL &&
+    import.meta.env.PUBLIC_API_PASS_URL &&
+    import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
+  ) && DOCUMENTS_BUILD;
 const reviewed: ((r: CompletedReview) => void)[] = [];
 const restarted: (() => void)[] = [];
 
