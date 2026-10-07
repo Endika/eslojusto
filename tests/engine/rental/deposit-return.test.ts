@@ -122,6 +122,36 @@ describe('late-payment interest (LAU art. 36.4)', () => {
     ]);
   });
 
+  it('accrues on one month of deposit only: two months returned late accrue on one', () => {
+    // Rent 1.000 (the fixture's), deposit 2.000 back on 10-07-2025, keys 10-01-2025: 1.000 accrues
+    // from 10-02-2025 for 150 days at 3,25 %: 1.000 × 0,0325 × 150 / 365 = 13,36 (360: 13,54).
+    const { interest } = check(2000, {
+      keysReturnedOn: f('2025-01-10'),
+      returns: [{ on: f('2025-07-10'), amount: 2000 }],
+      deductions: [],
+    });
+    expect(bothBases(interest)).toEqual({
+      reasons: ['interest_day_count'],
+      low: 13.36,
+      high: 13.54,
+    });
+  });
+
+  it('takes the part above the month as kept or returned first', () => {
+    // Deposit 1.500 of a 1.000 rent; 300 kept, then 400 back on time, 800 back late. The 500 above
+    // the month go first: 300 kept, 200 of the 400. The late 800 accrue in full: 800 × 0,0325 ×
+    // 30 / 365 = 2,14 from 10-02-2025 to 11-03-2025.
+    const { interest } = check(1500, {
+      keysReturnedOn: f('2025-01-10'),
+      returns: [
+        { on: f('2025-03-12'), amount: 800 },
+        { on: f('2025-01-20'), amount: 400 },
+      ],
+      deductions: [{ kind: 'cleaning', amount: 300 }],
+    });
+    expect(bothBases(interest).low).toBe(2.14);
+  });
+
   it('a 2024 stretch counts 366 days a year', () => {
     // 1.000 × 0,0325 × 60 / 366 = 5,33 (360: 5,42), from 01-03-2024 to 29-04-2024.
     const { interest } = check(

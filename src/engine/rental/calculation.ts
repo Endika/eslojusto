@@ -83,6 +83,7 @@ export type RentalPhraseKey =
   | 'deposit.returned_in_full'
   | 'deposit.returned_on_time'
   | 'deposit.interest_not_yet'
+  | 'deposit.interest_deposit_only'
   | 'deposit.interest_stretch'
   | 'deposit.interest_day_count'
   | 'deposit.interest_total'
