@@ -1,4 +1,6 @@
-import { SHEETS } from './form';
+import { applies, prepareFigures } from './conditions';
+import type { Flow } from './flow';
+import { SHEETS, sheetErrors, type Sheet } from './form';
 
 // A step is one sheet or the result; a section (one tab, one ground colour) can own more than one
 // step. Step ids are also the URL fragments, so they keep their Spanish names.
@@ -18,12 +20,13 @@ export const SECTION_OF_STEP: Record<Step, string> = {
   finiquito: 'settlement',
   resultado: 'result',
 };
-export const LAST_SHEET = SHEETS.length - 1;
-export const RESULT_STEP = STEPS.length - 1;
 
-export const stepAt = (i: number): Step => STEPS[i] ?? 'causa';
+const isSheet = (step: Step): step is Sheet => step !== 'resultado';
 
-export const indexOfHash = (hash: string): number => {
-  const i = STEPS.indexOf(hash.replace(/^#/, '') as Step);
-  return i < 0 ? 0 : i;
+export const FINAL_PAY_FLOW: Flow<Step> = {
+  steps: STEPS,
+  sectionOfStep: SECTION_OF_STEP,
+  applies,
+  complete: (form, step, today) => !isSheet(step) || sheetErrors(form, step, today).length === 0,
+  prepareLastSheet: prepareFigures,
 };

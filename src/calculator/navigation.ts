@@ -1,7 +1,5 @@
 import type { CivilDate } from '../engine/date';
-import { applies, prepareFigures, stepFrom } from './conditions';
-import type { CalculatorEvents } from './ports';
-import { LAST_SHEET, RESULT_STEP, SECTION_OF_STEP, STEPS, stepAt } from './steps';
+import { lastSheet, resultStep, stepAt, stepFrom, type Flow } from './flow';
 import { setUpTabs } from './tabs';
 
 export interface Screen {
@@ -30,14 +28,22 @@ export interface Navigation {
   renderTabs(): void;
 }
 
+export interface NavigationEvents<S extends string> {
+  stepShown(step: S): void;
+  wentBack(from: S, to: S): void;
+}
+
 // The step on screen, the furthest one reached, and the browser history that follows them.
-export function createNavigation(
+export function createNavigation<S extends string>(
   screen: Screen,
-  events: CalculatorEvents,
+  events: NavigationEvents<S>,
   today: () => CivilDate,
+  flow: Flow<S>,
 ): Navigation {
   const { root, form, result, resultTitle, sheets, actions } = screen;
-  const tabs = setUpTabs(root);
+  const tabs = setUpTabs(root, flow);
+  const lastSheetIndex = lastSheet(flow);
+  const resultIndex = resultStep(flow);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let current = -1;
   let reached = 0;
@@ -46,27 +52,27 @@ export function createNavigation(
 
   function show(i: number, options: ShowOptions = {}) {
     let target = Math.max(0, Math.min(i, reached));
-    if (!applies(form, target)) target = stepFrom(form, target, -1);
+    if (!flow.applies(form, stepAt(flow, target))) target = stepFrom(flow, form, target, -1);
     const firstTime = current < 0;
     const changes = target !== current;
     current = target;
-    const id = STEPS[current] ?? 'causa';
+    const id = stepAt(flow, current);
 
     sheets.forEach((h, j) => (h.hidden = j !== current));
-    result.hidden = current !== RESULT_STEP;
-    actions.hidden = current === RESULT_STEP;
+    result.hidden = current !== resultIndex;
+    actions.hidden = current === resultIndex;
     screen.backButton.hidden = current === 0;
-    screen.nextButton.hidden = current >= LAST_SHEET;
-    screen.reviewButton.hidden = current !== LAST_SHEET;
-    root.dataset['section'] = SECTION_OF_STEP[id];
+    screen.nextButton.hidden = current >= lastSheetIndex;
+    screen.reviewButton.hidden = current !== lastSheetIndex;
+    root.dataset['section'] = flow.sectionOfStep[id];
     events.stepShown(id);
-    if (current === LAST_SHEET) prepareFigures(form, today());
+    if (current === lastSheetIndex) flow.prepareLastSheet?.(form, today());
     renderTabs();
 
     if (options.history === 'push') history.pushState(null, '', `#${id}`);
     else if (options.history === 'replace') history.replaceState(null, '', `#${id}`);
 
-    const visible = current === RESULT_STEP ? result : sheets[current];
+    const visible = current === resultIndex ? result : sheets[current];
     if (changes && !firstTime && visible && !reducedMotion.matches) {
       visible.classList.remove('turning');
       void visible.offsetWidth;
@@ -74,7 +80,7 @@ export function createNavigation(
     }
     if (changes && !firstTime) window.scrollTo({ top: 0 });
     if (options.focus) {
-      const title = current === RESULT_STEP ? resultTitle : visible?.querySelector('h2');
+      const title = current === resultIndex ? resultTitle : visible?.querySelector('h2');
       title?.focus({ preventScroll: true });
     }
   }
@@ -83,7 +89,7 @@ export function createNavigation(
   function goBack(i: number, options: ShowOptions) {
     const before = current;
     show(i, options);
-    if (current < before) events.wentBack(stepAt(before), stepAt(current));
+    if (current < before) events.wentBack(stepAt(flow, before), stepAt(flow, current));
   }
 
   return {

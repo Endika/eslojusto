@@ -1,4 +1,4 @@
-import { SECTION_OF_STEP, STEPS } from './steps';
+import { stepAt, type Flow } from './flow';
 
 function asTab(el: HTMLElement, link: boolean): HTMLElement {
   if (el instanceof HTMLAnchorElement === link) return el;
@@ -10,19 +10,23 @@ function asTab(el: HTMLElement, link: boolean): HTMLElement {
 }
 
 // A tab is a link once its section is reached and plain text before; it swaps element on change.
-export function setUpTabs(root: ParentNode): (current: number, reached: number) => void {
+export function setUpTabs<S extends string>(
+  root: ParentNode,
+  flow: Flow<S>,
+): (current: number, reached: number) => void {
+  const { steps, sectionOfStep } = flow;
   const tabs = [...root.querySelectorAll<HTMLElement>('[data-tab]')];
   return (current, reached) => {
-    const currentSection = SECTION_OF_STEP[STEPS[current] ?? 'causa'];
+    const currentSection = sectionOfStep[stepAt(flow, current)];
     tabs.forEach((el, i) => {
-      const id = el.dataset['tab'] ?? 'cause';
-      const first = STEPS.findIndex((p) => SECTION_OF_STEP[p] === id);
+      const id = el.dataset['tab'] ?? sectionOfStep[steps[0]];
+      const first = steps.findIndex((p) => sectionOfStep[p] === id);
       const available = first <= reached;
       const isCurrent = id === currentSection;
       const p = asTab(el, available);
       tabs[i] = p;
       if (available) {
-        p.setAttribute('href', `#${STEPS[first]}`);
+        p.setAttribute('href', `#${steps[first]}`);
         p.removeAttribute('aria-disabled');
       } else {
         p.removeAttribute('href');
