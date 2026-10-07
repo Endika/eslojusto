@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/Endika/eslojusto/compare/v1.1.0...v1.1.1) (2026-10-07)
+
+
+### Bug Fixes
+
+* **infra:** trust the immutable OIDC subject the repository signs ([4dd2edd](https://github.com/Endika/eslojusto/commit/4dd2eddd2941884d44d5ffd63dd4cff616d87ea1))
+
 ## [1.1.0](https://github.com/Endika/eslojusto/compare/v1.0.1...v1.1.0) (2026-10-07)
 
 
