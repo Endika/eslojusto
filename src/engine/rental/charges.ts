@@ -74,7 +74,9 @@ function compare(
 }
 
 // LAU art. 20.2: each year the charge may rise at most twice what the rent may rise that year
-// under art. 18.1, compounding from the yearly amount agreed in the contract.
+// under art. 18.1, compounding from the yearly amount agreed in the contract. The limit is tied to
+// the rent's possible rise, so with no update clause (no rise under art. 18.1) the charge cannot
+// rise at all. Whether the extraordinary caps count as that rise is read both ways.
 function cappedYear(
   agreed: number,
   year: number,
