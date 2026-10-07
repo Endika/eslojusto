@@ -16,6 +16,7 @@
     "test:run": "vitest run",
     "test:e2e": "playwright test",
     "prepare": "husky",
+    "employment:review": "vitest run tests/engine/employment/monthly-review.test.ts --reporter=verbose",
     "indices:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indices.mjs --check"
   },
   "dependencies": {
