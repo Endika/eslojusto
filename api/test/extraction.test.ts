@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { failedChecks, hasLowConfidence, parseReading } from '../src/domain/extraction';
+import { LIMITS } from '../src/domain/documents';
 import { coherentSettlement, f, page, proposal } from './support/fields';
 
 const withProposal = (fields: Record<string, unknown>) => ({
@@ -59,7 +60,7 @@ describe('parseReading', () => {
     ['a page beyond the attached ones', page(3, 'payslip')],
     ['an unknown kind', page(1, 'contract')],
     ['a page number that is not whole', { ...page(1, 'payslip'), page: 1.5 }],
-    ['a document number out of range', page(1, 'payslip', 16)],
+    ['a document number out of range', page(1, 'payslip', LIMITS.maxImages + 1)],
     ['a month that is not one', page(1, 'payslip', 1, 'high', '2026-13')],
     ['a page with an extra key', { ...page(1, 'payslip'), note: 'x' }],
     [

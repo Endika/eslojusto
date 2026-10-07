@@ -5,13 +5,13 @@ import { jpeg, webpLossy } from './support/synthetic';
 const img = (w = 1000, h = 1400): DocumentFile => ({ mediaType: 'image/jpeg', bytes: jpeg(w, h) });
 
 describe('checkFileShapes', () => {
-  it('accepts up to fifteen images', () => {
+  it('accepts up to twenty-five images', () => {
     expect(checkFileShapes(Array.from({ length: LIMITS.maxImages }, () => img()))).toBeNull();
   });
 
   it.each([
     ['no files', [], 'no_files'],
-    ['sixteen images', Array.from({ length: 16 }, () => img()), 'too_many_files'],
+    ['twenty-six images', Array.from({ length: 26 }, () => img()), 'too_many_files'],
     [
       'WebP bytes labelled JPEG',
       [{ mediaType: 'image/jpeg', bytes: webpLossy(800, 600) }],

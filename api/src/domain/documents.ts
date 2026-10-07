@@ -27,9 +27,10 @@ export interface DocumentFile {
   readonly bytes: Uint8Array;
 }
 
-// One read takes a whole pack: up to 15 page images, of any kind of document, in any order.
+// One read takes a whole pack: up to 25 page images, of any kind of document, in any order. Above
+// 20 images Claude takes none over 2000 px a side, which MAX_IMAGE_LONG_SIDE stays under.
 export const LIMITS = {
-  maxImages: 15,
+  maxImages: 25,
   maxImageLongSide: MAX_IMAGE_LONG_SIDE,
   // Lambda's synchronous invocation payload limit.
   maxPayloadBytes: 6 * 1024 * 1024,

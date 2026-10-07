@@ -40,13 +40,13 @@ API never returns prose. All requests are `POST` with a JSON body.
 
 The person never says what they upload: a read takes the whole pack (dismissal letter,
 settlement notification, payslips, company certificate, agreement, work history, and pages
-that matter to none of it) and the model sorts it. **Images only**, one per page, up to 15, in
+that matter to none of it) and the model sorts it. **Images only**, one per page, up to 25, in
 any order: JPEG/WebP with the long side at most `MAX_IMAGE_LONG_SIDE`
 (`src/domain/image-limit.ts`, 1568 px, checked from the image header). The browser renders a
 PDF's pages to images with pdf.js before sending, so the API never parses a PDF and a read's
 cost depends only on pixels it can measure; `application/pdf` is answered with
 `unsupported_media_type`. One read that answers `ok` is one free read or one pass read, whatever it holds. Codes:
-`too_many_files` (16 images), `image_unreadable`, `image_too_large`, `document_too_dense`
+`too_many_files` (26 images), `image_unreadable`, `image_too_large`, `document_too_dense`
 (a guard: no accepted pack reaches it).
 `model_unavailable` (every model call failed, as when the budget action denies Bedrock) spends
 neither a free read nor a pass read; the site then offers only the manual path for an hour.
@@ -308,8 +308,8 @@ Cheapest first, and nothing that parses what the person sent runs before the cap
   prompt and schema at 14,000 (about 27,000 characters at two per token;
   `test/tokens.test.ts` keeps it honest). Bedrock's CountTokens does not serve Claude models
   offered only through cross-Region profiles, so this is computed, not asked. The largest pack
-  the API accepts, fifteen 1568 × 1568 images, comes to 14,000 + 15 × 3,279 = 63,185; above
-  **65,000** the answer would be `document_too_dense`. Nothing in an image can add tokens
+  the API accepts, twenty-five 1568 × 1568 images, comes to 14,000 + 25 × 3,279 = 95,975; above
+  **96,000** the answer would be `document_too_dense`. Nothing in an image can add tokens
   beyond its pixels, which is why PDFs are rendered in the browser instead of read here: a PDF
   can hide text from any measure short of a full reader.
 - **With Haiku reading first** (not the default), no escalation above 43,000 real input tokens
@@ -363,7 +363,7 @@ the function bundles, never user data).
 **Function URLs, not HTTP API.** Function URLs exist in eu-south-2 (the regional endpoint
 `*.lambda-url.eu-south-2.on.aws` resolves; it does not for regions without them), cost
 nothing, and their timeout is the function's. HTTP API cuts at 30 s, far too close for a primary
-read plus an escalated read of a 15-page pack (the function's timeout is 180 s). Throttling comes from reserved concurrency (429
+read plus an escalated read of a 25-page pack (the function's timeout is 180 s). Throttling comes from reserved concurrency (429
 beyond it: 5 for `extract`, 2 each for `checkout` and `pass`); CORS allows only
 `https://eslojusto.es`.
 
@@ -500,23 +500,27 @@ are free up to 1,000 a month.
 Per read, from the eu-south-2 Price List (07-10-2026): Sonnet 4.6 at 3.30 / 16.50 USD per
 million input / output tokens (EU profile); Haiku 4.5, if it reads first again, at 1.10 / 5.50
 (`MODEL_PRICES_USD_PER_MTOK` in `src/config.ts`, which the dashboard's cost estimate reads).
-`max_tokens` is 5,000 (a full pack records about 1,500–2,500 tokens, a long work history up to
+`max_tokens` is 5,000 (a 15-page pack records about 1,500–2,500 tokens, each further page adds its
+entry to the page list, and a long work history takes up to
 4,000), and `test/tokens.test.ts` recomputes the bounds below from the constants.
 
 | Read, Sonnet 4.6 alone                    | Input tokens    | Output tokens        | Cost                         |
 | ----------------------------------------- | --------------- | -------------------- | ---------------------------- |
 | Typical, 8 photos                         | ~21,000         | ~1,500               | 0.069 + 0.025 = **0.09 USD** |
 | Full pack, 15 photos                      | ~32,000         | ~2,000               | 0.106 + 0.033 = **0.14 USD** |
-| Largest pack accepted, 15 × 1568 × 1568   | 63,185          | 5,000 (`max_tokens`) | 0.209 + 0.083 = **0.29 USD** |
+| Largest pack, 25 photos                   | ~48,000         | ~2,500               | 0.158 + 0.041 = **0.20 USD** |
+| Largest pack accepted, 25 × 1568 × 1568   | 95,975          | 5,000 (`max_tokens`) | 0.317 + 0.083 = **0.40 USD** |
 | Were Haiku to read first: worst escalated | 43,000 + 43,000 | 5,000 + 5,000        | 0.075 + 0.225 = 0.30 USD     |
 
 "Typical" counts 1,600 tokens per photo, as if Claude scales them down (above), plus about
 8,000 for the prompt and schema; were every pixel billed, 15 phone photos (1568 × 1176) would
-be about 44,900 in, 0.18 USD.
+be about 44,900 in, 0.18 USD, and 25 about 69,500 in, 0.27 USD. A pack over 15 that the browser
+had to send at 1280 or 1100 px (above, «Payload budget») costs less, not more.
 
-**Worst case: 0.29 USD per read** (63,185 × 3.30 USD/M + 5,000 × 16.50 USD/M = 0.291), for any
-input: the API takes images only, priced by their pixels, and refuses anything above 65,000
-estimated tokens (0.30 USD) before a call. A PDF never reaches it; the browser renders its pages
+**Worst case: 0.40 USD per read** (95,975 × 3.30 USD/M + 5,000 × 16.50 USD/M = 0.399), for any
+input: the API takes images only, priced by their pixels, and refuses anything above 96,000
+estimated tokens (0.40 USD) before a call. The bound counts every page at 1568 px, since the
+API accepts that size at any count; the browser stepping a large pack down only lowers it. A PDF never reaches it; the browser renders its pages
 to images of the same size as a photo. Should Bedrock still bill more than twice the estimate,
 the read is logged with `underestimated`. A free read needs a fresh captcha, at most 5 reads
 run at once, and the budget action caps the month.
@@ -541,7 +545,8 @@ run at once, and the budget action caps the month.
   logged yet.
 - Whether the models set pages aside as the readability list intends, and how often a page in
   Catalan, Basque, Galician or English is read: the language fixtures are hand-written.
-- The real latency of an escalated read of a 15-page pack (the 180 s timeout is a guess), and
+- The real latency of a 25-page read (15 pages took about 15 s, so about 25–30 s is expected,
+  well inside the 160 s deadline) and of an escalated one (the 180 s timeout is a guess), and
   whether Bedrock bills a 1568-px photo at about 1,600 tokens, as Anthropic's resizing
   suggests, or at its full 2,459.
 - Model accuracy: the Bedrock fixtures are hand-written in Bedrock's response shape, not

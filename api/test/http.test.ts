@@ -130,8 +130,8 @@ describe('handleExtract', () => {
       'invalid_request',
     ],
     [
-      'sixteen files',
-      post(extractBody({ files: Array(16).fill({ mediaType: 'image/jpeg', data: '' }) })),
+      'twenty-six files',
+      post(extractBody({ files: Array(26).fill({ mediaType: 'image/jpeg', data: '' }) })),
       422,
       'too_many_files',
     ],

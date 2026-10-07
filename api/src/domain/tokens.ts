@@ -6,10 +6,10 @@ import type { ImageSize } from './image-dimensions';
 // System prompt, tool schema, page labels and Anthropic's tool-use preamble: about 27,000
 // characters, priced at two per token like document text (test/tokens.test.ts keeps it honest).
 export const PROMPT_TOKENS = 14_000;
-// One Sonnet read at this cap costs 65,000 × 3.30 + 5,000 × 16.50 USD per million = 0.30 USD
-// (api/README.md, «Cost»). The largest pack the API accepts, fifteen 1568 × 1568 images, comes
-// to 14,000 + 15 × 3,279 = 63,185, so the cap is a guard rather than a limit anyone meets.
-export const MAX_ESTIMATED_INPUT_TOKENS = 65_000;
+// One Sonnet read at this cap costs 96,000 × 3.30 + 5,000 × 16.50 USD per million = 0.40 USD
+// (api/README.md, «Cost»). The largest pack the API accepts, twenty-five 1568 × 1568 images,
+// comes to 14,000 + 25 × 3,279 = 95,975, so the cap is a guard rather than a limit anyone meets.
+export const MAX_ESTIMATED_INPUT_TOKENS = 96_000;
 // Only when a cheaper model reads first. Measured by Bedrock after the primary read, so exact;
 // above it a second, dearer read would take the worst case past 0.30 USD (api/README.md, «Cost»).
 export const MAX_ESCALATION_INPUT_TOKENS = 43_000;
