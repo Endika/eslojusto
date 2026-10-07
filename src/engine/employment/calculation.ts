@@ -149,6 +149,7 @@ type WorkingTimePhraseKey =
   | 'working_time.weekly_hours_agreed'
   | 'working_time.weekly_hours_scheduled'
   | 'working_time.irregular_distribution'
+  | 'working_time.time_worked_counts'
   | 'working_time.longest_day'
   | 'working_time.shortest_rest'
   | 'working_time.longest_rest'

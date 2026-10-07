@@ -59,23 +59,47 @@ describe('weekly schedule geometry', () => {
 });
 
 describe('weekly hours (art. 34.1 ET)', () => {
-  it('42 hours a week on average is over the legal limit', () => {
+  it('42 scheduled hours are to review: slots are presence, effective work is what counts', () => {
     const schedule = every([1, 2, 3, 4, 5, 6], ['09:00', '16:00']);
-    expect(findingFor({ schedule }, 'weekly_40')).toMatchObject({
-      status: 'over_legal_limit',
-      calculation: [phrase('working_time.weekly_hours_scheduled', { hours: 42 })],
+    const finding = findingFor({ schedule }, 'weekly_40');
+    expect(finding).toMatchObject({
+      status: 'review_it',
+      calculation: [
+        phrase('working_time.weekly_hours_scheduled', { hours: 42 }),
+        phrase('working_time.time_worked_counts'),
+      ],
     });
+    expect(offerPass([{ kind: 'single', finding }])).toBe(false);
   });
 
-  it('42 agreed hours is over the limit even without a schedule', () => {
-    expect(
-      findingFor({ schedule: null, contractHours: { weekly: 42, annual: null } }, 'weekly_40'),
-    ).toMatchObject({ status: 'over_legal_limit' });
-  });
-
-  it('a long week in an irregular distribution is to review, not a verdict', () => {
+  it('42 scheduled hours in rotating shifts are to review too', () => {
     const schedule = every([1, 2, 3, 4, 5, 6], ['09:00', '16:00']);
-    expect(findingFor({ schedule, irregular: true }, 'weekly_40').status).toBe('review_it');
+    expect(findingFor({ schedule, shifts: true }, 'weekly_40').status).toBe('review_it');
+  });
+
+  it.each([42, 60, 65, 72])(
+    '%s agreed hours are to review against the special regimes, never a verdict',
+    (weekly) => {
+      const finding = findingFor(
+        { schedule: null, contractHours: { weekly, annual: null } },
+        'weekly_40',
+      );
+      expect(finding).toMatchObject({
+        status: 'review_it',
+        calculation: [
+          phrase('working_time.weekly_hours_agreed', { hours: weekly }),
+          phrase('working_time.special_regimes'),
+        ],
+      });
+      expect(finding.sources.map((s) => s.id)).toEqual(['weekly_40', 'special_working_time']);
+    },
+  );
+
+  it('a long week in an irregular distribution says so', () => {
+    const schedule = every([1, 2, 3, 4, 5, 6], ['09:00', '16:00']);
+    const finding = findingFor({ schedule, irregular: true }, 'weekly_40');
+    expect(finding.status).toBe('review_it');
+    expect(finding.calculation).toContainEqual(phrase('working_time.irregular_distribution'));
   });
 
   it('40 hours is within the limit', () => {

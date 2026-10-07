@@ -28,6 +28,10 @@ const hours = (minutes: number): number => round2(minutes / 60);
 
 const finding = findingsFor('working_time');
 
+// Over forty hours is never a sure verdict here. Agreed hours may be lawful under a special regime
+// whose sector we do not know (RD 1561/1995, arts. 5.2, 8, 10 bis and 20, which sets no figure);
+// scheduled hours are presence, which breaks of art. 34.4 ET, rotating shifts or an irregular
+// distribution may bring down to forty hours of effective work.
 function weeklyHours(
   input: EmploymentInput,
   week: WorkWeek | null,
@@ -35,41 +39,51 @@ function weeklyHours(
 ): Finding | null {
   const agreed = input.contractHours.weekly;
   const scheduled = week === null ? null : hours(week.minutes);
-  if (agreed === null && scheduled === null) return null;
   if (agreed !== null && agreed > WEEKLY_MAX_HOURS)
     return finding(
       'weekly_40',
       {
-        status: 'over_legal_limit',
-        calculation: [phrase('working_time.weekly_hours_agreed', { hours: agreed })],
+        status: 'review_it',
+        calculation: [
+          phrase('working_time.weekly_hours_agreed', { hours: agreed }),
+          phrase('working_time.special_regimes'),
+        ],
+        alsoCites: ['special_working_time'],
       },
       norms,
     );
   if (scheduled !== null && scheduled > WEEKLY_MAX_HOURS)
-    // An irregular distribution averages out over the year; one week of it proves nothing.
     return finding(
       'weekly_40',
       {
-        status: input.irregular ? 'review_it' : 'over_legal_limit',
+        status: 'review_it',
         calculation: [
           phrase('working_time.weekly_hours_scheduled', { hours: scheduled }),
+          phrase('working_time.time_worked_counts'),
           ...(input.irregular ? [phrase('working_time.irregular_distribution')] : []),
         ],
       },
       norms,
     );
-  return finding(
-    'weekly_40',
-    {
-      status: 'within_limit',
-      calculation: [
-        scheduled === null
-          ? phrase('working_time.weekly_hours_agreed', { hours: agreed ?? 0 })
-          : phrase('working_time.weekly_hours_scheduled', { hours: scheduled }),
-      ],
-    },
-    norms,
-  );
+  if (scheduled !== null)
+    return finding(
+      'weekly_40',
+      {
+        status: 'within_limit',
+        calculation: [phrase('working_time.weekly_hours_scheduled', { hours: scheduled })],
+      },
+      norms,
+    );
+  if (agreed !== null)
+    return finding(
+      'weekly_40',
+      {
+        status: 'within_limit',
+        calculation: [phrase('working_time.weekly_hours_agreed', { hours: agreed })],
+      },
+      norms,
+    );
+  return null;
 }
 
 function longestDay(week: WorkWeek, norms: NormTable): Finding {
