@@ -278,7 +278,7 @@ Nothing here has been run. Each step needs an account administrator.
 7. **GitHub:** create the `production` environment with yourself as required reviewer and
    deployments limited to `main`; set the variables `AWS_DEPLOY_ROLE_ARN` (step 5 output) and
    `STRIPE_PRICE_ID`. The deploy role trusts only
-   `repo:Endika/eslojusto:environment:production`.
+   `repo:Endika@568585/eslojusto@1407967362:environment:production`.
 8. **Approve** the `Deploy API` run, then give the three function URLs (stack outputs `extractUrl`, `checkoutUrl`,
    `passUrl`) and the
    Turnstile site key to the site.
