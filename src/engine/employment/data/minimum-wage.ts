@@ -1,0 +1,63 @@
+import type { MinimumWageTable } from '../minimum-wage';
+
+// Read in the BOE on 07-10-2026: amounts from arts. 1, 3.1, 4.1 and 4.2 of each decree, and its
+// disposición final 3.ª, which gives it effects from 1 January to 31 December of its year.
+// A new year is one more row once its decree is published; nothing else changes.
+export const MINIMUM_WAGE: MinimumWageTable = [
+  {
+    year: 2023,
+    norm: 'rd99_2023',
+    url: 'https://www.boe.es/eli/es/rd/2023/02/14/99/con',
+    publishedOn: '2023-02-15',
+    effectsFrom: '2023-01-01',
+    effectsUntil: '2023-12-31',
+    retroactiveVerified: true,
+    monthly: 1080,
+    daily: 36,
+    annual: 15120,
+    temporaryPerDay: 51.15,
+    householdPerHour: 8.45,
+  },
+  {
+    year: 2024,
+    norm: 'rd145_2024',
+    url: 'https://www.boe.es/eli/es/rd/2024/02/06/145/con',
+    publishedOn: '2024-02-07',
+    effectsFrom: '2024-01-01',
+    effectsUntil: '2024-12-31',
+    retroactiveVerified: true,
+    monthly: 1134,
+    daily: 37.8,
+    annual: 15876,
+    temporaryPerDay: 53.71,
+    householdPerHour: 8.87,
+  },
+  {
+    year: 2025,
+    norm: 'rd87_2025',
+    url: 'https://www.boe.es/eli/es/rd/2025/02/11/87/con',
+    publishedOn: '2025-02-12',
+    effectsFrom: '2025-01-01',
+    effectsUntil: '2025-12-31',
+    retroactiveVerified: true,
+    monthly: 1184,
+    daily: 39.47,
+    annual: 16576,
+    temporaryPerDay: 56.08,
+    householdPerHour: 9.26,
+  },
+  {
+    year: 2026,
+    norm: 'rd126_2026',
+    url: 'https://www.boe.es/eli/es/rd/2026/02/18/126/con',
+    publishedOn: '2026-02-19',
+    effectsFrom: '2026-01-01',
+    effectsUntil: '2026-12-31',
+    retroactiveVerified: true,
+    monthly: 1221,
+    daily: 40.7,
+    annual: 17094,
+    temporaryPerDay: 57.82,
+    householdPerHour: 9.55,
+  },
+];
