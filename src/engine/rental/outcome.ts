@@ -57,7 +57,7 @@ export interface Measure<T> {
 // Each open doubt doubles the readings; inputs are validated so a review opens far fewer.
 const MAX_DOUBTS = 20;
 
-const uniqueById = (doubts: readonly Doubt[]): readonly Doubt[] =>
+export const uniqueById = (doubts: readonly Doubt[]): readonly Doubt[] =>
   doubts.filter((d, i) => doubts.findIndex((o) => o.id === d.id) === i);
 
 export function worldsFor(doubts: readonly Doubt[]): readonly World[] {
@@ -72,14 +72,14 @@ export function worldsFor(doubts: readonly Doubt[]): readonly World[] {
   return worlds;
 }
 
-const worldKey = (doubts: readonly Doubt[], w: World): string =>
+export const worldKey = (doubts: readonly Doubt[], w: World): string =>
   doubts.map((d) => (w[d.id] === true ? '1' : '0')).join('');
 
-// Gathers results worked out in every world of `doubts`. A doubt is a reason only when flipping
-// it alone changes the result in some reading.
-export function outcomeOf<T>(
-  doubts: readonly Doubt[],
+// Groups results by the measure into readings: one reading is a single outcome; more give the
+// lowest and highest and the reasons that move them.
+export function outcomeFrom<T>(
   results: readonly { readonly world: World; readonly value: T }[],
+  reasons: ReadonlySet<DoubtReason>,
   measure: Measure<T>,
 ): Outcome<T> {
   const first = results[0];
@@ -91,7 +91,28 @@ export function outcomeOf<T>(
     else readings.push({ value, worlds: [world] });
   }
   if (readings.length === 1) return { kind: 'single', value: first.value };
+  let low = first.value;
+  let high = first.value;
+  for (const { value } of readings) {
+    if (measure.amount(value) < measure.amount(low)) low = value;
+    if (measure.amount(value) > measure.amount(high)) high = value;
+  }
+  return {
+    kind: 'depends',
+    reasons: REASON_ORDER.filter((r) => reasons.has(r)),
+    low,
+    high,
+    readings,
+  };
+}
 
+// Gathers results worked out in every world of `doubts`. A doubt is a reason only when flipping
+// it alone changes the result in some reading.
+export function outcomeOf<T>(
+  doubts: readonly Doubt[],
+  results: readonly { readonly world: World; readonly value: T }[],
+  measure: Measure<T>,
+): Outcome<T> {
   const open = uniqueById(doubts);
   const byWorld = new Map(results.map((r) => [worldKey(open, r.world), r.value]));
   const moving = new Set<DoubtReason>();
@@ -102,19 +123,7 @@ export function outcomeOf<T>(
       if (flipped !== undefined && !measure.same(value, flipped)) moving.add(d.reason);
     }
   }
-  let low = first.value;
-  let high = first.value;
-  for (const { value } of readings) {
-    if (measure.amount(value) < measure.amount(low)) low = value;
-    if (measure.amount(value) > measure.amount(high)) high = value;
-  }
-  return {
-    kind: 'depends',
-    reasons: REASON_ORDER.filter((r) => moving.has(r)),
-    low,
-    high,
-    readings,
-  };
+  return outcomeFrom(results, moving, measure);
 }
 
 export function evaluateAcross<T>(

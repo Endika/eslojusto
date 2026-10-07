@@ -15,7 +15,8 @@ export type RentalPhraseKey =
   | 'rent_update.base_previous_max'
   | 'rent_update.base_from_answer'
   | 'rent_update.no_clause'
-  | 'rent_update.not_anniversary'
+  | 'rent_update.before_anniversary'
+  | 'rent_update.second_rise'
   | 'rent_update.figure.index'
   | 'rent_update.figure.flash'
   | 'rent_update.figure.fixed'
@@ -35,7 +36,8 @@ export type RentalPhraseKey =
   | 'rent_update.index_not_loaded'
   | 'rent_update.index_publication_unknown'
   | 'rent_update.index_none_published'
-  | 'rent_update.flash_not_loaded';
+  | 'rent_update.flash_not_loaded'
+  | 'rent_update.too_many_readings';
 
 // The UI words a phrase through the dictionary key `client.rental.calculation.<key>`.
 export interface RentalPhrase {

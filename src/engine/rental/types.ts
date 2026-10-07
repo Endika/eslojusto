@@ -56,8 +56,11 @@ export type NoticeForm =
   'letter' | 'burofax' | 'receipt_note' | 'annex' | 'email' | 'messaging' | 'verbal' | 'none';
 
 export interface RentUpdateInput {
-  // The day the update took effect, as the landlord applied it.
+  // The contract anniversary the rise is for.
   readonly anniversary: CivilDate;
+  // The day the rise took effect, as the landlord applied it: on the anniversary, later, or
+  // (not allowed) before it.
+  readonly effectiveOn: CivilDate;
   readonly previousRent: number;
   readonly newRent: number;
   // Any day of the first month charged at the new rent.

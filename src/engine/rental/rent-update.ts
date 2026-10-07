@@ -1,12 +1,15 @@
-import { compareDates, daysInMonth, toIso, type CivilDate } from '../date';
+import { compareDates, toIso, type CivilDate } from '../date';
+import { anniversaryIn } from './anniversary';
 import { round2 } from '../money';
 import { rentalPhrase, type RentalPhrase } from './calculation';
 import { referenceMonth, type IndexId, type ReferenceMonth } from './indices';
 import { normStanding, type NormId, type NormTable } from './norms';
 import {
-  outcomeOf,
+  outcomeFrom,
+  uniqueById,
   worldsFor,
   type Doubt,
+  type DoubtReason,
   type Measure,
   type Outcome,
   type World,
@@ -27,7 +30,8 @@ export type RentUpdateUnchecked =
   | 'index_not_loaded'
   | 'index_publication_unknown'
   | 'index_none_published'
-  | 'flash_not_loaded';
+  | 'flash_not_loaded'
+  | 'too_many_readings';
 
 export interface IndexFigure {
   readonly index: IndexId;
@@ -67,6 +71,7 @@ export interface RentUpdateResult {
   // Position of the update in the input.
   readonly index: number;
   readonly anniversary: CivilDate;
+  readonly effectiveOn: CivilDate;
   readonly outcome: Outcome<RentUpdateReading>;
   readonly sources: readonly RentalSource[];
   // The contract shows a company as landlord while the person does not know if it is a large one.
@@ -110,30 +115,6 @@ const monthIndex = (d: CivilDate): number => d.y * 12 + d.m - 1;
 const monthIso = (i: number): string =>
   `${Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, '0')}`;
 
-// The contract's anniversary in a year; a 29 February start falls on 28 February otherwise.
-function anniversaryIn(start: CivilDate, y: number): CivilDate {
-  return { y, m: start.m, d: Math.min(start.d, daysInMonth(y, start.m)) };
-}
-
-// The last anniversary before `day`, or the start itself in the first year.
-function previousAnniversary(start: CivilDate, day: CivilDate): CivilDate {
-  for (let y = day.y; y > start.y; y--) {
-    const a = anniversaryIn(start, y);
-    if (compareDates(a, day) < 0) return a;
-  }
-  return start;
-}
-
-function nextAnniversary(start: CivilDate, day: CivilDate): CivilDate {
-  for (let y = Math.max(day.y, start.y + 1); ; y++) {
-    const a = anniversaryIn(start, y);
-    if (compareDates(a, day) > 0) return a;
-  }
-}
-
-const isAnniversary = (start: CivilDate, day: CivilDate): boolean =>
-  day.y > start.y && compareDates(anniversaryIn(start, day.y), day) === 0;
-
 const normDoubtId = (norm: NormId): string => `norm:${norm}`;
 const LARGE_LANDLORD = 'large_landlord';
 
@@ -150,7 +131,8 @@ interface Frame {
   readonly index: number;
   readonly update: RentUpdateInput;
   readonly day: string;
-  readonly anniversary: boolean;
+  // A rise before the anniversary, or a second one in the same contract year, allows nothing.
+  readonly rise: 'valid' | 'early' | 'second';
   readonly active: ReadonlyMap<RuleId, ActiveRule>;
   readonly refs: ReadonlyMap<IndexId, ReferenceMonth>;
   readonly doubts: readonly Doubt[];
@@ -173,15 +155,22 @@ function frameOf(
   const { index, update } = entry;
   const start = input.startDate;
   const day = toIso(update.anniversary);
-  const anniversary = isAnniversary(start, update.anniversary);
+  const previousEntry = sorted[k - 1]?.update;
+  const rise =
+    compareDates(update.effectiveOn, update.anniversary) < 0
+      ? 'early'
+      : previousEntry && compareDates(previousEntry.anniversary, update.anniversary) === 0
+        ? 'second'
+        : 'valid';
   const ids = { agreement: `agreement:${day}`, notice: `notice:${day}` };
-  const firstYear = compareDates(previousAnniversary(start, update.anniversary), start) === 0;
+  const firstYear = update.anniversary.y === start.y + 1;
 
   // Months charged at this rent: up to the next anniversary or the next update, while the
   // contract lasts, and only those already due.
   const next = sorted[k + 1]?.update;
   const due = monthIndex(today) - (today.d > PAYMENT_DAY ? 0 : 1);
-  let endMonth = Math.min(monthIndex(nextAnniversary(start, update.anniversary)) - 1, due);
+  const nextAnniversary = anniversaryIn(start, update.anniversary.y + 1);
+  let endMonth = Math.min(monthIndex(nextAnniversary) - 1, due);
   if (next && monthIndex(next.chargedFrom) > monthIndex(update.chargedFrom))
     endMonth = Math.min(endMonth, monthIndex(next.chargedFrom) - 1);
   if (input.moveOut) endMonth = Math.min(endMonth, monthIndex(input.moveOut.keysReturnedOn) - 1);
@@ -189,7 +178,7 @@ function frameOf(
   const active = new Map<RuleId, ActiveRule>();
   const refs = new Map<IndexId, ReferenceMonth>();
   const doubts: Doubt[] = [];
-  const checked = anniversary && input.updateClause !== 'none';
+  const checked = rise === 'valid' && input.updateClause !== 'none';
   if (checked) {
     for (const a of activeRules(update.anniversary, norms)) {
       if (!UPDATE_RULES.has(a.rule.id)) continue;
@@ -225,7 +214,7 @@ function frameOf(
     if (ELECTRONIC.has(update.notice))
       doubts.push({ id: ids.notice, reason: 'notice_form_doubtful' });
   }
-  return { index, update, day, anniversary, active, refs, doubts, ids, firstYear, endMonth };
+  return { index, update, day, rise, active, refs, doubts, ids, firstYear, endMonth };
 }
 
 type Looked =
@@ -306,6 +295,7 @@ const UNCHECKED_PHRASE: Record<RentUpdateUnchecked, RentalPhrase['key']> = {
   index_publication_unknown: 'rent_update.index_publication_unknown',
   index_none_published: 'rent_update.index_none_published',
   flash_not_loaded: 'rent_update.flash_not_loaded',
+  too_many_readings: 'rent_update.too_many_readings',
 };
 
 interface Base {
@@ -348,26 +338,26 @@ function allowance(
   norms: NormTable,
 ): Allowance {
   const { update, day, active, refs } = frame;
-  const unchanged = (key: RentalPhrase['key'], rules: readonly RuleId[]): Allowance => ({
+  const unchanged = (phrase: RentalPhrase, rules: readonly RuleId[]): Allowance => ({
     ok: true,
     allowed: {
       maxRent: base,
       carried: base,
       agreed: null,
       cap: null,
-      phrases: [
-        rentalPhrase(
-          key,
-          key === 'rent_update.not_anniversary' ? { date: { date: day } } : undefined,
-        ),
-      ],
+      phrases: [phrase],
       rules,
       upperBoundOnly: false,
     },
   });
-  // LAU art. 18.1: the rent is updated only on each anniversary, and only as agreed.
-  if (!frame.anniversary) return unchanged('rent_update.not_anniversary', ['update_clause']);
-  if (input.updateClause === 'none') return unchanged('rent_update.no_clause', ['update_clause']);
+  // LAU art. 18.1: the rent is updated once a year, from the anniversary, and only as agreed.
+  const when = { anniversary: { date: day }, date: { date: toIso(update.effectiveOn) } };
+  if (frame.rise === 'early')
+    return unchanged(rentalPhrase('rent_update.before_anniversary', when), ['update_clause']);
+  if (frame.rise === 'second')
+    return unchanged(rentalPhrase('rent_update.second_rise', when), ['update_clause']);
+  if (input.updateClause === 'none')
+    return unchanged(rentalPhrase('rent_update.no_clause'), ['update_clause']);
 
   const holds = (id: RuleId): boolean => {
     const a = active.get(id);
@@ -525,13 +515,13 @@ function readUpdate(
 
   // LAU art. 18.2: the updated rent is due from the month after written notice; until then each
   // month charged above the base is paid over in full.
-  const annMonth = monthIndex(update.anniversary);
+  const effectiveMonth = monthIndex(update.effectiveOn);
   const written =
     WRITTEN.has(update.notice) ||
     (ELECTRONIC.has(update.notice) && world[frame.ids.notice] === true);
   const dueFrom =
     written && update.noticeOn !== null
-      ? Math.max(annMonth, monthIndex(update.noticeOn) + 1)
+      ? Math.max(effectiveMonth, monthIndex(update.noticeOn) + 1)
       : Number.POSITIVE_INFINITY;
   const first = monthIndex(update.chargedFrom);
   let accumulated = 0;
@@ -612,66 +602,188 @@ const measure: Measure<RentUpdateReading> = {
 
 export const rentUpdateAmount = measure.amount;
 
+// Each reading of an update is worked out once per open doubt combination and carried base;
+// past this many, the update says it cannot be checked rather than run on.
+const MAX_READINGS = 4096;
+// Distinct carried bases kept per combination of the doubts still ahead. Past this, only the
+// lowest and highest stay: a higher base never allows a lower rent, so the extremes give the
+// lowest and highest amount.
+const MAX_BASES = 4;
+
+// What one year hands to the next: the side taken on doubts that come back later, and the rent
+// the next anniversary updates from.
+interface Branch {
+  readonly assign: World;
+  readonly carried: number | null;
+}
+
+interface Output {
+  readonly branch: number;
+  readonly world: World;
+  readonly reading: RentUpdateReading;
+  readonly carried: number | null;
+}
+
+const keyOf = (w: World): string =>
+  Object.keys(w)
+    .sort()
+    .map((id) => `${id}=${w[id] === true ? 1 : 0}`)
+    .join(',');
+
+// The reasons that move `value` across outputs: a doubt opened here when flipping it alone, in the
+// same branch, changes it; a doubt taken from an earlier year when flipping it changes it in any
+// branch; and whatever moved the carried bases, when outputs alike in every doubt here differ.
+function movingReasons<V>(
+  outputs: readonly Output[],
+  doubts: readonly Doubt[],
+  fresh: (o: Output, id: string) => boolean,
+  inherited: ReadonlySet<DoubtReason>,
+  value: (o: Output) => V,
+  same: (a: V, b: V) => boolean,
+): Set<DoubtReason> {
+  const moving = new Set<DoubtReason>();
+  const local = (w: World) =>
+    keyOf(Object.fromEntries(doubts.map((d) => [d.id, w[d.id] === true])));
+  const exact = new Map(outputs.map((o) => [`${o.branch}|${keyOf(o.world)}`, o]));
+  const byLocal = new Map<string, Output[]>();
+  for (const o of outputs) byLocal.set(local(o.world), [...(byLocal.get(local(o.world)) ?? []), o]);
+  for (const d of doubts)
+    for (const o of outputs) {
+      if (o.world[d.id] === true || moving.has(d.reason)) continue;
+      const flipped = { ...o.world, [d.id]: true };
+      const others = fresh(o, d.id)
+        ? [exact.get(`${o.branch}|${keyOf(flipped)}`)]
+        : (byLocal.get(local(flipped)) ?? []);
+      if (others.some((x) => x !== undefined && !same(value(o), value(x)))) moving.add(d.reason);
+    }
+  for (const group of byLocal.values())
+    if (group.some((o) => !same(value(o), value(group[0] as Output))))
+      for (const r of inherited) moving.add(r);
+  return moving;
+}
+
+function nextBranches(outputs: readonly Output[], ahead: ReadonlySet<string>): Branch[] {
+  const byAssign = new Map<string, { assign: World; carried: Set<number | null> }>();
+  for (const o of outputs) {
+    const assign = Object.fromEntries(Object.entries(o.world).filter(([id]) => ahead.has(id)));
+    const key = keyOf(assign);
+    const entry = byAssign.get(key) ?? { assign, carried: new Set<number | null>() };
+    entry.carried.add(o.carried);
+    byAssign.set(key, entry);
+  }
+  return [...byAssign.values()].flatMap(({ assign, carried }) => {
+    const numbers = [...carried].filter((c): c is number => c !== null);
+    const kept =
+      numbers.length > MAX_BASES ? [Math.min(...numbers), Math.max(...numbers)] : numbers;
+    return [...kept, ...(carried.has(null) ? [null] : [])].map((c) => ({ assign, carried: c }));
+  });
+}
+
+const tooMany = (base: Base): RentUpdateReading => ({
+  status: 'not_checkable',
+  unchecked: 'too_many_readings',
+  base: base.rent,
+  agreed: null,
+  cap: null,
+  maxRent: null,
+  monthly: 0,
+  accumulated: 0,
+  months: 0,
+  monthsBeforeDue: 0,
+  calculation: [rentalPhrase('rent_update.too_many_readings')],
+  rules: ['update_clause'],
+});
+
 // Checks each update against the clause and the cap in force on its anniversary (LAU art. 18 and
-// the extraordinary caps), carrying the allowed rent, not the charged one, to the next year. Each
-// update is worked out in every reading of the doubts the whole chain opens.
+// the extraordinary caps), carrying the allowed rent, not the charged one, to the next year. Year
+// by year, each update is worked out in every reading of its own doubts and of the bases the
+// readings of earlier years left.
 export function checkRentUpdates(
   input: RentalInput,
   today: CivilDate,
   deps: RentalDeps,
+  { maxReadings }: { readonly maxReadings: number } = { maxReadings: MAX_READINGS },
 ): readonly RentUpdateResult[] {
   const sorted = input.updates
     .map((update, index) => ({ index, update }))
-    .sort((a, b) => compareDates(a.update.anniversary, b.update.anniversary));
-  const frames = sorted.map((_, k) => frameOf(input, sorted, k, today, deps));
-  const doubts = frames.flatMap((f) => f.doubts);
-  const runs = worldsFor(doubts).map((world) => {
-    let carried: number | null = null;
-    let previous: Frame | null = null;
-    const readings: RentUpdateReading[] = [];
-    for (const frame of frames) {
-      const consecutive =
-        previous !== null &&
-        compareDates(
-          previous.update.anniversary,
-          previousAnniversary(input.startDate, frame.update.anniversary),
-        ) >= 0;
-      const base: Base =
-        consecutive && carried !== null
-          ? { rent: carried, from: 'previous_max' }
-          : previous === null && frame.firstYear
-            ? { rent: input.initialRent, from: 'initial' }
-            : { rent: frame.update.previousRent, from: 'answer' };
-      const step = readUpdate(input, frame, base, world, deps.norms);
-      readings.push(step.reading);
-      carried = step.carried;
-      previous = frame;
-    }
-    return { world, readings };
-  });
-
-  return frames.map((frame, k) => {
-    const outcome = outcomeOf(
-      doubts,
-      runs.map(({ world, readings }) => {
-        const value = readings[k];
-        if (value === undefined) throw new RangeError(`No reading ${k}`);
-        return { world, value };
-      }),
-      measure,
+    .sort(
+      (a, b) =>
+        compareDates(a.update.anniversary, b.update.anniversary) ||
+        compareDates(a.update.effectiveOn, b.update.effectiveOn),
     );
-    const values =
-      outcome.kind === 'single' ? [outcome.value] : outcome.readings.map((r) => r.value);
-    const ruleIds = [...new Set(values.flatMap((v) => v.rules))];
-    return {
-      index: frame.index,
-      anniversary: frame.update.anniversary,
-      outcome,
-      sources: ruleIds.map((id) => ruleSource(id, deps.norms)),
-      companyLandlordHint:
-        input.landlordType === 'company' &&
-        outcome.kind === 'depends' &&
-        outcome.reasons.includes('large_landlord_unknown'),
-    };
+  const frames = sorted.map((_, k) => frameOf(input, sorted, k, today, deps));
+  const lastSeen = new Map<string, number>();
+  frames.forEach((f, k) => f.doubts.forEach((d) => lastSeen.set(d.id, k)));
+
+  let branches: Branch[] = [{ assign: {}, carried: null }];
+  let inherited = new Set<DoubtReason>();
+  return frames.map((frame, k) => {
+    const previous = frames[k - 1];
+    const consecutive =
+      previous !== undefined && previous.update.anniversary.y >= frame.update.anniversary.y - 1;
+    const baseOf = (carried: number | null): Base =>
+      consecutive && carried !== null
+        ? { rent: carried, from: 'previous_max' }
+        : previous === undefined && frame.firstYear
+          ? { rent: input.initialRent, from: 'initial' }
+          : { rent: frame.update.previousRent, from: 'answer' };
+    // A base not taken from the year before makes the carried rents irrelevant.
+    if (!consecutive)
+      branches = [...new Map(branches.map((b) => [keyOf(b.assign), b])).values()].map((b) => ({
+        assign: b.assign,
+        carried: null,
+      }));
+    const doubts = uniqueById(frame.doubts);
+    const openIn = (b: Branch) => doubts.filter((d) => !(d.id in b.assign));
+    const work = branches.reduce((n, b) => n + 2 ** openIn(b).length, 0);
+    const ahead = new Set([...lastSeen].filter(([, last]) => last > k).map(([id]) => id));
+
+    if (work > maxReadings) {
+      branches = [{ assign: {}, carried: null }];
+      inherited = new Set();
+      return result(input, frame, { kind: 'single', value: tooMany(baseOf(null)) }, deps.norms);
+    }
+    const outputs: Output[] = branches.flatMap((b, i) =>
+      worldsFor(openIn(b)).map((w) => {
+        const world = { ...b.assign, ...w };
+        const step = readUpdate(input, frame, baseOf(b.carried), world, deps.norms);
+        return { branch: i, world, reading: step.reading, carried: step.carried };
+      }),
+    );
+    const fresh = (o: Output, id: string) => !(id in (branches[o.branch]?.assign ?? {}));
+    const carriedIn = consecutive ? inherited : new Set<DoubtReason>();
+    const reasons = movingReasons(
+      outputs,
+      doubts,
+      fresh,
+      carriedIn,
+      (o) => o.reading,
+      measure.same,
+    );
+    inherited = movingReasons(outputs, doubts, fresh, carriedIn, (o) => o.carried, Object.is);
+    branches = nextBranches(outputs, ahead);
+    const results = outputs.map((o) => ({ world: o.world, value: o.reading }));
+    return result(input, frame, outcomeFrom(results, reasons, measure), deps.norms);
   });
+}
+
+function result(
+  input: RentalInput,
+  frame: Frame,
+  outcome: Outcome<RentUpdateReading>,
+  norms: NormTable,
+): RentUpdateResult {
+  const values = outcome.kind === 'single' ? [outcome.value] : outcome.readings.map((r) => r.value);
+  const ruleIds = [...new Set(values.flatMap((v) => v.rules))];
+  return {
+    index: frame.index,
+    anniversary: frame.update.anniversary,
+    effectiveOn: frame.update.effectiveOn,
+    outcome,
+    sources: ruleIds.map((id) => ruleSource(id, norms)),
+    companyLandlordHint:
+      input.landlordType === 'company' &&
+      outcome.kind === 'depends' &&
+      outcome.reasons.includes('large_landlord_unknown'),
+  };
 }

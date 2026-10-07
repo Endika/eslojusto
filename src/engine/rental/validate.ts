@@ -1,4 +1,5 @@
-import { addMonthsClamped, compareDates, daysInMonth, type CivilDate } from '../date';
+import { addMonthsClamped, compareDates, daysInMonth, toIso, type CivilDate } from '../date';
+import { anniversaryIn, isAnniversary } from './anniversary';
 import { REGION_CODES, type RentalInput } from './types';
 
 export type RentalInputErrorCode =
@@ -10,7 +11,8 @@ export type RentalInputErrorCode =
   | 'percent_out_of_range'
   | 'percent_missing'
   | 'unknown_region'
-  | 'update_before_start'
+  | 'not_an_anniversary'
+  | 'effective_outside_year'
   | 'update_in_future'
   | 'update_repeated'
   | 'charged_before_start'
@@ -92,16 +94,28 @@ export function validateRental(e: RentalInput, today: CivilDate): readonly Renta
   e.updates.forEach((u, i) => {
     amount('updates', u.previousRent, i);
     amount('updates', u.newRent, i);
-    if (!isValidDate(u.anniversary) || !isValidDate(u.chargedFrom)) {
+    if (!isValidDate(u.anniversary) || !isValidDate(u.effectiveOn) || !isValidDate(u.chargedFrom)) {
       err('updates', 'invalid_date', i);
       return;
     }
-    const key = `${u.anniversary.y}-${u.anniversary.m}-${u.anniversary.d}`;
+    const key = `${toIso(u.anniversary)}/${toIso(u.effectiveOn)}`;
     if (seen.has(key)) err('updates', 'update_repeated', i);
     seen.add(key);
-    if (startOk && compareDates(u.anniversary, e.startDate) <= 0)
-      err('updates', 'update_before_start', i);
-    if (compareDates(u.anniversary, today) > 0) err('updates', 'update_in_future', i);
+    if (startOk) {
+      if (!isAnniversary(e.startDate, u.anniversary)) err('updates', 'not_an_anniversary', i);
+      else {
+        // A rise belongs to the contract year that starts on its anniversary; one applied early
+        // still falls after the anniversary before.
+        const year = u.anniversary.y;
+        const opens = year - 1 > e.startDate.y ? anniversaryIn(e.startDate, year - 1) : e.startDate;
+        if (
+          compareDates(u.effectiveOn, opens) <= 0 ||
+          compareDates(u.effectiveOn, anniversaryIn(e.startDate, year + 1)) >= 0
+        )
+          err('updates', 'effective_outside_year', i);
+      }
+    }
+    if (compareDates(u.effectiveOn, today) > 0) err('updates', 'update_in_future', i);
     if (startOk && (u.chargedFrom.y - e.startDate.y) * 12 + u.chargedFrom.m - e.startDate.m < 0)
       err('updates', 'charged_before_start', i);
     if (WRITTEN_OR_ELECTRONIC.has(u.notice)) {

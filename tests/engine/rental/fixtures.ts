@@ -34,6 +34,7 @@ export const update = (
   const before = day.m === 1 ? { y: day.y - 1, m: 12, d: 1 } : { y: day.y, m: day.m - 1, d: 1 };
   return {
     anniversary: day,
+    effectiveOn: day,
     previousRent,
     newRent,
     chargedFrom: { y: day.y, m: day.m, d: 1 },

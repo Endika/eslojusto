@@ -87,13 +87,14 @@ function randomContract(seed: number): RentalInput {
       m: startDate.m,
       d: Math.min(startDate.d, daysInMonth(y, startDate.m)),
     };
-    const day = r() < 0.1 ? addDays(anniversary, int(1, 20)) : anniversary;
+    const day = r() < 0.15 ? addDays(anniversary, int(-20, 40)) : anniversary;
     if (compareDates(day, TODAY) > 0) break;
     const newRent = round2(rent * (1 + int(-10, 80) / 1000));
     const notice = pick(NOTICES);
     const charged = { y: day.y, m: day.m, d: 1 };
     updates.push({
-      anniversary: day,
+      anniversary,
+      effectiveOn: day,
       previousRent: r() < 0.8 ? rent : int(400, 2000),
       newRent,
       chargedFrom: r() < 0.2 ? { ...charged, m: charged.m === 12 ? 12 : charged.m + 1 } : charged,
