@@ -5,9 +5,15 @@ import { DOCUMENTS } from '../../documents/config';
 import { PASS_DAYS, PASS_READS } from '../../documents/contract';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
-const tx = (key: Key) => t('es', key);
+const tx = (key: Key, vars?: Record<string, string>) => t('es', key, vars);
 
 const email = 'hola@eslojusto.es';
+// The owner's details (art. 10 LSSI), on every build: the duty covers the whole site.
+const owner = {
+  titular: tx('legal.owner_name'),
+  nif: tx('legal.owner_id'),
+  domicilio: tx('legal.owner_address'),
+};
 // The pass and its conditions exist only in a build with the documents API.
 const documents = DOCUMENTS !== null;
 ---
@@ -22,7 +28,7 @@ const documents = DOCUMENTS !== null;
   <main class="document" id="content">
     <header class="document__head">
       <h1 class="document__title">{tx('legal_notice.h1')}</h1>
-      <p class="document__date">{tx('legal.updated')}</p>
+      <p class="document__date">{tx('legal_notice.updated')}</p>
     </header>
 
     <div class="document__sheets">
@@ -32,6 +38,29 @@ const documents = DOCUMENTS !== null;
           eslojusto.es es un proyecto de Endika Iglesias. Para cualquier consulta sobre la web,
           escribe a <a href={`mailto:${email}`}>{email}</a>.
         </p>
+        <p>{tx('legal_notice.owner')}</p>
+        <dl class="data-list" data-owner>
+          <div>
+            <dt>{tx('legal.owner_name_label')}</dt>
+            <dd>{owner.titular}</dd>
+          </div>
+          <div>
+            <dt>{tx('legal.owner_id_label')}</dt>
+            <dd>{owner.nif}</dd>
+          </div>
+          {owner.domicilio && (
+            <div>
+              <dt>{tx('legal.owner_address_label')}</dt>
+              <dd>{owner.domicilio}</dd>
+            </div>
+          )}
+          <div>
+            <dt>{tx('legal.owner_contact_label')}</dt>
+            <dd>
+              <a href={`mailto:${email}`}>{email}</a>
+            </dd>
+          </div>
+        </dl>
       </section>
 
       <section class="sheet sheet--text">
@@ -78,8 +107,9 @@ const documents = DOCUMENTS !== null;
         <section class="sheet sheet--text">
           <h2 id="condiciones">{tx('legal_notice.conditions')}</h2>
           <p>
-            Lo vende Endika Iglesias, responsable de eslojusto.es. Para cualquier duda sobre una
-            compra, escribe a <a href={`mailto:${email}`}>{email}</a>.
+            {tx('legal_notice.seller', owner)}{' '}
+            {owner.domicilio && <>{tx('legal_notice.seller_address', owner)} </>}
+            Para cualquier duda sobre una compra, escribe a <a href={`mailto:${email}`}>{email}</a>.
           </p>
           <ul>
             <li>

@@ -317,6 +317,14 @@ export const es = {
     'Si subes tu finiquito, tus nóminas o tu vida laboral, se envían cifrados a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo solo copia los datos que necesita el formulario y no calcula nada. Ni el servidor ni el modelo guardan el documento: se procesa en memoria y se descarta. Antes de subirlo te pedimos tu consentimiento, porque una nómina puede mostrar datos sensibles. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
 
   'legal.updated': 'Actualizado el 6 de octubre de 2026',
+  'legal.owner_name_label': 'Titular',
+  'legal.owner_name': 'Endika Iglesias',
+  'legal.owner_id_label': 'NIF',
+  'legal.owner_id': '72406514F',
+  'legal.owner_address_label': 'Domicilio',
+  // Rendered only when not empty.
+  'legal.owner_address': 'Calle Barranco del Novillo 26, 28051 Madrid',
+  'legal.owner_contact_label': 'Contacto',
   'legal_notice.title': 'Aviso legal · eslojusto.es',
   'legal_notice.description':
     'Quién está detrás de eslojusto.es y qué hace y qué no hace su revisión del finiquito. Informa sobre la ley y no da asesoramiento jurídico.',
@@ -326,6 +334,11 @@ export const es = {
   'legal_notice.what_it_does_not': 'Qué no hace',
   'legal_notice.errors': 'Errores en las cifras',
   'legal_notice.conditions': 'Condiciones de venta del pase',
+  'legal_notice.updated': 'Actualizado el 7 de octubre de 2026',
+  'legal_notice.owner':
+    'eslojusto.es es un proyecto personal. Estos son los datos de su titular (art. 10 de la Ley de Servicios de la Sociedad de la Información):',
+  'legal_notice.seller': 'Lo vende {titular}, con NIF {nif}, titular de eslojusto.es.',
+  'legal_notice.seller_address': 'Su domicilio es {domicilio}.',
   'not_found.title': 'Página no encontrada · eslojusto.es',
   'not_found.description':
     'Esta dirección no lleva a ninguna página de eslojusto.es. Desde aquí puedes ir a la revisión del finiquito o a la portada.',

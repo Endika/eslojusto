@@ -71,3 +71,14 @@ test('the privacy page says what is tracked, who receives it and that there are 
   await expect(main.getByRole('link', { name: 'hola@eslojusto.es' })).toBeVisible();
   await expect(main.getByRole('link', { name: /Protección de Datos/ })).toBeVisible();
 });
+test('the legal notice identifies the owner on every build', async ({ page }) => {
+  await page.goto('aviso-legal/');
+  const owner = page.locator('[data-owner]');
+  await expect(owner).toContainText('Titular');
+  await expect(owner).toContainText('Endika Iglesias');
+  await expect(owner).toContainText('NIF');
+  await expect(owner).toContainText('Domicilio');
+  await expect(owner).toContainText('Calle Barranco del Novillo 26, 28051 Madrid');
+  await expect(owner.getByRole('link', { name: 'hola@eslojusto.es' })).toBeVisible();
+  await expect(page.locator('main')).toContainText('Actualizado el 7 de octubre de 2026');
+});
