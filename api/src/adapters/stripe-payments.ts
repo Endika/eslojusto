@@ -1,6 +1,27 @@
 import Stripe from 'stripe';
 import { CHECKOUT_CANCEL_PATH, CHECKOUT_SUCCESS_PATH, SITE_ORIGIN } from '../config';
+import { PASS_READS } from '../domain/allowance';
 import type { CheckoutCreator, PaymentVerifier, SessionSnapshot } from '../domain/ports';
+
+export const READS_METADATA_KEY = 'reads_used';
+
+// Only this code writes the counter; anything else in it counts as a spent pass.
+export function readsUsed(metadata: Stripe.Metadata | null): number {
+  const raw = metadata?.[READS_METADATA_KEY];
+  if (raw === undefined) return 0;
+  return /^\d{1,3}$/.test(raw) ? Number(raw) : PASS_READS;
+}
+
+// A refund (even partial) or a dispute on the charge withdraws the pass. A 100 % promotion
+// code leaves no payment to refund.
+export function isRevoked(session: Stripe.Checkout.Session): boolean {
+  const intent = session.payment_intent;
+  if (intent === null || typeof intent === 'string') return false;
+  const charge = intent.latest_charge;
+  if (intent.status === 'canceled') return true;
+  if (charge === null || typeof charge === 'string') return false;
+  return charge.refunded || charge.amount_refunded > 0 || charge.disputed;
+}
 
 export function toSessionSnapshot(session: Stripe.Checkout.Session): SessionSnapshot {
   return {
@@ -12,6 +33,8 @@ export function toSessionSnapshot(session: Stripe.Checkout.Session): SessionSnap
     clientReferenceId: session.client_reference_id,
     created: session.created,
     amountSubtotal: session.amount_subtotal,
+    readsUsed: readsUsed(session.metadata),
+    revoked: isRevoked(session),
     lineItems: (session.line_items?.data ?? []).map((item) => ({
       priceId: item.price?.id ?? null,
       unitAmount: item.price?.unit_amount ?? null,
@@ -41,21 +64,27 @@ export function checkoutParams(
   ];
 }
 
-export function createStripePayments(
-  secretKey: string,
-  priceId: string,
-): CheckoutCreator & PaymentVerifier {
-  const stripe = new Stripe(secretKey, { maxNetworkRetries: 1, timeout: 8000 });
+const client = (secretKey: string): Stripe =>
+  new Stripe(secretKey, { maxNetworkRetries: 1, timeout: 8000 });
+
+export function createStripeCheckout(secretKey: string, priceId: string): CheckoutCreator {
+  const stripe = client(secretKey);
   return {
     async create(nonce) {
       const session = await stripe.checkout.sessions.create(...checkoutParams(nonce, priceId));
       if (!session.url) throw new Error('Checkout Session without a URL');
       return { sessionId: session.id, url: session.url };
     },
+  };
+}
+
+export function createStripeSessions(secretKey: string): PaymentVerifier {
+  const stripe = client(secretKey);
+  return {
     async findSession(sessionId) {
       try {
         const session = await stripe.checkout.sessions.retrieve(sessionId, {
-          expand: ['line_items'],
+          expand: ['line_items', 'payment_intent.latest_charge'],
         });
         return toSessionSnapshot(session);
       } catch (error) {
@@ -66,6 +95,11 @@ export function createStripePayments(
           return null;
         throw error;
       }
+    },
+    async recordReads(sessionId, used) {
+      await stripe.checkout.sessions.update(sessionId, {
+        metadata: { [READS_METADATA_KEY]: String(used) },
+      });
     },
   };
 }

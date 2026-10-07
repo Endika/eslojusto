@@ -103,7 +103,6 @@ describe('parseResponseBody', () => {
 
   it('survives a body that is not a message', () => {
     expect(parseResponseBody('nonsense')).toEqual({
-      outcome: 'read',
       toolInput: null,
       inputTokens: 0,
       outputTokens: 0,
@@ -112,21 +111,20 @@ describe('parseResponseBody', () => {
 });
 
 describe('createBedrockReader', () => {
-  it('maps a validation error on the document to a rejection', async () => {
+  // With fixed requests, a validation error means a retired, disabled or misconfigured model;
+  // the domain then tries the escalation model or answers model_unavailable.
+  it.each([
+    new ValidationException({
+      message: 'This model version has reached end of life',
+      $metadata: {},
+    }),
+    new Error('ThrottlingException'),
+  ])('lets every provider error throw: %s', async (error) => {
     const reader = createBedrockReader(async () => {
-      throw new ValidationException({ message: 'Could not process PDF', $metadata: {} });
-    });
-    expect(await reader.read({ model: HAIKU_4_5, kind: 'settlement', files: [photo] })).toEqual({
-      outcome: 'rejected',
-    });
-  });
-
-  it('lets an unavailable provider throw', async () => {
-    const reader = createBedrockReader(async () => {
-      throw new Error('ThrottlingException');
+      throw error;
     });
     await expect(
       reader.read({ model: HAIKU_4_5, kind: 'settlement', files: [photo] }),
-    ).rejects.toThrow();
+    ).rejects.toBe(error);
   });
 });

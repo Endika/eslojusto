@@ -1,5 +1,11 @@
-import { passClaims, passExpiry } from './allowance';
-import type { CheckoutCreator, Clock, PaymentVerifier, TokenSigner } from './ports';
+import { passClaims, passExpiry, passSessionProblem, readsLeft } from './allowance';
+import type {
+  CaptchaVerifier,
+  CheckoutCreator,
+  Clock,
+  PaymentVerifier,
+  TokenSigner,
+} from './ports';
 import type { ErrorCode } from './results';
 
 export const PASS_PRICE_CENTS = 499;
@@ -18,8 +24,10 @@ export type CheckoutResponse =
 
 export async function startCheckout(
   nonce: string,
-  deps: { readonly checkout: CheckoutCreator },
+  captchaToken: string,
+  deps: { readonly checkout: CheckoutCreator; readonly captcha: CaptchaVerifier },
 ): Promise<CheckoutResponse> {
+  if (!(await deps.captcha.verify(captchaToken))) return { code: 'captcha_failed' };
   try {
     const session = await deps.checkout.create(nonce);
     return { code: 'ok', ...session };
@@ -36,10 +44,15 @@ export interface PassDeps {
 }
 
 export type PassResponse =
-  | { readonly code: 'ok'; readonly pass: string; readonly expiresAt: number }
+  | {
+      readonly code: 'ok';
+      readonly pass: string;
+      readonly expiresAt: number;
+      readonly readsLeft: number;
+    }
   | { readonly code: ErrorCode };
 
-// Same session and nonce, same pass: the token is derived only from what Stripe returns.
+// Same session and nonce, same pass; the reads it has left come from Stripe, not the token.
 export async function issuePass(
   sessionId: string,
   nonce: string,
@@ -53,12 +66,6 @@ export async function issuePass(
   }
   if (session === null) return { code: 'session_not_found' };
   if (session.clientReferenceId !== nonce) return { code: 'session_mismatch' };
-  if (
-    session.mode !== 'payment' ||
-    session.status !== 'complete' ||
-    session.paymentStatus === 'unpaid'
-  )
-    return { code: 'payment_not_complete' };
   const [line, ...rest] = session.lineItems;
   if (
     session.currency !== PASS_CURRENCY ||
@@ -70,7 +77,13 @@ export async function issuePass(
     line.quantity !== 1
   )
     return { code: 'price_mismatch' };
+  const problem = passSessionProblem(session, deps.clock.now());
+  if (problem !== null) return { code: problem };
   const expiresAt = passExpiry(session.created);
-  if (deps.clock.now() >= expiresAt * 1000) return { code: 'pass_expired' };
-  return { code: 'ok', pass: deps.signer.sign(passClaims(session.id, expiresAt, 0)), expiresAt };
+  return {
+    code: 'ok',
+    pass: deps.signer.sign(passClaims(session.id, expiresAt)),
+    expiresAt,
+    readsLeft: readsLeft(session),
+  };
 }

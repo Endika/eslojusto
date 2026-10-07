@@ -1,8 +1,4 @@
-import {
-  BedrockRuntimeClient,
-  InvokeModelCommand,
-  ValidationException,
-} from '@aws-sdk/client-bedrock-runtime';
+import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { MODEL_SETTINGS, REGION } from '../config';
 import type { DocumentFile, DocumentKind } from '../domain/documents';
 import { SCHEMAS, TOOL_NAME, toolInputSchema } from '../domain/extraction-schema';
@@ -75,7 +71,7 @@ const isRecord = (v: unknown): v is Record<string, unknown> =>
 const count = (v: unknown): number =>
   Number.isInteger(v) && (v as number) >= 0 ? (v as number) : 0;
 
-export function parseResponseBody(body: unknown): ModelRead & { outcome: 'read' } {
+export function parseResponseBody(body: unknown): ModelRead {
   const response = isRecord(body) ? body : {};
   const usage = isRecord(response['usage']) ? response['usage'] : {};
   const content = Array.isArray(response['content']) ? response['content'] : [];
@@ -86,7 +82,6 @@ export function parseResponseBody(body: unknown): ModelRead & { outcome: 'read' 
       isRecord(block) && block['type'] === 'tool_use' && block['name'] === TOOL_NAME,
   ) as Record<string, unknown> | undefined;
   return {
-    outcome: 'read',
     toolInput: complete && toolUse ? (toolUse['input'] ?? null) : null,
     inputTokens: count(usage['input_tokens']),
     outputTokens: count(usage['output_tokens']),
@@ -109,16 +104,12 @@ export function bedrockInvoke(client = new BedrockRuntimeClient({ region: REGION
   };
 }
 
+// Every provider error throws, a validation error included: with fixed requests it means the
+// model is retired, not enabled or misconfigured, not that the document is at fault.
 export function createBedrockReader(invoke: Invoke): DocumentReader {
   return {
     async read({ model, kind, files }) {
-      let raw: string;
-      try {
-        raw = await invoke(model, JSON.stringify(buildRequestBody(model, kind, files)));
-      } catch (error) {
-        if (error instanceof ValidationException) return { outcome: 'rejected' };
-        throw error;
-      }
+      const raw = await invoke(model, JSON.stringify(buildRequestBody(model, kind, files)));
       return parseResponseBody(JSON.parse(raw));
     },
   };

@@ -29,7 +29,6 @@ export class FakeReader implements DocumentReader {
 }
 
 export const read = (toolInput: unknown, inputTokens = 1000, outputTokens = 200): ModelRead => ({
-  outcome: 'read',
   toolInput,
   inputTokens,
   outputTokens,
@@ -72,12 +71,39 @@ export class FakeCheckout implements CheckoutCreator {
 }
 
 export class FakePayments implements PaymentVerifier {
+  readonly recorded: { sessionId: string; readsUsed: number }[] = [];
   constructor(
-    private readonly sessions: Readonly<Record<string, SessionSnapshot>>,
-    private readonly fail = false,
+    private readonly sessions: Record<string, SessionSnapshot>,
+    private readonly fail: 'find' | 'record' | null = null,
   ) {}
   async findSession(id: string) {
-    if (this.fail) throw new Error('Stripe is down');
+    if (this.fail === 'find') throw new Error('Stripe is down');
     return this.sessions[id] ?? null;
   }
+  async recordReads(sessionId: string, readsUsed: number) {
+    if (this.fail === 'record') throw new Error('Stripe is down');
+    this.recorded.push({ sessionId, readsUsed });
+    const session = this.sessions[sessionId];
+    if (session) this.sessions[sessionId] = { ...session, readsUsed };
+  }
 }
+
+export const NONCE = 'n0nce-generated-by-the-browser';
+export const PRICE = 'price_test_pass';
+export const CREATED = Date.UTC(2026, 9, 6, 12) / 1000;
+
+// A finished, paid Checkout Session for the pass.
+export const paidSession = (overrides: Partial<SessionSnapshot> = {}): SessionSnapshot => ({
+  id: 'cs_test_paid',
+  mode: 'payment',
+  status: 'complete',
+  paymentStatus: 'paid',
+  currency: 'eur',
+  clientReferenceId: NONCE,
+  created: CREATED,
+  amountSubtotal: 499,
+  readsUsed: 0,
+  revoked: false,
+  lineItems: [{ priceId: PRICE, unitAmount: 499, quantity: 1 }],
+  ...overrides,
+});

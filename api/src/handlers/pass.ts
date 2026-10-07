@@ -2,7 +2,7 @@ import { PARAMETER_NAMES, STRIPE_PRICE_ENV } from '../config';
 import { createHmacSigner } from '../adapters/hmac-signer';
 import { consoleLogger, systemClock } from '../adapters/runtime';
 import { loadParameters } from '../adapters/ssm-parameters';
-import { createStripePayments } from '../adapters/stripe-payments';
+import { createStripeSessions } from '../adapters/stripe-payments';
 import { handlePass } from '../http/payments';
 import { unavailable } from './unavailable';
 import type { HttpEvent, HttpResponse } from '../http/common';
@@ -16,7 +16,7 @@ const load = async () => {
   const priceId = process.env[STRIPE_PRICE_ENV];
   if (!priceId) throw new Error('Missing Stripe price id');
   return {
-    payments: createStripePayments(stripeSecretKey, priceId),
+    payments: createStripeSessions(stripeSecretKey),
     signer: createHmacSigner(tokenKey),
     priceId,
   };
