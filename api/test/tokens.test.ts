@@ -47,7 +47,7 @@ describe('input token estimate', () => {
   it('admits the largest pack the API accepts: fifteen images at the largest size', () => {
     const square = { format: 'image/jpeg' as const, width: 1568, height: 1568 };
     const largest = PROMPT_TOKENS + LIMITS.maxImages * imageTokens(square);
-    expect(largest).toBe(62_185);
+    expect(largest).toBe(63_185);
     expect(largest).toBeLessThanOrEqual(MAX_ESTIMATED_INPUT_TOKENS);
     expect(PROMPT_TOKENS + LIMITS.maxImages * imageTokens(photo)).toBeLessThan(largest);
   });

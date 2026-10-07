@@ -5,10 +5,12 @@ import {
   type LineCategory,
   MAX_DAYS,
   MAX_MONEY,
+  READABILITY,
   SECTION_KINDS,
   SECTIONS,
   type Confidence,
   type FieldType,
+  type Readability,
   type SectionKind,
   type SectionSchema,
 } from './extraction-schema';
@@ -38,6 +40,7 @@ export interface PageReading {
   readonly document: number;
   // A payslip's pay period, YYYY-MM.
   readonly month?: string;
+  readonly readability: { readonly value: Readability; readonly confidence: Confidence };
   readonly confidence: Confidence;
 }
 
@@ -166,12 +169,21 @@ export function parseSection(
   return { section: { fields, lists }, dropped };
 }
 
-const PAGE_KEYS = ['page', 'kind', 'document', 'month', 'confidence'];
+const PAGE_KEYS = ['page', 'kind', 'document', 'month', 'readability', 'confidence'];
+
+function parseReadability(raw: unknown): PageReading['readability'] | null {
+  if (!isRecord(raw) || !hasOnlyKeys(raw, ['value', 'confidence'])) return null;
+  const { value, confidence } = raw;
+  if (typeof value !== 'string' || !(READABILITY as readonly string[]).includes(value)) return null;
+  return isConfidence(confidence) ? { value: value as Readability, confidence } : null;
+}
 
 function parsePage(raw: unknown, pageCount: number): PageReading | null {
   if (!isRecord(raw) || !hasOnlyKeys(raw, PAGE_KEYS)) return null;
   const { page, kind, document, month, confidence } = raw;
+  const readability = parseReadability(raw['readability']);
   if (
+    readability === null ||
     !isWhole(page, 1, pageCount) ||
     !isWhole(document, 1, LIMITS.maxImages) ||
     typeof kind !== 'string' ||
@@ -185,9 +197,12 @@ function parsePage(raw: unknown, pageCount: number): PageReading | null {
     kind: kind as PageKind,
     document,
     ...(month !== undefined && { month }),
+    readability,
     confidence,
   };
 }
+
+export const isReadable = (p: PageReading): boolean => p.readability.value === 'ok';
 
 // `pageCount` is how many pages were attached: page numbers beyond it are invalid.
 export function parseReading(toolInput: unknown, pageCount: number): Reading {
@@ -206,7 +221,9 @@ export function parseReading(toolInput: unknown, pageCount: number): Reading {
   const pages = [...byPage.values()].sort((a, b) => a.page - b.page);
 
   const sections: Partial<Record<SectionKind, Section>> = {};
-  const kinds = new Set(pages.map((p) => p.kind));
+  // Only a page that can be read backs a section: one set aside as blurry, handwritten or
+  // foreign is never transcribed.
+  const kinds = new Set(pages.filter(isReadable).map((p) => p.kind));
   for (const kind of SECTION_KINDS) {
     if (!Object.hasOwn(input, kind)) continue;
     const raw = input[kind];
@@ -301,7 +318,7 @@ export function failedChecks(r: Reading): readonly CoherenceCheck[] {
 
 export function hasLowConfidence(r: Reading): boolean {
   return (
-    r.pages.some((p) => p.confidence === 'low') ||
+    r.pages.some((p) => p.confidence === 'low' || p.readability.confidence === 'low') ||
     Object.values(r.sections).some(
       (s) =>
         Object.values(s.fields).some((f) => f.confidence === 'low') ||

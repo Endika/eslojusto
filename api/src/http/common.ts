@@ -1,5 +1,6 @@
 import { LIMITS } from '../domain/documents';
 import type { Clock, Logger, Operation } from '../domain/ports';
+import type { Readability } from '../domain/extraction-schema';
 import type { ResultCode } from '../domain/results';
 
 // The subset of a Lambda function URL event (payload format 2.0) the handlers read.
@@ -34,6 +35,7 @@ const STATUS: Readonly<Record<ResultCode, number>> = {
   pass_revoked: 403,
   pass_unconfirmed: 503,
   document_unreadable: 422,
+  nothing_read: 422,
   model_unavailable: 503,
   session_not_found: 404,
   session_mismatch: 403,
@@ -53,6 +55,7 @@ export interface Metrics {
   conflicts?: number;
   underestimated?: boolean;
   countNotSaved?: boolean;
+  readability?: Partial<Record<Readability, number>>;
   verify?: boolean;
 }
 

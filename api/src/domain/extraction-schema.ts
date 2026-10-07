@@ -260,7 +260,23 @@ export type SectionKind = keyof typeof SECTIONS;
 export const SECTION_KINDS = Object.keys(SECTIONS) as readonly SectionKind[];
 
 export const PAGES_DESCRIPTION =
-  'One entry per attached page, in order: its kind and the number of its document.';
+  'One entry per attached page, in order: its kind, the number of its document and its readability.';
+
+// Why a page can't be used, or `ok`. Its language is never a reason.
+export const READABILITY = [
+  'ok',
+  'handwritten',
+  'blurry',
+  'dark',
+  'cropped',
+  'not_labour_document',
+  'foreign_jurisdiction',
+  'unknown_format',
+] as const;
+export type Readability = (typeof READABILITY)[number];
+
+export const READABILITY_DESCRIPTION =
+  'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_labour_document (not about a job), foreign_jurisdiction (an employment document from another country, where Spanish law does not apply; never because of its language), unknown_format (about a job, but no kind of document you know).';
 export const PAGE_KIND_DESCRIPTION =
   'settlement_proposal: a settlement proposal or notification (propuesta o notificación de finiquito, «liquidación, saldo y finiquito»), listing the liquidation concepts (salario del mes, vacaciones, partes proporcionales, indemnización, preaviso), with or without amounts, and a total, often net. payslip: a nómina with the earnings and deductions of a pay period, the final liquidation payslip included. dismissal_letter: a dismissal letter or termination notice (carta de despido). company_certificate: the company certificate for the public employment service (certificado de empresa): a Ministerio de Trabajo or SEPE header and a table of «bases de cotización de los últimos 180 días»; never a payslip, despite its monthly amounts. settlement_agreement: an agreement or conciliation record (acuerdo, acta de conciliación). work_history: the Social Security work history (vida laboral). other: anything else, such as a tax withholding certificate (certificado de retenciones del IRPF).';
 
@@ -345,6 +361,16 @@ export function toolInputSchema(): JsonSchema {
             description:
               'Number the documents in order of appearance; all pages of one document get the same number.',
           },
+          readability: {
+            type: 'object',
+            description: READABILITY_DESCRIPTION,
+            properties: {
+              value: { type: 'string', enum: READABILITY },
+              confidence: confidenceSchema,
+            },
+            required: ['value', 'confidence'],
+            additionalProperties: false,
+          },
           month: {
             type: 'string',
             pattern: '^[0-9]{4}-[0-9]{2}$',
@@ -352,7 +378,7 @@ export function toolInputSchema(): JsonSchema {
           },
           confidence: confidenceSchema,
         },
-        required: ['page', 'kind', 'document', 'confidence'],
+        required: ['page', 'kind', 'document', 'readability', 'confidence'],
         additionalProperties: false,
       },
     },

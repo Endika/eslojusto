@@ -1,4 +1,4 @@
-import type { Confidence } from '../../src/domain/extraction-schema';
+import type { Confidence, Readability } from '../../src/domain/extraction-schema';
 
 export const f = (value: unknown, confidence: Confidence = 'high') => ({ value, confidence });
 
@@ -8,7 +8,15 @@ export const page = (
   document = n,
   confidence: Confidence = 'high',
   month?: string,
-) => ({ page: n, kind, document, confidence, ...(month !== undefined && { month }) });
+  readability: Readability = 'ok',
+) => ({
+  page: n,
+  kind,
+  document,
+  ...(month !== undefined && { month }),
+  readability: f(readability),
+  confidence,
+});
 
 // A fictitious settlement proposal whose items add up to the total.
 export const proposal = (confidence: Confidence = 'high') => ({

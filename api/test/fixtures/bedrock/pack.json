@@ -14,18 +14,30 @@
             "page": 1,
             "kind": "dismissal_letter",
             "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
             "confidence": "high"
           },
           {
             "page": 2,
             "kind": "dismissal_letter",
             "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
             "confidence": "high"
           },
           {
             "page": 3,
             "kind": "payslip",
             "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
             "confidence": "high",
             "month": "2026-08"
           },
@@ -33,12 +45,20 @@
             "page": 4,
             "kind": "other",
             "document": 3,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
             "confidence": "high"
           },
           {
             "page": 5,
             "kind": "settlement_proposal",
             "document": 4,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
             "confidence": "high"
           }
         ],

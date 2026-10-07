@@ -62,11 +62,38 @@ describe('parseReading', () => {
     ['a document number out of range', page(1, 'payslip', 16)],
     ['a month that is not one', page(1, 'payslip', 1, 'high', '2026-13')],
     ['a page with an extra key', { ...page(1, 'payslip'), note: 'x' }],
+    [
+      'a page without its readability',
+      { page: 1, kind: 'payslip', document: 1, confidence: 'high' },
+    ],
+    ['an unknown readability', { ...page(1, 'payslip'), readability: f('illegible') }],
+    ['a readability without a confidence', { ...page(1, 'payslip'), readability: { value: 'ok' } }],
+    [
+      'a readability with an extra key',
+      { ...page(1, 'payslip'), readability: { ...f('ok'), language: 'ca' } },
+    ],
   ])('drops %s and leaves the page unclassified', (_, raw) => {
     const r = parseReading({ pages: [raw] }, 2);
     expect(r.pages).toEqual([]);
     expect(r.dropped).toBe(1);
     expect(r.unclassified).toBe(2);
+  });
+
+  it('transcribes nothing from a page set aside, whatever the model copied from it', () => {
+    const r = parseReading(
+      {
+        pages: [
+          page(1, 'settlement_proposal', 1, 'high', undefined, 'blurry'),
+          page(2, 'dismissal_letter'),
+        ],
+        settlement_proposal: proposal(),
+        dismissal_letter: { endDate: f('2026-09-15') },
+      },
+      2,
+    );
+    expect(Object.keys(r.sections)).toEqual(['dismissal_letter']);
+    expect(r.pages[0]?.readability).toEqual(f('blurry'));
+    expect(r.dropped).toBe(1);
   });
 
   it('keeps the first reading of a page given twice and drops the second', () => {
@@ -261,6 +288,8 @@ describe('hasLowConfidence', () => {
     expect(hasLowConfidence(parseReading(coherentSettlement(), 1))).toBe(false);
     expect(hasLowConfidence(parseReading(coherentSettlement('low'), 1))).toBe(true);
     expect(hasLowConfidence(parseReading({ pages: [page(1, 'other', 1, 'low')] }, 1))).toBe(true);
+    const unsureWhy = { ...page(1, 'other'), readability: f('dark', 'low') };
+    expect(hasLowConfidence(parseReading({ pages: [unsureWhy] }, 1))).toBe(true);
     const lowRow = parseReading(
       {
         pages: [page(1, 'work_history')],
