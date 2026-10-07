@@ -1,0 +1,95 @@
+---
+import FigureTable from '../../../components/FigureTable.astro';
+import CasePage from '../../../views/CasePage.astro';
+import CaseLink from '../../../components/CaseLink.astro';
+import { BENEFIT_SCALE, durationByTime } from '../../../content/examples';
+import { integer } from '../../../content/format';
+
+// Each row runs from its own threshold to the day before the next one; the last has no end.
+const rows = BENEFIT_SCALE.map(([from, days], i) => ({
+  from,
+  to: BENEFIT_SCALE[i + 1]?.[0],
+  days,
+}));
+const months = (days: number) => integer(days / 30);
+---
+
+<CasePage id="benefit_duration">
+  <section class="sheet sheet--text">
+    <h3 id="pt-escala">La escala completa</h3>
+    <p>
+      La duración del paro depende de los días cotizados por desempleo en los 6 años anteriores que
+      no hayas usado ya para otro paro (art. 269.1 LGSS). Cuentan todos tus trabajos de ese tiempo,
+      no solo el último.
+    </p>
+    <FigureTable id="pt-tabla">
+      <Fragment slot="caption">Días cotizados en los últimos 6 años y días de paro.</Fragment>
+      <thead>
+        <tr>
+          <th scope="col">Días cotizados</th>
+          <th scope="col">Días de paro</th>
+          <th scope="col">Meses</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map(({ from, to, days }) => (
+          <tr>
+            <th scope="row">
+              {to === undefined
+                ? `${integer(from)} o más`
+                : `De ${integer(from)} a ${integer(to - 1)}`}
+            </th>
+            <td>{integer(days)}</td>
+            <td>{months(days)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </FigureTable>
+    <p>
+      Con menos de 360 días cotizados no hay prestación contributiva. Las vacaciones pagadas en el
+      finiquito y no disfrutadas también cuentan como cotizadas (art. 269.4 LGSS).
+    </p>
+    <p class="folio">
+      Art. <span>269</span> LGSS
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="pt-ejemplos">Ejemplos: de 6 meses a 6 años</h3>
+    <p>
+      Un solo contrato que termina el 31 de agosto de 2026, sin otros trabajos en los 6 años
+      anteriores ni otro paro cobrado:
+    </p>
+    <FigureTable id="pt-ejemplos-tabla">
+      <Fragment slot="caption">Tiempo trabajado, días cotizados y paro.</Fragment>
+      <thead>
+        <tr>
+          <th scope="col">Tiempo trabajado</th>
+          <th scope="col">Días cotizados</th>
+          <th scope="col">Días de paro</th>
+        </tr>
+      </thead>
+      <tbody>
+        {durationByTime.map(({ label, days, benefitDays }) => (
+          <tr>
+            <th scope="row">{label}</th>
+            <td>{integer(days)}</td>
+            <td>
+              {benefitDays === 0
+                ? 'No llega a 360'
+                : `${integer(benefitDays)} (${months(benefitDays)} meses)`}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </FigureTable>
+    <p>
+      Con 6 meses no se llega a los 360 días, pero si en los 6 años anteriores trabajaste en otros
+      sitios, esos días suman. Por eso la calculadora te pregunta por otros trabajos y te enlaza a
+      tu vida laboral, donde salen todos los días cotizados.
+    </p>
+    <p>
+      La cuantía de cada mes la tienes en <CaseLink id="benefit" />.
+    </p>
+  </section>
+</CasePage>

@@ -1,0 +1,83 @@
+---
+import CasePage from '../../../views/CasePage.astro';
+import CaseLink from '../../../components/CaseLink.astro';
+import { itemRange, objective, severanceMonths } from '../../../content/examples';
+import { euroRange, euros } from '../../../content/format';
+
+const severance = itemRange(objective, 'severance');
+const notice = itemRange(objective, 'employer_notice');
+const salary = itemRange(objective, 'pending_salary');
+const holidays = itemRange(objective, 'holiday_pay');
+const extraPay = itemRange(objective, 'extra_pay');
+const unfair = objective.unfairReference;
+const months =
+  severanceMonths(
+    objective.items.find((p) => p.item.id === 'severance')?.item.calculation ?? [],
+  )[0] ?? 0;
+if (!severance || !notice || !salary || !holidays || !extraPay || unfair === null)
+  throw new Error('Incomplete example');
+---
+
+<CasePage id="objective_dismissal">
+  <section class="sheet sheet--text">
+    <h3 id="do-20-dias">20 días por año, con un tope de 12 mensualidades</h3>
+    <p>
+      En un despido por causas objetivas, la empresa tiene que poner a tu disposición, junto con la
+      carta, una indemnización de 20 días de salario por año trabajado, con un máximo de 12
+      mensualidades (art. 53.1.b ET). La guía del CGPJ, tras la STS 651/2026, cuenta ese tope como
+      360 días. El tiempo se cuenta en meses, y una fracción de mes cuenta como un mes entero.
+    </p>
+    <p class="folio">
+      Art. <span>53.1.b</span> ET
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="do-preaviso">15 días de preaviso, o su pago</h3>
+    <p>
+      Entre la carta y el despido tienen que pasar 15 días de preaviso (art. 53.1.c ET). Los días
+      que la empresa no dé se pagan. La calculadora te pregunta cuántos te dieron y calcula los que
+      faltan.
+    </p>
+    <p class="folio">
+      Art. <span>53.1.c</span> ET
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="do-ejemplo">Ejemplo resuelto</h3>
+    <p>
+      Una persona con 1.500&nbsp;€ brutos al mes y dos pagas extra de 1.500&nbsp;€ trabaja del 3 de
+      mayo de 2018 al 20 de julio de 2026. Ha disfrutado 10 días de vacaciones este año y la empresa
+      no le da preaviso. Estas son las cifras de la calculadora:
+    </p>
+    <ul>
+      <li>
+        Indemnización: {euroRange(severance)} ({months} meses × 20 / 12 ={' '}
+        {String((months * 20) / 12).replace('.', ',')} días).
+      </li>
+      <li>Preaviso no dado: {euroRange(notice)}.</li>
+      <li>Salario de julio: {euroRange(salary)}.</li>
+      <li>Vacaciones no disfrutadas: {euroRange(holidays)}.</li>
+      <li>Paga de Navidad generada desde el 1 de julio: {euroRange(extraPay)}.</li>
+    </ul>
+    <p class="example">
+      <span class="example__label">Si se declarara improcedente</span> Con las mismas fechas, la
+      indemnización sería de {euros(unfair)}, a 33 días por año. La revisión te enseña esa cifra al
+      lado de la del despido objetivo.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="do-diferencia">Despido objetivo o improcedente</h3>
+    <p>
+      Un despido objetivo se puede impugnar como uno disciplinario (art. 53.3 ET). Si se declara
+      improcedente, la indemnización se calcula a 33 días por año, con un tope de 720 días: lo
+      tienes en <CaseLink id="unfair_dismissal" />. El plazo para impugnarlo es de 20 días hábiles
+      (art. 59.3 ET).
+    </p>
+    <p class="folio">
+      Art. <span>53 · 56 · 59</span> ET
+    </p>
+  </section>
+</CasePage>

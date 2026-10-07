@@ -1,0 +1,109 @@
+---
+import FigureTable from '../../../components/FigureTable.astro';
+import CasePage from '../../../views/CasePage.astro';
+import CaseLink from '../../../components/CaseLink.astro';
+import { fixedTerms } from '../../../content/examples';
+import { euroRange } from '../../../content/format';
+---
+
+<CasePage id="fixed_term_end">
+  <section class="sheet sheet--text">
+    <h3 id="fc-indemnizacion">12 días por año, salvo sustitución y formación</h3>
+    <p>
+      Al acabar un contrato temporal por circunstancias de la producción, te corresponde una
+      indemnización de 12 días de salario por año, en proporción a los días trabajados (art. 49.1.c
+      ET). Si el contrato empezó antes de 2015, son menos días: 8 si empezó en 2011 o antes, 9 en
+      2012, 10 en 2013 y 11 en 2014 (disposición transitoria 8.ª ET). Los contratos firmados antes
+      del 4 de marzo de 2001 no tienen esta indemnización (disposición transitoria 8.ª.2 ET).
+    </p>
+    <p>
+      Los contratos de sustitución de otra persona y los contratos formativos no tienen
+      indemnización (art. 49.1.c ET). Por eso la calculadora te pregunta el tipo de contrato justo
+      después de la causa.
+    </p>
+    <p class="folio">
+      Art. <span>49.1.c</span> ET · DT <span>8.ª</span>
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="fc-preaviso">El preaviso de más de un año</h3>
+    <p>
+      Si el contrato duró más de un año, como puede pasar con uno de sustitución, la empresa tiene
+      que avisarte del fin con al menos 15 días de antelación (art. 49.1.c ET). La revisión cuenta
+      como pendientes de pago los días de ese preaviso que no te dieron. Cada día vale entre tu
+      salario mensual / 30 y tu salario anual / 365, según cómo lo cuente la empresa.
+    </p>
+    <p class="folio">
+      Art. <span>49.1.c</span> ET
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="fc-ejemplos">Ejemplos: 3, 6 y 12 meses</h3>
+    <p>
+      Un contrato por circunstancias de la producción dura como mucho 6 meses, o hasta un año si tu
+      convenio sectorial lo amplía (art. 15.2 ET).
+    </p>
+    <FigureTable id="fc-tabla">
+      <Fragment slot="caption">
+        Contratos por circunstancias de la producción que acaban el 30 de septiembre de 2026, con
+        1.500&nbsp;€ brutos al mes y dos pagas extra de 1.500&nbsp;€.
+      </Fragment>
+      <thead>
+        <tr>
+          <th scope="col">Duración</th>
+          <th scope="col">Indemnización</th>
+        </tr>
+      </thead>
+      <tbody>
+        {fixedTerms.map(({ label, limit, severance }) => (
+          <tr>
+            <th scope="row">
+              {label}
+              {limit === 'sector_agreement' && (
+                <span class="figures-note">solo si tu convenio sectorial lo amplía</span>
+              )}
+            </th>
+            <td>{severance ? euroRange(severance) : '—'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </FigureTable>
+    <p>
+      Cada indemnización son los días del contrato × 12 / 365 días de salario, a 21.000&nbsp;€ / 365
+      cada uno. El finiquito suma además el salario del último mes, las vacaciones y las pagas
+      extra, que la calculadora revisa con tus datos.
+    </p>
+    <p>
+      Un contrato temporal que pasa de su duración máxima puede ser en realidad indefinido (art.
+      15.4 ET), y entonces su fin sería un despido. Solo los contratos de obra o servicio firmados
+      antes del 31 de diciembre de 2021 podían durar más (disposición transitoria 3.ª del Real
+      Decreto-ley 32/2021). Si el tuyo duró más, revísalo.
+    </p>
+    <p class="folio">
+      Art. <span>15</span> ET
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="fc-baja">Si el contrato acaba estando de baja</h3>
+    <p>
+      La revisión calcula el finiquito con las fechas, el salario y los días de vacaciones que
+      escribas. No tiene en cuenta la baja médica ni lo que pasa con su prestación al terminar el
+      contrato: eso no lo comprobamos.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="fc-paro">Y el paro</h3>
+    <p>
+      El fin de un contrato temporal es situación legal de desempleo, salvo que lo terminaras tú
+      (art. 267.1.a.6.º LGSS). Cuánto dura depende de los días cotizados en los últimos 6 años: lo
+      tienes en <CaseLink id="benefit_duration" />.
+    </p>
+    <p class="folio">
+      Art. <span>267</span> LGSS
+    </p>
+  </section>
+</CasePage>

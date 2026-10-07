@@ -1,0 +1,78 @@
+---
+import CasePage from '../../../views/CasePage.astro';
+import CaseLink from '../../../components/CaseLink.astro';
+import { disciplinary, entitledByCause } from '../../../content/examples';
+import { integer, wholeEuros } from '../../../content/format';
+import { t } from '../../../i18n';
+
+if (disciplinary.entitled !== 'yes' || disciplinary.figures === null)
+  throw new Error('Incomplete example');
+const { figures } = disciplinary;
+// The reasons are the calculator's own: the same sentence and article it shows in the result.
+const causes = entitledByCause.map(({ cause, entitled }) => ({
+  name: t('es', `cause.${cause}`),
+  entitled,
+  reason: t('es', `client.unemployment.reason.${cause}`),
+}));
+---
+
+<CasePage id="benefit_disciplinary">
+  <section class="sheet sheet--text">
+    <h3 id="pdd-si">Sí da paro, aunque sea procedente</h3>
+    <p>
+      Es una duda frecuente, y la respuesta está en la ley: el despido es situación legal de
+      desempleo (art. 267.1.a.3.º LGSS), y para cobrar el paro no hace falta impugnarlo (art. 268.4
+      LGSS). Da igual que el despido sea disciplinario y que se declare procedente.
+    </p>
+    <p>
+      Lo que sí hace falta es lo de siempre: 360 días cotizados en los últimos 6 años, inscribirte
+      como demandante de empleo y suscribir el acuerdo de actividad, entre otros requisitos (art.
+      266 LGSS).
+    </p>
+    <p class="folio">
+      Arts. <span>267 · 268.4</span> LGSS
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="pdd-ceses">Qué ceses dan paro</h3>
+    <div class="causes">
+      {causes.map(({ name, entitled, reason }) => (
+        <div>
+          <h4>{name}</h4>
+          <p>
+            <strong>{entitled === 'yes' ? 'Sí da paro.' : 'No da paro, salvo excepciones.'}</strong>{' '}
+            {reason}
+          </p>
+        </div>
+      ))}
+    </div>
+    <p>
+      Las excepciones de la baja voluntaria, como un traslado o los impagos graves, están en{' '}
+      <CaseLink id="benefit_resignation" />.
+    </p>
+    <p class="folio">
+      Art. <span>267</span> LGSS
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h3 id="pdd-ejemplo">Ejemplo resuelto</h3>
+    <p>
+      Una persona con 1.500&nbsp;€ brutos al mes y dos pagas extra de 1.500&nbsp;€ trabaja del 1 de
+      junio de 2022 al 30 de septiembre de 2026, sin hijos o hijas a cargo, y la empresa la despide
+      por motivos disciplinarios.
+    </p>
+    <p class="example">
+      <span class="example__label">Su paro</span> Con {integer(disciplinary.contractDays)} días
+      cotizados le corresponden al menos {integer(disciplinary.duration.days)} días de paro (
+      {integer(disciplinary.duration.days / 30)} meses): unos {wholeEuros(figures.firstStretch.min)}{' '}
+      al mes los primeros 6 meses y unos {wholeEuros(figures.secondStretch.min)} después, en bruto.
+      «Al menos», porque otros trabajos de los últimos 6 años pueden sumar días.
+    </p>
+    <p>
+      Si el despido se declarara improcedente, además habría indemnización: lo tienes en{' '}
+      <CaseLink id="unfair_dismissal" />.
+    </p>
+  </section>
+</CasePage>

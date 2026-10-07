@@ -42,3 +42,14 @@ export const calculatorApp = (home: URL, page: URL, lang: Lang) => ({
   inLanguage: lang,
   publisher: organization(home),
 });
+
+// The trail from the home page to this one; the last crumb is the page itself.
+export const breadcrumbList = (home: URL, crumbs: readonly { name: string; path: string }[]) => ({
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map(({ name, path }, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name,
+    item: new URL(path.replace(/^\//, ''), home).href,
+  })),
+});

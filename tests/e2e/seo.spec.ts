@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { LAST_UPDATED } from '../../src/content/updated';
 
 const PATHS = ['./', 'finiquito/', 'aviso-legal/', 'privacidad/', 'alquiler/irav-ipc/'];
 
@@ -127,6 +128,12 @@ test('robots.txt points to the sitemap', async ({ request }) => {
   expect(text).toContain('Sitemap:');
 });
 
+// Every indexable page has its date of last change, so the dates' list is the sitemap's list:
+// a new page joins both at once and this test needs no count.
+const SITEMAP_URLS = Object.keys(LAST_UPDATED)
+  .map((path) => `https://eslojusto.es${path}`)
+  .toSorted();
+
 test('the sitemap lists every page', async ({ request }) => {
   const index = await (await request.get('sitemap-index.xml')).text();
   const parts = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1] ?? '');
@@ -135,16 +142,14 @@ test('the sitemap lists every page', async ({ request }) => {
     const xml = await (await request.get(new URL(part).pathname.slice(1))).text();
     urls.push(...[...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1] ?? ''));
   }
-  expect(urls.toSorted()).toEqual(
-    ['', 'alquiler/irav-ipc/', 'aviso-legal/', 'finiquito/', 'privacidad/'].map(
-      (r) => `https://eslojusto.es/${r}`,
-    ),
-  );
+  expect(urls.toSorted()).toEqual(SITEMAP_URLS);
+  for (const path of ['', 'finiquito/', 'paro/', 'paro/baja-voluntaria/', 'alquiler/irav-ipc/'])
+    expect(urls).toContain(`https://eslojusto.es/${path}`);
 });
 
 test('every sitemap URL carries the date of its last change', async ({ request }) => {
   const xml = await (await request.get('sitemap-0.xml')).text();
   const urls = [...xml.matchAll(/<url>(.*?)<\/url>/g)].map((m) => m[1] ?? '');
-  expect(urls).toHaveLength(5);
+  expect(urls).toHaveLength(SITEMAP_URLS.length);
   for (const url of urls) expect(url).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}/);
 });

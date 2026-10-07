@@ -1,0 +1,64 @@
+---
+// A table of worked figures. Its caption sits above the box, so it never scrolls away with a table
+// wider than a phone, which scrolls inside the box and never moves the page.
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+---
+
+<p class="table-caption" id={id}>
+  <slot name="caption" />
+</p>
+<div class="table-scroll" role="region" aria-labelledby={id} tabindex="0">
+  <table class="figures-table" aria-labelledby={id}>
+    <slot />
+  </table>
+</div>
+
+<style>
+  .table-caption {
+    margin-bottom: 0.5rem;
+  }
+  .table-scroll {
+    max-inline-size: 100%;
+    margin: 0 0 0.875rem;
+    overflow-x: auto;
+  }
+  .table-scroll:focus-visible {
+    outline-offset: 2px;
+  }
+  /* The rows come from the page through the slot, so they carry the page's scope, not this one. */
+  .figures-table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font: 500 0.8125rem / 1.45 var(--f-mono);
+    font-stretch: 87.5%;
+    font-variant-numeric: tabular-nums;
+  }
+  .figures-table :global(th),
+  .figures-table :global(td) {
+    padding: 0.5rem 0 0.5rem 0.5rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--sheet-ink) 18%, transparent);
+    text-align: end;
+    vertical-align: top;
+  }
+  .figures-table :global(th:first-child),
+  .figures-table :global(td:first-child) {
+    padding-inline-start: 0;
+    text-align: start;
+  }
+  .figures-table :global(thead th) {
+    font: 700 0.8125rem / 1.3 var(--f-grotesque);
+    hyphens: auto;
+    vertical-align: bottom;
+  }
+  .figures-table :global(.figures-note) {
+    display: block;
+    font: 400 0.8125rem / 1.35 var(--f-serif);
+  }
+  .figures-table :global(tbody th) {
+    min-inline-size: 4.5rem;
+    font: 700 0.8125rem / 1.3 var(--f-grotesque);
+  }
+</style>
