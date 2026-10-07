@@ -43,6 +43,7 @@ export type ValidationCode =
   | 'invalid_date'
   | 'too_far_ahead'
   | 'before_start'
+  | 'too_late_after_start'
   | 'amount_range'
   | 'hours_range'
   | 'percent_range'
@@ -66,6 +67,9 @@ const WEEKS_IN_YEAR = 52;
 const MAX_ANNUAL_HOURS = MAX_WEEKLY_HOURS * WEEKS_IN_YEAR;
 const MAX_PAYMENTS = 16;
 const MAX_DAYS_IN_YEAR = 366;
+const MONTHS_IN_YEAR = 12;
+// Payslips are read from this year on.
+const FIRST_PAYSLIP_YEAR = 2000;
 // A contract may be reviewed before it starts, up to a year ahead.
 const MONTHS_AHEAD = 12;
 
@@ -82,9 +86,19 @@ const inRange = (v: number, min: number, max: number): boolean =>
 const positiveUpTo = (v: number, max: number): boolean => Number.isFinite(v) && v > 0 && v <= max;
 const isCount = (v: number, max = Number.MAX_SAFE_INTEGER): boolean =>
   Number.isInteger(v) && v >= 0 && v <= max;
-const isMonth = (s: string): boolean => {
+const isMonth = (s: string, lastYear: number): boolean => {
   const match = /^(\d{4})-(\d{2})$/.exec(s);
-  return match !== null && inRange(Number(match[2]), 1, 12);
+  return (
+    match !== null &&
+    inRange(Number(match[1]), FIRST_PAYSLIP_YEAR, lastYear) &&
+    inRange(Number(match[2]), 1, MONTHS_IN_YEAR)
+  );
+};
+// A trial period of at most a year in any unit.
+const TRIAL_MAX: Readonly<Record<'days' | 'weeks' | 'months', number>> = {
+  days: MAX_DAYS_IN_YEAR,
+  weeks: WEEKS_IN_YEAR,
+  months: MONTHS_IN_YEAR,
 };
 const minutesOf = (s: string): number | null => {
   const match = /^(\d{2}):(\d{2})$/.exec(s);
@@ -125,7 +139,16 @@ export function validate(input: EmploymentInput, today: CivilDate): readonly Val
     else if (isRealDate(start) && compareDates(input.endDate, start) < 0)
       fail('endDate', 'before_start');
   }
-  if (input.signedOn !== null && !isRealDate(input.signedOn)) fail('signedOn', 'invalid_date');
+  if (input.signedOn !== null) {
+    if (!isRealDate(input.signedOn)) fail('signedOn', 'invalid_date');
+    else if (compareDates(input.signedOn, addMonthsClamped(today, MONTHS_AHEAD)) > 0)
+      fail('signedOn', 'too_far_ahead');
+    else if (
+      isRealDate(start) &&
+      compareDates(input.signedOn, addMonthsClamped(start, MONTHS_IN_YEAR)) > 0
+    )
+      fail('signedOn', 'too_late_after_start');
+  }
   count('extensions', input.extensions);
 
   if (input.training !== null) {
@@ -150,12 +173,12 @@ export function validate(input: EmploymentInput, today: CivilDate): readonly Val
   count('agreement.holidayDays', input.agreement.holidayDays);
   if (
     input.agreement.trialMonths !== null &&
-    !inRange(input.agreement.trialMonths, 0, MAX_DAYS_IN_YEAR)
+    !inRange(input.agreement.trialMonths, 0, MONTHS_IN_YEAR)
   )
     fail('agreement.trialMonths', 'count_range');
 
   input.payslips.forEach((p, i) => {
-    if (!isMonth(p.month)) fail('payslips.month', 'invalid_month', i);
+    if (!isMonth(p.month, today.y + 1)) fail('payslips.month', 'invalid_month', i);
     amount('payslips.salaryInMoney', p.salaryInMoney, i);
     amountOrZero('payslips.inKind', p.inKind, i);
     amountOrZero('payslips.proratedExtraPay', p.proratedExtraPay, i);
@@ -164,7 +187,7 @@ export function validate(input: EmploymentInput, today: CivilDate): readonly Val
         fail('payslips.hours', 'hours_range', i);
   });
 
-  if (input.trial !== null && !positiveUpTo(input.trial.amount, MAX_DAYS_IN_YEAR))
+  if (input.trial !== null && !positiveUpTo(input.trial.amount, TRIAL_MAX[input.trial.unit]))
     fail('trial.amount', 'count_range');
 
   input.schedule?.forEach((day, i) => {

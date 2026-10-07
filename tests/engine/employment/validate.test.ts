@@ -139,4 +139,56 @@ describe('validate', () => {
       }),
     ).toEqual([['training.effectiveWorkPercent', null, 'percent_range']]);
   });
+
+  it.each([
+    ['months', 12, true],
+    ['months', 13, false],
+    ['weeks', 52, true],
+    ['weeks', 53, false],
+    ['days', 366, true],
+    ['days', 367, false],
+  ] as const)('a trial of %s %s valid: %s', (unit, amount, valid) => {
+    expect(errorsOf({ trial: { amount, unit } }).length === 0).toBe(valid);
+  });
+
+  it.each([
+    [12, true],
+    [13, false],
+  ])('an agreement trial of %s months valid: %s', (trialMonths, valid) => {
+    expect(errorsOf({ agreement: { ...contract().agreement, trialMonths } }).length === 0).toBe(
+      valid,
+    );
+  });
+
+  it('rejects a signing day over a year ahead of today', () => {
+    expect(
+      errorsOf({ startDate: parseDate('2027-10-01'), signedOn: parseDate('2027-10-08') }),
+    ).toEqual([['signedOn', null, 'too_far_ahead']]);
+  });
+
+  it('rejects a signing day more than a year after the start', () => {
+    expect(errorsOf({ signedOn: parseDate('2025-03-01') })).toEqual([]);
+    expect(errorsOf({ signedOn: parseDate('2025-03-02') })).toEqual([
+      ['signedOn', null, 'too_late_after_start'],
+    ]);
+  });
+
+  it.each([
+    ['1999-12', false],
+    ['2000-01', true],
+    ['2027-12', true],
+    ['2028-01', false],
+  ])('a payslip of %s valid: %s', (month, valid) => {
+    const payslip = {
+      month,
+      wholeMonth: true,
+      incidents: false,
+      salaryInMoney: 1200,
+      inKind: 0,
+      proratedExtraPay: 0,
+      overtimeHours: null,
+      complementaryHours: null,
+    };
+    expect(errorsOf({ payslips: [payslip] }).length === 0).toBe(valid);
+  });
 });
