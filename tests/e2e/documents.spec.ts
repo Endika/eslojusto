@@ -16,7 +16,7 @@ const PHOTO = Buffer.from(
 
 const b64url = (v: object) => Buffer.from(JSON.stringify(v)).toString('base64url');
 const expiresAt = Math.floor(Date.now() / 1000) + 7 * 86400;
-const PASS = `v1.${b64url({ typ: 'pass', sid: 'cs_test_e2e', exp: expiresAt, used: 0 })}.c2ln`;
+const PASS = `v1.${b64url({ typ: 'pass', sid: 'cs_test_e2e', exp: expiresAt })}.c2ln`;
 
 const SETTLEMENT = {
   code: 'ok',
@@ -38,6 +38,7 @@ const SETTLEMENT = {
 
 interface Fake {
   readonly extract: Request[];
+  readonly checkout: Request[];
   readonly pass: Request[];
   readonly other: string[];
 }
@@ -47,23 +48,24 @@ async function fakeServices(
   page: Page,
   extract: { status: number; body: object } = { status: 200, body: SETTLEMENT },
 ): Promise<Fake> {
-  const fake: Fake = { extract: [], pass: [], other: [] };
+  const fake: Fake = { extract: [], checkout: [], pass: [], other: [] };
   await page.route('https://challenges.cloudflare.com/**', (route) =>
     route.fulfill({
       contentType: 'text/javascript',
-      body: `window.turnstile = { render(el, o) { setTimeout(() => o.callback('e2e-token')); return 'w'; }, remove() {} };`,
+      body: `window.turnstile = { render(el, o) { setTimeout(() => o.callback(o.action + '-token')); return 'w'; }, remove() {} };`,
     }),
   );
   await page.route(`${API}/extract`, (route) => {
     fake.extract.push(route.request());
     return route.fulfill({ status: extract.status, json: extract.body });
   });
-  await page.route(`${API}/checkout`, (route) =>
-    route.fulfill({ json: { code: 'ok', sessionId: 'cs_test_e2e', url: STRIPE } }),
-  );
+  await page.route(`${API}/checkout`, (route) => {
+    fake.checkout.push(route.request());
+    return route.fulfill({ json: { code: 'ok', sessionId: 'cs_test_e2e', url: STRIPE } });
+  });
   await page.route(`${API}/pass`, (route) => {
     fake.pass.push(route.request());
-    return route.fulfill({ json: { code: 'ok', pass: PASS, expiresAt } });
+    return route.fulfill({ json: { code: 'ok', pass: PASS, expiresAt, readsLeft: 15 } });
   });
   // Stripe takes the payment and sends the person back with the session id.
   await page.route('https://checkout.stripe.com/**', (route) =>
@@ -132,7 +134,7 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   await uploadSettlement(page);
 
   const sent = fake.extract[0]?.postDataJSON() as Record<string, unknown>;
-  expect(sent).toMatchObject({ kind: 'settlement', captchaToken: 'e2e-token', quota: null });
+  expect(sent).toMatchObject({ kind: 'settlement', captchaToken: 'extract-token', quota: null });
   expect(sent['files']).toEqual([{ mediaType: 'image/jpeg', data: expect.any(String) }]);
   await expect(page.getByText('Se han leído 5 datos')).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('eslojusto-lecturas'))).toBe(
@@ -184,7 +186,10 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   await page.waitForURL(/\/finiquito\/(#.*)?$/);
   await expect(page.getByText('Pago recibido')).toBeVisible();
   expect(page.url()).not.toContain('session_id');
+  const started = fake.checkout[0]?.postDataJSON() as Record<string, unknown>;
+  expect(started['captchaToken']).toBe('checkout-token');
   const asked = fake.pass[0]?.postDataJSON() as Record<string, unknown>;
+  expect(asked['nonce']).toBe(started['nonce']);
   expect(asked['sessionId']).toBe('cs_test_e2e');
   expect(asked['nonce']).toMatch(/^[A-Za-z0-9_-]{32}$/);
   expect(await page.evaluate(() => sessionStorage.length)).toBe(0);
