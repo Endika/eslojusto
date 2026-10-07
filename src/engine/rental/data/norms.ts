@@ -90,17 +90,17 @@ export const NORMS: NormTable = {
     statusSince: null,
     statusUrl: null,
   },
-  // Art. 2: updates capped at 2 % without a new agreement. Repealed by the Congress on 28-04-2026,
-  // published 30-04-2026; which of those days ends its effects is not settled.
+  // Art. 2: updates capped at 2 % without a new agreement. The repeal is dated 30-04-2026, so its
+  // last day with effects is 29-04; that it did not reach 30-04 is not settled.
   rdl8_2026: {
     id: 'rdl8_2026',
     citation: 'Real Decreto-ley 8/2026, de 20 de marzo',
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-6545',
     inForceSince: '2026-03-22',
-    inForceUntil: '2026-04-28',
+    inForceUntil: '2026-04-29',
     endUncertainUntil: '2026-04-30',
     status: 'repealed',
-    statusSince: '2026-04-28',
+    statusSince: '2026-04-30',
     statusUrl: 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-9359',
   },
   // In force on 01-10-2026 only; repealed on 02-10-2026.

@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { addDays, parseDate, toIso } from '../../../src/engine/date';
 import { NORMS } from '../../../src/engine/rental/data/norms';
-import type { Norm, NormId, NormTable } from '../../../src/engine/rental/norms';
+import {
+  normStanding,
+  type Norm,
+  type NormId,
+  type NormTable,
+} from '../../../src/engine/rental/norms';
 import { activeRules, ruleSource, RULES, type RuleId } from '../../../src/engine/rental/rules';
 
 const BOE = 'https://www.boe.es/';
@@ -28,7 +33,8 @@ describe('norm table', () => {
     expect(n.id).toBe(id);
     expect(n.url.startsWith(BOE)).toBe(true);
     expect(n.inForceSince).toMatch(ISO);
-    if (n.inForceUntil !== null) expect(n.inForceUntil >= n.inForceSince).toBe(true);
+    if (n.inForceUntil !== null && n.status !== 'repealed')
+      expect(n.inForceUntil >= n.inForceSince).toBe(true);
     if (n.endUncertainUntil !== undefined)
       expect(n.endUncertainUntil > (n.inForceUntil ?? '')).toBe(true);
     expect(n.statusSince === null).toBe(n.statusUrl === null);
@@ -89,7 +95,7 @@ describe('rule sources', () => {
   it('show the widened end of a repealed norm', () => {
     expect(ruleSource('cap_2_rdl8', NORMS)).toMatchObject({
       status: 'repealed',
-      inForceUntil: '2026-04-28',
+      inForceUntil: '2026-04-29',
       endUncertainUntil: '2026-04-30',
       statusUrl: `${BOE}diario_boe/txt.php?id=BOE-A-2026-9359`,
     });
@@ -144,6 +150,40 @@ describe('rules active on a day', () => {
     ['2028-01-01', []],
   ])('a 2 %% cap on an anniversary of %s', (day, expected) => {
     expect(rulesOn(day, NORMS, 'cap_2_')).toEqual(expected);
+  });
+
+  it('a clause naming no index follows the IRAV only in the reading where RDL 29/2026 holds', () => {
+    expect(rulesOn('2026-10-07', NORMS, 'update_clause')).toEqual([['update_clause', null]]);
+    expect(rulesOn('2026-10-08', NORMS, 'update_clause')).toEqual([
+      ['update_clause', 'pending_validation'],
+      ['update_clause_rdl29', 'pending_validation'],
+    ]);
+  });
+
+  it('the tacit renewal in force is in doubt once RDL 28/2026 takes effect', () => {
+    expect(rulesOn('2026-11-14', NORMS, 'term_')).toEqual([
+      ['term_minimum', null],
+      ['term_tacit', null],
+    ]);
+    expect(rulesOn('2026-11-15', NORMS, 'term_')).toEqual([
+      ['term_minimum', null],
+      ['term_tacit', 'pending_validation'],
+      ['term_rdl28', 'pending_validation'],
+    ]);
+  });
+
+  it('a norm repealed before it took effect never applies', () => {
+    const neverInForce = withNorm('rdl28_2026', {
+      status: 'repealed',
+      inForceUntil: '2026-11-13',
+      statusSince: '2026-11-14',
+      statusUrl: `${BOE}diario_boe/txt.php?id=BOE-A-2026-99997`,
+    });
+    expect(normStanding(neverInForce.rdl28_2026, '2026-11-15')).toBe('not_in_force');
+    expect(rulesOn('2026-11-20', neverInForce, 'term_')).toEqual([
+      ['term_minimum', null],
+      ['term_tacit', null],
+    ]);
   });
 
   it('a temporary cap ends on its last day', () => {

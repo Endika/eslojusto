@@ -19,7 +19,8 @@ export interface Norm {
   readonly citation: string;
   readonly url: string;
   readonly inForceSince: string;
-  // Last day with effects; null while no end is known.
+  // Last day with effects; null while no end is known. A repealed norm that never took effect has
+  // it before `inForceSince`.
   readonly inForceUntil: string | null;
   // When the exact last day is in doubt, the doubtful window widens up to this day.
   readonly endUncertainUntil?: string;
