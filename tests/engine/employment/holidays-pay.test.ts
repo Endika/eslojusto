@@ -7,8 +7,10 @@ import { offerPass } from '../../../src/engine/employment/readings';
 import type { EmploymentInput, Finding, Holidays } from '../../../src/engine/employment/types';
 import { contract } from './input';
 
-const findings = (change: Partial<EmploymentInput>): Finding[] =>
-  assessHolidaysAndPay(contract(change), EMPLOYMENT_NORMS).map((a) => {
+const TODAY = parseDate('2026-10-08');
+
+const findings = (change: Partial<EmploymentInput>, today = TODAY): Finding[] =>
+  assessHolidaysAndPay(contract(change), today, EMPLOYMENT_NORMS).map((a) => {
     if (a.kind !== 'single') throw new Error('expected single findings');
     return a.finding;
   });
@@ -76,7 +78,7 @@ describe('holidays (art. 38.1 ET)', () => {
     ]);
   });
 
-  it('a fixed-term contract of 90 days may include them', () => {
+  it('a fixed-term contract of 90 days is to review: art. 4.1 needs holidays outside it', () => {
     const finding = findingFor(
       {
         ...holidays({ includedInSalary: true }),
@@ -86,7 +88,7 @@ describe('holidays (art. 38.1 ET)', () => {
       },
       'holidays_not_paid_out',
     );
-    expect(finding.status).toBe('within_limit');
+    expect(finding.status).toBe('review_it');
     expect(finding.sources.map((s) => s.id)).toEqual([
       'holidays_not_paid_out',
       'smi_temporary_120',
@@ -107,14 +109,89 @@ describe('holidays (art. 38.1 ET)', () => {
     ).toBe('clause_void');
   });
 
+  describe('fewer than 30 calendar days against the prorated entitlement', () => {
+    // 01-01-2026 to 30-06-2026: 181 days, entitled to 30 × 181 / 365 = 14.88 days.
+    const sixMonths = {
+      modality: 'production' as const,
+      startDate: parseDate('2026-01-01'),
+      endDate: parseDate('2026-06-30'),
+    };
+
+    it.each([
+      [15, 'within_limit'],
+      [14, 'review_it'],
+      [13, 'below_minimum'],
+    ] as const)('%s days in a six-month contract: %s', (days, status) => {
+      expect(findingFor({ ...sixMonths, ...holidays({ days }) }, 'holidays_30')).toMatchObject({
+        status,
+        calculation: [
+          phrase('holidays.calendar_days', { days: { days } }),
+          phrase('holidays.prorated_entitlement', {
+            span: { days: 181 },
+            entitled: { days: 14.88 },
+          }),
+        ],
+      });
+    });
+
+    it('an open-ended contract in its first year: 01-07 to 31-12 is entitled to 15.12 days', () => {
+      const firstYear = { startDate: parseDate('2026-07-01'), endDate: null };
+      expect(findingFor({ ...firstYear, ...holidays({ days: 16 }) }, 'holidays_30').status).toBe(
+        'within_limit',
+      );
+      expect(findingFor({ ...firstYear, ...holidays({ days: 15 }) }, 'holidays_30').status).toBe(
+        'review_it',
+      );
+      expect(findingFor({ ...firstYear, ...holidays({ days: 14 }) }, 'holidays_30').status).toBe(
+        'below_minimum',
+      );
+    });
+
+    it('a contract that ended this year counts its last year: 90 days of 2026 give 7.4 days', () => {
+      const lastYear = { startDate: parseDate('2024-03-01'), endDate: parseDate('2026-03-31') };
+      expect(findingFor({ ...lastYear, ...holidays({ days: 8 }) }, 'holidays_30').status).toBe(
+        'within_limit',
+      );
+    });
+
+    it('29 days in a full year is within rounding, to review', () => {
+      expect(findingFor(holidays({ days: 29 }), 'holidays_30').status).toBe('review_it');
+    });
+
+    it('a fixed-term contract without an end date has an unknown span', () => {
+      expect(
+        findingFor(
+          { modality: 'replacement', endDate: null, ...holidays({ days: 20 }) },
+          'holidays_30',
+        ),
+      ).toMatchObject({
+        status: 'review_it',
+        calculation: [
+          phrase('holidays.calendar_days', { days: { days: 20 } }),
+          phrase('holidays.span_unknown'),
+        ],
+      });
+    });
+  });
+
   it('without holidays entered there is nothing to compare', () => {
     expect(findingFor({ holidays: null }, 'holidays_30').status).toBe('not_entered');
   });
 });
 
 describe('extra payments (art. 31 ET)', () => {
-  it('one payment without proration is below the minimum', () => {
+  it('one payment without proration is to review: the agreement may prorate the other', () => {
     expect(findingFor({ extraPays: { count: 1, prorated: false } }, 'extra_pays')).toMatchObject({
+      status: 'review_it',
+      calculation: [
+        phrase('extra_pays.count', { count: { integer: 1 } }),
+        phrase('extra_pays.one_may_be_prorated'),
+      ],
+    });
+  });
+
+  it('no payment at all is below the minimum', () => {
+    expect(findingFor({ extraPays: { count: 0, prorated: false } }, 'extra_pays')).toMatchObject({
       status: 'below_minimum',
       amount: null,
     });

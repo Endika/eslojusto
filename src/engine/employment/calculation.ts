@@ -181,10 +181,13 @@ type HolidaysPayPhraseKey =
   | 'holidays.working_days_equivalent'
   | 'holidays.counted_in_calendar_days'
   | 'holidays.under_your_agreement'
+  | 'holidays.span_unknown'
+  | 'holidays.prorated_entitlement'
   | 'holidays.included_in_salary'
   | 'holidays.short_temporary_exception'
   | 'extra_pays.count'
   | 'extra_pays.amount_by_agreement'
+  | 'extra_pays.one_may_be_prorated'
   | 'extra_pays.prorated_by_agreement';
 
 type ClausePhraseKey =
