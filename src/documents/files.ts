@@ -93,6 +93,24 @@ export function fitWithin(width: number, height: number, max: number = LIMITS.ma
   };
 }
 
+// Tried in turn until an image fits its share of the request (api/README.md, «Payload budget»):
+// every quality at the full size first, and only then a shorter long side, which a pack of up to
+// about fifteen pages never needs and a larger one of noisy photos may.
+export const JPEG_QUALITIES = [0.85, 0.75, 0.65, 0.5] as const;
+export const LONG_SIDES = [LIMITS.maxImageLongSide, 1280, 1100] as const;
+
+// The sizes an image of `width` × `height` is encoded at in turn, each once: one that is already
+// short is never enlarged, so it may have a single size.
+export function encodingSizes(width: number, height: number) {
+  const sizes: { width: number; height: number }[] = [];
+  for (const side of LONG_SIDES) {
+    const size = fitWithin(width, height, side);
+    const last = sizes.at(-1);
+    if (last?.width !== size.width || last.height !== size.height) sizes.push(size);
+  }
+  return sizes;
+}
+
 // The size that brings the long side to exactly `max`: a PDF page is drawn, not resampled, so
 // it is rendered at the size a photo is sent at.
 export function fitExactly(width: number, height: number, max = LIMITS.maxImageLongSide) {

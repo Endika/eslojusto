@@ -6,6 +6,7 @@ import {
   bytesToBase64,
   checkSelection,
   encodedSize,
+  encodingSizes,
   filesBucket,
   fitExactly,
   fitWithin,
@@ -103,6 +104,23 @@ describe('fitWithin', () => {
   });
   it('never enlarges', () => {
     expect(fitWithin(800, 600)).toEqual({ width: 800, height: 600 });
+  });
+});
+
+describe('encodingSizes', () => {
+  it('tries the full size first, then 1280 and 1100 px on the long side', () => {
+    expect(encodingSizes(1176, 1568)).toEqual([
+      { width: 1176, height: 1568 },
+      { width: 960, height: 1280 },
+      { width: 825, height: 1100 },
+    ]);
+  });
+  it('tries each size once and never enlarges a small image', () => {
+    expect(encodingSizes(1200, 900)).toEqual([
+      { width: 1200, height: 900 },
+      { width: 1100, height: 825 },
+    ]);
+    expect(encodingSizes(800, 600)).toEqual([{ width: 800, height: 600 }]);
   });
 });
 

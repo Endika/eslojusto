@@ -74,9 +74,10 @@ budget action.
 included, and the API refuses a body over 6 MiB. Base64 adds a third, so the browser keeps the
 JSON under 5.8 MB (`requestBudgetBytes` in `src/documents/contract.ts`), shared out among the
 images: each photo or PDF page is re-encoded as JPEG at falling quality (0.85, 0.75, 0.65, 0.5)
-until it fits its share. With 15 images that is about 290 KB each, which a 1568-px document
-page usually meets by quality 0.65. If the pack still does not fit, the browser says the files
-are too heavy before sending anything.
+until it fits its share, and only when no quality does, at 1280 and then 1100 px on the long side
+(`JPEG_QUALITIES` and `LONG_SIDES` in `src/documents/files.ts`). With 15 images that is about
+290 KB each, which a 1568-px document page usually meets by quality 0.65. If the pack still does
+not fit, the browser says the files are too heavy before sending anything.
 
 `ok` answers:
 
