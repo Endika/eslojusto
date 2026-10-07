@@ -52,6 +52,8 @@ export interface LogEvent {
   readonly underestimated?: boolean;
   // A pass read went through but Stripe did not store its count.
   readonly countNotSaved?: boolean;
+  // A `pass` request that verified a pass rather than issued one.
+  readonly verify?: boolean;
 }
 
 export interface Logger {

@@ -1,4 +1,12 @@
-import { isNonce, isSessionId, issuePass, startCheckout, type PassDeps } from '../domain/payments';
+import {
+  isNonce,
+  isSessionId,
+  issuePass,
+  startCheckout,
+  verifyPass,
+  type PassDeps,
+  type VerifyMemo,
+} from '../domain/payments';
 import type { CaptchaVerifier, CheckoutCreator, Clock, Logger } from '../domain/ports';
 import { handle, type HttpEvent, type HttpResponse } from './common';
 
@@ -26,12 +34,29 @@ export function handleCheckout(
   });
 }
 
+// `{ sessionId, nonce }` issues the pass; `{ pass }` alone verifies one the browser holds.
 export function handlePass(
   event: HttpEvent,
-  deps: PassDeps & { readonly logger: Logger },
+  deps: PassDeps & {
+    readonly logger: Logger;
+    readonly memo: VerifyMemo;
+    readonly hash: (token: string) => string;
+  },
 ): Promise<HttpResponse> {
-  return handle('pass', event, deps, async (body) => {
-    const { sessionId, nonce } = body;
+  return handle('pass', event, deps, async (body, metrics) => {
+    const { sessionId, nonce, pass } = body;
+    if (pass !== undefined) {
+      metrics.verify = true;
+      if (
+        sessionId !== undefined ||
+        nonce !== undefined ||
+        typeof pass !== 'string' ||
+        pass.length === 0 ||
+        pass.length > MAX_TOKEN_LENGTH
+      )
+        return { code: 'invalid_request' };
+      return verifyPass(pass, deps);
+    }
     if (!isSessionId(sessionId) || !isNonce(nonce)) return { code: 'invalid_request' };
     return issuePass(sessionId, nonce, deps);
   });

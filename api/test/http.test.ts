@@ -5,6 +5,8 @@ import { consoleLogger } from '../src/adapters/runtime';
 import type { ExtractDeps } from '../src/domain/extract';
 import type { HttpEvent } from '../src/http/common';
 import { handleExtract } from '../src/http/extract';
+import { tokenHash } from '../src/adapters/token-hash';
+import { createVerifyMemo } from '../src/domain/payments';
 import { handleCheckout, handlePass } from '../src/http/payments';
 import { coherentSettlement, f, page, proposal } from './support/fields';
 import {
@@ -281,10 +283,22 @@ describe('logs', () => {
       clock: new FakeClock(),
       priceId: 'price_test',
       logger: consoleLogger,
+      memo: createVerifyMemo(),
+      hash: tokenHash,
     });
     expect(json(pass)).toEqual({ code: 'session_not_found' });
+    const verified = await handlePass(post({ pass: sentinels.session }), {
+      payments: new FakePayments({}),
+      signer,
+      clock: new FakeClock(),
+      priceId: 'price_test',
+      logger: consoleLogger,
+      memo: createVerifyMemo(),
+      hash: tokenHash,
+    });
+    expect(json(verified)).toEqual({ code: 'pass_invalid' });
 
-    expect(lines).toHaveLength(4);
+    expect(lines).toHaveLength(5);
     const allowed = [
       'op',
       'code',
@@ -294,6 +308,7 @@ describe('logs', () => {
       'outputTokens',
       'escalated',
       'conflicts',
+      'verify',
     ];
     for (const line of lines) {
       for (const key of Object.keys(JSON.parse(line) as object)) expect(allowed).toContain(key);
@@ -348,8 +363,46 @@ describe('payment handlers', () => {
         clock: new FakeClock(),
         priceId: 'price_test',
         logger: new MemoryLogger(),
+        memo: createVerifyMemo(),
+        hash: tokenHash,
       },
     );
     expect(json(response)).toEqual({ code: 'invalid_request' });
+  });
+
+  describe('verifying a pass', () => {
+    const verify = (body: unknown, session = paidSession()) => {
+      const logger = new MemoryLogger();
+      return handlePass(post(body), {
+        payments: new FakePayments({ [session.id]: session }),
+        signer,
+        clock: new FakeClock(),
+        priceId: 'price_test',
+        logger,
+        memo: createVerifyMemo(),
+        hash: tokenHash,
+      }).then((r) => ({ r, logger }));
+    };
+    const token = signer.sign(passClaims(paidSession().id, paidSession().created + 7 * 86_400));
+
+    it('answers with its expiry and reads left, and logs it as a verify', async () => {
+      const { r, logger } = await verify({ pass: token });
+      expect(r.statusCode).toBe(200);
+      expect(json(r)).toEqual({
+        code: 'ok',
+        expiresAt: paidSession().created + 7 * 86_400,
+        readsLeft: 15,
+      });
+      expect(logger.events[0]).toMatchObject({ op: 'pass', code: 'ok', verify: true });
+    });
+
+    it.each([
+      [{ pass: '' }],
+      [{ pass: 42 }],
+      [{ pass: 'x'.repeat(2049) }],
+      [{ pass: token, sessionId: paidSession().id }],
+    ])('refuses a malformed verify %j', async (body) => {
+      expect(json((await verify(body)).r)).toEqual({ code: 'invalid_request' });
+    });
   });
 });

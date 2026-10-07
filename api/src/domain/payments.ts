@@ -1,4 +1,4 @@
-import { passClaims, passExpiry, passSessionProblem, readsLeft } from './allowance';
+import { checkAllowance, passClaims, passExpiry, passSessionProblem, readsLeft } from './allowance';
 import type {
   CaptchaVerifier,
   CheckoutCreator,
@@ -86,4 +86,71 @@ export async function issuePass(
     expiresAt,
     readsLeft: readsLeft(session),
   };
+}
+
+export type VerifyResponse =
+  | { readonly code: 'ok'; readonly expiresAt: number; readonly readsLeft: number }
+  | { readonly code: ErrorCode };
+
+// A pass verified a moment ago, by the hash of its token, so a page that reloads does not reach
+// Stripe every time. Per container: a refund can take this long to withdraw a pass that already
+// unlocked the page.
+export const VERIFY_MEMO_MS = 60_000;
+
+export interface VerifyMemo {
+  get(key: string, nowMs: number): VerifyResponse | null;
+  set(key: string, response: VerifyResponse, nowMs: number): void;
+}
+
+const MEMO_LIMIT = 500;
+
+export function createVerifyMemo(): VerifyMemo {
+  const entries = new Map<string, { response: VerifyResponse; until: number }>();
+  return {
+    get(key, nowMs) {
+      const hit = entries.get(key);
+      if (!hit || hit.until <= nowMs) {
+        entries.delete(key);
+        return null;
+      }
+      return hit.response;
+    },
+    set(key, response, nowMs) {
+      if (entries.size >= MEMO_LIMIT) entries.clear();
+      entries.set(key, { response, until: nowMs + VERIFY_MEMO_MS });
+    },
+  };
+}
+
+// Whether a pass the browser holds still unlocks the detail, the report and the letter: its
+// signature and expiry here, then its session in Stripe (refunded, disputed or cancelled). Only a
+// successful answer is remembered.
+export async function verifyPass(
+  token: string,
+  deps: PassDeps & { readonly memo: VerifyMemo; readonly hash: (token: string) => string },
+): Promise<VerifyResponse> {
+  const now = deps.clock.now();
+  const check = checkAllowance({ type: 'pass', token }, deps.signer, now);
+  if (!check.ok) return { code: check.code };
+  if (check.type !== 'pass') return { code: 'pass_invalid' };
+  const key = deps.hash(token);
+  const remembered = deps.memo.get(key, now);
+  if (remembered) return remembered;
+  let session;
+  try {
+    session = await deps.payments.findSession(check.sessionId);
+  } catch {
+    return { code: 'payment_provider_unavailable' };
+  }
+  if (session === null) return { code: 'pass_invalid' };
+  const problem = passSessionProblem(session, now);
+  if (problem === 'payment_not_complete') return { code: 'pass_invalid' };
+  if (problem !== null) return { code: problem };
+  const response: VerifyResponse = {
+    code: 'ok',
+    expiresAt: passExpiry(session.created),
+    readsLeft: readsLeft(session),
+  };
+  deps.memo.set(key, response, now);
+  return response;
 }

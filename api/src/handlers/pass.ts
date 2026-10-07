@@ -3,11 +3,15 @@ import { createHmacSigner } from '../adapters/hmac-signer';
 import { consoleLogger, systemClock } from '../adapters/runtime';
 import { loadParameters } from '../adapters/ssm-parameters';
 import { createStripeSessions } from '../adapters/stripe-payments';
+import { tokenHash } from '../adapters/token-hash';
+import { createVerifyMemo } from '../domain/payments';
 import { handlePass } from '../http/payments';
 import { unavailable } from './unavailable';
 import type { HttpEvent, HttpResponse } from '../http/common';
 
 let deps: ReturnType<typeof load> | undefined;
+// Lives as long as the container.
+const memo = createVerifyMemo();
 const load = async () => {
   const { stripeRestrictedKey, tokenKey } = await loadParameters({
     stripeRestrictedKey: PARAMETER_NAMES.stripeRestrictedKey,
@@ -30,5 +34,11 @@ export async function handler(event: HttpEvent): Promise<HttpResponse> {
     deps = undefined;
     return unavailable('pass', event);
   }
-  return handlePass(event, { ...loaded, clock: systemClock, logger: consoleLogger });
+  return handlePass(event, {
+    ...loaded,
+    memo,
+    hash: tokenHash,
+    clock: systemClock,
+    logger: consoleLogger,
+  });
 }

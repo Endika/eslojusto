@@ -52,6 +52,7 @@ export interface Metrics {
   conflicts?: number;
   underestimated?: boolean;
   countNotSaved?: boolean;
+  verify?: boolean;
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
