@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.8.0](https://github.com/Endika/eslojusto/compare/v1.7.0...v1.8.0) (2026-10-07)
+
+
+### Features
+
+* **api:** chart reads with nothing read by reason and their share on the dashboard ([957608c](https://github.com/Endika/eslojusto/commit/957608ccfafd4acd6f93be63538e01de3874c754))
+* **api:** read up to 25 images and cap the input estimate at 96,000 tokens ([eed9cc1](https://github.com/Endika/eslojusto/commit/eed9cc136ec042deaf0d2223309e68c6561729ce))
+* **api:** say why each page can't be read and answer nothing_read when a read yields no field ([e0fa7dc](https://github.com/Endika/eslojusto/commit/e0fa7dc021cf073041f47b841c2eb48fa28b6e6e))
+* **documents:** say why pages went unread and warn before sending a dark, blurry or small photo ([d9ec60c](https://github.com/Endika/eslojusto/commit/d9ec60c8bf437fe788ff896760b0d6628128f91c))
+* **documents:** show encoding progress and stop early when a pack can't fit ([88d091c](https://github.com/Endika/eslojusto/commit/88d091c37f4b5f8f89894daeb126cb81ff5ece2f))
+* **documents:** step a page down to 1280 then 1100 px when no JPEG quality fits its share ([966d78c](https://github.com/Endika/eslojusto/commit/966d78cecbdb94b6210908472e88fa26ed480191))
+* **documents:** take up to 25 photos or PDF pages per read ([8457fb3](https://github.com/Endika/eslojusto/commit/8457fb365d95e72e30fa3dcd3466abc37154a915))
+
+
+### Performance Improvements
+
+* **documents:** measure photo quality with plain typed-array loops ([5e281b6](https://github.com/Endika/eslojusto/commit/5e281b6223523da599e429b8149e159e6d64d5e7))
+* **documents:** start a shorter long side at JPEG quality 0.65 ([be98e12](https://github.com/Endika/eslojusto/commit/be98e12224e6b5b5936c6dcdcdc14640f965b2a2))
+
 ## [1.7.0](https://github.com/Endika/eslojusto/compare/v1.6.0...v1.7.0) (2026-10-07)
 
 
