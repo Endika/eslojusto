@@ -160,6 +160,19 @@ describe('the pass offer', () => {
     expect(events.log).toEqual([['passVerified', result]]);
   });
 
+  it('a pass Stripe could not confirm is kept, locked, with a retry', async () => {
+    const { payment, passes, events } = setUp([], undefined, [
+      { ok: false, code: 'pass_unconfirmed' },
+    ]);
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
+    payment.show(completed());
+    await flush();
+    expect(payment.verified()).toBe(false);
+    expect(passes.pass()).not.toBeNull();
+    expect($('[data-pass-verify-retry]').hidden).toBe(false);
+    expect(events.log).toEqual([['passVerified', 'unavailable']]);
+  });
+
   it('the API out of reach: nothing unlocks, the pass is kept and can be checked again', async () => {
     const { payment, passes, events, saved } = setUp([], undefined, [
       { ok: false, code: 'network_error' },
@@ -528,6 +541,28 @@ describe('the notice after paying', () => {
       'Informe y carta descargados. Guárdalos: no guardamos tu revisión.',
     );
     expect(leaving()).toBe(false);
+  });
+
+  it('starting over before any download takes the warning away with the notice', async () => {
+    const { payment, leaving } = await paid();
+    expect(leaving()).toBe(true);
+    payment.hide();
+    expect($('[data-pass-notice]').hidden).toBe(true);
+    expect(leaving()).toBe(false);
+    payment.show(completed());
+    expect(leaving()).toBe(false);
+  });
+
+  it('a pass that dies during the visit takes the warning away with the notice', async () => {
+    const t = setUp([{ ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 }]);
+    t.passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
+    t.payment.show(completed());
+    await t.payment.returned('cs_test_1');
+    expect(t.leaving()).toBe(true);
+    t.passes.forgetPass();
+    t.payment.show(completed());
+    expect($('[data-pass-notice]').hidden).toBe(true);
+    expect(t.leaving()).toBe(false);
   });
 
   it('a pass recovered by hand or one already held shows no notice and never warns', async () => {

@@ -124,7 +124,10 @@ export function createVerifyMemo(): VerifyMemo {
 
 // Whether a pass the browser holds still unlocks the detail, the report and the letter: its
 // signature and expiry here, then its session in Stripe (refunded, disputed or cancelled). Only a
-// successful answer is remembered.
+// successful answer is remembered. A pass this API signed whose session Stripe doesn't find is
+// `pass_unconfirmed`, never `pass_invalid`: a rotated key, a test/live mix-up or an outage must not
+// make the browser drop a paid pass. Only a bad signature, an expired token, or Stripe stating a
+// refund, a dispute, a cancellation or no payment says the pass is gone.
 export async function verifyPass(
   token: string,
   deps: PassDeps & { readonly memo: VerifyMemo; readonly hash: (token: string) => string },
@@ -142,7 +145,7 @@ export async function verifyPass(
   } catch {
     return { code: 'payment_provider_unavailable' };
   }
-  if (session === null) return { code: 'pass_invalid' };
+  if (session === null) return { code: 'pass_unconfirmed' };
   const problem = passSessionProblem(session, now);
   if (problem === 'payment_not_complete') return { code: 'pass_invalid' };
   if (problem !== null) return { code: problem };

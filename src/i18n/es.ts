@@ -737,13 +737,15 @@ export const es = {
     'Ya has usado las 15 lecturas de tu pase. Puedes rellenar a mano; el informe y la carta siguen disponibles.',
   'client.documents.error.pass_revoked':
     'Este pase ya no vale porque su pago se devolvió o se anuló. Puedes rellenar a mano.',
+  'client.documents.error.pass_unconfirmed':
+    'No hemos podido comprobar tu pase ahora mismo. Prueba otra vez en un momento.',
   'client.documents.error.document_unreadable':
     'No se han podido leer los documentos. Prueba con fotos más nítidas o rellena a mano.',
   'client.documents.error.model_unavailable':
     'La lectura no está disponible ahora mismo. Prueba más tarde o rellena a mano.',
   'client.documents.error.session_not_found': 'No encontramos ese pago. Revisa el código.',
   'client.documents.error.session_mismatch':
-    'Ese pago no se hizo desde este navegador, y el pase solo se recupera en el navegador con el que se pagó.',
+    'Ese pago no se hizo desde este navegador, y el pase solo se recupera en el navegador con el que se pagó. Para devoluciones o quejas, escribe a hola@eslojusto.es.',
   'client.documents.error.payment_not_complete':
     'El pago aún no está completo. Si acabas de pagar, prueba en un momento.',
   'client.documents.error.price_mismatch':
@@ -762,7 +764,7 @@ export const es = {
   'client.documents.error.checkout_unavailable':
     'No se ha podido abrir el pago. Prueba otra vez en un momento.',
   'client.documents.error.no_checkout':
-    'No hay ningún pago hecho desde este navegador. El pase solo se recupera en el navegador con el que se pagó.',
+    'No hay ningún pago hecho desde este navegador. El pase solo se recupera en el navegador con el que se pagó. Para devoluciones o quejas, escribe a hola@eslojusto.es.',
   'client.documents.pass.waiver_missing': 'Marca la casilla para seguir',
   'client.documents.pass.redirecting': 'Abriendo el pago de Stripe…',
   'client.documents.pass.checking': 'Comprobando el pago…',

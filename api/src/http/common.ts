@@ -32,6 +32,7 @@ const STATUS: Readonly<Record<ResultCode, number>> = {
   pass_expired: 403,
   pass_exhausted: 429,
   pass_revoked: 403,
+  pass_unconfirmed: 503,
   document_unreadable: 422,
   model_unavailable: 503,
   session_not_found: 404,

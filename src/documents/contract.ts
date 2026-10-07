@@ -52,6 +52,7 @@ export const API_ERROR_CODES = [
   'pass_expired',
   'pass_exhausted',
   'pass_revoked',
+  'pass_unconfirmed',
   'document_unreadable',
   'model_unavailable',
   'session_not_found',

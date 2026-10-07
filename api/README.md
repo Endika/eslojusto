@@ -110,8 +110,10 @@ the letter until it expires.
 
 **`pass`** `{ "pass": "<token>" }` (verify) → `{ "code": "ok", "expiresAt": <epoch seconds>,
 "readsLeft": <n> }`, or `pass_invalid` (bad signature, not a pass, e.g. a free-read quota token,
-or a session Stripe does not have as paid), `pass_expired`, `pass_revoked` (refund, dispute or
-cancelled payment) and `payment_provider_unavailable`. The site asks before it shows the
+or a session Stripe reports as unpaid), `pass_expired`, `pass_revoked` (refund, dispute or
+cancelled payment), `pass_unconfirmed` (a validly signed, unexpired pass whose session Stripe does
+not find: a rotated key, a test/live mix-up or an outage, so the browser keeps it and asks again)
+and `payment_provider_unavailable`. The site asks before it shows the
 detail of a review or builds the report or the letter. No captcha: it does no Bedrock work and
 the function's reserved concurrency of 2 bounds it. Each container remembers a success for 60 s
 by the token's SHA-256, so a refund can take that long to lock a page again; failures are never

@@ -273,8 +273,8 @@ describe('verifyPass', () => {
     expect(await verifyPass(token, d)).toEqual({ code: 'pass_revoked' });
   });
 
-  it('a session Stripe no longer has, or never finished, is invalid', async () => {
-    expect(await verifyPass(token, verifyDeps(null).deps)).toEqual({ code: 'pass_invalid' });
+  it('a session Stripe does not find is unconfirmed, never invalid; one never paid is', async () => {
+    expect(await verifyPass(token, verifyDeps(null).deps)).toEqual({ code: 'pass_unconfirmed' });
     expect(
       await verifyPass(token, verifyDeps(paidSession({ paymentStatus: 'unpaid' })).deps),
     ).toEqual({ code: 'pass_invalid' });
