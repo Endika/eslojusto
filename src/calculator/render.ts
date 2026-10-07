@@ -11,7 +11,7 @@ import {
 import type { Review } from '../engine/review';
 import type { Cause, Item, ItemId } from '../engine/types';
 import type { ClientKey, Translate } from '../i18n/client';
-import { calculationText } from './calculation';
+import { calculationText, phraseText } from './calculation';
 import type { FieldError } from './form';
 import { formatInteger, formatEuros, formatWholeEuros } from './number';
 
@@ -177,6 +177,11 @@ function renderItem(
     }
   }
   setText(sheet, '[data-calculation]', calculationText(item.calculation, tr));
+  const counted = sheet.querySelector<HTMLElement>('[data-counted]');
+  if (counted) {
+    counted.hidden = item.counted === undefined;
+    counted.textContent = item.counted ? phraseText(item.counted, tr) : '';
+  }
   const basedOn = sheet.querySelector<HTMLElement>('[data-based-on]');
   if (basedOn) basedOn.hidden = !item.basedOnYourAnswer;
   const agreement = sheet.querySelector<HTMLElement>('[data-agreement]');

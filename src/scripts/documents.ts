@@ -210,7 +210,12 @@ export function wireDocuments(
     // A damaged entry is dropped below like any other.
   }
   session.remove(REVIEW_KEY);
-  const review = isEntries(saved) ? saved : null;
+  // Answers kept before the holiday unit was asked were in calendar days.
+  const review = isEntries(saved)
+    ? saved.some(([name]) => name === 'holidayUnit')
+      ? saved
+      : [...saved, ['holidayUnit', 'calendar'] as const]
+    : null;
 
   const sessionId = new URLSearchParams(arrival.search).get('session_id');
   if (sessionId !== null) history.replaceState(null, '', `${location.pathname}${location.hash}`);

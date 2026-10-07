@@ -58,6 +58,12 @@ export function applyConditions(form: HTMLFormElement) {
     const text = el.dataset[prorating === 'yes' ? 'hintYes' : 'hintNo'];
     if (hint && text) hint.textContent = text;
   }
+  const unit = data.get('holidayUnit') === 'calendar' ? 'hintCalendar' : 'hintWorking';
+  for (const el of form.querySelectorAll<HTMLElement>('[data-hint-working]')) {
+    const hint = el.querySelector('.hint');
+    const text = el.dataset[unit];
+    if (hint && text) hint.textContent = text;
+  }
   for (const checkbox of form.querySelectorAll<HTMLInputElement>('[data-unknown-for]')) {
     const input = form.querySelector<HTMLInputElement>(
       `[name="${checkbox.dataset['unknownFor']}"]`,
@@ -79,4 +85,17 @@ export function prepareFigures(form: HTMLFormElement, today: CivilDate) {
     box.hidden = !ids.has(id);
     input.disabled = !ids.has(id);
   }
+}
+
+// A change of holiday unit carries the yearly days along while they still hold the other unit's
+// default, so a figure the person typed is never rewritten.
+export function followHolidayUnit(form: HTMLFormElement, changed: EventTarget | null) {
+  if (!(changed instanceof HTMLInputElement) || changed.name !== 'holidayUnit') return;
+  const annual = form.querySelector<HTMLInputElement>('[name="annualHolidayDays"]');
+  const other = [...form.querySelectorAll<HTMLInputElement>('[name="holidayUnit"]')].find(
+    (el) => el !== changed,
+  );
+  const from = other?.dataset['defaultDays'];
+  const to = changed.dataset['defaultDays'];
+  if (annual && from && to && annual.value.trim() === from) annual.value = to;
 }

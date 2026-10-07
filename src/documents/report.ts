@@ -3,7 +3,7 @@ import { toIso, type CivilDate } from '../engine/date';
 import type { Range } from '../engine/money';
 import type { BenefitEstimate } from '../engine/unemployment';
 import type { Item } from '../engine/types';
-import { calculationText } from '../calculator/calculation';
+import { calculationText, phraseText } from '../calculator/calculation';
 import { formatDays, formatEuros, formatInteger, formatWholeEuros } from '../calculator/number';
 import type { CompletedReview } from '../calculator/ports';
 import {
@@ -98,6 +98,7 @@ function itemBlocks(r: ItemResult, reference: number | null, tr: Translate): Blo
       value: rangeText(item, tr),
     },
     { type: 'text', text: statusText(r, tr, reference) },
+    ...(item.counted ? [{ type: 'note', text: phraseText(item.counted, tr) } as const] : []),
     ...(item.dependsOnAgreement && item.range !== null
       ? [{ type: 'note', text: tr('client.agreement_may_improve') } as const]
       : []),
@@ -183,11 +184,14 @@ function dataRows({ input: e }: CompletedReview, tr: Translate): Block[] {
         n: formatInteger(e.extraPayCount),
         importe: formatEuros(e.extraPayAmount),
       });
+  const anuales = formatDays(e.annualHolidayDays);
+  const unidad = tr(`client.calculation.holiday_pay.unit.${e.holidayUnit}`);
   const holidays =
     e.holidayDaysTaken === null
-      ? tr('client.documents.report.holidays_unknown', { anuales: formatDays(e.annualHolidayDays) })
+      ? tr('client.documents.report.holidays_unknown', { anuales, unidad })
       : tr('client.documents.report.holidays_text', {
-          anuales: formatDays(e.annualHolidayDays),
+          anuales,
+          unidad,
           disfrutados: formatDays(e.holidayDaysTaken),
         });
   const row = (label: string, value: string): Block => ({ type: 'row', label, value });

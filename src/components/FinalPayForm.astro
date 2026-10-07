@@ -2,6 +2,7 @@
 import Field from './Field.astro';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
+import { MINIMUM_HOLIDAYS } from '../engine/settlement';
 
 interface Props {
   lang: Lang;
@@ -19,6 +20,7 @@ const causes = [
 ] as const;
 const fixedTermTypes = ['production_circumstances', 'replacement', 'training'] as const;
 const accruals = ['annual', 'semiannual', 'unknown'] as const;
+const holidayUnits = ['working', 'calendar'] as const;
 const items = [
   'pending_salary',
   'holiday_pay',
@@ -226,19 +228,47 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
       <h2 class="question" id="question-vacaciones" tabindex="-1">
         {tx('holidays.question')}
       </h2>
+      <fieldset class="group" data-field="holidayUnit">
+        <legend class="visually-hidden">{tx('holidays.unit')}</legend>
+        <div class="chips chips--pair">
+          {holidayUnits.map((value) => (
+            <div class="chip">
+              <input
+                type="radio"
+                name="holidayUnit"
+                id={`holiday-unit-${value}`}
+                value={value}
+                checked={value === 'working'}
+                data-default-days={String(MINIMUM_HOLIDAYS[value])}
+                aria-describedby="hint-annualHolidayDays error-holidayUnit"
+              />
+              <label for={`holiday-unit-${value}`}>{tx(`holidays.unit_${value}`)}</label>
+            </div>
+          ))}
+        </div>
+        <p class="errata" id="error-holidayUnit" data-error-for="holidayUnit" hidden></p>
+      </fieldset>
       <div class="pair">
         <Field
           name="annualHolidayDays"
           label={tx('holidays.annual')}
-          hint={tx('holidays.annual_hint')}
+          hint={tx('holidays.annual_hint_working')}
           kind="days"
-          value="30"
+          value={String(MINIMUM_HOLIDAYS.working)}
+          attributes={{
+            'data-hint-working': tx('holidays.annual_hint_working'),
+            'data-hint-calendar': tx('holidays.annual_hint_calendar'),
+          }}
         />
         <Field
           name="holidayDaysTaken"
           label={tx('holidays.taken')}
-          hint={tx('holidays.taken_hint')}
+          hint={tx('holidays.taken_hint_working')}
           kind="days"
+          attributes={{
+            'data-hint-working': tx('holidays.taken_hint_working'),
+            'data-hint-calendar': tx('holidays.taken_hint_calendar'),
+          }}
         >
           <div class="checkbox">
             <input

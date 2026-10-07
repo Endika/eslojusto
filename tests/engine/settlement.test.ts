@@ -23,6 +23,7 @@ const base: FinalPayInput = {
   extraPayCount: 2,
   extraPayAmount: 1500,
   extraPayAccrual: 'annual',
+  holidayUnit: 'calendar',
   annualHolidayDays: 30,
   holidayDaysTaken: 0,
 };
@@ -76,6 +77,51 @@ describe('holiday pay', () => {
   });
   it('an agreement with 31 days → based on your answer', () => {
     expect(holidayPayItem(withInput({ annualHolidayDays: 31 })).basedOnYourAnswer).toBe(true);
+  });
+});
+
+describe('holiday pay in working days', () => {
+  const working = (o: Partial<FinalPayInput>) => withInput({ holidayUnit: 'working', ...o });
+
+  it('22 working days a year are the 30 calendar days of the law', () => {
+    expect(holidayPayItem(working({ annualHolidayDays: 22 })).range).toEqual(
+      holidayPayItem(base).range,
+    );
+    expect(holidayPayItem(working({ annualHolidayDays: 22 })).basedOnYourAnswer).toBe(false);
+    expect(holidayPayItem(working({ annualHolidayDays: 23 })).basedOnYourAnswer).toBe(true);
+  });
+
+  it('says the unit and turns the days left into calendar days', () => {
+    const p = holidayPayItem(working({ annualHolidayDays: 22, holidayDaysTaken: 10 }));
+    const said = text(p.calculation);
+    expect(said).toContain('22 días laborables al año');
+    expect(said).toContain('días laborables pendientes');
+    expect(said).toContain('22 días laborables equivalen a 30 naturales');
+    expect(text(holidayPayItem(base).calculation)).toContain('30 días naturales al año');
+  });
+
+  it('says how many days it counted as taken, and in which unit', () => {
+    const p = holidayPayItem(working({ annualHolidayDays: 22, holidayDaysTaken: 20 }));
+    expect(p.counted && text([p.counted])).toBe(
+      'Hemos contado 20 días laborables disfrutados de 22 al año.',
+    );
+    expect(holidayPayItem(working({ holidayDaysTaken: null })).counted).toBeUndefined();
+  });
+
+  // Synthetic figures: 22 working days a year and 20 taken by late September. Typed as calendar
+  // days they read as two days short; in working days they are all the days accrued and more.
+  it('20 working days taken by late September are not below the minimum', () => {
+    const scenario = {
+      startDate: f('2021-04-12'),
+      endDate: f('2026-09-26'),
+      monthlySalary: 4300,
+      extraPayProrated: true,
+      holidayDaysTaken: 20,
+    } as const;
+    const asCalendar = holidayPayItem(withInput({ ...scenario, annualHolidayDays: 30 }));
+    expect(compareItem(asCalendar, 0).status).toBe('below_minimum');
+    const asWorking = holidayPayItem(working({ ...scenario, annualHolidayDays: 22 }));
+    expect(compareItem(asWorking, 0).status).not.toBe('below_minimum');
   });
 });
 

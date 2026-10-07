@@ -64,7 +64,7 @@ describe('the PDF writer', () => {
     expect(text).toContain('Revisión de tu finiquito');
     expect(text).toContain('Indemnización');
     expect(text).toContain('40.438,41 €');
-    expect(text).toContain('30 días al año');
+    expect(text).toContain('30 días naturales al año');
   });
 
   it('links each source', async () => {

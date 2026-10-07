@@ -654,6 +654,21 @@ input[type='radio'][aria-invalid='true'] {
   font-weight: 560;
   cursor: pointer;
 }
+/* Two answers that always share a row, side by side like the fields they qualify. */
+.chips--pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 0.75rem;
+}
+.group:has(> .chips--pair) {
+  margin-bottom: 0.75rem;
+}
+.group .chips--pair {
+  margin-top: 0;
+}
+.chips--pair .chip {
+  padding-inline: 0.5rem;
+}
 
 .checkbox {
   position: relative;

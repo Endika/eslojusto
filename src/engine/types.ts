@@ -1,4 +1,4 @@
-import type { Calculation } from './calculation';
+import type { Calculation, Phrase } from './calculation';
 import type { CivilDate } from './date';
 import type { Range } from './money';
 import type { Source } from './sources';
@@ -12,6 +12,8 @@ export type Cause =
 export type FixedTermType = 'production_circumstances' | 'replacement' | 'training';
 
 export type Accrual = 'annual' | 'semiannual' | 'unknown';
+// How the person counts holiday days: Monday to Friday, or every day of the week.
+export type HolidayUnit = 'working' | 'calendar';
 export type ItemId =
   | 'pending_salary'
   | 'holiday_pay'
@@ -43,6 +45,8 @@ export interface FinalPayInput {
   readonly extraPayCount: number;
   readonly extraPayAmount: number;
   readonly extraPayAccrual: Accrual;
+  readonly holidayUnit: HolidayUnit;
+  // Both in `holidayUnit`.
   readonly annualHolidayDays: number;
   readonly holidayDaysTaken: number | null;
   readonly noticeDaysReceived?: number;
@@ -64,4 +68,6 @@ export interface Item {
   readonly zeroReason?: ZeroReason;
   // Set when `range` is null for want of an answer the person gave as «No lo sé», not the agreement.
   readonly missingAnswer?: 'days_taken';
+  // What the item took from the person's answers, said in the result so a slip shows.
+  readonly counted?: Phrase;
 }

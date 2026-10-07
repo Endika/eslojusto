@@ -14,6 +14,7 @@ const base: FinalPayInput = {
   extraPayCount: 0,
   extraPayAmount: 0,
   extraPayAccrual: 'unknown',
+  holidayUnit: 'calendar',
   annualHolidayDays: 30,
   holidayDaysTaken: 10,
 };
@@ -30,6 +31,26 @@ describe('reviewFinalPay', () => {
     const p = review(base, { severance: 40000 }).items.find((x) => x.item.id === 'severance');
     expect(p?.status).toBe('below_minimum');
     expect(p?.difference).toBe(7178.08);
+  });
+
+  it('holiday days are bounded per unit: 60 calendar, 44 working', () => {
+    const errors = (o: Partial<FinalPayInput>) => {
+      const r = reviewFinalPay(withInput(o), {}, TODAY);
+      return r.ok ? [] : r.errors;
+    };
+    expect(errors({ annualHolidayDays: 45, holidayDaysTaken: 45 })).toEqual([]);
+    expect(errors({ holidayUnit: 'working', annualHolidayDays: 44, holidayDaysTaken: 44 })).toEqual(
+      [],
+    );
+    expect(errors({ holidayUnit: 'working', annualHolidayDays: 45, holidayDaysTaken: 45 })).toEqual(
+      [
+        { field: 'annualHolidayDays', code: 'annual_working_holidays_out_of_range' },
+        { field: 'holidayDaysTaken', code: 'working_holidays_taken_out_of_range' },
+      ],
+    );
+    expect(errors({ annualHolidayDays: 61 })).toEqual([
+      { field: 'annualHolidayDays', code: 'annual_holidays_out_of_range' },
+    ]);
   });
 
   it('(b) end before start → error on endDate', () => {

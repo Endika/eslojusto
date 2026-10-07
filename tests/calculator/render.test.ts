@@ -24,6 +24,7 @@ const resignation: FinalPayInput = {
   extraPayCount: 2,
   extraPayAmount: 0,
   extraPayAccrual: 'unknown',
+  holidayUnit: 'calendar',
   annualHolidayDays: 30,
   holidayDaysTaken: 0,
 };
@@ -89,6 +90,7 @@ function container(): HTMLElement {
         <p><svg data-mark><use></use></svg><span data-status-text></span></p>
         <p data-citation hidden></p>
         <dl data-figures><dt data-range-label></dt><dd data-range></dd><dd data-employer></dd></dl>
+        <p data-counted hidden></p>
         <p data-based-on hidden></p>
         <p data-agreement hidden>agreement</p>
         <p data-reference hidden></p>
@@ -103,6 +105,21 @@ function container(): HTMLElement {
 }
 
 describe('renderReview', () => {
+  it('the holiday item says the days it counted as taken and their unit', () => {
+    const c = container();
+    renderReview(
+      c,
+      review({ holidayUnit: 'working', annualHolidayDays: 22, holidayDaysTaken: 20 }),
+      trV,
+    );
+    const counted = c.querySelector<HTMLElement>('[data-item="holiday_pay"] [data-counted]');
+    expect(counted?.hidden).toBe(false);
+    expect(counted?.textContent).toBe('Hemos contado 20 días laborables disfrutados de 22 al año.');
+    expect(c.querySelector<HTMLElement>('[data-item="severance"] [data-counted]')?.hidden).toBe(
+      true,
+    );
+  });
+
   it('each source shows the date it came into force', () => {
     const c = container();
     renderReview(c, review({}), trV);
@@ -171,7 +188,8 @@ describe('readForm: «No lo sé» for the holiday days taken', () => {
       <input name="cause" value="resignation">
       <input name="startDate" value="2022-01-10"><input name="endDate" value="2026-09-15">
       <input name="extraPayProrated" value="yes"><input name="monthlySalary" value="1850">
-      <input name="extraPayCount" value="2"><input name="annualHolidayDays" value="30">
+      <input name="extraPayCount" value="2"><input name="holidayUnit" value="calendar">
+      <input name="annualHolidayDays" value="30">
       <input name="holidayDaysTaken" value="" ${unknown ? 'disabled' : ''}>
       ${unknown ? '<input name="holidayDaysTakenUnknown" value="yes">' : ''}`;
     return form;
@@ -380,7 +398,8 @@ describe('the benefit sheets', () => {
       <input name="cause" value="objective_dismissal">
       <input name="startDate" value="2026-01-01"><input name="endDate" value="2026-08-31">
       <input name="extraPayProrated" value="yes"><input name="monthlySalary" value="2000">
-      <input name="extraPayCount" value="2"><input name="annualHolidayDays" value="30">
+      <input name="extraPayCount" value="2"><input name="holidayUnit" value="calendar">
+      <input name="annualHolidayDays" value="30">
       <input name="holidayDaysTaken" value="0">
       <ol>
         <li data-other-contract="0">

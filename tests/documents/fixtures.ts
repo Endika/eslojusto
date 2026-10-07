@@ -18,6 +18,7 @@ export const unfairDismissal: FinalPayInput = {
   extraPayCount: 2,
   extraPayAmount: 0,
   extraPayAccrual: 'unknown',
+  holidayUnit: 'calendar',
   annualHolidayDays: 30,
   holidayDaysTaken: 0,
 };

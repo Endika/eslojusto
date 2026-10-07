@@ -20,7 +20,7 @@ test('unfair dismissal with a short severance → below the minimum, with the di
   await expect(page.getByText('con la parte de pagas extra incluida')).toBeVisible();
   await page.getByLabel('Salario bruto mensual').fill('2142,86');
   await next();
-  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await page.getByLabel('Ninguno').check();
   await next();
@@ -121,7 +121,7 @@ test('a figure with a decimal comma and thousands dots reads in Spanish format',
   await next();
   await page.getByLabel('Salario bruto mensual').fill('1.850,00');
   await next();
-  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await page.getByLabel('Descuento por no preavisar').fill('1,234.56');
   await page.getByRole('button', { name: 'Revisar' }).click();
@@ -229,7 +229,7 @@ test('fixed-term end: every sheet fits in 360×640, the conditional ones too', a
   await fitsAboveBar(page);
   await next();
   await page.getByRole('checkbox', { name: 'No lo sé' }).check();
-  await expect(page.getByLabel('Días naturales disfrutados')).toBeDisabled();
+  await expect(page.getByLabel('Disfrutados este año')).toBeDisabled();
   await fitsAboveBar(page);
   await next();
   await page.getByLabel('Ninguno').check();
@@ -261,7 +261,7 @@ test('whoever is paid exactly the legal minimum sees «Coincide» on every item'
   await next();
   await page.getByLabel('Importe de cada paga').fill('1.500,00');
   await next();
-  await page.getByLabel('Días naturales disfrutados').fill('7');
+  await page.getByLabel('Disfrutados este año').fill('7');
   await page.getByLabel('Días de preaviso que te dio la empresa').fill('5');
   await next();
   await page.getByLabel('Prefiero no decirlo').check();
@@ -313,7 +313,7 @@ test('with prorated extra pay, the salary carries the share and the severance co
   // 1,500 € base plus two 1,500 € payments spread over twelve payslips: 1,750 € a month.
   await page.getByLabel('Salario bruto mensual').fill('1.750,00');
   await next();
-  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await page.getByLabel('Ninguno').check();
   await next();
@@ -321,4 +321,40 @@ test('with prorated extra pay, the salary carries the share and the severance co
   await page.getByRole('button', { name: 'Revisar' }).click();
   // The CGPJ guide's own example: 21,000 € × 272.25 / 365.
   await expect(page.locator('[data-item="severance"] [data-range]')).toContainText('15.663,70');
+});
+
+test('holidays count in working days by default; the yearly figure follows the unit', async ({
+  page,
+}) => {
+  await page.goto('finiquito/');
+  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  await page.getByLabel('Despido improcedente').check();
+  await next();
+  await page.getByLabel('Fecha de alta', { exact: true }).fill('2021-04-12');
+  await page.getByLabel('Fecha de baja', { exact: true }).fill('2026-09-26');
+  await next();
+  await page
+    .getByRole('group', { name: '¿Tus pagas extra van prorrateadas en la nómina?' })
+    .getByLabel('Sí')
+    .check();
+  await next();
+  await page.getByLabel('Salario bruto mensual').fill('4.300,00');
+  await next();
+  await expect(page.getByLabel('Laborables', { exact: true })).toBeChecked();
+  await expect(page.getByLabel('Vacaciones al año')).toHaveValue('22');
+  await page.getByLabel('Naturales', { exact: true }).check();
+  await expect(page.getByLabel('Vacaciones al año')).toHaveValue('30');
+  await expect(page.getByText('7 por semana.')).toBeVisible();
+  await page.getByLabel('Laborables', { exact: true }).check();
+  await expect(page.getByLabel('Vacaciones al año')).toHaveValue('22');
+  await page.getByLabel('Disfrutados este año').fill('20');
+  await next();
+  await page.getByLabel('Ninguno').check();
+  await next();
+  await next();
+  await page.getByLabel('Vacaciones no disfrutadas').fill('0');
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  const card = page.locator('[data-item="holiday_pay"]');
+  await expect(card).toContainText('Hemos contado 20 días laborables disfrutados de 22 al año.');
+  await expect(card).not.toContainText('Por debajo del mínimo legal');
 });

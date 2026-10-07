@@ -165,7 +165,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
   await next();
   await page.getByLabel('Salario bruto mensual').fill('1.500');
   await next();
-  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await page.getByLabel('1', { exact: true }).check();
   await next();
@@ -208,6 +208,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
     cause: 'unfair_dismissal',
     fixed_term_type: 'not_applicable',
     extra_pay: 'prorated',
+    holiday_unit: 'working',
     figures_entered: 1,
     result: expect.stringMatching(/^(shortfall|all_match)$/),
     attempt: '1',
@@ -225,6 +226,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
       'cause',
       'fixed_term_type',
       'extra_pay',
+      'holiday_unit',
       'figures_entered',
       'below_minimum',
       'matching',
@@ -379,7 +381,7 @@ test('a repeated review counts the attempt and names only what changed', async (
   await next();
   await page.getByLabel('Salario bruto mensual').fill('1.500');
   await next();
-  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await page.getByRole('button', { name: 'Revisar' }).click();
   await page.getByRole('link', { name: /Salario/ }).click();

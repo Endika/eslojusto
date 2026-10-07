@@ -115,6 +115,7 @@ function generate(g: ReturnType<typeof prng>): FinalPayInput {
     extraPayCount,
     extraPayAmount: prorated || extraPayCount === 0 ? 0 : g.int(50000, 600000) / 100,
     extraPayAccrual: g.pick(['annual', 'semiannual', 'unknown'] as const),
+    holidayUnit: 'calendar',
     annualHolidayDays: g.int(22, 35),
     holidayDaysTaken: g.r() < 0.1 ? null : g.int(0, 30),
     ...(g.r() < 0.7 ? { noticeDaysReceived: g.int(0, 30) } : {}),
@@ -310,4 +311,61 @@ describe('property: never a made-up finding (500 seeded inputs)', () => {
       }
     }
   });
+});
+
+// The same holidays told in working days: 22 for every 30 calendar ones.
+const inWorkingDays = (e: FinalPayInput): FinalPayInput => ({
+  ...e,
+  holidayUnit: 'working',
+  annualHolidayDays: (e.annualHolidayDays * 22) / 30,
+  holidayDaysTaken: e.holidayDaysTaken === null ? null : (e.holidayDaysTaken * 22) / 30,
+});
+const holidayItem = (e: FinalPayInput, c: EmployerFigures = {}) => {
+  const p = review(e, c).items.find((x) => x.item.id === 'holiday_pay');
+  if (!p) throw new Error('no holiday item');
+  return p;
+};
+
+describe('property: the holiday unit never changes the result (500 seeded inputs)', () => {
+  const cases = inputs();
+
+  it('the same holidays in working days give the same range and status, to the cent', () => {
+    for (const { e, g } of cases) {
+      const figure = round2(g.int(0, 400000) / 100);
+      const calendar = holidayItem(e, { holiday_pay: figure });
+      const working = holidayItem(inWorkingDays(e), { holiday_pay: figure });
+      const testCase = JSON.stringify([calendar.item.range, working.item.range, figure, e]);
+      expect(working.item.range === null, testCase).toBe(calendar.item.range === null);
+      if (calendar.item.range && working.item.range) {
+        expect(Math.abs(working.item.range.min - calendar.item.range.min), testCase).toBeLessThan(
+          0.011,
+        );
+        expect(Math.abs(working.item.range.max - calendar.item.range.max), testCase).toBeLessThan(
+          0.011,
+        );
+      }
+      // A figure right on a rounding edge may land on either side of the 1 € tolerance.
+      const edge =
+        calendar.item.range !== null &&
+        [calendar.item.range.min - 1, calendar.item.range.max + 1].some(
+          (x) => Math.abs(x - figure) <= 0.011,
+        );
+      if (!edge) expect(working.status, testCase).toBe(calendar.status);
+    }
+  });
+
+  it.each(['working', 'calendar'] as const)(
+    'in %s days, every accrued day taken leaves nothing owed',
+    (unit) => {
+      for (const { e } of cases) {
+        const days = unit === 'working' ? inWorkingDays(e) : e;
+        const accrued = Math.max(
+          ...METHODS.map((m) => pendingHolidays({ ...days, holidayDaysTaken: 0 }, m) ?? 0),
+        );
+        const p = holidayItem({ ...days, holidayDaysTaken: accrued });
+        // Null when the float sum lands a hair past what was accrued.
+        expect(p.item.range?.max ?? 0, JSON.stringify([accrued, days])).toBe(0);
+      }
+    },
+  );
 });

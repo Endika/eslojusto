@@ -74,6 +74,7 @@ describe('client strings', () => {
       extraPayCount: 9,
       extraPayAmount: -1,
       extraPayAccrual: 'unknown',
+      holidayUnit: 'calendar',
       annualHolidayDays: 99,
       holidayDaysTaken: -1,
       noticeDaysReceived: 200,
@@ -93,6 +94,7 @@ describe('client strings', () => {
       extraPayCount: 2,
       extraPayAmount: 0,
       extraPayAccrual: 'unknown',
+      holidayUnit: 'calendar',
       annualHolidayDays: 30,
       holidayDaysTaken: 0,
     };
@@ -116,6 +118,7 @@ describe('client strings', () => {
         extraPayCount: 2,
         extraPayAmount: 0,
         extraPayAccrual: 'unknown',
+        holidayUnit: 'calendar',
         annualHolidayDays: 30,
         holidayDaysTaken: 0,
       },

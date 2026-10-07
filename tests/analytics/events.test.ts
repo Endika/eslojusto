@@ -36,6 +36,7 @@ const input: FinalPayInput = {
   extraPayCount: 2,
   extraPayAmount: 1500,
   extraPayAccrual: 'semiannual',
+  holidayUnit: 'calendar',
   annualHolidayDays: 30,
   holidayDaysTaken: 10,
 };
@@ -392,6 +393,7 @@ describe('review_completed', () => {
       cause: 'fixed_term_end',
       fixed_term_type: 'production_circumstances',
       extra_pay: 'semiannual',
+      holiday_unit: 'calendar',
       figures_entered: 5,
       below_minimum: 2,
       matching: 1,

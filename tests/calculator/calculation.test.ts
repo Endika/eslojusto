@@ -58,6 +58,7 @@ describe('calculation text', () => {
       extraPayCount: 1,
       extraPayAmount: 2000,
       extraPayAccrual: 'unknown',
+      holidayUnit: 'calendar',
       annualHolidayDays: 30,
       holidayDaysTaken: 3,
       agreementNoticeDays: 15,
