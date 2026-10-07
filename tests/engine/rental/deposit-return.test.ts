@@ -190,13 +190,23 @@ describe('late-payment interest (LAU art. 36.4)', () => {
     expect(bothBases(interest)).toEqual({ reasons: ['interest_day_count'], low: 9.53, high: 9.66 });
   });
 
-  it('a balance still within its month accrues nothing yet', () => {
+  it('a balance still within its month is not due yet and accrues nothing', () => {
     const { returned, interest } = check(1000, {
       keysReturnedOn: f('2026-09-20'),
       returns: [],
       deductions: [],
     });
-    expect(singleOf(returned)).toEqual({ status: 'owed', amount: 1000 });
+    expect(singleOf(returned)).toEqual({ status: 'not_yet_due', amount: null });
+    expect(returned.outcome.kind === 'single' && returned.outcome.value.calculation.at(-1)).toEqual(
+      { key: 'deposit.not_yet_due', vars: { due: { date: '2026-10-20' } } },
+    );
+    // On the day the month runs out, it is owed.
+    const late = check(
+      1000,
+      { keysReturnedOn: f('2026-09-20'), returns: [], deductions: [] },
+      f('2026-10-20'),
+    );
+    expect(singleOf(late.returned)).toEqual({ status: 'owed', amount: 1000 });
     expect(singleOf(interest)).toEqual({ status: 'within_limit', amount: null });
   });
 

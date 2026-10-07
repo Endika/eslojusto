@@ -36,7 +36,7 @@ const pendingOf = (deposit: number | null, out: MoveOut): number | null =>
 
 // The deposit less what came back and what was kept. What was kept is listed as the landlord
 // gave it: whether damage justifies it is not something this review can weigh.
-function returnReading(deposit: number | null, out: MoveOut): ItemReading {
+function returnReading(deposit: number | null, out: MoveOut, today: CivilDate): ItemReading {
   const rules: RuleId[] = ['deposit_interest'];
   const pending = pendingOf(deposit, out);
   if (deposit === null || pending === null) return notEntered(rules);
@@ -50,6 +50,15 @@ function returnReading(deposit: number | null, out: MoveOut): ItemReading {
     ...out.deductions.map((d) => p(`deposit.deduction.${d.kind}`, { amount: { euros: d.amount } })),
   ];
   if (out.deductions.length > 0) phrases.push(p('deposit.deductions_not_judged'));
+  // Within the month after the keys the balance is not due yet: no figure, no total.
+  const due = addMonthsClamped(out.keysReturnedOn, 1);
+  if (pending > TOLERANCE && compareDates(today, due) < 0)
+    return itemReading(
+      'not_yet_due',
+      null,
+      [...phrases, p('deposit.not_yet_due', { due: { date: toIso(due) } })],
+      rules,
+    );
   if (pending > TOLERANCE)
     return itemReading(
       'owed',
@@ -168,7 +177,7 @@ export function checkDepositReturn(
   const out = input.moveOut;
   if (out === null) return [];
   return [
-    itemResult('deposit_return', {}, single(returnReading(input.deposit, out)), deps.norms),
+    itemResult('deposit_return', {}, single(returnReading(input.deposit, out, today)), deps.norms),
     itemResult(
       'deposit_interest',
       {},

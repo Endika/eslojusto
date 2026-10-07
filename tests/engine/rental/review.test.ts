@@ -125,6 +125,18 @@ describe('a contract end to end', () => {
   });
 });
 
+describe("a deposit within the landlord's month", () => {
+  it('stays out of the totals and the pass', () => {
+    const r = review(
+      contract({ moveOut: { keysReturnedOn: f('2026-10-01'), returns: [], deductions: [] } }),
+    );
+    const item = r.items.find((i) => i.kind === 'deposit_return');
+    expect(item?.outcome).toMatchObject({ kind: 'single', value: { status: 'not_yet_due' } });
+    expect(r.totals.owed).toEqual({ counted: 0, upTo: 0 });
+    expect(r.offerPass).toBe(false);
+  });
+});
+
 describe('rent updates', () => {
   it('come in as items and add to the totals', () => {
     // IPC April 2021 2,2 % (out 14-05-2021): 800 × 1,022 = 817,60; 12,40 a month over for the
