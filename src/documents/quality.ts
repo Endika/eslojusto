@@ -2,7 +2,9 @@
 // sent. They only ever warn: the person can always send the photo as it is.
 
 // The long side of the grey copy the signals are measured on: enough for text to stay edges,
-// small enough to measure in a few milliseconds on a phone.
+// and about 2 ms a photo on a desktop. At 256 px it took a quarter of that, but a page blurred
+// past reading scored about 200, above where a soft but legible one sits at 512 px, and telling
+// the two apart would rest on retuning MIN_SHARPNESS against one synthetic pattern.
 export const ANALYSIS_LONG_SIDE = 512;
 
 // Mean luma, 0 to 255, below which a page reads as dark: white paper photographed in fair light
@@ -27,42 +29,49 @@ export interface QualitySignals {
   readonly longSide: number;
 }
 
-// Rec. 601 luma, the weights JPEG uses.
-const luma = (rgba: ArrayLike<number>, i: number): number =>
-  0.299 * (rgba[i] ?? 0) + 0.587 * (rgba[i + 1] ?? 0) + 0.114 * (rgba[i + 2] ?? 0);
-
-// Mean brightness and the variance of the 4-neighbour Laplacian of an RGBA image, as a canvas's
-// getImageData gives it.
+// Mean brightness (Rec. 601 luma, the weights JPEG uses) and the variance of the 4-neighbour
+// Laplacian of an RGBA image, as a canvas's getImageData gives it. Plain indexed loops over typed
+// arrays: this runs once per photo on a phone's main thread.
 export function measureQuality(
-  rgba: ArrayLike<number>,
+  rgba: Uint8ClampedArray,
   width: number,
   height: number,
   longSide: number,
 ): QualitySignals {
-  const grey = new Float32Array(width * height);
+  const size = width * height;
+  const grey = new Float32Array(size);
   let sum = 0;
-  for (let i = 0; i < grey.length; i += 1) {
-    const y = luma(rgba, i * 4);
+  for (let i = 0, j = 0; i < size; i += 1, j += 4) {
+    const y =
+      0.299 * (rgba[j] as number) +
+      0.587 * (rgba[j + 1] as number) +
+      0.114 * (rgba[j + 2] as number);
     grey[i] = y;
     sum += y;
   }
+  // Laplacians are at most 1,020 in size and there are fewer than a million of them, so plain
+  // sums in doubles lose nothing that matters.
   let n = 0;
-  let mean = 0;
+  let total = 0;
   let squares = 0;
-  for (let y = 1; y < height - 1; y += 1)
-    for (let x = 1; x < width - 1; x += 1) {
-      const i = y * width + x;
-      const at = (j: number) => grey[j] ?? 0;
-      const l = at(i - 1) + at(i + 1) + at(i - width) + at(i + width) - 4 * at(i);
-      // Welford's running variance: no second pass, no precision lost on large sums.
+  for (let y = 1; y < height - 1; y += 1) {
+    const row = y * width;
+    for (let i = row + 1; i < row + width - 1; i += 1) {
+      const l =
+        (grey[i - 1] as number) +
+        (grey[i + 1] as number) +
+        (grey[i - width] as number) +
+        (grey[i + width] as number) -
+        4 * (grey[i] as number);
+      total += l;
+      squares += l * l;
       n += 1;
-      const delta = l - mean;
-      mean += delta / n;
-      squares += delta * (l - mean);
     }
+  }
+  const mean = n > 0 ? total / n : 0;
   return {
-    brightness: grey.length > 0 ? sum / grey.length : 0,
-    sharpness: n > 0 ? squares / n : 0,
+    brightness: size > 0 ? sum / size : 0,
+    sharpness: n > 0 ? squares / n - mean * mean : 0,
     longSide,
   };
 }

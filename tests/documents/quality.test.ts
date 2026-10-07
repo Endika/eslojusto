@@ -95,6 +95,18 @@ describe('photo quality', () => {
     expect(measureQuality(red, WIDTH, HEIGHT, 1568).brightness).toBeCloseTo(76.245, 2);
   });
 
+  // The measure runs on the main thread once per photo, up to 15 in a pack. About 2 ms here.
+  it('measures a photo at the analysis size in well under 15 ms', () => {
+    const data = rgba(page());
+    for (let i = 0; i < 3; i += 1) measureQuality(data, WIDTH, HEIGHT, 1568);
+    const runs = 20;
+    const started = performance.now();
+    for (let i = 0; i < runs; i += 1) measureQuality(data, WIDTH, HEIGHT, 1568);
+    const perPhoto = (performance.now() - started) / runs;
+    console.info(`measureQuality: ${perPhoto.toFixed(2)} ms per ${WIDTH}×${HEIGHT} photo`);
+    expect(perPhoto).toBeLessThan(15);
+  });
+
   it('survives an image too small to have an inside', () => {
     expect(measureQuality(new Uint8ClampedArray(4), 1, 1, 1)).toEqual({
       brightness: 0,
