@@ -24,11 +24,6 @@ export type InputError = {
 const MAX_SALARY = 1_000_000;
 const MAX_DAYS_AHEAD = 365;
 
-export function localToday(): CivilDate {
-  const now = new Date();
-  return { y: now.getFullYear(), m: now.getMonth() + 1, d: now.getDate() };
-}
-
 const isValidDate = (f: CivilDate): boolean =>
   Number.isInteger(f.y) &&
   Number.isInteger(f.m) &&
@@ -41,7 +36,7 @@ const isValidDate = (f: CivilDate): boolean =>
 const isIntInRange = (n: number, min: number, max: number): boolean =>
   Number.isInteger(n) && n >= min && n <= max;
 
-export function validate(e: FinalPayInput, today: CivilDate = localToday()): readonly InputError[] {
+export function validate(e: FinalPayInput, today: CivilDate): readonly InputError[] {
   const errors: InputError[] = [];
   const err = (field: keyof FinalPayInput, code: InputErrorCode, message: string) =>
     errors.push({ field, code, message });

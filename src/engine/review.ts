@@ -65,7 +65,7 @@ function severanceItem(e: FinalPayInput): Item {
 export function reviewFinalPay(
   e: FinalPayInput,
   figures: EmployerFigures,
-  today?: CivilDate,
+  today: CivilDate,
 ): { ok: true; review: Review } | { ok: false; errors: readonly InputError[] } {
   const errors = validate(e, today);
   if (errors.length > 0) return { ok: false, errors };
