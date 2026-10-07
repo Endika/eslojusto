@@ -1,0 +1,105 @@
+---
+import Base from '../layouts/Base.astro';
+import FinalPayForm from '../components/FinalPayForm.astro';
+import FinalPayResult from '../components/FinalPayResult.astro';
+import DocumentStart from '../components/DocumentStart.astro';
+import { DOCUMENTS } from '../documents/config';
+import type { Cause } from '../engine/types';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+
+// The calculator with its tabs, its result and the reading of documents, as one page. Each page
+// that embeds it brings its own heading and lead (and, under the `head` slot, anything above the
+// heading), the text that follows it, and loads the composition root.
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  path: string;
+  langs?: readonly Lang[];
+  structuredData: readonly object[];
+  h1: string;
+  lead: string;
+  // The cause this page is about, already marked; the visit opens past its sheet.
+  cause?: Cause | undefined;
+  // The benefit estimate first in the result, on a page about the benefit.
+  benefitFirst?: boolean;
+}
+const {
+  lang,
+  title,
+  description,
+  path,
+  langs,
+  structuredData,
+  h1,
+  lead,
+  cause,
+  benefitFirst = false,
+} = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+// Each tab's share of the rail follows how many sheets its section holds (the result counts two).
+// The second column is the section's first step, whose id is its URL fragment.
+const sections = [
+  ['cause', 'causa', '01', 2],
+  ['dates', 'fechas', '02', 1],
+  ['salary', 'salario', '03', 3],
+  ['holidays', 'vacaciones', '04', 4],
+  ['settlement', 'finiquito', '05', 1],
+  ['result', 'resultado', '06', 2],
+] as const;
+// With the documents API the visit opens on the choice between uploading and typing; the tabs and
+// the form wait until it is made.
+const documents = DOCUMENTS !== null;
+---
+
+<Base
+  title={title}
+  description={description}
+  path={path}
+  lang={lang}
+  {...(langs ? { langs } : {})}
+  section="cause"
+  structuredData={structuredData}
+  calculator
+>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
+    <ol>
+      {/* Only a section already reached is a link; one still ahead is plain text until then. */}
+      {sections.map(([id, step, number, weight], i) => (
+        <li style={`--weight: ${weight}`} data-tone={id}>
+          {i === 0 ? (
+            <a class="tab" data-tab={id} data-state="current" href={`#${step}`} aria-current="step">
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`section.${id}`)}</span>
+            </a>
+          ) : (
+            <span class="tab" data-tab={id} data-state="pending" aria-disabled="true">
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`section.${id}`)}</span>
+            </span>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+  <main id="content">
+    <div class="desk">
+      <header class="desk__head">
+        <slot name="head" />
+        <h1 class="desk__title">{h1}</h1>
+        <p class="desk__lead">{lead}</p>
+      </header>
+      <noscript>
+        <div class="sheet sheet--notice">
+          <p class="help">{tx('final_pay.no_js')}</p>
+        </div>
+      </noscript>
+      {documents && <DocumentStart lang={lang} />}
+      <FinalPayForm lang={lang} hidden={documents} cause={cause} />
+      <FinalPayResult lang={lang} documents={documents} benefitFirst={benefitFirst} />
+    </div>
+    <slot />
+  </main>
+</Base>

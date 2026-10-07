@@ -29,6 +29,8 @@ interface Props {
   structuredData?: object | readonly object[];
   // A page that must never be indexed, such as the 404.
   noindex?: boolean;
+  // A page with the calculator talks to the documents API, when the build has one.
+  calculator?: boolean;
 }
 const {
   title,
@@ -39,6 +41,7 @@ const {
   section = 'cause',
   structuredData,
   noindex = false,
+  calculator = false,
 } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const root = base.replace(/\/$/, '');
@@ -69,7 +72,7 @@ const csp = contentSecurityPolicy({
   themeHash,
   analytics: Boolean(import.meta.env.PUBLIC_POSTHOG_KEY),
   // Only the calculator talks to the documents API and Turnstile; every other page stays closed.
-  documents: path === '/finiquito/' ? (DOCUMENTS?.origins ?? null) : null,
+  documents: calculator ? (DOCUMENTS?.origins ?? null) : null,
 });
 // This page in the other published languages, for the bar that offers the browser's language.
 // Only Spanish is published today, so the list is empty and the bar never shows.
