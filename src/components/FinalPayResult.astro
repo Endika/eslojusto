@@ -1,11 +1,13 @@
 ---
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
+import PassOffer from './PassOffer.astro';
 
 interface Props {
   lang: Lang;
+  documents?: boolean;
 }
-const { lang } = Astro.props;
+const { lang, documents = false } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 const workHistoryUrl =
   'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
@@ -55,6 +57,7 @@ const workHistoryUrl =
 
   <div class="review" data-review>
     <div class="review__items" data-items></div>
+    {documents && <PassOffer lang={lang} />}
 
     <section class="item benefit" data-benefit data-tone="holidays" aria-labelledby="benefit-title">
       <span class="item__tab" aria-hidden="true">
