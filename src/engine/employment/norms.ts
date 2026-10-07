@@ -13,7 +13,8 @@ export type EmploymentNormId =
   | 'rd145_2024'
   | 'rd87_2025'
   | 'rd126_2026'
-  | 'rd723_2026';
+  | 'rd723_2026'
+  | 'rd1561_1995';
 
 export type Norm = LawNorm<EmploymentNormId>;
 

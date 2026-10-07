@@ -58,6 +58,7 @@ export type EmploymentRuleId =
   | 'overtime_voluntary'
   | 'overtime_value'
   | 'time_record'
+  | 'special_working_time'
   | 'part_time_contents'
   | 'part_time_no_overtime'
   | 'complementary_hours'
@@ -223,6 +224,15 @@ export const RULES: Readonly<Record<EmploymentRuleId, Rule>> = {
     'Estatuto de los Trabajadores, art. 34.9',
     `${ET}#a34`,
     '2019-05-12',
+  ),
+  // RD 1561/1995, arts. 19 and 32 and chapter II: some activities, shift changes and night work
+  // may shorten the rest between days, split the weekly rest or average night hours over longer.
+  special_working_time: rule(
+    'special_working_time',
+    'rd1561_1995',
+    'arts. 19 y 32',
+    'https://www.boe.es/buscar/act.php?id=BOE-A-1995-21346#a19',
+    '1995-09-27',
   ),
   // 12.4.a: the contract states the hours and their distribution.
   part_time_contents: et('part_time_contents', '12.4.a', 'a12'),

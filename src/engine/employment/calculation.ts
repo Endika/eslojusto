@@ -55,7 +55,20 @@ export type EmploymentPhraseKey =
   | ModalityPhraseKey
   | ChainingPhraseKey
   | 'clause.partial_nullity'
-  | TrialPhraseKey;
+  | TrialPhraseKey
+  | WorkingTimePhraseKey;
+
+export interface EmploymentPhrase {
+  readonly key: EmploymentPhraseKey;
+  readonly vars?: Readonly<Record<string, Figure | EmploymentPhrase>>;
+}
+
+export type EmploymentCalculation = readonly EmploymentPhrase[];
+
+export const phrase = (
+  key: EmploymentPhraseKey,
+  vars?: EmploymentPhrase['vars'],
+): EmploymentPhrase => (vars === undefined ? { key } : { key, vars });
 
 // Art. 15.4 and 15.5 ET are quoted, never asserted: «permanent_on_breach» and
 // «chaining.permanent» say the article states that, in a case like this one, the person acquires
@@ -129,14 +142,20 @@ type TrialPhraseKey =
   | 'trial.void_same_duties'
   | 'trial.not_in_writing';
 
-export interface EmploymentPhrase {
-  readonly key: EmploymentPhraseKey;
-  readonly vars?: Readonly<Record<string, Figure | EmploymentPhrase>>;
-}
-
-export type EmploymentCalculation = readonly EmploymentPhrase[];
-
-export const phrase = (
-  key: EmploymentPhraseKey,
-  vars?: EmploymentPhrase['vars'],
-): EmploymentPhrase => (vars === undefined ? { key } : { key, vars });
+type WorkingTimePhraseKey =
+  | 'working_time.weekly_hours_agreed'
+  | 'working_time.weekly_hours_scheduled'
+  | 'working_time.irregular_distribution'
+  | 'working_time.longest_day'
+  | 'working_time.shortest_rest'
+  | 'working_time.longest_rest'
+  | 'working_time.special_regimes'
+  | 'working_time.longest_stretch'
+  | 'working_time.night_hours_in_schedule'
+  | 'working_time.night_average'
+  | 'working_time.night_overtime'
+  | 'working_time.overtime_not_allowed'
+  | 'working_time.overtime_as_needed'
+  | 'working_time.overtime_hours'
+  | 'working_time.time_record'
+  | 'part_time.monthly_summary';
