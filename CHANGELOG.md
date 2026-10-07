@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/Endika/eslojusto/compare/v1.2.0...v1.3.0) (2026-10-07)
+
+
+### Features
+
+* **documents:** accept files dropped on the upload zone ([51dc790](https://github.com/Endika/eslojusto/commit/51dc79012eb55c681068805b32610ef113349606))
+
 ## [1.2.0](https://github.com/Endika/eslojusto/compare/v1.1.2...v1.2.0) (2026-10-07)
 
 
