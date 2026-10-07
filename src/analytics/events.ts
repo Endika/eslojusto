@@ -174,6 +174,8 @@ const BASE_CATALOGUE = {
     seconds: oneOf(REVIEW_SECONDS),
     benefit: oneOf(BENEFIT_STATES),
     other_contracts: oneOf(OTHER_CONTRACT_BUCKETS),
+    // Whether the result showed what an unfair dismissal would pay, never the figure.
+    unfair_reference: oneOf(['shown', 'none']),
   },
   detail_opened: { item: oneOf(ITEM_IDS) },
   started_over: {},
@@ -330,5 +332,6 @@ export function reviewProps(data: {
     seconds: reviewSecondsBucket(data.seconds),
     benefit: benefitState(data.benefit),
     other_contracts: otherContractsBucket(data.otherContracts),
+    unfair_reference: review.unfairReference === null ? 'none' : 'shown',
   };
 }

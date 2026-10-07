@@ -9,6 +9,7 @@ import type { CompletedReview } from '../calculator/ports';
 import {
   durationKey,
   qualifyingText,
+  referenceKey,
   sourceDate,
   statusText,
   withHolidayNote,
@@ -74,6 +75,13 @@ function sources(list: Item['sources'], tr: Translate): Block[] {
   }));
 }
 
+function referenceNote(r: ItemResult, reference: number | null, tr: Translate): Block[] {
+  const key = referenceKey(r, reference);
+  return key === null || reference === null
+    ? []
+    : [{ type: 'note', text: tr(key, { importe: formatEuros(reference) }) }];
+}
+
 function itemBlocks(r: ItemResult, reference: number | null, tr: Translate): Block[] {
   const { item } = r;
   const deduction = item.direction === 'deduction';
@@ -93,14 +101,7 @@ function itemBlocks(r: ItemResult, reference: number | null, tr: Translate): Blo
     ...(item.dependsOnAgreement && item.range !== null
       ? [{ type: 'note', text: tr('client.agreement_may_improve') } as const]
       : []),
-    ...(item.id === 'severance' && reference !== null && r.employerFigure !== null
-      ? [
-          {
-            type: 'note',
-            text: tr('client.unfair_reference', { importe: formatEuros(reference) }),
-          } as const,
-        ]
-      : []),
+    ...referenceNote(r, reference, tr),
     {
       type: 'note',
       text: `${tr('client.documents.report.how')}: ${calculationText(item.calculation, tr)}`,

@@ -398,6 +398,8 @@ export const es = {
   'client.source.in_force': 'en vigor desde {fecha}',
   'client.unfair_reference':
     'Si un juzgado declarase improcedente el despido, la indemnización sería de {importe}.',
+  'client.unfair_reference_objective':
+    'Referencia: si un juzgado declarase improcedente el despido, la indemnización sería de {importe} (33 días de salario por año trabajado, 45 por el tiempo anterior al 12 de febrero de 2012, con sus topes). Es la cifra con la que suelen compararse los acuerdos de mejora.',
 
   'client.other_contracts.contract': 'Otro trabajo {n}',
   'client.other_contracts.start': 'Fecha de alta del trabajo {n}',

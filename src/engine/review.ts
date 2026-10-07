@@ -19,6 +19,8 @@ export type UncheckedCode =
 
 export interface Review {
   readonly items: readonly ItemResult[];
+  // What the severance would be were the dismissal declared unfair, for a disciplinary or an
+  // objective dismissal; null for any other cause.
   readonly unfairReference: number | null;
   readonly uncheckedCodes: readonly UncheckedCode[];
 }
@@ -71,7 +73,7 @@ export function reviewFinalPay(
     .map((p) => compareItem(p, figures[p.id] ?? null));
 
   const unfairReference =
-    e.cause === 'disciplinary_dismissal'
+    e.cause === 'disciplinary_dismissal' || e.cause === 'objective_dismissal'
       ? computeSeverance({
           cause: 'unfair_dismissal',
           startDate: e.startDate,

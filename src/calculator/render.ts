@@ -42,6 +42,16 @@ const disciplinaryNeutral = (r: ItemResult, reference: number | null) =>
   r.item.zeroReason === 'disciplinary_dismissal' &&
   reference !== null;
 
+// The note under severance with the unfair-dismissal reference, when it is not already in the
+// status: a disciplinary dismissal with a figure to compare, or any objective dismissal.
+export function referenceKey(r: ItemResult, reference: number | null): ClientKey | null {
+  if (r.item.id !== 'severance' || reference === null || disciplinaryNeutral(r, reference))
+    return null;
+  return r.item.zeroReason === 'disciplinary_dismissal'
+    ? 'client.unfair_reference'
+    : 'client.unfair_reference_objective';
+}
+
 function statusAndAmount(
   r: ItemResult,
   reference: number | null,
@@ -173,15 +183,10 @@ function renderItem(
   if (agreement) agreement.hidden = !(item.dependsOnAgreement && item.range !== null);
   const reference = sheet.querySelector<HTMLElement>('[data-reference]');
   if (reference) {
-    const applies =
-      item.id === 'severance' &&
-      unfairReference !== null &&
-      !disciplinaryNeutral(r, unfairReference);
-    reference.hidden = !applies;
-    if (applies)
-      setWithAmounts(reference, tr('client.unfair_reference'), {
-        importe: unfairReference,
-      });
+    const key = referenceKey(r, unfairReference);
+    reference.hidden = key === null;
+    if (key !== null && unfairReference !== null)
+      setWithAmounts(reference, tr(key), { importe: unfairReference });
   }
   const list = sheet.querySelector<HTMLElement>('[data-sources]');
   if (list) setSources(container, list, item.sources, tr);
