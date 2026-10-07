@@ -267,6 +267,46 @@ export function addDashboard(
     ),
   );
 
+  // A read that answers nothing_read logs how many of its pages had each readability
+  // (READABILITY in src/domain/extraction-schema.ts; test/infra.test.ts keeps them equal).
+  const reasons: readonly [string, string][] = [
+    ['blurry', 'borrosa'],
+    ['dark', 'oscura'],
+    ['cropped', 'cortada'],
+    ['handwritten', 'aMano'],
+    ['not_labour_document', 'noLaboral'],
+    ['foreign_jurisdiction', 'otroPais'],
+    ['unknown_format', 'formatoDesconocido'],
+    ['ok', 'legibleSinDatos'],
+  ];
+  const answered = `${extract} and code in ["ok", "nothing_read"]`;
+  dashboard.addWidgets(
+    logQuery(
+      'Lecturas sin datos por motivo (páginas por día)',
+      ['extract'],
+      [
+        `${extract} and code = "nothing_read"`,
+        `stats count(*) as lecturas, ${reasons
+          .map(([reason, name]) => `sum(readability.${reason}) as ${name}`)
+          .join(', ')} by bin(1d)`,
+        'sort @timestamp desc',
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+      18,
+    ),
+    logQuery(
+      '% lecturas sin datos (24 h)',
+      ['extract'],
+      [
+        answered,
+        'stats 100 * sum(code = "nothing_read") / count(*) as porcentaje, ' +
+          'sum(code = "nothing_read") as sinDatos, count(*) as respondidas',
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+      6,
+    ),
+  );
+
   dashboard.addWidgets(
     logQuery(
       'Lecturas: latencia según el registro (ms)',

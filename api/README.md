@@ -397,7 +397,10 @@ throttles and 5xx, p50/p95 duration, concurrency against the account's 10); Bedr
 `eu.anthropic.claude-haiku-4-5-20251001-v1:0`), so a new model shows up without a change; and
 Logs Insights widgets over the one-line log: `extract` codes over time and in a table,
 `checkout`/`pass` codes, `escalated`/`underestimated`/`countNotSaved` counts, pages, tokens
-and latency percentiles. The AI cost is tokens × `MODEL_PRICES_USD_PER_MTOK` for the
+and latency percentiles; «Lecturas sin datos por motivo», a table of `nothing_read` reads per
+day with how many pages had each readability, and «% lecturas sin datos (24 h)», the share of
+answered reads (`ok` plus `nothing_read`) that found nothing. Log widgets follow the
+dashboard's range, 24 h by default, so that share covers whatever range is chosen. The AI cost is tokens × `MODEL_PRICES_USD_PER_MTOK` for the
 configured models; synth fails if a configured model has no price. It charts only AWS metrics
 and inline queries, with the alarms' state on top.
 
@@ -418,7 +421,10 @@ filter is needed for `model_unavailable`. The one metric filter, `Eslojusto/Api 
 the `extract` log group, exists because no AWS metric counts successful reads. Bedrock's
 `Invocations` for the primary model count the attempts, so console playground calls count too.
 `countNotSaved` and `pass_revoked` have no alarm: each would need a filter of its own; the
-dashboard counts them. The address comes from the `alertEmail` context, which CI takes from the
+dashboard counts them. Neither has `nothing_read`: a rate alarm needs its own metric filter and
+two more alarm metrics, past the free 10, and a run of reads where nothing is read already trips
+`extract-no-success`, which counts only `ok` reads as a success on purpose: that is what a broken
+prompt or model looks like. The address comes from the `alertEmail` context, which CI takes from the
 repository variable `ALERT_EMAIL`; without it the topic exists with no subscribers.
 
 **Budget**: 10 USD a month on the whole account (Claude on Bedrock is billed through AWS
@@ -529,7 +535,9 @@ run at once, and the budget action caps the month.
   high-severity advisory; it runs only at synth time, never in the Lambdas.
 - The dashboard's Live Tail link: the console's URL format is undocumented, so it may open
   Live Tail without the log groups selected. The `SEARCH` and cost expressions and the Logs
-  Insights queries were checked against real data with read-only calls.
+  Insights queries were checked against real data with read-only calls, except the two over
+  `nothing_read` (nested `readability.*` fields and arithmetic inside `stats`), which no read has
+  logged yet.
 - Whether the models set pages aside as the readability list intends, and how often a page in
   Catalan, Basque, Galician or English is read: the language fixtures are hand-written.
 - The real latency of an escalated read of a 15-page pack (the 180 s timeout is a guess), and

@@ -13,6 +13,7 @@ import {
 } from '../src/config';
 import { buildApp, GLOBAL_STACK_REGION } from '../infra/stacks';
 import { NO_ESCALATION_AFTER_MS, READ_DEADLINE_MS } from '../src/domain/extract';
+import { READABILITY } from '../src/domain/extraction-schema';
 
 const { api, global } = buildApp(
   { stripePriceId: 'price_test', alertEmail: 'alerts@example.com' },
@@ -168,6 +169,17 @@ describe('dashboard', () => {
       ),
     );
     expect(namespaces).toEqual(new Set(['AWS/Bedrock', 'AWS/Lambda']));
+  });
+
+  it('counts reads with nothing read per day by every reason, and their share', () => {
+    const byReason = queries.find((q) => q.includes('code = "nothing_read"'));
+    for (const reason of READABILITY) expect(byReason).toContain(`sum(readability.${reason}) as`);
+    expect(byReason).toContain('by bin(1d)');
+    const share = queries.find((q) => q.includes('code in ["ok", "nothing_read"]'));
+    expect(share).toContain('100 * sum(code = "nothing_read") / count(*) as porcentaje');
+    const titles = widgets.map((w) => w.properties['title']);
+    expect(titles).toContain('Lecturas sin datos por motivo (páginas por día)');
+    expect(titles).toContain('% lecturas sin datos (24 h)');
   });
 
   it('stays within the free tier of 50 metrics per dashboard, with room for two models', () => {
