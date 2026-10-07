@@ -27,6 +27,9 @@ jobs:
       - name: analytics (test key, PostHog stubbed)
         run: npm run test:e2e -- --project=analytics
         env: { CI: 'true', TEST_ANALYTICS: '1' }
+      - name: documents (fake API origins, routed by the page)
+        run: npm run test:e2e -- --project=documents
+        env: { CI: 'true', TEST_DOCUMENTS: '1' }
   audit:
     name: audit
     runs-on: ubuntu-latest
