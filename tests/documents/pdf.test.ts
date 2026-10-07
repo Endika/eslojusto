@@ -90,6 +90,15 @@ describe('the PDF writer', () => {
     );
   });
 
+  it('a missing character copies as «?», never as the character that first used the glyph', async () => {
+    const doc = new PdfDocument({ sans, serif }, 'x');
+    doc.paragraph('ع 😀 ¿Qué? ok', { font: 'sans', size: 10 });
+    const pdf = latin1(await doc.save());
+    const text = extractText(pdf);
+    expect(text).toBe('? ? ¿Qué? ok');
+    expect(pdf).not.toMatch(/<[0-9a-f]{4}> <[0-9a-f]{5,}>/);
+  });
+
   it('writes titles as PDF strings', () => {
     expect(pdfString('Report (1)')).toBe('(Report \\(1\\))');
     expect(pdfString('Recibí')).toBe('<FEFF0052006500630069006200ED>');

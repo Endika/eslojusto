@@ -120,12 +120,14 @@ export class PdfDocument {
     this.y = MARGIN.top;
   }
 
-  private glyph(state: FontState, ch: string): readonly [number, number] {
+  // The glyph a character is drawn with, and the character that glyph stands for: a character
+  // the subset lacks, a code point beyond the BMP among them, is drawn and copied as «?».
+  private glyph(state: FontState, ch: string): { glyph: readonly [number, number]; text: string } {
     const g = state.font.glyphs[String(ch.codePointAt(0))];
-    if (g) return g;
+    if (g) return { glyph: g, text: ch };
     const fallback = state.font.glyphs[String('?'.codePointAt(0))];
     if (!fallback) throw new Error('The font has no fallback glyph');
-    return fallback;
+    return { glyph: fallback, text: '?' };
   }
 
   private chars(text: string): string[] {
@@ -134,7 +136,7 @@ export class PdfDocument {
 
   measure(text: string, style: TextStyle): number {
     const state = this.fonts[style.font];
-    const units = this.chars(text).reduce((sum, c) => sum + (this.glyph(state, c)[1] ?? 0), 0);
+    const units = this.chars(text).reduce((sum, c) => sum + this.glyph(state, c).glyph[1], 0);
     return (units / state.font.unitsPerEm) * style.size;
   }
 
@@ -167,8 +169,9 @@ export class PdfDocument {
   private encode(state: FontState, text: string): string {
     let hex = '';
     for (const c of this.chars(text)) {
-      const [gid] = this.glyph(state, c);
-      if (!state.used.has(gid)) state.used.set(gid, c);
+      const { glyph, text: shown } = this.glyph(state, c);
+      const [gid] = glyph;
+      if (!state.used.has(gid)) state.used.set(gid, shown);
       hex += gid.toString(16).padStart(4, '0');
     }
     return `<${hex}>`;
@@ -301,9 +304,10 @@ export class PdfDocument {
       const entries = [...state.used.entries()]
         .sort(([a], [b]) => a - b)
         .map(([gid, text]) => {
-          const code = [...text]
-            .map((c) => (c.codePointAt(0) ?? 0).toString(16).padStart(4, '0'))
-            .join('');
+          // UTF-16 code units, so a pair of surrogates stays a valid ToUnicode entry.
+          const code = Array.from({ length: text.length }, (_, k) =>
+            text.charCodeAt(k).toString(16).padStart(4, '0'),
+          ).join('');
           return `<${gid.toString(16).padStart(4, '0')}> <${code}>`;
         });
       const cmap = [
