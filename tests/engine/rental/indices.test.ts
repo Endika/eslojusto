@@ -66,16 +66,16 @@ describe('CPI flash estimates', () => {
     expect(IPC.values.filter((v) => v.flashPublishedOn === undefined)).toEqual([]);
   });
 
-  it.each([
-    ['2019-02', '2022-03'],
-    ['2024-12', '2026-08'],
-  ])('are loaded, with their press release, from %s to %s', (first, last) => {
-    const missing = IPC.values.filter(
-      (v) => v.month >= first && v.month <= last && v.flashRate === undefined,
-    );
-    expect(missing).toEqual([]);
-    expect(flashReleaseUrl(first).startsWith(INE_PRESS)).toBe(true);
-  });
+  it.each([['2019-02', '2026-08']])(
+    'are loaded, with their press release, from %s to %s',
+    (first, last) => {
+      const missing = IPC.values.filter(
+        (v) => v.month >= first && v.month <= last && v.flashRate === undefined,
+      );
+      expect(missing).toEqual([]);
+      expect(flashReleaseUrl(first).startsWith(INE_PRESS)).toBe(true);
+    },
+  );
 
   it('include September 2026, whose definitive figure is not out yet', () => {
     expect(IPC.pendingFlash).toEqual({
@@ -107,10 +107,15 @@ describe('reference month', () => {
       value: { month: '2019-02' },
       earlier: { source: 'flash', flash: { month: '2019-02', rate: 1.1 } },
     });
-    expect(lookup(IPC, '2023-03-14')).toMatchObject({
+    expect(lookup(IPC, '2024-03-14')).toMatchObject({
+      kind: 'same_day',
+      value: { month: '2024-02', rate: 2.8 },
+      earlier: { source: 'flash', flash: { month: '2024-02', rate: 2.8 } },
+    });
+    expect(lookup(IPC, '2019-01-15')).toMatchObject({
       kind: 'flash_not_loaded',
-      definitive: { month: '2023-02' },
-      month: '2023-02',
+      definitive: { month: '2018-12' },
+      month: '2018-12',
     });
   });
 
@@ -146,10 +151,10 @@ describe('reference month', () => {
   });
 
   it('says when a CPI flash was out and its rate is not in the table', () => {
-    expect(lookup(IPC, '2023-04-05')).toEqual({
+    expect(lookup(IPC, '2019-02-05')).toEqual({
       kind: 'flash_not_loaded',
-      definitive: expect.objectContaining({ month: '2023-02' }),
-      month: '2023-03',
+      definitive: expect.objectContaining({ month: '2018-12' }),
+      month: '2019-01',
     });
   });
 
