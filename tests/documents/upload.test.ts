@@ -316,6 +316,32 @@ describe('the start sheet', () => {
     expect(form.querySelectorAll('[data-read-mark]')).toHaveLength(2);
   });
 
+  it('a row’s mark goes away when its row is edited, even after the rows were renumbered', async () => {
+    const row = (i: number) =>
+      `<li data-other-contract="${i}"><fieldset><div class="field">` +
+      `<input name="otherContracts.${i}.startDate" /></div></fieldset></li>`;
+    const reading: DocumentReading<ExtractedFieldName, 'contracts'> = {
+      prefill: () => ({
+        entries: [],
+        marks: [{ id: 'row', container: '[data-other-contract="0"] fieldset', confidence: 'high' }],
+        count: 1,
+        lowConfidence: false,
+        notes: [],
+      }),
+    };
+    const { form } = setUp(settlement, { reading });
+    form.insertAdjacentHTML('beforeend', `<ol>${row(0)}${row(1)}</ol>`);
+    choose([photo]);
+    await submit();
+    const [first, second] = [...form.querySelectorAll<HTMLInputElement>('ol input')];
+    // As «Añadir otro» or «Quitar» renumber the rows: their description is written anew.
+    for (const input of [first, second]) input?.setAttribute('aria-describedby', 'error-row');
+    second?.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(form.querySelectorAll('[data-read-mark]')).toHaveLength(1);
+    first?.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(form.querySelectorAll('[data-read-mark]')).toHaveLength(0);
+  });
+
   it('with a valid pass, the read goes on the pass and its reads left are kept', async () => {
     const { requests, passes } = setUp({ ...settlement, allowance: null, readsLeft: 11 });
     const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
