@@ -8,6 +8,7 @@ import { createApi } from '../documents/api';
 import { DOCUMENTS, TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/config';
 import { fitWithin } from '../documents/files';
 import { canvasJpeg, whiteCanvas } from './jpeg';
+import { photoQuality } from './quality';
 import { createOutageMemory } from '../documents/outage';
 import { createPassStore } from '../documents/pass';
 import { setUpPayment } from '../documents/payment';
@@ -106,15 +107,18 @@ function turnstileCaptcha(siteKey: string, container: HTMLElement, action: Captc
   };
 }
 
-// Photos are drawn on a canvas at most 1568 px on their long side and leave as JPEG.
+// Photos are drawn on a canvas at most 1568 px on their long side and leave as JPEG, with what
+// the page measured of them to warn before sending.
 const canvasEncoder: FileEncoder = {
   async encode(file, maxBytes) {
     const bitmap = await createImageBitmap(file);
+    const longSide = Math.max(bitmap.width, bitmap.height);
     const { width, height } = fitWithin(bitmap.width, bitmap.height);
     const { canvas, context } = whiteCanvas(width, height);
     context.drawImage(bitmap, 0, 0, width, height);
     bitmap.close();
-    return canvasJpeg(canvas, maxBytes);
+    const quality = photoQuality(canvas, longSide);
+    return { ...(await canvasJpeg(canvas, maxBytes)), ...(quality && { quality }) };
   },
 };
 

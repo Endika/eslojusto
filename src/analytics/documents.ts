@@ -10,7 +10,15 @@ export function documentsAnalytics(track: Track): DocumentEvents {
     uploadStarted(files, pdfs) {
       track('upload_started', { files_bucket: files, pdfs });
     },
-    extractionCompleted({ kinds, fields, lowConfidence, failedChecks, conflicts, escalated }) {
+    extractionCompleted({
+      kinds,
+      fields,
+      lowConfidence,
+      failedChecks,
+      conflicts,
+      escalated,
+      skippedReasons,
+    }) {
       track('extraction_completed', {
         doc_types: kinds,
         fields_bucket: fieldsBucket(fields),
@@ -18,10 +26,20 @@ export function documentsAnalytics(track: Track): DocumentEvents {
         failed_checks: failedChecks,
         conflicts,
         escalated: escalated === null ? 'unknown' : escalated ? 'yes' : 'no',
+        skipped_reasons: [...skippedReasons],
       });
     },
     extractionFailed(code) {
       track('extraction_failed', { code });
+    },
+    nothingRead(reasons, files, pdfs) {
+      track('nothing_read', { reasons: [...reasons], files_bucket: files, pdfs });
+    },
+    qualityWarned(problem) {
+      track('quality_warned', { kind: problem });
+    },
+    qualityOverridden() {
+      track('quality_overridden', {});
     },
     checkoutStarted() {
       track('checkout_started', {});

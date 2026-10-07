@@ -85,7 +85,7 @@ export function filesBucket(n: number): '1' | '2-4' | '5-9' | '10-15' {
 }
 
 // The size that keeps the proportions with the long side at most `max`, never enlarged.
-export function fitWithin(width: number, height: number, max = LIMITS.maxImageLongSide) {
+export function fitWithin(width: number, height: number, max: number = LIMITS.maxImageLongSide) {
   const scale = Math.min(1, max / Math.max(width, height));
   return {
     width: Math.max(1, Math.round(width * scale)),

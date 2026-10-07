@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { EXTRACT_TIMEOUT_SECONDS } from '../../api/src/config';
+import { READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
 import { API_TIMEOUT_MS, createApi, parseExtraction, type Fetch } from '../../src/documents/api';
+import { READABILITY } from '../../src/documents/contract';
 
 interface Call {
   url: string;
@@ -25,7 +27,15 @@ const ENDPOINTS = {
 
 // As the API sends it: page numbers per document, rows under `lists`.
 const sent = {
-  pages: [{ page: 1, kind: 'settlement_proposal', document: 1, confidence: 'high' }],
+  pages: [
+    {
+      page: 1,
+      kind: 'settlement_proposal',
+      document: 1,
+      readability: { value: 'ok', confidence: 'high' },
+      confidence: 'high',
+    },
+  ],
   documents: [{ kind: 'settlement_proposal', pages: [1] }],
   fields: { endDate: { value: '2026-09-15', confidence: 'high', source: 'settlement_proposal' } },
   lists: {},
@@ -33,6 +43,7 @@ const sent = {
 };
 // As the page keeps it: how many pages per document, and the rows on their own.
 const extraction = {
+  pages: [{ page: 1, kind: 'settlement_proposal', readability: 'ok' }],
   documents: [{ kind: 'settlement_proposal', pages: 1 }],
   fields: sent.fields,
   contracts: [],
@@ -90,6 +101,32 @@ describe('extract', () => {
       code: 'unexpected_response',
     });
   });
+  it('passes on why a read found nothing, page by page, and nothing else', async () => {
+    const fetch = fakeFetch(422, {
+      code: 'nothing_read',
+      pages: [
+        { page: 1, kind: 'payslip', readability: { value: 'blurry', confidence: 'high' } },
+        {
+          page: 2,
+          kind: 'other',
+          readability: { value: 'foreign_jurisdiction', confidence: 'high' },
+        },
+        { page: 3, kind: 'other', readability: { value: 'Barcelona', confidence: 'high' } },
+      ],
+      allowance: 'not-for-a-read-that-found-nothing',
+    });
+    expect(await createApi(ENDPOINTS, fetch).extract(request)).toEqual({
+      ok: false,
+      code: 'nothing_read',
+      pages: [
+        { page: 1, kind: 'payslip', readability: 'blurry' },
+        { page: 2, kind: 'other', readability: 'foreign_jurisdiction' },
+      ],
+    });
+  });
+  it('mirrors the API’s readability list', () => {
+    expect(READABILITY).toEqual(API_READABILITY);
+  });
   it('turns every API code into a failure', async () => {
     const fetch = fakeFetch(429, { code: 'daily_limit_reached' });
     expect(await createApi(ENDPOINTS, fetch).extract(request)).toEqual({
@@ -140,7 +177,15 @@ describe('parseExtraction', () => {
   it('keeps only what has the contract’s shape, and counts each document’s pages', () => {
     expect(
       parseExtraction({
-        pages: [],
+        pages: [
+          { page: 1, kind: 'dismissal_letter', readability: { value: 'ok', confidence: 'high' } },
+          { page: 2, kind: 'payslip', readability: { value: 'blurry', confidence: 'low' } },
+          { page: 3, kind: 'other', readability: { value: 'illegible', confidence: 'high' } },
+          { page: 4, kind: 'other', readability: 'ok' },
+          { page: 0, kind: 'other', readability: { value: 'ok', confidence: 'high' } },
+          { page: 16, kind: 'other', readability: { value: 'ok', confidence: 'high' } },
+          { page: 5, kind: 'contract', readability: { value: 'ok', confidence: 'high' } },
+        ],
         documents: [
           { kind: 'dismissal_letter', pages: [1, 2, 3] },
           { kind: 'payslip', pages: [4], month: '2026-08' },
@@ -170,6 +215,10 @@ describe('parseExtraction', () => {
         ],
       }),
     ).toEqual({
+      pages: [
+        { page: 1, kind: 'dismissal_letter', readability: 'ok' },
+        { page: 2, kind: 'payslip', readability: 'blurry' },
+      ],
       documents: [
         { kind: 'dismissal_letter', pages: 3 },
         { kind: 'payslip', pages: 1, month: '2026-08' },

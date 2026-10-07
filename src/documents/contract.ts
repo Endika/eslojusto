@@ -15,6 +15,34 @@ export const PAGE_KINDS = [
 export type PageKind = (typeof PAGE_KINDS)[number];
 export type SourceKind = Exclude<PageKind, 'other'>;
 
+// Whether the API could read a page, or the main reason it set it aside.
+export const READABILITY = [
+  'ok',
+  'handwritten',
+  'blurry',
+  'dark',
+  'cropped',
+  'not_labour_document',
+  'foreign_jurisdiction',
+  'unknown_format',
+] as const;
+export type Readability = (typeof READABILITY)[number];
+
+// Why a page sent gave nothing: what the API said of it, `no_data` when it was legible with
+// nothing the review uses, `unread` when the API left it out of its answer.
+export const SKIP_REASONS = [
+  'handwritten',
+  'blurry',
+  'dark',
+  'cropped',
+  'not_labour_document',
+  'foreign_jurisdiction',
+  'unknown_format',
+  'no_data',
+  'unread',
+] as const satisfies readonly (Exclude<Readability, 'ok'> | 'no_data' | 'unread')[];
+export type SkipReason = (typeof SKIP_REASONS)[number];
+
 // The API reads images only; the browser renders a PDF's pages to images first.
 export const MEDIA_TYPES = ['image/jpeg', 'image/webp'] as const;
 export type MediaType = (typeof MEDIA_TYPES)[number];
@@ -149,7 +177,15 @@ export interface Conflict {
   readonly sources: readonly SourceKind[];
 }
 
+// A page as the API classified it, numbered from 1 in the order sent.
+export interface ReadPage {
+  readonly page: number;
+  readonly kind: PageKind;
+  readonly readability: Readability;
+}
+
 export interface Extraction {
+  readonly pages: readonly ReadPage[];
   readonly documents: readonly RecognisedDocument[];
   readonly fields: Readonly<Partial<Record<ExtractedFieldName, SourcedField>>>;
   // Rows for «Otros trabajos», from the work history.
@@ -183,6 +219,13 @@ export interface ExtractRequest {
 
 export type Failure = { readonly ok: false; readonly code: ErrorCode };
 
+// A read that found nothing to fill the form with; it spent no read.
+export type NothingRead = {
+  readonly ok: false;
+  readonly code: 'nothing_read';
+  readonly pages: readonly ReadPage[];
+};
+
 export type ExtractResult =
   | {
       readonly ok: true;
@@ -194,6 +237,7 @@ export type ExtractResult =
       // Whether the reading was repeated with the stronger model; null when the API doesn't say.
       readonly escalated: boolean | null;
     }
+  | NothingRead
   | Failure;
 
 export type CheckoutResult =

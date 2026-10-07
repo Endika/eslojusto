@@ -10,6 +10,13 @@ import { memoryStore, passToken, tr } from './fixtures';
 
 const NOW = Date.UTC(2026, 9, 7);
 
+// What the page measures of a synthetic photo, told by its name.
+const looks = (f: File) => ({
+  brightness: f.name.includes('oscura') ? 30 : 200,
+  sharpness: f.name.includes('borrosa') ? 10 : 5000,
+  longSide: f.name.includes('pequena') ? 600 : 1568,
+});
+
 // A read the test answers by hand, to look at the page while it is on its way.
 const pending: { next: Promise<ExtractResult> | null } = { next: null };
 
@@ -58,7 +65,7 @@ function setUp(
     encoder: {
       encode: async (f, maxBytes) => {
         shares.push(maxBytes);
-        return { mediaType: 'image/jpeg', data: btoa(f.name), bytes: f.size };
+        return { mediaType: 'image/jpeg', data: btoa(f.name), bytes: f.size, quality: looks(f) };
       },
     },
     // A fake PDF: its text is its page count, «cifrado» in its name makes it encrypted.
@@ -136,9 +143,11 @@ const submit = async () => {
 };
 
 const photo = new File(['x'], 'finiquito.jpg', { type: 'image/jpeg' });
-const settlement: ExtractResult = {
+type Read = Extract<ExtractResult, { ok: true }>;
+const settlement: Read = {
   ok: true,
   extraction: {
+    pages: [{ page: 1, kind: 'settlement_proposal', readability: 'ok' }],
     documents: [{ kind: 'settlement_proposal', pages: 1 }],
     fields: {
       cause: { value: 'unfair_dismissal', confidence: 'high', source: 'settlement_proposal' },
@@ -229,6 +238,7 @@ describe('the start sheet', () => {
           failedChecks: true,
           conflicts: false,
           escalated: true,
+          skippedReasons: [],
         },
       ],
     ]);
@@ -686,6 +696,144 @@ describe('the start sheet', () => {
     form.dispatchEvent(new Event('reset'));
     upload.showAgreementOffer(result);
     expect(result.querySelector('[data-agreement-offer]')).toBeNull();
+  });
+
+  it('a read that found nothing says why for each file, keeps them, and spends no read', async () => {
+    const { events, store, passes, requests } = setUp({
+      ok: false,
+      code: 'nothing_read',
+      pages: [
+        { page: 1, kind: 'payslip', readability: 'blurry' },
+        { page: 2, kind: 'other', readability: 'foreign_jurisdiction' },
+        { page: 3, kind: 'other', readability: 'ok' },
+      ],
+    });
+    passes.saveQuota('v1.quota.kept');
+    const files = ['nomina.jpg', 'contrato-lisboa.jpg', 'irpf.jpg', 'manuscrito.jpg'].map(
+      (name) => new File(['x'], name, { type: 'image/jpeg' }),
+    );
+    choose(files);
+    await submit();
+    expect(requests).toHaveLength(1);
+    const review = document.querySelector<HTMLElement>('[data-doc-review]');
+    expect(review?.hidden).toBe(false);
+    expect(text('[data-doc-review-lead]')).toBe(
+      'No se ha leído ningún dato, así que esta lectura no cuenta. Puedes cambiar las fotos o páginas que fallan y volver a probar, o rellenar a mano.',
+    );
+    expect(
+      [...document.querySelectorAll('[data-doc-review-list] li')].map((li) => li.textContent),
+    ).toEqual([
+      'nomina.jpg: sale borrosa. Prueba con más luz y el móvil quieto.',
+      'contrato-lisboa.jpg: es de otro país. Esta revisión aplica la ley española.',
+      'irpf.jpg: no trae datos que use esta revisión.',
+      'manuscrito.jpg: no se ha podido leer.',
+    ]);
+    expect(document.querySelector<HTMLElement>('[data-doc-review-actions]')?.hidden).toBe(true);
+    expect(document.activeElement).toBe(document.querySelector('[data-doc-review-lead]'));
+    expect(listed()).toHaveLength(4);
+    expect(store.get('eslojusto-lecturas')).toBe('v1.quota.kept');
+    expect(events.log).toContainEqual([
+      'nothingRead',
+      ['blurry', 'foreign_jurisdiction', 'no_data', 'unread'],
+      '2-4',
+      0,
+    ]);
+    expect(events.log.map(([name]) => name)).not.toContain('extractionFailed');
+    expect(
+      document
+        .querySelector('[data-start-panel="upload"] [data-start-manual]')
+        ?.getAttribute('aria-disabled'),
+    ).toBe('false');
+    // Changing the files clears what was said about the old ones.
+    document.querySelector<HTMLElement>('[data-doc-remove="0"]')?.click();
+    expect(review?.hidden).toBe(true);
+  });
+
+  it('a read that skipped pages says which and why beside what it read', async () => {
+    const { events } = setUp({
+      ...settlement,
+      extraction: {
+        ...settlement.extraction,
+        pages: [
+          { page: 1, kind: 'settlement_proposal', readability: 'ok' },
+          { page: 2, kind: 'payslip', readability: 'handwritten' },
+        ],
+      },
+    });
+    const second = new File(['y'], 'nomina-a-mano.jpg', { type: 'image/jpeg' });
+    const third = new File(['z'], 'reverso.jpg', { type: 'image/jpeg' });
+    choose([photo, second, third]);
+    await submit();
+    const notes = [...document.querySelectorAll('[data-done-notes] li')].map(
+      (li) => li.textContent,
+    );
+    expect(notes.slice(0, 2)).toEqual([
+      'Se ha saltado nomina-a-mano.jpg: parece escrito a mano. Es mejor que escribas los datos tú.',
+      'Se ha saltado reverso.jpg: no se ha podido leer.',
+    ]);
+    expect(events.log.at(-1)).toEqual([
+      'extractionCompleted',
+      expect.objectContaining({ skippedReasons: ['handwritten', 'unread'] }),
+    ]);
+  });
+
+  it('warns before sending a photo that looks dark, and sends it if asked to', async () => {
+    const { events, requests } = setUp(settlement);
+    choose([photo, new File(['o'], 'oscura.jpg', { type: 'image/jpeg' })]);
+    await submit();
+    expect(requests).toHaveLength(0);
+    expect(
+      [...document.querySelectorAll('[data-doc-review-list] li')].map((li) => li.textContent),
+    ).toEqual(['oscura.jpg se ve muy oscura.']);
+    expect(text('[data-doc-review-ask]')).toBe('¿La repites?');
+    expect(document.querySelector<HTMLElement>('[data-doc-review-actions]')?.hidden).toBe(false);
+    expect(document.activeElement).toBe(document.querySelector('[data-doc-review-ask]'));
+    expect(events.log).toContainEqual(['qualityWarned', 'dark']);
+    click('[data-doc-send-anyway]');
+    await flush();
+    await flush();
+    expect(requests).toHaveLength(1);
+    expect(requests[0]?.files).toHaveLength(2);
+    expect(events.log).toContainEqual(['qualityOverridden']);
+    expect(document.querySelector<HTMLElement>('[data-doc-review]')?.hidden).toBe(true);
+  });
+
+  it('«Repetir» takes the flagged photos out of the list and sends nothing', async () => {
+    const { events, requests } = setUp(settlement);
+    choose([
+      new File(['b'], 'borrosa.jpg', { type: 'image/jpeg' }),
+      photo,
+      new File(['p'], 'pequena.jpg', { type: 'image/jpeg' }),
+    ]);
+    await submit();
+    expect(
+      [...document.querySelectorAll('[data-doc-review-list] li')].map((li) => li.textContent),
+    ).toEqual([
+      'borrosa.jpg se ve borrosa.',
+      'pequena.jpg es muy pequeña: puede que la letra no se lea.',
+    ]);
+    expect(text('[data-doc-review-ask]')).toBe('¿Las repites?');
+    expect(events.log.filter(([name]) => name === 'qualityWarned')).toEqual([
+      ['qualityWarned', 'blurry'],
+      ['qualityWarned', 'small'],
+    ]);
+    click('[data-doc-retake]');
+    expect(listed()).toEqual(['finiquito.jpg1 KBQuitar']);
+    expect(text('[data-doc-files-status]')).toBe(
+      'Quitado: borrosa.jpg, pequena.jpg. Llevas 1 de 15.',
+    );
+    expect(document.activeElement?.id).toBe('document-files');
+    expect(requests).toHaveLength(0);
+    expect(events.log.map(([name]) => name)).not.toContain('qualityOverridden');
+  });
+
+  it('never warns about the pages of a PDF, which are drawn, not photographed', async () => {
+    const { requests, events } = setUp(settlement);
+    choose([new File(['2'], 'oscura.pdf', { type: 'application/pdf' })]);
+    await flush();
+    await submit();
+    expect(requests).toHaveLength(1);
+    expect(events.log.map(([name]) => name)).not.toContain('qualityWarned');
   });
 
   it('once reading is unavailable, the start sheet offers only the manual path for an hour', async () => {

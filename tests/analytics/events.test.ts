@@ -191,6 +191,9 @@ describe('the catalogue guard', () => {
         'upload_started',
         'extraction_completed',
         'extraction_failed',
+        'nothing_read',
+        'quality_warned',
+        'quality_overridden',
         'checkout_started',
         'pass_issued',
         'pass_failed',
@@ -213,8 +216,19 @@ describe('document and pass events', () => {
         failed_checks: true,
         conflicts: true,
         escalated: 'yes',
+        skipped_reasons: [],
       }),
     ).toBe(true);
+    expect(
+      isValidEvent('nothing_read', {
+        reasons: ['blurry', 'handwritten', 'unread'],
+        files_bucket: '2-4',
+        pdfs: 1,
+      }),
+    ).toBe(true);
+    for (const kind of ['dark', 'blurry', 'small'])
+      expect(isValidEvent('quality_warned', { kind })).toBe(true);
+    expect(isValidEvent('quality_overridden', {})).toBe(true);
     expect(isValidEvent('extraction_failed', { code: 'network_error' })).toBe(true);
     expect(isValidEvent('checkout_started', {})).toBe(true);
     expect(isValidEvent('pass_issued', { via: 'recovery' })).toBe(true);
@@ -247,8 +261,20 @@ describe('document and pass events', () => {
       failed_checks: false,
       conflicts: false,
       escalated: 'no',
+      skipped_reasons: ['dark'],
     };
     expect(isValidEvent('extraction_completed', completed)).toBe(true);
+    expect(
+      isValidEvent('extraction_completed', { ...completed, skipped_reasons: ['Foto 3'] }),
+    ).toBe(false);
+    expect(
+      isValidEvent('extraction_completed', { ...completed, skipped_reasons: ['dark', 'dark'] }),
+    ).toBe(false);
+    expect(isValidEvent('nothing_read', { reasons: ['ok'], files_bucket: '1', pdfs: 0 })).toBe(
+      false,
+    );
+    expect(isValidEvent('quality_warned', { kind: 'too_dark_42' })).toBe(false);
+    expect(isValidEvent('quality_overridden', { kind: 'dark' })).toBe(false);
     expect(isValidEvent('extraction_completed', { ...completed, doc_types: ['nómina'] })).toBe(
       false,
     );
@@ -295,10 +321,14 @@ describe('document and pass events', () => {
       failedChecks: false,
       conflicts: true,
       escalated: null,
+      skippedReasons: ['blurry', 'foreign_jurisdiction'] as const,
     };
     events.extractionCompleted(result);
     events.extractionCompleted({ ...result, escalated: true });
     events.extractionFailed('captcha_failed');
+    events.nothingRead(['dark', 'no_data'], '1', 0);
+    events.qualityWarned('blurry');
+    events.qualityOverridden();
     events.checkoutStarted();
     events.passIssued('return');
     events.passFailed('price_mismatch');
@@ -314,6 +344,9 @@ describe('document and pass events', () => {
       'extraction_completed',
       'extraction_completed',
       'extraction_failed',
+      'nothing_read',
+      'quality_warned',
+      'quality_overridden',
       'checkout_started',
       'pass_issued',
       'pass_failed',
@@ -328,8 +361,12 @@ describe('document and pass events', () => {
       failed_checks: false,
       conflicts: true,
       escalated: 'unknown',
+      skipped_reasons: ['blurry', 'foreign_jurisdiction'],
     });
     expect(sent[3]?.[1]).toMatchObject({ escalated: 'yes' });
+    expect(sent[5]?.[1]).toEqual({ reasons: ['dark', 'no_data'], files_bucket: '1', pdfs: 0 });
+    expect(sent[6]?.[1]).toEqual({ kind: 'blurry' });
+    expect(sent[7]?.[1]).toEqual({});
   });
 });
 

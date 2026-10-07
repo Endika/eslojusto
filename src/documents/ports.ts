@@ -1,11 +1,14 @@
 import type { CompletedReview } from '../calculator/ports';
-import type { ErrorCode, MediaType, PageKind } from './contract';
+import type { ErrorCode, MediaType, PageKind, SkipReason } from './contract';
 import type { filesBucket } from './files';
 import type { LetterDetails, LetterField, LetterKind, LetterPrefilled } from './letter';
+import type { QualityProblem, QualitySignals } from './quality';
 
-export { ERROR_CODES, PAGE_KINDS } from './contract';
+export { ERROR_CODES, PAGE_KINDS, SKIP_REASONS } from './contract';
+export { QUALITY_PROBLEMS } from './quality';
 export { LETTER_KINDS, LETTER_PREFILLED } from './letter';
-export type { ErrorCode, PageKind } from './contract';
+export type { ErrorCode, PageKind, SkipReason } from './contract';
+export type { QualityProblem } from './quality';
 
 export type FilesBucket = ReturnType<typeof filesBucket>;
 export const FILES_BUCKETS = ['1', '2-4', '5-9', '10-15'] as const satisfies readonly FilesBucket[];
@@ -30,8 +33,15 @@ export interface DocumentEvents {
     readonly failedChecks: boolean;
     readonly conflicts: boolean;
     readonly escalated: boolean | null;
+    // Why pages were set aside, each reason once.
+    readonly skippedReasons: readonly SkipReason[];
   }): void;
   extractionFailed(code: ErrorCode): void;
+  // A read that found nothing: why, each reason once, never which page said what.
+  nothingRead(reasons: readonly SkipReason[], files: FilesBucket, pdfs: number): void;
+  // Before sending, a photo looked dark, blurry or small; then whether it was sent all the same.
+  qualityWarned(problem: QualityProblem): void;
+  qualityOverridden(): void;
   checkoutStarted(): void;
   passIssued(via: PassVia): void;
   passFailed(code: ErrorCode): void;
@@ -59,6 +69,8 @@ export interface EncodedFile {
   readonly mediaType: MediaType;
   readonly data: string;
   readonly bytes: number;
+  // A photo's, measured on the canvas it was drawn on; a PDF page has none.
+  readonly quality?: QualitySignals;
 }
 
 export interface FileEncoder {

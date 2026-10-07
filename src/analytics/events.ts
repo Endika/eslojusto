@@ -13,6 +13,8 @@ import {
   PAGE_KINDS,
   PASS_VERIFY_RESULTS,
   PASS_VIA,
+  QUALITY_PROBLEMS,
+  SKIP_REASONS,
 } from '../documents/ports';
 
 // Every property is a code from a closed list, a small count or a bucket: nothing a person
@@ -218,8 +220,19 @@ const DOCUMENT_CATALOGUE = {
     failed_checks: { boolean: true },
     conflicts: { boolean: true },
     escalated: oneOf(['yes', 'no', 'unknown']),
+    // Why pages were set aside, each reason once; never which page.
+    skipped_reasons: { list: SKIP_REASONS },
   },
   extraction_failed: { code: oneOf(ERROR_CODES) },
+  // A read that found nothing to fill the form with.
+  nothing_read: {
+    reasons: { list: SKIP_REASONS },
+    files_bucket: oneOf(FILES_BUCKETS),
+    pdfs: { intRange: [0, 15] },
+  },
+  // Measured in the browser before sending: a photo looked dark, blurry or small.
+  quality_warned: { kind: oneOf(QUALITY_PROBLEMS) },
+  quality_overridden: {},
   checkout_started: {},
   pass_issued: { via: oneOf(PASS_VIA) },
   pass_failed: { code: oneOf(ERROR_CODES) },

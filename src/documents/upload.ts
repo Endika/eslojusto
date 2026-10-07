@@ -14,6 +14,8 @@ import {
 import { admit, checkSelection, filesBucket, photoShare, requestBytes } from './files';
 import type { OutageMemory } from './outage';
 import { passClaims, passState, type PassStore, type StoredPass } from './pass';
+import { qualityProblem, type QualityProblem } from './quality';
+import { reasonsOf, skippedLines, skippedPages } from './skipped';
 import type {
   Captcha,
   DocumentEvents,
@@ -117,6 +119,12 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
   const consent = required(upload.querySelector<HTMLInputElement>('#document-consent'), 'consent');
   const status = required(upload.querySelector<HTMLElement>('[data-doc-status]'), 'status');
   const errorSlip = required(upload.querySelector<HTMLElement>('[data-doc-error]'), 'error');
+  const review = required(upload.querySelector<HTMLElement>('[data-doc-review]'), 'review');
+  const reviewPart = (name: string) =>
+    required(review.querySelector<HTMLElement>(`[data-doc-review-${name}]`), name);
+  const [reviewLead, reviewList, reviewAsk, reviewActions] = ['lead', 'list', 'ask', 'actions'].map(
+    reviewPart,
+  ) as [HTMLElement, HTMLElement, HTMLElement, HTMLElement];
   const recognised = panels.done.querySelector<HTMLElement>('[data-done-documents]');
   const summary = required(panels.done.querySelector<HTMLElement>('[data-done-summary]'), 'sum');
   const notes = required(panels.done.querySelector<HTMLElement>('[data-done-notes]'), 'notes');
@@ -139,6 +147,8 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
   let picked: Picked[] = [];
   const encodedPages = new Map<Picked, EncodedFile>();
   let photos = 0;
+  // The photos the last quality warning was about, for «Repetir».
+  let flagged: Picked[] = [];
   // What an uploaded agreement offers as severance, from the last read, until the form restarts.
   let agreementOffer: number | null = null;
 
@@ -176,6 +186,28 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
   function setError(code: ErrorCode | null) {
     errorSlip.hidden = code === null;
     errorSlip.textContent = code === null ? '' : tr(`client.documents.error.${code}`);
+  }
+
+  // A message about the files themselves: why a read found nothing, or which photos look like
+  // they will read badly, with the choice to take them again or send them as they are.
+  function showReview(lead: string, lines: readonly string[], ask: string) {
+    reviewLead.textContent = lead;
+    reviewAsk.textContent = ask;
+    reviewList.replaceChildren(
+      ...lines.map((text) => {
+        const li = document.createElement('li');
+        li.textContent = text;
+        return li;
+      }),
+    );
+    reviewActions.hidden = ask === '';
+    review.hidden = false;
+    (lead ? reviewLead : reviewAsk).focus();
+  }
+
+  function hideReview() {
+    review.hidden = true;
+    flagged = [];
   }
 
   function setBusy(on: boolean, message: string, preparation = false) {
@@ -287,6 +319,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
   async function addFiles(files: readonly File[], fromCamera = false) {
     if (busy || files.length === 0) return;
     setError(null);
+    hideReview();
     const {
       photos: images,
       pdfs,
@@ -345,6 +378,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     fileStatus.textContent = tr('client.documents.removed', { nombre: gone.name, ...count() });
     fieldError('files', null);
     setError(null);
+    hideReview();
     // Focus stays in the list: on the file that took its place, the one before, or the picker.
     const buttons = fileList.querySelectorAll<HTMLElement>('[data-doc-remove]');
     (buttons[Math.min(index, buttons.length - 1)] ?? fileInput).focus();
@@ -375,7 +409,12 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     });
   }
 
-  function showDone(p: Prefill, checks: readonly CoherenceCheck[], e: Extraction) {
+  function showDone(
+    p: Prefill,
+    checks: readonly CoherenceCheck[],
+    e: Extraction,
+    skipped: readonly string[],
+  ) {
     const line = recognisedLine(e.documents, tr);
     if (recognised) {
       recognised.hidden = line === '';
@@ -385,6 +424,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     summary.textContent =
       n === 0 ? tr('client.documents.done_none') : tr('client.documents.done', { n });
     const lines = [
+      ...skipped,
       ...conflictLines(e.conflicts, tr),
       ...(hasLowConfidence(p) ? [tr('client.documents.done_low')] : []),
       ...(hasHolidayDays(p) ? [tr('client.documents.holiday_unit')] : []),
@@ -455,7 +495,30 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     return encoded;
   }
 
-  async function read(pages: readonly Picked[]) {
+  // The photos that look like they will read badly, each with the one thing to say about it.
+  function qualityWarnings(pages: readonly Picked[], encoded: readonly EncodedFile[]) {
+    return pages.flatMap((picked, i) => {
+      const quality = encoded[i]?.quality;
+      const problem = quality ? qualityProblem(quality) : null;
+      return problem ? [{ picked, problem }] : [];
+    });
+  }
+
+  function warnQuality(warnings: readonly { picked: Picked; problem: QualityProblem }[]) {
+    for (const problem of new Set(warnings.map((w) => w.problem))) events.qualityWarned(problem);
+    flagged = warnings.map((w) => w.picked);
+    showReview(
+      '',
+      warnings.map((w) => tr(`client.documents.quality.${w.problem}`, { nombre: w.picked.name })),
+      tr(
+        warnings.length === 1
+          ? 'client.documents.quality.ask_one'
+          : 'client.documents.quality.ask_many',
+      ),
+    );
+  }
+
+  async function read(pages: readonly Picked[], qualityChecked = false) {
     const started = generation;
     setBusy(true, tr('client.documents.status.preparing'), true);
     const fail = (code: ErrorCode) => {
@@ -481,6 +544,11 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       return fail('pdf_too_slow');
     }
     if (requestBytes(encoded) > LIMITS.requestBudgetBytes) return fail('payload_too_large');
+    const warnings = qualityChecked ? [] : qualityWarnings(pages, encoded);
+    if (warnings.length > 0) {
+      setBusy(false, '');
+      return warnQuality(warnings);
+    }
 
     setBusy(true, tr('client.documents.status.captcha'), true);
     let captchaToken: string;
@@ -495,13 +563,22 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     const stored = passes.pass();
     const usePass = stored !== null && passState(stored, deps.now()) === 'valid';
     const pdfsPicked = new Set(pages.filter((p) => p.pdf).map((p) => p.file)).size;
-    events.uploadStarted(filesBucket(pages.length), pdfsPicked);
+    const files = filesBucket(pages.length);
+    events.uploadStarted(files, pdfsPicked);
     setBusy(true, tr('client.documents.status.reading'));
     const result = await api.extract({
       files: encoded.map(({ mediaType, data }) => ({ mediaType, data })),
       captchaToken,
       ...(usePass ? { pass: stored.token } : { quota: passes.quota() }),
     });
+    const nameOf = (page: number) => pages[page - 1]?.name ?? '';
+    if (!result.ok && result.code === 'nothing_read') {
+      // Spent no read: the files stay, so the ones that failed can be changed.
+      const skipped = skippedPages(result.pages, pages.length, true);
+      events.nothingRead(reasonsOf(skipped), files, pdfsPicked);
+      setBusy(false, '');
+      return showReview(tr('client.documents.nothing_read'), skippedLines(skipped, nameOf, tr), '');
+    }
     if (!result.ok) {
       // The server has the last word on what was sent: a pass it no longer honours is dropped, so
       // the next read is a free one, and so is a quota token it refuses.
@@ -531,6 +608,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     markForm(prefill);
     const offer = result.extraction.fields.agreementSeveranceTotal;
     agreementOffer = offer && typeof offer.value === 'number' ? offer.value : null;
+    const skipped = skippedPages(result.extraction.pages, pages.length, false);
     events.extractionCompleted({
       kinds: [...new Set(result.extraction.documents.map((d) => d.kind))],
       fields: prefilledCount(prefill),
@@ -538,20 +616,48 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
       failedChecks: result.failedChecks.length > 0,
       conflicts: result.extraction.conflicts.length > 0,
       escalated: result.escalated,
+      skippedReasons: reasonsOf(skipped),
     });
     setBusy(false, '');
     upload.reset();
     clearFiles();
     fieldError('files', null);
-    showDone(prefill, result.failedChecks, result.extraction);
+    showDone(
+      prefill,
+      result.failedChecks,
+      result.extraction,
+      skippedLines(skipped, nameOf, tr, 'client.documents.skipped.done'),
+    );
   }
 
   upload.addEventListener('submit', (e) => {
     e.preventDefault();
     if (busy) return;
     setError(null);
+    hideReview();
     const valid = validate();
     if (valid) void read(valid);
+  });
+  review.querySelector('[data-doc-send-anyway]')?.addEventListener('click', () => {
+    if (busy) return;
+    events.qualityOverridden();
+    hideReview();
+    const valid = validate();
+    if (valid) void read(valid, true);
+  });
+  // Takes the flagged photos out of the list, so new ones can take their place.
+  review.querySelector('[data-doc-retake]')?.addEventListener('click', () => {
+    if (busy) return;
+    const gone = flagged.filter((p) => picked.includes(p));
+    for (const p of gone) if (p.thumbnail) URL.revokeObjectURL(p.thumbnail);
+    picked = picked.filter((p) => !gone.includes(p));
+    hideReview();
+    renderFiles();
+    fileStatus.textContent = tr('client.documents.removed', {
+      nombre: gone.map((p) => p.name).join(', '),
+      ...count(),
+    });
+    fileInput.focus();
   });
   for (const input of [fileInput, cameraInput])
     input?.addEventListener('change', () => {
