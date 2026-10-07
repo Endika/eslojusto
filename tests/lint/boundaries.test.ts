@@ -86,6 +86,28 @@ describe('import boundaries', () => {
     expect(await violations(filePath, code)).toContain('no-restricted-syntax');
   });
 
+  it.each([
+    'export const now = () => new top.Date();',
+    'export const now = () => new parent.Date();',
+    'export const now = () => new frames.Date();',
+    'export const now = () => new opener.Date();',
+    'export const now = () => new Intl.DateTimeFormat().format();',
+  ])('the engine cannot reach the clock through a window alias or Intl: %s', async (code) => {
+    expect(await violations('src/engine/rental/x.ts', code)).toContain('no-restricted-globals');
+  });
+
+  it.each([
+    "import { track } from './posthog.js';",
+    "import { track } from './posthog.ts';",
+    "import { track } from './posthog/';",
+    "import { setUpCalculator } from '../engine/../calculator/main';",
+  ])(
+    'analytics cannot reach the adapter or other zones by spelling the path differently: %s',
+    async (code) => {
+      expect(await violations('src/analytics/x.ts', code)).toContain('no-restricted-imports');
+    },
+  );
+
   it('the engine cannot reach the browser or the clock', async () => {
     const fired = await violations(
       'src/engine/x.ts',
