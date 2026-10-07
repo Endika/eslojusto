@@ -374,6 +374,69 @@ export const es = {
   'client.item.employer_notice': 'Preaviso no dado por la empresa',
   'client.item.notice_deduction': 'Descuento por preaviso no cumplido',
 
+  'client.calculation.pending_salary':
+    '{salario} × {dias} días trabajados del mes, entre 30 días (mes comercial) y {dias_mes} días (mes natural): de {desde} a {hasta}.',
+  'client.calculation.holiday_pay.accrual':
+    '{anuales} días al año: por días, × {dias}/{dias_ejercicio} días trabajados en {ejercicio} = {por_dias} días devengados; por meses, × {meses}/12 = {por_meses} días devengados',
+  'client.calculation.holiday_pay.accrual_from_start':
+    '{anuales} días al año: por días, × {dias}/{dias_ejercicio} días trabajados en {ejercicio} = {por_dias} días devengados; por meses, × {meses}/12 = {por_meses} días devengados; por meses desde el alta, × {meses_alta}/12 = {por_meses_alta} días devengados',
+  'client.calculation.holiday_pay.days_unknown':
+    '{devengo}. Sin saber cuántos días has disfrutado este año no se puede comprobar.',
+  'client.calculation.holiday_pay.over_taken':
+    '{devengo}, menos {disfrutados} disfrutados: has disfrutado más días de los devengados. Que proceda o no un descuento por los días disfrutados de más depende del convenio.',
+  'client.calculation.holiday_pay.pending':
+    '{devengo}, menos {disfrutados} disfrutados = entre {minimo} y {maximo} días pendientes × {diario_mensual} (salario mensual / 30) o {diario_anual} (salario anual / 365) al día.',
+  'client.calculation.methods.two_counts':
+    'Las empresas lo calculan por días naturales o por meses (meses enteros más los días del mes en curso / 30); se muestran las dos cuentas.',
+  'client.calculation.methods.three_counts':
+    'Las empresas lo calculan por días naturales o por meses (meses enteros más los días sueltos / 30), contando los meses por calendario o desde tu fecha de alta; se muestran las tres cuentas.',
+  'client.calculation.extra_pay.share':
+    '{importe} × {dias}/{total} días = {por_dias} o × {meses}/{meses_periodo} meses = {por_meses}',
+  'client.calculation.extra_pay.share_from_start':
+    '{importe} × {dias}/{total} días = {por_dias} o × {meses}/{meses_periodo} meses = {por_meses} o × {meses_alta}/{meses_periodo} meses desde el alta = {por_meses_alta}',
+  'client.calculation.extra_pay.annual':
+    'Devengo anual: {verano} + {navidad}, suponiendo que no se ha cobrado nada del periodo abierto.',
+  'client.calculation.extra_pay.semiannual':
+    'Devengo semestral: {paga}, suponiendo que no se ha cobrado nada del periodo abierto.',
+  'client.calculation.extra_pay.unknown':
+    'Sin saber cómo se devengan las pagas, entre el devengo semestral y el anual ({verano} + {navidad}; o bien {paga}).',
+  'client.calculation.extra_pay.same_count_for_both':
+    'Cada cuenta se aplica igual a las dos pagas.',
+  'client.calculation.extra_pay.summer_in_last_payslip':
+    'La paga de verano se suele cobrar en junio o julio: puede ir ya en la nómina de ese mes, así que el mínimo de esa paga parte de 0 €.',
+  'client.calculation.extra_pay.christmas_in_last_payslip':
+    'La paga de Navidad se suele cobrar en diciembre: puede ir ya en la nómina de ese mes, así que el mínimo de esa paga parte de 0 €.',
+  'client.calculation.extra_pay.single':
+    'Con una sola paga extra no se sabe cuál es (verano o Navidad), por lo que se muestra el rango entre ambas.',
+  'client.calculation.extra_pay.over_two':
+    'Solo se calculan las dos pagas habituales (verano y Navidad); las demás dependen del convenio.',
+  'client.calculation.employer_notice':
+    '{preaviso} días de preaviso − {recibidos} recibidos = {faltan} días × entre {minimo} y {maximo} al día.',
+  'client.calculation.notice_deduction':
+    '{convenio} días de preaviso del convenio − {dados} dados = {faltan} días × {diario} al día como máximo.',
+  'client.calculation.notice_deduction.agreement_unknown':
+    'El plazo de preaviso de una dimisión lo fija el convenio; sin ese dato no se puede comprobar el descuento.',
+  'client.calculation.severance.unfair': '{meses} meses × 2,75 = {dias} días.',
+  'client.calculation.severance.objective': '{meses} meses × 20/12 = {dias} días.',
+  'client.calculation.severance.first_stretch':
+    'Tramo hasta 11-02-2012: {meses} meses × 3,75 = {dias} días.',
+  'client.calculation.severance.second_stretch':
+    'Tramo desde 12-02-2012: {meses} meses × 2,75 = {dias} días.',
+  'client.calculation.severance.over_cap':
+    'Supera {tope} días: el tramo posterior no suma y el máximo es {maximo} días.',
+  'client.calculation.severance.cap': 'Tope de {tope} días.',
+  'client.calculation.severance.total': 'Total {dias} días × {diario}/día.',
+  'client.calculation.severance.cgpj_range':
+    'La calculadora del CGPJ y su guía cuentan distinto los meses en este caso (un mes de diferencia); por eso damos un margen entre ambas cifras.',
+  'client.calculation.severance.fixed_term': '{dias} días × {dias_anuales}/365 × {diario}/día',
+  'client.calculation.severance.replacement':
+    'Los contratos de sustitución no generan indemnización por fin de contrato.',
+  'client.calculation.severance.training':
+    'Los contratos de formación no generan indemnización por fin de contrato.',
+  'client.calculation.severance.resignation': 'La dimisión voluntaria no genera indemnización.',
+  'client.calculation.severance.disciplinary':
+    'El despido disciplinario declarado procedente no genera indemnización. Si se declara improcedente, se calcula como un despido improcedente.',
+
   'client.unchecked.net_pay': 'El neto: retenciones de IRPF y cotizaciones',
   'client.unchecked.bonuses':
     'Pluses, complementos, horas extra y comisiones de tu convenio o contrato',

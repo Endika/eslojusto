@@ -39,3 +39,21 @@ const INTEGER = new Intl.NumberFormat('es-ES', { useGrouping: 'always' });
 export function formatInteger(n: number): string {
   return INTEGER.format(n);
 }
+
+const DECIMAL = new Intl.NumberFormat('es-ES', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+  useGrouping: 'always',
+});
+
+// The calculation text writes euros with a plain space: «725,81 €».
+export function formatCalculationEuros(n: number): string {
+  return `${DECIMAL.format(n)} €`;
+}
+
+const DAYS = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2, useGrouping: 'always' });
+
+// «17,5», «1.031,5».
+export function formatDays(n: number): string {
+  return DAYS.format(n);
+}

@@ -10,6 +10,9 @@ import {
   annualSalary,
 } from '../../src/engine/settlement';
 import { compareItem } from '../../src/engine/compare';
+import { calculationText } from '../../src/calculator/calculation';
+import type { Calculation } from '../../src/engine/calculation';
+import { t } from '../../src/i18n';
 
 const base: FinalPayInput = {
   cause: 'resignation',
@@ -23,6 +26,7 @@ const base: FinalPayInput = {
   annualHolidayDays: 30,
   holidayDaysTaken: 0,
 };
+const text = (c: Calculation) => calculationText(c, (key, vars) => t('es', key, vars));
 const withInput = (o: Partial<FinalPayInput>): FinalPayInput => ({ ...base, ...o });
 const extraPay = (e: FinalPayInput) => {
   const p = extraPayItem(e);
@@ -41,7 +45,7 @@ describe('pending salary', () => {
     expect(pendingSalaryItem(base).range).toEqual({ min: 725.81, max: 750 });
   });
   it('the text gives the margin from low to high', () => {
-    expect(pendingSalaryItem(base).calculation).toContain('de 725,81 € a 750,00 €');
+    expect(text(pendingSalaryItem(base).calculation)).toContain('de 725,81 € a 750,00 €');
   });
   it('a whole month = the monthly salary', () => {
     expect(pendingSalaryItem(withInput({ endDate: f('2026-10-31') })).range).toEqual({
@@ -161,7 +165,7 @@ describe('accrual by months: never a made-up finding', () => {
     const p = holidayPayItem(twoThousand);
     expect(p.range?.min).toBe(166.67);
     expect(compareItem(p, 166.67).status).toBe('matches');
-    expect(p.calculation).toContain('por días naturales o por meses');
+    expect(text(p.calculation)).toContain('por días naturales o por meses');
   });
 });
 
@@ -174,7 +178,7 @@ describe('months counted from the start date', () => {
     const p = holidayPayItem(fromStart);
     expect(p.range).toEqual({ min: 875, max: 1011.97 });
     expect(compareItem(p, 875).status).toBe('matches');
-    expect(p.calculation).toContain('por meses desde el alta, × 7/12 = 17,5 días devengados');
+    expect(text(p.calculation)).toContain('por meses desde el alta, × 7/12 = 17,5 días devengados');
   });
   it('annual payments: Christmas from the start date, summer unchanged', () => {
     // summer 07-01→10-14 (the start falls outside): by days 106/365 × 1500 = 435.62, by months 3.467/12 × 1500 = 433.33
@@ -183,11 +187,11 @@ describe('months counted from the start date', () => {
     const p = extraPay(fromStart);
     expect(p.range).toEqual({ min: 1308.33, max: 1315.07 });
     expect(compareItem(p, 1308.33).status).toBe('matches');
-    expect(p.calculation).toContain('7/12 meses desde el alta = 875,00 €');
+    expect(text(p.calculation)).toContain('7/12 meses desde el alta = 875,00 €');
   });
   it('with the start outside the period there is no third method', () => {
-    expect(holidayPayItem(base).calculation).not.toContain('desde el alta');
-    expect(extraPay(base).calculation).toContain('se muestran las dos cuentas');
+    expect(text(holidayPayItem(base).calculation)).not.toContain('desde el alta');
+    expect(text(extraPay(base).calculation)).toContain('se muestran las dos cuentas');
   });
 });
 
@@ -198,7 +202,7 @@ describe('one method for both payments', () => {
     const p = extraPay(base);
     expect(p.range).toEqual({ min: 1623.29, max: 1625 });
     expect(compareItem(p, 1622.28).status).toBe('below_minimum');
-    expect(p.calculation).toContain('Cada cuenta se aplica igual a las dos pagas');
+    expect(text(p.calculation)).toContain('Cada cuenta se aplica igual a las dos pagas');
   });
 });
 
@@ -207,7 +211,7 @@ describe('unknown holiday days taken', () => {
     const p = holidayPayItem(withInput({ holidayDaysTaken: null }));
     expect(p.range).toBeNull();
     expect(p.missingAnswer).toBe('days_taken');
-    expect(p.calculation).toContain(
+    expect(text(p.calculation)).toContain(
       'Sin saber cuántos días has disfrutado este año no se puede comprobar',
     );
   });
@@ -225,16 +229,16 @@ describe('payment paid in the month of the end date', () => {
     const p = extraPay(e);
     expect(p.range).toEqual({ min: 0, max: 2000 });
     expect(compareItem(p, 0).status).toBe('matches');
-    expect(p.calculation).toContain('La paga de Navidad se suele cobrar en diciembre');
+    expect(text(p.calculation)).toContain('La paga de Navidad se suele cobrar en diciembre');
   });
   it('annual, end 06-30: summer starts from 0, Christmas does not', () => {
     // Christmas: 181/365 × 1500 = 743.84 or 6/12 × 1500 = 750; summer up to 1500
     const p = extraPay(withInput({ endDate: f('2026-06-30') }));
     expect(p.range).toEqual({ min: 743.84, max: 2250 });
-    expect(p.calculation).toContain('La paga de verano se suele cobrar en junio o julio');
+    expect(text(p.calculation)).toContain('La paga de verano se suele cobrar en junio o julio');
   });
   it('outside June, July and December nothing is lowered', () => {
-    expect(extraPayItem(base)?.calculation).not.toContain('se suele cobrar');
+    expect(text(extraPay(base).calculation)).not.toContain('se suele cobrar');
   });
 });
 

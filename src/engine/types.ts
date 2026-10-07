@@ -1,3 +1,4 @@
+import type { Calculation } from './calculation';
 import type { CivilDate } from './date';
 import type { Range } from './money';
 import type { Source } from './sources';
@@ -56,7 +57,7 @@ export interface Item {
   readonly id: ItemId;
   readonly direction: 'credit' | 'deduction';
   readonly range: Range | null;
-  readonly calculation: string;
+  readonly calculation: Calculation;
   readonly dependsOnAgreement: boolean;
   readonly basedOnYourAnswer: boolean;
   readonly sources: readonly Source[];

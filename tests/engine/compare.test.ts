@@ -6,7 +6,7 @@ const credit = (min: number, max: number): Item => ({
   id: 'holiday_pay',
   direction: 'credit',
   range: { min, max },
-  calculation: '',
+  calculation: [],
   dependsOnAgreement: false,
   basedOnYourAnswer: false,
   sources: [],

@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { computeSeverance } from '../../src/engine/severance';
 import { parseDate as f } from '../../src/engine/date';
+import { calculationText } from '../../src/calculator/calculation';
+import type { Calculation } from '../../src/engine/calculation';
+import { t } from '../../src/i18n';
 
+const text = (c: Calculation) => calculationText(c, (key, vars) => t('es', key, vars));
 const annual = (monthly: number) => monthly * 12;
 const testCase = (
   cause: 'unfair_dismissal' | 'objective_dismissal',
@@ -78,7 +82,7 @@ describe('fixed-term contract end (guide §9)', () => {
   ])('contract from %s to %s (%i days) → %i days per year', (startDate, endDate, days, n) => {
     const r = fixedTerm(startDate, endDate);
     expect(r.amount).toBe(Math.round(((100 * days * n) / 365) * 100) / 100);
-    expect(r.detail).toContain(`${n}/365`);
+    expect(text(r.calculation)).toContain(`${n}/365`);
   });
   it('replacement and training contracts have no severance', () => {
     expect(fixedTerm('2025-01-01', '2025-12-31', 'replacement').amount).toBe(0);
@@ -116,11 +120,11 @@ describe('range where the CGPJ calculator and its guide disagree', () => {
   it('away from the edge the range is the amount itself, with no note', () => {
     const r = testCase('unfair_dismissal', '2010-03-01', '2026-09-15', 30000);
     expect(r.range).toEqual({ min: r.amount, max: r.amount });
-    expect(r.detail).not.toContain('La calculadora del CGPJ');
+    expect(text(r.calculation)).not.toContain('La calculadora del CGPJ');
   });
   it('the note appears only when the range is not degenerate', () => {
     const r = testCase('objective_dismissal', '2014-02-15', '2015-07-16', 35938);
-    expect(r.detail).toContain(
+    expect(text(r.calculation)).toContain(
       'La calculadora del CGPJ y su guía cuentan distinto los meses en este caso (un mes de diferencia); por eso damos un margen entre ambas cifras.',
     );
   });

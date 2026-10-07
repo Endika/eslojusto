@@ -1,5 +1,6 @@
 import { SOURCES, type Source } from './sources';
-import { days, between, exact, num, round2, type Range } from './money';
+import { between, exact, round2, type Range } from './money';
+import { phrase, type Calculation, type Phrase } from './calculation';
 import {
   compareDates,
   calendarDays,
@@ -16,7 +17,7 @@ export interface Severance {
   readonly salaryDays: number;
   readonly dailySalary: number;
   readonly capApplied: boolean;
-  readonly detail: string;
+  readonly calculation: Calculation;
   readonly sources: readonly Source[];
 }
 
@@ -30,7 +31,7 @@ function result(
   dailySalary: number,
   salaryDays: number,
   capApplied: boolean,
-  detail: string,
+  calculation: Calculation,
   sources: readonly Source[],
 ): Severance {
   const amount = round2(dailySalary * salaryDays);
@@ -40,13 +41,10 @@ function result(
     salaryDays,
     dailySalary,
     capApplied,
-    detail,
+    calculation,
     sources,
   };
 }
-
-const RANGE_NOTE =
-  ' La calculadora del CGPJ y su guía cuentan distinto los meses en este caso (un mes de diferencia); por eso damos un margen entre ambas cifras.';
 
 type Pick = 'g' | 'lo' | 'hi';
 interface MonthsRange {
@@ -68,8 +66,15 @@ function monthsRange(from: CivilDate, to: CivilDate): MonthsRange {
 interface Computation {
   readonly days: number;
   readonly capped: boolean;
-  readonly detail: string;
+  readonly calculation: Calculation;
 }
+
+const total = (days: number, sd: number): Phrase =>
+  phrase('severance.total', { dias: { days }, diario: { euros: sd } });
+
+// The cap, when it applies, comes before the total.
+const capAndTotal = (capped: boolean, cap: number, days: number, sd: number): Phrase[] =>
+  capped ? [phrase('severance.cap', { tope: cap }), total(days, sd)] : [total(days, sd)];
 
 function unfairComputation(
   startDate: CivilDate,
@@ -77,43 +82,50 @@ function unfairComputation(
   sd: number,
   pick: Pick,
 ): Computation {
-  const perDay = `${num(sd)} €/día`;
   if (compareDates(startDate, DT11_START) >= 0) {
     const months = monthsRange(startDate, endDate)[pick];
     const gross = months * 2.75;
-    const total = Math.min(gross, UNFAIR_CAP_DAYS);
+    const days = Math.min(gross, UNFAIR_CAP_DAYS);
     const capped = gross > UNFAIR_CAP_DAYS;
-    const base = `${months} meses × 2,75 = ${days(gross)} días.`;
-    const detail = capped
-      ? `${base} Tope de ${UNFAIR_CAP_DAYS} días. Total ${days(total)} días × ${perDay}.`
-      : `${base} Total ${days(total)} días × ${perDay}.`;
-    return { days: total, capped, detail };
+    return {
+      days,
+      capped,
+      calculation: [
+        phrase('severance.unfair', { meses: months, dias: { days: gross } }),
+        ...capAndTotal(capped, UNFAIR_CAP_DAYS, days, sd),
+      ],
+    };
   }
   const months1 = monthsRange(startDate, min(endDate, FIRST_STRETCH_END))[pick];
   const d1 = months1 * 3.75;
-  const txt1 = `Tramo hasta 11-02-2012: ${months1} meses × 3,75 = ${days(d1)} días.`;
+  const first = phrase('severance.first_stretch', { meses: months1, dias: { days: d1 } });
   if (d1 > UNFAIR_CAP_DAYS) {
-    const total = Math.min(d1, ABSOLUTE_CAP_DAYS);
+    const days = Math.min(d1, ABSOLUTE_CAP_DAYS);
     return {
-      days: total,
-      capped: total < d1,
-      detail: `${txt1} Supera ${UNFAIR_CAP_DAYS} días: el tramo posterior no suma y el máximo es ${ABSOLUTE_CAP_DAYS} días. Total ${days(total)} días × ${perDay}.`,
+      days,
+      capped: days < d1,
+      calculation: [
+        first,
+        phrase('severance.over_cap', { tope: UNFAIR_CAP_DAYS, maximo: ABSOLUTE_CAP_DAYS }),
+        total(days, sd),
+      ],
     };
   }
   let d2 = 0;
-  let txt2 = '';
+  const second: Phrase[] = [];
   if (compareDates(endDate, DT11_START) >= 0) {
     const months2 = monthsRange(DT11_START, endDate)[pick];
     d2 = months2 * 2.75;
-    txt2 = ` Tramo desde 12-02-2012: ${months2} meses × 2,75 = ${days(d2)} días.`;
+    second.push(phrase('severance.second_stretch', { meses: months2, dias: { days: d2 } }));
   }
   const gross = d1 + d2;
-  const total = Math.min(gross, UNFAIR_CAP_DAYS);
+  const days = Math.min(gross, UNFAIR_CAP_DAYS);
   const capped = gross > UNFAIR_CAP_DAYS;
-  const tail = capped
-    ? ` Tope de ${UNFAIR_CAP_DAYS} días. Total ${days(total)} días × ${perDay}.`
-    : ` Total ${days(total)} días × ${perDay}.`;
-  return { days: total, capped, detail: `${txt1}${txt2}${tail}` };
+  return {
+    days,
+    capped,
+    calculation: [first, ...second, ...capAndTotal(capped, UNFAIR_CAP_DAYS, days, sd)],
+  };
 }
 
 function objectiveComputation(
@@ -124,13 +136,16 @@ function objectiveComputation(
 ): Computation {
   const months = monthsRange(startDate, endDate)[pick];
   const gross = (months * 20) / 12;
-  const total = Math.min(gross, OBJECTIVE_CAP_DAYS);
+  const days = Math.min(gross, OBJECTIVE_CAP_DAYS);
   const capped = gross > OBJECTIVE_CAP_DAYS;
-  const base = `${months} meses × 20/12 = ${days(gross)} días.`;
-  const detail = capped
-    ? `${base} Tope de ${OBJECTIVE_CAP_DAYS} días. Total ${days(total)} días × ${num(sd)} €/día.`
-    : `${base} Total ${days(total)} días × ${num(sd)} €/día.`;
-  return { days: total, capped, detail };
+  return {
+    days,
+    capped,
+    calculation: [
+      phrase('severance.objective', { meses: months, dias: { days: gross } }),
+      ...capAndTotal(capped, OBJECTIVE_CAP_DAYS, days, sd),
+    ],
+  };
 }
 
 function withRange(
@@ -143,13 +158,15 @@ function withRange(
   const guide = calculation(startDate, endDate, sd, 'g');
   const low = round2(sd * calculation(startDate, endDate, sd, 'lo').days);
   const high = round2(sd * calculation(startDate, endDate, sd, 'hi').days);
-  const base = result(sd, guide.days, guide.capped, guide.detail, sources);
+  const base = result(sd, guide.days, guide.capped, guide.calculation, sources);
   const range = between(Math.min(low, base.amount), Math.max(high, base.amount));
   const degenerate = range.min === range.max;
   return {
     ...base,
     range,
-    detail: degenerate ? base.detail : base.detail + RANGE_NOTE,
+    calculation: degenerate
+      ? base.calculation
+      : [...base.calculation, phrase('severance.cgpj_range')],
   };
 }
 
@@ -183,13 +200,7 @@ function fixedTermEnd(
 ): Severance {
   const sources = [SOURCES.et49_1c, SOURCES.etDt8, SOURCES.cgpjGuide];
   if (kind === 'replacement' || kind === 'training') {
-    return result(
-      sd,
-      0,
-      false,
-      `Los contratos de ${kind === 'replacement' ? 'sustitución' : 'formación'} no generan indemnización por fin de contrato.`,
-      sources,
-    );
+    return result(sd, 0, false, [phrase(`severance.${kind}`)], sources);
   }
   const n = fixedTermDaysPerYear(startDate);
   const dn = calendarDays(startDate, endDate);
@@ -198,7 +209,13 @@ function fixedTermEnd(
     sd,
     salaryDays,
     false,
-    `${new Intl.NumberFormat('es-ES', { useGrouping: 'always' }).format(dn)} días × ${n}/365 × ${num(sd)} €/día`,
+    [
+      phrase('severance.fixed_term', {
+        dias: { integer: dn },
+        dias_anuales: n,
+        diario: { euros: sd },
+      }),
+    ],
     sources,
   );
 }
@@ -220,16 +237,19 @@ export function computeSeverance(args: {
     case 'fixed_term_end':
       return fixedTermEnd(startDate, endDate, sd, fixedTermType);
     case 'resignation':
-      return result(sd, 0, false, 'La dimisión voluntaria no genera indemnización.', [
-        SOURCES.et49_1d,
-        SOURCES.cgpjGuide,
-      ]);
+      return result(
+        sd,
+        0,
+        false,
+        [phrase('severance.resignation')],
+        [SOURCES.et49_1d, SOURCES.cgpjGuide],
+      );
     case 'disciplinary_dismissal':
       return result(
         sd,
         0,
         false,
-        'El despido disciplinario declarado procedente no genera indemnización. Si se declara improcedente, se calcula como un despido improcedente.',
+        [phrase('severance.disciplinary')],
         [SOURCES.et55, SOURCES.et56, SOURCES.cgpjGuide],
       );
   }
