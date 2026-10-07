@@ -160,6 +160,16 @@ describe('the extraordinary caps', () => {
 });
 
 describe('a charge with no basis to compare', () => {
+  it('of another kind may be a metered supply or a tax: left to look at', () => {
+    const [r] = checkCharges(
+      input([
+        community({ kind: 'other', annualAgreed: 300, charged: [{ year: 2026, amount: 500 }] }),
+      ]),
+      DEPS,
+    );
+    expect(singleOf(r)).toEqual({ status: 'review_it', amount: null });
+  });
+
   it('missing from the contract is left to look at, with what was charged and no total', () => {
     const [r] = checkCharges(
       input([

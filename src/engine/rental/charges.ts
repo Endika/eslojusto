@@ -162,6 +162,12 @@ function chargeItems(
     );
   }
   if (tax || missing !== null) return [item(single(informative))];
+  // A charge of another kind may be a supply read by meter (art. 20.3, the tenant's) or a tax, both
+  // outside the cap: left to look at, with no figure.
+  if (c.kind === 'other')
+    return [
+      item(single(itemReading('review_it', null, [p('charges.other_kind')], ['charges_meters']))),
+    ];
   const agreed = c.annualAgreed ?? 0;
   if (c.charged.length === 0) return [item(single(notEntered(['charges_pact'])))];
   const start = input.startDate;
