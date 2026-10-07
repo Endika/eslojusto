@@ -1,0 +1,47 @@
+name: Deploy API
+
+# Only after CI went green on a push to main, and only once a reviewer approves the protected
+# `production` environment: the AWS role trusts nothing but jobs running in that environment.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer run replaces one still waiting for approval, never one already deploying.
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+      || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v7
+        with: { node-version: 24, cache: npm, cache-dependency-path: api/package-lock.json }
+      - run: npm ci
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: eu-south-2
+      - run: npx cdk deploy EslojustoApi --require-approval never -c stripePriceId="$STRIPE_PRICE_ID"
+        env:
+          STRIPE_PRICE_ID: ${{ vars.STRIPE_PRICE_ID }}
