@@ -1,0 +1,74 @@
+import { describe, expect, it } from 'vitest';
+import { letterModel, reportModel, type Block } from '../../src/documents/report';
+import { completed, today, tr, unfairDismissal } from './fixtures';
+
+const text = (blocks: readonly Block[]) =>
+  blocks
+    .map((b) =>
+      'text' in b ? b.text : 'label' in b ? `${b.label} ${'value' in b ? b.value : ''}` : '',
+    )
+    .join('\n');
+
+describe('the report', () => {
+  const model = reportModel(completed(), tr, today);
+  const all = text(model.blocks);
+  it('covers the data, every item, what is not checked and the benefit', () => {
+    expect(all).toContain('Despido improcedente');
+    expect(all).toContain('01-03-2010');
+    expect(all).toContain('Indemnización');
+    expect(all).toContain('Por debajo del mínimo legal: faltan 438,41');
+    expect(all).toContain('Lo que esta revisión no comprueba');
+    expect(all).toContain('Salarios de tramitación');
+    expect(all).toContain('Tu paro (estimación)');
+    expect(all).toContain('720 días');
+  });
+  it('cites every source with its link and the date it is in force from', () => {
+    const sources = model.blocks.filter((b) => b.type === 'source');
+    expect(sources.length).toBeGreaterThan(5);
+    expect(sources).toContainEqual({
+      type: 'source',
+      text: 'Estatuto de los Trabajadores, art. 56 · en vigor desde 13-11-2015',
+      url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430#a56',
+    });
+  });
+  it('dates itself and the law it applies', () => {
+    expect(all).toContain('7 de octubre de 2026');
+    expect(model.footer).toContain('Cifras según la ley en vigor el 7 de octubre de 2026');
+  });
+});
+
+describe('the letter', () => {
+  it('lists only what falls short, with both figures and the difference', () => {
+    const bullets = letterModel(completed(), tr).blocks.filter((b) => b.type === 'bullet');
+    expect(bullets).toHaveLength(1);
+    expect(bullets[0]).toMatchObject({
+      text: expect.stringMatching(
+        /^Indemnización: la propuesta recoge 40\.000,00\s€ y el mínimo legal es 40\.438,41\s€; faltan 438,41\s€\.$/,
+      ),
+    });
+  });
+  it('a deduction above its maximum reads as such', () => {
+    const r = completed(
+      { ...unfairDismissal, cause: 'resignation', agreementNoticeDays: 15, noticeDaysGiven: 0 },
+      { notice_deduction: 5000 },
+    );
+    const bullets = letterModel(r, tr).blocks.filter((b) => b.type === 'bullet');
+    expect(bullets[0]).toMatchObject({
+      text: expect.stringContaining('la propuesta descuenta 5.000,00'),
+    });
+  });
+  it('leaves name, ID, company, place and date for the person to write', () => {
+    const blanks = letterModel(completed(), tr).blocks.filter((b) => b.type === 'blank');
+    expect(blanks.map((b) => ('label' in b ? b.label : ''))).toEqual([
+      'Nombre y apellidos',
+      'DNI o NIE',
+      'Empresa',
+      'Nombre y apellidos',
+    ]);
+  });
+  it('gives no advice and asks for nothing', () => {
+    const all = text(letterModel(completed(), tr).blocks).toLowerCase();
+    for (const word of [/\bfirma/, /\breclam/, /\bdemand/, /está bien/, /es correcto/])
+      expect(all).not.toMatch(word);
+  });
+});
