@@ -80,6 +80,7 @@ export type RentalPhraseKey =
   | 'deposit.deduction.other'
   | 'deposit.deductions_not_judged'
   | 'deposit.owed'
+  | 'deposit.not_yet_due'
   | 'deposit.returned_in_full'
   | 'deposit.returned_on_time'
   | 'deposit.interest_not_yet'
