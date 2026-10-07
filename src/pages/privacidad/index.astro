@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { t, type Key } from '../../i18n';
 import { DOCUMENTS } from '../../documents/config';
+import { OUTAGE_KEY } from '../../documents/outage';
 import { STORAGE_KEYS } from '../../documents/pass';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
@@ -28,11 +29,11 @@ const stored = [
         {
           what: tx('privacy.data_documents'),
           where:
-            'Solo si eliges subir tu finiquito, tus nóminas o tu vida laboral y das tu consentimiento. Las fotos o el PDF viajan cifrados a un servidor de eslojusto.es en Amazon Web Services, en España (región eu-south-2), que se los pasa a un modelo de IA (Claude, de Anthropic) a través de Amazon Bedrock, dentro de la Unión Europea. El modelo copia los datos que pide el formulario y lo leído vuelve a tu navegador. No se guarda nada: el documento solo existe en la memoria del servidor mientras se lee, y sus registros, que se conservan 14 días, llevan solo datos técnicos: el resultado, el número de páginas, cuánto tardó, cuánto texto procesó el modelo y unas marcas de funcionamiento, como si hizo falta una segunda lectura. Nunca el contenido ni nada que te identifique.',
+            'Solo si eliges subir tus documentos (la carta de despido, el finiquito, tus nóminas, el certificado de empresa, un acuerdo o acta de conciliación o tu vida laboral) y das tu consentimiento. Los PDF se convierten en imágenes de sus páginas en tu navegador, sin salir de él; esas imágenes y las fotos viajan cifradas a un servidor de eslojusto.es en Amazon Web Services, en España (región eu-south-2), que se los pasa a un modelo de IA (Claude, de Anthropic) a través de Amazon Bedrock, dentro de la Unión Europea. El modelo indica qué tipo de documento es cada página, copia los datos que pide el formulario y lo leído vuelve a tu navegador. No se guarda nada: los documentos solo existen en la memoria del servidor mientras se lee, y sus registros, que se conservan 14 días, llevan solo datos técnicos: el resultado, el número de páginas, cuánto tardó, cuánto texto procesó el modelo y unas marcas de funcionamiento, como si hizo falta una segunda lectura o cuántos datos no coincidían entre documentos (sin decir cuáles ni sus valores). Nunca el contenido ni nada que te identifique.',
         },
         {
           what: tx('privacy.data_pass'),
-          where: `En el almacenamiento local (localStorage) de tu navegador, y solo si los usas: un contador firmado de tus lecturas gratis del día («${STORAGE_KEYS.quota}»); si compras el pase, el pase y las lecturas que le quedan («${STORAGE_KEYS.pass}») y el código de cada pago que empiezas, con un número al azar que solo conoce tu navegador, para poder recuperar el pase («${STORAGE_KEYS.checkout}»; cada pago se quita a los 7 días si no se completó, o cuando caduca su pase). No llevan tu nombre ni nada de tus documentos, y solo salen de tu dispositivo con la siguiente lectura o para recuperar el pase. Se borran al borrar los datos de este sitio en tu navegador.`,
+          where: `En el almacenamiento local (localStorage) de tu navegador, y solo si los usas: un contador firmado de tus lecturas gratis del día («${STORAGE_KEYS.quota}»); si compras el pase, el pase y las lecturas que le quedan («${STORAGE_KEYS.pass}») y el código de cada pago que empiezas, con un número al azar que solo conoce tu navegador, para poder recuperar el pase («${STORAGE_KEYS.checkout}»; cada pago se quita a los 7 días si no se completó, o cuando caduca su pase). No llevan tu nombre ni nada de tus documentos, y solo salen de tu dispositivo con la siguiente lectura o para recuperar el pase. Se borran al borrar los datos de este sitio en tu navegador. Si la lectura no está disponible, la pestaña lo recuerda una hora en su almacenamiento de sesión («${OUTAGE_KEY}», solo con la hora) para no ofrecértela mientras tanto.`,
         },
         {
           what: tx('privacy.data_checkout'),
@@ -99,8 +100,8 @@ const tracked = [
           what: 'Si eliges subir un documento o rellenar a mano.',
         },
         {
-          when: 'Al leer un documento',
-          what: 'Qué tipo de documento eliges (finiquito, nóminas o vida laboral), cuántos archivos subes y si son fotos o un PDF. Al terminar, cuántos datos se rellenaron, en un tramo (0, de 1 a 3, de 4 a 8, o 9 o más), si alguno salió con confianza baja, si las cifras no cuadraban y si hizo falta leerlo otra vez con un modelo más preciso; o, si falla, el código del error. Nunca nada de lo que pone el documento.',
+          when: 'Al leer documentos',
+          what: 'Cuántas fotos o páginas subes, en un tramo (1, de 2 a 4, de 5 a 9, o de 10 a 15), y cuántos PDF elegiste. Al terminar, qué tipos de documento se reconocieron (por ejemplo, carta de despido o nómina), cuántos datos se rellenaron, en un tramo (0, de 1 a 3, de 4 a 8, o 9 o más), si alguno salió con confianza baja, si las cifras no cuadraban, si dos documentos no coincidían y si hizo falta leerlos otra vez con un modelo más preciso; o, si falla, el código del error. Nunca nada de lo que ponen los documentos.',
         },
         {
           when: 'Con el pase',

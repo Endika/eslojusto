@@ -36,7 +36,7 @@ const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
 export const lowest = (...cs: Confidence[]): Confidence =>
   cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
 
-const money = (f: ExtractedField | undefined): number | null =>
+const num = (f: ExtractedField | undefined): number | null =>
   f && typeof f.value === 'number' ? f.value : null;
 const text = (f: ExtractedField | undefined): string | null =>
   f && typeof f.value === 'string' ? f.value : null;
@@ -64,44 +64,50 @@ function wholeMonth(start: string | null, end: string | null): boolean {
   );
 }
 
-function settlement(e: Extraction): PrefilledField[] {
+type Fields = Extraction['fields'];
+
+// The values the documents state as such.
+function stated(fields: Fields): PrefilledField[] {
   const out: PrefilledField[] = [];
-  const { fields } = e;
   for (const name of ['startDate', 'endDate', 'cause'] as const) {
     const f = fields[name];
     const v = text(f);
     if (f && v !== null) out.push({ name, value: v, confidence: f.confidence });
   }
-  const fixedTerm = fields['fixedTermType'];
-  if (fixedTerm && text(fixedTerm) !== null && text(fields['cause']) === 'fixed_term_end')
+  const fixedTerm = fields.fixedTermType;
+  if (fixedTerm && text(fixedTerm) !== null && text(fields.cause) === 'fixed_term_end')
     out.push({
       name: 'fixedTermType',
       value: String(fixedTerm.value),
       confidence: fixedTerm.confidence,
     });
-  const salary = money(fields['monthlySalary']);
-  if (salary !== null && fields['monthlySalary'])
+  const salary = fields.monthlySalary;
+  const salaryAmount = num(salary);
+  if (salary && salaryAmount !== null)
     out.push({
       name: 'monthlySalary',
-      value: formatAmountInput(salary),
-      confidence: fields['monthlySalary'].confidence,
+      value: formatAmountInput(salaryAmount),
+      confidence: salary.confidence,
     });
+  for (const name of ['annualHolidayDays', 'holidayDaysTaken', 'noticeDaysReceived'] as const) {
+    const f = fields[name];
+    const v = num(f);
+    if (f && v !== null && Number.isInteger(v))
+      out.push({ name, value: String(v), confidence: f.confidence });
+  }
   for (const id of ITEM_IDS) {
     const f = fields[id];
-    const v = money(f);
+    const v = num(f);
     if (f && v !== null)
       out.push({ name: `figure_${id}`, value: formatAmountInput(v), confidence: f.confidence });
   }
   return out;
 }
 
-function payslip(e: Extraction): PrefilledField[] {
+// What the latest ordinary payslip says about extra pay, and the salary worked out from it.
+function payslip(fields: Fields, salaryStated: boolean): PrefilledField[] {
   const out: PrefilledField[] = [];
-  const { fields } = e;
-  const start = fields['startDate'];
-  if (start && text(start) !== null)
-    out.push({ name: 'startDate', value: String(start.value), confidence: start.confidence });
-  const prorated = fields['extraPayProrated'];
+  const prorated = fields.extraPayProrated;
   const isProrated = prorated && typeof prorated.value === 'boolean' ? prorated.value : null;
   if (prorated && isProrated !== null)
     out.push({
@@ -109,24 +115,25 @@ function payslip(e: Extraction): PrefilledField[] {
       value: isProrated ? 'yes' : 'no',
       confidence: prorated.confidence,
     });
-  const extra = fields['extraPayAmount'];
-  const extraAmount = money(extra);
+  const extra = fields.extraPayAmount;
+  const extraAmount = num(extra);
   if (extra && extraAmount !== null && isProrated === false)
     out.push({
       name: 'extraPayAmount',
       value: formatAmountInput(extraAmount),
       confidence: extra.confidence,
     });
+  if (salaryStated) return out;
 
   // The form's salary, only for a payslip of one whole calendar month: with proration, the
   // month's total; without it, the total less the full extra payment when one was paid that
   // month, and the total otherwise. Without the proration answer the total can't be read either
   // way, so no salary is proposed. The person sees it as worked out and confirms it.
-  const total = fields['totalAccrued'];
-  const totalAmount = money(total);
-  const paid = fields['extraPayPaid'];
+  const total = fields.payslipTotalAccrued;
+  const totalAmount = num(total);
+  const paid = fields.extraPayPaid;
   const extraPaid = paid && typeof paid.value === 'boolean' ? paid.value : false;
-  const period = [text(fields['periodStart']), text(fields['periodEnd'])] as const;
+  const period = [text(fields.payslipPeriodStart), text(fields.payslipPeriodEnd)] as const;
   const known = isProrated === true || !extraPaid || extraAmount !== null;
   if (
     total &&
@@ -155,10 +162,13 @@ function payslip(e: Extraction): PrefilledField[] {
 }
 
 // The other jobs of the last 6 years: every row with both dates, but not the job being reviewed.
-function workHistory(e: Extraction, current: { startDate?: string; endDate?: string }) {
+function workHistory(
+  rows: Extraction['contracts'],
+  current: { startDate?: string; endDate?: string },
+) {
   const end = safeDate(current.endDate ?? null);
   const since = end ? `${String(end.y - 6).padStart(4, '0')}${current.endDate?.slice(4)}` : null;
-  return (e.lists['contracts'] ?? []).flatMap((row): PrefilledContract[] => {
+  return rows.flatMap((row): PrefilledContract[] => {
     const { startDate, endDate } = row.values;
     if (typeof startDate !== 'string' || typeof endDate !== 'string') return [];
     if (startDate === current.startDate) return [];
@@ -169,14 +179,29 @@ function workHistory(e: Extraction, current: { startDate?: string; endDate?: str
 }
 
 // What a reading puts into the form. Nothing here calculates the final pay: it only fills fields,
-// and the person goes through every sheet before anything is reviewed.
+// and the person goes through every sheet before anything is reviewed. The job's own dates come
+// from the documents when they state them, otherwise from what the form already has.
 export function prefillFrom(
   e: Extraction,
   current: { startDate?: string; endDate?: string } = {},
 ): Prefill {
-  if (e.kind === 'settlement') return { fields: settlement(e), otherContracts: null };
-  if (e.kind === 'payslip') return { fields: payslip(e), otherContracts: null };
-  return { fields: [], otherContracts: workHistory(e, current) };
+  const own = stated(e.fields);
+  const fields = [
+    ...own,
+    ...payslip(
+      e.fields,
+      own.some((f) => f.name === 'monthlySalary'),
+    ),
+  ];
+  const dates = {
+    ...current,
+    ...(text(e.fields.startDate) !== null && { startDate: text(e.fields.startDate) as string }),
+    ...(text(e.fields.endDate) !== null && { endDate: text(e.fields.endDate) as string }),
+  };
+  return {
+    fields,
+    otherContracts: e.contracts.length > 0 ? workHistory(e.contracts, dates) : null,
+  };
 }
 
 export const prefilledCount = (p: Prefill): number =>

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { createApi, parseExtraction, type Fetch } from '../../src/documents/api';
+import { EXTRACT_TIMEOUT_SECONDS } from '../../api/src/config';
+import { API_TIMEOUT_MS, createApi, parseExtraction, type Fetch } from '../../src/documents/api';
 
 interface Call {
   url: string;
@@ -22,13 +23,22 @@ const ENDPOINTS = {
   pass: 'https://pass.api.test/',
 };
 
+// As the API sends it: page numbers per document, rows under `lists`.
+const sent = {
+  pages: [{ page: 1, kind: 'settlement_proposal', document: 1, confidence: 'high' }],
+  documents: [{ kind: 'settlement_proposal', pages: [1] }],
+  fields: { endDate: { value: '2026-09-15', confidence: 'high', source: 'settlement_proposal' } },
+  lists: {},
+  conflicts: [],
+};
+// As the page keeps it: how many pages per document, and the rows on their own.
 const extraction = {
-  kind: 'settlement',
-  fields: { endDate: { value: '2026-09-15', confidence: 'high' } },
-  lists: { otherAccruals: [{ values: { amount: 12.5 }, confidence: 'medium' }] },
+  documents: [{ kind: 'settlement_proposal', pages: 1 }],
+  fields: sent.fields,
+  contracts: [],
+  conflicts: [],
 };
 const request = {
-  kind: 'settlement' as const,
   files: [{ mediaType: 'image/jpeg' as const, data: 'AAAA' }],
   captchaToken: 'turnstile',
 };
@@ -37,7 +47,7 @@ describe('extract', () => {
   it('posts to {base}/extract and returns the reading and the next allowance', async () => {
     const fetch = fakeFetch(200, {
       code: 'ok',
-      extraction,
+      extraction: sent,
       failedChecks: ['items_do_not_sum', 'x'],
       allowance: 'v1.q.s',
     });
@@ -56,7 +66,7 @@ describe('extract', () => {
   it('passes on whether the reading escalated', async () => {
     const fetch = fakeFetch(200, {
       code: 'ok',
-      extraction,
+      extraction: sent,
       failedChecks: [],
       allowance: 'q',
       escalated: true,
@@ -64,17 +74,17 @@ describe('extract', () => {
     expect(await createApi(ENDPOINTS, fetch).extract(request)).toMatchObject({ escalated: true });
   });
   it('sends a pass instead of the quota when it has one', async () => {
-    const fetch = fakeFetch(200, { code: 'ok', extraction, failedChecks: [], readsLeft: 11 });
+    const fetch = fakeFetch(200, { code: 'ok', extraction: sent, failedChecks: [], readsLeft: 11 });
     await createApi(ENDPOINTS, fetch).extract({ ...request, pass: 'p1', quota: 'q' });
     expect(fetch.calls[0]?.body).toEqual({ ...request, pass: 'p1' });
   });
   it('a pass read without its reads left, or a free read without a quota, is unexpected', async () => {
-    const free = fakeFetch(200, { code: 'ok', extraction, failedChecks: [], readsLeft: 3 });
+    const free = fakeFetch(200, { code: 'ok', extraction: sent, failedChecks: [], readsLeft: 3 });
     expect(await createApi(ENDPOINTS, free).extract(request)).toEqual({
       ok: false,
       code: 'unexpected_response',
     });
-    const paid = fakeFetch(200, { code: 'ok', extraction, failedChecks: [], allowance: 'q' });
+    const paid = fakeFetch(200, { code: 'ok', extraction: sent, failedChecks: [], allowance: 'q' });
     expect(await createApi(ENDPOINTS, paid).extract({ ...request, pass: 'p' })).toEqual({
       ok: false,
       code: 'unexpected_response',
@@ -88,7 +98,7 @@ describe('extract', () => {
     });
   });
   it('an unknown code, a bad shape or no JSON is an unexpected response', async () => {
-    for (const body of [{ code: 'teapot' }, { code: 'ok', extraction: { kind: 'x' } }, 'nope'])
+    for (const body of [{ code: 'teapot' }, { code: 'ok', extraction: { documents: [] } }, 'nope'])
       expect(await createApi(ENDPOINTS, fakeFetch(200, body)).extract(request)).toEqual({
         ok: false,
         code: 'unexpected_response',
@@ -120,31 +130,59 @@ describe('extract', () => {
   });
 });
 
+describe('the time the browser waits', () => {
+  it('outlasts the extract function by a minute, for the upload', () => {
+    expect(API_TIMEOUT_MS).toBeGreaterThanOrEqual((EXTRACT_TIMEOUT_SECONDS + 60) * 1000);
+  });
+});
+
 describe('parseExtraction', () => {
-  it('keeps only the fields and lists its kind has, in the contract shape', () => {
+  it('keeps only what has the contract’s shape, and counts each document’s pages', () => {
     expect(
       parseExtraction({
-        kind: 'payslip',
+        pages: [],
+        documents: [
+          { kind: 'dismissal_letter', pages: [1, 2, 3] },
+          { kind: 'payslip', pages: [4], month: '2026-08' },
+          { kind: 'payslip', pages: [5], month: 'agosto' },
+          { kind: 'contract', pages: [6] },
+          { kind: 'other', pages: [] },
+        ],
         fields: {
-          totalAccrued: { value: 1850, confidence: 'high' },
-          bad: { value: { nested: 1 }, confidence: 'high' },
-          unsure: { value: 1, confidence: 'maybe' },
-          severance: { value: 1, confidence: 'high' },
-          extraPayPaid: { value: true, confidence: 'medium' },
+          payslipTotalAccrued: { value: 1850, confidence: 'high', source: 'payslip' },
+          bad: { value: { nested: 1 }, confidence: 'high', source: 'payslip' },
+          unsure: { value: 1, confidence: 'maybe', source: 'payslip' },
+          severance: { value: 1, confidence: 'high', source: 'other' },
+          endDate: { value: '2026-09-15', confidence: 'high' },
+          extraPayPaid: { value: true, confidence: 'medium', source: 'payslip' },
         },
         lists: {
-          accruals: [{ values: { amount: 1 }, confidence: 'low' }, { values: 3 }],
-          contracts: [{ values: { startDate: '2020-01-01' }, confidence: 'high' }],
+          contracts: [
+            { values: { startDate: '2020-01-01' }, confidence: 'high', source: 'work_history' },
+            { values: 3 },
+          ],
           x: 4,
         },
+        conflicts: [
+          { field: 'endDate', sources: ['settlement_proposal', 'dismissal_letter', 'x'] },
+          { field: 'name', sources: ['payslip'] },
+          { field: 'cause', sources: [] },
+        ],
       }),
     ).toEqual({
-      kind: 'payslip',
+      documents: [
+        { kind: 'dismissal_letter', pages: 3 },
+        { kind: 'payslip', pages: 1, month: '2026-08' },
+        { kind: 'payslip', pages: 1 },
+      ],
       fields: {
-        totalAccrued: { value: 1850, confidence: 'high' },
-        extraPayPaid: { value: true, confidence: 'medium' },
+        payslipTotalAccrued: { value: 1850, confidence: 'high', source: 'payslip' },
+        extraPayPaid: { value: true, confidence: 'medium', source: 'payslip' },
       },
-      lists: { accruals: [{ values: { amount: 1 }, confidence: 'low' }] },
+      contracts: [
+        { values: { startDate: '2020-01-01' }, confidence: 'high', source: 'work_history' },
+      ],
+      conflicts: [{ field: 'endDate', sources: ['settlement_proposal', 'dismissal_letter'] }],
     });
   });
 });

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { test, expect, type Page, type Request } from '@playwright/test';
+import { devices, test, expect, type Page, type Request } from '@playwright/test';
+import { pdfBomb, syntheticPdf } from '../support/synthetic-pdf';
 
 // Runs only against a TEST_DOCUMENTS=1 build, whose API is three fake origins: every request to them,
 // to Turnstile and to Stripe is answered here. The documents are synthetic.
@@ -24,19 +25,25 @@ const b64url = (v: object) => Buffer.from(JSON.stringify(v)).toString('base64url
 const expiresAt = Math.floor(Date.now() / 1000) + 7 * 86400;
 const PASS = `v1.${b64url({ typ: 'pass', sid: 'cs_test_e2e', exp: expiresAt })}.c2ln`;
 
+const from = (source: string, value: string | number, confidence = 'high') => ({
+  value,
+  confidence,
+  source,
+});
 const SETTLEMENT = {
   code: 'ok',
   extraction: {
-    kind: 'settlement',
+    pages: [{ page: 1, kind: 'settlement_proposal', document: 1, confidence: 'high' }],
+    documents: [{ kind: 'settlement_proposal', pages: [1] }],
     fields: {
-      detectedKind: { value: 'settlement', confidence: 'high' },
-      cause: { value: 'unfair_dismissal', confidence: 'high' },
-      startDate: { value: '2010-03-01', confidence: 'high' },
-      endDate: { value: '2026-09-15', confidence: 'medium' },
-      monthlySalary: { value: 2142.86, confidence: 'high' },
-      severance: { value: 40000, confidence: 'low' },
+      cause: from('settlement_proposal', 'unfair_dismissal'),
+      startDate: from('settlement_proposal', '2010-03-01'),
+      endDate: from('settlement_proposal', '2026-09-15', 'medium'),
+      monthlySalary: from('settlement_proposal', 2142.86),
+      severance: from('settlement_proposal', 40000, 'low'),
     },
     lists: {},
+    conflicts: [],
   },
   failedChecks: [],
   allowance: 'v1.quota.e2e',
@@ -93,17 +100,18 @@ async function fakeServices(
   return fake;
 }
 
+const photo = (name: string) => ({ name, mimeType: 'image/png', buffer: PHOTO });
+
+async function openUpload(page: Page) {
+  await page.getByRole('button', { name: /Sube tus documentos/ }).click();
+  await expect(page.getByRole('heading', { name: 'Sube tus documentos' })).toBeFocused();
+}
+
 async function uploadSettlement(page: Page, { read = true } = {}) {
-  await page.getByRole('button', { name: /Sube tu finiquito, nóminas o vida laboral/ }).click();
-  await expect(page.getByRole('heading', { name: 'Sube un documento' })).toBeFocused();
-  await page.getByLabel('Propuesta de finiquito').check();
-  await page.getByLabel('Fotos o PDF').setInputFiles({
-    name: 'finiquito-sintetico.png',
-    mimeType: 'image/png',
-    buffer: PHOTO,
-  });
+  await openUpload(page);
+  await page.getByLabel('Elegir fotos o PDF').setInputFiles(photo('finiquito-sintetico.png'));
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
-  await page.getByRole('button', { name: 'Leer el documento' }).click();
+  await page.getByRole('button', { name: 'Leer los documentos' }).click();
   if (read) await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
 }
 
@@ -143,7 +151,8 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   await uploadSettlement(page);
 
   const sent = fake.extract[0]?.postDataJSON() as Record<string, unknown>;
-  expect(sent).toMatchObject({ kind: 'settlement', captchaToken: 'extract-token', quota: null });
+  expect(sent).toMatchObject({ captchaToken: 'extract-token', quota: null });
+  expect(sent).not.toHaveProperty('kind');
   expect(sent['files']).toEqual([{ mediaType: 'image/jpeg', data: expect.any(String) }]);
   await expect(page.getByText('Se han leído 5 datos')).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('eslojusto-lecturas'))).toBe(
@@ -264,12 +273,15 @@ test('cancelling at Stripe brings the review back and keeps nothing in the tab',
 test('files dropped on the zone are listed like chosen ones', async ({ page }) => {
   await fakeServices(page);
   await page.goto('finiquito/');
-  await page.getByRole('button', { name: /Sube tu finiquito, nóminas o vida laboral/ }).click();
-  await expect(page.getByText('Arrastra aquí tus fotos o el PDF')).toBeVisible();
+  await openUpload(page);
+  await expect(page.getByText('Arrastra aquí tus fotos o PDF')).toBeVisible();
+  await expect(page.getByText('Hacer foto')).toBeHidden();
   const transfer = await page.evaluateHandle((b64) => {
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
     const dt = new DataTransfer();
-    dt.items.add(new File([bytes], 'nomina-arrastrada.png', { type: 'image/png' }));
+    dt.items.add(
+      new File([bytes], 'nomina-arrastrada.png', { type: 'image/png', lastModified: 1 }),
+    );
     return dt;
   }, PHOTO.toString('base64'));
   const zone = page.locator('[data-doc-drop]');
@@ -280,6 +292,12 @@ test('files dropped on the zone are listed like chosen ones', async ({ page }) =
   await expect(page.getByRole('list', { name: 'Archivos elegidos' })).toContainText(
     'nomina-arrastrada.png',
   );
+  // The same file dropped again is not added twice.
+  await zone.dispatchEvent('drop', { dataTransfer: transfer });
+  await expect(page.getByText('Ya estaba añadido: nomina-arrastrada.png.')).toBeVisible();
+  await expect(
+    page.getByRole('list', { name: 'Archivos elegidos' }).getByRole('listitem'),
+  ).toHaveCount(1);
 });
 
 test('an API error is worded and the manual path is still there', async ({ page }) => {
@@ -307,12 +325,13 @@ test('the start sheet works by keyboard and fits 360 px in both themes', async (
       );
     expect(await overflow(), scheme).toBeLessThanOrEqual(0);
     await expect(page.getByRole('button', { name: /Rellenar a mano/ })).toBeInViewport();
-    await page.getByRole('button', { name: /Sube tu finiquito/ }).focus();
+    await page.getByRole('button', { name: /Sube tus documentos/ }).focus();
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('heading', { name: 'Sube un documento' })).toBeFocused();
+    await expect(page.getByRole('heading', { name: 'Sube tus documentos' })).toBeFocused();
     expect(await overflow(), scheme).toBeLessThanOrEqual(0);
-    await page.getByRole('button', { name: 'Leer el documento' }).click();
-    await expect(page.getByLabel('Propuesta de finiquito')).toBeFocused();
+    await page.getByRole('button', { name: 'Leer los documentos' }).click();
+    await expect(page.getByLabel('Elegir fotos o PDF')).toBeFocused();
+    await expect(page.getByText('Añade al menos una foto o un PDF')).toBeVisible();
   }
 });
 
@@ -341,4 +360,260 @@ test('the privacy page and the legal notice describe documents and the pass', as
   );
   await page.goto('finiquito/');
   await expect(page.locator('#faq-documentos')).toContainText('¿Qué pasa con mis documentos?');
+});
+
+test('files add up across picks, each can be removed, and only the rest are read', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page);
+  await page.goto('finiquito/');
+  await openUpload(page);
+  await expect(page.getByText('Sube lo que te hayan dado')).toBeVisible();
+  const choose = page.getByLabel('Elegir fotos o PDF');
+  await choose.setInputFiles(photo('carta-despido.png'));
+  await choose.setInputFiles([photo('nomina-agosto.png'), photo('certificado.png')]);
+  const list = page.getByRole('list', { name: 'Archivos elegidos' });
+  await expect(list.getByRole('listitem')).toHaveCount(3);
+  await expect(page.getByText('Añadidos 2 archivos. Llevas 3 de 15.')).toBeVisible();
+  await list.getByRole('button', { name: 'Quitar nomina-agosto.png' }).click();
+  await expect(list.getByRole('listitem')).toHaveCount(2);
+  await expect(page.getByRole('status').filter({ hasText: 'Quitado' })).toHaveText(
+    'Quitado: nomina-agosto.png. Llevas 2 de 15.',
+  );
+  await expect(list.getByRole('button', { name: 'Quitar certificado.png' })).toBeFocused();
+  await expect(list.locator('img')).toHaveCount(2);
+  await page.getByLabel(/Doy mi consentimiento explícito/).check();
+  await page.getByRole('button', { name: 'Leer los documentos' }).click();
+  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
+  const sent = fake.extract[0]?.postDataJSON() as { files: unknown[] };
+  expect(sent.files).toHaveLength(2);
+});
+
+test('a PDF is drawn in the browser: one entry per page, and only images are sent', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page);
+  await page.goto('finiquito/');
+  await openUpload(page);
+  await page.getByLabel('Elegir fotos o PDF').setInputFiles({
+    name: 'carta-sintetica.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from(syntheticPdf(3)),
+  });
+  const list = page.getByRole('list', { name: 'Archivos elegidos' });
+  await expect(list.getByRole('listitem')).toHaveCount(3);
+  await expect(list).toContainText('carta-sintetica.pdf, página 3');
+  await expect(page.getByText('Añadido: carta-sintetica.pdf. Páginas: 3.')).toBeVisible();
+  await page.getByLabel(/Doy mi consentimiento explícito/).check();
+  await page.getByRole('button', { name: 'Leer los documentos' }).click();
+  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
+  const sent = fake.extract[0]?.postDataJSON() as { files: { mediaType: string; data: string }[] };
+  expect(sent.files.map((f) => f.mediaType)).toEqual(['image/jpeg', 'image/jpeg', 'image/jpeg']);
+  expect(JSON.stringify(sent)).not.toContain('application/pdf');
+  // A JPEG of the page, not the PDF's bytes.
+  for (const f of sent.files) expect(f.data.startsWith('/9j/')).toBe(true);
+  expect(fake.other).toEqual([]);
+});
+
+test.describe('a PDF that would take minutes to draw', () => {
+  // Generated here, never committed: one page of 200 MB of drawing operators.
+  const bomb = {
+    name: 'bomba.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from(pdfBomb(200)),
+  };
+
+  async function pickBomb(page: Page) {
+    await page.goto('finiquito/');
+    await openUpload(page);
+    await page.getByLabel('Elegir fotos o PDF').setInputFiles(bomb);
+    await expect(
+      page.getByRole('list', { name: 'Archivos elegidos' }).getByRole('listitem'),
+    ).toHaveCount(1);
+    await page.getByLabel(/Doy mi consentimiento explícito/).check();
+    await page.getByRole('button', { name: 'Leer los documentos' }).click();
+    await expect(page.getByText('Preparando los archivos…')).toBeVisible();
+  }
+
+  test('«Rellenar a mano» leaves while it is being drawn', async ({ page }) => {
+    const fake = await fakeServices(page);
+    await pickBomb(page);
+    await page
+      .locator('[data-start-panel="upload"]')
+      .getByRole('button', { name: 'Rellenar a mano' })
+      .click();
+    await expect(page.getByRole('heading', { name: '¿Cómo terminó tu contrato?' })).toBeFocused();
+    expect(fake.extract).toHaveLength(0);
+  });
+
+  test('is given up on after 15 s, with a message', async ({ page }) => {
+    test.setTimeout(90_000);
+    const fake = await fakeServices(page);
+    await pickBomb(page);
+    await expect(page.getByRole('alert')).toHaveText(
+      'Este PDF tarda demasiado en abrirse aquí. Sube fotos de sus páginas.',
+      { timeout: 30_000 },
+    );
+    await expect(
+      page.getByRole('list', { name: 'Archivos elegidos' }).getByRole('listitem'),
+    ).toHaveCount(0);
+    expect(fake.extract).toHaveLength(0);
+  });
+});
+
+test('the 16th file is left out with a message, and 15 go in one read', async ({ page }) => {
+  const fake = await fakeServices(page);
+  await page.goto('finiquito/');
+  await openUpload(page);
+  await page
+    .getByLabel('Elegir fotos o PDF')
+    .setInputFiles(Array.from({ length: 16 }, (_, i) => photo(`pagina-${i + 1}.png`)));
+  await expect(
+    page.getByRole('list', { name: 'Archivos elegidos' }).getByRole('listitem'),
+  ).toHaveCount(15);
+  await expect(page.getByText('1 archivo no se ha añadido.')).toBeVisible();
+  await expect(page.getByText('Como mucho 15 fotos o páginas de PDF en total')).toBeVisible();
+  await page.getByLabel(/Doy mi consentimiento explícito/).check();
+  await page.getByRole('button', { name: 'Leer los documentos' }).click();
+  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
+  const sent = fake.extract[0]?.postDataJSON() as { files: unknown[] };
+  expect(sent.files).toHaveLength(15);
+});
+
+test('a mixed pack: what was recognised, where the documents disagree, and the prefill', async ({
+  page,
+}) => {
+  await fakeServices(page, {
+    status: 200,
+    body: {
+      ...SETTLEMENT,
+      extraction: {
+        pages: [],
+        documents: [
+          { kind: 'dismissal_letter', pages: [1, 2, 3, 4, 5, 6] },
+          { kind: 'payslip', pages: [7], month: '2026-08' },
+          { kind: 'company_certificate', pages: [8] },
+          { kind: 'other', pages: [9] },
+        ],
+        fields: {
+          cause: from('dismissal_letter', 'objective_dismissal'),
+          endDate: from('dismissal_letter', '2026-09-15'),
+          startDate: from('payslip', '2010-03-01'),
+          noticeDaysReceived: from('dismissal_letter', 15),
+        },
+        lists: {},
+        conflicts: [{ field: 'endDate', sources: ['dismissal_letter', 'company_certificate'] }],
+      },
+    },
+  });
+  await page.goto('finiquito/');
+  await uploadSettlement(page);
+  await expect(
+    page.getByText(
+      'Carta de despido (6 páginas) · Nómina de agosto · Certificado de empresa · 1 página sin datos útiles',
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      'Fecha de baja: los documentos no dicen lo mismo. Se ha usado lo que pone la carta de despido; compáralo con los demás.',
+    ),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Revisar los datos' }).click();
+  await expect(page.getByLabel('Despido objetivo')).toBeChecked();
+});
+
+test('an objective dismissal with an agreement: the reference and the offer, side by side', async ({
+  page,
+}) => {
+  await fakeServices(page, {
+    status: 200,
+    body: {
+      ...SETTLEMENT,
+      extraction: {
+        pages: [],
+        documents: [
+          { kind: 'dismissal_letter', pages: [1, 2] },
+          { kind: 'settlement_agreement', pages: [3] },
+        ],
+        fields: {
+          cause: from('dismissal_letter', 'objective_dismissal'),
+          startDate: from('settlement_proposal', '2024-01-01'),
+          endDate: from('dismissal_letter', '2026-06-30'),
+          monthlySalary: from('settlement_proposal', 3000),
+          noticeDaysReceived: from('dismissal_letter', 15),
+          agreementSeveranceTotal: from('settlement_agreement', 8000),
+        },
+        lists: {},
+        conflicts: [],
+      },
+    },
+  });
+  await page.goto('finiquito/');
+  await uploadSettlement(page);
+  await page.getByRole('button', { name: 'Revisar los datos' }).click();
+  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  await next();
+  await next();
+  await page.locator('#prorated-yes').check();
+  await next();
+  await next();
+  await page.getByLabel('Días naturales disfrutados').fill('0');
+  await next();
+  await page.getByLabel('Ninguno').check();
+  await next();
+  await next();
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  const severance = page.getByRole('region', { name: 'Indemnización' });
+  await expect(severance).toContainText(
+    /Referencia: si un juzgado declarase improcedente el despido, la indemnización sería de 8\.136,99\s€/,
+  );
+  await expect(severance).toContainText(/El acuerdo que has subido ofrece 8\.000,00\s€ en total\./);
+});
+
+test('once reading is unavailable, the start sheet offers only the manual path', async ({
+  page,
+}) => {
+  await fakeServices(page, { status: 503, body: { code: 'model_unavailable' } });
+  await page.goto('finiquito/');
+  await uploadSettlement(page, { read: false });
+  await expect(page.getByRole('alert')).toContainText('La lectura no está disponible ahora mismo');
+  await page.getByRole('button', { name: 'Volver' }).click();
+  const note =
+    'La lectura automática de documentos no está disponible ahora mismo. Puedes escribir los datos a mano; el cálculo es el mismo.';
+  await expect(page.getByText(note)).toBeVisible();
+  await expect(page.getByRole('button', { name: /Sube tus documentos/ })).toBeHidden();
+  // Coming back to the page in the same tab, it is still remembered.
+  await page.goto('finiquito/');
+  await expect(page.getByText(note)).toBeVisible();
+  await expect(page.getByRole('button', { name: /Sube tus documentos/ })).toBeHidden();
+  await page.getByRole('button', { name: /Rellenar a mano/ }).click();
+  await expect(page.getByRole('heading', { name: '¿Cómo terminó tu contrato?' })).toBeFocused();
+});
+
+test.describe('on a phone', () => {
+  // The phone as Playwright describes it, without its browser type, which only a project can set.
+  const { viewport, userAgent, deviceScaleFactor, isMobile, hasTouch } = devices['Pixel 7'];
+  test.use({ viewport, userAgent, deviceScaleFactor, isMobile, hasTouch });
+
+  test('takes photos with the camera, one after another, and fits the screen', async ({ page }) => {
+    await fakeServices(page);
+    await page.goto('finiquito/');
+    await openUpload(page);
+    const camera = page.getByLabel('Hacer foto');
+    await expect(page.getByText('Hacer foto')).toBeVisible();
+    await expect(page.getByText('Elegir fotos o PDF')).toBeVisible();
+    await expect(camera).toHaveAttribute('capture', 'environment');
+    await expect(camera).toHaveAttribute('accept', 'image/*');
+    await expect(page.getByText('Arrastra aquí tus fotos o PDF')).toBeHidden();
+    await camera.setInputFiles(photo('image-1.png'));
+    await camera.setInputFiles(photo('image-2.png'));
+    const list = page.getByRole('list', { name: 'Archivos elegidos' });
+    await expect(list.getByRole('button', { name: 'Quitar Foto 1' })).toBeVisible();
+    await expect(list.getByRole('button', { name: 'Quitar Foto 2' })).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(0);
+  });
 });

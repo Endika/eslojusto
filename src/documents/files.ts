@@ -3,27 +3,86 @@ import { LIMITS, type ErrorCode } from './contract';
 export interface Selected {
   readonly type: string;
   readonly size: number;
+  readonly name?: string;
+  readonly lastModified?: number;
 }
 
-const isPdf = (f: Selected) => f.type === 'application/pdf';
+// The same file chosen twice: same name, size and modification time.
+const sameFile = (a: Selected, b: Selected) =>
+  a.name !== undefined &&
+  a.name === b.name &&
+  a.size === b.size &&
+  a.lastModified === b.lastModified;
+
+export const isPdf = (f: Selected) => f.type === 'application/pdf';
 // Any photo the browser can decode is re-encoded to JPEG before it leaves, so HEIC or PNG work too.
 const isImage = (f: Selected) => f.type.startsWith('image/');
 
 export const MAX_PDF_BYTES = LIMITS.maxPdfBytes;
 
-// The checks the API makes that the browser can make first, so a bad choice costs no request.
-export function checkSelection(files: readonly Selected[]): ErrorCode | null {
-  if (files.length === 0) return 'no_files';
-  if (!files.every((f) => isPdf(f) || isImage(f))) return 'file_type';
-  const pdfs = files.filter(isPdf).length;
-  if (pdfs > 0 && pdfs !== files.length) return 'mixed_files';
-  if (pdfs > LIMITS.maxPdfFiles || files.length > LIMITS.maxImages) return 'too_many_files';
-  if (pdfs === 1 && (files[0]?.size ?? 0) > MAX_PDF_BYTES) return 'pdf_too_large';
-  return null;
+export interface Admission<T> {
+  // Photos to add, and PDFs to open; a PDF then takes as many of the free places as its pages.
+  readonly photos: readonly T[];
+  readonly pdfs: readonly T[];
+  // How many of the incoming files were left out, and why the first of them was.
+  readonly refused: number;
+  readonly problem: ErrorCode | null;
+  // Files already in the list, left out without counting as refused.
+  readonly duplicates: readonly T[];
 }
 
-export const mediaOf = (files: readonly Selected[]): 'image' | 'pdf' =>
-  files.some(isPdf) ? 'pdf' : 'image';
+// Which newly picked files join the list, in turn: a photo while there is a free place, a PDF
+// under its size limit while there is one for its first page. The rest are left out, never
+// silently.
+export function admit<T extends Selected>(
+  current: readonly Selected[],
+  free: number,
+  incoming: readonly T[],
+): Admission<T> {
+  const photos: T[] = [];
+  const pdfs: T[] = [];
+  const duplicates: T[] = [];
+  let places = free;
+  let problem: ErrorCode | null = null;
+  for (const file of incoming) {
+    if ([...current, ...photos, ...pdfs].some((f) => sameFile(f, file))) {
+      duplicates.push(file);
+      continue;
+    }
+    const why: ErrorCode | null =
+      !isPdf(file) && !isImage(file)
+        ? 'file_type'
+        : isPdf(file) && file.size > MAX_PDF_BYTES
+          ? 'pdf_too_large'
+          : places <= 0
+            ? 'too_many_files'
+            : null;
+    if (why !== null) {
+      problem ??= why;
+      continue;
+    }
+    (isPdf(file) ? pdfs : photos).push(file);
+    places -= 1;
+  }
+  return {
+    photos,
+    pdfs,
+    refused: incoming.length - photos.length - pdfs.length - duplicates.length,
+    problem,
+    duplicates,
+  };
+}
+
+// What the browser checks before sending: something to read, and no more than the API takes.
+export function checkSelection(images: number): ErrorCode | null {
+  if (images === 0) return 'no_files';
+  return images > LIMITS.maxImages ? 'too_many_files' : null;
+}
+
+// A closed bucket for analytics: never the exact count.
+export function filesBucket(n: number): '1' | '2-4' | '5-9' | '10-15' {
+  return n <= 1 ? '1' : n <= 4 ? '2-4' : n <= 9 ? '5-9' : '10-15';
+}
 
 // The size that keeps the proportions with the long side at most `max`, never enlarged.
 export function fitWithin(width: number, height: number, max = LIMITS.maxImageLongSide) {
@@ -34,9 +93,33 @@ export function fitWithin(width: number, height: number, max = LIMITS.maxImageLo
   };
 }
 
+// The size that brings the long side to exactly `max`: a PDF page is drawn, not resampled, so
+// it is rendered at the size a photo is sent at.
+export function fitExactly(width: number, height: number, max = LIMITS.maxImageLongSide) {
+  const scale = max / Math.max(width, height);
+  return {
+    width: Math.max(1, Math.min(max, Math.round(width * scale))),
+    height: Math.max(1, Math.min(max, Math.round(height * scale))),
+    scale,
+  };
+}
+
+const REQUEST_OVERHEAD = 4096;
+const FILE_OVERHEAD = 64;
+
 // The JSON body's size, near enough: base64 data plus a margin for the rest of the request.
 export const requestBytes = (files: readonly { data: string }[]) =>
-  files.reduce((sum, f) => sum + f.data.length + 64, 4096);
+  files.reduce((sum, f) => sum + f.data.length + FILE_OVERHEAD, REQUEST_OVERHEAD);
+
+// What a file adds to the request once in base64.
+export const encodedSize = (bytes: number) => Math.ceil(bytes / 3) * 4 + FILE_OVERHEAD;
+
+// The bytes the next image may weigh once encoded: what the budget has left after `usedBytes`,
+// shared equally among the images still to encode.
+export function photoShare(usedBytes: number, photosLeft: number): number {
+  const left = LIMITS.requestBudgetBytes - usedBytes - photosLeft * FILE_OVERHEAD;
+  return Math.max(0, Math.floor(left / Math.max(1, photosLeft) / 4) * 3);
+}
 
 export function bytesToBase64(bytes: Uint8Array): string {
   let binary = '';

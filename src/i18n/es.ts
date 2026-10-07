@@ -262,41 +262,37 @@ export const es = {
 
   'documents.start.question': '¿Cómo quieres empezar?',
   'documents.start.help':
-    'Puedes subir tu finiquito, tus nóminas o tu vida laboral para rellenar los datos con lo que se lea en ellos, o escribirlos tú. Antes de calcular nada, revisas cada dato.',
+    'Puedes subir los documentos que te ha dado la empresa para rellenar los datos con lo que se lea en ellos, o escribirlos tú. Antes de calcular nada, revisas cada dato.',
   'documents.start.choices': 'Cómo empezar',
-  'documents.start.upload': 'Sube tu finiquito, nóminas o vida laboral',
+  'documents.start.upload': 'Sube tus documentos',
   'documents.start.upload_hint':
     'Una IA lee los datos y tú los confirmas. Gratis, 2 lecturas al día.',
   'documents.start.manual': 'Rellenar a mano',
   'documents.start.manual_hint': 'Escribes los datos tú y nada sale de tu dispositivo.',
-  'documents.upload.question': 'Sube un documento',
-  'documents.upload.kind': '¿Qué documento es?',
-  'documents.upload.settlement': 'Propuesta de finiquito',
-  'documents.upload.settlement_hint': 'El documento de liquidación que te da la empresa.',
-  'documents.upload.payslip': 'Nóminas',
-  'documents.upload.payslip_hint': 'Si subes varias, se lee la más reciente.',
-  'documents.upload.work_history': 'Vida laboral',
-  'documents.upload.work_history_hint':
-    'El informe de la Seguridad Social, para tus otros trabajos.',
-  'documents.upload.files': 'Fotos o PDF',
-  'documents.upload.drop': 'Arrastra aquí tus fotos o el PDF, o elígelos con el botón.',
+  'documents.start.unavailable':
+    'La lectura automática de documentos no está disponible ahora mismo. Puedes escribir los datos a mano; el cálculo es el mismo.',
+  'documents.upload.question': 'Sube tus documentos',
+  'documents.upload.files': 'Sube lo que te hayan dado',
   'documents.upload.files_hint':
-    'Hasta 4 fotos o un PDF de hasta 4 páginas. Las fotos se reducen en tu dispositivo antes de enviarse.',
+    'Por ejemplo, la carta de despido, el finiquito, tus nóminas, el certificado de empresa o tu vida laboral, en el orden que sea. Hasta 15 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+  'documents.upload.drop': 'Arrastra aquí tus fotos o PDF, o elígelos con el botón.',
+  'documents.upload.camera': 'Hacer foto',
+  'documents.upload.choose': 'Elegir fotos o PDF',
   'documents.upload.consent':
     'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos sensibles, como la afiliación a un sindicato o una baja médica. Se leen en la Unión Europea y no se guardan.',
   'documents.upload.consent_link': 'Cómo se tratan tus documentos',
-  'documents.upload.send': 'Leer el documento',
+  'documents.upload.send': 'Leer los documentos',
   'documents.upload.back': 'Volver',
   'documents.upload.selected': 'Archivos elegidos',
   'documents.done.question': 'Datos leídos',
   'documents.done.continue': 'Revisar los datos',
-  'documents.done.another': 'Subir otro documento',
+  'documents.done.another': 'Subir más documentos',
 
   'documents.pass.title': 'Informe en PDF y carta «recibí no conforme»',
   'documents.pass.text':
     'Con lo que sale de esta revisión: un informe con cada partida, su mínimo legal, sus fuentes y lo que no se ha comprobado, y una plantilla de carta «recibí no conforme» con tus cifras. Los dos se generan en tu dispositivo.',
   'documents.pass.price':
-    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días: en ese tiempo puedes volver a descargar el informe y la carta y leer hasta 15 documentos.',
+    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días: en ese tiempo puedes volver a descargar el informe y la carta y hacer hasta 15 lecturas de documentos.',
   'documents.pass.waiver':
     'Quiero el informe ahora. Sé que, al ser contenido digital que se entrega al momento, pierdo el derecho de desistimiento (art. 103.m de la Ley General para la Defensa de los Consumidores y Usuarios).',
   'documents.pass.conditions': 'Condiciones de venta',
@@ -315,7 +311,7 @@ export const es = {
 
   'faq.documents': '¿Qué pasa con mis documentos?',
   'faq.documents_answer':
-    'Si subes tu finiquito, tus nóminas o tu vida laboral, se envían cifrados a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo solo copia los datos que necesita el formulario y no calcula nada. Ni el servidor ni el modelo guardan el documento: se procesa en memoria y se descarta. Antes de subirlo te pedimos tu consentimiento, porque una nómina puede mostrar datos sensibles. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
+    'Si subes tus documentos (la carta de despido, el finiquito, tus nóminas, el certificado de empresa o tu vida laboral), se envían cifrados a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo indica qué es cada página, copia solo los datos que necesita el formulario y no calcula nada. Ni el servidor ni el modelo guardan el documento: se procesa en memoria y se descarta. Antes de subirlo te pedimos tu consentimiento, porque una nómina puede mostrar datos sensibles. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
 
   'legal.updated': 'Actualizado el 6 de octubre de 2026',
   'legal.owner_name_label': 'Titular',
@@ -575,14 +571,61 @@ export const es = {
   'client.documents.confidence.low': 'baja',
   'client.documents.status.preparing': 'Preparando los archivos…',
   'client.documents.status.captcha': 'Comprobando que no eres un robot…',
-  'client.documents.status.reading': 'Leyendo el documento. Puede tardar hasta un minuto.',
-  'client.documents.file': '{nombre} ({tamano})',
+  'client.documents.status.reading':
+    'Leyendo los documentos. Puede tardar hasta dos minutos si son muchas páginas.',
+  'client.documents.photo': 'Foto {n}',
+  'client.documents.pdf_page': '{nombre}, página {n}',
+  'client.documents.pdf_page_detail': 'Página {n} de {total}',
+  'client.documents.pdf_added': 'Añadido: {nombre}. Páginas: {total}.',
+  'client.documents.pdf_pages_fit':
+    'De {nombre} caben las páginas 1 a {k} de {total}: como mucho 15 fotos o páginas en total.',
+  'client.documents.count': 'Llevas {n} de 15.',
+  'client.documents.status.opening': 'Abriendo el PDF…',
+  'client.documents.remove': 'Quitar',
+  'client.documents.remove_label': 'Quitar {nombre}',
+  'client.documents.added_one': 'Añadido: {nombre}. Llevas {n} de 15.',
+  'client.documents.added_many': 'Añadidos {k} archivos. Llevas {n} de 15.',
+  'client.documents.already_added': 'Ya estaba añadido: {nombre}.',
+  'client.documents.removed': 'Quitado: {nombre}. Llevas {n} de 15.',
+  'client.documents.left_out_one': '1 archivo no se ha añadido.',
+  'client.documents.left_out_many': '{k} archivos no se han añadido.',
+  'client.documents.kind.settlement_proposal': 'Propuesta de finiquito',
+  'client.documents.kind.payslip': 'Nómina',
+  'client.documents.kind.payslip_month': 'Nómina de {mes}',
+  'client.documents.kind.dismissal_letter': 'Carta de despido',
+  'client.documents.kind.company_certificate': 'Certificado de empresa',
+  'client.documents.kind.settlement_agreement': 'Acuerdo o acta de conciliación',
+  'client.documents.kind.work_history': 'Vida laboral',
+  'client.documents.kind.pages': '{nombre} ({n} páginas)',
+  'client.documents.kind.other_one': '1 página sin datos útiles',
+  'client.documents.kind.other_many': '{n} páginas sin datos útiles',
+  'client.documents.source.settlement_proposal': 'la propuesta de finiquito',
+  'client.documents.source.payslip': 'la nómina',
+  'client.documents.source.dismissal_letter': 'la carta de despido',
+  'client.documents.source.company_certificate': 'el certificado de empresa',
+  'client.documents.source.settlement_agreement': 'el acuerdo o acta de conciliación',
+  'client.documents.source.work_history': 'la vida laboral',
+  'client.documents.field.startDate': 'Fecha de alta',
+  'client.documents.field.endDate': 'Fecha de baja',
+  'client.documents.field.cause': 'Cómo terminó el contrato',
+  'client.documents.field.fixedTermType': 'Tipo de contrato temporal',
+  'client.documents.field.pending_salary': 'Salario pendiente',
+  'client.documents.field.holiday_pay': 'Vacaciones no disfrutadas',
+  'client.documents.field.extra_pay': 'Pagas extra',
+  'client.documents.field.severance': 'Indemnización',
+  'client.documents.field.employer_notice': 'Falta de preaviso',
+  'client.documents.field.notice_deduction': 'Descuento por preaviso',
+  'client.documents.field.annualHolidayDays': 'Días de vacaciones al año',
+  'client.documents.field.holidayDaysTaken': 'Días de vacaciones disfrutados',
+  'client.documents.agreement_offer': 'El acuerdo que has subido ofrece {importe} en total.',
+  'client.documents.conflict':
+    '{dato}: los documentos no dicen lo mismo. Se ha usado lo que pone {fuente}; compáralo con los demás.',
   'client.documents.done':
     'Se han leído {n} datos. Pasa por cada hoja y confírmalos antes de revisar: los leídos llevan la marca «Leído del documento».',
   'client.documents.done_none':
-    'No se ha leído ningún dato que sirva para el formulario. Puedes subir otro documento o rellenar a mano.',
+    'No se ha leído ningún dato que sirva para el formulario. Puedes subir otros documentos o rellenar a mano.',
   'client.documents.done_low':
-    'Algún dato se ha leído con confianza baja: compáralo con el documento.',
+    'Algún dato se ha leído con confianza baja: compáralo con tus documentos.',
   'client.documents.check.end_before_start':
     'La fecha de baja leída es anterior a la de alta: revisa las dos.',
   'client.documents.check.items_do_not_sum':
@@ -595,31 +638,31 @@ export const es = {
     'La prorrata de pagas extra leída es mayor que el total: revisa el salario.',
   'client.documents.check.contract_end_before_start':
     'Algún contrato de la vida laboral termina antes de empezar: revisa sus fechas.',
-  'client.documents.error.kind_missing': 'Elige qué documento es',
-  'client.documents.error.consent_missing': 'Para leer el documento hace falta tu consentimiento',
+  'client.documents.error.consent_missing': 'Para leer los documentos hace falta tu consentimiento',
   'client.documents.error.method_not_allowed':
     'No se ha podido leer el documento. Prueba otra vez o rellena a mano.',
   'client.documents.error.invalid_request':
     'No se ha podido leer el documento. Prueba otra vez o rellena a mano.',
   'client.documents.error.payload_too_large':
-    'Los archivos ocupan demasiado. Prueba con menos fotos o con un PDF más pequeño.',
-  'client.documents.error.no_files': 'Elige al menos una foto o un PDF',
-  'client.documents.error.too_many_files': 'Como mucho 4 fotos o un PDF',
-  'client.documents.error.mixed_files': 'Sube fotos o un PDF, pero no los dos a la vez',
+    'Los archivos ocupan demasiado. Quita alguna foto o algún PDF y prueba otra vez.',
+  'client.documents.error.no_files': 'Añade al menos una foto o un PDF',
+  'client.documents.error.too_many_files': 'Como mucho 15 fotos o páginas de PDF en total',
   'client.documents.error.unsupported_media_type':
-    'Ese tipo de archivo no se puede leer. Sube fotos o un PDF.',
+    'Ese tipo de archivo no se puede leer. Sube fotos o PDF.',
   'client.documents.error.image_unreadable':
     'Alguna foto no se puede abrir. Prueba a hacerla de nuevo o a subirla en otro formato.',
   'client.documents.error.image_too_large':
     'Alguna foto es demasiado grande. Prueba otra vez; se reduce antes de enviarla.',
   'client.documents.error.pdf_unreadable':
-    'Este PDF no se puede leer tal cual: puede ser un escaneo o estar protegido con contraseña. Sube fotos de sus páginas.',
+    'Este PDF no se puede abrir: puede estar dañado. Prueba a descargarlo otra vez o sube fotos de sus páginas.',
+  'client.documents.error.pdf_encrypted':
+    'Este PDF está protegido con contraseña y no se puede abrir aquí. Sube fotos de sus páginas.',
+  'client.documents.error.pdf_too_slow':
+    'Este PDF tarda demasiado en abrirse aquí. Sube fotos de sus páginas.',
   'client.documents.error.pdf_too_large':
-    'El PDF pesa más de 2 MB, como suele pasar con un escaneo. Sube fotos de sus páginas.',
-  'client.documents.error.pdf_too_many_pages':
-    'El PDF tiene más de 4 páginas. Sube solo las páginas con los datos.',
+    'Un PDF pesa más de 20 MB y no se puede abrir aquí. Sube fotos de las páginas con datos.',
   'client.documents.error.document_too_dense':
-    'El documento tiene demasiado texto para leerlo de una vez. Sube solo las páginas con los datos.',
+    'Los documentos tienen demasiado texto para leerlos de una vez. Sube solo las páginas con los datos.',
   'client.documents.error.captcha_failed':
     'No se ha podido comprobar que no eres un robot. Prueba otra vez.',
   'client.documents.error.daily_limit_reached':
@@ -632,10 +675,8 @@ export const es = {
     'Ya has usado las 15 lecturas de tu pase. Puedes rellenar a mano; el informe y la carta siguen disponibles.',
   'client.documents.error.pass_revoked':
     'Este pase ya no vale porque su pago se devolvió o se anuló. Puedes rellenar a mano.',
-  'client.documents.error.document_kind_mismatch':
-    'Parece otro tipo de documento. Comprueba qué documento has elegido.',
   'client.documents.error.document_unreadable':
-    'No se ha podido leer este documento. Prueba con una foto más nítida o rellena a mano.',
+    'No se han podido leer los documentos. Prueba con fotos más nítidas o rellena a mano.',
   'client.documents.error.model_unavailable':
     'La lectura no está disponible ahora mismo. Prueba más tarde o rellena a mano.',
   'client.documents.error.session_not_found': 'No encontramos ese pago. Revisa el código.',
@@ -655,7 +696,7 @@ export const es = {
     'La respuesta del servicio no se entiende. Prueba otra vez o rellena a mano.',
   'client.documents.error.captcha_unavailable':
     'No se ha podido cargar la comprobación de que no eres un robot. Prueba otra vez o rellena a mano.',
-  'client.documents.error.file_type': 'Sube fotos o un PDF',
+  'client.documents.error.file_type': 'Solo se pueden subir fotos o PDF',
   'client.documents.error.checkout_unavailable':
     'No se ha podido abrir el pago. Prueba otra vez en un momento.',
   'client.documents.error.no_checkout':
@@ -665,7 +706,7 @@ export const es = {
   'client.documents.pass.checking': 'Comprobando el pago…',
   'client.documents.pass.issued': 'Pago recibido. Ya puedes descargar el informe y la carta.',
   'client.documents.pass.valid_until': 'Tu pase vale hasta el {fecha}.',
-  'client.documents.pass.renewed': 'Tu pase se ha renovado. Prueba otra vez a leer el documento.',
+  'client.documents.pass.renewed': 'Tu pase se ha renovado. Prueba otra vez a leer los documentos.',
   'client.documents.pass.generating': 'Preparando el PDF…',
   'client.documents.pass.generated': 'PDF listo.',
   'client.documents.pass.lost':

@@ -6,7 +6,9 @@ import type { CompletedReview } from '../calculator/ports';
 import { STEPS } from '../calculator/steps';
 import { createApi } from '../documents/api';
 import { DOCUMENTS, TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/config';
-import { bytesToBase64, fitWithin } from '../documents/files';
+import { fitWithin } from '../documents/files';
+import { canvasJpeg, whiteCanvas } from './jpeg';
+import { createOutageMemory } from '../documents/outage';
 import { createPassStore } from '../documents/pass';
 import { setUpPayment } from '../documents/payment';
 import type {
@@ -15,6 +17,7 @@ import type {
   CaptchaAction,
   FileEncoder,
   KeyValueStore,
+  PdfPages,
 } from '../documents/ports';
 import { setUpUpload } from '../documents/upload';
 import { pageTranslator } from '../i18n/client';
@@ -22,7 +25,6 @@ import { localToday } from './clock';
 
 // The review's answers while the person is on Stripe's page; read back and deleted on return.
 const REVIEW_KEY = 'eslojusto-revision-en-pago';
-const JPEG_QUALITY = 0.85;
 const CAPTCHA_TIMEOUT_MS = 90_000;
 
 // localStorage or sessionStorage behind try/catch: blocked storage reads as empty.
@@ -106,29 +108,19 @@ function turnstileCaptcha(siteKey: string, container: HTMLElement, action: Captc
 
 // Photos are drawn on a canvas at most 1568 px on their long side and leave as JPEG.
 const canvasEncoder: FileEncoder = {
-  async encode(file) {
-    if (file.type === 'application/pdf') {
-      const bytes = new Uint8Array(await file.arrayBuffer());
-      return { mediaType: 'application/pdf', data: bytesToBase64(bytes), bytes: bytes.length };
-    }
+  async encode(file, maxBytes) {
     const bitmap = await createImageBitmap(file);
     const { width, height } = fitWithin(bitmap.width, bitmap.height);
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext('2d');
-    if (!context) throw new Error('No canvas');
-    context.fillStyle = '#fff';
-    context.fillRect(0, 0, width, height);
+    const { canvas, context } = whiteCanvas(width, height);
     context.drawImage(bitmap, 0, 0, width, height);
     bitmap.close();
-    const blob = await new Promise<Blob | null>((r) =>
-      canvas.toBlob(r, 'image/jpeg', JPEG_QUALITY),
-    );
-    if (!blob) throw new Error('No JPEG');
-    const bytes = new Uint8Array(await blob.arrayBuffer());
-    return { mediaType: 'image/jpeg', data: bytesToBase64(bytes), bytes: bytes.length };
+    return canvasJpeg(canvas, maxBytes);
   },
+};
+
+// pdf.js and its worker load only when a PDF is picked, from this site.
+const pdfPages: PdfPages = {
+  open: (file) => import('./pdf-pages').then((m) => m.pdfPages.open(file)),
 };
 
 const browser: Browser = {
@@ -184,8 +176,10 @@ export function wireDocuments(
     api,
     captcha: turnstileCaptcha(config.turnstileSiteKey, captchaBox, 'extract'),
     encoder: canvasEncoder,
+    pdfs: pdfPages,
     passes,
     events,
+    outage: createOutageMemory(session, browser.now),
     now: browser.now,
     tr,
     calculator,
@@ -201,7 +195,10 @@ export function wireDocuments(
     pdf: () => import('../documents/pdf').then((m) => m.pdfMaker(tr, localToday)),
     keepReview: () => session.set(REVIEW_KEY, JSON.stringify(calculator.entries())),
   });
-  hooks.onReview((r) => payment.show(r));
+  hooks.onReview((r) => {
+    payment.show(r);
+    upload.showAgreementOffer(document);
+  });
   hooks.onRestart(() => payment.hide());
 
   // The answers kept for the trip to Stripe come back on any return, paid or not (cancelling or

@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import { LIMITS } from '../../src/documents/contract';
 import {
   MAX_PDF_BYTES,
+  admit,
   bytesToBase64,
   checkSelection,
+  encodedSize,
+  filesBucket,
+  fitExactly,
   fitWithin,
-  mediaOf,
+  photoShare,
   requestBytes,
 } from '../../src/documents/files';
 
@@ -12,23 +17,82 @@ const jpeg = { type: 'image/jpeg', size: 3_000_000 };
 const heic = { type: 'image/heic', size: 2_000_000 };
 const pdf = { type: 'application/pdf', size: 500_000 };
 
+const photos = (n: number) => Array.from({ length: n }, () => jpeg);
+
 describe('checkSelection', () => {
-  it('accepts up to 4 photos of any decodable kind, or one PDF', () => {
-    expect(checkSelection([jpeg])).toBeNull();
-    expect(checkSelection([jpeg, heic, jpeg, jpeg])).toBeNull();
-    expect(checkSelection([pdf])).toBeNull();
+  it('wants between one and fifteen images', () => {
+    expect(checkSelection(0)).toBe('no_files');
+    expect(checkSelection(1)).toBeNull();
+    expect(checkSelection(15)).toBeNull();
+    expect(checkSelection(16)).toBe('too_many_files');
   });
-  it('names what is wrong, as the API would', () => {
-    expect(checkSelection([])).toBe('no_files');
-    expect(checkSelection([jpeg, jpeg, jpeg, jpeg, jpeg])).toBe('too_many_files');
-    expect(checkSelection([pdf, pdf])).toBe('too_many_files');
-    expect(checkSelection([pdf, jpeg])).toBe('mixed_files');
-    expect(checkSelection([{ type: 'text/plain', size: 10 }])).toBe('file_type');
-    expect(checkSelection([{ ...pdf, size: 2 * 1024 * 1024 + 1 }])).toBe('pdf_too_large');
+});
+
+describe('admit', () => {
+  it('takes photos of any decodable kind and PDFs to open, while places are free', () => {
+    expect(admit(photos(3), 12, [jpeg, heic, pdf])).toEqual({
+      photos: [jpeg, heic],
+      pdfs: [pdf],
+      refused: 0,
+      problem: null,
+      duplicates: [],
+    });
   });
-  it('tells photos from a PDF', () => {
-    expect(mediaOf([jpeg])).toBe('image');
-    expect(mediaOf([pdf])).toBe('pdf');
+  it('stops when no place is left and says how many were left out', () => {
+    expect(admit(photos(13), 2, photos(4))).toEqual({
+      photos: photos(2),
+      pdfs: [],
+      refused: 2,
+      problem: 'too_many_files',
+      duplicates: [],
+    });
+  });
+  it('leaves out what is no photo or PDF, and a PDF too heavy to open, with the first reason', () => {
+    const text = { type: 'text/plain', size: 10 };
+    const heavy = { ...pdf, size: MAX_PDF_BYTES + 1 };
+    expect(admit([], 15, [text, jpeg, heavy])).toEqual({
+      photos: [jpeg],
+      pdfs: [],
+      refused: 2,
+      problem: 'file_type',
+      duplicates: [],
+    });
+  });
+});
+
+describe('admit, with the same file twice', () => {
+  const file = (name: string, lastModified = 1) => ({ ...jpeg, name, lastModified });
+  it('leaves out a file already in the list, or picked twice at once, without refusing it', () => {
+    expect(admit([file('a.jpg')], 14, [file('a.jpg'), file('b.jpg'), file('b.jpg')])).toEqual({
+      photos: [file('b.jpg')],
+      pdfs: [],
+      refused: 0,
+      problem: null,
+      duplicates: [file('a.jpg'), file('b.jpg')],
+    });
+  });
+  it('tells apart two files of one name that differ in time or size', () => {
+    expect(admit([file('a.jpg')], 14, [file('a.jpg', 2)]).photos).toEqual([file('a.jpg', 2)]);
+  });
+});
+
+describe('filesBucket', () => {
+  it.each([
+    [1, '1'],
+    [2, '2-4'],
+    [4, '2-4'],
+    [5, '5-9'],
+    [10, '10-15'],
+    [15, '10-15'],
+  ])('puts %i files in %s', (n, bucket) => {
+    expect(filesBucket(n)).toBe(bucket);
+  });
+});
+
+describe('fitExactly', () => {
+  it('draws a PDF page with its long side at 1568 px, enlarging if need be', () => {
+    expect(fitExactly(595, 842)).toEqual({ width: 1108, height: 1568, scale: 1568 / 842 });
+    expect(fitExactly(842, 595).width).toBe(1568);
   });
 });
 
@@ -43,8 +107,14 @@ describe('fitWithin', () => {
 });
 
 describe('the request size', () => {
-  it('a PDF at its 2 MB limit fits in a 6 MB request once in base64', () => {
-    expect(Math.ceil(MAX_PDF_BYTES / 3) * 4).toBeLessThan(6 * 1024 * 1024);
+  it('keeps the browser’s budget under the API’s limit', () => {
+    expect(LIMITS.requestBudgetBytes).toBeLessThan(LIMITS.maxPayloadBytes);
+  });
+  it('shares what the budget has left among the photos still to encode', () => {
+    const share = photoShare(4096, 15);
+    expect(share).toBeGreaterThan(260_000);
+    expect(4096 + 15 * encodedSize(share)).toBeLessThanOrEqual(LIMITS.requestBudgetBytes);
+    expect(photoShare(LIMITS.requestBudgetBytes, 1)).toBe(0);
   });
   it('adds up the encoded files', () => {
     expect(requestBytes([{ data: 'a'.repeat(100) }])).toBe(4096 + 164);

@@ -9,7 +9,6 @@ interface Props {
 }
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
-const kinds = ['settlement', 'payslip', 'work_history'] as const;
 const arrow = 'M4 12h15m-6-6 6 6-6 6';
 ---
 
@@ -25,6 +24,9 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         <span class="start__choice-title">{tx('documents.start.upload')}</span>
         <span class="hint">{tx('documents.start.upload_hint')}</span>
       </button>
+      <p class="start__unavailable" data-start-unavailable hidden>
+        {tx('documents.start.unavailable')}
+      </p>
       <button class="start__choice" type="button" data-start-manual>
         <span class="start__choice-title">{tx('documents.start.manual')}</span>
         <span class="hint">{tx('documents.start.manual_hint')}</span>
@@ -42,31 +44,16 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
     <h2 class="question" id="question-upload" tabindex="-1">
       {tx('documents.upload.question')}
     </h2>
-    <fieldset class="group" data-doc-field="kind">
-      <legend>{tx('documents.upload.kind')}</legend>
-      <div class="options">
-        {kinds.map((kind) => (
-          <div class="option">
-            <input
-              type="radio"
-              name="documentKind"
-              id={`document-${kind}`}
-              value={kind}
-              aria-describedby={`hint-document-${kind} error-documentKind`}
-            />
-            <label for={`document-${kind}`}>{tx(`documents.upload.${kind}`)}</label>
-            <p class="hint" id={`hint-document-${kind}`}>
-              {tx(`documents.upload.${kind}_hint`)}
-            </p>
-          </div>
-        ))}
-      </div>
-      <p class="errata" id="error-documentKind" data-doc-error-for="kind" hidden></p>
-    </fieldset>
-    <div class="field" data-doc-field="files">
-      <label class="field__label" for="document-files">
+    <div
+      class="field"
+      role="group"
+      data-doc-field="files"
+      aria-labelledby="label-document-files"
+      aria-describedby="hint-document-files"
+    >
+      <p class="field__label" id="label-document-files">
         {tx('documents.upload.files')}
-      </label>
+      </p>
       <p class="hint" id="hint-document-files">
         {tx('documents.upload.files_hint')}
       </p>
@@ -74,15 +61,34 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         <p class="start__drop-text" aria-hidden="true">
           {tx('documents.upload.drop')}
         </p>
-        <input
-          class="field__input start__file"
-          type="file"
-          id="document-files"
-          name="documentFiles"
-          multiple
-          accept="image/*,application/pdf"
-          aria-describedby="hint-document-files error-documentFiles"
-        />
+        <div class="start__pickers">
+          <span class="start__camera">
+            <input
+              class="visually-hidden start__picker-input"
+              type="file"
+              id="document-camera"
+              accept="image/*"
+              capture="environment"
+              data-doc-input="camera"
+              aria-describedby="hint-document-files error-documentFiles"
+            />
+            <label class="button start__picker" for="document-camera">
+              {tx('documents.upload.camera')}
+            </label>
+          </span>
+          <input
+            class="visually-hidden start__picker-input"
+            type="file"
+            id="document-files"
+            multiple
+            accept="image/*,application/pdf"
+            data-doc-input="files"
+            aria-describedby="hint-document-files error-documentFiles"
+          />
+          <label class="button start__picker" for="document-files">
+            {tx('documents.upload.choose')}
+          </label>
+        </div>
       </div>
       <ul
         class="start__files"
@@ -90,6 +96,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         aria-label={tx('documents.upload.selected')}
         hidden
       ></ul>
+      <p class="start__count" role="status" aria-live="polite" data-doc-files-status></p>
       <p class="errata" id="error-documentFiles" data-doc-error-for="files" hidden></p>
     </div>
     <div class="start__consent" data-doc-field="consent">
@@ -136,6 +143,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
     <h2 class="question" id="question-done" tabindex="-1">
       {tx('documents.done.question')}
     </h2>
+    <p class="help start__recognised" data-done-documents hidden></p>
     <p class="help" data-done-summary></p>
     <ul class="list start__notes" data-done-notes hidden></ul>
     <div class="start__actions">
@@ -185,9 +193,27 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
     outline: 3px solid var(--sheet-ink);
     outline-offset: 2px;
   }
-  .start__file {
-    font: 500 0.9375rem / 1.3 var(--f-grotesque);
-    padding-block: 0.625rem;
+  .start__unavailable {
+    margin: 0;
+    padding: 0.75rem 0.875rem;
+    border-inline-start: 3px solid var(--sheet-ink);
+    font: 400 0.9375rem / 1.4 var(--f-serif);
+  }
+  .start__pickers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .start .start__picker {
+    flex: 1 1 12rem;
+    max-inline-size: 100%;
+  }
+  .start__picker-input:focus-visible + .start__picker {
+    outline: 3px solid var(--sheet-ink);
+    outline-offset: 2px;
+  }
+  .start__camera {
+    display: none;
   }
   .start__drop {
     display: grid;
@@ -208,12 +234,58 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
     .start__drop-text {
       display: none;
     }
+    .start__camera {
+      display: contents;
+    }
   }
   .start__files {
-    margin: 0.375rem 0 0;
-    padding-inline-start: 1.125rem;
-    font: 500 0.875rem / 1.5 var(--f-mono);
+    display: grid;
+    gap: 0.375rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    font: 500 0.875rem / 1.4 var(--f-mono);
+  }
+  .start__file {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.25rem;
+    border: 1px solid color-mix(in oklab, var(--sheet-ink) 18%, transparent);
+    border-radius: 0.375rem;
+  }
+  .start__thumb {
+    display: grid;
+    place-items: center;
+    font-size: 0.6875rem;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: 0.25rem;
+    object-fit: cover;
+    background: color-mix(in oklab, var(--sheet-ink) 10%, transparent);
+  }
+  .start__file-name {
     overflow-wrap: anywhere;
+  }
+  .start__file-size {
+    display: block;
+    color: var(--sheet-ink-soft);
+  }
+  .start .start__remove {
+    min-block-size: 2.75rem;
+    padding-inline: 0.75rem;
+    font-size: 0.9375rem;
+  }
+  .start__count:empty {
+    display: none;
+  }
+  .start__count {
+    margin: 0.375rem 0 0;
+    font: 400 var(--t-small) / 1.4 var(--f-serif);
+  }
+  .start__recognised {
+    font-weight: 600;
   }
   .start__consent {
     margin: 0 0 0.75rem;

@@ -1,20 +1,34 @@
 // The API's request and response shapes, mirrored from the api package (api/README.md, «Contract»).
 // The two must change together; the site never trusts a response that does not match them.
+import { MAX_IMAGE_LONG_SIDE } from '../../api/src/domain/image-limit';
 
-export const DOCUMENT_KINDS = ['settlement', 'payslip', 'work_history'] as const;
-export type DocumentKind = (typeof DOCUMENT_KINDS)[number];
+// What the API says each page is; `other` is a page the review has no use for.
+export const PAGE_KINDS = [
+  'settlement_proposal',
+  'payslip',
+  'dismissal_letter',
+  'company_certificate',
+  'settlement_agreement',
+  'work_history',
+  'other',
+] as const;
+export type PageKind = (typeof PAGE_KINDS)[number];
+export type SourceKind = Exclude<PageKind, 'other'>;
 
-export const MEDIA_TYPES = ['image/jpeg', 'image/webp', 'application/pdf'] as const;
+// The API reads images only; the browser renders a PDF's pages to images first.
+export const MEDIA_TYPES = ['image/jpeg', 'image/webp'] as const;
 export type MediaType = (typeof MEDIA_TYPES)[number];
 
 export const LIMITS = {
-  maxImages: 4,
-  maxPdfFiles: 1,
-  maxPdfPages: 4,
-  // A heavier PDF is almost always a scan; photos of its pages read better.
-  maxPdfBytes: 2 * 1024 * 1024,
-  maxImageLongSide: 1568,
+  // Photos and PDF pages together: each becomes one image.
+  maxImages: 15,
+  // What the browser opens to render; past it, a PDF is too heavy to render on a phone.
+  maxPdfBytes: 20 * 1024 * 1024,
+  maxImageLongSide: MAX_IMAGE_LONG_SIDE,
   maxPayloadBytes: 6 * 1024 * 1024,
+  // What the browser lets a request weigh: under the API's limit, with room for Lambda's event
+  // envelope, which counts towards its 6 MB too.
+  requestBudgetBytes: 5_800_000,
 } as const;
 
 export const FREE_READS_PER_DAY = 2;
@@ -28,13 +42,9 @@ export const API_ERROR_CODES = [
   'payload_too_large',
   'no_files',
   'too_many_files',
-  'mixed_files',
   'unsupported_media_type',
   'image_unreadable',
   'image_too_large',
-  'pdf_unreadable',
-  'pdf_too_large',
-  'pdf_too_many_pages',
   'document_too_dense',
   'captcha_failed',
   'daily_limit_reached',
@@ -42,7 +52,6 @@ export const API_ERROR_CODES = [
   'pass_expired',
   'pass_exhausted',
   'pass_revoked',
-  'document_kind_mismatch',
   'document_unreadable',
   'model_unavailable',
   'session_not_found',
@@ -60,6 +69,10 @@ export const CLIENT_ERROR_CODES = [
   'unexpected_response',
   'captcha_unavailable',
   'file_type',
+  'pdf_unreadable',
+  'pdf_encrypted',
+  'pdf_too_large',
+  'pdf_too_slow',
   'checkout_unavailable',
   'no_checkout',
 ] as const;
@@ -86,51 +99,61 @@ export interface ExtractedRow {
   readonly confidence: Confidence;
 }
 
-// The fields and lists each kind can return (api/src/domain/extraction-schema.ts). For a payslip,
-// `extraPayAmount` is the full extra payment paid in the period, when `extraPayPaid` is true.
-export const EXTRACTION_SHAPE = {
-  settlement: {
-    fields: [
-      'detectedKind',
-      'startDate',
-      'endDate',
-      'cause',
-      'fixedTermType',
-      'monthlySalary',
-      'pending_salary',
-      'holiday_pay',
-      'extra_pay',
-      'severance',
-      'employer_notice',
-      'notice_deduction',
-      'totalAccrued',
-    ],
-    lists: ['otherAccruals'],
-  },
-  payslip: {
-    fields: [
-      'detectedKind',
-      'periodStart',
-      'periodEnd',
-      'startDate',
-      'totalAccrued',
-      'extraPayProrated',
-      'extraPayProratedAmount',
-      'extraPayPaid',
-      'extraPayAmount',
-    ],
-    lists: ['accruals'],
-  },
-  work_history: { fields: ['detectedKind'], lists: ['contracts'] },
-} as const satisfies Record<
-  DocumentKind,
-  { readonly fields: readonly string[]; readonly lists: readonly string[] }
->;
+// The fields the API merges from the documents (api/src/domain/merge.ts), each with the kind of
+// document it came from. `extraPayAmount` is the full extra payment paid in the payslip's period,
+// when `extraPayPaid` is true.
+export const EXTRACTED_FIELDS = [
+  'startDate',
+  'endDate',
+  'cause',
+  'fixedTermType',
+  'monthlySalary',
+  'pending_salary',
+  'holiday_pay',
+  'extra_pay',
+  'severance',
+  'employer_notice',
+  'notice_deduction',
+  'annualHolidayDays',
+  'holidayDaysTaken',
+  'noticeDaysReceived',
+  // Notice paid instead of given; the form takes only the days given.
+  'noticeDaysPaid',
+  'payslipPeriodStart',
+  'payslipPeriodEnd',
+  'payslipTotalAccrued',
+  'extraPayProrated',
+  'extraPayProratedAmount',
+  'extraPayPaid',
+  'extraPayAmount',
+  // What an agreement or conciliation offers as severance in total: shown, never prefilled.
+  'agreementSeveranceTotal',
+] as const;
+export type ExtractedFieldName = (typeof EXTRACTED_FIELDS)[number];
+
+export interface SourcedField extends ExtractedField {
+  readonly source: SourceKind;
+}
+
+// Consecutive pages of one document; `month` (YYYY-MM) only for a payslip.
+export interface RecognisedDocument {
+  readonly kind: PageKind;
+  readonly pages: number;
+  readonly month?: string;
+}
+
+// Two documents that state a field differently; the first source is the one kept.
+export interface Conflict {
+  readonly field: ExtractedFieldName;
+  readonly sources: readonly SourceKind[];
+}
 
 export interface Extraction {
-  readonly kind: DocumentKind;
-  readonly fields: Readonly<Record<string, ExtractedField>>;
-  readonly lists: Readonly<Record<string, readonly ExtractedRow[]>>;
+  readonly documents: readonly RecognisedDocument[];
+  readonly fields: Readonly<Partial<Record<ExtractedFieldName, SourcedField>>>;
+  // Rows for «Otros trabajos», from the work history.
+  readonly contracts: readonly ExtractedRow[];
+  readonly conflicts: readonly Conflict[];
 }
 
 export const COHERENCE_CHECKS = [
@@ -150,7 +173,6 @@ export interface DocumentFile {
 }
 
 export interface ExtractRequest {
-  readonly kind: DocumentKind;
   readonly files: readonly DocumentFile[];
   readonly captchaToken: string;
   // Exactly one of the two: a pass read, or a free read with the last quota token (or null).

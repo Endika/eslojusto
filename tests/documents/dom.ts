@@ -7,18 +7,18 @@ export const START = `
     <h2 class="question" tabindex="-1">Start</h2>
     <p data-start-status></p>
     <button data-start-upload>Upload</button>
+    <p data-start-unavailable hidden>Unavailable</p>
     <button data-start-manual>Manual</button>
   </section>
   <form data-start-panel="upload" hidden>
     <h2 class="question" tabindex="-1">Upload</h2>
-    <fieldset data-doc-field="kind">
-      <input type="radio" name="documentKind" id="document-settlement" value="settlement" />
-      <input type="radio" name="documentKind" id="document-payslip" value="payslip" />
-      <p data-doc-error-for="kind" hidden></p>
-    </fieldset>
     <div data-doc-field="files">
-      <div data-doc-drop><input type="file" id="document-files" multiple /></div>
+      <div data-doc-drop>
+        <input type="file" id="document-camera" accept="image/*" capture="environment" />
+        <input type="file" id="document-files" multiple />
+      </div>
       <ul data-doc-files hidden></ul>
+      <p data-doc-files-status></p>
       <p data-doc-error-for="files" hidden></p>
     </div>
     <div data-doc-field="consent">
@@ -34,6 +34,7 @@ export const START = `
   </form>
   <section data-start-panel="done" hidden>
     <h2 class="question" tabindex="-1">Done</h2>
+    <p data-done-documents hidden></p>
     <p data-done-summary></p>
     <ul data-done-notes hidden></ul>
     <button data-start-upload>Another</button>
