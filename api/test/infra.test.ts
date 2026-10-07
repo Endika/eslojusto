@@ -55,7 +55,7 @@ describe('regional stack', () => {
     apiTemplate.resourceCountIs('AWS::DynamoDB::GlobalTable', 0);
   });
 
-  it('runs three arm64 functions on Node 24 with the extractor capped at 5', () => {
+  it('runs three arm64 functions on Node 24, capped at 5 + 2 + 2 concurrent runs', () => {
     apiTemplate.resourceCountIs('AWS::Lambda::Function', 3);
     apiTemplate.allResourcesProperties('AWS::Lambda::Function', {
       Runtime: 'nodejs24.x',
@@ -66,10 +66,12 @@ describe('regional stack', () => {
       ReservedConcurrentExecutions: 5,
       Environment: Match.absent(),
     });
-    apiTemplate.hasResourceProperties('AWS::Lambda::Function', {
-      FunctionName: 'eslojusto-api-pass',
-      Environment: { Variables: { STRIPE_PRICE_ID: 'price_test' } },
-    });
+    for (const fn of ['checkout', 'pass'])
+      apiTemplate.hasResourceProperties('AWS::Lambda::Function', {
+        FunctionName: `eslojusto-api-${fn}`,
+        ReservedConcurrentExecutions: 2,
+        Environment: { Variables: { STRIPE_PRICE_ID: 'price_test' } },
+      });
   });
 
   it('opens each function URL to the site only, for POST', () => {
@@ -127,8 +129,15 @@ describe('global stack', () => {
   });
 
   it.each([
-    ['extract', [PARAMETER_NAMES.tokenKey, PARAMETER_NAMES.turnstileSecretKey]],
-    ['checkout', [PARAMETER_NAMES.stripeSecretKey]],
+    [
+      'extract',
+      [
+        PARAMETER_NAMES.tokenKey,
+        PARAMETER_NAMES.turnstileSecretKey,
+        PARAMETER_NAMES.stripeSecretKey,
+      ],
+    ],
+    ['checkout', [PARAMETER_NAMES.stripeSecretKey, PARAMETER_NAMES.turnstileSecretKey]],
     ['pass', [PARAMETER_NAMES.stripeSecretKey, PARAMETER_NAMES.tokenKey]],
   ])('lets %s read only its parameters, and never Bedrock elsewhere', (fn, params) => {
     const all = statements(globalTemplate, `eslojusto-api-${fn}`);
@@ -140,6 +149,16 @@ describe('global stack', () => {
       new RegExp(`(parameter/eslojusto/api/.*){${params.length}}`),
     );
     if (fn !== 'extract') expect(JSON.stringify(all)).not.toContain('bedrock');
+  });
+
+  it.each(['extract', 'checkout', 'pass'])('lets %s write only to its own log group', (fn) => {
+    const logs = statements(globalTemplate, `eslojusto-api-${fn}`).filter((s) =>
+      JSON.stringify(s['Action']).includes('logs:'),
+    );
+    const json = JSON.stringify(logs);
+    expect(json).toContain(`log-group:/aws/lambda/eslojusto-api-${fn}"`);
+    expect(json).toContain(`log-group:/aws/lambda/eslojusto-api-${fn}:*"`);
+    expect(json.match(/log-group:/g)).toHaveLength(2);
   });
 
   it('budgets 10 USD a month with alerts at 50, 80 and 100%', () => {
@@ -158,6 +177,17 @@ describe('global stack', () => {
       ActionThreshold: { Type: 'PERCENTAGE', Value: 100 },
       ApprovalModel: 'AUTOMATIC',
       Definition: { IamActionDefinition: { Roles: ['eslojusto-api-extract'] } },
+    });
+    globalTemplate.hasResourceProperties('AWS::IAM::Role', {
+      RoleName: 'eslojusto-api-budget-action',
+      AssumeRolePolicyDocument: {
+        Statement: [
+          Match.objectLike({
+            Principal: { Service: 'budgets.amazonaws.com' },
+            Condition: { StringEquals: { 'aws:SourceAccount': { Ref: 'AWS::AccountId' } } },
+          }),
+        ],
+      },
     });
     globalTemplate.hasResourceProperties('AWS::IAM::ManagedPolicy', {
       ManagedPolicyName: 'eslojusto-api-deny-bedrock',
