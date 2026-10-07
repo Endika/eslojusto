@@ -64,6 +64,19 @@ const flowOnly = {
   regex: `^\\./(?!flow$|tabs$)|^\\.\\./(?!engine/date$)|${notCanonical}`,
   message: 'Navigation and tabs serve every section: its specifics come in through a Flow.',
 };
+// Reading documents and the pass serve every review section the same way: what is particular to
+// one comes in through their ports, wired by that section's composition root.
+const finalPayParts = '(case|final-pay-reading|prefill|report)$';
+const documentsPlatform = {
+  regex: `^\\./${finalPayParts}|^\\.\\./calculator/(?!dom$|fill$|number$)|^\\.\\./engine/(?!date$)`,
+  message:
+    'Document reading and the pass serve every section: its specifics come in through ports.',
+};
+const documentsRoot = {
+  regex: `^\\.\\./documents/${finalPayParts}|^\\.\\./calculator/(?!fill$|ports$)`,
+  message:
+    'The documents wiring serves every section: its specifics come in as a DocumentsSection.',
+};
 const hiddenImports = [
   ['ImportExpression', 'Dynamic imports'],
   ['TSImportType', 'Type imports (`typeof import(…)`)'],
@@ -178,4 +191,12 @@ export default tseslint.config(
     ['src/calculator/{flow,navigation,tabs}.ts'],
     [noAnalytics, noRoot, noPosthogSdk, flowOnly],
   ),
+  boundary(
+    ['src/documents/{api,contract,payment,pdf,ports,upload}.ts'],
+    [noAnalytics, noRoot, noPosthogSdk, documentsPlatform],
+  ),
+  {
+    files: ['src/scripts/documents.ts'],
+    rules: { 'no-restricted-imports': ['error', { patterns: [documentsRoot] }] },
+  },
 );

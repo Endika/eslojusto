@@ -1,5 +1,14 @@
-import type { CompletedReview } from '../calculator/ports';
-import type { ErrorCode, MediaType, PageKind, SkipReason } from './contract';
+import type { FormEntries } from '../calculator/fill';
+import type { CivilDate } from '../engine/date';
+import type { Translate } from '../i18n/client';
+import type {
+  Confidence,
+  ErrorCode,
+  Extraction,
+  MediaType,
+  PageKind,
+  SkipReason,
+} from './contract';
 import type { filesBucket } from './files';
 import type { LetterDetails, LetterField, LetterKind, LetterPrefilled } from './letter';
 import type { QualityProblem, QualitySignals } from './quality';
@@ -102,11 +111,82 @@ export interface PdfPages {
   open(file: File): Promise<OpenedPdf | PdfProblem>;
 }
 
+// What a PDF says, block by block, before any layout: a report or a letter is built from the
+// review the person confirmed and the page's dictionary, never from anything else.
+export type Block =
+  | { readonly type: 'title'; readonly text: string }
+  | { readonly type: 'meta'; readonly text: string }
+  | { readonly type: 'heading'; readonly text: string }
+  | { readonly type: 'subheading'; readonly text: string }
+  | { readonly type: 'text'; readonly text: string }
+  | { readonly type: 'note'; readonly text: string }
+  | { readonly type: 'row'; readonly label: string; readonly value: string }
+  | { readonly type: 'bullet'; readonly text: string }
+  | { readonly type: 'source'; readonly text: string; readonly url: string }
+  // A line to write on, with the value already on it when the person gave one.
+  | { readonly type: 'blank'; readonly label: string; readonly value?: string }
+  | { readonly type: 'rule' };
+
+export interface DocumentModel {
+  readonly title: string;
+  readonly footer: string | null;
+  readonly blocks: readonly Block[];
+}
+
 export interface PdfMaker {
-  report(review: CompletedReview): Promise<Blob>;
-  letter(review: CompletedReview, details: LetterDetails): Promise<Blob>;
+  render(model: DocumentModel): Promise<Blob>;
   // The fields with a character the letter's fonts can't draw.
   unprintable(details: Record<LetterField, string>): LetterField[];
+}
+
+// A completed review as the pass sees it, whichever section made it: whether the pass is offered,
+// and the report and letters it unlocks.
+export interface PaidReview {
+  readonly offer: boolean;
+  // The letters this review can download; the first is the one a plain letter button gives.
+  readonly letterKinds: readonly [LetterKind, ...LetterKind[]];
+  report(tr: Translate, today: CivilDate): DocumentModel;
+  letter(kind: LetterKind, details: LetterDetails, tr: Translate): DocumentModel;
+}
+
+// A review's form as reading and the pass drive it: set or read its answers, and open or review it.
+export interface ReviewForm {
+  readonly form: HTMLFormElement;
+  // Sets the answers and returns the names it could not set.
+  fill(entries: FormEntries): string[];
+  entries(): FormEntries;
+  // Shows the first sheet, as if the visit started there.
+  open(): void;
+  // Reviews the answers as the «Revisar» button does; false when a sheet still needs an answer.
+  review(): boolean;
+  // Shows the last review again, locked or with its detail as the pass now says.
+  refreshResult(): void;
+}
+
+// Where a value read lands in the form, to mark it as read and how surely.
+export interface ReadMark {
+  readonly id: string;
+  // A selector, within the form, for the element that holds the answer.
+  readonly container: string;
+  readonly confidence: Confidence;
+  // Worked out from what was read rather than read as such.
+  readonly derived?: true;
+}
+
+export interface ReadPrefill {
+  readonly entries: FormEntries;
+  readonly marks: readonly ReadMark[];
+  // How many answers the read gave.
+  readonly count: number;
+  readonly lowConfidence: boolean;
+  // What the summary adds about this read, after the pages it set aside.
+  readonly notes: readonly string[];
+}
+
+// How a section turns what the API read into answers for its form.
+export interface DocumentReading<F extends string, L extends string> {
+  // `answers` are the form's current ones, by name.
+  prefill(extraction: Extraction<F, L>, answers: Readonly<Record<string, string>>): ReadPrefill;
 }
 
 export interface Browser {

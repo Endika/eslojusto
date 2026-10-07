@@ -1,16 +1,31 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it } from 'vitest';
+import type { CompletedReview } from '../../src/calculator/ports';
+import { finalPayCase } from '../../src/documents/case';
 import type { Api, PassResult, VerifyResult } from '../../src/documents/contract';
 import { createPassStore } from '../../src/documents/pass';
 import { setUpPayment } from '../../src/documents/payment';
 import type { LetterDetails } from '../../src/documents/letter';
-import type { Browser } from '../../src/documents/ports';
+import type { Browser, PaidReview } from '../../src/documents/ports';
 import { NOTICE, OFFER, flush, recordingEvents } from './dom';
 import { completed, memoryStore, passToken, tr, unfairDismissal } from './fixtures';
 
 const NOW = Date.UTC(2026, 9, 7);
 const EXPIRES = NOW / 1000 + 7 * 86400;
 const validPass = passToken({ typ: 'pass', sid: 'cs_test_1', exp: EXPIRES });
+
+// The details each letter was built with, since the last setUp.
+const letters: LetterDetails[] = [];
+function asPaid(r: CompletedReview): PaidReview {
+  const c = finalPayCase(r);
+  return {
+    ...c,
+    letter: (kind, details, t) => {
+      letters.push(details);
+      return c.letter(kind, details, t);
+    },
+  };
+}
 
 function setUp(
   passResults: PassResult[] = [],
@@ -23,7 +38,7 @@ function setUp(
   const calls: string[] = [];
   const saved: string[] = [];
   const redirects: string[] = [];
-  const letters: LetterDetails[] = [];
+  letters.length = 0;
   let kept = 0;
   const api: Api = {
     extract: async () => ({ ok: false, code: 'service_unavailable' }),
@@ -59,11 +74,7 @@ function setUp(
     browser,
     tr,
     pdf: async () => ({
-      report: async () => new Blob(['%PDF']),
-      letter: async (_review, details) => {
-        letters.push(details);
-        return new Blob(['%PDF']);
-      },
+      render: async () => new Blob(['%PDF']),
       // Stands in for the fonts: «€» is the one character they lack here.
       unprintable: (d) =>
         (['name', 'id', 'company', 'place'] as const).filter((f) => d[f].includes('€')),
@@ -102,11 +113,11 @@ describe('the pass offer', () => {
 
   it('shows only when an item falls short', () => {
     const { payment, section } = setUp();
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     expect(section.hidden).toBe(false);
     expect($('[data-pass-buy]').hidden).toBe(false);
     expect($('[data-pass-downloads]').hidden).toBe(true);
-    payment.show(completed(unfairDismissal, { severance: 41000 }));
+    payment.show(asPaid(completed(unfairDismissal, { severance: 41000 })));
     expect(section.hidden).toBe(true);
     payment.hide();
     expect(section.hidden).toBe(true);
@@ -115,7 +126,7 @@ describe('the pass offer', () => {
   it('a held pass unlocks only once the API verifies it, and only once per page', async () => {
     const { payment, passes, calls, events, changes } = setUp();
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     expect(payment.verified()).toBe(false);
     expect($('[data-pass-downloads]').hidden).toBe(true);
     await flush();
@@ -124,7 +135,7 @@ describe('the pass offer', () => {
     expect(changes()).toBe(1);
     expect($('[data-pass-downloads]').hidden).toBe(false);
     expect(events.log).toEqual([['passVerified', 'ok']]);
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await flush();
     expect(calls).toEqual(['verify valid']);
   });
@@ -135,7 +146,7 @@ describe('the pass offer', () => {
       { ok: false, code: 'pass_invalid' },
     ]);
     passes.savePass({ token: forged, expiresAt: EXPIRES + 999_999, readsLeft: 15 });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await flush();
     expect(payment.verified()).toBe(false);
     expect(changes()).toBe(0);
@@ -152,7 +163,7 @@ describe('the pass offer', () => {
   ] as const)('%s: dropped, with its reason', async (code, result, text) => {
     const { payment, passes, events } = setUp([], undefined, [{ ok: false, code }]);
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await flush();
     expect(payment.verified()).toBe(false);
     expect(passes.pass()).toBeNull();
@@ -165,7 +176,7 @@ describe('the pass offer', () => {
       { ok: false, code: 'pass_unconfirmed' },
     ]);
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await flush();
     expect(payment.verified()).toBe(false);
     expect(passes.pass()).not.toBeNull();
@@ -179,7 +190,7 @@ describe('the pass offer', () => {
       { ok: false, code: 'service_unavailable' },
     ]);
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await flush();
     expect(payment.verified()).toBe(false);
     expect(passes.pass()).not.toBeNull();
@@ -206,7 +217,7 @@ describe('the pass offer', () => {
       { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
     ]);
     passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await payment.returned('cs_test_1');
     expect(payment.verified()).toBe(true);
     expect(changes()).toBe(1);
@@ -215,7 +226,7 @@ describe('the pass offer', () => {
 
   it('asks for the express waiver before paying', async () => {
     const { payment, calls, redirects } = setUp();
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await click('[data-pass-pay]');
     expect(calls).toEqual([]);
     expect(redirects).toEqual([]);
@@ -225,7 +236,7 @@ describe('the pass offer', () => {
 
   it('pays: keeps the nonce, the session and the review, then goes to Stripe', async () => {
     const { payment, calls, redirects, passes, events, kept } = setUp();
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     $<HTMLInputElement>('#pass-waiver').checked = true;
     await click('[data-pass-pay]');
     expect(calls).toEqual(['checkout 32 checkout-token']);
@@ -239,7 +250,7 @@ describe('the pass offer', () => {
 
   it('a checkout that fails keeps no nonce', async () => {
     const { payment, passes } = setUp([], 'https://evil.example/pay');
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     $<HTMLInputElement>('#pass-waiver').checked = true;
     await click('[data-pass-pay]');
     expect(passes.checkouts()).toEqual([]);
@@ -250,7 +261,7 @@ describe('the pass offer', () => {
       { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
     ]);
     passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_old' });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     $<HTMLInputElement>('#pass-waiver').checked = true;
     await click('[data-pass-pay]');
     expect(calls).toEqual(['pass cs_test_old n']);
@@ -273,7 +284,7 @@ describe('the pass offer', () => {
       { ok: false, code: 'payment_not_complete' },
     ]);
     passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_old' });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     $<HTMLInputElement>('#pass-waiver').checked = true;
     await click('[data-pass-pay]');
     expect(calls).toEqual(['pass cs_test_old n', 'checkout 32 checkout-token']);
@@ -289,7 +300,7 @@ describe('the pass offer', () => {
     ]);
     passes.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_a' });
     passes.addCheckout({ nonce: 'b'.repeat(32), sessionId: 'cs_test_b' });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await click('[data-pass-recover-button]');
     expect(calls).toEqual(['pass cs_test_b b', 'pass cs_test_a a']);
     expect(passes.checkouts().map((c) => [c.sessionId, c.redeemed ?? false])).toEqual([
@@ -304,10 +315,10 @@ describe('the pass offer', () => {
       { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 14 },
     ]);
     passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     expect(await payment.returned('cs_test_1')).toBe(true);
     passes.forgetPass();
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     $<HTMLInputElement>('#pass-session').value = 'cs_test_1';
     await click('[data-pass-recover-button]');
     expect(calls).toEqual(['pass cs_test_1 n', 'pass cs_test_1 n']);
@@ -325,7 +336,7 @@ describe('the pass offer', () => {
     ]);
     passes.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_old' });
     passes.addCheckout({ nonce: 'b'.repeat(32), sessionId: 'cs_test_new' });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     expect(await payment.returned('cs_test_new')).toBe('payment_not_complete');
     expect($('[data-pass-error]').textContent).toContain('El pago aún no está completo');
   });
@@ -342,7 +353,7 @@ describe('the pass offer', () => {
     ]);
     own.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_a' });
     own.addCheckout({ nonce: 'b'.repeat(32), sessionId: 'cs_test_b' });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await click('[data-pass-recover-button]');
     expect(own.checkouts()).toEqual([]);
   });
@@ -351,14 +362,14 @@ describe('the pass offer', () => {
     const { payment, passes, calls } = setUp();
     for (const id of ['a', 'b', 'c', 'd'])
       passes.addCheckout({ nonce: id.repeat(32), sessionId: `cs_test_${id}` });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await click('[data-pass-recover-button]');
     expect(calls).toEqual(['pass cs_test_d d', 'pass cs_test_c c']);
   });
 
   it('never follows a checkout address outside Stripe', async () => {
     const { payment, redirects } = setUp([], 'https://evil.example/pay');
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     $<HTMLInputElement>('#pass-waiver').checked = true;
     await click('[data-pass-pay]');
     expect(redirects).toEqual([]);
@@ -371,7 +382,7 @@ describe('the pass offer', () => {
       { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
     ]);
     passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     expect(await payment.returned('cs_test_1')).toBe(true);
     expect(calls).toEqual(['pass cs_test_1 n', 'pass cs_test_1 n']);
     expect(passes.pass()).toEqual({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
@@ -385,7 +396,7 @@ describe('the pass offer', () => {
 
   it('«¿Ya has pagado?» without a payment from this browser says so', async () => {
     const { payment, calls, events } = setUp();
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     $<HTMLInputElement>('#pass-session').value = 'cs_test_9';
     await click('[data-pass-recover-button]');
     expect(calls).toEqual([]);
@@ -400,7 +411,7 @@ describe('the pass offer', () => {
       { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
     ]);
     passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await click('[data-pass-recover-button]');
     expect(calls).toEqual(['pass cs_test_1 n']);
     expect(events.log).toEqual([['passIssued', 'recovery']]);
@@ -410,7 +421,7 @@ describe('the pass offer', () => {
   it('with a pass, downloads the report and the letter', async () => {
     const { payment, passes, saved, events } = setUp();
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await click('[data-download="report"]');
     await click('[data-download="letter"]');
     expect(saved).toEqual(['eslojusto-informe-finiquito.pdf', 'eslojusto-recibi-no-conforme.pdf']);
@@ -424,7 +435,7 @@ describe('the pass offer', () => {
   it('the letter takes what the person adds, dated today unless changed', async () => {
     const { payment, passes, letters, events } = setUp();
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     expect($<HTMLInputElement>('[data-letter-field="date"]').value).toBe('2026-10-07');
     $<HTMLInputElement>('[data-letter-field="name"]').value = 'Alex Ejemplo';
     $<HTMLInputElement>('[data-letter-field="company"]').value = 'Empresa Ficticia SL';
@@ -447,7 +458,7 @@ describe('the pass offer', () => {
   it('warns about an ID that is no DNI or NIE, and downloads the letter anyway', async () => {
     const { payment, passes, saved } = setUp();
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     const id = $<HTMLInputElement>('[data-letter-field="id"]');
     id.value = '1234';
     id.dispatchEvent(new Event('change'));
@@ -463,7 +474,7 @@ describe('the pass offer', () => {
   it('a field with a character the fonts lack keeps its blank line, with a warning', async () => {
     const { payment, passes, letters, events } = setUp();
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await flush();
     $<HTMLInputElement>('[data-letter-field="name"]').value = 'Alex Ejemplo';
     $<HTMLInputElement>('[data-letter-field="company"]').value = 'Empresa € SL';
@@ -479,7 +490,7 @@ describe('the pass offer', () => {
   it('starting over forgets what was typed for the letter', () => {
     const { payment, passes } = setUp();
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     $<HTMLInputElement>('[data-letter-field="name"]').value = 'Alex Ejemplo';
     payment.hide();
     expect($<HTMLInputElement>('[data-letter-field="name"]').value).toBe('');
@@ -489,7 +500,7 @@ describe('the pass offer', () => {
   it('with a pass and nothing short, the general letter too, and still no offer to pay', async () => {
     const { payment, passes, section, saved, events } = setUp();
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
-    payment.show(completed(unfairDismissal, { severance: 41000 }));
+    payment.show(asPaid(completed(unfairDismissal, { severance: 41000 })));
     await flush();
     expect(section.hidden).toBe(false);
     expect($('[data-pass-buy]').hidden).toBe(true);
@@ -501,7 +512,7 @@ describe('the pass offer', () => {
 
   it('without a pass and nothing short, nothing is offered', () => {
     const { payment, section } = setUp();
-    payment.show(completed(unfairDismissal, { severance: 41000 }));
+    payment.show(asPaid(completed(unfairDismissal, { severance: 41000 })));
     expect(section.hidden).toBe(true);
   });
 
@@ -509,7 +520,7 @@ describe('the pass offer', () => {
     const { payment, passes, saved } = setUp();
     const old = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 - 1 });
     passes.savePass({ token: old, expiresAt: NOW / 1000 - 1, readsLeft: 15 });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     expect($('[data-pass-buy]').hidden).toBe(false);
     await click('[data-download="report"]');
     expect(saved).toEqual([]);
@@ -524,7 +535,7 @@ describe('the notice after paying', () => {
   async function paid() {
     const t = setUp([{ ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 }]);
     t.passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
-    t.payment.show(completed());
+    t.payment.show(asPaid(completed()));
     await t.payment.returned('cs_test_1');
     return t;
   }
@@ -560,18 +571,18 @@ describe('the notice after paying', () => {
     payment.hide();
     expect($('[data-pass-notice]').hidden).toBe(true);
     expect(leaving()).toBe(false);
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     expect(leaving()).toBe(false);
   });
 
   it('a pass that dies during the visit takes the warning away with the notice', async () => {
     const t = setUp([{ ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 }]);
     t.passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
-    t.payment.show(completed());
+    t.payment.show(asPaid(completed()));
     await t.payment.returned('cs_test_1');
     expect(t.leaving()).toBe(true);
     t.passes.forgetPass();
-    t.payment.show(completed());
+    t.payment.show(asPaid(completed()));
     expect($('[data-pass-notice]').hidden).toBe(true);
     expect(t.leaving()).toBe(false);
   });
@@ -581,7 +592,7 @@ describe('the notice after paying', () => {
       { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
     ]);
     passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
-    payment.show(completed());
+    payment.show(asPaid(completed()));
     await click('[data-pass-recover-button]');
     expect(payment.verified()).toBe(true);
     expect($('[data-pass-notice]').hidden).toBe(true);

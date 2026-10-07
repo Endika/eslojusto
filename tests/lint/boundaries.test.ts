@@ -51,6 +51,16 @@ describe('import boundaries', () => {
     ['src/calculator/navigation.ts', "import { STEPS } from './steps';"],
     ['src/calculator/tabs.ts', "import { applies } from './conditions';"],
     ['src/calculator/flow.ts', "import { reviewFinalPay } from '../engine/review';"],
+    ['src/documents/upload.ts', "import { prefillFrom } from './prefill';"],
+    ['src/documents/payment.ts', "import { hasShortfall } from './case';"],
+    ['src/documents/pdf.ts', "import { reportModel } from './report';"],
+    ['src/documents/ports.ts', "import type { CompletedReview } from '../calculator/ports';"],
+    ['src/documents/upload.ts', "import type { Calculator } from '../calculator/main';"],
+    [
+      'src/scripts/documents.ts',
+      "import { finalPayReading } from '../documents/final-pay-reading';",
+    ],
+    ['src/scripts/documents.ts', "import { STEPS } from '../calculator/steps';"],
   ])('%s cannot %s', async (filePath, code) => {
     expect(await violations(filePath, code)).toContain('no-restricted-imports');
   });
@@ -199,6 +209,9 @@ describe('import boundaries', () => {
     ['src/engine/law/x.ts', "import type { NormStatus } from './norms';"],
     ['src/calculator/navigation.ts', "import { stepFrom, type Flow } from './flow';"],
     ['src/calculator/steps.ts', "import { applies } from './conditions';"],
+    ['src/documents/upload.ts', "import type { ReviewForm } from './ports';"],
+    ['src/documents/case.ts', "import { reportModel } from './report';"],
+    ['src/scripts/final-pay-documents.ts', "import { finalPayCase } from '../documents/case';"],
   ])('%s may %s', async (filePath, code) => {
     expect(await violations(filePath, code)).not.toContain('no-restricted-imports');
   });

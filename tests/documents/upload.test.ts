@@ -1,9 +1,17 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it } from 'vitest';
 import { formEntries, setEntry } from '../../src/calculator/fill';
-import type { Api, ExtractRequest, ExtractResult, PassResult } from '../../src/documents/contract';
+import type {
+  Api,
+  ExtractedFieldName,
+  ExtractRequest,
+  ExtractResult,
+  PassResult,
+} from '../../src/documents/contract';
+import { finalPayReading } from '../../src/documents/final-pay-reading';
 import { createOutageMemory } from '../../src/documents/outage';
 import { canDownload, createPassStore, passState } from '../../src/documents/pass';
+import type { DocumentReading } from '../../src/documents/ports';
 import { setUpUpload } from '../../src/documents/upload';
 import { START, flush, recordingEvents } from './dom';
 import { memoryStore, passToken, tr } from './fixtures';
@@ -28,6 +36,8 @@ function setUp(
     // Holds every PDF open until the test lets it go.
     pdfGate?: Promise<void>;
     slowPages?: boolean;
+    // Another section's way of taking what was read; the final pay's otherwise.
+    reading?: DocumentReading<ExtractedFieldName, 'contracts'>;
   } = {},
 ) {
   document.body.innerHTML = START;
@@ -56,8 +66,10 @@ function setUp(
     },
     verify: async () => ({ ok: false, code: 'service_unavailable' }),
   };
+  const reading = finalPayReading(form, tr);
   const upload = setUpUpload(document.querySelector('[data-documents-start]') as HTMLElement, {
     api,
+    reading: options.reading ?? reading,
     captcha: {
       token: () =>
         options.captchaFails ? Promise.reject(new Error('blocked')) : Promise.resolve('captcha'),
@@ -101,6 +113,7 @@ function setUp(
   upload.showStart();
   return {
     upload,
+    reading,
     store,
     session,
     outage,
@@ -241,6 +254,44 @@ describe('the start sheet', () => {
           skippedReasons: [],
         },
       ],
+    ]);
+  });
+
+  it('fills, marks and sums up a read as the section’s reading says', async () => {
+    const seen: Record<string, string>[] = [];
+    const reading: DocumentReading<ExtractedFieldName, 'contracts'> = {
+      prefill: (_extraction, answers) => {
+        seen.push({ ...answers });
+        return {
+          entries: [['endDate', '2026-09-30']],
+          marks: [{ id: 'end', container: '[data-field="endDate"]', confidence: 'medium' }],
+          count: 2,
+          lowConfidence: false,
+          notes: ['A note of the section'],
+        };
+      },
+    };
+    const { form, events } = setUp(settlement, { reading });
+    setEntry(form, 'startDate', '2012-02-01');
+    choose([photo]);
+    await submit();
+    expect(seen).toEqual([{ startDate: '2012-02-01' }]);
+    expect(formEntries(form)).toEqual([
+      ['startDate', '2012-02-01'],
+      ['endDate', '2026-09-30'],
+    ]);
+    const marks = [...form.querySelectorAll('[data-read-mark]')].map((m) => m.textContent);
+    expect(marks).toEqual(['Leído del documento · confianza media']);
+    expect(document.querySelector('[data-done-summary]')?.textContent).toContain(
+      'Se han leído 2 datos',
+    );
+    const notes = [...document.querySelectorAll('[data-done-notes] li')].map(
+      (li) => li.textContent,
+    );
+    expect(notes[0]).toBe('A note of the section');
+    expect(events.log.at(-1)).toMatchObject([
+      'extractionCompleted',
+      { fields: 2, lowConfidence: false },
     ]);
   });
 
@@ -666,7 +717,7 @@ describe('the start sheet', () => {
   });
 
   it('shows what an uploaded agreement offers beside the severance, until the form restarts', async () => {
-    const { upload, form } = setUp({
+    const { reading, form } = setUp({
       ...settlement,
       extraction: {
         ...settlement.extraction,
@@ -684,8 +735,8 @@ describe('the start sheet', () => {
     await submit();
     const result = document.createElement('div');
     result.innerHTML = '<section data-item="severance"><p data-reference></p></section>';
-    upload.showAgreementOffer(result);
-    upload.showAgreementOffer(result);
+    reading.showAgreementOffer(result);
+    reading.showAgreementOffer(result);
     const notes = result.querySelectorAll('[data-agreement-offer]');
     expect(notes).toHaveLength(1);
     expect(notes[0]?.textContent?.replace(/\s/g, ' ')).toBe(
@@ -694,7 +745,7 @@ describe('the start sheet', () => {
     expect(notes[0]?.previousElementSibling?.hasAttribute('data-reference')).toBe(true);
     expect(formEntries(form)).toEqual([]);
     form.dispatchEvent(new Event('reset'));
-    upload.showAgreementOffer(result);
+    reading.showAgreementOffer(result);
     expect(result.querySelector('[data-agreement-offer]')).toBeNull();
   });
 

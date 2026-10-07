@@ -1,11 +1,10 @@
 import { documentsAnalytics } from '../analytics/documents';
 import { track } from '../analytics/posthog';
 import type { FormEntries } from '../calculator/fill';
-import type { Calculator } from '../calculator/main';
-import type { CompletedReview, Detail } from '../calculator/ports';
-import { STEPS } from '../calculator/steps';
+import type { Detail } from '../calculator/ports';
 import { createApi } from '../documents/api';
-import { DOCUMENTS, TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/config';
+import { TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/config';
+import type { ExtractionShape } from '../documents/contract';
 import { fitWithin } from '../documents/files';
 import { canvasJpeg, whiteCanvas } from './jpeg';
 import { photoQuality } from './quality';
@@ -16,16 +15,17 @@ import type {
   Browser,
   Captcha,
   CaptchaAction,
+  DocumentReading,
   FileEncoder,
   KeyValueStore,
+  PaidReview,
   PdfPages,
+  ReviewForm,
 } from '../documents/ports';
 import { setUpUpload } from '../documents/upload';
-import { pageTranslator } from '../i18n/client';
+import type { Translate } from '../i18n/client';
 import { localToday } from './clock';
 
-// The review's answers while the person is on Stripe's page; read back and deleted on return.
-const REVIEW_KEY = 'eslojusto-revision-en-pago';
 const CAPTCHA_TIMEOUT_MS = 90_000;
 
 // localStorage or sessionStorage behind try/catch: blocked storage reads as empty.
@@ -60,27 +60,34 @@ interface Turnstile {
   remove(widget: string): void;
 }
 
-// Turnstile loads only when a document is about to be read or the pass paid for, and each of
-// those gets a fresh token.
-let turnstileApi: Promise<Turnstile> | null = null;
-const loadTurnstile = () =>
-  (turnstileApi ??= new Promise<Turnstile>((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = TURNSTILE_SCRIPT;
-    script.async = true;
-    script.onload = () => {
-      const t = (window as unknown as { turnstile?: Turnstile }).turnstile;
-      if (t) resolve(t);
-      else reject(new Error('Turnstile missing'));
-    };
-    script.onerror = () => {
-      turnstileApi = null;
-      reject(new Error('Turnstile unavailable'));
-    };
-    document.head.append(script);
-  }));
+// Turnstile loads only when a document is about to be read or the pass paid for, once for the
+// page, and each of those gets a fresh token.
+function turnstileLoader(): () => Promise<Turnstile> {
+  let turnstileApi: Promise<Turnstile> | null = null;
+  return () =>
+    (turnstileApi ??= new Promise<Turnstile>((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = TURNSTILE_SCRIPT;
+      script.async = true;
+      script.onload = () => {
+        const t = (window as unknown as { turnstile?: Turnstile }).turnstile;
+        if (t) resolve(t);
+        else reject(new Error('Turnstile missing'));
+      };
+      script.onerror = () => {
+        turnstileApi = null;
+        reject(new Error('Turnstile unavailable'));
+      };
+      document.head.append(script);
+    }));
+}
 
-function turnstileCaptcha(siteKey: string, container: HTMLElement, action: CaptchaAction): Captcha {
+function turnstileCaptcha(
+  loadTurnstile: () => Promise<Turnstile>,
+  siteKey: string,
+  container: HTMLElement,
+  action: CaptchaAction,
+): Captcha {
   let widget: string | null = null;
   return {
     async token() {
@@ -153,11 +160,38 @@ const browser: Browser = {
   },
 };
 
-export interface CalculatorHooks {
-  onReview(listener: (r: CompletedReview) => void): void;
+// What a section's page tells the documents of its review, and what it lets them decide.
+export interface ReviewHooks<R> {
+  onReview(listener: (r: R) => void): void;
   onRestart(listener: () => void): void;
-  // Tells the calculator how a review's result will be shown.
+  // Tells the form how a review's result will be shown.
   detail(state: () => Detail): void;
+}
+
+// What a section brings to reading documents and to the pass; the rest is the same for all.
+export interface DocumentsSection<R, F extends string, L extends string> {
+  readonly extraction: ExtractionShape<F, L>;
+  readonly reading: DocumentReading<F, L>;
+  // The fragments that open the form itself rather than the start sheet.
+  readonly steps: readonly string[];
+  // Where the review's answers wait while the person is on Stripe's page; read back and deleted
+  // on return.
+  readonly keptReviewKey: string;
+  paidReview(r: R): PaidReview;
+  // Adds to a result just shown what only the documents read can say.
+  decorateResult(result: ParentNode): void;
+  // Answers kept by an earlier version of the page, as the form takes them now.
+  restore(saved: FormEntries): FormEntries;
+}
+
+export interface DocumentsWiring<R, F extends string, L extends string> {
+  readonly form: ReviewForm;
+  readonly hooks: ReviewHooks<R>;
+  // The address the visit arrived at, before the form rewrote its fragment.
+  readonly arrival: { readonly hash: string; readonly search: string };
+  readonly section: DocumentsSection<R, F, L>;
+  readonly config: DocumentsConfig | null;
+  readonly tr: Translate;
 }
 
 const isEntries = (v: unknown): v is FormEntries =>
@@ -166,21 +200,22 @@ const isEntries = (v: unknown): v is FormEntries =>
     (e) => Array.isArray(e) && e.length === 2 && e.every((x: unknown) => typeof x === 'string'),
   );
 
-export function wireDocuments(
-  calculator: Calculator,
-  hooks: CalculatorHooks,
-  // The address the visit arrived at, before the calculator rewrote its fragment.
-  arrival: { hash: string; search: string },
-  config: DocumentsConfig | null = DOCUMENTS,
-): void {
+export function wireDocuments<R, F extends string, L extends string>({
+  form: calculator,
+  hooks,
+  arrival,
+  section,
+  config,
+  tr,
+}: DocumentsWiring<R, F, L>): void {
   const start = document.querySelector<HTMLElement>('[data-documents-start]');
   const offer = document.querySelector<HTMLElement>('[data-pass-offer]');
   const captchaBox = start?.querySelector<HTMLElement>('[data-captcha]');
   const checkoutCaptchaBox = offer?.querySelector<HTMLElement>('[data-pass-captcha]');
   if (!config || !start || !offer || !captchaBox || !checkoutCaptchaBox) return;
 
-  const tr = pageTranslator();
-  const api = createApi(config.endpoints, (url, init) => fetch(url, init));
+  const api = createApi(config.endpoints, (url, init) => fetch(url, init), section.extraction);
+  const loadTurnstile = turnstileLoader();
   const passes = createPassStore(
     storage(() => localStorage),
     browser.now,
@@ -190,7 +225,8 @@ export function wireDocuments(
 
   const upload = setUpUpload(start, {
     api,
-    captcha: turnstileCaptcha(config.turnstileSiteKey, captchaBox, 'extract'),
+    reading: section.reading,
+    captcha: turnstileCaptcha(loadTurnstile, config.turnstileSiteKey, captchaBox, 'extract'),
     encoder: canvasEncoder,
     pdfs: pdfPages,
     passes,
@@ -204,24 +240,29 @@ export function wireDocuments(
   const payment = setUpPayment(offer, {
     notice: document.querySelector<HTMLElement>('[data-pass-notice]'),
     api,
-    captcha: turnstileCaptcha(config.turnstileSiteKey, checkoutCaptchaBox, 'checkout'),
+    captcha: turnstileCaptcha(
+      loadTurnstile,
+      config.turnstileSiteKey,
+      checkoutCaptchaBox,
+      'checkout',
+    ),
     passes,
     events,
     browser,
     tr,
-    pdf: () => import('../documents/pdf').then((m) => m.pdfMaker(tr, localToday)),
-    keepReview: () => session.set(REVIEW_KEY, JSON.stringify(calculator.entries())),
+    pdf: () => import('../documents/pdf').then((m) => m.pdfMaker),
+    keepReview: () => session.set(section.keptReviewKey, JSON.stringify(calculator.entries())),
     today: localToday,
     // A pass verified or dropped shows the review again, with or without its detail.
     passChanged: () => {
       calculator.refreshResult();
-      upload.showAgreementOffer(document);
+      section.decorateResult(document);
     },
   });
   hooks.detail(() => (payment.verified() ? 'unlocked' : 'locked'));
   hooks.onReview((r) => {
-    payment.show(r);
-    upload.showAgreementOffer(document);
+    payment.show(section.paidReview(r));
+    section.decorateResult(document);
   });
   hooks.onRestart(() => payment.hide());
 
@@ -229,17 +270,12 @@ export function wireDocuments(
   // the browser's back button arrive without a session id), and are deleted at once.
   let saved: unknown = null;
   try {
-    saved = JSON.parse(session.get(REVIEW_KEY) ?? 'null');
+    saved = JSON.parse(session.get(section.keptReviewKey) ?? 'null');
   } catch {
     // A damaged entry is dropped below like any other.
   }
-  session.remove(REVIEW_KEY);
-  // Answers kept before the holiday unit was asked were in calendar days.
-  const review = isEntries(saved)
-    ? saved.some(([name]) => name === 'holidayUnit')
-      ? saved
-      : [...saved, ['holidayUnit', 'calendar'] as const]
-    : null;
+  session.remove(section.keptReviewKey);
+  const review = isEntries(saved) ? section.restore(saved) : null;
 
   const sessionId = new URLSearchParams(arrival.search).get('session_id');
   if (sessionId !== null) history.replaceState(null, '', `${location.pathname}${location.hash}`);
@@ -248,7 +284,7 @@ export function wireDocuments(
     calculator.fill(review);
     upload.showCalculator(false);
     calculator.review();
-  } else if (sessionId === null && (STEPS as readonly string[]).includes(arrival.hash.slice(1)))
+  } else if (sessionId === null && section.steps.includes(arrival.hash.slice(1)))
     upload.showCalculator(false);
   else upload.showStart();
 

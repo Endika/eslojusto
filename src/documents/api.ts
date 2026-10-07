@@ -2,7 +2,6 @@ import {
   API_ERROR_CODES,
   COHERENCE_CHECKS,
   CONFIDENCES,
-  EXTRACTED_FIELDS,
   LIMITS,
   PAGE_KINDS,
   READABILITY,
@@ -10,9 +9,9 @@ import {
   type CoherenceCheck,
   type Conflict,
   type ErrorCode,
-  type ExtractedFieldName,
   type ExtractedRow,
   type Extraction,
+  type ExtractionShape,
   type Failure,
   type ReadPage,
   type RecognisedDocument,
@@ -43,8 +42,10 @@ const isConfidence = (v: unknown) =>
 const isPageKind = (v: unknown): v is RecognisedDocument['kind'] =>
   typeof v === 'string' && (PAGE_KINDS as readonly string[]).includes(v);
 const isSource = (v: unknown): v is SourceKind => isPageKind(v) && v !== 'other';
-const isFieldName = (v: unknown): v is ExtractedFieldName =>
-  typeof v === 'string' && (EXTRACTED_FIELDS as readonly string[]).includes(v);
+const isOneOf =
+  <T extends string>(names: readonly T[]) =>
+  (v: unknown): v is T =>
+    typeof v === 'string' && (names as readonly string[]).includes(v);
 
 function parseField(v: unknown): SourcedField | null {
   if (!isRecord(v) || !isScalar(v['value']) || !isConfidence(v['confidence'])) return null;
@@ -84,7 +85,10 @@ function parsePage(v: unknown): ReadPage | null {
   };
 }
 
-function parseConflict(v: unknown): Conflict | null {
+function parseConflict<F extends string>(
+  v: unknown,
+  isFieldName: (v: unknown) => v is F,
+): Conflict<F> | null {
   if (!isRecord(v) || !isFieldName(v['field']) || !Array.isArray(v['sources'])) return null;
   const sources = v['sources'].filter(isSource);
   return sources.length > 0 ? { field: v['field'], sources } : null;
@@ -93,21 +97,30 @@ function parseConflict(v: unknown): Conflict | null {
 const present = <T>(v: T | null): v is T => v !== null;
 const list = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
 
-// Keeps what has the contract's shape; anything else in the answer is left out, never guessed at.
-export function parseExtraction(v: unknown): Extraction | null {
+// Keeps what has the contract's shape for the review; anything else in the answer is left out,
+// never guessed at.
+export function parseExtraction<F extends string, L extends string>(
+  v: unknown,
+  shape: ExtractionShape<F, L>,
+): Extraction<F, L> | null {
   if (!isRecord(v) || !isRecord(v['fields'])) return null;
-  const fields: Partial<Record<ExtractedFieldName, SourcedField>> = {};
+  const isFieldName = isOneOf(shape.fields);
+  const fields: Partial<Record<F, SourcedField>> = {};
   for (const [name, raw] of Object.entries(v['fields'])) {
     const field = parseField(raw);
     if (field && isFieldName(name)) fields[name] = field;
   }
   const lists = isRecord(v['lists']) ? v['lists'] : {};
+  const rows = {} as Record<L, readonly ExtractedRow[]>;
+  for (const name of shape.lists) rows[name] = list(lists[name]).map(parseRow).filter(present);
   return {
     pages: list(v['pages']).map(parsePage).filter(present),
     documents: list(v['documents']).map(parseDocument).filter(present),
     fields,
-    contracts: list(lists['contracts']).map(parseRow).filter(present),
-    conflicts: list(v['conflicts']).map(parseConflict).filter(present),
+    ...rows,
+    conflicts: list(v['conflicts'])
+      .map((c) => parseConflict(c, isFieldName))
+      .filter(present),
   };
 }
 
@@ -119,12 +132,15 @@ const isApiError = (v: unknown): v is ErrorCode =>
 const isToken = (v: unknown): v is string => typeof v === 'string' && v.length > 0;
 const isCount = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0;
 
-// One HTTP client per function URL; every failure becomes a code the page can word.
-export function createApi(
+// One HTTP client per function URL, for one review's page; every failure becomes a code the page
+// can word. The final pay's requests carry no review, as they did before there was another.
+export function createApi<F extends string, L extends string>(
   endpoints: Readonly<Record<Operation, string>>,
   fetchFn: Fetch,
+  shape: ExtractionShape<F, L>,
   timeoutMs = API_TIMEOUT_MS,
-): Api {
+): Api<F, L> {
+  const review = shape.review === 'final_pay' ? {} : { review: shape.review };
   async function post(
     op: Operation,
     body: object,
@@ -170,6 +186,7 @@ export function createApi(
       const r = await post('extract', {
         files,
         captchaToken,
+        ...review,
         ...(pass === undefined ? { quota: quota ?? null } : { pass }),
       });
       if (failed(r)) return r;
@@ -179,7 +196,7 @@ export function createApi(
           code: 'nothing_read',
           pages: list(r['pages']).map(parsePage).filter(present),
         };
-      const extraction = parseExtraction(r['extraction']);
+      const extraction = parseExtraction(r['extraction'], shape);
       const checks = Array.isArray(r['failedChecks']) ? r['failedChecks'] : [];
       const allowance = isToken(r['allowance']) ? r['allowance'] : null;
       const readsLeft = isCount(r['readsLeft']) ? r['readsLeft'] : null;
@@ -196,7 +213,11 @@ export function createApi(
       };
     },
     async checkout(nonce, captchaToken) {
-      const r = await post('checkout', { nonce, captchaToken });
+      const r = await post('checkout', {
+        nonce,
+        captchaToken,
+        ...(shape.review === 'final_pay' ? {} : { returnTo: shape.review }),
+      });
       if (failed(r)) return r;
       const { sessionId, url } = r;
       if (!isToken(sessionId) || !isToken(url)) return fail('unexpected_response');

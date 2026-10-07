@@ -1,16 +1,14 @@
-import type { CompletedReview } from '../calculator/ports';
 import { required } from '../calculator/dom';
 import { parseDate, toIso, type CivilDate } from '../engine/date';
-import type { Review } from '../engine/review';
 import type { Translate } from '../i18n/client';
-import { SESSION_ID, type Api, type ErrorCode } from './contract';
+import { SESSION_ID, type ErrorCode, type PassApi } from './contract';
 import { CHECKOUT_ORIGIN } from './config';
 import {
-  letterKind,
   letterPrefilled,
   looksLikeDniOrNie,
   type LetterDetails,
   type LetterField,
+  type LetterKind,
 } from './letter';
 import { noticeView, warnsOnLeave, type NoticeState } from './notice';
 import { canDownload, newNonce, passState, type PassStore, type PendingCheckout } from './pass';
@@ -19,14 +17,10 @@ import type {
   Captcha,
   DocumentEvents,
   Download,
+  PaidReview,
   PassVerifyResult,
   PdfMaker,
 } from './ports';
-
-// The pass is offered only when the review finds money missing: an item below its minimum or a
-// deduction above its maximum.
-export const hasShortfall = (r: Review): boolean =>
-  r.items.some((i) => i.status === 'below_minimum' || i.status === 'deduction_too_high');
 
 // Answers after which a payment can never give a pass, so it is no longer kept.
 const DEAD_CHECKOUT: ReadonlySet<ErrorCode> = new Set([
@@ -64,7 +58,7 @@ export function reportedFailure(failures: readonly { code: ErrorCode; matches: b
 }
 
 export interface PaymentDeps {
-  readonly api: Api;
+  readonly api: PassApi;
   // A Turnstile widget with the action «checkout».
   readonly captcha: Captcha;
   readonly passes: PassStore;
@@ -131,7 +125,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     section.querySelector<HTMLButtonElement>('[data-pass-verify-retry]'),
     'retry',
   );
-  let current: CompletedReview | null = null;
+  let current: PaidReview | null = null;
   let busy = false;
   // The pass the API confirmed during this page's life. Kept in memory only: a reload asks again.
   let verifiedToken: string | null = null;
@@ -236,8 +230,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     const stored = passes.pass();
     const held = heldPass() !== null;
     const paid = verified();
-    const shortfall = hasShortfall(current.review);
-    section.hidden = !held && !shortfall;
+    section.hidden = !held && !current.offer;
     buy.hidden = held;
     downloads.hidden = !paid;
     if (paid && stored) {
@@ -378,7 +371,11 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     checkId();
   }
 
-  async function download(which: Download) {
+  // A letter button names its kind when the review offers more than one letter.
+  const letterKindOf = (button: HTMLElement, review: PaidReview): LetterKind =>
+    review.letterKinds.find((k) => k === button.dataset['letterKind']) ?? review.letterKinds[0];
+
+  async function download(which: Download, button: HTMLElement) {
     if (!current || !(await verify())) return render();
     setError(null);
     status.textContent = tr('client.documents.pass.generating');
@@ -392,12 +389,12 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
           blanked.length === 0 ? '' : tr('client.documents.letter.glyph_warning');
         details = { ...details, ...Object.fromEntries(blanked.map((f) => [f, ''])) };
       }
-      const blob = await (which === 'report'
-        ? maker.report(current)
-        : maker.letter(current, details));
+      const kind = letterKindOf(button, current);
+      const blob = await maker.render(
+        which === 'report' ? current.report(tr, deps.today()) : current.letter(kind, details, tr),
+      );
       browser.save(blob, tr(`client.documents.${FILENAMES[which]}.filename`));
-      if (which === 'letter')
-        events.downloaded(which, letterPrefilled(details), letterKind(current.review));
+      if (which === 'letter') events.downloaded(which, letterPrefilled(details), kind);
       else events.downloaded(which);
       downloaded.add(which);
       renderNotice();
@@ -446,11 +443,11 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   ])
     button.addEventListener(
       'click',
-      guard(() => download(button.dataset['download'] === 'letter' ? 'letter' : 'report')),
+      guard(() => download(button.dataset['download'] === 'letter' ? 'letter' : 'report', button)),
     );
 
   return {
-    show(review: CompletedReview) {
+    show(review: PaidReview) {
       current = review;
       if (letterInputs.date.value === '') letterInputs.date.value = toIso(deps.today());
       status.textContent = '';

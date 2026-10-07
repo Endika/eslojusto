@@ -1,11 +1,8 @@
-import type { CivilDate } from '../engine/date';
-import type { Translate } from '../i18n/client';
 import { sans } from './fonts/sans';
 import { serif } from './fonts/serif';
 import { INK, PdfDocument, SOFT, type Rgb, type TextStyle } from './pdf-writer';
 import { LETTER_FIELDS, type LetterField } from './letter';
-import type { PdfMaker } from './ports';
-import { letterModel, reportModel, type DocumentModel } from './report';
+import type { DocumentModel, PdfMaker } from './ports';
 
 // Loaded only when a person with a pass asks for a PDF: the fonts and the writer stay out of the
 // page until then.
@@ -90,10 +87,7 @@ export function unprintable(details: Record<LetterField, string>): LetterField[]
 
 const asBlob = (bytes: Uint8Array) => new Blob([bytes as BlobPart], { type: 'application/pdf' });
 
-export function pdfMaker(tr: Translate, today: () => CivilDate): PdfMaker {
-  return {
-    report: async (r) => asBlob(await renderPdf(reportModel(r, tr, today()))),
-    letter: async (r, details) => asBlob(await renderPdf(letterModel(r, tr, details))),
-    unprintable,
-  };
-}
+export const pdfMaker: PdfMaker = {
+  render: async (model) => asBlob(await renderPdf(model)),
+  unprintable,
+};

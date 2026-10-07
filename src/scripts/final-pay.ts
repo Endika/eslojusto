@@ -47,9 +47,9 @@ const calculator = setUpCalculator(document.body, {
 });
 
 if (documentsBuild) {
-  import('./documents')
-    .then(({ wireDocuments }) =>
-      wireDocuments(
+  import('./final-pay-documents')
+    .then(({ wireFinalPayDocuments }) =>
+      wireFinalPayDocuments(
         calculator,
         {
           onReview: (listener) => reviewed.push(listener),

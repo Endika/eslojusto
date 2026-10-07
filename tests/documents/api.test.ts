@@ -3,7 +3,7 @@ import { EXTRACT_TIMEOUT_SECONDS } from '../../api/src/config';
 import { LIMITS as API_LIMITS } from '../../api/src/domain/documents';
 import { READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
 import { API_TIMEOUT_MS, createApi, parseExtraction, type Fetch } from '../../src/documents/api';
-import { LIMITS, READABILITY } from '../../src/documents/contract';
+import { FINAL_PAY_EXTRACTION, LIMITS, READABILITY } from '../../src/documents/contract';
 
 interface Call {
   url: string;
@@ -50,6 +50,8 @@ const extraction = {
   contracts: [],
   conflicts: [],
 };
+const finalPayApi = (fetch: Fetch) => createApi(ENDPOINTS, fetch, FINAL_PAY_EXTRACTION);
+const parseFinalPay = (v: unknown) => parseExtraction(v, FINAL_PAY_EXTRACTION);
 const request = {
   files: [{ mediaType: 'image/jpeg' as const, data: 'AAAA' }],
   captchaToken: 'turnstile',
@@ -63,7 +65,7 @@ describe('extract', () => {
       failedChecks: ['items_do_not_sum', 'x'],
       allowance: 'v1.q.s',
     });
-    const result = await createApi(ENDPOINTS, fetch).extract({ ...request, quota: null });
+    const result = await finalPayApi(fetch).extract({ ...request, quota: null });
     expect(fetch.calls[0]?.url).toBe('https://extract.api.test/');
     expect(fetch.calls[0]?.body).toEqual({ ...request, quota: null });
     expect(result).toEqual({
@@ -83,21 +85,21 @@ describe('extract', () => {
       allowance: 'q',
       escalated: true,
     });
-    expect(await createApi(ENDPOINTS, fetch).extract(request)).toMatchObject({ escalated: true });
+    expect(await finalPayApi(fetch).extract(request)).toMatchObject({ escalated: true });
   });
   it('sends a pass instead of the quota when it has one', async () => {
     const fetch = fakeFetch(200, { code: 'ok', extraction: sent, failedChecks: [], readsLeft: 11 });
-    await createApi(ENDPOINTS, fetch).extract({ ...request, pass: 'p1', quota: 'q' });
+    await finalPayApi(fetch).extract({ ...request, pass: 'p1', quota: 'q' });
     expect(fetch.calls[0]?.body).toEqual({ ...request, pass: 'p1' });
   });
   it('a pass read without its reads left, or a free read without a quota, is unexpected', async () => {
     const free = fakeFetch(200, { code: 'ok', extraction: sent, failedChecks: [], readsLeft: 3 });
-    expect(await createApi(ENDPOINTS, free).extract(request)).toEqual({
+    expect(await finalPayApi(free).extract(request)).toEqual({
       ok: false,
       code: 'unexpected_response',
     });
     const paid = fakeFetch(200, { code: 'ok', extraction: sent, failedChecks: [], allowance: 'q' });
-    expect(await createApi(ENDPOINTS, paid).extract({ ...request, pass: 'p' })).toEqual({
+    expect(await finalPayApi(paid).extract({ ...request, pass: 'p' })).toEqual({
       ok: false,
       code: 'unexpected_response',
     });
@@ -116,7 +118,7 @@ describe('extract', () => {
       ],
       allowance: 'not-for-a-read-that-found-nothing',
     });
-    expect(await createApi(ENDPOINTS, fetch).extract(request)).toEqual({
+    expect(await finalPayApi(fetch).extract(request)).toEqual({
       ok: false,
       code: 'nothing_read',
       pages: [
@@ -134,14 +136,14 @@ describe('extract', () => {
   });
   it('turns every API code into a failure', async () => {
     const fetch = fakeFetch(429, { code: 'daily_limit_reached' });
-    expect(await createApi(ENDPOINTS, fetch).extract(request)).toEqual({
+    expect(await finalPayApi(fetch).extract(request)).toEqual({
       ok: false,
       code: 'daily_limit_reached',
     });
   });
   it('an unknown code, a bad shape or no JSON is an unexpected response', async () => {
     for (const body of [{ code: 'teapot' }, { code: 'ok', extraction: { documents: [] } }, 'nope'])
-      expect(await createApi(ENDPOINTS, fakeFetch(200, body)).extract(request)).toEqual({
+      expect(await finalPayApi(fakeFetch(200, body)).extract(request)).toEqual({
         ok: false,
         code: 'unexpected_response',
       });
@@ -152,20 +154,17 @@ describe('extract', () => {
       [502, ''],
       [503, { message: 'Service Unavailable' }],
     ] as const)
-      expect(
-        await createApi(ENDPOINTS, fakeFetch(status, body)).extract(request),
-        String(status),
-      ).toEqual({
+      expect(await finalPayApi(fakeFetch(status, body)).extract(request), String(status)).toEqual({
         ok: false,
         code: 'service_unavailable',
       });
   });
   it('a request the network drops is a network error', async () => {
-    const api = createApi(ENDPOINTS, () => Promise.reject(new TypeError('offline')));
+    const api = finalPayApi(() => Promise.reject(new TypeError('offline')));
     expect(await api.extract(request)).toEqual({ ok: false, code: 'network_error' });
   });
   it('a 413 without JSON (from the function URL itself) is a payload too large', async () => {
-    expect(await createApi(ENDPOINTS, fakeFetch(413, '')).extract(request)).toEqual({
+    expect(await finalPayApi(fakeFetch(413, '')).extract(request)).toEqual({
       ok: false,
       code: 'payload_too_large',
     });
@@ -181,7 +180,7 @@ describe('the time the browser waits', () => {
 describe('parseExtraction', () => {
   it('keeps only what has the contract’s shape, and counts each document’s pages', () => {
     expect(
-      parseExtraction({
+      parseFinalPay({
         pages: [
           { page: 1, kind: 'dismissal_letter', readability: { value: 'ok', confidence: 'high' } },
           { page: 2, kind: 'payslip', readability: { value: 'blurry', confidence: 'low' } },
@@ -245,6 +244,50 @@ describe('parseExtraction', () => {
   });
 });
 
+describe('the review a page reads for', () => {
+  const ok = (extraction: object) =>
+    fakeFetch(200, {
+      code: 'ok',
+      extraction,
+      failedChecks: [],
+      allowance: 'q',
+      sessionId: 'cs_test_1',
+      url: 'u',
+    });
+  it('the final pay names none, in the read or in the checkout', async () => {
+    const fetch = ok(sent);
+    await finalPayApi(fetch).extract(request);
+    await finalPayApi(fetch).checkout('n'.repeat(32), 'turnstile');
+    expect(fetch.calls[0]?.body).not.toHaveProperty('review');
+    expect(fetch.calls[1]?.body).not.toHaveProperty('returnTo');
+  });
+  it('another review names itself in both, and reads only its own fields and lists', async () => {
+    const shape = { review: 'rental', fields: ['deposit'], lists: ['receipts'] } as const;
+    const fetch = ok({
+      ...sent,
+      fields: { deposit: { value: 900, confidence: 'high', source: 'payslip' }, ...sent.fields },
+      lists: { receipts: [{ values: { total: 900 }, confidence: 'high' }], contracts: [] },
+      conflicts: [{ field: 'deposit', sources: ['payslip', 'other'] }],
+    });
+    const api = createApi(ENDPOINTS, fetch, shape);
+    const result = await api.extract(request);
+    await api.checkout('n'.repeat(32), 'turnstile');
+    expect(fetch.calls[0]?.body).toEqual({ ...request, review: 'rental', quota: null });
+    expect(fetch.calls[1]?.body).toEqual({
+      nonce: 'n'.repeat(32),
+      captchaToken: 'turnstile',
+      returnTo: 'rental',
+    });
+    expect(result.ok && result.extraction).toEqual({
+      pages: extraction.pages,
+      documents: extraction.documents,
+      fields: { deposit: { value: 900, confidence: 'high', source: 'payslip' } },
+      receipts: [{ values: { total: 900 }, confidence: 'high' }],
+      conflicts: [{ field: 'deposit', sources: ['payslip'] }],
+    });
+  });
+});
+
 describe('checkout and pass', () => {
   it('starts a checkout with the nonce', async () => {
     const fetch = fakeFetch(200, {
@@ -252,7 +295,7 @@ describe('checkout and pass', () => {
       sessionId: 'cs_test_1',
       url: 'https://checkout.stripe.com/c/1',
     });
-    expect(await createApi(ENDPOINTS, fetch).checkout('n'.repeat(32), 'turnstile')).toEqual({
+    expect(await finalPayApi(fetch).checkout('n'.repeat(32), 'turnstile')).toEqual({
       ok: true,
       sessionId: 'cs_test_1',
       url: 'https://checkout.stripe.com/c/1',
@@ -269,7 +312,7 @@ describe('checkout and pass', () => {
       expiresAt: 1_800_000_000,
       readsLeft: 15,
     });
-    expect(await createApi(ENDPOINTS, fetch).pass('cs_test_1', 'n'.repeat(32))).toEqual({
+    expect(await finalPayApi(fetch).pass('cs_test_1', 'n'.repeat(32))).toEqual({
       ok: true,
       pass: 'v1.p.s',
       expiresAt: 1_800_000_000,
@@ -279,7 +322,7 @@ describe('checkout and pass', () => {
   });
   it('a payment that is not complete is a failure with its code', async () => {
     const fetch = fakeFetch(402, { code: 'payment_not_complete' });
-    expect(await createApi(ENDPOINTS, fetch).pass('cs_test_1', 'n')).toEqual({
+    expect(await finalPayApi(fetch).pass('cs_test_1', 'n')).toEqual({
       ok: false,
       code: 'payment_not_complete',
     });
@@ -289,7 +332,7 @@ describe('checkout and pass', () => {
 describe('verify', () => {
   it('posts only the pass to the pass function and returns its expiry and reads left', async () => {
     const fetch = fakeFetch(200, { code: 'ok', expiresAt: 1_800_000_000, readsLeft: 3 });
-    expect(await createApi(ENDPOINTS, fetch).verify('v1.p.s')).toEqual({
+    expect(await finalPayApi(fetch).verify('v1.p.s')).toEqual({
       ok: true,
       expiresAt: 1_800_000_000,
       readsLeft: 3,
@@ -299,14 +342,14 @@ describe('verify', () => {
   it.each(['pass_invalid', 'pass_expired', 'pass_revoked'])(
     '%s comes back as such',
     async (code) => {
-      expect(await createApi(ENDPOINTS, fakeFetch(403, { code })).verify('v1.p.s')).toEqual({
+      expect(await finalPayApi(fakeFetch(403, { code })).verify('v1.p.s')).toEqual({
         ok: false,
         code,
       });
     },
   );
   it('an answer without its figures is never a yes', async () => {
-    expect(await createApi(ENDPOINTS, fakeFetch(200, { code: 'ok' })).verify('v1.p.s')).toEqual({
+    expect(await finalPayApi(fakeFetch(200, { code: 'ok' })).verify('v1.p.s')).toEqual({
       ok: false,
       code: 'unexpected_response',
     });

@@ -2,6 +2,9 @@
 // The two must change together; the site never trusts a response that does not match them.
 import { MAX_IMAGE_LONG_SIDE } from '../../api/src/domain/image-limit';
 
+// Which review a request is for; a request without one is the final pay's.
+export type ReviewKind = 'final_pay' | 'rental';
+
 // What the API says each page is; `other` is a page the review has no use for.
 export const PAGE_KINDS = [
   'settlement_proposal',
@@ -160,6 +163,20 @@ export const EXTRACTED_FIELDS = [
 ] as const;
 export type ExtractedFieldName = (typeof EXTRACTED_FIELDS)[number];
 
+// What a review reads from documents: its fields, and its lists of rows by name.
+export interface ExtractionShape<F extends string, L extends string> {
+  readonly review: ReviewKind;
+  readonly fields: readonly F[];
+  readonly lists: readonly L[];
+}
+
+// The final pay's rows are the other jobs of «Otros trabajos», from the work history.
+export const FINAL_PAY_EXTRACTION: ExtractionShape<ExtractedFieldName, 'contracts'> = {
+  review: 'final_pay',
+  fields: EXTRACTED_FIELDS,
+  lists: ['contracts'],
+};
+
 export interface SourcedField extends ExtractedField {
   readonly source: SourceKind;
 }
@@ -172,8 +189,8 @@ export interface RecognisedDocument {
 }
 
 // Two documents that state a field differently; the first source is the one kept.
-export interface Conflict {
-  readonly field: ExtractedFieldName;
+export interface Conflict<F extends string = ExtractedFieldName> {
+  readonly field: F;
   readonly sources: readonly SourceKind[];
 }
 
@@ -184,14 +201,13 @@ export interface ReadPage {
   readonly readability: Readability;
 }
 
-export interface Extraction {
+// Each of the review's lists sits beside the fields under its own name.
+export type Extraction<F extends string = ExtractedFieldName, L extends string = 'contracts'> = {
   readonly pages: readonly ReadPage[];
   readonly documents: readonly RecognisedDocument[];
-  readonly fields: Readonly<Partial<Record<ExtractedFieldName, SourcedField>>>;
-  // Rows for «Otros trabajos», from the work history.
-  readonly contracts: readonly ExtractedRow[];
-  readonly conflicts: readonly Conflict[];
-}
+  readonly fields: Readonly<Partial<Record<F, SourcedField>>>;
+  readonly conflicts: readonly Conflict<F>[];
+} & { readonly [List in L]: readonly ExtractedRow[] };
 
 export const COHERENCE_CHECKS = [
   'end_before_start',
@@ -226,10 +242,10 @@ export type NothingRead = {
   readonly pages: readonly ReadPage[];
 };
 
-export type ExtractResult =
+export type ExtractResult<F extends string = ExtractedFieldName, L extends string = 'contracts'> =
   | {
       readonly ok: true;
-      readonly extraction: Extraction;
+      readonly extraction: Extraction<F, L>;
       readonly failedChecks: readonly CoherenceCheck[];
       // A free read returns the quota token to send next time; a pass read, the reads it has left.
       readonly allowance: string | null;
@@ -255,13 +271,21 @@ export type PassResult =
 export type VerifyResult =
   { readonly ok: true; readonly expiresAt: number; readonly readsLeft: number } | Failure;
 
-export interface Api {
-  extract(request: ExtractRequest): Promise<ExtractResult>;
+// The pass is one for every review: bought, issued and checked the same way.
+export interface PassApi {
   // The captcha token comes from a Turnstile widget with the action «checkout».
   checkout(nonce: string, captchaToken: string): Promise<CheckoutResult>;
   pass(sessionId: string, nonce: string): Promise<PassResult>;
   // Whether a pass the browser holds still unlocks the detail, the report and the letter.
   verify(pass: string): Promise<VerifyResult>;
+}
+
+// The API as one review's page uses it: reading reads that review's documents.
+export interface Api<
+  F extends string = ExtractedFieldName,
+  L extends string = 'contracts',
+> extends PassApi {
+  extract(request: ExtractRequest): Promise<ExtractResult<F, L>>;
 }
 
 // Shapes the API checks too (src/domain/payments.ts there).
