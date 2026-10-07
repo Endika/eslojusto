@@ -51,6 +51,7 @@ into page images. `ok` answers:
     "lists": { "otherAccruals": [{ "values": { "amount": 12.5 }, "confidence": "medium" }] },
   },
   "failedChecks": [], // coherence checks still failing after any escalation
+  "escalated": false, // whether the escalation model read it too
   "allowance": "<free reads: the quota token to send next time>",
   "readsLeft": 11, // pass reads: what Stripe has left on the pass
 }
@@ -63,7 +64,9 @@ session id and nonce before redirecting; Stripe returns to
 `/finiquito/?session_id={CHECKOUT_SESSION_ID}`.
 
 **`pass`** `{ "sessionId": "cs_…", "nonce": "…" }` →
-`{ "code": "ok", "pass": "<token>", "expiresAt": <epoch seconds>, "readsLeft": <n> }`. Asking
+`{ "code": "ok", "pass": "<token>", "expiresAt": <epoch seconds>, "readsLeft": <n> }`. The
+token is `v1.<payload>.<signature>`, the payload being base64url JSON
+`{ "typ": "pass", "sid": "cs_…", "exp": <epoch seconds> }`; only the API can verify it. Asking
 again with the same session and nonce returns the same pass, with the reads it really has left,
 which is how «¿Ya has pagado?» works. A pass with no reads left still unlocks the report and
 the letter until it expires.
@@ -73,13 +76,23 @@ the letter until it expires.
 Names match `src/engine/types.ts` so the form can be prefilled; `test/engine-contract.test.ts`
 fails the type check if the engine drifts.
 
-| Document     | Fields                                                                                                                  | Lists                              | Fills                                                                                            |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------ |
-| settlement   | `startDate`, `endDate`, `cause`, `fixedTermType`, `monthlySalary`                                                       |                                    | `FinalPayInput`                                                                                  |
-|              | `pending_salary`, `holiday_pay`, `extra_pay`, `severance`, `employer_notice`, `notice_deduction`                        |                                    | `EmployerFigures` by `ItemId`                                                                    |
-|              | `totalAccrued`                                                                                                          | `otherAccruals[].amount`           | coherence check only                                                                             |
-| payslip      | `periodStart`, `periodEnd`, `startDate`, `totalAccrued`, `extraPayProrated`, `extraPayProratedAmount`, `extraPayAmount` | `accruals[].amount`                | the UI proposes `monthlySalary` = `totalAccrued` − `extraPayProratedAmount`; the person confirms |
-| work_history |                                                                                                                         | `contracts[].startDate`, `endDate` | `OtherContracts.contracts` (`ContributionPeriod`)                                                |
+| Document     | Fields                                                                                                                                  | Lists                              | Fills                                                                                      |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------ |
+| settlement   | `startDate`, `endDate`, `cause`, `fixedTermType`, `monthlySalary`                                                                       |                                    | `FinalPayInput`                                                                            |
+|              | `pending_salary`, `holiday_pay`, `extra_pay`, `severance`, `employer_notice`, `notice_deduction`                                        |                                    | `EmployerFigures` by `ItemId`                                                              |
+|              | `totalAccrued`                                                                                                                          | `otherAccruals[].amount`           | coherence check only                                                                       |
+| payslip      | `periodStart`, `periodEnd`, `startDate`, `totalAccrued`, `extraPayProrated`, `extraPayProratedAmount`, `extraPayPaid`, `extraPayAmount` | `accruals[].amount`                | `monthlySalary`, proposed only for a payslip covering one whole calendar month (see below) |
+| work_history |                                                                                                                                         | `contracts[].startDate`, `endDate` | `OtherContracts.contracts` (`ContributionPeriod`)                                          |
+
+The engine's `monthlySalary` includes the prorated share of extra payments when they are
+prorated. So, for a payslip whose `periodStart` and `periodEnd` are the first and last day of
+the same month, the UI proposes:
+
+- `extraPayProrated` true: `monthlySalary` = `totalAccrued`;
+- otherwise: `totalAccrued` minus `extraPayAmount` when `extraPayPaid` is true (a full extra
+  payment paid that month), or `totalAccrued` alone.
+
+For any other period it proposes no salary.
 
 Every kind also returns `detectedKind`. The model never calculates: a derived value is the UI's
 proposal, confirmed by the person.
@@ -264,7 +277,8 @@ Nothing here has been run. Each step needs an account administrator.
    deployments limited to `main`; set the variables `AWS_DEPLOY_ROLE_ARN` (step 5 output) and
    `STRIPE_PRICE_ID`. The deploy role trusts only
    `repo:Endika/eslojusto:environment:production`.
-8. **Approve** the `Deploy API` run, then give the three function URLs (stack outputs) and the
+8. **Approve** the `Deploy API` run, then give the three function URLs (stack outputs `extractUrl`, `checkoutUrl`,
+   `passUrl`) and the
    Turnstile site key to the site.
 9. **Before going live, in Stripe test mode with the restricted key:** create a session through
    `checkout`, pay it with `4242 4242 4242 4242`, redeem it through `pass`, and make one pass
