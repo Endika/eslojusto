@@ -303,6 +303,29 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     if (valid) void read(valid.kind, valid.files);
   });
   fileInput.addEventListener('change', listFiles);
+  const drop = required(upload.querySelector<HTMLElement>('[data-doc-drop]'), 'drop zone');
+  const carriesFiles = (e: DragEvent) => e.dataTransfer?.types.includes('Files') ?? false;
+  // A file dropped beside the zone would make the browser open it and leave the page.
+  for (const type of ['dragover', 'drop'] as const)
+    upload.addEventListener(type, (e) => {
+      if (carriesFiles(e)) e.preventDefault();
+    });
+  drop.addEventListener('dragover', (e) => {
+    if (!carriesFiles(e) || busy) return;
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    drop.dataset['over'] = '';
+  });
+  drop.addEventListener('dragleave', (e) => {
+    if (!(e.relatedTarget instanceof Node && drop.contains(e.relatedTarget)))
+      delete drop.dataset['over'];
+  });
+  drop.addEventListener('drop', (e) => {
+    delete drop.dataset['over'];
+    const dropped = e.dataTransfer?.files;
+    if (busy || !dropped || dropped.length === 0) return;
+    fileInput.files = dropped;
+    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+  });
   consent.addEventListener('change', () => fieldError('consent', null));
   upload.addEventListener('change', (e) => {
     if (e.target instanceof HTMLInputElement && e.target.name === 'documentKind')

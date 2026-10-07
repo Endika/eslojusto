@@ -261,6 +261,27 @@ test('cancelling at Stripe brings the review back and keeps nothing in the tab',
   expect(fake.pass).toHaveLength(0);
 });
 
+test('files dropped on the zone are listed like chosen ones', async ({ page }) => {
+  await fakeServices(page);
+  await page.goto('finiquito/');
+  await page.getByRole('button', { name: /Sube tu finiquito, nóminas o vida laboral/ }).click();
+  await expect(page.getByText('Arrastra aquí tus fotos o el PDF')).toBeVisible();
+  const transfer = await page.evaluateHandle((b64) => {
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const dt = new DataTransfer();
+    dt.items.add(new File([bytes], 'nomina-arrastrada.png', { type: 'image/png' }));
+    return dt;
+  }, PHOTO.toString('base64'));
+  const zone = page.locator('[data-doc-drop]');
+  await zone.dispatchEvent('dragover', { dataTransfer: transfer });
+  await expect(zone).toHaveAttribute('data-over', '');
+  await zone.dispatchEvent('drop', { dataTransfer: transfer });
+  await expect(zone).not.toHaveAttribute('data-over', '');
+  await expect(page.getByRole('list', { name: 'Archivos elegidos' })).toContainText(
+    'nomina-arrastrada.png',
+  );
+});
+
 test('an API error is worded and the manual path is still there', async ({ page }) => {
   await fakeServices(page, { status: 429, body: { code: 'daily_limit_reached' } });
   await page.goto('finiquito/');

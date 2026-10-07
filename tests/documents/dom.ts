@@ -17,7 +17,7 @@ export const START = `
       <p data-doc-error-for="kind" hidden></p>
     </fieldset>
     <div data-doc-field="files">
-      <input type="file" id="document-files" multiple />
+      <div data-doc-drop><input type="file" id="document-files" multiple /></div>
       <ul data-doc-files hidden></ul>
       <p data-doc-error-for="files" hidden></p>
     </div>
