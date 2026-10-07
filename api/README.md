@@ -113,7 +113,7 @@ domain, adapters never reach `http/` or `handlers/`, and the infrastructure read
 - The output is validated in the domain (hand-written, because the domain imports nothing):
   any field or row with an invalid value, an unknown confidence or an extra key is dropped and
   counted, never repaired. Keys outside the schema are ignored.
-- **Escalation by doubt** (spec decision 5): a `low` confidence anywhere, a dropped field, no
+- **Escalation by doubt**: a `low` confidence anywhere, a dropped field, no
   tool output, or a failed coherence check (items not adding up to `totalAccrued` within 1 €,
   impossible or inverted dates, proration above the total) re-reads the document with
   `ESCALATION_MODEL`, whose read wins. Same path with or without a pass. Equal constants mean
@@ -233,7 +233,7 @@ Marketplace, so a Bedrock service filter would miss it; Budgets are in USD, and 
 under the 10 € cap), emails at 50/80/100 % of actual spend, and at 100 % an automatic action
 attaching `eslojusto-api-deny-bedrock` to the `extract` role.
 
-## Deploying (Ekin, once, in this order)
+## Deploying (once, in this order)
 
 Nothing here has been run. Each step needs an account administrator.
 
@@ -314,4 +314,4 @@ free read needs a fresh captcha, and at most 5 reads run at once.
   high-severity advisory; it runs only at synth time, never in the Lambdas.
 - The real latency of an escalated read of a 4-page PDF (the 120 s timeout is a guess).
 - Model accuracy: the Bedrock fixtures are hand-written in Bedrock's response shape, not
-  recordings. Spec decision 5's comparison with Ekin's anonymised documents is still to do.
+  recordings. Choosing the models still needs a comparison on real, anonymised documents.

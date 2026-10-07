@@ -449,7 +449,7 @@ describe('benefit: other contracts in the last 6 years', () => {
     expect(r.contributedDays).toBe(365 + 31);
   });
 
-  // Ekin's example: three 8-month contracts that together reach the 720-day row.
+  // Three 8-month contracts that together reach the 720-day row.
   //   this one   2026-01-01 → 2026-08-31: 31+28+31+30+31+30+31+31 = 243 days
   //   other A    2025-03-01 → 2025-10-31: 31+30+31+30+31+31+30+31 = 245 days
   //   other B    2024-03-01 → 2024-10-31: same months, 245 days
