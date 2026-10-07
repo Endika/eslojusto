@@ -58,7 +58,8 @@ export type EmploymentPhraseKey =
   | TrialPhraseKey
   | WorkingTimePhraseKey
   | PartTimePhraseKey
-  | HolidaysPayPhraseKey;
+  | HolidaysPayPhraseKey
+  | ClausePhraseKey;
 
 export interface EmploymentPhrase {
   readonly key: EmploymentPhraseKey;
@@ -183,3 +184,27 @@ type HolidaysPayPhraseKey =
   | 'extra_pays.count'
   | 'extra_pays.amount_by_agreement'
   | 'extra_pays.prorated_by_agreement';
+
+type ClausePhraseKey =
+  | 'clauses.months_unknown'
+  | 'clauses.non_compete_months'
+  | 'clauses.non_compete_no_compensation'
+  | 'clauses.non_compete_adequacy'
+  | 'clauses.non_compete_compensation_unknown'
+  | 'clauses.retention_months'
+  | 'clauses.retention_training_missing'
+  | 'clauses.exclusivity_compensated'
+  | 'clauses.exclusivity_no_compensation'
+  | 'clauses.exclusivity_compensation_unknown'
+  | 'clauses.waiver_holidays'
+  | 'clauses.waiver_salary'
+  | 'clauses.waiver_severance'
+  | 'clauses.waiver_other'
+  | 'clauses.overtime_hours_unknown'
+  | 'clauses.overtime_included'
+  | 'clauses.hourly_pay'
+  | 'clauses.agreement_hourly_pay'
+  | 'clauses.remote_share_unknown'
+  | 'clauses.remote_not_regular'
+  | 'clauses.remote_costs_on_worker'
+  | 'clauses.remote_costs_unknown';
