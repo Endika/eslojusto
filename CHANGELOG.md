@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.6.0](https://github.com/Endika/eslojusto/compare/v1.5.0...v1.6.0) (2026-10-07)
+
+
+### Features
+
+* **api:** verify a pass the browser holds ([3fdf076](https://github.com/Endika/eslojusto/commit/3fdf076375dbf6e9ad9119e1fe4c1f15a68386dc))
+* ask whether holiday days are working or calendar days ([ca816c6](https://github.com/Endika/eslojusto/commit/ca816c65ab2b8cab7ecaa2addef9bae4a9af5517))
+* **documents:** build the paid detail only after the API verifies the pass ([947b0f5](https://github.com/Endika/eslojusto/commit/947b0f5088491c80202fb98845d2d2cfe4d1404f))
+* **documents:** prefill the «recibí no conforme» letter with optional details ([193afb5](https://github.com/Endika/eslojusto/commit/193afb56362e852c658fff7a767e292b9dcabbe2))
+* **documents:** urge downloading right after paying and say where the pass lives ([ffebaa6](https://github.com/Endika/eslojusto/commit/ffebaa68c333a134141313c5629240a45a99d2f4))
+* **result:** show a free summary and keep the detail for pass holders ([0602769](https://github.com/Endika/eslojusto/commit/060276945f3ae74c06084fa7ba1c1861bb01a0d0))
+
+
+### Bug Fixes
+
+* **api:** leave a pass unconfirmed when Stripe can't find its session on a read ([8cb26ff](https://github.com/Endika/eslojusto/commit/8cb26ffb9363bafe18ff0301a49641393cd31546))
+* count working-day holidays by the days worked a week ([fbe70d2](https://github.com/Endika/eslojusto/commit/fbe70d230606442b002dd2d5cd05083b5dd2f47c))
+* **documents:** keep letter details on their line and blank what the font can't draw ([1764c03](https://github.com/Endika/eslojusto/commit/1764c0315a6aad2a25b562f8ba7b04db2804bb93))
+* keep a pass Stripe can't confirm and drop the leave warning with its notice ([de1eadf](https://github.com/Endika/eslojusto/commit/de1eadffade03d8c3094c90099d8a62de87d46e6))
+* **result:** show the case's deadlines in the free summary ([96e7b34](https://github.com/Endika/eslojusto/commit/96e7b34654c443333b2029e98b024cccc54826b6))
+
 ## [1.5.0](https://github.com/Endika/eslojusto/compare/v1.4.0...v1.5.0) (2026-10-07)
 
 
