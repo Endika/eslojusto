@@ -705,12 +705,14 @@ export function setUpUpload<F extends string, L extends string>(
     ?.addEventListener('click', () => showCalculator(true));
 
   // A mark tells where a value came from; once the person changes the value, it no longer applies.
+  // It sits in the element that holds the answer, the nearest one around the input that has one.
   const unmark = (e: Event) => {
     const input = e.target instanceof HTMLInputElement ? e.target : null;
-    if (!input) return;
-    const describedBy = (input.getAttribute('aria-describedby') ?? '').split(' ');
-    for (const mark of form.querySelectorAll('[data-read-mark]'))
-      if (describedBy.includes(mark.id)) removeMark(mark);
+    let container = input?.parentElement ?? null;
+    while (container && container !== form && !container.querySelector(':scope > [data-read-mark]'))
+      container = container.parentElement;
+    if (!container || container === form) return;
+    for (const mark of container.querySelectorAll(':scope > [data-read-mark]')) removeMark(mark);
   };
   form.addEventListener('input', unmark);
   form.addEventListener('change', unmark);
