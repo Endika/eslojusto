@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import FinalPayForm from '../components/FinalPayForm.astro';
 import FinalPayResult from '../components/FinalPayResult.astro';
 import FinalPayGuide from '../components/FinalPayGuide.astro';
+import DocumentStart from '../components/DocumentStart.astro';
+import { DOCUMENTS } from '../documents/config';
 import { faqPage } from '../content/faq';
 import { calculatorApp } from '../content/structured-data';
 import { t, type Key } from '../i18n';
@@ -26,6 +28,9 @@ const sections = [
 ] as const;
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
 const page = new URL(link(lang, 'finiquito/'), Astro.site);
+// With the documents API the visit opens on the choice between uploading and typing; the tabs and
+// the form wait until it is made.
+const documents = DOCUMENTS !== null;
 ---
 
 <Base
@@ -34,9 +39,9 @@ const page = new URL(link(lang, 'finiquito/'), Astro.site);
   path="/finiquito/"
   lang={lang}
   section="cause"
-  structuredData={[calculatorApp(home, page, lang), faqPage(lang)]}
+  structuredData={[calculatorApp(home, page, lang), faqPage(lang, { documents })]}
 >
-  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
     <ol>
       {/* Only a section already reached is a link; one still ahead is plain text until then. */}
       {sections.map(([id, step, number, weight], i) => (
@@ -60,17 +65,18 @@ const page = new URL(link(lang, 'finiquito/'), Astro.site);
     <div class="desk">
       <header class="desk__head">
         <h1 class="desk__title">{tx('final_pay.h1')}</h1>
-        <p class="desk__lead">{tx('final_pay.lead')}</p>
+        <p class="desk__lead">{tx(documents ? 'final_pay.lead_documents' : 'final_pay.lead')}</p>
       </header>
       <noscript>
         <div class="sheet sheet--notice">
           <p class="help">{tx('final_pay.no_js')}</p>
         </div>
       </noscript>
-      <FinalPayForm lang={lang} />
-      <FinalPayResult lang={lang} />
+      {documents && <DocumentStart lang={lang} />}
+      <FinalPayForm lang={lang} hidden={documents} />
+      <FinalPayResult lang={lang} documents={documents} />
     </div>
-    <FinalPayGuide lang={lang} />
+    <FinalPayGuide lang={lang} documents={documents} />
   </main>
 </Base>
 

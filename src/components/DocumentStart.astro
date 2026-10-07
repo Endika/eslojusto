@@ -1,0 +1,287 @@
+---
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+// Rendered only in a build with the documents API: the first sheet offers reading a document or
+// filling the form by hand. Its styles live here, inline, so a build without the API ships none.
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+const kinds = ['settlement', 'payslip', 'work_history'] as const;
+const arrow = 'M4 12h15m-6-6 6 6-6 6';
+---
+
+<div class="stack start" id="documento" data-documents-start>
+  <section class="sheet" data-start-panel="choose" aria-labelledby="question-start">
+    <h2 class="question" id="question-start" tabindex="-1">
+      {tx('documents.start.question')}
+    </h2>
+    <p class="help">{tx('documents.start.help')}</p>
+    <p class="start__status" role="status" aria-live="polite" data-start-status></p>
+    <div class="start__choices" role="group" aria-label={tx('documents.start.choices')}>
+      <button class="start__choice" type="button" data-start-upload>
+        <span class="start__choice-title">{tx('documents.start.upload')}</span>
+        <span class="hint">{tx('documents.start.upload_hint')}</span>
+      </button>
+      <button class="start__choice" type="button" data-start-manual>
+        <span class="start__choice-title">{tx('documents.start.manual')}</span>
+        <span class="hint">{tx('documents.start.manual_hint')}</span>
+      </button>
+    </div>
+  </section>
+
+  <form
+    class="sheet start__upload"
+    data-start-panel="upload"
+    aria-labelledby="question-upload"
+    novalidate
+    hidden
+  >
+    <h2 class="question" id="question-upload" tabindex="-1">
+      {tx('documents.upload.question')}
+    </h2>
+    <fieldset class="group" data-doc-field="kind">
+      <legend>{tx('documents.upload.kind')}</legend>
+      <div class="options">
+        {kinds.map((kind) => (
+          <div class="option">
+            <input
+              type="radio"
+              name="documentKind"
+              id={`document-${kind}`}
+              value={kind}
+              aria-describedby={`hint-document-${kind} error-documentKind`}
+            />
+            <label for={`document-${kind}`}>{tx(`documents.upload.${kind}`)}</label>
+            <p class="hint" id={`hint-document-${kind}`}>
+              {tx(`documents.upload.${kind}_hint`)}
+            </p>
+          </div>
+        ))}
+      </div>
+      <p class="errata" id="error-documentKind" data-doc-error-for="kind" hidden></p>
+    </fieldset>
+    <div class="field" data-doc-field="files">
+      <label class="field__label" for="document-files">
+        {tx('documents.upload.files')}
+      </label>
+      <p class="hint" id="hint-document-files">
+        {tx('documents.upload.files_hint')}
+      </p>
+      <input
+        class="field__input start__file"
+        type="file"
+        id="document-files"
+        name="documentFiles"
+        multiple
+        accept="image/*,application/pdf"
+        aria-describedby="hint-document-files error-documentFiles"
+      />
+      <ul
+        class="start__files"
+        data-doc-files
+        aria-label={tx('documents.upload.selected')}
+        hidden
+      ></ul>
+      <p class="errata" id="error-documentFiles" data-doc-error-for="files" hidden></p>
+    </div>
+    <div class="start__consent" data-doc-field="consent">
+      <div class="checkbox">
+        <input
+          type="checkbox"
+          id="document-consent"
+          name="documentConsent"
+          value="yes"
+          aria-describedby="error-documentConsent"
+        />
+        <label for="document-consent">{tx('documents.upload.consent')}</label>
+      </div>
+      <p class="hint start__privacy">
+        <a href={`${link('es', 'privacidad/')}#pr-documentos`}>
+          {tx('documents.upload.consent_link')}
+        </a>
+      </p>
+      <p class="errata" id="error-documentConsent" data-doc-error-for="consent" hidden></p>
+    </div>
+    <div class="start__captcha" data-captcha></div>
+    <p class="start__status" role="status" aria-live="polite" data-doc-status></p>
+    <p class="errata" role="alert" data-doc-error hidden></p>
+    <div class="start__actions">
+      <button class="button start__back" type="button" data-start-back>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow} transform="rotate(180 12 12)"></path>
+        </svg>
+        {tx('documents.upload.back')}
+      </button>
+      <button class="button start__secondary" type="button" data-start-manual>
+        {tx('documents.start.manual')}
+      </button>
+      <button class="button start__forward" type="submit" data-start-send>
+        {tx('documents.upload.send')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+    </div>
+  </form>
+
+  <section class="sheet" data-start-panel="done" aria-labelledby="question-done" hidden>
+    <h2 class="question" id="question-done" tabindex="-1">
+      {tx('documents.done.question')}
+    </h2>
+    <p class="help" data-done-summary></p>
+    <ul class="list start__notes" data-done-notes hidden></ul>
+    <div class="start__actions">
+      <button class="button start__secondary" type="button" data-start-upload>
+        {tx('documents.done.another')}
+      </button>
+      <button class="button start__forward" type="button" data-start-continue>
+        {tx('documents.done.continue')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+    </div>
+  </section>
+</div>
+
+<style is:inline>
+  html:not(.js) .start {
+    display: none;
+  }
+  .start__choices {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .start__choice {
+    display: grid;
+    gap: 0.25rem;
+    inline-size: 100%;
+    min-block-size: 3.25rem;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid color-mix(in oklab, var(--sheet-ink) 22%, transparent);
+    border-radius: 0.5rem;
+    background: color-mix(in oklab, var(--field-fill) 55%, transparent);
+    color: var(--sheet-ink);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .start__choice:hover {
+    border-color: var(--sheet-ink);
+  }
+  .start__choice-title {
+    font-weight: 640;
+  }
+  .start__choice:focus-visible,
+  .start .button:focus-visible {
+    outline: 3px solid var(--sheet-ink);
+    outline-offset: 2px;
+  }
+  .start__file {
+    font: 500 0.9375rem / 1.3 var(--f-grotesque);
+    padding-block: 0.625rem;
+  }
+  .start__files {
+    margin: 0.375rem 0 0;
+    padding-inline-start: 1.125rem;
+    font: 500 0.875rem / 1.5 var(--f-mono);
+    overflow-wrap: anywhere;
+  }
+  .start__consent {
+    margin: 0 0 0.75rem;
+  }
+  .start__consent .checkbox {
+    align-items: flex-start;
+  }
+  .start__consent .checkbox label {
+    font: 400 0.9375rem / 1.4 var(--f-serif);
+  }
+  .start__privacy {
+    margin: 0.25rem 0 0 1.875rem;
+  }
+  [dir='rtl'] .start__privacy {
+    margin: 0.25rem 1.875rem 0 0;
+  }
+  .start__status:empty {
+    display: none;
+  }
+  .start__status {
+    margin: 0 0 0.75rem;
+    font: 400 var(--t-small) / 1.4 var(--f-serif);
+  }
+  .start__captcha:empty {
+    display: none;
+  }
+  .start__captcha {
+    margin: 0 0 0.75rem;
+    max-inline-size: 100%;
+    overflow: hidden;
+  }
+  .start__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .start .button {
+    border-color: var(--sheet-ink);
+    background: transparent;
+    color: var(--sheet-ink);
+    min-block-size: 3rem;
+  }
+  .start .button:hover {
+    background: color-mix(in oklab, var(--sheet-ink) 10%, transparent);
+  }
+  .start .start__forward {
+    margin-inline-start: auto;
+    background: var(--sheet-ink);
+    color: var(--field-fill);
+  }
+  .start .start__forward:hover {
+    background: color-mix(in oklab, var(--sheet-ink) 86%, var(--field-fill));
+  }
+  .start .button[aria-disabled='true'] {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .start__notes {
+    margin-bottom: 0.5rem;
+  }
+  .read-mark {
+    display: block;
+    margin: 0.25rem 0 0;
+    font: 500 0.75rem / 1.4 var(--f-mono);
+    letter-spacing: 0.02em;
+    color: var(--sheet-ink-soft);
+  }
+  .read-mark[data-confidence='low'] {
+    color: var(--sheet-ink);
+    font-weight: 700;
+  }
+  .pass__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.75rem 0;
+  }
+  .pass .checkbox {
+    align-items: flex-start;
+    margin-top: 0.5rem;
+  }
+  .pass .checkbox label {
+    font: 400 0.9375rem / 1.4 var(--f-serif);
+  }
+  .pass__status:empty {
+    display: none;
+  }
+  .pass__status {
+    margin: 0.5rem 0 0;
+    font: 400 var(--t-small) / 1.4 var(--f-serif);
+  }
+  .pass .field {
+    margin-top: 0.5rem;
+  }
+</style>
