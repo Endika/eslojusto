@@ -130,8 +130,9 @@ function interestIn(
 }
 
 // LAU art. 36.1 and 36.4: the deposit is one month's rent and only it accrues; what was paid above
-// it is an extra guarantee. Which money came back first is not known, so the part above the month
-// is taken as kept or returned first: the lower reading.
+// it is an extra guarantee. Which money it was is not known, so it is taken as the money that
+// would accrue longest: the balance still out, then late returns from the latest back. That gives
+// the lowest interest any split could.
 function interestItem(
   deposit: number | null,
   rent: number,
@@ -143,20 +144,27 @@ function interestItem(
   // from the day after it.
   const from = addDays(addMonthsClamped(out.keysReturnedOn, 1), 1);
   const late = (until: CivilDate) => compareDates(until, from) > 0;
-  const aboveMonth = deposit === null ? 0 : Math.max(0, round2(deposit - rent));
-  let notAccruing = Math.max(0, round2(aboveMonth - sum(out.deductions)));
-  const stretches: Stretch[] = [];
-  for (const r of [...out.returns].sort((a, b) => compareDates(a.on, b.on))) {
-    const kept = Math.min(r.amount, notAccruing);
+  let notAccruing = deposit === null ? 0 : Math.max(0, round2(deposit - rent));
+  const aboveMonth = notAccruing;
+  const accruing = (amount: number): number => {
+    const kept = Math.min(amount, notAccruing);
     notAccruing = round2(notAccruing - kept);
-    const accruing = round2(r.amount - kept);
-    if (late(r.on) && accruing > 0) stretches.push({ amount: accruing, from, until: r.on });
-  }
+    return round2(amount - kept);
+  };
+  const stretches: Stretch[] = [];
   const pending = pendingOf(deposit, out);
   const stillOwed = pending !== null && pending > TOLERANCE;
-  const pendingAccruing = pending === null ? 0 : round2(pending - notAccruing);
-  if (stillOwed && late(today) && pendingAccruing > TOLERANCE)
-    stretches.push({ amount: pendingAccruing, from, until: today });
+  if (stillOwed && late(today)) {
+    const amount = accruing(pending);
+    if (amount > TOLERANCE) stretches.push({ amount, from, until: today });
+  }
+  const lateReturns = out.returns
+    .filter((r) => late(r.on))
+    .sort((a, b) => compareDates(b.on, a.on));
+  for (const r of lateReturns) {
+    const amount = accruing(r.amount);
+    if (amount > 0) stretches.push({ amount, from, until: r.on });
+  }
   const capPhrase =
     aboveMonth > TOLERANCE ? [p('deposit.interest_deposit_only', { rent: { euros: rent } })] : [];
   if (stretches.length > 0)
