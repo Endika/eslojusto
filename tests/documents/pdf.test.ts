@@ -5,7 +5,7 @@ import { PdfDocument, pdfString } from '../../src/documents/pdf-writer';
 import { sans } from '../../src/documents/fonts/sans';
 import { serif } from '../../src/documents/fonts/serif';
 import { letterModel, reportModel } from '../../src/documents/report';
-import { completed, today, tr } from './fixtures';
+import { completed, today, tr, unfairDismissal } from './fixtures';
 
 const latin1 = (bytes: Uint8Array) => Buffer.from(bytes).toString('latin1');
 
@@ -120,6 +120,17 @@ describe('the PDF writer', () => {
     expect(value).toBeLessThan(10);
     expect(doc.measure(long, { font: 'sans', size: value })).toBeLessThanOrEqual(line);
     expect(extractText(pdf)).toContain(long);
+  });
+
+  it('both letters carry their own body in the PDF text', async () => {
+    const items = extractText(latin1(await renderPdf(letterModel(completed(), tr))));
+    expect(items).toContain('hago constar que no estoy conforme con estas cantidades');
+    expect(items).toContain('Indemnización: la propuesta recoge');
+    const general = extractText(
+      latin1(await renderPdf(letterModel(completed(unfairDismissal, { severance: 41000 }), tr))),
+    );
+    expect(general).toContain('sin mostrar mi conformidad con su contenido');
+    expect(general).not.toContain('la propuesta recoge');
   });
 
   it('links each source', async () => {

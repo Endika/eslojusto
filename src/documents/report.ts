@@ -15,7 +15,7 @@ import {
   withHolidayNote,
 } from '../calculator/render';
 import type { Translate } from '../i18n/client';
-import { NO_DETAILS, type LetterDetails } from './letter';
+import { letterKind, NO_DETAILS, type LetterDetails } from './letter';
 
 // What a PDF says, block by block, before any layout: the report and the letter are built from
 // the review the person confirmed and the page's dictionary, never from anything else.
@@ -241,8 +241,9 @@ const blank = (label: string, value: string): Block => {
   return v === '' ? { type: 'blank', label } : { type: 'blank', label, value: v };
 };
 
-// The letter lists only what falls short, with the figures of the review; what the person added
-// fills its lines, the rest is left to write by hand, and whether to use it at all is theirs.
+// The letter lists what falls short, with the figures of the review, or, with nothing short, only
+// says the proposal is received without agreeing to it. What the person added fills its lines,
+// the rest is left to write by hand, and whether to use it at all is theirs.
 export function letterModel(
   r: CompletedReview,
   tr: Translate,
@@ -288,7 +289,12 @@ export function letterModel(
       blank(tr('client.documents.letter.company'), details.company),
       {
         type: 'text',
-        text: tr('client.documents.letter.body', { fecha: shortDate(r.input.endDate) }),
+        text: tr(
+          letterKind(r.review) === 'items'
+            ? 'client.documents.letter.body'
+            : 'client.documents.letter.body_general',
+          { fecha: shortDate(r.input.endDate) },
+        ),
       },
       ...lines,
       { type: 'text', text: tr('client.documents.letter.closing') },

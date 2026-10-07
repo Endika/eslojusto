@@ -35,10 +35,11 @@ export function documentsAnalytics(track: Track): DocumentEvents {
     passVerified(result) {
       track('pass_verified', { result });
     },
-    downloaded(document, letterPrefilled) {
+    downloaded(document, letterPrefilled, letterKind) {
       track('report_downloaded', {
         document,
         letter_prefilled: letterPrefilled ?? 'not_applicable',
+        letter_kind: letterKind ?? 'not_applicable',
       });
     },
   };

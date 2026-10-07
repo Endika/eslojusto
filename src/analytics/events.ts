@@ -8,6 +8,7 @@ import {
   DOWNLOADS,
   ERROR_CODES,
   FILES_BUCKETS,
+  LETTER_KINDS,
   LETTER_PREFILLED,
   PAGE_KINDS,
   PASS_VERIFY_RESULTS,
@@ -228,6 +229,8 @@ const DOCUMENT_CATALOGUE = {
   report_downloaded: {
     document: oneOf(DOWNLOADS),
     letter_prefilled: oneOf([...LETTER_PREFILLED, 'not_applicable']),
+    // Whether the letter listed what falls short or only acknowledged receipt.
+    letter_kind: oneOf([...LETTER_KINDS, 'not_applicable']),
   },
 } as const satisfies Record<string, Record<string, Rule>>;
 

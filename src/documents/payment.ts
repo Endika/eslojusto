@@ -5,7 +5,13 @@ import type { Review } from '../engine/review';
 import type { Translate } from '../i18n/client';
 import { SESSION_ID, type Api, type ErrorCode } from './contract';
 import { CHECKOUT_ORIGIN } from './config';
-import { letterPrefilled, looksLikeDniOrNie, type LetterDetails, type LetterField } from './letter';
+import {
+  letterKind,
+  letterPrefilled,
+  looksLikeDniOrNie,
+  type LetterDetails,
+  type LetterField,
+} from './letter';
 import { noticeView, warnsOnLeave, type NoticeState } from './notice';
 import { canDownload, newNonce, passState, type PassStore, type PendingCheckout } from './pass';
 import type {
@@ -204,7 +210,6 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     const state: NoticeState = {
       fresh,
       showing: current !== null && verified(),
-      letter: current !== null && hasShortfall(current.review),
       downloaded,
     };
     const view = noticeView(state);
@@ -214,18 +219,10 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       el.hidden = view !== 'full';
     for (const el of notice.querySelectorAll<HTMLElement>('[data-notice-done]'))
       el.hidden = view !== 'done';
-    for (const el of notice.querySelectorAll<HTMLElement>('[data-notice-letter]'))
-      el.hidden = !state.letter;
     const text = notice.querySelector<HTMLElement>('[data-notice-text]');
     if (text)
       text.textContent = tr(
-        view === 'done'
-          ? state.letter
-            ? 'client.documents.notice.done'
-            : 'client.documents.notice.done_report'
-          : state.letter
-            ? 'client.documents.notice.full'
-            : 'client.documents.notice.full_report',
+        view === 'done' ? 'client.documents.notice.done' : 'client.documents.notice.full',
       );
     browser.warnBeforeLeaving(warnsOnLeave(state));
   }
@@ -243,7 +240,6 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     section.hidden = !held && !shortfall;
     buy.hidden = held;
     downloads.hidden = !paid;
-    letter.hidden = !shortfall;
     if (paid && stored) {
       const until = new Date(stored.expiresAt * 1000).toLocaleDateString('es-ES', {
         day: 'numeric',
@@ -400,7 +396,8 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
         ? maker.report(current)
         : maker.letter(current, details));
       browser.save(blob, tr(`client.documents.${FILENAMES[which]}.filename`));
-      if (which === 'letter') events.downloaded(which, letterPrefilled(details));
+      if (which === 'letter')
+        events.downloaded(which, letterPrefilled(details), letterKind(current.review));
       else events.downloaded(which);
       downloaded.add(which);
       renderNotice();

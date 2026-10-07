@@ -223,10 +223,18 @@ describe('document and pass events', () => {
       expect(isValidEvent('pass_verified', { result })).toBe(true);
     expect(isValidEvent('pass_verified', { result: 'v1.pass.token' })).toBe(false);
     expect(
-      isValidEvent('report_downloaded', { document: 'letter', letter_prefilled: 'some' }),
+      isValidEvent('report_downloaded', {
+        document: 'letter',
+        letter_prefilled: 'some',
+        letter_kind: 'general',
+      }),
     ).toBe(true);
     expect(
-      isValidEvent('report_downloaded', { document: 'report', letter_prefilled: 'not_applicable' }),
+      isValidEvent('report_downloaded', {
+        document: 'report',
+        letter_prefilled: 'not_applicable',
+        letter_kind: 'not_applicable',
+      }),
     ).toBe(true);
   });
   it('refuse anything read from a document or a payment', () => {
@@ -254,7 +262,11 @@ describe('document and pass events', () => {
     expect(isValidEvent('checkout_started', { session: 'cs_test_123' })).toBe(false);
     expect(isValidEvent('report_downloaded', { document: 'letter' })).toBe(false);
     expect(
-      isValidEvent('report_downloaded', { document: 'letter', letter_prefilled: 'Alex Ejemplo' }),
+      isValidEvent('report_downloaded', {
+        document: 'letter',
+        letter_prefilled: 'Alex Ejemplo',
+        letter_kind: 'items',
+      }),
     ).toBe(false);
   });
   it('fields_bucket', () => {
@@ -291,10 +303,10 @@ describe('document and pass events', () => {
     events.passIssued('return');
     events.passFailed('price_mismatch');
     events.downloaded('report');
-    events.downloaded('letter', 'all');
+    events.downloaded('letter', 'all', 'items');
     expect(sent.slice(-2).map(([, p]) => p)).toEqual([
-      { document: 'report', letter_prefilled: 'not_applicable' },
-      { document: 'letter', letter_prefilled: 'all' },
+      { document: 'report', letter_prefilled: 'not_applicable', letter_kind: 'not_applicable' },
+      { document: 'letter', letter_prefilled: 'all', letter_kind: 'items' },
     ]);
     expect(sent.map(([n]) => n)).toEqual([
       'start_chosen',
