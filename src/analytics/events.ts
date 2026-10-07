@@ -193,6 +193,8 @@ export type Props<E extends EventName> = {
   -readonly [K in keyof (typeof CATALOGUE)[E]]: RuleValue<(typeof CATALOGUE)[E][K]>;
 };
 
+export type Track = <E extends EventName>(event: E, props: Props<E>) => void;
+
 function matchesRule(rule: Rule, v: unknown): boolean {
   if ('values' in rule) return typeof v === 'string' && rule.values.includes(v);
   if ('pattern' in rule) return typeof v === 'string' && rule.pattern.test(v);
