@@ -448,11 +448,16 @@ describe('extract with a pass', () => {
     expect(reader.calls).toEqual([]);
   });
 
-  it('refuses a pass for a session Stripe does not know, or when Stripe is down', async () => {
+  it('a session Stripe does not find leaves the pass unconfirmed, with no read made or counted', async () => {
     const unknown = pass({});
     expect(
       await extract(request({ allowance: { type: 'pass', token: passToken() } }), unknown.deps, {}),
-    ).toEqual({ code: 'pass_invalid' });
+    ).toEqual({ code: 'pass_unconfirmed' });
+    expect(unknown.reader.calls).toEqual([]);
+    expect(unknown.payments.recorded).toEqual([]);
+  });
+
+  it('refuses a pass read when Stripe is down', async () => {
     const down = setup({}, {});
     const deps = { ...down.deps, payments: new FakePayments({}, 'find') };
     expect(
