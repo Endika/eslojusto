@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { devices, test, expect, type Locator, type Page, type Request } from '@playwright/test';
 import { pdfBomb, syntheticPdf } from '../support/synthetic-pdf';
 import { syntheticPhoto } from '../support/synthetic-photo';
+import { imageDimensions } from '../../api/src/domain/image-dimensions';
 
 // Runs only against a TEST_DOCUMENTS=1 build, whose API is three fake origins: every request to them,
 // to Turnstile and to Stripe is answered here. The documents are synthetic.
@@ -21,6 +22,8 @@ const STRIPE = 'https://checkout.stripe.com/c/pay/cs_test_e2e';
 const PHOTO = syntheticPhoto();
 // The same page in shadow.
 const DARK_PHOTO = syntheticPhoto({ paper: 40, ink: 5 });
+// The same page with heavy sensor noise: too heavy for a full pack at 1568 px.
+const NOISY_PHOTO = syntheticPhoto({ noise: 16 });
 
 const b64url = (v: object) => Buffer.from(JSON.stringify(v)).toString('base64url');
 const expiresAt = Math.floor(Date.now() / 1000) + 7 * 86400;
@@ -602,7 +605,7 @@ test('«Repetir» takes a dark photo out of the list so another can take its pla
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
   await page.getByRole('button', { name: 'Repetir' }).click();
-  await expect(page.getByText('Quitado: nomina-a-oscuras.png. Llevas 0 de 15.')).toBeVisible();
+  await expect(page.getByText('Quitado: nomina-a-oscuras.png. Llevas 0 de 25.')).toBeVisible();
   await expect(page.getByRole('list', { name: 'Archivos elegidos' })).toBeHidden();
   expect(fake.extract).toHaveLength(0);
 });
@@ -671,11 +674,11 @@ test('files add up across picks, each can be removed, and only the rest are read
   await choose.setInputFiles([photo('nomina-agosto.png'), photo('certificado.png')]);
   const list = page.getByRole('list', { name: 'Archivos elegidos' });
   await expect(list.getByRole('listitem')).toHaveCount(3);
-  await expect(page.getByText('Añadidos 2 archivos. Llevas 3 de 15.')).toBeVisible();
+  await expect(page.getByText('Añadidos 2 archivos. Llevas 3 de 25.')).toBeVisible();
   await list.getByRole('button', { name: 'Quitar nomina-agosto.png' }).click();
   await expect(list.getByRole('listitem')).toHaveCount(2);
   await expect(page.getByRole('status').filter({ hasText: 'Quitado' })).toHaveText(
-    'Quitado: nomina-agosto.png. Llevas 2 de 15.',
+    'Quitado: nomina-agosto.png. Llevas 2 de 25.',
   );
   await expect(list.getByRole('button', { name: 'Quitar certificado.png' })).toBeFocused();
   await expect(list.locator('img')).toHaveCount(2);
@@ -758,23 +761,59 @@ test.describe('a PDF that would take minutes to draw', () => {
   });
 });
 
-test('the 16th file is left out with a message, and 15 go in one read', async ({ page }) => {
+const longSides = (files: readonly { data: string }[]) =>
+  files.map((f) => {
+    const size = imageDimensions(Buffer.from(f.data, 'base64'));
+    return size && Math.max(size.width, size.height);
+  });
+
+test('the 26th file is left out with a message, and 25 go in one read', async ({ page }) => {
   const fake = await fakeServices(page);
   await page.goto('finiquito/');
   await openUpload(page);
   await page
     .getByLabel('Elegir fotos o PDF')
-    .setInputFiles(Array.from({ length: 16 }, (_, i) => photo(`pagina-${i + 1}.png`)));
+    .setInputFiles(Array.from({ length: 26 }, (_, i) => photo(`pagina-${i + 1}.png`)));
   await expect(
     page.getByRole('list', { name: 'Archivos elegidos' }).getByRole('listitem'),
-  ).toHaveCount(15);
+  ).toHaveCount(25);
   await expect(page.getByText('1 archivo no se ha añadido.')).toBeVisible();
-  await expect(page.getByText('Como mucho 15 fotos o páginas de PDF en total')).toBeVisible();
+  await expect(page.getByText('Como mucho 25 fotos o páginas de PDF en total')).toBeVisible();
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
   await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
-  const sent = fake.extract[0]?.postDataJSON() as { files: unknown[] };
-  expect(sent.files).toHaveLength(15);
+  const sent = fake.extract[0]?.postDataJSON() as { files: { data: string }[] };
+  expect(sent.files).toHaveLength(25);
+  // Clean pages fit their share at the full size.
+  expect(new Set(longSides(sent.files))).toEqual(new Set([1568]));
+});
+
+test('25 noisy photos fit one request, a shorter side only where the share needs it', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page);
+  await page.goto('finiquito/');
+  await openUpload(page);
+  await page.getByLabel('Elegir fotos o PDF').setInputFiles(
+    Array.from({ length: 25 }, (_, i) => ({
+      name: `nomina-con-grano-${i + 1}.png`,
+      mimeType: 'image/png',
+      buffer: NOISY_PHOTO,
+    })),
+  );
+  await page.getByLabel(/Doy mi consentimiento explícito/).check();
+  await page.getByRole('button', { name: 'Leer los documentos' }).click();
+  // Each noisy page is encoded several times before one fits.
+  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused({
+    timeout: 60_000,
+  });
+  const body = fake.extract[0]?.postData() ?? '';
+  expect(body.length).toBeLessThanOrEqual(5_800_000);
+  const sent = JSON.parse(body) as { files: { data: string }[] };
+  expect(sent.files).toHaveLength(25);
+  const sides = longSides(sent.files);
+  expect(sides.every((side) => side !== null && side <= 1568)).toBe(true);
+  expect(sides.some((side) => side !== null && side < 1568)).toBe(true);
 });
 
 test('a mixed pack: what was recognised, where the documents disagree, and the prefill', async ({

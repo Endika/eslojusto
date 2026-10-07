@@ -10,14 +10,22 @@ const chunk = (type: string, data: Buffer): Buffer => {
 };
 
 // A grey PNG of a fictitious page: lines of solid word blocks on paper, like printed text from
-// afar, and light enough as JPEG for fifteen to fit one request.
+// afar, and light enough as JPEG for a full pack to fit one request.
 // The defaults read as a sharp, well-lit photo of the usual size; dark paper reads as dark.
+// `noise` adds up to that many grey levels either way to every pixel, like a phone's sensor in
+// poor light, which is what makes a photo heavy as JPEG.
 export function syntheticPhoto({
   width = 1176,
   height = 1568,
   paper = 225,
   ink = 30,
+  noise = 0,
 } = {}): Buffer {
+  let seed = 1;
+  const grain = () => {
+    seed = (Math.imul(seed, 1103515245) + 12345) >>> 0;
+    return Math.round(((seed >>> 8) / 0xffffff - 0.5) * 2 * noise);
+  };
   const rows: Buffer[] = [];
   for (let y = 0; y < height; y += 1) {
     const row = Buffer.alloc(width + 1, paper);
@@ -26,6 +34,9 @@ export function syntheticPhoto({
     if (line)
       for (let x = 60; x < width - 60; x += 1)
         if (Math.floor(x / 70) % 4 !== 3 && x % 70 < 55) row[x + 1] = ink;
+    if (noise > 0)
+      for (let x = 1; x <= width; x += 1)
+        row[x] = Math.min(255, Math.max(0, (row[x] ?? paper) + grain()));
     rows.push(row);
   }
   const header = Buffer.alloc(13);

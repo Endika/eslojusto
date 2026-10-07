@@ -49,7 +49,7 @@ export type MediaType = (typeof MEDIA_TYPES)[number];
 
 export const LIMITS = {
   // Photos and PDF pages together: each becomes one image.
-  maxImages: 15,
+  maxImages: 25,
   // What the browser opens to render; past it, a PDF is too heavy to render on a phone.
   maxPdfBytes: 20 * 1024 * 1024,
   maxImageLongSide: MAX_IMAGE_LONG_SIDE,

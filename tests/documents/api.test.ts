@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { EXTRACT_TIMEOUT_SECONDS } from '../../api/src/config';
+import { LIMITS as API_LIMITS } from '../../api/src/domain/documents';
 import { READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
 import { API_TIMEOUT_MS, createApi, parseExtraction, type Fetch } from '../../src/documents/api';
-import { READABILITY } from '../../src/documents/contract';
+import { LIMITS, READABILITY } from '../../src/documents/contract';
 
 interface Call {
   url: string;
@@ -127,6 +128,10 @@ describe('extract', () => {
   it('mirrors the API’s readability list', () => {
     expect(READABILITY).toEqual(API_READABILITY);
   });
+  it('takes as many images and as large a request as the API', () => {
+    expect(LIMITS.maxImages).toBe(API_LIMITS.maxImages);
+    expect(LIMITS.maxPayloadBytes).toBe(API_LIMITS.maxPayloadBytes);
+  });
   it('turns every API code into a failure', async () => {
     const fetch = fakeFetch(429, { code: 'daily_limit_reached' });
     expect(await createApi(ENDPOINTS, fetch).extract(request)).toEqual({
@@ -183,7 +188,11 @@ describe('parseExtraction', () => {
           { page: 3, kind: 'other', readability: { value: 'illegible', confidence: 'high' } },
           { page: 4, kind: 'other', readability: 'ok' },
           { page: 0, kind: 'other', readability: { value: 'ok', confidence: 'high' } },
-          { page: 16, kind: 'other', readability: { value: 'ok', confidence: 'high' } },
+          {
+            page: LIMITS.maxImages + 1,
+            kind: 'other',
+            readability: { value: 'ok', confidence: 'high' },
+          },
           { page: 5, kind: 'contract', readability: { value: 'ok', confidence: 'high' } },
         ],
         documents: [

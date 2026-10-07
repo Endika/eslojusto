@@ -210,7 +210,7 @@ const DOCUMENT_CATALOGUE = {
   upload_started: {
     files_bucket: oneOf(FILES_BUCKETS),
     // PDFs picked; their pages leave as images.
-    pdfs: { intRange: [0, 15] },
+    pdfs: { intRange: [0, 25] },
   },
   extraction_completed: {
     // The kinds of document recognised in the pack, each once.
@@ -228,7 +228,7 @@ const DOCUMENT_CATALOGUE = {
   nothing_read: {
     reasons: { list: SKIP_REASONS },
     files_bucket: oneOf(FILES_BUCKETS),
-    pdfs: { intRange: [0, 15] },
+    pdfs: { intRange: [0, 25] },
   },
   // Measured in the browser before sending: a photo looked dark, blurry or small.
   quality_warned: { kind: oneOf(QUALITY_PROBLEMS) },

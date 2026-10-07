@@ -208,6 +208,7 @@ describe('document and pass events', () => {
   it('accept kinds, codes and buckets', () => {
     expect(isValidEvent('start_chosen', { path: 'upload' })).toBe(true);
     expect(isValidEvent('upload_started', { files_bucket: '10-15', pdfs: 2 })).toBe(true);
+    expect(isValidEvent('upload_started', { files_bucket: '16-25', pdfs: 25 })).toBe(true);
     expect(
       isValidEvent('extraction_completed', {
         doc_types: ['dismissal_letter', 'payslip', 'other'],
@@ -253,7 +254,8 @@ describe('document and pass events', () => {
   });
   it('refuse anything read from a document or a payment', () => {
     expect(isValidEvent('upload_started', { files_bucket: '7', pdfs: 0 })).toBe(false);
-    expect(isValidEvent('upload_started', { files_bucket: '1', pdfs: 16 })).toBe(false);
+    expect(isValidEvent('upload_started', { files_bucket: '26', pdfs: 0 })).toBe(false);
+    expect(isValidEvent('upload_started', { files_bucket: '1', pdfs: 26 })).toBe(false);
     const completed = {
       doc_types: ['payslip'],
       fields_bucket: '1-3',

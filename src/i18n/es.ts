@@ -286,7 +286,7 @@ export const es = {
   'documents.upload.question': 'Sube tus documentos',
   'documents.upload.files': 'Sube lo que te hayan dado',
   'documents.upload.files_hint':
-    'Por ejemplo, la carta de despido, el finiquito, tus nóminas, el certificado de empresa o tu vida laboral, en el orden que sea. Hasta 15 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+    'Por ejemplo, la carta de despido, el finiquito, tus nóminas, el certificado de empresa o tu vida laboral, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
   'documents.upload.drop': 'Arrastra aquí tus fotos o PDF, o elígelos con el botón.',
   'documents.upload.camera': 'Hacer foto',
   'documents.upload.choose': 'Elegir fotos o PDF',
@@ -640,15 +640,15 @@ export const es = {
   'client.documents.pdf_page_detail': 'Página {n} de {total}',
   'client.documents.pdf_added': 'Añadido: {nombre}. Páginas: {total}.',
   'client.documents.pdf_pages_fit':
-    'De {nombre} caben las páginas 1 a {k} de {total}: como mucho 15 fotos o páginas en total.',
-  'client.documents.count': 'Llevas {n} de 15.',
+    'De {nombre} caben las páginas 1 a {k} de {total}: como mucho 25 fotos o páginas en total.',
+  'client.documents.count': 'Llevas {n} de 25.',
   'client.documents.status.opening': 'Abriendo el PDF…',
   'client.documents.remove': 'Quitar',
   'client.documents.remove_label': 'Quitar {nombre}',
-  'client.documents.added_one': 'Añadido: {nombre}. Llevas {n} de 15.',
-  'client.documents.added_many': 'Añadidos {k} archivos. Llevas {n} de 15.',
+  'client.documents.added_one': 'Añadido: {nombre}. Llevas {n} de 25.',
+  'client.documents.added_many': 'Añadidos {k} archivos. Llevas {n} de 25.',
   'client.documents.already_added': 'Ya estaba añadido: {nombre}.',
-  'client.documents.removed': 'Quitado: {nombre}. Llevas {n} de 15.',
+  'client.documents.removed': 'Quitado: {nombre}. Llevas {n} de 25.',
   'client.documents.left_out_one': '1 archivo no se ha añadido.',
   'client.documents.left_out_many': '{k} archivos no se han añadido.',
   'client.documents.kind.settlement_proposal': 'Propuesta de finiquito',
@@ -730,7 +730,7 @@ export const es = {
   'client.documents.error.payload_too_large':
     'Los archivos ocupan demasiado. Quita alguna foto o algún PDF y prueba otra vez.',
   'client.documents.error.no_files': 'Añade al menos una foto o un PDF',
-  'client.documents.error.too_many_files': 'Como mucho 15 fotos o páginas de PDF en total',
+  'client.documents.error.too_many_files': 'Como mucho 25 fotos o páginas de PDF en total',
   'client.documents.error.unsupported_media_type':
     'Ese tipo de archivo no se puede leer. Sube fotos o PDF.',
   'client.documents.error.image_unreadable':

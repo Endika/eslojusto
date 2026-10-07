@@ -95,7 +95,7 @@ describe('photo quality', () => {
     expect(measureQuality(red, WIDTH, HEIGHT, 1568).brightness).toBeCloseTo(76.245, 2);
   });
 
-  // The measure runs on the main thread once per photo, up to 15 in a pack. About 2 ms here.
+  // The measure runs on the main thread once per photo, up to 25 in a pack. About 2 ms here.
   it('measures a photo at the analysis size in well under 15 ms', () => {
     const data = rgba(page());
     for (let i = 0; i < 3; i += 1) measureQuality(data, WIDTH, HEIGHT, 1568);
