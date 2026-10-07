@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.10.0](https://github.com/Endika/eslojusto/compare/v1.9.0...v1.10.0) (2026-10-07)
+
+
+### Features
+
+* **engine:** add employment input, scope gate and labelled readings ([8e66e44](https://github.com/Endika/eslojusto/commit/8e66e44e5e42d7277d815319689b964d493df117))
+* **engine:** add employment norms, rules and the 2023-2026 minimum wage table ([5898ef9](https://github.com/Endika/eslojusto/commit/5898ef9fcf57fc46bc8b143920e475c1f1857c8c))
+* **engine:** add rental input, scope gate and two-reading outcomes ([997f5ce](https://github.com/Endika/eslojusto/commit/997f5cedd0900a7e4fe11ac62c7ea2b825879fe9))
+* **engine:** check annual rent updates against the cap in force on each anniversary ([df5f6f8](https://github.com/Endika/eslojusto/commit/df5f6f8a0149dfcc775ab33c9191925194bf60b6))
+
+
+### Bug Fixes
+
+* **engine:** anchor remote work costs, date the reform by signing and bound employment input ([de158f0](https://github.com/Endika/eslojusto/commit/de158f0e03ac544d278b1b3749613175d1e29d95))
+* **engine:** carry update bases year by year and take late rises as that year's update ([c07ef32](https://github.com/Endika/eslojusto/commit/c07ef326b4bf9af2d8d5dcb54cc53477356ece27))
+* **engine:** read the IGC within 0 and 2 % as Ley 2/2015 sets for revisions ([fb34468](https://github.com/Endika/eslojusto/commit/fb3446893df06554a14f728f61e13f9a75f090aa))
+* **engine:** take a rise applied early as its anniversary's update ([a63fd38](https://github.com/Endika/eslojusto/commit/a63fd3835688ab758766a9023d85fc8b960986ee))
+* **engine:** weigh the RDL 26/2026 update wording and keep the CPI cap for 2023 contracts ([a28fddf](https://github.com/Endika/eslojusto/commit/a28fddfde2048cb198bca08f9cfb11f9dae74463))
+
 ## [1.9.0](https://github.com/Endika/eslojusto/compare/v1.8.0...v1.9.0) (2026-10-07)
 
 
