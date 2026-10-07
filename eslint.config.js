@@ -205,6 +205,15 @@ export default tseslint.config(
   boundary(['src/documents/*.ts'], [noAnalytics, noRoot, noPosthogSdk, documentsPlatform], {
     ignores: FINAL_PAY_DOCUMENTS.map((name) => `src/documents/${name}.ts`),
   }),
+  boundary(
+    ['src/documents/*/**'],
+    [
+      {
+        regex: `^(?!\\.\\./pdf-writer$)|${notCanonical}`,
+        message: 'A subfolder of src/documents holds data: it reaches only the PDF writer.',
+      },
+    ],
+  ),
   {
     files: ['src/scripts/documents.ts'],
     rules: {

@@ -229,6 +229,15 @@ describe('import boundaries', () => {
     expect(await violations(filePath, code)).toContain('no-restricted-globals');
   });
 
+  it.each([
+    ['src/documents/rental/x.ts', "import { track } from '../../analytics/posthog';"],
+    ['src/documents/rental/x.ts', "import { prefillFrom } from '../prefill';"],
+    ['src/documents/rental/x.ts', "import { upload } from '../upload';"],
+    ['src/documents/fonts/x.ts', "import type { EmbeddedFont } from './../pdf-writer';"],
+  ])('a subfolder of src/documents holds data: %s cannot %s', async (filePath, code) => {
+    expect(await violations(filePath, code)).toContain('no-restricted-imports');
+  });
+
   it('a dynamic import cannot slip past them', async () => {
     expect(
       await violations('src/calculator/x.ts', "export const a = import('../analytics/posthog');"),
@@ -264,6 +273,7 @@ describe('import boundaries', () => {
     ['src/documents/upload.ts', "import { required } from '../calculator/dom';"],
     ['src/documents/payment.ts', "import { parseDate } from '../engine/date';"],
     ['src/documents/pdf.ts', "import { sans } from './fonts/sans';"],
+    ['src/documents/fonts/x.ts', "import type { EmbeddedFont } from '../pdf-writer';"],
     ['src/documents/contract.ts', "import { X } from '../../api/src/domain/image-limit';"],
     ['src/documents/report.ts', "import { formatEuros } from '../calculator/number';"],
     ['src/scripts/documents.ts', "import { setUpUpload } from '../documents/upload';"],
