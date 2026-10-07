@@ -55,7 +55,20 @@ export type RentalPhraseKey =
   | 'guarantees.insurance_banned'
   | 'guarantees.insurance_before_ban'
   | 'advance.over_cap'
-  | 'advance.within_cap';
+  | 'advance.within_cap'
+  | 'charges.not_in_contract'
+  | 'charges.no_annual_amount'
+  | 'charges.agreed'
+  | 'charges.year_cap'
+  | 'charges.over_cap'
+  | 'charges.within_cap'
+  | 'charges.rise_upper_bound'
+  | 'charges.rise_not_checkable'
+  | 'charges.too_many_readings'
+  | 'charges.past_first_years'
+  | 'charges.tax_outside_cap'
+  | 'charges.tax_banned'
+  | 'charges.waste_may_be_tax';
 
 // The UI words a phrase through the dictionary key `client.rental.calculation.<key>`.
 export interface RentalPhrase {
