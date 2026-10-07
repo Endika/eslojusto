@@ -50,9 +50,10 @@ function returnReading(deposit: number | null, out: MoveOut, today: CivilDate): 
     ...out.deductions.map((d) => p(`deposit.deduction.${d.kind}`, { amount: { euros: d.amount } })),
   ];
   if (out.deductions.length > 0) phrases.push(p('deposit.deductions_not_judged'));
-  // Within the month after the keys the balance is not due yet: no figure, no total.
+  // Up to the day the month after the keys runs out (date to date) the balance is not due yet: no
+  // figure, no total.
   const due = addMonthsClamped(out.keysReturnedOn, 1);
-  if (pending > TOLERANCE && compareDates(today, due) < 0)
+  if (pending > TOLERANCE && compareDates(today, due) <= 0)
     return itemReading(
       'not_yet_due',
       null,
@@ -138,7 +139,9 @@ function interestItem(
   today: CivilDate,
   rates: ReviewDeps['legalInterest'],
 ): ItemResult['outcome'] {
-  const from = addMonthsClamped(out.keysReturnedOn, 1);
+  // Months run date to date (Código Civil, art. 5.1): the month ends on `due`, and interest runs
+  // from the day after it.
+  const from = addDays(addMonthsClamped(out.keysReturnedOn, 1), 1);
   const late = (until: CivilDate) => compareDates(until, from) > 0;
   const aboveMonth = deposit === null ? 0 : Math.max(0, round2(deposit - rent));
   let notAccruing = Math.max(0, round2(aboveMonth - sum(out.deductions)));
