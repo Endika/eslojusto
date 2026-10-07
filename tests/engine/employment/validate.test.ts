@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate, type CivilDate } from '../../../src/engine/date';
-import { validate } from '../../../src/engine/employment/validate';
+import { validate, validationWarnings } from '../../../src/engine/employment/validate';
 import type { EmploymentInput } from '../../../src/engine/employment/types';
 import { contract } from './input';
 
@@ -190,5 +190,24 @@ describe('validate', () => {
       complementaryHours: null,
     };
     expect(errorsOf({ payslips: [payslip] }).length === 0).toBe(valid);
+  });
+});
+
+describe('validationWarnings', () => {
+  const withBreakdown = (amount: number, base: number) =>
+    contract({
+      salary: { ...contract().salary, amount, breakdown: [{ kind: 'base', amount: base }] },
+    });
+
+  it('warns when the breakdown falls short of the total, without failing', () => {
+    const input = withBreakdown(1300, 1100);
+    expect(validationWarnings(input)).toEqual([
+      { field: 'salary.breakdown', index: null, code: 'breakdown_short_of_total' },
+    ]);
+    expect(validate(input, parseDate('2026-10-07'))).toEqual([]);
+  });
+
+  it('is quiet when the breakdown adds up', () => {
+    expect(validationWarnings(withBreakdown(1300, 1300))).toEqual([]);
   });
 });

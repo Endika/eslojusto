@@ -233,3 +233,24 @@ export function validate(input: EmploymentInput, today: CivilDate): readonly Val
   }
   return errors;
 }
+
+export type ValidationWarningCode = 'breakdown_short_of_total';
+
+// Something the review can still read, but worth a second look.
+export interface ValidationWarning {
+  readonly field: EmploymentField;
+  readonly index: number | null;
+  readonly code: ValidationWarningCode;
+}
+
+// Half a cent absorbs rounding in the amounts typed.
+const CENT_TOLERANCE = 0.005;
+
+export function validationWarnings(input: EmploymentInput): readonly ValidationWarning[] {
+  const { amount, breakdown } = input.salary;
+  const listed = breakdown.reduce((total, c) => total + c.amount, 0);
+  // The part left unexplained is read as a complement of unknown kind.
+  return breakdown.length > 0 && amount - listed > CENT_TOLERANCE
+    ? [{ field: 'salary.breakdown', index: null, code: 'breakdown_short_of_total' }]
+    : [];
+}
