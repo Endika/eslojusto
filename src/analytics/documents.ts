@@ -10,12 +10,13 @@ export function documentsAnalytics(track: Track): DocumentEvents {
     uploadStarted(kind, files, media) {
       track('upload_started', { doc_type: kind, files, media });
     },
-    extractionCompleted(kind, fields, lowConfidence, failedChecks) {
+    extractionCompleted(kind, fields, lowConfidence, failedChecks, escalated) {
       track('extraction_completed', {
         doc_type: kind,
         fields_bucket: fieldsBucket(fields),
         low_confidence: lowConfidence,
         failed_checks: failedChecks,
+        escalated: escalated === null ? 'unknown' : escalated ? 'yes' : 'no',
       });
     },
     extractionFailed(kind, code) {

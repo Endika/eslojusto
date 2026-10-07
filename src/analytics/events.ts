@@ -190,6 +190,7 @@ export const CATALOGUE = {
     fields_bucket: oneOf(FIELD_BUCKETS),
     low_confidence: { boolean: true },
     failed_checks: { boolean: true },
+    escalated: oneOf(['yes', 'no', 'unknown']),
   },
   extraction_failed: { doc_type: oneOf(DOCUMENT_KINDS), code: oneOf(ERROR_CODES) },
   checkout_started: {},

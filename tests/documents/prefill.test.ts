@@ -65,10 +65,15 @@ describe('a payslip', () => {
       { name: 'monthlySalary', value: '2.100,00', confidence: 'medium', derived: true },
     ]);
   });
-  it('without proration: the total less a full extra payment, which fills its own field', () => {
+  it('without proration and an extra payment paid that month: the total less that payment', () => {
     const p = prefillFrom({
       kind: 'payslip',
-      fields: { ...base, extraPayProrated: f(false), extraPayAmount: f(1800, 'low') },
+      fields: {
+        ...base,
+        extraPayProrated: f(false),
+        extraPayPaid: f(true, 'medium'),
+        extraPayAmount: f(1800, 'low'),
+      },
       lists: {},
     });
     expect(p.fields).toContainEqual({
@@ -82,6 +87,27 @@ describe('a payslip', () => {
       confidence: 'low',
       derived: true,
     });
+  });
+  it('without proration and no extra payment paid that month: the whole total', () => {
+    const p = prefillFrom({
+      kind: 'payslip',
+      fields: { ...base, extraPayProrated: f(false), extraPayPaid: f(false, 'medium') },
+      lists: {},
+    });
+    expect(p.fields).toContainEqual({
+      name: 'monthlySalary',
+      value: '2.100,00',
+      confidence: 'medium',
+      derived: true,
+    });
+  });
+  it('an extra payment said to be paid but without its amount gives no salary', () => {
+    const p = prefillFrom({
+      kind: 'payslip',
+      fields: { ...base, extraPayProrated: f(false), extraPayPaid: f(true) },
+      lists: {},
+    });
+    expect(p.fields.map((x) => x.name)).not.toContain('monthlySalary');
   });
   it('a period that is not a whole month gives no salary', () => {
     const p = prefillFrom({

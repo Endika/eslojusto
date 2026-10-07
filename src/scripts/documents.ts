@@ -172,7 +172,7 @@ export function wireDocuments(
   if (!config || !start || !offer || !captchaBox || !checkoutCaptchaBox) return;
 
   const tr = pageTranslator();
-  const api = createApi(config.apiUrl, (url, init) => fetch(url, init));
+  const api = createApi(config.endpoints, (url, init) => fetch(url, init));
   const passes = createPassStore(storage(() => localStorage));
   const session = storage(() => sessionStorage);
   const events = documentsAnalytics(track);

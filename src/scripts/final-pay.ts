@@ -8,11 +8,18 @@ import { localToday } from './clock';
 const analytics = calculatorAnalytics(track, () => performance.now());
 // The calculator rewrites the fragment as it opens, so the address it arrived at is kept first.
 const arrival = { hash: location.hash, search: location.search };
+// Inlined at build time, so a build without the API drops every document branch below.
+const documentsBuild = !!(
+  import.meta.env.PUBLIC_API_EXTRACT_URL &&
+  import.meta.env.PUBLIC_API_CHECKOUT_URL &&
+  import.meta.env.PUBLIC_API_PASS_URL &&
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
+);
 const reviewed: ((r: CompletedReview) => void)[] = [];
 const restarted: (() => void)[] = [];
 
 // Document reading listens to the same events as analytics; without its API, nothing else listens.
-const events: CalculatorEvents = import.meta.env.PUBLIC_API_URL
+const events: CalculatorEvents = documentsBuild
   ? {
       ...analytics,
       reviewCompleted(r) {
@@ -32,7 +39,7 @@ const calculator = setUpCalculator(document.body, {
   tr: pageTranslator(),
 });
 
-if (import.meta.env.PUBLIC_API_URL) {
+if (documentsBuild) {
   import('./documents')
     .then(({ wireDocuments }) =>
       wireDocuments(

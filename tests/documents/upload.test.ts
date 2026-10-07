@@ -85,6 +85,7 @@ const settlement: ExtractResult = {
   failedChecks: ['items_do_not_sum'],
   allowance: 'v1.quota.next',
   readsLeft: null,
+  escalated: true,
 };
 
 describe('the start sheet', () => {
@@ -154,7 +155,7 @@ describe('the start sheet', () => {
     expect(events.log).toEqual([
       ['startChosen', 'upload'],
       ['uploadStarted', 'settlement', 1, 'image'],
-      ['extractionCompleted', 'settlement', 3, true, true],
+      ['extractionCompleted', 'settlement', 3, true, true, true],
     ]);
   });
 

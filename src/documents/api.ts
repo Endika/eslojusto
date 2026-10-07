@@ -3,6 +3,7 @@ import {
   COHERENCE_CHECKS,
   CONFIDENCES,
   DOCUMENT_KINDS,
+  EXTRACTION_SHAPE,
   type Api,
   type CoherenceCheck,
   type ErrorCode,
@@ -11,6 +12,7 @@ import {
   type Extraction,
   type Failure,
 } from './contract';
+import type { Operation } from './config';
 
 const CHECKS_SET: ReadonlySet<unknown> = new Set(COHERENCE_CHECKS);
 
@@ -40,12 +42,14 @@ export function parseExtraction(v: unknown): Extraction | null {
   if (!isRecord(v) || !(DOCUMENT_KINDS as readonly unknown[]).includes(v['kind'])) return null;
   const fields: Record<string, ExtractedField> = {};
   const lists: Record<string, ExtractedRow[]> = {};
+  const shape = EXTRACTION_SHAPE[v['kind'] as Extraction['kind']];
+  const known = (names: readonly string[], name: string) => names.includes(name);
   for (const [name, raw] of Object.entries(isRecord(v['fields']) ? v['fields'] : {})) {
     const field = parseField(raw);
-    if (field) fields[name] = field;
+    if (field && known(shape.fields, name)) fields[name] = field;
   }
   for (const [name, raw] of Object.entries(isRecord(v['lists']) ? v['lists'] : {})) {
-    if (!Array.isArray(raw)) continue;
+    if (!Array.isArray(raw) || !known(shape.lists, name)) continue;
     lists[name] = raw.map(parseRow).filter((r): r is ExtractedRow => r !== null);
   }
   return { kind: v['kind'] as Extraction['kind'], fields, lists };
@@ -59,12 +63,16 @@ const isApiError = (v: unknown): v is ErrorCode =>
 const isToken = (v: unknown): v is string => typeof v === 'string' && v.length > 0;
 const isCount = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0;
 
-// One HTTP client per operation path; every failure becomes a code the page can word.
-export function createApi(baseUrl: string, fetchFn: Fetch, timeoutMs = 120_000): Api {
-  async function post(path: string, body: object): Promise<Record<string, unknown> | Failure> {
+// One HTTP client per function URL; every failure becomes a code the page can word.
+export function createApi(
+  endpoints: Readonly<Record<Operation, string>>,
+  fetchFn: Fetch,
+  timeoutMs = 120_000,
+): Api {
+  async function post(op: Operation, body: object): Promise<Record<string, unknown> | Failure> {
     let response: Response;
     try {
-      response = await fetchFn(`${baseUrl}/${path}`, {
+      response = await fetchFn(endpoints[op], {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),
@@ -110,6 +118,7 @@ export function createApi(baseUrl: string, fetchFn: Fetch, timeoutMs = 120_000):
         failedChecks: checks.filter((c): c is CoherenceCheck => CHECKS_SET.has(c)),
         allowance,
         readsLeft,
+        escalated: typeof r['escalated'] === 'boolean' ? r['escalated'] : null,
       };
     },
     async checkout(nonce, captchaToken) {
