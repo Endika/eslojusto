@@ -119,31 +119,47 @@ function interestIn(
     : itemReading('within_limit', null, phrases, INTEREST_RULES);
 }
 
+// LAU art. 36.1 and 36.4: the deposit is one month's rent and only it accrues; what was paid above
+// it is an extra guarantee. Which money came back first is not known, so the part above the month
+// is taken as kept or returned first: the lower reading.
 function interestItem(
   deposit: number | null,
+  rent: number,
   out: MoveOut,
   today: CivilDate,
   rates: ReviewDeps['legalInterest'],
 ): ItemResult['outcome'] {
   const from = addMonthsClamped(out.keysReturnedOn, 1);
   const late = (until: CivilDate) => compareDates(until, from) > 0;
-  const stretches: Stretch[] = out.returns
-    .filter((r) => late(r.on))
-    .map((r) => ({ amount: r.amount, from, until: r.on }));
+  const aboveMonth = deposit === null ? 0 : Math.max(0, round2(deposit - rent));
+  let notAccruing = Math.max(0, round2(aboveMonth - sum(out.deductions)));
+  const stretches: Stretch[] = [];
+  for (const r of [...out.returns].sort((a, b) => compareDates(a.on, b.on))) {
+    const kept = Math.min(r.amount, notAccruing);
+    notAccruing = round2(notAccruing - kept);
+    const accruing = round2(r.amount - kept);
+    if (late(r.on) && accruing > 0) stretches.push({ amount: accruing, from, until: r.on });
+  }
   const pending = pendingOf(deposit, out);
   const stillOwed = pending !== null && pending > TOLERANCE;
-  if (stillOwed && late(today)) stretches.push({ amount: pending, from, until: today });
+  const pendingAccruing = pending === null ? 0 : round2(pending - notAccruing);
+  if (stillOwed && late(today) && pendingAccruing > TOLERANCE)
+    stretches.push({ amount: pendingAccruing, from, until: today });
+  const capPhrase =
+    aboveMonth > TOLERANCE ? [p('deposit.interest_deposit_only', { rent: { euros: rent } })] : [];
   if (stretches.length > 0)
-    return readAcross([DAY_COUNT], (world) => interestIn(stretches, rates, world));
+    return readAcross([DAY_COUNT], (world) => {
+      const r = interestIn(stretches, rates, world);
+      return { ...r, calculation: [...capPhrase, ...r.calculation] };
+    });
   const why = stillOwed
     ? p('deposit.interest_not_yet', { from: { date: toIso(from) } })
     : p('deposit.returned_on_time', { from: { date: toIso(from) } });
-  return single(itemReading('within_limit', null, [why], INTEREST_RULES));
+  return single(itemReading('within_limit', null, [...capPhrase, why], INTEREST_RULES));
 }
 
 // The deposit's return once the keys are back: what is still owed, and the interest on what came
-// back late or has not come back. Only the deposit accrues it (art. 36.4): extra guarantees do
-// not, here.
+// back late or has not come back.
 export function checkDepositReturn(
   input: RentalInput,
   today: CivilDate,
@@ -156,7 +172,7 @@ export function checkDepositReturn(
     itemResult(
       'deposit_interest',
       {},
-      interestItem(input.deposit, out, today, deps.legalInterest),
+      interestItem(input.deposit, input.initialRent, out, today, deps.legalInterest),
       deps.norms,
     ),
   ];
