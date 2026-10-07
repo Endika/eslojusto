@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
 import { IGC } from '../../../src/engine/rental/data/igc';
-import { IPC } from '../../../src/engine/rental/data/ipc';
+import { IPC, flashReleaseUrl } from '../../../src/engine/rental/data/ipc';
 import { IRAV } from '../../../src/engine/rental/data/irav';
 import { LEGAL_INTEREST } from '../../../src/engine/rental/data/legal-interest';
 import {
@@ -11,6 +11,7 @@ import {
 } from '../../../src/engine/rental/indices';
 
 const INE = 'https://servicios.ine.es/';
+const INE_PRESS = 'https://www.ine.es/';
 const BDE = 'https://clientebancario.bde.es/';
 
 const nextMonth = (month: string): string => {
@@ -45,14 +46,45 @@ describe.each([IRAV, IPC, IGC])('the $id table', (series) => {
       if (v.flashRate !== undefined) expect(v.flashPublishedOn).toBeDefined();
       if (v.flashPublishedOn !== undefined) {
         expect(v.flashPublishedOn.slice(0, 7)).toBe(v.month);
-        expect(v.flashUrl?.startsWith(INE)).toBe(true);
+        expect([INE, INE_PRESS].some((origin) => v.flashUrl?.startsWith(origin))).toBe(true);
       }
+      if (v.flashRate !== undefined) expect(v.flashUrl).toBe(flashReleaseUrl(v.month));
     }
+  });
+
+  it('keeps a pending flash only for the month after the last definitive one', () => {
+    const { pendingFlash } = series;
+    if (pendingFlash === null) return;
+    expect(pendingFlash.month).toBe(nextMonth(series.values.at(-1)?.month ?? ''));
+    expect(pendingFlash.publishedOn <= series.coveredUntil).toBe(true);
+    expect(pendingFlash.url).toBe(flashReleaseUrl(pendingFlash.month));
   });
 });
 
-it('every CPI month records when its flash came out, so no flash window goes unnoticed', () => {
-  expect(IPC.values.filter((v) => v.flashPublishedOn === undefined)).toEqual([]);
+describe('CPI flash estimates', () => {
+  it('every month records when its flash came out, so no flash window goes unnoticed', () => {
+    expect(IPC.values.filter((v) => v.flashPublishedOn === undefined)).toEqual([]);
+  });
+
+  it.each([
+    ['2019-02', '2022-03'],
+    ['2024-12', '2026-08'],
+  ])('are loaded, with their press release, from %s to %s', (first, last) => {
+    const missing = IPC.values.filter(
+      (v) => v.month >= first && v.month <= last && v.flashRate === undefined,
+    );
+    expect(missing).toEqual([]);
+    expect(flashReleaseUrl(first).startsWith(INE_PRESS)).toBe(true);
+  });
+
+  it('include September 2026, whose definitive figure is not out yet', () => {
+    expect(IPC.pendingFlash).toEqual({
+      month: '2026-09',
+      rate: 4.9,
+      publishedOn: '2026-09-29',
+      url: 'https://www.ine.es/dyngs/Prensa/adIPC0926.htm',
+    });
+  });
 });
 
 describe('reference month', () => {
@@ -60,7 +92,25 @@ describe('reference month', () => {
     expect(lookup(IRAV, '2026-09-15')).toMatchObject({
       kind: 'same_day',
       value: { month: '2026-08', rate: 2.47 },
-      previous: { month: '2026-07', rate: 2.49 },
+      earlier: { source: 'previous', value: { month: '2026-07', rate: 2.49 } },
+    });
+  });
+
+  it('on the day the definitive CPI comes out, weighs it against that month’s flash', () => {
+    expect(lookup(IPC, '2022-03-11')).toMatchObject({
+      kind: 'same_day',
+      value: { month: '2022-02', rate: 7.6 },
+      earlier: { source: 'flash', flash: { month: '2022-02', rate: 7.4 } },
+    });
+    expect(lookup(IPC, '2019-03-13')).toMatchObject({
+      kind: 'same_day',
+      value: { month: '2019-02' },
+      earlier: { source: 'flash', flash: { month: '2019-02', rate: 1.1 } },
+    });
+    expect(lookup(IPC, '2023-03-14')).toMatchObject({
+      kind: 'flash_not_loaded',
+      definitive: { month: '2023-02' },
+      month: '2023-02',
     });
   });
 
@@ -71,19 +121,36 @@ describe('reference month', () => {
     });
   });
 
-  it('is not loaded after the table coverage or before the index existed', () => {
+  it('is not loaded after the table coverage', () => {
     expect(lookup(IRAV, '2026-10-08')).toEqual({ kind: 'not_loaded' });
-    expect(lookup(IRAV, '2025-01-01')).toEqual({ kind: 'not_loaded' });
+    expect(lookup(IGC, '2018-12-31')).toEqual({ kind: 'not_loaded' });
+  });
+
+  it('does not exist before the index was first published', () => {
+    expect(lookup(IRAV, '2025-01-01')).toEqual({ kind: 'none_published' });
+    expect(lookup(IRAV, '2025-01-02')).toMatchObject({ kind: 'same_day', earlier: null });
+  });
+
+  it('weighs a CPI flash already out against the last definitive figure', () => {
+    expect(lookup(IPC, '2025-04-05')).toMatchObject({
+      kind: 'flash_window',
+      definitive: { month: '2025-02', rate: 3 },
+      flash: { month: '2025-03', rate: 2.3, publishedOn: '2025-03-28' },
+    });
+    expect(lookup(IPC, '2025-04-20')).toMatchObject({ kind: 'ok', value: { month: '2025-03' } });
+    expect(lookup(IPC, '2026-10-05')).toMatchObject({
+      kind: 'flash_window',
+      definitive: { month: '2026-08' },
+      flash: { month: '2026-09', rate: 4.9 },
+    });
   });
 
   it('says when a CPI flash was out and its rate is not in the table', () => {
-    const r = lookup(IPC, '2025-04-05');
-    expect(r).toMatchObject({
+    expect(lookup(IPC, '2023-04-05')).toEqual({
       kind: 'flash_not_loaded',
-      definitive: { month: '2025-02', publishedOn: '2025-03-14' },
-      next: { month: '2025-03', flashPublishedOn: '2025-03-28' },
+      definitive: expect.objectContaining({ month: '2023-02' }),
+      month: '2023-03',
     });
-    expect(lookup(IPC, '2025-04-20')).toMatchObject({ kind: 'ok', value: { month: '2025-03' } });
   });
 
   describe('on a series with flash rates and unknown dates', () => {
@@ -103,7 +170,9 @@ describe('reference month', () => {
       table: 1,
       series: 'X',
       coveredUntil: '2030-12-31',
+      loadedFromStart: false,
       values,
+      pendingFlash: null,
     });
 
     it('weighs the flash of the next month against the last definitive one', () => {
@@ -114,7 +183,7 @@ describe('reference month', () => {
       expect(lookup(s, '2030-02-27')).toMatchObject({
         kind: 'flash_window',
         definitive: { month: '2030-01' },
-        flashNext: { month: '2030-02', flashRate: 2.5 },
+        flash: { month: '2030-02', rate: 2.5 },
       });
       expect(lookup(s, '2030-02-26')).toMatchObject({ kind: 'ok', value: { month: '2030-01' } });
       expect(lookup(s, '2030-03-15')).toMatchObject({ kind: 'ok', value: { month: '2030-02' } });
