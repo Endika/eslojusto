@@ -87,6 +87,23 @@ describe('the pass offer', () => {
     expect(section.hidden).toBe(true);
   });
 
+  it('keeps the detail locked until a pass is there, then shows it', async () => {
+    const { payment, passes } = setUp([
+      { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
+    ]);
+    passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<section data-summary hidden></section><div data-items data-detail></div>',
+    );
+    payment.show(completed());
+    expect($('[data-summary]').hidden).toBe(false);
+    expect($('[data-items]').hidden).toBe(true);
+    await payment.returned('cs_test_1');
+    expect($('[data-summary]').hidden).toBe(true);
+    expect($('[data-items]').hidden).toBe(false);
+  });
+
   it('asks for the express waiver before paying', async () => {
     const { payment, calls, redirects } = setUp();
     payment.show(completed());

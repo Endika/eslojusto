@@ -216,6 +216,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
     benefit: 'with_figures',
     other_contracts: '1',
     unfair_reference: 'none',
+    detail: 'unlocked',
   });
   expect(keys(spy.named('review_completed')[0])).toEqual(
     [
@@ -241,6 +242,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
       'benefit',
       'other_contracts',
       'unfair_reference',
+      'detail',
     ].toSorted(),
   );
 

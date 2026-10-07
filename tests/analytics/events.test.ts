@@ -137,6 +137,7 @@ describe('the catalogue guard', () => {
       seconds: 90,
       benefit,
       otherContracts: 0,
+      detail: 'unlocked',
     });
     expect(isValidEvent('review_completed', props)).toBe(true);
     expect(isValidEvent('review_completed', { ...props, difference: 412.5 })).toBe(false);
@@ -381,6 +382,7 @@ describe('review_completed', () => {
         seconds: 30,
         benefit,
         otherContracts: 0,
+        detail: 'unlocked',
       });
     expect(props(8136.99).unfair_reference).toBe('shown');
     expect(props(null).unfair_reference).toBe('none');
@@ -403,6 +405,7 @@ describe('review_completed', () => {
       seconds: 200,
       benefit,
       otherContracts: 0,
+      detail: 'locked',
     });
     expect(props).toEqual({
       cause: 'fixed_term_end',
@@ -423,6 +426,7 @@ describe('review_completed', () => {
       benefit: 'with_figures',
       other_contracts: '0',
       unfair_reference: 'none',
+      detail: 'locked',
     });
     expect(isValidEvent('review_completed', props)).toBe(true);
   });
@@ -435,6 +439,7 @@ describe('review_completed', () => {
       seconds: 1,
       benefit,
       otherContracts: 0,
+      detail: 'unlocked',
     } as const;
     const withInput = (e: Partial<FinalPayInput>) =>
       reviewProps({ ...base, input: { ...input, ...e } });
@@ -462,6 +467,7 @@ describe('review_completed', () => {
       seconds: 30,
       benefit,
       otherContracts: 0,
+      detail: 'unlocked',
     });
     expect(isValidEvent('review_completed', props)).toBe(true);
     expect(JSON.stringify(props)).not.toMatch(/1500|40000|2010|2026/);
@@ -471,7 +477,7 @@ describe('review_completed', () => {
 describe('review_completed: the benefit', () => {
   const base = { review: review(), input, attempt: 1, changedFields: [], seconds: 1 } as const;
   const props = (p: ReturnType<typeof estimateBenefit>, otherContracts = 0) =>
-    reviewProps({ ...base, benefit: p, otherContracts });
+    reviewProps({ ...base, benefit: p, otherContracts, detail: 'unlocked' });
 
   it('says whether there were figures, none, or it does not apply, and nothing else', () => {
     expect(props(benefit).benefit).toBe('with_figures');

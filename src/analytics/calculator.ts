@@ -42,7 +42,7 @@ export function calculatorAnalytics(track: Track, now: () => number): Calculator
     fieldRejected(step, field) {
       track('validation_error', { section: step, field: field as TrackableField });
     },
-    reviewCompleted({ review, input, figures, benefit, otherContracts }) {
+    reviewCompleted({ review, input, figures, benefit, otherContracts, detail }) {
       attempts += 1;
       const answers = snapshot(input, figures);
       track(
@@ -55,6 +55,7 @@ export function calculatorAnalytics(track: Track, now: () => number): Calculator
           seconds: secondsSince(start ?? sectionEnteredAt),
           benefit,
           otherContracts,
+          detail,
         }),
       );
       previous = answers;

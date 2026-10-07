@@ -2,14 +2,14 @@ import { documentsAnalytics } from '../analytics/documents';
 import { track } from '../analytics/posthog';
 import type { FormEntries } from '../calculator/fill';
 import type { Calculator } from '../calculator/main';
-import type { CompletedReview } from '../calculator/ports';
+import type { CompletedReview, Detail } from '../calculator/ports';
 import { STEPS } from '../calculator/steps';
 import { createApi } from '../documents/api';
 import { DOCUMENTS, TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/config';
 import { fitWithin } from '../documents/files';
 import { canvasJpeg, whiteCanvas } from './jpeg';
 import { createOutageMemory } from '../documents/outage';
-import { createPassStore } from '../documents/pass';
+import { canDownload, createPassStore, passState } from '../documents/pass';
 import { setUpPayment } from '../documents/payment';
 import type {
   Browser,
@@ -142,6 +142,8 @@ const browser: Browser = {
 export interface CalculatorHooks {
   onReview(listener: (r: CompletedReview) => void): void;
   onRestart(listener: () => void): void;
+  // Tells the calculator how a review's result will be shown.
+  detail(state: () => Detail): void;
 }
 
 const isEntries = (v: unknown): v is FormEntries =>
@@ -196,6 +198,9 @@ export function wireDocuments(
     keepReview: () => session.set(REVIEW_KEY, JSON.stringify(calculator.entries())),
     today: localToday,
   });
+  hooks.detail(() =>
+    canDownload(passState(passes.pass(), browser.now())) ? 'unlocked' : 'locked',
+  );
   hooks.onReview((r) => {
     payment.show(r);
     upload.showAgreementOffer(document);
