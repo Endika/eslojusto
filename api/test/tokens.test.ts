@@ -44,10 +44,11 @@ describe('input token estimate', () => {
     expect(PROMPT_TOKENS).toBeGreaterThanOrEqual(Math.ceil(fixed / 2));
   });
 
-  it('admits the largest pack the API accepts: fifteen images at the largest size', () => {
+  it('admits the largest pack the API accepts: twenty-five images at the largest size', () => {
     const square = { format: 'image/jpeg' as const, width: 1568, height: 1568 };
     const largest = PROMPT_TOKENS + LIMITS.maxImages * imageTokens(square);
-    expect(largest).toBe(63_185);
+    expect(LIMITS.maxImages).toBe(25);
+    expect(largest).toBe(95_975);
     expect(largest).toBeLessThanOrEqual(MAX_ESTIMATED_INPUT_TOKENS);
     expect(PROMPT_TOKENS + LIMITS.maxImages * imageTokens(photo)).toBeLessThan(largest);
   });
@@ -58,9 +59,9 @@ describe('input token estimate', () => {
 });
 
 describe('cost of a read', () => {
-  it('stays at or under 0.30 USD for one read at the estimate cap', () => {
-    expect(cost(PRIMARY_MODEL, MAX_ESTIMATED_INPUT_TOKENS)).toBeLessThanOrEqual(0.3);
-    expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS)).toBeLessThanOrEqual(0.3);
+  it('stays at or under 0.40 USD for one read at the estimate cap', () => {
+    expect(cost(PRIMARY_MODEL, MAX_ESTIMATED_INPUT_TOKENS)).toBeLessThanOrEqual(0.4);
+    expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS)).toBeLessThanOrEqual(0.4);
   });
 
   it('reads with Sonnet alone, so nothing escalates', () => {

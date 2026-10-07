@@ -361,14 +361,14 @@ describe('extract', () => {
     );
   });
 
-  it('reads fifteen of the largest images and refuses a sixteenth', async () => {
+  it('reads twenty-five of the largest images and refuses a twenty-sixth', async () => {
     const { reader, deps } = setup({ [PRIMARY]: read(coherentSettlement()) });
     const largest: DocumentFile = { mediaType: 'image/jpeg', bytes: jpeg(1568, 1568) };
     const metrics: ExtractMetrics = {};
-    const fifteen = Array.from({ length: 15 }, () => largest);
-    expect((await extract(request({ files: fifteen }), deps, metrics)).code).toBe('ok');
-    expect(metrics.pages).toBe(15);
-    expect(await extract(request({ files: [...fifteen, largest] }), deps, {})).toEqual({
+    const pack = Array.from({ length: 25 }, () => largest);
+    expect((await extract(request({ files: pack }), deps, metrics)).code).toBe('ok');
+    expect(metrics.pages).toBe(25);
+    expect(await extract(request({ files: [...pack, largest] }), deps, {})).toEqual({
       code: 'too_many_files',
     });
     expect(reader.calls.filter((c) => c.model === PRIMARY)).toHaveLength(1);
