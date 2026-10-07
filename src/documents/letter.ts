@@ -10,6 +10,18 @@ export interface LetterDetails {
   readonly date: CivilDate | null;
 }
 
+// The fields a person types; the date comes from a date picker.
+export const LETTER_FIELDS = ['name', 'id', 'company', 'place'] as const;
+export type LetterField = (typeof LETTER_FIELDS)[number];
+
+// Long enough for any real value, short enough to fit its line.
+export const LETTER_MAX_LENGTH: Record<LetterField, number> = {
+  name: 80,
+  id: 12,
+  company: 80,
+  place: 50,
+};
+
 export const NO_DETAILS: LetterDetails = { name: '', id: '', company: '', place: '', date: null };
 
 export const LETTER_PREFILLED = ['none', 'some', 'all'] as const;
@@ -18,7 +30,7 @@ export type LetterPrefilled = (typeof LETTER_PREFILLED)[number];
 // How many of the personal fields were filled, for analytics; the date, filled in for the person,
 // does not count.
 export function letterPrefilled(d: LetterDetails): LetterPrefilled {
-  const filled = [d.name, d.id, d.company, d.place].filter((v) => v.trim() !== '').length;
+  const filled = LETTER_FIELDS.filter((f) => d[f].trim() !== '').length;
   return filled === 0 ? 'none' : filled === 4 ? 'all' : 'some';
 }
 

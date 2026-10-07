@@ -64,6 +64,9 @@ function setUp(
         letters.push(details);
         return new Blob(['%PDF']);
       },
+      // Stands in for the fonts: «€» is the one character they lack here.
+      unprintable: (d) =>
+        (['name', 'id', 'company', 'place'] as const).filter((f) => d[f].includes('€')),
     }),
     keepReview: () => void (kept += 1),
     today: () => ({ y: 2026, m: 10, d: 7 }),
@@ -442,6 +445,22 @@ describe('the pass offer', () => {
     id.value = '12345678Z';
     id.dispatchEvent(new Event('input'));
     expect($('[data-letter-id-warning]').hidden).toBe(true);
+  });
+
+  it('a field with a character the fonts lack keeps its blank line, with a warning', async () => {
+    const { payment, passes, letters, events } = setUp();
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
+    payment.show(completed());
+    await flush();
+    $<HTMLInputElement>('[data-letter-field="name"]').value = 'Alex Ejemplo';
+    $<HTMLInputElement>('[data-letter-field="company"]').value = 'Empresa € SL';
+    await click('[data-download="letter"]');
+    expect(letters[0]).toMatchObject({ name: 'Alex Ejemplo', company: '' });
+    expect($('[data-letter-glyph-warning]').hidden).toBe(false);
+    expect($('[data-letter-glyph-warning]').textContent).toBe(
+      'Algunas letras no se pueden escribir en la carta: se deja la línea en blanco para escribirlo a mano.',
+    );
+    expect(events.log.at(-1)).toEqual(['downloaded', 'letter', 'some']);
   });
 
   it('starting over forgets what was typed for the letter', () => {

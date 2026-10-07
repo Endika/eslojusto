@@ -1,6 +1,7 @@
 ---
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
+import { LETTER_MAX_LENGTH } from '../documents/letter';
 
 // The pass for the PDF report and the letter, offered in the result when an item falls short.
 // Rendered only in a build with the documents API; DocumentStart carries its styles.
@@ -97,12 +98,14 @@ const letterFields = [
               autocomplete={autocomplete}
               spellcheck="false"
               dir={type === 'date' ? 'ltr' : undefined}
+              maxlength={type === 'date' ? undefined : LETTER_MAX_LENGTH[id]}
               aria-describedby={id === 'id' ? 'error-letter-id' : undefined}
               data-letter-field={id}
             />
             {id === 'id' && <p class="hint" id="error-letter-id" data-letter-id-warning hidden />}
           </div>
         ))}
+        <p class="hint" role="status" data-letter-glyph-warning hidden></p>
         <p class="item__note">{tx('documents.letter.privacy')}</p>
         <div class="pass__actions">
           <button class="button button--sheet" type="button" data-download="letter">

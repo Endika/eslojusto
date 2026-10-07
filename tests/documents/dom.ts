@@ -80,6 +80,7 @@ export const OFFER = `
       <input data-letter-field="name" />
       <input data-letter-field="id" />
       <p data-letter-id-warning hidden></p>
+      <p data-letter-glyph-warning hidden></p>
       <input data-letter-field="company" />
       <input data-letter-field="place" />
       <input type="date" data-letter-field="date" />
