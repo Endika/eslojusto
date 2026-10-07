@@ -14,7 +14,7 @@ day, and the row is added by hand to src/engine/rental/data.`;
 
 const API = 'https://servicios.ine.es/wstempus/js/ES';
 const DEFINITIVE = 1;
-const FLASH_SAMPLE = 6;
+const FLASH_SAMPLE = 9;
 const MONTHS =
   'enero febrero marzo abril mayo junio julio agosto septiembre octubre noviembre diciembre'.split(
     ' ',
@@ -82,15 +82,20 @@ async function releaseText(url) {
   return text;
 }
 
-// The headline of each release: «El indicador adelantado del IPC sitúa su variación anual en el
-// 1,1% en febrero».
+// The headline of each release («El indicador adelantado del IPC sitúa su variación anual en el
+// 1,1% en febrero»), or its first paragraph when the headline is worded otherwise.
 async function releasedFlashRate(month) {
   const text = (await releaseText(flashReleaseUrl(month))).replace(/\s+/g, ' ');
   const name = MONTHS[Number(month.slice(5, 7)) - 1];
-  const hit = new RegExp(
-    `IPC,? sit[uú]a su variaci[oó]n anual en el ([−–-]?\\d+,\\d)\\s?% en ${name}`,
-    'i',
-  ).exec(text);
+  const hit =
+    new RegExp(
+      `IPC,? sit[uú]a su variaci[oó]n anual en el ([−–-]?\\d+,\\d)\\s?% en ${name}`,
+      'i',
+    ).exec(text) ??
+    new RegExp(
+      `inflaci[oó]n anual estimada del IPC en ${name} de ${month.slice(0, 4)} es del ([−–-]?\\d+,\\d)\\s?%`,
+      'i',
+    ).exec(text);
   return hit ? Number(hit[1].replace(/[−–]/, '-').replace(',', '.')) : null;
 }
 
