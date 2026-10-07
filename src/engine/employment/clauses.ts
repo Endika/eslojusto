@@ -5,8 +5,17 @@ import type { NormTable } from './norms';
 import { assessAcross, worldsOf } from './readings';
 import type { EmploymentRuleId } from './rules';
 import { WEEKS_PER_YEAR } from './term';
-import { assessOvertimePact } from './working-time';
-import type { Assessed, Clause, ClauseLabel, EmploymentInput, Finding, Salary } from './types';
+import { overtimePactRule } from './working-time';
+import type {
+  Assessed,
+  Clause,
+  ClauseLabel,
+  EmploymentInput,
+  Finding,
+  FindingId,
+  ItemId,
+  Salary,
+} from './types';
 
 // Art. 21.2 ET: a non-compete pact lasts at most two years for technicians and six months for
 // everyone else. Art. 21.4 ET: a staying commitment, two years at most.
@@ -22,8 +31,10 @@ export interface ClauseAssessment {
   // Position in `clauses`, to show the clause's own words next to its finding.
   readonly index: number;
   readonly label: ClauseLabel;
-  // Null for a clause listed with its words and no verdict.
+  // Null for a clause listed with its words and no verdict, or checked under another item.
   readonly assessed: Assessed | null;
+  // The finding of another item that already checks this clause, such as the overtime pact.
+  readonly checkedIn: { readonly item: ItemId; readonly id: FindingId } | null;
 }
 
 const finding = findingsFor('clauses');
@@ -220,10 +231,10 @@ function assessClause(input: EmploymentInput, clause: Clause, norms: NormTable):
     case 'waiver':
       return single(waiver(clause, norms));
     case 'mandatory_overtime':
-      return (
-        assessOvertimePact(input, norms) ??
-        single(reviewIt('overtime_cap_80', 'clauses.overtime_hours_unknown', norms))
-      );
+      // With the hours entered, the working time already checks the pact.
+      return overtimePactRule(input) === null
+        ? single(reviewIt('overtime_cap_80', 'clauses.overtime_hours_unknown', norms))
+        : null;
     case 'overtime_included':
       return single(overtimeIncluded(input, norms));
     case 'remote_work_costs':
@@ -231,6 +242,12 @@ function assessClause(input: EmploymentInput, clause: Clause, norms: NormTable):
     case 'other':
       return null;
   }
+}
+
+function checkedIn(input: EmploymentInput, clause: Clause): ClauseAssessment['checkedIn'] {
+  if (clause.label !== 'mandatory_overtime') return null;
+  const id = overtimePactRule(input);
+  return id === null ? null : { item: 'working_time', id };
 }
 
 export function assessClauses(
@@ -241,5 +258,6 @@ export function assessClauses(
     index,
     label: clause.label,
     assessed: assessClause(input, clause, norms),
+    checkedIn: checkedIn(input, clause),
   }));
 }

@@ -161,6 +161,7 @@ type WorkingTimePhraseKey =
   | 'working_time.overtime_not_allowed'
   | 'working_time.overtime_as_needed'
   | 'working_time.overtime_hours'
+  | 'working_time.overtime_rest_not_counted'
   | 'working_time.time_record';
 
 type PartTimePhraseKey =
