@@ -1,4 +1,5 @@
 import type { CivilDate } from '../engine/date';
+import type { Review } from '../engine/review';
 
 // What the person adds to the letter right before downloading it. It lives in the page only: it is
 // never sent, stored or tracked, and a field left empty keeps its line to write by hand.
@@ -21,6 +22,19 @@ export const LETTER_MAX_LENGTH: Record<LetterField, number> = {
   company: 80,
   place: 50,
 };
+
+// With something short, the letter lists it with its figures; with nothing short, it says only
+// that the proposal is received without agreeing to it.
+export const LETTER_KINDS = ['items', 'general'] as const;
+export type LetterKind = (typeof LETTER_KINDS)[number];
+
+export const letterKind = (r: Review): LetterKind =>
+  r.items.some(
+    (i) =>
+      i.item.range !== null && (i.status === 'below_minimum' || i.status === 'deduction_too_high'),
+  )
+    ? 'items'
+    : 'general';
 
 export const NO_DETAILS: LetterDetails = { name: '', id: '', company: '', place: '', date: null };
 

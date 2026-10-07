@@ -417,7 +417,7 @@ describe('the pass offer', () => {
     expect(events.log).toEqual([
       ['passVerified', 'ok'],
       ['downloaded', 'report'],
-      ['downloaded', 'letter', 'none'],
+      ['downloaded', 'letter', 'none', 'items'],
     ]);
   });
 
@@ -440,7 +440,7 @@ describe('the pass offer', () => {
     ]);
     expect(events.log).toEqual([
       ['passVerified', 'ok'],
-      ['downloaded', 'letter', 'some'],
+      ['downloaded', 'letter', 'some', 'items'],
     ]);
   });
 
@@ -473,7 +473,7 @@ describe('the pass offer', () => {
     expect($('[data-letter-glyph-warning]').textContent).toBe(
       'Algunas letras no se pueden escribir en la carta: se deja la línea en blanco para escribirlo a mano.',
     );
-    expect(events.log.at(-1)).toEqual(['downloaded', 'letter', 'some']);
+    expect(events.log.at(-1)).toEqual(['downloaded', 'letter', 'some', 'items']);
   });
 
   it('starting over forgets what was typed for the letter', () => {
@@ -486,12 +486,23 @@ describe('the pass offer', () => {
     expect($<HTMLInputElement>('[data-letter-field="date"]').value).toBe('');
   });
 
-  it('with a pass and nothing short, only the report', () => {
-    const { payment, passes, section } = setUp();
+  it('with a pass and nothing short, the general letter too, and still no offer to pay', async () => {
+    const { payment, passes, section, saved, events } = setUp();
     passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
     payment.show(completed(unfairDismissal, { severance: 41000 }));
+    await flush();
     expect(section.hidden).toBe(false);
-    expect($('[data-letter]').hidden).toBe(true);
+    expect($('[data-pass-buy]').hidden).toBe(true);
+    expect($('[data-letter]').hidden).toBe(false);
+    await click('[data-pass-offer] [data-download="letter"]');
+    expect(saved).toEqual(['eslojusto-recibi-no-conforme.pdf']);
+    expect(events.log.at(-1)).toEqual(['downloaded', 'letter', 'none', 'general']);
+  });
+
+  it('without a pass and nothing short, nothing is offered', () => {
+    const { payment, section } = setUp();
+    payment.show(completed(unfairDismissal, { severance: 41000 }));
+    expect(section.hidden).toBe(true);
   });
 
   it('an expired pass downloads nothing and offers the pass again', async () => {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { letterKind } from '../../src/documents/letter';
 import { letterModel, reportModel, type Block } from '../../src/documents/report';
 import { completed, today, tr, unfairDismissal } from './fixtures';
 
@@ -129,8 +130,27 @@ describe('the letter', () => {
     ]);
     expect(text(blocks)).toContain('En Logroño, a ____ de ____________________ de ________');
   });
+  it('with nothing short, a general letter: received without agreeing, no item listed', () => {
+    const r = completed(unfairDismissal, { severance: 41000 });
+    expect(letterKind(r.review)).toBe('general');
+    expect(letterKind(completed().review)).toBe('items');
+    const blocks = letterModel(r, tr).blocks;
+    expect(blocks.filter((b) => b.type === 'bullet')).toEqual([]);
+    const all = text(blocks);
+    expect(all).toContain(
+      'He recibido la propuesta de liquidación (finiquito) por el fin de mi contrato, con fecha de baja el 15-09-2026, y hago constar que la recibo sin mostrar mi conformidad con su contenido.',
+    );
+    expect(all).toContain(
+      'Este recibí deja constancia de que he recibido el documento, no de que esté de acuerdo con sus cantidades.',
+    );
+    expect(all).toContain('En ____________________, a ____ de ____________________ de ________');
+    expect(all).not.toContain('hago constar que no estoy conforme con estas cantidades');
+  });
   it('gives no advice and asks for nothing', () => {
-    const all = text(letterModel(completed(), tr).blocks).toLowerCase();
+    const all = [completed(), completed(unfairDismissal, { severance: 41000 })]
+      .map((r) => text(letterModel(r, tr).blocks))
+      .join('\n')
+      .toLowerCase();
     for (const word of [/\bfirma/, /\breclam/, /\bdemand/, /está bien/, /es correcto/])
       expect(all).not.toMatch(word);
   });

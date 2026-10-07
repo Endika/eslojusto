@@ -1,10 +1,10 @@
 import type { CompletedReview } from '../calculator/ports';
 import type { ErrorCode, MediaType, PageKind } from './contract';
 import type { filesBucket } from './files';
-import type { LetterDetails, LetterField, LetterPrefilled } from './letter';
+import type { LetterDetails, LetterField, LetterKind, LetterPrefilled } from './letter';
 
 export { ERROR_CODES, PAGE_KINDS } from './contract';
-export { LETTER_PREFILLED } from './letter';
+export { LETTER_KINDS, LETTER_PREFILLED } from './letter';
 export type { ErrorCode, PageKind } from './contract';
 
 export type FilesBucket = ReturnType<typeof filesBucket>;
@@ -37,7 +37,7 @@ export interface DocumentEvents {
   passFailed(code: ErrorCode): void;
   passVerified(result: PassVerifyResult): void;
   // For the letter, how many of its optional fields were filled; never what they say.
-  downloaded(document: Download, letterPrefilled?: LetterPrefilled): void;
+  downloaded(document: Download, letterPrefilled?: LetterPrefilled, letterKind?: LetterKind): void;
 }
 
 // localStorage or sessionStorage; a store that throws or is missing behaves as empty.

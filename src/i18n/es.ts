@@ -331,7 +331,7 @@ export const es = {
     'Más abajo puedes poner tu nombre y otros datos en la carta y descargarla otra vez.',
   'documents.pass.verify_retry': 'Comprobar otra vez',
   'documents.pass.letter_note':
-    'La carta es una plantilla con tus cifras. Usarla o no, y cómo, es decisión tuya.',
+    'La carta es una plantilla: si falta algo, lleva tus cifras. Usarla o no, y cómo, es decisión tuya.',
 
   'faq.pass': '¿Qué incluye el pase de 4,99 €?',
   'faq.pass_answer':
@@ -785,11 +785,8 @@ export const es = {
     'Este pase ya no vale porque su pago se devolvió o se anuló, y se ha quitado de este navegador.',
   'client.documents.notice.full':
     'Descarga ahora tu informe y tu carta y guárdalos: no guardamos tu revisión en ningún sitio. Durante 7 días, en este navegador, puedes corregir tus datos y volver a descargarlos sin pagar otra vez.',
-  'client.documents.notice.full_report':
-    'Descarga ahora tu informe y guárdalo: no guardamos tu revisión en ningún sitio. Durante 7 días, en este navegador, puedes corregir tus datos y volver a descargarlo sin pagar otra vez.',
   'client.documents.notice.done':
     'Informe y carta descargados. Guárdalos: no guardamos tu revisión.',
-  'client.documents.notice.done_report': 'Informe descargado. Guárdalo: no guardamos tu revisión.',
   'client.documents.pass.lost':
     'Hemos vuelto del pago, pero la revisión no se ha podido recuperar. Repítela y aparecerán las descargas.',
 
@@ -835,6 +832,8 @@ export const es = {
   'client.documents.letter.company': 'Empresa',
   'client.documents.letter.body':
     'He recibido la propuesta de liquidación (finiquito) por el fin de mi contrato, con fecha de baja el {fecha}, y hago constar que no estoy conforme con estas cantidades:',
+  'client.documents.letter.body_general':
+    'He recibido la propuesta de liquidación (finiquito) por el fin de mi contrato, con fecha de baja el {fecha}, y hago constar que la recibo sin mostrar mi conformidad con su contenido.',
   'client.documents.letter.credit':
     '{partida}: la propuesta recoge {empresa} y el mínimo legal es {minimo}; faltan {diferencia}.',
   'client.documents.letter.deduction':

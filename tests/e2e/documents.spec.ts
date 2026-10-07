@@ -356,6 +356,48 @@ async function confirmToResult(page: Page) {
   );
 }
 
+test('a pass holder with nothing short gets the general letter, and no offer to pay', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page);
+  await page.goto('finiquito/');
+  await uploadSettlement(page);
+  await page.getByRole('button', { name: 'Revisar los datos' }).click();
+  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  await next();
+  await next();
+  await page.locator('#prorated-yes').check();
+  await next();
+  await next();
+  await page.getByLabel('Disfrutados este año').fill('0');
+  await next();
+  await page.getByLabel('Ninguno').check();
+  await next();
+  await next();
+  // The severance the review asks for: nothing falls short.
+  await page.getByLabel('Indemnización').fill('40.438,41');
+  await page.evaluate(
+    (pass) => localStorage.setItem('eslojusto-pase', pass),
+    JSON.stringify({ token: PASS, expiresAt, readsLeft: 15 }),
+  );
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  await expect(page.getByRole('region', { name: 'Indemnización' })).toContainText(
+    'Coincide con el mínimo legal',
+  );
+  const offer = page.getByRole('region', { name: /Informe en PDF/ });
+  await expect(offer.getByRole('button', { name: 'Pagar 4,99 €' })).toBeHidden();
+  const download = page.waitForEvent('download');
+  await offer.getByRole('button', { name: 'Descargar la carta (PDF)' }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toBe('eslojusto-recibi-no-conforme.pdf');
+  expect(
+    readFileSync(await file.path())
+      .subarray(0, 8)
+      .toString('latin1'),
+  ).toBe('%PDF-1.7');
+  expect(fake.verify).toHaveLength(1);
+});
+
 test('cancelling at Stripe brings the review back and keeps nothing in the tab', async ({
   page,
 }) => {
