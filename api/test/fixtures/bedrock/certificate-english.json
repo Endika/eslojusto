@@ -2,7 +2,7 @@
   "id": "msg_bdrk_01FICTITIOUS",
   "type": "message",
   "role": "assistant",
-  "model": "claude-haiku-4-5-20251001",
+  "model": "claude-sonnet-4-6",
   "content": [
     {
       "type": "tool_use",
@@ -12,8 +12,18 @@
         "pages": [
           {
             "page": 1,
-            "kind": "settlement_proposal",
+            "kind": "company_certificate",
             "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "work_history",
+            "document": 2,
             "readability": {
               "value": "ok",
               "confidence": "high"
@@ -21,13 +31,13 @@
             "confidence": "high"
           }
         ],
-        "settlement_proposal": {
+        "company_certificate": {
           "startDate": {
-            "value": "2022-03-01",
+            "value": "2023-01-09",
             "confidence": "high"
           },
           "endDate": {
-            "value": "2026-09-15",
+            "value": "2026-08-31",
             "confidence": "high"
           },
           "cause": {
@@ -36,24 +46,17 @@
           },
           "fixedTermType": {
             "value": "production_circumstances",
-            "confidence": "medium"
-          },
-          "pending_salary": {
-            "value": 1250,
-            "confidence": "high"
-          },
-          "holiday_pay": {
-            "value": 640.5,
-            "confidence": "high"
-          },
-          "extra_pay": {
-            "value": 980,
-            "confidence": "high"
-          },
-          "totalGross": {
-            "value": 2870.5,
             "confidence": "high"
           }
+        },
+        "work_history": {
+          "contracts": [
+            {
+              "startDate": "2023-01-09",
+              "endDate": "2026-08-31",
+              "confidence": "high"
+            }
+          ]
         }
       }
     }
@@ -61,7 +64,7 @@
   "stop_reason": "tool_use",
   "stop_sequence": null,
   "usage": {
-    "input_tokens": 6120,
-    "output_tokens": 410
+    "input_tokens": 6300,
+    "output_tokens": 480
   }
 }

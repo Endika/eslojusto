@@ -11,7 +11,12 @@ export type Recording =
   | 'injected'
   | 'max-tokens'
   | 'refusal'
-  | 'text-only';
+  | 'text-only'
+  | 'payslip-catalan'
+  | 'liquidation-basque'
+  | 'settlement-galician'
+  | 'certificate-english'
+  | 'unreadable';
 
 export const recording = (name: Recording): string =>
   readFileSync(new URL(`../fixtures/bedrock/${name}.json`, import.meta.url), 'utf8');

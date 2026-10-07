@@ -1,4 +1,5 @@
 import type { DocumentFile } from './documents';
+import type { Readability } from './extraction-schema';
 import type { ResultCode } from './results';
 
 export interface ModelRead {
@@ -52,6 +53,8 @@ export interface LogEvent {
   readonly underestimated?: boolean;
   // A pass read went through but Stripe did not store its count.
   readonly countNotSaved?: boolean;
+  // Pages per readability, when a read set any aside or found nothing: counts, never content.
+  readonly readability?: Readonly<Partial<Record<Readability, number>>>;
   // A `pass` request that verified a pass rather than issued one.
   readonly verify?: boolean;
 }

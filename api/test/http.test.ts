@@ -182,6 +182,36 @@ describe('handleExtract', () => {
   });
 });
 
+describe('a read that found nothing', () => {
+  it('answers with each page’s reason and no values, and logs only the counts', async () => {
+    const { deps, logger } = extractDeps({
+      pages: [page(1, 'payslip', 1, 'high', undefined, 'blurry'), page(2, 'other')],
+    });
+    const response = await handleExtract(
+      post(
+        extractBody({
+          files: [
+            { mediaType: 'image/jpeg', data: b64(jpeg(1000, 1400)) },
+            { mediaType: 'image/jpeg', data: b64(jpeg(1000, 1400)) },
+          ],
+        }),
+      ),
+      deps,
+    );
+    expect(response.statusCode).toBe(422);
+    expect(json(response)).toEqual({
+      code: 'nothing_read',
+      pages: [
+        { page: 1, kind: 'payslip', readability: f('blurry') },
+        { page: 2, kind: 'other', readability: f('ok') },
+      ],
+    });
+    expect(logger.events).toEqual([
+      expect.objectContaining({ code: 'nothing_read', readability: { blurry: 1, ok: 1 } }),
+    ]);
+  });
+});
+
 describe('flags in the log line', () => {
   it('marks a pass read whose count Stripe failed to store, with nothing about the person', async () => {
     const { deps, logger } = extractDeps();
@@ -308,6 +338,7 @@ describe('logs', () => {
       'outputTokens',
       'escalated',
       'conflicts',
+      'readability',
       'verify',
     ];
     for (const line of lines) {

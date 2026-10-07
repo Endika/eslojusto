@@ -2,7 +2,7 @@
   "id": "msg_bdrk_01FICTITIOUS",
   "type": "message",
   "role": "assistant",
-  "model": "claude-haiku-4-5-20251001",
+  "model": "claude-sonnet-4-6",
   "content": [
     {
       "type": "tool_use",
@@ -14,56 +14,48 @@
             "page": 1,
             "kind": "payslip",
             "document": 1,
+            "month": "2026-09",
             "readability": {
               "value": "ok",
               "confidence": "high"
             },
-            "confidence": "high",
-            "month": "2026-08"
+            "confidence": "high"
           }
         ],
-        "monthly_payslip": {
+        "final_payslip": {
           "periodStart": {
-            "value": "2026-08-01",
+            "value": "2026-09-01",
             "confidence": "high"
           },
           "periodEnd": {
-            "value": "2026-08-31",
+            "value": "2026-09-15",
             "confidence": "high"
           },
           "startDate": {
-            "value": "2022-03-01",
+            "value": "2020-05-04",
             "confidence": "high"
           },
           "totalAccrued": {
-            "value": 1980,
-            "confidence": "high"
-          },
-          "extraPayProrated": {
-            "value": true,
-            "confidence": "high"
-          },
-          "extraPayProratedAmount": {
-            "value": 280,
+            "value": 2390,
             "confidence": "high"
           },
           "lines": [
             {
-              "concept": "SALARIO BASE",
-              "amount": 1500,
+              "concept": "OINARRIZKO SOLDATA",
+              "amount": 800,
               "category": "salary",
               "confidence": "high"
             },
             {
-              "concept": "PLUS CONVENIO",
-              "amount": 200,
-              "category": "salary",
+              "concept": "GOZATU GABEKO OPORRAK",
+              "amount": 540,
+              "category": "holiday_pay",
               "confidence": "high"
             },
             {
-              "concept": "PP PAGAS EXTRAS",
-              "amount": 280,
-              "category": "salary",
+              "concept": "KALERATZE-KALTE-ORDAINA",
+              "amount": 1050,
+              "category": "severance",
               "confidence": "high"
             }
           ]
@@ -74,7 +66,7 @@
   "stop_reason": "tool_use",
   "stop_sequence": null,
   "usage": {
-    "input_tokens": 6120,
-    "output_tokens": 410
+    "input_tokens": 3900,
+    "output_tokens": 560
   }
 }

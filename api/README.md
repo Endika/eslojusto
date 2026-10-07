@@ -10,7 +10,8 @@ Three Lambda functions in **eu-south-2** behind function URLs:
 
 Nothing is stored: documents live in the invocation's memory, the server keeps no state, and
 logs carry only `op`, `code`, `latencyMs`, `pages`, `inputTokens`, `outputTokens`,
-`escalated`, `conflicts` (how many fields two documents stated differently) and two flags (`test/http.test.ts` proves it): `underestimated` when Bedrock
+`escalated`, `conflicts` (how many fields two documents stated differently), `readability` (how
+many pages had each readability, only when a read set a page aside or found nothing) and two flags (`test/http.test.ts` proves it): `underestimated` when Bedrock
 counted more than twice the input the pre-read estimate allowed for, and `countNotSaved` when
 a pass read went through but Stripe did not store its count; `verify` marks a `pass` request that
 verified a pass. The manual calculator never calls this API.
@@ -44,13 +45,30 @@ any order: JPEG/WebP with the long side at most `MAX_IMAGE_LONG_SIDE`
 (`src/domain/image-limit.ts`, 1568 px, checked from the image header). The browser renders a
 PDF's pages to images with pdf.js before sending, so the API never parses a PDF and a read's
 cost depends only on pixels it can measure; `application/pdf` is answered with
-`unsupported_media_type`. One read is one free read or one pass read, whatever it holds. Codes:
+`unsupported_media_type`. One read that answers `ok` is one free read or one pass read, whatever it holds. Codes:
 `too_many_files` (16 images), `image_unreadable`, `image_too_large`, `document_too_dense`
 (a guard: no accepted pack reaches it).
 `model_unavailable` (every model call failed, as when the budget action denies Bedrock) spends
 neither a free read nor a pass read; the site then offers only the manual path for an hour.
 `pass_unconfirmed` (a valid pass whose session Stripe does not find) reads and counts nothing;
 the site keeps the pass and asks to try again.
+`nothing_read` (422) is a read that yielded no field and no work-history row at all: it carries
+each page's kind and readability, as `ok` lists them, and no values, and, like `model_unavailable`, spends neither a free read
+nor a pass read, because the person got nothing for it. What bounds a run of them is what bounds
+any read: a fresh captcha each time, the per-read cost cap, the reserved concurrency and the
+budget action.
+
+```jsonc
+{
+  "code": "nothing_read",
+  // Every page the model classified; a page it did not is missing.
+  "pages": [
+    { "page": 1, "kind": "payslip", "readability": { "value": "blurry", "confidence": "high" } },
+    // Legible, but with nothing the review uses.
+    { "page": 2, "kind": "other", "readability": { "value": "ok", "confidence": "high" } },
+  ],
+}
+```
 
 **Payload budget.** Lambda takes at most 6 MB per synchronous request, event envelope
 included, and the API refuses a body over 6 MiB. Base64 adds a third, so the browser keeps the
@@ -67,7 +85,15 @@ are too heavy before sending anything.
   "code": "ok",
   "extraction": {
     // Every page the model classified, by number (1-based, in the order sent).
-    "pages": [{ "page": 1, "kind": "dismissal_letter", "document": 1, "confidence": "high" }],
+    "pages": [
+      {
+        "page": 1,
+        "kind": "dismissal_letter",
+        "document": 1,
+        "readability": { "value": "ok", "confidence": "high" },
+        "confidence": "high",
+      },
+    ],
     // Consecutive pages of one document, grouped; `month` only for payslips.
     "documents": [
       { "kind": "dismissal_letter", "pages": [1, 2] },
@@ -95,6 +121,13 @@ are too heavy before sending anything.
 Page kinds: `settlement_proposal`, `payslip`, `dismissal_letter`, `company_certificate`,
 `settlement_agreement`, `work_history`, `other` (for instance an IRPF withholding
 certificate). A field's `source` is any of them but `other`.
+
+Readability (`READABILITY` in `src/domain/extraction-schema.ts`): `ok`, or the main reason a page
+can't be used: `handwritten`, `blurry`, `dark`, `cropped`, `not_labour_document`,
+`foreign_jurisdiction` (an employment document from another country, where Spanish law does not
+apply) or `unknown_format`. Language is never a reason: the prompt names Spanish, Catalan,
+Basque, Galician and English and says so (`test/languages.test.ts`, with hand-written fixtures in
+each of them). An `ok` read can still list pages set aside; the site says which and why.
 
 **`checkout`** `{ "nonce": "<22–64 url-safe random chars, kept in the browser>",
 "captchaToken": "<Turnstile, action 'checkout'>" }` →
@@ -162,9 +195,10 @@ anything up: asked for the salary pending, it had returned the base salary alone
 line, a total with notice in it, or 0. The lines stay inside the API; the response carries only
 the merged fields.
 
-A section counts only if a page of its kind backs it (either payslip section needs a `payslip`
-page); one that does not is dropped and counts as a doubt, so an agreement «read» from a pack
-whose pages are all `other` never reaches the form.
+A section counts only if a readable page of its kind backs it (either payslip section needs a
+`payslip` page whose readability is `ok`); one that does not is dropped and counts as a doubt, so
+an agreement «read» from a pack whose pages are all `other`, or from a page set aside as blurry,
+never reaches the form.
 
 A losing value that is less than sure of itself (`medium` or `low`) is no conflict: it is dropped
 and counts as a doubt, so a stray amount the model copied without conviction never shows the
@@ -215,6 +249,8 @@ domain, adapters never reach `http/` or `handlers/`, and the infrastructure read
   with `tool_choice` where the model allows it: the kind and document number of every page,
   then one optional section per kind of document. A fixed system prompt treats the documents
   as data, never instructions, and forbids recording union dues, sick leave or third parties.
+  It reads documents in Spanish, Catalan, Basque, Galician or English, gives every page a
+  readability, and records nothing from a page it sets aside.
   The person's request contributes only the image bytes; the request numbers each image as a
   page before it («Page 3:»).
 - The output is validated in the domain (hand-written, because the domain imports nothing):
@@ -228,8 +264,9 @@ domain, adapters never reach `http/` or `handlers/`, and the infrastructure read
   payslip present but no settlement figure and no salary line read; payslip lines without
   `extraPayProrated`; or any page set aside as `other` in a pack with a dismissal letter,
   no settlement and no final payslip beside it (a cheap re-check, since that page may be the
-  settlement itself; an IRPF certificate beside a complete pack triggers nothing). Same path with or without a pass. Equal constants mean no escalation. A pack with
-  nothing useful in it is an answer: `ok` with its pages as `other` and no fields.
+  settlement itself; an IRPF certificate beside a complete pack triggers nothing). Only readable
+  pages count here: a stronger model can't fix a blurry photo. Same path with or without a pass. Equal constants mean no escalation. A pack with
+  nothing useful in it is an answer: `nothing_read`, with each page's readability.
 - **Provider errors.** Every Bedrock error throws, a `ValidationException` included: the request
   is fixed, so it means a retired, disabled or misconfigured model, never a bad document. A
   failed primary read goes to the escalation model; if that fails too, the answer is
@@ -267,10 +304,10 @@ Cheapest first, and nothing that parses what the person sent runs before the cap
 
 - **The input is known before any call.** Every image is priced by its pixels, at
   w × h / 750 tokens (Anthropic's formula) or one per 28 × 28 patch if that is more, and the
-  prompt and schema at 13,000 (about 24,500 characters at two per token;
+  prompt and schema at 14,000 (about 27,000 characters at two per token;
   `test/tokens.test.ts` keeps it honest). Bedrock's CountTokens does not serve Claude models
   offered only through cross-Region profiles, so this is computed, not asked. The largest pack
-  the API accepts, fifteen 1568 × 1568 images, comes to 13,000 + 15 × 3,279 = 62,185; above
+  the API accepts, fifteen 1568 × 1568 images, comes to 14,000 + 15 × 3,279 = 63,185; above
   **65,000** the answer would be `document_too_dense`. Nothing in an image can add tokens
   beyond its pixels, which is why PDFs are rendered in the browser instead of read here: a PDF
   can hide text from any measure short of a full reader.
@@ -461,16 +498,16 @@ million input / output tokens (EU profile); Haiku 4.5, if it reads first again, 
 
 | Read, Sonnet 4.6 alone                    | Input tokens    | Output tokens        | Cost                         |
 | ----------------------------------------- | --------------- | -------------------- | ---------------------------- |
-| Typical, 8 photos                         | ~20,000         | ~1,500               | 0.066 + 0.025 = **0.09 USD** |
-| Full pack, 15 photos                      | ~31,000         | ~2,000               | 0.102 + 0.033 = **0.13 USD** |
-| Largest pack accepted, 15 × 1568 × 1568   | 62,185          | 5,000 (`max_tokens`) | 0.205 + 0.083 = **0.29 USD** |
+| Typical, 8 photos                         | ~21,000         | ~1,500               | 0.069 + 0.025 = **0.09 USD** |
+| Full pack, 15 photos                      | ~32,000         | ~2,000               | 0.106 + 0.033 = **0.14 USD** |
+| Largest pack accepted, 15 × 1568 × 1568   | 63,185          | 5,000 (`max_tokens`) | 0.209 + 0.083 = **0.29 USD** |
 | Were Haiku to read first: worst escalated | 43,000 + 43,000 | 5,000 + 5,000        | 0.075 + 0.225 = 0.30 USD     |
 
 "Typical" counts 1,600 tokens per photo, as if Claude scales them down (above), plus about
-7,500 for the prompt and schema; were every pixel billed, 15 phone photos (1568 × 1176) would
-be about 44,400 in, 0.18 USD.
+8,000 for the prompt and schema; were every pixel billed, 15 phone photos (1568 × 1176) would
+be about 44,900 in, 0.18 USD.
 
-**Worst case: 0.29 USD per read** (62,185 × 3.30 USD/M + 5,000 × 16.50 USD/M = 0.288), for any
+**Worst case: 0.29 USD per read** (63,185 × 3.30 USD/M + 5,000 × 16.50 USD/M = 0.291), for any
 input: the API takes images only, priced by their pixels, and refuses anything above 65,000
 estimated tokens (0.30 USD) before a call. A PDF never reaches it; the browser renders its pages
 to images of the same size as a photo. Should Bedrock still bill more than twice the estimate,
@@ -493,6 +530,8 @@ run at once, and the budget action caps the month.
 - The dashboard's Live Tail link: the console's URL format is undocumented, so it may open
   Live Tail without the log groups selected. The `SEARCH` and cost expressions and the Logs
   Insights queries were checked against real data with read-only calls.
+- Whether the models set pages aside as the readability list intends, and how often a page in
+  Catalan, Basque, Galician or English is read: the language fixtures are hand-written.
 - The real latency of an escalated read of a 15-page pack (the 180 s timeout is a guess), and
   whether Bedrock bills a 1568-px photo at about 1,600 tokens, as Anthropic's resizing
   suggests, or at its full 2,459.

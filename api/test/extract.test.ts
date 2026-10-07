@@ -189,12 +189,12 @@ describe('extract', () => {
   });
 
   it('flags a read that cost more than twice its estimate', async () => {
-    // One 1176 × 1568 photo: 13,000 + 1176 × 1568 / 750 = 15,459 estimated tokens.
-    const fooled = setup({ [PRIMARY]: read(coherentSettlement(), 30_919) });
+    // One 1176 × 1568 photo: 14,000 + 1176 × 1568 / 750 = 16,459 estimated tokens.
+    const fooled = setup({ [PRIMARY]: read(coherentSettlement(), 32_919) });
     const metrics: ExtractMetrics = {};
     await extract(request(), fooled.deps, metrics);
     expect(metrics.underestimated).toBe(true);
-    const honest = setup({ [PRIMARY]: read(coherentSettlement(), 30_918) });
+    const honest = setup({ [PRIMARY]: read(coherentSettlement(), 32_918) });
     const fine: ExtractMetrics = {};
     await extract(request(), honest.deps, fine);
     expect(fine.underestimated).toBeUndefined();
@@ -228,14 +228,16 @@ describe('extract', () => {
     expect(await extract(request(), deps, {})).toEqual({ code: 'model_unavailable' });
   });
 
-  it('answers a pack with nothing useful in it without escalating', async () => {
+  it('answers nothing_read for a pack with nothing useful in it, without escalating', async () => {
     const { reader, deps } = setup({ [PRIMARY]: read({ pages: [page(1, 'other')] }) });
-    const response = await extract(request(), deps, {});
-    expect(response).toMatchObject({
-      code: 'ok',
-      extraction: { documents: [{ kind: 'other', pages: [1] }], fields: {}, conflicts: [] },
+    const metrics: ExtractMetrics = {};
+    const response = await extract(request(), deps, metrics);
+    expect(response).toEqual({
+      code: 'nothing_read',
+      pages: [{ page: 1, kind: 'other', readability: f('ok') }],
     });
     expect(reader.calls).toHaveLength(1);
+    expect(metrics.readability).toEqual({ ok: 1 });
   });
 
   it.each([
@@ -245,7 +247,10 @@ describe('extract', () => {
     ],
     [
       'a final payslip without salary lines or items',
-      { pages: [page(1, 'payslip')], final_payslip: { periodStart: f('2026-09-01') } },
+      {
+        pages: [page(1, 'payslip')],
+        final_payslip: { periodStart: f('2026-09-01'), startDate: f('2022-03-01') },
+      },
     ],
     [
       'payslip lines without saying whether extra pay is prorated',
@@ -322,7 +327,7 @@ describe('extract', () => {
     });
     const metrics: ExtractMetrics = {};
     expect((await extract(request({ files: [photo, photo, photo] }), deps, metrics)).code).toBe(
-      'ok',
+      'nothing_read',
     );
     expect(reader.calls[0]?.files).toHaveLength(3);
     expect(metrics.pages).toBe(3);
@@ -403,6 +408,55 @@ describe('extract', () => {
     if (next.code !== 'ok' || !next.allowanceToken) throw new Error(next.code);
     expect(signer.verify(next.allowanceToken)).toMatchObject({ used: 2 });
   });
+
+  it('spends no free read on a read that found nothing, and says why page by page', async () => {
+    const unread = {
+      pages: [
+        page(1, 'payslip', 1, 'high', undefined, 'blurry'),
+        page(2, 'other', 2, 'high', undefined, 'foreign_jurisdiction'),
+      ],
+    };
+    const { deps } = setup({ [PRIMARY]: read(unread) });
+    const token = signer.sign({ typ: 'quota', day: '2026-10-07', used: 1 });
+    const allowance = { type: 'free' as const, token };
+    const metrics: ExtractMetrics = {};
+    expect(await extract(request({ files: [photo, photo], allowance }), deps, metrics)).toEqual({
+      code: 'nothing_read',
+      pages: [
+        { page: 1, kind: 'payslip', readability: f('blurry') },
+        { page: 2, kind: 'other', readability: f('foreign_jurisdiction') },
+      ],
+    });
+    expect(metrics.readability).toEqual({ blurry: 1, foreign_jurisdiction: 1 });
+    const back = setup({ [PRIMARY]: read(coherentSettlement()) });
+    const next = await extract(request({ allowance }), back.deps, {});
+    if (next.code !== 'ok' || !next.allowanceToken) throw new Error(next.code);
+    expect(signer.verify(next.allowanceToken)).toMatchObject({ used: 2 });
+  });
+
+  it('reads the rest of a pack and keeps why a page was set aside', async () => {
+    const input = {
+      ...coherentSettlement(),
+      pages: [
+        page(1, 'settlement_proposal'),
+        page(2, 'payslip', 2, 'high', undefined, 'handwritten'),
+      ],
+    };
+    const { deps } = setup({ [PRIMARY]: read(input) });
+    const metrics: ExtractMetrics = {};
+    const response = await extract(request({ files: [photo, photo] }), deps, metrics);
+    expect(response).toMatchObject({
+      code: 'ok',
+      extraction: {
+        pages: [
+          { page: 1, readability: { value: 'ok', confidence: 'high' } },
+          { page: 2, readability: { value: 'handwritten', confidence: 'high' } },
+        ],
+        fields: { holiday_pay: { value: 640.5 } },
+      },
+    });
+    expect(metrics.readability).toEqual({ ok: 1, handwritten: 1 });
+  });
 });
 
 describe('extract with a pass', () => {
@@ -473,6 +527,23 @@ describe('extract with a pass', () => {
     expect(
       await extract(request({ allowance: { type: 'pass', token: passToken() } }), deps, {}),
     ).toEqual({ code: 'model_unavailable' });
+    expect(payments.recorded).toEqual([]);
+  });
+
+  it('does not spend a pass read when nothing was read', async () => {
+    const { payments, deps } = setup(
+      { [PRIMARY]: read({ pages: [page(1, 'other', 1, 'high', undefined, 'dark')] }) },
+      { sessions: { cs_test_paid: paidSession({ readsUsed: 3 }) } },
+    );
+    const response = await extract(
+      request({ allowance: { type: 'pass', token: passToken() } }),
+      deps,
+      {},
+    );
+    expect(response).toEqual({
+      code: 'nothing_read',
+      pages: [{ page: 1, kind: 'other', readability: f('dark') }],
+    });
     expect(payments.recorded).toEqual([]);
   });
 
@@ -569,6 +640,27 @@ describe('extract with recorded Bedrock responses', () => {
     ]);
     expect(metrics).toMatchObject({ pages: 5, escalated: false, conflicts: 1 });
     expect(requests.map((r) => r.modelId)).toEqual([HAIKU_4_5]);
+  });
+
+  it('answers nothing_read when every page is set aside', async () => {
+    const { reader } = recordedReader({ [HAIKU_4_5]: 'unreadable', [SONNET_4_6]: 'unreadable' });
+    const response = await extract(
+      {
+        files: [photo, photo, photo],
+        captchaToken: 'turnstile-token',
+        allowance: { type: 'free', token: null },
+      },
+      base(reader),
+      {},
+    );
+    expect(response).toEqual({
+      code: 'nothing_read',
+      pages: [
+        { page: 1, kind: 'payslip', readability: f('blurry') },
+        { page: 2, kind: 'other', readability: f('handwritten') },
+        { page: 3, kind: 'other', readability: f('foreign_jurisdiction') },
+      ],
+    });
   });
 
   it('ignores whatever an injected document made the model add', async () => {

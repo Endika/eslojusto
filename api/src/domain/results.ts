@@ -18,6 +18,7 @@ export type ResultCode =
   | 'pass_revoked'
   | 'pass_unconfirmed'
   | 'document_unreadable'
+  | 'nothing_read'
   | 'model_unavailable'
   | 'session_not_found'
   | 'session_mismatch'
@@ -26,4 +27,4 @@ export type ResultCode =
   | 'payment_provider_unavailable'
   | 'service_unavailable';
 
-export type ErrorCode = Exclude<ResultCode, 'ok'>;
+export type ErrorCode = Exclude<ResultCode, 'ok' | 'nothing_read'>;

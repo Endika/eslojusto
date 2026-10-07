@@ -9,11 +9,13 @@ import { checkFileShapes, imageSizes, type DocumentFile } from './documents';
 import {
   failedChecks,
   hasLowConfidence,
+  isReadable,
   parseReading,
   type CoherenceCheck,
+  type PageReading,
   type Reading,
 } from './extraction';
-import { ITEM_IDS } from './extraction-schema';
+import { ITEM_IDS, type Readability } from './extraction-schema';
 import { merge, type Merged } from './merge';
 import type {
   CaptchaVerifier,
@@ -62,7 +64,15 @@ export type ExtractResponse =
       readonly allowanceToken?: string;
       readonly readsLeft?: number;
     }
+  | {
+      // The read found nothing to fill the form with: why, page by page, and no values.
+      readonly code: 'nothing_read';
+      readonly pages: readonly UnreadPage[];
+    }
   | { readonly code: ErrorCode };
+
+// A page as `ok` lists it, without its month: nothing_read carries no value from a document.
+export type UnreadPage = Pick<PageReading, 'page' | 'kind' | 'readability'>;
 
 export interface ExtractMetrics {
   pages?: number;
@@ -72,6 +82,8 @@ export interface ExtractMetrics {
   conflicts?: number;
   underestimated?: boolean;
   countNotSaved?: boolean;
+  // How many pages had each readability, when any page could not be read or nothing was.
+  readability?: Partial<Record<Readability, number>>;
 }
 
 interface Assessment {
@@ -83,7 +95,8 @@ interface Assessment {
 
 // What a pack about the end of a job should have yielded and did not: worth a second look.
 function incomplete(reading: Reading, extraction: Merged): boolean {
-  const kinds = new Set(reading.pages.map((p) => p.kind));
+  // A page set aside as unreadable is no gap a second read could fill.
+  const kinds = new Set(reading.pages.filter(isReadable).map((p) => p.kind));
   const final = reading.sections.final_payslip;
   const salaryLines = (final?.lists['lines'] ?? []).some((l) => l.values['category'] === 'salary');
   const figures = ITEM_IDS.some((id) => extraction.fields[id] !== undefined);
@@ -129,6 +142,16 @@ function measure(files: readonly DocumentFile[]): number | ErrorCode {
   if (typeof sizes === 'string') return sizes;
   const tokens = PROMPT_TOKENS + sizes.reduce((sum, size) => sum + imageTokens(size), 0);
   return tokens > MAX_ESTIMATED_INPUT_TOKENS ? 'document_too_dense' : tokens;
+}
+
+const hasUsableValue = (e: Merged): boolean =>
+  Object.keys(e.fields).length > 0 || (e.lists.contracts?.length ?? 0) > 0;
+
+function readabilityCounts(pages: readonly PageReading[]): Partial<Record<Readability, number>> {
+  const counts: Partial<Record<Readability, number>> = {};
+  for (const { readability } of pages)
+    counts[readability.value] = (counts[readability.value] ?? 0) + 1;
+  return counts;
 }
 
 export async function extract(
@@ -207,6 +230,17 @@ export async function extract(
 
   if (result === null) return { code: 'model_unavailable' };
   if (result.noOutput) return { code: 'document_unreadable' };
+
+  const { pages } = result.extraction;
+  const usable = hasUsableValue(result.extraction);
+  if (!usable || !pages.every(isReadable)) metrics.readability = readabilityCounts(pages);
+  // Like model_unavailable, it spends neither a free read nor a pass read: the person got
+  // nothing, and the captcha, the per-read cost bound and the budget cap a run of them.
+  if (!usable)
+    return {
+      code: 'nothing_read',
+      pages: pages.map(({ page, kind, readability }) => ({ page, kind, readability })),
+    };
 
   // A count, never which values: the log carries nothing a document said.
   metrics.conflicts = result.extraction.conflicts.length;

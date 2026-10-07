@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { PAGE_KINDS } from '../src/domain/documents';
-import { SECTION_KINDS, SECTIONS, toolInputSchema } from '../src/domain/extraction-schema';
+import {
+  READABILITY,
+  SECTION_KINDS,
+  SECTIONS,
+  toolInputSchema,
+} from '../src/domain/extraction-schema';
 
 function objects(node: unknown, found: Record<string, unknown>[] = []): Record<string, unknown>[] {
   if (Array.isArray(node)) node.forEach((n) => objects(n, found));
@@ -32,8 +37,32 @@ describe('toolInputSchema', () => {
       'page',
       'kind',
       'document',
+      'readability',
       'confidence',
     ]);
+  });
+
+  it('asks every page why it can’t be read, from a closed list with a confidence', () => {
+    const page = properties(properties(toolInputSchema())['pages']?.['items']);
+    const readability = page['readability'];
+    expect(readability?.['required']).toEqual(['value', 'confidence']);
+    expect(properties(readability)).toMatchObject({
+      value: { enum: READABILITY },
+      confidence: { enum: ['high', 'medium', 'low'] },
+    });
+    expect(READABILITY).toEqual([
+      'ok',
+      'handwritten',
+      'blurry',
+      'dark',
+      'cropped',
+      'not_labour_document',
+      'foreign_jurisdiction',
+      'unknown_format',
+    ]);
+    const description = String(readability?.['description']);
+    for (const reason of READABILITY) expect(description).toMatch(new RegExp(`\\b${reason}\\b`));
+    expect(description).toContain('never because of its language');
   });
 
   it.each(SECTION_KINDS)('lists exactly the %s fields and lists', (kind) => {
