@@ -61,6 +61,7 @@ export function handleExtract(
       code: 'ok',
       extraction: response.extraction,
       failedChecks: response.failedChecks,
+      escalated: metrics.escalated ?? false,
       ...(response.allowanceToken !== undefined && { allowance: response.allowanceToken }),
       ...(response.readsLeft !== undefined && { readsLeft: response.readsLeft }),
     };
