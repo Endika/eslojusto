@@ -94,6 +94,20 @@ describe('extract', () => {
         code: 'unexpected_response',
       });
   });
+  it('a 429 or a 5xx without a code means the service is busy or down', async () => {
+    for (const [status, body] of [
+      [429, 'Too Many Requests'],
+      [502, ''],
+      [503, { message: 'Service Unavailable' }],
+    ] as const)
+      expect(
+        await createApi(ENDPOINTS, fakeFetch(status, body)).extract(request),
+        String(status),
+      ).toEqual({
+        ok: false,
+        code: 'service_unavailable',
+      });
+  });
   it('a request the network drops is a network error', async () => {
     const api = createApi(ENDPOINTS, () => Promise.reject(new TypeError('offline')));
     expect(await api.extract(request)).toEqual({ ok: false, code: 'network_error' });

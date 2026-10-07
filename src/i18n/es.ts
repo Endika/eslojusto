@@ -632,7 +632,7 @@ export const es = {
   'client.documents.error.payment_provider_unavailable':
     'El pago no está disponible ahora mismo. Prueba más tarde.',
   'client.documents.error.service_unavailable':
-    'El servicio no está disponible ahora mismo. Prueba más tarde o rellena a mano.',
+    'El servicio está ocupado o no responde ahora mismo. Prueba otra vez en unos minutos o rellena a mano.',
   'client.documents.error.network_error':
     'No hay conexión con el servicio. Comprueba tu conexión y prueba otra vez.',
   'client.documents.error.unexpected_response':
