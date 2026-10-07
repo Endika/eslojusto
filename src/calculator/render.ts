@@ -356,9 +356,14 @@ export function qualifyingText(
 
 export function renderReview(container: HTMLElement, r: Review, tr: Translate): void {
   const items = container.querySelector('[data-items]');
-  const unchecked = container.querySelector('[data-unchecked]');
-  if (!items || !unchecked) throw new Error('Missing the result container');
+  if (!items) throw new Error('Missing the result container');
   items.replaceChildren(...r.items.map((p) => renderItem(container, p, r.unfairReference, tr)));
+  renderUnchecked(container, r, tr);
+}
+
+function renderUnchecked(container: HTMLElement, r: Review, tr: Translate): void {
+  const unchecked = container.querySelector('[data-unchecked]');
+  if (!unchecked) throw new Error('Missing the unchecked list');
   unchecked.replaceChildren(
     ...r.uncheckedCodes.map((code) => {
       const li = document.createElement('li');
@@ -473,9 +478,31 @@ export function renderSummary(
   setText(summary, '[data-summary-benefit]', '').replaceChildren(...summaryBenefit(benefit, tr));
 }
 
-// Locked, the result shows the summary; unlocked, by a pass or in a build without one, the detail.
-export function setDetail(container: ParentNode, locked: boolean): void {
-  const summary = container.querySelector<HTMLElement>('[data-summary]');
+export interface ResultData {
+  readonly review: Review;
+  readonly benefit: BenefitEstimate;
+  readonly cause: Cause;
+  readonly children: Children;
+}
+
+// Locked, only the summary is built: the detail is not in the page at all, not even hidden, so
+// nothing a pass pays for can be read from it. Unlocked (a verified pass, or a build without the
+// pass), the detail is cloned in from its templates and filled.
+export function renderResult(root: HTMLElement, d: ResultData, locked: boolean, tr: Translate) {
+  const summary = root.querySelector<HTMLElement>('[data-summary]');
+  const lead = root.querySelector<HTMLElement>('[data-lead]');
+  if (lead) lead.hidden = locked;
   if (summary) summary.hidden = !locked;
-  for (const el of container.querySelectorAll<HTMLElement>('[data-detail]')) el.hidden = locked;
+  renderUnchecked(root, d.review, tr);
+  const slots = [...root.querySelectorAll<HTMLElement>('[data-slot]')];
+  if (locked) {
+    root.querySelector('[data-items]')?.replaceChildren();
+    for (const slot of slots) slot.replaceChildren();
+    renderSummary(root, d.review, d.benefit, tr);
+    return;
+  }
+  for (const slot of slots) slot.replaceChildren(template(root, slot.dataset['slot'] ?? ''));
+  renderReview(root, d.review, tr);
+  const sheet = root.querySelector<HTMLElement>('[data-benefit]');
+  if (sheet) renderBenefit(sheet, d.benefit, d.cause, d.children, tr);
 }

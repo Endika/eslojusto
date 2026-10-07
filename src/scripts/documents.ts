@@ -9,7 +9,7 @@ import { DOCUMENTS, TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/
 import { fitWithin } from '../documents/files';
 import { canvasJpeg, whiteCanvas } from './jpeg';
 import { createOutageMemory } from '../documents/outage';
-import { canDownload, createPassStore, passState } from '../documents/pass';
+import { createPassStore } from '../documents/pass';
 import { setUpPayment } from '../documents/payment';
 import type {
   Browser,
@@ -197,10 +197,13 @@ export function wireDocuments(
     pdf: () => import('../documents/pdf').then((m) => m.pdfMaker(tr, localToday)),
     keepReview: () => session.set(REVIEW_KEY, JSON.stringify(calculator.entries())),
     today: localToday,
+    // A pass verified or dropped shows the review again, with or without its detail.
+    passChanged: () => {
+      calculator.refreshResult();
+      upload.showAgreementOffer(document);
+    },
   });
-  hooks.detail(() =>
-    canDownload(passState(passes.pass(), browser.now())) ? 'unlocked' : 'locked',
-  );
+  hooks.detail(() => (payment.verified() ? 'unlocked' : 'locked'));
   hooks.onReview((r) => {
     payment.show(r);
     upload.showAgreementOffer(document);

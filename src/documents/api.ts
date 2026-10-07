@@ -25,6 +25,8 @@ export type Fetch = (url: string, init: RequestInit) => Promise<Response>;
 // Longer than the extract function's 180 s by a minute for the upload, so the browser never
 // gives up on a read the API is still able to answer.
 export const API_TIMEOUT_MS = 240_000;
+// A verify only asks Stripe; past this the page offers to try again.
+export const VERIFY_TIMEOUT_MS = 15_000;
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -103,7 +105,11 @@ export function createApi(
   fetchFn: Fetch,
   timeoutMs = API_TIMEOUT_MS,
 ): Api {
-  async function post(op: Operation, body: object): Promise<Record<string, unknown> | Failure> {
+  async function post(
+    op: Operation,
+    body: object,
+    timeout = timeoutMs,
+  ): Promise<Record<string, unknown> | Failure> {
     let response: Response;
     try {
       response = await fetchFn(endpoints[op], {
@@ -113,7 +119,7 @@ export function createApi(
         credentials: 'omit',
         cache: 'no-store',
         referrerPolicy: 'no-referrer',
-        signal: AbortSignal.timeout(timeoutMs),
+        signal: AbortSignal.timeout(timeout),
       });
     } catch {
       return fail('network_error');
@@ -177,6 +183,13 @@ export function createApi(
       if (!isToken(pass) || !isCount(expiresAt) || !isCount(readsLeft))
         return fail('unexpected_response');
       return { ok: true, pass, expiresAt, readsLeft };
+    },
+    async verify(pass) {
+      const r = await post('pass', { pass }, Math.min(timeoutMs, VERIFY_TIMEOUT_MS));
+      if (failed(r)) return r;
+      const { expiresAt, readsLeft } = r;
+      if (!isCount(expiresAt) || !isCount(readsLeft)) return fail('unexpected_response');
+      return { ok: true, expiresAt, readsLeft };
     },
   };
 }

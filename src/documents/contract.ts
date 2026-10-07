@@ -207,11 +207,16 @@ export type PassResult =
     }
   | Failure;
 
+export type VerifyResult =
+  { readonly ok: true; readonly expiresAt: number; readonly readsLeft: number } | Failure;
+
 export interface Api {
   extract(request: ExtractRequest): Promise<ExtractResult>;
   // The captcha token comes from a Turnstile widget with the action «checkout».
   checkout(nonce: string, captchaToken: string): Promise<CheckoutResult>;
   pass(sessionId: string, nonce: string): Promise<PassResult>;
+  // Whether a pass the browser holds still unlocks the detail, the report and the letter.
+  verify(pass: string): Promise<VerifyResult>;
 }
 
 // Shapes the API checks too (src/domain/payments.ts there).

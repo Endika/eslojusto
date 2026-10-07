@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Api, PassResult } from '../../src/documents/contract';
+import type { Api, PassResult, VerifyResult } from '../../src/documents/contract';
 import { createPassStore } from '../../src/documents/pass';
 import { setUpPayment } from '../../src/documents/payment';
 import type { LetterDetails } from '../../src/documents/letter';
@@ -15,6 +15,7 @@ const validPass = passToken({ typ: 'pass', sid: 'cs_test_1', exp: EXPIRES });
 function setUp(
   passResults: PassResult[] = [],
   checkoutUrl = 'https://checkout.stripe.com/c/pay/1',
+  verifyResults: VerifyResult[] = [],
 ) {
   document.body.innerHTML = OFFER;
   const passes = createPassStore(memoryStore(), () => NOW);
@@ -34,7 +35,12 @@ function setUp(
       calls.push(`pass ${sessionId} ${nonce[0]}`);
       return passResults.shift() ?? { ok: false, code: 'service_unavailable' };
     },
+    verify: async (pass) => {
+      calls.push(`verify ${pass === validPass ? 'valid' : 'other'}`);
+      return verifyResults.shift() ?? { ok: true, expiresAt: EXPIRES, readsLeft: 15 };
+    },
   };
+  let changes = 0;
   const browser: Browser = {
     now: () => NOW,
     redirect: (url) => void redirects.push(url),
@@ -58,9 +64,21 @@ function setUp(
     }),
     keepReview: () => void (kept += 1),
     today: () => ({ y: 2026, m: 10, d: 7 }),
+    passChanged: () => void (changes += 1),
     wait: async () => {},
   });
-  return { payment, section, passes, events, calls, saved, redirects, letters, kept: () => kept };
+  return {
+    payment,
+    section,
+    passes,
+    events,
+    calls,
+    saved,
+    redirects,
+    letters,
+    kept: () => kept,
+    changes: () => changes,
+  };
 }
 
 const $ = <T extends HTMLElement>(s: string) => document.querySelector(s) as T;
@@ -87,21 +105,92 @@ describe('the pass offer', () => {
     expect(section.hidden).toBe(true);
   });
 
-  it('keeps the detail locked until a pass is there, then shows it', async () => {
-    const { payment, passes } = setUp([
+  it('a held pass unlocks only once the API verifies it, and only once per page', async () => {
+    const { payment, passes, calls, events, changes } = setUp();
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
+    payment.show(completed());
+    expect(payment.verified()).toBe(false);
+    expect($('[data-pass-downloads]').hidden).toBe(true);
+    await flush();
+    expect(calls).toEqual(['verify valid']);
+    expect(payment.verified()).toBe(true);
+    expect(changes()).toBe(1);
+    expect($('[data-pass-downloads]').hidden).toBe(false);
+    expect(events.log).toEqual([['passVerified', 'ok']]);
+    payment.show(completed());
+    await flush();
+    expect(calls).toEqual(['verify valid']);
+  });
+
+  it('a forged or tampered pass never unlocks: it is dropped and the offer comes back', async () => {
+    const forged = passToken({ typ: 'pass', sid: 'cs_test_1', exp: EXPIRES + 999_999 });
+    const { payment, passes, events, changes } = setUp([], undefined, [
+      { ok: false, code: 'pass_invalid' },
+    ]);
+    passes.savePass({ token: forged, expiresAt: EXPIRES + 999_999, readsLeft: 15 });
+    payment.show(completed());
+    await flush();
+    expect(payment.verified()).toBe(false);
+    expect(changes()).toBe(0);
+    expect(passes.pass()).toBeNull();
+    expect($('[data-pass-downloads]').hidden).toBe(true);
+    expect($('[data-pass-buy]').hidden).toBe(false);
+    expect($('[data-pass-error]').textContent).toContain('Este pase no es válido');
+    expect(events.log).toEqual([['passVerified', 'invalid']]);
+  });
+
+  it.each([
+    ['pass_expired', 'expired', 'Tu pase ha caducado'],
+    ['pass_revoked', 'revoked', 'su pago se devolvió o se anuló'],
+  ] as const)('%s: dropped, with its reason', async (code, result, text) => {
+    const { payment, passes, events } = setUp([], undefined, [{ ok: false, code }]);
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
+    payment.show(completed());
+    await flush();
+    expect(payment.verified()).toBe(false);
+    expect(passes.pass()).toBeNull();
+    expect($('[data-pass-error]').textContent).toContain(text);
+    expect(events.log).toEqual([['passVerified', result]]);
+  });
+
+  it('the API out of reach: nothing unlocks, the pass is kept and can be checked again', async () => {
+    const { payment, passes, events, saved } = setUp([], undefined, [
+      { ok: false, code: 'network_error' },
+      { ok: false, code: 'service_unavailable' },
+    ]);
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
+    payment.show(completed());
+    await flush();
+    expect(payment.verified()).toBe(false);
+    expect(passes.pass()).not.toBeNull();
+    expect($('[data-pass-error]').textContent).toBe(
+      'No hemos podido comprobar tu pase ahora mismo. Prueba otra vez en un momento.',
+    );
+    expect($('[data-pass-verify-retry]').hidden).toBe(false);
+    expect($('[data-pass-buy]').hidden).toBe(true);
+    // A download asks again first, and builds nothing without a yes.
+    await click('[data-download="report"]');
+    expect(saved).toEqual([]);
+    await click('[data-pass-verify-retry]');
+    expect(payment.verified()).toBe(true);
+    expect($('[data-pass-verify-retry]').hidden).toBe(true);
+    expect(events.log).toEqual([
+      ['passVerified', 'unavailable'],
+      ['passVerified', 'unavailable'],
+      ['passVerified', 'ok'],
+    ]);
+  });
+
+  it('a pass just issued from the payment counts as verified', async () => {
+    const { payment, passes, calls, changes } = setUp([
       { ok: true, pass: validPass, expiresAt: EXPIRES, readsLeft: 15 },
     ]);
     passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_1' });
-    document.body.insertAdjacentHTML(
-      'beforeend',
-      '<section data-summary hidden></section><div data-items data-detail></div>',
-    );
     payment.show(completed());
-    expect($('[data-summary]').hidden).toBe(false);
-    expect($('[data-items]').hidden).toBe(true);
     await payment.returned('cs_test_1');
-    expect($('[data-summary]').hidden).toBe(true);
-    expect($('[data-items]').hidden).toBe(false);
+    expect(payment.verified()).toBe(true);
+    expect(changes()).toBe(1);
+    expect(calls).toEqual(['pass cs_test_1 n']);
   });
 
   it('asks for the express waiver before paying', async () => {
@@ -306,6 +395,7 @@ describe('the pass offer', () => {
     await click('[data-download="letter"]');
     expect(saved).toEqual(['eslojusto-informe-finiquito.pdf', 'eslojusto-recibi-no-conforme.pdf']);
     expect(events.log).toEqual([
+      ['passVerified', 'ok'],
       ['downloaded', 'report'],
       ['downloaded', 'letter', 'none'],
     ]);
@@ -328,7 +418,10 @@ describe('the pass offer', () => {
         date: { y: 2026, m: 10, d: 7 },
       },
     ]);
-    expect(events.log).toEqual([['downloaded', 'letter', 'some']]);
+    expect(events.log).toEqual([
+      ['passVerified', 'ok'],
+      ['downloaded', 'letter', 'some'],
+    ]);
   });
 
   it('warns about an ID that is no DNI or NIE, and downloads the letter anyway', async () => {

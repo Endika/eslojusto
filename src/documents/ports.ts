@@ -13,6 +13,9 @@ export const FILES_BUCKETS = ['1', '2-4', '5-9', '10-15'] as const satisfies rea
 export const PASS_VIA = ['return', 'recovery'] as const;
 export type PassVia = (typeof PASS_VIA)[number];
 export const DOWNLOADS = ['report', 'letter'] as const;
+// What the API said of the pass this browser holds; `unavailable` when it could not say.
+export const PASS_VERIFY_RESULTS = ['ok', 'invalid', 'expired', 'revoked', 'unavailable'] as const;
+export type PassVerifyResult = (typeof PASS_VERIFY_RESULTS)[number];
 export type Download = (typeof DOWNLOADS)[number];
 
 // What happens around documents and the pass, for whoever listens. Never a value from a document.
@@ -32,6 +35,7 @@ export interface DocumentEvents {
   checkoutStarted(): void;
   passIssued(via: PassVia): void;
   passFailed(code: ErrorCode): void;
+  passVerified(result: PassVerifyResult): void;
   // For the letter, how many of its optional fields were filled; never what they say.
   downloaded(document: Download, letterPrefilled?: LetterPrefilled): void;
 }

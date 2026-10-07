@@ -10,6 +10,7 @@ import {
   FILES_BUCKETS,
   LETTER_PREFILLED,
   PAGE_KINDS,
+  PASS_VERIFY_RESULTS,
   PASS_VIA,
 } from '../documents/ports';
 
@@ -217,6 +218,7 @@ const DOCUMENT_CATALOGUE = {
   checkout_started: {},
   pass_issued: { via: oneOf(PASS_VIA) },
   pass_failed: { code: oneOf(ERROR_CODES) },
+  pass_verified: { result: oneOf(PASS_VERIFY_RESULTS) },
   // For the letter, whether none, some or all of its optional fields were filled; never their
   // values. The report has none.
   report_downloaded: {

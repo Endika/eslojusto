@@ -194,6 +194,7 @@ describe('the catalogue guard', () => {
         'checkout_started',
         'pass_issued',
         'pass_failed',
+        'pass_verified',
         'report_downloaded',
       ].toSorted(),
     );
@@ -218,6 +219,9 @@ describe('document and pass events', () => {
     expect(isValidEvent('checkout_started', {})).toBe(true);
     expect(isValidEvent('pass_issued', { via: 'recovery' })).toBe(true);
     expect(isValidEvent('pass_failed', { code: 'session_mismatch' })).toBe(true);
+    for (const result of ['ok', 'invalid', 'expired', 'revoked', 'unavailable'])
+      expect(isValidEvent('pass_verified', { result })).toBe(true);
+    expect(isValidEvent('pass_verified', { result: 'v1.pass.token' })).toBe(false);
     expect(
       isValidEvent('report_downloaded', { document: 'letter', letter_prefilled: 'some' }),
     ).toBe(true);
