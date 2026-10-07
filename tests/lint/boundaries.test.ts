@@ -38,6 +38,16 @@ describe('import boundaries', () => {
     ['src/engine/rental/x.ts', "import { NORMS } from './data/index';"],
     ['src/engine/x.ts', "import { t } from './../i18n';"],
     ['src/engine/x.ts', "import { t } from './a/../../i18n';"],
+    ['src/engine/employment/x.ts', "import { t } from '../../i18n';"],
+    ['src/engine/employment/x.ts', "import { MINIMUM_WAGE } from './data/minimum-wage';"],
+    ['src/engine/employment/x.ts', "import { RULES } from '../rental/rules';"],
+    ['src/engine/rental/x.ts', "import type { NormTable } from '../employment/norms';"],
+    ['src/engine/employment/data/x.ts', "import type { NormTable } from '../../law/norms';"],
+    ['src/engine/employment/data/x.ts', "import type { Norm } from '../../norms';"],
+    ['src/engine/law/x.ts', "import type { NormId } from '../rental/norms';"],
+    ['src/engine/law/x.ts', "import type { Phrase } from '../calculation';"],
+    ['src/engine/law/x.ts', "import { t } from '../../i18n';"],
+    ['src/engine/law/x.ts', "import { t } from './../../i18n';"],
   ])('%s cannot %s', async (filePath, code) => {
     expect(await violations(filePath, code)).toContain('no-restricted-imports');
   });
@@ -50,25 +60,31 @@ describe('import boundaries', () => {
     expect(fired.filter((r) => r === 'no-restricted-globals')).toHaveLength(3);
   });
 
-  it.each(['src/engine/rental/x.ts', 'src/engine/rental/data/x.ts'])(
-    '%s cannot read the clock',
-    async (filePath) => {
-      expect(await violations(filePath, 'export const now = () => new Date();')).toContain(
-        'no-restricted-globals',
-      );
-    },
-  );
+  it.each([
+    'src/engine/rental/x.ts',
+    'src/engine/rental/data/x.ts',
+    'src/engine/employment/x.ts',
+    'src/engine/employment/data/x.ts',
+    'src/engine/law/x.ts',
+  ])('%s cannot read the clock', async (filePath) => {
+    expect(await violations(filePath, 'export const now = () => new Date();')).toContain(
+      'no-restricted-globals',
+    );
+  });
 
-  it.each(['src/engine/x.ts', 'src/engine/rental/x.ts', 'src/engine/rental/data/x.ts'])(
-    '%s cannot reach the clock through globalThis',
-    async (filePath) => {
-      const fired = await violations(
-        filePath,
-        'export const now = () => [new globalThis.Date(), globalThis.performance.now()];',
-      );
-      expect(fired.filter((r) => r === 'no-restricted-properties')).toHaveLength(2);
-    },
-  );
+  it.each([
+    'src/engine/x.ts',
+    'src/engine/rental/x.ts',
+    'src/engine/rental/data/x.ts',
+    'src/engine/employment/x.ts',
+    'src/engine/law/x.ts',
+  ])('%s cannot reach the clock through globalThis', async (filePath) => {
+    const fired = await violations(
+      filePath,
+      'export const now = () => [new globalThis.Date(), globalThis.performance.now()];',
+    );
+    expect(fired.filter((r) => r === 'no-restricted-properties')).toHaveLength(2);
+  });
 
   it('a dynamic import cannot slip past them', async () => {
     expect(
@@ -90,6 +106,15 @@ describe('import boundaries', () => {
     ['src/engine/rental/x.ts', "import { round2 } from '../money';"],
     ['src/engine/rental/x.ts', "import type { NormTable } from './norms';"],
     ['src/engine/rental/data/x.ts', "import type { NormTable } from '../norms';"],
+    ['src/engine/rental/x.ts', "import { activeRules } from '../law/rules';"],
+    ['src/engine/employment/x.ts', "import { round2 } from '../money';"],
+    ['src/engine/employment/x.ts', "import { normStanding } from '../law/norms';"],
+    ['src/engine/employment/x.ts', "import type { NormTable } from './norms';"],
+    ['src/engine/employment/data/x.ts', "import type { NormTable } from '../norms';"],
+    ['src/engine/law/x.ts', "import { toIso } from '../date';"],
+    ['src/engine/law/x.ts', "import { round2 } from '../money';"],
+    ['src/engine/law/x.ts', "import type { Source } from '../sources';"],
+    ['src/engine/law/x.ts', "import type { NormStatus } from './norms';"],
   ])('%s may %s', async (filePath, code) => {
     expect(await violations(filePath, code)).not.toContain('no-restricted-imports');
   });
