@@ -4,16 +4,27 @@ import { defineConfig, devices } from '@playwright/test';
 const rtl = process.env['TEST_RTL'] === '1';
 // The analytics project needs a build with an analytics key; every other build has none.
 const analytics = process.env['TEST_ANALYTICS'] === '1';
-const optInSpecs = /(rtl|analytics)\.spec\.ts/;
+// The documents project needs a build with a (fake) documents API; the page routes it.
+const documents = process.env['TEST_DOCUMENTS'] === '1';
+const optInSpecs = /(rtl|analytics|documents)\.spec\.ts/;
+const port = Number(process.env['E2E_PORT'] ?? 4321);
+const DOCUMENTS_API = 'https://api.eslojusto.test';
+
+const buildEnv = {
+  ...(analytics ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
+  ...(documents
+    ? { PUBLIC_API_URL: DOCUMENTS_API, PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA' }
+    : {}),
+};
 
 export default defineConfig({
   testDir: 'tests/e2e',
-  use: { baseURL: 'http://localhost:4321/' },
+  use: { baseURL: `http://localhost:${port}/` },
   webServer: {
-    command: 'npm run build && npm run preview',
-    url: 'http://localhost:4321/',
+    command: `npm run build && npm run preview -- --port ${port}`,
+    url: `http://localhost:${port}/`,
     reuseExistingServer: !process.env['CI'],
-    ...(analytics ? { env: { PUBLIC_POSTHOG_KEY: 'phc_test' } } : {}),
+    ...(Object.keys(buildEnv).length > 0 ? { env: buildEnv } : {}),
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] }, testIgnore: optInSpecs },
@@ -27,6 +38,15 @@ export default defineConfig({
             name: 'analytics',
             use: { ...devices['Desktop Chrome'] },
             testMatch: /analytics\.spec\.ts/,
+          },
+        ]
+      : []),
+    ...(documents
+      ? [
+          {
+            name: 'documents',
+            use: { ...devices['Desktop Chrome'] },
+            testMatch: /documents\.spec\.ts/,
           },
         ]
       : []),

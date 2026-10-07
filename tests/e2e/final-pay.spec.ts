@@ -1,5 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
+const ORIGIN = `http://localhost:${process.env['E2E_PORT'] ?? 4321}`;
+
 test('unfair dismissal with a short severance → below the minimum, with the difference', async ({
   page,
 }) => {
@@ -94,7 +96,7 @@ test('the CSP blocks nothing: the theme and the fonts come from the site itself'
   });
   const external: string[] = [];
   page.on('request', (r) => {
-    if (!r.url().startsWith('http://localhost:4321/')) external.push(r.url());
+    if (!r.url().startsWith(`${ORIGIN}/`)) external.push(r.url());
   });
   await page.goto('finiquito/');
   await page.evaluate(() => document.fonts.ready);
