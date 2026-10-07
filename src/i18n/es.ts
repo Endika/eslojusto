@@ -253,6 +253,69 @@ export const es = {
   'faq.data_answer':
     'Lo que escribes, no. La revisión se calcula entera en tu navegador y no se guarda. Sí se mide qué pasos usas, sin cookies y sin identificarte: qué secciones abres, qué campo no se acepta o en qué tramo queda la diferencia. Nunca tus importes ni tus fechas. El detalle está en la página de privacidad.',
 
+  'home.final_pay_text_documents':
+    'Tu finiquito frente al mínimo legal, partida por partida (salario del último mes, vacaciones, pagas extra, indemnización y preaviso), y una estimación de tu paro. Escribe los datos o sube una foto de tu finiquito.',
+  'home.note_documents':
+    'Todo se calcula en tu dispositivo. Lo que escribes no sale de él; si subes un documento, se lee en la Unión Europea y no se guarda. Sí se mide qué pasos usas, sin cookies y sin identificarte.',
+  'final_pay.lead_documents':
+    'Calcula el mínimo legal de tu finiquito por despido, baja voluntaria o fin de contrato y compáralo con lo que te ofrece la empresa. Escribe los datos o sube una foto de tu finiquito.',
+
+  'documents.start.question': '¿Cómo quieres empezar?',
+  'documents.start.help':
+    'Puedes subir tu finiquito, tus nóminas o tu vida laboral para rellenar los datos con lo que se lea en ellos, o escribirlos tú. Antes de calcular nada, revisas cada dato.',
+  'documents.start.choices': 'Cómo empezar',
+  'documents.start.upload': 'Sube tu finiquito, nóminas o vida laboral',
+  'documents.start.upload_hint':
+    'Una IA lee los datos y tú los confirmas. Gratis, 2 lecturas al día.',
+  'documents.start.manual': 'Rellenar a mano',
+  'documents.start.manual_hint': 'Escribes los datos tú y nada sale de tu dispositivo.',
+  'documents.upload.question': 'Sube un documento',
+  'documents.upload.kind': '¿Qué documento es?',
+  'documents.upload.settlement': 'Propuesta de finiquito',
+  'documents.upload.settlement_hint': 'El documento de liquidación que te da la empresa.',
+  'documents.upload.payslip': 'Nóminas',
+  'documents.upload.payslip_hint': 'Si subes varias, se lee la más reciente.',
+  'documents.upload.work_history': 'Vida laboral',
+  'documents.upload.work_history_hint':
+    'El informe de la Seguridad Social, para tus otros trabajos.',
+  'documents.upload.files': 'Fotos o PDF',
+  'documents.upload.files_hint':
+    'Hasta 4 fotos o un PDF de hasta 4 páginas. Las fotos se reducen en tu dispositivo antes de enviarse.',
+  'documents.upload.consent':
+    'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos sensibles, como la afiliación a un sindicato o una baja médica. Se leen en la Unión Europea y no se guardan.',
+  'documents.upload.consent_link': 'Cómo se tratan tus documentos',
+  'documents.upload.send': 'Leer el documento',
+  'documents.upload.back': 'Volver',
+  'documents.upload.selected': 'Archivos elegidos',
+  'documents.done.question': 'Datos leídos',
+  'documents.done.continue': 'Revisar los datos',
+  'documents.done.another': 'Subir otro documento',
+
+  'documents.pass.title': 'Informe en PDF y carta «recibí no conforme»',
+  'documents.pass.text':
+    'Con lo que sale de esta revisión: un informe con cada partida, su mínimo legal, sus fuentes y lo que no se ha comprobado, y una plantilla de carta «recibí no conforme» con tus cifras. Los dos se generan en tu dispositivo.',
+  'documents.pass.price':
+    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días: en ese tiempo puedes volver a descargar el informe y la carta y leer hasta 15 documentos.',
+  'documents.pass.waiver':
+    'Quiero el informe ahora. Sé que, al ser contenido digital que se entrega al momento, pierdo el derecho de desistimiento (art. 103.m de la Ley General para la Defensa de los Consumidores y Usuarios).',
+  'documents.pass.conditions': 'Condiciones de venta',
+  'documents.pass.pay': 'Pagar 4,99 €',
+  'documents.pass.paid_question': '¿Ya has pagado?',
+  'documents.pass.paid_help':
+    'Si pagaste desde este navegador y no ves la descarga, recupera tu pase. Si pagaste desde otro, escribe a hola@eslojusto.es con el justificante de Stripe.',
+  'documents.pass.session': 'Código del pago',
+  'documents.pass.session_hint':
+    'Empieza por «cs_» y está en la dirección a la que volviste tras pagar. En blanco, se usa el último pago de este navegador.',
+  'documents.pass.recover': 'Recuperar el pase',
+  'documents.pass.download_report': 'Descargar el informe (PDF)',
+  'documents.pass.download_letter': 'Descargar la carta (PDF)',
+  'documents.pass.letter_note':
+    'La carta es una plantilla con tus cifras. Usarla o no, y cómo, es decisión tuya.',
+
+  'faq.documents': '¿Qué pasa con mis documentos?',
+  'faq.documents_answer':
+    'Si subes tu finiquito, tus nóminas o tu vida laboral, se envían cifrados a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo solo copia los datos que necesita el formulario y no calcula nada. Ni el servidor ni el modelo guardan el documento: se procesa en memoria y se descarta. Antes de subirlo te pedimos tu consentimiento, porque una nómina puede mostrar datos sensibles. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
+
   'legal.updated': 'Actualizado el 6 de octubre de 2026',
   'legal_notice.title': 'Aviso legal · eslojusto.es',
   'legal_notice.description':
@@ -262,6 +325,7 @@ export const es = {
   'legal_notice.what_it_does': 'Qué hace la herramienta',
   'legal_notice.what_it_does_not': 'Qué no hace',
   'legal_notice.errors': 'Errores en las cifras',
+  'legal_notice.conditions': 'Condiciones de venta del pase',
   'not_found.title': 'Página no encontrada · eslojusto.es',
   'not_found.description':
     'Esta dirección no lleva a ninguna página de eslojusto.es. Desde aquí puedes ir a la revisión del finiquito o a la portada.',
@@ -283,6 +347,10 @@ export const es = {
   'privacy.data_theme': 'Tu elección de tema (claro u oscuro)',
   'privacy.data_analytics': 'Lo que se mide de tu visita',
   'privacy.data_server': 'Los registros del servidor',
+  'privacy.data_documents': 'Los documentos que subes',
+  'privacy.data_pass': 'Las lecturas gratis y el pase',
+  'privacy.data_checkout': 'Tu revisión mientras pagas',
+  'privacy.documents': 'Documentos y pagos',
   'privacy.analytics': 'Qué se mide',
   'privacy.who': 'Quién lo recibe',
   'privacy.cookies': 'Sin cookies',
@@ -483,6 +551,153 @@ export const es = {
     'La fecha de baja de este contrato es anterior a la de alta',
   'client.error.other_contract_ends_after_this_one':
     'La fecha de baja de este contrato es posterior a la del contrato que estás revisando',
+  'client.documents.mark': 'Leído del documento · confianza {nivel}',
+  'client.documents.mark_derived': 'Sale del total de tu nómina · confianza {nivel}',
+  'client.documents.mark_low': ': compruébalo',
+  'client.documents.confidence.high': 'alta',
+  'client.documents.confidence.medium': 'media',
+  'client.documents.confidence.low': 'baja',
+  'client.documents.status.preparing': 'Preparando los archivos…',
+  'client.documents.status.captcha': 'Comprobando que no eres un robot…',
+  'client.documents.status.reading': 'Leyendo el documento. Puede tardar hasta un minuto.',
+  'client.documents.file': '{nombre} ({tamano})',
+  'client.documents.done':
+    'Se han leído {n} datos. Pasa por cada hoja y confírmalos antes de revisar: los leídos llevan la marca «Leído del documento».',
+  'client.documents.done_none':
+    'No se ha leído ningún dato que sirva para el formulario. Puedes subir otro documento o rellenar a mano.',
+  'client.documents.done_low':
+    'Algún dato se ha leído con confianza baja: compáralo con el documento.',
+  'client.documents.check.end_before_start':
+    'La fecha de baja leída es anterior a la de alta: revisa las dos.',
+  'client.documents.check.items_do_not_sum':
+    'Las partidas leídas no suman el total del documento: revisa las cifras.',
+  'client.documents.check.period_end_before_start':
+    'Las fechas del periodo de la nómina no cuadran: revísalas.',
+  'client.documents.check.start_after_period_end':
+    'La fecha de antigüedad leída es posterior al periodo de la nómina: revísala.',
+  'client.documents.check.proration_exceeds_total':
+    'La prorrata de pagas extra leída es mayor que el total: revisa el salario.',
+  'client.documents.check.contract_end_before_start':
+    'Algún contrato de la vida laboral termina antes de empezar: revisa sus fechas.',
+  'client.documents.error.kind_missing': 'Elige qué documento es',
+  'client.documents.error.consent_missing': 'Para leer el documento hace falta tu consentimiento',
+  'client.documents.error.method_not_allowed':
+    'No se ha podido leer el documento. Prueba otra vez o rellena a mano.',
+  'client.documents.error.invalid_request':
+    'No se ha podido leer el documento. Prueba otra vez o rellena a mano.',
+  'client.documents.error.payload_too_large':
+    'Los archivos ocupan demasiado. Prueba con menos fotos o con un PDF más pequeño.',
+  'client.documents.error.no_files': 'Elige al menos una foto o un PDF',
+  'client.documents.error.too_many_files': 'Como mucho 4 fotos o un PDF',
+  'client.documents.error.mixed_files': 'Sube fotos o un PDF, pero no los dos a la vez',
+  'client.documents.error.unsupported_media_type':
+    'Ese tipo de archivo no se puede leer. Sube fotos o un PDF.',
+  'client.documents.error.image_unreadable':
+    'Alguna foto no se puede abrir. Prueba a hacerla de nuevo o a subirla en otro formato.',
+  'client.documents.error.image_too_large':
+    'Alguna foto es demasiado grande. Prueba otra vez; se reduce antes de enviarla.',
+  'client.documents.error.pdf_unreadable':
+    'El PDF no se puede abrir. Puede estar dañado o protegido con contraseña.',
+  'client.documents.error.pdf_too_many_pages':
+    'El PDF tiene más de 4 páginas. Sube solo las páginas con los datos.',
+  'client.documents.error.captcha_failed':
+    'No se ha podido comprobar que no eres un robot. Prueba otra vez.',
+  'client.documents.error.daily_limit_reached':
+    'Ya has usado las 2 lecturas gratis de hoy en este navegador. Puedes rellenar a mano o volver mañana.',
+  'client.documents.error.pass_invalid':
+    'Tu pase no es válido. Puedes recuperarlo en «¿Ya has pagado?» o rellenar a mano.',
+  'client.documents.error.pass_expired': 'Tu pase ha caducado. Puedes rellenar a mano.',
+  'client.documents.error.pass_exhausted':
+    'Ya has usado las 15 lecturas de tu pase. Puedes rellenar a mano.',
+  'client.documents.error.document_kind_mismatch':
+    'Parece otro tipo de documento. Comprueba qué documento has elegido.',
+  'client.documents.error.document_unreadable':
+    'No se ha podido leer este documento. Prueba con una foto más nítida o rellena a mano.',
+  'client.documents.error.model_unavailable':
+    'La lectura no está disponible ahora mismo. Prueba más tarde o rellena a mano.',
+  'client.documents.error.session_not_found': 'No encontramos ese pago. Revisa el código.',
+  'client.documents.error.session_mismatch':
+    'Ese pago no se hizo desde este navegador. Escribe a hola@eslojusto.es con el justificante.',
+  'client.documents.error.payment_not_complete':
+    'El pago aún no está completo. Si acabas de pagar, prueba en un momento.',
+  'client.documents.error.price_mismatch':
+    'Ese pago no corresponde al pase. Escribe a hola@eslojusto.es con el justificante.',
+  'client.documents.error.payment_provider_unavailable':
+    'El pago no está disponible ahora mismo. Prueba más tarde.',
+  'client.documents.error.service_unavailable':
+    'El servicio no está disponible ahora mismo. Prueba más tarde o rellena a mano.',
+  'client.documents.error.network_error':
+    'No hay conexión con el servicio. Comprueba tu conexión y prueba otra vez.',
+  'client.documents.error.unexpected_response':
+    'La respuesta del servicio no se entiende. Prueba otra vez o rellena a mano.',
+  'client.documents.error.captcha_unavailable':
+    'No se ha podido cargar la comprobación de que no eres un robot. Prueba otra vez o rellena a mano.',
+  'client.documents.error.file_type': 'Sube fotos o un PDF',
+  'client.documents.error.file_too_large': 'El PDF ocupa demasiado: como mucho 4 MB.',
+  'client.documents.error.checkout_unavailable':
+    'No se ha podido abrir el pago. Prueba otra vez en un momento.',
+  'client.documents.error.no_checkout':
+    'No hay ningún pago hecho desde este navegador. Si pagaste desde otro, escribe a hola@eslojusto.es con el justificante.',
+  'client.documents.pass.waiver_missing': 'Marca la casilla para seguir',
+  'client.documents.pass.redirecting': 'Abriendo el pago de Stripe…',
+  'client.documents.pass.checking': 'Comprobando el pago…',
+  'client.documents.pass.issued': 'Pago recibido. Ya puedes descargar el informe y la carta.',
+  'client.documents.pass.valid_until': 'Tu pase vale hasta el {fecha}.',
+  'client.documents.pass.generating': 'Preparando el PDF…',
+  'client.documents.pass.generated': 'PDF listo.',
+  'client.documents.pass.lost':
+    'Hemos vuelto del pago, pero la revisión no se ha podido recuperar. Repítela y aparecerán las descargas.',
+
+  'client.documents.report.title': 'Revisión de tu finiquito',
+  'client.documents.report.generated': 'eslojusto.es · {fecha}',
+  'client.documents.report.intro':
+    'Este informe compara tu finiquito con el mínimo que marca la ley, partida por partida, con los datos que confirmaste en la revisión. Informa sobre la ley y no es asesoramiento jurídico.',
+  'client.documents.report.your_data': 'Tus datos',
+  'client.documents.report.cause': 'Causa',
+  'client.documents.report.start': 'Fecha de alta',
+  'client.documents.report.end': 'Fecha de baja',
+  'client.documents.report.salary': 'Salario bruto mensual',
+  'client.documents.report.extra_pay': 'Pagas extra',
+  'client.documents.report.extra_pay_prorated': 'Prorrateadas en la nómina',
+  'client.documents.report.extra_pay_apart': '{n} pagas de {importe}',
+  'client.documents.report.holidays': 'Vacaciones',
+  'client.documents.report.holidays_text': '{anuales} días al año; {disfrutados} disfrutados',
+  'client.documents.report.holidays_unknown': '{anuales} días al año; disfrutados, sin dato',
+  'client.documents.report.cause.resignation': 'Baja voluntaria (dimisión)',
+  'client.documents.report.cause.fixed_term_end': 'Fin de contrato temporal',
+  'client.documents.report.cause.objective_dismissal': 'Despido objetivo',
+  'client.documents.report.cause.unfair_dismissal': 'Despido improcedente',
+  'client.documents.report.cause.disciplinary_dismissal': 'Despido disciplinario',
+  'client.documents.report.fixed_term.production_circumstances': 'eventual',
+  'client.documents.report.fixed_term.replacement': 'de sustitución',
+  'client.documents.report.fixed_term.training': 'formativo',
+  'client.documents.report.items': 'Partida por partida',
+  'client.documents.report.employer': 'En tu finiquito',
+  'client.documents.report.how': 'Cómo se calcula',
+  'client.documents.report.sources': 'Fuentes',
+  'client.documents.report.unchecked': 'Lo que esta revisión no comprueba',
+  'client.documents.report.benefit': 'Tu paro (estimación)',
+  'client.documents.report.footer':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Cifras según la ley en vigor el {fecha}.',
+  'client.documents.report.page': 'Página {n} de {total}',
+  'client.documents.report.filename': 'eslojusto-informe-finiquito.pdf',
+
+  'client.documents.letter.title': 'Recibí no conforme',
+  'client.documents.letter.name': 'Nombre y apellidos',
+  'client.documents.letter.id': 'DNI o NIE',
+  'client.documents.letter.company': 'Empresa',
+  'client.documents.letter.body':
+    'He recibido la propuesta de liquidación (finiquito) por el fin de mi contrato, con fecha de baja el {fecha}, y hago constar que no estoy conforme con estas cantidades:',
+  'client.documents.letter.credit':
+    '{partida}: la propuesta recoge {empresa} y el mínimo legal es {minimo}; faltan {diferencia}.',
+  'client.documents.letter.deduction':
+    '{partida}: la propuesta descuenta {empresa} y el máximo legal es {maximo}; sobran {diferencia}.',
+  'client.documents.letter.closing':
+    'Este recibí deja constancia de que he recibido el documento, no de que esté de acuerdo con sus cantidades.',
+  'client.documents.letter.place_date':
+    'En ____________________, a ____ de ____________________ de ________',
+  'client.documents.letter.received': 'Recibí no conforme,',
+  'client.documents.letter.filename': 'eslojusto-recibi-no-conforme.pdf',
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof es;

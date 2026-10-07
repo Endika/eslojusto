@@ -178,4 +178,9 @@ describe('client strings', () => {
     expect(keys.every((k) => k.startsWith('client.'))).toBe(true);
     expect(keys.some((k) => k.startsWith('client.documents.'))).toBe(false);
   });
+  it('a build with it ships them', () => {
+    expect(clientStrings('es', { documents: true })['client.documents.mark']).toBe(
+      'Leído del documento · confianza {nivel}',
+    );
+  });
 });
