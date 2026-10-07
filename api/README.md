@@ -2,11 +2,11 @@
 
 Three Lambda functions in **eu-south-2** behind function URLs:
 
-| Function   | Does                                                                                     | Calls                            |
-| ---------- | ---------------------------------------------------------------------------------------- | -------------------------------- |
-| `extract`  | Reads a settlement proposal, payslips or a work history and returns the fields it states | Turnstile, Bedrock (EU profiles) |
-| `checkout` | Starts a Stripe Checkout for the 4,99 € pass                                             | Stripe                           |
-| `pass`     | Verifies a finished Checkout Session and issues the signed pass                          | Stripe                           |
+| Function   | Does                                                                                     | Calls                                                   |
+| ---------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `extract`  | Reads a settlement proposal, payslips or a work history and returns the fields it states | Turnstile, Bedrock (EU profiles), Stripe for pass reads |
+| `checkout` | Starts a Stripe Checkout for the 4,99 € pass                                             | Turnstile, Stripe                                       |
+| `pass`     | Verifies a finished Checkout Session and issues the signed pass                          | Stripe                                                  |
 
 Nothing is stored: documents live in the invocation's memory, the server keeps no state, and
 logs carry only `op`, `code`, `latencyMs`, `pages`, `inputTokens`, `outputTokens` and
@@ -36,7 +36,9 @@ API never returns prose. All requests are `POST` with a JSON body.
 ```
 
 Up to 4 JPEG/WebP images (long side ≤ 1568 px, checked from the image header) or 1 PDF of up
-to 4 pages, 6 MB per request. The browser downsizes photos before sending. `ok` answers:
+to 4 pages and 2 MB, 6 MB per request. The browser downsizes photos before sending, and turns
+a PDF the API refuses (`pdf_too_large`, `pdf_unreadable`: scanned, encrypted or ambiguous)
+into page images. `ok` answers:
 
 ```jsonc
 {
@@ -47,18 +49,22 @@ to 4 pages, 6 MB per request. The browser downsizes photos before sending. `ok` 
     "lists": { "otherAccruals": [{ "values": { "amount": 12.5 }, "confidence": "medium" }] },
   },
   "failedChecks": [], // coherence checks still failing after any escalation
-  "allowance": "<the quota or pass token to send next time>",
+  "allowance": "<free reads: the quota token to send next time>",
+  "readsLeft": 11, // pass reads: what Stripe has left on the pass
 }
 ```
 
-**`checkout`** `{ "nonce": "<22–64 url-safe random chars, kept in the browser>" }` →
+**`checkout`** `{ "nonce": "<22–64 url-safe random chars, kept in the browser>",
+"captchaToken": "<Turnstile, action 'checkout'>" }` →
 `{ "code": "ok", "sessionId": "cs_…", "url": "https://checkout.stripe.com/…" }`. Keep the
 session id and nonce before redirecting; Stripe returns to
 `/finiquito/?session_id={CHECKOUT_SESSION_ID}`.
 
 **`pass`** `{ "sessionId": "cs_…", "nonce": "…" }` →
-`{ "code": "ok", "pass": "<token>", "expiresAt": <epoch seconds> }`. Asking again with the same
-session and nonce returns the same pass, which is how «¿Ya has pagado?» works.
+`{ "code": "ok", "pass": "<token>", "expiresAt": <epoch seconds>, "readsLeft": <n> }`. Asking
+again with the same session and nonce returns the same pass, with the reads it really has left,
+which is how «¿Ya has pagado?» works. A pass with no reads left still unlocks the report and
+the letter until it expires.
 
 ### Fields and the site's engine
 
@@ -111,24 +117,64 @@ domain, adapters never reach `http/` or `handlers/`, and the infrastructure read
   `ESCALATION_MODEL`, whose read wins. Same path with or without a pass. Equal constants mean
   no escalation. A confident "this is another kind of document" is answered as
   `document_kind_mismatch` without escalating or returning data.
+- **Provider errors.** Every Bedrock error throws, a `ValidationException` included: the request
+  is fixed, so it means a retired, disabled or misconfigured model, never a bad document. A
+  failed primary read goes to the escalation model; if that fails too, the answer is
+  `model_unavailable`. An escalated read replaces the primary only if it recorded something.
 - Models (`src/config.ts`): `PRIMARY_MODEL` = Haiku 4.5, `ESCALATION_MODEL` = Sonnet 4.6.
   Sonnet 5.5 is one line away (`ESCALATION_MODEL = SONNET_5_5`); its settings already use
   `tool_choice: auto` and more output room, because it rejects forced tool use and thinking is
   on by default there. No request sends `temperature`, which Sonnet 5.5 rejects.
 
+### Order of checks
+
+Cheapest first, and nothing that parses what the person sent runs before the captcha:
+
+1. Counts, byte sizes and magic bytes; the allowance token's signature and dates.
+2. **Turnstile.** Siteverify refuses a token it has seen and must report hostname
+   `eslojusto.es` and the endpoint's action, so every read and every checkout costs a fresh
+   challenge.
+3. Image headers; the PDF inspection; the input-token estimate.
+4. For a pass, the Checkout Session in Stripe (paid, not refunded or disputed, reads left).
+5. The model reads.
+
+### Bounding the cost of a read
+
+- **PDF pages are counted the way every reader would count them, or not at all.** The inspector
+  refuses bytes after the last `%%EOF`, an object defined twice within one revision (later
+  revisions may redefine objects, as signatures do), more than 5,000 objects, anything pdf-lib
+  reports on the console or as an invalid object, encryption, and any disagreement between the
+  page tree's `/Count`, the pages pdf-lib finds, and every page tree and page object a
+  sequential scan finds. Text-bearing streams may only use Flate, ASCII85 or ASCIIHex filters,
+  and decode to 8 MB at most. Measured on 25 real PDFs on the dev machine: all accepted with
+  the right page count.
+- **Input tokens are estimated before the first read** (Bedrock's CountTokens does not serve
+  Claude models offered only through cross-Region profiles, and the mantle alternative would
+  send the document to eu-west-1 through a hand-signed request): 3,000 for the prompt and
+  schema, Claude's 28-px patch formula for each image, 1,600 per PDF page plus one token per two
+  bytes of text in its streams. Real documents land around 1,200–1,700 text tokens per dense
+  page. Above **32,000** the answer is `document_too_dense`; four dense pages estimate at about
+  27,000.
+- **No escalation above 25,000 real input tokens** (Bedrock's own count from the primary read),
+  nor, when the primary read failed, above that estimate. Real four-page documents need about
+  20,000.
+- **PDFs are capped at 2 MB**: digital payslips and work histories weigh tens of kilobytes; a
+  heavier file is a scan, better sent as page images.
+
 ### Limits without storage
 
-There is no database, so per-browser counting is cooperative, not enforcement:
-
-- A free read returns an HMAC-signed `{ day, used }` token (UTC day); the third read of the day
-  with it is refused. A pass carries `{ session, expiry, used }` and allows 15 reads in 7 days.
-- **Weakness, stated plainly:** a client that drops its token, replays an older one, opens a
-  private window or asks `pass` again for the same session starts from zero. The counters stop
-  honest overuse and shape the UI; they do not stop anyone determined.
-- What actually caps spend: a **fresh Turnstile token per read** (siteverify refuses a token
-  it has seen, and checks hostname `eslojusto.es` and action `extract`), **reserved
-  concurrency 5** on `extract`, request-size limits, and the **budget action** that denies
-  Bedrock at 100 % of the monthly budget (8–12 h late, as Budgets updates).
+- **Free reads** are counted in an HMAC-signed `{ day, used }` token (UTC day): the third read
+  of the day with it is refused. **Weakness, stated plainly:** a browser that drops or replays
+  the token, or opens a private window, starts over. The captcha, the per-read cost bound,
+  reserved concurrency and the budget action are what actually cap spend.
+- **Pass reads** are counted by Stripe: the Checkout Session's `metadata.reads_used`, read
+  before each pass read and written after it. Re-requesting the pass cannot reset it, and the
+  16th read is refused. Two reads racing on the same pass can both count as one
+  (read-modify-write, at most the reserved concurrency of 5 at once); a failed write errs in
+  the person's favour. Anything in that key other than a small integer counts as spent.
+- **Revocation:** each pass read and each `pass` request retrieves the session with its
+  PaymentIntent and latest charge; a refund (even partial), a dispute or a cancelled payment
+  answers `pass_revoked`. A 100 % promotion code has no payment to revoke.
 
 ### Payments
 
@@ -141,8 +187,8 @@ the configured Price at 499 cents, and a payment less than 7 days old. There is 
 to obtain a pass: testing without paying is Stripe test mode, or a 100 % promotion code with
 `max_redemptions` and `expires_at` in live mode.
 
-Not handled yet: revoking a pass after a refund or dispute (it would mean calling Stripe on
-every read), the 21 % tax rate and invoices (pending the gestoría).
+`checkout` also needs a fresh Turnstile token (action `checkout`). Not handled yet: the 21 %
+tax rate and invoices (pending the gestoría).
 
 ## Infrastructure
 
@@ -155,7 +201,8 @@ the function bundles, never user data).
 `*.lambda-url.eu-south-2.on.aws` resolves; it does not for regions without them), cost
 nothing, and their timeout is the function's. HTTP API cuts at 30 s, too close for a primary
 read plus an escalated read of a 4-page PDF. Throttling comes from reserved concurrency (429
-beyond it); CORS allows only `https://eslojusto.es`.
+beyond it: 5 for `extract`, 2 each for `checkout` and `pass`); CORS allows only
+`https://eslojusto.es`.
 
 **Two stacks.**
 
@@ -171,9 +218,11 @@ beyond it); CORS allows only `https://eslojusto.es`.
 
 Execution roles: `extract` may `bedrock:InvokeModel` on the two EU inference profiles and on
 their foundation models in the six EU regions the profiles route to, only through those
-profiles (`bedrock:InferenceProfileArn` condition), plus `ssm:GetParameter` on its two
-parameters. `checkout` reads the Stripe key; `pass` the Stripe key and the token key. All three
-may write only to their own log group.
+profiles (`bedrock:InferenceProfileArn` condition), plus `ssm:GetParameter` on the token key,
+the Turnstile secret and the Stripe key (passes count their reads in Stripe). `checkout` reads
+the Stripe key and the Turnstile secret; `pass` the Stripe key and the token key. Each may
+write only to its own log group (`log-group:NAME` and `log-group:NAME:*`). The budget action's
+role can be assumed by Budgets only on behalf of this account (`aws:SourceAccount`).
 
 **Budget**: 10 USD a month on the whole account (Claude on Bedrock is billed through AWS
 Marketplace, so a Bedrock service filter would miss it; Budgets are in USD, and 10 USD stays
@@ -185,8 +234,8 @@ attaching `eslojusto-api-deny-bedrock` to the `extract` role.
 Nothing here has been run. Each step needs an account administrator.
 
 1. **Lambda concurrency quota.** The account allows 10 concurrent executions, and Lambda keeps
-   100 unreserved, so reserving 5 fails until the quota is at least 105. Request it in Service
-   Quotas (`L-B99A9384`, eu-south-2).
+   100 unreserved. The functions reserve 5 + 2 + 2 = 9, so the deployment fails until the quota
+   is at least 109. Request it in Service Quotas (`L-B99A9384`, eu-south-2).
 2. **Bedrock, eu-south-2.** Submit Anthropic's use-case form once in the console. Set data
    retention to none (on 07-10-2026 it reads `inherit`), so a model that would retain data is
    blocked instead:
@@ -214,8 +263,19 @@ Nothing here has been run. Each step needs an account administrator.
 
 Fixed: about 0 USD a month. Function URLs, idle Lambdas, standard SSM parameters and the first
 two budgets with actions cost nothing; the bootstrap bucket holds about 1 MB; logs are a few
-KB a day. Per read: about 0.015–0.02 USD with Haiku 4.5 (EU profile list prices, phase-2
-research §1.4), roughly three times that again when a read escalates to Sonnet 4.6.
+KB a day.
+
+Per read, from the eu-south-2 Price List (07-10-2026): Haiku 4.5 at 1.10 / 5.50 USD per
+million input / output tokens, Sonnet 4.6 at 3.30 / 16.50 (EU profiles).
+
+| Read                                           | Input tokens    | Output tokens        | Cost                         |
+| ---------------------------------------------- | --------------- | -------------------- | ---------------------------- |
+| Typical (3 photos or a 2-page PDF), Haiku only | 6,000–10,600    | ~1,500               | 0.015–0.02 USD               |
+| Worst case, Haiku only (estimate at the cap)   | 32,000          | 4,096 (`max_tokens`) | 0.058 USD                    |
+| Worst case escalated, Haiku + Sonnet 4.6       | 25,000 + 25,000 | 4,096 + 4,096        | 0.050 + 0.150 = **0.20 USD** |
+
+The worst case needs a document the estimate let through at the escalation cap and a doubtful
+first read; a free read also needs a fresh captcha, and at most 5 run at once.
 
 ## Unverified
 
@@ -224,6 +284,14 @@ research §1.4), roughly three times that again when a read escalates to Sonnet 
 - That `iam:AttachRolePolicy`/`DetachRolePolicy` on the one role is all the budget action needs.
 - That `data_retention_mode: none` set in eu-south-2 also governs requests the EU profile
   routes to other EU regions.
+- That Stripe accepts a metadata update on a `complete` Checkout Session. The API reference
+  lists `metadata` among the update parameters without the "while the session is active"
+  restriction it puts on others; confirm with one test-mode call before going live.
+- That a PDF hiding pages behind duplicate objects _inside compressed object streams_
+  (invisible to the raw scan) is caught; the token estimate and the escalation cap still bound
+  its cost.
+- `npm audit` (dev): `brace-expansion` bundled inside `aws-cdk-lib` (latest release) has a
+  high-severity advisory; it runs only at synth time, never in the Lambdas.
 - The real latency of an escalated read of a 4-page PDF (the 120 s timeout is a guess).
 - Model accuracy: the Bedrock fixtures are hand-written in Bedrock's response shape, not
   recordings. Spec decision 5's comparison with Ekin's anonymised documents is still to do.
