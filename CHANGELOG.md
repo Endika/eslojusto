@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/Endika/eslojusto/compare/v1.6.0...v1.7.0) (2026-10-07)
+
+
+### Features
+
+* **documents:** give pass holders a general letter when nothing falls short ([1619bef](https://github.com/Endika/eslojusto/commit/1619bef9c042d5087d49300303e9ae7171bb7697))
+
 ## [1.6.0](https://github.com/Endika/eslojusto/compare/v1.5.0...v1.6.0) (2026-10-07)
 
 
