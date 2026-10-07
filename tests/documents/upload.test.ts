@@ -9,6 +9,9 @@ import { memoryStore, passToken, tr } from './fixtures';
 
 const NOW = Date.UTC(2026, 9, 7);
 
+// A read the test answers by hand, to look at the page while it is on its way.
+const pending: { next: Promise<ExtractResult> | null } = { next: null };
+
 function setUp(result: ExtractResult, options: { captchaFails?: boolean } = {}) {
   document.body.innerHTML = START;
   const store = memoryStore();
@@ -20,7 +23,9 @@ function setUp(result: ExtractResult, options: { captchaFails?: boolean } = {}) 
   const api: Api = {
     extract: async (r) => {
       requests.push(r);
-      return result;
+      const answer = pending.next ?? Promise.resolve(result);
+      pending.next = null;
+      return answer;
     },
     checkout: async () => ({ ok: false, code: 'service_unavailable' }),
     pass: async () => ({ ok: false, code: 'service_unavailable' }),
@@ -208,6 +213,28 @@ describe('the start sheet', () => {
     choose([photo]);
     await submit();
     expect(used.requests[1]).toHaveProperty('quota', null);
+  });
+
+  it('while a read is on its way, «Rellenar a mano» waits for it', async () => {
+    let answer: (r: ExtractResult) => void = () => {};
+    const { form, events, requests } = setUp(settlement);
+    pending.next = new Promise<ExtractResult>((r) => (answer = r));
+    choose([photo]);
+    document
+      .querySelector('[data-start-panel="upload"]')
+      ?.dispatchEvent(new Event('submit', { cancelable: true }));
+    await flush();
+    await flush();
+    const manual = document.querySelector('[data-start-panel="upload"] [data-start-manual]');
+    expect(manual?.getAttribute('aria-disabled')).toBe('true');
+    manual?.dispatchEvent(new Event('click'));
+    expect(form.hidden).toBe(true);
+    answer(settlement);
+    await flush();
+    await flush();
+    expect(requests).toHaveLength(1);
+    expect(manual?.getAttribute('aria-disabled')).toBe('false');
+    expect(events.log.filter(([e]) => e === 'startChosen')).toEqual([['startChosen', 'upload']]);
   });
 
   it('an invalid or expired pass is forgotten, so the next read is a free one', async () => {
