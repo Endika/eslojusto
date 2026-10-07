@@ -29,6 +29,7 @@ export const START = `
     <p data-doc-status></p>
     <p data-doc-error hidden></p>
     <button type="button" data-start-back>Back</button>
+    <button type="button" data-start-manual>Manual</button>
     <button type="submit" data-start-send>Send</button>
   </form>
   <section data-start-panel="done" hidden>

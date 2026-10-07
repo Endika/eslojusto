@@ -92,7 +92,6 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
   const consent = required(upload.querySelector<HTMLInputElement>('#document-consent'), 'consent');
   const status = required(upload.querySelector<HTMLElement>('[data-doc-status]'), 'status');
   const errorSlip = required(upload.querySelector<HTMLElement>('[data-doc-error]'), 'error');
-  const send = required(upload.querySelector<HTMLButtonElement>('[data-start-send]'), 'send');
   const summary = required(panels.done.querySelector<HTMLElement>('[data-done-summary]'), 'sum');
   const notes = required(panels.done.querySelector<HTMLElement>('[data-done-notes]'), 'notes');
   let busy = false;
@@ -129,7 +128,11 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
   function setBusy(on: boolean, message: string) {
     busy = on;
     status.textContent = message;
-    send.setAttribute('aria-disabled', String(on));
+    // While a read is on its way, leaving for the form would let a late answer overwrite it.
+    for (const button of upload.querySelectorAll(
+      '[data-start-send], [data-start-manual], [data-start-back]',
+    ))
+      button.setAttribute('aria-disabled', String(on));
     upload.setAttribute('aria-busy', String(on));
   }
 
@@ -284,6 +287,7 @@ export function setUpUpload(start: HTMLElement, deps: UploadDeps) {
     });
   for (const button of start.querySelectorAll('[data-start-manual]'))
     button.addEventListener('click', () => {
+      if (busy) return;
       events.startChosen('manual');
       showCalculator(true);
     });
