@@ -47,13 +47,17 @@ describe('regional stack', () => {
     for (const region of regions(apiTemplate)) expect(region).toBe(REGION);
   });
 
-  it('holds only functions, their URLs, their log groups and the dashboard: no storage, no IAM', () => {
+  it('holds only functions, their URLs, logs, the dashboard and alerts: no storage, no IAM', () => {
     expect(types(apiTemplate)).toEqual([
+      'AWS::CloudWatch::Alarm',
       'AWS::CloudWatch::Dashboard',
       'AWS::Lambda::Function',
       'AWS::Lambda::Permission',
       'AWS::Lambda::Url',
       'AWS::Logs::LogGroup',
+      'AWS::Logs::MetricFilter',
+      'AWS::SNS::Subscription',
+      'AWS::SNS::Topic',
     ]);
     apiTemplate.resourceCountIs('AWS::S3::Bucket', 0);
     apiTemplate.resourceCountIs('AWS::DynamoDB::Table', 0);
@@ -150,9 +154,7 @@ describe('dashboard', () => {
     }
   });
 
-  it('adds no custom metrics, metric filters or alarms, which would bill monthly', () => {
-    apiTemplate.resourceCountIs('AWS::Logs::MetricFilter', 0);
-    apiTemplate.resourceCountIs('AWS::CloudWatch::Alarm', 0);
+  it('charts only free AWS metrics, never the custom one', () => {
     // A metric row starts with its namespace; an expression names one only inside SEARCH.
     const namespaces = new Set(
       widgets.flatMap((w) =>
@@ -172,6 +174,132 @@ describe('dashboard', () => {
     const rows = widgets.flatMap((w) => (w.properties['metrics'] ?? []) as unknown[]);
     const searches = body.match(/SEARCH\(/g) ?? [];
     expect(rows.length + searches.length).toBeLessThanOrEqual(50);
+  });
+});
+
+describe('alerts', () => {
+  const alarms = Object.values(apiTemplate.findResources('AWS::CloudWatch::Alarm')) as {
+    Properties: Record<string, unknown> & { AlarmName: string };
+  }[];
+  const byName = (name: string) => {
+    const alarm = alarms.find((a) => a.Properties.AlarmName === `eslojusto-api-${name}`);
+    if (!alarm) throw new Error(`No alarm ${name}`);
+    return alarm.Properties;
+  };
+  const topicRef = { Ref: Object.keys(apiTemplate.findResources('AWS::SNS::Topic'))[0] };
+
+  it('emails one address through the eslojusto-api-alerts topic', () => {
+    apiTemplate.resourceCountIs('AWS::SNS::Topic', 1);
+    apiTemplate.hasResourceProperties('AWS::SNS::Topic', { TopicName: 'eslojusto-api-alerts' });
+    apiTemplate.resourceCountIs('AWS::SNS::Subscription', 1);
+    apiTemplate.hasResourceProperties('AWS::SNS::Subscription', {
+      Protocol: 'email',
+      Endpoint: 'alerts@example.com',
+      TopicArn: topicRef,
+    });
+  });
+
+  it('keeps the topic without subscribers when no address is given', () => {
+    const quiet = Template.fromStack(
+      buildApp(
+        { stripePriceId: 'price_test' },
+        new App({ context: { 'aws:cdk:bundling-stacks': [] } }),
+      ).api,
+    );
+    quiet.resourceCountIs('AWS::SNS::Topic', 1);
+    quiet.resourceCountIs('AWS::SNS::Subscription', 0);
+    quiet.resourceCountIs('AWS::CloudWatch::Alarm', 5);
+  });
+
+  it('raises five standard alarms that email on trouble and on recovery', () => {
+    expect(alarms.map((a) => a.Properties.AlarmName).sort()).toEqual(
+      ['extract-5xx', 'extract-errors', 'extract-no-success', 'payments-errors', 'throttles'].map(
+        (n) => `eslojusto-api-${n}`,
+      ),
+    );
+    for (const { Properties: p } of alarms) {
+      expect(p['AlarmActions']).toEqual([topicRef]);
+      expect(p['OKActions']).toEqual([topicRef]);
+      expect(p['TreatMissingData']).toBe('notBreaching');
+      expect(p['ComparisonOperator']).toBe('GreaterThanOrEqualToThreshold');
+      expect(p['EvaluationPeriods']).toBe(1);
+    }
+  });
+
+  // CloudWatch's free tier covers 10 alarm metrics; a metric-math alarm counts each metric.
+  it('stays within the 10 free alarm metrics', () => {
+    const count = alarms.reduce((n, { Properties: p }) => {
+      const metrics = p['Metrics'] as { MetricStat?: unknown }[] | undefined;
+      return n + (metrics ? metrics.filter((m) => m.MetricStat).length : 1);
+    }, 0);
+    expect(count).toBeLessThanOrEqual(10);
+  });
+
+  it.each([
+    ['extract-errors', 3, 900, 'Errors', 'eslojusto-api-extract'],
+    ['extract-5xx', 3, 1800, 'Url5xxCount', 'eslojusto-api-extract'],
+  ])('%s: %i or more in %i s', (name, threshold, period, metricName, fn) => {
+    expect(byName(name)).toMatchObject({
+      Threshold: threshold,
+      Period: period,
+      Statistic: 'Sum',
+      Namespace: 'AWS/Lambda',
+      MetricName: metricName,
+      Dimensions: [{ Name: 'FunctionName', Value: fn }],
+    });
+  });
+
+  it('throttles: 1 or more on any function in 5 min', () => {
+    expect(byName('throttles')).toMatchObject({
+      Threshold: 1,
+      Period: 300,
+      Namespace: 'AWS/Lambda',
+      MetricName: 'Throttles',
+    });
+    expect(byName('throttles')['Dimensions']).toBeUndefined();
+  });
+
+  it('payments: 2 or more errors or 5xx across checkout and pass in 15 min', () => {
+    const p = byName('payments-errors');
+    expect(p['Threshold']).toBe(2);
+    const stats = (
+      p['Metrics'] as {
+        MetricStat?: {
+          Metric: { MetricName: string; Dimensions: { Value: string }[] };
+          Period: number;
+        };
+      }[]
+    ).flatMap((m) => (m.MetricStat ? [m.MetricStat] : []));
+    expect(
+      stats
+        .map((m) => `${m.Metric.Dimensions[0]?.Value} ${m.Metric.MetricName} ${m.Period}`)
+        .sort(),
+    ).toEqual([
+      'eslojusto-api-checkout Errors 900',
+      'eslojusto-api-checkout Url5xxCount 900',
+      'eslojusto-api-pass Errors 900',
+      'eslojusto-api-pass Url5xxCount 900',
+    ]);
+  });
+
+  it('no success: 5 or more primary-model calls in an hour and no ok read', () => {
+    const p = byName('extract-no-success');
+    expect(p['Threshold']).toBe(1);
+    const json = JSON.stringify(p['Metrics']);
+    expect(json).toContain('IF(FILL(attempts, 0) >= 5 AND FILL(ok, 0) == 0, 1, 0)');
+    expect(json).toContain(PRIMARY_MODEL);
+    expect(json).toContain('"MetricName":"ExtractOk"');
+    expect(json).toContain('"Period":3600');
+  });
+
+  it('adds one metric filter, for successful reads, on the extract log group', () => {
+    apiTemplate.resourceCountIs('AWS::Logs::MetricFilter', 1);
+    apiTemplate.hasResourceProperties('AWS::Logs::MetricFilter', {
+      FilterPattern: '{ $.op = "extract" && $.code = "ok" }',
+      MetricTransformations: [
+        { MetricNamespace: 'Eslojusto/Api', MetricName: 'ExtractOk', MetricValue: '1' },
+      ],
+    });
   });
 });
 
@@ -348,6 +476,22 @@ describe('global stack', () => {
     );
   });
 
+  it('lets CloudFormation manage only the alerts topic and the API alarms', () => {
+    const json = JSON.stringify(
+      globalTemplate.findResources('AWS::IAM::ManagedPolicy', {
+        Properties: { ManagedPolicyName: 'eslojusto-api-cfn-execution' },
+      }),
+    );
+    expect(json).toContain(':eslojusto-api-alerts"');
+    expect(json).toContain(':eslojusto-api-alerts:*"');
+    expect(json).toContain(':alarm:eslojusto-api-*"');
+    expect(json).toContain('cloudwatch:PutMetricAlarm');
+    expect(json).toContain('sns:Subscribe');
+    expect(json).not.toMatch(/sns:\*|cloudwatch:\*|sns:Publish|iam:PassRole[^}]*sns/);
+    expect(json.match(/arn:aws:sns:/g)).toHaveLength(2);
+    expect(json.match(/:alarm:/g)).toHaveLength(1);
+  });
+
   it('lets CloudFormation manage the API dashboard and no other', () => {
     const [policy] = Object.values(
       globalTemplate.findResources('AWS::IAM::ManagedPolicy', {
@@ -355,7 +499,7 @@ describe('global stack', () => {
       }),
     ) as { Properties: { PolicyDocument: { Statement: Record<string, unknown>[] } } }[];
     const cloudwatch = (policy?.Properties.PolicyDocument.Statement ?? []).filter((s) =>
-      JSON.stringify(s['Action']).includes('cloudwatch:'),
+      JSON.stringify(s['Action']).includes('Dashboard'),
     );
     expect(cloudwatch).toHaveLength(1);
     expect(cloudwatch[0]?.['Action']).toEqual([

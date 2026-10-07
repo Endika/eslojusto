@@ -100,7 +100,7 @@ function header(monthlyBudgetUsd: number, budgetName: string): cw.TextWidget {
       '# eslojusto.es · API',
       `[Live Tail de las tres funciones](${liveTail()}) · Logs: ${logLinks} · Lambda: ${lambdaLinks} · [Presupuesto ${budgetName}](https://console.aws.amazon.com/billing/home#/budgets) · [Cost Explorer](https://console.aws.amazon.com/costmanagement/home#/cost-explorer)`,
       '',
-      `**Bien** es: 0 errores de Lambda, 0 limitaciones, 0 \`model_unavailable\`, duración p95 de extract por debajo de 60 s (la mitad de su tiempo límite) y coste IA por debajo de ${daily} USD al día (${monthlyBudgetUsd} USD al mes).`,
+      `**Bien** es: ninguna alarma en rojo, 0 errores de Lambda, 0 limitaciones, 0 \`model_unavailable\`, duración p95 de extract por debajo de 60 s (la mitad de su tiempo límite) y coste IA por debajo de ${daily} USD al día (${monthlyBudgetUsd} USD al mes).`,
     ].join('\n'),
   });
 }
@@ -127,6 +127,7 @@ const flag = (name: string) => `sum(@message like /"${name}":true/)`;
 export function addDashboard(
   stack: Stack,
   budget: { readonly monthlyUsd: number; readonly name: string },
+  alarms: cw.IAlarm[],
 ): cw.Dashboard {
   const dashboard = new cw.Dashboard(stack, 'Dashboard', {
     dashboardName: DASHBOARD_NAME,
@@ -134,6 +135,14 @@ export function addDashboard(
   });
 
   dashboard.addWidgets(header(budget.monthlyUsd, budget.name));
+  dashboard.addWidgets(
+    new cw.AlarmStatusWidget({
+      title: 'Alarmas (avisan por correo)',
+      alarms,
+      width: 24,
+      height: 3,
+    }),
+  );
 
   dashboard.addWidgets(
     new cw.SingleValueWidget({
