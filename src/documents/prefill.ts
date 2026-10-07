@@ -120,7 +120,8 @@ function payslip(e: Extraction): PrefilledField[] {
 
   // The form's salary, only for a payslip of one whole calendar month: with proration, the
   // month's total; without it, the total less the full extra payment when one was paid that
-  // month, and the total otherwise. The person sees it as worked out and confirms it.
+  // month, and the total otherwise. Without the proration answer the total can't be read either
+  // way, so no salary is proposed. The person sees it as worked out and confirms it.
   const total = fields['totalAccrued'];
   const totalAmount = money(total);
   const paid = fields['extraPayPaid'];

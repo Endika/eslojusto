@@ -109,6 +109,10 @@ describe('a payslip', () => {
     });
     expect(p.fields.map((x) => x.name)).not.toContain('monthlySalary');
   });
+  it('without knowing whether extra pay is prorated, no salary is proposed', () => {
+    const p = prefillFrom({ kind: 'payslip', fields: { ...base }, lists: {} });
+    expect(p.fields.map((x) => x.name)).toEqual(['startDate']);
+  });
   it('a period that is not a whole month gives no salary', () => {
     const p = prefillFrom({
       kind: 'payslip',
