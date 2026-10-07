@@ -159,7 +159,8 @@ export async function extract(
     } catch {
       return { code: 'payment_provider_unavailable' };
     }
-    if (passSession === null) return { code: 'pass_invalid' };
+    // Signed by this API and unexpired: a session Stripe can't find is its problem, not the pass's.
+    if (passSession === null) return { code: 'pass_unconfirmed' };
     const problem = passSessionProblem(passSession, deps.clock.now());
     if (problem !== null) return { code: problem };
     if (readsLeft(passSession) === 0) return { code: 'pass_exhausted' };

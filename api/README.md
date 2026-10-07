@@ -49,6 +49,8 @@ cost depends only on pixels it can measure; `application/pdf` is answered with
 (a guard: no accepted pack reaches it).
 `model_unavailable` (every model call failed, as when the budget action denies Bedrock) spends
 neither a free read nor a pass read; the site then offers only the manual path for an hour.
+`pass_unconfirmed` (a valid pass whose session Stripe does not find) reads and counts nothing;
+the site keeps the pass and asks to try again.
 
 **Payload budget.** Lambda takes at most 6 MB per synchronous request, event envelope
 included, and the API refuses a body over 6 MiB. Base64 adds a third, so the browser keeps the

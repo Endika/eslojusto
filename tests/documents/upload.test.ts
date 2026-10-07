@@ -398,6 +398,23 @@ describe('the start sheet', () => {
     expect(requests[1]).toHaveProperty('quota', null);
   });
 
+  it('a pass Stripe could not confirm is kept as it was, with a try-again message', async () => {
+    const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
+    const { passes, requests } = setUp({ ok: false, code: 'pass_unconfirmed' });
+    const held = { token, expiresAt: NOW / 1000 + 3600, readsLeft: 5 };
+    passes.savePass(held);
+    choose([photo]);
+    await submit();
+    expect(requests[0]).toHaveProperty('pass', token);
+    expect(passes.pass()).toEqual(held);
+    expect(document.querySelector('[data-doc-error]')?.textContent).toBe(
+      'No hemos podido comprobar tu pase ahora mismo. Prueba otra vez en un momento.',
+    );
+    choose([photo]);
+    await submit();
+    expect(requests[1]).toHaveProperty('pass', token);
+  });
+
   it('a quota token the API refuses is forgotten', async () => {
     const { passes, requests } = setUp({ ok: false, code: 'invalid_request' });
     passes.saveQuota('v1.stale.quota');
