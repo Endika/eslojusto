@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { letterKind } from '../../src/documents/letter';
+import { letterKind } from '../../src/documents/case';
 import type { Block } from '../../src/documents/ports';
 import { letterModel, reportModel } from '../../src/documents/report';
 import { completed, today, tr, unfairDismissal } from './fixtures';

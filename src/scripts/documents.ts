@@ -1,7 +1,7 @@
 import { documentsAnalytics } from '../analytics/documents';
 import { track } from '../analytics/posthog';
 import type { FormEntries } from '../calculator/fill';
-import type { Detail } from '../calculator/ports';
+import type { Detail } from '../calculator/flow';
 import { createApi } from '../documents/api';
 import { TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/config';
 import type { ExtractionShape } from '../documents/contract';

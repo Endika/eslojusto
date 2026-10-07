@@ -15,7 +15,7 @@ import {
   withHolidayNote,
 } from '../calculator/render';
 import type { Translate } from '../i18n/client';
-import { letterKind, NO_DETAILS, type LetterDetails } from './letter';
+import { NO_DETAILS, type LetterDetails } from './letter';
 import type { Block, DocumentModel } from './ports';
 
 // «2026-10-07» → «07-10-2026», as the site writes dates.
@@ -269,7 +269,7 @@ export function letterModel(
       {
         type: 'text',
         text: tr(
-          letterKind(r.review) === 'items'
+          lines.length > 0
             ? 'client.documents.letter.body'
             : 'client.documents.letter.body_general',
           { fecha: shortDate(r.input.endDate) },

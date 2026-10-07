@@ -61,6 +61,54 @@ describe('import boundaries', () => {
       "import { finalPayReading } from '../documents/final-pay-reading';",
     ],
     ['src/scripts/documents.ts', "import { STEPS } from '../calculator/steps';"],
+    // Every spelling of a final-pay piece, from any shared documents module.
+    ...[
+      './prefill',
+      './prefill.js',
+      './prefill.ts',
+      './prefill/',
+      './prefill/index',
+      '../documents/prefill',
+      './../documents/prefill',
+      './/prefill',
+      './case',
+      './report',
+      './final-pay-reading',
+      '../calculator/ports',
+      '../calculator/main',
+      '../calculator/steps',
+      '../calculator/dom.js',
+      '../engine/review',
+      '../engine/date.ts',
+      '../engine/law/norms',
+      '../scripts/clock',
+      'posthog-js',
+    ].flatMap((source) =>
+      ['upload', 'payment', 'pdf', 'ports', 'letter', 'summary', 'x'].map(
+        (file): [string, string] => [`src/documents/${file}.ts`, `import { x } from '${source}';`],
+      ),
+    ),
+    ...[
+      '../documents/case',
+      '../documents/final-pay-reading.js',
+      '../documents/prefill',
+      '../documents/report',
+      './../documents/case',
+      '../calculator/ports',
+      '../calculator/steps',
+      '../calculator/main',
+      '../engine/review',
+      './final-pay-documents',
+    ].map(
+      (source): [string, string] =>
+        ['src/scripts/documents.ts', `import { x } from '${source}';`] as const,
+    ),
+    ...['./steps', './conditions', './flow.js', './../calculator/flow', '../engine/review'].map(
+      (source): [string, string] => [
+        'src/calculator/navigation.ts',
+        `import { x } from '${source}';`,
+      ],
+    ),
   ])('%s cannot %s', async (filePath, code) => {
     expect(await violations(filePath, code)).toContain('no-restricted-imports');
   });
@@ -210,9 +258,28 @@ describe('import boundaries', () => {
     ['src/calculator/navigation.ts', "import { stepFrom, type Flow } from './flow';"],
     ['src/calculator/steps.ts', "import { applies } from './conditions';"],
     ['src/documents/upload.ts', "import type { ReviewForm } from './ports';"],
+    ['src/documents/upload.ts', "import { required } from '../calculator/dom';"],
+    ['src/documents/payment.ts', "import { parseDate } from '../engine/date';"],
+    ['src/documents/pdf.ts', "import { sans } from './fonts/sans';"],
+    ['src/documents/contract.ts', "import { X } from '../../api/src/domain/image-limit';"],
+    ['src/documents/report.ts', "import { formatEuros } from '../calculator/number';"],
+    ['src/scripts/documents.ts', "import { setUpUpload } from '../documents/upload';"],
+    ['src/scripts/documents.ts', "import type { Detail } from '../calculator/flow';"],
     ['src/documents/case.ts', "import { reportModel } from './report';"],
     ['src/scripts/final-pay-documents.ts', "import { finalPayCase } from '../documents/case';"],
   ])('%s may %s', async (filePath, code) => {
     expect(await violations(filePath, code)).not.toContain('no-restricted-imports');
+  });
+
+  it('the documents wiring loads on demand only the PDF writer and pdf.js', async () => {
+    const lazy = (source: string) =>
+      violations('src/scripts/documents.ts', `export const m = () => import('${source}');`);
+    expect(await lazy('../documents/pdf')).not.toContain('no-restricted-syntax');
+    expect(await lazy('./pdf-pages')).not.toContain('no-restricted-syntax');
+    for (const source of ['../documents/report', '../documents/pdf.js', './final-pay-documents'])
+      expect(await lazy(source), source).toContain('no-restricted-syntax');
+    expect(
+      await violations('src/scripts/documents.ts', 'export const m = (s: string) => import(s);'),
+    ).toContain('no-restricted-syntax');
   });
 });

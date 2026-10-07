@@ -1,5 +1,8 @@
 import type { CivilDate } from '../engine/date';
 
+// Whether a section's result shows its detail: locked until a pass unlocks it, where a pass exists.
+export type Detail = 'locked' | 'unlocked';
+
 // A review's walk through its sheets: what navigation and the tabs need to know of a section's
 // form, and nothing else. Step ids are also the URL fragments.
 export interface Flow<S extends string> {

@@ -61,21 +61,32 @@ const analyticsReach = {
 // Every review section walks its sheets on the same navigation and tabs, which learn a section's
 // steps from the Flow they are given, so a new section plugs in without touching them.
 const flowOnly = {
-  regex: `^\\./(?!flow$|tabs$)|^\\.\\./(?!engine/date$)|${notCanonical}`,
+  regex: `^(?!\\./(flow|tabs)$|\\.\\./engine/date$)|${notCanonical}`,
   message: 'Navigation and tabs serve every section: its specifics come in through a Flow.',
 };
 // Reading documents and the pass serve every review section the same way: what is particular to
-// one comes in through their ports, wired by that section's composition root.
-const finalPayParts = '(case|final-pay-reading|prefill|report)$';
+// one (the final pay's case, reading, prefill and report) comes in through their ports, wired by
+// that section's composition root. Allowlists, so no spelling of a path gets around them.
+const FINAL_PAY_DOCUMENTS = ['case', 'final-pay-reading', 'prefill', 'report'];
+const sharedDocuments =
+  'api|config|contract|files|letter|notice|outage|pass|pdf|pdf-pages|pdf-writer|ports|quality|skipped|summary|upload';
+// The contract mirrors one constant of the API package, two levels up.
+const apiMirror = '\\.\\./\\.\\./api/src/domain/image-limit$';
 const documentsPlatform = {
-  regex: `^\\./${finalPayParts}|^\\.\\./calculator/(?!dom$|fill$|number$)|^\\.\\./engine/(?!date$)`,
+  regex: `^(?!\\./(${sharedDocuments})$|\\./fonts/(sans|serif)$|\\.\\./calculator/(dom|fill|number)$|\\.\\./engine/date$|\\.\\./i18n/client$|${apiMirror})|^(?!${apiMirror})(\\.\\.?/(.*/)?\\.\\.?(/|$)|.*//)`,
   message:
     'Document reading and the pass serve every section: its specifics come in through ports.',
 };
 const documentsRoot = {
-  regex: `^\\.\\./documents/${finalPayParts}|^\\.\\./calculator/(?!fill$|ports$)`,
+  regex: `^(?!\\.\\./analytics/(documents|posthog)$|\\.\\./calculator/(fill|flow)$|\\.\\./documents/(api|config|contract|files|outage|pass|payment|ports|upload)$|\\.\\./i18n/client$|\\./(clock|jpeg|quality)$)|${notCanonical}`,
   message:
     'The documents wiring serves every section: its specifics come in as a DocumentsSection.',
+};
+// The documents wiring loads the PDF writer and pdf.js when they are needed, and nothing else.
+const documentsRootLazy = {
+  selector:
+    'ImportExpression:not([source.type="Literal"][source.value=/^(\\.\\.\\/documents\\/pdf|\\.\\/pdf-pages)$/])',
+  message: 'The documents wiring loads only the PDF writer and pdf.js on demand.',
 };
 const hiddenImports = [
   ['ImportExpression', 'Dynamic imports'],
@@ -191,12 +202,18 @@ export default tseslint.config(
     ['src/calculator/{flow,navigation,tabs}.ts'],
     [noAnalytics, noRoot, noPosthogSdk, flowOnly],
   ),
-  boundary(
-    ['src/documents/{api,contract,payment,pdf,ports,upload}.ts'],
-    [noAnalytics, noRoot, noPosthogSdk, documentsPlatform],
-  ),
+  boundary(['src/documents/*.ts'], [noAnalytics, noRoot, noPosthogSdk, documentsPlatform], {
+    ignores: FINAL_PAY_DOCUMENTS.map((name) => `src/documents/${name}.ts`),
+  }),
   {
     files: ['src/scripts/documents.ts'],
-    rules: { 'no-restricted-imports': ['error', { patterns: [documentsRoot] }] },
+    rules: {
+      'no-restricted-imports': ['error', { patterns: [documentsRoot] }],
+      'no-restricted-syntax': [
+        'error',
+        documentsRootLazy,
+        ...hiddenImports.filter((h) => h.selector !== 'ImportExpression'),
+      ],
+    },
   },
 );
