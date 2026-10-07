@@ -19,6 +19,9 @@ import {
 // The official reference-index system that RDL 29/2026, DF 6.ª.a points to.
 export const REFERENCE_INDEX_URL = 'https://serpavi.mivau.gob.es/';
 
+// Ley 12/2023, art. 3.k: who counts as a large landlord from 26-05-2023.
+const LARGE_LANDLORD_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2023-12203#a3';
+
 const DECREES = ['rdl8_2026', 'rdl26_2026', 'rdl29_2026'] as const;
 
 const SHORT_NAME: Record<(typeof DECREES)[number], string> = {
@@ -112,7 +115,10 @@ export function capsCopy(
       id: 'three',
       when: tx('rent_indices.cap.three.when'),
       rule: tx('rent_indices.cap.three.rule'),
-      sources: sources(['cap_3_2024']),
+      sources: [
+        ...sources(['cap_3_2024']),
+        { citation: tx('rent_indices.large_landlord_source'), url: LARGE_LANDLORD_URL },
+      ],
     },
     {
       id: 'irav',
@@ -131,7 +137,7 @@ export function capsCopy(
             when: tx('rent_indices.cap.two.when', { desde: formatDay(decree.inForceSince) }),
             rule: tx('rent_indices.cap.two.rule'),
             sources: [
-              ...sources(['cap_2_rdl29', 'irav_all_contracts']),
+              ...sources(['cap_2_rdl29', 'irav_all_contracts', 'stressed_zone']),
               { citation: tx('rent_indices.reference_index'), url: REFERENCE_INDEX_URL },
             ],
           },
