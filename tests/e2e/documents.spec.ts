@@ -307,6 +307,7 @@ test('the privacy page and the legal notice describe documents and the pass', as
   await expect(privacy).toContainText('Stripe');
   await expect(privacy).toContainText('Cloudflare Turnstile');
   await expect(privacy).toContainText('eslojusto-pase');
+  await expect(privacy).toContainText('cuánto texto procesó el modelo');
   await page.goto('aviso-legal/');
   await expect(page.locator('#condiciones')).toContainText('Condiciones de venta del pase');
   await expect(page.locator('main')).toContainText('art. 103.m');
