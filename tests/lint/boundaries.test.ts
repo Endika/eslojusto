@@ -1,7 +1,10 @@
 import { ESLint } from 'eslint';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 const eslint = new ESLint();
+
+// Loading the config and parsers takes seconds on a cold runner; pay it here, not in the first case.
+beforeAll(() => eslint.lintText('', { filePath: 'src/engine/x.ts' }), 60_000);
 
 // The rules that fired on `code` as if it lived at `filePath`; nothing is written to disk.
 async function violations(filePath: string, code: string): Promise<string[]> {
