@@ -247,9 +247,16 @@ export class PdfDocument {
   }
 
   // A blank line to write on by hand, with its label under it.
-  blank(label: string, style: TextStyle, width = this.width): void {
+  blank(
+    label: string,
+    style: TextStyle,
+    width = this.width,
+    value?: string,
+    valueStyle: TextStyle = style,
+  ): void {
     this.ensure(42);
     this.y += 26;
+    if (value) this.textAt(value, 2, this.y - 5, valueStyle);
     const y = A4.height - this.y;
     this.page.ops.push(
       `${color(SOFT)} RG 0.6 w ${MARGIN.left} ${fmt(y)} m ${fmt(MARGIN.left + width)} ${fmt(y)} l S`,

@@ -32,8 +32,11 @@ export function documentsAnalytics(track: Track): DocumentEvents {
     passFailed(code) {
       track('pass_failed', { code });
     },
-    downloaded(document) {
-      track('report_downloaded', { document });
+    downloaded(document, letterPrefilled) {
+      track('report_downloaded', {
+        document,
+        letter_prefilled: letterPrefilled ?? 'not_applicable',
+      });
     },
   };
 }

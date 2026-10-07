@@ -1,9 +1,11 @@
 import type { CompletedReview } from '../calculator/ports';
 import { required } from '../calculator/dom';
+import { parseDate, toIso, type CivilDate } from '../engine/date';
 import type { Review } from '../engine/review';
 import type { Translate } from '../i18n/client';
 import { SESSION_ID, type Api, type ErrorCode } from './contract';
 import { CHECKOUT_ORIGIN } from './config';
+import { letterPrefilled, looksLikeDniOrNie, type LetterDetails } from './letter';
 import { canDownload, newNonce, passState, type PassStore, type PendingCheckout } from './pass';
 import type { Browser, Captcha, DocumentEvents, Download, PdfMaker } from './ports';
 
@@ -58,6 +60,8 @@ export interface PaymentDeps {
   readonly pdf: () => Promise<PdfMaker>;
   // Keeps the review's answers for the trip to the payment page and back.
   readonly keepReview: () => void;
+  // The letter's date starts at today, in the person's own calendar.
+  readonly today: () => CivilDate;
   readonly wait?: (ms: number) => Promise<void>;
 }
 
@@ -77,11 +81,23 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   const session = required(section.querySelector<HTMLInputElement>('#pass-session'), 'session');
   const status = required(section.querySelector<HTMLElement>('[data-pass-status]'), 'status');
   const errorSlip = required(section.querySelector<HTMLElement>('[data-pass-error]'), 'error');
-  const letterButton = required(
-    section.querySelector<HTMLButtonElement>('[data-download="letter"]'),
-    'letter',
+  const letter = required(section.querySelector<HTMLElement>('[data-letter]'), 'letter');
+  const letterField = (name: keyof LetterDetails) =>
+    required(
+      letter.querySelector<HTMLInputElement>(`[data-letter-field="${name}"]`),
+      `letter ${name}`,
+    );
+  const letterInputs = {
+    name: letterField('name'),
+    id: letterField('id'),
+    company: letterField('company'),
+    place: letterField('place'),
+    date: letterField('date'),
+  };
+  const idWarning = required(
+    letter.querySelector<HTMLElement>('[data-letter-id-warning]'),
+    'id warning',
   );
-  const letterNote = required(section.querySelector<HTMLElement>('[data-letter-note]'), 'note');
   let current: CompletedReview | null = null;
   let busy = false;
 
@@ -101,8 +117,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     section.hidden = !paid && !shortfall;
     buy.hidden = paid;
     downloads.hidden = !paid;
-    letterButton.hidden = !shortfall;
-    letterNote.hidden = !shortfall;
+    letter.hidden = !shortfall;
     if (paid && stored) {
       const until = new Date(stored.expiresAt * 1000).toLocaleDateString('es-ES', {
         day: 'numeric',
@@ -207,15 +222,48 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     browser.redirect(result.url);
   }
 
+  function letterDetails(): LetterDetails {
+    let date: CivilDate | null = null;
+    try {
+      date = letterInputs.date.value ? parseDate(letterInputs.date.value) : null;
+    } catch {
+      // A date the browser lets through unfinished keeps its line.
+    }
+    return {
+      name: letterInputs.name.value,
+      id: letterInputs.id.value,
+      company: letterInputs.company.value,
+      place: letterInputs.place.value,
+      date,
+    };
+  }
+
+  // A warning only: the letter is downloaded with whatever was typed.
+  function checkId() {
+    const typed = letterInputs.id.value.trim();
+    const odd = typed !== '' && !looksLikeDniOrNie(typed);
+    idWarning.hidden = !odd;
+    idWarning.textContent = odd ? tr('client.documents.letter.id_warning') : '';
+  }
+
+  function clearLetter() {
+    for (const input of Object.values(letterInputs)) input.value = '';
+    checkId();
+  }
+
   async function download(which: Download) {
     if (!current || !canDownload(passState(passes.pass(), browser.now()))) return render();
     setError(null);
     status.textContent = tr('client.documents.pass.generating');
     try {
       const maker = await deps.pdf();
-      const blob = await (which === 'report' ? maker.report(current) : maker.letter(current));
+      const details = letterDetails();
+      const blob = await (which === 'report'
+        ? maker.report(current)
+        : maker.letter(current, details));
       browser.save(blob, tr(`client.documents.${FILENAMES[which]}.filename`));
-      events.downloaded(which);
+      if (which === 'letter') events.downloaded(which, letterPrefilled(details));
+      else events.downloaded(which);
       status.textContent = tr('client.documents.pass.generated');
     } catch {
       status.textContent = '';
@@ -232,6 +280,11 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       busy = false;
     }
   };
+
+  letterInputs.id.addEventListener('change', checkId);
+  letterInputs.id.addEventListener('input', () => {
+    if (!idWarning.hidden) checkId();
+  });
 
   waiver.addEventListener('change', () => {
     waiverError.hidden = true;
@@ -258,12 +311,14 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   return {
     show(review: CompletedReview) {
       current = review;
+      if (letterInputs.date.value === '') letterInputs.date.value = toIso(deps.today());
       status.textContent = '';
       setError(null);
       render();
     },
     hide() {
       current = null;
+      clearLetter();
       render();
     },
     // Back from Stripe with `?session_id=`: the pass is asked for with the nonce kept before leaving.

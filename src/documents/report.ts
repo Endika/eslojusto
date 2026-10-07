@@ -15,6 +15,7 @@ import {
   withHolidayNote,
 } from '../calculator/render';
 import type { Translate } from '../i18n/client';
+import { NO_DETAILS, type LetterDetails } from './letter';
 
 // What a PDF says, block by block, before any layout: the report and the letter are built from
 // the review the person confirmed and the page's dictionary, never from anything else.
@@ -28,7 +29,8 @@ export type Block =
   | { readonly type: 'row'; readonly label: string; readonly value: string }
   | { readonly type: 'bullet'; readonly text: string }
   | { readonly type: 'source'; readonly text: string; readonly url: string }
-  | { readonly type: 'blank'; readonly label: string }
+  // A line to write on, with the value already on it when the person gave one.
+  | { readonly type: 'blank'; readonly label: string; readonly value?: string }
   | { readonly type: 'rule' };
 
 export interface DocumentModel {
@@ -229,9 +231,18 @@ export function reportModel(r: CompletedReview, tr: Translate, today: CivilDate)
   };
 }
 
-// The letter lists only what falls short, with the figures of the review; the person fills in
-// the rest by hand and decides whether to use it at all.
-export function letterModel(r: CompletedReview, tr: Translate): DocumentModel {
+const blank = (label: string, value: string): Block => {
+  const v = value.trim();
+  return v === '' ? { type: 'blank', label } : { type: 'blank', label, value: v };
+};
+
+// The letter lists only what falls short, with the figures of the review; what the person added
+// fills its lines, the rest is left to write by hand, and whether to use it at all is theirs.
+export function letterModel(
+  r: CompletedReview,
+  tr: Translate,
+  details: LetterDetails = NO_DETAILS,
+): DocumentModel {
   const lines = r.review.items.flatMap((i): Block[] => {
     const partida = tr(`client.item.${i.item.id}`);
     const empresa = formatEuros(i.employerFigure ?? 0);
@@ -267,18 +278,24 @@ export function letterModel(r: CompletedReview, tr: Translate): DocumentModel {
     footer: null,
     blocks: [
       { type: 'title', text: tr('client.documents.letter.title') },
-      { type: 'blank', label: tr('client.documents.letter.name') },
-      { type: 'blank', label: tr('client.documents.letter.id') },
-      { type: 'blank', label: tr('client.documents.letter.company') },
+      blank(tr('client.documents.letter.name'), details.name),
+      blank(tr('client.documents.letter.id'), details.id),
+      blank(tr('client.documents.letter.company'), details.company),
       {
         type: 'text',
         text: tr('client.documents.letter.body', { fecha: shortDate(r.input.endDate) }),
       },
       ...lines,
       { type: 'text', text: tr('client.documents.letter.closing') },
-      { type: 'text', text: tr('client.documents.letter.place_date') },
+      {
+        type: 'text',
+        text: tr('client.documents.letter.place_date', {
+          lugar: details.place.trim() || tr('client.documents.letter.place_blank'),
+          fecha: details.date ? longDate(details.date) : tr('client.documents.letter.date_blank'),
+        }),
+      },
       { type: 'text', text: tr('client.documents.letter.received') },
-      { type: 'blank', label: tr('client.documents.letter.name') },
+      blank(tr('client.documents.letter.name'), details.name),
     ],
   };
 }

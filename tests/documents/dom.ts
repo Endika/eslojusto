@@ -67,8 +67,16 @@ export const OFFER = `
   <div data-pass-downloads hidden>
     <p data-pass-validity></p>
     <button data-download="report">Report</button>
-    <button data-download="letter">Letter</button>
-    <p data-letter-note></p>
+    <fieldset data-letter>
+      <input data-letter-field="name" />
+      <input data-letter-field="id" />
+      <p data-letter-id-warning hidden></p>
+      <input data-letter-field="company" />
+      <input data-letter-field="place" />
+      <input type="date" data-letter-field="date" />
+      <button data-download="letter">Letter</button>
+      <p data-letter-note></p>
+    </fieldset>
   </div>
   <p data-pass-status></p>
   <p data-pass-error hidden></p>

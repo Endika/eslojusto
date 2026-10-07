@@ -102,6 +102,33 @@ describe('the letter', () => {
       'Nombre y apellidos',
     ]);
   });
+  it('with nothing added, the place and date are left to write too', () => {
+    const lines = letterModel(completed(), tr).blocks.filter((b) => b.type === 'text');
+    expect(lines.map((b) => ('text' in b ? b.text : ''))).toContain(
+      'En ____________________, a ____ de ____________________ de ________',
+    );
+    expect(
+      letterModel(completed(), tr)
+        .blocks.filter((b) => b.type === 'blank')
+        .every((b) => !('value' in b)),
+    ).toBe(true);
+  });
+  it('fills each line the person filled, and leaves the empty ones', () => {
+    const blocks = letterModel(completed(), tr, {
+      name: '  Alex Ejemplo ',
+      id: '',
+      company: 'Empresa Ficticia SL',
+      place: 'Logroño',
+      date: null,
+    }).blocks;
+    expect(blocks.filter((b) => b.type === 'blank')).toEqual([
+      { type: 'blank', label: 'Nombre y apellidos', value: 'Alex Ejemplo' },
+      { type: 'blank', label: 'DNI o NIE' },
+      { type: 'blank', label: 'Empresa', value: 'Empresa Ficticia SL' },
+      { type: 'blank', label: 'Nombre y apellidos', value: 'Alex Ejemplo' },
+    ]);
+    expect(text(blocks)).toContain('En Logroño, a ____ de ____________________ de ________');
+  });
   it('gives no advice and asks for nothing', () => {
     const all = text(letterModel(completed(), tr).blocks).toLowerCase();
     for (const word of [/\bfirma/, /\breclam/, /\bdemand/, /está bien/, /es correcto/])

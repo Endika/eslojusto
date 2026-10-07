@@ -3,7 +3,14 @@ import type { EmployerFigures, Review } from '../engine/review';
 import type { Cause, FinalPayInput, HolidayUnit, ItemId, FixedTermType } from '../engine/types';
 import { FAQ_TOPICS } from '../content/faq-topics';
 import { DOCUMENTS_BUILD } from '../documents/config';
-import { DOWNLOADS, ERROR_CODES, FILES_BUCKETS, PAGE_KINDS, PASS_VIA } from '../documents/ports';
+import {
+  DOWNLOADS,
+  ERROR_CODES,
+  FILES_BUCKETS,
+  LETTER_PREFILLED,
+  PAGE_KINDS,
+  PASS_VIA,
+} from '../documents/ports';
 
 // Every property is a code from a closed list, a small count or a bucket: nothing a person
 // types can fit in one. `isValidEvent` enforces it at runtime before anything is sent.
@@ -207,7 +214,12 @@ const DOCUMENT_CATALOGUE = {
   checkout_started: {},
   pass_issued: { via: oneOf(PASS_VIA) },
   pass_failed: { code: oneOf(ERROR_CODES) },
-  report_downloaded: { document: oneOf(DOWNLOADS) },
+  // For the letter, whether none, some or all of its optional fields were filled; never their
+  // values. The report has none.
+  report_downloaded: {
+    document: oneOf(DOWNLOADS),
+    letter_prefilled: oneOf([...LETTER_PREFILLED, 'not_applicable']),
+  },
 } as const satisfies Record<string, Record<string, Rule>>;
 
 // The document events exist only in a build with the documents API; elsewhere they are dropped
