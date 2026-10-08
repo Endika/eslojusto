@@ -44,31 +44,67 @@ export function shortfallOf(f: Finding): Shortfall | null {
   return found ?? null;
 }
 
-// Concrete findings: something below the minimum, over a limit, void, missing or turned
-// permanent by the law.
-const CONCRETE: ReadonlySet<FindingStatus> = new Set([
+// How a shortfall against the minimum wage reads: per year or per working day in the last year
+// below it, or, without a year to name, the payslips' or the finding's own total.
+export interface Euros {
+  readonly per: 'year' | 'day' | 'payslips' | 'total';
+  readonly amount: number;
+}
+
+export function figureOf(f: Finding): Euros | null {
+  const shortfall = shortfallOf(f);
+  if (shortfall !== null) return { per: shortfall.per, amount: shortfall.amount };
+  const amount = amountOf(f);
+  if (amount === null) return null;
+  return { per: f.id === 'smi_monthly' ? 'payslips' : 'total', amount };
+}
+
+// A year left out of the sum: before the table, without its decree yet, or with its effects from
+// 1 January unchecked. With any of them the total does not cover the whole contract.
+const GAPS: ReadonlySet<EmploymentPhrase['key']> = new Set([
+  'minimum_wage.not_loaded',
+  'minimum_wage.not_published',
+  'minimum_wage.year.effects_unverified',
+  'minimum_wage.year.hours_unknown',
+  'minimum_wage.year.extra_pays_unknown',
+  'minimum_wage.year.training_effective_work',
+]);
+const YEAR_PHRASE = /^minimum_wage\.year\./;
+
+// The contract's shortfall added up over the years compared, from the first of them; null when a
+// year of the span is left out or there is no yearly total.
+export function sinceOf(f: Finding): { readonly from: number; readonly amount: number } | null {
+  if (shortfallOf(f)?.per !== 'year') return null;
+  const amount = amountOf(f);
+  if (amount === null || f.calculation.some((p) => GAPS.has(p.key))) return null;
+  const first = f.calculation.find((p) => YEAR_PHRASE.test(p.key));
+  const from = first === undefined ? null : integer(first.vars, 'year');
+  return from === null ? null : { from, amount };
+}
+
+const findingsOf = (a: Assessed): readonly Finding[] =>
+  a.kind === 'single' ? [a.finding] : a.readings.map((r) => r.finding);
+
+// Anything to look at: a concrete finding the pass does not open, or a doubt.
+const TO_REVIEW: ReadonlySet<FindingStatus> = new Set([
   'below_minimum',
   'over_legal_limit',
   'clause_void',
   'becomes_permanent',
   'missing_requirement',
+  'review_it',
+  'depends_on_agreement',
 ]);
-const DOUBT: ReadonlySet<FindingStatus> = new Set(['review_it', 'depends_on_agreement']);
-
-const isConcrete = (f: Finding): boolean => CONCRETE.has(f.status) && !f.agreementMaySetOther;
-
-const findingsOf = (a: Assessed): readonly Finding[] =>
-  a.kind === 'single' ? [a.finding] : a.readings.map((r) => r.finding);
 
 export type Headline = 'found' | 'to_review' | 'nothing_found' | 'nothing_entered';
 
-// The summary's first line: something concrete in every reading, something to look at, nothing,
-// or nothing to compare.
+// The summary's first line follows the engine: what opens the pass (a shortfall, a limit passed,
+// a void clause or a contract the law makes permanent, in every reading) is «found»; anything
+// else to look at, such as information missing, is only to review.
 export function headline(review: EmploymentReview): Headline {
-  const all = everyAssessed(review);
-  if (all.some((a) => findingsOf(a).every(isConcrete))) return 'found';
-  const findings = all.flatMap(findingsOf);
-  if (findings.some((f) => CONCRETE.has(f.status) || DOUBT.has(f.status))) return 'to_review';
+  if (review.offerPass) return 'found';
+  const findings = everyAssessed(review).flatMap(findingsOf);
+  if (findings.some((f) => TO_REVIEW.has(f.status))) return 'to_review';
   return findings.every((f) => f.status === 'not_entered') ? 'nothing_entered' : 'nothing_found';
 }
 

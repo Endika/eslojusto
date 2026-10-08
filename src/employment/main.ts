@@ -156,6 +156,8 @@ export function setUpEmployment(
   );
 
   form.addEventListener('change', conditions);
+  // A typed figure can open or close a question too, such as the extra pays and their proration.
+  form.addEventListener('input', conditions);
   // A changed answer reopens the sheets: the furthest one reachable is the first that still needs
   // an answer, so a stop at the gate never opens the sheets it skipped.
   form.addEventListener('input', () => {

@@ -1199,7 +1199,8 @@ export const es = {
   'employment.period.day': 'Al día',
   'employment.period.hour': 'A la hora',
   'employment.salary.extra_pays': 'Pagas extra al año',
-  'employment.salary.extra_pays_hint': 'Lo normal son 2, en verano y en Navidad. Si no hay, 0.',
+  'employment.salary.extra_pays_hint':
+    'Lo normal son 2, en verano y en Navidad. Cuéntalas también si van prorrateadas en la nómina: lo dirás en la pregunta siguiente. Si no hay ninguna, 0.',
   'employment.salary.prorated': '¿Las pagas extra van prorrateadas en cada nómina?',
   'employment.salary.prorated_hint': 'Repartidas en las 12 nóminas en vez de cobrarse aparte.',
   'employment.salary.in_kind': 'Salario en especie',
@@ -1294,7 +1295,7 @@ export const es = {
   'employment.unit.months': 'Meses',
   'employment.trial.technical': '¿Eres técnico titulado?',
   'employment.trial.technical_hint':
-    'Con un título universitario o de formación profesional superior, y trabajas en funciones de ese título.',
+    'Con un título universitario o de formación profesional superior, y trabajas en funciones de ese título. Cuenta para el periodo de prueba y para el pacto de no competencia.',
   'employment.trial.small_company': '¿Tu empresa tiene menos de 25 personas en plantilla?',
   'employment.trial.same_duties': '¿Ya habías hecho este mismo trabajo en esta empresa?',
   'employment.trial.after_training': '¿Vienes de un contrato formativo en esta empresa?',
@@ -1475,10 +1476,9 @@ export const es = {
   'client.employment.out_of_scope.minor':
     'Con menos de 18 años hay reglas propias de jornada y descanso. Esta versión no las calcula: abajo las tienes como información.',
 
-  'client.employment.headline.found':
-    'Hay puntos por debajo de lo que garantiza la ley o por encima de sus límites.',
+  'client.employment.headline.found': 'Hay puntos que no cumplen lo que marca la ley.',
   'client.employment.headline.to_review':
-    'Nada sale seguro fuera de la ley, pero hay puntos que dependen de tu convenio, de tus respuestas o que hay que revisar.',
+    'Hay puntos que revisar o que dependen de tu convenio o de tus respuestas.',
   'client.employment.headline.nothing_found':
     'Con los datos que has metido, nada queda por debajo de lo que garantiza la ley ni por encima de sus límites.',
   'client.employment.headline.nothing_entered':
@@ -1490,7 +1490,7 @@ export const es = {
   'client.employment.status.below_minimum_year': 'Por debajo del SMI: {importe} al año',
   'client.employment.status.below_minimum_day': 'Por debajo del SMI: {importe} por jornada',
   'client.employment.status.below_minimum_payslips': 'Por debajo del SMI: {importe} en tus nóminas',
-  'client.employment.status.below_minimum_amount': 'Por debajo del mínimo legal: {importe}',
+  'client.employment.status.below_minimum_total': 'Por debajo del mínimo legal: {importe}',
   'client.employment.status.over_legal_limit': 'Por encima del límite legal',
   'client.employment.status.clause_void': 'Esta cláusula no vale',
   'client.employment.status.becomes_permanent': 'La ley prevé la condición de fija',
@@ -1504,7 +1504,13 @@ export const es = {
   'client.employment.status.not_published': 'SMI aún no publicado',
   'client.employment.status.depends': 'Depende',
   'client.employment.reading_status.below_minimum': 'por debajo del mínimo legal',
-  'client.employment.reading_status.below_minimum_amount': 'por debajo del SMI en {importe}',
+  'client.employment.reading_status.below_minimum_year': 'por debajo del SMI en {importe} al año',
+  'client.employment.reading_status.below_minimum_day':
+    'por debajo del SMI en {importe} por jornada',
+  'client.employment.reading_status.below_minimum_payslips':
+    'por debajo del SMI en {importe} en tus nóminas',
+  'client.employment.reading_status.below_minimum_total':
+    'por debajo del mínimo legal en {importe}',
   'client.employment.reading_status.over_legal_limit': 'por encima del límite legal',
   'client.employment.reading_status.clause_void': 'esta cláusula no vale',
   'client.employment.reading_status.becomes_permanent': 'la ley prevé la condición de fija',
@@ -1551,7 +1557,8 @@ export const es = {
     'Si no lo eres y tu empresa tiene menos de 25 personas',
   'client.employment.reading.not_technical_from_25_staff':
     'Si no lo eres y tu empresa tiene 25 o más',
-  'client.employment.since_start': 'Desde que empezó el contrato, {importe} en total.',
+  'client.employment.since_year':
+    'Desde {anio}, {importe} en total. Las cantidades se pueden pedir durante un año desde que se debieron pagar (art. 59.2): lo explica «Plazos», más abajo.',
   'client.employment.note.your_answer': 'Según lo que has contestado.',
   'client.employment.note.agreement': 'Tu convenio puede fijar otro límite.',
   'client.employment.permanent.15_4':

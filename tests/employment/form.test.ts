@@ -90,6 +90,15 @@ describe('the employment form', () => {
     expect(contractAnnualPay(r.input)).toBe(21000);
   });
 
+  it('asks no proration of a contract without extra pays', () => {
+    const el = form({ extraPays: '0' });
+    el.querySelector('[name="extraProrated"]')?.remove();
+    const r = readEmploymentForm(el, TODAY);
+    if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
+    expect(r.input.extraPays).toEqual({ count: 0, prorated: false });
+    expect(r.input.salary.payments).toBe(12);
+  });
+
   it('stops household employment at the gate, whatever else it says', () => {
     const el = form({ relationship: 'household' });
     expect(gate(el)).toEqual({ inScope: false, reason: 'special_relationship' });
