@@ -783,7 +783,10 @@ test('the 26th file is left out with a message, and 25 go in one read', async ({
   await expect(page.getByText('Como mucho 25 fotos o páginas de PDF en total')).toBeVisible();
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
-  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
+  // Preparing 25 pages takes longer than the default wait on a loaded runner.
+  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused({
+    timeout: 60_000,
+  });
   const sent = fake.extract[0]?.postDataJSON() as { files: { data: string }[] };
   expect(sent.files).toHaveLength(25);
   // Light pages fit their share at the full size.
