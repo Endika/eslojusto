@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.16.0](https://github.com/Endika/eslojusto/compare/v1.15.0...v1.16.0) (2026-10-08)
+
+
+### Features
+
+* **calculator:** let a flow open past a page's preset cause and show the benefit first ([b4a734c](https://github.com/Endika/eslojusto/commit/b4a734c0be0a382242d540989d409e93a9fdbe0a))
+* **content:** work out the case pages' examples with the engine at build time ([ad6cee9](https://github.com/Endika/eslojusto/commit/ad6cee9c0658e2cb9a1f7bc0c9c110c4c5bca415))
+* **finiquito:** link the case pages from the guide and home and add the table by seniority ([89a22a3](https://github.com/Endika/eslojusto/commit/89a22a3f775fe8d47c527288d38a0e2d187deecd))
+* **pages:** add the finiquito and paro case pages with the calculator preset ([e408e4b](https://github.com/Endika/eslojusto/commit/e408e4bc16aaa367faca6a589c5f744fe32dac16))
+
+
+### Bug Fixes
+
+* **content:** require a harmful substantial change and leave pre-2001 temporary contracts without severance ([dd7a2ba](https://github.com/Endika/eslojusto/commit/dd7a2bac4186da9c3f2a47e6aa28f57a3740a6ce))
+
 ## [1.15.0](https://github.com/Endika/eslojusto/compare/v1.14.0...v1.15.0) (2026-10-08)
 
 
