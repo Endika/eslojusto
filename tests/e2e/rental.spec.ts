@@ -136,7 +136,7 @@ for (const { name, viewport } of SIZES) {
       await open(page, viewport);
       await fillContract(page, { type: 'De temporada', signed: '2025-09-01', start: '2025-09-01' });
       await expect(page.getByText('Esta revisión no cubre tu tipo de contrato')).toBeVisible();
-      await expect(page.getByText(/Un contrato de temporada/)).toBeVisible();
+      await expect(page.getByText(/aún no cubre los contratos de temporada/)).toBeVisible();
       // The sheets it skipped stay closed: the next tab is not a way around the gate.
       await page.getByRole('link', { name: /Contrato/ }).click();
       await expect(sheet(page, 'Tu contrato')).toBeVisible();

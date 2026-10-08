@@ -3239,9 +3239,9 @@ export const es = {
   'client.rental.out_of_scope.before_2019':
     'Esta versión no revisa contratos firmados antes del 6 de marzo de 2019: siguen otras reglas para actualizar la renta.',
   'client.rental.out_of_scope.seasonal':
-    'Un contrato de temporada no es de vivienda habitual y la ley le da otras reglas.',
+    'Esta revisión aún no cubre los contratos de temporada. El Real Decreto-ley 29/2026, en vigor desde el 8 de octubre de 2026 y pendiente de convalidación, trata como de vivienda habitual el contrato temporal que no recoge una causa de temporalidad real y acreditable.',
   'client.rental.out_of_scope.room':
-    'Un alquiler por habitaciones no sigue las reglas de vivienda habitual que revisa esta versión.',
+    'Esta revisión aún no cubre los alquileres por habitaciones. El Real Decreto-ley 29/2026, en vigor desde el 8 de octubre de 2026 y pendiente de convalidación, los incluye en el alquiler de vivienda habitual.',
   'client.rental.out_of_scope.other_use':
     'Un contrato para un uso distinto del de vivienda tiene sus propias reglas.',
   'client.rental.out_of_scope.protected':
@@ -3363,7 +3363,7 @@ export const es = {
     'Si la vivienda está en una zona tensionada, la renta inicial puede tener tope (art. 17.6 y 17.7 LAU). Las zonas las declara cada comunidad; el precio de referencia está en SERPAVI.',
   'client.rental.info.reference_price.title': 'Precio de referencia',
   'client.rental.info.reference_price.text':
-    'El Real Decreto-ley 29/2026, pendiente de convalidación, no permite subir la renta mientras pase del precio de referencia. Esta revisión no lo calcula; el precio está en SERPAVI.',
+    'En las actualizaciones hasta el 31 de diciembre de 2027, el Real Decreto-ley 29/2026, pendiente de convalidación, dice que no cabe ninguna subida si la renta supera el límite de precio que le sea aplicable según el sistema de índices de referencia; no dice en qué casos se aplica ese límite. Esta revisión no lo calcula; el precio está en SERPAVI.',
   'client.rental.info.minimum_term.title': 'Hasta cuándo dura tu contrato',
   'client.rental.info.minimum_term.text':
     'Tu contrato acaba el {contractEnd}. Con la prórroga obligatoria, tu plazo mínimo acaba el {mandatoryEnd}.',

@@ -81,6 +81,14 @@ describe('term and extensions, dates only', () => {
     expect(ids(bs)).not.toContain('extension_rdl29');
   });
 
+  it('counts from the signing when the keys came before it (LAU art. 9.1)', () => {
+    const bs = blocks({ signedOn: f('2021-04-02'), startDate: f('2021-03-20'), agreedMonths: 12 });
+    expect(find(bs, 'minimum_term').dates).toEqual({
+      contractEnd: '2022-04-02',
+      mandatoryEnd: '2026-04-02',
+    });
+  });
+
   it('seven years with a company', () => {
     const bs = blocks({ startDate: f('2021-03-20'), agreedMonths: 36, landlordType: 'company' });
     expect(find(bs, 'minimum_term').dates.mandatoryEnd).toBe('2028-03-20');

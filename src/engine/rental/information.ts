@@ -62,7 +62,8 @@ function termEnds(input: RentalInput): {
   readonly contract: CivilDate;
   readonly mandatory: CivilDate;
 } {
-  const start = input.startDate;
+  // LAU art. 9.1: the term runs from the contract date, or from the handover if later.
+  const start = max(input.signedOn, input.startDate);
   const contract = addMonthsClamped(start, input.agreedMonths);
   const years = MINIMUM_YEARS[input.landlordType];
   return { contract, mandatory: max(contract, anniversaryIn(start, start.y + years)) };
