@@ -14,6 +14,19 @@ describe('hasIdentifier', () => {
     ['a mobile number', 'tel 600123456'],
     ['a phone number in groups', 'llamar al 912 34 56 78'],
     ['a phone number with +34', 'móvil +34 600 123 456'],
+    ['a DNI with dots and a dash', 'DNI: 12.345.678-A'],
+    ['a DNI with a dash', '12345678-A'],
+    ['a DNI with spaces', '12 345 678 A'],
+    ['a DNI glued to its label', 'DNI12345678A'],
+    ['an NIE with dashes', 'X-1234567-A'],
+    ['an NIE with spaces', 'X 1234567 A'],
+    ['an IBAN in uneven groups', 'ES00 2100 0418 45 0200051332'],
+    ['an IBAN with dots', 'ES00.2100.0418.4502.0005.1332'],
+    ['an old account number in groups', '2100 0418 45 0200051332'],
+    ['an old account number with dashes', '2100-0418-45-0200051332'],
+    ['an old account number in one piece', '21000418450200051332'],
+    ['a phone number with 0034', '0034600123456'],
+    ['a phone number with dots', '600.12.34.56'],
   ])('finds %s', (_, text) => {
     expect(hasIdentifier(text)).toBe(true);
   });
@@ -26,6 +39,18 @@ describe('hasIdentifier', () => {
     ['a percentage', 'se actualizará un 3,5 % o un 2.25 %'],
     ['a contract clause', 'aplicando la variación del IRAV publicada por el INE'],
     ['a long number that is no phone', 'expediente 9123456789'],
+    ['a file number with its year', 'Expte. 600123456/2026'],
+    ['an invoice number after its year', 'factura nº 2026-600123456'],
+    ['a large amount with dots', '1.234.567,89 €'],
+    ['an amount that starts like a phone', '600.123,45 €'],
+    ['a millionaire amount', '600.123.456,78 €'],
+    ['a month', 'desde 2025-07'],
+    ['a date with no separators', '20240520'],
+    ['laws', 'Ley 29/1994 y RDL 7/2019'],
+    ['a cadastral reference', 'Ref. catastral 9872023VH5797S0001WX'],
+    ['a receipt number', 'Recibo 202607-0001'],
+    ['a thirteen-digit reference', 'referencia 9123456789012'],
+    ['a company tax number', 'NIF B12345678'],
   ])('finds nothing in %s', (_, text) => {
     expect(hasIdentifier(text)).toBe(false);
   });
