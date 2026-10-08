@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.28.2](https://github.com/Endika/eslojusto/compare/v1.28.1...v1.28.2) (2026-10-08)
+
+
+### Bug Fixes
+
+* **employment:** count the SMI only where pay is known; zero extras over it depend on agreement ([c6b5f7a](https://github.com/Endika/eslojusto/commit/c6b5f7af6e8b6aa36c20da54cd018f110c8a1bd4))
+* **rental:** leave to review a charge year over 1.5 times the agreed amount ([de4f5f8](https://github.com/Endika/eslojusto/commit/de4f5f892cc603800587e9e4293e1a5d029008fb))
+* **rental:** read unwritten notice and verbal acceptance as doubts; ask about gran tenedor ([4a74480](https://github.com/Endika/eslojusto/commit/4a74480b418af03c9d315ecb49d80d39fa77c64e))
+* **rental:** soften out-of-scope and reference price copy; count the term from the later date ([52e3cc6](https://github.com/Endika/eslojusto/commit/52e3cc644719d2b201e7c0755895b0daa6515236))
+
 ## [1.28.1](https://github.com/Endika/eslojusto/compare/v1.28.0...v1.28.1) (2026-10-08)
 
 
