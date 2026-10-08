@@ -5,10 +5,12 @@ import type { Block, DocumentModel } from '../../src/documents/ports';
 import { sans } from '../../src/documents/fonts/sans';
 import { serif } from '../../src/documents/fonts/serif';
 import { NO_DETAILS } from '../../src/documents/letter';
+import { STYLES } from '../../src/documents/pdf';
+import { PdfDocument } from '../../src/documents/pdf-writer';
 import { depositLetter, rentLetter } from '../../src/rental/letters';
 import { rentalReport } from '../../src/rental/report';
 import { FORBIDDEN } from '../support/forbidden';
-import { repealedWindow, review, riseAboveIrav, TODAY, tr } from './fixtures';
+import { repealedWindow, review, riseAboveIrav, TODAY, tr, update } from './fixtures';
 
 const report = (input: RentalInput): DocumentModel =>
   rentalReport({ review: review(input), input, detail: 'unlocked' }, tr, TODAY);
@@ -147,5 +149,62 @@ describe('the rental documents', () => {
         }
     }
     expect([...missing]).toEqual([]);
+  });
+});
+
+describe('the rental report on the page', () => {
+  // A row puts its value on the right and wraps its label in what is left: the value, and the
+  // longest word of the label beside it, must fit the page.
+  it('never has a row wider than the page', () => {
+    const doc = new PdfDocument({ sans, serif }, 'x');
+    const longFlash: RentalInput = {
+      ...full,
+      updates: [update('2025-03-20', 1000, 1030, { agreedInWriting: null })],
+    };
+    for (const input of [full, repealedWindow, longFlash]) {
+      const model = rentalReport({ review: review(input), input, detail: 'unlocked' }, tr, TODAY);
+      for (const b of model.blocks) {
+        if (b.type !== 'row') continue;
+        const word = Math.max(...b.label.split(' ').map((w) => doc.measure(w, STYLES.row)));
+        expect(
+          doc.measure(b.value, STYLES.row) + 16 + word,
+          `${b.label}: ${b.value}`,
+        ).toBeLessThanOrEqual(doc.width);
+      }
+    }
+  });
+
+  it('names the cap’s norm on its own line, not in the row', () => {
+    const model = report(full);
+    expect(model.blocks).toContainEqual({
+      type: 'row',
+      label: 'Tope legal',
+      value: 'IRAV de febrero de 2025: 2,08 %, publicado el 14-03-2025',
+    });
+    expect(model.blocks).toContainEqual(
+      expect.objectContaining({
+        type: 'bullet',
+        text: expect.stringMatching(/^Tope legal: .*INE\)$/),
+      }),
+    );
+  });
+});
+
+describe('a blank line with a long value', () => {
+  it('wraps it at full size instead of shrinking it', () => {
+    const doc = new PdfDocument({ sans, serif }, 'x');
+    const drawn: { text: string; size: number }[] = [];
+    const textAt = doc.textAt.bind(doc);
+    doc.textAt = (text, x, top, style, page) => {
+      drawn.push({ text, size: style.size });
+      textAt(text, x, top, style, page);
+    };
+    const address =
+      'Calle de la Avenida Inventada Muy Larga 123, Escalera B, Piso 4.º Izquierda, Villaficticia de Abajo';
+    doc.blank('Vivienda', STYLES.label, doc.width * 0.7, address, STYLES.row, true);
+    const lines = drawn.filter((d) => d.text !== 'Vivienda');
+    expect(lines.length).toBeGreaterThan(1);
+    expect(lines.every((l) => l.size === STYLES.row.size)).toBe(true);
+    expect(lines.map((l) => l.text).join(' ')).toBe(address);
   });
 });

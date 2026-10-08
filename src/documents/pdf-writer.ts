@@ -246,17 +246,26 @@ export class PdfDocument {
     this.y += points;
   }
 
-  // A blank line to write on by hand, with its label under it.
+  // A blank line to write on by hand, with its label under it. With `wrap`, a long value takes
+  // as many lines above it as it needs.
   blank(
     label: string,
     style: TextStyle,
     width = this.width,
     value?: string,
     valueStyle: TextStyle = style,
+    wrap = false,
   ): void {
-    this.ensure(42);
-    this.y += 26;
-    if (value) {
+    const lines = value && wrap ? this.wrap(value, valueStyle, width - 4) : null;
+    const leading = valueStyle.leading ?? valueStyle.size * 1.4;
+    const extra = lines ? (lines.length - 1) * leading : 0;
+    this.ensure(42 + extra);
+    this.y += 26 + extra;
+    if (lines)
+      lines.forEach((line, i) =>
+        this.textAt(line, 2, this.y - 5 - (lines.length - 1 - i) * leading, valueStyle),
+      );
+    else if (value) {
       // A long value shrinks to fit on its line rather than cross the margin.
       const room = width - 4;
       const measured = this.measure(value, valueStyle);

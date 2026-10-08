@@ -130,8 +130,14 @@ export type Block =
   | { readonly type: 'row'; readonly label: string; readonly value: string }
   | { readonly type: 'bullet'; readonly text: string }
   | { readonly type: 'source'; readonly text: string; readonly url: string }
-  // A line to write on, with the value already on it when the person gave one.
-  | { readonly type: 'blank'; readonly label: string; readonly value?: string }
+  // A line to write on, with the value already on it when the person gave one; with `wrap`, a
+  // long value takes more lines instead of shrinking.
+  | {
+      readonly type: 'blank';
+      readonly label: string;
+      readonly value?: string;
+      readonly wrap?: true;
+    }
   | { readonly type: 'rule' };
 
 export interface DocumentModel {

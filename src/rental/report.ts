@@ -118,6 +118,12 @@ function figureRows(figures: Figures, tr: Translate): Block[] {
   );
 }
 
+// The cap's norm, on a line of its own under the figures.
+function capNote(r: RentUpdateReading, item: RentUpdateItem, tr: Translate): string[] {
+  const cap = r.cap && item.sources.find((s) => s.id === r.cap?.rule);
+  return cap ? [`${tr('client.rental.detail.cap')}: ${cap.citation}`] : [];
+}
+
 // Each reading the item was worked out under: one, or the two the result moves between.
 function readingBlocks(item: RentalItemResult, input: RentalInput, tr: Translate): Block[] {
   const titled = item.outcome.kind === 'depends';
@@ -135,7 +141,10 @@ function readingBlocks(item: RentalItemResult, input: RentalInput, tr: Translate
     const values: readonly RentUpdateReading[] =
       item.outcome.kind === 'single' ? [item.outcome.value] : [item.outcome.low, item.outcome.high];
     return values.flatMap((r, i) =>
-      blocks(titles[i], riseFigures(r, item, input, tr), calculationLines(r.calculation, tr)),
+      blocks(titles[i], riseFigures(r, item, input, tr, { citeCap: false }), [
+        ...capNote(r, item, tr),
+        ...calculationLines(r.calculation, tr),
+      ]),
     );
   }
   const values: readonly ItemReading[] =

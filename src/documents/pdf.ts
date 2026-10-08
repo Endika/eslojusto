@@ -8,7 +8,7 @@ import type { DocumentModel, PdfMaker } from './ports';
 // page until then.
 
 const VIOLET: Rgb = [0.478, 0.247, 0.82];
-const STYLES = {
+export const STYLES = {
   title: { font: 'sans', size: 22, bold: true, leading: 28 },
   meta: { font: 'sans', size: 9, color: SOFT },
   heading: { font: 'sans', size: 14, bold: true, leading: 20 },
@@ -65,7 +65,14 @@ export async function renderPdf(model: DocumentModel): Promise<Uint8Array> {
         doc.paragraph(block.text, STYLES.source, { after: 2, link: block.url });
         break;
       case 'blank':
-        doc.blank(block.label, STYLES.label, doc.width * 0.7, block.value, STYLES.row);
+        doc.blank(
+          block.label,
+          STYLES.label,
+          doc.width * 0.7,
+          block.value,
+          STYLES.row,
+          block.wrap === true,
+        );
         break;
       case 'rule':
         doc.rule(VIOLET, 1.5, 12);
