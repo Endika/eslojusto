@@ -148,22 +148,29 @@ export const es = {
     'Calcula el mínimo legal de tu finiquito y compáralo con lo que te pagan, partida por partida y con el artículo de cada cifra. Todo en tu dispositivo.',
   'home.h1': 'Comprueba si te pagan lo justo',
   'home.lead':
-    'eslojusto.es compara lo que te pagan o te cobran con lo que marca la ley, cifra a cifra y con el artículo al lado. Por ahora revisa el finiquito.',
+    'eslojusto.es pone lo que te pagan o te cobran al lado de lo que marca la ley, cifra a cifra y con el artículo del que sale cada una.',
   'home.note':
-    'Todo se calcula en tu dispositivo y lo que escribes no sale de él. Sí se mide qué pasos usas, sin cookies y sin identificarte.',
-  'home.index': 'Trámites',
+    'Lo que escribes no sale de tu dispositivo. Se mide qué pasos usas, sin cookies y sin identificarte.',
+  'home.note_documents':
+    'Lo que escribes no sale de tu dispositivo, y un documento que subas se lee en la Unión Europea y no se guarda. Se mide qué pasos usas, sin cookies y sin identificarte.',
+  'home.group_work': 'Trabajo',
+  'home.group_housing': 'Vivienda',
+  'home.group_money': 'Dinero',
+  'home.review': 'Revisar',
+  'home.final_pay_situation': 'Te vas o te echan: comprueba cada partida',
+  'home.benefit_situation': 'Te quedas sin trabajo: cuánto cobrarías y durante cuánto tiempo',
+  'home.contract_situation': 'Tienes un contrato o una oferta: cada condición frente a la ley',
+  'home.rent_situation': 'Vives de alquiler: lo que te cobran frente a lo que permite la ley',
+  'home.mortgage': 'Hipoteca',
+  'home.finance': 'Financiación y seguros',
+  'home.bills': 'Facturas',
+  'home.coming_soon': 'Próximamente: {secciones}',
   'home.final_pay': 'Finiquito',
-  'home.final_pay_text':
-    'Tu finiquito frente al mínimo legal, partida por partida (salario del último mes, vacaciones, pagas extra, indemnización y preaviso), y una estimación de tu paro.',
   'home.final_pay_citation': 'Estatuto de los Trabajadores · guía del CGPJ v0.6',
   'home.benefit': 'Paro',
-  'home.benefit_text':
-    'Cuánto paro cobrarías al mes y durante cuánto tiempo, con las fechas de tu contrato, tu salario y tus hijos o hijas a cargo.',
   'home.benefit_citation': 'Ley General de la Seguridad Social · cuantías del SEPE 2026',
   'home.contract': 'Contrato de trabajo',
   'home.rent': 'Alquiler',
-  'home.coming_soon': 'Próximamente',
-  'home.coming_soon_aria': '{nombre}, próximamente',
   'home.rent_indices': 'IRAV e IPC de cada mes',
 
   'final_pay.title': 'Calcular finiquito 2026: compáralo con el mínimo legal',
@@ -405,10 +412,6 @@ export const es = {
   'faq.data_answer':
     'Lo que escribes, no. La revisión se calcula entera en tu navegador y no se guarda. Sí se mide qué pasos usas, sin cookies y sin identificarte: qué secciones abres, qué campo no se acepta o en qué tramo queda la diferencia. Nunca tus importes ni tus fechas. El detalle está en la página de privacidad.',
 
-  'home.final_pay_text_documents':
-    'Tu finiquito frente al mínimo legal, partida por partida (salario del último mes, vacaciones, pagas extra, indemnización y preaviso), y una estimación de tu paro. Escribe los datos o sube una foto de tu finiquito.',
-  'home.note_documents':
-    'Todo se calcula en tu dispositivo. Lo que escribes no sale de él; si subes un documento, se lee en la Unión Europea y no se guarda. Sí se mide qué pasos usas, sin cookies y sin identificarte.',
   'final_pay.lead_documents':
     'Calcula el mínimo legal de tu finiquito por despido, baja voluntaria o fin de contrato y compáralo con lo que te ofrece la empresa. Escribe los datos o sube una foto de tu finiquito.',
 
@@ -1130,15 +1133,9 @@ export const es = {
     'No parece un DNI ni un NIE: revísalo. La carta se descarga igualmente.',
   'client.documents.letter.received': 'Recibí no conforme,',
   'client.documents.letter.filename': 'eslojusto-recibi-no-conforme.pdf',
-  'home.lead_rental':
-    'eslojusto.es compara lo que te pagan o te cobran con lo que marca la ley, cifra a cifra y con el artículo al lado. Revisa el finiquito y, en pruebas, el alquiler.',
-  'home.rent_text':
-    'Lo que pagas o has pagado por tu alquiler frente a lo que permite la ley, partida por partida: agencia, fianza y garantías, subidas, gastos y devolución de la fianza.',
   'home.rent_citation': 'Ley de Arrendamientos Urbanos · Ley 12/2023 · IRAV e IPC del INE',
   'home.beta': 'Beta',
 
-  'home.contract_text':
-    'Tu contrato de trabajo frente a lo que garantiza la ley, punto por punto: salario y SMI, tipo de contrato, periodo de prueba, jornada, vacaciones y cláusulas.',
   'home.contract_citation': 'Estatuto de los Trabajadores · SMI 2026 · RD 723/2026',
 
   'employment.title': 'Revisa tu contrato de trabajo: SMI, temporalidad y prueba',

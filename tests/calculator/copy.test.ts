@@ -75,3 +75,13 @@ describe('employment contract copy', () => {
       expect(text.toLowerCase(), `${name}: ${forbidden}`).not.toMatch(forbidden);
   });
 });
+
+// Each home card carries one line: it must fit an index, not explain the review.
+describe('home situation lines', () => {
+  it.each(Object.entries(es).filter(([key]) => /^home\..+_situation$/.test(key)))(
+    '%s fits in 70 characters',
+    (_, text) => {
+      expect([...text].length).toBeLessThanOrEqual(70);
+    },
+  );
+});
