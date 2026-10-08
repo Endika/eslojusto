@@ -1,4 +1,8 @@
-import type { Norm as LawNorm, NormTable as LawNormTable } from '../law/norms';
+import type {
+  Norm as LawNorm,
+  NormReview as LawNormReview,
+  NormTable as LawNormTable,
+} from '../law/norms';
 
 export { normStanding, type NormStanding, type NormStatus } from '../law/norms';
 
@@ -20,6 +24,4 @@ export type Norm = LawNorm<EmploymentNormId>;
 
 export type NormTable = LawNormTable<EmploymentNormId>;
 
-// Day each norm was last read in the BOE during the monthly review; kept apart from `Norm` so the
-// shared model stays the same for every section.
-export type NormReview = Readonly<Record<EmploymentNormId, string>>;
+export type NormReview = LawNormReview<EmploymentNormId>;

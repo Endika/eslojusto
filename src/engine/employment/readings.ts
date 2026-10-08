@@ -1,3 +1,4 @@
+import { assessAcross as lawAssessAcross } from '../law/readings';
 import {
   READINGS,
   type Assessed,
@@ -13,32 +14,12 @@ export const worldsOf = <Q extends DoubtQuestion>(
   answer: ReadingCode<Q> | null,
 ): readonly ReadingCode<Q>[] => (answer === null ? READINGS[question] : [answer]);
 
-const same = (a: unknown, b: unknown): boolean => {
-  if (a === b) return true;
-  if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false;
-  if (Array.isArray(a) !== Array.isArray(b)) return false;
-  const keys = Object.keys(a);
-  if (keys.length !== Object.keys(b).length) return false;
-  return keys.every(
-    (k) =>
-      Object.hasOwn(b, k) &&
-      same((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]),
-  );
-};
-
 // Assesses one point in each world; when every world agrees the answer did not matter.
-export function assessAcross<Q extends DoubtQuestion>(
+export const assessAcross = <Q extends DoubtQuestion>(
   question: Q,
   worlds: readonly ReadingCode<Q>[],
   assess: (world: ReadingCode<Q>) => Finding,
-): Assessed {
-  const readings = worlds.map((when) => ({ when, finding: assess(when) }));
-  const [first, ...rest] = readings;
-  if (first === undefined) throw new RangeError(`No reading to assess for ${question}`);
-  if (rest.every((r) => same(r.finding, first.finding)))
-    return { kind: 'single', finding: first.finding };
-  return { kind: 'readings', question, readings };
-}
+): Assessed => lawAssessAcross(question, worlds, assess);
 
 // Findings that say something concrete is wrong (below the minimum, over a legal limit, a void
 // clause, a fixed-term contract the law turns permanent).
