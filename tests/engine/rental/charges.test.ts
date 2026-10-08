@@ -84,6 +84,32 @@ describe('a charge agreed with its yearly amount', () => {
     );
   });
 
+  it('leaves to review a year with two yearly bills rather than count it', () => {
+    // Two community bills of 600 € and 618 € paid in 2025: 1.218 €, over 1,5 × 600.
+    const [r] = checkCharges(
+      input([
+        community({
+          charged: [
+            { year: 2025, amount: 600 },
+            { year: 2025, amount: 618 },
+          ],
+        }),
+      ]),
+      DEPS,
+    );
+    expect(singleOf(r)).toEqual({ status: 'review_it', amount: null });
+    expect(r && countedAmount(r.outcome, itemAmount)).toBe(0);
+    expect(r?.outcome.kind === 'single' && r.outcome.value.calculation).toContainEqual({
+      key: 'charges.year_unclear',
+      vars: { year: { integer: 2025 }, charged: { euros: 1218 } },
+    });
+  });
+
+  it('still counts a year over the cap but under 1,5 times the agreed amount', () => {
+    const [r] = checkCharges(input([community({ charged: [{ year: 2025, amount: 900 }] })]), DEPS);
+    expect(singleOf(r)).toEqual({ status: 'paid_over', amount: 300 });
+  });
+
   it('cannot rise at all when the rent has no update clause', () => {
     const [r] = checkCharges(
       input([community({ charged: [{ year: 2026, amount: 612 }] })], { updateClause: 'none' }),

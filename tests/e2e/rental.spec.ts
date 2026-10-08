@@ -278,7 +278,9 @@ test('no sheet scrolls sideways at 360×640, with every list open', async ({ pag
   await charge.getByLabel('Año', { exact: true }).fill('2025');
   await charge.getByLabel('Sí', { exact: true }).check();
   await charge.getByLabel('Importe al año que fija el contrato').fill('600');
-  await charge.getByLabel('Lo que te cobraron ese año').fill('640');
+  await charge
+    .getByLabel('Importe de los gastos de ese año (el año al que corresponden)')
+    .fill('640');
   await fits('gastos');
   await next(page);
   const out = sheet(page, 'La salida');
