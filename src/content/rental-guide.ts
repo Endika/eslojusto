@@ -1,4 +1,5 @@
-import type { NormTable } from '../engine/rental/norms';
+import { addDays, parseDate, toIso } from '../engine/date';
+import type { Norm, NormTable } from '../engine/rental/norms';
 import { ruleSource, type RuleId } from '../engine/rental/rules';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
@@ -65,8 +66,14 @@ export function rentalGuide(
         status: tx(NORM_STATUS[s.status], { fecha: s.statusSince ? formatDay(s.statusSince) : '' }),
       };
     });
-  const withDecree = (key: Key, id: Decree): string =>
-    decreeSentence(lang, norms, key, id, checkedOn);
+  const withDecree = (key: Key, id: Decree, vars?: Variables): string =>
+    decreeSentence(lang, norms, key, id, checkedOn, vars);
+  // The day RDL 29/2026 took effect and the one before, while it stands; once repealed, the 2023
+  // wording runs on with no end.
+  const rdl29 = norms.rdl29_2026;
+  const rdl29Stands = rdl29.status !== 'repealed';
+  const rdl29Since = formatLongDay(rdl29.inForceSince);
+  const rdl29Eve = formatLongDay(toIso(addDays(parseDate(rdl29.inForceSince), -1)));
 
   const block = (
     id: GuideBlockId,
@@ -89,11 +96,18 @@ export function rentalGuide(
 
   return [
     block('fees', 'g-honorarios', {
-      paragraphs: [tx('rental.guide.fees.lead'), tx('rental.guide.fees.other_names')],
+      paragraphs: [
+        tx('rental.guide.fees.lead'),
+        rdl29Stands
+          ? tx('rental.guide.fees.other_names', { desde: rdl29Since })
+          : tx('rental.guide.fees.other_names_open'),
+      ],
       list: [
         tx('rental.guide.fees.2019'),
-        tx('rental.guide.fees.2023'),
-        withDecree('rental.guide.fees.2026', 'rdl29_2026'),
+        rdl29Stands
+          ? tx('rental.guide.fees.2023', { hasta: rdl29Eve })
+          : tx('rental.guide.fees.2023_open'),
+        withDecree('rental.guide.fees.2026', 'rdl29_2026', { desde: rdl29Since }),
       ],
       rules: ['fees_2019', 'fees_2023', 'fees_2026'],
     }),
@@ -147,7 +161,7 @@ export function rentalGuide(
       paragraphs: [
         tx('rental.guide.term.minimum'),
         tx('rental.guide.term.tacit'),
-        withDecree('rental.guide.term.extension', 'rdl29_2026'),
+        withDecree('rental.guide.term.extension', 'rdl29_2026', { desde: rdl29Since }),
         withDecree('rental.guide.term.rdl28', 'rdl28_2026'),
         tx('rental.guide.term.unchecked'),
       ],
@@ -183,14 +197,24 @@ export function decreeSentence(
   key: Key,
   id: Decree,
   checkedOn: string,
+  vars: Variables = {},
 ): string {
-  return norms[id].status === 'repealed'
+  const norm = norms[id];
+  if (neverInForce(norm)) return t(lang, 'rental.guide.decree_never', { norma: DECREE_NAME[id] });
+  return norm.status === 'repealed'
     ? t(lang, 'rental.guide.decree_repealed', {
         norma: DECREE_NAME[id],
-        periodo: period(lang, norms[id]),
+        periodo: period(lang, norm),
       })
-    : t(lang, key, { decreto: decreeClause(lang, norms, id, checkedOn) });
+    : t(lang, key, { ...vars, decreto: decreeClause(lang, norms, id, checkedOn) });
 }
+
+// A decree the Congress voted down before the day it was to take effect, even at its doubtful end:
+// it never applied, as normStanding reads it too.
+export const neverInForce = (norm: Norm): boolean => {
+  const lastDay = norm.endUncertainUntil ?? norm.inForceUntil;
+  return norm.status === 'repealed' && lastDay !== null && lastDay < norm.inForceSince;
+};
 
 // The legal interest the guide names: the latest year's rate and the first year it has held.
 export interface LegalInterestSummary {

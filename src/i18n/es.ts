@@ -570,7 +570,7 @@ export const es = {
     'En el alquiler, el contrato y los demás papeles llevan datos personales tuyos y de terceros, como el casero, quien avale o la agencia: nombres, DNI, la dirección de la vivienda o cuentas bancarias. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. El modelo tiene orden de no copiar esos datos y el servidor descarta lo que aún los lleve; nada se guarda.',
   'privacy.rental.tracked_sheets': 'En la revisión del alquiler',
   'privacy.rental.tracked_sheets_what':
-    'Lo mismo que en el finiquito con sus hojas (contrato, casero, entrada, renta, subidas, gastos, salida y resultado): que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha del contrato», nunca lo que escribiste. Qué pregunta frecuente abres o de qué partida miras «Cómo se calcula», por su tipo (honorarios, fianza, garantía, subida, gasto o devolución), nunca su concepto. Y si pulsas «Empezar de nuevo».',
+    'Lo mismo que en el finiquito con sus hojas (contrato, casero, entrada, renta, subidas, gastos, salida y resultado): que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha del contrato», nunca lo que escribiste. Qué pregunta frecuente abres o de qué partida miras «Cómo se calcula», por su tipo (honorarios, fianza, garantía, pago por adelantado, subida, gasto, devolución o intereses de la fianza), nunca su concepto. Y si pulsas «Empezar de nuevo».',
   'privacy.rental.tracked_scope': 'Si tu contrato queda fuera de la revisión',
   'privacy.rental.tracked_scope_what':
     'El motivo, de una lista cerrada: firmado antes del 6 de marzo de 2019, de temporada, por habitaciones, para otro uso, de vivienda protegida o de renta antigua.',
@@ -2289,6 +2289,8 @@ export const es = {
   'rental.guide.norms': 'Normas',
   'rental.guide.decree_live': 'el {norma}, en vigor desde el {desde} y {estado},',
   'rental.guide.decree_upcoming': 'el {norma}, que entra en vigor el {desde} y está {estado},',
+  'rental.guide.decree_never':
+    'El {norma} no llegó a aplicarse: el Congreso lo derogó antes de que entrara en vigor.',
   'rental.guide.decree_repealed':
     'El {norma} lo cambió {periodo}, pero el Congreso lo derogó: sigue la regla anterior.',
 
@@ -2298,11 +2300,15 @@ export const es = {
   'rental.guide.fees.2019':
     'Contratos firmados entre el 6 de marzo de 2019 y el 25 de mayo de 2023: son del casero cuando es una empresa (persona jurídica). Si es una persona, la ley no dice quién los paga.',
   'rental.guide.fees.2023':
-    'Contratos firmados entre el 26 de mayo de 2023 y el 7 de octubre de 2026: son siempre del casero.',
+    'Contratos firmados entre el 26 de mayo de 2023 y el {hasta}: son siempre del casero.',
+  'rental.guide.fees.2023_open':
+    'Contratos firmados desde el 26 de mayo de 2023: son siempre del casero.',
   'rental.guide.fees.2026':
-    'Contratos firmados desde el 8 de octubre de 2026: {decreto} dice que no pueden cobrarse al inquilino ni directa ni indirectamente, con ningún concepto o nombre. Cubre cualquier servicio para preparar, formalizar, gestionar, renovar o cambiar el contrato; otro servicio que no haga falta para el contrato solo puede cobrarse si lo pediste por escrito sabiendo que era opcional y su precio.',
+    'Contratos firmados desde el {desde}: {decreto} dice que no pueden cobrarse al inquilino ni directa ni indirectamente, con ningún concepto o nombre. Cubre cualquier servicio para preparar, formalizar, gestionar, renovar o cambiar el contrato; otro servicio que no haga falta para el contrato solo puede cobrarse si lo pediste por escrito sabiendo que era opcional y su precio.',
   'rental.guide.fees.other_names':
-    'Un cargo con otro nombre, como «estudio de solvencia», «reserva» o «gestión», puede ser un honorario. En un contrato anterior al 8 de octubre de 2026, la revisión lo señala para que lo mires, sin cifra; desde esa fecha, lo cuenta como pagado de más, salvo que fuera un servicio opcional que pediste por escrito.',
+    'Un cargo con otro nombre, como «estudio de solvencia», «reserva» o «gestión», puede ser un honorario. En un contrato anterior al {desde}, la revisión lo señala para que lo mires, sin cifra; desde esa fecha, lo cuenta como pagado de más, salvo que fuera un servicio opcional que pediste por escrito.',
+  'rental.guide.fees.other_names_open':
+    'Un cargo con otro nombre, como «estudio de solvencia», «reserva» o «gestión», puede ser un honorario. La revisión lo señala para que lo mires, sin cifra.',
 
   'rental.guide.guarantees.title': 'Fianza, garantías y pago por adelantado',
   'rental.guide.guarantees.deposit':
@@ -2333,9 +2339,9 @@ export const es = {
   'rental.guide.charges.pact':
     'El casero solo puede cobrarte los gastos generales del edificio, los tributos o los servicios sin contador si lo pactasteis por escrito y con su importe anual a la fecha del contrato (art. 20.1 LAU).',
   'rental.guide.charges.increase':
-    'En los cinco primeros años de contrato, o siete si el casero es una empresa, esos gastos, salvo los tributos, solo pueden subir una vez al año, por acuerdo, y nunca más del doble de lo que puede subir la renta (art. 20.2 LAU).',
+    'En los cinco primeros años de contrato, o siete si el casero es una empresa, esos gastos, salvo los tributos, solo pueden subir una vez al año, por acuerdo, y nunca más del doble de lo que puede subir la renta (art. 20.2 LAU, que el Real Decreto-ley 29/2026 numera como 20.3).',
   'rental.guide.charges.meters':
-    'Lo que se mide con un contador propio de la vivienda, como el agua o la luz, lo pagas tú (art. 20.3 LAU).',
+    'Lo que se mide con un contador propio de la vivienda, como el agua o la luz, lo pagas tú (art. 20.3 LAU, que el Real Decreto-ley 29/2026 numera como 20.4).',
   'rental.guide.charges.taxes':
     'Además, {decreto} dice que los tributos de la vivienda, como el IBI, no pueden cargarse al inquilino, salvo que sea el inquilino quien tiene que pagarlos. La revisión lo aplica a los contratos firmados desde esa fecha; en los anteriores, lo da como información.',
 
@@ -2353,7 +2359,7 @@ export const es = {
   'rental.guide.zones.declared':
     'Las comunidades autónomas pueden declarar zonas de mercado residencial tensionado, y el Ministerio de Vivienda publica cada declaración en el BOE. En una zona declarada, la renta de un contrato nuevo puede tener tope: la del contrato anterior o, en algunos casos, como con un gran tenedor, el precio del sistema estatal de referencia (art. 17.6 y 17.7 LAU).',
   'rental.guide.zones.rise':
-    'Y hasta el 31 de diciembre de 2027, {decreto} dice que si tu renta pasa del límite de precio que fija para tu zona el sistema de índices de referencia, no cabe ninguna subida anual.',
+    'Y en las actualizaciones hasta el 31 de diciembre de 2027, {decreto} dice que si la renta supera el límite máximo de precio que le sea aplicable según el sistema de índices de precios de referencia, no cabe ninguna subida. El decreto no dice en qué casos se aplica ese límite; la ley lo fija para algunos contratos nuevos en zonas tensionadas (art. 17.7 LAU).',
   'rental.guide.zones.unchecked':
     'La revisión no calcula estos topes: pregunta si tu vivienda está en una zona tensionada y te da el enlace al sistema estatal de referencia.',
   'rental.guide.zones.link': 'Sistema Estatal de Referencia del Precio del Alquiler (SERPAVI)',
@@ -2362,11 +2368,11 @@ export const es = {
   'rental.guide.term.minimum':
     'Si el contrato pacta menos de cinco años, o siete si el casero es una empresa, se prorroga cada año hasta llegar a ellos, salvo que avises con 30 días de antelación de que no quieres seguir (art. 9.1 LAU).',
   'rental.guide.term.tacit':
-    'Cumplido ese plazo, si nadie avisa (el casero con cuatro meses de antelación y tú con dos), el contrato sigue un año más cada vez, hasta tres años (art. 10.1 LAU).',
+    'Cumplido ese plazo, si nadie avisa (el casero con cuatro meses de antelación y tú con dos), el contrato sigue un año más cada vez, hasta tres años, y puedes dejarlo al acabar cualquiera de esos años avisando con un mes de antelación (art. 10.1 LAU).',
   'rental.guide.term.extension':
-    'Para los contratos cuyo plazo acaba entre el 8 de octubre de 2026 y el 31 de diciembre de 2028, {decreto} prevé una prórroga extraordinaria de hasta dos años, por años, si la pides y estás al corriente del pago de la renta.',
+    'Además, {decreto} prevé, con requisitos y excepciones, una prórroga extraordinaria por años, hasta dos más, si la pides. Los principales: el contrato tiene que estar en vigor el {desde}; su prórroga del art. 9.1, su prórroga tácita o su tácita reconducción tiene que acabar antes del 31 de diciembre de 2028, y tienes que estar al corriente del pago de la renta y haberlo estado cada mes durante los ocho anteriores. No se aplica si pactáis otras condiciones, un contrato nuevo o una renovación con una renta al menos un 5 % más baja, ni si el casero comunica que necesita la vivienda para sí o su familia (art. 9.3 LAU). Si cabe la prórroga de las zonas tensionadas (art. 10.3 LAU), se aplica esa.',
   'rental.guide.term.rdl28':
-    'Por otro lado, {decreto} reescribe el art. 10 de la LAU, el de las prórrogas.',
+    'Por otro lado, {decreto} reescribe el art. 10 de la LAU, el de las prórrogas, y desde entonces deja fuera esa prórroga extraordinaria cuando proceda la prórroga del nuevo art. 10.1.',
   'rental.guide.term.unchecked':
     'La revisión no comprueba prórrogas ni preavisos: te da las fechas de tu contrato como información.',
 
@@ -2379,7 +2385,7 @@ export const es = {
   'rental.guide.faq': 'Preguntas frecuentes',
   'rental.faq.agency_fees': '¿Me pueden cobrar honorarios de agencia?',
   'rental.faq.agency_fees_answer':
-    'Depende de cuándo se firmó tu contrato. Desde el 26 de mayo de 2023, los gastos de gestión inmobiliaria y de formalización del contrato son del casero (art. 20.1 LAU). Entre el 6 de marzo de 2019 y el 25 de mayo de 2023, lo eran cuando el casero era una empresa. {decreto}',
+    'Depende de cuándo se firmó tu contrato. Desde el 26 de mayo de 2023, los gastos de gestión inmobiliaria y de formalización del contrato son del casero (art. 20.1 LAU, en su redacción anterior al Real Decreto-ley 29/2026). Entre el 6 de marzo de 2019 y el 25 de mayo de 2023, lo eran cuando el casero era una empresa. {decreto}',
   'rental.faq.agency_fees_decree':
     'Además, {decreto} dice que, en los contratos firmados desde entonces, no pueden cobrarse al inquilino con ningún concepto o nombre.',
   'rental.faq.rent_rise': '¿Cuánto me pueden subir el alquiler este año?',
@@ -2401,6 +2407,8 @@ export const es = {
   'rental.faq.pending_norms_none': 'A {fecha} no hay ninguna pendiente.',
   'rental.faq.pending_norms_item_live': 'el {norma}, en vigor desde el {desde}',
   'rental.faq.pending_norms_item_upcoming': 'el {norma}, que entra en vigor el {desde}',
+  'rental.faq.pending_norms_never':
+    'El Congreso derogó el {lista} antes de que entrara en vigor, así que no llegó a aplicarse.',
   'rental.faq.pending_norms_repealed':
     'Si una subida cae en los días de un decreto que el Congreso derogó, la revisión da las dos cuentas y no la suma al total. Los derogados: {lista}.',
   'rental.faq.documents': '¿Qué pasa con mis documentos?',
@@ -2909,7 +2917,7 @@ export const es = {
     '{comunidad} puede tener normas propias que se suman a las estatales. Esta revisión solo aplica las estatales.',
   'client.rental.info.meters.title': 'Suministros con contador',
   'client.rental.info.meters.text':
-    'La luz, el agua o el gas con contador los pagas según lo que gastas (art. 20.3 LAU), así que no se revisan aquí.',
+    'La luz, el agua o el gas con contador los pagas según lo que gastas (art. 20.3 LAU, art. 20.4 desde el 8 de octubre de 2026), así que no se revisan aquí.',
   'client.rental.info.guarantee_return.title': 'Devolución de las garantías',
   'client.rental.info.guarantee_return.text':
     'Las garantías en dinero, además de la fianza, también vuelven a ti al acabar el contrato.',
@@ -2986,7 +2994,7 @@ export const es = {
   'client.rental.calculation.fees.any_name':
     'Desde el 8 de octubre de 2026 no se te puede cobrar la gestión ni la formalización, se llame como se llame.',
   'client.rental.calculation.fees.other_name':
-    'Puede ser un honorario con otro nombre: el art. 20.1 LAU pone a cargo del casero la gestión inmobiliaria y la formalización del contrato.',
+    'Puede ser un honorario con otro nombre: el art. 20.1 LAU, en su redacción anterior al Real Decreto-ley 29/2026, pone a cargo del casero la gestión inmobiliaria y la formalización del contrato.',
   'client.rental.calculation.fees.requested_in_writing':
     'Si pediste ese servicio por escrito, la ley permite cobrarlo.',
   'client.rental.calculation.fees.paid_over': 'Pagaste {amount} por ello.',
