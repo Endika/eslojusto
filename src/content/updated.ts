@@ -10,7 +10,7 @@ const employmentBuild = process.env['PUBLIC_EMPLOYMENT'] === '1';
 
 export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/': '2026-10-07',
-  '/finiquito/': '2026-10-07',
+  '/finiquito/': '2026-10-08',
   '/aviso-legal/': '2026-10-07',
   '/privacidad/': '2026-10-07',
   // Moves with the INE's newest figure on the page and with each check of its norms.

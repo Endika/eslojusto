@@ -1,6 +1,7 @@
 ---
-import { t } from '../i18n';
-import { link, type Lang } from '../i18n/languages';
+import { t, type Key } from '../i18n';
+import { link, LANGS, type Lang } from '../i18n/languages';
+import { RENTAL_BUILD } from '../content/sections';
 
 interface Props {
   lang: Lang;
@@ -12,11 +13,21 @@ const links = [
   [link('es', 'privacidad/'), t(lang, 'footer.privacy')],
 ] as const;
 const current = Astro.url.pathname;
+// Each section names the norms its figures follow; the home page, with more than one, names none.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const local = current
+  .slice(base.length)
+  .replace(new RegExp(`^/(${Object.keys(LANGS).join('|')})(?=/)`), '');
+const note: Key = local.startsWith('/alquiler/')
+  ? 'footer.note_rental'
+  : local === '/' && RENTAL_BUILD
+    ? 'footer.note_general'
+    : 'footer.note';
 ---
 
 <footer class="footer">
   <div class="footer__inner">
-    <p class="footer__note">{t(lang, 'footer.note')}</p>
+    <p class="footer__note">{t(lang, note)}</p>
     <nav aria-label={t(lang, 'footer.nav')}>
       <ul class="footer__links">
         {links.map(([href, name]) => (
