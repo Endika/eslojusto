@@ -193,7 +193,8 @@ type HolidaysPayPhraseKey =
   | 'extra_pays.amount_by_agreement'
   | 'extra_pays.one_may_be_prorated'
   | 'extra_pays.prorated_by_agreement'
-  | 'extra_pays.in_daily_minimum';
+  | 'extra_pays.in_daily_minimum'
+  | 'extra_pays.may_be_in_daily_minimum';
 
 type ClausePhraseKey =
   | 'clauses.months_unknown'
