@@ -93,7 +93,7 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
   fees_2026: rule(
     'fees_2026',
     'rdl29_2026',
-    'art. 3.Doce, que reforma el art. 20 de la LAU',
+    'art. 3.Doce, que da nueva redacción al art. 20.2 de la LAU',
     RDL29_2026,
     '2026-10-08',
   ),
@@ -221,14 +221,22 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
     '2026-10-08',
   ),
   charges_pact: rule('charges_pact', 'lau', 'LAU, art. 20.1', `${LAU}#a20`, '1995-01-01'),
+  // RDL 29/2026, art. 3.Doce, renumbers art. 20 from 08-10-2026: the increase limit moves to 20.3
+  // and the meters to 20.4. The link is the wording before it.
   charges_increase: rule(
     'charges_increase',
     'rdl7_2019',
-    'LAU, art. 20.2',
-    `${LAU}#a20`,
+    'LAU, art. 20.2 en su redacción anterior al RDL 29/2026 (art. 20.3 desde el 08-10-2026)',
+    `${LAU_2023}#a20`,
     '2019-03-06',
   ),
-  charges_meters: rule('charges_meters', 'lau', 'LAU, art. 20.3', `${LAU}#a20`, '1995-01-01'),
+  charges_meters: rule(
+    'charges_meters',
+    'lau',
+    'LAU, art. 20.3 en su redacción anterior al RDL 29/2026 (art. 20.4 desde el 08-10-2026)',
+    `${LAU_2023}#a20`,
+    '1995-01-01',
+  ),
   taxes_ban: rule(
     'taxes_ban',
     'rdl29_2026',

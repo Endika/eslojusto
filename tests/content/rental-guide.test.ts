@@ -83,6 +83,57 @@ describe('the rental guide', () => {
     );
   });
 
+  it('dates the agency fees by RDL 29/2026, and drops its dates once it is repealed', () => {
+    const fees = (norms: NormTable) => {
+      const b = guide(norms).find((x) => x.id === 'fees');
+      return [...(b?.list ?? []), ...(b?.paragraphs ?? [])].join('\n');
+    };
+    expect(fees(NORMS)).toContain('entre el 26 de mayo de 2023 y el 7 de octubre de 2026');
+    expect(fees(NORMS)).toContain('En un contrato anterior al 8 de octubre de 2026');
+    const after = fees(repealed);
+    expect(after).toContain(
+      'Contratos firmados desde el 26 de mayo de 2023: son siempre del casero.',
+    );
+    expect(after).not.toContain('7 de octubre de 2026');
+    expect(after).not.toContain('8 de octubre de 2026');
+  });
+
+  it('says a decree repealed before it took effect never applied, with no dates of its own', () => {
+    const never: NormTable = {
+      ...NORMS,
+      rdl28_2026: {
+        ...NORMS.rdl28_2026,
+        status: 'repealed',
+        inForceUntil: '2026-11-05',
+        statusSince: '2026-11-06',
+        statusUrl: 'https://www.boe.es/',
+      },
+    };
+    const all = text(never);
+    expect(all).toContain(
+      'El Real Decreto-ley 28/2026 no llegó a aplicarse: el Congreso lo derogó antes de que entrara en vigor.',
+    );
+    expect(all).not.toContain('15-11-2026');
+    expect(all).not.toContain('15 de noviembre de 2026');
+    expect(all).not.toContain('lo cambió del');
+    const faq = rentalFaqEntries('es', never, { checkedOn: CHECKED }).find(
+      (e) => e.anchor === 'faq-alquiler-normas-pendientes',
+    )?.answer;
+    expect(faq).toContain(
+      'El Congreso derogó el Real Decreto-ley 28/2026 antes de que entrara en vigor, así que no llegó a aplicarse.',
+    );
+    expect(faq).not.toContain('15 de noviembre');
+    expect(faq).not.toContain('15-11-2026');
+  });
+
+  it('cites the charges by their numbering before RDL 29/2026, on that wording', () => {
+    const charges = guide(NORMS).find((b) => b.id === 'charges');
+    const increase = charges?.sources.find((s) => s.citation.startsWith('LAU, art. 20.2'));
+    expect(increase?.citation).toContain('anterior al RDL 29/2026 (art. 20.3 desde el 08-10-2026)');
+    expect(increase?.url).toContain('&p=20230525');
+    expect(charges?.paragraphs.join(' ')).toContain('numera como 20.4');
+  });
+
   it('names the legal interest from its table, with the Banco de España link', () => {
     expect(legalInterest.rate).toBe(LEGAL_INTEREST.at(-1)?.rate);
     const rate = guide(NORMS).find((b) => b.id === 'return');

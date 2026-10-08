@@ -4,7 +4,7 @@ import type { Lang } from '../i18n/languages';
 import type { Variables } from '../i18n/interpolate';
 import { period } from './rent-caps';
 import { formatLongDay } from './rent-indices';
-import { decreeSentence, type Decree } from './rental-guide';
+import { decreeSentence, neverInForce, type Decree } from './rental-guide';
 import { RENTAL_DOCUMENT_TOPICS, RENTAL_FAQ_TOPICS, type RentalFaqId } from './rental-faq-topics';
 
 // The decrees a doubt can rest on, in the order the answer names them.
@@ -37,9 +37,12 @@ export function rentalFaqEntries(
         { norma: NAME[id], desde: formatLongDay(norms[id].inForceSince) },
       ),
   );
-  const repealed = REPEALED_CANDIDATES.filter((id) => norms[id].status === 'repealed').map(
-    (id) => `${NAME[id]}, ${period(lang, norms[id])}`,
-  );
+  const repealedIds = REPEALED_CANDIDATES.filter((id) => norms[id].status === 'repealed');
+  // A decree repealed before it took effect never had days of its own to fall in.
+  const repealed = repealedIds
+    .filter((id) => !neverInForce(norms[id]))
+    .map((id) => `${NAME[id]}, ${period(lang, norms[id])}`);
+  const never = repealedIds.filter((id) => neverInForce(norms[id])).map((id) => NAME[id]);
   const fecha = formatLongDay(checkedOn);
 
   const answers: Record<RentalFaqId, string> = {
@@ -57,10 +60,16 @@ export function rentalFaqEntries(
         pending.length > 0
           ? tx('rental.faq.pending_norms_list', { fecha, lista: pending.join(', y ') })
           : tx('rental.faq.pending_norms_none', { fecha }),
-      derogados:
+      derogados: [
         repealed.length > 0
           ? tx('rental.faq.pending_norms_repealed', { lista: repealed.join('; ') })
           : '',
+        never.length > 0
+          ? tx('rental.faq.pending_norms_never', { lista: never.join(' y el ') })
+          : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
     }).trim(),
     documents: tx('rental.faq.documents_answer'),
     pass: tx('rental.faq.pass_answer'),
