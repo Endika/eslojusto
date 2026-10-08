@@ -1,0 +1,137 @@
+{
+  "id": "anniversary-after-tables",
+  "description": "LAU art. 18.1: the reference index is the last one published on the anniversary; on 20-10-2026, past the loaded tables, the review never falls back to an older month and says the update is not checkable.",
+  "eval": false,
+  "today": "2026-11-03",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Santiago de Compostela",
+        "postcode": "15702",
+        "signedOnText": "10 de octubre de 2025",
+        "startDateText": "20 de octubre de 2025",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia J, mayor de edad, con DNI 44567821S.",
+        "landlordName": "Persona Arrendadora Ficticia J",
+        "landlordDni": "44567821S",
+        "tenantName": "Persona Arrendataria Ficticia J",
+        "tenantDni": "66790032V",
+        "iban": "ES47 2100 1654 3210 1200 0097 5310",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 1.100,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta se actualizará cada año de vigencia aplicando la variación anual del Índice de Referencia para la Actualización de Arrendamientos de Vivienda (IRAV) publicado por el INE.",
+        "depositText": "La parte arrendataria entrega en este acto 1.100,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    },
+    {
+      "kind": "rent_update_notice",
+      "data": {
+        "city": "Santiago de Compostela",
+        "noticeOnText": "1 de octubre de 2026",
+        "medium": "letter",
+        "previousRent": "1.100,00 €",
+        "newRent": "1.127,17 €",
+        "percent": "2,47 %",
+        "appliesFromText": "1 de octubre de 2026",
+        "tenantName": "Persona Arrendataria Ficticia J",
+        "landlordName": "Persona Arrendadora Ficticia J"
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2025-10-10",
+        "startDate": "2025-10-20",
+        "postcode": "15702",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 1100,
+        "updateClauseIndex": "irav",
+        "deposit": 1100
+      },
+      "lists": {
+        "notices": [
+          {
+            "noticeOn": "2026-10-01",
+            "previousRent": 1100,
+            "newRent": 1127.17
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "irav",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2026-10-20",
+          "effectiveOn": "2026-10-20",
+          "previousRent": 1100,
+          "newRent": 1127.17,
+          "chargedFrom": "2026-10-01",
+          "notice": "letter",
+          "noticeOn": "2026-10-01",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2025-10-10",
+      "startDate": "2025-10-20",
+      "initialRent": 1100,
+      "region": "GA",
+      "deposit": 1100
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "not_checkable"
+        }
+      ]
+    }
+  }
+}

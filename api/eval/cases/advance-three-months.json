@@ -1,0 +1,93 @@
+{
+  "id": "advance-three-months",
+  "description": "LAU art. 17.2: no more than one month's rent may be required in advance; three months at signing is 1.400 € over.",
+  "eval": false,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Madrid",
+        "postcode": "28014",
+        "signedOnText": "1 de febrero de 2022",
+        "startDateText": "1 de febrero de 2022",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia O, mayor de edad, con DNI 56296176A.",
+        "landlordName": "Persona Arrendadora Ficticia O",
+        "landlordDni": "56296176A",
+        "tenantName": "Persona Arrendataria Ficticia O",
+        "tenantDni": "84073937C",
+        "iban": "ES48 2100 5481 4815 1200 0146 2965",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 700,00 €.",
+        "advanceText": "A la firma se abonan por adelantado 3 mensualidades de renta.",
+        "updateClauseText": "La renta pactada no será objeto de actualización durante la vigencia del contrato.",
+        "depositText": "La parte arrendataria entrega en este acto 700,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2022-02-01",
+        "startDate": "2022-02-01",
+        "postcode": "28014",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 700,
+        "updateClauseIndex": "none",
+        "deposit": 700
+      },
+      "lists": {}
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "none",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 3,
+      "updates": [],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2022-02-01",
+      "startDate": "2022-02-01",
+      "initialRent": 700,
+      "region": "MD",
+      "deposit": 700
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "over_cap",
+          "amount": 1400
+        }
+      ]
+    }
+  }
+}

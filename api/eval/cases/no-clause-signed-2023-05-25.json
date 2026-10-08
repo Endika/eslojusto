@@ -1,0 +1,149 @@
+{
+  "id": "no-clause-signed-2023-05-25",
+  "description": "Signed 25-05-2023, the day before Ley 12/2023 took effect: agency fees fall on the landlord only when a company (LAU art. 20.1 as worded by RDL 7/2019), and a contract with no update clause allows no rise (LAU art. 18.1), so the 3 % taken in 2024 is 28,50 € a month over, 342 €.",
+  "eval": false,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Barcelona",
+        "postcode": "08012",
+        "signedOnText": "25 de mayo de 2023",
+        "startDateText": "1 de junio de 2023",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia F, mayor de edad, con DNI 35185137C.",
+        "landlordName": "Persona Arrendadora Ficticia F",
+        "landlordDni": "35185137C",
+        "tenantName": "Persona Arrendataria Ficticia F",
+        "tenantDni": "52962908X",
+        "iban": "ES54 2100 8592 5926 1200 0058 5186",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 950,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta pactada no será objeto de actualización durante la vigencia del contrato.",
+        "depositText": "La parte arrendataria entrega en este acto 950,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "La parte arrendataria abona a Inmobiliaria Ficticia de Pruebas, S.L. los conceptos que figuran en la factura que se entrega aparte."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    },
+    {
+      "kind": "rent_update_notice",
+      "data": {
+        "city": "Barcelona",
+        "noticeOnText": "2 de mayo de 2024",
+        "medium": "letter",
+        "previousRent": "950,00 €",
+        "newRent": "978,50 €",
+        "percent": "3 %",
+        "appliesFromText": "1 de junio de 2024",
+        "tenantName": "Persona Arrendataria Ficticia F",
+        "landlordName": "Persona Arrendadora Ficticia F"
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2023-05-25",
+        "startDate": "2023-06-01",
+        "postcode": "08012",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 950,
+        "updateClauseIndex": "none",
+        "deposit": 950
+      },
+      "lists": {
+        "notices": [
+          {
+            "noticeOn": "2024-05-02",
+            "previousRent": 950,
+            "newRent": 978.5
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "none",
+      "stressedZone": null,
+      "fees": [
+        {
+          "kind": "agency_fee",
+          "amount": 950,
+          "deductedLater": false,
+          "requestedInWriting": false
+        }
+      ],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2024-06-01",
+          "effectiveOn": "2024-06-01",
+          "previousRent": 950,
+          "newRent": 978.5,
+          "chargedFrom": "2024-06-01",
+          "notice": "letter",
+          "noticeOn": "2024-05-02",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2023-05-25",
+      "startDate": "2023-06-01",
+      "initialRent": 950,
+      "region": "CT",
+      "deposit": 950
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "fee:0",
+          "status": "not_applicable_to_date"
+        },
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "paid_over",
+          "amount": 342
+        }
+      ]
+    }
+  }
+}

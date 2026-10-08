@@ -1,0 +1,105 @@
+{
+  "id": "deposit-two-months-and-cash",
+  "description": "LAU art. 36.1 and 36.5: the deposit is one month's rent and what goes past it counts as an extra guarantee; 750 € over the month plus a 1.500 € cash deposit come to 2.250 €, 750 € over the two months' cap.",
+  "eval": false,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Sevilla",
+        "postcode": "41003",
+        "signedOnText": "15 de enero de 2020",
+        "startDateText": "1 de febrero de 2020",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia N, mayor de edad, con DNI 53950505X.",
+        "landlordName": "Persona Arrendadora Ficticia N",
+        "landlordDni": "53950505X",
+        "tenantName": "Persona Arrendataria Ficticia N",
+        "tenantDni": "80617156R",
+        "iban": "ES09 2100 4716 0494 1200 0136 5434",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 750,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta se actualizará cada año de vigencia, en la fecha en que se cumpla cada anualidad, aplicando la variación anual del Índice de Precios de Consumo (IPC) publicada por el INE.",
+        "depositText": "La parte arrendataria entrega en este acto 1.500,00 € en concepto de fianza legal.",
+        "guaranteesText": "Además, la parte arrendataria entrega 1.500,00 € en concepto de depósito de garantía adicional en metálico.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2020-01-15",
+        "startDate": "2020-02-01",
+        "postcode": "41003",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 750,
+        "updateClauseIndex": "ipc",
+        "deposit": 1500
+      },
+      "lists": {
+        "guarantees": [
+          {
+            "kind": "cash",
+            "amount": 1500
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "ipc",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [
+        {
+          "kind": "cash",
+          "amount": 1500
+        }
+      ],
+      "advanceMonths": 1,
+      "updates": [],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2020-01-15",
+      "startDate": "2020-02-01",
+      "initialRent": 750,
+      "region": "AN",
+      "deposit": 1500
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "over_cap",
+          "amount": 750
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        }
+      ]
+    }
+  }
+}

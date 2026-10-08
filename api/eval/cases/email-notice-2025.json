@@ -1,0 +1,167 @@
+{
+  "id": "email-notice-2025",
+  "description": "LAU art. 18.2: the update is due from the month after written notice; whether an email counts as written is not settled, so July 2025 alone (20,70 €) or the whole year (248,40 €) was paid over, and 20,70 € is counted.",
+  "eval": true,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Zaragoza",
+        "postcode": "50004",
+        "signedOnText": "1 de julio de 2021",
+        "startDateText": "20 de julio de 2021",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia C, mayor de edad, con DNI 89135570C.",
+        "landlordName": "Persona Arrendadora Ficticia C",
+        "landlordDni": "89135570C",
+        "tenantName": "Persona Arrendataria Ficticia C",
+        "tenantDni": "42468871E",
+        "iban": "ES43 2100 6197 5309 1200 0282 8399",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 850,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta se actualizará cada año de vigencia, en la fecha en que se cumpla cada anualidad, aplicando la variación anual del Índice de Precios de Consumo (IPC) publicada por el INE.",
+        "depositText": "La parte arrendataria entrega en este acto 850,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    },
+    {
+      "kind": "rent_update_notice",
+      "data": {
+        "city": "Zaragoza",
+        "noticeOnText": "25 de julio de 2025",
+        "medium": "email",
+        "previousRent": "900,00 €",
+        "newRent": "920,70 €",
+        "percent": "2,3 %",
+        "appliesFromText": "1 de julio de 2025",
+        "tenantName": "Persona Arrendataria Ficticia C",
+        "landlordName": "Persona Arrendadora Ficticia C"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    },
+    {
+      "kind": "rent_receipt",
+      "data": {
+        "monthText": "julio de 2025",
+        "rent": "920,70 €",
+        "community": "",
+        "propertyTax": "",
+        "total": "920,70 €",
+        "tenantName": "Persona Arrendataria Ficticia C",
+        "landlordName": "Persona Arrendadora Ficticia C",
+        "iban": "ES43 2100 6197 5309 1200 0282 8399"
+      },
+      "degrade": {
+        "rotate": -3.2,
+        "shadow": 0.5,
+        "blur": 1.3,
+        "dark": 0.18,
+        "crop": 0.04,
+        "jpegQuality": 0.6
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2021-07-01",
+        "startDate": "2021-07-20",
+        "postcode": "50004",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 850,
+        "updateClauseIndex": "ipc",
+        "deposit": 850
+      },
+      "lists": {
+        "notices": [
+          {
+            "noticeOn": "2025-07-25",
+            "previousRent": 900,
+            "newRent": 920.7
+          }
+        ],
+        "receipts": [
+          {
+            "month": "2025-07",
+            "rent": 920.7
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "ipc",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2025-07-20",
+          "effectiveOn": "2025-07-20",
+          "previousRent": 900,
+          "newRent": 920.7,
+          "chargedFrom": "2025-07-01",
+          "notice": "email",
+          "noticeOn": "2025-07-25",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2021-07-01",
+      "startDate": "2021-07-20",
+      "initialRent": 850,
+      "region": "AR",
+      "deposit": 850
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "depends",
+          "amount": 20.7,
+          "upTo": 248.4,
+          "reasons": ["notice_form_doubtful"]
+        }
+      ]
+    }
+  }
+}

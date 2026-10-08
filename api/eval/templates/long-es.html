@@ -1,0 +1,217 @@
+<!--
+  Lease template «long-es»: a four-sheet residential lease in Spanish with numbered clauses and an
+  annex, for packs where the values sit deep in a long document.
+  Source: written for this bank. No administration's model was copied: the reuse licence of the
+  published models could not be verified, so the text is original and neutral, following only the
+  headings any lease under Ley 29/1994 (LAU) carries. Licence: same as this repository.
+  Placeholders in double braces are filled by scripts/rental-bank/render.mjs from each case's data.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #222;
+        font:
+          16px/1.55 'DejaVu Serif',
+          serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 80px 90px 100px;
+        position: relative;
+        overflow: hidden;
+        background: #fff;
+      }
+      h1 {
+        font:
+          bold 22px 'DejaVu Serif',
+          serif;
+        text-align: center;
+        margin: 0 0 30px;
+      }
+      h2 {
+        font:
+          bold 17px 'DejaVu Serif',
+          serif;
+        text-align: center;
+        margin: 22px 0 12px;
+      }
+      h3 {
+        font:
+          bold 16px 'DejaVu Serif',
+          serif;
+        margin: 16px 0 6px;
+      }
+      p {
+        margin: 0 0 9px;
+        text-align: justify;
+      }
+      .num {
+        position: absolute;
+        top: 36px;
+        right: 90px;
+        font-size: 13px;
+        color: #777;
+      }
+      .sign {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 70px;
+      }
+      .sign div {
+        width: 42%;
+        border-top: 1px solid #333;
+        padding-top: 6px;
+        text-align: center;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 34px;
+        text-align: center;
+        font:
+          13px 'DejaVu Sans',
+          sans-serif;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <div class="num">1 / 4</div>
+      <h1>CONTRATO DE ARRENDAMIENTO DE VIVIENDA</h1>
+      <p>En {{city}}, a {{signedOnText}}.</p>
+      <h2>REUNIDOS</h2>
+      <p>De una parte, como ARRENDADORA, {{landlordBlock}}</p>
+      <p>De otra parte, como ARRENDATARIA, {{tenantName}}, mayor de edad, con DNI {{tenantDni}}.</p>
+      <p>Ambas partes se reconocen capacidad legal suficiente para obligarse y, a tal efecto,</p>
+      <h2>EXPONEN</h2>
+      <p>
+        I. Que la parte arrendadora es titular de la vivienda situada en {{address}}, código postal
+        {{postcode}}, con su cocina, baño y un trastero anejo.
+      </p>
+      <p>II. Que la parte arrendataria desea arrendar dicha vivienda {{useText}}.</p>
+      <p>
+        III. Que la vivienda se entrega en buen estado de conservación, con el inventario de
+        mobiliario que figura en el anexo, y con el certificado de eficiencia energética a
+        disposición de la parte arrendataria.
+      </p>
+      <p>
+        IV. Que ambas partes han convenido celebrar el presente contrato de arrendamiento, que se
+        regirá por la Ley 29/1994, de 24 de noviembre, de Arrendamientos Urbanos, y por las
+        siguientes
+      </p>
+      <h2>CLÁUSULAS</h2>
+      <h3>Primera. Objeto</h3>
+      <p>
+        La parte arrendadora cede en arrendamiento a la parte arrendataria la vivienda descrita en
+        el expositivo I, que esta acepta en el estado en que se encuentra.
+      </p>
+      <h3>Segunda. Duración</h3>
+      <p>
+        El contrato entra en vigor el {{startDateText}}. {{durationText}} Llegado el día del
+        vencimiento, el contrato se prorrogará en los términos de los artículos 9 y 10 de la Ley de
+        Arrendamientos Urbanos.
+      </p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+    <section class="page">
+      <div class="num">2 / 4</div>
+      <h3>Tercera. Renta</h3>
+      <p>
+        {{rentText}} La renta se pagará por meses anticipados dentro de los siete primeros días de
+        cada mes mediante transferencia a la cuenta {{iban}}, sirviendo el justificante bancario
+        como recibo.
+      </p>
+      <p>{{advanceText}}</p>
+      <h3>Cuarta. Actualización de la renta</h3>
+      <p>{{updateClauseText}}</p>
+      <h3>Quinta. Fianza</h3>
+      <p>
+        {{depositText}} La fianza no podrá aplicarse al pago de las rentas mientras dure el contrato
+        y será depositada por la parte arrendadora en el organismo autonómico competente.
+      </p>
+      <h3>Sexta. Garantías adicionales</h3>
+      <p>{{guaranteesText}}</p>
+      <h3>Séptima. Gastos generales y tributos</h3>
+      <p>{{chargesText}}</p>
+      <h3>Octava. Suministros</h3>
+      <p>
+        Serán por cuenta de la parte arrendataria los gastos por servicios con que cuente la
+        vivienda que se individualicen mediante aparatos contadores, en particular electricidad,
+        agua y gas, cuyos contratos podrá cambiar a su nombre.
+      </p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+    <section class="page">
+      <div class="num">3 / 4</div>
+      <h3>Novena. Honorarios</h3>
+      <p>{{feesText}}</p>
+      <h3>Décima. Conservación de la vivienda</h3>
+      <p>
+        La parte arrendadora realizará las reparaciones necesarias para conservar la vivienda en
+        condiciones de habitabilidad, salvo cuando el deterioro sea imputable a la parte
+        arrendataria. Las pequeñas reparaciones que exija el desgaste por el uso ordinario serán de
+        cargo de la parte arrendataria.
+      </p>
+      <h3>Undécima. Obras</h3>
+      <p>
+        La parte arrendataria no podrá realizar obras que modifiquen la configuración de la vivienda
+        o de sus accesorios sin el consentimiento expreso y por escrito de la parte arrendadora.
+      </p>
+      <h3>Duodécima. Cesión y subarriendo</h3>
+      <p>
+        Queda prohibida la cesión del contrato y el subarriendo, total o parcial, sin el
+        consentimiento escrito de la parte arrendadora.
+      </p>
+      <h3>Decimotercera. Desistimiento</h3>
+      <p>
+        La parte arrendataria podrá desistir del contrato una vez transcurridos seis meses, siempre
+        que lo comunique con una antelación mínima de treinta días.
+      </p>
+      <h3>Decimocuarta. Notificaciones</h3>
+      <p>
+        Las partes señalan como domicilio para notificaciones la vivienda arrendada, en el caso de
+        la parte arrendataria, y el que figura en el encabezamiento, en el de la parte arrendadora.
+        Se admite también la comunicación por correo electrónico cuando deje constancia de su
+        recepción.
+      </p>
+      <h3>Decimoquinta. Fuero</h3>
+      <p>
+        Para cuantas cuestiones se deriven de este contrato, las partes se someten a los juzgados y
+        tribunales del lugar donde radica la vivienda.
+      </p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+    <section class="page">
+      <div class="num">4 / 4</div>
+      <h2>ANEXO. INVENTARIO</h2>
+      <p>
+        Cocina: frigorífico, horno, placa de inducción, lavadora y campana extractora. Salón: sofá
+        de tres plazas, mesa con cuatro sillas y estantería. Dormitorio principal: cama de
+        matrimonio, dos mesillas y armario empotrado. Dormitorio secundario: cama individual y
+        escritorio.
+      </p>
+      <p>
+        Las partes declaran haber revisado el inventario y estar conformes con el estado de cada
+        elemento en la fecha de entrega de llaves.
+      </p>
+      <p>
+        Y en prueba de conformidad, firman el presente contrato y su anexo por duplicado ejemplar y
+        a un solo efecto, en el lugar y fecha del encabezamiento.
+      </p>
+      <div class="sign">
+        <div>La parte arrendadora</div>
+        <div>La parte arrendataria</div>
+      </div>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

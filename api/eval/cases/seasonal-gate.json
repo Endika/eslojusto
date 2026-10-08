@@ -1,0 +1,84 @@
+{
+  "id": "seasonal-gate",
+  "description": "A seasonal let (LAU art. 3) is not a main home: the review stops at the door and checks nothing.",
+  "eval": false,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Barcelona",
+        "postcode": "08012",
+        "signedOnText": "1 de julio de 2024",
+        "startDateText": "1 de septiembre de 2024",
+        "useText": "por temporada, para uso distinto del de vivienda habitual, durante un curso académico",
+        "landlordBlock": "Persona Arrendadora Ficticia L, mayor de edad, con DNI 49259163R.",
+        "landlordName": "Persona Arrendadora Ficticia L",
+        "landlordDni": "49259163R",
+        "tenantName": "Persona Arrendataria Ficticia L",
+        "tenantDni": "73703594D",
+        "iban": "ES28 2100 3185 1852 1200 0117 0372",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 10 meses.",
+        "rentText": "La renta mensual es de 650,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta pactada no será objeto de actualización durante la vigencia del contrato.",
+        "depositText": "La parte arrendataria entrega en este acto 650,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2024-07-01",
+        "startDate": "2024-09-01",
+        "postcode": "08012",
+        "landlordType": "person",
+        "use": "seasonal",
+        "agreedMonths": 10,
+        "initialRent": 650,
+        "updateClauseIndex": "none",
+        "deposit": 650
+      },
+      "lists": {}
+    },
+    "input": {
+      "contractType": "seasonal",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 10,
+      "updateClause": "none",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2024-07-01",
+      "startDate": "2024-09-01",
+      "initialRent": 650,
+      "region": "CT",
+      "deposit": 650
+    },
+    "review": {
+      "scope": {
+        "inScope": false,
+        "reason": "seasonal"
+      },
+      "items": []
+    }
+  }
+}
