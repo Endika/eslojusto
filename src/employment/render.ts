@@ -23,22 +23,14 @@ import type { Source } from '../engine/sources';
 import {
   formatCalculationEuros,
   formatDays,
-  formatEuros,
   formatInteger,
   formatWholeEuros,
 } from '../calculator/number';
+import { amountEl, pieces, shownAmount, type Piece, type Shown } from '../calculator/amounts';
 import type { ClientKey, Translate } from '../i18n/client';
 import type { FieldError } from './form';
 import type { OutOfScopeReason } from './ports';
-import {
-  amountOf,
-  headline,
-  shortfallOf,
-  shownOne,
-  shownPair,
-  stateOf,
-  type Shown,
-} from './summary';
+import { amountOf, headline, shortfallOf, shownOne, shownPair, stateOf } from './summary';
 
 // «2025-03-14» → «14-03-2025».
 export const dayText = (iso: string): string => iso.split('-').reverse().join('-');
@@ -177,26 +169,6 @@ export const calculationLines = (c: EmploymentCalculation, tr: Translate): strin
 
 // ---------- DOM helpers ----------
 
-// An amount keeps its Spanish format and reads left to right, also inside right-to-left text.
-function amountEl(n: number, format: (n: number) => string = formatEuros): HTMLElement {
-  const bdi = document.createElement('bdi');
-  bdi.dir = 'ltr';
-  bdi.textContent = format(n);
-  return bdi;
-}
-
-type Piece = string | Node;
-
-// Fills a translated template, putting each `{variable}` amount in its own isolated element.
-function pieces(template: string, vars: Readonly<Record<string, string | Piece[]>>): Piece[] {
-  return template.split(/\{(\w+)\}/).flatMap((part, i): Piece[] => {
-    if (i % 2 === 0) return part === '' ? [] : [part];
-    const v = vars[part];
-    if (v === undefined) return [`{${part}}`];
-    return typeof v === 'string' ? [v] : v;
-  });
-}
-
 function template(container: ParentNode, name: string): DocumentFragment {
   const t = container.querySelector<HTMLTemplateElement>(`template[data-template="${name}"]`);
   if (!t) throw new Error(`Missing template ${name}`);
@@ -227,13 +199,9 @@ function link(url: string, text: string): HTMLAnchorElement {
 
 // ---------- Verdicts ----------
 
-const shownPieces = (s: Shown): Piece[] => [
-  amountEl(s.amount, s.cents ? formatEuros : formatWholeEuros),
-];
-
 // «unos 340 €»; an amount kept with its cents is said as it is.
 const approx = (s: Shown, tr: Translate): Piece[] =>
-  s.cents ? shownPieces(s) : pieces(tr('client.employment.about'), { importe: shownPieces(s) });
+  s.cents ? shownAmount(s) : pieces(tr('client.employment.about'), { importe: shownAmount(s) });
 
 // A finding's status in words, with its euros when it carries them: «Por debajo del SMI: unos
 // 900 € al año».

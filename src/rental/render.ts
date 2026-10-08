@@ -12,13 +12,8 @@ import type { RentalItemResult, RentalReview } from '../engine/rental/review';
 import type { RentalSource } from '../engine/rental/rules';
 import type { OutOfScopeReason } from '../engine/rental/scope';
 import type { ItemStatus, RentalInput } from '../engine/rental/types';
-import {
-  formatCalculationEuros,
-  formatDays,
-  formatEuros,
-  formatInteger,
-  formatWholeEuros,
-} from '../calculator/number';
+import { formatCalculationEuros, formatDays, formatInteger } from '../calculator/number';
+import { amountEl, pieces, shownAmount, type Piece } from '../calculator/amounts';
 import type { ClientKey, Translate } from '../i18n/client';
 import type { FieldError } from './form';
 import {
@@ -95,31 +90,6 @@ export function phraseText(p: RentalPhrase, tr: Translate): string {
 export const calculationLines = (c: RentalCalculation, tr: Translate): string[] =>
   c.map((p) => phraseText(p, tr));
 
-// An amount keeps its Spanish format and reads left to right, also inside right-to-left text.
-function amountEl(n: number, format: (n: number) => string = formatEuros): HTMLElement {
-  const bdi = document.createElement('bdi');
-  bdi.dir = 'ltr';
-  bdi.textContent = format(n);
-  return bdi;
-}
-
-type Piece = string | Node;
-
-// Fills a translated template, putting each `{variable}` amount in its own isolated element.
-function pieces(
-  template: string,
-  vars: Readonly<Record<string, number | string | Piece[]>>,
-  format: (n: number) => string = formatWholeEuros,
-): Piece[] {
-  return template.split(/\{(\w+)\}/).flatMap((part, i): Piece[] => {
-    if (i % 2 === 0) return part === '' ? [] : [part];
-    const v = vars[part];
-    if (v === undefined) return [`{${part}}`];
-    if (typeof v === 'number') return [amountEl(v, format)];
-    return typeof v === 'string' ? [v] : v;
-  });
-}
-
 function template(container: ParentNode, name: string): DocumentFragment {
   const t = container.querySelector<HTMLTemplateElement>(`template[data-template="${name}"]`);
   if (!t) throw new Error(`Missing template ${name}`);
@@ -134,14 +104,9 @@ function find<T extends Element = HTMLElement>(root: ParentNode, selector: strin
 
 // ---------- Summary ----------
 
-// An amount as decided for it: whole euros to the ten, or with its cents.
-const amountOf = (s: Shown): Piece[] => [
-  amountEl(s.amount, s.cents ? formatEuros : formatWholeEuros),
-];
-
 // «unos 340 €»; an amount kept with its cents is said as it is.
 const approx = (s: Shown, tr: Translate): Piece[] =>
-  s.cents ? amountOf(s) : pieces(tr('client.rental.about'), { importe: amountOf(s) });
+  s.cents ? shownAmount(s) : pieces(tr('client.rental.about'), { importe: shownAmount(s) });
 
 const FIGURED: ReadonlySet<ItemStatus> = new Set(['paid_over', 'owed', 'over_cap']);
 
@@ -196,8 +161,8 @@ export function dependsPieces(
   const [minimo, maximo] = shownPair(low, high);
   return pieces(tr('client.rental.depends'), {
     motivo,
-    minimo: amountOf(minimo),
-    maximo: amountOf(maximo),
+    minimo: shownAmount(minimo),
+    maximo: shownAmount(maximo),
   });
 }
 

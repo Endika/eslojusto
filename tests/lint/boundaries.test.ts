@@ -343,6 +343,8 @@ describe('import boundaries', () => {
     ['src/employment/x.ts', "import type { NormSource } from '../engine/law/sources';"],
     ['src/employment/x.ts', "import { createNavigation } from '../calculator/navigation';"],
     ['src/employment/x.ts', "import type { Translate } from '../i18n/client';"],
+    ['src/employment/x.ts', "import { shownPair } from '../calculator/amounts';"],
+    ['src/rental/x.ts', "import { shownPair } from '../calculator/amounts';"],
     [
       'src/scripts/employment.ts',
       "import { MINIMUM_WAGE } from '../engine/employment/data/minimum-wage';",
