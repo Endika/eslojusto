@@ -2204,10 +2204,10 @@ export const es = {
     'Descargar la petición del certificado de contratos temporales (PDF, gratis)',
   'employment.pass.download_company_letter': 'Descargar la carta a la empresa (PDF)',
   'employment.pass.letter_note':
-    'Las cartas son plantillas. La que pide la información y la petición del certificado son gratis; la carta a la empresa lleva tus cifras y viene con el pase. Se descargan en tu dispositivo y no se envían desde aquí: usarlas o no, y cómo, es decisión tuya.',
+    'Las cartas son plantillas. Se descargan en tu dispositivo y no se envían desde aquí: usarlas o no, y cómo, es decisión tuya.',
   'employment.letters.title': 'Cartas que puedes descargar gratis',
   'employment.letters.text':
-    'Estas cartas solo piden información, así que no necesitan el pase. Se generan en tu dispositivo.',
+    'Estas cartas solo piden información y se descargan gratis. Se generan en tu dispositivo.',
   'employment.letter.legend': 'Tus datos para las cartas (opcional)',
   'employment.letter.id': 'DNI o NIE (opcional)',
   'employment.letter.workplace': 'Centro de trabajo',

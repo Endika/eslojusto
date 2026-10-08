@@ -728,6 +728,8 @@ test('with nothing to sell, the letter asking for the information is free', asyn
   const letters = page.getByRole('region', { name: 'Cartas que puedes descargar gratis' });
   await expect(letters).toContainText('Estas cartas solo piden información');
   await expect(letters.getByRole('button', { name: 'Pagar 4,99 €' })).toBeHidden();
+  // Nothing on show speaks of the pass.
+  await expect(letters).not.toContainText(/pase|4,99/, { useInnerText: true });
   await expect(letters.getByRole('button', { name: /petición del certificado/ })).toBeHidden();
   await letters.getByLabel('Tu nombre y apellidos').fill('Alex Ejemplo');
   expect(
