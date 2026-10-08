@@ -716,35 +716,47 @@ run at once, and the budget action caps the month.
 
 ## Evaluation
 
-`eval/` holds a synthetic bank of 35 lease packs: each case (`eval/cases/*.json`, shape in
-`eval/schema.ts`) lists its pages, drawn from the lease templates in `eval/templates/` or as
-notices, receipts, invoices and deposit returns, with how each photo is spoiled; what a read
-should find in them; and the facts and review the site's engine should give
-(`tests/engine/rental/bank.test.ts` checks the engine against every case, at no cost). Every
-person, DNI and IBAN in it is invented, and `test/eval-synthetic.test.ts` proves that each DNI
-and IBAN fails its check digits.
+`eval/` holds two synthetic banks. The rental one has 35 lease packs: each case
+(`eval/cases/*.json`, shape in `eval/schema.ts`) lists its pages, drawn from the lease templates in
+`eval/templates/` or as notices, receipts, invoices and deposit returns, with how each photo is
+spoiled; what a read should find in them; and the facts and review the site's engine should give
+(`tests/engine/rental/bank.test.ts` checks the engine against every case, at no cost). The
+employment one has 36 packs (`eval/cases/employment/*.json`, shape in `eval/employment-schema.ts`)
+drawn from `eval/templates/employment/`: open-ended, fixed-term, training and part-time contracts
+(two of them in Catalan and Galician), payslips laid out after the official salary receipt, work
+histories and job offers; `tests/engine/employment/bank.test.ts` runs `reviewEmployment` on each
+case's facts, also at no cost, and every case's `description` names the rule it exercises. Every
+person, company and identifier in both banks is invented, and `test/eval-synthetic.test.ts` proves
+that each DNI, NIE, IBAN, Social Security number, employer account code and CIF fails its check
+digits.
 
 ```bash
-npm run rental-bank                          # at the root: renders the photos to api/eval/out/
-EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval # here: reads them with Bedrock, never in CI
+npm run rental-bank                          # at the root: renders the lease photos to api/eval/out/
+npm run employment-bank                      # at the root: the employment ones to api/eval/out/employment/
+EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval # here: reads the lease photos with Bedrock, never in CI
+EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval -- --review employment --cases eval/cases/employment
 ```
 
 The renderer is deterministic: the same seed (`--seed`, by default 20261008) gives the same
-bytes, and it prints the hash of what it wrote. The run (`eval/run.ts`, with `tsx`, outside
-vitest) refuses to start without `EVAL_CONFIRM=yes` and a positive `EVAL_MAX_USD`, and exits
-before it loads any AWS adapter. It reads, by default, the 15 packs marked `eval: true` (bad
-photos, doubtful cases, long documents); `EVAL_CASES=all` or a comma-separated list of ids picks
-others. Each pack goes through the Lambda's own domain (`extract` with `review: 'rental'`) and
-the real `createBedrockReader`, with the models of `src/config.ts`. Before each pack it adds the
-cost measured so far (tokens × `MODEL_PRICES_USD_PER_MTOK`) to the worst case of one more pack
-and stops if that could pass `EVAL_MAX_USD`. It writes `eval/out/report.json`: accuracy by field
-and by page kind, `nothing_read` expected and got, conflicts, escalations, reads cut at
-`max_tokens`, values of a person found in what the model wrote (it must be 0) and the total cost.
+bytes, and it prints the hash of what it wrote; `--cases` and `--out` point it at another bank.
+The run (`eval/run.ts`, with `tsx`, outside vitest) refuses to start without `EVAL_CONFIRM=yes`
+and a positive `EVAL_MAX_USD`, and exits before it loads any AWS adapter. `--review` picks the
+bank (`rental` by default, or `employment`) and `--cases` its folder. It reads, by default, the 15
+packs marked `eval: true` (bad photos, doubtful cases, long documents); `EVAL_CASES=all` or a
+comma-separated list of ids picks others. Each pack goes through the Lambda's own domain (`extract`
+with that review) and the real `createBedrockReader`, with the models of `src/config.ts`. Before
+each pack it adds the cost measured so far (tokens × `MODEL_PRICES_USD_PER_MTOK`) to the worst
+case of one more pack and stops if that could pass `EVAL_MAX_USD`. It writes `report.json` next to
+the bank's photos (`eval/out/` or `eval/out/employment/`): accuracy by field and by page kind,
+`nothing_read` expected and got, conflicts, escalations, reads cut at `max_tokens`, values of a
+person found in what the model wrote (it must be 0; for employment the person replaced and a
+household employer count too) and the total cost.
 
-**How much.** 15 packs of 2 to 7 photos, one pass with Sonnet 4.6: each pack is at most
-**0.40 USD** (the worst case above, 96,000 tokens in and 5,000 out), so `EVAL_MAX_USD=3` stops the
-run before it could pass 3 USD, and about **2–2.50 USD** is expected. Nothing runs without the
-owner's written approval and that figure.
+**How much.** 15 packs of 1 to 8 photos, one pass with Sonnet 4.6, per bank. A rental pack is at
+most **0.40 USD** (96,000 tokens in and 5,000 out); an employment pack at most **0.51 USD**
+(96,000 in and 12,000 out, `EXTRA_OUTPUT_TOKENS_BY_REVIEW`). So `EVAL_MAX_USD=3` stops either run
+before it could pass 3 USD, and about **2–2.50 USD** is expected for each. Nothing runs without
+the owner's written approval and that figure.
 
 ## Unverified
 

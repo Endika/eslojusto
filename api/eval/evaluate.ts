@@ -10,16 +10,45 @@ import type {
 } from '../src/domain/ports';
 import { costUsd, priceOf, SpendCounter, worstCaseUsd, type WorstCase } from './budget';
 import {
+  EMPLOYMENT_PERSON_KEYS,
+  employmentPageKind,
+  isEmploymentTemplatePage,
+  type EmploymentBankCase,
+  type EmploymentTemplateId,
+} from './employment-schema';
+import {
   isTemplatePage,
   pageKind,
   PERSON_KEYS,
   type BankCase,
+  type ExpectedExtraction,
   type ExpectedValue,
+  type PageData,
   type TemplateId,
 } from './schema';
 
-export interface EvalPack {
-  readonly bankCase: BankCase;
+// What any bank's case gives the run: its pages' data and what a read should find.
+export interface EvalCase {
+  readonly id: string;
+  readonly pages: readonly { readonly data: PageData }[];
+  readonly expected: { readonly extraction: ExpectedExtraction };
+}
+
+export interface ExpectedPage {
+  readonly kind: string;
+  readonly readability: string;
+}
+
+// A bank of packs: the review its packs are read as, the image each page renders to, and the page
+// data keys that hold a person's data.
+export interface EvalBank<C extends EvalCase> {
+  readonly review: 'rental' | 'employment';
+  readonly pagesOf: (bankCase: C) => readonly ExpectedPage[];
+  readonly personKeys: readonly string[];
+}
+
+export interface EvalPack<C extends EvalCase = BankCase> {
+  readonly bankCase: C;
   // One image per sheet, in the order the case lists its pages.
   readonly files: readonly DocumentFile[];
 }
@@ -96,7 +125,7 @@ const NO_PAYMENTS: PaymentVerifier = {
 export function expectedPages(
   bankCase: BankCase,
   sheetsOf: (template: TemplateId) => number,
-): readonly { readonly kind: string; readonly readability: string }[] {
+): readonly ExpectedPage[] {
   return bankCase.pages.flatMap((page) => {
     const count = isTemplatePage(page) ? sheetsOf(page.template) : 1;
     const entry = { kind: pageKind(page), readability: page.readability ?? 'ok' };
@@ -104,16 +133,45 @@ export function expectedPages(
   });
 }
 
+export function expectedEmploymentPages(
+  bankCase: EmploymentBankCase,
+  sheetsOf: (template: EmploymentTemplateId) => number,
+): readonly ExpectedPage[] {
+  return bankCase.pages.flatMap((page) => {
+    const count = isEmploymentTemplatePage(page) ? sheetsOf(page.template) : 1;
+    const entry = { kind: employmentPageKind(page), readability: page.readability ?? 'ok' };
+    return Array.from({ length: count }, () => entry);
+  });
+}
+
+export const rentalBank = (sheetsOf: (template: TemplateId) => number): EvalBank<BankCase> => ({
+  review: 'rental',
+  pagesOf: (c) => expectedPages(c, sheetsOf),
+  personKeys: PERSON_KEYS,
+});
+
+export const employmentBank = (
+  sheetsOf: (template: EmploymentTemplateId) => number,
+): EvalBank<EmploymentBankCase> => ({
+  review: 'employment',
+  pagesOf: (c) => expectedEmploymentPages(c, sheetsOf),
+  personKeys: EMPLOYMENT_PERSON_KEYS,
+});
+
 const same = (got: unknown, want: ExpectedValue): boolean =>
   typeof want === 'number' && typeof got === 'number' ? Math.abs(got - want) < 0.005 : got === want;
 
 const normalise = (s: string): string => s.replace(/[\s-]/g, '').toLowerCase();
 
 // Each person value the model wrote anywhere, however it spaced it.
-function personsIn(reads: readonly ModelRead[], bankCase: BankCase): number {
+function personsIn(
+  reads: readonly ModelRead[],
+  bankCase: EvalCase,
+  keys: readonly string[],
+): number {
   const values = new Set<string>();
   for (const page of bankCase.pages)
-    for (const key of PERSON_KEYS) {
+    for (const key of keys) {
       const v = page.data[key];
       if (typeof v === 'string') values.add(normalise(v));
     }
@@ -130,14 +188,22 @@ function tally<K extends string>(map: Map<K, Tally>, key: K, correct: boolean): 
 
 const ratio = (t: Tally): number => (t.expected === 0 ? 0 : t.correct / t.expected);
 
-type RentalResponse = ExtractResponse<'rental'>;
+// Both reviews' responses, read through the names they share.
+type AnyResponse = ExtractResponse<'rental'> | ExtractResponse<'employment'>;
+interface Scored {
+  readonly fields: Readonly<Record<string, { readonly value: unknown } | undefined>>;
+  readonly lists: Readonly<
+    Record<string, readonly { readonly values: Readonly<Record<string, unknown>> }[] | undefined>
+  >;
+  readonly conflicts: readonly unknown[];
+}
 
-// Reads each pack through the same domain the Lambda runs, as a rental review, and scores it.
+// Reads each pack through the same domain the Lambda runs, as its bank's review, and scores it.
 // Before each pack it adds the measured cost so far to the worst case of the next one, and stops
 // if that could cross the cap.
-export async function evaluate(
-  packs: readonly EvalPack[],
-  sheetsOf: (template: TemplateId) => number,
+export async function evaluate<C extends EvalCase>(
+  packs: readonly EvalPack<C>[],
+  bank: EvalBank<C>,
   deps: EvalDeps,
 ): Promise<EvalReport> {
   const counter = new SpendCounter(deps.maxUsd);
@@ -168,7 +234,12 @@ export async function evaluate(
     const truncatedBefore = deps.truncatedReads();
     const metrics: ExtractMetrics = {};
     const response = (await extract(
-      { files, captchaToken: 'eval', allowance: { type: 'free', token: null }, review: 'rental' },
+      {
+        files,
+        captchaToken: 'eval',
+        allowance: { type: 'free', token: null },
+        review: bank.review,
+      },
       {
         reader,
         captcha: ACCEPT_ALL,
@@ -178,7 +249,7 @@ export async function evaluate(
         models: deps.models,
       },
       metrics,
-    )) as RentalResponse;
+    )) as AnyResponse;
     const cost = reads.reduce(
       (sum, r) =>
         sum + costUsd(priceOf(deps.prices, r.model), r.read.inputTokens, r.read.outputTokens),
@@ -199,7 +270,7 @@ export async function evaluate(
           ? response.pages
           : [];
     const pages: Tally = { expected: 0, correct: 0 };
-    expectedPages(bankCase, sheetsOf).forEach((want, i) => {
+    bank.pagesOf(bankCase).forEach((want, i) => {
       const got = pagesGot.find((p) => p.page === i + 1);
       const correct = got?.kind === want.kind;
       tally(byKind, want.kind, correct);
@@ -210,7 +281,7 @@ export async function evaluate(
     });
 
     const fields: Tally = { expected: 0, correct: 0 };
-    const extraction = response.code === 'ok' ? response.extraction : null;
+    const extraction: Scored | null = response.code === 'ok' ? response.extraction : null;
     const score = (name: string, got: unknown, want: ExpectedValue) => {
       const correct = same(got, want);
       tally(byField, name, correct);
@@ -218,9 +289,9 @@ export async function evaluate(
       if (correct) fields.correct += 1;
     };
     for (const [name, want] of Object.entries(expected.fields))
-      score(name, extraction?.fields[name as keyof typeof extraction.fields]?.value, want);
+      score(name, extraction?.fields[name]?.value, want);
     for (const [list, rows] of Object.entries(expected.lists)) {
-      const got = extraction?.lists[list as keyof typeof extraction.lists] ?? [];
+      const got = extraction?.lists[list] ?? [];
       rows.forEach((row, i) => {
         for (const [name, want] of Object.entries(row))
           score(`${list}.${name}`, got[i]?.values[name], want);
@@ -239,6 +310,7 @@ export async function evaluate(
       personsTranscribed: personsIn(
         reads.map((r) => r.read),
         bankCase,
+        bank.personKeys,
       ),
       fields,
       pages,
