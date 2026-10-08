@@ -9,8 +9,7 @@ import { rentUpdateAmount, type RentUpdateReading } from '../engine/rental/rent-
 import type { RentalItemResult, RentalReview, Total } from '../engine/rental/review';
 import type { ItemStatus } from '../engine/rental/types';
 
-// An amount for the free summary: to the nearest 10 €.
-export const roundToTens = (n: number): number => Math.round(n / 10) * 10;
+export { roundToTens, shownOne, shownPair, type Shown } from '../calculator/amounts';
 
 // One reading of an item as the summary words it: its status and, when it carries one, the euros.
 export interface Verdict {
@@ -94,37 +93,3 @@ export const totalLines = (review: RentalReview): readonly { kind: TotalKind; to
   (['paidOver', 'owed', 'overCap'] as const)
     .map((kind) => ({ kind, total: review.totals[kind] }))
     .filter(({ total }) => total.upTo > 0);
-
-// How an approximate amount is shown: to tens («unos 340 €»), or with its cents where tens would
-// say something false.
-export interface Shown {
-  readonly amount: number;
-  readonly cents: boolean;
-}
-
-// One amount alone: to tens, unless that would turn something into «0 €».
-export const shownOne = (n: number): Shown =>
-  n > 0 && roundToTens(n) === 0
-    ? { amount: n, cents: true }
-    : { amount: roundToTens(n), cents: false };
-
-// Two amounts that bound something (two readings, or what is counted and the most it can be): to
-// tens only when the rounded figures stay apart and neither passes the other's figure; otherwise
-// both keep their cents, so a range never reads as one figure and «al menos» never goes above
-// the most there can be.
-export function shownPair(low: number, high: number): readonly [Shown, Shown] {
-  const [a, b] = [roundToTens(low), roundToTens(high)];
-  const tens =
-    low === high
-      ? low === 0 || (a > 0 && a <= high)
-      : a < b && a <= high && b >= low && (low === 0 || a > 0);
-  return tens
-    ? [
-        { amount: a, cents: false },
-        { amount: b, cents: false },
-      ]
-    : [
-        { amount: low, cents: true },
-        { amount: high, cents: true },
-      ];
-}
