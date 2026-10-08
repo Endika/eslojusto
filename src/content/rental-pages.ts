@@ -53,12 +53,12 @@ export const RENTAL_PAGES: Record<RentalPageId, RentalPage> = {
       {
         question: '¿Cuánto tiempo tiene el casero para devolver la fianza?',
         answer:
-          'Un mes desde que entregas las llaves. Pasado ese mes, lo que falte por devolver genera el interés legal del dinero, sin que tengas que pedirlo (art. 36.4 LAU).',
+          'Un mes desde que entregas las llaves. Pasado ese mes, lo que falte por devolver genera el interés legal del dinero (art. 36.4 LAU).',
       },
       {
         question: '¿Desde qué día corre el interés?',
         answer:
-          'Desde el día siguiente a que se cumple el mes contado de fecha a fecha, y hasta el día en que te devuelven el dinero, que ya no cuenta. La revisión cuenta así el mes (art. 36.4 LAU y art. 5.1 del Código Civil).',
+          'Desde el día siguiente a que se cumple el mes, contado de fecha a fecha, y hasta el día en que te devuelven el dinero, que ya no cuenta (art. 36.4 LAU).',
       },
       {
         question: '¿Qué interés se aplica?',
@@ -68,12 +68,7 @@ export const RENTAL_PAGES: Record<RentalPageId, RentalPage> = {
       {
         question: '¿Puede descontarme algo de la fianza por desperfectos?',
         answer:
-          'Esta revisión no valora si un descuento por desperfectos, limpieza u otro concepto está justificado: lo anota como te lo dieron y no lo incluye en lo que te deben. Solo información, no asesoramiento.',
-      },
-      {
-        question: '¿Genera interés todo lo que pagué de más de una mensualidad?',
-        answer:
-          'No. Solo genera interés la fianza, que es una mensualidad (art. 36.1 y 36.4 LAU). Lo que pasa de ahí es otra garantía y la revisión no le calcula interés.',
+          'Esta revisión no valora si un descuento por desperfectos, limpieza u otro concepto está justificado: lo anota como te lo dieron y no lo incluye en lo que te deben.',
       },
     ],
     related: ['deposit', 'charges'],
@@ -99,16 +94,11 @@ export const RENTAL_PAGES: Record<RentalPageId, RentalPage> = {
       },
       {
         question: '¿Cuánto me pueden pedir por adelantado?',
-        answer: 'No más de una mensualidad de renta por adelantado (art. 17.2 LAU).',
+        answer: 'No más de una mensualidad de renta por adelantado (art. 17 LAU).',
       },
       {
         question: '¿Pueden obligarme a contratar un seguro de impago?',
-        answer: `No, según ${RDL29}, en vigor desde el 8 de octubre de 2026 y pendiente de que el Congreso lo convalide: no se puede exigir al inquilino un seguro de impago de la renta (art. 3.Diecisiete, que reforma el art. 36.5 LAU). Antes de esa fecha, la revisión no da por resuelto si un seguro cuenta dentro del tope.`,
-      },
-      {
-        question: '¿Qué pasa con un aval bancario?',
-        answer:
-          'Un aval o un seguro no es dinero entregado: esta revisión los señala para que los mires, sin cifra, y solo compara con el tope el dinero que pagaste.',
+        answer: `No, según ${RDL29}, en vigor desde el 8 de octubre de 2026 y pendiente de que el Congreso lo convalide: no se puede exigir al inquilino un seguro de impago de la renta (art. 36 LAU, en la redacción del Real Decreto-ley 29/2026).`,
       },
     ],
     related: ['deposit_return', 'charges'],
@@ -121,31 +111,21 @@ export const RENTAL_PAGES: Record<RentalPageId, RentalPage> = {
     description:
       'El casero solo puede pasarte gastos si lo pactáis por escrito con su importe anual, y sin subirlos más del doble que la renta. Qué dice el art. 20 LAU.',
     h1: 'IBI, comunidad y basura: qué puede cobrarte tu casero',
-    lead: 'Los gastos de la comunidad, los tributos y los servicios sin contador solo pasan al inquilino si el contrato lo dice con su importe anual. Y su subida tiene un tope.',
+    lead: 'Los gastos de la comunidad, los tributos y otros servicios solo pasan al inquilino si lo pactáis por escrito con su importe anual. Y su subida tiene un tope.',
     faq: [
       {
         question: '¿Qué gastos puede cobrarme el casero aparte de la renta?',
         answer:
-          'Los gastos generales del edificio, los tributos y los servicios sin contador, solo si lo pactasteis por escrito y con su importe anual a la fecha del contrato (art. 20.1 LAU, en su redacción anterior al Real Decreto-ley 29/2026).',
+          'Los gastos que el contrato pase al inquilino, solo si lo pactasteis por escrito y con su importe anual a la fecha del contrato (art. 20 LAU).',
       },
       {
         question: '¿Cuánto pueden subir esos gastos?',
         answer:
-          'En los cinco primeros años de contrato, o siete si el casero es una empresa, esos gastos, salvo los tributos, solo pueden subir una vez al año, por acuerdo, y nunca más del doble de lo que puede subir la renta (art. 20.2 LAU, que el Real Decreto-ley 29/2026 numera como 20.3).',
+          'En los cinco primeros años de contrato, o siete si el casero es una empresa, esos gastos, salvo los tributos, solo pueden subir una vez al año, por acuerdo, y nunca más del doble de lo que puede subir la renta (art. 20 LAU).',
       },
       {
         question: '¿Puede cobrarme el IBI?',
-        answer: `Depende de cuándo firmaste. Según ${RDL29}, en vigor desde el 8 de octubre de 2026 y pendiente de que el Congreso lo convalide, los tributos de la vivienda no pueden cargarse al inquilino, salvo que sea el inquilino quien tiene que pagarlos (art. 3.Doce, que reforma el art. 20.1 LAU). La revisión lo aplica a los contratos firmados desde esa fecha; en los anteriores, lo da como información.`,
-      },
-      {
-        question: '¿Quién paga el agua y la luz?',
-        answer:
-          'Lo que se mide con un contador propio de la vivienda lo pagas tú (art. 20.3 LAU, que el Real Decreto-ley 29/2026 numera como 20.4).',
-      },
-      {
-        question: '¿Y la tasa de basuras?',
-        answer:
-          'En la mayoría de municipios es un tributo, así que cae en lo del IBI y queda fuera del límite de subida de los gastos. Como no en todos lo es, la revisión la señala para que la mires.',
+        answer: `Depende de cuándo firmaste. Según ${RDL29}, en vigor desde el 8 de octubre de 2026 y pendiente de que el Congreso lo convalide, los tributos de la vivienda no pueden cargarse al inquilino, salvo que sea el inquilino quien tiene que pagarlos (art. 20 LAU, en la redacción del Real Decreto-ley 29/2026). La revisión lo aplica a los contratos firmados desde esa fecha; en los anteriores, lo da como información.`,
       },
     ],
     related: ['deposit', 'deposit_return'],
