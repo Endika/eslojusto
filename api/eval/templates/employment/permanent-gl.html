@@ -1,0 +1,201 @@
+<!--
+  Employment template «permanent-gl»: a two-sheet open-ended full-time contract in Galician.
+  Source: written for this bank. It follows the structure of the contract models the public
+  employment service publishes (employer and worker data, then numbered clauses, then place, date
+  and signatures) without copying their text or layout: its legal notice
+  (https://www.sepe.es/HomeSepe/mas-informacion-contacto/aviso-legal, read on 08-10-2026) allows
+  reuse under Ley 37/2007 but also limits any content of the site to download and private use with
+  the content kept whole, so the reuse of those models could not be confirmed.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="gl">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1b1b1b;
+        font:
+          16px/1.45 'DejaVu Sans',
+          sans-serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 60px 70px 90px;
+        position: relative;
+        overflow: hidden;
+        background: #fdfdfb;
+      }
+      h1 {
+        font-size: 22px;
+        text-align: center;
+        margin: 0 0 4px;
+        letter-spacing: 0.5px;
+      }
+      .sub {
+        text-align: center;
+        font-size: 14px;
+        color: #444;
+        margin-bottom: 20px;
+      }
+      .box {
+        border: 1.5px solid #333;
+        margin-bottom: 12px;
+      }
+      .box h2 {
+        font-size: 13px;
+        text-transform: uppercase;
+        margin: 0;
+        background: #e6e6e6;
+        padding: 4px 8px;
+        border-bottom: 1px solid #333;
+      }
+      .box .in {
+        padding: 8px 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 18px;
+      }
+      .label {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #555;
+        display: block;
+      }
+      p {
+        margin: 0 0 9px;
+        text-align: justify;
+      }
+      .clause b {
+        text-transform: uppercase;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 6px 0;
+        font-size: 15px;
+      }
+      td,
+      th {
+        border: 1px solid #777;
+        padding: 5px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      td.n,
+      th.n {
+        text-align: right;
+        white-space: nowrap;
+      }
+      .sign {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 50px;
+      }
+      .sign div {
+        width: 40%;
+        border-top: 1px solid #333;
+        padding-top: 6px;
+        text-align: center;
+        font-size: 14px;
+      }
+      .muted {
+        color: #555;
+        font-size: 13px;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <h1>CONTRATO DE TRABALLO POR TEMPO INDEFINIDO</h1>
+      <div class="sub">{{modalityText}}</div>
+      <div class="box">
+        <h2>Datos da empresa</h2>
+        <div class="in"><p>{{employerBlock}}</p></div>
+      </div>
+      <div class="box">
+        <h2>Datos da persoa traballadora</h2>
+        <div class="in">
+          <div class="grid">
+            <div><span class="label">Nome e apelidos</span>{{workerName}}</div>
+            <div><span class="label">DNI/NIE</span>{{workerDni}}</div>
+            <div>
+              <span class="label">Núm. de afiliación á Seguridade Social</span>{{workerNaf}}
+            </div>
+            <div><span class="label">Centro de traballo</span>{{workplace}}</div>
+          </div>
+        </div>
+      </div>
+      <p>Ambas as partes recoñécense capacidade para contratar e conveñen as seguintes</p>
+      <div class="box">
+        <h2>Cláusulas</h2>
+        <div class="in">
+          <p class="clause">
+            <b>Primeira.</b> A persoa traballadora prestará os seus servizos coa categoría ou grupo
+            profesional de {{category}}. Será de aplicación o {{agreementText}}.
+          </p>
+
+          <p class="clause">
+            <b>Segunda.</b> O contrato iníciase o {{startDateText}}. {{durationText}}
+          </p>
+          <p class="clause"><b>Terceira.</b> {{hoursText}} Horario: {{scheduleText}}</p>
+        </div>
+      </div>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+    <section class="page">
+      <div class="box">
+        <h2>Cláusulas (continuación)</h2>
+        <div class="in">
+          <p class="clause"><b>Cuarta.</b> {{salaryText}}</p>
+          <table>
+            <tr>
+              <th>Concepto</th>
+              <th class="n">Importe bruto</th>
+            </tr>
+            {{#salaryParts}}
+            <tr>
+              <td>{{concept}}</td>
+              <td class="n">{{amount}}</td>
+            </tr>
+            {{/salaryParts}}
+          </table>
+          <p>{{extraPaysText}} O pagamento farase por transferencia á conta {{iban}}.</p>
+          <p class="clause"><b>Quinta.</b> {{holidaysText}}</p>
+          <p class="clause"><b>Sexta.</b> {{trialText}}</p>
+
+          <p class="clause"><b>Sétima.</b> {{infoText}}</p>
+          {{#clauses}}
+          <p class="clause"><b>{{title}}.</b> {{text}}</p>
+          {{/clauses}}
+        </div>
+      </div>
+      <p>
+        E en proba de conformidade, as partes asinan este contrato por triplicado en {{city}}, o
+        {{signedOnText}}.
+      </p>
+      <div class="sign">
+        <div>A empresa</div>
+        <div>A persoa traballadora</div>
+      </div>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

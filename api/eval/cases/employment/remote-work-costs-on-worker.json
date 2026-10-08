@@ -1,0 +1,329 @@
+{
+  "id": "remote-work-costs-on-worker",
+  "description": "Ley 10/2021 arts. 1 and 12.1: remote work from 30 % of the working time is regular, and its equipment and costs are the company’s; putting them on the worker is void (art. 9.1 ET).",
+  "eval": false,
+  "today": "2026-10-08",
+  "pages": [
+    {
+      "template": "employment/permanent-es",
+      "data": {
+        "employerBlock": "Ficticia Traducciones Ejemplo, S. L., con CIF B91287915, código de cuenta de cotización 51 1366299 00 y domicilio en Calle de la Prueba Ficticia, 24, Madrid.",
+        "workplace": "Madrid",
+        "category": "Traductor",
+        "agreementText": "convenio colectivo de oficinas y despachos de la provincia",
+        "startDateText": "9 de febrero de 2026",
+        "modalityText": "Jornada completa",
+        "durationText": "Se concierta por tiempo indefinido.",
+        "hoursText": "La jornada será de 40 horas semanales de trabajo efectivo.",
+        "scheduleText": "de lunes a viernes, de 09:00 a 14:00 y de 15:00 a 18:00.",
+        "salaryText": "La retribución bruta será de 1.700,00 € mensuales, en 14 pagas.",
+        "salaryParts": [
+          {
+            "concept": "Salario base",
+            "amount": "1.700,00 €"
+          }
+        ],
+        "extraPaysText": "Las dos pagas extraordinarias se abonarán en junio y diciembre.",
+        "holidaysText": "Las vacaciones anuales retribuidas serán de 30 días naturales.",
+        "trialText": "Se establece un periodo de prueba de 2 meses.",
+        "infoText": "La empresa entrega en documento aparte la información sobre los elementos esenciales del contrato.",
+        "clauses": [
+          {
+            "title": "Octava. Trabajo a distancia",
+            "text": "La persona trabajadora prestará el 60 % de su jornada desde su domicilio, con su propio ordenador y su conexión a internet, cuyos gastos correrán de su cuenta."
+          }
+        ],
+        "city": "Madrid",
+        "signedOnText": "5 de febrero de 2026",
+        "workerName": "Persona Trabajadora Ficticia V",
+        "workerDni": "55925907D",
+        "workerNaf": "29 82592569 01",
+        "iban": "ES75 2121 5147 3110 0259 2597"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "employerType": "company",
+        "signedOn": "2026-02-05",
+        "startDate": "2026-02-09",
+        "modality": "permanent",
+        "partTime": false,
+        "salaryAmount": 1700,
+        "salaryPeriod": "month",
+        "payments": 14,
+        "workplaceRegion": "MD",
+        "weeklyHours": 40,
+        "trialAmount": 2,
+        "trialUnit": "months",
+        "holidayDays": 30,
+        "holidayUnit": "calendar",
+        "remoteShare": 60
+      },
+      "lists": {
+        "salaryParts": [
+          {
+            "amount": 1700,
+            "kind": "base"
+          }
+        ],
+        "clauses": [
+          {
+            "label": "remote_work_costs",
+            "costsOnWorker": true
+          }
+        ]
+      }
+    },
+    "input": {
+      "relationship": "common",
+      "viaTempAgency": false,
+      "relief": false,
+      "under18": false,
+      "writtenContract": true,
+      "startDate": "2026-02-09",
+      "endDate": null,
+      "signedOn": "2026-02-05",
+      "modality": "permanent",
+      "extensions": 0,
+      "causeStated": null,
+      "circumstancesStated": null,
+      "replacedPersonNamed": null,
+      "replacementCauseStated": null,
+      "discontinuous": null,
+      "training": null,
+      "salary": {
+        "amount": 1700,
+        "period": "month",
+        "payments": 14,
+        "prorated": false,
+        "breakdown": [
+          {
+            "kind": "base",
+            "amount": 1700
+          }
+        ],
+        "inKind": null
+      },
+      "contractHours": {
+        "weekly": 40,
+        "annual": null
+      },
+      "fullTimeHours": null,
+      "agreement": {
+        "named": true,
+        "categoryAnnualSalary": null,
+        "annualHours": null,
+        "holidayDays": null,
+        "trialMonths": null
+      },
+      "payslips": [],
+      "trial": {
+        "amount": 2,
+        "unit": "months"
+      },
+      "technical": false,
+      "smallCompany": false,
+      "sameDutiesBefore": false,
+      "afterTraining": false,
+      "schedule": [
+        {
+          "day": 1,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        }
+      ],
+      "shifts": false,
+      "nightWorker": false,
+      "irregular": false,
+      "overtimeAgreed": null,
+      "partTime": null,
+      "remoteShare": 60,
+      "realWeeklyHours": null,
+      "holidays": {
+        "days": 30,
+        "unit": "calendar",
+        "workDaysPerWeek": 5,
+        "includedInSalary": false
+      },
+      "extraPays": {
+        "count": 2,
+        "prorated": false
+      },
+      "clauses": [
+        {
+          "label": "remote_work_costs",
+          "months": null,
+          "compensationStated": null,
+          "trainingDescribed": null,
+          "waivedRight": null,
+          "costsOnWorker": true,
+          "literal": {
+            "text": "La persona trabajadora prestará el 60 % de su jornada desde su domicilio, con su propio ordenador y su conexión a internet, cuyos gastos correrán de su cuenta."
+          }
+        }
+      ],
+      "info": {
+        "a": "present",
+        "b": "present",
+        "c": "present",
+        "d": "present",
+        "e": "present",
+        "f": "present",
+        "g": "present",
+        "h": "present",
+        "i": "present",
+        "j": "present",
+        "k": "present",
+        "l": "present",
+        "m": "present",
+        "n": "present",
+        "o": "present",
+        "p": "present",
+        "q": "present"
+      },
+      "history": null,
+      "historyIncomplete": false,
+      "offer": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "partial": false
+      },
+      "items": [
+        {
+          "id": "smi_annual",
+          "status": "within_limit"
+        },
+        {
+          "id": "smi_monthly",
+          "status": "not_entered"
+        },
+        {
+          "id": "fixed_term_presumption",
+          "status": "within_limit"
+        },
+        {
+          "id": "trial_limits",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_40",
+          "status": "within_limit"
+        },
+        {
+          "id": "daily_9",
+          "status": "within_limit"
+        },
+        {
+          "id": "rest_12",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_rest_36",
+          "status": "within_limit"
+        },
+        {
+          "id": "break_15",
+          "status": "within_limit"
+        },
+        {
+          "id": "holidays_30",
+          "status": "within_limit"
+        },
+        {
+          "id": "extra_pays",
+          "status": "within_limit"
+        }
+      ],
+      "clauses": [
+        {
+          "label": "remote_work_costs",
+          "point": {
+            "id": "remote_costs",
+            "status": "clause_void"
+          },
+          "checkedIn": null
+        }
+      ],
+      "informationDuty": {
+        "applies": true,
+        "moment": "on_request",
+        "flagged": []
+      },
+      "offer": null,
+      "offerPass": true
+    }
+  }
+}

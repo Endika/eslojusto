@@ -1,0 +1,504 @@
+{
+  "id": "payslips-below-minimum-2026",
+  "description": "ET art. 27.1 and RD 126/2026 arts. 1 and 3.1: 1.184,00 € in 14 payments (16.576,00 €) met the 2025 minimum but is 518,00 € short of the 2026 one, 398,79 € up to 08-10-2026; each payslip is 37,00 € under the monthly 1.221,00 €, which, with the extra payments paid apart, only the year decides.",
+  "eval": false,
+  "today": "2026-10-08",
+  "pages": [
+    {
+      "template": "employment/permanent-es",
+      "data": {
+        "employerBlock": "Ficticia Lavandería Ejemplo, S. L., con CIF B91356462, código de cuenta de cotización 56 1405894 00 y domicilio en Calle de la Prueba Ficticia, 29, Santander.",
+        "workplace": "Santander",
+        "category": "Planchador",
+        "agreementText": "convenio colectivo de tintorerías y lavanderías",
+        "startDateText": "2 de junio de 2025",
+        "modalityText": "Jornada completa",
+        "durationText": "Se concierta por tiempo indefinido.",
+        "hoursText": "La jornada será de 40 horas semanales de trabajo efectivo.",
+        "scheduleText": "de lunes a viernes, de 09:00 a 14:00 y de 15:00 a 18:00.",
+        "salaryText": "La retribución bruta será de 1.184,00 € mensuales, en 14 pagas.",
+        "salaryParts": [
+          {
+            "concept": "Salario base",
+            "amount": "1.184,00 €"
+          }
+        ],
+        "extraPaysText": "Las dos pagas extraordinarias se abonarán en junio y diciembre.",
+        "holidaysText": "Las vacaciones anuales retribuidas serán de 30 días naturales.",
+        "trialText": "Se establece un periodo de prueba de 2 meses.",
+        "infoText": "La empresa entrega en documento aparte la información sobre los elementos esenciales del contrato.",
+        "clauses": [],
+        "city": "Santander",
+        "signedOnText": "29 de mayo de 2025",
+        "workerName": "Persona Trabajadora Ficticia A",
+        "workerDni": "62098742N",
+        "workerNaf": "34 99876514 00",
+        "iban": "ES56 2126 5182 3610 0320 9882"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "employment/payslip-es",
+      "data": {
+        "monthText": "abril de 2026",
+        "companyName": "Ficticia Lavandería Ejemplo, S. L.",
+        "companyAddress": "Calle de la Prueba Ficticia, 29, Santander",
+        "companyCif": "B91356462",
+        "companyCcc": "56 1405894 00",
+        "workerName": "Persona Trabajadora Ficticia A",
+        "workerDni": "62098742N",
+        "workerNaf": "34 99876514 00",
+        "category": "Planchador",
+        "contributionGroup": "05",
+        "periodStartText": "01.04.2026",
+        "periodEndText": "30.04.2026",
+        "days": 30,
+        "agreementText": "convenio colectivo de tintorerías y lavanderías",
+        "earnings": [
+          {
+            "concept": "Salario base",
+            "amount": "1.184,00 €"
+          }
+        ],
+        "nonSalary": [
+          {
+            "concept": "Plus de transporte",
+            "amount": "0,00 €"
+          }
+        ],
+        "totalAccrued": "1.184,00 €",
+        "commonContingencies": "64,92 €",
+        "unemployment": "21,41 €",
+        "vocationalTraining": "1,38 €",
+        "irpfPercent": "9,00",
+        "irpf": "106,56 €",
+        "totalDeducted": "194,27 €",
+        "net": "989,73 €",
+        "monthlyRemuneration": "1.184,00 €",
+        "extraPayProrata": "197,33 €",
+        "contributionBase": "1.381,33 €",
+        "incidentsText": "Sin incidencias en el periodo.",
+        "city": "Santander",
+        "issuedOnText": "30 de abril de 2026"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "employment/payslip-es",
+      "data": {
+        "monthText": "mayo de 2026",
+        "companyName": "Ficticia Lavandería Ejemplo, S. L.",
+        "companyAddress": "Calle de la Prueba Ficticia, 29, Santander",
+        "companyCif": "B91356462",
+        "companyCcc": "56 1405894 00",
+        "workerName": "Persona Trabajadora Ficticia A",
+        "workerDni": "62098742N",
+        "workerNaf": "34 99876514 00",
+        "category": "Planchador",
+        "contributionGroup": "05",
+        "periodStartText": "01.05.2026",
+        "periodEndText": "31.05.2026",
+        "days": 30,
+        "agreementText": "convenio colectivo de tintorerías y lavanderías",
+        "earnings": [
+          {
+            "concept": "Salario base",
+            "amount": "1.184,00 €"
+          }
+        ],
+        "nonSalary": [
+          {
+            "concept": "Plus de transporte",
+            "amount": "0,00 €"
+          }
+        ],
+        "totalAccrued": "1.184,00 €",
+        "commonContingencies": "64,92 €",
+        "unemployment": "21,41 €",
+        "vocationalTraining": "1,38 €",
+        "irpfPercent": "9,00",
+        "irpf": "106,56 €",
+        "totalDeducted": "194,27 €",
+        "net": "989,73 €",
+        "monthlyRemuneration": "1.184,00 €",
+        "extraPayProrata": "197,33 €",
+        "contributionBase": "1.381,33 €",
+        "incidentsText": "Sin incidencias en el periodo.",
+        "city": "Santander",
+        "issuedOnText": "31 de mayo de 2026"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "employment/payslip-es",
+      "data": {
+        "monthText": "junio de 2026",
+        "companyName": "Ficticia Lavandería Ejemplo, S. L.",
+        "companyAddress": "Calle de la Prueba Ficticia, 29, Santander",
+        "companyCif": "B91356462",
+        "companyCcc": "56 1405894 00",
+        "workerName": "Persona Trabajadora Ficticia A",
+        "workerDni": "62098742N",
+        "workerNaf": "34 99876514 00",
+        "category": "Planchador",
+        "contributionGroup": "05",
+        "periodStartText": "01.06.2026",
+        "periodEndText": "30.06.2026",
+        "days": 30,
+        "agreementText": "convenio colectivo de tintorerías y lavanderías",
+        "earnings": [
+          {
+            "concept": "Salario base",
+            "amount": "1.184,00 €"
+          }
+        ],
+        "nonSalary": [
+          {
+            "concept": "Plus de transporte",
+            "amount": "0,00 €"
+          }
+        ],
+        "totalAccrued": "1.184,00 €",
+        "commonContingencies": "64,92 €",
+        "unemployment": "21,41 €",
+        "vocationalTraining": "1,38 €",
+        "irpfPercent": "9,00",
+        "irpf": "106,56 €",
+        "totalDeducted": "194,27 €",
+        "net": "989,73 €",
+        "monthlyRemuneration": "1.184,00 €",
+        "extraPayProrata": "197,33 €",
+        "contributionBase": "1.381,33 €",
+        "incidentsText": "Sin incidencias en el periodo.",
+        "city": "Santander",
+        "issuedOnText": "30 de junio de 2026"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "employerType": "company",
+        "signedOn": "2025-05-29",
+        "startDate": "2025-06-02",
+        "modality": "permanent",
+        "partTime": false,
+        "salaryAmount": 1184,
+        "salaryPeriod": "month",
+        "payments": 14,
+        "workplaceRegion": "CB",
+        "weeklyHours": 40,
+        "trialAmount": 2,
+        "trialUnit": "months",
+        "holidayDays": 30,
+        "holidayUnit": "calendar"
+      },
+      "lists": {
+        "salaryParts": [
+          {
+            "amount": 1184,
+            "kind": "base"
+          }
+        ],
+        "payslips": [
+          {
+            "month": "2026-04",
+            "totalAccrued": 1184
+          },
+          {
+            "month": "2026-05",
+            "totalAccrued": 1184
+          },
+          {
+            "month": "2026-06",
+            "totalAccrued": 1184
+          }
+        ]
+      }
+    },
+    "input": {
+      "relationship": "common",
+      "viaTempAgency": false,
+      "relief": false,
+      "under18": false,
+      "writtenContract": true,
+      "startDate": "2025-06-02",
+      "endDate": null,
+      "signedOn": "2025-05-29",
+      "modality": "permanent",
+      "extensions": 0,
+      "causeStated": null,
+      "circumstancesStated": null,
+      "replacedPersonNamed": null,
+      "replacementCauseStated": null,
+      "discontinuous": null,
+      "training": null,
+      "salary": {
+        "amount": 1184,
+        "period": "month",
+        "payments": 14,
+        "prorated": false,
+        "breakdown": [
+          {
+            "kind": "base",
+            "amount": 1184
+          }
+        ],
+        "inKind": null
+      },
+      "contractHours": {
+        "weekly": 40,
+        "annual": null
+      },
+      "fullTimeHours": null,
+      "agreement": {
+        "named": true,
+        "categoryAnnualSalary": null,
+        "annualHours": null,
+        "holidayDays": null,
+        "trialMonths": null
+      },
+      "payslips": [
+        {
+          "month": "2026-04",
+          "wholeMonth": true,
+          "incidents": false,
+          "salaryInMoney": 1184,
+          "inKind": 0,
+          "proratedExtraPay": 0,
+          "overtimeHours": null,
+          "complementaryHours": null
+        },
+        {
+          "month": "2026-05",
+          "wholeMonth": true,
+          "incidents": false,
+          "salaryInMoney": 1184,
+          "inKind": 0,
+          "proratedExtraPay": 0,
+          "overtimeHours": null,
+          "complementaryHours": null
+        },
+        {
+          "month": "2026-06",
+          "wholeMonth": true,
+          "incidents": false,
+          "salaryInMoney": 1184,
+          "inKind": 0,
+          "proratedExtraPay": 0,
+          "overtimeHours": null,
+          "complementaryHours": null
+        }
+      ],
+      "trial": {
+        "amount": 2,
+        "unit": "months"
+      },
+      "technical": false,
+      "smallCompany": false,
+      "sameDutiesBefore": false,
+      "afterTraining": false,
+      "schedule": [
+        {
+          "day": 1,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        }
+      ],
+      "shifts": false,
+      "nightWorker": false,
+      "irregular": false,
+      "overtimeAgreed": null,
+      "partTime": null,
+      "remoteShare": null,
+      "realWeeklyHours": null,
+      "holidays": {
+        "days": 30,
+        "unit": "calendar",
+        "workDaysPerWeek": 5,
+        "includedInSalary": false
+      },
+      "extraPays": {
+        "count": 2,
+        "prorated": false
+      },
+      "clauses": [],
+      "info": {
+        "a": "present",
+        "b": "present",
+        "c": "present",
+        "d": "present",
+        "e": "present",
+        "f": "present",
+        "g": "present",
+        "h": "present",
+        "i": "present",
+        "j": "present",
+        "k": "present",
+        "l": "present",
+        "m": "present",
+        "n": "present",
+        "o": "present",
+        "p": "present",
+        "q": "present"
+      },
+      "history": null,
+      "historyIncomplete": false,
+      "offer": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "partial": false
+      },
+      "items": [
+        {
+          "id": "smi_annual",
+          "status": "below_minimum",
+          "amount": {
+            "min": 398.79,
+            "max": 398.79
+          }
+        },
+        {
+          "id": "smi_monthly",
+          "status": "review_it"
+        },
+        {
+          "id": "fixed_term_presumption",
+          "status": "within_limit"
+        },
+        {
+          "id": "trial_limits",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_40",
+          "status": "within_limit"
+        },
+        {
+          "id": "daily_9",
+          "status": "within_limit"
+        },
+        {
+          "id": "rest_12",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_rest_36",
+          "status": "within_limit"
+        },
+        {
+          "id": "break_15",
+          "status": "within_limit"
+        },
+        {
+          "id": "holidays_30",
+          "status": "within_limit"
+        },
+        {
+          "id": "extra_pays",
+          "status": "within_limit"
+        }
+      ],
+      "clauses": [],
+      "informationDuty": {
+        "applies": true,
+        "moment": "on_request",
+        "flagged": []
+      },
+      "offer": null,
+      "offerPass": true
+    }
+  }
+}

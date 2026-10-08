@@ -1,0 +1,305 @@
+{
+  "id": "production-seven-months",
+  "description": "ET art. 15.2: a production contract lasts up to six months, and up to a year only if the sectoral agreement extends it; seven months depends on the agreement.",
+  "eval": false,
+  "today": "2026-10-08",
+  "pages": [
+    {
+      "template": "employment/temporary-es",
+      "data": {
+        "employerBlock": "Ficticia Conservas Ejemplo, S. A., con CIF B91068554, código de cuenta de cotización 55 1239595 00 y domicilio en Calle de la Prueba Ficticia, 8, Logroño.",
+        "workplace": "Logroño",
+        "category": "Operario de producción",
+        "agreementText": "convenio colectivo de conservas vegetales",
+        "startDateText": "12 de enero de 2026",
+        "modalityText": "Por circunstancias de la producción",
+        "durationText": "Finalizará el 11 de agosto de 2026.",
+        "hoursText": "La jornada será de 40 horas semanales de trabajo efectivo.",
+        "scheduleText": "de lunes a viernes, de 09:00 a 14:00 y de 15:00 a 18:00.",
+        "salaryText": "La retribución bruta será de 1.300,00 € mensuales, en 14 pagas.",
+        "salaryParts": [
+          {
+            "concept": "Salario base",
+            "amount": "1.300,00 €"
+          }
+        ],
+        "extraPaysText": "Las dos pagas extraordinarias se abonarán en junio y diciembre.",
+        "holidaysText": "Las vacaciones anuales retribuidas serán de 30 días naturales.",
+        "trialText": "Se establece un periodo de prueba de 1 mes.",
+        "infoText": "La empresa entrega en documento aparte la información sobre los elementos esenciales del contrato.",
+        "clauses": [],
+        "city": "Logroño",
+        "signedOnText": "9 de enero de 2026",
+        "workerName": "Persona Trabajadora Ficticia F",
+        "workerDni": "36172835G",
+        "workerNaf": "33 27283945 00",
+        "iban": "ES00 2105 5035 1510 0061 7285",
+        "causeText": "Incremento ocasional e imprevisible de los pedidos de la campaña de 2026, que desajusta temporalmente la plantilla disponible."
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "employerType": "company",
+        "signedOn": "2026-01-09",
+        "startDate": "2026-01-12",
+        "modality": "production",
+        "partTime": false,
+        "salaryAmount": 1300,
+        "salaryPeriod": "month",
+        "payments": 14,
+        "workplaceRegion": "RI",
+        "endDate": "2026-08-11",
+        "weeklyHours": 40,
+        "trialAmount": 1,
+        "trialUnit": "months",
+        "holidayDays": 30,
+        "holidayUnit": "calendar"
+      },
+      "lists": {
+        "salaryParts": [
+          {
+            "amount": 1300,
+            "kind": "base"
+          }
+        ]
+      }
+    },
+    "input": {
+      "relationship": "common",
+      "viaTempAgency": false,
+      "relief": false,
+      "under18": false,
+      "writtenContract": true,
+      "startDate": "2026-01-12",
+      "endDate": "2026-08-11",
+      "signedOn": "2026-01-09",
+      "modality": "production",
+      "extensions": 0,
+      "causeStated": true,
+      "circumstancesStated": true,
+      "replacedPersonNamed": null,
+      "replacementCauseStated": null,
+      "discontinuous": null,
+      "training": null,
+      "salary": {
+        "amount": 1300,
+        "period": "month",
+        "payments": 14,
+        "prorated": false,
+        "breakdown": [
+          {
+            "kind": "base",
+            "amount": 1300
+          }
+        ],
+        "inKind": null
+      },
+      "contractHours": {
+        "weekly": 40,
+        "annual": null
+      },
+      "fullTimeHours": null,
+      "agreement": {
+        "named": true,
+        "categoryAnnualSalary": null,
+        "annualHours": null,
+        "holidayDays": null,
+        "trialMonths": null
+      },
+      "payslips": [],
+      "trial": {
+        "amount": 1,
+        "unit": "months"
+      },
+      "technical": false,
+      "smallCompany": false,
+      "sameDutiesBefore": false,
+      "afterTraining": false,
+      "schedule": [
+        {
+          "day": 1,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        }
+      ],
+      "shifts": false,
+      "nightWorker": false,
+      "irregular": false,
+      "overtimeAgreed": null,
+      "partTime": null,
+      "remoteShare": null,
+      "realWeeklyHours": null,
+      "holidays": {
+        "days": 30,
+        "unit": "calendar",
+        "workDaysPerWeek": 5,
+        "includedInSalary": false
+      },
+      "extraPays": {
+        "count": 2,
+        "prorated": false
+      },
+      "clauses": [],
+      "info": {
+        "a": "present",
+        "b": "present",
+        "c": "present",
+        "d": "present",
+        "e": "present",
+        "f": "present",
+        "g": "present",
+        "h": "present",
+        "i": "present",
+        "j": "present",
+        "k": "present",
+        "l": "present",
+        "m": "present",
+        "n": "present",
+        "o": "present",
+        "p": "present",
+        "q": "present"
+      },
+      "history": null,
+      "historyIncomplete": false,
+      "offer": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "partial": false
+      },
+      "items": [
+        {
+          "id": "smi_annual",
+          "status": "within_limit"
+        },
+        {
+          "id": "smi_monthly",
+          "status": "not_entered"
+        },
+        {
+          "id": "fixed_term_presumption",
+          "status": "within_limit"
+        },
+        {
+          "id": "production_1_year",
+          "status": "depends_on_agreement"
+        },
+        {
+          "id": "chaining_18_in_24",
+          "status": "not_entered"
+        },
+        {
+          "id": "trial_limits",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_40",
+          "status": "within_limit"
+        },
+        {
+          "id": "daily_9",
+          "status": "within_limit"
+        },
+        {
+          "id": "rest_12",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_rest_36",
+          "status": "within_limit"
+        },
+        {
+          "id": "break_15",
+          "status": "within_limit"
+        },
+        {
+          "id": "holidays_30",
+          "status": "within_limit"
+        },
+        {
+          "id": "extra_pays",
+          "status": "within_limit"
+        }
+      ],
+      "clauses": [],
+      "informationDuty": {
+        "applies": false,
+        "reason": "ended_before_decree"
+      },
+      "offer": null,
+      "offerPass": false
+    }
+  }
+}

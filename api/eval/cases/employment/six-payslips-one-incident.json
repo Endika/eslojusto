@@ -1,0 +1,747 @@
+{
+  "id": "six-payslips-one-incident",
+  "description": "ET art. 27.1 and RD 126/2026 art. 1: each whole month without incidents is set against 1.221,00 €; base and plus convenio reach it, and the month with an absence is left out of the comparison.",
+  "eval": true,
+  "today": "2026-10-08",
+  "pages": [
+    {
+      "template": "employment/permanent-es",
+      "data": {
+        "employerBlock": "Ficticia Ferretería Ejemplo, S. L., con CIF B91342751, código de cuenta de cotización 55 1397975 00 y domicilio en Calle de la Prueba Ficticia, 28, Lugo.",
+        "workplace": "Lugo",
+        "category": "Dependiente",
+        "agreementText": "convenio colectivo de comercio del metal de la provincia",
+        "startDateText": "1 de octubre de 2025",
+        "modalityText": "Jornada completa",
+        "durationText": "Se concierta por tiempo indefinido.",
+        "hoursText": "La jornada será de 40 horas semanales de trabajo efectivo.",
+        "scheduleText": "de lunes a viernes, de 09:00 a 14:00 y de 15:00 a 18:00.",
+        "salaryText": "La retribución bruta será de 1.221,00 € mensuales, en 14 pagas.",
+        "salaryParts": [
+          {
+            "concept": "Salario base",
+            "amount": "1.150,00 €"
+          },
+          {
+            "concept": "Plus convenio",
+            "amount": "71,00 €"
+          }
+        ],
+        "extraPaysText": "Las dos pagas extraordinarias se abonarán en junio y diciembre.",
+        "holidaysText": "Las vacaciones anuales retribuidas serán de 30 días naturales.",
+        "trialText": "Se establece un periodo de prueba de 2 meses.",
+        "infoText": "La empresa entrega en documento aparte la información sobre los elementos esenciales del contrato.",
+        "clauses": [],
+        "city": "Lugo",
+        "signedOnText": "26 de septiembre de 2025",
+        "workerName": "Persona Trabajadora Ficticia Z",
+        "workerDni": "60864175Q",
+        "workerNaf": "33 96419725 00",
+        "iban": "ES21 2125 5175 3510 0308 6425"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "employment/payslip-es",
+      "data": {
+        "monthText": "marzo de 2026",
+        "companyName": "Ficticia Ferretería Ejemplo, S. L.",
+        "companyAddress": "Calle de la Prueba Ficticia, 28, Lugo",
+        "companyCif": "B91342751",
+        "companyCcc": "55 1397975 00",
+        "workerName": "Persona Trabajadora Ficticia Z",
+        "workerDni": "60864175Q",
+        "workerNaf": "33 96419725 00",
+        "category": "Dependiente",
+        "contributionGroup": "05",
+        "periodStartText": "01.03.2026",
+        "periodEndText": "31.03.2026",
+        "days": 30,
+        "agreementText": "convenio colectivo de comercio del metal de la provincia",
+        "earnings": [
+          {
+            "concept": "Salario base",
+            "amount": "1.150,00 €"
+          },
+          {
+            "concept": "Plus convenio",
+            "amount": "71,00 €"
+          }
+        ],
+        "nonSalary": [
+          {
+            "concept": "Plus de transporte",
+            "amount": "0,00 €"
+          }
+        ],
+        "totalAccrued": "1.221,00 €",
+        "commonContingencies": "66,95 €",
+        "unemployment": "22,08 €",
+        "vocationalTraining": "1,42 €",
+        "irpfPercent": "9,00",
+        "irpf": "109,89 €",
+        "totalDeducted": "200,34 €",
+        "net": "1.020,66 €",
+        "monthlyRemuneration": "1.221,00 €",
+        "extraPayProrata": "203,50 €",
+        "contributionBase": "1.424,50 €",
+        "incidentsText": "Sin incidencias en el periodo.",
+        "city": "Lugo",
+        "issuedOnText": "31 de marzo de 2026"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "employment/payslip-es",
+      "data": {
+        "monthText": "abril de 2026",
+        "companyName": "Ficticia Ferretería Ejemplo, S. L.",
+        "companyAddress": "Calle de la Prueba Ficticia, 28, Lugo",
+        "companyCif": "B91342751",
+        "companyCcc": "55 1397975 00",
+        "workerName": "Persona Trabajadora Ficticia Z",
+        "workerDni": "60864175Q",
+        "workerNaf": "33 96419725 00",
+        "category": "Dependiente",
+        "contributionGroup": "05",
+        "periodStartText": "01.04.2026",
+        "periodEndText": "30.04.2026",
+        "days": 30,
+        "agreementText": "convenio colectivo de comercio del metal de la provincia",
+        "earnings": [
+          {
+            "concept": "Salario base",
+            "amount": "1.150,00 €"
+          },
+          {
+            "concept": "Plus convenio",
+            "amount": "71,00 €"
+          }
+        ],
+        "nonSalary": [
+          {
+            "concept": "Plus de transporte",
+            "amount": "0,00 €"
+          }
+        ],
+        "totalAccrued": "1.221,00 €",
+        "commonContingencies": "66,95 €",
+        "unemployment": "22,08 €",
+        "vocationalTraining": "1,42 €",
+        "irpfPercent": "9,00",
+        "irpf": "109,89 €",
+        "totalDeducted": "200,34 €",
+        "net": "1.020,66 €",
+        "monthlyRemuneration": "1.221,00 €",
+        "extraPayProrata": "203,50 €",
+        "contributionBase": "1.424,50 €",
+        "incidentsText": "Sin incidencias en el periodo.",
+        "city": "Lugo",
+        "issuedOnText": "30 de abril de 2026"
+      },
+      "degrade": {
+        "rotate": -1.4,
+        "shadow": 0.28,
+        "blur": 0.6,
+        "dark": 0.07,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    },
+    {
+      "template": "employment/payslip-es",
+      "data": {
+        "monthText": "mayo de 2026",
+        "companyName": "Ficticia Ferretería Ejemplo, S. L.",
+        "companyAddress": "Calle de la Prueba Ficticia, 28, Lugo",
+        "companyCif": "B91342751",
+        "companyCcc": "55 1397975 00",
+        "workerName": "Persona Trabajadora Ficticia Z",
+        "workerDni": "60864175Q",
+        "workerNaf": "33 96419725 00",
+        "category": "Dependiente",
+        "contributionGroup": "05",
+        "periodStartText": "01.05.2026",
+        "periodEndText": "31.05.2026",
+        "days": 30,
+        "agreementText": "convenio colectivo de comercio del metal de la provincia",
+        "earnings": [
+          {
+            "concept": "Salario base (20 días)",
+            "amount": "766,67 €"
+          },
+          {
+            "concept": "Plus convenio (20 días)",
+            "amount": "47,33 €"
+          },
+          {
+            "concept": "Complemento por ausencia",
+            "amount": "271,33 €"
+          }
+        ],
+        "nonSalary": [
+          {
+            "concept": "Plus de transporte",
+            "amount": "0,00 €"
+          }
+        ],
+        "totalAccrued": "1.085,33 €",
+        "commonContingencies": "59,51 €",
+        "unemployment": "19,63 €",
+        "vocationalTraining": "1,27 €",
+        "irpfPercent": "9,00",
+        "irpf": "97,68 €",
+        "totalDeducted": "178,09 €",
+        "net": "907,24 €",
+        "monthlyRemuneration": "1.085,33 €",
+        "extraPayProrata": "180,89 €",
+        "contributionBase": "1.266,22 €",
+        "incidentsText": "Incidencias del periodo: ausencia de 10 días.",
+        "city": "Lugo",
+        "issuedOnText": "31 de mayo de 2026"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "employment/payslip-es",
+      "data": {
+        "monthText": "junio de 2026",
+        "companyName": "Ficticia Ferretería Ejemplo, S. L.",
+        "companyAddress": "Calle de la Prueba Ficticia, 28, Lugo",
+        "companyCif": "B91342751",
+        "companyCcc": "55 1397975 00",
+        "workerName": "Persona Trabajadora Ficticia Z",
+        "workerDni": "60864175Q",
+        "workerNaf": "33 96419725 00",
+        "category": "Dependiente",
+        "contributionGroup": "05",
+        "periodStartText": "01.06.2026",
+        "periodEndText": "30.06.2026",
+        "days": 30,
+        "agreementText": "convenio colectivo de comercio del metal de la provincia",
+        "earnings": [
+          {
+            "concept": "Salario base",
+            "amount": "1.150,00 €"
+          },
+          {
+            "concept": "Plus convenio",
+            "amount": "71,00 €"
+          }
+        ],
+        "nonSalary": [
+          {
+            "concept": "Plus de transporte",
+            "amount": "0,00 €"
+          }
+        ],
+        "totalAccrued": "1.221,00 €",
+        "commonContingencies": "66,95 €",
+        "unemployment": "22,08 €",
+        "vocationalTraining": "1,42 €",
+        "irpfPercent": "9,00",
+        "irpf": "109,89 €",
+        "totalDeducted": "200,34 €",
+        "net": "1.020,66 €",
+        "monthlyRemuneration": "1.221,00 €",
+        "extraPayProrata": "203,50 €",
+        "contributionBase": "1.424,50 €",
+        "incidentsText": "Sin incidencias en el periodo.",
+        "city": "Lugo",
+        "issuedOnText": "30 de junio de 2026"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "employment/payslip-es",
+      "data": {
+        "monthText": "julio de 2026",
+        "companyName": "Ficticia Ferretería Ejemplo, S. L.",
+        "companyAddress": "Calle de la Prueba Ficticia, 28, Lugo",
+        "companyCif": "B91342751",
+        "companyCcc": "55 1397975 00",
+        "workerName": "Persona Trabajadora Ficticia Z",
+        "workerDni": "60864175Q",
+        "workerNaf": "33 96419725 00",
+        "category": "Dependiente",
+        "contributionGroup": "05",
+        "periodStartText": "01.07.2026",
+        "periodEndText": "31.07.2026",
+        "days": 30,
+        "agreementText": "convenio colectivo de comercio del metal de la provincia",
+        "earnings": [
+          {
+            "concept": "Salario base",
+            "amount": "1.150,00 €"
+          },
+          {
+            "concept": "Plus convenio",
+            "amount": "71,00 €"
+          }
+        ],
+        "nonSalary": [
+          {
+            "concept": "Plus de transporte",
+            "amount": "0,00 €"
+          }
+        ],
+        "totalAccrued": "1.221,00 €",
+        "commonContingencies": "66,95 €",
+        "unemployment": "22,08 €",
+        "vocationalTraining": "1,42 €",
+        "irpfPercent": "9,00",
+        "irpf": "109,89 €",
+        "totalDeducted": "200,34 €",
+        "net": "1.020,66 €",
+        "monthlyRemuneration": "1.221,00 €",
+        "extraPayProrata": "203,50 €",
+        "contributionBase": "1.424,50 €",
+        "incidentsText": "Sin incidencias en el periodo.",
+        "city": "Lugo",
+        "issuedOnText": "31 de julio de 2026"
+      },
+      "degrade": {
+        "rotate": -1.4,
+        "shadow": 0.28,
+        "blur": 0.6,
+        "dark": 0.07,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    },
+    {
+      "template": "employment/payslip-es",
+      "data": {
+        "monthText": "agosto de 2026",
+        "companyName": "Ficticia Ferretería Ejemplo, S. L.",
+        "companyAddress": "Calle de la Prueba Ficticia, 28, Lugo",
+        "companyCif": "B91342751",
+        "companyCcc": "55 1397975 00",
+        "workerName": "Persona Trabajadora Ficticia Z",
+        "workerDni": "60864175Q",
+        "workerNaf": "33 96419725 00",
+        "category": "Dependiente",
+        "contributionGroup": "05",
+        "periodStartText": "01.08.2026",
+        "periodEndText": "31.08.2026",
+        "days": 30,
+        "agreementText": "convenio colectivo de comercio del metal de la provincia",
+        "earnings": [
+          {
+            "concept": "Salario base",
+            "amount": "1.150,00 €"
+          },
+          {
+            "concept": "Plus convenio",
+            "amount": "71,00 €"
+          }
+        ],
+        "nonSalary": [
+          {
+            "concept": "Plus de transporte",
+            "amount": "0,00 €"
+          }
+        ],
+        "totalAccrued": "1.221,00 €",
+        "commonContingencies": "66,95 €",
+        "unemployment": "22,08 €",
+        "vocationalTraining": "1,42 €",
+        "irpfPercent": "9,00",
+        "irpf": "109,89 €",
+        "totalDeducted": "200,34 €",
+        "net": "1.020,66 €",
+        "monthlyRemuneration": "1.221,00 €",
+        "extraPayProrata": "203,50 €",
+        "contributionBase": "1.424,50 €",
+        "incidentsText": "Sin incidencias en el periodo.",
+        "city": "Lugo",
+        "issuedOnText": "31 de agosto de 2026"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "employerType": "company",
+        "signedOn": "2025-09-26",
+        "startDate": "2025-10-01",
+        "modality": "permanent",
+        "partTime": false,
+        "salaryAmount": 1221,
+        "salaryPeriod": "month",
+        "payments": 14,
+        "workplaceRegion": "GA",
+        "weeklyHours": 40,
+        "trialAmount": 2,
+        "trialUnit": "months",
+        "holidayDays": 30,
+        "holidayUnit": "calendar"
+      },
+      "lists": {
+        "salaryParts": [
+          {
+            "amount": 1150,
+            "kind": "base"
+          },
+          {
+            "amount": 71,
+            "kind": "fixed_complement"
+          }
+        ],
+        "payslips": [
+          {
+            "month": "2026-03",
+            "totalAccrued": 1221,
+            "incidents": false
+          },
+          {
+            "month": "2026-04",
+            "totalAccrued": 1221,
+            "incidents": false
+          },
+          {
+            "month": "2026-05",
+            "totalAccrued": 1085.33,
+            "incidents": true
+          },
+          {
+            "month": "2026-06",
+            "totalAccrued": 1221,
+            "incidents": false
+          },
+          {
+            "month": "2026-07",
+            "totalAccrued": 1221,
+            "incidents": false
+          },
+          {
+            "month": "2026-08",
+            "totalAccrued": 1221,
+            "incidents": false
+          }
+        ]
+      }
+    },
+    "input": {
+      "relationship": "common",
+      "viaTempAgency": false,
+      "relief": false,
+      "under18": false,
+      "writtenContract": true,
+      "startDate": "2025-10-01",
+      "endDate": null,
+      "signedOn": "2025-09-26",
+      "modality": "permanent",
+      "extensions": 0,
+      "causeStated": null,
+      "circumstancesStated": null,
+      "replacedPersonNamed": null,
+      "replacementCauseStated": null,
+      "discontinuous": null,
+      "training": null,
+      "salary": {
+        "amount": 1221,
+        "period": "month",
+        "payments": 14,
+        "prorated": false,
+        "breakdown": [
+          {
+            "kind": "base",
+            "amount": 1150
+          },
+          {
+            "kind": "fixed_complement",
+            "amount": 71
+          }
+        ],
+        "inKind": null
+      },
+      "contractHours": {
+        "weekly": 40,
+        "annual": null
+      },
+      "fullTimeHours": null,
+      "agreement": {
+        "named": true,
+        "categoryAnnualSalary": null,
+        "annualHours": null,
+        "holidayDays": null,
+        "trialMonths": null
+      },
+      "payslips": [
+        {
+          "month": "2026-03",
+          "wholeMonth": true,
+          "incidents": false,
+          "salaryInMoney": 1221,
+          "inKind": 0,
+          "proratedExtraPay": 0,
+          "overtimeHours": null,
+          "complementaryHours": null
+        },
+        {
+          "month": "2026-04",
+          "wholeMonth": true,
+          "incidents": false,
+          "salaryInMoney": 1221,
+          "inKind": 0,
+          "proratedExtraPay": 0,
+          "overtimeHours": null,
+          "complementaryHours": null
+        },
+        {
+          "month": "2026-05",
+          "wholeMonth": true,
+          "incidents": true,
+          "salaryInMoney": 1085.33,
+          "inKind": 0,
+          "proratedExtraPay": 0,
+          "overtimeHours": null,
+          "complementaryHours": null
+        },
+        {
+          "month": "2026-06",
+          "wholeMonth": true,
+          "incidents": false,
+          "salaryInMoney": 1221,
+          "inKind": 0,
+          "proratedExtraPay": 0,
+          "overtimeHours": null,
+          "complementaryHours": null
+        },
+        {
+          "month": "2026-07",
+          "wholeMonth": true,
+          "incidents": false,
+          "salaryInMoney": 1221,
+          "inKind": 0,
+          "proratedExtraPay": 0,
+          "overtimeHours": null,
+          "complementaryHours": null
+        },
+        {
+          "month": "2026-08",
+          "wholeMonth": true,
+          "incidents": false,
+          "salaryInMoney": 1221,
+          "inKind": 0,
+          "proratedExtraPay": 0,
+          "overtimeHours": null,
+          "complementaryHours": null
+        }
+      ],
+      "trial": {
+        "amount": 2,
+        "unit": "months"
+      },
+      "technical": false,
+      "smallCompany": false,
+      "sameDutiesBefore": false,
+      "afterTraining": false,
+      "schedule": [
+        {
+          "day": 1,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        }
+      ],
+      "shifts": false,
+      "nightWorker": false,
+      "irregular": false,
+      "overtimeAgreed": null,
+      "partTime": null,
+      "remoteShare": null,
+      "realWeeklyHours": null,
+      "holidays": {
+        "days": 30,
+        "unit": "calendar",
+        "workDaysPerWeek": 5,
+        "includedInSalary": false
+      },
+      "extraPays": {
+        "count": 2,
+        "prorated": false
+      },
+      "clauses": [],
+      "info": {
+        "a": "present",
+        "b": "present",
+        "c": "present",
+        "d": "present",
+        "e": "present",
+        "f": "present",
+        "g": "present",
+        "h": "present",
+        "i": "present",
+        "j": "present",
+        "k": "present",
+        "l": "present",
+        "m": "present",
+        "n": "present",
+        "o": "present",
+        "p": "present",
+        "q": "present"
+      },
+      "history": null,
+      "historyIncomplete": false,
+      "offer": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "partial": false
+      },
+      "items": [
+        {
+          "id": "smi_annual",
+          "status": "within_limit"
+        },
+        {
+          "id": "smi_monthly",
+          "status": "within_limit"
+        },
+        {
+          "id": "fixed_term_presumption",
+          "status": "within_limit"
+        },
+        {
+          "id": "trial_limits",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_40",
+          "status": "within_limit"
+        },
+        {
+          "id": "daily_9",
+          "status": "within_limit"
+        },
+        {
+          "id": "rest_12",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_rest_36",
+          "status": "within_limit"
+        },
+        {
+          "id": "break_15",
+          "status": "within_limit"
+        },
+        {
+          "id": "holidays_30",
+          "status": "within_limit"
+        },
+        {
+          "id": "extra_pays",
+          "status": "within_limit"
+        }
+      ],
+      "clauses": [],
+      "informationDuty": {
+        "applies": true,
+        "moment": "on_request",
+        "flagged": []
+      },
+      "offer": null,
+      "offerPass": false
+    }
+  }
+}

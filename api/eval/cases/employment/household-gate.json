@@ -1,0 +1,240 @@
+{
+  "id": "household-gate",
+  "description": "RD 1620/2011 and ET art. 2.1.b: household employment is a special relationship outside this review, which stops at the door.",
+  "eval": true,
+  "today": "2026-10-08",
+  "pages": [
+    {
+      "template": "employment/permanent-es",
+      "data": {
+        "employerBlock": "Persona Empleadora Ficticia W, con DNI 51000017Y, titular del hogar familiar sito en la calle de la Prueba Ficticia, 4, de Oviedo.",
+        "workplace": "Oviedo",
+        "category": "Empleada de hogar",
+        "agreementText": "Real Decreto 1620/2011, de la relación laboral de carácter especial del servicio del hogar familiar",
+        "startDateText": "7 de enero de 2026",
+        "modalityText": "Jornada completa",
+        "durationText": "Se concierta por tiempo indefinido.",
+        "hoursText": "La jornada será de 40 horas semanales de trabajo efectivo.",
+        "scheduleText": "de lunes a viernes, de 09:00 a 14:00 y de 15:00 a 18:00.",
+        "salaryText": "La retribución bruta será de 1.221,00 € mensuales, en 14 pagas.",
+        "salaryParts": [
+          {
+            "concept": "Salario base",
+            "amount": "1.221,00 €"
+          }
+        ],
+        "extraPaysText": "Las dos pagas extraordinarias se abonarán en junio y diciembre.",
+        "holidaysText": "Las vacaciones anuales retribuidas serán de 30 días naturales.",
+        "trialText": "Se establece un periodo de prueba de 2 meses.",
+        "infoText": "La empresa entrega en documento aparte la información sobre los elementos esenciales del contrato.",
+        "clauses": [],
+        "city": "Oviedo",
+        "signedOnText": "5 de enero de 2026",
+        "workerName": "Persona Trabajadora Ficticia X",
+        "workerDni": "58395041R",
+        "workerNaf": "31 89506147 00",
+        "iban": "ES48 2123 5161 3310 0283 9511",
+        "employerPersonName": "Persona Empleadora Ficticia W"
+      },
+      "degrade": {
+        "rotate": -1.4,
+        "shadow": 0.28,
+        "blur": 0.6,
+        "dark": 0.07,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "employerType": "person",
+        "signedOn": "2026-01-05",
+        "startDate": "2026-01-07",
+        "modality": "permanent",
+        "salaryAmount": 1221,
+        "salaryPeriod": "month",
+        "payments": 14
+      },
+      "lists": {
+        "relationshipHints": [
+          {
+            "hint": "household"
+          }
+        ]
+      }
+    },
+    "input": {
+      "relationship": "household",
+      "viaTempAgency": false,
+      "relief": false,
+      "under18": false,
+      "writtenContract": true,
+      "startDate": "2026-01-07",
+      "endDate": null,
+      "signedOn": "2026-01-05",
+      "modality": "permanent",
+      "extensions": 0,
+      "causeStated": null,
+      "circumstancesStated": null,
+      "replacedPersonNamed": null,
+      "replacementCauseStated": null,
+      "discontinuous": null,
+      "training": null,
+      "salary": {
+        "amount": 1221,
+        "period": "month",
+        "payments": 14,
+        "prorated": false,
+        "breakdown": [
+          {
+            "kind": "base",
+            "amount": 1221
+          }
+        ],
+        "inKind": null
+      },
+      "contractHours": {
+        "weekly": 40,
+        "annual": null
+      },
+      "fullTimeHours": null,
+      "agreement": {
+        "named": true,
+        "categoryAnnualSalary": null,
+        "annualHours": null,
+        "holidayDays": null,
+        "trialMonths": null
+      },
+      "payslips": [],
+      "trial": {
+        "amount": 2,
+        "unit": "months"
+      },
+      "technical": false,
+      "smallCompany": false,
+      "sameDutiesBefore": false,
+      "afterTraining": false,
+      "schedule": [
+        {
+          "day": 1,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        }
+      ],
+      "shifts": false,
+      "nightWorker": false,
+      "irregular": false,
+      "overtimeAgreed": null,
+      "partTime": null,
+      "remoteShare": null,
+      "realWeeklyHours": null,
+      "holidays": {
+        "days": 30,
+        "unit": "calendar",
+        "workDaysPerWeek": 5,
+        "includedInSalary": false
+      },
+      "extraPays": {
+        "count": 2,
+        "prorated": false
+      },
+      "clauses": [],
+      "info": {
+        "a": "present",
+        "b": "present",
+        "c": "present",
+        "d": "present",
+        "e": "present",
+        "f": "present",
+        "g": "present",
+        "h": "present",
+        "i": "present",
+        "j": "present",
+        "k": "present",
+        "l": "present",
+        "m": "present",
+        "n": "present",
+        "o": "present",
+        "p": "present",
+        "q": "present"
+      },
+      "history": null,
+      "historyIncomplete": false,
+      "offer": null
+    },
+    "review": {
+      "scope": {
+        "inScope": false,
+        "reason": "special_relationship"
+      },
+      "items": [],
+      "clauses": [],
+      "informationDuty": null,
+      "offer": null,
+      "offerPass": false
+    }
+  }
+}

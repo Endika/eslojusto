@@ -43,7 +43,9 @@ export interface Degrade {
   readonly jpegQuality: number;
 }
 
-export type PageData = Readonly<Record<string, string | number>>;
+// A list of rows fills a block the template repeats once per row: {{#name}}…{{/name}}.
+export type PageRow = Readonly<Record<string, string | number>>;
+export type PageData = Readonly<Record<string, string | number | readonly PageRow[]>>;
 
 interface PageBase {
   readonly data: PageData;
@@ -175,6 +177,9 @@ export const pageKind = (page: PageSpec): DocumentKind =>
 
 // Placeholders a template or a drawn document fills: `{{name}}`.
 export const PLACEHOLDER = /\{\{(\w+)\}\}/g;
+
+// A block repeated once per row of a list in the page data.
+export const SECTION = /\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
 
 // Sheets of a lease template: one image each.
 export const SHEET = /<section class="page"/g;

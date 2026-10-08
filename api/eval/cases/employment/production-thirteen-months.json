@@ -1,0 +1,309 @@
+{
+  "id": "production-thirteen-months",
+  "description": "ET art. 15.2: a production contract never lasts over a year, even when the sectoral agreement extends it; thirteen months, through one extension, is over the legal limit.",
+  "eval": false,
+  "today": "2026-10-08",
+  "pages": [
+    {
+      "template": "employment/temporary-es",
+      "data": {
+        "employerBlock": "Ficticia Envases Ejemplo, S. L., con CIF B91082266, código de cuenta de cotización 56 1247514 00 y domicilio en Calle de la Prueba Ficticia, 9, Pamplona.",
+        "workplace": "Pamplona",
+        "category": "Operario de producción",
+        "agreementText": "convenio colectivo de la industria del envase",
+        "startDateText": "7 de enero de 2025",
+        "modalityText": "Por circunstancias de la producción",
+        "durationText": "Finalizará el 6 de julio de 2025. Prorrogado por acuerdo de las partes hasta el 6 de febrero de 2026.",
+        "hoursText": "La jornada será de 40 horas semanales de trabajo efectivo.",
+        "scheduleText": "de lunes a viernes, de 09:00 a 14:00 y de 15:00 a 18:00.",
+        "salaryText": "La retribución bruta será de 1.350,00 € mensuales, en 14 pagas.",
+        "salaryParts": [
+          {
+            "concept": "Salario base",
+            "amount": "1.350,00 €"
+          }
+        ],
+        "extraPaysText": "Las dos pagas extraordinarias se abonarán en junio y diciembre.",
+        "holidaysText": "Las vacaciones anuales retribuidas serán de 30 días naturales.",
+        "trialText": "Se establece un periodo de prueba de 1 mes.",
+        "infoText": "La empresa entrega en documento aparte la información sobre los elementos esenciales del contrato.",
+        "clauses": [],
+        "city": "Pamplona",
+        "signedOnText": "3 de enero de 2025",
+        "workerName": "Persona Trabajadora Ficticia G",
+        "workerDni": "37407402T",
+        "workerNaf": "34 30740734 00",
+        "iban": "ES35 2106 5042 1610 0074 0742",
+        "causeText": "Aumento imprevisible de la demanda por la entrada de un cliente nuevo, que exige reforzar la línea de envasado."
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "employerType": "company",
+        "signedOn": "2025-01-03",
+        "startDate": "2025-01-07",
+        "modality": "production",
+        "partTime": false,
+        "salaryAmount": 1350,
+        "salaryPeriod": "month",
+        "payments": 14,
+        "workplaceRegion": "NC",
+        "endDate": "2026-02-06",
+        "weeklyHours": 40,
+        "trialAmount": 1,
+        "trialUnit": "months",
+        "holidayDays": 30,
+        "holidayUnit": "calendar"
+      },
+      "lists": {
+        "salaryParts": [
+          {
+            "amount": 1350,
+            "kind": "base"
+          }
+        ]
+      }
+    },
+    "input": {
+      "relationship": "common",
+      "viaTempAgency": false,
+      "relief": false,
+      "under18": false,
+      "writtenContract": true,
+      "startDate": "2025-01-07",
+      "endDate": "2026-02-06",
+      "signedOn": "2025-01-03",
+      "modality": "production",
+      "extensions": 1,
+      "causeStated": true,
+      "circumstancesStated": true,
+      "replacedPersonNamed": null,
+      "replacementCauseStated": null,
+      "discontinuous": null,
+      "training": null,
+      "salary": {
+        "amount": 1350,
+        "period": "month",
+        "payments": 14,
+        "prorated": false,
+        "breakdown": [
+          {
+            "kind": "base",
+            "amount": 1350
+          }
+        ],
+        "inKind": null
+      },
+      "contractHours": {
+        "weekly": 40,
+        "annual": null
+      },
+      "fullTimeHours": null,
+      "agreement": {
+        "named": true,
+        "categoryAnnualSalary": null,
+        "annualHours": null,
+        "holidayDays": null,
+        "trialMonths": null
+      },
+      "payslips": [],
+      "trial": {
+        "amount": 1,
+        "unit": "months"
+      },
+      "technical": false,
+      "smallCompany": false,
+      "sameDutiesBefore": false,
+      "afterTraining": false,
+      "schedule": [
+        {
+          "day": 1,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        }
+      ],
+      "shifts": false,
+      "nightWorker": false,
+      "irregular": false,
+      "overtimeAgreed": null,
+      "partTime": null,
+      "remoteShare": null,
+      "realWeeklyHours": null,
+      "holidays": {
+        "days": 30,
+        "unit": "calendar",
+        "workDaysPerWeek": 5,
+        "includedInSalary": false
+      },
+      "extraPays": {
+        "count": 2,
+        "prorated": false
+      },
+      "clauses": [],
+      "info": {
+        "a": "present",
+        "b": "present",
+        "c": "present",
+        "d": "present",
+        "e": "present",
+        "f": "present",
+        "g": "present",
+        "h": "present",
+        "i": "present",
+        "j": "present",
+        "k": "present",
+        "l": "present",
+        "m": "present",
+        "n": "present",
+        "o": "present",
+        "p": "present",
+        "q": "present"
+      },
+      "history": null,
+      "historyIncomplete": false,
+      "offer": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "partial": false
+      },
+      "items": [
+        {
+          "id": "smi_annual",
+          "status": "within_limit"
+        },
+        {
+          "id": "smi_monthly",
+          "status": "not_entered"
+        },
+        {
+          "id": "fixed_term_presumption",
+          "status": "within_limit"
+        },
+        {
+          "id": "production_1_year",
+          "status": "over_legal_limit"
+        },
+        {
+          "id": "production_one_extension",
+          "status": "within_limit"
+        },
+        {
+          "id": "chaining_18_in_24",
+          "status": "not_entered"
+        },
+        {
+          "id": "trial_limits",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_40",
+          "status": "within_limit"
+        },
+        {
+          "id": "daily_9",
+          "status": "within_limit"
+        },
+        {
+          "id": "rest_12",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_rest_36",
+          "status": "within_limit"
+        },
+        {
+          "id": "break_15",
+          "status": "within_limit"
+        },
+        {
+          "id": "holidays_30",
+          "status": "within_limit"
+        },
+        {
+          "id": "extra_pays",
+          "status": "within_limit"
+        }
+      ],
+      "clauses": [],
+      "informationDuty": {
+        "applies": false,
+        "reason": "ended_before_decree"
+      },
+      "offer": null,
+      "offerPass": true
+    }
+  }
+}

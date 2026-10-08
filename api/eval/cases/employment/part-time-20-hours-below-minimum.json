@@ -1,0 +1,290 @@
+{
+  "id": "part-time-20-hours-below-minimum",
+  "description": "ET arts. 12.1 and 27.1, RD 87/2025 and RD 126/2026 art. 3.1: 20 of 40 hours earn half the yearly minimum (8.288,00 € in 2025, 8.547,00 € in 2026); 560,00 € in 14 payments is 7.840,00 €, short in both years.",
+  "eval": false,
+  "today": "2026-10-08",
+  "pages": [
+    {
+      "template": "employment/part-time-es",
+      "data": {
+        "employerBlock": "Ficticia Limpiezas del Ejemplo, S. L., con CIF B91027428, código de cuenta de cotización 52 1215838 00 y domicilio en Calle de la Prueba Ficticia, 5, Sevilla.",
+        "workplace": "Sevilla",
+        "category": "Limpiador",
+        "agreementText": "convenio colectivo de limpieza de edificios y locales de la provincia",
+        "startDateText": "1 de septiembre de 2025",
+        "modalityText": "Duración indefinida",
+        "durationText": "Se concierta por tiempo indefinido.",
+        "hoursText": "La jornada será de 20 horas semanales, inferior a la de un trabajador a tiempo completo comparable.",
+        "scheduleText": "de lunes a viernes, de 09:00 a 13:00.",
+        "salaryText": "La retribución bruta será de 560,00 € mensuales, en 14 pagas.",
+        "salaryParts": [
+          {
+            "concept": "Salario base",
+            "amount": "560,00 €"
+          }
+        ],
+        "extraPaysText": "Las dos pagas extraordinarias se abonarán en junio y diciembre.",
+        "holidaysText": "Las vacaciones anuales retribuidas serán de 30 días naturales.",
+        "trialText": "Se establece un periodo de prueba de 2 meses.",
+        "infoText": "La empresa entrega en documento aparte la información sobre los elementos esenciales del contrato.",
+        "clauses": [],
+        "city": "Sevilla",
+        "signedOnText": "27 de agosto de 2025",
+        "workerName": "Persona Trabajadora Ficticia C",
+        "workerDni": "32469134Q",
+        "workerNaf": "30 16913578 00",
+        "iban": "ES89 2102 5014 1210 0024 6914",
+        "complementaryText": "No se pactan horas complementarias."
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "employerType": "company",
+        "signedOn": "2025-08-27",
+        "startDate": "2025-09-01",
+        "modality": "permanent",
+        "partTime": true,
+        "salaryAmount": 560,
+        "salaryPeriod": "month",
+        "payments": 14,
+        "workplaceRegion": "AN",
+        "weeklyHours": 20,
+        "trialAmount": 2,
+        "trialUnit": "months",
+        "holidayDays": 30,
+        "holidayUnit": "calendar"
+      },
+      "lists": {
+        "salaryParts": [
+          {
+            "amount": 560,
+            "kind": "base"
+          }
+        ]
+      }
+    },
+    "input": {
+      "relationship": "common",
+      "viaTempAgency": false,
+      "relief": false,
+      "under18": false,
+      "writtenContract": true,
+      "startDate": "2025-09-01",
+      "endDate": null,
+      "signedOn": "2025-08-27",
+      "modality": "permanent",
+      "extensions": 0,
+      "causeStated": null,
+      "circumstancesStated": null,
+      "replacedPersonNamed": null,
+      "replacementCauseStated": null,
+      "discontinuous": null,
+      "training": null,
+      "salary": {
+        "amount": 560,
+        "period": "month",
+        "payments": 14,
+        "prorated": false,
+        "breakdown": [
+          {
+            "kind": "base",
+            "amount": 560
+          }
+        ],
+        "inKind": null
+      },
+      "contractHours": {
+        "weekly": 20,
+        "annual": null
+      },
+      "fullTimeHours": null,
+      "agreement": {
+        "named": true,
+        "categoryAnnualSalary": null,
+        "annualHours": null,
+        "holidayDays": null,
+        "trialMonths": null
+      },
+      "payslips": [],
+      "trial": {
+        "amount": 2,
+        "unit": "months"
+      },
+      "technical": false,
+      "smallCompany": false,
+      "sameDutiesBefore": false,
+      "afterTraining": false,
+      "schedule": [
+        {
+          "day": 1,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "13:00"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "13:00"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "13:00"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "13:00"
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "13:00"
+            }
+          ]
+        }
+      ],
+      "shifts": false,
+      "nightWorker": false,
+      "irregular": false,
+      "overtimeAgreed": null,
+      "partTime": {
+        "hoursStated": true,
+        "distributionStated": true,
+        "complementary": null,
+        "voluntaryPercent": null
+      },
+      "remoteShare": null,
+      "realWeeklyHours": null,
+      "holidays": {
+        "days": 30,
+        "unit": "calendar",
+        "workDaysPerWeek": 5,
+        "includedInSalary": false
+      },
+      "extraPays": {
+        "count": 2,
+        "prorated": false
+      },
+      "clauses": [],
+      "info": {
+        "a": "present",
+        "b": "present",
+        "c": "present",
+        "d": "present",
+        "e": "present",
+        "f": "present",
+        "g": "present",
+        "h": "present",
+        "i": "present",
+        "j": "present",
+        "k": "present",
+        "l": "present",
+        "m": "present",
+        "n": "present",
+        "o": "present",
+        "p": "present",
+        "q": "present"
+      },
+      "history": null,
+      "historyIncomplete": false,
+      "offer": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "partial": false
+      },
+      "items": [
+        {
+          "id": "smi_prorata",
+          "status": "below_minimum",
+          "amount": {
+            "min": 694.03,
+            "max": 694.03
+          }
+        },
+        {
+          "id": "smi_monthly",
+          "status": "not_entered"
+        },
+        {
+          "id": "fixed_term_presumption",
+          "status": "within_limit"
+        },
+        {
+          "id": "trial_limits",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_40",
+          "status": "within_limit"
+        },
+        {
+          "id": "daily_9",
+          "status": "within_limit"
+        },
+        {
+          "id": "rest_12",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_rest_36",
+          "status": "within_limit"
+        },
+        {
+          "id": "break_15",
+          "status": "within_limit"
+        },
+        {
+          "id": "part_time_contents",
+          "status": "within_limit"
+        },
+        {
+          "id": "holidays_30",
+          "status": "within_limit"
+        },
+        {
+          "id": "extra_pays",
+          "status": "within_limit"
+        }
+      ],
+      "clauses": [],
+      "informationDuty": {
+        "applies": true,
+        "moment": "on_request",
+        "flagged": []
+      },
+      "offer": null,
+      "offerPass": true
+    }
+  }
+}

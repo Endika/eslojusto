@@ -1,0 +1,259 @@
+<!--
+  Employment template «payslip-es»: a one-sheet monthly payslip in Spanish.
+  Source: written for this bank, following the structure and the headings of the official model of
+  the salary receipt, Orden de 27 de diciembre de 1994 as worded by Orden ESS/2098/2014, annex
+  (BOE-A-1995-912, read in the BOE open-data API on 08-10-2026): employer and worker boxes,
+  settlement period, earnings, deductions and the contribution bases. A legal text is not subject
+  to copyright (art. 13 of the Ley de Propiedad Intelectual); the layout is this bank's own.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1b1b1b;
+        font:
+          16px/1.45 'DejaVu Sans',
+          sans-serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 60px 70px 90px;
+        position: relative;
+        overflow: hidden;
+        background: #fdfdfb;
+      }
+      h1 {
+        font-size: 22px;
+        text-align: center;
+        margin: 0 0 4px;
+        letter-spacing: 0.5px;
+      }
+      .sub {
+        text-align: center;
+        font-size: 14px;
+        color: #444;
+        margin-bottom: 20px;
+      }
+      .box {
+        border: 1.5px solid #333;
+        margin-bottom: 12px;
+      }
+      .box h2 {
+        font-size: 13px;
+        text-transform: uppercase;
+        margin: 0;
+        background: #e6e6e6;
+        padding: 4px 8px;
+        border-bottom: 1px solid #333;
+      }
+      .box .in {
+        padding: 8px 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 18px;
+      }
+      .label {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #555;
+        display: block;
+      }
+      p {
+        margin: 0 0 9px;
+        text-align: justify;
+      }
+      .clause b {
+        text-transform: uppercase;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 6px 0;
+        font-size: 15px;
+      }
+      td,
+      th {
+        border: 1px solid #777;
+        padding: 5px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      td.n,
+      th.n {
+        text-align: right;
+        white-space: nowrap;
+      }
+      .sign {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 50px;
+      }
+      .sign div {
+        width: 40%;
+        border-top: 1px solid #333;
+        padding-top: 6px;
+        text-align: center;
+        font-size: 14px;
+      }
+      .muted {
+        color: #555;
+        font-size: 13px;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <h1>RECIBO INDIVIDUAL JUSTIFICATIVO DEL PAGO DE SALARIOS</h1>
+      <div class="sub">Nómina de {{monthText}}</div>
+      <div class="grid">
+        <div class="box">
+          <div class="in">
+            <div><span class="label">Empresa</span>{{companyName}}</div>
+            <div><span class="label">Domicilio</span>{{companyAddress}}</div>
+            <div><span class="label">CIF</span>{{companyCif}}</div>
+            <div><span class="label">CCC</span>{{companyCcc}}</div>
+          </div>
+        </div>
+        <div class="box">
+          <div class="in">
+            <div><span class="label">Trabajador</span>{{workerName}}</div>
+            <div><span class="label">NIF</span>{{workerDni}}</div>
+            <div><span class="label">Núm. afil. Seguridad Social</span>{{workerNaf}}</div>
+            <div><span class="label">Grupo profesional</span>{{category}}</div>
+            <div><span class="label">Grupo de cotización</span>{{contributionGroup}}</div>
+          </div>
+        </div>
+      </div>
+      <p>
+        Periodo de liquidación: del {{periodStartText}} al {{periodEndText}}. Total días: {{days}}.
+        Convenio: {{agreementText}}.
+      </p>
+      <table>
+        <tr>
+          <th>I. Devengos</th>
+          <th class="n">Importe</th>
+        </tr>
+        <tr>
+          <td colspan="2"><b>1. Percepciones salariales</b></td>
+        </tr>
+        {{#earnings}}
+        <tr>
+          <td>{{concept}}</td>
+          <td class="n">{{amount}}</td>
+        </tr>
+        {{/earnings}}
+        <tr>
+          <td colspan="2"><b>2. Percepciones no salariales</b></td>
+        </tr>
+        {{#nonSalary}}
+        <tr>
+          <td>{{concept}}</td>
+          <td class="n">{{amount}}</td>
+        </tr>
+        {{/nonSalary}}
+        <tr>
+          <th>A. Total devengado</th>
+          <th class="n">{{totalAccrued}}</th>
+        </tr>
+      </table>
+      <table>
+        <tr>
+          <th>II. Deducciones</th>
+          <th class="n">%</th>
+          <th class="n">Importe</th>
+        </tr>
+        <tr>
+          <td>Contingencias comunes</td>
+          <td class="n">4,70</td>
+          <td class="n">{{commonContingencies}}</td>
+        </tr>
+        <tr>
+          <td>Desempleo</td>
+          <td class="n">1,55</td>
+          <td class="n">{{unemployment}}</td>
+        </tr>
+        <tr>
+          <td>Formación profesional</td>
+          <td class="n">0,10</td>
+          <td class="n">{{vocationalTraining}}</td>
+        </tr>
+        <tr>
+          <td>Horas extraordinarias</td>
+          <td class="n"></td>
+          <td class="n">0,00</td>
+        </tr>
+        <tr>
+          <td>Impuesto sobre la renta de las personas físicas</td>
+          <td class="n">{{irpfPercent}}</td>
+          <td class="n">{{irpf}}</td>
+        </tr>
+        <tr>
+          <td>Anticipos</td>
+          <td class="n"></td>
+          <td class="n">0,00</td>
+        </tr>
+        <tr>
+          <td>Valor de los productos recibidos en especie</td>
+          <td class="n"></td>
+          <td class="n">0,00</td>
+        </tr>
+        <tr>
+          <td>Otras deducciones</td>
+          <td class="n"></td>
+          <td class="n">0,00</td>
+        </tr>
+        <tr>
+          <th>B. Total a deducir</th>
+          <th class="n"></th>
+          <th class="n">{{totalDeducted}}</th>
+        </tr>
+        <tr>
+          <th>Líquido total a percibir (A − B)</th>
+          <th class="n"></th>
+          <th class="n">{{net}}</th>
+        </tr>
+      </table>
+      <table>
+        <tr>
+          <th>Determinación de las bases de cotización</th>
+          <th class="n">Base</th>
+        </tr>
+        <tr>
+          <td>Importe remuneración mensual</td>
+          <td class="n">{{monthlyRemuneration}}</td>
+        </tr>
+        <tr>
+          <td>Importe prorrata pagas extraordinarias</td>
+          <td class="n">{{extraPayProrata}}</td>
+        </tr>
+        <tr>
+          <td>Base de contingencias comunes</td>
+          <td class="n">{{contributionBase}}</td>
+        </tr>
+      </table>
+      <p class="muted">{{incidentsText}}</p>
+      <p>En {{city}}, a {{issuedOnText}}. Firma y sello de la empresa. Recibí.</p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,201 @@
+<!--
+  Employment template «permanent-ca»: a two-sheet open-ended full-time contract in Catalan.
+  Source: written for this bank. It follows the structure of the contract models the public
+  employment service publishes (employer and worker data, then numbered clauses, then place, date
+  and signatures) without copying their text or layout: its legal notice
+  (https://www.sepe.es/HomeSepe/mas-informacion-contacto/aviso-legal, read on 08-10-2026) allows
+  reuse under Ley 37/2007 but also limits any content of the site to download and private use with
+  the content kept whole, so the reuse of those models could not be confirmed.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="ca">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1b1b1b;
+        font:
+          16px/1.45 'DejaVu Sans',
+          sans-serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 60px 70px 90px;
+        position: relative;
+        overflow: hidden;
+        background: #fdfdfb;
+      }
+      h1 {
+        font-size: 22px;
+        text-align: center;
+        margin: 0 0 4px;
+        letter-spacing: 0.5px;
+      }
+      .sub {
+        text-align: center;
+        font-size: 14px;
+        color: #444;
+        margin-bottom: 20px;
+      }
+      .box {
+        border: 1.5px solid #333;
+        margin-bottom: 12px;
+      }
+      .box h2 {
+        font-size: 13px;
+        text-transform: uppercase;
+        margin: 0;
+        background: #e6e6e6;
+        padding: 4px 8px;
+        border-bottom: 1px solid #333;
+      }
+      .box .in {
+        padding: 8px 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 18px;
+      }
+      .label {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #555;
+        display: block;
+      }
+      p {
+        margin: 0 0 9px;
+        text-align: justify;
+      }
+      .clause b {
+        text-transform: uppercase;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 6px 0;
+        font-size: 15px;
+      }
+      td,
+      th {
+        border: 1px solid #777;
+        padding: 5px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      td.n,
+      th.n {
+        text-align: right;
+        white-space: nowrap;
+      }
+      .sign {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 50px;
+      }
+      .sign div {
+        width: 40%;
+        border-top: 1px solid #333;
+        padding-top: 6px;
+        text-align: center;
+        font-size: 14px;
+      }
+      .muted {
+        color: #555;
+        font-size: 13px;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <h1>CONTRACTE DE TREBALL PER TEMPS INDEFINIT</h1>
+      <div class="sub">{{modalityText}}</div>
+      <div class="box">
+        <h2>Dades de l'empresa</h2>
+        <div class="in"><p>{{employerBlock}}</p></div>
+      </div>
+      <div class="box">
+        <h2>Dades de la persona treballadora</h2>
+        <div class="in">
+          <div class="grid">
+            <div><span class="label">Nom i cognoms</span>{{workerName}}</div>
+            <div><span class="label">DNI/NIE</span>{{workerDni}}</div>
+            <div>
+              <span class="label">Núm. d'afiliació a la Seguretat Social</span>{{workerNaf}}
+            </div>
+            <div><span class="label">Centre de treball</span>{{workplace}}</div>
+          </div>
+        </div>
+      </div>
+      <p>Ambdues parts es reconeixen capacitat per contractar i convenen les clàusules següents</p>
+      <div class="box">
+        <h2>Clàusules</h2>
+        <div class="in">
+          <p class="clause">
+            <b>Primera.</b> La persona treballadora prestarà els seus serveis amb la categoria o
+            grup professional de {{category}}. Serà aplicable el {{agreementText}}.
+          </p>
+
+          <p class="clause">
+            <b>Segona.</b> El contracte s'inicia el {{startDateText}}. {{durationText}}
+          </p>
+          <p class="clause"><b>Tercera.</b> {{hoursText}} Horari: {{scheduleText}}</p>
+        </div>
+      </div>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+    <section class="page">
+      <div class="box">
+        <h2>Clàusules (continuació)</h2>
+        <div class="in">
+          <p class="clause"><b>Quarta.</b> {{salaryText}}</p>
+          <table>
+            <tr>
+              <th>Concepte</th>
+              <th class="n">Import brut</th>
+            </tr>
+            {{#salaryParts}}
+            <tr>
+              <td>{{concept}}</td>
+              <td class="n">{{amount}}</td>
+            </tr>
+            {{/salaryParts}}
+          </table>
+          <p>{{extraPaysText}} El pagament es farà per transferència al compte {{iban}}.</p>
+          <p class="clause"><b>Cinquena.</b> {{holidaysText}}</p>
+          <p class="clause"><b>Sisena.</b> {{trialText}}</p>
+
+          <p class="clause"><b>Setena.</b> {{infoText}}</p>
+          {{#clauses}}
+          <p class="clause"><b>{{title}}.</b> {{text}}</p>
+          {{/clauses}}
+        </div>
+      </div>
+      <p>
+        I en prova de conformitat, les parts signen aquest contracte per triplicat a {{city}}, el
+        {{signedOnText}}.
+      </p>
+      <div class="sign">
+        <div>L'empresa</div>
+        <div>La persona treballadora</div>
+      </div>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>
