@@ -54,12 +54,13 @@ export function missingInformation(review: EmploymentReview): MissingInformation
   return elements.length === 0 ? null : { moment: duty.moment, elements };
 }
 
-// The years the contract's pay is certainly below the minimum wage, with the figures most
-// favourable to the pay: only a shortfall found without any «No lo sé», and only in a year whose
-// minimum is published.
+// The years the contract's pay is below the minimum wage in every reading, with the figures most
+// favourable to the pay, and only in a year whose minimum is published.
 export interface PayShortfall {
   readonly finding: Finding;
   readonly years: readonly Extract<YearComparison, { kind: 'compared' }>[];
+  // A «No lo sé» gives other readings with more: these figures are the lowest of them.
+  readonly lowest: boolean;
 }
 
 export function payShortfall(
@@ -68,11 +69,15 @@ export function payShortfall(
   tables: EmploymentDeps,
 ): PayShortfall | null {
   const assessed = r.review.items.find((a) => findingsOf(a).some((f) => CONTRACT_PAY.has(f.id)));
-  if (assessed?.kind !== 'single' || assessed.finding.status !== 'below_minimum') return null;
+  if (assessed === undefined) return null;
+  const findings = findingsOf(assessed);
+  const [finding] = findings;
+  if (finding === undefined || findings.some((f) => f.status !== 'below_minimum')) return null;
+  // Without a world, the comparison takes the one most favourable to the pay: the lowest shortfall.
   const years = compareByYear(r.input, today, tables.minimumWage).flatMap((y) =>
     y.kind === 'compared' && y.verdict === 'below' ? [y] : [],
   );
-  return years.length === 0 ? null : { finding: assessed.finding, years };
+  return years.length === 0 ? null : { finding, years, lowest: assessed.kind === 'readings' };
 }
 
 // Every other point that does not match the law in every reading, each to be named with its norm.
@@ -219,6 +224,9 @@ function payBlocks(shortfall: PayShortfall, tables: EmploymentDeps, tr: Translat
         }),
       };
     }),
+    ...(shortfall.lowest
+      ? [{ type: 'note', text: tr('client.employment.letter.pay.lowest') } as const]
+      : []),
     { type: 'text', text: tr('client.employment.letter.pay.ask') },
   ];
 }

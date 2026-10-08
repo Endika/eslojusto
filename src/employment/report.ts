@@ -22,7 +22,7 @@ import {
   uniqueSources,
   type Labels,
 } from './render';
-import { figureOf, headline, sinceOf } from './summary';
+import { figureOf, headline, rangeOf, sinceOf } from './summary';
 
 const row = (label: string, value: string): Block => ({ type: 'row', label, value });
 const day = (d: CivilDate) => civilText(d);
@@ -102,6 +102,17 @@ function statusText(f: Finding, tr: Translate): string {
       });
 }
 
+// Below the minimum in every reading: the lower amount counts, the higher only bounds it.
+function rangeText(assessed: Assessed, tr: Translate): string {
+  const range = rangeOf(assessed);
+  return range === null
+    ? tr('client.employment.status.depends')
+    : tr(`client.employment.status.below_minimum_${range.per}_up_to`, {
+        importe: formatEuros(range.low),
+        maximo: formatEuros(range.high),
+      });
+}
+
 function readingText(f: Finding, tr: Translate): string {
   const figure = figureOf(f);
   return figure === null
@@ -131,7 +142,7 @@ function assessedBlocks(assessed: Assessed, tr: Translate, labels: Labels): Bloc
     ...(assessed.kind === 'single'
       ? [{ type: 'text', text: statusText(assessed.finding, tr) } as const]
       : [
-          { type: 'text', text: tr('client.employment.status.depends') } as const,
+          { type: 'text', text: rangeText(assessed, tr) } as const,
           { type: 'text', text: labels.question(assessed.question, tr) } as const,
           ...assessed.readings.map((r): Block => ({
             type: 'bullet',

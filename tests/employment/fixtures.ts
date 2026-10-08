@@ -45,6 +45,23 @@ export const shortDayRate = contract({
   extraPays: { count: 0, prorated: false },
 });
 
+// The same short contract at 55 € a day, 10 € of them a complement of unknown kind: below the
+// 57,82 € daily minimum either way, by 2,82 € counting it and by 12,82 € without it.
+export const shortDayRateDoubt = contract({
+  ...shortDayRate,
+  salary: {
+    amount: 55,
+    period: 'day',
+    payments: 12,
+    prorated: false,
+    breakdown: [
+      { kind: 'base', amount: 45 },
+      { kind: 'unknown', amount: 10 },
+    ],
+    inKind: null,
+  },
+});
+
 // A work-or-service contract after the 2021 reform.
 export const workOrService = contract({
   startDate: f('2023-05-02'),
