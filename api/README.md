@@ -233,12 +233,12 @@ and `settlement_agreement` (labelled as always, with nothing read from them, so 
 them as pages without data) and `other`; readability as the final pay's. Payslips and the work
 history get sections of their own, so the final pay's stay as they were:
 
-| Section                   | Source                | Fields                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Lists (most rows)                                                                                                                                                                                                                                                  |
-| ------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `employment_contract`     | `employment_contract` | `employerType`, `companyName` (a company only, ≤ 80), `companyTaxId` (a CIF), `workplaceRegion` (ISO 3166-2:ES), `signedOn`, `startDate`, `endDate`, `durationMonths`, `modalityText` (literal, ≤ 120), `modality`, `contractKey` (three digits, a hint), `partTime`, `causeText` (literal, ≤ 600), `replacedPersonNamed` (never the name), `replacementCauseStated`, `category`, `agreementName` (≤ 160), `agreementCode`, `salaryAmount`, `salaryPeriod`, `annualSalaryAmount`, `payments`, `prorated`, `inKindAmount`, `weeklyHours`, `annualHours`, `scheduleText` (literal, ≤ 400), `shifts`, `night`, `complementaryPercent`, `complementaryNoticeDays`, `overtimeAgreed`, `overtimeHoursPerYear`, `holidayDays`, `holidayUnit`, `trialAmount`, `trialUnit`, `remoteShare`, `trainingType`, `studiesEndedOn`, `planAttached`, `effectiveWorkPercent` | `salaryParts` [`concept`, `amount`, `kind`] (12), `clauses` [`label`, `literal` ≤ 600, `months`, `compensationStated`, `trainingDescribed`, `waivedRight`, `costsOnWorker`] (10), `information` [`element` a–q, `presence`] (17), `relationshipHints` [`hint`] (3) |
-| `job_offer`               | `job_offer`           | `position`, `salaryAmount`, `salaryPeriod`, `net`, `variable`, `weeklyHours`, `modality`, `remote`, `publishedOn`, returned as `offerPosition`, `offerSalaryAmount` and so on                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                                                                                                                                                    |
-| `employment_payslips`     | `payslip`             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `payslips` [`month`, `periodStart`, `periodEnd`, `daysWorked`, `incidents` (never which), `totalAccrued`, `partTimeCoefficient`, `agreementName`, `category`] (12), `lines` [`month`, `concept`, `amount`, `category`] (150)                                       |
-| `employment_work_history` | `work_history`        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `contracts` [`startDate`, `endDate`, `employerType`, `employerName` (a company only), `accountCode` (C.C.C.), `contractKey`, `partTimeCoefficient` (per thousand)] (60)                                                                                            |
+| Section                   | Source                | Fields                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Lists (most rows)                                                                                                                                                                                                                                                  |
+| ------------------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `employment_contract`     | `employment_contract` | `employerType`, `companyName` (a company only, ≤ 80), `companyTaxId` (a CIF), `workplaceRegion` (ISO 3166-2:ES), `signedOn`, `startDate`, `endDate`, `durationMonths`, `modalityText` (literal, ≤ 120), `modality`, `partTime`, `causeText` (literal, ≤ 600), `replacedPersonNamed` (never the name), `replacementCauseStated`, `category`, `agreementName` (≤ 160), `agreementCode` (REGCON digits only), `salaryAmount`, `salaryPeriod`, `annualSalaryAmount`, `payments`, `prorated`, `inKindAmount`, `weeklyHours`, `annualHours`, `scheduleText` (literal, ≤ 400), `shifts`, `night`, `complementaryPercent`, `complementaryNoticeDays`, `overtimeAgreed`, `overtimeHoursPerYear`, `holidayDays`, `holidayUnit`, `trialAmount`, `trialUnit`, `remoteShare`, `trainingType`, `studiesEndedOn`, `planAttached`, `effectiveWorkPercent` | `salaryParts` [`concept`, `amount`, `kind`] (12), `clauses` [`label`, `literal` ≤ 600, `months`, `compensationStated`, `trainingDescribed`, `waivedRight`, `costsOnWorker`] (10), `information` [`element` a–q, `presence`] (17), `relationshipHints` [`hint`] (3) |
+| `job_offer`               | `job_offer`           | `position`, `salaryAmount`, `salaryPeriod`, `net`, `variable`, `weeklyHours`, `modality`, `remote`, `publishedOn`, returned as `offerPosition`, `offerSalaryAmount` and so on                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |                                                                                                                                                                                                                                                                    |
+| `employment_payslips`     | `payslip`             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | `payslips` [`month`, `periodStart`, `periodEnd`, `daysWorked`, `incidents` (never which), `totalAccrued`, `partTimeCoefficient`, `agreementName`, `category`] (6, the most recent), `lines` [`month`, `concept`, `amount`, `category`] (60)                        |
+| `employment_work_history` | `work_history`        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | `contracts` [`startDate`, `endDate`, `employerType`, `employerName` and `accountCode` (C.C.C.), a company's only, `partTimeCoefficient` (per thousand)] (15, the most recent)                                                                                      |
 
 `src/domain/employment-merge.ts` takes every field from its only source, except `agreementName`
 and `category`, from the contract first and the most recent payslip that prints them second,
@@ -249,7 +249,9 @@ with the same conflicts and discards as the other reviews, and carries every lis
 the model adds up nothing and copies no deduction. `modality`, the clause `label`, the salary
 part `kind`, the information elements and the other closed lists mirror the site's employment
 engine (`test/employment-contract.test.ts`); a special employment centre is no relationship
-hint, since naming one would say something about the worker's health.
+hint, since naming one would say something about the worker's health, and there is no contract
+code (clave de contrato): some codes say the worker has a disability, and the engine does not
+use them.
 
 The model copies the cause, the modality, the schedule and each clause word for word, with
 «[nombre]» in place of a person's name, and picks their labels; it never says whether a clause
@@ -257,14 +259,25 @@ is valid, whether the cause is justified or which agreement applies. The prompt 
 to record the name, DNI/NIE, NAF, address, phone, email, IBAN or signature of the worker or of
 anyone else, nor disability, health, the kind of any leave, union membership or deductions; the
 schema has no field for any of them (`test/employment-schema.test.ts` walks every field name and
-description). The API does not take that on trust: a `companyName` or a work-history
-`employerName` beside any `employerType` but `company` is dropped, `companyTaxId` takes a CIF
-only and `accountCode` an employer's eleven digits only, and any copied text (`causeText`,
-`scheduleText`, `modalityText`, `companyName`, `category`, `agreementName`, `position`, a clause
-`literal`, a `concept`, an `employerName`) that still holds a DNI/NIE, a Spanish IBAN or
-account number, an email, a Spanish phone number or a Social Security number is dropped, each as
-a discard.
+description). The API does not take that on trust: a `companyName`, or a work-history
+`employerName` and `accountCode`, beside any `employerType` but `company` is dropped;
+`companyTaxId` takes a CIF only, `accountCode` an employer's eleven digits only and
+`agreementCode` digits only; and any copied text (`causeText`, `scheduleText`, `modalityText`,
+`companyName`, `category`, `agreementName`, `position`, a clause `literal`, a `concept`, an
+`employerName`) that still holds a DNI/NIE, a Spanish IBAN or account number, an email, a
+Spanish phone number or a Social Security number (`src/domain/identifiers.ts`), or a word about
+health, family leave, union membership or debts (`src/domain/special-categories.ts`: IT or
+I.T., incapacidad, enfermedad, accidente, maternidad, paternidad, nacimiento y cuidado,
+lactancia, embarazo, riesgo durante, sindical, sindicato, afiliado, CCOO, UGT, discapacidad,
+minusvalía, diversidad funcional, embargo, pensión alimenticia and their commonest Catalan and
+Basque forms, as whole words without case or accents), is dropped, each as a discard. A payslip
+line or a salary part whose `concept` carries such a word keeps its amount and category and
+loses only the concept, with no discard: the figure is still right, and the read no less sure.
+The word list errs on dropping: «accidente» in a safety clause or «IT» for information
+technology in a category take their text with them.
 
+The lists are sized so that, all at their maximum, they fit in `max_tokens` (below, «Cost»):
+past six payslips, sixty lines or fifteen work-history rows, the model keeps the most recent.
 The extraction carries `truncated: true` when the model filled a list to its maximum (counted on
 what it sent, so a row that failed validation still counts; the seventeen information elements
 are a whole list, not a cut): the documents may hold more rows than the response, and the site
@@ -652,28 +665,37 @@ texts are the largest records), raise `maxTokens` and this bound with it.
 
 An employment read takes the same input bound (its prompt is 14,000 tokens, so its largest pack
 is also 95,975) and 7,000 more output tokens (`EXTRA_OUTPUT_TOKENS_BY_REVIEW` in
-`src/domain/tokens.ts`): `max_tokens` is 12,000 with Sonnet 4.6. Measured at two characters per
-token on synthetic records (`test/tokens.test.ts`), a contract with six payslips records about
-10,000 tokens; twelve payslips with 144 lines about 15,200; twelve payslips, 150 lines and 60
-work-history rows about 22,400; every list and copied text at its limit, 33,500. 12,000 is also
-about as much as Sonnet can write before `READ_DEADLINE_MS` (160 s, at an estimated 60–80
-tokens a second after reading the images), so a larger cap would buy little: a pack that needs
-more stops at `max_tokens` (`document_unreadable`) or at the deadline (`model_unavailable`), and
-neither spends a read. Should the evaluation see either, the cap and this bound go up together.
+`src/domain/tokens.ts`): `max_tokens` is 12,000 with Sonnet 4.6 and Haiku 4.5, and 23,000 with
+Sonnet 5.5, whose 16,000 already leave room for thinking. Measured at two characters per token
+on synthetic records (`test/tokens.test.ts`), the largest realistic record (a contract with
+three clauses, six payslips, sixty lines and fifteen work-history rows, texts of the usual
+length) is about 10,850 tokens, a tenth under the cap. With every copied text at its limit
+(600-character causes and clauses, 80-character concepts) the contract and six payslips fit up
+to fifteen lines (about 11,750); every list and text at its limit (about 17,700) does not, and
+stops at `max_tokens`.
+
+The cap also keeps a read inside `READ_DEADLINE_MS` (160 s) on one assumption, not yet
+measured: that Sonnet 4.6 writes at least about 80 tokens a second through the EU profile, so
+that 12,000 take about 150 s after the images are read. At 60 a second, the largest realistic
+record (about 135 s at 80) would run past the deadline. A pack that stops at `max_tokens` answers
+`document_unreadable`; one that runs out of time, `model_unavailable`, which also locks the
+documents path for an hour in the browser; neither spends a read. The evaluation with real
+documents measures both; should either appear, the lists shrink or the cap and the deadline
+move together.
 
 | Employment read, Sonnet 4.6 alone         | Input tokens    | Output tokens         | Cost                         |
 | ----------------------------------------- | --------------- | --------------------- | ---------------------------- |
 | Contract alone, 5 photos                  | ~22,000         | ~3,300                | 0.073 + 0.054 = **0.13 USD** |
-| Contract and six payslips, 11 photos      | ~31,600         | ~10,000               | 0.104 + 0.165 = **0.27 USD** |
-| Largest pack accepted, 25 × 1568 × 1568   | 95,975          | 12,000 (`max_tokens`) | 0.317 + 0.198 = **0.52 USD** |
+| Contract and six payslips, 11 photos      | ~31,600         | ~9,300                | 0.104 + 0.153 = **0.26 USD** |
+| Largest pack accepted, 25 × 1568 × 1568   | 95,975          | 12,000 (`max_tokens`) | 0.317 + 0.198 = **0.51 USD** |
 | Were Haiku to read first: worst escalated | 43,000 + 43,000 | 12,000 + 12,000       | 0.113 + 0.340 = 0.45 USD     |
 
 "Contract alone" and "contract and six payslips" count 1,600 tokens per photo and the 14,000 of
 the prompt, as above.
 
 **Worst case: 0.40 USD per read** for the final pay and the rental review (95,975 × 3.30 USD/M +
-5,000 × 16.50 USD/M = 0.399), and **0.52 USD** for the employment review (95,975 × 3.30 USD/M +
-12,000 × 16.50 USD/M = 0.515), for any input: the API takes images only, priced by their pixels, and refuses anything above 96,000
+5,000 × 16.50 USD/M = 0.399), and an upper bound of about **0.51 USD** for the employment review
+(95,975 × 3.30 USD/M + 12,000 × 16.50 USD/M = 0.5147), for any input: the API takes images only, priced by their pixels, and refuses anything above 96,000
 estimated tokens (0.40 USD) before a call. The bound counts every page at 1568 px, since the
 API accepts that size at any count; the browser stepping a large pack down only lowers it. A PDF never reaches it; the browser renders its pages
 to images of the same size as a photo. Should Bedrock still bill more than twice the estimate,

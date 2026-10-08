@@ -39,7 +39,6 @@
               "employerType": "company",
               "employerName": "Conservas Imaginarias S.A.",
               "accountCode": "48/0000000/00",
-              "contractKey": "402",
               "partTimeCoefficient": 0,
               "confidence": "high"
             },
@@ -49,7 +48,6 @@
               "employerType": "company",
               "employerName": "Conservas Imaginarias S.A.",
               "accountCode": "48/0000000/00",
-              "contractKey": "402",
               "confidence": "high"
             },
             {
@@ -57,7 +55,6 @@
               "endDate": "2023-08-31",
               "employerType": "person",
               "accountCode": "48/1111111/11",
-              "contractKey": "100",
               "partTimeCoefficient": 500,
               "confidence": "high"
             },
@@ -67,7 +64,6 @@
               "employerType": "company",
               "employerName": "Logística de Ficción S.L.",
               "accountCode": "48/2222222/22",
-              "contractKey": "410",
               "confidence": "high"
             },
             {
@@ -75,7 +71,6 @@
               "employerType": "company",
               "employerName": "Conservas Imaginarias S.A.",
               "accountCode": "48/0000000/00",
-              "contractKey": "402",
               "confidence": "high"
             }
           ]
@@ -87,6 +82,6 @@
   "stop_sequence": null,
   "usage": {
     "input_tokens": 18918,
-    "output_tokens": 610
+    "output_tokens": 560
   }
 }

@@ -74,10 +74,6 @@
             "value": "permanent",
             "confidence": "high"
           },
-          "contractKey": {
-            "value": "100",
-            "confidence": "high"
-          },
           "partTime": {
             "value": false,
             "confidence": "high"
@@ -268,6 +264,6 @@
   "stop_sequence": null,
   "usage": {
     "input_tokens": 21377,
-    "output_tokens": 1743
+    "output_tokens": 1718
   }
 }

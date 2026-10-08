@@ -1,0 +1,184 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "employment_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "employment_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "payslip",
+            "document": 2,
+            "month": "2026-05",
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "employment_contract": {
+          "employerType": {
+            "value": "company",
+            "confidence": "high"
+          },
+          "companyName": {
+            "value": "Clínica Veterinaria Ficticia S.L.",
+            "confidence": "high"
+          },
+          "startDate": {
+            "value": "2026-05-04",
+            "confidence": "high"
+          },
+          "modalityText": {
+            "value": "Sustitución por incapacidad temporal",
+            "confidence": "high"
+          },
+          "modality": {
+            "value": "replacement",
+            "confidence": "high"
+          },
+          "causeText": {
+            "value": "Sustitución de [nombre], en situación de incapacidad temporal por enfermedad común, hasta su reincorporación.",
+            "confidence": "high"
+          },
+          "replacedPersonNamed": {
+            "value": true,
+            "confidence": "high"
+          },
+          "replacementCauseStated": {
+            "value": true,
+            "confidence": "high"
+          },
+          "category": {
+            "value": "Auxiliar de clínica",
+            "confidence": "high"
+          },
+          "salaryAmount": {
+            "value": 1350,
+            "confidence": "high"
+          },
+          "salaryPeriod": {
+            "value": "month",
+            "confidence": "high"
+          },
+          "payments": {
+            "value": 14,
+            "confidence": "high"
+          },
+          "scheduleText": {
+            "value": "De lunes a viernes de 8:00 a 15:00, con permiso de lactancia de una hora.",
+            "confidence": "high"
+          },
+          "clauses": [
+            {
+              "label": "other",
+              "literal": "La persona trabajadora declara una discapacidad del 33 % a efectos de bonificación.",
+              "confidence": "high"
+            },
+            {
+              "label": "exclusivity",
+              "literal": "Plena dedicación a la empresa, con un complemento de 100 euros mensuales.",
+              "compensationStated": true,
+              "confidence": "high"
+            }
+          ]
+        },
+        "employment_payslips": {
+          "payslips": [
+            {
+              "month": "2026-05",
+              "periodStart": "2026-05-01",
+              "periodEnd": "2026-05-31",
+              "incidents": true,
+              "totalAccrued": 1600,
+              "confidence": "high"
+            }
+          ],
+          "lines": [
+            {
+              "month": "2026-05",
+              "concept": "SALARIO BASE",
+              "amount": 1000,
+              "category": "salary",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-05",
+              "concept": "COMPLEMENTO I.T. EMPRESA",
+              "amount": 150,
+              "category": "other",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-05",
+              "concept": "PRESTACIÓN MATERNIDAD",
+              "amount": 100,
+              "category": "other",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-05",
+              "concept": "PLUS DE TRANSPORTE",
+              "amount": 80,
+              "category": "expenses",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-05",
+              "concept": "COMPLEMENTO DE NOCTURNIDAD",
+              "amount": 120,
+              "category": "fixed_complement",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-05",
+              "concept": "LIBERADO SINDICAL UGT",
+              "amount": 50,
+              "category": "other",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-05",
+              "concept": "REGULARIZACIÓN EMBARGO",
+              "amount": 100,
+              "category": "other",
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 21377,
+    "output_tokens": 1312
+  }
+}
