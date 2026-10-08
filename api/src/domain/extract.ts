@@ -116,7 +116,7 @@ export interface ExtractMetrics {
   truncated?: boolean;
 }
 
-interface Assessment {
+export interface Assessment {
   readonly extraction: AnyMerged;
   readonly failed: readonly AnyCheck[];
   readonly doubtful: boolean;
@@ -185,7 +185,8 @@ function check(reading: Reading, review: ReviewKind, toolInput: unknown): Checke
   return checkFinalPay(reading);
 }
 
-function assess(read: ModelRead, pageCount: number, review: ReviewKind): Assessment {
+// What one read yields once validated, merged and checked; the evaluation run keeps it for a miss.
+export function assess(read: ModelRead, pageCount: number, review: ReviewKind): Assessment {
   const reading = parseReading(read.toolInput, pageCount, review);
   const { extraction, failed, incomplete } = check(reading, review, read.toolInput);
   const noOutput = read.toolInput === null;

@@ -1,5 +1,12 @@
 import type { DocumentFile } from '../src/domain/documents';
-import { extract, type ExtractMetrics, type ExtractResponse } from '../src/domain/extract';
+import {
+  assess,
+  extract,
+  type Assessment,
+  type ExtractMetrics,
+  type ExtractResponse,
+} from '../src/domain/extract';
+import { parseReading } from '../src/domain/extraction';
 import type {
   CaptchaVerifier,
   Clock,
@@ -69,6 +76,19 @@ interface Tally {
   correct: number;
 }
 
+// One read of a pack that missed a field: the tool input exactly as the model wrote it (the bank is
+// synthetic), what validation left out and what the domain made of the rest.
+interface ReadDiagnosis {
+  readonly model: string;
+  readonly toolInput: unknown;
+  readonly dropped: number;
+  readonly unclassified: number;
+  readonly sections: readonly string[];
+  readonly doubtful: boolean;
+  readonly failedChecks: Assessment['failed'];
+  readonly extraction: Assessment['extraction'];
+}
+
 interface PackReport {
   readonly id: string;
   readonly code: string;
@@ -81,6 +101,7 @@ interface PackReport {
   readonly personsTranscribed: number;
   readonly fields: Tally;
   readonly pages: Tally;
+  readonly reads?: readonly ReadDiagnosis[];
 }
 
 export interface EvalReport {
@@ -157,6 +178,26 @@ export const employmentBank = (
   pagesOf: (c) => expectedEmploymentPages(c, sheetsOf),
   personKeys: EMPLOYMENT_PERSON_KEYS,
 });
+
+function diagnose(
+  model: string,
+  read: ModelRead,
+  pageCount: number,
+  review: EvalBank<EvalCase>['review'],
+): ReadDiagnosis {
+  const reading = parseReading(read.toolInput, pageCount, review);
+  const { extraction, failed, doubtful } = assess(read, pageCount, review);
+  return {
+    model,
+    toolInput: read.toolInput,
+    dropped: reading.dropped,
+    unclassified: reading.unclassified,
+    sections: Object.keys(reading.sections),
+    doubtful,
+    failedChecks: failed,
+    extraction,
+  };
+}
 
 const same = (got: unknown, want: ExpectedValue): boolean =>
   typeof want === 'number' && typeof got === 'number' ? Math.abs(got - want) < 0.005 : got === want;
@@ -314,6 +355,9 @@ export async function evaluate<C extends EvalCase>(
       ),
       fields,
       pages,
+      ...(fields.correct < fields.expected && {
+        reads: reads.map(({ model, read }) => diagnose(model, read, files.length, bank.review)),
+      }),
     };
     perPack.push(report);
     deps.progress?.(

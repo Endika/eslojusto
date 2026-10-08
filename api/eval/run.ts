@@ -1,6 +1,6 @@
 // Composition root of an evaluation run over a synthetic bank: the real Bedrock reader, the
 // Lambda's own domain, a spending cap. Outside vitest and CI; see api/README.md, «Evaluation».
-//   EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval [-- --review employment --cases eval/cases/employment]
+//   EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval [-- --review employment --cases eval/cases/employment --only id1,id2]
 import { randomBytes } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import {
@@ -58,7 +58,7 @@ function packsOf<C extends EvalCase & { readonly eval: boolean }>(
     .filter((name) => name.endsWith('.json'))
     .sort()
     .map((name) => JSON.parse(readFileSync(new URL(name, dir), 'utf8')) as C);
-  return selectCases(cases, process.env['EVAL_CASES']).map((bankCase) => {
+  return selectCases(cases, args.only ?? process.env['EVAL_CASES']).map((bankCase) => {
     const images = new URL(`${bankCase.id}/`, OUT);
     const names = existsSync(images)
       ? readdirSync(images)
