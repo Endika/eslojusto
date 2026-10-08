@@ -23,6 +23,8 @@ describe('api import boundaries', () => {
     ['src/adapters/x.ts', "import { handler } from '../handlers/extract';"],
     ['src/config.ts', "import { LIMITS } from './domain/documents';"],
     ['infra/x.ts', "import { createTurnstileVerifier } from '../src/adapters/turnstile';"],
+    ['eval/x.ts', "import { createBedrockReader } from '../src/adapters/bedrock-reader';"],
+    ['eval/x.ts', "import { REGION } from '../src/config';"],
   ])('%s cannot %s', async (filePath, code) => {
     expect(await violations(filePath, code)).toContain('no-restricted-imports');
   });
@@ -51,6 +53,8 @@ describe('api import boundaries', () => {
     ['src/adapters/x.ts', "import type { Clock } from '../domain/ports';"],
     ['src/handlers/x.ts', "import { createTurnstileVerifier } from '../adapters/turnstile';"],
     ['infra/x.ts', "import { REGION } from '../src/config';"],
+    ['eval/x.ts', "import { extract } from '../src/domain/extract';"],
+    ['eval/run.ts', "import { createBedrockReader } from '../src/adapters/bedrock-reader';"],
   ])('%s may %s', async (filePath, code) => {
     expect(await violations(filePath, code)).not.toContain('no-restricted-imports');
   });

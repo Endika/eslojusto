@@ -714,6 +714,38 @@ to images of the same size as a photo. Should Bedrock still bill more than twice
 the read is logged with `underestimated`. A free read needs a fresh captcha, at most 5 reads
 run at once, and the budget action caps the month.
 
+## Evaluation
+
+`eval/` holds a synthetic bank of 35 lease packs: each case (`eval/cases/*.json`, shape in
+`eval/schema.ts`) lists its pages, drawn from the lease templates in `eval/templates/` or as
+notices, receipts, invoices and deposit returns, with how each photo is spoiled; what a read
+should find in them; and the facts and review the site's engine should give
+(`tests/engine/rental/bank.test.ts` checks the engine against every case, at no cost). Every
+person, DNI and IBAN in it is invented, and `test/eval-synthetic.test.ts` proves that each DNI
+and IBAN fails its check digits.
+
+```bash
+npm run rental-bank                          # at the root: renders the photos to api/eval/out/
+EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval # here: reads them with Bedrock, never in CI
+```
+
+The renderer is deterministic: the same seed (`--seed`, by default 20261008) gives the same
+bytes, and it prints the hash of what it wrote. The run (`eval/run.ts`, with `tsx`, outside
+vitest) refuses to start without `EVAL_CONFIRM=yes` and a positive `EVAL_MAX_USD`, and exits
+before it loads any AWS adapter. It reads, by default, the 15 packs marked `eval: true` (bad
+photos, doubtful cases, long documents); `EVAL_CASES=all` or a comma-separated list of ids picks
+others. Each pack goes through the Lambda's own domain (`extract` with `review: 'rental'`) and
+the real `createBedrockReader`, with the models of `src/config.ts`. Before each pack it adds the
+cost measured so far (tokens × `MODEL_PRICES_USD_PER_MTOK`) to the worst case of one more pack
+and stops if that could pass `EVAL_MAX_USD`. It writes `eval/out/report.json`: accuracy by field
+and by page kind, `nothing_read` expected and got, conflicts, escalations, reads cut at
+`max_tokens`, values of a person found in what the model wrote (it must be 0) and the total cost.
+
+**How much.** 15 packs of 2 to 7 photos, one pass with Sonnet 4.6: each pack is at most
+**0.40 USD** (the worst case above, 96,000 tokens in and 5,000 out), so `EVAL_MAX_USD=3` stops the
+run before it could pass 3 USD, and about **2–2.50 USD** is expected. Nothing runs without the
+owner's written approval and that figure.
+
 ## Unverified
 
 - That a budget action resets by itself at the start of the next month; if not, detach

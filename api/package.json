@@ -11,7 +11,8 @@
     "lint": "eslint . --max-warnings 0",
     "type:check": "tsc --noEmit",
     "test:run": "vitest run",
-    "synth": "cdk synth --quiet -c stripePriceId=price_ci_placeholder -c alertEmail=ci@example.com"
+    "synth": "cdk synth --quiet -c stripePriceId=price_ci_placeholder -c alertEmail=ci@example.com",
+    "eval": "tsx eval/run.ts"
   },
   "allowScripts": {
     "esbuild": true

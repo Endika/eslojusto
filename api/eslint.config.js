@@ -53,6 +53,14 @@ export default tseslint.config(
     '.',
     'Config is plain constants shared by the code and the infrastructure.',
   ),
+  {
+    ...boundary(
+      ['eval/**'],
+      '^(?!\\./|\\.\\./src/domain/)',
+      'The evaluation reaches only the domain; eval/run.ts wires the adapters in.',
+    ),
+    ignores: ['eval/run.ts'],
+  },
   boundary(
     ['infra/**'],
     '^\\.\\./src/(?!config$)',
