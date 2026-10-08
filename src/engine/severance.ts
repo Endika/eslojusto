@@ -237,6 +237,10 @@ function fixedTermEnd(
   );
 }
 
+// The daily salary every severance and notice amount uses: the year's pay over 365 days.
+export const DAYS_FOR_DAILY_SALARY = 365;
+export const dailySalary = (annualSalary: number): number => annualSalary / DAYS_FOR_DAILY_SALARY;
+
 export function computeSeverance(args: {
   cause: StatedCause;
   startDate: CivilDate;
@@ -245,7 +249,7 @@ export function computeSeverance(args: {
   fixedTermType?: FixedTermType | undefined;
 }): Severance {
   const { cause, startDate, endDate, annualSalary, fixedTermType } = args;
-  const sd = annualSalary / 365;
+  const sd = dailySalary(annualSalary);
   switch (cause) {
     case 'unfair_dismissal':
       return unfair(startDate, endDate, sd);

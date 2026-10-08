@@ -19,6 +19,10 @@ export interface Norm<Id extends string> {
 
 export type NormTable<Id extends string> = Readonly<Record<Id, Norm<Id>>>;
 
+// Day each norm was last read in the BOE during the monthly review; kept apart from `Norm` so the
+// shared model stays the same for every section.
+export type NormReview<Id extends string> = Readonly<Record<Id, string>>;
+
 // How a norm stands on a given day: a repealed norm's whole window, widened to its uncertain end,
 // is doubtful, and so is anything resting on a norm still pending validation.
 export type NormStanding = 'not_in_force' | 'in_force' | 'pending_validation' | 'repealed_window';
