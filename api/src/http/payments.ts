@@ -29,7 +29,7 @@ export function handleCheckout(
       typeof captchaToken !== 'string' ||
       captchaToken.length === 0 ||
       captchaToken.length > MAX_TOKEN_LENGTH ||
-      (returnTo !== undefined && returnTo !== 'rental')
+      (returnTo !== undefined && returnTo !== 'rental' && returnTo !== 'employment')
     )
       return { code: 'invalid_request' };
     const review: ReviewKind = returnTo ?? 'final_pay';
