@@ -126,12 +126,24 @@ describe('the rental guide', () => {
     expect(faq).not.toContain('15-11-2026');
   });
 
+  it('names the RDL 29/2026 extension in the RDL 28/2026 sentence, also once RDL 29 is repealed', () => {
+    const term =
+      guide(repealed)
+        .find((b) => b.id === 'term')
+        ?.paragraphs.join(' ') ?? '';
+    expect(term).toContain('la prórroga extraordinaria del Real Decreto-ley 29/2026');
+    expect(term).not.toContain('esa prórroga');
+  });
+
   it('cites the charges by their numbering before RDL 29/2026, on that wording', () => {
     const charges = guide(NORMS).find((b) => b.id === 'charges');
     const increase = charges?.sources.find((s) => s.citation.startsWith('LAU, art. 20.2'));
     expect(increase?.citation).toContain('anterior al RDL 29/2026 (art. 20.3 desde el 08-10-2026)');
     expect(increase?.url).toContain('&p=20230525');
     expect(charges?.paragraphs.join(' ')).toContain('numera como 20.4');
+    const pact = charges?.sources.find((s) => s.citation.startsWith('LAU, art. 20.1'));
+    expect(pact?.citation).toContain('en su redacción anterior al RDL 29/2026');
+    expect(pact?.url).toContain('&p=20230525');
   });
 
   it('names the legal interest from its table, with the Banco de España link', () => {

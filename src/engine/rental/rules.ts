@@ -220,7 +220,15 @@ export const RULES: Readonly<Record<RuleId, Rule>> = {
     RDL29_2026,
     '2026-10-08',
   ),
-  charges_pact: rule('charges_pact', 'lau', 'LAU, art. 20.1', `${LAU}#a20`, '1995-01-01'),
+  // Since RDL 29/2026 the current 20.1 also keeps taxes off the tenant (taxes_ban); the pact
+  // itself is the wording before it.
+  charges_pact: rule(
+    'charges_pact',
+    'lau',
+    'LAU, art. 20.1 en su redacción anterior al RDL 29/2026',
+    `${LAU_2023}#a20`,
+    '1995-01-01',
+  ),
   // RDL 29/2026, art. 3.Doce, renumbers art. 20 from 08-10-2026: the increase limit moves to 20.3
   // and the meters to 20.4. The link is the wording before it.
   charges_increase: rule(

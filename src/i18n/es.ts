@@ -2341,7 +2341,7 @@ export const es = {
 
   'rental.guide.charges.title': 'Gastos: comunidad, IBI y basura',
   'rental.guide.charges.pact':
-    'El casero solo puede cobrarte los gastos generales del edificio, los tributos o los servicios sin contador si lo pactasteis por escrito y con su importe anual a la fecha del contrato (art. 20.1 LAU).',
+    'El casero solo puede cobrarte los gastos generales del edificio, los tributos o los servicios sin contador si lo pactasteis por escrito y con su importe anual a la fecha del contrato (art. 20.1 LAU, en su redacción anterior al Real Decreto-ley 29/2026).',
   'rental.guide.charges.increase':
     'En los cinco primeros años de contrato, o siete si el casero es una empresa, esos gastos, salvo los tributos, solo pueden subir una vez al año, por acuerdo, y nunca más del doble de lo que puede subir la renta (art. 20.2 LAU, que el Real Decreto-ley 29/2026 numera como 20.3).',
   'rental.guide.charges.meters':
@@ -2376,7 +2376,7 @@ export const es = {
   'rental.guide.term.extension':
     'Además, {decreto} prevé, con requisitos y excepciones, una prórroga extraordinaria por años, hasta dos más, si la pides. Los principales: el contrato tiene que estar en vigor el {desde}; su prórroga del art. 9.1, su prórroga tácita o su tácita reconducción tiene que acabar antes del 31 de diciembre de 2028, y tienes que estar al corriente del pago de la renta y haberlo estado cada mes durante los ocho anteriores. No se aplica si pactáis otras condiciones, un contrato nuevo o una renovación con una renta al menos un 5 % más baja, ni si el casero comunica que necesita la vivienda para sí o su familia (art. 9.3 LAU). Si cabe la prórroga de las zonas tensionadas (art. 10.3 LAU), se aplica esa.',
   'rental.guide.term.rdl28':
-    'Por otro lado, {decreto} reescribe el art. 10 de la LAU, el de las prórrogas, y desde entonces deja fuera esa prórroga extraordinaria cuando proceda la prórroga del nuevo art. 10.1.',
+    'Por otro lado, {decreto} reescribe el art. 10 de la LAU, el de las prórrogas, y desde entonces deja fuera la prórroga extraordinaria del Real Decreto-ley 29/2026 cuando proceda la prórroga del nuevo art. 10.1.',
   'rental.guide.term.unchecked':
     'La revisión no comprueba prórrogas ni preavisos: te da las fechas de tu contrato como información.',
 
