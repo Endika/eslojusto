@@ -71,7 +71,7 @@ function addMark(container: HTMLElement, id: string, text: string, confidence: C
   const slip = container.querySelector(':scope > .errata, :scope > [data-row-error]');
   if (slip) slip.before(mark);
   else container.append(mark);
-  for (const input of container.querySelectorAll<HTMLInputElement>('input')) {
+  for (const input of container.querySelectorAll('input, select')) {
     const ids = (input.getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean);
     if (!ids.includes(mark.id)) input.setAttribute('aria-describedby', [...ids, mark.id].join(' '));
   }
@@ -79,7 +79,7 @@ function addMark(container: HTMLElement, id: string, text: string, confidence: C
 
 function removeMark(mark: Element) {
   const container = mark.parentElement;
-  for (const input of container?.querySelectorAll<HTMLInputElement>('input') ?? []) {
+  for (const input of container?.querySelectorAll('input, select') ?? []) {
     const ids = (input.getAttribute('aria-describedby') ?? '').split(' ');
     input.setAttribute('aria-describedby', ids.filter((i) => i !== mark.id).join(' '));
   }
@@ -711,7 +711,10 @@ export function setUpUpload<F extends string, L extends string>(
   // A mark tells where a value came from; once the person changes the value, it no longer applies.
   // It sits in the element that holds the answer, the nearest one around the input that has one.
   const unmark = (e: Event) => {
-    const input = e.target instanceof HTMLInputElement ? e.target : null;
+    const input =
+      e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement
+        ? e.target
+        : null;
     let container = input?.parentElement ?? null;
     while (container && container !== form && !container.querySelector(':scope > [data-read-mark]'))
       container = container.parentElement;

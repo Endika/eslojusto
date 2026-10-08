@@ -139,10 +139,14 @@ export interface PdfMaker {
   unprintable(details: Record<LetterField, string>): LetterField[];
 }
 
-// A completed review as the pass sees it, whichever section made it: whether the pass is offered,
-// and the report and letters it unlocks.
-export interface PaidReview {
+// A completed review as the pass sees it, whichever section made it: whether the pass is offered.
+// A review whose pass unlocks only its detail has nothing more.
+export interface OfferedReview {
   readonly offer: boolean;
+}
+
+// One whose pass unlocks downloads too: the report and the letters.
+export interface PaidReview extends OfferedReview {
   // The letters this review can download; the first is the one a plain letter button gives.
   readonly letterKinds: readonly [LetterKind, ...LetterKind[]];
   report(tr: Translate, today: CivilDate): DocumentModel;
