@@ -1,22 +1,35 @@
-// Renders the synthetic bank of lease packs (api/eval/cases) to the JPEG photos a person would
-// upload: each page as HTML, then a PNG, then spoiled in a <canvas> from a seeded PRNG. The same
-// seed gives the same bytes, and the manifest's hash says so.
-//   node scripts/rental-bank/render.mjs [--seed N]
+// Renders a synthetic bank of packs (by default the lease packs of api/eval/cases) to the JPEG
+// photos a person would upload: each page as HTML, then a PNG, then spoiled in a <canvas> from a
+// seeded PRNG. The same seed gives the same bytes, and the manifest's hash says so.
+//   node scripts/rental-bank/render.mjs [--seed N] [--cases DIR --out DIR]
 import { chromium } from '@playwright/test';
 import { createHash } from 'node:crypto';
-import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = new URL('../../api/eval/', import.meta.url);
-const CASES = new URL('cases/', ROOT);
 const TEMPLATES = new URL('templates/', ROOT);
-const OUT = new URL('out/', ROOT);
 const FOOTER = 'Documento ficticio · banco de pruebas';
 const PLACEHOLDER = /\{\{(\w+)\}\}/g;
+// A block repeated once per row of a list in the page data: {{#rows}}…{{/rows}}.
+const SECTION = /\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
 
-const seedArg = process.argv.indexOf('--seed');
-const SEED = seedArg === -1 ? 20261008 : Number(process.argv[seedArg + 1]);
+const argOf = (name) => {
+  const i = process.argv.indexOf(name);
+  return i === -1 ? undefined : process.argv[i + 1];
+};
+const dirArg = (name, fallback) => {
+  const v = argOf(name);
+  if (v === undefined) return fallback;
+  if (v === '' || v.startsWith('--')) throw new Error(`${name} takes a directory`);
+  return pathToFileURL(`${v.replace(/\/+$/, '')}/`);
+};
+
+const seedArg = argOf('--seed');
+const SEED = seedArg === undefined ? 20261008 : Number(seedArg);
 if (!Number.isInteger(SEED)) throw new Error('--seed takes an integer');
+const CASES = dirArg('--cases', new URL('cases/', ROOT));
+const OUT = dirArg('--out', new URL('out/', ROOT));
 
 const escape = (v) =>
   String(v).replace(
@@ -25,8 +38,14 @@ const escape = (v) =>
   );
 
 function fill(html, data, where) {
-  return html.replace(PLACEHOLDER, (_, key) => {
-    if (!(key in data)) throw new Error(`${where}: no value for {{${key}}}`);
+  const expanded = html.replace(SECTION, (_, key, block) => {
+    const rows = data[key];
+    if (!Array.isArray(rows)) throw new Error(`${where}: {{#${key}}} needs a list`);
+    return rows.map((row) => fill(block, { ...data, ...row }, where)).join('');
+  });
+  return expanded.replace(PLACEHOLDER, (_, key) => {
+    if (!(key in data) || Array.isArray(data[key]))
+      throw new Error(`${where}: no value for {{${key}}}`);
     return escape(data[key]);
   });
 }
@@ -225,9 +244,11 @@ const cases = readdirSync(CASES)
   .sort()
   .map((name) => JSON.parse(readFileSync(new URL(name, CASES), 'utf8')));
 
+// A directory with a manifest of its own holds another bank's photos, and stays.
 mkdirSync(OUT, { recursive: true });
 for (const entry of readdirSync(OUT, { withFileTypes: true }).filter((e) => e.isDirectory()))
-  rmSync(new URL(`${entry.name}/`, OUT), { recursive: true });
+  if (!existsSync(new URL(`${entry.name}/manifest.json`, OUT)))
+    rmSync(new URL(`${entry.name}/`, OUT), { recursive: true });
 
 const browser = await chromium.launch();
 const images = [];

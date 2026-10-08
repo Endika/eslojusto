@@ -1,0 +1,328 @@
+{
+  "id": "catalan-exclusivity",
+  "description": "ET art. 21.1: full exclusivity for one company needs an express compensation; this Catalan contract states none, so it is to review.",
+  "eval": true,
+  "today": "2026-10-08",
+  "pages": [
+    {
+      "template": "employment/permanent-ca",
+      "data": {
+        "employerBlock": "Ficticia Disseny Exemple, S. L., amb CIF B91411309, codi de compte de cotització 60 1437570 00 i domicili al carrer de la Prova Fictícia, a Barcelona.",
+        "workplace": "Barcelona",
+        "category": "Dissenyador gràfic",
+        "agreementText": "conveni col·lectiu d'arts gràfiques",
+        "startDateText": "2 de març de 2026",
+        "modalityText": "Jornada completa",
+        "durationText": "Es concerta per temps indefinit.",
+        "hoursText": "La jornada serà de 40 hores setmanals de treball efectiu.",
+        "scheduleText": "de dilluns a divendres, de 9:00 a 14:00 i de 15:00 a 18:00.",
+        "salaryText": "La retribució bruta serà de 1.650,00 € mensuals, en 14 pagues.",
+        "salaryParts": [
+          {
+            "concept": "Salari base",
+            "amount": "1.650,00 €"
+          }
+        ],
+        "extraPaysText": "Les dues pagues extraordinàries es pagaran al juny i al desembre.",
+        "holidaysText": "Les vacances anuals retribuïdes seran de 30 dies naturals.",
+        "trialText": "S'estableix un període de prova de 2 mesos.",
+        "infoText": "L'empresa lliura en document a part la informació sobre els elements essencials del contracte.",
+        "clauses": [
+          {
+            "title": "Vuitena. Exclusivitat",
+            "text": "La persona treballadora es compromet a prestar serveis en exclusiva per a l'empresa i a no treballar per a cap altra durant la vigència del contracte."
+          }
+        ],
+        "city": "Barcelona",
+        "signedOnText": "25 de febrer de 2026",
+        "workerName": "Persona Trabajadora Ficticia E",
+        "workerDni": "67037010L",
+        "workerNaf": "38 23703671 00",
+        "iban": "ES02 2130 5210 4010 0370 3710"
+      },
+      "degrade": {
+        "rotate": -1.4,
+        "shadow": 0.28,
+        "blur": 0.6,
+        "dark": 0.07,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "employerType": "company",
+        "signedOn": "2026-02-25",
+        "startDate": "2026-03-02",
+        "modality": "permanent",
+        "partTime": false,
+        "salaryAmount": 1650,
+        "salaryPeriod": "month",
+        "payments": 14,
+        "workplaceRegion": "CT",
+        "weeklyHours": 40,
+        "trialAmount": 2,
+        "trialUnit": "months",
+        "holidayDays": 30,
+        "holidayUnit": "calendar"
+      },
+      "lists": {
+        "salaryParts": [
+          {
+            "amount": 1650,
+            "kind": "base"
+          }
+        ],
+        "clauses": [
+          {
+            "label": "exclusivity",
+            "compensationStated": false
+          }
+        ]
+      }
+    },
+    "input": {
+      "relationship": "common",
+      "viaTempAgency": false,
+      "relief": false,
+      "under18": false,
+      "writtenContract": true,
+      "startDate": "2026-03-02",
+      "endDate": null,
+      "signedOn": "2026-02-25",
+      "modality": "permanent",
+      "extensions": 0,
+      "causeStated": null,
+      "circumstancesStated": null,
+      "replacedPersonNamed": null,
+      "replacementCauseStated": null,
+      "discontinuous": null,
+      "training": null,
+      "salary": {
+        "amount": 1650,
+        "period": "month",
+        "payments": 14,
+        "prorated": false,
+        "breakdown": [
+          {
+            "kind": "base",
+            "amount": 1650
+          }
+        ],
+        "inKind": null
+      },
+      "contractHours": {
+        "weekly": 40,
+        "annual": null
+      },
+      "fullTimeHours": null,
+      "agreement": {
+        "named": true,
+        "categoryAnnualSalary": null,
+        "annualHours": null,
+        "holidayDays": null,
+        "trialMonths": null
+      },
+      "payslips": [],
+      "trial": {
+        "amount": 2,
+        "unit": "months"
+      },
+      "technical": false,
+      "smallCompany": false,
+      "sameDutiesBefore": false,
+      "afterTraining": false,
+      "schedule": [
+        {
+          "day": 1,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        }
+      ],
+      "shifts": false,
+      "nightWorker": false,
+      "irregular": false,
+      "overtimeAgreed": null,
+      "partTime": null,
+      "remoteShare": null,
+      "realWeeklyHours": null,
+      "holidays": {
+        "days": 30,
+        "unit": "calendar",
+        "workDaysPerWeek": 5,
+        "includedInSalary": false
+      },
+      "extraPays": {
+        "count": 2,
+        "prorated": false
+      },
+      "clauses": [
+        {
+          "label": "exclusivity",
+          "months": null,
+          "compensationStated": false,
+          "trainingDescribed": null,
+          "waivedRight": null,
+          "costsOnWorker": null,
+          "literal": {
+            "text": "La persona treballadora es compromet a prestar serveis en exclusiva per a l'empresa i a no treballar per a cap altra durant la vigència del contracte."
+          }
+        }
+      ],
+      "info": {
+        "a": "present",
+        "b": "present",
+        "c": "present",
+        "d": "present",
+        "e": "present",
+        "f": "present",
+        "g": "present",
+        "h": "present",
+        "i": "present",
+        "j": "present",
+        "k": "present",
+        "l": "present",
+        "m": "present",
+        "n": "present",
+        "o": "present",
+        "p": "present",
+        "q": "present"
+      },
+      "history": null,
+      "historyIncomplete": false,
+      "offer": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "partial": false
+      },
+      "items": [
+        {
+          "id": "smi_annual",
+          "status": "within_limit"
+        },
+        {
+          "id": "smi_monthly",
+          "status": "not_entered"
+        },
+        {
+          "id": "fixed_term_presumption",
+          "status": "within_limit"
+        },
+        {
+          "id": "trial_limits",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_40",
+          "status": "within_limit"
+        },
+        {
+          "id": "daily_9",
+          "status": "within_limit"
+        },
+        {
+          "id": "rest_12",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_rest_36",
+          "status": "within_limit"
+        },
+        {
+          "id": "break_15",
+          "status": "within_limit"
+        },
+        {
+          "id": "holidays_30",
+          "status": "within_limit"
+        },
+        {
+          "id": "extra_pays",
+          "status": "within_limit"
+        }
+      ],
+      "clauses": [
+        {
+          "label": "exclusivity",
+          "point": {
+            "id": "exclusivity",
+            "status": "review_it"
+          },
+          "checkedIn": null
+        }
+      ],
+      "informationDuty": {
+        "applies": true,
+        "moment": "on_request",
+        "flagged": []
+      },
+      "offer": null,
+      "offerPass": false
+    }
+  }
+}

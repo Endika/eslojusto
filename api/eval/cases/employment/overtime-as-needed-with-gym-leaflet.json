@@ -1,0 +1,347 @@
+{
+  "id": "overtime-as-needed-with-gym-leaflet",
+  "description": "ET arts. 35.2 and 35.4: overtime is compulsory only if agreed and always within eighty hours a year; «las que la empresa requiera» sets no figure, so it is to review. A gym leaflet in the pack matters to nothing.",
+  "eval": true,
+  "today": "2026-10-08",
+  "pages": [
+    {
+      "template": "employment/permanent-es",
+      "data": {
+        "employerBlock": "Ficticia Mudanzas Ejemplo, S. L., con CIF B91452436, código de cuenta de cotización 63 1461327 00 y domicilio en Calle de la Prueba Ficticia, 36, Bilbao.",
+        "workplace": "Bilbao",
+        "category": "Mozo de mudanzas",
+        "agreementText": "convenio colectivo de transporte de mercancías",
+        "startDateText": "11 de mayo de 2026",
+        "modalityText": "Jornada completa",
+        "durationText": "Se concierta por tiempo indefinido.",
+        "hoursText": "La jornada será de 40 horas semanales de trabajo efectivo.",
+        "scheduleText": "de lunes a viernes, de 09:00 a 14:00 y de 15:00 a 18:00.",
+        "salaryText": "La retribución bruta será de 1.550,00 € mensuales, en 14 pagas.",
+        "salaryParts": [
+          {
+            "concept": "Salario base",
+            "amount": "1.550,00 €"
+          }
+        ],
+        "extraPaysText": "Las dos pagas extraordinarias se abonarán en junio y diciembre.",
+        "holidaysText": "Las vacaciones anuales retribuidas serán de 30 días naturales.",
+        "trialText": "Se establece un periodo de prueba de 2 meses.",
+        "infoText": "La empresa entrega en documento aparte la información sobre los elementos esenciales del contrato.",
+        "clauses": [
+          {
+            "title": "Octava. Horas extraordinarias",
+            "text": "La persona trabajadora realizará las horas extraordinarias que la empresa le requiera según las necesidades del servicio."
+          }
+        ],
+        "city": "Bilbao",
+        "signedOnText": "7 de mayo de 2026",
+        "workerName": "Persona Trabajadora Ficticia H",
+        "workerDni": "70740711F",
+        "workerNaf": "41 34074038 00",
+        "iban": "ES10 2133 5231 4310 0407 4081"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "kind": "other",
+      "data": {
+        "variant": "gym"
+      },
+      "degrade": {
+        "rotate": 3.1,
+        "shadow": 0.48,
+        "blur": 1.2,
+        "dark": 0.16,
+        "crop": 0.03,
+        "jpegQuality": 0.6
+      },
+      "readability": "not_labour_document"
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "employerType": "company",
+        "signedOn": "2026-05-07",
+        "startDate": "2026-05-11",
+        "modality": "permanent",
+        "partTime": false,
+        "salaryAmount": 1550,
+        "salaryPeriod": "month",
+        "payments": 14,
+        "workplaceRegion": "PV",
+        "weeklyHours": 40,
+        "trialAmount": 2,
+        "trialUnit": "months",
+        "holidayDays": 30,
+        "holidayUnit": "calendar",
+        "overtimeAgreed": "as_needed"
+      },
+      "lists": {
+        "salaryParts": [
+          {
+            "amount": 1550,
+            "kind": "base"
+          }
+        ],
+        "clauses": [
+          {
+            "label": "mandatory_overtime"
+          }
+        ]
+      }
+    },
+    "input": {
+      "relationship": "common",
+      "viaTempAgency": false,
+      "relief": false,
+      "under18": false,
+      "writtenContract": true,
+      "startDate": "2026-05-11",
+      "endDate": null,
+      "signedOn": "2026-05-07",
+      "modality": "permanent",
+      "extensions": 0,
+      "causeStated": null,
+      "circumstancesStated": null,
+      "replacedPersonNamed": null,
+      "replacementCauseStated": null,
+      "discontinuous": null,
+      "training": null,
+      "salary": {
+        "amount": 1550,
+        "period": "month",
+        "payments": 14,
+        "prorated": false,
+        "breakdown": [
+          {
+            "kind": "base",
+            "amount": 1550
+          }
+        ],
+        "inKind": null
+      },
+      "contractHours": {
+        "weekly": 40,
+        "annual": null
+      },
+      "fullTimeHours": null,
+      "agreement": {
+        "named": true,
+        "categoryAnnualSalary": null,
+        "annualHours": null,
+        "holidayDays": null,
+        "trialMonths": null
+      },
+      "payslips": [],
+      "trial": {
+        "amount": 2,
+        "unit": "months"
+      },
+      "technical": false,
+      "smallCompany": false,
+      "sameDutiesBefore": false,
+      "afterTraining": false,
+      "schedule": [
+        {
+          "day": 1,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        }
+      ],
+      "shifts": false,
+      "nightWorker": false,
+      "irregular": false,
+      "overtimeAgreed": {
+        "hoursPerYear": "as_needed",
+        "paidInMoney": null
+      },
+      "partTime": null,
+      "remoteShare": null,
+      "realWeeklyHours": null,
+      "holidays": {
+        "days": 30,
+        "unit": "calendar",
+        "workDaysPerWeek": 5,
+        "includedInSalary": false
+      },
+      "extraPays": {
+        "count": 2,
+        "prorated": false
+      },
+      "clauses": [
+        {
+          "label": "mandatory_overtime",
+          "months": null,
+          "compensationStated": null,
+          "trainingDescribed": null,
+          "waivedRight": null,
+          "costsOnWorker": null,
+          "literal": {
+            "text": "La persona trabajadora realizará las horas extraordinarias que la empresa le requiera según las necesidades del servicio."
+          }
+        }
+      ],
+      "info": {
+        "a": "present",
+        "b": "present",
+        "c": "present",
+        "d": "present",
+        "e": "present",
+        "f": "present",
+        "g": "present",
+        "h": "present",
+        "i": "present",
+        "j": "present",
+        "k": "present",
+        "l": "present",
+        "m": "present",
+        "n": "present",
+        "o": "present",
+        "p": "present",
+        "q": "present"
+      },
+      "history": null,
+      "historyIncomplete": false,
+      "offer": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "partial": false
+      },
+      "items": [
+        {
+          "id": "smi_annual",
+          "status": "within_limit"
+        },
+        {
+          "id": "smi_monthly",
+          "status": "not_entered"
+        },
+        {
+          "id": "fixed_term_presumption",
+          "status": "within_limit"
+        },
+        {
+          "id": "trial_limits",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_40",
+          "status": "within_limit"
+        },
+        {
+          "id": "daily_9",
+          "status": "within_limit"
+        },
+        {
+          "id": "rest_12",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_rest_36",
+          "status": "within_limit"
+        },
+        {
+          "id": "break_15",
+          "status": "within_limit"
+        },
+        {
+          "id": "overtime_cap_80",
+          "status": "review_it"
+        },
+        {
+          "id": "holidays_30",
+          "status": "within_limit"
+        },
+        {
+          "id": "extra_pays",
+          "status": "within_limit"
+        }
+      ],
+      "clauses": [
+        {
+          "label": "mandatory_overtime",
+          "point": null,
+          "checkedIn": "overtime_cap_80"
+        }
+      ],
+      "informationDuty": {
+        "applies": true,
+        "moment": "on_request",
+        "flagged": []
+      },
+      "offer": null,
+      "offerPass": false
+    }
+  }
+}

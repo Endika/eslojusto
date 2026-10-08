@@ -1,0 +1,329 @@
+{
+  "id": "galician-retention-30-months",
+  "description": "ET art. 21.4: a commitment to stay after specialised training paid by the company lasts two years at most; this Galician contract asks for 30 months.",
+  "eval": true,
+  "today": "2026-10-08",
+  "pages": [
+    {
+      "template": "employment/permanent-gl",
+      "data": {
+        "employerBlock": "Ficticia Naval Exemplo, S. A., con CIF B91425010, código de conta de cotización 61 1445489 00 e domicilio na rúa da Proba Ficticia, en Lugo.",
+        "workplace": "Lugo",
+        "category": "Soldador",
+        "agreementText": "convenio colectivo do metal da provincia",
+        "startDateText": "19 de xaneiro de 2026",
+        "modalityText": "Xornada completa",
+        "durationText": "Concértase por tempo indefinido.",
+        "hoursText": "A xornada será de 40 horas semanais de traballo efectivo.",
+        "scheduleText": "de luns a venres, de 9:00 a 14:00 e de 15:00 a 18:00.",
+        "salaryText": "A retribución bruta será de 1.750,00 € mensuais, en 14 pagas.",
+        "salaryParts": [
+          {
+            "concept": "Salario base",
+            "amount": "1.750,00 €"
+          }
+        ],
+        "extraPaysText": "As dúas pagas extraordinarias aboaranse en xuño e decembro.",
+        "holidaysText": "As vacacións anuais retribuídas serán de 30 días naturais.",
+        "trialText": "Establécese un período de proba de 2 meses.",
+        "infoText": "A empresa entrega en documento á parte a información sobre os elementos esenciais do contrato.",
+        "clauses": [
+          {
+            "title": "Oitava. Permanencia",
+            "text": "Tras a formación en soldadura especializada que paga a empresa, a persoa traballadora comprométese a permanecer nela durante 30 meses."
+          }
+        ],
+        "city": "Lugo",
+        "signedOnText": "14 de xaneiro de 2026",
+        "workerName": "Persona Trabajadora Ficticia F",
+        "workerDni": "68271577S",
+        "workerNaf": "39 27160460 00",
+        "iban": "ES37 2131 5217 4110 0382 7167"
+      },
+      "degrade": {
+        "rotate": -1.4,
+        "shadow": 0.28,
+        "blur": 0.6,
+        "dark": 0.07,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "employerType": "company",
+        "signedOn": "2026-01-14",
+        "startDate": "2026-01-19",
+        "modality": "permanent",
+        "partTime": false,
+        "salaryAmount": 1750,
+        "salaryPeriod": "month",
+        "payments": 14,
+        "workplaceRegion": "GA",
+        "weeklyHours": 40,
+        "trialAmount": 2,
+        "trialUnit": "months",
+        "holidayDays": 30,
+        "holidayUnit": "calendar"
+      },
+      "lists": {
+        "salaryParts": [
+          {
+            "amount": 1750,
+            "kind": "base"
+          }
+        ],
+        "clauses": [
+          {
+            "label": "retention",
+            "months": 30,
+            "trainingDescribed": true
+          }
+        ]
+      }
+    },
+    "input": {
+      "relationship": "common",
+      "viaTempAgency": false,
+      "relief": false,
+      "under18": false,
+      "writtenContract": true,
+      "startDate": "2026-01-19",
+      "endDate": null,
+      "signedOn": "2026-01-14",
+      "modality": "permanent",
+      "extensions": 0,
+      "causeStated": null,
+      "circumstancesStated": null,
+      "replacedPersonNamed": null,
+      "replacementCauseStated": null,
+      "discontinuous": null,
+      "training": null,
+      "salary": {
+        "amount": 1750,
+        "period": "month",
+        "payments": 14,
+        "prorated": false,
+        "breakdown": [
+          {
+            "kind": "base",
+            "amount": 1750
+          }
+        ],
+        "inKind": null
+      },
+      "contractHours": {
+        "weekly": 40,
+        "annual": null
+      },
+      "fullTimeHours": null,
+      "agreement": {
+        "named": true,
+        "categoryAnnualSalary": null,
+        "annualHours": null,
+        "holidayDays": null,
+        "trialMonths": null
+      },
+      "payslips": [],
+      "trial": {
+        "amount": 2,
+        "unit": "months"
+      },
+      "technical": false,
+      "smallCompany": false,
+      "sameDutiesBefore": false,
+      "afterTraining": false,
+      "schedule": [
+        {
+          "day": 1,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 2,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "slots": [
+            {
+              "from": "09:00",
+              "to": "14:00"
+            },
+            {
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        }
+      ],
+      "shifts": false,
+      "nightWorker": false,
+      "irregular": false,
+      "overtimeAgreed": null,
+      "partTime": null,
+      "remoteShare": null,
+      "realWeeklyHours": null,
+      "holidays": {
+        "days": 30,
+        "unit": "calendar",
+        "workDaysPerWeek": 5,
+        "includedInSalary": false
+      },
+      "extraPays": {
+        "count": 2,
+        "prorated": false
+      },
+      "clauses": [
+        {
+          "label": "retention",
+          "months": 30,
+          "compensationStated": null,
+          "trainingDescribed": true,
+          "waivedRight": null,
+          "costsOnWorker": null,
+          "literal": {
+            "text": "Tras a formación en soldadura especializada que paga a empresa, a persoa traballadora comprométese a permanecer nela durante 30 meses."
+          }
+        }
+      ],
+      "info": {
+        "a": "present",
+        "b": "present",
+        "c": "present",
+        "d": "present",
+        "e": "present",
+        "f": "present",
+        "g": "present",
+        "h": "present",
+        "i": "present",
+        "j": "present",
+        "k": "present",
+        "l": "present",
+        "m": "present",
+        "n": "present",
+        "o": "present",
+        "p": "present",
+        "q": "present"
+      },
+      "history": null,
+      "historyIncomplete": false,
+      "offer": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "partial": false
+      },
+      "items": [
+        {
+          "id": "smi_annual",
+          "status": "within_limit"
+        },
+        {
+          "id": "smi_monthly",
+          "status": "not_entered"
+        },
+        {
+          "id": "fixed_term_presumption",
+          "status": "within_limit"
+        },
+        {
+          "id": "trial_limits",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_40",
+          "status": "within_limit"
+        },
+        {
+          "id": "daily_9",
+          "status": "within_limit"
+        },
+        {
+          "id": "rest_12",
+          "status": "within_limit"
+        },
+        {
+          "id": "weekly_rest_36",
+          "status": "within_limit"
+        },
+        {
+          "id": "break_15",
+          "status": "within_limit"
+        },
+        {
+          "id": "holidays_30",
+          "status": "within_limit"
+        },
+        {
+          "id": "extra_pays",
+          "status": "within_limit"
+        }
+      ],
+      "clauses": [
+        {
+          "label": "retention",
+          "point": {
+            "id": "retention",
+            "status": "over_legal_limit"
+          },
+          "checkedIn": null
+        }
+      ],
+      "informationDuty": {
+        "applies": true,
+        "moment": "on_request",
+        "flagged": []
+      },
+      "offer": null,
+      "offerPass": true
+    }
+  }
+}

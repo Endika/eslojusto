@@ -19,7 +19,8 @@
     "rent-indices:review": "vitest run tests/content/rent-indices.test.ts --reporter=verbose",
     "employment:review": "vitest run tests/engine/employment/monthly-review.test.ts --reporter=verbose",
     "indices:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indices.mjs --check",
-    "rental-bank": "node scripts/rental-bank/render.mjs"
+    "rental-bank": "node scripts/rental-bank/render.mjs",
+    "employment-bank": "node scripts/rental-bank/render.mjs --cases api/eval/cases/employment --out api/eval/out/employment"
   },
   "dependencies": {
     "@fontsource-variable/golos-text": "^5.3.0",

@@ -1,10 +1,12 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { EMPLOYMENT_PERSON_KEYS } from '../eval/employment-schema';
 import { PERSON_KEYS } from '../eval/schema';
-import { BANK } from './support/bank';
+import { BANK, EMPLOYMENT_BANK } from './support/bank';
 
-// Every person in the bank is invented, and so are their identifiers: each DNI or NIE carries a
-// wrong check letter and each IBAN wrong check digits, so none can belong to anyone.
+// Every person and company in the banks is invented, and so are their identifiers: each DNI or NIE
+// carries a wrong check letter, and each IBAN, Social Security number (NAF), employer account code
+// (CCC) and CIF wrong check digits, so none can belong to anyone.
 
 const DNI_LETTERS = 'TRWAGMYFPDXBNJZSQVHLCKE';
 
@@ -26,17 +28,56 @@ function validIban(iban: string): boolean {
   return r === 1;
 }
 
+// A NAF or a CCC: province, number and two check digits, the remainder by 97 of the first two.
+// Read both ways the number may be taken, a valid one under either counts as valid.
+function validMod97(id: string, numberDigits: number): boolean {
+  const digits = id.replace(/[\s/-]/g, '');
+  if (digits.length !== 2 + numberDigits + 2) return false;
+  const province = BigInt(digits.slice(0, 2));
+  const number = BigInt(digits.slice(2, 2 + numberDigits));
+  const check = BigInt(digits.slice(2 + numberDigits));
+  return [10n ** 7n, 10n ** 8n].some((scale) => (province * scale + number) % 97n === check);
+}
+const validNaf = (id: string): boolean => validMod97(id, 8);
+const validCcc = (id: string): boolean => validMod97(id, 7);
+
+const CIF_LETTERS = 'JABCDEFGHI';
+
+// The control of a CIF: digits in even places doubled and their figures summed, plus the odd
+// ones; ten minus the last figure, as a digit or as a letter.
+function validCif(id: string): boolean {
+  const m = /^([ABCDEFGHJNPQRSUVW])(\d{7})([0-9A-J])$/.exec(id.toUpperCase());
+  if (!m) return false;
+  let sum = 0;
+  [...(m[2] ?? '')].forEach((ch, i) => {
+    const n = Number(ch) * (i % 2 === 0 ? 2 : 1);
+    sum += Math.floor(n / 10) + (n % 10);
+  });
+  const control = (10 - (sum % 10)) % 10;
+  return m[3] === String(control) || m[3] === CIF_LETTERS[control];
+}
+
 const ROOTS = ['../eval/cases/', '../eval/templates/', '../../scripts/rental-bank/'];
-const FILES = ROOTS.flatMap((root) => {
-  const dir = new URL(root, import.meta.url);
-  return readdirSync(dir).map((name) => ({
-    name: `${root}${name}`,
-    text: readFileSync(new URL(name, dir), 'utf8'),
-  }));
-});
+
+function filesUnder(root: string, dir: URL): { name: string; text: string }[] {
+  return readdirSync(dir).flatMap((name) => {
+    const url = new URL(name, dir);
+    return statSync(url).isDirectory()
+      ? filesUnder(`${root}${name}/`, new URL(`${name}/`, dir))
+      : [{ name: `${root}${name}`, text: readFileSync(url, 'utf8') }];
+  });
+}
+const FILES = ROOTS.flatMap((root) => filesUnder(root, new URL(root, import.meta.url)));
+const EMPLOYMENT_FILES = FILES.filter((f) => f.name.includes('/employment/'));
 
 const DNI_LIKE = /\b(?:\d{8}|[XYZ]\d{7})-?[A-Z]\b/g;
 const IBAN_LIKE = /\bES\d{2}(?: ?\d{4}){5}\b/g;
+const NAF_LIKE = /\b\d{2}[ /-]?\d{8}[ /-]?\d{2}\b/g;
+const CCC_LIKE = /\b\d{2}[ /-]\d{7}[ /-]\d{2}\b/g;
+const CIF_LIKE = /\b[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]\b/g;
+
+const found = (files: readonly { name: string; text: string }[], pattern: RegExp) =>
+  files.flatMap((f) => [...f.text.matchAll(pattern)].map((m) => ({ file: f.name, id: m[0] })));
 
 describe('the checks themselves', () => {
   // Identifiers built here with their right check letter and digits, then spoiled by one.
@@ -74,6 +115,34 @@ describe('the checks themselves', () => {
   );
 });
 
+describe('the checks of employment identifiers', () => {
+  const mod97 = (province: string, number: string) =>
+    `${province}${number}${String(Number((BigInt(province) * 10n ** 8n + BigInt(number)) % 97n)).padStart(2, '0')}`;
+
+  it('accept a NAF with its check digits and refuse it with others', () => {
+    const naf = mod97('28', '12345678');
+    expect(validNaf(naf)).toBe(true);
+    expect(
+      validNaf(`${naf.slice(0, 10)}${String((Number(naf.slice(10)) + 1) % 97).padStart(2, '0')}`),
+    ).toBe(false);
+  });
+
+  it('accept a CCC with its check digits', () => {
+    const p = 28n;
+    const n = 1234567n;
+    const ccc = `28 1234567 ${String(Number((p * 10n ** 7n + n) % 97n)).padStart(2, '0')}`;
+    expect(validCcc(ccc)).toBe(true);
+    expect(validCcc(`${ccc.slice(0, 11)}${ccc.endsWith('96') ? '00' : '96'}`)).toBe(false);
+  });
+
+  it('accept a CIF with its control digit or letter, and refuse another', () => {
+    // 1234567: 2+2+6+4+(1+0)+6+(1+4) = 26, control 4, letter D.
+    expect(validCif('B12345674')).toBe(true);
+    expect(validCif('Q1234567D')).toBe(true);
+    expect(validCif('B12345675')).toBe(false);
+  });
+});
+
 describe('the synthetic bank', () => {
   it('holds DNIs and IBANs to check, and every one of them is invalid', () => {
     const dnis = FILES.flatMap((f) =>
@@ -88,6 +157,17 @@ describe('the synthetic bank', () => {
     for (const { file, id } of ibans) expect(validIban(id), `${file}: ${id}`).toBe(false);
   });
 
+  it('holds employment NAFs, CCCs and CIFs to check, and every one of them is invalid', () => {
+    const nafs = found(EMPLOYMENT_FILES, NAF_LIKE);
+    const cccs = found(EMPLOYMENT_FILES, CCC_LIKE);
+    const cifs = found(EMPLOYMENT_FILES, CIF_LIKE);
+    for (const list of [nafs, cccs, cifs])
+      expect(list.length).toBeGreaterThan(EMPLOYMENT_BANK.length);
+    for (const { file, id } of nafs) expect(validNaf(id), `${file}: ${id}`).toBe(false);
+    for (const { file, id } of cccs) expect(validCcc(id), `${file}: ${id}`).toBe(false);
+    for (const { file, id } of cifs) expect(validCif(id), `${file}: ${id}`).toBe(false);
+  });
+
   it('names only invented people', () => {
     for (const c of BANK)
       for (const page of c.pages)
@@ -96,6 +176,31 @@ describe('the synthetic bank', () => {
           if (name !== undefined)
             expect(name, `${c.id}: ${key}`).toMatch(/^Persona \w+ Ficticia [A-Z]$/);
         }
+  });
+
+  it('names only invented workers, people replaced and household employers', () => {
+    for (const c of EMPLOYMENT_BANK)
+      for (const page of c.pages)
+        for (const key of ['workerName', 'replacedName', 'employerPersonName'] as const) {
+          const name = page.data[key];
+          if (name !== undefined)
+            expect(name, `${c.id}: ${key}`).toMatch(/^Persona \w+ Ficticia [A-Z]$/);
+        }
+  });
+
+  it('names only companies that say they are invented', () => {
+    for (const c of EMPLOYMENT_BANK)
+      for (const page of c.pages) {
+        const name = page.data['companyName'];
+        if (name !== undefined) expect(name, c.id).toMatch(/Ficticia/);
+      }
+  });
+
+  it('keeps the employment person keys it scans for in the AI pass', () => {
+    const keys = new Set(
+      EMPLOYMENT_BANK.flatMap((c) => c.pages.flatMap((p) => Object.keys(p.data))),
+    );
+    for (const key of EMPLOYMENT_PERSON_KEYS) expect(keys).toContain(key);
   });
 
   it('keeps the person keys it scans for in the AI pass', () => {
