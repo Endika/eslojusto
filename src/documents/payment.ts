@@ -430,7 +430,22 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       if (which === 'letter')
         events.downloaded(
           which,
-          letterPrefilled(details, letterForm ? [...letterForm.typed.keys()] : undefined),
+          letterPrefilled(
+            details,
+            // Only the fields this letter asks for: one hidden, or kept for another letter, does
+            // not count.
+            letterForm
+              ? [...letterForm.typed]
+                  .filter(([, el]) => {
+                    const only = el.closest<HTMLElement>('[data-letter-kind]');
+                    return (
+                      el.closest('[hidden]') === null &&
+                      (only === null || only.dataset['letterKind'] === kind)
+                    );
+                  })
+                  .map(([f]) => f)
+              : undefined,
+          ),
           kind,
         );
       else events.downloaded(which);

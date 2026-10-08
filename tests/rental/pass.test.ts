@@ -166,6 +166,24 @@ describe('the rental pass downloads', () => {
     ]);
   });
 
+  it('counts as filled only the fields the letter asks for', async () => {
+    const { payment, events } = setUp();
+    payment.show(review(['deposit_return', 'rent_review']));
+    await flush();
+    for (const field of ['name', 'id', 'landlord', 'address', 'place']) type(field, 'Ficticio');
+    // The account goes only on the deposit's letter: left empty, the rent letter is still full.
+    await click('button[data-letter-kind="rent_review"]');
+    await click('button[data-letter-kind="deposit_return"]');
+    payment.show(review(['rent_review']));
+    type('iban', 'ES00 0000');
+    await click('button[data-letter-kind="rent_review"]');
+    expect(events.log.slice(1)).toEqual([
+      ['downloaded', 'letter', 'all', 'rent_review'],
+      ['downloaded', 'letter', 'some', 'deposit_return'],
+      ['downloaded', 'letter', 'all', 'rent_review'],
+    ]);
+  });
+
   it('a rental field with a character the fonts lack keeps its blank line, with a warning', async () => {
     const { payment } = setUp();
     payment.show(review(['deposit_return']));
