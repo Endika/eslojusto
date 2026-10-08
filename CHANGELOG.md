@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.21.0](https://github.com/Endika/eslojusto/compare/v1.20.0...v1.21.0) (2026-10-08)
+
+
+### Features
+
+* **rental:** add the PDF report and the deposit and rent letters ([828755b](https://github.com/Endika/eslojusto/commit/828755bf1bd1eee92f9ba92ce723b103b9d0f6ef))
+
+
+### Bug Fixes
+
+* **documents:** count only the fields a letter asks for as prefilled ([d8a7491](https://github.com/Endika/eslojusto/commit/d8a7491a84f2bd53dfa9c51f6070d6bbf2edc6b3))
+* **rental:** keep the report's rows within the page and let long letter lines wrap ([45f94f4](https://github.com/Endika/eslojusto/commit/45f94f46ef840dedbf2c0694cbfd11e2e3e58551))
+* **rental:** word caps as caps, ask for late interest alone and only the counted interest ([9126e6f](https://github.com/Endika/eslojusto/commit/9126e6f979de79599ea129050c8c4d307d2bc7b4))
+
 ## [1.20.0](https://github.com/Endika/eslojusto/compare/v1.19.0...v1.20.0) (2026-10-08)
 
 
