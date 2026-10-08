@@ -32,6 +32,13 @@ describe('the final pay read', () => {
   });
 });
 
+describe('the rental read', () => {
+  it('asks for exactly what it asked when it shipped', () => {
+    expect(toolInputSchema('rental')).toEqual(JSON.parse(fixture('rental-tool-schema.json')));
+    expect(SYSTEM_PROMPTS.rental).toBe(fixture('rental-prompt.txt'));
+  });
+});
+
 describe('toolInputSchema', () => {
   it('is closed at every level', () => {
     const all = objects(toolInputSchema('final_pay'));
