@@ -244,7 +244,7 @@ export const LANDINGS: Record<LandingId, Landing> = {
       {
         question: '¿En qué plazo se pide el paro?',
         answer:
-          'En los 15 días hábiles siguientes al fin del contrato, o al fin de las vacaciones no disfrutadas que te pague el finiquito. Pedirlo más tarde resta días de paro (art. 268 LGSS).',
+          'En los 15 días hábiles siguientes al fin del contrato, o al fin de las vacaciones no disfrutadas que te pague el finiquito, y antes tienes que inscribirte como demandante de empleo. Pedirlo más tarde resta días de paro (arts. 266 y 268 LGSS).',
       },
     ],
     related: ['benefit_duration', 'benefit_resignation', 'benefit_disciplinary'],

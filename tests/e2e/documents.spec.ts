@@ -229,7 +229,9 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   await expect(summary).toContainText(
     'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
   );
-  await expect(summary).toContainText('El paro se pide en los 15 días hábiles');
+  await expect(summary).toContainText(
+    'Para cobrar el paro tienes que inscribirte como demandante de empleo',
+  );
   const result = page.locator('#resultado');
   await expectNoDetail(result);
 

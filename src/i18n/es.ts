@@ -320,9 +320,9 @@ export const es = {
     'Estas cifras suponen jornada completa; con jornada parcial son menores.',
   'result.benefit_duration': 'Cuánto tiempo',
   'result.benefit_contributed': 'Días cotizados',
-  'result.benefit_deadline': 'Plazo para pedirlo',
+  'result.benefit_deadline': 'Cómo y cuándo pedirlo',
   'result.benefit_deadline_text':
-    'Se pide en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (art. 268 LGSS).',
+    'Sin inscribirte como demandante de empleo no hay paro: date de alta en el servicio de empleo de tu comunidad y pide la prestación al SEPE en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días; si lo pides tarde, pierdes los días de retraso (arts. 266 y 268 LGSS).',
   'result.benefit_work_history':
     'Tu vida laboral muestra cada alta y cada baja y los días cotizados:',
   'result.benefit_work_history_link': 'informe de tu vida laboral (sede de la Seguridad Social)',
@@ -554,7 +554,7 @@ export const es = {
   'client.summary.dismissal_deadline':
     'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
   'client.summary.benefit_deadline':
-    'El paro se pide en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (art. 268 LGSS).',
+    'Para cobrar el paro tienes que inscribirte como demandante de empleo y pedirlo en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (arts. 266 y 268 LGSS).',
 
   'client.status.below_minimum': 'Por debajo del mínimo legal: faltan {importe}',
   'client.status.matches': 'Coincide con el mínimo legal',
