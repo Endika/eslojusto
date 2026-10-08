@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.27.0](https://github.com/Endika/eslojusto/compare/v1.26.0...v1.27.0) (2026-10-08)
+
+
+### Features
+
+* **home:** group the reviews by theme in compact cards ([8fd770c](https://github.com/Endika/eslojusto/commit/8fd770cde369b1e55ec49b3bfd841e610f8933fd))
+
+
+### Bug Fixes
+
+* **home:** put the IRAV link right under the rental card ([d7779e1](https://github.com/Endika/eslojusto/commit/d7779e1e0b8ee1f88e10c45545cd43f54076de39))
+
 ## [1.26.0](https://github.com/Endika/eslojusto/compare/v1.25.0...v1.26.0) (2026-10-08)
 
 
