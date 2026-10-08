@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.19.0](https://github.com/Endika/eslojusto/compare/v1.18.0...v1.19.0) (2026-10-08)
+
+
+### Features
+
+* **rental:** read lease documents and prefill the review ([71ef72b](https://github.com/Endika/eslojusto/commit/71ef72bedd983181f4a681fcfaf021840e8a8ce7))
+
+
+### Bug Fixes
+
+* **rental:** attribute rises to their anniversary, count each receipt once and keep the API's checks ([dae0912](https://github.com/Endika/eslojusto/commit/dae091252a98b4bc5b073186ae439d3823932f24))
+* **rental:** keep every change in sparse receipts and date rises by month ([45093d4](https://github.com/Endika/eslojusto/commit/45093d4404fb8ab5da144a14301e3d25689b2eb2))
+* **rental:** leave a change across two anniversaries to the person, with a note ([f9cb11f](https://github.com/Endika/eslojusto/commit/f9cb11f741cbe84a9e19678f303bf2970c19456f))
+* **rental:** name the DNI in the consent and the detail in the pass recovery ([d74bdcf](https://github.com/Endika/eslojusto/commit/d74bdcf28b89ebd34f0b0cd303e2a42e8b3a089c))
+
 ## [1.18.0](https://github.com/Endika/eslojusto/compare/v1.17.0...v1.18.0) (2026-10-08)
 
 
