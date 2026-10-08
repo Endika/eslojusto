@@ -1598,7 +1598,7 @@ export const es = {
 
   'employment.salary.question': 'Tu salario',
   'employment.salary.help':
-    'Lo que dice el contrato, en bruto. Si no tienes un dato opcional, déjalo en blanco.',
+    'Lo que dice el contrato, en bruto. Se compara con el SMI del año en que empezó; para los años siguientes hacen falta tus nóminas, porque te lo pueden haber subido. Si no tienes un dato opcional, déjalo en blanco.',
   'employment.salary.amount': 'Salario bruto',
   'employment.salary.amount_hint': 'En euros, antes de impuestos y cotizaciones.',
   'employment.salary.period': '¿Por qué periodo es esa cifra?',
@@ -2187,6 +2187,8 @@ export const es = {
     '{year}: SMI de {minimum}; tu salario sin las pagas extra, {pay}. Puede quedar por debajo, pero falta el importe de las pagas extra.',
   'client.employment.calculation.minimum_wage.year.training_effective_work':
     '{year}: SMI de {minimum}; tu salario, {pay}. En formación en alternancia el mínimo va en proporción al tiempo de trabajo efectivo, que esta revisión no calcula.',
+  'client.employment.calculation.minimum_wage.year.salary_may_have_risen':
+    '{year}: SMI de {minimum}; el salario de tu contrato, {pay}, quedaría por debajo, pero no se sabe si te lo subieron después de firmarlo. Tus nóminas de {year} lo dirán.',
   'client.employment.calculation.minimum_wage.temporary.within':
     '{year}: mínimo por jornada de {minimum} en contratos de hasta 120 días; tu salario por día, {pay}. No queda por debajo.',
   'client.employment.calculation.minimum_wage.temporary.below':
@@ -2201,6 +2203,8 @@ export const es = {
     '{year}: mínimo por jornada de {minimum}; tu salario por día, {pay}. Falta el importe de las pagas extra.',
   'client.employment.calculation.minimum_wage.temporary.training_effective_work':
     '{year}: mínimo por jornada de {minimum}; tu salario por día, {pay}. En formación en alternancia el mínimo va en proporción al trabajo efectivo.',
+  'client.employment.calculation.minimum_wage.temporary.salary_may_have_risen':
+    '{year}: mínimo por jornada de {minimum}; el salario por día de tu contrato, {pay}, quedaría por debajo, pero no se sabe si te lo subieron en {year}. Tus nóminas de ese año lo dirán.',
   'client.employment.calculation.minimum_wage.discontinuous_periods':
     'En un fijo discontinuo solo cuentan los periodos de actividad, así que no se da un total.',
   'client.employment.calculation.minimum_wage.total': 'En total, {total}.',
@@ -2228,6 +2232,10 @@ export const es = {
     'Nómina de {month} de {year}: {paid}, por debajo de los {minimum} de ese mes; con las pagas extra aparte, lo que cuenta es el cómputo anual.',
   'client.employment.calculation.minimum_wage.payslip.prorated_count_unknown':
     'Nómina de {month} de {year}: {paid} con parte de las pagas extra; no se sabe cuántas van prorrateadas, así que lo que cuenta es el cómputo anual (mínimo de {minimum}).',
+  'client.employment.calculation.minimum_wage.payslip.annual_within':
+    'Nómina de {month} de {year}: {paid}, por debajo de los {minimum} de ese mes; pero el SMI se compara en el conjunto del año, y tu salario de {year} no queda por debajo. Un mes solo no basta.',
+  'client.employment.calculation.minimum_wage.payslip.annual_unproven':
+    'Nómina de {month} de {year}: {paid}, por debajo de los {minimum} de ese mes; el SMI se compara en el conjunto del año, así que hacen falta las demás nóminas de {year} para saberlo.',
   'client.employment.calculation.minimum_wage.payslip.none': 'No has metido nóminas.',
   'client.employment.calculation.minimum_wage.in_kind':
     'En especie, {inKind} al año; en dinero, {money}. La especie es el {percent} % del salario y el máximo es el 30 %.',
@@ -2447,6 +2455,12 @@ export const es = {
     'La ley prevé 2 pagas extra al año; puede que la otra vaya prorrateada.',
   'client.employment.calculation.extra_pays.prorated_by_agreement':
     'Las pagas extra van prorrateadas: el art. 31 prevé que eso lo acuerde el convenio.',
+  'client.employment.calculation.extra_pays.none_over_minimum':
+    'Tu salario de {year}, {annual} al año, llega al SMI, que es de {minimum}. El art. 31 da derecho a dos pagas extra, pero su importe lo fija tu convenio, que también puede repartirlas en las 12 nóminas: puede que tu salario ya las lleve dentro.',
+  'client.employment.calculation.extra_pays.none_below_minimum':
+    'Sin pagas extra, tu salario de {year}, {annual} al año, no llega al SMI, que es de {minimum} y ya cuenta las dos pagas (art. 31).',
+  'client.employment.calculation.extra_pays.none_pay_unknown':
+    'El art. 31 da derecho a dos pagas extra, y el convenio puede repartirlas en las 12 nóminas; sin saber tu salario al año no se puede comprobar si van dentro.',
   'client.employment.calculation.extra_pays.in_daily_minimum':
     'En un contrato temporal de hasta {days} pagado por días, el mínimo por jornada ya incluye las pagas extra, los domingos y los festivos (art. 4.1 del real decreto del SMI de cada año).',
   'client.employment.calculation.extra_pays.may_be_in_daily_minimum':

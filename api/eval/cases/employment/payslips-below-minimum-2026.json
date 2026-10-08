@@ -1,6 +1,6 @@
 {
   "id": "payslips-below-minimum-2026",
-  "description": "ET art. 27.1 and RD 126/2026 arts. 1 and 3.1: 1.184,00 € in 14 payments (16.576,00 €) met the 2025 minimum but is 518,00 € short of the 2026 one, 398,79 € up to 08-10-2026; each payslip is 37,00 € under the monthly 1.221,00 €, which, with the extra payments paid apart, only the year decides.",
+  "description": "ET art. 27.1 and RD 126/2026 arts. 1 and 3.1: 1.184,00 € in 14 payments (16.576,00 €) met the 2025 minimum, the year it was signed, and would be 518,00 € short of the 2026 one if never raised; three payslips are 37,00 € under the monthly 1.221,00 €, which, with the extra payments paid apart and the rest of 2026 unknown, only the year decides.",
   "eval": false,
   "today": "2026-10-08",
   "pages": [
@@ -444,11 +444,7 @@
       "items": [
         {
           "id": "smi_annual",
-          "status": "below_minimum",
-          "amount": {
-            "min": 398.79,
-            "max": 398.79
-          }
+          "status": "review_it"
         },
         {
           "id": "smi_monthly",
@@ -498,7 +494,7 @@
         "flagged": []
       },
       "offer": null,
-      "offerPass": true
+      "offerPass": false
     }
   }
 }

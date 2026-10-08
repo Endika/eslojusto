@@ -1,6 +1,6 @@
 {
   "id": "signed-2024-never-raised",
-  "description": "ET art. 27.1 with RD 145/2024, RD 87/2025 and RD 126/2026 art. 3.1: 1.134,00 € in 14 payments (15.876,00 €) met the 2024 minimum but is 700,00 € short of 2025 and 1.218,00 € short of 2026.",
+  "description": "ET art. 27.1 with RD 145/2024, RD 87/2025 and RD 126/2026 art. 3.1: 1.134,00 € in 14 payments (15.876,00 €) met the 2024 minimum, the year it was signed; it would be short of 2025 and 2026 if never raised, which only those years' payslips can tell.",
   "eval": false,
   "today": "2026-10-08",
   "pages": [
@@ -240,11 +240,7 @@
       "items": [
         {
           "id": "smi_annual",
-          "status": "below_minimum",
-          "amount": {
-            "min": 1637.69,
-            "max": 1637.69
-          }
+          "status": "review_it"
         },
         {
           "id": "smi_monthly",
@@ -294,7 +290,7 @@
         "flagged": []
       },
       "offer": null,
-      "offerPass": true
+      "offerPass": false
     }
   }
 }

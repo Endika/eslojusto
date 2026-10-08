@@ -121,25 +121,42 @@ describe('contract against the yearly minimum', () => {
     expect(short(twelveProrated).amount).toEqual({ min: 120, max: 120 });
   });
 
-  it('follows each year from 2024 with an unchanged 15.876 € up to 07-10-2026', () => {
+  it('compares later years with the contract salary only as a doubt: it may have been raised', () => {
     const input = contract({ startDate: day('2024-03-01'), salary: yearly(15876) });
     const years = compareByYear(input, day('2026-10-07'), MINIMUM_WAGE);
     expect(years).toMatchObject([
       { kind: 'compared', year: 2024, verdict: 'within', shortfall: 0, accrued: 0 },
-      { kind: 'compared', year: 2025, verdict: 'below', shortfall: 700, days: 365, accrued: 700 },
-      // 1.218 € a year over the 280 days from 1 January to 7 October.
-      {
-        kind: 'compared',
-        year: 2026,
-        verdict: 'below',
-        shortfall: 1218,
-        days: 280,
-        accrued: 934.36,
-      },
+      { kind: 'compared', year: 2025, verdict: 'salary_may_have_risen', shortfall: 700 },
+      { kind: 'compared', year: 2026, verdict: 'salary_may_have_risen', shortfall: 1218 },
     ]);
     const f = contractFinding(input, '2026-10-07');
-    expect(f.amount).toEqual({ min: 1634.36, max: 1634.36 });
-    expect(f.calculation.map((p) => p.key)).toContain('minimum_wage.total');
+    expect(f).toMatchObject({ status: 'review_it', amount: null });
+    expect(f.calculation.map((p) => p.key)).toContain('minimum_wage.year.salary_may_have_risen');
+  });
+
+  it('counts nothing for a 2023 contract at 1.080 € × 14 reviewed in 2026', () => {
+    const input = contract({
+      startDate: day('2023-03-01'),
+      signedOn: day('2023-03-01'),
+      salary: salary({ amount: 1080, breakdown: [{ kind: 'base', amount: 1080 }] }),
+    });
+    const assessed = review(input, '2026-10-09');
+    const f = single(assessed[0]);
+    expect(f).toMatchObject({ status: 'review_it', amount: null });
+    expect(offerPass(assessed)).toBe(false);
+  });
+
+  it('takes the signing year as known when the contract is signed the year after it starts', () => {
+    const input = contract({
+      startDate: day('2025-12-01'),
+      signedOn: day('2026-01-10'),
+      salary: yearly(16000),
+    });
+    const years = compareByYear(input, day('2026-10-07'), MINIMUM_WAGE);
+    expect(years.map((y) => (y.kind === 'compared' ? y.verdict : y.kind))).toEqual([
+      'below',
+      'below',
+    ]);
   });
 
   it('prorates the first year by days', () => {
@@ -408,7 +425,8 @@ describe('a year whose minimum is not published yet', () => {
 
   it('computes the difference once the 2027 decree is injected', () => {
     const deps = { ...DEPS, minimumWage: withRow(ROW_2027) };
-    const f = contractFinding(input, '2027-03-01', deps);
+    const from2027 = { ...input, startDate: day('2027-01-01'), signedOn: day('2027-01-01') };
+    const f = contractFinding(from2027, '2027-03-01', deps);
     // 18.200 − 17.500 = 700 € a year, over the 60 days to 1 March.
     expect(f).toMatchObject({ status: 'below_minimum', amount: { min: 115.07, max: 115.07 } });
   });
@@ -525,12 +543,16 @@ describe('payslips', () => {
     expect(f.calculation.map((p) => p.key)).toContain('minimum_wage.payslip.not_compared');
   });
 
-  it('adds up the short prorated months', () => {
-    const input = proratedTwo(
-      payslip({ month: '2026-09', salaryInMoney: 1200, proratedExtraPay: 200 }),
-      payslip({ month: '2026-10', salaryInMoney: 1150, proratedExtraPay: 200 }),
-      payslip({ month: '2026-11', salaryInMoney: 500, incidents: true }),
-    );
+  it('adds up the short prorated months when the contract year falls short too', () => {
+    const input = {
+      ...proratedTwo(
+        payslip({ month: '2026-09', salaryInMoney: 1200, proratedExtraPay: 200 }),
+        payslip({ month: '2026-10', salaryInMoney: 1150, proratedExtraPay: 200 }),
+        payslip({ month: '2026-11', salaryInMoney: 500, incidents: true }),
+      ),
+      // 1.400 € × 12 = 16.800 € a year, under the 17.094 € of 2026.
+      salary: salary({ amount: 1400, prorated: true }),
+    };
     const f = single(byId(review(input, '2026-11-30'), 'smi_monthly'));
     // 24,50 € and 74,50 €.
     expect(f).toMatchObject({ status: 'below_minimum', amount: { min: 99, max: 99 } });
@@ -540,6 +562,40 @@ describe('payslips', () => {
       'minimum_wage.payslip.not_compared',
       'minimum_wage.total',
     ]);
+  });
+
+  it('leaves one low prorated payslip to review when the contract year reaches the minimum', () => {
+    // 1.500 € × 12 = 18.000 € a year; one month paid 1.400 € with both extras prorated.
+    const input = proratedTwo(payslip({ salaryInMoney: 1200, proratedExtraPay: 200 }));
+    expect(comparePayslips(input, MINIMUM_WAGE)[0]).toMatchObject({ verdict: 'below' });
+    const assessed = review(input, '2026-10-31');
+    const f = single(byId(assessed, 'smi_monthly'));
+    expect(f).toMatchObject({ status: 'review_it', amount: null });
+    expect(f.calculation.map((p) => p.key)).toEqual(['minimum_wage.payslip.annual_within']);
+    expect(offerPass(assessed)).toBe(false);
+  });
+
+  it('counts a later year only when every whole month of it has a short payslip', () => {
+    // Signed in 2025 at 1.200 € × 12 prorated (14.400 €); 2026 may have brought a raise.
+    const months = ['2026-01', '2026-02', '2026-03'];
+    const input = (entered: readonly string[]) => ({
+      ...contract({
+        startDate: day('2025-06-01'),
+        signedOn: day('2025-06-01'),
+        extraPays: { count: 2, prorated: true },
+        payslips: entered.map((month) =>
+          payslip({ month, salaryInMoney: 1200, proratedExtraPay: 200 }),
+        ),
+      }),
+      salary: salary({ amount: 1400, prorated: true }),
+    });
+    const partial = single(byId(review(input(months.slice(0, 2)), '2026-04-15'), 'smi_monthly'));
+    expect(partial).toMatchObject({ status: 'review_it', amount: null });
+    expect(partial.calculation.map((p) => p.key)).toContain('minimum_wage.payslip.annual_unproven');
+    const whole = single(byId(review(input(months), '2026-04-15'), 'smi_monthly'));
+    // 24,50 € a month over January to March.
+    expect(whole).toMatchObject({ status: 'below_minimum', amount: { min: 73.5, max: 73.5 } });
+    expect(contractFinding(input(months), '2026-04-15').status).toBe('review_it');
   });
 
   it('prorates the monthly minimum for part time', () => {

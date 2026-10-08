@@ -8,6 +8,7 @@ import type {
   SourceKind,
 } from '../../src/documents/contract';
 import { employmentPrefill } from '../../src/employment/prefill';
+import { MINIMUM_WAGE } from '../../src/engine/employment/data/minimum-wage';
 import { EMPLOYMENT_NORMS } from '../../src/engine/employment/data/norms';
 import { assessHolidaysAndPay } from '../../src/engine/employment/holidays-pay';
 import type { EmploymentInput } from '../../src/engine/employment/types';
@@ -150,10 +151,15 @@ describe('the contract', () => {
     expect(entry(q, 'extraPays')).toBeUndefined();
     expect(entry(q, 'extraProrated')).toBeUndefined();
     expect(q.notes).toContain(tr('client.employment.documents.extras_in_twelve'));
-    // What a derived 0 would have told: no extra pays at all, below the legal minimum, when the
-    // two the contract prorates are within it.
+    // What a derived 0 would have told on a low salary: no extra pays at all, below the legal
+    // minimum, when the two the contract prorates are within it.
+    const low = { ...engineInput().salary, amount: 1200, payments: 12 };
     const extraPays = (pays: EmploymentInput['extraPays']) =>
-      assessHolidaysAndPay(engineInput({ extraPays: pays }), EMPLOYMENT_NORMS)
+      assessHolidaysAndPay(
+        engineInput({ extraPays: pays, salary: { ...low, prorated: pays?.prorated ?? false } }),
+        EMPLOYMENT_NORMS,
+        MINIMUM_WAGE,
+      )
         .flatMap((a) => (a.kind === 'single' ? [a.finding] : []))
         .find((f) => f.id === 'extra_pays')?.status;
     expect(extraPays({ count: 0, prorated: false })).toBe('below_minimum');

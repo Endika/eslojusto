@@ -1,6 +1,6 @@
 {
   "id": "part-time-20-hours-below-minimum",
-  "description": "ET arts. 12.1 and 27.1, RD 87/2025 and RD 126/2026 art. 3.1: 20 of 40 hours earn half the yearly minimum (8.288,00 € in 2025, 8.547,00 € in 2026); 560,00 € in 14 payments is 7.840,00 €, short in both years.",
+  "description": "ET arts. 12.1 and 27.1, RD 87/2025 and RD 126/2026 art. 3.1: 20 of 40 hours earn half the yearly minimum (8.288,00 € in 2025, 8.547,00 € in 2026); 560,00 € in 14 payments is 7.840,00 €, short in 2025, the year it was signed; for 2026 the salary may have been raised, so only that year's payslips can tell.",
   "eval": false,
   "today": "2026-10-08",
   "pages": [
@@ -228,8 +228,8 @@
           "id": "smi_prorata",
           "status": "below_minimum",
           "amount": {
-            "min": 694.03,
-            "max": 694.03
+            "min": 149.74,
+            "max": 149.74
           }
         },
         {

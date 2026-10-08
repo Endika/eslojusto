@@ -121,7 +121,7 @@ export function reviewEmployment(
     assessTrialPeriod(input, norms),
     ...assessWorkingTime(input, norms),
     ...assessPartTime(input, norms),
-    ...assessHolidaysAndPay(input, norms),
+    ...assessHolidaysAndPay(input, norms, deps.minimumWage),
   ];
   const clauses = assessClauses(input, norms);
   const informationDuty = reviewInformationDuty(input, norms);

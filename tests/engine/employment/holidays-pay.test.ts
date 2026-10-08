@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { addDays, parseDate } from '../../../src/engine/date';
 import { phrase } from '../../../src/engine/employment/calculation';
+import { MINIMUM_WAGE } from '../../../src/engine/employment/data/minimum-wage';
 import { EMPLOYMENT_NORMS } from '../../../src/engine/employment/data/norms';
 import { assessHolidaysAndPay } from '../../../src/engine/employment/holidays-pay';
 import { round2 } from '../../../src/engine/money';
@@ -9,7 +10,7 @@ import type { EmploymentInput, Finding, Holidays } from '../../../src/engine/emp
 import { contract } from './input';
 
 const findings = (change: Partial<EmploymentInput>): Finding[] =>
-  assessHolidaysAndPay(contract(change), EMPLOYMENT_NORMS).map((a) => {
+  assessHolidaysAndPay(contract(change), EMPLOYMENT_NORMS, MINIMUM_WAGE).map((a) => {
     if (a.kind !== 'single') throw new Error('expected single findings');
     return a.finding;
   });
@@ -473,10 +474,46 @@ describe('extra payments (art. 31 ET)', () => {
     });
   });
 
-  it('no payment at all is below the minimum', () => {
-    expect(findingFor({ extraPays: { count: 0, prorated: false } }, 'extra_pays')).toMatchObject({
+  const twelve = (amount: number): Partial<EmploymentInput> => ({
+    startDate: parseDate('2026-01-01'),
+    signedOn: parseDate('2026-01-01'),
+    salary: { amount, period: 'month', payments: 12, prorated: false, breakdown: [], inKind: null },
+    extraPays: { count: 0, prorated: false },
+  });
+
+  it('no payment with 1.500 € × 12 over the minimum depends on the agreement', () => {
+    const f = findingFor(twelve(1500), 'extra_pays');
+    expect(f).toMatchObject({
+      status: 'depends_on_agreement',
+      amount: null,
+      calculation: [
+        phrase('extra_pays.count', { count: { integer: 0 } }),
+        phrase('extra_pays.none_over_minimum', {
+          year: { integer: 2026 },
+          annual: { euros: 18000 },
+          minimum: { euros: 17094 },
+        }),
+      ],
+    });
+    expect(offerPass([{ kind: 'single', finding: f }])).toBe(false);
+  });
+
+  it('no payment is below the minimum only when the year falls short of it too', () => {
+    // 1.400 € × 12 = 16.800 €, under the 17.094 € of 2026.
+    expect(findingFor(twelve(1400), 'extra_pays')).toMatchObject({
       status: 'below_minimum',
       amount: null,
+    });
+  });
+
+  it('no payment is to review when the yearly pay is unknown', () => {
+    // Fourteen payments in the salary contradict the none entered.
+    expect(findingFor({ extraPays: { count: 0, prorated: false } }, 'extra_pays')).toMatchObject({
+      status: 'review_it',
+      calculation: [
+        phrase('extra_pays.count', { count: { integer: 0 } }),
+        phrase('extra_pays.none_pay_unknown'),
+      ],
     });
   });
 
@@ -555,8 +592,9 @@ describe('extra payments (art. 31 ET)', () => {
     expect(offerPass([{ kind: 'single', finding: f }])).toBe(false);
   });
 
-  it('from 121 days, in either pay form, the extra pays are owed apart', () => {
-    expect(noExtras(dayRate, 121).status).toBe('below_minimum');
-    expect(noExtras(monthly, 121).status).toBe('below_minimum');
+  it('from 121 days, in either pay form, the agreement decides once the year reaches the minimum', () => {
+    // 60 € × 365 days and 1.800 € × 12 are both over the 17.094 € of 2026.
+    expect(noExtras(dayRate, 121).status).toBe('depends_on_agreement');
+    expect(noExtras(monthly, 121).status).toBe('depends_on_agreement');
   });
 });
