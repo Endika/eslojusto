@@ -2,6 +2,10 @@ import { PATH as RENT_INDICES, lastChanged } from './rent-indices';
 
 // The day each page's content last changed, for the sitemap's lastmod. Update a page's date only
 // when its content changes: a date that moves on every build teaches Google to ignore it.
+// /alquiler/ exists only in a PUBLIC_RENTAL=1 build. The Astro config reads this file in Node,
+// before any import.meta.env, so the switch is read from the process as the build sets it.
+const rentalBuild = process.env['PUBLIC_RENTAL'] === '1';
+
 export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/': '2026-10-07',
   '/finiquito/': '2026-10-07',
@@ -18,4 +22,5 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/paro/por-tiempo-trabajado/': '2026-10-07',
   '/paro/baja-voluntaria/': '2026-10-07',
   '/paro/despido-disciplinario/': '2026-10-07',
+  ...(rentalBuild ? { '/alquiler/': '2026-10-08' } : {}),
 };

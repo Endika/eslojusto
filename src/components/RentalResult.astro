@@ -146,7 +146,7 @@ const tx = (key: Key) => t(lang, key);
         <summary>{tx('rental.result.how')}</summary>
         <div class="readings" data-readings></div>
         <h4 class="rules__title">{tx('rental.result.sources')}</h4>
-        <ul class="sources" data-sources></ul>
+        <ul class="sources sources--wrap" data-sources></ul>
       </details>
     </template>
     <template data-template="reading">
@@ -172,7 +172,7 @@ const tx = (key: Key) => t(lang, key);
       <details class="information__block">
         <summary data-info-title></summary>
         <p class="help" data-info-text></p>
-        <ul class="sources" data-info-links></ul>
+        <ul class="sources sources--wrap" data-info-links></ul>
       </details>
     </template>
   </div>

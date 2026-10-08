@@ -694,19 +694,19 @@ const cross = 'M6 6l12 12M18 6 6 18';
                   <p class="errata" data-row-error="year" hidden></p>
                 </div>
               </div>
-              <fieldset class="group" data-row-box="inContract">
-                <legend>{tx('rental.charges.in_contract')}</legend>
-                <div class="chips chips--pair">
-                  {yesNo.map((value) => (
-                    <div class="chip">
-                      <input type="radio" data-row-field="inContract" value={value} />
-                      <label data-row-label={`inContract:${value}`}>{answer(value)}</label>
-                    </div>
-                  ))}
-                </div>
-                <p class="errata" data-row-error="inContract" hidden></p>
-              </fieldset>
-              <div class="row__fields">
+              <div class="row__concept" data-row-first-of="kind">
+                <fieldset class="group" data-row-box="inContract">
+                  <legend>{tx('rental.charges.in_contract')}</legend>
+                  <div class="chips chips--pair">
+                    {yesNo.map((value) => (
+                      <div class="chip">
+                        <input type="radio" data-row-field="inContract" value={value} />
+                        <label data-row-label={`inContract:${value}`}>{answer(value)}</label>
+                      </div>
+                    ))}
+                  </div>
+                  <p class="errata" data-row-error="inContract" hidden></p>
+                </fieldset>
                 <div class="field" data-row-box="annualAgreed">
                   <label class="field__label" data-row-label="annualAgreed">
                     {tx('rental.charges.agreed')}
@@ -722,25 +722,28 @@ const cross = 'M6 6l12 12M18 6 6 18';
                   />
                   <p class="errata" data-row-error="annualAgreed" hidden></p>
                 </div>
-                <div class="field" data-row-box="amount">
-                  <label class="field__label" data-row-label="amount">
-                    {tx('rental.charges.amount')}
-                  </label>
-                  <input
-                    class="field__input field__input--figure"
-                    type="text"
-                    inputmode="decimal"
-                    autocomplete="off"
-                    spellcheck="false"
-                    dir="ltr"
-                    data-row-field="amount"
-                  />
-                  <p class="errata" data-row-error="amount" hidden></p>
-                </div>
+                <p class="hint" data-row-hint="annualAgreed">
+                  {tx('rental.charges.agreed_hint')}
+                </p>
               </div>
-              <p class="hint" data-row-hint="annualAgreed">
-                {tx('rental.charges.agreed_hint')}
+              <p class="hint" data-row-repeat-of="kind" hidden>
+                {tx('rental.charges.same_concept')}
               </p>
+              <div class="field" data-row-box="amount">
+                <label class="field__label" data-row-label="amount">
+                  {tx('rental.charges.amount')}
+                </label>
+                <input
+                  class="field__input field__input--figure"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  spellcheck="false"
+                  dir="ltr"
+                  data-row-field="amount"
+                />
+                <p class="errata" data-row-error="amount" hidden></p>
+              </div>
               <button class="row__remove" type="button" data-row-remove>
                 <svg
                   viewBox="0 0 24 24"

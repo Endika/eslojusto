@@ -773,7 +773,7 @@
   color: var(--sheet-ink);
   font-weight: 700;
 }
-.sources li {
+.sources--wrap li {
   overflow-wrap: anywhere;
 }
 .readings {

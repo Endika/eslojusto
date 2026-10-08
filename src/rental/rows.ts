@@ -106,7 +106,7 @@ function setUpList(box: HTMLElement, list: RowList, tr: Translate, onChange: () 
       }
       const removeButton = row.querySelector<HTMLButtonElement>('[data-row-remove]');
       if (removeButton) {
-        removeButton.hidden = all.length <= Math.max(1, min);
+        removeButton.hidden = all.length <= min;
         removeButton.setAttribute('aria-label', tr(REMOVE[list], { n }));
       }
     });

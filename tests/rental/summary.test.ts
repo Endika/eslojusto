@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { contract, repealedWindow, review, riseAboveIrav, unknownLargeLandlord } from './fixtures';
-import { headline, roundToTens, summarise, totalLines, totalShare } from '../../src/rental/summary';
+import {
+  headline,
+  roundToTens,
+  shownOne,
+  shownPair,
+  summarise,
+  totalLines,
+  totalShare,
+} from '../../src/rental/summary';
 
 const riseOf = (input: Parameters<typeof review>[0]) => {
   const item = review(input).items.find((i) => i.kind === 'rent_update');
@@ -50,5 +58,40 @@ describe('the free summary', () => {
   it('says when nothing was entered and when nothing came out', () => {
     expect(headline(review(contract({ deposit: null })))).toBe('nothing_entered');
     expect(headline(review(contract({ advanceMonths: 1 })))).toBe('nothing_found');
+  });
+});
+
+describe('approximate amounts', () => {
+  it('round to tens alone, but never to «0 €»', () => {
+    expect(shownOne(344)).toEqual({ amount: 340, cents: false });
+    expect(shownOne(4.1)).toEqual({ amount: 4.1, cents: true });
+    expect(shownOne(0)).toEqual({ amount: 0, cents: false });
+  });
+
+  it('round a pair to tens only while the figures stay apart', () => {
+    expect(shownPair(0, 360)).toEqual([
+      { amount: 0, cents: false },
+      { amount: 360, cents: false },
+    ]);
+    expect(shownPair(1210, 1260)).toEqual([
+      { amount: 1210, cents: false },
+      { amount: 1260, cents: false },
+    ]);
+    expect(shownPair(17.27, 17.55)).toEqual([
+      { amount: 17.27, cents: true },
+      { amount: 17.55, cents: true },
+    ]);
+    // Tens would put «al menos» at 20 €, above the 17,55 € the most it can be.
+    expect(shownPair(16, 17.55).every((s) => s.cents)).toBe(true);
+    expect(shownPair(4, 50).every((s) => s.cents)).toBe(true);
+  });
+
+  it('never let the lower figure pass the higher one', () => {
+    for (let low = 0; low < 200; low += 0.37)
+      for (const high of [low, low + 0.5, low + 4, low + 9, low + 30]) {
+        const [a, b] = shownPair(low, high);
+        expect(a.amount).toBeLessThanOrEqual(high);
+        expect(b.amount).toBeGreaterThanOrEqual(a.amount);
+      }
   });
 });

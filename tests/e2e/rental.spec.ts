@@ -162,7 +162,7 @@ for (const { name, viewport } of SIZES) {
       const card = page.getByRole('region', { name: 'Subida del 25-06-2023' });
       await expect(card.locator('.item__status')).toHaveText('Depende');
       await expect(card).toContainText(
-        /Depende de si tu casero es gran tenedor: entre 0\s€ y 360\s€/,
+        /Depende de si tu casero es gran tenedor: no se puede comprobar o pagas de más unos 360\s€/,
       );
       await expect(card).toContainText('No se suma al total');
     });
@@ -272,4 +272,42 @@ test('no sheet scrolls sideways at 360×640, with every list open', async ({ pag
   await expect(page.getByRole('region', { name: 'Devolución de la fianza' })).toContainText(
     'Te deben',
   );
+});
+
+test('an empty row on the last sheet can be removed and does not block the review', async ({
+  page,
+}) => {
+  await open(page, { width: 1280, height: 800 });
+  await fillCase(page, {
+    signed: '2024-03-15',
+    start: '2024-03-20',
+    clause: 'El IPC',
+    rise: {
+      year: '2025',
+      previous: '1000',
+      next: '1030',
+      chargedFrom: '2025-03-01',
+      noticeOn: '2025-02-01',
+      agreed: 'No',
+    },
+  });
+  await page.getByRole('link', { name: /Salida/ }).click();
+  const out = sheet(page, 'La salida');
+  await out.getByLabel('Sí', { exact: true }).check();
+  await out.getByLabel('Día en que devolviste las llaves').fill('2026-07-31');
+  for (const [add, row] of [
+    ['Añadir devolución', 'Devolución 1'],
+    ['Añadir descuento', 'Descuento 1'],
+  ] as const) {
+    await out.getByRole('button', { name: add }).click();
+    await out
+      .getByRole('group', { name: row })
+      .getByRole('button', { name: /Quitar/ })
+      .click();
+    await expect(out.getByRole('group', { name: row })).toHaveCount(0);
+    await expect(out.getByRole('button', { name: add })).toBeFocused();
+  }
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
+  await expect(page.getByRole('region', { name: 'Devolución de la fianza' })).toBeVisible();
 });
