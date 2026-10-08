@@ -2,13 +2,18 @@
   <a href="https://eslojusto.es"><img src="public/og.png" alt="eslojusto.es" width="600"></a>
 </p>
 
-<h3 align="center">Is your final pay fair? Check it against Spanish law, line by line.</h3>
+<h3 align="center">Is it fair? Check it against Spanish law, item by item.</h3>
 
-- Enter your dates, your salary and what your final pay (finiquito) says.
-- See the legal minimum for each item: salary, holidays, extra pay, severance and notice.
-- Get an estimate of your unemployment benefit (paro), with the article behind every figure.
+- **Final pay (finiquito)** — enter your dates, salary and what your final pay says, and see the
+  legal minimum for each item: salary, holidays, extra pay, severance and notice.
+- **Unemployment benefit (paro)** — an estimate of how much and for how long, with the article
+  behind every figure.
+- **Rent and employment contracts** — built behind build switches (`PUBLIC_RENTAL`,
+  `PUBLIC_EMPLOYMENT`) and not yet published.
 
-Everything runs in your browser. Nothing you type is sent anywhere.
+The calculators run in your browser and nothing you type is sent anywhere. Reading your documents
+is optional: with your explicit consent, the pages go to the API in Spain, are read by a model in
+the EU and are never stored.
 
 <h2 align="center"><a href="https://eslojusto.es">eslojusto.es →</a></h2>
 
@@ -26,7 +31,8 @@ Analytics (PostHog EU, no cookies) only turn on when the build has `PUBLIC_POSTH
 
 Document reading and the paid report only turn on when the build has all of
 `PUBLIC_API_EXTRACT_URL`, `PUBLIC_API_CHECKOUT_URL` and `PUBLIC_API_PASS_URL` (the API stack's
-outputs `extractUrl`, `checkoutUrl` and `passUrl`) plus `PUBLIC_TURNSTILE_SITE_KEY`; without them the site is the calculator alone.
+outputs `extractUrl`, `checkoutUrl` and `passUrl`) plus `PUBLIC_TURNSTILE_SITE_KEY`; without them the site is the calculator alone. The API lives in
+[`api/`](api/README.md).
 
 ## Licence
 
