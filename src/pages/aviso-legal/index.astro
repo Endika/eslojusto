@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { t, type Key } from '../../i18n';
 import { DOCUMENTS } from '../../documents/config';
 import { PASS_DAYS, PASS_READS } from '../../documents/contract';
-import { RENTAL_BUILD } from '../../content/sections';
+import { EMPLOYMENT_BUILD, RENTAL_BUILD } from '../../content/sections';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
 const tx = (key: Key, vars?: Record<string, string>) => t('es', key, vars);
@@ -19,6 +19,8 @@ const owner = {
 const documents = DOCUMENTS !== null;
 // The rental review and its paragraphs exist only in a PUBLIC_RENTAL=1 build.
 const rental = RENTAL_BUILD;
+// The contract review exists only in a PUBLIC_EMPLOYMENT=1 build; so do the paragraphs about it.
+const employment = EMPLOYMENT_BUILD;
 ---
 
 <Base
@@ -120,6 +122,19 @@ const rental = RENTAL_BUILD;
         </section>
       )}
 
+      {employment && (
+        <section class="sheet sheet--text">
+          <h2 id="al-contrato">
+            {tx('legal_notice.employment')} <span class="beta">{tx('employment.beta')}</span>
+          </h2>
+          <p>{tx('legal_notice.employment.does')}</p>
+          <p>{tx('legal_notice.employment.does_not')}</p>
+          <p>
+            {tx('legal_notice.employment.beta')} <a href={`mailto:${email}`}>{email}</a>.
+          </p>
+        </section>
+      )}
+
       {documents && (
         <section class="sheet sheet--text">
           <h2 id="condiciones">{tx('legal_notice.conditions')}</h2>
@@ -139,6 +154,9 @@ const rental = RENTAL_BUILD;
               sitio.
             </li>
             {rental && <li>{tx('legal_notice.rental.pass', { dias: String(PASS_DAYS) })}</li>}
+            {employment && (
+              <li>{tx('legal_notice.employment.pass', { dias: String(PASS_DAYS) })}</li>
+            )}
             <li>
               Dónde vale: el pase se guarda solo en ese navegador. En otro dispositivo, en una
               ventana privada o si borras los datos de navegación, se pierde.

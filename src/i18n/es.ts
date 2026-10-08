@@ -8,6 +8,8 @@ export const es = {
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen el Estatuto de los Trabajadores y la guía del CGPJ (v0.6, julio de 2026).',
   'footer.note_rental':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen la Ley de Arrendamientos Urbanos (Ley 29/1994), la Ley 12/2023 y el IRAV y el IPC del INE.',
+  'footer.note_employment':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen el Estatuto de los Trabajadores, el Real Decreto 723/2026 y los reales decretos del SMI de cada año.',
   'footer.note_general':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Cada cifra lleva la norma de la que sale.',
   'footer.note_benefit':
@@ -586,6 +588,42 @@ export const es = {
   'privacy.rental.tracked_documents': 'Al leer documentos del alquiler',
   'privacy.rental.tracked_documents_what':
     'Los mismos avisos que con los demás documentos, con los tipos del alquiler (contrato, aviso de subida, recibo, factura de la agencia o devolución de la fianza) y, si una página no es del alquiler, ese motivo. Al descargar, si es el informe, la carta de la fianza o la de la renta y, de una carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en las cartas.',
+
+  'privacy.employment.summary':
+    'La revisión del contrato de trabajo funciona igual: lo que escribes se calcula en tu navegador y no se guarda.',
+  'privacy.employment.data_review': 'Lo que escribes en la revisión del contrato',
+  'privacy.employment.data_review_where':
+    'Solo en tu navegador, mientras la página está abierta. Las fechas de tu contrato, tu salario, tu jornada, tus nóminas, tus contratos anteriores, la oferta de empleo y tus respuestas se calculan en tu dispositivo y no se envían a ningún servidor ni se guardan. La respuesta sobre si tienes una discapacidad reconocida, que solo se pregunta en un contrato de práctica profesional, tampoco sale de tu navegador. Al cerrar o recargar la página, desaparece todo.',
+  'privacy.employment.data_documents': 'Los documentos del contrato que subes',
+  'privacy.employment.data_documents_where':
+    'Solo si eliges subirlos y das tu consentimiento: el contrato con sus anexos, tus nóminas, la oferta de empleo o tu vida laboral. Siguen el mismo camino que los demás documentos, por el mismo servidor en España y el mismo modelo en la Unión Europea, y tampoco se guardan. Un contrato puede llevar tu DNI, tu domicilio y a veces una discapacidad; una nómina, la cuota de un sindicato. El modelo tiene orden de no copiar nombres de personas, DNI, NIE, número de la Seguridad Social, domicilios, cuentas, teléfonos, correos ni firmas, ni nada sobre discapacidad, salud, bajas o afiliación sindical, y el nombre de la empresa solo si es una empresa. Además, el servidor descarta cualquier texto copiado que aún lleve un DNI, un NIE, un número de la Seguridad Social, una cuenta, un correo o un teléfono, o que hable de salud, bajas, discapacidad, sindicatos o embargos.',
+  'privacy.employment.data_letters': 'Los datos de las cartas del contrato',
+  'privacy.employment.data_letters_where':
+    'Lo que añades a las cartas (tu nombre, tu DNI o NIE, la empresa, el centro de trabajo y la localidad) solo rellena la carta en tu navegador. Las cartas no salen de tu dispositivo ni se guardan.',
+  'privacy.employment.consent':
+    'En el contrato de trabajo, el contrato, las nóminas y la vida laboral pueden mostrar datos especialmente protegidos, como una discapacidad, una baja o la afiliación a un sindicato por su cuota. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. El modelo tiene orden de no copiar esos datos y el servidor descarta los textos que aún los lleven; nada se guarda.',
+  'privacy.employment.tracked_sheets': 'En la revisión del contrato',
+  'privacy.employment.tracked_sheets_what':
+    'Lo mismo que en el finiquito con sus hojas (relación, tipo de contrato, contratos anteriores, salario, nóminas, jornada, periodo de prueba, vacaciones, cláusulas, información, oferta y resultado): que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha de inicio», nunca lo que escribiste. Qué pregunta frecuente abres o de qué punto miras «Cómo se calcula», por su tipo (salario, tipo de contrato, encadenamiento, periodo de prueba, jornada, tiempo parcial, vacaciones y pagas, cláusulas, información, oferta o referencia), nunca su texto. Y si pulsas «Empezar de nuevo».',
+  'privacy.employment.tracked_scope': 'Si tu contrato queda fuera de la revisión del contrato',
+  'privacy.employment.tracked_scope_what':
+    'El motivo, de una lista cerrada: una relación laboral especial, personal funcionario, un contrato por empresa de trabajo temporal, un contrato de relevo o tener menos de 18 años.',
+  'privacy.employment.tracked_review': 'Al revisar el contrato',
+  'privacy.employment.tracked_review_what':
+    'En qué tramo empezó el contrato (antes de la reforma de marzo de 2022, en 2022 o 2023, en 2024 o 2025, o desde 2026), su tipo tal como lo eliges, si es a tiempo parcial, y si tienes contrato por escrito, eres técnico titulado o tu empresa tiene menos de 25 personas (sí, no o no lo sabes). De cada grupo de puntos (salario, tipo de contrato, encadenamiento, periodo de prueba, jornada, tiempo parcial, vacaciones, pagas extra, cláusulas e información), el resultado que más pesa, como «por debajo del mínimo» o «dentro del límite», que depende de un «No lo sé», o que no hay ninguno. En cuántos años queda el salario por debajo del SMI (0, 1, 2 o 3 o más) y si algún año aún no tiene SMI publicado. Cuántas nóminas añadiste, en un tramo (0, de 1 a 3, o 4 o más), y si añadiste tu vida laboral o una oferta y si el contrato nombra un convenio, nunca cuál. Si la diferencia es cero, menor de 100 €, de 100 a 500 €, de 500 a 2.000 € o mayor, si se ofrece el pase, si el resultado sale en resumen o con el detalle del pase, cuántas veces has revisado en esta página y cuánto tardaste, en tramos. Nunca un importe, una fecha, el nombre de la empresa o del convenio, tu respuesta sobre discapacidad ni nada de lo que pone tu contrato.',
+  'privacy.employment.tracked_documents': 'Al leer documentos del contrato',
+  'privacy.employment.tracked_documents_what':
+    'Los mismos avisos que con los demás documentos, con los tipos del contrato (contrato, nómina, vida laboral u oferta de empleo). Al descargar, si es el informe, la carta a la empresa, la carta para pedir la información por escrito o la petición del certificado de contratos temporales y, de una carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en las cartas.',
+
+  'legal_notice.employment': 'La revisión del contrato de trabajo',
+  'legal_notice.employment.does':
+    'Compara un contrato de trabajo de relación laboral común en España con lo que garantiza la ley: el salario frente al SMI de cada año, el tipo de contrato y su temporalidad, el encadenamiento de contratos con tu vida laboral, el periodo de prueba, la jornada y los descansos, el tiempo parcial, las vacaciones y las pagas extra, los límites que la ley pone a algunas cláusulas y la información que la empresa tiene que darte por escrito (Real Decreto 723/2026). Cada punto lleva la norma de la que sale, con su vigencia. Cuando la ley dice que un contrato temporal pasa a fijo, cita el artículo con su texto; no decide tu caso.',
+  'legal_notice.employment.does_not':
+    'No lee convenios colectivos ni sus tablas: lo que depende de tu convenio lo dice, y el salario de tu categoría solo lo compara si lo metes tú. No valora si la causa de un contrato temporal está justificada ni si una cláusula es válida más allá de lo que la ley fija por escrito, como su duración o su compensación. No calcula el salario neto, el IRPF ni las cotizaciones. No revisa relaciones laborales especiales, contratos por empresa de trabajo temporal, contratos de relevo ni a menores de 18 años, y en los contratos anteriores al 30 de marzo de 2022 no revisa la temporalidad.',
+  'legal_notice.employment.beta':
+    'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves un punto que no cuadra con la ley, puedes escribir a',
+  'legal_notice.employment.pass':
+    'En la revisión del contrato, el mismo pase muestra el detalle de cada punto y permite descargar un informe en PDF y la carta a la empresa, también generados en tu dispositivo. La carta para pedir la información por escrito y la petición del certificado de contratos temporales se descargan gratis. El pase vale para cualquier revisión durante sus {dias} días.',
 
   'legal_notice.rental': 'La revisión del alquiler',
   'legal_notice.rental.does':
