@@ -24,6 +24,11 @@ export const SOURCES: Record<
   | 'et38'
   | 'et31'
   | 'et26'
+  | 'et29'
+  | 'et51'
+  | 'et55_5'
+  | 'et59'
+  | 'ley15_2022'
   | 'cgpjGuide'
   | 'sts651_2026'
   | 'lgss267'
@@ -99,6 +104,38 @@ export const SOURCES: Record<
     citation: 'Estatuto de los Trabajadores, art. 26',
     url: `${ET}#a26`,
     inForceSince: '2015-11-13',
+  },
+  et29: {
+    id: 'et29',
+    citation: 'Estatuto de los Trabajadores, art. 29.3',
+    url: `${ET}#a29`,
+    inForceSince: '2015-11-13',
+  },
+  et51: {
+    id: 'et51',
+    citation: 'Estatuto de los Trabajadores, art. 51',
+    url: `${ET}#a51`,
+    inForceSince: '2015-11-13',
+  },
+  // Letter b in the wording of LO 1/2025.
+  et55_5: {
+    id: 'et55_5',
+    citation: 'Estatuto de los Trabajadores, art. 55.5 y 55.6',
+    url: `${ET}#a55`,
+    inForceSince: '2025-04-03',
+  },
+  et59: {
+    id: 'et59',
+    citation: 'Estatuto de los Trabajadores, art. 59',
+    url: `${ET}#a59`,
+    inForceSince: '2015-11-13',
+  },
+  ley15_2022: {
+    id: 'ley15_2022',
+    citation:
+      'Ley 15/2022, integral para la igualdad de trato y la no discriminación, arts. 2.1 y 26',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2022-11589',
+    inForceSince: '2022-07-14',
   },
   cgpjGuide: {
     id: 'cgpjGuide',

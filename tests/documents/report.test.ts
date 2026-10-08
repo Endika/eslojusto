@@ -156,3 +156,29 @@ describe('the letter', () => {
       expect(all).not.toMatch(word);
   });
 });
+
+describe('the report of the extended final pay', () => {
+  const reportOf = (o: Partial<typeof unfairDismissal>) =>
+    text(reportModel(completed({ ...unfairDismissal, ...o }, {}), tr, today).blocks);
+
+  it('a collective dismissal: its cause and the minimum the agreement may improve', () => {
+    const all = reportOf({ cause: 'collective_dismissal' });
+    expect(all).toContain('Despido colectivo (ERE)');
+    expect(all).toContain('O más, según el acuerdo del ERE');
+    expect(all).toContain('El despido colectivo es situación legal de desempleo');
+  });
+
+  it('a cause not known: no severance figure and a benefit that depends on it', () => {
+    const all = reportOf({ cause: 'unknown' });
+    expect(all).toContain('Sin la causa no se calcula la indemnización');
+    expect(all).toContain('Depende de la causa');
+  });
+
+  it('unpaid: the interest with its working, apart from the items', () => {
+    const all = reportOf({ paid: false });
+    expect(all).toContain('Si aún no te han pagado');
+    expect(all).toContain('10 % al año ×');
+    expect(all).toContain('te quedan 343 días para reclamarlo');
+    expect(reportOf({})).not.toContain('Si aún no te han pagado');
+  });
+});

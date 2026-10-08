@@ -1,10 +1,10 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import type {
-  Cause,
   ContributionPeriod,
   FinalPayInput,
   FixedTermType,
   ItemId,
+  StatedCause,
 } from '../../src/engine/types';
 import { CAUSES, FIXED_TERM_TYPES, ITEM_IDS, SECTIONS } from '../src/domain/extraction-schema';
 import { MERGED_FIELDS } from '../src/domain/merge';
@@ -12,7 +12,7 @@ import { MERGED_FIELDS } from '../src/domain/merge';
 // The site prefills its form from these names; type:check fails if the engine drifts.
 describe('engine contract', () => {
   it('mirrors the engine unions', () => {
-    expectTypeOf<(typeof CAUSES)[number]>().toEqualTypeOf<Cause>();
+    expectTypeOf<(typeof CAUSES)[number]>().toEqualTypeOf<StatedCause>();
     expectTypeOf<(typeof FIXED_TERM_TYPES)[number]>().toEqualTypeOf<FixedTermType>();
     expectTypeOf<(typeof ITEM_IDS)[number]>().toEqualTypeOf<ItemId>();
   });

@@ -1,15 +1,18 @@
 import { parseDate, type CivilDate } from '../engine/date';
 import type { Children } from '../engine/unemployment';
 import type { EmployerFigures } from '../engine/review';
-import type {
-  Cause,
-  Accrual,
-  HolidayUnit,
-  FinalPayInput,
-  OtherContracts,
-  ItemId,
-  ContributionPeriod,
-  FixedTermType,
+import {
+  PROTECTED_SITUATIONS,
+  type Cause,
+  type Accrual,
+  type HolidayUnit,
+  type FinalPayInput,
+  type OtherContracts,
+  type ItemId,
+  type ContributionPeriod,
+  type Erte,
+  type FixedTermType,
+  type ProtectedSituation,
 } from '../engine/types';
 import {
   validate,
@@ -54,13 +57,16 @@ export const SHEETS = [
   'causa',
   'temporal',
   'fechas',
+  'situacion',
   'prorrateo',
   'salario',
+  'erte',
   'pagas',
   'vacaciones',
   'preaviso',
   'hijos',
   'otros',
+  'pago',
   'finiquito',
 ] as const;
 export type Sheet = (typeof SHEETS)[number];
@@ -81,12 +87,16 @@ export const SHEET_FIELDS: Record<Sheet, readonly string[]> = {
   temporal: ['fixedTermType'],
   fechas: ['startDate', 'endDate'],
   prorrateo: ['extraPayProrated'],
+  // Its answers never leave the page, not even by name.
+  situacion: [],
   salario: ['monthlySalary'],
+  erte: ['erte', 'preErteMonthlySalary'],
   pagas: ['extraPayCount', 'extraPayAmount', 'extraPayAccrual'],
   vacaciones: ['holidayUnit', 'workDaysPerWeek', 'annualHolidayDays', 'holidayDaysTaken'],
   preaviso: ['noticeDaysReceived', 'agreementNoticeDays', 'noticeDaysGiven'],
   hijos: ['children'],
   otros: ['otherContracts', 'benefitDrawnSince'],
+  pago: ['paid'],
   finiquito: ITEM_IDS.map(figureField),
 };
 
@@ -192,6 +202,12 @@ function read(form: HTMLFormElement): Reading {
   const accrual = text('extraPayAccrual');
   if (accrual) partial.extraPayAccrual = accrual as Accrual;
 
+  const erte = text('erte');
+  if (erte) partial.erte = erte as Erte;
+
+  const paid = text('paid');
+  if (paid === 'yes' || paid === 'no') partial.paid = paid === 'yes';
+
   const numericFields = [
     ['monthlySalary', true],
     ['extraPayCount', true],
@@ -201,6 +217,7 @@ function read(form: HTMLFormElement): Reading {
     ['noticeDaysReceived', false],
     ['agreementNoticeDays', false],
     ['noticeDaysGiven', false],
+    ['preErteMonthlySalary', false],
   ] as const;
   for (const [field, required] of numericFields) {
     const t = text(field);
@@ -240,6 +257,15 @@ export function readForm(
   const { partial, figures, errors } = read(form);
   if (errors.length > 0) return { errors };
   return { input: complete(partial), figures };
+}
+
+export const situationField = (s: ProtectedSituation) => `situation_${s}`;
+
+// The situations that may make the dismissal null, ticked on their own sheet. Read apart from
+// FinalPayInput so they reach only the result on this page, never an event or a request.
+export function readSituations(form: HTMLFormElement): ProtectedSituation[] {
+  const data = new FormData(form);
+  return PROTECTED_SITUATIONS.filter((s) => data.get(situationField(s)) === 'yes');
 }
 
 export interface BenefitAnswers {

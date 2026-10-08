@@ -8,9 +8,12 @@ import {
   type BenefitEstimate,
   type Children,
 } from '../engine/unemployment';
+import type { LateInterest } from '../engine/late-interest';
 import type { Review } from '../engine/review';
-import type { Cause, Item, ItemId } from '../engine/types';
+import { SOURCES } from '../engine/sources';
+import type { Cause, Erte, Item, ItemId, ProtectedSituation } from '../engine/types';
 import type { ClientKey, Translate } from '../i18n/client';
+import { pieces, shownAmount, shownOne } from './amounts';
 import { calculationText, phraseText } from './calculation';
 import type { FieldError } from './form';
 import { formatInteger, formatEuros, formatWholeEuros } from './number';
@@ -52,14 +55,32 @@ export function referenceKey(r: ItemResult, reference: number | null): ClientKey
     : 'client.unfair_reference_objective';
 }
 
+type MissingAnswer = NonNullable<Item['missingAnswer']>;
+
+const MISSING_STATUS: Record<MissingAnswer, ClientKey> = {
+  days_taken: 'client.status.not_checkable_days',
+  cause: 'client.status.not_checkable_cause',
+  pre_erte_salary: 'client.status.not_checkable_erte',
+};
+
+// What a figure the review cannot give depends on: an answer left as «No lo sé», or the agreement.
+const MISSING_RANGE: Record<MissingAnswer, ClientKey> = {
+  days_taken: 'client.range.days',
+  cause: 'client.range.cause',
+  pre_erte_salary: 'client.range.erte',
+};
+
+export const missingRangeKey = (item: Item): ClientKey =>
+  item.missingAnswer === undefined ? 'client.range.agreement' : MISSING_RANGE[item.missingAnswer];
+
 function statusAndAmount(
   r: ItemResult,
   reference: number | null,
 ): { key: ClientKey; amount: number } {
   if (disciplinaryNeutral(r, reference))
     return { key: 'client.status.no_severance_disciplinary', amount: reference ?? 0 };
-  if (r.status === 'not_checkable' && r.item.missingAnswer === 'days_taken')
-    return { key: 'client.status.not_checkable_days', amount: 0 };
+  if (r.status === 'not_checkable' && r.item.missingAnswer !== undefined)
+    return { key: MISSING_STATUS[r.item.missingAnswer], amount: 0 };
   return { key: `client.status.${visibleStatus(r)}`, amount: r.difference ?? 0 };
 }
 
@@ -108,10 +129,7 @@ function setWithAmounts(
 function setRange(el: HTMLElement, item: Item, tr: Translate): void {
   const { range } = item;
   const deduction = item.direction === 'deduction';
-  if (range === null)
-    el.textContent = tr(
-      item.missingAnswer === 'days_taken' ? 'client.range.days' : 'client.range.agreement',
-    );
+  if (range === null) el.textContent = tr(missingRangeKey(item));
   else if (deduction) el.replaceChildren(amountEl(range.max));
   else if (range.min === range.max) el.replaceChildren(amountEl(range.min));
   else setWithAmounts(el, tr('client.range.between'), { minimo: range.min, maximo: range.max });
@@ -184,6 +202,11 @@ function renderItem(
   }
   const basedOn = sheet.querySelector<HTMLElement>('[data-based-on]');
   if (basedOn) basedOn.hidden = !item.basedOnYourAnswer;
+  const orMore = sheet.querySelector<HTMLElement>('[data-or-more]');
+  if (orMore) {
+    orMore.hidden = item.orMore === undefined;
+    orMore.textContent = item.orMore ? tr(`client.or_more.${item.orMore}`) : '';
+  }
   const agreement = sheet.querySelector<HTMLElement>('[data-agreement]');
   if (agreement) agreement.hidden = !(item.dependsOnAgreement && item.range !== null);
   const reference = sheet.querySelector<HTMLElement>('[data-reference]');
@@ -251,6 +274,14 @@ export function durationKey(d: BenefitDuration): ClientKey {
 export const withHolidayNote = (d: BenefitDuration): boolean =>
   d.days > 0 && d.days < MAX_DAYS && d.kind !== 'up_to';
 
+// Without the cause the estimate stands only if it is a dismissal or the end of a fixed term.
+export const benefitStatusKey = (p: BenefitEstimate, cause: Cause): ClientKey =>
+  p.entitled === 'no'
+    ? 'client.unemployment.status.no'
+    : cause === 'unknown'
+      ? 'client.unemployment.status.unknown'
+      : 'client.unemployment.status.yes';
+
 // The benefit sheet: whether the cause gives the benefit, roughly how much and for how long, in the same
 // words for every figure: «unos», «al menos», «hasta», never an exact promise.
 export function renderBenefit(
@@ -263,11 +294,7 @@ export function renderBenefit(
   const container = sheet.closest<HTMLElement>('[data-review]') ?? sheet;
   sheet.dataset['state'] = benefitState(p);
   const entitled = p.entitled === 'yes';
-  setText(
-    sheet,
-    '[data-benefit-status-text]',
-    tr(entitled ? 'client.unemployment.status.yes' : 'client.unemployment.status.no'),
-  );
+  setText(sheet, '[data-benefit-status-text]', tr(benefitStatusKey(p, cause)));
   sheet
     .querySelector('[data-benefit-mark] use')
     ?.setAttributeNS(null, 'href', entitled ? '#mark-benefit-yes' : '#mark-no-severance');
@@ -442,8 +469,9 @@ export function shortfallLine(r: ItemResult, tr: Translate): Piece[] | null {
   );
 }
 
-function summaryBenefit(p: BenefitEstimate, tr: Translate): Piece[] {
+function summaryBenefit(p: BenefitEstimate, cause: Cause, tr: Translate): Piece[] {
   if (p.entitled === 'no') return [tr('client.summary.benefit_no')];
+  if (cause === 'unknown') return [tr('client.summary.benefit_unknown')];
   if (p.figures === null) return [tr('client.summary.benefit_yes_no_figures')];
   const { min, max } = p.figures.firstStretch;
   return piecesWithAmounts(tr('client.summary.benefit_yes'), {
@@ -453,6 +481,7 @@ function summaryBenefit(p: BenefitEstimate, tr: Translate): Piece[] {
 
 const DISMISSALS: readonly Cause[] = [
   'objective_dismissal',
+  'collective_dismissal',
   'unfair_dismissal',
   'disciplinary_dismissal',
 ];
@@ -490,7 +519,9 @@ export function renderSummary(
   const counted = r.items.find((p) => p.item.counted)?.item.counted;
   const note = setText(summary, '[data-summary-counted]', counted ? phraseText(counted, tr) : '');
   note.hidden = !counted;
-  setText(summary, '[data-summary-benefit]', '').replaceChildren(...summaryBenefit(benefit, tr));
+  setText(summary, '[data-summary-benefit]', '').replaceChildren(
+    ...summaryBenefit(benefit, cause, tr),
+  );
   summary.querySelector('[data-summary-deadlines]')?.replaceChildren(
     ...summaryDeadlines(cause, benefit).map((key) => {
       const p = document.createElement('p');
@@ -506,6 +537,157 @@ export interface ResultData {
   readonly benefit: BenefitEstimate;
   readonly cause: Cause;
   readonly children: Children;
+  readonly erte?: Erte | undefined;
+  // Answers that stay on this page: they reach only these warnings.
+  readonly situations?: readonly ProtectedSituation[];
+}
+
+export type WarningId = 'cause_unknown' | 'null_dismissal' | 'erte_unknown' | 'late_interest';
+
+// A warning beside the items, with no figure that opens a pass: never behind it either.
+export interface Warning {
+  readonly id: WarningId;
+  readonly lines: readonly Piece[][];
+  readonly sources: readonly Source[];
+  // How a figure in it is worked out; only with the detail unlocked.
+  readonly calculation: string | null;
+}
+
+// The 20 working days to challenge a dismissal also apply when the cause is not known.
+const challengeable = (cause: Cause) => DISMISSALS.includes(cause) || cause === 'unknown';
+
+// One sentence of the late-payment warning: its key and the figure it carries, if any.
+export interface InterestLine {
+  readonly key: ClientKey;
+  readonly importe?: number;
+  readonly dias?: number;
+}
+
+// The interest while the year to claim lasts, then that year: the 20 working days to challenge a
+// dismissal are another deadline and are said apart.
+export function lateInterestLines(l: LateInterest, cause: Cause): InterestLine[] {
+  const lines: InterestLine[] = [];
+  if (l.daysLeft >= 0)
+    lines.push(
+      l.amount > 0
+        ? { key: 'client.warning.late_interest.amount', importe: l.amount }
+        : { key: 'client.warning.late_interest.none' },
+    );
+  lines.push(
+    l.daysLeft > 1
+      ? { key: 'client.warning.late_interest.days_left', dias: l.daysLeft }
+      : {
+          key:
+            l.daysLeft === 1
+              ? 'client.warning.late_interest.one_day_left'
+              : l.daysLeft === 0
+                ? 'client.warning.late_interest.last_day'
+                : 'client.warning.late_interest.lapsed',
+        },
+  );
+  if (challengeable(cause)) lines.push({ key: 'client.warning.late_interest.other_deadline' });
+  return lines;
+}
+
+const interestPieces = (line: InterestLine, tr: Translate): Piece[] =>
+  line.importe === undefined
+    ? [tr(line.key, line.dias === undefined ? {} : { dias: formatInteger(line.dias) })]
+    : pieces(tr(line.key), { importe: shownAmount(shownOne(line.importe)) });
+
+const PROTECTED: readonly ProtectedSituation[] = [
+  'pregnancy',
+  'family_leave',
+  'back_from_leave',
+  'care_rights',
+  'gender_violence',
+];
+
+// The warnings a review carries, in order. The null warning never carries a figure, and a sick
+// leave is worded more weakly than the cases art. 55.5 ET lists.
+export function warnings(d: ResultData, locked: boolean, tr: Translate): Warning[] {
+  const out: Warning[] = [];
+  if (d.cause === 'unknown')
+    out.push({
+      id: 'cause_unknown',
+      lines: [[tr('client.warning.cause_unknown')]],
+      sources: [],
+      calculation: null,
+    });
+  const situations = challengeable(d.cause) ? (d.situations ?? []) : [];
+  const listed = situations.some((s) => PROTECTED.includes(s));
+  const sick = situations.includes('sick_leave');
+  if (listed || sick)
+    out.push({
+      id: 'null_dismissal',
+      lines: [
+        ...(listed ? [[tr('client.warning.null_dismissal.protected')]] : []),
+        ...(sick ? [[tr('client.warning.null_dismissal.sick_leave')]] : []),
+        [tr('client.warning.null_dismissal.effects')],
+        [tr('client.warning.null_dismissal.deadline')],
+      ],
+      sources: [SOURCES.et55_5, SOURCES.et53, SOURCES.et59, ...(sick ? [SOURCES.ley15_2022] : [])],
+      calculation: null,
+    });
+  if (d.erte === 'unknown' && DISMISSALS.includes(d.cause))
+    out.push({
+      id: 'erte_unknown',
+      lines: [[tr('client.warning.erte_unknown')]],
+      sources: [],
+      calculation: null,
+    });
+  const interest = d.review.lateInterest;
+  if (interest)
+    out.push({
+      id: 'late_interest',
+      lines: lateInterestLines(interest, d.cause).map((line) => interestPieces(line, tr)),
+      sources: interest.sources,
+      calculation:
+        locked || interest.daysLeft < 0 ? null : calculationText(interest.calculation, tr),
+    });
+  return out;
+}
+
+const WARNING_TONE: Record<WarningId, readonly [string, string]> = {
+  cause_unknown: ['cause', '01'],
+  null_dismissal: ['legal', 'ET'],
+  erte_unknown: ['salary', '03'],
+  late_interest: ['legal', 'ET'],
+};
+
+function renderWarnings(root: HTMLElement, d: ResultData, locked: boolean, tr: Translate) {
+  const box = root.querySelector<HTMLElement>('[data-warnings]');
+  if (!box) return;
+  box.replaceChildren(
+    ...warnings(d, locked, tr).map((w) => {
+      const frag = template(root, 'warning');
+      const section = frag.querySelector<HTMLElement>('[data-warning]');
+      if (!section) throw new Error('Missing [data-warning]');
+      const [tone, tab] = WARNING_TONE[w.id];
+      section.dataset['warning'] = w.id;
+      section.dataset['tone'] = tone;
+      setText(section, '[data-warning-tab]', tab);
+      const title = setText(section, '[data-warning-title]', tr(`client.warning.${w.id}.title`));
+      title.id = `warning-${w.id}`;
+      section.setAttribute('aria-labelledby', title.id);
+      const lines = section.querySelector('[data-warning-lines]');
+      lines?.replaceChildren(
+        ...w.lines.map((line) => {
+          const p = document.createElement('p');
+          p.className = 'help';
+          p.replaceChildren(...line);
+          return p;
+        }),
+      );
+      const detail = section.querySelector<HTMLElement>('[data-warning-detail]');
+      if (detail) detail.hidden = w.calculation === null && w.sources.length === 0;
+      const calculation = setText(section, '[data-warning-calculation]', w.calculation ?? '');
+      calculation.hidden = w.calculation === null;
+      const list = section.querySelector<HTMLElement>('[data-warning-sources]');
+      if (list) setSources(root, list, w.sources, tr);
+      return frag;
+    }),
+  );
+  box.hidden = box.childElementCount === 0;
 }
 
 // Locked, only the summary is built: the detail is not in the page at all, not even hidden, so
@@ -517,6 +699,7 @@ export function renderResult(root: HTMLElement, d: ResultData, locked: boolean, 
   if (lead) lead.hidden = locked;
   if (summary) summary.hidden = !locked;
   renderUnchecked(root, d.review, tr);
+  renderWarnings(root, d, locked, tr);
   const slots = [...root.querySelectorAll<HTMLElement>('[data-slot]')];
   if (locked) {
     root.querySelector('[data-items]')?.replaceChildren();

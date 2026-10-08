@@ -8,6 +8,7 @@ const CAUSES: readonly Cause[] = [
   'resignation',
   'fixed_term_end',
   'objective_dismissal',
+  'collective_dismissal',
   'unfair_dismissal',
   'disciplinary_dismissal',
 ];

@@ -80,6 +80,7 @@ async function review(page: Page) {
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2022-03-01');
   await page.getByLabel('Fecha de baja', { exact: true }).fill('2026-09-15');
   await next(page);
+  if (await visible('situacion').count()) await next(page);
   await page
     .getByRole('group', { name: '¿Tus pagas extra van prorrateadas en la nómina?' })
     .getByLabel('Sí')
@@ -87,6 +88,7 @@ async function review(page: Page) {
   await next(page);
   await page.getByLabel('Salario bruto mensual').fill('2.000,00');
   await next(page);
+  if (await visible('erte').count()) await next(page);
   await page.getByLabel('Disfrutados este año').fill('0');
   const submit = page.getByRole('button', { name: 'Revisar' });
   while (!(await submit.isVisible())) {

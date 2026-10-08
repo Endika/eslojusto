@@ -15,7 +15,7 @@ import {
 import { computeSeverance } from '../../src/engine/severance';
 import { annualSalary } from '../../src/engine/settlement';
 import { reviewFinalPay, type EmployerFigures } from '../../src/engine/review';
-import type { Cause, FinalPayInput, ItemId, FixedTermType } from '../../src/engine/types';
+import type { FinalPayInput, ItemId, FixedTermType, StatedCause } from '../../src/engine/types';
 
 const TODAY = f('2026-10-06');
 const CASES = 500;
@@ -85,10 +85,11 @@ function accrual(
 }
 
 function generate(g: ReturnType<typeof prng>): FinalPayInput {
-  const cause = g.pick<Cause>([
+  const cause = g.pick<StatedCause>([
     'resignation',
     'fixed_term_end',
     'objective_dismissal',
+    'collective_dismissal',
     'unfair_dismissal',
     'disciplinary_dismissal',
   ]);
@@ -216,7 +217,8 @@ function employerFigures(e: FinalPayInput, m: Method, g: ReturnType<typeof prng>
   }
 
   c.severance = computeSeverance({
-    cause: e.cause,
+    // `generate` only states causes.
+    cause: e.cause as StatedCause,
     startDate: e.startDate,
     endDate: e.endDate,
     annualSalary: annual,

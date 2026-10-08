@@ -25,6 +25,7 @@ describe('parseReading', () => {
     ['an amount as text', 'severance', f('1.234,56')],
     ['an amount over the maximum', 'severance', f(1_000_000.01)],
     ['a cause outside the engine', 'cause', f('dismissal')],
+    ['a cause only a person can give', 'cause', f('unknown')],
     ['days that are not whole', 'holidayDaysTaken', f(2.5)],
     ['more days than a year has', 'annualHolidayDays', f(400)],
     ['an unknown confidence', 'severance', f(100, 'certain' as 'high')],
@@ -34,6 +35,18 @@ describe('parseReading', () => {
     const r = parseReading(withProposal({ [name]: raw }), 1);
     expect(r.sections.settlement_proposal?.fields[name]).toBeUndefined();
     expect(r.dropped).toBe(1);
+  });
+
+  it('keeps a collective dismissal as its own cause', () => {
+    const r = parseReading(
+      {
+        pages: [page(1, 'dismissal_letter')],
+        dismissal_letter: { cause: f('collective_dismissal') },
+      },
+      1,
+    );
+    expect(r.sections.dismissal_letter?.fields['cause']).toEqual(f('collective_dismissal'));
+    expect(r.dropped).toBe(0);
   });
 
   it('ignores keys outside the schema without counting them as fields', () => {

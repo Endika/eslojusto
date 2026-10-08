@@ -158,12 +158,14 @@ test('tracks languages, steps and outcome without sending anything typed', async
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2010-03-01');
   await page.getByLabel('Fecha de baja', { exact: true }).fill('2026-09-15');
   await next();
+  await next();
   await page
     .getByRole('group', { name: '¿Tus pagas extra van prorrateadas en la nómina?' })
     .getByLabel('Sí')
     .check();
   await next();
   await page.getByLabel('Salario bruto mensual').fill('1.500');
+  await next();
   await next();
   await page.getByLabel('Disfrutados este año').fill('0');
   await next();
@@ -176,6 +178,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
     .getByRole('group', { name: '¿Has cobrado paro después de alguno?' })
     .getByLabel('No', { exact: true })
     .check();
+  await next();
   await next();
   await page.getByLabel('Indemnización').fill('40.000,00');
   await page.getByRole('button', { name: 'Revisar' }).click();
@@ -193,15 +196,18 @@ test('tracks languages, steps and outcome without sending anything typed', async
   expect(spy.named('section_viewed').map((e) => e.properties['section'])).toEqual([
     'causa',
     'fechas',
+    'situacion',
     'prorrateo',
     'salario',
+    'erte',
     'vacaciones',
     'hijos',
     'otros',
+    'pago',
     'finiquito',
     'resultado',
   ]);
-  expect(spy.named('section_completed')).toHaveLength(8);
+  expect(spy.named('section_completed')).toHaveLength(11);
   expect(spy.named('detail_opened').map((e) => e.properties['item'])).toEqual(['severance']);
   expect(spy.named('help_opened')[0]?.properties['topic']).toBe('faq-datos');
   expect(spy.named('review_completed')[0]?.properties).toMatchObject({
@@ -336,6 +342,7 @@ test("a full run writes nothing to the browser's storage", async ({ page, contex
   await page.getByLabel('Prefiero no decirlo').check();
   await next();
   await next();
+  await next();
   await page.getByRole('button', { name: 'Revisar' }).click();
   await page.getByRole('region', { name: 'Indemnización' }).getByText('Cómo se calcula').click();
   await page.getByText('¿Se envían mis datos a algún sitio?').click();
@@ -357,6 +364,7 @@ test("a full run writes nothing to the browser's storage", async ({ page, contex
     'preaviso',
     'hijos',
     'otros',
+    'pago',
     'finiquito',
     'resultado',
     'causa',
@@ -390,10 +398,12 @@ test('a repeated review counts the attempt and names only what changed', async (
   await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await next();
+  await next();
   await page.getByRole('button', { name: 'Revisar' }).click();
   await page.getByRole('link', { name: /Salario/ }).click();
   await next(); // the Salario tab opens on the prorating sheet, already answered
   await page.getByLabel('Salario bruto mensual').fill('1.600');
+  await next();
   await next();
   await next();
   await next();
@@ -413,6 +423,54 @@ test('a repeated review counts the attempt and names only what changed', async (
     ['resultado', 'prorrateo'],
   ]);
   for (const e of spy.events()) expect(withoutRandom(e)).not.toMatch(/1\.?[56]00/);
+});
+
+test('the situations of a possibly null dismissal never leave the page, not even by name', async ({
+  page,
+}) => {
+  const spy = await spyOn(page);
+  await page.goto('finiquito/');
+  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  await page.getByLabel('Despido objetivo').check();
+  await next();
+  await page.getByLabel('Fecha de alta', { exact: true }).fill('2020-01-01');
+  await page.getByLabel('Fecha de baja', { exact: true }).fill('2026-09-15');
+  await next();
+  await page.getByLabel('Sí, marcar cuáles').check();
+  await page.getByLabel('Estabas embarazada').check();
+  await page.getByLabel('Estabas de baja médica').check();
+  await next();
+  await page
+    .getByRole('group', { name: '¿Tus pagas extra van prorrateadas en la nómina?' })
+    .getByLabel('Sí')
+    .check();
+  await next();
+  await page.getByLabel('Salario bruto mensual').fill('1.500');
+  await next();
+  await next();
+  await page.getByLabel('Disfrutados este año').fill('0');
+  await next();
+  await next();
+  await page.getByLabel('Ninguno').check();
+  await next();
+  await next();
+  await next();
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  await expect(page.getByRole('region', { name: 'Este despido podría ser nulo' })).toBeVisible();
+  // Unticking one and reviewing again would name a changed field, were they ever tracked.
+  await page.getByRole('link', { name: /Fechas/ }).click();
+  await next();
+  await page.getByLabel('Estabas de baja médica').uncheck();
+  await page.getByRole('link', { name: /Tu finiquito/ }).click();
+  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  await expect.poll(() => spy.named('review_completed').length, { timeout: 15_000 }).toBe(2);
+
+  expect(spy.named('review_completed')[1]?.properties['changed_fields']).toEqual([]);
+  for (const e of spy.events())
+    expect(withoutRandom(e)).not.toMatch(
+      /situation|embaraz|pregnan|sick|baja m[eé]dica|family_leave|care_rights|violence/i,
+    );
 });
 
 test('with the do-not-track signal nothing is sent', async ({ page }) => {

@@ -3,7 +3,7 @@ import Field from './Field.astro';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
 import { minimumHolidays } from '../engine/settlement';
-import type { Cause } from '../engine/types';
+import { PROTECTED_SITUATIONS, type Cause } from '../engine/types';
 
 interface Props {
   lang: Lang;
@@ -18,9 +18,15 @@ const causes = [
   'resignation',
   'fixed_term_end',
   'objective_dismissal',
+  'collective_dismissal',
   'unfair_dismissal',
   'disciplinary_dismissal',
+  'unknown',
 ] as const;
+// The answers below are asked only after a dismissal, or when the cause is not known.
+const dismissals =
+  'objective_dismissal collective_dismissal unfair_dismissal disciplinary_dismissal';
+const ertes = ['none', 'reduced', 'suspended', 'unknown'] as const;
 const fixedTermTypes = ['production_circumstances', 'replacement', 'training'] as const;
 const accruals = ['annual', 'semiannual', 'unknown'] as const;
 const holidayUnits = ['working', 'calendar'] as const;
@@ -128,6 +134,55 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
 
     <fieldset
       class="sheet"
+      id="sheet-situacion"
+      data-sheet="situacion"
+      aria-labelledby="question-situacion"
+    >
+      <h2 class="question" id="question-situacion" tabindex="-1">
+        {tx('situations.question')}
+      </h2>
+      <p class="help" id="hint-situations">
+        {tx('situations.help')}
+      </p>
+      <div data-if-cause={`${dismissals} unknown`} hidden>
+        <div class="chips" data-field="situations">
+          {(['no', 'yes'] as const).map((value) => (
+            <div class="chip">
+              <input
+                type="radio"
+                name="situations"
+                id={`situations-${value}`}
+                value={value}
+                checked={value === 'no'}
+                aria-describedby="hint-situations"
+                disabled
+              />
+              <label for={`situations-${value}`}>{tx(`situations.${value}`)}</label>
+            </div>
+          ))}
+        </div>
+        <fieldset class="group" data-if-situations="yes" hidden>
+          <legend>{tx('situations.legend')}</legend>
+          <div class="options">
+            {PROTECTED_SITUATIONS.map((value) => (
+              <div class="option">
+                <input
+                  type="checkbox"
+                  name={`situation_${value}`}
+                  id={`situation-${value}`}
+                  value="yes"
+                  disabled
+                />
+                <label for={`situation-${value}`}>{tx(`situations.${value}`)}</label>
+              </div>
+            ))}
+          </div>
+        </fieldset>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
       id="sheet-prorrateo"
       data-sheet="prorrateo"
       aria-labelledby="question-prorrateo"
@@ -183,6 +238,40 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           'data-hint-no': tx('salary.monthly_hint_no'),
         }}
       />
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-erte" data-sheet="erte" aria-labelledby="question-erte">
+      <h2 class="question" id="question-erte" tabindex="-1">
+        {tx('erte.question')}
+      </h2>
+      <p class="help" id="hint-erte">
+        {tx('erte.help')}
+      </p>
+      <div data-if-cause={dismissals} hidden>
+        <div class="chips" data-field="erte">
+          {ertes.map((value) => (
+            <div class="chip">
+              <input
+                type="radio"
+                name="erte"
+                id={`erte-${value}`}
+                value={value}
+                checked={value === 'none'}
+                aria-describedby="hint-erte"
+                disabled
+              />
+              <label for={`erte-${value}`}>{tx(`erte.${value}`)}</label>
+            </div>
+          ))}
+        </div>
+        <Field
+          name="preErteMonthlySalary"
+          label={tx('erte.pre_salary')}
+          hint={tx('erte.pre_salary_hint')}
+          kind="amount"
+          attributes={{ 'data-if-erte': 'reduced suspended', hidden: '' }}
+        />
+      </div>
     </fieldset>
 
     <fieldset class="sheet" id="sheet-pagas" data-sheet="pagas" aria-labelledby="question-pagas">
@@ -344,7 +433,10 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         label={tx('holidays.notice_received')}
         hint={tx('holidays.notice_received_hint')}
         kind="days"
-        attributes={{ 'data-if-cause': 'objective_dismissal fixed_term_end', hidden: '' }}
+        attributes={{
+          'data-if-cause': 'objective_dismissal collective_dismissal fixed_term_end',
+          hidden: '',
+        }}
       />
       <div class="pair" data-if-cause="resignation" hidden>
         <Field
@@ -492,6 +584,29 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           </fieldset>
         </li>
       </template>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-pago" data-sheet="pago" aria-labelledby="question-pago">
+      <h2 class="question" id="question-pago" tabindex="-1">
+        {tx('paid.question')}
+      </h2>
+      <p class="help" id="hint-paid">
+        {tx('paid.help')}
+      </p>
+      <div class="chips" data-field="paid">
+        {(['yes', 'no'] as const).map((value) => (
+          <div class="chip">
+            <input
+              type="radio"
+              name="paid"
+              id={`paid-${value}`}
+              value={value}
+              aria-describedby="hint-paid"
+            />
+            <label for={`paid-${value}`}>{tx(`form.${value}`)}</label>
+          </div>
+        ))}
+      </div>
     </fieldset>
 
     <fieldset

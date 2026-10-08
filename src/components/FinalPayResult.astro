@@ -74,6 +74,8 @@ const workHistoryUrl =
         <div data-summary-deadlines></div>
       </div>
     </section>
+    {/* Warnings with no figure behind the pass: shown with the summary and with the detail. */}
+    <div class="review__items" data-warnings hidden></div>
     {benefitFirst && <div class="review__slot" data-slot="benefit" />}
     <div class="review__items" data-items></div>
     {documents && <PassOffer lang={lang} />}
@@ -204,6 +206,7 @@ const workHistoryUrl =
             <span data-status-text></span>
           </p>
           <p class="source item__citation" data-citation hidden></p>
+          <p class="item__note" data-or-more hidden></p>
           <p class="item__note" data-agreement hidden>
             {tx('client.agreement_may_improve')}
           </p>
@@ -212,6 +215,20 @@ const workHistoryUrl =
             <summary>{tx('result.how_it_is_calculated')}</summary>
             <p class="help" data-calculation></p>
             <ul class="sources" data-sources></ul>
+          </details>
+        </div>
+      </section>
+    </template>
+    <template data-template="warning">
+      <section class="item" data-warning>
+        <span class="item__tab" aria-hidden="true" data-warning-tab></span>
+        <div class="sheet">
+          <h3 class="item__title" data-warning-title></h3>
+          <div data-warning-lines></div>
+          <details class="item__detail" data-warning-detail>
+            <summary>{tx('result.how_it_is_calculated')}</summary>
+            <p class="help" data-warning-calculation></p>
+            <ul class="sources" data-warning-sources></ul>
           </details>
         </div>
       </section>

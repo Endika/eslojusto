@@ -57,10 +57,12 @@ async function readToOtherJobs(page: Page) {
   const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
   await next();
   await next();
+  await next();
   await page
     .getByRole('group', { name: '¿Tus pagas extra van prorrateadas en la nómina?' })
     .getByLabel('Sí')
     .check();
+  await next();
   await next();
   await next();
   await page.getByLabel('Disfrutados este año').fill('0');

@@ -11,7 +11,7 @@ import {
   estimateBenefit,
   monthlyBase,
 } from '../engine/unemployment';
-import type { Cause, FinalPayInput, ItemId } from '../engine/types';
+import type { Cause, FinalPayInput, ItemId, StatedCause } from '../engine/types';
 
 // The worked examples of the case pages, worked out by the same engine as the calculator when the
 // site is built, so a figure on a page can never drift from what the calculator gives. Every
@@ -137,7 +137,7 @@ export const SENIORITY = [
 export const bySeniority = SENIORITY.map(([label, start, months]) => {
   const end = '2026-09-30';
   const finalPay = finalPayTotal(review(exampleInput('resignation', start, end)));
-  const severance = (cause: Cause) =>
+  const severance = (cause: StatedCause) =>
     computeSeverance({
       cause,
       startDate: date(start),

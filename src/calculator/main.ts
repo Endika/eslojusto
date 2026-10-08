@@ -20,6 +20,7 @@ import {
   sheetOfField,
   readBenefitSheets,
   readForm,
+  readSituations,
   type FieldError,
 } from './form';
 import { createNavigation } from './navigation';
@@ -130,6 +131,9 @@ export function setUpCalculator(
       benefit: estimate,
       cause: parsed.input.cause,
       children: benefit.data?.children ?? null,
+      erte: parsed.input.erte,
+      // Kept to the result: the events below never get them.
+      situations: readSituations(form),
     };
     const state = detail();
     renderResult(result, shown, state === 'locked', tr);
