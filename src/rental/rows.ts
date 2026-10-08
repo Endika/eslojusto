@@ -13,6 +13,16 @@ export const ROW_LISTS = [
 ] as const;
 export type RowList = (typeof ROW_LISTS)[number];
 
+// The most rows each list holds on screen.
+export const ROW_MAX: Readonly<Record<RowList, number>> = {
+  guarantees: 6,
+  fees: 8,
+  updates: 15,
+  charges: 30,
+  returns: 6,
+  deductions: 10,
+};
+
 export const rowField = (list: RowList, row: number, key: string): string =>
   `${list}.${row}.${key}`;
 

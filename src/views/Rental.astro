@@ -2,6 +2,8 @@
 import Base from '../layouts/Base.astro';
 import RentalForm from '../components/RentalForm.astro';
 import RentalResult from '../components/RentalResult.astro';
+import DocumentStart from '../components/DocumentStart.astro';
+import { DOCUMENTS } from '../documents/config';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
 
@@ -21,6 +23,9 @@ const sections = [
   ['settlement', 'salida', '05', 1],
   ['result', 'resultado', '06', 2],
 ] as const;
+// With the documents API the visit opens on the choice between uploading and typing; the tabs and
+// the form wait until it is made.
+const documents = DOCUMENTS !== null;
 ---
 
 <Base
@@ -29,8 +34,9 @@ const sections = [
   path="/alquiler/"
   lang={lang}
   section="cause"
+  calculator={documents}
 >
-  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
     <ol>
       {/* Only a section already reached is a link; one still ahead is plain text until then. */}
       {sections.map(([id, step, number, weight], i) => (
@@ -65,8 +71,9 @@ const sections = [
           <p class="help">{tx('rental.no_js')}</p>
         </div>
       </noscript>
-      <RentalForm lang={lang} />
-      <RentalResult lang={lang} />
+      {documents && <DocumentStart lang={lang} review="rental" />}
+      <RentalForm lang={lang} hidden={documents} />
+      <RentalResult lang={lang} documents={documents} />
     </div>
   </main>
 </Base>

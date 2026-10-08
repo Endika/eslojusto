@@ -15,11 +15,14 @@ import {
   NOTICE_FORMS,
   UPDATE_CLAUSES,
 } from '../rental/form';
+import { ROW_MAX } from '../rental/rows';
 
 interface Props {
   lang: Lang;
+  // With the documents API the form waits behind the choice between uploading and typing.
+  hidden?: boolean;
 }
-const { lang } = Astro.props;
+const { lang, hidden = false } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 
 const yesNo = ['yes', 'no'] as const;
@@ -36,7 +39,7 @@ const plus = 'M12 5v14M5 12h14';
 const cross = 'M6 6l12 12M18 6 6 18';
 ---
 
-<form class="calculator" id="rental" novalidate aria-label={tx('rental.form_aria')}>
+<form class="calculator" id="rental" novalidate aria-label={tx('rental.form_aria')} hidden={hidden}>
   <div class="stack">
     <fieldset
       class="sheet"
@@ -226,7 +229,7 @@ const cross = 'M6 6l12 12M18 6 6 18';
         class="rows"
         data-rows="guarantees"
         data-min="1"
-        data-max="6"
+        data-max={ROW_MAX.guarantees}
         data-if="hasGuarantees:yes"
         hidden
       >
@@ -312,7 +315,14 @@ const cross = 'M6 6l12 12M18 6 6 18';
           ))}
         </div>
       </fieldset>
-      <div class="rows" data-rows="fees" data-min="1" data-max="8" data-if="hasFees:yes" hidden>
+      <div
+        class="rows"
+        data-rows="fees"
+        data-min="1"
+        data-max={ROW_MAX.fees}
+        data-if="hasFees:yes"
+        hidden
+      >
         <ol class="rows__list" data-rows-list aria-label={tx('rental.entry.fees')}></ol>
         <button class="button button--sheet" type="button" data-rows-add>
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
@@ -481,7 +491,7 @@ const cross = 'M6 6l12 12M18 6 6 18';
         class="rows"
         data-rows="updates"
         data-min="1"
-        data-max="15"
+        data-max={ROW_MAX.updates}
         data-if="hasUpdates:yes"
         hidden
       >
@@ -650,7 +660,7 @@ const cross = 'M6 6l12 12M18 6 6 18';
         class="rows"
         data-rows="charges"
         data-min="1"
-        data-max="30"
+        data-max={ROW_MAX.charges}
         data-if="hasCharges:yes"
         hidden
       >
@@ -787,7 +797,7 @@ const cross = 'M6 6l12 12M18 6 6 18';
       </fieldset>
       <div class="moveout" data-if="movedOut:yes" hidden>
         <Field name="keysReturnedOn" label={tx('rental.moveout.keys')} kind="date" />
-        <div class="rows" data-rows="returns" data-min="0" data-max="6">
+        <div class="rows" data-rows="returns" data-min="0" data-max={ROW_MAX.returns}>
           <p class="field__label">{tx('rental.moveout.returns')}</p>
           <p class="hint">{tx('rental.moveout.returns_hint')}</p>
           <ol class="rows__list" data-rows-list aria-label={tx('rental.moveout.returns')}></ol>
@@ -846,7 +856,7 @@ const cross = 'M6 6l12 12M18 6 6 18';
             </li>
           </template>
         </div>
-        <div class="rows" data-rows="deductions" data-min="0" data-max="10">
+        <div class="rows" data-rows="deductions" data-min="0" data-max={ROW_MAX.deductions}>
           <p class="field__label">{tx('rental.moveout.deductions')}</p>
           <ol class="rows__list" data-rows-list aria-label={tx('rental.moveout.deductions')}></ol>
           <button class="button button--sheet" type="button" data-rows-add>
