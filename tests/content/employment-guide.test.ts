@@ -225,6 +225,34 @@ describe('the guide follows how each norm stands', () => {
   });
 });
 
+describe('the guide words the law as the BOE does', () => {
+  it('names the agreement duty of RD 723/2026, and its repeal once repealed', () => {
+    expect(block('agreement')?.paragraphs[0]).toBe(
+      'Desde el 5 de octubre de 2026, la empresa tiene que informarte por escrito de qué convenio se aplica, con su código y su fecha de publicación (art. 3.2.o del Real Decreto 723/2026).',
+    );
+    expect(block('agreement', repealed('rd723_2026', '2027-06-30'))?.paragraphs[0]).toContain(
+      'La norma Real Decreto 723/2026 se aplicó del 05-10-2026 al 30-06-2027',
+    );
+  });
+
+  it('gives the transitional rules of RDL 32/2021 their exact dates', () => {
+    const list = block('modalities')?.list.join(' ') ?? '';
+    expect(list).toContain(
+      'los hechos antes del 31 de diciembre de 2021 siguen sus reglas anteriores',
+    );
+    expect(list).toContain(
+      'los hechos del 31 de diciembre de 2021 al 30 de marzo de 2022 también, pero sin pasar de 6 meses',
+    );
+    expect(list).toContain('En los sectores agrario y agroalimentario');
+  });
+
+  it('states the 120-day condition of art. 4.1 apart from how the review applies it', () => {
+    const wage = block('minimum_wage')?.paragraphs.join(' ') ?? '';
+    expect(wage).toContain('Cuando los servicios a una misma empresa no pasan de 120 días');
+    expect(wage).toContain('La revisión lo aplica cuando el contrato paga por días.');
+  });
+});
+
 describe('the employment FAQ', () => {
   it('asks about documents and the pass only with the documents API', () => {
     expect(faq({ documents: true }).map((e) => e.anchor)).toEqual(

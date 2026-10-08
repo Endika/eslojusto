@@ -1,4 +1,3 @@
-import { addDays, parseDate, toIso } from '../engine/date';
 import type { NormSource } from '../engine/law/sources';
 import { round2 } from '../engine/money';
 import {
@@ -245,9 +244,6 @@ function currentYearSentence(
   });
 }
 
-// The day before a norm took effect, as the last day of the wording it replaced.
-const eveOf = (iso: string): string => formatLongDay(toIso(addDays(parseDate(iso), -1)));
-
 export function employmentGuide(
   lang: Lang,
   norms: NormTable,
@@ -274,7 +270,6 @@ export function employmentGuide(
   };
   const reform = formatLongDay(RULES.fixed_term_presumption.from);
   const rd723Stands = normStands(norms.rd723_2026);
-  const reformEve = eveOf(RULES.fixed_term_presumption.from);
   const latest = [...minimumWage].sort((a, b) => b.year - a.year)[0];
   if (latest === undefined) throw new Error('The employment guide needs the minimum wage table.');
 
@@ -328,7 +323,7 @@ export function employmentGuide(
       paragraphs: [
         tx('employment.guide.modalities.lead', { desde: reform }),
         tx('employment.guide.modalities.written'),
-        tx('employment.guide.modalities.before_reform', { hasta: reformEve }),
+        tx('employment.guide.modalities.before_reform', { desde: reform }),
       ],
       list: [
         tx('employment.guide.modalities.production'),
@@ -336,7 +331,7 @@ export function employmentGuide(
         tx('employment.guide.modalities.replacement'),
         tx('employment.guide.modalities.discontinuous'),
         tx('employment.guide.modalities.training'),
-        tx('employment.guide.modalities.abolished', { desde: reform }),
+        tx('employment.guide.modalities.abolished'),
       ],
       rules: [
         'fixed_term_presumption',
@@ -476,11 +471,14 @@ export function employmentGuide(
     }),
     block('agreement', 'g-convenio', {
       paragraphs: [
-        tx('employment.guide.agreement.lead'),
+        withNorm('rd723_2026', 'employment.guide.agreement.lead', {
+          nombre: shortName(norms.rd723_2026),
+        }),
+        tx('employment.guide.agreement.binding'),
         tx('employment.guide.agreement.where'),
         tx('employment.guide.agreement.review'),
       ],
-      rules: ['agreement_salary'],
+      rules: ['info_elements', 'agreement_salary'],
       links: [{ label: tx('client.employment.link.regcon'), url: REGCON.url }],
     }),
   ];
