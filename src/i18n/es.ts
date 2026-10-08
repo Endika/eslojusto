@@ -2914,9 +2914,9 @@ export const es = {
   'rental.landlord.type': '¿Quién te alquila la vivienda?',
   'rental.landlord.type_hint':
     'Lo dice el contrato: el nombre de una persona o el de una sociedad (S.L., S.A.).',
-  'rental.landlord.large': '¿Tu casero es una empresa o tiene muchas viviendas?',
+  'rental.landlord.large': '¿Tu casero es gran tenedor?',
   'rental.landlord.large_hint':
-    'La ley lo llama «gran tenedor»: quien tiene más de diez viviendas o más de 1.500 m² de uso residencial, o cinco o más en una zona tensionada si así se declara.',
+    'Es gran tenedor quien tiene más de diez viviendas o más de 1.500 m² de uso residencial, sin contar garajes ni trasteros (art. 3.k de la Ley 12/2023); en una zona tensionada, la comunidad autónoma puede bajarlo a cinco o más viviendas. Ser una empresa no basta: una sociedad con pocos pisos no lo es.',
   'rental.landlord.region': 'Comunidad autónoma',
   'rental.landlord.region_hint': 'Donde está la vivienda.',
   'rental.landlord.region_choose': 'Elige una',
@@ -2990,7 +2990,9 @@ export const es = {
   'rental.notice.verbal': 'De palabra',
   'rental.notice.none': 'No me avisaron',
   'rental.updates.notice_on': 'Fecha del aviso',
-  'rental.updates.agreed': '¿Aceptaste esa subida por escrito?',
+  'rental.updates.agreed': '¿Aceptaste esa subida?',
+  'rental.updates.agreed_written': 'Sí, por escrito',
+  'rental.updates.agreed_verbal': 'Sí, de palabra',
 
   'rental.charges.question': 'Los gastos',
   'rental.charges.help':
@@ -3168,7 +3170,7 @@ export const es = {
   'client.rental.report.signed': 'Fecha del contrato',
   'client.rental.report.start': 'Fecha de entrada',
   'client.rental.report.landlord': 'Casero',
-  'client.rental.report.large_landlord': '¿Empresa o muchas viviendas?',
+  'client.rental.report.large_landlord': '¿Gran tenedor?',
   'client.rental.report.region': 'Comunidad autónoma',
   'client.rental.report.stressed_zone': '¿Zona tensionada?',
   'client.rental.report.agreed_months': 'Duración pactada',
@@ -3314,8 +3316,11 @@ export const es = {
   'client.rental.reason.large_landlord_unknown': 'si tu casero es gran tenedor',
   'client.rental.reason.index_month_doubtful': 'qué dato del índice estaba publicado ese día',
   'client.rental.reason.agreement_unknown': 'si lo pactasteis por escrito',
+  'client.rental.reason.agreement_verbal': 'si se puede probar que la aceptaste de palabra',
   'client.rental.reason.notice_form_doubtful':
     'si un aviso por correo o mensaje cuenta como aviso por escrito',
+  'client.rental.reason.notice_missing_paid':
+    'si pagar la subida sin aviso por escrito cuenta como aceptarla',
   'client.rental.reason.interest_day_count': 'si el año de intereses cuenta 365 días o 360',
   'client.rental.reason.extraordinary_cap_reach':
     'si los topes extraordinarios de la renta alcanzan a los gastos',
@@ -3422,6 +3427,8 @@ export const es = {
     'La variación fue del {rate}: no permite subir.',
   'client.rental.calculation.rent_update.agreed_in_writing':
     'Aceptaste la subida por escrito, así que no se compara con el índice.',
+  'client.rental.calculation.rent_update.agreed_verbally':
+    'Aceptaste la subida de palabra: si se puede probar, vale como pacto y no se compara con el índice.',
   'client.rental.calculation.rent_update.large_landlord_cap':
     'Si tu casero es gran tenedor, el tope se aplica aunque aceptaras la subida.',
   'client.rental.calculation.rent_update.charged_before_notice_one':
@@ -3432,6 +3439,8 @@ export const es = {
     'Sin aviso por escrito, se cobró 1 mes con la renta nueva cuando tocaba pagar {base}.',
   'client.rental.calculation.rent_update.notice_not_written_many':
     'Sin aviso por escrito, se cobraron {months} meses con la renta nueva cuando tocaba pagar {base}.',
+  'client.rental.calculation.rent_update.accepted_by_paying':
+    'No te avisaron por escrito, pero pagaste la subida: si eso cuenta como aceptarla, la renta nueva valía desde el aniversario.',
   'client.rental.calculation.rent_update.months': 'Meses contados: {months}, de {from} a {to}.',
   'client.rental.calculation.rent_update.monthly_over': 'Pagas {monthly} de más cada mes.',
   'client.rental.calculation.rent_update.within_limit': 'La renta nueva no pasa de la máxima.',

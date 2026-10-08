@@ -195,7 +195,9 @@ export const DOUBT_REASONS = [
   'large_landlord_unknown',
   'index_month_doubtful',
   'agreement_unknown',
+  'agreement_verbal',
   'notice_form_doubtful',
+  'notice_missing_paid',
   'interest_day_count',
   'extraordinary_cap_reach',
 ] as const satisfies readonly DoubtReason[];

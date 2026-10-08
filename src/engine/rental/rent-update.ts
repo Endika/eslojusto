@@ -101,6 +101,7 @@ const IGC_CEILING = 2;
 
 const WRITTEN = new Set(['letter', 'burofax', 'receipt_note', 'annex']);
 const ELECTRONIC = new Set(['email', 'messaging']);
+const UNWRITTEN = new Set(['verbal', 'none']);
 // Below a cent a month the difference is rounding (no norm fixes how to round the updated rent).
 const TOLERANCE = 0.01;
 // LAU art. 17.2: unless agreed otherwise, rent is paid within the first seven days of the month.
@@ -191,12 +192,17 @@ function frameOf(
         doubts.push({ id: indexDoubtId(id, day), reason: 'index_month_doubtful' });
     }
     const largeLandlordCap = [...active.keys()].some((id) => EXTRA_CAPS[id]?.largeLandlord);
-    if (input.largeLandlord === null && update.agreedInWriting !== false && largeLandlordCap)
+    const mayBeAgreed = update.agreedInWriting !== false || update.agreedVerbally === true;
+    if (input.largeLandlord === null && mayBeAgreed && largeLandlordCap)
       doubts.push({ id: LARGE_LANDLORD, reason: 'large_landlord_unknown' });
     if (update.agreedInWriting === null)
       doubts.push({ id: ids.agreement, reason: 'agreement_unknown' });
+    else if (update.agreedInWriting === false && update.agreedVerbally === true)
+      doubts.push({ id: ids.agreement, reason: 'agreement_verbal' });
     if (ELECTRONIC.has(update.notice))
       doubts.push({ id: ids.notice, reason: 'notice_form_doubtful' });
+    if (UNWRITTEN.has(update.notice))
+      doubts.push({ id: ids.notice, reason: 'notice_missing_paid' });
   }
   return { index, update, day, rise, active, refs, doubts, ids, firstYear, endMonth };
 }
@@ -359,7 +365,11 @@ function allowance(
   ): RateFigure =>
     'fixed' in l ? { kind: 'fixed', rate: l.fixed } : { kind: 'index', figure: l.figure };
 
-  const agreedInWriting = update.agreedInWriting ?? world[frame.ids.agreement] === true;
+  // LAU art. 18.1 and RDL 6/2022 art. 46: a new agreement replaces the clause, in any form.
+  const agreedInWriting =
+    update.agreedInWriting === true ||
+    ((update.agreedInWriting === null || update.agreedVerbally === true) &&
+      world[frame.ids.agreement] === true);
   const largeLandlord = input.largeLandlord ?? world[LARGE_LANDLORD] === true;
   const extra = extraordinary
     ? [...active.keys()].filter((id) => EXTRA_CAPS[id] !== undefined && holds(id))
@@ -374,7 +384,13 @@ function allowance(
     if (binding.length === 0)
       return { ok: false, unchecked: 'agreed_in_writing', rules: ['update_clause'] };
     for (const id of binding) caps.push({ rule: id, rate: EXTRA_CAPS[id]?.rate ?? 0 });
-    phrases.push(rentalPhrase('rent_update.agreed_in_writing'));
+    phrases.push(
+      rentalPhrase(
+        update.agreedVerbally === true
+          ? 'rent_update.agreed_verbally'
+          : 'rent_update.agreed_in_writing',
+      ),
+    );
     phrases.push(rentalPhrase('rent_update.large_landlord_cap'));
   } else {
     const clause = input.updateClause;
@@ -489,7 +505,14 @@ function readUpdate(
         agreed: null,
         cap: null,
         maxRent: null,
-        calculation: [basePhrase, rentalPhrase(UNCHECKED_PHRASE[a.unchecked])],
+        calculation: [
+          basePhrase,
+          rentalPhrase(
+            a.unchecked === 'agreed_in_writing' && update.agreedVerbally === true
+              ? 'rent_update.agreed_verbally'
+              : UNCHECKED_PHRASE[a.unchecked],
+          ),
+        ],
         rules: a.rules,
       },
       carried: null,
@@ -505,8 +528,15 @@ function readUpdate(
   const written =
     WRITTEN.has(update.notice) ||
     (ELECTRONIC.has(update.notice) && world[frame.ids.notice] === true);
-  const dueFrom =
-    written && update.noticeOn !== null
+  // Without written notice, paying a rise the clause and the cap allow may have accepted it; a rise
+  // over them is never read so.
+  const acceptedByPaying =
+    UNWRITTEN.has(update.notice) &&
+    world[frame.ids.notice] === true &&
+    update.newRent <= allowed.maxRent + TOLERANCE;
+  const dueFrom = acceptedByPaying
+    ? effectiveMonth
+    : written && update.noticeOn !== null
       ? Math.max(effectiveMonth, monthIndex(update.noticeOn) + 1)
       : Number.POSITIVE_INFINITY;
   const first = monthIndex(update.chargedFrom);
@@ -537,6 +567,7 @@ function readUpdate(
         base: { euros: base.rent },
       }),
     );
+  if (acceptedByPaying) phrases.push(rentalPhrase('rent_update.accepted_by_paying'));
   if (monthsBeforeDue > 0)
     phrases.push(
       rentalPhrase(

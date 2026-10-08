@@ -152,6 +152,7 @@ describe('rent updates (property, seeded)', () => {
       'index_month_doubtful',
       'large_landlord_unknown',
       'notice_form_doubtful',
+      'notice_missing_paid',
       'repealed_window',
     ]);
   });

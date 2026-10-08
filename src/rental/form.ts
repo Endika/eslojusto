@@ -321,7 +321,8 @@ function read(form: HTMLFormElement): Reading {
       const notice = choice(field('notice'), NOTICE_FORMS);
       const dated = notice !== null && DATED_NOTICES.includes(notice);
       const noticeOn = dated ? date(field('noticeOn'), true) : null;
-      const agreed = answer(field('agreedInWriting'));
+      const verbally = text(field('agreedInWriting')) === 'verbal';
+      const agreed = verbally ? false : answer(field('agreedInWriting'));
       const start = partial.startDate;
       if (year !== null && (year < 1900 || year > 2200)) fail(field('year'), 'invalid_number');
       else if (
@@ -347,6 +348,7 @@ function read(form: HTMLFormElement): Reading {
           notice,
           noticeOn,
           agreedInWriting: agreed,
+          ...(verbally ? { agreedVerbally: true } : {}),
         });
         rows.updates.push([i]);
       }

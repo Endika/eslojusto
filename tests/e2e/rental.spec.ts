@@ -21,7 +21,7 @@ interface Rise {
   readonly next: string;
   readonly chargedFrom: string;
   readonly noticeOn: string;
-  readonly agreed: 'Sí' | 'No' | 'No lo sé';
+  readonly agreed: 'Sí, por escrito' | 'Sí, de palabra' | 'No' | 'No lo sé';
 }
 
 interface Case extends Contract {
@@ -53,7 +53,7 @@ async function fillCase(page: Page, c: Case) {
   const landlord = sheet(page, 'Tu casero');
   await landlord.getByLabel('Una persona').check();
   await landlord
-    .getByRole('group', { name: '¿Tu casero es una empresa o tiene muchas viviendas?' })
+    .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
     .getByLabel(c.large ?? 'No', { exact: true })
     .check();
   await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
@@ -80,7 +80,7 @@ async function fillCase(page: Page, c: Case) {
   await row.getByLabel('¿Cómo te avisaron?').selectOption({ label: 'Carta' });
   await row.getByLabel('Fecha del aviso').fill(c.rise.noticeOn);
   await row
-    .getByRole('group', { name: '¿Aceptaste esa subida por escrito?' })
+    .getByRole('group', { name: '¿Aceptaste esa subida?' })
     .getByLabel(c.rise.agreed, { exact: true })
     .check();
   await next(page);
@@ -157,13 +157,38 @@ for (const { name, viewport } of SIZES) {
           next: '1050',
           chargedFrom: '2023-06-01',
           noticeOn: '2023-05-01',
-          agreed: 'Sí',
+          agreed: 'Sí, por escrito',
         },
       });
       const card = page.getByRole('region', { name: 'Subida del 25-06-2023' });
       await expect(card.locator('.item__status')).toHaveText('Depende');
       await expect(card).toContainText(
         /Depende de si tu casero es gran tenedor: no se puede comprobar o pagas de más unos 360\s€/,
+      );
+      await expect(card).toContainText('No se suma al total');
+    });
+
+    test('a rise accepted by word of mouth is a doubt, out of the total', async ({ page }) => {
+      await open(page, viewport);
+      // 25-06-2023: a 5 % rise against the IGC (2 %) without a new agreement.
+      await fillCase(page, {
+        signed: '2020-06-20',
+        start: '2020-06-25',
+        clause: 'Un porcentaje fijo',
+        percent: '5',
+        rise: {
+          year: '2023',
+          previous: '1000',
+          next: '1050',
+          chargedFrom: '2023-06-01',
+          noticeOn: '2023-05-01',
+          agreed: 'Sí, de palabra',
+        },
+      });
+      const card = page.getByRole('region', { name: 'Subida del 25-06-2023' });
+      await expect(card.locator('.item__status')).toHaveText('Depende');
+      await expect(card).toContainText(
+        /Depende de si se puede probar que la aceptaste de palabra: no se puede comprobar o pagas de más unos 360\s€/,
       );
       await expect(card).toContainText('No se suma al total');
     });
@@ -210,7 +235,7 @@ test('no sheet scrolls sideways at 360×640, with every list open', async ({ pag
   await fits('casero');
   await landlord.getByLabel('Una empresa').check();
   await landlord
-    .getByRole('group', { name: '¿Tu casero es una empresa o tiene muchas viviendas?' })
+    .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
     .getByLabel('No lo sé')
     .check();
   await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Cataluña' });
