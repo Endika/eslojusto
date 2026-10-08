@@ -6,6 +6,10 @@ export const es = {
 
   'footer.note':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen el Estatuto de los Trabajadores y la guía del CGPJ (v0.6, julio de 2026).',
+  'footer.note_rental':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen la Ley de Arrendamientos Urbanos (Ley 29/1994), la Ley 12/2023 y el IRAV y el IPC del INE.',
+  'footer.note_general':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Cada cifra lleva la norma de la que sale.',
   'footer.nav': 'Información legal',
   'footer.legal_notice': 'Aviso legal',
   'footer.privacy': 'Privacidad',

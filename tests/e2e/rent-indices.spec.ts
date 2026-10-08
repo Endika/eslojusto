@@ -60,3 +60,11 @@ test('the home page links to the rent indices', async ({ page }) => {
   await page.getByRole('link', { name: 'IRAV e IPC de cada mes' }).click();
   await expect(page).toHaveURL(/\/alquiler\/irav-ipc\/$/);
 });
+
+test('the footer names the rental norms, and the final pay keeps its own', async ({ page }) => {
+  await page.goto('alquiler/irav-ipc/');
+  await expect(page.locator('.footer__note')).toContainText('Ley de Arrendamientos Urbanos');
+  await expect(page.locator('.footer__note')).not.toContainText('Estatuto de los Trabajadores');
+  await page.goto('finiquito/');
+  await expect(page.locator('.footer__note')).toContainText('Estatuto de los Trabajadores');
+});
