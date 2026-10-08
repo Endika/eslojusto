@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.1](https://github.com/Endika/eslojusto/compare/v1.16.0...v1.16.1) (2026-10-08)
+
+
+### Bug Fixes
+
+* **content:** say there is no paro without signing up as a job seeker ([9b152fe](https://github.com/Endika/eslojusto/commit/9b152fe29e1e60f07c15b680d3cb13a3e29d4a13))
+
 ## [1.16.0](https://github.com/Endika/eslojusto/compare/v1.15.0...v1.16.0) (2026-10-08)
 
 
