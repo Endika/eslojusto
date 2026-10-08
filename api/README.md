@@ -265,19 +265,31 @@ description). The API does not take that on trust: a `companyName`, or a work-hi
 `agreementCode` digits only; and any copied text (`causeText`, `scheduleText`, `modalityText`,
 `companyName`, `category`, `agreementName`, `position`, a clause `literal`, a `concept`, an
 `employerName`) that still holds a DNI/NIE, a Spanish IBAN or account number, an email, a
-Spanish phone number or a Social Security number (`src/domain/identifiers.ts`), or a word about
-health, family leave, union membership or debts (`src/domain/special-categories.ts`: IT or
-I.T., incapacidad, enfermedad, accidente, maternidad, paternidad, nacimiento y cuidado,
-lactancia, embarazo, riesgo durante, sindical, sindicato, afiliado, CCOO, UGT, discapacidad,
-minusvalía, diversidad funcional, embargo, pensión alimenticia and their commonest Catalan and
-Basque forms, as whole words without case or accents), is dropped, each as a discard. A payslip
+Spanish phone number or a Social Security number (`src/domain/identifiers.ts`) is dropped, each
+as a discard. So is any of them but `agreementName` that holds a word about health, family leave,
+union membership or debts (`src/domain/special-categories.ts`): incapacidad, enfermedad,
+accidente, salud, maternidad, paternidad, nacimiento y cuidado, permiso nacimiento, lactancia,
+embarazo, riesgo durante, discapacidad, minusvalía, diversidad funcional, sindical, sindicato,
+afiliado, CCOO, UGT, CGT, embargo, retención judicial, pensión alimenticia, with their plurals and
+feminine forms, the abbreviations «Inc. temporal», «cuota sind.» and «Emb. judicial», AT as a word
+of its own in capitals, and the Catalan and Galician forms (incapacitat, afiliat, discapacitat,
+embargament; incapacidade, enfermidade, maternidade, paternidade, discapacidade), as whole words
+without case or accents; Basque adds its endings to the word, so its stems match as prefixes
+(ezintasun, gaixotasun, amatasun, aitatasun, sindikatu, desgaitasun, bahiketa). IT or I.T.
+counts only where it is leave: alone, after «Compl.», «Prest.», «Dif.», «Baja» and the like, or
+before «EC», «CC», «AT», «Contingencias» or «Pago delegado»; «Técnico IT» stays. «Sin embargo»
+and «afiliado a la Seguridad Social» do not count. An agreement's name says nothing about the
+worker, even when it names a union, health or disability, so it is spared this list. A payslip
 line or a salary part whose `concept` carries such a word keeps its amount and category and
 loses only the concept, with no discard: the figure is still right, and the read no less sure.
-The word list errs on dropping: «accidente» in a safety clause or «IT» for information
-technology in a category take their text with them.
+The list errs on dropping: «accidente» in a safety clause or «Vigilancia de la salud» in a clause
+take their text with them.
 
 The lists are sized so that, all at their maximum, they fit in `max_tokens` (below, «Cost»):
-past six payslips, sixty lines or fifteen work-history rows, the model keeps the most recent.
+past six payslips, sixty lines or fifteen work-history rows, the model is asked to keep the most
+recent, and the API keeps the latest by `month` or `startDate` whatever order the rows came in
+(`keepLatestBy` in the list's spec, never sent to the model; the final pay and the rental review
+still keep the first rows).
 The extraction carries `truncated: true` when the model filled a list to its maximum (counted on
 what it sent, so a row that failed validation still counts; the seventeen information elements
 are a whole list, not a cut): the documents may hold more rows than the response, and the site
