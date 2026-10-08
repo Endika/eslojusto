@@ -352,17 +352,17 @@ export function employmentGuide(
       ],
     }),
     block('permanent', 'g-paso-a-fijo', {
-      // The quotes follow the first paragraph; each names its article as the review does.
+      // The quotes follow the first paragraph, each after the article it quotes.
       paragraphs: [
         tx('employment.guide.permanent.lead'),
         tx('employment.guide.permanent.certificate'),
         tx('employment.guide.permanent.review'),
       ],
       quotes: [
-        quote('permanent_on_breach', 'client.employment.permanent.15_4'),
+        quote('permanent_on_breach', 'employment.guide.permanent.quote_15_4'),
         quote(
           'chaining_18_in_24',
-          'client.employment.permanent.15_5',
+          'employment.guide.permanent.quote_15_5',
           'employment.guide.permanent.chaining',
         ),
         quote(

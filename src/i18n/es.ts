@@ -1236,6 +1236,10 @@ export const es = {
     'Con varios contratos: si en un periodo de 24 meses has tenido contratos durante más de 18, seguidos o no, con la misma empresa o grupo de empresas, mediante dos o más contratos por circunstancias de la producción, también a través de una ETT:',
   'employment.guide.permanent.not_written':
     'Y si un contrato que la ley pide por escrito no se hizo por escrito:',
+  'employment.guide.permanent.quote_15_4':
+    'El artículo 15.4 del Estatuto de los Trabajadores dice:',
+  'employment.guide.permanent.quote_15_5':
+    'El artículo 15.5 del Estatuto de los Trabajadores dice:',
   'employment.guide.permanent.quote_8_2': 'El artículo 8.2 del Estatuto de los Trabajadores dice:',
   'employment.guide.permanent.certificate':
     'Puedes pedir por escrito al servicio público de empleo un certificado de los contratos temporales que has tenido (art. 15.9). Con tu vida laboral, la revisión suma tus contratos para el límite de 18 meses dentro de 24.',
@@ -1336,7 +1340,7 @@ export const es = {
     'En proporción a tu jornada: el SMI es para la jornada completa, y con menos horas se cobra a prorrata (art. 1 de cada real decreto del SMI). Por ejemplo, con 20 horas a la semana frente a 40, en {anio} el mínimo es la mitad: {mitad} al año. La revisión hace la proporción con la jornada completa de tu convenio si la metes; si no, con las 40 horas de la ley.',
   'employment.faq.temporary': '¿Cuánto puede durar un contrato temporal?',
   'employment.faq.temporary_answer':
-    'Por circunstancias de la producción, hasta 6 meses, o hasta un año si lo amplía tu convenio sectorial, con una sola prórroga dentro de ese máximo; para situaciones ocasionales y previsibles, la empresa puede usarlo hasta 90 días en el año natural, no seguidos. De sustitución, mientras dura la ausencia de la persona a la que sustituyes, o hasta 3 meses para cubrir un puesto durante un proceso de selección (art. 15). Si en 24 meses has tenido contratos durante más de 18 con la misma empresa o grupo, mediante dos o más contratos por circunstancias de la producción, el artículo 15.5 del Estatuto de los Trabajadores dice que, en un caso como el tuyo, la persona adquiere la condición de fija.',
+    'Por circunstancias de la producción, hasta 6 meses, o hasta un año si lo amplía tu convenio sectorial, con una sola prórroga dentro de ese máximo; para situaciones ocasionales y previsibles, la empresa puede usarlo hasta 90 días en el año natural, no seguidos. De sustitución, mientras dura la ausencia de la persona a la que sustituyes, o hasta 3 meses para cubrir un puesto durante un proceso de selección (art. 15). Si en 24 meses has tenido contratos durante más de 18 con la misma empresa o grupo, mediante dos o más contratos por circunstancias de la producción, el artículo 15.5 del Estatuto de los Trabajadores dice que esas personas «adquirirán la condición de personas trabajadoras fijas».',
   'employment.faq.trial': '¿Cuánto puede durar el periodo de prueba?',
   'employment.faq.trial_answer':
     'Lo fija tu convenio, y solo cabe si se pacta por escrito. Si el convenio no dice nada, como mucho 6 meses para técnicos titulados y 2 meses para el resto, o 3 en empresas de menos de 25 personas. En un contrato temporal de 6 meses o menos, 1 mes, salvo que el convenio diga otra cosa. Si ya habías hecho las mismas funciones en la empresa, no cabe (art. 14.1). En un contrato de formación en alternancia no hay periodo de prueba (art. 11.2.l).',
