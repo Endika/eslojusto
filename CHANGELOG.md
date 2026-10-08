@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.15.0](https://github.com/Endika/eslojusto/compare/v1.14.0...v1.15.0) (2026-10-08)
+
+
+### Features
+
+* **api:** choose the extraction schema and prompt by review ([4572e94](https://github.com/Endika/eslojusto/commit/4572e9479bb7f9de7968a1605042bebea65bdbfa))
+* **api:** read lease contracts, rent notices, receipts, agency invoices and deposit returns ([51e2cda](https://github.com/Endika/eslojusto/commit/51e2cdade16ca084675a1c3464091ba0a9bebd53))
+* **api:** return a rental checkout to /alquiler/ ([40752cf](https://github.com/Endika/eslojusto/commit/40752cf5c10cdf9d8bc0f6c3bb60ef7b947fc10c))
+* **engine:** review an employment contract end to end with its information duty ([4af0538](https://github.com/Endika/eslojusto/commit/4af0538e94e8e14ca9e5f95fc85e991e2d98ab3e))
+
+
+### Bug Fixes
+
+* **api:** drop copied rental texts that still hold an ID, IBAN, email or phone ([c6c2a25](https://github.com/Endika/eslojusto/commit/c6c2a251c264221e3654e096d12e3f8c18f33897))
+* **api:** find IDs, IBANs, account numbers and phones in their common spellings ([c2167aa](https://github.com/Endika/eslojusto/commit/c2167aac93289cf57b6fe21a9dbf2622446c7e24))
+* **engine:** give no end-of-contract severance to temporary contracts before 04-03-2001 ([1b2ae58](https://github.com/Endika/eslojusto/commit/1b2ae58a6c844c6035382a9be56a20bca8f35277))
+
 ## [1.14.0](https://github.com/Endika/eslojusto/compare/v1.13.0...v1.14.0) (2026-10-08)
 
 
