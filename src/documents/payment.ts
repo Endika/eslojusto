@@ -9,6 +9,7 @@ import {
   type LetterDetails,
   type LetterField,
   type LetterKind,
+  NO_DETAILS,
 } from './letter';
 import { noticeView, warnsOnLeave, type NoticeState } from './notice';
 import { canDownload, newNonce, passState, type PassStore, type PendingCheckout } from './pass';
@@ -17,6 +18,7 @@ import type {
   Captcha,
   DocumentEvents,
   Download,
+  OfferedReview,
   PaidReview,
   PassVerifyResult,
   PdfMaker,
@@ -86,6 +88,34 @@ const DEAD_PASS = {
 
 const FILENAMES: Record<Download, 'report' | 'letter'> = { report: 'report', letter: 'letter' };
 
+const downloadsWith = (r: OfferedReview): r is PaidReview => 'report' in r;
+
+// The letter's fields and the warnings beside them.
+function letterParts(letter: HTMLElement) {
+  const field = (name: keyof LetterDetails) =>
+    required(
+      letter.querySelector<HTMLInputElement>(`[data-letter-field="${name}"]`),
+      `letter ${name}`,
+    );
+  return {
+    inputs: {
+      name: field('name'),
+      id: field('id'),
+      company: field('company'),
+      place: field('place'),
+      date: field('date'),
+    },
+    glyphWarning: required(
+      letter.querySelector<HTMLElement>('[data-letter-glyph-warning]'),
+      'glyph warning',
+    ),
+    idWarning: required(
+      letter.querySelector<HTMLElement>('[data-letter-id-warning]'),
+      'id warning',
+    ),
+  };
+}
+
 export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   const { api, passes, events, browser, tr } = deps;
   const wait = deps.wait ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
@@ -100,32 +130,14 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   const session = required(section.querySelector<HTMLInputElement>('#pass-session'), 'session');
   const status = required(section.querySelector<HTMLElement>('[data-pass-status]'), 'status');
   const errorSlip = required(section.querySelector<HTMLElement>('[data-pass-error]'), 'error');
-  const letter = required(section.querySelector<HTMLElement>('[data-letter]'), 'letter');
-  const letterField = (name: keyof LetterDetails) =>
-    required(
-      letter.querySelector<HTMLInputElement>(`[data-letter-field="${name}"]`),
-      `letter ${name}`,
-    );
-  const letterInputs = {
-    name: letterField('name'),
-    id: letterField('id'),
-    company: letterField('company'),
-    place: letterField('place'),
-    date: letterField('date'),
-  };
-  const glyphWarning = required(
-    letter.querySelector<HTMLElement>('[data-letter-glyph-warning]'),
-    'glyph warning',
-  );
-  const idWarning = required(
-    letter.querySelector<HTMLElement>('[data-letter-id-warning]'),
-    'id warning',
-  );
+  // A section whose pass unlocks only its detail has no letter.
+  const letter = section.querySelector<HTMLElement>('[data-letter]');
+  const letterForm = letter ? letterParts(letter) : null;
   const retry = required(
     section.querySelector<HTMLButtonElement>('[data-pass-verify-retry]'),
     'retry',
   );
-  let current: PaidReview | null = null;
+  let current: OfferedReview | null = null;
   let busy = false;
   // The pass the API confirmed during this page's life. Kept in memory only: a reload asks again.
   let verifiedToken: string | null = null;
@@ -341,13 +353,15 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   }
 
   function letterDetails(): LetterDetails {
+    if (!letterForm) return NO_DETAILS;
+    const { inputs } = letterForm;
     let date: CivilDate | null = null;
     try {
-      date = letterInputs.date.value ? parseDate(letterInputs.date.value) : null;
+      date = inputs.date.value ? parseDate(inputs.date.value) : null;
     } catch {
       // A date the browser lets through unfinished keeps its line.
     }
-    const typed = (f: LetterField) => letterInputs[f].value.normalize('NFC');
+    const typed = (f: LetterField) => inputs[f].value.normalize('NFC');
     return {
       name: typed('name'),
       id: typed('id'),
@@ -359,15 +373,18 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
 
   // A warning only: the letter is downloaded with whatever was typed.
   function checkId() {
-    const typed = letterInputs.id.value.trim();
+    if (!letterForm) return;
+    const { inputs, idWarning } = letterForm;
+    const typed = inputs.id.value.trim();
     const odd = typed !== '' && !looksLikeDniOrNie(typed);
     idWarning.hidden = !odd;
     idWarning.textContent = odd ? tr('client.documents.letter.id_warning') : '';
   }
 
   function clearLetter() {
-    for (const input of Object.values(letterInputs)) input.value = '';
-    glyphWarning.hidden = true;
+    if (!letterForm) return;
+    for (const input of Object.values(letterForm.inputs)) input.value = '';
+    letterForm.glyphWarning.hidden = true;
     checkId();
   }
 
@@ -376,13 +393,14 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     review.letterKinds.find((k) => k === button.dataset['letterKind']) ?? review.letterKinds[0];
 
   async function download(which: Download, button: HTMLElement) {
-    if (!current || !(await verify())) return render();
+    if (!current || !downloadsWith(current) || !(await verify())) return render();
     setError(null);
     status.textContent = tr('client.documents.pass.generating');
     try {
       const maker = await deps.pdf();
       let details = letterDetails();
-      if (which === 'letter') {
+      if (which === 'letter' && letterForm) {
+        const { glyphWarning } = letterForm;
         const blanked = maker.unprintable(details);
         glyphWarning.hidden = blanked.length === 0;
         glyphWarning.textContent =
@@ -416,10 +434,13 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   };
 
   retry.addEventListener('click', guard(verify));
-  letterInputs.id.addEventListener('change', checkId);
-  letterInputs.id.addEventListener('input', () => {
-    if (!idWarning.hidden) checkId();
-  });
+  if (letterForm) {
+    const { inputs, idWarning } = letterForm;
+    inputs.id.addEventListener('change', checkId);
+    inputs.id.addEventListener('input', () => {
+      if (!idWarning.hidden) checkId();
+    });
+  }
 
   waiver.addEventListener('change', () => {
     waiverError.hidden = true;
@@ -447,9 +468,10 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     );
 
   return {
-    show(review: PaidReview) {
+    show(review: OfferedReview) {
       current = review;
-      if (letterInputs.date.value === '') letterInputs.date.value = toIso(deps.today());
+      const date = letterForm?.inputs.date;
+      if (date && date.value === '') date.value = toIso(deps.today());
       status.textContent = '';
       setError(null);
       render();

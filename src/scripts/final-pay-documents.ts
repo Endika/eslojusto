@@ -1,3 +1,5 @@
+import { documentsAnalytics } from '../analytics/documents';
+import { track } from '../analytics/posthog';
 import type { FormEntries } from '../calculator/fill';
 import type { Calculator } from '../calculator/main';
 import type { CompletedReview } from '../calculator/ports';
@@ -27,6 +29,7 @@ export function wireFinalPayDocuments(
     arrival,
     config: DOCUMENTS,
     tr,
+    events: documentsAnalytics(track),
     section: {
       extraction: FINAL_PAY_EXTRACTION,
       reading,

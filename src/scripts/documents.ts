@@ -1,5 +1,3 @@
-import { documentsAnalytics } from '../analytics/documents';
-import { track } from '../analytics/posthog';
 import type { FormEntries } from '../calculator/fill';
 import type { Detail } from '../calculator/flow';
 import { createApi } from '../documents/api';
@@ -15,10 +13,11 @@ import type {
   Browser,
   Captcha,
   CaptchaAction,
+  DocumentEvents,
   DocumentReading,
   FileEncoder,
   KeyValueStore,
-  PaidReview,
+  OfferedReview,
   PdfPages,
   ReviewForm,
 } from '../documents/ports';
@@ -177,7 +176,7 @@ export interface DocumentsSection<R, F extends string, L extends string> {
   // Where the review's answers wait while the person is on Stripe's page; read back and deleted
   // on return.
   readonly keptReviewKey: string;
-  paidReview(r: R): PaidReview;
+  paidReview(r: R): OfferedReview;
   // Adds to a result just shown what only the documents read can say.
   decorateResult(result: ParentNode): void;
   // Answers kept by an earlier version of the page, as the form takes them now.
@@ -191,7 +190,9 @@ export interface DocumentsWiring<R, F extends string, L extends string> {
   readonly arrival: { readonly hash: string; readonly search: string };
   readonly section: DocumentsSection<R, F, L>;
   readonly config: DocumentsConfig | null;
+  // The section's copy: its root may word some messages its own way.
   readonly tr: Translate;
+  readonly events: DocumentEvents;
 }
 
 const isEntries = (v: unknown): v is FormEntries =>
@@ -207,6 +208,7 @@ export function wireDocuments<R, F extends string, L extends string>({
   section,
   config,
   tr,
+  events,
 }: DocumentsWiring<R, F, L>): void {
   const start = document.querySelector<HTMLElement>('[data-documents-start]');
   const offer = document.querySelector<HTMLElement>('[data-pass-offer]');
@@ -221,7 +223,6 @@ export function wireDocuments<R, F extends string, L extends string>({
     browser.now,
   );
   const session = storage(() => sessionStorage);
-  const events = documentsAnalytics(track);
 
   const upload = setUpUpload(start, {
     api,
