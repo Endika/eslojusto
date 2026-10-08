@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.14.0](https://github.com/Endika/eslojusto/compare/v1.13.0...v1.14.0) (2026-10-08)
+
+
+### Features
+
+* **engine:** check agency fees, deposit, extra guarantees and advance payments ([3315563](https://github.com/Endika/eslojusto/commit/3315563419cb1fea9ba0bdf26d41faf06e9ef55a))
+* **engine:** check service charges passed on to the tenant ([bc425b2](https://github.com/Endika/eslojusto/commit/bc425b2bcfc6301f4931d04945dfef09b0be335c))
+* **engine:** review a rental contract end to end with informative blocks ([876e82f](https://github.com/Endika/eslojusto/commit/876e82f9163bc42706cb582104215fac1becc9c8))
+* **engine:** work out deposit returns and late-payment interest ([f67470a](https://github.com/Endika/eslojusto/commit/f67470a0d9a0941c99dfd02c3e8cef70ef5a6811))
+
+
+### Bug Fixes
+
+* **engine:** accrue deposit interest on one month's rent at most ([d5517da](https://github.com/Endika/eslojusto/commit/d5517da66d377187c0a3c0d8ecafee237552f379))
+* **engine:** accrue on one month of what came back and say why nothing accrued ([959f86e](https://github.com/Endika/eslojusto/commit/959f86ef8b3f27bc7d612ec4d80e2d8a0ac1bff3))
+* **engine:** cite the RDL 7/2019 wording for the tacit extension notices ([9a6ba2f](https://github.com/Endika/eslojusto/commit/9a6ba2fa0ed71025a8dffa355bcdc4d17da270d0))
+* **engine:** count deposit interest up to the last year with a known rate ([cbb212b](https://github.com/Endika/eslojusto/commit/cbb212b1065af3cb3d82093bbda233411c12781b))
+* **engine:** hold a deposit balance as not yet due within the landlord's month ([b394bb0](https://github.com/Endika/eslojusto/commit/b394bb072c087b092341e5816ee6367280714e58))
+* **engine:** leave a charge of another kind to look at, with no figure ([cd6086f](https://github.com/Endika/eslojusto/commit/cd6086f0b0265fff34cfb47c32de5d107eb0cfbf))
+* **engine:** point the legal interest table at its current Banco de España page ([e10af21](https://github.com/Endika/eslojusto/commit/e10af21dc6b4f4fe4eca0e5c2177825a985327d9))
+* **engine:** put the deposit above one month on the money that accrues longest ([af0592b](https://github.com/Endika/eslojusto/commit/af0592b7df0c41859d2c4864fdca93804e1d6a77))
+* **engine:** read the charges cap with and without the extraordinary caps ([dc3955f](https://github.com/Endika/eslojusto/commit/dc3955f33c402c833b0708564656be94d1bb44a4))
+* **engine:** run the landlord's month date to date before the deposit falls due ([5011285](https://github.com/Endika/eslojusto/commit/50112853c8dceff6512fa058f04f3dadb5ac65a7))
+* **engine:** say only money is compared when other guarantees exist ([86d5bb7](https://github.com/Endika/eslojusto/commit/86d5bb7eb67eefc4659742711596ebc9eca4847b))
+* **engine:** take deposit returns only between the keys and today ([0b7ede3](https://github.com/Endika/eslojusto/commit/0b7ede3a503d6621a3a9d5212225832bd9189ce4))
+
 ## [1.13.0](https://github.com/Endika/eslojusto/compare/v1.12.1...v1.13.0) (2026-10-08)
 
 
