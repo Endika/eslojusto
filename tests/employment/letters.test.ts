@@ -283,9 +283,117 @@ describe('the request for the certificate of temporary contracts', () => {
     for (const input of corners) {
       const r = completed(input);
       expect(kindsOf(r).free.includes('temporary_contracts_certificate')).toBe(
-        hasTemporalityFinding(r.review),
+        hasTemporalityFinding(r),
       );
     }
+  });
+
+  // Each case with the findings it is about, so a change in the engine shows here.
+  const statusesOf = (r: CompletedEmploymentReview) =>
+    r.review.items.flatMap((a) =>
+      a.kind === 'single' ? [[a.finding.id, a.finding.status] as const] : [],
+    );
+
+  it.each<[string, Partial<EmploymentInput>, readonly [string, string]]>([
+    [
+      'a permanent part-time contract not in writing',
+      {
+        writtenContract: false,
+        contractHours: { weekly: 20, annual: null },
+        partTime: {
+          hoursStated: true,
+          distributionStated: true,
+          complementary: null,
+          voluntaryPercent: null,
+        },
+      },
+      ['written_form', 'missing_requirement'],
+    ],
+    [
+      'a fixed-discontinuous contract without its activity period',
+      {
+        modality: 'discontinuous',
+        discontinuous: { activityPeriod: false, hours: true, distribution: true },
+      },
+      ['discontinuous_essentials', 'missing_requirement'],
+    ],
+    [
+      'alternance training at 80 % effective work',
+      {
+        modality: 'training_alternance',
+        startDate: f('2026-01-12'),
+        endDate: f('2026-12-31'),
+        signedOn: null,
+        trial: null,
+        training: {
+          studiesEndedOn: null,
+          disability: false,
+          planAttached: true,
+          effectiveWorkPercent: { year1: 80, year2: null },
+        },
+      },
+      ['training_alternance_effective_work', 'over_legal_limit'],
+    ],
+  ])('is not offered for %s', (_name, change, finding) => {
+    const r = completed(contract(change));
+    expect(statusesOf(r)).toContainEqual(finding);
+    expect(hasTemporalityFinding(r)).toBe(false);
+    expect(kindsOf(r).free).not.toContain('temporary_contracts_certificate');
+  });
+
+  const production = (change: Partial<EmploymentInput>) =>
+    contract({
+      modality: 'production',
+      causeStated: true,
+      circumstancesStated: true,
+      startDate: f('2026-01-12'),
+      endDate: f('2026-05-31'),
+      signedOn: null,
+      ...change,
+    });
+
+  it.each<[string, EmploymentInput, readonly [string, string]]>([
+    [
+      'a production contract over one year',
+      production({ startDate: f('2025-01-12'), endDate: f('2026-03-31') }),
+      ['production_1_year', 'over_legal_limit'],
+    ],
+    [
+      'a production contract with two extensions',
+      production({ extensions: 2 }),
+      ['production_one_extension', 'over_legal_limit'],
+    ],
+    [
+      'a replacement contract that names no one',
+      contract({
+        modality: 'replacement',
+        replacedPersonNamed: false,
+        replacementCauseStated: true,
+        startDate: f('2026-01-12'),
+        endDate: f('2026-05-31'),
+        signedOn: null,
+      }),
+      ['replacement_name_cause', 'missing_requirement'],
+    ],
+    [
+      'a fixed-term contract not in writing',
+      production({ writtenContract: false }),
+      ['written_form', 'missing_requirement'],
+    ],
+    [
+      'a work-or-service contract after the reform',
+      workOrService,
+      ['abolished_modalities', 'becomes_permanent'],
+    ],
+    [
+      'contracts chained over 18 months in 24',
+      corners[4] as EmploymentInput,
+      ['chaining_18_in_24', 'becomes_permanent'],
+    ],
+  ])('is offered for %s', (_name, input, finding) => {
+    const r = completed(input);
+    expect(statusesOf(r)).toContainEqual(finding);
+    expect(kindsOf(r).free).toContain('temporary_contracts_certificate');
   });
 
   it('is not offered when the finding depends on a «No lo sé»', () => {
@@ -319,7 +427,7 @@ describe('the request for the certificate of temporary contracts', () => {
       (a) => a.kind === 'readings' && a.readings.some((x) => x.finding.item === 'chaining'),
     );
     expect(chaining).toBeDefined();
-    expect(hasTemporalityFinding(r.review)).toBe(false);
+    expect(hasTemporalityFinding(r)).toBe(false);
     expect(kindsOf(r).free).toEqual([]);
   });
 
