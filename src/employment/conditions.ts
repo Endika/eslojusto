@@ -1,7 +1,8 @@
+import { parseAmount } from '../calculator/number';
 import type { Scope } from '../engine/employment/types';
 import { formScope, sheetApplies, type Sheet } from './form';
 
-const CONDITIONS = '[data-if], [data-if-not], [data-row-if]';
+const CONDITIONS = '[data-if], [data-if-above0], [data-row-if]';
 
 // The value a control group holds now: the checked radio, or the field's own value.
 function valueIn(scope: ParentNode, selector: string): string {
@@ -24,10 +25,10 @@ function holds(el: HTMLElement, form: HTMLFormElement): boolean {
     const [name = ''] = dataset['if'].split(':');
     if (!listed(dataset['if'], valueIn(form, `[name="${name}"]`))) return false;
   }
-  // Asked unless the answer is one of these; an empty answer is listed as a trailing space.
-  if (dataset['ifNot'] !== undefined) {
-    const [name = ''] = dataset['ifNot'].split(':');
-    if (listed(dataset['ifNot'], valueIn(form, `[name="${name}"]`).trim())) return false;
+  // Asked only when the figure typed reads as more than zero: «0», «00» and «0,0» all close it.
+  if (dataset['ifAbove0'] !== undefined) {
+    const n = parseAmount(valueIn(form, `[name="${dataset['ifAbove0']}"]`));
+    if (n === null || Number.isNaN(n) || n <= 0) return false;
   }
   if (dataset['rowIf'] !== undefined) {
     const [key = ''] = dataset['rowIf'].split(':');

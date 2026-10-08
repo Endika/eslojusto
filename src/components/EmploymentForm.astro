@@ -320,7 +320,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         hint={tx('employment.salary.prorated_hint')}
         layout="pair"
         options={yesNo}
-        attributes={{ 'data-if-not': 'extraPays:0 ', hidden: '' }}
+        attributes={{ 'data-if-above0': 'extraPays', hidden: '' }}
       />
       <EmploymentChoice
         name="hasBreakdown"
