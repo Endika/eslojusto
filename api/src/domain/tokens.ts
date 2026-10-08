@@ -6,15 +6,27 @@ import type { ReviewKind } from './reviews';
 
 // System prompt, tool schema, page labels and Anthropic's tool-use preamble of each review, priced
 // at two characters per token like document text (test/tokens.test.ts keeps it honest): about
-// 27,000 characters for the final pay and 21,000 for the rental review.
+// 27,000 characters for the final pay, 21,000 for the rental review and 28,000 for the
+// employment review.
 export const PROMPT_TOKENS_BY_REVIEW: Readonly<Record<ReviewKind, number>> = {
   final_pay: 14_000,
   rental: 11_000,
+  employment: 14_000,
 };
-// One Sonnet read at this cap costs 96,000 × 3.30 + 5,000 × 16.50 USD per million = 0.40 USD
-// (api/README.md, «Cost»). The largest pack the API accepts, twenty-five 1568 × 1568 images,
-// comes to 14,000 + 25 × 3,279 = 95,975 for the final pay and 92,975 for a rental review, so the
-// cap is a guard rather than a limit anyone meets.
+// Output tokens a review's record can need beyond a model's max_tokens (MODEL_SETTINGS in
+// src/config.ts). A contract with six payslips records about 20,000 characters, 10,000 tokens at
+// two characters each; twelve payslips with 144 lines, about 30,000. More than 12,000 in all
+// could hardly be written before READ_DEADLINE_MS (api/README.md, «Cost»).
+export const EXTRA_OUTPUT_TOKENS_BY_REVIEW: Readonly<Record<ReviewKind, number>> = {
+  final_pay: 0,
+  rental: 0,
+  employment: 7_000,
+};
+// One Sonnet read at this cap costs 96,000 × 3.30 + 5,000 × 16.50 USD per million = 0.40 USD,
+// and 0.52 USD for an employment read with its 12,000 output tokens (api/README.md, «Cost»). The
+// largest pack the API accepts, twenty-five 1568 × 1568 images, comes to 14,000 + 25 × 3,279 =
+// 95,975 for the final pay and the employment review and 92,975 for a rental review, so the cap
+// is a guard rather than a limit anyone meets.
 export const MAX_ESTIMATED_INPUT_TOKENS = 96_000;
 // Only when a cheaper model reads first. Measured by Bedrock after the primary read, so exact;
 // above it a second, dearer read would take the worst case past 0.30 USD (api/README.md, «Cost»).

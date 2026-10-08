@@ -11,9 +11,10 @@ Three Lambda functions in **eu-south-2** behind function URLs:
 Nothing is stored: documents live in the invocation's memory, the server keeps no state, and
 logs carry only `op`, `code`, `latencyMs`, `pages`, `inputTokens`, `outputTokens`,
 `escalated`, `conflicts` (how many fields two documents stated differently), `readability` (how
-many pages had each readability, only when a read set a page aside or found nothing) and two flags (`test/http.test.ts` proves it): `underestimated` when Bedrock
-counted more than twice the input the pre-read estimate allowed for, and `countNotSaved` when
-a pass read went through but Stripe did not store its count; `verify` marks a `pass` request that
+many pages had each readability, only when a read set a page aside or found nothing) and three flags (`test/http.test.ts` proves it): `underestimated` when Bedrock
+counted more than twice the input the pre-read estimate allowed for, `countNotSaved` when
+a pass read went through but Stripe did not store its count, and `truncated` when an employment
+read filled a list to its maximum; `verify` marks a `pass` request that
 verified a pass. The manual calculator never calls this API.
 
 ```bash
@@ -35,14 +36,16 @@ API never returns prose. All requests are `POST` with a JSON body.
   "captchaToken": "<Turnstile token, widget action 'extract'>",
   "quota": "<token from the last free read, or null>", // free read
   "pass": "<pass token>", // or a pass read
-  "review": "rental" // optional: none is the final pay
+  "review": "rental" // optional: "rental" or "employment"; none is the final pay
 }
 ```
 
 `review` picks the schema, the prompt and the merge rules (`src/domain/reviews.ts`): absent, it
 is `final_pay`, exactly as before the field existed (`test/fixtures/final-pay-tool-schema.json` and
-`final-pay-prompt.txt` pin its schema and prompt); `rental` reads a tenancy pack (below, «Rental
-review»); anything else is `invalid_request`. The log line carries `review` only when the request
+`final-pay-prompt.txt` pin its schema and prompt, and `rental-tool-schema.json` and
+`rental-prompt.txt` the rental review's); `rental` reads a tenancy pack (below, «Rental review»),
+`employment` an employment contract and the documents around it (below, «Employment review»);
+anything else is `invalid_request`. The log line carries `review` only when the request
 named one.
 
 The person never says what they upload: a read takes the whole pack (dismissal letter,
@@ -220,6 +223,61 @@ apart), `invoice_total_mismatch` (base + VAT more than 0.05 € from the total),
 `start_long_before_signing` (over 31 days). A legible lease with neither `initialRent` nor
 `signedOn` is worth a second read, as a failed check is.
 
+### Employment review
+
+With `"review": "employment"` the model sorts the pack of an employment contract
+(`src/domain/employment-schema.ts`). Page kinds: `employment_contract`, `job_offer`, `payslip`,
+`work_history`, the final pay's `settlement_proposal`, `dismissal_letter`, `company_certificate`
+and `settlement_agreement` (labelled as always, with nothing read from them, so the site shows
+them as pages without data) and `other`; readability as the final pay's. Payslips and the work
+history get sections of their own, so the final pay's stay as they were:
+
+| Section                   | Source                | Fields                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Lists (most rows)                                                                                                                                                                                                                                                  |
+| ------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `employment_contract`     | `employment_contract` | `employerType`, `companyName` (a company only, ≤ 80), `companyTaxId` (a CIF), `workplaceRegion` (ISO 3166-2:ES), `signedOn`, `startDate`, `endDate`, `durationMonths`, `modalityText` (literal, ≤ 120), `modality`, `contractKey` (three digits, a hint), `partTime`, `causeText` (literal, ≤ 600), `replacedPersonNamed` (never the name), `replacementCauseStated`, `category`, `agreementName` (≤ 160), `agreementCode`, `salaryAmount`, `salaryPeriod`, `annualSalaryAmount`, `payments`, `prorated`, `inKindAmount`, `weeklyHours`, `annualHours`, `scheduleText` (literal, ≤ 400), `shifts`, `night`, `complementaryPercent`, `complementaryNoticeDays`, `overtimeAgreed`, `overtimeHoursPerYear`, `holidayDays`, `holidayUnit`, `trialAmount`, `trialUnit`, `remoteShare`, `trainingType`, `studiesEndedOn`, `planAttached`, `effectiveWorkPercent` | `salaryParts` [`concept`, `amount`, `kind`] (12), `clauses` [`label`, `literal` ≤ 600, `months`, `compensationStated`, `trainingDescribed`, `waivedRight`, `costsOnWorker`] (10), `information` [`element` a–q, `presence`] (17), `relationshipHints` [`hint`] (3) |
+| `job_offer`               | `job_offer`           | `position`, `salaryAmount`, `salaryPeriod`, `net`, `variable`, `weeklyHours`, `modality`, `remote`, `publishedOn`, returned as `offerPosition`, `offerSalaryAmount` and so on                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                                                                                                                                                    |
+| `employment_payslips`     | `payslip`             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `payslips` [`month`, `periodStart`, `periodEnd`, `daysWorked`, `incidents` (never which), `totalAccrued`, `partTimeCoefficient`, `agreementName`, `category`] (12), `lines` [`month`, `concept`, `amount`, `category`] (150)                                       |
+| `employment_work_history` | `work_history`        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `contracts` [`startDate`, `endDate`, `employerType`, `employerName` (a company only), `accountCode` (C.C.C.), `contractKey`, `partTimeCoefficient` (per thousand)] (60)                                                                                            |
+
+`src/domain/employment-merge.ts` takes every field from its only source, except `agreementName`
+and `category`, from the contract first and the most recent payslip that prints them second,
+with the same conflicts and discards as the other reviews, and carries every list row with its
+`source`. The line categories (`salary`, `fixed_complement`, `variable`, `overtime`,
+`complementary_hours`, `in_kind`, `extra_pay`, `prorated_extra_pay`, `expenses`, `one_off`,
+`other`) are summed by month on the site, which decides what counts against the minimum wage;
+the model adds up nothing and copies no deduction. `modality`, the clause `label`, the salary
+part `kind`, the information elements and the other closed lists mirror the site's employment
+engine (`test/employment-contract.test.ts`); a special employment centre is no relationship
+hint, since naming one would say something about the worker's health.
+
+The model copies the cause, the modality, the schedule and each clause word for word, with
+«[nombre]» in place of a person's name, and picks their labels; it never says whether a clause
+is valid, whether the cause is justified or which agreement applies. The prompt tells it never
+to record the name, DNI/NIE, NAF, address, phone, email, IBAN or signature of the worker or of
+anyone else, nor disability, health, the kind of any leave, union membership or deductions; the
+schema has no field for any of them (`test/employment-schema.test.ts` walks every field name and
+description). The API does not take that on trust: a `companyName` or a work-history
+`employerName` beside any `employerType` but `company` is dropped, `companyTaxId` takes a CIF
+only and `accountCode` an employer's eleven digits only, and any copied text (`causeText`,
+`scheduleText`, `modalityText`, `companyName`, `category`, `agreementName`, `position`, a clause
+`literal`, a `concept`, an `employerName`) that still holds a DNI/NIE, a Spanish IBAN or
+account number, an email, a Spanish phone number or a Social Security number is dropped, each as
+a discard.
+
+The extraction carries `truncated: true` when the model filled a list to its maximum (counted on
+what it sent, so a row that failed validation still counts; the seventeen information elements
+are a whole list, not a cut): the documents may hold more rows than the response, and the site
+says so. The log line carries the `truncated` flag and the dashboard counts it.
+
+`failedChecks` for an employment read are coherence checks only, never findings
+(`src/domain/employment-checks.ts`): `end_before_start` (the contract, a payslip's period or a
+work-history row), `payslip_not_whole_month` (a period that is not the whole calendar month of
+its payslip), `payslip_lines_do_not_sum` (a month's lines more than 1 € from its payslips' gross
+totals), `hours_over_week` (over 80 a week, in the contract or the offer) and
+`salary_period_mismatch` (a monthly salary times its payments more than 5 % from the annual one
+the contract prints). A legible contract with neither `startDate` nor `salaryAmount` is worth a
+second read, as a failed check is.
+
 ### Fields and the site's engine
 
 The model transcribes each kind of document into its own section of the tool input
@@ -370,9 +428,9 @@ Cheapest first, and nothing that parses what the person sent runs before the cap
 
 - **The input is known before any call.** Every image is priced by its pixels, at
   w × h / 750 tokens (Anthropic's formula) or one per 28 × 28 patch if that is more, and the
-  prompt and schema at 14,000 for the final pay and 11,000 for a rental review (about 27,000
-  and 21,000 characters at two per token, `PROMPT_TOKENS_BY_REVIEW`; `test/tokens.test.ts`
-  keeps both honest). Bedrock's CountTokens does not serve Claude models
+  prompt and schema at 14,000 for the final pay and the employment review and 11,000 for a
+  rental review (about 27,000, 28,000 and 21,000 characters at two per token,
+  `PROMPT_TOKENS_BY_REVIEW`; `test/tokens.test.ts` keeps them honest). Bedrock's CountTokens does not serve Claude models
   offered only through cross-Region profiles, so this is computed, not asked. The largest pack
   the API accepts, twenty-five 1568 × 1568 images, comes to 14,000 + 25 × 3,279 = 95,975 (92,975
   for a rental review); above
@@ -591,8 +649,30 @@ case is the same **0.40 USD** with Sonnet 4.6. A contract runs to 6–20 pages; 
 receipts a pack fills the 25. If rental reads stop at `max_tokens` (36 receipts and long clause
 texts are the largest records), raise `maxTokens` and this bound with it.
 
-**Worst case: 0.40 USD per read** (95,975 × 3.30 USD/M + 5,000 × 16.50 USD/M = 0.399), for any
-review and any input: the API takes images only, priced by their pixels, and refuses anything above 96,000
+An employment read takes the same input bound (its prompt is 14,000 tokens, so its largest pack
+is also 95,975) and 7,000 more output tokens (`EXTRA_OUTPUT_TOKENS_BY_REVIEW` in
+`src/domain/tokens.ts`): `max_tokens` is 12,000 with Sonnet 4.6. Measured at two characters per
+token on synthetic records (`test/tokens.test.ts`), a contract with six payslips records about
+10,000 tokens; twelve payslips with 144 lines about 15,200; twelve payslips, 150 lines and 60
+work-history rows about 22,400; every list and copied text at its limit, 33,500. 12,000 is also
+about as much as Sonnet can write before `READ_DEADLINE_MS` (160 s, at an estimated 60–80
+tokens a second after reading the images), so a larger cap would buy little: a pack that needs
+more stops at `max_tokens` (`document_unreadable`) or at the deadline (`model_unavailable`), and
+neither spends a read. Should the evaluation see either, the cap and this bound go up together.
+
+| Employment read, Sonnet 4.6 alone         | Input tokens    | Output tokens         | Cost                         |
+| ----------------------------------------- | --------------- | --------------------- | ---------------------------- |
+| Contract alone, 5 photos                  | ~22,000         | ~3,300                | 0.073 + 0.054 = **0.13 USD** |
+| Contract and six payslips, 11 photos      | ~31,600         | ~10,000               | 0.104 + 0.165 = **0.27 USD** |
+| Largest pack accepted, 25 × 1568 × 1568   | 95,975          | 12,000 (`max_tokens`) | 0.317 + 0.198 = **0.52 USD** |
+| Were Haiku to read first: worst escalated | 43,000 + 43,000 | 12,000 + 12,000       | 0.113 + 0.340 = 0.45 USD     |
+
+"Contract alone" and "contract and six payslips" count 1,600 tokens per photo and the 14,000 of
+the prompt, as above.
+
+**Worst case: 0.40 USD per read** for the final pay and the rental review (95,975 × 3.30 USD/M +
+5,000 × 16.50 USD/M = 0.399), and **0.52 USD** for the employment review (95,975 × 3.30 USD/M +
+12,000 × 16.50 USD/M = 0.515), for any input: the API takes images only, priced by their pixels, and refuses anything above 96,000
 estimated tokens (0.40 USD) before a call. The bound counts every page at 1568 px, since the
 API accepts that size at any count; the browser stepping a large pack down only lowers it. A PDF never reaches it; the browser renders its pages
 to images of the same size as a photo. Should Bedrock still bill more than twice the estimate,

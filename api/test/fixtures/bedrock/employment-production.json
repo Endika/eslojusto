@@ -1,0 +1,212 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "employment_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "employment_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "employment_contract": {
+          "employerType": {
+            "value": "company",
+            "confidence": "high"
+          },
+          "companyName": {
+            "value": "Conservas Imaginarias S.A.",
+            "confidence": "high"
+          },
+          "companyTaxId": {
+            "value": "A00000000",
+            "confidence": "high"
+          },
+          "workplaceRegion": {
+            "value": "PV",
+            "confidence": "high"
+          },
+          "signedOn": {
+            "value": "2026-05-29",
+            "confidence": "high"
+          },
+          "startDate": {
+            "value": "2026-06-01",
+            "confidence": "high"
+          },
+          "endDate": {
+            "value": "2026-11-30",
+            "confidence": "high"
+          },
+          "durationMonths": {
+            "value": 6,
+            "confidence": "high"
+          },
+          "modalityText": {
+            "value": "Contrato de duración determinada por circunstancias de la producción",
+            "confidence": "high"
+          },
+          "modality": {
+            "value": "production",
+            "confidence": "high"
+          },
+          "contractKey": {
+            "value": "402",
+            "confidence": "high"
+          },
+          "partTime": {
+            "value": false,
+            "confidence": "high"
+          },
+          "causeText": {
+            "value": "Incremento ocasional e imprevisible de la actividad por la campaña de verano en el centro de trabajo de Bilbao, que genera un desajuste temporal entre el empleo estable disponible y el que se requiere, durante seis meses.",
+            "confidence": "high"
+          },
+          "category": {
+            "value": "Peón",
+            "confidence": "high"
+          },
+          "salaryAmount": {
+            "value": 1500,
+            "confidence": "high"
+          },
+          "salaryPeriod": {
+            "value": "month",
+            "confidence": "high"
+          },
+          "payments": {
+            "value": 14,
+            "confidence": "high"
+          },
+          "weeklyHours": {
+            "value": 40,
+            "confidence": "high"
+          },
+          "trialAmount": {
+            "value": 1,
+            "confidence": "high"
+          },
+          "trialUnit": {
+            "value": "months",
+            "confidence": "high"
+          },
+          "information": [
+            {
+              "element": "a",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "b",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "c",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "d",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "e",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "f",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "g",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "h",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "i",
+              "presence": "by_reference",
+              "confidence": "high"
+            },
+            {
+              "element": "j",
+              "presence": "absent",
+              "confidence": "high"
+            },
+            {
+              "element": "k",
+              "presence": "absent",
+              "confidence": "high"
+            },
+            {
+              "element": "l",
+              "presence": "absent",
+              "confidence": "high"
+            },
+            {
+              "element": "m",
+              "presence": "absent",
+              "confidence": "high"
+            },
+            {
+              "element": "n",
+              "presence": "by_reference",
+              "confidence": "high"
+            },
+            {
+              "element": "o",
+              "presence": "absent",
+              "confidence": "high"
+            },
+            {
+              "element": "p",
+              "presence": "absent",
+              "confidence": "high"
+            },
+            {
+              "element": "q",
+              "presence": "absent",
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 18918,
+    "output_tokens": 1304
+  }
+}

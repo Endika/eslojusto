@@ -112,6 +112,14 @@ function isValidValue(type: FieldType, v: unknown): v is ExtractedValue {
       return isWhole(v, 0, MAX_DAYS);
     case 'integer':
       return isWhole(v, type.min, type.max);
+    case 'decimal':
+      return (
+        typeof v === 'number' &&
+        Number.isFinite(v) &&
+        v >= type.min &&
+        v <= type.max &&
+        hasAtMostTwoDecimals(v)
+      );
     case 'percent':
       return (
         typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100 && hasAtMostTwoDecimals(v)

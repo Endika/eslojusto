@@ -3,7 +3,7 @@
 import { MAX_IMAGE_LONG_SIDE } from '../../api/src/domain/image-limit';
 
 // Which review a request is for; a request without one is the final pay's.
-export type ReviewKind = 'final_pay' | 'rental';
+export type ReviewKind = 'final_pay' | 'rental' | 'employment';
 
 // What the API says each page is; `other` is a page the review has no use for.
 export const PAGE_KINDS = [
@@ -18,6 +18,8 @@ export const PAGE_KINDS = [
   'rent_receipt',
   'agency_invoice',
   'deposit_return',
+  'employment_contract',
+  'job_offer',
   'other',
 ] as const;
 export type PageKind = (typeof PAGE_KINDS)[number];

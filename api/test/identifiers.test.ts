@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hasIdentifier } from '../src/domain/identifiers';
+import { hasIdentifier, hasSocialSecurityNumber } from '../src/domain/identifiers';
 
 // Made-up identifiers: control letters and check digits are not valid.
 describe('hasIdentifier', () => {
@@ -53,5 +53,26 @@ describe('hasIdentifier', () => {
     ['a company tax number', 'NIF B12345678'],
   ])('finds nothing in %s', (_, text) => {
     expect(hasIdentifier(text)).toBe(false);
+  });
+});
+
+describe('hasSocialSecurityNumber', () => {
+  it.each([
+    ['in one piece', 'NAF 281234567890'],
+    ['in groups', 'n.º afiliación 28 12345678 90'],
+    ['with slashes', '28/12345678/90'],
+    ['with dashes', '28-12345678-90'],
+  ])('finds one %s', (_, text) => {
+    expect(hasSocialSecurityNumber(text)).toBe(true);
+  });
+
+  it.each([
+    ['an employer account code', 'C.C.C. 28/1234567/89'],
+    ['an agreement code', 'código 28000000011900'],
+    ['an amount', '12.345.678,90 €'],
+    ['a date', '2026-10-07'],
+    ['a thirteen-digit reference', 'referencia 9123456789012'],
+  ])('finds nothing in %s', (_, text) => {
+    expect(hasSocialSecurityNumber(text)).toBe(false);
   });
 });

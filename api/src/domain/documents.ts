@@ -22,6 +22,19 @@ export const RENTAL_PAGE_KINDS = [
   'deposit_return',
   'other',
 ] as const;
+// An employment review's documents. A settlement or a dismissal letter in the pack keeps its own
+// kind, and nothing is read from it.
+export const EMPLOYMENT_PAGE_KINDS = [
+  'employment_contract',
+  'job_offer',
+  'payslip',
+  'work_history',
+  'settlement_proposal',
+  'dismissal_letter',
+  'company_certificate',
+  'settlement_agreement',
+  'other',
+] as const;
 // Every kind any review can give a page.
 export const PAGE_KINDS = [
   'settlement_proposal',
@@ -35,9 +48,13 @@ export const PAGE_KINDS = [
   'rent_receipt',
   'agency_invoice',
   'deposit_return',
+  'employment_contract',
+  'job_offer',
   'other',
 ] as const satisfies readonly (
-  (typeof FINAL_PAY_PAGE_KINDS)[number] | (typeof RENTAL_PAGE_KINDS)[number]
+  | (typeof FINAL_PAY_PAGE_KINDS)[number]
+  | (typeof RENTAL_PAGE_KINDS)[number]
+  | (typeof EMPLOYMENT_PAGE_KINDS)[number]
 )[];
 export type PageKind = (typeof PAGE_KINDS)[number];
 // The documents a value can come from.

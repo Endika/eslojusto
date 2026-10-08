@@ -1,0 +1,340 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "employment_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "employment_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "payslip",
+            "document": 2,
+            "month": "2026-03",
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 4,
+            "kind": "payslip",
+            "document": 3,
+            "month": "2026-04",
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 5,
+            "kind": "payslip",
+            "document": 4,
+            "month": "2026-05",
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 6,
+            "kind": "payslip",
+            "document": 5,
+            "month": "2026-06",
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 7,
+            "kind": "payslip",
+            "document": 6,
+            "month": "2026-07",
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 8,
+            "kind": "payslip",
+            "document": 7,
+            "month": "2026-08",
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "employment_contract": {
+          "employerType": {
+            "value": "company",
+            "confidence": "high"
+          },
+          "companyName": {
+            "value": "Almacenes Inexistentes S.A.",
+            "confidence": "high"
+          },
+          "workplaceRegion": {
+            "value": "AN",
+            "confidence": "high"
+          },
+          "signedOn": {
+            "value": "2026-02-27",
+            "confidence": "high"
+          },
+          "startDate": {
+            "value": "2026-03-01",
+            "confidence": "high"
+          },
+          "modalityText": {
+            "value": "Indefinido a tiempo parcial",
+            "confidence": "high"
+          },
+          "modality": {
+            "value": "permanent",
+            "confidence": "high"
+          },
+          "contractKey": {
+            "value": "200",
+            "confidence": "high"
+          },
+          "partTime": {
+            "value": true,
+            "confidence": "high"
+          },
+          "salaryAmount": {
+            "value": 700,
+            "confidence": "high"
+          },
+          "salaryPeriod": {
+            "value": "month",
+            "confidence": "high"
+          },
+          "payments": {
+            "value": 14,
+            "confidence": "high"
+          },
+          "weeklyHours": {
+            "value": 20,
+            "confidence": "high"
+          },
+          "complementaryPercent": {
+            "value": 30,
+            "confidence": "high"
+          },
+          "complementaryNoticeDays": {
+            "value": 3,
+            "confidence": "high"
+          }
+        },
+        "employment_payslips": {
+          "payslips": [
+            {
+              "month": "2026-03",
+              "periodStart": "2026-03-01",
+              "periodEnd": "2026-03-31",
+              "daysWorked": 30,
+              "incidents": false,
+              "totalAccrued": 700,
+              "partTimeCoefficient": 50,
+              "agreementName": "Convenio colectivo estatal de grandes almacenes",
+              "category": "Dependiente",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-04",
+              "periodStart": "2026-04-01",
+              "periodEnd": "2026-04-30",
+              "daysWorked": 30,
+              "incidents": false,
+              "totalAccrued": 700,
+              "partTimeCoefficient": 50,
+              "agreementName": "Convenio colectivo estatal de grandes almacenes",
+              "category": "Dependiente",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-05",
+              "periodStart": "2026-05-01",
+              "periodEnd": "2026-05-31",
+              "daysWorked": 30,
+              "incidents": true,
+              "totalAccrued": 700,
+              "partTimeCoefficient": 50,
+              "agreementName": "Convenio colectivo estatal de grandes almacenes",
+              "category": "Dependiente",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-06",
+              "periodStart": "2026-06-01",
+              "periodEnd": "2026-06-30",
+              "daysWorked": 30,
+              "incidents": false,
+              "totalAccrued": 1400,
+              "partTimeCoefficient": 50,
+              "agreementName": "Convenio colectivo estatal de grandes almacenes",
+              "category": "Dependiente",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-07",
+              "periodStart": "2026-07-01",
+              "periodEnd": "2026-07-31",
+              "daysWorked": 30,
+              "incidents": false,
+              "totalAccrued": 700,
+              "partTimeCoefficient": 50,
+              "agreementName": "Convenio colectivo estatal de grandes almacenes",
+              "category": "Dependiente",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-08",
+              "periodStart": "2026-08-01",
+              "periodEnd": "2026-08-31",
+              "daysWorked": 30,
+              "incidents": false,
+              "totalAccrued": 700,
+              "partTimeCoefficient": 50,
+              "agreementName": "Convenio colectivo estatal de grandes almacenes",
+              "category": "Dependiente mayor",
+              "confidence": "high"
+            }
+          ],
+          "lines": [
+            {
+              "month": "2026-03",
+              "concept": "SALARIO BASE",
+              "amount": 600,
+              "category": "salary",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-03",
+              "concept": "PLUS CONVENIO",
+              "amount": 100,
+              "category": "fixed_complement",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-04",
+              "concept": "SALARIO BASE",
+              "amount": 600,
+              "category": "salary",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-04",
+              "concept": "PLUS CONVENIO",
+              "amount": 100,
+              "category": "fixed_complement",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-05",
+              "concept": "SALARIO BASE",
+              "amount": 600,
+              "category": "salary",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-05",
+              "concept": "PLUS CONVENIO",
+              "amount": 100,
+              "category": "fixed_complement",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-06",
+              "concept": "SALARIO BASE",
+              "amount": 600,
+              "category": "salary",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-06",
+              "concept": "PLUS CONVENIO",
+              "amount": 100,
+              "category": "fixed_complement",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-06",
+              "concept": "PAGA EXTRA VERANO",
+              "amount": 700,
+              "category": "extra_pay",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-07",
+              "concept": "SALARIO BASE",
+              "amount": 600,
+              "category": "salary",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-07",
+              "concept": "PLUS CONVENIO",
+              "amount": 100,
+              "category": "fixed_complement",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-08",
+              "concept": "SALARIO BASE",
+              "amount": 600,
+              "category": "salary",
+              "confidence": "high"
+            },
+            {
+              "month": "2026-08",
+              "concept": "PLUS CONVENIO",
+              "amount": 100,
+              "category": "fixed_complement",
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 33672,
+    "output_tokens": 2418
+  }
+}

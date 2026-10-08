@@ -182,6 +182,11 @@ describe('dashboard', () => {
     expect(titles).toContain('% lecturas sin datos (24 h)');
   });
 
+  it('counts the reads whose lists came back at their maximum', () => {
+    const flags = queries.find((q) => q.includes('as escaladas'));
+    expect(flags).toContain('sum(@message like /"truncated":true/) as recortadas');
+  });
+
   it('stays within the free tier of 50 metrics per dashboard, with room for two models', () => {
     const rows = widgets.flatMap((w) => (w.properties['metrics'] ?? []) as unknown[]);
     const searches = body.match(/SEARCH\(/g) ?? [];

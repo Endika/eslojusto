@@ -16,3 +16,9 @@ const PATTERNS: readonly RegExp[] = [
 ];
 
 export const hasIdentifier = (text: string): boolean => PATTERNS.some((p) => p.test(text));
+
+// The Social Security number (NAF): province, eight digits and two check digits. Only the
+// employment review looks for it, since only its documents carry one.
+const NAF = /(?<![\d.,/-])\d{2}[\s/-]?\d{8}[\s/-]?\d{2}(?![\d]|[.,]\d)/;
+
+export const hasSocialSecurityNumber = (text: string): boolean => NAF.test(text);

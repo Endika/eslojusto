@@ -224,6 +224,47 @@ describe('the review a read is for', () => {
     ]);
     expect(JSON.stringify(logger.events)).not.toMatch(/98765|2024-05-20/);
   });
+
+  it('reads an employment pack as one and logs only that it was one', async () => {
+    const { deps, logger, reader } = extractDeps({
+      pages: [page(1, 'employment_contract')],
+      employment_contract: {
+        startDate: f('2026-10-07'),
+        salaryAmount: f(98765.43),
+        causeText: f('Campaña de verano'),
+      },
+    });
+    const response = await handleExtract(post(extractBody({ review: 'employment' })), deps);
+    expect(json(response)).toMatchObject({
+      code: 'ok',
+      extraction: {
+        fields: { salaryAmount: { value: 98765.43, source: 'employment_contract' } },
+        truncated: false,
+      },
+    });
+    expect(reader.calls.map((c) => c.review)).toEqual(['employment']);
+    expect(logger.events).toEqual([
+      {
+        op: 'extract',
+        code: 'ok',
+        latencyMs: 0,
+        pages: 1,
+        inputTokens: 1000,
+        outputTokens: 200,
+        escalated: false,
+        conflicts: 0,
+        review: 'employment',
+      },
+    ]);
+    expect(JSON.stringify(logger.events)).not.toMatch(/98765|2026-10-07|Campaña/);
+  });
+
+  it('refuses a review it does not know', async () => {
+    const { deps, reader } = extractDeps();
+    const response = await handleExtract(post(extractBody({ review: 'contract' })), deps);
+    expect(json(response)).toEqual({ code: 'invalid_request' });
+    expect(reader.calls).toEqual([]);
+  });
 });
 
 describe('a read that found nothing', () => {

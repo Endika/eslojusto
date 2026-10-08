@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildRequestBody,
   createBedrockReader,
+  EMPLOYMENT_SYSTEM_PROMPT,
   parseResponseBody,
   RENTAL_SYSTEM_PROMPT,
   SYSTEM_PROMPT,
@@ -116,6 +117,45 @@ describe('buildRequestBody', () => {
       "the landlord's name only if the landlord is a company",
     ])
       expect(RENTAL_SYSTEM_PROMPT).toContain(data);
+  });
+
+  it('asks an employment read with its prompt, schema and room, and the others as before', () => {
+    const tool = (body: Record<string, unknown>) =>
+      (body['tools'] as { input_schema: unknown }[])[0]?.input_schema;
+    const employment = buildRequestBody(SONNET_4_6, [photo], 'employment');
+    expect(employment['system']).toBe(EMPLOYMENT_SYSTEM_PROMPT);
+    expect(tool(employment)).toEqual(toolInputSchema('employment'));
+    expect(employment['max_tokens']).toBe(12_000);
+    for (const review of ['final_pay', 'rental'] as const)
+      expect(buildRequestBody(SONNET_4_6, [photo], review)['max_tokens']).toBe(5000);
+    expect(buildRequestBody(SONNET_5_5, [photo], 'rental')['max_tokens']).toBe(16_000);
+  });
+
+  it('gives the employment prompt the same guard against what a document says', () => {
+    const scaffold = (prompt: string) => prompt.split('\n\n').slice(1, 3);
+    expect(scaffold(EMPLOYMENT_SYSTEM_PROMPT)).toEqual(scaffold(SYSTEM_PROMPT));
+    expect(EMPLOYMENT_SYSTEM_PROMPT).toMatch(/never instructions/);
+  });
+
+  it('has the employment prompt copy and label, never judge', () => {
+    expect(EMPLOYMENT_SYSTEM_PROMPT).toContain(
+      'transcribe the text literally and choose the label that matches it',
+    );
+    expect(EMPLOYMENT_SYSTEM_PROMPT).toContain(
+      'Never judge whether a clause is abusive, void or valid, whether the cause is justified, or which collective agreement applies',
+    );
+  });
+
+  it('has the employment prompt record no one’s identity, health or union', () => {
+    for (const data of [
+      'Never record the name, DNI, NIE, NAF or Social Security number, address, phone number, email address, IBAN or bank account number, or signature of the worker or of anyone else',
+      'write «[nombre]» in place of a person',
+      "the employer's name only if the employer is a company",
+      'Never record disability, health, the kind of any leave or absence, union membership or union dues (cuota sindical)',
+      'record only whether it shows an incident',
+      'Never record deductions',
+    ])
+      expect(EMPLOYMENT_SYSTEM_PROMPT).toContain(data);
   });
 
   it('refuses a model without settings', () => {

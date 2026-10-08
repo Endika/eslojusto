@@ -1,0 +1,71 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "job_offer",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "job_offer": {
+          "position": {
+            "value": "Administrativo/a contable",
+            "confidence": "high"
+          },
+          "salaryAmount": {
+            "value": 1300,
+            "confidence": "high"
+          },
+          "salaryPeriod": {
+            "value": "month",
+            "confidence": "high"
+          },
+          "net": {
+            "value": true,
+            "confidence": "high"
+          },
+          "variable": {
+            "value": false,
+            "confidence": "high"
+          },
+          "weeklyHours": {
+            "value": 40,
+            "confidence": "high"
+          },
+          "modality": {
+            "value": "permanent",
+            "confidence": "high"
+          },
+          "remote": {
+            "value": "hybrid",
+            "confidence": "high"
+          },
+          "publishedOn": {
+            "value": "2026-08-20",
+            "confidence": "high"
+          }
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 16459,
+    "output_tokens": 301
+  }
+}

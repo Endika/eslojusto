@@ -1,0 +1,85 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "employment_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "employment_contract": {
+          "employerType": {
+            "value": "person",
+            "confidence": "high"
+          },
+          "companyName": {
+            "value": "Fulanita Inventada Ejemplo",
+            "confidence": "high"
+          },
+          "workplaceRegion": {
+            "value": "CT",
+            "confidence": "high"
+          },
+          "startDate": {
+            "value": "2026-02-01",
+            "confidence": "high"
+          },
+          "modalityText": {
+            "value": "Contrato de trabajo para el servicio del hogar familiar",
+            "confidence": "high"
+          },
+          "modality": {
+            "value": "permanent",
+            "confidence": "high"
+          },
+          "partTime": {
+            "value": true,
+            "confidence": "high"
+          },
+          "salaryAmount": {
+            "value": 9.55,
+            "confidence": "high"
+          },
+          "salaryPeriod": {
+            "value": "hour",
+            "confidence": "high"
+          },
+          "weeklyHours": {
+            "value": 20,
+            "confidence": "high"
+          },
+          "scheduleText": {
+            "value": "Lunes, miércoles y viernes de 9:00 a 13:00; dudas al 600 123 456.",
+            "confidence": "high"
+          },
+          "relationshipHints": [
+            {
+              "hint": "household",
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 16459,
+    "output_tokens": 462
+  }
+}
