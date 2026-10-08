@@ -1,6 +1,7 @@
 import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { syntheticPhoto } from '../support/synthetic-photo';
+import { nextSheet } from '../support/sheets';
 
 // Runs only against a TEST_DOCUMENTS=1 build, which has /alquiler/ too: every request to the
 // fake API, to Turnstile and to Stripe is answered here. The documents and figures are synthetic.
@@ -185,13 +186,7 @@ async function upload(page: Page, files: readonly string[]) {
 }
 
 const sheet = (page: Page, name: string) => page.getByRole('group', { name, exact: true });
-async function next(page: Page) {
-  await page.getByRole('button', { name: 'Siguiente' }).click();
-  // The page turn moves in steps, so a click during it can land beside its target.
-  await page.waitForFunction(() =>
-    document.getAnimations().every((a) => a.playState !== 'running'),
-  );
-}
+const next = nextSheet;
 const markOf = (page: Page, field: string) => page.locator(`[data-field="${field}"] > .read-mark`);
 
 // The pack read, confirmed sheet by sheet with the answers no document gives.

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { nextSheet } from '../support/sheets';
 
 const ORIGIN = `http://localhost:${process.env['E2E_PORT'] ?? 4321}`;
 test('reviewing a final pay makes no request and leaves no cookies', async ({ page, context }) => {
@@ -6,7 +7,7 @@ test('reviewing a final pay makes no request and leaves no cookies', async ({ pa
   await page.goto('finiquito/');
   await page.waitForLoadState('networkidle');
   page.on('request', (r) => requests.push(r.url()));
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByLabel('Baja voluntaria (dimisión)').check();
   await next();
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2020-01-01');

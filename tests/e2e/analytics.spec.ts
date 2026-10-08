@@ -1,5 +1,6 @@
 import { gunzipSync } from 'node:zlib';
 import { test, expect, type Page, type Request } from '@playwright/test';
+import { nextSheet } from '../support/sheets';
 
 const ORIGIN = `http://localhost:${process.env['E2E_PORT'] ?? 4321}`;
 
@@ -151,7 +152,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
     document.documentElement.lang = 'ar';
   });
 
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await next(); // no cause: a validation error
   await page.getByLabel('Despido improcedente').check();
   await next();
@@ -318,7 +319,7 @@ test("a full run writes nothing to the browser's storage", async ({ page, contex
   const stored = () =>
     page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage } }));
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await next();
   await page.getByLabel('Fin de contrato temporal').check();
   await next();
@@ -384,7 +385,7 @@ test("a full run writes nothing to the browser's storage", async ({ page, contex
 test('a repeated review counts the attempt and names only what changed', async ({ page }) => {
   const spy = await spyOn(page);
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByLabel('Baja voluntaria (dimisión)').check();
   await next();
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2020-01-01');
@@ -432,7 +433,7 @@ test('the situations of a possibly null dismissal never leave the page, not even
 }) => {
   const spy = await spyOn(page);
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByLabel('Despido objetivo').check();
   await next();
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2020-01-01');
@@ -464,7 +465,7 @@ test('the situations of a possibly null dismissal never leave the page, not even
   await next();
   await page.getByLabel('Estabas de baja médica').uncheck();
   await page.getByRole('link', { name: /Tu finiquito/ }).click();
-  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await nextSheet(page);
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect.poll(() => spy.named('review_completed').length, { timeout: 15_000 }).toBe(2);
 
@@ -482,7 +483,7 @@ test('with the do-not-track signal nothing is sent', async ({ page }) => {
   const spy = await spyOn(page);
   await page.goto('finiquito/');
   await page.getByLabel('Baja voluntaria (dimisión)').check();
-  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await nextSheet(page);
   await page.waitForTimeout(1500);
   expect(spy.bodies).toEqual([]);
   expect(spy.external).toEqual([]);
@@ -499,13 +500,7 @@ test('the rental review sends sheets, field names and its outcome in codes, neve
   const spy = await spyOn(page);
   await page.clock.setFixedTime(new Date('2026-10-08T12:00:00'));
   await page.goto('alquiler/');
-  const next = async () => {
-    await page.getByRole('button', { name: 'Siguiente' }).click();
-    // The page turn moves in steps, so a click during it can land beside its target.
-    await page.waitForFunction(() =>
-      document.getAnimations().every((a) => a.playState !== 'running'),
-    );
-  };
+  const next = () => nextSheet(page);
   const sheet = (name: string) => page.getByRole('group', { name, exact: true });
 
   await next(); // nothing answered: validation errors, by field name
@@ -658,13 +653,7 @@ test('the contract review sends sheets, field names and its outcome in codes, ne
   const spy = await spyOn(page);
   await page.clock.setFixedTime(new Date('2026-10-08T12:00:00'));
   await page.goto('contrato/');
-  const next = async () => {
-    await page.getByRole('button', { name: 'Siguiente' }).click();
-    // The page turn moves in steps, so a click during it can land beside its target.
-    await page.waitForFunction(() =>
-      document.getAnimations().every((a) => a.playState !== 'running'),
-    );
-  };
+  const next = () => nextSheet(page);
   const sheet = (name: string) => page.getByRole('group', { name, exact: true });
   const choose = (scope: ReturnType<typeof sheet>, name: string, value: string) =>
     scope.getByRole('group', { name, exact: true }).getByLabel(value, { exact: true }).check();
