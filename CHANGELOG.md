@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.1](https://github.com/Endika/eslojusto/compare/v1.28.0...v1.28.1) (2026-10-08)
+
+
+### Bug Fixes
+
+* **api:** retry a read once when a section comes back as a string, not an object ([7a9a57c](https://github.com/Endika/eslojusto/commit/7a9a57c454acd1556e35ecb4a319f28784c2e963))
+
 ## [1.28.0](https://github.com/Endika/eslojusto/compare/v1.27.0...v1.28.0) (2026-10-08)
 
 
