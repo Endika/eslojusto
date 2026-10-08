@@ -15,18 +15,11 @@ import {
   withHolidayNote,
 } from '../calculator/render';
 import type { Translate } from '../i18n/client';
-import { NO_DETAILS, type LetterDetails } from './letter';
+import { longDate, NO_DETAILS, type LetterDetails } from './letter';
 import type { Block, DocumentModel } from './ports';
 
 // «2026-10-07» → «07-10-2026», as the site writes dates.
 const shortDate = (d: CivilDate) => sourceDate(toIso(d));
-
-export const longDate = (d: CivilDate) =>
-  new Date(d.y, d.m - 1, d.d).toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
 
 function rangeText(item: Item, tr: Translate): string {
   const { range } = item;

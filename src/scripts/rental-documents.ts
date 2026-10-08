@@ -2,10 +2,12 @@ import { DOCUMENTS } from '../documents/config';
 import { RENTAL_EXTRACTION } from '../documents/contract';
 import type { DocumentEvents } from '../documents/ports';
 import { pageTranslator, type ClientKey, type Translate } from '../i18n/client';
+import { rentalCase } from '../rental/case';
 import type { RentalCalculator } from '../rental/main';
 import type { CompletedRentalReview } from '../rental/ports';
 import { rentalReading } from '../rental/reading';
 import { STEPS } from '../rental/steps';
+import { localToday } from './clock';
 import { wireDocuments, type ReviewHooks } from './documents';
 
 // The shared messages the rental page words its own way: what a value worked out from the
@@ -40,7 +42,7 @@ const quiet: DocumentEvents = {
 };
 
 // Document reading and the pass on the rental review's page. The pass unlocks the detail of each
-// item; nothing else is paid for here yet.
+// item, the report and the letters the review has figures for.
 export function wireRentalDocuments(
   rental: RentalCalculator,
   hooks: ReviewHooks<CompletedRentalReview>,
@@ -59,7 +61,8 @@ export function wireRentalDocuments(
       reading: rentalReading(rental.form, tr),
       steps: STEPS,
       keptReviewKey: 'eslojusto-revision-alquiler-en-pago',
-      paidReview: (r) => ({ offer: r.review.offerPass }),
+      // The review was just worked out: its interest runs up to today.
+      paidReview: (r) => rentalCase(r, localToday()),
       decorateResult: () => {},
       restore: (saved) => saved,
     },

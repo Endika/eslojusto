@@ -8,11 +8,23 @@ export interface LetterDetails {
   readonly company: string;
   readonly place: string;
   readonly date: CivilDate | null;
+  // Only the rental letters ask for these; the account only for the deposit's.
+  readonly landlord?: string;
+  readonly address?: string;
+  readonly iban?: string;
 }
 
-// The fields a person types; the date comes from a date picker.
+// The fields a person types on the final pay's letter; the date comes from a date picker.
 export const LETTER_FIELDS = ['name', 'id', 'company', 'place'] as const;
-export type LetterField = (typeof LETTER_FIELDS)[number];
+// And on the rental letters.
+export const RENTAL_LETTER_FIELDS = ['name', 'id', 'landlord', 'address', 'place', 'iban'] as const;
+export type LetterField = (typeof LETTER_FIELDS)[number] | (typeof RENTAL_LETTER_FIELDS)[number];
+export const ALL_LETTER_FIELDS: readonly LetterField[] = [
+  ...new Set<LetterField>([...LETTER_FIELDS, ...RENTAL_LETTER_FIELDS]),
+];
+// The typed fields of a letter: the final pay's always, the rental ones when its form has them.
+export type TypedDetails = Record<(typeof LETTER_FIELDS)[number], string> &
+  Partial<Record<LetterField, string>>;
 
 // Long enough for any real value, short enough to fit its line.
 export const LETTER_MAX_LENGTH: Record<LetterField, number> = {
@@ -20,11 +32,16 @@ export const LETTER_MAX_LENGTH: Record<LetterField, number> = {
   id: 12,
   company: 80,
   place: 50,
+  landlord: 80,
+  address: 120,
+  // 34 characters at most (ISO 13616), with a space every four.
+  iban: 42,
 };
 
 // The letters a review can offer: the final pay's lists what falls short (`items`) or only
-// acknowledges the proposal (`general`).
-export const LETTER_KINDS = ['items', 'general'] as const;
+// acknowledges the proposal (`general`); the rental review's asks for the deposit back
+// (`deposit_return`) or for a rise to be looked at again (`rent_review`).
+export const LETTER_KINDS = ['items', 'general', 'deposit_return', 'rent_review'] as const;
 export type LetterKind = (typeof LETTER_KINDS)[number];
 
 export const NO_DETAILS: LetterDetails = { name: '', id: '', company: '', place: '', date: null };
@@ -32,12 +49,22 @@ export const NO_DETAILS: LetterDetails = { name: '', id: '', company: '', place:
 export const LETTER_PREFILLED = ['none', 'some', 'all'] as const;
 export type LetterPrefilled = (typeof LETTER_PREFILLED)[number];
 
-// How many of the personal fields were filled, for analytics; the date, filled in for the person,
-// does not count.
-export function letterPrefilled(d: LetterDetails): LetterPrefilled {
-  const filled = LETTER_FIELDS.filter((f) => d[f].trim() !== '').length;
-  return filled === 0 ? 'none' : filled === 4 ? 'all' : 'some';
+// How many of the personal fields of its form were filled, for analytics; the date, filled in for
+// the person, does not count.
+export function letterPrefilled(
+  d: LetterDetails,
+  fields: readonly LetterField[] = LETTER_FIELDS,
+): LetterPrefilled {
+  const filled = fields.filter((f) => (d[f] ?? '').trim() !== '').length;
+  return filled === 0 ? 'none' : filled === fields.length ? 'all' : 'some';
 }
+
+export const longDate = (d: CivilDate) =>
+  new Date(d.y, d.m - 1, d.d).toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
 const CHECK_LETTERS = 'TRWAGMYFPDXBNJZSQVHLCKE';
 

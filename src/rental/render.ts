@@ -221,6 +221,20 @@ const NORM_STATUS: Record<RentalSource['status'], ClientKey> = {
   repealed: 'client.rental.norm.repealed',
 };
 
+// How a norm stands today: «en vigor», «pendiente de convalidación», «derogada el …».
+export const normStatusText = (s: RentalSource, tr: Translate): string =>
+  tr(NORM_STATUS[s.status], { fecha: s.statusSince ? dayText(s.statusSince) : '' });
+
+// The days a rule had effect, and how its norm stands today.
+export function inForceText(s: RentalSource, tr: Translate): string {
+  const since = dayText(s.inForceSince);
+  const period =
+    s.inForceUntil === null
+      ? tr('client.rental.source.since', { desde: since })
+      : tr('client.rental.source.between', { desde: since, hasta: dayText(s.inForceUntil) });
+  return `${period} · ${normStatusText(s, tr)}`;
+}
+
 // Each rule an item rests on: the norm and article, a link to it and how it stands today.
 function renderRules(
   container: ParentNode,
@@ -236,9 +250,7 @@ function renderRules(
       a.textContent = s.citation;
       const status = find(li, '[data-rule-status]');
       status.dataset['status'] = s.status;
-      status.textContent = tr(NORM_STATUS[s.status], {
-        fecha: s.statusSince ? dayText(s.statusSince) : '',
-      });
+      status.textContent = normStatusText(s, tr);
       return li;
     }),
   );
@@ -293,6 +305,41 @@ function renderItem(
   return frag;
 }
 
+// An information block in words: its title, its text and the pages it points to.
+export function informationText(
+  b: InformationBlock,
+  tr: Translate,
+): {
+  readonly title: string;
+  readonly text: string;
+  readonly links: readonly { readonly url: string; readonly text: string }[];
+} {
+  const vars: Record<string, string> = Object.fromEntries(
+    Object.entries(b.dates).map(([name, iso]) => [name, dayText(iso)]),
+  );
+  if (b.region) vars['comunidad'] = tr(`client.rental.region.${b.region}`);
+  const key: ClientKey =
+    b.id === 'stressed_zone'
+      ? b.answer === 'yes'
+        ? 'client.rental.info.stressed_zone.text_yes'
+        : 'client.rental.info.stressed_zone.text_unknown'
+      : `client.rental.info.${b.id}.text`;
+  const linkLabel: ClientKey | null =
+    b.id === 'stressed_zone' || b.id === 'reference_price'
+      ? 'client.rental.info.serpavi'
+      : b.id === 'regional_rules'
+        ? 'client.rental.info.lau'
+        : null;
+  return {
+    title: tr(`client.rental.info.${b.id}.title`),
+    text: tr(key, vars),
+    links: [
+      ...b.links.map((url) => ({ url, text: linkLabel ? tr(linkLabel) : url })),
+      ...b.sources.map((s) => ({ url: s.url, text: s.citation })),
+    ],
+  };
+}
+
 function renderInformation(
   container: ParentNode,
   blocks: readonly InformationBlock[],
@@ -301,29 +348,11 @@ function renderInformation(
   find(container, '[data-information]').replaceChildren(
     ...blocks.map((b) => {
       const frag = template(container, 'information');
-      find(frag, '[data-info-title]').textContent = tr(`client.rental.info.${b.id}.title`);
-      const vars: Record<string, string> = Object.fromEntries(
-        Object.entries(b.dates).map(([name, iso]) => [name, dayText(iso)]),
-      );
-      if (b.region) vars['comunidad'] = tr(`client.rental.region.${b.region}`);
-      const key: ClientKey =
-        b.id === 'stressed_zone'
-          ? b.answer === 'yes'
-            ? 'client.rental.info.stressed_zone.text_yes'
-            : 'client.rental.info.stressed_zone.text_unknown'
-          : `client.rental.info.${b.id}.text`;
-      find(frag, '[data-info-text]').textContent = tr(key, vars);
+      const info = informationText(b, tr);
+      find(frag, '[data-info-title]').textContent = info.title;
+      find(frag, '[data-info-text]').textContent = info.text;
       const links = find(frag, '[data-info-links]');
-      const linkLabel: ClientKey | null =
-        b.id === 'stressed_zone' || b.id === 'reference_price'
-          ? 'client.rental.info.serpavi'
-          : b.id === 'regional_rules'
-            ? 'client.rental.info.lau'
-            : null;
-      const sources = [
-        ...b.links.map((url) => ({ url, text: linkLabel ? tr(linkLabel) : url })),
-        ...b.sources.map((s) => ({ url: s.url, text: s.citation })),
-      ];
+      const sources = info.links;
       links.replaceChildren(
         ...sources.map(({ url, text }) => {
           const li = document.createElement('li');
@@ -377,7 +406,7 @@ function renderTotals(container: ParentNode, review: RentalReview, tr: Translate
 
 // ---------- Detail ----------
 
-function rateText(rate: RateFigure, tr: Translate): string {
+export function rateText(rate: RateFigure, tr: Translate): string {
   if (rate.kind === 'fixed')
     return tr('client.rental.detail.fixed_rate', { tasa: percentText(rate.rate) });
   const f = rate.figure;
@@ -389,9 +418,9 @@ function rateText(rate: RateFigure, tr: Translate): string {
   });
 }
 
-type Figures = readonly (readonly [ClientKey, string | number])[];
+export type Figures = readonly (readonly [ClientKey, string | number])[];
 
-function riseFigures(
+export function riseFigures(
   r: RentUpdateReading,
   item: Extract<RentalItemResult, { kind: 'rent_update' }>,
   input: RentalInput,
@@ -466,15 +495,7 @@ function renderSources(
       const a = find<HTMLAnchorElement>(li, 'a');
       a.href = s.url;
       a.textContent = s.citation;
-      const since = dayText(s.inForceSince);
-      const span = find(li, '[data-in-force]');
-      const period =
-        s.inForceUntil === null
-          ? tr('client.rental.source.since', { desde: since })
-          : tr('client.rental.source.between', { desde: since, hasta: dayText(s.inForceUntil) });
-      span.textContent = `${period} · ${tr(NORM_STATUS[s.status], {
-        fecha: s.statusSince ? dayText(s.statusSince) : '',
-      })}`;
+      find(li, '[data-in-force]').textContent = inForceText(s, tr);
       return li;
     }),
   );

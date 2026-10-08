@@ -2,20 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { es } from '../../src/i18n/es';
-
-const FORBIDDEN = [
-  /\bfirma(lo)?\b/,
-  /\bno firmes\b/,
-  /\breclama(lo)?\b/,
-  /\bdemanda\b/,
-  /\best[aá] bien\b/,
-  /\bes correcto\b/,
-  /\breclamo\b/,
-  /\bexij[oa]\b/,
-  /\babusiv[ao]s?\b/,
-  /\bilegal(es)?\b/,
-  /\bdenuncia\b/,
-];
+import { FORBIDDEN } from '../support/forbidden';
 
 const filesUnder = (dir: string, ext: string): string[] =>
   readdirSync(dir).flatMap((n) => {

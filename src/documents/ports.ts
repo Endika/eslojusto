@@ -1,6 +1,6 @@
 import type { FormEntries } from '../calculator/fill';
 import type { CivilDate } from '../engine/date';
-import type { Translate } from '../i18n/client';
+import type { ClientKey, Translate } from '../i18n/client';
 import type {
   Confidence,
   ErrorCode,
@@ -11,7 +11,13 @@ import type {
   SkipReason,
 } from './contract';
 import type { filesBucket } from './files';
-import type { LetterDetails, LetterField, LetterKind, LetterPrefilled } from './letter';
+import type {
+  LetterDetails,
+  LetterField,
+  LetterKind,
+  LetterPrefilled,
+  TypedDetails,
+} from './letter';
 import type { QualityProblem, QualitySignals } from './quality';
 
 export { ERROR_CODES, PAGE_KINDS, SKIP_REASONS } from './contract';
@@ -137,7 +143,7 @@ export interface DocumentModel {
 export interface PdfMaker {
   render(model: DocumentModel): Promise<Blob>;
   // The fields with a character the letter's fonts can't draw.
-  unprintable(details: Record<LetterField, string>): LetterField[];
+  unprintable(details: TypedDetails): LetterField[];
 }
 
 // A completed review as the pass sees it, whichever section made it: whether the pass is offered.
@@ -148,10 +154,13 @@ export interface OfferedReview {
 
 // One whose pass unlocks downloads too: the report and the letters.
 export interface PaidReview extends OfferedReview {
-  // The letters this review can download; the first is the one a plain letter button gives.
-  readonly letterKinds: readonly [LetterKind, ...LetterKind[]];
+  // The letters this review can download, maybe none; the first is the one a plain letter button
+  // gives.
+  readonly letterKinds: readonly LetterKind[];
   report(tr: Translate, today: CivilDate): DocumentModel;
   letter(kind: LetterKind, details: LetterDetails, tr: Translate): DocumentModel;
+  // The file's name, when the section names its downloads its own way.
+  filename?(document: Download, kind?: LetterKind): ClientKey;
 }
 
 // A review's form as reading and the pass drive it: set or read its answers, and open or review it.
