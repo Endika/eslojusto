@@ -228,6 +228,8 @@ export interface EmploymentInput {
   readonly clauses: readonly Clause[];
   readonly info: Readonly<Record<InfoElement, InfoPresence>>;
   readonly history: readonly EmploymentPeriod[] | null;
+  // The history holds only its most recent rows: older contracts may be missing from it.
+  readonly historyIncomplete: boolean;
   readonly offer: Offer | null;
 }
 

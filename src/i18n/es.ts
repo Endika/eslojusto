@@ -1189,6 +1189,9 @@ export const es = {
   'employment.history.to': 'Hasta',
   'employment.history.employer': 'Empresa',
   'employment.history.kind': 'Tipo de contrato',
+  'employment.history.incomplete': 'Faltan contratos más antiguos en esta lista',
+  'employment.history.incomplete_hint':
+    'Márcalo si tu vida laboral tiene contratos anteriores que no has metido aquí: entonces no se puede confirmar que estés dentro del límite.',
   'employment.employer.same': 'La misma empresa',
   'employment.employer.same_group': 'Otra empresa del mismo grupo',
   'employment.employer.same_via_agency': 'La misma empresa, a través de una ETT',
@@ -1917,6 +1920,8 @@ export const es = {
     'Sin tu vida laboral no se pueden sumar tus contratos. El art. 15.5 pone un límite de 18 meses dentro de 24 con dos o más contratos por circunstancias de la producción.',
   'client.employment.calculation.chaining.within':
     'En la ventana de 24 meses con más días, {contratos} suman {dias}; el límite es de 18 meses ({limite}).',
+  'client.employment.calculation.chaining.history_incomplete':
+    'En la lista faltan contratos más antiguos de tu vida laboral: si alguno es con la misma empresa, podría sumar. Con lo que hay no se puede confirmar que estés dentro del límite.',
   'client.employment.calculation.chaining.near_limit':
     'En una ventana de 24 meses, {contratos} suman {dias}, tan cerca del límite de 18 meses ({limite}) que depende de cómo se cuenten el primer y el último día.',
   'client.employment.calculation.chaining.exceeds':

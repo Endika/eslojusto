@@ -152,6 +152,27 @@ describe('the employment form', () => {
     ]);
   });
 
+  it('reads whether older contracts are missing from the history', () => {
+    const row = {
+      startDate: '2024-01-01',
+      endDate: '2024-06-30',
+      employer: 'same',
+      kind: 'production',
+    };
+    const input = (change: Values) => {
+      const r = readEmploymentForm(
+        form({ modality: 'production', ...change }, { history: [row] }),
+        TODAY,
+      );
+      if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
+      return r.input;
+    };
+    expect(input({ hasHistory: 'yes', historyIncomplete: 'yes' }).historyIncomplete).toBe(true);
+    expect(input({ hasHistory: 'yes', historyIncomplete: '' }).historyIncomplete).toBe(false);
+    // Without a history there is nothing to be missing from.
+    expect(input({ hasHistory: 'no', historyIncomplete: 'yes' }).historyIncomplete).toBe(false);
+  });
+
   it('groups the schedule by day', () => {
     const el = form(
       { hasSchedule: 'yes' },
