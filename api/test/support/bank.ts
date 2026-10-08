@@ -31,3 +31,15 @@ export const employmentTemplate = (id: EmploymentTemplateId): string =>
 
 export const employmentSheetsOf = (id: EmploymentTemplateId): number =>
   employmentTemplate(id).match(SHEET)?.length ?? 0;
+
+// Cut every comment by position, so a nested or unclosed «<!--» never survives the cut.
+export function withoutComments(html: string): string {
+  let kept = '';
+  let rest = html;
+  for (let start = rest.indexOf('<!--'); start >= 0; start = rest.indexOf('<!--')) {
+    kept += rest.slice(0, start);
+    const end = rest.indexOf('-->', start + 4);
+    rest = end < 0 ? '' : rest.slice(end + 3);
+  }
+  return kept + rest;
+}

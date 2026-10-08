@@ -8,19 +8,7 @@ import {
   TEMPLATE_IDS,
   type BankCase,
 } from '../eval/schema';
-import { BANK, template } from './support/bank';
-
-// Cut every comment by position, so a nested or unclosed «<!--» never survives the cut.
-function withoutComments(html: string): string {
-  let kept = '';
-  let rest = html;
-  for (let start = rest.indexOf('<!--'); start >= 0; start = rest.indexOf('<!--')) {
-    kept += rest.slice(0, start);
-    const end = rest.indexOf('-->', start + 4);
-    rest = end < 0 ? '' : rest.slice(end + 3);
-  }
-  return kept + rest;
-}
+import { BANK, template, withoutComments } from './support/bank';
 
 const placeholders = (html: string): string[] =>
   [...withoutComments(html).matchAll(PLACEHOLDER)].map((m) => m[1] ?? '');
