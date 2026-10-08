@@ -4,6 +4,7 @@ import type { Translate } from '../i18n/client';
 import { SESSION_ID, type ErrorCode, type PassApi } from './contract';
 import { CHECKOUT_ORIGIN } from './config';
 import {
+  ALL_LETTER_FIELDS,
   letterPrefilled,
   looksLikeDniOrNie,
   type LetterDetails,
@@ -90,21 +91,24 @@ const FILENAMES: Record<Download, 'report' | 'letter'> = { report: 'report', let
 
 const downloadsWith = (r: OfferedReview): r is PaidReview => 'report' in r;
 
-// The letter's fields and the warnings beside them.
+// The letter's fields and the warnings beside them. Each section's form has its own typed fields:
+// the final pay's asks for the company, the rental one for the landlord, the address and the account.
 function letterParts(letter: HTMLElement) {
-  const field = (name: keyof LetterDetails) =>
-    required(
-      letter.querySelector<HTMLInputElement>(`[data-letter-field="${name}"]`),
-      `letter ${name}`,
-    );
+  const input = (name: keyof LetterDetails) =>
+    letter.querySelector<HTMLInputElement>(`[data-letter-field="${name}"]`);
+  const field = (name: keyof LetterDetails) => required(input(name), `letter ${name}`);
+  const typed = ALL_LETTER_FIELDS.flatMap((f) => {
+    const el = input(f);
+    return el ? [[f, el] as const] : [];
+  });
   return {
     inputs: {
       name: field('name'),
       id: field('id'),
-      company: field('company'),
       place: field('place'),
       date: field('date'),
     },
+    typed: new Map<LetterField, HTMLInputElement>(typed),
     glyphWarning: required(
       letter.querySelector<HTMLElement>('[data-letter-glyph-warning]'),
       'glyph warning',
@@ -233,12 +237,21 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     browser.warnBeforeLeaving(warnsOnLeave(state));
   }
 
+  // Only the letters this review offers, and the fields only they ask for.
+  function renderLetters(review: OfferedReview) {
+    if (!letter || !downloadsWith(review)) return;
+    letter.hidden = review.letterKinds.length === 0;
+    for (const el of letter.querySelectorAll<HTMLElement>('[data-letter-kind]'))
+      el.hidden = !review.letterKinds.some((k) => k === el.dataset['letterKind']);
+  }
+
   function render() {
     renderNotice();
     if (!current) {
       section.hidden = true;
       return;
     }
+    renderLetters(current);
     const stored = passes.pass();
     const held = heldPass() !== null;
     const paid = verified();
@@ -361,14 +374,10 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     } catch {
       // A date the browser lets through unfinished keeps its line.
     }
-    const typed = (f: LetterField) => inputs[f].value.normalize('NFC');
-    return {
-      name: typed('name'),
-      id: typed('id'),
-      company: typed('company'),
-      place: typed('place'),
-      date,
-    };
+    const typed = Object.fromEntries(
+      [...letterForm.typed].map(([f, el]) => [f, el.value.normalize('NFC')]),
+    );
+    return { ...NO_DETAILS, ...typed, date };
   }
 
   // A warning only: the letter is downloaded with whatever was typed.
@@ -383,17 +392,21 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
 
   function clearLetter() {
     if (!letterForm) return;
-    for (const input of Object.values(letterForm.inputs)) input.value = '';
+    for (const input of [...Object.values(letterForm.inputs), ...letterForm.typed.values()])
+      input.value = '';
     letterForm.glyphWarning.hidden = true;
     checkId();
   }
 
   // A letter button names its kind when the review offers more than one letter.
-  const letterKindOf = (button: HTMLElement, review: PaidReview): LetterKind =>
+  const letterKindOf = (button: HTMLElement, review: PaidReview): LetterKind | undefined =>
     review.letterKinds.find((k) => k === button.dataset['letterKind']) ?? review.letterKinds[0];
 
   async function download(which: Download, button: HTMLElement) {
     if (!current || !downloadsWith(current) || !(await verify())) return render();
+    // A letter the review does not offer is never built.
+    const kind = which === 'letter' ? letterKindOf(button, current) : undefined;
+    if (which === 'letter' && kind === undefined) return render();
     setError(null);
     status.textContent = tr('client.documents.pass.generating');
     try {
@@ -407,12 +420,19 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
           blanked.length === 0 ? '' : tr('client.documents.letter.glyph_warning');
         details = { ...details, ...Object.fromEntries(blanked.map((f) => [f, ''])) };
       }
-      const kind = letterKindOf(button, current);
       const blob = await maker.render(
-        which === 'report' ? current.report(tr, deps.today()) : current.letter(kind, details, tr),
+        kind === undefined ? current.report(tr, deps.today()) : current.letter(kind, details, tr),
       );
-      browser.save(blob, tr(`client.documents.${FILENAMES[which]}.filename`));
-      if (which === 'letter') events.downloaded(which, letterPrefilled(details), kind);
+      browser.save(
+        blob,
+        tr(current.filename?.(which, kind) ?? `client.documents.${FILENAMES[which]}.filename`),
+      );
+      if (which === 'letter')
+        events.downloaded(
+          which,
+          letterPrefilled(details, letterForm ? [...letterForm.typed.keys()] : undefined),
+          kind,
+        );
       else events.downloaded(which);
       downloaded.add(which);
       renderNotice();

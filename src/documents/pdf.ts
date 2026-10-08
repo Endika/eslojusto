@@ -1,7 +1,7 @@
 import { sans } from './fonts/sans';
 import { serif } from './fonts/serif';
 import { INK, PdfDocument, SOFT, type Rgb, type TextStyle } from './pdf-writer';
-import { LETTER_FIELDS, type LetterField } from './letter';
+import { ALL_LETTER_FIELDS, type LetterField, type TypedDetails } from './letter';
 import type { DocumentModel, PdfMaker } from './ports';
 
 // Loaded only when a person with a pass asks for a PDF: the fonts and the writer stay out of the
@@ -76,13 +76,13 @@ export async function renderPdf(model: DocumentModel): Promise<Uint8Array> {
 }
 
 // The letter's own fields whose text has a character neither font can draw; their lines stay blank.
-export function unprintable(details: Record<LetterField, string>): LetterField[] {
+export function unprintable(details: TypedDetails): LetterField[] {
   const drawable = (text: string) =>
     [...text.normalize('NFC')].every((c) => {
       const code = String(c.codePointAt(0));
       return code in sans.glyphs && code in serif.glyphs;
     });
-  return LETTER_FIELDS.filter((f) => !drawable(details[f]));
+  return ALL_LETTER_FIELDS.filter((f) => !drawable(details[f] ?? ''));
 }
 
 const asBlob = (bytes: Uint8Array) => new Blob([bytes as BlobPart], { type: 'application/pdf' });

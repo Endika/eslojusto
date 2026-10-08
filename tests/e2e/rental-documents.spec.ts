@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import { syntheticPhoto } from '../support/synthetic-photo';
 
 // Runs only against a TEST_DOCUMENTS=1 build, which has /alquiler/ too: every request to the
@@ -184,7 +185,13 @@ async function upload(page: Page, files: readonly string[]) {
 }
 
 const sheet = (page: Page, name: string) => page.getByRole('group', { name, exact: true });
-const next = (page: Page) => page.getByRole('button', { name: 'Siguiente' }).click();
+async function next(page: Page) {
+  await page.getByRole('button', { name: 'Siguiente' }).click();
+  // The page turn moves in steps, so a click during it can land beside its target.
+  await page.waitForFunction(() =>
+    document.getAnimations().every((a) => a.playState !== 'running'),
+  );
+}
 const markOf = (page: Page, field: string) => page.locator(`[data-field="${field}"] > .read-mark`);
 
 // The pack read, confirmed sheet by sheet with the answers no document gives.
@@ -343,13 +350,15 @@ test('a whole pack fills every sheet; the detail waits for the pass, which unloc
   await expectNoDetail(result);
 
   // The same pass as the final pay's, returning to this page.
-  const offer = page.getByRole('region', { name: 'El detalle de cada partida' });
+  const offer = page.getByRole('region', { name: 'El detalle, el informe y las cartas' });
   await expect(offer).toContainText('4,99 € con IVA incluido');
   await expect(offer.getByRole('button', { name: /Descargar/ })).toHaveCount(0);
   await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
   await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
   await expect(
-    page.getByText('Pago recibido. Ya puedes ver el detalle de cada partida.'),
+    page.getByText(
+      'Pago recibido. Ya puedes ver el detalle de cada partida y descargar el informe.',
+    ),
   ).toBeVisible();
   expect(fake.checkout[0]?.postDataJSON()).toMatchObject({ returnTo: 'rental' });
   expect(fake.pass[0]?.postDataJSON()).toMatchObject({ sessionId: 'cs_test_e2e' });
@@ -421,4 +430,147 @@ test('a read that finds nothing says why for each file and spends no read', asyn
   ).toBeVisible();
   expect(fake.extract).toHaveLength(1);
   expect(await page.evaluate(() => localStorage.getItem('eslojusto-lecturas'))).toBeNull();
+});
+
+// Typed by hand: a 2025 rise above the IRAV, and the keys back on 30-06-2026 with 850 € of the
+// 1.000 € deposit returned, so 150 € is still owed.
+async function fillByHand(page: Page) {
+  await page.goto('alquiler/');
+  await page.getByRole('button', { name: /Rellenar a mano/ }).click();
+  const contract = sheet(page, 'Tu contrato');
+  await contract.getByLabel('Vivienda habitual', { exact: true }).check();
+  await contract.getByLabel('Fecha del contrato', { exact: true }).fill('2024-03-15');
+  await contract.getByLabel('Fecha de entrada', { exact: true }).fill('2024-03-20');
+  await next(page);
+  const landlord = sheet(page, 'Tu casero');
+  await landlord.getByLabel('Una persona').check();
+  await landlord
+    .getByRole('group', { name: '¿Tu casero es una empresa o tiene muchas viviendas?' })
+    .getByLabel('No', { exact: true })
+    .check();
+  await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
+  await landlord
+    .getByRole('group', { name: '¿Está la vivienda en una zona tensionada?' })
+    .getByLabel('No', { exact: true })
+    .check();
+  await next(page);
+  await sheet(page, 'Lo que pagaste al entrar').getByLabel('Fianza', { exact: true }).fill('1000');
+  await next(page);
+  const rent = sheet(page, 'La renta');
+  await rent.getByLabel('Renta al empezar').fill('1.000,00');
+  await rent.getByLabel('Duración pactada, en meses').fill('60');
+  await rent.getByLabel('El IPC', { exact: true }).check();
+  await next(page);
+  const rises = sheet(page, 'Las subidas');
+  await rises.getByLabel('Sí, añadirlas').check();
+  const rise = rises.getByRole('group', { name: 'Subida 1' });
+  await rise.getByLabel('Año de la subida').fill('2025');
+  await rise.getByLabel('Primer recibo con la renta nueva').fill('2025-03-01');
+  await rise.getByLabel('Renta antes').fill('1000');
+  await rise.getByLabel('Renta después').fill('1030');
+  await rise.getByLabel('¿Cómo te avisaron?').selectOption({ label: 'Carta' });
+  await rise.getByLabel('Fecha del aviso').fill('2025-02-01');
+  await rise
+    .getByRole('group', { name: '¿Aceptaste esa subida por escrito?' })
+    .getByLabel('No', { exact: true })
+    .check();
+  await next(page);
+  await expect(sheet(page, 'Los gastos')).toBeVisible();
+  await next(page);
+  const exit = sheet(page, 'La salida');
+  await exit.getByLabel('Sí', { exact: true }).check();
+  await exit.getByLabel('Día en que devolviste las llaves', { exact: true }).fill('2026-06-30');
+  await exit.getByRole('button', { name: 'Añadir devolución' }).click();
+  const returned = exit.getByRole('group', { name: 'Devolución 1' });
+  await returned.getByLabel('Fecha', { exact: true }).fill('2026-08-14');
+  await returned.getByLabel('Importe', { exact: true }).fill('850');
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
+}
+
+async function downloadOf(page: Page, button: Locator): Promise<string> {
+  const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
+  const path = await download.path();
+  expect(readFileSync(path).subarray(0, 5).toString()).toBe('%PDF-');
+  return download.suggestedFilename();
+}
+
+test('the pass unlocks the report and both letters, filled in and downloaded', async ({ page }) => {
+  await fakeServices(page);
+  const sent: string[] = [];
+  page.on('request', (r) => sent.push(`${r.url()} ${r.postData() ?? ''}`));
+  await fillByHand(page);
+  const result = page.locator('#resultado');
+  await expect(result.getByRole('region', { name: 'Devolución de la fianza' })).toContainText(
+    'Te deben',
+  );
+
+  const offer = page.getByRole('region', { name: 'El detalle, el informe y las cartas' });
+  await expect(offer.getByRole('button', { name: /Descargar/ })).toHaveCount(0);
+  await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
+  await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
+  await expect(offer).toContainText(/Tu pase vale hasta el/);
+
+  expect(
+    await downloadOf(page, offer.getByRole('button', { name: 'Descargar el informe (PDF)' })),
+  ).toBe('eslojusto-informe-alquiler.pdf');
+
+  const letter = offer.getByRole('group', { name: 'Tus datos para las cartas (opcional)' });
+  await letter.getByLabel('Tu nombre y apellidos').fill('Alex Ejemplo');
+  await letter.getByLabel('DNI o NIE').fill('00000000A');
+  await letter.getByLabel('Nombre de tu casero o de la empresa').fill('Inmuebles Ficticios SL');
+  await letter.getByLabel('Dirección de la vivienda').fill('Calle Inventada 0, Villaficticia');
+  await letter.getByLabel('Localidad').fill('Villaficticia');
+  await expect(letter.getByLabel('Fecha')).toHaveValue('2026-10-08');
+  await letter
+    .getByLabel('Cuenta (IBAN) para devolverte la fianza')
+    .fill('ES00 0000 0000 0000 0000 0000');
+
+  expect(
+    await downloadOf(
+      page,
+      letter.getByRole('button', { name: 'Descargar la carta de la fianza (PDF)' }),
+    ),
+  ).toBe('eslojusto-carta-fianza.pdf');
+  expect(
+    await downloadOf(
+      page,
+      letter.getByRole('button', { name: 'Descargar la carta de la renta (PDF)' }),
+    ),
+  ).toBe('eslojusto-carta-renta.pdf');
+  // Downloaded, never sent: nothing typed for the letters left the page.
+  await expect(letter.getByText(/^Las cartas son plantillas con tus cifras\./)).toBeVisible();
+  for (const typed of ['Alex Ejemplo', 'Inmuebles Ficticios', 'Calle Inventada', 'ES00 0000'])
+    expect(sent.filter((r) => r.includes(typed) || r.includes(encodeURIComponent(typed)))).toEqual(
+      [],
+    );
+});
+
+test('without a deposit owed, only the rent letter and no account to ask for', async ({ page }) => {
+  await fakeServices(page);
+  await page.setViewportSize({ width: 360, height: 640 });
+  await fillByHand(page);
+  // Back to the exit: the whole deposit came back.
+  await page.getByRole('link', { name: /Salida/ }).click();
+  const returned = sheet(page, 'La salida').getByRole('group', { name: 'Devolución 1' });
+  await returned.getByLabel('Importe', { exact: true }).fill('1000');
+  await returned.getByLabel('Fecha', { exact: true }).fill('2026-07-10');
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
+
+  const offer = page.getByRole('region', { name: 'El detalle, el informe y las cartas' });
+  await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
+  await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
+  await expect(offer).toContainText(/Tu pase vale hasta el/);
+  await expect(
+    offer.getByRole('button', { name: 'Descargar la carta de la renta (PDF)' }),
+  ).toBeVisible();
+  await expect(
+    offer.getByRole('button', { name: 'Descargar la carta de la fianza (PDF)' }),
+  ).toBeHidden();
+  await expect(offer.getByLabel('Cuenta (IBAN) para devolverte la fianza')).toBeHidden();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
 });

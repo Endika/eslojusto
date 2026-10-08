@@ -475,15 +475,26 @@ export const es = {
     'El contrato y, si los tienes, los avisos de subida, los recibos, la factura de la agencia o la devolución de la fianza, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
   'rental.documents.consent':
     'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, DNI, direcciones o números de cuenta. Se leen en la Unión Europea y no se guardan.',
-  'rental.pass.title': 'El detalle de cada partida',
+  'rental.pass.title': 'El detalle, el informe y las cartas',
   'rental.pass.text':
-    'Por 4,99 € ves el cálculo paso a paso de cada partida: mes a mes y año a año, con el índice, el tope que aplica y las fuentes legales.',
+    'Por 4,99 € ves el cálculo paso a paso de cada partida (mes a mes y año a año, con el índice, el tope que aplica y las fuentes legales) y descargas el informe en PDF y, si tu revisión tiene cifras para ellas, las cartas sobre la fianza y las subidas. Se generan en tu dispositivo.',
   'rental.pass.price':
-    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para la revisión del finiquito: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a ver el detalle sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
+    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para la revisión del finiquito: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a ver el detalle y descargar el informe y las cartas sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
   'rental.pass.paid_help':
-    'Si pagaste desde este navegador y no ves el detalle, recupera aquí tu pase. Solo funciona en el navegador con el que pagaste.',
+    'Si pagaste desde este navegador y no ves el detalle ni las descargas, recupera aquí tu pase. Solo funciona en el navegador con el que pagaste.',
   'rental.pass.waiver':
-    'Quiero ver el detalle ahora. Sé que, al ser contenido digital que se entrega al momento, pierdo el derecho de desistimiento (art. 103.m de la Ley General para la Defensa de los Consumidores y Usuarios).',
+    'Quiero ver el detalle y el informe ahora. Sé que, al ser contenido digital que se entrega al momento, pierdo el derecho de desistimiento (art. 103.m de la Ley General para la Defensa de los Consumidores y Usuarios).',
+  'rental.pass.download_deposit_letter': 'Descargar la carta de la fianza (PDF)',
+  'rental.pass.download_rent_letter': 'Descargar la carta de la renta (PDF)',
+  'rental.pass.letter_note':
+    'Las cartas son plantillas con tus cifras. Se descargan en tu dispositivo y no se envían desde aquí: usarlas o no, y cómo, es decisión tuya.',
+  'rental.letter.legend': 'Tus datos para las cartas (opcional)',
+  'rental.letter.landlord': 'Nombre de tu casero o de la empresa',
+  'rental.letter.address': 'Dirección de la vivienda',
+  'rental.letter.iban': 'Cuenta (IBAN) para devolverte la fianza',
+  'rental.letter.iban_hint': 'Solo va en la carta de la fianza.',
+  'rental.letter.privacy':
+    'Estos datos solo se usan para rellenar las cartas en tu dispositivo; no se envían ni se guardan.',
   'faq.pass': '¿Qué incluye el pase de 4,99 €?',
   'faq.pass_answer':
     'Durante 7 días, y solo en el navegador con el que pagas, puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a descargar el informe y la carta sin pagar otra vez. No guardamos tu revisión en ningún sitio, así que conviene descargar el informe y la carta en cuanto pagas. El pase vive solo en ese navegador: en otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde, y «¿Ya has pagado?» solo lo recupera en el navegador con el que pagaste.',
@@ -2407,9 +2418,74 @@ export const es = {
     'Tu pase ya no sirve para leer documentos en este navegador; el detalle sigue disponible hasta que caduque. Prueba otra vez con una lectura gratis o rellena a mano.',
   'client.rental.documents.error.pass_exhausted':
     'Ya has usado las 15 lecturas de tu pase. Puedes rellenar a mano; el detalle sigue disponible.',
-  'client.rental.documents.pass.issued': 'Pago recibido. Ya puedes ver el detalle de cada partida.',
+  'client.rental.documents.pass.issued':
+    'Pago recibido. Ya puedes ver el detalle de cada partida y descargar el informe.',
   'client.rental.documents.pass.lost':
-    'Hemos vuelto del pago, pero la revisión no se ha podido recuperar. Repítela y verás el detalle.',
+    'Hemos vuelto del pago, pero la revisión no se ha podido recuperar. Repítela y verás el detalle y las descargas.',
+  'client.rental.report.title': 'Revisión de tu alquiler',
+  'client.rental.report.intro':
+    'Este informe compara lo que pagas o has pagado por tu alquiler con lo que permite la ley, partida por partida, con los datos que confirmaste en la revisión. Donde el resultado depende de una duda, da las dos cuentas. Informa sobre la ley y no es asesoramiento jurídico.',
+  'client.rental.report.footer':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Normas e índices según su estado el {fecha}.',
+  'client.rental.report.filename': 'eslojusto-informe-alquiler.pdf',
+  'client.rental.report.your_data': 'Tus datos',
+  'client.rental.report.signed': 'Fecha del contrato',
+  'client.rental.report.start': 'Fecha de entrada',
+  'client.rental.report.landlord': 'Casero',
+  'client.rental.report.large_landlord': '¿Empresa o muchas viviendas?',
+  'client.rental.report.region': 'Comunidad autónoma',
+  'client.rental.report.stressed_zone': '¿Zona tensionada?',
+  'client.rental.report.agreed_months': 'Duración pactada',
+  'client.rental.report.months': '{meses} meses',
+  'client.rental.report.initial_rent': 'Renta al empezar',
+  'client.rental.report.clause': 'Actualización de la renta',
+  'client.rental.report.clause.none': 'El contrato no dice nada',
+  'client.rental.report.clause.ipc': 'El IPC',
+  'client.rental.report.clause.irav': 'El IRAV',
+  'client.rental.report.clause.igc': 'El IGC',
+  'client.rental.report.clause.fixed_percent': 'Un {tasa} fijo al año',
+  'client.rental.report.clause.unspecified_index': 'Un índice sin decir cuál',
+  'client.rental.report.clause.other': 'Otra fórmula',
+  'client.rental.report.deposit': 'Fianza',
+  'client.rental.report.advance': 'Mensualidades por adelantado',
+  'client.rental.report.keys': 'Llaves devueltas el',
+  'client.rental.report.no_figure': 'Sin dato',
+  'client.rental.report.summary': 'Resumen',
+  'client.rental.report.items': 'Partida por partida',
+  'client.rental.report.how': 'Cómo se calcula',
+  'client.rental.report.indices': 'Índices usados, con su mes y su publicación',
+  'client.rental.report.norms': 'Las normas y su estado',
+  'client.rental.report.information': 'Para que lo tengas en cuenta',
+  'client.rental.report.unchecked': 'Lo que esta revisión no comprueba',
+  'client.rental.letter.landlord': 'Casero',
+  'client.rental.letter.address': 'Vivienda',
+  'client.rental.letter.iban': 'Cuenta (IBAN)',
+  'client.rental.letter.regards': 'Un saludo.',
+  'client.rental.letter.deposit.title': 'Devolución de la fianza',
+  'client.rental.letter.deposit.body':
+    'Te escribo por nuestro contrato de alquiler de esta vivienda, con fecha {contrato}. Te devolví las llaves el {llaves} y de la fianza queda por devolver {pendiente}.',
+  'client.rental.letter.deposit.interest_rule':
+    'Como referencia, el art. 36.4 LAU prevé interés legal pasado un mes desde la entrega de las llaves.',
+  'client.rental.letter.deposit.interest': 'Hasta el {fecha}, ese interés suma {importe}.',
+  'client.rental.letter.deposit.interest_range':
+    'Hasta el {fecha}, ese interés suma entre {minimo} y {maximo}, según se cuente el año de 365 días o de 360.',
+  'client.rental.letter.deposit.account': 'Te pido que me devuelvas lo pendiente en esta cuenta:',
+  'client.rental.letter.deposit.filename': 'eslojusto-carta-fianza.pdf',
+  'client.rental.letter.rent.title': 'Revisión de la renta',
+  'client.rental.letter.rent.body':
+    'Te escribo por nuestro contrato de alquiler de esta vivienda, con fecha {contrato}. He comparado las subidas de la renta con lo que permite el art. 18 de la Ley de Arrendamientos Urbanos y el tope legal de cada año, y en estas la renta que resulta es más baja que la que pago:',
+  'client.rental.letter.rent.rise': 'Subida del {aniversario}',
+  'client.rental.letter.rent.index': 'el {indice} de {mes}, {tasa}',
+  'client.rental.letter.rent.index_flash': 'el {indice} adelantado de {mes}, {tasa}',
+  'client.rental.letter.rent.fixed': 'el {tasa} fijo del contrato',
+  'client.rental.letter.rent.line':
+    '{subida}: la renta que resulta según el art. 18 LAU es {renta} al mes; pago {pagada}, {diferencia} más cada mes.',
+  'client.rental.letter.rent.cap': 'Tope legal de ese año: {norma}.',
+  'client.rental.letter.rent.pending':
+    'Esta cifra es la más baja de las dos cuentas posibles, porque una norma de la que depende está pendiente de convalidación por el Congreso: {normas}.',
+  'client.rental.letter.rent.lowest': 'Esta cifra es la más baja de las cuentas posibles.',
+  'client.rental.letter.rent.ask': 'Por eso te pido que revises el importe.',
+  'client.rental.letter.rent.filename': 'eslojusto-carta-renta.pdf',
   'client.rental.result.lead_locked':
     'Cada partida con su resultado redondeado y la norma en que se apoya.',
   'client.rental.result.lead_out_of_scope':
