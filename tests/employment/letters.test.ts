@@ -24,6 +24,7 @@ import {
   contract,
   corners,
   shortDayRate,
+  shortDayRateDoubt,
   TABLES,
   TODAY,
   tr,
@@ -150,6 +151,17 @@ describe('the salary block of the company letter', () => {
     expect(text(full(completed(shortDayRate)))).toContain(
       'fija un mínimo de 57,82 € por jornada legal para los contratos de hasta 120 días. Mi salario pactado es de 50,00 € por jornada: 7,82 € menos por jornada.',
     );
+  });
+
+  it('with a shortfall in every reading, gives only the lowest and says so', () => {
+    const r = completed(shortDayRateDoubt);
+    expect(kindsOf(r).paid).toEqual(['employment']);
+    const all = text(full(r));
+    expect(all).toContain(
+      'Mi salario pactado es de 55,00 € por jornada: 2,82 € menos por jornada.',
+    );
+    expect(all).toContain('Estas cifras son las más bajas de las cuentas posibles');
+    expect(all).not.toContain('12,82');
   });
 
   it('never comes for 2027 while its minimum is unpublished', () => {

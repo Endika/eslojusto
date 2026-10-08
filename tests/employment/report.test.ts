@@ -10,7 +10,16 @@ import { PdfDocument } from '../../src/documents/pdf-writer';
 import { employmentCase } from '../../src/employment/case';
 import { employmentReport } from '../../src/employment/report';
 import { EMPLOYMENT_FORBIDDEN, FORBIDDEN } from '../support/forbidden';
-import { belowMinimum, contract, corners, review, TABLES, TODAY, tr } from './fixtures';
+import {
+  belowMinimum,
+  contract,
+  corners,
+  review,
+  shortDayRateDoubt,
+  TABLES,
+  TODAY,
+  tr,
+} from './fixtures';
 
 const report = (input: EmploymentInput): DocumentModel =>
   employmentReport({ review: review(input), input, detail: 'unlocked' }, tr, TODAY);
@@ -77,6 +86,14 @@ describe('the contract report', () => {
     expect(all).toContain(
       'El artículo 15.5 del Estatuto de los Trabajadores dice que, en un caso como el tuyo, la persona adquiere la condición de fija:',
     );
+  });
+
+  it('counts the lower shortfall of two readings and bounds it with the higher', () => {
+    const all = text(report(shortDayRateDoubt).blocks);
+    expect(all).toContain(
+      'Por debajo del SMI: 2,82 € por jornada, y hasta 12,82 € según tu respuesta',
+    );
+    expect(all).toContain('Si cuentan todos los complementos: por debajo del SMI en 2,82 €');
   });
 
   it('lists every element of the information the company owes in writing', () => {

@@ -32,7 +32,17 @@ import { amountEl, pieces, shownAmount, type Piece, type Shown } from '../calcul
 import type { ClientKey, Translate } from '../i18n/client';
 import type { FieldError } from './form';
 import type { OutOfScopeReason } from './ports';
-import { figureOf, headline, shownOne, shownPair, sinceOf, stateOf, type Euros } from './summary';
+import {
+  figureOf,
+  headline,
+  rangeOf,
+  shownOne,
+  shownPair,
+  sinceOf,
+  stateOf,
+  type Euros,
+  type EurosRange,
+} from './summary';
 
 // «2025-03-14» → «14-03-2025».
 export const dayText = (iso: string): string => iso.split('-').reverse().join('-');
@@ -217,6 +227,21 @@ function statusPieces(f: Finding, tr: Translate): Piece[] {
   if (figure === null) return [tr(`client.employment.status.${f.status}`)];
   return pieces(tr(`client.employment.status.below_minimum_${figure.per}`), {
     importe: approx(shownFigure(figure), tr),
+  });
+}
+
+// Below the minimum in every reading: the lower amount, and the higher only as «y hasta».
+function rangePieces(range: EurosRange, tr: Translate): Piece[] {
+  const [low, high] =
+    range.per === 'day'
+      ? [
+          { amount: range.low, cents: true },
+          { amount: range.high, cents: true },
+        ]
+      : shownPair(range.low, range.high);
+  return pieces(tr(`client.employment.status.below_minimum_${range.per}_up_to`), {
+    importe: approx(low, tr),
+    maximo: shownAmount(high),
   });
 }
 
@@ -428,9 +453,12 @@ function fillAssessed(
 ): void {
   const status = find(el, '[data-status-text]');
   const readings = find(el, '[data-readings]');
+  const range = rangeOf(assessed);
   if (assessed.kind === 'single') status.replaceChildren(...statusPieces(assessed.finding, tr));
   else {
-    status.textContent = tr('client.employment.status.depends');
+    status.replaceChildren(
+      ...(range ? rangePieces(range, tr) : [tr('client.employment.status.depends')]),
+    );
     const shown = readingAmounts(assessed.readings);
     find(el, '[data-question]').textContent = labels.question(assessed.question, tr);
     find(el, '[data-question]').hidden = false;

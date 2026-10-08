@@ -59,6 +59,25 @@ export function figureOf(f: Finding): Euros | null {
   return { per: f.id === 'smi_monthly' ? 'payslips' : 'total', amount };
 }
 
+// A shortfall below the minimum wage in every reading of a «No lo sé», by different amounts: the
+// lower one is what counts, the higher only bounds it.
+export interface EurosRange {
+  readonly per: Euros['per'];
+  readonly low: number;
+  readonly high: number;
+}
+
+export function rangeOf(a: Assessed): EurosRange | null {
+  if (a.kind !== 'readings') return null;
+  const figures = a.readings.map((r) =>
+    r.finding.status === 'below_minimum' ? figureOf(r.finding) : null,
+  );
+  const [first] = figures;
+  if (!first || figures.some((x) => x === null || x.per !== first.per)) return null;
+  const amounts = figures.flatMap((x) => (x === null ? [] : [x.amount]));
+  return { per: first.per, low: Math.min(...amounts), high: Math.max(...amounts) };
+}
+
 // A year left out of the sum: before the table, without its decree yet, or with its effects from
 // 1 January unchecked. With any of them the total does not cover the whole contract.
 const GAPS: ReadonlySet<EmploymentPhrase['key']> = new Set([

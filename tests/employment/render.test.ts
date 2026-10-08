@@ -11,6 +11,7 @@ import {
   corners,
   review,
   shortDayRate,
+  shortDayRateDoubt,
   tr,
   unknownComplement,
   workOrService,
@@ -134,6 +135,16 @@ describe('the employment result', () => {
     expect(smi?.querySelector<HTMLElement>('[data-total]')?.hidden).toBe(true);
     expect(text(card(root, 'Pagas extra')?.querySelector('[data-status-text]'))).toBe(
       'Dentro del límite',
+    );
+  });
+
+  it('counts the lower shortfall when both readings fall short, the higher only as «y hasta»', () => {
+    const root = render(shortDayRateDoubt, true);
+    const status = text(
+      card(root, 'Salario por jornada frente al SMI')?.querySelector('[data-status-text]'),
+    );
+    expect(status).toBe(
+      'Por debajo del SMI: 2,82 € por jornada, y hasta 12,82 € según tu respuesta',
     );
   });
 

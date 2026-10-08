@@ -1548,6 +1548,16 @@ export const es = {
   'client.employment.status.below_minimum_day': 'Por debajo del SMI: {importe} por jornada',
   'client.employment.status.below_minimum_payslips': 'Por debajo del SMI: {importe} en tus nóminas',
   'client.employment.status.below_minimum_total': 'Por debajo del mínimo legal: {importe}',
+  'client.employment.status.below_minimum_year_up_to':
+    'Por debajo del SMI: {importe} al año, y hasta {maximo} según tu respuesta',
+  'client.employment.status.below_minimum_day_up_to':
+    'Por debajo del SMI: {importe} por jornada, y hasta {maximo} según tu respuesta',
+  'client.employment.status.below_minimum_payslips_up_to':
+    'Por debajo del SMI: {importe} en tus nóminas, y hasta {maximo} según tu respuesta',
+  'client.employment.status.below_minimum_total_up_to':
+    'Por debajo del mínimo legal: {importe}, y hasta {maximo} según tu respuesta',
+  'client.employment.letter.pay.lowest':
+    'Estas cifras son las más bajas de las cuentas posibles con lo que sé de mi salario.',
   'client.employment.status.over_legal_limit': 'Por encima del límite legal',
   'client.employment.status.clause_void': 'Esta cláusula no vale',
   'client.employment.status.becomes_permanent': 'La ley prevé la condición de fija',
