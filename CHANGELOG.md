@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.0](https://github.com/Endika/eslojusto/compare/v1.27.0...v1.28.0) (2026-10-08)
+
+
+### Features
+
+* **final-pay:** add ERE, «No lo sé», ERTE, late interest and the null dismissal warning ([bd36ca2](https://github.com/Endika/eslojusto/commit/bd36ca22bbff326937a333dc08c60b54af946565))
+
 ## [1.27.0](https://github.com/Endika/eslojusto/compare/v1.26.0...v1.27.0) (2026-10-08)
 
 
