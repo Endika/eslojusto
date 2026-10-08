@@ -96,11 +96,11 @@ describe('the employment guide', () => {
       expect(all.toLowerCase()).not.toMatch(forbidden);
   });
 
-  it('quotes art. 15.4 and 15.5 with the sentence the review uses and the BOE link', () => {
+  it('quotes art. 15.4 and 15.5 word for word with the BOE link', () => {
     const quotes = block('permanent')?.quotes ?? [];
     expect(quotes.map((q) => q.intro)).toEqual([
-      'El artículo 15.4 del Estatuto de los Trabajadores dice que, en un caso como el tuyo, la persona adquiere la condición de fija:',
-      'El artículo 15.5 del Estatuto de los Trabajadores dice que, en un caso como el tuyo, la persona adquiere la condición de fija:',
+      'El artículo 15.4 del Estatuto de los Trabajadores dice:',
+      'El artículo 15.5 del Estatuto de los Trabajadores dice:',
       'El artículo 8.2 del Estatuto de los Trabajadores dice:',
     ]);
     expect(quotes[0]?.text).toContain('adquirirán la condición de fijas');
@@ -234,6 +234,12 @@ describe('the employment FAQ', () => {
     expect(plain).not.toContain('¿Qué pasa con mis documentos?');
     expect(plain).not.toContain('¿Qué incluye el pase de 4,99 €?');
     expect(plain).toContain('¿Cuál es el salario mínimo en 2026?');
+  });
+
+  it('quotes art. 15.5 in the temporary contracts answer instead of wording it', () => {
+    const a = answer('faq-contrato-temporal');
+    expect(a).toContain('esas personas «adquirirán la condición de personas trabajadoras fijas»');
+    expect(a).not.toContain('en un caso como el tuyo');
   });
 
   it('every answer is filled in', () => {

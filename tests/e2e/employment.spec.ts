@@ -268,9 +268,8 @@ test('the page has its title, description, heading, canonical, JSON-LD and revie
 
   const guide = page.locator('.guide');
   await expect(guide).toContainText('La jornada máxima sigue en 40 horas semanales');
-  await expect(guide).toContainText(
-    'El artículo 15.4 del Estatuto de los Trabajadores dice que, en un caso como el tuyo, la persona adquiere la condición de fija',
-  );
+  await expect(guide).toContainText('El artículo 15.4 del Estatuto de los Trabajadores dice:');
+  await expect(guide).toContainText('adquirirán la condición de fijas');
   await expect(guide.getByRole('link', { name: /REGCON/ })).toHaveAttribute(
     'href',
     'https://expinterweb.mites.gob.es/regcon/',
