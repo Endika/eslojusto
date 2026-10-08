@@ -48,6 +48,7 @@ export function addAlarms(
     description: string,
     metric: cw.IMetric,
     threshold: number,
+    comparisonOperator = cw.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
   ): cw.Alarm => {
     const a = new cw.Alarm(stack, `${name}Alarm`, {
       alarmName: `${ALARM_PREFIX}${name}`,
@@ -55,12 +56,46 @@ export function addAlarms(
       metric,
       threshold,
       evaluationPeriods: 1,
-      comparisonOperator: cw.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+      comparisonOperator,
       treatMissingData: cw.TreatMissingData.NOT_BREACHING,
     });
     a.addAlarmAction(action);
     a.addOkAction(action);
     return a;
+  };
+
+  // One metric per review, 1 for a read with nothing read and 0 for an ok one: its Sum counts the
+  // unread and its SampleCount the answered, so a review costs one custom metric, not two.
+  const sixHours = Duration.hours(6);
+  const unreadShare = (review: 'rental' | 'employment', id: string, section: string) => {
+    const metricName = `${id}Answered`;
+    for (const [code, value] of [
+      ['nothing_read', '1'],
+      ['ok', '0'],
+    ] as const)
+      new logs.MetricFilter(stack, `${id}${code === 'ok' ? 'Ok' : 'Unread'}Filter`, {
+        logGroup: extractLogGroup,
+        filterPattern: logs.FilterPattern.literal(
+          `{ $.op = "extract" && $.review = "${review}" && $.code = "${code}" }`,
+        ),
+        metricNamespace: METRIC_NAMESPACE,
+        metricName,
+        metricValue: value,
+      });
+    const metric = (statistic: string) =>
+      new cw.Metric({ namespace: METRIC_NAMESPACE, metricName, statistic, period: sixHours });
+    return alarm(
+      `${review}-unread-share`,
+      `Beta de ${section}: más del 40 % de las lecturas respondidas en 6 h no han sacado ningún dato (con 5 o más lecturas).`,
+      new cw.MathExpression({
+        expression: 'IF(FILL(answered, 0) >= 5, 100 * FILL(unread, 0) / answered, 0)',
+        usingMetrics: { answered: metric('SampleCount'), unread: metric('Sum') },
+        period: sixHours,
+        label: `% lecturas sin datos de ${section}`,
+      }),
+      40,
+      cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
+    );
   };
 
   const quarter = Duration.minutes(15);
@@ -126,5 +161,7 @@ export function addAlarms(
       }),
       1,
     ),
+    unreadShare('rental', 'Rental', 'alquiler'),
+    unreadShare('employment', 'Employment', 'contrato'),
   ];
 }

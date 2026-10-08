@@ -14,6 +14,7 @@ import {
 import { buildApp, GLOBAL_STACK_REGION } from '../infra/stacks';
 import { NO_ESCALATION_AFTER_MS, READ_DEADLINE_MS } from '../src/domain/extract';
 import { READABILITY } from '../src/domain/extraction-schema';
+import { REVIEWS } from '../src/domain/reviews';
 
 const { api, global } = buildApp(
   { stripePriceId: 'price_test', alertEmail: 'alerts@example.com' },
@@ -187,6 +188,52 @@ describe('dashboard', () => {
     expect(flags).toContain('sum(@message like /"truncated":true/) as recortadas');
   });
 
+  const byTitle = (title: string) => {
+    const widget = widgets.find((w) => w.properties['title'] === title);
+    if (!widget) throw new Error(`No widget ${title}`);
+    return String(widget.properties['query']);
+  };
+
+  it('counts reads and their results per review, the final pay where the log names none', () => {
+    const perHour = byTitle('Lecturas por revisión (por hora)');
+    expect(perHour).toContain('coalesce(review, "final_pay") as revision');
+    for (const review of REVIEWS) expect(perHour).toContain(`sum(revision = "${review}") as`);
+    expect(byTitle('Lecturas por revisión: resultados')).toContain('as sinDatos');
+  });
+
+  it('counts reads with nothing read by review, every reason, and their share', () => {
+    const byReason = byTitle('Lecturas sin datos por revisión y motivo (páginas)');
+    for (const reason of READABILITY) expect(byReason).toContain(`sum(readability.${reason}) as`);
+    expect(byReason).toContain('by revision');
+    expect(byTitle('% lecturas sin datos por revisión')).toContain(
+      '100 * sum(code = "nothing_read") / count(*) as porcentaje',
+    );
+  });
+
+  it('counts conflicts and escalations per review, and truncated employment lists', () => {
+    const flags = byTitle('Conflictos y escalados por revisión');
+    expect(flags).toContain('sum(conflicts) as conflictos');
+    expect(flags).toContain('sum(@message like /"escalated":true/) as escaladas');
+    const truncated = byTitle('Contrato: lecturas con listas recortadas (por día)');
+    expect(truncated).toContain('review = "employment"');
+    expect(truncated).toContain('sum(@message like /"truncated":true/) as recortadas');
+  });
+
+  it('charts p95 tokens and prices each review’s reads from the config', () => {
+    const tokens = byTitle('Tokens p95 por revisión');
+    expect(tokens).toContain('pct(inputTokens, 95)');
+    expect(tokens).toContain('pct(outputTokens, 95)');
+    const cost = byTitle('Coste IA por lectura y revisión (USD)');
+    const prices = [PRIMARY_MODEL, ESCALATION_MODEL].map((m) => MODEL_PRICES_USD_PER_MTOK[m]);
+    expect(cost).toContain(
+      `sum(inputTokens) * ${Math.max(...prices.map((p) => p?.input ?? 0))} / 1000000 / count(*)`,
+    );
+    expect(cost).toContain(
+      `sum(outputTokens) * ${Math.max(...prices.map((p) => p?.output ?? 0))} / 1000000 / count(*)`,
+    );
+    expect(cost).toContain('as costePorLectura by revision');
+  });
+
   it('stays within the free tier of 50 metrics per dashboard, with room for two models', () => {
     const rows = widgets.flatMap((w) => (w.properties['metrics'] ?? []) as unknown[]);
     const searches = body.match(/SEARCH\(/g) ?? [];
@@ -225,31 +272,66 @@ describe('alerts', () => {
     );
     quiet.resourceCountIs('AWS::SNS::Topic', 1);
     quiet.resourceCountIs('AWS::SNS::Subscription', 0);
-    quiet.resourceCountIs('AWS::CloudWatch::Alarm', 5);
+    quiet.resourceCountIs('AWS::CloudWatch::Alarm', 7);
   });
 
-  it('raises five standard alarms that email on trouble and on recovery', () => {
+  it('raises seven standard alarms that email on trouble and on recovery', () => {
     expect(alarms.map((a) => a.Properties.AlarmName).sort()).toEqual(
-      ['extract-5xx', 'extract-errors', 'extract-no-success', 'payments-errors', 'throttles'].map(
-        (n) => `eslojusto-api-${n}`,
-      ),
+      [
+        'employment-unread-share',
+        'extract-5xx',
+        'extract-errors',
+        'extract-no-success',
+        'payments-errors',
+        'rental-unread-share',
+        'throttles',
+      ].map((n) => `eslojusto-api-${n}`),
     );
     for (const { Properties: p } of alarms) {
       expect(p['AlarmActions']).toEqual([topicRef]);
       expect(p['OKActions']).toEqual([topicRef]);
       expect(p['TreatMissingData']).toBe('notBreaching');
-      expect(p['ComparisonOperator']).toBe('GreaterThanOrEqualToThreshold');
+      expect(p['ComparisonOperator']).toBe(
+        p.AlarmName.endsWith('-unread-share')
+          ? 'GreaterThanThreshold'
+          : 'GreaterThanOrEqualToThreshold',
+      );
       expect(p['EvaluationPeriods']).toBe(1);
     }
   });
 
-  // CloudWatch's free tier covers 10 alarm metrics; a metric-math alarm counts each metric.
-  it('stays within the 10 free alarm metrics', () => {
+  // CloudWatch's free tier covers 10 alarm metrics; a metric-math alarm counts each metric. The
+  // two beta alarms take it to 13: 0.30 USD a month over the free tier.
+  it('keeps to 13 alarm metrics', () => {
     const count = alarms.reduce((n, { Properties: p }) => {
       const metrics = p['Metrics'] as { MetricStat?: unknown }[] | undefined;
       return n + (metrics ? metrics.filter((m) => m.MetricStat).length : 1);
     }, 0);
-    expect(count).toBeLessThanOrEqual(10);
+    expect(count).toBeLessThanOrEqual(13);
+  });
+
+  it.each([
+    ['rental', 'Rental'],
+    ['employment', 'Employment'],
+  ])('%s beta: over 40%% of 5 or more answered reads in 6 h with nothing read', (review, id) => {
+    const p = byName(`${review}-unread-share`);
+    expect(p['Threshold']).toBe(40);
+    const json = JSON.stringify(p['Metrics']);
+    expect(json).toContain('IF(FILL(answered, 0) >= 5, 100 * FILL(unread, 0) / answered, 0)');
+    expect(json).toContain(`"MetricName":"${id}Answered"`);
+    expect(json).toContain('"Stat":"SampleCount"');
+    expect(json).toContain('"Stat":"Sum"');
+    expect(json).toContain('"Period":21600');
+    for (const [code, value] of [
+      ['nothing_read', '1'],
+      ['ok', '0'],
+    ])
+      apiTemplate.hasResourceProperties('AWS::Logs::MetricFilter', {
+        FilterPattern: `{ $.op = "extract" && $.review = "${review}" && $.code = "${code}" }`,
+        MetricTransformations: [
+          { MetricNamespace: 'Eslojusto/Api', MetricName: `${id}Answered`, MetricValue: value },
+        ],
+      });
   });
 
   it.each([
@@ -309,8 +391,8 @@ describe('alerts', () => {
     expect(json).toContain('"Period":3600');
   });
 
-  it('adds one metric filter, for successful reads, on the extract log group', () => {
-    apiTemplate.resourceCountIs('AWS::Logs::MetricFilter', 1);
+  it('adds a metric filter for successful reads, and two per beta review', () => {
+    apiTemplate.resourceCountIs('AWS::Logs::MetricFilter', 5);
     apiTemplate.hasResourceProperties('AWS::Logs::MetricFilter', {
       FilterPattern: '{ $.op = "extract" && $.code = "ok" }',
       MetricTransformations: [
