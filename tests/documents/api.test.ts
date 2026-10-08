@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { EXTRACT_TIMEOUT_SECONDS } from '../../api/src/config';
 import { LIMITS as API_LIMITS, PAGE_KINDS as API_PAGE_KINDS } from '../../api/src/domain/documents';
 import { READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
+import { RENTAL_SECTIONS } from '../../api/src/domain/rental-schema';
 import { API_TIMEOUT_MS, createApi, parseExtraction, type Fetch } from '../../src/documents/api';
 import {
   FINAL_PAY_EXTRACTION,
   LIMITS,
   PAGE_KINDS,
   READABILITY,
+  RENTAL_EXTRACTION,
 } from '../../src/documents/contract';
 
 interface Call {
@@ -137,6 +139,13 @@ describe('extract', () => {
   });
   it('mirrors the API’s page kinds', () => {
     expect(PAGE_KINDS).toEqual(API_PAGE_KINDS);
+  });
+  it('reads the rental fields and lists the API merges, from every section', () => {
+    const sections = Object.values(RENTAL_SECTIONS);
+    const names = (key: 'fields' | 'lists') =>
+      [...new Set(sections.flatMap((section) => Object.keys(section[key])))].sort();
+    expect([...RENTAL_EXTRACTION.fields].sort()).toEqual(names('fields'));
+    expect([...RENTAL_EXTRACTION.lists].sort()).toEqual(names('lists'));
   });
   it('takes as many images and as large a request as the API', () => {
     expect(LIMITS.maxImages).toBe(API_LIMITS.maxImages);

@@ -186,6 +186,52 @@ export const FINAL_PAY_EXTRACTION: ExtractionShape<ExtractedFieldName, 'contract
   lists: ['contracts'],
 };
 
+// The fields the API merges from rental documents (api/src/domain/rental-merge.ts). The deposit
+// is the only one two kinds of document state: the contract's comes first.
+export const RENTAL_FIELDS = [
+  'signedOn',
+  'startDate',
+  'postcode',
+  'landlordType',
+  'landlordCompanyName',
+  'agencyNamed',
+  'use',
+  'agreedMonths',
+  'initialRent',
+  'updateClauseText',
+  'updateClauseIndex',
+  'updateFixedPercent',
+  'deposit',
+  'advanceMonths',
+  'necessityClause',
+  'feesText',
+  'chargesClauseText',
+  'keysReturnedOn',
+  'closingDocumentSigned',
+] as const;
+export type RentalFieldName = (typeof RENTAL_FIELDS)[number];
+
+// Their lists, each row with the kind of document it came from (api/src/domain/rental-schema.ts).
+export const RENTAL_LISTS = [
+  'guarantees',
+  'charges',
+  'utilities',
+  'notices',
+  'receipts',
+  'invoices',
+  'returns',
+  'deductions',
+] as const;
+export type RentalListName = (typeof RENTAL_LISTS)[number];
+
+export const RENTAL_EXTRACTION: ExtractionShape<RentalFieldName, RentalListName> = {
+  review: 'rental',
+  fields: RENTAL_FIELDS,
+  lists: RENTAL_LISTS,
+};
+
+export type RentalExtraction = Extraction<RentalFieldName, RentalListName>;
+
 export interface SourcedField extends ExtractedField {
   readonly source: SourceKind;
 }

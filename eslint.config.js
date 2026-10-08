@@ -65,11 +65,12 @@ const flowOnly = {
   message: 'Navigation and tabs serve every section: its specifics come in through a Flow.',
 };
 // The rental review reaches the rental engine through its modules, never its tables, which its
-// composition root passes in; of the calculator, only what every section shares.
+// composition root passes in; of the calculator, only what every section shares; of reading
+// documents, only the shared contract, ports and summary lines, never the final pay's pieces.
 const rentalReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|rental/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|flow|navigation|number)$|\\.\\./i18n/client$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|rental/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|fill|flow|navigation|number)$|\\.\\./documents/(contract|ports|summary)$|\\.\\./i18n/client$)|${notCanonical}`,
   message:
-    'src/rental reaches the rental engine (its tables come from the composition root), the shared sheets and the translator type.',
+    'src/rental reaches the rental engine (its tables come from the composition root), the shared sheets, the documents contract and ports, and the translator type.',
 };
 const noRental = {
   regex: '(^|/)rental/',

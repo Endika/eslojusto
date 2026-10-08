@@ -3,12 +3,16 @@ import type { Conflict, RecognisedDocument } from './contract';
 
 const MONTH = new Intl.DateTimeFormat('es-ES', { month: 'long', timeZone: 'UTC' });
 
+// The kinds of document named with their month: a payslip, a rent receipt.
+const MONTHLY: Partial<Record<RecognisedDocument['kind'], ClientKey>> = {
+  payslip: 'client.documents.kind.payslip_month',
+  rent_receipt: 'client.documents.kind.rent_receipt_month',
+};
+
 function documentName(d: RecognisedDocument, tr: Translate): string {
-  const month = d.kind === 'payslip' && d.month ? d.month : null;
-  const name = month
-    ? tr('client.documents.kind.payslip_month', {
-        mes: MONTH.format(new Date(`${month}-01T00:00:00Z`)),
-      })
+  const monthly = d.month ? MONTHLY[d.kind] : undefined;
+  const name = monthly
+    ? tr(monthly, { mes: MONTH.format(new Date(`${d.month}-01T00:00:00Z`)) })
     : tr(`client.documents.kind.${d.kind}` as ClientKey);
   return d.pages > 1 ? tr('client.documents.kind.pages', { nombre: name, n: d.pages }) : name;
 }
@@ -43,11 +47,18 @@ export const CONFLICT_FIELDS = [
   'holidayDaysTaken',
 ] as const;
 
+// Of the rental documents, only the contract and the deposit return both state the deposit.
+export const RENTAL_CONFLICT_FIELDS = ['deposit'] as const;
+
 // One plain sentence per field the documents state differently, naming the one that was used.
-export function conflictLines(conflicts: readonly Conflict[], tr: Translate): string[] {
+export function conflictLines<F extends string>(
+  conflicts: readonly Conflict<F>[],
+  tr: Translate,
+  fields: readonly string[] = CONFLICT_FIELDS,
+): string[] {
   return conflicts.flatMap((c) => {
     const kept = c.sources[0];
-    if (!kept || !(CONFLICT_FIELDS as readonly string[]).includes(c.field)) return [];
+    if (!kept || !fields.includes(c.field)) return [];
     return [
       tr('client.documents.conflict', {
         dato: tr(`client.documents.field.${c.field}` as ClientKey),

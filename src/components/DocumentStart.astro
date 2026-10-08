@@ -4,11 +4,19 @@ import { link, type Lang } from '../i18n/languages';
 
 // Rendered only in a build with the documents API: the first sheet offers reading a document or
 // filling the form by hand. Its styles live here, inline, so a build without the API ships none.
+// Each review names the documents it reads in its own words.
 interface Props {
   lang: Lang;
+  review?: 'final_pay' | 'rental';
 }
-const { lang } = Astro.props;
-const tx = (key: Key) => t(lang, key);
+const { lang, review = 'final_pay' } = Astro.props;
+const RENTAL: Partial<Record<Key, Key>> = {
+  'documents.start.help': 'rental.documents.start_help',
+  'documents.start.upload': 'rental.documents.upload',
+  'documents.upload.files_hint': 'rental.documents.files_hint',
+  'documents.upload.consent': 'rental.documents.consent',
+};
+const tx = (key: Key) => t(lang, (review === 'rental' && RENTAL[key]) || key);
 const arrow = 'M4 12h15m-6-6 6 6-6 6';
 ---
 
@@ -391,6 +399,25 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
   .read-mark[data-confidence='low'] {
     color: var(--sheet-ink);
     font-weight: 700;
+  }
+  .read-quote {
+    margin: 0.5rem 0 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-inline-start: 3px solid var(--sheet-ink);
+    background: color-mix(in oklab, var(--field-fill) 55%, transparent);
+  }
+  .read-quote__label,
+  .read-quote__note {
+    margin: 0;
+    font: 500 0.75rem / 1.4 var(--f-mono);
+    letter-spacing: 0.02em;
+    color: var(--sheet-ink-soft);
+  }
+  .read-quote__text {
+    margin: 0.25rem 0;
+    font: italic 400 0.9375rem / 1.45 var(--f-serif);
+    color: var(--sheet-ink);
+    overflow-wrap: anywhere;
   }
   .pass__actions {
     display: flex;

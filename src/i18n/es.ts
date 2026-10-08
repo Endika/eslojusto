@@ -467,6 +467,21 @@ export const es = {
   'documents.pass.letter_note':
     'La carta es una plantilla: si falta algo, lleva tus cifras. Usarla o no, y cómo, es decisión tuya.',
 
+  'rental.documents.start_help':
+    'Puedes subir tu contrato y los demás papeles del alquiler para rellenar los datos con lo que se lea en ellos, o escribirlos tú. Antes de calcular nada, revisas cada dato.',
+  'rental.documents.upload':
+    'Sube tu contrato y, si los tienes, avisos de subida, recibos, factura de la agencia y devolución de la fianza',
+  'rental.documents.files_hint':
+    'El contrato y, si los tienes, los avisos de subida, los recibos, la factura de la agencia o la devolución de la fianza, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+  'rental.documents.consent':
+    'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, direcciones o números de cuenta. Se leen en la Unión Europea y no se guardan.',
+  'rental.pass.title': 'El detalle de cada partida',
+  'rental.pass.text':
+    'Por 4,99 € ves el cálculo paso a paso de cada partida: mes a mes y año a año, con el índice, el tope que aplica y las fuentes legales.',
+  'rental.pass.price':
+    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para la revisión del finiquito: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a ver el detalle sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
+  'rental.pass.waiver':
+    'Quiero ver el detalle ahora. Sé que, al ser contenido digital que se entrega al momento, pierdo el derecho de desistimiento (art. 103.m de la Ley General para la Defensa de los Consumidores y Usuarios).',
   'faq.pass': '¿Qué incluye el pase de 4,99 €?',
   'faq.pass_answer':
     'Durante 7 días, y solo en el navegador con el que pagas, puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a descargar el informe y la carta sin pagar otra vez. No guardamos tu revisión en ningún sitio, así que conviene descargar el informe y la carta en cuanto pagas. El pase vive solo en ese navegador: en otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde, y «¿Ya has pagado?» solo lo recupera en el navegador con el que pagaste.',
@@ -814,6 +829,18 @@ export const es = {
   'client.documents.field.notice_deduction': 'Descuento por preaviso',
   'client.documents.field.annualHolidayDays': 'Días de vacaciones al año',
   'client.documents.field.holidayDaysTaken': 'Días de vacaciones disfrutados',
+  'client.documents.field.deposit': 'Fianza',
+  'client.documents.kind.lease': 'Contrato de alquiler',
+  'client.documents.kind.rent_update_notice': 'Aviso de subida de la renta',
+  'client.documents.kind.rent_receipt': 'Recibo del alquiler',
+  'client.documents.kind.rent_receipt_month': 'Recibo de {mes}',
+  'client.documents.kind.agency_invoice': 'Factura de la agencia',
+  'client.documents.kind.deposit_return': 'Devolución de la fianza',
+  'client.documents.source.lease': 'el contrato',
+  'client.documents.source.rent_update_notice': 'el aviso de subida',
+  'client.documents.source.rent_receipt': 'el recibo',
+  'client.documents.source.agency_invoice': 'la factura de la agencia',
+  'client.documents.source.deposit_return': 'la devolución de la fianza',
   'client.documents.agreement_offer': 'El acuerdo que has subido ofrece {importe} en total.',
   'client.documents.conflict':
     '{dato}: los documentos no dicen lo mismo. Se ha usado lo que pone {fuente}; compáralo con los demás.',
@@ -1267,6 +1294,27 @@ export const es = {
   'client.rental.error.return_in_future': 'La devolución es posterior a hoy',
 
   'client.rental.result.lead': 'Cada partida, con lo que dice la ley y la norma en que se apoya.',
+  'client.rental.documents.mark_derived': 'Sale de lo leído en tus documentos · confianza {nivel}',
+  'client.rental.documents.receipt_sums':
+    'Los gastos de cada año suman solo los recibos leídos: si falta alguno, corrige la cifra en la hoja de gastos.',
+  'client.rental.documents.receipt_other_lines':
+    'Los recibos traen otros importes, como suministros, que no se pasan a la hoja de gastos: si alguno es un gasto de la vivienda, añádelo tú.',
+  'client.rental.documents.rows_cut':
+    'Se ha leído más de lo que cabe en alguna lista: compara sus filas con tus documentos y completa lo que falte.',
+  'client.rental.documents.quote.updateClause': 'Lo que dice tu contrato sobre actualizar la renta',
+  'client.rental.documents.quote.hasFees':
+    'Lo que dice tu contrato sobre honorarios y gastos de gestión',
+  'client.rental.documents.quote.hasCharges':
+    'Lo que dice tu contrato sobre gastos aparte de la renta',
+  'client.rental.documents.quote_note':
+    'Copiado tal cual del documento: compáralo con lo que marcas aquí.',
+  'client.rental.documents.error.pass_invalid':
+    'Tu pase ya no sirve para leer documentos en este navegador; el detalle sigue disponible hasta que caduque. Prueba otra vez con una lectura gratis o rellena a mano.',
+  'client.rental.documents.error.pass_exhausted':
+    'Ya has usado las 15 lecturas de tu pase. Puedes rellenar a mano; el detalle sigue disponible.',
+  'client.rental.documents.pass.issued': 'Pago recibido. Ya puedes ver el detalle de cada partida.',
+  'client.rental.documents.pass.lost':
+    'Hemos vuelto del pago, pero la revisión no se ha podido recuperar. Repítela y verás el detalle.',
   'client.rental.result.lead_locked':
     'Cada partida con su resultado redondeado y la norma en que se apoya.',
   'client.rental.result.lead_out_of_scope':

@@ -4,12 +4,21 @@ import { link, type Lang } from '../i18n/languages';
 import { LETTER_MAX_LENGTH } from '../documents/letter';
 
 // The pass for the PDF report and the letter, offered in the result when an item falls short.
-// Rendered only in a build with the documents API; DocumentStart carries its styles.
+// Rendered only in a build with the documents API; DocumentStart carries its styles. On the rental
+// review the same pass unlocks each item's detail, and there is nothing to download yet.
 interface Props {
   lang: Lang;
+  review?: 'final_pay' | 'rental';
 }
-const { lang } = Astro.props;
-const tx = (key: Key) => t(lang, key);
+const { lang, review = 'final_pay' } = Astro.props;
+const downloads = review === 'final_pay';
+const RENTAL: Partial<Record<Key, Key>> = {
+  'documents.pass.title': 'rental.pass.title',
+  'documents.pass.text': 'rental.pass.text',
+  'documents.pass.price': 'rental.pass.price',
+  'documents.pass.waiver': 'rental.pass.waiver',
+};
+const tx = (key: Key) => t(lang, (review === 'rental' && RENTAL[key]) || key);
 const letterFields = [
   ['name', 'documents.letter.name', 'name', 'text'],
   ['id', 'documents.letter.id', 'off', 'text'],
@@ -75,47 +84,53 @@ const letterFields = [
     </div>
     <div data-pass-downloads hidden>
       <p class="help" data-pass-validity></p>
-      <div class="pass__actions">
-        <button class="button button--sheet" type="button" data-download="report">
-          {tx('documents.pass.download_report')}
-        </button>
-      </div>
-      <fieldset class="group pass__letter" data-letter aria-describedby="hint-letter">
-        <legend>{tx('documents.letter.legend')}</legend>
-        <p class="hint" id="hint-letter">
-          {tx('documents.letter.hint')}
-        </p>
-        {letterFields.map(([id, key, autocomplete, type]) => (
-          <div class="field">
-            <label class="field__label" for={`letter-${id}`}>
-              {tx(key)}
-            </label>
-            <input
-              class:list={['field__input', { 'field__input--figure': type === 'date' }]}
-              type={type}
-              id={`letter-${id}`}
-              name={`letter-${id}`}
-              autocomplete={autocomplete}
-              spellcheck="false"
-              dir={type === 'date' ? 'ltr' : undefined}
-              maxlength={type === 'date' ? undefined : LETTER_MAX_LENGTH[id]}
-              aria-describedby={id === 'id' ? 'error-letter-id' : undefined}
-              data-letter-field={id}
-            />
-            {id === 'id' && <p class="hint" id="error-letter-id" data-letter-id-warning hidden />}
+      {downloads && (
+        <>
+          <div class="pass__actions">
+            <button class="button button--sheet" type="button" data-download="report">
+              {tx('documents.pass.download_report')}
+            </button>
           </div>
-        ))}
-        <p class="hint" role="status" data-letter-glyph-warning hidden></p>
-        <p class="item__note">{tx('documents.letter.privacy')}</p>
-        <div class="pass__actions">
-          <button class="button button--sheet" type="button" data-download="letter">
-            {tx('documents.pass.download_letter')}
-          </button>
-        </div>
-        <p class="item__note" data-letter-note>
-          {tx('documents.pass.letter_note')}
-        </p>
-      </fieldset>
+          <fieldset class="group pass__letter" data-letter aria-describedby="hint-letter">
+            <legend>{tx('documents.letter.legend')}</legend>
+            <p class="hint" id="hint-letter">
+              {tx('documents.letter.hint')}
+            </p>
+            {letterFields.map(([id, key, autocomplete, type]) => (
+              <div class="field">
+                <label class="field__label" for={`letter-${id}`}>
+                  {tx(key)}
+                </label>
+                <input
+                  class:list={['field__input', { 'field__input--figure': type === 'date' }]}
+                  type={type}
+                  id={`letter-${id}`}
+                  name={`letter-${id}`}
+                  autocomplete={autocomplete}
+                  spellcheck="false"
+                  dir={type === 'date' ? 'ltr' : undefined}
+                  maxlength={type === 'date' ? undefined : LETTER_MAX_LENGTH[id]}
+                  aria-describedby={id === 'id' ? 'error-letter-id' : undefined}
+                  data-letter-field={id}
+                />
+                {id === 'id' && (
+                  <p class="hint" id="error-letter-id" data-letter-id-warning hidden />
+                )}
+              </div>
+            ))}
+            <p class="hint" role="status" data-letter-glyph-warning hidden></p>
+            <p class="item__note">{tx('documents.letter.privacy')}</p>
+            <div class="pass__actions">
+              <button class="button button--sheet" type="button" data-download="letter">
+                {tx('documents.pass.download_letter')}
+              </button>
+            </div>
+            <p class="item__note" data-letter-note>
+              {tx('documents.pass.letter_note')}
+            </p>
+          </fieldset>
+        </>
+      )}
     </div>
     <p class="pass__status" role="status" aria-live="polite" data-pass-status></p>
     <p class="errata" role="alert" data-pass-error hidden></p>

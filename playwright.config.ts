@@ -13,8 +13,9 @@ const rentalSpecs = /[\\/]rental[^\\/]*\.spec\.ts$/;
 const optInSpecs = [/(rtl|analytics|documents)\.spec\.ts/, rentalSpecs];
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
+// The documents project reads documents on /alquiler/ too, so its build has that page.
 const buildEnv = {
-  ...(rental ? { PUBLIC_RENTAL: '1' } : {}),
+  ...(rental || documents ? { PUBLIC_RENTAL: '1' } : {}),
   ...(analytics ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
     ? {
@@ -56,6 +57,8 @@ export default defineConfig({
             name: 'rental',
             use: { ...devices['Desktop Chrome'] },
             testMatch: rentalSpecs,
+            // Reading documents on /alquiler/ needs the documents project's build.
+            testIgnore: /documents\.spec\.ts/,
           },
         ]
       : []),

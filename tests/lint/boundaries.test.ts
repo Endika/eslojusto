@@ -120,6 +120,15 @@ describe('import boundaries', () => {
       '../analytics/posthog',
       '../scripts/clock',
       './../engine/rental/data/tables',
+      // Of reading documents, never the final pay's pieces nor the platform's own workings.
+      '../documents/prefill',
+      '../documents/final-pay-reading',
+      '../documents/report',
+      '../documents/upload',
+      '../documents/payment',
+      '../documents/api',
+      './../documents/contract',
+      '../documents//ports',
     ].map((source): [string, string] => ['src/rental/x.ts', `import { x } from '${source}';`]),
     ...['../rental/main', '../rental/form'].map((source): [string, string] => [
       'src/calculator/x.ts',
@@ -306,6 +315,11 @@ describe('import boundaries', () => {
     ['src/rental/x.ts', "import type { Translate } from '../i18n/client';"],
     ['src/rental/x.ts', "import { SHEETS } from './form';"],
     ['src/scripts/rental.ts', "import { RENTAL_TABLES } from '../engine/rental/data/tables';"],
+    ['src/rental/x.ts', "import type { RentalExtraction } from '../documents/contract';"],
+    ['src/rental/x.ts', "import type { ReadPrefill } from '../documents/ports';"],
+    ['src/rental/x.ts', "import { conflictLines } from '../documents/summary';"],
+    ['src/rental/x.ts', "import type { FormEntries } from '../calculator/fill';"],
+    ['src/scripts/rental-documents.ts', "import { rentalReading } from '../rental/reading';"],
   ])('%s may %s', async (filePath, code) => {
     expect(await violations(filePath, code)).not.toContain('no-restricted-imports');
   });
