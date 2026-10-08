@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.0](https://github.com/Endika/eslojusto/compare/v1.24.0...v1.25.0) (2026-10-08)
+
+
+### Features
+
+* **api:** chart rental and employment reads and alert on unread packs during the beta ([2452fbb](https://github.com/Endika/eslojusto/commit/2452fbbff533aa0eeeeacd00e5a4a51e67bac9df))
+
 ## [1.24.0](https://github.com/Endika/eslojusto/compare/v1.23.0...v1.24.0) (2026-10-08)
 
 
