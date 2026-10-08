@@ -111,6 +111,8 @@ describe('handleExtract', () => {
     ['a JSON array', post('[]'), 400, 'invalid_request'],
     ['files that are not a list', post(extractBody({ files: 'x' })), 400, 'invalid_request'],
     ['no captcha token', post(extractBody({ captchaToken: '' })), 400, 'invalid_request'],
+    ['an unknown review', post(extractBody({ review: 'tenancy' })), 400, 'invalid_request'],
+    ['a review that is no string', post(extractBody({ review: 1 })), 400, 'invalid_request'],
     [
       'a PDF, which the browser sends as page images',
       post(extractBody({ files: [{ mediaType: 'application/pdf', data: '' }] })),
@@ -179,6 +181,21 @@ describe('handleExtract', () => {
         conflicts: 0,
       },
     ]);
+  });
+});
+
+describe('the review a read is for', () => {
+  it('reads as the final pay and logs no review when the request names none', async () => {
+    const { deps, logger, reader } = extractDeps();
+    await handleExtract(post(extractBody()), deps);
+    expect(reader.calls.map((c) => c.review)).toEqual(['final_pay']);
+    expect(logger.events[0]).not.toHaveProperty('review');
+  });
+
+  it('logs the review a request names', async () => {
+    const { deps, logger } = extractDeps();
+    await handleExtract(post(extractBody({ review: 'final_pay' })), deps);
+    expect(logger.events[0]).toMatchObject({ code: 'ok', review: 'final_pay' });
   });
 });
 
@@ -339,6 +356,7 @@ describe('logs', () => {
       'escalated',
       'conflicts',
       'readability',
+      'review',
       'verify',
     ];
     for (const line of lines) {

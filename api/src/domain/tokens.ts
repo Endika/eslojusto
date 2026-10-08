@@ -1,11 +1,15 @@
 import type { ImageSize } from './image-dimensions';
+import type { ReviewKind } from './reviews';
 
 // CountTokens on bedrock-runtime does not serve Claude models offered only through
 // cross-Region profiles, so input is estimated here, erring high.
 
-// System prompt, tool schema, page labels and Anthropic's tool-use preamble: about 27,000
-// characters, priced at two per token like document text (test/tokens.test.ts keeps it honest).
-export const PROMPT_TOKENS = 14_000;
+// System prompt, tool schema, page labels and Anthropic's tool-use preamble of each review, priced
+// at two characters per token like document text (test/tokens.test.ts keeps it honest): about
+// 27,000 characters for the final pay.
+export const PROMPT_TOKENS_BY_REVIEW: Readonly<Record<ReviewKind, number>> = {
+  final_pay: 14_000,
+};
 // One Sonnet read at this cap costs 96,000 × 3.30 + 5,000 × 16.50 USD per million = 0.40 USD
 // (api/README.md, «Cost»). The largest pack the API accepts, twenty-five 1568 × 1568 images,
 // comes to 14,000 + 25 × 3,279 = 95,975, so the cap is a guard rather than a limit anyone meets.

@@ -30,9 +30,10 @@ import {
   imageTokens,
   MAX_ESCALATION_INPUT_TOKENS,
   MAX_ESTIMATED_INPUT_TOKENS,
-  PROMPT_TOKENS,
+  PROMPT_TOKENS_BY_REVIEW,
   UNDERESTIMATE_FACTOR,
 } from './tokens';
+import type { ReviewKind } from './reviews';
 
 // Every model read, retries included, is abandoned this long after the request started, which
 // leaves the function's 180 s room to count a pass read and answer.
@@ -53,6 +54,8 @@ export interface ExtractRequest {
   readonly files: readonly DocumentFile[];
   readonly captchaToken: string;
   readonly allowance: Allowance;
+  // None is the final pay's.
+  readonly review?: ReviewKind;
 }
 
 export type ExtractResponse =
@@ -84,6 +87,8 @@ export interface ExtractMetrics {
   countNotSaved?: boolean;
   // How many pages had each readability, when any page could not be read or nothing was.
   readability?: Partial<Record<Readability, number>>;
+  // Only when the request named one.
+  review?: ReviewKind;
 }
 
 interface Assessment {
@@ -110,8 +115,8 @@ function incomplete(reading: Reading, extraction: Merged): boolean {
   return kinds.has('other') && missing;
 }
 
-function assess(read: ModelRead, pageCount: number): Assessment {
-  const reading = parseReading(read.toolInput, pageCount);
+function assess(read: ModelRead, pageCount: number, review: ReviewKind): Assessment {
+  const reading = parseReading(read.toolInput, pageCount, review);
   const extraction = merge(reading);
   const { startDate, endDate } = extraction.fields;
   const failed = [...failedChecks(reading)];
@@ -137,10 +142,11 @@ function assess(read: ModelRead, pageCount: number): Assessment {
 
 // Estimated input tokens, or why the images can't be read at a bounded cost. Images are priced
 // by their pixels, so the estimate is a bound, not a guess.
-function measure(files: readonly DocumentFile[]): number | ErrorCode {
+function measure(files: readonly DocumentFile[], review: ReviewKind): number | ErrorCode {
   const sizes = imageSizes(files);
   if (typeof sizes === 'string') return sizes;
-  const tokens = PROMPT_TOKENS + sizes.reduce((sum, size) => sum + imageTokens(size), 0);
+  const tokens =
+    PROMPT_TOKENS_BY_REVIEW[review] + sizes.reduce((sum, size) => sum + imageTokens(size), 0);
   return tokens > MAX_ESTIMATED_INPUT_TOKENS ? 'document_too_dense' : tokens;
 }
 
@@ -161,6 +167,8 @@ export async function extract(
 ): Promise<ExtractResponse> {
   const started = deps.clock.now();
   const deadline = started + READ_DEADLINE_MS;
+  const review = request.review ?? 'final_pay';
+  if (request.review !== undefined) metrics.review = request.review;
   const shapeProblem = checkFileShapes(request.files);
   if (shapeProblem !== null) return { code: shapeProblem };
 
@@ -170,7 +178,7 @@ export async function extract(
   // Before anything that parses what the person sent.
   if (!(await deps.captcha.verify(request.captchaToken))) return { code: 'captcha_failed' };
 
-  const estimate = measure(request.files);
+  const estimate = measure(request.files, review);
   if (typeof estimate === 'string') return { code: estimate };
   const pageCount = request.files.length;
   metrics.pages = pageCount;
@@ -193,6 +201,7 @@ export async function extract(
     try {
       const read = await deps.reader.read({
         model,
+        review,
         files: request.files,
         deadline,
       });
@@ -213,7 +222,7 @@ export async function extract(
   metrics.escalated = false;
   let result: Assessment | null = null;
   const primary = await readWith(primaryModel);
-  if (primary !== null) result = assess(primary, pageCount);
+  if (primary !== null) result = assess(primary, pageCount, review);
   if (primary !== null && primary.inputTokens > UNDERESTIMATE_FACTOR * estimate)
     metrics.underestimated = true;
 
@@ -223,7 +232,7 @@ export async function extract(
   if (doubt && canEscalate(primary?.inputTokens ?? estimate)) {
     metrics.escalated = true;
     const second = await readWith(escalationModel);
-    const assessed = second === null ? null : assess(second, pageCount);
+    const assessed = second === null ? null : assess(second, pageCount, review);
     // The escalation read wins only if it has something to say.
     if (assessed !== null && (!assessed.noOutput || result === null)) result = assessed;
   }

@@ -115,10 +115,16 @@ describe('createBedrockReader', () => {
     });
     await reader.read({
       model: HAIKU_4_5,
+      review: 'final_pay',
       files: [photo],
       deadline: Date.now() + 60_000,
     });
-    await reader.read({ model: HAIKU_4_5, files: [photo], deadline: Date.now() - 1 });
+    await reader.read({
+      model: HAIKU_4_5,
+      review: 'final_pay',
+      files: [photo],
+      deadline: Date.now() - 1,
+    });
     await new Promise((r) => setTimeout(r, 5));
     expect(signals[0]?.aborted).toBe(false);
     expect(signals[1]?.aborted).toBe(true);
@@ -137,7 +143,12 @@ describe('createBedrockReader', () => {
       throw error;
     });
     await expect(
-      reader.read({ model: HAIKU_4_5, files: [photo], deadline: Date.now() + 60_000 }),
+      reader.read({
+        model: HAIKU_4_5,
+        review: 'final_pay',
+        files: [photo],
+        deadline: Date.now() + 60_000,
+      }),
     ).rejects.toBe(error);
   });
 });

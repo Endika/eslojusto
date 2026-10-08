@@ -4,7 +4,7 @@ import type { ErrorCode } from './results';
 
 // What the model says each page is. `other` is a page with nothing the review uses, such as an
 // IRPF withholding certificate.
-export const PAGE_KINDS = [
+export const FINAL_PAY_PAGE_KINDS = [
   'settlement_proposal',
   'payslip',
   'dismissal_letter',
@@ -13,6 +13,8 @@ export const PAGE_KINDS = [
   'work_history',
   'other',
 ] as const;
+// Every kind any review can give a page.
+export const PAGE_KINDS = FINAL_PAY_PAGE_KINDS;
 export type PageKind = (typeof PAGE_KINDS)[number];
 // The documents a value can come from.
 export type SourceKind = Exclude<PageKind, 'other'>;

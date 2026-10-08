@@ -1,6 +1,7 @@
 import type { DocumentFile } from './documents';
 import type { Readability } from './extraction-schema';
 import type { ResultCode } from './results';
+import type { ReviewKind } from './reviews';
 
 export interface ModelRead {
   // The tool input exactly as the model produced it, or null if it produced none.
@@ -13,6 +14,7 @@ export interface ModelRead {
 export interface DocumentReader {
   read(request: {
     readonly model: string;
+    readonly review: ReviewKind;
     readonly files: readonly DocumentFile[];
     // Epoch milliseconds by which the read must be over, retries included, or abandoned.
     readonly deadline: number;
@@ -55,6 +57,8 @@ export interface LogEvent {
   readonly countNotSaved?: boolean;
   // Pages per readability, when a read set any aside or found nothing: counts, never content.
   readonly readability?: Readonly<Partial<Record<Readability, number>>>;
+  // The review an `extract` request named; none is the final pay's.
+  readonly review?: ReviewKind;
   // A `pass` request that verified a pass rather than issued one.
   readonly verify?: boolean;
 }

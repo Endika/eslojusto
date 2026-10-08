@@ -1,0 +1,957 @@
+{
+  "type": "object",
+  "properties": {
+    "pages": {
+      "type": "array",
+      "description": "One entry per attached page, in order: its kind, the number of its document and its readability.",
+      "maxItems": 25,
+      "items": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25,
+            "description": "The number given before the page."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "settlement_proposal",
+              "payslip",
+              "dismissal_letter",
+              "company_certificate",
+              "settlement_agreement",
+              "work_history",
+              "other"
+            ],
+            "description": "settlement_proposal: a settlement proposal or notification (propuesta o notificación de finiquito, «liquidación, saldo y finiquito»), listing the liquidation concepts (salario del mes, vacaciones, partes proporcionales, indemnización, preaviso), with or without amounts, and a total, often net. payslip: a nómina with the earnings and deductions of a pay period, the final liquidation payslip included. dismissal_letter: a dismissal letter or termination notice (carta de despido). company_certificate: the company certificate for the public employment service (certificado de empresa): a Ministerio de Trabajo or SEPE header and a table of «bases de cotización de los últimos 180 días»; never a payslip, despite its monthly amounts. settlement_agreement: an agreement or conciliation record (acuerdo, acta de conciliación). work_history: the Social Security work history (vida laboral). other: anything else, such as a tax withholding certificate (certificado de retenciones del IRPF)."
+          },
+          "document": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25,
+            "description": "Number the documents in order of appearance; all pages of one document get the same number."
+          },
+          "readability": {
+            "type": "object",
+            "description": "ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_labour_document (not about a job), foreign_jurisdiction (an employment document from another country, where Spanish law does not apply; never because of its language), unknown_format (about a job, but no kind of document you know).",
+            "properties": {
+              "value": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "handwritten",
+                  "blurry",
+                  "dark",
+                  "cropped",
+                  "not_labour_document",
+                  "foreign_jurisdiction",
+                  "unknown_format"
+                ]
+              },
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              }
+            },
+            "required": ["value", "confidence"],
+            "additionalProperties": false
+          },
+          "month": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}$",
+            "description": "For a payslip page only: the month of its pay period, as YYYY-MM."
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          }
+        },
+        "required": ["page", "kind", "document", "readability", "confidence"],
+        "additionalProperties": false
+      }
+    },
+    "settlement_proposal": {
+      "type": "object",
+      "description": "Settlement proposal or notification (propuesta o notificación de finiquito, «liquidación, saldo y finiquito»), with or without amounts per concept. Leave the section out when no attached document is one.",
+      "properties": {
+        "startDate": {
+          "type": "object",
+          "description": "Employment start or seniority date (fecha de alta, antigüedad).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "endDate": {
+          "type": "object",
+          "description": "Employment end date (fecha de baja, fecha de efectos del despido o del cese).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "cause": {
+          "type": "object",
+          "description": "Termination cause only if the document states it: resignation (baja voluntaria), fixed_term_end (fin de contrato), objective_dismissal (despido objetivo), unfair_dismissal (despido improcedente, also when the company acknowledges it), disciplinary_dismissal (despido disciplinario).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": [
+                "resignation",
+                "fixed_term_end",
+                "objective_dismissal",
+                "unfair_dismissal",
+                "disciplinary_dismissal"
+              ]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "fixedTermType": {
+          "type": "object",
+          "description": "Type of fixed-term contract only if stated: production_circumstances (circunstancias de la producción), replacement (sustitución), training (formativo).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["production_circumstances", "replacement", "training"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "monthlySalary": {
+          "type": "object",
+          "description": "Gross monthly salary, only if printed as such.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "pending_salary": {
+          "type": "object",
+          "description": "Salary for the days worked in the last month (salario pendiente). Only the amount printed next to this very concept; leave the field out when the concept has no amount of its own. Never another line’s amount, never a total.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "holiday_pay": {
+          "type": "object",
+          "description": "Untaken holidays paid out (vacaciones no disfrutadas). Only the amount printed next to this very concept; leave the field out when the concept has no amount of its own. Never another line’s amount, never a total.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "extra_pay": {
+          "type": "object",
+          "description": "Accrued share of extra payments (parte proporcional de pagas extra). Only the amount printed next to this very concept; leave the field out when the concept has no amount of its own. Never another line’s amount, never a total.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "severance": {
+          "type": "object",
+          "description": "Severance pay (indemnización por fin de contrato o despido). Only the amount printed next to this very concept; leave the field out when the concept has no amount of its own. Never another line’s amount, never a total.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "employer_notice": {
+          "type": "object",
+          "description": "Pay in lieu of notice owed by the employer (falta de preaviso). Only the amount printed next to this very concept; leave the field out when the concept has no amount of its own. Never another line’s amount, never a total.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "notice_deduction": {
+          "type": "object",
+          "description": "Deduction for notice the worker did not give (descuento por preaviso). Only the amount printed next to this very concept; leave the field out when the concept has no amount of its own. Never another line’s amount, never a total.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "annualHolidayDays": {
+          "type": "object",
+          "description": "Holiday days per year, only if printed (días de vacaciones al año).",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 366
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "holidayDaysTaken": {
+          "type": "object",
+          "description": "Holiday days already taken this year, only if printed.",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 366
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "totalGross": {
+          "type": "object",
+          "description": "Total GROSS amount, before deductions (total devengado, total bruto), only if printed as such.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "totalNet": {
+          "type": "object",
+          "description": "Total NET amount to be paid, after deductions (líquido a percibir, total neto, a percibir).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "otherAccruals": {
+          "type": "array",
+          "description": "Every other gross line (devengo) not recorded in an item field above, one entry per line.",
+          "maxItems": 30,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "amount": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Gross amount of the line, in euros."
+              }
+            },
+            "required": ["amount", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "final_payslip": {
+      "type": "object",
+      "description": "The final payslip that settles the employment (nómina de liquidación, nómina del finiquito): its items are worked out from its lines. Leave the section out when no attached document is one.",
+      "properties": {
+        "periodStart": {
+          "type": "object",
+          "description": "First day of the pay period (periodo de liquidación).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "periodEnd": {
+          "type": "object",
+          "description": "Last day of the pay period.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "startDate": {
+          "type": "object",
+          "description": "Seniority date (fecha de antigüedad).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "annualHolidayDays": {
+          "type": "object",
+          "description": "Holiday days per year, only if printed (días de vacaciones al año).",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 366
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "holidayDaysTaken": {
+          "type": "object",
+          "description": "Holiday days already taken this year, only if printed.",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 366
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "totalAccrued": {
+          "type": "object",
+          "description": "Total gross amount (total devengado).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "lines": {
+          "type": "array",
+          "description": "Every earnings line (devengo) of the payslip, one entry per line, in the order printed. Never deductions (IRPF, Seguridad Social, anticipos).",
+          "maxItems": 30,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "concept": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "description": "The concept exactly as printed, for example «PLUS TRANSPORTE»."
+              },
+              "amount": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Amount of the line, in euros."
+              },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "salary",
+                  "notice_compensation",
+                  "severance",
+                  "holiday_pay",
+                  "extra_pay",
+                  "one_off",
+                  "other"
+                ],
+                "description": "salary: base salary, pluses and allowances paid for the days of the period, prorated extra pay (PP PAGAS EXTRAS, prorrata pagas extra), teleworking or transport if paid as earnings. notice_compensation: falta de preaviso, indemnización por falta de preaviso. severance: indemnización por despido o fin de contrato. holiday_pay: vacaciones no disfrutadas, vacaciones pendientes. extra_pay: a full extra payment or its liquidation (paga extra de verano, de Navidad, liquidación pagas extras). one_off: a payment that is not for the period, such as a bonus, study aid (ayuda estudios) or backpay (atrasos). other: anything else."
+              }
+            },
+            "required": ["concept", "amount", "category", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "monthly_payslip": {
+      "type": "object",
+      "description": "The most recent ordinary payslip (nómina) whose period is one whole calendar month, from its first to its last day. Leave the section out when no attached document is one.",
+      "properties": {
+        "periodStart": {
+          "type": "object",
+          "description": "First day of the pay period (periodo de liquidación).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "periodEnd": {
+          "type": "object",
+          "description": "Last day of the pay period.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "startDate": {
+          "type": "object",
+          "description": "Seniority date (fecha de antigüedad).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "totalAccrued": {
+          "type": "object",
+          "description": "Total gross amount of the period (total devengado).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "extraPayProrated": {
+          "type": "object",
+          "description": "true when a line prorates the extra payments, such as «PP PAGAS EXTRAS», «P.P. EXTRAS» or «prorrata pagas extra»; false when the payslip has no such line. Required whenever the payslip has lines.",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "extraPayProratedAmount": {
+          "type": "object",
+          "description": "Amount of that prorated extra payment line.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "lines": {
+          "type": "array",
+          "description": "Every earnings line (devengo) of the payslip, one entry per line, in the order printed. Never deductions (IRPF, Seguridad Social, anticipos).",
+          "maxItems": 30,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "concept": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "description": "The concept exactly as printed, for example «PLUS TRANSPORTE»."
+              },
+              "amount": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Amount of the line, in euros."
+              },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "salary",
+                  "notice_compensation",
+                  "severance",
+                  "holiday_pay",
+                  "extra_pay",
+                  "one_off",
+                  "other"
+                ],
+                "description": "salary: base salary, pluses and allowances paid for the days of the period, prorated extra pay (PP PAGAS EXTRAS, prorrata pagas extra), teleworking or transport if paid as earnings. notice_compensation: falta de preaviso, indemnización por falta de preaviso. severance: indemnización por despido o fin de contrato. holiday_pay: vacaciones no disfrutadas, vacaciones pendientes. extra_pay: a full extra payment or its liquidation (paga extra de verano, de Navidad, liquidación pagas extras). one_off: a payment that is not for the period, such as a bonus, study aid (ayuda estudios) or backpay (atrasos). other: anything else."
+              }
+            },
+            "required": ["concept", "amount", "category", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "dismissal_letter": {
+      "type": "object",
+      "description": "Dismissal letter or termination notice (carta de despido, comunicación de cese). Leave the section out when no attached document is one.",
+      "properties": {
+        "endDate": {
+          "type": "object",
+          "description": "Employment end date (fecha de baja, fecha de efectos del despido o del cese).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "cause": {
+          "type": "object",
+          "description": "Termination cause only if the document states it: resignation (baja voluntaria), fixed_term_end (fin de contrato), objective_dismissal (despido objetivo), unfair_dismissal (despido improcedente, also when the company acknowledges it), disciplinary_dismissal (despido disciplinario).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": [
+                "resignation",
+                "fixed_term_end",
+                "objective_dismissal",
+                "unfair_dismissal",
+                "disciplinary_dismissal"
+              ]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "fixedTermType": {
+          "type": "object",
+          "description": "Type of fixed-term contract only if stated: production_circumstances (circunstancias de la producción), replacement (sustitución), training (formativo).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["production_circumstances", "replacement", "training"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "severance": {
+          "type": "object",
+          "description": "Severance pay (indemnización por fin de contrato o despido).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "employer_notice": {
+          "type": "object",
+          "description": "Pay in lieu of notice owed by the employer (falta de preaviso).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "noticeDaysReceived": {
+          "type": "object",
+          "description": "Days of notice actually GIVEN: days the worker kept working between being notified and the end date (fecha de efectos). 0 when the dismissal takes effect the same day as the notification and the notice is paid instead. Never the days of notice paid as compensation.",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 366
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "noticeDaysPaid": {
+          "type": "object",
+          "description": "Days of notice PAID instead of given (indemnización por falta de preaviso, «se le abonan 15 días de preaviso»), only if stated as a number of days.",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 366
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "company_certificate": {
+      "type": "object",
+      "description": "Company certificate for the public employment service (certificado de empresa, SEPE header, bases de cotización de los últimos 180 días). Leave the section out when no attached document is one.",
+      "properties": {
+        "startDate": {
+          "type": "object",
+          "description": "Employment start or seniority date (fecha de alta, antigüedad).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "endDate": {
+          "type": "object",
+          "description": "Employment end date (fecha de baja, fecha de efectos del despido o del cese).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "cause": {
+          "type": "object",
+          "description": "Termination cause only if the document states it: resignation (baja voluntaria), fixed_term_end (fin de contrato), objective_dismissal (despido objetivo), unfair_dismissal (despido improcedente, also when the company acknowledges it), disciplinary_dismissal (despido disciplinario).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": [
+                "resignation",
+                "fixed_term_end",
+                "objective_dismissal",
+                "unfair_dismissal",
+                "disciplinary_dismissal"
+              ]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "fixedTermType": {
+          "type": "object",
+          "description": "Type of fixed-term contract only if stated: production_circumstances (circunstancias de la producción), replacement (sustitución), training (formativo).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["production_circumstances", "replacement", "training"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "settlement_agreement": {
+      "type": "object",
+      "description": "Agreement or conciliation record ending the dispute (acuerdo, acta de conciliación). Leave the section out when no attached document is one.",
+      "properties": {
+        "endDate": {
+          "type": "object",
+          "description": "Employment end date (fecha de baja, fecha de efectos del despido o del cese).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "cause": {
+          "type": "object",
+          "description": "Termination cause only if the document states it: resignation (baja voluntaria), fixed_term_end (fin de contrato), objective_dismissal (despido objetivo), unfair_dismissal (despido improcedente, also when the company acknowledges it), disciplinary_dismissal (despido disciplinario).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": [
+                "resignation",
+                "fixed_term_end",
+                "objective_dismissal",
+                "unfair_dismissal",
+                "disciplinary_dismissal"
+              ]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "severanceTotal": {
+          "type": "object",
+          "description": "Total amount the agreement gives as severance (indemnización total pactada), only if stated as one figure.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "work_history": {
+      "type": "object",
+      "description": "Social Security work history report (informe de vida laboral). Leave the section out when no attached document is one.",
+      "properties": {
+        "contracts": {
+          "type": "array",
+          "description": "Every employment period listed, one entry per row.",
+          "maxItems": 60,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "startDate": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Start date of the period (fecha de alta)."
+              },
+              "endDate": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "End date of the period (fecha de baja); omit while still active."
+              }
+            },
+            "required": ["startDate", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["pages"],
+  "additionalProperties": false
+}
