@@ -10,6 +10,8 @@ export const es = {
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen la Ley de Arrendamientos Urbanos (Ley 29/1994), la Ley 12/2023 y el IRAV y el IPC del INE.',
   'footer.note_general':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Cada cifra lleva la norma de la que sale.',
+  'footer.note_benefit':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras del paro siguen la Ley General de la Seguridad Social (arts. 262 a 277) y el IPREM; las del finiquito, el Estatuto de los Trabajadores y la guía del CGPJ (v0.6, julio de 2026).',
   'footer.nav': 'Información legal',
   'footer.legal_notice': 'Aviso legal',
   'footer.privacy': 'Privacidad',

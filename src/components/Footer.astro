@@ -13,16 +13,21 @@ const links = [
   [link('es', 'privacidad/'), t(lang, 'footer.privacy')],
 ] as const;
 const current = Astro.url.pathname;
-// Each section names the norms its figures follow; the home page, with more than one, names none.
+// Each section names the norms its figures follow; the legal pages and a home page with more than
+// one section name none.
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const local = current
   .slice(base.length)
   .replace(new RegExp(`^/(${Object.keys(LANGS).join('|')})(?=/)`), '');
+const general =
+  ['/privacidad/', '/aviso-legal/'].includes(local) || (local === '/' && RENTAL_BUILD);
 const note: Key = local.startsWith('/alquiler/')
   ? 'footer.note_rental'
-  : local === '/' && RENTAL_BUILD
-    ? 'footer.note_general'
-    : 'footer.note';
+  : local.startsWith('/paro/')
+    ? 'footer.note_benefit'
+    : general
+      ? 'footer.note_general'
+      : 'footer.note';
 ---
 
 <footer class="footer">

@@ -67,4 +67,13 @@ test('the footer names the rental norms, and the final pay keeps its own', async
   await expect(page.locator('.footer__note')).not.toContainText('Estatuto de los Trabajadores');
   await page.goto('finiquito/');
   await expect(page.locator('.footer__note')).toContainText('Estatuto de los Trabajadores');
+  await page.goto('paro/');
+  await expect(page.locator('.footer__note')).toContainText('Ley General de la Seguridad Social');
+  await expect(page.locator('.footer__note')).toContainText('IPREM');
+  for (const path of ['privacidad/', 'aviso-legal/']) {
+    await page.goto(path);
+    await expect(page.locator('.footer__note'), path).toHaveText(
+      'eslojusto.es informa sobre tus derechos y no da asesoramiento. Cada cifra lleva la norma de la que sale.',
+    );
+  }
 });
