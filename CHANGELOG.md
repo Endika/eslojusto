@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.17.0](https://github.com/Endika/eslojusto/compare/v1.16.1...v1.17.0) (2026-10-08)
+
+
+### Features
+
+* **rental:** add the rental review form, its scope gate and its result ([9e493df](https://github.com/Endika/eslojusto/commit/9e493df234821f46f15efa2a4f3af87744b77f6b))
+
+
+### Bug Fixes
+
+* **rental:** keep rounded amounts within their readings and group charges by concept ([4b3a5fd](https://github.com/Endika/eslojusto/commit/4b3a5fd8b2e33b630b44cf7720818237a82eb4fe))
+
 ## [1.16.1](https://github.com/Endika/eslojusto/compare/v1.16.0...v1.16.1) (2026-10-08)
 
 
