@@ -574,3 +574,19 @@ test('without a deposit owed, only the rent letter and no account to ask for', a
   );
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test('with the documents API, the questions cover documents and the pass, in the JSON-LD too', async ({
+  page,
+}) => {
+  await page.goto('alquiler/');
+  const questions = (await page.locator('.faq-item summary').allTextContents()).map((q) =>
+    q.trim(),
+  );
+  expect(questions).toContain('¿Qué pasa con mis documentos?');
+  expect(questions).toContain('¿Qué incluye el pase de 4,99 €?');
+  const json = (await page.locator('script[type="application/ld+json"]').textContent()) ?? '';
+  const graph = (JSON.parse(json) as { '@graph': Record<string, unknown>[] })['@graph'];
+  const faq = graph.find((n) => n['@type'] === 'FAQPage') as
+    { mainEntity: { name: string }[] } | undefined;
+  expect(faq?.mainEntity.map((q) => q.name)).toEqual(questions);
+});

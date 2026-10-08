@@ -1,0 +1,131 @@
+---
+import { NORMS } from '../engine/rental/data/norms';
+import { LEGAL_INTEREST } from '../engine/rental/data/legal-interest';
+import { capsCopy } from '../content/rent-caps';
+import {
+  SERIES,
+  example,
+  formatLongDay,
+  inePage,
+  latest,
+  monthRows,
+} from '../content/rent-indices';
+import { legalInterestSummary, rentalGuide } from '../content/rental-guide';
+import { rentalFaqEntries } from '../content/rental-faq';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+  // The day the page's rules were last checked, ISO.
+  checkedOn: string;
+  documents?: boolean;
+}
+const { lang, checkedOn, documents = false } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+const blocks = rentalGuide(lang, NORMS, {
+  checkedOn,
+  legalInterest: legalInterestSummary(LEGAL_INTEREST),
+});
+const irav = latest('irav', monthRows());
+if (!irav) throw new Error('The rental guide needs a published IRAV.');
+// Only the periods and their rule: the index figures live on the indices page.
+const caps = capsCopy(lang, NORMS, {
+  checkedOn,
+  iravRate: irav.figure.rate,
+  example: example(),
+});
+const faq = rentalFaqEntries(lang, NORMS, { documents, checkedOn });
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('rental.guide.title')}
+    </h2>
+    <p class="guide__lead">{tx('rental.guide.lead')}</p>
+    <p class="guide__sources">
+      <span>{t(lang, 'rental.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>
+        {tx('rental.guide.sources')}: <a href={NORMS.lau.url}>{tx('rental.guide.source_lau')}</a> ·{' '}
+        <a href={inePage(SERIES.irav)}>{tx('rental.guide.source_irav')}</a> ·{' '}
+        <a href={LEGAL_INTEREST.at(-1)?.url}>{tx('rental.guide.source_bde')}</a>
+      </span>
+      <a href={link('es', 'aviso-legal/')}>{tx('rental.guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    {blocks.map(({ id, anchor, title, paragraphs, list, sources, links }) => (
+      <section class="sheet sheet--text" data-guide={id}>
+        <h3 id={anchor}>{title}</h3>
+        <p>{paragraphs[0]}</p>
+        {list.length > 0 && (
+          <ul>
+            {list.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        )}
+        {paragraphs.slice(1).map((text) => (
+          <p>{text}</p>
+        ))}
+        {id === 'update' && (
+          <>
+            <p>{tx('rental.guide.update.caps_lead')}</p>
+            <dl class="data-list caps">
+              {caps.rows.map(({ id: cap, when, rule }) => (
+                <div data-cap={cap}>
+                  <dt>{when}</dt>
+                  <dd>
+                    <p>{rule}</p>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <p class="status" role="note">
+              {caps.status}
+            </p>
+            {caps.repealed && <p>{caps.repealed}</p>}
+            <p>{tx('rental.guide.update.doubtful')}</p>
+            <p>
+              {tx('rental.guide.update.indices')}{' '}
+              <a href={link(lang, 'alquiler/irav-ipc/')}>
+                {tx('rental.guide.update.indices_link')}
+              </a>
+            </p>
+          </>
+        )}
+        <h4 class="rules__title">{tx('rental.guide.norms')}</h4>
+        <ul class="sources sources--wrap">
+          {sources.map((s) => (
+            <li>
+              <a href={s.url}>{s.citation}</a>{' '}
+              <span class="rules__status" data-status={s.statusCode}>
+                {s.status}
+              </span>
+            </li>
+          ))}
+          {links.map(({ label, url }) => (
+            <li>
+              <a href={url}>{label}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('rental.guide.faq')}</h2>
+      <div class="faq-list">
+        {faq.map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>

@@ -1053,7 +1053,7 @@ export const es = {
     'eslojusto.es compara lo que te pagan o te cobran con lo que marca la ley, cifra a cifra y con el artículo al lado. Revisa el finiquito y, en pruebas, el alquiler.',
   'home.rent_text':
     'Lo que pagas o has pagado por tu alquiler frente a lo que permite la ley, partida por partida: agencia, fianza y garantías, subidas, gastos y devolución de la fianza.',
-  'home.rent_citation': 'Ley de Arrendamientos Urbanos · IRAV e IPC del INE',
+  'home.rent_citation': 'Ley de Arrendamientos Urbanos · Ley 12/2023 · IRAV e IPC del INE',
   'home.beta': 'Beta',
 
   'home.contract_text':
@@ -2227,9 +2227,9 @@ export const es = {
   'client.employment.documents.pass.lost':
     'Hemos vuelto del pago, pero la revisión no se ha podido recuperar. Repítela y verás el detalle.',
 
-  'rental.title': 'Revisión de alquiler: subidas, fianza y gastos',
+  'rental.title': 'Subida del alquiler y fianza: revisa si pagas de más',
   'rental.description':
-    'Comprueba si la subida, la fianza, los gastos o la agencia de tu alquiler pasan de lo que permite la ley, partida por partida. Todo en tu dispositivo.',
+    'Comprueba si la subida, la fianza, los gastos o la agencia de tu alquiler pasan de lo que permite la ley, partida por partida y con la norma de cada una.',
   'rental.h1': 'Comprueba si tu alquiler es justo',
   'rental.lead':
     'Revisa lo que pagas o has pagado por tu alquiler de vivienda frente a lo que permite la ley: agencia, fianza y garantías, subidas, gastos y devolución de la fianza.',
@@ -2238,6 +2238,141 @@ export const es = {
     'Sección en pruebas. Las normas del alquiler han cambiado varias veces en 2026: cada regla dice si está en vigor, pendiente de convalidación o derogada.',
   'rental.no_js':
     'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
+  'rental.reviewed': 'Revisado el {fecha}',
+  'rental.app_name': 'Revisión de alquiler',
+
+  'rental.guide.title': 'Qué permite la ley en tu alquiler',
+  'rental.guide.lead':
+    'Las reglas con las que la revisión compara cada partida, según la fecha de tu contrato y con la norma de cada una. Varias han cambiado en 2026: cada norma dice si está en vigor, pendiente de convalidación o derogada.',
+  'rental.guide.sources': 'Fuentes',
+  'rental.guide.source_lau': 'Ley de Arrendamientos Urbanos (BOE)',
+  'rental.guide.source_irav': 'IRAV (INE)',
+  'rental.guide.source_bde': 'Interés legal (Banco de España)',
+  'rental.guide.who': 'Quién está detrás',
+  'rental.guide.norms': 'Normas',
+  'rental.guide.decree_live': 'el {norma}, en vigor desde el {desde} y {estado},',
+  'rental.guide.decree_upcoming': 'el {norma}, que entra en vigor el {desde} y está {estado},',
+  'rental.guide.decree_repealed':
+    'El {norma} lo cambió {periodo}, pero el Congreso lo derogó: sigue la regla anterior.',
+
+  'rental.guide.fees.title': 'Honorarios de la agencia',
+  'rental.guide.fees.lead':
+    'Los gastos de gestión inmobiliaria y de formalización del contrato van según la fecha de tu contrato:',
+  'rental.guide.fees.2019':
+    'Contratos firmados entre el 6 de marzo de 2019 y el 25 de mayo de 2023: son del casero cuando es una empresa (persona jurídica). Si es una persona, la ley no dice quién los paga.',
+  'rental.guide.fees.2023':
+    'Contratos firmados entre el 26 de mayo de 2023 y el 7 de octubre de 2026: son siempre del casero.',
+  'rental.guide.fees.2026':
+    'Contratos firmados desde el 8 de octubre de 2026: {decreto} dice que no pueden cobrarse al inquilino ni directa ni indirectamente, con ningún concepto o nombre. Cubre cualquier servicio para preparar, formalizar, gestionar, renovar o cambiar el contrato; otro servicio que no haga falta para el contrato solo puede cobrarse si lo pediste por escrito sabiendo que era opcional y su precio.',
+  'rental.guide.fees.other_names':
+    'Un cargo con otro nombre, como «estudio de solvencia», «reserva» o «gestión», puede ser un honorario. En un contrato anterior al 8 de octubre de 2026, la revisión lo señala para que lo mires, sin cifra; desde esa fecha, lo cuenta como pagado de más, salvo que fuera un servicio opcional que pediste por escrito.',
+
+  'rental.guide.guarantees.title': 'Fianza, garantías y pago por adelantado',
+  'rental.guide.guarantees.deposit':
+    'La fianza es obligatoria y, en un alquiler de vivienda, de una mensualidad de renta en metálico (art. 36.1 LAU).',
+  'rental.guide.guarantees.extra':
+    'Además, el contrato puede pedir otra garantía: más dinero, un aval o un seguro. En los contratos firmados desde el 6 de marzo de 2019 de hasta cinco años, o hasta siete si el casero es una empresa, esa garantía adicional no puede pasar de dos mensualidades de renta (art. 36.5 LAU).',
+  'rental.guide.guarantees.advance':
+    'Por adelantado, el casero no puede exigir más de una mensualidad de renta (art. 17.2 LAU).',
+  'rental.guide.guarantees.insurance':
+    'Además, {decreto} dice que no se puede exigir al inquilino que contrate un seguro de impago de la renta ni otra cobertura parecida.',
+  'rental.guide.guarantees.money':
+    'La revisión compara con esos topes el dinero que entregaste. Un aval o un seguro no es dinero entregado: los señala, sin cifra.',
+
+  'rental.guide.update.title': 'Cómo se actualiza la renta',
+  'rental.guide.update.clause':
+    'En los contratos firmados desde el 6 de marzo de 2019, la renta solo se actualiza si el contrato lo pacta, y una vez al año: el día en que se cumple cada año de contrato. Si la cláusula dice que se actualiza pero no con qué índice, se usa el que fija la ley. Y la subida nunca puede pasar del tope legal de ese día (art. 18.1 LAU).',
+  'rental.guide.update.notice':
+    'La renta nueva se paga desde el mes siguiente a que te avisen por escrito, con el porcentaje aplicado; vale una nota en el recibo del mes anterior (art. 18.2 LAU).',
+  'rental.guide.update.caps_lead':
+    'El tope de cada año, según el día en que se cumple el año de contrato:',
+  'rental.guide.update.indices':
+    'El índice que cuenta es el último publicado ese día. Las cifras de cada mes, con el día en que las publicó el INE, están aquí:',
+  'rental.guide.update.indices_link': 'IRAV e IPC de cada mes',
+  'rental.guide.update.doubtful':
+    'Si una subida cae en los días de un decreto que el Congreso derogó, la revisión da las dos cuentas y no la suma al total. Si depende de una norma pendiente de convalidación, da las dos y el total solo suma la más baja.',
+
+  'rental.guide.charges.title': 'Gastos: comunidad, IBI y basura',
+  'rental.guide.charges.pact':
+    'El casero solo puede cobrarte los gastos generales del edificio, los tributos o los servicios sin contador si lo pactasteis por escrito y con su importe anual a la fecha del contrato (art. 20.1 LAU).',
+  'rental.guide.charges.increase':
+    'En los cinco primeros años de contrato, o siete si el casero es una empresa, esos gastos, salvo los tributos, solo pueden subir una vez al año, por acuerdo, y nunca más del doble de lo que puede subir la renta (art. 20.2 LAU).',
+  'rental.guide.charges.meters':
+    'Lo que se mide con un contador propio de la vivienda, como el agua o la luz, lo pagas tú (art. 20.3 LAU).',
+  'rental.guide.charges.taxes':
+    'Además, {decreto} dice que los tributos de la vivienda, como el IBI, no pueden cargarse al inquilino, salvo que sea el inquilino quien tiene que pagarlos. La revisión lo aplica a los contratos firmados desde esa fecha; en los anteriores, lo da como información.',
+
+  'rental.guide.return.title': 'Devolución de la fianza',
+  'rental.guide.return.month':
+    'Cuando acaba el contrato y entregas las llaves, el casero tiene un mes para devolverte la fianza. Pasado ese mes, lo que falte por devolver genera el interés legal del dinero (art. 36.4 LAU).',
+  'rental.guide.return.rate':
+    'El interés legal es del {tipo} desde {desde}: lo fijó la Ley de Presupuestos Generales del Estado para 2023 y sigue mientras esos presupuestos estén prorrogados. El tipo de cada año está en la tabla del Banco de España. Como ninguna norma dice si el año cuenta 365 o 360 días, la revisión da el interés con las dos cuentas.',
+  'rental.guide.return.deductions':
+    'El casero puede descontar desperfectos o deudas. La revisión no valora si un descuento procede: compara lo devuelto con la fianza y los descuentos que anotes, y calcula el interés del retraso.',
+  'rental.guide.return.closing':
+    'Además, {decreto} prevé un documento de finalización del contrato que suscriben las dos partes; si no se hace o no recoge desperfectos, se presume, salvo prueba en contrario, que la vivienda se entregó en buen estado.',
+
+  'rental.guide.zones.title': 'Zonas tensionadas',
+  'rental.guide.zones.declared':
+    'Las comunidades autónomas pueden declarar zonas de mercado residencial tensionado, y el Ministerio de Vivienda publica cada declaración en el BOE. En una zona declarada, la renta de un contrato nuevo puede tener tope: la del contrato anterior o, en algunos casos, como con un gran tenedor, el precio del sistema estatal de referencia (art. 17.6 y 17.7 LAU).',
+  'rental.guide.zones.rise':
+    'Y hasta el 31 de diciembre de 2027, {decreto} dice que si tu renta pasa del límite de precio que fija para tu zona el sistema de índices de referencia, no cabe ninguna subida anual.',
+  'rental.guide.zones.unchecked':
+    'La revisión no calcula estos topes: pregunta si tu vivienda está en una zona tensionada y te da el enlace al sistema estatal de referencia.',
+  'rental.guide.zones.link': 'Sistema Estatal de Referencia del Precio del Alquiler (SERPAVI)',
+
+  'rental.guide.term.title': 'Duración y prórrogas',
+  'rental.guide.term.minimum':
+    'Si el contrato pacta menos de cinco años, o siete si el casero es una empresa, se prorroga cada año hasta llegar a ellos, salvo que avises con 30 días de antelación de que no quieres seguir (art. 9.1 LAU).',
+  'rental.guide.term.tacit':
+    'Cumplido ese plazo, si nadie avisa (el casero con cuatro meses de antelación y tú con dos), el contrato sigue un año más cada vez, hasta tres años (art. 10.1 LAU).',
+  'rental.guide.term.extension':
+    'Para los contratos cuyo plazo acaba entre el 8 de octubre de 2026 y el 31 de diciembre de 2028, {decreto} prevé una prórroga extraordinaria de hasta dos años, por años, si la pides y estás al corriente del pago de la renta.',
+  'rental.guide.term.rdl28':
+    'Por otro lado, {decreto} reescribe el art. 10 de la LAU, el de las prórrogas.',
+  'rental.guide.term.unchecked':
+    'La revisión no comprueba prórrogas ni preavisos: te da las fechas de tu contrato como información.',
+
+  'rental.guide.regional.title': 'Normas de tu comunidad autónoma',
+  'rental.guide.regional.state':
+    'La Ley de Arrendamientos Urbanos se aplica en toda España, y la revisión solo aplica las normas estatales. Tu comunidad puede tener normas propias que se suman a ellas, como las de sus zonas tensionadas.',
+  'rental.guide.regional.lodging':
+    'Las comunidades pueden obligar al casero a depositar la fianza en un organismo público (disposición adicional 3.ª LAU). Es una obligación del casero con la administración: no cambia lo que pagas.',
+
+  'rental.guide.faq': 'Preguntas frecuentes',
+  'rental.faq.agency_fees': '¿Me pueden cobrar honorarios de agencia?',
+  'rental.faq.agency_fees_answer':
+    'Depende de cuándo se firmó tu contrato. Desde el 26 de mayo de 2023, los gastos de gestión inmobiliaria y de formalización del contrato son del casero (art. 20.1 LAU). Entre el 6 de marzo de 2019 y el 25 de mayo de 2023, lo eran cuando el casero era una empresa. {decreto}',
+  'rental.faq.agency_fees_decree':
+    'Además, {decreto} dice que, en los contratos firmados desde entonces, no pueden cobrarse al inquilino con ningún concepto o nombre.',
+  'rental.faq.rent_rise': '¿Cuánto me pueden subir el alquiler este año?',
+  'rental.faq.rent_rise_answer':
+    'Solo lo que pacte tu contrato, una vez al año y sin pasar del tope legal del día en que se cumple el año de contrato (art. 18.1 LAU). {decreto} La tabla de esta página da el tope de cada año.',
+  'rental.faq.rent_rise_decree':
+    'Hasta el 31 de diciembre de 2027, según {decreto} el tope sin un nuevo pacto es el IRAV, y como mucho un 2 %.',
+  'rental.faq.irav': '¿Qué es el IRAV?',
+  'rental.faq.deposit': '¿Cuánta fianza me pueden pedir?',
+  'rental.faq.deposit_answer':
+    'Una mensualidad de renta en metálico (art. 36.1 LAU). Aparte, el contrato puede pedir una garantía adicional: en los contratos firmados desde el 6 de marzo de 2019 de hasta cinco años, o siete si el casero es una empresa, no más de dos mensualidades (art. 36.5 LAU). Y por adelantado, no más de una mensualidad (art. 17.2 LAU).',
+  'rental.faq.deposit_return': '¿Cuándo me tienen que devolver la fianza?',
+  'rental.faq.deposit_return_answer':
+    'Pasado un mes desde que entregas las llaves, lo que falte por devolver genera el interés legal del dinero (art. 36.4 LAU). El casero puede descontar desperfectos o deudas; la revisión no valora si un descuento procede, pero sí calcula el interés del retraso.',
+  'rental.faq.pending_norms': '¿Qué pasa con las normas pendientes de convalidación?',
+  'rental.faq.pending_norms_answer':
+    'Un real decreto-ley rige desde que entra en vigor, pero el Congreso tiene que convalidarlo en los 30 días siguientes a su promulgación; si no lo hace, queda derogado. {pendientes} Cuando un resultado depende de una norma pendiente, la revisión da las dos cuentas y el total solo suma la más baja. {derogados}',
+  'rental.faq.pending_norms_list': 'A {fecha} están pendientes de convalidación {lista}.',
+  'rental.faq.pending_norms_none': 'A {fecha} no hay ninguna pendiente.',
+  'rental.faq.pending_norms_item_live': 'el {norma}, en vigor desde el {desde}',
+  'rental.faq.pending_norms_item_upcoming': 'el {norma}, que entra en vigor el {desde}',
+  'rental.faq.pending_norms_repealed':
+    'Si una subida cae en los días de un decreto que el Congreso derogó, la revisión da las dos cuentas y no la suma al total. Los derogados: {lista}.',
+  'rental.faq.documents': '¿Qué pasa con mis documentos?',
+  'rental.faq.documents_answer':
+    'Si subes tu contrato y los demás papeles del alquiler, se envían cifrados a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo indica qué es cada página y copia solo los datos que necesita el formulario. Tiene orden de no copiar nombres de personas, DNI, NIE, cuentas bancarias, teléfonos ni correos, y el servidor descarta cualquier texto copiado que aún lleve un DNI, una cuenta, un correo o un teléfono. No se guarda nada: el documento se procesa en memoria y se descarta. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
+  'rental.faq.pass': '¿Qué incluye el pase de 4,99 €?',
+  'rental.faq.pass_answer':
+    'El pase vale para cualquier revisión durante 7 días, también la del finiquito, y solo en el navegador con el que pagas. En la del alquiler te enseña el cálculo paso a paso de cada partida y te deja descargar el informe en PDF y, si tu revisión tiene cifras para ellas, las cartas sobre la fianza y las subidas. En esos días puedes rehacer o corregir tu revisión y leer hasta 15 paquetes de documentos sin pagar otra vez. No guardamos tu revisión en ningún sitio: en otro dispositivo, en una ventana privada o si borras los datos de navegación, el pase se pierde.',
+
   'rental.form_aria': 'Revisión del alquiler',
   'rental.tab.contrato': 'Contrato',
   'rental.tab.entrada': 'Entrada',
