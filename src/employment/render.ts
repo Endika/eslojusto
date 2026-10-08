@@ -69,6 +69,7 @@ const UNITS: Partial<Record<EmploymentPhraseKey, Readonly<Record<string, Unit>>>
   'minimum_wage.year.below': { days: 'day' },
   'extra_pays.count': { count: 'extra_pay' },
   'extra_pays.in_daily_minimum': { days: 'day' },
+  'extra_pays.may_be_in_daily_minimum': { days: 'day' },
   'trial.amount_days': { amount: 'day' },
   'trial.amount_weeks': { amount: 'week' },
   'trial.amount_months': { amount: 'month' },

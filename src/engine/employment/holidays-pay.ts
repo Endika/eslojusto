@@ -215,21 +215,32 @@ function paidInSalary(input: EmploymentInput, norms: NormTable): Finding {
 function extraPays(input: EmploymentInput, norms: NormTable): Finding {
   const pays = input.extraPays;
   if (pays === null) return finding('extra_pays', { status: 'not_entered' }, norms);
-  // Art. 4.1 of each year's minimum wage decree: in a fixed-term contract of up to 120 days paid by
-  // the day, the daily minimum already holds the extra payments, Sundays and public holidays.
-  if (isShortTemporary(input) && pays.count < EXTRA_PAYS)
+  // Art. 4.1 of each year's minimum wage decree: for services of up to 120 days the daily minimum
+  // holds the extra payments, Sundays and public holidays. Paid by the day, that settles it; paid
+  // by the month or the year, the extra pays may or may not sit inside the pay, so it is to review.
+  const days = agreedDays(input);
+  if (
+    !isOpenEnded(input.modality) &&
+    days !== null &&
+    days <= SHORT_TEMPORARY_DAYS &&
+    pays.count < EXTRA_PAYS
+  ) {
+    const dayRate = isShortTemporary(input);
     return finding(
       'extra_pays',
       {
-        status: 'within_limit',
+        status: dayRate ? 'within_limit' : 'review_it',
         calculation: [
           phrase('extra_pays.count', { count: { integer: pays.count } }),
-          phrase('extra_pays.in_daily_minimum', { days: { days: SHORT_TEMPORARY_DAYS } }),
+          phrase(dayRate ? 'extra_pays.in_daily_minimum' : 'extra_pays.may_be_in_daily_minimum', {
+            days: { days: SHORT_TEMPORARY_DAYS },
+          }),
         ],
         alsoCites: ['smi_temporary_120'],
       },
       norms,
     );
+  }
   if (pays.prorated)
     return finding(
       'extra_pays',

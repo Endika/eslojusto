@@ -500,26 +500,39 @@ describe('extra payments (art. 31 ET)', () => {
     expect(findingFor({ extraPays: null }, 'extra_pays').status).toBe('not_entered');
   });
 
-  // Art. 4.1 of the decree: the daily minimum of a short fixed-term contract holds the extra pays.
-  const shortDayRate: Partial<EmploymentInput> = {
-    modality: 'production',
-    startDate: parseDate('2026-08-01'),
-    endDate: parseDate('2026-10-15'),
-    salary: {
-      amount: 50,
-      period: 'day',
-      payments: 12,
-      prorated: false,
-      breakdown: [],
-      inKind: null,
-    },
-  };
-
-  it('a day-rate contract of up to 120 days needs no extra pays of its own', () => {
-    const f = findingFor(
-      { ...shortDayRate, extraPays: { count: 0, prorated: false } },
+  // Art. 4.1 of the decree: for services of up to 120 days the daily minimum holds the extra pays.
+  const START = parseDate('2026-06-01');
+  const lasting = (days: number) => addDays(START, days - 1);
+  const dayRate = {
+    amount: 60,
+    period: 'day',
+    payments: 12,
+    prorated: false,
+    breakdown: [],
+    inKind: null,
+  } as const;
+  const monthly = {
+    amount: 1800,
+    period: 'month',
+    payments: 12,
+    prorated: false,
+    breakdown: [],
+    inKind: null,
+  } as const;
+  const noExtras = (salary: EmploymentInput['salary'], days: number) =>
+    findingFor(
+      {
+        modality: 'production',
+        startDate: START,
+        endDate: lasting(days),
+        salary,
+        extraPays: { count: 0, prorated: false },
+      },
       'extra_pays',
     );
+
+  it('a day rate for 120 days holds its extra pays in the daily minimum', () => {
+    const f = noExtras(dayRate, 120);
     expect(f).toMatchObject({
       status: 'within_limit',
       calculation: [
@@ -530,16 +543,20 @@ describe('extra payments (art. 31 ET)', () => {
     expect(f.sources.map((s) => s.id)).toContain('smi_temporary_120');
   });
 
-  it('a longer day-rate contract still counts its extra pays', () => {
-    expect(
-      findingFor(
-        {
-          ...shortDayRate,
-          endDate: parseDate('2027-03-01'),
-          extraPays: { count: 0, prorated: false },
-        },
-        'extra_pays',
-      ).status,
-    ).toBe('below_minimum');
+  it('a monthly pay for 120 days may hold them too: to review, never a concrete finding', () => {
+    const f = noExtras(monthly, 120);
+    expect(f).toMatchObject({
+      status: 'review_it',
+      calculation: [
+        phrase('extra_pays.count', { count: { integer: 0 } }),
+        phrase('extra_pays.may_be_in_daily_minimum', { days: { days: 120 } }),
+      ],
+    });
+    expect(offerPass([{ kind: 'single', finding: f }])).toBe(false);
+  });
+
+  it('from 121 days, in either pay form, the extra pays are owed apart', () => {
+    expect(noExtras(dayRate, 121).status).toBe('below_minimum');
+    expect(noExtras(monthly, 121).status).toBe('below_minimum');
   });
 });
