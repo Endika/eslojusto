@@ -162,8 +162,9 @@ each of them). An `ok` read can still list pages set aside; the site says which 
 "captchaToken": "<Turnstile, action 'checkout'>", "returnTo": "rental" }` →
 `{ "code": "ok", "sessionId": "cs_…", "url": "https://checkout.stripe.com/…" }`. Keep the
 session id and nonce before redirecting; Stripe returns to
-`/finiquito/?session_id={CHECKOUT_SESSION_ID}`, or to `/alquiler/` with `"returnTo": "rental"`
-(`CHECKOUT_PATHS` in `src/config.ts`); any other `returnTo` is `invalid_request`. The pass is the
+`/finiquito/?session_id={CHECKOUT_SESSION_ID}`, to `/alquiler/` with `"returnTo": "rental"` or to
+`/contrato/` with `"returnTo": "employment"` (`CHECKOUT_PATHS` in `src/config.ts`); any other
+`returnTo` is `invalid_request`. The pass is the
 same product either way and unlocks every review.
 
 **`pass`** `{ "sessionId": "cs_…", "nonce": "…" }` →

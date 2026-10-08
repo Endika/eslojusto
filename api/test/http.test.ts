@@ -469,6 +469,7 @@ describe('payment handlers', () => {
     { nonce: 'n0nce-generated-by-the-browser' },
     { nonce: 'n0nce-generated-by-the-browser', captchaToken: 't', returnTo: 'final_pay' },
     { nonce: 'n0nce-generated-by-the-browser', captchaToken: 't', returnTo: '/alquiler/' },
+    { nonce: 'n0nce-generated-by-the-browser', captchaToken: 't', returnTo: '/contrato/' },
     { nonce: 'n0nce-generated-by-the-browser', captchaToken: 't', returnTo: null },
   ])('refuses a malformed request %j', async (body) => {
     expect(json(await handleCheckout(post(body), deps()))).toEqual({ code: 'invalid_request' });
@@ -479,7 +480,8 @@ describe('payment handlers', () => {
     const body = { nonce: 'n0nce-generated-by-the-browser', captchaToken: 'turnstile-token' };
     await handleCheckout(post(body), { ...deps(), checkout });
     await handleCheckout(post({ ...body, returnTo: 'rental' }), { ...deps(), checkout });
-    expect(checkout.returns).toEqual(['final_pay', 'rental']);
+    await handleCheckout(post({ ...body, returnTo: 'employment' }), { ...deps(), checkout });
+    expect(checkout.returns).toEqual(['final_pay', 'rental', 'employment']);
   });
 
   it('refuses a malformed session id', async () => {

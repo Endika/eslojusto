@@ -176,6 +176,15 @@ describe('Stripe adapter', () => {
     expect(options).toEqual({ idempotencyKey: `checkout-rental-${NONCE}` });
   });
 
+  it('returns an employment payment to /contrato/, under a key of its own', () => {
+    const [params, options] = checkoutParams(NONCE, PRICE, 'employment');
+    expect(params.success_url).toBe(
+      'https://eslojusto.es/contrato/?session_id={CHECKOUT_SESSION_ID}',
+    );
+    expect(params.cancel_url).toBe('https://eslojusto.es/contrato/');
+    expect(options).toEqual({ idempotencyKey: `checkout-employment-${NONCE}` });
+  });
+
   const session = (extra: Record<string, unknown> = {}) =>
     ({
       id: 'cs_test_paid',
