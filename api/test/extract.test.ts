@@ -87,6 +87,7 @@ describe('extract', () => {
       inputTokens: 1000,
       outputTokens: 200,
       escalated: false,
+      retried: false,
       conflicts: 0,
     });
   });

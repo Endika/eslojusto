@@ -16,6 +16,7 @@ import {
   failedChecks,
   hasLowConfidence,
   isReadable,
+  malformedParts,
   parseReading,
   type CoherenceCheck,
   type PageReading,
@@ -28,6 +29,7 @@ import { rentalMerge, type RentalMerged } from './rental-merge';
 import type {
   CaptchaVerifier,
   Clock,
+  Correction,
   DocumentReader,
   ModelRead,
   PaymentVerifier,
@@ -35,6 +37,7 @@ import type {
 } from './ports';
 import type { ErrorCode } from './results';
 import {
+  CORRECTION_TOKENS,
   imageTokens,
   MAX_ESCALATION_INPUT_TOKENS,
   MAX_ESTIMATED_INPUT_TOKENS,
@@ -105,6 +108,7 @@ export interface ExtractMetrics {
   inputTokens?: number;
   outputTokens?: number;
   escalated?: boolean;
+  retried?: boolean;
   conflicts?: number;
   underestimated?: boolean;
   countNotSaved?: boolean;
@@ -259,13 +263,14 @@ export async function extract<R extends ReviewKind = 'final_pay'>(
     if (readsLeft(passSession) === 0) return { code: 'pass_exhausted' };
   }
 
-  const readWith = async (model: string): Promise<ModelRead | null> => {
+  const readWith = async (model: string, correction?: Correction): Promise<ModelRead | null> => {
     try {
       const read = await deps.reader.read({
         model,
         review,
         files: request.files,
         deadline,
+        ...(correction !== undefined && { correction }),
       });
       metrics.inputTokens = (metrics.inputTokens ?? 0) + read.inputTokens;
       metrics.outputTokens = (metrics.outputTokens ?? 0) + read.outputTokens;
@@ -288,10 +293,35 @@ export async function extract<R extends ReviewKind = 'final_pay'>(
   if (primary !== null && primary.inputTokens > UNDERESTIMATE_FACTOR * estimate)
     metrics.underestimated = true;
 
+  // A section sent as a string of JSON, or pages that are not a list, is refused, never parsed:
+  // the same model gets its call back with the error and records the whole extraction again.
+  // Its input is the first read's input and output, and it may write only what the first read
+  // left of max_tokens, so both reads together cost no more than one read can; it needs at least
+  // as much room as the first read took to write the record again.
+  const malformed = primary === null ? [] : malformedParts(primary.toolInput, review);
+  const canRetry = (read: ModelRead): boolean =>
+    read.toolUseId !== undefined &&
+    read.maxTokens !== undefined &&
+    2 * read.outputTokens <= read.maxTokens &&
+    2 * read.inputTokens + read.outputTokens + CORRECTION_TOKENS <= MAX_ESTIMATED_INPUT_TOKENS &&
+    deps.clock.now() - started < NO_ESCALATION_AFTER_MS;
+
+  metrics.retried = false;
   // A failed primary (model retired, not enabled, throttled) or a doubtful read goes to the
-  // escalation model, unless the pack is too big to be worth a dearer second read.
+  // escalation model, unless the pack is too big to be worth a dearer second read. Either way,
+  // a request makes at most one second read.
   const doubt = result === null || result.doubtful;
-  if (doubt && canEscalate(primary?.inputTokens ?? estimate)) {
+  if (primary !== null && malformed.length > 0 && canRetry(primary)) {
+    metrics.retried = true;
+    const retry = await readWith(primaryModel, { previous: primary, malformed });
+    // The retry wins only if it came back whole.
+    if (
+      retry !== null &&
+      retry.toolInput !== null &&
+      malformedParts(retry.toolInput, review).length === 0
+    )
+      result = assess(retry, pageCount, review);
+  } else if (doubt && canEscalate(primary?.inputTokens ?? estimate)) {
     metrics.escalated = true;
     const second = await readWith(escalationModel);
     const assessed = second === null ? null : assess(second, pageCount, review);

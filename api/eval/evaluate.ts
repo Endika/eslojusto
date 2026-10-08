@@ -96,6 +96,7 @@ interface PackReport {
   readonly inputTokens: number;
   readonly outputTokens: number;
   readonly escalated: boolean;
+  readonly retried: boolean;
   readonly conflicts: number;
   readonly maxTokens: number;
   readonly personsTranscribed: number;
@@ -125,6 +126,7 @@ export interface EvalReport {
   };
   readonly conflicts: number;
   readonly escalations: number;
+  readonly retries: number;
   readonly maxTokens: number;
   // Values of a person (names, DNI, IBAN) found in what the model wrote: must be 0.
   readonly personsTranscribed: number;
@@ -346,6 +348,7 @@ export async function evaluate<C extends EvalCase>(
       inputTokens: metrics.inputTokens ?? 0,
       outputTokens: metrics.outputTokens ?? 0,
       escalated: metrics.escalated === true,
+      retried: metrics.retried === true,
       conflicts: extraction?.conflicts.length ?? 0,
       maxTokens: deps.truncatedReads() - truncatedBefore,
       personsTranscribed: personsIn(
@@ -389,6 +392,7 @@ export async function evaluate<C extends EvalCase>(
     nothingRead,
     conflicts: sum((p) => p.conflicts),
     escalations: sum((p) => (p.escalated ? 1 : 0)),
+    retries: sum((p) => (p.retried ? 1 : 0)),
     maxTokens: sum((p) => p.maxTokens),
     personsTranscribed: sum((p) => p.personsTranscribed),
     perPack,

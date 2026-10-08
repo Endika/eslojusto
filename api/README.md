@@ -10,7 +10,7 @@ Three Lambda functions in **eu-south-2** behind function URLs:
 
 Nothing is stored: documents live in the invocation's memory, the server keeps no state, and
 logs carry only `op`, `code`, `latencyMs`, `pages`, `inputTokens`, `outputTokens`,
-`escalated`, `conflicts` (how many fields two documents stated differently), `readability` (how
+`escalated`, `retried`, `conflicts` (how many fields two documents stated differently), `readability` (how
 many pages had each readability, only when a read set a page aside or found nothing) and three flags (`test/http.test.ts` proves it): `underestimated` when Bedrock
 counted more than twice the input the pre-read estimate allowed for, `countNotSaved` when
 a pass read went through but Stripe did not store its count, and `truncated` when an employment
@@ -421,6 +421,18 @@ domain, adapters never reach `http/` or `handlers/`, and the infrastructure read
   is fixed, so it means a retired, disabled or misconfigured model, never a bad document. A
   failed primary read goes to the escalation model; if that fails too, the answer is
   `model_unavailable`. An escalated read replaces the primary only if it recorded something.
+- **Malformed tool input.** A section sent as a string of JSON instead of an object, or pages
+  that are not a list, is refused, never parsed or repaired; Sonnet 4.6 has done it with legible
+  contracts. The same model then gets one corrective retry: the same request, its own tool call
+  and a `tool_result` error naming the malformed parts (schema names only, nothing a document
+  said), and the retry replaces the read only if it comes back whole. It is logged as `retried`
+  and takes the place of the escalation: a request makes one second read at most. It starts only
+  before `NO_ESCALATION_AFTER_MS`, only when both reads together stay within 96,000 input tokens
+  (Bedrock's own counts, plus 500 for the correction) and its `max_tokens` is what the first read
+  left, at least as much as the first read wrote: both reads cost no more than the worst case of
+  one (below, «Cost»). Strict tool use (`strict: true`), which would rule this out at the source,
+  allows 24 optional parameters across a request's schemas, and each review's schema has more
+  than 50 (`test/tool-schema.test.ts`).
 - Models (`src/config.ts`): every read is **Sonnet 4.6 alone**: `PRIMARY_MODEL` and
   `ESCALATION_MODEL` are both `SONNET_4_6`, and equal constants turn escalation off. The
   escalation path and its tests stay: `PRIMARY_MODEL = HAIKU_4_5` brings back Haiku first and
@@ -549,7 +561,7 @@ throttles and 5xx, p50/p95 duration, concurrency against the account's 10); Bedr
 `SEARCH` over `{AWS/Bedrock,ModelId}` (the EU profile id, e.g.
 `eu.anthropic.claude-haiku-4-5-20251001-v1:0`), so a new model shows up without a change; and
 Logs Insights widgets over the one-line log: `extract` codes over time and in a table,
-`checkout`/`pass` codes, `escalated`/`underestimated`/`countNotSaved` counts, pages, tokens
+`checkout`/`pass` codes, `escalated`/`retried`/`underestimated`/`countNotSaved` counts, pages, tokens
 and latency percentiles; «Lecturas sin datos por motivo», a table of `nothing_read` reads per
 day with how many pages had each readability, and «% lecturas sin datos (24 h)», the share of
 answered reads (`ok` plus `nothing_read`) that found nothing. Log widgets follow the
@@ -710,7 +722,8 @@ the prompt, as above.
 (95,975 × 3.30 USD/M + 12,000 × 16.50 USD/M = 0.5147), for any input: the API takes images only, priced by their pixels, and refuses anything above 96,000
 estimated tokens (0.40 USD) before a call. The bound counts every page at 1568 px, since the
 API accepts that size at any count; the browser stepping a large pack down only lowers it. A PDF never reaches it; the browser renders its pages
-to images of the same size as a photo. Should Bedrock still bill more than twice the estimate,
+to images of the same size as a photo. A corrective retry stays inside the bound: with it, the
+two reads take at most 96,000 input tokens and one `max_tokens` of output between them. Should Bedrock still bill more than twice the estimate,
 the read is logged with `underestimated`. A free read needs a fresh captcha, at most 5 reads
 run at once, and the budget action caps the month.
 
@@ -748,7 +761,7 @@ with that review) and the real `createBedrockReader`, with the models of `src/co
 each pack it adds the cost measured so far (tokens × `MODEL_PRICES_USD_PER_MTOK`) to the worst
 case of one more pack and stops if that could pass `EVAL_MAX_USD`. It writes `report.json` next to
 the bank's photos (`eval/out/` or `eval/out/employment/`): accuracy by field and by page kind,
-`nothing_read` expected and got, conflicts, escalations, reads cut at `max_tokens`, values of a
+`nothing_read` expected and got, conflicts, escalations, corrective retries, reads cut at `max_tokens`, values of a
 person found in what the model wrote (it must be 0; for employment the person replaced and a
 household employer count too) and the total cost. For a pack that missed any field it keeps, per
 read, the tool input exactly as the model wrote it (the bank is synthetic), what validation left

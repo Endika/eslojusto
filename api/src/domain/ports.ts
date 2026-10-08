@@ -8,6 +8,18 @@ export interface ModelRead {
   readonly toolInput: unknown;
   readonly inputTokens: number;
   readonly outputTokens: number;
+  // The id the provider gave the tool call, which a corrective retry answers.
+  readonly toolUseId?: string;
+  // The max_tokens the read was asked with.
+  readonly maxTokens?: number;
+}
+
+// A second turn on a read whose tool input had parts of the wrong JSON type: the model gets its
+// own call back with an error naming them, and records the whole extraction again.
+export interface Correction {
+  readonly previous: ModelRead;
+  // Schema names only: `pages` or section kinds.
+  readonly malformed: readonly string[];
 }
 
 // Throws whenever the model provider does not answer, whatever the reason.
@@ -18,6 +30,7 @@ export interface DocumentReader {
     readonly files: readonly DocumentFile[];
     // Epoch milliseconds by which the read must be over, retries included, or abandoned.
     readonly deadline: number;
+    readonly correction?: Correction;
   }): Promise<ModelRead>;
 }
 
@@ -49,6 +62,8 @@ export interface LogEvent {
   readonly inputTokens?: number;
   readonly outputTokens?: number;
   readonly escalated?: boolean;
+  // A read retried with the same model because parts of its tool input had the wrong JSON type.
+  readonly retried?: boolean;
   // How many fields two documents stated differently.
   readonly conflicts?: number;
   // Bedrock counted more than twice the input the pre-read estimate allowed for.

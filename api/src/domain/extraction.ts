@@ -291,6 +291,18 @@ export function parseReading(
   return { pages, sections, dropped, unclassified: pageCount - pages.length };
 }
 
+// The parts of a tool input whose JSON type is wrong as a whole: pages that are not a list, a
+// section that is not an object (a section sent as a string of JSON, say). Names from the schema
+// only, never what the model wrote.
+export function malformedParts(toolInput: unknown, review: ReviewKind): readonly string[] {
+  if (!isRecord(toolInput)) return [];
+  const parts: string[] = [];
+  if (Object.hasOwn(toolInput, 'pages') && !Array.isArray(toolInput['pages'])) parts.push('pages');
+  for (const [kind] of sectionsOf(review))
+    if (Object.hasOwn(toolInput, kind) && !isRecord(toolInput[kind])) parts.push(kind);
+  return parts;
+}
+
 const TOLERANCE_EUROS = 1;
 const cents = (n: number): number => Math.round(n * 100);
 

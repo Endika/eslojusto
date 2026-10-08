@@ -342,11 +342,12 @@ export function addDashboard(
       cw.LogQueryVisualizationType.LINE,
     ),
     logQuery(
-      'Lecturas: escaladas, subestimadas, sin contar, recortadas y páginas',
+      'Lecturas: escaladas, reintentadas, subestimadas, sin contar, recortadas y páginas',
       ['extract'],
       [
         extract,
         `stats count(*) as lecturas, ${flag('escalated')} as escaladas, ` +
+          `${flag('retried')} as reintentadas, ` +
           `${flag('underestimated')} as subestimadas, ${flag('countNotSaved')} as sinContar, ` +
           `${flag('truncated')} as recortadas, ` +
           'avg(pages) as paginasMedias, avg(inputTokens) as tokensEntrada, ' +

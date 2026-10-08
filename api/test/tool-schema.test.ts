@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { SYSTEM_PROMPTS } from '../src/adapters/bedrock-reader';
+import { buildRequestBody, SYSTEM_PROMPTS } from '../src/adapters/bedrock-reader';
+import { SONNET_4_6 } from '../src/config';
 import { FINAL_PAY_PAGE_KINDS } from '../src/domain/documents';
 import {
   FINAL_PAY_READABILITY,
@@ -127,4 +128,30 @@ describe('toolInputSchema', () => {
     for (const word of ['sindical', 'union', 'sick', 'baja médica', ' it ', 'name', 'dni', 'nif'])
       expect(text).not.toContain(word);
   });
+});
+
+// Every property left out of its object's `required`, at any depth: what strict tool use counts
+// against its limit of 24 per request (platform.claude.com/docs/en/build-with-claude/structured-outputs,
+// «Schema complexity limits»).
+function optionalParameters(node: unknown): number {
+  if (Array.isArray(node)) return node.reduce((n: number, v) => n + optionalParameters(v), 0);
+  if (typeof node !== 'object' || node === null) return 0;
+  const record = node as Record<string, unknown>;
+  const required = new Set(Array.isArray(record['required']) ? record['required'] : []);
+  const own =
+    record['type'] === 'object' && typeof record['properties'] === 'object'
+      ? Object.keys(record['properties'] as object).filter((k) => !required.has(k)).length
+      : 0;
+  return own + Object.values(record).reduce((n: number, v) => n + optionalParameters(v), 0);
+}
+
+describe('strict tool use', () => {
+  it.each(['final_pay', 'rental', 'employment'] as const)(
+    'is off for a %s read, whose schema has more optional parameters than it allows',
+    (review) => {
+      expect(optionalParameters(toolInputSchema(review))).toBeGreaterThan(24);
+      const [tool] = buildRequestBody(SONNET_4_6, [], review)['tools'] as Record<string, unknown>[];
+      expect(tool).not.toHaveProperty('strict');
+    },
+  );
 });
