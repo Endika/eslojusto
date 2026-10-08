@@ -276,4 +276,26 @@ test('the page has its title, description, heading, canonical, JSON-LD and revie
     'https://expinterweb.mites.gob.es/regcon/',
   );
   await expect(guide.locator('tr[data-year]').first()).toContainText('17.094,00');
+  // The footer names the labour norms of this section, not the final pay's guide.
+  const footer = page.locator('.footer__note');
+  await expect(footer).toContainText('Real Decreto 723/2026');
+  await expect(footer).toContainText('reales decretos del SMI');
+  await expect(footer).not.toContainText('CGPJ');
+});
+
+test('the privacy page and the legal notice describe the contract review in this build', async ({
+  page,
+}) => {
+  await page.goto('privacidad/');
+  const privacy = page.locator('main');
+  await expect(privacy).toContainText('Lo que escribes en la revisión del contrato');
+  await expect(privacy).toContainText('La respuesta sobre si tienes una discapacidad reconocida');
+  await expect(privacy).toContainText('Al revisar el contrato');
+  await page.goto('aviso-legal/');
+  const notice = page.locator('main');
+  await expect(
+    notice.getByRole('heading', { name: /La revisión del contrato de trabajo/ }),
+  ).toContainText('Beta');
+  await expect(notice).toContainText('No lee convenios colectivos ni sus tablas');
+  await expect(notice).toContainText('No calcula el salario neto, el IRPF ni las cotizaciones');
 });

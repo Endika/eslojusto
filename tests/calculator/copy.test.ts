@@ -47,7 +47,14 @@ describe('result copy', () => {
 
 const employmentCopy: readonly (readonly [string, string])[] = [
   ...Object.entries(es)
-    .filter(([key]) => key.startsWith('employment.') || key.startsWith('client.employment.'))
+    .filter(
+      ([key]) =>
+        key.startsWith('employment.') ||
+        key.startsWith('client.employment.') ||
+        key.startsWith('privacy.employment.') ||
+        key.startsWith('legal_notice.employment.') ||
+        key === 'footer.note_employment',
+    )
     .map(([key, text]): [string, string] => [key, text]),
   ...(existsSync('src/employment') ? filesUnder('src/employment', '.ts') : []).map(
     (file): [string, string] => [file, readFileSync(file, 'utf8')],

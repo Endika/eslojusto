@@ -4,7 +4,7 @@ import { t, type Key } from '../../i18n';
 import { DOCUMENTS } from '../../documents/config';
 import { OUTAGE_KEY } from '../../documents/outage';
 import { STORAGE_KEYS } from '../../documents/pass';
-import { RENTAL_BUILD } from '../../content/sections';
+import { EMPLOYMENT_BUILD, RENTAL_BUILD } from '../../content/sections';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
 const tx = (key: Key) => t('es', key);
@@ -14,6 +14,8 @@ const email = 'hola@eslojusto.es';
 const documents = DOCUMENTS !== null;
 // The rental review exists only in a PUBLIC_RENTAL=1 build; so do the paragraphs about it.
 const rental = RENTAL_BUILD;
+// The contract review exists only in a PUBLIC_EMPLOYMENT=1 build; so do the paragraphs about it.
+const employment = EMPLOYMENT_BUILD;
 
 // One entry per thing that is stored or processed; a new tool adds a row here.
 const stored = [
@@ -24,6 +26,14 @@ const stored = [
   },
   ...(rental
     ? [{ what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') }]
+    : []),
+  ...(employment
+    ? [
+        {
+          what: tx('privacy.employment.data_review'),
+          where: tx('privacy.employment.data_review_where'),
+        },
+      ]
     : []),
   {
     what: tx('privacy.data_analytics'),
@@ -46,6 +56,18 @@ const stored = [
               {
                 what: tx('privacy.rental.data_letters'),
                 where: tx('privacy.rental.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(employment
+          ? [
+              {
+                what: tx('privacy.employment.data_documents'),
+                where: tx('privacy.employment.data_documents_where'),
+              },
+              {
+                what: tx('privacy.employment.data_letters'),
+                where: tx('privacy.employment.data_letters_where'),
               },
             ]
           : []),
@@ -127,6 +149,22 @@ const tracked = [
         },
       ]
     : []),
+  ...(employment
+    ? [
+        {
+          when: tx('privacy.employment.tracked_sheets'),
+          what: tx('privacy.employment.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_scope'),
+          what: tx('privacy.employment.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_review'),
+          what: tx('privacy.employment.tracked_review_what'),
+        },
+      ]
+    : []),
   ...(documents
     ? [
         {
@@ -146,6 +184,14 @@ const tracked = [
               {
                 when: tx('privacy.rental.tracked_documents'),
                 what: tx('privacy.rental.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(employment
+          ? [
+              {
+                when: tx('privacy.employment.tracked_documents'),
+                what: tx('privacy.employment.tracked_documents_what'),
               },
             ]
           : []),
@@ -181,6 +227,7 @@ const tracked = [
           un importe ni una fecha. No hay cookies ni publicidad.
         </p>
         {rental && <p>{tx('privacy.rental.summary')}</p>}
+        {employment && <p>{tx('privacy.employment.summary')}</p>}
         {documents && (
           <p>
             Si decides subir un documento para rellenar los datos, se lee con IA en la Unión Europea
@@ -268,6 +315,7 @@ const tracked = [
             subiendo más documentos: como no se guarda nada, no queda nada que borrar.
           </p>
           {rental && <p>{tx('privacy.rental.consent')}</p>}
+          {employment && <p>{tx('privacy.employment.consent')}</p>}
           <p>
             Los documentos los procesa Amazon Web Services EMEA SARL (Luxemburgo), encargada del
             tratamiento: el servidor (AWS Lambda) está en España y el modelo de IA se usa a través
