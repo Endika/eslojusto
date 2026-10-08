@@ -474,12 +474,14 @@ export const es = {
   'rental.documents.files_hint':
     'El contrato y, si los tienes, los avisos de subida, los recibos, la factura de la agencia o la devolución de la fianza, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
   'rental.documents.consent':
-    'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, direcciones o números de cuenta. Se leen en la Unión Europea y no se guardan.',
+    'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, DNI, direcciones o números de cuenta. Se leen en la Unión Europea y no se guardan.',
   'rental.pass.title': 'El detalle de cada partida',
   'rental.pass.text':
     'Por 4,99 € ves el cálculo paso a paso de cada partida: mes a mes y año a año, con el índice, el tope que aplica y las fuentes legales.',
   'rental.pass.price':
     '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para la revisión del finiquito: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a ver el detalle sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
+  'rental.pass.paid_help':
+    'Si pagaste desde este navegador y no ves el detalle, recupera aquí tu pase. Solo funciona en el navegador con el que pagaste.',
   'rental.pass.waiver':
     'Quiero ver el detalle ahora. Sé que, al ser contenido digital que se entrega al momento, pierdo el derecho de desistimiento (art. 103.m de la Ley General para la Defensa de los Consumidores y Usuarios).',
   'faq.pass': '¿Qué incluye el pase de 4,99 €?',
