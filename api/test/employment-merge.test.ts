@@ -175,7 +175,7 @@ describe('employmentMerge', () => {
     expect(m.discarded).toBe(8);
   });
 
-  it('drops a copied text that tells about health, leave, union or debts', () => {
+  it('drops a copied text that tells about health, leave, union or debts, but no agreement’s name', () => {
     const m = pack(
       {
         pages: [page(1, 'employment_contract'), page(2, 'payslip')],
@@ -193,9 +193,20 @@ describe('employmentMerge', () => {
       },
       2,
     );
-    expect(Object.keys(m.fields)).toEqual(['category']);
+    expect(Object.keys(m.fields).sort()).toEqual(['agreementName', 'category']);
+    expect(m.fields.agreementName?.value).toBe('Convenio firmado por CCOO y UGT');
     expect(m.lists.clauses?.[0]?.values).toEqual({ label: 'other' });
-    expect(m.discarded).toBe(4);
+    expect(m.discarded).toBe(3);
+  });
+
+  it('keeps an agreement named after health or disability', () => {
+    const name = 'Convenio colectivo de centros de atención a personas con discapacidad y salud';
+    const m = pack(
+      { pages: [page(1, 'employment_contract')], employment_contract: { agreementName: f(name) } },
+      1,
+    );
+    expect(m.fields.agreementName?.value).toBe(name);
+    expect(m.discarded).toBe(0);
   });
 
   it('keeps a payslip line whose concept tells too much, without its concept and as no doubt', () => {

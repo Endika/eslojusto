@@ -70,7 +70,7 @@ export interface EmploymentMerged {
 }
 
 // Every text copied from the documents. The worker never appears in them: anything that still
-// looks like an identifier or a special category of data takes the text with it.
+// looks like an identifier takes the text with it.
 const FREE_TEXTS = {
   fields: [
     'causeText',
@@ -84,8 +84,15 @@ const FREE_TEXTS = {
   items: ['literal', 'concept', 'employerName', 'agreementName', 'category'],
 };
 
-const leaks = (text: string): boolean =>
-  hasIdentifier(text) || hasSocialSecurityNumber(text) || hasSpecialCategory(text);
+const hasPersonalIdentifier = (text: string): boolean =>
+  hasIdentifier(text) || hasSocialSecurityNumber(text);
+
+// The same texts but an agreement's name, which says nothing about the worker even when it names
+// a union or health: a word about health, leave, union or debts takes the text with it too.
+const ABOUT_THE_WORKER = {
+  fields: FREE_TEXTS.fields.filter((name) => name !== 'agreementName'),
+  items: FREE_TEXTS.items.filter((name) => name !== 'agreementName'),
+};
 
 // A payslip line or a salary part whose concept told about health, leave, union or debts loses
 // the concept alone: its amount and category still count, so the read is no less sure for it.
@@ -180,7 +187,16 @@ export function employmentMerge(read: Reading, toolInput: unknown): EmploymentMe
   const sections: Partial<Record<SectionKind, Section>> = {};
   for (const [kind, section] of Object.entries(read.sections) as [SectionKind, Section][]) {
     const named = withoutPersonsNames(kind, section);
-    const cleaned = withoutIdentifiers(withoutSpecialConcepts(named.section), FREE_TEXTS, leaks);
+    const identified = withoutIdentifiers(
+      withoutSpecialConcepts(named.section),
+      FREE_TEXTS,
+      hasPersonalIdentifier,
+    );
+    const special = withoutIdentifiers(identified.section, ABOUT_THE_WORKER, hasSpecialCategory);
+    const cleaned = {
+      section: special.section,
+      dropped: identified.dropped + special.dropped,
+    };
     sections[kind] =
       kind === 'employment_payslips' ? withPayslipHeadings(cleaned.section) : cleaned.section;
     dropped += named.dropped + cleaned.dropped;
