@@ -77,6 +77,9 @@ export type EmploymentRuleId =
   | 'info_before_start'
   | 'info_on_request'
   | 'info_short_relations'
+  | 'info_model'
+  | 'public_holidays'
+  | 'minors_work'
   | 'late_payment_interest'
   | 'limitation';
 
@@ -272,6 +275,13 @@ export const RULES: Readonly<Record<EmploymentRuleId, Rule>> = {
   info_on_request: rd723('info_on_request', 'disposición transitoria única', 'dt'),
   // 2.2: chapter II only for relationships of over four weeks.
   info_short_relations: rd723('info_short_relations', 'art. 2.2', 'a2'),
+  // Additional provision 1.ª: the public employment service publishes a model information document.
+  info_model: rd723('info_model', 'disposición adicional primera', 'da'),
+  // 37.2: up to fourteen paid public holidays a year.
+  public_holidays: et('public_holidays', '37.2', 'a37'),
+  // 6.2 and 6.3: no night work and no overtime under eighteen; 34.3 and 37.1 add eight hours a day
+  // and two days of weekly rest.
+  minors_work: et('minors_work', '6', 'a6'),
   // 29.3: late wages carry ten per cent of the amount owed.
   late_payment_interest: et('late_payment_interest', '29.3', 'a29'),
   // 59: one year to claim.

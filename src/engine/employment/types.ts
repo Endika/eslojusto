@@ -314,9 +314,3 @@ export type Scope =
       readonly reason:
         'special_relationship' | 'public_servant' | 'temp_agency' | 'relief' | 'minor';
     };
-
-export interface EmploymentReview {
-  readonly scope: Scope;
-  readonly assessed: readonly Assessed[];
-  readonly offerPass: boolean;
-}

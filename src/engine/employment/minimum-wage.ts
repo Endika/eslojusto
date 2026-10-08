@@ -232,6 +232,26 @@ function annualPay(input: EmploymentInput, rate: number, hoursWorld: HoursWorld)
   }
 }
 
+// The contract's money carried to a year when no reading is in doubt: null for an hour rate with
+// only yearly hours or without hours, for extra payments of unknown size, and when the payments and
+// the extra pays answer contradict each other. Unprorated extra pays of a monthly salary are taken
+// as a whole month only when nothing but base pay is stated: many agreements pay them on base
+// salary alone (art. 31 ET leaves their amount to the agreement).
+export function contractAnnualPay(input: EmploymentInput): number | null {
+  const { salary, extraPays } = input;
+  if (hoursInDoubt(input)) return null;
+  if (
+    extraPays !== null &&
+    (extraPays.count !== extraPaysOf(salary) || extraPays.prorated !== salary.prorated)
+  )
+    return null;
+  const onlyBase = breakdownGap(salary) === 0 && salary.breakdown.every((c) => c.kind === 'base');
+  if (salary.period === 'month' && !salary.prorated && extraPaysOf(salary) > 0 && !onlyBase)
+    return null;
+  const pay = annualPay(input, salary.amount, 'effective_hours');
+  return pay === null || pay.extraPaysUnknown ? null : round2(pay.annual);
+}
+
 // Art. 1 of each decree and art. 12.1 ET: a shorter working time earns the minimum pro rata to the
 // agreement's full time, else to the legal 40 hours; a longer one never raises it. Null if unknown.
 export function partTimeCoefficient(input: EmploymentInput): number | null {
