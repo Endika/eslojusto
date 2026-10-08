@@ -33,6 +33,18 @@ export const belowMinimum = contract({
   },
 });
 
+// 50 € a day for a production contract of 76 days in 2026: the daily minimum is 57,82 €.
+export const shortDayRate = contract({
+  startDate: f('2026-08-01'),
+  endDate: f('2026-10-15'),
+  signedOn: null,
+  modality: 'production',
+  causeStated: true,
+  circumstancesStated: true,
+  salary: { amount: 50, period: 'day', payments: 12, prorated: false, breakdown: [], inKind: null },
+  extraPays: { count: 0, prorated: false },
+});
+
 // A work-or-service contract after the 2021 reform.
 export const workOrService = contract({
   startDate: f('2023-05-02'),
@@ -60,6 +72,7 @@ export const unknownComplement = contract({
 // Many corners of the review at once, so every phrase they produce is worded.
 export const corners: readonly EmploymentInput[] = [
   belowMinimum,
+  shortDayRate,
   workOrService,
   unknownComplement,
   contract({

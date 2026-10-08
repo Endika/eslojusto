@@ -10,6 +10,7 @@ import {
   contract,
   corners,
   review,
+  shortDayRate,
   tr,
   unknownComplement,
   workOrService,
@@ -120,7 +121,26 @@ describe('the employment result', () => {
     expect(text(smi?.querySelector('[data-status-text]'))).toMatch(
       /Por debajo del SMI: unos 990\s€ al año/,
     );
-    expect(text(smi?.querySelector('[data-total]'))).toMatch(/unos 770\s€ en total/);
+    expect(text(smi?.querySelector('[data-total]'))).toMatch(/^Desde 2026, unos 770\s€ en total/);
+    expect(text(smi?.querySelector('[data-total]'))).toMatch(/art\. 59\.2/);
+  });
+
+  it('keeps the cents of a shortfall per working day', () => {
+    const root = render(shortDayRate, false);
+    const smi = card(root, 'Salario por jornada frente al SMI');
+    expect(text(smi?.querySelector('[data-status-text]'))).toMatch(
+      /^Por debajo del SMI: 7,82\s€ por jornada$/,
+    );
+    expect(smi?.querySelector<HTMLElement>('[data-total]')?.hidden).toBe(true);
+    expect(text(card(root, 'Pagas extra')?.querySelector('[data-status-text]'))).toBe(
+      'Dentro del límite',
+    );
+  });
+
+  it('gives no total since the start when years before the table are left out', () => {
+    const root = render({ ...belowMinimum, startDate: f('2021-06-01') }, false);
+    const smi = card(root, 'Salario frente al SMI');
+    expect(smi?.querySelector<HTMLElement>('[data-total]')?.hidden).toBe(true);
   });
 
   it('quotes art. 15.4 for a work-or-service contract, with the law’s words', () => {
@@ -140,7 +160,9 @@ describe('the employment result', () => {
     const readings = [...(smi?.querySelectorAll('[data-readings] li') ?? [])].map(text);
     expect(readings).toHaveLength(2);
     expect(readings.join(' | ')).toMatch(/Si cuentan todos los complementos: dentro del límite/);
-    expect(readings.join(' | ')).toMatch(/Si solo cuentan .*: por debajo del SMI en unos/);
+    expect(readings.join(' | ')).toMatch(
+      /Si solo cuentan .*: por debajo del SMI en unos [\d.]+\s€ al año/,
+    );
   });
 
   it('leaves the detail out entirely while it is locked', () => {

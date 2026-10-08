@@ -131,7 +131,7 @@ for (const { name, viewport } of SIZES) {
       );
       await expect(card.getByRole('link', { name: /art\. 27\.1/ })).toBeVisible();
       await expect(page.getByRole('region', { name: 'Resumen' })).toContainText(
-        'Hay puntos por debajo de lo que garantiza la ley',
+        'Hay puntos que no cumplen lo que marca la ley.',
       );
       // Without the documents API the detail is all there, year by year.
       await card.getByText('Cómo se calcula').click();

@@ -320,6 +320,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         hint={tx('employment.salary.prorated_hint')}
         layout="pair"
         options={yesNo}
+        attributes={{ 'data-if-not': 'extraPays:0 ', hidden: '' }}
       />
       <EmploymentChoice
         name="hasBreakdown"
@@ -624,6 +625,12 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         {tx('employment.trial.question')}
       </h2>
       <EmploymentChoice
+        name="technical"
+        legend={tx('employment.trial.technical')}
+        hint={tx('employment.trial.technical_hint')}
+        options={yesNoUnknown}
+      />
+      <EmploymentChoice
         name="hasTrial"
         legend={tx('employment.trial.ask')}
         layout="pair"
@@ -638,12 +645,6 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
             options={TRIAL_UNITS.map((u) => ({ value: u, label: tx(`employment.unit.${u}`) }))}
           />
         </div>
-        <EmploymentChoice
-          name="technical"
-          legend={tx('employment.trial.technical')}
-          hint={tx('employment.trial.technical_hint')}
-          options={yesNoUnknown}
-        />
         <EmploymentChoice
           name="smallCompany"
           legend={tx('employment.trial.small_company')}

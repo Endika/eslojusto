@@ -1,8 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate as f } from '../../src/engine/date';
-import { amountOf, headline, shortfallOf, shownOne, shownPair } from '../../src/employment/summary';
+import {
+  amountOf,
+  figureOf,
+  headline,
+  shortfallOf,
+  shownOne,
+  shownPair,
+  sinceOf,
+} from '../../src/employment/summary';
 import { finding } from '../engine/employment/input';
-import { belowMinimum, contract, review, workOrService } from './fixtures';
+import { belowMinimum, contract, review, shortDayRate, workOrService } from './fixtures';
 
 describe('the free summary', () => {
   it('rounds one amount to tens, never down to «0 €»', () => {
@@ -35,6 +43,39 @@ describe('the free summary', () => {
     expect(smi?.kind).toBe('single');
     if (smi?.kind !== 'single') return;
     expect(shortfallOf(smi.finding)).toEqual({ per: 'year', year: 2026, amount: 994 });
+  });
+
+  it('heads the summary as the engine opens the pass: missing information is only to review', () => {
+    const r = review(
+      contract({
+        startDate: f('2026-01-01'),
+        signedOn: null,
+        schedule: null,
+        info: Object.fromEntries(
+          'abcdefghijklmnopq'.split('').map((e) => [e, e === 'o' ? 'absent' : 'present']),
+        ) as never,
+      }),
+    );
+    expect(r.offerPass).toBe(false);
+    expect(headline(r)).toBe('to_review');
+  });
+
+  it('adds up the years compared from the first one, and not when a year is left out', () => {
+    const smi = (input: Parameters<typeof review>[0]) => {
+      const a = review(input).items[0];
+      if (a?.kind !== 'single') throw new Error('expected a single finding');
+      return a.finding;
+    };
+    expect(sinceOf(smi(belowMinimum))).toEqual({ from: 2026, amount: 765.24 });
+    // 2021 and 2022 are before the table: the total would not cover them.
+    expect(sinceOf(smi({ ...belowMinimum, startDate: f('2021-06-01') }))).toBeNull();
+  });
+
+  it('reads a short day-rate shortfall per working day', () => {
+    const r = review(shortDayRate);
+    const smi = r.items[0];
+    if (smi?.kind !== 'single') throw new Error('expected a single finding');
+    expect(figureOf(smi.finding)).toEqual({ per: 'day', amount: 7.82 });
   });
 
   it('heads the summary by what it found', () => {

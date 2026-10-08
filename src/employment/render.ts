@@ -30,7 +30,7 @@ import { amountEl, pieces, shownAmount, type Piece, type Shown } from '../calcul
 import type { ClientKey, Translate } from '../i18n/client';
 import type { FieldError } from './form';
 import type { OutOfScopeReason } from './ports';
-import { amountOf, headline, shortfallOf, shownOne, shownPair, stateOf } from './summary';
+import { figureOf, headline, shownOne, shownPair, sinceOf, stateOf, type Euros } from './summary';
 
 // «2025-03-14» → «14-03-2025».
 export const dayText = (iso: string): string => iso.split('-').reverse().join('-');
@@ -203,46 +203,40 @@ function link(url: string, text: string): HTMLAnchorElement {
 const approx = (s: Shown, tr: Translate): Piece[] =>
   s.cents ? shownAmount(s) : pieces(tr('client.employment.about'), { importe: shownAmount(s) });
 
+// A shortfall per working day is a few euros: it keeps its cents, never rounded to tens.
+const shownFigure = (f: Euros): Shown =>
+  f.per === 'day' ? { amount: f.amount, cents: true } : shownOne(f.amount);
+
 // A finding's status in words, with its euros when it carries them: «Por debajo del SMI: unos
-// 900 € al año».
-function statusPieces(f: Finding, tr: Translate, shown?: Shown): Piece[] {
-  const amount = amountOf(f);
-  if (amount === null) return [tr(`client.employment.status.${f.status}`)];
-  const shortfall = shortfallOf(f);
-  if (shortfall !== null)
-    return pieces(tr(`client.employment.status.below_minimum_${shortfall.per}`), {
-      importe: approx(shownOne(shortfall.amount), tr),
-    });
-  return pieces(
-    tr(
-      f.id === 'smi_monthly'
-        ? 'client.employment.status.below_minimum_payslips'
-        : 'client.employment.status.below_minimum_amount',
-    ),
-    { importe: approx(shown ?? shownOne(amount), tr) },
-  );
+// 900 € al año», «Por debajo del SMI: 7,82 € por jornada».
+function statusPieces(f: Finding, tr: Translate): Piece[] {
+  const figure = figureOf(f);
+  if (figure === null) return [tr(`client.employment.status.${f.status}`)];
+  return pieces(tr(`client.employment.status.below_minimum_${figure.per}`), {
+    importe: approx(shownFigure(figure), tr),
+  });
 }
 
 // One reading in words, lower case, with its euros when it carries them.
 function readingPieces(f: Finding, tr: Translate, shown: Shown | null): Piece[] {
-  const amount = amountOf(f);
-  if (amount === null || shown === null)
+  const figure = figureOf(f);
+  if (figure === null || shown === null)
     return [tr(`client.employment.reading_status.${f.status}`)];
-  return pieces(tr('client.employment.reading_status.below_minimum_amount'), {
+  return pieces(tr(`client.employment.reading_status.below_minimum_${figure.per}`), {
     importe: approx(shown, tr),
   });
 }
 
-// The amounts each reading shows: two readings with euros are rounded as a pair, so the range
-// never reads as one figure.
+// The amounts each reading shows: two readings with euros of the same kind are rounded as a pair,
+// so the range never reads as one figure.
 function readingAmounts(readings: readonly Reading[]): (Shown | null)[] {
-  const amounts = readings.map((r) => amountOf(r.finding));
-  const [a, b] = amounts;
-  if (amounts.length === 2 && a != null && b != null) {
-    const [low, high] = shownPair(Math.min(a, b), Math.max(a, b));
-    return a <= b ? [low, high] : [high, low];
+  const figures = readings.map((r) => figureOf(r.finding));
+  const [a, b] = figures;
+  if (figures.length === 2 && a && b && a.per === b.per && a.per !== 'day') {
+    const [low, high] = shownPair(Math.min(a.amount, b.amount), Math.max(a.amount, b.amount));
+    return a.amount <= b.amount ? [low, high] : [high, low];
   }
-  return amounts.map((n) => (n === null ? null : shownOne(n)));
+  return figures.map((f) => (f === null ? null : shownFigure(f)));
 }
 
 const uniqueSources = (sources: readonly NormSource[]): NormSource[] =>
@@ -420,16 +414,16 @@ function fillAssessed(
       ? tr('client.employment.note.agreement')
       : null,
   );
-  const first = findings[0];
-  const since =
-    assessed.kind === 'single' && first !== undefined && shortfallOf(first)?.per === 'year'
-      ? amountOf(first)
-      : null;
+  // The total since the first year compared, never more than the years it covers.
+  const since = assessed.kind === 'single' ? sinceOf(assessed.finding) : null;
   const total = find(el, '[data-total]');
   total.hidden = since === null;
   if (since !== null)
     total.replaceChildren(
-      ...pieces(tr('client.employment.since_start'), { importe: approx(shownOne(since), tr) }),
+      ...pieces(tr('client.employment.since_year'), {
+        anio: String(since.from),
+        importe: approx(shownOne(since.amount), tr),
+      }),
     );
   renderLiteral(find(el, '[data-literal]'), findings, tr);
   renderRules(

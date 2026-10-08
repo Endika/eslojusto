@@ -506,7 +506,8 @@ function read(form: HTMLFormElement): Reading {
     const amount = figure('salaryAmount', true);
     const period = choice('salaryPeriod', SALARY_PERIODS);
     const extras = whole('extraPays', true);
-    const prorated = yesNo('extraProrated');
+    // Without extra pays there is nothing to prorate, and the question is not asked.
+    const prorated = asked('extraProrated') ? yesNo('extraProrated') : false;
     const inKind = figure('inKind', false);
     const breakdown: SalaryComponent[] = [];
     if (text('hasBreakdown') === 'yes') {

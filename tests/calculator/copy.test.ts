@@ -65,7 +65,7 @@ const EMPLOYMENT_FORBIDDEN = [
   /\bte convierte en fij[oa]\b/,
   /\bya eres\b/,
   /\bpasas a ser\b/,
-  /\bte deben\b/,
+  /\bte deben?\b/,
 ];
 
 const employmentCopy: readonly (readonly [string, string])[] = [

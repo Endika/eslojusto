@@ -1,7 +1,7 @@
 import type { Scope } from '../engine/employment/types';
 import { formScope, sheetApplies, type Sheet } from './form';
 
-const CONDITIONS = '[data-if], [data-row-if]';
+const CONDITIONS = '[data-if], [data-if-not], [data-row-if]';
 
 // The value a control group holds now: the checked radio, or the field's own value.
 function valueIn(scope: ParentNode, selector: string): string {
@@ -23,6 +23,11 @@ function holds(el: HTMLElement, form: HTMLFormElement): boolean {
   if (dataset['if'] !== undefined) {
     const [name = ''] = dataset['if'].split(':');
     if (!listed(dataset['if'], valueIn(form, `[name="${name}"]`))) return false;
+  }
+  // Asked unless the answer is one of these; an empty answer is listed as a trailing space.
+  if (dataset['ifNot'] !== undefined) {
+    const [name = ''] = dataset['ifNot'].split(':');
+    if (listed(dataset['ifNot'], valueIn(form, `[name="${name}"]`).trim())) return false;
   }
   if (dataset['rowIf'] !== undefined) {
     const [key = ''] = dataset['rowIf'].split(':');
