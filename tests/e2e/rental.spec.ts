@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { nextSheet } from '../support/sheets';
 
 // Every case reads the indices and norms as loaded on this day, so the clock is fixed to it.
 const TODAY = new Date('2026-10-08T12:00:00');
@@ -31,7 +32,7 @@ interface Case extends Contract {
 }
 
 const sheet = (page: Page, name: string) => page.getByRole('group', { name, exact: true });
-const next = (page: Page) => page.getByRole('button', { name: 'Siguiente' }).click();
+const next = nextSheet;
 
 async function open(page: Page, viewport: { width: number; height: number }) {
   await page.clock.setFixedTime(TODAY);

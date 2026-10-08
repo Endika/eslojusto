@@ -3,6 +3,7 @@ import { devices, test, expect, type Locator, type Page, type Request } from '@p
 import { pdfBomb, syntheticPdf } from '../support/synthetic-pdf';
 import { syntheticPhoto } from '../support/synthetic-photo';
 import { imageDimensions } from '../../api/src/domain/image-dimensions';
+import { nextSheet } from '../support/sheets';
 
 // Runs only against a TEST_DOCUMENTS=1 build, whose API is three fake origins: every request to them,
 // to Turnstile and to Stripe is answered here. The documents are synthetic.
@@ -197,7 +198,7 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
     'Leído del documento · confianza alta',
   );
   await expect(page.locator('#resultado')).toBeHidden();
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await next();
   await expect(page.getByLabel('Fecha de alta', { exact: true })).toHaveValue('2010-03-01');
   await expect(page.locator('[data-field="endDate"] .read-mark')).toHaveText(
@@ -356,7 +357,7 @@ async function expectNoDetail(result: Locator) {
 // The read values, confirmed sheet by sheet with the answers a document can't give.
 async function confirmToResult(page: Page) {
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await next();
   await next();
   await next();
@@ -383,7 +384,7 @@ test('the situations of a possibly null dismissal reach no request, and come bac
   await page.goto('finiquito/');
   await uploadSettlement(page);
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await next();
   await next();
   await page.getByLabel('Sí, marcar cuáles').check();
@@ -423,7 +424,7 @@ test('a pass holder with nothing short gets the general letter, and no offer to 
   await page.goto('finiquito/');
   await uploadSettlement(page);
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await next();
   await next();
   await next();
@@ -942,7 +943,7 @@ test('an objective dismissal with an agreement: the reference and the offer, sid
   await page.goto('finiquito/');
   await uploadSettlement(page);
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await next();
   await next();
   await next();

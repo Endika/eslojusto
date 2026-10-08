@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { nextSheet } from '../support/sheets';
 
 // One smoke per case page: its own heading and metadata, valid JSON-LD that matches what the page
 // shows, the cause already marked, a review that completes, and no horizontal scroll on a phone.
@@ -64,7 +65,7 @@ const graph = async (page: Page) =>
     }
   )['@graph'];
 
-const next = (page: Page) => page.getByRole('button', { name: 'Siguiente' }).click();
+const next = nextSheet;
 
 // From wherever the page opens to the result, with whatever cause it marked (or a dismissal).
 async function review(page: Page) {

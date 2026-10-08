@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
+import { nextSheet } from '../support/sheets';
 
 // Every case reads the minimum wage and the norms as loaded on this day, so the clock is fixed.
 const TODAY = new Date('2026-10-08T12:00:00');
@@ -36,11 +37,7 @@ async function fits(page: Page) {
 
 async function next(page: Page) {
   await fits(page);
-  await page.getByRole('button', { name: 'Siguiente' }).click();
-  // The page turn moves in steps, so a click during it can land beside its target.
-  await page.waitForFunction(() =>
-    document.getAnimations().every((a) => a.playState !== 'running'),
-  );
+  await nextSheet(page);
 }
 
 async function open(page: Page, viewport: { width: number; height: number }, today = TODAY) {

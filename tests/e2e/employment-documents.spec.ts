@@ -1,6 +1,7 @@
 import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { syntheticPhoto } from '../support/synthetic-photo';
+import { nextSheet } from '../support/sheets';
 
 // Runs only against a TEST_DOCUMENTS=1 build, which has /contrato/ too: every request to the fake
 // API, to Turnstile and to Stripe is answered here. The documents, companies and figures are
@@ -261,13 +262,7 @@ const choose = (scope: Locator, name: string, value: string) =>
   question(scope, name).getByLabel(value, { exact: true }).check();
 const markOf = (page: Page, field: string) => page.locator(`[data-field="${field}"] > .read-mark`);
 
-async function next(page: Page) {
-  await page.getByRole('button', { name: 'Siguiente' }).click();
-  // The page turn moves in steps, so a click during it can land beside its target.
-  await page.waitForFunction(() =>
-    document.getAnimations().every((a) => a.playState !== 'running'),
-  );
-}
+const next = nextSheet;
 
 // The relationship and the contract's type, read; the answers no document gives.
 async function confirmStart(page: Page) {

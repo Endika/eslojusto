@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { syntheticPhoto } from '../support/synthetic-photo';
+import { nextSheet } from '../support/sheets';
 
 // Runs only against a TEST_DOCUMENTS=1 build: the read below comes from a fake extract function.
 // The work history is synthetic.
@@ -54,7 +55,7 @@ async function readToOtherJobs(page: Page) {
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await next();
   await next();
   await next();

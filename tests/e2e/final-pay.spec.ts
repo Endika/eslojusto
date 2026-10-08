@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { nextSheet } from '../support/sheets';
 
 const ORIGIN = `http://localhost:${process.env['E2E_PORT'] ?? 4321}`;
 
@@ -6,7 +7,7 @@ test('unfair dismissal with a short severance → below the minimum, with the di
   page,
 }) => {
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByLabel('Despido improcedente').check();
   await next();
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2010-03-01');
@@ -46,10 +47,10 @@ test('unfair dismissal with a short severance → below the minimum, with the di
 test('a date error is announced next to its field', async ({ page }) => {
   await page.goto('finiquito/');
   await page.getByLabel('Baja voluntaria (dimisión)').check();
-  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await nextSheet(page);
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2026-05-01');
   await page.getByLabel('Fecha de baja', { exact: true }).fill('2026-04-01');
-  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await nextSheet(page);
   await expect(page.getByLabel('Fecha de baja', { exact: true })).toHaveAttribute(
     'aria-invalid',
     'true',
@@ -62,7 +63,7 @@ test('each sheet fits in 360×640 and a completed section can be reopened', asyn
   await page.goto('finiquito/');
   await page.getByLabel('Baja voluntaria (dimisión)').check();
   await expect(page.getByRole('button', { name: 'Siguiente' })).toBeInViewport();
-  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await nextSheet(page);
   await page.getByRole('link', { name: /Causa/ }).click();
   await expect(page.getByLabel('Baja voluntaria (dimisión)')).toBeChecked();
 });
@@ -74,7 +75,7 @@ test('a pending section is not a link until it is reached', async ({ page }) => 
   await expect(strip.getByRole('link')).toHaveCount(1);
   await expect(strip.locator('[data-tab="dates"]')).toHaveAttribute('aria-disabled', 'true');
   await page.getByLabel('Baja voluntaria (dimisión)').check();
-  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await nextSheet(page);
   await expect(strip.getByRole('link')).toHaveCount(2);
   await expect(strip.getByRole('link', { name: /Fechas/ })).toHaveAttribute('aria-current', 'step');
   await expect(page.locator('a:not([href])')).toHaveCount(0);
@@ -119,7 +120,7 @@ test('a figure with a decimal comma and thousands dots reads in Spanish format',
   page,
 }) => {
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByLabel('Baja voluntaria (dimisión)').check();
   await next();
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2025-01-01');
@@ -214,7 +215,7 @@ async function fitsAboveBar(page: Page) {
 test('fixed-term end: every sheet fits in 360×640, the conditional ones too', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByLabel('Fin de contrato temporal').check();
   await fitsAboveBar(page);
   await next();
@@ -269,7 +270,7 @@ test('whoever is paid exactly the legal minimum sees «Coincide» on every item'
   page,
 }) => {
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByLabel('Despido objetivo').check();
   await next();
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2018-05-03');
@@ -327,7 +328,7 @@ test('with prorated extra pay, the salary carries the share and the severance co
   page,
 }) => {
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByLabel('Despido improcedente').check();
   await next();
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2018-05-03');
@@ -358,7 +359,7 @@ test('holidays count in working days by default; the yearly figure follows the u
   page,
 }) => {
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByLabel('Despido improcedente').check();
   await next();
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2021-04-12');
@@ -412,7 +413,7 @@ test('a collective dismissal during a reduced ERTE: the salary from before, «o 
 }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByLabel('Despido colectivo (ERE)').check();
   await expect(page.getByText('Por un ERE de tu empresa.')).toBeVisible();
   await fitsAboveBar(page);
@@ -471,7 +472,7 @@ test('«No lo sé» as the cause: no severance, and the null warning for what wa
   page,
 }) => {
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByRole('radio', { name: 'No lo sé' }).check();
   await expect(page.getByText('Está en la carta y en el certificado de empresa.')).toBeVisible();
   await next();
@@ -519,7 +520,7 @@ test('«No lo sé» as the cause: no severance, and the null warning for what wa
 
 test('an ERTE not known gives a warning only', async ({ page }) => {
   await page.goto('finiquito/');
-  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  const next = () => nextSheet(page);
   await page.getByLabel('Despido improcedente').check();
   await next();
   await page.getByLabel('Fecha de alta', { exact: true }).fill('2020-01-01');

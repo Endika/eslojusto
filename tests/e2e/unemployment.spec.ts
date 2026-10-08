@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
+import { nextSheet } from '../support/sheets';
 
-const next = (page: Page) => page.getByRole('button', { name: 'Siguiente' }).click();
+const next = nextSheet;
 
 // From the cause to the sheet after holidays and notice, with prorated extra pay and no days taken.
 async function toHolidays(page: Page, cause: string, startDate: string, endDate: string) {
