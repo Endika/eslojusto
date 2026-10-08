@@ -1,11 +1,13 @@
 import type { PageKind, SourceKind } from './documents';
 import { ALL_SECTIONS, type Confidence, type SectionKind } from './extraction-schema';
+import { hasIdentifier } from './identifiers';
 import {
   withLineTotals,
   withinTolerance,
   type ExtractedRow,
   type ExtractedValue,
   type Reading,
+  type Section,
 } from './extraction';
 
 export type From = readonly [SectionKind, string];
@@ -161,6 +163,40 @@ export function mergeFields<N extends string>(
     if (others.length > 0) conflicts.push({ field: name, sources: [kept.source, ...others] });
   }
   return { fields, conflicts, discarded };
+}
+
+// A text copied from a document that still holds an identifier is dropped: the text alone, never
+// the figures beside it. `fields` and `items` name the copied texts of the section and its rows.
+export function withoutIdentifiers(
+  section: Section,
+  texts: { readonly fields: readonly string[]; readonly items: readonly string[] },
+  leaks: (text: string) => boolean = hasIdentifier,
+): { readonly section: Section; readonly dropped: number } {
+  const carries = (v: unknown): boolean => typeof v === 'string' && leaks(v);
+  let dropped = 0;
+  const fields = Object.fromEntries(
+    Object.entries(section.fields).filter(([name, field]) => {
+      const leaking = texts.fields.includes(name) && carries(field.value);
+      if (leaking) dropped += 1;
+      return !leaking;
+    }),
+  );
+  const lists = Object.fromEntries(
+    Object.entries(section.lists).map(([name, rows]) => [
+      name,
+      rows.map((row) => {
+        const values = Object.fromEntries(
+          Object.entries(row.values).filter(([item, v]) => {
+            const leaking = texts.items.includes(item) && carries(v);
+            if (leaking) dropped += 1;
+            return !leaking;
+          }),
+        );
+        return { ...row, values };
+      }),
+    ]),
+  );
+  return { section: { fields, lists }, dropped };
 }
 
 export function merge(read: Reading): Merged {

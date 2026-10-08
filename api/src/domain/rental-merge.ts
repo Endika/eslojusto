@@ -1,6 +1,5 @@
 import type { Reading, Section } from './extraction';
 import type { SectionKind } from './extraction-schema';
-import { hasIdentifier } from './identifiers';
 import {
   groupDocuments,
   mergeFields,
@@ -10,6 +9,7 @@ import {
   type MergedField,
   type MergedRow,
   type RecognisedDocument,
+  withoutIdentifiers,
 } from './merge';
 import { RENTAL_SECTIONS, type RentalSectionKind } from './rental-schema';
 
@@ -71,54 +71,18 @@ function withoutPersonsName(lease: Section): {
   return { section: { ...lease, fields }, dropped: 1 };
 }
 
-const FREE_TEXT_FIELDS = [
-  'updateClauseText',
-  'chargesClauseText',
-  'feesText',
-  'landlordCompanyName',
-];
-const FREE_TEXT_ITEMS = ['concept'];
-
-const carriesIdentifier = (v: unknown): boolean => typeof v === 'string' && hasIdentifier(v);
-
-// A text copied from a document that still holds a DNI, an IBAN, an email or a phone is dropped:
-// the text alone, never the figures beside it.
-function withoutIdentifiers(section: Section): {
-  readonly section: Section;
-  readonly dropped: number;
-} {
-  let dropped = 0;
-  const fields = Object.fromEntries(
-    Object.entries(section.fields).filter(([name, field]) => {
-      const leaks = FREE_TEXT_FIELDS.includes(name) && carriesIdentifier(field.value);
-      if (leaks) dropped += 1;
-      return !leaks;
-    }),
-  );
-  const lists = Object.fromEntries(
-    Object.entries(section.lists).map(([name, rows]) => [
-      name,
-      rows.map((row) => {
-        const values = Object.fromEntries(
-          Object.entries(row.values).filter(([item, v]) => {
-            const leaks = FREE_TEXT_ITEMS.includes(item) && carriesIdentifier(v);
-            if (leaks) dropped += 1;
-            return !leaks;
-          }),
-        );
-        return { ...row, values };
-      }),
-    ]),
-  );
-  return { section: { fields, lists }, dropped };
-}
+// Texts copied from a lease, an invoice or a deposit return.
+const FREE_TEXTS = {
+  fields: ['updateClauseText', 'chargesClauseText', 'feesText', 'landlordCompanyName'],
+  items: ['concept'],
+};
 
 export function rentalMerge(read: Reading): RentalMerged {
   let dropped = 0;
   const sections: Partial<Record<SectionKind, Section>> = {};
   for (const [kind, section] of Object.entries(read.sections) as [SectionKind, Section][]) {
     const named = kind === 'lease' ? withoutPersonsName(section) : { section, dropped: 0 };
-    const cleaned = withoutIdentifiers(named.section);
+    const cleaned = withoutIdentifiers(named.section, FREE_TEXTS);
     sections[kind] = cleaned.section;
     dropped += named.dropped + cleaned.dropped;
   }
