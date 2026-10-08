@@ -146,14 +146,14 @@ const documents = DOCUMENTS !== null;
               ))}
             </ul>
           )}
-          {soon(group).length > 0 && (
-            <p class="group__soon">
-              {t(lang, 'home.coming_soon', { secciones: soon(group).join(', ') })}
-            </p>
-          )}
           {group.more && (
             <p class="group__more">
               <a href={group.more.href}>{tx(group.more.label)}</a>
+            </p>
+          )}
+          {soon(group).length > 0 && (
+            <p class="group__soon">
+              {t(lang, 'home.coming_soon', { secciones: soon(group).join(', ') })}
             </p>
           )}
         </section>
