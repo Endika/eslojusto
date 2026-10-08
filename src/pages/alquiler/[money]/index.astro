@@ -1,0 +1,20 @@
+---
+import type { GetStaticPaths } from 'astro';
+import RentalDeposit from '../../../views/RentalDeposit.astro';
+import RentalDepositReturn from '../../../views/RentalDepositReturn.astro';
+import RentalCharges from '../../../views/RentalCharges.astro';
+import { RENTAL_BUILD } from '../../../content/sections';
+import { RENTAL_PAGES } from '../../../content/rental-pages';
+
+// Without PUBLIC_RENTAL=1 the build has none of these pages.
+export const getStaticPaths = (() =>
+  RENTAL_BUILD
+    ? Object.values(RENTAL_PAGES).map(({ slug }) => ({ params: { money: slug } }))
+    : []) satisfies GetStaticPaths;
+
+const { money } = Astro.params;
+---
+
+{money === RENTAL_PAGES.deposit_return.slug && <RentalDepositReturn />}
+{money === RENTAL_PAGES.deposit.slug && <RentalDeposit />}
+{money === RENTAL_PAGES.charges.slug && <RentalCharges />}

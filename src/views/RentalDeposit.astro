@@ -1,0 +1,100 @@
+---
+import RentalTopic from './RentalTopic.astro';
+import { NORMS } from '../engine/rental/data/norms';
+import { REVIEW, RENTAL_PAGES, decreeStatus, depositExample } from '../content/rental-pages';
+import { formatEuros, formatLongDay } from '../content/rent-indices';
+import { link } from '../i18n/languages';
+
+const ex = depositExample();
+const rdl29 = NORMS.rdl29_2026;
+const href = (path: string) => link('es', path.replace(/^\//, ''));
+---
+
+<RentalTopic id="deposit">
+  <section class="sheet sheet--text" aria-labelledby="fianza-legal">
+    <h2 id="fianza-legal">La fianza: una mensualidad</h2>
+    <p>
+      La fianza es obligatoria y, en un alquiler de vivienda, es de una mensualidad de renta en
+      metálico (art. 36.1 LAU).
+    </p>
+    <p>
+      Cuando acabe el contrato y entregues las llaves, te la deben devolver en un mes:{' '}
+      <a href={href(RENTAL_PAGES.deposit_return.path)}>{RENTAL_PAGES.deposit_return.name}</a>.
+    </p>
+    <p class="folio">
+      Art. <span>36.1</span> LAU
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="garantia-adicional">
+    <h2 id="garantia-adicional">Otras garantías: hasta dos mensualidades más</h2>
+    <p>
+      Además de la fianza, el contrato puede pedir otra garantía: más dinero, un aval o un seguro.
+      En los contratos firmados desde el 6 de marzo de 2019 de hasta cinco años, o hasta siete si el
+      casero es una empresa, esa garantía adicional no puede pasar de dos mensualidades de renta
+      (art. 36.5 LAU).
+    </p>
+    <p>
+      Un aval o un seguro no es dinero entregado: la revisión los señala para que los mires, sin
+      cifra. Solo compara con el tope el dinero que pagaste.
+    </p>
+    <p class="folio">
+      Art. <span>36.5</span> LAU
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="adelantado">
+    <h2 id="adelantado">Por adelantado: una mensualidad</h2>
+    <p>
+      Por adelantado, el casero no puede exigir más de una mensualidad de renta (art. 17.2 LAU).
+    </p>
+    <p class="folio">
+      Art. <span>17.2</span> LAU
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="seguro">
+    <h2 id="seguro">El seguro de impago ya no puede ser para ti</h2>
+    <p>
+      El Real Decreto-ley 29/2026, en vigor desde el {formatLongDay(rdl29.inForceSince)} y{' '}
+      {decreeStatus(rdl29)}, dice que no se puede exigir al inquilino que contrate un seguro de
+      impago de la renta ni otra cobertura parecida (art. 3.Diecisiete, que reforma el art. 36.5
+      LAU).
+    </p>
+    <p>
+      Antes de esa fecha, que un seguro cuente dentro del tope de dos mensualidades no está
+      resuelto, y la revisión lo da como información.
+    </p>
+    <p class="status" role="note">
+      Estado de la norma: {decreeStatus(rdl29)}. Si el Congreso la deroga, esta página cambiará.
+    </p>
+    <p class="folio">
+      Art. <span>3.Diecisiete</span> RDL 29/2026
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="ejemplo">
+    <h2 id="ejemplo">Ejemplo resuelto</h2>
+    <p>
+      Con una renta de {formatEuros(ex.rent)}, un casero pide {formatEuros(ex.asked)} en dinero
+      antes de entrar: la fianza y garantías adicionales.
+    </p>
+    <p class="example">
+      <span class="example__label">Las cuentas</span> La fianza es una mensualidad,{' '}
+      {formatEuros(ex.rent)}, y la garantía adicional puede ser de dos, {formatEuros(2 * ex.rent)}.
+      Lo máximo es {formatEuros(ex.allowed)}. Te piden {formatEuros(ex.asked)}:{' '}
+      {formatEuros(ex.over)} por encima del tope.
+    </p>
+    <p class="folio">
+      Art. <span>36.1 · 36.5</span> LAU
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="revision">
+    <h2 id="revision">Comprueba lo que te han pedido</h2>
+    <p>
+      La <a href={href(REVIEW.path)}>revisión del alquiler</a> compara con estos topes la fianza,
+      las garantías y el pago por adelantado de tu contrato, y te dice cuánto pasa de cada tope.
+    </p>
+  </section>
+</RentalTopic>

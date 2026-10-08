@@ -1,0 +1,90 @@
+---
+import RentalTopic from './RentalTopic.astro';
+import { NORMS } from '../engine/rental/data/norms';
+import { REVIEW, decreeStatus, chargesExample } from '../content/rental-pages';
+import { formatEuros, formatLongDay } from '../content/rent-indices';
+import { link } from '../i18n/languages';
+
+const ex = chargesExample();
+const rdl29 = NORMS.rdl29_2026;
+const href = (path: string) => link('es', path.replace(/^\//, ''));
+---
+
+<RentalTopic id="charges">
+  <section class="sheet sheet--text" aria-labelledby="pacto">
+    <h2 id="pacto">Solo con pacto por escrito y su importe anual</h2>
+    <p>
+      El casero solo puede cobrarte los gastos generales del edificio, los tributos o los servicios
+      sin contador si lo pactasteis por escrito y con su importe anual a la fecha del contrato (art.
+      20.1 LAU, en su redacción anterior al Real Decreto-ley 29/2026).
+    </p>
+    <p>
+      Si el contrato no los menciona o no da un importe al año, no puedes dar por hecho que te los
+      deban: la revisión lo señala para que lo mires. Puede haber un acuerdo posterior que no vemos.
+    </p>
+    <p class="folio">
+      Art. <span>20.1</span> LAU
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="subida">
+    <h2 id="subida">Cuánto pueden subir: el doble que la renta</h2>
+    <p>
+      En los cinco primeros años de contrato, o siete si el casero es una empresa, esos gastos,
+      salvo los tributos, solo pueden subir una vez al año, por acuerdo, y nunca más del doble de lo
+      que puede subir la renta (art. 20.2 LAU, que el Real Decreto-ley 29/2026 numera como 20.3).
+    </p>
+    <p>
+      Lo que se mide con un contador propio de la vivienda, como el agua o la luz, lo pagas tú (art.
+      20.3 LAU, que el Real Decreto-ley 29/2026 numera como 20.4).
+    </p>
+    <p class="folio">
+      Art. <span>20.2 · 20.3</span> LAU
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="ibi">
+    <h2 id="ibi">El IBI y las tasas</h2>
+    <p>
+      El Real Decreto-ley 29/2026, en vigor desde el {formatLongDay(rdl29.inForceSince)} y{' '}
+      {decreeStatus(rdl29)}, dice que los tributos de la vivienda, como el IBI, no pueden cargarse
+      al inquilino, salvo que sea el inquilino quien tiene que pagarlos (art. 3.Doce, que reforma el
+      art. 20.1 LAU). La revisión lo aplica a los contratos firmados desde esa fecha; en los
+      anteriores, lo da como información.
+    </p>
+    <p>
+      La tasa de basuras es un tributo en la mayoría de municipios, no en todos: la revisión la
+      señala para que la mires, sin compararla con el límite de subida.
+    </p>
+    <p class="status" role="note">
+      Estado de la norma: {decreeStatus(rdl29)}. Si el Congreso la deroga, esta página cambiará.
+    </p>
+    <p class="folio">
+      Art. <span>3.Doce</span> RDL 29/2026
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="ejemplo">
+    <h2 id="ejemplo">Ejemplo resuelto</h2>
+    <p>
+      Un contrato fija {formatEuros(ex.agreed)} al año de comunidad. El primer año, el casero cobra{' '}
+      {formatEuros(ex.charged)}.
+    </p>
+    <p class="example">
+      <span class="example__label">Las cuentas</span> Aún no ha podido haber ninguna subida, así que
+      el máximo es lo pactado, {formatEuros(ex.agreed)}. {formatEuros(ex.charged)} −{' '}
+      {formatEuros(ex.agreed)} = {formatEuros(ex.over)} de más.
+    </p>
+    <p class="folio">
+      Art. <span>20.1 · 20.2</span> LAU
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="revision">
+    <h2 id="revision">Comprueba lo que te cobran</h2>
+    <p>
+      La <a href={href(REVIEW.path)}>revisión del alquiler</a> compara cada gasto de cada año con lo
+      pactado y con el tope de subida, y te dice cuánto has pagado de más.
+    </p>
+  </section>
+</RentalTopic>

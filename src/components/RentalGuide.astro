@@ -36,6 +36,18 @@ const caps = capsCopy(lang, NORMS, {
   iravRate: irav.figure.rate,
   example: example(),
 });
+// The pages that go deeper into a block of the guide.
+const deeper: Partial<Record<(typeof blocks)[number]['id'], { href: string; label: string }>> = {
+  guarantees: { href: 'alquiler/fianza/', label: 'Fianza del alquiler: cuánto pueden pedirte' },
+  return: {
+    href: 'alquiler/devolucion-fianza/',
+    label: 'Tu casero no te devuelve la fianza: plazo e intereses',
+  },
+  charges: {
+    href: 'alquiler/gastos/',
+    label: 'IBI, comunidad y basura: qué puede cobrarte tu casero',
+  },
+};
 const faq = rentalFaqEntries(lang, NORMS, { documents, checkedOn });
 ---
 
@@ -96,6 +108,11 @@ const faq = rentalFaqEntries(lang, NORMS, { documents, checkedOn });
               </a>
             </p>
           </>
+        )}
+        {deeper[id] && (
+          <p>
+            <a href={link(lang, deeper[id].href)}>{deeper[id].label}</a>
+          </p>
         )}
         <h4 class="rules__title">{tx('rental.guide.norms')}</h4>
         <ul class="sources sources--wrap">

@@ -1,0 +1,107 @@
+---
+import RentalTopic from './RentalTopic.astro';
+import { LEGAL_INTEREST } from '../engine/rental/data/legal-interest';
+import { NORMS } from '../engine/rental/data/norms';
+import { REVIEW, RENTAL_PAGES, depositReturnExample } from '../content/rental-pages';
+import { formatDay, formatEuros, formatRate } from '../content/rent-indices';
+import { link } from '../i18n/languages';
+
+const ex = depositReturnExample();
+const href = (path: string) => link('es', path.replace(/^\//, ''));
+const [first, second] = ex.stretches;
+if (!first || !second) throw new Error('The example spans a year change.');
+const table = LEGAL_INTEREST[0]?.url;
+---
+
+<RentalTopic id="deposit_return">
+  <section class="sheet sheet--text" aria-labelledby="plazo">
+    <h2 id="plazo">El plazo: un mes desde que entregas las llaves</h2>
+    <p>
+      Cuando acaba el contrato y entregas las llaves, el casero tiene un mes para devolverte la
+      fianza. Pasado ese mes, lo que falte por devolver genera el interés legal del dinero (art.
+      36.4 LAU). No hace falta que lo reclames para que el interés corra.
+    </p>
+    <p>
+      El mes se cuenta de fecha a fecha: si entregas las llaves el 15 de noviembre, el plazo acaba
+      el 15 de diciembre y el interés corre desde el 16. Corre hasta el día en que te devuelven el
+      dinero, que ya no cuenta.
+    </p>
+    <p>
+      Solo genera interés la fianza, que es una mensualidad (art. 36.1 LAU). Si pagaste más, lo que
+      pasa de una mensualidad es otra garantía y esta cuenta no le calcula interés. Cuánta fianza
+      pueden pedirte: <a href={href(RENTAL_PAGES.deposit.path)}>{RENTAL_PAGES.deposit.name}</a>.
+    </p>
+    <p class="folio">
+      Art. <span>36.4 · 36.1</span> LAU
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="interes">
+    <h2 id="interes">Qué interés se aplica</h2>
+    <p>
+      El interés legal del dinero. Cada año lo fija la Ley de Presupuestos Generales del Estado, y
+      las cuentas usan el tipo del año natural de cada día. Los tipos de cada año están en la
+      <a href={table}>tabla del Banco de España</a>.
+    </p>
+    <p>
+      Ninguna norma dice si el año de intereses cuenta sus días naturales (365, o 366 en un año
+      bisiesto) o 360, así que damos las dos cuentas.
+    </p>
+    <p class="folio">
+      Art. <span>36.4</span> LAU
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="ejemplo">
+    <h2 id="ejemplo">Ejemplo resuelto</h2>
+    <p>
+      Una persona con una fianza de {formatEuros(ex.deposit)} entrega las llaves el{' '}
+      {formatDay(ex.keysReturnedOn)}. El casero se las acepta y le devuelve la fianza entera el{' '}
+      {formatDay(ex.returnedOn)}. El mes acabó el 15-12-2022, así que el interés corre desde el{' '}
+      {formatDay(ex.interestFrom)} y cruza el cambio de año, con el tipo de cada uno:
+    </p>
+    <ul>
+      <li>
+        Del {formatDay(first.from)} al {formatDay(first.to)} ({first.days} días) al{' '}
+        {formatRate(first.rate)}: {formatEuros(first.interest)}.
+      </li>
+      <li>
+        Del {formatDay(second.from)} al {formatDay(second.to)} ({second.days} días) al{' '}
+        {formatRate(second.rate)}: {formatEuros(second.interest)}.
+      </li>
+    </ul>
+    <p class="example">
+      <span class="example__label">Las cuentas</span> Cada tramo es la fianza por el tipo y por los
+      días, entre 100 y entre {first.yearDays} días del año: {formatEuros(ex.deposit)} ×{' '}
+      {formatRate(first.rate)} × {first.days} ÷ {first.yearDays} y {formatEuros(ex.deposit)} ×{' '}
+      {formatRate(second.rate)} × {second.days} ÷ {second.yearDays}. En total,{' '}
+      {formatEuros(ex.total)}
+      de intereses; si el año se cuenta a 360 días, {formatEuros(ex.totalCommercial)}.
+    </p>
+    <p class="folio">
+      Art. <span>36.4</span> LAU
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="no-valoramos">
+    <h2 id="no-valoramos">Lo que no valoramos</h2>
+    <p>
+      Si el casero se queda con parte de la fianza por desperfectos, limpieza u otros conceptos, la
+      revisión anota cada descuento como te lo han dado y lo resta de lo que falta por devolver. No
+      valora si está justificado ni cuánto cuesta un arreglo: eso solo puede decidirlo, en su caso,
+      un juzgado.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text" aria-labelledby="revision">
+    <h2 id="revision">Calcula lo que te deben</h2>
+    <p>
+      En la <a href={href(REVIEW.path)}>revisión del alquiler</a> escribes cuándo entregaste las
+      llaves, cuánto te han devuelto y cuándo. Te da lo que falta de la fianza y el interés, con las
+      dos cuentas del año, y puede preparar una carta para pedirlo.
+    </p>
+    <p>
+      {NORMS.lau.citation}: <a href={NORMS.lau.url}>texto consolidado en el BOE</a>.
+    </p>
+  </section>
+</RentalTopic>
