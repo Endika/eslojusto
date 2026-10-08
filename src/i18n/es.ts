@@ -497,7 +497,7 @@ export const es = {
     'Estos datos solo se usan para rellenar las cartas en tu dispositivo; no se envían ni se guardan.',
   'faq.pass': '¿Qué incluye el pase de 4,99 €?',
   'faq.pass_answer':
-    'Durante 7 días, y solo en el navegador con el que pagas, puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a descargar el informe y la carta sin pagar otra vez. No guardamos tu revisión en ningún sitio, así que conviene descargar el informe y la carta en cuanto pagas. El pase vive solo en ese navegador: en otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde, y «¿Ya has pagado?» solo lo recupera en el navegador con el que pagaste.',
+    'El pase vale para cualquier revisión durante 7 días, y solo en el navegador con el que pagas: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a descargar el informe y la carta sin pagar otra vez. No guardamos tu revisión en ningún sitio, así que conviene descargar el informe y la carta en cuanto pagas. El pase vive solo en ese navegador: en otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde, y «¿Ya has pagado?» solo lo recupera en el navegador con el que pagaste.',
   'faq.documents': '¿Qué pasa con mis documentos?',
   'faq.documents_answer':
     'Si subes tus documentos (la carta de despido, el finiquito, tus nóminas, el certificado de empresa o tu vida laboral), se envían cifrados a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo indica qué es cada página, copia solo los datos que necesita el formulario y no calcula nada. Ni el servidor ni el modelo guardan el documento: se procesa en memoria y se descarta. Antes de subirlo te pedimos tu consentimiento, porque una nómina puede mostrar datos sensibles. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
@@ -555,6 +555,43 @@ export const es = {
   'privacy.cookies': 'Sin cookies',
   'privacy.legal_basis': 'Por qué se mide',
   'privacy.controller': 'Responsable, contacto y derechos',
+  'privacy.rental.summary':
+    'La revisión del alquiler funciona igual: lo que escribes se calcula en tu navegador y no se guarda.',
+  'privacy.rental.data_review': 'Lo que escribes en la revisión del alquiler',
+  'privacy.rental.data_review_where':
+    'Solo en tu navegador, mientras la página está abierta. Las fechas de tu contrato, tus rentas y subidas, la fianza, los gastos y lo que te devolvieron se calculan en tu dispositivo y no se envían a ningún servidor ni se guardan. Al cerrar o recargar la página, desaparecen.',
+  'privacy.rental.data_documents': 'Los documentos del alquiler que subes',
+  'privacy.rental.data_documents_where':
+    'Solo si eliges subirlos y das tu consentimiento: el contrato, los avisos de subida, los recibos, la factura de la agencia o la devolución de la fianza. Siguen el mismo camino que los demás documentos, por el mismo servidor en España y el mismo modelo en la Unión Europea, y tampoco se guardan. Un contrato de alquiler lleva datos personales tuyos y de otras personas: nombres y DNI de las partes y de quien avale, la dirección de la vivienda, cuentas bancarias o firmas. El modelo tiene orden de no copiar nombres de personas, DNI, NIE, cuentas, teléfonos, correos ni firmas, y el nombre del casero solo si es una empresa. Además, el servidor descarta cualquier texto copiado que aún lleve un DNI, una cuenta, un correo o un teléfono, y el nombre de un casero que no sea una empresa.',
+  'privacy.rental.data_letters': 'Los datos de las cartas del alquiler',
+  'privacy.rental.data_letters_where':
+    'Lo que añades a las cartas (tu nombre, tu DNI o NIE, el nombre de tu casero, la dirección de la vivienda, la localidad y la cuenta IBAN en la que pides la fianza) solo rellena la carta en tu navegador. Las cartas y la cuenta no salen de tu dispositivo ni se guardan.',
+  'privacy.rental.consent':
+    'En el alquiler, el contrato y los demás papeles llevan datos personales tuyos y de terceros, como el casero, quien avale o la agencia: nombres, DNI, la dirección de la vivienda o cuentas bancarias. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. El modelo tiene orden de no copiar esos datos y el servidor descarta lo que aún los lleve; nada se guarda.',
+  'privacy.rental.tracked_sheets': 'En la revisión del alquiler',
+  'privacy.rental.tracked_sheets_what':
+    'Lo mismo que en el finiquito con sus hojas (contrato, casero, entrada, renta, subidas, gastos, salida y resultado): que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha del contrato», nunca lo que escribiste. Qué pregunta frecuente abres o de qué partida miras «Cómo se calcula», por su tipo (honorarios, fianza, garantía, subida, gasto o devolución), nunca su concepto. Y si pulsas «Empezar de nuevo».',
+  'privacy.rental.tracked_scope': 'Si tu contrato queda fuera de la revisión',
+  'privacy.rental.tracked_scope_what':
+    'El motivo, de una lista cerrada: firmado antes del 6 de marzo de 2019, de temporada, por habitaciones, para otro uso, de vivienda protegida o de renta antigua.',
+  'privacy.rental.tracked_review': 'Al revisar el alquiler',
+  'privacy.rental.tracked_review_what':
+    'En qué tramo se firmó el contrato (de marzo de 2019 a mayo de 2023, de mayo de 2023 a octubre de 2026, o después), si el casero es una persona o una empresa, si es gran tenedor (sí, no o no lo sabes), qué tipo de cláusula de actualización tiene y cuántas subidas añadiste, en un tramo: 0, 1, 2 o 3 o más. De cada grupo de partidas (honorarios, garantías, subidas, gastos y devolución de la fianza), el resultado que más pesa, como «pagas de más» o «dentro del límite», o que no hay ninguna. Qué dudas cambian algún resultado, como una norma pendiente de convalidación o un «No lo sé». Si la diferencia es cero, menor de 100 €, de 100 a 500 €, de 500 a 2.000 € o mayor, si se ofrece el pase, si el resultado sale en resumen o con el detalle del pase, cuántas veces has revisado en esta página y cuánto tardaste, en tramos. Nunca un importe, una fecha, tu comunidad, tu código postal ni nada de lo que pone tu contrato.',
+  'privacy.rental.tracked_documents': 'Al leer documentos del alquiler',
+  'privacy.rental.tracked_documents_what':
+    'Los mismos avisos que con los demás documentos, con los tipos del alquiler (contrato, aviso de subida, recibo, factura de la agencia o devolución de la fianza) y, si una página no es del alquiler, ese motivo. Al descargar, si es el informe, la carta de la fianza o la de la renta y, de una carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en las cartas.',
+
+  'legal_notice.rental': 'La revisión del alquiler',
+  'legal_notice.rental.does':
+    'Compara lo que pagas o has pagado por un alquiler de vivienda habitual, con contrato firmado desde el 6 de marzo de 2019, con lo que permite la ley: honorarios de la agencia, fianza y garantías, subidas anuales, gastos y devolución de la fianza con sus intereses. Cada partida lleva la norma de la que sale, con su vigencia y su estado.',
+  'legal_notice.rental.pending':
+    'Varias normas del alquiler cambiaron en 2026, y algunas están pendientes de que el Congreso las convalide. Cada regla dice si está en vigor, pendiente de convalidación o derogada. Cuando un resultado depende de una norma pendiente, da las dos cuentas y el total solo suma la más baja; si depende de un decreto que el Congreso derogó, da las dos cuentas y no la suma.',
+  'legal_notice.rental.does_not':
+    'No valora desperfectos ni si un descuento de la fianza procede, no calcula el tope de la renta inicial en las zonas tensionadas, no aplica las normas propias de cada comunidad autónoma y no comprueba prórrogas ni preavisos más allá de sus fechas. Tampoco revisa contratos de temporada, por habitaciones, para otro uso ni firmados antes del 6 de marzo de 2019.',
+  'legal_notice.rental.beta':
+    'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves una cifra que no cuadra con la ley, puedes escribir a',
+  'legal_notice.rental.pass':
+    'En la revisión del alquiler, el mismo pase muestra el detalle de cada partida y permite descargar un informe en PDF y, si la revisión tiene cifras para ellas, cartas sobre la fianza y las subidas, también generados en tu dispositivo. El pase vale para cualquier revisión durante sus {dias} días, también la del finiquito.',
 
   'client.theme.to_dark': 'Tema: pasar a oscuro',
   'client.theme.to_light': 'Tema: pasar a claro',
