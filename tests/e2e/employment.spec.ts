@@ -37,6 +37,10 @@ async function fits(page: Page) {
 async function next(page: Page) {
   await fits(page);
   await page.getByRole('button', { name: 'Siguiente' }).click();
+  // The page turn moves in steps, so a click during it can land beside its target.
+  await page.waitForFunction(() =>
+    document.getAnimations().every((a) => a.playState !== 'running'),
+  );
 }
 
 async function open(page: Page, viewport: { width: number; height: number }, today = TODAY) {
