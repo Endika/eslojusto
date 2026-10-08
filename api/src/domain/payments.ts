@@ -7,6 +7,7 @@ import type {
   TokenSigner,
 } from './ports';
 import type { ErrorCode } from './results';
+import type { ReviewKind } from './reviews';
 
 export const PASS_PRICE_CENTS = 499;
 export const PASS_CURRENCY = 'eur';
@@ -26,10 +27,11 @@ export async function startCheckout(
   nonce: string,
   captchaToken: string,
   deps: { readonly checkout: CheckoutCreator; readonly captcha: CaptchaVerifier },
+  returnTo: ReviewKind = 'final_pay',
 ): Promise<CheckoutResponse> {
   if (!(await deps.captcha.verify(captchaToken))) return { code: 'captcha_failed' };
   try {
-    const session = await deps.checkout.create(nonce);
+    const session = await deps.checkout.create(nonce, returnTo);
     return { code: 'ok', ...session };
   } catch {
     return { code: 'payment_provider_unavailable' };

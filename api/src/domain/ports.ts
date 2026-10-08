@@ -68,8 +68,12 @@ export interface Logger {
 }
 
 export interface CheckoutCreator {
-  // Throws when the payment provider is unavailable.
-  create(nonce: string): Promise<{ readonly sessionId: string; readonly url: string }>;
+  // Throws when the payment provider is unavailable. Stripe returns the person to the page of
+  // the review they paid from.
+  create(
+    nonce: string,
+    returnTo: ReviewKind,
+  ): Promise<{ readonly sessionId: string; readonly url: string }>;
 }
 
 export interface SessionSnapshot {

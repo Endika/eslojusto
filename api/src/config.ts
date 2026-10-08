@@ -1,8 +1,8 @@
 export const REGION = 'eu-south-2';
 export const SITE_ORIGIN = 'https://eslojusto.es';
 export const SITE_HOSTNAME = 'eslojusto.es';
-export const CHECKOUT_SUCCESS_PATH = '/finiquito/';
-export const CHECKOUT_CANCEL_PATH = '/finiquito/';
+// Where Stripe sends the person back to, after paying or not, by the review they pay from.
+export const CHECKOUT_PATHS = { final_pay: '/finiquito/', rental: '/alquiler/' } as const;
 
 // EU geographic inference profiles, as listed by `aws bedrock list-inference-profiles --region eu-south-2`.
 export const HAIKU_4_5 = 'eu.anthropic.claude-haiku-4-5-20251001-v1:0';

@@ -112,6 +112,13 @@ describe('startCheckout', () => {
     expect(response).toMatchObject({ code: 'ok', url: expect.stringMatching(/^https:\/\//) });
     expect(captcha.tokens).toEqual(['turnstile-token']);
     expect(checkout.nonces).toEqual([NONCE]);
+    expect(checkout.returns).toEqual(['final_pay']);
+  });
+
+  it('asks Stripe to return the person to the review they pay from', async () => {
+    const checkout = new FakeCheckout();
+    await startCheckout(NONCE, 't', { checkout, captcha: new FakeCaptcha() }, 'rental');
+    expect(checkout.returns).toEqual(['rental']);
   });
 
   it('creates nothing without a valid captcha', async () => {
@@ -157,6 +164,16 @@ describe('Stripe adapter', () => {
     );
     expect(options).toEqual({ idempotencyKey: `checkout-${NONCE}` });
     expect(checkoutParams(NONCE, PRICE)).toEqual([params, options]);
+    expect(checkoutParams(NONCE, PRICE, 'final_pay')).toEqual([params, options]);
+  });
+
+  it('returns a rental payment to /alquiler/, under a key of its own', () => {
+    const [params, options] = checkoutParams(NONCE, PRICE, 'rental');
+    expect(params.success_url).toBe(
+      'https://eslojusto.es/alquiler/?session_id={CHECKOUT_SESSION_ID}',
+    );
+    expect(params.cancel_url).toBe('https://eslojusto.es/alquiler/');
+    expect(options).toEqual({ idempotencyKey: `checkout-rental-${NONCE}` });
   });
 
   const session = (extra: Record<string, unknown> = {}) =>

@@ -156,10 +156,12 @@ Basque, Galician and English and says so (`test/languages.test.ts`, with hand-wr
 each of them). An `ok` read can still list pages set aside; the site says which and why.
 
 **`checkout`** `{ "nonce": "<22–64 url-safe random chars, kept in the browser>",
-"captchaToken": "<Turnstile, action 'checkout'>" }` →
+"captchaToken": "<Turnstile, action 'checkout'>", "returnTo": "rental" }` →
 `{ "code": "ok", "sessionId": "cs_…", "url": "https://checkout.stripe.com/…" }`. Keep the
 session id and nonce before redirecting; Stripe returns to
-`/finiquito/?session_id={CHECKOUT_SESSION_ID}`.
+`/finiquito/?session_id={CHECKOUT_SESSION_ID}`, or to `/alquiler/` with `"returnTo": "rental"`
+(`CHECKOUT_PATHS` in `src/config.ts`); any other `returnTo` is `invalid_request`. The pass is the
+same product either way and unlocks every review.
 
 **`pass`** `{ "sessionId": "cs_…", "nonce": "…" }` →
 `{ "code": "ok", "pass": "<token>", "expiresAt": <epoch seconds>, "readsLeft": <n> }`. The

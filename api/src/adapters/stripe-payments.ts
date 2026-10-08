@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
-import { CHECKOUT_CANCEL_PATH, CHECKOUT_SUCCESS_PATH, SITE_ORIGIN } from '../config';
+import { CHECKOUT_PATHS, SITE_ORIGIN } from '../config';
 import { PASS_READS } from '../domain/allowance';
 import type { CheckoutCreator, PaymentVerifier, SessionSnapshot } from '../domain/ports';
+import type { ReviewKind } from '../domain/reviews';
 
 export const READS_METADATA_KEY = 'reads_used';
 
@@ -46,7 +47,9 @@ export function toSessionSnapshot(session: Stripe.Checkout.Session): SessionSnap
 export function checkoutParams(
   nonce: string,
   priceId: string,
+  returnTo: ReviewKind = 'final_pay',
 ): [Stripe.Checkout.SessionCreateParams, Stripe.RequestOptions] {
+  const path = CHECKOUT_PATHS[returnTo];
   return [
     {
       mode: 'payment',
@@ -56,11 +59,16 @@ export function checkoutParams(
       allow_promotion_codes: true,
       client_reference_id: nonce,
       locale: 'es',
-      success_url: `${SITE_ORIGIN}${CHECKOUT_SUCCESS_PATH}?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${SITE_ORIGIN}${CHECKOUT_CANCEL_PATH}`,
+      success_url: `${SITE_ORIGIN}${path}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${SITE_ORIGIN}${path}`,
     },
-    // Retrying with the same nonce returns the same session instead of a second one.
-    { idempotencyKey: `checkout-${nonce}` },
+    // Retrying with the same nonce returns the same session instead of a second one. Stripe
+    // refuses a key reused with other parameters, so a nonce first used for another page gets
+    // a key of its own there.
+    {
+      idempotencyKey:
+        returnTo === 'final_pay' ? `checkout-${nonce}` : `checkout-${returnTo}-${nonce}`,
+    },
   ];
 }
 
@@ -77,8 +85,10 @@ const client = (restrictedKey: string): Stripe => {
 export function createStripeCheckout(restrictedKey: string, priceId: string): CheckoutCreator {
   const stripe = client(restrictedKey);
   return {
-    async create(nonce) {
-      const session = await stripe.checkout.sessions.create(...checkoutParams(nonce, priceId));
+    async create(nonce, returnTo) {
+      const session = await stripe.checkout.sessions.create(
+        ...checkoutParams(nonce, priceId, returnTo),
+      );
       if (!session.url) throw new Error('Checkout Session without a URL');
       return { sessionId: session.id, url: session.url };
     },
