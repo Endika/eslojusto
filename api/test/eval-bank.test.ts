@@ -10,8 +10,20 @@ import {
 } from '../eval/schema';
 import { BANK, template } from './support/bank';
 
+// Cut every comment by position, so a nested or unclosed «<!--» never survives the cut.
+function withoutComments(html: string): string {
+  let kept = '';
+  let rest = html;
+  for (let start = rest.indexOf('<!--'); start >= 0; start = rest.indexOf('<!--')) {
+    kept += rest.slice(0, start);
+    const end = rest.indexOf('-->', start + 4);
+    rest = end < 0 ? '' : rest.slice(end + 3);
+  }
+  return kept + rest;
+}
+
 const placeholders = (html: string): string[] =>
-  [...html.replace(/<!--[\s\S]*?-->/g, '').matchAll(PLACEHOLDER)].map((m) => m[1] ?? '');
+  [...withoutComments(html).matchAll(PLACEHOLDER)].map((m) => m[1] ?? '');
 
 const leaseOf = (c: BankCase) => c.pages.find(isTemplatePage);
 
