@@ -27,7 +27,7 @@ test.describe('without JavaScript', () => {
     await expect(page.getByText('45 días').first()).toBeVisible();
     await expect(page.getByText('12 de febrero de 2012').first()).toBeVisible();
     await expect(
-      page.getByRole('article').getByText('Se pide en los 15 días hábiles siguientes'),
+      page.getByRole('article').getByText('Sin inscribirte como demandante de empleo no hay paro'),
     ).toBeVisible();
   });
 });

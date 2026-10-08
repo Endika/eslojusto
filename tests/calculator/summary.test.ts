@@ -181,7 +181,7 @@ describe('the deadlines in the summary', () => {
   it('a dismissal: the 20 days to challenge it and the 15 to ask for the benefit', () => {
     expect(summaryOf(completed()).deadlines).toEqual([
       'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
-      'El paro se pide en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (art. 268 LGSS).',
+      'Para cobrar el paro tienes que inscribirte como demandante de empleo y pedirlo en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (arts. 266 y 268 LGSS).',
     ]);
   });
   it('the end of a fixed-term contract: only the benefit; a resignation: none', () => {
@@ -191,7 +191,7 @@ describe('the deadlines in the summary', () => {
       fixedTermType: 'production_circumstances',
     });
     expect(summaryOf(fixedTerm).deadlines).toHaveLength(1);
-    expect(summaryOf(fixedTerm).deadlines[0]).toMatch(/^El paro se pide/);
+    expect(summaryOf(fixedTerm).deadlines[0]).toMatch(/^Para cobrar el paro/);
     expect(summaryOf(completed({ ...unfairDismissal, cause: 'resignation' })).deadlines).toEqual(
       [],
     );
