@@ -1,0 +1,154 @@
+{
+  "id": "basque-fixed-2024-2025",
+  "description": "A lease in Basque with a fixed 3 % clause, signed after Ley 12/2023: 3 % is within in 2024 (DF 6.ª), but on 20-07-2025 the IRAV (2,1 %, LAU DA 11.ª) caps it, so 9,27 € a month, 111,24 €, were paid over.",
+  "eval": true,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "basque-eu",
+      "data": {
+        "city": "Donostia",
+        "postcode": "20004",
+        "signedOnText": "2023ko uztailaren 3a",
+        "startDateText": "2023ko uztailaren 20a",
+        "useText": "errentariaren ohiko etxebizitza iraunkorra",
+        "landlordBlock": "Persona Arrendadora Ficticia W, adinez nagusia, NAN 75061544Q.",
+        "landlordName": "Persona Arrendadora Ficticia W",
+        "landlordDni": "75061544Q",
+        "tenantName": "Persona Arrendataria Ficticia W",
+        "tenantDni": "21728185T",
+        "iban": "ES86 2100 1604 9383 1200 0224 3213",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "Hitzartutako iraupena 60 hilabetekoa da.",
+        "rentText": "Hileko errenta 1.000,00 € da.",
+        "advanceText": "Sinatzean lehen hilabeteko errenta ordaintzen da.",
+        "updateClauseText": "Errenta urtero ehuneko 3 igoko da, une horretan indarrean dagoen errentaren gainean.",
+        "depositText": "Errentariak 1.000,00 € ematen ditu egintza honetan lege-fidantza gisa, hileko errenta baten baliokidea.",
+        "guaranteesText": "Ez da fidantzaz gaindiko bermerik hitzartzen.",
+        "chargesText": "Komunitateko gastuak eta Ondasun Higiezinen gaineko Zerga errentatzailearen kontura izango dira.",
+        "feesText": "Agentziaren ordainsariak eta kontratua formalizatzeko gastuak errentatzailearen kontura izango dira."
+      },
+      "degrade": {
+        "rotate": -3.2,
+        "shadow": 0.5,
+        "blur": 1.3,
+        "dark": 0.18,
+        "crop": 0.04,
+        "jpegQuality": 0.6
+      }
+    },
+    {
+      "kind": "rent_update_notice",
+      "data": {
+        "city": "Donostia",
+        "noticeOnText": "20 de junio de 2025",
+        "medium": "letter",
+        "previousRent": "1.030,00 €",
+        "newRent": "1.060,90 €",
+        "percent": "3 %",
+        "appliesFromText": "1 de julio de 2025",
+        "tenantName": "Persona Arrendataria Ficticia W",
+        "landlordName": "Persona Arrendadora Ficticia W"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2023-07-03",
+        "startDate": "2023-07-20",
+        "postcode": "20004",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 1000,
+        "updateClauseIndex": "fixed_percent",
+        "deposit": 1000,
+        "updateFixedPercent": 3
+      },
+      "lists": {
+        "notices": [
+          {
+            "noticeOn": "2025-06-20",
+            "previousRent": 1030,
+            "newRent": 1060.9
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "fixed_percent",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2024-07-20",
+          "effectiveOn": "2024-07-20",
+          "previousRent": 1000,
+          "newRent": 1030,
+          "chargedFrom": "2024-07-01",
+          "notice": "letter",
+          "noticeOn": "2024-06-20",
+          "agreedInWriting": false
+        },
+        {
+          "anniversary": "2025-07-20",
+          "effectiveOn": "2025-07-20",
+          "previousRent": 1030,
+          "newRent": 1060.9,
+          "chargedFrom": "2025-07-01",
+          "notice": "letter",
+          "noticeOn": "2025-06-20",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2023-07-03",
+      "startDate": "2023-07-20",
+      "initialRent": 1000,
+      "region": "PV",
+      "fixedPercent": 3,
+      "deposit": 1000
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:1",
+          "status": "paid_over",
+          "amount": 111.24
+        }
+      ]
+    }
+  }
+}

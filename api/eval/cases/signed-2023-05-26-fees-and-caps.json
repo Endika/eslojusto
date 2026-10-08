@@ -1,0 +1,198 @@
+{
+  "id": "signed-2023-05-26-fees-and-caps",
+  "description": "Signed 26-05-2023, the day Ley 12/2023 took effect: agency fees are the landlord's whatever the landlord (LAU art. 20.1) and a reservation fee is left to look at; the 2024 rise is capped at 3 % (DF 6.ª) and the 2025 one at the IRAV (1,99 %, LAU DA 11.ª), from the allowed 1.030 €: 72 € and 74,64 € paid over.",
+  "eval": false,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Madrid",
+        "postcode": "28014",
+        "signedOnText": "26 de mayo de 2023",
+        "startDateText": "20 de junio de 2023",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia G, mayor de edad, con DNI 37530808J.",
+        "landlordName": "Persona Arrendadora Ficticia G",
+        "landlordDni": "37530808J",
+        "tenantName": "Persona Arrendataria Ficticia G",
+        "tenantDni": "56419689Y",
+        "iban": "ES79 2100 9358 0247 1200 0068 2717",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 1.000,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta se actualizará cada año de vigencia, en la fecha en que se cumpla cada anualidad, aplicando la variación anual del Índice de Precios de Consumo (IPC) publicada por el INE.",
+        "depositText": "La parte arrendataria entrega en este acto 1.000,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "La parte arrendataria abona a Inmobiliaria Ficticia de Pruebas, S.L. los conceptos que figuran en la factura que se entrega aparte."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    },
+    {
+      "kind": "agency_invoice",
+      "data": {
+        "issuer": "Inmobiliaria Ficticia de Pruebas, S.L.",
+        "number": "F-2026-0011",
+        "issuedOnText": "26 de mayo de 2023",
+        "concept": "Honorarios de intermediación en el arrendamiento",
+        "base": "826,45 €",
+        "vat": "173,55 €",
+        "total": "1.000,00 €",
+        "tenantName": "Persona Arrendataria Ficticia G"
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    },
+    {
+      "kind": "agency_invoice",
+      "data": {
+        "issuer": "Inmobiliaria Ficticia de Pruebas, S.L.",
+        "number": "F-2026-0012",
+        "issuedOnText": "26 de mayo de 2023",
+        "concept": "Reserva de la vivienda (a cuenta de la primera renta)",
+        "base": "165,29 €",
+        "vat": "34,71 €",
+        "total": "200,00 €",
+        "tenantName": "Persona Arrendataria Ficticia G"
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2023-05-26",
+        "startDate": "2023-06-20",
+        "postcode": "28014",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 1000,
+        "updateClauseIndex": "ipc",
+        "deposit": 1000
+      },
+      "lists": {
+        "invoices": [
+          {
+            "conceptKind": "agency_fee",
+            "total": 1000
+          },
+          {
+            "conceptKind": "reservation",
+            "total": 200
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "ipc",
+      "stressedZone": null,
+      "fees": [
+        {
+          "kind": "agency_fee",
+          "amount": 1000,
+          "deductedLater": false,
+          "requestedInWriting": false
+        },
+        {
+          "kind": "reservation",
+          "amount": 200,
+          "deductedLater": false,
+          "requestedInWriting": null
+        }
+      ],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2024-06-20",
+          "effectiveOn": "2024-06-20",
+          "previousRent": 1000,
+          "newRent": 1036,
+          "chargedFrom": "2024-06-01",
+          "notice": "letter",
+          "noticeOn": "2024-05-20",
+          "agreedInWriting": false
+        },
+        {
+          "anniversary": "2025-06-20",
+          "effectiveOn": "2025-06-20",
+          "previousRent": 1036,
+          "newRent": 1056.72,
+          "chargedFrom": "2025-06-01",
+          "notice": "letter",
+          "noticeOn": "2025-05-20",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2023-05-26",
+      "startDate": "2023-06-20",
+      "initialRent": 1000,
+      "region": "MD",
+      "deposit": 1000
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "fee:0",
+          "status": "paid_over",
+          "amount": 1000
+        },
+        {
+          "id": "fee:1",
+          "status": "review_it"
+        },
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "paid_over",
+          "amount": 72
+        },
+        {
+          "id": "rent_update:1",
+          "status": "paid_over",
+          "amount": 74.64
+        }
+      ]
+    }
+  }
+}

@@ -17,5 +17,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "infra", "test", "*.config.ts"]
+  "include": ["src", "infra", "test", "eval", "*.config.ts"]
 }

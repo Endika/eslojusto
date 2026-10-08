@@ -1,0 +1,107 @@
+{
+  "id": "irav-2025-company",
+  "description": "LAU DA 11.ª and the INE IRAV resolution (BOE-A-2024-26685): a contract signed in 2024 with a company and an IRAV clause rises on 01-02-2025 by the IRAV of December 2024 (2,28 %), lower than the CPI cap of art. 18.1: 1.200 € to 1.227,36 € is within. Guarantees capped for a company contract of seven years (LAU art. 36.5).",
+  "eval": false,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "València",
+        "postcode": "46005",
+        "signedOnText": "15 de enero de 2024",
+        "startDateText": "1 de febrero de 2024",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Viviendas Ficticias del Banco de Pruebas, S.L., con domicilio social en la misma ciudad, representada por Persona Representante Ficticia C, con DNI 28148124H.",
+        "signatory": "Persona Representante Ficticia C",
+        "landlordDni": "28148124H",
+        "tenantName": "Persona Arrendataria Ficticia C",
+        "tenantDni": "42592565E",
+        "iban": "ES34 2100 6296 2963 1200 0029 2593",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 84 meses.",
+        "rentText": "La renta mensual es de 1.200,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta se actualizará cada año de vigencia aplicando la variación anual del Índice de Referencia para la Actualización de Arrendamientos de Vivienda (IRAV) publicado por el INE.",
+        "depositText": "La parte arrendataria entrega en este acto 1.200,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2024-01-15",
+        "startDate": "2024-02-01",
+        "postcode": "46005",
+        "landlordType": "company",
+        "use": "main_home",
+        "agreedMonths": 84,
+        "initialRent": 1200,
+        "updateClauseIndex": "irav",
+        "deposit": 1200
+      },
+      "lists": {}
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "company",
+      "largeLandlord": false,
+      "agreedMonths": 84,
+      "updateClause": "irav",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2025-02-01",
+          "effectiveOn": "2025-02-01",
+          "previousRent": 1200,
+          "newRent": 1227.36,
+          "chargedFrom": "2025-02-01",
+          "notice": "letter",
+          "noticeOn": "2025-01-10",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2024-01-15",
+      "startDate": "2024-02-01",
+      "initialRent": 1200,
+      "region": "VC",
+      "deposit": 1200
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "within_limit"
+        }
+      ]
+    }
+  }
+}

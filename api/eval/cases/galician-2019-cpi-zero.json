@@ -1,0 +1,149 @@
+{
+  "id": "galician-2019-cpi-zero",
+  "description": "A lease in Galician signed in April 2019: the CPI of March 2020 was 0 % (LAU art. 18.1), so the 1,1 % rise on 20-04-2020 is 7,70 € a month over, 92,40 €; agency fees with a person as landlord are not the landlord's.",
+  "eval": false,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "galician-gl",
+      "data": {
+        "city": "Santiago de Compostela",
+        "postcode": "15702",
+        "signedOnText": "1 de abril de 2019",
+        "startDateText": "20 de abril de 2019",
+        "useText": "vivenda habitual e permanente da parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia X, maior de idade, con DNI 77407215D.",
+        "landlordName": "Persona Arrendadora Ficticia X",
+        "landlordDni": "77407215D",
+        "tenantName": "Persona Arrendataria Ficticia X",
+        "tenantDni": "25184966L",
+        "iban": "ES42 2100 2370 3704 1200 0234 0744",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "A duración pactada é de 60 meses.",
+        "rentText": "A renda mensual é de 700,00 €.",
+        "advanceText": "Na sinatura abónase a primeira mensualidade de renda.",
+        "updateClauseText": "A renda actualizarase cada ano de vixencia, na data en que se cumpra cada anualidade, aplicando a variación anual do Índice de Prezos de Consumo (IPC) publicada polo INE.",
+        "depositText": "A parte arrendataria entrega neste acto 700,00 € en concepto de fianza legal, equivalente a unha mensualidade de renda.",
+        "guaranteesText": "Non se pacta ningunha garantía adicional á fianza.",
+        "chargesText": "Os gastos de comunidade e o Imposto sobre Bens Inmobles serán por conta da parte arrendadora.",
+        "feesText": "A parte arrendataria aboa a Inmobiliaria Ficticia de Pruebas, S.L. os honorarios que figuran na factura que se entrega á parte."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    },
+    {
+      "kind": "rent_update_notice",
+      "data": {
+        "city": "Santiago de Compostela",
+        "noticeOnText": "20 de marzo de 2020",
+        "medium": "letter",
+        "previousRent": "700,00 €",
+        "newRent": "707,70 €",
+        "percent": "1,1 %",
+        "appliesFromText": "1 de abril de 2020",
+        "tenantName": "Persona Arrendataria Ficticia X",
+        "landlordName": "Persona Arrendadora Ficticia X"
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2019-04-01",
+        "startDate": "2019-04-20",
+        "postcode": "15702",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 700,
+        "updateClauseIndex": "ipc",
+        "deposit": 700
+      },
+      "lists": {
+        "notices": [
+          {
+            "noticeOn": "2020-03-20",
+            "previousRent": 700,
+            "newRent": 707.7
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "ipc",
+      "stressedZone": null,
+      "fees": [
+        {
+          "kind": "agency_fee",
+          "amount": 700,
+          "deductedLater": false,
+          "requestedInWriting": false
+        }
+      ],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2020-04-20",
+          "effectiveOn": "2020-04-20",
+          "previousRent": 700,
+          "newRent": 707.7,
+          "chargedFrom": "2020-04-01",
+          "notice": "letter",
+          "noticeOn": "2020-03-20",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2019-04-01",
+      "startDate": "2019-04-20",
+      "initialRent": 700,
+      "region": "GA",
+      "deposit": 700
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "fee:0",
+          "status": "not_applicable_to_date"
+        },
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "paid_over",
+          "amount": 92.4
+        }
+      ]
+    }
+  }
+}

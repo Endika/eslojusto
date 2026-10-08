@@ -1,0 +1,137 @@
+{
+  "id": "catalan-igc-2023",
+  "description": "A lease in Catalan: on 01-12-2023 RDL 20/2022 art. 67 caps an IPC rise at the IGC (2 %), below the CPI and its flash estimate, so 950 € to 969 € is within.",
+  "eval": true,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "catalan-ca",
+      "data": {
+        "city": "Barcelona",
+        "postcode": "08012",
+        "signedOnText": "10 de novembre de 2022",
+        "startDateText": "1 de desembre de 2022",
+        "useText": "habitatge habitual i permanent de la part arrendatària",
+        "landlordBlock": "Viviendas Ficticias del Banco de Pruebas, S.L., representada per Persona Representante Ficticia V, amb DNI 72715873T.",
+        "signatory": "Persona Representante Ficticia V",
+        "landlordDni": "72715873T",
+        "tenantName": "Persona Arrendataria Ficticia V",
+        "tenantDni": "18271404G",
+        "iban": "ES61 2100 0839 5062 1200 0214 5682",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La durada pactada és de 84 mesos.",
+        "rentText": "La renda mensual és de 950,00 €.",
+        "advanceText": "En el moment de la signatura es paga la primera mensualitat de renda.",
+        "updateClauseText": "La renda s'actualitzarà cada any de vigència, en la data en què es compleixi cada anualitat, aplicant la variació anual de l'Índex de Preus de Consum (IPC) publicada per l'INE.",
+        "depositText": "La part arrendatària lliura en aquest acte 950,00 € en concepte de fiança legal, equivalent a una mensualitat de renda.",
+        "guaranteesText": "No es pacta cap garantia addicional a la fiança.",
+        "chargesText": "Les despeses de comunitat i l'Impost sobre Béns Immobles aniran a càrrec de la part arrendadora.",
+        "feesText": "Els honoraris de l'agència i les despeses de formalització del contracte aniran a càrrec de la part arrendadora."
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    },
+    {
+      "kind": "rent_update_notice",
+      "data": {
+        "city": "Barcelona",
+        "noticeOnText": "10 de noviembre de 2023",
+        "medium": "letter",
+        "previousRent": "950,00 €",
+        "newRent": "969,00 €",
+        "percent": "2 %",
+        "appliesFromText": "1 de diciembre de 2023",
+        "tenantName": "Persona Arrendataria Ficticia V",
+        "landlordName": "Persona Arrendadora Ficticia V"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2022-11-10",
+        "startDate": "2022-12-01",
+        "postcode": "08012",
+        "landlordType": "company",
+        "use": "main_home",
+        "agreedMonths": 84,
+        "initialRent": 950,
+        "updateClauseIndex": "ipc",
+        "deposit": 950
+      },
+      "lists": {
+        "notices": [
+          {
+            "noticeOn": "2023-11-10",
+            "previousRent": 950,
+            "newRent": 969
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "company",
+      "largeLandlord": false,
+      "agreedMonths": 84,
+      "updateClause": "ipc",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2023-12-01",
+          "effectiveOn": "2023-12-01",
+          "previousRent": 950,
+          "newRent": 969,
+          "chargedFrom": "2023-12-01",
+          "notice": "letter",
+          "noticeOn": "2023-11-10",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2022-11-10",
+      "startDate": "2022-12-01",
+      "initialRent": 950,
+      "region": "CT",
+      "deposit": 950
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "within_limit"
+        }
+      ]
+    }
+  }
+}

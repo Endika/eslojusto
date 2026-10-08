@@ -1,0 +1,248 @@
+{
+  "id": "fees-under-other-names-2024",
+  "description": "LAU art. 20.1 as reworded by Ley 12/2023: agency and formalisation fees are the landlord's, while «gastos de gestión» under another name are left to look at; a reservation taken off the first rent is no fee. A gym leaflet in the pack matters to nothing.",
+  "eval": true,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Madrid",
+        "postcode": "28014",
+        "signedOnText": "1 de marzo de 2024",
+        "startDateText": "15 de marzo de 2024",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia T, mayor de edad, con DNI 68024531Z.",
+        "landlordName": "Persona Arrendadora Ficticia T",
+        "landlordDni": "68024531Z",
+        "tenantName": "Persona Arrendataria Ficticia T",
+        "tenantDni": "11357842N",
+        "iban": "ES49 2100 9308 6420 1200 0195 0620",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 1.100,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta se actualizará cada año de vigencia aplicando la variación anual del Índice de Referencia para la Actualización de Arrendamientos de Vivienda (IRAV) publicado por el INE.",
+        "depositText": "La parte arrendataria entrega en este acto 1.100,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "La parte arrendataria abona a Inmobiliaria Ficticia de Pruebas, S.L. los conceptos que figuran en la factura que se entrega aparte."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    },
+    {
+      "kind": "agency_invoice",
+      "data": {
+        "issuer": "Inmobiliaria Ficticia de Pruebas, S.L.",
+        "number": "F-2026-0031",
+        "issuedOnText": "1 de marzo de 2024",
+        "concept": "Honorarios de intermediación en el arrendamiento",
+        "base": "909,09 €",
+        "vat": "190,91 €",
+        "total": "1.100,00 €",
+        "tenantName": "Persona Arrendataria Ficticia T"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    },
+    {
+      "kind": "agency_invoice",
+      "data": {
+        "issuer": "Inmobiliaria Ficticia de Pruebas, S.L.",
+        "number": "F-2026-0032",
+        "issuedOnText": "1 de marzo de 2024",
+        "concept": "Gastos de gestión del expediente",
+        "base": "247,93 €",
+        "vat": "52,07 €",
+        "total": "300,00 €",
+        "tenantName": "Persona Arrendataria Ficticia T"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    },
+    {
+      "kind": "agency_invoice",
+      "data": {
+        "issuer": "Inmobiliaria Ficticia de Pruebas, S.L.",
+        "number": "F-2026-0033",
+        "issuedOnText": "1 de marzo de 2024",
+        "concept": "Gastos de formalización del contrato",
+        "base": "123,97 €",
+        "vat": "26,03 €",
+        "total": "150,00 €",
+        "tenantName": "Persona Arrendataria Ficticia T"
+      },
+      "degrade": {
+        "rotate": -3.2,
+        "shadow": 0.5,
+        "blur": 1.3,
+        "dark": 0.18,
+        "crop": 0.04,
+        "jpegQuality": 0.6
+      }
+    },
+    {
+      "kind": "agency_invoice",
+      "data": {
+        "issuer": "Inmobiliaria Ficticia de Pruebas, S.L.",
+        "number": "F-2026-0034",
+        "issuedOnText": "20 de febrero de 2024",
+        "concept": "Reserva de la vivienda (a cuenta de la primera renta)",
+        "base": "909,09 €",
+        "vat": "190,91 €",
+        "total": "1.100,00 €",
+        "tenantName": "Persona Arrendataria Ficticia T"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    },
+    {
+      "kind": "other",
+      "data": {
+        "variant": "gym"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2024-03-01",
+        "startDate": "2024-03-15",
+        "postcode": "28014",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 1100,
+        "updateClauseIndex": "irav",
+        "deposit": 1100
+      },
+      "lists": {
+        "invoices": [
+          {
+            "conceptKind": "agency_fee",
+            "total": 1100
+          },
+          {
+            "conceptKind": "management",
+            "total": 300
+          },
+          {
+            "conceptKind": "formalisation",
+            "total": 150
+          },
+          {
+            "conceptKind": "reservation",
+            "total": 1100
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "irav",
+      "stressedZone": null,
+      "fees": [
+        {
+          "kind": "agency_fee",
+          "amount": 1100,
+          "deductedLater": false,
+          "requestedInWriting": false
+        },
+        {
+          "kind": "management",
+          "amount": 300,
+          "deductedLater": false,
+          "requestedInWriting": false
+        },
+        {
+          "kind": "formalisation",
+          "amount": 150,
+          "deductedLater": false,
+          "requestedInWriting": false
+        },
+        {
+          "kind": "reservation",
+          "amount": 1100,
+          "deductedLater": true,
+          "requestedInWriting": false
+        }
+      ],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2024-03-01",
+      "startDate": "2024-03-15",
+      "initialRent": 1100,
+      "region": "MD",
+      "deposit": 1100
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "fee:0",
+          "status": "paid_over",
+          "amount": 1100
+        },
+        {
+          "id": "fee:1",
+          "status": "review_it"
+        },
+        {
+          "id": "fee:2",
+          "status": "paid_over",
+          "amount": 150
+        },
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        }
+      ]
+    }
+  }
+}

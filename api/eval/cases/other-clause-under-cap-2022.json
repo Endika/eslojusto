@@ -1,0 +1,107 @@
+{
+  "id": "other-clause-under-cap-2022",
+  "description": "An «other» clause: under the 2 % cap of RDL 6/2022 art. 46 the agreed index decides, and it is unknown, so a rise to 610 € cannot be checked.",
+  "eval": false,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Madrid",
+        "postcode": "28014",
+        "signedOnText": "1 de septiembre de 2021",
+        "startDateText": "21 de septiembre de 2021",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia Z, mayor de edad, con DNI 82098557H.",
+        "landlordName": "Persona Arrendadora Ficticia Z",
+        "landlordDni": "82098557H",
+        "tenantName": "Persona Arrendataria Ficticia Z",
+        "tenantDni": "32098528B",
+        "iban": "ES23 2100 3901 2346 1200 0253 5806",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 600,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta se actualizará anualmente según la variación del precio medio del alquiler que publique el observatorio municipal de vivienda.",
+        "depositText": "La parte arrendataria entrega en este acto 600,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2021-09-01",
+        "startDate": "2021-09-21",
+        "postcode": "28014",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 600,
+        "updateClauseIndex": "other",
+        "deposit": 600
+      },
+      "lists": {}
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "other",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2022-09-21",
+          "effectiveOn": "2022-09-21",
+          "previousRent": 600,
+          "newRent": 610,
+          "chargedFrom": "2022-09-01",
+          "notice": "letter",
+          "noticeOn": "2022-08-20",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2021-09-01",
+      "startDate": "2021-09-21",
+      "initialRent": 600,
+      "region": "MD",
+      "deposit": 600
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "not_checkable"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "id": "fixed-percent-2023-2024-long",
+  "description": "A fixed 5 % clause in a long four-sheet contract: on 15-09-2023 RDL 20/2022 art. 67 caps the rise at the IGC (2 %), and on 15-09-2024 Ley 12/2023 DF 6.ª caps it at 3 % while the CPI (2,3 %) is lower still (LAU art. 18.1); each year starts from the allowed rent, not the charged one, so 324 € and 637,68 € were paid over.",
+  "eval": true,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "long-es",
+      "data": {
+        "city": "Zaragoza",
+        "postcode": "50004",
+        "signedOnText": "5 de septiembre de 2022",
+        "startDateText": "15 de septiembre de 2022",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia D, mayor de edad, con DNI 30493795B.",
+        "landlordName": "Persona Arrendadora Ficticia D",
+        "landlordDni": "30493795B",
+        "tenantName": "Persona Arrendataria Ficticia D",
+        "tenantDni": "46049346H",
+        "iban": "ES73 2100 7061 7284 1200 0039 0124",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 900,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta se incrementará en cada anualidad en un 5 % sobre la renta vigente en ese momento.",
+        "depositText": "La parte arrendataria entrega en este acto 900,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    },
+    {
+      "kind": "rent_update_notice",
+      "data": {
+        "city": "Zaragoza",
+        "noticeOnText": "10 de agosto de 2023",
+        "medium": "letter",
+        "previousRent": "900,00 €",
+        "newRent": "945,00 €",
+        "percent": "5 %",
+        "appliesFromText": "1 de septiembre de 2023",
+        "tenantName": "Persona Arrendataria Ficticia D",
+        "landlordName": "Persona Arrendadora Ficticia D"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    },
+    {
+      "kind": "rent_update_notice",
+      "data": {
+        "city": "Zaragoza",
+        "noticeOnText": "10 de agosto de 2024",
+        "medium": "letter",
+        "previousRent": "945,00 €",
+        "newRent": "992,25 €",
+        "percent": "5 %",
+        "appliesFromText": "1 de septiembre de 2024",
+        "tenantName": "Persona Arrendataria Ficticia D",
+        "landlordName": "Persona Arrendadora Ficticia D"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2022-09-05",
+        "startDate": "2022-09-15",
+        "postcode": "50004",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 900,
+        "updateClauseIndex": "fixed_percent",
+        "deposit": 900,
+        "updateFixedPercent": 5
+      },
+      "lists": {
+        "notices": [
+          {
+            "noticeOn": "2023-08-10",
+            "previousRent": 900,
+            "newRent": 945
+          },
+          {
+            "noticeOn": "2024-08-10",
+            "previousRent": 945,
+            "newRent": 992.25
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "fixed_percent",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2023-09-15",
+          "effectiveOn": "2023-09-15",
+          "previousRent": 900,
+          "newRent": 945,
+          "chargedFrom": "2023-09-01",
+          "notice": "letter",
+          "noticeOn": "2023-08-10",
+          "agreedInWriting": false
+        },
+        {
+          "anniversary": "2024-09-15",
+          "effectiveOn": "2024-09-15",
+          "previousRent": 945,
+          "newRent": 992.25,
+          "chargedFrom": "2024-09-01",
+          "notice": "letter",
+          "noticeOn": "2024-08-10",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2022-09-05",
+      "startDate": "2022-09-15",
+      "initialRent": 900,
+      "region": "AR",
+      "fixedPercent": 5,
+      "deposit": 900
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "paid_over",
+          "amount": 324
+        },
+        {
+          "id": "rent_update:1",
+          "status": "paid_over",
+          "amount": 637.68
+        }
+      ]
+    }
+  }
+}

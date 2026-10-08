@@ -1,0 +1,123 @@
+<!--
+  Lease template «basque-eu»: a two-sheet residential lease in Basque.
+  Source: written for this bank. No administration's model was copied: the reuse licence of the
+  published models could not be verified, so the text is original and neutral, following only the
+  headings any lease under Ley 29/1994 (LAU) carries. Licence: same as this repository.
+  Placeholders in double braces are filled by scripts/rental-bank/render.mjs from each case's data.
+-->
+<!doctype html>
+<html lang="eu">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1d1d1d;
+        font:
+          17px/1.5 'DejaVu Serif',
+          serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 75px 85px 95px;
+        position: relative;
+        overflow: hidden;
+        background: #fbfbfb;
+      }
+      h1 {
+        font:
+          bold 23px 'DejaVu Sans',
+          sans-serif;
+        text-align: center;
+        margin: 0 0 28px;
+        color: #11542f;
+      }
+      h2 {
+        font:
+          bold 16px 'DejaVu Sans',
+          sans-serif;
+        margin: 18px 0 6px;
+        color: #11542f;
+      }
+      p {
+        margin: 0 0 9px;
+        text-align: justify;
+      }
+      .sign {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 70px;
+      }
+      .sign div {
+        width: 42%;
+        border-top: 1px solid #333;
+        padding-top: 6px;
+        text-align: center;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font:
+          13px 'DejaVu Sans',
+          sans-serif;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <h1>ETXEBIZITZA ERRENTAN EMATEKO KONTRATUA</h1>
+      <p>{{city}}n, {{signedOnText}}.</p>
+      <h2>1. Alderdiak</h2>
+      <p>Errentatzailea: {{landlordBlock}}</p>
+      <p>Errentaria: {{tenantName}}, NAN {{tenantDni}}.</p>
+      <h2>2. Etxebizitza</h2>
+      <p>Helbidea: {{address}}. Posta-kodea: {{postcode}}. Erabilera: {{useText}}.</p>
+      <h2>3. Iraupena</h2>
+      <p>Kontratua {{startDateText}} hasiko da indarrean. {{durationText}}</p>
+      <h2>4. Errenta</h2>
+      <p>
+        {{rentText}} Hilabete bakoitzeko lehen zazpi egunetan ordainduko da, kontu honetara
+        transferentzia eginez: {{iban}}.
+      </p>
+      <p>{{advanceText}}</p>
+      <h2>5. Errentaren eguneratzea</h2>
+      <p>{{updateClauseText}}</p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+    <section class="page">
+      <h2>6. Fidantza eta bermeak</h2>
+      <p>{{depositText}}</p>
+      <p>{{guaranteesText}}</p>
+      <h2>7. Gastu orokorrak eta zergak</h2>
+      <p>{{chargesText}}</p>
+      <h2>8. Ordainsariak</h2>
+      <p>{{feesText}}</p>
+      <h2>9. Hornidurak</h2>
+      <p>
+        Kontagailu bidez neurtzen diren argindarra, ura eta gasa errentariaren kontura izango dira.
+      </p>
+      <h2>10. Kontserbazioa</h2>
+      <p>
+        Errentatzaileak egingo ditu etxebizitza bizigarritasun-baldintzetan mantentzeko beharrezkoak
+        diren konponketak. Ohiko erabileraren higadurak eskatzen dituen konponketa txikiak
+        errentariaren kontura izango dira.
+      </p>
+      <p>
+        Eta ados daudela adierazteko, alderdiek kontratu hau sinatzen dute, bi aletan, goian
+        adierazitako tokian eta egunean.
+      </p>
+      <div class="sign">
+        <div>Errentatzailea</div>
+        <div>Errentaria</div>
+      </div>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

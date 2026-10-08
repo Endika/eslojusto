@@ -1,0 +1,123 @@
+{
+  "id": "deposit-not-yet-due",
+  "description": "LAU art. 36.4: keys handed back on 20-09-2026 leave the landlord until 20-10-2026 to return the deposit, so on 07-10-2026 nothing is owed yet.",
+  "eval": false,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Donostia",
+        "postcode": "20004",
+        "signedOnText": "1 de septiembre de 2023",
+        "startDateText": "15 de septiembre de 2023",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia S, mayor de edad, con DNI 65678860K.",
+        "landlordName": "Persona Arrendadora Ficticia S",
+        "landlordDni": "65678860K",
+        "tenantName": "Persona Arrendataria Ficticia S",
+        "tenantDni": "97901061G",
+        "iban": "ES10 2100 8543 2099 1200 0185 3089",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 800,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta se actualizará cada año de vigencia aplicando la variación anual del Índice de Referencia para la Actualización de Arrendamientos de Vivienda (IRAV) publicado por el INE.",
+        "depositText": "La parte arrendataria entrega en este acto 800,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    },
+    {
+      "kind": "deposit_return",
+      "data": {
+        "keysText": "20 de septiembre de 2026",
+        "deposit": "800,00 €",
+        "tenantName": "Persona Arrendataria Ficticia S",
+        "landlordName": "Persona Arrendadora Ficticia S",
+        "iban": "ES10 2100 8543 2099 1200 0185 3089"
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2023-09-01",
+        "startDate": "2023-09-15",
+        "postcode": "20004",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 800,
+        "updateClauseIndex": "irav",
+        "deposit": 800,
+        "keysReturnedOn": "2026-09-20"
+      },
+      "lists": {}
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "irav",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [],
+      "charges": [],
+      "moveOut": {
+        "keysReturnedOn": "2026-09-20",
+        "returns": [],
+        "deductions": []
+      },
+      "signedOn": "2023-09-01",
+      "startDate": "2023-09-15",
+      "initialRent": 800,
+      "region": "PV",
+      "deposit": 800
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "deposit_return",
+          "status": "not_yet_due"
+        },
+        {
+          "id": "deposit_interest",
+          "status": "within_limit"
+        }
+      ]
+    }
+  }
+}

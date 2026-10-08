@@ -1,0 +1,138 @@
+{
+  "id": "other-clause-over-cap-2022",
+  "description": "An «other» clause (a municipal price index): only the cap is known, RDL 6/2022 art. 46 at 2 %; 630 € on a 600 € rent passes that ceiling by 18 € a month, 216 €.",
+  "eval": false,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Sevilla",
+        "postcode": "41003",
+        "signedOnText": "1 de septiembre de 2021",
+        "startDateText": "20 de septiembre de 2021",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia Y, mayor de edad, con DNI 79752886W.",
+        "landlordName": "Persona Arrendadora Ficticia Y",
+        "landlordDni": "79752886W",
+        "tenantName": "Persona Arrendataria Ficticia Y",
+        "tenantDni": "28641747S",
+        "iban": "ES81 2100 3135 8025 1200 0243 8275",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 600,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta se actualizará anualmente según la variación del precio medio del alquiler que publique el observatorio municipal de vivienda.",
+        "depositText": "La parte arrendataria entrega en este acto 600,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    },
+    {
+      "kind": "rent_update_notice",
+      "data": {
+        "city": "Sevilla",
+        "noticeOnText": "20 de agosto de 2022",
+        "medium": "letter",
+        "previousRent": "600,00 €",
+        "newRent": "630,00 €",
+        "percent": "5 %",
+        "appliesFromText": "1 de septiembre de 2022",
+        "tenantName": "Persona Arrendataria Ficticia Y",
+        "landlordName": "Persona Arrendadora Ficticia Y"
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2021-09-01",
+        "startDate": "2021-09-20",
+        "postcode": "41003",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 600,
+        "updateClauseIndex": "other",
+        "deposit": 600
+      },
+      "lists": {
+        "notices": [
+          {
+            "noticeOn": "2022-08-20",
+            "previousRent": 600,
+            "newRent": 630
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "other",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2022-09-20",
+          "effectiveOn": "2022-09-20",
+          "previousRent": 600,
+          "newRent": 630,
+          "chargedFrom": "2022-09-01",
+          "notice": "letter",
+          "noticeOn": "2022-08-20",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [],
+      "moveOut": null,
+      "signedOn": "2021-09-01",
+      "startDate": "2021-09-20",
+      "initialRent": 600,
+      "region": "AN",
+      "deposit": 600
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "paid_over",
+          "amount": 216
+        }
+      ]
+    }
+  }
+}

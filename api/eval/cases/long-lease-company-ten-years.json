@@ -1,0 +1,204 @@
+{
+  "id": "long-lease-company-ten-years",
+  "description": "A long ten-year contract with a company: the guarantee cap of LAU art. 36.5 binds only up to seven years and the cap on service charges of art. 20.2 only for the first seven, so neither applies; a fixed 2 % rise in 2026 is under the CPI.",
+  "eval": true,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "long-es",
+      "data": {
+        "city": "Madrid",
+        "postcode": "28014",
+        "signedOnText": "20 de mayo de 2019",
+        "startDateText": "1 de junio de 2019",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Viviendas Ficticias del Banco de Pruebas, S.L., con domicilio social en la misma ciudad, representada por Persona Representante Ficticia D, con DNI 91481241J.",
+        "signatory": "Persona Representante Ficticia D",
+        "landlordDni": "91481241J",
+        "tenantName": "Persona Arrendataria Ficticia D",
+        "tenantDni": "45925652H",
+        "iban": "ES82 2100 6962 9630 1200 0292 5930",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 120 meses.",
+        "rentText": "La renta mensual es de 1.300,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta se incrementará en cada anualidad en un 2 % sobre la renta vigente en ese momento.",
+        "depositText": "La parte arrendataria entrega en este acto 1.300,00 € en concepto de fianza legal, equivalente a una mensualidad de renta.",
+        "guaranteesText": "Además, la parte arrendataria aporta un aval bancario por importe de 6.000,00 €.",
+        "chargesText": "Serán por cuenta de la parte arrendataria los gastos de comunidad, cuyo importe anual a la firma es de 600,00 €.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    },
+    {
+      "kind": "rent_update_notice",
+      "data": {
+        "city": "Madrid",
+        "noticeOnText": "4 de mayo de 2026",
+        "medium": "letter",
+        "previousRent": "1.400,00 €",
+        "newRent": "1.428,00 €",
+        "percent": "2 %",
+        "appliesFromText": "1 de junio de 2026",
+        "tenantName": "Persona Arrendataria Ficticia D",
+        "landlordName": "Persona Arrendadora Ficticia D"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    },
+    {
+      "kind": "rent_receipt",
+      "data": {
+        "monthText": "junio de 2026",
+        "rent": "1.428,00 €",
+        "community": "75,00 €",
+        "propertyTax": "",
+        "total": "1.503,00 €",
+        "tenantName": "Persona Arrendataria Ficticia D",
+        "landlordName": "Persona Arrendadora Ficticia D",
+        "iban": "ES82 2100 6962 9630 1200 0292 5930"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.7,
+        "dark": 0.08,
+        "crop": 0,
+        "jpegQuality": 0.72
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2019-05-20",
+        "startDate": "2019-06-01",
+        "postcode": "28014",
+        "landlordType": "company",
+        "use": "main_home",
+        "agreedMonths": 120,
+        "initialRent": 1300,
+        "updateClauseIndex": "fixed_percent",
+        "deposit": 1300,
+        "updateFixedPercent": 2
+      },
+      "lists": {
+        "guarantees": [
+          {
+            "kind": "bank_guarantee",
+            "amount": 6000
+          }
+        ],
+        "charges": [
+          {
+            "kind": "community",
+            "annualAmount": 600
+          }
+        ],
+        "notices": [
+          {
+            "noticeOn": "2026-05-04",
+            "previousRent": 1400,
+            "newRent": 1428
+          }
+        ],
+        "receipts": [
+          {
+            "month": "2026-06",
+            "rent": 1428,
+            "community": 75
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "company",
+      "largeLandlord": false,
+      "agreedMonths": 120,
+      "updateClause": "fixed_percent",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [
+        {
+          "kind": "bank_guarantee",
+          "amount": 6000
+        }
+      ],
+      "advanceMonths": 1,
+      "updates": [
+        {
+          "anniversary": "2026-06-01",
+          "effectiveOn": "2026-06-01",
+          "previousRent": 1400,
+          "newRent": 1428,
+          "chargedFrom": "2026-06-01",
+          "notice": "letter",
+          "noticeOn": "2026-05-04",
+          "agreedInWriting": false
+        }
+      ],
+      "charges": [
+        {
+          "kind": "community",
+          "inContract": true,
+          "annualAgreed": 600,
+          "charged": [
+            {
+              "year": 2026,
+              "amount": 900
+            }
+          ]
+        }
+      ],
+      "moveOut": null,
+      "signedOn": "2019-05-20",
+      "startDate": "2019-06-01",
+      "initialRent": 1300,
+      "region": "MD",
+      "fixedPercent": 2,
+      "deposit": 1300
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "not_applicable_to_date"
+        },
+        {
+          "id": "guarantee:0",
+          "status": "not_applicable_to_date"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "rent_update:0",
+          "status": "within_limit"
+        },
+        {
+          "id": "charge:0:2026",
+          "status": "not_applicable_to_date"
+        }
+      ]
+    }
+  }
+}

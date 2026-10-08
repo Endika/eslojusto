@@ -1,0 +1,140 @@
+{
+  "id": "deposit-interest-above-one-month",
+  "description": "LAU art. 36.1 and 36.4: only the deposit of one month accrues interest; of a two-month deposit returned late on 15-03-2026, 1.000 € accrue for 42 days, 3,74 € or 3,79 € as the year counts 365 or 360 days.",
+  "eval": false,
+  "today": "2026-10-07",
+  "pages": [
+    {
+      "template": "general-es",
+      "data": {
+        "city": "Sevilla",
+        "postcode": "41003",
+        "signedOnText": "10 de enero de 2022",
+        "startDateText": "15 de enero de 2022",
+        "useText": "para destinarla a vivienda habitual y permanente de la parte arrendataria",
+        "landlordBlock": "Persona Arrendadora Ficticia E, mayor de edad, con DNI 93826912Y.",
+        "landlordName": "Persona Arrendadora Ficticia E",
+        "landlordDni": "93826912Y",
+        "tenantName": "Persona Arrendataria Ficticia E",
+        "tenantDni": "49382433Z",
+        "iban": "ES24 2100 7728 3951 1200 0302 3461",
+        "address": "Calle de la Prueba Ficticia, 12, 3.º B",
+        "durationText": "La duración pactada es de 60 meses.",
+        "rentText": "La renta mensual es de 1.000,00 €.",
+        "advanceText": "A la firma se abona la primera mensualidad de renta.",
+        "updateClauseText": "La renta pactada no será objeto de actualización durante la vigencia del contrato.",
+        "depositText": "La parte arrendataria entrega en este acto 2.000,00 € en concepto de fianza legal.",
+        "guaranteesText": "No se pacta ninguna garantía adicional a la fianza.",
+        "chargesText": "Los gastos de comunidad y el Impuesto sobre Bienes Inmuebles serán por cuenta de la parte arrendadora.",
+        "feesText": "Los honorarios de la agencia y los gastos de formalización del contrato serán por cuenta de la parte arrendadora."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    },
+    {
+      "kind": "deposit_return",
+      "data": {
+        "keysText": "31 de diciembre de 2025",
+        "deposit": "2.000,00 €",
+        "tenantName": "Persona Arrendataria Ficticia E",
+        "landlordName": "Persona Arrendadora Ficticia E",
+        "iban": "ES24 2100 7728 3951 1200 0302 3461",
+        "return1On": "15 de marzo de 2026",
+        "return1Amount": "2.000,00 €"
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.05,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2022-01-10",
+        "startDate": "2022-01-15",
+        "postcode": "41003",
+        "landlordType": "person",
+        "use": "main_home",
+        "agreedMonths": 60,
+        "initialRent": 1000,
+        "updateClauseIndex": "none",
+        "deposit": 2000,
+        "keysReturnedOn": "2025-12-31"
+      },
+      "lists": {
+        "returns": [
+          {
+            "on": "2026-03-15",
+            "amount": 2000
+          }
+        ]
+      }
+    },
+    "input": {
+      "contractType": "main_home",
+      "landlordType": "person",
+      "largeLandlord": false,
+      "agreedMonths": 60,
+      "updateClause": "none",
+      "stressedZone": null,
+      "fees": [],
+      "guarantees": [],
+      "advanceMonths": 1,
+      "updates": [],
+      "charges": [],
+      "moveOut": {
+        "keysReturnedOn": "2025-12-31",
+        "returns": [
+          {
+            "on": "2026-03-15",
+            "amount": 2000
+          }
+        ],
+        "deductions": []
+      },
+      "signedOn": "2022-01-10",
+      "startDate": "2022-01-15",
+      "initialRent": 1000,
+      "region": "AN",
+      "deposit": 2000
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "guarantees",
+          "status": "within_limit"
+        },
+        {
+          "id": "advance",
+          "status": "within_limit"
+        },
+        {
+          "id": "deposit_return",
+          "status": "within_limit"
+        },
+        {
+          "id": "deposit_interest",
+          "status": "depends",
+          "amount": 3.74,
+          "upTo": 3.79,
+          "reasons": ["interest_day_count"]
+        }
+      ]
+    }
+  }
+}
