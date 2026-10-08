@@ -27,3 +27,31 @@ export function selectCases<C extends { readonly id: string; readonly eval: bool
   if (unknown.length > 0) throw new Error(`No such case: ${unknown.join(', ')}`);
   return cases.filter((c) => ids.includes(c.id));
 }
+
+export type EvalReview = 'rental' | 'employment';
+
+export interface EvalArgs {
+  readonly review: EvalReview;
+  // Relative to api/.
+  readonly cases: string;
+}
+
+const DEFAULT_CASES: Readonly<Record<EvalReview, string>> = {
+  rental: 'eval/cases',
+  employment: 'eval/cases/employment',
+};
+
+// `--review rental|employment` (rental by default) and `--cases <dir>` (that review's bank by default).
+export function parseEvalArgs(argv: readonly string[]): EvalArgs {
+  const valueOf = (name: string): string | undefined => {
+    const i = argv.indexOf(name);
+    if (i === -1) return undefined;
+    const v = argv[i + 1];
+    if (v === undefined || v === '' || v.startsWith('--')) throw new Error(`${name} takes a value`);
+    return v;
+  };
+  const review = valueOf('--review') ?? 'rental';
+  if (review !== 'rental' && review !== 'employment')
+    throw new Error(`--review is rental or employment, not ${review}`);
+  return { review, cases: (valueOf('--cases') ?? DEFAULT_CASES[review]).replace(/\/+$/, '') };
+}

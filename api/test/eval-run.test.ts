@@ -6,10 +6,19 @@ import { MODEL_PRICES_USD_PER_MTOK, SONNET_4_6, SONNET_5_5 } from '../src/config
 import type { DocumentReader, ModelRead } from '../src/domain/ports';
 import { MAX_ESTIMATED_INPUT_TOKENS } from '../src/domain/tokens';
 import { SpendCounter, worstCaseUsd } from '../eval/budget';
-import { parseEvalEnv, selectCases } from '../eval/env';
-import { evaluate, expectedPages, type EvalDeps, type EvalPack } from '../eval/evaluate';
+import type { EmploymentBankCase } from '../eval/employment-schema';
+import { parseEvalArgs, parseEvalEnv, selectCases } from '../eval/env';
+import {
+  employmentBank,
+  evaluate,
+  expectedEmploymentPages,
+  expectedPages,
+  rentalBank,
+  type EvalDeps,
+  type EvalPack,
+} from '../eval/evaluate';
 import type { BankCase } from '../eval/schema';
-import { BANK, sheetsOf } from './support/bank';
+import { BANK, EMPLOYMENT_BANK, employmentSheetsOf, sheetsOf } from './support/bank';
 import { FakeClock } from './support/fakes';
 import { jpeg } from './support/synthetic';
 
@@ -60,6 +69,27 @@ describe('starting an evaluation run', () => {
     expect(run.status).toBe(1);
     expect(run.stderr).toContain(needed);
     expect(run.stdout).toBe('');
+  });
+
+  it('reads the rental bank unless told which review and which cases', () => {
+    expect(parseEvalArgs([])).toEqual({ review: 'rental', cases: 'eval/cases' });
+    expect(parseEvalArgs(['--review', 'employment'])).toEqual({
+      review: 'employment',
+      cases: 'eval/cases/employment',
+    });
+    expect(parseEvalArgs(['--review', 'employment', '--cases', 'eval/cases/employment/'])).toEqual({
+      review: 'employment',
+      cases: 'eval/cases/employment',
+    });
+  });
+
+  it.each([
+    [['--review', 'final_pay'], 'rental or employment'],
+    [['--review'], '--review takes a value'],
+    [['--review', 'employment', '--cases'], '--cases takes a value'],
+    [['--cases', '--review', 'employment'], '--cases takes a value'],
+  ])('refuses the arguments %j', (argv, message) => {
+    expect(() => parseEvalArgs(argv)).toThrow(message);
   });
 
   it('reads the packs marked for the AI pass unless told otherwise', () => {
@@ -183,7 +213,7 @@ describe('the spend counter of a run', () => {
       inputTokens: 30_000,
       outputTokens: 2000,
     }));
-    const report = await evaluate(packs, sheetsOf, deps(reader, 1));
+    const report = await evaluate(packs, rentalBank(sheetsOf), deps(reader, 1));
     // After five packs 0,66 USD is spent, and 0,66 + 0,3993 > 1.
     expect(reader.calls).toHaveLength(5);
     expect(report.read).toBe(5);
@@ -198,14 +228,14 @@ describe('the spend counter of a run', () => {
       inputTokens: MAX_ESTIMATED_INPUT_TOKENS,
       outputTokens: 5000,
     }));
-    const report = await evaluate(packs, sheetsOf, deps(reader, 1));
+    const report = await evaluate(packs, rentalBank(sheetsOf), deps(reader, 1));
     expect(report.read).toBe(2);
     expect(report.costUsd).toBeLessThanOrEqual(1);
   });
 
   it('reads nothing when the cap cannot hold one pack', async () => {
     const reader = new FixedReader(() => ({ toolInput: null, inputTokens: 1, outputTokens: 1 }));
-    const report = await evaluate(packs, sheetsOf, deps(reader, 0.39));
+    const report = await evaluate(packs, rentalBank(sheetsOf), deps(reader, 0.39));
     expect(reader.calls).toHaveLength(0);
     expect(report.stoppedBefore).toBe(packs[0]?.bankCase.id);
     expect(report.costUsd).toBe(0);
@@ -221,7 +251,7 @@ describe('scoring a run', () => {
       if (c === undefined) throw new Error('no case');
       return { toolInput: perfectRead(c), inputTokens: 20_000, outputTokens: 1500 };
     });
-    const report = await evaluate(cases.map(packOf), sheetsOf, deps(reader, 100));
+    const report = await evaluate(cases.map(packOf), rentalBank(sheetsOf), deps(reader, 100));
     expect(report.read).toBe(cases.length);
     for (const t of Object.values(report.accuracy.byField)) expect(t.accuracy).toBe(1);
     for (const t of Object.values(report.accuracy.byPageKind)) {
@@ -250,7 +280,7 @@ describe('scoring a run', () => {
       inputTokens: 20_000,
       outputTokens: 1500,
     }));
-    const report = await evaluate([packOf(c)], sheetsOf, deps(reader, 100));
+    const report = await evaluate([packOf(c)], rentalBank(sheetsOf), deps(reader, 100));
     expect(report.personsTranscribed).toBe(2);
   });
 
@@ -268,11 +298,135 @@ describe('scoring a run', () => {
       }));
       return { toolInput: { pages }, inputTokens: 10_000, outputTokens: 300 };
     });
-    const report = await evaluate(unreadable.map(packOf), sheetsOf, deps(reader, 100));
+    const report = await evaluate(unreadable.map(packOf), rentalBank(sheetsOf), deps(reader, 100));
     expect(report.nothingRead).toEqual({
       expected: unreadable.length,
       got: unreadable.length,
       agreed: unreadable.length,
     });
+  });
+});
+
+// An employment read that states exactly what the case expects.
+function perfectEmploymentRead(c: EmploymentBankCase): Record<string, unknown> {
+  const pages = expectedEmploymentPages(c, employmentSheetsOf).map((p, i) => ({
+    page: i + 1,
+    kind: p.kind,
+    document: i + 1,
+    readability: { value: p.readability, confidence: 'high' },
+    confidence: 'high',
+  }));
+  const SECTION: Record<string, string> = {
+    payslips: 'employment_payslips',
+    contracts: 'employment_work_history',
+  };
+  const sections: Record<string, { [k: string]: unknown }> = {};
+  const section = (kind: string) => (sections[kind] ??= {});
+  for (const [name, value] of Object.entries(c.expected.extraction.fields)) {
+    const offer = /^offer([A-Z].*)$/.exec(name)?.[1];
+    if (offer === undefined) section('employment_contract')[name] = { value, confidence: 'high' };
+    else
+      section('job_offer')[`${offer.charAt(0).toLowerCase()}${offer.slice(1)}`] = {
+        value,
+        confidence: 'high',
+      };
+  }
+  for (const [list, rows] of Object.entries(c.expected.extraction.lists))
+    section(SECTION[list] ?? 'employment_contract')[list] = rows.map((r) => ({
+      ...r,
+      ...(list === 'clauses' ? { literal: 'Texto de la cláusula.' } : {}),
+      confidence: 'high',
+    }));
+  return { pages, ...sections };
+}
+
+const employmentPackOf = (c: EmploymentBankCase): EvalPack<EmploymentBankCase> => ({
+  bankCase: c,
+  files: expectedEmploymentPages(c, employmentSheetsOf).map(() => ({
+    mediaType: 'image/jpeg',
+    bytes: jpeg(1000, 1414),
+  })),
+});
+
+// max_tokens of an employment read: Sonnet 4.6's 5,000 and the review's 7,000 more.
+const employmentDeps = (reader: EvalDeps['reader'], maxUsd: number): EvalDeps => ({
+  ...deps(reader, maxUsd),
+  maxOutputTokens: { [SONNET_4_6]: 12_000 },
+});
+
+describe('an evaluation run over the employment bank', () => {
+  const bank = employmentBank(employmentSheetsOf);
+  const hard = EMPLOYMENT_BANK.filter((c) => c.eval);
+
+  it('reads the fifteen hard packs by default', () => {
+    expect(selectCases(EMPLOYMENT_BANK, undefined)).toHaveLength(15);
+  });
+
+  it('counts the worst case of an employment pack at about 0,51 USD', () => {
+    const worst = worstCaseUsd({
+      models: { primary: SONNET_4_6, escalation: SONNET_4_6 },
+      prices: SONNET_PRICE,
+      maxOutputTokens: { [SONNET_4_6]: 12_000 },
+      maxInputTokens: MAX_ESTIMATED_INPUT_TOKENS,
+    });
+    expect(worst).toBeCloseTo((96_000 * 3.3 + 12_000 * 16.5) / 1e6, 10);
+  });
+
+  it('stops before an employment pack whose worst case would cross a 3 USD cap', async () => {
+    // 40.000 in and 6.000 out: 0,231 USD a pack, against a worst case of 0,5148 USD.
+    const reader = new FixedReader(() => ({
+      toolInput: null,
+      inputTokens: 40_000,
+      outputTokens: 6000,
+    }));
+    const report = await evaluate(hard.map(employmentPackOf), bank, employmentDeps(reader, 3));
+    // After eleven packs 2,541 USD is spent, and 2,541 + 0,5148 > 3.
+    expect(reader.calls).toHaveLength(11);
+    expect(report.stoppedBefore).toBe(hard[11]?.id);
+    expect(report.costUsd).toBeCloseTo(2.541, 10);
+    expect(report.costUsd).toBeLessThanOrEqual(3);
+    for (const call of reader.calls) expect(call.review).toBe('employment');
+  });
+
+  it('a read that states what each case expects scores every field and page right', async () => {
+    const readable = hard.filter((c) => c.expected.extraction.outcome === 'ok');
+    const reader = new FixedReader((n) => {
+      const c = readable[n - 1];
+      if (c === undefined) throw new Error('no case');
+      return { toolInput: perfectEmploymentRead(c), inputTokens: 20_000, outputTokens: 3000 };
+    });
+    const report = await evaluate(
+      readable.map(employmentPackOf),
+      bank,
+      employmentDeps(reader, 100),
+    );
+    expect(report.read).toBe(readable.length);
+    for (const [name, t] of Object.entries(report.accuracy.byField))
+      expect(t.accuracy, name).toBe(1);
+    for (const [kind, t] of Object.entries(report.accuracy.byPageKind)) {
+      expect(t.accuracy, kind).toBe(1);
+      expect(t.readabilityCorrect, kind).toBe(t.expected);
+    }
+    expect(report.personsTranscribed).toBe(0);
+  });
+
+  it('counts the name of the person replaced when the model writes it', async () => {
+    const c = EMPLOYMENT_BANK.find((x) => x.id === 'replacement-named');
+    if (c === undefined) throw new Error('no case');
+    const name = String(c.pages[0]?.data['replacedName']);
+    const read = perfectEmploymentRead(c);
+    const reader = new FixedReader(() => ({
+      toolInput: {
+        ...read,
+        employment_contract: {
+          ...(read['employment_contract'] as object),
+          causeText: { value: `Sustituir a ${name}.`, confidence: 'high' },
+        },
+      },
+      inputTokens: 20_000,
+      outputTokens: 3000,
+    }));
+    const report = await evaluate([employmentPackOf(c)], bank, employmentDeps(reader, 100));
+    expect(report.personsTranscribed).toBe(1);
   });
 });
