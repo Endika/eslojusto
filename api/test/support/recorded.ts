@@ -34,7 +34,8 @@ export type Recording =
   | 'employment-offer-net'
   | 'employment-injected'
   | 'employment-basque'
-  | 'employment-household';
+  | 'employment-household'
+  | 'employment-special-categories';
 
 export const recording = (name: Recording): string =>
   readFileSync(new URL(`../fixtures/bedrock/${name}.json`, import.meta.url), 'utf8');

@@ -71,9 +71,9 @@ describe('the employment tool schema', () => {
     ['employment_contract', 'clauses', 10],
     ['employment_contract', 'information', 17],
     ['employment_contract', 'relationshipHints', 3],
-    ['employment_payslips', 'payslips', 12],
-    ['employment_payslips', 'lines', 150],
-    ['employment_work_history', 'contracts', 60],
+    ['employment_payslips', 'payslips', 6],
+    ['employment_payslips', 'lines', 60],
+    ['employment_work_history', 'contracts', 15],
   ])('caps %s.%s at %i rows', (section, list, max) => {
     expect(properties(properties(schema)[section])[list]?.['maxItems']).toBe(max);
   });
@@ -84,7 +84,7 @@ describe('the employment tool schema', () => {
     ['employment_contract', 'modalityText', 120],
     ['employment_contract', 'companyName', 80],
     ['employment_contract', 'agreementName', 160],
-    ['employment_contract', 'agreementCode', 20],
+    ['employment_contract', 'agreementCode', 14],
     ['employment_contract', 'companyTaxId', 12],
     ['employment_contract', 'category', 80],
     ['job_offer', 'position', 80],
@@ -128,7 +128,7 @@ describe('what the employment schema never asks for', () => {
   // unless it is a company's.
   const NAMES = ['companyName', 'employerName', 'agreementName'];
   const FORBIDDEN_NAMES =
-    /dni|^nie|nie$|naf|nif|passport|affiliat|surname|(person|worker|full|replaced)Name$|workerId|address|domicil|postcode|phone|email|iban|bank|signature|disab|discapac|health|sick|union|leave|birth/i;
+    /dni|^nie|nie$|naf|nif|passport|affiliat|surname|(person|worker|full|replaced)Name$|contractKey|clave|workerId|address|domicil|postcode|phone|email|iban|bank|signature|disab|discapac|health|sick|union|leave|birth/i;
   const FORBIDDEN_TEXT =
     /\bdni\b|\bnie\b|\bnaf\b|\bnif\b|n[uú]mero de afiliaci|seguridad social n|domicilio|address|discapacidad|disabilit|minusval|salud|health|sindical|tipo de baja|maternidad|paternidad/i;
 
@@ -190,11 +190,11 @@ describe('an employment reading', () => {
   it('reads the largest record the schema allows without dropping anything', () => {
     const reading = parseReading(employmentRecord(), 25, 'employment');
     expect(reading.dropped).toBe(0);
-    expect(reading.sections.employment_payslips?.lists['lines']).toHaveLength(150);
+    expect(reading.sections.employment_payslips?.lists['lines']).toHaveLength(60);
   });
 
   it.each([
-    ['a contract code that is not three digits', { contractKey: f('40') }],
+    ['an agreement code that is no REGCON code', { agreementCode: f('00000000T') }],
     ['weekly hours with three decimals', { weeklyHours: f(37.125) }],
     ['weekly hours past a week', { weeklyHours: f(169) }],
     ['a modality off the list', { modality: f('obra') }],

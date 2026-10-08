@@ -72,10 +72,6 @@
             "value": "production",
             "confidence": "high"
           },
-          "contractKey": {
-            "value": "402",
-            "confidence": "high"
-          },
           "partTime": {
             "value": false,
             "confidence": "high"
@@ -207,6 +203,6 @@
   "stop_sequence": null,
   "usage": {
     "input_tokens": 18918,
-    "output_tokens": 1304
+    "output_tokens": 1279
   }
 }

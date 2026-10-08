@@ -82,10 +82,6 @@
             "value": "training_alternance",
             "confidence": "high"
           },
-          "contractKey": {
-            "value": "421",
-            "confidence": "high"
-          },
           "partTime": {
             "value": false,
             "confidence": "high"
@@ -126,6 +122,6 @@
   "stop_sequence": null,
   "usage": {
     "input_tokens": 21377,
-    "output_tokens": 738
+    "output_tokens": 713
   }
 }

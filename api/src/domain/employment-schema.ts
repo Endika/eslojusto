@@ -124,9 +124,9 @@ export const EMPLOYMENT_LIST_MAXIMA = {
   salaryParts: 12,
   clauses: 10,
   relationshipHints: 3,
-  payslips: 12,
-  lines: 150,
-  contracts: 60,
+  payslips: 6,
+  lines: 60,
+  contracts: 15,
 } as const;
 
 const field = (type: FieldSpec['type'], description: string): FieldSpec => ({ type, description });
@@ -154,10 +154,6 @@ const list = (
 // (persons' names become «[nombre]») and that the model never judges them.
 const LITERAL = ' Word for word.';
 
-const CONTRACT_KEY = field(
-  { type: 'text', maxLength: 3, pattern: '^[0-9]{3}$' },
-  'Contract code (clave de contrato), such as 100 or 402.',
-);
 const SALARY_PERIOD = oneOf(SALARY_PERIODS, 'What that amount is for.');
 const MODALITY_LABELS =
   'permanent (indefinido), discontinuous (fijo-discontinuo), production (circunstancias de la producción), production_occasional (at most 90 days a year), replacement (sustitución), replacement_selection (cover during a selection), training_alternance, training_practice, work_or_service (obra o servicio), eventual, interim (interinidad), unknown.';
@@ -182,7 +178,6 @@ const employmentContract = {
     durationMonths: whole(1, 120, 'Duration in months, if stated so.'),
     modalityText: text(MAX_MODALITY_TEXT, 'The modality as printed (modalidad).' + LITERAL),
     modality: oneOf(MODALITIES, 'Its label: ' + MODALITY_LABELS),
-    contractKey: CONTRACT_KEY,
     partTime: flag('true for part time (tiempo parcial), false for full time.'),
     causeText: text(
       MAX_CAUSE_TEXT,
@@ -192,7 +187,10 @@ const employmentContract = {
     replacementCauseStated: flag('For a replacement: whether it states why.'),
     category: text(MAX_SHORT_TEXT, 'Professional group or category.'),
     agreementName: text(MAX_AGREEMENT_NAME, 'Collective agreement (convenio).'),
-    agreementCode: text(20, 'Code of that agreement.'),
+    agreementCode: field(
+      { type: 'text', maxLength: 14, pattern: '^[0-9]{8,14}$' },
+      'Code of that agreement (REGCON), digits only.',
+    ),
     salaryAmount: money('Gross salary.'),
     salaryPeriod: SALARY_PERIOD,
     annualSalaryAmount: money('Gross annual salary, if printed besides another.'),
@@ -292,7 +290,7 @@ const employmentPayslips = {
   fields: {},
   lists: {
     payslips: list(
-      'Every payslip; past twelve, the most recent.',
+      'Every payslip; past six, the six most recent.',
       EMPLOYMENT_LIST_MAXIMA.payslips,
       {
         month: field({ type: 'month' }, 'Month of its pay period.'),
@@ -308,7 +306,7 @@ const employmentPayslips = {
       ['month'],
     ),
     lines: list(
-      'Every earnings line (devengo); never deductions.',
+      'Every earnings line (devengo) of those payslips; never deductions.',
       EMPLOYMENT_LIST_MAXIMA.lines,
       {
         month: field({ type: 'month' }, 'Month of its payslip.'),
@@ -330,7 +328,7 @@ const employmentWorkHistory = {
   fields: {},
   lists: {
     contracts: list(
-      'Every row; past sixty, the most recent.',
+      'Every row; past fifteen, the fifteen most recent.',
       EMPLOYMENT_LIST_MAXIMA.contracts,
       {
         startDate: date('Start (alta).'),
@@ -341,7 +339,6 @@ const employmentWorkHistory = {
           { type: 'text', maxLength: 15, pattern: '^[0-9]{2}[ /-]?[0-9]{7}[ /-]?[0-9]{2}$' },
           'Employer account code (C.C.C.).',
         ),
-        contractKey: CONTRACT_KEY,
         partTimeCoefficient: whole(0, 1000, 'Part-time coefficient (C.T.P.), per thousand.'),
       },
       ['startDate'],

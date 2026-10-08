@@ -2,6 +2,7 @@ import { EMPLOYMENT_SECTIONS, type EmploymentSectionKind } from './employment-sc
 import type { ExtractedField, ExtractedRow, Reading, Section } from './extraction';
 import type { SectionKind } from './extraction-schema';
 import { hasIdentifier, hasSocialSecurityNumber } from './identifiers';
+import { hasSpecialCategory } from './special-categories';
 import {
   groupDocuments,
   mergeFields,
@@ -68,8 +69,8 @@ export interface EmploymentMerged {
   readonly discarded: number;
 }
 
-// Texts copied from the documents. The worker never appears in them: anything that still looks
-// like an identifier takes the text with it.
+// Every text copied from the documents. The worker never appears in them: anything that still
+// looks like an identifier or a special category of data takes the text with it.
 const FREE_TEXTS = {
   fields: [
     'causeText',
@@ -83,12 +84,30 @@ const FREE_TEXTS = {
   items: ['literal', 'concept', 'employerName', 'agreementName', 'category'],
 };
 
-const leaks = (text: string): boolean => hasIdentifier(text) || hasSocialSecurityNumber(text);
+const leaks = (text: string): boolean =>
+  hasIdentifier(text) || hasSocialSecurityNumber(text) || hasSpecialCategory(text);
+
+// A payslip line or a salary part whose concept told about health, leave, union or debts loses
+// the concept alone: its amount and category still count, so the read is no less sure for it.
+function withoutSpecialConcepts(section: Section): Section {
+  const lists = Object.fromEntries(
+    Object.entries(section.lists).map(([name, rows]) => [
+      name,
+      rows.map((row): ExtractedRow => {
+        const { concept, ...values } = row.values;
+        if (typeof concept !== 'string' || !hasSpecialCategory(concept)) return row;
+        return { ...row, values };
+      }),
+    ]),
+  );
+  return { ...section, lists };
+}
 
 const isCompany = (v: unknown): boolean => v === 'company';
 
-// An employer's name is kept only for a company: a household employer's name is a person's,
-// which the review has no use for, whatever the model was told.
+// An employer's name, and in the work history its account code, are kept only for a company: a
+// household employer's are a person's, which the review has no use for, whatever the model was
+// told.
 function withoutPersonsNames(
   kind: SectionKind,
   section: Section,
@@ -105,9 +124,11 @@ function withoutPersonsNames(
   if (kind !== 'employment_work_history') return { section, dropped: 0 };
   let dropped = 0;
   const contracts = (section.lists['contracts'] ?? []).map((row): ExtractedRow => {
-    const { employerName, ...values } = row.values;
-    if (employerName === undefined || isCompany(row.values['employerType'])) return row;
-    dropped += 1;
+    if (isCompany(row.values['employerType'])) return row;
+    const { employerName, accountCode, ...values } = row.values;
+    const held = [employerName, accountCode].filter((v) => v !== undefined).length;
+    if (held === 0) return row;
+    dropped += held;
     return { ...row, values };
   });
   return { section: { ...section, lists: { ...section.lists, contracts } }, dropped };
@@ -159,7 +180,7 @@ export function employmentMerge(read: Reading, toolInput: unknown): EmploymentMe
   const sections: Partial<Record<SectionKind, Section>> = {};
   for (const [kind, section] of Object.entries(read.sections) as [SectionKind, Section][]) {
     const named = withoutPersonsNames(kind, section);
-    const cleaned = withoutIdentifiers(named.section, FREE_TEXTS, leaks);
+    const cleaned = withoutIdentifiers(withoutSpecialConcepts(named.section), FREE_TEXTS, leaks);
     sections[kind] =
       kind === 'employment_payslips' ? withPayslipHeadings(cleaned.section) : cleaned.section;
     dropped += named.dropped + cleaned.dropped;

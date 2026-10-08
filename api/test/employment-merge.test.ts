@@ -97,7 +97,7 @@ describe('employmentMerge', () => {
     expect(m.truncated).toBe(false);
   });
 
-  it('drops an employer’s name unless it is a company’s', () => {
+  it('drops an employer’s name and account code unless they are a company’s', () => {
     const named = (employerType?: string) =>
       pack(
         {
@@ -112,6 +112,7 @@ describe('employmentMerge', () => {
                 startDate: '2024-01-01',
                 ...(employerType && { employerType }),
                 employerName: 'Fulanita Inventada Ejemplo',
+                accountCode: '28/0000000/00',
                 confidence: 'high',
               },
             ],
@@ -120,12 +121,15 @@ describe('employmentMerge', () => {
         2,
       );
     for (const m of [named('person'), named()]) {
-      expect(JSON.stringify(m)).not.toContain('Fulanita');
-      expect(m.discarded).toBe(2);
+      expect(JSON.stringify(m)).not.toMatch(/Fulanita|28\/0000000/);
+      expect(m.discarded).toBe(3);
     }
     const company = named('company');
     expect(company.fields.companyName?.value).toBe('Fulanita Inventada Ejemplo');
-    expect(company.lists.contracts?.[0]?.values['employerName']).toBe('Fulanita Inventada Ejemplo');
+    expect(company.lists.contracts?.[0]?.values).toMatchObject({
+      employerName: 'Fulanita Inventada Ejemplo',
+      accountCode: '28/0000000/00',
+    });
     expect(company.discarded).toBe(0);
   });
 
@@ -171,22 +175,74 @@ describe('employmentMerge', () => {
     expect(m.discarded).toBe(8);
   });
 
+  it('drops a copied text that tells about health, leave, union or debts', () => {
+    const m = pack(
+      {
+        pages: [page(1, 'employment_contract'), page(2, 'payslip')],
+        employment_contract: {
+          causeText: f('Sustitución de [nombre] durante su incapacidad temporal.'),
+          scheduleText: f('De 8:00 a 15:00, con una hora de lactancia.'),
+          category: f('Oficial de primera'),
+          clauses: [
+            { label: 'other', literal: 'Declara una discapacidad del 33 %.', confidence: 'high' },
+          ],
+        },
+        employment_payslips: {
+          payslips: [payslip('2026-05', { agreementName: 'Convenio firmado por CCOO y UGT' })],
+        },
+      },
+      2,
+    );
+    expect(Object.keys(m.fields)).toEqual(['category']);
+    expect(m.lists.clauses?.[0]?.values).toEqual({ label: 'other' });
+    expect(m.discarded).toBe(4);
+  });
+
+  it('keeps a payslip line whose concept tells too much, without its concept and as no doubt', () => {
+    const line = (concept: string, amount: number) => ({
+      month: '2026-05',
+      concept,
+      amount,
+      category: 'other',
+      confidence: 'high',
+    });
+    const m = pack(
+      {
+        pages: [page(1, 'payslip')],
+        employment_payslips: {
+          lines: [
+            line('COMPLEMENTO I.T.', 150),
+            line('CUOTA SINDICAL', 12),
+            line('PLUS DE TRANSPORTE', 80),
+          ],
+        },
+      },
+      1,
+    );
+    expect(m.lists.lines?.map((l) => l.values)).toEqual([
+      { month: '2026-05', amount: 150, category: 'other' },
+      { month: '2026-05', amount: 12, category: 'other' },
+      { month: '2026-05', concept: 'PLUS DE TRANSPORTE', amount: 80, category: 'other' },
+    ]);
+    expect(m.discarded).toBe(0);
+  });
+
   it('says a list came back at its maximum', () => {
     expect(pack(employmentRecord(), 25).truncated).toBe(true);
-    const below = { payslips: 11, lines: 149, contracts: 59, texts: 'typical' } as const;
+    const below = { payslips: 5, lines: 59, contracts: 14, texts: 'typical' } as const;
     const fewer = employmentRecord(below);
     expect(fewer).toMatchObject({ employment_contract: { information: { length: 17 } } });
     expect(pack(fewer, 25).truncated).toBe(false);
   });
 
   it('counts a list at its maximum even when a row failed validation', () => {
-    const shape = { payslips: 11, lines: 150, contracts: 59, texts: 'typical' } as const;
+    const shape = { payslips: 5, lines: 60, contracts: 14, texts: 'typical' } as const;
     const record = employmentRecord(shape) as {
       employment_payslips: { lines: Record<string, unknown>[] };
     };
     record.employment_payslips.lines[0] = { month: 'not a month', confidence: 'high' };
     const m = pack(record, 25);
-    expect(m.lists.lines).toHaveLength(149);
+    expect(m.lists.lines).toHaveLength(59);
     expect(m.truncated).toBe(true);
   });
 

@@ -84,9 +84,9 @@ describe('cost of a read', () => {
     expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS)).toBeLessThanOrEqual(0.4);
   });
 
-  it('stays at or under 0.52 USD for an employment read, with its room for 12,000 tokens out', () => {
+  it('stays under 0.515 USD for an employment read, with its room for 12,000 tokens out', () => {
     expect(maxOutput(SONNET_4_6, 'employment')).toBe(12_000);
-    expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'employment')).toBeLessThanOrEqual(0.52);
+    expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'employment')).toBeLessThanOrEqual(0.515);
   });
 
   it('gives only the employment review more room to write', () => {
@@ -112,17 +112,21 @@ describe('cost of a read', () => {
 
 // api/README.md, «Cost», quotes these sizes.
 describe('what an employment read records', () => {
-  const typical = (payslips: number, lines: number, contracts: number) =>
-    recordTokens(employmentRecord({ payslips, lines, contracts, texts: 'typical' }));
+  const room = maxOutput(SONNET_4_6, 'employment');
 
-  it('fits a contract with six payslips in its max_tokens', () => {
-    expect(typical(6, 72, 0)).toBe(10_021);
-    expect(typical(6, 72, 0)).toBeLessThanOrEqual(maxOutput(SONNET_4_6, 'employment'));
+  it('fits every list at its maximum, with texts of the usual length, a tenth under max_tokens', () => {
+    const full = recordTokens(employmentRecord({ ...LARGEST, texts: 'typical' }));
+    expect(full).toBe(10_846);
+    expect(full).toBeLessThanOrEqual(0.91 * room);
   });
 
-  it('may not fit twelve payslips with every line and a long work history', () => {
-    expect(typical(12, 144, 0)).toBe(15_202);
-    expect(typical(12, 150, 60)).toBe(22_363);
-    expect(recordTokens(employmentRecord(LARGEST))).toBe(33_521);
+  it('fits every copied text at its limit with six payslips and fifteen lines', () => {
+    const limit = recordTokens(employmentRecord({ ...LARGEST, lines: 15, contracts: 0 }));
+    expect(limit).toBe(11_746);
+    expect(limit).toBeLessThanOrEqual(room);
+  });
+
+  it('does not fit every list and every copied text at its limit', () => {
+    expect(recordTokens(employmentRecord(LARGEST))).toBe(17_708);
   });
 });

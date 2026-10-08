@@ -77,7 +77,6 @@ describe('an employment read', () => {
       workplaceRegion: value('MD'),
       startDate: value('2026-10-07'),
       modality: value('permanent'),
-      contractKey: value('100'),
       salaryAmount: value(1600),
       salaryPeriod: value('month'),
       annualSalaryAmount: value(22400),
@@ -110,7 +109,6 @@ describe('an employment read', () => {
     const { extraction } = await ok('employment-production', 2);
     expect(extraction.fields).toMatchObject({
       modality: value('production'),
-      contractKey: value('402'),
       endDate: value('2026-11-30'),
       durationMonths: value(6),
       workplaceRegion: value('PV'),
@@ -168,20 +166,18 @@ describe('an employment read', () => {
     expect(failedChecks).toEqual([]);
   });
 
-  it('reads a work history with five contracts and no person’s name', async () => {
+  it('reads a work history with five contracts and nothing of a person employer', async () => {
     const { extraction } = await ok('employment-work-history', 2);
     const rows = extraction.lists.contracts ?? [];
     expect(rows).toHaveLength(5);
     expect(rows.every((r) => r.source === 'work_history')).toBe(true);
-    expect(rows.map((r) => r.values['contractKey'])).toEqual(['402', '402', '100', '410', '402']);
     expect(rows[2]?.values).toEqual({
       startDate: '2023-06-01',
       endDate: '2023-08-31',
       employerType: 'person',
-      accountCode: '48/1111111/11',
-      contractKey: '100',
       partTimeCoefficient: 500,
     });
+    expect(rows[0]?.values['accountCode']).toBe('48/0000000/00');
     expect(rows[4]?.values).not.toHaveProperty('endDate');
   });
 
@@ -250,6 +246,35 @@ describe('an employment read', () => {
     expect(JSON.stringify(extraction)).not.toMatch(/Fulanita|600 123 456/);
   });
 
+  it('lets nothing about health, leave, union or debts out, and keeps the figures', async () => {
+    const { extraction } = await ok('employment-special-categories', 3);
+    expect(extraction.fields).toMatchObject({
+      modality: value('replacement'),
+      replacedPersonNamed: value(true),
+      category: value('Auxiliar de clínica'),
+      salaryAmount: value(1350),
+    });
+    for (const name of ['causeText', 'modalityText', 'scheduleText'])
+      expect(extraction.fields).not.toHaveProperty(name);
+    expect(extraction.lists.clauses?.map((c) => c.values['literal'])).toEqual([
+      undefined,
+      'Plena dedicación a la empresa, con un complemento de 100 euros mensuales.',
+    ]);
+    expect(extraction.lists.lines?.map((l) => [l.values['concept'], l.values['amount']])).toEqual([
+      ['SALARIO BASE', 1000],
+      [undefined, 150],
+      [undefined, 100],
+      ['PLUS DE TRANSPORTE', 80],
+      ['COMPLEMENTO DE NOCTURNIDAD', 120],
+      [undefined, 50],
+      [undefined, 100],
+    ]);
+    expect(extraction.lists.payslips?.[0]?.values['incidents']).toBe(true);
+    expect(JSON.stringify(extraction)).not.toMatch(
+      /incapacidad|enfermedad|lactancia|discapacidad|I\.T\.|maternidad|sindical|UGT|embargo/i,
+    );
+  });
+
   it('says when a list came back at its maximum, and logs only that', async () => {
     const reader = createBedrockReader(async () =>
       JSON.stringify({
@@ -260,7 +285,7 @@ describe('an employment read', () => {
     );
     const { extraction, metrics } = await readWith(reader, 25);
     expect(extraction.truncated).toBe(true);
-    expect(extraction.lists.lines).toHaveLength(150);
+    expect(extraction.lists.lines).toHaveLength(60);
     expect(metrics.truncated).toBe(true);
   });
 });
