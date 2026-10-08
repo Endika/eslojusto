@@ -30,6 +30,11 @@ export type PhraseKey =
   | 'notice_deduction.agreement_unknown'
   | 'severance.unfair'
   | 'severance.objective'
+  | 'severance.collective'
+  | 'severance.cause_unknown'
+  | 'severance.erte_reduced'
+  | 'severance.erte_suspended'
+  | 'severance.erte_salary_unknown'
   | 'severance.first_stretch'
   | 'severance.second_stretch'
   | 'severance.over_cap'
@@ -41,7 +46,9 @@ export type PhraseKey =
   | 'severance.replacement'
   | 'severance.training'
   | 'severance.resignation'
-  | 'severance.disciplinary';
+  | 'severance.disciplinary'
+  | 'late_interest'
+  | 'late_interest.scope';
 
 // The UI words a phrase through the dictionary key `client.calculation.<key>`.
 export interface Phrase {

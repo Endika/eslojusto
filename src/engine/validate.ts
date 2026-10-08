@@ -53,6 +53,10 @@ export function validate(e: FinalPayInput, today: CivilDate): readonly InputErro
   if (!Number.isFinite(e.monthlySalary) || e.monthlySalary <= 0 || e.monthlySalary > MAX_SALARY)
     err('monthlySalary', 'salary_out_of_range');
 
+  const preErte = e.preErteMonthlySalary;
+  if (preErte !== undefined && (!Number.isFinite(preErte) || preErte <= 0 || preErte > MAX_SALARY))
+    err('preErteMonthlySalary', 'salary_out_of_range');
+
   if (!isIntInRange(e.extraPayCount, 0, 6)) err('extraPayCount', 'extra_pay_count_out_of_range');
 
   const extraPayRequired = !e.extraPayProrated && e.extraPayCount > 0;

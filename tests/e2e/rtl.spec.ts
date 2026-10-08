@@ -16,9 +16,13 @@ async function toTheResult(page: Page) {
   await page.locator('#holidayDaysTaken').fill('0');
   await next();
   await next();
+  // Unpaid, so the result carries the late-payment warning too.
+  await page.locator('#paid-no').check();
+  await next();
   await page.locator('#figure_pending_salary').fill('1.234,56');
   await page.locator('[data-submit]').click();
   await expect(page.locator('#resultado')).toBeVisible();
+  await expect(page.locator('[data-warning="late_interest"]')).toBeVisible();
 }
 
 test('the page declares ar-test and right to left', async ({ page }) => {

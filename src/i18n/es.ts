@@ -204,10 +204,14 @@ export const es = {
   'cause.fixed_term_end_hint': 'Llega su fecha de fin.',
   'cause.objective_dismissal': 'Despido objetivo',
   'cause.objective_dismissal_hint': 'Causas económicas u otras.',
+  'cause.collective_dismissal': 'Despido colectivo (ERE)',
+  'cause.collective_dismissal_hint': 'Por un ERE de tu empresa.',
   'cause.unfair_dismissal': 'Despido improcedente',
   'cause.unfair_dismissal_hint': 'Reconocido o declarado así.',
   'cause.disciplinary_dismissal': 'Despido disciplinario',
   'cause.disciplinary_dismissal_hint': 'Alegan una falta grave.',
+  'cause.unknown': 'No lo sé',
+  'cause.unknown_hint': 'Está en la carta y en el certificado de empresa.',
 
   'fixed_term.question': '¿Qué tipo de contrato temporal tenías?',
   'fixed_term.help': 'Lo pone tu contrato, arriba.',
@@ -225,6 +229,21 @@ export const es = {
   'dates.start_hint': 'Tu primer día en esta empresa.',
   'dates.end': 'Fecha de baja',
   'dates.end_hint': 'Tu último día de trabajo.',
+  'situations.question': '¿Se daba alguna situación que pueda hacer nulo el despido?',
+  'situations.help':
+    'Como un embarazo, un permiso por nacimiento o una baja médica. Es opcional, y lo que contestes se queda en tu navegador: no se envía a ningún sitio.',
+  'situations.no': 'No',
+  'situations.yes': 'Sí, marcar cuáles',
+  'situations.legend': 'Cuando te despidieron:',
+  'situations.pregnancy': 'Estabas embarazada',
+  'situations.family_leave':
+    'Estabas de permiso o suspensión por nacimiento, adopción, guarda o acogimiento, riesgo en el embarazo o la lactancia, o permiso parental',
+  'situations.back_from_leave':
+    'Hacía menos de 12 meses que habías vuelto de un permiso por nacimiento, adopción, guarda o acogimiento',
+  'situations.care_rights':
+    'Habías pedido o tenías un permiso o una reducción de jornada por cuidado, una adaptación de jornada (art. 34.8 ET) o una excedencia por cuidado (art. 46.3 ET)',
+  'situations.gender_violence': 'Eras víctima de violencia de género o sexual',
+  'situations.sick_leave': 'Estabas de baja médica',
 
   'prorating.question': '¿Tus pagas extra van prorrateadas en la nómina?',
   'prorating.help':
@@ -235,6 +254,14 @@ export const es = {
   'salary.monthly_hint_yes':
     'Lo que pone tu nómina cada mes, con la parte de pagas extra incluida. Por ejemplo, 1.850,00.',
   'salary.monthly_hint_no': 'Tu bruto mensual sin las pagas extra. Por ejemplo, 1.850,00.',
+  'erte.question': '¿Estabas en un ERTE cuando te despidieron?',
+  'erte.help': 'Lo pone tu nómina.',
+  'erte.none': 'No',
+  'erte.reduced': 'Sí, con jornada reducida',
+  'erte.suspended': 'Sí, con el contrato suspendido',
+  'erte.unknown': 'No lo sé',
+  'erte.pre_salary': 'Salario de antes del ERTE',
+  'erte.pre_salary_hint': 'Bruto al mes, de un mes entero sin ERTE. Si no lo sabes, en blanco.',
 
   'extra_pay.question': '¿Cómo son tus pagas extra?',
   'extra_pay.help': 'Mira tu nómina de diciembre.',
@@ -305,6 +332,8 @@ export const es = {
   'figures.severance': 'Indemnización',
   'figures.employer_notice': 'Falta de preaviso',
   'figures.notice_deduction': 'Descuento por no preavisar',
+  'paid.question': '¿Te han pagado ya el finiquito?',
+  'paid.help': 'Si todavía no, el salario que falta lleva un interés por el retraso.',
 
   'result.title': 'Resultado',
   'result.lead':
@@ -663,6 +692,8 @@ export const es = {
   'client.summary.benefit_yes_no_figures':
     'Esta causa da derecho a paro si sumas al menos 360 días cotizados en los últimos 6 años; la cuantía depende de tus últimas nóminas.',
   'client.summary.benefit_no': 'Esta causa no da derecho a paro.',
+  'client.summary.benefit_unknown':
+    'El paro depende de la causa: un despido o el fin de un contrato temporal dan derecho si sumas al menos 360 días cotizados en los últimos 6 años; una baja voluntaria, no.',
   'client.summary.dismissal_deadline':
     'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
   'client.summary.benefit_deadline':
@@ -679,13 +710,19 @@ export const es = {
   'client.status.no_severance_disciplinary':
     'Si el despido es procedente, no hay indemnización (art. 55.7 ET). Si se declarara improcedente, la referencia sería {importe}; el plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
   'client.status.not_checkable_days': 'No se puede comprobar sin los días que has disfrutado',
+  'client.status.not_checkable_cause': 'Sin la causa no se calcula la indemnización',
+  'client.status.not_checkable_erte': 'No se puede comprobar sin tu salario de antes del ERTE',
   'client.range.minimum': 'Mínimo legal',
   'client.range.maximum_deduction': 'Máximo que pueden descontarte',
   'client.range.agreement': 'Depende de tu convenio',
   'client.range.days': 'Depende de los días que has disfrutado',
+  'client.range.cause': 'Depende de la causa',
+  'client.range.erte': 'Depende de tu salario de antes del ERTE',
   'client.range.between': 'entre {minimo} y {maximo}',
   'client.no_figure': 'Sin cifra',
   'client.agreement_may_improve': 'Tu convenio puede mejorar esta cifra (más días, otro devengo).',
+  'client.or_more.ere_agreement':
+    'O más, según el acuerdo del ERE: el acuerdo del periodo de consultas puede mejorar este mínimo, y suele hacerlo (art. 51.2 ET). Esta revisión no lo conoce.',
   'client.source.in_force': 'en vigor desde {fecha}',
   'client.unfair_reference':
     'Si un juzgado declarase improcedente el despido, la indemnización sería de {importe}.',
@@ -700,16 +737,21 @@ export const es = {
   'client.unemployment.status.yes':
     'Esta causa da derecho a paro si cumples el resto de requisitos',
   'client.unemployment.status.no': 'No da derecho a paro',
+  'client.unemployment.status.unknown': 'Depende de la causa',
   'client.unemployment.reason.resignation':
     'Dejar el trabajo por decisión propia no es situación legal de desempleo (art. 267.2.a LGSS).',
   'client.unemployment.reason.fixed_term_end':
     'El fin de un contrato temporal es situación legal de desempleo, salvo que lo terminaras tú (art. 267.1.a.6.º LGSS).',
   'client.unemployment.reason.objective_dismissal':
     'El despido objetivo es situación legal de desempleo (art. 267.1.a.4.º LGSS).',
+  'client.unemployment.reason.collective_dismissal':
+    'El despido colectivo es situación legal de desempleo (art. 267.1.a.1.º LGSS).',
   'client.unemployment.reason.unfair_dismissal':
     'El despido es situación legal de desempleo (art. 267.1.a.3.º LGSS).',
   'client.unemployment.reason.disciplinary_dismissal':
     'El despido disciplinario también es situación legal de desempleo, aunque no se impugne (arts. 267.1.a.3.º y 268.4 LGSS).',
+  'client.unemployment.reason.unknown':
+    'Depende de la causa: un despido o el fin de un contrato temporal son situación legal de desempleo; una baja voluntaria, no (art. 267 LGSS).',
   'client.unemployment.about': 'unos {importe}',
   'client.unemployment.amount.two':
     'Serían {tramo1} al mes los primeros 6 meses y {tramo2} después, en bruto.',
@@ -799,6 +841,16 @@ export const es = {
     'El plazo de preaviso de una dimisión lo fija el convenio; sin ese dato no se puede comprobar el descuento.',
   'client.calculation.severance.unfair': '{meses} meses × 2,75 = {dias} días.',
   'client.calculation.severance.objective': '{meses} meses × 20/12 = {dias} días.',
+  'client.calculation.severance.collective':
+    'En un despido colectivo, cada despido sigue el art. 53.1 ET (art. 51.4 ET): 20 días por año, prorrateando por meses, con un tope de 12 mensualidades.',
+  'client.calculation.severance.cause_unknown':
+    'La indemnización depende de la causa y sin ella no se calcula. Lo que no depende de la causa (el salario del mes, las vacaciones y las pagas extra) sí se revisa. La causa está en la carta de despido y en el certificado de empresa, en la casilla «causa de la situación legal de desempleo».',
+  'client.calculation.severance.erte_reduced':
+    'Con un ERTE de reducción de jornada, la indemnización se calcula con el salario de antes de la reducción (STS 678/2018, de 27 de junio): {salario} al mes.',
+  'client.calculation.severance.erte_suspended':
+    'Con un ERTE de suspensión, los meses suspendidos no cuentan: la indemnización se calcula con lo cobrado en los meses trabajados (STS 638/2022, de 7 de julio): {salario} al mes.',
+  'client.calculation.severance.erte_salary_unknown':
+    'Con un ERTE, la indemnización debería calcularse con el salario completo de antes del ERTE, no con el de tus últimas nóminas (STS 678/2018 y STS 638/2022). Sin ese salario no se da una cifra.',
   'client.calculation.severance.first_stretch':
     'Tramo hasta 11-02-2012: {meses} meses × 3,75 = {dias} días.',
   'client.calculation.severance.second_stretch':
@@ -819,6 +871,42 @@ export const es = {
   'client.calculation.severance.resignation': 'La dimisión voluntaria no genera indemnización.',
   'client.calculation.severance.disciplinary':
     'El despido disciplinario declarado procedente no genera indemnización. Si se declara improcedente, se calcula como un despido improcedente.',
+
+  'client.calculation.late_interest':
+    '10 % al año × {base} × {dias} días desde la baja / 365 = {importe}. El Tribunal Supremo lo aplica a las deudas de salario aunque la cantidad se discuta (STS de 17 de junio de 2014, rcud 1315/2013).',
+  'client.calculation.late_interest.scope':
+    'Solo cuenta lo que es salario: el salario del mes de la baja y las pagas extra, por su mínimo legal. La indemnización no lleva este interés, y las vacaciones no disfrutadas no se suman porque es dudoso que lo lleven.',
+
+  'client.warning.cause_unknown.title': 'Sin la causa',
+  'client.warning.cause_unknown':
+    'Sin la causa solo se revisan las partidas que no dependen de ella: el salario del mes de la baja, las vacaciones y las pagas extra. La indemnización no se calcula. La causa está en la carta de despido y en el certificado de empresa, en la casilla «causa de la situación legal de desempleo».',
+  'client.warning.null_dismissal.title': 'Este despido podría ser nulo',
+  'client.warning.null_dismissal.protected':
+    'Por lo que has marcado, el despido podría ser nulo (art. 55.5 ET), salvo que el motivo no tenga nada que ver con esa situación.',
+  'client.warning.null_dismissal.sick_leave':
+    'Despedir a alguien de baja médica podría ser nulo si el motivo es la enfermedad: la Ley 15/2022 prohíbe discriminar por enfermedad o condición de salud y hace nulos esos actos (arts. 2.1 y 26). Los tribunales todavía no lo aplican de forma uniforme.',
+  'client.warning.null_dismissal.effects':
+    'Si un juzgado lo declarase nulo, la empresa tendría que readmitirte y pagarte los salarios que dejaste de cobrar (arts. 55.6 y 53.4 ET). Esta revisión no calcula cifras para ese caso.',
+  'client.warning.null_dismissal.deadline':
+    'Para impugnar el despido hay 20 días hábiles desde la fecha de baja (art. 59.3 ET); presentar la papeleta de conciliación interrumpe el plazo. Consulta a un abogado laboralista o a un sindicato antes de que pasen.',
+  'client.warning.erte_unknown.title': 'Si estabas en un ERTE',
+  'client.warning.erte_unknown':
+    'Con un ERTE, la indemnización debería calcularse con el salario completo de antes del ERTE: con jornada reducida, el de antes de la reducción (STS 678/2018); con el contrato suspendido, lo cobrado en los meses trabajados (STS 638/2022). Si alguna de tus últimas nóminas es de un ERTE, la indemnización de esta revisión puede quedarse corta.',
+  'client.warning.late_interest.title': 'Si aún no te han pagado',
+  'client.warning.late_interest.amount':
+    'Lo que es salario lleva un interés por el retraso del 10 % al año (art. 29.3 ET): unos {importe} desde la baja hasta hoy. La indemnización no lo lleva, y las vacaciones no disfrutadas no se suman porque es dudoso que lo lleven.',
+  'client.warning.late_interest.none':
+    'Lo que es salario lleva un interés por el retraso del 10 % al año (art. 29.3 ET), contado desde la baja; hoy todavía no suma nada. La indemnización no lo lleva, y las vacaciones no disfrutadas no se suman porque es dudoso que lo lleven.',
+  'client.warning.late_interest.days_left':
+    'Para reclamar las cantidades del finiquito hay un año desde la baja (art. 59.1 y 59.2 ET): te quedan {dias} días para reclamarlo.',
+  'client.warning.late_interest.one_day_left':
+    'Para reclamar las cantidades del finiquito hay un año desde la baja (art. 59.1 y 59.2 ET): te queda 1 día para reclamarlo.',
+  'client.warning.late_interest.last_day':
+    'Para reclamar las cantidades del finiquito hay un año desde la baja (art. 59.1 y 59.2 ET): hoy es el último día.',
+  'client.warning.late_interest.lapsed':
+    'Ha pasado más de un año desde la baja, así que puede haber prescrito (art. 59.1 y 59.2 ET), salvo que algo interrumpiera el plazo. Por eso no se cuenta el interés.',
+  'client.warning.late_interest.other_deadline':
+    'Es un plazo distinto de los 20 días hábiles para impugnar un despido (art. 59.3 ET).',
 
   'client.unchecked.net_pay': 'El neto: retenciones de IRPF y cotizaciones',
   'client.unchecked.bonuses':
@@ -1096,6 +1184,8 @@ export const es = {
   'client.documents.report.cause.objective_dismissal': 'Despido objetivo',
   'client.documents.report.cause.unfair_dismissal': 'Despido improcedente',
   'client.documents.report.cause.disciplinary_dismissal': 'Despido disciplinario',
+  'client.documents.report.cause.collective_dismissal': 'Despido colectivo (ERE)',
+  'client.documents.report.cause.unknown': 'Sin indicar',
   'client.documents.report.fixed_term.production_circumstances': 'eventual',
   'client.documents.report.fixed_term.replacement': 'de sustitución',
   'client.documents.report.fixed_term.training': 'formativo',

@@ -23,6 +23,7 @@ export const CAUSES = [
   'resignation',
   'fixed_term_end',
   'objective_dismissal',
+  'collective_dismissal',
   'unfair_dismissal',
   'disciplinary_dismissal',
 ] as const;
@@ -138,7 +139,7 @@ const END = date('Employment end date (fecha de baja, fecha de efectos del despi
 const CAUSE: FieldSpec = {
   type: { type: 'enum', values: CAUSES },
   description:
-    'Termination cause only if the document states it: resignation (baja voluntaria), fixed_term_end (fin de contrato), objective_dismissal (despido objetivo), unfair_dismissal (despido improcedente, also when the company acknowledges it), disciplinary_dismissal (despido disciplinario).',
+    'Termination cause only if the document states it: resignation (baja voluntaria), fixed_term_end (fin de contrato), objective_dismissal (despido objetivo), collective_dismissal (despido colectivo, ERE, expediente de regulación de empleo), unfair_dismissal (despido improcedente, also when the company acknowledges it), disciplinary_dismissal (despido disciplinario).',
 };
 const FIXED_TERM: FieldSpec = {
   type: { type: 'enum', values: FIXED_TERM_TYPES },

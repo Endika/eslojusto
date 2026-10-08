@@ -204,6 +204,7 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
     'Leído del documento · confianza media',
   );
   await next();
+  await next();
   await page
     .getByRole('group', { name: '¿Tus pagas extra van prorrateadas en la nómina?' })
     .getByLabel('Sí')
@@ -211,9 +212,11 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   await next();
   await expect(page.getByLabel('Salario bruto mensual')).toHaveValue('2.142,86');
   await next();
+  await next();
   await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await page.getByLabel('Ninguno').check();
+  await next();
   await next();
   await next();
   await expect(page.getByLabel('Indemnización')).toHaveValue('40.000,00');
@@ -356,7 +359,9 @@ async function confirmToResult(page: Page) {
   const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
   await next();
   await next();
+  await next();
   await page.locator('#prorated-yes').check();
+  await next();
   await next();
   await next();
   await page.getByLabel('Disfrutados este año').fill('0');
@@ -364,11 +369,52 @@ async function confirmToResult(page: Page) {
   await page.getByLabel('Ninguno').check();
   await next();
   await next();
+  await next();
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('region', { name: 'En resumen' })).toContainText(
     'Indemnización: podrían faltarte unos 440 €.',
   );
 }
+
+test('the situations of a possibly null dismissal reach no request, and come back from Stripe in the form', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page);
+  await page.goto('finiquito/');
+  await uploadSettlement(page);
+  await page.getByRole('button', { name: 'Revisar los datos' }).click();
+  const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
+  await next();
+  await next();
+  await page.getByLabel('Sí, marcar cuáles').check();
+  await page.getByLabel('Estabas embarazada').check();
+  await next();
+  await page.locator('#prorated-yes').check();
+  await next();
+  await next();
+  await next();
+  await page.getByLabel('Disfrutados este año').fill('0');
+  await next();
+  await page.getByLabel('Ninguno').check();
+  await next();
+  await next();
+  await next();
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  const warning = page.getByRole('region', { name: 'Este despido podría ser nulo' });
+  // Never behind the pass.
+  await expect(warning).toBeVisible();
+  const offer = page.getByRole('region', { name: /Informe en PDF/ });
+  await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
+  await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
+  await page.waitForURL(/\/finiquito\/(#.*)?$/);
+  await expect(page.getByText('Pago recibido')).toBeVisible();
+  await expect(warning).toBeVisible();
+  expect(await page.evaluate(() => sessionStorage.length)).toBe(0);
+
+  const requests = [...fake.extract, ...fake.checkout, ...fake.pass, ...fake.verify];
+  expect(requests.length).toBeGreaterThan(2);
+  for (const r of requests) expect(r.postData() ?? '').not.toMatch(/situation|embaraz|pregnan/i);
+});
 
 test('a pass holder with nothing short gets the general letter, and no offer to pay', async ({
   page,
@@ -380,12 +426,15 @@ test('a pass holder with nothing short gets the general letter, and no offer to 
   const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
   await next();
   await next();
+  await next();
   await page.locator('#prorated-yes').check();
+  await next();
   await next();
   await next();
   await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await page.getByLabel('Ninguno').check();
+  await next();
   await next();
   await next();
   // The severance the review asks for: nothing falls short.
@@ -896,13 +945,16 @@ test('an objective dismissal with an agreement: the reference and the offer, sid
   const next = () => page.getByRole('button', { name: 'Siguiente' }).click();
   await next();
   await next();
+  await next();
   await page.locator('#prorated-yes').check();
+  await next();
   await next();
   await next();
   await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await next();
   await page.getByLabel('Ninguno').check();
+  await next();
   await next();
   await next();
   // Both are the pass's detail.

@@ -10,6 +10,9 @@ async function toHolidays(page: Page, cause: string, startDate: string, endDate:
   await page.getByLabel('Fecha de alta', { exact: true }).fill(startDate);
   await page.getByLabel('Fecha de baja', { exact: true }).fill(endDate);
   await next(page);
+  const dismissal = /despido/i.test(cause);
+  // A dismissal asks for the situations that may make it null, and for an ERTE.
+  if (dismissal) await next(page);
   await page
     .getByRole('group', { name: '¿Tus pagas extra van prorrateadas en la nómina?' })
     .getByLabel('Sí')
@@ -17,6 +20,7 @@ async function toHolidays(page: Page, cause: string, startDate: string, endDate:
   await next(page);
   await page.getByLabel('Salario bruto mensual').fill('2.000,00');
   await next(page);
+  if (dismissal) await next(page);
   await page.getByLabel('Disfrutados este año').fill('0');
   await next(page);
   // An unfair or disciplinary dismissal has no notice sheet.
@@ -68,6 +72,7 @@ test('objective dismissal with one dependent child: the estimate carries figures
     /sede\.seg-social\.gob\.es/,
   );
   await next(page);
+  await next(page);
   await page.getByRole('button', { name: 'Revisar' }).click();
 
   const sheet = benefit(page);
@@ -97,10 +102,14 @@ test('objective dismissal with one dependent child: the estimate carries figures
 
 test('resignation: no benefit sheets and «No da derecho a paro»', async ({ page }) => {
   await toHolidays(page, 'Baja voluntaria (dimisión)', '2022-01-10', '2026-09-15');
-  await expect(page.getByRole('heading', { name: '¿Qué pone tu finiquito?' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: '¿Te han pagado ya el finiquito?' }),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Atrás' }).click();
   await expect(page.getByRole('heading', { name: 'Tu preaviso' })).toBeVisible();
   await next(page);
+  await next(page);
+  await expect(page.getByRole('heading', { name: '¿Qué pone tu finiquito?' })).toBeVisible();
   await page.getByRole('button', { name: 'Revisar' }).click();
 
   await expect(page.locator('#sheet-hijos')).toBeHidden();
@@ -119,6 +128,7 @@ test('resignation: no benefit sheets and «No da derecho a paro»', async ({ pag
 test('three more contracts lengthen the duration against this one alone', async ({ page }) => {
   await toHolidays(page, 'Despido objetivo', '2025-06-01', '2026-08-31');
   await page.getByLabel('Ninguno').check();
+  await next(page);
   await next(page);
   await next(page);
   await page.getByRole('button', { name: 'Revisar' }).click();
@@ -161,6 +171,7 @@ test('three more contracts lengthen the duration against this one alone', async 
   await expect(page.getByRole('group', { name: 'Otro trabajo 3' }).getByLabel('Alta')).toHaveValue(
     '2024-01-01',
   );
+  await next(page);
   await next(page);
   await page.getByRole('button', { name: 'Revisar' }).click();
 
@@ -229,5 +240,7 @@ test('removing a row, its error stays with the row that has it', async ({ page }
 
   await endDate.fill('2024-12-31');
   await next(page);
-  await expect(page.getByRole('heading', { name: '¿Qué pone tu finiquito?' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: '¿Te han pagado ya el finiquito?' }),
+  ).toBeVisible();
 });

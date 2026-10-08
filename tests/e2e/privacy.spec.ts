@@ -22,6 +22,7 @@ test('reviewing a final pay makes no request and leaves no cookies', async ({ pa
   await page.getByLabel('Disfrutados este año').fill('0');
   await next();
   await next();
+  await next();
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: /Resultado/ })).toBeVisible();
   expect(requests).toEqual([]);

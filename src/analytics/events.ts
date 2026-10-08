@@ -65,13 +65,16 @@ export const SECTIONS = [
   'causa',
   'temporal',
   'fechas',
+  'situacion',
   'prorrateo',
   'salario',
+  'erte',
   'pagas',
   'vacaciones',
   'preaviso',
   'hijos',
   'otros',
+  'pago',
   'finiquito',
   'resultado',
   ...RENTAL_SECTIONS,
@@ -105,6 +108,9 @@ const INPUT_FIELDS = [
   'noticeDaysReceived',
   'agreementNoticeDays',
   'noticeDaysGiven',
+  'erte',
+  'preErteMonthlySalary',
+  'paid',
 ] as const satisfies readonly (keyof FinalPayInput)[];
 
 // Fails the typecheck when the engine gains an input field or an item the catalogue lacks.
@@ -123,6 +129,8 @@ void _allEmploymentSteps;
 // The benefit answers, by name only: an error on one of them names the field, never the answer.
 // They are left out of `snapshot`, so `changed_fields` never lists them either.
 const BENEFIT_FIELDS = ['children', 'otherContracts', 'benefitDrawnSince'] as const;
+// The situations of a possibly null dismissal (pregnancy, leave, sick leave…) are not listed at
+// all: neither their answers nor their names ever leave the page.
 
 const figureField = (id: ItemId) => `figure_${id}` as const;
 export const TRACKABLE_FIELDS = [
@@ -287,8 +295,10 @@ const CAUSES = [
   'resignation',
   'fixed_term_end',
   'objective_dismissal',
+  'collective_dismissal',
   'unfair_dismissal',
   'disciplinary_dismissal',
+  'unknown',
 ] as const satisfies readonly Cause[];
 const FIXED_TERM_TYPES = [
   'production_circumstances',

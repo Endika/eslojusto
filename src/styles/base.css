@@ -637,6 +637,10 @@ input[type='radio'][aria-invalid='true'] {
 .option .hint {
   grid-column: 2;
 }
+/* Seven causes only fit a phone's screen with one hint open: the chosen one's. */
+[data-field='cause'] .option:not(:has(:checked)) .hint {
+  display: none;
+}
 
 .chips {
   display: flex;

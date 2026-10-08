@@ -1,6 +1,9 @@
+import { phrase } from './calculation';
 import { compareItem, type ItemResult } from './compare';
 import type { CivilDate } from './date';
+import { lateInterest, type LateInterest } from './late-interest';
 import { computeSeverance } from './severance';
+import { SOURCES } from './sources';
 import {
   noticeDeductionItem,
   extraPayItem,
@@ -9,7 +12,7 @@ import {
   holidayPayItem,
   annualSalary,
 } from './settlement';
-import type { FinalPayInput, ZeroReason, Item, ItemId } from './types';
+import type { Cause, FinalPayInput, ZeroReason, Item, ItemId } from './types';
 import { validate, type InputError } from './validate';
 
 export type EmployerFigures = Partial<Record<ItemId, number>>;
@@ -19,10 +22,12 @@ export type UncheckedCode =
 
 export interface Review {
   readonly items: readonly ItemResult[];
-  // What the severance would be were the dismissal declared unfair, for a disciplinary or an
-  // objective dismissal; null for any other cause.
+  // What the severance would be were the dismissal declared unfair, for a disciplinary, an
+  // objective or a collective dismissal; null for any other cause or without the salary for it.
   readonly unfairReference: number | null;
   readonly uncheckedCodes: readonly UncheckedCode[];
+  // Only when the person says the final pay is still unpaid.
+  readonly lateInterest: LateInterest | null;
 }
 
 function zeroReason(e: FinalPayInput): ZeroReason | undefined {
@@ -32,26 +37,88 @@ function zeroReason(e: FinalPayInput): ZeroReason | undefined {
   return undefined;
 }
 
+// The monthly salary the severance is counted on. Under an ERTE it is the full one from before:
+// a reduced working day does not lower it (STS 678/2018) and suspended months do not count
+// (STS 638/2022). null when the person did not give it.
+export function severanceMonthlySalary(e: FinalPayInput): number | null {
+  if (e.erte === 'reduced' || e.erte === 'suspended') return e.preErteMonthlySalary ?? null;
+  return e.monthlySalary;
+}
+
+function severanceAnnualSalary(e: FinalPayInput): number | null {
+  const monthlySalary = severanceMonthlySalary(e);
+  return monthlySalary === null ? null : annualSalary({ ...e, monthlySalary });
+}
+
+const ERTE_PHRASE = {
+  reduced: 'severance.erte_reduced',
+  suspended: 'severance.erte_suspended',
+} as const;
+
 function severanceItem(e: FinalPayInput): Item {
-  const reason = zeroReason(e);
-  const r = computeSeverance({
-    cause: e.cause,
-    startDate: e.startDate,
-    endDate: e.endDate,
-    annualSalary: annualSalary(e),
-    fixedTermType: e.fixedTermType,
-  });
-  return {
+  const base = {
     id: 'severance',
     direction: 'credit',
-    range: r.range,
-    calculation: r.calculation,
     dependsOnAgreement: false,
     basedOnYourAnswer: false,
+  } as const;
+  const { cause } = e;
+  if (cause === 'unknown')
+    return {
+      ...base,
+      range: null,
+      missingAnswer: 'cause',
+      calculation: [phrase('severance.cause_unknown')],
+      sources: [SOURCES.et49],
+    };
+  const reason = zeroReason(e);
+  const annual = severanceAnnualSalary(e);
+  const r = computeSeverance({
+    cause,
+    startDate: e.startDate,
+    endDate: e.endDate,
+    annualSalary: annual ?? annualSalary(e),
+    fixedTermType: e.fixedTermType,
+  });
+  const orMore = cause === 'collective_dismissal' ? ({ orMore: 'ere_agreement' } as const) : {};
+  if (reason !== undefined)
+    return {
+      ...base,
+      range: r.range,
+      calculation: r.calculation,
+      sources: r.sources,
+      zeroReason: reason,
+    };
+  if (annual === null)
+    return {
+      ...base,
+      ...orMore,
+      range: null,
+      missingAnswer: 'pre_erte_salary',
+      calculation: [phrase('severance.erte_salary_unknown')],
+      sources: r.sources,
+    };
+  const erte = e.erte === 'reduced' || e.erte === 'suspended' ? e.erte : null;
+  return {
+    ...base,
+    ...orMore,
+    range: r.range,
+    calculation:
+      erte === null
+        ? r.calculation
+        : [
+            phrase(ERTE_PHRASE[erte], { salario: { euros: severanceMonthlySalary(e) ?? 0 } }),
+            ...r.calculation,
+          ],
     sources: r.sources,
-    ...(reason === undefined ? {} : { zeroReason: reason }),
   };
 }
+
+const REFERENCE_CAUSES: readonly Cause[] = [
+  'disciplinary_dismissal',
+  'objective_dismissal',
+  'collective_dismissal',
+];
 
 export function reviewFinalPay(
   e: FinalPayInput,
@@ -72,13 +139,14 @@ export function reviewFinalPay(
     .filter((p): p is Item => p !== null)
     .map((p) => compareItem(p, figures[p.id] ?? null));
 
+  const referenceSalary = severanceAnnualSalary(e);
   const unfairReference =
-    e.cause === 'disciplinary_dismissal' || e.cause === 'objective_dismissal'
+    REFERENCE_CAUSES.includes(e.cause) && referenceSalary !== null
       ? computeSeverance({
           cause: 'unfair_dismissal',
           startDate: e.startDate,
           endDate: e.endDate,
-          annualSalary: annualSalary(e),
+          annualSalary: referenceSalary,
         }).amount
       : null;
 
@@ -92,6 +160,18 @@ export function reviewFinalPay(
 
   return {
     ok: true,
-    review: { items, unfairReference, uncheckedCodes },
+    review: {
+      items,
+      unfairReference,
+      uncheckedCodes,
+      lateInterest:
+        e.paid === false
+          ? lateInterest(
+              items.map((p) => p.item),
+              e.endDate,
+              today,
+            )
+          : null,
+    },
   };
 }

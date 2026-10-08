@@ -7,8 +7,14 @@ export type Cause =
   | 'resignation'
   | 'fixed_term_end'
   | 'objective_dismissal'
+  | 'collective_dismissal'
   | 'unfair_dismissal'
-  | 'disciplinary_dismissal';
+  | 'disciplinary_dismissal'
+  | 'unknown';
+// The causes a document can state; «No lo sé» is only ever the person's answer.
+export type StatedCause = Exclude<Cause, 'unknown'>;
+// Whether the person was in an ERTE when dismissed, and how.
+export type Erte = 'none' | 'reduced' | 'suspended' | 'unknown';
 export type FixedTermType = 'production_circumstances' | 'replacement' | 'training';
 
 export type Accrual = 'annual' | 'semiannual' | 'unknown';
@@ -54,7 +60,25 @@ export interface FinalPayInput {
   readonly noticeDaysReceived?: number;
   readonly agreementNoticeDays?: number;
   readonly noticeDaysGiven?: number;
+  // Absent = not in an ERTE.
+  readonly erte?: Erte;
+  // The full monthly salary before the ERTE, on the same basis as `monthlySalary`.
+  readonly preErteMonthlySalary?: number;
+  // false when the final pay is still unpaid; absent when not answered.
+  readonly paid?: boolean;
 }
+
+// The situations that may make a dismissal null (art. 55.5 ET; Ley 15/2022 for sick leave). Kept
+// out of FinalPayInput on purpose: health and family answers stay in the browser, in the form.
+export const PROTECTED_SITUATIONS = [
+  'pregnancy',
+  'family_leave',
+  'back_from_leave',
+  'care_rights',
+  'gender_violence',
+  'sick_leave',
+] as const;
+export type ProtectedSituation = (typeof PROTECTED_SITUATIONS)[number];
 
 // Why a severance item is legally zero; the UI words each cause differently.
 export type ZeroReason = 'resignation' | 'disciplinary_dismissal' | 'replacement' | 'training';
@@ -69,7 +93,9 @@ export interface Item {
   readonly sources: readonly Source[];
   readonly zeroReason?: ZeroReason;
   // Set when `range` is null for want of an answer the person gave as «No lo sé», not the agreement.
-  readonly missingAnswer?: 'days_taken';
+  readonly missingAnswer?: 'days_taken' | 'cause' | 'pre_erte_salary';
+  // The figure is a legal minimum that an agreement the review cannot know usually improves.
+  readonly orMore?: 'ere_agreement';
   // What the item took from the person's answers, said in the result so a slip shows.
   readonly counted?: Phrase;
 }

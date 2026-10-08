@@ -337,8 +337,10 @@ export function extraPayItem(e: FinalPayInput): Item | null {
 
 export function employerNoticeItem(e: FinalPayInput): Item | null {
   const objective = e.cause === 'objective_dismissal';
+  // Art. 51.4 ET: a collective dismissal's notice is the objective one's, art. 53.1.c.
+  const collective = e.cause === 'collective_dismissal';
   const longFixedTerm = e.cause === 'fixed_term_end' && calendarDays(e.startDate, e.endDate) > 365;
-  if (!objective && !longFixedTerm) return null;
+  if (!objective && !collective && !longFixedTerm) return null;
   const received = e.noticeDaysReceived ?? 0;
   const missingDays = Math.max(0, NOTICE_DAYS - received);
   const dayMin = e.monthlySalary / 30;
@@ -358,7 +360,11 @@ export function employerNoticeItem(e: FinalPayInput): Item | null {
     ],
     dependsOnAgreement: false,
     basedOnYourAnswer: false,
-    sources: [objective ? SOURCES.et53 : SOURCES.et49],
+    sources: objective
+      ? [SOURCES.et53]
+      : collective
+        ? [SOURCES.et53, SOURCES.et51]
+        : [SOURCES.et49],
   };
 }
 

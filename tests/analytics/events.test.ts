@@ -58,7 +58,7 @@ function review(...statuses: [ItemId, Status, number | null, number | null][]): 
     status,
     difference,
   }));
-  return { items, unfairReference: null, uncheckedCodes: [] };
+  return { items, unfairReference: null, uncheckedCodes: [], lateInterest: null };
 }
 
 describe('buckets', () => {

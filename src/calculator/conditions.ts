@@ -7,17 +7,33 @@ import type { HolidayUnit } from '../engine/types';
 import { parseAmount } from './number';
 import type { Step } from './steps';
 
-// An unfair or disciplinary dismissal has no notice to check.
-const NOTICE_CAUSES: readonly string[] = ['objective_dismissal', 'fixed_term_end', 'resignation'];
+const DISMISSALS: readonly string[] = [
+  'objective_dismissal',
+  'collective_dismissal',
+  'unfair_dismissal',
+  'disciplinary_dismissal',
+];
 
-// Conditional sheets: the fixed-term type only for a fixed-term contract, extra pay only when
-// it is not already spread over the monthly payslip, the notice only for a cause that has one,
-// and the benefit questions only when the cause can give a right to the benefit.
+// An unfair or disciplinary dismissal has no notice to check.
+const NOTICE_CAUSES: readonly string[] = [
+  'objective_dismissal',
+  'collective_dismissal',
+  'fixed_term_end',
+  'resignation',
+];
+
+// Conditional sheets: the fixed-term type only for a fixed-term contract, the situations that may
+// make a dismissal null after one (or a cause not known), the ERTE only after a dismissal, extra
+// pay only when it is not already spread over the monthly payslip, the notice only for a cause
+// that has one, and the benefit questions only when the cause can give a right to the benefit.
 export function applies(form: HTMLFormElement, step: Step): boolean {
   const data = new FormData(form);
-  if (step === 'temporal') return data.get('cause') === 'fixed_term_end';
+  const cause = String(data.get('cause') ?? '');
+  if (step === 'temporal') return cause === 'fixed_term_end';
+  if (step === 'situacion') return DISMISSALS.includes(cause) || cause === 'unknown';
+  if (step === 'erte') return DISMISSALS.includes(cause);
   if (step === 'pagas') return data.get('extraPayProrated') === 'no';
-  if (step === 'preaviso') return NOTICE_CAUSES.includes(String(data.get('cause') ?? ''));
+  if (step === 'preaviso') return NOTICE_CAUSES.includes(cause);
   if (step === 'hijos' || step === 'otros')
     return asksAboutBenefit(data.get('cause') as string | null);
   return true;
@@ -34,6 +50,14 @@ export function applyConditions(form: HTMLFormElement) {
   const cause = String(data.get('cause') ?? '');
   for (const el of form.querySelectorAll<HTMLElement>('[data-if-cause]'))
     setActive(el, (el.dataset['ifCause'] ?? '').split(' ').includes(cause));
+  // Read again: these answers exist only while their groups are active.
+  const after = new FormData(form);
+  const erte = String(after.get('erte') ?? '');
+  for (const el of form.querySelectorAll<HTMLElement>('[data-if-erte]'))
+    setActive(el, (el.dataset['ifErte'] ?? '').split(' ').includes(erte));
+  const situations = String(after.get('situations') ?? '');
+  for (const el of form.querySelectorAll<HTMLElement>('[data-if-situations]'))
+    setActive(el, el.dataset['ifSituations'] === situations);
   const otherContractsChoice = String(data.get('otherContracts') ?? '');
   for (const el of form.querySelectorAll<HTMLElement>('[data-if-other-contracts]'))
     setActive(el, el.dataset['ifOtherContracts'] === otherContractsChoice);

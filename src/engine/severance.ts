@@ -9,7 +9,7 @@ import {
   parseDate,
   type CivilDate,
 } from './date';
-import type { Cause, FixedTermType } from './types';
+import type { FixedTermType, StatedCause } from './types';
 
 export interface Severance {
   readonly amount: number;
@@ -188,6 +188,18 @@ function objective(startDate: CivilDate, endDate: CivilDate, sd: number): Severa
   ]);
 }
 
+// Art. 51.4 ET: each dismissal of a collective one follows art. 53.1, so the legal minimum is the
+// objective dismissal's; what the consultation agreement adds (art. 51.2) is not known here.
+function collective(startDate: CivilDate, endDate: CivilDate, sd: number): Severance {
+  const r = withRange(startDate, endDate, sd, objectiveComputation, [
+    SOURCES.et51,
+    SOURCES.et53,
+    SOURCES.cgpjGuide,
+    SOURCES.sts651_2026,
+  ]);
+  return { ...r, calculation: [phrase('severance.collective'), ...r.calculation] };
+}
+
 function fixedTermDaysPerYear(startDate: CivilDate): number {
   if (startDate.y <= 2011) return 8;
   if (startDate.y >= 2015) return 12;
@@ -226,7 +238,7 @@ function fixedTermEnd(
 }
 
 export function computeSeverance(args: {
-  cause: Cause;
+  cause: StatedCause;
   startDate: CivilDate;
   endDate: CivilDate;
   annualSalary: number;
@@ -239,6 +251,8 @@ export function computeSeverance(args: {
       return unfair(startDate, endDate, sd);
     case 'objective_dismissal':
       return objective(startDate, endDate, sd);
+    case 'collective_dismissal':
+      return collective(startDate, endDate, sd);
     case 'fixed_term_end':
       return fixedTermEnd(startDate, endDate, sd, fixedTermType);
     case 'resignation':

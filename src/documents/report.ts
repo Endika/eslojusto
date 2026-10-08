@@ -7,7 +7,10 @@ import { calculationText, phraseText } from '../calculator/calculation';
 import { formatDays, formatEuros, formatInteger, formatWholeEuros } from '../calculator/number';
 import type { CompletedReview } from '../calculator/ports';
 import {
+  benefitStatusKey,
   durationKey,
+  lateInterestLines,
+  missingRangeKey,
   qualifyingText,
   referenceKey,
   sourceDate,
@@ -23,8 +26,7 @@ const shortDate = (d: CivilDate) => sourceDate(toIso(d));
 
 function rangeText(item: Item, tr: Translate): string {
   const { range } = item;
-  if (range === null)
-    return tr(item.missingAnswer === 'days_taken' ? 'client.range.days' : 'client.range.agreement');
+  if (range === null) return tr(missingRangeKey(item));
   if (item.direction === 'deduction') return formatEuros(range.max);
   if (range.min === range.max) return formatEuros(range.min);
   return tr('client.range.between', {
@@ -73,6 +75,7 @@ function itemBlocks(r: ItemResult, reference: number | null, tr: Translate): Blo
     },
     { type: 'text', text: statusText(r, tr, reference) },
     ...(item.counted ? [{ type: 'note', text: phraseText(item.counted, tr) } as const] : []),
+    ...(item.orMore ? [{ type: 'note', text: tr(`client.or_more.${item.orMore}`) } as const] : []),
     ...(item.dependsOnAgreement && item.range !== null
       ? [{ type: 'note', text: tr('client.agreement_may_improve') } as const]
       : []),
@@ -94,9 +97,7 @@ function benefitBlocks(
     { type: 'heading', text: tr('client.documents.report.benefit') },
     {
       type: 'text',
-      text: tr(
-        p.entitled === 'yes' ? 'client.unemployment.status.yes' : 'client.unemployment.status.no',
-      ),
+      text: tr(benefitStatusKey(p, cause)),
     },
     { type: 'note', text: tr(`client.unemployment.reason.${cause}`) },
   ];
@@ -184,6 +185,30 @@ function dataRows({ input: e }: CompletedReview, tr: Translate): Block[] {
   ];
 }
 
+function interestBlocks({ review, input }: CompletedReview, tr: Translate): Block[] {
+  const l = review.lateInterest;
+  if (l === null) return [];
+  return [
+    { type: 'heading', text: tr('client.warning.late_interest.title') },
+    ...lateInterestLines(l, input.cause).map(({ key, importe, dias }): Block => ({
+      type: 'text',
+      text: tr(key, {
+        ...(importe === undefined ? {} : { importe: formatEuros(importe) }),
+        ...(dias === undefined ? {} : { dias: formatInteger(dias) }),
+      }),
+    })),
+    ...(l.daysLeft < 0
+      ? []
+      : [
+          {
+            type: 'note',
+            text: `${tr('client.documents.report.how')}: ${calculationText(l.calculation, tr)}`,
+          } as const,
+        ]),
+    ...sources(l.sources, tr),
+  ];
+}
+
 export function reportModel(r: CompletedReview, tr: Translate, today: CivilDate): DocumentModel {
   const { review } = r;
   return {
@@ -203,6 +228,7 @@ export function reportModel(r: CompletedReview, tr: Translate, today: CivilDate)
         type: 'bullet',
         text: tr(`client.unchecked.${c}`),
       })),
+      ...interestBlocks(r, tr),
       ...benefitBlocks(r.benefit, r.input.cause, tr),
     ],
   };
