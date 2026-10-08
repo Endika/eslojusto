@@ -105,6 +105,15 @@ describe('the employment tool schema', () => {
     expect(line['month']).toMatchObject({ type: 'string', pattern: '^[0-9]{4}-[0-9]{2}$' });
   });
 
+  it('says which rows to keep in the prompt and descriptions, not as a schema keyword', () => {
+    expect(JSON.stringify(schema)).not.toContain('keepLatestBy');
+    expect(
+      String(
+        properties(properties(schema)['employment_work_history'])['contracts']?.['description'],
+      ),
+    ).toContain('most recent');
+  });
+
   it('asks for literal texts word for word and never for a verdict on them', () => {
     expect(String(contract['causeText']?.['description'])).toContain('Word for word');
     const text = JSON.stringify(schema).toLowerCase();
@@ -204,6 +213,40 @@ describe('an employment reading', () => {
     const { section, dropped } = parseSection(EMPLOYMENT_SECTIONS.employment_contract, fields);
     expect(section.fields).toEqual({});
     expect(dropped).toBe(1);
+  });
+
+  it('keeps the most recent rows past a maximum, whatever order they came in', () => {
+    const contracts = Array.from({ length: 20 }, (_, i) => ({
+      startDate: `${2006 + i}-01-01`,
+      confidence: 'high',
+    }));
+    const { section, dropped } = parseSection(EMPLOYMENT_SECTIONS.employment_work_history, {
+      contracts,
+    });
+    expect(section.lists['contracts']?.map((r) => r.values['startDate'])).toEqual(
+      contracts.slice(5).map((c) => c.startDate),
+    );
+    expect(dropped).toBe(5);
+  });
+
+  it('keeps the payslips and lines of the most recent months', () => {
+    const months = Array.from({ length: 8 }, (_, i) => `2026-0${i + 1}`);
+    const { section } = parseSection(EMPLOYMENT_SECTIONS.employment_payslips, {
+      payslips: months.map((month) => ({ month, confidence: 'high' })),
+      lines: months.flatMap((month) =>
+        Array.from({ length: 10 }, () => ({
+          month,
+          concept: 'SALARIO BASE',
+          amount: 600,
+          category: 'salary',
+          confidence: 'high',
+        })),
+      ),
+    });
+    expect(section.lists['payslips']?.map((r) => r.values['month'])).toEqual(months.slice(2));
+    expect(new Set(section.lists['lines']?.map((r) => r.values['month']))).toEqual(
+      new Set(months.slice(2)),
+    );
   });
 
   it('drops a payslip line without its month and counts it', () => {

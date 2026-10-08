@@ -148,7 +148,8 @@ const list = (
   maxItems: number,
   item: Readonly<Record<string, FieldSpec>>,
   required: readonly string[],
-): ListSpec => ({ description, maxItems, item, required });
+  keepLatestBy?: string,
+): ListSpec => ({ description, maxItems, item, required, ...(keepLatestBy && { keepLatestBy }) });
 
 // Literal texts are copied so the person can check the label against them; the prompt says how
 // (persons' names become «[nombre]») and that the model never judges them.
@@ -304,9 +305,10 @@ const employmentPayslips = {
         category: text(MAX_SHORT_TEXT, 'Professional group or category.'),
       },
       ['month'],
+      'month',
     ),
     lines: list(
-      'Every earnings line (devengo) of those payslips; never deductions.',
+      'Every earnings line (devengo) of those payslips; past sixty, the most recent; never deductions.',
       EMPLOYMENT_LIST_MAXIMA.lines,
       {
         month: field({ type: 'month' }, 'Month of its payslip.'),
@@ -318,6 +320,7 @@ const employmentPayslips = {
         ),
       },
       ['month', 'concept', 'amount', 'category'],
+      'month',
     ),
   },
 } as const satisfies SectionSchema;
@@ -342,6 +345,7 @@ const employmentWorkHistory = {
         partTimeCoefficient: whole(0, 1000, 'Part-time coefficient (C.T.P.), per thousand.'),
       },
       ['startDate'],
+      'startDate',
     ),
   },
 } as const satisfies SectionSchema;

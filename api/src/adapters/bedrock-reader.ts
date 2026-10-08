@@ -60,7 +60,7 @@ First, in pages, give every attached page its kind, the number of the document i
 - job_offer: a job offer.
 - employment_payslips: every payslip (nómina) and each of its earnings lines, with its month.
 - employment_work_history: the work history report (vida laboral), one entry per row.
-Leave out a section when no attached document is of that kind. Record nothing from pages of kind other, nor from a settlement, dismissal letter, company certificate or agreement: give them their kind only.
+Leave out a section when no attached document is of that kind. Record nothing from pages of kind other, nor from a settlement, dismissal letter, company certificate or agreement: give them their kind only. When a list cannot hold every row, keep the most recent.
 
 Rules:
 - Record only values printed in the documents. Do not calculate, infer, convert, round or complete anything. If a value is absent, illegible or ambiguous, leave its field out.
