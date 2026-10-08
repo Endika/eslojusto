@@ -6,10 +6,11 @@ import { LETTER_MAX_LENGTH } from '../documents/letter';
 // The pass for the PDF report and the letter, offered in the result when an item falls short.
 // Rendered only in a build with the documents API; DocumentStart carries its styles. On the rental
 // review the same pass unlocks each item's detail too, and its letters are two, each shown only
-// when the review has figures for it.
+// when the review has figures for it. On the contract review it unlocks the detail alone, and
+// there is nothing to download yet.
 interface Props {
   lang: Lang;
-  review?: 'final_pay' | 'rental';
+  review?: 'final_pay' | 'rental' | 'employment';
 }
 const { lang, review = 'final_pay' } = Astro.props;
 const rental = review === 'rental';
@@ -23,7 +24,18 @@ const RENTAL: Partial<Record<Key, Key>> = {
   'documents.letter.legend': 'rental.letter.legend',
   'documents.letter.privacy': 'rental.letter.privacy',
 };
-const tx = (key: Key) => t(lang, (rental && RENTAL[key]) || key);
+const EMPLOYMENT: Partial<Record<Key, Key>> = {
+  'documents.pass.title': 'employment.pass.title',
+  'documents.pass.text': 'employment.pass.text',
+  'documents.pass.price': 'employment.pass.price',
+  'documents.pass.waiver': 'employment.pass.waiver',
+  'documents.pass.paid_help': 'employment.pass.paid_help',
+};
+const OWN: Partial<Record<Key, Key>> = { final_pay: {}, rental: RENTAL, employment: EMPLOYMENT }[
+  review
+];
+const tx = (key: Key) => t(lang, OWN[key] ?? key);
+const downloads = review !== 'employment';
 type LetterField = readonly [
   id: 'name' | 'id' | 'company' | 'landlord' | 'address' | 'place' | 'iban' | 'date',
   label: Key,
@@ -112,72 +124,78 @@ const describedBy = (id: LetterField[0]) =>
     </div>
     <div data-pass-downloads hidden>
       <p class="help" data-pass-validity></p>
-      <div class="pass__actions">
-        <button class="button button--sheet" type="button" data-download="report">
-          {tx('documents.pass.download_report')}
-        </button>
-      </div>
-      <fieldset class="group pass__letter" data-letter aria-describedby="hint-letter">
-        <legend>{tx('documents.letter.legend')}</legend>
-        <p class="hint" id="hint-letter">
-          {tx('documents.letter.hint')}
-        </p>
-        {letterFields.map(([id, key, autocomplete, type]) => (
-          <div class="field" data-letter-kind={id === 'iban' ? 'deposit_return' : undefined}>
-            <label class="field__label" for={`letter-${id}`}>
-              {tx(key)}
-            </label>
-            {id === 'iban' && (
-              <p class="hint" id="hint-letter-iban">
-                {tx('rental.letter.iban_hint')}
-              </p>
-            )}
-            <input
-              class:list={[
-                'field__input',
-                { 'field__input--figure': type === 'date' || id === 'iban' },
-              ]}
-              type={type}
-              id={`letter-${id}`}
-              name={`letter-${id}`}
-              autocomplete={autocomplete}
-              spellcheck="false"
-              dir={type === 'date' || id === 'iban' ? 'ltr' : undefined}
-              maxlength={
-                type === 'date'
-                  ? undefined
-                  : LETTER_MAX_LENGTH[id as Exclude<LetterField[0], 'date'>]
-              }
-              aria-describedby={describedBy(id)}
-              data-letter-field={id}
-            />
-            {id === 'id' && <p class="hint" id="error-letter-id" data-letter-id-warning hidden />}
-          </div>
-        ))}
-        <p class="hint" role="status" data-letter-glyph-warning hidden></p>
-        <p class="item__note">{tx('documents.letter.privacy')}</p>
-        <div class="pass__actions">
-          {rental ? (
-            rentalLetters.map(([kind, key]) => (
-              <button
-                class="button button--sheet"
-                type="button"
-                data-download="letter"
-                data-letter-kind={kind}
-              >
-                {tx(key)}
-              </button>
-            ))
-          ) : (
-            <button class="button button--sheet" type="button" data-download="letter">
-              {tx('documents.pass.download_letter')}
+      {downloads && (
+        <>
+          <div class="pass__actions">
+            <button class="button button--sheet" type="button" data-download="report">
+              {tx('documents.pass.download_report')}
             </button>
-          )}
-        </div>
-        <p class="item__note" data-letter-note>
-          {tx('documents.pass.letter_note')}
-        </p>
-      </fieldset>
+          </div>
+          <fieldset class="group pass__letter" data-letter aria-describedby="hint-letter">
+            <legend>{tx('documents.letter.legend')}</legend>
+            <p class="hint" id="hint-letter">
+              {tx('documents.letter.hint')}
+            </p>
+            {letterFields.map(([id, key, autocomplete, type]) => (
+              <div class="field" data-letter-kind={id === 'iban' ? 'deposit_return' : undefined}>
+                <label class="field__label" for={`letter-${id}`}>
+                  {tx(key)}
+                </label>
+                {id === 'iban' && (
+                  <p class="hint" id="hint-letter-iban">
+                    {tx('rental.letter.iban_hint')}
+                  </p>
+                )}
+                <input
+                  class:list={[
+                    'field__input',
+                    { 'field__input--figure': type === 'date' || id === 'iban' },
+                  ]}
+                  type={type}
+                  id={`letter-${id}`}
+                  name={`letter-${id}`}
+                  autocomplete={autocomplete}
+                  spellcheck="false"
+                  dir={type === 'date' || id === 'iban' ? 'ltr' : undefined}
+                  maxlength={
+                    type === 'date'
+                      ? undefined
+                      : LETTER_MAX_LENGTH[id as Exclude<LetterField[0], 'date'>]
+                  }
+                  aria-describedby={describedBy(id)}
+                  data-letter-field={id}
+                />
+                {id === 'id' && (
+                  <p class="hint" id="error-letter-id" data-letter-id-warning hidden />
+                )}
+              </div>
+            ))}
+            <p class="hint" role="status" data-letter-glyph-warning hidden></p>
+            <p class="item__note">{tx('documents.letter.privacy')}</p>
+            <div class="pass__actions">
+              {rental ? (
+                rentalLetters.map(([kind, key]) => (
+                  <button
+                    class="button button--sheet"
+                    type="button"
+                    data-download="letter"
+                    data-letter-kind={kind}
+                  >
+                    {tx(key)}
+                  </button>
+                ))
+              ) : (
+                <button class="button button--sheet" type="button" data-download="letter">
+                  {tx('documents.pass.download_letter')}
+                </button>
+              )}
+            </div>
+            <p class="item__note" data-letter-note>
+              {tx('documents.pass.letter_note')}
+            </p>
+          </fieldset>
+        </>
+      )}
     </div>
     <p class="pass__status" role="status" aria-live="polite" data-pass-status></p>
     <p class="errata" role="alert" data-pass-error hidden></p>

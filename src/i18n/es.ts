@@ -2138,6 +2138,91 @@ export const es = {
   'client.employment.calculation.information.out_of_scope.relief':
     'El contrato de relevo tiene reglas propias, que esta versión no revisa.',
 
+  'employment.documents.start_help':
+    'Puedes subir tu contrato y los demás papeles de tu trabajo para rellenar los datos con lo que se lea en ellos, o escribirlos tú. Antes de revisar nada, confirmas cada dato.',
+  'employment.documents.upload':
+    'Sube tu contrato y, si los tienes, nóminas, la oferta de empleo y tu vida laboral',
+  'employment.documents.files_hint':
+    'El contrato con sus anexos y, si los tienes, tus nóminas, la oferta de empleo o tu vida laboral, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+  'employment.documents.consent':
+    'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos sensibles, como la afiliación a un sindicato, una baja médica o una discapacidad. Se leen en la Unión Europea y no se guardan.',
+  'employment.pass.title': 'El detalle de cada punto',
+  'employment.pass.text':
+    'Por 4,99 € ves el cálculo paso a paso de cada punto de tu contrato: año a año y nómina a nómina, con la norma que aplica y su fuente.',
+  'employment.pass.price':
+    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para las revisiones del finiquito y del alquiler: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a ver el detalle sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
+  'employment.pass.paid_help':
+    'Si pagaste desde este navegador y no ves el detalle, recupera aquí tu pase. Solo funciona en el navegador con el que pagaste.',
+  'employment.pass.waiver':
+    'Quiero ver el detalle ahora. Sé que, al ser contenido digital que se entrega al momento, pierdo el derecho de desistimiento (art. 103.m de la Ley General para la Defensa de los Consumidores y Usuarios).',
+  'client.documents.kind.employment_contract': 'Contrato de trabajo',
+  'client.documents.kind.job_offer': 'Oferta de empleo',
+  'client.documents.source.employment_contract': 'el contrato',
+  'client.documents.source.job_offer': 'la oferta de empleo',
+  'client.employment.documents.mark_derived':
+    'Sale de lo leído en tus documentos · confianza {nivel}',
+  'client.employment.documents.quote.modality': 'Cómo llama tu contrato a su modalidad',
+  'client.employment.documents.quote.causeStated': 'Lo que dice tu contrato sobre su causa',
+  'client.employment.documents.quote.replacementCauseStated':
+    'Lo que dice tu contrato sobre su causa',
+  'client.employment.documents.quote.agreementNamed': 'El convenio que nombran tus documentos',
+  'client.employment.documents.quote.categorySalary':
+    'La categoría o el grupo que dicen tus documentos',
+  'client.employment.documents.quote.hasSchedule': 'Lo que dice tu contrato sobre el horario',
+  'client.employment.documents.quote_note':
+    'Copiado tal cual del documento: compáralo con lo que marcas aquí.',
+  'client.employment.documents.agreement_with_code': '{nombre} (código {codigo})',
+  'client.employment.documents.agreement_code': 'Código {codigo}',
+  'client.employment.documents.conflict.category':
+    'La categoría o el grupo no es el mismo en el contrato y en alguna nómina: compáralos con tus documentos, porque el salario de tu convenio depende de ella.',
+  'client.employment.documents.conflict.agreementName':
+    'El convenio no es el mismo en el contrato y en alguna nómina: compáralos con tus documentos.',
+  'client.employment.documents.lines_left_out':
+    'En los devengos salariales de cada nómina se suman el salario base y los complementos fijos. No se han sumado: {lineas}. Si alguno debe contar, corrige la cifra en la hoja de nóminas.',
+  'client.employment.documents.line.variable': 'incentivos y otros pluses variables',
+  'client.employment.documents.line.overtime': 'horas extra',
+  'client.employment.documents.line.complementary_hours': 'horas complementarias',
+  'client.employment.documents.line.extra_pay': 'pagas extra cobradas ese mes',
+  'client.employment.documents.line.expenses': 'dietas y gastos',
+  'client.employment.documents.line.one_off': 'atrasos y pagos sueltos',
+  'client.employment.documents.line.other': 'otros conceptos',
+  'client.employment.documents.payslip_no_lines':
+    'De alguna nómina no se han leído sus devengos: escribe tú la cifra en la hoja de nóminas.',
+  'client.employment.documents.offer_period':
+    'La oferta no da el salario al año, así que no se ha pasado: escribe tú la cifra anual en la hoja de la oferta.',
+  'client.employment.documents.cut.salaryParts':
+    'El contrato desglosa el salario en más partes de las que se leen de una vez: se han leído {n}. Compara el desglose con tu contrato.',
+  'client.employment.documents.cut.clauses':
+    'El contrato tiene más cláusulas de las que se leen de una vez: se han leído {n}. Añade tú las que falten.',
+  'client.employment.documents.cut.payslips':
+    'Has subido más nóminas de las que se leen de una vez: se han leído las {n} más recientes.',
+  'client.employment.documents.cut.lines':
+    'Tus nóminas tienen más devengos de los que se leen de una vez: se han leído los {n} más recientes, así que las nóminas más antiguas pueden quedar incompletas.',
+  'client.employment.documents.cut.contracts':
+    'Tu vida laboral tiene más filas de las que se leen de una vez: se han leído las {n} más recientes, y la lista queda marcada como incompleta.',
+  'client.employment.documents.cut.unknown':
+    'Alguna lista de tus documentos tenía más filas de las que se leen de una vez: se han leído las más recientes. Compara las listas con tus documentos.',
+  'client.employment.documents.rows_cut':
+    'Se ha leído más de lo que cabe en alguna lista: compara sus filas con tus documentos y completa lo que falte.',
+  'client.employment.documents.check.end_before_start':
+    'Alguna fecha de fin leída es anterior a la de inicio, en el contrato, en una nómina o en tu vida laboral: revisa esas fechas.',
+  'client.employment.documents.check.payslip_not_whole_month':
+    'Alguna nómina no cubre el mes entero: revisa en la hoja de nóminas si trabajaste el mes completo.',
+  'client.employment.documents.check.payslip_lines_do_not_sum':
+    'Los devengos leídos de alguna nómina no suman su total devengado: revisa las cifras de la hoja de nóminas.',
+  'client.employment.documents.check.hours_over_week':
+    'Las horas a la semana leídas son demasiadas para una semana de trabajo: revísalas.',
+  'client.employment.documents.check.salary_period_mismatch':
+    'El salario al mes por el número de pagas no da el salario al año que dice el contrato: revisa el salario y las pagas extra.',
+  'client.employment.documents.error.pass_invalid':
+    'Tu pase ya no sirve para leer documentos en este navegador; el detalle sigue disponible hasta que caduque. Prueba otra vez con una lectura gratis o rellena a mano.',
+  'client.employment.documents.error.pass_exhausted':
+    'Ya has usado las 15 lecturas de tu pase. Puedes rellenar a mano; el detalle sigue disponible.',
+  'client.employment.documents.pass.issued':
+    'Pago recibido. Ya puedes ver el detalle de cada punto.',
+  'client.employment.documents.pass.lost':
+    'Hemos vuelto del pago, pero la revisión no se ha podido recuperar. Repítela y verás el detalle.',
+
   'rental.title': 'Revisión de alquiler: subidas, fianza y gastos',
   'rental.description':
     'Comprueba si la subida, la fianza, los gastos o la agencia de tu alquiler pasan de lo que permite la ley, partida por partida. Todo en tu dispositivo.',

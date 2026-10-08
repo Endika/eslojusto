@@ -24,11 +24,14 @@ import {
   WEEKDAYS,
   infoField,
 } from '../employment/form';
+import { ROW_MAX } from '../employment/rows';
 
 interface Props {
   lang: Lang;
+  // With the documents API the form waits behind the choice between uploading and typing.
+  hidden?: boolean;
 }
-const { lang } = Astro.props;
+const { lang, hidden = false } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 
 const answer = (v: 'yes' | 'no' | 'unknown') => ({
@@ -43,7 +46,13 @@ const noOr = (yes: Key) => [answer('no'), { value: 'yes', label: tx(yes) }];
 const arrow = 'M4 12h15m-6-6 6 6-6 6';
 ---
 
-<form class="calculator" id="employment" novalidate aria-label={tx('employment.form_aria')}>
+<form
+  class="calculator"
+  id="employment"
+  novalidate
+  aria-label={tx('employment.form_aria')}
+  hidden={hidden}
+>
   <div class="stack">
     <fieldset
       class="sheet"
@@ -245,7 +254,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         remove={tx('client.employment.rows.remove')}
         full={tx('employment.rows.full')}
         min={1}
-        max={20}
+        max={ROW_MAX.history}
         attributes={{ 'data-if': 'hasHistory:yes', hidden: '' }}
       >
         <div class="row__fields">
@@ -351,7 +360,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         remove={tx('client.employment.rows.remove')}
         full={tx('employment.rows.full')}
         min={1}
-        max={10}
+        max={ROW_MAX.parts}
         attributes={{ 'data-if': 'hasBreakdown:yes', hidden: '' }}
       >
         <div class="row__fields">
@@ -441,7 +450,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         remove={tx('client.employment.rows.remove')}
         full={tx('employment.rows.full')}
         min={1}
-        max={24}
+        max={ROW_MAX.payslips}
         attributes={{ 'data-if': 'hasPayslips:yes', hidden: '' }}
       >
         <div class="row__fields">
@@ -509,7 +518,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         full={tx('employment.rows.full')}
         hint={tx('employment.time.slots_hint')}
         min={1}
-        max={21}
+        max={ROW_MAX.schedule}
         attributes={{ 'data-if': 'hasSchedule:yes', hidden: '' }}
       >
         <div class="field" data-row-box="day">
@@ -756,7 +765,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         remove={tx('client.employment.rows.remove')}
         full={tx('employment.rows.full')}
         min={1}
-        max={12}
+        max={ROW_MAX.clauses}
         attributes={{ 'data-if': 'hasClauses:yes', hidden: '' }}
       >
         <div class="field" data-row-box="label">

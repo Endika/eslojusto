@@ -2,6 +2,8 @@
 import Base from '../layouts/Base.astro';
 import EmploymentForm from '../components/EmploymentForm.astro';
 import EmploymentResult from '../components/EmploymentResult.astro';
+import DocumentStart from '../components/DocumentStart.astro';
+import { DOCUMENTS } from '../documents/config';
 import { EMPLOYMENT_BETA } from '../content/sections';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
@@ -22,6 +24,9 @@ const sections = [
   ['settlement', 'prueba', '05', 5],
   ['result', 'resultado', '06', 2],
 ] as const;
+// With the documents API the visit opens on the choice between uploading and typing; the tabs and
+// the form wait until it is made.
+const documents = DOCUMENTS !== null;
 ---
 
 <Base
@@ -30,8 +35,9 @@ const sections = [
   path="/contrato/"
   lang={lang}
   section="cause"
+  calculator={documents}
 >
-  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
     <ol>
       {/* Only a section already reached is a link; one still ahead is plain text until then. */}
       {sections.map(([id, step, number, weight], i) => (
@@ -68,8 +74,9 @@ const sections = [
           <p class="help">{tx('employment.no_js')}</p>
         </div>
       </noscript>
-      <EmploymentForm lang={lang} />
-      <EmploymentResult lang={lang} />
+      {documents && <DocumentStart lang={lang} review="employment" />}
+      <EmploymentForm lang={lang} hidden={documents} />
+      <EmploymentResult lang={lang} documents={documents} />
     </div>
   </main>
 </Base>

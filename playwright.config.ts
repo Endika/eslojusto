@@ -16,10 +16,10 @@ const employmentSpecs = /[\\/]employment[^\\/]*\.spec\.ts$/;
 const optInSpecs = [/(rtl|analytics|documents)\.spec\.ts/, rentalSpecs, employmentSpecs];
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
-// The documents project reads documents on /alquiler/ too, so its build has that page.
+// The documents project reads documents on /alquiler/ and /contrato/ too, so its build has them.
 const buildEnv = {
   ...(rental || documents ? { PUBLIC_RENTAL: '1' } : {}),
-  ...(employment ? { PUBLIC_EMPLOYMENT: '1' } : {}),
+  ...(employment || documents ? { PUBLIC_EMPLOYMENT: '1' } : {}),
   ...(analytics ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
     ? {
@@ -72,6 +72,8 @@ export default defineConfig({
             name: 'employment',
             use: { ...devices['Desktop Chrome'] },
             testMatch: employmentSpecs,
+            // Reading documents on /contrato/ needs the documents project's build.
+            testIgnore: /documents\.spec\.ts/,
           },
         ]
       : []),
