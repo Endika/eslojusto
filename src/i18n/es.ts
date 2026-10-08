@@ -385,6 +385,7 @@ export const es = {
   'guide.severance': 'Indemnización según la causa',
   'guide.unfair_dismissal': 'Finiquito por despido improcedente',
   'guide.objective_dismissal': 'Finiquito por despido objetivo',
+  'guide.collective_dismissal': 'Finiquito por despido colectivo (ERE)',
   'guide.fixed_term_end': 'Finiquito por fin de contrato temporal',
   'guide.resignation': 'Finiquito por baja voluntaria',
   'guide.disciplinary_dismissal': 'Finiquito por despido disciplinario',
@@ -416,15 +417,30 @@ export const es = {
   'faq.objective_dismissal': '¿Cuánto es la indemnización por despido objetivo?',
   'faq.objective_dismissal_answer':
     'Son 20 días de salario por año trabajado, con un tope de 12 mensualidades (360 días), y 15 días de preaviso (art. 53 ET). Si la empresa no da el preaviso, los días que falten se pagan.',
+  'faq.collective_dismissal': '¿Cuánto es la indemnización en un despido colectivo (ERE)?',
+  'faq.collective_dismissal_answer':
+    'Como mínimo, la de un despido objetivo: 20 días de salario por año trabajado, con un tope de 12 mensualidades, y 15 días de preaviso (arts. 51.4 y 53.1 ET). El acuerdo del periodo de consultas puede mejorar ese mínimo, y suele hacerlo (art. 51.2 ET). La revisión no conoce tu acuerdo, así que da el mínimo legal «o más, según el acuerdo del ERE».',
   'faq.daily_salary': '¿Cómo se calcula el salario diario?',
   'faq.daily_salary_answer':
     'Es tu salario bruto anual, con las pagas extra, entre 365. Así lo calcula la guía del CGPJ para las indemnizaciones.',
+  'faq.erte': '¿Y si me despiden durante un ERTE?',
+  'faq.erte_answer':
+    'La indemnización debería calcularse con el salario completo de antes del ERTE, no con el de tus últimas nóminas. Con jornada reducida, con el de antes de la reducción (STS 678/2018, de 27 de junio); con el contrato suspendido, con lo cobrado en los meses trabajados (STS 638/2022, de 7 de julio). La revisión te pide ese salario, y sin él no da una cifra.',
   'faq.fixed_term': '¿Hay indemnización al acabar un contrato temporal?',
   'faq.fixed_term_answer':
     'Sí, 12 días por año, en proporción a los días trabajados (art. 49.1.c ET). Para contratos que empezaron entre 2011 y 2014 son de 8 a 11 días (disposición transitoria 8.ª ET). Los contratos de sustitución y los formativos no tienen indemnización, ni los firmados antes del 4 de marzo de 2001 (disposición transitoria 8.ª.2 ET).',
+  'faq.unknown_cause': '¿Y si no sé cómo terminó mi contrato?',
+  'faq.unknown_cause_answer':
+    'Marca «No lo sé». Se revisan las partidas que no dependen de la causa: el salario del mes de la baja, las vacaciones y las pagas extra. La indemnización depende de la causa y sin ella no se calcula. La causa está en la carta de despido y en el certificado de empresa, en la casilla «causa de la situación legal de desempleo».',
   'faq.deadlines': '¿Qué plazo tengo para pedir lo que falta en mi finiquito?',
   'faq.deadlines_answer':
-    'Para cantidades como el salario pendiente, las vacaciones, las pagas extra o la indemnización por fin de contrato temporal, un año (art. 59.1 ET). En un despido (objetivo, improcedente o disciplinario), el plazo para impugnarlo es de 20 días hábiles (art. 59.3 ET), y quien no esté de acuerdo con su indemnización suele plantearlo por esa misma vía. El plazo es corto, y un despacho laboralista, un despacho de graduado social o un sindicato pueden decirte cuál se aplica a tu caso.',
+    'Para cantidades como el salario pendiente, las vacaciones, las pagas extra o la indemnización por fin de contrato temporal, un año (art. 59.1 ET). En un despido (objetivo, colectivo, improcedente o disciplinario), el plazo para impugnarlo es de 20 días hábiles (art. 59.3 ET), y quien no esté de acuerdo con su indemnización suele plantearlo por esa misma vía. El plazo es corto, y un despacho laboralista, un despacho de graduado social o un sindicato pueden decirte cuál se aplica a tu caso.',
+  'faq.null_dismissal': '¿Cuándo puede ser nulo un despido?',
+  'faq.null_dismissal_answer':
+    'Si te despiden estando embarazada, de permiso por nacimiento, adopción, guarda o acogimiento o en los 12 meses después de volver de él, teniendo o habiendo pedido un permiso, una reducción o una adaptación de jornada o una excedencia por cuidado, o siendo víctima de violencia de género o sexual, el despido podría ser nulo, salvo que el motivo no tenga nada que ver con esa situación (art. 55.5 ET). Estando de baja médica, podría serlo si el motivo es la enfermedad (Ley 15/2022, arts. 2.1 y 26), aunque los tribunales todavía no lo aplican de forma uniforme. La revisión te avisa si lo marcas, sin dar cifras para ese caso. Para impugnar el despido hay 20 días hábiles (art. 59.3 ET).',
+  'faq.late_interest': '¿Y si todavía no me han pagado el finiquito?',
+  'faq.late_interest_answer':
+    'Lo que es salario lleva un interés por el retraso del 10 % al año desde la baja (art. 29.3 ET), aunque la cantidad se discuta (STS de 17 de junio de 2014, rcud 1315/2013). La revisión lo cuenta sobre el mínimo legal del salario del mes de la baja y de las pagas extra. La indemnización no lo lleva, y las vacaciones no disfrutadas no se suman porque es dudoso que lo lleven. Para reclamar las cantidades del finiquito hay un año desde la baja (art. 59.1 y 59.2 ET).',
   'faq.benefit': '¿Tengo paro si me despiden o se acaba mi contrato?',
   'faq.benefit_answer':
     'Cualquier despido es situación legal de desempleo, también el disciplinario aunque sea procedente, y el fin de un contrato temporal también lo es si no lo terminaste tú (arts. 267.1.a y 268.4 LGSS). Dejar el trabajo por decisión propia no lo es, salvo excepciones como un traslado o impagos graves de la empresa (art. 267 LGSS). Además hacen falta 360 días cotizados en los últimos 6 años, que pueden venir de varios trabajos, e inscribirte como demandante de empleo, entre otros requisitos (arts. 266 y 269.1 LGSS).',
