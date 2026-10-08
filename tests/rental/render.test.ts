@@ -8,7 +8,15 @@ import {
   verdictPieces,
 } from '../../src/rental/render';
 import { summarise } from '../../src/rental/summary';
-import { repealedWindow, review, riseAboveIrav, tr, unknownLargeLandlord } from './fixtures';
+import { parseDate as f } from '../../src/engine/date';
+import {
+  contract,
+  repealedWindow,
+  review,
+  riseAboveIrav,
+  tr,
+  unknownLargeLandlord,
+} from './fixtures';
 import type { RentalInput } from '../../src/engine/rental/types';
 
 // The result's hooks and templates, as RentalResult.astro has them.
@@ -69,18 +77,92 @@ describe('the summary of an item', () => {
     expect(text(el)).toBe('Te deben menos de 10 €');
   });
 
-  it('words two readings as «depende de …: entre X € y Y €»', () => {
-    const s = summarise(firstRise(unknownLargeLandlord));
+  const dependsText = (input: RentalInput) => {
+    const s = summarise(firstRise(input));
     if (s.kind !== 'depends') throw new Error('expected depends');
     const el = document.createElement('p');
     el.replaceChildren(...dependsPieces(s, tr));
-    expect(text(el)).toBe('Depende de si tu casero es gran tenedor: entre 0 € y 360 €');
+    return text(el);
+  };
+
+  it('words a reading with no figure by its result, never as «0 €»', () => {
+    expect(dependsText(unknownLargeLandlord)).toBe(
+      'Depende de si tu casero es gran tenedor: no se puede comprobar o pagas de más unos 360 €',
+    );
+  });
+
+  it('gives a range when both readings have a figure: within the limit is 0 €', () => {
+    expect(dependsText(repealedWindow)).toMatch(
+      /^Depende de cómo se lea una norma que ya está derogada: entre 0 € y \d+ €$/,
+    );
+  });
+
+  it('keeps the cents where tens would make the two readings, the share and the total alike', () => {
+    // Keys back on 31-05-2024 and the whole 800 € deposit returned on 01-03-2025: the interest
+    // differs by cents with the length of the year.
+    const input = contract({
+      initialRent: 800,
+      deposit: 800,
+      signedOn: f('2021-03-15'),
+      startDate: f('2021-03-20'),
+      moveOut: {
+        keysReturnedOn: f('2024-05-31'),
+        returns: [{ on: f('2025-03-01'), amount: 800 }],
+        deductions: [],
+      },
+    });
+    const root = render(input, true);
+    const card = root.querySelector('[data-item="deposit_interest"]');
+    const depends = text(card?.querySelector('[data-depends]'));
+    const range = /entre ([\d.,]+ €) y ([\d.,]+ €)/.exec(depends);
+    expect(range?.[1]).toMatch(/,\d\d €$/);
+    expect(range?.[2]).toMatch(/,\d\d €$/);
+    expect(text(card?.querySelector('[data-total-share]'))).toBe(
+      `Al total se suma solo la cuenta más baja: ${range?.[1]}.`,
+    );
+    expect(text(root.querySelector('[data-totals]'))).toContain(`al menos ${range?.[1]}`);
   });
 
   it('joins several reasons in one sentence', () => {
     expect(reasonsText(['repealed_window', 'agreement_unknown', 'interest_day_count'], tr)).toBe(
       'cómo se lea una norma que ya está derogada, de si lo pactasteis por escrito y de si el año de intereses cuenta 365 días o 360',
     );
+  });
+});
+
+describe('the calculation text', () => {
+  it('writes a year as it is and counts one month in the singular', () => {
+    const root = render(
+      contract({
+        signedOn: f('2024-03-15'),
+        startDate: f('2024-03-20'),
+        updates: [
+          {
+            anniversary: f('2025-03-20'),
+            effectiveOn: f('2025-03-20'),
+            previousRent: 1000,
+            newRent: 1030,
+            chargedFrom: f('2025-03-01'),
+            notice: 'letter',
+            noticeOn: f('2025-03-01'),
+            agreedInWriting: false,
+          },
+        ],
+        charges: [
+          {
+            kind: 'community',
+            inContract: true,
+            annualAgreed: 600,
+            charged: [{ year: 2025, amount: 700 }],
+          },
+        ],
+      }),
+      false,
+    );
+    const detail = text(root);
+    expect(detail).toContain('Se cobró 1 mes con la renta nueva antes del mes siguiente');
+    expect(detail).toMatch(/En 2025 la renta podía subir/);
+    expect(detail).not.toMatch(/2\.025/);
   });
 });
 

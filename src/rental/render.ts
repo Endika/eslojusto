@@ -1,4 +1,9 @@
-import type { RentalCalculation, RentalFigure, RentalPhrase } from '../engine/rental/calculation';
+import type {
+  RentalCalculation,
+  RentalFigure,
+  RentalPhrase,
+  RentalPhraseKey,
+} from '../engine/rental/calculation';
 import type { InformationBlock } from '../engine/rental/information';
 import type { ItemReading } from '../engine/rental/item';
 import type { DoubtReason } from '../engine/rental/outcome';
@@ -19,10 +24,13 @@ import type { FieldError } from './form';
 import {
   headline,
   roundToTens,
+  shownOne,
+  shownPair,
   summarise,
   totalLines,
   totalShare,
   type ItemSummary,
+  type Shown,
   type Verdict,
 } from './summary';
 
@@ -38,8 +46,12 @@ const PERCENT = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2, useGr
 
 export const percentText = (n: number): string => `${PERCENT.format(n)} %`;
 
-function figureText(f: RentalFigure, tr: Translate): string {
+// A calendar year reads as it is written, «2022», never with a thousands dot.
+const YEAR_VARS: ReadonlySet<string> = new Set(['year']);
+
+function figureText(f: RentalFigure, tr: Translate, name: string): string {
   if (typeof f === 'number') return String(f);
+  if (YEAR_VARS.has(name) && 'integer' in f) return String(f.integer);
   if ('percent' in f) return percentText(f.percent);
   if ('month' in f) return monthText(f.month);
   if ('date' in f) return dayText(f.date);
@@ -49,14 +61,35 @@ function figureText(f: RentalFigure, tr: Translate): string {
   return formatInteger(f.integer);
 }
 
+// Phrases that count something, with the variable that says how many: «1 mes», «2 meses».
+const COUNTED = {
+  'rent_update.before_anniversary': 'months',
+  'rent_update.charged_before_notice': 'months',
+  'rent_update.notice_not_written': 'months',
+  'deposit.interest_stretch': 'days',
+} as const satisfies Partial<Record<RentalPhraseKey, string>>;
+type CountedKey = keyof typeof COUNTED;
+
+const isCounted = (key: RentalPhraseKey): key is CountedKey => key in COUNTED;
+
+function phraseKey(p: RentalPhrase): ClientKey {
+  if (!isCounted(p.key))
+    return `client.rental.calculation.${p.key as Exclude<RentalPhraseKey, CountedKey>}`;
+  const count = p.vars?.[COUNTED[p.key]];
+  const one =
+    typeof count === 'object' &&
+    (('integer' in count && count.integer === 1) || ('days' in count && count.days === 1));
+  return `client.rental.calculation.${p.key}_${one ? 'one' : 'many'}`;
+}
+
 export function phraseText(p: RentalPhrase, tr: Translate): string {
   const vars = Object.fromEntries(
     Object.entries(p.vars ?? {}).map(([name, v]) => [
       name,
-      typeof v === 'object' && 'key' in v ? phraseText(v, tr) : figureText(v, tr),
+      typeof v === 'object' && 'key' in v ? phraseText(v, tr) : figureText(v, tr, name),
     ]),
   );
-  return tr(`client.rental.calculation.${p.key}`, vars);
+  return tr(phraseKey(p), vars);
 }
 
 export const calculationLines = (c: RentalCalculation, tr: Translate): string[] =>
@@ -101,9 +134,14 @@ function find<T extends Element = HTMLElement>(root: ParentNode, selector: strin
 
 // ---------- Summary ----------
 
-// «unos 340 €» rounds to tens; below 10 € the rounding would read «0 €», so the cents stay.
-const about = (n: number): Piece[] =>
-  roundToTens(n) >= 10 || n === 0 ? [amountEl(roundToTens(n), formatWholeEuros)] : [amountEl(n)];
+// An amount as decided for it: whole euros to the ten, or with its cents.
+const amountOf = (s: Shown): Piece[] => [
+  amountEl(s.amount, s.cents ? formatEuros : formatWholeEuros),
+];
+
+// «unos 340 €»; an amount kept with its cents is said as it is.
+const approx = (s: Shown, tr: Translate): Piece[] =>
+  s.cents ? amountOf(s) : pieces(tr('client.rental.about'), { importe: amountOf(s) });
 
 const FIGURED: ReadonlySet<ItemStatus> = new Set(['paid_over', 'owed', 'over_cap']);
 
@@ -111,10 +149,9 @@ const FIGURED: ReadonlySet<ItemStatus> = new Set(['paid_over', 'owed', 'over_cap
 export function verdictPieces(v: Verdict, tr: Translate): Piece[] {
   if (!FIGURED.has(v.status)) return [tr(`client.rental.status.${v.status}`)];
   if (v.amount === null) return [tr('client.rental.status.over_cap_no_amount')];
-  const rounded = roundToTens(v.amount);
   const status = v.status as 'paid_over' | 'owed' | 'over_cap';
-  if (rounded < 10) return [tr(`client.rental.status.${status}_little`)];
-  return pieces(tr(`client.rental.status.${status}`), { importe: rounded });
+  if (roundToTens(v.amount) < 10) return [tr(`client.rental.status.${status}_little`)];
+  return pieces(tr(`client.rental.status.${status}`), { importe: approx(shownOne(v.amount), tr) });
 }
 
 export function reasonsText(reasons: readonly DoubtReason[], tr: Translate): string {
@@ -127,26 +164,40 @@ export function reasonsText(reasons: readonly DoubtReason[], tr: Translate): str
   });
 }
 
-// «Depende de si tu casero es gran tenedor: entre 0 € y 360 €».
+// The euros a reading stands for: its figure, or none at all for a result without one; only a
+// result within the limit is truly «0 €».
+const figureOf = (v: Verdict): number | null =>
+  v.amount ?? (v.status === 'within_limit' ? 0 : null);
+
+// One reading in words, with its amount when it carries one: «pagas de más unos 360 €».
+function readingPieces(v: Verdict, tr: Translate): Piece[] {
+  if (v.amount === null || !FIGURED.has(v.status)) return [tr(`client.rental.reading.${v.status}`)];
+  const status = v.status as 'paid_over' | 'owed' | 'over_cap';
+  return pieces(tr(`client.rental.reading_amount.${status}`), {
+    importe: approx(shownOne(v.amount), tr),
+  });
+}
+
+// «Depende de cómo se lea una norma derogada: entre 0 € y 50 €»; when a reading has no figure,
+// each one in words: «no se puede comprobar o pagas de más unos 360 €».
 export function dependsPieces(
   s: Extract<ItemSummary, { kind: 'depends' }>,
   tr: Translate,
 ): Piece[] {
   const motivo = reasonsText(s.reasons, tr);
-  const low = s.low.amount ?? 0;
-  const high = s.high.amount ?? 0;
-  if (s.low.status !== s.high.status && roundToTens(low) === roundToTens(high))
+  const low = figureOf(s.low);
+  const high = figureOf(s.high);
+  if (low === null || high === null || (s.low.status === s.high.status && low === high))
     return pieces(tr('client.rental.depends_status'), {
       motivo,
-      una: tr(`client.rental.reading.${s.low.status}`),
-      otra: tr(`client.rental.reading.${s.high.status}`),
+      una: readingPieces(s.low, tr),
+      otra: readingPieces(s.high, tr),
     });
-  // Two readings that round alike keep their cents, so they never read as the same figure.
-  const close = roundToTens(low) === roundToTens(high);
+  const [minimo, maximo] = shownPair(low, high);
   return pieces(tr('client.rental.depends'), {
     motivo,
-    minimo: close ? [amountEl(low)] : about(low),
-    maximo: close ? [amountEl(high)] : about(high),
+    minimo: amountOf(minimo),
+    maximo: amountOf(maximo),
   });
 }
 
@@ -264,7 +315,9 @@ function renderItem(
       share.replaceChildren(
         ...(how === 'out'
           ? [tr('client.rental.share.out')]
-          : pieces(tr('client.rental.share.lowest'), { importe: about(s.counted) })),
+          : pieces(tr('client.rental.share.lowest'), {
+              importe: approx(shownPair(s.counted, s.upTo)[0], tr),
+            })),
       );
       share.hidden = false;
     }
@@ -339,14 +392,18 @@ function renderTotals(container: ParentNode, review: RentalReview, tr: Translate
   find(container, '[data-totals]').replaceChildren(
     ...totalLines(review).map(({ kind, total }) => {
       const li = document.createElement('li');
-      const counted = about(total.counted);
-      const upTo = about(total.upTo);
+      const [counted, upTo] = shownPair(total.counted, total.upTo).map((x) => approx(x, tr));
       const line =
         total.counted === 0
-          ? pieces(tr(`client.rental.total.${kind}_doubtful`), { maximo: upTo })
-          : roundToTens(total.upTo) > roundToTens(total.counted)
-            ? pieces(tr(`client.rental.total.${kind}_up_to`), { importe: counted, maximo: upTo })
-            : pieces(tr(`client.rental.total.${kind}`), { importe: counted });
+          ? pieces(tr(`client.rental.total.${kind}_doubtful`), {
+              maximo: approx(shownOne(total.upTo), tr),
+            })
+          : total.upTo > total.counted
+            ? pieces(tr(`client.rental.total.${kind}_up_to`), {
+                importe: counted ?? [],
+                maximo: upTo ?? [],
+              })
+            : pieces(tr(`client.rental.total.${kind}`), { importe: counted ?? [] });
       li.replaceChildren(...line);
       return li;
     }),

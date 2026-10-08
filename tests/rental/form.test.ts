@@ -22,6 +22,19 @@ const FEE_ROW = `
     <button type="button" data-row-remove></button>
   </fieldset></li>`;
 
+const CHARGE_ROW = `
+  <li data-row><fieldset><legend data-row-legend></legend>
+    <select data-row-field="kind"><option value="community"></option><option value="waste"></option></select>
+    <input data-row-field="year" />
+    <div data-row-first-of="kind">
+      ${radios('inContract', ['yes', 'no'], true)}
+      <input data-row-field="annualAgreed" />
+    </div>
+    <p data-row-repeat-of="kind" hidden></p>
+    <input data-row-field="amount" /><p data-row-error="amount" hidden></p>
+    <button type="button" data-row-remove></button>
+  </fieldset></li>`;
+
 const list = (name: string, row: string, condition = '') => `
   <div data-rows="${name}" data-min="1" data-max="3" ${condition}>
     <ol data-rows-list></ol><button type="button" data-rows-add></button>
@@ -41,7 +54,9 @@ function form(): HTMLFormElement {
     <input name="deposit" />
     ${radios('hasFees', ['no', 'yes'])}
     ${list('fees', FEE_ROW, 'data-if="hasFees:yes"')}
-    ${ROW_LISTS.filter((l) => l !== 'fees')
+    ${radios('hasCharges', ['no', 'yes'])}
+    ${list('charges', CHARGE_ROW, 'data-if="hasCharges:yes"')}
+    ${ROW_LISTS.filter((l) => l !== 'fees' && l !== 'charges')
       .map((l) => list(l, '<li data-row></li>', 'data-if="never:yes"'))
       .join('')}
     <input name="initialRent" /><input name="agreedMonths" />
@@ -142,6 +157,54 @@ describe('reading the form', () => {
     const r = readRentalForm(f, TODAY);
     expect('input' in r && r.input.fees).toEqual([
       { kind: 'management', amount: 150, deductedLater: false, requestedInWriting: null },
+    ]);
+  });
+});
+
+describe('charge rows', () => {
+  it('ask the contract terms once per concept and make one charge of its years', () => {
+    const f = answered([['hasCharges', 'yes']]);
+    f.querySelector<HTMLButtonElement>('[data-rows="charges"] [data-rows-add]')?.click();
+    f.querySelector<HTMLButtonElement>('[data-rows="charges"] [data-rows-add]')?.click();
+    for (const [name, value] of [
+      ['charges.0.year', '2024'],
+      ['charges.0.inContract', 'yes'],
+      ['charges.0.annualAgreed', '600'],
+      ['charges.0.amount', '600'],
+      ['charges.1.year', '2025'],
+      ['charges.1.amount', '640'],
+      ['charges.2.year', '2025'],
+      ['charges.2.amount', '90'],
+    ])
+      set(f, name ?? '', value ?? '');
+    const third = f.querySelector<HTMLSelectElement>('[name="charges.2.kind"]');
+    if (!third) throw new Error('no third row');
+    third.value = 'waste';
+    applyConditions(f);
+    const asked = (row: number) =>
+      !f.querySelector<HTMLInputElement>(`[name="charges.${row}.annualAgreed"]`)?.disabled;
+    expect([0, 1, 2].map(asked)).toEqual([true, false, true]);
+    expect(sheetErrors(f, 'gastos', TODAY)).toEqual([
+      { field: 'charges.2.inContract', code: 'missing_choice' },
+    ]);
+    set(f, 'charges.2.inContract', 'no');
+    const r = readRentalForm(f, TODAY);
+    expect('input' in r && r.input.charges).toEqual([
+      {
+        kind: 'community',
+        inContract: true,
+        annualAgreed: 600,
+        charged: [
+          { year: 2024, amount: 600 },
+          { year: 2025, amount: 640 },
+        ],
+      },
+      {
+        kind: 'waste',
+        inContract: false,
+        annualAgreed: null,
+        charged: [{ year: 2025, amount: 90 }],
+      },
     ]);
   });
 });

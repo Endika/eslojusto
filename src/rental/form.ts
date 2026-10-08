@@ -353,27 +353,34 @@ function read(form: HTMLFormElement): Reading {
   } else if (asked('hasUpdates')) partial.updates = [];
 
   if (text('hasCharges') === 'yes') {
-    const groups = new Map<string, { charge: Mutable<Charge>; rows: number[] }>();
+    // One charge per concept: its first row says what the contract fixes, every row one year.
+    const groups = new Map<ChargeKind, { charge: Mutable<Charge>; rows: number[] } | null>();
     for (const i of enabledRows('charges')) {
       const field = (key: string) => rowField('charges', i, key);
       const kind = choice(field('kind'), CHARGE_KINDS);
-      const inContract = answer(field('inContract'));
-      const agreed = amount(field('annualAgreed'), false);
       const year = whole(field('year'), true);
       const charged = amount(field('amount'), true);
-      if (!kind || typeof inContract !== 'boolean' || year === null || charged === null) continue;
-      // Rows of one concept, one per year, make one charge.
-      const key = `${kind}/${inContract}/${agreed ?? ''}`;
-      const group = groups.get(key) ?? {
-        charge: { kind, inContract, annualAgreed: agreed, charged: [] },
-        rows: [],
-      };
+      if (!kind) continue;
+      if (!groups.has(kind)) {
+        const inContract = answer(field('inContract'));
+        const agreed = amount(field('annualAgreed'), false);
+        groups.set(
+          kind,
+          typeof inContract === 'boolean'
+            ? { charge: { kind, inContract, annualAgreed: agreed, charged: [] }, rows: [] }
+            : null,
+        );
+      }
+      const group = groups.get(kind);
+      if (!group || year === null || charged === null) continue;
       group.charge.charged = [...group.charge.charged, { year, amount: charged }];
       group.rows.push(i);
-      groups.set(key, group);
     }
-    partial.charges = [...groups.values()].map((g) => g.charge);
-    rows.charges.push(...[...groups.values()].map((g) => g.rows));
+    const read = [...groups.values()].filter(
+      (g): g is NonNullable<typeof g> => g !== null && g.rows.length > 0,
+    );
+    partial.charges = read.map((g) => g.charge);
+    rows.charges.push(...read.map((g) => g.rows));
   } else if (asked('hasCharges')) partial.charges = [];
 
   if (text('movedOut') === 'yes') {

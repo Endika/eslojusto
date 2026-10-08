@@ -1063,7 +1063,7 @@ export const es = {
     'Lo dice el contrato: el nombre de una persona o el de una sociedad (S.L., S.A.).',
   'rental.landlord.large': '¿Tu casero es una empresa o tiene muchas viviendas?',
   'rental.landlord.large_hint':
-    'La ley lo llama «gran tenedor»: quien tiene más de diez viviendas, o cinco en algunas zonas tensionadas.',
+    'La ley lo llama «gran tenedor»: quien tiene más de diez viviendas o más de 1.500 m² de uso residencial, o cinco o más en una zona tensionada si así se declara.',
   'rental.landlord.region': 'Comunidad autónoma',
   'rental.landlord.region_hint': 'Donde está la vivienda.',
   'rental.landlord.region_choose': 'Elige una',
@@ -1146,6 +1146,7 @@ export const es = {
   'rental.charges.yes': 'Sí, añadirlos',
   'rental.charges.rows_hint': 'Una fila por concepto y año.',
   'rental.charges.add': 'Añadir gasto',
+  'rental.charges.same_concept': 'Lo que dice el contrato de este concepto va en su primera fila.',
   'rental.charges.kind': 'Concepto',
   'rental.charges.in_contract': '¿Lo pone el contrato?',
   'rental.charges.agreed': 'Importe al año que fija el contrato',
@@ -1291,21 +1292,21 @@ export const es = {
     'Con los datos que has metido, nada sale por encima de lo que permite la ley.',
   'client.rental.headline.nothing_entered':
     'No has metido datos que se puedan comparar con la ley.',
-  'client.rental.total.paidOver': 'Pagas o has pagado de más al menos unos {importe}.',
+  'client.rental.total.paidOver': 'Pagas o has pagado de más al menos {importe}.',
   'client.rental.total.paidOver_up_to':
-    'Pagas o has pagado de más al menos unos {importe}, y hasta unos {maximo} según se resuelvan las dudas.',
+    'Pagas o has pagado de más al menos {importe}, y hasta {maximo} según se resuelvan las dudas.',
   'client.rental.total.paidOver_doubtful':
-    'Según se resuelvan las dudas, podrías haber pagado de más hasta unos {maximo}.',
-  'client.rental.total.owed': 'Te deben al menos unos {importe}.',
+    'Según se resuelvan las dudas, podrías haber pagado de más hasta {maximo}.',
+  'client.rental.total.owed': 'Te deben al menos {importe}.',
   'client.rental.total.owed_up_to':
-    'Te deben al menos unos {importe}, y hasta unos {maximo} según se resuelvan las dudas.',
+    'Te deben al menos {importe}, y hasta {maximo} según se resuelvan las dudas.',
   'client.rental.total.owed_doubtful':
-    'Según se resuelvan las dudas, podrían deberte hasta unos {maximo}.',
-  'client.rental.total.overCap': 'Por encima del tope legal, al menos unos {importe}.',
+    'Según se resuelvan las dudas, podrían deberte hasta {maximo}.',
+  'client.rental.total.overCap': 'Por encima del tope legal, al menos {importe}.',
   'client.rental.total.overCap_up_to':
-    'Por encima del tope legal, al menos unos {importe}, y hasta unos {maximo} según se resuelvan las dudas.',
+    'Por encima del tope legal, al menos {importe}, y hasta {maximo} según se resuelvan las dudas.',
   'client.rental.total.overCap_doubtful':
-    'Según se resuelvan las dudas, podría haber hasta unos {maximo} por encima del tope legal.',
+    'Según se resuelvan las dudas, podría haber hasta {maximo} por encima del tope legal.',
 
   'client.rental.item.fee': 'Pago al entrar: {concepto}',
   'client.rental.item.guarantees': 'Fianza y garantías en dinero',
@@ -1317,11 +1318,11 @@ export const es = {
   'client.rental.item.deposit_interest': 'Intereses por el retraso',
   'client.rental.item.rules': 'Normas de esta partida',
 
-  'client.rental.status.paid_over': 'Pagas de más: unos {importe}',
+  'client.rental.status.paid_over': 'Pagas de más: {importe}',
   'client.rental.status.paid_over_little': 'Pagas de más: menos de 10 €',
-  'client.rental.status.owed': 'Te deben unos {importe}',
+  'client.rental.status.owed': 'Te deben {importe}',
   'client.rental.status.owed_little': 'Te deben menos de 10 €',
-  'client.rental.status.over_cap': 'Por encima del tope: unos {importe}',
+  'client.rental.status.over_cap': 'Por encima del tope: {importe}',
   'client.rental.status.over_cap_little': 'Por encima del tope: menos de 10 €',
   'client.rental.status.over_cap_no_amount': 'Por encima del tope',
   'client.rental.status.within_limit': 'Dentro del límite',
@@ -1340,6 +1341,10 @@ export const es = {
   'client.rental.reading.not_entered': 'sin dato',
   'client.rental.reading.review_it': 'revísalo',
   'client.rental.reading.not_yet_due': 'aún en plazo',
+  'client.rental.about': 'unos {importe}',
+  'client.rental.reading_amount.paid_over': 'pagas de más {importe}',
+  'client.rental.reading_amount.owed': 'te deben {importe}',
+  'client.rental.reading_amount.over_cap': 'por encima del tope en {importe}',
   'client.rental.depends': 'Depende de {motivo}: entre {minimo} y {maximo}',
   'client.rental.depends_status': 'Depende de {motivo}: {una} o {otra}',
   'client.rental.reason.pending_validation':
@@ -1436,7 +1441,9 @@ export const es = {
     'Sin la subida del año anterior, se parte de la renta que pagabas antes: {rent}.',
   'client.rental.calculation.rent_update.no_clause':
     'El contrato no prevé actualizar la renta, así que no cabe subida (art. 18.1 LAU).',
-  'client.rental.calculation.rent_update.before_anniversary':
+  'client.rental.calculation.rent_update.before_anniversary_one':
+    'Se cobró 1 mes con la renta nueva antes del aniversario del {anniversary}; en él tocaba pagar {base}.',
+  'client.rental.calculation.rent_update.before_anniversary_many':
     'Se cobraron {months} meses con la renta nueva antes del aniversario del {anniversary}; en ellos tocaba pagar {base}.',
   'client.rental.calculation.rent_update.second_rise':
     'Ya hubo una subida en el año del aniversario del {anniversary}: la del {date} no cabe.',
@@ -1456,9 +1463,13 @@ export const es = {
     'Aceptaste la subida por escrito, así que no se compara con el índice.',
   'client.rental.calculation.rent_update.large_landlord_cap':
     'Si tu casero es gran tenedor, el tope se aplica aunque aceptaras la subida.',
-  'client.rental.calculation.rent_update.charged_before_notice':
+  'client.rental.calculation.rent_update.charged_before_notice_one':
+    'Se cobró 1 mes con la renta nueva antes del mes siguiente al aviso por escrito; en él tocaba pagar {base}.',
+  'client.rental.calculation.rent_update.charged_before_notice_many':
     'Se cobraron {months} meses con la renta nueva antes del mes siguiente al aviso por escrito; en ellos tocaba pagar {base}.',
-  'client.rental.calculation.rent_update.notice_not_written':
+  'client.rental.calculation.rent_update.notice_not_written_one':
+    'Sin aviso por escrito, se cobró 1 mes con la renta nueva cuando tocaba pagar {base}.',
+  'client.rental.calculation.rent_update.notice_not_written_many':
     'Sin aviso por escrito, se cobraron {months} meses con la renta nueva cuando tocaba pagar {base}.',
   'client.rental.calculation.rent_update.months': 'Meses contados: {months}, de {from} a {to}.',
   'client.rental.calculation.rent_update.monthly_over': 'Pagas {monthly} de más cada mes.',
@@ -1557,7 +1568,9 @@ export const es = {
   'client.rental.calculation.deposit.interest_not_yet': 'El interés empieza a correr el {from}.',
   'client.rental.calculation.deposit.interest_deposit_only':
     'Solo genera interés la fianza, una mensualidad ({rent}); lo que pasaba de ella es otra garantía.',
-  'client.rental.calculation.deposit.interest_stretch':
+  'client.rental.calculation.deposit.interest_stretch_one':
+    '{amount} del {from} al {to}: 1 día al {rate} sobre {yearDays} días al año, {interest}.',
+  'client.rental.calculation.deposit.interest_stretch_many':
     '{amount} del {from} al {to}: {days} días al {rate} sobre {yearDays} días al año, {interest}.',
   'client.rental.calculation.deposit.interest_day_count':
     'Ninguna norma dice si el año de intereses cuenta 365 días o 360: se hacen las dos cuentas.',
