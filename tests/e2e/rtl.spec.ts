@@ -70,3 +70,14 @@ test('amounts stay in Spanish format and left to right', async ({ page }) => {
   await expect(employer).toHaveAttribute('dir', 'ltr');
   await expect(salary.locator('[data-range] bdi')).toHaveText(/^925,00\s€$/);
 });
+
+test('the home page has no horizontal scroll at 360 px', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('ar-test/');
+  await expect(page.locator('.card').first()).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    ),
+  ).toBeLessThanOrEqual(0);
+});

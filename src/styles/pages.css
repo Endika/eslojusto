@@ -335,13 +335,13 @@
 
 .home {
   display: grid;
-  gap: 2.5rem;
+  gap: 2rem;
   inline-size: min(100%, 76rem);
   margin-inline: auto;
-  padding: 1.5rem var(--margin) 4.5rem;
+  padding: 1.25rem var(--margin) 4rem;
 }
 .home__title {
-  margin: 0 0 1.25rem;
+  margin: 0 0 1rem;
   font-size: clamp(2.75rem, 1.5rem + 5.6vw, 6rem);
   font-weight: 800;
   line-height: 0.92;
@@ -350,127 +350,238 @@
 }
 .home__lead {
   max-inline-size: 40ch;
-  margin: 0 0 1rem;
+  margin: 0;
   font: 400 1.1875rem / 1.55 var(--f-serif);
   text-wrap: pretty;
 }
 .home__note {
   max-inline-size: 44ch;
   margin: 0;
-  font: 400 1rem / 1.5 var(--f-serif);
+  font: 400 0.9375rem / 1.5 var(--f-serif);
   text-wrap: pretty;
 }
 
 .index {
   display: grid;
-  gap: 1.25rem;
+  gap: 2.25rem;
+}
+
+/* Each theme is a divider: its tab colour labels the group and marks every card filed behind it. */
+.group {
+  --tab-y: 0.875rem;
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+}
+.group:nth-of-type(2) {
+  --tab-y: 2.5rem;
+}
+.group:nth-of-type(3) {
+  --tab-y: 4.125rem;
+}
+.group__label {
   margin: 0;
-  padding: 0 1.25rem 0 0;
-  list-style: none;
-  filter: drop-shadow(0 0.5rem 0.875rem var(--sheet-shadow))
-    drop-shadow(0 0.125rem 0.1875rem var(--sheet-shadow));
+  padding: 0.4375rem 0.625rem 0.375rem;
+  border-radius: 0.375rem;
+  background: var(--ground);
+  color: var(--on-ground);
+  font: 650 0.75rem / 1 var(--f-mono);
+  font-stretch: 87.5%;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
-[dir='rtl'] .index {
-  padding: 0 0 0 1.25rem;
-}
-.index .sheet {
-  /* Short cards: holes tucked into the corners and text padded clear of them, so they never read as bullets. */
-  --hole-y: 1.125rem;
+.group__cards {
+  display: grid;
+  gap: 0.75rem;
   inline-size: 100%;
-  padding-block: 2.125rem;
+  margin: 0;
+  padding: 0 1rem 0 0;
+  list-style: none;
 }
-.index__name {
-  margin: 0 0 0.5rem;
-  font-size: clamp(1.75rem, 1.3rem + 2vw, 2.5rem);
+[dir='rtl'] .group__cards {
+  padding: 0 0 0 1rem;
+}
+.group__soon {
+  margin: 0;
+  font: 550 0.9375rem / 1.45 var(--f-grotesque);
+}
+.group__more {
+  margin: -0.5rem 0 0;
+  font: 620 var(--t-help) / 1.4 var(--f-grotesque);
+}
+.group__more a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.75rem;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.15em;
+}
+
+/* One soft box shadow per card: the ring holes carry their own. */
+.card {
+  position: relative;
+  display: grid;
+  border-radius: var(--radius-sheet);
+  box-shadow:
+    0 0.375rem 0.75rem -0.25rem var(--sheet-shadow),
+    0 1px 2px var(--sheet-shadow);
+  transition: translate var(--step) steps(2);
+}
+.card:has(a:hover),
+.card:has(a:active) {
+  translate: 0 -3px;
+}
+.card .sheet {
+  /* Short cards: holes tucked into the corners and text padded clear of them. */
+  --hole-y: 1rem;
+  inline-size: 100%;
+  padding-block: 0.75rem 0.8125rem;
+  padding-inline: calc(var(--hole-x) * 2 + 0.5rem) 1rem;
+}
+.card__name {
+  margin: 0;
+  font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.625rem);
   font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.035em;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
 }
-.index__name a {
+.card__name a {
   text-decoration: none;
 }
-.index__name a::after {
+/* The whole card is the name's link. */
+.card__name a::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: var(--radius-sheet);
 }
-.index__name a:focus-visible {
+.card__name a:focus-visible {
   outline: none;
 }
-.index__name a:focus-visible::after {
+.card__name a:focus-visible::after {
   outline: 3px solid var(--sheet-ink);
   outline-offset: -6px;
 }
-.index__text {
-  max-inline-size: 46ch;
-  margin: 0 0 1rem;
-  font: 400 var(--t-help) / var(--l-help) var(--f-serif);
-  text-wrap: pretty;
-}
-.index__citation {
-  margin: 0;
-  font: 500 0.8125rem / 1.4 var(--f-mono);
-  font-stretch: 87.5%;
-  color: var(--sheet-ink-soft);
-}
-.index__live .sheet {
-  transition: translate var(--step) steps(2);
-}
-.index__live:has(a:hover) .sheet {
-  translate: 0 -3px;
-}
-.index__live:has(a:hover) .index__name a {
+.card:has(a:hover) .card__name a {
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.12em;
 }
-
-/* Not open yet: the sheet hangs at half hinge, and its tab is muted. */
-.index__soon .sheet {
-  transform: perspective(60rem) rotateY(-14deg);
-  transform-origin: left center;
+.card__situation {
+  max-inline-size: 60ch;
+  margin: 0.25rem 0 0.375rem;
+  font: 400 0.9375rem / 1.4 var(--f-serif);
+  text-wrap: pretty;
 }
-[dir='rtl'] .index__soon .sheet {
-  transform: perspective(60rem) rotateY(14deg);
-  transform-origin: right center;
-}
-.index__soon .index__name {
-  font-size: clamp(1.375rem, 1.1rem + 1.2vw, 1.75rem);
-}
-.index__soon .item__tab {
-  background: color-mix(in srgb, var(--ground) 70%, transparent);
-}
-.index__status {
+.card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.25rem 1rem;
   margin: 0;
-  font: 600 var(--t-folio) / 1 var(--f-mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+}
+.card__citation {
+  flex: 1 1 16rem;
+  font: 500 0.6875rem / 1.5 var(--f-mono);
+  font-stretch: 87.5%;
   color: var(--sheet-ink-soft);
 }
-.index .item__tab {
-  min-height: 3.5rem;
+/* The badge and the affordance travel together: they wrap below the citation, never apart. */
+.card__go {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-inline-start: auto;
+  white-space: nowrap;
+}
+.card__go .beta {
+  margin: 0;
+  font-size: 0.625rem;
+  vertical-align: baseline;
+}
+.card__review {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font: 700 0.875rem / 1 var(--f-grotesque);
+  color: var(--sheet-ink);
+}
+.card__review svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: square;
+  transition: translate var(--step) steps(2);
+}
+.card:has(a:hover) .card__review svg {
+  translate: 3px 0;
+}
+[dir='rtl'] .card__review svg {
+  scale: -1 1;
+}
+[dir='rtl'] .card:has(a:hover) .card__review svg {
+  translate: -3px 0;
+}
+.card__tab {
+  position: absolute;
+  right: -0.875rem;
+  top: var(--tab-y);
+  inline-size: 1rem;
+  block-size: 2.75rem;
+  border-radius: 0 0.375rem 0.375rem 0;
+  background: var(--ground);
+}
+[dir='rtl'] .card__tab {
+  right: auto;
+  left: -0.875rem;
+  border-radius: 0.375rem 0 0 0.375rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .index__live .sheet {
+  .card,
+  .card__review svg {
     transition: none;
   }
 }
 
 @media (min-width: 60rem) {
-  /* The hero shares the footer's 72rem column and sits centred in the first screen. */
+  /* The hero shares the footer's 72rem column and stays in view, from the top, as the index scrolls. */
   .home {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    align-items: center;
-    align-content: center;
-    gap: 4rem;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    gap: 2rem 4rem;
     inline-size: min(100%, calc(72rem + 2 * var(--margin)));
-    min-block-size: calc(100dvh - 3.25rem);
-    padding-block: 3rem 4rem;
+    padding-block: 3rem 5rem;
   }
+  .home__head {
+    grid-area: 1 / 1;
+    position: sticky;
+    top: 2rem;
+  }
+  .index {
+    grid-area: 1 / 2 / span 2;
+  }
+  .home__note {
+    grid-area: 2 / 1;
+    align-self: end;
+  }
+  /* Sized to the narrower hero column, so its longest word never overflows it. */
   .home__title {
-    margin-bottom: 2.25rem;
+    margin-bottom: 2rem;
+    font-size: min(5.5rem, 8vw - 0.75rem);
+  }
+  .card .sheet {
+    padding-block: 1.25rem 1.3125rem;
+  }
+  .card__name {
+    font-size: 1.75rem;
+  }
+  .card__situation {
+    margin-block: 0.375rem 0.75rem;
+    font-size: 1rem;
   }
   .guide {
     padding-block: 5rem 6rem;
@@ -481,6 +592,14 @@
   }
   .document {
     padding-top: 3rem;
+  }
+}
+
+/* Tall enough for both: the privacy note waits at the foot of the hero's column as the index scrolls. */
+@media (min-width: 60rem) and (min-height: 44rem) {
+  .home__note {
+    position: sticky;
+    bottom: 2rem;
   }
 }
 
@@ -598,17 +717,6 @@
   font-weight: 560;
 }
 
-.index__more {
-  margin: 0.75rem 0 0;
-  font: 620 var(--t-help) / 1.4 var(--f-grotesque);
-}
-.index__more a {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 2.75rem;
-  color: var(--link-legal);
-}
-
 /* ---------- Rental review ---------- */
 
 .desk__beta {
@@ -633,15 +741,6 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   vertical-align: 0.2em;
-}
-.index__name .beta {
-  font-size: 0.75rem;
-  vertical-align: middle;
-}
-/* The card's link covers the whole card; the indices link sits above it. */
-.index__live .index__more a {
-  position: relative;
-  z-index: 1;
 }
 
 .options--compact {

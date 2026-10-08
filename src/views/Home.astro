@@ -11,11 +11,90 @@ interface Props {
 }
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
-// With a review section built, its card is live and labelled as a beta.
-const comingSoon = [
-  ...(EMPLOYMENT_BUILD ? [] : ([['salary', tx('home.contract')]] as const)),
-  ...(RENTAL_BUILD ? [] : ([['settlement', tx('home.rent')]] as const)),
-] as const;
+
+interface Review {
+  id: string;
+  name: Key;
+  href: string;
+  situation: Key;
+  citation: Key;
+  beta: boolean;
+}
+interface Group {
+  id: string;
+  tone: string;
+  label: Key;
+  // A section is live with its review in hand; until then it is a name on the «próximamente» line.
+  sections: (Review | Key)[];
+  more?: { href: string; label: Key };
+}
+
+const groups: Group[] = [
+  {
+    id: 'work',
+    tone: 'cause',
+    label: 'home.group_work',
+    sections: [
+      {
+        id: 'final-pay',
+        name: 'home.final_pay',
+        href: link(lang, 'finiquito/'),
+        situation: 'home.final_pay_situation',
+        citation: 'home.final_pay_citation',
+        beta: false,
+      },
+      {
+        id: 'benefit',
+        name: 'home.benefit',
+        // The benefit's pages are Spanish legal prose, published only in Spanish for now.
+        href: link('es', 'paro/'),
+        situation: 'home.benefit_situation',
+        citation: 'home.benefit_citation',
+        beta: false,
+      },
+      EMPLOYMENT_BUILD
+        ? {
+            id: 'employment',
+            name: 'home.contract',
+            href: link(lang, 'contrato/'),
+            situation: 'home.contract_situation',
+            citation: 'home.contract_citation',
+            beta: EMPLOYMENT_BETA,
+          }
+        : 'home.contract',
+    ],
+  },
+  {
+    id: 'housing',
+    tone: 'settlement',
+    label: 'home.group_housing',
+    sections: [
+      RENTAL_BUILD
+        ? {
+            id: 'rental',
+            name: 'home.rent',
+            href: link(lang, 'alquiler/'),
+            situation: 'home.rent_situation',
+            citation: 'home.rent_citation',
+            beta: true,
+          }
+        : 'home.rent',
+      'home.mortgage',
+    ],
+    more: { href: link(lang, 'alquiler/irav-ipc/'), label: 'home.rent_indices' },
+  },
+  {
+    id: 'money',
+    tone: 'salary',
+    label: 'home.group_money',
+    sections: ['home.finance', 'home.bills'],
+  },
+];
+
+const live = (group: Group) => group.sections.filter((s): s is Review => typeof s !== 'string');
+const soon = (group: Group) =>
+  group.sections.filter((s): s is Key => typeof s === 'string').map(tx);
+
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
 const documents = DOCUMENTS !== null;
 ---
@@ -31,81 +110,56 @@ const documents = DOCUMENTS !== null;
   <main class="home" id="content">
     <div class="home__head">
       <h1 class="home__title">{tx('home.h1')}</h1>
-      <p class="home__lead">{tx(RENTAL_BUILD ? 'home.lead_rental' : 'home.lead')}</p>
-      <p class="home__note">{tx(documents ? 'home.note_documents' : 'home.note')}</p>
+      <p class="home__lead">{tx('home.lead')}</p>
     </div>
 
-    <ul class="index" aria-label={tx('home.index')}>
-      <li class="item index__live" data-tone="cause">
-        <section class="sheet" data-tone="dates" aria-labelledby="index-final-pay">
-          <h2 class="index__name" id="index-final-pay">
-            <a href={link(lang, 'finiquito/')}>{tx('home.final_pay')}</a>
+    <div class="index">
+      {groups.map((group) => (
+        <section class="group" data-tone={group.tone} aria-labelledby={`group-${group.id}`}>
+          <h2 class="group__label" id={`group-${group.id}`}>
+            {tx(group.label)}
           </h2>
-          <p class="index__text">
-            {tx(documents ? 'home.final_pay_text_documents' : 'home.final_pay_text')}
-          </p>
-          <p class="index__citation">{tx('home.final_pay_citation')}</p>
-        </section>
-        <span class="item__tab" aria-hidden="true"></span>
-      </li>
-      <li class="item index__live" data-tone="holidays">
-        <section class="sheet" data-tone="dates" aria-labelledby="index-benefit">
-          <h2 class="index__name" id="index-benefit">
-            {/* The benefit's pages are Spanish legal prose, published only in Spanish for now. */}
-            <a href={link('es', 'paro/')}>{tx('home.benefit')}</a>
-          </h2>
-          <p class="index__text">{tx('home.benefit_text')}</p>
-          <p class="index__citation">{tx('home.benefit_citation')}</p>
-        </section>
-        <span class="item__tab" aria-hidden="true"></span>
-      </li>
-      {RENTAL_BUILD && (
-        <li class="item index__live" data-tone="settlement">
-          <section class="sheet" data-tone="dates" aria-labelledby="index-rental">
-            <h2 class="index__name" id="index-rental">
-              <a href={link(lang, 'alquiler/')}>{tx('home.rent')}</a>{' '}
-              <span class="beta">{tx('home.beta')}</span>
-            </h2>
-            <p class="index__text">{tx('home.rent_text')}</p>
-            <p class="index__citation">{tx('home.rent_citation')}</p>
-            <p class="index__more">
-              <a href={link(lang, 'alquiler/irav-ipc/')}>{tx('home.rent_indices')}</a>
+          {live(group).length > 0 && (
+            <ul class="group__cards">
+              {live(group).map((review) => (
+                <li class="card">
+                  <article class="sheet" data-tone="dates" aria-labelledby={`card-${review.id}`}>
+                    <h3 class="card__name" id={`card-${review.id}`}>
+                      <a href={review.href}>{tx(review.name)}</a>
+                    </h3>
+                    <p class="card__situation">{tx(review.situation)}</p>
+                    <p class="card__meta">
+                      <span class="card__citation">{tx(review.citation)}</span>
+                      <span class="card__go">
+                        {review.beta && <span class="beta">{tx('home.beta')}</span>}
+                        <span class="card__review" aria-hidden="true">
+                          {tx('home.review')}
+                          <svg viewBox="0 0 24 24" focusable="false">
+                            <path d="M4 12h15m-6-6 6 6-6 6" />
+                          </svg>
+                        </span>
+                      </span>
+                    </p>
+                  </article>
+                  <span class="card__tab" aria-hidden="true" />
+                </li>
+              ))}
+            </ul>
+          )}
+          {soon(group).length > 0 && (
+            <p class="group__soon">
+              {t(lang, 'home.coming_soon', { secciones: soon(group).join(', ') })}
             </p>
-          </section>
-          <span class="item__tab" aria-hidden="true"></span>
-        </li>
-      )}
-      {EMPLOYMENT_BUILD && (
-        <li class="item index__live" data-tone="salary">
-          <section class="sheet" data-tone="dates" aria-labelledby="index-employment">
-            <h2 class="index__name" id="index-employment">
-              <a href={link(lang, 'contrato/')}>{tx('home.contract')}</a>{' '}
-              {EMPLOYMENT_BETA && <span class="beta">{tx('home.beta')}</span>}
-            </h2>
-            <p class="index__text">{tx('home.contract_text')}</p>
-            <p class="index__citation">{tx('home.contract_citation')}</p>
-          </section>
-          <span class="item__tab" aria-hidden="true"></span>
-        </li>
-      )}
-      {comingSoon.map(([tone, name]) => (
-        <li class="item index__soon" data-tone={tone}>
-          <section
-            class="sheet"
-            data-tone="dates"
-            aria-label={t(lang, 'home.coming_soon_aria', { nombre: name })}
-          >
-            <h2 class="index__name">{name}</h2>
-            <p class="index__status">{tx('home.coming_soon')}</p>
-            {tone === 'settlement' && (
-              <p class="index__more">
-                <a href={link(lang, 'alquiler/irav-ipc/')}>{tx('home.rent_indices')}</a>
-              </p>
-            )}
-          </section>
-          <span class="item__tab" aria-hidden="true" />
-        </li>
+          )}
+          {group.more && (
+            <p class="group__more">
+              <a href={group.more.href}>{tx(group.more.label)}</a>
+            </p>
+          )}
+        </section>
       ))}
-    </ul>
+    </div>
+
+    <p class="home__note">{tx(documents ? 'home.note_documents' : 'home.note')}</p>
   </main>
 </Base>

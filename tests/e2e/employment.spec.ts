@@ -210,9 +210,11 @@ for (const { name, viewport } of SIZES) {
 
 test('the home page labels the contract review as a beta', async ({ page }) => {
   await page.goto('');
-  const card = page.getByRole('region', { name: /Contrato de trabajo/ });
+  const work = page.getByRole('region', { name: 'Trabajo' });
+  const card = work.getByRole('article', { name: 'Contrato de trabajo' });
   await expect(card.getByRole('link', { name: 'Contrato de trabajo' })).toBeVisible();
   await expect(card.getByText('Beta')).toBeVisible();
+  await expect(work.getByText(/^Próximamente/)).toHaveCount(0);
 });
 
 test('the page has its title, description, heading, canonical, JSON-LD and review date', async ({
