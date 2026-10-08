@@ -2467,9 +2467,12 @@ export const es = {
   'client.rental.letter.deposit.interest_rule':
     'Como referencia, el art. 36.4 LAU prevé interés legal pasado un mes desde la entrega de las llaves.',
   'client.rental.letter.deposit.interest': 'Hasta el {fecha}, ese interés suma {importe}.',
-  'client.rental.letter.deposit.interest_range':
-    'Hasta el {fecha}, ese interés suma entre {minimo} y {maximo}, según se cuente el año de 365 días o de 360.',
   'client.rental.letter.deposit.account': 'Te pido que me devuelvas lo pendiente en esta cuenta:',
+  'client.rental.letter.deposit.body_late':
+    'Te escribo por nuestro contrato de alquiler de esta vivienda, con fecha {contrato}. Te devolví las llaves el {llaves} y me devolviste la fianza el {devuelta}, pasado el mes que prevé el art. 36.4 LAU; los intereses legales de ese retraso son {importe}.',
+  'client.rental.letter.deposit.account_interest':
+    'Te pido que me ingreses esos intereses en esta cuenta:',
+  'client.rental.letter.lowest': 'Esta cifra es la más baja de las cuentas posibles.',
   'client.rental.letter.deposit.filename': 'eslojusto-carta-fianza.pdf',
   'client.rental.letter.rent.title': 'Revisión de la renta',
   'client.rental.letter.rent.body':
@@ -2478,12 +2481,15 @@ export const es = {
   'client.rental.letter.rent.index': 'el {indice} de {mes}, {tasa}',
   'client.rental.letter.rent.index_flash': 'el {indice} adelantado de {mes}, {tasa}',
   'client.rental.letter.rent.fixed': 'el {tasa} fijo del contrato',
+  'client.rental.letter.rent.cap_fixed': 'el tope del {tasa} de ese año, según {norma}',
+  'client.rental.letter.rent.cap_index': 'el tope de ese año, {indice}, según {norma}',
   'client.rental.letter.rent.line':
+    '{subida}: con {criterio}, la renta que resulta según el art. 18 LAU es {renta} al mes; pago {pagada}, {diferencia} más cada mes.',
+  'client.rental.letter.rent.line_no_rate':
     '{subida}: la renta que resulta según el art. 18 LAU es {renta} al mes; pago {pagada}, {diferencia} más cada mes.',
   'client.rental.letter.rent.cap': 'Tope legal de ese año: {norma}.',
   'client.rental.letter.rent.pending':
     'Esta cifra es la más baja de las dos cuentas posibles, porque una norma de la que depende está pendiente de convalidación por el Congreso: {normas}.',
-  'client.rental.letter.rent.lowest': 'Esta cifra es la más baja de las cuentas posibles.',
   'client.rental.letter.rent.ask': 'Por eso te pido que revises el importe.',
   'client.rental.letter.rent.filename': 'eslojusto-carta-renta.pdf',
   'client.rental.result.lead_locked':
