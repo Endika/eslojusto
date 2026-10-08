@@ -13,6 +13,7 @@ import type {
   SalaryPeriod,
   Trial,
 } from '../../src/engine/employment/types';
+import type { EmploymentCheck as SiteEmploymentCheck } from '../../src/documents/contract';
 import {
   CLAUSE_LABELS,
   HOLIDAY_UNITS,
@@ -27,6 +28,7 @@ import {
   TRIAL_UNITS,
   WAIVED_RIGHTS,
 } from '../src/domain/employment-schema';
+import type { EmploymentCheck } from '../src/domain/employment-checks';
 
 // The site prefills its employment form from these labels; type:check fails if the engine drifts.
 describe('employment engine contract', () => {
@@ -52,6 +54,11 @@ describe('employment engine contract', () => {
     expectTypeOf<(typeof RELATIONSHIP_HINTS)[number]>().toEqualTypeOf<
       Exclude<Relationship, 'common' | 'special_employment_centre'> | 'temp_agency' | 'relief'
     >();
+  });
+
+  // The site words each check it is sent and drops any it does not know.
+  it('mirrors the employment checks the site words', () => {
+    expectTypeOf<SiteEmploymentCheck>().toEqualTypeOf<EmploymentCheck>();
   });
 
   it('lists the information elements in the engine’s order', () => {

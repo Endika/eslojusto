@@ -234,6 +234,84 @@ export const RENTAL_EXTRACTION: ExtractionShape<RentalFieldName, RentalListName>
 
 export type RentalExtraction = Extraction<RentalFieldName, RentalListName>;
 
+// The fields the API merges from employment documents (api/src/domain/employment-merge.ts): the
+// contract's, the agreement and category a payslip may state too, and the offer's, prefixed.
+export const EMPLOYMENT_FIELDS = [
+  'employerType',
+  'companyName',
+  'companyTaxId',
+  'workplaceRegion',
+  'signedOn',
+  'startDate',
+  'endDate',
+  'durationMonths',
+  'modalityText',
+  'modality',
+  'partTime',
+  'causeText',
+  'replacedPersonNamed',
+  'replacementCauseStated',
+  'category',
+  'agreementName',
+  'agreementCode',
+  'salaryAmount',
+  'salaryPeriod',
+  'annualSalaryAmount',
+  'payments',
+  'prorated',
+  'inKindAmount',
+  'weeklyHours',
+  'annualHours',
+  'scheduleText',
+  'shifts',
+  'night',
+  'complementaryPercent',
+  'complementaryNoticeDays',
+  'overtimeAgreed',
+  'overtimeHoursPerYear',
+  'holidayDays',
+  'holidayUnit',
+  'trialAmount',
+  'trialUnit',
+  'remoteShare',
+  'trainingType',
+  'studiesEndedOn',
+  'planAttached',
+  'effectiveWorkPercent',
+  'offerPosition',
+  'offerSalaryAmount',
+  'offerSalaryPeriod',
+  'offerNet',
+  'offerVariable',
+  'offerWeeklyHours',
+  'offerModality',
+  'offerRemote',
+  'offerPublishedOn',
+] as const;
+export type EmploymentFieldName = (typeof EMPLOYMENT_FIELDS)[number];
+
+// Their lists (api/src/domain/employment-schema.ts). Past its maximum a list keeps its most recent
+// rows, and the response says one was cut.
+export const EMPLOYMENT_LIST_MAXIMA = {
+  salaryParts: 12,
+  clauses: 10,
+  information: 17,
+  relationshipHints: 3,
+  payslips: 6,
+  lines: 60,
+  contracts: 15,
+} as const;
+export type EmploymentListName = keyof typeof EMPLOYMENT_LIST_MAXIMA;
+export const EMPLOYMENT_LISTS = Object.keys(EMPLOYMENT_LIST_MAXIMA) as EmploymentListName[];
+
+export const EMPLOYMENT_EXTRACTION: ExtractionShape<EmploymentFieldName, EmploymentListName> = {
+  review: 'employment',
+  fields: EMPLOYMENT_FIELDS,
+  lists: EMPLOYMENT_LISTS,
+};
+
+export type EmploymentExtraction = Extraction<EmploymentFieldName, EmploymentListName>;
+
 export interface SourcedField extends ExtractedField {
   readonly source: SourceKind;
 }
@@ -264,6 +342,8 @@ export type Extraction<F extends string = ExtractedFieldName, L extends string =
   readonly documents: readonly RecognisedDocument[];
   readonly fields: Readonly<Partial<Record<F, SourcedField>>>;
   readonly conflicts: readonly Conflict<F>[];
+  // Some list reached its maximum, so the documents may hold rows beyond it (employment only).
+  readonly truncated?: true;
 } & { readonly [List in L]: readonly ExtractedRow[] };
 
 export const COHERENCE_CHECKS = [
@@ -286,8 +366,19 @@ export const RENTAL_CHECKS = [
 ] as const;
 export type RentalCheck = (typeof RENTAL_CHECKS)[number];
 
+// What the API finds incoherent in employment documents (api/src/domain/employment-checks.ts).
+// `end_before_start` shares its name with the final pay's check, but the reading words it.
+export const EMPLOYMENT_CHECKS = [
+  'end_before_start',
+  'payslip_not_whole_month',
+  'payslip_lines_do_not_sum',
+  'hours_over_week',
+  'salary_period_mismatch',
+] as const;
+export type EmploymentCheck = (typeof EMPLOYMENT_CHECKS)[number];
+
 // The final pay's checks are worded by the upload; any other review's, by its own reading.
-export type FailedCheck = CoherenceCheck | RentalCheck;
+export type FailedCheck = CoherenceCheck | RentalCheck | EmploymentCheck;
 export const isCoherenceCheck = (c: FailedCheck): c is CoherenceCheck =>
   (COHERENCE_CHECKS as readonly string[]).includes(c);
 
