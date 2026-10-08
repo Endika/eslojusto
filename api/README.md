@@ -743,14 +743,17 @@ The run (`eval/run.ts`, with `tsx`, outside vitest) refuses to start without `EV
 and a positive `EVAL_MAX_USD`, and exits before it loads any AWS adapter. `--review` picks the
 bank (`rental` by default, or `employment`) and `--cases` its folder. It reads, by default, the 15
 packs marked `eval: true` (bad photos, doubtful cases, long documents); `EVAL_CASES=all` or a
-comma-separated list of ids picks others. Each pack goes through the Lambda's own domain (`extract`
+comma-separated list of ids picks others, and so does `--only id1,id2`. Each pack goes through the Lambda's own domain (`extract`
 with that review) and the real `createBedrockReader`, with the models of `src/config.ts`. Before
 each pack it adds the cost measured so far (tokens × `MODEL_PRICES_USD_PER_MTOK`) to the worst
 case of one more pack and stops if that could pass `EVAL_MAX_USD`. It writes `report.json` next to
 the bank's photos (`eval/out/` or `eval/out/employment/`): accuracy by field and by page kind,
 `nothing_read` expected and got, conflicts, escalations, reads cut at `max_tokens`, values of a
 person found in what the model wrote (it must be 0; for employment the person replaced and a
-household employer count too) and the total cost.
+household employer count too) and the total cost. For a pack that missed any field it keeps, per
+read, the tool input exactly as the model wrote it (the bank is synthetic), what validation left
+out, which sections survived and the merged extraction, so a miss can be traced without paying for
+the read again. A run with `--only` writes its report over the last one.
 
 **How much.** 15 packs of 1 to 8 photos, one pass with Sonnet 4.6, per bank. A rental pack is at
 most **0.40 USD** (96,000 tokens in and 5,000 out); an employment pack at most **0.51 USD**

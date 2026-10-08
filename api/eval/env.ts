@@ -34,6 +34,8 @@ export interface EvalArgs {
   readonly review: EvalReview;
   // Relative to api/.
   readonly cases: string;
+  // `--only`: the ids of the packs to read, as EVAL_CASES takes them.
+  readonly only?: string;
 }
 
 const DEFAULT_CASES: Readonly<Record<EvalReview, string>> = {
@@ -41,7 +43,8 @@ const DEFAULT_CASES: Readonly<Record<EvalReview, string>> = {
   employment: 'eval/cases/employment',
 };
 
-// `--review rental|employment` (rental by default) and `--cases <dir>` (that review's bank by default).
+// `--review rental|employment` (rental by default), `--cases <dir>` (that review's bank by default)
+// and `--only id1,id2`.
 export function parseEvalArgs(argv: readonly string[]): EvalArgs {
   const valueOf = (name: string): string | undefined => {
     const i = argv.indexOf(name);
@@ -53,5 +56,7 @@ export function parseEvalArgs(argv: readonly string[]): EvalArgs {
   const review = valueOf('--review') ?? 'rental';
   if (review !== 'rental' && review !== 'employment')
     throw new Error(`--review is rental or employment, not ${review}`);
-  return { review, cases: (valueOf('--cases') ?? DEFAULT_CASES[review]).replace(/\/+$/, '') };
+  const cases = (valueOf('--cases') ?? DEFAULT_CASES[review]).replace(/\/+$/, '');
+  const only = valueOf('--only');
+  return { review, cases, ...(only !== undefined && { only }) };
 }

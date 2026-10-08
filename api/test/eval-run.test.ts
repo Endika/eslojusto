@@ -81,6 +81,13 @@ describe('starting an evaluation run', () => {
       review: 'employment',
       cases: 'eval/cases/employment',
     });
+    expect(
+      parseEvalArgs(['--review', 'employment', '--only', 'replacement-named,household-gate']),
+    ).toEqual({
+      review: 'employment',
+      cases: 'eval/cases/employment',
+      only: 'replacement-named,household-gate',
+    });
   });
 
   it.each([
@@ -88,6 +95,7 @@ describe('starting an evaluation run', () => {
     [['--review'], '--review takes a value'],
     [['--review', 'employment', '--cases'], '--cases takes a value'],
     [['--cases', '--review', 'employment'], '--cases takes a value'],
+    [['--only'], '--only takes a value'],
   ])('refuses the arguments %j', (argv, message) => {
     expect(() => parseEvalArgs(argv)).toThrow(message);
   });
@@ -428,5 +436,60 @@ describe('an evaluation run over the employment bank', () => {
     }));
     const report = await evaluate([employmentPackOf(c)], bank, employmentDeps(reader, 100));
     expect(report.personsTranscribed).toBe(1);
+  });
+
+  describe('a pack that misses a field', () => {
+    const c = EMPLOYMENT_BANK.find((x) => x.id === 'replacement-named');
+    if (c === undefined) throw new Error('no case');
+    const perfect = perfectEmploymentRead(c);
+
+    it('keeps what the model wrote and what the domain made of it', async () => {
+      // The contract's section sent as a JSON string: validation leaves it out whole.
+      const toolInput = {
+        ...perfect,
+        employment_contract: JSON.stringify(perfect['employment_contract']),
+      };
+      const reader = new FixedReader(() => ({ toolInput, inputTokens: 20_000, outputTokens: 900 }));
+      const report = await evaluate([employmentPackOf(c)], bank, employmentDeps(reader, 100));
+      const pack = report.perPack[0];
+      expect(pack?.code).toBe('nothing_read');
+      expect(pack?.reads).toEqual([
+        expect.objectContaining({
+          model: SONNET_4_6,
+          toolInput,
+          dropped: 1,
+          unclassified: 0,
+          sections: [],
+          doubtful: true,
+          extraction: expect.objectContaining({ fields: {}, lists: {} }),
+        }),
+      ]);
+    });
+
+    it('keeps the merged extraction of a read that came back short', async () => {
+      const contract = perfect['employment_contract'] as Record<string, unknown>;
+      const { trialUnit: _trialUnit, ...rest } = contract;
+      const reader = new FixedReader(() => ({
+        toolInput: { ...perfect, employment_contract: rest },
+        inputTokens: 20_000,
+        outputTokens: 900,
+      }));
+      const report = await evaluate([employmentPackOf(c)], bank, employmentDeps(reader, 100));
+      const read = report.perPack[0]?.reads?.[0];
+      expect(read?.sections).toEqual(['employment_contract']);
+      expect(read?.extraction.fields).toHaveProperty('trialAmount');
+      expect(read?.extraction.fields).not.toHaveProperty('trialUnit');
+    });
+
+    it('keeps nothing of a pack that scores every field', async () => {
+      const reader = new FixedReader(() => ({
+        toolInput: perfect,
+        inputTokens: 20_000,
+        outputTokens: 900,
+      }));
+      const report = await evaluate([employmentPackOf(c)], bank, employmentDeps(reader, 100));
+      expect(report.perPack[0]?.fields.correct).toBe(report.perPack[0]?.fields.expected);
+      expect(report.perPack[0]).not.toHaveProperty('reads');
+    });
   });
 });
