@@ -1,0 +1,92 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "work_history",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "work_history",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "employment_work_history": {
+          "contracts": [
+            {
+              "startDate": "2022-04-04",
+              "endDate": "2022-09-30",
+              "employerType": "company",
+              "employerName": "Conservas Imaginarias S.A.",
+              "accountCode": "48/0000000/00",
+              "contractKey": "402",
+              "partTimeCoefficient": 0,
+              "confidence": "high"
+            },
+            {
+              "startDate": "2022-11-02",
+              "endDate": "2023-04-30",
+              "employerType": "company",
+              "employerName": "Conservas Imaginarias S.A.",
+              "accountCode": "48/0000000/00",
+              "contractKey": "402",
+              "confidence": "high"
+            },
+            {
+              "startDate": "2023-06-01",
+              "endDate": "2023-08-31",
+              "employerType": "person",
+              "accountCode": "48/1111111/11",
+              "contractKey": "100",
+              "partTimeCoefficient": 500,
+              "confidence": "high"
+            },
+            {
+              "startDate": "2024-01-08",
+              "endDate": "2024-12-31",
+              "employerType": "company",
+              "employerName": "Logística de Ficción S.L.",
+              "accountCode": "48/2222222/22",
+              "contractKey": "410",
+              "confidence": "high"
+            },
+            {
+              "startDate": "2025-03-03",
+              "employerType": "company",
+              "employerName": "Conservas Imaginarias S.A.",
+              "accountCode": "48/0000000/00",
+              "contractKey": "402",
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 18918,
+    "output_tokens": 610
+  }
+}

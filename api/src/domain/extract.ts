@@ -7,6 +7,12 @@ import {
 } from './allowance';
 import { checkFileShapes, imageSizes, type DocumentFile } from './documents';
 import {
+  employmentFailedChecks,
+  employmentIncomplete,
+  type EmploymentCheck,
+} from './employment-checks';
+import { employmentMerge, type EmploymentMerged } from './employment-merge';
+import {
   failedChecks,
   hasLowConfidence,
   isReadable,
@@ -63,8 +69,17 @@ export interface ExtractRequest<R extends ReviewKind = 'final_pay'> {
 
 type ExtractionOf<R extends ReviewKind> = R extends 'rental'
   ? Omit<RentalMerged, 'discarded'>
-  : Omit<Merged, 'discarded'>;
-type CheckOf<R extends ReviewKind> = R extends 'rental' ? RentalCheck : CoherenceCheck;
+  : R extends 'employment'
+    ? Omit<EmploymentMerged, 'discarded'>
+    : Omit<Merged, 'discarded'>;
+type CheckOf<R extends ReviewKind> = R extends 'rental'
+  ? RentalCheck
+  : R extends 'employment'
+    ? EmploymentCheck
+    : CoherenceCheck;
+
+type AnyMerged = Merged | RentalMerged | EmploymentMerged;
+type AnyCheck = CoherenceCheck | RentalCheck | EmploymentCheck;
 
 export type ExtractResponse<R extends ReviewKind = 'final_pay'> =
   | {
@@ -97,11 +112,13 @@ export interface ExtractMetrics {
   readability?: Partial<Record<Readability, number>>;
   // Only when the request named one.
   review?: ReviewKind;
+  // A list came back at its maximum.
+  truncated?: boolean;
 }
 
 interface Assessment {
-  readonly extraction: Merged | RentalMerged;
-  readonly failed: readonly (CoherenceCheck | RentalCheck)[];
+  readonly extraction: AnyMerged;
+  readonly failed: readonly AnyCheck[];
   readonly doubtful: boolean;
   readonly noOutput: boolean;
 }
@@ -124,8 +141,8 @@ function incomplete(reading: Reading, extraction: Merged): boolean {
 }
 
 interface Checked {
-  readonly extraction: Merged | RentalMerged;
-  readonly failed: readonly (CoherenceCheck | RentalCheck)[];
+  readonly extraction: AnyMerged;
+  readonly failed: readonly AnyCheck[];
   readonly incomplete: boolean;
 }
 
@@ -153,10 +170,24 @@ function checkRental(reading: Reading): Checked {
   };
 }
 
+function checkEmployment(reading: Reading, toolInput: unknown): Checked {
+  const extraction = employmentMerge(reading, toolInput);
+  return {
+    extraction,
+    failed: employmentFailedChecks(reading),
+    incomplete: employmentIncomplete(reading, extraction),
+  };
+}
+
+function check(reading: Reading, review: ReviewKind, toolInput: unknown): Checked {
+  if (review === 'rental') return checkRental(reading);
+  if (review === 'employment') return checkEmployment(reading, toolInput);
+  return checkFinalPay(reading);
+}
+
 function assess(read: ModelRead, pageCount: number, review: ReviewKind): Assessment {
   const reading = parseReading(read.toolInput, pageCount, review);
-  const { extraction, failed, incomplete } =
-    review === 'rental' ? checkRental(reading) : checkFinalPay(reading);
+  const { extraction, failed, incomplete } = check(reading, review, read.toolInput);
   const noOutput = read.toolInput === null;
   const doubtful =
     noOutput ||
@@ -179,7 +210,7 @@ function measure(files: readonly DocumentFile[], review: ReviewKind): number | E
   return tokens > MAX_ESTIMATED_INPUT_TOKENS ? 'document_too_dense' : tokens;
 }
 
-const hasUsableValue = (e: Merged | RentalMerged): boolean =>
+const hasUsableValue = (e: AnyMerged): boolean =>
   Object.keys(e.fields).length > 0 ||
   Object.values(e.lists).some((rows) => (rows?.length ?? 0) > 0);
 
@@ -283,6 +314,7 @@ export async function extract<R extends ReviewKind = 'final_pay'>(
 
   // A count, never which values: the log carries nothing a document said.
   metrics.conflicts = result.extraction.conflicts.length;
+  if ('truncated' in result.extraction && result.extraction.truncated) metrics.truncated = true;
   const { discarded: _discarded, ...extraction } = result.extraction;
   // The review chose the schema, so the extraction is that review's.
   const ok = {

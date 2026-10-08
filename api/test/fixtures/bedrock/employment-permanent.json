@@ -1,0 +1,273 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "employment_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "employment_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "employment_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "employment_contract": {
+          "employerType": {
+            "value": "company",
+            "confidence": "high"
+          },
+          "companyName": {
+            "value": "Talleres Inventados del Norte S.L.",
+            "confidence": "high"
+          },
+          "companyTaxId": {
+            "value": "B00000000",
+            "confidence": "high"
+          },
+          "workplaceRegion": {
+            "value": "MD",
+            "confidence": "high"
+          },
+          "signedOn": {
+            "value": "2026-10-06",
+            "confidence": "high"
+          },
+          "startDate": {
+            "value": "2026-10-07",
+            "confidence": "high"
+          },
+          "modalityText": {
+            "value": "Contrato de trabajo indefinido a jornada completa",
+            "confidence": "high"
+          },
+          "modality": {
+            "value": "permanent",
+            "confidence": "high"
+          },
+          "contractKey": {
+            "value": "100",
+            "confidence": "high"
+          },
+          "partTime": {
+            "value": false,
+            "confidence": "high"
+          },
+          "category": {
+            "value": "Grupo 5 - Oficial administrativo",
+            "confidence": "high"
+          },
+          "agreementName": {
+            "value": "Convenio colectivo de oficinas y despachos de la Comunidad de Madrid",
+            "confidence": "high"
+          },
+          "agreementCode": {
+            "value": "28000000011900",
+            "confidence": "high"
+          },
+          "salaryAmount": {
+            "value": 1600,
+            "confidence": "high"
+          },
+          "salaryPeriod": {
+            "value": "month",
+            "confidence": "high"
+          },
+          "annualSalaryAmount": {
+            "value": 22400,
+            "confidence": "high"
+          },
+          "payments": {
+            "value": 14,
+            "confidence": "high"
+          },
+          "prorated": {
+            "value": false,
+            "confidence": "high"
+          },
+          "weeklyHours": {
+            "value": 40,
+            "confidence": "high"
+          },
+          "scheduleText": {
+            "value": "De lunes a viernes, de 9:00 a 14:00 y de 15:00 a 18:00 horas.",
+            "confidence": "high"
+          },
+          "shifts": {
+            "value": false,
+            "confidence": "high"
+          },
+          "night": {
+            "value": false,
+            "confidence": "high"
+          },
+          "overtimeAgreed": {
+            "value": "none",
+            "confidence": "high"
+          },
+          "holidayDays": {
+            "value": 30,
+            "confidence": "high"
+          },
+          "holidayUnit": {
+            "value": "calendar",
+            "confidence": "high"
+          },
+          "trialAmount": {
+            "value": 6,
+            "confidence": "high"
+          },
+          "trialUnit": {
+            "value": "months",
+            "confidence": "high"
+          },
+          "salaryParts": [
+            {
+              "concept": "SALARIO BASE",
+              "amount": 1400,
+              "kind": "base",
+              "confidence": "high"
+            },
+            {
+              "concept": "PLUS CONVENIO",
+              "amount": 200,
+              "kind": "fixed_complement",
+              "confidence": "high"
+            }
+          ],
+          "clauses": [
+            {
+              "label": "non_compete",
+              "literal": "Durante los doce meses siguientes a la extinción del contrato, [nombre] no prestará servicios para empresas competidoras, y percibirá por ello una compensación de 300 euros mensuales.",
+              "months": 12,
+              "compensationStated": true,
+              "confidence": "high"
+            }
+          ],
+          "information": [
+            {
+              "element": "a",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "b",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "c",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "d",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "e",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "f",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "g",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "h",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "i",
+              "presence": "by_reference",
+              "confidence": "high"
+            },
+            {
+              "element": "j",
+              "presence": "absent",
+              "confidence": "high"
+            },
+            {
+              "element": "k",
+              "presence": "absent",
+              "confidence": "high"
+            },
+            {
+              "element": "l",
+              "presence": "absent",
+              "confidence": "high"
+            },
+            {
+              "element": "m",
+              "presence": "absent",
+              "confidence": "high"
+            },
+            {
+              "element": "n",
+              "presence": "by_reference",
+              "confidence": "high"
+            },
+            {
+              "element": "o",
+              "presence": "present",
+              "confidence": "high"
+            },
+            {
+              "element": "p",
+              "presence": "absent",
+              "confidence": "high"
+            },
+            {
+              "element": "q",
+              "presence": "absent",
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 21377,
+    "output_tokens": 1743
+  }
+}

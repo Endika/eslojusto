@@ -1,4 +1,15 @@
-import { FINAL_PAY_PAGE_KINDS, LIMITS, type PageKind, type SourceKind } from './documents';
+import {
+  EMPLOYMENT_PAGE_KINDS,
+  FINAL_PAY_PAGE_KINDS,
+  LIMITS,
+  type PageKind,
+  type SourceKind,
+} from './documents';
+import {
+  EMPLOYMENT_PAGE_KIND_DESCRIPTION,
+  EMPLOYMENT_SECTIONS,
+  type EmploymentSectionKind,
+} from './employment-schema';
 import {
   RENTAL_READABILITY,
   RENTAL_SCHEMA,
@@ -41,6 +52,8 @@ export type FieldType =
   | { readonly type: 'money' }
   | { readonly type: 'days' }
   | { readonly type: 'integer'; readonly min: number; readonly max: number }
+  // At most two decimals.
+  | { readonly type: 'decimal'; readonly min: number; readonly max: number }
   // 0 to 100, at most two decimals.
   | { readonly type: 'percent' }
   // YYYY-MM.
@@ -269,7 +282,7 @@ export const SECTIONS = {
 } as const satisfies Readonly<Record<string, SectionSchema>>;
 
 export type FinalPaySectionKind = keyof typeof SECTIONS;
-export type SectionKind = FinalPaySectionKind | RentalSectionKind;
+export type SectionKind = FinalPaySectionKind | RentalSectionKind | EmploymentSectionKind;
 export const SECTION_KINDS = Object.keys(SECTIONS) as readonly FinalPaySectionKind[];
 
 export const PAGES_DESCRIPTION =
@@ -331,12 +344,22 @@ export const REVIEW_SCHEMAS: Readonly<Record<ReviewKind, ReviewSchema>> = {
     sections: SECTIONS,
   },
   rental: RENTAL_SCHEMA,
+  // Its readability is the final pay's: every page of the pack is about a job.
+  employment: {
+    pageKinds: EMPLOYMENT_PAGE_KINDS,
+    pageKindDescription: EMPLOYMENT_PAGE_KIND_DESCRIPTION,
+    readability: FINAL_PAY_READABILITY,
+    readabilityDescription: READABILITY_DESCRIPTION,
+    monthDescription: FINAL_PAY_MONTH_DESCRIPTION,
+    sections: EMPLOYMENT_SECTIONS,
+  },
 };
 
 // Every review's sections, by kind.
 export const ALL_SECTIONS: Readonly<Record<SectionKind, SectionSchema>> = {
   ...SECTIONS,
   ...RENTAL_SECTIONS,
+  ...EMPLOYMENT_SECTIONS,
 };
 
 export const sectionsOf = (review: ReviewKind): readonly [SectionKind, SectionSchema][] =>
@@ -363,6 +386,8 @@ function valueSchema(type: FieldType): JsonSchema {
       return { type: 'integer', minimum: 0, maximum: MAX_DAYS };
     case 'integer':
       return { type: 'integer', minimum: type.min, maximum: type.max };
+    case 'decimal':
+      return { type: 'number', minimum: type.min, maximum: type.max };
     case 'percent':
       return { type: 'number', minimum: 0, maximum: 100 };
     case 'month':

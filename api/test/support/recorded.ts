@@ -24,7 +24,17 @@ export type Recording =
   | 'rental-injected'
   | 'rental-lease-catalan'
   | 'rental-not-rental'
-  | 'rental-identifiers';
+  | 'rental-identifiers'
+  | 'employment-permanent'
+  | 'employment-production'
+  | 'employment-replacement'
+  | 'employment-training'
+  | 'employment-contract-payslips'
+  | 'employment-work-history'
+  | 'employment-offer-net'
+  | 'employment-injected'
+  | 'employment-basque'
+  | 'employment-household';
 
 export const recording = (name: Recording): string =>
   readFileSync(new URL(`../fixtures/bedrock/${name}.json`, import.meta.url), 'utf8');

@@ -8,13 +8,15 @@ import {
   SONNET_4_6,
 } from '../src/config';
 import { LIMITS } from '../src/domain/documents';
-import { REVIEWS } from '../src/domain/reviews';
+import { REVIEWS, type ReviewKind } from '../src/domain/reviews';
 import {
+  EXTRA_OUTPUT_TOKENS_BY_REVIEW,
   imageTokens,
   MAX_ESCALATION_INPUT_TOKENS,
   MAX_ESTIMATED_INPUT_TOKENS,
   PROMPT_TOKENS_BY_REVIEW,
 } from '../src/domain/tokens';
+import { employmentRecord, LARGEST } from './support/employment-largest';
 
 const PROMPT_TOKENS = PROMPT_TOKENS_BY_REVIEW.final_pay;
 
@@ -28,9 +30,12 @@ const price = (model: string) => {
   if (!p) throw new Error(`No price for ${model}`);
   return p;
 };
-const maxOutput = (model: string) => MODEL_SETTINGS[model]?.maxTokens ?? Infinity;
-const cost = (model: string, input: number) =>
-  input * price(model).input + maxOutput(model) * price(model).output;
+const maxOutput = (model: string, review: ReviewKind = 'final_pay') =>
+  (MODEL_SETTINGS[model]?.maxTokens ?? Infinity) + EXTRA_OUTPUT_TOKENS_BY_REVIEW[review];
+const cost = (model: string, input: number, review: ReviewKind = 'final_pay') =>
+  input * price(model).input + maxOutput(model, review) * price(model).output;
+// Output priced like the prompt, at two characters per token.
+const recordTokens = (record: unknown) => Math.ceil(JSON.stringify(record).length / 2);
 
 const photo = { format: 'image/jpeg' as const, width: 1176, height: LIMITS.maxImageLongSide };
 
@@ -79,6 +84,16 @@ describe('cost of a read', () => {
     expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS)).toBeLessThanOrEqual(0.4);
   });
 
+  it('stays at or under 0.52 USD for an employment read, with its room for 12,000 tokens out', () => {
+    expect(maxOutput(SONNET_4_6, 'employment')).toBe(12_000);
+    expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'employment')).toBeLessThanOrEqual(0.52);
+  });
+
+  it('gives only the employment review more room to write', () => {
+    expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.final_pay).toBe(0);
+    expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.rental).toBe(0);
+  });
+
   it('reads with Sonnet alone, so nothing escalates', () => {
     expect(PRIMARY_MODEL).toBe(SONNET_4_6);
     expect(ESCALATION_MODEL).toBe(PRIMARY_MODEL);
@@ -88,5 +103,26 @@ describe('cost of a read', () => {
     const escalated =
       cost(HAIKU_4_5, MAX_ESCALATION_INPUT_TOKENS) + cost(SONNET_4_6, MAX_ESCALATION_INPUT_TOKENS);
     expect(escalated).toBeLessThanOrEqual(0.3);
+    const employment =
+      cost(HAIKU_4_5, MAX_ESCALATION_INPUT_TOKENS, 'employment') +
+      cost(SONNET_4_6, MAX_ESCALATION_INPUT_TOKENS, 'employment');
+    expect(employment).toBeLessThanOrEqual(0.46);
+  });
+});
+
+// api/README.md, «Cost», quotes these sizes.
+describe('what an employment read records', () => {
+  const typical = (payslips: number, lines: number, contracts: number) =>
+    recordTokens(employmentRecord({ payslips, lines, contracts, texts: 'typical' }));
+
+  it('fits a contract with six payslips in its max_tokens', () => {
+    expect(typical(6, 72, 0)).toBe(10_021);
+    expect(typical(6, 72, 0)).toBeLessThanOrEqual(maxOutput(SONNET_4_6, 'employment'));
+  });
+
+  it('may not fit twelve payslips with every line and a long work history', () => {
+    expect(typical(12, 144, 0)).toBe(15_202);
+    expect(typical(12, 150, 60)).toBe(22_363);
+    expect(recordTokens(employmentRecord(LARGEST))).toBe(33_521);
   });
 });
