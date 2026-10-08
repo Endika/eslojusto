@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.20.0](https://github.com/Endika/eslojusto/compare/v1.19.0...v1.20.0) (2026-10-08)
+
+
+### Features
+
+* **employment:** add the employment contract form, its scope gate and its result ([43af81d](https://github.com/Endika/eslojusto/commit/43af81d3d4215a4cfde481e439dea7d559e94fc0))
+
+
+### Bug Fixes
+
+* **calculator:** share how review sections round and place approximate amounts ([b2f2a47](https://github.com/Endika/eslojusto/commit/b2f2a47d7988b2bcdad0cf392919aff3161e88c0))
+* **employment:** ask the extra pays' proration only when their number reads above zero ([5ad1417](https://github.com/Endika/eslojusto/commit/5ad14175cbd63f55693a03937a6820538b41ded5))
+* **employment:** follow the pass for the headline and name the years a total covers ([6b8b13a](https://github.com/Endika/eslojusto/commit/6b8b13a1ccba5437af677b320079cb88451fe218))
+* **employment:** name the non-compete doubt by the post, as art. 21.2 does ([e1a5be2](https://github.com/Endika/eslojusto/commit/e1a5be22d9dd4b2a75a5192d94156bad74873167))
+* **engine:** count the extra pays of a short day-rate contract inside its daily minimum ([a2b7289](https://github.com/Endika/eslojusto/commit/a2b7289455217a80220b87c3be4071425d48f049))
+* **engine:** read art. 4.1 by how long the service lasts, leaving a monthly pay to review ([bc87c23](https://github.com/Endika/eslojusto/commit/bc87c238b21004e429bc8d51cb554d636cbb0dd4))
+
 ## [1.19.0](https://github.com/Endika/eslojusto/compare/v1.18.0...v1.19.0) (2026-10-08)
 
 
