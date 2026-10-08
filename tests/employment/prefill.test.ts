@@ -8,6 +8,10 @@ import type {
   SourceKind,
 } from '../../src/documents/contract';
 import { employmentPrefill } from '../../src/employment/prefill';
+import { EMPLOYMENT_NORMS } from '../../src/engine/employment/data/norms';
+import { assessHolidaysAndPay } from '../../src/engine/employment/holidays-pay';
+import type { EmploymentInput } from '../../src/engine/employment/types';
+import { contract as engineInput } from '../engine/employment/input';
 import { tr } from './fixtures';
 
 const f = (
@@ -127,8 +131,10 @@ describe('the contract', () => {
   });
 
   it('never answers whether the cause is explained: it quotes it beside the question', () => {
-    expect(entry(p, 'causeStated')).toBeUndefined();
-    expect(entry(p, 'circumstancesStated')).toBeUndefined();
+    // Even when the reading labels a replacement's cause as stated.
+    const q = prefill({ fields: { ...contract, replacementCauseStated: f(true) } });
+    for (const field of ['causeStated', 'circumstancesStated', 'replacementCauseStated'])
+      expect(entry(q, field)).toBeUndefined();
     expect(p.quotes).toEqual({
       modality: 'Contrato de duración determinada por circunstancias de la producción',
       causeStated: 'Aumento de pedidos por la campaña de otoño de la línea de montaje.',
@@ -137,6 +143,28 @@ describe('the contract', () => {
       categorySalary: 'Oficial de segunda',
       hasSchedule: 'De lunes a viernes, de 8:00 a 16:00.',
     });
+  });
+
+  it('twelve payments with the extras prorated leave the extras to the person, and say so', () => {
+    const q = prefill({ fields: { ...contract, payments: f(12), prorated: f(true) } });
+    expect(entry(q, 'extraPays')).toBeUndefined();
+    expect(entry(q, 'extraProrated')).toBeUndefined();
+    expect(q.notes).toContain(tr('client.employment.documents.extras_in_twelve'));
+    // What a derived 0 would have told: no extra pays at all, below the legal minimum, when the
+    // two the contract prorates are within it.
+    const extraPays = (pays: EmploymentInput['extraPays']) =>
+      assessHolidaysAndPay(engineInput({ extraPays: pays }), EMPLOYMENT_NORMS)
+        .flatMap((a) => (a.kind === 'single' ? [a.finding] : []))
+        .find((f) => f.id === 'extra_pays')?.status;
+    expect(extraPays({ count: 0, prorated: false })).toBe('below_minimum');
+    expect(extraPays({ count: 2, prorated: true })).not.toBe('below_minimum');
+  });
+
+  it('enters the salary period once when only the annual salary comes', () => {
+    const q = prefill({
+      fields: { ...without(contract, 'salaryAmount'), annualSalaryAmount: f(19600) },
+    });
+    expect(q.entries.filter(([n]) => n === 'salaryPeriod')).toEqual([['salaryPeriod', 'year']]);
   });
 
   it('works out the end from a duration in months when no end is printed', () => {
@@ -269,6 +297,21 @@ describe('the payslips', () => {
     expect(mark(p, 'payslips.1.wholeMonth')).toMatchObject({ derived: true, confidence: 'medium' });
   });
 
+  it.each([
+    ['2025-02', 30, 'yes'],
+    ['2025-02', 28, undefined],
+    ['2024-02', 29, undefined],
+    ['2025-02', 20, 'no'],
+    ['2025-06', 30, 'yes'],
+    ['2025-06', 29, 'no'],
+    ['2025-05', 31, 'yes'],
+    ['2025-05', 30, undefined],
+    ['2025-05', 25, 'no'],
+  ])('%s with %i days paid reads whole as %s', (month, days, whole) => {
+    const q = prefill({ payslips: [row({ month, daysWorked: days })] });
+    expect(entry(q, 'payslips.0.wholeMonth')).toBe(whole);
+  });
+
   it('passes on whether a payslip shows an incident', () => {
     expect(entry(p, 'payslips.0.incidents')).toBe('no');
     expect(entry(p, 'payslips.1.incidents')).toBe('yes');
@@ -287,14 +330,22 @@ describe('the payslips', () => {
     expect(q.notes).toContain(tr('client.employment.documents.check.payslip_lines_do_not_sum'));
   });
 
-  it('lines cut to the most recent rows leave the earliest month in doubt', () => {
+  it('lines cut to the most recent rows leave the earliest month’s salary to the person', () => {
     const many = Array.from({ length: 60 }, (_, i) =>
       row({ month: i < 5 ? '2025-01' : '2025-02', amount: 20, category: 'salary' }),
     );
     const q = prefill({ lines: many, truncated: true });
-    expect(mark(q, 'payslips.0.salary')?.confidence).toBe('low');
+    expect(entry(q, 'payslips.0.month')).toBe('2025-01');
+    expect(entry(q, 'payslips.0.salary')).toBeUndefined();
     expect(mark(q, 'payslips.1.salary')?.confidence).toBe('high');
     expect(q.notes).toContain(tr('client.employment.documents.cut.lines', { n: 60 }));
+    expect(q.notes).toContain(tr('client.employment.documents.payslip_partial'));
+  });
+
+  it('a cut no list shows may be in the lines too', () => {
+    const q = prefill({ payslips: slips, lines, truncated: true });
+    expect(entry(q, 'payslips.0.salary')).toBeUndefined();
+    expect(entry(q, 'payslips.1.salary')).toBe('1.400,00');
   });
 
   it('a payslip without lines leaves its salary to the person, and says so', () => {
@@ -365,11 +416,30 @@ describe('the work history', () => {
     expect(q.notes).toContain(tr('client.employment.documents.cut.unknown'));
   });
 
-  it('a cut the payslips show leaves the history whole', () => {
+  it('any cut marks a read history incomplete, even one another list shows', () => {
     const six = Array.from({ length: 6 }, (_, i) => row({ month: `2025-0${i + 1}` }));
     const q = prefill({ fields: contract, contracts, payslips: six, truncated: true });
-    expect(entry(q, 'historyIncomplete')).toBeUndefined();
+    expect(entry(q, 'historyIncomplete')).toBe('yes');
     expect(q.notes).toContain(tr('client.employment.documents.cut.payslips', { n: 6 }));
+  });
+
+  it('a history cut at 15 with one row dropped by the API is still incomplete beside full lines', () => {
+    const sixty = Array.from({ length: 60 }, () =>
+      row({ month: '2025-05', amount: 20, category: 'salary' }),
+    );
+    const fourteen = Array.from({ length: 14 }, (_, i) =>
+      company(`20${10 + i}-01-01`, `20${10 + i}-03-31`, 'Otra Empresa Inventada, S.A.', null),
+    );
+    const q = prefill({ fields: contract, contracts: fourteen, lines: sixty, truncated: true });
+    expect(entry(q, 'historyIncomplete')).toBe('yes');
+  });
+
+  it('a contract still running takes the end worked out from its duration', () => {
+    const q = prefill({
+      fields: { ...without(contract, 'endDate'), durationMonths: f(6) },
+      contracts: [company('2025-04-01', null, null, '48 1234567 89')],
+    });
+    expect(entry(q, 'history.0.endDate')).toBe('2025-09-30');
   });
 });
 
