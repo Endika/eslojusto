@@ -7,9 +7,7 @@ import {
   type EmploymentBankCase,
 } from '../eval/employment-schema';
 import { FOOTER, PLACEHOLDER, SECTION, SHEET } from '../eval/schema';
-import { EMPLOYMENT_BANK, employmentTemplate } from './support/bank';
-
-const withoutComments = (html: string): string => html.replace(/<!--[\s\S]*?-->/g, '');
+import { EMPLOYMENT_BANK, employmentTemplate, withoutComments } from './support/bank';
 
 // The placeholders a template fills from the page itself, and those each repeated block fills
 // from its rows.

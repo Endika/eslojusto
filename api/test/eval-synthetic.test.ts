@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { EMPLOYMENT_PERSON_KEYS } from '../eval/employment-schema';
 import { PERSON_KEYS } from '../eval/schema';
@@ -60,12 +60,11 @@ function validCif(id: string): boolean {
 const ROOTS = ['../eval/cases/', '../eval/templates/', '../../scripts/rental-bank/'];
 
 function filesUnder(root: string, dir: URL): { name: string; text: string }[] {
-  return readdirSync(dir).flatMap((name) => {
-    const url = new URL(name, dir);
-    return statSync(url).isDirectory()
-      ? filesUnder(`${root}${name}/`, new URL(`${name}/`, dir))
-      : [{ name: `${root}${name}`, text: readFileSync(url, 'utf8') }];
-  });
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+    entry.isDirectory()
+      ? filesUnder(`${root}${entry.name}/`, new URL(`${entry.name}/`, dir))
+      : [{ name: `${root}${entry.name}`, text: readFileSync(new URL(entry.name, dir), 'utf8') }],
+  );
 }
 const FILES = ROOTS.flatMap((root) => filesUnder(root, new URL(root, import.meta.url)));
 const EMPLOYMENT_FILES = FILES.filter((f) => f.name.includes('/employment/'));
