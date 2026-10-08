@@ -1,12 +1,13 @@
-import { toIso, type CivilDate } from '../engine/date';
-import { itemAmount, type ItemResult } from '../engine/rental/item';
-import { countedAmount, highestAmount, letterAmount } from '../engine/rental/outcome';
+import { addDays, compareDates, toIso, type CivilDate } from '../engine/date';
+import { itemAmount, type ItemReading, type ItemResult } from '../engine/rental/item';
+import { letterAmount } from '../engine/rental/outcome';
 import {
   rentUpdateAmount,
   type RateFigure,
   type RentUpdateReading,
 } from '../engine/rental/rent-update';
 import type { RentalReview, RentUpdateItem } from '../engine/rental/review';
+import type { MoveOut } from '../engine/rental/types';
 import { formatEuros } from '../calculator/number';
 import { longDate, type LetterDetails, type LetterKind } from '../documents/letter';
 import type { Block, DocumentModel } from '../documents/ports';
@@ -16,18 +17,28 @@ import { dayText, monthText, percentText } from './render';
 
 const day = (d: CivilDate) => dayText(toIso(d));
 
+// What the person typed wraps on its line rather than shrinking: an address can be long.
 const blank = (label: string, value = ''): Block => {
   const v = value.trim();
-  return v === '' ? { type: 'blank', label } : { type: 'blank', label, value: v };
+  return v === '' ? { type: 'blank', label } : { type: 'blank', label, value: v, wrap: true };
 };
 
 const itemOf = (review: RentalReview, kind: ItemResult['kind']): ItemResult | undefined =>
   review.items.find((i): i is ItemResult => i.kind === kind);
 
+const owedAmount = (r: ItemReading): number => (r.status === 'owed' ? itemAmount(r) : 0);
+
 // What is still to come back of the deposit in every reading; null when nothing is owed.
 export const depositOwed = (review: RentalReview): number | null => {
   const item = itemOf(review, 'deposit_return');
-  return item ? letterAmount(item.outcome, (r) => (r.status === 'owed' ? itemAmount(r) : 0)) : null;
+  return item ? letterAmount(item.outcome, owedAmount) : null;
+};
+
+// The interest for the delay in every reading: the lowest, never the day count that gives more;
+// null when there is none.
+export const interestOwed = (review: RentalReview): number | null => {
+  const item = itemOf(review, 'deposit_interest');
+  return item ? letterAmount(item.outcome, owedAmount) : null;
 };
 
 // A rise the rent letter asks to look at again: what holds in every reading and is above zero,
@@ -49,10 +60,13 @@ export function riseLines(review: RentalReview): readonly RiseLine[] {
   });
 }
 
-// The deposit letter with something still owed for it; the rent letter with some rise to look at.
+// The deposit letter with something still owed of it or of its interest; the rent letter with some
+// rise to look at.
 export function rentalLetterKinds(review: RentalReview): LetterKind[] {
   return [
-    ...(depositOwed(review) !== null ? (['deposit_return'] as const) : []),
+    ...(depositOwed(review) !== null || interestOwed(review) !== null
+      ? (['deposit_return'] as const)
+      : []),
     ...(riseLines(review).length > 0 ? (['rent_review'] as const) : []),
   ];
 }
@@ -81,32 +95,36 @@ function closing(details: LetterDetails, tr: Translate): Block[] {
   ];
 }
 
-// The interest up to the day of the review: one figure, or the two the year's day count gives.
+// The interest the balance still out has run up to, the last day counted being the eve of the
+// review; only the lowest reading, as with every figure in a letter.
 function interestBlocks(review: RentalReview, today: CivilDate, tr: Translate): Block[] {
+  const interest = interestOwed(review);
+  if (interest === null) return [];
   const item = itemOf(review, 'deposit_interest');
-  if (!item) return [];
-  const owed = (r: Parameters<typeof itemAmount>[0]) => (r.status === 'owed' ? itemAmount(r) : 0);
-  const low = countedAmount(item.outcome, owed);
-  const high = highestAmount(item.outcome, owed);
-  if (high <= 0) return [];
-  const fecha = day(today);
   return [
     {
       type: 'text',
-      text:
-        low === high
-          ? tr('client.rental.letter.deposit.interest', { fecha, importe: formatEuros(low) })
-          : tr('client.rental.letter.deposit.interest_range', {
-              fecha,
-              minimo: formatEuros(low),
-              maximo: formatEuros(high),
-            }),
+      text: tr('client.rental.letter.deposit.interest', {
+        fecha: day(addDays(today, -1)),
+        importe: formatEuros(interest),
+      }),
     },
+    ...(item?.outcome.kind === 'depends'
+      ? [{ type: 'note', text: tr('client.rental.letter.lowest') } as const]
+      : []),
   ];
 }
 
+// The day the last of the deposit came back.
+const lastReturn = (out: MoveOut): CivilDate | null =>
+  out.returns.reduce<CivilDate | null>(
+    (last, r) => (last === null || compareDates(r.on, last) > 0 ? r.on : last),
+    null,
+  );
+
 // Asks for the deposit back: the contract, the day of the keys, what is pending, what art. 36.4
-// LAU says of interest, the interest so far and the account to pay it into.
+// LAU says of interest, the interest so far and the account to pay it into. With the deposit
+// back in full but late, it asks only for the interest of the delay.
 export function depositLetter(
   r: CompletedRentalReview,
   today: CivilDate,
@@ -115,22 +133,46 @@ export function depositLetter(
 ): DocumentModel {
   const { input, review } = r;
   const title = tr('client.rental.letter.deposit.title');
+  const pending = depositOwed(review);
+  const out = input.moveOut;
+  const keys = out ? day(out.keysReturnedOn) : '';
+  const returned = out && lastReturn(out);
+  const body: Block[] =
+    pending !== null || returned === null
+      ? [
+          {
+            type: 'text',
+            text: tr('client.rental.letter.deposit.body', {
+              contrato: day(input.signedOn),
+              llaves: keys,
+              pendiente: formatEuros(pending ?? 0),
+            }),
+          },
+          { type: 'text', text: tr('client.rental.letter.deposit.interest_rule') },
+          ...interestBlocks(review, today, tr),
+          { type: 'text', text: tr('client.rental.letter.deposit.account') },
+        ]
+      : [
+          {
+            type: 'text',
+            text: tr('client.rental.letter.deposit.body_late', {
+              contrato: day(input.signedOn),
+              llaves: keys,
+              devuelta: day(returned),
+              importe: formatEuros(interestOwed(review) ?? 0),
+            }),
+          },
+          ...(itemOf(review, 'deposit_interest')?.outcome.kind === 'depends'
+            ? [{ type: 'note', text: tr('client.rental.letter.lowest') } as const]
+            : []),
+          { type: 'text', text: tr('client.rental.letter.deposit.account_interest') },
+        ];
   return {
     title,
     footer: null,
     blocks: [
       ...header(title, details, tr),
-      {
-        type: 'text',
-        text: tr('client.rental.letter.deposit.body', {
-          contrato: day(input.signedOn),
-          llaves: input.moveOut ? day(input.moveOut.keysReturnedOn) : '',
-          pendiente: formatEuros(depositOwed(review) ?? 0),
-        }),
-      },
-      { type: 'text', text: tr('client.rental.letter.deposit.interest_rule') },
-      ...interestBlocks(review, today, tr),
-      { type: 'text', text: tr('client.rental.letter.deposit.account') },
+      ...body,
       blank(tr('client.rental.letter.iban'), details.iban),
       ...closing(details, tr),
     ],
@@ -141,42 +183,63 @@ const rateValue = (rate: RateFigure): number =>
   rate.kind === 'fixed' ? rate.rate : rate.figure.rate;
 
 // The figure that sets the rent the update allows: the agreed one, or the cap when it is lower.
-function bindingRate(r: RentUpdateReading): RateFigure | null {
+function bindingRate(
+  r: RentUpdateReading,
+): { readonly rate: RateFigure; readonly cap: boolean } | null {
   const cap = r.cap?.rate ?? null;
-  if (cap && (r.agreed === null || rateValue(cap) <= rateValue(r.agreed))) return cap;
-  return r.agreed;
+  if (cap && (r.agreed === null || rateValue(cap) <= rateValue(r.agreed)))
+    return { rate: cap, cap: true };
+  return r.agreed && { rate: r.agreed, cap: false };
 }
 
-function rateWords(rate: RateFigure, tr: Translate): string {
+// The agreed figure as the contract has it; a cap as the year's cap, with its norm.
+function rateWords(rate: RateFigure, cap: string | null, tr: Translate): string {
   if (rate.kind === 'fixed')
-    return tr('client.rental.letter.rent.fixed', { tasa: percentText(rate.rate) });
+    return cap === null
+      ? tr('client.rental.letter.rent.fixed', { tasa: percentText(rate.rate) })
+      : tr('client.rental.letter.rent.cap_fixed', { tasa: percentText(rate.rate), norma: cap });
   const f = rate.figure;
-  return tr(f.flash ? 'client.rental.letter.rent.index_flash' : 'client.rental.letter.rent.index', {
+  const vars = {
     indice: tr(`client.rental.index.${f.index}`),
     mes: monthText(f.month),
     tasa: percentText(f.rate),
-  });
+  };
+  const words = tr(
+    f.flash ? 'client.rental.letter.rent.index_flash' : 'client.rental.letter.rent.index',
+    vars,
+  );
+  return cap === null
+    ? words
+    : tr('client.rental.letter.rent.cap_index', { indice: words, norma: cap });
 }
 
 function riseBlocks(line: RiseLine, input: CompletedRentalReview['input'], tr: Translate): Block[] {
   const { item, reading } = line;
-  const rate = bindingRate(reading);
+  const binding = bindingRate(reading);
   const cap = reading.cap && item.sources.find((s) => s.id === reading.cap?.rule);
+  const capCitation = cap ? cap.citation : null;
   const subida = tr('client.rental.letter.rent.rise', { aniversario: day(item.anniversary) });
   const pending = item.sources
     .filter((s) => s.status === 'pending_validation')
     .map((s) => s.citation);
+  const figures = {
+    subida,
+    renta: formatEuros(reading.maxRent ?? 0),
+    pagada: formatEuros(input.updates[item.index]?.newRent ?? 0),
+    diferencia: formatEuros(reading.monthly),
+  };
   return [
     {
       type: 'bullet',
-      text: tr('client.rental.letter.rent.line', {
-        subida: rate ? `${subida} (${rateWords(rate, tr)})` : subida,
-        renta: formatEuros(reading.maxRent ?? 0),
-        pagada: formatEuros(input.updates[item.index]?.newRent ?? 0),
-        diferencia: formatEuros(reading.monthly),
-      }),
+      text: binding
+        ? tr('client.rental.letter.rent.line', {
+            ...figures,
+            criterio: rateWords(binding.rate, binding.cap ? (capCitation ?? '') : null, tr),
+          })
+        : tr('client.rental.letter.rent.line_no_rate', figures),
     },
-    ...(cap
+    // A cap that did not set the rent is still named: art. 18 and that year's cap.
+    ...(cap && !binding?.cap
       ? [
           {
             type: 'note',
@@ -192,7 +255,7 @@ function riseBlocks(line: RiseLine, input: CompletedRentalReview['input'], tr: T
           } as const,
         ]
       : item.outcome.kind === 'depends'
-        ? [{ type: 'note', text: tr('client.rental.letter.rent.lowest') } as const]
+        ? [{ type: 'note', text: tr('client.rental.letter.lowest') } as const]
         : []),
   ];
 }

@@ -132,10 +132,12 @@ describe('the deposit letter', () => {
     );
   });
 
-  it('gives the interest up to today as a range when the day count moves it', () => {
-    expect(all).toMatch(
-      /Hasta el 08-10-2026, ese interés suma entre \d+,\d\d\s€ y \d+,\d\d\s€, según se cuente el año de 365 días o de 360\./,
-    );
+  it('gives only the lower interest, up to the last day counted', () => {
+    // 150 € from 31-07-2026 to 07-10-2026 and 850 € to 13-08-2026, at 3,25 %: 1,98 € on 365
+    // days, 2,01 € on 360. The letter asks only for what holds in both.
+    expect(all).toMatch(/Hasta el 07-10-2026, ese interés suma 1,98\s€\./);
+    expect(all).toContain('Esta cifra es la más baja de las cuentas posibles.');
+    expect(all).not.toMatch(/2,01|365|360/);
   });
 
   it('fills the account and the person’s details, and leaves no line to sign', () => {
@@ -144,21 +146,25 @@ describe('the deposit letter', () => {
       type: 'blank',
       label: 'Cuenta (IBAN)',
       value: 'ES00 0000 0000 0000 0000 0000',
+      wrap: true,
     });
     expect(model.blocks).toContainEqual({
       type: 'blank',
       label: 'Casero',
       value: 'Inmuebles Ficticios SL',
+      wrap: true,
     });
     expect(model.blocks).toContainEqual({
       type: 'blank',
       label: 'Vivienda',
       value: 'Calle Inventada 0, Villaficticia',
+      wrap: true,
     });
     expect(model.blocks.at(-1)).toEqual({
       type: 'blank',
       label: 'Nombre y apellidos',
       value: 'Alex Ejemplo',
+      wrap: true,
     });
     expect(all).toContain('En Villaficticia, a 8 de octubre de 2026');
     expect(all.toLowerCase()).not.toContain('firma');
@@ -178,15 +184,89 @@ describe('the deposit letter', () => {
   });
 });
 
+describe('the deposit letter, deposit back in full but late', () => {
+  // Keys back 30-06-2025; the whole 1.000 € came back on 30-06-2026, eleven months late.
+  const late = completed(
+    contract({
+      signedOn: f('2021-03-15'),
+      startDate: f('2021-03-20'),
+      moveOut: {
+        keysReturnedOn: f('2025-06-30'),
+        returns: [{ on: f('2026-06-30'), amount: 1000 }],
+        deductions: [],
+      },
+    }),
+  );
+
+  it('is offered for the interest alone', () => {
+    expect(rentalLetterKinds(late.review)).toEqual(['deposit_return']);
+  });
+
+  it('asks only for the interest of the delay, never for a deposit of 0 €', () => {
+    const all = text(depositLetter(late, TODAY, details, tr));
+    expect(all).toMatch(
+      /Te devolví las llaves el 30-06-2025 y me devolviste la fianza el 30-06-2026, pasado el mes que prevé el art\. 36\.4 LAU; los intereses legales de ese retraso son \d+,\d\d\s€\./,
+    );
+    expect(all).toContain('Te pido que me ingreses esos intereses en esta cuenta:');
+    expect(all).not.toContain('queda por devolver');
+    expect(all).not.toMatch(/0,00\s€/);
+  });
+});
+
 describe('the rent letter', () => {
   it('words each rise: anniversary, index and month, the rent art. 18 gives, the cap and the difference', () => {
     const all = text(rentLetter(completed(riseAboveIrav), details, tr));
     expect(all).toContain('con fecha 15-03-2024');
+    // The IRAV caps the IPC the contract agreed: worded as that year's cap, with its norm.
     expect(all).toMatch(
-      /Subida del 20-03-2025 \(el IRAV de febrero de 2025, 2,08 %\): la renta que resulta según el art\. 18 LAU es 1\.020,80\s€ al mes; pago 1\.030,00\s€, 9,20\s€ más cada mes\./,
+      /Subida del 20-03-2025: con el tope de ese año, el IRAV de febrero de 2025, 2,08 %, según .*Presidencia del INE\), la renta que resulta según el art\. 18 LAU es 1\.020,80\s€ al mes; pago 1\.030,00\s€, 9,20\s€ más cada mes\./,
     );
-    expect(all).toMatch(/Tope legal de ese año: .*Presidencia del INE\)\./);
+    expect(all).not.toContain('Tope legal de ese año');
     expect(all).toContain('te pido que revises el importe');
+  });
+
+  it('words a fixed cap as that year’s cap, never as the contract’s clause', () => {
+    // 20-06-2024: a 5 % clause from 2020 against the 3 % cap of 2024; 1.030 € allowed.
+    const all = text(
+      rentLetter(
+        completed(
+          contract({
+            signedOn: f('2020-06-15'),
+            startDate: f('2020-06-20'),
+            updateClause: 'fixed_percent',
+            fixedPercent: 5,
+            updates: [update('2024-06-20', 1000, 1050)],
+          }),
+        ),
+        details,
+        tr,
+      ),
+    );
+    expect(all).toMatch(
+      /Subida del 20-06-2024: con el tope del 3 % de ese año, según .*Ley 12\/2023.*, la renta que resulta según el art\. 18 LAU es 1\.030,00\s€ al mes; pago 1\.050,00\s€, 20,00\s€ más cada mes\./,
+    );
+    expect(all).not.toContain('fijo del contrato');
+  });
+
+  it('words an agreed figure below the cap as the contract’s, and names the cap apart', () => {
+    // 20-06-2024: a 2 % clause, under the 3 % cap, charged at 3 %.
+    const all = text(
+      rentLetter(
+        completed(
+          contract({
+            signedOn: f('2020-06-15'),
+            startDate: f('2020-06-20'),
+            updateClause: 'fixed_percent',
+            fixedPercent: 2,
+            updates: [update('2024-06-20', 1000, 1030)],
+          }),
+        ),
+        details,
+        tr,
+      ),
+    );
+    expect(all).toMatch(/Subida del 20-06-2024: con el 2 % fijo del contrato, la renta/);
+    expect(all).toMatch(/Tope legal de ese año: .*Ley 12\/2023/);
   });
 
   it('never carries a rise inside a repealed window', () => {
