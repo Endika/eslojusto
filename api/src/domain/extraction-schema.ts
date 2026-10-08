@@ -1,4 +1,5 @@
-import { LIMITS, PAGE_KINDS, type SourceKind } from './documents';
+import { FINAL_PAY_PAGE_KINDS, LIMITS, type PageKind, type SourceKind } from './documents';
+import type { ReviewKind } from './reviews';
 
 // Mirrors of the site's engine unions (src/engine/types.ts); test/engine-contract.test.ts keeps them equal.
 export const CAUSES = [
@@ -256,14 +257,15 @@ export const SECTIONS = {
   },
 } as const satisfies Readonly<Record<string, SectionSchema>>;
 
-export type SectionKind = keyof typeof SECTIONS;
-export const SECTION_KINDS = Object.keys(SECTIONS) as readonly SectionKind[];
+export type FinalPaySectionKind = keyof typeof SECTIONS;
+export type SectionKind = FinalPaySectionKind;
+export const SECTION_KINDS = Object.keys(SECTIONS) as readonly FinalPaySectionKind[];
 
 export const PAGES_DESCRIPTION =
   'One entry per attached page, in order: its kind, the number of its document and its readability.';
 
 // Why a page can't be used, or `ok`. Its language is never a reason.
-export const READABILITY = [
+export const FINAL_PAY_READABILITY = [
   'ok',
   'handwritten',
   'blurry',
@@ -273,12 +275,42 @@ export const READABILITY = [
   'foreign_jurisdiction',
   'unknown_format',
 ] as const;
+// Every reason any review can give.
+export const READABILITY = FINAL_PAY_READABILITY;
 export type Readability = (typeof READABILITY)[number];
 
 export const READABILITY_DESCRIPTION =
   'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_labour_document (not about a job), foreign_jurisdiction (an employment document from another country, where Spanish law does not apply; never because of its language), unknown_format (about a job, but no kind of document you know).';
 export const PAGE_KIND_DESCRIPTION =
   'settlement_proposal: a settlement proposal or notification (propuesta o notificación de finiquito, «liquidación, saldo y finiquito»), listing the liquidation concepts (salario del mes, vacaciones, partes proporcionales, indemnización, preaviso), with or without amounts, and a total, often net. payslip: a nómina with the earnings and deductions of a pay period, the final liquidation payslip included. dismissal_letter: a dismissal letter or termination notice (carta de despido). company_certificate: the company certificate for the public employment service (certificado de empresa): a Ministerio de Trabajo or SEPE header and a table of «bases de cotización de los últimos 180 días»; never a payslip, despite its monthly amounts. settlement_agreement: an agreement or conciliation record (acuerdo, acta de conciliación). work_history: the Social Security work history (vida laboral). other: anything else, such as a tax withholding certificate (certificado de retenciones del IRPF).';
+
+const FINAL_PAY_MONTH_DESCRIPTION =
+  'For a payslip page only: the month of its pay period, as YYYY-MM.';
+
+// What a review asks the model for: its page kinds, its reasons to set a page aside and one
+// section per kind of document.
+export interface ReviewSchema {
+  readonly pageKinds: readonly PageKind[];
+  readonly pageKindDescription: string;
+  readonly readability: readonly Readability[];
+  readonly readabilityDescription: string;
+  readonly monthDescription: string;
+  readonly sections: Readonly<Partial<Record<SectionKind, SectionSchema>>>;
+}
+
+export const REVIEW_SCHEMAS: Readonly<Record<ReviewKind, ReviewSchema>> = {
+  final_pay: {
+    pageKinds: FINAL_PAY_PAGE_KINDS,
+    pageKindDescription: PAGE_KIND_DESCRIPTION,
+    readability: FINAL_PAY_READABILITY,
+    readabilityDescription: READABILITY_DESCRIPTION,
+    monthDescription: FINAL_PAY_MONTH_DESCRIPTION,
+    sections: SECTIONS,
+  },
+};
+
+export const sectionsOf = (review: ReviewKind): readonly [SectionKind, SectionSchema][] =>
+  Object.entries(REVIEW_SCHEMAS[review].sections) as [SectionKind, SectionSchema][];
 
 export const TOOL_NAME = 'record_extraction';
 
@@ -340,7 +372,8 @@ function sectionSchema(schema: SectionSchema): JsonSchema {
 }
 
 // The closed JSON schema of the tool input: every page's kind, then one section per document kind.
-export function toolInputSchema(): JsonSchema {
+export function toolInputSchema(review: ReviewKind): JsonSchema {
+  const schema = REVIEW_SCHEMAS[review];
   const page = {
     type: 'integer',
     minimum: 1,
@@ -355,7 +388,7 @@ export function toolInputSchema(): JsonSchema {
         type: 'object',
         properties: {
           page: { ...page, description: 'The number given before the page.' },
-          kind: { type: 'string', enum: PAGE_KINDS, description: PAGE_KIND_DESCRIPTION },
+          kind: { type: 'string', enum: schema.pageKinds, description: schema.pageKindDescription },
           document: {
             ...page,
             description:
@@ -363,9 +396,9 @@ export function toolInputSchema(): JsonSchema {
           },
           readability: {
             type: 'object',
-            description: READABILITY_DESCRIPTION,
+            description: schema.readabilityDescription,
             properties: {
-              value: { type: 'string', enum: READABILITY },
+              value: { type: 'string', enum: schema.readability },
               confidence: confidenceSchema,
             },
             required: ['value', 'confidence'],
@@ -374,7 +407,7 @@ export function toolInputSchema(): JsonSchema {
           month: {
             type: 'string',
             pattern: '^[0-9]{4}-[0-9]{2}$',
-            description: 'For a payslip page only: the month of its pay period, as YYYY-MM.',
+            description: schema.monthDescription,
           },
           confidence: confidenceSchema,
         },
@@ -383,7 +416,7 @@ export function toolInputSchema(): JsonSchema {
       },
     },
   };
-  for (const kind of SECTION_KINDS) properties[kind] = sectionSchema(SECTIONS[kind]);
+  for (const [kind, section] of sectionsOf(review)) properties[kind] = sectionSchema(section);
   return {
     type: 'object',
     properties,

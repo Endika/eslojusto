@@ -2,6 +2,7 @@ import { LIMITS } from '../domain/documents';
 import type { Clock, Logger, Operation } from '../domain/ports';
 import type { Readability } from '../domain/extraction-schema';
 import type { ResultCode } from '../domain/results';
+import type { ReviewKind } from '../domain/reviews';
 
 // The subset of a Lambda function URL event (payload format 2.0) the handlers read.
 export interface HttpEvent {
@@ -56,6 +57,7 @@ export interface Metrics {
   underestimated?: boolean;
   countNotSaved?: boolean;
   readability?: Partial<Record<Readability, number>>;
+  review?: ReviewKind;
   verify?: boolean;
 }
 

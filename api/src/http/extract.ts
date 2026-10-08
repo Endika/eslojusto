@@ -3,6 +3,7 @@ import { LIMITS, MEDIA_TYPES, type DocumentFile, type MediaType } from '../domai
 import { extract, type ExtractDeps, type ExtractRequest } from '../domain/extract';
 import type { Clock, Logger } from '../domain/ports';
 import type { ErrorCode } from '../domain/results';
+import { isReview } from '../domain/reviews';
 import { handle, type HttpEvent, type HttpResponse } from './common';
 
 const BASE64 = /^[A-Za-z0-9+/]*={0,2}$/;
@@ -14,8 +15,9 @@ const isToken = (v: unknown): v is string =>
   typeof v === 'string' && v.length > 0 && v.length <= MAX_TOKEN_LENGTH;
 
 function toRequest(body: Record<string, unknown>): ExtractRequest | ErrorCode {
-  const { files, captchaToken, pass, quota } = body;
+  const { files, captchaToken, pass, quota, review } = body;
   if (!Array.isArray(files) || !isToken(captchaToken)) return 'invalid_request';
+  if (review !== undefined && !isReview(review)) return 'invalid_request';
   if (files.length > LIMITS.maxImages) return 'too_many_files';
 
   let allowance: Allowance;
@@ -36,7 +38,7 @@ function toRequest(body: Record<string, unknown>): ExtractRequest | ErrorCode {
       return 'invalid_request';
     decoded.push({ mediaType, bytes: new Uint8Array(Buffer.from(data, 'base64')) });
   }
-  return { files: decoded, captchaToken, allowance };
+  return { files: decoded, captchaToken, allowance, ...(review !== undefined && { review }) };
 }
 
 export function handleExtract(

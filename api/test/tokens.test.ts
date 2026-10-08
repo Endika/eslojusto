@@ -12,8 +12,10 @@ import {
   imageTokens,
   MAX_ESCALATION_INPUT_TOKENS,
   MAX_ESTIMATED_INPUT_TOKENS,
-  PROMPT_TOKENS,
+  PROMPT_TOKENS_BY_REVIEW,
 } from '../src/domain/tokens';
+
+const PROMPT_TOKENS = PROMPT_TOKENS_BY_REVIEW.final_pay;
 
 // eu-south-2 list prices, USD per token (api/README.md, «Cost»).
 const PRICES: Readonly<Record<string, { input: number; output: number }>> = {

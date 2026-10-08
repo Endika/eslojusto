@@ -1,19 +1,20 @@
-import { LIMITS, PAGE_KINDS, type PageKind } from './documents';
+import { LIMITS, type PageKind } from './documents';
 import {
   CONFIDENCES,
   CREDIT_ITEM_IDS,
   type LineCategory,
   MAX_DAYS,
   MAX_MONEY,
-  READABILITY,
-  SECTION_KINDS,
-  SECTIONS,
+  REVIEW_SCHEMAS,
+  sectionsOf,
   type Confidence,
   type FieldType,
   type Readability,
   type SectionKind,
+  type ReviewSchema,
   type SectionSchema,
 } from './extraction-schema';
+import type { ReviewKind } from './reviews';
 
 export type ExtractedValue = string | number | boolean;
 
@@ -171,23 +172,26 @@ export function parseSection(
 
 const PAGE_KEYS = ['page', 'kind', 'document', 'month', 'readability', 'confidence'];
 
-function parseReadability(raw: unknown): PageReading['readability'] | null {
+function parseReadability(
+  raw: unknown,
+  allowed: readonly Readability[],
+): PageReading['readability'] | null {
   if (!isRecord(raw) || !hasOnlyKeys(raw, ['value', 'confidence'])) return null;
   const { value, confidence } = raw;
-  if (typeof value !== 'string' || !(READABILITY as readonly string[]).includes(value)) return null;
+  if (typeof value !== 'string' || !(allowed as readonly string[]).includes(value)) return null;
   return isConfidence(confidence) ? { value: value as Readability, confidence } : null;
 }
 
-function parsePage(raw: unknown, pageCount: number): PageReading | null {
+function parsePage(raw: unknown, pageCount: number, schema: ReviewSchema): PageReading | null {
   if (!isRecord(raw) || !hasOnlyKeys(raw, PAGE_KEYS)) return null;
   const { page, kind, document, month, confidence } = raw;
-  const readability = parseReadability(raw['readability']);
+  const readability = parseReadability(raw['readability'], schema.readability);
   if (
     readability === null ||
     !isWhole(page, 1, pageCount) ||
     !isWhole(document, 1, LIMITS.maxImages) ||
     typeof kind !== 'string' ||
-    !(PAGE_KINDS as readonly string[]).includes(kind) ||
+    !(schema.pageKinds as readonly string[]).includes(kind) ||
     !isConfidence(confidence) ||
     (month !== undefined && !isMonth(month))
   )
@@ -205,7 +209,12 @@ function parsePage(raw: unknown, pageCount: number): PageReading | null {
 export const isReadable = (p: PageReading): boolean => p.readability.value === 'ok';
 
 // `pageCount` is how many pages were attached: page numbers beyond it are invalid.
-export function parseReading(toolInput: unknown, pageCount: number): Reading {
+export function parseReading(
+  toolInput: unknown,
+  pageCount: number,
+  review: ReviewKind = 'final_pay',
+): Reading {
+  const schema = REVIEW_SCHEMAS[review];
   const input = isRecord(toolInput) ? toolInput : {};
   let dropped = 0;
 
@@ -213,7 +222,7 @@ export function parseReading(toolInput: unknown, pageCount: number): Reading {
   const rawPages = Array.isArray(input['pages']) ? input['pages'] : [];
   if (Object.hasOwn(input, 'pages') && !Array.isArray(input['pages'])) dropped += 1;
   for (const raw of rawPages) {
-    const page = parsePage(raw, pageCount);
+    const page = parsePage(raw, pageCount, schema);
     // A page classified twice is as unreliable as one classified wrongly.
     if (page === null || byPage.has(page.page)) dropped += 1;
     else byPage.set(page.page, page);
@@ -224,15 +233,15 @@ export function parseReading(toolInput: unknown, pageCount: number): Reading {
   // Only a page that can be read backs a section: one set aside as blurry, handwritten or
   // foreign is never transcribed.
   const kinds = new Set(pages.filter(isReadable).map((p) => p.kind));
-  for (const kind of SECTION_KINDS) {
+  for (const [kind, section] of sectionsOf(review)) {
     if (!Object.hasOwn(input, kind)) continue;
     const raw = input[kind];
     // A section is a document's transcription: without a page of that kind, it came from nowhere.
-    if (!isRecord(raw) || !kinds.has(SECTIONS[kind].source)) {
+    if (!isRecord(raw) || !kinds.has(section.source)) {
       dropped += 1;
       continue;
     }
-    const parsed = parseSection(SECTIONS[kind], raw);
+    const parsed = parseSection(section, raw);
     sections[kind] = parsed.section;
     dropped += parsed.dropped;
   }

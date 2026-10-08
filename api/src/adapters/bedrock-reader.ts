@@ -3,6 +3,7 @@ import { MODEL_SETTINGS, REGION } from '../config';
 import type { DocumentFile } from '../domain/documents';
 import { TOOL_NAME, toolInputSchema } from '../domain/extraction-schema';
 import type { DocumentReader, ModelRead } from '../domain/ports';
+import type { ReviewKind } from '../domain/reviews';
 
 export const SYSTEM_PROMPT = `You read Spanish employment documents and record what they literally state by calling the ${TOOL_NAME} tool exactly once.
 
@@ -26,6 +27,10 @@ Rules:
 - confidence: "high" when the value is printed and clearly legible; "medium" when legible but its label or meaning is not certain; "low" when partly illegible or you are unsure it is the right value. The same for a page's kind.
 - Never record union dues (cuota sindical), sick leave or any health information, or details about anyone other than the worker, even if they appear.`;
 
+export const SYSTEM_PROMPTS: Readonly<Record<ReviewKind, string>> = {
+  final_pay: SYSTEM_PROMPT,
+};
+
 const base64 = (bytes: Uint8Array): string => Buffer.from(bytes).toString('base64');
 
 const imageBlock = (file: DocumentFile): Record<string, unknown> => ({
@@ -38,6 +43,7 @@ const imageBlock = (file: DocumentFile): Record<string, unknown> => ({
 export function buildRequestBody(
   model: string,
   files: readonly DocumentFile[],
+  review: ReviewKind = 'final_pay',
 ): Record<string, unknown> {
   const settings = MODEL_SETTINGS[model];
   if (!settings) throw new Error(`No settings for model ${model}`);
@@ -52,12 +58,12 @@ export function buildRequestBody(
   return {
     anthropic_version: 'bedrock-2023-05-31',
     max_tokens: settings.maxTokens,
-    system: SYSTEM_PROMPT,
+    system: SYSTEM_PROMPTS[review],
     tools: [
       {
         name: TOOL_NAME,
         description: 'Record the kind of every page and the fields each kind of document states.',
-        input_schema: toolInputSchema(),
+        input_schema: toolInputSchema(review),
       },
     ],
     tool_choice: settings.forcedToolChoice ? { type: 'tool', name: TOOL_NAME } : { type: 'auto' },
@@ -112,9 +118,13 @@ export function bedrockInvoke(
 // model is retired, not enabled or misconfigured, not that the document is at fault.
 export function createBedrockReader(invoke: Invoke): DocumentReader {
   return {
-    async read({ model, files, deadline }) {
+    async read({ model, review, files, deadline }) {
       const signal = AbortSignal.timeout(Math.max(1, deadline - Date.now()));
-      const raw = await invoke(model, JSON.stringify(buildRequestBody(model, files)), signal);
+      const raw = await invoke(
+        model,
+        JSON.stringify(buildRequestBody(model, files, review)),
+        signal,
+      );
       return parseResponseBody(JSON.parse(raw));
     },
   };
