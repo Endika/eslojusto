@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { es } from '../../src/i18n/es';
 
 const FORBIDDEN = [
   /\bfirma(lo)?\b/,
@@ -46,11 +47,47 @@ describe.skipIf(!existsSync('dist'))('published copy', () => {
 const sources = [
   'src/calculator/render.ts',
   'src/i18n/es.ts',
-  ...['src/engine', 'src/rental'].flatMap((dir) => (existsSync(dir) ? filesUnder(dir, '.ts') : [])),
+  ...['src/engine', 'src/rental', 'src/employment'].flatMap((dir) =>
+    existsSync(dir) ? filesUnder(dir, '.ts') : [],
+  ),
 ];
 
 describe('result copy', () => {
   it.each(sources)('%s gives no advice', (file) => {
     check(file, readFileSync(file, 'utf8').toLowerCase());
+  });
+});
+
+// The contract review never tells a person what they are, nor that an offer owes them anything:
+// the law is quoted as what it says (art. 15.4 ET), and only amounts below the minimum wage carry euros.
+const EMPLOYMENT_FORBIDDEN = [
+  /\beres fij[oa]\b/,
+  /\bte convierte en fij[oa]\b/,
+  /\bya eres\b/,
+  /\bpasas a ser\b/,
+  /\bte deben\b/,
+];
+
+const employmentCopy: readonly (readonly [string, string])[] = [
+  ...Object.entries(es)
+    .filter(([key]) => key.startsWith('employment.') || key.startsWith('client.employment.'))
+    .map(([key, text]): [string, string] => [key, text]),
+  ...(existsSync('src/employment') ? filesUnder('src/employment', '.ts') : []).map(
+    (file): [string, string] => [file, readFileSync(file, 'utf8')],
+  ),
+  ...(existsSync('dist/contrato/index.html')
+    ? [
+        [
+          'dist/contrato/index.html',
+          readFileSync('dist/contrato/index.html', 'utf8').replace(/<[^>]+>/g, ' '),
+        ] as [string, string],
+      ]
+    : []),
+];
+
+describe('employment contract copy', () => {
+  it.each(employmentCopy)('%s informs without asserting', (name, text) => {
+    for (const forbidden of [...FORBIDDEN, ...EMPLOYMENT_FORBIDDEN])
+      expect(text.toLowerCase(), `${name}: ${forbidden}`).not.toMatch(forbidden);
   });
 });

@@ -1,0 +1,24 @@
+---
+// A choice inside a row of a list: the rows script names and links its controls.
+interface Props {
+  name: string;
+  legend: string;
+  options: readonly { value: string; label: string }[];
+  pair?: boolean;
+  attributes?: Record<string, string>;
+}
+const { name, legend, options, pair = false, attributes = {} } = Astro.props;
+---
+
+<fieldset class="group" data-row-box={name} {...attributes}>
+  <legend>{legend}</legend>
+  <div class:list={['chips', { 'chips--pair': pair }]}>
+    {options.map((o) => (
+      <div class="chip">
+        <input type="radio" data-row-field={name} value={o.value} />
+        <label data-row-label={`${name}:${o.value}`}>{o.label}</label>
+      </div>
+    ))}
+  </div>
+  <p class="errata" data-row-error={name} hidden></p>
+</fieldset>

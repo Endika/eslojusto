@@ -187,6 +187,15 @@ describe('client strings', () => {
     );
     expect(clientStrings('es', { rental: true })['client.rental.status.depends']).toBe('Depende');
   });
+
+  it('the employment contract review ships its strings only on its own page', () => {
+    expect(Object.keys(clientStrings('es')).some((k) => k.startsWith('client.employment.'))).toBe(
+      false,
+    );
+    expect(clientStrings('es', { employment: true })['client.employment.status.depends']).toBe(
+      'Depende',
+    );
+  });
   it('a build with it ships them', () => {
     expect(clientStrings('es', { documents: true })['client.documents.mark']).toBe(
       'Leído del documento · confianza {nivel}',

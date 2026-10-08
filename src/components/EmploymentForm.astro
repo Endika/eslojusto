@@ -1,0 +1,922 @@
+---
+import Field from './Field.astro';
+import EmploymentChoice from './EmploymentChoice.astro';
+import EmploymentRowChoice from './EmploymentRowChoice.astro';
+import EmploymentRowField from './EmploymentRowField.astro';
+import EmploymentRows from './EmploymentRows.astro';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+import { INFO_ELEMENTS } from '../engine/employment/types';
+import {
+  CAUSED,
+  CLAUSE_LABELS,
+  EMPLOYERS,
+  EXTENDABLE,
+  MODALITIES,
+  PART_KINDS,
+  PERIOD_KINDS,
+  RELATIONSHIPS,
+  REMOTE_KINDS,
+  REPLACEMENTS,
+  SALARY_PERIODS,
+  TRIAL_UNITS,
+  WAIVED_RIGHTS,
+  WEEKDAYS,
+  infoField,
+} from '../employment/form';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+const answer = (v: 'yes' | 'no' | 'unknown') => ({
+  value: v,
+  label: tx(`employment.answer.${v}`),
+});
+const yesNo = [answer('yes'), answer('no')];
+const yesNoUnknown = [answer('yes'), answer('no'), answer('unknown')];
+// «No» first and checked: the list behind «Sí» opens only when asked for.
+const noOr = (yes: Key) => [answer('no'), { value: 'yes', label: tx(yes) }];
+
+const arrow = 'M4 12h15m-6-6 6 6-6 6';
+---
+
+<form class="calculator" id="employment" novalidate aria-label={tx('employment.form_aria')}>
+  <div class="stack">
+    <fieldset
+      class="sheet"
+      id="sheet-relacion"
+      data-sheet="relacion"
+      aria-labelledby="question-relacion"
+    >
+      <h2 class="question" id="question-relacion" tabindex="-1">
+        {tx('employment.relation.question')}
+      </h2>
+      <p class="help help--short">{tx('employment.relation.help')}</p>
+      <EmploymentChoice
+        name="relationship"
+        legend={tx('employment.relation.kind')}
+        layout="list"
+        options={RELATIONSHIPS.map((r) => ({
+          value: r,
+          label: tx(`employment.relationship.${r}`),
+          hint: tx(`employment.relationship.${r}_hint`),
+        }))}
+      />
+      <div class="subquestions" data-if="relationship:common" hidden>
+        <EmploymentChoice
+          name="viaTempAgency"
+          legend={tx('employment.relation.agency')}
+          hint={tx('employment.relation.agency_hint')}
+          layout="pair"
+          options={yesNo}
+        />
+        <EmploymentChoice
+          name="relief"
+          legend={tx('employment.relation.relief')}
+          hint={tx('employment.relation.relief_hint')}
+          layout="pair"
+          options={yesNo}
+        />
+        <EmploymentChoice
+          name="under18"
+          legend={tx('employment.relation.minor')}
+          layout="pair"
+          options={yesNo}
+        />
+        <EmploymentChoice
+          name="writtenContract"
+          legend={tx('employment.relation.written')}
+          hint={tx('employment.relation.written_hint')}
+          options={yesNoUnknown}
+        />
+      </div>
+      <div class="pair">
+        <Field
+          name="startDate"
+          label={tx('employment.relation.start')}
+          hint={tx('employment.relation.start_hint')}
+          kind="date"
+        />
+        <Field
+          name="endDate"
+          label={tx('employment.relation.end')}
+          hint={tx('employment.relation.end_hint')}
+          kind="date"
+        />
+      </div>
+      <Field
+        name="signedOn"
+        label={tx('employment.relation.signed')}
+        hint={tx('employment.relation.signed_hint')}
+        kind="date"
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-modalidad"
+      data-sheet="modalidad"
+      aria-labelledby="question-modalidad"
+    >
+      <h2 class="question" id="question-modalidad" tabindex="-1">
+        {tx('employment.modality.question')}
+      </h2>
+      <p class="help help--short">{tx('employment.modality.help')}</p>
+      <EmploymentChoice
+        name="modality"
+        legend={tx('employment.modality.kind')}
+        layout="list"
+        options={MODALITIES.map((m) => ({
+          value: m,
+          label: tx(`client.employment.modality.${m}`),
+          hint: tx(`employment.modality.${m}_hint`),
+        }))}
+      />
+      <div class="subquestions" data-if={`modality:${EXTENDABLE.join(' ')}`} hidden>
+        <Field
+          name="extensions"
+          label={tx('employment.modality.extensions')}
+          hint={tx('employment.modality.extensions_hint')}
+          kind="days"
+        />
+      </div>
+      <div class="subquestions" data-if={`modality:${CAUSED.join(' ')}`} hidden>
+        <EmploymentChoice
+          name="causeStated"
+          legend={tx('employment.modality.cause')}
+          hint={tx('employment.modality.cause_hint')}
+          options={yesNoUnknown}
+        />
+        <EmploymentChoice
+          name="circumstancesStated"
+          legend={tx('employment.modality.circumstances')}
+          options={yesNoUnknown}
+        />
+      </div>
+      <div class="subquestions" data-if={`modality:${REPLACEMENTS.join(' ')}`} hidden>
+        <EmploymentChoice
+          name="replacedPersonNamed"
+          legend={tx('employment.modality.replaced_named')}
+          options={yesNoUnknown}
+        />
+        <EmploymentChoice
+          name="replacementCauseStated"
+          legend={tx('employment.modality.replacement_cause')}
+          options={yesNoUnknown}
+        />
+      </div>
+      <div class="subquestions" data-if="modality:discontinuous" hidden>
+        <p class="help help--short">{tx('employment.modality.discontinuous_help')}</p>
+        <EmploymentChoice
+          name="activityPeriod"
+          legend={tx('employment.modality.activity_period')}
+          options={yesNoUnknown}
+        />
+        <EmploymentChoice
+          name="discontinuousHours"
+          legend={tx('employment.modality.discontinuous_hours')}
+          options={yesNoUnknown}
+        />
+        <EmploymentChoice
+          name="distribution"
+          legend={tx('employment.modality.distribution')}
+          options={yesNoUnknown}
+        />
+      </div>
+      <div class="subquestions" data-if="modality:training_alternance training_practice" hidden>
+        <EmploymentChoice
+          name="planAttached"
+          legend={tx('employment.modality.plan')}
+          options={yesNoUnknown}
+        />
+        <div class="subquestions" data-if="modality:training_practice" hidden>
+          <Field
+            name="studiesEndedOn"
+            label={tx('employment.modality.studies_end')}
+            hint={tx('employment.modality.studies_end_hint')}
+            kind="date"
+          />
+          <EmploymentChoice
+            name="disability"
+            legend={tx('employment.modality.disability')}
+            hint={tx('employment.modality.disability_hint')}
+            options={yesNoUnknown}
+          />
+        </div>
+        <div class="pair" data-if="modality:training_alternance" hidden>
+          <Field
+            name="effectiveYear1"
+            label={tx('employment.modality.effective_1')}
+            hint={tx('employment.modality.effective_hint')}
+            kind="amount"
+          />
+          <Field
+            name="effectiveYear2"
+            label={tx('employment.modality.effective_2')}
+            kind="amount"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-historial"
+      data-sheet="historial"
+      aria-labelledby="question-historial"
+    >
+      <h2 class="question" id="question-historial" tabindex="-1">
+        {tx('employment.history.question')}
+      </h2>
+      <p class="help help--short">{tx('employment.history.help')}</p>
+      <EmploymentChoice
+        name="hasHistory"
+        legend={tx('employment.history.ask')}
+        options={noOr('employment.history.yes')}
+        checked="no"
+      />
+      <EmploymentRows
+        list="history"
+        label={tx('employment.history.question')}
+        add={tx('employment.history.add')}
+        remove={tx('client.employment.rows.remove')}
+        full={tx('employment.rows.full')}
+        min={1}
+        max={20}
+        attributes={{ 'data-if': 'hasHistory:yes', hidden: '' }}
+      >
+        <div class="row__fields">
+          <EmploymentRowField name="startDate" label={tx('employment.history.from')} kind="date" />
+          <EmploymentRowField name="endDate" label={tx('employment.history.to')} kind="date" />
+        </div>
+        <div class="field" data-row-box="employer">
+          <label class="field__label" data-row-label="employer">
+            {tx('employment.history.employer')}
+          </label>
+          <select class="field__input field__input--select" data-row-field="employer">
+            <option value="">{tx('employment.choose')}</option>
+            {EMPLOYERS.map((e) => (
+              <option value={e}>{tx(`employment.employer.${e}`)}</option>
+            ))}
+          </select>
+          <p class="errata" data-row-error="employer" hidden></p>
+        </div>
+        <div class="field" data-row-box="kind">
+          <label class="field__label" data-row-label="kind">
+            {tx('employment.history.kind')}
+          </label>
+          <select class="field__input field__input--select" data-row-field="kind">
+            <option value="">{tx('employment.choose')}</option>
+            {PERIOD_KINDS.map((k) => (
+              <option value={k}>{tx(`employment.period_kind.${k}`)}</option>
+            ))}
+          </select>
+          <p class="errata" data-row-error="kind" hidden></p>
+        </div>
+      </EmploymentRows>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-salario"
+      data-sheet="salario"
+      aria-labelledby="question-salario"
+    >
+      <h2 class="question" id="question-salario" tabindex="-1">
+        {tx('employment.salary.question')}
+      </h2>
+      <p class="help help--short">{tx('employment.salary.help')}</p>
+      <Field
+        name="salaryAmount"
+        label={tx('employment.salary.amount')}
+        hint={tx('employment.salary.amount_hint')}
+        kind="amount"
+      />
+      <EmploymentChoice
+        name="salaryPeriod"
+        legend={tx('employment.salary.period')}
+        options={SALARY_PERIODS.map((p) => ({ value: p, label: tx(`employment.period.${p}`) }))}
+      />
+      <div class="pair">
+        <Field
+          name="extraPays"
+          label={tx('employment.salary.extra_pays')}
+          hint={tx('employment.salary.extra_pays_hint')}
+          kind="days"
+        />
+        <Field
+          name="inKind"
+          label={tx('employment.salary.in_kind')}
+          hint={tx('employment.salary.in_kind_hint')}
+          kind="amount"
+        />
+      </div>
+      <EmploymentChoice
+        name="extraProrated"
+        legend={tx('employment.salary.prorated')}
+        hint={tx('employment.salary.prorated_hint')}
+        layout="pair"
+        options={yesNo}
+      />
+      <EmploymentChoice
+        name="hasBreakdown"
+        legend={tx('employment.salary.breakdown')}
+        hint={tx('employment.salary.breakdown_hint')}
+        options={noOr('employment.salary.breakdown_yes')}
+        checked="no"
+      />
+      <EmploymentRows
+        list="parts"
+        label={tx('employment.salary.breakdown')}
+        add={tx('employment.salary.parts_add')}
+        remove={tx('client.employment.rows.remove')}
+        full={tx('employment.rows.full')}
+        min={1}
+        max={10}
+        attributes={{ 'data-if': 'hasBreakdown:yes', hidden: '' }}
+      >
+        <div class="row__fields">
+          <div class="field" data-row-box="kind">
+            <label class="field__label" data-row-label="kind">
+              {tx('employment.salary.part_kind')}
+            </label>
+            <select class="field__input field__input--select" data-row-field="kind">
+              <option value="">{tx('employment.choose')}</option>
+              {PART_KINDS.map((k) => (
+                <option value={k}>{tx(`employment.part.${k}`)}</option>
+              ))}
+            </select>
+            <p class="errata" data-row-error="kind" hidden></p>
+          </div>
+          <EmploymentRowField
+            name="amount"
+            label={tx('employment.salary.part_amount')}
+            kind="amount"
+          />
+        </div>
+      </EmploymentRows>
+      <div class="pair">
+        <Field
+          name="weeklyHours"
+          label={tx('employment.salary.weekly_hours')}
+          hint={tx('employment.salary.weekly_hours_hint')}
+          kind="amount"
+        />
+        <Field
+          name="annualHours"
+          label={tx('employment.salary.annual_hours')}
+          hint={tx('employment.salary.annual_hours_hint')}
+          kind="amount"
+        />
+      </div>
+      <h3 class="subhead">{tx('employment.agreement.title')}</h3>
+      <p class="help help--short">{tx('employment.agreement.help')}</p>
+      <EmploymentChoice
+        name="agreementNamed"
+        legend={tx('employment.agreement.named')}
+        layout="pair"
+        options={yesNo}
+      />
+      <Field
+        name="fullTimeHours"
+        label={tx('employment.agreement.full_time')}
+        hint={tx('employment.agreement.full_time_hint')}
+        kind="amount"
+      />
+      <div class="pair">
+        <Field
+          name="categorySalary"
+          label={tx('employment.agreement.category_salary')}
+          hint={tx('employment.agreement.your_figure')}
+          kind="amount"
+        />
+        <Field
+          name="agreementAnnualHours"
+          label={tx('employment.agreement.annual_hours')}
+          hint={tx('employment.agreement.your_figure')}
+          kind="amount"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-nominas"
+      data-sheet="nominas"
+      aria-labelledby="question-nominas"
+    >
+      <h2 class="question" id="question-nominas" tabindex="-1">
+        {tx('employment.payslips.question')}
+      </h2>
+      <p class="help help--short">{tx('employment.payslips.help')}</p>
+      <EmploymentChoice
+        name="hasPayslips"
+        legend={tx('employment.payslips.ask')}
+        options={noOr('employment.payslips.yes')}
+        checked="no"
+      />
+      <EmploymentRows
+        list="payslips"
+        label={tx('employment.payslips.question')}
+        add={tx('employment.payslips.add')}
+        remove={tx('client.employment.rows.remove')}
+        full={tx('employment.rows.full')}
+        min={1}
+        max={24}
+        attributes={{ 'data-if': 'hasPayslips:yes', hidden: '' }}
+      >
+        <div class="row__fields">
+          <EmploymentRowField
+            name="month"
+            label={tx('employment.payslips.month')}
+            hint={tx('employment.payslips.month_hint')}
+            kind="month"
+          />
+          <EmploymentRowField
+            name="salary"
+            label={tx('employment.payslips.salary')}
+            hint={tx('employment.payslips.salary_hint')}
+            kind="amount"
+          />
+        </div>
+        <div class="row__fields">
+          <EmploymentRowField
+            name="prorated"
+            label={tx('employment.payslips.prorated')}
+            kind="amount"
+          />
+          <EmploymentRowField
+            name="inKind"
+            label={tx('employment.payslips.in_kind')}
+            kind="amount"
+          />
+        </div>
+        <EmploymentRowChoice
+          name="wholeMonth"
+          legend={tx('employment.payslips.whole_month')}
+          options={yesNo}
+          pair
+        />
+        <EmploymentRowChoice
+          name="incidents"
+          legend={tx('employment.payslips.incidents')}
+          options={yesNo}
+          pair
+        />
+      </EmploymentRows>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-jornada"
+      data-sheet="jornada"
+      aria-labelledby="question-jornada"
+    >
+      <h2 class="question" id="question-jornada" tabindex="-1">
+        {tx('employment.time.question')}
+      </h2>
+      <EmploymentChoice
+        name="hasSchedule"
+        legend={tx('employment.time.schedule')}
+        hint={tx('employment.time.schedule_hint')}
+        options={noOr('employment.time.schedule_yes')}
+        checked="no"
+      />
+      <EmploymentRows
+        list="schedule"
+        label={tx('employment.time.schedule')}
+        add={tx('employment.time.slot_add')}
+        remove={tx('client.employment.rows.remove')}
+        full={tx('employment.rows.full')}
+        hint={tx('employment.time.slots_hint')}
+        min={1}
+        max={21}
+        attributes={{ 'data-if': 'hasSchedule:yes', hidden: '' }}
+      >
+        <div class="field" data-row-box="day">
+          <label class="field__label" data-row-label="day">
+            {tx('employment.time.day')}
+          </label>
+          <select class="field__input field__input--select" data-row-field="day">
+            <option value="">{tx('employment.choose')}</option>
+            {WEEKDAYS.map((d) => (
+              <option value={String(d)}>{tx(`client.employment.weekday.${d}`)}</option>
+            ))}
+          </select>
+          <p class="errata" data-row-error="day" hidden></p>
+        </div>
+        <div class="row__fields">
+          <EmploymentRowField name="from" label={tx('employment.time.from')} kind="time" />
+          <EmploymentRowField name="to" label={tx('employment.time.to')} kind="time" />
+        </div>
+      </EmploymentRows>
+      <EmploymentChoice
+        name="shifts"
+        legend={tx('employment.time.shifts')}
+        layout="pair"
+        options={yesNo}
+      />
+      <EmploymentChoice
+        name="nightWorker"
+        legend={tx('employment.time.night')}
+        hint={tx('employment.time.night_hint')}
+        options={yesNoUnknown}
+      />
+      <EmploymentChoice
+        name="irregular"
+        legend={tx('employment.time.irregular')}
+        hint={tx('employment.time.irregular_hint')}
+        layout="pair"
+        options={yesNo}
+      />
+      <EmploymentChoice
+        name="hasOvertime"
+        legend={tx('employment.time.overtime')}
+        hint={tx('employment.time.overtime_hint')}
+        options={noOr('employment.time.overtime_yes')}
+        checked="no"
+      />
+      <div class="subquestions" data-if="hasOvertime:yes" hidden>
+        <EmploymentChoice
+          name="overtimeKind"
+          legend={tx('employment.time.overtime_kind')}
+          options={[
+            { value: 'hours', label: tx('employment.time.overtime_hours_choice') },
+            { value: 'as_needed', label: tx('employment.time.overtime_as_needed') },
+          ]}
+        />
+        <div data-if="overtimeKind:hours" hidden>
+          <Field name="overtimeHours" label={tx('employment.time.overtime_hours')} kind="amount" />
+        </div>
+        <EmploymentChoice
+          name="overtimePaid"
+          legend={tx('employment.time.overtime_paid')}
+          hint={tx('employment.time.overtime_paid_hint')}
+          options={yesNoUnknown}
+        />
+      </div>
+      <EmploymentChoice
+        name="isPartTime"
+        legend={tx('employment.time.part_time')}
+        layout="pair"
+        options={yesNo}
+      />
+      <div class="subquestions" data-if="isPartTime:yes" hidden>
+        <EmploymentChoice
+          name="hoursStated"
+          legend={tx('employment.time.hours_stated')}
+          layout="pair"
+          options={yesNo}
+        />
+        <EmploymentChoice
+          name="distributionStated"
+          legend={tx('employment.time.distribution_stated')}
+          layout="pair"
+          options={yesNo}
+        />
+        <EmploymentChoice
+          name="hasComplementary"
+          legend={tx('employment.time.complementary')}
+          hint={tx('employment.time.complementary_hint')}
+          layout="pair"
+          options={yesNo}
+        />
+        <div class="pair" data-if="hasComplementary:yes" hidden>
+          <Field
+            name="complementaryPercent"
+            label={tx('employment.time.complementary_percent')}
+            kind="amount"
+          />
+          <Field
+            name="complementaryNotice"
+            label={tx('employment.time.complementary_notice')}
+            kind="days"
+          />
+        </div>
+        <Field
+          name="voluntaryPercent"
+          label={tx('employment.time.voluntary_percent')}
+          hint={tx('employment.time.voluntary_hint')}
+          kind="amount"
+        />
+      </div>
+      <div class="pair">
+        <Field
+          name="remoteShare"
+          label={tx('employment.time.remote')}
+          hint={tx('employment.time.remote_hint')}
+          kind="amount"
+        />
+        <Field
+          name="realWeeklyHours"
+          label={tx('employment.time.real_hours')}
+          hint={tx('employment.time.real_hours_hint')}
+          kind="amount"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-prueba" data-sheet="prueba" aria-labelledby="question-prueba">
+      <h2 class="question" id="question-prueba" tabindex="-1">
+        {tx('employment.trial.question')}
+      </h2>
+      <EmploymentChoice
+        name="hasTrial"
+        legend={tx('employment.trial.ask')}
+        layout="pair"
+        options={yesNo}
+      />
+      <div class="subquestions" data-if="hasTrial:yes" hidden>
+        <div class="pair">
+          <Field name="trialAmount" label={tx('employment.trial.amount')} kind="amount" />
+          <EmploymentChoice
+            name="trialUnit"
+            legend={tx('employment.trial.unit')}
+            options={TRIAL_UNITS.map((u) => ({ value: u, label: tx(`employment.unit.${u}`) }))}
+          />
+        </div>
+        <EmploymentChoice
+          name="technical"
+          legend={tx('employment.trial.technical')}
+          hint={tx('employment.trial.technical_hint')}
+          options={yesNoUnknown}
+        />
+        <EmploymentChoice
+          name="smallCompany"
+          legend={tx('employment.trial.small_company')}
+          options={yesNoUnknown}
+        />
+        <EmploymentChoice
+          name="sameDutiesBefore"
+          legend={tx('employment.trial.same_duties')}
+          options={yesNoUnknown}
+        />
+        <EmploymentChoice
+          name="afterTraining"
+          legend={tx('employment.trial.after_training')}
+          options={yesNoUnknown}
+        />
+        <Field
+          name="agreementTrialMonths"
+          label={tx('employment.trial.agreement')}
+          hint={tx('employment.agreement.your_figure')}
+          kind="amount"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-vacaciones"
+      data-sheet="vacaciones"
+      aria-labelledby="question-vacaciones"
+    >
+      <h2 class="question" id="question-vacaciones" tabindex="-1">
+        {tx('employment.holidays.question')}
+      </h2>
+      <EmploymentChoice
+        name="hasHolidays"
+        legend={tx('employment.holidays.ask')}
+        layout="pair"
+        options={yesNo}
+      />
+      <div class="subquestions" data-if="hasHolidays:yes" hidden>
+        <Field name="holidayDays" label={tx('employment.holidays.days')} kind="amount" />
+        <EmploymentChoice
+          name="holidayUnit"
+          legend={tx('employment.holidays.unit')}
+          options={[
+            { value: 'calendar', label: tx('employment.holidays.calendar') },
+            { value: 'working', label: tx('employment.holidays.working') },
+          ]}
+        />
+        <div data-if="holidayUnit:working" hidden>
+          <Field
+            name="workDaysPerWeek"
+            label={tx('employment.holidays.per_week')}
+            hint={tx('employment.holidays.per_week_hint')}
+            kind="days"
+          />
+        </div>
+        <EmploymentChoice
+          name="holidaysInSalary"
+          legend={tx('employment.holidays.in_salary')}
+          hint={tx('employment.holidays.in_salary_hint')}
+          layout="pair"
+          options={yesNo}
+        />
+      </div>
+      <Field
+        name="agreementHolidayDays"
+        label={tx('employment.holidays.agreement')}
+        hint={tx('employment.agreement.your_figure')}
+        kind="days"
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-clausulas"
+      data-sheet="clausulas"
+      aria-labelledby="question-clausulas"
+    >
+      <h2 class="question" id="question-clausulas" tabindex="-1">
+        {tx('employment.clauses.question')}
+      </h2>
+      <p class="help help--short">{tx('employment.clauses.help')}</p>
+      <EmploymentChoice
+        name="hasClauses"
+        legend={tx('employment.clauses.ask')}
+        options={noOr('employment.clauses.yes')}
+        checked="no"
+      />
+      <EmploymentRows
+        list="clauses"
+        label={tx('employment.clauses.question')}
+        add={tx('employment.clauses.add')}
+        remove={tx('client.employment.rows.remove')}
+        full={tx('employment.rows.full')}
+        min={1}
+        max={12}
+        attributes={{ 'data-if': 'hasClauses:yes', hidden: '' }}
+      >
+        <div class="field" data-row-box="label">
+          <label class="field__label" data-row-label="label">
+            {tx('employment.clauses.label')}
+          </label>
+          <select class="field__input field__input--select" data-row-field="label">
+            <option value="">{tx('employment.choose')}</option>
+            {CLAUSE_LABELS.map((l) => (
+              <option value={l}>{tx(`client.employment.clause.${l}`)}</option>
+            ))}
+          </select>
+          <p class="errata" data-row-error="label" hidden></p>
+        </div>
+        <div data-row-if="label:non_compete retention" hidden>
+          <EmploymentRowField
+            name="months"
+            label={tx('employment.clauses.months')}
+            hint={tx('employment.clauses.months_hint')}
+            kind="number"
+          />
+        </div>
+        <div data-row-if="label:non_compete exclusivity" hidden>
+          <EmploymentRowChoice
+            name="compensation"
+            legend={tx('employment.clauses.compensation')}
+            options={yesNoUnknown}
+          />
+        </div>
+        <div data-row-if="label:retention" hidden>
+          <EmploymentRowChoice
+            name="training"
+            legend={tx('employment.clauses.training')}
+            options={yesNoUnknown}
+          />
+        </div>
+        <div class="field" data-row-box="waived" data-row-if="label:waiver" hidden>
+          <label class="field__label" data-row-label="waived">
+            {tx('employment.clauses.waived')}
+          </label>
+          <select class="field__input field__input--select" data-row-field="waived">
+            <option value="">{tx('employment.choose')}</option>
+            {WAIVED_RIGHTS.map((w) => (
+              <option value={w}>{tx(`employment.waived.${w}`)}</option>
+            ))}
+          </select>
+          <p class="errata" data-row-error="waived" hidden></p>
+        </div>
+        <div data-row-if="label:remote_work_costs" hidden>
+          <EmploymentRowChoice
+            name="costs"
+            legend={tx('employment.clauses.costs')}
+            options={yesNoUnknown}
+          />
+        </div>
+        <EmploymentRowField
+          name="text"
+          label={tx('employment.clauses.text')}
+          hint={tx('employment.clauses.text_hint')}
+          kind="text"
+        />
+      </EmploymentRows>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-informacion"
+      data-sheet="informacion"
+      aria-labelledby="question-informacion"
+    >
+      <h2 class="question" id="question-informacion" tabindex="-1">
+        {tx('employment.info.question')}
+      </h2>
+      <p class="help help--short">{tx('employment.info.help')}</p>
+      <div class="information-list">
+        {INFO_ELEMENTS.map((e) => (
+          <EmploymentChoice
+            name={infoField(e)}
+            legend={tx(`client.employment.info.${e}`)}
+            checked="unknown"
+            options={[
+              { value: 'present', label: tx('employment.info.present') },
+              { value: 'by_reference', label: tx('employment.info.by_reference') },
+              { value: 'absent', label: tx('employment.info.absent') },
+              { value: 'unknown', label: tx('employment.answer.unknown') },
+            ]}
+          />
+        ))}
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-oferta" data-sheet="oferta" aria-labelledby="question-oferta">
+      <h2 class="question" id="question-oferta" tabindex="-1">
+        {tx('employment.offer.question')}
+      </h2>
+      <p class="help help--short">{tx('employment.offer.help')}</p>
+      <EmploymentChoice
+        name="hasOffer"
+        legend={tx('employment.offer.ask')}
+        options={noOr('employment.offer.yes')}
+        checked="no"
+      />
+      <div class="subquestions" data-if="hasOffer:yes" hidden>
+        <div class="pair">
+          <Field
+            name="offerGross"
+            label={tx('employment.offer.gross')}
+            hint={tx('employment.offer.gross_hint')}
+            kind="amount"
+          />
+          <Field name="offerHours" label={tx('employment.offer.hours')} kind="amount" />
+        </div>
+        <EmploymentChoice
+          name="offerNet"
+          legend={tx('employment.offer.net')}
+          layout="pair"
+          options={yesNo}
+        />
+        <div class="field" data-field="offerModality">
+          <label class="field__label" for="offerModality">
+            {tx('employment.offer.modality')}
+          </label>
+          <select
+            class="field__input field__input--select"
+            id="offerModality"
+            name="offerModality"
+            aria-describedby="error-offerModality"
+          >
+            <option value="unknown">{tx('employment.offer.not_said')}</option>
+            {MODALITIES.filter((m) => m !== 'unknown').map((m) => (
+              <option value={m}>{tx(`client.employment.modality.${m}`)}</option>
+            ))}
+          </select>
+          <p class="errata" id="error-offerModality" data-error-for="offerModality" hidden></p>
+        </div>
+        <div class="field" data-field="offerRemote">
+          <label class="field__label" for="offerRemote">
+            {tx('employment.offer.remote')}
+          </label>
+          <select
+            class="field__input field__input--select"
+            id="offerRemote"
+            name="offerRemote"
+            aria-describedby="error-offerRemote"
+          >
+            <option value="">{tx('employment.offer.not_said')}</option>
+            {REMOTE_KINDS.map((r) => (
+              <option value={r}>{tx(`client.employment.remote.${r}`)}</option>
+            ))}
+          </select>
+          <p class="errata" id="error-offerRemote" data-error-for="offerRemote" hidden></p>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="actions">
+    <div class="actions__inner">
+      <button class="button button--back" type="button" data-back hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow} transform="rotate(180 12 12)"></path>
+        </svg>
+        {tx('form.back')}
+      </button>
+      <button class="button button--forward" type="button" data-next>
+        {tx('form.next')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+      <button class="button button--forward" type="submit" data-submit hidden>
+        {tx('form.review')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</form>

@@ -4,16 +4,16 @@ import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
 import { homeGraph } from '../content/structured-data';
 import { DOCUMENTS } from '../documents/config';
-import { RENTAL_BUILD } from '../content/sections';
+import { EMPLOYMENT_BETA, EMPLOYMENT_BUILD, RENTAL_BUILD } from '../content/sections';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
-// With the rental review built, its card is live and labelled as a beta.
+// With a review section built, its card is live and labelled as a beta.
 const comingSoon = [
-  ['salary', tx('home.contract')],
+  ...(EMPLOYMENT_BUILD ? [] : ([['salary', tx('home.contract')]] as const)),
   ...(RENTAL_BUILD ? [] : ([['settlement', tx('home.rent')]] as const)),
 ] as const;
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
@@ -71,6 +71,19 @@ const documents = DOCUMENTS !== null;
             <p class="index__more">
               <a href={link(lang, 'alquiler/irav-ipc/')}>{tx('home.rent_indices')}</a>
             </p>
+          </section>
+          <span class="item__tab" aria-hidden="true"></span>
+        </li>
+      )}
+      {EMPLOYMENT_BUILD && (
+        <li class="item index__live" data-tone="salary">
+          <section class="sheet" data-tone="dates" aria-labelledby="index-employment">
+            <h2 class="index__name" id="index-employment">
+              <a href={link(lang, 'contrato/')}>{tx('home.contract')}</a>{' '}
+              {EMPLOYMENT_BETA && <span class="beta">{tx('home.beta')}</span>}
+            </h2>
+            <p class="index__text">{tx('home.contract_text')}</p>
+            <p class="index__citation">{tx('home.contract_citation')}</p>
           </section>
           <span class="item__tab" aria-hidden="true"></span>
         </li>

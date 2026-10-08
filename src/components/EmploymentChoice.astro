@@ -1,0 +1,74 @@
+---
+// One question answered by choosing: a group of radios with its legend, hint and slip.
+interface Option {
+  value: string;
+  label: string;
+  hint?: string;
+}
+interface Props {
+  name: string;
+  legend: string;
+  hint?: string;
+  options: readonly Option[];
+  checked?: string;
+  // Chips for short answers, a list for options that carry a hint.
+  layout?: 'chips' | 'pair' | 'list';
+  attributes?: Record<string, string>;
+}
+const { name, legend, hint, options, checked, layout = 'chips', attributes = {} } = Astro.props;
+const id = (value: string) => `${name}-${value}`.replace(/[^\w-]/g, '-');
+const hintId = `hint-${name}`;
+const errorId = `error-${name}`;
+const describedBy = (option?: Option) =>
+  [...(hint ? [hintId] : []), ...(option?.hint ? [`hint-${id(option.value)}`] : []), errorId].join(
+    ' ',
+  );
+---
+
+<fieldset class="group" data-field={name} {...attributes}>
+  <legend>{legend}</legend>
+  {hint && (
+    <p class="hint" id={hintId}>
+      {hint}
+    </p>
+  )}
+  {layout === 'list' ? (
+    <div class="options options--compact">
+      {options.map((o) => (
+        <div class="option">
+          <input
+            type="radio"
+            name={name}
+            id={id(o.value)}
+            value={o.value}
+            checked={o.value === checked}
+            aria-describedby={describedBy(o)}
+          />
+          <label for={id(o.value)}>{o.label}</label>
+          {o.hint && (
+            <p class="hint" id={`hint-${id(o.value)}`}>
+              {o.hint}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div class:list={['chips', { 'chips--pair': layout === 'pair' }]}>
+      {options.map((o) => (
+        <div class="chip">
+          <input
+            type="radio"
+            name={name}
+            id={id(o.value)}
+            value={o.value}
+            checked={o.value === checked}
+            aria-describedby={describedBy()}
+          />
+          <label for={id(o.value)}>{o.label}</label>
+        </div>
+      ))}
+    </div>
+  )}
+  <p class="errata" id={errorId} data-error-for={name} hidden></p>
+</fieldset>
