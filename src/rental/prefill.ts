@@ -1,10 +1,12 @@
 import { formatAmountInput } from '../calculator/number';
-import type {
-  Confidence,
-  ExtractedRow,
-  ExtractedValue,
-  RentalExtraction,
-  SourcedField,
+import {
+  RENTAL_CHECKS,
+  type Confidence,
+  type ExtractedRow,
+  type ExtractedValue,
+  type FailedCheck,
+  type RentalExtraction,
+  type SourcedField,
 } from '../documents/contract';
 import type { ReadMark, ReadPrefill } from '../documents/ports';
 import { conflictLines, RENTAL_CONFLICT_FIELDS } from '../documents/summary';
@@ -95,17 +97,46 @@ export function regionOfPostcode(postcode: string): RegionCode | null {
   return found ? (found[0] as RegionCode) : null;
 }
 
-// The anniversary year a rise belongs to: the one whose anniversary falls nearest the day it was
-// charged from, as a rise charged a little early or late still belongs to it.
-export function riseYear(start: CivilDate, chargedFrom: CivilDate): number {
-  const candidates = [chargedFrom.y - 1, chargedFrom.y, chargedFrom.y + 1].filter(
-    (y) => y > start.y,
+// How many days before its anniversary a rise may be charged and still belong to it.
+export const EARLY_DAYS = 31;
+
+// The anniversary year a rise belongs to: the latest anniversary on or before the day it applies
+// from (the notice's date when it gives one, otherwise the first month charged). Only when that
+// day falls just before the next anniversary does it belong to that one, and then less surely.
+export function riseYear(
+  start: CivilDate,
+  from: CivilDate,
+): { readonly year: number; readonly early: boolean } {
+  const latest = compareDates(anniversaryIn(start, from.y), from) <= 0 ? from.y : from.y - 1;
+  const following = latest + 1;
+  const daysBefore = ordinal(anniversaryIn(start, following)) - ordinal(from);
+  if (latest <= start.y || daysBefore <= EARLY_DAYS)
+    return { year: Math.max(following, start.y + 1), early: true };
+  return { year: latest, early: false };
+}
+
+// One receipt per month. Two that state the same month differently leave the month in doubt:
+// the receipt document's row is kept over any other, at low confidence.
+export function receiptsByMonth(receipts: readonly ExtractedRow[]): {
+  readonly months: ReadonlyMap<string, ExtractedRow>;
+  readonly disagree: boolean;
+} {
+  const ordered = [...receipts].sort(
+    (a, b) => Number(b.source === 'rent_receipt') - Number(a.source === 'rent_receipt'),
   );
-  const distance = (y: number) => Math.abs(ordinal(anniversaryIn(start, y)) - ordinal(chargedFrom));
-  return candidates.reduce(
-    (best, y) => (distance(y) < distance(best) ? y : best),
-    candidates[0] ?? start.y + 1,
-  );
+  const months = new Map<string, ExtractedRow>();
+  let disagree = false;
+  for (const row of ordered) {
+    const month = monthOf(row.values['month']);
+    if (!month) continue;
+    const kept = months.get(month);
+    if (!kept) months.set(month, row);
+    else if (JSON.stringify(kept.values) !== JSON.stringify(row.values)) {
+      disagree = true;
+      months.set(month, { ...kept, confidence: 'low' });
+    }
+  }
+  return { months, disagree };
 }
 
 // A change of rent seen in the receipts: the first month at the new rent, and the rent before it.
@@ -116,30 +147,43 @@ interface RentChange {
   readonly confidence: Confidence;
 }
 
-// The rent charged month by month, in order, and every month it changed. A change after a gap in
-// the receipts may have come in any month of the gap, so it is less sure.
-export function rentChanges(receipts: readonly ExtractedRow[]): RentChange[] {
-  const months = new Map<string, { rent: number; confidence: Confidence }>();
-  for (const row of receipts) {
-    const month = monthOf(row.values['month']);
-    const rent = amountOf(row.values['rent']);
-    if (month && rent !== null && !months.has(month))
-      months.set(month, { rent, confidence: row.confidence });
-  }
-  const sorted = [...months.entries()].sort(([a], [b]) => (a < b ? -1 : 1));
-  return sorted.flatMap(([month, { rent, confidence }], i): RentChange[] => {
-    const before = sorted[i - 1];
-    if (!before || Math.abs(before[1].rent - rent) < 0.005) return [];
-    const gap = monthIndex(month) - monthIndex(before[0]) > 1;
-    return [
-      {
-        month,
-        previous: before[1].rent,
-        next: rent,
-        confidence: gap ? 'low' : lowest(confidence, before[1].confidence),
-      },
-    ];
+const sameRent = (a: number, b: number) => Math.abs(a - b) < 0.005;
+const toMonth = (d: CivilDate) => `${d.y}-${String(d.m).padStart(2, '0')}`;
+
+// Every month the rent charged changed and stayed changed. A new rent counts once it holds for
+// two receipts or is the last one read, so a one-off month is no change; the month the contract
+// started, when it did not start on the 1st, is prorated and left out, as is any before it. A
+// change after a gap in the receipts may have come in any month of the gap, so it is less sure.
+export function rentChanges(
+  months: ReadonlyMap<string, ExtractedRow>,
+  start: CivilDate | null = null,
+): RentChange[] {
+  const first = start ? (start.d > 1 ? toMonth(start) : null) : null;
+  const sorted = [...months.entries()]
+    .flatMap(([month, row]) => {
+      const rent = amountOf(row.values['rent']);
+      const before = start !== null && month < toMonth(start);
+      return rent === null || before || month === first
+        ? []
+        : [{ month, rent, confidence: row.confidence }];
+    })
+    .sort((a, b) => (a.month < b.month ? -1 : 1));
+  const changes: RentChange[] = [];
+  let current = sorted[0];
+  sorted.forEach((r, i) => {
+    if (!current || sameRent(current.rent, r.rent)) return;
+    const after = sorted[i + 1];
+    if (after && !sameRent(after.rent, r.rent)) return;
+    const gap = monthIndex(r.month) - monthIndex(sorted[i - 1]?.month ?? r.month) > 1;
+    changes.push({
+      month: r.month,
+      previous: current.rent,
+      next: r.rent,
+      confidence: gap ? 'low' : lowest(r.confidence, current.confidence),
+    });
+    current = r;
   });
+  return changes;
 }
 
 // What a receipt line is called on the charges sheet; utilities and other lines are not charges.
@@ -199,11 +243,12 @@ function contract(a: Answers, fields: RentalExtraction['fields']) {
   const depositAmount = amountOf(deposit?.value);
   if (deposit && depositAmount !== null)
     a.read('deposit', amountText(depositAmount), deposit.confidence);
-  // The contract counts the months paid beyond the first; the form counts the first too.
+  // The contract counts the months paid beyond the first; the form counts the first too. Whether
+  // the contract meant the first is not always plain, so this is never more than fairly sure.
   const advance = field('advanceMonths');
   const advanceMonths = wholeOf(advance?.value);
   if (advance && advanceMonths !== null && advanceMonths >= 0)
-    a.read('advanceMonths', String(advanceMonths + 1), advance.confidence, true);
+    a.read('advanceMonths', String(advanceMonths + 1), lowest(advance.confidence, 'medium'), true);
 
   const rent = field('initialRent');
   const rentAmount = amountOf(rent?.value);
@@ -238,26 +283,43 @@ function guarantees(a: Answers, rows: readonly ExtractedRow[], rent: number | nu
   });
 }
 
-// Each invoice is a fee paid on moving in, for what it says it charges in total.
-function fees(a: Answers, invoices: readonly ExtractedRow[]) {
+// An invoice whose base and VAT do not add up to its total, as the API checks it.
+const INVOICE_TOLERANCE = 0.05;
+function totalMismatch(row: ExtractedRow): boolean {
+  const [base, vat, total] = ['base', 'vat', 'total'].map((k) => row.values[k]);
+  return (
+    isNumber(base) &&
+    isNumber(vat) &&
+    isNumber(total) &&
+    Math.abs(base + vat - total) > INVOICE_TOLERANCE
+  );
+}
+
+// Each invoice is a fee paid on moving in, for what it says it charges in total. When the API
+// found an invoice that does not add up, its amount is to be checked.
+function fees(a: Answers, invoices: readonly ExtractedRow[], mismatch: boolean) {
   const read = a.rows('fees', invoices);
   if (read.length === 0) return;
   a.open('hasFees', 'yes');
+  const located = read.some(totalMismatch);
   read.forEach((row, i) => {
     const field = (key: string) => rowField('fees', i, key);
     const kind = oneOf(row.values['conceptKind'], FEE_KINDS);
     if (kind) a.read(field('kind'), kind, row.confidence);
+    const doubtful = mismatch && (!located || totalMismatch(row));
+    const confidence = doubtful ? 'low' : row.confidence;
     const total = amountOf(row.values['total']);
     const base = amountOf(row.values['base']);
     const vat = amountOf(row.values['vat']) ?? 0;
-    if (total !== null) a.read(field('amount'), amountText(total), row.confidence);
-    else if (base !== null) a.read(field('amount'), amountText(base + vat), row.confidence, true);
+    if (total !== null) a.read(field('amount'), amountText(total), confidence);
+    else if (base !== null) a.read(field('amount'), amountText(base + vat), confidence, true);
   });
 }
 
 interface Rise {
   readonly chargedFrom: CivilDate | null;
-  readonly chargedFromDerived: boolean;
+  // The day the rise applies from, as the notice says it.
+  readonly appliesFrom: CivilDate | null;
   readonly previous: number | null;
   readonly previousDerived: boolean;
   readonly next: number | null;
@@ -270,13 +332,20 @@ interface Rise {
 }
 
 const firstOfMonth = (month: string): CivilDate => parseDate(`${month}-01`);
-const toMonth = (d: CivilDate) => `${d.y}-${String(d.m).padStart(2, '0')}`;
-const sameRent = (a: number, b: number) => Math.abs(a - b) < 0.005;
+// The API's own tolerance between a notice's rent and the rent it works out.
+const NOTICE_TOLERANCE = 1;
 
-// Each notice, with the first receipt at its new rent as the month it was charged from; a change
-// in the receipts no notice speaks of is a rise of its own.
+const isDecrease = (r: Rise) => r.previous !== null && r.next !== null && r.next < r.previous;
+
+// Each notice, with the first receipt at its new rent (within a euro, or else in the month it
+// applies from) as the month it was charged from; a change in the receipts no notice speaks of is
+// a rise of its own.
 function rises(notices: readonly ExtractedRow[], changes: readonly RentChange[]): Rise[] {
   const unmatched = [...changes];
+  const take = (found: (c: RentChange) => boolean) => {
+    const at = unmatched.findIndex(found);
+    return at >= 0 ? unmatched.splice(at, 1)[0] : undefined;
+  };
   const fromNotices = notices.map((row): Rise => {
     const v = row.values;
     const previousRead = amountOf(v['previousRent']);
@@ -288,13 +357,12 @@ function rises(notices: readonly ExtractedRow[], changes: readonly RentChange[])
         ? Math.round(previousRead * (1 + percent / 100) * 100) / 100
         : null);
     const applies = dateOf(v['appliesFrom']);
-    const at = unmatched.findIndex((c) =>
-      next !== null ? sameRent(c.next, next) : applies !== null && c.month === toMonth(applies),
-    );
-    const change = at >= 0 ? unmatched.splice(at, 1)[0] : undefined;
+    const change =
+      (next !== null ? take((c) => Math.abs(c.next - next) <= NOTICE_TOLERANCE) : undefined) ??
+      (applies !== null ? take((c) => c.month === toMonth(applies)) : undefined);
     return {
       chargedFrom: change ? firstOfMonth(change.month) : applies,
-      chargedFromDerived: true,
+      appliesFrom: applies,
       previous: previousRead ?? change?.previous ?? null,
       previousDerived: previousRead === null,
       next: next ?? change?.next ?? null,
@@ -308,7 +376,7 @@ function rises(notices: readonly ExtractedRow[], changes: readonly RentChange[])
   });
   const fromReceipts = unmatched.map((c): Rise => ({
     chargedFrom: firstOfMonth(c.month),
-    chargedFromDerived: true,
+    appliesFrom: null,
     previous: c.previous,
     previousDerived: true,
     next: c.next,
@@ -325,22 +393,26 @@ function rises(notices: readonly ExtractedRow[], changes: readonly RentChange[])
   });
 }
 
-function updates(a: Answers, all: readonly Rise[], start: CivilDate | null) {
-  const read = a.rows('updates', all);
-  if (read.length === 0) return;
-  a.open('hasUpdates', 'yes');
+// The rises on their sheet; a rent that went down is no rise, and is only said.
+function updates(a: Answers, all: readonly Rise[], start: CivilDate | null): boolean {
+  const read = a.rows(
+    'updates',
+    all.filter((r) => !isDecrease(r)),
+  );
   read.forEach((r, i) => {
+    if (i === 0) a.open('hasUpdates', 'yes');
     const field = (key: string) => rowField('updates', i, key);
-    const when = r.chargedFrom ?? r.noticeOn;
-    if (when)
+    const from = r.appliesFrom ?? r.chargedFrom ?? r.noticeOn;
+    if (from) {
+      const belongs = start ? riseYear(start, from) : null;
       a.read(
         field('year'),
-        String(start ? riseYear(start, when) : when.y),
-        start ? r.worked : 'low',
+        String(belongs ? belongs.year : from.y),
+        belongs && !belongs.early ? r.worked : 'low',
         true,
       );
-    if (r.chargedFrom)
-      a.read(field('chargedFrom'), toIso(r.chargedFrom), r.worked, r.chargedFromDerived);
+    }
+    if (r.chargedFrom) a.read(field('chargedFrom'), toIso(r.chargedFrom), r.worked, true);
     if (r.previous !== null)
       a.read(
         field('previousRent'),
@@ -358,6 +430,7 @@ function updates(a: Answers, all: readonly Rise[], start: CivilDate | null) {
     if (r.notice) a.read(field('notice'), r.notice, r.confidence);
     if (r.noticeOn) a.read(field('noticeOn'), toIso(r.noticeOn), r.confidence);
   });
+  return all.some(isDecrease);
 }
 
 interface ChargeYear {
@@ -366,14 +439,12 @@ interface ChargeYear {
   readonly confidence: Confidence;
 }
 
-// What the receipts charged each calendar year, concept by concept; whether they carry lines
-// that are no charge of the review's.
-function receiptCharges(receipts: readonly ExtractedRow[]) {
+// What the receipts charged each calendar year, concept by concept, one receipt per month;
+// whether they carry lines that are no charge of the review's.
+function receiptCharges(months: ReadonlyMap<string, ExtractedRow>) {
   const sums = new Map<string, Map<number, ChargeYear>>();
   let otherLines = false;
-  for (const row of receipts) {
-    const month = monthOf(row.values['month']);
-    if (!month) continue;
+  for (const [month, row] of months) {
     const year = Number(month.slice(0, 4));
     if (amountOf(row.values['utilities']) !== null || amountOf(row.values['other']) !== null)
       otherLines = true;
@@ -393,8 +464,6 @@ function receiptCharges(receipts: readonly ExtractedRow[]) {
   return { sums, otherLines };
 }
 
-// One row per concept and year. What the contract says of a concept goes on its first row: that
-// it is in the contract, and for how much a year when it says so.
 interface ChargeTerms {
   readonly confidence: Confidence;
   readonly annual: number | null;
@@ -408,8 +477,14 @@ interface ChargeRow {
   readonly year: ChargeYear | null;
 }
 
-function charges(a: Answers, lease: readonly ExtractedRow[], receipts: readonly ExtractedRow[]) {
-  const { sums, otherLines } = receiptCharges(receipts);
+// One row per concept and year. What the contract says of a concept goes on its first row: that
+// it is in the contract, and for how much a year when it says so.
+function charges(
+  a: Answers,
+  lease: readonly ExtractedRow[],
+  months: ReadonlyMap<string, ExtractedRow>,
+) {
+  const { sums, otherLines } = receiptCharges(months);
   const rows = CHARGE_KINDS.flatMap((kind): ChargeRow[] => {
     const inLease = lease.filter((r) => r.values['kind'] === kind);
     const agreed = inLease
@@ -481,14 +556,16 @@ export function rentalPrefill(
   e: RentalExtraction,
   answers: Readonly<Record<string, string>>,
   tr: Translate,
+  checks: readonly FailedCheck[] = [],
 ): RentalPrefill {
   const a = new Answers();
   contract(a, e.fields);
   guarantees(a, e.guarantees, amountOf(e.fields.initialRent?.value));
-  fees(a, e.invoices);
+  fees(a, e.invoices, checks.includes('invoice_total_mismatch'));
   const start = dateOf(e.fields.startDate?.value) ?? dateOf(answers['startDate']);
-  updates(a, rises(e.notices, rentChanges(e.receipts)), start);
-  const charged = charges(a, e.charges, e.receipts);
+  const receipts = receiptsByMonth(e.receipts);
+  const decrease = updates(a, rises(e.notices, rentChanges(receipts.months, start)), start);
+  const charged = charges(a, e.charges, receipts.months);
   moveOut(a, e.fields.keysReturnedOn, e.returns, e.deductions);
 
   const quotes: Partial<Record<Quoted, string>> = {};
@@ -511,7 +588,12 @@ export function rentalPrefill(
       ...(low ? [tr('client.documents.done_low')] : []),
       ...(charged.fromReceipts ? [tr('client.rental.documents.receipt_sums')] : []),
       ...(charged.otherLines ? [tr('client.rental.documents.receipt_other_lines')] : []),
+      ...(receipts.disagree ? [tr('client.rental.documents.receipt_duplicate')] : []),
+      ...(decrease ? [tr('client.rental.documents.decrease')] : []),
       ...(a.cut ? [tr('client.rental.documents.rows_cut')] : []),
+      ...RENTAL_CHECKS.filter((c) => checks.includes(c)).map((c) =>
+        tr(`client.rental.documents.check.${c}`),
+      ),
     ],
     quotes,
   };

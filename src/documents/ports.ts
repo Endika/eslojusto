@@ -5,6 +5,7 @@ import type {
   Confidence,
   ErrorCode,
   Extraction,
+  FailedCheck,
   MediaType,
   PageKind,
   SkipReason,
@@ -189,8 +190,13 @@ export interface ReadPrefill {
 
 // How a section turns what the API read into answers for its form.
 export interface DocumentReading<F extends string, L extends string> {
-  // `answers` are the form's current ones, by name.
-  prefill(extraction: Extraction<F, L>, answers: Readonly<Record<string, string>>): ReadPrefill;
+  // `answers` are the form's current ones, by name; `checks`, what the API found incoherent, for
+  // the reading to word those that are its own.
+  prefill(
+    extraction: Extraction<F, L>,
+    answers: Readonly<Record<string, string>>,
+    checks: readonly FailedCheck[],
+  ): ReadPrefill;
 }
 
 export interface Browser {

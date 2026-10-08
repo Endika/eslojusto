@@ -4,7 +4,8 @@ import type { Translate } from '../i18n/client';
 import {
   LIMITS,
   type Api,
-  type CoherenceCheck,
+  isCoherenceCheck,
+  type FailedCheck,
   type Confidence,
   type ErrorCode,
   type Extraction,
@@ -394,7 +395,7 @@ export function setUpUpload<F extends string, L extends string>(
 
   function showDone(
     p: ReadPrefill,
-    checks: readonly CoherenceCheck[],
+    checks: readonly FailedCheck[],
     e: Extraction<F, L>,
     skipped: readonly string[],
   ) {
@@ -410,7 +411,11 @@ export function setUpUpload<F extends string, L extends string>(
         : n === 1
           ? tr('client.documents.done_one')
           : tr('client.documents.done', { n });
-    const lines = [...skipped, ...p.notes, ...checks.map((c) => tr(`client.documents.check.${c}`))];
+    const lines = [
+      ...skipped,
+      ...p.notes,
+      ...checks.filter(isCoherenceCheck).map((c) => tr(`client.documents.check.${c}`)),
+    ];
     notes.hidden = lines.length === 0;
     notes.replaceChildren(
       ...lines.map((text) => {
@@ -595,6 +600,7 @@ export function setUpUpload<F extends string, L extends string>(
     const prefill = deps.reading.prefill(
       result.extraction,
       Object.fromEntries(calculator.entries()),
+      result.failedChecks,
     );
     calculator.fill(prefill.entries);
     markForm(prefill.marks);

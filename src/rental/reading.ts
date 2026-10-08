@@ -36,8 +36,8 @@ export function rentalReading(
     for (const quote of form.querySelectorAll('[data-read-quote]')) quote.remove();
   });
   return {
-    prefill(extraction, answers) {
-      const p = rentalPrefill(extraction, answers, tr);
+    prefill(extraction, answers, checks) {
+      const p = rentalPrefill(extraction, answers, tr, checks);
       for (const question of QUOTED) {
         const text = p.quotes[question];
         if (text) showQuote(form, question, text, tr);

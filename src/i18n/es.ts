@@ -1299,6 +1299,20 @@ export const es = {
     'Los gastos de cada año suman solo los recibos leídos: si falta alguno, corrige la cifra en la hoja de gastos.',
   'client.rental.documents.receipt_other_lines':
     'Los recibos traen otros importes, como suministros, que no se pasan a la hoja de gastos: si alguno es un gasto de la vivienda, añádelo tú.',
+  'client.rental.documents.receipt_duplicate':
+    'Hay recibos del mismo mes que no dicen lo mismo: se ha usado uno de ellos. Compara las cifras de ese mes con tus recibos.',
+  'client.rental.documents.decrease':
+    'Tus documentos muestran que la renta bajó en algún momento. Una bajada no es una subida, así que no se pasa a la hoja de subidas.',
+  'client.rental.documents.check.return_before_keys':
+    'La devolución leída es anterior a la entrega de llaves: revisa las dos fechas.',
+  'client.rental.documents.check.receipt_parts_do_not_sum':
+    'Las partes de algún recibo no suman su total: revisa las cifras de los recibos.',
+  'client.rental.documents.check.invoice_total_mismatch':
+    'La base y el IVA de alguna factura no suman su total: revisa el importe en la hoja de entrada.',
+  'client.rental.documents.check.notice_rent_mismatch':
+    'En algún aviso, la renta nueva no sale de aplicar el porcentaje a la anterior: revisa las cifras de la subida.',
+  'client.rental.documents.check.start_long_before_signing':
+    'La fecha de entrada leída es muy anterior a la del contrato: revisa las dos.',
   'client.rental.documents.rows_cut':
     'Se ha leído más de lo que cabe en alguna lista: compara sus filas con tus documentos y completa lo que falte.',
   'client.rental.documents.quote.updateClause': 'Lo que dice tu contrato sobre actualizar la renta',

@@ -303,6 +303,32 @@ describe('the review a page reads for', () => {
       conflicts: [{ field: 'deposit', sources: ['payslip'] }],
     });
   });
+  it('keeps the rental checks and each rental row’s source, and nothing it does not know', async () => {
+    const shape = { review: 'rental', fields: [], lists: ['receipts'] } as const;
+    const fetch = fakeFetch(200, {
+      code: 'ok',
+      extraction: {
+        ...sent,
+        lists: {
+          receipts: [
+            { values: { month: '2025-01' }, confidence: 'high', source: 'rent_receipt' },
+            { values: { month: '2025-02' }, confidence: 'high', source: 'nowhere' },
+          ],
+        },
+      },
+      failedChecks: ['invoice_total_mismatch', 'return_before_keys', 'x'],
+      allowance: 'q',
+    });
+    const result = await createApi(ENDPOINTS, fetch, shape).extract(request);
+    expect(result.ok && result.failedChecks).toEqual([
+      'invoice_total_mismatch',
+      'return_before_keys',
+    ]);
+    expect(result.ok && result.extraction.receipts).toEqual([
+      { values: { month: '2025-01' }, confidence: 'high', source: 'rent_receipt' },
+      { values: { month: '2025-02' }, confidence: 'high' },
+    ]);
+  });
 });
 
 describe('checkout and pass', () => {
