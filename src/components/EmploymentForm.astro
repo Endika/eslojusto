@@ -277,6 +277,21 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           <p class="errata" data-row-error="kind" hidden></p>
         </div>
       </EmploymentRows>
+      <div class="field" data-field="historyIncomplete" data-if="hasHistory:yes" hidden>
+        <div class="checkbox">
+          <input
+            type="checkbox"
+            name="historyIncomplete"
+            id="historyIncomplete"
+            value="yes"
+            aria-describedby="hint-historyIncomplete"
+          />
+          <label for="historyIncomplete">{tx('employment.history.incomplete')}</label>
+        </div>
+        <p class="hint" id="hint-historyIncomplete">
+          {tx('employment.history.incomplete_hint')}
+        </p>
+      </div>
     </fieldset>
 
     <fieldset

@@ -87,6 +87,41 @@ describe('reviewChaining', () => {
     expect(offerPass([review(input)])).toBe(true);
   });
 
+  it('a history cut to its most recent rows never reads as within the limit', () => {
+    const input = chained(['2023-10-01', '2024-06-30'], [period('2023-01-01', '2023-08-31')], {
+      historyIncomplete: true,
+    });
+    const f = only(review(input));
+    expect(f.status).toBe('review_it');
+    expect(f.calculation.map((p) => p.key)).toEqual([
+      'chaining.within',
+      'chaining.history_incomplete',
+    ]);
+    expect(offerPass([review(input)])).toBe(false);
+  });
+
+  it('a cut history that already passes the limit still quotes art. 15.5: older rows only add', () => {
+    const input = chained(['2023-11-01', '2024-08-31'], [period('2023-01-01', '2023-09-30')], {
+      historyIncomplete: true,
+    });
+    expect(only(review(input)).status).toBe('becomes_permanent');
+  });
+
+  it('a cut history near the limit says older rows may be missing too', () => {
+    const f = only(
+      review(
+        chained(['2023-03-03', '2024-06-30'], [period('2023-01-01', '2023-03-01')], {
+          historyIncomplete: true,
+        }),
+      ),
+    );
+    expect(f.status).toBe('review_it');
+    expect(f.calculation.map((p) => p.key)).toEqual([
+      'chaining.near_limit',
+      'chaining.history_incomplete',
+    ]);
+  });
+
   it('a single contract of 19 months is not a chain', () => {
     const f = only(review(chained(['2024-01-01', '2025-07-31'], [])));
     expect(f.status).toBe('within_limit');

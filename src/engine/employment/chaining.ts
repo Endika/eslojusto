@@ -175,8 +175,16 @@ const DEPENDS_ON = {
   chaining_cutoff: 'chaining.depends_on_cutoff',
 } as const;
 
-function draftOf(outcome: Outcome, doubts: readonly Dimension[], notes: EmploymentPhrase[]): Draft {
+// A history holding only its most recent rows may leave out older contracts, which could only add
+// to the count: a count within the limit can't be confirmed, one past it stands.
+function draftOf(
+  outcome: Outcome,
+  doubts: readonly Dimension[],
+  notes: EmploymentPhrase[],
+  incomplete: boolean,
+): Draft {
   const dependsOn = doubts.map((d) => phrase(DEPENDS_ON[d]));
+  const cut = incomplete ? [phrase('chaining.history_incomplete')] : [];
   const figures = {
     dias: { integer: outcome.days },
     limite: { integer: outcome.limit },
@@ -206,13 +214,13 @@ function draftOf(outcome: Outcome, doubts: readonly Dimension[], notes: Employme
       return {
         ...base,
         status: 'review_it',
-        calculation: [phrase('chaining.near_limit', figures), ...dependsOn, ...notes],
+        calculation: [phrase('chaining.near_limit', figures), ...cut, ...dependsOn, ...notes],
       };
     case 'within':
       return {
         ...base,
-        status: 'within_limit',
-        calculation: [phrase('chaining.within', figures), ...notes],
+        status: incomplete ? 'review_it' : 'within_limit',
+        calculation: [phrase('chaining.within', figures), ...cut, ...notes],
       };
   }
 }
@@ -316,7 +324,7 @@ export function reviewChaining(
         (c) => c.world.chaining_cutoff === cutoff && c.world.chaining_group === 'group_not_counted',
       );
       if (cell === undefined) throw new RangeError(`no world for ${cutoff}`);
-      return settle(draftOf(cell.outcome, [], notes), today, norms);
+      return settle(draftOf(cell.outcome, [], notes, input.historyIncomplete), today, norms);
     });
   }
   // Each reading shows its worst world, marked with every doubt that still decides it.
@@ -330,6 +338,6 @@ export function reviewChaining(
         : a,
     ).outcome;
     const doubts = [question, ...DIMENSIONS.filter((d) => d !== question && matters(d, cells))];
-    return settle(draftOf(worst, doubts, notes), today, norms);
+    return settle(draftOf(worst, doubts, notes, input.historyIncomplete), today, norms);
   });
 }

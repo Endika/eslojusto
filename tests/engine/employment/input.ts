@@ -59,6 +59,7 @@ export const contract = (change: Partial<EmploymentInput> = {}): EmploymentInput
   clauses: [],
   info: Object.fromEntries(INFO_ELEMENTS.map((e) => [e, 'present'])) as EmploymentInput['info'],
   history: null,
+  historyIncomplete: false,
   offer: null,
   ...change,
 });

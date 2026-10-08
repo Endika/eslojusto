@@ -160,7 +160,7 @@ export const SHEET_FIELDS: Record<Sheet, readonly string[]> = {
     'effectiveYear1',
     'effectiveYear2',
   ],
-  historial: ['hasHistory', 'history'],
+  historial: ['hasHistory', 'history', 'historyIncomplete'],
   salario: [
     'salaryAmount',
     'salaryPeriod',
@@ -286,6 +286,7 @@ const DEFAULTS: EmploymentInput = {
     InfoPresence
   >,
   history: null,
+  historyIncomplete: false,
   offer: null,
 };
 
@@ -495,6 +496,7 @@ function read(form: HTMLFormElement): Reading {
         }
       }
       partial.history = history;
+      partial.historyIncomplete = text('historyIncomplete') === 'yes';
     } else if (asked('hasHistory')) {
       if (text('hasHistory') !== 'no') fail('hasHistory', 'missing_choice');
       partial.history = null;

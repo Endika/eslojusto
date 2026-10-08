@@ -123,6 +123,7 @@ type ModalityPhraseKey =
 type ChainingPhraseKey =
   | 'chaining.no_history'
   | 'chaining.within'
+  | 'chaining.history_incomplete'
   | 'chaining.near_limit'
   | 'chaining.exceeds'
   | 'chaining.permanent'
