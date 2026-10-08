@@ -30,7 +30,10 @@ export interface InformationBlock {
 }
 
 // The public register of collective agreements; the review never looks up an agreement's tables.
-const REGCON: InformationLink = { id: 'regcon', url: 'https://expinterweb.mites.gob.es/regcon/' };
+export const REGCON: InformationLink = {
+  id: 'regcon',
+  url: 'https://expinterweb.mites.gob.es/regcon/',
+};
 
 const block = (
   id: InformationBlockId,

@@ -214,3 +214,66 @@ test('the home page labels the contract review as a beta', async ({ page }) => {
   await expect(card.getByRole('link', { name: 'Contrato de trabajo' })).toBeVisible();
   await expect(card.getByText('Beta')).toBeVisible();
 });
+
+test('the page has its title, description, heading, canonical, JSON-LD and review date', async ({
+  page,
+}) => {
+  await page.goto('contrato/');
+  const title = await page.title();
+  expect(title.length).toBeLessThanOrEqual(60);
+  expect(title).toMatch(/contrato de trabajo/i);
+  expect(title).toMatch(/SMI/);
+  const description =
+    (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
+  expect(description.length).toBeGreaterThan(0);
+  expect(description.length).toBeLessThanOrEqual(155);
+  expect(description).toMatch(/contrato de trabajo/);
+  expect(description).toMatch(/SMI/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Comprueba si tu contrato de trabajo es justo',
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://eslojusto.es/contrato/',
+  );
+
+  const reviewed = page.locator('.desk__reviewed time');
+  const day = (await reviewed.getAttribute('datetime')) ?? '';
+  expect(day).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  const longDay = new Intl.DateTimeFormat('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${day}T00:00:00Z`));
+  await expect(reviewed).toHaveText(`Revisado el ${longDay}`);
+
+  const json = (await page.locator('script[type="application/ld+json"]').textContent()) ?? '';
+  const graph = (JSON.parse(json) as { '@graph': Record<string, unknown>[] })['@graph'];
+  const app = graph.find((n) => n['@type'] === 'WebApplication');
+  expect(app).toMatchObject({
+    name: 'Revisión de contrato de trabajo',
+    url: 'https://eslojusto.es/contrato/',
+    description,
+  });
+  const faq = graph.find((n) => n['@type'] === 'FAQPage') as
+    { mainEntity: { name: string; acceptedAnswer: { text: string } }[] } | undefined;
+  const questions = (await page.locator('.faq-item summary').allTextContents()).map((q) =>
+    q.trim(),
+  );
+  expect(questions).toContain('¿Cuánto puede durar el periodo de prueba?');
+  expect(faq?.mainEntity.map((q) => q.name)).toEqual(questions);
+  // Without the documents API there is no reading and no pass to ask about.
+  expect(questions).not.toContain('¿Qué pasa con mis documentos?');
+
+  const guide = page.locator('.guide');
+  await expect(guide).toContainText('La jornada máxima sigue en 40 horas semanales');
+  await expect(guide).toContainText(
+    'El artículo 15.4 del Estatuto de los Trabajadores dice que, en un caso como el tuyo, la persona adquiere la condición de fija',
+  );
+  await expect(guide.getByRole('link', { name: /REGCON/ })).toHaveAttribute(
+    'href',
+    'https://expinterweb.mites.gob.es/regcon/',
+  );
+  await expect(guide.locator('tr[data-year]').first()).toContainText('17.094,00');
+});
