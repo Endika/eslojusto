@@ -327,7 +327,7 @@ export const es = {
     'Tu vida laboral muestra cada alta y cada baja y los días cotizados:',
   'result.benefit_work_history_link': 'informe de tu vida laboral (sede de la Seguridad Social)',
   'result.benefit_just_cause':
-    'Hay excepciones. Irte por alguno de estos motivos sí es situación legal de desempleo y, si cumples el resto de requisitos, da derecho a paro: un traslado (art. 40 ET), un cambio sustancial de tus condiciones (art. 41.3 ET), un incumplimiento grave de la empresa, como no pagarte o pagarte tarde una y otra vez (art. 50 ET), o la violencia de género o sexual (art. 49.1.m ET). Lo recoge el art. 267.1.a.5.º LGSS. La salida por el art. 50 la suele declarar un juzgado.',
+    'Hay excepciones. Irte por alguno de estos motivos sí es situación legal de desempleo y, si cumples el resto de requisitos, da derecho a paro: un traslado (art. 40 ET), una modificación sustancial de tus condiciones que te perjudique (art. 41.3 ET), un incumplimiento grave de la empresa, como no pagarte o pagarte tarde una y otra vez (art. 50 ET), o la violencia de género o sexual (art. 49.1.m ET). Lo recoge el art. 267.1.a.5.º LGSS. La salida por el art. 50 la suele declarar un juzgado.',
   'result.benefit_calculation':
     'La base es la media de lo cotizado por desempleo en los últimos 180 días; aquí sale de tu salario bruto anual con las pagas extra, entre 12, dentro de las bases mínima y máxima de 2026. Se cobra el 70 % de la base los primeros 180 días y el 60 % después, con un mínimo y un máximo según tus hijos o hijas a cargo. La duración sigue la escala del art. 269.1: 360 días cotizados en los últimos 6 años dan 120 días de paro, y cada 180 más suman 60, hasta 720.',
 
@@ -377,7 +377,7 @@ export const es = {
     'Es tu salario bruto anual, con las pagas extra, entre 365. Así lo calcula la guía del CGPJ para las indemnizaciones.',
   'faq.fixed_term': '¿Hay indemnización al acabar un contrato temporal?',
   'faq.fixed_term_answer':
-    'Sí, 12 días por año, en proporción a los días trabajados (art. 49.1.c ET). Para contratos que empezaron entre 2011 y 2014 son de 8 a 11 días (disposición transitoria 8.ª ET). Los contratos de sustitución y los formativos no tienen indemnización.',
+    'Sí, 12 días por año, en proporción a los días trabajados (art. 49.1.c ET). Para contratos que empezaron entre 2011 y 2014 son de 8 a 11 días (disposición transitoria 8.ª ET). Los contratos de sustitución y los formativos no tienen indemnización, ni los firmados antes del 4 de marzo de 2001 (disposición transitoria 8.ª.2 ET).',
   'faq.deadlines': '¿Qué plazo tengo para pedir lo que falta en mi finiquito?',
   'faq.deadlines_answer':
     'Para cantidades como el salario pendiente, las vacaciones, las pagas extra o la indemnización por fin de contrato temporal, un año (art. 59.1 ET). En un despido (objetivo, improcedente o disciplinario), el plazo para impugnarlo es de 20 días hábiles (art. 59.3 ET), y quien no esté de acuerdo con su indemnización suele plantearlo por esa misma vía. El plazo es corto, y un despacho laboralista, un despacho de graduado social o un sindicato pueden decirte cuál se aplica a tu caso.',
