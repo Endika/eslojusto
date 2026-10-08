@@ -3,9 +3,16 @@ import Base from '../layouts/Base.astro';
 import RentalForm from '../components/RentalForm.astro';
 import RentalResult from '../components/RentalResult.astro';
 import DocumentStart from '../components/DocumentStart.astro';
+import RentalGuide from '../components/RentalGuide.astro';
 import { DOCUMENTS } from '../documents/config';
+import { NORMS } from '../engine/rental/data/norms';
+import { formatLongDay } from '../content/rent-indices';
+import { rentalFaqEntries } from '../content/rental-faq';
+import { faqNode } from '../content/faq';
+import { rentalApp } from '../content/structured-data';
+import { LAST_UPDATED } from '../content/updated';
 import { t, type Key } from '../i18n';
-import type { Lang } from '../i18n/languages';
+import { link, type Lang } from '../i18n/languages';
 
 interface Props {
   lang: Lang;
@@ -26,6 +33,16 @@ const sections = [
 // With the documents API the visit opens on the choice between uploading and typing; the tabs and
 // the form wait until it is made.
 const documents = DOCUMENTS !== null;
+
+// The day the page's rules and norms were last checked; it exists only in a build with the page.
+const checkedOn = LAST_UPDATED['/alquiler/'];
+if (!checkedOn) throw new Error('/alquiler/ needs its date in LAST_UPDATED.');
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const page = new URL(link(lang, 'alquiler/'), Astro.site);
+const structuredData = [
+  rentalApp(home, page, lang),
+  faqNode(rentalFaqEntries(lang, NORMS, { documents, checkedOn })),
+];
 ---
 
 <Base
@@ -34,6 +51,7 @@ const documents = DOCUMENTS !== null;
   path="/alquiler/"
   lang={lang}
   section="cause"
+  structuredData={structuredData}
   calculator={documents}
 >
   <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
@@ -65,6 +83,11 @@ const documents = DOCUMENTS !== null;
           <span class="beta">{tx('rental.beta')}</span>
           {tx('rental.beta_note')}
         </p>
+        <p class="desk__reviewed">
+          <time datetime={checkedOn}>
+            {t(lang, 'rental.reviewed', { fecha: formatLongDay(checkedOn) })}
+          </time>
+        </p>
       </header>
       <noscript>
         <div class="sheet sheet--notice">
@@ -75,6 +98,7 @@ const documents = DOCUMENTS !== null;
       <RentalForm lang={lang} hidden={documents} />
       <RentalResult lang={lang} documents={documents} />
     </div>
+    <RentalGuide lang={lang} checkedOn={checkedOn} documents={documents} />
   </main>
 </Base>
 

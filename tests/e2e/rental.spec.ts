@@ -311,3 +311,60 @@ test('an empty row on the last sheet can be removed and does not block the revie
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
   await expect(page.getByRole('region', { name: 'Devolución de la fianza' })).toBeVisible();
 });
+
+test('the page has its title, description, heading, canonical, JSON-LD and review date', async ({
+  page,
+}) => {
+  await page.goto('alquiler/');
+  const title = await page.title();
+  expect(title.length).toBeLessThanOrEqual(60);
+  expect(title).toMatch(/alquiler/i);
+  expect(title).toMatch(/subida|fianza/i);
+  const description =
+    (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
+  expect(description.length).toBeGreaterThan(0);
+  expect(description.length).toBeLessThanOrEqual(155);
+  expect(description).toMatch(/alquiler/);
+  expect(description).toMatch(/subida|fianza/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Comprueba si tu alquiler es justo',
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://eslojusto.es/alquiler/',
+  );
+
+  const reviewed = page.locator('.desk__reviewed time');
+  const day = (await reviewed.getAttribute('datetime')) ?? '';
+  expect(day).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  const longDay = new Intl.DateTimeFormat('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${day}T00:00:00Z`));
+  await expect(reviewed).toHaveText(`Revisado el ${longDay}`);
+
+  const json = (await page.locator('script[type="application/ld+json"]').textContent()) ?? '';
+  const graph = (JSON.parse(json) as { '@graph': Record<string, unknown>[] })['@graph'];
+  const app = graph.find((n) => n['@type'] === 'WebApplication');
+  expect(app).toMatchObject({
+    name: 'Revisión de alquiler',
+    url: 'https://eslojusto.es/alquiler/',
+    description,
+  });
+  const faq = graph.find((n) => n['@type'] === 'FAQPage') as
+    { mainEntity: { name: string; acceptedAnswer: { text: string } }[] } | undefined;
+  const questions = await page.locator('.faq-item summary').allTextContents();
+  expect(questions).toContain('¿Cuánto me pueden subir el alquiler este año?');
+  expect(faq?.mainEntity.map((q) => q.name)).toEqual(questions.map((q) => q.trim()));
+  // Without the documents API there is no reading and no pass to ask about.
+  expect(questions).not.toContain('¿Qué pasa con mis documentos?');
+
+  const guide = page.locator('.guide');
+  await expect(guide.getByRole('link', { name: 'IRAV e IPC de cada mes' })).toHaveAttribute(
+    'href',
+    /\/alquiler\/irav-ipc\/$/,
+  );
+  await expect(guide).toContainText('pendiente de convalidación');
+});

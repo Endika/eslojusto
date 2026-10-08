@@ -56,7 +56,7 @@ export interface CapsCopy {
 
 // When a norm ruled, with the doubt about its last day when there is one: «del 22-03-2026 hasta
 // el 29 o el 30-04-2026».
-const period = (lang: Lang, norm: Norm): string => {
+export const period = (lang: Lang, norm: Norm): string => {
   const tx = (key: Key, vars?: Variables) => t(lang, key, vars);
   const since = formatDay(norm.inForceSince);
   const until = norm.inForceUntil;
