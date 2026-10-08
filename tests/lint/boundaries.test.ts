@@ -106,6 +106,25 @@ describe('import boundaries', () => {
       (source): [string, string] =>
         ['src/scripts/documents.ts', `import { x } from '${source}';`] as const,
     ),
+    // The rental review gets its tables from its composition root and shares only the sheets.
+    ...[
+      '../engine/rental/data/tables',
+      '../engine/rental/data',
+      '../engine/rental/data/norms',
+      '../engine/review',
+      '../engine/employment/norms',
+      '../calculator/main',
+      '../calculator/render',
+      '../calculator/form',
+      '../documents/case',
+      '../analytics/posthog',
+      '../scripts/clock',
+      './../engine/rental/data/tables',
+    ].map((source): [string, string] => ['src/rental/x.ts', `import { x } from '${source}';`]),
+    ...['../rental/main', '../rental/form'].map((source): [string, string] => [
+      'src/calculator/x.ts',
+      `import { x } from '${source}';`,
+    ]),
     ...['./steps', './conditions', './flow.js', './../calculator/flow', '../engine/review'].map(
       (source): [string, string] => [
         'src/calculator/navigation.ts',
@@ -280,6 +299,13 @@ describe('import boundaries', () => {
     ['src/scripts/documents.ts', "import type { Detail } from '../calculator/flow';"],
     ['src/documents/case.ts', "import { reportModel } from './report';"],
     ['src/scripts/final-pay-documents.ts', "import { finalPayCase } from '../documents/case';"],
+    ['src/rental/x.ts', "import { reviewRental } from '../engine/rental/review';"],
+    ['src/rental/x.ts', "import { parseDate } from '../engine/date';"],
+    ['src/rental/x.ts', "import { createNavigation } from '../calculator/navigation';"],
+    ['src/rental/x.ts', "import { parseAmount } from '../calculator/number';"],
+    ['src/rental/x.ts', "import type { Translate } from '../i18n/client';"],
+    ['src/rental/x.ts', "import { SHEETS } from './form';"],
+    ['src/scripts/rental.ts', "import { RENTAL_TABLES } from '../engine/rental/data/tables';"],
   ])('%s may %s', async (filePath, code) => {
     expect(await violations(filePath, code)).not.toContain('no-restricted-imports');
   });

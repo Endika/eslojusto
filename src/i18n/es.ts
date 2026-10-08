@@ -1009,6 +1009,561 @@ export const es = {
     'No parece un DNI ni un NIE: revísalo. La carta se descarga igualmente.',
   'client.documents.letter.received': 'Recibí no conforme,',
   'client.documents.letter.filename': 'eslojusto-recibi-no-conforme.pdf',
+  'home.lead_rental':
+    'eslojusto.es compara lo que te pagan o te cobran con lo que marca la ley, cifra a cifra y con el artículo al lado. Revisa el finiquito y, en pruebas, el alquiler.',
+  'home.rent_text':
+    'Lo que pagas o has pagado por tu alquiler frente a lo que permite la ley, partida por partida: agencia, fianza y garantías, subidas, gastos y devolución de la fianza.',
+  'home.rent_citation': 'Ley de Arrendamientos Urbanos · IRAV e IPC del INE',
+  'home.beta': 'Beta',
+
+  'rental.title': 'Revisión de alquiler: subidas, fianza y gastos',
+  'rental.description':
+    'Comprueba si la subida, la fianza, los gastos o la agencia de tu alquiler pasan de lo que permite la ley, partida por partida. Todo en tu dispositivo.',
+  'rental.h1': 'Comprueba si tu alquiler es justo',
+  'rental.lead':
+    'Revisa lo que pagas o has pagado por tu alquiler de vivienda frente a lo que permite la ley: agencia, fianza y garantías, subidas, gastos y devolución de la fianza.',
+  'rental.beta': 'Beta',
+  'rental.beta_note':
+    'Sección en pruebas. Las normas del alquiler han cambiado varias veces en 2026: cada regla dice si está en vigor, pendiente de convalidación o derogada.',
+  'rental.no_js':
+    'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
+  'rental.form_aria': 'Revisión del alquiler',
+  'rental.tab.contrato': 'Contrato',
+  'rental.tab.entrada': 'Entrada',
+  'rental.tab.renta': 'Renta',
+  'rental.tab.gastos': 'Gastos',
+  'rental.tab.salida': 'Salida',
+  'rental.tab.resultado': 'Resultado',
+
+  'rental.contract.question': 'Tu contrato',
+  'rental.contract.help':
+    'Esta revisión es para contratos de alquiler de vivienda habitual. Con estas respuestas sabrás si el tuyo entra.',
+  'rental.contract.type': '¿Qué tipo de contrato es?',
+  'rental.contract_type.main_home': 'Vivienda habitual',
+  'rental.contract_type.main_home_hint': 'Vives en ella de forma permanente.',
+  'rental.contract_type.seasonal': 'De temporada',
+  'rental.contract_type.seasonal_hint':
+    'Para una temporada: estudios, un trabajo temporal o vacaciones.',
+  'rental.contract_type.room': 'Por habitaciones',
+  'rental.contract_type.room_hint': 'Alquilas una habitación, no la vivienda entera.',
+  'rental.contract_type.other_use': 'Otro uso',
+  'rental.contract_type.other_use_hint': 'Un local, una oficina, un garaje o un trastero.',
+  'rental.contract_type.protected': 'Vivienda protegida',
+  'rental.contract_type.protected_hint': 'Una vivienda de protección oficial.',
+  'rental.contract_type.old_rent': 'Renta antigua',
+  'rental.contract_type.old_rent_hint': 'Un contrato anterior al 9 de mayo de 1985.',
+  'rental.contract.signed': 'Fecha del contrato',
+  'rental.contract.signed_hint': 'El día en que se firmó el contrato.',
+  'rental.contract.start': 'Fecha de entrada',
+  'rental.contract.start_hint': 'El día desde el que cuenta el contrato: marca cada aniversario.',
+
+  'rental.landlord.question': 'Tu casero',
+  'rental.landlord.type': '¿Quién te alquila la vivienda?',
+  'rental.landlord.type_hint':
+    'Lo dice el contrato: el nombre de una persona o el de una sociedad (S.L., S.A.).',
+  'rental.landlord.large': '¿Tu casero es una empresa o tiene muchas viviendas?',
+  'rental.landlord.large_hint':
+    'La ley lo llama «gran tenedor»: quien tiene más de diez viviendas, o cinco en algunas zonas tensionadas.',
+  'rental.landlord.region': 'Comunidad autónoma',
+  'rental.landlord.region_hint': 'Donde está la vivienda.',
+  'rental.landlord.region_choose': 'Elige una',
+  'rental.landlord.stressed': '¿Está la vivienda en una zona tensionada?',
+  'rental.landlord.stressed_hint':
+    'Una zona declarada de mercado residencial tensionado. Si no lo sabes, el resultado te dice dónde mirarlo.',
+
+  'rental.entry.question': 'Lo que pagaste al entrar',
+  'rental.entry.help':
+    'La fianza, otras garantías y lo que te cobraron la agencia o el casero al empezar. Si no tienes un dato, déjalo en blanco.',
+  'rental.entry.deposit': 'Fianza',
+  'rental.entry.deposit_hint': 'En euros.',
+  'rental.entry.advance': 'Mensualidades por adelantado',
+  'rental.entry.advance_hint': 'Las que pagaste al entrar, contando la del primer mes.',
+  'rental.entry.guarantees': '¿Diste otras garantías además de la fianza?',
+  'rental.entry.guarantees_hint':
+    'Un depósito o garantía en dinero, un aval bancario o un seguro de impago.',
+  'rental.entry.guarantees_yes': 'Sí, añadirlas',
+  'rental.entry.guarantees_add': 'Añadir garantía',
+  'rental.entry.guarantee_kind': 'Tipo',
+  'rental.entry.guarantee_amount': 'Importe',
+  'rental.entry.guarantee_amount_hint':
+    'Si es un aval o un seguro y no lo sabes, déjalo en blanco.',
+  'rental.entry.fees': '¿Pagaste a la agencia o al casero algo más al entrar?',
+  'rental.entry.fees_hint':
+    'Honorarios, formalización del contrato, estudio de solvencia, reserva o gestión.',
+  'rental.entry.fees_yes': 'Sí, añadir pagos',
+  'rental.entry.fees_add': 'Añadir pago',
+  'rental.entry.fee_kind': 'Concepto',
+  'rental.entry.fee_amount': 'Importe',
+  'rental.entry.fee_later': '¿Te lo descontaron después de la renta o de la fianza?',
+  'rental.entry.fee_requested': '¿Pediste ese servicio por escrito?',
+
+  'rental.rent.question': 'La renta',
+  'rental.rent.initial': 'Renta al empezar',
+  'rental.rent.initial_hint': 'La que fija el contrato, en euros al mes.',
+  'rental.rent.months': 'Duración pactada, en meses',
+  'rental.rent.months_hint': 'Un año son 12 meses; cinco años, 60.',
+  'rental.rent.clause': '¿Qué dice el contrato sobre actualizar la renta?',
+  'rental.rent.clause_help':
+    'Búscalo en la cláusula de «actualización» o de «revisión» de la renta: suele nombrar el IRAV, el IPC o un porcentaje.',
+  'rental.clause.none': 'Nada: no prevé actualizarla',
+  'rental.clause.irav': 'El IRAV',
+  'rental.clause.ipc': 'El IPC',
+  'rental.clause.igc': 'El índice de garantía de competitividad (IGC)',
+  'rental.clause.unspecified_index': 'Que se actualiza, sin nombrar el índice',
+  'rental.clause.fixed_percent': 'Un porcentaje fijo',
+  'rental.clause.other': 'Otra fórmula',
+  'rental.rent.percent': 'Porcentaje al año',
+  'rental.rent.percent_hint': 'El que dice el contrato, por ejemplo 3.',
+
+  'rental.updates.question': 'Las subidas',
+  'rental.updates.help':
+    'Una fila por cada subida de la renta, con lo que pagabas antes y lo que pagas después.',
+  'rental.updates.none': 'No ha habido subidas',
+  'rental.updates.yes': 'Sí, añadirlas',
+  'rental.updates.add': 'Añadir subida',
+  'rental.updates.year': 'Año de la subida',
+  'rental.updates.year_hint': 'El del aniversario del contrato en que subió.',
+  'rental.updates.previous': 'Renta antes',
+  'rental.updates.new': 'Renta después',
+  'rental.updates.charged_from': 'Primer recibo con la renta nueva',
+  'rental.updates.charged_from_hint': 'Vale cualquier día de ese mes.',
+  'rental.updates.notice': '¿Cómo te avisaron?',
+  'rental.notice.letter': 'Carta',
+  'rental.notice.burofax': 'Burofax',
+  'rental.notice.receipt_note': 'Nota en el recibo',
+  'rental.notice.annex': 'Anexo al contrato',
+  'rental.notice.email': 'Correo electrónico',
+  'rental.notice.messaging': 'Mensaje (WhatsApp, SMS…)',
+  'rental.notice.verbal': 'De palabra',
+  'rental.notice.none': 'No me avisaron',
+  'rental.updates.notice_on': 'Fecha del aviso',
+  'rental.updates.agreed': '¿Aceptaste esa subida por escrito?',
+
+  'rental.charges.question': 'Los gastos',
+  'rental.charges.help':
+    'Gastos que te pasa el casero aparte de la renta: comunidad, IBI o basuras. Los suministros con contador (luz, agua, gas) son tuyos y no se revisan.',
+  'rental.charges.ask': '¿Te cobran gastos aparte de la renta?',
+  'rental.charges.yes': 'Sí, añadirlos',
+  'rental.charges.rows_hint': 'Una fila por concepto y año.',
+  'rental.charges.add': 'Añadir gasto',
+  'rental.charges.kind': 'Concepto',
+  'rental.charges.in_contract': '¿Lo pone el contrato?',
+  'rental.charges.agreed': 'Importe al año que fija el contrato',
+  'rental.charges.agreed_hint': 'Déjalo en blanco si el contrato no da una cifra.',
+  'rental.charges.year': 'Año',
+  'rental.charges.amount': 'Lo que te cobraron ese año',
+
+  'rental.moveout.question': 'La salida',
+  'rental.moveout.ask': '¿Has dejado ya la vivienda?',
+  'rental.moveout.keys': 'Día en que devolviste las llaves',
+  'rental.moveout.returns': 'Lo que te han devuelto de la fianza',
+  'rental.moveout.returns_hint': 'Una fila por cada pago; si no te han devuelto nada, ninguna.',
+  'rental.moveout.returns_add': 'Añadir devolución',
+  'rental.moveout.return_on': 'Fecha',
+  'rental.moveout.return_amount': 'Importe',
+  'rental.moveout.deductions': 'Lo que te han descontado',
+  'rental.moveout.deductions_add': 'Añadir descuento',
+  'rental.moveout.deduction_kind': 'Motivo',
+  'rental.moveout.deduction_amount': 'Importe',
+  'rental.deduction.damage': 'Desperfectos',
+  'rental.deduction.cleaning': 'Limpieza',
+  'rental.deduction.unpaid_rent': 'Renta pendiente',
+  'rental.deduction.unpaid_bills': 'Recibos pendientes',
+  'rental.deduction.wear': 'Desgaste',
+  'rental.deduction.other': 'Otro',
+
+  'rental.result.title': 'Resultado',
+  'rental.result.out_of_scope': 'Fuera de esta revisión',
+  'rental.result.summary': 'Resumen',
+  'rental.result.information': 'Para que lo sepas',
+  'rental.result.unchecked': 'Lo que esta revisión no mira',
+  'rental.result.rules': 'Normas',
+  'rental.result.how': 'Cómo se calcula',
+  'rental.result.sources': 'Fuentes',
+  'rental.result.restart': 'Empezar de nuevo',
+
+  'client.rental.answer.yes': 'Sí',
+  'client.rental.answer.no': 'No',
+  'client.rental.answer.unknown': 'No lo sé',
+  'client.rental.landlord.person': 'Una persona',
+  'client.rental.landlord.company': 'Una empresa',
+  'client.rental.guarantee.cash': 'Dinero',
+  'client.rental.guarantee.bank_guarantee': 'Aval bancario',
+  'client.rental.guarantee.insurance': 'Seguro de impago',
+  'client.rental.guarantee.other': 'Otra',
+  'client.rental.fee.agency_fee': 'Honorarios de agencia',
+  'client.rental.fee.formalisation': 'Formalización del contrato',
+  'client.rental.fee.solvency_check': 'Estudio de solvencia',
+  'client.rental.fee.reservation': 'Reserva',
+  'client.rental.fee.management': 'Gestión',
+  'client.rental.fee.other': 'Otro concepto',
+  'client.rental.charge.community': 'Comunidad',
+  'client.rental.charge.property_tax': 'IBI',
+  'client.rental.charge.waste': 'Basuras',
+  'client.rental.charge.other': 'Otro gasto',
+  'client.rental.region.AN': 'Andalucía',
+  'client.rental.region.AR': 'Aragón',
+  'client.rental.region.AS': 'Principado de Asturias',
+  'client.rental.region.IB': 'Illes Balears',
+  'client.rental.region.CN': 'Canarias',
+  'client.rental.region.CB': 'Cantabria',
+  'client.rental.region.CL': 'Castilla y León',
+  'client.rental.region.CM': 'Castilla-La Mancha',
+  'client.rental.region.CT': 'Cataluña',
+  'client.rental.region.VC': 'Comunitat Valenciana',
+  'client.rental.region.EX': 'Extremadura',
+  'client.rental.region.GA': 'Galicia',
+  'client.rental.region.MD': 'Comunidad de Madrid',
+  'client.rental.region.MC': 'Región de Murcia',
+  'client.rental.region.NC': 'Comunidad Foral de Navarra',
+  'client.rental.region.PV': 'País Vasco',
+  'client.rental.region.RI': 'La Rioja',
+  'client.rental.region.CE': 'Ceuta',
+  'client.rental.region.ML': 'Melilla',
+
+  'client.rental.rows.guarantees': 'Garantía {n}',
+  'client.rental.rows.guarantees_remove': 'Quitar la garantía {n}',
+  'client.rental.rows.fees': 'Pago {n}',
+  'client.rental.rows.fees_remove': 'Quitar el pago {n}',
+  'client.rental.rows.updates': 'Subida {n}',
+  'client.rental.rows.updates_remove': 'Quitar la subida {n}',
+  'client.rental.rows.charges': 'Gasto {n}',
+  'client.rental.rows.charges_remove': 'Quitar el gasto {n}',
+  'client.rental.rows.returns': 'Devolución {n}',
+  'client.rental.rows.returns_remove': 'Quitar la devolución {n}',
+  'client.rental.rows.deductions': 'Descuento {n}',
+  'client.rental.rows.deductions_remove': 'Quitar el descuento {n}',
+  'client.rental.rows.remove': 'Quitar',
+
+  'client.rental.error.missing_value': 'Falta este dato',
+  'client.rental.error.missing_choice': 'Elige una respuesta',
+  'client.rental.error.invalid_date': 'La fecha no es válida',
+  'client.rental.error.invalid_amount': 'No se entiende la cifra: escríbela como 1.234,56',
+  'client.rental.error.invalid_number': 'Escribe un número entero',
+  'client.rental.error.signed_in_future': 'La fecha del contrato es posterior a hoy',
+  'client.rental.error.start_too_early':
+    'La fecha de entrada es más de un año anterior a la del contrato',
+  'client.rental.error.amount_out_of_range':
+    'Escribe una cifra mayor que cero y de hasta un millón',
+  'client.rental.error.months_out_of_range': 'El número de meses no es válido',
+  'client.rental.error.percent_out_of_range': 'Escribe un porcentaje entre 0 y 100',
+  'client.rental.error.percent_missing': 'Falta el porcentaje',
+  'client.rental.error.unknown_region': 'Elige una comunidad autónoma',
+  'client.rental.error.not_an_anniversary':
+    'Ese año no hay aniversario del contrato: tiene que ser posterior al año de entrada',
+  'client.rental.error.effective_outside_year':
+    'El primer recibo con la renta nueva no cae en el año de esa subida',
+  'client.rental.error.update_in_future': 'Esa subida es posterior a hoy',
+  'client.rental.error.update_repeated': 'Esta subida ya está en otra fila',
+  'client.rental.error.charged_before_start':
+    'El primer recibo con la renta nueva es anterior a la fecha de entrada',
+  'client.rental.error.notice_date_missing': 'Falta la fecha del aviso',
+  'client.rental.error.notice_in_future': 'La fecha del aviso es posterior a hoy',
+  'client.rental.error.year_out_of_range': 'El año no encaja con las fechas del contrato',
+  'client.rental.error.keys_before_start': 'La entrega de llaves es anterior a la fecha de entrada',
+  'client.rental.error.keys_in_future': 'La entrega de llaves es posterior a hoy',
+  'client.rental.error.return_before_keys': 'La devolución es anterior a la entrega de llaves',
+  'client.rental.error.return_in_future': 'La devolución es posterior a hoy',
+
+  'client.rental.result.lead': 'Cada partida, con lo que dice la ley y la norma en que se apoya.',
+  'client.rental.result.lead_locked':
+    'Cada partida con su resultado redondeado y la norma en que se apoya.',
+  'client.rental.result.lead_out_of_scope':
+    'Con lo que has contestado, esta revisión no calcula nada.',
+  'client.rental.out_of_scope.status': 'Esta revisión no cubre tu tipo de contrato',
+  'client.rental.out_of_scope.before_2019_status': 'Esta revisión no cubre tu contrato',
+  'client.rental.out_of_scope.before_2019':
+    'Esta versión no revisa contratos firmados antes del 6 de marzo de 2019: siguen otras reglas para actualizar la renta.',
+  'client.rental.out_of_scope.seasonal':
+    'Un contrato de temporada no es de vivienda habitual y la ley le da otras reglas.',
+  'client.rental.out_of_scope.room':
+    'Un alquiler por habitaciones no sigue las reglas de vivienda habitual que revisa esta versión.',
+  'client.rental.out_of_scope.other_use':
+    'Un contrato para un uso distinto del de vivienda tiene sus propias reglas.',
+  'client.rental.out_of_scope.protected':
+    'Una vivienda protegida tiene su renta máxima y sus reglas propias.',
+  'client.rental.out_of_scope.old_rent': 'Un contrato de renta antigua sigue otras reglas.',
+
+  'client.rental.headline.found': 'Hay partidas por encima de lo que permite la ley.',
+  'client.rental.headline.only_doubtful':
+    'Nada seguro por encima de la ley: lo que sale depende de dudas que esta revisión no puede resolver.',
+  'client.rental.headline.nothing_found':
+    'Con los datos que has metido, nada sale por encima de lo que permite la ley.',
+  'client.rental.headline.nothing_entered':
+    'No has metido datos que se puedan comparar con la ley.',
+  'client.rental.total.paidOver': 'Pagas o has pagado de más al menos unos {importe}.',
+  'client.rental.total.paidOver_up_to':
+    'Pagas o has pagado de más al menos unos {importe}, y hasta unos {maximo} según se resuelvan las dudas.',
+  'client.rental.total.paidOver_doubtful':
+    'Según se resuelvan las dudas, podrías haber pagado de más hasta unos {maximo}.',
+  'client.rental.total.owed': 'Te deben al menos unos {importe}.',
+  'client.rental.total.owed_up_to':
+    'Te deben al menos unos {importe}, y hasta unos {maximo} según se resuelvan las dudas.',
+  'client.rental.total.owed_doubtful':
+    'Según se resuelvan las dudas, podrían deberte hasta unos {maximo}.',
+  'client.rental.total.overCap': 'Por encima del tope legal, al menos unos {importe}.',
+  'client.rental.total.overCap_up_to':
+    'Por encima del tope legal, al menos unos {importe}, y hasta unos {maximo} según se resuelvan las dudas.',
+  'client.rental.total.overCap_doubtful':
+    'Según se resuelvan las dudas, podría haber hasta unos {maximo} por encima del tope legal.',
+
+  'client.rental.item.fee': 'Pago al entrar: {concepto}',
+  'client.rental.item.guarantees': 'Fianza y garantías en dinero',
+  'client.rental.item.guarantee': 'Garantía: {tipo}',
+  'client.rental.item.advance': 'Pago por adelantado',
+  'client.rental.item.rent_update': 'Subida del {fecha}',
+  'client.rental.item.charge_year': '{concepto} de {ejercicio}',
+  'client.rental.item.deposit_return': 'Devolución de la fianza',
+  'client.rental.item.deposit_interest': 'Intereses por el retraso',
+  'client.rental.item.rules': 'Normas de esta partida',
+
+  'client.rental.status.paid_over': 'Pagas de más: unos {importe}',
+  'client.rental.status.paid_over_little': 'Pagas de más: menos de 10 €',
+  'client.rental.status.owed': 'Te deben unos {importe}',
+  'client.rental.status.owed_little': 'Te deben menos de 10 €',
+  'client.rental.status.over_cap': 'Por encima del tope: unos {importe}',
+  'client.rental.status.over_cap_little': 'Por encima del tope: menos de 10 €',
+  'client.rental.status.over_cap_no_amount': 'Por encima del tope',
+  'client.rental.status.within_limit': 'Dentro del límite',
+  'client.rental.status.not_checkable': 'No se puede comprobar',
+  'client.rental.status.not_applicable_to_date': 'No aplica a la fecha de tu contrato',
+  'client.rental.status.not_entered': 'No lo has metido',
+  'client.rental.status.review_it': 'Revísalo',
+  'client.rental.status.not_yet_due': 'Aún en plazo',
+  'client.rental.status.depends': 'Depende',
+  'client.rental.reading.paid_over': 'pagas de más',
+  'client.rental.reading.owed': 'te deben',
+  'client.rental.reading.over_cap': 'por encima del tope',
+  'client.rental.reading.within_limit': 'dentro del límite',
+  'client.rental.reading.not_checkable': 'no se puede comprobar',
+  'client.rental.reading.not_applicable_to_date': 'no aplica a tu fecha',
+  'client.rental.reading.not_entered': 'sin dato',
+  'client.rental.reading.review_it': 'revísalo',
+  'client.rental.reading.not_yet_due': 'aún en plazo',
+  'client.rental.depends': 'Depende de {motivo}: entre {minimo} y {maximo}',
+  'client.rental.depends_status': 'Depende de {motivo}: {una} o {otra}',
+  'client.rental.reason.pending_validation':
+    'si el Congreso convalida una norma aún pendiente de convalidación',
+  'client.rental.reason.repealed_window': 'cómo se lea una norma que ya está derogada',
+  'client.rental.reason.large_landlord_unknown': 'si tu casero es gran tenedor',
+  'client.rental.reason.index_month_doubtful': 'qué dato del índice estaba publicado ese día',
+  'client.rental.reason.agreement_unknown': 'si lo pactasteis por escrito',
+  'client.rental.reason.notice_form_doubtful':
+    'si un aviso por correo o mensaje cuenta como aviso por escrito',
+  'client.rental.reason.interest_day_count': 'si el año de intereses cuenta 365 días o 360',
+  'client.rental.reason.extraordinary_cap_reach':
+    'si los topes extraordinarios de la renta alcanzan a los gastos',
+  'client.rental.reason_list': '{a}, de {b}',
+  'client.rental.reason_join': '{a} y de {b}',
+  'client.rental.share.out': 'No se suma al total mientras esa duda siga abierta.',
+  'client.rental.share.lowest': 'Al total se suma solo la cuenta más baja: {importe}.',
+  'client.rental.hint.company_landlord':
+    'En tu contrato el casero es una empresa: puede ser gran tenedor.',
+  'client.rental.norm.in_force': 'en vigor',
+  'client.rental.norm.pending_validation': 'pendiente de convalidación',
+  'client.rental.norm.repealed': 'derogada el {fecha}',
+  'client.rental.source.since': 'con efectos desde el {desde}',
+  'client.rental.source.between': 'con efectos del {desde} al {hasta}',
+
+  'client.rental.detail.base': 'Renta de partida',
+  'client.rental.detail.agreed': 'Lo pactado',
+  'client.rental.detail.cap': 'Tope legal',
+  'client.rental.detail.max_rent': 'Renta máxima',
+  'client.rental.detail.charged': 'Renta que pagas',
+  'client.rental.detail.months': 'Meses contados',
+  'client.rental.detail.monthly': 'De más cada mes',
+  'client.rental.detail.accumulated': 'De más en total',
+  'client.rental.detail.index': '{indice} de {mes}: {tasa}, publicado el {fecha}',
+  'client.rental.detail.index_flash': '{indice} adelantado de {mes}: {tasa}, publicado el {fecha}',
+  'client.rental.detail.fixed_rate': '{tasa} fijo',
+  'client.rental.detail.reading_low': 'Una cuenta',
+  'client.rental.detail.reading_high': 'La otra cuenta',
+  'client.rental.index.irav': 'IRAV',
+  'client.rental.index.ipc': 'IPC',
+  'client.rental.index.igc': 'IGC',
+
+  'client.rental.info.serpavi':
+    'SERPAVI, precio de referencia del alquiler (Ministerio de Vivienda)',
+  'client.rental.info.lau': 'Ley de Arrendamientos Urbanos (BOE)',
+  'client.rental.info.stressed_zone.title': 'Zona tensionada',
+  'client.rental.info.stressed_zone.text_yes':
+    'En una zona tensionada la renta inicial puede tener tope (art. 17.6 y 17.7 LAU). Esta revisión no lo calcula; el precio de referencia está en SERPAVI.',
+  'client.rental.info.stressed_zone.text_unknown':
+    'Si la vivienda está en una zona tensionada, la renta inicial puede tener tope (art. 17.6 y 17.7 LAU). Las zonas las declara cada comunidad; el precio de referencia está en SERPAVI.',
+  'client.rental.info.reference_price.title': 'Precio de referencia',
+  'client.rental.info.reference_price.text':
+    'El Real Decreto-ley 29/2026, pendiente de convalidación, no permite subir la renta mientras pase del precio de referencia. Esta revisión no lo calcula; el precio está en SERPAVI.',
+  'client.rental.info.minimum_term.title': 'Hasta cuándo dura tu contrato',
+  'client.rental.info.minimum_term.text':
+    'Tu contrato acaba el {contractEnd}. Con la prórroga obligatoria, tu plazo mínimo acaba el {mandatoryEnd}.',
+  'client.rental.info.notice_windows.title': 'Prórroga año a año',
+  'client.rental.info.notice_windows.text':
+    'Si nadie avisa a tiempo (el casero, hasta el {landlordBy}; tú, hasta el {tenantBy}), el contrato sigue año a año hasta el {tacitUntil}.',
+  'client.rental.info.extensions_rdl28.title': 'Prórrogas desde el 15 de noviembre de 2026',
+  'client.rental.info.extensions_rdl28.text':
+    'El Real Decreto-ley 28/2026, pendiente de convalidación, cambia las prórrogas desde el 15 de noviembre de 2026. Tu plazo mínimo acaba el {mandatoryEnd}.',
+  'client.rental.info.extension_rdl29.title': 'Prórroga extraordinaria',
+  'client.rental.info.extension_rdl29.text':
+    'El Real Decreto-ley 29/2026, pendiente de convalidación, prevé una prórroga extraordinaria para los contratos cuyo plazo acaba entre el {from} y el {until}.',
+  'client.rental.info.deposit_lodging.title': 'Depósito de la fianza',
+  'client.rental.info.deposit_lodging.text':
+    'El casero deposita la fianza en el organismo de la comunidad autónoma que lo prevea (disposición adicional 3.ª LAU).',
+  'client.rental.info.regional_rules.title': 'Normas de tu comunidad',
+  'client.rental.info.regional_rules.text':
+    '{comunidad} puede tener normas propias que se suman a las estatales. Esta revisión solo aplica las estatales.',
+  'client.rental.info.meters.title': 'Suministros con contador',
+  'client.rental.info.meters.text':
+    'La luz, el agua o el gas con contador los pagas según lo que gastas (art. 20.3 LAU), así que no se revisan aquí.',
+  'client.rental.info.guarantee_return.title': 'Devolución de las garantías',
+  'client.rental.info.guarantee_return.text':
+    'Las garantías en dinero, además de la fianza, también vuelven a ti al acabar el contrato.',
+  'client.rental.info.closing_document.title': 'Documento de finalización',
+  'client.rental.info.closing_document.text':
+    'Desde el 8 de octubre de 2026, si al dejar la vivienda no hay un documento de finalización, se presume que la devolviste en buen estado (art. 36.7 LAU).',
+
+  'client.rental.unchecked.initial_rent_cap': 'El tope de la renta inicial en zonas tensionadas.',
+  'client.rental.unchecked.regional_rules': 'Las normas propias de tu comunidad autónoma.',
+  'client.rental.unchecked.extensions': 'Las prórrogas y los preavisos, más allá de sus fechas.',
+  'client.rental.unchecked.damage': 'Si los desperfectos justifican un descuento de la fianza.',
+  'client.rental.unchecked.later_agreements': 'Si un acuerdo posterior cambió el contrato.',
+
+  'client.rental.calculation.item.not_entered': 'No has metido este dato.',
+  'client.rental.calculation.rent_update.base_initial':
+    'Se parte de la renta del contrato: {rent}.',
+  'client.rental.calculation.rent_update.base_previous_max':
+    'Se parte de la renta máxima del año anterior, no de la cobrada: {rent}.',
+  'client.rental.calculation.rent_update.base_from_answer':
+    'Sin la subida del año anterior, se parte de la renta que pagabas antes: {rent}.',
+  'client.rental.calculation.rent_update.no_clause':
+    'El contrato no prevé actualizar la renta, así que no cabe subida (art. 18.1 LAU).',
+  'client.rental.calculation.rent_update.before_anniversary':
+    'Se cobraron {months} meses con la renta nueva antes del aniversario del {anniversary}; en ellos tocaba pagar {base}.',
+  'client.rental.calculation.rent_update.second_rise':
+    'Ya hubo una subida en el año del aniversario del {anniversary}: la del {date} no cabe.',
+  'client.rental.calculation.rent_update.figure.index':
+    '{index} de {month}: {rate}, publicado el {published}',
+  'client.rental.calculation.rent_update.figure.flash':
+    '{index} adelantado de {month}: {rate}, publicado el {published}',
+  'client.rental.calculation.rent_update.figure.fixed': '{rate} fijo',
+  'client.rental.calculation.rent_update.agreed': 'Lo que pacta el contrato: {rate}.',
+  'client.rental.calculation.rent_update.agreed_other':
+    'El contrato pacta otra fórmula: la subida solo se compara con el tope.',
+  'client.rental.calculation.rent_update.cap': 'Tope legal: {rate}.',
+  'client.rental.calculation.rent_update.max_rent': 'Renta máxima: {base} más el {rate}, {max}.',
+  'client.rental.calculation.rent_update.negative_rate':
+    'La variación fue del {rate}: no permite subir.',
+  'client.rental.calculation.rent_update.agreed_in_writing':
+    'Aceptaste la subida por escrito, así que no se compara con el índice.',
+  'client.rental.calculation.rent_update.large_landlord_cap':
+    'Si tu casero es gran tenedor, el tope se aplica aunque aceptaras la subida.',
+  'client.rental.calculation.rent_update.charged_before_notice':
+    'Se cobraron {months} meses con la renta nueva antes del mes siguiente al aviso por escrito; en ellos tocaba pagar {base}.',
+  'client.rental.calculation.rent_update.notice_not_written':
+    'Sin aviso por escrito, se cobraron {months} meses con la renta nueva cuando tocaba pagar {base}.',
+  'client.rental.calculation.rent_update.months': 'Meses contados: {months}, de {from} a {to}.',
+  'client.rental.calculation.rent_update.monthly_over': 'Pagas {monthly} de más cada mes.',
+  'client.rental.calculation.rent_update.within_limit': 'La renta nueva no pasa de la máxima.',
+  'client.rental.calculation.rent_update.other_clause_within_cap':
+    'La renta nueva no pasa del tope; lo que pacta tu contrato no se puede comprobar.',
+  'client.rental.calculation.rent_update.index_not_loaded':
+    'El dato del índice de ese mes aún no está en esta revisión, así que no se calcula.',
+  'client.rental.calculation.rent_update.index_publication_unknown':
+    'No se sabe qué día se publicó el dato del índice de ese mes, así que no se calcula.',
+  'client.rental.calculation.rent_update.index_none_published':
+    'El índice aún no se publicaba ese día, así que no se puede aplicar.',
+  'client.rental.calculation.rent_update.flash_not_loaded':
+    'Ese día ya había un IPC adelantado que esta revisión no tiene, así que no se calcula.',
+  'client.rental.calculation.rent_update.too_many_readings':
+    'Hay demasiadas dudas abiertas a la vez para calcular esta subida.',
+  'client.rental.calculation.fees.company_landlord':
+    'En un contrato firmado desde el 6 de marzo de 2019 con una empresa como casero, estos gastos son de la empresa.',
+  'client.rental.calculation.fees.person_landlord':
+    'Con un casero persona y un contrato anterior al 26 de mayo de 2023, la ley no ponía estos gastos a su cargo.',
+  'client.rental.calculation.fees.landlord_pays':
+    'Desde el 26 de mayo de 2023, la gestión inmobiliaria y la formalización del contrato son del casero.',
+  'client.rental.calculation.fees.any_name':
+    'Desde el 8 de octubre de 2026 no se te puede cobrar la gestión ni la formalización, se llame como se llame.',
+  'client.rental.calculation.fees.other_name':
+    'Puede ser un honorario con otro nombre: el art. 20.1 LAU pone a cargo del casero la gestión inmobiliaria y la formalización del contrato.',
+  'client.rental.calculation.fees.requested_in_writing':
+    'Si pediste ese servicio por escrito, la ley permite cobrarlo.',
+  'client.rental.calculation.fees.paid_over': 'Pagaste {amount} por ello.',
+  'client.rental.calculation.guarantees.deposit_excess':
+    'La fianza es de una mensualidad: de los {deposit}, {excess} pasan de los {rent} y cuentan como garantía.',
+  'client.rental.calculation.guarantees.money': 'Garantías en dinero: {money}; el tope es {cap}.',
+  'client.rental.calculation.guarantees.over_cap': 'Pasan del tope {amount}.',
+  'client.rental.calculation.guarantees.within_cap': 'No pasan del tope.',
+  'client.rental.calculation.guarantees.long_contract':
+    'Con una duración pactada de {months} meses, por encima de {limit}, la ley no pone tope a las garantías.',
+  'client.rental.calculation.guarantees.not_money':
+    'Esta garantía no es dinero: no se suma al tope en euros.',
+  'client.rental.calculation.guarantees.only_money_compared':
+    'Solo las garantías en dinero se comparan con el tope.',
+  'client.rental.calculation.guarantees.insurance_banned':
+    'Desde el 8 de octubre de 2026 no se puede exigir un seguro de impago.',
+  'client.rental.calculation.guarantees.insurance_before_ban':
+    'Antes del 8 de octubre de 2026, si un seguro de impago cuenta dentro del tope de dos mensualidades no está resuelto.',
+  'client.rental.calculation.advance.over_cap':
+    'Pagaste {months} mensualidades por adelantado y la ley permite una: pasan del tope {amount}, a {rent} al mes.',
+  'client.rental.calculation.advance.within_cap': 'No pasa de una mensualidad por adelantado.',
+  'client.rental.calculation.charges.not_in_contract':
+    'Este gasto no aparece en tu contrato; te cobraron {charged}.',
+  'client.rental.calculation.charges.no_annual_amount':
+    'El contrato no fija su importe al año, que el art. 20.1 LAU pide para pasártelo.',
+  'client.rental.calculation.charges.agreed': 'Importe al año pactado: {amount}.',
+  'client.rental.calculation.charges.year_cap':
+    'En {year} la renta podía subir un {rise} y el gasto, el doble: de {previous} a {cap}.',
+  'client.rental.calculation.charges.over_cap':
+    'Te cobraron {charged} y el máximo era {cap}: {amount} de más.',
+  'client.rental.calculation.charges.within_cap': 'Te cobraron {charged}, sin pasar de {cap}.',
+  'client.rental.calculation.charges.rise_upper_bound':
+    'Esa cifra es solo un máximo, porque tu contrato pacta otra fórmula: lo cobrado no pasa de ahí.',
+  'client.rental.calculation.charges.rise_not_checkable':
+    'La subida que permitía la renta en {year} no se puede calcular, así que tampoco la del gasto.',
+  'client.rental.calculation.charges.too_many_readings':
+    'Hay demasiadas dudas abiertas a la vez para calcular este gasto.',
+  'client.rental.calculation.charges.past_first_years':
+    'Pasados los {years} primeros años del contrato, la ley no limita cuánto sube este gasto.',
+  'client.rental.calculation.charges.tax_outside_cap':
+    'Es un tributo: queda fuera del límite de subida de los gastos.',
+  'client.rental.calculation.charges.tax_banned':
+    'En un contrato firmado desde el 8 de octubre de 2026, los tributos de la vivienda no se te pueden pasar salvo que debas pagarlos tú; te cobraron {charged}.',
+  'client.rental.calculation.charges.waste_may_be_tax':
+    'La tasa de basuras es un tributo en la mayoría de municipios: queda fuera del límite de subida.',
+  'client.rental.calculation.charges.other_kind':
+    'Puede ser un suministro con contador, que es tuyo, o un tributo: no se compara con un límite.',
+  'client.rental.calculation.deposit.pending':
+    'Fianza {deposit}; devuelto {returned}; descontado {deducted}; queda {pending}.',
+  'client.rental.calculation.deposit.deduction.damage': 'Descuento por desperfectos: {amount}.',
+  'client.rental.calculation.deposit.deduction.cleaning': 'Descuento por limpieza: {amount}.',
+  'client.rental.calculation.deposit.deduction.unpaid_rent':
+    'Descuento por renta pendiente: {amount}.',
+  'client.rental.calculation.deposit.deduction.unpaid_bills':
+    'Descuento por recibos pendientes: {amount}.',
+  'client.rental.calculation.deposit.deduction.wear': 'Descuento por desgaste: {amount}.',
+  'client.rental.calculation.deposit.deduction.other': 'Otro descuento: {amount}.',
+  'client.rental.calculation.deposit.deductions_not_judged':
+    'Esta revisión no valora si los descuentos están justificados.',
+  'client.rental.calculation.deposit.owed': 'Te deben {amount} de la fianza.',
+  'client.rental.calculation.deposit.not_yet_due':
+    'El casero tiene hasta el {due} para devolverla.',
+  'client.rental.calculation.deposit.returned_in_full': 'No queda nada por devolver.',
+  'client.rental.calculation.deposit.returned_on_time':
+    'Te la devolvieron antes del {from}, cuando habría empezado a correr el interés.',
+  'client.rental.calculation.deposit.returned_after_month':
+    'Te la devolvieron el {from}, el día en que empezaba a correr el interés: no da intereses.',
+  'client.rental.calculation.deposit.late_part_above_month':
+    'Lo devuelto tarde es lo que pasaba de una mensualidad ({rent}), que no genera interés.',
+  'client.rental.calculation.deposit.interest_not_yet': 'El interés empieza a correr el {from}.',
+  'client.rental.calculation.deposit.interest_deposit_only':
+    'Solo genera interés la fianza, una mensualidad ({rent}); lo que pasaba de ella es otra garantía.',
+  'client.rental.calculation.deposit.interest_stretch':
+    '{amount} del {from} al {to}: {days} días al {rate} sobre {yearDays} días al año, {interest}.',
+  'client.rental.calculation.deposit.interest_day_count':
+    'Ninguna norma dice si el año de intereses cuenta 365 días o 360: se hacen las dos cuentas.',
+  'client.rental.calculation.deposit.interest_total': 'Intereses: {total}.',
+  'client.rental.calculation.deposit.interest_rate_not_loaded':
+    'El interés legal de {year} aún no está en esta revisión: desde ese año no se cuenta.',
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof es;

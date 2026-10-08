@@ -4,15 +4,17 @@ import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
 import { homeGraph } from '../content/structured-data';
 import { DOCUMENTS } from '../documents/config';
+import { RENTAL_BUILD } from '../content/sections';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
+// With the rental review built, its card is live and labelled as a beta.
 const comingSoon = [
   ['salary', tx('home.contract')],
-  ['settlement', tx('home.rent')],
+  ...(RENTAL_BUILD ? [] : ([['settlement', tx('home.rent')]] as const)),
 ] as const;
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
 const documents = DOCUMENTS !== null;
@@ -29,7 +31,7 @@ const documents = DOCUMENTS !== null;
   <main class="home" id="content">
     <div class="home__head">
       <h1 class="home__title">{tx('home.h1')}</h1>
-      <p class="home__lead">{tx('home.lead')}</p>
+      <p class="home__lead">{tx(RENTAL_BUILD ? 'home.lead_rental' : 'home.lead')}</p>
       <p class="home__note">{tx(documents ? 'home.note_documents' : 'home.note')}</p>
     </div>
 
@@ -57,6 +59,22 @@ const documents = DOCUMENTS !== null;
         </section>
         <span class="item__tab" aria-hidden="true"></span>
       </li>
+      {RENTAL_BUILD && (
+        <li class="item index__live" data-tone="settlement">
+          <section class="sheet" data-tone="dates" aria-labelledby="index-rental">
+            <h2 class="index__name" id="index-rental">
+              <a href={link(lang, 'alquiler/')}>{tx('home.rent')}</a>{' '}
+              <span class="beta">{tx('home.beta')}</span>
+            </h2>
+            <p class="index__text">{tx('home.rent_text')}</p>
+            <p class="index__citation">{tx('home.rent_citation')}</p>
+            <p class="index__more">
+              <a href={link(lang, 'alquiler/irav-ipc/')}>{tx('home.rent_indices')}</a>
+            </p>
+          </section>
+          <span class="item__tab" aria-hidden="true"></span>
+        </li>
+      )}
       {comingSoon.map(([tone, name]) => (
         <li class="item index__soon" data-tone={tone}>
           <section

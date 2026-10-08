@@ -1,0 +1,11 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Rental from '../../views/Rental.astro';
+import { RENTAL_BUILD } from '../../content/sections';
+
+// Without PUBLIC_RENTAL=1 the build has no /alquiler/ at all.
+export const getStaticPaths = (() =>
+  RENTAL_BUILD ? [{ params: { path: undefined } }] : []) satisfies GetStaticPaths;
+---
+
+<Rental lang="es" />
