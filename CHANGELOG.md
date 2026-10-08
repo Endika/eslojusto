@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.24.0](https://github.com/Endika/eslojusto/compare/v1.23.0...v1.24.0) (2026-10-08)
+
+
+### Features
+
+* **employment:** add the PDF report, the company letter and the 15.9 certificate request ([e153de1](https://github.com/Endika/eslojusto/commit/e153de1aa7c24a0214722cd6ab95b9d67f274b89))
+
+
+### Bug Fixes
+
+* **employment:** count the lower of two shortfalls, the higher only as «y hasta» ([8dfbe53](https://github.com/Endika/eslojusto/commit/8dfbe5313fcf8ee3f78349642a5fe5281aafb0e4))
+* **employment:** never speak of the pass where only the free letters show ([dc239a6](https://github.com/Endika/eslojusto/commit/dc239a61e4a6e571d6a981a0b8f7e18163f993ae))
+* **employment:** offer the 15.9 request only for findings on fixed-term contracts ([8ab66ab](https://github.com/Endika/eslojusto/commit/8ab66ab2cb90d6713a346cf7c62376b39a47fa00))
+* **engine:** keep both minimum wage readings when they fall short by different amounts ([2df550f](https://github.com/Endika/eslojusto/commit/2df550fdb167ccbbb2bf2c18340b16d64068b407))
+
 ## [1.23.0](https://github.com/Endika/eslojusto/compare/v1.22.0...v1.23.0) (2026-10-08)
 
 
