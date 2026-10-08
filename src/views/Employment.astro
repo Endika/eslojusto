@@ -1,0 +1,79 @@
+---
+import Base from '../layouts/Base.astro';
+import EmploymentForm from '../components/EmploymentForm.astro';
+import EmploymentResult from '../components/EmploymentResult.astro';
+import { EMPLOYMENT_BETA } from '../content/sections';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+// Each tab's share of the rail follows how many sheets its section holds (the result counts two).
+// The second column is the section's first step, whose id is its URL fragment.
+const sections = [
+  ['cause', 'relacion', '01', 1],
+  ['dates', 'modalidad', '02', 2],
+  ['salary', 'salario', '03', 2],
+  ['holidays', 'jornada', '04', 1],
+  ['settlement', 'prueba', '05', 3],
+  ['result', 'resultado', '06', 2],
+] as const;
+---
+
+<Base
+  title={tx('employment.title')}
+  description={tx('employment.description')}
+  path="/contrato/"
+  lang={lang}
+  section="cause"
+>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
+    <ol>
+      {/* Only a section already reached is a link; one still ahead is plain text until then. */}
+      {sections.map(([id, step, number, weight], i) => (
+        <li style={`--weight: ${weight}`} data-tone={id}>
+          {i === 0 ? (
+            <a class="tab" data-tab={id} data-state="current" href={`#${step}`} aria-current="step">
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`employment.tab.${step}`)}</span>
+            </a>
+          ) : (
+            <span class="tab" data-tab={id} data-state="pending" aria-disabled="true">
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`employment.tab.${step}`)}</span>
+            </span>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+  <main id="content">
+    <div class="desk">
+      <header class="desk__head">
+        <h1 class="desk__title">{tx('employment.h1')}</h1>
+        <p class="desk__lead">{tx('employment.lead')}</p>
+        {EMPLOYMENT_BETA && (
+          <p class="desk__beta">
+            <span class="beta">{tx('employment.beta')}</span>
+            {tx('employment.beta_note')}
+          </p>
+        )}
+      </header>
+      <noscript>
+        <div class="sheet sheet--notice">
+          <p class="help">{tx('employment.no_js')}</p>
+        </div>
+      </noscript>
+      <EmploymentForm lang={lang} />
+      <EmploymentResult lang={lang} />
+    </div>
+  </main>
+</Base>
+
+<script>
+  import '../scripts/employment';
+</script>

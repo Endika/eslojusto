@@ -17,6 +17,7 @@ export default defineConfig({
       'tests/lint/**/*.test.ts',
       'tests/documents/**/*.test.ts',
       'tests/rental/**/*.test.ts',
+      'tests/employment/**/*.test.ts',
       'tests/content/**/*.test.ts',
     ],
   },

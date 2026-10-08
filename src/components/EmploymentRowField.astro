@@ -1,0 +1,39 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+// A field inside a row of a list: the rows script names and links its control.
+interface Props {
+  name: string;
+  label: string;
+  kind: 'amount' | 'number' | 'date' | 'month' | 'time' | 'text';
+  hint?: string;
+  attributes?: Record<string, string>;
+}
+const { name, label, kind, hint, attributes = {} } = Astro.props;
+const input: HTMLAttributes<'input'> =
+  kind === 'amount' || kind === 'number'
+    ? {
+        type: 'text',
+        inputmode: kind === 'amount' ? 'decimal' : 'numeric',
+        autocomplete: 'off',
+        spellcheck: 'false',
+      }
+    : { type: kind === 'text' ? 'text' : kind };
+---
+
+<div class="field" data-row-box={name} {...attributes}>
+  <label class="field__label" data-row-label={name}>
+    {label}
+  </label>
+  {kind === 'text' ? (
+    <textarea class="field__input field__input--text" rows="3" data-row-field={name}></textarea>
+  ) : (
+    <input class="field__input field__input--figure" dir="ltr" data-row-field={name} {...input} />
+  )}
+  {hint && (
+    <p class="hint" data-row-hint={name}>
+      {hint}
+    </p>
+  )}
+  <p class="errata" data-row-error={name} hidden></p>
+</div>

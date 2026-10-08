@@ -10,12 +10,16 @@ const documents = process.env['TEST_DOCUMENTS'] === '1';
 const rental = process.env['TEST_RENTAL'] === '1';
 // Matched on the file name alone, so a folder named after a section never opts every spec in.
 const rentalSpecs = /[\\/]rental[^\\/]*\.spec\.ts$/;
-const optInSpecs = [/(rtl|analytics|documents)\.spec\.ts/, rentalSpecs];
+// The employment project needs a build with /contrato/, which a normal build leaves out.
+const employment = process.env['TEST_EMPLOYMENT'] === '1';
+const employmentSpecs = /[\\/]employment[^\\/]*\.spec\.ts$/;
+const optInSpecs = [/(rtl|analytics|documents)\.spec\.ts/, rentalSpecs, employmentSpecs];
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
 // The documents project reads documents on /alquiler/ too, so its build has that page.
 const buildEnv = {
   ...(rental || documents ? { PUBLIC_RENTAL: '1' } : {}),
+  ...(employment ? { PUBLIC_EMPLOYMENT: '1' } : {}),
   ...(analytics ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
     ? {
@@ -59,6 +63,15 @@ export default defineConfig({
             testMatch: rentalSpecs,
             // Reading documents on /alquiler/ needs the documents project's build.
             testIgnore: /documents\.spec\.ts/,
+          },
+        ]
+      : []),
+    ...(employment
+      ? [
+          {
+            name: 'employment',
+            use: { ...devices['Desktop Chrome'] },
+            testMatch: employmentSpecs,
           },
         ]
       : []),

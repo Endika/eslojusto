@@ -1,0 +1,45 @@
+---
+// A list whose rows the person adds, each in its own box; the list scrolls inside itself.
+interface Props {
+  list: string;
+  label: string;
+  add: string;
+  remove: string;
+  full: string;
+  min: number;
+  max: number;
+  hint?: string;
+  attributes?: Record<string, string>;
+}
+const { list, label, add, remove, full, min, max, hint, attributes = {} } = Astro.props;
+const plus = 'M12 5v14M5 12h14';
+const cross = 'M6 6l12 12M18 6 6 18';
+---
+
+<div class="rows" data-rows={list} data-min={String(min)} data-max={String(max)} {...attributes}>
+  {hint && <p class="hint">{hint}</p>}
+  <ol class="rows__list" data-rows-list aria-label={label}></ol>
+  <p class="hint" data-rows-full hidden>
+    {full}
+  </p>
+  <button class="button button--sheet" type="button" data-rows-add>
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+      <path d={plus}></path>
+    </svg>
+    {add}
+  </button>
+  <template data-rows-template>
+    <li class="row" data-row>
+      <fieldset class="group row__group">
+        <legend data-row-legend></legend>
+        <slot />
+        <button class="row__remove" type="button" data-row-remove>
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+            <path d={cross}></path>
+          </svg>
+          {remove}
+        </button>
+      </fieldset>
+    </li>
+  </template>
+</div>

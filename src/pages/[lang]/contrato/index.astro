@@ -1,0 +1,13 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Employment from '../../../views/Employment.astro';
+import { EMPLOYMENT_BUILD } from '../../../content/sections';
+import { langPaths, type Lang } from '../../../i18n/languages';
+
+export const getStaticPaths = (() =>
+  EMPLOYMENT_BUILD ? langPaths() : []) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+---
+
+<Employment lang={lang} />

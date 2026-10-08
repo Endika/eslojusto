@@ -1,0 +1,11 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Employment from '../../views/Employment.astro';
+import { EMPLOYMENT_BUILD } from '../../content/sections';
+
+// Without PUBLIC_EMPLOYMENT=1 the build has no /contrato/ at all.
+export const getStaticPaths = (() =>
+  EMPLOYMENT_BUILD ? [{ params: { path: undefined } }] : []) satisfies GetStaticPaths;
+---
+
+<Employment lang="es" />

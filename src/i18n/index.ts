@@ -21,16 +21,21 @@ export function t(lang: Lang, key: Key, vars?: Variables): string {
 }
 
 // The strings the browser scripts need, for the page to ship as JSON. Those of document reading
-// and the pass ship only in a build that has them, and the rental review's only on its page.
+// and the pass ship only in a build that has them, and each review section's only on its page.
 export const clientStrings = (
   lang: Lang,
-  { documents = false, rental = false }: { documents?: boolean; rental?: boolean } = {},
+  {
+    documents = false,
+    rental = false,
+    employment = false,
+  }: { documents?: boolean; rental?: boolean; employment?: boolean } = {},
 ): Partial<Record<Key, string>> =>
   Object.fromEntries(
     Object.entries(DICTIONARIES[lang]).filter(
       ([key]) =>
         key.startsWith('client.') &&
         (documents || !key.startsWith('client.documents.')) &&
-        (rental || !key.startsWith('client.rental.')),
+        (rental || !key.startsWith('client.rental.')) &&
+        (employment || !key.startsWith('client.employment.')),
     ),
   );

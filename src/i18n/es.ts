@@ -1045,6 +1045,1069 @@ export const es = {
   'home.rent_citation': 'Ley de Arrendamientos Urbanos · IRAV e IPC del INE',
   'home.beta': 'Beta',
 
+  'home.contract_text':
+    'Tu contrato de trabajo frente a lo que garantiza la ley, punto por punto: salario y SMI, tipo de contrato, periodo de prueba, jornada, vacaciones y cláusulas.',
+  'home.contract_citation': 'Estatuto de los Trabajadores · SMI 2026 · RD 723/2026',
+
+  'employment.title': 'Revisión de contrato de trabajo: SMI, temporalidad y cláusulas',
+  'employment.description':
+    'Comprueba tu contrato de trabajo frente a lo que garantiza la ley: salario y SMI, tipo de contrato, periodo de prueba, jornada, vacaciones y cláusulas. Todo en tu dispositivo.',
+  'employment.h1': 'Comprueba si tu contrato de trabajo es justo',
+  'employment.lead':
+    'Revisa tu contrato punto por punto frente al Estatuto de los Trabajadores y el SMI: qué queda por debajo de lo que garantiza la ley o por encima de sus límites, con el artículo al lado.',
+  'employment.beta': 'Beta',
+  'employment.beta_note':
+    'Sección en pruebas. Tu convenio colectivo puede mejorar lo que dice la ley: lo que depende de él se dice siempre.',
+  'employment.no_js':
+    'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
+  'employment.form_aria': 'Revisión del contrato de trabajo',
+  'employment.tab.relacion': 'Relación',
+  'employment.tab.modalidad': 'Contrato',
+  'employment.tab.salario': 'Salario',
+  'employment.tab.jornada': 'Jornada',
+  'employment.tab.prueba': 'Condiciones',
+  'employment.tab.resultado': 'Resultado',
+  'employment.choose': 'Elige uno',
+  'employment.answer.yes': 'Sí',
+  'employment.answer.no': 'No',
+  'employment.answer.unknown': 'No lo sé',
+  'employment.rows.full': 'Has llegado al máximo de filas de esta lista.',
+
+  'employment.relation.question': 'Tu relación laboral',
+  'employment.relation.help':
+    'Esta revisión es para la relación laboral común del Estatuto de los Trabajadores. Con estas respuestas sabrás si la tuya entra.',
+  'employment.relation.kind': '¿Qué relación tienes con la empresa?',
+  'employment.relationship.common': 'Trabajo por cuenta ajena',
+  'employment.relationship.common_hint':
+    'La relación de casi todo el mundo: trabajas para una empresa a cambio de un salario.',
+  'employment.relationship.household': 'Empleo del hogar',
+  'employment.relationship.household_hint': 'Trabajas en una casa particular.',
+  'employment.relationship.senior_management': 'Alta dirección',
+  'employment.relationship.senior_management_hint':
+    'Diriges la empresa con poderes propios de su titular.',
+  'employment.relationship.sport': 'Deporte profesional',
+  'employment.relationship.sport_hint': 'Eres deportista profesional.',
+  'employment.relationship.artist': 'Artes escénicas',
+  'employment.relationship.artist_hint': 'Trabajas en espectáculos o en la producción artística.',
+  'employment.relationship.law_firm': 'Abogacía en un despacho',
+  'employment.relationship.law_firm_hint': 'Ejerces la abogacía en un despacho ajeno.',
+  'employment.relationship.medical_resident': 'Residencia sanitaria',
+  'employment.relationship.medical_resident_hint': 'Haces la residencia (MIR, EIR, FIR…).',
+  'employment.relationship.special_employment_centre': 'Centro especial de empleo',
+  'employment.relationship.special_employment_centre_hint':
+    'Trabajas en un centro especial de empleo con una discapacidad reconocida.',
+  'employment.relationship.public_servant': 'Personal funcionario',
+  'employment.relationship.public_servant_hint': 'Eres funcionario o funcionaria.',
+  'employment.relationship.other_special': 'Otra relación especial',
+  'employment.relationship.other_special_hint':
+    'Por ejemplo, estibadores, penados en instituciones penitenciarias o representantes de comercio.',
+  'employment.relation.agency':
+    '¿Te contrató una empresa de trabajo temporal para trabajar en otra?',
+  'employment.relation.agency_hint': 'Una ETT que te pone a disposición de una empresa usuaria.',
+  'employment.relation.relief': '¿Es un contrato de relevo?',
+  'employment.relation.relief_hint':
+    'El que se hace para sustituir a quien se jubila de forma parcial.',
+  'employment.relation.minor': '¿Tienes menos de 18 años?',
+  'employment.relation.written': '¿Tienes el contrato por escrito?',
+  'employment.relation.written_hint': 'Un documento con tu nombre y el de la empresa.',
+  'employment.relation.start': 'Fecha de inicio',
+  'employment.relation.start_hint': 'El día en que empezaste o empiezas a trabajar.',
+  'employment.relation.end': 'Fecha de fin',
+  'employment.relation.end_hint': 'Si el contrato es temporal y la dice. Si no, déjalo en blanco.',
+  'employment.relation.signed': 'Fecha del contrato',
+  'employment.relation.signed_hint':
+    'El día en que se firmó el contrato, si lo sabes. Si no, déjalo en blanco.',
+
+  'employment.modality.question': 'Tu tipo de contrato',
+  'employment.modality.help':
+    'Lo dice el título del contrato o su primera cláusula. Si en tus nóminas sale una clave (100, 402, 410…), también ayuda a reconocerlo.',
+  'employment.modality.kind': '¿Qué tipo de contrato es?',
+  'employment.modality.permanent_hint': 'Sin fecha de fin. Clave 100 o 200.',
+  'employment.modality.discontinuous_hint':
+    'Indefinido, pero solo trabajas en temporadas o periodos. Clave 300.',
+  'employment.modality.production_hint':
+    'Temporal por un aumento de trabajo que no se puede atender con la plantilla. Clave 402 o 502.',
+  'employment.modality.production_occasional_hint':
+    'Temporal por situaciones ocasionales y previsibles de corta duración, como campañas.',
+  'employment.modality.replacement_hint':
+    'Temporal para sustituir a alguien con derecho a volver a su puesto. Clave 410 o 510.',
+  'employment.modality.replacement_selection_hint':
+    'Temporal para cubrir un puesto mientras dura un proceso de selección.',
+  'employment.modality.training_alternance_hint':
+    'Trabajo y estudios a la vez, con un plan formativo. Clave 421.',
+  'employment.modality.training_practice_hint':
+    'Primer trabajo tras terminar los estudios, para practicar lo aprendido. Clave 420.',
+  'employment.modality.work_or_service_hint':
+    'Un nombre de antes de 2022. Si tu contrato lo usa, márcalo aunque sea reciente.',
+  'employment.modality.eventual_hint':
+    'Otro nombre de antes de 2022 para el contrato por circunstancias de la producción.',
+  'employment.modality.interim_hint':
+    'Otro nombre de antes de 2022 para el contrato de sustitución.',
+  'employment.modality.unknown_hint': 'Si no lo tienes claro, márcalo y lo dirá el resultado.',
+  'employment.modality.extensions': 'Número de prórrogas',
+  'employment.modality.extensions_hint': 'Las veces que se ha alargado. Si ninguna, 0.',
+  'employment.modality.cause': '¿El contrato explica la causa de que sea temporal?',
+  'employment.modality.cause_hint':
+    'Qué ha pasado en la empresa para necesitar el contrato: un pedido, una campaña…',
+  'employment.modality.circumstances':
+    '¿Y explica las circunstancias concretas y su relación con la duración?',
+  'employment.modality.replaced_named':
+    '¿El contrato dice el nombre de la persona a la que sustituyes?',
+  'employment.modality.replacement_cause': '¿Y la causa de la sustitución?',
+  'employment.modality.discontinuous_help': 'Pueden estar de forma estimada.',
+  'employment.modality.activity_period': '¿El contrato dice el periodo de actividad?',
+  'employment.modality.discontinuous_hours': '¿Dice la jornada?',
+  'employment.modality.distribution': '¿Dice cómo se reparte el horario?',
+  'employment.modality.plan': '¿El contrato lleva tu plan formativo individual?',
+  'employment.modality.studies_end': 'Fecha en que acabaste los estudios',
+  'employment.modality.studies_end_hint': 'Los que dan acceso a este contrato.',
+  'employment.modality.disability': '¿Tienes una discapacidad reconocida?',
+  'employment.modality.disability_hint': 'Cambia el plazo desde que acabaste los estudios.',
+  'employment.modality.effective_1': 'Trabajo efectivo el primer año, en %',
+  'employment.modality.effective_hint':
+    'La parte de la jornada que trabajas, sin la formación. Si no lo sabes, déjalo en blanco.',
+  'employment.modality.effective_2': 'Trabajo efectivo el segundo año, en %',
+
+  'employment.history.question': 'Tus contratos anteriores',
+  'employment.history.help':
+    'Opcional. Con tu vida laboral se puede comprobar si los contratos temporales seguidos pasan del límite de 18 meses en 24. Cuenta también el actual si sale en ella.',
+  'employment.history.ask': '¿Quieres meter contratos de tu vida laboral?',
+  'employment.history.yes': 'Sí, añadirlos',
+  'employment.history.add': 'Añadir contrato',
+  'employment.history.from': 'Desde',
+  'employment.history.to': 'Hasta',
+  'employment.history.employer': 'Empresa',
+  'employment.history.kind': 'Tipo de contrato',
+  'employment.employer.same': 'La misma empresa',
+  'employment.employer.same_group': 'Otra empresa del mismo grupo',
+  'employment.employer.same_via_agency': 'La misma empresa, a través de una ETT',
+  'employment.employer.other': 'Otra empresa',
+  'employment.period_kind.production': 'Por circunstancias de la producción',
+  'employment.period_kind.replacement': 'De sustitución',
+  'employment.period_kind.training': 'Formativo',
+  'employment.period_kind.permanent': 'Indefinido',
+  'employment.period_kind.unknown': 'No lo sé',
+
+  'employment.salary.question': 'Tu salario',
+  'employment.salary.help':
+    'Lo que dice el contrato, en bruto. Si no tienes un dato opcional, déjalo en blanco.',
+  'employment.salary.amount': 'Salario bruto',
+  'employment.salary.amount_hint': 'En euros, antes de impuestos y cotizaciones.',
+  'employment.salary.period': '¿Por qué periodo es esa cifra?',
+  'employment.period.year': 'Al año',
+  'employment.period.month': 'Al mes',
+  'employment.period.day': 'Al día',
+  'employment.period.hour': 'A la hora',
+  'employment.salary.extra_pays': 'Pagas extra al año',
+  'employment.salary.extra_pays_hint': 'Lo normal son 2, en verano y en Navidad. Si no hay, 0.',
+  'employment.salary.prorated': '¿Las pagas extra van prorrateadas en cada nómina?',
+  'employment.salary.prorated_hint': 'Repartidas en las 12 nóminas en vez de cobrarse aparte.',
+  'employment.salary.in_kind': 'Salario en especie',
+  'employment.salary.in_kind_hint':
+    'Vivienda, comida, coche… en euros y por el mismo periodo que el salario. Opcional.',
+  'employment.salary.breakdown': '¿El contrato desglosa el salario?',
+  'employment.salary.breakdown_hint':
+    'Salario base y complementos por separado, en el mismo periodo que el total.',
+  'employment.salary.breakdown_yes': 'Sí, añadir las partes',
+  'employment.salary.parts_add': 'Añadir parte',
+  'employment.salary.part_kind': 'Concepto',
+  'employment.salary.part_amount': 'Importe',
+  'employment.part.base': 'Salario base',
+  'employment.part.fixed_complement': 'Complemento fijo',
+  'employment.part.variable': 'Complemento variable',
+  'employment.part.unknown': 'No sé de qué tipo',
+  'employment.salary.weekly_hours': 'Horas a la semana',
+  'employment.salary.weekly_hours_hint': 'Las que fija el contrato.',
+  'employment.salary.annual_hours': 'Horas al año',
+  'employment.salary.annual_hours_hint': 'Si el contrato las da al año en vez de a la semana.',
+  'employment.agreement.title': 'Tu convenio',
+  'employment.agreement.help':
+    'Esta revisión no tiene las tablas de los convenios. Si sabes estos datos, se comparan «según tu dato».',
+  'employment.agreement.named': '¿El contrato nombra tu convenio colectivo?',
+  'employment.agreement.full_time': 'Jornada completa de tu convenio, horas a la semana',
+  'employment.agreement.full_time_hint': 'Si no la sabes, se toma la legal de 40 horas.',
+  'employment.agreement.category_salary': 'Salario de tu categoría en el convenio, al año',
+  'employment.agreement.annual_hours': 'Jornada anual de tu convenio, en horas',
+  'employment.agreement.your_figure': 'Opcional: se usa como dato tuyo.',
+
+  'employment.payslips.question': 'Tus nóminas',
+  'employment.payslips.help':
+    'Opcional. Cada nómina de un mes completo y sin incidencias se compara con el SMI de ese mes.',
+  'employment.payslips.ask': '¿Quieres meter nóminas?',
+  'employment.payslips.yes': 'Sí, añadirlas',
+  'employment.payslips.add': 'Añadir nómina',
+  'employment.payslips.month': 'Mes',
+  'employment.payslips.month_hint': 'Como 2026-03.',
+  'employment.payslips.salary': 'Devengos salariales en dinero',
+  'employment.payslips.salary_hint':
+    'Salario base y complementos, sin horas extra, dietas ni la prorrata de pagas.',
+  'employment.payslips.prorated': 'Prorrata de pagas extra',
+  'employment.payslips.in_kind': 'Salario en especie',
+  'employment.payslips.whole_month': '¿Trabajaste el mes completo?',
+  'employment.payslips.incidents': '¿Tiene incidencias (baja, ausencias)?',
+
+  'employment.time.question': 'Tu jornada',
+  'employment.time.schedule': '¿Quieres meter tu horario semanal?',
+  'employment.time.schedule_hint':
+    'Con él se comprueban las horas al día, los descansos y las pausas.',
+  'employment.time.schedule_yes': 'Sí, añadir el horario',
+  'employment.time.slots_hint': 'Un tramo por fila: si partes la jornada, dos tramos ese día.',
+  'employment.time.slot_add': 'Añadir tramo',
+  'employment.time.day': 'Día',
+  'employment.time.from': 'Desde',
+  'employment.time.to': 'Hasta',
+  'employment.time.shifts': '¿Trabajas a turnos?',
+  'employment.time.night': '¿Trabajas de noche?',
+  'employment.time.night_hint': 'Al menos 3 horas de tu jornada entre las 22:00 y las 6:00.',
+  'employment.time.irregular': '¿El contrato reparte la jornada de forma irregular en el año?',
+  'employment.time.irregular_hint': 'Semanas con más horas y otras con menos.',
+  'employment.time.overtime': '¿El contrato te obliga a hacer horas extra?',
+  'employment.time.overtime_hint': 'Una cláusula que las hace obligatorias, no las voluntarias.',
+  'employment.time.overtime_yes': 'Sí',
+  'employment.time.overtime_kind': '¿Cuántas?',
+  'employment.time.overtime_hours_choice': 'Un número de horas al año',
+  'employment.time.overtime_as_needed': 'Las que hagan falta',
+  'employment.time.overtime_hours': 'Horas extra al año',
+  'employment.time.overtime_paid': '¿Se pagan en dinero?',
+  'employment.time.overtime_paid_hint': 'En vez de compensarse con descanso.',
+  'employment.time.part_time': '¿Es un contrato a tiempo parcial?',
+  'employment.time.hours_stated': '¿El contrato dice cuántas horas trabajas?',
+  'employment.time.distribution_stated': '¿Dice cómo se reparten?',
+  'employment.time.complementary': '¿Tiene un pacto de horas complementarias?',
+  'employment.time.complementary_hint':
+    'Horas además de las del contrato que la empresa puede pedirte.',
+  'employment.time.complementary_percent': 'Horas complementarias, en % de las ordinarias',
+  'employment.time.complementary_notice': 'Días de preaviso',
+  'employment.time.voluntary_percent': 'Horas complementarias voluntarias, en %',
+  'employment.time.voluntary_hint': 'Si el contrato las ofrece. Si no, déjalo en blanco.',
+  'employment.time.remote': 'Teletrabajo, en % de tu jornada',
+  'employment.time.remote_hint': 'Si no teletrabajas, 0. Opcional.',
+  'employment.time.real_hours': 'Horas que trabajas de verdad a la semana',
+  'employment.time.real_hours_hint': 'Opcional: solo para comparar con el salario.',
+
+  'employment.trial.question': 'Tu periodo de prueba',
+  'employment.trial.ask': '¿El contrato tiene periodo de prueba?',
+  'employment.trial.amount': 'Duración',
+  'employment.trial.unit': 'En',
+  'employment.unit.days': 'Días',
+  'employment.unit.weeks': 'Semanas',
+  'employment.unit.months': 'Meses',
+  'employment.trial.technical': '¿Eres técnico titulado?',
+  'employment.trial.technical_hint':
+    'Con un título universitario o de formación profesional superior, y trabajas en funciones de ese título.',
+  'employment.trial.small_company': '¿Tu empresa tiene menos de 25 personas en plantilla?',
+  'employment.trial.same_duties': '¿Ya habías hecho este mismo trabajo en esta empresa?',
+  'employment.trial.after_training': '¿Vienes de un contrato formativo en esta empresa?',
+  'employment.trial.agreement': 'Periodo de prueba máximo de tu convenio, en meses',
+
+  'employment.holidays.question': 'Tus vacaciones',
+  'employment.holidays.ask': '¿El contrato dice cuántos días de vacaciones tienes?',
+  'employment.holidays.days': 'Días de vacaciones al año',
+  'employment.holidays.unit': '¿Qué días son?',
+  'employment.holidays.calendar': 'Naturales',
+  'employment.holidays.working': 'Laborables',
+  'employment.holidays.per_week': 'Días de trabajo a la semana',
+  'employment.holidays.per_week_hint': 'Como 5, de lunes a viernes.',
+  'employment.holidays.in_salary': '¿Dice que las vacaciones van incluidas en el salario?',
+  'employment.holidays.in_salary_hint': 'Pagadas en dinero en vez de disfrutadas.',
+  'employment.holidays.agreement': 'Días de vacaciones de tu convenio',
+
+  'employment.clauses.question': 'Cláusulas',
+  'employment.clauses.help':
+    'Opcional. Elige qué tipo de cláusula es y responde lo que se pregunta: se revisa por sus datos, no por su redacción.',
+  'employment.clauses.ask': '¿Quieres revisar alguna cláusula?',
+  'employment.clauses.yes': 'Sí, añadirlas',
+  'employment.clauses.add': 'Añadir cláusula',
+  'employment.clauses.label': 'Tipo de cláusula',
+  'employment.clauses.months': 'Duración, en meses',
+  'employment.clauses.months_hint': 'Si no la dice, déjalo en blanco.',
+  'employment.clauses.compensation': '¿Prevé una compensación económica?',
+  'employment.clauses.training': '¿Menciona una formación pagada por la empresa?',
+  'employment.clauses.waived': '¿A qué renuncias?',
+  'employment.waived.holidays': 'A vacaciones',
+  'employment.waived.salary': 'A parte del salario',
+  'employment.waived.severance': 'A la indemnización',
+  'employment.waived.other': 'A otra cosa',
+  'employment.clauses.costs': '¿Pone a tu cargo los gastos del teletrabajo?',
+  'employment.clauses.text': 'Lo que dice la cláusula',
+  'employment.clauses.text_hint': 'Opcional: se muestra en el resultado tal como lo escribas.',
+
+  'employment.info.question': 'Lo que el contrato tiene que decir',
+  'employment.info.help':
+    'Desde el 5 de octubre de 2026 la empresa tiene que darte esta información por escrito. Marca si está en el contrato o en otro documento.',
+  'employment.info.present': 'Está',
+  'employment.info.by_reference': 'Remite al convenio o a la ley',
+  'employment.info.absent': 'No está',
+
+  'employment.offer.question': 'La oferta de empleo',
+  'employment.offer.help':
+    'Opcional. Se pone al lado del contrato, sin decir cuál vale: la ley no fija qué valor tiene una oferta.',
+  'employment.offer.ask': '¿Quieres comparar la oferta con el contrato?',
+  'employment.offer.yes': 'Sí, añadir la oferta',
+  'employment.offer.gross': 'Salario al año de la oferta',
+  'employment.offer.gross_hint': 'Si no lo decía, déjalo en blanco.',
+  'employment.offer.hours': 'Horas a la semana de la oferta',
+  'employment.offer.net': '¿La cifra de la oferta era neta?',
+  'employment.offer.modality': 'Tipo de contrato de la oferta',
+  'employment.offer.remote': 'Teletrabajo de la oferta',
+  'employment.offer.not_said': 'No lo decía',
+
+  'employment.result.title': 'Resultado',
+  'employment.result.out_of_scope': 'Fuera de esta revisión',
+  'employment.result.summary': 'Resumen',
+  'employment.result.information': 'Para que lo sepas',
+  'employment.result.unchecked': 'Lo que esta revisión no mira',
+  'employment.result.rules': 'Normas',
+  'employment.result.how': 'Cómo se calcula',
+  'employment.result.sources': 'Fuentes',
+  'employment.result.duty_list': 'La lista completa',
+  'employment.result.offer_detail': 'Lado a lado',
+  'employment.result.restart': 'Empezar de nuevo',
+
+  'client.employment.about': 'unos {importe}',
+  'client.employment.and': '{a} y {b}',
+  'client.employment.unit.day_one': '{n} día',
+  'client.employment.unit.day_many': '{n} días',
+  'client.employment.unit.week_one': '{n} semana',
+  'client.employment.unit.week_many': '{n} semanas',
+  'client.employment.unit.month_one': '{n} mes',
+  'client.employment.unit.month_many': '{n} meses',
+  'client.employment.unit.contract_one': '{n} contrato',
+  'client.employment.unit.contract_many': '{n} contratos',
+  'client.employment.unit.extension_one': '{n} prórroga',
+  'client.employment.unit.extension_many': '{n} prórrogas',
+  'client.employment.unit.extra_pay_one': '{n} paga extra',
+  'client.employment.unit.extra_pay_many': '{n} pagas extra',
+  'client.employment.weekday.1': 'lunes',
+  'client.employment.weekday.2': 'martes',
+  'client.employment.weekday.3': 'miércoles',
+  'client.employment.weekday.4': 'jueves',
+  'client.employment.weekday.5': 'viernes',
+  'client.employment.weekday.6': 'sábado',
+  'client.employment.weekday.7': 'domingo',
+
+  'client.employment.modality.permanent': 'Indefinido',
+  'client.employment.modality.discontinuous': 'Fijo discontinuo',
+  'client.employment.modality.production': 'Por circunstancias de la producción',
+  'client.employment.modality.production_occasional': 'Por situaciones ocasionales y previsibles',
+  'client.employment.modality.replacement': 'De sustitución',
+  'client.employment.modality.replacement_selection':
+    'Para cubrir un puesto durante un proceso de selección',
+  'client.employment.modality.training_alternance': 'Formativo en alternancia',
+  'client.employment.modality.training_practice': 'Formativo para la práctica profesional',
+  'client.employment.modality.work_or_service': 'De obra o servicio',
+  'client.employment.modality.eventual': 'Eventual por circunstancias de la producción',
+  'client.employment.modality.interim': 'De interinidad',
+  'client.employment.modality.unknown': 'No lo sé',
+  'client.employment.remote.none': 'sin teletrabajo',
+  'client.employment.remote.hybrid': 'en parte',
+  'client.employment.remote.full': 'todo en teletrabajo',
+  'client.employment.clause.non_compete': 'No competencia',
+  'client.employment.clause.retention': 'Permanencia',
+  'client.employment.clause.exclusivity': 'Exclusividad',
+  'client.employment.clause.waiver': 'Renuncia a un derecho',
+  'client.employment.clause.mandatory_overtime': 'Horas extra obligatorias',
+  'client.employment.clause.overtime_included': 'Horas extra incluidas en el salario',
+  'client.employment.clause.remote_work_costs': 'Gastos del teletrabajo',
+  'client.employment.clause.other': 'Otra cláusula',
+  'client.employment.info.a': 'Quiénes son las partes',
+  'client.employment.info.b': 'Fecha de inicio y, si es temporal, de fin o duración',
+  'client.employment.info.c': 'Domicilio de la empresa y centro de trabajo',
+  'client.employment.info.d': 'Tus funciones y, si es temporal, su causa',
+  'client.employment.info.e': 'Categoría o grupo profesional y descripción del puesto',
+  'client.employment.info.f': 'Salario base, cada complemento, cuándo y cómo se paga',
+  'client.employment.info.g': 'Jornada, horario, turnos, horas extra y vacaciones',
+  'client.employment.info.h': 'Periodo de prueba y su duración',
+  'client.employment.info.i': 'Formación',
+  'client.employment.info.j': 'Empresa de trabajo temporal y empresa usuaria',
+  'client.employment.info.k': 'Sistemas algorítmicos que deciden sobre tu trabajo',
+  'client.employment.info.l': 'Plan de igualdad y protocolo contra el acoso',
+  'client.employment.info.m': 'Medidas para la igualdad de las personas LGTBI',
+  'client.employment.info.n': 'Cómo termina el contrato y sus preavisos',
+  'client.employment.info.o': 'Convenio colectivo, con su código y su fecha de publicación',
+  'client.employment.info.p': 'Mutua, mejoras voluntarias y planes de pensiones',
+  'client.employment.info.q': 'Cuándo se puede modificar el contrato',
+
+  'client.employment.rows.history': 'Contrato {n}',
+  'client.employment.rows.history_remove': 'Quitar el contrato {n}',
+  'client.employment.rows.parts': 'Parte {n}',
+  'client.employment.rows.parts_remove': 'Quitar la parte {n}',
+  'client.employment.rows.payslips': 'Nómina {n}',
+  'client.employment.rows.payslips_remove': 'Quitar la nómina {n}',
+  'client.employment.rows.schedule': 'Tramo {n}',
+  'client.employment.rows.schedule_remove': 'Quitar el tramo {n}',
+  'client.employment.rows.clauses': 'Cláusula {n}',
+  'client.employment.rows.clauses_remove': 'Quitar la cláusula {n}',
+  'client.employment.rows.remove': 'Quitar',
+
+  'client.employment.error.missing_value': 'Falta este dato',
+  'client.employment.error.missing_choice': 'Elige una respuesta',
+  'client.employment.error.invalid_amount': 'No se entiende la cifra: escríbela como 1.234,56',
+  'client.employment.error.invalid_number': 'Escribe un número entero',
+  'client.employment.error.invalid_date': 'La fecha no es válida',
+  'client.employment.error.too_far_ahead': 'La fecha es más de un año posterior a hoy',
+  'client.employment.error.before_start': 'Es anterior a la fecha de inicio',
+  'client.employment.error.too_late_after_start': 'Es más de un año posterior a la fecha de inicio',
+  'client.employment.error.amount_range': 'Escribe una cifra mayor que cero y de hasta un millón',
+  'client.employment.error.hours_range': 'El número de horas no es válido',
+  'client.employment.error.percent_range': 'Escribe un porcentaje entre 0 y 100',
+  'client.employment.error.payments_range': 'El número de pagas no es válido',
+  'client.employment.error.count_range': 'El número no es válido',
+  'client.employment.error.invalid_month': 'Escribe el mes como 2026-03',
+  'client.employment.error.invalid_time': 'La hora no es válida',
+  'client.employment.error.empty_slot': 'El tramo empieza y acaba a la misma hora',
+
+  'client.employment.result.lead': 'Cada punto, con lo que dice la ley y la norma en que se apoya.',
+  'client.employment.result.lead_locked': 'Cada punto con su resultado y la norma en que se apoya.',
+  'client.employment.result.lead_out_of_scope':
+    'Con lo que has contestado, esta revisión no calcula nada.',
+  'client.employment.partial.notice':
+    'Revisión parcial: tu contrato empezó o se hizo antes del 30 de marzo de 2022. Se revisan el salario, el periodo de prueba, la jornada, las vacaciones y las cláusulas; la temporalidad se rige por la norma anterior y esta versión no la revisa.',
+  'client.employment.out_of_scope.status': 'Esta revisión no cubre tu tipo de contrato',
+  'client.employment.out_of_scope.special_relationship':
+    'Es una relación laboral especial, con sus propias normas, que esta versión no revisa.',
+  'client.employment.out_of_scope.public_servant':
+    'El personal funcionario tiene su propio régimen, fuera del Estatuto de los Trabajadores.',
+  'client.employment.out_of_scope.temp_agency':
+    'Un contrato con una empresa de trabajo temporal para trabajar en otra tiene reglas propias que esta versión no revisa.',
+  'client.employment.out_of_scope.relief':
+    'Un contrato de relevo tiene reglas propias que esta versión no revisa.',
+  'client.employment.out_of_scope.minor':
+    'Con menos de 18 años hay reglas propias de jornada y descanso. Esta versión no las calcula: abajo las tienes como información.',
+
+  'client.employment.headline.found':
+    'Hay puntos por debajo de lo que garantiza la ley o por encima de sus límites.',
+  'client.employment.headline.to_review':
+    'Nada sale seguro fuera de la ley, pero hay puntos que dependen de tu convenio, de tus respuestas o que hay que revisar.',
+  'client.employment.headline.nothing_found':
+    'Con los datos que has metido, nada queda por debajo de lo que garantiza la ley ni por encima de sus límites.',
+  'client.employment.headline.nothing_entered':
+    'No has metido datos que se puedan comparar con la ley.',
+  'client.employment.warning.breakdown_short_of_total':
+    'El desglose suma menos que el salario: la parte que falta se cuenta como un complemento de tipo desconocido.',
+
+  'client.employment.status.below_minimum': 'Por debajo del mínimo legal',
+  'client.employment.status.below_minimum_year': 'Por debajo del SMI: {importe} al año',
+  'client.employment.status.below_minimum_day': 'Por debajo del SMI: {importe} por jornada',
+  'client.employment.status.below_minimum_payslips': 'Por debajo del SMI: {importe} en tus nóminas',
+  'client.employment.status.below_minimum_amount': 'Por debajo del mínimo legal: {importe}',
+  'client.employment.status.over_legal_limit': 'Por encima del límite legal',
+  'client.employment.status.clause_void': 'Esta cláusula no vale',
+  'client.employment.status.becomes_permanent': 'La ley prevé la condición de fija',
+  'client.employment.status.missing_requirement': 'Falta lo que exige la ley',
+  'client.employment.status.within_limit': 'Dentro del límite',
+  'client.employment.status.depends_on_agreement': 'Depende de tu convenio',
+  'client.employment.status.review_it': 'Revísalo',
+  'client.employment.status.not_applicable_to_date': 'No aplica a tu fecha',
+  'client.employment.status.not_entered': 'No lo has metido',
+  'client.employment.status.not_reviewed_in_this_version': 'No se revisa en esta versión',
+  'client.employment.status.not_published': 'SMI aún no publicado',
+  'client.employment.status.depends': 'Depende',
+  'client.employment.reading_status.below_minimum': 'por debajo del mínimo legal',
+  'client.employment.reading_status.below_minimum_amount': 'por debajo del SMI en {importe}',
+  'client.employment.reading_status.over_legal_limit': 'por encima del límite legal',
+  'client.employment.reading_status.clause_void': 'esta cláusula no vale',
+  'client.employment.reading_status.becomes_permanent': 'la ley prevé la condición de fija',
+  'client.employment.reading_status.missing_requirement': 'falta lo que exige la ley',
+  'client.employment.reading_status.within_limit': 'dentro del límite',
+  'client.employment.reading_status.depends_on_agreement': 'depende de tu convenio',
+  'client.employment.reading_status.review_it': 'revísalo',
+  'client.employment.reading_status.not_applicable_to_date': 'no aplica a tu fecha',
+  'client.employment.reading_status.not_entered': 'sin dato',
+  'client.employment.reading_status.not_reviewed_in_this_version': 'no se revisa en esta versión',
+  'client.employment.reading_status.not_published': 'SMI aún no publicado',
+  'client.employment.reading_line': '{cuando}: {resultado}',
+  'client.employment.question.technical': 'Depende de si eres técnico titulado:',
+  'client.employment.question.small_company':
+    'Depende de si tu empresa tiene menos de 25 personas en plantilla:',
+  'client.employment.question.chaining_cutoff':
+    'Depende de qué contrato anterior a la reforma de 2022 cuenta:',
+  'client.employment.question.chaining_group':
+    'Depende de si cuentan los contratos con otras empresas del grupo o por ETT:',
+  'client.employment.question.chaining_overlap':
+    'Depende de si los contratos que se solapan son uno solo:',
+  'client.employment.question.complement_kind':
+    'Depende de si los complementos cuentan para el SMI:',
+  'client.employment.question.paid_hours':
+    'Depende de si las horas al año incluyen el descanso pagado:',
+  'client.employment.question.technical_and_staff':
+    'Depende de si eres técnico titulado y del tamaño de tu empresa:',
+  'client.employment.reading.technical': 'Si eres técnico titulado',
+  'client.employment.reading.not_technical': 'Si no lo eres',
+  'client.employment.reading.under_25_staff': 'Con menos de 25 personas',
+  'client.employment.reading.from_25_staff': 'Con 25 personas o más',
+  'client.employment.reading.cutoff_2021_12_31': 'Si cuenta el vigente el 31-12-2021',
+  'client.employment.reading.cutoff_2022_03_30': 'Si cuenta el vigente el 30-03-2022',
+  'client.employment.reading.group_counted': 'Si cuentan',
+  'client.employment.reading.group_not_counted': 'Si no cuentan',
+  'client.employment.reading.overlap_same_contract': 'Si son un solo contrato',
+  'client.employment.reading.overlap_separate_contracts': 'Si son contratos distintos',
+  'client.employment.reading.complement_fixed': 'Si cuentan todos los complementos',
+  'client.employment.reading.complement_variable':
+    'Si solo cuentan el salario base y los complementos fijos',
+  'client.employment.reading.effective_hours': 'Si son horas de trabajo efectivo',
+  'client.employment.reading.with_paid_rest': 'Si incluyen el descanso pagado',
+  'client.employment.reading.not_technical_under_25_staff':
+    'Si no lo eres y tu empresa tiene menos de 25 personas',
+  'client.employment.reading.not_technical_from_25_staff':
+    'Si no lo eres y tu empresa tiene 25 o más',
+  'client.employment.since_start': 'Desde que empezó el contrato, {importe} en total.',
+  'client.employment.note.your_answer': 'Según lo que has contestado.',
+  'client.employment.note.agreement': 'Tu convenio puede fijar otro límite.',
+  'client.employment.permanent.15_4':
+    'El artículo 15.4 del Estatuto de los Trabajadores dice que, en un caso como el tuyo, la persona adquiere la condición de fija:',
+  'client.employment.permanent.15_5':
+    'El artículo 15.5 del Estatuto de los Trabajadores dice que, en un caso como el tuyo, la persona adquiere la condición de fija:',
+  'client.employment.literal.intro': 'Lo que dice la norma ({cita}):',
+  'client.employment.literal.link': 'Texto en el BOE: {cita}',
+  'client.employment.clause_not_assessed':
+    'Sin veredicto: esta revisión no valora esta cláusula por su redacción.',
+  'client.employment.clause_checked_in': 'Se revisa con tu jornada, en las horas extra.',
+  'client.employment.norm.in_force': 'en vigor',
+  'client.employment.norm.pending_validation': 'pendiente de convalidación',
+  'client.employment.norm.repealed': 'derogada el {fecha}',
+  'client.employment.source.since': 'con efectos desde el {desde}',
+  'client.employment.source.between': 'con efectos del {desde} al {hasta}',
+
+  'client.employment.duty.title': 'Información obligatoria por escrito',
+  'client.employment.duty.short_relation': 'No aplica: tu contrato dura cuatro semanas o menos.',
+  'client.employment.duty.ended_before_decree':
+    'No aplica: tu contrato terminó antes del 5 de octubre de 2026.',
+  'client.employment.duty.missing_one': 'Falta {n} punto de los que pide la ley',
+  'client.employment.duty.missing_many': 'Faltan {n} puntos de los que pide la ley',
+  'client.employment.duty.review_one': 'Revisa {n} punto',
+  'client.employment.duty.review_many': 'Revisa {n} puntos',
+  'client.employment.duty.complete': 'Están todos los puntos que pide la ley',
+  'client.employment.duty.before_start':
+    'Tu contrato empezó desde el 5 de octubre de 2026: la empresa tenía que darte esta información por escrito antes de empezar.',
+  'client.employment.duty.on_request':
+    'Tu contrato ya estaba en marcha el 5 de octubre de 2026: puedes pedir esta información por escrito y la empresa tiene 30 días hábiles.',
+  'client.employment.duty.temp_agency_only': 'Solo para contratos por ETT',
+
+  'client.employment.offer.title': 'La oferta frente al contrato',
+  'client.employment.offer.none': 'Sin diferencias en lo que se puede comparar',
+  'client.employment.offer.count_one': 'Difieren en {n} punto',
+  'client.employment.offer.count_many': 'Difieren en {n} puntos',
+  'client.employment.offer.no_verdict':
+    'Solo se ponen lado a lado: esta revisión no dice cuál de los dos vale.',
+  'client.employment.offer.difference.gross_annual':
+    'Salario bruto al año: la oferta decía {oferta}; el contrato dice {contrato}.',
+  'client.employment.offer.difference.weekly_hours':
+    'Horas a la semana: la oferta decía {oferta}; el contrato dice {contrato}.',
+  'client.employment.offer.difference.modality':
+    'Tipo de contrato: la oferta decía {oferta}; el contrato dice {contrato}.',
+  'client.employment.offer.difference.remote':
+    'Teletrabajo: la oferta decía {oferta}; el contrato dice {contrato}.',
+  'client.employment.offer.field.gross_annual': 'el salario',
+  'client.employment.offer.field.weekly_hours': 'las horas',
+  'client.employment.offer.field.modality': 'el tipo de contrato',
+  'client.employment.offer.field.remote': 'el teletrabajo',
+  'client.employment.offer.not_compared.net_against_gross':
+    'No se compara {dato}: la oferta da una cifra neta y el contrato, bruta.',
+  'client.employment.offer.not_compared.not_known':
+    'No se compara {dato}: falta en la oferta o en el contrato.',
+
+  'client.employment.reference.title': 'Si un juzgado lo declarase así',
+  'client.employment.reference.lead':
+    'Dos cifras de referencia a {fecha}, por si un juzgado declarase indefinido tu contrato. No son una recomendación ni una cantidad a tu favor.',
+  'client.employment.reference.fixed_term_end':
+    'Fin de contrato temporal (art. 49.1.c): {importe}.',
+  'client.employment.reference.fixed_term_end_range':
+    'Fin de contrato temporal (art. 49.1.c): entre {minimo} y {maximo}.',
+  'client.employment.reference.unfair_dismissal': 'Despido improcedente (art. 56): {importe}.',
+  'client.employment.reference.unfair_dismissal_range':
+    'Despido improcedente (art. 56): entre {minimo} y {maximo}.',
+
+  'client.employment.block.agreement': 'Tu convenio colectivo',
+  'client.employment.block.public_holidays': 'Festivos',
+  'client.employment.block.time_record': 'Registro de jornada',
+  'client.employment.block.late_payment_interest': 'Retrasos en el pago',
+  'client.employment.block.limitation': 'Plazos',
+  'client.employment.block.information_model': 'Modelo de documento informativo',
+  'client.employment.block.minors': 'Menores de 18 años',
+  'client.employment.block.out_of_scope': 'Fuera de esta revisión',
+  'client.employment.link.regcon': 'REGCON, registro de convenios colectivos',
+
+  'client.employment.unchecked.agreement_tables': 'Las tablas salariales de tu convenio.',
+  'client.employment.unchecked.bonuses': 'Los pluses y complementos que fija tu convenio.',
+  'client.employment.unchecked.real_hours': 'Las horas que trabajas de verdad.',
+  'client.employment.unchecked.equal_pay': 'La igualdad retributiva.',
+  'client.employment.unchecked.contributions': 'La cotización a la Seguridad Social.',
+  'client.employment.unchecked.net_pay': 'El salario neto y el IRPF.',
+  'client.employment.unchecked.later_agreements': 'Si un acuerdo posterior cambió el contrato.',
+
+  'client.employment.finding.smi_annual': 'Salario frente al SMI',
+  'client.employment.finding.smi_prorata': 'Salario frente al SMI, en proporción a tu jornada',
+  'client.employment.finding.smi_in_kind_cap': 'Salario en especie',
+  'client.employment.finding.smi_temporary_120': 'Salario por jornada frente al SMI',
+  'client.employment.finding.smi_absorption': 'Absorción del SMI',
+  'client.employment.finding.smi_monthly': 'Nóminas frente al SMI',
+  'client.employment.finding.agreement_salary': 'Salario de tu categoría, según tu dato',
+  'client.employment.finding.fixed_term_presumption': 'Tipo de contrato y su causa',
+  'client.employment.finding.production_6_months': 'Duración del contrato por producción',
+  'client.employment.finding.production_1_year': 'Duración del contrato por producción',
+  'client.employment.finding.production_one_extension': 'Prórrogas',
+  'client.employment.finding.production_occasional_90': 'Días por situaciones ocasionales',
+  'client.employment.finding.production_occasional_agrifood_120':
+    'Días por situaciones ocasionales',
+  'client.employment.finding.replacement_name_cause': 'Contrato de sustitución',
+  'client.employment.finding.replacement_selection_3_months':
+    'Sustitución durante un proceso de selección',
+  'client.employment.finding.abolished_modalities': 'Modalidad de contrato',
+  'client.employment.finding.permanent_on_breach': 'Contrato temporal fuera de la ley',
+  'client.employment.finding.chaining_18_in_24': 'Contratos temporales encadenados',
+  'client.employment.finding.temporary_certificate': 'Certificado de contratos temporales',
+  'client.employment.finding.discontinuous_essentials': 'Contrato fijo discontinuo',
+  'client.employment.finding.training_alternance_duration':
+    'Duración de la formación en alternancia',
+  'client.employment.finding.training_alternance_effective_work': 'Tiempo de trabajo efectivo',
+  'client.employment.finding.training_alternance_no_overtime': 'Turnos, noche y horas extra',
+  'client.employment.finding.training_alternance_no_trial': 'Periodo de prueba',
+  'client.employment.finding.training_alternance_pay': 'Salario en alternancia',
+  'client.employment.finding.training_practice_window': 'Plazo desde que acabaste los estudios',
+  'client.employment.finding.training_practice_duration': 'Duración del contrato en prácticas',
+  'client.employment.finding.training_practice_trial': 'Periodo de prueba',
+  'client.employment.finding.training_practice_no_overtime': 'Horas extra',
+  'client.employment.finding.training_practice_pay': 'Salario en prácticas',
+  'client.employment.finding.training_plan_attached': 'Plan formativo',
+  'client.employment.finding.training_no_new_trial': 'Periodo de prueba',
+  'client.employment.finding.written_form': 'Contrato por escrito',
+  'client.employment.finding.trial_limits': 'Periodo de prueba',
+  'client.employment.finding.trial_temporary_1_month': 'Periodo de prueba',
+  'client.employment.finding.trial_void_same_duties': 'Periodo de prueba',
+  'client.employment.finding.weekly_40': 'Horas a la semana',
+  'client.employment.finding.daily_9': 'Horas al día',
+  'client.employment.finding.rest_12': 'Descanso entre jornadas',
+  'client.employment.finding.weekly_rest_36': 'Descanso semanal',
+  'client.employment.finding.break_15': 'Pausa en la jornada',
+  'client.employment.finding.night_limits': 'Trabajo nocturno',
+  'client.employment.finding.overtime_cap_80': 'Horas extra',
+  'client.employment.finding.overtime_voluntary': 'Horas extra',
+  'client.employment.finding.overtime_value': 'Horas extra incluidas en el salario',
+  'client.employment.finding.time_record': 'Registro de jornada',
+  'client.employment.finding.special_working_time': 'Jornadas especiales',
+  'client.employment.finding.part_time_contents': 'Contrato a tiempo parcial',
+  'client.employment.finding.part_time_no_overtime': 'Horas extra a tiempo parcial',
+  'client.employment.finding.part_time_record': 'Resumen mensual de horas',
+  'client.employment.finding.complementary_hours': 'Horas complementarias',
+  'client.employment.finding.voluntary_complementary': 'Horas complementarias voluntarias',
+  'client.employment.finding.holidays_30': 'Vacaciones',
+  'client.employment.finding.holidays_not_paid_out': 'Vacaciones pagadas en el salario',
+  'client.employment.finding.extra_pays': 'Pagas extra',
+  'client.employment.finding.non_compete': 'No competencia',
+  'client.employment.finding.exclusivity': 'Exclusividad',
+  'client.employment.finding.retention': 'Permanencia',
+  'client.employment.finding.waiver': 'Renuncia a un derecho',
+  'client.employment.finding.partial_nullity': 'Nulidad parcial',
+  'client.employment.finding.remote_costs': 'Gastos del teletrabajo',
+  'client.employment.finding.info_elements': 'Información obligatoria',
+  'client.employment.finding.info_before_start': 'Información antes de empezar',
+  'client.employment.finding.info_on_request': 'Información a petición',
+  'client.employment.finding.info_short_relations': 'Relaciones de cuatro semanas o menos',
+  'client.employment.finding.info_model': 'Modelo de documento informativo',
+  'client.employment.finding.public_holidays': 'Festivos',
+  'client.employment.finding.minors_work': 'Trabajo de menores',
+  'client.employment.finding.late_payment_interest': 'Retrasos en el pago',
+  'client.employment.finding.limitation': 'Plazos',
+
+  'client.employment.calculation.minimum_wage.not_published':
+    'El SMI de {year} aún no se ha publicado en el BOE. Como referencia, el de {referenceYear}: {reference}. Para {year} no se calcula ninguna diferencia.',
+  'client.employment.calculation.minimum_wage.not_loaded':
+    'Esta revisión tiene el SMI desde {from}: los años anteriores no se comparan.',
+  'client.employment.calculation.minimum_wage.pay.year': 'Salario pactado: {annual} al año.',
+  'client.employment.calculation.minimum_wage.pay.month':
+    'Salario pactado: {monthly} al mes en {payments} pagas, contando cada paga extra como una mensualidad: {annual} al año.',
+  'client.employment.calculation.minimum_wage.pay.month_prorated':
+    'Salario pactado: {monthly} al mes con las pagas extra prorrateadas: {annual} al año.',
+  'client.employment.calculation.minimum_wage.pay.day':
+    'Salario pactado: {daily} al día por {days}: {annual} al año.',
+  'client.employment.calculation.minimum_wage.pay.hour':
+    'Salario pactado: {hourly} la hora por {hours} h al año: {annual}.',
+  'client.employment.calculation.minimum_wage.pay.hour_weekly':
+    'Salario pactado: {hourly} la hora por {weekly} h a la semana durante {weeks} semanas: {annual} al año.',
+  'client.employment.calculation.minimum_wage.pay.hour_with_paid_rest':
+    'Si tus {hours} h al año son solo de trabajo efectivo, con el descanso pagado (vacaciones y festivos, {restDays}) son {paidHours} h pagadas: {hourly} la hora, {annual} al año.',
+  'client.employment.calculation.minimum_wage.pay.hours_unknown':
+    'Sin las horas del contrato, un salario por hora no se puede pasar a un año.',
+  'client.employment.calculation.minimum_wage.pay.extra_pays_unknown':
+    'El contrato tiene {count} sin prorratear y no se sabe su importe: no se suman al año.',
+  'client.employment.calculation.minimum_wage.breakdown_gap':
+    'El desglose deja sin explicar {gap}: se cuenta como un complemento de tipo desconocido.',
+  'client.employment.calculation.minimum_wage.excluded':
+    'No se cuentan {excluded} de complementos variables o de tipo desconocido.',
+  'client.employment.calculation.minimum_wage.in_kind_not_counted':
+    'El salario en especie no se cuenta: el SMI se paga en dinero.',
+  'client.employment.calculation.minimum_wage.prorata':
+    'Jornada de {hours} h a la semana sobre {fullTime} h a tiempo completo: el SMI se aplica en proporción ({coefficient}).',
+  'client.employment.calculation.minimum_wage.prorata_annual':
+    'Jornada de {hours} h al año sobre {fullTime} h a tiempo completo: el SMI se aplica en proporción ({coefficient}).',
+  'client.employment.calculation.minimum_wage.legal_week':
+    'Se toma como tiempo completo la semana legal de 40 horas; si tu convenio fija menos, el mínimo es algo mayor.',
+  'client.employment.calculation.minimum_wage.year.within':
+    '{year}: SMI de {minimum}; tu salario, {pay}. No queda por debajo.',
+  'client.employment.calculation.minimum_wage.year.below':
+    '{year}: SMI de {minimum}; tu salario, {pay}. Faltan {difference} al año; en {days} de contrato ese año, {accrued}.',
+  'client.employment.calculation.minimum_wage.year.below_no_total':
+    '{year}: SMI de {minimum}; tu salario, {pay}. Faltan {difference} al año.',
+  'client.employment.calculation.minimum_wage.year.effects_unverified':
+    '{year}: tu salario, {pay}, queda por debajo del SMI de {minimum}, pero no está comprobado que ese SMI se aplique desde el 1 de enero; el del año anterior era {previous}.',
+  'client.employment.calculation.minimum_wage.year.effects_unverified_no_previous':
+    '{year}: tu salario, {pay}, queda por debajo del SMI de {minimum}, pero no está comprobado que ese SMI se aplique desde el 1 de enero.',
+  'client.employment.calculation.minimum_wage.year.hours_unknown':
+    '{year}: SMI de {minimum}; tu salario, {pay}. Puede quedar por debajo, pero sin las horas del contrato no se sabe.',
+  'client.employment.calculation.minimum_wage.year.extra_pays_unknown':
+    '{year}: SMI de {minimum}; tu salario sin las pagas extra, {pay}. Puede quedar por debajo, pero falta el importe de las pagas extra.',
+  'client.employment.calculation.minimum_wage.year.training_effective_work':
+    '{year}: SMI de {minimum}; tu salario, {pay}. En formación en alternancia el mínimo va en proporción al tiempo de trabajo efectivo, que esta revisión no calcula.',
+  'client.employment.calculation.minimum_wage.temporary.within':
+    '{year}: mínimo por jornada de {minimum} en contratos de hasta 120 días; tu salario por día, {pay}. No queda por debajo.',
+  'client.employment.calculation.minimum_wage.temporary.below':
+    '{year}: mínimo por jornada de {minimum} en contratos de hasta 120 días; tu salario por día, {pay}. Faltan {difference} por jornada.',
+  'client.employment.calculation.minimum_wage.temporary.effects_unverified':
+    '{year}: tu salario por día, {pay}, queda por debajo del mínimo por jornada de {minimum}, pero no está comprobado que se aplique desde el 1 de enero; el del año anterior era {previous}.',
+  'client.employment.calculation.minimum_wage.temporary.effects_unverified_no_previous':
+    '{year}: tu salario por día, {pay}, queda por debajo del mínimo por jornada de {minimum}, pero no está comprobado que se aplique desde el 1 de enero.',
+  'client.employment.calculation.minimum_wage.temporary.hours_unknown':
+    '{year}: mínimo por jornada de {minimum}; tu salario por día, {pay}. Sin las horas del contrato no se sabe si queda por debajo.',
+  'client.employment.calculation.minimum_wage.temporary.extra_pays_unknown':
+    '{year}: mínimo por jornada de {minimum}; tu salario por día, {pay}. Falta el importe de las pagas extra.',
+  'client.employment.calculation.minimum_wage.temporary.training_effective_work':
+    '{year}: mínimo por jornada de {minimum}; tu salario por día, {pay}. En formación en alternancia el mínimo va en proporción al trabajo efectivo.',
+  'client.employment.calculation.minimum_wage.discontinuous_periods':
+    'En un fijo discontinuo solo cuentan los periodos de actividad, así que no se da un total.',
+  'client.employment.calculation.minimum_wage.total': 'En total, {total}.',
+  'client.employment.calculation.minimum_wage.agreement_may_pay_more':
+    'Tu convenio puede fijar un salario mayor que el SMI: está en su tabla salarial.',
+  'client.employment.calculation.minimum_wage.payslip.within':
+    'Nómina de {month} de {year}: {paid}; el mínimo de ese mes es {minimum}.',
+  'client.employment.calculation.minimum_wage.payslip.below':
+    'Nómina de {month} de {year}: {paid}; el mínimo de ese mes es {minimum}. Faltan {difference}.',
+  'client.employment.calculation.minimum_wage.payslip.effects_unverified':
+    'Nómina de {month} de {year}: {paid}, por debajo de {minimum}, pero no está comprobado que el SMI de ese año se aplique desde el 1 de enero.',
+  'client.employment.calculation.minimum_wage.payslip.hours_unknown':
+    'Nómina de {month} de {year}: {paid}, por debajo de {minimum} a tiempo completo; sin las horas del contrato no se puede aplicar la proporción.',
+  'client.employment.calculation.minimum_wage.payslip.extra_pays_unknown':
+    'Nómina de {month} de {year}: {paid}; el mínimo de ese mes es {minimum}, y falta el importe de las pagas extra.',
+  'client.employment.calculation.minimum_wage.payslip.training_effective_work':
+    'Nómina de {month} de {year}: {paid}; el mínimo a tiempo completo es {minimum}, y en formación en alternancia va en proporción al trabajo efectivo.',
+  'client.employment.calculation.minimum_wage.payslip.not_compared':
+    'Nómina de {month} de {year}: no es de un mes completo o tiene incidencias, así que no se compara.',
+  'client.employment.calculation.minimum_wage.payslip.not_published':
+    'Nómina de {month} de {year}: el SMI de {year} aún no se ha publicado; el de {referenceYear} era {reference} al mes.',
+  'client.employment.calculation.minimum_wage.payslip.not_loaded':
+    'Nómina de {month} de {year}: esta revisión no tiene el SMI de ese año.',
+  'client.employment.calculation.minimum_wage.payslip.annual_decides':
+    'Nómina de {month} de {year}: {paid}, por debajo de los {minimum} de ese mes; con las pagas extra aparte, lo que cuenta es el cómputo anual.',
+  'client.employment.calculation.minimum_wage.payslip.prorated_count_unknown':
+    'Nómina de {month} de {year}: {paid} con parte de las pagas extra; no se sabe cuántas van prorrateadas, así que lo que cuenta es el cómputo anual (mínimo de {minimum}).',
+  'client.employment.calculation.minimum_wage.payslip.none': 'No has metido nóminas.',
+  'client.employment.calculation.minimum_wage.in_kind':
+    'En especie, {inKind} al año; en dinero, {money}. La especie es el {percent} % del salario y el máximo es el 30 %.',
+  'client.employment.calculation.minimum_wage.in_kind_rate':
+    'Con un salario por día o por hora no se puede calcular qué parte del año es especie ({inKind} por periodo); el máximo es el 30 %.',
+  'client.employment.calculation.minimum_wage.agreement.within':
+    'Según tu dato, tu categoría cobra {category} al año ({minimum} con tu jornada); tu salario, {pay}, no queda por debajo.',
+  'client.employment.calculation.minimum_wage.agreement.below':
+    'Según tu dato, tu categoría cobra {category} al año ({minimum} con tu jornada); tu salario, {pay}, queda {difference} por debajo. Depende de tu convenio: está en su tabla salarial.',
+  'client.employment.calculation.modality.before_reform':
+    'Tu contrato empezó o se hizo antes del 30 de marzo de 2022: su temporalidad se rige por la norma anterior y esta versión no la revisa.',
+  'client.employment.calculation.modality.permanent':
+    'Es un contrato indefinido: no tiene límites de temporalidad.',
+  'client.employment.calculation.modality.unknown':
+    'Sin saber el tipo de contrato no se pueden comprobar sus límites.',
+  'client.employment.calculation.modality.abolished':
+    'Desde el 30 de marzo de 2022 ya no se puede hacer un contrato de obra o servicio: un contrato temporal solo cabe por circunstancias de la producción o por sustitución.',
+  'client.employment.calculation.modality.outdated_label':
+    'El contrato usa un nombre de antes de la reforma de 2022; se revisa como el tipo actual que le corresponde.',
+  'client.employment.calculation.modality.permanent_on_breach':
+    'El artículo 15.4 del Estatuto de los Trabajadores dice que, en un caso como el tuyo, la persona adquiere la condición de fija.',
+  'client.employment.calculation.modality.rule_in_doubt':
+    'La norma en que se apoya está en duda ese día, así que solo se pide revisarlo.',
+  'client.employment.calculation.modality.cause_stated':
+    'Según lo que has contestado, el contrato explica la causa y las circunstancias.',
+  'client.employment.calculation.modality.cause_missing':
+    'Según lo que has contestado, el contrato no explica la causa, las circunstancias o su relación con la duración, como pide el art. 15.1.',
+  'client.employment.calculation.modality.cause_unknown':
+    'No sabes si el contrato explica la causa y las circunstancias.',
+  'client.employment.calculation.modality.duration': 'El contrato dura {duracion}.',
+  'client.employment.calculation.modality.duration_so_far':
+    'Sin fecha de fin, el contrato lleva {duracion} hasta hoy.',
+  'client.employment.calculation.modality.no_end_date':
+    'Sin fecha de fin no se puede saber si pasará del límite.',
+  'client.employment.calculation.modality.production_within':
+    'No pasa de 6 meses, el límite del art. 15.2.',
+  'client.employment.calculation.modality.production_agreement_year':
+    'Pasa de 6 meses: solo cabe si tu convenio sectorial amplía la duración, hasta un año.',
+  'client.employment.calculation.modality.production_over_year':
+    'Pasa de un año, el máximo del art. 15.2 incluso con convenio.',
+  'client.employment.calculation.modality.extensions':
+    'Ha tenido {prorrogas}; el art. 15.2 permite una sola.',
+  'client.employment.calculation.modality.occasional_days':
+    'En {anio}, {dias} de contrato; el límite para situaciones ocasionales es de {limite} al año.',
+  'client.employment.calculation.modality.occasional_agrifood':
+    'En el sector agroalimentario el límite es de 120 días, y esta revisión no sabe tu sector.',
+  'client.employment.calculation.modality.replacement_stated':
+    'Según lo que has contestado, el contrato dice a quién sustituyes y por qué.',
+  'client.employment.calculation.modality.replacement_missing':
+    'Según lo que has contestado, al contrato le falta el nombre de la persona sustituida o la causa, que pide el art. 15.3.',
+  'client.employment.calculation.modality.replacement_unknown':
+    'No sabes si el contrato dice a quién sustituyes y por qué.',
+  'client.employment.calculation.modality.selection_within':
+    'No pasa de 3 meses, el máximo para cubrir un puesto durante un proceso de selección; tu convenio puede fijar menos.',
+  'client.employment.calculation.modality.selection_over':
+    'Pasa de 3 meses, el máximo para cubrir un puesto durante un proceso de selección.',
+  'client.employment.calculation.modality.training_too_short':
+    'Dura menos de {minimo}, el mínimo legal (entre {minimo} y {maximo}). Puede que acabara antes por otra causa.',
+  'client.employment.calculation.modality.training_too_long':
+    'Pasa de {maximo}, el máximo legal (entre {minimo} y {maximo}).',
+  'client.employment.calculation.modality.training_within':
+    'Está entre {minimo} y {maximo}, lo que fija la ley.',
+  'client.employment.calculation.modality.training_max_disability':
+    'Las bajas y otras suspensiones paran la cuenta, y con discapacidad el máximo puede ser mayor.',
+  'client.employment.calculation.modality.practice_window':
+    'Se hizo {meses} después de acabar los estudios; el límite es de {limite}.',
+  'client.employment.calculation.modality.practice_window_disability_unknown':
+    'Con una discapacidad el límite es de 5 años, y no sabemos si es tu caso.',
+  'client.employment.calculation.modality.effective_work':
+    'Año {anio} del contrato: {porcentaje} % de trabajo efectivo; el máximo es el {limite} %.',
+  'client.employment.calculation.modality.effective_work_unknown':
+    'No has metido el porcentaje de trabajo efectivo.',
+  'client.employment.calculation.modality.alternance_shifts_or_night':
+    'En formación en alternancia no se trabaja a turnos ni de noche, salvo de forma excepcional si la formación lo necesita.',
+  'client.employment.calculation.modality.plan_attached':
+    'Según lo que has contestado, el contrato lleva el plan formativo individual.',
+  'client.employment.calculation.modality.plan_missing':
+    'Según lo que has contestado, el contrato no lleva el plan formativo individual que pide el art. 11.4.c.',
+  'client.employment.calculation.modality.plan_unknown':
+    'No sabes si el contrato lleva el plan formativo individual.',
+  'client.employment.calculation.modality.studies_end_unknown':
+    'Sin la fecha en que acabaste los estudios no se puede comprobar el plazo.',
+  'client.employment.calculation.modality.written_missing':
+    'Según lo que has contestado, no tienes contrato por escrito, y tu tipo de contrato tiene que hacerse por escrito (art. 8.2).',
+  'client.employment.calculation.modality.written_unknown':
+    'No sabes si tienes contrato por escrito, y tu tipo de contrato tiene que hacerse por escrito.',
+  'client.employment.calculation.modality.discontinuous_stated':
+    'Según lo que has contestado, el contrato dice el periodo de actividad, la jornada y su distribución.',
+  'client.employment.calculation.modality.discontinuous_missing':
+    'Según lo que has contestado, al contrato le falta el periodo de actividad, la jornada o su distribución, que pide el art. 16.2, aunque sea de forma estimada.',
+  'client.employment.calculation.modality.discontinuous_unknown':
+    'No sabes si el contrato dice el periodo de actividad, la jornada y su distribución.',
+  'client.employment.calculation.chaining.no_history':
+    'Sin tu vida laboral no se pueden sumar tus contratos. El art. 15.5 pone un límite de 18 meses dentro de 24 con dos o más contratos por circunstancias de la producción.',
+  'client.employment.calculation.chaining.within':
+    'En la ventana de 24 meses con más días, {contratos} suman {dias}; el límite es de 18 meses ({limite}).',
+  'client.employment.calculation.chaining.near_limit':
+    'En una ventana de 24 meses, {contratos} suman {dias}, tan cerca del límite de 18 meses ({limite}) que depende de cómo se cuenten el primer y el último día.',
+  'client.employment.calculation.chaining.exceeds':
+    'En una ventana de 24 meses, {contratos} suman {dias}, más que los 18 meses ({limite}) del art. 15.5.',
+  'client.employment.calculation.chaining.permanent':
+    'El artículo 15.5 del Estatuto de los Trabajadores dice que, en un caso como el tuyo, la persona adquiere la condición de fija.',
+  'client.employment.calculation.chaining.depends_on_cutoff':
+    'Depende de qué contrato anterior a la reforma cuenta: el vigente el 31 de diciembre de 2021 o el vigente el 30 de marzo de 2022.',
+  'client.employment.calculation.chaining.depends_on_group':
+    'Depende de si cuentan los contratos con otras empresas del grupo o a través de una ETT.',
+  'client.employment.calculation.chaining.depends_on_overlap':
+    'Depende de si los contratos que se solapan son uno solo o varios.',
+  'client.employment.calculation.chaining.same_group_not_counted':
+    'No se han sumado {contratos} con otras empresas del grupo o a través de una ETT.',
+  'client.employment.calculation.chaining.kind_unknown_not_counted':
+    'No se han sumado {contratos} con la misma empresa cuyo tipo no sabes.',
+  'client.employment.calculation.clause.partial_nullity':
+    'Esa parte del contrato se sustituye por lo que dice la ley y el resto sigue valiendo (art. 9.1).',
+  'client.employment.calculation.trial.amount_days': '{amount}',
+  'client.employment.calculation.trial.amount_weeks': '{amount}',
+  'client.employment.calculation.trial.amount_months': '{amount}',
+  'client.employment.calculation.trial.within_legal_limit':
+    'Periodo de prueba de {trial}; el límite legal es de {months}.',
+  'client.employment.calculation.trial.over_legal_limit':
+    'Periodo de prueba de {trial}; pasa del límite legal de {months}, aunque tu convenio puede fijar otro.',
+  'client.employment.calculation.trial.within_your_agreement':
+    'Periodo de prueba de {trial}; según tu dato, tu convenio permite {months}.',
+  'client.employment.calculation.trial.over_your_agreement':
+    'Periodo de prueba de {trial}; según tu dato, tu convenio permite {months}, y lo pasa.',
+  'client.employment.calculation.trial.temporary_end_unknown':
+    'Sin fecha de fin no se sabe si el contrato dura 6 meses o menos; si es así, el límite es de {months}.',
+  'client.employment.calculation.trial.void_alternance':
+    'En un contrato de formación en alternancia no cabe periodo de prueba, y el tuyo pone {trial}.',
+  'client.employment.calculation.trial.void_after_training':
+    'Si sigues en la empresa después de un contrato formativo, no cabe un periodo de prueba nuevo, y el tuyo pone {trial}.',
+  'client.employment.calculation.trial.void_same_duties':
+    'Según lo que has contestado, ya habías hecho este trabajo en la empresa, y entonces no cabe periodo de prueba; el tuyo pone {trial}.',
+  'client.employment.calculation.trial.not_in_writing':
+    'El periodo de prueba solo cabe si se pacta por escrito, y según lo que has contestado no tienes contrato por escrito; el tuyo sería de {trial}.',
+  'client.employment.calculation.working_time.weekly_hours_agreed':
+    'El contrato fija {hours} h a la semana; el máximo legal es de 40 h de media.',
+  'client.employment.calculation.working_time.weekly_hours_scheduled':
+    'Tu horario suma {hours} h a la semana; el máximo legal es de 40 h de media.',
+  'client.employment.calculation.working_time.irregular_distribution':
+    'Con una distribución irregular, el límite de 40 h es de media en el año.',
+  'client.employment.calculation.working_time.time_worked_counts':
+    'El límite es de trabajo efectivo de media en el año: las pausas o los turnos pueden bajar la cuenta.',
+  'client.employment.calculation.working_time.longest_day':
+    'El día más largo es el {day}, con {hours} h; el límite es de 9 h ordinarias, salvo que tu convenio o un acuerdo las repartan de otra forma.',
+  'client.employment.calculation.working_time.shortest_rest':
+    'El descanso más corto entre dos jornadas es de {hours} h; el mínimo es de 12 h.',
+  'client.employment.calculation.working_time.longest_rest':
+    'El descanso más largo de la semana es de {hours} h; el mínimo es de 36 h seguidas.',
+  'client.employment.calculation.working_time.special_regimes':
+    'Algunos sectores y los cambios de turno tienen reglas especiales que permiten acortarlo con compensación (RD 1561/1995).',
+  'client.employment.calculation.working_time.longest_stretch':
+    'El tramo seguido más largo es de {hours} h; a partir de 6 h seguidas hay una pausa de al menos 15 minutos.',
+  'client.employment.calculation.working_time.night_hours_in_schedule':
+    'Tu horario tiene al menos 3 h de noche en {days} a la semana.',
+  'client.employment.calculation.working_time.night_average':
+    'De media trabajas {hours} h al día; en trabajo nocturno el límite es de 8 h.',
+  'client.employment.calculation.working_time.night_overtime':
+    'Quien trabaja de noche no hace horas extra, y tu contrato las pacta.',
+  'client.employment.calculation.working_time.overtime_not_allowed':
+    'En tu tipo de contrato no se hacen horas extra, salvo para prevenir o reparar daños urgentes (art. 35.3).',
+  'client.employment.calculation.working_time.overtime_as_needed':
+    'El contrato te obliga a las horas extra que hagan falta, sin límite; la ley pone un máximo de {cap} h al año.',
+  'client.employment.calculation.working_time.overtime_hours':
+    'El contrato pacta {hours} h extra al año; el máximo legal para tu jornada es de {cap} h.',
+  'client.employment.calculation.working_time.overtime_rest_not_counted':
+    'Las horas compensadas con descanso en los 4 meses siguientes no cuentan para ese máximo.',
+  'client.employment.calculation.working_time.time_record':
+    'La empresa registra cada día el inicio y el final de tu jornada, y tienes derecho a verlo (art. 34.9).',
+  'client.employment.calculation.part_time.hours_missing':
+    'El contrato no dice cuántas horas trabajas.',
+  'client.employment.calculation.part_time.distribution_missing':
+    'El contrato no dice cómo se reparten tus horas.',
+  'client.employment.calculation.part_time.full_time_presumed':
+    'Sin eso, el art. 12.4.a presume que el contrato es a jornada completa, salvo prueba en contrario.',
+  'client.employment.calculation.part_time.complementary_under_10_hours':
+    'Con {hours} h a la semana no caben horas complementarias: el mínimo es de 10 h.',
+  'client.employment.calculation.part_time.complementary_percent':
+    'Las horas complementarias pactadas son el {percent} % de las ordinarias; el límite es el {cap} %, y tu convenio puede subirlo hasta el {agreementMax} %.',
+  'client.employment.calculation.part_time.complementary_notice':
+    'Te avisan con {days} de antelación; el mínimo es de {minimum}, salvo que tu convenio fije menos.',
+  'client.employment.calculation.part_time.voluntary_percent':
+    'Las horas complementarias voluntarias son el {percent} %; el límite es el {cap} %, y tu convenio puede subirlo hasta el {agreementMax} %.',
+  'client.employment.calculation.part_time.voluntary_needs_open_ended':
+    'Las horas complementarias voluntarias solo caben en contratos indefinidos.',
+  'client.employment.calculation.part_time.monthly_summary':
+    'A tiempo parcial, tienes derecho a una copia del resumen de tus horas de cada mes junto con la nómina (art. 12.4.c).',
+  'client.employment.calculation.holidays.calendar_days':
+    'El contrato fija {days} naturales de vacaciones; el mínimo legal es de 30.',
+  'client.employment.calculation.holidays.working_days':
+    'El contrato fija {days} laborables de vacaciones.',
+  'client.employment.calculation.holidays.working_days_equivalent':
+    '{days} laborables con {week} de trabajo a la semana equivalen a unos {calendar} naturales.',
+  'client.employment.calculation.holidays.counted_in_calendar_days':
+    'El mínimo legal se cuenta en días naturales: {minimum}.',
+  'client.employment.calculation.holidays.under_your_agreement':
+    'Según tu dato, tu convenio da {agreed}.',
+  'client.employment.calculation.holidays.span_unknown':
+    'Sin fecha de fin no se sabe si te corresponden los 30 días enteros o la parte proporcional.',
+  'client.employment.calculation.holidays.prorated_entitlement':
+    'Para un contrato de {span}, la parte proporcional de 30 días es de {entitled}.',
+  'client.employment.calculation.holidays.may_be_annual':
+    'La cifra del contrato puede ser al año y no solo para este contrato.',
+  'client.employment.calculation.holidays.prorated_if_temporary':
+    'Solo un contrato temporal cuenta la parte proporcional; si es indefinido, son 30 días.',
+  'client.employment.calculation.holidays.under_your_agreement_prorated':
+    'Según tu dato, tu convenio da {agreed} al año: {entitled} para este contrato.',
+  'client.employment.calculation.holidays.included_in_salary':
+    'Las vacaciones no se pueden cambiar por dinero mientras sigue el contrato (art. 38.1).',
+  'client.employment.calculation.holidays.short_temporary_exception':
+    'En contratos temporales de hasta {days}, la norma del SMI permite pagar las vacaciones con el salario de cada día.',
+  'client.employment.calculation.extra_pays.count': 'El contrato fija {count} al año.',
+  'client.employment.calculation.extra_pays.amount_by_agreement': 'Su importe lo fija tu convenio.',
+  'client.employment.calculation.extra_pays.one_may_be_prorated':
+    'La ley prevé 2 pagas extra al año; puede que la otra vaya prorrateada.',
+  'client.employment.calculation.extra_pays.prorated_by_agreement':
+    'Las pagas extra van prorrateadas: el art. 31 prevé que eso lo acuerde el convenio.',
+  'client.employment.calculation.clauses.months_unknown': 'No has metido cuánto dura.',
+  'client.employment.calculation.clauses.non_compete_months':
+    'El pacto dura {months}; el máximo es de {cap}.',
+  'client.employment.calculation.clauses.non_compete_no_compensation':
+    'El pacto de no competencia no prevé una compensación económica, que el art. 21.2 pide.',
+  'client.employment.calculation.clauses.non_compete_adequacy':
+    'Prevé una compensación; esta revisión no puede valorar si es adecuada.',
+  'client.employment.calculation.clauses.non_compete_compensation_unknown':
+    'No sabes si el pacto prevé una compensación económica.',
+  'client.employment.calculation.clauses.retention_months':
+    'El compromiso de permanencia dura {months}; el máximo es de {cap}.',
+  'client.employment.calculation.clauses.retention_training_missing':
+    'La permanencia solo cabe tras una especialización profesional pagada por la empresa, y la cláusula no la menciona.',
+  'client.employment.calculation.clauses.exclusivity_compensated':
+    'La exclusividad prevé una compensación expresa.',
+  'client.employment.calculation.clauses.exclusivity_no_compensation':
+    'La exclusividad no prevé una compensación expresa.',
+  'client.employment.calculation.clauses.exclusivity_compensation_unknown':
+    'No sabes si la exclusividad prevé una compensación.',
+  'client.employment.calculation.clauses.waiver_holidays':
+    'Renuncia a las vacaciones: los derechos que da la ley no se pueden renunciar (art. 3.5).',
+  'client.employment.calculation.clauses.waiver_salary':
+    'Renuncia a parte del salario: los derechos que da la ley no se pueden renunciar (art. 3.5).',
+  'client.employment.calculation.clauses.waiver_severance':
+    'Renuncia a la indemnización legal: los derechos que da la ley no se pueden renunciar (art. 3.5).',
+  'client.employment.calculation.clauses.waiver_other':
+    'Si lo que se renuncia es un derecho que da la ley, la renuncia no vale (art. 3.5).',
+  'client.employment.calculation.clauses.overtime_hours_unknown':
+    'Sin las horas extra pactadas no se puede comparar con el máximo de 80 h al año.',
+  'client.employment.calculation.clauses.overtime_included':
+    'El salario «incluye» las horas extra; la hora extra nunca se paga por debajo de la ordinaria (art. 35.1).',
+  'client.employment.calculation.clauses.hourly_pay':
+    'Con {hours} h reales a la semana, tu salario sale a {euros} la hora.',
+  'client.employment.calculation.clauses.agreement_hourly_pay':
+    'Según tus datos del convenio, la hora ordinaria de tu categoría sale a {euros}.',
+  'client.employment.calculation.clauses.remote_share_unknown':
+    'No has metido qué parte de tu jornada es teletrabajo.',
+  'client.employment.calculation.clauses.remote_not_regular':
+    'El teletrabajo es el {percent} % de tu jornada; la ley de trabajo a distancia se aplica desde el {regular} %.',
+  'client.employment.calculation.clauses.remote_costs_on_worker':
+    'Con teletrabajo regular, los gastos de equipos y medios no pueden ir a tu cargo (Ley 10/2021, art. 12).',
+  'client.employment.calculation.clauses.remote_costs_unknown':
+    'No sabes si la cláusula pone a tu cargo los gastos del teletrabajo.',
+  'client.employment.calculation.information.present':
+    'Está en el contrato o en un documento aparte.',
+  'client.employment.calculation.information.by_reference':
+    'Remite a la ley o al convenio, como se permite para este punto.',
+  'client.employment.calculation.information.reference_not_allowed':
+    'Para este punto no basta con remitir a la ley o al convenio.',
+  'client.employment.calculation.information.reference_covers_part':
+    'La remisión a la ley o al convenio solo vale para una parte de este punto.',
+  'client.employment.calculation.information.missing_before_start':
+    'La empresa tenía que dártelo por escrito antes de que empezaras (art. 7.1).',
+  'client.employment.calculation.information.missing_on_request':
+    'Puedes pedirlo por escrito y la empresa tiene 30 días hábiles para dártelo.',
+  'client.employment.calculation.information.only_if_used':
+    'Solo hace falta si la empresa lo usa o lo tiene, y eso el contrato no lo dice.',
+  'client.employment.calculation.information.unknown': 'No sabes si está.',
+  'client.employment.calculation.information.temporary_cause':
+    'En un contrato temporal tiene que decir con precisión la causa, las circunstancias y su relación con la duración.',
+  'client.employment.calculation.information.agreement.named':
+    'El contrato nombra tu convenio: en él están tu tabla salarial, tus pluses y tu jornada.',
+  'client.employment.calculation.information.agreement.not_named':
+    'El contrato no nombra tu convenio. Desde el 5 de octubre de 2026 tiene que constar con su código y su fecha de publicación.',
+  'client.employment.calculation.information.agreement.where':
+    'Los convenios se publican en el BOE o en el boletín de tu provincia o comunidad, y están en el registro público REGCON.',
+  'client.employment.calculation.information.agreement.sector_salary_amount_priority':
+    'Desde 2022, en el salario base y los complementos manda el convenio del sector sobre el de empresa (art. 84.2).',
+  'client.employment.calculation.information.public_holidays':
+    'Tienes hasta 14 fiestas laborales al año, retribuidas y que no se recuperan (art. 37.2).',
+  'client.employment.calculation.information.late_payment_interest':
+    'Si la empresa se retrasa en pagarte el salario, el interés por mora es del 10 % de la cantidad pagada con retraso (art. 29.3).',
+  'client.employment.calculation.information.limitation':
+    'Lo que nace del contrato prescribe al año de terminar; para cantidades, al año desde que se pudieron pedir (art. 59).',
+  'client.employment.calculation.information.model':
+    'El RD 723/2026 prevé un modelo oficial de documento informativo del servicio público de empleo.',
+  'client.employment.calculation.information.minors.hours':
+    'Con menos de 18 años no se trabajan más de 8 horas al día, contando la formación.',
+  'client.employment.calculation.information.minors.no_night_or_overtime':
+    'Tampoco se trabaja de noche ni se hacen horas extra.',
+  'client.employment.calculation.information.minors.rest':
+    'Hay al menos dos días seguidos de descanso a la semana y, con más de 4 h y media seguidas, una pausa de 30 minutos.',
+  'client.employment.calculation.information.out_of_scope.special_relationship':
+    'Las relaciones laborales especiales tienen sus propias normas, que esta versión no revisa.',
+  'client.employment.calculation.information.out_of_scope.public_servant':
+    'El personal funcionario tiene su propio régimen, que esta versión no revisa.',
+  'client.employment.calculation.information.out_of_scope.temp_agency':
+    'Los contratos por empresas de trabajo temporal tienen reglas propias, que esta versión no revisa.',
+  'client.employment.calculation.information.out_of_scope.relief':
+    'El contrato de relevo tiene reglas propias, que esta versión no revisa.',
+
   'rental.title': 'Revisión de alquiler: subidas, fianza y gastos',
   'rental.description':
     'Comprueba si la subida, la fianza, los gastos o la agencia de tu alquiler pasan de lo que permite la ley, partida por partida. Todo en tu dispositivo.',

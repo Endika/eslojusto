@@ -9,4 +9,6 @@ interface ImportMetaEnv {
   readonly PUBLIC_TURNSTILE_SITE_KEY?: string;
   // '1' builds the rental review at /alquiler/; anything else leaves it out.
   readonly PUBLIC_RENTAL?: string;
+  // '1' builds the employment contract review at /contrato/; anything else leaves it out.
+  readonly PUBLIC_EMPLOYMENT?: string;
 }

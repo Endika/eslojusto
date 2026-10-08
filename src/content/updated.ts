@@ -5,6 +5,8 @@ import { PATH as RENT_INDICES, lastChanged } from './rent-indices';
 // /alquiler/ exists only in a PUBLIC_RENTAL=1 build. The Astro config reads this file in Node,
 // before any import.meta.env, so the switch is read from the process as the build sets it.
 const rentalBuild = process.env['PUBLIC_RENTAL'] === '1';
+// /contrato/ likewise exists only in a PUBLIC_EMPLOYMENT=1 build.
+const employmentBuild = process.env['PUBLIC_EMPLOYMENT'] === '1';
 
 export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/': '2026-10-07',
@@ -23,4 +25,5 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/paro/baja-voluntaria/': '2026-10-07',
   '/paro/despido-disciplinario/': '2026-10-07',
   ...(rentalBuild ? { '/alquiler/': '2026-10-08' } : {}),
+  ...(employmentBuild ? { '/contrato/': '2026-10-08' } : {}),
 };
