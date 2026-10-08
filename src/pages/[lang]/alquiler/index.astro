@@ -1,0 +1,12 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Rental from '../../../views/Rental.astro';
+import { RENTAL_BUILD } from '../../../content/sections';
+import { langPaths, type Lang } from '../../../i18n/languages';
+
+export const getStaticPaths = (() => (RENTAL_BUILD ? langPaths() : [])) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+---
+
+<Rental lang={lang} />

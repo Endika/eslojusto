@@ -6,10 +6,15 @@ const rtl = process.env['TEST_RTL'] === '1';
 const analytics = process.env['TEST_ANALYTICS'] === '1';
 // The documents project needs a build with a (fake) documents API; the page routes it.
 const documents = process.env['TEST_DOCUMENTS'] === '1';
-const optInSpecs = /(rtl|analytics|documents)\.spec\.ts/;
+// The rental project needs a build with /alquiler/, which a normal build leaves out.
+const rental = process.env['TEST_RENTAL'] === '1';
+// Matched on the file name alone, so a folder named after a section never opts every spec in.
+const rentalSpecs = /[\\/]rental[^\\/]*\.spec\.ts$/;
+const optInSpecs = [/(rtl|analytics|documents)\.spec\.ts/, rentalSpecs];
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
 const buildEnv = {
+  ...(rental ? { PUBLIC_RENTAL: '1' } : {}),
   ...(analytics ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
     ? {
@@ -42,6 +47,15 @@ export default defineConfig({
             name: 'analytics',
             use: { ...devices['Desktop Chrome'] },
             testMatch: /analytics\.spec\.ts/,
+          },
+        ]
+      : []),
+    ...(rental
+      ? [
+          {
+            name: 'rental',
+            use: { ...devices['Desktop Chrome'] },
+            testMatch: rentalSpecs,
           },
         ]
       : []),

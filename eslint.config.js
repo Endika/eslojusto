@@ -64,6 +64,17 @@ const flowOnly = {
   regex: `^(?!\\./(flow|tabs)$|\\.\\./engine/date$)|${notCanonical}`,
   message: 'Navigation and tabs serve every section: its specifics come in through a Flow.',
 };
+// The rental review reaches the rental engine through its modules, never its tables, which its
+// composition root passes in; of the calculator, only what every section shares.
+const rentalReach = {
+  regex: `^(?!\\./|\\.\\./engine/(date|rental/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|flow|navigation|number)$|\\.\\./i18n/client$)|${notCanonical}`,
+  message:
+    'src/rental reaches the rental engine (its tables come from the composition root), the shared sheets and the translator type.',
+};
+const noRental = {
+  regex: '(^|/)rental/',
+  message: 'The final pay never reaches into the rental review.',
+};
 // Reading documents and the pass serve every review section the same way: what is particular to
 // one (the final pay's case, reading, prefill and report) comes in through their ports, wired by
 // that section's composition root. Allowlists, so no spelling of a path gets around them.
@@ -202,6 +213,10 @@ export default tseslint.config(
     ['src/calculator/{flow,navigation,tabs}.ts'],
     [noAnalytics, noRoot, noPosthogSdk, flowOnly],
   ),
+  boundary(['src/calculator/**'], [noAnalytics, noRoot, noPosthogSdk, noRental], {
+    ignores: ['src/calculator/{flow,navigation,tabs}.ts'],
+  }),
+  boundary(['src/rental/**'], [noAnalytics, noRoot, noPosthogSdk, rentalReach]),
   boundary(['src/documents/*.ts'], [noAnalytics, noRoot, noPosthogSdk, documentsPlatform], {
     ignores: FINAL_PAY_DOCUMENTS.map((name) => `src/documents/${name}.ts`),
   }),

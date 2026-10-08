@@ -16,7 +16,9 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm run type:check
+      # With /alquiler/ in the build, so the copy test reads its page too.
       - run: npm run build
+        env: { PUBLIC_RENTAL: '1' }
       - run: npm run test:run
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
@@ -27,6 +29,9 @@ jobs:
       - name: analytics (test key, PostHog stubbed)
         run: npm run test:e2e -- --project=analytics
         env: { CI: 'true', TEST_ANALYTICS: '1' }
+      - name: rental review (built with /alquiler/)
+        run: npm run test:e2e -- --project=rental
+        env: { CI: 'true', TEST_RENTAL: '1' }
       - name: documents (fake API origins, routed by the page)
         run: npm run test:e2e -- --project=documents
         env: { CI: 'true', TEST_DOCUMENTS: '1' }

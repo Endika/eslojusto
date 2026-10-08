@@ -56,7 +56,7 @@ const OG_LOCALE: Partial<Record<Lang, string>> = { es: 'es_ES' };
 const ogLocale = OG_LOCALE[lang];
 // The browser scripts' strings, as data: the CSP does not apply to a JSON block.
 const clientStringsJson = JSON.stringify(
-  clientStrings(lang, { documents: DOCUMENTS !== null }),
+  clientStrings(lang, { documents: DOCUMENTS !== null, rental: path === '/alquiler/' }),
 ).replace(/</g, '\\u003c');
 const socialImage = new URL(`${root}/og.png`, Astro.site);
 // A JSON-LD block is data, not script, so the CSP does not apply; `<` is escaped so it can't close the tag.
