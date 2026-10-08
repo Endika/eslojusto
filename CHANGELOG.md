@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.26.0](https://github.com/Endika/eslojusto/compare/v1.25.0...v1.26.0) (2026-10-08)
+
+
+### Features
+
+* **analytics:** measure the employment review with closed codes ([59c1a9a](https://github.com/Endika/eslojusto/commit/59c1a9a0bb92dff8cbc345f1329c64f137451eac))
+* **employment:** explain the rules and answer common questions on /contrato/ ([423e669](https://github.com/Endika/eslojusto/commit/423e6699cbef0bcd0f6404c47f5e7d44457a44a0))
+
+
+### Bug Fixes
+
+* **employment:** quote art. 15.4 and 15.5 word for word in the guide and the FAQ ([23221a7](https://github.com/Endika/eslojusto/commit/23221a71d8de154a5990ec904a58632b0b6d6c9a))
+* **employment:** word the agreement duty, transitional contracts and 120-day floor as the BOE does ([1a14e25](https://github.com/Endika/eslojusto/commit/1a14e25ae3777e61102c6e007554645c21b2415d))
+
 ## [1.25.0](https://github.com/Endika/eslojusto/compare/v1.24.0...v1.25.0) (2026-10-08)
 
 
