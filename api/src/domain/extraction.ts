@@ -9,6 +9,7 @@ import {
   sectionsOf,
   type Confidence,
   type FieldType,
+  type ListSpec,
   type Readability,
   type SectionKind,
   type ReviewSchema,
@@ -133,6 +134,26 @@ function isValidValue(type: FieldType, v: unknown): v is ExtractedValue {
   }
 }
 
+const sortKey = (row: unknown, field: string): string => {
+  const v = isRecord(row) ? row[field] : undefined;
+  return typeof v === 'string' ? v : '';
+};
+
+// The rows within a list's maximum, in the order sent: the first ones, or the latest by the
+// list's date when it asks for them.
+function keptRows(raw: readonly unknown[], list: ListSpec): readonly unknown[] {
+  const key = list.keepLatestBy;
+  if (key === undefined || raw.length <= list.maxItems) return raw.slice(0, list.maxItems);
+  const latest = raw
+    .map((row, index) => ({ index, key: sortKey(row, key) }))
+    // ISO dates and months sort as strings; a row without one goes last.
+    .sort((a, b) => (a.key === b.key ? a.index - b.index : a.key < b.key ? 1 : -1))
+    .slice(0, list.maxItems)
+    .map((r) => r.index)
+    .sort((a, b) => a - b);
+  return latest.map((index) => raw[index]);
+}
+
 // Keeps only what the schema allows; anything else the model returned is ignored, never repaired.
 export function parseSection(
   schema: SectionSchema,
@@ -163,7 +184,7 @@ export function parseSection(
       continue;
     }
     const rows: ExtractedRow[] = [];
-    for (const rawRow of raw.slice(0, list.maxItems)) {
+    for (const rawRow of keptRows(raw, list)) {
       if (
         !isRecord(rawRow) ||
         !hasOnlyKeys(rawRow, [...Object.keys(list.item), 'confidence']) ||

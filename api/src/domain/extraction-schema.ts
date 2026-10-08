@@ -71,6 +71,9 @@ export interface ListSpec {
   readonly maxItems: number;
   readonly item: Readonly<Record<string, FieldSpec>>;
   readonly required: readonly string[];
+  // Past maxItems, the rows kept are those with the latest value of this date or month field,
+  // not the first ones sent. Never part of the tool schema.
+  readonly keepLatestBy?: string;
 }
 
 export interface SectionSchema {
