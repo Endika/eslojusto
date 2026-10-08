@@ -1,3 +1,5 @@
+import { employmentAnalytics } from '../analytics/employment';
+import { track } from '../analytics/posthog';
 import { EMPLOYMENT_NORMS } from '../engine/employment/data/norms';
 import { MINIMUM_WAGE } from '../engine/employment/data/minimum-wage';
 import { DOCUMENTS_BUILD } from '../documents/config';
@@ -23,18 +25,16 @@ let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedEmploymentReview) => void)[] = [];
 const restarted: (() => void)[] = [];
 
-// The contract review measures nothing yet: its events reach no one until they have a catalogue,
-// except reading documents and the pass, which listen to a completed review and a restart.
+const analytics = employmentAnalytics(track, () => performance.now());
+// Reading documents and the pass listen to the same completed review and restart as analytics.
 const events: EmploymentEvents = {
-  stepShown() {},
-  stepCompleted() {},
-  wentBack() {},
-  fieldRejected() {},
-  outOfScope() {},
+  ...analytics,
   reviewCompleted(r) {
+    analytics.reviewCompleted(r);
     for (const listener of reviewed) listener(r);
   },
   startedOver() {
+    analytics.startedOver();
     for (const listener of restarted) listener();
   },
 };

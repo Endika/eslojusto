@@ -13,6 +13,14 @@ import {
   type RentalItemKind,
   type Step as RentalStep,
 } from '../rental/ports';
+import { EMPLOYMENT_FAQ_TOPICS } from '../content/employment-faq-topics';
+import { type FindingStatus, type Modality } from '../engine/employment/types';
+import {
+  EMPLOYMENT_FIELDS,
+  type EmploymentItemKind,
+  type OutOfScopeReason as EmploymentOutOfScopeReason,
+  type Step as EmploymentStep,
+} from '../employment/ports';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import {
   DOWNLOADS,
@@ -41,6 +49,18 @@ const RENTAL_SECTIONS = [
   'gastos',
   'salida',
 ] as const satisfies readonly RentalStep[];
+// The contract review's sheets; «salario» and «vacaciones» are already the final pay's.
+const EMPLOYMENT_SECTIONS = [
+  'relacion',
+  'modalidad',
+  'historial',
+  'nominas',
+  'jornada',
+  'prueba',
+  'clausulas',
+  'informacion',
+  'oferta',
+] as const satisfies readonly EmploymentStep[];
 export const SECTIONS = [
   'causa',
   'temporal',
@@ -55,6 +75,7 @@ export const SECTIONS = [
   'finiquito',
   'resultado',
   ...RENTAL_SECTIONS,
+  ...EMPLOYMENT_SECTIONS,
 ] as const;
 export type Section = (typeof SECTIONS)[number];
 
@@ -96,6 +117,8 @@ void _allFieldsListed;
 void _allItemsListed;
 void _allRentalSteps;
 void _allRentalInputs;
+const _allEmploymentSteps: CoversAll<EmploymentStep, Section> = true;
+void _allEmploymentSteps;
 
 // The benefit answers, by name only: an error on one of them names the field, never the answer.
 // They are left out of `snapshot`, so `changed_fields` never lists them either.
@@ -111,7 +134,12 @@ export type TrackableField = (typeof TRACKABLE_FIELDS)[number];
 // The rental questions by name; never what was answered.
 export const RENTAL_TRACKABLE_FIELDS = RENTAL_FIELDS;
 
-export const HELP_TOPICS = [...FAQ_TOPICS, ...RENTAL_FAQ_TOPICS].map(([, anchor]) => anchor);
+// The contract questions by name; never what was answered.
+export const EMPLOYMENT_TRACKABLE_FIELDS = EMPLOYMENT_FIELDS;
+
+export const HELP_TOPICS = [...FAQ_TOPICS, ...RENTAL_FAQ_TOPICS, ...EMPLOYMENT_FAQ_TOPICS].map(
+  ([, anchor]) => anchor,
+);
 
 // What a rental result card is about. A card is a kind of item, never its concept as written.
 export const RENTAL_ITEMS = [
@@ -183,6 +211,78 @@ const LANDLORDS = ['person', 'company'] as const satisfies readonly LandlordType
 export const SIGNED_PERIODS = ['2019-2023', '2023-2026', '2026+'] as const;
 export const UPDATE_COUNTS = ['0', '1', '2', '3+'] as const;
 
+// What a contract result card is about: a checked point by its kind, never its words.
+export const EMPLOYMENT_ITEMS = [
+  'minimum_wage',
+  'modality',
+  'chaining',
+  'trial_period',
+  'working_time',
+  'part_time',
+  'holidays_pay',
+  'clauses',
+  'information',
+  'offer',
+  'reference',
+] as const satisfies readonly EmploymentItemKind[];
+const _allEmploymentItems: CoversAll<EmploymentItemKind, (typeof EMPLOYMENT_ITEMS)[number]> = true;
+void _allEmploymentItems;
+
+export const EMPLOYMENT_OUT_OF_SCOPE_REASONS = [
+  'special_relationship',
+  'public_servant',
+  'temp_agency',
+  'relief',
+  'minor',
+] as const satisfies readonly EmploymentOutOfScopeReason[];
+const _allEmploymentReasons: CoversAll<
+  EmploymentOutOfScopeReason,
+  (typeof EMPLOYMENT_OUT_OF_SCOPE_REASONS)[number]
+> = true;
+void _allEmploymentReasons;
+
+const MODALITIES = [
+  'permanent',
+  'discontinuous',
+  'production',
+  'production_occasional',
+  'replacement',
+  'replacement_selection',
+  'training_alternance',
+  'training_practice',
+  'work_or_service',
+  'eventual',
+  'interim',
+  'unknown',
+] as const satisfies readonly Modality[];
+const _allModalities: CoversAll<Modality, (typeof MODALITIES)[number]> = true;
+void _allModalities;
+
+// From the status that weighs most on a family of points to the one that weighs least; a point
+// whose verdict changes with a «No lo sé» counts as `readings`, after the concrete findings.
+export const POINT_STATUSES = [
+  'below_minimum',
+  'over_legal_limit',
+  'clause_void',
+  'becomes_permanent',
+  'missing_requirement',
+  'readings',
+  'depends_on_agreement',
+  'review_it',
+  'not_reviewed_in_this_version',
+  'not_published',
+  'within_limit',
+  'not_applicable_to_date',
+  'not_entered',
+] as const satisfies readonly (FindingStatus | 'readings')[];
+const _allPointStatuses: CoversAll<FindingStatus, (typeof POINT_STATUSES)[number]> = true;
+void _allPointStatuses;
+
+// By the 2021 reform's start (30-03-2022) and the years of the minimum wage decrees after it.
+export const START_PERIODS = ['before_reform', '2022-2023', '2024-2025', '2026+'] as const;
+export const PAYSLIP_COUNTS = ['0', '1-3', '4+'] as const;
+export const YEAR_COUNTS = ['0', '1', '2', '3+'] as const;
+
 const CAUSES = [
   'resignation',
   'fixed_term_end',
@@ -223,6 +323,8 @@ export const ERROR_TYPES = [
 ] as const;
 
 const ITEM_RESULT = { values: [...ITEM_STATUSES, 'none'] } as const;
+const POINT_RESULT = { values: [...POINT_STATUSES, 'none'] } as const;
+const ANSWERS = ['yes', 'no', 'unknown'] as const;
 
 const SECTION_SECONDS = ['<10', '10-30', '30-60', '60-180', '>180'] as const;
 const REVIEW_SECONDS = ['<60', '60-180', '180-600', '>600'] as const;
@@ -269,7 +371,10 @@ const BASE_CATALOGUE = {
   section_viewed: { section },
   section_completed: { section, seconds: oneOf(SECTION_SECONDS) },
   went_back: { from: section, to: section },
-  validation_error: { section, field: oneOf([...TRACKABLE_FIELDS, ...RENTAL_TRACKABLE_FIELDS]) },
+  validation_error: {
+    section,
+    field: oneOf([...TRACKABLE_FIELDS, ...RENTAL_TRACKABLE_FIELDS, ...EMPLOYMENT_TRACKABLE_FIELDS]),
+  },
   help_opened: { topic: oneOf(HELP_TOPICS) },
   review_completed: {
     cause: oneOf(CAUSES),
@@ -296,7 +401,7 @@ const BASE_CATALOGUE = {
     // Whether the result showed only its summary or the detail a pass unlocks.
     detail: oneOf(['locked', 'unlocked']),
   },
-  detail_opened: { item: oneOf([...ITEM_IDS, ...RENTAL_ITEMS]) },
+  detail_opened: { item: oneOf([...ITEM_IDS, ...RENTAL_ITEMS, ...EMPLOYMENT_ITEMS]) },
   // Why a lease stopped at the rental review's door.
   rental_out_of_scope: { reason: oneOf(OUT_OF_SCOPE_REASONS) },
   rental_review_completed: {
@@ -313,6 +418,40 @@ const BASE_CATALOGUE = {
     deposit_return: ITEM_RESULT,
     // The doubts that move some result, each once.
     depends: { list: DOUBT_REASONS },
+    difference: oneOf(DIFFERENCE_BUCKETS),
+    offered: { boolean: true },
+    detail: oneOf(['locked', 'unlocked']),
+    attempt: oneOf(ATTEMPT_BUCKETS),
+    seconds: oneOf(REVIEW_SECONDS),
+  },
+  // Why a contract stopped at the contract review's door.
+  employment_out_of_scope: { reason: oneOf(EMPLOYMENT_OUT_OF_SCOPE_REASONS) },
+  employment_review_completed: {
+    start_period: oneOf(START_PERIODS),
+    modality: oneOf(MODALITIES),
+    part_time: { boolean: true },
+    written: oneOf(ANSWERS),
+    technical: oneOf(ANSWERS),
+    small_company: oneOf(ANSWERS),
+    // Each family of points by the status that weighs most among them, or none.
+    smi: POINT_RESULT,
+    modality_check: POINT_RESULT,
+    chaining: POINT_RESULT,
+    trial: POINT_RESULT,
+    working_time: POINT_RESULT,
+    part_time_check: POINT_RESULT,
+    holidays: POINT_RESULT,
+    extra_pays: POINT_RESULT,
+    clauses: POINT_RESULT,
+    information: POINT_RESULT,
+    // Years below the minimum wage in every reading, and whether a year's decree is not out yet.
+    smi_years_below: oneOf(YEAR_COUNTS),
+    smi_not_published: { boolean: true },
+    payslips: oneOf(PAYSLIP_COUNTS),
+    history: { boolean: true },
+    offer: { boolean: true },
+    // Whether the contract names its collective agreement; never which one.
+    agreement_named: { boolean: true },
     difference: oneOf(DIFFERENCE_BUCKETS),
     offered: { boolean: true },
     detail: oneOf(['locked', 'unlocked']),

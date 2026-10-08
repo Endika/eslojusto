@@ -20,7 +20,7 @@ import {
   sheetOfField,
   type FieldError,
 } from './form';
-import type { EmploymentReviewDeps } from './ports';
+import type { EmploymentItemKind, EmploymentReviewDeps } from './ports';
 import {
   renderEmploymentResult,
   renderErrors,
@@ -182,6 +182,20 @@ export function setUpEmployment(
   window.addEventListener('popstate', () => nav.goBack(indexOfHash(flow, location.hash), {}));
 
   const rows = setUpRows(form, tr, conditions);
+
+  // Which question or point detail a visitor opens; `toggle` does not bubble, so it is caught on
+  // the way down.
+  root.addEventListener(
+    'toggle',
+    (e) => {
+      const d = e.target;
+      if (!(d instanceof HTMLDetailsElement) || !d.open) return;
+      if (d.hasAttribute('data-help')) events.helpOpened(d.id);
+      const kind = d.closest<HTMLElement>('[data-item]')?.dataset['kind'];
+      if (d.hasAttribute('data-detail') && kind) events.detailOpened(kind as EmploymentItemKind);
+    },
+    true,
+  );
 
   required(result.querySelector('[data-restart]'), 'the restart button').addEventListener(
     'click',

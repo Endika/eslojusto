@@ -31,7 +31,7 @@ import {
 import { amountEl, pieces, shownAmount, type Piece, type Shown } from '../calculator/amounts';
 import type { ClientKey, Translate } from '../i18n/client';
 import type { FieldError } from './form';
-import type { OutOfScopeReason } from './ports';
+import type { EmploymentItemKind, OutOfScopeReason } from './ports';
 import {
   figureOf,
   headline,
@@ -393,11 +393,19 @@ interface Card {
 
 function card(
   container: ParentNode,
-  { title, tone, state, id }: { title: string; tone: string; state: string; id: string },
+  {
+    title,
+    tone,
+    state,
+    id,
+    kind,
+  }: { title: string; tone: string; state: string; id: string; kind: EmploymentItemKind },
 ): Card {
   const frag = template(container, 'item');
   const el = find(frag, '[data-item]');
   el.dataset['item'] = id;
+  // What the card is about, as a code: a point never names the person's own clause or figures.
+  el.dataset['kind'] = kind;
   el.dataset['state'] = state;
   el.dataset['tone'] = tone;
   const titleId = `employment-item-${id}`;
@@ -560,6 +568,7 @@ function itemCard(
     tone: TONE[first.item],
     state: stateOf(assessed),
     id: `${position}`,
+    kind: first.item,
   });
   fillAssessed(container, el, assessed, tr);
   if (!locked) renderDetail(container, el, assessed, tr);
@@ -578,6 +587,7 @@ function clauseCard(
     tone: 'settlement',
     state: clause.assessed === null ? 'not_assessed' : stateOf(clause.assessed),
     id: `clause-${clause.index}`,
+    kind: 'clauses',
   });
   const words = input.clauses[clause.index]?.literal.text ?? '';
   const quote = find(el, '[data-clause-words]');
@@ -613,6 +623,7 @@ function dutyCard(
       tone: 'settlement',
       state: 'not_applicable_to_date',
       id: 'duty',
+      kind: 'information',
     });
     find(el, '[data-status-text]').textContent = tr(`client.employment.duty.${duty.reason}`);
     renderRules(container, find(el, '[data-rules]'), duty.sources, tr);
@@ -628,6 +639,7 @@ function dutyCard(
     tone: 'settlement',
     state,
     id: 'duty',
+    kind: 'information',
   });
   const count = (key: 'missing' | 'review', n: number) =>
     tr(`client.employment.duty.${key}_${n === 1 ? 'one' : 'many'}`, { n: String(n) });
@@ -705,6 +717,7 @@ function offerCard(
     tone: 'settlement',
     state: 'no_verdict',
     id: 'offer',
+    kind: 'offer',
   });
   const n = offer.differences.length;
   find(el, '[data-status-text]').textContent =
@@ -760,6 +773,7 @@ function referenceCard(
     tone: 'dates',
     state: 'no_verdict',
     id: 'reference',
+    kind: 'reference',
   });
   find(el, '[data-status-text]').textContent = tr('client.employment.reference.lead', {
     fecha: civilText(reference.on),

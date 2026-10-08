@@ -187,6 +187,8 @@ describe('the catalogue guard', () => {
         'review_completed',
         'rental_out_of_scope',
         'rental_review_completed',
+        'employment_out_of_scope',
+        'employment_review_completed',
         'section_completed',
         'section_viewed',
         'start_chosen',

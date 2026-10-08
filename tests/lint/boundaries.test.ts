@@ -34,6 +34,10 @@ describe('import boundaries', () => {
     ['src/analytics/x.ts', "import { SHEET_FIELDS } from '../rental/form';"],
     ['src/analytics/x.ts', "import { rentalFaqEntries } from '../content/rental-faq';"],
     ['src/rental/x.ts', "import { rentalAnalytics } from '../analytics/rental';"],
+    ['src/analytics/x.ts', "import { setUpEmployment } from '../employment/main';"],
+    ['src/analytics/x.ts', "import { SHEET_FIELDS } from '../employment/form';"],
+    ['src/analytics/x.ts', "import { employmentFaqEntries } from '../content/employment-faq';"],
+    ['src/employment/x.ts', "import { employmentAnalytics } from '../analytics/employment';"],
     ['src/engine/rental/x.ts', "import { t } from '../../i18n';"],
     ['src/engine/rental/x.ts', "import { track } from '../../analytics/posthog';"],
     ['src/engine/rental/x.ts', "import posthog from 'posthog-js';"],
@@ -231,6 +235,8 @@ describe('import boundaries', () => {
     "import { setUpCalculator } from '../engine/../calculator/main';",
     "import { RENTAL_FIELDS } from '../rental/./ports';",
     "import { RENTAL_FIELDS } from '../engine/../rental/ports';",
+    "import { EMPLOYMENT_FIELDS } from '../employment/./ports';",
+    "import { EMPLOYMENT_FIELDS } from '../engine/../employment/ports';",
   ])(
     'analytics cannot reach the adapter or other zones by spelling the path differently: %s',
     async (code) => {
@@ -322,6 +328,12 @@ describe('import boundaries', () => {
     ['src/analytics/x.ts', "import type { RentalEvents } from '../rental/ports';"],
     ['src/analytics/x.ts', "import { RENTAL_FIELDS } from '../rental/ports';"],
     ['src/analytics/x.ts', "import { RENTAL_FAQ_TOPICS } from '../content/rental-faq-topics';"],
+    ['src/analytics/x.ts', "import type { EmploymentEvents } from '../employment/ports';"],
+    ['src/analytics/x.ts', "import { EMPLOYMENT_FIELDS } from '../employment/ports';"],
+    [
+      'src/analytics/x.ts',
+      "import { EMPLOYMENT_FAQ_TOPICS } from '../content/employment-faq-topics';",
+    ],
     ['src/layouts/csp.ts', "import { TURNSTILE_ORIGIN } from '../documents/config';"],
     ['src/scripts/x.ts', "export const pdf = () => import('../documents/pdf');"],
     ['src/engine/rental/x.ts', "import { round2 } from '../money';"],
