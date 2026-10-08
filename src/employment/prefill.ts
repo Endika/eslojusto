@@ -19,7 +19,7 @@ import {
   toIso,
   type CivilDate,
 } from '../engine/date';
-import { INFO_ELEMENTS } from '../engine/employment/types';
+import { INFO_ELEMENTS, type SalaryPeriod } from '../engine/employment/types';
 import type { ClientKey, Translate } from '../i18n/client';
 import {
   CLAUSE_LABELS,
@@ -170,22 +170,22 @@ function relationship(a: Answers, e: EmploymentExtraction, contractRead: boolean
   if (contractRead) a.read('writtenContract', 'yes', 'high', true);
 }
 
-function dates(a: Answers, fields: Fields): CivilDate | null {
+function dates(
+  a: Answers,
+  fields: Fields,
+): { readonly start: CivilDate | null; readonly end: CivilDate | null } {
   const read = fieldReader(a, fields);
   const start = read.date('startDate', 'startDate');
   read.date('signedOn', 'signedOn');
-  if (read.date('endDate', 'endDate')) return start;
+  const end = read.date('endDate', 'endDate');
+  if (end) return { start, end };
   // A duration in months ends the day before the same day that many months on.
   const months = fields.durationMonths;
   const n = wholeOf(months?.value);
-  if (start && months && n !== null && n > 0)
-    a.read(
-      'endDate',
-      toIso(addDays(addMonthsClamped(start, n), -1)),
-      lowest(months.confidence, 'medium'),
-      true,
-    );
-  return start;
+  if (!start || !months || n === null || n <= 0) return { start, end: null };
+  const worked = addDays(addMonthsClamped(start, n), -1);
+  a.read('endDate', toIso(worked), lowest(months.confidence, 'medium'), true);
+  return { start, end: worked };
 }
 
 function modality(a: Answers, fields: Fields) {
@@ -193,30 +193,36 @@ function modality(a: Answers, fields: Fields) {
   if (!read.choice('modality', 'modality', MODALITIES))
     read.choice('modality', 'trainingType', MODALITIES);
   read.flag('replacedPersonNamed', 'replacedPersonNamed');
-  read.flag('replacementCauseStated', 'replacementCauseStated');
   read.flag('planAttached', 'planAttached');
   read.date('studiesEndedOn', 'studiesEndedOn');
   read.figure('effectiveYear1', 'effectiveWorkPercent');
 }
 
-function salary(a: Answers, fields: Fields, parts: readonly ExtractedRow[]) {
+// The salary and its period, once each: the annual figure, by the year, when it is the only one.
+function salaryAndPeriod(a: Answers, fields: Fields): SalaryPeriod | null {
   const read = fieldReader(a, fields);
-  let period = read.choice('salaryPeriod', 'salaryPeriod', SALARY_PERIODS);
-  if (read.figure('salaryAmount', 'salaryAmount') === null) {
-    const annual = fields.annualSalaryAmount;
-    const amount = amountOf(annual?.value);
-    if (annual && amount !== null) {
-      a.read('salaryAmount', amountText(amount), annual.confidence);
-      a.read('salaryPeriod', 'year', annual.confidence);
-      period = 'year';
-    }
-  }
-  // Twelve monthly payments and the extra ones: the form asks for the extra ones.
+  const annual = fields.annualSalaryAmount;
+  const annualAmount = amountOf(annual?.value);
+  if (read.figure('salaryAmount', 'salaryAmount') !== null || !annual || annualAmount === null)
+    return read.choice('salaryPeriod', 'salaryPeriod', SALARY_PERIODS);
+  a.read('salaryAmount', amountText(annualAmount), annual.confidence);
+  a.read('salaryPeriod', 'year', annual.confidence);
+  return 'year';
+}
+
+// Whether the contract's twelve payments seem to hold the extra pays, which leaves their number
+// to the person.
+function salary(a: Answers, fields: Fields, parts: readonly ExtractedRow[]): boolean {
+  const read = fieldReader(a, fields);
+  const period = salaryAndPeriod(a, fields);
+  // Twelve monthly payments and the extra ones: the form asks for the extra ones. Twelve payments
+  // with the extras prorated hold them inside, in a number the contract does not give.
   const payments = fields.payments;
   const count = wholeOf(payments?.value);
-  const extras = payments && count !== null && count >= 12 ? count - 12 : null;
+  const inTwelve = count === 12 && fields.prorated?.value === true;
+  const extras = payments && count !== null && count >= 12 && !inTwelve ? count - 12 : null;
   if (payments && extras !== null) a.read('extraPays', String(extras), payments.confidence, true);
-  if (extras !== 0) read.flag('extraProrated', 'prorated');
+  if (extras !== 0 && !inTwelve) read.flag('extraProrated', 'prorated');
   // The contract gives pay in kind a year; the form takes it for the salary's period.
   const inKind = fields.inKindAmount;
   const yearly = amountOf(inKind?.value);
@@ -231,6 +237,11 @@ function salary(a: Answers, fields: Fields, parts: readonly ExtractedRow[]) {
   );
   if (agreement) a.read('agreementNamed', 'yes', agreement.confidence);
 
+  salaryParts(a, parts);
+  return inTwelve;
+}
+
+function salaryParts(a: Answers, parts: readonly ExtractedRow[]) {
   const rows = a.rows(
     'parts',
     parts.filter(
@@ -318,8 +329,11 @@ function wholeMonth(
   }
   const days = wholeOf(row.values['daysWorked']);
   if (days === null) return null;
-  // A payslip pays a whole month as 30 days whatever its length.
-  return { value: days >= Math.min(30, last) ? 'yes' : 'no', derived: true };
+  // A whole month is paid as 30 days or as its calendar days; 28 or 29 in February, or 30 in a
+  // 31-day month, may be either a whole month or not, and is left to the person.
+  if (days >= Math.max(30, last)) return { value: 'yes', derived: true };
+  if ((m === 2 && days >= 28) || (last === 31 && days === 30)) return null;
+  return { value: 'no', derived: true };
 }
 
 function payslips(
@@ -329,7 +343,8 @@ function payslips(
   doubts: { readonly mismatch: boolean; readonly cut: boolean },
 ) {
   const { months: sums, leftOut } = sumLines(lines);
-  // A list of lines cut to its most recent rows may hold only part of its earliest month.
+  // Lines that may be cut to their most recent rows may hold only part of their earliest month:
+  // its sum could read short, so it is left to the person.
   const partial = doubts.cut ? [...sums.keys()].sort()[0] : undefined;
   const byMonth = new Map<string, ExtractedRow>();
   for (const row of slips) {
@@ -337,7 +352,7 @@ function payslips(
     if (month && !byMonth.has(month)) byMonth.set(month, row);
   }
   const months = a.rows('payslips', [...new Set([...byMonth.keys(), ...sums.keys()])].sort());
-  if (months.length === 0) return { leftOut, unsummed: false };
+  if (months.length === 0) return { leftOut, unsummed: false, partial: false };
   a.open('hasPayslips', 'yes');
   let unsummed = false;
   months.forEach((month, i) => {
@@ -346,9 +361,11 @@ function payslips(
     const sum = sums.get(month);
     const base = lowest(slip?.confidence ?? 'high', sum?.confidence ?? 'high');
     a.read(field('month'), month, slip?.confidence ?? sum?.confidence ?? 'high');
-    if (sum && sum.salary > 0) {
+    if (month === partial) {
+      // Its month is still listed; its sums are the person's.
+    } else if (sum && sum.salary > 0) {
       // Lines that do not add up to the payslip's total leave every sum in doubt.
-      const confidence = doubts.mismatch || month === partial ? 'low' : base;
+      const confidence = doubts.mismatch ? 'low' : base;
       a.read(field('salary'), amountText(sum.salary / 100), confidence, true);
       if (sum.prorated > 0)
         a.read(field('prorated'), amountText(sum.prorated / 100), confidence, true);
@@ -356,17 +373,11 @@ function payslips(
     } else unsummed = true;
     if (!slip) return;
     const whole = wholeMonth(slip, month);
-    if (whole)
-      a.read(
-        field('wholeMonth'),
-        whole.value,
-        whole.derived ? lowest(slip.confidence, 'medium') : slip.confidence,
-        whole.derived,
-      );
+    if (whole) a.read(field('wholeMonth'), whole.value, slip.confidence, whole.derived);
     const incidents = yesNo(slip.values['incidents']);
     if (incidents) a.read(field('incidents'), incidents, slip.confidence);
   });
-  return { leftOut, unsummed };
+  return { leftOut, unsummed, partial: partial !== undefined && months.includes(partial) };
 }
 
 function time(a: Answers, fields: Fields) {
@@ -569,14 +580,13 @@ function history(
 const CUT_LISTS = ['salaryParts', 'clauses', 'payslips', 'lines', 'contracts'] as const;
 type CutList = (typeof CUT_LISTS)[number];
 
-// Which lists reached their maximum when the API says one was cut. When none shows it, the work
-// history is taken as possibly cut too: a count within a limit is never said on a list that may
-// be short.
+// Which lists reached their maximum when the API says one was cut; rows that failed its checks
+// can leave a cut list short of it, so `unknown` says the cut may be anywhere. Any read work
+// history is then taken as possibly cut: that only leaves the chaining count in doubt.
 function cutLists(e: EmploymentExtraction) {
   if (!e.truncated) return { lists: [] as CutList[], history: false, unknown: false };
   const lists = CUT_LISTS.filter((l) => e[l].length >= EMPLOYMENT_LIST_MAXIMA[l]);
-  const history = e.contracts.length > 0 && (lists.length === 0 || lists.includes('contracts'));
-  return { lists, history, unknown: lists.length === 0 };
+  return { lists, history: e.contracts.length > 0, unknown: lists.length === 0 };
 }
 
 // Category and agreement are not asked as such, so a disagreement is only said.
@@ -594,23 +604,23 @@ export function employmentPrefill(
   const a = new Answers();
   const contractRead = e.documents.some((d) => d.kind === 'employment_contract');
   relationship(a, e, contractRead);
-  const start = dates(a, e.fields);
+  const contractDates = dates(a, e.fields);
   modality(a, e.fields);
   const cut = cutLists(e);
   history(
     a,
     e.contracts,
     {
-      start: start ?? dateOf(answers['startDate']),
-      end: dateOf(e.fields.endDate?.value) ?? dateOf(answers['endDate']),
+      start: contractDates.start ?? dateOf(answers['startDate']),
+      end: contractDates.end ?? dateOf(answers['endDate']),
     },
     textOf(e.fields.companyName?.value),
     cut.history,
   );
-  salary(a, e.fields, e.salaryParts);
+  const extrasInTwelve = salary(a, e.fields, e.salaryParts);
   const slips = payslips(a, e.payslips, e.lines, {
     mismatch: checks.includes('payslip_lines_do_not_sum'),
-    cut: cut.lists.includes('lines'),
+    cut: cut.lists.includes('lines') || cut.unknown,
   });
   time(a, e.fields);
   const holidayUnitMissing = trialAndHolidays(a, e.fields);
@@ -660,6 +670,8 @@ export function employmentPrefill(
           ]
         : []),
       ...(slips.unsummed ? [tr('client.employment.documents.payslip_no_lines')] : []),
+      ...(slips.partial ? [tr('client.employment.documents.payslip_partial')] : []),
+      ...(extrasInTwelve ? [tr('client.employment.documents.extras_in_twelve')] : []),
       ...(holidayUnitMissing ? [tr('client.documents.holiday_unit')] : []),
       ...(offerPeriod ? [tr('client.employment.documents.offer_period')] : []),
       ...cut.lists.map((l) => tr(listCut(l), { n: EMPLOYMENT_LIST_MAXIMA[l] })),

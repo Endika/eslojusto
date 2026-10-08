@@ -2188,6 +2188,10 @@ export const es = {
   'client.employment.documents.line.other': 'otros conceptos',
   'client.employment.documents.payslip_no_lines':
     'De alguna nómina no se han leído sus devengos: escribe tú la cifra en la hoja de nóminas.',
+  'client.employment.documents.payslip_partial':
+    'De la nómina más antigua puede que solo se hayan leído algunos devengos, así que no se ha sumado su cifra: escríbela tú en la hoja de nóminas.',
+  'client.employment.documents.extras_in_twelve':
+    'El contrato dice 12 pagas con las extra prorrateadas, así que las pagas extra parecen ir dentro de esas 12. Dinos en la hoja de salario cuántas son y si van prorrateadas.',
   'client.employment.documents.offer_period':
     'La oferta no da el salario al año, así que no se ha pasado: escribe tú la cifra anual en la hoja de la oferta.',
   'client.employment.documents.cut.salaryParts':
