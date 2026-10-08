@@ -10,8 +10,7 @@ import {
 } from '../documents/contract';
 import type { ReadMark, ReadPrefill } from '../documents/ports';
 import { conflictLines, RENTAL_CONFLICT_FIELDS } from '../documents/summary';
-import { compareDates, ordinal, parseDate, toIso, type CivilDate } from '../engine/date';
-import { anniversaryIn } from '../engine/rental/anniversary';
+import { compareDates, parseDate, toIso, type CivilDate } from '../engine/date';
 import type { RegionCode } from '../engine/rental/types';
 import type { Translate } from '../i18n/client';
 import {
@@ -97,22 +96,26 @@ export function regionOfPostcode(postcode: string): RegionCode | null {
   return found ? (found[0] as RegionCode) : null;
 }
 
-// How many days before its anniversary a rise may be charged and still belong to it.
-export const EARLY_DAYS = 31;
+// A rise first charged in the month before an anniversary belongs to it; one within this many
+// months before it may still, so its year is to be checked.
+export const EARLY_MONTHS = 1;
+export const DOUBT_MONTHS = 3;
 
-// The anniversary year a rise belongs to: the latest anniversary on or before the day it applies
-// from (the notice's date when it gives one, otherwise the first month charged). Only when that
-// day falls just before the next anniversary does it belong to that one, and then less surely.
+// The anniversary year a rise belongs to, counted in months: the latest anniversary month on or
+// before the month it applies from (the notice's when it gives one, otherwise the first month
+// charged). In the month just before the next anniversary it belongs to that one, and in the
+// months before that it keeps the latest one; either way the year is in doubt.
 export function riseYear(
   start: CivilDate,
   from: CivilDate,
-): { readonly year: number; readonly early: boolean } {
-  const latest = compareDates(anniversaryIn(start, from.y), from) <= 0 ? from.y : from.y - 1;
-  const following = latest + 1;
-  const daysBefore = ordinal(anniversaryIn(start, following)) - ordinal(from);
-  if (latest <= start.y || daysBefore <= EARLY_DAYS)
-    return { year: Math.max(following, start.y + 1), early: true };
-  return { year: latest, early: false };
+): { readonly year: number; readonly doubtful: boolean } {
+  const month = from.y * 12 + from.m;
+  const anniversary = (y: number) => y * 12 + start.m;
+  const latest = anniversary(from.y) <= month ? from.y : from.y - 1;
+  const ahead = anniversary(latest + 1) - month;
+  if (latest <= start.y || ahead <= EARLY_MONTHS)
+    return { year: Math.max(latest + 1, start.y + 1), doubtful: true };
+  return { year: latest, doubtful: ahead <= DOUBT_MONTHS };
 }
 
 // One receipt per month. Two that state the same month differently leave the month in doubt:
@@ -145,13 +148,15 @@ interface RentChange {
   readonly previous: number;
   readonly next: number;
   readonly confidence: Confidence;
+  // The month of the receipt before it, when months between them are missing.
+  readonly gapAfter: string | null;
 }
 
 const sameRent = (a: number, b: number) => Math.abs(a - b) < 0.005;
 const toMonth = (d: CivilDate) => `${d.y}-${String(d.m).padStart(2, '0')}`;
 
-// Every month the rent charged changed and stayed changed. A new rent counts once it holds for
-// two receipts or is the last one read, so a one-off month is no change; the month the contract
+// Every month the rent charged changed. A month whose very next month is back at the rent before
+// it is a one-off, no change; a gap between receipts never hides one. The month the contract
 // started, when it did not start on the 1st, is prorated and left out, as is any before it. A
 // change after a gap in the receipts may have come in any month of the gap, so it is less sure.
 export function rentChanges(
@@ -172,14 +177,20 @@ export function rentChanges(
   let current = sorted[0];
   sorted.forEach((r, i) => {
     if (!current || sameRent(current.rent, r.rent)) return;
+    // A one-off month: the very next month is back at the rent before it.
     const after = sorted[i + 1];
-    if (after && !sameRent(after.rent, r.rent)) return;
+    const oneOff =
+      after !== undefined &&
+      monthIndex(after.month) === monthIndex(r.month) + 1 &&
+      sameRent(after.rent, current.rent);
+    if (oneOff) return;
     const gap = monthIndex(r.month) - monthIndex(sorted[i - 1]?.month ?? r.month) > 1;
     changes.push({
       month: r.month,
       previous: current.rent,
       next: r.rent,
       confidence: gap ? 'low' : lowest(r.confidence, current.confidence),
+      gapAfter: gap ? (sorted[i - 1]?.month ?? null) : null,
     });
     current = r;
   });
@@ -329,6 +340,19 @@ interface Rise {
   readonly confidence: Confidence;
   // How sure what was worked out from the receipts is.
   readonly worked: Confidence;
+  // When the receipts skip months before it: the last month read at the earlier rent.
+  readonly gapAfter: string | null;
+}
+
+// In months missing between two receipts, the rise may have come with any anniversary among
+// them: the latest one, which is still only a guess.
+function anniversaryInGap(start: CivilDate, after: string, month: string): number | null {
+  for (let y = Number(month.slice(0, 4)); y > start.y; y -= 1) {
+    const at = y * 12 + start.m;
+    if (at <= monthIndex(after)) return null;
+    if (at <= monthIndex(month)) return y;
+  }
+  return null;
 }
 
 const firstOfMonth = (month: string): CivilDate => parseDate(`${month}-01`);
@@ -363,6 +387,7 @@ function rises(notices: readonly ExtractedRow[], changes: readonly RentChange[])
     return {
       chargedFrom: change ? firstOfMonth(change.month) : applies,
       appliesFrom: applies,
+      gapAfter: change?.gapAfter ?? null,
       previous: previousRead ?? change?.previous ?? null,
       previousDerived: previousRead === null,
       next: next ?? change?.next ?? null,
@@ -377,6 +402,7 @@ function rises(notices: readonly ExtractedRow[], changes: readonly RentChange[])
   const fromReceipts = unmatched.map((c): Rise => ({
     chargedFrom: firstOfMonth(c.month),
     appliesFrom: null,
+    gapAfter: c.gapAfter,
     previous: c.previous,
     previousDerived: true,
     next: c.next,
@@ -403,12 +429,17 @@ function updates(a: Answers, all: readonly Rise[], start: CivilDate | null): boo
     if (i === 0) a.open('hasUpdates', 'yes');
     const field = (key: string) => rowField('updates', i, key);
     const from = r.appliesFrom ?? r.chargedFrom ?? r.noticeOn;
+    const inGap =
+      start && !r.appliesFrom && r.chargedFrom && r.gapAfter
+        ? anniversaryInGap(start, r.gapAfter, toMonth(r.chargedFrom))
+        : null;
     if (from) {
-      const belongs = start ? riseYear(start, from) : null;
+      const belongs =
+        inGap !== null ? { year: inGap, doubtful: true } : start ? riseYear(start, from) : null;
       a.read(
         field('year'),
         String(belongs ? belongs.year : from.y),
-        belongs && !belongs.early ? r.worked : 'low',
+        belongs && !belongs.doubtful ? r.worked : 'low',
         true,
       );
     }

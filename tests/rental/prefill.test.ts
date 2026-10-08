@@ -215,8 +215,8 @@ describe('rises', () => {
       ['updates.1.newRent', '1.060,00'],
     ]);
     expect(mark(p, 'updates.0.chargedFrom')?.confidence).toBe('high');
-    // Charged before its anniversary, the rise belongs to it, but less surely.
-    expect(mark(p, 'updates.0.year')?.confidence).toBe('low');
+    // First charged in its anniversary's own month: not early.
+    expect(mark(p, 'updates.0.year')?.confidence).toBe('high');
     expect(mark(p, 'updates.1.chargedFrom')?.confidence).toBe('low');
     expect(entry(p, 'updates.1.notice')).toBeUndefined();
   });
@@ -239,17 +239,68 @@ describe('rises', () => {
     expect(entry(p, 'updates.0.chargedFrom')).toBe('2025-10-01');
   });
 
-  it('belong to the latest anniversary on or before the day they apply from', () => {
+  it('belong to the latest anniversary month on or before the month they apply from', () => {
     const start = d('2024-03-20');
-    expect(riseYear(start, d('2025-10-01'))).toEqual({ year: 2025, early: false });
-    expect(riseYear(start, d('2025-03-20'))).toEqual({ year: 2025, early: false });
-    expect(riseYear(start, d('2026-01-15'))).toEqual({ year: 2025, early: false });
-    // Only just before an anniversary does a rise belong to it, and less surely.
-    expect(riseYear(start, d('2025-03-01'))).toEqual({ year: 2025, early: true });
-    expect(riseYear(start, d('2026-02-18'))).toEqual({ year: 2026, early: true });
-    expect(riseYear(start, d('2026-02-16'))).toEqual({ year: 2025, early: false });
+    expect(riseYear(start, d('2025-10-01'))).toEqual({ year: 2025, doubtful: false });
+    expect(riseYear(start, d('2025-03-20'))).toEqual({ year: 2025, doubtful: false });
+    // The anniversary's own month, even before its day, is not early.
+    expect(riseYear(start, d('2025-03-01'))).toEqual({ year: 2025, doubtful: false });
+    expect(riseYear(start, d('2025-11-30'))).toEqual({ year: 2025, doubtful: false });
+    // Within three months of the next anniversary, the latest one is kept, in doubt.
+    expect(riseYear(start, d('2025-12-15'))).toEqual({ year: 2025, doubtful: true });
+    expect(riseYear(start, d('2026-01-15'))).toEqual({ year: 2025, doubtful: true });
+    // The month just before it belongs to it, in doubt too.
+    expect(riseYear(start, d('2026-02-16'))).toEqual({ year: 2026, doubtful: true });
     // Never the year the contract started.
-    expect(riseYear(d('2024-12-20'), d('2024-12-01'))).toEqual({ year: 2025, early: true });
+    expect(riseYear(d('2024-12-20'), d('2024-12-01'))).toEqual({ year: 2025, doubtful: true });
+  });
+
+  it('mark the year to check when a rise applies weeks before the next anniversary', () => {
+    const p = prefill({
+      fields: lease,
+      notices: [row({ previousRent: 1000, newRent: 1030, appliesFrom: '2026-01-10' })],
+    });
+    expect(entry(p, 'updates.0.year')).toBe('2025');
+    expect(mark(p, 'updates.0.year')?.confidence).toBe('low');
+  });
+
+  it('keep every change in sparse receipts, one a year', () => {
+    const sparse = {
+      fields: { ...lease, signedOn: f('2023-01-20'), startDate: f('2023-02-01') },
+      receipts: [
+        row({ month: '2024-01', rent: 1000 }),
+        row({ month: '2025-01', rent: 1030 }),
+        row({ month: '2026-01', rent: 1060 }),
+      ],
+    };
+    const rises = (p: ReturnType<typeof prefill>) =>
+      p.entries.filter(([n]) => /^updates\.\d\.(year|previousRent|newRent)$/.test(n));
+    expect(rises(prefill(sparse))).toEqual([
+      ['updates.0.year', '2024'],
+      ['updates.0.previousRent', '1.000,00'],
+      ['updates.0.newRent', '1.030,00'],
+      ['updates.1.year', '2025'],
+      ['updates.1.previousRent', '1.030,00'],
+      ['updates.1.newRent', '1.060,00'],
+    ]);
+    // Each notice matches its own year's change, not the next one.
+    const noticed = prefill({
+      ...sparse,
+      notices: [
+        row({ previousRent: 1030, newRent: 1060, appliesFrom: '2025-02-01' }),
+        row({ previousRent: 1000, newRent: 1030, appliesFrom: '2024-02-01' }),
+      ],
+    });
+    expect(
+      noticed.entries.filter(([n]) => /^updates\.\d\.(year|chargedFrom|newRent)$/.test(n)),
+    ).toEqual([
+      ['updates.0.year', '2024'],
+      ['updates.0.chargedFrom', '2025-01-01'],
+      ['updates.0.newRent', '1.030,00'],
+      ['updates.1.year', '2025'],
+      ['updates.1.chargedFrom', '2026-01-01'],
+      ['updates.1.newRent', '1.060,00'],
+    ]);
   });
 
   it('go by the notice’s day when it says when the rise applies', () => {
