@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.18.0](https://github.com/Endika/eslojusto/compare/v1.17.0...v1.18.0) (2026-10-08)
+
+
+### Features
+
+* **api:** read employment contracts, payslips, job offers and work histories ([58bcdd2](https://github.com/Endika/eslojusto/commit/58bcdd227c12fc22779c72dd891b6e3981f895f5))
+* **api:** return an employment checkout to /contrato/ ([daab1b4](https://github.com/Endika/eslojusto/commit/daab1b46174d507767d6a84769bc0fa7065d9824))
+
+
+### Bug Fixes
+
+* **api:** fit employment lists in max_tokens and drop special-category texts ([7a3a975](https://github.com/Endika/eslojusto/commit/7a3a97503641694744928fbd90490a9c3bf7cb0a))
+* **api:** keep the most recent payslips, lines and work-history rows past a list's maximum ([416114d](https://github.com/Endika/eslojusto/commit/416114d488d3b7e3a27b956ea0467bfd1c7cba3b))
+* **api:** widen the special-category guard and spare agreement names and IT jobs ([6d264a2](https://github.com/Endika/eslojusto/commit/6d264a2ced86fac224d24c0a06382c0d3f558bfe))
+
 ## [1.17.0](https://github.com/Endika/eslojusto/compare/v1.16.1...v1.17.0) (2026-10-08)
 
 
