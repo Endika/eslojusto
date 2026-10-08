@@ -54,9 +54,9 @@ const noPosthogAdapter = {
   message: 'Only the composition root (src/scripts) imports the PostHog adapter.',
 };
 const analyticsReach = {
-  regex: `^\\.\\./(?!engine/|content/faq-topics$|i18n/client$|calculator/ports$|documents/ports$|documents/config$)|${notCanonical}`,
+  regex: `^\\.\\./(?!engine/|content/(rental-)?faq-topics$|i18n/client$|calculator/ports$|rental/ports$|documents/ports$|documents/config$)|${notCanonical}`,
   message:
-    'src/analytics reaches only the engine, the help topics, the translator type, the calculator and documents ports and the documents switch.',
+    'src/analytics reaches only the engine, the help topics, the translator type, the calculator, rental and documents ports and the documents switch.',
 };
 // Every review section walks its sheets on the same navigation and tabs, which learn a section's
 // steps from the Flow they are given, so a new section plugs in without touching them.

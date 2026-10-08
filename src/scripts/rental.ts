@@ -1,3 +1,5 @@
+import { rentalAnalytics } from '../analytics/rental';
+import { track } from '../analytics/posthog';
 import { RENTAL_TABLES } from '../engine/rental/data/tables';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import { pageTranslator } from '../i18n/client';
@@ -22,18 +24,16 @@ let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedRentalReview) => void)[] = [];
 const restarted: (() => void)[] = [];
 
-// The rental review measures nothing yet: its events reach no one until they have a catalogue,
-// except reading documents and the pass, which listen to a completed review and a restart.
+const analytics = rentalAnalytics(track, () => performance.now());
+// Reading documents and the pass listen to the same completed review and restart as analytics.
 const events: RentalEvents = {
-  stepShown() {},
-  stepCompleted() {},
-  wentBack() {},
-  fieldRejected() {},
-  outOfScope() {},
+  ...analytics,
   reviewCompleted(r) {
+    analytics.reviewCompleted(r);
     for (const listener of reviewed) listener(r);
   },
   startedOver() {
+    analytics.startedOver();
     for (const listener of restarted) listener();
   },
 };

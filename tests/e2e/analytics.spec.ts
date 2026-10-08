@@ -427,3 +427,166 @@ test('with the do-not-track signal nothing is sent', async ({ page }) => {
   expect(spy.bodies).toEqual([]);
   expect(spy.external).toEqual([]);
 });
+
+// The keys an event carries of its own, past what PostHog and the page add to every one.
+const ownKeys = (e: CapturedEvent | undefined) =>
+  keys(e).filter((k) => !TECHNICAL.includes(k) && !PAGE.includes(k) && k !== '$pageview_id');
+
+test('the rental review sends sheets, field names and its outcome in codes, never a figure or a date', async ({
+  page,
+  context,
+}) => {
+  const spy = await spyOn(page);
+  await page.clock.setFixedTime(new Date('2026-10-08T12:00:00'));
+  await page.goto('alquiler/');
+  const next = async () => {
+    await page.getByRole('button', { name: 'Siguiente' }).click();
+    // The page turn moves in steps, so a click during it can land beside its target.
+    await page.waitForFunction(() =>
+      document.getAnimations().every((a) => a.playState !== 'running'),
+    );
+  };
+  const sheet = (name: string) => page.getByRole('group', { name, exact: true });
+
+  await next(); // nothing answered: validation errors, by field name
+  const contract = sheet('Tu contrato');
+  await contract.getByLabel('Vivienda habitual', { exact: true }).check();
+  await contract.getByLabel('Fecha del contrato', { exact: true }).fill('2024-03-15');
+  await contract.getByLabel('Fecha de entrada', { exact: true }).fill('2024-03-20');
+  await next();
+  const landlord = sheet('Tu casero');
+  await landlord.getByLabel('Una persona').check();
+  await landlord
+    .getByRole('group', { name: '¿Tu casero es una empresa o tiene muchas viviendas?' })
+    .getByLabel('No lo sé', { exact: true })
+    .check();
+  await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
+  await landlord
+    .getByRole('group', { name: '¿Está la vivienda en una zona tensionada?' })
+    .getByLabel('No', { exact: true })
+    .check();
+  await next();
+  await next();
+  const rent = sheet('La renta');
+  await rent.getByLabel('Renta al empezar').fill('1.000,00');
+  await rent.getByLabel('Duración pactada, en meses').fill('60');
+  await rent.getByLabel('El IPC', { exact: true }).check();
+  await next();
+  const rises = sheet('Las subidas');
+  await rises.getByLabel('Sí, añadirlas').check();
+  const row = rises.getByRole('group', { name: 'Subida 1' });
+  await row.getByLabel('Año de la subida').fill('2025');
+  await row.getByLabel('Primer recibo con la renta nueva').fill('2025-03-01');
+  await row.getByLabel('Renta antes').fill('1000');
+  await row.getByLabel('Renta después').fill('1030');
+  await row.getByLabel('¿Cómo te avisaron?').selectOption({ label: 'Carta' });
+  await row.getByLabel('Fecha del aviso').fill('2025-02-01');
+  await row
+    .getByRole('group', { name: '¿Aceptaste esa subida por escrito?' })
+    .getByLabel('No', { exact: true })
+    .check();
+  await next();
+  await next();
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
+  await page
+    .getByRole('region', { name: 'Subida del 20-03-2025' })
+    .getByText('Cómo se calcula')
+    .click();
+  await page.getByText('¿Qué es el IRAV?').click();
+
+  await expect.poll(() => spy.named('help_opened').length, { timeout: 15_000 }).toBe(1);
+  await expect.poll(() => spy.named('rental_review_completed').length, { timeout: 15_000 }).toBe(1);
+
+  // A gate: a seasonal lease stops at the first sheet.
+  await page.getByRole('button', { name: 'Empezar de nuevo' }).click();
+  await sheet('Tu contrato').getByLabel('De temporada', { exact: true }).check();
+  await sheet('Tu contrato').getByLabel('Fecha del contrato', { exact: true }).fill('2025-09-01');
+  await sheet('Tu contrato').getByLabel('Fecha de entrada', { exact: true }).fill('2025-09-01');
+  await next();
+  await expect.poll(() => spy.named('rental_out_of_scope').length, { timeout: 15_000 }).toBe(1);
+
+  expect(new Set(spy.named('validation_error').map((e) => e.properties['field']))).toEqual(
+    new Set(['contractType', 'signedOn', 'startDate']),
+  );
+  expect(spy.named('validation_error').every((e) => e.properties['section'] === 'contrato')).toBe(
+    true,
+  );
+  expect(spy.named('section_viewed').map((e) => e.properties['section'])).toEqual([
+    'contrato',
+    'casero',
+    'entrada',
+    'renta',
+    'subidas',
+    'gastos',
+    'salida',
+    'resultado',
+    'contrato',
+    'resultado',
+  ]);
+  expect(spy.named('detail_opened').map((e) => e.properties['item'])).toEqual(['rent_update']);
+  expect(spy.named('help_opened').map((e) => e.properties['topic'])).toEqual(['faq-alquiler-irav']);
+  expect(spy.named('started_over')).toHaveLength(1);
+
+  const completed = spy.named('rental_review_completed')[0];
+  expect(completed?.properties).toMatchObject({
+    signed_period: '2023-2026',
+    landlord: 'person',
+    large_landlord: 'unknown',
+    clause: 'ipc',
+    updates: '1',
+    rent_update: 'paid_over',
+    fees: 'none',
+    charges: 'none',
+    deposit_return: 'none',
+    offered: true,
+    detail: 'unlocked',
+    attempt: '1',
+  });
+  expect(ownKeys(completed)).toEqual(
+    [
+      'signed_period',
+      'landlord',
+      'large_landlord',
+      'clause',
+      'updates',
+      'fees',
+      'guarantees',
+      'rent_update',
+      'charges',
+      'deposit_return',
+      'depends',
+      'difference',
+      'offered',
+      'detail',
+      'attempt',
+      'seconds',
+    ].toSorted(),
+  );
+  const outOfScope = spy.named('rental_out_of_scope')[0];
+  expect(outOfScope?.properties['reason']).toBe('seasonal');
+  expect(ownKeys(outOfScope)).toEqual(['reason']);
+
+  for (const e of spy.events()) {
+    const text = withoutRandom(e);
+    for (const forbidden of [
+      '1000',
+      '1.000',
+      '1030',
+      '1.030',
+      '2024-03-15',
+      '2024-03-20',
+      '2025-03-01',
+      '2025-02-01',
+      '2025-09-01',
+      '20-03-2025',
+    ])
+      expect(text, `${e.event}: ${forbidden}`).not.toContain(forbidden);
+  }
+  for (const e of spy.events())
+    expect(String(e.properties['$current_url'])).toMatch(
+      new RegExp(`^${ORIGIN}/alquiler/(#[a-z]+)?$`),
+    );
+  expect(spy.external).toEqual([]);
+  expect(await context.cookies()).toEqual([]);
+});

@@ -16,9 +16,10 @@ const employmentSpecs = /[\\/]employment[^\\/]*\.spec\.ts$/;
 const optInSpecs = [/(rtl|analytics|documents)\.spec\.ts/, rentalSpecs, employmentSpecs];
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
-// The documents project reads documents on /alquiler/ and /contrato/ too, so its build has them.
+// The documents project reads documents on /alquiler/ and /contrato/ too, so its build has them;
+// the analytics project measures /alquiler/ too.
 const buildEnv = {
-  ...(rental || documents ? { PUBLIC_RENTAL: '1' } : {}),
+  ...(rental || documents || analytics ? { PUBLIC_RENTAL: '1' } : {}),
   ...(employment || documents ? { PUBLIC_EMPLOYMENT: '1' } : {}),
   ...(analytics ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents

@@ -185,6 +185,8 @@ describe('the catalogue guard', () => {
         'browser_language',
         'page_translated',
         'review_completed',
+        'rental_out_of_scope',
+        'rental_review_completed',
         'section_completed',
         'section_viewed',
         'start_chosen',
@@ -381,10 +383,10 @@ describe('the catalogue follows the form', () => {
     for (const id of ITEM_IDS) expect(TRACKABLE_FIELDS).toContain(`figure_${id}`);
   });
   it('every form sheet, and the result, is a trackable section', () => {
-    expect(SECTIONS).toEqual([...SHEETS, 'resultado']);
+    expect(SECTIONS.slice(0, SHEETS.length + 1)).toEqual([...SHEETS, 'resultado']);
   });
   it('every frequently asked question is a help topic', () => {
-    expect(HELP_TOPICS).toEqual(FAQ_TOPICS.map(([, anchor]) => anchor));
+    expect(HELP_TOPICS.slice(0, FAQ_TOPICS.length)).toEqual(FAQ_TOPICS.map(([, anchor]) => anchor));
   });
 });
 

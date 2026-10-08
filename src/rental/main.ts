@@ -19,7 +19,7 @@ import {
   sheetOfField,
   type FieldError,
 } from './form';
-import type { RentalDeps } from './ports';
+import type { RentalDeps, RentalItemKind } from './ports';
 import {
   renderErrors,
   renderOutOfScope,
@@ -178,6 +178,20 @@ export function setUpRental(
   window.addEventListener('popstate', () => nav.goBack(indexOfHash(flow, location.hash), {}));
 
   const rows = setUpRows(form, tr, conditions);
+
+  // Which question or item detail a visitor opens; `toggle` does not bubble, so it is caught on
+  // the way down.
+  root.addEventListener(
+    'toggle',
+    (e) => {
+      const d = e.target;
+      if (!(d instanceof HTMLDetailsElement) || !d.open) return;
+      if (d.hasAttribute('data-help')) events.helpOpened(d.id);
+      const item = d.closest<HTMLElement>('[data-item]')?.dataset['item'];
+      if (d.hasAttribute('data-detail') && item) events.detailOpened(item as RentalItemKind);
+    },
+    true,
+  );
 
   required(result.querySelector('[data-restart]'), 'the restart button').addEventListener(
     'click',

@@ -23,6 +23,7 @@ import {
   type RentalInputErrorCode,
 } from '../engine/rental/validate';
 import { parseAmount } from '../calculator/number';
+import type { RentalField } from './ports';
 import { ROW_LISTS, parseRowField, rowField, type RowList } from './rows';
 
 export const SHEETS = [
@@ -108,7 +109,7 @@ export interface FieldError {
 }
 
 // The questions each sheet asks; a row list counts by its name.
-export const SHEET_FIELDS: Record<Sheet, readonly string[]> = {
+export const SHEET_FIELDS: Record<Sheet, readonly RentalField[]> = {
   contrato: ['contractType', 'signedOn', 'startDate'],
   casero: ['landlordType', 'largeLandlord', 'region', 'stressedZone'],
   entrada: ['deposit', 'advanceMonths', 'hasGuarantees', 'guarantees', 'hasFees', 'fees'],
@@ -122,7 +123,8 @@ export const SHEET_FIELDS: Record<Sheet, readonly string[]> = {
 export const baseField = (field: string): string => field.split('.')[0] ?? field;
 
 export const sheetOfField = (field: string): Sheet =>
-  SHEETS.find((s) => SHEET_FIELDS[s].includes(baseField(field))) ?? 'contrato';
+  SHEETS.find((s) => (SHEET_FIELDS[s] as readonly string[]).includes(baseField(field))) ??
+  'contrato';
 
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
@@ -482,7 +484,7 @@ function engineErrors(r: Reading, today: CivilDate): FieldError[] {
 
 export function sheetErrors(form: HTMLFormElement, sheet: Sheet, today: CivilDate): FieldError[] {
   const r = read(form);
-  const fields = SHEET_FIELDS[sheet];
+  const fields: readonly string[] = SHEET_FIELDS[sheet];
   const own = r.errors.filter((e) => fields.includes(baseField(e.field)));
   const withError = new Set(own.map((e) => e.field));
   const fromEngine = engineErrors(r, today).filter(
