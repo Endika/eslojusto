@@ -425,8 +425,10 @@ export function riseFigures(
   item: Extract<RentalItemResult, { kind: 'rent_update' }>,
   input: RentalInput,
   tr: Translate,
+  // The page names the cap's norm beside its figure; a PDF row has no room for it.
+  { citeCap = true }: { readonly citeCap?: boolean } = {},
 ): Figures {
-  const cap = r.cap && item.sources.find((s) => s.id === r.cap?.rule);
+  const cap = citeCap && r.cap && item.sources.find((s) => s.id === r.cap?.rule);
   const charged = input.updates[item.index]?.newRent;
   return [
     ['client.rental.detail.base', r.base],
