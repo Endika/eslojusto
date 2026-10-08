@@ -209,7 +209,7 @@ async function confirmPack(page: Page) {
     'Sale de lo leído en tus documentos · confianza alta',
   );
   await landlord
-    .getByRole('group', { name: '¿Tu casero es una empresa o tiene muchas viviendas?' })
+    .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
     .getByLabel('No', { exact: true })
     .check();
   await landlord
@@ -255,7 +255,7 @@ async function confirmPack(page: Page) {
   await expect(rise.getByLabel('¿Cómo te avisaron?', { exact: true })).toHaveValue('letter');
   await expect(rise.getByLabel('Fecha del aviso', { exact: true })).toHaveValue('2025-02-01');
   await rise
-    .getByRole('group', { name: '¿Aceptaste esa subida por escrito?' })
+    .getByRole('group', { name: '¿Aceptaste esa subida?' })
     .getByLabel('No', { exact: true })
     .check();
   await next(page);
@@ -440,7 +440,7 @@ async function fillByHand(page: Page) {
   const landlord = sheet(page, 'Tu casero');
   await landlord.getByLabel('Una persona').check();
   await landlord
-    .getByRole('group', { name: '¿Tu casero es una empresa o tiene muchas viviendas?' })
+    .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
     .getByLabel('No', { exact: true })
     .check();
   await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
@@ -466,7 +466,7 @@ async function fillByHand(page: Page) {
   await rise.getByLabel('¿Cómo te avisaron?').selectOption({ label: 'Carta' });
   await rise.getByLabel('Fecha del aviso').fill('2025-02-01');
   await rise
-    .getByRole('group', { name: '¿Aceptaste esa subida por escrito?' })
+    .getByRole('group', { name: '¿Aceptaste esa subida?' })
     .getByLabel('No', { exact: true })
     .check();
   await next(page);

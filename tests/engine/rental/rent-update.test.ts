@@ -705,6 +705,104 @@ describe('when the new rent is due (LAU art. 18.2)', () => {
   });
 });
 
+describe('a rise paid without written notice, within the clause and the cap', () => {
+  // Contract from June 2023; IPC of April 2024 3,3 %, capped at 3 % in 2024: 1.030,00 allowed.
+  const june = { signedOn: f('2023-06-01'), startDate: f('2023-06-01') };
+  const rise = (change: Parameters<typeof update>[3]) =>
+    first(check(contract({ ...june, updates: [update('2024-06-01', 1000, 1030, change)] })));
+
+  it.each(['verbal', 'none'] as const)(
+    'with %s notice, counts only the lower reading',
+    (notice) => {
+      const r = rise({ notice, noticeOn: null });
+      const d = depends(r);
+      expect(d.reasons).toEqual(['notice_missing_paid']);
+      expect(figures(d.low)).toMatchObject({
+        status: 'within_limit',
+        maxRent: 1030,
+        accumulated: 0,
+      });
+      expect(d.low.calculation.map((p) => p.key)).toContain('rent_update.accepted_by_paying');
+      // June 2024 to May 2025: 30 a month.
+      expect(d.high.accumulated).toBe(360);
+      expect(counted(r)).toBe(0);
+      expect(letterAmount(r.outcome, rentUpdateAmount)).toBeNull();
+    },
+  );
+
+  it('over the cap, the whole rise stays paid over in every reading', () => {
+    const over = first(
+      check(
+        contract({
+          ...june,
+          updates: [update('2024-06-01', 1000, 1040, { notice: 'verbal', noticeOn: null })],
+        }),
+      ),
+    );
+    expect(figures(single(over))).toMatchObject({ monthly: 10, accumulated: 480 });
+  });
+});
+
+describe('accepting the rise (LAU art. 18.1, RDL 6/2022 art. 46)', () => {
+  const june = { signedOn: f('2023-06-01'), startDate: f('2023-06-01') };
+  const accepted = (change: Parameters<typeof update>[3]) =>
+    first(check(contract({ ...june, updates: [update('2024-06-01', 1000, 1050, change)] })));
+
+  it('in writing, the agreement replaces the clause for a landlord who is not a large one', () => {
+    expect(single(accepted({ agreedInWriting: true })).status).toBe('not_checkable');
+  });
+
+  it('by word of mouth, is a doubt, never «no agreement»', () => {
+    const r = accepted({ agreedInWriting: false, agreedVerbally: true });
+    const d = depends(r);
+    expect(d.reasons).toEqual(['agreement_verbal']);
+    // Without the agreement: 1.050 against 1.030 allowed, 20 a month for twelve months.
+    expect(d.high.accumulated).toBe(240);
+    expect(d.low.status).toBe('not_checkable');
+    expect(d.low.calculation.map((p) => p.key)).toContain('rent_update.agreed_verbally');
+    expect(counted(r)).toBe(0);
+  });
+
+  it('«No lo sé» is a doubt as before', () => {
+    expect(depends(accepted({ agreedInWriting: null })).reasons).toEqual(['agreement_unknown']);
+  });
+
+  it('«No» compares the rise with the clause and the cap', () => {
+    expect(figures(single(accepted({ agreedInWriting: false })))).toMatchObject({
+      status: 'paid_over',
+      accumulated: 240,
+    });
+  });
+});
+
+describe('a company landlord that is not a large landlord (Ley 12/2023, art. 3.k)', () => {
+  // 25-06-2023: a 5 % rise agreed in writing; only a large landlord stays within the IGC (2 %).
+  const agreed = (largeLandlord: boolean) =>
+    first(
+      check(
+        contract({
+          signedOn: f('2020-06-20'),
+          startDate: f('2020-06-25'),
+          landlordType: 'company',
+          largeLandlord,
+          updateClause: 'fixed_percent',
+          fixedPercent: 5,
+          updates: [update('2023-06-25', 1000, 1050, { agreedInWriting: true })],
+        }),
+      ),
+    );
+
+  it('takes no large-landlord cap', () => {
+    const v = single(agreed(false));
+    expect(v).toMatchObject({ status: 'not_checkable', cap: null });
+    expect(v.rules).not.toContain('cap_igc_2023');
+  });
+
+  it('a large one keeps the IGC cap even with the agreement', () => {
+    expect(single(agreed(true))).toMatchObject({ status: 'paid_over', maxRent: 1020 });
+  });
+});
+
 describe('several years', () => {
   it('carry the allowed rent, not the charged one, as the next base', () => {
     // 2022: IPC Feb 2022 7,6 % → 1.076,00, charged 1.100 (24/month).

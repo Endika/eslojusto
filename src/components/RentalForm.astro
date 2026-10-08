@@ -28,6 +28,13 @@ const tx = (key: Key) => t(lang, key);
 const yesNo = ['yes', 'no'] as const;
 const yesNoUnknown = ['yes', 'no', 'unknown'] as const;
 const answer = (v: 'yes' | 'no' | 'unknown') => tx(`client.rental.answer.${v}`);
+// A rise needs no written form to be accepted (LAU art. 18.1): «yes» is in writing.
+const acceptance = [
+  ['yes', tx('rental.updates.agreed_written')],
+  ['verbal', tx('rental.updates.agreed_verbal')],
+  ['no', answer('no')],
+  ['unknown', answer('unknown')],
+] as const;
 // Any concept but the two the law names asks whether it was requested in writing, and only in a
 // contract signed once that question decides the fee (LAU art. 20 as reworded by RDL 29/2026).
 const otherFees = FEE_KINDS.filter((k) => !NAMED_FEES.includes(k)).join(' ');
@@ -605,10 +612,10 @@ const cross = 'M6 6l12 12M18 6 6 18';
               <fieldset class="group" data-row-box="agreedInWriting">
                 <legend>{tx('rental.updates.agreed')}</legend>
                 <div class="chips">
-                  {yesNoUnknown.map((value) => (
+                  {acceptance.map(([value, label]) => (
                     <div class="chip">
                       <input type="radio" data-row-field="agreedInWriting" value={value} />
-                      <label data-row-label={`agreedInWriting:${value}`}>{answer(value)}</label>
+                      <label data-row-label={`agreedInWriting:${value}`}>{label}</label>
                     </div>
                   ))}
                 </div>

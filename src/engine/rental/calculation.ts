@@ -29,6 +29,8 @@ export type RentalPhraseKey =
   | 'rent_update.large_landlord_cap'
   | 'rent_update.charged_before_notice'
   | 'rent_update.notice_not_written'
+  | 'rent_update.accepted_by_paying'
+  | 'rent_update.agreed_verbally'
   | 'rent_update.months'
   | 'rent_update.monthly_over'
   | 'rent_update.within_limit'

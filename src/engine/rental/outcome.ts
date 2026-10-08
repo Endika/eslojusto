@@ -9,10 +9,15 @@ export type DoubtReason =
   | 'large_landlord_unknown'
   // The reference figure came out that same day, or a CPI flash estimate was already out.
   | 'index_month_doubtful'
-  // «No lo sé» on whether the update was agreed in writing.
+  // «No lo sé» on whether the update was agreed.
   | 'agreement_unknown'
+  // The update was accepted by word of mouth: whether that agreement can be shown is in doubt.
+  | 'agreement_verbal'
   // Notice by email or messaging: whether it counts as written (LAU art. 18.2) is not settled.
   | 'notice_form_doubtful'
+  // A rise within the clause and the cap paid without written notice: whether paying it accepted
+  // it is not settled.
+  | 'notice_missing_paid'
   // No norm says whether the legal interest year has 365 (366) or 360 days.
   | 'interest_day_count'
   // Whether the limit on service charges (LAU art. 20.2), which points to art. 18.1, takes in the
@@ -25,7 +30,9 @@ const REASON_ORDER: readonly DoubtReason[] = [
   'large_landlord_unknown',
   'index_month_doubtful',
   'agreement_unknown',
+  'agreement_verbal',
   'notice_form_doubtful',
+  'notice_missing_paid',
   'interest_day_count',
   'extraordinary_cap_reach',
 ];

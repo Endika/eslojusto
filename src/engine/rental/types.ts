@@ -68,8 +68,11 @@ export interface RentUpdateInput {
   readonly chargedFrom: CivilDate;
   readonly notice: NoticeForm;
   readonly noticeOn: CivilDate | null;
-  // null = «No lo sé».
+  // Whether the person accepted the rise in writing; null = «No lo sé».
   readonly agreedInWriting: boolean | null;
+  // Accepted by word of mouth, with `agreedInWriting` false: an agreement needs no form (LAU art.
+  // 18.1, RDL 6/2022 art. 46), but whether it can be shown is in doubt.
+  readonly agreedVerbally?: boolean;
 }
 
 export type ChargeKind = 'community' | 'property_tax' | 'waste' | 'other';

@@ -512,7 +512,7 @@ test('the rental review sends sheets, field names and its outcome in codes, neve
   const landlord = sheet('Tu casero');
   await landlord.getByLabel('Una persona').check();
   await landlord
-    .getByRole('group', { name: '¿Tu casero es una empresa o tiene muchas viviendas?' })
+    .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
     .getByLabel('No lo sé', { exact: true })
     .check();
   await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
@@ -537,7 +537,7 @@ test('the rental review sends sheets, field names and its outcome in codes, neve
   await row.getByLabel('¿Cómo te avisaron?').selectOption({ label: 'Carta' });
   await row.getByLabel('Fecha del aviso').fill('2025-02-01');
   await row
-    .getByRole('group', { name: '¿Aceptaste esa subida por escrito?' })
+    .getByRole('group', { name: '¿Aceptaste esa subida?' })
     .getByLabel('No', { exact: true })
     .check();
   await next();
