@@ -37,6 +37,7 @@ export type PhraseKey =
   | 'severance.total'
   | 'severance.cgpj_range'
   | 'severance.fixed_term'
+  | 'severance.fixed_term_before_2001'
   | 'severance.replacement'
   | 'severance.training'
   | 'severance.resignation'

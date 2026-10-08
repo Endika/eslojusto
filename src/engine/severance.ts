@@ -26,6 +26,8 @@ const UNFAIR_CAP_DAYS = 720;
 const ABSOLUTE_CAP_DAYS = 1260;
 const DT11_START = parseDate('2012-02-12');
 const FIRST_STRETCH_END = parseDate('2012-02-11');
+// DT 8.ª.2 ET: temporary contracts concluded before this date keep the rules of their time.
+const DT8_START = parseDate('2001-03-04');
 
 function result(
   dailySalary: number,
@@ -201,6 +203,9 @@ function fixedTermEnd(
   const sources = [SOURCES.et49_1c, SOURCES.etDt8, SOURCES.cgpjGuide];
   if (kind === 'replacement' || kind === 'training') {
     return result(sd, 0, false, [phrase(`severance.${kind}`)], sources);
+  }
+  if (compareDates(startDate, DT8_START) < 0) {
+    return result(sd, 0, false, [phrase('severance.fixed_term_before_2001')], sources);
   }
   const n = fixedTermDaysPerYear(startDate);
   const dn = calendarDays(startDate, endDate);

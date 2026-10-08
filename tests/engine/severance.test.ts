@@ -84,6 +84,17 @@ describe('fixed-term contract end (guide §9)', () => {
     expect(r.amount).toBe(Math.round(((100 * days * n) / 365) * 100) / 100);
     expect(text(r.calculation)).toContain(`${n}/365`);
   });
+  it.each([
+    ['2001-03-03', '2002-03-02', 0],
+    ['2001-03-04', '2002-03-03', 8],
+  ] as const)(
+    'a contract from %s to %s gets %i days per year (DT 8.ª.2)',
+    (startDate, endDate, n) => {
+      const r = fixedTerm(startDate, endDate);
+      expect(r.amount).toBe(Math.round(((100 * 365 * n) / 365) * 100) / 100);
+      if (n === 0) expect(text(r.calculation)).toContain('4 de marzo de 2001');
+    },
+  );
   it('replacement and training contracts have no severance', () => {
     expect(fixedTerm('2025-01-01', '2025-12-31', 'replacement').amount).toBe(0);
     expect(fixedTerm('2025-01-01', '2025-12-31', 'training').amount).toBe(0);

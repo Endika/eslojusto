@@ -692,6 +692,8 @@ export const es = {
   'client.calculation.severance.cgpj_range':
     'La calculadora del CGPJ y su guía cuentan distinto los meses en este caso (un mes de diferencia); por eso damos un margen entre ambas cifras.',
   'client.calculation.severance.fixed_term': '{dias} días × {dias_anuales}/365 × {diario}/día',
+  'client.calculation.severance.fixed_term_before_2001':
+    'Los contratos temporales firmados antes del 4 de marzo de 2001 no tienen esta indemnización: se rigen por la norma de entonces (DT 8.ª ET). Si tu convenio la prevé, revísalo.',
   'client.calculation.severance.replacement':
     'Los contratos de sustitución no generan indemnización por fin de contrato.',
   'client.calculation.severance.training':
