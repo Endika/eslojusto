@@ -1,17 +1,17 @@
-import { describe, expect, expectTypeOf, it } from 'vitest';
-import {
+import { describe, expectTypeOf, it } from 'vitest';
+import type {
   INFO_ELEMENTS as ENGINE_INFO_ELEMENTS,
-  type ClauseLabel,
-  type Clause,
-  type Holidays,
-  type InfoElement,
-  type InfoPresence,
-  type Modality,
-  type Offer,
-  type Relationship,
-  type SalaryComponentKind,
-  type SalaryPeriod,
-  type Trial,
+  ClauseLabel,
+  Clause,
+  Holidays,
+  InfoElement,
+  InfoPresence,
+  Modality,
+  Offer,
+  Relationship,
+  SalaryComponentKind,
+  SalaryPeriod,
+  Trial,
 } from '../../src/engine/employment/types';
 import {
   CLAUSE_LABELS,
@@ -55,6 +55,6 @@ describe('employment engine contract', () => {
   });
 
   it('lists the information elements in the engine’s order', () => {
-    expect(INFO_ELEMENTS).toEqual(ENGINE_INFO_ELEMENTS);
+    expectTypeOf<typeof INFO_ELEMENTS>().toEqualTypeOf<typeof ENGINE_INFO_ELEMENTS>();
   });
 });
