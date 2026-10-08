@@ -16,7 +16,14 @@ export type Recording =
   | 'liquidation-basque'
   | 'settlement-galician'
   | 'certificate-english'
-  | 'unreadable';
+  | 'unreadable'
+  | 'rental-lease'
+  | 'rental-lease-notices-receipts'
+  | 'rental-agency-invoice'
+  | 'rental-deposit-return'
+  | 'rental-injected'
+  | 'rental-lease-catalan'
+  | 'rental-not-rental';
 
 export const recording = (name: Recording): string =>
   readFileSync(new URL(`../fixtures/bedrock/${name}.json`, import.meta.url), 'utf8');

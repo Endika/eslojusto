@@ -94,7 +94,12 @@ function isValidValue(type: FieldType, v: unknown): v is ExtractedValue {
     case 'date':
       return typeof v === 'string' && isCalendarDate(v);
     case 'text':
-      return typeof v === 'string' && v.length > 0 && v.length <= type.maxLength;
+      return (
+        typeof v === 'string' &&
+        v.length > 0 &&
+        v.length <= type.maxLength &&
+        (type.pattern === undefined || new RegExp(type.pattern).test(v))
+      );
     case 'money':
       return (
         typeof v === 'number' &&
@@ -105,6 +110,14 @@ function isValidValue(type: FieldType, v: unknown): v is ExtractedValue {
       );
     case 'days':
       return isWhole(v, 0, MAX_DAYS);
+    case 'integer':
+      return isWhole(v, type.min, type.max);
+    case 'percent':
+      return (
+        typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100 && hasAtMostTwoDecimals(v)
+      );
+    case 'month':
+      return isMonth(v);
     case 'boolean':
       return typeof v === 'boolean';
     case 'enum':

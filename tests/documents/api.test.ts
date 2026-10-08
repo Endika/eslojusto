@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { EXTRACT_TIMEOUT_SECONDS } from '../../api/src/config';
-import { LIMITS as API_LIMITS } from '../../api/src/domain/documents';
+import { LIMITS as API_LIMITS, PAGE_KINDS as API_PAGE_KINDS } from '../../api/src/domain/documents';
 import { READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
 import { API_TIMEOUT_MS, createApi, parseExtraction, type Fetch } from '../../src/documents/api';
-import { FINAL_PAY_EXTRACTION, LIMITS, READABILITY } from '../../src/documents/contract';
+import {
+  FINAL_PAY_EXTRACTION,
+  LIMITS,
+  PAGE_KINDS,
+  READABILITY,
+} from '../../src/documents/contract';
 
 interface Call {
   url: string;
@@ -129,6 +134,9 @@ describe('extract', () => {
   });
   it('mirrors the API’s readability list', () => {
     expect(READABILITY).toEqual(API_READABILITY);
+  });
+  it('mirrors the API’s page kinds', () => {
+    expect(PAGE_KINDS).toEqual(API_PAGE_KINDS);
   });
   it('takes as many images and as large a request as the API', () => {
     expect(LIMITS.maxImages).toBe(API_LIMITS.maxImages);

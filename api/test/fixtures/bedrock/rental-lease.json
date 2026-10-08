@@ -1,0 +1,163 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "lease",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "lease",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "lease",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 4,
+            "kind": "lease",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "lease": {
+          "signedOn": {
+            "value": "2024-05-20",
+            "confidence": "high"
+          },
+          "startDate": {
+            "value": "2024-06-01",
+            "confidence": "high"
+          },
+          "postcode": {
+            "value": "28999",
+            "confidence": "high"
+          },
+          "landlordType": {
+            "value": "company",
+            "confidence": "high"
+          },
+          "landlordCompanyName": {
+            "value": "Pisos de Mentira S.L.",
+            "confidence": "high"
+          },
+          "agencyNamed": {
+            "value": true,
+            "confidence": "high"
+          },
+          "use": {
+            "value": "main_home",
+            "confidence": "high"
+          },
+          "agreedMonths": {
+            "value": 60,
+            "confidence": "high"
+          },
+          "initialRent": {
+            "value": 1100,
+            "confidence": "high"
+          },
+          "updateClauseText": {
+            "value": "La renta se actualizará anualmente, en la fecha en que se cumpla cada año de vigencia del contrato, aplicando a la renta del año anterior la variación porcentual del Índice de Referencia para la Actualización de Arrendamientos de Vivienda (IRAV).",
+            "confidence": "high"
+          },
+          "updateClauseIndex": {
+            "value": "irav",
+            "confidence": "high"
+          },
+          "deposit": {
+            "value": 1100,
+            "confidence": "high"
+          },
+          "advanceMonths": {
+            "value": 1,
+            "confidence": "high"
+          },
+          "necessityClause": {
+            "value": false,
+            "confidence": "high"
+          },
+          "feesText": {
+            "value": "Los gastos de gestión inmobiliaria y de formalización del contrato serán a cargo de la parte arrendadora.",
+            "confidence": "high"
+          },
+          "chargesClauseText": {
+            "value": "Serán por cuenta de la parte arrendataria los gastos de comunidad, que a la firma ascienden a 600 euros anuales, y la tasa de basuras, de 95 euros anuales.",
+            "confidence": "high"
+          },
+          "guarantees": [
+            {
+              "kind": "cash",
+              "amount": 2200,
+              "months": 2,
+              "confidence": "high"
+            }
+          ],
+          "charges": [
+            {
+              "kind": "community",
+              "annualAmount": 600,
+              "concept": "Gastos de comunidad",
+              "confidence": "high"
+            },
+            {
+              "kind": "waste",
+              "annualAmount": 95,
+              "concept": "Tasa de basuras",
+              "confidence": "high"
+            }
+          ],
+          "utilities": [
+            {
+              "kind": "electricity",
+              "payer": "tenant",
+              "confidence": "high"
+            },
+            {
+              "kind": "water",
+              "payer": "tenant",
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 21400,
+    "output_tokens": 1300
+  }
+}

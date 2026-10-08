@@ -13,6 +13,11 @@ export const PAGE_KINDS = [
   'company_certificate',
   'settlement_agreement',
   'work_history',
+  'lease',
+  'rent_update_notice',
+  'rent_receipt',
+  'agency_invoice',
+  'deposit_return',
   'other',
 ] as const;
 export type PageKind = (typeof PAGE_KINDS)[number];
@@ -26,6 +31,7 @@ export const READABILITY = [
   'dark',
   'cropped',
   'not_labour_document',
+  'not_rental_document',
   'foreign_jurisdiction',
   'unknown_format',
 ] as const;
@@ -39,6 +45,7 @@ export const SKIP_REASONS = [
   'dark',
   'cropped',
   'not_labour_document',
+  'not_rental_document',
   'foreign_jurisdiction',
   'unknown_format',
   'no_data',

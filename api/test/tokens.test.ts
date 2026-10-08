@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildRequestBody, SYSTEM_PROMPT } from '../src/adapters/bedrock-reader';
+import { buildRequestBody, SYSTEM_PROMPTS } from '../src/adapters/bedrock-reader';
 import {
   ESCALATION_MODEL,
   HAIKU_4_5,
@@ -8,6 +8,7 @@ import {
   SONNET_4_6,
 } from '../src/config';
 import { LIMITS } from '../src/domain/documents';
+import { REVIEWS } from '../src/domain/reviews';
 import {
   imageTokens,
   MAX_ESCALATION_INPUT_TOKENS,
@@ -40,11 +41,15 @@ describe('input token estimate', () => {
     expect(imageTokens({ format: 'image/jpeg', width: 1568, height: 1568 })).toBe(3279);
   });
 
-  it('prices the prompt and schema at two characters per token or more', () => {
-    const body = buildRequestBody(PRIMARY_MODEL, []);
-    const fixed = JSON.stringify(body['tools']).length + SYSTEM_PROMPT.length;
-    expect(PROMPT_TOKENS).toBeGreaterThanOrEqual(Math.ceil(fixed / 2));
-  });
+  it.each(REVIEWS)(
+    'prices the %s prompt and schema at two characters per token or more, with little slack',
+    (review) => {
+      const body = buildRequestBody(PRIMARY_MODEL, [], review);
+      const fixed = JSON.stringify(body['tools']).length + SYSTEM_PROMPTS[review].length;
+      expect(PROMPT_TOKENS_BY_REVIEW[review]).toBeGreaterThanOrEqual(Math.ceil(fixed / 2));
+      expect(PROMPT_TOKENS_BY_REVIEW[review]).toBeLessThanOrEqual(Math.ceil(fixed / 2) + 1000);
+    },
+  );
 
   it('admits the largest pack the API accepts: twenty-five images at the largest size', () => {
     const square = { format: 'image/jpeg' as const, width: 1568, height: 1568 };
@@ -53,6 +58,14 @@ describe('input token estimate', () => {
     expect(largest).toBe(95_975);
     expect(largest).toBeLessThanOrEqual(MAX_ESTIMATED_INPUT_TOKENS);
     expect(PROMPT_TOKENS + LIMITS.maxImages * imageTokens(photo)).toBeLessThan(largest);
+  });
+
+  it('admits the largest pack for every review', () => {
+    const square = { format: 'image/jpeg' as const, width: 1568, height: 1568 };
+    for (const review of REVIEWS)
+      expect(
+        PROMPT_TOKENS_BY_REVIEW[review] + LIMITS.maxImages * imageTokens(square),
+      ).toBeLessThanOrEqual(MAX_ESTIMATED_INPUT_TOKENS);
   });
 
   it('keeps escalation below the estimate cap', () => {

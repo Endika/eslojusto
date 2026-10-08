@@ -1,5 +1,5 @@
 import type { PageKind, SourceKind } from './documents';
-import { SECTIONS, type Confidence, type SectionKind } from './extraction-schema';
+import { ALL_SECTIONS, type Confidence, type SectionKind } from './extraction-schema';
 import {
   withLineTotals,
   withinTolerance,
@@ -8,7 +8,7 @@ import {
   type Reading,
 } from './extraction';
 
-type From = readonly [SectionKind, string];
+export type From = readonly [SectionKind, string];
 
 const ITEM_SOURCES: readonly SectionKind[] = [
   'settlement_proposal',
@@ -16,7 +16,7 @@ const ITEM_SOURCES: readonly SectionKind[] = [
   'dismissal_letter',
 ];
 
-const own = (...sections: readonly SectionKind[]) => sections.map((s): From => [s, '']);
+export const own = (...sections: readonly SectionKind[]) => sections.map((s): From => [s, '']);
 
 // For each field the response carries, where it may come from, preferred first. An empty field
 // name means the field's own name. The settlement proposal is the employer's own account of the
@@ -75,8 +75,8 @@ export interface MergedRow extends ExtractedRow {
 }
 
 // Two documents that state different values for one field: the first source is the one kept.
-export interface Conflict {
-  readonly field: MergedFieldName;
+export interface Conflict<N extends string = MergedFieldName> {
+  readonly field: N;
   readonly sources: readonly SourceKind[];
 }
 
@@ -131,18 +131,24 @@ export function groupDocuments(pages: Reading['pages']): readonly RecognisedDocu
 // One value per field, from the preferred document that states it. Another document that states
 // something else with high confidence is a conflict, kept as field and sources only; a less sure
 // value that loses is dropped, so a stray amount the model was unsure of shows no disagreement.
-export function merge(read: Reading): Merged {
-  const reading = withLineTotals(read);
-  const fields: Partial<Record<MergedFieldName, MergedField>> = {};
-  const conflicts: Conflict[] = [];
+export function mergeFields<N extends string>(
+  reading: Reading,
+  rules: Readonly<Record<N, readonly From[]>>,
+): {
+  readonly fields: Partial<Record<N, MergedField>>;
+  readonly conflicts: readonly Conflict<N>[];
+  readonly discarded: number;
+} {
+  const fields: Partial<Record<N, MergedField>> = {};
+  const conflicts: Conflict<N>[] = [];
   let discarded = 0;
-  for (const name of MERGED_FIELDS) {
+  for (const name of Object.keys(rules) as N[]) {
     let kept: MergedField | null = null;
     const disagreeing: SourceKind[] = [];
-    for (const [section, own] of MERGE_RULES[name] as readonly From[]) {
+    for (const [section, own] of rules[name]) {
       const field = reading.sections[section]?.fields[own || name];
       if (!field) continue;
-      const source = SECTIONS[section].source;
+      const source = ALL_SECTIONS[section].source;
       if (kept === null) kept = { ...field, source };
       else if (same(kept.value, field.value)) continue;
       else if (field.confidence !== 'high') discarded += 1;
@@ -154,6 +160,12 @@ export function merge(read: Reading): Merged {
     const others = disagreeing.filter((s) => s !== kept.source);
     if (others.length > 0) conflicts.push({ field: name, sources: [kept.source, ...others] });
   }
+  return { fields, conflicts, discarded };
+}
+
+export function merge(read: Reading): Merged {
+  const reading = withLineTotals(read);
+  const { fields, conflicts, discarded } = mergeFields(reading, MERGE_RULES);
   const contracts = reading.sections.work_history?.lists['contracts'];
   return {
     pages: reading.pages,
