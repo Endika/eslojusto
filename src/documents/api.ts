@@ -1,12 +1,13 @@
 import {
   API_ERROR_CODES,
   COHERENCE_CHECKS,
+  RENTAL_CHECKS,
   CONFIDENCES,
   LIMITS,
   PAGE_KINDS,
   READABILITY,
   type Api,
-  type CoherenceCheck,
+  type FailedCheck,
   type Conflict,
   type ErrorCode,
   type ExtractedRow,
@@ -20,7 +21,7 @@ import {
 } from './contract';
 import type { Operation } from './config';
 
-const CHECKS_SET: ReadonlySet<unknown> = new Set(COHERENCE_CHECKS);
+const CHECKS_SET: ReadonlySet<unknown> = new Set([...COHERENCE_CHECKS, ...RENTAL_CHECKS]);
 
 export type Fetch = (url: string, init: RequestInit) => Promise<Response>;
 
@@ -54,7 +55,9 @@ function parseField(v: unknown): SourcedField | null {
 
 function parseRow(v: unknown): ExtractedRow | null {
   if (!isRecord(v) || !isConfidence(v['confidence']) || !isRecord(v['values'])) return null;
-  return Object.values(v['values']).every(isScalar) ? (v as unknown as ExtractedRow) : null;
+  if (!Object.values(v['values']).every(isScalar)) return null;
+  const row = { values: v['values'], confidence: v['confidence'] } as ExtractedRow;
+  return isSource(v['source']) ? { ...row, source: v['source'] } : row;
 }
 
 function parseDocument(v: unknown): RecognisedDocument | null {
@@ -206,7 +209,7 @@ export function createApi<F extends string, L extends string>(
       return {
         ok: true,
         extraction,
-        failedChecks: checks.filter((c): c is CoherenceCheck => CHECKS_SET.has(c)),
+        failedChecks: checks.filter((c): c is FailedCheck => CHECKS_SET.has(c)),
         allowance,
         readsLeft,
         escalated: typeof r['escalated'] === 'boolean' ? r['escalated'] : null,

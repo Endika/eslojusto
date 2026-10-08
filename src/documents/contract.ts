@@ -138,6 +138,8 @@ export interface ExtractedField {
 export interface ExtractedRow {
   readonly values: Readonly<Record<string, ExtractedValue>>;
   readonly confidence: Confidence;
+  // The kind of document a rental row came from.
+  readonly source?: SourceKind;
 }
 
 // The fields the API merges from the documents (api/src/domain/merge.ts), each with the kind of
@@ -274,6 +276,21 @@ export const COHERENCE_CHECKS = [
 ] as const;
 export type CoherenceCheck = (typeof COHERENCE_CHECKS)[number];
 
+// What the API finds incoherent in rental documents (api/src/domain/rental-checks.ts).
+export const RENTAL_CHECKS = [
+  'return_before_keys',
+  'receipt_parts_do_not_sum',
+  'invoice_total_mismatch',
+  'notice_rent_mismatch',
+  'start_long_before_signing',
+] as const;
+export type RentalCheck = (typeof RENTAL_CHECKS)[number];
+
+// The final pay's checks are worded by the upload; any other review's, by its own reading.
+export type FailedCheck = CoherenceCheck | RentalCheck;
+export const isCoherenceCheck = (c: FailedCheck): c is CoherenceCheck =>
+  (COHERENCE_CHECKS as readonly string[]).includes(c);
+
 export interface DocumentFile {
   readonly mediaType: MediaType;
   // Base64, without a data: prefix.
@@ -301,7 +318,7 @@ export type ExtractResult<F extends string = ExtractedFieldName, L extends strin
   | {
       readonly ok: true;
       readonly extraction: Extraction<F, L>;
-      readonly failedChecks: readonly CoherenceCheck[];
+      readonly failedChecks: readonly FailedCheck[];
       // A free read returns the quota token to send next time; a pass read, the reads it has left.
       readonly allowance: string | null;
       readonly readsLeft: number | null;

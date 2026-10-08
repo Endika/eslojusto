@@ -107,7 +107,8 @@ describe('the contract', () => {
 
   it('counts the first month among those paid in advance, as the form does', () => {
     expect(entry(p, 'advanceMonths')).toBe('2');
-    expect(mark(p, 'advanceMonths')?.derived).toBe(true);
+    // Read with high confidence, but whether the contract counted the first month is less sure.
+    expect(mark(p, 'advanceMonths')).toMatchObject({ confidence: 'medium', derived: true });
   });
 
   it('quotes the clauses word for word beside the questions they answer', () => {
@@ -201,6 +202,7 @@ describe('rises', () => {
       receipts: [
         row({ month: '2025-02', rent: 1000 }),
         row({ month: '2025-03', rent: 1030 }),
+        row({ month: '2025-04', rent: 1030 }),
         row({ month: '2026-05', rent: 1060 }),
       ],
     });
@@ -213,17 +215,107 @@ describe('rises', () => {
       ['updates.1.newRent', '1.060,00'],
     ]);
     expect(mark(p, 'updates.0.chargedFrom')?.confidence).toBe('high');
+    // Charged before its anniversary, the rise belongs to it, but less surely.
+    expect(mark(p, 'updates.0.year')?.confidence).toBe('low');
     expect(mark(p, 'updates.1.chargedFrom')?.confidence).toBe('low');
     expect(entry(p, 'updates.1.notice')).toBeUndefined();
   });
 
-  it('belong to the anniversary nearest the month they were charged from', () => {
+  it('belong to the anniversary of a rise charged late, never the next one', () => {
+    // 20-03-2024 start; noticed on 01-09-2025 and first charged in October 2025.
+    const p = prefill({
+      fields: lease,
+      notices: [
+        row({ noticeOn: '2025-09-01', medium: 'letter', previousRent: 1000, newRent: 1030 }),
+      ],
+      receipts: [
+        row({ month: '2025-09', rent: 1000 }),
+        row({ month: '2025-10', rent: 1030 }),
+        row({ month: '2025-11', rent: 1030 }),
+      ],
+    });
+    expect(entry(p, 'updates.0.year')).toBe('2025');
+    expect(mark(p, 'updates.0.year')?.confidence).toBe('high');
+    expect(entry(p, 'updates.0.chargedFrom')).toBe('2025-10-01');
+  });
+
+  it('belong to the latest anniversary on or before the day they apply from', () => {
     const start = d('2024-03-20');
-    expect(riseYear(start, d('2025-03-01'))).toBe(2025);
-    expect(riseYear(start, d('2025-04-01'))).toBe(2025);
-    expect(riseYear(start, d('2026-01-15'))).toBe(2026);
+    expect(riseYear(start, d('2025-10-01'))).toEqual({ year: 2025, early: false });
+    expect(riseYear(start, d('2025-03-20'))).toEqual({ year: 2025, early: false });
+    expect(riseYear(start, d('2026-01-15'))).toEqual({ year: 2025, early: false });
+    // Only just before an anniversary does a rise belong to it, and less surely.
+    expect(riseYear(start, d('2025-03-01'))).toEqual({ year: 2025, early: true });
+    expect(riseYear(start, d('2026-02-18'))).toEqual({ year: 2026, early: true });
+    expect(riseYear(start, d('2026-02-16'))).toEqual({ year: 2025, early: false });
     // Never the year the contract started.
-    expect(riseYear(d('2024-12-20'), d('2024-12-01'))).toBe(2025);
+    expect(riseYear(d('2024-12-20'), d('2024-12-01'))).toEqual({ year: 2025, early: true });
+  });
+
+  it('go by the notice’s day when it says when the rise applies', () => {
+    const p = prefill({
+      fields: lease,
+      notices: [row({ newRent: 1030, appliesFrom: '2025-03-20' })],
+      receipts: [row({ month: '2025-02', rent: 1000 }), row({ month: '2025-03', rent: 1030 })],
+    });
+    expect(entry(p, 'updates.0.year')).toBe('2025');
+    expect(mark(p, 'updates.0.year')?.confidence).toBe('high');
+  });
+
+  it('match a notice to the receipts within a euro, or by the month it applies from', () => {
+    const rounded = prefill({
+      fields: lease,
+      notices: [row({ previousRent: 1000, newRent: 1030.4, appliesFrom: '2025-03-20' })],
+      receipts: [row({ month: '2025-02', rent: 1000 }), row({ month: '2025-03', rent: 1030 })],
+    });
+    expect(rounded.entries.filter(([n]) => n.endsWith('.chargedFrom'))).toEqual([
+      ['updates.0.chargedFrom', '2025-03-01'],
+    ]);
+    const byMonth = prefill({
+      fields: lease,
+      notices: [row({ previousRent: 1000, newRent: 1050, appliesFrom: '2025-03-20' })],
+      receipts: [row({ month: '2025-02', rent: 1000 }), row({ month: '2025-03', rent: 1030 })],
+    });
+    expect(byMonth.entries.filter(([n]) => n.endsWith('.chargedFrom'))).toEqual([
+      ['updates.0.chargedFrom', '2025-03-01'],
+    ]);
+  });
+
+  it('never count a prorated or one-off month as a rise', () => {
+    const p = prefill({
+      fields: lease,
+      receipts: [
+        row({ month: '2024-03', rent: 387.1 }),
+        row({ month: '2024-04', rent: 1000 }),
+        row({ month: '2024-05', rent: 1000 }),
+        row({ month: '2024-06', rent: 1250 }),
+        row({ month: '2024-07', rent: 1000 }),
+      ],
+    });
+    expect(entry(p, 'hasUpdates')).toBeUndefined();
+  });
+
+  it('take the last receipt’s new rent as a change, with nothing after it', () => {
+    const p = prefill({
+      fields: lease,
+      receipts: [row({ month: '2025-02', rent: 1000 }), row({ month: '2025-03', rent: 1030 })],
+    });
+    expect(entry(p, 'updates.0.newRent')).toBe('1.030,00');
+  });
+
+  it('leave a rent that went down off the sheet, and say so', () => {
+    const p = prefill({
+      fields: lease,
+      notices: [row({ previousRent: 1000, newRent: 980, appliesFrom: '2025-03-20' })],
+      receipts: [
+        row({ month: '2025-02', rent: 1000 }),
+        row({ month: '2025-03', rent: 980 }),
+        row({ month: '2025-04', rent: 980 }),
+      ],
+    });
+    expect(entry(p, 'hasUpdates')).toBeUndefined();
+    expect(p.entries.some(([n]) => n.startsWith('updates.'))).toBe(false);
+    expect(p.notes).toContain(tr('client.rental.documents.decrease'));
   });
 });
 
@@ -272,6 +364,28 @@ describe('charges', () => {
   });
 });
 
+it('counts each month once in the charges, and flags two receipts that disagree', () => {
+  const year = Array.from({ length: 12 }, (_, i) =>
+    row({ month: `2025-${String(i + 1).padStart(2, '0')}`, rent: 1000, community: 50 }),
+  );
+  const same = prefill({
+    receipts: [...year, row({ month: '2025-06', rent: 1000, community: 50 })],
+  });
+  expect(entry(same, 'charges.0.amount')).toBe('600,00');
+  expect(same.notes).not.toContain(tr('client.rental.documents.receipt_duplicate'));
+
+  const other = prefill({
+    receipts: [
+      row({ month: '2025-06', rent: 1000, community: 80 }),
+      ...year.map((r) => ({ ...r, source: 'rent_receipt' as const })),
+    ],
+  });
+  // The receipt document's row is kept over the other, and the month made less sure.
+  expect(entry(other, 'charges.0.amount')).toBe('600,00');
+  expect(mark(other, 'charges.0.amount')?.confidence).toBe('low');
+  expect(other.notes).toContain(tr('client.rental.documents.receipt_duplicate'));
+});
+
 describe('fees, from the invoices', () => {
   it('take the total, or the base and VAT added up when the total is missing', () => {
     const p = prefill({
@@ -288,6 +402,17 @@ describe('fees, from the invoices', () => {
       ['fees.1.amount', '605,00'],
     ]);
     expect(mark(p, 'fees.1.amount')).toMatchObject({ confidence: 'low', derived: true });
+  });
+
+  it('are to be checked when an invoice does not add up, as the API found', () => {
+    const invoices = [
+      row({ conceptKind: 'solvency_check', base: 200, vat: 42, total: 242 }),
+      row({ conceptKind: 'agency_fee', base: 500, vat: 105, total: 650 }),
+    ];
+    const p = rentalPrefill(extraction({ invoices }), {}, tr, ['invoice_total_mismatch']);
+    expect(mark(p, 'fees.0.amount')?.confidence).toBe('high');
+    expect(mark(p, 'fees.1.amount')?.confidence).toBe('low');
+    expect(p.notes).toContain(tr('client.rental.documents.check.invoice_total_mismatch'));
   });
 });
 
@@ -334,6 +459,11 @@ it('says when a list holds less than was read, rather than leave it out quietly'
   const p = prefill({ receipts: months });
   expect(p.entries.filter(([n]) => /^charges\.\d+\.kind$/.test(n))).toHaveLength(30);
   expect(p.notes).toContain(tr('client.rental.documents.rows_cut'));
+});
+
+it('words the rental checks the API found, and leaves the final pay’s to the upload', () => {
+  const p = rentalPrefill(extraction({}), {}, tr, ['return_before_keys', 'items_do_not_sum']);
+  expect(p.notes).toEqual([tr('client.rental.documents.check.return_before_keys')]);
 });
 
 it('reads nothing into the form from an empty reading', () => {

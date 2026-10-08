@@ -8,6 +8,7 @@ import type {
   LandlordType,
   UpdateClause,
 } from '../../src/engine/rental/types';
+import type { RentalCheck as SiteRentalCheck } from '../../src/documents/contract';
 import {
   CHARGE_KINDS,
   DEDUCTION_KINDS,
@@ -17,6 +18,7 @@ import {
   LEASE_USES,
   UPDATE_CLAUSE_INDEXES,
 } from '../src/domain/rental-schema';
+import type { RentalCheck } from '../src/domain/rental-checks';
 
 // The site prefills its rental form from these labels; type:check fails if the engine drifts.
 describe('rental engine contract', () => {
@@ -28,5 +30,10 @@ describe('rental engine contract', () => {
     expectTypeOf<(typeof GUARANTEE_KINDS)[number]>().toEqualTypeOf<GuaranteeKind>();
     expectTypeOf<(typeof CHARGE_KINDS)[number]>().toEqualTypeOf<ChargeKind>();
     expectTypeOf<(typeof DEDUCTION_KINDS)[number]>().toEqualTypeOf<DeductionKind>();
+  });
+
+  // The site words each check it is sent and drops any it does not know.
+  it('mirrors the rental checks the site words', () => {
+    expectTypeOf<SiteRentalCheck>().toEqualTypeOf<RentalCheck>();
   });
 });
