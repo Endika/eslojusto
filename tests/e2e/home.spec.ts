@@ -30,7 +30,10 @@ test('a card is one link, and the whole card answers to it', async ({ page }) =>
   const card = page.getByRole('article', { name: 'Finiquito' });
   await expect(card.getByRole('link')).toHaveCount(1);
   await expect(card.getByText('Revisar')).toBeVisible();
-  await card.click({ position: { x: 40, y: 100 } });
+  // A real click on the situation line, plain text outside the link, lands on the stretched link.
+  const line = await card.getByText('Te vas o te echan').boundingBox();
+  if (!line) throw new Error('the situation line is not on screen');
+  await page.mouse.click(line.x + line.width / 2, line.y + line.height / 2);
   await expect(page).toHaveURL(/\/finiquito\/$/);
 });
 
