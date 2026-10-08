@@ -3,10 +3,18 @@ import Base from '../layouts/Base.astro';
 import EmploymentForm from '../components/EmploymentForm.astro';
 import EmploymentResult from '../components/EmploymentResult.astro';
 import DocumentStart from '../components/DocumentStart.astro';
+import EmploymentGuide from '../components/EmploymentGuide.astro';
 import { DOCUMENTS } from '../documents/config';
+import { EMPLOYMENT_NORMS } from '../engine/employment/data/norms';
+import { MINIMUM_WAGE } from '../engine/employment/data/minimum-wage';
 import { EMPLOYMENT_BETA } from '../content/sections';
+import { formatLongDay } from '../content/rent-indices';
+import { employmentFaqEntries } from '../content/employment-faq';
+import { faqNode } from '../content/faq';
+import { employmentApp } from '../content/structured-data';
+import { LAST_UPDATED } from '../content/updated';
 import { t, type Key } from '../i18n';
-import type { Lang } from '../i18n/languages';
+import { link, type Lang } from '../i18n/languages';
 
 interface Props {
   lang: Lang;
@@ -27,6 +35,22 @@ const sections = [
 // With the documents API the visit opens on the choice between uploading and typing; the tabs and
 // the form wait until it is made.
 const documents = DOCUMENTS !== null;
+
+// The day the page's rules and norms were last checked; it exists only in a build with the page.
+const checkedOn = LAST_UPDATED['/contrato/'];
+if (!checkedOn) throw new Error('/contrato/ needs its date in LAST_UPDATED.');
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const page = new URL(link(lang, 'contrato/'), Astro.site);
+const structuredData = [
+  employmentApp(home, page, lang),
+  faqNode(
+    employmentFaqEntries(lang, EMPLOYMENT_NORMS, {
+      documents,
+      checkedOn,
+      minimumWage: MINIMUM_WAGE,
+    }),
+  ),
+];
 ---
 
 <Base
@@ -35,6 +59,7 @@ const documents = DOCUMENTS !== null;
   path="/contrato/"
   lang={lang}
   section="cause"
+  structuredData={structuredData}
   calculator={documents}
 >
   <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
@@ -68,6 +93,11 @@ const documents = DOCUMENTS !== null;
             {tx('employment.beta_note')}
           </p>
         )}
+        <p class="desk__reviewed">
+          <time datetime={checkedOn}>
+            {t(lang, 'employment.reviewed', { fecha: formatLongDay(checkedOn) })}
+          </time>
+        </p>
       </header>
       <noscript>
         <div class="sheet sheet--notice">
@@ -78,6 +108,7 @@ const documents = DOCUMENTS !== null;
       <EmploymentForm lang={lang} hidden={documents} />
       <EmploymentResult lang={lang} documents={documents} />
     </div>
+    <EmploymentGuide lang={lang} checkedOn={checkedOn} documents={documents} />
   </main>
 </Base>
 

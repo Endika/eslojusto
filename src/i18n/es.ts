@@ -1103,9 +1103,9 @@ export const es = {
     'Tu contrato de trabajo frente a lo que garantiza la ley, punto por punto: salario y SMI, tipo de contrato, periodo de prueba, jornada, vacaciones y cláusulas.',
   'home.contract_citation': 'Estatuto de los Trabajadores · SMI 2026 · RD 723/2026',
 
-  'employment.title': 'Revisión de contrato de trabajo: SMI, temporalidad y cláusulas',
+  'employment.title': 'Revisa tu contrato de trabajo: SMI, temporalidad y prueba',
   'employment.description':
-    'Comprueba tu contrato de trabajo frente a lo que garantiza la ley: salario y SMI, tipo de contrato, periodo de prueba, jornada, vacaciones y cláusulas. Todo en tu dispositivo.',
+    'Comprueba tu contrato de trabajo frente a la ley: salario y SMI, temporalidad, periodo de prueba, jornada, vacaciones y cláusulas, con su artículo.',
   'employment.h1': 'Comprueba si tu contrato de trabajo es justo',
   'employment.lead':
     'Revisa tu contrato punto por punto frente al Estatuto de los Trabajadores y el SMI: qué queda por debajo de lo que garantiza la ley o por encima de sus límites, con el artículo al lado.',
@@ -1114,6 +1114,210 @@ export const es = {
     'Sección en pruebas. Tu convenio colectivo puede mejorar lo que dice la ley: lo que depende de él se dice siempre.',
   'employment.no_js':
     'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
+  'employment.reviewed': 'Revisado el {fecha}',
+  'employment.app_name': 'Revisión de contrato de trabajo',
+
+  'employment.guide.title': 'Qué garantiza la ley en tu contrato de trabajo',
+  'employment.guide.lead':
+    'Las reglas con las que la revisión compara cada punto de tu contrato, con la norma de cada una y su texto en el BOE. Tu convenio colectivo puede mejorarlas: lo que depende de él se dice siempre.',
+  'employment.guide.sources': 'Fuentes',
+  'employment.guide.source_et': 'Estatuto de los Trabajadores (BOE)',
+  'employment.guide.source_smi': 'SMI de {anio} (BOE)',
+  'employment.guide.source_rd723': 'Real Decreto 723/2026 (BOE)',
+  'employment.guide.who': 'Quién está detrás',
+  'employment.guide.norms': 'Normas',
+  'employment.guide.norm.upcoming': 'en vigor desde el {fecha}',
+  'employment.guide.norm.ended': 'con efectos hasta el {fecha}',
+  'employment.guide.norm.never_applied': 'derogada antes de aplicarse',
+  'employment.guide.norm_clause_upcoming': '{norma}, que entra en vigor el {desde},',
+  'employment.guide.norm_clause_pending_validation':
+    '{norma}, en vigor desde el {desde} y pendiente de convalidación,',
+  'employment.guide.norm_repealed':
+    'La norma {norma} se aplicó del {desde} al {hasta} y después se derogó: la revisión ya no la aplica.',
+  'employment.guide.norm_never':
+    'La norma {norma} no llegó a aplicarse: se derogó antes de entrar en vigor.',
+  'employment.guide.quote_link': 'Texto en el BOE: {cita}',
+
+  'employment.guide.minimum_wage.title': 'Salario mínimo (SMI) de cada año',
+  'employment.guide.minimum_wage.lead':
+    'El Gobierno fija cada año el salario mínimo interprofesional por real decreto (art. 27.1). Es para la jornada completa y cuenta lo que cobras en un año: ningún salario puede quedar por debajo, salvo que trabajes menos horas.',
+  'employment.guide.minimum_wage.table': 'El SMI de cada año, a jornada completa',
+  'employment.guide.minimum_wage.year': 'Año',
+  'employment.guide.minimum_wage.monthly': 'Al mes, en 14 pagas',
+  'employment.guide.minimum_wage.twelve': 'Al mes, en 12 pagas',
+  'employment.guide.minimum_wage.annual': 'Al año',
+  'employment.guide.minimum_wage.daily': 'Al día',
+  'employment.guide.minimum_wage.norm': 'Norma',
+  'employment.guide.minimum_wage.twelve_note':
+    'La cifra en 12 pagas es la anual dividida entre 12: los reales decretos dan la de 14 pagas y la anual.',
+  'employment.guide.minimum_wage.current':
+    'En {anio}, el SMI es de {mensual} al mes en 14 pagas, {anual} al año, o {doce} al mes si cobras en 12 pagas. Lo fija {norma}, publicado en el BOE el {publicado} y con efectos desde el {efectos}.',
+  'employment.guide.minimum_wage.not_published':
+    'El SMI de {anio} aún no se ha publicado en el BOE. Hasta que salga, la revisión usa el de {referencia} solo como referencia y no da diferencia para {anio}.',
+  'employment.guide.minimum_wage.prorata':
+    'A tiempo parcial, el mínimo se cobra en proporción a tu jornada (art. 1 de cada real decreto del SMI): con 20 horas a la semana frente a 40, la mitad. La revisión hace la proporción con la jornada completa de tu convenio si la metes; si no, con las 40 horas de la ley.',
+  'employment.guide.minimum_wage.temporary':
+    'En un contrato temporal de hasta 120 días pagado por días, el mínimo es por cada jornada legal e incluye la parte de los domingos, los festivos y las pagas extra: {diario} en {anio} (art. 4.1 de cada real decreto del SMI).',
+
+  'employment.guide.what_counts.title': 'Qué cuenta para el SMI',
+  'employment.guide.what_counts.lead':
+    'El SMI se compara con lo que cobras en un año: el salario base, los complementos fijos y las pagas extra, aunque vayan prorrateadas.',
+  'employment.guide.what_counts.in_kind':
+    'El salario en especie, como una vivienda o un vehículo, no puede pasar del 30 % de lo que cobras ni bajar de la cifra del SMI lo que cobras en dinero (art. 26.1).',
+  'employment.guide.what_counts.absorption':
+    'Cuando sube el SMI, un salario que en su conjunto y en cómputo anual ya era más alto no tiene que subir (art. 27.1).',
+  'employment.guide.what_counts.review':
+    'La revisión suma el salario base, los complementos fijos y las pagas extra. Deja fuera los complementos variables, las horas extra, las dietas y el salario en especie, y lo dice. Si no sabes si un complemento es fijo o variable, da las dos cuentas.',
+
+  'employment.guide.modalities.title': 'Tipos de contrato desde la reforma de 2022',
+  'employment.guide.modalities.lead':
+    'Desde el {desde}, un contrato de trabajo se presume indefinido. Un contrato temporal solo cabe por circunstancias de la producción o para sustituir a otra persona, y tiene que explicar con precisión su causa, las circunstancias que la justifican y su relación con la duración (art. 15.1):',
+  'employment.guide.modalities.production':
+    'Por circunstancias de la producción: hasta 6 meses, o hasta un año si lo amplía tu convenio sectorial, con una sola prórroga dentro de ese máximo (art. 15.2).',
+  'employment.guide.modalities.occasional':
+    'Para situaciones ocasionales y previsibles de corta duración, la empresa puede usarlo hasta 90 días en el año natural, que no pueden ser seguidos (art. 15.2).',
+  'employment.guide.modalities.agrifood':
+    'En el sector agroalimentario, {norma} amplía ese límite a 120 días.',
+  'employment.guide.modalities.replacement':
+    'De sustitución: para cubrir a una persona con derecho a reserva de su puesto, con su nombre y la causa en el contrato, o hasta 3 meses para cubrir un puesto durante un proceso de selección (art. 15.3).',
+  'employment.guide.modalities.discontinuous':
+    'Fijo discontinuo: es indefinido, para trabajos de temporada o que se repiten con periodos sin actividad. El contrato dice el periodo de actividad, la jornada y su distribución, aunque sea de forma estimada (art. 16.2).',
+  'employment.guide.modalities.training':
+    'Formativos: el de formación en alternancia dura entre 3 meses y 2 años, y el de práctica profesional entre 6 meses y un año (art. 11).',
+  'employment.guide.modalities.abolished':
+    'Desde el {desde} ya no se pueden hacer contratos de obra o servicio ni eventuales con sus reglas anteriores.',
+  'employment.guide.modalities.written':
+    'La ley pide por escrito, entre otros, los contratos formativos, a tiempo parcial, fijos discontinuos, de relevo y de trabajo a distancia, y los temporales de más de cuatro semanas (art. 8.2).',
+  'employment.guide.modalities.before_reform':
+    'Los contratos hechos hasta el {hasta} siguen las reglas de temporalidad anteriores a la reforma: la revisión comprueba todo lo demás y dice que su temporalidad no se revisa en esta versión.',
+
+  'employment.guide.permanent.title': 'Cuándo un contrato temporal pasa a fijo',
+  'employment.guide.permanent.lead':
+    'Un contrato temporal tiene que cumplir el artículo 15 del Estatuto: una causa de producción o de sustitución explicada con precisión, y su duración máxima. La revisión no decide tu caso: cita lo que dice la ley. Si tu contrato no lo cumple:',
+  'employment.guide.permanent.chaining':
+    'Con varios contratos: si en un periodo de 24 meses has tenido contratos durante más de 18, seguidos o no, con la misma empresa o grupo de empresas, mediante dos o más contratos por circunstancias de la producción, también a través de una ETT:',
+  'employment.guide.permanent.not_written':
+    'Y si un contrato que la ley pide por escrito no se hizo por escrito:',
+  'employment.guide.permanent.quote_8_2': 'El artículo 8.2 del Estatuto de los Trabajadores dice:',
+  'employment.guide.permanent.certificate':
+    'Puedes pedir por escrito al servicio público de empleo un certificado de los contratos temporales que has tenido (art. 15.9). Con tu vida laboral, la revisión suma tus contratos para el límite de 18 meses dentro de 24.',
+  'employment.guide.permanent.review':
+    'Cuando la cuenta depende de algo que no se sabe, como qué contrato anterior a la reforma cuenta, la revisión da las dos lecturas y no cita el paso a fijo hasta que coinciden.',
+
+  'employment.guide.trial.title': 'Periodo de prueba',
+  'employment.guide.trial.lead':
+    'El periodo de prueba solo cabe si se pacta por escrito, y su duración la fija tu convenio. Si el convenio no dice nada, estos son los máximos (art. 14.1):',
+  'employment.guide.trial.technicians': '6 meses para técnicos titulados.',
+  'employment.guide.trial.others': '2 meses para el resto.',
+  'employment.guide.trial.small_company':
+    '3 meses para quien no es técnico titulado en una empresa de menos de 25 personas en plantilla.',
+  'employment.guide.trial.temporary':
+    '1 mes en un contrato temporal de 6 meses o menos, salvo que el convenio diga otra cosa.',
+  'employment.guide.trial.void':
+    'No cabe periodo de prueba si ya habías hecho las mismas funciones en la empresa, con cualquier contrato (art. 14.1).',
+  'employment.guide.trial.training':
+    'En un contrato de formación en alternancia no hay periodo de prueba (art. 11.2.l); en uno de práctica profesional, como mucho 1 mes, salvo que el convenio diga otra cosa (art. 11.3.e). Y quien sigue en la empresa tras un contrato formativo no hace un periodo de prueba nuevo (art. 11.4.g).',
+
+  'employment.guide.working_time.title': 'Jornada y descansos',
+  'employment.guide.working_time.lead':
+    'La jornada máxima sigue en 40 horas semanales de trabajo efectivo, de media en el año (art. 34.1). Además:',
+  'employment.guide.working_time.daily':
+    'Como mucho 9 horas ordinarias al día, salvo que tu convenio o un acuerdo de empresa las repartan de otra forma (art. 34.3).',
+  'employment.guide.working_time.rest':
+    'Al menos 12 horas entre el final de una jornada y el inicio de la siguiente (art. 34.3).',
+  'employment.guide.working_time.weekly_rest':
+    'Un descanso semanal de día y medio seguido, que puede acumularse en periodos de hasta 14 días (art. 37.1).',
+  'employment.guide.working_time.break':
+    'Una pausa de al menos 15 minutos cuando la jornada seguida pasa de 6 horas (art. 34.4).',
+  'employment.guide.working_time.night':
+    'Quien trabaja de noche no pasa de 8 horas al día de media en 15 días ni hace horas extra (art. 36.1).',
+  'employment.guide.working_time.overtime':
+    'Como mucho 80 horas extra al año, sin contar las compensadas con descanso en los 4 meses siguientes. Se pagan al menos como la hora ordinaria o se compensan con descanso, y son voluntarias salvo que las pacte el convenio o el contrato (art. 35).',
+  'employment.guide.working_time.record':
+    'La empresa registra cada día el inicio y el final de tu jornada (art. 34.9). Algunos sectores y los cambios de turno tienen reglas especiales sobre jornada y descansos (Real Decreto 1561/1995); la revisión las nombra cuando pueden aplicarse.',
+
+  'employment.guide.part_time.title': 'Tiempo parcial',
+  'employment.guide.part_time.lead':
+    'Un contrato a tiempo parcial dice las horas de trabajo y cómo se reparten; si no lo dice, se presume a jornada completa, salvo prueba en contrario (art. 12.4.a). La empresa registra tus horas cada día y te da el resumen del mes con la nómina (art. 12.4.c).',
+  'employment.guide.part_time.overtime':
+    'A tiempo parcial no se hacen horas extra, salvo para prevenir o reparar daños urgentes (arts. 12.4.c y 35.3).',
+  'employment.guide.part_time.complementary':
+    'Las horas complementarias se pactan por escrito y solo con 10 horas semanales o más de media en el año. No pasan del 30 % de las horas ordinarias, o del 60 % si lo fija el convenio, y te las avisan con al menos 3 días de antelación, salvo que el convenio fije menos (art. 12.5).',
+  'employment.guide.part_time.voluntary':
+    'En un contrato indefinido, la empresa puede ofrecerte además horas complementarias voluntarias, hasta el 15 %, o el 30 % si lo fija el convenio (art. 12.5.g).',
+
+  'employment.guide.holidays_pay.title': 'Vacaciones y pagas extra',
+  'employment.guide.holidays_pay.holidays':
+    'Las vacaciones son al menos 30 días naturales al año, retribuidos; el convenio o el contrato pueden dar más (art. 38.1). En un contrato de menos de un año, corresponde la parte proporcional.',
+  'employment.guide.holidays_pay.money':
+    'Mientras sigue el contrato, las vacaciones no se pueden cambiar por dinero (art. 38.1).',
+  'employment.guide.holidays_pay.extra_pays':
+    'Hay dos pagas extra al año: una en Navidad y la otra en el mes que fije el convenio. Su importe lo fija el convenio, que también puede prorratearlas en las doce mensualidades (art. 31).',
+  'employment.guide.holidays_pay.public_holidays':
+    'Además, hay hasta 14 fiestas laborales al año, retribuidas y que no se recuperan (art. 37.2).',
+
+  'employment.guide.clauses.title': 'Cláusulas',
+  'employment.guide.clauses.lead': 'Algunas cláusulas tienen límites en la ley:',
+  'employment.guide.clauses.non_compete':
+    'No competencia después del contrato: como mucho 2 años para técnicos y 6 meses para el resto, y solo si la empresa tiene un interés efectivo y te paga una compensación económica adecuada (art. 21.2).',
+  'employment.guide.clauses.exclusivity':
+    'Plena dedicación a una sola empresa: se pacta con una compensación económica expresa (art. 21.1).',
+  'employment.guide.clauses.retention':
+    'Permanencia: solo tras una especialización profesional pagada por la empresa, como mucho 2 años y siempre por escrito (art. 21.4).',
+  'employment.guide.clauses.waiver':
+    'Renuncias: los derechos que da la ley no se pueden renunciar, ni antes ni después de tenerlos (art. 3.5). Si una cláusula no vale, se sustituye por lo que dice la ley y el resto del contrato sigue valiendo (art. 9.1).',
+  'employment.guide.clauses.remote':
+    'Teletrabajo: con trabajo a distancia regular, {norma} pone a cargo de la empresa los gastos de equipos, herramientas y medios (art. 12).',
+  'employment.guide.clauses.review':
+    'La revisión mira la letra de cada cláusula que confirmas: su duración, si prevé una compensación y si consta por escrito. No valora si una compensación es adecuada ni si la empresa tiene un interés efectivo.',
+
+  'employment.guide.information.title': 'Qué tiene que darte la empresa por escrito',
+  'employment.guide.information.lead':
+    'Desde el {desde}, {norma} dice que la empresa tiene que darte por escrito los elementos esenciales de tu relación laboral (art. 3.2):',
+  'employment.guide.information.when':
+    'Si tu relación empezó desde ese día, tenía que dártelos antes de empezar (art. 7.1). Si ya estaba en marcha, puedes pedirlos por escrito y la empresa tiene 30 días hábiles para dártelos (disposición transitoria única). No se aplica a relaciones de cuatro semanas o menos (art. 2.2).',
+  'employment.guide.information.review':
+    'Algunos puntos pueden remitir a la ley o al convenio. La revisión te pregunta por cada uno y dice cuáles faltan.',
+
+  'employment.guide.agreement.title': 'Cómo encontrar tu convenio',
+  'employment.guide.agreement.lead':
+    'Tu convenio colectivo fija tu salario por categoría, tus pluses, tu jornada y muchas de las duraciones de esta página, y obliga a la empresa dentro de su ámbito (art. 82.3). El contrato tiene que nombrarlo, con su código y su fecha de publicación.',
+  'employment.guide.agreement.where':
+    'Los convenios se publican en el BOE, si son estatales, o en el boletín oficial de tu comunidad o tu provincia, y están en REGCON, el registro público de convenios del Ministerio de Trabajo, donde se buscan por nombre, sector o código.',
+  'employment.guide.agreement.review':
+    'La revisión no lee convenios ni sus tablas: si metes el salario de tu categoría según tu convenio, lo compara como dato tuyo.',
+
+  'employment.guide.faq': 'Preguntas frecuentes',
+  'employment.faq.minimum_wage': '¿Cuál es el salario mínimo en {anio}?',
+  'employment.faq.minimum_wage_answer':
+    'En {anio}, el salario mínimo interprofesional (SMI) es de {mensual} al mes en 14 pagas, {anual} al año. Si cobras en 12 pagas, equivale a {doce} al mes, y por días es de {diario}. Lo fija el {norma}, con efectos desde el {efectos}. Es para la jornada completa: con menos horas se cobra en proporción.',
+  'employment.faq.minimum_wage_not_published':
+    'El SMI de {anio} aún no se ha publicado en el BOE. El último publicado es el de {referencia}: {mensual} al mes en 14 pagas, {anual} al año. Mientras no salga el de {anio}, la revisión lo usa solo como referencia y no da diferencia para {anio}.',
+  'employment.faq.part_time': '¿Cómo se calcula el SMI si trabajo a tiempo parcial?',
+  'employment.faq.part_time_answer':
+    'En proporción a tu jornada: el SMI es para la jornada completa, y con menos horas se cobra a prorrata (art. 1 de cada real decreto del SMI). Por ejemplo, con 20 horas a la semana frente a 40, en {anio} el mínimo es la mitad: {mitad} al año. La revisión hace la proporción con la jornada completa de tu convenio si la metes; si no, con las 40 horas de la ley.',
+  'employment.faq.temporary': '¿Cuánto puede durar un contrato temporal?',
+  'employment.faq.temporary_answer':
+    'Por circunstancias de la producción, hasta 6 meses, o hasta un año si lo amplía tu convenio sectorial, con una sola prórroga dentro de ese máximo; para situaciones ocasionales y previsibles, la empresa puede usarlo hasta 90 días en el año natural, no seguidos. De sustitución, mientras dura la ausencia de la persona a la que sustituyes, o hasta 3 meses para cubrir un puesto durante un proceso de selección (art. 15). Si en 24 meses has tenido contratos durante más de 18 con la misma empresa o grupo, mediante dos o más contratos por circunstancias de la producción, el artículo 15.5 del Estatuto de los Trabajadores dice que, en un caso como el tuyo, la persona adquiere la condición de fija.',
+  'employment.faq.trial': '¿Cuánto puede durar el periodo de prueba?',
+  'employment.faq.trial_answer':
+    'Lo fija tu convenio, y solo cabe si se pacta por escrito. Si el convenio no dice nada, como mucho 6 meses para técnicos titulados y 2 meses para el resto, o 3 en empresas de menos de 25 personas. En un contrato temporal de 6 meses o menos, 1 mes, salvo que el convenio diga otra cosa. Si ya habías hecho las mismas funciones en la empresa, no cabe (art. 14.1). En un contrato de formación en alternancia no hay periodo de prueba (art. 11.2.l).',
+  'employment.faq.holidays': '¿Cuántas vacaciones me corresponden?',
+  'employment.faq.holidays_answer':
+    'Al menos 30 días naturales al año, retribuidos; tu convenio o tu contrato pueden dar más (art. 38.1). Si tu contrato dura menos de un año, te corresponde la parte proporcional. Mientras sigue el contrato, las vacaciones no se pueden cambiar por dinero.',
+  'employment.faq.information': '¿Qué información me tiene que dar la empresa?',
+  'employment.faq.information_answer':
+    'Desde el {desde}, {norma} dice que la empresa tiene que darte por escrito los elementos esenciales de tu relación laboral: quiénes son las partes, el puesto y la categoría, el salario y sus complementos, la jornada y las vacaciones, el periodo de prueba, el convenio colectivo con su código y cómo termina el contrato, entre otros. Si tu relación empezó desde ese día, antes de empezar; si ya estaba en marcha, puedes pedirlos por escrito y la empresa tiene 30 días hábiles. No se aplica a relaciones de cuatro semanas o menos.',
+  'employment.faq.january': '¿Qué pasa en enero antes de que salga el nuevo SMI?',
+  'employment.faq.january_answer':
+    'Cada año, el SMI lo fija un real decreto. El de {anio} se publicó en el BOE el {publicado}, con efectos desde el {efectos}. Hasta que sale el del año, la revisión no pone una cifra que aún no existe: dice que el SMI de ese año aún no se ha publicado, usa el último publicado solo como referencia y no da diferencia para ese año. Cuando sale en el BOE, la revisión compara ese año también.',
+  'employment.faq.documents': '¿Qué pasa con mis documentos?',
+  'employment.faq.documents_answer':
+    'Si subes tu contrato y, si los tienes, tus nóminas, la oferta de empleo o tu vida laboral, se envían cifrados a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo indica qué es cada página y copia solo los datos que necesita el formulario. Tiene orden de no copiar nombres de personas, DNI, NIE, número de la Seguridad Social, domicilios, cuentas, teléfonos ni correos, ni nada sobre discapacidad, salud, bajas o afiliación sindical, como la cuota del sindicato de una nómina. El servidor descarta cualquier texto copiado que aún lleve un DNI, un número de la Seguridad Social, una cuenta, un correo o un teléfono, o que hable de salud, bajas, discapacidad, sindicatos o embargos. No se guarda nada: los documentos se procesan en memoria y se descartan. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
+  'employment.faq.pass': '¿Qué incluye el pase de 4,99 €?',
+  'employment.faq.pass_answer':
+    'El pase vale para cualquier revisión durante 7 días, también las del finiquito y el alquiler, y solo en el navegador con el que pagas. En la del contrato te enseña el cálculo paso a paso de cada punto y te deja descargar el informe en PDF y la carta a la empresa sobre lo que no coincide con la ley. En esos días puedes rehacer o corregir tu revisión y leer hasta 15 paquetes de documentos sin pagar otra vez. La carta para pedir la información por escrito y la petición del certificado de contratos temporales se descargan gratis. No guardamos tu revisión en ningún sitio: en otro dispositivo, en una ventana privada o si borras los datos de navegación, el pase se pierde.',
+
   'employment.form_aria': 'Revisión del contrato de trabajo',
   'employment.tab.relacion': 'Relación',
   'employment.tab.modalidad': 'Contrato',
