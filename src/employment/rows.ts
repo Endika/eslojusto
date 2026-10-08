@@ -7,6 +7,15 @@ import type { ClientKey, Translate } from '../i18n/client';
 export const ROW_LISTS = ['history', 'parts', 'payslips', 'schedule', 'clauses'] as const;
 export type RowList = (typeof ROW_LISTS)[number];
 
+// The most rows each list holds on screen.
+export const ROW_MAX: Readonly<Record<RowList, number>> = {
+  history: 20,
+  parts: 10,
+  payslips: 24,
+  schedule: 21,
+  clauses: 12,
+};
+
 export const rowField = (list: RowList, row: number, key: string): string =>
   `${list}.${row}.${key}`;
 

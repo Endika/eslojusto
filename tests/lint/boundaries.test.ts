@@ -144,6 +144,15 @@ describe('import boundaries', () => {
       '../analytics/posthog',
       '../scripts/clock',
       './../engine/employment/data/norms',
+      // Of reading documents, never the final pay's pieces nor the platform's own workings.
+      '../documents/prefill',
+      '../documents/final-pay-reading',
+      '../documents/report',
+      '../documents/upload',
+      '../documents/payment',
+      '../documents/api',
+      './../documents/contract',
+      '../documents//ports',
     ].map((source): [string, string] => ['src/employment/x.ts', `import { x } from '${source}';`]),
     ...['../employment/main', '../employment/form'].map((source): [string, string] => [
       'src/calculator/x.ts',
@@ -348,6 +357,14 @@ describe('import boundaries', () => {
     ['src/employment/x.ts', "import type { Translate } from '../i18n/client';"],
     ['src/employment/x.ts', "import { shownPair } from '../calculator/amounts';"],
     ['src/rental/x.ts', "import { shownPair } from '../calculator/amounts';"],
+    ['src/employment/x.ts', "import type { EmploymentExtraction } from '../documents/contract';"],
+    ['src/employment/x.ts', "import type { ReadPrefill } from '../documents/ports';"],
+    ['src/employment/x.ts', "import { conflictLines } from '../documents/summary';"],
+    ['src/employment/x.ts', "import type { FormEntries } from '../calculator/fill';"],
+    [
+      'src/scripts/employment-documents.ts',
+      "import { employmentReading } from '../employment/reading';",
+    ],
     [
       'src/scripts/employment.ts',
       "import { MINIMUM_WAGE } from '../engine/employment/data/minimum-wage';",

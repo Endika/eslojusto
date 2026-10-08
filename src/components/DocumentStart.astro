@@ -7,7 +7,7 @@ import { link, type Lang } from '../i18n/languages';
 // Each review names the documents it reads in its own words.
 interface Props {
   lang: Lang;
-  review?: 'final_pay' | 'rental';
+  review?: 'final_pay' | 'rental' | 'employment';
 }
 const { lang, review = 'final_pay' } = Astro.props;
 const RENTAL: Partial<Record<Key, Key>> = {
@@ -16,7 +16,16 @@ const RENTAL: Partial<Record<Key, Key>> = {
   'documents.upload.files_hint': 'rental.documents.files_hint',
   'documents.upload.consent': 'rental.documents.consent',
 };
-const tx = (key: Key) => t(lang, (review === 'rental' && RENTAL[key]) || key);
+const EMPLOYMENT: Partial<Record<Key, Key>> = {
+  'documents.start.help': 'employment.documents.start_help',
+  'documents.start.upload': 'employment.documents.upload',
+  'documents.upload.files_hint': 'employment.documents.files_hint',
+  'documents.upload.consent': 'employment.documents.consent',
+};
+const OWN: Partial<Record<Key, Key>> = { final_pay: {}, rental: RENTAL, employment: EMPLOYMENT }[
+  review
+];
+const tx = (key: Key) => t(lang, OWN[key] ?? key);
 const arrow = 'M4 12h15m-6-6 6 6-6 6';
 ---
 

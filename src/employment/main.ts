@@ -7,6 +7,7 @@ import {
   stepAt,
   stepFrom,
 } from '../calculator/flow';
+import type { FormEntries } from '../calculator/fill';
 import { createNavigation } from '../calculator/navigation';
 import { reviewEmployment } from '../engine/employment/review';
 import { applyConditions, gate } from './conditions';
@@ -26,13 +27,17 @@ import {
   renderOutOfScope,
   type EmploymentResultData,
 } from './render';
-import { setUpRows } from './rows';
+import { employmentEntries, rowsNeeded, setControl } from './fill';
+import { ROW_LISTS, setUpRows } from './rows';
 import { EMPLOYMENT_FLOW } from './steps';
 
-// What the page's other parts can do with the review: open it, review it, and show its last
-// result again when the detail is locked or unlocked.
+// What the page's other parts can do with the review: set or read its answers, open it, review
+// it, and show its last result again when the detail is locked or unlocked.
 export interface EmploymentCalculator {
   readonly form: HTMLFormElement;
+  // Sets the answers, with the rows they name, and returns the names it could not set.
+  fill(entries: FormEntries): string[];
+  entries(): FormEntries;
   open(): void;
   review(): boolean;
   refreshResult(): void;
@@ -198,6 +203,17 @@ export function setUpEmployment(
 
   return {
     form,
+    fill(entries) {
+      const needed = rowsNeeded(entries);
+      for (const list of ROW_LISTS) {
+        const n = needed[list];
+        if (n !== undefined) rows[list].setRows(n);
+      }
+      const missed = entries.filter(([name, value]) => !setControl(form, name, value));
+      conditions();
+      return missed.map(([name]) => name);
+    },
+    entries: () => employmentEntries(form),
     open() {
       nav.reached = 0;
       nav.show(0, { history: 'replace', focus: true });
