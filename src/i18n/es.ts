@@ -2189,15 +2189,30 @@ export const es = {
     'El contrato con sus anexos y, si los tienes, tus nóminas, la oferta de empleo o tu vida laboral, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
   'employment.documents.consent':
     'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos sensibles, como la afiliación a un sindicato, una baja médica o una discapacidad. Se leen en la Unión Europea y no se guardan.',
-  'employment.pass.title': 'El detalle de cada punto',
+  'employment.pass.title': 'El detalle, el informe y la carta',
   'employment.pass.text':
-    'Por 4,99 € ves el cálculo paso a paso de cada punto de tu contrato: año a año y nómina a nómina, con la norma que aplica y su fuente.',
+    'Por 4,99 € ves el cálculo paso a paso de cada punto de tu contrato (año a año y nómina a nómina, con la norma que aplica y su fuente) y descargas el informe en PDF y, si tu revisión tiene puntos para ella, la carta a la empresa. Se generan en tu dispositivo.',
   'employment.pass.price':
-    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para las revisiones del finiquito y del alquiler: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a ver el detalle sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
+    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para las revisiones del finiquito y del alquiler: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a ver el detalle y descargar el informe y la carta sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
   'employment.pass.paid_help':
-    'Si pagaste desde este navegador y no ves el detalle, recupera aquí tu pase. Solo funciona en el navegador con el que pagaste.',
+    'Si pagaste desde este navegador y no ves el detalle ni las descargas, recupera aquí tu pase. Solo funciona en el navegador con el que pagaste.',
   'employment.pass.waiver':
-    'Quiero ver el detalle ahora. Sé que, al ser contenido digital que se entrega al momento, pierdo el derecho de desistimiento (art. 103.m de la Ley General para la Defensa de los Consumidores y Usuarios).',
+    'Quiero ver el detalle y el informe ahora. Sé que, al ser contenido digital que se entrega al momento, pierdo el derecho de desistimiento (art. 103.m de la Ley General para la Defensa de los Consumidores y Usuarios).',
+  'employment.pass.download_information_letter':
+    'Descargar la carta que pide la información por escrito (PDF, gratis)',
+  'employment.pass.download_certificate_request':
+    'Descargar la petición del certificado de contratos temporales (PDF, gratis)',
+  'employment.pass.download_company_letter': 'Descargar la carta a la empresa (PDF)',
+  'employment.pass.letter_note':
+    'Las cartas son plantillas. La que pide la información y la petición del certificado son gratis; la carta a la empresa lleva tus cifras y viene con el pase. Se descargan en tu dispositivo y no se envían desde aquí: usarlas o no, y cómo, es decisión tuya.',
+  'employment.letters.title': 'Cartas que puedes descargar gratis',
+  'employment.letters.text':
+    'Estas cartas solo piden información, así que no necesitan el pase. Se generan en tu dispositivo.',
+  'employment.letter.legend': 'Tus datos para las cartas (opcional)',
+  'employment.letter.id': 'DNI o NIE (opcional)',
+  'employment.letter.workplace': 'Centro de trabajo',
+  'employment.letter.privacy':
+    'Estos datos solo se usan para rellenar las cartas en tu dispositivo; no se envían ni se guardan.',
   'client.documents.kind.employment_contract': 'Contrato de trabajo',
   'client.documents.kind.job_offer': 'Oferta de empleo',
   'client.documents.source.employment_contract': 'el contrato',
@@ -2266,9 +2281,75 @@ export const es = {
   'client.employment.documents.error.pass_exhausted':
     'Ya has usado las 15 lecturas de tu pase. Puedes rellenar a mano; el detalle sigue disponible.',
   'client.employment.documents.pass.issued':
-    'Pago recibido. Ya puedes ver el detalle de cada punto.',
+    'Pago recibido. Ya puedes ver el detalle de cada punto y descargar el informe.',
   'client.employment.documents.pass.lost':
-    'Hemos vuelto del pago, pero la revisión no se ha podido recuperar. Repítela y verás el detalle.',
+    'Hemos vuelto del pago, pero la revisión no se ha podido recuperar. Repítela y verás el detalle y las descargas.',
+  'client.employment.report.title': 'Revisión de tu contrato de trabajo',
+  'client.employment.report.intro':
+    'Este informe compara tu contrato con lo que marca la ley, punto por punto, con los datos que confirmaste en la revisión. Donde el resultado depende de una respuesta «No lo sé», da cada lectura. Informa sobre la ley y no es asesoramiento jurídico.',
+  'client.employment.report.footer':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Normas y SMI según su estado el {fecha}.',
+  'client.employment.report.filename': 'eslojusto-informe-contrato.pdf',
+  'client.employment.report.your_data': 'Tus datos',
+  'client.employment.report.start': 'Fecha de inicio',
+  'client.employment.report.end': 'Fecha de fin',
+  'client.employment.report.no_end': 'Sin fecha de fin',
+  'client.employment.report.modality': 'Tipo de contrato',
+  'client.employment.report.salary': 'Salario bruto',
+  'client.employment.report.salary_per.year': '{importe} al año',
+  'client.employment.report.salary_per.month': '{importe} al mes',
+  'client.employment.report.salary_per.day': '{importe} al día',
+  'client.employment.report.salary_per.hour': '{importe} la hora',
+  'client.employment.report.payments': 'Pagas al año',
+  'client.employment.report.weekly_hours': 'Horas a la semana',
+  'client.employment.report.annual_hours': 'Horas al año',
+  'client.employment.report.full_time': 'Jornada completa de tu convenio',
+  'client.employment.report.category_salary': 'Salario de tu categoría',
+  'client.employment.report.trial': 'Periodo de prueba',
+  'client.employment.report.holidays': 'Vacaciones',
+  'client.employment.report.holidays_calendar': '{dias} días naturales',
+  'client.employment.report.holidays_working': '{dias} días laborables',
+  'client.employment.report.payslips': 'Nóminas',
+  'client.employment.report.history': 'Contratos en tu vida laboral',
+  'client.employment.report.no_figure': 'Sin dato',
+  'client.employment.report.summary': 'Resumen',
+  'client.employment.report.points': 'Punto por punto',
+  'client.employment.report.how': 'Cómo se calcula',
+  'client.employment.report.information': 'Para que lo tengas en cuenta',
+  'client.employment.report.unchecked': 'Lo que esta revisión no comprueba',
+  'client.employment.letter.workplace': 'Centro de trabajo',
+  'client.employment.letter.regards': 'Un saludo.',
+  'client.employment.letter.company.title': 'Revisión de mi contrato de trabajo',
+  'client.employment.letter.company.body':
+    'Te escribo por mi contrato de trabajo, que empezó el {inicio}.',
+  'client.employment.letter.company.filename': 'eslojusto-carta-empresa.pdf',
+  'client.employment.letter.information.title': 'Información de mi contrato por escrito',
+  'client.employment.letter.information.on_request':
+    'Según el {norma} (art. 3 y disposición transitoria única), puedo pedir por escrito la información de mi relación laboral y la empresa tiene 30 días hábiles para darla. Te pido por escrito la que no encuentro en mi contrato:',
+  'client.employment.letter.information.before_start':
+    'Según el {norma} (arts. 3 y 7.1), esta información se da por escrito antes de empezar a trabajar. Como no la encuentro en mi contrato, te la pido por escrito:',
+  'client.employment.letter.information.filename': 'eslojusto-carta-informacion.pdf',
+  'client.employment.letter.pay.intro':
+    'He comparado mi salario con el salario mínimo interprofesional (SMI) de cada año, y en estos años queda por debajo:',
+  'client.employment.letter.pay.year':
+    'En {anio}, el {norma}, fija un mínimo anual de {completo} a jornada completa. Mi salario pactado es de {salario} al año: {diferencia} menos al año.',
+  'client.employment.letter.pay.year_prorata':
+    'En {anio}, el {norma}, fija un mínimo anual de {completo} a jornada completa, que en proporción a mi jornada es de {minimo}. Mi salario pactado es de {salario} al año: {diferencia} menos al año.',
+  'client.employment.letter.pay.day':
+    'En {anio}, el {norma}, fija un mínimo de {completo} por jornada legal para los contratos de hasta 120 días. Mi salario pactado es de {salario} por jornada: {diferencia} menos por jornada.',
+  'client.employment.letter.pay.day_prorata':
+    'En {anio}, el {norma}, fija un mínimo de {completo} por jornada legal para los contratos de hasta 120 días, que en proporción a mi jornada es de {minimo}. Mi salario pactado es de {salario} por jornada: {diferencia} menos por jornada.',
+  'client.employment.letter.pay.ask': 'Te pido que se revise mi salario.',
+  'client.employment.letter.points.intro':
+    'También he comparado mi contrato con lo que marca la ley, y estos puntos no coinciden:',
+  'client.employment.letter.points.line': '{punto}: {norma}.',
+  'client.employment.letter.points.ask': 'Te pido que se revisen.',
+  'client.employment.letter.certificate.title': 'Petición del certificado de contratos temporales',
+  'client.employment.letter.certificate.to': 'Al servicio público de empleo',
+  'client.employment.letter.certificate.company': 'Empresa de los contratos',
+  'client.employment.letter.certificate.body':
+    'Pido por escrito el certificado de los contratos de duración determinada o temporales que he celebrado con la empresa indicada arriba, como prevé el {cita}:',
+  'client.employment.letter.certificate.filename': 'eslojusto-certificado-contratos-temporales.pdf',
 
   'rental.title': 'Subida del alquiler y fianza: revisa si pagas de más',
   'rental.description':

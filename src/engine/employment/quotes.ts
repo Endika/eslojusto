@@ -7,6 +7,7 @@ type QuotedRule = Extract<
   | 'replacement_name_cause'
   | 'permanent_on_breach'
   | 'chaining_18_in_24'
+  | 'temporary_certificate'
   | 'written_form'
 >;
 
@@ -29,6 +30,10 @@ export const LAW_QUOTES: Readonly<Record<QuotedRule, LiteralQuote>> = {
   // 15.5, first paragraph, first sentence.
   chaining_18_in_24: {
     text: 'Sin perjuicio de lo anterior, las personas trabajadoras que en un periodo de veinticuatro meses hubieran estado contratadas durante un plazo superior a dieciocho meses, con o sin solución de continuidad, para el mismo o diferente puesto de trabajo con la misma empresa o grupo de empresas, mediante dos o más contratos por circunstancias de la producción, sea directamente o a través de su puesta a disposición por empresas de trabajo temporal, adquirirán la condición de personas trabajadoras fijas.',
+  },
+  // 15.9, second sentence.
+  temporary_certificate: {
+    text: 'En todo caso, la persona trabajadora podrá solicitar, por escrito al servicio público de empleo correspondiente un certificado de los contratos de duración determinada o temporales celebrados, a los efectos de poder acreditar su condición de persona trabajadora fija en la empresa.',
   },
   // 8.2, third paragraph.
   written_form: {

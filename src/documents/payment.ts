@@ -90,9 +90,12 @@ const DEAD_PASS = {
 const FILENAMES: Record<Download, 'report' | 'letter'> = { report: 'report', letter: 'letter' };
 
 const downloadsWith = (r: OfferedReview): r is PaidReview => 'report' in r;
+const freeKinds = (r: OfferedReview): readonly LetterKind[] =>
+  downloadsWith(r) ? (r.freeLetterKinds ?? []) : [];
 
 // The letter's fields and the warnings beside them. Each section's form has its own typed fields:
-// the final pay's asks for the company, the rental one for the landlord, the address and the account.
+// the final pay's asks for the company, the rental one for the landlord, the address and the
+// account, the contract review's for the company and the workplace.
 function letterParts(letter: HTMLElement) {
   const input = (name: keyof LetterDetails) =>
     letter.querySelector<HTMLInputElement>(`[data-letter-field="${name}"]`);
@@ -237,12 +240,14 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     browser.warnBeforeLeaving(warnsOnLeave(state));
   }
 
-  // Only the letters this review offers, and the fields only they ask for.
-  function renderLetters(review: OfferedReview) {
+  // Only the letters this review offers, and the fields only they ask for: those the pass pays
+  // for once it is verified, those that only ask for information always.
+  function renderLetters(review: OfferedReview, paid: boolean) {
     if (!letter || !downloadsWith(review)) return;
-    letter.hidden = review.letterKinds.length === 0;
+    const kinds = [...(paid ? review.letterKinds : []), ...freeKinds(review)];
+    letter.hidden = kinds.length === 0;
     for (const el of letter.querySelectorAll<HTMLElement>('[data-letter-kind]'))
-      el.hidden = !review.letterKinds.some((k) => k === el.dataset['letterKind']);
+      el.hidden = !kinds.some((k) => k === el.dataset['letterKind']);
   }
 
   function render() {
@@ -251,12 +256,18 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       section.hidden = true;
       return;
     }
-    renderLetters(current);
     const stored = passes.pass();
     const held = heldPass() !== null;
     const paid = verified();
-    section.hidden = !held && !current.offer;
-    buy.hidden = held;
+    renderLetters(current, paid);
+    // With nothing to sell and no pass, only the free letters show, under their own title.
+    const freeOnly = !held && !current.offer;
+    section.hidden = freeOnly && freeKinds(current).length === 0;
+    for (const el of section.querySelectorAll<HTMLElement>('[data-pass-pitch]'))
+      el.hidden = freeOnly;
+    for (const el of section.querySelectorAll<HTMLElement>('[data-pass-free-only]'))
+      el.hidden = !freeOnly;
+    buy.hidden = held || !current.offer;
     downloads.hidden = !paid;
     if (paid && stored) {
       const until = new Date(stored.expiresAt * 1000).toLocaleDateString('es-ES', {
@@ -402,10 +413,16 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   const letterKindOf = (button: HTMLElement, review: PaidReview): LetterKind | undefined =>
     review.letterKinds.find((k) => k === button.dataset['letterKind']) ?? review.letterKinds[0];
 
+  // A free letter is built without asking about the pass.
+  const freeKindOf = (button: HTMLElement, review: PaidReview): LetterKind | undefined =>
+    freeKinds(review).find((k) => k === button.dataset['letterKind']);
+
   async function download(which: Download, button: HTMLElement) {
-    if (!current || !downloadsWith(current) || !(await verify())) return render();
+    if (!current || !downloadsWith(current)) return render();
+    const free = which === 'letter' ? freeKindOf(button, current) : undefined;
+    if (free === undefined && !(await verify())) return render();
     // A letter the review does not offer is never built.
-    const kind = which === 'letter' ? letterKindOf(button, current) : undefined;
+    const kind = which === 'letter' ? (free ?? letterKindOf(button, current)) : undefined;
     if (which === 'letter' && kind === undefined) return render();
     setError(null);
     status.textContent = tr('client.documents.pass.generating');

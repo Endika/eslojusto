@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { es } from '../../src/i18n/es';
-import { FORBIDDEN } from '../support/forbidden';
+import { EMPLOYMENT_FORBIDDEN, FORBIDDEN } from '../support/forbidden';
 
 const filesUnder = (dir: string, ext: string): string[] =>
   readdirSync(dir).flatMap((n) => {
@@ -44,16 +44,6 @@ describe('result copy', () => {
     check(file, readFileSync(file, 'utf8').toLowerCase());
   });
 });
-
-// The contract review never tells a person what they are, nor that an offer owes them anything:
-// the law is quoted as what it says (art. 15.4 ET), and only amounts below the minimum wage carry euros.
-const EMPLOYMENT_FORBIDDEN = [
-  /\beres fij[oa]\b/,
-  /\bte convierte en fij[oa]\b/,
-  /\bya eres\b/,
-  /\bpasas a ser\b/,
-  /\bte deben?\b/,
-];
 
 const employmentCopy: readonly (readonly [string, string])[] = [
   ...Object.entries(es)

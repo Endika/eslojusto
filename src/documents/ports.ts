@@ -163,6 +163,9 @@ export interface PaidReview extends OfferedReview {
   // The letters this review can download, maybe none; the first is the one a plain letter button
   // gives.
   readonly letterKinds: readonly LetterKind[];
+  // Letters that only ask for information: offered whether or not there is a pass, and whether or
+  // not the pass is offered.
+  readonly freeLetterKinds?: readonly LetterKind[];
   report(tr: Translate, today: CivilDate): DocumentModel;
   letter(kind: LetterKind, details: LetterDetails, tr: Translate): DocumentModel;
   // The file's name, when the section names its downloads its own way.

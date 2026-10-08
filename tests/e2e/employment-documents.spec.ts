@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import { syntheticPhoto } from '../support/synthetic-photo';
 
 // Runs only against a TEST_DOCUMENTS=1 build, which has /contrato/ too: every request to the fake
@@ -449,13 +450,13 @@ test('a whole pack fills every sheet; the detail waits for the pass, which unloc
   await expectNoDetail(result);
 
   // The same pass as the other reviews', returning to this page.
-  const offer = page.getByRole('region', { name: 'El detalle de cada punto' });
+  const offer = page.getByRole('region', { name: 'El detalle, el informe y la carta' });
   await expect(offer).toContainText('4,99 € con IVA incluido');
   await expect(offer.getByRole('button', { name: /Descargar/ })).toHaveCount(0);
   await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
   await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
   await expect(
-    page.getByText('Pago recibido. Ya puedes ver el detalle de cada punto.'),
+    page.getByText('Pago recibido. Ya puedes ver el detalle de cada punto y descargar el informe.'),
   ).toBeVisible();
   expect(fake.checkout[0]?.postDataJSON()).toMatchObject({ returnTo: 'employment' });
   expect(fake.pass[0]?.postDataJSON()).toMatchObject({ sessionId: 'cs_test_e2e' });
@@ -561,4 +562,206 @@ test('a read that finds nothing says why for each file and spends no read', asyn
   await expect(page.getByText('factura-luz.png: no parece un documento laboral.')).toBeVisible();
   expect(fake.extract).toHaveLength(1);
   expect(await page.evaluate(() => localStorage.getItem('eslojusto-lecturas'))).toBeNull();
+});
+
+interface ByHand {
+  readonly start: string;
+  readonly salary?: string;
+  readonly modality?: string;
+  // The elements of the information the contract lacks, by their names on the sheet.
+  readonly missing?: readonly string[];
+}
+
+// Typed by hand: a full-time contract with 2 extra payments, a 2-month trial and 30 days of
+// holidays; the rest as each case says.
+async function fillByHand(page: Page, c: ByHand) {
+  await page.goto('contrato/');
+  await page.getByRole('button', { name: /Rellenar a mano/ }).click();
+  const relation = sheet(page, 'Tu relación laboral');
+  await relation.getByLabel('Trabajo por cuenta ajena', { exact: true }).check();
+  await choose(
+    relation,
+    '¿Te contrató una empresa de trabajo temporal para trabajar en otra?',
+    'No',
+  );
+  await choose(relation, '¿Es un contrato de relevo?', 'No');
+  await choose(relation, '¿Tienes menos de 18 años?', 'No');
+  await choose(relation, '¿Tienes el contrato por escrito?', 'Sí');
+  await relation.getByLabel('Fecha de inicio', { exact: true }).fill(c.start);
+  await next(page);
+  await sheet(page, 'Tu tipo de contrato')
+    .getByLabel(c.modality ?? 'Indefinido', { exact: true })
+    .check();
+  await next(page);
+  if (c.modality !== undefined) {
+    await expect(sheet(page, 'Tus contratos anteriores')).toBeVisible();
+    await next(page);
+  }
+  const salary = sheet(page, 'Tu salario');
+  await salary.getByLabel('Salario bruto', { exact: true }).fill(c.salary ?? '1.500,00');
+  await choose(salary, '¿Por qué periodo es esa cifra?', 'Al mes');
+  await salary.getByLabel('Pagas extra al año', { exact: true }).fill('2');
+  await choose(salary, '¿Las pagas extra van prorrateadas en cada nómina?', 'No');
+  await salary.getByLabel('Horas a la semana', { exact: true }).fill('40');
+  await choose(salary, '¿El contrato nombra tu convenio colectivo?', 'Sí');
+  await next(page);
+  await expect(sheet(page, 'Tus nóminas')).toBeVisible();
+  await next(page);
+  const time = sheet(page, 'Tu jornada');
+  await choose(time, '¿Trabajas a turnos?', 'No');
+  await choose(time, '¿Trabajas de noche?', 'No');
+  await choose(time, '¿El contrato reparte la jornada de forma irregular en el año?', 'No');
+  await choose(time, '¿Es un contrato a tiempo parcial?', 'No');
+  await next(page);
+  const trial = sheet(page, 'Tu periodo de prueba');
+  await choose(trial, '¿El contrato tiene periodo de prueba?', 'Sí');
+  await trial.getByLabel('Duración', { exact: true }).fill('2');
+  await choose(trial, 'En', 'Meses');
+  await choose(trial, '¿Eres técnico titulado?', 'No');
+  await choose(trial, '¿Tu empresa tiene menos de 25 personas en plantilla?', 'No');
+  await choose(trial, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
+  await choose(trial, '¿Vienes de un contrato formativo en esta empresa?', 'No');
+  await next(page);
+  const holidays = sheet(page, 'Tus vacaciones');
+  await choose(holidays, '¿El contrato dice cuántos días de vacaciones tienes?', 'Sí');
+  await holidays.getByLabel('Días de vacaciones al año', { exact: true }).fill('30');
+  await choose(holidays, '¿Qué días son?', 'Naturales');
+  await choose(holidays, '¿Dice que las vacaciones van incluidas en el salario?', 'No');
+  await next(page);
+  await expect(sheet(page, 'Cláusulas')).toBeVisible();
+  await next(page);
+  const info = sheet(page, 'Lo que el contrato tiene que decir');
+  for (const element of c.missing ?? []) await choose(info, element, 'No está');
+  await next(page);
+  await expect(sheet(page, 'La oferta de empleo')).toBeVisible();
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
+}
+
+const AGREEMENT = 'Convenio colectivo, con su código y su fecha de publicación';
+const CATEGORY = 'Categoría o grupo profesional y descripción del puesto';
+
+async function downloadOf(page: Page, button: Locator): Promise<string> {
+  const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
+  const path = await download.path();
+  expect(readFileSync(path).subarray(0, 5).toString()).toBe('%PDF-');
+  return download.suggestedFilename();
+}
+
+// No sheet is ever wider than the screen.
+async function fits(page: Page) {
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+}
+
+test('the pass unlocks the report and the letter to the company, filled in and downloaded', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page);
+  const sent: string[] = [];
+  page.on('request', (r) => sent.push(`${r.url()} ${r.postData() ?? ''}`));
+  // 1.150 € in 14 payments is 16.100 € a year, under the 2026 minimum; the agreement and the
+  // category are not in the contract.
+  await fillByHand(page, {
+    start: '2026-01-01',
+    salary: '1.150,00',
+    missing: [AGREEMENT, CATEGORY],
+  });
+
+  const offer = page.getByRole('region', { name: 'El detalle, el informe y la carta' });
+  const letter = offer.getByRole('group', { name: 'Tus datos para las cartas (opcional)' });
+  // Before paying, only the letter that asks for the information.
+  await expect(
+    letter.getByRole('button', {
+      name: 'Descargar la carta que pide la información por escrito (PDF, gratis)',
+    }),
+  ).toBeVisible();
+  await expect(
+    letter.getByRole('button', { name: 'Descargar la carta a la empresa (PDF)' }),
+  ).toBeHidden();
+  await expect(offer.getByRole('button', { name: 'Descargar el informe (PDF)' })).toBeHidden();
+  await expect(letter.getByRole('button', { name: /petición del certificado/ })).toBeHidden();
+
+  await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
+  await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
+  await expect(offer).toContainText(/Tu pase vale hasta el/);
+  expect(fake.pass).toHaveLength(1);
+
+  expect(
+    await downloadOf(page, offer.getByRole('button', { name: 'Descargar el informe (PDF)' })),
+  ).toBe('eslojusto-informe-contrato.pdf');
+  await letter.getByLabel('Tu nombre y apellidos').fill('Alex Ejemplo');
+  await letter.getByLabel('DNI o NIE (opcional)').fill('00000000A');
+  await letter.getByLabel('Empresa').fill('Talleres Ficticios SL');
+  await letter.getByLabel('Centro de trabajo').fill('Calle Inventada 0, Villaficticia');
+  await letter.getByLabel('Localidad').fill('Villaficticia');
+  await expect(letter.getByLabel('Fecha')).toHaveValue('2026-10-08');
+  expect(
+    await downloadOf(
+      page,
+      letter.getByRole('button', { name: 'Descargar la carta a la empresa (PDF)' }),
+    ),
+  ).toBe('eslojusto-carta-empresa.pdf');
+  expect(
+    await downloadOf(
+      page,
+      letter.getByRole('button', {
+        name: 'Descargar la carta que pide la información por escrito (PDF, gratis)',
+      }),
+    ),
+  ).toBe('eslojusto-carta-informacion.pdf');
+  // Downloaded, never sent: nothing typed for the letters left the page.
+  await expect(letter.getByText(/^Las cartas son plantillas\./)).toBeVisible();
+  for (const typed of ['Alex Ejemplo', '00000000A', 'Talleres Ficticios', 'Calle Inventada'])
+    expect(sent.filter((r) => r.includes(typed) || r.includes(encodeURIComponent(typed)))).toEqual(
+      [],
+    );
+});
+
+test('with nothing to sell, the letter asking for the information is free', async ({ page }) => {
+  const fake = await fakeServices(page);
+  await page.setViewportSize({ width: 360, height: 640 });
+  await fillByHand(page, { start: '2024-03-01', missing: [AGREEMENT] });
+
+  const letters = page.getByRole('region', { name: 'Cartas que puedes descargar gratis' });
+  await expect(letters).toContainText('Estas cartas solo piden información');
+  await expect(letters.getByRole('button', { name: 'Pagar 4,99 €' })).toBeHidden();
+  await expect(letters.getByRole('button', { name: /petición del certificado/ })).toBeHidden();
+  await letters.getByLabel('Tu nombre y apellidos').fill('Alex Ejemplo');
+  expect(
+    await downloadOf(
+      page,
+      letters.getByRole('button', {
+        name: 'Descargar la carta que pide la información por escrito (PDF, gratis)',
+      }),
+    ),
+  ).toBe('eslojusto-carta-informacion.pdf');
+  // Nothing was bought nor any pass fetched.
+  expect(fake.checkout).toHaveLength(0);
+  expect(fake.pass).toHaveLength(0);
+  await fits(page);
+});
+
+test('a fixed-term finding gives the certificate request free, beside the pass', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page);
+  await page.setViewportSize({ width: 360, height: 640 });
+  await fillByHand(page, { start: '2023-05-02', modality: 'De obra o servicio' });
+
+  const offer = page.getByRole('region', { name: 'El detalle, el informe y la carta' });
+  await expect(offer.getByRole('button', { name: 'Pagar 4,99 €' })).toBeVisible();
+  await expect(offer.getByRole('button', { name: /carta que pide la información/ })).toBeHidden();
+  expect(
+    await downloadOf(
+      page,
+      offer.getByRole('button', {
+        name: 'Descargar la petición del certificado de contratos temporales (PDF, gratis)',
+      }),
+    ),
+  ).toBe('eslojusto-certificado-contratos-temporales.pdf');
+  expect(fake.pass).toHaveLength(0);
+  await fits(page);
 });

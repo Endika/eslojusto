@@ -37,7 +37,7 @@ import { figureOf, headline, shownOne, shownPair, sinceOf, stateOf, type Euros }
 // «2025-03-14» → «14-03-2025».
 export const dayText = (iso: string): string => iso.split('-').reverse().join('-');
 
-const civilText = ({ y, m, d }: { y: number; m: number; d: number }): string =>
+export const civilText = ({ y, m, d }: { y: number; m: number; d: number }): string =>
   `${String(d).padStart(2, '0')}-${String(m).padStart(2, '0')}-${y}`;
 
 const MONTH_NAME = new Intl.DateTimeFormat('es-ES', { month: 'long', timeZone: 'UTC' });
@@ -46,7 +46,7 @@ const monthName = (m: number): string =>
 
 // Hours, percentages and coefficients: Spanish decimals, up to four of them.
 const NUMBER = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 4 });
-const numberText = (n: number): string => NUMBER.format(n);
+export const numberText = (n: number): string => NUMBER.format(n);
 
 // ---------- Phrases ----------
 
@@ -242,10 +242,10 @@ function readingAmounts(readings: readonly Reading[]): (Shown | null)[] {
   return figures.map((f) => (f === null ? null : shownFigure(f)));
 }
 
-const uniqueSources = (sources: readonly NormSource[]): NormSource[] =>
+export const uniqueSources = (sources: readonly NormSource[]): NormSource[] =>
   sources.filter((s, i) => sources.findIndex((o) => o.citation === s.citation) === i);
 
-const findingsOf = (a: Assessed): readonly Finding[] =>
+export const findingsOf = (a: Assessed): readonly Finding[] =>
   a.kind === 'single' ? [a.finding] : a.readings.map((r) => r.finding);
 
 const NORM_STATUS: Record<NormSource['status'], ClientKey> = {
@@ -254,7 +254,7 @@ const NORM_STATUS: Record<NormSource['status'], ClientKey> = {
   repealed: 'client.employment.norm.repealed',
 };
 
-const normStatusText = (s: NormSource, tr: Translate): string =>
+export const normStatusText = (s: NormSource, tr: Translate): string =>
   tr(NORM_STATUS[s.status], { fecha: s.statusSince ? dayText(s.statusSince) : '' });
 
 // Each rule a point rests on: the norm and article, a link to it and how it stands today.
@@ -278,6 +278,16 @@ function renderRules(
   );
 }
 
+// When a source took effect, until when, and how it stands today.
+export function inForceText(s: NormSource, tr: Translate): string {
+  const since = dayText(s.inForceSince);
+  const period =
+    s.inForceUntil === null
+      ? tr('client.employment.source.since', { desde: since })
+      : tr('client.employment.source.between', { desde: since, hasta: dayText(s.inForceUntil) });
+  return `${period} · ${normStatusText(s, tr)}`;
+}
+
 function renderSources(
   container: ParentNode,
   list: HTMLElement,
@@ -290,15 +300,7 @@ function renderSources(
       const a = find<HTMLAnchorElement>(li, 'a');
       a.href = s.url;
       a.textContent = s.citation;
-      const since = dayText(s.inForceSince);
-      const period =
-        s.inForceUntil === null
-          ? tr('client.employment.source.since', { desde: since })
-          : tr('client.employment.source.between', {
-              desde: since,
-              hasta: dayText(s.inForceUntil),
-            });
-      find(li, '[data-in-force]').textContent = `${period} · ${normStatusText(s, tr)}`;
+      find(li, '[data-in-force]').textContent = inForceText(s, tr);
       return li;
     }),
   );
@@ -327,20 +329,31 @@ const markId = (state: string): string => `#employment-mark-${state.replace(/_/g
 
 // The words of the law a finding quotes. Arts. 15.4 and 15.5 ET are introduced as what the law
 // says, never as what the person is.
-function renderLiteral(box: HTMLElement, findings: readonly Finding[], tr: Translate) {
+export function literalOf(
+  findings: readonly Finding[],
+  tr: Translate,
+): { readonly intro: string; readonly text: string; readonly source?: NormSource } | null {
   const f = findings.find((x) => x.literal !== null && x.literal.text !== '');
-  box.hidden = f === undefined;
-  if (f === undefined || f.literal === null) return;
+  if (f === undefined || f.literal === null) return null;
   const breach = f.sources.find((s) => s.id === 'permanent_on_breach');
   const chaining = f.id === 'chaining_18_in_24' ? f.sources[0] : undefined;
   const source = breach ?? chaining ?? f.sources[0];
-  find(box, '[data-literal-intro]').textContent = breach
+  const intro = breach
     ? tr('client.employment.permanent.15_4')
     : chaining
       ? tr('client.employment.permanent.15_5')
       : tr('client.employment.literal.intro', { cita: source?.citation ?? '' });
-  find(box, '[data-literal-text]').textContent = `«${f.literal.text}»`;
+  return { intro, text: `«${f.literal.text}»`, ...(source && { source }) };
+}
+
+function renderLiteral(box: HTMLElement, findings: readonly Finding[], tr: Translate) {
+  const literal = literalOf(findings, tr);
+  box.hidden = literal === null;
+  if (literal === null) return;
+  find(box, '[data-literal-intro]').textContent = literal.intro;
+  find(box, '[data-literal-text]').textContent = literal.text;
   const a = find<HTMLAnchorElement>(box, '[data-literal-link]');
+  const { source } = literal;
   a.hidden = source === undefined;
   if (source) {
     a.href = source.url;
@@ -378,12 +391,12 @@ function note(el: HTMLElement, text: string | null) {
 }
 
 // How a doubt and its readings are named on a card.
-interface Labels {
+export interface Labels {
   question(q: DoubtQuestion, tr: Translate): string;
   reading(code: ReadingCode, tr: Translate): string;
 }
 
-const ITEM_LABELS: Labels = {
+export const ITEM_LABELS: Labels = {
   question: (q, tr) => tr(`client.employment.question.${q}`),
   reading: (code, tr) => tr(`client.employment.reading.${code}`),
 };
@@ -394,7 +407,7 @@ const POST_READINGS: Partial<Record<ReadingCode, ClientKey>> = {
   technical: 'client.employment.reading.technical_post',
   not_technical: 'client.employment.reading.not_technical_post',
 };
-const CLAUSE_LABELS: Labels = {
+export const CLAUSE_LABELS: Labels = {
   question: (q, tr) =>
     q === 'technical'
       ? tr('client.employment.question.technical_post')

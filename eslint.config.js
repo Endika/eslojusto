@@ -79,12 +79,12 @@ const noRental = {
 };
 // The employment contract review reaches the employment engine through its modules, never its
 // tables, which its composition root passes in; of the calculator, only what every section shares;
-// of reading documents, only the shared contract, ports and summary lines, never the final pay's
-// pieces.
+// of reading documents, only the shared contract, ports, letter details and summary lines, never
+// the final pay's pieces.
 const employmentReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|calculation|sources|law/sources|employment/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|dom|fill|flow|navigation|number)$|\\.\\./documents/(contract|ports|summary)$|\\.\\./i18n/client$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|calculation|sources|law/sources|employment/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|dom|fill|flow|navigation|number)$|\\.\\./documents/(contract|letter|ports|summary)$|\\.\\./i18n/client$)|${notCanonical}`,
   message:
-    'src/employment reaches the employment engine (its tables come from the composition root), the shared sheets, the documents contract and ports, and the translator type.',
+    'src/employment reaches the employment engine (its tables come from the composition root), the shared sheets, the documents contract, ports and letter details, and the translator type.',
 };
 const noEmployment = {
   regex: '(^|/)employment/',

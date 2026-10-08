@@ -1,0 +1,118 @@
+---
+import type { Key } from '../i18n';
+import { LETTER_MAX_LENGTH } from '../documents/letter';
+
+// The letter's optional details and a button for each letter the review can give, worded in its
+// section's own copy. On the final pay's and the rental pages it sits among the paid downloads; on
+// the contract review's, below them, because two of its letters are free.
+interface Props {
+  review: 'final_pay' | 'rental' | 'employment';
+  tx: (key: Key) => string;
+}
+const { review, tx } = Astro.props;
+const rental = review === 'rental';
+const employment = review === 'employment';
+type LetterField = readonly [
+  id: 'name' | 'id' | 'company' | 'workplace' | 'landlord' | 'address' | 'place' | 'iban' | 'date',
+  label: Key,
+  autocomplete: string,
+  type: 'text' | 'date',
+];
+const letterFields: readonly LetterField[] = rental
+  ? [
+      ['name', 'documents.letter.name', 'name', 'text'],
+      ['id', 'documents.letter.id', 'off', 'text'],
+      ['landlord', 'rental.letter.landlord', 'off', 'text'],
+      ['address', 'rental.letter.address', 'street-address', 'text'],
+      ['place', 'documents.letter.place', 'address-level2', 'text'],
+      ['date', 'documents.letter.date', 'off', 'date'],
+      ['iban', 'rental.letter.iban', 'off', 'text'],
+    ]
+  : employment
+    ? [
+        ['name', 'documents.letter.name', 'name', 'text'],
+        ['id', 'documents.letter.id', 'off', 'text'],
+        ['company', 'documents.letter.company', 'organization', 'text'],
+        ['workplace', 'employment.letter.workplace', 'off', 'text'],
+        ['place', 'documents.letter.place', 'address-level2', 'text'],
+        ['date', 'documents.letter.date', 'off', 'date'],
+      ]
+    : [
+        ['name', 'documents.letter.name', 'name', 'text'],
+        ['id', 'documents.letter.id', 'off', 'text'],
+        ['company', 'documents.letter.company', 'organization', 'text'],
+        ['place', 'documents.letter.place', 'address-level2', 'text'],
+        ['date', 'documents.letter.date', 'off', 'date'],
+      ];
+// The rental letters, each with its own button; the account goes only on the deposit's.
+const rentalLetters = [
+  ['deposit_return', 'rental.pass.download_deposit_letter'],
+  ['rent_review', 'rental.pass.download_rent_letter'],
+] as const;
+// The contract review's letters: the two free ones first, then the one the pass pays for.
+const employmentLetters = [
+  ['information_request', 'employment.pass.download_information_letter'],
+  ['temporary_contracts_certificate', 'employment.pass.download_certificate_request'],
+  ['employment', 'employment.pass.download_company_letter'],
+] as const;
+const letterButtons = rental ? rentalLetters : employment ? employmentLetters : null;
+const describedBy = (id: LetterField[0]) =>
+  id === 'id' ? 'error-letter-id' : id === 'iban' ? 'hint-letter-iban' : undefined;
+---
+
+<fieldset class="group pass__letter" data-letter aria-describedby="hint-letter">
+  <legend>{tx('documents.letter.legend')}</legend>
+  <p class="hint" id="hint-letter">
+    {tx('documents.letter.hint')}
+  </p>
+  {letterFields.map(([id, key, autocomplete, type]) => (
+    <div class="field" data-letter-kind={id === 'iban' ? 'deposit_return' : undefined}>
+      <label class="field__label" for={`letter-${id}`}>
+        {tx(key)}
+      </label>
+      {id === 'iban' && (
+        <p class="hint" id="hint-letter-iban">
+          {tx('rental.letter.iban_hint')}
+        </p>
+      )}
+      <input
+        class:list={['field__input', { 'field__input--figure': type === 'date' || id === 'iban' }]}
+        type={type}
+        id={`letter-${id}`}
+        name={`letter-${id}`}
+        autocomplete={autocomplete}
+        spellcheck="false"
+        dir={type === 'date' || id === 'iban' ? 'ltr' : undefined}
+        maxlength={
+          type === 'date' ? undefined : LETTER_MAX_LENGTH[id as Exclude<LetterField[0], 'date'>]
+        }
+        aria-describedby={describedBy(id)}
+        data-letter-field={id}
+      />
+      {id === 'id' && <p class="hint" id="error-letter-id" data-letter-id-warning hidden />}
+    </div>
+  ))}
+  <p class="hint" role="status" data-letter-glyph-warning hidden></p>
+  <p class="item__note">{tx('documents.letter.privacy')}</p>
+  <div class="pass__actions">
+    {letterButtons ? (
+      letterButtons.map(([kind, key]) => (
+        <button
+          class="button button--sheet"
+          type="button"
+          data-download="letter"
+          data-letter-kind={kind}
+        >
+          {tx(key)}
+        </button>
+      ))
+    ) : (
+      <button class="button button--sheet" type="button" data-download="letter">
+        {tx('documents.pass.download_letter')}
+      </button>
+    )}
+  </div>
+  <p class="item__note" data-letter-note>
+    {tx('documents.pass.letter_note')}
+  </p>
+</fieldset>

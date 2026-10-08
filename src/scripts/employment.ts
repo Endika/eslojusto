@@ -39,11 +39,12 @@ const events: EmploymentEvents = {
   },
 };
 
+const tables = { norms: EMPLOYMENT_NORMS, minimumWage: MINIMUM_WAGE };
 const employment = setUpEmployment(document.body, {
   events,
   today: localToday,
   tr: pageTranslator(),
-  tables: { norms: EMPLOYMENT_NORMS, minimumWage: MINIMUM_WAGE },
+  tables,
   detail: () => detail(),
 });
 
@@ -58,6 +59,7 @@ if (documentsBuild) {
           detail: (state) => (detail = state),
         },
         arrival,
+        tables,
       ),
     )
     // Without the document module the page is still the review.

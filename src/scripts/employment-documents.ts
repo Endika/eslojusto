@@ -1,11 +1,14 @@
 import { DOCUMENTS } from '../documents/config';
 import { EMPLOYMENT_EXTRACTION } from '../documents/contract';
 import type { DocumentEvents } from '../documents/ports';
+import { employmentCase } from '../employment/case';
 import type { EmploymentCalculator } from '../employment/main';
 import type { CompletedEmploymentReview } from '../employment/ports';
 import { employmentReading } from '../employment/reading';
 import { STEPS } from '../employment/steps';
 import { pageTranslator, type ClientKey, type Translate } from '../i18n/client';
+import type { EmploymentDeps } from '../engine/employment/review';
+import { localToday } from './clock';
 import { wireDocuments, type ReviewHooks } from './documents';
 
 // The shared messages the contract page words its own way: what a value worked out from the
@@ -40,11 +43,13 @@ const quiet: DocumentEvents = {
 };
 
 // Document reading and the pass on the contract review's page. The pass unlocks the detail of
-// each point; nothing else is paid for here yet.
+// each point, the report and the letter to the company; the letters that only ask for information
+// download without it. The tables are the ones the review read.
 export function wireEmploymentDocuments(
   employment: EmploymentCalculator,
   hooks: ReviewHooks<CompletedEmploymentReview>,
   arrival: { hash: string; search: string },
+  tables: EmploymentDeps,
 ): void {
   const tr = employmentCopy(pageTranslator());
   wireDocuments({
@@ -59,7 +64,8 @@ export function wireEmploymentDocuments(
       reading: employmentReading(employment.form, tr),
       steps: STEPS,
       keptReviewKey: 'eslojusto-revision-contrato-en-pago',
-      paidReview: (r) => ({ offer: r.review.offerPass }),
+      // The review was just worked out: its years run up to today.
+      paidReview: (r) => employmentCase(r, localToday(), tables),
       decorateResult: () => {},
       restore: (saved) => saved,
     },
