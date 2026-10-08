@@ -1,6 +1,7 @@
+import { documentsAnalytics } from '../analytics/documents';
+import { track } from '../analytics/posthog';
 import { DOCUMENTS } from '../documents/config';
 import { EMPLOYMENT_EXTRACTION } from '../documents/contract';
-import type { DocumentEvents } from '../documents/ports';
 import { employmentCase } from '../employment/case';
 import type { EmploymentCalculator } from '../employment/main';
 import type { CompletedEmploymentReview } from '../employment/ports';
@@ -26,22 +27,6 @@ const employmentCopy =
   (key, vars) =>
     tr(EMPLOYMENT_COPY[key] ?? key, vars);
 
-// Reading documents and the pass are measured only on the final pay's page for now.
-const quiet: DocumentEvents = {
-  startChosen() {},
-  uploadStarted() {},
-  extractionCompleted() {},
-  extractionFailed() {},
-  nothingRead() {},
-  qualityWarned() {},
-  qualityOverridden() {},
-  checkoutStarted() {},
-  passIssued() {},
-  passFailed() {},
-  passVerified() {},
-  downloaded() {},
-};
-
 // Document reading and the pass on the contract review's page. The pass unlocks the detail of
 // each point, the report and the letter to the company; the letters that only ask for information
 // download without it. The tables are the ones the review read.
@@ -58,7 +43,7 @@ export function wireEmploymentDocuments(
     arrival,
     config: DOCUMENTS,
     tr,
-    events: quiet,
+    events: documentsAnalytics(track),
     section: {
       extraction: EMPLOYMENT_EXTRACTION,
       reading: employmentReading(employment.form, tr),

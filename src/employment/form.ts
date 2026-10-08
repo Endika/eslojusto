@@ -27,6 +27,7 @@ import {
   type ValidationError,
 } from '../engine/employment/validate';
 import { parseAmount } from '../calculator/number';
+import type { EmploymentFormField } from './ports';
 import { ROW_LISTS, parseRowField, rowField, type RowList } from './rows';
 
 // The sheets in order. The work history sits right after the modality: both are about how long
@@ -121,7 +122,7 @@ export const INFO_PRESENCES: readonly InfoPresence[] = [
 ];
 export const REMOTE_KINDS: readonly NonNullable<Offer['remote']>[] = ['none', 'hybrid', 'full'];
 
-export const infoField = (element: InfoElement): string => `info_${element}`;
+export const infoField = (element: InfoElement): `info_${InfoElement}` => `info_${element}`;
 
 export type FieldErrorCode =
   ValidationCode | 'missing_value' | 'missing_choice' | 'invalid_amount' | 'invalid_number';
@@ -133,7 +134,7 @@ export interface FieldError {
 }
 
 // The questions each sheet asks; a row list counts by its name.
-export const SHEET_FIELDS: Record<Sheet, readonly string[]> = {
+export const SHEET_FIELDS: Record<Sheet, readonly EmploymentFormField[]> = {
   relacion: [
     'relationship',
     'viaTempAgency',
@@ -224,7 +225,8 @@ export const SHEET_FIELDS: Record<Sheet, readonly string[]> = {
 export const baseField = (field: string): string => field.split('.')[0] ?? field;
 
 export const sheetOfField = (field: string): Sheet =>
-  SHEETS.find((s) => SHEET_FIELDS[s].includes(baseField(field))) ?? 'relacion';
+  SHEETS.find((s) => (SHEET_FIELDS[s] as readonly string[]).includes(baseField(field))) ??
+  'relacion';
 
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
@@ -880,7 +882,7 @@ function engineErrors(r: Reading, today: CivilDate): FieldError[] {
 
 export function sheetErrors(form: HTMLFormElement, sheet: Sheet, today: CivilDate): FieldError[] {
   const r = read(form);
-  const fields = SHEET_FIELDS[sheet];
+  const fields: readonly string[] = SHEET_FIELDS[sheet];
   const own = r.errors.filter((e) => fields.includes(baseField(e.field)));
   const withError = new Set(own.map((e) => e.field));
   const fromEngine = engineErrors(r, today).filter(

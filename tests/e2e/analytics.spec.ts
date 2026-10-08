@@ -590,3 +590,194 @@ test('the rental review sends sheets, field names and its outcome in codes, neve
   expect(spy.external).toEqual([]);
   expect(await context.cookies()).toEqual([]);
 });
+
+test('the contract review sends sheets, field names and its outcome in codes, never a figure, a date or a name', async ({
+  page,
+  context,
+}) => {
+  const spy = await spyOn(page);
+  await page.clock.setFixedTime(new Date('2026-10-08T12:00:00'));
+  await page.goto('contrato/');
+  const next = async () => {
+    await page.getByRole('button', { name: 'Siguiente' }).click();
+    // The page turn moves in steps, so a click during it can land beside its target.
+    await page.waitForFunction(() =>
+      document.getAnimations().every((a) => a.playState !== 'running'),
+    );
+  };
+  const sheet = (name: string) => page.getByRole('group', { name, exact: true });
+  const choose = (scope: ReturnType<typeof sheet>, name: string, value: string) =>
+    scope.getByRole('group', { name, exact: true }).getByLabel(value, { exact: true }).check();
+
+  await next(); // nothing answered: validation errors, by field name
+  const relation = sheet('Tu relación laboral');
+  await relation.getByLabel('Trabajo por cuenta ajena', { exact: true }).check();
+  await choose(
+    relation,
+    '¿Te contrató una empresa de trabajo temporal para trabajar en otra?',
+    'No',
+  );
+  await choose(relation, '¿Es un contrato de relevo?', 'No');
+  await choose(relation, '¿Tienes menos de 18 años?', 'No');
+  await choose(relation, '¿Tienes el contrato por escrito?', 'Sí');
+  await relation.getByLabel('Fecha de inicio', { exact: true }).fill('2026-01-01');
+  await next();
+  await sheet('Tu tipo de contrato').getByLabel('Indefinido', { exact: true }).check();
+  await next();
+  const salary = sheet('Tu salario');
+  await salary.getByLabel('Salario bruto', { exact: true }).fill('1.150,00');
+  await choose(salary, '¿Por qué periodo es esa cifra?', 'Al mes');
+  await salary.getByLabel('Pagas extra al año', { exact: true }).fill('2');
+  await choose(salary, '¿Las pagas extra van prorrateadas en cada nómina?', 'No');
+  await salary.getByLabel('Horas a la semana', { exact: true }).fill('40');
+  await choose(salary, '¿El contrato nombra tu convenio colectivo?', 'Sí');
+  await next();
+  await next();
+  const time = sheet('Tu jornada');
+  await choose(time, '¿Trabajas a turnos?', 'No');
+  await choose(time, '¿Trabajas de noche?', 'No');
+  await choose(time, '¿El contrato reparte la jornada de forma irregular en el año?', 'No');
+  await choose(time, '¿Es un contrato a tiempo parcial?', 'No');
+  await next();
+  const trial = sheet('Tu periodo de prueba');
+  await choose(trial, '¿El contrato tiene periodo de prueba?', 'Sí');
+  await trial.getByLabel('Duración', { exact: true }).fill('2');
+  await choose(trial, 'En', 'Meses');
+  await choose(trial, '¿Eres técnico titulado?', 'No');
+  await choose(trial, '¿Tu empresa tiene menos de 25 personas en plantilla?', 'No lo sé');
+  await choose(trial, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
+  await choose(trial, '¿Vienes de un contrato formativo en esta empresa?', 'No');
+  await next();
+  const holidays = sheet('Tus vacaciones');
+  await choose(holidays, '¿El contrato dice cuántos días de vacaciones tienes?', 'Sí');
+  await holidays.getByLabel('Días de vacaciones al año', { exact: true }).fill('30');
+  await choose(holidays, '¿Qué días son?', 'Naturales');
+  await choose(holidays, '¿Dice que las vacaciones van incluidas en el salario?', 'No');
+  await next();
+  await next();
+  await next();
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
+  await page
+    .getByRole('region', { name: 'Salario frente al SMI', exact: true })
+    .getByText('Cómo se calcula')
+    .click();
+  await page.getByText('¿Cuánto puede durar el periodo de prueba?').click();
+
+  await expect.poll(() => spy.named('help_opened').length, { timeout: 15_000 }).toBe(1);
+  await expect
+    .poll(() => spy.named('employment_review_completed').length, { timeout: 15_000 })
+    .toBe(1);
+
+  // A gate: household employment stops at the first sheet.
+  await page.getByRole('button', { name: 'Empezar de nuevo' }).click();
+  await sheet('Tu relación laboral').getByLabel('Empleo del hogar', { exact: true }).check();
+  await sheet('Tu relación laboral')
+    .getByLabel('Fecha de inicio', { exact: true })
+    .fill('2025-03-01');
+  await next();
+  await expect.poll(() => spy.named('employment_out_of_scope').length, { timeout: 15_000 }).toBe(1);
+
+  expect(spy.named('validation_error').every((e) => e.properties['section'] === 'relacion')).toBe(
+    true,
+  );
+  expect(spy.named('validation_error').map((e) => e.properties['field'])).toContain('relationship');
+  expect(spy.named('section_viewed').map((e) => e.properties['section'])).toEqual([
+    'relacion',
+    'modalidad',
+    'salario',
+    'nominas',
+    'jornada',
+    'prueba',
+    'vacaciones',
+    'clausulas',
+    'informacion',
+    'oferta',
+    'resultado',
+    'relacion',
+    'resultado',
+  ]);
+  expect(spy.named('detail_opened').map((e) => e.properties['item'])).toEqual(['minimum_wage']);
+  expect(spy.named('help_opened').map((e) => e.properties['topic'])).toEqual([
+    'faq-contrato-prueba',
+  ]);
+  expect(spy.named('started_over')).toHaveLength(1);
+
+  const completed = spy.named('employment_review_completed')[0];
+  expect(completed?.properties).toMatchObject({
+    start_period: '2026+',
+    modality: 'permanent',
+    part_time: false,
+    written: 'yes',
+    technical: 'no',
+    small_company: 'unknown',
+    smi: 'below_minimum',
+    smi_years_below: '1',
+    smi_not_published: false,
+    payslips: '0',
+    history: false,
+    offer: false,
+    agreement_named: true,
+    difference: '500-2000',
+    offered: true,
+    detail: 'unlocked',
+    attempt: '1',
+  });
+  expect(ownKeys(completed)).toEqual(
+    [
+      'start_period',
+      'modality',
+      'part_time',
+      'written',
+      'technical',
+      'small_company',
+      'smi',
+      'modality_check',
+      'chaining',
+      'trial',
+      'working_time',
+      'part_time_check',
+      'holidays',
+      'extra_pays',
+      'clauses',
+      'information',
+      'smi_years_below',
+      'smi_not_published',
+      'payslips',
+      'history',
+      'offer',
+      'agreement_named',
+      'difference',
+      'offered',
+      'detail',
+      'attempt',
+      'seconds',
+    ].toSorted(),
+  );
+  const outOfScope = spy.named('employment_out_of_scope')[0];
+  expect(outOfScope?.properties['reason']).toBe('special_relationship');
+  expect(ownKeys(outOfScope)).toEqual(['reason']);
+
+  for (const e of spy.events()) {
+    const text = withoutRandom(e);
+    for (const forbidden of [
+      '1150',
+      '1.150',
+      '16100',
+      '16.100',
+      '17094',
+      '17.094',
+      '2026-01-01',
+      '01-01-2026',
+      '2025-03-01',
+      'household',
+    ])
+      expect(text, `${e.event}: ${forbidden}`).not.toContain(forbidden);
+  }
+  for (const e of spy.events())
+    expect(String(e.properties['$current_url'])).toMatch(
+      new RegExp(`^${ORIGIN}/contrato/(#[a-z]+)?$`),
+    );
+  expect(spy.external).toEqual([]);
+  expect(await context.cookies()).toEqual([]);
+});
