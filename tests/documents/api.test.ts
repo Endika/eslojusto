@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { EXTRACT_TIMEOUT_SECONDS } from '../../api/src/config';
 import { LIMITS as API_LIMITS, PAGE_KINDS as API_PAGE_KINDS } from '../../api/src/domain/documents';
 import { READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
+import { EMPLOYMENT_SECTIONS } from '../../api/src/domain/employment-schema';
 import { RENTAL_SECTIONS } from '../../api/src/domain/rental-schema';
 import { API_TIMEOUT_MS, createApi, parseExtraction, type Fetch } from '../../src/documents/api';
 import {
+  EMPLOYMENT_EXTRACTION,
+  EMPLOYMENT_LIST_MAXIMA,
   FINAL_PAY_EXTRACTION,
   LIMITS,
   PAGE_KINDS,
@@ -146,6 +149,22 @@ describe('extract', () => {
       [...new Set(sections.flatMap((section) => Object.keys(section[key])))].sort();
     expect([...RENTAL_EXTRACTION.fields].sort()).toEqual(names('fields'));
     expect([...RENTAL_EXTRACTION.lists].sort()).toEqual(names('lists'));
+  });
+  it('reads the employment fields the API merges and the lists of every section, as long', () => {
+    // The contract's fields, and the offer's prefixed, as api/src/domain/employment-merge.ts names them.
+    const offer = Object.keys(EMPLOYMENT_SECTIONS.job_offer.fields).map(
+      (name) => `offer${name.charAt(0).toUpperCase()}${name.slice(1)}`,
+    );
+    expect([...EMPLOYMENT_EXTRACTION.fields].sort()).toEqual(
+      [...Object.keys(EMPLOYMENT_SECTIONS.employment_contract.fields), ...offer].sort(),
+    );
+    const lists = Object.fromEntries(
+      Object.values(EMPLOYMENT_SECTIONS).flatMap((section) =>
+        Object.entries(section.lists).map(([name, list]) => [name, list.maxItems]),
+      ),
+    );
+    expect(EMPLOYMENT_LIST_MAXIMA).toEqual(lists);
+    expect([...EMPLOYMENT_EXTRACTION.lists].sort()).toEqual(Object.keys(lists).sort());
   });
   it('takes as many images and as large a request as the API', () => {
     expect(LIMITS.maxImages).toBe(API_LIMITS.maxImages);
@@ -328,6 +347,47 @@ describe('the review a page reads for', () => {
       { values: { month: '2025-01' }, confidence: 'high', source: 'rent_receipt' },
       { values: { month: '2025-02' }, confidence: 'high' },
     ]);
+  });
+});
+
+describe('an employment read', () => {
+  it('names its review, keeps its checks and says when a list was cut', async () => {
+    const fetch = fakeFetch(200, {
+      code: 'ok',
+      extraction: {
+        ...sent,
+        lists: {
+          contracts: [
+            { values: { startDate: '2024-01-01' }, confidence: 'high', source: 'work_history' },
+          ],
+        },
+        truncated: true,
+      },
+      failedChecks: ['end_before_start', 'payslip_lines_do_not_sum', 'invoice_total_mismatch'],
+      allowance: 'q',
+    });
+    const api = createApi(ENDPOINTS, fetch, EMPLOYMENT_EXTRACTION);
+    const result = await api.extract(request);
+    await api.checkout('n'.repeat(32), 'turnstile');
+    expect(fetch.calls[0]?.body).toMatchObject({ review: 'employment' });
+    expect(fetch.calls[1]?.body).toMatchObject({ returnTo: 'employment' });
+    expect(result.ok && result.extraction.truncated).toBe(true);
+    expect(result.ok && result.extraction.contracts).toHaveLength(1);
+    expect(result.ok && result.failedChecks).toEqual([
+      'end_before_start',
+      'payslip_lines_do_not_sum',
+      'invoice_total_mismatch',
+    ]);
+  });
+  it('reads a list as whole unless the API says it was cut', async () => {
+    const fetch = fakeFetch(200, {
+      code: 'ok',
+      extraction: { ...sent, truncated: 'yes' },
+      failedChecks: [],
+      allowance: 'q',
+    });
+    const result = await createApi(ENDPOINTS, fetch, EMPLOYMENT_EXTRACTION).extract(request);
+    expect(result.ok && 'truncated' in result.extraction).toBe(false);
   });
 });
 

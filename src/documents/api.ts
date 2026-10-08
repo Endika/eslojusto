@@ -1,6 +1,7 @@
 import {
   API_ERROR_CODES,
   COHERENCE_CHECKS,
+  EMPLOYMENT_CHECKS,
   RENTAL_CHECKS,
   CONFIDENCES,
   LIMITS,
@@ -21,7 +22,11 @@ import {
 } from './contract';
 import type { Operation } from './config';
 
-const CHECKS_SET: ReadonlySet<unknown> = new Set([...COHERENCE_CHECKS, ...RENTAL_CHECKS]);
+const CHECKS_SET: ReadonlySet<unknown> = new Set([
+  ...COHERENCE_CHECKS,
+  ...RENTAL_CHECKS,
+  ...EMPLOYMENT_CHECKS,
+]);
 
 export type Fetch = (url: string, init: RequestInit) => Promise<Response>;
 
@@ -124,6 +129,7 @@ export function parseExtraction<F extends string, L extends string>(
     conflicts: list(v['conflicts'])
       .map((c) => parseConflict(c, isFieldName))
       .filter(present),
+    ...(v['truncated'] === true && { truncated: true as const }),
   };
 }
 

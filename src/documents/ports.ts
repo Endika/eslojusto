@@ -212,6 +212,9 @@ export interface DocumentReading<F extends string, L extends string> {
     answers: Readonly<Record<string, string>>,
     checks: readonly FailedCheck[],
   ): ReadPrefill;
+  // A reading that words every check, even one named like the final pay's, which the upload
+  // otherwise words.
+  readonly wordsEveryCheck?: true;
 }
 
 export interface Browser {

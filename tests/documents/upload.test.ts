@@ -295,6 +295,50 @@ describe('the start sheet', () => {
     ]);
   });
 
+  it('leaves every check to a reading that words them all, even one named as the final pay’s', async () => {
+    const reading: DocumentReading<ExtractedFieldName, 'contracts'> = {
+      prefill: (_extraction, _answers, checks) => ({
+        entries: [],
+        marks: [],
+        count: 0,
+        lowConfidence: false,
+        notes: checks.map((c) => `Own words for ${c}`),
+      }),
+      wordsEveryCheck: true,
+    };
+    setUp({ ...settlement, failedChecks: ['end_before_start'] }, { reading });
+    choose([photo]);
+    await submit();
+    const notes = [...document.querySelectorAll('[data-done-notes] li')].map(
+      (li) => li.textContent,
+    );
+    expect(notes).toEqual(['Own words for end_before_start']);
+  });
+
+  it('a mark beside a text box goes away once the text changes', async () => {
+    const reading: DocumentReading<ExtractedFieldName, 'contracts'> = {
+      prefill: () => ({
+        entries: [],
+        marks: [{ id: 'clause', container: '[data-field="clause"]', confidence: 'high' }],
+        count: 1,
+        lowConfidence: false,
+        notes: [],
+      }),
+    };
+    const { form } = setUp(settlement, { reading });
+    form.insertAdjacentHTML(
+      'beforeend',
+      '<div class="field" data-field="clause"><textarea name="clause"></textarea></div>',
+    );
+    choose([photo]);
+    await submit();
+    const text = form.querySelector('textarea') as HTMLTextAreaElement;
+    expect(text.getAttribute('aria-describedby')).toContain('read-clause');
+    text.value = 'Otra cosa';
+    text.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(form.querySelectorAll('[data-read-mark]')).toHaveLength(0);
+  });
+
   it('nothing is reviewed: «Revisar los datos» only opens the first sheet', async () => {
     const { opened, form } = setUp(settlement);
     choose([photo]);
