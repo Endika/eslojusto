@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { t, type Key } from '../../i18n';
 import { DOCUMENTS } from '../../documents/config';
 import { PASS_DAYS, PASS_READS } from '../../documents/contract';
+import { RENTAL_BUILD } from '../../content/sections';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
 const tx = (key: Key, vars?: Record<string, string>) => t('es', key, vars);
@@ -16,6 +17,8 @@ const owner = {
 };
 // The pass and its conditions exist only in a build with the documents API.
 const documents = DOCUMENTS !== null;
+// The rental review and its paragraphs exist only in a PUBLIC_RENTAL=1 build.
+const rental = RENTAL_BUILD;
 ---
 
 <Base
@@ -103,6 +106,20 @@ const documents = DOCUMENTS !== null;
         </p>
       </section>
 
+      {rental && (
+        <section class="sheet sheet--text">
+          <h2 id="al-alquiler">
+            {tx('legal_notice.rental')} <span class="beta">{tx('rental.beta')}</span>
+          </h2>
+          <p>{tx('legal_notice.rental.does')}</p>
+          <p>{tx('legal_notice.rental.pending')}</p>
+          <p>{tx('legal_notice.rental.does_not')}</p>
+          <p>
+            {tx('legal_notice.rental.beta')} <a href={`mailto:${email}`}>{email}</a>.
+          </p>
+        </section>
+      )}
+
       {documents && (
         <section class="sheet sheet--text">
           <h2 id="condiciones">{tx('legal_notice.conditions')}</h2>
@@ -121,6 +138,7 @@ const documents = DOCUMENTS !== null;
               generan en tu dispositivo con los datos de tu revisión, que no guardamos en ningún
               sitio.
             </li>
+            {rental && <li>{tx('legal_notice.rental.pass', { dias: String(PASS_DAYS) })}</li>}
             <li>
               Dónde vale: el pase se guarda solo en ese navegador. En otro dispositivo, en una
               ventana privada o si borras los datos de navegación, se pierde.
