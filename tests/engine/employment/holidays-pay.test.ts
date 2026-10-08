@@ -499,4 +499,47 @@ describe('extra payments (art. 31 ET)', () => {
   it('not entered', () => {
     expect(findingFor({ extraPays: null }, 'extra_pays').status).toBe('not_entered');
   });
+
+  // Art. 4.1 of the decree: the daily minimum of a short fixed-term contract holds the extra pays.
+  const shortDayRate: Partial<EmploymentInput> = {
+    modality: 'production',
+    startDate: parseDate('2026-08-01'),
+    endDate: parseDate('2026-10-15'),
+    salary: {
+      amount: 50,
+      period: 'day',
+      payments: 12,
+      prorated: false,
+      breakdown: [],
+      inKind: null,
+    },
+  };
+
+  it('a day-rate contract of up to 120 days needs no extra pays of its own', () => {
+    const f = findingFor(
+      { ...shortDayRate, extraPays: { count: 0, prorated: false } },
+      'extra_pays',
+    );
+    expect(f).toMatchObject({
+      status: 'within_limit',
+      calculation: [
+        phrase('extra_pays.count', { count: { integer: 0 } }),
+        phrase('extra_pays.in_daily_minimum', { days: { days: 120 } }),
+      ],
+    });
+    expect(f.sources.map((s) => s.id)).toContain('smi_temporary_120');
+  });
+
+  it('a longer day-rate contract still counts its extra pays', () => {
+    expect(
+      findingFor(
+        {
+          ...shortDayRate,
+          endDate: parseDate('2027-03-01'),
+          extraPays: { count: 0, prorated: false },
+        },
+        'extra_pays',
+      ).status,
+    ).toBe('below_minimum');
+  });
 });

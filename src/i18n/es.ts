@@ -2017,6 +2017,8 @@ export const es = {
     'La ley prevé 2 pagas extra al año; puede que la otra vaya prorrateada.',
   'client.employment.calculation.extra_pays.prorated_by_agreement':
     'Las pagas extra van prorrateadas: el art. 31 prevé que eso lo acuerde el convenio.',
+  'client.employment.calculation.extra_pays.in_daily_minimum':
+    'En un contrato temporal de hasta {days} pagado por días, el mínimo por jornada ya incluye las pagas extra, los domingos y los festivos (art. 4.1 del real decreto del SMI de cada año).',
   'client.employment.calculation.clauses.months_unknown': 'No has metido cuánto dura.',
   'client.employment.calculation.clauses.non_compete_months':
     'El pacto dura {months}; el máximo es de {cap}.',
