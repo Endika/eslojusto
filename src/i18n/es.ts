@@ -3007,7 +3007,7 @@ export const es = {
   'rental.charges.agreed': 'Importe al año que fija el contrato',
   'rental.charges.agreed_hint': 'Déjalo en blanco si el contrato no da una cifra.',
   'rental.charges.year': 'Año',
-  'rental.charges.amount': 'Lo que te cobraron ese año',
+  'rental.charges.amount': 'Importe de los gastos de ese año (el año al que corresponden)',
 
   'rental.moveout.question': 'La salida',
   'rental.moveout.ask': '¿Has dejado ya la vivienda?',
@@ -3496,6 +3496,8 @@ export const es = {
     'En {year} la renta podía subir un {rise} y el gasto, el doble: de {previous} a {cap}.',
   'client.rental.calculation.charges.over_cap':
     'Te cobraron {charged} y el máximo era {cap}: {amount} de más.',
+  'client.rental.calculation.charges.year_unclear':
+    'En {year} te cobraron {charged}, más de vez y media lo pactado al año: puede que entren recibos de otro año. Comprueba a qué año corresponde cada recibo.',
   'client.rental.calculation.charges.within_cap': 'Te cobraron {charged}, sin pasar de {cap}.',
   'client.rental.calculation.charges.rise_upper_bound':
     'Esa cifra es solo un máximo, porque tu contrato pacta otra fórmula: lo cobrado no pasa de ahí.',

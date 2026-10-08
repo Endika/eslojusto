@@ -24,6 +24,9 @@ const TOLERANCE = 0.01;
 const CAPPED_YEARS = { person: 5, company: 7 } as const;
 // Each open doubt doubles the readings of a year; past this many, the year is not worked out.
 const MAX_DOUBTS = 10;
+// A year charged over one and a half times the agreed amount more likely holds receipts of two
+// years than a rise: it is left to look at, never counted.
+const SUSPECT_SHARE = 1.5;
 
 const sumCharged = (c: Charge): number => round2(c.charged.reduce((s, x) => s + x.amount, 0));
 
@@ -185,7 +188,25 @@ function chargeItems(
         ),
         year,
       );
-    return item(cappedYear(agreed, year, amount, rises(year)), year);
+    const outcome = cappedYear(agreed, year, amount, rises(year));
+    const values =
+      outcome.kind === 'single' ? [outcome.value] : outcome.readings.map((r) => r.value);
+    if (amount > agreed * SUSPECT_SHARE && values.some((v) => v.status !== 'within_limit'))
+      return item(
+        single(
+          itemReading(
+            'review_it',
+            null,
+            [
+              p('charges.agreed', { amount: { euros: agreed } }),
+              p('charges.year_unclear', { year: { integer: year }, charged: { euros: amount } }),
+            ],
+            ['charges_pact', 'charges_increase'],
+          ),
+        ),
+        year,
+      );
+    return item(outcome, year);
   });
 }
 

@@ -60,6 +60,7 @@ export type RentalPhraseKey =
   | 'advance.over_cap'
   | 'advance.within_cap'
   | 'charges.not_in_contract'
+  | 'charges.year_unclear'
   | 'charges.no_annual_amount'
   | 'charges.agreed'
   | 'charges.year_cap'

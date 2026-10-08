@@ -267,9 +267,11 @@ async function confirmPack(page: Page) {
   const charge = charges.getByRole('group', { name: 'Gasto 1' });
   await expect(charge.getByLabel('Concepto', { exact: true })).toHaveValue('community');
   await expect(charge.getByLabel('Año', { exact: true })).toHaveValue('2025');
-  await expect(charge.getByLabel('Lo que te cobraron ese año', { exact: true })).toHaveValue(
-    '100,00',
-  );
+  await expect(
+    charge.getByLabel('Importe de los gastos de ese año (el año al que corresponden)', {
+      exact: true,
+    }),
+  ).toHaveValue('100,00');
   await expect(
     charge.getByLabel('Importe al año que fija el contrato', { exact: true }),
   ).toHaveValue('600,00');
