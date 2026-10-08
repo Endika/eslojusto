@@ -165,6 +165,31 @@ describe('the employment result', () => {
     );
   });
 
+  it('names the art. 21.2 doubt by the post, not by the qualified technician asked', () => {
+    const input = contract({
+      technical: false,
+      clauses: [
+        {
+          label: 'non_compete',
+          months: 12,
+          compensationStated: true,
+          trainingDescribed: null,
+          waivedRight: null,
+          costsOnWorker: null,
+          literal: { text: '' },
+        },
+      ],
+    });
+    const clause = card(render(input, false), 'No competencia');
+    expect(text(clause?.querySelector('[data-question]'))).toBe(
+      'Depende de si tu puesto es técnico (art. 21.2):',
+    );
+    const readings = [...(clause?.querySelectorAll('[data-readings] li') ?? [])].map(text);
+    expect(readings[0]).toMatch(/^Si tu puesto es técnico: /);
+    expect(readings[1]).toMatch(/^Si no lo es: /);
+    expect(text(clause)).not.toMatch(/técnico titulado/);
+  });
+
   it('leaves the detail out entirely while it is locked', () => {
     const locked = render(workOrService, true);
     expect(locked.querySelector('[data-detail]')).toBeNull();

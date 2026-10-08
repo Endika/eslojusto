@@ -16,8 +16,10 @@ import type {
   EmploymentInput,
   Finding,
   FindingStatus,
+  DoubtQuestion,
   ItemId,
   Reading,
+  ReadingCode,
 } from '../engine/employment/types';
 import type { Source } from '../engine/sources';
 import {
@@ -375,12 +377,41 @@ function note(el: HTMLElement, text: string | null) {
   el.textContent = text ?? '';
 }
 
+// How a doubt and its readings are named on a card.
+interface Labels {
+  question(q: DoubtQuestion, tr: Translate): string;
+  reading(code: ReadingCode, tr: Translate): string;
+}
+
+const ITEM_LABELS: Labels = {
+  question: (q, tr) => tr(`client.employment.question.${q}`),
+  reading: (code, tr) => tr(`client.employment.reading.${code}`),
+};
+
+// Art. 21.2 ET speaks of «técnicos», not of the qualified technicians of art. 14.1 the form asks
+// about, so a clause names its doubt by the post.
+const POST_READINGS: Partial<Record<ReadingCode, ClientKey>> = {
+  technical: 'client.employment.reading.technical_post',
+  not_technical: 'client.employment.reading.not_technical_post',
+};
+const CLAUSE_LABELS: Labels = {
+  question: (q, tr) =>
+    q === 'technical'
+      ? tr('client.employment.question.technical_post')
+      : ITEM_LABELS.question(q, tr),
+  reading: (code, tr) => {
+    const key = POST_READINGS[code];
+    return key === undefined ? ITEM_LABELS.reading(code, tr) : tr(key);
+  },
+};
+
 // An assessed point on its card: the verdict, or each reading of a «No lo sé», with the rules.
 function fillAssessed(
   container: ParentNode,
   el: HTMLElement,
   assessed: Assessed,
   tr: Translate,
+  labels: Labels = ITEM_LABELS,
 ): void {
   const status = find(el, '[data-status-text]');
   const readings = find(el, '[data-readings]');
@@ -388,14 +419,14 @@ function fillAssessed(
   else {
     status.textContent = tr('client.employment.status.depends');
     const shown = readingAmounts(assessed.readings);
-    find(el, '[data-question]').textContent = tr(`client.employment.question.${assessed.question}`);
+    find(el, '[data-question]').textContent = labels.question(assessed.question, tr);
     find(el, '[data-question]').hidden = false;
     readings.replaceChildren(
       ...assessed.readings.map((r, i) => {
         const li = document.createElement('li');
         li.replaceChildren(
           ...pieces(tr('client.employment.reading_line'), {
-            cuando: tr(`client.employment.reading.${r.when}`),
+            cuando: labels.reading(r.when, tr),
             resultado: readingPieces(r.finding, tr, shown[i] ?? null),
           }),
         );
@@ -437,13 +468,19 @@ function fillAssessed(
 
 // The method behind a point: each reading's calculation and its sources with the days each was
 // in force. Cloned in only when the detail may be shown.
-function renderDetail(container: ParentNode, el: HTMLElement, assessed: Assessed, tr: Translate) {
+function renderDetail(
+  container: ParentNode,
+  el: HTMLElement,
+  assessed: Assessed,
+  tr: Translate,
+  labels: Labels = ITEM_LABELS,
+) {
   const frag = template(container, 'detail');
   const values: readonly { title: string | null; finding: Finding }[] =
     assessed.kind === 'single'
       ? [{ title: null, finding: assessed.finding }]
       : assessed.readings.map((r) => ({
-          title: tr(`client.employment.reading.${r.when}`),
+          title: labels.reading(r.when, tr),
           finding: r.finding,
         }));
   find(frag, '[data-readings-detail]').replaceChildren(
@@ -506,8 +543,8 @@ function clauseCard(
   quote.hidden = words === '';
   find(quote, '[data-clause-text]').textContent = `«${words}»`;
   if (clause.assessed !== null) {
-    fillAssessed(container, el, clause.assessed, tr);
-    if (!locked) renderDetail(container, el, clause.assessed, tr);
+    fillAssessed(container, el, clause.assessed, tr, CLAUSE_LABELS);
+    if (!locked) renderDetail(container, el, clause.assessed, tr, CLAUSE_LABELS);
     return frag;
   }
   find(el, '[data-status-text]').textContent = tr(
