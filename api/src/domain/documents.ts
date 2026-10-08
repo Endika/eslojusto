@@ -13,8 +13,32 @@ export const FINAL_PAY_PAGE_KINDS = [
   'work_history',
   'other',
 ] as const;
+// A rental review's documents; `other` is a page with nothing it uses, such as a payslip.
+export const RENTAL_PAGE_KINDS = [
+  'lease',
+  'rent_update_notice',
+  'rent_receipt',
+  'agency_invoice',
+  'deposit_return',
+  'other',
+] as const;
 // Every kind any review can give a page.
-export const PAGE_KINDS = FINAL_PAY_PAGE_KINDS;
+export const PAGE_KINDS = [
+  'settlement_proposal',
+  'payslip',
+  'dismissal_letter',
+  'company_certificate',
+  'settlement_agreement',
+  'work_history',
+  'lease',
+  'rent_update_notice',
+  'rent_receipt',
+  'agency_invoice',
+  'deposit_return',
+  'other',
+] as const satisfies readonly (
+  (typeof FINAL_PAY_PAGE_KINDS)[number] | (typeof RENTAL_PAGE_KINDS)[number]
+)[];
 export type PageKind = (typeof PAGE_KINDS)[number];
 // The documents a value can come from.
 export type SourceKind = Exclude<PageKind, 'other'>;

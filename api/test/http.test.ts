@@ -197,6 +197,33 @@ describe('the review a read is for', () => {
     await handleExtract(post(extractBody({ review: 'final_pay' })), deps);
     expect(logger.events[0]).toMatchObject({ code: 'ok', review: 'final_pay' });
   });
+
+  it('reads a rental pack as one and logs only that it was one', async () => {
+    const { deps, logger, reader } = extractDeps({
+      pages: [page(1, 'lease')],
+      lease: { signedOn: f('2024-05-20'), initialRent: f(98765.43) },
+    });
+    const response = await handleExtract(post(extractBody({ review: 'rental' })), deps);
+    expect(json(response)).toMatchObject({
+      code: 'ok',
+      extraction: { fields: { initialRent: { value: 98765.43, source: 'lease' } } },
+    });
+    expect(reader.calls.map((c) => c.review)).toEqual(['rental']);
+    expect(logger.events).toEqual([
+      {
+        op: 'extract',
+        code: 'ok',
+        latencyMs: 0,
+        pages: 1,
+        inputTokens: 1000,
+        outputTokens: 200,
+        escalated: false,
+        conflicts: 0,
+        review: 'rental',
+      },
+    ]);
+    expect(JSON.stringify(logger.events)).not.toMatch(/98765|2024-05-20/);
+  });
 });
 
 describe('a read that found nothing', () => {

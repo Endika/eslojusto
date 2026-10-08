@@ -17,6 +17,8 @@ import {
 } from './extraction';
 import { ITEM_IDS, type Readability } from './extraction-schema';
 import { merge, type Merged } from './merge';
+import { rentalFailedChecks, rentalIncomplete, type RentalCheck } from './rental-checks';
+import { rentalMerge, type RentalMerged } from './rental-merge';
 import type {
   CaptchaVerifier,
   Clock,
@@ -50,19 +52,25 @@ export interface ExtractDeps {
   readonly models: { readonly primary: string; readonly escalation: string };
 }
 
-export interface ExtractRequest {
+// A request typed by its review, so a final-pay caller gets final-pay fields back.
+export interface ExtractRequest<R extends ReviewKind = 'final_pay'> {
   readonly files: readonly DocumentFile[];
   readonly captchaToken: string;
   readonly allowance: Allowance;
   // None is the final pay's.
-  readonly review?: ReviewKind;
+  readonly review?: R;
 }
 
-export type ExtractResponse =
+type ExtractionOf<R extends ReviewKind> = R extends 'rental'
+  ? Omit<RentalMerged, 'discarded'>
+  : Omit<Merged, 'discarded'>;
+type CheckOf<R extends ReviewKind> = R extends 'rental' ? RentalCheck : CoherenceCheck;
+
+export type ExtractResponse<R extends ReviewKind = 'final_pay'> =
   | {
       readonly code: 'ok';
-      readonly extraction: Omit<Merged, 'discarded'>;
-      readonly failedChecks: readonly CoherenceCheck[];
+      readonly extraction: ExtractionOf<R>;
+      readonly failedChecks: readonly CheckOf<R>[];
       // The quota token to keep for the next free read; a pass keeps its own token.
       readonly allowanceToken?: string;
       readonly readsLeft?: number;
@@ -92,8 +100,8 @@ export interface ExtractMetrics {
 }
 
 interface Assessment {
-  readonly extraction: Merged;
-  readonly failed: readonly CoherenceCheck[];
+  readonly extraction: Merged | RentalMerged;
+  readonly failed: readonly (CoherenceCheck | RentalCheck)[];
   readonly doubtful: boolean;
   readonly noOutput: boolean;
 }
@@ -115,8 +123,13 @@ function incomplete(reading: Reading, extraction: Merged): boolean {
   return kinds.has('other') && missing;
 }
 
-function assess(read: ModelRead, pageCount: number, review: ReviewKind): Assessment {
-  const reading = parseReading(read.toolInput, pageCount, review);
+interface Checked {
+  readonly extraction: Merged | RentalMerged;
+  readonly failed: readonly (CoherenceCheck | RentalCheck)[];
+  readonly incomplete: boolean;
+}
+
+function checkFinalPay(reading: Reading): Checked {
   const extraction = merge(reading);
   const { startDate, endDate } = extraction.fields;
   const failed = [...failedChecks(reading)];
@@ -128,6 +141,22 @@ function assess(read: ModelRead, pageCount: number, review: ReviewKind): Assessm
     !failed.includes('end_before_start')
   )
     failed.push('end_before_start');
+  return { extraction, failed, incomplete: incomplete(reading, extraction) };
+}
+
+function checkRental(reading: Reading): Checked {
+  const extraction = rentalMerge(reading);
+  return {
+    extraction,
+    failed: rentalFailedChecks(reading),
+    incomplete: rentalIncomplete(reading, extraction),
+  };
+}
+
+function assess(read: ModelRead, pageCount: number, review: ReviewKind): Assessment {
+  const reading = parseReading(read.toolInput, pageCount, review);
+  const { extraction, failed, incomplete } =
+    review === 'rental' ? checkRental(reading) : checkFinalPay(reading);
   const noOutput = read.toolInput === null;
   const doubtful =
     noOutput ||
@@ -136,7 +165,7 @@ function assess(read: ModelRead, pageCount: number, review: ReviewKind): Assessm
     failed.length > 0 ||
     hasLowConfidence(reading) ||
     extraction.discarded > 0 ||
-    incomplete(reading, extraction);
+    incomplete;
   return { extraction, failed, doubtful, noOutput };
 }
 
@@ -150,8 +179,9 @@ function measure(files: readonly DocumentFile[], review: ReviewKind): number | E
   return tokens > MAX_ESTIMATED_INPUT_TOKENS ? 'document_too_dense' : tokens;
 }
 
-const hasUsableValue = (e: Merged): boolean =>
-  Object.keys(e.fields).length > 0 || (e.lists.contracts?.length ?? 0) > 0;
+const hasUsableValue = (e: Merged | RentalMerged): boolean =>
+  Object.keys(e.fields).length > 0 ||
+  Object.values(e.lists).some((rows) => (rows?.length ?? 0) > 0);
 
 function readabilityCounts(pages: readonly PageReading[]): Partial<Record<Readability, number>> {
   const counts: Partial<Record<Readability, number>> = {};
@@ -160,11 +190,11 @@ function readabilityCounts(pages: readonly PageReading[]): Partial<Record<Readab
   return counts;
 }
 
-export async function extract(
-  request: ExtractRequest,
+export async function extract<R extends ReviewKind = 'final_pay'>(
+  request: ExtractRequest<R>,
   deps: ExtractDeps,
   metrics: ExtractMetrics,
-): Promise<ExtractResponse> {
+): Promise<ExtractResponse<R>> {
   const started = deps.clock.now();
   const deadline = started + READ_DEADLINE_MS;
   const review = request.review ?? 'final_pay';
@@ -254,7 +284,12 @@ export async function extract(
   // A count, never which values: the log carries nothing a document said.
   metrics.conflicts = result.extraction.conflicts.length;
   const { discarded: _discarded, ...extraction } = result.extraction;
-  const ok = { code: 'ok' as const, extraction, failedChecks: result.failed };
+  // The review chose the schema, so the extraction is that review's.
+  const ok = {
+    code: 'ok' as const,
+    extraction: extraction as ExtractionOf<R>,
+    failedChecks: result.failed as readonly CheckOf<R>[],
+  };
   if (allowance.type === 'free') return { ...ok, allowanceToken: allowance.next() };
 
   // Counted only now, with the answer ready: a read that failed or ran out of time costs nothing.

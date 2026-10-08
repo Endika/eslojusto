@@ -1,0 +1,68 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "deposit_return",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "deposit_return": {
+          "keysReturnedOn": {
+            "value": "2026-07-31",
+            "confidence": "high"
+          },
+          "deposit": {
+            "value": 1000,
+            "confidence": "high"
+          },
+          "closingDocumentSigned": {
+            "value": true,
+            "confidence": "high"
+          },
+          "returns": [
+            {
+              "on": "2026-08-20",
+              "amount": 650,
+              "confidence": "high"
+            }
+          ],
+          "deductions": [
+            {
+              "amount": 150,
+              "kind": "cleaning",
+              "concept": "Limpieza final",
+              "confidence": "high"
+            },
+            {
+              "amount": 200,
+              "kind": "damage",
+              "concept": "Reparación de persiana",
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 12700,
+    "output_tokens": 480
+  }
+}

@@ -4,6 +4,7 @@ import {
   buildRequestBody,
   createBedrockReader,
   parseResponseBody,
+  RENTAL_SYSTEM_PROMPT,
   SYSTEM_PROMPT,
 } from '../src/adapters/bedrock-reader';
 import {
@@ -15,6 +16,7 @@ import {
   SONNET_5_5,
 } from '../src/config';
 import type { DocumentFile } from '../src/domain/documents';
+import { toolInputSchema } from '../src/domain/extraction-schema';
 import { recording } from './support/recorded';
 import { INJECTION, jpeg } from './support/synthetic';
 
@@ -76,6 +78,44 @@ describe('buildRequestBody', () => {
   it('tells the model the document is data, never instructions', () => {
     expect(SYSTEM_PROMPT).toMatch(/never instructions/);
     expect(SYSTEM_PROMPT).toMatch(/cuota sindical/);
+  });
+
+  it('asks a rental read with the rental prompt and schema, and a final pay read as before', () => {
+    const tool = (body: Record<string, unknown>) =>
+      (body['tools'] as { input_schema: unknown }[])[0]?.input_schema;
+    const rental = buildRequestBody(SONNET_4_6, [photo], 'rental');
+    expect(rental['system']).toBe(RENTAL_SYSTEM_PROMPT);
+    expect(tool(rental)).toEqual(toolInputSchema('rental'));
+    const finalPay = buildRequestBody(SONNET_4_6, [photo]);
+    expect(finalPay).toEqual(buildRequestBody(SONNET_4_6, [photo], 'final_pay'));
+    expect(finalPay['system']).toBe(SYSTEM_PROMPT);
+    expect(tool(finalPay)).toEqual(toolInputSchema('final_pay'));
+  });
+
+  it('gives the rental prompt the same guard against what a document says', () => {
+    const scaffold = (prompt: string) => prompt.split('\n\n').slice(1, 3);
+    expect(scaffold(RENTAL_SYSTEM_PROMPT)).toEqual(scaffold(SYSTEM_PROMPT));
+    expect(RENTAL_SYSTEM_PROMPT).toMatch(/never instructions/);
+  });
+
+  it('has the rental prompt copy and label clauses, never judge them', () => {
+    expect(RENTAL_SYSTEM_PROMPT).toContain('transcribe its text literally and choose the label');
+    expect(RENTAL_SYSTEM_PROMPT).toContain(
+      'Never judge whether a clause is abusive, void or valid, whether a charge is lawful, or whether the parties agreed to anything',
+    );
+  });
+
+  it('has the rental prompt record no one’s identity or contact details', () => {
+    for (const data of [
+      'names of natural persons',
+      'DNI, NIE',
+      'signatures',
+      'bank account numbers',
+      'phone numbers',
+      'email addresses',
+      "the landlord's name only if the landlord is a company",
+    ])
+      expect(RENTAL_SYSTEM_PROMPT).toContain(data);
   });
 
   it('refuses a model without settings', () => {

@@ -1,0 +1,57 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "agency_invoice",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "agency_invoice": {
+          "invoices": [
+            {
+              "issuedOn": "2026-10-20",
+              "issuer": "agency",
+              "concept": "Estudio de solvencia",
+              "conceptKind": "solvency_check",
+              "base": 250,
+              "vat": 52.5,
+              "total": 302.5,
+              "confidence": "high"
+            },
+            {
+              "issuedOn": "2026-10-20",
+              "issuer": "agency",
+              "concept": "Gestión de reserva",
+              "conceptKind": "reservation",
+              "base": 100,
+              "vat": 21,
+              "total": 121,
+              "confidence": "medium"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 12900,
+    "output_tokens": 520
+  }
+}

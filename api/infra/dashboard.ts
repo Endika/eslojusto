@@ -275,6 +275,7 @@ export function addDashboard(
     ['cropped', 'cortada'],
     ['handwritten', 'aMano'],
     ['not_labour_document', 'noLaboral'],
+    ['not_rental_document', 'noAlquiler'],
     ['foreign_jurisdiction', 'otroPais'],
     ['unknown_format', 'formatoDesconocido'],
     ['ok', 'legibleSinDatos'],

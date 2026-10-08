@@ -3,7 +3,7 @@ import { LIMITS, MEDIA_TYPES, type DocumentFile, type MediaType } from '../domai
 import { extract, type ExtractDeps, type ExtractRequest } from '../domain/extract';
 import type { Clock, Logger } from '../domain/ports';
 import type { ErrorCode } from '../domain/results';
-import { isReview } from '../domain/reviews';
+import { isReview, type ReviewKind } from '../domain/reviews';
 import { handle, type HttpEvent, type HttpResponse } from './common';
 
 const BASE64 = /^[A-Za-z0-9+/]*={0,2}$/;
@@ -14,7 +14,7 @@ const isMediaType = (v: unknown): v is MediaType =>
 const isToken = (v: unknown): v is string =>
   typeof v === 'string' && v.length > 0 && v.length <= MAX_TOKEN_LENGTH;
 
-function toRequest(body: Record<string, unknown>): ExtractRequest | ErrorCode {
+function toRequest(body: Record<string, unknown>): ExtractRequest<ReviewKind> | ErrorCode {
   const { files, captchaToken, pass, quota, review } = body;
   if (!Array.isArray(files) || !isToken(captchaToken)) return 'invalid_request';
   if (review !== undefined && !isReview(review)) return 'invalid_request';

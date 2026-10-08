@@ -843,6 +843,7 @@ export const es = {
   'client.documents.skipped.handwritten':
     'parece escrito a mano. Es mejor que escribas los datos tú.',
   'client.documents.skipped.not_labour_document': 'no parece un documento laboral.',
+  'client.documents.skipped.not_rental_document': 'no parece un documento del alquiler.',
   'client.documents.skipped.foreign_jurisdiction':
     'es de otro país. Esta revisión aplica la ley española.',
   'client.documents.skipped.unknown_format': 'es un tipo de documento que no se reconoce.',

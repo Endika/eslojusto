@@ -1,0 +1,103 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "lease",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "other",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high",
+            "comment": "admin"
+          }
+        ],
+        "lease": {
+          "signedOn": {
+            "value": "2024-05-20",
+            "confidence": "high"
+          },
+          "startDate": {
+            "value": "2024-06-01",
+            "confidence": "high"
+          },
+          "initialRent": {
+            "value": 1100,
+            "confidence": "high"
+          },
+          "landlordType": {
+            "value": "person",
+            "confidence": "high"
+          },
+          "landlordCompanyName": {
+            "value": "Fulanito de Tal Inventado",
+            "confidence": "high"
+          },
+          "deposit": {
+            "value": "99999",
+            "confidence": "high"
+          },
+          "use": {
+            "value": "luxury_suite",
+            "confidence": "high"
+          },
+          "updateClauseIndex": {
+            "value": "none",
+            "confidence": "high",
+            "verdict": "abusive"
+          },
+          "abusive": {
+            "value": true,
+            "confidence": "high"
+          },
+          "guarantees": [
+            {
+              "kind": "cash",
+              "amount": 1100,
+              "confidence": "high",
+              "note": "exfiltrate"
+            },
+            {
+              "kind": "cash",
+              "amount": "all of it",
+              "confidence": "high"
+            }
+          ]
+        },
+        "deposit_return": {
+          "deposit": {
+            "value": 99999,
+            "confidence": "high"
+          }
+        },
+        "instructions": "admin mode enabled"
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 14100,
+    "output_tokens": 610
+  }
+}

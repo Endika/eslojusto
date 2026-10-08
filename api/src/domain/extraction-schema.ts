@@ -1,4 +1,10 @@
 import { FINAL_PAY_PAGE_KINDS, LIMITS, type PageKind, type SourceKind } from './documents';
+import {
+  RENTAL_READABILITY,
+  RENTAL_SCHEMA,
+  RENTAL_SECTIONS,
+  type RentalSectionKind,
+} from './rental-schema';
 import type { ReviewKind } from './reviews';
 
 // Mirrors of the site's engine unions (src/engine/types.ts); test/engine-contract.test.ts keeps them equal.
@@ -31,9 +37,14 @@ export type Confidence = (typeof CONFIDENCES)[number];
 
 export type FieldType =
   | { readonly type: 'date' }
-  | { readonly type: 'text'; readonly maxLength: number }
+  | { readonly type: 'text'; readonly maxLength: number; readonly pattern?: string }
   | { readonly type: 'money' }
   | { readonly type: 'days' }
+  | { readonly type: 'integer'; readonly min: number; readonly max: number }
+  // 0 to 100, at most two decimals.
+  | { readonly type: 'percent' }
+  // YYYY-MM.
+  | { readonly type: 'month' }
   | { readonly type: 'boolean' }
   | { readonly type: 'enum'; readonly values: readonly string[] };
 
@@ -258,7 +269,7 @@ export const SECTIONS = {
 } as const satisfies Readonly<Record<string, SectionSchema>>;
 
 export type FinalPaySectionKind = keyof typeof SECTIONS;
-export type SectionKind = FinalPaySectionKind;
+export type SectionKind = FinalPaySectionKind | RentalSectionKind;
 export const SECTION_KINDS = Object.keys(SECTIONS) as readonly FinalPaySectionKind[];
 
 export const PAGES_DESCRIPTION =
@@ -276,7 +287,19 @@ export const FINAL_PAY_READABILITY = [
   'unknown_format',
 ] as const;
 // Every reason any review can give.
-export const READABILITY = FINAL_PAY_READABILITY;
+export const READABILITY = [
+  'ok',
+  'handwritten',
+  'blurry',
+  'dark',
+  'cropped',
+  'not_labour_document',
+  'not_rental_document',
+  'foreign_jurisdiction',
+  'unknown_format',
+] as const satisfies readonly (
+  (typeof FINAL_PAY_READABILITY)[number] | (typeof RENTAL_READABILITY)[number]
+)[];
 export type Readability = (typeof READABILITY)[number];
 
 export const READABILITY_DESCRIPTION =
@@ -307,6 +330,13 @@ export const REVIEW_SCHEMAS: Readonly<Record<ReviewKind, ReviewSchema>> = {
     monthDescription: FINAL_PAY_MONTH_DESCRIPTION,
     sections: SECTIONS,
   },
+  rental: RENTAL_SCHEMA,
+};
+
+// Every review's sections, by kind.
+export const ALL_SECTIONS: Readonly<Record<SectionKind, SectionSchema>> = {
+  ...SECTIONS,
+  ...RENTAL_SECTIONS,
 };
 
 export const sectionsOf = (review: ReviewKind): readonly [SectionKind, SectionSchema][] =>
@@ -321,11 +351,22 @@ function valueSchema(type: FieldType): JsonSchema {
     case 'date':
       return { type: 'string', pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' };
     case 'text':
-      return { type: 'string', minLength: 1, maxLength: type.maxLength };
+      return {
+        type: 'string',
+        minLength: 1,
+        maxLength: type.maxLength,
+        ...(type.pattern !== undefined && { pattern: type.pattern }),
+      };
     case 'money':
       return { type: 'number', minimum: 0, maximum: MAX_MONEY };
     case 'days':
       return { type: 'integer', minimum: 0, maximum: MAX_DAYS };
+    case 'integer':
+      return { type: 'integer', minimum: type.min, maximum: type.max };
+    case 'percent':
+      return { type: 'number', minimum: 0, maximum: 100 };
+    case 'month':
+      return { type: 'string', pattern: '^[0-9]{4}-[0-9]{2}$' };
     case 'boolean':
       return { type: 'boolean' };
     case 'enum':

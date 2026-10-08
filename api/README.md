@@ -34,9 +34,16 @@ API never returns prose. All requests are `POST` with a JSON body.
   "files": [{ "mediaType": "image/jpeg" | "image/webp", "data": "<base64>" }],
   "captchaToken": "<Turnstile token, widget action 'extract'>",
   "quota": "<token from the last free read, or null>", // free read
-  "pass": "<pass token>" // or a pass read
+  "pass": "<pass token>", // or a pass read
+  "review": "rental" // optional: none is the final pay
 }
 ```
+
+`review` picks the schema, the prompt and the merge rules (`src/domain/reviews.ts`): absent, it
+is `final_pay`, exactly as before the field existed (`test/fixtures/final-pay-tool-schema.json` and
+`final-pay-prompt.txt` pin its schema and prompt); `rental` reads a tenancy pack (below, «Rental
+review»); anything else is `invalid_request`. The log line carries `review` only when the request
+named one.
 
 The person never says what they upload: a read takes the whole pack (dismissal letter,
 settlement notification, payslips, company certificate, agreement, work history, and pages
@@ -141,7 +148,7 @@ Page kinds: `settlement_proposal`, `payslip`, `dismissal_letter`, `company_certi
 `settlement_agreement`, `work_history`, `other` (for instance an IRPF withholding
 certificate). A field's `source` is any of them but `other`.
 
-Readability (`READABILITY` in `src/domain/extraction-schema.ts`): `ok`, or the main reason a page
+Readability of a final-pay read (`FINAL_PAY_READABILITY` in `src/domain/extraction-schema.ts`): `ok`, or the main reason a page
 can't be used: `handwritten`, `blurry`, `dark`, `cropped`, `not_labour_document`,
 `foreign_jurisdiction` (an employment document from another country, where Spanish law does not
 apply) or `unknown_format`. Language is never a reason: the prompt names Spanish, Catalan,
@@ -172,6 +179,39 @@ detail of a review or builds the report or the letter. No captcha: it does no Be
 the function's reserved concurrency of 2 bounds it. Each container remembers a success for 60 s
 by the token's SHA-256, so a refund can take that long to lock a page again; failures are never
 remembered.
+
+### Rental review
+
+With `"review": "rental"` the model sorts a tenancy pack instead (`src/domain/rental-schema.ts`).
+Page kinds: `lease`, `rent_update_notice`, `rent_receipt`, `agency_invoice`, `deposit_return`,
+`other`; readability as above, with `not_rental_document` in place of `not_labour_document`
+(`READABILITY` lists every reason of both reviews). Each kind is transcribed into its own section;
+`src/domain/rental-merge.ts` takes every field from its only source, except `deposit`, from the
+lease first and the deposit return second, with the same conflicts and discards as the final
+pay, and carries every list row with its `source`:
+
+| Section              | Fields                                                                                                                                                                                                                                                                                                                                    | Lists (most rows)                                                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `lease`              | `signedOn`, `startDate`, `postcode`, `landlordType`, `landlordCompanyName` (a company only), `agencyNamed`, `use`, `agreedMonths`, `initialRent`, `updateClauseText` (literal, ≤ 600), `updateClauseIndex`, `updateFixedPercent`, `deposit`, `advanceMonths`, `necessityClause`, `feesText` (literal, ≤ 300), `chargesClauseText` (≤ 600) | `guarantees` [`kind`, `amount`, `months`] (5), `charges` [`kind`, `annualAmount`, `concept`] (10), `utilities` [`kind`, `payer`] (6) |
+| `rent_update_notice` |                                                                                                                                                                                                                                                                                                                                           | `notices` [`noticeOn`, `medium`, `percent`, `indexNamed`, `referenceMonth`, `previousRent`, `newRent`, `appliesFrom`] (8)            |
+| `rent_receipt`       |                                                                                                                                                                                                                                                                                                                                           | `receipts` [`month`, `total`, `rent`, `community`, `propertyTax`, `waste`, `utilities`, `other`] (36)                                |
+| `agency_invoice`     |                                                                                                                                                                                                                                                                                                                                           | `invoices` [`issuedOn`, `issuer`, `concept`, `conceptKind`, `base`, `vat`, `total`] (4)                                              |
+| `deposit_return`     | `keysReturnedOn`, `deposit`, `closingDocumentSigned`                                                                                                                                                                                                                                                                                      | `returns` [`on`, `amount`] (4), `deductions` [`amount`, `kind`, `concept`] (10)                                                      |
+
+The labels `use`, `landlordType`, `updateClauseIndex`, `conceptKind` and the `kind` of guarantees,
+charges and deductions mirror the site's rental engine (`test/rental-contract.test.ts`). The model
+copies a clause word for word and picks its label; it never says whether a clause is abusive or
+valid or whether anyone agreed to it, which the person checks against the text. It records no
+names of natural persons, DNI/NIE, signatures, account numbers, phones or emails, and the
+landlord's name only for a company: a `landlordCompanyName` beside any `landlordType` but
+`company` is dropped all the same, as a discard.
+
+`failedChecks` for a rental read are coherence checks only, never findings
+(`src/domain/rental-checks.ts`): `return_before_keys`, `receipt_parts_do_not_sum` (more than 1 €
+apart), `invoice_total_mismatch` (base + VAT more than 0.05 € from the total),
+`notice_rent_mismatch` (previous rent × (1 + %) more than 1 € from the new one) and
+`start_long_before_signing` (over 31 days). A legible lease with neither `initialRent` nor
+`signedOn` is worth a second read, as a failed check is.
 
 ### Fields and the site's engine
 
@@ -323,10 +363,12 @@ Cheapest first, and nothing that parses what the person sent runs before the cap
 
 - **The input is known before any call.** Every image is priced by its pixels, at
   w × h / 750 tokens (Anthropic's formula) or one per 28 × 28 patch if that is more, and the
-  prompt and schema at 14,000 (about 27,000 characters at two per token;
-  `test/tokens.test.ts` keeps it honest). Bedrock's CountTokens does not serve Claude models
+  prompt and schema at 14,000 for the final pay and 11,000 for a rental review (about 27,000
+  and 21,000 characters at two per token, `PROMPT_TOKENS_BY_REVIEW`; `test/tokens.test.ts`
+  keeps both honest). Bedrock's CountTokens does not serve Claude models
   offered only through cross-Region profiles, so this is computed, not asked. The largest pack
-  the API accepts, twenty-five 1568 × 1568 images, comes to 14,000 + 25 × 3,279 = 95,975; above
+  the API accepts, twenty-five 1568 × 1568 images, comes to 14,000 + 25 × 3,279 = 95,975 (92,975
+  for a rental review); above
   **96,000** the answer would be `document_too_dense`. Nothing in an image can add tokens
   beyond its pixels, which is why PDFs are rendered in the browser instead of read here: a PDF
   can hide text from any measure short of a full reader.
@@ -536,8 +578,15 @@ entry to the page list, and a long work history takes up to
 be about 44,900 in, 0.18 USD, and 25 about 69,500 in, 0.27 USD. A pack over 15 that the browser
 had to send at 1280 or 1100 px (above, «Payload budget») costs less, not more.
 
+A rental read has the same bounds: up to 25 images and `max_tokens` 5,000, with a smaller prompt
+(11,000 tokens), so its largest pack, 25 × 1568 × 1568, is 92,975 in and 0.39 USD, and its worst
+case is the same **0.40 USD** with Sonnet 4.6. A contract runs to 6–20 pages; with its notices and
+receipts a pack fills the 25. Should the rental evaluation see reads stop at `max_tokens` (36
+receipts and long clause texts are the largest records), the cap goes up only with approval, and
+this bound with it.
+
 **Worst case: 0.40 USD per read** (95,975 × 3.30 USD/M + 5,000 × 16.50 USD/M = 0.399), for any
-input: the API takes images only, priced by their pixels, and refuses anything above 96,000
+review and any input: the API takes images only, priced by their pixels, and refuses anything above 96,000
 estimated tokens (0.40 USD) before a call. The bound counts every page at 1568 px, since the
 API accepts that size at any count; the browser stepping a large pack down only lowers it. A PDF never reaches it; the browser renders its pages
 to images of the same size as a photo. Should Bedrock still bill more than twice the estimate,
