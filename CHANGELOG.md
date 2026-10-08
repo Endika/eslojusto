@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.13.0](https://github.com/Endika/eslojusto/compare/v1.12.1...v1.13.0) (2026-10-08)
+
+
+### Features
+
+* **engine:** check holidays and extra pays against the statute ([97720d3](https://github.com/Endika/eslojusto/commit/97720d357732d43873ea01265fd69f21da1baff4))
+* **engine:** check part-time contract contents and complementary hours ([cee6da2](https://github.com/Endika/eslojusto/commit/cee6da28d8e333f3dc5208ad39d466f3e3780a2e))
+* **engine:** check the trial period against its legal limits ([58f5ba8](https://github.com/Endika/eslojusto/commit/58f5ba8f895552eddca1324fc475451fee40aa17))
+* **engine:** check working hours, rests and overtime pacts ([6a881d7](https://github.com/Endika/eslojusto/commit/6a881d74fe54630e9c2b15edf2361c26c79790c8))
+* **engine:** flag contract clauses by their objective terms ([9b3a9e4](https://github.com/Endika/eslojusto/commit/9b3a9e4c72e906643b6655f00027d76d7a8bde0d))
+
+
+### Bug Fixes
+
+* **engine:** accept zero holiday days ([e5870dd](https://github.com/Endika/eslojusto/commit/e5870ddbfa28ba4dd3ae56d9662a832c13d963aa))
+* **engine:** leave holidays in the salary to review when the term has no end date ([750749f](https://github.com/Endika/eslojusto/commit/750749fe6abb2b6979d3f36995001355914b877a))
+* **engine:** prorate holidays by the span they cover and review a single extra pay ([4cb10fa](https://github.com/Endika/eslojusto/commit/4cb10fa0a6746342c5e58bf30f92bc24d6a74592))
+* **engine:** prorate holidays only over a fixed term under a year ([36f2f64](https://github.com/Endika/eslojusto/commit/36f2f64a3940ff061c5ef55ca36a028a89d9c511))
+* **engine:** review overtime pacts that rest may compensate and check them once ([3572237](https://github.com/Endika/eslojusto/commit/3572237835d495552490234c01b705b373da88fe))
+* **engine:** review weekly hours over forty instead of ruling on them ([79409c9](https://github.com/Endika/eslojusto/commit/79409c96c11be246485829f176a8dffad5af60a7))
+
 ## [1.12.1](https://github.com/Endika/eslojusto/compare/v1.12.0...v1.12.1) (2026-10-07)
 
 
