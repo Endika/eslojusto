@@ -59,7 +59,8 @@ export type EmploymentPhraseKey =
   | WorkingTimePhraseKey
   | PartTimePhraseKey
   | HolidaysPayPhraseKey
-  | ClausePhraseKey;
+  | ClausePhraseKey
+  | InformationPhraseKey;
 
 export interface EmploymentPhrase {
   readonly key: EmploymentPhraseKey;
@@ -216,3 +217,29 @@ type ClausePhraseKey =
   | 'clauses.remote_not_regular'
   | 'clauses.remote_costs_on_worker'
   | 'clauses.remote_costs_unknown';
+
+type InformationPhraseKey =
+  | 'information.present'
+  | 'information.by_reference'
+  | 'information.reference_not_allowed'
+  | 'information.reference_covers_part'
+  | 'information.missing_before_start'
+  | 'information.missing_on_request'
+  | 'information.only_if_used'
+  | 'information.unknown'
+  | 'information.temporary_cause'
+  | 'information.agreement.named'
+  | 'information.agreement.not_named'
+  | 'information.agreement.where'
+  | 'information.agreement.sector_salary_amount_priority'
+  | 'information.public_holidays'
+  | 'information.late_payment_interest'
+  | 'information.limitation'
+  | 'information.model'
+  | 'information.minors.hours'
+  | 'information.minors.no_night_or_overtime'
+  | 'information.minors.rest'
+  | 'information.out_of_scope.special_relationship'
+  | 'information.out_of_scope.public_servant'
+  | 'information.out_of_scope.temp_agency'
+  | 'information.out_of_scope.relief';
