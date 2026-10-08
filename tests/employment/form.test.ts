@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { contractAnnualPay } from '../../src/engine/employment/minimum-wage';
 import { INFO_ELEMENTS } from '../../src/engine/employment/types';
-import { gate } from '../../src/employment/conditions';
+import { applyConditions, gate } from '../../src/employment/conditions';
 import { readEmploymentForm, sheetApplies, sheetErrors } from '../../src/employment/form';
 import { TODAY } from './fixtures';
 
@@ -97,6 +97,20 @@ describe('the employment form', () => {
     if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
     expect(r.input.extraPays).toEqual({ count: 0, prorated: false });
     expect(r.input.salary.payments).toBe(12);
+  });
+
+  it.each([
+    ['', false],
+    ['0', false],
+    ['00', false],
+    ['0,0', false],
+    ['2', true],
+  ])('with «%s» extra pays, proration is asked: %s', (typed, shown) => {
+    const el = document.createElement('form');
+    el.innerHTML = `<input name="extraPays" value="${typed}" />
+      <fieldset data-if-above0="extraPays"><input type="radio" name="extraProrated" value="no" /></fieldset>`;
+    applyConditions(el);
+    expect(el.querySelector<HTMLInputElement>('[name="extraProrated"]')?.disabled).toBe(!shown);
   });
 
   it('stops household employment at the gate, whatever else it says', () => {
