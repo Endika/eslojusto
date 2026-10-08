@@ -17,6 +17,7 @@ const RENTAL: Partial<Record<Key, Key>> = {
   'documents.pass.text': 'rental.pass.text',
   'documents.pass.price': 'rental.pass.price',
   'documents.pass.waiver': 'rental.pass.waiver',
+  'documents.pass.paid_help': 'rental.pass.paid_help',
 };
 const tx = (key: Key) => t(lang, (review === 'rental' && RENTAL[key]) || key);
 const letterFields = [
