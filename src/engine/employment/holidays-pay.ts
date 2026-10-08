@@ -1,8 +1,8 @@
 import { round2 } from '../money';
 import { CALENDAR_MINIMUM, calendarDaysPer } from '../settlement';
-import { phrase } from './calculation';
+import { phrase, type EmploymentPhrase } from './calculation';
 import { findingsFor, single } from './finding';
-import { isShortTemporary } from './minimum-wage';
+import { contractAgainstMinimum, isShortTemporary, type MinimumWageTable } from './minimum-wage';
 import type { NormTable } from './norms';
 import { agreedDays, isFixedTerm, isOpenEnded } from './term';
 import type { Assessed, EmploymentInput, Finding, Holidays } from './types';
@@ -211,8 +211,54 @@ function paidInSalary(input: EmploymentInput, norms: NormTable): Finding {
   );
 }
 
+// Art. 31 ET leaves the amount of the two payments to the agreement, which may also spread them
+// over the twelve months: a contract with none falls short for certain only when its pay over the
+// year is under the minimum wage, which holds both payments (art. 3.1 of each decree).
+function noExtraPays(
+  input: EmploymentInput,
+  count: EmploymentPhrase,
+  norms: NormTable,
+  table: MinimumWageTable,
+): Finding {
+  const compared = contractAgainstMinimum(input, table);
+  if (compared === null)
+    return finding(
+      'extra_pays',
+      {
+        status: 'review_it',
+        calculation: [count, phrase('extra_pays.none_pay_unknown')],
+        alsoCites: ['smi_annual'],
+      },
+      norms,
+    );
+  const vars = {
+    year: { integer: compared.year },
+    annual: { euros: compared.annual },
+    minimum: { euros: compared.minimum },
+  };
+  if (compared.annual < compared.minimum)
+    return finding(
+      'extra_pays',
+      {
+        status: 'below_minimum',
+        calculation: [count, phrase('extra_pays.none_below_minimum', vars)],
+        alsoCites: ['smi_annual'],
+      },
+      norms,
+    );
+  return finding(
+    'extra_pays',
+    {
+      status: 'depends_on_agreement',
+      calculation: [count, phrase('extra_pays.none_over_minimum', vars)],
+      alsoCites: ['smi_annual'],
+    },
+    norms,
+  );
+}
+
 // Art. 31 ET: the amount of each payment and their proration are for the collective agreement.
-function extraPays(input: EmploymentInput, norms: NormTable): Finding {
+function extraPays(input: EmploymentInput, norms: NormTable, table: MinimumWageTable): Finding {
   const pays = input.extraPays;
   if (pays === null) return finding('extra_pays', { status: 'not_entered' }, norms);
   // Art. 4.1 of each year's minimum wage decree: for services of up to 120 days the daily minimum
@@ -251,8 +297,7 @@ function extraPays(input: EmploymentInput, norms: NormTable): Finding {
       norms,
     );
   const count = phrase('extra_pays.count', { count: { integer: pays.count } });
-  if (pays.count === 0)
-    return finding('extra_pays', { status: 'below_minimum', calculation: [count] }, norms);
+  if (pays.count === 0) return noExtraPays(input, count, norms, table);
   if (pays.count < EXTRA_PAYS)
     return finding(
       'extra_pays',
@@ -272,6 +317,7 @@ function extraPays(input: EmploymentInput, norms: NormTable): Finding {
 export function assessHolidaysAndPay(
   input: EmploymentInput,
   norms: NormTable,
+  table: MinimumWageTable,
 ): readonly Assessed[] {
   const { holidays } = input;
   const findings: Finding[] =
@@ -281,5 +327,5 @@ export function assessHolidaysAndPay(
           holidayDays(input, holidays, norms),
           ...(holidays.includedInSalary ? [paidInSalary(input, norms)] : []),
         ];
-  return [...findings, extraPays(input, norms)].map(single);
+  return [...findings, extraPays(input, norms, table)].map(single);
 }

@@ -26,12 +26,14 @@ export type EmploymentPhraseKey =
   | 'minimum_wage.year.hours_unknown'
   | 'minimum_wage.year.extra_pays_unknown'
   | 'minimum_wage.year.training_effective_work'
+  | 'minimum_wage.year.salary_may_have_risen'
   | 'minimum_wage.temporary.within'
   | 'minimum_wage.temporary.below'
   | 'minimum_wage.temporary.effects_unverified'
   | 'minimum_wage.temporary.hours_unknown'
   | 'minimum_wage.temporary.extra_pays_unknown'
   | 'minimum_wage.temporary.training_effective_work'
+  | 'minimum_wage.temporary.salary_may_have_risen'
   | 'minimum_wage.discontinuous_periods'
   | 'minimum_wage.total'
   | 'minimum_wage.agreement_may_pay_more'
@@ -46,6 +48,8 @@ export type EmploymentPhraseKey =
   | 'minimum_wage.payslip.not_loaded'
   | 'minimum_wage.payslip.annual_decides'
   | 'minimum_wage.payslip.prorated_count_unknown'
+  | 'minimum_wage.payslip.annual_within'
+  | 'minimum_wage.payslip.annual_unproven'
   | 'minimum_wage.payslip.none'
   | 'minimum_wage.in_kind'
   | 'minimum_wage.in_kind_rate'
@@ -195,7 +199,10 @@ type HolidaysPayPhraseKey =
   | 'extra_pays.one_may_be_prorated'
   | 'extra_pays.prorated_by_agreement'
   | 'extra_pays.in_daily_minimum'
-  | 'extra_pays.may_be_in_daily_minimum';
+  | 'extra_pays.may_be_in_daily_minimum'
+  | 'extra_pays.none_over_minimum'
+  | 'extra_pays.none_below_minimum'
+  | 'extra_pays.none_pay_unknown';
 
 type ClausePhraseKey =
   | 'clauses.months_unknown'

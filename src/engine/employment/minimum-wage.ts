@@ -1,4 +1,13 @@
-import { calendarDays, compareDates, daysInYear, max, min, toIso, type CivilDate } from '../date';
+import {
+  calendarDays,
+  compareDates,
+  daysInMonth,
+  daysInYear,
+  max,
+  min,
+  toIso,
+  type CivilDate,
+} from '../date';
 import type { Figure } from '../calculation';
 import type { NormSource } from '../law/sources';
 import { exact, round2 } from '../money';
@@ -252,6 +261,25 @@ export function contractAnnualPay(input: EmploymentInput): number | null {
   return pay === null || pay.extraPaysUnknown ? null : round2(pay.annual);
 }
 
+// The contract's salary is known to be paid only in the year it starts or is signed: later years
+// may have brought a raise, which only that year's payslips show.
+const lastYearOfContractSalary = (input: EmploymentInput): number =>
+  Math.max(input.startDate.y, input.signedOn?.y ?? input.startDate.y);
+
+// The contract's yearly pay against the yearly minimum of the year that pay is known to apply, pro
+// rata to the working time; null when either is unknown.
+export function contractAgainstMinimum(
+  input: EmploymentInput,
+  table: MinimumWageTable,
+): { readonly year: number; readonly annual: number; readonly minimum: number } | null {
+  const annual = contractAnnualPay(input);
+  const coefficient = partTimeCoefficient(input);
+  const year = lastYearOfContractSalary(input);
+  const lookup = minimumWageFor(year, table);
+  if (annual === null || coefficient === null || lookup.kind !== 'published') return null;
+  return { year, annual, minimum: round2(lookup.row.annual * coefficient) };
+}
+
 // Art. 1 of each decree and art. 12.1 ET: a shorter working time earns the minimum pro rata to the
 // agreement's full time, else to the legal 40 hours; a longer one never raises it. Null if unknown.
 export function partTimeCoefficient(input: EmploymentInput): number | null {
@@ -291,7 +319,9 @@ export type ComparisonVerdict =
   | 'hours_unknown'
   | 'extra_pays_unknown'
   // Art. 11.2.m ET: alternance training earns the minimum in proportion to effective work only.
-  | 'training_effective_work';
+  | 'training_effective_work'
+  // A year after the contract was signed: the salary may have been raised since.
+  | 'salary_may_have_risen';
 
 interface Doubts {
   readonly hoursKnown: boolean;
@@ -300,7 +330,11 @@ interface Doubts {
 }
 
 // A shortfall is certain only when nothing it rests on is in doubt.
-function verdictOf(input: EmploymentInput, shortfall: number, doubts: Doubts): ComparisonVerdict {
+function verdictOf(
+  input: EmploymentInput,
+  shortfall: number,
+  doubts: Doubts,
+): Exclude<ComparisonVerdict, 'salary_may_have_risen'> {
   if (shortfall <= 0) return 'within';
   if (!doubts.hoursKnown) return 'hours_unknown';
   if (doubts.extraPaysUnknown) return 'extra_pays_unknown';
@@ -374,12 +408,16 @@ export function compareByYear(
     const paid = round2(short ? rate : (pay?.annual ?? 0));
     const shortfall = Math.max(0, round2(minimum - paid));
     const days = daysInside(year, input.startDate, until);
-    const verdict = verdictOf(input, shortfall, {
+    const certain = verdictOf(input, shortfall, {
       hoursKnown: coefficient !== null && (short || pay !== null),
       // Art. 4.1: the floor per working day already holds the share of the extra payments.
       extraPaysUnknown: pay?.extraPaysUnknown ?? false,
       effectsVerified: row.retroactiveVerified || toIso(input.startDate) >= row.publishedOn,
     });
+    const verdict =
+      certain === 'below' && year > lastYearOfContractSalary(input)
+        ? 'salary_may_have_risen'
+        : certain;
     const accrued =
       short || input.modality === 'discontinuous'
         ? null
@@ -401,12 +439,17 @@ export function compareByYear(
 }
 
 export type PayslipVerdict =
-  | ComparisonVerdict
+  | Exclude<ComparisonVerdict, 'salary_may_have_risen'>
   // Extra payments paid apart: arts. 3.1 and 3.2 of each decree compare the year, so the month is
   // only a guide.
   | 'annual_decides'
   // Some extra payments are prorated into the month, but not how many.
   | 'prorated_count_unknown'
+  // Short in the month, but not over the year: arts. 3.1 and 3.2 of each decree and art. 27.1 ET
+  // compare the pay as a whole and over the year.
+  | 'annual_within'
+  // Short in the month, with the year's pay unknown: the rest of that year's payslips would tell.
+  | 'annual_unproven'
   | 'not_compared'
   | 'not_published'
   | 'not_loaded';
@@ -493,6 +536,56 @@ export function comparePayslips(
   });
 }
 
+// Whole calendar months of `year` the contract covered from its start to today or its end.
+function wholeMonthsCovered(input: EmploymentInput, year: number, today: CivilDate): string[] {
+  const until = min(input.endDate ?? today, today);
+  const months: string[] = [];
+  for (let m = 1; m <= MONTHS_IN_YEAR; m += 1) {
+    const first = { y: year, m, d: 1 };
+    const last = { y: year, m, d: daysInMonth(year, m) };
+    if (compareDates(first, input.startDate) >= 0 && compareDates(last, until) <= 0) {
+      months.push(`${year}-${String(m).padStart(2, '0')}`);
+    }
+  }
+  return months;
+}
+
+// The strictest answer to each doubt about the pay: what holds in it holds in every reading.
+const STRICTEST: PayWorld = { complement: 'complement_variable', hours: 'effective_hours' };
+
+// A month short of its minimum counts only when the year falls short too: the contract's salary
+// in a year it is known to apply, or, in a later year, a payslip short of the minimum for every
+// whole month the contract covered that year.
+export function payslipsAgainstYear(
+  input: EmploymentInput,
+  today: CivilDate,
+  table: MinimumWageTable,
+): readonly PayslipComparison[] {
+  const compared = comparePayslips(input, table);
+  const verdictsIn = (world: PayWorld) =>
+    new Map(
+      compareByYear(input, today, table, world).flatMap((y) =>
+        y.kind === 'compared' ? [[y.year, y.verdict] as const] : [],
+      ),
+    );
+  const favourable = verdictsIn(FAVOURABLE);
+  const strictest = verdictsIn(STRICTEST);
+  const shortMonths = new Set(compared.filter((c) => c.verdict === 'below').map((c) => c.month));
+  const yearProven = (year: number): boolean => {
+    const months = wholeMonthsCovered(input, year, today);
+    return months.length > 0 && months.every((m) => shortMonths.has(m));
+  };
+  return compared.map((c): PayslipComparison => {
+    if (c.verdict !== 'below') return c;
+    const { year } = yearAndMonth(c.month);
+    const annual = favourable.get(year);
+    if (annual === 'below') return c;
+    if (annual === 'salary_may_have_risen' && yearProven(year)) return c;
+    if (strictest.get(year) === 'within') return { ...c, verdict: 'annual_within' };
+    return { ...c, verdict: 'annual_unproven' };
+  });
+}
+
 // The findings.
 
 const decreeSource = (row: MinimumWageRow, article: string, norms: NormTable): NormSource => {
@@ -515,7 +608,7 @@ const uniqueSources = (sources: readonly NormSource[]): NormSource[] =>
 
 type Outcome = 'below' | 'review' | 'not_published' | 'within' | 'not_loaded' | 'not_compared';
 
-const outcomeOf = (verdict: PayslipVerdict): Outcome => {
+const outcomeOf = (verdict: PayslipVerdict | ComparisonVerdict): Outcome => {
   if (verdict === 'below' || verdict === 'within') return verdict;
   if (verdict === 'not_published' || verdict === 'not_loaded' || verdict === 'not_compared') {
     return verdict;
@@ -739,9 +832,9 @@ function payslipPhrase(c: PayslipComparison): EmploymentPhrase {
   return phrase(`minimum_wage.payslip.${c.verdict}`, vars);
 }
 
-function payslipFinding(input: EmploymentInput, deps: MinimumWageDeps): Finding {
+function payslipFinding(input: EmploymentInput, today: CivilDate, deps: MinimumWageDeps): Finding {
   if (input.payslips.length === 0) return finding('smi_monthly', 'not_entered');
-  const compared = comparePayslips(input, deps.minimumWage);
+  const compared = payslipsAgainstYear(input, today, deps.minimumWage);
   const below = compared.filter((c) => c.verdict === 'below');
   const total = sumOf(below.map((c) => c.shortfall));
   const calculation = compared.map(payslipPhrase);
@@ -821,7 +914,7 @@ export function assessMinimumWage(
   );
   return [
     assessContract(input, today, deps),
-    { kind: 'single', finding: payslipFinding(input, deps) },
+    { kind: 'single', finding: payslipFinding(input, today, deps) },
     ...extra,
   ];
 }
