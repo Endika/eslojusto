@@ -658,21 +658,47 @@ function contractFinding(
   );
 }
 
-const sameAmount = (a: Finding, b: Finding): boolean =>
-  a.amount?.min === b.amount?.min && a.amount?.max === b.amount?.max;
+// What each year comes to in one world: its verdict and how short it falls. A total alone hides a
+// shortfall per working day and the idle periods of a fixed-discontinuous contract, which add up
+// to no total.
+function yearOutcomes(
+  input: EmploymentInput,
+  today: CivilDate,
+  deps: MinimumWageDeps,
+  world: PayWorld,
+): string {
+  return compareByYear(input, today, deps.minimumWage, world)
+    .map((y) =>
+      y.kind === 'compared' ? `${y.year}:${y.verdict}:${y.shortfall}` : `${y.year}:${y.kind}`,
+    )
+    .join('|');
+}
 
-// Each doubt about the pay opens two readings that show only when they change the result; the
-// complement's kind comes first, read with the hours most favourable to the pay.
+// Each doubt about the pay opens two readings that show only when they change the result, year by
+// year; the complement's kind comes first, read with the hours most favourable to the pay. A
+// result that holds in every reading but by different amounts keeps both readings, so the lower
+// amount is the one counted.
 function assessContract(input: EmploymentInput, today: CivilDate, deps: MinimumWageDeps): Assessed {
+  const worldOf = (world: Partial<PayWorld>): PayWorld => ({ ...FAVOURABLE, ...world });
   const findingIn = (world: Partial<PayWorld>): Finding =>
-    contractFinding(input, today, deps, { ...FAVOURABLE, ...world });
+    contractFinding(input, today, deps, worldOf(world));
+  const outcomeIn = (world: Partial<PayWorld>): string =>
+    yearOutcomes(input, today, deps, worldOf(world));
   if (complementInDoubt(input.salary)) {
-    return readingsOf('complement_kind', 'complement_variable', (complement) =>
-      findingIn({ complement }),
+    return readingsOf(
+      'complement_kind',
+      'complement_variable',
+      (complement) => findingIn({ complement }),
+      (complement) => outcomeIn({ complement }),
     );
   }
   if (hoursInDoubt(input)) {
-    return readingsOf('paid_hours', 'effective_hours', (hours) => findingIn({ hours }));
+    return readingsOf(
+      'paid_hours',
+      'effective_hours',
+      (hours) => findingIn({ hours }),
+      (hours) => outcomeIn({ hours }),
+    );
   }
   return { kind: 'single', finding: findingIn({}) };
 }
@@ -681,14 +707,12 @@ function readingsOf<Q extends 'complement_kind' | 'paid_hours'>(
   question: Q,
   strictest: ReadingCode<Q>,
   findingIn: (world: ReadingCode<Q>) => Finding,
+  outcomeIn: (world: ReadingCode<Q>) => string,
 ): Assessed {
   const worlds: readonly ReadingCode<Q>[] = READINGS[question];
-  const strict = findingIn(strictest);
-  const agree = worlds.every((w) => {
-    const f = findingIn(w);
-    return f.status === strict.status && sameAmount(f, strict);
-  });
-  if (agree) return { kind: 'single', finding: strict };
+  const strict = outcomeIn(strictest);
+  if (worlds.every((w) => outcomeIn(w) === strict))
+    return { kind: 'single', finding: findingIn(strictest) };
   return assessAcross(question, worlds, (world) => ({
     ...findingIn(world),
     basedOnYourAnswer: true,

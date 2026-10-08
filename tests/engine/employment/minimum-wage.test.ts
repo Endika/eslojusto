@@ -678,6 +678,69 @@ describe('complements of doubtful kind', () => {
     expect(single(review(input, '2026-12-31')[0]).status).toBe('within_limit');
   });
 
+  // Both readings fall short by different amounts: neither is folded into the other, so the lower
+  // one can be counted.
+  const shortfalls = (a: Assessed | undefined) =>
+    a?.kind === 'readings'
+      ? a.readings.map((r) => [
+          r.when,
+          r.finding.status,
+          r.finding.calculation.flatMap((p) =>
+            /^minimum_wage\.(year|temporary)\.below$/.test(p.key) ? [p.vars?.['difference']] : [],
+          ),
+        ])
+      : a?.kind;
+
+  it('keeps both readings of a short contract below the daily minimum by different amounts', () => {
+    // 55 € a day, 10 € of it a complement of unknown kind, against the 57,82 € daily minimum.
+    const input = contract({
+      modality: 'production',
+      causeStated: true,
+      circumstancesStated: true,
+      startDate: day('2026-08-01'),
+      endDate: day('2026-10-15'),
+      signedOn: null,
+      salary: salary({
+        amount: 55,
+        period: 'day',
+        payments: 12,
+        breakdown: [
+          { kind: 'base', amount: 45 },
+          { kind: 'unknown', amount: 10 },
+        ],
+      }),
+      extraPays: { count: 0, prorated: false },
+    });
+    const [assessed] = review(input, '2026-10-08');
+    expect(shortfalls(assessed)).toEqual([
+      ['complement_fixed', 'below_minimum', [{ euros: 2.82 }]],
+      ['complement_variable', 'below_minimum', [{ euros: 12.82 }]],
+    ]);
+    expect(offerPass(assessed ? [assessed] : [])).toBe(true);
+  });
+
+  it('keeps both readings of a fixed-discontinuous year with no total', () => {
+    // 1.150 € a month in 14 payments, 100 € of it of unknown kind: 16.100 € or 14.700 € a year,
+    // under 17.094 € either way; the idle periods leave no total to compare.
+    const input = contract({
+      startDate: day('2026-01-01'),
+      modality: 'discontinuous',
+      discontinuous: { activityPeriod: true, hours: true, distribution: true },
+      salary: salary({
+        amount: 1150,
+        breakdown: [
+          { kind: 'base', amount: 1050 },
+          { kind: 'unknown', amount: 100 },
+        ],
+      }),
+    });
+    const [assessed] = review(input, '2026-12-31');
+    expect(shortfalls(assessed)).toEqual([
+      ['complement_fixed', 'below_minimum', [{ euros: 994 }]],
+      ['complement_variable', 'below_minimum', [{ euros: 2394 }]],
+    ]);
+  });
+
   it('offers the pass when the shortfall holds in both readings', () => {
     const assessed = review(withVariable('variable', 50), '2026-12-31');
     expect(assessed[0]?.kind).toBe('readings');
