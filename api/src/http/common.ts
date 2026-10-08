@@ -53,6 +53,7 @@ export interface Metrics {
   inputTokens?: number;
   outputTokens?: number;
   escalated?: boolean;
+  retried?: boolean;
   conflicts?: number;
   underestimated?: boolean;
   countNotSaved?: boolean;

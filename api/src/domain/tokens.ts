@@ -36,6 +36,10 @@ export const MAX_ESTIMATED_INPUT_TOKENS = 96_000;
 // (api/README.md, «Cost»).
 export const MAX_ESCALATION_INPUT_TOKENS = 43_000;
 
+// What a corrective retry adds to the input beyond the first read's input and output: the
+// tool_result naming the malformed parts and the turns around it, erring high.
+export const CORRECTION_TOKENS = 500;
+
 // A read that costs more than this many times its estimate means the estimator was fooled.
 export const UNDERESTIMATE_FACTOR = 2;
 
