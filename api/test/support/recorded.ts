@@ -23,7 +23,8 @@ export type Recording =
   | 'rental-deposit-return'
   | 'rental-injected'
   | 'rental-lease-catalan'
-  | 'rental-not-rental';
+  | 'rental-not-rental'
+  | 'rental-identifiers';
 
 export const recording = (name: Recording): string =>
   readFileSync(new URL(`../fixtures/bedrock/${name}.json`, import.meta.url), 'utf8');

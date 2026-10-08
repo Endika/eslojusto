@@ -105,4 +105,32 @@ describe('rentalMerge', () => {
     });
     expect(company.discarded).toBe(0);
   });
+
+  it('drops a copied text that still holds an identifier, and keeps the figures beside it', () => {
+    const m = pack(
+      {
+        pages: [page(1, 'lease'), page(2, 'deposit_return')],
+        lease: {
+          landlordType: f('company'),
+          landlordCompanyName: f('Pisos de Mentira S.L., ES00 2100 0418 4502 0005 1332'),
+          feesText: f('Honorarios a cargo de la parte arrendadora.'),
+          chargesClauseText: f('Comunidad a cargo del inquilino; dudas al 600 123 456.'),
+          updateClauseText: f('Se actualizará según el IRAV.'),
+        },
+        deposit_return: {
+          deductions: [
+            { amount: 150, kind: 'cleaning', concept: 'Limpieza final', confidence: 'high' },
+            { amount: 90, kind: 'other', concept: 'Pago a NIE X1234567A', confidence: 'high' },
+          ],
+        },
+      },
+      2,
+    );
+    expect(Object.keys(m.fields).sort()).toEqual(['feesText', 'landlordType', 'updateClauseText']);
+    expect(m.lists.deductions?.map((d) => d.values)).toEqual([
+      { amount: 150, kind: 'cleaning', concept: 'Limpieza final' },
+      { amount: 90, kind: 'other' },
+    ]);
+    expect(m.discarded).toBe(3);
+  });
 });
