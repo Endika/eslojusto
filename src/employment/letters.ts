@@ -3,14 +3,15 @@ import type { InformationMoment } from '../engine/employment/information-duty';
 import { compareByYear, type YearComparison } from '../engine/employment/minimum-wage';
 import { LAW_QUOTES } from '../engine/employment/quotes';
 import type { EmploymentDeps, EmploymentReview } from '../engine/employment/review';
+import { isFixedTerm } from '../engine/employment/term';
 import { ruleSource } from '../engine/employment/rules';
 import type {
   Assessed,
+  EmploymentInput,
   Finding,
   FindingId,
   FindingStatus,
   InfoElement,
-  ItemId,
 } from '../engine/employment/types';
 import { formatEuros } from '../calculator/number';
 import { longDate, type LetterDetails, type LetterKind } from '../documents/letter';
@@ -87,21 +88,40 @@ export function pointsToReview(review: EmploymentReview): readonly Finding[] {
   );
 }
 
-const TEMPORALITY_ITEMS: ReadonlySet<ItemId> = new Set(['modality', 'chaining']);
+// The limits and requirements art. 15 ET sets on fixed-term contracts: the cause, the duration,
+// the extensions, the replacement, the abolished modalities and the chaining. Training contracts,
+// fixed-discontinuous ones and the written form of an open-ended contract are other rules.
+const FIXED_TERM_RULES: ReadonlySet<FindingId> = new Set([
+  'fixed_term_presumption',
+  'production_6_months',
+  'production_1_year',
+  'production_one_extension',
+  'production_occasional_90',
+  'production_occasional_agrifood_120',
+  'replacement_name_cause',
+  'replacement_selection_3_months',
+  'abolished_modalities',
+  'permanent_on_breach',
+  'chaining_18_in_24',
+]);
 const TEMPORALITY_STATUSES: ReadonlySet<FindingStatus> = new Set([
   'becomes_permanent',
   'over_legal_limit',
   'missing_requirement',
 ]);
-const isTemporality = (f: Finding): boolean =>
-  TEMPORALITY_ITEMS.has(f.item) && TEMPORALITY_STATUSES.has(f.status) && !f.agreementMaySetOther;
 
-// A fixed-term finding on the modality or the chaining that holds in every reading: the only case
-// in which the certificate of art. 15.9 ET is offered.
-export const hasTemporalityFinding = (review: EmploymentReview): boolean =>
+const isTemporality = (f: Finding, input: EmploymentInput): boolean =>
+  !f.agreementMaySetOther &&
+  (f.status === 'becomes_permanent' ||
+    (TEMPORALITY_STATUSES.has(f.status) &&
+      (FIXED_TERM_RULES.has(f.id) || (f.id === 'written_form' && isFixedTerm(input.modality)))));
+
+// A finding about the fixed-term contract that holds in every reading: the only case in which the
+// certificate of art. 15.9 ET is offered.
+export const hasTemporalityFinding = ({ review, input }: CompletedEmploymentReview): boolean =>
   review.items.some((a) => {
     const findings = findingsOf(a);
-    return findings.length > 0 && findings.every(isTemporality);
+    return findings.length > 0 && findings.every((f) => isTemporality(f, input));
   });
 
 export interface EmploymentLetterKinds {
@@ -124,7 +144,7 @@ export function employmentLetterKinds(
         : [],
     free: [
       ...(missingInformation(review) !== null ? (['information_request'] as const) : []),
-      ...(hasTemporalityFinding(review) ? (['temporary_contracts_certificate'] as const) : []),
+      ...(hasTemporalityFinding(r) ? (['temporary_contracts_certificate'] as const) : []),
     ],
   };
 }
