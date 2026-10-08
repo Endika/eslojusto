@@ -1303,6 +1303,8 @@ export const es = {
     'Los recibos traen otros importes, como suministros, que no se pasan a la hoja de gastos: si alguno es un gasto de la vivienda, añádelo tú.',
   'client.rental.documents.receipt_duplicate':
     'Hay recibos del mismo mes que no dicen lo mismo: se ha usado uno de ellos. Compara las cifras de ese mes con tus recibos.',
+  'client.rental.documents.gap_unclear':
+    'Entre el recibo de {desde} ({antes}) y el de {hasta} ({despues}) la renta cambió, pero en medio hubo más de un aniversario, así que pudo subir más de una vez. No se ha pasado a la hoja de subidas: sube los recibos o avisos de esos meses, o añade tú cada subida.',
   'client.rental.documents.decrease':
     'Tus documentos muestran que la renta bajó en algún momento. Una bajada no es una subida, así que no se pasa a la hoja de subidas.',
   'client.rental.documents.check.return_before_keys':

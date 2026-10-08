@@ -1,4 +1,4 @@
-import { formatAmountInput } from '../calculator/number';
+import { formatAmountInput, formatEuros } from '../calculator/number';
 import {
   RENTAL_CHECKS,
   type Confidence,
@@ -22,6 +22,7 @@ import {
   GUARANTEE_KINDS,
   UPDATE_CLAUSES,
 } from './form';
+import { monthText } from './render';
 import { ROW_MAX, rowField, type RowList } from './rows';
 
 // The questions beside which the contract's own words are shown, so the person can check the
@@ -150,6 +151,16 @@ interface RentChange {
   readonly confidence: Confidence;
   // The month of the receipt before it, when months between them are missing.
   readonly gapAfter: string | null;
+  // The missing months hold two anniversaries or more, so it may be more than one rise.
+  readonly unclear: boolean;
+}
+
+// How many anniversaries fall in the months after `after` up to `month`.
+function anniversariesBetween(start: CivilDate, after: string, month: string): number {
+  let n = 0;
+  for (let y = start.y + 1; y * 12 + start.m <= monthIndex(month); y += 1)
+    if (y * 12 + start.m > monthIndex(after)) n += 1;
+  return n;
 }
 
 const sameRent = (a: number, b: number) => Math.abs(a - b) < 0.005;
@@ -184,13 +195,15 @@ export function rentChanges(
       monthIndex(after.month) === monthIndex(r.month) + 1 &&
       sameRent(after.rent, current.rent);
     if (oneOff) return;
-    const gap = monthIndex(r.month) - monthIndex(sorted[i - 1]?.month ?? r.month) > 1;
+    const before = sorted[i - 1]?.month ?? r.month;
+    const gap = monthIndex(r.month) - monthIndex(before) > 1;
     changes.push({
       month: r.month,
       previous: current.rent,
       next: r.rent,
       confidence: gap ? 'low' : lowest(r.confidence, current.confidence),
-      gapAfter: gap ? (sorted[i - 1]?.month ?? null) : null,
+      gapAfter: gap ? before : null,
+      unclear: gap && start !== null && anniversariesBetween(start, before, r.month) >= 2,
     });
     current = r;
   });
@@ -364,8 +377,10 @@ const isDecrease = (r: Rise) => r.previous !== null && r.next !== null && r.next
 // Each notice, with the first receipt at its new rent (within a euro, or else in the month it
 // applies from) as the month it was charged from; a change in the receipts no notice speaks of is
 // a rise of its own.
+// A change across two anniversaries or more is left to the person: it is never a row of its own,
+// nor what a notice is matched to.
 function rises(notices: readonly ExtractedRow[], changes: readonly RentChange[]): Rise[] {
-  const unmatched = [...changes];
+  const unmatched = changes.filter((c) => !c.unclear);
   const take = (found: (c: RentChange) => boolean) => {
     const at = unmatched.findIndex(found);
     return at >= 0 ? unmatched.splice(at, 1)[0] : undefined;
@@ -595,7 +610,18 @@ export function rentalPrefill(
   fees(a, e.invoices, checks.includes('invoice_total_mismatch'));
   const start = dateOf(e.fields.startDate?.value) ?? dateOf(answers['startDate']);
   const receipts = receiptsByMonth(e.receipts);
-  const decrease = updates(a, rises(e.notices, rentChanges(receipts.months, start)), start);
+  const changes = rentChanges(receipts.months, start);
+  const decrease = updates(a, rises(e.notices, changes), start);
+  const unclear = changes
+    .filter((c) => c.unclear)
+    .map((c) =>
+      tr('client.rental.documents.gap_unclear', {
+        desde: monthText(c.gapAfter ?? c.month),
+        antes: formatEuros(c.previous),
+        hasta: monthText(c.month),
+        despues: formatEuros(c.next),
+      }),
+    );
   const charged = charges(a, e.charges, receipts.months);
   moveOut(a, e.fields.keysReturnedOn, e.returns, e.deductions);
 
@@ -620,6 +646,7 @@ export function rentalPrefill(
       ...(charged.fromReceipts ? [tr('client.rental.documents.receipt_sums')] : []),
       ...(charged.otherLines ? [tr('client.rental.documents.receipt_other_lines')] : []),
       ...(receipts.disagree ? [tr('client.rental.documents.receipt_duplicate')] : []),
+      ...unclear,
       ...(decrease ? [tr('client.rental.documents.decrease')] : []),
       ...(a.cut ? [tr('client.rental.documents.rows_cut')] : []),
       ...RENTAL_CHECKS.filter((c) => checks.includes(c)).map((c) =>
