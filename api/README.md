@@ -588,9 +588,8 @@ had to send at 1280 or 1100 px (above, «Payload budget») costs less, not more.
 A rental read has the same bounds: up to 25 images and `max_tokens` 5,000, with a smaller prompt
 (11,000 tokens), so its largest pack, 25 × 1568 × 1568, is 92,975 in and 0.39 USD, and its worst
 case is the same **0.40 USD** with Sonnet 4.6. A contract runs to 6–20 pages; with its notices and
-receipts a pack fills the 25. Should the rental evaluation see reads stop at `max_tokens` (36
-receipts and long clause texts are the largest records), the cap goes up only with approval, and
-this bound with it.
+receipts a pack fills the 25. If rental reads stop at `max_tokens` (36 receipts and long clause
+texts are the largest records), raise `maxTokens` and this bound with it.
 
 **Worst case: 0.40 USD per read** (95,975 × 3.30 USD/M + 5,000 × 16.50 USD/M = 0.399), for any
 review and any input: the API takes images only, priced by their pixels, and refuses anything above 96,000
