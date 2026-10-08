@@ -264,6 +264,38 @@ describe('rises', () => {
     expect(mark(p, 'updates.0.year')?.confidence).toBe('low');
   });
 
+  describe('across a gap in the receipts', () => {
+    const gapped = (later: number, month = '2026-01') =>
+      prefill({
+        fields: { ...lease, signedOn: f('2023-01-20'), startDate: f('2023-02-01') },
+        receipts: [row({ month: '2024-01', rent: 1000 }), row({ month, rent: later })],
+      });
+
+    it.each([1060, 1090])(
+      'with two anniversaries or more, prefill no rise to %s and say what changed',
+      (later) => {
+        const p = gapped(later);
+        expect(entry(p, 'hasUpdates')).toBeUndefined();
+        expect(p.entries.some(([n]) => n.startsWith('updates.'))).toBe(false);
+        const note = p.notes.find((n) => n.startsWith('Entre el recibo'));
+        expect(note).toMatch(
+          new RegExp(
+            `^Entre el recibo de enero de 2024 \\(1\\.000,00\\s€\\) y el de enero de 2026 \\(1\\.0${later - 1000},00\\s€\\) la renta cambió, pero en medio hubo más de un aniversario`,
+          ),
+        );
+      },
+    );
+
+    it('with one anniversary, prefill the rise as before', () => {
+      const p = gapped(1030, '2025-01');
+      expect(p.entries.filter(([n]) => /^updates\.\d\.(year|newRent)$/.test(n))).toEqual([
+        ['updates.0.year', '2024'],
+        ['updates.0.newRent', '1.030,00'],
+      ]);
+      expect(p.notes.some((n) => n.startsWith('Entre el recibo'))).toBe(false);
+    });
+  });
+
   it('keep every change in sparse receipts, one a year', () => {
     const sparse = {
       fields: { ...lease, signedOn: f('2023-01-20'), startDate: f('2023-02-01') },
