@@ -84,6 +84,8 @@ export default defineConfig({
             name: 'documents',
             use: { ...devices['Desktop Chrome'] },
             testMatch: /documents\.spec\.ts/,
+            // Reading prepares every page in the browser first, slower than the default wait on CI.
+            expect: { timeout: 15_000 },
           },
         ]
       : []),
