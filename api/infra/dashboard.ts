@@ -124,6 +124,29 @@ const logQuery = (
 
 const flag = (name: string) => `sum(@message like /"${name}":true/)`;
 
+// REVIEWS in src/domain/reviews.ts (test/infra.test.ts keeps them equal); the log names no review
+// for the final pay's reads.
+const REVIEW_LABELS: Readonly<Record<string, string>> = {
+  final_pay: 'finiquito',
+  rental: 'alquiler',
+  employment: 'contrato',
+};
+const byReview = 'fields coalesce(review, "final_pay") as revision';
+
+// The log sums the tokens of a read and its escalation without naming the model; with two prices,
+// the dearer one bounds the cost from above.
+function logTokenPrice(): { readonly input: number; readonly output: number } {
+  const prices = [...new Set([PRIMARY_MODEL, ESCALATION_MODEL])].map((model) => {
+    const price = MODEL_PRICES_USD_PER_MTOK[model];
+    if (!price) throw new Error(`No price for ${model} in MODEL_PRICES_USD_PER_MTOK`);
+    return price;
+  });
+  return {
+    input: Math.max(...prices.map((p) => p.input)),
+    output: Math.max(...prices.map((p) => p.output)),
+  };
+}
+
 export function addDashboard(
   stack: Stack,
   budget: { readonly monthlyUsd: number; readonly name: string },
@@ -328,6 +351,114 @@ export function addDashboard(
           `${flag('truncated')} as recortadas, ` +
           'avg(pages) as paginasMedias, avg(inputTokens) as tokensEntrada, ' +
           'avg(outputTokens) as tokensSalida',
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+    ),
+  );
+
+  dashboard.addWidgets(
+    logQuery(
+      'Lecturas por revisión (por hora)',
+      ['extract'],
+      [
+        extract,
+        byReview,
+        `stats ${Object.entries(REVIEW_LABELS)
+          .map(([r, label]) => `sum(revision = "${r}") as ${label}`)
+          .join(', ')} by bin(1h)`,
+      ],
+      cw.LogQueryVisualizationType.STACKEDAREA,
+    ),
+    logQuery(
+      'Lecturas por revisión: resultados',
+      ['extract'],
+      [
+        extract,
+        byReview,
+        'stats count(*) as lecturas, sum(code = "ok") as ok, sum(code = "nothing_read") as sinDatos, ' +
+          'sum(code not in ["ok", "nothing_read"]) as otros by revision',
+        'sort lecturas desc',
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+    ),
+  );
+
+  dashboard.addWidgets(
+    logQuery(
+      'Lecturas sin datos por revisión y motivo (páginas)',
+      ['extract'],
+      [
+        `${extract} and code = "nothing_read"`,
+        byReview,
+        `stats count(*) as lecturas, ${reasons
+          .map(([reason, name]) => `sum(readability.${reason}) as ${name}`)
+          .join(', ')} by revision`,
+        'sort lecturas desc',
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+      18,
+    ),
+    logQuery(
+      '% lecturas sin datos por revisión',
+      ['extract'],
+      [
+        answered,
+        byReview,
+        'stats 100 * sum(code = "nothing_read") / count(*) as porcentaje, ' +
+          'sum(code = "nothing_read") as sinDatos, count(*) as respondidas by revision',
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+      6,
+    ),
+  );
+
+  const price = logTokenPrice();
+  const cost = (per: string) =>
+    `sum(inputTokens) * ${price.input} / 1000000${per} + sum(outputTokens) * ${price.output} / 1000000${per}`;
+  const read = `${extract} and ispresent(inputTokens)`;
+  dashboard.addWidgets(
+    logQuery(
+      'Conflictos y escalados por revisión',
+      ['extract'],
+      [
+        extract,
+        byReview,
+        `stats count(*) as lecturas, sum(conflicts > 0) as conConflictos, sum(conflicts) as conflictos, ${flag('escalated')} as escaladas by revision`,
+        'sort lecturas desc',
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+    ),
+    logQuery(
+      'Contrato: lecturas con listas recortadas (por día)',
+      ['extract'],
+      [
+        `${extract} and review = "employment" and code = "ok"`,
+        `stats count(*) as lecturas, ${flag('truncated')} as recortadas by bin(1d)`,
+        'sort @timestamp desc',
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+    ),
+  );
+
+  dashboard.addWidgets(
+    logQuery(
+      'Tokens p95 por revisión',
+      ['extract'],
+      [
+        read,
+        byReview,
+        'stats count(*) as lecturas, pct(inputTokens, 95) as entradaP95, ' +
+          'pct(outputTokens, 95) as salidaP95 by revision',
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+    ),
+    logQuery(
+      'Coste IA por lectura y revisión (USD)',
+      ['extract'],
+      [
+        read,
+        byReview,
+        `stats count(*) as lecturas, ${cost('')} as coste, ${cost(' / count(*)')} as costePorLectura by revision`,
       ],
       cw.LogQueryVisualizationType.TABLE,
     ),
