@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.22.0](https://github.com/Endika/eslojusto/compare/v1.21.0...v1.22.0) (2026-10-08)
+
+
+### Features
+
+* **documents:** take the employment fields, lists, checks and cut lists from the API ([5b1eec3](https://github.com/Endika/eslojusto/commit/5b1eec3e5223d6d97c447e9fa5abefb4f59c2aa5))
+* **employment:** read contracts, payslips and work histories to prefill the review ([4aab453](https://github.com/Endika/eslojusto/commit/4aab453ed51a1aae66c7438c0660c14536085e70))
+* **engine:** leave chaining to review when older contracts may be missing from the history ([6b24252](https://github.com/Endika/eslojusto/commit/6b24252d07e2c208ceec0e44e2c8ab9c2b2f1b8e))
+
+
+### Bug Fixes
+
+* **employment:** leave doubtful reads to the person: prorated extras, causes, days and cut lists ([ffcfc03](https://github.com/Endika/eslojusto/commit/ffcfc032e41bb04b2569516569944cac84910929))
+
 ## [1.21.0](https://github.com/Endika/eslojusto/compare/v1.20.0...v1.21.0) (2026-10-08)
 
 
