@@ -107,6 +107,36 @@ test('the guide explains the benefit with its law, and the FAQ and JSON-LD carry
   }
 });
 
+test('the FAQ and its JSON-LD cover ERE, the unknown cause, ERTE, null dismissal and late interest', async ({
+  page,
+}) => {
+  await page.goto('finiquito/');
+  const guide = page.getByRole('article');
+  const faq = (await data(page))['@graph'].find((n) => n['@type'] === 'FAQPage') as {
+    mainEntity: { name: string; acceptedAnswer: { text: string } }[];
+  };
+  const summaries = guide.locator('.faq-item summary');
+  await expect(summaries).toHaveCount(faq.mainEntity.length);
+  for (const [i, q] of faq.mainEntity.entries()) await expect(summaries.nth(i)).toHaveText(q.name);
+  for (const [anchor, question] of [
+    ['faq-ere', '¿Cuánto es la indemnización en un despido colectivo (ERE)?'],
+    ['faq-erte', '¿Y si me despiden durante un ERTE?'],
+    ['faq-sin_causa', '¿Y si no sé cómo terminó mi contrato?'],
+    ['faq-nulo', '¿Cuándo puede ser nulo un despido?'],
+    ['faq-intereses', '¿Y si todavía no me han pagado el finiquito?'],
+  ] as const) {
+    const item = guide.locator(`#${anchor}`);
+    await item.locator('summary').click();
+    await expect(item.locator('summary')).toHaveText(question);
+    const answer = faq.mainEntity.find((q) => q.name === question)?.acceptedAnswer.text;
+    expect(answer).toBeTruthy();
+    await expect(item.locator('p')).toHaveText(answer ?? '');
+  }
+  await expect(
+    guide.getByRole('heading', { name: 'Finiquito por despido colectivo (ERE)' }),
+  ).toBeVisible();
+});
+
 test('an address that does not exist gives the 404 page, unindexed and with a way out', async ({
   page,
 }) => {

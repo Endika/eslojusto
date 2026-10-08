@@ -32,6 +32,11 @@ const causes: { title: string; rule: string; citation: string; page?: LandingId 
     page: 'objective_dismissal',
   },
   {
+    title: tx('guide.collective_dismissal'),
+    rule: 'Como mínimo, lo mismo que un despido objetivo: 20 días por año, con un tope de 12 mensualidades, y 15 días de preaviso. El acuerdo del ERE puede mejorarlo, y suele hacerlo; la revisión no lo conoce y da el mínimo.',
+    citation: 'Art. 51.2, 51.4 y 53.1 ET',
+  },
+  {
     title: tx('guide.fixed_term_end'),
     rule: '12 días por año, en proporción a los días trabajados. Si empezó en 2011 o antes, 8 días; en 2012, 9; en 2013, 10; en 2014, 11. Los contratos de sustitución y los formativos no tienen indemnización, ni los firmados antes del 4 de marzo de 2001. Si duró más de un año, 15 días de preaviso.',
     citation: 'Art. 49.1.c ET y DT 8.ª',
@@ -56,6 +61,7 @@ const unchecked = [
   'Pagas extra además de las dos ordinarias.',
   'Si la causa del despido está justificada, algo que decide un juzgado.',
   'Los salarios de tramitación.',
+  'Lo que el acuerdo de un ERE mejore sobre el mínimo legal.',
 ];
 
 // The case pages, in the order of the map: the finiquito ones, then the pages on the benefit.
@@ -232,7 +238,8 @@ const benefitSources = [
         Se cuenta en días de salario. El salario diario es tu salario anual, con las pagas extra,
         entre 365, como hace la guía del CGPJ. En el ejemplo, 21.000&nbsp;€ / 365 ≈ 57,53&nbsp;€.
         Los ejemplos multiplican por la cifra exacta, sin redondear. En los despidos, el tiempo
-        trabajado se cuenta en meses, y una fracción de mes cuenta como un mes entero.
+        trabajado se cuenta en meses, y una fracción de mes cuenta como un mes entero. Si te
+        despiden durante un ERTE, se cuenta con el salario completo de antes del ERTE.
       </p>
       <div class="causes">
         {causes.map(({ title, rule, citation, page }) => (
@@ -258,7 +265,7 @@ const benefitSources = [
         690,41&nbsp;€.
       </p>
       <p class="folio">
-        Art. <span>49 · 53 · 56</span> ET
+        Art. <span>49 · 51 · 53 · 56</span> ET
       </p>
     </section>
 
@@ -364,19 +371,21 @@ const benefitSources = [
       <h3 id="g-plazos">{tx('guide.deadlines')}</h3>
       <p>
         Para cantidades como el salario pendiente, las vacaciones, las pagas extra o la
-        indemnización por fin de contrato temporal, el plazo es de un año (art. 59.1 ET).
+        indemnización por fin de contrato temporal, el plazo es de un año (art. 59.1 ET). Si la
+        empresa aún no te ha pagado, lo que es salario lleva un interés por el retraso del 10&nbsp;%
+        al año (art. 29.3 ET); la indemnización, no.
       </p>
       <p>
-        En un despido (objetivo, improcedente o disciplinario), el plazo para impugnarlo es de 20
-        días hábiles (art. 59.3 ET). Quien no esté de acuerdo con la indemnización de un despido
-        suele plantearlo por esa misma vía, dentro de esos 20 días.
+        En un despido (objetivo, colectivo, improcedente o disciplinario), el plazo para impugnarlo
+        es de 20 días hábiles (art. 59.3 ET). Quien no esté de acuerdo con la indemnización de un
+        despido suele plantearlo por esa misma vía, dentro de esos 20 días.
       </p>
       <p>
         El plazo es corto, y un despacho laboralista, un despacho de graduado social o un sindicato
         pueden decirte cuál se aplica a tu caso.
       </p>
       <p class="folio">
-        Art. <span>59</span> ET
+        Art. <span>29.3 · 59</span> ET
       </p>
     </section>
 
@@ -404,8 +413,8 @@ const benefitSources = [
       </p>
       <ul>
         <li>
-          Un despido objetivo, improcedente o disciplinario sí lo es (art. 267.1.a LGSS). El
-          disciplinario también cuenta aunque se declare procedente o no se impugne (art. 268.4
+          Un despido objetivo, colectivo, improcedente o disciplinario sí lo es (art. 267.1.a LGSS).
+          El disciplinario también cuenta aunque se declare procedente o no se impugne (art. 268.4
           LGSS).
         </li>
         <li>
