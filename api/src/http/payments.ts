@@ -8,6 +8,7 @@ import {
   type VerifyMemo,
 } from '../domain/payments';
 import type { CaptchaVerifier, CheckoutCreator, Clock, Logger } from '../domain/ports';
+import type { ReviewKind } from '../domain/reviews';
 import { handle, type HttpEvent, type HttpResponse } from './common';
 
 const MAX_TOKEN_LENGTH = 2048;
@@ -22,15 +23,17 @@ export function handleCheckout(
   },
 ): Promise<HttpResponse> {
   return handle('checkout', event, deps, async (body) => {
-    const { nonce, captchaToken } = body;
+    const { nonce, captchaToken, returnTo } = body;
     if (
       !isNonce(nonce) ||
       typeof captchaToken !== 'string' ||
       captchaToken.length === 0 ||
-      captchaToken.length > MAX_TOKEN_LENGTH
+      captchaToken.length > MAX_TOKEN_LENGTH ||
+      (returnTo !== undefined && returnTo !== 'rental')
     )
       return { code: 'invalid_request' };
-    return startCheckout(nonce, captchaToken, deps);
+    const review: ReviewKind = returnTo ?? 'final_pay';
+    return startCheckout(nonce, captchaToken, deps, review);
   });
 }
 

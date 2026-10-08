@@ -9,6 +9,7 @@ import type {
   PaymentVerifier,
   SessionSnapshot,
 } from '../../src/domain/ports';
+import type { ReviewKind } from '../../src/domain/reviews';
 
 export const PRIMARY = 'primary-model';
 export const ESCALATION = 'escalation-model';
@@ -63,9 +64,11 @@ export class MemoryLogger implements Logger {
 
 export class FakeCheckout implements CheckoutCreator {
   readonly nonces: string[] = [];
+  readonly returns: ReviewKind[] = [];
   constructor(private readonly fail = false) {}
-  async create(nonce: string) {
+  async create(nonce: string, returnTo: ReviewKind) {
     this.nonces.push(nonce);
+    this.returns.push(returnTo);
     if (this.fail) throw new Error('Stripe is down');
     return {
       sessionId: `cs_test_${nonce.replace(/[^A-Za-z0-9]/g, '')}`,
