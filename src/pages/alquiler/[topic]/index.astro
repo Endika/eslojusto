@@ -1,0 +1,19 @@
+---
+import type { GetStaticPaths } from 'astro';
+import RentalTopic from '../../../views/RentalTopic.astro';
+import { RENTAL_BUILD } from '../../../content/sections';
+import { TOPIC_IDS, TOPIC_PATH, type TopicId } from '../../../content/rental-topics';
+
+// Without PUBLIC_RENTAL=1 the build has none of these pages.
+export const getStaticPaths = (() =>
+  RENTAL_BUILD
+    ? TOPIC_IDS.map((id) => ({
+        params: { topic: TOPIC_PATH[id].split('/')[2] },
+        props: { id },
+      }))
+    : []) satisfies GetStaticPaths;
+
+const { id } = Astro.props as { id: TopicId };
+---
+
+<RentalTopic id={id} />

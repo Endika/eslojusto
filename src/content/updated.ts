@@ -24,6 +24,13 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/paro/por-tiempo-trabajado/': '2026-10-07',
   '/paro/baja-voluntaria/': '2026-10-07',
   '/paro/despido-disciplinario/': '2026-10-07',
-  ...(rentalBuild ? { '/alquiler/': '2026-10-08' } : {}),
+  ...(rentalBuild
+    ? {
+        '/alquiler/': '2026-10-08',
+        '/alquiler/subida/': '2026-10-08',
+        '/alquiler/decreto-2026/': '2026-10-08',
+        '/alquiler/honorarios-inmobiliaria/': '2026-10-08',
+      }
+    : {}),
   ...(employmentBuild ? { '/contrato/': '2026-10-08' } : {}),
 };

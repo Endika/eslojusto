@@ -2814,6 +2814,11 @@ export const es = {
   'rental.guide.regional.lodging':
     'Las comunidades pueden obligar al casero a depositar la fianza en un organismo público (disposición adicional 3.ª LAU). Es una obligación del casero con la administración: no cambia lo que pagas.',
 
+  'rental.guide.pages': 'Guías',
+  'rental.guide.pages.subida': 'Cuánto te pueden subir el alquiler en 2026',
+  'rental.guide.pages.decreto': 'Decreto del alquiler 2026: qué cambia y en qué estado está',
+  'rental.guide.pages.honorarios':
+    '¿Puede la inmobiliaria cobrarte a ti? Honorarios en el alquiler',
   'rental.guide.faq': 'Preguntas frecuentes',
   'rental.faq.agency_fees': '¿Me pueden cobrar honorarios de agencia?',
   'rental.faq.agency_fees_answer':

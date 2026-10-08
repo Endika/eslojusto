@@ -11,6 +11,7 @@ import {
   monthRows,
 } from '../content/rent-indices';
 import { legalInterestSummary, rentalGuide } from '../content/rental-guide';
+import { TOPIC_IDS, TOPIC_PATH } from '../content/rental-topics';
 import { rentalFaqEntries } from '../content/rental-faq';
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
@@ -115,6 +116,17 @@ const faq = rentalFaqEntries(lang, NORMS, { documents, checkedOn });
         </ul>
       </section>
     ))}
+
+    <nav class="sheet sheet--text" aria-labelledby="g-guias">
+      <h2 id="g-guias">{tx('rental.guide.pages')}</h2>
+      <ul class="next-pages">
+        {TOPIC_IDS.map((id) => (
+          <li>
+            <a href={link(lang, TOPIC_PATH[id].slice(1))}>{tx(`rental.guide.pages.${id}`)}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
 
     <section class="sheet sheet--text">
       <h2 id="g-preguntas">{tx('rental.guide.faq')}</h2>
