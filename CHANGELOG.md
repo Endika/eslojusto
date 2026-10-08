@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.23.0](https://github.com/Endika/eslojusto/compare/v1.22.0...v1.23.0) (2026-10-08)
+
+
+### Features
+
+* **analytics:** measure the rental review with closed codes ([018669a](https://github.com/Endika/eslojusto/commit/018669aa0a99847a19d8036a4f3acd49631f3f4b))
+* **rental:** explain the rules and answer common questions on /alquiler/ ([cdb8cc3](https://github.com/Endika/eslojusto/commit/cdb8cc3214d05e07da71002064db5d50e320ab94))
+
+
+### Bug Fixes
+
+* **content:** cite the benefit's norms in its footer and give the legal pages the general note ([398008a](https://github.com/Endika/eslojusto/commit/398008a417e5b2ba3f6498cfd9c31ccb05f00dbd))
+* **content:** name each section's norms in the footer and date the final pay's FAQ change ([81b7744](https://github.com/Endika/eslojusto/commit/81b7744f43a6460516841af3346d639a8a22fdff))
+* **rental:** cite the charges pact before RDL 29/2026 and name its extension in the RDL 28 sentence ([9903ff5](https://github.com/Endika/eslojusto/commit/9903ff58830eeb9c8294a206b5f7f9dd289bb93f))
+* **rental:** follow art. 20's renumbering, the extension's conditions and repeals in the guide ([488c70a](https://github.com/Endika/eslojusto/commit/488c70a039d3c9c241e24e1471b02d060a6bb420))
+
 ## [1.22.0](https://github.com/Endika/eslojusto/compare/v1.21.0...v1.22.0) (2026-10-08)
 
 
