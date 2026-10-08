@@ -1295,7 +1295,7 @@ export const es = {
   'employment.unit.months': 'Meses',
   'employment.trial.technical': '¿Eres técnico titulado?',
   'employment.trial.technical_hint':
-    'Con un título universitario o de formación profesional superior, y trabajas en funciones de ese título. Cuenta para el periodo de prueba y para el pacto de no competencia.',
+    'Con un título universitario o de formación profesional superior, y trabajas en funciones de ese título.',
   'employment.trial.small_company': '¿Tu empresa tiene menos de 25 personas en plantilla?',
   'employment.trial.same_duties': '¿Ya habías hecho este mismo trabajo en esta empresa?',
   'employment.trial.after_training': '¿Vienes de un contrato formativo en esta empresa?',
@@ -1536,10 +1536,13 @@ export const es = {
     'Depende de si los complementos cuentan para el SMI:',
   'client.employment.question.paid_hours':
     'Depende de si las horas al año incluyen el descanso pagado:',
+  'client.employment.question.technical_post': 'Depende de si tu puesto es técnico (art. 21.2):',
   'client.employment.question.technical_and_staff':
     'Depende de si eres técnico titulado y del tamaño de tu empresa:',
   'client.employment.reading.technical': 'Si eres técnico titulado',
   'client.employment.reading.not_technical': 'Si no lo eres',
+  'client.employment.reading.technical_post': 'Si tu puesto es técnico',
+  'client.employment.reading.not_technical_post': 'Si no lo es',
   'client.employment.reading.under_25_staff': 'Con menos de 25 personas',
   'client.employment.reading.from_25_staff': 'Con 25 personas o más',
   'client.employment.reading.cutoff_2021_12_31': 'Si cuenta el vigente el 31-12-2021',
