@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createHmacSigner } from '../src/adapters/hmac-signer';
-import { SONNET_4_6 } from '../src/config';
+import { HAIKU_4_5, SONNET_4_6 } from '../src/config';
 import type { DocumentFile } from '../src/domain/documents';
 import { extract, type ExtractDeps, type ExtractMetrics } from '../src/domain/extract';
 import { FakeCaptcha, FakeClock, FakePayments } from './support/fakes';
@@ -166,6 +166,33 @@ describe('a rental read', () => {
     expect(extraction.lists).toEqual({});
     expect(extraction.pages.map((p) => p.page)).toEqual([1]);
     expect(JSON.stringify(extraction)).not.toMatch(/99999|Fulanito|abusive|admin|exfiltrate/);
+  });
+
+  it('drops a copied text that slipped through with identifiers, and doubts the read', async () => {
+    const { reader, requests } = recordedReader({
+      [SONNET_4_6]: 'rental-identifiers',
+      [HAIKU_4_5]: 'rental-identifiers',
+    });
+    const { deps } = setup('rental-identifiers');
+    const response = await extract(
+      {
+        files: [photo],
+        captchaToken: 'turnstile-token',
+        allowance: { type: 'free', token: null },
+        review: 'rental',
+      },
+      { ...deps, reader, models: { primary: HAIKU_4_5, escalation: SONNET_4_6 } },
+      {},
+    );
+    if (response.code !== 'ok') throw new Error(response.code);
+    expect(Object.keys(response.extraction.fields).sort()).toEqual([
+      'initialRent',
+      'landlordType',
+      'signedOn',
+    ]);
+    expect(JSON.stringify(response)).not.toMatch(/Fulano|12345678A|ES00|600123456|@/);
+    // A discard is a doubt, so a second model reads the pack again.
+    expect(requests.map((r) => r.modelId)).toEqual([HAIKU_4_5, SONNET_4_6]);
   });
 
   it('answers nothing_read for a page that is no rental document', async () => {

@@ -1,4 +1,6 @@
 import type { Reading, Section } from './extraction';
+import type { SectionKind } from './extraction-schema';
+import { hasIdentifier } from './identifiers';
 import {
   groupDocuments,
   mergeFields,
@@ -59,21 +61,68 @@ export interface RentalMerged {
 
 // The landlord's name is kept only for a company: a person's name is personal data the review
 // has no use for, whatever the model was told.
-function withoutPersonsName(lease: Section): { readonly lease: Section; readonly dropped: number } {
+function withoutPersonsName(lease: Section): {
+  readonly section: Section;
+  readonly dropped: number;
+} {
   const { landlordCompanyName, ...fields } = lease.fields;
   if (landlordCompanyName === undefined || lease.fields['landlordType']?.value === 'company')
-    return { lease, dropped: 0 };
-  return { lease: { ...lease, fields }, dropped: 1 };
+    return { section: lease, dropped: 0 };
+  return { section: { ...lease, fields }, dropped: 1 };
+}
+
+const FREE_TEXT_FIELDS = [
+  'updateClauseText',
+  'chargesClauseText',
+  'feesText',
+  'landlordCompanyName',
+];
+const FREE_TEXT_ITEMS = ['concept'];
+
+const carriesIdentifier = (v: unknown): boolean => typeof v === 'string' && hasIdentifier(v);
+
+// A text copied from a document that still holds a DNI, an IBAN, an email or a phone is dropped:
+// the text alone, never the figures beside it.
+function withoutIdentifiers(section: Section): {
+  readonly section: Section;
+  readonly dropped: number;
+} {
+  let dropped = 0;
+  const fields = Object.fromEntries(
+    Object.entries(section.fields).filter(([name, field]) => {
+      const leaks = FREE_TEXT_FIELDS.includes(name) && carriesIdentifier(field.value);
+      if (leaks) dropped += 1;
+      return !leaks;
+    }),
+  );
+  const lists = Object.fromEntries(
+    Object.entries(section.lists).map(([name, rows]) => [
+      name,
+      rows.map((row) => {
+        const values = Object.fromEntries(
+          Object.entries(row.values).filter(([item, v]) => {
+            const leaks = FREE_TEXT_ITEMS.includes(item) && carriesIdentifier(v);
+            if (leaks) dropped += 1;
+            return !leaks;
+          }),
+        );
+        return { ...row, values };
+      }),
+    ]),
+  );
+  return { section: { fields, lists }, dropped };
 }
 
 export function rentalMerge(read: Reading): RentalMerged {
-  let reading = read;
   let dropped = 0;
-  if (read.sections.lease) {
-    const cleaned = withoutPersonsName(read.sections.lease);
-    reading = { ...read, sections: { ...read.sections, lease: cleaned.lease } };
-    dropped = cleaned.dropped;
+  const sections: Partial<Record<SectionKind, Section>> = {};
+  for (const [kind, section] of Object.entries(read.sections) as [SectionKind, Section][]) {
+    const named = kind === 'lease' ? withoutPersonsName(section) : { section, dropped: 0 };
+    const cleaned = withoutIdentifiers(named.section);
+    sections[kind] = cleaned.section;
+    dropped += named.dropped + cleaned.dropped;
   }
+  const reading: Reading = { ...read, sections };
   const { fields, conflicts, discarded } = mergeFields(reading, RENTAL_MERGE_RULES);
   const lists: Partial<Record<RentalListName, MergedRow[]>> = {};
   for (const [kind, schema] of Object.entries(RENTAL_SECTIONS) as [

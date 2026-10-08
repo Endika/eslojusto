@@ -203,10 +203,15 @@ pay, and carries every list row with its `source`:
 The labels `use`, `landlordType`, `updateClauseIndex`, `conceptKind` and the `kind` of guarantees,
 charges and deductions mirror the site's rental engine (`test/rental-contract.test.ts`). The model
 copies a clause word for word and picks its label; it never says whether a clause is abusive or
-valid or whether anyone agreed to it, which the person checks against the text. It records no
-names of natural persons, DNI/NIE, signatures, account numbers, phones or emails, and the
-landlord's name only for a company: a `landlordCompanyName` beside any `landlordType` but
-`company` is dropped all the same, as a discard.
+valid or whether anyone agreed to it, which the person checks against the text. The prompt
+tells the model not to record names of natural persons, DNI/NIE, signatures, account numbers,
+phones or emails, and the landlord's name only for a company. The API does not take that on
+trust: a `landlordCompanyName` beside any `landlordType` but `company` is dropped, and so is any
+copied text (`updateClauseText`, `chargesClauseText`, `feesText`, `landlordCompanyName` or a
+row's `concept`) that still holds a DNI/NIE, a Spanish IBAN, an email or a Spanish phone number
+(`src/domain/identifiers.ts`), each as a discard, which makes the read doubtful. A person's name
+inside a clause text has no pattern to catch it: only the length limits (600, 300 and 80
+characters) bound what such a text can carry.
 
 `failedChecks` for a rental read are coherence checks only, never findings
 (`src/domain/rental-checks.ts`): `return_before_keys`, `receipt_parts_do_not_sum` (more than 1 €

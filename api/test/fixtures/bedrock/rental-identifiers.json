@@ -1,0 +1,51 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "lease",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "lease": {
+          "signedOn": {
+            "value": "2024-05-20",
+            "confidence": "high"
+          },
+          "initialRent": {
+            "value": 1100,
+            "confidence": "high"
+          },
+          "landlordType": {
+            "value": "company",
+            "confidence": "high"
+          },
+          "feesText": {
+            "value": "Honorarios a cargo de D. Fulano Inventado, DNI 12345678A, IBAN ES0021000418450200051332, tel 600123456, fulano@ejemplo.test",
+            "confidence": "high"
+          }
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 13300,
+    "output_tokens": 420
+  }
+}
