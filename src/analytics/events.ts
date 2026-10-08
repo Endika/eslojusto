@@ -3,6 +3,16 @@ import type { EmployerFigures, Review } from '../engine/review';
 import type { Cause, FinalPayInput, HolidayUnit, ItemId, FixedTermType } from '../engine/types';
 import type { Detail } from '../calculator/ports';
 import { FAQ_TOPICS } from '../content/faq-topics';
+import { RENTAL_FAQ_TOPICS } from '../content/rental-faq-topics';
+import type { DoubtReason } from '../engine/rental/outcome';
+import type { OutOfScopeReason } from '../engine/rental/scope';
+import type { ItemStatus, LandlordType, RentalInput, UpdateClause } from '../engine/rental/types';
+import {
+  RENTAL_FIELDS,
+  type RentalField,
+  type RentalItemKind,
+  type Step as RentalStep,
+} from '../rental/ports';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import {
   DOWNLOADS,
@@ -20,8 +30,17 @@ import {
 // Every property is a code from a closed list, a small count or a bucket: nothing a person
 // types can fit in one. `isValidEvent` enforces it at runtime before anything is sent.
 
-// One per sheet of the form, conditional ones included, plus the result. They are the steps'
-// URL fragments, so they keep their Spanish names.
+// One per sheet of each review's form, conditional ones included, plus the result. They are the
+// steps' URL fragments, so they keep their Spanish names; `$pathname` tells the pages apart.
+const RENTAL_SECTIONS = [
+  'contrato',
+  'casero',
+  'entrada',
+  'renta',
+  'subidas',
+  'gastos',
+  'salida',
+] as const satisfies readonly RentalStep[];
 export const SECTIONS = [
   'causa',
   'temporal',
@@ -35,6 +54,7 @@ export const SECTIONS = [
   'otros',
   'finiquito',
   'resultado',
+  ...RENTAL_SECTIONS,
 ] as const;
 export type Section = (typeof SECTIONS)[number];
 
@@ -70,8 +90,12 @@ const INPUT_FIELDS = [
 type CoversAll<All, Listed> = Exclude<All, Listed> extends never ? true : never;
 const _allFieldsListed: CoversAll<keyof FinalPayInput, (typeof INPUT_FIELDS)[number]> = true;
 const _allItemsListed: CoversAll<ItemId, (typeof ITEM_IDS)[number]> = true;
+const _allRentalSteps: CoversAll<RentalStep, Section> = true;
+const _allRentalInputs: CoversAll<keyof RentalInput, RentalField> = true;
 void _allFieldsListed;
 void _allItemsListed;
+void _allRentalSteps;
+void _allRentalInputs;
 
 // The benefit answers, by name only: an error on one of them names the field, never the answer.
 // They are left out of `snapshot`, so `changed_fields` never lists them either.
@@ -84,8 +108,80 @@ export const TRACKABLE_FIELDS = [
   ...BENEFIT_FIELDS,
 ] as const;
 export type TrackableField = (typeof TRACKABLE_FIELDS)[number];
+// The rental questions by name; never what was answered.
+export const RENTAL_TRACKABLE_FIELDS = RENTAL_FIELDS;
 
-export const HELP_TOPICS = FAQ_TOPICS.map(([, anchor]) => anchor);
+export const HELP_TOPICS = [...FAQ_TOPICS, ...RENTAL_FAQ_TOPICS].map(([, anchor]) => anchor);
+
+// What a rental result card is about. A card is a kind of item, never its concept as written.
+export const RENTAL_ITEMS = [
+  'fee',
+  'guarantees',
+  'guarantee',
+  'advance',
+  'rent_update',
+  'charge',
+  'deposit_return',
+  'deposit_interest',
+] as const satisfies readonly RentalItemKind[];
+const _allRentalItems: CoversAll<RentalItemKind, (typeof RENTAL_ITEMS)[number]> = true;
+void _allRentalItems;
+
+export const OUT_OF_SCOPE_REASONS = [
+  'before_2019',
+  'seasonal',
+  'room',
+  'other_use',
+  'protected',
+  'old_rent',
+] as const satisfies readonly OutOfScopeReason[];
+const _allReasons: CoversAll<OutOfScopeReason, (typeof OUT_OF_SCOPE_REASONS)[number]> = true;
+void _allReasons;
+
+// From the status that weighs most on a family of items to the one that weighs least.
+export const ITEM_STATUSES = [
+  'paid_over',
+  'owed',
+  'over_cap',
+  'review_it',
+  'not_checkable',
+  'not_yet_due',
+  'within_limit',
+  'not_applicable_to_date',
+  'not_entered',
+] as const satisfies readonly ItemStatus[];
+const _allStatuses: CoversAll<ItemStatus, (typeof ITEM_STATUSES)[number]> = true;
+void _allStatuses;
+
+export const DOUBT_REASONS = [
+  'pending_validation',
+  'repealed_window',
+  'large_landlord_unknown',
+  'index_month_doubtful',
+  'agreement_unknown',
+  'notice_form_doubtful',
+  'interest_day_count',
+  'extraordinary_cap_reach',
+] as const satisfies readonly DoubtReason[];
+const _allDoubts: CoversAll<DoubtReason, (typeof DOUBT_REASONS)[number]> = true;
+void _allDoubts;
+
+const UPDATE_CLAUSES = [
+  'none',
+  'ipc',
+  'irav',
+  'igc',
+  'fixed_percent',
+  'unspecified_index',
+  'other',
+] as const satisfies readonly UpdateClause[];
+const _allClauses: CoversAll<UpdateClause, (typeof UPDATE_CLAUSES)[number]> = true;
+void _allClauses;
+
+const LANDLORDS = ['person', 'company'] as const satisfies readonly LandlordType[];
+// By the norms that changed who pays the agency: RDL 7/2019, Ley 12/2023 and RDL 29/2026.
+export const SIGNED_PERIODS = ['2019-2023', '2023-2026', '2026+'] as const;
+export const UPDATE_COUNTS = ['0', '1', '2', '3+'] as const;
 
 const CAUSES = [
   'resignation',
@@ -125,6 +221,8 @@ export const ERROR_TYPES = [
   'SecurityError',
   'other',
 ] as const;
+
+const ITEM_RESULT = { values: [...ITEM_STATUSES, 'none'] } as const;
 
 const SECTION_SECONDS = ['<10', '10-30', '30-60', '60-180', '>180'] as const;
 const REVIEW_SECONDS = ['<60', '60-180', '180-600', '>600'] as const;
@@ -171,7 +269,7 @@ const BASE_CATALOGUE = {
   section_viewed: { section },
   section_completed: { section, seconds: oneOf(SECTION_SECONDS) },
   went_back: { from: section, to: section },
-  validation_error: { section, field: oneOf(TRACKABLE_FIELDS) },
+  validation_error: { section, field: oneOf([...TRACKABLE_FIELDS, ...RENTAL_TRACKABLE_FIELDS]) },
   help_opened: { topic: oneOf(HELP_TOPICS) },
   review_completed: {
     cause: oneOf(CAUSES),
@@ -198,7 +296,29 @@ const BASE_CATALOGUE = {
     // Whether the result showed only its summary or the detail a pass unlocks.
     detail: oneOf(['locked', 'unlocked']),
   },
-  detail_opened: { item: oneOf(ITEM_IDS) },
+  detail_opened: { item: oneOf([...ITEM_IDS, ...RENTAL_ITEMS]) },
+  // Why a lease stopped at the rental review's door.
+  rental_out_of_scope: { reason: oneOf(OUT_OF_SCOPE_REASONS) },
+  rental_review_completed: {
+    signed_period: oneOf(SIGNED_PERIODS),
+    landlord: oneOf(LANDLORDS),
+    large_landlord: oneOf(['yes', 'no', 'unknown']),
+    clause: oneOf(UPDATE_CLAUSES),
+    updates: oneOf(UPDATE_COUNTS),
+    // Each family of items by the status that weighs most among its cards, or none.
+    fees: ITEM_RESULT,
+    guarantees: ITEM_RESULT,
+    rent_update: ITEM_RESULT,
+    charges: ITEM_RESULT,
+    deposit_return: ITEM_RESULT,
+    // The doubts that move some result, each once.
+    depends: { list: DOUBT_REASONS },
+    difference: oneOf(DIFFERENCE_BUCKETS),
+    offered: { boolean: true },
+    detail: oneOf(['locked', 'unlocked']),
+    attempt: oneOf(ATTEMPT_BUCKETS),
+    seconds: oneOf(REVIEW_SECONDS),
+  },
   started_over: {},
   js_error: { kind: oneOf(ERROR_TYPES), source: SOURCE_RULE },
 } as const satisfies Record<string, Record<string, Rule>>;

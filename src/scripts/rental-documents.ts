@@ -1,6 +1,7 @@
+import { documentsAnalytics } from '../analytics/documents';
+import { track } from '../analytics/posthog';
 import { DOCUMENTS } from '../documents/config';
 import { RENTAL_EXTRACTION } from '../documents/contract';
-import type { DocumentEvents } from '../documents/ports';
 import { pageTranslator, type ClientKey, type Translate } from '../i18n/client';
 import { rentalCase } from '../rental/case';
 import type { RentalCalculator } from '../rental/main';
@@ -25,22 +26,6 @@ const rentalCopy =
   (key, vars) =>
     tr(RENTAL_COPY[key] ?? key, vars);
 
-// Reading documents and the pass are measured only on the final pay's page for now.
-const quiet: DocumentEvents = {
-  startChosen() {},
-  uploadStarted() {},
-  extractionCompleted() {},
-  extractionFailed() {},
-  nothingRead() {},
-  qualityWarned() {},
-  qualityOverridden() {},
-  checkoutStarted() {},
-  passIssued() {},
-  passFailed() {},
-  passVerified() {},
-  downloaded() {},
-};
-
 // Document reading and the pass on the rental review's page. The pass unlocks the detail of each
 // item, the report and the letters the review has figures for.
 export function wireRentalDocuments(
@@ -55,7 +40,7 @@ export function wireRentalDocuments(
     arrival,
     config: DOCUMENTS,
     tr,
-    events: quiet,
+    events: documentsAnalytics(track),
     section: {
       extraction: RENTAL_EXTRACTION,
       reading: rentalReading(rental.form, tr),
