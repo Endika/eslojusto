@@ -1195,7 +1195,7 @@ export const es = {
   'employment.guide.minimum_wage.prorata':
     'A tiempo parcial, el mínimo se cobra en proporción a tu jornada (art. 1 de cada real decreto del SMI): con 20 horas a la semana frente a 40, la mitad. La revisión hace la proporción con la jornada completa de tu convenio si la metes; si no, con las 40 horas de la ley.',
   'employment.guide.minimum_wage.temporary':
-    'En un contrato temporal de hasta 120 días pagado por días, el mínimo es por cada jornada legal e incluye la parte de los domingos, los festivos y las pagas extra: {diario} en {anio} (art. 4.1 de cada real decreto del SMI).',
+    'Cuando los servicios a una misma empresa no pasan de 120 días, cada real decreto del SMI fija un mínimo por jornada legal que incluye la parte de los domingos, los festivos y las pagas extra: {diario} en {anio} (art. 4.1). La revisión lo aplica cuando el contrato paga por días.',
 
   'employment.guide.what_counts.title': 'Qué cuenta para el SMI',
   'employment.guide.what_counts.lead':
@@ -1215,7 +1215,7 @@ export const es = {
   'employment.guide.modalities.occasional':
     'Para situaciones ocasionales y previsibles de corta duración, la empresa puede usarlo hasta 90 días en el año natural, que no pueden ser seguidos (art. 15.2).',
   'employment.guide.modalities.agrifood':
-    'En el sector agroalimentario, {norma} amplía ese límite a 120 días.',
+    'En los sectores agrario y agroalimentario, {norma} amplía ese límite a 120 días.',
   'employment.guide.modalities.replacement':
     'De sustitución: para cubrir a una persona con derecho a reserva de su puesto, con su nombre y la causa en el contrato, o hasta 3 meses para cubrir un puesto durante un proceso de selección (art. 15.3).',
   'employment.guide.modalities.discontinuous':
@@ -1223,11 +1223,11 @@ export const es = {
   'employment.guide.modalities.training':
     'Formativos: el de formación en alternancia dura entre 3 meses y 2 años, y el de práctica profesional entre 6 meses y un año (art. 11).',
   'employment.guide.modalities.abolished':
-    'Desde el {desde} ya no se pueden hacer contratos de obra o servicio ni eventuales con sus reglas anteriores.',
+    'Los contratos de obra o servicio y los eventuales por circunstancias de la producción desaparecieron con la reforma: los hechos antes del 31 de diciembre de 2021 siguen sus reglas anteriores hasta su fin (disposición transitoria 3.ª del Real Decreto-ley 32/2021), y los hechos del 31 de diciembre de 2021 al 30 de marzo de 2022 también, pero sin pasar de 6 meses (disposición transitoria 4.ª).',
   'employment.guide.modalities.written':
-    'La ley pide por escrito, entre otros, los contratos formativos, a tiempo parcial, fijos discontinuos, de relevo y de trabajo a distancia, y los temporales de más de cuatro semanas (art. 8.2).',
+    'La ley pide por escrito, entre otros, los contratos de prácticas y para la formación y el aprendizaje, a tiempo parcial, fijos discontinuos, de relevo y de trabajo a distancia, y los temporales de más de cuatro semanas (art. 8.2).',
   'employment.guide.modalities.before_reform':
-    'Los contratos hechos hasta el {hasta} siguen las reglas de temporalidad anteriores a la reforma: la revisión comprueba todo lo demás y dice que su temporalidad no se revisa en esta versión.',
+    'En un contrato que empezó antes del {desde}, la revisión comprueba todo lo demás y dice que su temporalidad no se revisa en esta versión.',
 
   'employment.guide.permanent.title': 'Cuándo un contrato temporal pasa a fijo',
   'employment.guide.permanent.lead':
@@ -1284,7 +1284,7 @@ export const es = {
   'employment.guide.part_time.overtime':
     'A tiempo parcial no se hacen horas extra, salvo para prevenir o reparar daños urgentes (arts. 12.4.c y 35.3).',
   'employment.guide.part_time.complementary':
-    'Las horas complementarias se pactan por escrito y solo con 10 horas semanales o más de media en el año. No pasan del 30 % de las horas ordinarias, o del 60 % si lo fija el convenio, y te las avisan con al menos 3 días de antelación, salvo que el convenio fije menos (art. 12.5).',
+    'Las horas complementarias se pactan por escrito y solo con 10 horas semanales o más de media en el año. No pasan del 30 % de las horas ordinarias, o del porcentaje que fije el convenio, de entre el 30 % y el 60 %, y te las avisan con al menos 3 días de antelación, salvo que el convenio fije menos (art. 12.5).',
   'employment.guide.part_time.voluntary':
     'En un contrato indefinido, la empresa puede ofrecerte además horas complementarias voluntarias, hasta el 15 %, o el 30 % si lo fija el convenio (art. 12.5.g).',
 
@@ -1294,7 +1294,7 @@ export const es = {
   'employment.guide.holidays_pay.money':
     'Mientras sigue el contrato, las vacaciones no se pueden cambiar por dinero (art. 38.1).',
   'employment.guide.holidays_pay.extra_pays':
-    'Hay dos pagas extra al año: una en Navidad y la otra en el mes que fije el convenio. Su importe lo fija el convenio, que también puede prorratearlas en las doce mensualidades (art. 31).',
+    'Hay dos pagas extra al año: una en Navidad y la otra en el mes que fije el convenio o un acuerdo entre la empresa y los representantes de los trabajadores. Su importe lo fija el convenio, que también puede prorratearlas en las doce mensualidades (art. 31).',
   'employment.guide.holidays_pay.public_holidays':
     'Además, hay hasta 14 fiestas laborales al año, retribuidas y que no se recuperan (art. 37.2).',
 
@@ -1307,7 +1307,7 @@ export const es = {
   'employment.guide.clauses.retention':
     'Permanencia: solo tras una especialización profesional pagada por la empresa, como mucho 2 años y siempre por escrito (art. 21.4).',
   'employment.guide.clauses.waiver':
-    'Renuncias: los derechos que da la ley no se pueden renunciar, ni antes ni después de tenerlos (art. 3.5). Si una cláusula no vale, se sustituye por lo que dice la ley y el resto del contrato sigue valiendo (art. 9.1).',
+    'Renuncias: los derechos que la ley reconoce como de derecho necesario no se pueden renunciar, ni antes ni después de tenerlos (art. 3.5). Si una cláusula no vale, se sustituye por lo que dice la ley y el resto del contrato sigue valiendo (art. 9.1).',
   'employment.guide.clauses.remote':
     'Teletrabajo: con trabajo a distancia regular, {norma} pone a cargo de la empresa los gastos de equipos, herramientas y medios (art. 12).',
   'employment.guide.clauses.review':
@@ -1323,7 +1323,9 @@ export const es = {
 
   'employment.guide.agreement.title': 'Cómo encontrar tu convenio',
   'employment.guide.agreement.lead':
-    'Tu convenio colectivo fija tu salario por categoría, tus pluses, tu jornada y muchas de las duraciones de esta página, y obliga a la empresa dentro de su ámbito (art. 82.3). El contrato tiene que nombrarlo, con su código y su fecha de publicación.',
+    'Desde el {desde}, la empresa tiene que informarte por escrito de qué convenio se aplica, con su código y su fecha de publicación (art. 3.2.o del {nombre}).',
+  'employment.guide.agreement.binding':
+    'Tu convenio colectivo fija tu salario por categoría, tus pluses, tu jornada y muchas de las duraciones de esta página, y obliga a la empresa dentro de su ámbito (art. 82.3).',
   'employment.guide.agreement.where':
     'Los convenios se publican en el BOE, si son estatales, o en el boletín oficial de tu comunidad o tu provincia, y están en REGCON, el registro público de convenios del Ministerio de Trabajo, donde se buscan por nombre, sector o código.',
   'employment.guide.agreement.review':
