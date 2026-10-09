@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.37.1](https://github.com/Endika/eslojusto/compare/v1.37.0...v1.37.1) (2026-10-09)
+
+
+### Bug Fixes
+
+* **csp:** allow connect-src 'self' so the page can fetch its own robots.txt ([e52d2ea](https://github.com/Endika/eslojusto/commit/e52d2ea9b0dfb77861195070093858a7f8b571a5))
+
+
+### Performance Improvements
+
+* **fonts:** preload the latin Martian Mono face the home cards cite in ([331154a](https://github.com/Endika/eslojusto/commit/331154adb506938322d452e057abe979fee78004))
+
 ## [1.37.0](https://github.com/Endika/eslojusto/compare/v1.36.0...v1.37.0) (2026-10-09)
 
 
