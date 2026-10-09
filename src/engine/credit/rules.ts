@@ -17,6 +17,7 @@ export type StatuteRuleId =
   | 'tae_missing'
   | 'tae_inexact'
   | 'contract_mentions'
+  | 'cash_option'
   | 'withdrawal'
   | 'early_repayment_cap'
   | 'early_repayment_none'
@@ -101,6 +102,9 @@ export const STATUTE_RULES: Readonly<Record<StatuteRuleId, StatuteRule>> = {
   tae_inexact: lcc('tae_inexact', '21.4', 'info'),
   // 16.2: what the contract must state.
   contract_mentions: lcc('contract_mentions', '16.2', 'info'),
+  // 26.3: whoever finances a purchase may always choose not to take the credit and pay as agreed
+  // with the seller.
+  cash_option: lcc('cash_option', '26.3', 'info'),
   // 28: fourteen calendar days to withdraw, from the contract or the later receipt of its terms.
   withdrawal: lcc('withdrawal', '28', 'date'),
   // 30.2: compensation up to 1 % of the amount repaid with over a year left, 0,5 % otherwise.
