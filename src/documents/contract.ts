@@ -21,6 +21,14 @@ export const PAGE_KINDS = [
   'employment_contract',
   'job_offer',
   'other',
+  'credit_agreement',
+  'credit_precontract_info',
+  'amortization_schedule',
+  'early_repayment_statement',
+  'revolving_agreement',
+  'card_statement',
+  'insurance_policy',
+  'insurance_renewal_notice',
 ] as const;
 export type PageKind = (typeof PAGE_KINDS)[number];
 export type SourceKind = Exclude<PageKind, 'other'>;
@@ -36,6 +44,8 @@ export const READABILITY = [
   'not_rental_document',
   'foreign_jurisdiction',
   'unknown_format',
+  'not_credit_document',
+  'not_insurance_document',
 ] as const;
 export type Readability = (typeof READABILITY)[number];
 
@@ -50,6 +60,8 @@ export const SKIP_REASONS = [
   'not_rental_document',
   'foreign_jurisdiction',
   'unknown_format',
+  'not_credit_document',
+  'not_insurance_document',
   'no_data',
   'unread',
 ] as const satisfies readonly (Exclude<Readability, 'ok'> | 'no_data' | 'unread')[];
@@ -138,7 +150,7 @@ export interface ExtractedField {
 export interface ExtractedRow {
   readonly values: Readonly<Record<string, ExtractedValue>>;
   readonly confidence: Confidence;
-  // The kind of document a rental row came from.
+  // The kind of document a row came from, for the reviews whose lists say it.
   readonly source?: SourceKind;
 }
 
@@ -312,6 +324,103 @@ export const EMPLOYMENT_EXTRACTION: ExtractionShape<EmploymentFieldName, Employm
 
 export type EmploymentExtraction = Extraction<EmploymentFieldName, EmploymentListName>;
 
+// The fields the API merges from consumer credit documents (api/src/domain/credit-merge.ts).
+export const CREDIT_FIELDS = [
+  'product',
+  'lenderName',
+  'intermediaryType',
+  'intermediaryCompanyName',
+  'agreedOn',
+  'principal',
+  'netDisbursed',
+  'cashPrice',
+  'goods',
+  'nominalRate',
+  'rateType',
+  'declaredApr',
+  'declaredTotalPayable',
+  'instalmentCount',
+  'instalmentAmount',
+  'firstDueOn',
+  'balloonAmount',
+  'balloonDueOn',
+  'agreedEndOn',
+  'insurancePremium',
+  'insuranceSingle',
+  'insuranceFinanced',
+  'insuranceRequired',
+  'earlyRepaymentClauseText',
+  'withdrawalClauseText',
+  'precontractDeliveredOn',
+  'repaidOn',
+  'principalRepaid',
+  'interestSettled',
+  'compensationCharged',
+  'compensationConcept',
+  'premiumRefunded',
+  'paidByInsurance',
+  'discountLost',
+  'creditLimit',
+  'minimumPayment',
+  'minimumPaymentPercent',
+  'annualFee',
+  'paymentMode',
+] as const;
+export type CreditFieldName = (typeof CREDIT_FIELDS)[number];
+
+// Their lists, each row with the kind of document it came from (api/src/domain/credit-schema.ts).
+// The schedule keeps its first rows and the statements their most recent past their maximum, and
+// the response says one was cut.
+export const CREDIT_LISTS = ['charges', 'schedule', 'statements'] as const;
+export type CreditListName = (typeof CREDIT_LISTS)[number];
+
+export const CREDIT_EXTRACTION: ExtractionShape<CreditFieldName, CreditListName> = {
+  review: 'credit',
+  fields: CREDIT_FIELDS,
+  lists: CREDIT_LISTS,
+};
+
+export type CreditExtraction = Extraction<CreditFieldName, CreditListName>;
+
+// The fields the API merges from insurance documents (api/src/domain/insurance-merge.ts).
+export const INSURANCE_FIELDS = [
+  'line',
+  'carCover',
+  'insurerName',
+  'intermediaryType',
+  'intermediaryCompanyName',
+  'concludedOn',
+  'effectiveOn',
+  'expiresOn',
+  'renews',
+  'premiumNet',
+  'premiumSurcharges',
+  'premiumTaxes',
+  'premiumTotal',
+  'proportionalRuleExcluded',
+  'proportionalRuleMarginPercent',
+  'channel',
+  'nonRenewalClauseText',
+  'noticeOn',
+  'noticeMedium',
+  'previousPremium',
+  'newPremium',
+  'coverChanges',
+  'changesText',
+] as const;
+export type InsuranceFieldName = (typeof INSURANCE_FIELDS)[number];
+
+export const INSURANCE_LISTS = ['sumsInsured'] as const;
+export type InsuranceListName = (typeof INSURANCE_LISTS)[number];
+
+export const INSURANCE_EXTRACTION: ExtractionShape<InsuranceFieldName, InsuranceListName> = {
+  review: 'insurance',
+  fields: INSURANCE_FIELDS,
+  lists: INSURANCE_LISTS,
+};
+
+export type InsuranceExtraction = Extraction<InsuranceFieldName, InsuranceListName>;
+
 export interface SourcedField extends ExtractedField {
   readonly source: SourceKind;
 }
@@ -377,8 +486,28 @@ export const EMPLOYMENT_CHECKS = [
 ] as const;
 export type EmploymentCheck = (typeof EMPLOYMENT_CHECKS)[number];
 
+// What the API finds incoherent in consumer credit documents (api/src/domain/credit-checks.ts).
+export const CREDIT_CHECKS = [
+  'net_above_principal',
+  'declared_total_mismatch',
+  'schedule_rows_do_not_sum',
+  'schedule_balance_jump',
+  'repayment_after_end',
+  'statement_total_below_balance',
+] as const;
+export type CreditCheck = (typeof CREDIT_CHECKS)[number];
+
+// What the API finds incoherent in insurance documents (api/src/domain/insurance-checks.ts).
+export const INSURANCE_CHECKS = [
+  'expiry_before_effect',
+  'notice_after_expiry',
+  'premium_parts_do_not_sum',
+] as const;
+export type InsuranceCheck = (typeof INSURANCE_CHECKS)[number];
+
 // The final pay's checks are worded by the upload; any other review's, by its own reading.
-export type FailedCheck = CoherenceCheck | RentalCheck | EmploymentCheck;
+export type FailedCheck =
+  CoherenceCheck | RentalCheck | EmploymentCheck | CreditCheck | InsuranceCheck;
 export const isCoherenceCheck = (c: FailedCheck): c is CoherenceCheck =>
   (COHERENCE_CHECKS as readonly string[]).includes(c);
 
