@@ -1,0 +1,226 @@
+---
+import Field from './Field.astro';
+import Choice from './EmploymentChoice.astro';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+import { CAR_COVERS, LINES } from '../insurance/form';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+const answers = (values: readonly ('yes' | 'no' | 'unknown')[]) =>
+  values.map((value) => ({ value, label: tx(`insurance.answer.${value}`) }));
+const yesNo = answers(['yes', 'no']);
+const yesNoUnknown = answers(['yes', 'no', 'unknown']);
+
+const arrow = 'M4 12h15m-6-6 6 6-6 6';
+---
+
+<form class="calculator" id="insurance" novalidate aria-label={tx('insurance.form_aria')}>
+  <div class="stack">
+    <fieldset class="sheet" id="sheet-poliza" data-sheet="poliza" aria-labelledby="question-poliza">
+      <h2 class="question" id="question-poliza" tabindex="-1">
+        {tx('insurance.policy.question')}
+      </h2>
+      <p class="help help--short">{tx('insurance.policy.help')}</p>
+      <Choice
+        name="line"
+        legend={tx('insurance.policy.line')}
+        options={LINES.map((value) => ({ value, label: tx(`insurance.policy.line.${value}`) }))}
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-cobertura"
+      data-sheet="cobertura"
+      aria-labelledby="question-cobertura"
+    >
+      <h2 class="question" id="question-cobertura" tabindex="-1">
+        {tx('insurance.cover.question')}
+      </h2>
+      <Choice
+        name="carCover"
+        legend={tx('insurance.policy.car_cover')}
+        options={CAR_COVERS.map((value) => ({
+          value,
+          label: tx(`insurance.policy.car_cover.${value}`),
+        }))}
+        layout="list"
+        attributes={{ 'data-if': 'line:car' }}
+      />
+      <Choice
+        name="mortgageRequired"
+        legend={tx('insurance.policy.mortgage')}
+        hint={tx('insurance.policy.mortgage_hint')}
+        options={yesNoUnknown}
+        attributes={{ 'data-if': 'line:home' }}
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-vencimiento"
+      data-sheet="vencimiento"
+      aria-labelledby="question-vencimiento"
+    >
+      <h2 class="question" id="question-vencimiento" tabindex="-1">
+        {tx('insurance.expiry.question')}
+      </h2>
+      <Choice
+        name="renews"
+        legend={tx('insurance.policy.renews')}
+        hint={tx('insurance.policy.renews_hint')}
+        options={yesNoUnknown}
+        attributes={{ 'data-if': 'line:home car' }}
+      />
+      <Field
+        name="expiresOn"
+        label={tx('insurance.policy.expires')}
+        hint={tx('insurance.policy.expires_hint')}
+        kind="date"
+        attributes={{ 'data-if': 'line:home car' }}
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-contratacion"
+      data-sheet="contratacion"
+      aria-labelledby="question-contratacion"
+    >
+      <h2 class="question" id="question-contratacion" tabindex="-1">
+        {tx('insurance.contracting.question')}
+      </h2>
+      <Choice
+        name="distance"
+        legend={tx('insurance.contracting.distance')}
+        hint={tx('insurance.contracting.distance_hint')}
+        options={yesNoUnknown}
+      />
+      {/* The contract dates count only for a policy that may have been bought at a distance. */}
+      <Field
+        name="concludedOn"
+        label={tx('insurance.contracting.concluded')}
+        hint={tx('insurance.contracting.concluded_hint')}
+        kind="date"
+        attributes={{ 'data-if': 'distance:yes unknown' }}
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-condiciones"
+      data-sheet="condiciones"
+      aria-labelledby="question-condiciones"
+    >
+      <h2 class="question" id="question-condiciones" tabindex="-1">
+        {tx('insurance.terms.question')}
+      </h2>
+      <div data-if="distance:yes unknown">
+        <Choice
+          name="policyReceived"
+          legend={tx('insurance.contracting.received')}
+          hint={tx('insurance.contracting.received_hint')}
+          options={yesNoUnknown}
+        />
+        <Field
+          name="policyReceivedOn"
+          label={tx('insurance.contracting.received_on')}
+          hint={tx('insurance.contracting.received_on_hint')}
+          kind="date"
+          attributes={{ 'data-if': 'policyReceived:yes' }}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-renovacion"
+      data-sheet="renovacion"
+      aria-labelledby="question-renovacion"
+    >
+      <h2 class="question" id="question-renovacion" tabindex="-1">
+        {tx('insurance.renewal.question')}
+      </h2>
+      <Choice
+        name="hasNotice"
+        legend={tx('insurance.renewal.has_notice')}
+        hint={tx('insurance.renewal.has_notice_hint')}
+        options={yesNo}
+        layout="pair"
+      />
+      <Field
+        name="noticeReceivedOn"
+        label={tx('insurance.renewal.received_on')}
+        kind="date"
+        attributes={{ 'data-if': 'hasNotice:yes' }}
+      />
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-primas" data-sheet="primas" aria-labelledby="question-primas">
+      <h2 class="question" id="question-primas" tabindex="-1">
+        {tx('insurance.premiums.question')}
+      </h2>
+      <div data-if="hasNotice:yes">
+        <div class="pair">
+          <Field
+            name="previousPremium"
+            label={tx('insurance.renewal.previous')}
+            hint={tx('insurance.renewal.previous_hint')}
+            kind="amount"
+          />
+          <Field
+            name="newPremium"
+            label={tx('insurance.renewal.next')}
+            hint={tx('insurance.renewal.next_hint')}
+            kind="amount"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-cambios"
+      data-sheet="cambios"
+      aria-labelledby="question-cambios"
+    >
+      <h2 class="question" id="question-cambios" tabindex="-1">
+        {tx('insurance.changes.question')}
+      </h2>
+      <Choice
+        name="changes"
+        legend={tx('insurance.renewal.changes')}
+        options={yesNoUnknown}
+        attributes={{ 'data-if': 'hasNotice:yes' }}
+      />
+    </fieldset>
+  </div>
+
+  <div class="actions">
+    <div class="actions__inner">
+      <button class="button button--back" type="button" data-back hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow} transform="rotate(180 12 12)"></path>
+        </svg>
+        {tx('form.back')}
+      </button>
+      <button class="button button--forward" type="button" data-next>
+        {tx('form.next')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+      <button class="button button--forward" type="submit" data-submit hidden>
+        {tx('form.review')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</form>

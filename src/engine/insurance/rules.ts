@@ -28,6 +28,7 @@ const LCS = 'https://www.boe.es/buscar/act.php?id=BOE-A-1980-22501';
 const LAW22_2007 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-13411';
 const LCS_SINCE = '1981-04-17';
 const LAW22_2007_SINCE = '2007-10-12';
+const LAW22_2007_NAME = 'Ley de comercialización a distancia de servicios financieros';
 // Art. 22 LCS as worded by Ley 20/2015, in force from 01-01-2016.
 const ART22_SINCE = '2016-01-01';
 
@@ -70,7 +71,7 @@ export const RULES: Readonly<Record<InsuranceRuleId, Rule>> = {
   distance_withdrawal: rule(
     'distance_withdrawal',
     'law22_2007',
-    'art. 10.1',
+    `${LAW22_2007_NAME}, art. 10.1`,
     `${LAW22_2007}#a10`,
     LAW22_2007_SINCE,
     'date',
@@ -80,7 +81,7 @@ export const RULES: Readonly<Record<InsuranceRuleId, Rule>> = {
   distance_withdrawal_excluded: rule(
     'distance_withdrawal_excluded',
     'law22_2007',
-    'art. 10.2.b.4.º',
+    `${LAW22_2007_NAME}, art. 10.2.b.4.º`,
     `${LAW22_2007}#a10`,
     LAW22_2007_SINCE,
     'info',

@@ -1,0 +1,19 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { INSURANCE_BUILD } from '../../content/sections';
+
+// Without PUBLIC_INSURANCE=1 the build has no /seguros/ at all, and the page's code stays out of it.
+export const getStaticPaths = (() =>
+  INSURANCE_BUILD ? [{ params: { path: undefined } }] : []) satisfies GetStaticPaths;
+
+// The literal switch, not INSURANCE_BUILD: the bundler drops the page and its script from a build
+// without it, which keeps that build identical to one without this page.
+/* eslint-disable no-restricted-syntax -- a fixed path into src/views, not a boundary escape */
+const Insurance =
+  import.meta.env.PUBLIC_INSURANCE === '1'
+    ? (await import('../../views/Insurance.astro')).default
+    : null;
+/* eslint-enable no-restricted-syntax */
+---
+
+{Insurance && <Insurance lang="es" />}

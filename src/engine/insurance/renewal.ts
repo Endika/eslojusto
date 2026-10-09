@@ -34,6 +34,9 @@ export function nonRenewal(input: InsuranceInput, today: CivilDate, norms: NormT
       insurancePhrase('non_renewal.last_day', { day: day(lastDay), expiry: day(input.expiresOn) }),
       ...state.calculation,
       insurancePhrase('non_renewal.arrive_by', { day: day(lastDay) }),
+      // A period ending at 00:00 h of the expiry day concludes the day before; the date asked is
+      // the one the policy prints, so the earlier reading is left to the person.
+      insurancePhrase('non_renewal.midnight'),
       ...(monthEnd ? [insurancePhrase('non_renewal.month_end')] : []),
       ...(input.renews === null ? [insurancePhrase('non_renewal.extension_assumed')] : []),
     ],

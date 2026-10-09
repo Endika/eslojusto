@@ -1,7 +1,12 @@
 ---
 import { t, type Key } from '../i18n';
 import { link, LANGS, type Lang } from '../i18n/languages';
-import { EMPLOYMENT_BUILD, HOUSEHOLD_BUILD, RENTAL_BUILD } from '../content/sections';
+import {
+  EMPLOYMENT_BUILD,
+  HOUSEHOLD_BUILD,
+  INSURANCE_BUILD,
+  RENTAL_BUILD,
+} from '../content/sections';
 
 interface Props {
   lang: Lang;
@@ -21,18 +26,20 @@ const local = current
   .replace(new RegExp(`^/(${Object.keys(LANGS).join('|')})(?=/)`), '');
 const general =
   ['/privacidad/', '/aviso-legal/'].includes(local) ||
-  (local === '/' && (RENTAL_BUILD || EMPLOYMENT_BUILD || HOUSEHOLD_BUILD));
+  (local === '/' && (RENTAL_BUILD || EMPLOYMENT_BUILD || HOUSEHOLD_BUILD || INSURANCE_BUILD));
 const note: Key = local.startsWith('/alquiler/')
   ? 'footer.note_rental'
   : local.startsWith('/contrato/')
     ? 'footer.note_employment'
     : local.startsWith('/empleada-de-hogar/')
       ? 'footer.note_household'
-      : local.startsWith('/paro/')
-        ? 'footer.note_benefit'
-        : general
-          ? 'footer.note_general'
-          : 'footer.note';
+      : local.startsWith('/seguros/')
+        ? 'footer.note_insurance'
+        : local.startsWith('/paro/')
+          ? 'footer.note_benefit'
+          : general
+            ? 'footer.note_general'
+            : 'footer.note';
 ---
 
 <footer class="footer">

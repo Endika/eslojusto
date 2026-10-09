@@ -15,4 +15,6 @@ interface ImportMetaEnv {
   readonly PUBLIC_ERTE?: string;
   // '1' builds the household worker review at /empleada-de-hogar/; anything else leaves it out.
   readonly PUBLIC_HOUSEHOLD?: string;
+  // '1' builds the review of a policy's dates at /seguros/; anything else leaves it out.
+  readonly PUBLIC_INSURANCE?: string;
 }

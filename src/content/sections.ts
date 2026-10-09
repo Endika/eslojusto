@@ -12,3 +12,8 @@ export const ERTE_BUILD = import.meta.env.PUBLIC_ERTE === '1';
 // no route, no home card, no sitemap entry and no link or text about it.
 export const HOUSEHOLD_BUILD = import.meta.env.PUBLIC_HOUSEHOLD === '1';
 export const HOUSEHOLD_BETA = true;
+
+// /seguros/, the dates of a home or motor policy, is built only when PUBLIC_INSURANCE=1, on the
+// same terms; it opens as a beta.
+export const INSURANCE_BUILD = import.meta.env.PUBLIC_INSURANCE === '1';
+export const INSURANCE_BETA = true;

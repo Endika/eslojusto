@@ -29,7 +29,14 @@ export const clientStrings = (
     rental = false,
     employment = false,
     household = false,
-  }: { documents?: boolean; rental?: boolean; employment?: boolean; household?: boolean } = {},
+    insurance = false,
+  }: {
+    documents?: boolean;
+    rental?: boolean;
+    employment?: boolean;
+    household?: boolean;
+    insurance?: boolean;
+  } = {},
 ): Partial<Record<Key, string>> =>
   Object.fromEntries(
     Object.entries(DICTIONARIES[lang]).filter(
@@ -38,6 +45,7 @@ export const clientStrings = (
         (documents || !key.startsWith('client.documents.')) &&
         (rental || !key.startsWith('client.rental.')) &&
         (employment || !key.startsWith('client.employment.')) &&
-        (household || !key.startsWith('client.household.')),
+        (household || !key.startsWith('client.household.')) &&
+        (insurance || !key.startsWith('client.insurance.')),
     ),
   );
