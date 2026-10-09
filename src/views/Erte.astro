@@ -1,0 +1,267 @@
+---
+import Base from '../layouts/Base.astro';
+import Field from '../components/Field.astro';
+import {
+  ERTE_FAQ,
+  ERTE_GUIDE,
+  ERTE_PAGE,
+  ERTE_QUESTIONS as Q,
+  erteUnknownView,
+} from '../content/erte';
+import { faqNode } from '../content/faq';
+import { breadcrumbList } from '../content/structured-data';
+import { LAST_UPDATED } from '../content/updated';
+import { ET, LGSS } from '../engine/sources';
+import { t } from '../i18n';
+import { link } from '../i18n/languages';
+
+// The benefit during an ERTE: one short form and its result, Spanish only. It exists only in a
+// PUBLIC_ERTE=1 build and has no document reading, no pass and no analytics events of its own.
+const checkedOn = LAST_UPDATED['/paro/erte/'];
+if (!checkedOn) throw new Error('/paro/erte/ needs its date in LAST_UPDATED.');
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const crumbs = [
+  { name: 'Inicio', path: '/' },
+  { name: 'Paro', path: '/paro/' },
+  { name: 'Paro durante un ERTE', path: '/paro/erte/' },
+];
+const regimes = erteUnknownView().blocks;
+const arrow = 'M4 12h15m-6-6 6 6-6 6';
+---
+
+<Base
+  title={ERTE_PAGE.title}
+  description={ERTE_PAGE.description}
+  path="/paro/erte/"
+  lang="es"
+  langs={['es']}
+  section="cause"
+  structuredData={[breadcrumbList(home, crumbs), faqNode(ERTE_FAQ)]}
+>
+  <main id="content">
+    <div class="desk">
+      <header class="desk__head">
+        <nav class="crumbs" aria-label="Estás en">
+          <ol>
+            <li>
+              <a href={link('es', '')}>Inicio</a>
+            </li>
+            <li>
+              <a href={link('es', 'paro/')}>Paro</a>
+            </li>
+            <li aria-current="page">Paro durante un ERTE</li>
+          </ol>
+        </nav>
+        <h1 class="desk__title">{ERTE_PAGE.h1}</h1>
+        <p class="desk__lead">{ERTE_PAGE.lead}</p>
+        <p class="desk__beta">
+          <span class="beta">{ERTE_PAGE.beta}</span>
+          {ERTE_PAGE.betaNote}
+        </p>
+      </header>
+      <noscript>
+        <div class="sheet sheet--notice">
+          <p class="help">{ERTE_PAGE.noJs}</p>
+        </div>
+      </noscript>
+
+      <form class="calculator" id="erte-form" novalidate aria-label={ERTE_PAGE.h1}>
+        <div class="stack">
+          <fieldset class="sheet" id="sheet-regime" aria-labelledby="question-regime">
+            <h2 class="question" id="question-regime" tabindex="-1">
+              {Q.regime.question}
+            </h2>
+            <p class="help" id="hint-regime">
+              {Q.regime.help}
+            </p>
+            <div class="chips" data-field="regime">
+              {Q.regime.options.map(([value, label]) => (
+                <div class="chip">
+                  <input
+                    type="radio"
+                    name="regime"
+                    id={`regime-${value}`}
+                    value={value}
+                    aria-describedby="hint-regime error-regime"
+                  />
+                  <label for={`regime-${value}`}>{label}</label>
+                </div>
+              ))}
+            </div>
+            <p class="errata" id="error-regime" data-error-for="regime" hidden></p>
+          </fieldset>
+
+          <fieldset
+            class="sheet"
+            id="sheet-measure"
+            aria-labelledby="question-measure"
+            data-known-only
+          >
+            <h2 class="question" id="question-measure" tabindex="-1">
+              {Q.measure.question}
+            </h2>
+            <div class="chips" data-field="measure">
+              {Q.measure.options.map(([value, label]) => (
+                <div class="chip">
+                  <input
+                    type="radio"
+                    name="measure"
+                    id={`measure-${value}`}
+                    value={value}
+                    aria-describedby="error-measure"
+                  />
+                  <label for={`measure-${value}`}>{label}</label>
+                </div>
+              ))}
+            </div>
+            <p class="errata" id="error-measure" data-error-for="measure" hidden></p>
+            <div data-if-measure="reduction" hidden>
+              <Field name="percent" label={Q.percent.label} hint={Q.percent.hint} kind="amount" />
+            </div>
+          </fieldset>
+
+          <fieldset class="sheet" id="sheet-base" aria-labelledby="question-base" data-known-only>
+            <h2 class="question" id="question-base" tabindex="-1">
+              {Q.base.question}
+            </h2>
+            <Field
+              name="base"
+              label={Q.base.label}
+              hint={Q.base.hint}
+              kind="amount"
+              attributes={{ 'data-hint-red': Q.base.hintRed, 'data-hint-other': Q.base.hint }}
+            />
+          </fieldset>
+
+          <fieldset
+            class="sheet"
+            id="sheet-children"
+            aria-labelledby="question-children"
+            data-known-only
+            data-not-red
+          >
+            <h2 class="question" id="question-children" tabindex="-1">
+              {Q.children.question}
+            </h2>
+            <p class="help help--short">{Q.children.help}</p>
+            <div class="chips" data-field="children">
+              {Q.children.options.map(([value, label]) => (
+                <div class="chip">
+                  <input
+                    type="radio"
+                    name="children"
+                    id={`children-${value}`}
+                    value={value}
+                    aria-describedby="error-children"
+                  />
+                  <label for={`children-${value}`}>{label}</label>
+                </div>
+              ))}
+            </div>
+            <p class="errata" id="error-children" data-error-for="children" hidden></p>
+          </fieldset>
+        </div>
+        <div class="erte-actions">
+          <button class="button button--forward" type="submit">
+            {ERTE_PAGE.button}
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+              <path d={arrow}></path>
+            </svg>
+          </button>
+        </div>
+      </form>
+
+      <section
+        class="sheet sheet--text"
+        id="erte-result"
+        aria-labelledby="erte-result-title"
+        hidden
+      >
+        <h2 class="question" id="erte-result-title" tabindex="-1"></h2>
+        <p class="help" data-result-lead></p>
+        <div data-result-blocks></div>
+        <button class="button button--restart" type="button" data-restart>
+          {ERTE_PAGE.restart}
+        </button>
+      </section>
+    </div>
+
+    <article class="guide" data-tone="legal" aria-labelledby="guide-title">
+      <header class="guide__head">
+        <h2 class="guide__title" id="guide-title">
+          {ERTE_GUIDE.title}
+        </h2>
+        <p class="guide__sources">
+          <span>{t('es', 'guide.updated')}</span>
+          <span>
+            {t('es', 'guide.sources')}: <a href={ET}>{t('es', 'guide.source_et')}</a> ·{' '}
+            <a href={LGSS}>{t('es', 'guide.source_lgss')}</a>
+          </span>
+          <a href={link('es', 'aviso-legal/')}>{t('es', 'guide.who')}</a>
+        </p>
+      </header>
+
+      <div class="guide__sheets">
+        <section class="sheet sheet--text">
+          <h3 id="erte-tipos">{ERTE_GUIDE.sheetTitle}</h3>
+          <p>{ERTE_GUIDE.sheetLead}</p>
+          <dl class="data-list caps">
+            {regimes.map((b) => (
+              <div>
+                <dt>{b.title}</dt>
+                <dd>
+                  <p>{b.text}</p>
+                  <p class="source">{b.source}</p>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <section class="sheet sheet--text" aria-labelledby="erte-faq">
+          <h2 id="erte-faq">{t('es', 'guide.faq')}</h2>
+          <div class="faq-list">
+            {ERTE_FAQ.map(({ question, answer }) => (
+              <details class="faq-item">
+                <summary>{question}</summary>
+                <p>{answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <nav class="sheet sheet--text" aria-labelledby="erte-next">
+          <h2 id="erte-next">{ERTE_GUIDE.nextTitle}</h2>
+          <ul class="next-pages">
+            <li>
+              <a href={link('es', ERTE_GUIDE.hubPath)}>{ERTE_GUIDE.nextHub}</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </article>
+  </main>
+</Base>
+
+<script>
+  import '../scripts/erte';
+</script>
+
+<style>
+  /* This form is short: it does not fill the first screen like the calculator's. */
+  .calculator {
+    min-block-size: 0;
+  }
+  /* Under the title and the lead, as on the case pages, whatever the screen. */
+  #erte-result {
+    order: 2;
+  }
+  .erte-actions {
+    display: flex;
+    inline-size: min(100%, 40rem);
+    margin-inline: auto;
+  }
+  [data-result-blocks] h3 {
+    margin: 1.25rem 0 0.25rem;
+  }
+</style>

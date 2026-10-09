@@ -1,0 +1,17 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { ERTE_BUILD } from '../../../content/sections';
+
+// Without PUBLIC_ERTE=1 the build has no /paro/erte/ at all, and the page's code stays out of it.
+export const getStaticPaths = (() =>
+  ERTE_BUILD ? [{ params: { path: undefined } }] : []) satisfies GetStaticPaths;
+
+// The literal switch, not ERTE_BUILD: the bundler drops the page and its script from a build
+// without it, which keeps that build identical to one without this page.
+/* eslint-disable no-restricted-syntax -- a fixed path into src/views, not a boundary escape */
+const Erte =
+  import.meta.env.PUBLIC_ERTE === '1' ? (await import('../../../views/Erte.astro')).default : null;
+/* eslint-enable no-restricted-syntax */
+---
+
+{Erte && <Erte />}

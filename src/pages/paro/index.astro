@@ -5,6 +5,7 @@ import CaseLink from '../../components/CaseLink.astro';
 import { benefitBySalary } from '../../content/examples';
 import { euros, wholeEuros } from '../../content/format';
 import { BENEFIT_2026 } from '../../engine/unemployment';
+import { link } from '../../i18n/languages';
 
 const { minCap, maxCap } = BENEFIT_2026;
 const [, mid, high] = benefitBySalary;
@@ -116,4 +117,19 @@ const rows: readonly (readonly [string, (b: Row) => number])[] = [
       Arts. <span>266 · 267 · 268</span> LGSS
     </p>
   </section>
+
+  {/* The literal switch, as in the ERTE page's route: a build without it renders nothing here. */}
+  {import.meta.env.PUBLIC_ERTE === '1' && (
+    <section class="sheet sheet--text">
+      <h3 id="p-erte">Si estás en un ERTE</h3>
+      <p>
+        Un ERTE también puede dar derecho a paro mientras dura. Cuánto se cobra y si gasta tu paro
+        futuro dependen del tipo de ERTE:{' '}
+        <a href={link('es', 'paro/erte/')}>calcula tu paro durante un ERTE</a>.
+      </p>
+      <p class="folio">
+        Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+      </p>
+    </section>
+  )}
 </CasePage>
