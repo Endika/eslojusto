@@ -94,6 +94,8 @@ export interface MortgageInput {
   readonly rateType: RateType;
   // Last day of the fixed stretch of a mixed rate.
   readonly fixedUntil: CivilDate | null;
+  // Months between two revisions of a variable rate; null when unknown.
+  readonly rateRevisionMonths: number | null;
   // Whether the deed has a clause putting the set-up costs on the borrower.
   readonly expensesClause: 'present' | 'absent' | 'unknown';
   readonly invoices: readonly Invoice[];

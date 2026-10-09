@@ -11,8 +11,8 @@ import type {
   MortgageInput,
 } from '../../../src/engine/mortgage/types';
 
-// A synthetic consumer's variable-rate mortgage on a home, deed of 10-05-2012 with a clause putting
-// the set-up costs on the borrower; tests override what they check.
+// A synthetic consumer's variable-rate mortgage on a home, revised yearly, deed of 10-05-2012 with a
+// clause putting the set-up costs on the borrower; tests override what they check.
 export const mortgage = (change: Partial<MortgageInput> = {}): MortgageInput => ({
   deedOn: parseDate('2012-05-10'),
   borrower: 'individual',
@@ -21,6 +21,7 @@ export const mortgage = (change: Partial<MortgageInput> = {}): MortgageInput => 
   loanKind: 'standard',
   rateType: 'variable',
   fixedUntil: null,
+  rateRevisionMonths: 12,
   expensesClause: 'present',
   invoices: [],
   alreadyReturned: null,

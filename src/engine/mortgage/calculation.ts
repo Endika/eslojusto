@@ -47,7 +47,28 @@ export type MortgagePhraseKey =
   | 'interest.estimated'
   | 'interest.explained'
   | 'interest.returned'
-  | 'interest.before_table';
+  | 'interest.before_table'
+  | 'fees.lcci_variable'
+  | 'fees.lcci_fixed_first'
+  | 'fees.lcci_fixed_after'
+  | 'fees.law41_first'
+  | 'fees.law41_after'
+  | 'fees.law41_fixed'
+  | 'fees.law41_revised_less_often'
+  | 'fees.before_2007'
+  | 'fees.conversion'
+  | 'fees.conversion_no_repayment'
+  | 'fees.conversion_no_repayment_2019'
+  | 'fees.after_period'
+  | 'fees.window'
+  | 'fees.already_fixed'
+  | 'fees.earlier_deed_novation'
+  | 'fees.doubtful_norm'
+  | 'fees.above_cap'
+  | 'fees.within_cap'
+  | 'fees.financial_loss'
+  | 'fees.subrogation'
+  | 'fees.unused_premium';
 
 // The UI words a phrase through the dictionary key `client.mortgage.calculation.<key>`.
 export interface MortgagePhrase {

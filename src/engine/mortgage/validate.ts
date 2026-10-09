@@ -5,6 +5,7 @@ import type { Clause, MortgageInput } from './types';
 export type MortgageField =
   | 'deedOn'
   | 'fixedUntil'
+  | 'rateRevisionMonths'
   | 'invoices.total'
   | 'invoices.paidOn'
   | 'invoices.supplied'
@@ -25,6 +26,7 @@ export type ValidationCode =
   | 'before_deed'
   | 'amount_range'
   | 'percent_range'
+  | 'count_range'
   | 'not_agency'
   | 'above_total';
 
@@ -38,6 +40,8 @@ export interface ValidationError {
 // Bounds on what a person can type, not legal limits.
 const MAX_AMOUNT = 1_000_000;
 const MAX_PERCENT = 30;
+// Months of a 50-year loan: the most instalments or months between revisions.
+const MAX_MONTHS = 600;
 // The legal interest table starts in 1995, and so does what this review reads.
 const FIRST_DEED = parseDate('1995-01-01');
 // A provision of funds paid to the notary or the agency may come a little before the deed.
@@ -59,6 +63,8 @@ const isPercent = (v: number): boolean => Number.isFinite(v) && v >= 0 && v <= M
 
 const CLAUSE_RATES = ['floorPercent', 'defaultRate', 'ordinaryRate'] as const;
 
+const isCount = (v: number): boolean => Number.isInteger(v) && v >= 1 && v <= MAX_MONTHS;
+
 export function validate(input: MortgageInput, today: CivilDate): readonly ValidationError[] {
   const errors: ValidationError[] = [];
   const fail = (field: MortgageField, code: ValidationCode, index: number | null = null) =>
@@ -78,6 +84,8 @@ export function validate(input: MortgageInput, today: CivilDate): readonly Valid
   }
   if (input.fixedUntil !== null && !isRealDate(input.fixedUntil))
     fail('fixedUntil', 'invalid_date');
+  if (input.rateRevisionMonths !== null && !isCount(input.rateRevisionMonths))
+    fail('rateRevisionMonths', 'count_range');
 
   input.invoices.forEach((invoice, i) => {
     if (invoice.total !== null && !isAmount(invoice.total))
@@ -105,7 +113,12 @@ export function validate(input: MortgageInput, today: CivilDate): readonly Valid
   input.operations.forEach((operation, i) => {
     if (past('operations.on', operation.on, i) && deed !== null)
       if (compareDates(operation.on, deed) < 0) fail('operations.on', 'before_deed', i);
-    if (!isAmount(operation.principal)) fail('operations.principal', 'amount_range', i);
+    // A switch to a fixed rate may come without repaying anything.
+    const principalOk =
+      operation.kind === 'fixed_rate_novation'
+        ? isAmountOrZero(operation.principal)
+        : isAmount(operation.principal);
+    if (!principalOk) fail('operations.principal', 'amount_range', i);
     if (!isAmountOrZero(operation.feeCharged)) fail('operations.feeCharged', 'amount_range', i);
   });
 
