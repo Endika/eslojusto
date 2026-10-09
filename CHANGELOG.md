@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.31.0](https://github.com/Endika/eslojusto/compare/v1.30.0...v1.31.0) (2026-10-09)
+
+
+### Features
+
+* **engine:** date-stamp case-law sources and keep amounts off unverified ones ([f4c6645](https://github.com/Endika/eslojusto/commit/f4c66457b3d0855b4018476a533a63bb5d1cd276))
+* **engine:** work out insurance renewal, change notice and distance withdrawal dates ([1cbe40c](https://github.com/Endika/eslojusto/commit/1cbe40c2c0701627b88cd682fc6e266510612fba))
+
 ## [1.30.0](https://github.com/Endika/eslojusto/compare/v1.29.0...v1.30.0) (2026-10-09)
 
 
