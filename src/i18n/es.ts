@@ -16,6 +16,8 @@ export const es = {
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Cada cifra lleva la norma de la que sale.',
   'footer.note_insurance':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las fechas siguen la Ley de Contrato de Seguro (Ley 50/1980) y la Ley 22/2007, de comercialización a distancia de servicios financieros.',
+  'footer.note_credit':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen la Ley 16/2011, de contratos de crédito al consumo, y los tipos medios que publica el Banco de España.',
   'footer.note_benefit':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras del paro siguen la Ley General de la Seguridad Social (arts. 262 a 277) y el IPREM; las del finiquito, el Estatuto de los Trabajadores y la guía del CGPJ (v0.6, julio de 2026).',
   'footer.nav': 'Información legal',
@@ -175,6 +177,7 @@ export const es = {
   'home.credit': 'Financiación',
   'home.insurance': 'Seguros',
   'home.insurance_situation': 'Renuevas tu seguro de hogar o de coche: sus plazos frente a la ley',
+  'home.credit_situation': 'Tienes un préstamo o una tarjeta: su TAE y sus plazos frente a la ley',
   'home.bills': 'Facturas',
   'home.coming_soon': 'Próximamente: {secciones}',
   'home.final_pay': 'Finiquito',
@@ -1262,6 +1265,7 @@ export const es = {
   'client.documents.letter.received': 'Recibí no conforme,',
   'client.documents.letter.filename': 'eslojusto-recibi-no-conforme.pdf',
   'home.insurance_citation': 'Ley de Contrato de Seguro · Ley 22/2007',
+  'home.credit_citation': 'Ley 16/2011 de crédito al consumo · tipos medios del Banco de España',
   'home.rent_citation': 'Ley de Arrendamientos Urbanos · Ley 12/2023 · IRAV e IPC del INE',
   'home.beta': 'Beta',
 
@@ -4321,6 +4325,441 @@ export const es = {
   'client.insurance.error.after_expiry': 'Esa fecha es posterior al vencimiento',
   'client.insurance.error.before_concluded': 'Esa fecha es anterior al día en que la contrataste',
   'client.insurance.error.amount_range': 'Escribe una cifra mayor que 0',
+
+  'credit.title': 'Comprueba la TAE de tu préstamo o tu tarjeta',
+  'credit.description':
+    'La TAE que sale de las cifras de tu contrato, frente al tipo medio del Banco de España, el tope por devolverlo antes y el plazo para desistir.',
+  'credit.h1': 'La TAE y los plazos de tu préstamo o tu tarjeta',
+  'credit.lead':
+    'Con las cifras de tu contrato: qué TAE sale de ellas, cómo queda frente al tipo medio que publica el Banco de España, si lo que te cobraron por devolverlo antes pasa del tope de la ley y hasta cuándo puedes desistir. Para préstamos personales, financiación de coches y tarjetas revolving.',
+  'credit.beta': 'Beta',
+  'credit.beta_note':
+    'Sección en pruebas. Las cifras salen de lo que escribes y de la ley; lo que diga tu contrato también cuenta.',
+  'credit.no_js':
+    'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
+  'credit.reviewed': 'Revisado el {fecha}',
+  'credit.form_aria': 'Revisión de tu préstamo o tu tarjeta',
+  'credit.tab.producto': 'Contrato',
+  'credit.tab.interes': 'Coste',
+  'credit.tab.amortizacion': 'Devolución',
+  'credit.tab.desistimiento': 'Desistir',
+  'credit.tab.resultado': 'Resultado',
+  'credit.answer.yes': 'Sí',
+  'credit.answer.no': 'No',
+  'credit.answer.unknown': 'No lo sé',
+
+  'credit.product.question': 'Tu crédito',
+  'credit.product.help': 'Ten a mano el contrato y, si lo tienes, el cuadro de cuotas.',
+  'credit.product.kind': '¿Qué es?',
+  'credit.product.kind.personal_loan': 'Préstamo personal',
+  'credit.product.kind.car_loan': 'Financiación de coche',
+  'credit.product.kind.revolving': 'Tarjeta revolving',
+  'credit.product.kind.mortgage': 'Préstamo con hipoteca',
+  'credit.product.kind.lease': 'Renting sin opción de compra',
+
+  'credit.purpose.question': 'Para qué es',
+  'credit.purpose.purpose': '¿Para qué lo pediste?',
+  'credit.purpose.purpose_hint': 'Si lo pediste para las dos cosas, elige el uso principal.',
+  'credit.purpose.purpose.personal': 'Para mí o mi casa, fuera de mi trabajo o negocio',
+  'credit.purpose.purpose.business': 'Para mi negocio o mi profesión',
+
+  'credit.amount.question': 'El importe',
+  'credit.amount.principal': 'Importe del préstamo',
+  'credit.amount.principal_hint':
+    'El capital prestado, en euros, sin sumarle comisiones ni seguros. Por ejemplo, 10.500,00.',
+  'credit.amount.limit': 'Límite de la tarjeta',
+  'credit.amount.limit_hint': 'En euros, el que dice el contrato o el último extracto.',
+
+  'credit.dates.question': 'Las fechas',
+  'credit.dates.agreed': '¿Cuándo lo contrataste?',
+  'credit.dates.agreed_hint': 'El día que pone el contrato.',
+  'credit.dates.drawn': '¿Cuándo recibiste el dinero?',
+  'credit.dates.drawn_hint': 'El día en que te lo ingresaron o se pagó al vendedor.',
+
+  'credit.rate.question': 'El interés',
+  'credit.rate.nominal': 'Tipo de interés nominal (TIN)',
+  'credit.rate.nominal_hint': 'En % al año, por ejemplo 7,99.',
+  'credit.rate.type': '¿El interés es fijo o variable?',
+  'credit.rate.type.fixed': 'Fijo',
+  'credit.rate.type.variable': 'Variable',
+
+  'credit.apr.question': 'La TAE del contrato',
+  'credit.apr.stated': '¿Tu contrato indica la TAE?',
+  'credit.apr.declared': 'TAE que dice tu contrato',
+  'credit.apr.declared_hint': 'En %, por ejemplo 8,29. Suele ir junto al TIN.',
+  'credit.apr.total': 'Importe total adeudado que dice tu contrato',
+  'credit.apr.total_hint': 'Si no lo encuentras, déjalo en blanco.',
+
+  'credit.instalments.question': 'Las cuotas',
+  'credit.instalments.count': 'Número de cuotas',
+  'credit.instalments.amount': 'Importe de cada cuota',
+  'credit.instalments.amount_hint':
+    'Cuotas mensuales iguales, en euros; una última cuota más grande va aparte.',
+  'credit.instalments.first': 'Día de la primera cuota',
+  'credit.instalments.first_hint': 'Las demás se cuentan cada mes desde ese día.',
+
+  'credit.balloon.question': 'La cuota final',
+  'credit.balloon.has': '¿Hay una última cuota más grande que las demás?',
+  'credit.balloon.has_hint': 'Es habitual al financiar un coche.',
+  'credit.balloon.amount': 'Importe de la cuota final',
+  'credit.balloon.due': 'Día de la cuota final',
+  'credit.balloon.due_hint': 'Si no lo sabes, déjalo en blanco: se calcula de las dos formas.',
+
+  'credit.opening.question': 'La comisión de apertura',
+  'credit.opening.fee': 'Comisión de apertura',
+  'credit.opening.fee_hint': 'En euros. Si no te la cobraron, déjalo en blanco.',
+  'credit.other.question': 'Otros gastos',
+  'credit.other.fee': 'Otros gastos al contratarlo',
+  'credit.other.fee_hint':
+    'Como estudio o gestión, sumados, en euros. Si no hubo, déjalo en blanco.',
+  'credit.charges.how': '¿Cómo la pagaste?',
+  'credit.charges.how.deducted': 'Me llegó menos dinero',
+  'credit.charges.how.financed': 'Se sumó al préstamo',
+  'credit.charges.how.paid': 'La pagué aparte',
+  'credit.charges.how_other': '¿Cómo los pagaste?',
+  'credit.charges.how_other.deducted': 'Me llegó menos dinero',
+  'credit.charges.how_other.financed': 'Se sumaron al préstamo',
+  'credit.charges.how_other.paid': 'Los pagué aparte',
+
+  'credit.insurance.question': 'El seguro',
+  'credit.insurance.has': '¿Contrataste un seguro con el préstamo?',
+  'credit.insurance.premium': 'Prima del seguro',
+  'credit.insurance.premium_hint': 'En euros. Si se paga con cada cuota, lo de cada vez.',
+  'credit.insurance.kind': '¿Cómo se paga?',
+  'credit.insurance.kind.single': 'Una sola vez',
+  'credit.insurance.kind.periodic': 'Con cada cuota',
+  'credit.insurance_terms.question': 'Más sobre el seguro',
+  'credit.insurance.financed': '¿La prima se sumó al préstamo?',
+  'credit.insurance.required': '¿Te dijeron que era obligatorio para darte el préstamo?',
+  'credit.insurance.required_hint':
+    'Solo entra en la TAE si lo era. Si no lo sabes, se calcula de las dos formas.',
+
+  'credit.card.question': 'Tu tarjeta',
+  'credit.card.fee': 'Cuota anual de la tarjeta',
+  'credit.card.fee_hint': 'En euros. Si no tiene, déjalo en blanco.',
+  'credit.card.payment': 'Lo que pagas cada mes',
+  'credit.card.balance': 'Lo que debes ahora',
+  'credit.card.balance_hint':
+    'En euros, como dice el último extracto. Si no sabes lo que debes, déjalo en blanco.',
+
+  'credit.compare.question': 'La TAE que se compara',
+  'credit.compare.apr': '¿Qué TAE se compara con el tipo medio del Banco de España?',
+  'credit.compare.apr_hint':
+    'La que sale de las cifras solo es la de tu contrato si has metido todos sus gastos y seguros.',
+  'credit.compare.apr.recalculated': 'La que sale de las cifras que has metido',
+  'credit.compare.apr.declared': 'La que dice tu contrato',
+
+  'credit.repayment.question': 'Si lo devolviste antes',
+  'credit.repayment.repaid': '¿Has devuelto antes de tiempo todo o parte del préstamo?',
+  'credit.repayment.on': 'Día en que lo devolviste',
+  'credit.repayment.principal': 'Capital que devolviste',
+  'credit.repayment.principal_hint': 'En euros, sin la compensación ni los intereses.',
+  'credit.compensation.question': 'Lo que te cobraron',
+  'credit.compensation.charged': 'Compensación que te cobraron por devolverlo antes',
+  'credit.compensation.charged_hint': 'En euros. Si no te cobraron nada, escribe 0.',
+  'credit.compensation.interest': 'Intereses que te cobraron ese día',
+  'credit.compensation.interest_hint': 'Si la liquidación los separa. Si no, déjalo en blanco.',
+  'credit.agreed_end.question': 'El final pactado',
+  'credit.agreed_end.end': 'Día en que acababa el préstamo según el contrato',
+  'credit.agreed_end.end_hint': 'El de la última cuota.',
+  'credit.agreed_end.interest': 'Intereses que quedaban por pagar según el cuadro',
+  'credit.agreed_end.interest_hint':
+    'Desde el día en que lo devolviste. Si no lo sabes, déjalo en blanco.',
+  'credit.repayment_terms.question': 'Quién lo pagó',
+  'credit.repayment_terms.insurance': '¿Lo pagó un seguro?',
+  'credit.repayment_terms.insurance_hint':
+    'Por ejemplo, un seguro que cubre la deuda si falta quien lo pidió.',
+  'credit.repayment_terms.discount':
+    '¿El concesionario te cobró un descuento que te había hecho por financiar?',
+
+  'credit.withdrawal.question': 'Tu copia del contrato',
+  'credit.withdrawal.received': '¿Te dieron una copia del contrato con sus condiciones?',
+  'credit.withdrawal.received_hint': 'En papel o en otro soporte duradero, como un PDF.',
+  'credit.withdrawal.received_on': 'Día en que la recibiste, si fue después de contratarlo',
+  'credit.withdrawal.received_on_hint': 'Si fue el mismo día, déjalo en blanco.',
+
+  'credit.result.title': 'Resultado',
+  'credit.result.out_of_scope': 'Fuera de esta revisión',
+  'credit.result.information': 'Para que lo sepas',
+  'credit.result.unchecked': 'Lo que esta revisión no mira',
+  'credit.result.rules': 'Normas y criterios',
+  'credit.result.how': 'Cómo se calcula',
+  'credit.result.channels': 'Dónde informarte gratis',
+  'credit.result.channels_portal':
+    'El Portal del Cliente Bancario del Banco de España, que explica tus derechos como cliente.',
+  'credit.result.channels_service': 'El Servicio de Reclamaciones del Banco de España.',
+  'credit.result.channels_consumer':
+    'Las oficinas municipales de información al consumidor (OMIC) y los servicios de consumo de tu comunidad autónoma.',
+  'credit.result.restart': 'Empezar de nuevo',
+
+  'client.credit.result.lead':
+    'Cada partida, con la cuenta que lleva a ella y la norma o el criterio en que se apoya. Los días que quedan se cuentan desde hoy.',
+  'client.credit.result.lead_out_of_scope':
+    'Este crédito queda fuera de lo que revisa esta página.',
+  'client.credit.unit.day_one': '{n} día',
+  'client.credit.unit.day_many': '{n} días',
+  'client.credit.unit.month_one': '{n} mes',
+  'client.credit.unit.month_many': '{n} meses',
+  'client.credit.unit.points': '{n} puntos',
+
+  'client.credit.item.apr': 'La TAE de tu contrato',
+  'client.credit.item.indicator': 'Tu TAE frente al tipo medio del Banco de España',
+  'client.credit.item.early_repayment': 'Compensación por devolverlo antes',
+  'client.credit.item.dealer_discount': 'Descuento que pierdes al devolverlo antes',
+  'client.credit.item.withdrawal': 'Desistir del crédito',
+
+  'client.credit.status.matches': 'Coincide',
+  'client.credit.status.contract_lower':
+    'La TAE de tu contrato es más baja que la que sale de sus cifras ({declarada} frente a {calculada})',
+  'client.credit.status.contract_higher':
+    'Revísalo: la TAE de tu contrato es más alta que la que sale de sus cifras ({declarada} frente a {calculada})',
+  'client.credit.status.contract_missing': 'Tu contrato no indica la TAE',
+  'client.credit.status.unsolvable': 'Revísalo: con estas cifras no sale una TAE',
+  'client.credit.status.above_general_cap': 'Por encima del tope general del art. 30 ({importe})',
+  'client.credit.status.within_cap': 'Dentro del tope',
+  'client.credit.status.charged_without_basis': 'Cobro de más ({importe})',
+  'client.credit.status.nothing_charged': 'No cabe compensación y no te la cobraron',
+  'client.credit.status.open': 'Te quedan {dias} (hasta el {fecha})',
+  'client.credit.status.open_today': 'Hoy es el último día ({fecha})',
+  'client.credit.status.ended': 'El plazo terminó el {fecha}',
+  'client.credit.status.not_started': 'El plazo aún no ha empezado',
+  'client.credit.status.review_it': 'Revísalo',
+  'client.credit.status.not_entered': 'No lo has metido',
+  'client.credit.status.depends': 'Depende de un dato que no sabes',
+  'client.credit.status.out_of_scope': 'Esta revisión no cubre este crédito',
+
+  'client.credit.indicator.status.above': 'Más de 6 puntos por encima del tipo medio ({puntos})',
+  'client.credit.indicator.status.edge':
+    'En el borde: depende de cómo se ajuste el tipo medio por comisiones',
+  'client.credit.indicator.status.below': 'Por debajo del umbral de 6 puntos ({puntos})',
+  'client.credit.indicator.status.distance_only': 'Diferencia con el tipo medio: {puntos}',
+  'client.credit.indicator.status.not_published':
+    'El Banco de España aún no ha publicado el tipo de ese mes',
+  'client.credit.indicator.status.no_data': 'El Banco de España no tiene dato de ese mes',
+  'client.credit.indicator.status.not_entered': 'No lo has metido',
+
+  'client.credit.depends.insurance_required':
+    'Depende de si el seguro era obligatorio para darte el préstamo, que no sabes.',
+  'client.credit.depends.balloon_due': 'Depende del día de la cuota final, que no sabes.',
+  'client.credit.depends.insurance_required_and_balloon_due':
+    'Depende de si el seguro era obligatorio y del día de la cuota final, que no sabes.',
+  'client.credit.depends.repayment_base':
+    'Depende de sobre qué importe se calcula el tope: la ley habla del importe reembolsado y no está claro si incluye los intereses de ese día.',
+  'client.credit.reading.insurance_counted': 'Si el seguro era obligatorio',
+  'client.credit.reading.insurance_left_out': 'Si no lo era',
+  'client.credit.reading.balloon_with_last': 'Si la cuota final va con la última cuota',
+  'client.credit.reading.balloon_month_after': 'Si va un mes después',
+  'client.credit.reading.principal_and_interest': 'Con el capital y los intereses de ese día',
+  'client.credit.reading.principal_only': 'Con solo el capital',
+
+  'client.credit.calculation.scope.mortgage':
+    'Esta revisión es para créditos al consumo sin hipoteca: un préstamo con garantía hipotecaria tiene otras reglas, que aquí no se calculan.',
+  'client.credit.calculation.scope.lease_without_purchase':
+    'La ley de crédito al consumo deja fuera el renting sin obligación de comprar el bien al final (art. 3), así que aquí no se calcula.',
+  'client.credit.calculation.scope.business':
+    'La ley de crédito al consumo es para quien pide el crédito para fines ajenos a su negocio o su profesión (art. 2): un crédito para tu negocio queda fuera de esta revisión.',
+  'client.credit.calculation.scope.under_200':
+    'La ley de crédito al consumo deja fuera los créditos de menos de 200 € (art. 3), así que aquí no se calcula.',
+  'client.credit.calculation.scope.before_lcc':
+    'Lo contrataste antes del 25-09-2011, cuando entró en vigor la Ley 16/2011, de contratos de crédito al consumo: lo regían otras reglas, que aquí no se calculan.',
+  'client.credit.calculation.scope.indicator_only':
+    'Tu tarjeta es anterior al 25-09-2011, cuando entró en vigor la Ley 16/2011: aquí solo se compara su TAE con el tipo medio, un criterio del Tribunal Supremo que no depende de la fecha del contrato.',
+  'client.credit.calculation.item.not_entered': 'No has metido este dato, así que no se calcula.',
+
+  'client.credit.calculation.apr.recomputed': 'Con las cifras que has metido, la TAE sale {apr}.',
+  'client.credit.calculation.apr.matches':
+    'Tu contrato dice {declared}: coincide a un decimal con la que sale de sus cifras.',
+  'client.credit.calculation.apr.contract_lower':
+    'Tu contrato dice {declared}, menos que la que sale de sus cifras ({apr}). Antes, comprueba que has metido todos los gastos y seguros: si falta alguno, la cifra cambia. La ley trata este caso en su art. 21.4, que dice que sus consecuencias se modularán; aquí no se calcula ningún importe.',
+  'client.credit.calculation.apr.contract_higher':
+    'Tu contrato dice {declared}, más que la que sale de sus cifras ({apr}). Casi siempre es porque falta algún gasto o seguro en lo que has metido: revísalo.',
+  'client.credit.calculation.apr.contract_missing':
+    'Has indicado que tu contrato no dice la TAE. Para ese caso, la ley dice que tu obligación se reduce a pagar el interés legal en los plazos convenidos (art. 21.2); aquí no se calcula ninguna cifra.',
+  'client.credit.calculation.apr.unsolvable':
+    'Con estas cifras no sale una sola TAE: revisa los importes y las fechas que has metido.',
+  'client.credit.calculation.apr.one_decimal':
+    'Las dos se comparan redondeadas a un decimal, como pide el anexo I de la ley; aquí se muestran con dos.',
+  'client.credit.calculation.apr.revolving_assumption':
+    'Para una tarjeta, la TAE se calcula con los supuestos de la ley (anexo I, parte II): dispones de todo el límite, {limit}, y lo devuelves en un año, en 12 cuotas mensuales con la misma parte de capital más los intereses de lo pendiente; la cuota anual y las comisiones se pagan al principio.',
+  'client.credit.calculation.apr.revolving_before_2013':
+    'Tu tarjeta es anterior al 09-02-2013, cuando cambiaron los supuestos con que la ley calcula la TAE de una tarjeta. La versión anterior no se ha comprobado, así que aquí no se calcula.',
+  'client.credit.calculation.apr.insurance_counted':
+    'Se cuenta la prima del seguro: entra en el coste del crédito cuando el seguro es obligatorio para obtenerlo.',
+  'client.credit.calculation.apr.insurance_left_out':
+    'No se cuenta la prima del seguro: solo entra en el coste del crédito cuando el seguro es obligatorio para obtenerlo.',
+  'client.credit.calculation.apr.balloon_with_last':
+    'La cuota final se cuenta el mismo día que la última cuota.',
+  'client.credit.calculation.apr.balloon_month_after':
+    'La cuota final se cuenta un mes después de la última cuota.',
+  'client.credit.calculation.apr.total_payable':
+    'Importe total que pagas, según estas cifras: {euros}.',
+  'client.credit.calculation.apr.total_cost':
+    'Coste total del crédito: {euros}, lo que pagas menos lo que recibiste.',
+  'client.credit.calculation.apr.declared_total':
+    'Tu contrato dice que el importe total adeudado es {euros}.',
+  'client.credit.calculation.apr.contribution.opening':
+    'La comisión de apertura añade {points} puntos a la TAE.',
+  'client.credit.calculation.apr.contribution.study':
+    'La comisión de estudio añade {points} puntos a la TAE.',
+  'client.credit.calculation.apr.contribution.management':
+    'Los gastos de gestión añaden {points} puntos a la TAE.',
+  'client.credit.calculation.apr.contribution.other':
+    'Los otros gastos añaden {points} puntos a la TAE.',
+  'client.credit.calculation.apr.contribution.insurance':
+    'El seguro añade {points} puntos a la TAE.',
+
+  'client.credit.calculation.indicator.not_entered':
+    'Falta la TAE con la que comparar, así que no se compara.',
+  'client.credit.calculation.indicator.term_unknown':
+    'No se puede saber en qué plazo del Banco de España cae tu préstamo: depende del día de la cuota final, que no sabes.',
+  'client.credit.calculation.indicator.not_published':
+    'El Banco de España aún no ha publicado el tipo medio de {month}.',
+  'client.credit.calculation.indicator.no_data':
+    'El Banco de España no da un tipo medio de {month} en esta serie.',
+  'client.credit.calculation.indicator.apr_recalculated':
+    'Se compara la TAE que sale de las cifras de tu contrato: {apr}.',
+  'client.credit.calculation.indicator.apr_declared':
+    'Se compara la TAE que dice tu contrato: {apr}.',
+  'client.credit.calculation.indicator.reference_revolving':
+    'El tipo medio de las tarjetas revolving en {month}, según el Banco de España, fue del {rate}.',
+  'client.credit.calculation.indicator.reference_loan':
+    'El tipo medio de los créditos al consumo con un plazo como el tuyo, {term}, en {month}, según el Banco de España, fue del {rate}.',
+  'client.credit.calculation.indicator.reference_loan_fixation':
+    'El tipo medio de los créditos al consumo con el tipo fijado hasta un año, en {month}, según el Banco de España, fue del {rate}.',
+  'client.credit.calculation.indicator.reference_2010':
+    'Tu tarjeta es anterior a junio de 2010, cuando empieza la serie del Banco de España: se toma el {rate} que tomó el Tribunal Supremo para esos contratos (STS 258/2023).',
+  'client.credit.calculation.indicator.variable_rate_series':
+    'Con interés variable, el Banco de España clasifica el crédito por el periodo en que el tipo está fijado al principio; se toma el de hasta un año, porque no consta cuándo se revisa.',
+  'client.credit.calculation.indicator.above':
+    'Tu TAE está {points} puntos por encima del tipo medio: más de 6 puntos.',
+  'client.credit.calculation.indicator.edge':
+    'Tu TAE está {points} puntos por encima del tipo medio.',
+  'client.credit.calculation.indicator.below':
+    'La diferencia con el tipo medio es de {points} puntos: no pasa de 6 puntos.',
+  'client.credit.calculation.indicator.distance':
+    'La diferencia con el tipo medio es de {points} puntos.',
+  'client.credit.calculation.indicator.loan_criterion_unread':
+    'Para los préstamos, el criterio del Tribunal Supremo sobre esa diferencia aún no se ha comprobado en el texto de la sentencia, así que solo se da la diferencia, sin compararla con ningún umbral.',
+  'client.credit.calculation.indicator.revolving_criterion':
+    'Para las tarjetas revolving, el Tribunal Supremo toma como referencia una diferencia de más de 6 puntos porcentuales sobre el tipo medio (STS 258/2023). Es un criterio del tribunal, no una norma.',
+  'client.credit.calculation.indicator.edge_reason':
+    'El tipo medio del Banco de España no incluye comisiones; la STS 258/2023 estima esa diferencia en 20-30 centésimas: entre 6 y 6,30 puntos, el resultado depende de cómo se ajuste.',
+  'client.credit.calculation.indicator.judge':
+    'Es una referencia, no una conclusión: un juez valora además las circunstancias del caso.',
+  'client.credit.calculation.indicator.channels':
+    'Puedes informarte gratis en el Banco de España y en los servicios de consumo de tu comunidad o tu ayuntamiento.',
+
+  'client.credit.calculation.early_repayment.paid_by_insurance':
+    'Lo pagó un seguro: en ese caso la ley no permite cobrar compensación (art. 30.3).',
+  'client.credit.calculation.early_repayment.variable_rate':
+    'Tu préstamo tiene interés variable: en un periodo sin tipo fijo la ley no permite cobrar compensación (art. 30.3).',
+  'client.credit.calculation.early_repayment.nothing_charged': 'No te cobraron nada por ello.',
+  'client.credit.calculation.early_repayment.charged_without_basis':
+    'Te cobraron {charged} de compensación, que en este caso la ley no permite.',
+  'client.credit.calculation.early_repayment.over_a_year':
+    'Entre el día en que lo devolviste ({on}) y el final pactado ({end}) quedaba más de un año, contado de fecha a fecha: el tope es el 1 % de lo reembolsado (art. 30.2).',
+  'client.credit.calculation.early_repayment.up_to_a_year':
+    'Entre el día en que lo devolviste ({on}) y el final pactado ({end}) quedaba un año o menos, contado de fecha a fecha: el tope es el 0,5 % de lo reembolsado (art. 30.2).',
+  'client.credit.calculation.early_repayment.base_with_interest':
+    'Sobre {base}, el capital más los intereses de ese día, el {rate} da {cap}.',
+  'client.credit.calculation.early_repayment.base_principal':
+    'Sobre {base}, el capital devuelto, el {rate} da {cap}.',
+  'client.credit.calculation.early_repayment.interest_cap':
+    'Además, nunca puede pasar de los intereses que quedaban por pagar (art. 30.5): el tope queda en {cap}.',
+  'client.credit.calculation.early_repayment.above_general_cap':
+    'Te cobraron {charged}: {over} por encima de ese tope.',
+  'client.credit.calculation.early_repayment.losses':
+    'El prestamista solo puede cobrar más si demuestra que el reembolso le hizo perder más que ese tope (art. 30.4).',
+  'client.credit.calculation.early_repayment.within_cap':
+    'Te cobraron {charged}: no pasa de ese tope.',
+  'client.credit.calculation.dealer_discount.review_it':
+    'Lo que cobra el concesionario por perder un descuento por financiar no es la compensación del prestamista, así que no se compara con el tope del art. 30. El contrato tiene que decir el precio al contado (art. 16.2), y puedes no financiar la compra y pagarla como acordaste con el vendedor (art. 26.3): mira qué dice tu contrato de ese descuento.',
+
+  'client.credit.calculation.withdrawal.start':
+    'Son 14 días naturales desde el día en que lo contrataste, el {day}, sin contar ese día.',
+  'client.credit.calculation.withdrawal.start_on_terms':
+    'Son 14 días naturales desde que recibes el contrato y su información: como llegaron después, se cuentan desde el {day}, sin contar ese día.',
+  'client.credit.calculation.withdrawal.days_left':
+    'Desde hoy quedan {days}, hasta el {day} incluido.',
+  'client.credit.calculation.withdrawal.days_left_today': 'Hoy, {day}, es el último día.',
+  'client.credit.calculation.withdrawal.ended': 'El plazo terminó el {day}.',
+  'client.credit.calculation.withdrawal.not_started':
+    'Son 14 días naturales desde que recibes el contrato y su información. Como aún no los has recibido, el plazo aún no ha empezado.',
+  'client.credit.calculation.withdrawal.receipt_unknown':
+    'No sabes si recibiste el contrato y su información después, así que se cuenta desde el día en que lo contrataste; si llegaron después, el plazo acaba más tarde.',
+  'client.credit.calculation.withdrawal.send_by':
+    'Basta con enviar tu comunicación como tarde ese último día, en papel o en otro soporte duradero (art. 28.2).',
+  'client.credit.calculation.withdrawal.effects':
+    'Si desistes, devuelves el capital y los intereses de los días que lo tuviste en 30 días como mucho, y los servicios accesorios ligados al crédito, como un seguro, quedan sin efecto (art. 28).',
+
+  'client.credit.calculation.information.contract_mentions':
+    'La ley lista lo que tiene que decir el contrato, como el tipo de interés, la TAE, el importe total o el derecho a desistir (art. 16.2).',
+  'client.credit.calculation.information.contract_mentions.missing':
+    'Has indicado que a tu contrato le falta alguna.',
+  'client.credit.calculation.information.contract_mentions.consequences':
+    'Lo que pasa si falta alguna lo dice el art. 21.',
+  'client.credit.calculation.information.linked_insurance.apr':
+    'La prima de un seguro entra en la TAE cuando el seguro es obligatorio para obtener el crédito.',
+  'client.credit.calculation.information.linked_insurance.withdrawal':
+    'Si desistes del crédito, el seguro accesorio queda sin efecto (art. 28.3).',
+  'client.credit.calculation.information.linked_insurance.unused_premium':
+    'Si lo devuelves antes, el art. 30.6 se ocupa de la parte de la prima que no se ha consumido.',
+  'client.credit.calculation.information.unused_premium.guide':
+    'Como orientación, repartiendo la prima a partes iguales por los días del préstamo, la parte sin consumir sería de unos {euros}. Es orientativa: tu póliza fija el método.',
+  'client.credit.calculation.information.cash_price':
+    'En una compra financiada, el contrato tiene que decir el bien y su precio al contado (art. 16.2).',
+  'client.credit.calculation.information.cash_option':
+    'Y puedes no financiar la compra y pagarla como acordaste con el vendedor (art. 26.3).',
+  'client.credit.calculation.information.revolving_info':
+    'La orden de transparencia bancaria prevé que una tarjeta revolving informe al menos cada trimestre de lo pagado y lo que se debe, y que, si lo pides, te den el desglose y un cuadro de pagos en 5 días hábiles. No se ha comprobado a qué entidades y contratos anteriores llega, así que no se afirma que la tuya lo deba.',
+  'client.credit.calculation.information.card_payoff.months':
+    'Con una deuda de {balance} y pagando {payment} al mes sin nuevas compras, tardarías {months} en pagarla y pagarías {interest} de intereses.',
+  'client.credit.calculation.information.card_payoff.never':
+    'Con una deuda de {balance}, los intereses del mes son unos {interest}: con una cuota de {payment} la deuda no baja.',
+  'client.credit.calculation.information.law_change':
+    'La ley de crédito al consumo va a cambiar: la nueva directiva europea se aplica desde el 20-11-2026 y la ley que la traspone aún está en tramitación. Aquí se aplica la ley vigente, la Ley 16/2011.',
+
+  'client.credit.info.contract_mentions': 'Lo que tiene que decir tu contrato',
+  'client.credit.info.linked_insurance': 'El seguro ligado al crédito',
+  'client.credit.info.unused_premium': 'La prima sin consumir',
+  'client.credit.info.cash_price': 'Si financias una compra',
+  'client.credit.info.revolving_info': 'La información de tu tarjeta',
+  'client.credit.info.card_payoff': 'Cuánto tardarías en pagar la tarjeta',
+  'client.credit.info.law_change': 'La ley va a cambiar',
+
+  'client.credit.unchecked.clause_transparency':
+    'Si las cláusulas de tu contrato son claras y válidas',
+  'client.credit.unchecked.insurance_required': 'Si un seguro era de verdad obligatorio',
+  'client.credit.unchecked.default_charges': 'Las comisiones por impago',
+  'client.credit.unchecked.limit_changes': 'Los cambios de límite de una tarjeta',
+  'client.credit.unchecked.new_law': 'Lo que cambie con la nueva ley de crédito al consumo',
+
+  'client.credit.norm.in_force': 'en vigor',
+  'client.credit.norm.pending_validation': 'pendiente de convalidación',
+  'client.credit.norm.repealed': 'derogada el {fecha}',
+  'client.credit.norm.draft': 'en tramitación: no se aplica',
+  'client.credit.norm.conditional': 'pendiente de una condición',
+  'client.credit.source.since': 'con efectos desde el {desde}',
+  'client.credit.source.case_law': 'criterio del Tribunal Supremo',
+  'client.credit.source.checked': 'estado a {fecha}',
+  'client.credit.source.case_law_unverified': 'sin comprobar en el texto de la sentencia',
+  'client.credit.source.official_data': 'dato oficial',
+  'client.credit.source.statute': 'norma',
+
+  'client.credit.error.missing_value': 'Falta este dato',
+  'client.credit.error.missing_choice': 'Elige una respuesta',
+  'client.credit.error.invalid_date': 'La fecha no es válida',
+  'client.credit.error.invalid_amount': 'No se entiende la cifra: escríbela como 1.234,56',
+  'client.credit.error.invalid_rate': 'No se entiende el porcentaje: escríbelo como 7,99',
+  'client.credit.error.invalid_count': 'Escribe un número entero, como 48',
+  'client.credit.error.in_future': 'Esa fecha aún no ha llegado',
+  'client.credit.error.before_agreed': 'Esa fecha es anterior al día en que lo contrataste',
+  'client.credit.error.outside_term': 'Esa fecha queda fuera del plazo del préstamo',
+  'client.credit.error.amount_range': 'Escribe una cifra mayor que 0 y de hasta 1.000.000',
+  'client.credit.error.rate_range': 'Escribe un porcentaje entre 0 y 100',
+  'client.credit.error.count_range': 'Escribe entre 1 y 600 cuotas',
+  'client.credit.error.above_principal': 'Es más que el importe del préstamo',
+  'client.credit.error.in_schedule': 'Esa cuota ya está en el cuadro',
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof es;

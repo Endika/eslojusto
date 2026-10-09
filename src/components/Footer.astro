@@ -2,6 +2,7 @@
 import { t, type Key } from '../i18n';
 import { link, LANGS, type Lang } from '../i18n/languages';
 import {
+  CREDIT_BUILD,
   EMPLOYMENT_BUILD,
   HOUSEHOLD_BUILD,
   INSURANCE_BUILD,
@@ -26,7 +27,8 @@ const local = current
   .replace(new RegExp(`^/(${Object.keys(LANGS).join('|')})(?=/)`), '');
 const general =
   ['/privacidad/', '/aviso-legal/'].includes(local) ||
-  (local === '/' && (RENTAL_BUILD || EMPLOYMENT_BUILD || HOUSEHOLD_BUILD || INSURANCE_BUILD));
+  (local === '/' &&
+    (RENTAL_BUILD || EMPLOYMENT_BUILD || HOUSEHOLD_BUILD || INSURANCE_BUILD || CREDIT_BUILD));
 const note: Key = local.startsWith('/alquiler/')
   ? 'footer.note_rental'
   : local.startsWith('/contrato/')
@@ -35,11 +37,13 @@ const note: Key = local.startsWith('/alquiler/')
       ? 'footer.note_household'
       : local.startsWith('/seguros/')
         ? 'footer.note_insurance'
-        : local.startsWith('/paro/')
-          ? 'footer.note_benefit'
-          : general
-            ? 'footer.note_general'
-            : 'footer.note';
+        : local.startsWith('/financiacion/')
+          ? 'footer.note_credit'
+          : local.startsWith('/paro/')
+            ? 'footer.note_benefit'
+            : general
+              ? 'footer.note_general'
+              : 'footer.note';
 ---
 
 <footer class="footer">

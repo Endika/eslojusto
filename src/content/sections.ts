@@ -17,3 +17,8 @@ export const HOUSEHOLD_BETA = true;
 // same terms; it opens as a beta.
 export const INSURANCE_BUILD = import.meta.env.PUBLIC_INSURANCE === '1';
 export const INSURANCE_BETA = true;
+
+// /financiacion/, a consumer credit's APR, average-rate indicator and dates, is built only when
+// PUBLIC_CREDIT=1, on the same terms; it opens as a beta.
+export const CREDIT_BUILD = import.meta.env.PUBLIC_CREDIT === '1';
+export const CREDIT_BETA = true;

@@ -1,0 +1,19 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { CREDIT_BUILD } from '../../../content/sections';
+import { langPaths, type Lang } from '../../../i18n/languages';
+
+export const getStaticPaths = (() => (CREDIT_BUILD ? langPaths() : [])) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+
+// The literal switch, as on /financiacion/: a build without it carries none of the page's code.
+/* eslint-disable no-restricted-syntax -- a fixed path into src/views, not a boundary escape */
+const Credit =
+  import.meta.env.PUBLIC_CREDIT === '1'
+    ? (await import('../../../views/Credit.astro')).default
+    : null;
+/* eslint-enable no-restricted-syntax */
+---
+
+{Credit && <Credit lang={lang} />}

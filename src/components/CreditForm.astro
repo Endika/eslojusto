@@ -1,0 +1,540 @@
+---
+import Field from './Field.astro';
+import Choice from './EmploymentChoice.astro';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+import {
+  CHARGE_PAYMENTS,
+  COMPARED_APRS,
+  PREMIUM_KINDS,
+  PRODUCTS,
+  PURPOSES,
+  RATE_TYPES,
+} from '../credit/form';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+const answers = (values: readonly ('yes' | 'no' | 'unknown')[]) =>
+  values.map((value) => ({ value, label: tx(`credit.answer.${value}`) }));
+const yesNo = answers(['yes', 'no']);
+const yesNoUnknown = answers(['yes', 'no', 'unknown']);
+
+// The loans' own questions; a card is asked about its limit, fee and statement instead.
+const loan = { 'data-if': 'product:personal_loan car_loan' };
+const card = { 'data-if': 'product:revolving' };
+
+const arrow = 'M4 12h15m-6-6 6 6-6 6';
+---
+
+<form class="calculator" id="credit" novalidate aria-label={tx('credit.form_aria')}>
+  <div class="stack">
+    <fieldset
+      class="sheet"
+      id="sheet-producto"
+      data-sheet="producto"
+      aria-labelledby="question-producto"
+    >
+      <h2 class="question" id="question-producto" tabindex="-1">
+        {tx('credit.product.question')}
+      </h2>
+      <p class="help help--short">{tx('credit.product.help')}</p>
+      <Choice
+        name="product"
+        legend={tx('credit.product.kind')}
+        options={PRODUCTS.map((value) => ({ value, label: tx(`credit.product.kind.${value}`) }))}
+        layout="list"
+      />
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-uso" data-sheet="uso" aria-labelledby="question-uso">
+      <h2 class="question" id="question-uso" tabindex="-1">
+        {tx('credit.purpose.question')}
+      </h2>
+      <Choice
+        name="purpose"
+        legend={tx('credit.purpose.purpose')}
+        hint={tx('credit.purpose.purpose_hint')}
+        options={PURPOSES.map((value) => ({ value, label: tx(`credit.purpose.purpose.${value}`) }))}
+        layout="list"
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-importe"
+      data-sheet="importe"
+      aria-labelledby="question-importe"
+    >
+      <h2 class="question" id="question-importe" tabindex="-1">
+        {tx('credit.amount.question')}
+      </h2>
+      <Field
+        name="principal"
+        label={tx('credit.amount.principal')}
+        hint={tx('credit.amount.principal_hint')}
+        kind="amount"
+        attributes={loan}
+      />
+      <Field
+        name="cardLimit"
+        label={tx('credit.amount.limit')}
+        hint={tx('credit.amount.limit_hint')}
+        kind="amount"
+        attributes={card}
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-contrato"
+      data-sheet="contrato"
+      aria-labelledby="question-contrato"
+    >
+      <h2 class="question" id="question-contrato" tabindex="-1">
+        {tx('credit.dates.question')}
+      </h2>
+      <Field
+        name="agreedOn"
+        label={tx('credit.dates.agreed')}
+        hint={tx('credit.dates.agreed_hint')}
+        kind="date"
+      />
+      <Field
+        name="drawnOn"
+        label={tx('credit.dates.drawn')}
+        hint={tx('credit.dates.drawn_hint')}
+        kind="date"
+        attributes={loan}
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-interes"
+      data-sheet="interes"
+      aria-labelledby="question-interes"
+    >
+      <h2 class="question" id="question-interes" tabindex="-1">
+        {tx('credit.rate.question')}
+      </h2>
+      <Field
+        name="nominalRate"
+        label={tx('credit.rate.nominal')}
+        hint={tx('credit.rate.nominal_hint')}
+        kind="amount"
+      />
+      <Choice
+        name="rateType"
+        legend={tx('credit.rate.type')}
+        options={RATE_TYPES.map((value) => ({ value, label: tx(`credit.rate.type.${value}`) }))}
+        layout="pair"
+        attributes={loan}
+      />
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-tae" data-sheet="tae" aria-labelledby="question-tae">
+      <h2 class="question" id="question-tae" tabindex="-1">
+        {tx('credit.apr.question')}
+      </h2>
+      <Choice name="aprStated" legend={tx('credit.apr.stated')} options={yesNo} layout="pair" />
+      <Field
+        name="declaredApr"
+        label={tx('credit.apr.declared')}
+        hint={tx('credit.apr.declared_hint')}
+        kind="amount"
+        attributes={{ 'data-if': 'aprStated:yes' }}
+      />
+      <Field
+        name="declaredTotalPayable"
+        label={tx('credit.apr.total')}
+        hint={tx('credit.apr.total_hint')}
+        kind="amount"
+        attributes={loan}
+      />
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-cuotas" data-sheet="cuotas" aria-labelledby="question-cuotas">
+      <h2 class="question" id="question-cuotas" tabindex="-1">
+        {tx('credit.instalments.question')}
+      </h2>
+      <div {...loan}>
+        <div class="pair">
+          <Field name="instalmentCount" label={tx('credit.instalments.count')} kind="days" />
+          <Field
+            name="instalmentAmount"
+            label={tx('credit.instalments.amount')}
+            kind="amount"
+            extraHints={['hint-instalments']}
+          />
+        </div>
+        <p class="hint" id="hint-instalments">
+          {tx('credit.instalments.amount_hint')}
+        </p>
+        <Field
+          name="firstDueOn"
+          label={tx('credit.instalments.first')}
+          hint={tx('credit.instalments.first_hint')}
+          kind="date"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-cuota-final"
+      data-sheet="cuota-final"
+      aria-labelledby="question-cuota-final"
+    >
+      <h2 class="question" id="question-cuota-final" tabindex="-1">
+        {tx('credit.balloon.question')}
+      </h2>
+      <div {...loan}>
+        <Choice
+          name="hasBalloon"
+          legend={tx('credit.balloon.has')}
+          hint={tx('credit.balloon.has_hint')}
+          options={yesNo}
+          layout="pair"
+        />
+        <div data-if="hasBalloon:yes">
+          <Field name="balloonAmount" label={tx('credit.balloon.amount')} kind="amount" />
+          <Field
+            name="balloonDueOn"
+            label={tx('credit.balloon.due')}
+            hint={tx('credit.balloon.due_hint')}
+            kind="date"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-apertura"
+      data-sheet="apertura"
+      aria-labelledby="question-apertura"
+    >
+      <h2 class="question" id="question-apertura" tabindex="-1">
+        {tx('credit.opening.question')}
+      </h2>
+      <div {...loan}>
+        <Field
+          name="openingFee"
+          label={tx('credit.opening.fee')}
+          hint={tx('credit.opening.fee_hint')}
+          kind="amount"
+        />
+        <Choice
+          name="openingHow"
+          legend={tx('credit.charges.how')}
+          options={CHARGE_PAYMENTS.map((value) => ({
+            value,
+            label: tx(`credit.charges.how.${value}`),
+          }))}
+          layout="list"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-otros-gastos"
+      data-sheet="otros-gastos"
+      aria-labelledby="question-otros-gastos"
+    >
+      <h2 class="question" id="question-otros-gastos" tabindex="-1">
+        {tx('credit.other.question')}
+      </h2>
+      <div {...loan}>
+        <Field
+          name="otherFee"
+          label={tx('credit.other.fee')}
+          hint={tx('credit.other.fee_hint')}
+          kind="amount"
+        />
+        <Choice
+          name="otherHow"
+          legend={tx('credit.charges.how_other')}
+          options={CHARGE_PAYMENTS.map((value) => ({
+            value,
+            label: tx(`credit.charges.how_other.${value}`),
+          }))}
+          layout="list"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-seguro" data-sheet="seguro" aria-labelledby="question-seguro">
+      <h2 class="question" id="question-seguro" tabindex="-1">
+        {tx('credit.insurance.question')}
+      </h2>
+      <div {...loan}>
+        <Choice
+          name="hasInsurance"
+          legend={tx('credit.insurance.has')}
+          options={yesNo}
+          layout="pair"
+        />
+        <div data-if="hasInsurance:yes">
+          <Field
+            name="premium"
+            label={tx('credit.insurance.premium')}
+            hint={tx('credit.insurance.premium_hint')}
+            kind="amount"
+          />
+          <Choice
+            name="premiumKind"
+            legend={tx('credit.insurance.kind')}
+            options={PREMIUM_KINDS.map((value) => ({
+              value,
+              label: tx(`credit.insurance.kind.${value}`),
+            }))}
+            layout="pair"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-seguro-pago"
+      data-sheet="seguro-pago"
+      aria-labelledby="question-seguro-pago"
+    >
+      <h2 class="question" id="question-seguro-pago" tabindex="-1">
+        {tx('credit.insurance_terms.question')}
+      </h2>
+      <div {...loan}>
+        <div data-if="hasInsurance:yes">
+          <Choice
+            name="premiumFinanced"
+            legend={tx('credit.insurance.financed')}
+            options={yesNo}
+            layout="pair"
+            attributes={{ 'data-if': 'premiumKind:single' }}
+          />
+          <Choice
+            name="insuranceRequired"
+            legend={tx('credit.insurance.required')}
+            hint={tx('credit.insurance.required_hint')}
+            options={yesNoUnknown}
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-tarjeta"
+      data-sheet="tarjeta"
+      aria-labelledby="question-tarjeta"
+    >
+      <h2 class="question" id="question-tarjeta" tabindex="-1">
+        {tx('credit.card.question')}
+      </h2>
+      <div {...card}>
+        <Field
+          name="annualFee"
+          label={tx('credit.card.fee')}
+          hint={tx('credit.card.fee_hint')}
+          kind="amount"
+        />
+        <div class="pair">
+          <Field name="monthlyPayment" label={tx('credit.card.payment')} kind="amount" />
+          <Field
+            name="balance"
+            label={tx('credit.card.balance')}
+            kind="amount"
+            extraHints={['hint-card']}
+          />
+        </div>
+        <p class="hint" id="hint-card">
+          {tx('credit.card.balance_hint')}
+        </p>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-comparar"
+      data-sheet="comparar"
+      aria-labelledby="question-comparar"
+    >
+      <h2 class="question" id="question-comparar" tabindex="-1">
+        {tx('credit.compare.question')}
+      </h2>
+      <Choice
+        name="confirmedApr"
+        legend={tx('credit.compare.apr')}
+        hint={tx('credit.compare.apr_hint')}
+        options={COMPARED_APRS.map((value) => ({
+          value,
+          label: tx(`credit.compare.apr.${value}`),
+        }))}
+        layout="list"
+        attributes={{ 'data-if': 'aprStated:yes' }}
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-amortizacion"
+      data-sheet="amortizacion"
+      aria-labelledby="question-amortizacion"
+    >
+      <h2 class="question" id="question-amortizacion" tabindex="-1">
+        {tx('credit.repayment.question')}
+      </h2>
+      <div {...loan}>
+        <Choice
+          name="repaid"
+          legend={tx('credit.repayment.repaid')}
+          options={yesNo}
+          layout="pair"
+        />
+        <div data-if="repaid:yes">
+          <Field name="repaidOn" label={tx('credit.repayment.on')} kind="date" />
+          <Field
+            name="principalRepaid"
+            label={tx('credit.repayment.principal')}
+            hint={tx('credit.repayment.principal_hint')}
+            kind="amount"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-compensacion"
+      data-sheet="compensacion"
+      aria-labelledby="question-compensacion"
+    >
+      <h2 class="question" id="question-compensacion" tabindex="-1">
+        {tx('credit.compensation.question')}
+      </h2>
+      <div {...loan}>
+        <div data-if="repaid:yes">
+          <Field
+            name="compensation"
+            label={tx('credit.compensation.charged')}
+            hint={tx('credit.compensation.charged_hint')}
+            kind="amount"
+          />
+          <Field
+            name="interestSettled"
+            label={tx('credit.compensation.interest')}
+            hint={tx('credit.compensation.interest_hint')}
+            kind="amount"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-fin-pactado"
+      data-sheet="fin-pactado"
+      aria-labelledby="question-fin-pactado"
+    >
+      <h2 class="question" id="question-fin-pactado" tabindex="-1">
+        {tx('credit.agreed_end.question')}
+      </h2>
+      <div {...loan}>
+        <div data-if="repaid:yes">
+          <Field
+            name="agreedEndOn"
+            label={tx('credit.agreed_end.end')}
+            hint={tx('credit.agreed_end.end_hint')}
+            kind="date"
+          />
+          <Field
+            name="remainingInterest"
+            label={tx('credit.agreed_end.interest')}
+            hint={tx('credit.agreed_end.interest_hint')}
+            kind="amount"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-detalles"
+      data-sheet="detalles"
+      aria-labelledby="question-detalles"
+    >
+      <h2 class="question" id="question-detalles" tabindex="-1">
+        {tx('credit.repayment_terms.question')}
+      </h2>
+      <div {...loan}>
+        <div data-if="repaid:yes">
+          <Choice
+            name="paidByInsurance"
+            legend={tx('credit.repayment_terms.insurance')}
+            hint={tx('credit.repayment_terms.insurance_hint')}
+            options={yesNo}
+            layout="pair"
+          />
+          <Choice
+            name="discountLost"
+            legend={tx('credit.repayment_terms.discount')}
+            options={yesNoUnknown}
+            attributes={{ 'data-if': 'product:car_loan' }}
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-desistimiento"
+      data-sheet="desistimiento"
+      aria-labelledby="question-desistimiento"
+    >
+      <h2 class="question" id="question-desistimiento" tabindex="-1">
+        {tx('credit.withdrawal.question')}
+      </h2>
+      <Choice
+        name="infoReceived"
+        legend={tx('credit.withdrawal.received')}
+        hint={tx('credit.withdrawal.received_hint')}
+        options={yesNoUnknown}
+      />
+      <Field
+        name="infoReceivedOn"
+        label={tx('credit.withdrawal.received_on')}
+        hint={tx('credit.withdrawal.received_on_hint')}
+        kind="date"
+        attributes={{ 'data-if': 'infoReceived:yes' }}
+      />
+    </fieldset>
+  </div>
+
+  <div class="actions">
+    <div class="actions__inner">
+      <button class="button button--back" type="button" data-back hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow} transform="rotate(180 12 12)"></path>
+        </svg>
+        {tx('form.back')}
+      </button>
+      <button class="button button--forward" type="button" data-next>
+        {tx('form.next')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+      <button class="button button--forward" type="submit" data-submit hidden>
+        {tx('form.review')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</form>

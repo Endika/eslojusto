@@ -17,7 +17,9 @@
 - **Household workers (empleada de hogar)** — pay, hours, holidays, final pay and the
   «desistimiento» of a domestic worker. In beta.
 - **Insurance and credit** — in development, not yet published; the dates of a home or motor
-  insurance policy at `/seguros/` are built only with `PUBLIC_INSURANCE=1`.
+  insurance policy at `/seguros/` are built only with `PUBLIC_INSURANCE=1`, and the APR, the
+  average-rate indicator and the dates of a consumer credit at `/financiacion/` only with
+  `PUBLIC_CREDIT=1`.
 
 The calculators run in your browser and nothing you type is sent anywhere. Reading your documents
 is optional: with your explicit consent, the pages go to the API in Spain, are read by a model in
