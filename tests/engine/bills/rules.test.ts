@@ -25,7 +25,14 @@ const BOE_INDEX = JSON.parse(
 ) as BoeIndex;
 
 // Anchors taken over from the table rows before the index was read for this section.
-const UNREAD_ANCHORS = ['BOE-A-2016-12274#ai-2', 'BOE-A-2013-8561#dt'];
+const UNREAD_ANCHORS = [
+  'BOE-A-2016-12274#ai-2',
+  'BOE-A-2013-8561#dt',
+  'BOE-A-1992-28741#a99',
+  'BOE-A-1992-28740#a90',
+  'BOE-A-2026-6544#a1',
+  'BOE-A-2017-11505#ai',
+];
 
 const everyCheck = (input: ElectricityBillInput): readonly BillItem[] => [
   ...checkArithmetic(input, BILLS_NORMS),
@@ -62,12 +69,18 @@ describe('the bills rules', () => {
     expect(BOE_INDEX.norms[boeId]?.blocks[anchor], `${boeId}#${anchor}`).toBe(`Artículo ${number}`);
   });
 
-  it('only the billing rules open on a whole consolidated text, whose block is not read', () => {
+  it('only the rules whose block is not read open on a whole consolidated text', () => {
     expect(
       Object.values(RULES)
         .filter((r) => r.url.includes('/buscar/act.php') && !r.url.includes('#'))
         .map((r) => r.id),
-    ).toEqual(['billing']);
+    ).toEqual([
+      'billing',
+      'additional_services',
+      'unsolicited_services',
+      'exit_penalty',
+      'power_change',
+    ]);
   });
 
   it('give a source with the norm status', () => {

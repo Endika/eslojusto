@@ -19,6 +19,15 @@ export type BillsRuleId =
   | 'social_bonus_funding_until_june'
   | 'social_bonus_funding'
   | 'meter_rent'
+  | 'electricity_tax'
+  | 'vat'
+  | 'social_bonus_discount'
+  | 'social_bonus_cap'
+  | 'services_pvpc'
+  | 'additional_services'
+  | 'unsolicited_services'
+  | 'exit_penalty'
+  | 'power_change'
   | 'commitment_proportional';
 
 export type BillsRule = LawRule<BillsRuleId, BillsNormId> & RuleBase<BillsSourceId>;
@@ -49,12 +58,17 @@ const CHARGES_URL = 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2025-26705';
 const FUNDING_URL = 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-13759';
 const MARGIN_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2016-12274#ai-2';
 const METER_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2013-8561#dt';
-// The block of arts. 43 to 45 in the consolidated text has not been read: the link opens on the
-// whole regulation.
+const ELECTRICITY_TAX_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-1992-28741#a99';
+const VAT_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-1992-28740#a90';
+const SOCIAL_BONUS_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-6544#a1';
+const SOCIAL_BONUS_CAP_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2017-11505#ai';
+// No block of the consolidated text has been read: the link opens on the whole regulation.
 const RD88_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-3212';
 const RD216_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2014-3376#a5';
 // Art. 62.5 in the wording of Real Decreto-ley 7/2021, in force from 01-01-2022.
 const TRLGDCU_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555#a62';
+// The blocks of arts. 60 bis and 66 quáter have not been read: the link opens on the whole text.
+const TRLGDCU_TEXT_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555';
 
 export const RULES: Readonly<Record<BillsRuleId, BillsRule>> = {
   // Arts. 43 to 45: reading and billing, and what was charged wrong is settled in the next bill.
@@ -137,6 +151,102 @@ export const RULES: Readonly<Record<BillsRuleId, BillsRule>> = {
     '2026-01-01',
     null,
     'amount',
+  ),
+  // Arts. 95, 97 and 99: the electricity tax falls due with the bill, on the supply's
+  // consideration, at the rate of that day and never under its floor per MWh. Rates by day live in
+  // the table, each row with its own decree.
+  electricity_tax: rule(
+    'electricity_tax',
+    'law38_1992',
+    'Ley 38/1992, arts. 95, 97 y 99',
+    ELECTRICITY_TAX_URL,
+    '2026-01-01',
+    null,
+    'amount',
+  ),
+  // Arts. 75, 78 and 90: VAT falls due with the bill, on everything charged including the
+  // electricity tax, at the rate of that day.
+  vat: rule(
+    'vat',
+    'law37_1992',
+    'Ley 37/1992, arts. 75, 78 y 90',
+    VAT_URL,
+    '2026-01-01',
+    null,
+    'amount',
+  ),
+  // Art. 1: the social bonus discounts of 2026 on the PVPC of a reference retailer.
+  social_bonus_discount: rule(
+    'social_bonus_discount',
+    'rdl7_2026',
+    'Real Decreto-ley 7/2026, art. 1',
+    SOCIAL_BONUS_URL,
+    '2026-03-22',
+    '2026-12-31',
+    'amount',
+  ),
+  // Annex I: the kWh a year with the discount.
+  social_bonus_cap: rule(
+    'social_bonus_cap',
+    'rd897_2017',
+    'Real Decreto 897/2017, anexo I',
+    SOCIAL_BONUS_CAP_URL,
+    '2026-01-01',
+    null,
+    'amount',
+  ),
+  // Art. 5.6: a PVPC bill carries the supply and nothing else.
+  services_pvpc: rule(
+    'services_pvpc',
+    'rd216_2014',
+    'Real Decreto 216/2014, art. 5.6',
+    RD216_URL,
+    '2026-01-01',
+    null,
+    'amount',
+  ),
+  // Art. 18.7: services besides the supply only when the person asked for them, which the retailer
+  // has to prove. In force with the decree.
+  additional_services: rule(
+    'additional_services',
+    'rd88_2026',
+    'Real Decreto 88/2026, art. 18.7',
+    RD88_URL,
+    '2026-02-12',
+    null,
+    'amount',
+  ),
+  // Arts. 60 bis and 66 quáter: no extra payment without express consent, and nothing supplied
+  // that was not asked for.
+  unsolicited_services: rule(
+    'unsolicited_services',
+    'trlgdcu',
+    'Texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios, arts. 60 bis y 66 quáter',
+    TRLGDCU_TEXT_URL,
+    '2026-01-01',
+    null,
+    'amount',
+  ),
+  // Art. 28.3: a natural person on the 2.0TD tariff pays for leaving only on a fixed price before
+  // the first renewal. Takes effect on 12-06-2026 (final provision 9.ª.4).
+  exit_penalty: rule(
+    'exit_penalty',
+    'rd88_2026',
+    'Real Decreto 88/2026, art. 28.3',
+    RD88_URL,
+    '2026-06-12',
+    null,
+    'amount',
+  ),
+  // Art. 38: the contracted power may change once every 12 months. In force with the decree.
+  power_change: rule(
+    'power_change',
+    'rd88_2026',
+    'Real Decreto 88/2026, art. 38',
+    RD88_URL,
+    '2026-02-12',
+    null,
+    'info',
   ),
   // Art. 62.5: a penalty for leaving a commitment early, in proportion to the days left.
   commitment_proportional: rule(

@@ -113,11 +113,15 @@ export interface RowCitation {
   readonly doubt: RowDoubt | null;
 }
 
-export function rowsCited<V>(
+export const rowsCited = <V>(
   stretches: readonly Stretch<V>[],
   norms: NormTable,
+): readonly RowCitation[] => citeRows([...new Set(stretches.flatMap((s) => s.rows))], norms);
+
+export function citeRows<V>(
+  rows: readonly TableRow<V>[],
+  norms: NormTable,
 ): readonly RowCitation[] {
-  const rows = [...new Set(stretches.flatMap((s) => s.rows))];
   return rows.map((row) => ({
     from: row.from,
     until: row.until,
@@ -126,6 +130,24 @@ export function rowsCited<V>(
     status: norms[row.norm].status,
     doubt: row.doubt ?? null,
   }));
+}
+
+// Every row of `table` that may hold on one day, as a tax read on the day the bill falls due, and
+// the norms not yet settled that choose between them.
+export type DayRows<V> =
+  | {
+      readonly kind: 'covered';
+      readonly rows: readonly TableRow<V>[];
+      readonly deciding: readonly BillsNormId[];
+    }
+  | { readonly kind: 'missing'; readonly day: string };
+
+export function rowsOn<V>(table: Table<V>, day: string, norms: NormTable): DayRows<V> {
+  const lookup = valueOn(table, day, norms);
+  if (lookup.kind === 'missing') return { kind: 'missing', day };
+  return lookup.kind === 'ok'
+    ? { kind: 'covered', rows: [lookup.row], deciding: [] }
+    : { kind: 'covered', rows: lookup.rows, deciding: lookup.norms };
 }
 
 // An official figure over a period, for each way of dividing the year, with the rows it rests on.

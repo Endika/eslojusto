@@ -60,6 +60,31 @@ export const juneBill = (change: Partial<ElectricityBillInput> = {}): Electricit
   ...change,
 });
 
+// The same supply billed for 15-04 → 15-05-2026 and due in May, when RDL 7/2026 set the electricity
+// tax at 0,5 % and VAT at 10 %, with more kWh so the floor of the tax bites:
+//   energy: 100 × 0,12 + 100 × 0,09 + 200 × 0,05 = 31,00
+//   electricity tax: 0,5 % × (11,92 + 31,00 + 0,60) = 0,2176, under its floor of
+//     1 €/MWh × 400 kWh = 0,40 → 0,40
+//   VAT: (43,52 + 0,40 + 0,80) × 10 % = 4,472 → 4,47
+//   total: 44,72 + 4,47 = 49,19
+export const mayBill = (change: Partial<ElectricityBillInput> = {}): ElectricityBillInput =>
+  juneBill({
+    issuedOn: parseDate('2026-05-18'),
+    dueOn: parseDate('2026-05-25'),
+    readingFrom: parseDate('2026-04-15'),
+    readingTo: parseDate('2026-05-15'),
+    energy: [
+      { period: 'p1', kwh: 100, price: 0.12, amount: 12 },
+      { period: 'p2', kwh: 100, price: 0.09, amount: 9 },
+      { period: 'p3', kwh: 200, price: 0.05, amount: 10 },
+    ],
+    tollsAndCharges: null,
+    electricityTax: { base: 43.52, percent: 0.5, amount: 0.4 },
+    vat: { base: 44.72, percent: 10, amount: 4.47 },
+    total: 49.19,
+    ...change,
+  });
+
 export function meter(change: Partial<MeterRental> = {}): MeterRental {
   return {
     amount: 0.8,
