@@ -78,12 +78,15 @@ export function rangeOf(a: Assessed): EurosRange | null {
   return { per: first.per, low: Math.min(...amounts), high: Math.max(...amounts) };
 }
 
-// A year left out of the sum: before the table, without its decree yet, or with its effects from
-// 1 January unchecked. With any of them the total does not cover the whole contract.
+// A year left out of the sum: before the table, without its decree yet, with its effects from
+// 1 January unchecked, or after the signing, when the salary may have risen. With any of them the
+// total does not cover the whole contract.
 const GAPS: ReadonlySet<EmploymentPhrase['key']> = new Set([
   'minimum_wage.not_loaded',
   'minimum_wage.not_published',
   'minimum_wage.year.effects_unverified',
+  'minimum_wage.year.salary_may_have_risen',
+  'minimum_wage.temporary.salary_may_have_risen',
   'minimum_wage.year.hours_unknown',
   'minimum_wage.year.extra_pays_unknown',
   'minimum_wage.year.training_effective_work',

@@ -69,6 +69,17 @@ describe('the free summary', () => {
     expect(sinceOf(smi(belowMinimum))).toEqual({ from: 2026, amount: 765.24 });
     // 2021 and 2022 are before the table: the total would not cover them.
     expect(sinceOf(smi({ ...belowMinimum, startDate: f('2021-06-01') }))).toBeNull();
+    // Signed in 2023 at 1.000 € × 14: only 2023 is added up, the later years are to check.
+    const signed2023 = smi({
+      ...belowMinimum,
+      startDate: f('2023-03-01'),
+      signedOn: f('2023-03-01'),
+      salary: { ...belowMinimum.salary, amount: 1000 },
+    });
+    expect(signed2023.calculation.map((p) => p.key)).toContain(
+      'minimum_wage.year.salary_may_have_risen',
+    );
+    expect(sinceOf(signed2023)).toBeNull();
   });
 
   it('reads a short day-rate shortfall per working day', () => {
