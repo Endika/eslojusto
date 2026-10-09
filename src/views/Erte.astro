@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Field from '../components/Field.astro';
 import {
   ERTE_FAQ,
@@ -9,7 +10,8 @@ import {
   erteUnknownView,
 } from '../content/erte';
 import { faqNode } from '../content/faq';
-import { breadcrumbList } from '../content/structured-data';
+import { HUBS } from '../content/landings';
+import { breadcrumbList, trail } from '../content/structured-data';
 import { LAST_UPDATED } from '../content/updated';
 import { ET, LGSS } from '../engine/sources';
 import { t } from '../i18n';
@@ -20,11 +22,11 @@ import { link } from '../i18n/languages';
 const checkedOn = LAST_UPDATED['/paro/erte/'];
 if (!checkedOn) throw new Error('/paro/erte/ needs its date in LAST_UPDATED.');
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
-const crumbs = [
-  { name: 'Inicio', path: '/' },
-  { name: 'Paro', path: '/paro/' },
+const crumbs = trail(
+  'es',
+  { name: HUBS.paro.name, path: HUBS.paro.path },
   { name: 'Paro durante un ERTE', path: '/paro/erte/' },
-];
+);
 const regimes = erteUnknownView().blocks;
 const arrow = 'M4 12h15m-6-6 6 6-6 6';
 ---
@@ -36,22 +38,12 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
   lang="es"
   langs={['es']}
   section="cause"
-  structuredData={[breadcrumbList(home, crumbs), faqNode(ERTE_FAQ)]}
+  structuredData={[breadcrumbList(home, 'es', crumbs), faqNode(ERTE_FAQ)]}
 >
   <main id="content">
     <div class="desk">
       <header class="desk__head">
-        <nav class="crumbs" aria-label="Estás en">
-          <ol>
-            <li>
-              <a href={link('es', '')}>Inicio</a>
-            </li>
-            <li>
-              <a href={link('es', 'paro/')}>Paro</a>
-            </li>
-            <li aria-current="page">Paro durante un ERTE</li>
-          </ol>
-        </nav>
+        <Breadcrumbs lang="es" crumbs={crumbs} />
         <h1 class="desk__title">{ERTE_PAGE.h1}</h1>
         <p class="desk__lead">{ERTE_PAGE.lead}</p>
         <p class="desk__beta">

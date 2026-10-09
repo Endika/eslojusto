@@ -1,4 +1,5 @@
 import type { Cause } from '../engine/types';
+import { t } from '../i18n';
 
 // The case pages: one search intent each, the same calculator with the case already marked.
 // Their prose is Spanish legal text, like the guide of /finiquito/, so they exist only in Spanish
@@ -35,8 +36,16 @@ export const HUBS: Record<
   Hub,
   { readonly path: string; readonly name: string; readonly anchor: string }
 > = {
-  finiquito: { path: '/finiquito/', name: 'Finiquito', anchor: 'Calcula tu finiquito' },
-  paro: { path: '/paro/', name: 'Paro', anchor: 'Calcula cuánto paro vas a cobrar' },
+  finiquito: {
+    path: '/finiquito/',
+    name: t('es', 'home.final_pay'),
+    anchor: 'Calcula tu finiquito',
+  },
+  paro: {
+    path: '/paro/',
+    name: t('es', 'home.benefit'),
+    anchor: 'Calcula cuánto paro vas a cobrar',
+  },
 };
 
 export type LandingId =

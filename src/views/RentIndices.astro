@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
 import type { Variables } from '../i18n/interpolate';
@@ -24,6 +25,7 @@ import {
 import { capsCopy } from '../content/rent-caps';
 import { NORMS } from '../engine/rental/data/norms';
 import { RENTAL_BUILD } from '../content/sections';
+import { breadcrumbList, trail } from '../content/structured-data';
 
 interface Props {
   lang: Lang;
@@ -78,6 +80,12 @@ const faq = (
 
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
 const page = new URL(link(lang, PATH.slice(1)), Astro.site);
+// Under the rental review when the build has it; straight under the home when it does not.
+const crumbs = trail(
+  lang,
+  ...(RENTAL_BUILD ? [{ name: tx('home.rent'), path: '/alquiler/' }] : []),
+  { name: tx('rent_indices.h1'), path: PATH },
+);
 const variable = (name: string, description: string) => ({
   '@type': 'PropertyValue',
   name,
@@ -108,13 +116,7 @@ const structuredData = [
       variable('IGC', SERIES.igc.citation),
     ],
   },
-  {
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: tx('rent_indices.home'), item: home.href },
-      { '@type': 'ListItem', position: 2, name: tx('rent_indices.h1'), item: page.href },
-    ],
-  },
+  breadcrumbList(home, lang, crumbs),
   {
     '@type': 'FAQPage',
     mainEntity: faq.map(({ question, answer }) => ({
@@ -139,16 +141,7 @@ const structuredData = [
   structuredData={structuredData}
 >
   <main class="document rent" id="content">
-    <nav class="crumbs" aria-label={tx('rent_indices.breadcrumb')}>
-      <ol>
-        <li>
-          <a href={link(lang)}>{tx('rent_indices.home')}</a>
-        </li>
-        <li>
-          <span aria-current="page">{tx('rent_indices.h1')}</span>
-        </li>
-      </ol>
-    </nav>
+    <Breadcrumbs lang={lang} crumbs={crumbs} />
     <header class="document__head">
       <h1 class="document__title">{tx('rent_indices.h1')}</h1>
       <p class="guide__lead">{tx('rent_indices.lead')}</p>
