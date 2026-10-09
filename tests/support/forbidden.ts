@@ -46,6 +46,25 @@ const CREDIT_FORBIDDEN = [
 // pase»).
 const CREDIT_OWN_FORBIDDEN = [...CREDIT_FORBIDDEN, /\brecupera(r)?\b/];
 
+// The mortgage review separates what the law says from what depends on a judge and never sounds
+// like a firm chasing cases: no money back promised, no ceiling of euros, no count of people
+// affected, no hurry, no verdict on a clause and no word on whether a time limit has run.
+const MORTGAGE_FORBIDDEN = [
+  ...CREDIT_FORBIDDEN,
+  /\bte devuelven\b/,
+  /\bgana\b/,
+  /\bsin coste\b/,
+  /\bhasta \{?[\w.,]*\}? ?€/,
+  /\bafectados\b/,
+  /prescri(to|ba|be)\b/,
+  /\bnul[ao]s?\b/,
+  /\bfecha de firma\b/,
+  /\bantes de que\b/,
+];
+// Its own copy never says any form of «recuperar»; its pages may, in the shared pass copy
+// («recupera aquí tu pase»).
+const MORTGAGE_OWN_FORBIDDEN = [...MORTGAGE_FORBIDDEN, /\brecuper/];
+
 // The household review speaks to the worker but never says what she is entitled to: where the law
 // is not decisive it says «podría».
 const HOUSEHOLD_FORBIDDEN = [/\btienes derecho\b/, /\btienen derecho\b/];
@@ -65,6 +84,11 @@ export const SECTION_FORBIDDEN: Readonly<Record<string, readonly RegExp[]>> = {
   'credit.': CREDIT_OWN_FORBIDDEN,
   'client.credit.': CREDIT_OWN_FORBIDDEN,
   'dist/financiacion': CREDIT_FORBIDDEN,
+  'src/mortgage': MORTGAGE_OWN_FORBIDDEN,
+  'src/engine/mortgage': MORTGAGE_OWN_FORBIDDEN,
+  'mortgage.': MORTGAGE_OWN_FORBIDDEN,
+  'client.mortgage.': MORTGAGE_OWN_FORBIDDEN,
+  'dist/hipoteca': MORTGAGE_FORBIDDEN,
   'src/household': HOUSEHOLD_FORBIDDEN,
   'dist/empleada-de-hogar': HOUSEHOLD_FORBIDDEN,
   'household.': HOUSEHOLD_FORBIDDEN,
