@@ -89,6 +89,7 @@ describe('credit rule table', () => {
         .map((r) => [r.id, r.url.replace(LCC, '')]),
     );
     expect(anchors).toEqual({
+      cash_option: '#a26',
       consumer: '#a2',
       exclusions: '#a3',
       tae_formula: '#a32',
