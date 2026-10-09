@@ -1,3 +1,8 @@
+import {
+  BILLS_NORMS,
+  NORM_REVIEW as BILLS_NORM_REVIEW,
+} from '../../../src/engine/bills/data/norms';
+import { BILLS_SOURCES } from '../../../src/engine/bills/data/sources';
 import type { Norm } from '../../../src/engine/law/norms';
 import type { RuleBase } from '../../../src/engine/law/rules';
 import type { LawSource } from '../../../src/engine/law/sources';
@@ -72,5 +77,12 @@ export const LAW_SECTIONS: readonly LawSection[] = [
     normReview: MORTGAGE_NORM_REVIEW,
     sources: MORTGAGE_SOURCES,
     rules: MORTGAGE_RULES,
+  },
+  {
+    name: 'bills',
+    norms: BILLS_NORMS,
+    normReview: BILLS_NORM_REVIEW,
+    sources: BILLS_SOURCES,
+    rules: {},
   },
 ];
