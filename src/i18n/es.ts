@@ -3482,6 +3482,8 @@ export const es = {
     'Sin aviso por escrito, se cobraron {months} meses con la renta nueva cuando tocaba pagar {base}.',
   'client.rental.calculation.rent_update.accepted_by_paying':
     'No te avisaron por escrito, pero pagaste la subida: si eso cuenta como aceptarla, la renta nueva valía desde el aniversario.',
+  'client.rental.calculation.rent_update.accepted_by_paying_up_to_max':
+    'No te avisaron por escrito, pero pagaste la subida: si eso cuenta como aceptarla, desde el aniversario valía la subida hasta la renta máxima. Lo que pasa de ella lo pagas de más igualmente.',
   'client.rental.calculation.rent_update.months': 'Meses contados: {months}, de {from} a {to}.',
   'client.rental.calculation.rent_update.monthly_over': 'Pagas {monthly} de más cada mes.',
   'client.rental.calculation.rent_update.within_limit': 'La renta nueva no pasa de la máxima.',

@@ -30,6 +30,7 @@ export type RentalPhraseKey =
   | 'rent_update.charged_before_notice'
   | 'rent_update.notice_not_written'
   | 'rent_update.accepted_by_paying'
+  | 'rent_update.accepted_by_paying_up_to_max'
   | 'rent_update.agreed_verbally'
   | 'rent_update.months'
   | 'rent_update.monthly_over'

@@ -91,6 +91,23 @@ describe('the summary of an item', () => {
     );
   });
 
+  it('counts only what passes the cap of a rise paid without written notice', () => {
+    const verbal = {
+      ...riseAboveIrav,
+      updates: riseAboveIrav.updates.map((u) => ({
+        ...u,
+        notice: 'verbal' as const,
+        noticeOn: null,
+      })),
+    };
+    const s = summarise(firstRise(verbal));
+    if (s.kind !== 'depends') throw new Error('expected depends');
+    expect([s.counted, s.upTo]).toEqual([110.4, 360]);
+    expect(dependsText(verbal)).toBe(
+      'Depende de si pagar la subida sin aviso por escrito cuenta como aceptarla: entre 110 € y 360 €',
+    );
+  });
+
   it('gives a range when both readings have a figure: within the limit is 0 €', () => {
     expect(dependsText(repealedWindow)).toMatch(
       /^Depende de cómo se lea una norma que ya está derogada: entre 0 € y \d+ €$/,
