@@ -17,12 +17,27 @@ import type {
 } from '../src/domain/ports';
 import { costUsd, priceOf, SpendCounter, worstCaseUsd, type WorstCase } from './budget';
 import {
+  CREDIT_PERSON_KEYS,
+  creditPageKind,
+  isCreditTemplatePage,
+  type CreditBankCase,
+  type CreditTemplateId,
+} from './credit-schema';
+import {
   EMPLOYMENT_PERSON_KEYS,
   employmentPageKind,
   isEmploymentTemplatePage,
   type EmploymentBankCase,
   type EmploymentTemplateId,
 } from './employment-schema';
+import type { EvalReview } from './env';
+import {
+  INSURANCE_PERSON_KEYS,
+  insurancePageKind,
+  isInsuranceTemplatePage,
+  type InsuranceBankCase,
+  type InsuranceTemplateId,
+} from './insurance-schema';
 import {
   isTemplatePage,
   pageKind,
@@ -49,7 +64,7 @@ export interface ExpectedPage {
 // A bank of packs: the review its packs are read as, the image each page renders to, and the page
 // data keys that hold a person's data.
 export interface EvalBank<C extends EvalCase> {
-  readonly review: 'rental' | 'employment';
+  readonly review: EvalReview;
   readonly pagesOf: (bankCase: C) => readonly ExpectedPage[];
   readonly personKeys: readonly string[];
 }
@@ -156,16 +171,53 @@ export function expectedPages(
   });
 }
 
-export function expectedEmploymentPages(
-  bankCase: EmploymentBankCase,
-  sheetsOf: (template: EmploymentTemplateId) => number,
+// What each image of a bank whose pages are templates or drawn pages should be read as.
+function templatedPages<P extends { readonly readability?: string }, T extends string>(
+  pages: readonly P[],
+  templateOf: (page: P) => T | null,
+  kindOf: (page: P) => string,
+  sheetsOf: (template: T) => number,
 ): readonly ExpectedPage[] {
-  return bankCase.pages.flatMap((page) => {
-    const count = isEmploymentTemplatePage(page) ? sheetsOf(page.template) : 1;
-    const entry = { kind: employmentPageKind(page), readability: page.readability ?? 'ok' };
+  return pages.flatMap((page) => {
+    const template = templateOf(page);
+    const count = template === null ? 1 : sheetsOf(template);
+    const entry = { kind: kindOf(page), readability: page.readability ?? 'ok' };
     return Array.from({ length: count }, () => entry);
   });
 }
+
+export const expectedEmploymentPages = (
+  bankCase: EmploymentBankCase,
+  sheetsOf: (template: EmploymentTemplateId) => number,
+): readonly ExpectedPage[] =>
+  templatedPages(
+    bankCase.pages,
+    (p) => (isEmploymentTemplatePage(p) ? p.template : null),
+    employmentPageKind,
+    sheetsOf,
+  );
+
+export const expectedCreditPages = (
+  bankCase: CreditBankCase,
+  sheetsOf: (template: CreditTemplateId) => number,
+): readonly ExpectedPage[] =>
+  templatedPages(
+    bankCase.pages,
+    (p) => (isCreditTemplatePage(p) ? p.template : null),
+    creditPageKind,
+    sheetsOf,
+  );
+
+export const expectedInsurancePages = (
+  bankCase: InsuranceBankCase,
+  sheetsOf: (template: InsuranceTemplateId) => number,
+): readonly ExpectedPage[] =>
+  templatedPages(
+    bankCase.pages,
+    (p) => (isInsuranceTemplatePage(p) ? p.template : null),
+    insurancePageKind,
+    sheetsOf,
+  );
 
 export const rentalBank = (sheetsOf: (template: TemplateId) => number): EvalBank<BankCase> => ({
   review: 'rental',
@@ -179,6 +231,22 @@ export const employmentBank = (
   review: 'employment',
   pagesOf: (c) => expectedEmploymentPages(c, sheetsOf),
   personKeys: EMPLOYMENT_PERSON_KEYS,
+});
+
+export const creditBank = (
+  sheetsOf: (template: CreditTemplateId) => number,
+): EvalBank<CreditBankCase> => ({
+  review: 'credit',
+  pagesOf: (c) => expectedCreditPages(c, sheetsOf),
+  personKeys: CREDIT_PERSON_KEYS,
+});
+
+export const insuranceBank = (
+  sheetsOf: (template: InsuranceTemplateId) => number,
+): EvalBank<InsuranceBankCase> => ({
+  review: 'insurance',
+  pagesOf: (c) => expectedInsurancePages(c, sheetsOf),
+  personKeys: INSURANCE_PERSON_KEYS,
 });
 
 function diagnose(
@@ -231,8 +299,12 @@ function tally<K extends string>(map: Map<K, Tally>, key: K, correct: boolean): 
 
 const ratio = (t: Tally): number => (t.expected === 0 ? 0 : t.correct / t.expected);
 
-// Both reviews' responses, read through the names they share.
-type AnyResponse = ExtractResponse<'rental'> | ExtractResponse<'employment'>;
+// Every review's response, read through the names they share.
+type AnyResponse =
+  | ExtractResponse<'rental'>
+  | ExtractResponse<'employment'>
+  | ExtractResponse<'credit'>
+  | ExtractResponse<'insurance'>;
 interface Scored {
   readonly fields: Readonly<Record<string, { readonly value: unknown } | undefined>>;
   readonly lists: Readonly<

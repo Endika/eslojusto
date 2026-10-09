@@ -1,6 +1,6 @@
 // Composition root of an evaluation run over a synthetic bank: the real Bedrock reader, the
 // Lambda's own domain, a spending cap. Outside vitest and CI; see api/README.md, «Evaluation».
-//   EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval [-- --review employment --cases eval/cases/employment --only id1,id2]
+//   EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval [-- --review employment|credit|insurance --only id1,id2]
 import { randomBytes } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import {
@@ -10,10 +10,12 @@ import {
   PRIMARY_MODEL,
 } from '../src/config';
 import { EXTRA_OUTPUT_TOKENS_BY_REVIEW, MAX_ESTIMATED_INPUT_TOKENS } from '../src/domain/tokens';
-import { parseEvalArgs, parseEvalEnv, selectCases, type EvalArgs } from './env';
+import { parseEvalArgs, parseEvalEnv, selectCases, type EvalArgs, type EvalReview } from './env';
 import {
+  creditBank,
   employmentBank,
   evaluate,
+  insuranceBank,
   rentalBank,
   type EvalBank,
   type EvalCase,
@@ -43,9 +45,15 @@ const { systemClock } = await import('../src/adapters/runtime');
 
 const EVAL = new URL('./', import.meta.url);
 const API = new URL('../', EVAL);
-// Each bank renders to its own folder, where the report goes too.
-const OUT = new URL(args.review === 'rental' ? 'out/' : 'out/employment/', EVAL);
-const RENDER = args.review === 'rental' ? 'rental-bank' : 'employment-bank';
+// Each bank renders to its own folder, where the report goes too, with its own script at the root.
+const BANK_OUT: Readonly<Record<EvalReview, { readonly out: string; readonly render: string }>> = {
+  rental: { out: 'out/', render: 'rental-bank' },
+  employment: { out: 'out/employment/', render: 'employment-bank' },
+  credit: { out: 'out/credit/', render: 'credit-bank' },
+  insurance: { out: 'out/insurance/', render: 'insurance-bank' },
+};
+const OUT = new URL(BANK_OUT[args.review].out, EVAL);
+const RENDER = BANK_OUT[args.review].render;
 
 const sheetsOf = (template: string): number =>
   readFileSync(new URL(`templates/${template}.html`, EVAL), 'utf8').match(SHEET)?.length ?? 0;
@@ -87,8 +95,13 @@ function prepared<C extends EvalCase & { readonly eval: boolean }>(
   const packs = packsOf(bank);
   return (deps) => evaluate(packs, bank, deps);
 }
-const run =
-  args.review === 'rental' ? prepared(rentalBank(sheetsOf)) : prepared(employmentBank(sheetsOf));
+const runs: Readonly<Record<EvalReview, () => (deps: EvalDeps) => Promise<EvalReport>>> = {
+  rental: () => prepared(rentalBank(sheetsOf)),
+  employment: () => prepared(employmentBank(sheetsOf)),
+  credit: () => prepared(creditBank(sheetsOf)),
+  insurance: () => prepared(insuranceBank(sheetsOf)),
+};
+const run = runs[args.review]();
 
 // The reader port drops the stop reason, so the raw answer is looked at on its way.
 let truncated = 0;

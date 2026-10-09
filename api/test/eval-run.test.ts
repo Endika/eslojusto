@@ -6,19 +6,39 @@ import { MODEL_PRICES_USD_PER_MTOK, SONNET_4_6, SONNET_5_5 } from '../src/config
 import type { DocumentReader, ModelRead } from '../src/domain/ports';
 import { MAX_ESTIMATED_INPUT_TOKENS } from '../src/domain/tokens';
 import { SpendCounter, worstCaseUsd } from '../eval/budget';
+import type { CreditBankCase } from '../eval/credit-schema';
 import type { EmploymentBankCase } from '../eval/employment-schema';
 import { parseEvalArgs, parseEvalEnv, selectCases } from '../eval/env';
 import {
+  creditBank,
   employmentBank,
   evaluate,
+  expectedCreditPages,
   expectedEmploymentPages,
+  expectedInsurancePages,
   expectedPages,
+  insuranceBank,
   rentalBank,
+  type EvalBank,
+  type EvalCase,
   type EvalDeps,
   type EvalPack,
+  type ExpectedPage,
 } from '../eval/evaluate';
+import type { InsuranceBankCase } from '../eval/insurance-schema';
 import type { BankCase } from '../eval/schema';
-import { BANK, EMPLOYMENT_BANK, employmentSheetsOf, sheetsOf } from './support/bank';
+import { CREDIT_MERGE_RULES } from '../src/domain/credit-merge';
+import { INSURANCE_MERGE_RULES } from '../src/domain/insurance-merge';
+import type { From } from '../src/domain/merge';
+import {
+  BANK,
+  bankSheetsOf,
+  CREDIT_BANK,
+  EMPLOYMENT_BANK,
+  employmentSheetsOf,
+  INSURANCE_BANK,
+  sheetsOf,
+} from './support/bank';
 import { FakeClock } from './support/fakes';
 import { jpeg } from './support/synthetic';
 
@@ -81,6 +101,14 @@ describe('starting an evaluation run', () => {
       review: 'employment',
       cases: 'eval/cases/employment',
     });
+    expect(parseEvalArgs(['--review', 'credit'])).toEqual({
+      review: 'credit',
+      cases: 'eval/cases/credit',
+    });
+    expect(parseEvalArgs(['--review', 'insurance'])).toEqual({
+      review: 'insurance',
+      cases: 'eval/cases/insurance',
+    });
     expect(
       parseEvalArgs(['--review', 'employment', '--only', 'replacement-named,household-gate']),
     ).toEqual({
@@ -91,7 +119,7 @@ describe('starting an evaluation run', () => {
   });
 
   it.each([
-    [['--review', 'final_pay'], 'rental or employment'],
+    [['--review', 'final_pay'], 'rental, employment, credit or insurance'],
     [['--review'], '--review takes a value'],
     [['--review', 'employment', '--cases'], '--cases takes a value'],
     [['--cases', '--review', 'employment'], '--cases takes a value'],
@@ -491,5 +519,213 @@ describe('an evaluation run over the employment bank', () => {
       expect(report.perPack[0]?.fields.correct).toBe(report.perPack[0]?.fields.expected);
       expect(report.perPack[0]).not.toHaveProperty('reads');
     });
+  });
+});
+
+// A credit or insurance read that states exactly what the case expects: each field in the first
+// section its response takes it from among the pack's documents, each list in the section that
+// holds it.
+function perfectFinanceRead(
+  pages: readonly ExpectedPage[],
+  expected: CreditBankCase['expected']['extraction'],
+  rules: Readonly<Record<string, readonly From[]>>,
+  listSections: Readonly<Record<string, readonly string[]>>,
+): Record<string, unknown> {
+  const kinds = new Set(pages.map((p) => p.kind));
+  const sections: Record<string, { [k: string]: unknown }> = {};
+  const section = (kind: string) => (sections[kind] ??= {});
+  for (const [name, value] of Object.entries(expected.fields)) {
+    const from = rules[name]?.find(([kind]) => kinds.has(kind));
+    if (from === undefined) throw new Error(`no document for ${name}`);
+    section(from[0])[from[1] === '' ? name : from[1]] = { value, confidence: 'high' };
+  }
+  for (const [list, rows] of Object.entries(expected.lists)) {
+    const kind = listSections[list]?.find((k) => kinds.has(k));
+    if (kind === undefined) throw new Error(`no document for ${list}`);
+    section(kind)[list] = rows.map((r) => ({ ...r, confidence: 'high' }));
+  }
+  return {
+    pages: pages.map((p, i) => ({
+      page: i + 1,
+      kind: p.kind,
+      document: i + 1,
+      readability: { value: p.readability, confidence: 'high' },
+      confidence: 'high',
+    })),
+    ...sections,
+  };
+}
+
+const CREDIT_LISTS = {
+  charges: ['credit_agreement', 'revolving_agreement'],
+  schedule: ['amortization_schedule'],
+  statements: ['card_statement'],
+};
+const INSURANCE_LISTS = { sumsInsured: ['insurance_policy'] };
+
+const creditBankOf = creditBank(bankSheetsOf);
+const insuranceBankOf = insuranceBank(bankSheetsOf);
+
+const packFor =
+  <C extends EvalCase & { readonly eval: boolean }>(bank: EvalBank<C>) =>
+  (c: C): EvalPack<C> => ({
+    bankCase: c,
+    files: bank.pagesOf(c).map(() => ({ mediaType: 'image/jpeg', bytes: jpeg(1000, 1414) })),
+  });
+
+const perfectCreditRead = (c: CreditBankCase) =>
+  perfectFinanceRead(
+    expectedCreditPages(c, bankSheetsOf),
+    c.expected.extraction,
+    CREDIT_MERGE_RULES,
+    CREDIT_LISTS,
+  );
+const perfectInsuranceRead = (c: InsuranceBankCase) =>
+  perfectFinanceRead(
+    expectedInsurancePages(c, bankSheetsOf),
+    c.expected.extraction,
+    INSURANCE_MERGE_RULES,
+    INSURANCE_LISTS,
+  );
+
+describe('an evaluation run over the credit and insurance banks', () => {
+  it('reads fifteen hard packs between them by default, ten of credit and five of insurance', () => {
+    expect(selectCases(CREDIT_BANK, undefined)).toHaveLength(10);
+    expect(selectCases(INSURANCE_BANK, undefined)).toHaveLength(5);
+  });
+
+  it('stops before a credit pack whose worst case would cross the 2 USD of its share', async () => {
+    // A credit read gets the employment room to write: 60.000 in and 8.000 out is 0,33 USD a
+    // pack, against a worst case of 0,5148 USD.
+    const hard = CREDIT_BANK.filter((c) => c.eval);
+    const reader = new FixedReader(() => ({
+      toolInput: null,
+      inputTokens: 60_000,
+      outputTokens: 8000,
+    }));
+    const report = await evaluate(
+      hard.map(packFor(creditBankOf)),
+      creditBankOf,
+      employmentDeps(reader, 2),
+    );
+    // After five packs 1,65 USD is spent, and 1,65 + 0,5148 > 2.
+    expect(reader.calls).toHaveLength(5);
+    expect(report.stoppedBefore).toBe(hard[5]?.id);
+    expect(report.costUsd).toBeCloseTo(1.65, 10);
+    expect(report.costUsd).toBeLessThanOrEqual(2);
+    for (const call of reader.calls) expect(call.review).toBe('credit');
+  });
+
+  it('stops before an insurance pack whose worst case would cross the 1 USD of its share', async () => {
+    // Every read at the worst case of 96.000 in and 5.000 out: 0,3993 USD a pack.
+    const reader = new FixedReader(() => ({
+      toolInput: null,
+      inputTokens: MAX_ESTIMATED_INPUT_TOKENS,
+      outputTokens: 5000,
+    }));
+    const hard = INSURANCE_BANK.filter((c) => c.eval);
+    const report = await evaluate(
+      hard.map(packFor(insuranceBankOf)),
+      insuranceBankOf,
+      deps(reader, 1),
+    );
+    // After two packs 0,7986 USD is spent, and 0,7986 + 0,3993 > 1.
+    expect(reader.calls).toHaveLength(2);
+    expect(report.stoppedBefore).toBe(hard[2]?.id);
+    expect(report.costUsd).toBeCloseTo(0.7986, 10);
+    for (const call of reader.calls) expect(call.review).toBe('insurance');
+  });
+
+  it('a read that states what each credit case expects scores every field and page right', async () => {
+    const readable = CREDIT_BANK.filter((c) => c.expected.extraction.outcome === 'ok');
+    const reader = new FixedReader((n) => {
+      const c = readable[n - 1];
+      if (c === undefined) throw new Error('no case');
+      return { toolInput: perfectCreditRead(c), inputTokens: 20_000, outputTokens: 3000 };
+    });
+    const report = await evaluate(
+      readable.map(packFor(creditBankOf)),
+      creditBankOf,
+      employmentDeps(reader, 100),
+    );
+    expect(report.read).toBe(readable.length);
+    for (const [name, t] of Object.entries(report.accuracy.byField))
+      expect(t.accuracy, name).toBe(1);
+    for (const [kind, t] of Object.entries(report.accuracy.byPageKind)) {
+      expect(t.accuracy, kind).toBe(1);
+      expect(t.readabilityCorrect, kind).toBe(t.expected);
+    }
+    expect(report.conflicts).toBe(0);
+    expect(report.personsTranscribed).toBe(0);
+  });
+
+  it('a read that states what each insurance case expects scores every field and page right', async () => {
+    const readable = INSURANCE_BANK.filter((c) => c.expected.extraction.outcome === 'ok');
+    const reader = new FixedReader((n) => {
+      const c = readable[n - 1];
+      if (c === undefined) throw new Error('no case');
+      return { toolInput: perfectInsuranceRead(c), inputTokens: 15_000, outputTokens: 1500 };
+    });
+    const report = await evaluate(
+      readable.map(packFor(insuranceBankOf)),
+      insuranceBankOf,
+      deps(reader, 100),
+    );
+    expect(report.read).toBe(readable.length);
+    for (const [name, t] of Object.entries(report.accuracy.byField))
+      expect(t.accuracy, name).toBe(1);
+    for (const [kind, t] of Object.entries(report.accuracy.byPageKind)) {
+      expect(t.accuracy, kind).toBe(1);
+      expect(t.readabilityCorrect, kind).toBe(t.expected);
+    }
+    expect(report.personsTranscribed).toBe(0);
+  });
+
+  it("counts a borrower's DNI and an insurer's staff member the model wrote", async () => {
+    const loan = CREDIT_BANK.find((x) => x.id === 'personal-loan-opening-deducted-2019');
+    const policy = INSURANCE_BANK.find((x) => x.id === 'home-renewal-notice-on-time');
+    if (loan === undefined || policy === undefined) throw new Error('no case');
+    const dni = String(loan.pages[0]?.data['borrowerDni']);
+    const contact = String(policy.pages[0]?.data['contactName']);
+    const loanRead = perfectCreditRead(loan);
+    const credit = await evaluate(
+      [packFor(creditBankOf)(loan)],
+      creditBankOf,
+      employmentDeps(
+        new FixedReader(() => ({
+          toolInput: {
+            ...loanRead,
+            credit_agreement: {
+              ...(loanRead['credit_agreement'] as object),
+              withdrawalClauseText: { value: `Titular ${dni}.`, confidence: 'high' },
+            },
+          },
+          inputTokens: 20_000,
+          outputTokens: 3000,
+        })),
+        100,
+      ),
+    );
+    expect(credit.personsTranscribed).toBe(1);
+    const policyRead = perfectInsuranceRead(policy);
+    const insurance = await evaluate(
+      [packFor(insuranceBankOf)(policy)],
+      insuranceBankOf,
+      deps(
+        new FixedReader(() => ({
+          toolInput: {
+            ...policyRead,
+            insurance_policy: {
+              ...(policyRead['insurance_policy'] as object),
+              nonRenewalClauseText: { value: `Gestor: ${contact}.`, confidence: 'high' },
+            },
+          },
+          inputTokens: 15_000,
+          outputTokens: 1500,
+        })),
+        100,
+      ),
+    );
+    expect(insurance.personsTranscribed).toBe(1);
   });
 });
