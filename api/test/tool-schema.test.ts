@@ -40,6 +40,15 @@ describe('the rental read', () => {
   });
 });
 
+describe('the employment read', () => {
+  it('asks for exactly what it asked before each prompt had a module of its own', () => {
+    expect(toolInputSchema('employment')).toEqual(
+      JSON.parse(fixture('employment-tool-schema.json')),
+    );
+    expect(SYSTEM_PROMPTS.employment).toBe(fixture('employment-prompt.txt'));
+  });
+});
+
 describe('toolInputSchema', () => {
   it('is closed at every level', () => {
     const all = objects(toolInputSchema('final_pay'));
