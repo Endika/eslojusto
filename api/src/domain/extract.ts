@@ -5,6 +5,8 @@ import {
   readsLeft,
   type Allowance,
 } from './allowance';
+import { creditFailedChecks, creditIncomplete, type CreditCheck } from './credit-checks';
+import { creditMerge, type CreditMerged } from './credit-merge';
 import { checkFileShapes, imageSizes, type DocumentFile } from './documents';
 import {
   employmentFailedChecks,
@@ -23,6 +25,12 @@ import {
   type Reading,
 } from './extraction';
 import { ITEM_IDS, type Readability } from './extraction-schema';
+import {
+  insuranceFailedChecks,
+  insuranceIncomplete,
+  type InsuranceCheck,
+} from './insurance-checks';
+import { insuranceMerge, type InsuranceMerged } from './insurance-merge';
 import { merge, type Merged } from './merge';
 import { rentalFailedChecks, rentalIncomplete, type RentalCheck } from './rental-checks';
 import { rentalMerge, type RentalMerged } from './rental-merge';
@@ -74,15 +82,23 @@ type ExtractionOf<R extends ReviewKind> = R extends 'rental'
   ? Omit<RentalMerged, 'discarded'>
   : R extends 'employment'
     ? Omit<EmploymentMerged, 'discarded'>
-    : Omit<Merged, 'discarded'>;
+    : R extends 'credit'
+      ? Omit<CreditMerged, 'discarded'>
+      : R extends 'insurance'
+        ? Omit<InsuranceMerged, 'discarded'>
+        : Omit<Merged, 'discarded'>;
 type CheckOf<R extends ReviewKind> = R extends 'rental'
   ? RentalCheck
   : R extends 'employment'
     ? EmploymentCheck
-    : CoherenceCheck;
+    : R extends 'credit'
+      ? CreditCheck
+      : R extends 'insurance'
+        ? InsuranceCheck
+        : CoherenceCheck;
 
-type AnyMerged = Merged | RentalMerged | EmploymentMerged;
-type AnyCheck = CoherenceCheck | RentalCheck | EmploymentCheck;
+type AnyMerged = Merged | RentalMerged | EmploymentMerged | CreditMerged | InsuranceMerged;
+type AnyCheck = CoherenceCheck | RentalCheck | EmploymentCheck | CreditCheck | InsuranceCheck;
 
 export type ExtractResponse<R extends ReviewKind = 'final_pay'> =
   | {
@@ -183,9 +199,29 @@ function checkEmployment(reading: Reading, toolInput: unknown): Checked {
   };
 }
 
+function checkCredit(reading: Reading, toolInput: unknown): Checked {
+  const extraction = creditMerge(reading, toolInput);
+  return {
+    extraction,
+    failed: creditFailedChecks(reading),
+    incomplete: creditIncomplete(reading, extraction),
+  };
+}
+
+function checkInsurance(reading: Reading): Checked {
+  const extraction = insuranceMerge(reading);
+  return {
+    extraction,
+    failed: insuranceFailedChecks(reading),
+    incomplete: insuranceIncomplete(reading, extraction),
+  };
+}
+
 function check(reading: Reading, review: ReviewKind, toolInput: unknown): Checked {
   if (review === 'rental') return checkRental(reading);
   if (review === 'employment') return checkEmployment(reading, toolInput);
+  if (review === 'credit') return checkCredit(reading, toolInput);
+  if (review === 'insurance') return checkInsurance(reading);
   return checkFinalPay(reading);
 }
 

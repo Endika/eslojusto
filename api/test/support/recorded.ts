@@ -35,7 +35,18 @@ export type Recording =
   | 'employment-injected'
   | 'employment-basque'
   | 'employment-household'
-  | 'employment-special-categories';
+  | 'employment-special-categories'
+  | 'credit-personal-loan'
+  | 'credit-car-balloon'
+  | 'credit-revolving-statements'
+  | 'credit-early-repayment'
+  | 'credit-agreement-catalan'
+  | 'credit-injected'
+  | 'credit-not-credit'
+  | 'credit-identifiers'
+  | 'insurance-home-renewal'
+  | 'insurance-car-online'
+  | 'insurance-not-insurance';
 
 export const recording = (name: Recording): string =>
   readFileSync(new URL(`../fixtures/bedrock/${name}.json`, import.meta.url), 'utf8');

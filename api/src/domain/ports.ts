@@ -1,7 +1,7 @@
 import type { DocumentFile } from './documents';
 import type { Readability } from './extraction-schema';
 import type { ResultCode } from './results';
-import type { ReviewKind } from './reviews';
+import type { CheckoutReview, ReviewKind } from './reviews';
 
 export interface ModelRead {
   // The tool input exactly as the model produced it, or null if it produced none.
@@ -87,7 +87,7 @@ export interface CheckoutCreator {
   // the review they paid from.
   create(
     nonce: string,
-    returnTo: ReviewKind,
+    returnTo: CheckoutReview,
   ): Promise<{ readonly sessionId: string; readonly url: string }>;
 }
 

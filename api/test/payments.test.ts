@@ -185,6 +185,15 @@ describe('Stripe adapter', () => {
     expect(options).toEqual({ idempotencyKey: `checkout-employment-${NONCE}` });
   });
 
+  it('returns a credit payment to /financiacion/, under a key of its own', () => {
+    const [params, options] = checkoutParams(NONCE, PRICE, 'credit');
+    expect(params.success_url).toBe(
+      'https://eslojusto.es/financiacion/?session_id={CHECKOUT_SESSION_ID}',
+    );
+    expect(params.cancel_url).toBe('https://eslojusto.es/financiacion/');
+    expect(options).toEqual({ idempotencyKey: `checkout-credit-${NONCE}` });
+  });
+
   const session = (extra: Record<string, unknown> = {}) =>
     ({
       id: 'cs_test_paid',

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { buildRequestBody, SYSTEM_PROMPTS } from '../src/adapters/bedrock-reader';
 import { SONNET_4_6 } from '../src/config';
 import { FINAL_PAY_PAGE_KINDS } from '../src/domain/documents';
+import { REVIEWS } from '../src/domain/reviews';
 import {
   FINAL_PAY_READABILITY,
   SECTION_KINDS,
@@ -46,6 +47,13 @@ describe('the employment read', () => {
       JSON.parse(fixture('employment-tool-schema.json')),
     );
     expect(SYSTEM_PROMPTS.employment).toBe(fixture('employment-prompt.txt'));
+  });
+});
+
+describe.each(['credit', 'insurance'] as const)('the %s read', (review) => {
+  it('asks for exactly what it asked when it shipped', () => {
+    expect(toolInputSchema(review)).toEqual(JSON.parse(fixture(`${review}-tool-schema.json`)));
+    expect(SYSTEM_PROMPTS[review]).toBe(fixture(`${review}-prompt.txt`));
   });
 });
 
@@ -155,7 +163,7 @@ function optionalParameters(node: unknown): number {
 }
 
 describe('strict tool use', () => {
-  it.each(['final_pay', 'rental', 'employment'] as const)(
+  it.each(REVIEWS)(
     'is off for a %s read, whose schema has more optional parameters than it allows',
     (review) => {
       expect(optionalParameters(toolInputSchema(review))).toBeGreaterThan(24);

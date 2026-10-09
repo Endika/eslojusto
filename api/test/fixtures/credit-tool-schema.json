@@ -1,0 +1,1179 @@
+{
+  "type": "object",
+  "properties": {
+    "pages": {
+      "type": "array",
+      "description": "One entry per attached page, in order: its kind, the number of its document and its readability.",
+      "maxItems": 25,
+      "items": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25,
+            "description": "The number given before the page."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "credit_agreement",
+              "credit_precontract_info",
+              "amortization_schedule",
+              "early_repayment_statement",
+              "revolving_agreement",
+              "card_statement",
+              "other"
+            ],
+            "description": "credit_agreement: a consumer credit contract (préstamo personal, financiación de un coche, compra a plazos) or its conditions. credit_precontract_info: the Información Normalizada Europea (INE, SECCI) given before it. amortization_schedule: a repayment schedule (cuadro de amortización). early_repayment_statement: a statement of an early repayment (liquidación de amortización o cancelación anticipada). revolving_agreement: the contract of a revolving card or credit line. card_statement: a monthly statement (extracto) of such a card. other: anything else, such as an ID card, a mortgage or a payslip."
+          },
+          "document": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25,
+            "description": "Number the documents in order of appearance; all pages of one document get the same number."
+          },
+          "readability": {
+            "type": "object",
+            "description": "ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_credit_document (not about a consumer credit), foreign_jurisdiction (a credit under the law of another country; never because of its language), unknown_format (about a consumer credit, but no kind of document you know).",
+            "properties": {
+              "value": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "handwritten",
+                  "blurry",
+                  "dark",
+                  "cropped",
+                  "not_credit_document",
+                  "foreign_jurisdiction",
+                  "unknown_format"
+                ]
+              },
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              }
+            },
+            "required": ["value", "confidence"],
+            "additionalProperties": false
+          },
+          "month": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}$",
+            "description": "For a card statement page only: the month it is for, as YYYY-MM."
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          }
+        },
+        "required": ["page", "kind", "document", "readability", "confidence"],
+        "additionalProperties": false
+      }
+    },
+    "credit_agreement": {
+      "type": "object",
+      "description": "Consumer credit contract (préstamo personal, financiación de un coche o de una compra a plazos) and its conditions. Leave the section out when no attached document is one.",
+      "properties": {
+        "product": {
+          "type": "object",
+          "description": "personal_loan (préstamo personal), car_loan (financiación de un vehículo), revolving (tarjeta o línea de pago aplazado).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["personal_loan", "car_loan", "revolving"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "lenderName": {
+          "type": "object",
+          "description": "The lender (prestamista): its company name as printed.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "intermediaryType": {
+          "type": "object",
+          "description": "The credit intermediary (concesionario, tienda), if one appears: person or company.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["person", "company"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "intermediaryCompanyName": {
+          "type": "object",
+          "description": "Only when the intermediary is a company: its name as printed. Never the name of a person.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "agreedOn": {
+          "type": "object",
+          "description": "Date of the contract (fecha del contrato, «en … a … de …»).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "principal": {
+          "type": "object",
+          "description": "Amount of credit (importe total del crédito, capital prestado), in euros.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "netDisbursed": {
+          "type": "object",
+          "description": "Amount actually handed over or paid into the account (importe entregado, neto), only if printed apart from the capital.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "cashPrice": {
+          "type": "object",
+          "description": "Cash price of the goods financed (precio al contado), if stated.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "goods": {
+          "type": "object",
+          "description": "The goods or service financed (bien financiado), as printed.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "nominalRate": {
+          "type": "object",
+          "description": "Nominal annual interest rate (TIN, tipo deudor), 7,99 % is 7.99.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "rateType": {
+          "type": "object",
+          "description": "fixed (tipo fijo) or variable (tipo variable, referenciado).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["fixed", "variable"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "declaredApr": {
+          "type": "object",
+          "description": "The APR the document states (TAE), 8,29 % is 8.29.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "declaredTotalPayable": {
+          "type": "object",
+          "description": "Total amount payable the contract states (importe total adeudado).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "instalmentCount": {
+          "type": "object",
+          "description": "Number of instalments (número de cuotas).",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "instalmentAmount": {
+          "type": "object",
+          "description": "Amount of each regular instalment (importe de la cuota).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "firstDueOn": {
+          "type": "object",
+          "description": "Due date of the first instalment (primera cuota, primer vencimiento).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "balloonAmount": {
+          "type": "object",
+          "description": "A last payment larger than the instalments (cuota final, valor futuro garantizado).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "balloonDueOn": {
+          "type": "object",
+          "description": "Its due date, only if printed.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "agreedEndOn": {
+          "type": "object",
+          "description": "Date the credit ends (fecha de vencimiento final), if stated.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "insurancePremium": {
+          "type": "object",
+          "description": "Premium of an insurance linked to the credit (prima del seguro), in euros.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "insuranceSingle": {
+          "type": "object",
+          "description": "true for a single premium for the whole term (prima única); false for a periodic one.",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "insuranceFinanced": {
+          "type": "object",
+          "description": "true when that premium is added to the capital (financiada).",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "insuranceRequired": {
+          "type": "object",
+          "description": "true when the contract says the insurance is required to grant the credit; false when it says it is optional.",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "earlyRepaymentClauseText": {
+          "type": "object",
+          "description": "The clause on early repayment (reembolso o amortización anticipada) and its compensation. Copy it word for word, at most the first characters that fit; never summarise or judge it.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "withdrawalClauseText": {
+          "type": "object",
+          "description": "The clause on the right of withdrawal (derecho de desistimiento). Copy it word for word, at most the first characters that fit; never summarise or judge it.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "charges": {
+          "type": "array",
+          "description": "Every charge (comisión, gasto) the document states, one entry each.",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "kind": {
+                "type": "string",
+                "enum": ["opening", "study", "management", "other"],
+                "description": "opening (comisión de apertura), study (comisión de estudio), management (gastos de gestión, tramitación), other."
+              },
+              "concept": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "description": "The concept exactly as printed."
+              },
+              "amount": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Its amount, in euros."
+              },
+              "how": {
+                "type": "string",
+                "enum": ["deducted", "financed", "paid"],
+                "description": "deducted (descontada del importe entregado), financed (sumada al capital) or paid (pagada aparte), if stated."
+              }
+            },
+            "required": ["kind", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "credit_precontract_info": {
+      "type": "object",
+      "description": "Información Normalizada Europea (INE) given before the contract. Leave the section out when no attached document is one.",
+      "properties": {
+        "deliveredOn": {
+          "type": "object",
+          "description": "Date it was handed over (fecha de entrega), if stated.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "representativeExample": {
+          "type": "object",
+          "description": "true when its figures are a representative example (ejemplo representativo) rather than this credit’s own; false when they are this credit’s.",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "principal": {
+          "type": "object",
+          "description": "Importe total del crédito.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "nominalRate": {
+          "type": "object",
+          "description": "TIN.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "declaredApr": {
+          "type": "object",
+          "description": "TAE.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "declaredTotalPayable": {
+          "type": "object",
+          "description": "Importe total adeudado.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "instalmentCount": {
+          "type": "object",
+          "description": "Number of instalments.",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "instalmentAmount": {
+          "type": "object",
+          "description": "Amount of each instalment.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "amortization_schedule": {
+      "type": "object",
+      "description": "Repayment schedule (cuadro de amortización), one row per instalment. Leave the section out when no attached document is one.",
+      "properties": {
+        "schedule": {
+          "type": "array",
+          "description": "Every row in the order printed; past 96, the first 96.",
+          "maxItems": 96,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "dueOn": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Due date."
+              },
+              "amount": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Instalment (cuota)."
+              },
+              "interest": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Interest part (intereses)."
+              },
+              "principal": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Capital part (amortización, capital)."
+              },
+              "balance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Capital outstanding after it (capital pendiente)."
+              },
+              "fees": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Charges or premium in the row, if any."
+              }
+            },
+            "required": ["dueOn", "amount", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "early_repayment_statement": {
+      "type": "object",
+      "description": "Statement of an early repayment (liquidación de amortización o cancelación anticipada). Leave the section out when no attached document is one.",
+      "properties": {
+        "repaidOn": {
+          "type": "object",
+          "description": "Date of the repayment.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "principalRepaid": {
+          "type": "object",
+          "description": "Capital repaid (capital amortizado).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "interestSettled": {
+          "type": "object",
+          "description": "Interest settled that day (intereses liquidados), if printed.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "compensationCharged": {
+          "type": "object",
+          "description": "Compensation or fee charged for repaying early (compensación, comisión por amortización anticipada).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "compensationConcept": {
+          "type": "object",
+          "description": "The concept of that charge exactly as printed.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "premiumRefunded": {
+          "type": "object",
+          "description": "Insurance premium refunded (prima no consumida, extorno), if printed.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "agreedEndOn": {
+          "type": "object",
+          "description": "Date the credit was to end (fecha de vencimiento final pactada).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "paidByInsurance": {
+          "type": "object",
+          "description": "true when the statement says an insurance paid the repayment.",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "discountLost": {
+          "type": "object",
+          "description": "true when it charges back a discount given for financing the purchase (pérdida del descuento, bonificación por financiar).",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "revolving_agreement": {
+      "type": "object",
+      "description": "Contract of a revolving card or credit line (tarjeta de pago aplazado, revolving). Leave the section out when no attached document is one.",
+      "properties": {
+        "lenderName": {
+          "type": "object",
+          "description": "The lender (prestamista): its company name as printed.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "intermediaryType": {
+          "type": "object",
+          "description": "The credit intermediary (concesionario, tienda), if one appears: person or company.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["person", "company"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "intermediaryCompanyName": {
+          "type": "object",
+          "description": "Only when the intermediary is a company: its name as printed. Never the name of a person.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "agreedOn": {
+          "type": "object",
+          "description": "Date of the contract (fecha del contrato, «en … a … de …»).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "creditLimit": {
+          "type": "object",
+          "description": "Credit limit (límite de crédito, disponible).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "nominalRate": {
+          "type": "object",
+          "description": "Nominal annual interest rate (TIN, tipo deudor), 7,99 % is 7.99.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "declaredApr": {
+          "type": "object",
+          "description": "The APR the document states (TAE), 8,29 % is 8.29.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "minimumPayment": {
+          "type": "object",
+          "description": "Minimum monthly payment in euros (cuota mínima).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "minimumPaymentPercent": {
+          "type": "object",
+          "description": "Minimum monthly payment as a percentage of the balance.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "annualFee": {
+          "type": "object",
+          "description": "Annual fee (cuota anual, de emisión o mantenimiento).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "paymentMode": {
+          "type": "object",
+          "description": "How it is repaid (modalidad de pago): fixed_amount (cuota fija), percent_of_balance (porcentaje del saldo), full_balance (pago total a fin de mes), other.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["fixed_amount", "percent_of_balance", "full_balance", "other"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "charges": {
+          "type": "array",
+          "description": "Every charge (comisión, gasto) the document states, one entry each.",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "kind": {
+                "type": "string",
+                "enum": ["opening", "study", "management", "other"],
+                "description": "opening (comisión de apertura), study (comisión de estudio), management (gastos de gestión, tramitación), other."
+              },
+              "concept": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "description": "The concept exactly as printed."
+              },
+              "amount": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Its amount, in euros."
+              },
+              "how": {
+                "type": "string",
+                "enum": ["deducted", "financed", "paid"],
+                "description": "deducted (descontada del importe entregado), financed (sumada al capital) or paid (pagada aparte), if stated."
+              }
+            },
+            "required": ["kind", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "card_statement": {
+      "type": "object",
+      "description": "Monthly statement of a revolving card or credit line (extracto). Leave the section out when no attached document is one.",
+      "properties": {
+        "statements": {
+          "type": "array",
+          "description": "Every statement, one entry each; past twelve, the twelve most recent.",
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "statementOn": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Date of the statement."
+              },
+              "balance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Balance owed (saldo dispuesto, deuda pendiente)."
+              },
+              "interest": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Interest charged in the period."
+              },
+              "payment": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Payment due for the period (cuota, recibo)."
+              },
+              "nominalRate": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Nominal annual interest rate (TIN, tipo deudor), 7,99 % is 7.99."
+              },
+              "estimatedEndOn": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Estimated date the balance is paid off (fecha estimada de fin), if printed."
+              },
+              "totalToPay": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Estimated total still to pay (importe total a pagar), if printed."
+              }
+            },
+            "required": ["statementOn", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["pages"],
+  "additionalProperties": false
+}

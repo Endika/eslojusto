@@ -1,0 +1,446 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "credit_agreement",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "credit_agreement",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "amortization_schedule",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 4,
+            "kind": "amortization_schedule",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "credit_agreement": {
+          "product": {
+            "value": "car_loan",
+            "confidence": "high"
+          },
+          "lenderName": {
+            "value": "Financiera Inventada E.F.C., S.A.",
+            "confidence": "high"
+          },
+          "intermediaryType": {
+            "value": "company",
+            "confidence": "high"
+          },
+          "intermediaryCompanyName": {
+            "value": "Concesionario Ficticio S.L.",
+            "confidence": "high"
+          },
+          "agreedOn": {
+            "value": "2024-01-15",
+            "confidence": "high"
+          },
+          "principal": {
+            "value": 20000,
+            "confidence": "high"
+          },
+          "cashPrice": {
+            "value": 24500,
+            "confidence": "high"
+          },
+          "goods": {
+            "value": "Turismo de ocasión",
+            "confidence": "high"
+          },
+          "nominalRate": {
+            "value": 7.99,
+            "confidence": "high"
+          },
+          "rateType": {
+            "value": "fixed",
+            "confidence": "high"
+          },
+          "declaredApr": {
+            "value": 9.12,
+            "confidence": "high"
+          },
+          "instalmentCount": {
+            "value": 36,
+            "confidence": "high"
+          },
+          "instalmentAmount": {
+            "value": 400,
+            "confidence": "high"
+          },
+          "firstDueOn": {
+            "value": "2024-02-05",
+            "confidence": "high"
+          },
+          "balloonAmount": {
+            "value": 9185.41,
+            "confidence": "high"
+          },
+          "agreedEndOn": {
+            "value": "2027-02-05",
+            "confidence": "high"
+          },
+          "insurancePremium": {
+            "value": 950,
+            "confidence": "high"
+          },
+          "insuranceSingle": {
+            "value": true,
+            "confidence": "high"
+          },
+          "insuranceFinanced": {
+            "value": true,
+            "confidence": "high"
+          },
+          "insuranceRequired": {
+            "value": false,
+            "confidence": "high"
+          },
+          "charges": [
+            {
+              "kind": "opening",
+              "concept": "Comisión de formalización",
+              "amount": 400,
+              "how": "financed",
+              "confidence": "high"
+            }
+          ]
+        },
+        "amortization_schedule": {
+          "schedule": [
+            {
+              "dueOn": "2024-02-05",
+              "amount": 400,
+              "interest": 133.17,
+              "principal": 266.83,
+              "balance": 19733.17,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2024-03-05",
+              "amount": 400,
+              "interest": 131.39,
+              "principal": 268.61,
+              "balance": 19464.56,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2024-04-05",
+              "amount": 400,
+              "interest": 129.6,
+              "principal": 270.4,
+              "balance": 19194.16,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2024-05-05",
+              "amount": 400,
+              "interest": 127.8,
+              "principal": 272.2,
+              "balance": 18921.96,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2024-06-05",
+              "amount": 400,
+              "interest": 125.99,
+              "principal": 274.01,
+              "balance": 18647.95,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2024-07-05",
+              "amount": 400,
+              "interest": 124.16,
+              "principal": 275.84,
+              "balance": 18372.11,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2024-08-05",
+              "amount": 400,
+              "interest": 122.33,
+              "principal": 277.67,
+              "balance": 18094.44,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2024-09-05",
+              "amount": 400,
+              "interest": 120.48,
+              "principal": 279.52,
+              "balance": 17814.92,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2024-10-05",
+              "amount": 400,
+              "interest": 118.62,
+              "principal": 281.38,
+              "balance": 17533.54,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2024-11-05",
+              "amount": 400,
+              "interest": 116.74,
+              "principal": 283.26,
+              "balance": 17250.28,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2024-12-05",
+              "amount": 400,
+              "interest": 114.86,
+              "principal": 285.14,
+              "balance": 16965.14,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-01-05",
+              "amount": 400,
+              "interest": 112.96,
+              "principal": 287.04,
+              "balance": 16678.1,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-02-05",
+              "amount": 400,
+              "interest": 111.05,
+              "principal": 288.95,
+              "balance": 16389.15,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-03-05",
+              "amount": 400,
+              "interest": 109.12,
+              "principal": 290.88,
+              "balance": 16098.27,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-04-05",
+              "amount": 400,
+              "interest": 107.19,
+              "principal": 292.81,
+              "balance": 15805.46,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-05-05",
+              "amount": 400,
+              "interest": 105.24,
+              "principal": 294.76,
+              "balance": 15510.7,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-06-05",
+              "amount": 400,
+              "interest": 103.28,
+              "principal": 296.72,
+              "balance": 15213.98,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-07-05",
+              "amount": 400,
+              "interest": 101.3,
+              "principal": 298.7,
+              "balance": 14915.28,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-08-05",
+              "amount": 400,
+              "interest": 99.31,
+              "principal": 300.69,
+              "balance": 14614.59,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-09-05",
+              "amount": 400,
+              "interest": 97.31,
+              "principal": 302.69,
+              "balance": 14311.9,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-10-05",
+              "amount": 400,
+              "interest": 95.29,
+              "principal": 304.71,
+              "balance": 14007.19,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-11-05",
+              "amount": 400,
+              "interest": 93.26,
+              "principal": 306.74,
+              "balance": 13700.45,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2025-12-05",
+              "amount": 400,
+              "interest": 91.22,
+              "principal": 308.78,
+              "balance": 13391.67,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-01-05",
+              "amount": 400,
+              "interest": 89.17,
+              "principal": 310.83,
+              "balance": 13080.84,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-02-05",
+              "amount": 400,
+              "interest": 87.1,
+              "principal": 312.9,
+              "balance": 12767.94,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-03-05",
+              "amount": 400,
+              "interest": 85.01,
+              "principal": 314.99,
+              "balance": 12452.95,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-04-05",
+              "amount": 400,
+              "interest": 82.92,
+              "principal": 317.08,
+              "balance": 12135.87,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-05-05",
+              "amount": 400,
+              "interest": 80.8,
+              "principal": 319.2,
+              "balance": 11816.67,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-06-05",
+              "amount": 400,
+              "interest": 78.68,
+              "principal": 321.32,
+              "balance": 11495.35,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-07-05",
+              "amount": 400,
+              "interest": 76.54,
+              "principal": 323.46,
+              "balance": 11171.89,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-08-05",
+              "amount": 400,
+              "interest": 74.39,
+              "principal": 325.61,
+              "balance": 10846.28,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-09-05",
+              "amount": 400,
+              "interest": 72.22,
+              "principal": 327.78,
+              "balance": 10518.5,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-10-05",
+              "amount": 400,
+              "interest": 70.04,
+              "principal": 329.96,
+              "balance": 10188.54,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-11-05",
+              "amount": 400,
+              "interest": 67.84,
+              "principal": 332.16,
+              "balance": 9856.38,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2026-12-05",
+              "amount": 400,
+              "interest": 65.63,
+              "principal": 334.37,
+              "balance": 9522.01,
+              "confidence": "high"
+            },
+            {
+              "dueOn": "2027-01-05",
+              "amount": 400,
+              "interest": 63.4,
+              "principal": 336.6,
+              "balance": 9185.41,
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 24400,
+    "output_tokens": 3600
+  }
+}

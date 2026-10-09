@@ -8,7 +8,7 @@ import {
   type VerifyMemo,
 } from '../domain/payments';
 import type { CaptchaVerifier, CheckoutCreator, Clock, Logger } from '../domain/ports';
-import type { ReviewKind } from '../domain/reviews';
+import { isReturnTo, type CheckoutReview } from '../domain/reviews';
 import { handle, type HttpEvent, type HttpResponse } from './common';
 
 const MAX_TOKEN_LENGTH = 2048;
@@ -29,10 +29,10 @@ export function handleCheckout(
       typeof captchaToken !== 'string' ||
       captchaToken.length === 0 ||
       captchaToken.length > MAX_TOKEN_LENGTH ||
-      (returnTo !== undefined && returnTo !== 'rental' && returnTo !== 'employment')
+      (returnTo !== undefined && !isReturnTo(returnTo))
     )
       return { code: 'invalid_request' };
-    const review: ReviewKind = returnTo ?? 'final_pay';
+    const review: CheckoutReview = returnTo ?? 'final_pay';
     return startCheckout(nonce, captchaToken, deps, review);
   });
 }

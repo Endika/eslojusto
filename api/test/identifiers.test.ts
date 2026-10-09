@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { hasIdentifier, hasSocialSecurityNumber } from '../src/domain/identifiers';
+import {
+  hasIdentifier,
+  hasNumberPlate,
+  hasPaymentCardNumber,
+  hasSocialSecurityNumber,
+} from '../src/domain/identifiers';
 
 // Made-up identifiers: control letters and check digits are not valid.
 describe('hasIdentifier', () => {
@@ -74,5 +79,49 @@ describe('hasSocialSecurityNumber', () => {
     ['a thirteen-digit reference', 'referencia 9123456789012'],
   ])('finds nothing in %s', (_, text) => {
     expect(hasSocialSecurityNumber(text)).toBe(false);
+  });
+});
+
+describe('hasPaymentCardNumber', () => {
+  it.each([
+    ['in groups', 'Tarjeta 4000 0000 0000 0002'],
+    ['in one piece', 'cargo en la tarjeta 4000000000000002'],
+    ['with dashes', '5500-0000-0000-0004'],
+    ['of American Express', 'Amex 3400 000000 00009'],
+  ])('finds one %s', (_, text) => {
+    expect(hasPaymentCardNumber(text)).toBe(true);
+  });
+
+  it.each([
+    ['a masked number', 'Tarjeta **** **** **** 0002'],
+    ['an amount', '1.234.567,89 €'],
+    ['an old account number', '2100 0418 45 0200051332'],
+    ['a thirteen-digit reference', 'referencia 9123456789012'],
+    ['a date', 'desde el 2026-07-31'],
+    ['a law', 'Ley 16/2011, de 24 de junio'],
+  ])('finds nothing in %s', (_, text) => {
+    expect(hasPaymentCardNumber(text)).toBe(false);
+  });
+});
+
+describe('hasNumberPlate', () => {
+  it.each([
+    ['of today', 'Turismo matrícula 1234 BCD'],
+    ['in one piece', 'vehículo 1234BCD'],
+    ['with a dash', '1234-BCD'],
+    ['of a province', 'matrícula M-1234-AB'],
+  ])('finds one %s', (_, text) => {
+    expect(hasNumberPlate(text)).toBe(true);
+  });
+
+  it.each([
+    ['a law and its acronym', 'Ley 50/1980 LCS'],
+    ['a year and a word in lower case', '2026 bcd'],
+    ['a year and vowels', '2016 AEI'],
+    ['an amount', '12.345,67 €'],
+    ['a law', 'Ley 50/1980, de 8 de octubre'],
+    ['a company tax number', 'NIF B12345678'],
+  ])('finds nothing in %s', (_, text) => {
+    expect(hasNumberPlate(text)).toBe(false);
   });
 });

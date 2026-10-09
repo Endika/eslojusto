@@ -14,7 +14,7 @@ logs carry only `op`, `code`, `latencyMs`, `pages`, `inputTokens`, `outputTokens
 many pages had each readability, only when a read set a page aside or found nothing) and three flags (`test/http.test.ts` proves it): `underestimated` when Bedrock
 counted more than twice the input the pre-read estimate allowed for, `countNotSaved` when
 a pass read went through but Stripe did not store its count, and `truncated` when an employment
-read filled a list to its maximum; `verify` marks a `pass` request that
+or a credit read filled a list to its maximum; `verify` marks a `pass` request that
 verified a pass. The manual calculator never calls this API.
 
 ```bash
@@ -36,16 +36,18 @@ API never returns prose. All requests are `POST` with a JSON body.
   "captchaToken": "<Turnstile token, widget action 'extract'>",
   "quota": "<token from the last free read, or null>", // free read
   "pass": "<pass token>", // or a pass read
-  "review": "rental" // optional: "rental" or "employment"; none is the final pay
+  "review": "rental" // optional: "rental", "employment", "credit" or "insurance"; none is the final pay
 }
 ```
 
 `review` picks the schema, the prompt and the merge rules (`src/domain/reviews.ts`): absent, it
 is `final_pay`, exactly as before the field existed (`test/fixtures/final-pay-tool-schema.json` and
-`final-pay-prompt.txt` pin its schema and prompt, and `rental-tool-schema.json` and
-`rental-prompt.txt` the rental review's); `rental` reads a tenancy pack (below, «Rental review»),
-`employment` an employment contract and the documents around it (below, «Employment review»);
-anything else is `invalid_request`. The log line carries `review` only when the request
+`final-pay-prompt.txt` pin its schema and prompt, and the other reviews' fixtures beside them
+pin theirs); `rental` reads a tenancy pack (below, «Rental review»), `employment` an employment
+contract and the documents around it (below, «Employment review»), `credit` a consumer credit
+pack (below, «Credit review») and `insurance` a home or motor policy and its renewal notice
+(below, «Insurance review»); anything else is `invalid_request`. Each review's system prompt
+lives in a module of its own, `src/adapters/prompts/`. The log line carries `review` only when the request
 named one.
 
 The person never says what they upload: a read takes the whole pack (dismissal letter,
@@ -162,9 +164,10 @@ each of them). An `ok` read can still list pages set aside; the site says which 
 "captchaToken": "<Turnstile, action 'checkout'>", "returnTo": "rental" }` →
 `{ "code": "ok", "sessionId": "cs_…", "url": "https://checkout.stripe.com/…" }`. Keep the
 session id and nonce before redirecting; Stripe returns to
-`/finiquito/?session_id={CHECKOUT_SESSION_ID}`, to `/alquiler/` with `"returnTo": "rental"` or to
-`/contrato/` with `"returnTo": "employment"` (`CHECKOUT_PATHS` in `src/config.ts`); any other
-`returnTo` is `invalid_request`. The pass is the
+`/finiquito/?session_id={CHECKOUT_SESSION_ID}`, to `/alquiler/` with `"returnTo": "rental"`, to
+`/contrato/` with `"returnTo": "employment"` or to `/financiacion/` with `"returnTo": "credit"`
+(`CHECKOUT_PATHS` in `src/config.ts`); any other `returnTo` is `invalid_request`, `insurance`
+included: that review offers no pass. The pass is the
 same product either way and unlocks every review.
 
 **`pass`** `{ "sessionId": "cs_…", "nonce": "…" }` →
@@ -303,6 +306,77 @@ totals), `hours_over_week` (over 80 a week, in the contract or the offer) and
 `salary_period_mismatch` (a monthly salary times its payments more than 5 % from the annual one
 the contract prints). A legible contract with neither `startDate` nor `salaryAmount` is worth a
 second read, as a failed check is.
+
+### Credit review
+
+With `"review": "credit"` the model sorts a consumer credit pack (`src/domain/credit-schema.ts`).
+Page kinds: `credit_agreement`, `credit_precontract_info` (the INE), `amortization_schedule`,
+`early_repayment_statement`, `revolving_agreement`, `card_statement` and `other` (a mortgage, a
+lease without a purchase option or a business loan is `other`). Readability as the rental
+review's, with `not_credit_document` for a page about no consumer credit.
+
+| Section                     | Fields                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Lists (most rows)                                                                                                                   |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `credit_agreement`          | `product`, `lenderName`, `intermediaryType`, `intermediaryCompanyName` (a company only), `agreedOn`, `principal`, `netDisbursed`, `cashPrice`, `goods`, `nominalRate`, `rateType`, `declaredApr`, `declaredTotalPayable`, `instalmentCount`, `instalmentAmount`, `firstDueOn`, `balloonAmount`, `balloonDueOn`, `agreedEndOn`, `insurancePremium`, `insuranceSingle`, `insuranceFinanced`, `insuranceRequired`, `earlyRepaymentClauseText` and `withdrawalClauseText` (literal, ≤ 600) | `charges` [`kind`, `concept`, `amount`, `how`] (8)                                                                                  |
+| `credit_precontract_info`   | `deliveredOn` (returned as `precontractDeliveredOn`), `representativeExample`, `principal`, `nominalRate`, `declaredApr`, `declaredTotalPayable`, `instalmentCount`, `instalmentAmount`                                                                                                                                                                                                                                                                                                |                                                                                                                                     |
+| `amortization_schedule`     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `schedule` [`dueOn`, `amount`, `interest`, `principal`, `balance`, `fees`] (96, the first)                                          |
+| `early_repayment_statement` | `repaidOn`, `principalRepaid`, `interestSettled`, `compensationCharged`, `compensationConcept`, `premiumRefunded`, `agreedEndOn`, `paidByInsurance`, `discountLost`                                                                                                                                                                                                                                                                                                                    |                                                                                                                                     |
+| `revolving_agreement`       | `lenderName`, `intermediaryType`, `intermediaryCompanyName`, `agreedOn`, `creditLimit`, `nominalRate`, `declaredApr`, `minimumPayment`, `minimumPaymentPercent`, `annualFee`, `paymentMode`                                                                                                                                                                                                                                                                                            | `charges` (8)                                                                                                                       |
+| `card_statement`            |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `statements` [`statementOn`, `balance`, `interest`, `payment`, `nominalRate`, `estimatedEndOn`, `totalToPay`] (12, the most recent) |
+
+`src/domain/credit-merge.ts` takes the contract's figures first, then a revolving card's
+contract, then the INE, so an INE that states another APR shows as a conflict; the INE's figures
+are left out when it says they are a representative example rather than this credit's. The end
+date comes from an early repayment statement before the contract. `product`, the charge `kind`
+and `how` and `rateType` mirror the site's credit engine (`test/credit-contract.test.ts`). The
+model copies and labels; it never works out an APR or a total, compares a rate with the Bank of
+Spain's average or any limit, or says whether a clause or a charge is lawful: the site's engine
+does all of that. The art. 16.2 mentions are not asked for: whether a mention is there is the
+person's answer on the site.
+
+The prompt tells the model never to record the name, DNI/NIE, address, phone, email, IBAN, card
+number or signature of anyone, nor health, disability, illness or a health questionnaire of a
+linked insurance (art. 9 GDPR). The API does not take that on trust: `intermediaryCompanyName`
+beside any `intermediaryType` but `company` is dropped, and any copied text (`lenderName`,
+`intermediaryCompanyName`, `goods`, the two clause texts, `compensationConcept`, a charge
+`concept`) that holds an identifier, a payment card number, a number plate or a word about
+health, leave, union membership or debts (the employment review's list) is dropped, each as a
+discard. `test/free-text-guards.test.ts` walks every text field and list item of the credit and
+the insurance schema, so a text added later cannot skip the guards.
+
+The schedule keeps its first 96 rows (eight years of monthly instalments) and the card
+statements the twelve most recent; `truncated: true` says a list came back at its maximum.
+`failedChecks` are coherence checks only (`src/domain/credit-checks.ts`): `net_above_principal`,
+`declared_total_mismatch` (the instalments and the last payment add up to more than the total
+payable the contract states), `schedule_rows_do_not_sum` (a row's interest, capital and charges
+more than 1 € from its instalment), `schedule_balance_jump` (a row's outstanding capital more
+than 1 € from the previous one less the capital it repays), `repayment_after_end` and
+`statement_total_below_balance`. A legible contract with neither its amount nor its
+instalments, or a card contract with neither its limit nor its rate, is worth a second read.
+
+### Insurance review
+
+With `"review": "insurance"` the model sorts a home or motor policy and its renewal notice
+(`src/domain/insurance-schema.ts`). Page kinds: `insurance_policy`, `insurance_renewal_notice`
+and `other`; readability with `not_insurance_document`.
+
+| Section                    | Fields                                                                                                                                                                                                                                                                                                                                     | Lists (most rows)                               |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| `insurance_policy`         | `line`, `carCover`, `insurerName`, `intermediaryType`, `intermediaryCompanyName` (a company only), `concludedOn`, `effectiveOn`, `expiresOn`, `renews`, `premiumNet`, `premiumSurcharges`, `premiumTaxes`, `premiumTotal`, `proportionalRuleExcluded`, `proportionalRuleMarginPercent`, `channel`, `nonRenewalClauseText` (literal, ≤ 600) | `sumsInsured` [`kind`, `concept`, `amount`] (8) |
+| `insurance_renewal_notice` | `noticeOn`, `noticeMedium`, `expiresOn`, `previousPremium`, `newPremium`, `coverChanges`, `changesText` (literal, ≤ 600)                                                                                                                                                                                                                   |                                                 |
+
+`src/domain/insurance-merge.ts` takes `expiresOn` from the notice first, since it is about the
+period that ends next, and everything else from its only source. `line` and `carCover` mirror
+the site's insurance engine (`test/insurance-contract.test.ts`); life, health and funeral policies
+are labelled so the site can leave them out. The model never works out a deadline or says
+whether a notice came in time or a premium is fair. Names, identifiers, card numbers, number
+plates and health stay out as in the credit review, with the same guards on every copied text
+(`insurerName`, `intermediaryCompanyName`, the two literal texts, a sum's `concept`); the policy
+number has no fixed shape, so only the prompt keeps it out.
+`failedChecks`: `expiry_before_effect`, `notice_after_expiry` and `premium_parts_do_not_sum`
+(net premium, surcharges and taxes more than 5 cents from the total). A legible policy or notice
+with no `expiresOn` is worth a second read. The insurance review offers no pass, so no checkout
+starts from it.
 
 ### Fields and the site's engine
 
@@ -466,8 +540,9 @@ Cheapest first, and nothing that parses what the person sent runs before the cap
 
 - **The input is known before any call.** Every image is priced by its pixels, at
   w × h / 750 tokens (Anthropic's formula) or one per 28 × 28 patch if that is more, and the
-  prompt and schema at 14,000 for the final pay and the employment review and 11,000 for a
-  rental review (about 27,000, 28,000 and 21,000 characters at two per token,
+  prompt and schema at 14,000 for the final pay, the employment and the credit review, 11,000
+  for a rental review and 8,000 for an insurance review (about 27,000, 28,000, 28,000, 21,000
+  and 14,000 characters at two per token,
   `PROMPT_TOKENS_BY_REVIEW`; `test/tokens.test.ts` keeps them honest). Bedrock's CountTokens does not serve Claude models
   offered only through cross-Region profiles, so this is computed, not asked. The largest pack
   the API accepts, twenty-five 1568 × 1568 images, comes to 14,000 + 25 × 3,279 = 95,975 (92,975
@@ -717,8 +792,15 @@ move together.
 "Contract alone" and "contract and six payslips" count 1,600 tokens per photo and the 14,000 of
 the prompt, as above.
 
-**Worst case: 0.40 USD per read** for the final pay and the rental review (95,975 × 3.30 USD/M +
-5,000 × 16.50 USD/M = 0.399), and an upper bound of about **0.51 USD** for the employment review
+A credit read has the employment review's bounds: a prompt of 14,000 tokens (largest pack
+95,975 in) and `max_tokens` 12,000, so its worst case is the same **0.51 USD**. Every list at its
+maximum (a 96-row schedule, a year of card statements, both contracts' charges) with texts of
+the usual length is about 10,700 tokens, a tenth under the cap; with every copied text at its
+limit as well, about 12,200, which stops at `max_tokens`. An insurance read keeps `max_tokens`
+at 5,000 with an 8,000-token prompt: its largest pack is 89,975 in, 0.38 USD.
+
+**Worst case: 0.40 USD per read** for the final pay, the rental and the insurance review (95,975 × 3.30 USD/M +
+5,000 × 16.50 USD/M = 0.399), and an upper bound of about **0.51 USD** for the employment and the credit review
 (95,975 × 3.30 USD/M + 12,000 × 16.50 USD/M = 0.5147), for any input: the API takes images only, priced by their pixels, and refuses anything above 96,000
 estimated tokens (0.40 USD) before a call. The bound counts every page at 1568 px, since the
 API accepts that size at any count; the browser stepping a large pack down only lowers it. A PDF never reaches it; the browser renders its pages
