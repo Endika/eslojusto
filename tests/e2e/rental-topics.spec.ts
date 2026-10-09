@@ -110,7 +110,8 @@ test('the deposit pages link to each other and to the review', async ({ page }) 
     .click();
   await expect(page).toHaveURL(/\/alquiler\/devolucion-fianza\/$/);
   await page.getByRole('link', { name: 'revisión del alquiler' }).click();
-  await expect(page).toHaveURL(/\/alquiler\/$/);
+  // The review opens on its first sheet and writes it into the URL as soon as it starts.
+  await expect(page).toHaveURL(/\/alquiler\/(#contrato)?$/);
 });
 
 test('the worked example crosses the year change with each year’s rate', async ({ page }) => {
