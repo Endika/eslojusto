@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.36.0](https://github.com/Endika/eslojusto/compare/v1.35.0...v1.36.0) (2026-10-09)
+
+
+### Features
+
+* **engine:** add mortgage norms and dated case-law sources ([832c3f9](https://github.com/Endika/eslojusto/commit/832c3f97b67cf651897619374108f77f351c6882))
+* **engine:** check early repayment and withdrawal and review a consumer credit end to end ([927b340](https://github.com/Endika/eslojusto/commit/927b3409daacb81a2d8e0e39f82ce39d8c2e5397))
+* **engine:** place the contract's APR against the Bank of Spain average with an edge band ([efef841](https://github.com/Endika/eslojusto/commit/efef84103ac2fbde6eba4f408d0582e9b2217156))
+* **engine:** recompute the APR from the contract's cash flows as annex I prescribes ([2f28c16](https://github.com/Endika/eslojusto/commit/2f28c1630204290100e2adc37b2d5c18bf9af3c8))
+* **engine:** share the legal interest table by period from 1995 ([7c78f3c](https://github.com/Endika/eslojusto/commit/7c78f3c26169ad2d3f0a4fd0fa3cd3ad0ff8aa9a))
+
 ## [1.35.0](https://github.com/Endika/eslojusto/compare/v1.34.0...v1.35.0) (2026-10-09)
 
 
