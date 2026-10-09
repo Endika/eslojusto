@@ -31,10 +31,20 @@ export type Instalments =
     }
   | { readonly kind: 'schedule'; readonly rows: readonly ScheduleRow[] };
 
+// A last payment larger than the instalments. It is entered here and never also as a row of the
+// schedule, or it would be counted twice.
+export interface Balloon {
+  readonly amount: number;
+  // The day the contract sets for it. Null when the person does not know: contracts put it either
+  // with the last instalment or a month after it, and the review works out both.
+  readonly dueOn: CivilDate | null;
+}
+
 export interface LinkedInsurance {
   readonly premium: number;
-  // One premium for the whole term, or periodic.
+  // One premium for the whole term, or a periodic one paid with each instalment, on top of it.
   readonly single: boolean;
+  // A single premium added to the capital and repaid within the instalments.
   readonly financed: boolean;
   // Whether the lender required it to grant the credit.
   readonly required: boolean | null;
@@ -58,7 +68,29 @@ export interface EarlyRepayment {
   readonly agreedEndOn: CivilDate;
   // Interest the schedule had left to pay from that day.
   readonly remainingInterest: number | null;
+  // Whether the car dealer charged back a discount it had given for financing the purchase.
+  readonly discountLost: boolean | null;
 }
+
+// The letters of art. 16.2 LCC the review asks about, each a mention the contract must carry.
+export const MENTION_LETTERS = [
+  'a',
+  'c',
+  'd',
+  'e',
+  'f',
+  'g',
+  'h',
+  'i',
+  'l',
+  'o',
+  'p',
+  'q',
+  'r',
+  't',
+] as const;
+
+export type MentionLetter = (typeof MENTION_LETTERS)[number];
 
 // What the engine reads; free text, such as the literal name of a charge, never reaches it.
 export interface CreditInput {
@@ -68,7 +100,8 @@ export interface CreditInput {
   readonly leaseWithoutPurchase: boolean;
   readonly agreedOn: CivilDate;
   readonly drawnOn: CivilDate;
-  // For a revolving card, its limit.
+  // For a revolving card, its limit. The capital lent, without any charge or premium financed on
+  // top of it: those are entered apart and added by the engine.
   readonly principal: number;
   // What reached the account, when charges were taken off it.
   readonly netDisbursed: number | null;
@@ -76,9 +109,13 @@ export interface CreditInput {
   readonly rateType: 'fixed' | 'variable';
   readonly declaredApr: number | null;
   readonly declaredTotalPayable: number | null;
-  // Null for a revolving card.
+  // Whether the person takes the APR worked out from the contract's figures, rather than the
+  // declared one, to compare with the average rate.
+  readonly confirmedApr: boolean;
+  // Null for a revolving card. A regular plan's instalments are monthly.
   readonly instalments: Instalments | null;
-  readonly balloon: number | null;
+  readonly balloon: Balloon | null;
+  // A charge `financed` is added on top of `principal` and repaid within the instalments.
   readonly charges: readonly Charge[];
   readonly insurance: LinkedInsurance | null;
   readonly card: Card | null;
@@ -86,6 +123,8 @@ export interface CreditInput {
   // When the contract and its information arrived, if after the contract day.
   readonly infoReceivedOn: CivilDate | null;
   readonly infoReceived: boolean | null;
+  // Whether each mention of art. 16.2 is in the contract; a letter left out was not answered.
+  readonly mentions: Readonly<Partial<Record<MentionLetter, boolean>>>;
 }
 
 export type OutOfScopeReason =
