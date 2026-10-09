@@ -899,6 +899,7 @@ export function renderOutOfScope(
   reason: OutOfScopeReason,
   information: readonly InformationBlock[],
   tr: Translate,
+  householdWorker = false,
 ): void {
   for (const el of inScopeParts(root)) el.hidden = true;
   find(root, '[data-items]').replaceChildren();
@@ -909,6 +910,9 @@ export function renderOutOfScope(
   find(box, '[data-out-of-scope-reason]').textContent = tr(
     `client.employment.out_of_scope.${reason}`,
   );
+  // A household worker has her own review, in a build that carries it.
+  const household = box.querySelector<HTMLElement>('[data-out-of-scope-household]');
+  if (household) household.hidden = !householdWorker;
   const minors = information.filter((b) => b.id === 'minors');
   renderInformation(root, minors, tr);
   find(root, '[data-information-section]').hidden = minors.length === 0;

@@ -4,7 +4,7 @@ import { t, type Key } from '../../i18n';
 import { DOCUMENTS } from '../../documents/config';
 import { OUTAGE_KEY } from '../../documents/outage';
 import { STORAGE_KEYS } from '../../documents/pass';
-import { EMPLOYMENT_BUILD, RENTAL_BUILD } from '../../content/sections';
+import { EMPLOYMENT_BUILD, HOUSEHOLD_BUILD, RENTAL_BUILD } from '../../content/sections';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
 const tx = (key: Key) => t('es', key);
@@ -16,6 +16,8 @@ const documents = DOCUMENTS !== null;
 const rental = RENTAL_BUILD;
 // The contract review exists only in a PUBLIC_EMPLOYMENT=1 build; so do the paragraphs about it.
 const employment = EMPLOYMENT_BUILD;
+// The household review exists only in a PUBLIC_HOUSEHOLD=1 build; so do the paragraphs about it.
+const household = HOUSEHOLD_BUILD;
 
 // One entry per thing that is stored or processed; a new tool adds a row here.
 const stored = [
@@ -32,6 +34,14 @@ const stored = [
         {
           what: tx('privacy.employment.data_review'),
           where: tx('privacy.employment.data_review_where'),
+        },
+      ]
+    : []),
+  ...(household
+    ? [
+        {
+          what: tx('privacy.household.data_review'),
+          where: tx('privacy.household.data_review_where'),
         },
       ]
     : []),
@@ -165,6 +175,22 @@ const tracked = [
         },
       ]
     : []),
+  ...(household
+    ? [
+        {
+          when: tx('privacy.household.tracked_sheets'),
+          what: tx('privacy.household.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.household.tracked_scope'),
+          what: tx('privacy.household.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.household.tracked_review'),
+          what: tx('privacy.household.tracked_review_what'),
+        },
+      ]
+    : []),
   ...(documents
     ? [
         {
@@ -228,6 +254,7 @@ const tracked = [
         </p>
         {rental && <p>{tx('privacy.rental.summary')}</p>}
         {employment && <p>{tx('privacy.employment.summary')}</p>}
+        {household && <p>{tx('privacy.household.summary')}</p>}
         {documents && (
           <p>
             Si decides subir un documento para rellenar los datos, se lee con IA en la Unión Europea

@@ -13,4 +13,6 @@ interface ImportMetaEnv {
   readonly PUBLIC_EMPLOYMENT?: string;
   // '1' builds the benefit during an ERTE at /paro/erte/; anything else leaves it out.
   readonly PUBLIC_ERTE?: string;
+  // '1' builds the household worker review at /empleada-de-hogar/; anything else leaves it out.
+  readonly PUBLIC_HOUSEHOLD?: string;
 }

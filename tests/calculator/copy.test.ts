@@ -28,9 +28,14 @@ describe.skipIf(!existsSync('dist'))('published copy', () => {
 const sources = [
   'src/calculator/render.ts',
   'src/i18n/es.ts',
-  ...['src/engine', 'src/rental', 'src/employment', 'src/credit', 'src/insurance'].flatMap((dir) =>
-    existsSync(dir) ? filesUnder(dir, '.ts') : [],
-  ),
+  ...[
+    'src/engine',
+    'src/rental',
+    'src/employment',
+    'src/credit',
+    'src/insurance',
+    'src/household',
+  ].flatMap((dir) => (existsSync(dir) ? filesUnder(dir, '.ts') : [])),
 ];
 
 describe('result copy', () => {
@@ -110,6 +115,12 @@ describe('forbidden words', () => {
   it('«te deben» stays forbidden in the employment review', () => {
     expect(forbiddenIn('client.employment.x', 'te deben 10 €')).not.toEqual([]);
     expect(forbiddenIn('client.rental.x', 'te deben 10 €')).toEqual([]);
+  });
+
+  it('«tienes derecho» stays out of the household review', () => {
+    expect(forbiddenIn('client.household.x', 'tienes derecho a 10 €')).not.toEqual([]);
+    expect(forbiddenIn('dist/empleada-de-hogar/index.html', 'tienen derecho')).not.toEqual([]);
+    expect(forbiddenIn('client.rental.x', 'tienes derecho a 10 €')).toEqual([]);
   });
 
   it('a built page leaves out only the marked legal quotes', () => {

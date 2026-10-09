@@ -4,7 +4,13 @@ import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
 import { homeGraph } from '../content/structured-data';
 import { DOCUMENTS } from '../documents/config';
-import { EMPLOYMENT_BETA, EMPLOYMENT_BUILD, RENTAL_BUILD } from '../content/sections';
+import {
+  EMPLOYMENT_BETA,
+  EMPLOYMENT_BUILD,
+  HOUSEHOLD_BETA,
+  HOUSEHOLD_BUILD,
+  RENTAL_BUILD,
+} from '../content/sections';
 
 interface Props {
   lang: Lang;
@@ -62,6 +68,19 @@ const groups: Group[] = [
             beta: EMPLOYMENT_BETA,
           }
         : 'home.contract',
+      // Unlike the others it is not even a name on the «próximamente» line until its switch is on.
+      ...(HOUSEHOLD_BUILD
+        ? [
+            {
+              id: 'household',
+              name: 'home.household' as const,
+              href: link(lang, 'empleada-de-hogar/'),
+              situation: 'home.household_situation' as const,
+              citation: 'home.household_citation' as const,
+              beta: HOUSEHOLD_BETA,
+            },
+          ]
+        : []),
     ],
   },
   {

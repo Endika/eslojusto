@@ -14,6 +14,15 @@ import {
   type Step as RentalStep,
 } from '../rental/ports';
 import { EMPLOYMENT_FAQ_TOPICS } from '../content/employment-faq-topics';
+import { HOUSEHOLD_FAQ_TOPICS } from '../content/household-faq-topics';
+import type { FindingStatus as HouseholdFindingStatus } from '../engine/household/types';
+import {
+  HOUSEHOLD_FIELDS,
+  type HouseholdEnding,
+  type HouseholdItemKind,
+  type OutOfScopeReason as HouseholdOutOfScopeReason,
+  type Step as HouseholdStep,
+} from '../household/ports';
 import { type FindingStatus, type Modality } from '../engine/employment/types';
 import {
   EMPLOYMENT_FIELDS,
@@ -61,6 +70,18 @@ const EMPLOYMENT_SECTIONS = [
   'informacion',
   'oferta',
 ] as const satisfies readonly EmploymentStep[];
+// The household review's sheets; «fechas», «pagas», «jornada», «vacaciones» and «preaviso» are
+// already other reviews'.
+const HOUSEHOLD_SECTIONS = [
+  'trabajo',
+  'sueldo',
+  'pagas-cuando',
+  'descansos',
+  'desistimiento',
+  'escrito',
+  'indemnizacion',
+  'noche',
+] as const satisfies readonly HouseholdStep[];
 export const SECTIONS = [
   'causa',
   'temporal',
@@ -79,6 +100,7 @@ export const SECTIONS = [
   'resultado',
   ...RENTAL_SECTIONS,
   ...EMPLOYMENT_SECTIONS,
+  ...HOUSEHOLD_SECTIONS,
 ] as const;
 export type Section = (typeof SECTIONS)[number];
 
@@ -125,6 +147,8 @@ void _allRentalSteps;
 void _allRentalInputs;
 const _allEmploymentSteps: CoversAll<EmploymentStep, Section> = true;
 void _allEmploymentSteps;
+const _allHouseholdSteps: CoversAll<HouseholdStep, Section> = true;
+void _allHouseholdSteps;
 
 // The benefit answers, by name only: an error on one of them names the field, never the answer.
 // They are left out of `snapshot`, so `changed_fields` never lists them either.
@@ -145,9 +169,15 @@ export const RENTAL_TRACKABLE_FIELDS = RENTAL_FIELDS;
 // The contract questions by name; never what was answered.
 export const EMPLOYMENT_TRACKABLE_FIELDS = EMPLOYMENT_FIELDS;
 
-export const HELP_TOPICS = [...FAQ_TOPICS, ...RENTAL_FAQ_TOPICS, ...EMPLOYMENT_FAQ_TOPICS].map(
-  ([, anchor]) => anchor,
-);
+// The household questions by name; never what was answered.
+export const HOUSEHOLD_TRACKABLE_FIELDS = HOUSEHOLD_FIELDS;
+
+export const HELP_TOPICS = [
+  ...FAQ_TOPICS,
+  ...RENTAL_FAQ_TOPICS,
+  ...EMPLOYMENT_FAQ_TOPICS,
+  ...HOUSEHOLD_FAQ_TOPICS,
+].map(([, anchor]) => anchor);
 
 // What a rental result card is about. A card is a kind of item, never its concept as written.
 export const RENTAL_ITEMS = [
@@ -268,6 +298,61 @@ const MODALITIES = [
 const _allModalities: CoversAll<Modality, (typeof MODALITIES)[number]> = true;
 void _allModalities;
 
+// What a household result card is about: a checked point by its kind, never its words.
+export const HOUSEHOLD_ITEMS = [
+  'minimum_wage',
+  'working_time',
+  'holidays',
+  'termination',
+  'severance',
+  'notice',
+  'unemployment',
+] as const satisfies readonly HouseholdItemKind[];
+const _allHouseholdItems: CoversAll<HouseholdItemKind, (typeof HOUSEHOLD_ITEMS)[number]> = true;
+void _allHouseholdItems;
+
+export const HOUSEHOLD_OUT_OF_SCOPE_REASONS = [
+  'before_reform',
+] as const satisfies readonly HouseholdOutOfScopeReason[];
+const _allHouseholdReasons: CoversAll<
+  HouseholdOutOfScopeReason,
+  (typeof HOUSEHOLD_OUT_OF_SCOPE_REASONS)[number]
+> = true;
+void _allHouseholdReasons;
+
+// From the status that weighs most on a household point to the one that weighs least; a point
+// whose verdict changes with a «No lo sé» counts as `readings`, after the concrete findings.
+export const HOUSEHOLD_STATUSES = [
+  'below_minimum',
+  'over_legal_limit',
+  'dismissal_regime_presumed',
+  'missing_requirement',
+  'readings',
+  'warning',
+  'review_it',
+  'not_published',
+  'not_reviewed_in_this_version',
+  'within_limit',
+  'information',
+  'not_entered',
+] as const satisfies readonly (HouseholdFindingStatus | 'readings')[];
+const _allHouseholdStatuses: CoversAll<
+  HouseholdFindingStatus,
+  (typeof HOUSEHOLD_STATUSES)[number]
+> = true;
+void _allHouseholdStatuses;
+
+export const HOUSEHOLD_WORKS = ['hourly_external', 'monthly', 'live_in'] as const;
+export const HOUSEHOLD_ENDINGS = [
+  'working',
+  'desistimiento',
+  'et_cause',
+  'unknown',
+] as const satisfies readonly HouseholdEnding[];
+// By the years of the minimum wage decrees: the reform came in September 2022.
+export const HOUSEHOLD_PERIODS = ['2022-2023', '2024-2025', '2026+'] as const;
+export const HOUSEHOLD_EXTRA_PAYS = ['not_applicable', 'none', 'prorated', 'apart'] as const;
+
 // From the status that weighs most on a family of points to the one that weighs least; a point
 // whose verdict changes with a «No lo sé» counts as `readings`, after the concrete findings.
 export const POINT_STATUSES = [
@@ -336,6 +421,7 @@ export const ERROR_TYPES = [
 
 const ITEM_RESULT = { values: [...ITEM_STATUSES, 'none'] } as const;
 const POINT_RESULT = { values: [...POINT_STATUSES, 'none'] } as const;
+const HOUSEHOLD_RESULT = { values: [...HOUSEHOLD_STATUSES, 'none'] } as const;
 const ANSWERS = ['yes', 'no', 'unknown'] as const;
 
 const SECTION_SECONDS = ['<10', '10-30', '30-60', '60-180', '>180'] as const;
@@ -385,7 +471,12 @@ const BASE_CATALOGUE = {
   went_back: { from: section, to: section },
   validation_error: {
     section,
-    field: oneOf([...TRACKABLE_FIELDS, ...RENTAL_TRACKABLE_FIELDS, ...EMPLOYMENT_TRACKABLE_FIELDS]),
+    field: oneOf([
+      ...TRACKABLE_FIELDS,
+      ...RENTAL_TRACKABLE_FIELDS,
+      ...EMPLOYMENT_TRACKABLE_FIELDS,
+      ...HOUSEHOLD_TRACKABLE_FIELDS,
+    ]),
   },
   help_opened: { topic: oneOf(HELP_TOPICS) },
   review_completed: {
@@ -413,7 +504,9 @@ const BASE_CATALOGUE = {
     // Whether the result showed only its summary or the detail a pass unlocks.
     detail: oneOf(['locked', 'unlocked']),
   },
-  detail_opened: { item: oneOf([...ITEM_IDS, ...RENTAL_ITEMS, ...EMPLOYMENT_ITEMS]) },
+  detail_opened: {
+    item: oneOf([...ITEM_IDS, ...RENTAL_ITEMS, ...EMPLOYMENT_ITEMS, ...HOUSEHOLD_ITEMS]),
+  },
   // Why a lease stopped at the rental review's door.
   rental_out_of_scope: { reason: oneOf(OUT_OF_SCOPE_REASONS) },
   rental_review_completed: {
@@ -467,6 +560,27 @@ const BASE_CATALOGUE = {
     difference: oneOf(DIFFERENCE_BUCKETS),
     offered: { boolean: true },
     detail: oneOf(['locked', 'unlocked']),
+    attempt: oneOf(ATTEMPT_BUCKETS),
+    seconds: oneOf(REVIEW_SECONDS),
+  },
+  // Why a relationship stopped at the household review's door.
+  household_out_of_scope: { reason: oneOf(HOUSEHOLD_OUT_OF_SCOPE_REASONS) },
+  household_review_completed: {
+    work: oneOf(HOUSEHOLD_WORKS),
+    pay_period: oneOf(HOUSEHOLD_PERIODS),
+    ending: oneOf(HOUSEHOLD_ENDINGS),
+    extra_pays: oneOf(HOUSEHOLD_EXTRA_PAYS),
+    in_kind: { boolean: true },
+    // Each family of points by the status that weighs most among them, or none.
+    pay: HOUSEHOLD_RESULT,
+    working_time: HOUSEHOLD_RESULT,
+    holidays: HOUSEHOLD_RESULT,
+    termination: HOUSEHOLD_RESULT,
+    severance: HOUSEHOLD_RESULT,
+    notice: HOUSEHOLD_RESULT,
+    written: oneOf(ANSWERS),
+    severance_available: oneOf(ANSWERS),
+    difference: oneOf(DIFFERENCE_BUCKETS),
     attempt: oneOf(ATTEMPT_BUCKETS),
     seconds: oneOf(REVIEW_SECONDS),
   },

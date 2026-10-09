@@ -60,6 +60,7 @@ const clientStringsJson = JSON.stringify(
     documents: DOCUMENTS !== null,
     rental: path === '/alquiler/',
     employment: path === '/contrato/',
+    household: path === '/empleada-de-hogar/',
   }),
 ).replace(/</g, '\\u003c');
 const socialImage = new URL(`${root}/og.png`, Astro.site);
