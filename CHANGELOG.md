@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.40.0](https://github.com/Endika/eslojusto/compare/v1.39.0...v1.40.0) (2026-10-09)
+
+
+### Features
+
+* **credit:** add the consumer credit review at /financiacion/ behind PUBLIC_CREDIT ([10538f8](https://github.com/Endika/eslojusto/commit/10538f8aa3f93bae9481d9ab26de6175e4c134f3))
+
 ## [1.39.0](https://github.com/Endika/eslojusto/compare/v1.38.0...v1.39.0) (2026-10-09)
 
 
