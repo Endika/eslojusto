@@ -13,7 +13,10 @@ const rentalSpecs = /[\\/]rental[^\\/]*\.spec\.ts$/;
 // The employment project needs a build with /contrato/, which a normal build leaves out.
 const employment = process.env['TEST_EMPLOYMENT'] === '1';
 const employmentSpecs = /[\\/]employment[^\\/]*\.spec\.ts$/;
-const optInSpecs = [/(rtl|analytics|documents)\.spec\.ts/, rentalSpecs, employmentSpecs];
+// The ERTE project needs a build with /paro/erte/, which a normal build leaves out.
+const erte = process.env['TEST_ERTE'] === '1';
+const erteSpecs = /[\\/]erte[^\\/]*\.spec\.ts$/;
+const optInSpecs = [/(rtl|analytics|documents)\.spec\.ts/, rentalSpecs, employmentSpecs, erteSpecs];
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
 // The documents project reads documents on /alquiler/ and /contrato/ too, so its build has them;
@@ -21,6 +24,7 @@ const port = Number(process.env['E2E_PORT'] ?? 4321);
 const buildEnv = {
   ...(rental || documents || analytics ? { PUBLIC_RENTAL: '1' } : {}),
   ...(employment || documents || analytics ? { PUBLIC_EMPLOYMENT: '1' } : {}),
+  ...(erte ? { PUBLIC_ERTE: '1' } : {}),
   ...(analytics ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
     ? {
@@ -77,6 +81,9 @@ export default defineConfig({
             testIgnore: /documents\.spec\.ts/,
           },
         ]
+      : []),
+    ...(erte
+      ? [{ name: 'erte', use: { ...devices['Desktop Chrome'] }, testMatch: erteSpecs }]
       : []),
     ...(documents
       ? [

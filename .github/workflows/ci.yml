@@ -16,9 +16,9 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm run type:check
-      # With /alquiler/ and /contrato/ in the build, so the copy test reads their pages too.
+      # With /alquiler/, /contrato/ and /paro/erte/ in the build, so the copy test reads their pages too.
       - run: npm run build
-        env: { PUBLIC_RENTAL: '1', PUBLIC_EMPLOYMENT: '1' }
+        env: { PUBLIC_RENTAL: '1', PUBLIC_EMPLOYMENT: '1', PUBLIC_ERTE: '1' }
       - run: npm run test:run
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
@@ -35,6 +35,9 @@ jobs:
       - name: employment contract review (built with /contrato/)
         run: npm run test:e2e -- --project=employment
         env: { CI: 'true', TEST_EMPLOYMENT: '1' }
+      - name: benefit during an ERTE (built with /paro/erte/)
+        run: npm run test:e2e -- --project=erte
+        env: { CI: 'true', TEST_ERTE: '1' }
       - name: documents (fake API origins, routed by the page)
         run: npm run test:e2e -- --project=documents
         env: { CI: 'true', TEST_DOCUMENTS: '1' }
