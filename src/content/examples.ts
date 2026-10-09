@@ -132,7 +132,8 @@ export const SENIORITY = [
   ['3 meses', '2026-07-01', 3],
   ['6 meses', '2026-04-01', 6],
   ['1 año', '2025-10-01', 12],
-  ['3 años', '2023-10-01', 36],
+  ['2 años', '2024-10-01', 24],
+  ['5 años', '2021-10-01', 60],
 ] as const;
 export const bySeniority = SENIORITY.map(([label, start, months]) => {
   const end = '2026-09-30';

@@ -168,12 +168,12 @@ test('the final pay page links each case page and shows the table by seniority',
   for (const c of CASES.filter((x) => x.path.startsWith('finiquito/')))
     await expect(guide.locator(`a[href="/${c.path}"]`).first()).toBeVisible();
   await expect(guide.locator('a[href="/paro/"]').first()).toBeVisible();
-  const table = guide.getByRole('table', { name: /30 de septiembre de 2026/ });
-  await expect(table.getByRole('row')).toHaveCount(5);
-  // A contract for production circumstances can't last three years: no figure, and a note why.
+  const table = guide.getByRole('table', { name: /según el tiempo trabajado/ });
+  await expect(table.getByRole('row')).toHaveCount(6);
+  // A contract for production circumstances can't last five years: no figure, and a note why.
   await expect(
     table
-      .getByRole('row', { name: /^3 años/ })
+      .getByRole('row', { name: /^5 años/ })
       .getByRole('cell')
       .nth(1),
   ).toHaveText(/^—\s*2$/);

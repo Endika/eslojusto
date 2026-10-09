@@ -99,6 +99,27 @@ test('no horizontal scroll at 360 px', async ({ page }) => {
   expect(overflow).toBeLessThanOrEqual(0);
 });
 
+test('the seniority table scrolls inside its own box at 360 px, last column reachable', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('finiquito/');
+  const box = page.getByRole('region', { name: /según el tiempo trabajado/ });
+  await box.scrollIntoViewIfNeeded();
+  const table = box.getByRole('table');
+  await expect(table.getByRole('row')).toHaveCount(6);
+  const lastHeader = table.getByRole('columnheader', { name: /Improcedente/ });
+  await expect(lastHeader).toContainText('33 días');
+  const m = await box.evaluate((el) => ({
+    scrolls: el.scrollWidth > el.clientWidth,
+    page: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  }));
+  expect(m.scrolls).toBe(true);
+  expect(m.page).toBeLessThanOrEqual(0);
+  await box.evaluate((el) => (el.scrollLeft = el.scrollWidth));
+  await expect(lastHeader).toBeInViewport({ ratio: 0.9 });
+});
+
 test('the CSP blocks nothing: the theme and the fonts come from the site itself', async ({
   page,
 }) => {
