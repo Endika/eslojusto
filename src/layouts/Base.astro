@@ -5,6 +5,7 @@ import golosLatin from '@fontsource-variable/golos-text/files/golos-text-latin-w
 import serifLatin from '@fontsource-variable/source-serif-4/files/source-serif-4-latin-opsz-normal.woff2?url';
 import '@fontsource-variable/source-serif-4/opsz.css';
 import '@fontsource-variable/martian-mono/standard.css';
+import monoLatin from '@fontsource-variable/martian-mono/files/martian-mono-latin-standard-normal.woff2?url';
 import '@fontsource-variable/noto-kufi-arabic';
 import '@fontsource-variable/noto-naskh-arabic';
 import '../styles/tokens.css';
@@ -99,9 +100,11 @@ const otherLangsJson = JSON.stringify(otherLangs).replace(/</g, '\\u003c');
     <meta http-equiv="Content-Security-Policy" content={csp} />
     <script is:inline set:html={initialTheme} />
     <title>{title}</title>
-    {/* The faces of the first screen's headings and text, fetched alongside the HTML rather than after the CSS. */}
+    {/* The faces of the first screen's headings, text and citations, fetched alongside the HTML
+    rather than after the CSS, so their swap lands before the first paint and moves nothing. */}
     <link rel="preload" href={golosLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={serifLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monoLatin} as="font" type="font/woff2" crossorigin />
     <meta name="description" content={description} />
     {!noindex && <link rel="canonical" href={canonical} />}
     {!indexable && <meta name="robots" content="noindex" />}
