@@ -42,6 +42,7 @@ export type BillsPhraseKey =
   | 'pvpc.holder_unknown'
   | 'pvpc.eligible'
   | 'pvpc.not_reference_retailer'
+  | 'pvpc.retailer_unknown'
   | 'pvpc.power_p1'
   | 'pvpc.power_p2'
   | 'pvpc.margin_not_updated'

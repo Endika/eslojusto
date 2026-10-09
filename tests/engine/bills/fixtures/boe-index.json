@@ -1,0 +1,18 @@
+{
+  "retrievedOn": "2026-10-09",
+  "source": "https://www.boe.es/datosabiertos/api/legislacion-consolidada/id/{id}/texto/indice",
+  "norms": {
+    "BOE-A-2014-3376": {
+      "whole": false,
+      "blocks": {
+        "a5": "Artículo 5"
+      }
+    },
+    "BOE-A-2007-20555": {
+      "whole": false,
+      "blocks": {
+        "a62": "Artículo 62"
+      }
+    }
+  }
+}
