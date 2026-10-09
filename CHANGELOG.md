@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.35.0](https://github.com/Endika/eslojusto/compare/v1.34.0...v1.35.0) (2026-10-09)
+
+
+### Features
+
+* **insurance:** add the policy dates review at /seguros/ behind PUBLIC_INSURANCE ([8a5d586](https://github.com/Endika/eslojusto/commit/8a5d586476f4889d79833f902072d2b1a347dd23))
+
 ## [1.34.0](https://github.com/Endika/eslojusto/compare/v1.33.0...v1.34.0) (2026-10-09)
 
 
