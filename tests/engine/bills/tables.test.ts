@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
+import { RULES } from '../../../src/engine/bills/rules';
 import type { BillsNormId, Norm, NormTable } from '../../../src/engine/bills/norms';
 import {
   TABLE_NAMES,
@@ -343,17 +344,21 @@ describe('the bills norm table', () => {
     ['rdl25_2026', 'BOE-A-2026-20265', '2026-10-01'],
     ['order_iet1491_2013', 'BOE-A-2013-8561', '2013-08-03'],
     ['rd897_2017', 'BOE-A-2017-11505', '2017-10-08'],
+    ['rd88_2026', 'BOE-A-2026-3212', '2026-02-12'],
+    ['rd216_2014', 'BOE-A-2014-3376', '2014-03-30'],
+    ['trlgdcu', 'BOE-A-2007-20555', '2007-12-01'],
   ] as const)('%s is %s, in force from %s', (id, boe, since) => {
     expect(BILLS_NORMS[id].url).toMatch(new RegExp(`id=${boe}$`));
     expect(BILLS_NORMS[id].inForceSince).toBe(since);
   });
 
-  it('every norm backs a row', () => {
-    const cited = new Set(
-      TABLE_NAMES.flatMap((name) =>
+  it('every norm backs a row or a rule', () => {
+    const cited = new Set([
+      ...TABLE_NAMES.flatMap((name) =>
         (BILLS_TABLES[name] as Table<unknown>).flatMap((r) => [r.norm, ...(r.alsoRestsOn ?? [])]),
       ),
-    );
+      ...Object.values(RULES).map((r) => r.norm),
+    ]);
     expect(Object.keys(BILLS_NORMS).filter((id) => !cited.has(id as BillsNormId))).toEqual([]);
   });
 

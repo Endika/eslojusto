@@ -35,6 +35,7 @@ const sources = [
     'src/credit',
     'src/insurance',
     'src/household',
+    'src/bills',
   ].flatMap((dir) => (existsSync(dir) ? filesUnder(dir, '.ts') : [])),
 ];
 
