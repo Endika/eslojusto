@@ -50,3 +50,37 @@ test('the first card starts within the first screen, and nothing scrolls sideway
     ),
   ).toBeLessThanOrEqual(0);
 });
+
+test('the title, text and citation faces are preloaded, and nothing shifts as the page loads', async ({
+  page,
+}) => {
+  await page.goto('./');
+  const preloaded = await page
+    .locator('link[rel="preload"][as="font"]')
+    .evaluateAll((links) => links.map((l) => l.getAttribute('href') ?? ''));
+  for (const face of [
+    /golos-text-latin-wght-normal\..+\.woff2$/,
+    /source-serif-4-latin-opsz-normal\..+\.woff2$/,
+    /martian-mono-latin-standard-normal\..+\.woff2$/,
+  ])
+    expect(
+      preloaded.some((href) => face.test(href)),
+      String(face),
+    ).toBe(true);
+
+  const shift = await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return new Promise<number>((resolve) => {
+      new PerformanceObserver((list) => {
+        let total = 0;
+        for (const entry of list.getEntries() as unknown as { value: number }[])
+          total += entry.value;
+        resolve(total);
+      }).observe({ type: 'layout-shift', buffered: true });
+      // With no shift at all, the observer is never called.
+      setTimeout(() => resolve(0), 500);
+    });
+  });
+  expect(shift).toBeLessThan(0.01);
+});
