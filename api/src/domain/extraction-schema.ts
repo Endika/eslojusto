@@ -11,6 +11,18 @@ import {
   type EmploymentSectionKind,
 } from './employment-schema';
 import {
+  CREDIT_READABILITY,
+  CREDIT_SCHEMA,
+  CREDIT_SECTIONS,
+  type CreditSectionKind,
+} from './credit-schema';
+import {
+  INSURANCE_READABILITY,
+  INSURANCE_SCHEMA,
+  INSURANCE_SECTIONS,
+  type InsuranceSectionKind,
+} from './insurance-schema';
+import {
   RENTAL_READABILITY,
   RENTAL_SCHEMA,
   RENTAL_SECTIONS,
@@ -286,7 +298,12 @@ export const SECTIONS = {
 } as const satisfies Readonly<Record<string, SectionSchema>>;
 
 export type FinalPaySectionKind = keyof typeof SECTIONS;
-export type SectionKind = FinalPaySectionKind | RentalSectionKind | EmploymentSectionKind;
+export type SectionKind =
+  | FinalPaySectionKind
+  | RentalSectionKind
+  | EmploymentSectionKind
+  | CreditSectionKind
+  | InsuranceSectionKind;
 export const SECTION_KINDS = Object.keys(SECTIONS) as readonly FinalPaySectionKind[];
 
 export const PAGES_DESCRIPTION =
@@ -303,7 +320,8 @@ export const FINAL_PAY_READABILITY = [
   'foreign_jurisdiction',
   'unknown_format',
 ] as const;
-// Every reason any review can give.
+// Every reason the final pay, the rental and the employment review can give: the reviews the site
+// reads, whose documents client mirrors this list (src/documents/contract.ts).
 export const READABILITY = [
   'ok',
   'handwritten',
@@ -317,7 +335,17 @@ export const READABILITY = [
 ] as const satisfies readonly (
   (typeof FINAL_PAY_READABILITY)[number] | (typeof RENTAL_READABILITY)[number]
 )[];
-export type Readability = (typeof READABILITY)[number];
+// Every reason any review can give: the credit and the insurance review's too.
+export const ALL_READABILITY = [
+  ...READABILITY,
+  'not_credit_document',
+  'not_insurance_document',
+] as const satisfies readonly (
+  | (typeof READABILITY)[number]
+  | (typeof CREDIT_READABILITY)[number]
+  | (typeof INSURANCE_READABILITY)[number]
+)[];
+export type Readability = (typeof ALL_READABILITY)[number];
 
 export const READABILITY_DESCRIPTION =
   'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_labour_document (not about a job), foreign_jurisdiction (an employment document from another country, where Spanish law does not apply; never because of its language), unknown_format (about a job, but no kind of document you know).';
@@ -357,6 +385,8 @@ export const REVIEW_SCHEMAS: Readonly<Record<ReviewKind, ReviewSchema>> = {
     monthDescription: FINAL_PAY_MONTH_DESCRIPTION,
     sections: EMPLOYMENT_SECTIONS,
   },
+  credit: CREDIT_SCHEMA,
+  insurance: INSURANCE_SCHEMA,
 };
 
 // Every review's sections, by kind.
@@ -364,6 +394,8 @@ export const ALL_SECTIONS: Readonly<Record<SectionKind, SectionSchema>> = {
   ...SECTIONS,
   ...RENTAL_SECTIONS,
   ...EMPLOYMENT_SECTIONS,
+  ...CREDIT_SECTIONS,
+  ...INSURANCE_SECTIONS,
 };
 
 export const sectionsOf = (review: ReviewKind): readonly [SectionKind, SectionSchema][] =>

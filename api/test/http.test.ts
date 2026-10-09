@@ -262,6 +262,45 @@ describe('the review a read is for', () => {
     expect(JSON.stringify(logger.events)).not.toMatch(/98765|2026-10-07|Campaña/);
   });
 
+  it.each([
+    ['credit', 'credit_agreement', 'agreedOn', 'principal', 'Comisión de apertura'],
+    ['insurance', 'insurance_policy', 'expiresOn', 'premiumTotal', 'Continente'],
+  ] as const)(
+    'reads a %s pack as one and logs only that it was one',
+    async (review, section, day, field, concept) => {
+      const list = review === 'credit' ? 'charges' : 'sumsInsured';
+      const item =
+        review === 'credit'
+          ? { kind: 'opening', concept, amount: 761.25, confidence: 'high' }
+          : { kind: 'building', concept, amount: 150000, confidence: 'high' };
+      const { deps, logger, reader } = extractDeps({
+        pages: [page(1, section)],
+        [section]: { [day]: f('2026-10-07'), [field]: f(98765.43), [list]: [item] },
+      });
+      const response = await handleExtract(post(extractBody({ review })), deps);
+      expect(json(response)).toMatchObject({
+        code: 'ok',
+        extraction: { fields: { [field]: { value: 98765.43, source: section } } },
+      });
+      expect(reader.calls.map((c) => c.review)).toEqual([review]);
+      expect(logger.events).toEqual([
+        {
+          op: 'extract',
+          code: 'ok',
+          latencyMs: 0,
+          pages: 1,
+          inputTokens: 1000,
+          outputTokens: 200,
+          escalated: false,
+          retried: false,
+          conflicts: 0,
+          review,
+        },
+      ]);
+      expect(JSON.stringify(logger.events)).not.toMatch(/98765|2026-10-07|Comisión|Continente/);
+    },
+  );
+
   it('refuses a review it does not know', async () => {
     const { deps, reader } = extractDeps();
     const response = await handleExtract(post(extractBody({ review: 'contract' })), deps);
@@ -487,6 +526,19 @@ describe('payment handlers', () => {
     await handleCheckout(post({ ...body, returnTo: 'rental' }), { ...deps(), checkout });
     await handleCheckout(post({ ...body, returnTo: 'employment' }), { ...deps(), checkout });
     expect(checkout.returns).toEqual(['final_pay', 'rental', 'employment']);
+  });
+
+  it('sends a credit checkout back to its page and starts none from the insurance review', async () => {
+    const checkout = new FakeCheckout();
+    const body = { nonce: 'n0nce-generated-by-the-browser', captchaToken: 'turnstile-token' };
+    await handleCheckout(post({ ...body, returnTo: 'credit' }), { ...deps(), checkout });
+    expect(checkout.returns).toEqual(['credit']);
+    const refused = await handleCheckout(post({ ...body, returnTo: 'insurance' }), {
+      ...deps(),
+      checkout,
+    });
+    expect(json(refused)).toEqual({ code: 'invalid_request' });
+    expect(checkout.returns).toEqual(['credit']);
   });
 
   it('refuses a malformed session id', async () => {

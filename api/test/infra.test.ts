@@ -13,7 +13,7 @@ import {
 } from '../src/config';
 import { buildApp, GLOBAL_STACK_REGION } from '../infra/stacks';
 import { NO_ESCALATION_AFTER_MS, READ_DEADLINE_MS } from '../src/domain/extract';
-import { READABILITY } from '../src/domain/extraction-schema';
+import { ALL_READABILITY, READABILITY } from '../src/domain/extraction-schema';
 import { REVIEWS } from '../src/domain/reviews';
 
 const { api, global } = buildApp(
@@ -208,6 +208,12 @@ describe('dashboard', () => {
     expect(byTitle('% lecturas sin datos por revisión')).toContain(
       '100 * sum(code = "nothing_read") / count(*) as porcentaje',
     );
+  });
+
+  it('counts the reasons only the credit and the insurance review give too', () => {
+    const byReason = byTitle('Lecturas sin datos por revisión y motivo (páginas)');
+    for (const reason of ALL_READABILITY)
+      expect(byReason).toContain(`sum(readability.${reason}) as`);
   });
 
   it('counts conflicts and escalations per review, and truncated employment lists', () => {

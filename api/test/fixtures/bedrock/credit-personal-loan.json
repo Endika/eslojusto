@@ -1,0 +1,178 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "credit_agreement",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "credit_agreement",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "credit_agreement",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 4,
+            "kind": "credit_precontract_info",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 5,
+            "kind": "credit_precontract_info",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "credit_agreement": {
+          "product": {
+            "value": "personal_loan",
+            "confidence": "high"
+          },
+          "lenderName": {
+            "value": "Préstamos de Ficción E.F.C., S.A.",
+            "confidence": "high"
+          },
+          "agreedOn": {
+            "value": "2019-02-04",
+            "confidence": "high"
+          },
+          "principal": {
+            "value": 10500,
+            "confidence": "high"
+          },
+          "netDisbursed": {
+            "value": 9738.75,
+            "confidence": "high"
+          },
+          "nominalRate": {
+            "value": 9.95,
+            "confidence": "high"
+          },
+          "rateType": {
+            "value": "fixed",
+            "confidence": "high"
+          },
+          "declaredApr": {
+            "value": 12,
+            "confidence": "high"
+          },
+          "declaredTotalPayable": {
+            "value": 13120.8,
+            "confidence": "high"
+          },
+          "instalmentCount": {
+            "value": 48,
+            "confidence": "high"
+          },
+          "instalmentAmount": {
+            "value": 273.35,
+            "confidence": "high"
+          },
+          "firstDueOn": {
+            "value": "2019-03-05",
+            "confidence": "high"
+          },
+          "agreedEndOn": {
+            "value": "2023-02-05",
+            "confidence": "high"
+          },
+          "earlyRepaymentClauseText": {
+            "value": "El Prestatario podrá reembolsar anticipadamente, total o parcialmente, el importe del préstamo. La compensación será del 1 % del importe reembolsado si el periodo restante supera un año y del 0,5 % en otro caso.",
+            "confidence": "high"
+          },
+          "withdrawalClauseText": {
+            "value": "El Prestatario dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo.",
+            "confidence": "high"
+          },
+          "charges": [
+            {
+              "kind": "opening",
+              "concept": "Comisión de apertura",
+              "amount": 761.25,
+              "how": "deducted",
+              "confidence": "high"
+            }
+          ]
+        },
+        "credit_precontract_info": {
+          "deliveredOn": {
+            "value": "2019-02-01",
+            "confidence": "high"
+          },
+          "representativeExample": {
+            "value": false,
+            "confidence": "high"
+          },
+          "principal": {
+            "value": 10500,
+            "confidence": "high"
+          },
+          "nominalRate": {
+            "value": 9.95,
+            "confidence": "high"
+          },
+          "declaredApr": {
+            "value": 16.61,
+            "confidence": "medium"
+          },
+          "declaredTotalPayable": {
+            "value": 13120.8,
+            "confidence": "high"
+          },
+          "instalmentCount": {
+            "value": 48,
+            "confidence": "high"
+          },
+          "instalmentAmount": {
+            "value": 273.35,
+            "confidence": "high"
+          }
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 30100,
+    "output_tokens": 1900
+  }
+}

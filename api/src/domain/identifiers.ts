@@ -22,3 +22,24 @@ export const hasIdentifier = (text: string): boolean => PATTERNS.some((p) => p.t
 const NAF = /(?<![\d.,/-])\d{2}[\s/-]?\d{8}[\s/-]?\d{2}(?![\d]|[.,]\d)/;
 
 export const hasSocialSecurityNumber = (text: string): boolean => NAF.test(text);
+
+// A payment card number: sixteen digits in groups of four or in one piece, or an American Express
+// number (fifteen, grouped 4-6-5). A masked number («**** **** **** 1234») says nothing. Only the
+// credit and the insurance review look for it, since only a card or a premium receipt carries one.
+const CARD_NUMBERS: readonly RegExp[] = [
+  /(?<![\d.,])\d{4}(?:[\s-]?\d{4}){3}(?![\d]|[.,]\d)/,
+  /(?<![\d.,])3[47]\d{2}[\s-]?\d{6}[\s-]?\d{5}(?![\d]|[.,]\d)/,
+];
+
+export const hasPaymentCardNumber = (text: string): boolean =>
+  CARD_NUMBERS.some((p) => p.test(text));
+
+// A Spanish number plate: four digits and three consonants since 2000, or the provincial letters,
+// four digits and one or two letters before it, with their dashes. In capitals, as plates print; a
+// year after a slash is a law's («Ley 50/1980 LCS»).
+const PLATES: readonly RegExp[] = [
+  /(?<![A-Z\d/])\d{4}[\s-]?[BCDFGHJKLMNPRSTVWXYZ]{3}(?![A-Z\d])/,
+  /(?<![A-Z\d])[A-Z]{1,2}-\d{4}-[A-Z]{1,2}(?![A-Z\d])/,
+];
+
+export const hasNumberPlate = (text: string): boolean => PLATES.some((p) => p.test(text));

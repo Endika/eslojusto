@@ -1,0 +1,152 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "revolving_agreement",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "revolving_agreement",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "card_statement",
+            "document": 2,
+            "month": "2026-06",
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 4,
+            "kind": "card_statement",
+            "document": 3,
+            "month": "2026-07",
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 5,
+            "kind": "card_statement",
+            "document": 4,
+            "month": "2026-08",
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "revolving_agreement": {
+          "lenderName": {
+            "value": "Tarjetas Imaginarias E.F.C., S.A.",
+            "confidence": "high"
+          },
+          "intermediaryType": {
+            "value": "company",
+            "confidence": "high"
+          },
+          "intermediaryCompanyName": {
+            "value": "Grandes Almacenes de Mentira S.A.",
+            "confidence": "high"
+          },
+          "agreedOn": {
+            "value": "2021-06-01",
+            "confidence": "high"
+          },
+          "creditLimit": {
+            "value": 3000,
+            "confidence": "high"
+          },
+          "nominalRate": {
+            "value": 21.94,
+            "confidence": "high"
+          },
+          "declaredApr": {
+            "value": 24.29,
+            "confidence": "high"
+          },
+          "minimumPaymentPercent": {
+            "value": 3,
+            "confidence": "high"
+          },
+          "minimumPayment": {
+            "value": 30,
+            "confidence": "high"
+          },
+          "annualFee": {
+            "value": 0,
+            "confidence": "high"
+          },
+          "paymentMode": {
+            "value": "percent_of_balance",
+            "confidence": "high"
+          }
+        },
+        "card_statement": {
+          "statements": [
+            {
+              "statementOn": "2026-06-01",
+              "balance": 2900,
+              "interest": 53.02,
+              "payment": 87,
+              "nominalRate": 21.94,
+              "confidence": "high"
+            },
+            {
+              "statementOn": "2026-07-01",
+              "balance": 2866.02,
+              "interest": 52.4,
+              "payment": 85.98,
+              "nominalRate": 21.94,
+              "confidence": "high"
+            },
+            {
+              "statementOn": "2026-08-01",
+              "balance": 2832.44,
+              "interest": 51.79,
+              "payment": 84.97,
+              "nominalRate": 21.94,
+              "estimatedEndOn": "2031-04-01",
+              "totalToPay": 4012.6,
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 30600,
+    "output_tokens": 1500
+  }
+}

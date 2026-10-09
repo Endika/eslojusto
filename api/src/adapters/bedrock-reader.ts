@@ -7,8 +7,10 @@ import type { ReviewKind } from '../domain/reviews';
 import { EXTRA_OUTPUT_TOKENS_BY_REVIEW } from '../domain/tokens';
 import { SYSTEM_PROMPTS } from './prompts';
 
+export { CREDIT_SYSTEM_PROMPT } from './prompts/credit';
 export { EMPLOYMENT_SYSTEM_PROMPT } from './prompts/employment';
 export { SYSTEM_PROMPT } from './prompts/final-pay';
+export { INSURANCE_SYSTEM_PROMPT } from './prompts/insurance';
 export { RENTAL_SYSTEM_PROMPT } from './prompts/rental';
 export { SYSTEM_PROMPTS };
 

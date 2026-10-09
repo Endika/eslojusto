@@ -16,6 +16,7 @@ import {
   MAX_ESTIMATED_INPUT_TOKENS,
   PROMPT_TOKENS_BY_REVIEW,
 } from '../src/domain/tokens';
+import { creditRecord } from './support/credit-largest';
 import { employmentRecord, LARGEST } from './support/employment-largest';
 
 const PROMPT_TOKENS = PROMPT_TOKENS_BY_REVIEW.final_pay;
@@ -89,9 +90,19 @@ describe('cost of a read', () => {
     expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'employment')).toBeLessThanOrEqual(0.515);
   });
 
-  it('gives only the employment review more room to write', () => {
+  it('gives only the employment and the credit review more room to write', () => {
     expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.final_pay).toBe(0);
     expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.rental).toBe(0);
+    expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.insurance).toBe(0);
+  });
+
+  it('stays under 0.515 USD for a credit read, with the employment review’s room to write', () => {
+    expect(maxOutput(SONNET_4_6, 'credit')).toBe(12_000);
+    expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'credit')).toBeLessThanOrEqual(0.515);
+  });
+
+  it('stays at or under 0.40 USD for an insurance read', () => {
+    expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'insurance')).toBeLessThanOrEqual(0.4);
   });
 
   it('reads with Sonnet alone, so nothing escalates', () => {
@@ -107,6 +118,10 @@ describe('cost of a read', () => {
       cost(HAIKU_4_5, MAX_ESCALATION_INPUT_TOKENS, 'employment') +
       cost(SONNET_4_6, MAX_ESCALATION_INPUT_TOKENS, 'employment');
     expect(employment).toBeLessThanOrEqual(0.46);
+    const credit =
+      cost(HAIKU_4_5, MAX_ESCALATION_INPUT_TOKENS, 'credit') +
+      cost(SONNET_4_6, MAX_ESCALATION_INPUT_TOKENS, 'credit');
+    expect(credit).toBe(employment);
   });
 });
 
@@ -128,5 +143,20 @@ describe('what an employment read records', () => {
 
   it('does not fit every list and every copied text at its limit', () => {
     expect(recordTokens(employmentRecord(LARGEST))).toBe(17_708);
+  });
+});
+
+// api/README.md, «Cost», quotes these sizes.
+describe('what a credit read records', () => {
+  const room = maxOutput(SONNET_4_6, 'credit');
+
+  it('fits every list at its maximum, with texts of the usual length, a tenth under max_tokens', () => {
+    const full = recordTokens(creditRecord('typical'));
+    expect(full).toBe(10_696);
+    expect(full).toBeLessThanOrEqual(0.91 * room);
+  });
+
+  it('does not fit every list and every copied text at its limit', () => {
+    expect(recordTokens(creditRecord('largest'))).toBe(12_216);
   });
 });

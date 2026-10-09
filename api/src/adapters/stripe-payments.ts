@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import { CHECKOUT_PATHS, SITE_ORIGIN } from '../config';
 import { PASS_READS } from '../domain/allowance';
 import type { CheckoutCreator, PaymentVerifier, SessionSnapshot } from '../domain/ports';
-import type { ReviewKind } from '../domain/reviews';
+import type { CheckoutReview } from '../domain/reviews';
 
 export const READS_METADATA_KEY = 'reads_used';
 
@@ -47,7 +47,7 @@ export function toSessionSnapshot(session: Stripe.Checkout.Session): SessionSnap
 export function checkoutParams(
   nonce: string,
   priceId: string,
-  returnTo: ReviewKind = 'final_pay',
+  returnTo: CheckoutReview = 'final_pay',
 ): [Stripe.Checkout.SessionCreateParams, Stripe.RequestOptions] {
   const path = CHECKOUT_PATHS[returnTo];
   return [

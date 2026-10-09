@@ -130,6 +130,8 @@ const REVIEW_LABELS: Readonly<Record<string, string>> = {
   final_pay: 'finiquito',
   rental: 'alquiler',
   employment: 'contrato',
+  credit: 'financiacion',
+  insurance: 'seguros',
 };
 const byReview = 'fields coalesce(review, "final_pay") as revision';
 
@@ -291,7 +293,7 @@ export function addDashboard(
   );
 
   // A read that answers nothing_read logs how many of its pages had each readability
-  // (READABILITY in src/domain/extraction-schema.ts; test/infra.test.ts keeps them equal).
+  // (ALL_READABILITY in src/domain/extraction-schema.ts; test/infra.test.ts keeps them equal).
   const reasons: readonly [string, string][] = [
     ['blurry', 'borrosa'],
     ['dark', 'oscura'],
@@ -299,6 +301,8 @@ export function addDashboard(
     ['handwritten', 'aMano'],
     ['not_labour_document', 'noLaboral'],
     ['not_rental_document', 'noAlquiler'],
+    ['not_credit_document', 'noCredito'],
+    ['not_insurance_document', 'noSeguro'],
     ['foreign_jurisdiction', 'otroPais'],
     ['unknown_format', 'formatoDesconocido'],
     ['ok', 'legibleSinDatos'],

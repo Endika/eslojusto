@@ -1,11 +1,13 @@
 export const REGION = 'eu-south-2';
 export const SITE_ORIGIN = 'https://eslojusto.es';
 export const SITE_HOSTNAME = 'eslojusto.es';
-// Where Stripe sends the person back to, after paying or not, by the review they pay from.
+// Where Stripe sends the person back to, after paying or not, by the review they pay from. The
+// insurance review offers no pass, so no checkout starts from it.
 export const CHECKOUT_PATHS = {
   final_pay: '/finiquito/',
   rental: '/alquiler/',
   employment: '/contrato/',
+  credit: '/financiacion/',
 } as const;
 
 // EU geographic inference profiles, as listed by `aws bedrock list-inference-profiles --region eu-south-2`.

@@ -35,7 +35,24 @@ export const EMPLOYMENT_PAGE_KINDS = [
   'settlement_agreement',
   'other',
 ] as const;
-// Every kind any review can give a page.
+// A consumer credit review's documents; a mortgage or a payslip is `other`.
+export const CREDIT_PAGE_KINDS = [
+  'credit_agreement',
+  'credit_precontract_info',
+  'amortization_schedule',
+  'early_repayment_statement',
+  'revolving_agreement',
+  'card_statement',
+  'other',
+] as const;
+// An insurance review's documents; a claim report is `other`.
+export const INSURANCE_PAGE_KINDS = [
+  'insurance_policy',
+  'insurance_renewal_notice',
+  'other',
+] as const;
+// Every kind the final pay, the rental and the employment review can give a page: the reviews the
+// site reads, whose documents client mirrors this list (src/documents/contract.ts).
 export const PAGE_KINDS = [
   'settlement_proposal',
   'payslip',
@@ -56,7 +73,24 @@ export const PAGE_KINDS = [
   | (typeof RENTAL_PAGE_KINDS)[number]
   | (typeof EMPLOYMENT_PAGE_KINDS)[number]
 )[];
-export type PageKind = (typeof PAGE_KINDS)[number];
+// Every kind any review can give a page: the credit and the insurance review's too, which the
+// site mirrors once it reads them.
+export const ALL_PAGE_KINDS = [
+  ...PAGE_KINDS,
+  'credit_agreement',
+  'credit_precontract_info',
+  'amortization_schedule',
+  'early_repayment_statement',
+  'revolving_agreement',
+  'card_statement',
+  'insurance_policy',
+  'insurance_renewal_notice',
+] as const satisfies readonly (
+  | (typeof PAGE_KINDS)[number]
+  | (typeof CREDIT_PAGE_KINDS)[number]
+  | (typeof INSURANCE_PAGE_KINDS)[number]
+)[];
+export type PageKind = (typeof ALL_PAGE_KINDS)[number];
 // The documents a value can come from.
 export type SourceKind = Exclude<PageKind, 'other'>;
 

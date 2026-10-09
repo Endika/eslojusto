@@ -1,0 +1,59 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "credit_agreement",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "credit_agreement": {
+          "agreedOn": {
+            "value": "2024-05-20",
+            "confidence": "high"
+          },
+          "principal": {
+            "value": 8000,
+            "confidence": "high"
+          },
+          "insurancePremium": {
+            "value": 320,
+            "confidence": "high"
+          },
+          "insuranceRequired": {
+            "value": true,
+            "confidence": "high"
+          },
+          "earlyRepaymentClauseText": {
+            "value": "Firmado por D. Fulano Inventado, DNI 12345678A, cuenta ES0021000418450200051332.",
+            "confidence": "high"
+          },
+          "withdrawalClauseText": {
+            "value": "El asegurado declara no padecer enfermedad ni discapacidad alguna.",
+            "confidence": "high"
+          }
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 13300,
+    "output_tokens": 420
+  }
+}
