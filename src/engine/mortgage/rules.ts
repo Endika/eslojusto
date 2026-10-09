@@ -361,6 +361,17 @@ export function activeRules(date: CivilDate, norms: NormTable): readonly ActiveR
 export const ruleApplies = (id: StatuteRuleId, date: CivilDate, norms: NormTable): boolean =>
   activeRules(date, norms).some(({ rule: r }) => r.id === id);
 
+// Whether a statute rule governs `date`, and whether its norm stands that day without doubt.
+export function ruleStanding(
+  id: StatuteRuleId,
+  date: CivilDate,
+  norms: NormTable,
+): 'applies' | 'doubt' | 'no' {
+  const found = activeRules(date, norms).find(({ rule: r }) => r.id === id);
+  if (found === undefined) return 'no';
+  return found.doubt === null ? 'applies' : 'doubt';
+}
+
 // Whether a court's criterion reaches a deed of `date`.
 export function criterionReaches(id: CaseLawRuleId, date: CivilDate): boolean {
   const day = toIso(date);

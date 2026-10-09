@@ -10,11 +10,11 @@ import {
 } from './calculation';
 import type { NormStatus } from './norms';
 import {
-  activeRules,
   caseLawSources,
   criterionCounts,
   criterionReaches,
   ruleSource,
+  ruleStanding,
   type Basis,
   type CaseLawRuleId,
   type StatuteRuleId,
@@ -148,16 +148,8 @@ const BORROWER_PHRASE: Partial<Record<InvoiceKind, MortgagePhraseKey>> = {
   notary_copy_borrower: 'expenses.copy_borrower',
 };
 
-// Whether a statute rule governs the deed, and whether its norm stands that day without doubt.
-function standing(
-  id: StatuteRuleId,
-  deed: CivilDate,
-  deps: MortgageDeps,
-): 'applies' | 'doubt' | 'no' {
-  const found = activeRules(deed, deps.norms).find(({ rule }) => rule.id === id);
-  if (found === undefined) return 'no';
-  return found.doubt === null ? 'applies' : 'doubt';
-}
+const standing = (id: StatuteRuleId, deed: CivilDate, deps: MortgageDeps) =>
+  ruleStanding(id, deed, deps.norms);
 
 function allocate(
   kind: InvoiceKind,

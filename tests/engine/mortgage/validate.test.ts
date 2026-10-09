@@ -35,6 +35,21 @@ describe('mortgage validation', () => {
     ).toEqual([]);
   });
 
+  it('takes the revision of the rate as a whole count of months', () => {
+    expect(errors({ rateRevisionMonths: 6 })).toEqual([]);
+    expect(errors({ rateRevisionMonths: 0 })).toEqual(['rateRevisionMonths:count_range']);
+  });
+
+  it('lets a switch to a fixed rate repay nothing, and nothing else', () => {
+    const nothing = { principal: 0 };
+    expect(
+      errors({ operations: [operation({ ...nothing, kind: 'fixed_rate_novation' })] }),
+    ).toEqual([]);
+    expect(errors({ operations: [operation(nothing)] })).toEqual([
+      'operations.principal[0]:amount_range',
+    ]);
+  });
+
   it('rejects days that do not exist or have not happened', () => {
     expect(errors({ deedOn: { y: 2015, m: 2, d: 29 } })).toEqual(['deedOn:invalid_date']);
     expect(errors({ deedOn: parseDate('2026-10-10') })).toEqual(['deedOn:in_future']);
