@@ -218,6 +218,9 @@ describe('import boundaries', () => {
         `import { x } from '${source}';`,
       ],
     ),
+    ...['./steps', './conditions', '../engine/review', '../insurance/form'].map(
+      (source): [string, string] => ['src/calculator/section.ts', `import { x } from '${source}';`],
+    ),
   ])('%s cannot %s', async (filePath, code) => {
     expect(await violations(filePath, code)).toContain('no-restricted-imports');
   });
@@ -429,6 +432,8 @@ describe('import boundaries', () => {
     ['src/scripts/final-pay-documents.ts', "import { finalPayCase } from '../documents/case';"],
     ['src/insurance/x.ts', "import { reviewInsurance } from '../engine/insurance/review';"],
     ['src/insurance/x.ts', "import { createNavigation } from '../calculator/navigation';"],
+    ['src/insurance/x.ts', "import { setUpSection } from '../calculator/section';"],
+    ['src/calculator/section.ts', "import { createNavigation } from './navigation';"],
     ['src/insurance/x.ts', "import type { NormSource } from '../engine/law/sources';"],
     ['src/scripts/x.ts', "import { INSURANCE_NORMS } from '../engine/insurance/data/norms';"],
     ['src/rental/x.ts', "import { reviewRental } from '../engine/rental/review';"],

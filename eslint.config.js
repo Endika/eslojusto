@@ -69,11 +69,12 @@ const analyticsReach = {
   message:
     'src/analytics reaches only the engine, the help topics, the translator type, the calculator, rental, employment, household and documents ports and the documents switch.',
 };
-// Every review section walks its sheets on the same navigation and tabs, which learn a section's
-// steps from the Flow they are given, so a new section plugs in without touching them.
+// Every review section walks its sheets on the same navigation, tabs and sheet walk, which learn a
+// section's steps from the Flow they are given, so a new section plugs in without touching them.
 const flowOnly = {
-  regex: `^(?!\\./(flow|tabs)$|\\.\\./engine/date$)|${notCanonical}`,
-  message: 'Navigation and tabs serve every section: its specifics come in through a Flow.',
+  regex: `^(?!\\./(dom|flow|navigation|tabs)$|\\.\\./engine/date$)|${notCanonical}`,
+  message:
+    'Navigation, tabs and the sheet walk serve every section: its specifics come in through a Flow.',
 };
 // The rental review reaches the rental engine through its modules, never its tables, which its
 // composition root passes in; of the calculator, only what every section shares; of reading
@@ -100,7 +101,7 @@ const employmentReach = {
 // The insurance review reaches the insurance engine through its modules, never its tables, which
 // its composition root passes in; of the calculator, only what every section shares.
 const insuranceReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|calculation|law/sources|insurance/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|flow|navigation|number)$|\\.\\./i18n/client$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|calculation|law/sources|insurance/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|flow|navigation|number|section)$|\\.\\./i18n/client$)|${notCanonical}`,
   message:
     'src/insurance reaches the insurance engine (its tables come from the composition root), the shared sheets and the translator type.',
 };
@@ -263,14 +264,14 @@ export default tseslint.config(
   boundary(['src/**/*.ts'], [noAnalytics, noRoot, noPosthogSdk], { ignores: AREAS }),
   boundary(['src/**/*.astro', 'src/**/*.astro/**'], [noAnalytics, noPosthogSdk]),
   boundary(
-    ['src/calculator/{flow,navigation,tabs}.ts'],
+    ['src/calculator/{flow,navigation,section,tabs}.ts'],
     [noAnalytics, noRoot, noPosthogSdk, flowOnly],
   ),
   boundary(
     ['src/calculator/**'],
     [noAnalytics, noRoot, noPosthogSdk, noRental, noEmployment, noHousehold, noInsurance],
     {
-      ignores: ['src/calculator/{flow,navigation,tabs}.ts'],
+      ignores: ['src/calculator/{flow,navigation,section,tabs}.ts'],
     },
   ),
   boundary(['src/rental/**'], [noAnalytics, noRoot, noPosthogSdk, rentalReach]),
