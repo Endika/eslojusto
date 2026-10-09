@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.37.0](https://github.com/Endika/eslojusto/compare/v1.36.0...v1.37.0) (2026-10-09)
+
+
+### Features
+
+* **engine:** add a conditional norm status settled by its deciding figure ([ed48131](https://github.com/Endika/eslojusto/commit/ed48131fb2ecb58c592d9dc913376e3feded67ea))
+* **engine:** version 2026 electricity tariffs and taxes with their sources and a holiday calendar ([e8e37d2](https://github.com/Endika/eslojusto/commit/e8e37d22bff6437aafd0805e60aed7b28b5849fc))
+
 ## [1.36.0](https://github.com/Endika/eslojusto/compare/v1.35.0...v1.36.0) (2026-10-09)
 
 
