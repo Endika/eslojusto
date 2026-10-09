@@ -51,8 +51,7 @@ export const INSURANCE_PAGE_KINDS = [
   'insurance_renewal_notice',
   'other',
 ] as const;
-// Every kind the final pay, the rental and the employment review can give a page: the reviews the
-// site reads, whose documents client mirrors this list (src/documents/contract.ts).
+// Every kind the final pay, the rental and the employment review can give a page.
 export const PAGE_KINDS = [
   'settlement_proposal',
   'payslip',
@@ -73,8 +72,8 @@ export const PAGE_KINDS = [
   | (typeof RENTAL_PAGE_KINDS)[number]
   | (typeof EMPLOYMENT_PAGE_KINDS)[number]
 )[];
-// Every kind any review can give a page: the credit and the insurance review's too, which the
-// site mirrors once it reads them.
+// Every kind any review can give a page: the credit and the insurance review's too. The site's
+// documents client mirrors this list (src/documents/contract.ts).
 export const ALL_PAGE_KINDS = [
   ...PAGE_KINDS,
   'credit_agreement',

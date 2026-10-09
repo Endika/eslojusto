@@ -1,14 +1,27 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import { EXTRACT_TIMEOUT_SECONDS } from '../../api/src/config';
-import { LIMITS as API_LIMITS, PAGE_KINDS as API_PAGE_KINDS } from '../../api/src/domain/documents';
-import { READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
+import type { CreditCheck as ApiCreditCheck } from '../../api/src/domain/credit-checks';
+import { CREDIT_MERGE_RULES } from '../../api/src/domain/credit-merge';
+import { CREDIT_SECTIONS } from '../../api/src/domain/credit-schema';
+import type { InsuranceCheck as ApiInsuranceCheck } from '../../api/src/domain/insurance-checks';
+import { INSURANCE_MERGE_RULES } from '../../api/src/domain/insurance-merge';
+import { INSURANCE_SECTIONS } from '../../api/src/domain/insurance-schema';
+import {
+  LIMITS as API_LIMITS,
+  ALL_PAGE_KINDS as API_PAGE_KINDS,
+} from '../../api/src/domain/documents';
+import { ALL_READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
 import { EMPLOYMENT_SECTIONS } from '../../api/src/domain/employment-schema';
 import { RENTAL_SECTIONS } from '../../api/src/domain/rental-schema';
 import { API_TIMEOUT_MS, createApi, parseExtraction, type Fetch } from '../../src/documents/api';
 import {
+  CREDIT_CHECKS,
+  CREDIT_EXTRACTION,
   EMPLOYMENT_EXTRACTION,
   EMPLOYMENT_LIST_MAXIMA,
   FINAL_PAY_EXTRACTION,
+  INSURANCE_CHECKS,
+  INSURANCE_EXTRACTION,
   LIMITS,
   PAGE_KINDS,
   READABILITY,
@@ -165,6 +178,20 @@ describe('extract', () => {
     );
     expect(EMPLOYMENT_LIST_MAXIMA).toEqual(lists);
     expect([...EMPLOYMENT_EXTRACTION.lists].sort()).toEqual(Object.keys(lists).sort());
+  });
+  it('reads every credit and insurance field the API merges, and the lists of every section', () => {
+    const lists = (sections: Readonly<Record<string, { readonly lists: object }>>) =>
+      [...new Set(Object.values(sections).flatMap((s) => Object.keys(s.lists)))].sort();
+    expect([...CREDIT_EXTRACTION.fields].sort()).toEqual(Object.keys(CREDIT_MERGE_RULES).sort());
+    expect([...CREDIT_EXTRACTION.lists].sort()).toEqual(lists(CREDIT_SECTIONS));
+    expect([...INSURANCE_EXTRACTION.fields].sort()).toEqual(
+      Object.keys(INSURANCE_MERGE_RULES).sort(),
+    );
+    expect([...INSURANCE_EXTRACTION.lists].sort()).toEqual(lists(INSURANCE_SECTIONS));
+  });
+  it('knows every check the API makes of credit and insurance documents, and only those', () => {
+    expectTypeOf<(typeof CREDIT_CHECKS)[number]>().toEqualTypeOf<ApiCreditCheck>();
+    expectTypeOf<(typeof INSURANCE_CHECKS)[number]>().toEqualTypeOf<ApiInsuranceCheck>();
   });
   it('takes as many images and as large a request as the API', () => {
     expect(LIMITS.maxImages).toBe(API_LIMITS.maxImages);

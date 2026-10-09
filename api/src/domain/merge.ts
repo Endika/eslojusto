@@ -114,7 +114,7 @@ export function groupDocuments(pages: Reading['pages']): readonly RecognisedDocu
       last.pages.at(-1) === p.page - 1
     ) {
       last.pages.push(p.page);
-      last.month ??= p.month;
+      if (p.month !== undefined) last.month ??= p.month;
     } else
       documents.push({
         kind: p.kind,

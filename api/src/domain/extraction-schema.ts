@@ -320,8 +320,7 @@ export const FINAL_PAY_READABILITY = [
   'foreign_jurisdiction',
   'unknown_format',
 ] as const;
-// Every reason the final pay, the rental and the employment review can give: the reviews the site
-// reads, whose documents client mirrors this list (src/documents/contract.ts).
+// Every reason the final pay, the rental and the employment review can give.
 export const READABILITY = [
   'ok',
   'handwritten',
@@ -335,7 +334,8 @@ export const READABILITY = [
 ] as const satisfies readonly (
   (typeof FINAL_PAY_READABILITY)[number] | (typeof RENTAL_READABILITY)[number]
 )[];
-// Every reason any review can give: the credit and the insurance review's too.
+// Every reason any review can give: the credit and the insurance review's too. The site's
+// documents client mirrors this list (src/documents/contract.ts).
 export const ALL_READABILITY = [
   ...READABILITY,
   'not_credit_document',

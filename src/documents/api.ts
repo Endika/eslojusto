@@ -1,7 +1,9 @@
 import {
   API_ERROR_CODES,
   COHERENCE_CHECKS,
+  CREDIT_CHECKS,
   EMPLOYMENT_CHECKS,
+  INSURANCE_CHECKS,
   RENTAL_CHECKS,
   CONFIDENCES,
   LIMITS,
@@ -26,6 +28,8 @@ const CHECKS_SET: ReadonlySet<unknown> = new Set([
   ...COHERENCE_CHECKS,
   ...RENTAL_CHECKS,
   ...EMPLOYMENT_CHECKS,
+  ...CREDIT_CHECKS,
+  ...INSURANCE_CHECKS,
 ]);
 
 export type Fetch = (url: string, init: RequestInit) => Promise<Response>;

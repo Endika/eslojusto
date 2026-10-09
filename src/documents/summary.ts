@@ -3,10 +3,11 @@ import type { Conflict, RecognisedDocument } from './contract';
 
 const MONTH = new Intl.DateTimeFormat('es-ES', { month: 'long', timeZone: 'UTC' });
 
-// The kinds of document named with their month: a payslip, a rent receipt.
+// The kinds of document named with their month: a payslip, a rent receipt, a card statement.
 const MONTHLY: Partial<Record<RecognisedDocument['kind'], ClientKey>> = {
   payslip: 'client.documents.kind.payslip_month',
   rent_receipt: 'client.documents.kind.rent_receipt_month',
+  card_statement: 'client.documents.kind.card_statement_month',
 };
 
 function documentName(d: RecognisedDocument, tr: Translate): string {
