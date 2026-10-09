@@ -1,9 +1,10 @@
 ---
 import CalculatorPage from './CalculatorPage.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import FinalPayGuide from '../components/FinalPayGuide.astro';
 import { DOCUMENTS } from '../documents/config';
 import { faqPage } from '../content/faq';
-import { calculatorApp } from '../content/structured-data';
+import { breadcrumbList, calculatorApp, trail } from '../content/structured-data';
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
 
@@ -16,6 +17,7 @@ const tx = (key: Key) => t(lang, key);
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
 const page = new URL(link(lang, 'finiquito/'), Astro.site);
 const documents = DOCUMENTS !== null;
+const crumbs = trail(lang, { name: tx('home.final_pay'), path: '/finiquito/' });
 ---
 
 <CalculatorPage
@@ -23,10 +25,15 @@ const documents = DOCUMENTS !== null;
   title={tx('final_pay.title')}
   description={tx('final_pay.description')}
   path="/finiquito/"
-  structuredData={[calculatorApp(home, page, lang), faqPage(lang, { documents })]}
+  structuredData={[
+    calculatorApp(home, page, lang),
+    breadcrumbList(home, lang, crumbs),
+    faqPage(lang, { documents }),
+  ]}
   h1={tx('final_pay.h1')}
   lead={tx(documents ? 'final_pay.lead_documents' : 'final_pay.lead')}
 >
+  <Breadcrumbs slot="head" lang={lang} crumbs={crumbs} />
   <FinalPayGuide lang={lang} documents={documents} />
 </CalculatorPage>
 

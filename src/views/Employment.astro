@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import EmploymentForm from '../components/EmploymentForm.astro';
 import EmploymentResult from '../components/EmploymentResult.astro';
 import DocumentStart from '../components/DocumentStart.astro';
@@ -11,7 +12,7 @@ import { EMPLOYMENT_BETA } from '../content/sections';
 import { formatLongDay } from '../content/rent-indices';
 import { employmentFaqEntries } from '../content/employment-faq';
 import { faqNode } from '../content/faq';
-import { employmentApp } from '../content/structured-data';
+import { breadcrumbList, employmentApp, trail } from '../content/structured-data';
 import { LAST_UPDATED } from '../content/updated';
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
@@ -41,8 +42,10 @@ const checkedOn = LAST_UPDATED['/contrato/'];
 if (!checkedOn) throw new Error('/contrato/ needs its date in LAST_UPDATED.');
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
 const page = new URL(link(lang, 'contrato/'), Astro.site);
+const crumbs = trail(lang, { name: tx('home.contract'), path: '/contrato/' });
 const structuredData = [
   employmentApp(home, page, lang),
+  breadcrumbList(home, lang, crumbs),
   faqNode(
     employmentFaqEntries(lang, EMPLOYMENT_NORMS, {
       documents,
@@ -85,6 +88,7 @@ const structuredData = [
   <main id="content">
     <div class="desk">
       <header class="desk__head">
+        <Breadcrumbs lang={lang} crumbs={crumbs} />
         <h1 class="desk__title">{tx('employment.h1')}</h1>
         <p class="desk__lead">{tx('employment.lead')}</p>
         {EMPLOYMENT_BETA && (

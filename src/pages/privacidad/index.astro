@@ -1,5 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { breadcrumbList, trail } from '../../content/structured-data';
 import { t, type Key } from '../../i18n';
 import { DOCUMENTS } from '../../documents/config';
 import { OUTAGE_KEY } from '../../documents/outage';
@@ -8,6 +10,8 @@ import { EMPLOYMENT_BUILD, HOUSEHOLD_BUILD, RENTAL_BUILD } from '../../content/s
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
 const tx = (key: Key) => t('es', key);
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const crumbs = trail('es', { name: tx('footer.privacy'), path: '/privacidad/' });
 
 const email = 'hola@eslojusto.es';
 // Reading documents and the pass exist only in a build with their API; so do their paragraphs.
@@ -236,8 +240,10 @@ const tracked = [
   langs={['es']}
   path="/privacidad/"
   section="legal"
+  structuredData={[breadcrumbList(home, 'es', crumbs)]}
 >
   <main class="document" id="content">
+    <Breadcrumbs lang="es" crumbs={crumbs} />
     <header class="document__head">
       <h1 class="document__title">{tx('privacy.h1')}</h1>
       <p class="document__date">{tx('legal.updated')}</p>

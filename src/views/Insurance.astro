@@ -1,9 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import InsuranceForm from '../components/InsuranceForm.astro';
 import InsuranceResult from '../components/InsuranceResult.astro';
 import { INSURANCE_BETA } from '../content/sections';
 import { formatLongDay } from '../content/rent-indices';
+import { breadcrumbList, trail } from '../content/structured-data';
 import { LAST_UPDATED } from '../content/updated';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
@@ -26,6 +28,8 @@ const sections = [
 // The day the page's rules and norms were last checked; it exists only in a build with the page.
 const checkedOn = LAST_UPDATED['/seguros/'];
 if (!checkedOn) throw new Error('/seguros/ needs its date in LAST_UPDATED.');
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const crumbs = trail(lang, { name: tx('home.insurance'), path: '/seguros/' });
 ---
 
 <Base
@@ -34,6 +38,7 @@ if (!checkedOn) throw new Error('/seguros/ needs its date in LAST_UPDATED.');
   path="/seguros/"
   lang={lang}
   section="cause"
+  structuredData={[breadcrumbList(home, lang, crumbs)]}
 >
   <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
     <ol>
@@ -58,6 +63,7 @@ if (!checkedOn) throw new Error('/seguros/ needs its date in LAST_UPDATED.');
   <main id="content">
     <div class="desk">
       <header class="desk__head">
+        <Breadcrumbs lang={lang} crumbs={crumbs} />
         <h1 class="desk__title">{tx('insurance.h1')}</h1>
         <p class="desk__lead">{tx('insurance.lead')}</p>
         {INSURANCE_BETA && (
