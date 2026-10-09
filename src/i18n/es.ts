@@ -14,6 +14,8 @@ export const es = {
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen el Real Decreto 1620/2011, el Real Decreto-ley 16/2022 y los reales decretos del SMI de cada año.',
   'footer.note_general':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Cada cifra lleva la norma de la que sale.',
+  'footer.note_insurance':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las fechas siguen la Ley de Contrato de Seguro (Ley 50/1980) y la Ley 22/2007, de comercialización a distancia de servicios financieros.',
   'footer.note_benefit':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras del paro siguen la Ley General de la Seguridad Social (arts. 262 a 277) y el IPREM; las del finiquito, el Estatuto de los Trabajadores y la guía del CGPJ (v0.6, julio de 2026).',
   'footer.nav': 'Información legal',
@@ -169,6 +171,9 @@ export const es = {
   'home.rent_situation': 'Vives de alquiler: lo que te cobran frente a lo que permite la ley',
   'home.mortgage': 'Hipoteca',
   'home.finance': 'Financiación y seguros',
+  'home.credit': 'Financiación',
+  'home.insurance': 'Seguros',
+  'home.insurance_situation': 'Renuevas tu seguro de hogar o de coche: sus plazos frente a la ley',
   'home.bills': 'Facturas',
   'home.coming_soon': 'Próximamente: {secciones}',
   'home.final_pay': 'Finiquito',
@@ -1255,6 +1260,7 @@ export const es = {
     'No parece un DNI ni un NIE: revísalo. La carta se descarga igualmente.',
   'client.documents.letter.received': 'Recibí no conforme,',
   'client.documents.letter.filename': 'eslojusto-recibi-no-conforme.pdf',
+  'home.insurance_citation': 'Ley de Contrato de Seguro · Ley 22/2007',
   'home.rent_citation': 'Ley de Arrendamientos Urbanos · Ley 12/2023 · IRAV e IPC del INE',
   'home.beta': 'Beta',
 
@@ -4084,6 +4090,236 @@ export const es = {
     'No valora si la causa de un desistimiento es cierta, ni lo que hayas pactado con la familia, ni las cotizaciones, ni lo que cobras en neto. No pide nombre, DNI, domicilio, nacionalidad, situación administrativa, salud ni embarazo. Informa sobre la ley y no es asesoramiento jurídico.',
   'legal_notice.household.beta':
     'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves un punto que no cuadra con la ley, puedes escribir a',
+  'insurance.title': 'Fechas de tu seguro: renovación y desistimiento',
+  'insurance.description':
+    'Con las fechas de tu seguro de hogar o de coche: último día para decir que no lo renuevas, si el aviso de cambios llegó a tiempo y plazo para desistir.',
+  'insurance.h1': 'Las fechas de tu seguro de hogar o de coche',
+  'insurance.lead':
+    'Hasta cuándo puedes comunicar que no renuevas tu póliza, si el aviso de cambios llegó con la antelación que pide la ley y, si la contrataste a distancia, hasta cuándo puedes desistir. Solo fechas: no valora el precio ni las coberturas.',
+  'insurance.beta': 'Beta',
+  'insurance.beta_note':
+    'Sección en pruebas. Las fechas salen de lo que escribes y de la ley; lo que diga tu póliza también cuenta.',
+  'insurance.no_js':
+    'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
+  'insurance.reviewed': 'Revisado el {fecha}',
+  'insurance.form_aria': 'Revisión de las fechas de tu seguro',
+  'insurance.tab.poliza': 'Póliza',
+  'insurance.tab.contratacion': 'Contratación',
+  'insurance.tab.renovacion': 'Renovación',
+  'insurance.tab.resultado': 'Resultado',
+  'insurance.answer.yes': 'Sí',
+  'insurance.answer.no': 'No',
+  'insurance.answer.unknown': 'No lo sé',
+
+  'insurance.policy.question': 'Tu póliza',
+  'insurance.policy.help': 'Ten a mano la póliza o el último recibo.',
+  'insurance.policy.line': '¿Qué seguro es?',
+  'insurance.policy.line.home': 'Hogar',
+  'insurance.policy.line.car': 'Coche',
+  'insurance.policy.line.life': 'Vida',
+  'insurance.policy.line.health': 'Salud',
+  'insurance.policy.line.funeral': 'Decesos',
+  'insurance.policy.line.other': 'Otro',
+  'insurance.policy.car_cover': '¿Qué cubre tu seguro de coche?',
+  'insurance.policy.car_cover.compulsory_only': 'Solo el seguro obligatorio',
+  'insurance.policy.car_cover.with_voluntary':
+    'También coberturas voluntarias, como daños propios, lunas o robo',
+  'insurance.policy.mortgage': '¿La pide tu hipoteca?',
+  'insurance.policy.mortgage_hint':
+    'Si tienes una hipoteca sobre esta vivienda y el préstamo te pide asegurarla.',
+  'insurance.policy.renews': '¿Se renueva sola cada año?',
+  'insurance.policy.renews_hint': 'Lo pone la póliza, en su duración o en su prórroga.',
+  'insurance.policy.expires': 'Día en que vence según tu póliza',
+  'insurance.policy.expires_hint':
+    'Escribe el día que figura en la póliza como vencimiento, tal cual.',
+
+  'insurance.cover.question': 'Más sobre tu póliza',
+  'insurance.expiry.question': 'Cuándo vence',
+  'insurance.terms.question': 'Las condiciones del contrato',
+  'insurance.premiums.question': 'La prima',
+  'insurance.changes.question': 'Otros cambios',
+
+  'insurance.contracting.question': 'Cómo la contrataste',
+  'insurance.contracting.distance': '¿La contrataste por internet o por teléfono sin ver a nadie?',
+  'insurance.contracting.distance_hint':
+    'Puede darte 14 días naturales para desistir, según el seguro.',
+  'insurance.contracting.concluded': '¿Cuándo la contrataste?',
+  'insurance.contracting.concluded_hint': 'No el día en que empezó a cubrirte.',
+  'insurance.contracting.received': '¿Has recibido las condiciones del contrato?',
+  'insurance.contracting.received_hint':
+    'La póliza con sus condiciones, en papel o por correo electrónico.',
+  'insurance.contracting.received_on': 'Día en que las recibiste',
+  'insurance.contracting.received_on_hint': 'Si no lo sabes, déjalo en blanco.',
+
+  'insurance.renewal.question': 'El aviso de renovación',
+  'insurance.renewal.has_notice': '¿Te ha llegado el aviso de renovación de la aseguradora?',
+  'insurance.renewal.has_notice_hint':
+    'La carta o el correo con la prima o las condiciones del periodo siguiente.',
+  'insurance.renewal.received_on': 'Día en que te llegó el aviso',
+  'insurance.renewal.previous': 'Prima del periodo que acaba',
+  'insurance.renewal.previous_hint':
+    'En euros, el total del año, por ejemplo 300,00. Si no la tienes, déjala en blanco.',
+  'insurance.renewal.next': 'Prima del periodo siguiente',
+  'insurance.renewal.next_hint': 'La que dice el aviso. Si no la dice, déjala en blanco.',
+  'insurance.renewal.changes':
+    '¿El aviso cambia algo además del precio, como coberturas o franquicias?',
+
+  'insurance.result.title': 'Resultado',
+  'insurance.result.out_of_scope': 'Fuera de esta revisión',
+  'insurance.result.information': 'Para que lo sepas',
+  'insurance.result.unchecked': 'Lo que esta revisión no mira',
+  'insurance.result.rules': 'Normas',
+  'insurance.result.how': 'Cómo se calcula',
+  'insurance.result.channels': 'Dónde informarte gratis',
+  'insurance.result.channels_dgsfp':
+    'La Dirección General de Seguros y Fondos de Pensiones, que supervisa a las aseguradoras.',
+  'insurance.result.channels_service':
+    'El Servicio de Reclamaciones de la Dirección General de Seguros y Fondos de Pensiones.',
+  'insurance.result.channels_consumer':
+    'Las oficinas municipales de información al consumidor (OMIC) y los servicios de consumo de tu comunidad autónoma.',
+  'insurance.result.restart': 'Empezar de nuevo',
+
+  'client.insurance.result.lead':
+    'Cada fecha, con la cuenta que lleva a ella y la norma en que se apoya. Los días que quedan se cuentan desde hoy.',
+  'client.insurance.result.lead_out_of_scope':
+    'Esta póliza queda fuera de lo que revisa esta página.',
+  'client.insurance.unit.day_one': '{n} día',
+  'client.insurance.unit.day_many': '{n} días',
+
+  'client.insurance.item.non_renewal': 'Comunicar que no renuevas',
+  'client.insurance.item.change_notice': 'Aviso de cambios antes del vencimiento',
+  'client.insurance.item.premium': 'Prima del periodo siguiente',
+  'client.insurance.item.distance_withdrawal': 'Desistir de un seguro contratado a distancia',
+  'client.insurance.item.distance_withdrawal_compulsory': 'Desistir: seguro obligatorio del coche',
+  'client.insurance.item.distance_withdrawal_voluntary':
+    'Desistir: coberturas voluntarias del coche',
+
+  'client.insurance.status.open': 'Te quedan {dias} (hasta el {fecha})',
+  'client.insurance.status.open_today': 'Hoy es el último día ({fecha})',
+  'client.insurance.status.ended': 'El plazo terminó el {fecha}',
+  'client.insurance.status.not_started': 'El plazo aún no ha empezado',
+  'client.insurance.status.not_applicable': 'No aplica',
+  'client.insurance.status.review_it': 'Revísalo',
+  'client.insurance.status.not_entered': 'No lo has metido',
+  'client.insurance.status.on_time': 'Llegó con al menos dos meses de antelación',
+  'client.insurance.status.late': 'Llegó con {days} de antelación: la ley pide al menos dos meses',
+  'client.insurance.status.up': 'Tu prima sube un {percent} ({difference})',
+  'client.insurance.status.same': 'Tu prima no cambia',
+  'client.insurance.status.down': 'Tu prima baja un {percent} ({difference})',
+  'client.insurance.status.out_of_scope': 'Esta revisión no cubre esta póliza',
+
+  'client.insurance.calculation.item.not_entered':
+    'No has metido este dato, así que no se calcula.',
+  'client.insurance.calculation.non_renewal.last_day':
+    'Tu póliza vence el {expiry}. La ley pide comunicar por escrito que no la renuevas con al menos un mes de antelación: el último día es el {day}.',
+  'client.insurance.calculation.non_renewal.days_left': 'Desde hoy quedan {days}.',
+  'client.insurance.calculation.non_renewal.days_left_today': 'Hoy es ese último día.',
+  'client.insurance.calculation.non_renewal.ended': 'Ese plazo terminó el {day}.',
+  'client.insurance.calculation.non_renewal.arrive_by':
+    'Cuenta con que tu escrito tiene que llegar a la aseguradora como tarde el {day}: no está aclarado que baste con enviarlo ese día.',
+  'client.insurance.calculation.non_renewal.midnight':
+    'Si tu póliza vence a las 00:00 h de ese día, el periodo acaba el día anterior: cuenta un día menos.',
+  'client.insurance.calculation.non_renewal.month_end':
+    'El mes anterior al vencimiento no tiene ese mismo día, así que se toma su último día. Ninguna norma resuelve este caso al contar hacia atrás: es una interpretación, y por eso se da el día más temprano.',
+  'client.insurance.calculation.non_renewal.extension_assumed':
+    'Como no sabes si tu póliza se renueva sola, se calcula como si lo hiciera; lo dice tu póliza.',
+  'client.insurance.calculation.non_renewal.no_extension':
+    'Tu póliza no se renueva sola: termina en su fecha y no hay renovación a la que oponerse.',
+  'client.insurance.calculation.change_notice.deadline':
+    'La aseguradora tiene que comunicarte cualquier modificación del contrato con dos meses de antelación al vencimiento: como tarde el {day}.',
+  'client.insurance.calculation.change_notice.on_time':
+    'El aviso te llegó el {received}, {days} antes del vencimiento.',
+  'client.insurance.calculation.change_notice.late':
+    'El aviso te llegó el {received}, {days} antes del vencimiento: menos de los dos meses que pide la ley.',
+  'client.insurance.calculation.change_notice.month_end':
+    'Dos meses antes del vencimiento no hay ese mismo día, así que se toma el último día de ese mes. Ninguna norma resuelve este caso al contar hacia atrás: es una interpretación.',
+  'client.insurance.calculation.change_notice.any_change':
+    'La ley habla de cualquier modificación del contrato. Qué consecuencia tiene un aviso que llega tarde no se dice aquí: no se ha encontrado en una fuente oficial.',
+  'client.insurance.calculation.change_notice.premium_only':
+    'Si lo único que cambia es la prima, aquí no se afirma si eso cuenta como modificación del contrato a estos efectos.',
+  'client.insurance.calculation.premium.up':
+    'Pasas de {previous} a {next}: {difference} más, un {percent} más. Es un dato: no dice si el precio es alto o bajo.',
+  'client.insurance.calculation.premium.same': 'La prima sigue en {previous}.',
+  'client.insurance.calculation.premium.down':
+    'Pasas de {previous} a {next}: {difference} menos, un {percent} menos.',
+  'client.insurance.calculation.withdrawal.not_distance':
+    'No la contrataste a distancia, así que este plazo de 14 días no aplica.',
+  'client.insurance.calculation.withdrawal.channel_unknown':
+    'Sin saber si la contrataste a distancia no se puede decir si tienes este plazo. Si fue por internet o por teléfono sin ver a nadie, son 14 días naturales.',
+  'client.insurance.calculation.withdrawal.before_law':
+    'La contrataste antes del 12-10-2007, cuando entró en vigor la ley de servicios financieros a distancia: este plazo no aplica.',
+  'client.insurance.calculation.withdrawal.start':
+    'Son 14 días naturales, contados desde el {day}, el día en que la contrataste, sin contar ese día.',
+  'client.insurance.calculation.withdrawal.start_on_terms':
+    'Son 14 días naturales desde que recibes las condiciones del contrato: como llegaron después de contratarla, se cuentan desde el {day}, sin contar ese día.',
+  'client.insurance.calculation.withdrawal.receipt_unknown':
+    'No has metido el día en que recibiste las condiciones del contrato, así que se cuenta desde el día en que la contrataste; si las recibiste después, el plazo acaba más tarde.',
+  'client.insurance.calculation.withdrawal.days_left':
+    'Desde hoy quedan {days}, hasta el {day} incluido.',
+  'client.insurance.calculation.withdrawal.days_left_today': 'Hoy, {day}, es el último día.',
+  'client.insurance.calculation.withdrawal.ended': 'El plazo terminó el {day}.',
+  'client.insurance.calculation.withdrawal.not_started':
+    'Son 14 días naturales desde que recibes las condiciones del contrato. Como aún no las has recibido, el plazo aún no ha empezado.',
+  'client.insurance.calculation.withdrawal.compulsory_excluded':
+    'La ley deja fuera del desistimiento los seguros con los que cumples una obligación de asegurarte, como el seguro obligatorio del coche.',
+  'client.insurance.calculation.withdrawal.voluntary_unverified':
+    'Tu póliza incluye también coberturas voluntarias. No está comprobado en una fuente oficial si se puede desistir solo de ellas, así que no se da una fecha.',
+  'client.insurance.calculation.withdrawal.mortgage_unverified':
+    'Si tu hipoteca te pide asegurar la vivienda, este seguro podría cumplir una obligación de asegurarte, que la ley deja fuera del desistimiento. La norma de la hipoteca aún no se ha comprobado, así que no se da una fecha.',
+  'client.insurance.calculation.information.policy_correction':
+    'Si la póliza no coincide con lo que pediste o con lo que acordaste, la ley da un mes desde que te la entregan para pedir a la aseguradora que lo corrija; pasado ese mes, vale lo que dice la póliza.',
+  'client.insurance.calculation.information.policy_correction.until':
+    'Con tus fechas, ese mes llega hasta el {day}.',
+  'client.insurance.calculation.information.policy_correction.no_policy':
+    'El mes empieza a contar cuando recibes la póliza.',
+  'client.insurance.calculation.information.policy_correction.delivery_unknown':
+    'Sin el día en que recibiste la póliza no se puede dar una fecha: el mes se cuenta desde ese día.',
+  'client.insurance.calculation.information.questionnaire':
+    'Antes de contratar, la ley te pide declarar lo que te pregunta la aseguradora en su cuestionario y que conozcas. Lo que el cuestionario no pregunta no tienes el deber de declararlo.',
+  'client.insurance.calculation.information.proportional_rule':
+    'Si la suma asegurada es menor que lo que vale lo asegurado, la aseguradora paga el daño en la misma proporción, salvo que la póliza lo excluya.',
+  'client.insurance.calculation.information.proportional_rule.example':
+    'Por ejemplo, una vivienda que vale {value} asegurada por {insured}: ante un daño de {damage}, la aseguradora paga {paid}.',
+  'client.insurance.calculation.information.overinsurance':
+    'Si la suma asegurada supera mucho lo que vale lo asegurado, cualquiera de las partes puede pedir que se reduzca, junto con la prima; y en un siniestro se paga el daño que hubo.',
+  'client.insurance.calculation.information.out_of_scope.life':
+    'Esta revisión es solo para seguros de hogar y de coche; los seguros de vida tienen reglas propias que aquí no se calculan.',
+  'client.insurance.calculation.information.out_of_scope.health':
+    'Esta revisión es solo para seguros de hogar y de coche; los seguros de salud tienen reglas propias que aquí no se calculan.',
+  'client.insurance.calculation.information.out_of_scope.funeral':
+    'Esta revisión es solo para seguros de hogar y de coche; los seguros de decesos tienen reglas propias que aquí no se calculan.',
+  'client.insurance.calculation.information.out_of_scope.other_line':
+    'Esta revisión es solo para seguros de hogar y de coche.',
+  'client.insurance.calculation.information.out_of_scope.before_2016':
+    'Tu póliza venció antes del 01-01-2016, cuando empezaron los plazos de aviso que se calculan aquí; antes regían otros.',
+
+  'client.insurance.info.policy_correction': 'Si la póliza no coincide con lo acordado',
+  'client.insurance.info.questionnaire': 'Lo que declaras al contratar',
+  'client.insurance.info.proportional_rule': 'Si aseguras por menos de lo que vale',
+  'client.insurance.info.overinsurance': 'Si aseguras por más de lo que vale',
+  'client.insurance.info.out_of_scope': 'Por qué no se calcula',
+
+  'client.insurance.unchecked.clause_transparency':
+    'Si las cláusulas de tu póliza son claras y válidas',
+  'client.insurance.unchecked.premium_price': 'Si el precio de tu seguro es caro o barato',
+  'client.insurance.unchecked.insured_value':
+    'Si la suma asegurada se ajusta a lo que valen tu casa o tu coche',
+  'client.insurance.unchecked.claims': 'Cómo se valora un siniestro',
+
+  'client.insurance.norm.in_force': 'en vigor',
+  'client.insurance.norm.pending_validation': 'pendiente de convalidación',
+  'client.insurance.norm.repealed': 'derogada el {fecha}',
+  'client.insurance.source.since': 'con efectos desde el {desde}',
+
+  'client.insurance.error.missing_value': 'Falta este dato',
+  'client.insurance.error.missing_choice': 'Elige una respuesta',
+  'client.insurance.error.invalid_date': 'La fecha no es válida',
+  'client.insurance.error.invalid_amount': 'No se entiende la cifra: escríbela como 1.234,56',
+  'client.insurance.error.too_far_ahead': 'Esa fecha está a más de dos años de hoy',
+  'client.insurance.error.in_future': 'Esa fecha aún no ha llegado',
+  'client.insurance.error.after_expiry': 'Esa fecha es posterior al vencimiento',
+  'client.insurance.error.before_concluded': 'Esa fecha es anterior al día en que la contrataste',
+  'client.insurance.error.amount_range': 'Escribe una cifra mayor que 0',
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof es;

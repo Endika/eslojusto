@@ -206,6 +206,15 @@ describe('client strings', () => {
     ).toContain('{required}');
   });
 
+  it('the insurance review ships its strings only on its own page', () => {
+    expect(Object.keys(clientStrings('es')).some((k) => k.startsWith('client.insurance.'))).toBe(
+      false,
+    );
+    expect(clientStrings('es', { insurance: true })['client.insurance.status.review_it']).toBe(
+      'Revísalo',
+    );
+  });
+
   it('a build with it ships them', () => {
     expect(clientStrings('es', { documents: true })['client.documents.mark']).toBe(
       'Leído del documento · confianza {nivel}',

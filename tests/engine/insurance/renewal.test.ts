@@ -36,6 +36,7 @@ describe('last day to give notice of not renewing (art. 22.2 LCS)', () => {
       'non_renewal.last_day',
       'non_renewal.days_left',
       'non_renewal.arrive_by',
+      'non_renewal.midnight',
     ]);
     expect(f.calculation[1]?.vars).toEqual({ days: { days: 115 }, day: { date: '2027-02-01' } });
     expect(f.sources.map((s) => s.id)).toEqual(['non_renewal']);

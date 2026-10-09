@@ -169,6 +169,17 @@ describe('information blocks', () => {
     expect(block?.calculation[1]?.key).toBe('information.policy_correction.no_policy');
   });
 
+  it.each([
+    ['not known', { policyReceived: null }],
+    ['received on a day not given', { policyReceived: true, policyReceivedOn: null }],
+  ] as const)('gives no date when the delivery is %s', (_, delivery) => {
+    const block = review(policy({ concludedOn: parseDate('2024-01-15'), ...delivery }))
+      .information[0];
+    expect(block?.calculation[1]).toEqual({
+      key: 'information.policy_correction.delivery_unknown',
+    });
+  });
+
   it('works the proportional rule through an example', () => {
     const block = review(policy()).information.find((b) => b.id === 'proportional_rule');
     expect(block?.calculation[1]?.vars).toEqual({

@@ -86,6 +86,17 @@ const employmentReach = {
   message:
     'src/employment reaches the employment engine (its tables come from the composition root), the shared sheets, the documents contract, ports and letter details, and the translator type.',
 };
+// The insurance review reaches the insurance engine through its modules, never its tables, which
+// its composition root passes in; of the calculator, only what every section shares.
+const insuranceReach = {
+  regex: `^(?!\\./|\\.\\./engine/(date|calculation|law/sources|insurance/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|flow|navigation|number)$|\\.\\./i18n/client$)|${notCanonical}`,
+  message:
+    'src/insurance reaches the insurance engine (its tables come from the composition root), the shared sheets and the translator type.',
+};
+const noInsurance = {
+  regex: '(^|/)insurance/',
+  message: 'The final pay never reaches into the insurance review.',
+};
 const noEmployment = {
   regex: '(^|/)employment/',
   message: 'The final pay never reaches into the employment contract review.',
@@ -242,7 +253,7 @@ export default tseslint.config(
   ),
   boundary(
     ['src/calculator/**'],
-    [noAnalytics, noRoot, noPosthogSdk, noRental, noEmployment, noHousehold],
+    [noAnalytics, noRoot, noPosthogSdk, noRental, noEmployment, noHousehold, noInsurance],
     {
       ignores: ['src/calculator/{flow,navigation,tabs}.ts'],
     },
@@ -250,6 +261,7 @@ export default tseslint.config(
   boundary(['src/rental/**'], [noAnalytics, noRoot, noPosthogSdk, rentalReach]),
   boundary(['src/employment/**'], [noAnalytics, noRoot, noPosthogSdk, employmentReach]),
   boundary(['src/household/**'], [noAnalytics, noRoot, noPosthogSdk, householdReach]),
+  boundary(['src/insurance/**'], [noAnalytics, noRoot, noPosthogSdk, insuranceReach]),
   boundary(['src/documents/*.ts'], [noAnalytics, noRoot, noPosthogSdk, documentsPlatform], {
     ignores: FINAL_PAY_DOCUMENTS.map((name) => `src/documents/${name}.ts`),
   }),

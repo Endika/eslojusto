@@ -42,24 +42,24 @@ export const scopeBlock = (reason: OutOfScopeReason, norms: NormTable): Informat
 // Art. 8 LCS: one month from the delivery of the policy, date to date (Código Civil, art. 5.1).
 const CORRECTION_MONTHS = 1;
 
+// A date only from the day the policy was received: without it, the day of the contract would be
+// the earliest delivery possible, not the person's own.
 function policyCorrection(input: InsuranceInput, norms: NormTable): InformationBlock {
   const concluded = input.concludedOn;
-  const received = input.policyReceivedOn;
+  const received = input.policyReceived === true ? input.policyReceivedOn : null;
   const delivered =
-    input.policyReceived === false || concluded === null
-      ? null
-      : received === null
-        ? concluded
-        : max(concluded, received);
+    received === null ? null : concluded === null ? received : max(concluded, received);
   return block(
     'policy_correction',
     [
       insurancePhrase('information.policy_correction'),
-      delivered === null
+      input.policyReceived === false
         ? insurancePhrase('information.policy_correction.no_policy')
-        : insurancePhrase('information.policy_correction.until', {
-            day: day(addMonthsClamped(delivered, CORRECTION_MONTHS)),
-          }),
+        : delivered === null
+          ? insurancePhrase('information.policy_correction.delivery_unknown')
+          : insurancePhrase('information.policy_correction.until', {
+              day: day(addMonthsClamped(delivered, CORRECTION_MONTHS)),
+            }),
     ],
     ['policy_correction'],
     norms,

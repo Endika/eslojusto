@@ -1,0 +1,19 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { INSURANCE_BUILD } from '../../../content/sections';
+import { langPaths, type Lang } from '../../../i18n/languages';
+
+export const getStaticPaths = (() => (INSURANCE_BUILD ? langPaths() : [])) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+
+// The literal switch, as on /seguros/: a build without it carries none of the page's code.
+/* eslint-disable no-restricted-syntax -- a fixed path into src/views, not a boundary escape */
+const Insurance =
+  import.meta.env.PUBLIC_INSURANCE === '1'
+    ? (await import('../../../views/Insurance.astro')).default
+    : null;
+/* eslint-enable no-restricted-syntax */
+---
+
+{Insurance && <Insurance lang={lang} />}

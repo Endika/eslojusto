@@ -9,6 +9,8 @@ import {
   EMPLOYMENT_BUILD,
   HOUSEHOLD_BETA,
   HOUSEHOLD_BUILD,
+  INSURANCE_BETA,
+  INSURANCE_BUILD,
   RENTAL_BUILD,
 } from '../content/sections';
 
@@ -106,7 +108,23 @@ const groups: Group[] = [
     id: 'money',
     tone: 'salary',
     label: 'home.group_money',
-    sections: ['home.finance', 'home.bills'],
+    // With the insurance review live, credit alone is still to come.
+    sections: [
+      ...(INSURANCE_BUILD
+        ? [
+            {
+              id: 'insurance',
+              name: 'home.insurance',
+              href: link(lang, 'seguros/'),
+              situation: 'home.insurance_situation',
+              citation: 'home.insurance_citation',
+              beta: INSURANCE_BETA,
+            } satisfies Review,
+            'home.credit' as const,
+          ]
+        : ['home.finance' as const]),
+      'home.bills',
+    ],
   },
 ];
 

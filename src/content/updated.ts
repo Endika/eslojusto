@@ -11,6 +11,8 @@ const employmentBuild = process.env['PUBLIC_EMPLOYMENT'] === '1';
 const erteBuild = process.env['PUBLIC_ERTE'] === '1';
 // /empleada-de-hogar/ likewise exists only in a PUBLIC_HOUSEHOLD=1 build.
 const householdBuild = process.env['PUBLIC_HOUSEHOLD'] === '1';
+// /seguros/ likewise exists only in a PUBLIC_INSURANCE=1 build.
+const insuranceBuild = process.env['PUBLIC_INSURANCE'] === '1';
 
 export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/': '2026-10-09',
@@ -42,4 +44,5 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   ...(employmentBuild ? { '/contrato/': '2026-10-09' } : {}),
   ...(erteBuild ? { '/paro/erte/': '2026-10-09' } : {}),
   ...(householdBuild ? { '/empleada-de-hogar/': '2026-10-09' } : {}),
+  ...(insuranceBuild ? { '/seguros/': '2026-10-09' } : {}),
 };

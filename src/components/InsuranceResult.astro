@@ -1,0 +1,152 @@
+---
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+// Every state has its own mark beside its words, so none rests on colour alone.
+const MARKS: readonly (readonly [string, readonly string[]])[] = [
+  ['open', ['M12 7v5l3 3']],
+  ['ended', ['M8 12h8']],
+  ['not-started', ['M8 12h1m3 0h1m3 0h1']],
+  ['not-applicable', ['m6.5 6.5 11 11']],
+  ['review-it', ['M12 7v6M12 16v1']],
+  ['not-entered', ['M4 7h16']],
+  ['on-time', ['M4 7h16M4 17h16']],
+  ['late', ['M4 7h16', 'M4 17h8']],
+  ['up', ['M12 21V4m-5 5 5-5 5 5M3 14h18']],
+  ['same', ['M4 12h16']],
+  ['down', ['M12 3v17m-5-5 5 5 5-5M3 10h18']],
+];
+// Those that sit in a circle, as the other reviews draw them.
+const CIRCLED = new Set(['open', 'ended', 'not-started', 'not-applicable', 'review-it']);
+const channels: readonly Key[] = [
+  'insurance.result.channels_dgsfp',
+  'insurance.result.channels_service',
+  'insurance.result.channels_consumer',
+];
+---
+
+<section class="result" id="resultado" aria-labelledby="result-title" hidden>
+  <svg class="marks" aria-hidden="true" focusable="false">
+    {MARKS.map(([id, paths]) => (
+      <symbol id={`insurance-mark-${id}`} viewBox="0 0 24 24">
+        {CIRCLED.has(id) && <circle cx="12" cy="12" r="8" />}
+        {paths.map((d) => (
+          <path d={d} />
+        ))}
+      </symbol>
+    ))}
+    <symbol id="insurance-mark-out-of-scope" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8"></circle>
+      <path d="m6.5 6.5 11 11"></path>
+    </symbol>
+  </svg>
+
+  <header class="result__header">
+    <h2 class="result__title" id="result-title" tabindex="-1">
+      {tx('insurance.result.title')}
+    </h2>
+    <p class="result__lead" data-lead></p>
+  </header>
+
+  <div class="review" data-review>
+    <section
+      class="item"
+      data-out-of-scope
+      data-state="out_of_scope"
+      aria-labelledby="out-of-scope-title"
+      hidden
+    >
+      <div class="sheet">
+        <h3 class="item__title" id="out-of-scope-title">
+          {tx('insurance.result.out_of_scope')}
+        </h3>
+        <p class="item__status">
+          <svg class="item__mark" viewBox="0 0 24 24" aria-hidden="true">
+            <use href="#insurance-mark-out-of-scope"></use>
+          </svg>
+          <span data-out-of-scope-status></span>
+        </p>
+        <p class="help" data-out-of-scope-reason></p>
+      </div>
+    </section>
+
+    <div class="review__items" data-items></div>
+
+    <section class="item" data-in-scope aria-labelledby="information-title">
+      <div class="sheet">
+        <h3 class="item__title" id="information-title">
+          {tx('insurance.result.information')}
+        </h3>
+        <div class="information" data-information></div>
+      </div>
+    </section>
+
+    <section class="item" data-in-scope aria-labelledby="unchecked-title">
+      <div class="sheet">
+        <h3 class="item__title" id="unchecked-title">
+          {tx('insurance.result.unchecked')}
+        </h3>
+        <ul class="list" data-unchecked></ul>
+      </div>
+    </section>
+
+    <section class="item" aria-labelledby="channels-title">
+      <div class="sheet">
+        <h3 class="item__title" id="channels-title">
+          {tx('insurance.result.channels')}
+        </h3>
+        <ul class="list">
+          {channels.map((key) => (
+            <li>{tx(key)}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <template data-template="item">
+      <section class="item" data-item>
+        <span class="item__tab" aria-hidden="true" data-tab-number></span>
+        <div class="sheet">
+          <h3 class="item__title" data-title></h3>
+          <p class="item__status">
+            <svg class="item__mark" data-mark viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#insurance-mark-open"></use>
+            </svg>
+            <span data-status-text></span>
+          </p>
+          <h4 class="rules__title">{tx('insurance.result.how')}</h4>
+          <ol class="list reading__calculation" data-calculation></ol>
+          <h4 class="rules__title" data-rules-title>
+            {tx('insurance.result.rules')}
+          </h4>
+          <ul class="sources rules" data-rules></ul>
+        </div>
+      </section>
+    </template>
+    <template data-template="rule">
+      <li>
+        <a rel="noopener" target="_blank"></a>
+        <span class="rules__status" data-rule-status></span>
+      </li>
+    </template>
+    <template data-template="information">
+      <details class="information__block">
+        <summary data-info-title></summary>
+        <p class="help" data-info-text></p>
+        <ul class="sources sources--wrap" data-info-links></ul>
+      </details>
+    </template>
+  </div>
+
+  <div class="restart">
+    <button class="button button--restart" type="button" data-restart>
+      {tx('insurance.result.restart')}
+    </button>
+  </div>
+</section>
