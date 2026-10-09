@@ -11,6 +11,7 @@ import {
   monthRows,
 } from '../content/rent-indices';
 import { legalInterestSummary, rentalGuide } from '../content/rental-guide';
+import { RENTAL_PAGES, RENTAL_PAGE_IDS, type RentalPageId } from '../content/rental-pages';
 import { rentalFaqEntries } from '../content/rental-faq';
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
@@ -36,6 +37,14 @@ const caps = capsCopy(lang, NORMS, {
   iravRate: irav.figure.rate,
   example: example(),
 });
+// The pages that go deeper into a block of the guide. They exist in Spanish only.
+const deeper: Partial<Record<(typeof blocks)[number]['id'], RentalPageId>> = {
+  fees: 'fees',
+  guarantees: 'deposit',
+  update: 'rise',
+  return: 'deposit_return',
+  charges: 'charges',
+};
 const faq = rentalFaqEntries(lang, NORMS, { documents, checkedOn });
 ---
 
@@ -97,6 +106,13 @@ const faq = rentalFaqEntries(lang, NORMS, { documents, checkedOn });
             </p>
           </>
         )}
+        {deeper[id] && (
+          <p>
+            <a href={link('es', RENTAL_PAGES[deeper[id]].path.slice(1))}>
+              {RENTAL_PAGES[deeper[id]].h1}
+            </a>
+          </p>
+        )}
         <h4 class="rules__title">{tx('rental.guide.norms')}</h4>
         <ul class="sources sources--wrap">
           {sources.map((s) => (
@@ -115,6 +131,17 @@ const faq = rentalFaqEntries(lang, NORMS, { documents, checkedOn });
         </ul>
       </section>
     ))}
+
+    <nav class="sheet sheet--text" aria-labelledby="g-guias">
+      <h2 id="g-guias">{tx('rental.guide.pages')}</h2>
+      <ul class="next-pages">
+        {RENTAL_PAGE_IDS.map((id) => (
+          <li>
+            <a href={link('es', RENTAL_PAGES[id].path.slice(1))}>{RENTAL_PAGES[id].h1}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
 
     <section class="sheet sheet--text">
       <h2 id="g-preguntas">{tx('rental.guide.faq')}</h2>

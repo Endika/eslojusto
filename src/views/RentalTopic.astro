@@ -1,0 +1,195 @@
+---
+import Base from '../layouts/Base.astro';
+import { NORMS } from '../engine/rental/data/norms';
+import { LAST_UPDATED } from '../content/updated';
+import { breadcrumbList } from '../content/structured-data';
+import { faqNode } from '../content/faq';
+import {
+  RENTAL_PAGES,
+  REVIEW,
+  nextPages,
+  rentalPage,
+  type RentalPageId,
+} from '../content/rental-pages';
+import { example, formatLongDay, latest, monthRows } from '../content/rent-indices';
+import { t, type Key } from '../i18n';
+import { link } from '../i18n/languages';
+
+// A page on one question about a rental: what it says, its questions and the pages next to it.
+// Spanish only, like its prose; it exists only in a PUBLIC_RENTAL=1 build, so its date is in
+// LAST_UPDATED only then. A page with sections of its own puts them in the slot.
+interface Props {
+  id: RentalPageId;
+}
+const { id } = Astro.props;
+const irav = latest('irav', monthRows());
+if (!irav) throw new Error('The rental pages need a published IRAV.');
+const { path } = RENTAL_PAGES[id];
+const checkedOn = LAST_UPDATED[path];
+if (!checkedOn) throw new Error(`${path} needs its date in LAST_UPDATED.`);
+const page = rentalPage(id, {
+  norms: NORMS,
+  checkedOn,
+  irav: irav.figure.rate,
+  example: example(),
+});
+const tx = (key: Key) => t('es', key);
+const href = (to: string) => link('es', to.replace(/^\//, ''));
+
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const crumbs = [
+  { name: 'Inicio', path: '/' },
+  { name: REVIEW.name, path: REVIEW.path },
+  { name: page.crumb, path },
+];
+---
+
+<Base
+  title={page.title}
+  description={page.description}
+  path={path}
+  lang="es"
+  langs={['es']}
+  section="settlement"
+  structuredData={[breadcrumbList(home, crumbs), faqNode(page.faq)]}
+>
+  <main class="document rent" id="content">
+    <nav class="crumbs" aria-label="Estás en">
+      <ol>
+        {crumbs.map(({ name, path: to }, i) =>
+          i < crumbs.length - 1 ? (
+            <li>
+              <a href={href(to)}>{name}</a>
+            </li>
+          ) : (
+            <li>
+              <span aria-current="page">{name}</span>
+            </li>
+          ),
+        )}
+      </ol>
+    </nav>
+    <header class="document__head">
+      <h1 class="document__title">{page.h1}</h1>
+      <p class="guide__lead">{page.lead}</p>
+      <p class="guide__sources">
+        <span>{t('es', 'rental.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+        <span>
+          {tx('guide.sources')}: <a href={NORMS.lau.url}>Ley de Arrendamientos Urbanos</a> ·{' '}
+          <a href={NORMS.rdl29_2026.url}>Real Decreto-ley 29/2026</a>
+        </span>
+        <a href={href('/aviso-legal/')}>{tx('guide.who')}</a>
+      </p>
+    </header>
+
+    <div class="document__sheets">
+      {page.sections?.map((section) => (
+        <section class="sheet sheet--text" aria-labelledby={section.id} data-topic={section.id}>
+          <h2 id={section.id}>{section.heading}</h2>
+          {section.paragraphs.map((text) => (
+            <p>{text}</p>
+          ))}
+          {section.caps && (
+            <dl class="data-list caps">
+              {section.caps.map(({ id: cap, when, rule, sources }) => (
+                <div data-cap={cap}>
+                  <dt>{when}</dt>
+                  <dd>
+                    <p>{rule}</p>
+                    <ul class="sources">
+                      {sources.map((source) => (
+                        <li>
+                          <a href={source.url}>{source.citation}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          {section.status && (
+            <p class="status" role="note">
+              {section.status}
+            </p>
+          )}
+          {section.list && (
+            <ul>
+              {section.list.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          )}
+          {section.example?.map((text, i) => (
+            <p class="example">
+              {i === 0 && <span class="example__label">Ejemplo.</span>} {text}
+            </p>
+          ))}
+          {section.after?.map((text) => (
+            <p>{text}</p>
+          ))}
+          {section.links && (
+            <ul class="next-pages">
+              {section.links.map(({ label, path: to }) => (
+                <li>
+                  <a href={href(to)}>{label}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+          {section.folio && (
+            <p class="folio">
+              {section.folio.article && (
+                <>
+                  Art. <span>{section.folio.article}</span>{' '}
+                </>
+              )}
+              {section.folio.law}
+            </p>
+          )}
+        </section>
+      ))}
+
+      <slot />
+
+      {page.sources.length > 0 && (
+        <section class="sheet sheet--text" aria-labelledby="normas">
+          <h2 id="normas">Normas</h2>
+          <ul class="sources sources--wrap">
+            {page.sources.map((s) => (
+              <li>
+                <a href={s.url}>{s.citation}</a>{' '}
+                <span class="rules__status" data-status={s.statusCode}>
+                  {s.status}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section class="sheet sheet--text" aria-labelledby="preguntas">
+        <h2 id="preguntas">{tx('guide.faq')}</h2>
+        <div class="faq-list">
+          {page.faq.map(({ anchor, question, answer }) => (
+            <details class="faq-item" id={anchor}>
+              <summary>{question}</summary>
+              <p>{answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <nav class="sheet sheet--text" aria-labelledby="sigue">
+        <h2 id="sigue">Sigue leyendo</h2>
+        <ul class="next-pages">
+          {nextPages(id).map(({ name, path: to }) => (
+            <li>
+              <a href={href(to)}>{name}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </main>
+</Base>
