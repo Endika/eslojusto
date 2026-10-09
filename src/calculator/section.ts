@@ -1,8 +1,25 @@
 import type { CivilDate } from '../engine/date';
 import { required } from './dom';
 import { formEntries, setEntry, type FormEntries } from './fill';
-import { firstIncomplete, indexOfHash, lastSheet, resultStep, stepFrom, type Flow } from './flow';
+import {
+  firstIncomplete,
+  indexOfHash,
+  lastSheet,
+  resultStep,
+  stepAt,
+  stepFrom,
+  type Flow,
+} from './flow';
 import { createNavigation, type NavigationEvents } from './navigation';
+
+// What a visit through a section's sheets reports, for whoever listens.
+export interface SectionEvents<S extends string> extends NavigationEvents<S> {
+  stepCompleted(step: S): void;
+  fieldRejected(step: S, field: string): void;
+  // A frequently asked question, by the id of its <details>.
+  helpOpened(topic: string): void;
+  startedOver(): void;
+}
 
 // What a review section brings to the shared walk through its sheets: its form, how it checks a
 // sheet, how it stops at its gate and how it reviews the answers.
@@ -11,7 +28,7 @@ export interface Section<S extends string, Sheet extends S, E extends { readonly
   readonly formId: string;
   readonly flow: Flow<S>;
   readonly sheets: readonly Sheet[];
-  readonly events: NavigationEvents<S>;
+  readonly events: SectionEvents<S>;
   readonly today: () => CivilDate;
   applyConditions(form: HTMLFormElement): void;
   sheetOfField(field: E['field']): Sheet;
@@ -69,7 +86,12 @@ export function setUpSection<
     today,
     flow,
   );
+  const { events } = section;
   const conditions = () => section.applyConditions(form);
+
+  function trackErrors(errors: readonly E[]) {
+    for (const { field } of errors) events.fieldRejected(section.sheetOfField(field), field);
+  }
 
   function focusError(errors: readonly E[]) {
     const first = errors[0];
@@ -80,6 +102,7 @@ export function setUpSection<
   }
 
   function goToError(errors: readonly E[]) {
+    trackErrors(errors);
     section.renderErrors(form, errors);
     const first = errors[0];
     if (!first) return;
@@ -105,9 +128,11 @@ export function setUpSection<
     const errors = section.sheetErrors(form, sheet, today());
     section.renderErrors(form, errors);
     if (errors.length > 0) {
+      trackErrors(errors);
       focusError(errors);
       return;
     }
+    events.stepCompleted(sheet);
     if (stopAtGate()) return;
     const next = stepFrom(flow, form, nav.current, 1);
     // The last sheet that applies closes the walk with the review.
@@ -127,6 +152,7 @@ export function setUpSection<
       return false;
     }
     section.renderErrors(form, []);
+    events.stepCompleted(stepAt(flow, nav.current));
     showResult();
     return true;
   }
@@ -160,9 +186,21 @@ export function setUpSection<
 
   window.addEventListener('popstate', () => nav.goBack(indexOfHash(flow, location.hash), {}));
 
+  // Which question a visitor opens; `toggle` does not bubble, so it is caught on the way down.
+  root.addEventListener(
+    'toggle',
+    (e) => {
+      const d = e.target;
+      if (d instanceof HTMLDetailsElement && d.open && d.hasAttribute('data-help'))
+        events.helpOpened(d.id);
+    },
+    true,
+  );
+
   required(result.querySelector('[data-restart]'), 'the restart button').addEventListener(
     'click',
     () => {
+      events.startedOver();
       section.restarted?.();
       form.reset();
       section.renderErrors(form, []);

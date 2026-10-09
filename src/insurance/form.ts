@@ -14,6 +14,9 @@ import {
   type ValidationCode,
   type ValidationError,
 } from '../engine/insurance/validate';
+import type { InsuranceFormField } from './ports';
+
+export type { InsuranceFormField } from './ports';
 
 // The sheets in order. Step ids are also the URL fragments, so they keep their Spanish names.
 export const SHEETS = [
@@ -37,24 +40,6 @@ export const LINES: readonly InsuranceLine[] = [
   'other',
 ];
 export const CAR_COVERS: readonly CarCover[] = ['compulsory_only', 'with_voluntary'];
-
-export const INSURANCE_FIELDS = [
-  'line',
-  'carCover',
-  'mortgageRequired',
-  'renews',
-  'expiresOn',
-  'distance',
-  'concludedOn',
-  'policyReceived',
-  'policyReceivedOn',
-  'hasNotice',
-  'noticeReceivedOn',
-  'previousPremium',
-  'newPremium',
-  'changes',
-] as const;
-export type InsuranceFormField = (typeof INSURANCE_FIELDS)[number];
 
 export const SHEET_FIELDS: Readonly<Record<Sheet, readonly InsuranceFormField[]>> = {
   poliza: ['line'],

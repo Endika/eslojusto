@@ -1,3 +1,5 @@
+import { insuranceAnalytics } from '../analytics/insurance';
+import { track } from '../analytics/posthog';
 import { INSURANCE_NORMS } from '../engine/insurance/data/norms';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import { pageTranslator } from '../i18n/client';
@@ -20,12 +22,12 @@ const documentsBuild =
 const reviewed: ((r: CompletedInsuranceReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
-// The insurance review measures nothing yet: no event of it is in the analytics catalogue. The
-// letter listens to each review shown and each one cleared.
+const analytics = insuranceAnalytics(track, () => performance.now());
+// The measurement hears every event; the letter listens to each review shown and each one cleared.
 const events: InsuranceEvents = {
-  stepShown() {},
-  wentBack() {},
+  ...analytics,
   reviewCompleted(r) {
+    analytics.reviewCompleted(r);
     for (const listener of reviewed) listener(r);
   },
   reviewCleared() {

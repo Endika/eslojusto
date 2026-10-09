@@ -1,6 +1,8 @@
 import { CREDIT_NORMS } from '../engine/credit/data/norms';
 import { CREDIT_SOURCES } from '../engine/credit/data/sources';
 import { BE1904 } from '../engine/credit/data/be1904';
+import { creditAnalytics } from '../analytics/credit';
+import { track } from '../analytics/posthog';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import { setUpCredit } from '../credit/main';
 import type { CompletedCreditReview, CreditEvents } from '../credit/ports';
@@ -22,12 +24,12 @@ const documentsBuild =
 const reviewed: ((r: CompletedCreditReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
-// The credit review measures nothing yet: no event of it is in the analytics catalogue. The pass
-// listens to each review shown and each one cleared.
+const analytics = creditAnalytics(track, () => performance.now());
+// The measurement hears every event; the pass listens to each review shown and each one cleared.
 const events: CreditEvents = {
-  stepShown() {},
-  wentBack() {},
+  ...analytics,
   reviewCompleted(r) {
+    analytics.reviewCompleted(r);
     for (const listener of reviewed) listener(r);
   },
   reviewCleared() {

@@ -20,6 +20,16 @@ describe.skipIf(!built || withInsurance)('a build without the insurance switch',
     expect(read('dist/sitemap-0.xml')).not.toContain('/seguros/');
     expect(readdirSync('dist/_astro').filter((f) => f.startsWith('Insurance.'))).toEqual([]);
   });
+  it('ships none of its analytics codes', () => {
+    const scripts = readdirSync('dist/_astro')
+      .filter((f) => f.endsWith('.js'))
+      .map((f) => read(`dist/_astro/${f}`));
+    for (const code of ['insurance_review_completed', 'faq-seguro-aviso', 'renovacion'])
+      expect(
+        scripts.filter((js) => js.includes(`\`${code}\``)),
+        code,
+      ).toEqual([]);
+  });
   it('keeps the home page as it was', () => {
     const html = read('dist/index.html');
     expect(html).not.toContain('seguros/');

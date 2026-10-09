@@ -20,6 +20,9 @@ import {
   type ValidationCode,
   type ValidationError,
 } from '../engine/credit/validate';
+import type { CreditFormField } from './ports';
+
+export type { CreditFormField } from './ports';
 
 // The sheets in order. Step ids are also the URL fragments, so they keep their Spanish names.
 export const SHEETS = [
@@ -53,51 +56,6 @@ export const RATE_TYPES = ['fixed', 'variable'] as const;
 export const CHARGE_PAYMENTS: readonly ChargePayment[] = ['deducted', 'financed', 'paid'];
 export const PREMIUM_KINDS = ['single', 'periodic'] as const;
 export const COMPARED_APRS = ['recalculated', 'declared'] as const;
-
-export const CREDIT_FIELDS = [
-  'product',
-  'purpose',
-  'principal',
-  'cardLimit',
-  'agreedOn',
-  'drawnOn',
-  'nominalRate',
-  'rateType',
-  'aprStated',
-  'declaredApr',
-  'declaredTotalPayable',
-  'instalmentCount',
-  'instalmentAmount',
-  'firstDueOn',
-  'hasBalloon',
-  'balloonAmount',
-  'balloonDueOn',
-  'openingFee',
-  'openingHow',
-  'otherFee',
-  'otherHow',
-  'hasInsurance',
-  'premium',
-  'premiumKind',
-  'premiumFinanced',
-  'insuranceRequired',
-  'annualFee',
-  'monthlyPayment',
-  'balance',
-  'confirmedApr',
-  'repaid',
-  'repaidOn',
-  'principalRepaid',
-  'compensation',
-  'interestSettled',
-  'agreedEndOn',
-  'remainingInterest',
-  'paidByInsurance',
-  'discountLost',
-  'infoReceived',
-  'infoReceivedOn',
-] as const;
-export type CreditFormField = (typeof CREDIT_FIELDS)[number];
 
 export const SHEET_FIELDS: Readonly<Record<Sheet, readonly CreditFormField[]>> = {
   producto: ['product'],

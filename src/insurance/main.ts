@@ -26,6 +26,7 @@ export const setUpInsurance = (
       if (g.inScope) return false;
       renderOutOfScope(result, g.reason, tr);
       events.reviewCleared();
+      events.outOfScope(g.reason);
       return true;
     },
     review(form, result, day) {
@@ -34,12 +35,14 @@ export const setUpInsurance = (
       const r = reviewInsurance(parsed.input, day, tables);
       // The form already ran the engine's checks; this only guards against the two drifting apart.
       if (!r.ok) return onQuestions(r.errors);
-      if (r.review.scope.inScope) {
+      const reach = r.review.scope;
+      if (reach.inScope) {
         renderInsuranceResult(result, r.review, tr);
-        events.reviewCompleted({ input: parsed.input, review: r.review });
+        events.reviewCompleted({ review: r.review, input: parsed.input });
       } else {
-        renderOutOfScope(result, r.review.scope.reason, tr);
+        renderOutOfScope(result, reach.reason, tr);
         events.reviewCleared();
+        events.outOfScope(reach.reason);
       }
       return [];
     },

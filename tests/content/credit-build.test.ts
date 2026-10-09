@@ -24,6 +24,16 @@ describe.skipIf(!built || withCredit)('a build without the credit switch', () =>
     expect(read('dist/sitemap-0.xml')).not.toContain('/financiacion/');
     expect(readdirSync('dist/_astro').filter((f) => f.startsWith('Credit.'))).toEqual([]);
   });
+  it('ships none of its analytics codes', () => {
+    const scripts = readdirSync('dist/_astro')
+      .filter((f) => f.endsWith('.js'))
+      .map((f) => read(`dist/_astro/${f}`));
+    for (const code of ['credit_review_completed', 'faq-credito-tae', 'cuota-final'])
+      expect(
+        scripts.filter((js) => js.includes(`\`${code}\``)),
+        code,
+      ).toEqual([]);
+  });
   it('keeps the home page as it was', () => {
     const html = read('dist/index.html');
     expect(html).not.toContain('financiacion/');
