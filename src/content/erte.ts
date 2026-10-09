@@ -37,6 +37,15 @@ export const ERTE_PAGE = {
   restart: 'Empezar de nuevo',
 } as const;
 
+// The paragraphs of the legal notice about the page, only in a build that has it.
+export const ERTE_LEGAL = {
+  title: 'La estimación del paro durante un ERTE',
+  does: 'Estima el paro bruto al mes durante un ERTE por causas económicas, técnicas, organizativas o de producción, por fuerza mayor o del mecanismo RED, con la base reguladora y los datos que escribes tú: la cuantía con sus límites, si es desempleo total o parcial, si gasta el paro que te quede para más adelante y la cotización que hace falta. Cada bloque lleva el artículo de la Ley General de la Seguridad Social del que sale, también de sus disposiciones adicionales 41.ª y 46.ª.',
+  doesNot:
+    'No calcula tu base reguladora ni lo que cobras en neto, no comprueba si cumples los requisitos ni si el ERTE es válido, y no sustituye lo que reconozca el SEPE. Informa sobre la ley y no es asesoramiento jurídico.',
+  beta: 'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves una cifra que no cuadra con la ley, puedes escribir a',
+} as const;
+
 export const ERTE_QUESTIONS = {
   regime: {
     question: '¿Qué tipo de ERTE tienes?',

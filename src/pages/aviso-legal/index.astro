@@ -3,7 +3,13 @@ import Base from '../../layouts/Base.astro';
 import { t, type Key } from '../../i18n';
 import { DOCUMENTS } from '../../documents/config';
 import { PASS_DAYS, PASS_READS } from '../../documents/contract';
-import { EMPLOYMENT_BUILD, HOUSEHOLD_BUILD, RENTAL_BUILD } from '../../content/sections';
+import {
+  EMPLOYMENT_BUILD,
+  ERTE_BUILD,
+  HOUSEHOLD_BUILD,
+  RENTAL_BUILD,
+} from '../../content/sections';
+import { ERTE_LEGAL, ERTE_PAGE } from '../../content/erte';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
 const tx = (key: Key, vars?: Record<string, string>) => t('es', key, vars);
@@ -23,6 +29,8 @@ const rental = RENTAL_BUILD;
 const employment = EMPLOYMENT_BUILD;
 // The household review exists only in a PUBLIC_HOUSEHOLD=1 build; so do the paragraphs about it.
 const household = HOUSEHOLD_BUILD;
+// The ERTE page exists only in a PUBLIC_ERTE=1 build; so do the paragraphs about it.
+const erte = ERTE_BUILD;
 ---
 
 <Base
@@ -146,6 +154,19 @@ const household = HOUSEHOLD_BUILD;
           <p>{tx('legal_notice.household.does_not')}</p>
           <p>
             {tx('legal_notice.household.beta')} <a href={`mailto:${email}`}>{email}</a>.
+          </p>
+        </section>
+      )}
+
+      {erte && (
+        <section class="sheet sheet--text">
+          <h2 id="al-erte">
+            {ERTE_LEGAL.title} <span class="beta">{ERTE_PAGE.beta}</span>
+          </h2>
+          <p>{ERTE_LEGAL.does}</p>
+          <p>{ERTE_LEGAL.doesNot}</p>
+          <p>
+            {ERTE_LEGAL.beta} <a href={`mailto:${email}`}>{email}</a>.
           </p>
         </section>
       )}
