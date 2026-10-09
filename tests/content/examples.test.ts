@@ -90,14 +90,27 @@ describe('the worked examples match the engine', () => {
   });
 
   it('by seniority: the final pay stops growing after a year, the severance does not', () => {
-    const [threeMonths, , oneYear, threeYears] = x.bySeniority;
-    expect(oneYear?.finalPay).toEqual(threeYears?.finalPay);
+    const [threeMonths, , oneYear, twoYears, fiveYears] = x.bySeniority;
+    expect(x.bySeniority.map((r) => r.label)).toEqual([
+      '3 meses',
+      '6 meses',
+      '1 año',
+      '2 años',
+      '5 años',
+    ]);
+    expect(oneYear?.finalPay).toEqual(twoYears?.finalPay);
+    expect(oneYear?.finalPay).toEqual(fiveYears?.finalPay);
     expect(threeMonths?.finalPay.min).toBeLessThan(oneYear?.finalPay.min ?? 0);
     expect(oneYear?.fixedTerm).toBe(690.41);
     expect(oneYear?.fixedTermLimit).toBe('sector_agreement');
-    // A contract for production circumstances can't last three years: no figure, only a note.
-    expect(threeYears?.fixedTermLimit).toBe('over');
-    expect(threeYears?.fixedTerm).toBeNull();
+    // A contract for production circumstances can't last two years or more: no figure, only a note.
+    for (const row of [twoYears, fiveYears]) {
+      expect(row?.fixedTermLimit).toBe('over');
+      expect(row?.fixedTerm).toBeNull();
+    }
+    // Independent of the engine: 20 and 33 days a year, with 21.000 € a year (≈57,53 €/day).
+    expect(fiveYears?.objective).toBeCloseTo((21000 / 365) * 20 * 5, 0);
+    expect(fiveYears?.unfair).toBeCloseTo((21000 / 365) * 33 * 5, 0);
     for (const row of x.bySeniority) {
       const start = x.SENIORITY.find(([label]) => label === row.label)?.[1] ?? '';
       const severance = (cause: 'unfair_dismissal' | 'objective_dismissal') =>

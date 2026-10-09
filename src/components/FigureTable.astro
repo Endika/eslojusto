@@ -1,17 +1,21 @@
 ---
 // A table of worked figures. Its caption sits above the box, so it never scrolls away with a table
 // wider than a phone, which scrolls inside the box and never moves the page.
+// `label` names the region and the table when the caption is too long or repeats words that a
+// form on the same page uses as labels; the caption stays visible and unchanged.
 interface Props {
   id: string;
+  label?: string;
 }
-const { id } = Astro.props;
+const { id, label } = Astro.props;
+const naming = label ? { 'aria-label': label } : { 'aria-labelledby': id };
 ---
 
 <p class="table-caption" id={id}>
   <slot name="caption" />
 </p>
-<div class="table-scroll" role="region" aria-labelledby={id} tabindex="0">
-  <table class="figures-table" aria-labelledby={id}>
+<div class="table-scroll" role="region" {...naming} tabindex="0">
+  <table class="figures-table" {...naming}>
     <slot />
   </table>
 </div>
