@@ -28,6 +28,7 @@ import {
   type Shown,
   type Verdict,
 } from './summary';
+import { TAB_NUMBER } from './steps';
 
 // «2025-03-14» → «14-03-2025».
 export const dayText = (iso: string): string => iso.split('-').reverse().join('-');
@@ -175,12 +176,6 @@ const TONE: Record<RentalItemResult['kind'], string> = {
   charge: 'holidays',
   deposit_return: 'settlement',
   deposit_interest: 'settlement',
-};
-const TAB_NUMBER: Record<string, string> = {
-  dates: '02',
-  salary: '03',
-  holidays: '04',
-  settlement: '05',
 };
 
 export function itemTitle(item: RentalItemResult, input: RentalInput, tr: Translate): string {

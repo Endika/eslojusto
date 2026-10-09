@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { nextSheet } from '../support/sheets';
+import { fitsScreen, nextSheet } from '../support/sheets';
 
 // Every case reads the indices and norms as loaded on this day, so the clock is fixed to it.
 const TODAY = new Date('2026-10-08T12:00:00');
@@ -29,10 +29,16 @@ interface Case extends Contract {
   readonly clause: string;
   readonly percent?: string;
   readonly rise: Rise;
+  readonly keysReturnedOn?: string;
 }
 
 const sheet = (page: Page, name: string) => page.getByRole('group', { name, exact: true });
-const next = nextSheet;
+
+// `fit` also checks that the sheet sits whole on screen before leaving it.
+async function next(page: Page, fit = false) {
+  if (fit) await fitsScreen(page);
+  await nextSheet(page);
+}
 
 async function open(page: Page, viewport: { width: number; height: number }) {
   await page.clock.setFixedTime(TODAY);
@@ -40,37 +46,51 @@ async function open(page: Page, viewport: { width: number; height: number }) {
   await page.goto('alquiler/');
 }
 
-async function fillContract(page: Page, c: Contract) {
-  const s = sheet(page, 'Tu contrato');
-  await s.getByLabel(c.type ?? 'Vivienda habitual', { exact: true }).check();
-  await s.getByLabel('Fecha del contrato', { exact: true }).fill(c.signed);
-  await s.getByLabel('Fecha de entrada', { exact: true }).fill(c.start);
-  await next(page);
+async function fillContract(page: Page, c: Contract, fit = false) {
+  await sheet(page, 'Tu contrato')
+    .getByLabel('¿Qué tipo de contrato es?')
+    .selectOption({ label: c.type ?? 'Vivienda habitual' });
+  await next(page, fit);
+  const dates = sheet(page, 'Las fechas del contrato');
+  await dates.getByLabel('Fecha del contrato', { exact: true }).fill(c.signed);
+  await dates.getByLabel('Fecha de entrada', { exact: true }).fill(c.start);
+  await next(page, fit);
 }
 
-async function fillCase(page: Page, c: Case) {
-  await fillContract(page, c);
-  const landlord = sheet(page, 'Tu casero');
-  await landlord.getByLabel('Una persona').check();
-  await landlord
-    .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
+async function fillCase(page: Page, c: Case, fit = false) {
+  await fillContract(page, c, fit);
+  await sheet(page, 'Tu casero').getByLabel('Una persona').check();
+  await next(page, fit);
+  await sheet(page, 'Gran tenedor')
     .getByLabel(c.large ?? 'No', { exact: true })
     .check();
-  await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
-  await landlord
+  await next(page, fit);
+  const home = sheet(page, 'Dónde está la vivienda');
+  await home.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
+  await home
     .getByRole('group', { name: '¿Está la vivienda en una zona tensionada?' })
     .getByLabel('No', { exact: true })
     .check();
-  await next(page);
+  await next(page, fit);
   await expect(sheet(page, 'Lo que pagaste al entrar')).toBeVisible();
-  await next(page);
+  await next(page, fit);
+  await expect(sheet(page, 'Otras garantías')).toBeVisible();
+  await next(page, fit);
+  await expect(sheet(page, 'Otros pagos al entrar')).toBeVisible();
+  await next(page, fit);
   const rent = sheet(page, 'La renta');
   await rent.getByLabel('Renta al empezar').fill('1.000,00');
   await rent.getByLabel('Duración pactada, en meses').fill('60');
-  await rent.getByLabel(c.clause, { exact: true }).check();
-  if (c.percent) await rent.getByLabel('Porcentaje al año').fill(c.percent);
-  await next(page);
+  await next(page, fit);
+  const update = sheet(page, 'La actualización de la renta');
+  await update
+    .getByLabel('¿Qué dice el contrato sobre actualizar la renta?')
+    .selectOption({ label: c.clause });
+  if (c.percent) await update.getByLabel('Porcentaje al año').fill(c.percent);
+  await next(page, fit);
   const rises = sheet(page, 'Las subidas');
+  // A list grows inside its own box: the sheet fits before it opens.
+  if (fit) await fitsScreen(page);
   await rises.getByLabel('Sí, añadirlas').check();
   const row = rises.getByRole('group', { name: 'Subida 1' });
   await row.getByLabel('Año de la subida').fill(c.rise.year);
@@ -83,10 +103,17 @@ async function fillCase(page: Page, c: Case) {
     .getByRole('group', { name: '¿Aceptaste esa subida?' })
     .getByLabel(c.rise.agreed, { exact: true })
     .check();
-  await next(page);
+  await nextSheet(page);
+  const out = sheet(page, 'La salida');
+  if (c.keysReturnedOn) {
+    await out.getByLabel('Sí', { exact: true }).check();
+    await out.getByLabel('Día en que devolviste las llaves').fill(c.keysReturnedOn);
+    await next(page, fit);
+    await expect(sheet(page, 'La devolución de la fianza')).toBeVisible();
+  }
+  await next(page, fit);
   await expect(sheet(page, 'Los gastos')).toBeVisible();
-  await next(page);
-  await expect(sheet(page, 'La salida')).toBeVisible();
+  if (fit) await fitsScreen(page);
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
 }
@@ -221,6 +248,32 @@ for (const { name, viewport } of SIZES) {
   });
 }
 
+test('every sheet of the longest path fits in 360×640', async ({ page }) => {
+  await open(page, { width: 360, height: 640 });
+  // The percentage of a fixed-percent clause and the deposit's sheet after leaving: every
+  // question that can be asked is asked.
+  await fillCase(
+    page,
+    {
+      signed: '2020-06-20',
+      start: '2020-06-25',
+      large: 'No lo sé',
+      clause: 'Un porcentaje fijo',
+      percent: '5',
+      rise: {
+        year: '2023',
+        previous: '1000',
+        next: '1050',
+        chargedFrom: '2023-06-01',
+        noticeOn: '2023-05-01',
+        agreed: 'Sí, por escrito',
+      },
+      keysReturnedOn: '2026-07-31',
+    },
+    true,
+  );
+});
+
 test('no sheet scrolls sideways at 360×640, with every list open', async ({ page }) => {
   await open(page, { width: 360, height: 640 });
   const overflow = () =>
@@ -231,46 +284,65 @@ test('no sheet scrolls sideways at 360×640, with every list open', async ({ pag
 
   await fits('contrato');
   await fillContract(page, { signed: '2024-03-15', start: '2024-03-20' });
-  const landlord = sheet(page, 'Tu casero');
   await fits('casero');
-  await landlord.getByLabel('Una empresa').check();
-  await landlord
-    .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
-    .getByLabel('No lo sé')
-    .check();
-  await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Cataluña' });
-  await landlord
+  await sheet(page, 'Tu casero').getByLabel('Una empresa').check();
+  await next(page);
+  await sheet(page, 'Gran tenedor').getByLabel('No lo sé').check();
+  await next(page);
+  const home = sheet(page, 'Dónde está la vivienda');
+  await home.getByLabel('Comunidad autónoma').selectOption({ label: 'Cataluña' });
+  await home
     .getByRole('group', { name: '¿Está la vivienda en una zona tensionada?' })
     .getByLabel('No lo sé')
     .check();
+  await fits('vivienda');
   await next(page);
-  const entry = sheet(page, 'Lo que pagaste al entrar');
-  await entry.getByLabel('Fianza', { exact: true }).fill('1.500');
-  await entry.getByLabel('Sí, añadirlas').check();
-  await entry.getByRole('group', { name: 'Garantía 1' }).getByLabel('Importe').fill('2.000');
-  await entry.getByLabel('Sí, añadir pagos').check();
-  const fee = entry.getByRole('group', { name: 'Pago 1' });
+  await sheet(page, 'Lo que pagaste al entrar').getByLabel('Fianza', { exact: true }).fill('1.500');
+  await next(page);
+  const guarantees = sheet(page, 'Otras garantías');
+  await guarantees.getByLabel('Sí, añadirlas').check();
+  await guarantees.getByRole('group', { name: 'Garantía 1' }).getByLabel('Importe').fill('2.000');
+  await fits('garantias');
+  await next(page);
+  const fees = sheet(page, 'Otros pagos al entrar');
+  await fees.getByLabel('Sí, añadir pagos').check();
+  const fee = fees.getByRole('group', { name: 'Pago 1' });
   await fee.getByLabel('Importe').fill('1.210');
   const later = { name: '¿Te lo descontaron después de la renta o de la fianza?' };
   await fee.getByRole('group', later).getByLabel('No', { exact: true }).check();
-  await entry.getByRole('button', { name: 'Añadir pago' }).click();
-  const second = entry.getByRole('group', { name: 'Pago 2' });
+  await fees.getByRole('button', { name: 'Añadir pago' }).click();
+  const second = fees.getByRole('group', { name: 'Pago 2' });
   await second.getByLabel('Concepto').selectOption({ label: 'Estudio de solvencia' });
   await second.getByLabel('Importe').fill('150');
   await second.getByRole('group', later).getByLabel('No', { exact: true }).check();
-  await fits('entrada');
+  await fits('pagos');
   await next(page);
   const rent = sheet(page, 'La renta');
   await rent.getByLabel('Renta al empezar').fill('1000');
   await rent.getByLabel('Duración pactada, en meses').fill('84');
-  await rent.getByLabel('El IPC', { exact: true }).check();
-  await fits('renta');
+  await next(page);
+  await sheet(page, 'La actualización de la renta')
+    .getByLabel('¿Qué dice el contrato sobre actualizar la renta?')
+    .selectOption({ label: 'El IPC' });
+  await fits('actualizacion');
   await next(page);
   await sheet(page, 'Las subidas').getByLabel('Sí, añadirlas').check();
   await fits('subidas');
   // A list never drops below its first row.
   await expect(sheet(page, 'Las subidas').getByRole('button', { name: /Quitar/ })).toBeHidden();
   await sheet(page, 'Las subidas').getByLabel('No ha habido subidas').check();
+  await next(page);
+  const out = sheet(page, 'La salida');
+  await out.getByLabel('Sí', { exact: true }).check();
+  await out.getByLabel('Día en que devolviste las llaves').fill('2026-07-31');
+  await next(page);
+  const deposit = sheet(page, 'La devolución de la fianza');
+  await deposit.getByRole('button', { name: 'Añadir devolución' }).click();
+  await deposit.getByRole('group', { name: 'Devolución 1' }).getByLabel('Fecha').fill('2026-09-30');
+  await deposit.getByRole('group', { name: 'Devolución 1' }).getByLabel('Importe').fill('1.000');
+  await deposit.getByRole('button', { name: 'Añadir descuento' }).click();
+  await deposit.getByRole('group', { name: 'Descuento 1' }).getByLabel('Importe').fill('200');
+  await fits('fianza');
   await next(page);
   const charges = sheet(page, 'Los gastos');
   await charges.getByLabel('Sí, añadirlos').check();
@@ -282,16 +354,6 @@ test('no sheet scrolls sideways at 360×640, with every list open', async ({ pag
     .getByLabel('Importe de los gastos de ese año (el año al que corresponden)')
     .fill('640');
   await fits('gastos');
-  await next(page);
-  const out = sheet(page, 'La salida');
-  await out.getByLabel('Sí', { exact: true }).check();
-  await out.getByLabel('Día en que devolviste las llaves').fill('2026-07-31');
-  await out.getByRole('button', { name: 'Añadir devolución' }).click();
-  await out.getByRole('group', { name: 'Devolución 1' }).getByLabel('Fecha').fill('2026-09-30');
-  await out.getByRole('group', { name: 'Devolución 1' }).getByLabel('Importe').fill('1.000');
-  await out.getByRole('button', { name: 'Añadir descuento' }).click();
-  await out.getByRole('group', { name: 'Descuento 1' }).getByLabel('Importe').fill('200');
-  await fits('salida');
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
   for (const d of await page.locator('#resultado details').all())
@@ -302,7 +364,7 @@ test('no sheet scrolls sideways at 360×640, with every list open', async ({ pag
   );
 });
 
-test('an empty row on the last sheet can be removed and does not block the review', async ({
+test('an empty row of the deposit can be removed and does not block the review', async ({
   page,
 }) => {
   await open(page, { width: 1280, height: 800 });
@@ -323,18 +385,21 @@ test('an empty row on the last sheet can be removed and does not block the revie
   const out = sheet(page, 'La salida');
   await out.getByLabel('Sí', { exact: true }).check();
   await out.getByLabel('Día en que devolviste las llaves').fill('2026-07-31');
+  await next(page);
+  const deposit = sheet(page, 'La devolución de la fianza');
   for (const [add, row] of [
     ['Añadir devolución', 'Devolución 1'],
     ['Añadir descuento', 'Descuento 1'],
   ] as const) {
-    await out.getByRole('button', { name: add }).click();
-    await out
+    await deposit.getByRole('button', { name: add }).click();
+    await deposit
       .getByRole('group', { name: row })
       .getByRole('button', { name: /Quitar/ })
       .click();
-    await expect(out.getByRole('group', { name: row })).toHaveCount(0);
-    await expect(out.getByRole('button', { name: add })).toBeFocused();
+    await expect(deposit.getByRole('group', { name: row })).toHaveCount(0);
+    await expect(deposit.getByRole('button', { name: add })).toBeFocused();
   }
+  await next(page);
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
   await expect(page.getByRole('region', { name: 'Devolución de la fianza' })).toBeVisible();

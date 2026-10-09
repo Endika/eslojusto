@@ -2940,6 +2940,8 @@ export const es = {
   'rental.tab.salida': 'Salida',
   'rental.tab.resultado': 'Resultado',
 
+  'rental.choose': 'Elige uno',
+
   'rental.contract.question': 'Tu contrato',
   'rental.contract.help':
     'Esta revisión es para contratos de alquiler de vivienda habitual. Con estas respuestas sabrás si el tuyo entra.',
@@ -2957,6 +2959,7 @@ export const es = {
   'rental.contract_type.protected_hint': 'Una vivienda de protección oficial.',
   'rental.contract_type.old_rent': 'Renta antigua',
   'rental.contract_type.old_rent_hint': 'Un contrato anterior al 9 de mayo de 1985.',
+  'rental.dates.question': 'Las fechas del contrato',
   'rental.contract.signed': 'Fecha del contrato',
   'rental.contract.signed_hint': 'El día en que se firmó el contrato.',
   'rental.contract.start': 'Fecha de entrada',
@@ -2966,9 +2969,11 @@ export const es = {
   'rental.landlord.type': '¿Quién te alquila la vivienda?',
   'rental.landlord.type_hint':
     'Lo dice el contrato: el nombre de una persona o el de una sociedad (S.L., S.A.).',
+  'rental.large.question': 'Gran tenedor',
   'rental.landlord.large': '¿Tu casero es gran tenedor?',
   'rental.landlord.large_hint':
     'Es gran tenedor quien tiene más de diez viviendas o más de 1.500 m² de uso residencial, sin contar garajes ni trasteros (art. 3.k de la Ley 12/2023); en una zona tensionada, la comunidad autónoma puede bajarlo a cinco o más viviendas. Ser una empresa no basta: una sociedad con pocos pisos no lo es.',
+  'rental.home.question': 'Dónde está la vivienda',
   'rental.landlord.region': 'Comunidad autónoma',
   'rental.landlord.region_hint': 'Donde está la vivienda.',
   'rental.landlord.region_choose': 'Elige una',
@@ -2983,6 +2988,7 @@ export const es = {
   'rental.entry.deposit_hint': 'En euros.',
   'rental.entry.advance': 'Mensualidades por adelantado',
   'rental.entry.advance_hint': 'Las que pagaste al entrar, contando la del primer mes.',
+  'rental.guarantees.question': 'Otras garantías',
   'rental.entry.guarantees': '¿Diste otras garantías además de la fianza?',
   'rental.entry.guarantees_hint':
     'Un depósito o garantía en dinero, un aval bancario o un seguro de impago.',
@@ -2992,6 +2998,7 @@ export const es = {
   'rental.entry.guarantee_amount': 'Importe',
   'rental.entry.guarantee_amount_hint':
     'Si es un aval o un seguro y no lo sabes, déjalo en blanco.',
+  'rental.fees.question': 'Otros pagos al entrar',
   'rental.entry.fees': '¿Pagaste a la agencia o al casero algo más al entrar?',
   'rental.entry.fees_hint':
     'Honorarios, formalización del contrato, estudio de solvencia, reserva o gestión.',
@@ -3007,6 +3014,7 @@ export const es = {
   'rental.rent.initial_hint': 'La que fija el contrato, en euros al mes.',
   'rental.rent.months': 'Duración pactada, en meses',
   'rental.rent.months_hint': 'Un año son 12 meses; cinco años, 60.',
+  'rental.clause.question': 'La actualización de la renta',
   'rental.rent.clause': '¿Qué dice el contrato sobre actualizar la renta?',
   'rental.rent.clause_help':
     'Búscalo en la cláusula de «actualización» o de «revisión» de la renta: suele nombrar el IRAV, el IPC o un porcentaje.',
@@ -3064,6 +3072,7 @@ export const es = {
   'rental.moveout.question': 'La salida',
   'rental.moveout.ask': '¿Has dejado ya la vivienda?',
   'rental.moveout.keys': 'Día en que devolviste las llaves',
+  'rental.deposit.question': 'La devolución de la fianza',
   'rental.moveout.returns': 'Lo que te han devuelto de la fianza',
   'rental.moveout.returns_hint': 'Una fila por cada pago; si no te han devuelto nada, ninguna.',
   'rental.moveout.returns_add': 'Añadir devolución',

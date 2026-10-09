@@ -1,0 +1,59 @@
+---
+// One question answered from a list too long for a phone's screen: a select with its label, hint
+// and slip. The chosen option's own hint shows under it.
+interface Option {
+  value: string;
+  label: string;
+  hint?: string;
+}
+interface Props {
+  name: string;
+  label: string;
+  hint?: string;
+  options: readonly Option[];
+  // The empty first option; without it the select starts on `selected`.
+  choose?: string;
+  selected?: string;
+  attributes?: Record<string, string>;
+}
+const { name, label, hint, options, choose, selected, attributes = {} } = Astro.props;
+const hintId = `hint-${name}`;
+const errorId = `error-${name}`;
+const describe = [...(hint ? [hintId] : []), errorId].join(' ');
+---
+
+<div class="field" data-field={name} {...attributes}>
+  <label class="field__label" for={name}>
+    {label}
+  </label>
+  {hint && (
+    <p class="hint" id={hintId}>
+      {hint}
+    </p>
+  )}
+  <select
+    class="field__input field__input--select"
+    id={name}
+    name={name}
+    aria-describedby={describe}
+  >
+    {choose !== undefined && <option value="">{choose}</option>}
+    {options.map((o) => (
+      <option value={o.value} selected={o.value === selected}>
+        {o.label}
+      </option>
+    ))}
+  </select>
+  {/* Read out as it shows, since no radio of its own points at it any more. */}
+  <div aria-live="polite">
+    {options.map(
+      (o) =>
+        o.hint && (
+          <p class="hint" id={`hint-${name}-${o.value}`} data-if={`${name}:${o.value}`} hidden>
+            {o.hint}
+          </p>
+        ),
+    )}
+  </div>
+  <p class="errata" id={errorId} data-error-for={name} hidden></p>
+</div>

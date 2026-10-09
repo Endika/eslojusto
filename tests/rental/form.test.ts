@@ -1,15 +1,21 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest';
 import { NORMS } from '../../src/engine/rental/data/norms';
-import { applyConditions, gate } from '../../src/rental/conditions';
+import { applies, applyConditions, gate } from '../../src/rental/conditions';
 import { fieldOfError, readRentalForm, sheetErrors } from '../../src/rental/form';
 import { ROW_LISTS, setUpRows } from '../../src/rental/rows';
+import { SECTION_OF_STEP, STEPS, TABS } from '../../src/rental/steps';
 import { contract, TODAY, tr, update } from './fixtures';
 
 const radios = (name: string, values: readonly string[], row = false) =>
   values
     .map((v) => `<input type="radio" ${row ? 'data-row-field' : 'name'}="${name}" value="${v}" />`)
     .join('');
+
+const select = (name: string, values: readonly string[]) =>
+  `<select name="${name}"><option value=""></option>${values
+    .map((v) => `<option value="${v}">${v}</option>`)
+    .join('')}</select>`;
 
 const FEE_ROW = `
   <li data-row><fieldset><legend data-row-legend></legend>
@@ -45,7 +51,7 @@ const list = (name: string, row: string, condition = '') => `
 function form(): HTMLFormElement {
   const el = document.createElement('form');
   el.innerHTML = `
-    ${radios('contractType', ['main_home', 'seasonal', 'room'])}
+    ${select('contractType', ['main_home', 'seasonal', 'room'])}
     <input type="date" name="signedOn" /><input type="date" name="startDate" />
     ${radios('landlordType', ['person', 'company'])}
     ${radios('largeLandlord', ['yes', 'no', 'unknown'])}
@@ -60,8 +66,9 @@ function form(): HTMLFormElement {
       .map((l) => list(l, '<li data-row></li>', 'data-if="never:yes"'))
       .join('')}
     <input name="initialRent" /><input name="agreedMonths" />
-    ${radios('updateClause', ['none', 'ipc', 'fixed_percent'])}
-    <div data-if="updateClause:fixed_percent"><input name="fixedPercent" /></div>`;
+    ${select('updateClause', ['none', 'ipc', 'fixed_percent'])}
+    <div data-if="updateClause:fixed_percent"><input name="fixedPercent" /></div>
+    ${radios('movedOut', ['no', 'yes'])}`;
   document.body.replaceChildren(el);
   setUpRows(el, tr, () => applyConditions(el));
   applyConditions(el);
@@ -88,6 +95,7 @@ const ANSWERS: readonly (readonly [string, string])[] = [
   ['initialRent', '1.000,00'],
   ['agreedMonths', '60'],
   ['updateClause', 'ipc'],
+  ['movedOut', 'no'],
 ];
 
 function answered(change: readonly (readonly [string, string])[] = []): HTMLFormElement {
@@ -118,7 +126,7 @@ describe('reading the form', () => {
 
   it('asks the percentage only for a fixed-percent clause', () => {
     const f = answered([['updateClause', 'fixed_percent']]);
-    expect(sheetErrors(f, 'renta', TODAY)).toEqual([
+    expect(sheetErrors(f, 'actualizacion', TODAY)).toEqual([
       { field: 'fixedPercent', code: 'missing_value' },
     ]);
   });
@@ -129,7 +137,7 @@ describe('reading the form', () => {
       ['startDate', '2027-01-01'],
       ['initialRent', '0'],
     ]);
-    expect(sheetErrors(f, 'contrato', TODAY)).toEqual([
+    expect(sheetErrors(f, 'fechas', TODAY)).toEqual([
       { field: 'signedOn', code: 'signed_in_future' },
     ]);
     expect(sheetErrors(f, 'renta', TODAY)).toEqual([
@@ -146,11 +154,11 @@ describe('reading the form', () => {
     set(f, 'fees.0.amount', '150');
     set(f, 'fees.0.deductedLater', 'no');
     expect(row('requestedInWriting')?.disabled).toBe(true);
-    expect(sheetErrors(f, 'entrada', TODAY)).toEqual([]);
+    expect(sheetErrors(f, 'pagos', TODAY)).toEqual([]);
     set(f, 'signedOn', '2026-10-08');
     set(f, 'startDate', '2026-10-08');
     expect(row('requestedInWriting')?.disabled).toBe(false);
-    expect(sheetErrors(f, 'entrada', TODAY)).toEqual([
+    expect(sheetErrors(f, 'pagos', TODAY)).toEqual([
       { field: 'fees.0.requestedInWriting', code: 'missing_choice' },
     ]);
     set(f, 'fees.0.requestedInWriting', 'unknown');
@@ -226,6 +234,19 @@ describe('the gate', () => {
   it('lets the visit go on until the contract sheet reads', () => {
     expect(gate(form(), NORMS)).toEqual({ inScope: true });
   });
+
+  it('keeps to the contract’s sheets for a contract outside the review', () => {
+    const f = answered([['contractType', 'seasonal']]);
+    expect(applies(f, 'fechas', NORMS)).toBe(true);
+    expect(applies(f, 'casero', NORMS)).toBe(false);
+  });
+
+  it('asks what came back of the deposit only once the home is left', () => {
+    const f = answered();
+    expect(applies(f, 'fianza', NORMS)).toBe(false);
+    set(f, 'movedOut', 'yes');
+    expect(applies(f, 'fianza', NORMS)).toBe(true);
+  });
 });
 
 describe('engine errors on rows', () => {
@@ -262,5 +283,23 @@ describe('engine errors on rows', () => {
     [{ field: 'signedOn', code: 'signed_in_future' }, 'signedOn'],
   ] as const)('%o lands on %s', (error, field) => {
     expect(fieldOfError(error, rows, input, TODAY)).toBe(field);
+  });
+});
+
+describe('the tabs', () => {
+  it('follow the walk: each one starts on its section’s first sheet, in order', () => {
+    const firsts = TABS.map(([tone, step]) => {
+      expect(SECTION_OF_STEP[step]).toBe(tone);
+      return STEPS.findIndex((s) => SECTION_OF_STEP[s] === tone);
+    });
+    expect(firsts).toEqual(TABS.map(([, step]) => STEPS.indexOf(step)));
+    expect(firsts).toEqual([...firsts].sort((a, b) => a - b));
+  });
+
+  it('weigh as many sheets as each section holds, the result two', () => {
+    for (const [tone, , , weight] of TABS) {
+      const sheets = STEPS.filter((s) => SECTION_OF_STEP[s] === tone).length;
+      expect(weight).toBe(tone === 'result' ? 2 : sheets);
+    }
   });
 });

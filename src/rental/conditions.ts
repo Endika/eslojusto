@@ -67,14 +67,17 @@ export function applyConditions(form: HTMLFormElement): void {
   }
 }
 
-// The gate after the contract sheet: a contract the review does not cover goes straight to the
+// The gate after the contract's sheets: a contract the review does not cover goes straight to the
 // result. Until the three answers read, the visit goes on.
 export function gate(form: HTMLFormElement, norms: NormTable): Scope {
   const answers = contractAnswers(form);
   return answers === null ? { inScope: true } : scope(answers, norms);
 }
 
+// The contract's sheets ask the gate's answers; the rest follow it, and what was given back of the
+// deposit only once the home is left.
 export function applies(form: HTMLFormElement, step: Sheet | 'resultado', norms: NormTable) {
-  if (step === 'contrato' || step === 'resultado') return true;
-  return gate(form, norms).inScope;
+  if (step === 'contrato' || step === 'fechas' || step === 'resultado') return true;
+  if (!gate(form, norms).inScope) return false;
+  return step !== 'fianza' || valueIn(form, '[name="movedOut"]') === 'yes';
 }

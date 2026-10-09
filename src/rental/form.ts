@@ -26,14 +26,23 @@ import { parseAmount } from '../calculator/number';
 import type { RentalField } from './ports';
 import { ROW_LISTS, parseRowField, rowField, type RowList } from './rows';
 
+// The sheets in order. Each fits a phone's screen, so a long topic takes more than one; the
+// charges come last because the move-out's follow-up sheet is asked only after leaving.
 export const SHEETS = [
   'contrato',
+  'fechas',
   'casero',
+  'gran-tenedor',
+  'vivienda',
   'entrada',
+  'garantias',
+  'pagos',
   'renta',
+  'actualizacion',
   'subidas',
-  'gastos',
   'salida',
+  'fianza',
+  'gastos',
 ] as const;
 export type Sheet = (typeof SHEETS)[number];
 
@@ -110,13 +119,20 @@ export interface FieldError {
 
 // The questions each sheet asks; a row list counts by its name.
 export const SHEET_FIELDS: Record<Sheet, readonly RentalField[]> = {
-  contrato: ['contractType', 'signedOn', 'startDate'],
-  casero: ['landlordType', 'largeLandlord', 'region', 'stressedZone'],
-  entrada: ['deposit', 'advanceMonths', 'hasGuarantees', 'guarantees', 'hasFees', 'fees'],
-  renta: ['initialRent', 'agreedMonths', 'updateClause', 'fixedPercent'],
+  contrato: ['contractType'],
+  fechas: ['signedOn', 'startDate'],
+  casero: ['landlordType'],
+  'gran-tenedor': ['largeLandlord'],
+  vivienda: ['region', 'stressedZone'],
+  entrada: ['deposit', 'advanceMonths'],
+  garantias: ['hasGuarantees', 'guarantees'],
+  pagos: ['hasFees', 'fees'],
+  renta: ['initialRent', 'agreedMonths'],
+  actualizacion: ['updateClause', 'fixedPercent'],
   subidas: ['hasUpdates', 'updates'],
+  salida: ['movedOut', 'keysReturnedOn'],
+  fianza: ['returns', 'deductions'],
   gastos: ['hasCharges', 'charges'],
-  salida: ['movedOut', 'keysReturnedOn', 'returns', 'deductions'],
 };
 
 // «fees.0.amount» belongs to «fees».

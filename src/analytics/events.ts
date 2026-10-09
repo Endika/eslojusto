@@ -49,14 +49,21 @@ import {
 
 // One per sheet of each review's form, conditional ones included, plus the result. They are the
 // steps' URL fragments, so they keep their Spanish names; `$pathname` tells the pages apart.
+// «fechas» is already the final pay's.
 const RENTAL_SECTIONS = [
   'contrato',
   'casero',
+  'gran-tenedor',
+  'vivienda',
   'entrada',
+  'garantias',
+  'pagos',
   'renta',
+  'actualizacion',
   'subidas',
-  'gastos',
   'salida',
+  'fianza',
+  'gastos',
 ] as const satisfies readonly RentalStep[];
 // The contract review's sheets; «salario» and «vacaciones» are already the final pay's.
 const EMPLOYMENT_SECTIONS = [

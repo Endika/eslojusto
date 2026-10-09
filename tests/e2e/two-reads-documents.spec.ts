@@ -262,30 +262,39 @@ test.describe('alquiler', () => {
     await page.goto('alquiler/');
     await page.getByRole('button', { name: /Rellenar a mano/ }).click();
     const sheet = (name: string) => page.getByRole('group', { name, exact: true });
-    const contract = sheet('Tu contrato');
-    await contract.getByLabel('Vivienda habitual', { exact: true }).check();
-    await contract.getByLabel('Fecha del contrato', { exact: true }).fill('2024-03-15');
-    await contract.getByLabel('Fecha de entrada', { exact: true }).fill('2024-03-20');
+    await sheet('Tu contrato')
+      .getByLabel('¿Qué tipo de contrato es?')
+      .selectOption({ label: 'Vivienda habitual' });
     await nextSheet(page);
-    const landlord = sheet('Tu casero');
-    await landlord.getByLabel('Una persona').check();
-    await landlord
-      .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
-      .getByLabel('No', { exact: true })
-      .check();
-    await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
-    await landlord
+    const dates = sheet('Las fechas del contrato');
+    await dates.getByLabel('Fecha del contrato', { exact: true }).fill('2024-03-15');
+    await dates.getByLabel('Fecha de entrada', { exact: true }).fill('2024-03-20');
+    await nextSheet(page);
+    await sheet('Tu casero').getByLabel('Una persona').check();
+    await nextSheet(page);
+    await sheet('Gran tenedor').getByLabel('No', { exact: true }).check();
+    await nextSheet(page);
+    const home = sheet('Dónde está la vivienda');
+    await home.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
+    await home
       .getByRole('group', { name: '¿Está la vivienda en una zona tensionada?' })
       .getByLabel('No', { exact: true })
       .check();
+    // The deposit, the guarantees and the fees stay blank.
+    await nextSheet(page);
+    await nextSheet(page);
     await nextSheet(page);
     await nextSheet(page);
     const rent = sheet('La renta');
     await rent.getByLabel('Renta al empezar').fill('1.000,00');
     await rent.getByLabel('Duración pactada, en meses').fill('60');
-    await rent.getByLabel('El IPC', { exact: true }).check();
+    await nextSheet(page);
+    await sheet('La actualización de la renta')
+      .getByLabel('¿Qué dice el contrato sobre actualizar la renta?')
+      .selectOption({ label: 'El IPC' });
     await nextSheet(page);
     await sheet('Las subidas').getByLabel('No ha habido subidas').check();
+    await nextSheet(page);
     await nextSheet(page);
     const charges = sheet('Los gastos');
     await charges.getByLabel('Sí, añadirlos').check();
