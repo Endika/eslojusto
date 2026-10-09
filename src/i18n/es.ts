@@ -564,7 +564,7 @@ export const es = {
   'faq.documents_answer':
     'Si subes tus documentos (la carta de despido, el finiquito, tus nóminas, el certificado de empresa o tu vida laboral), se envían cifrados a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo indica qué es cada página, copia solo los datos que necesita el formulario y no calcula nada. Ni el servidor ni el modelo guardan el documento: se procesa en memoria y se descarta. Antes de subirlo te pedimos tu consentimiento, porque una nómina puede mostrar datos sensibles. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
 
-  'legal.updated': 'Actualizado el 6 de octubre de 2026',
+  'legal.updated': 'Actualizado el 9 de octubre de 2026',
   'legal.owner_name_label': 'Titular',
   'legal.owner_name': 'Endika Iglesias',
   'legal.owner_id_label': 'NIF',
@@ -582,7 +582,7 @@ export const es = {
   'legal_notice.what_it_does_not': 'Qué no hace',
   'legal_notice.errors': 'Errores en las cifras',
   'legal_notice.conditions': 'Condiciones de venta del pase',
-  'legal_notice.updated': 'Actualizado el 7 de octubre de 2026',
+  'legal_notice.updated': 'Actualizado el 9 de octubre de 2026',
   'legal_notice.owner':
     'eslojusto.es es un proyecto personal. Estos son los datos de su titular (art. 10 de la Ley de Servicios de la Sociedad de la Información):',
   'legal_notice.seller': 'Lo vende {titular}, con NIF {nif}, titular de eslojusto.es.',

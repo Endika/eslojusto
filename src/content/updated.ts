@@ -13,10 +13,10 @@ const erteBuild = process.env['PUBLIC_ERTE'] === '1';
 const householdBuild = process.env['PUBLIC_HOUSEHOLD'] === '1';
 
 export const LAST_UPDATED: Readonly<Record<string, string>> = {
-  '/': '2026-10-07',
+  '/': '2026-10-09',
   '/finiquito/': '2026-10-09',
-  '/aviso-legal/': '2026-10-07',
-  '/privacidad/': '2026-10-07',
+  '/aviso-legal/': '2026-10-09',
+  '/privacidad/': '2026-10-09',
   // Moves with the INE's newest figure on the page and with each check of its norms.
   [RENT_INDICES]: lastChanged(),
   '/finiquito/baja-voluntaria/': '2026-10-07',
@@ -24,7 +24,7 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/finiquito/fin-de-contrato/': '2026-10-07',
   '/finiquito/firmar-no-conforme/': '2026-10-07',
   '/finiquito/despido-objetivo/': '2026-10-07',
-  '/paro/': '2026-10-07',
+  '/paro/': '2026-10-09',
   '/paro/por-tiempo-trabajado/': '2026-10-07',
   '/paro/baja-voluntaria/': '2026-10-07',
   '/paro/despido-disciplinario/': '2026-10-07',
@@ -39,7 +39,7 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
         '/alquiler/gastos/': '2026-10-09',
       }
     : {}),
-  ...(employmentBuild ? { '/contrato/': '2026-10-08' } : {}),
+  ...(employmentBuild ? { '/contrato/': '2026-10-09' } : {}),
   ...(erteBuild ? { '/paro/erte/': '2026-10-09' } : {}),
   ...(householdBuild ? { '/empleada-de-hogar/': '2026-10-09' } : {}),
 };

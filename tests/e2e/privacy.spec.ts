@@ -83,5 +83,5 @@ test('the legal notice identifies the owner on every build', async ({ page }) =>
   await expect(owner).toContainText('Domicilio');
   await expect(owner).toContainText('Calle Barranco del Novillo 26, 28051 Madrid');
   await expect(owner.getByRole('link', { name: 'hola@eslojusto.es' })).toBeVisible();
-  await expect(page.locator('main')).toContainText('Actualizado el 7 de octubre de 2026');
+  await expect(page.locator('main')).toContainText('Actualizado el 9 de octubre de 2026');
 });
