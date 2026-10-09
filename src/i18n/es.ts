@@ -1773,6 +1773,9 @@ export const es = {
   'employment.result.offer_detail': 'Lado a lado',
   'employment.result.restart': 'Empezar de nuevo',
 
+  'law.quote.source': 'Fuente: {cita}',
+  'law.quote.case_law': 'Criterio del {tribunal}: {cita}',
+
   'client.employment.about': 'unos {importe}',
   'client.employment.and': '{a} y {b}',
   'client.employment.unit.day_one': '{n} día',

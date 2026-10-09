@@ -1,0 +1,31 @@
+---
+import type { LawSource } from '../engine/law/sources';
+import { t } from '../i18n';
+import type { Lang } from '../i18n/languages';
+import { LEGAL_QUOTES } from '../i18n/legal-quotes';
+
+interface Props {
+  lang: Lang;
+  source: LawSource;
+  // A key of LEGAL_QUOTES.
+  quote: string;
+}
+const { lang, source, quote } = Astro.props;
+const passage = LEGAL_QUOTES[quote];
+if (!source.verified || passage?.source !== source.id || !source.quotes.includes(passage.text))
+  throw new Error(`LegalQuote: «${quote}» is not a passage read in a verified ${source.id}.`);
+// A court's criterion is never shown as law.
+const origin =
+  source.basis === 'case_law'
+    ? t(lang, 'law.quote.case_law', { tribunal: source.court, cita: source.citation })
+    : t(lang, 'law.quote.source', { cita: source.citation });
+---
+
+<div class="literal">
+  <blockquote class="quote" data-legal-quote>
+    <p>«{passage.text}»</p>
+  </blockquote>
+  <p class="literal__link">
+    <a href={source.url}>{origin}</a>
+  </p>
+</div>
