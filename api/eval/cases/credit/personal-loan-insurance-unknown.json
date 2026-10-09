@@ -1,0 +1,182 @@
+{
+  "id": "personal-loan-insurance-unknown",
+  "description": "LCC arts. 6.a and 32: a single premium of 640,00 € for payment protection, paid apart, that the contract neither calls required nor optional. Left out, 12.000 € at 8,50 % in 72 × 213,34 € give 8,84 %, the APR stated; counted, 11,02 %. The answer «No lo sé» gives both readings and no pass (art. 21.4 only in one of them).",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/loan-es",
+      "data": {
+        "contractRef": "PF-2025-012000",
+        "lenderBlock": "Ficticia Banca de Prueba, S. A., con CIF A23456786 y domicilio en Calle de la Prueba Ficticia, 1, Zaragoza. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia F",
+        "borrowerDni": "38407402W",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 8, Oviedo",
+        "purposeText": "Compra de un vehículo de segunda mano entre particulares",
+        "terms": [
+          {
+            "label": "Importe total del crédito",
+            "value": "12.000,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "8,50 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "8,84 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "72 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "213,34 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "12/07/2025"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "12/06/2031"
+          },
+          {
+            "label": "Importe total adeudado",
+            "value": "16.000,48 €"
+          }
+        ],
+        "charges": [],
+        "chargesNote": "El contrato no devenga comisiones de apertura, estudio ni gestión.",
+        "insuranceText": "La persona prestataria contrata en este acto un seguro de protección de pagos con Ficticia Seguros de Prueba, S. A., con una prima única de 640,00 € que abona aparte en la fecha de hoy.",
+        "guaranteeText": "El préstamo no cuenta con garantía real. La persona prestataria responde del pago con todos sus bienes presentes y futuros.",
+        "infoText": "La persona prestataria declara haber recibido, antes de la celebración del contrato, la Información Normalizada Europea, y en este acto un ejemplar del contrato.",
+        "iban": "ES52 2100 1222 1610 4592 5926",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente, total o parcialmente, el crédito en cualquier momento. El prestamista percibirá una compensación del 1 % del importe reembolsado si el periodo restante hasta la terminación pactada es superior a un año, y del 0,5 % en otro caso.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Zaragoza",
+        "agreedOnText": "12 de junio de 2025"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "personal_loan",
+        "agreedOn": "2025-06-12",
+        "principal": 12000,
+        "nominalRate": 8.5,
+        "rateType": "fixed",
+        "declaredApr": 8.84,
+        "declaredTotalPayable": 16000.48,
+        "instalmentCount": 72,
+        "instalmentAmount": 213.34,
+        "firstDueOn": "2025-07-12",
+        "agreedEndOn": "2031-06-12",
+        "insurancePremium": 640,
+        "insuranceSingle": true,
+        "insuranceFinanced": false
+      },
+      "lists": {}
+    },
+    "input": {
+      "product": "personal_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2025-06-12",
+      "drawnOn": "2025-06-12",
+      "principal": 12000,
+      "netDisbursed": null,
+      "nominalRate": 8.5,
+      "rateType": "fixed",
+      "declaredApr": 8.84,
+      "declaredTotalPayable": 16000.48,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 72,
+        "amount": 213.34,
+        "frequency": "monthly",
+        "firstDueOn": "2025-07-12"
+      },
+      "balloon": null,
+      "charges": [],
+      "insurance": {
+        "premium": 640,
+        "single": true,
+        "financed": false,
+        "required": null
+      },
+      "card": null,
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "depends",
+          "question": "insurance_required",
+          "readings": [
+            {
+              "when": "insurance_counted",
+              "id": "apr",
+              "status": "contract_lower",
+              "apr": 11.02
+            },
+            {
+              "when": "insurance_left_out",
+              "id": "apr",
+              "status": "matches",
+              "apr": 8.84
+            }
+          ]
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2025-06-26"
+        }
+      ],
+      "indicator": {
+        "status": "distance_only",
+        "apr": 8.84,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.11",
+          "month": "2025-06",
+          "value": 7.5073
+        },
+        "points": 1.33
+      },
+      "information": ["contract_mentions", "linked_insurance", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

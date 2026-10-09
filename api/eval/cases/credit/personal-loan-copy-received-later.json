@@ -1,0 +1,156 @@
+{
+  "id": "personal-loan-copy-received-later",
+  "description": "LCC art. 28.1: concluded on 22-09-2026 by phone, with the copy of the contract and its information received on 30-09-2026. The fourteen calendar days run from the later day (Código Civil art. 5.1) and end on 14-10-2026: 5 days left. 3.000 € at 6,95 % in 24 × 134,25 € give 7,18 %, as stated.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/loan-es",
+      "data": {
+        "contractRef": "PF-2026-003000",
+        "lenderBlock": "Ficticia Banca de Prueba, S. A., con CIF A23456786 y domicilio en Calle de la Prueba Ficticia, 1, Bilbao. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia E",
+        "borrowerDni": "37172835Y",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 7, Murcia",
+        "purposeText": "Gastos personales",
+        "terms": [
+          {
+            "label": "Importe total del crédito",
+            "value": "3.000,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "6,95 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "7,18 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "24 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "134,25 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "23/10/2026"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "23/09/2028"
+          },
+          {
+            "label": "Importe total adeudado",
+            "value": "3.222,00 €"
+          }
+        ],
+        "charges": [],
+        "chargesNote": "El contrato no devenga comisiones de apertura, estudio ni gestión.",
+        "insuranceText": "La concesión del crédito no está condicionada a la contratación de ningún seguro.",
+        "guaranteeText": "El préstamo no cuenta con garantía real. La persona prestataria responde del pago con todos sus bienes presentes y futuros.",
+        "infoText": "Contrato celebrado por teléfono. Un ejemplar del contrato y la Información Normalizada Europea se remitirán a la persona prestataria por correo postal.",
+        "iban": "ES31 2100 1185 1510 3827 1605",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente, total o parcialmente, el crédito en cualquier momento. El prestamista percibirá una compensación del 1 % del importe reembolsado si el periodo restante hasta la terminación pactada es superior a un año, y del 0,5 % en otro caso.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Bilbao",
+        "agreedOnText": "22 de septiembre de 2026"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "personal_loan",
+        "agreedOn": "2026-09-22",
+        "principal": 3000,
+        "nominalRate": 6.95,
+        "rateType": "fixed",
+        "declaredApr": 7.18,
+        "declaredTotalPayable": 3222,
+        "instalmentCount": 24,
+        "instalmentAmount": 134.25,
+        "firstDueOn": "2026-10-23",
+        "agreedEndOn": "2028-09-23"
+      },
+      "lists": {}
+    },
+    "input": {
+      "product": "personal_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2026-09-22",
+      "drawnOn": "2026-09-23",
+      "principal": 3000,
+      "netDisbursed": null,
+      "nominalRate": 6.95,
+      "rateType": "fixed",
+      "declaredApr": 7.18,
+      "declaredTotalPayable": 3222,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 24,
+        "amount": 134.25,
+        "frequency": "monthly",
+        "firstDueOn": "2026-10-23"
+      },
+      "balloon": null,
+      "charges": [],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": null,
+      "infoReceivedOn": "2026-09-30",
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 7.18
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "open",
+          "lastDay": "2026-10-14",
+          "daysLeft": 5
+        }
+      ],
+      "indicator": {
+        "status": "not_published",
+        "apr": 7.18,
+        "aprOrigin": "declared",
+        "reference": null,
+        "points": null
+      },
+      "information": ["contract_mentions", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

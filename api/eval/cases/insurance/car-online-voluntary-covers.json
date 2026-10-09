@@ -1,0 +1,152 @@
+{
+  "id": "car-online-voluntary-covers",
+  "description": "Ley 22/2007 art. 10.2: a motor policy taken out online on 25-09-2026. Its compulsory liability cover cannot be withdrawn from: «no aplica». Whether its voluntary covers can is not settled from a primary source: «revísalo», with no date. The renewal deadline of LCS art. 22.2 is 26-08-2027.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "insurance/car-es",
+      "data": {
+        "policyNumber": "PRUEBA-AU-003925",
+        "lineText": "Automóvil",
+        "insurerBlock": "Ficticia Seguros de Prueba, S. A., con CIF A56789012 y domicilio en Paseo de la Prueba Ficticia, 5, Madrid, inscrita con un número ficticio en el registro administrativo de entidades aseguradoras.",
+        "agentText": "Contratación directa con la entidad, sin mediador.",
+        "holderName": "Persona Tomadora Ficticia D",
+        "holderDni": "61382684D",
+        "holderAddress": "Calle de la Prueba Ficticia, 24, Alicante",
+        "riskText": "Turismo Ficticio Modelo Prueba 1.2, gasolina",
+        "dates": [
+          {
+            "label": "Fecha de contratación",
+            "value": "25 de septiembre de 2026"
+          },
+          {
+            "label": "Fecha de efecto",
+            "value": "26 de septiembre de 2026"
+          },
+          {
+            "label": "Fecha de vencimiento",
+            "value": "26 de septiembre de 2027"
+          }
+        ],
+        "durationText": "La póliza se contrata por un año y se prorrogará tácitamente por periodos anuales. El tomador podrá oponerse a la prórroga mediante notificación escrita a la entidad con al menos un mes de antelación a la conclusión del periodo en curso, y la entidad con al menos dos meses.",
+        "sums": [
+          {
+            "concept": "Valor del vehículo (daños propios)",
+            "amount": "16.500,00 €"
+          }
+        ],
+        "proportionalText": "Daños propios con franquicia de 300,00 € por siniestro.",
+        "premium": [
+          {
+            "label": "Prima neta",
+            "value": "402,10 €"
+          },
+          {
+            "label": "Recargos (Consorcio de Compensación de Seguros)",
+            "value": "7,40 €"
+          },
+          {
+            "label": "Impuesto sobre las primas de seguros",
+            "value": "24,13 €"
+          },
+          {
+            "label": "Prima total",
+            "value": "433,63 €"
+          }
+        ],
+        "iban": "ES59 0049 2164 2430 2172 8436",
+        "coversText": "Coberturas: responsabilidad civil obligatoria y voluntaria (esta, hasta 50 millones de euros por siniestro), defensa jurídica, lunas, robo, incendio y daños propios con franquicia.",
+        "channelText": "Póliza contratada por internet, en la web de la entidad.",
+        "contactName": "Persona Gestora Ficticia D",
+        "city": "Madrid",
+        "issuedOnText": "25 de septiembre de 2026"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "line": "car",
+        "carCover": "with_voluntary",
+        "concludedOn": "2026-09-25",
+        "effectiveOn": "2026-09-26",
+        "expiresOn": "2027-09-26",
+        "renews": true,
+        "premiumNet": 402.1,
+        "premiumSurcharges": 7.4,
+        "premiumTaxes": 24.13,
+        "premiumTotal": 433.63,
+        "channel": "online"
+      },
+      "lists": {
+        "sumsInsured": [
+          {
+            "kind": "vehicle",
+            "amount": 16500
+          }
+        ]
+      }
+    },
+    "input": {
+      "line": "car",
+      "carCover": "with_voluntary",
+      "mortgageRequired": null,
+      "renews": true,
+      "expiresOn": "2027-09-26",
+      "notice": null,
+      "distance": true,
+      "concludedOn": "2026-09-25",
+      "policyReceived": true,
+      "policyReceivedOn": "2026-09-25"
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "findings": [
+        {
+          "id": "non_renewal",
+          "status": "open",
+          "lastDay": "2027-08-26",
+          "daysLeft": 321
+        },
+        {
+          "id": "change_notice",
+          "status": "not_entered",
+          "lastDay": null,
+          "daysLeft": null
+        },
+        {
+          "id": "premium",
+          "status": "not_entered",
+          "lastDay": null,
+          "daysLeft": null
+        },
+        {
+          "id": "distance_withdrawal_compulsory",
+          "status": "not_applicable",
+          "lastDay": null,
+          "daysLeft": null
+        },
+        {
+          "id": "distance_withdrawal_voluntary",
+          "status": "review_it",
+          "lastDay": null,
+          "daysLeft": null
+        }
+      ],
+      "information": ["policy_correction", "questionnaire", "proportional_rule", "overinsurance"],
+      "offerPass": false
+    }
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "id": "unreadable-dark-policy",
+  "description": "No date can be read from photos this dark: a read must give nothing_read rather than guess. The facts behind it: a home policy ending on 15-02-2027, whose renewal can be stopped until 15-01-2027 (LCS art. 22.2).",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "insurance/policy-es",
+      "data": {
+        "policyNumber": "PRUEBA-HG-007115",
+        "lineText": "Multirriesgo del hogar",
+        "insurerBlock": "Ficticia Seguros de Prueba, S. A., con CIF A56789012 y domicilio en Paseo de la Prueba Ficticia, 5, Madrid, inscrita con un número ficticio en el registro administrativo de entidades aseguradoras.",
+        "agentText": "Mediador: Ficticia Correduría de Seguros, S. L., correduría de seguros.",
+        "holderName": "Persona Tomadora Ficticia H",
+        "holderDni": "70765368G",
+        "holderAddress": "Calle de la Prueba Ficticia, 28, Zaragoza",
+        "riskText": "Vivienda en Calle de la Prueba Ficticia, 6, Vigo",
+        "dates": [
+          {
+            "label": "Fecha de contratación",
+            "value": "15 de febrero de 2023"
+          },
+          {
+            "label": "Fecha de efecto",
+            "value": "15 de febrero de 2026"
+          },
+          {
+            "label": "Fecha de vencimiento",
+            "value": "15 de febrero de 2027"
+          }
+        ],
+        "durationText": "La póliza se contrata por un año y se prorrogará tácitamente por periodos anuales. El tomador podrá oponerse a la prórroga mediante notificación escrita a la entidad con al menos un mes de antelación a la conclusión del periodo en curso, y la entidad con al menos dos meses.",
+        "sums": [
+          {
+            "concept": "Continente",
+            "amount": "110.000,00 €"
+          },
+          {
+            "concept": "Contenido",
+            "amount": "22.000,00 €"
+          },
+          {
+            "concept": "Responsabilidad civil",
+            "amount": "300.000,00 €"
+          }
+        ],
+        "proportionalText": "Se aplica la regla proporcional en caso de infraseguro, con un margen de tolerancia del 15 % sobre las sumas aseguradas.",
+        "premium": [
+          {
+            "label": "Prima neta",
+            "value": "231,00 €"
+          },
+          {
+            "label": "Recargos (Consorcio de Compensación de Seguros)",
+            "value": "11,70 €"
+          },
+          {
+            "label": "Impuesto sobre las primas de seguros",
+            "value": "14,53 €"
+          },
+          {
+            "label": "Prima total",
+            "value": "257,23 €"
+          }
+        ],
+        "iban": "ES21 0049 2328 2830 4345 6872",
+        "coversText": "Coberturas: incendio, daños por agua, fenómenos atmosféricos, robo, responsabilidad civil y asistencia en el hogar.",
+        "channelText": "Póliza contratada en la oficina del mediador.",
+        "contactName": "Persona Gestora Ficticia H",
+        "city": "Vigo",
+        "issuedOnText": "15 de febrero de 2023"
+      },
+      "degrade": {
+        "rotate": 4.5,
+        "shadow": 0.7,
+        "blur": 2.5,
+        "dark": 0.82,
+        "crop": 0.1,
+        "jpegQuality": 0.35
+      },
+      "readability": "dark"
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "nothing_read",
+      "fields": {},
+      "lists": {}
+    },
+    "input": {
+      "line": "home",
+      "carCover": null,
+      "mortgageRequired": false,
+      "renews": true,
+      "expiresOn": "2027-02-15",
+      "notice": null,
+      "distance": false,
+      "concludedOn": "2023-02-15",
+      "policyReceived": true,
+      "policyReceivedOn": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "findings": [
+        {
+          "id": "non_renewal",
+          "status": "open",
+          "lastDay": "2027-01-15",
+          "daysLeft": 98
+        },
+        {
+          "id": "change_notice",
+          "status": "not_entered",
+          "lastDay": null,
+          "daysLeft": null
+        },
+        {
+          "id": "premium",
+          "status": "not_entered",
+          "lastDay": null,
+          "daysLeft": null
+        },
+        {
+          "id": "distance_withdrawal",
+          "status": "not_applicable",
+          "lastDay": null,
+          "daysLeft": null
+        }
+      ],
+      "information": ["policy_correction", "questionnaire", "proportional_rule", "overinsurance"],
+      "offerPass": false
+    }
+  }
+}

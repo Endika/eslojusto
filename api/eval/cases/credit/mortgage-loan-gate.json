@@ -1,0 +1,129 @@
+{
+  "id": "mortgage-loan-gate",
+  "description": "LCC art. 3: a loan secured by a mortgage on the home is outside the consumer credit law, and the review stops at the door with nothing worked out.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/loan-es",
+      "data": {
+        "contractRef": "PF-2025-030000",
+        "lenderBlock": "Ficticia Banca de Prueba, S. A., con CIF A23456786 y domicilio en Calle de la Prueba Ficticia, 1, Valencia. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia T",
+        "borrowerDni": "55691340S",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 22, Oviedo",
+        "purposeText": "Reforma de la vivienda",
+        "terms": [
+          {
+            "label": "Importe total del crédito",
+            "value": "30.000,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "3,20 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "3,25 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "120 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "292,46 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "02/05/2025"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "02/04/2035"
+          }
+        ],
+        "charges": [],
+        "chargesNote": "El contrato no devenga comisiones de apertura, estudio ni gestión.",
+        "insuranceText": "La concesión del crédito no está condicionada a la contratación de ningún seguro.",
+        "guaranteeText": "En garantía del préstamo se constituye hipoteca sobre la vivienda de la persona prestataria, en escritura pública otorgada en esta misma fecha.",
+        "infoText": "La persona prestataria declara haber recibido, antes de la celebración del contrato, la Información Normalizada Europea, y en este acto un ejemplar del contrato.",
+        "iban": "ES55 2100 1740 3011 5308 6420",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente, total o parcialmente, el crédito en cualquier momento. El prestamista percibirá una compensación del 1 % del importe reembolsado si el periodo restante hasta la terminación pactada es superior a un año, y del 0,5 % en otro caso.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Valencia",
+        "agreedOnText": "2 de abril de 2025"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "personal_loan",
+        "agreedOn": "2025-04-02",
+        "principal": 30000,
+        "nominalRate": 3.2,
+        "rateType": "fixed",
+        "declaredApr": 3.25,
+        "instalmentCount": 120,
+        "instalmentAmount": 292.46,
+        "firstDueOn": "2025-05-02",
+        "agreedEndOn": "2035-04-02"
+      },
+      "lists": {}
+    },
+    "input": {
+      "product": "personal_loan",
+      "purpose": "personal",
+      "secured": "mortgage",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2025-04-02",
+      "drawnOn": "2025-04-02",
+      "principal": 30000,
+      "netDisbursed": null,
+      "nominalRate": 3.2,
+      "rateType": "fixed",
+      "declaredApr": 3.25,
+      "declaredTotalPayable": null,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 120,
+        "amount": 292.46,
+        "frequency": "monthly",
+        "firstDueOn": "2025-05-02"
+      },
+      "balloon": null,
+      "charges": [],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": false,
+        "reason": "mortgage"
+      },
+      "items": [],
+      "indicator": null,
+      "information": [],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "id": "personal-loan-no-apr-stated",
+  "description": "LCC art. 21.2: a contract that does not state the APR. 6.000 € at 9,50 % in 36 × 192,20 € with a study charge of 90,00 € give 11,06 % from its figures; the review shows art. 21.2 and no figure. The person takes that APR for the indicator, which shows only the distance to the average rate while the loan criterion (STS 366/2026) is unread. A supermarket receipt in the pack is read as other.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/loan-es",
+      "data": {
+        "contractRef": "PF-2022-006000",
+        "lenderBlock": "Ficticia Crédito Ejemplo, E. F. C., S. A., con CIF A12345677 y domicilio en Calle de la Prueba Ficticia, 1, Sevilla. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia D",
+        "borrowerDni": "35938268X",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 6, Zaragoza",
+        "purposeText": "Compra de mobiliario",
+        "terms": [
+          {
+            "label": "Importe total del crédito",
+            "value": "6.000,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "9,50 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "36 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "192,20 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "10/06/2022"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "10/05/2025"
+          },
+          {
+            "label": "Importe total adeudado",
+            "value": "7.009,20 €"
+          }
+        ],
+        "charges": [
+          {
+            "concept": "Comisión de estudio",
+            "amount": "90,00 €",
+            "howText": "Pagada aparte a la firma"
+          }
+        ],
+        "chargesNote": "",
+        "insuranceText": "La concesión del crédito no está condicionada a la contratación de ningún seguro.",
+        "guaranteeText": "El préstamo no cuenta con garantía real. La persona prestataria responde del pago con todos sus bienes presentes y futuros.",
+        "infoText": "La persona prestataria declara haber recibido, antes de la celebración del contrato, la Información Normalizada Europea, y en este acto un ejemplar del contrato.",
+        "iban": "ES10 2100 1148 1410 3061 7284",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente, total o parcialmente, el crédito en cualquier momento. El prestamista percibirá una compensación del 1 % del importe reembolsado si el periodo restante hasta la terminación pactada es superior a un año, y del 0,5 % en otro caso.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Sevilla",
+        "agreedOnText": "10 de mayo de 2022"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "kind": "other",
+      "data": {
+        "variant": "supermarket"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      },
+      "readability": "not_credit_document"
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "personal_loan",
+        "agreedOn": "2022-05-10",
+        "principal": 6000,
+        "nominalRate": 9.5,
+        "rateType": "fixed",
+        "declaredTotalPayable": 7009.2,
+        "instalmentCount": 36,
+        "instalmentAmount": 192.2,
+        "firstDueOn": "2022-06-10",
+        "agreedEndOn": "2025-05-10"
+      },
+      "lists": {
+        "charges": [
+          {
+            "kind": "study",
+            "amount": 90,
+            "how": "paid"
+          }
+        ]
+      }
+    },
+    "input": {
+      "product": "personal_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2022-05-10",
+      "drawnOn": "2022-05-10",
+      "principal": 6000,
+      "netDisbursed": null,
+      "nominalRate": 9.5,
+      "rateType": "fixed",
+      "declaredApr": null,
+      "declaredTotalPayable": 7009.2,
+      "confirmedApr": true,
+      "instalments": {
+        "kind": "regular",
+        "count": 36,
+        "amount": 192.2,
+        "frequency": "monthly",
+        "firstDueOn": "2022-06-10"
+      },
+      "balloon": null,
+      "charges": [
+        {
+          "kind": "study",
+          "amount": 90,
+          "paidOn": "2022-05-10",
+          "how": "paid"
+        }
+      ],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "contract_missing",
+          "apr": 11.06
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2022-05-24"
+        }
+      ],
+      "indicator": {
+        "status": "distance_only",
+        "apr": 11.06,
+        "aprOrigin": "recalculated",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.10",
+          "month": "2022-05",
+          "value": 7.1774
+        },
+        "points": 3.88
+      },
+      "information": ["contract_mentions", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

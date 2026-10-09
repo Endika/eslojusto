@@ -1,0 +1,206 @@
+{
+  "id": "home-renewal-notice-late-with-changes",
+  "description": "LCS art. 22.3: the insurer must notify any change at least two months before the end of the period, 01-10-2026 for a policy ending on 01-12-2026. The notice of a higher premium and a higher excess arrived on 06-10-2026, 56 days ahead: late, said as a fact, with no consequence drawn. The last day to stop the renewal is 01-11-2026 (art. 22.2): 23 days left.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "insurance/policy-es",
+      "data": {
+        "policyNumber": "PRUEBA-HG-001201",
+        "lineText": "Hogar",
+        "insurerBlock": "Ficticia Mutua de Seguros Ejemplo, con CIF A67890122 y domicilio en Paseo de la Prueba Ficticia, 5, Madrid, inscrita con un número ficticio en el registro administrativo de entidades aseguradoras.",
+        "agentText": "Contratación directa con la entidad, sin mediador.",
+        "holderName": "Persona Tomadora Ficticia B",
+        "holderDni": "56691342T",
+        "holderAddress": "Calle de la Prueba Ficticia, 22, Granada",
+        "riskText": "Vivienda en Calle de la Prueba Ficticia, 3, Granada",
+        "dates": [
+          {
+            "label": "Fecha de contratación",
+            "value": "1 de diciembre de 2019"
+          },
+          {
+            "label": "Fecha de efecto",
+            "value": "1 de diciembre de 2025"
+          },
+          {
+            "label": "Fecha de vencimiento",
+            "value": "1 de diciembre de 2026"
+          }
+        ],
+        "durationText": "La póliza se contrata por un año y se prorrogará tácitamente por periodos anuales. El tomador podrá oponerse a la prórroga mediante notificación escrita a la entidad con al menos un mes de antelación a la conclusión del periodo en curso, y la entidad con al menos dos meses.",
+        "sums": [
+          {
+            "concept": "Continente",
+            "amount": "95.000,00 €"
+          },
+          {
+            "concept": "Contenido",
+            "amount": "20.000,00 €"
+          },
+          {
+            "concept": "Responsabilidad civil",
+            "amount": "300.000,00 €"
+          }
+        ],
+        "proportionalText": "Contenido asegurado a primer riesgo: no se aplica la regla proporcional.",
+        "premium": [
+          {
+            "label": "Prima neta",
+            "value": "221,30 €"
+          },
+          {
+            "label": "Recargos (Consorcio de Compensación de Seguros)",
+            "value": "11,20 €"
+          },
+          {
+            "label": "Impuesto sobre las primas de seguros",
+            "value": "13,89 €"
+          },
+          {
+            "label": "Prima total",
+            "value": "246,39 €"
+          }
+        ],
+        "iban": "ES78 0049 2082 2230 1086 4218",
+        "coversText": "Coberturas: incendio, daños por agua, fenómenos atmosféricos, robo, responsabilidad civil y asistencia en el hogar.",
+        "channelText": "Póliza contratada en una oficina de la entidad.",
+        "contactName": "Persona Gestora Ficticia B",
+        "city": "Granada",
+        "issuedOnText": "1 de diciembre de 2019"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "insurance/renewal-es",
+      "data": {
+        "insurerBlock": "Ficticia Mutua de Seguros Ejemplo, con CIF A67890122 y domicilio en Paseo de la Prueba Ficticia, 5, Madrid, inscrita con un número ficticio en el registro administrativo de entidades aseguradoras.",
+        "holderName": "Persona Tomadora Ficticia B",
+        "holderAddress": "Calle de la Prueba Ficticia, 22, Granada",
+        "city": "Madrid",
+        "noticeOnText": "6 de octubre de 2026",
+        "mediumText": "Enviado por correo electrónico",
+        "policyNumber": "PRUEBA-HG-001201",
+        "lineText": "Hogar",
+        "expiresText": "1 de diciembre de 2026",
+        "premium": [
+          {
+            "label": "Prima total del periodo que termina",
+            "value": "246,39 €"
+          },
+          {
+            "label": "Prima total del nuevo periodo",
+            "value": "289,90 €"
+          }
+        ],
+        "changesText": "Además, la franquicia de la cobertura de daños por agua pasa de 150,00 € a 300,00 € por siniestro.",
+        "iban": "ES78 0049 2082 2230 1086 4218"
+      },
+      "degrade": {
+        "rotate": -2.8,
+        "shadow": 0.45,
+        "blur": 1.3,
+        "dark": 0.18,
+        "crop": 0.03,
+        "jpegQuality": 0.6
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "line": "home",
+        "concludedOn": "2019-12-01",
+        "effectiveOn": "2025-12-01",
+        "expiresOn": "2026-12-01",
+        "renews": true,
+        "premiumNet": 221.3,
+        "premiumSurcharges": 11.2,
+        "premiumTaxes": 13.89,
+        "premiumTotal": 246.39,
+        "proportionalRuleExcluded": true,
+        "channel": "in_person",
+        "noticeOn": "2026-10-06",
+        "noticeMedium": "email",
+        "previousPremium": 246.39,
+        "newPremium": 289.9,
+        "coverChanges": true
+      },
+      "lists": {
+        "sumsInsured": [
+          {
+            "kind": "building",
+            "amount": 95000
+          },
+          {
+            "kind": "contents",
+            "amount": 20000
+          },
+          {
+            "kind": "liability",
+            "amount": 300000
+          }
+        ]
+      }
+    },
+    "input": {
+      "line": "home",
+      "carCover": null,
+      "mortgageRequired": false,
+      "renews": true,
+      "expiresOn": "2026-12-01",
+      "notice": {
+        "receivedOn": "2026-10-06",
+        "previousPremium": 246.39,
+        "newPremium": 289.9,
+        "changes": true
+      },
+      "distance": false,
+      "concludedOn": "2019-12-01",
+      "policyReceived": true,
+      "policyReceivedOn": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "findings": [
+        {
+          "id": "non_renewal",
+          "status": "open",
+          "lastDay": "2026-11-01",
+          "daysLeft": 23
+        },
+        {
+          "id": "change_notice",
+          "status": "late",
+          "lastDay": "2026-10-01",
+          "daysLeft": null
+        },
+        {
+          "id": "premium",
+          "status": "up",
+          "lastDay": null,
+          "daysLeft": null
+        },
+        {
+          "id": "distance_withdrawal",
+          "status": "not_applicable",
+          "lastDay": null,
+          "daysLeft": null
+        }
+      ],
+      "information": ["policy_correction", "questionnaire", "proportional_rule", "overinsurance"],
+      "offerPass": false
+    }
+  }
+}

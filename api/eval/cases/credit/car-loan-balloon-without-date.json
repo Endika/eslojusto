@@ -1,0 +1,187 @@
+{
+  "id": "car-loan-balloon-without-date",
+  "description": "LCC annex I: the contract puts a last payment of 8.000,00 € «al término del contrato» without a date. Paid a month after the last of 36 × 367,89 €, 18.000 € at 7,99 % give 8,29 %, the APR stated; paid with the last instalment, the APR is higher and the stated one lower than its figures (art. 21.4). Both readings are shown and the pass is not offered.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/car-loan-es",
+      "data": {
+        "contractRef": "PF-2025-018000",
+        "lenderBlock": "Ficticia Motor Finanzas, E. F. C., S. A., con CIF A34567894 y domicilio en Calle de la Prueba Ficticia, 1, Madrid. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia I",
+        "borrowerDni": "42111103J",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 11, Valencia",
+        "dealerBlock": "Ficticia Automoción Ejemplo, S. L., con CIF B41001176, concesionario situado en Avenida de la Prueba Ficticia, 7, Alcalá de Henares, que actúa como intermediario de crédito vinculado a la entidad financiera.",
+        "goodsText": "Turismo Ficticio Modelo Ensayo, híbrido",
+        "discountText": "El precio al contado del vehículo es de 21.500,00 €. La persona compradora entrega 3.500,00 € a cuenta.",
+        "terms": [
+          {
+            "label": "Precio al contado del vehículo",
+            "value": "21.500,00 €"
+          },
+          {
+            "label": "Entrada",
+            "value": "3.500,00 €"
+          },
+          {
+            "label": "Importe total del crédito",
+            "value": "18.000,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "7,99 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "8,29 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "36 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "367,89 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "10/03/2025"
+          },
+          {
+            "label": "Cuota final",
+            "value": "8.000,00 €, al término del contrato"
+          },
+          {
+            "label": "Importe total adeudado",
+            "value": "21.244,04 €"
+          }
+        ],
+        "charges": [],
+        "chargesNote": "El contrato no devenga comisiones de apertura, estudio ni gestión.",
+        "insuranceText": "La concesión del crédito no está condicionada a la contratación de ningún seguro.",
+        "iban": "ES18 2100 1333 1910 6888 8889",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente, total o parcialmente, el crédito en cualquier momento. El prestamista percibirá una compensación del 1 % del importe reembolsado si el periodo restante hasta la terminación pactada es superior a un año, y del 0,5 % en otro caso.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Alcalá de Henares",
+        "agreedOnText": "10 de febrero de 2025"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "car_loan",
+        "intermediaryType": "company",
+        "agreedOn": "2025-02-10",
+        "principal": 18000,
+        "cashPrice": 21500,
+        "nominalRate": 7.99,
+        "rateType": "fixed",
+        "declaredApr": 8.29,
+        "declaredTotalPayable": 21244.04,
+        "instalmentCount": 36,
+        "instalmentAmount": 367.89,
+        "firstDueOn": "2025-03-10",
+        "balloonAmount": 8000
+      },
+      "lists": {}
+    },
+    "input": {
+      "product": "car_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2025-02-10",
+      "drawnOn": "2025-02-10",
+      "principal": 18000,
+      "netDisbursed": null,
+      "nominalRate": 7.99,
+      "rateType": "fixed",
+      "declaredApr": 8.29,
+      "declaredTotalPayable": 21244.04,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 36,
+        "amount": 367.89,
+        "frequency": "monthly",
+        "firstDueOn": "2025-03-10"
+      },
+      "balloon": {
+        "amount": 8000,
+        "dueOn": null
+      },
+      "charges": [],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "depends",
+          "question": "balloon_due",
+          "readings": [
+            {
+              "when": "balloon_with_last",
+              "id": "apr",
+              "status": "contract_lower",
+              "apr": 8.41
+            },
+            {
+              "when": "balloon_month_after",
+              "id": "apr",
+              "status": "matches",
+              "apr": 8.29
+            }
+          ]
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2025-02-24"
+        }
+      ],
+      "indicator": {
+        "status": "distance_only",
+        "apr": 8.29,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.10",
+          "month": "2025-02",
+          "value": 7.4496
+        },
+        "points": 0.84
+      },
+      "information": ["contract_mentions", "cash_price", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

@@ -1,0 +1,212 @@
+<!--
+  Credit template «loan-ca»: a two-sheet consumer loan contract in Catalan, with its conditions, charges and clauses.
+  Source: written for this bank, with invented wording and layout. Its conditions follow the
+  order of the mentions art. 16.2 of Ley 16/2011, de contratos de crédito al consumo, asks a
+  contract to state; it copies no lender's model.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="ca">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1b1b1b;
+        font:
+          16px/1.45 'DejaVu Sans',
+          sans-serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 60px 70px 90px;
+        position: relative;
+        overflow: hidden;
+        background: #fdfdfb;
+      }
+      h1 {
+        font-size: 22px;
+        text-align: center;
+        margin: 0 0 4px;
+        letter-spacing: 0.5px;
+      }
+      .sub {
+        text-align: center;
+        font-size: 14px;
+        color: #444;
+        margin-bottom: 20px;
+      }
+      .box {
+        border: 1.5px solid #333;
+        margin-bottom: 12px;
+      }
+      .box h2 {
+        font-size: 13px;
+        text-transform: uppercase;
+        margin: 0;
+        background: #e6e6e6;
+        padding: 4px 8px;
+        border-bottom: 1px solid #333;
+      }
+      .box .in {
+        padding: 8px 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 18px;
+      }
+      .label {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #555;
+        display: block;
+      }
+      p {
+        margin: 0 0 9px;
+        text-align: justify;
+      }
+      .clause b {
+        text-transform: uppercase;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 6px 0;
+        font-size: 15px;
+      }
+      table.small {
+        font-size: 13px;
+      }
+      td,
+      th {
+        border: 1px solid #777;
+        padding: 5px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      table.small td,
+      table.small th {
+        padding: 3px 6px;
+      }
+      td.n,
+      th.n {
+        text-align: right;
+        white-space: nowrap;
+      }
+      .sign {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 50px;
+      }
+      .sign div {
+        width: 40%;
+        border-top: 1px solid #333;
+        padding-top: 6px;
+        text-align: center;
+        font-size: 14px;
+      }
+      .muted {
+        color: #555;
+        font-size: 13px;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <h1>CONTRACTE DE PRÉSTEC PERSONAL</h1>
+      <div class="sub">Referència del contracte: {{contractRef}}</div>
+      <div class="box">
+        <h2>Prestador</h2>
+        <div class="in"><p>{{lenderBlock}}</p></div>
+      </div>
+      <div class="box">
+        <h2>Persona prestatària</h2>
+        <div class="in">
+          <div class="grid">
+            <div><span class="label">Nom i cognoms</span>{{borrowerName}}</div>
+            <div><span class="label">DNI/NIE</span>{{borrowerDni}}</div>
+            <div><span class="label">Domicili</span>{{borrowerAddress}}</div>
+            <div><span class="label">Finalitat</span>{{purposeText}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Condicions financeres</h2>
+        <div class="in">
+          <table>
+            {{#terms}}
+            <tr>
+              <td>{{label}}</td>
+              <td class="n">{{value}}</td>
+            </tr>
+            {{/terms}}
+          </table>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Comissions i despeses</h2>
+        <div class="in">
+          <table>
+            <tr>
+              <th>Concepte</th>
+              <th class="n">Import</th>
+              <th>Forma de pagament</th>
+            </tr>
+            {{#charges}}
+            <tr>
+              <td>{{concept}}</td>
+              <td class="n">{{amount}}</td>
+              <td>{{howText}}</td>
+            </tr>
+            {{/charges}}
+          </table>
+          <p class="muted">{{chargesNote}}</p>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Assegurança</h2>
+        <div class="in"><p>{{insuranceText}}</p></div>
+      </div>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+    <section class="page">
+      <div class="box">
+        <h2>Clàusules</h2>
+        <div class="in">
+          <p class="clause"><b>Primera. Garanties.</b> {{guaranteeText}}</p>
+          <p class="clause">
+            <b>Segona. Pagament de les quotes.</b> Les quotes es carregaran al compte {{iban}}, del
+            qual és titular la persona prestatària.
+          </p>
+          <p class="clause"><b>Tercera. Reemborsament anticipat.</b> {{earlyRepaymentText}}</p>
+          <p class="clause"><b>Quarta. Desistiment.</b> {{withdrawalText}}</p>
+          <p class="clause"><b>Cinquena. Informació.</b> {{infoText}}</p>
+        </div>
+      </div>
+      <p>
+        I com a prova de conformitat, les parts subscriuen aquest contracte per duplicat a {{city}},
+        el {{agreedOnText}}.
+      </p>
+      <div class="sign">
+        <div>El prestador</div>
+        <div>{{borrowerName}}</div>
+      </div>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

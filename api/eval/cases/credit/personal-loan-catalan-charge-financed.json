@@ -1,0 +1,185 @@
+{
+  "id": "personal-loan-catalan-charge-financed",
+  "description": "LCC art. 32 and annex I, art. 28: a loan in Catalan of 20.000 € with an opening charge of 790,00 € added to the capital, in 60 × 421,45 € at 7,99 %, gives 10,08 %, as stated. Concluded on 01-10-2026, the withdrawal period ends on 15-10-2026 (fourteen calendar days, Código Civil art. 5.1): 6 days left. October 2026 has no average rate yet: «aún no publicado».",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/loan-ca",
+      "data": {
+        "contractRef": "PF-2026-100008",
+        "lenderBlock": "Ficticia Banca de Prueba, S. A., amb CIF A23456786 i domicili a Calle de la Prueba Ficticia, 1, Barcelona. Inscrita al registre d'entitats del Banc d'Espanya amb un número fictici de prova.",
+        "borrowerName": "Persona Prestataria Ficticia C",
+        "borrowerDni": "34703701Z",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 5, Bilbao",
+        "purposeText": "Despeses personals",
+        "terms": [
+          {
+            "label": "Import total del crèdit",
+            "value": "20.000,00 €"
+          },
+          {
+            "label": "Comissió d'obertura finançada",
+            "value": "790,00 €"
+          },
+          {
+            "label": "Capital total finançat",
+            "value": "20.790,00 €"
+          },
+          {
+            "label": "Tipus deutor (TIN) fix",
+            "value": "7,99 %"
+          },
+          {
+            "label": "Taxa anual equivalent (TAE)",
+            "value": "10,08 %"
+          },
+          {
+            "label": "Nombre de quotes",
+            "value": "60 quotes mensuals"
+          },
+          {
+            "label": "Import de cada quota",
+            "value": "421,45 €"
+          },
+          {
+            "label": "Data de la primera quota",
+            "value": "01/11/2026"
+          },
+          {
+            "label": "Venciment final",
+            "value": "01/10/2031"
+          },
+          {
+            "label": "Import total degut",
+            "value": "25.287,00 €"
+          }
+        ],
+        "charges": [
+          {
+            "concept": "Comissió d'obertura (3,95 %)",
+            "amount": "790,00 €",
+            "howText": "Finançada: sumada al capital"
+          }
+        ],
+        "chargesNote": "",
+        "insuranceText": "La concessió del crèdit no està condicionada a la contractació de cap assegurança.",
+        "guaranteeText": "El préstec no té garantia real. La persona prestatària respon del pagament amb tots els seus béns presents i futurs.",
+        "infoText": "La persona prestatària declara haver rebut, abans de la celebració del contracte, la Informació Normalitzada Europea, i en aquest acte un exemplar del contracte.",
+        "iban": "ES86 2100 1111 1310 2296 2963",
+        "earlyRepaymentText": "La persona prestatària podrà reemborsar anticipadament el crèdit, totalment o parcialment, en qualsevol moment. El prestador percebrà una compensació de l'1 % de l'import reemborsat si el període restant fins a la terminació pactada és superior a un any, i del 0,5 % en cas contrari.",
+        "withdrawalText": "La persona prestatària disposa d'un termini de catorze dies naturals per desistir del contracte sense indicar-ne el motiu, comunicant-ho al prestador en paper o en un altre suport durador.",
+        "city": "Barcelona",
+        "agreedOnText": "1 d'octubre de 2026"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "personal_loan",
+        "agreedOn": "2026-10-01",
+        "principal": 20000,
+        "nominalRate": 7.99,
+        "rateType": "fixed",
+        "declaredApr": 10.08,
+        "declaredTotalPayable": 25287,
+        "instalmentCount": 60,
+        "instalmentAmount": 421.45,
+        "firstDueOn": "2026-11-01",
+        "agreedEndOn": "2031-10-01"
+      },
+      "lists": {
+        "charges": [
+          {
+            "kind": "opening",
+            "amount": 790,
+            "how": "financed"
+          }
+        ]
+      }
+    },
+    "input": {
+      "product": "personal_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2026-10-01",
+      "drawnOn": "2026-10-01",
+      "principal": 20000,
+      "netDisbursed": null,
+      "nominalRate": 7.99,
+      "rateType": "fixed",
+      "declaredApr": 10.08,
+      "declaredTotalPayable": 25287,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 60,
+        "amount": 421.45,
+        "frequency": "monthly",
+        "firstDueOn": "2026-11-01"
+      },
+      "balloon": null,
+      "charges": [
+        {
+          "kind": "opening",
+          "amount": 790,
+          "paidOn": "2026-10-01",
+          "how": "financed"
+        }
+      ],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 10.08
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "open",
+          "lastDay": "2026-10-15",
+          "daysLeft": 6
+        }
+      ],
+      "indicator": {
+        "status": "not_published",
+        "apr": 10.08,
+        "aprOrigin": "declared",
+        "reference": null,
+        "points": null
+      },
+      "information": ["contract_mentions", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

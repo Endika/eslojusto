@@ -1,0 +1,139 @@
+{
+  "id": "revolving-card-annual-fee-not-published",
+  "description": "LCC annex I, part II.e: a card with a limit of 1.000 € at 20,50 % and an annual fee of 30,00 €, which the APR counts: 30,12 %, as stated. Concluded on 28-09-2026: the withdrawal period ends on 12-10-2026 (art. 28), 3 days left, and the BdE has not published September 2026 yet, so the indicator says so and never takes the month before.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/revolving-es",
+      "data": {
+        "contractRef": "TF-2026-000928",
+        "lenderBlock": "Ficticia Tarjetas de Prueba, E. F. C., S. A., con CIF A45678904 y domicilio en Calle de la Prueba Ficticia, 1, Madrid. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia O",
+        "borrowerDni": "49518505N",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 17, Sevilla",
+        "iban": "ES47 2100 1555 2511 1481 4815",
+        "terms": [
+          {
+            "label": "Límite de crédito",
+            "value": "1.000,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) anual",
+            "value": "20,50 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "30,12 %"
+          },
+          {
+            "label": "Cuota anual",
+            "value": "30,00 €"
+          }
+        ],
+        "paymentText": "Modalidad de pago: aplazado, con una cuota mensual del 4 % del saldo dispuesto y un mínimo de 40,00 €.",
+        "charges": [
+          {
+            "concept": "Cuota anual de mantenimiento",
+            "amount": "30,00 €",
+            "howText": "Cargada en la cuenta cada año"
+          }
+        ],
+        "chargesNote": "",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Bilbao",
+        "agreedOnText": "28 de septiembre de 2026"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "agreedOn": "2026-09-28",
+        "creditLimit": 1000,
+        "nominalRate": 20.5,
+        "declaredApr": 30.12,
+        "minimumPayment": 40,
+        "minimumPaymentPercent": 4,
+        "annualFee": 30,
+        "paymentMode": "percent_of_balance"
+      },
+      "lists": {}
+    },
+    "input": {
+      "product": "revolving",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2026-09-28",
+      "drawnOn": "2026-09-28",
+      "principal": 1000,
+      "netDisbursed": null,
+      "nominalRate": 20.5,
+      "rateType": "fixed",
+      "declaredApr": 30.12,
+      "declaredTotalPayable": null,
+      "confirmedApr": false,
+      "instalments": null,
+      "balloon": null,
+      "charges": [],
+      "insurance": null,
+      "card": {
+        "limit": 1000,
+        "nominalRate": 20.5,
+        "annualFee": 30,
+        "minimumPayment": 40,
+        "balance": 0
+      },
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 30.12
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "open",
+          "lastDay": "2026-10-12",
+          "daysLeft": 3
+        }
+      ],
+      "indicator": {
+        "status": "not_published",
+        "apr": 30.12,
+        "aprOrigin": "declared",
+        "reference": null,
+        "points": null
+      },
+      "information": ["contract_mentions", "revolving_info", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "id": "car-voluntary-notice-on-time-premium-same",
+  "description": "LCS art. 22.2 and 22.3: a motor policy with voluntary covers ending on 20-12-2026. The notice of 08-10-2026 arrived before 20-10-2026, two months ahead, with the same premium of 420,00 €. The last day to stop the renewal is 20-11-2026, a month before, date to date (Código Civil art. 5.1): 42 days left.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "insurance/car-es",
+      "data": {
+        "policyNumber": "PRUEBA-AU-006074",
+        "lineText": "Automóvil",
+        "insurerBlock": "Ficticia Mutua de Seguros Ejemplo, con CIF A67890122 y domicilio en Paseo de la Prueba Ficticia, 5, Madrid, inscrita con un número ficticio en el registro administrativo de entidades aseguradoras.",
+        "agentText": "Mediador: Ficticia Correduría de Seguros, S. L., correduría de seguros.",
+        "holderName": "Persona Tomadora Ficticia G",
+        "holderDni": "47290163W",
+        "holderAddress": "Calle de la Prueba Ficticia, 27, Huesca",
+        "riskText": "Furgoneta Ficticia Modelo Ensayo, diésel",
+        "dates": [
+          {
+            "label": "Fecha de contratación",
+            "value": "20 de diciembre de 2022"
+          },
+          {
+            "label": "Fecha de efecto",
+            "value": "20 de diciembre de 2025"
+          },
+          {
+            "label": "Fecha de vencimiento",
+            "value": "20 de diciembre de 2026"
+          }
+        ],
+        "durationText": "La póliza se contrata por un año y se prorrogará tácitamente por periodos anuales. El tomador podrá oponerse a la prórroga mediante notificación escrita a la entidad con al menos un mes de antelación a la conclusión del periodo en curso, y la entidad con al menos dos meses.",
+        "sums": [
+          {
+            "concept": "Valor del vehículo (daños propios)",
+            "amount": "9.800,00 €"
+          }
+        ],
+        "proportionalText": "Daños propios con franquicia de 600,00 € por siniestro.",
+        "premium": [
+          {
+            "label": "Prima neta",
+            "value": "389,60 €"
+          },
+          {
+            "label": "Recargos (Consorcio de Compensación de Seguros)",
+            "value": "7,10 €"
+          },
+          {
+            "label": "Impuesto sobre las primas de seguros",
+            "value": "23,30 €"
+          },
+          {
+            "label": "Prima total",
+            "value": "420,00 €"
+          }
+        ],
+        "iban": "ES92 2100 0418 4502 0005 1332",
+        "coversText": "Coberturas: responsabilidad civil obligatoria y voluntaria, defensa jurídica, asistencia en viaje, lunas y robo.",
+        "channelText": "Póliza contratada en la oficina del mediador.",
+        "contactName": "Persona Gestora Ficticia G",
+        "city": "Zaragoza",
+        "issuedOnText": "20 de diciembre de 2022"
+      },
+      "degrade": {
+        "rotate": 0.5,
+        "shadow": 0.06,
+        "blur": 0.2,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.84
+      }
+    },
+    {
+      "template": "insurance/renewal-es",
+      "data": {
+        "insurerBlock": "Ficticia Mutua de Seguros Ejemplo, con CIF A67890122 y domicilio en Paseo de la Prueba Ficticia, 5, Madrid, inscrita con un número ficticio en el registro administrativo de entidades aseguradoras.",
+        "holderName": "Persona Tomadora Ficticia G",
+        "holderAddress": "Calle de la Prueba Ficticia, 27, Huesca",
+        "city": "Madrid",
+        "noticeOnText": "8 de octubre de 2026",
+        "mediumText": "Enviado por carta",
+        "policyNumber": "PRUEBA-AU-006074",
+        "lineText": "Automóvil",
+        "expiresText": "20 de diciembre de 2026",
+        "premium": [
+          {
+            "label": "Prima total del periodo que termina",
+            "value": "420,00 €"
+          },
+          {
+            "label": "Prima total del nuevo periodo",
+            "value": "420,00 €"
+          }
+        ],
+        "changesText": "Las coberturas y franquicias no cambian.",
+        "iban": "ES92 2100 0418 4502 0005 1332"
+      },
+      "degrade": {
+        "rotate": -0.4,
+        "shadow": 0.09,
+        "blur": 0.3,
+        "dark": 0.04,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "line": "car",
+        "carCover": "with_voluntary",
+        "intermediaryType": "company",
+        "concludedOn": "2022-12-20",
+        "effectiveOn": "2025-12-20",
+        "expiresOn": "2026-12-20",
+        "renews": true,
+        "premiumNet": 389.6,
+        "premiumSurcharges": 7.1,
+        "premiumTaxes": 23.3,
+        "premiumTotal": 420,
+        "channel": "in_person",
+        "noticeOn": "2026-10-08",
+        "noticeMedium": "letter",
+        "previousPremium": 420,
+        "newPremium": 420,
+        "coverChanges": false
+      },
+      "lists": {
+        "sumsInsured": [
+          {
+            "kind": "vehicle",
+            "amount": 9800
+          }
+        ]
+      }
+    },
+    "input": {
+      "line": "car",
+      "carCover": "with_voluntary",
+      "mortgageRequired": null,
+      "renews": true,
+      "expiresOn": "2026-12-20",
+      "notice": {
+        "receivedOn": "2026-10-08",
+        "previousPremium": 420,
+        "newPremium": 420,
+        "changes": false
+      },
+      "distance": false,
+      "concludedOn": "2022-12-20",
+      "policyReceived": true,
+      "policyReceivedOn": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "findings": [
+        {
+          "id": "non_renewal",
+          "status": "open",
+          "lastDay": "2026-11-20",
+          "daysLeft": 42
+        },
+        {
+          "id": "change_notice",
+          "status": "on_time",
+          "lastDay": "2026-10-20",
+          "daysLeft": null
+        },
+        {
+          "id": "premium",
+          "status": "same",
+          "lastDay": null,
+          "daysLeft": null
+        },
+        {
+          "id": "distance_withdrawal",
+          "status": "not_applicable",
+          "lastDay": null,
+          "daysLeft": null
+        }
+      ],
+      "information": ["policy_correction", "questionnaire", "proportional_rule", "overinsurance"],
+      "offerPass": false
+    }
+  }
+}

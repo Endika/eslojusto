@@ -1,0 +1,173 @@
+<!--
+  Credit template «precontract-es»: a one-sheet Información Normalizada Europea in Spanish, with this credit's figures or a representative example.
+  Source: written for this bank. Its headings follow those of the standard European consumer
+  credit information form of annex II of Ley 16/2011, de contratos de crédito al consumo; a
+  legal text is not subject to copyright (art. 13 of the Ley de Propiedad Intelectual), and the
+  layout and wording are this bank's own.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1b1b1b;
+        font:
+          16px/1.45 'DejaVu Sans',
+          sans-serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 60px 70px 90px;
+        position: relative;
+        overflow: hidden;
+        background: #fdfdfb;
+      }
+      h1 {
+        font-size: 22px;
+        text-align: center;
+        margin: 0 0 4px;
+        letter-spacing: 0.5px;
+      }
+      .sub {
+        text-align: center;
+        font-size: 14px;
+        color: #444;
+        margin-bottom: 20px;
+      }
+      .box {
+        border: 1.5px solid #333;
+        margin-bottom: 12px;
+      }
+      .box h2 {
+        font-size: 13px;
+        text-transform: uppercase;
+        margin: 0;
+        background: #e6e6e6;
+        padding: 4px 8px;
+        border-bottom: 1px solid #333;
+      }
+      .box .in {
+        padding: 8px 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 18px;
+      }
+      .label {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #555;
+        display: block;
+      }
+      p {
+        margin: 0 0 9px;
+        text-align: justify;
+      }
+      .clause b {
+        text-transform: uppercase;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 6px 0;
+        font-size: 15px;
+      }
+      table.small {
+        font-size: 13px;
+      }
+      td,
+      th {
+        border: 1px solid #777;
+        padding: 5px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      table.small td,
+      table.small th {
+        padding: 3px 6px;
+      }
+      td.n,
+      th.n {
+        text-align: right;
+        white-space: nowrap;
+      }
+      .sign {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 50px;
+      }
+      .sign div {
+        width: 40%;
+        border-top: 1px solid #333;
+        padding-top: 6px;
+        text-align: center;
+        font-size: 14px;
+      }
+      .muted {
+        color: #555;
+        font-size: 13px;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <h1>INFORMACIÓN NORMALIZADA EUROPEA SOBRE EL CRÉDITO AL CONSUMO</h1>
+      <div class="sub">Fecha de entrega: {{deliveredOnText}}</div>
+      <div class="box">
+        <h2>1. Identidad y datos de contacto del prestamista</h2>
+        <div class="in"><p>{{lenderBlock}}</p></div>
+      </div>
+      <div class="box">
+        <h2>2. Descripción de las principales características del crédito</h2>
+        <div class="in">
+          <p>{{exampleText}}</p>
+          <table>
+            {{#terms}}
+            <tr>
+              <td>{{label}}</td>
+              <td class="n">{{value}}</td>
+            </tr>
+            {{/terms}}
+          </table>
+        </div>
+      </div>
+      <div class="box">
+        <h2>3. Costes del crédito</h2>
+        <div class="in"><p>{{costsText}}</p></div>
+      </div>
+      <div class="box">
+        <h2>4. Otros aspectos jurídicos importantes</h2>
+        <div class="in">
+          <p>
+            Derecho de desistimiento: usted tiene derecho a desistir del contrato de crédito en el
+            plazo de catorce días naturales.
+          </p>
+          <p>
+            Reembolso anticipado: usted tiene derecho a reembolsar anticipadamente el crédito, total
+            o parcialmente, en cualquier momento.
+          </p>
+        </div>
+      </div>
+      <p class="muted">Solicitante: {{borrowerName}}</p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

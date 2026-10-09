@@ -1,0 +1,191 @@
+{
+  "id": "car-voluntary-notice-late-premium-up",
+  "description": "LCS art. 22.3: a motor policy with voluntary covers ending on 20-11-2026, so any change had to be notified by 20-09-2026. The notice of a higher premium and excess arrived on 02-10-2026, 49 days ahead: late, said as a fact, with no consequence drawn. The last day to stop the renewal is 20-10-2026 (art. 22.2): 11 days left. Taken out in person, so no distance withdrawal.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "insurance/car-es",
+      "data": {
+        "policyNumber": "PRUEBA-AU-005118",
+        "lineText": "Automóvil",
+        "insurerBlock": "Ficticia Mutua de Seguros Ejemplo, con CIF A67890122 y domicilio en Paseo de la Prueba Ficticia, 5, Madrid, inscrita con un número ficticio en el registro administrativo de entidades aseguradoras.",
+        "agentText": "Mediador: Ficticia Correduría de Seguros, S. L., correduría de seguros.",
+        "holderName": "Persona Tomadora Ficticia F",
+        "holderDni": "52183746J",
+        "holderAddress": "Calle de la Prueba Ficticia, 26, Logroño",
+        "riskText": "Turismo Ficticio Modelo Muestra, híbrido",
+        "dates": [
+          {
+            "label": "Fecha de contratación",
+            "value": "20 de noviembre de 2019"
+          },
+          {
+            "label": "Fecha de efecto",
+            "value": "20 de noviembre de 2025"
+          },
+          {
+            "label": "Fecha de vencimiento",
+            "value": "20 de noviembre de 2026"
+          }
+        ],
+        "durationText": "La póliza se contrata por un año y se prorrogará tácitamente por periodos anuales. El tomador podrá oponerse a la prórroga mediante notificación escrita a la entidad con al menos un mes de antelación a la conclusión del periodo en curso, y la entidad con al menos dos meses.",
+        "sums": [
+          {
+            "concept": "Valor del vehículo (daños propios)",
+            "amount": "14.200,00 €"
+          }
+        ],
+        "proportionalText": "Daños propios con franquicia de 300,00 € por siniestro.",
+        "premium": [
+          {
+            "label": "Prima neta",
+            "value": "475,00 €"
+          },
+          {
+            "label": "Recargos (Consorcio de Compensación de Seguros)",
+            "value": "9,10 €"
+          },
+          {
+            "label": "Impuesto sobre las primas de seguros",
+            "value": "28,20 €"
+          },
+          {
+            "label": "Prima total",
+            "value": "512,30 €"
+          }
+        ],
+        "iban": "ES40 0049 1836 1127 1004 5821",
+        "coversText": "Coberturas: responsabilidad civil obligatoria y voluntaria, defensa jurídica, lunas, robo, incendio y daños propios con franquicia.",
+        "channelText": "Póliza contratada en la oficina del mediador.",
+        "contactName": "Persona Gestora Ficticia F",
+        "city": "Logroño",
+        "issuedOnText": "20 de noviembre de 2019"
+      },
+      "degrade": {
+        "rotate": -0.6,
+        "shadow": 0.1,
+        "blur": 0.3,
+        "dark": 0.04,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    },
+    {
+      "template": "insurance/renewal-es",
+      "data": {
+        "insurerBlock": "Ficticia Mutua de Seguros Ejemplo, con CIF A67890122 y domicilio en Paseo de la Prueba Ficticia, 5, Madrid, inscrita con un número ficticio en el registro administrativo de entidades aseguradoras.",
+        "holderName": "Persona Tomadora Ficticia F",
+        "holderAddress": "Calle de la Prueba Ficticia, 26, Logroño",
+        "city": "Madrid",
+        "noticeOnText": "2 de octubre de 2026",
+        "mediumText": "Enviado por correo electrónico",
+        "policyNumber": "PRUEBA-AU-005118",
+        "lineText": "Automóvil",
+        "expiresText": "20 de noviembre de 2026",
+        "premium": [
+          {
+            "label": "Prima total del periodo que termina",
+            "value": "512,30 €"
+          },
+          {
+            "label": "Prima total del nuevo periodo",
+            "value": "589,10 €"
+          }
+        ],
+        "changesText": "La franquicia de daños propios pasa de 300,00 € a 450,00 € por siniestro.",
+        "iban": "ES40 0049 1836 1127 1004 5821"
+      },
+      "degrade": {
+        "rotate": 0.9,
+        "shadow": 0.18,
+        "blur": 0.5,
+        "dark": 0.06,
+        "crop": 0,
+        "jpegQuality": 0.76
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "line": "car",
+        "carCover": "with_voluntary",
+        "intermediaryType": "company",
+        "concludedOn": "2019-11-20",
+        "effectiveOn": "2025-11-20",
+        "expiresOn": "2026-11-20",
+        "renews": true,
+        "premiumNet": 475,
+        "premiumSurcharges": 9.1,
+        "premiumTaxes": 28.2,
+        "premiumTotal": 512.3,
+        "channel": "in_person",
+        "noticeOn": "2026-10-02",
+        "noticeMedium": "email",
+        "previousPremium": 512.3,
+        "newPremium": 589.1,
+        "coverChanges": true
+      },
+      "lists": {
+        "sumsInsured": [
+          {
+            "kind": "vehicle",
+            "amount": 14200
+          }
+        ]
+      }
+    },
+    "input": {
+      "line": "car",
+      "carCover": "with_voluntary",
+      "mortgageRequired": null,
+      "renews": true,
+      "expiresOn": "2026-11-20",
+      "notice": {
+        "receivedOn": "2026-10-02",
+        "previousPremium": 512.3,
+        "newPremium": 589.1,
+        "changes": true
+      },
+      "distance": false,
+      "concludedOn": "2019-11-20",
+      "policyReceived": true,
+      "policyReceivedOn": null
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "findings": [
+        {
+          "id": "non_renewal",
+          "status": "open",
+          "lastDay": "2026-10-20",
+          "daysLeft": 11
+        },
+        {
+          "id": "change_notice",
+          "status": "late",
+          "lastDay": "2026-09-20",
+          "daysLeft": null
+        },
+        {
+          "id": "premium",
+          "status": "up",
+          "lastDay": null,
+          "daysLeft": null
+        },
+        {
+          "id": "distance_withdrawal",
+          "status": "not_applicable",
+          "lastDay": null,
+          "daysLeft": null
+        }
+      ],
+      "information": ["policy_correction", "questionnaire", "proportional_rule", "overinsurance"],
+      "offerPass": false
+    }
+  }
+}

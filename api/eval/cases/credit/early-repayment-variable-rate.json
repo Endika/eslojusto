@@ -1,0 +1,208 @@
+{
+  "id": "early-repayment-variable-rate",
+  "description": "LCC art. 30.3: a loan at a variable rate (Euríbor plus a margin) repaid in part on 10-06-2026. No compensation may be charged for a repayment in a period without a fixed rate, and the 50,00 € charged has no basis: «cobro de más» of 50,00 €. The indicator reads the series of rates fixed for up to a year.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/loan-es",
+      "data": {
+        "contractRef": "PF-2021-015000",
+        "lenderBlock": "Ficticia Banca de Prueba, S. A., con CIF A23456786 y domicilio en Calle de la Prueba Ficticia, 1, Zaragoza. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia R",
+        "borrowerDni": "53222206T",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 20, Zaragoza",
+        "purposeText": "Reforma de la vivienda",
+        "terms": [
+          {
+            "label": "Importe total del crédito",
+            "value": "15.000,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) variable",
+            "value": "4,50 % el primer año; después, Euríbor a un año más 4,00 puntos, revisable cada año"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "4,59 % (calculada con el tipo inicial)"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "84 cuotas mensuales"
+          },
+          {
+            "label": "Importe de la cuota inicial",
+            "value": "208,50 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "20/02/2021"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "20/01/2028"
+          }
+        ],
+        "charges": [],
+        "chargesNote": "El contrato no devenga comisiones de apertura, estudio ni gestión.",
+        "insuranceText": "La concesión del crédito no está condicionada a la contratación de ningún seguro.",
+        "guaranteeText": "El préstamo no cuenta con garantía real. La persona prestataria responde del pago con todos sus bienes presentes y futuros.",
+        "infoText": "La persona prestataria declara haber recibido, antes de la celebración del contrato, la Información Normalizada Europea, y en este acto un ejemplar del contrato.",
+        "iban": "ES13 2100 1666 2811 3777 7778",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente el crédito en cualquier momento, abonando una comisión del 1 % sobre el capital reembolsado.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Zaragoza",
+        "agreedOnText": "20 de enero de 2021"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "credit/early-repayment-es",
+      "data": {
+        "lenderName": "Ficticia Banca de Prueba, S. A.",
+        "contractRef": "PF-2021-015000",
+        "borrowerName": "Persona Prestataria Ficticia R",
+        "repaidOnText": "10 de junio de 2026",
+        "kindText": "Parcial",
+        "endText": "20 de enero de 2028",
+        "iban": "ES13 2100 1666 2811 3777 7778",
+        "noteText": "Liquidación practicada a petición de la persona prestataria.",
+        "lines": [
+          {
+            "concept": "Capital amortizado",
+            "amount": "5.000,00 €"
+          },
+          {
+            "concept": "Intereses liquidados hasta la fecha",
+            "amount": "14,20 €"
+          },
+          {
+            "concept": "Comisión por amortización anticipada (1 %)",
+            "amount": "50,00 €"
+          },
+          {
+            "concept": "Total",
+            "amount": "5.064,20 €"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "personal_loan",
+        "agreedOn": "2021-01-20",
+        "principal": 15000,
+        "nominalRate": 4.5,
+        "rateType": "variable",
+        "declaredApr": 4.59,
+        "instalmentCount": 84,
+        "instalmentAmount": 208.5,
+        "firstDueOn": "2021-02-20",
+        "agreedEndOn": "2028-01-20",
+        "repaidOn": "2026-06-10",
+        "principalRepaid": 5000,
+        "interestSettled": 14.2,
+        "compensationCharged": 50
+      },
+      "lists": {}
+    },
+    "input": {
+      "product": "personal_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2021-01-20",
+      "drawnOn": "2021-01-20",
+      "principal": 15000,
+      "netDisbursed": null,
+      "nominalRate": 4.5,
+      "rateType": "variable",
+      "declaredApr": 4.59,
+      "declaredTotalPayable": null,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 84,
+        "amount": 208.5,
+        "frequency": "monthly",
+        "firstDueOn": "2021-02-20"
+      },
+      "balloon": null,
+      "charges": [],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": {
+        "on": "2026-06-10",
+        "principalRepaid": 5000,
+        "interestSettled": 14.2,
+        "compensationCharged": 50,
+        "paidByInsurance": false,
+        "agreedEndOn": "2028-01-20",
+        "remainingInterest": null,
+        "discountLost": null
+      },
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 4.59
+        },
+        {
+          "id": "early_repayment",
+          "status": "charged_without_basis",
+          "amount": 50
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2021-02-03"
+        }
+      ],
+      "indicator": {
+        "status": "distance_only",
+        "apr": 4.59,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.9",
+          "month": "2021-01",
+          "value": 3.3079
+        },
+        "points": 1.28
+      },
+      "information": ["contract_mentions", "law_change"],
+      "overCharged": {
+        "counted": 50,
+        "upTo": 50
+      },
+      "offerPass": true
+    }
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "id": "life-policy-gate",
+  "description": "The review works out the dates of LCS art. 22 for home and motor policies only: a life policy stops at the door with nothing worked out, and the review says why.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "insurance/policy-es",
+      "data": {
+        "policyNumber": "PRUEBA-VI-006300",
+        "lineText": "Vida riesgo",
+        "insurerBlock": "Ficticia Mutua de Seguros Ejemplo, con CIF A67890122 y domicilio en Paseo de la Prueba Ficticia, 5, Madrid, inscrita con un número ficticio en el registro administrativo de entidades aseguradoras.",
+        "agentText": "Mediador: Ficticia Correduría de Seguros, S. L., correduría de seguros.",
+        "holderName": "Persona Tomadora Ficticia G",
+        "holderDni": "68419697B",
+        "holderAddress": "Calle de la Prueba Ficticia, 27, Toledo",
+        "riskText": "Persona asegurada: la persona tomadora",
+        "dates": [
+          {
+            "label": "Fecha de contratación",
+            "value": "1 de marzo de 2022"
+          },
+          {
+            "label": "Fecha de efecto",
+            "value": "1 de marzo de 2026"
+          },
+          {
+            "label": "Fecha de vencimiento",
+            "value": "1 de marzo de 2027"
+          }
+        ],
+        "durationText": "La póliza se contrata por un año y se prorrogará tácitamente por periodos anuales. El tomador podrá oponerse a la prórroga mediante notificación escrita a la entidad con al menos un mes de antelación a la conclusión del periodo en curso, y la entidad con al menos dos meses.",
+        "sums": [
+          {
+            "concept": "Capital por fallecimiento",
+            "amount": "60.000,00 €"
+          }
+        ],
+        "proportionalText": "Beneficiarios: los designados por la persona tomadora.",
+        "premium": [
+          {
+            "label": "Prima neta",
+            "value": "118,40 €"
+          },
+          {
+            "label": "Recargos (Consorcio de Compensación de Seguros)",
+            "value": "0,00 €"
+          },
+          {
+            "label": "Impuesto sobre las primas de seguros",
+            "value": "0,00 €"
+          },
+          {
+            "label": "Prima total",
+            "value": "118,40 €"
+          }
+        ],
+        "iban": "ES79 0049 2287 2730 3802 4763",
+        "coversText": "Coberturas: fallecimiento por cualquier causa.",
+        "channelText": "Póliza contratada en la oficina del mediador.",
+        "contactName": "Persona Gestora Ficticia G",
+        "city": "Santander",
+        "issuedOnText": "1 de marzo de 2022"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "line": "life",
+        "intermediaryType": "company",
+        "concludedOn": "2022-03-01",
+        "effectiveOn": "2026-03-01",
+        "expiresOn": "2027-03-01",
+        "renews": true,
+        "premiumNet": 118.4,
+        "premiumTotal": 118.4,
+        "channel": "in_person"
+      },
+      "lists": {
+        "sumsInsured": [
+          {
+            "kind": "other",
+            "amount": 60000
+          }
+        ]
+      }
+    },
+    "input": {
+      "line": "life",
+      "carCover": null,
+      "mortgageRequired": null,
+      "renews": true,
+      "expiresOn": "2027-03-01",
+      "notice": null,
+      "distance": false,
+      "concludedOn": "2022-03-01",
+      "policyReceived": true,
+      "policyReceivedOn": null
+    },
+    "review": {
+      "scope": {
+        "inScope": false,
+        "reason": "life"
+      },
+      "findings": [],
+      "information": ["out_of_scope"],
+      "offerPass": false
+    }
+  }
+}
