@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.33.0](https://github.com/Endika/eslojusto/compare/v1.32.0...v1.33.0) (2026-10-09)
+
+
+### Features
+
+* publish the rent, contract, ERTE and household reviews in beta ([68ffd9f](https://github.com/Endika/eslojusto/commit/68ffd9f8d7cc917802c59eab2bfc43f649706f40))
+
+
+### Bug Fixes
+
+* **copy:** tell pre-decree seasonal leases apart and align room, reference-price and salary texts ([67dba9b](https://github.com/Endika/eslojusto/commit/67dba9b28d8dd0f9781f2b43b506cddbe7b3561a))
+* **documents:** keep a typed row's first-choice kind on a later read and stop promising a mark ([68387ff](https://github.com/Endika/eslojusto/commit/68387ffe1ecd6de4a0b1c59d40fc39399cb8dd45))
+* **employment:** add no minimum wage total over a contract whose later years are left to check ([b2a0036](https://github.com/Endika/eslojusto/commit/b2a003664cc22822dd4826a20509846c182e2c1c))
+* **rent-indices:** link to the rental review instead of announcing it once it is published ([918a23a](https://github.com/Endika/eslojusto/commit/918a23a8e78151e8f17f9c0f052e8a367a0ef670))
+* **rental:** count only what passes the cap of a rise paid without written notice ([857ab3c](https://github.com/Endika/eslojusto/commit/857ab3c9f4908ae17c6f591940fb3ab4066fd409))
+
 ## [1.32.0](https://github.com/Endika/eslojusto/compare/v1.31.0...v1.32.0) (2026-10-09)
 
 
