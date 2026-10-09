@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { nextSheet } from '../support/sheets';
 import { syntheticPhoto } from '../support/synthetic-photo';
 
 // Runs only against a TEST_DOCUMENTS=1 build: each read comes from a fake extract function, in
@@ -244,6 +245,79 @@ test.describe('alquiler', () => {
     ]);
     expect(rows(all, 'returns', ['on', 'amount'])).toEqual([
       { on: '2026-08-14', amount: '850,00' },
+    ]);
+  });
+  // The concept list starts on «Comunidad», so a row typed with it looks untouched there. No
+  // sheet leads back to the upload once typing, so the test opens it as the start sheet would.
+  test('a read never turns a typed row into another concept’s', async ({ page }) => {
+    const ibi = reading(
+      ['rent_receipt'],
+      {},
+      {
+        receipts: [
+          row('rent_receipt', { month: '2025-05', total: 1300, rent: 1000, propertyTax: 300 }),
+        ],
+      },
+    );
+    await fakeReads(page, [ibi]);
+    await page.goto('alquiler/');
+    await page.getByRole('button', { name: /Rellenar a mano/ }).click();
+    const sheet = (name: string) => page.getByRole('group', { name, exact: true });
+    const contract = sheet('Tu contrato');
+    await contract.getByLabel('Vivienda habitual', { exact: true }).check();
+    await contract.getByLabel('Fecha del contrato', { exact: true }).fill('2024-03-15');
+    await contract.getByLabel('Fecha de entrada', { exact: true }).fill('2024-03-20');
+    await nextSheet(page);
+    const landlord = sheet('Tu casero');
+    await landlord.getByLabel('Una persona').check();
+    await landlord
+      .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
+      .getByLabel('No', { exact: true })
+      .check();
+    await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
+    await landlord
+      .getByRole('group', { name: '¿Está la vivienda en una zona tensionada?' })
+      .getByLabel('No', { exact: true })
+      .check();
+    await nextSheet(page);
+    await nextSheet(page);
+    const rent = sheet('La renta');
+    await rent.getByLabel('Renta al empezar').fill('1.000,00');
+    await rent.getByLabel('Duración pactada, en meses').fill('60');
+    await rent.getByLabel('El IPC', { exact: true }).check();
+    await nextSheet(page);
+    await sheet('Las subidas').getByLabel('No ha habido subidas').check();
+    await nextSheet(page);
+    const charges = sheet('Los gastos');
+    await charges.getByLabel('Sí, añadirlos').check();
+    const charge = charges.getByRole('group', { name: 'Gasto 1' });
+    await expect(charge.getByLabel('Concepto')).toHaveValue('community');
+    await charge.getByLabel('Año', { exact: true }).fill('2025');
+    await charge.getByLabel('Sí', { exact: true }).check();
+    await charge.getByLabel('Importe al año que fija el contrato').fill('600,00');
+    await charge
+      .getByLabel('Importe de los gastos de ese año (el año al que corresponden)')
+      .fill('700,00');
+    await page.evaluate(() => {
+      document.querySelector<HTMLElement>('[data-documents-start]')?.removeAttribute('hidden');
+      document.querySelector<HTMLElement>('#rental')?.setAttribute('hidden', '');
+      document
+        .querySelector<HTMLElement>('[data-start-panel="choose"] [data-start-upload]')
+        ?.click();
+    });
+    await read(page, ['recibo.png']);
+    await expect(notes(page).filter({ hasText: DIFFER })).toHaveCount(0);
+
+    const all = await answers(page, 'rental');
+    expect(rows(all, 'charges', ['kind', 'inContract', 'annualAgreed', 'year', 'amount'])).toEqual([
+      {
+        kind: 'community',
+        inContract: 'yes',
+        annualAgreed: '600,00',
+        year: '2025',
+        amount: '700,00',
+      },
+      { kind: 'property_tax', year: '2025', amount: '300,00' },
     ]);
   });
 });

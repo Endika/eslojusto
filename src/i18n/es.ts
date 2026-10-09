@@ -1061,6 +1061,8 @@ export const es = {
     'Algún dato se ha leído con confianza baja: compáralo con tus documentos.',
   'client.documents.reads_differ':
     'Algún dato de estos documentos no dice lo mismo que lo leído antes: se ha dejado lo que ya había, con una marca para que lo compares con tus documentos.',
+  'client.documents.typed_differs':
+    'Algún dato que escribiste no dice lo mismo que estos documentos: se ha dejado lo que escribiste. Compáralo con tus documentos.',
   'client.documents.recalculated':
     'Algunas cifras que salen de tus documentos se han vuelto a calcular con todo lo leído: compruébalas.',
   'client.documents.rows_full':
