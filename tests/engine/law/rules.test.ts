@@ -141,4 +141,8 @@ describe('rules active on a day', () => {
     ]);
     expect(on('2031-07-03', repealed)).toEqual([['old_limit', null]]);
   });
+
+  it('a successor still a draft never applies nor displaces the rule it would replace', () => {
+    expect(on('2031-06-01', withReform({ status: 'draft' }))).toEqual([['old_limit', null]]);
+  });
 });

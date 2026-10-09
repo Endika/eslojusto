@@ -18,6 +18,7 @@
     "prepare": "husky",
     "rent-indices:review": "vitest run tests/content/rent-indices.test.ts --reporter=verbose",
     "household:review": "vitest run tests/engine/household/monthly-review.test.ts --reporter=verbose",
+    "law:review": "vitest run tests/law/review-list.test.ts --reporter=verbose",
     "employment:review": "vitest run tests/engine/employment/monthly-review.test.ts --reporter=verbose",
     "indices:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indices.mjs --check",
     "rental-bank": "node scripts/rental-bank/render.mjs",

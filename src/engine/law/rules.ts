@@ -1,5 +1,5 @@
 import { toIso, type CivilDate } from '../date';
-import { normStanding, type NormTable } from './norms';
+import { normStanding, type NormStatus, type NormTable } from './norms';
 import type { NormSource } from './sources';
 
 export interface Rule<RuleId extends string, NormId extends string> {
@@ -20,11 +20,23 @@ export type RuleTable<RuleId extends string, NormId extends string> = Readonly<
   Record<RuleId, Rule<RuleId, NormId>>
 >;
 
-export function ruleSource<RuleId extends string, NormId extends string>(
+// What a rule gives the person: an amount, a date, a position against a reference, or text.
+export type RuleOutput = 'amount' | 'date' | 'indicator' | 'info';
+
+// A rule that says what it outputs and which sources, besides its norm, it rests on.
+export interface RuleBase<SourceId extends string = string> {
+  readonly id: string;
+  // Null when the rule rests only on its sources, as a court's criterion does.
+  readonly norm: string | null;
+  readonly output: RuleOutput;
+  readonly sources: readonly SourceId[];
+}
+
+export function ruleSource<RuleId extends string, NormId extends string, Status extends NormStatus>(
   rules: RuleTable<RuleId, NormId>,
   id: RuleId,
-  norms: NormTable<NormId>,
-): NormSource {
+  norms: NormTable<NormId, Status>,
+): NormSource<Status> {
   const { article, url, norm: normId } = rules[id];
   const norm = norms[normId];
   return {

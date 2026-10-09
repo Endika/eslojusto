@@ -1,17 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { normStanding, type Norm } from '../../../src/engine/law/norms';
-
-const norm = (change: Partial<Norm<'x'>> = {}): Norm<'x'> => ({
-  id: 'x',
-  citation: 'Ley de prueba 1/2030',
-  url: 'https://www.boe.es/buscar/doc.php?id=BOE-A-2030-1',
-  inForceSince: '2030-03-01',
-  inForceUntil: null,
-  status: 'in_force',
-  statusSince: null,
-  statusUrl: null,
-  ...change,
-});
+import { normStanding } from '../../../src/engine/law/norms';
+import { norm } from './fixtures';
 
 describe('norm standing', () => {
   it.each([
@@ -58,5 +47,9 @@ describe('norm standing', () => {
   it('a norm repealed before it took effect never stands', () => {
     const never = norm({ status: 'repealed', inForceUntil: '2030-02-27' });
     expect(normStanding(never, '2030-03-01')).toBe('not_in_force');
+  });
+
+  it.each(['2030-02-28', '2030-03-01', '2099-12-31'])('a draft never stands, on %s', (day) => {
+    expect(normStanding(norm({ status: 'draft' }), day)).toBe('not_in_force');
   });
 });

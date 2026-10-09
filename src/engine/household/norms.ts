@@ -1,10 +1,11 @@
 import type {
+  EnactedStatus,
   Norm as LawNorm,
   NormReview as LawNormReview,
   NormTable as LawNormTable,
 } from '../law/norms';
 
-export { normStanding, type NormStanding, type NormStatus } from '../law/norms';
+export { normStanding, type NormStanding, type EnactedStatus as NormStatus } from '../law/norms';
 
 export type HouseholdNormId =
   | 'rd1620_2011'
@@ -17,8 +18,8 @@ export type HouseholdNormId =
   | 'rd87_2025'
   | 'rd126_2026';
 
-export type Norm = LawNorm<HouseholdNormId>;
+export type Norm = LawNorm<HouseholdNormId, EnactedStatus>;
 
-export type NormTable = LawNormTable<HouseholdNormId>;
+export type NormTable = LawNormTable<HouseholdNormId, EnactedStatus>;
 
 export type NormReview = LawNormReview<HouseholdNormId>;

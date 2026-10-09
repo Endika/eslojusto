@@ -1,6 +1,6 @@
-import type { Norm as LawNorm, NormTable as LawNormTable } from '../law/norms';
+import type { EnactedStatus, Norm as LawNorm, NormTable as LawNormTable } from '../law/norms';
 
-export { normStanding, type NormStanding, type NormStatus } from '../law/norms';
+export { normStanding, type NormStanding, type EnactedStatus as NormStatus } from '../law/norms';
 
 export type NormId =
   | 'lau'
@@ -17,6 +17,6 @@ export type NormId =
   | 'rdl29_2026'
   | 'rdl28_2026';
 
-export type Norm = LawNorm<NormId>;
+export type Norm = LawNorm<NormId, EnactedStatus>;
 
-export type NormTable = LawNormTable<NormId>;
+export type NormTable = LawNormTable<NormId, EnactedStatus>;
