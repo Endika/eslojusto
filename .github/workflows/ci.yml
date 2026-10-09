@@ -5,8 +5,38 @@ on:
 permissions: { contents: read }
 concurrency: { group: 'ci-${{ github.ref }}', cancel-in-progress: true }
 jobs:
+  # A release-please PR that only bumps the version and the changelog runs nothing heavy: the
+  # version is read nowhere, and main runs the whole pipeline again after the merge.
+  scope:
+    name: scope
+    runs-on: ubuntu-latest
+    outputs:
+      release_only: ${{ steps.check.outputs.release_only }}
+    steps:
+      - uses: actions/checkout@v7
+        with: { fetch-depth: 0 }
+      - id: check
+        env:
+          EVENT: ${{ github.event_name }}
+          HEAD_REF: ${{ github.head_ref }}
+          SAME_REPO: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          release_only=false
+          if [ "$EVENT" = pull_request ] && [ "$SAME_REPO" = true ] && [[ "$HEAD_REF" == release-please--* ]]; then
+            files=$(git diff --name-only "$BASE...$HEAD")
+            other=$(printf '%s\n' "$files" | grep -vxE 'CHANGELOG\.md|\.release-please-manifest\.json|package\.json|package-lock\.json' || true)
+            # In the two package files, only "version" lines may change.
+            changed=$(git diff -U0 "$BASE...$HEAD" -- package.json package-lock.json | grep -E '^[+-][^+-]' | grep -vE '^[+-][[:space:]]*"version": "[^"]+",?$' || true)
+            if [ -z "$other" ] && [ -z "$changed" ]; then release_only=true; fi
+          fi
+          echo "release_only=$release_only" >> "$GITHUB_OUTPUT"
+          echo "release_only=$release_only"
   quality:
     name: quality
+    needs: scope
+    if: needs.scope.outputs.release_only != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -46,6 +76,8 @@ jobs:
         env: { CI: 'true', TEST_DOCUMENTS: '1' }
   audit:
     name: audit
+    needs: scope
+    if: needs.scope.outputs.release_only != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -55,6 +87,8 @@ jobs:
       - run: npm audit --omit=dev --audit-level=high
   api:
     name: api
+    needs: scope
+    if: needs.scope.outputs.release_only != 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -74,10 +108,13 @@ jobs:
       - run: npm audit --omit=dev --audit-level=high
   all-green:
     name: all-green
-    needs: [quality, audit, api]
+    needs: [scope, quality, audit, api]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: every required job must have succeeded
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        if: >-
+          needs.scope.result != 'success'
+          || contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+          || (contains(needs.*.result, 'skipped') && needs.scope.outputs.release_only != 'true')
         run: exit 1
