@@ -10,6 +10,7 @@ import {
   type ErrorCode,
   type Extraction,
 } from './contract';
+import { mergeRead, type Applied } from './merge';
 import { admit, cannotFit, checkSelection, filesBucket, photoShare, requestBytes } from './files';
 import type { OutageMemory } from './outage';
 import { passClaims, passState, type PassStore, type StoredPass } from './pass';
@@ -139,6 +140,8 @@ export function setUpUpload<F extends string, L extends string>(
   let photos = 0;
   // The photos the last quality warning was about, for «Repetir».
   let flagged: Picked[] = [];
+  // What the reads since the form last started over put in it, by name.
+  const applied = new Map<string, Applied>();
 
   function show(panel: Panel, focus = true) {
     for (const [name, el] of Object.entries(panels)) el.hidden = name !== panel;
@@ -383,14 +386,51 @@ export function setUpUpload<F extends string, L extends string>(
   }
 
   function markForm(marks: readonly ReadMark[]) {
-    const label = (c: Confidence, derived = false) =>
-      tr(derived ? 'client.documents.mark_derived' : 'client.documents.mark', {
-        nivel: tr(`client.documents.confidence.${c}`),
-      }) + (c === 'low' ? tr('client.documents.mark_low') : '');
+    const label = (m: ReadMark) =>
+      m.conflict
+        ? tr('client.documents.mark_conflict')
+        : tr(m.derived ? 'client.documents.mark_derived' : 'client.documents.mark', {
+            nivel: tr(`client.documents.confidence.${m.confidence}`),
+          }) + (m.confidence === 'low' ? tr('client.documents.mark_low') : '');
     for (const m of marks) {
       const container = form.querySelector<HTMLElement>(m.container);
-      if (container) addMark(container, m.id, label(m.confidence, m.derived), m.confidence);
+      if (container) addMark(container, m.id, label(m), m.confidence);
     }
+  }
+
+  // Whether a control still holds what the page gave it, so the answer is nobody's yet.
+  function atDefault(name: string, value: string): boolean {
+    const controls = [
+      ...form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+        'input[name], select[name], textarea[name]',
+      ),
+    ].filter((el) => el.name === name);
+    return controls.every((el) => {
+      if (el instanceof HTMLSelectElement) {
+        const options = [...el.options];
+        return (options.find((o) => o.defaultSelected) ?? options[0])?.value === value;
+      }
+      if (el instanceof HTMLInputElement && (el.type === 'radio' || el.type === 'checkbox'))
+        return el.checked === el.defaultChecked;
+      return el.value === el.defaultValue;
+    });
+  }
+
+  // Fills the form with a read on top of what earlier reads or the person put there; the notes
+  // say what the read could not set as it came.
+  function apply(prefill: ReadPrefill): string[] {
+    const held = calculator
+      .entries()
+      .filter(([name, value]) => applied.get(name)?.value === value || !atDefault(name, value));
+    const merged = mergeRead(prefill, held, applied, deps.reading.lists ?? {});
+    calculator.fill(merged.entries);
+    markForm(merged.marks);
+    for (const [name, value] of merged.applied) applied.set(name, value);
+    return [
+      ...(merged.differ ? [tr('client.documents.reads_differ')] : []),
+      ...(merged.recalculated ? [tr('client.documents.recalculated')] : []),
+      ...(merged.full ? [tr('client.documents.rows_full')] : []),
+    ];
   }
 
   function showDone(
@@ -604,8 +644,7 @@ export function setUpUpload<F extends string, L extends string>(
       Object.fromEntries(calculator.entries()),
       result.failedChecks,
     );
-    calculator.fill(prefill.entries);
-    markForm(prefill.marks);
+    const merged = apply(prefill);
     const skipped = skippedPages(result.extraction.pages, pages.length, false);
     events.extractionCompleted({
       kinds: [...new Set(result.extraction.documents.map((d) => d.kind))],
@@ -621,7 +660,7 @@ export function setUpUpload<F extends string, L extends string>(
     clearFiles();
     fieldError('files', null);
     showDone(
-      prefill,
+      { ...prefill, notes: [...prefill.notes, ...merged] },
       result.failedChecks,
       result.extraction,
       skippedLines(skipped, nameOf, tr, 'client.documents.skipped.done'),
@@ -735,6 +774,7 @@ export function setUpUpload<F extends string, L extends string>(
   form.addEventListener('change', unmark);
   form.addEventListener('reset', () => {
     for (const mark of form.querySelectorAll('[data-read-mark]')) removeMark(mark);
+    applied.clear();
   });
 
   const startStatus = panels.choose.querySelector<HTMLElement>('[data-start-status]');

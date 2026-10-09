@@ -2,6 +2,7 @@ import type { EmploymentFieldName, EmploymentListName } from '../documents/contr
 import type { DocumentReading } from '../documents/ports';
 import type { Translate } from '../i18n/client';
 import { QUOTED, employmentPrefill, type Quoted } from './prefill';
+import { ROW_MAX } from './rows';
 
 // The documents' own words under a question, before its choices, with what they are.
 function showQuote(form: HTMLFormElement, question: Quoted, text: string, tr: Translate) {
@@ -46,5 +47,13 @@ export function employmentReading(
       return p;
     },
     wordsEveryCheck: true,
+    // One contract per start date, one payslip per month, one salary part per kind and one clause
+    // per label.
+    lists: {
+      history: { identity: ['startDate'], max: ROW_MAX.history },
+      parts: { identity: ['kind'], max: ROW_MAX.parts },
+      payslips: { identity: ['month'], max: ROW_MAX.payslips },
+      clauses: { identity: ['label'], max: ROW_MAX.clauses },
+    },
   };
 }

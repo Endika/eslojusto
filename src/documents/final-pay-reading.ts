@@ -12,7 +12,8 @@ import {
 } from './prefill';
 import { conflictLines } from './summary';
 
-// The prefill as form answers. «Otros trabajos» rows take the place of any typed before.
+// The prefill as form answers, its rows of «Otros trabajos» numbered from 0: the upload adds them
+// to the rows the form already has.
 export function prefillEntries(p: Prefill): FormEntries {
   const entries: [string, string][] = p.fields.map((f) => [f.name, f.value]);
   if (p.otherContracts && p.otherContracts.length > 0) {
@@ -25,6 +26,8 @@ export function prefillEntries(p: Prefill): FormEntries {
   return entries;
 }
 
+const otherContract = (row: number) => `[data-other-contract="${row}"] fieldset`;
+
 const marksOf = (p: Prefill): ReadMark[] => [
   ...p.fields.map((f) => ({
     id: f.name,
@@ -34,7 +37,7 @@ const marksOf = (p: Prefill): ReadMark[] => [
   })),
   ...(p.otherContracts ?? []).map((c, i) => ({
     id: `otherContracts.${i}`,
-    container: `[data-other-contract="${i}"] fieldset`,
+    container: otherContract(i),
     confidence: c.confidence,
   })),
 ];
@@ -69,6 +72,10 @@ export function finalPayReading(form: HTMLFormElement, tr: Translate): FinalPayR
           ...(hasHolidayDays(p) ? [tr('client.documents.holiday_unit')] : []),
         ],
       };
+    },
+    // One job per start date.
+    lists: {
+      otherContracts: { identity: ['startDate'], max: Infinity, rowContainer: otherContract },
     },
     showAgreementOffer(result) {
       const sheet = result.querySelector('[data-item="severance"]');

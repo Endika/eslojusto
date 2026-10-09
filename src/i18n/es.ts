@@ -980,6 +980,8 @@ export const es = {
   'client.documents.mark': 'Leído del documento · confianza {nivel}',
   'client.documents.mark_derived': 'Sale del total de tu nómina · confianza {nivel}',
   'client.documents.mark_low': ': compruébalo',
+  'client.documents.mark_conflict':
+    'Leído del documento · otro documento dice otra cosa: compáralos',
   'client.documents.confidence.high': 'alta',
   'client.documents.confidence.medium': 'media',
   'client.documents.confidence.low': 'baja',
@@ -1057,6 +1059,12 @@ export const es = {
     'Los documentos no siempre dicen si los días de vacaciones son laborables o naturales: compruébalo en la hoja de vacaciones.',
   'client.documents.done_low':
     'Algún dato se ha leído con confianza baja: compáralo con tus documentos.',
+  'client.documents.reads_differ':
+    'Algún dato de estos documentos no dice lo mismo que lo leído antes: se ha dejado lo que ya había, con una marca para que lo compares con tus documentos.',
+  'client.documents.recalculated':
+    'Algunas cifras que salen de tus documentos se han vuelto a calcular con todo lo leído: compruébalas.',
+  'client.documents.rows_full':
+    'En alguna lista ya no caben todas las filas leídas: se han dejado las que ya tenías y se han añadido las que caben. Compara la lista con tus documentos y completa lo que falte.',
   'client.documents.check.end_before_start':
     'La fecha de baja leída es anterior a la de alta: revisa las dos.',
   'client.documents.check.items_do_not_sum':

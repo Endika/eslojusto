@@ -107,7 +107,7 @@ const noHousehold = {
 // that section's composition root. Allowlists, so no spelling of a path gets around them.
 const FINAL_PAY_DOCUMENTS = ['case', 'final-pay-reading', 'prefill', 'report'];
 const sharedDocuments =
-  'api|config|contract|files|letter|notice|outage|pass|pdf|pdf-pages|pdf-writer|ports|quality|skipped|summary|upload';
+  'api|config|contract|files|letter|merge|notice|outage|pass|pdf|pdf-pages|pdf-writer|ports|quality|skipped|summary|upload';
 // The contract mirrors one constant of the API package, two levels up.
 const apiMirror = '\\.\\./\\.\\./api/src/domain/image-limit$';
 const documentsPlatform = {
