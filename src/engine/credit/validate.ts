@@ -1,5 +1,5 @@
 import { addDays, compareDates, daysInMonth, type CivilDate } from '../date';
-import type { CreditInput } from './types';
+import type { CreditInput, ScheduleRow } from './types';
 
 export type CreditField =
   | 'agreedOn'
@@ -14,6 +14,7 @@ export type CreditField =
   | 'instalments.firstDueOn'
   | 'instalments.rows'
   | 'balloon'
+  | 'balloon.dueOn'
   | 'charges'
   | 'insurance.premium'
   | 'card.limit'
@@ -37,7 +38,8 @@ export type ValidationCode =
   | 'amount_range'
   | 'rate_range'
   | 'count_range'
-  | 'above_principal';
+  | 'above_principal'
+  | 'in_schedule';
 
 export interface ValidationError {
   readonly field: CreditField;
@@ -65,6 +67,15 @@ const isAmount = (v: number): boolean => Number.isFinite(v) && v > 0 && v <= MAX
 const isAmountOrZero = (v: number): boolean => v === 0 || isAmount(v);
 const isRate = (v: number): boolean => Number.isFinite(v) && v >= 0 && v <= MAX_RATE;
 const isCount = (v: number): boolean => Number.isInteger(v) && v >= 1 && v <= MAX_INSTALMENTS;
+
+// A schedule whose last row is at least the balloon and larger than every other row already holds
+// it: entered again as the balloon, it would be counted twice.
+function holdsBalloon(rows: readonly ScheduleRow[], balloon: number): boolean {
+  const sorted = [...rows].sort((a, b) => compareDates(a.dueOn, b.dueOn));
+  const last = sorted.at(-1);
+  if (last === undefined || last.amount < balloon) return false;
+  return sorted.slice(0, -1).every((r) => r.amount < last.amount);
+}
 
 export function validate(input: CreditInput, today: CivilDate): readonly ValidationError[] {
   const errors: ValidationError[] = [];
@@ -115,7 +126,19 @@ export function validate(input: CreditInput, today: CivilDate): readonly Validat
     else if (rows.some((r) => !isRealDate(r.dueOn))) fail('instalments.rows', 'invalid_date');
     else if (rows.some((r) => !isAmount(r.amount))) fail('instalments.rows', 'amount_range');
   }
-  if (input.balloon !== null) amount('balloon', input.balloon);
+  const { balloon } = input;
+  if (balloon !== null) {
+    amount('balloon', balloon.amount);
+    if (balloon.dueOn !== null && date('balloon.dueOn', balloon.dueOn))
+      if (drawn !== null && compareDates(balloon.dueOn, drawn) <= 0)
+        fail('balloon.dueOn', 'outside_term');
+    if (
+      instalments?.kind === 'schedule' &&
+      !errors.some((e) => e.field === 'instalments.rows') &&
+      holdsBalloon(instalments.rows, balloon.amount)
+    )
+      fail('balloon', 'in_schedule');
+  }
 
   if (input.charges.some((c) => !isRealDate(c.paidOn))) fail('charges', 'invalid_date');
   else if (input.charges.some((c) => !isAmount(c.amount))) fail('charges', 'amount_range');

@@ -16,6 +16,7 @@ export const loan = (change: Partial<CreditInput> = {}): CreditInput => ({
   rateType: 'fixed',
   declaredApr: 12,
   declaredTotalPayable: 13_120.8,
+  confirmedApr: false,
   instalments: {
     kind: 'regular',
     count: 48,
@@ -30,6 +31,7 @@ export const loan = (change: Partial<CreditInput> = {}): CreditInput => ({
   earlyRepayment: null,
   infoReceivedOn: null,
   infoReceived: true,
+  mentions: {},
   ...change,
 });
 
@@ -41,6 +43,7 @@ export const repayment = (change: Partial<EarlyRepayment> = {}): EarlyRepayment 
   paidByInsurance: false,
   agreedEndOn: parseDate('2023-02-15'),
   remainingInterest: 600,
+  discountLost: false,
   ...change,
 });
 

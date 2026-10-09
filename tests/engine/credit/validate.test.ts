@@ -44,7 +44,33 @@ describe('credit validation', () => {
     expect(errors({ principal: 1_000_000.01, netDisbursed: null })).toEqual([
       'principal:amount_range',
     ]);
-    expect(errors({ balloon: -1 })).toEqual(['balloon:amount_range']);
+    expect(errors({ balloon: { amount: -1, dueOn: null } })).toEqual(['balloon:amount_range']);
+  });
+
+  it('keeps the balloon day real and after the drawdown', () => {
+    expect(errors({ balloon: { amount: 3_000, dueOn: parseDate('2023-03-15') } })).toEqual([]);
+    expect(errors({ balloon: { amount: 3_000, dueOn: { y: 2023, m: 2, d: 29 } } })).toEqual([
+      'balloon.dueOn:invalid_date',
+    ]);
+    expect(errors({ balloon: { amount: 3_000, dueOn: parseDate('2019-02-15') } })).toEqual([
+      'balloon.dueOn:outside_term',
+    ]);
+  });
+
+  it('refuses a balloon the schedule already holds as its last row', () => {
+    const rows = (last: number) => ({
+      kind: 'schedule' as const,
+      rows: [
+        { dueOn: parseDate('2019-03-15'), amount: 300 },
+        { dueOn: parseDate('2019-04-15'), amount: 300 },
+        { dueOn: parseDate('2019-05-15'), amount: last },
+      ],
+    });
+    const balloon = { amount: 3_000, dueOn: null };
+    expect(errors({ instalments: rows(3_300), balloon })).toEqual(['balloon:in_schedule']);
+    expect(errors({ instalments: rows(300), balloon })).toEqual([]);
+    // A small balloon next to equal rows is not in them.
+    expect(errors({ instalments: rows(300), balloon: { amount: 100, dueOn: null } })).toEqual([]);
   });
 
   it('keeps the money handed over at most the principal', () => {
