@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.32.0](https://github.com/Endika/eslojusto/compare/v1.31.0...v1.32.0) (2026-10-09)
+
+
+### Features
+
+* **household:** add the household worker review at /empleada-de-hogar/ behind PUBLIC_HOUSEHOLD ([1c7a1f7](https://github.com/Endika/eslojusto/commit/1c7a1f7fd309fbc0fae8c69d56dbe054b1d608f6))
+
+
+### Bug Fixes
+
+* **documents:** add a later read's rows to the form and keep values an earlier read gave ([2a15563](https://github.com/Endika/eslojusto/commit/2a15563e498d6791c01c80f0e95c4de2cca7597a))
+
 ## [1.31.0](https://github.com/Endika/eslojusto/compare/v1.30.0...v1.31.0) (2026-10-09)
 
 
