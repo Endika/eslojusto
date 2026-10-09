@@ -72,6 +72,11 @@ describe('import boundaries', () => {
     ['src/engine/credit/x.ts', "import { RULES } from '../rental/rules';"],
     ['src/engine/insurance/x.ts', "import { NORMS } from './data/norms';"],
     ['src/engine/insurance/x.ts', "import { RULES } from '../credit/rules';"],
+    ['src/engine/mortgage/x.ts', "import { MORTGAGE_NORMS } from './data/norms';"],
+    ['src/engine/mortgage/x.ts', "import { RULES } from '../credit/rules';"],
+    ['src/engine/mortgage/x.ts', "import { t } from '../../i18n';"],
+    ['src/engine/mortgage/x.ts', "import { LEGAL_INTEREST } from '../law/data/legal-interest';"],
+    ['src/engine/credit/x.ts', "import { RULES } from '../mortgage/rules';"],
     ['src/engine/credit/data/x.ts', "import { t } from '../../../i18n';"],
     ['src/engine/insurance/x.ts', "import { t } from '../../i18n';"],
     ['src/engine/insurance/x.ts', "import { INSURANCE_NORMS } from './data/norms';"],
@@ -288,6 +293,9 @@ describe('import boundaries', () => {
     'src/engine/employment/data/x.ts',
     'src/engine/insurance/x.ts',
     'src/engine/insurance/data/x.ts',
+    'src/engine/mortgage/x.ts',
+    'src/engine/mortgage/data/x.ts',
+    'src/engine/law/data/x.ts',
     'src/engine/law/x.ts',
   ])('%s cannot read the clock', async (filePath) => {
     expect(await violations(filePath, 'export const now = () => new Date();')).toContain(
@@ -383,6 +391,8 @@ describe('import boundaries', () => {
     ['src/engine/insurance/x.ts', "import { activeRules } from '../law/rules';"],
     ['src/engine/insurance/x.ts', "import type { NormTable } from './norms';"],
     ['src/engine/insurance/data/x.ts', "import type { NormTable } from '../norms';"],
+    ['src/engine/mortgage/x.ts', "import { activeRules } from '../law/rules';"],
+    ['src/engine/mortgage/data/x.ts', "import type { SourceTable } from '../norms';"],
     ['src/engine/rental/x.ts', "import { interestByYear } from '../law/interest';"],
     ['src/engine/law/data/x.ts', "import type { LegalInterestTable } from '../interest';"],
     [

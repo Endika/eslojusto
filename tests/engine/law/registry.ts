@@ -17,6 +17,12 @@ import {
   NORM_REVIEW as INSURANCE_NORM_REVIEW,
 } from '../../../src/engine/insurance/data/norms';
 import { RULES as INSURANCE_RULES } from '../../../src/engine/insurance/rules';
+import {
+  MORTGAGE_NORMS,
+  NORM_REVIEW as MORTGAGE_NORM_REVIEW,
+} from '../../../src/engine/mortgage/data/norms';
+import { MORTGAGE_SOURCES } from '../../../src/engine/mortgage/data/sources';
+import { RULES as MORTGAGE_RULES } from '../../../src/engine/mortgage/rules';
 import { NORMS as RENTAL_NORMS } from '../../../src/engine/rental/data/norms';
 
 // Every section's law tables, for the checks that span them all and the monthly review list.
@@ -59,5 +65,12 @@ export const LAW_SECTIONS: readonly LawSection[] = [
     normReview: CREDIT_NORM_REVIEW,
     sources: CREDIT_SOURCES,
     rules: CREDIT_RULES,
+  },
+  {
+    name: 'mortgage',
+    norms: MORTGAGE_NORMS,
+    normReview: MORTGAGE_NORM_REVIEW,
+    sources: MORTGAGE_SOURCES,
+    rules: MORTGAGE_RULES,
   },
 ];
