@@ -63,7 +63,7 @@ describe('the CSP of a build that reads documents', () => {
       documents: ['https://a.test', 'https://b.test', 'https://c.test'],
     });
     expect(directive(csp, 'connect-src')).toBe(
-      'connect-src https://a.test https://b.test https://c.test https://challenges.cloudflare.com',
+      "connect-src 'self' https://a.test https://b.test https://c.test https://challenges.cloudflare.com",
     );
     expect(directive(csp, 'script-src')).toBe(
       "script-src 'self' 'sha256-x' https://challenges.cloudflare.com",
@@ -83,7 +83,7 @@ describe('the CSP of a build that reads documents', () => {
       documents: ['https://a.test', 'https://b.test', 'https://c.test'],
     });
     expect(directive(csp, 'connect-src')).toBe(
-      'connect-src https://eu.i.posthog.com https://a.test https://b.test https://c.test https://challenges.cloudflare.com',
+      "connect-src 'self' https://eu.i.posthog.com https://a.test https://b.test https://c.test https://challenges.cloudflare.com",
     );
   });
   it('without it, the policy is the same as before', () => {

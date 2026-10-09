@@ -143,7 +143,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
   });
   await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveAttribute(
     'content',
-    /connect-src https:\/\/eu\.i\.posthog\.com;/,
+    /connect-src 'self' https:\/\/eu\.i\.posthog\.com;/,
   );
 
   // A browser translator marks <html> the way Chrome's and Google's do.

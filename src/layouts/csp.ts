@@ -12,7 +12,9 @@ export const contentSecurityPolicy = ({
   analytics: boolean;
   documents?: readonly string[] | null;
 }): string => {
+  // 'self' lets the page fetch this site's own files, such as the robots.txt that crawlers read.
   const connect = [
+    "'self'",
     ...(analytics ? [ANALYTICS_ORIGIN] : []),
     ...(documents ? [...documents, TURNSTILE_ORIGIN] : []),
   ];
@@ -23,7 +25,7 @@ export const contentSecurityPolicy = ({
     "font-src 'self'",
     // The thumbnails of the files chosen to read are blob: URLs.
     `img-src 'self' data:${documents ? ' blob:' : ''}`,
-    `connect-src ${connect.length > 0 ? connect.join(' ') : "'none'"}`,
+    `connect-src ${connect.join(' ')}`,
     ...(documents ? [`frame-src ${TURNSTILE_ORIGIN}`] : []),
     // pdf.js draws a PDF's pages in a worker served from this site.
     ...(documents ? ["worker-src 'self'"] : []),

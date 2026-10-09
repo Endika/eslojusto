@@ -37,7 +37,7 @@ describe.skipIf(!withErte)('a build with the ERTE switch', () => {
     expect(read('dist/paro/index.html')).toContain('href="/paro/erte/"');
     const page = read('dist/paro/erte/index.html');
     expect(page).toContain('¿Qué tipo de ERTE tienes?');
-    expect(page).toContain("connect-src 'none'");
+    expect(page).toContain("connect-src 'self';");
   });
   it('gives it a beta section in the legal notice, like the other beta reviews', () => {
     const notice = read('dist/aviso-legal/index.html');

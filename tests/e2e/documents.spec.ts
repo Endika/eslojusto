@@ -157,7 +157,7 @@ test('the page opens on the choice, and the CSP names only the three function UR
     .locator('meta[http-equiv="Content-Security-Policy"]')
     .getAttribute('content');
   expect(csp).toContain(
-    `connect-src ${[...API_ORIGINS, 'https://challenges.cloudflare.com'].join(' ')}; frame-src https://challenges.cloudflare.com;`,
+    `connect-src ${["'self'", ...API_ORIGINS, 'https://challenges.cloudflare.com'].join(' ')}; frame-src https://challenges.cloudflare.com;`,
   );
 });
 
@@ -687,7 +687,7 @@ test('the privacy page and the legal notice describe documents and the pass', as
   await page.goto('privacidad/');
   await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveAttribute(
     'content',
-    /connect-src 'none';/,
+    /connect-src 'self';/,
   );
   const privacy = page.locator('main');
   await expect(privacy).toContainText('Documentos y pagos');
@@ -1029,7 +1029,7 @@ test('a case page offers the same start, and the manual path opens past its mark
     .locator('meta[http-equiv="Content-Security-Policy"]')
     .getAttribute('content');
   expect(csp).toContain(
-    `connect-src ${[...API_ORIGINS, 'https://challenges.cloudflare.com'].join(' ')};`,
+    `connect-src ${["'self'", ...API_ORIGINS, 'https://challenges.cloudflare.com'].join(' ')};`,
   );
   await page.getByRole('button', { name: /Rellenar a mano/ }).click();
   await expect(page.getByRole('heading', { name: /¿Cuándo empezaste/ })).toBeFocused();

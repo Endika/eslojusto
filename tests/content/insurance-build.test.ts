@@ -34,7 +34,7 @@ describe.skipIf(!withInsurance)('a build with the insurance switch', () => {
     expect(read('dist/index.html')).toContain('href="/seguros/"');
     const page = read('dist/seguros/index.html');
     expect(page).toContain('Día en que vence según tu póliza');
-    expect(page).toContain("connect-src 'none'");
+    expect(page).toContain("connect-src 'self';");
   });
   it('ships its strings only on its own page', () => {
     expect(read('dist/seguros/index.html')).toContain('client.insurance.status.open');

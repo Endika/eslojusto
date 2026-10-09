@@ -6,14 +6,14 @@ import { contentSecurityPolicy } from '../../src/layouts/csp';
 const connectSrc = (csp: string) => csp.split('; ').find((d) => d.startsWith('connect-src'));
 
 describe('CSP', () => {
-  it('without an analytics key, the page can connect to nobody', () => {
+  it('without an analytics key, the page can only connect to its own site', () => {
     const csp = contentSecurityPolicy({ themeHash: "'sha256-x'", analytics: false });
-    expect(connectSrc(csp)).toBe("connect-src 'none'");
+    expect(connectSrc(csp)).toBe("connect-src 'self'");
     expect(csp).not.toContain('posthog');
   });
   it('with a key, it can only connect to PostHog EU', () => {
     const csp = contentSecurityPolicy({ themeHash: "'sha256-x'", analytics: true });
-    expect(connectSrc(csp)).toBe('connect-src https://eu.i.posthog.com');
+    expect(connectSrc(csp)).toBe("connect-src 'self' https://eu.i.posthog.com");
     expect(csp).toContain("script-src 'self' 'sha256-x'");
     expect(csp.match(/posthog/g)).toHaveLength(1);
   });
@@ -35,10 +35,10 @@ const keylessBuild =
 
 describe.skipIf(!keylessBuild)('a keyless build tracks nothing', () => {
   const all = keylessBuild ? files('dist') : [];
-  it("every page declares connect-src 'none'", () => {
+  it("every page declares connect-src 'self' alone", () => {
     const html = all.filter((p) => p.endsWith('.html'));
     expect(html.length).toBeGreaterThan(0);
-    for (const p of html) expect(readFileSync(p, 'utf8'), p).toContain("connect-src 'none'");
+    for (const p of html) expect(readFileSync(p, 'utf8'), p).toContain("connect-src 'self';");
   });
   it('no script carries the PostHog SDK or its address', () => {
     for (const p of all.filter((f) => f.endsWith('.js'))) {
