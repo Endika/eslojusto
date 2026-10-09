@@ -22,11 +22,12 @@ export const es = {
   'footer.legal_notice': 'Aviso legal',
   'footer.privacy': 'Privacidad',
 
+  'breadcrumb.label': 'Estás en',
+  'breadcrumb.home': 'Inicio',
+
   'rent_indices.title': 'IRAV e IPC para el alquiler: {mes}',
   'rent_indices.description':
     'El IRAV de {mes} es del {irav} y el IPC, del {ipc}. Cada mes desde noviembre de 2024, con su día de publicación y el enlace al INE.',
-  'rent_indices.breadcrumb': 'Ruta',
-  'rent_indices.home': 'Portada',
   'rent_indices.h1': 'IRAV e IPC de cada mes',
   'rent_indices.lead':
     'Los índices que marcan cuánto puede subir tu alquiler cada año, con el día en que el INE publicó cada cifra. El IRAV sale cada mes junto con el IPC definitivo.',

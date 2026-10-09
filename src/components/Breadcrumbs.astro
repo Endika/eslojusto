@@ -1,0 +1,28 @@
+---
+import type { Crumb } from '../content/structured-data';
+import { t } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+// The trail above a page's title, on every page but the home. The page lists the same crumbs in
+// its BreadcrumbList, so what it shows and what it declares never part.
+interface Props {
+  lang: Lang;
+  crumbs: readonly Crumb[];
+}
+const { lang, crumbs } = Astro.props;
+const last = crumbs.length - 1;
+---
+
+<nav class="crumbs" aria-label={t(lang, 'breadcrumb.label')}>
+  <ol>
+    {crumbs.map(({ name, path }, i) => (
+      <li>
+        {i < last ? (
+          <a href={link(lang, path.replace(/^\//, ''))}>{name}</a>
+        ) : (
+          <span aria-current="page">{name}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>

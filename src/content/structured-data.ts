@@ -1,5 +1,5 @@
 import { t } from '../i18n';
-import type { Lang } from '../i18n/languages';
+import { link, type Lang } from '../i18n/languages';
 
 // schema.org nodes for each page's @graph. Only what is true of the site: no ratings, no prices.
 const SITE_NAME = 'eslojusto.es';
@@ -82,13 +82,25 @@ export const householdApp = (home: URL, page: URL, lang: Lang) => ({
   publisher: organization(home),
 });
 
-// The trail from the home page to this one; the last crumb is the page itself.
-export const breadcrumbList = (home: URL, crumbs: readonly { name: string; path: string }[]) => ({
+export interface Crumb {
+  readonly name: string;
+  // From the site root, with its trailing slash.
+  readonly path: string;
+}
+
+// The trail from the home page to this one; the last crumb is the page itself. The page shows it
+// with the Breadcrumbs component and lists the same crumbs in its BreadcrumbList.
+export const trail = (lang: Lang, ...crumbs: readonly Crumb[]): readonly Crumb[] => [
+  { name: t(lang, 'breadcrumb.home'), path: '/' },
+  ...crumbs,
+];
+
+export const breadcrumbList = (home: URL, lang: Lang, crumbs: readonly Crumb[]) => ({
   '@type': 'BreadcrumbList',
   itemListElement: crumbs.map(({ name, path }, i) => ({
     '@type': 'ListItem',
     position: i + 1,
     name,
-    item: new URL(path.replace(/^\//, ''), home).href,
+    item: new URL(link(lang, path.replace(/^\//, '')), home).href,
   })),
 });

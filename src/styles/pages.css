@@ -611,34 +611,6 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-.crumbs {
-  inline-size: min(100%, 44rem);
-}
-.crumbs ol {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 0.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font: 500 0.8125rem / 1.5 var(--f-mono);
-  font-stretch: 87.5%;
-}
-.crumbs li + li::before {
-  content: '/';
-  margin-inline-end: 0.5rem;
-}
-.crumbs a {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 2.75rem;
-}
-.crumbs [aria-current] {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 2.75rem;
-}
-
 .sheet--text .next-pages {
   padding-inline-start: 0;
   list-style: none;
@@ -1032,4 +1004,56 @@
   flex: none;
   inline-size: 1.25rem;
   block-size: 1.25rem;
+}
+
+/* ---------- Breadcrumbs: the trail above the title of every page but the home ---------- */
+
+.crumbs {
+  inline-size: min(100%, 44rem);
+}
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 500 0.8125rem / 1.5 var(--f-mono);
+  font-stretch: 87.5%;
+}
+/* A long crumb wraps inside 360 px rather than pushing the page sideways. */
+.crumbs li {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.crumbs li + li::before {
+  content: '/';
+  margin-inline-end: 0.5rem;
+  opacity: 0.6;
+}
+.crumbs a,
+.crumbs [aria-current] {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.75rem;
+}
+.crumbs a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+.crumbs a:hover {
+  text-decoration-thickness: 2px;
+}
+/* On a calculator's page the trail waits under it with the lead, so the first sheet still answers
+   inside 360×640, and goes above the title once the screen is tall enough for both. */
+.desk__head .crumbs {
+  order: 1;
+  inline-size: min(100%, 40rem);
+  margin-top: 1.75rem;
+}
+@media (min-width: 60rem) and (min-height: 50rem) {
+  .desk__head .crumbs {
+    margin-top: 0;
+  }
 }
