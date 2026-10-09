@@ -41,12 +41,14 @@ test('no page loads resources from another origin', async ({ page }) => {
     page.removeAllListeners('request');
   }
 });
-test('without an analytics key, the CSP lets the page connect to nobody', async ({ page }) => {
+test('without an analytics key, the CSP lets the page connect only to its own site', async ({
+  page,
+}) => {
   for (const path of ['./', 'finiquito/', 'privacidad/']) {
     await page.goto(path);
     await expect(page.locator('meta[http-equiv="Content-Security-Policy"]'), path).toHaveAttribute(
       'content',
-      /connect-src 'none';/,
+      /connect-src 'self';/,
     );
   }
 });
