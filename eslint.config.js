@@ -15,7 +15,7 @@ const localOnly = (dir) => ({
 // Each section of the engine (src/engine/<section>) reaches the rest of the engine one level up,
 // never another section, and only its edges (data/, where its tables live) hold data: its rules take
 // those tables as arguments. Sections share the norm model through src/engine/law.
-const SECTIONS = ['rental', 'employment', 'household', 'credit', 'insurance'];
+const SECTIONS = ['rental', 'employment', 'household', 'credit', 'insurance', 'mortgage'];
 const sectionOnly = (name) => ({
   regex: `^(?!\\.\\.?/)|${notCanonical}`,
   message: `src/engine/${name} imports only from src/engine.`,
