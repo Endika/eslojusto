@@ -20,6 +20,7 @@ export default defineConfig({
       'tests/employment/**/*.test.ts',
       'tests/erte/**/*.test.ts',
       'tests/content/**/*.test.ts',
+      'tests/law/**/*.test.ts',
     ],
   },
 });
