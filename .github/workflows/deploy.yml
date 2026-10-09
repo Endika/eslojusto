@@ -37,6 +37,11 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
+          # Sections published in beta.
+          PUBLIC_RENTAL: '1'
+          PUBLIC_EMPLOYMENT: '1'
+          PUBLIC_ERTE: '1'
+          PUBLIC_HOUSEHOLD: '1'
           # Unset, the build measures nothing and keeps connect-src 'none'.
           PUBLIC_POSTHOG_KEY: ${{ vars.PUBLIC_POSTHOG_KEY }}
           # Unset, document reading and the pass stay out of the build.
