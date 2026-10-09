@@ -4,6 +4,7 @@ import { pdfBomb, syntheticPdf } from '../support/synthetic-pdf';
 import { syntheticPhoto } from '../support/synthetic-photo';
 import { imageDimensions } from '../../api/src/domain/image-dimensions';
 import { nextSheet } from '../support/sheets';
+import { expectShownAndFocused } from '../support/reads';
 
 // Runs only against a TEST_DOCUMENTS=1 build, whose API is three fake origins: every request to them,
 // to Turnstile and to Stripe is answered here. The documents are synthetic.
@@ -144,7 +145,7 @@ async function uploadSettlement(page: Page, { read = true } = {}) {
   await page.getByLabel('Elegir fotos o PDF').setInputFiles(photo('finiquito-sintetico.png'));
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
-  if (read) await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
+  if (read) await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }));
 }
 
 test('the page opens on the choice, and the CSP names only the three function URLs and Turnstile', async ({
@@ -597,9 +598,9 @@ test('a read that finds nothing says why for each file, spends no read and keeps
     .setInputFiles([photo('nomina-movida.png'), photo('contrato-lisboa.png')]);
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
-  await expect(
+  await expectShownAndFocused(
     page.getByText('No se ha leído ningún dato, así que esta lectura no cuenta.'),
-  ).toBeFocused();
+  );
   await expect(
     page.getByText('nomina-movida.png: sale borrosa. Prueba con más luz y el móvil quieto.'),
   ).toBeVisible();
@@ -632,7 +633,7 @@ test('a dark photo is flagged before sending, and goes anyway if asked to', asyn
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
   await expect(page.getByText('nomina-a-oscuras.png se ve muy oscura.')).toBeVisible();
-  await expect(page.getByText('¿La repites?')).toBeFocused();
+  await expectShownAndFocused(page.getByText('¿La repites?'));
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -640,7 +641,7 @@ test('a dark photo is flagged before sending, and goes anyway if asked to', asyn
   ).toBeLessThanOrEqual(0);
   expect(fake.extract).toHaveLength(0);
   await page.getByRole('button', { name: 'Enviar igualmente' }).click();
-  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
+  await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }));
   expect(fake.extract).toHaveLength(1);
   expect((fake.extract[0]?.postDataJSON() as { files: unknown[] }).files).toHaveLength(2);
 });
@@ -736,7 +737,7 @@ test('files add up across picks, each can be removed, and only the rest are read
   await expect(list.locator('img')).toHaveCount(2);
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
-  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
+  await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }));
   const sent = fake.extract[0]?.postDataJSON() as { files: unknown[] };
   expect(sent.files).toHaveLength(2);
 });
@@ -758,7 +759,7 @@ test('a PDF is drawn in the browser: one entry per page, and only images are sen
   await expect(page.getByText('Añadido: carta-sintetica.pdf. Páginas: 3.')).toBeVisible();
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
-  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused();
+  await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }));
   const sent = fake.extract[0]?.postDataJSON() as { files: { mediaType: string; data: string }[] };
   expect(sent.files.map((f) => f.mediaType)).toEqual(['image/jpeg', 'image/jpeg', 'image/jpeg']);
   expect(JSON.stringify(sent)).not.toContain('application/pdf');
@@ -834,9 +835,7 @@ test('the 26th file is left out with a message, and 25 go in one read', async ({
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
   // Preparing 25 pages takes longer than the default wait on a loaded runner.
-  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused({
-    timeout: 60_000,
-  });
+  await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }), 60_000);
   const sent = fake.extract[0]?.postDataJSON() as { files: { data: string }[] };
   expect(sent.files).toHaveLength(25);
   // Light pages fit their share at the full size.
@@ -860,9 +859,7 @@ test('25 noisy photos fit one request, a shorter side only where the share needs
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
   await expect(page.locator('[data-doc-status]')).toHaveText(/^Preparando \d+ de 25…$/);
   // Each noisy page is encoded several times before one fits.
-  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused({
-    timeout: 60_000,
-  });
+  await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }), 60_000);
   const body = fake.extract[0]?.postData() ?? '';
   expect(body.length).toBeLessThanOrEqual(5_800_000);
   const sent = JSON.parse(body) as { files: { data: string }[] };

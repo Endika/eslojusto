@@ -2,6 +2,7 @@ import { test, expect, type Locator, type Page, type Request } from '@playwright
 import { readFileSync } from 'node:fs';
 import { syntheticPhoto } from '../support/synthetic-photo';
 import { nextSheet } from '../support/sheets';
+import { expectShownAndFocused } from '../support/reads';
 
 // Runs only against a TEST_DOCUMENTS=1 build, which has /alquiler/ too: every request to the
 // fake API, to Turnstile and to Stripe is answered here. The documents and figures are synthetic.
@@ -317,9 +318,7 @@ test('a whole pack fills every sheet; the detail waits for the pass, which unloc
   const fake = await fakeServices(page);
   await upload(page, PACK_FILES);
   // Six photos take a while to draw and encode.
-  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused({
-    timeout: 30_000,
-  });
+  await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }));
 
   // The request names its review; the final pay's never does.
   const sent = fake.extract[0]?.postDataJSON() as Record<string, unknown>;
@@ -416,9 +415,9 @@ test('a read that finds nothing says why for each file and spends no read', asyn
     },
   });
   await upload(page, ['contrato-movido.png', 'factura-luz.png']);
-  await expect(
+  await expectShownAndFocused(
     page.getByText('No se ha leído ningún dato, así que esta lectura no cuenta.'),
-  ).toBeFocused();
+  );
   await expect(
     page.getByText('contrato-movido.png: sale borrosa. Prueba con más luz y el móvil quieto.'),
   ).toBeVisible();

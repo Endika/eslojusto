@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { nextSheet } from '../support/sheets';
 import { syntheticPhoto } from '../support/synthetic-photo';
+import { expectShownAndFocused } from '../support/reads';
 
 // Runs only against a TEST_DOCUMENTS=1 build: each read comes from a fake extract function, in
 // order. Two reads in a row, through «Subir más documentos»: the second adds to what the first
@@ -64,9 +65,7 @@ async function read(page: Page, files: readonly string[]) {
     .setInputFiles(files.map((name) => ({ name, mimeType: 'image/png', buffer: PHOTO })));
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
-  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused({
-    timeout: 30_000,
-  });
+  await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }));
 }
 
 // The first read from the start sheet, then «Subir más documentos» and the second.
