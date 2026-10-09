@@ -1,5 +1,5 @@
 import { toIso, type CivilDate } from '../date';
-import { normStanding, type NormStatus, type NormTable } from './norms';
+import { normStanding, type EnactedStatus, type NormStatus, type NormTable } from './norms';
 import type { NormSource } from './sources';
 
 export interface Rule<RuleId extends string, NormId extends string> {
@@ -52,26 +52,40 @@ export function ruleSource<RuleId extends string, NormId extends string, Status 
   };
 }
 
-export type RuleDoubt = 'pending_validation' | 'repealed_window';
+export type RuleDoubt = 'pending_validation' | 'repealed_window' | 'conditional';
 
-export interface ActiveRule<RuleId extends string, NormId extends string> {
+// The doubts a table of norms with these statuses can open.
+export type RuleDoubtOf<Status extends NormStatus> =
+  | (Status extends 'pending_validation' ? 'pending_validation' : never)
+  | (Status extends 'repealed' ? 'repealed_window' : never)
+  | (Status extends 'conditional' ? 'conditional' : never);
+
+export interface ActiveRule<
+  RuleId extends string,
+  NormId extends string,
+  Status extends NormStatus = EnactedStatus,
+> {
   readonly rule: Rule<RuleId, NormId>;
   // Why the rule may or may not apply that day; a rule displaced by a doubtful successor carries
   // the successor's doubt.
-  readonly doubt: RuleDoubt | null;
+  readonly doubt: RuleDoubtOf<Status> | null;
 }
 
-export function activeRules<RuleId extends string, NormId extends string>(
+export function activeRules<
+  RuleId extends string,
+  NormId extends string,
+  Status extends NormStatus,
+>(
   rules: RuleTable<RuleId, NormId>,
   date: CivilDate,
-  norms: NormTable<NormId>,
-): readonly ActiveRule<RuleId, NormId>[] {
+  norms: NormTable<NormId, Status>,
+): readonly ActiveRule<RuleId, NormId, Status>[] {
   const day = toIso(date);
   const standing = (r: Rule<RuleId, NormId>) => {
     if (day < r.from || (r.until !== null && day > r.until)) return 'not_in_force';
     return normStanding(norms[r.norm], day);
   };
-  const active: ActiveRule<RuleId, NormId>[] = [];
+  const active: ActiveRule<RuleId, NormId, Status>[] = [];
   for (const r of Object.values<Rule<RuleId, NormId>>(rules)) {
     const own = standing(r);
     if (own === 'not_in_force') continue;
@@ -79,7 +93,9 @@ export function activeRules<RuleId extends string, NormId extends string>(
     if (successor === 'in_force') continue;
     const ownDoubt = own === 'in_force' ? null : own;
     const successorDoubt = successor === 'not_in_force' ? null : successor;
-    active.push({ rule: r, doubt: ownDoubt ?? successorDoubt });
+    // A standing other than in force comes only from a status the table holds.
+    const doubt = (ownDoubt ?? successorDoubt) as RuleDoubtOf<Status> | null;
+    active.push({ rule: r, doubt });
   }
   return active;
 }

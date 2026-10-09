@@ -215,7 +215,7 @@ export function ruleSource(id: StatuteRuleId, norms: NormTable): NormSource<Norm
 export const criterionSource = (id: CriterionRuleId, sources: SourceTable): LawSource =>
   sources[CRITERION_RULES[id].source];
 
-export type ActiveRule = LawActiveRule<StatuteRuleId, CreditNormId>;
+export type ActiveRule = LawActiveRule<StatuteRuleId, CreditNormId, NormStatus>;
 
 // The statute rules that govern a contract concluded on `date`.
 export function activeRules(date: CivilDate, norms: NormTable): readonly ActiveRule[] {

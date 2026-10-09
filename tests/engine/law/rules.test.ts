@@ -145,4 +145,21 @@ describe('rules active on a day', () => {
   it('a successor still a draft never applies nor displaces the rule it would replace', () => {
     expect(on('2031-06-01', withReform({ status: 'draft' }))).toEqual([['old_limit', null]]);
   });
+
+  it('a successor resting on an open condition leaves both in doubt until it is settled', () => {
+    const condition = {
+      text: 'Que el dato de prueba supere el 15 %',
+      decidesOn: '2031-05-31',
+      source: 'x',
+      met: null,
+    };
+    expect(on('2031-06-01', withReform({ status: 'conditional', condition }))).toEqual([
+      ['old_limit', 'conditional'],
+      ['new_limit', 'conditional'],
+    ]);
+    const notMet = withReform({ status: 'conditional', condition: { ...condition, met: false } });
+    expect(on('2031-06-01', notMet)).toEqual([['old_limit', null]]);
+    const met = withReform({ status: 'conditional', condition: { ...condition, met: true } });
+    expect(on('2031-06-01', met)).toEqual([['new_limit', null]]);
+  });
 });
