@@ -68,6 +68,9 @@ function filesUnder(root: string, dir: URL): { name: string; text: string }[] {
 }
 const FILES = ROOTS.flatMap((root) => filesUnder(root, new URL(root, import.meta.url)));
 const EMPLOYMENT_FILES = FILES.filter((f) => f.name.includes('/employment/'));
+// The household cases are golden inputs of the engine, kept beside its tests, not eval packs.
+const HOUSEHOLD_ROOT = '../../tests/engine/household/cases/';
+const HOUSEHOLD_FILES = filesUnder(HOUSEHOLD_ROOT, new URL(HOUSEHOLD_ROOT, import.meta.url));
 
 const DNI_LIKE = /\b(?:\d{8}|[XYZ]\d{7})-?[A-Z]\b/g;
 const IBAN_LIKE = /\bES\d{2}(?: ?\d{4}){5}\b/g;
@@ -165,6 +168,14 @@ describe('the synthetic bank', () => {
     for (const { file, id } of nafs) expect(validNaf(id), `${file}: ${id}`).toBe(false);
     for (const { file, id } of cccs) expect(validCcc(id), `${file}: ${id}`).toBe(false);
     for (const { file, id } of cifs) expect(validCif(id), `${file}: ${id}`).toBe(false);
+  });
+
+  it('holds household cases with no identifier of any kind, valid or not', () => {
+    expect(HOUSEHOLD_FILES.length).toBeGreaterThanOrEqual(15);
+    for (const pattern of [DNI_LIKE, IBAN_LIKE, NAF_LIKE, CCC_LIKE, CIF_LIKE])
+      expect(found(HOUSEHOLD_FILES, pattern)).toEqual([]);
+    for (const { name, text } of HOUSEHOLD_FILES)
+      expect(text, name).not.toMatch(/@|https?:\/\/|\+34|\b[6-9]\d{8}\b/);
   });
 
   it('names only invented people', () => {

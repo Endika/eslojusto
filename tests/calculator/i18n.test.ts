@@ -196,6 +196,16 @@ describe('client strings', () => {
       'Depende',
     );
   });
+  it('the household review ships no string to any page until one asks for them', () => {
+    const household = (strings: Partial<Record<string, string>>) =>
+      Object.keys(strings).filter((k) => k.startsWith('client.household.'));
+    for (const options of [{}, { documents: true }, { rental: true }, { employment: true }])
+      expect(household(clientStrings('es', options))).toEqual([]);
+    expect(
+      clientStrings('es', { household: true })['client.household.calculation.notice.days'],
+    ).toContain('{required}');
+  });
+
   it('a build with it ships them', () => {
     expect(clientStrings('es', { documents: true })['client.documents.mark']).toBe(
       'Leído del documento · confianza {nivel}',

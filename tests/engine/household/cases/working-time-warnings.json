@@ -1,0 +1,66 @@
+{
+  "id": "working-time-warnings",
+  "description": "Art. 9: 48 hours of effective work, 9 hours between shifts and 30 of weekly rest, with 28 days of holidays: only warnings, no money.",
+  "today": "2026-10-08",
+  "input": {
+    "startDate": "2024-03-01",
+    "payYear": 2026,
+    "liveIn": false,
+    "regime": "monthly",
+    "weeklyHours": 48,
+    "monthlyCash": 1500,
+    "inKindMonthly": null,
+    "extraPays": {
+      "count": 2,
+      "amount": 1500,
+      "prorated": false,
+      "accrual": "semiannual"
+    },
+    "hourlyRate": null,
+    "shortestRestHours": 9,
+    "restMadeUpWithinFourWeeks": null,
+    "weeklyRestHours": 30,
+    "holidays": {
+      "days": 28,
+      "longestStretch": 10,
+      "taken": null
+    },
+    "termination": null
+  },
+  "expected": {
+    "scope": {
+      "inScope": true
+    },
+    "items": [
+      {
+        "id": "smi_monthly",
+        "status": "within_limit"
+      },
+      {
+        "id": "extra_pays",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_40",
+        "status": "warning"
+      },
+      {
+        "id": "rest_between_shifts",
+        "status": "warning"
+      },
+      {
+        "id": "weekly_rest_36",
+        "status": "warning"
+      },
+      {
+        "id": "holidays_30",
+        "status": "warning"
+      },
+      {
+        "id": "holidays_stretch_15",
+        "status": "warning"
+      }
+    ],
+    "finalPay": null
+  }
+}

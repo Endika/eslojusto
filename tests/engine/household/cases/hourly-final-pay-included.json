@@ -1,0 +1,71 @@
+{
+  "id": "hourly-final-pay-included",
+  "description": "Art. 8.5: an external worker paid 9,55 € an hour in 2026 has holidays and extra payments inside the price.",
+  "today": "2026-10-08",
+  "input": {
+    "startDate": "2024-03-01",
+    "payYear": 2026,
+    "liveIn": false,
+    "regime": "hourly_external",
+    "weeklyHours": 40,
+    "monthlyCash": null,
+    "inKindMonthly": null,
+    "extraPays": null,
+    "hourlyRate": 9.55,
+    "shortestRestHours": 12,
+    "restMadeUpWithinFourWeeks": null,
+    "weeklyRestHours": 36,
+    "holidays": null,
+    "termination": {
+      "route": "et_cause",
+      "noticeGivenOn": "2026-09-01",
+      "effectiveOn": "2026-09-21",
+      "noticeTime": "12:00",
+      "inWriting": true,
+      "cause": "family_needs_change",
+      "severanceAvailable": true,
+      "severanceOffered": 100000,
+      "substitutePaid": null,
+      "seriousBreachAlleged": null
+    }
+  },
+  "expected": {
+    "scope": {
+      "inScope": true
+    },
+    "items": [
+      {
+        "id": "smi_hourly_external",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_40",
+        "status": "within_limit"
+      },
+      {
+        "id": "rest_between_shifts",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_rest_36",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_30",
+        "status": "not_entered"
+      },
+      {
+        "id": "holidays_stretch_15",
+        "status": "not_entered"
+      },
+      {
+        "id": "termination_causes",
+        "status": "information"
+      }
+    ],
+    "finalPay": {
+      "kind": "hourly_external",
+      "included": ["holiday_pay", "extra_pay"]
+    }
+  }
+}
