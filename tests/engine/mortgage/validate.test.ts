@@ -35,21 +35,6 @@ describe('mortgage validation', () => {
     ).toEqual([]);
   });
 
-  it('takes the revision of the rate as a whole count of months', () => {
-    expect(errors({ rateRevisionMonths: 6 })).toEqual([]);
-    expect(errors({ rateRevisionMonths: 0 })).toEqual(['rateRevisionMonths:count_range']);
-  });
-
-  it('lets a switch to a fixed rate repay nothing, and nothing else', () => {
-    const nothing = { principal: 0 };
-    expect(
-      errors({ operations: [operation({ ...nothing, kind: 'fixed_rate_novation' })] }),
-    ).toEqual([]);
-    expect(errors({ operations: [operation(nothing)] })).toEqual([
-      'operations.principal[0]:amount_range',
-    ]);
-  });
-
   it('rejects days that do not exist or have not happened', () => {
     expect(errors({ deedOn: { y: 2015, m: 2, d: 29 } })).toEqual(['deedOn:invalid_date']);
     expect(errors({ deedOn: parseDate('2026-10-10') })).toEqual(['deedOn:in_future']);
@@ -113,5 +98,38 @@ describe('mortgage validation', () => {
       'operations.principal[0]:amount_range',
       'operations.feeCharged[0]:amount_range',
     ]);
+  });
+
+  it('takes the revision of the rate as a whole count of months and the capital as an amount', () => {
+    expect(errors({ rateRevisionMonths: 6, loanAmount: 150_000 })).toEqual([]);
+    expect(errors({ rateRevisionMonths: 0, loanAmount: 0 })).toEqual([
+      'rateRevisionMonths:count_range',
+      'loanAmount:amount_range',
+    ]);
+    expect(errors({ clauses: [{ label: 'opening_fee', present: true, feeAmount: -1 }] })).toEqual([
+      'clauses.feeAmount[0]:amount_range',
+    ]);
+  });
+
+  it('lets a switch to a fixed rate repay nothing, and nothing else', () => {
+    const nothing = { principal: 0 };
+    expect(
+      errors({ operations: [operation({ ...nothing, kind: 'fixed_rate_novation' })] }),
+    ).toEqual([]);
+    expect(errors({ operations: [operation(nothing)] })).toEqual([
+      'operations.principal[0]:amount_range',
+    ]);
+  });
+
+  it('takes the missed instalments of an early termination clause as a whole count', () => {
+    const clauses = (missedInstalments: number) => [
+      { label: 'early_termination' as const, present: true, missedInstalments },
+    ];
+    expect(errors({ clauses: clauses(1) })).toEqual([]);
+    expect(errors({ clauses: clauses(600) })).toEqual([]);
+    for (const bad of [0, 1.5, 601, Number.NaN])
+      expect(errors({ clauses: clauses(bad) })).toEqual([
+        'clauses.missedInstalments[0]:count_range',
+      ]);
   });
 });

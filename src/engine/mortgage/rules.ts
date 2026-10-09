@@ -7,7 +7,7 @@ import {
   type RuleBase,
   type RuleOutput,
 } from '../law/rules';
-import type { LawSource, NormSource } from '../law/sources';
+import type { CaseLawSource, LawSource, NormSource } from '../law/sources';
 import type { MortgageNormId, MortgageSourceId, NormStatus, NormTable, SourceTable } from './norms';
 
 // What a rule rests on: a law, or a court's criterion that depends on a judge. The two are never
@@ -350,6 +350,24 @@ export const criterionCounts = (rule: CaseLawRule, sources: SourceTable): boolea
 
 export const caseLawSources = (id: CaseLawRuleId, sources: SourceTable): readonly LawSource[] =>
   CASE_LAW_RULES[id].sources.map((s) => sources[s]);
+
+export interface ReadRulings {
+  readonly sources: readonly CaseLawSource[];
+  // The oldest day any of them was last read: the state of the case law is given as of it.
+  readonly asOf: string;
+}
+
+// The rulings of a criterion already read at their source; null when none is.
+export function readRulings(id: CaseLawRuleId, sources: SourceTable): ReadRulings | null {
+  const read = caseLawSources(id, sources).filter(
+    (s): s is CaseLawSource => s.basis === 'case_law' && s.verified,
+  );
+  if (read.length === 0) return null;
+  return {
+    sources: read,
+    asOf: read.map((s) => s.lastVerified).reduce((a, b) => (a < b ? a : b)),
+  };
+}
 
 export type ActiveRule = LawActiveRule<StatuteRuleId, MortgageNormId>;
 

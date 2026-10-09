@@ -80,6 +80,13 @@ export interface Clause {
   readonly floorPercent?: number;
   readonly defaultRate?: number;
   readonly ordinaryRate?: number;
+  // Missed monthly instalments after which an early termination clause lets the lender call in
+  // the whole loan.
+  readonly missedInstalments?: number;
+  // An opening fee clause that also charges a study or processing fee.
+  readonly duplicateFee?: boolean;
+  // Euros an opening fee clause charges.
+  readonly feeAmount?: number;
 }
 
 export interface MortgageInput {
@@ -96,6 +103,8 @@ export interface MortgageInput {
   readonly fixedUntil: CivilDate | null;
   // Months between two revisions of a variable rate; null when unknown.
   readonly rateRevisionMonths: number | null;
+  // Capital the deed lends; null when unknown.
+  readonly loanAmount: number | null;
   // Whether the deed has a clause putting the set-up costs on the borrower.
   readonly expensesClause: 'present' | 'absent' | 'unknown';
   readonly invoices: readonly Invoice[];
