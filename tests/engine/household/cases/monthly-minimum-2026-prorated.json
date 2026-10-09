@@ -1,0 +1,66 @@
+{
+  "id": "monthly-minimum-2026-prorated",
+  "description": "RD 1620/2011 art. 8.1 and 8.4: 1.424,50 € a month with the extra payments prorated is exactly the 2026 minimum of 17.094 € a year.",
+  "today": "2026-10-08",
+  "input": {
+    "startDate": "2024-03-01",
+    "payYear": 2026,
+    "liveIn": false,
+    "regime": "monthly",
+    "weeklyHours": 40,
+    "monthlyCash": 1424.5,
+    "inKindMonthly": null,
+    "extraPays": {
+      "count": 2,
+      "amount": null,
+      "prorated": true,
+      "accrual": "semiannual"
+    },
+    "hourlyRate": null,
+    "shortestRestHours": 12,
+    "restMadeUpWithinFourWeeks": null,
+    "weeklyRestHours": 36,
+    "holidays": {
+      "days": 30,
+      "longestStretch": 15,
+      "taken": 10
+    },
+    "termination": null
+  },
+  "expected": {
+    "scope": {
+      "inScope": true
+    },
+    "items": [
+      {
+        "id": "smi_monthly",
+        "status": "within_limit"
+      },
+      {
+        "id": "extra_pays",
+        "status": "review_it"
+      },
+      {
+        "id": "weekly_40",
+        "status": "within_limit"
+      },
+      {
+        "id": "rest_between_shifts",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_rest_36",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_30",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_stretch_15",
+        "status": "within_limit"
+      }
+    ],
+    "finalPay": null
+  }
+}

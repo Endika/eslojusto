@@ -1,0 +1,165 @@
+{
+  "id": "notice-at-the-end-of-the-first-year",
+  "description": "Art. 11.2 and Código Civil 5.1: notice on the last day of the first year with 7 days: enough if the year is counted at the notice, 13 days short if counted at the end.",
+  "today": "2026-10-08",
+  "input": {
+    "startDate": "2025-03-01",
+    "payYear": 2026,
+    "liveIn": false,
+    "regime": "monthly",
+    "weeklyHours": 40,
+    "monthlyCash": 1500,
+    "inKindMonthly": null,
+    "extraPays": {
+      "count": 2,
+      "amount": 1500,
+      "prorated": false,
+      "accrual": "semiannual"
+    },
+    "hourlyRate": null,
+    "shortestRestHours": 12,
+    "restMadeUpWithinFourWeeks": null,
+    "weeklyRestHours": 36,
+    "holidays": {
+      "days": 30,
+      "longestStretch": 15,
+      "taken": 10
+    },
+    "termination": {
+      "route": "desistimiento",
+      "noticeGivenOn": "2026-02-28",
+      "effectiveOn": "2026-03-07",
+      "noticeTime": "12:00",
+      "inWriting": true,
+      "cause": "family_needs_change",
+      "severanceAvailable": true,
+      "severanceOffered": 100,
+      "substitutePaid": null,
+      "seriousBreachAlleged": null
+    }
+  },
+  "expected": {
+    "scope": {
+      "inScope": true
+    },
+    "items": [
+      {
+        "id": "smi_monthly",
+        "status": "within_limit"
+      },
+      {
+        "id": "extra_pays",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_40",
+        "status": "within_limit"
+      },
+      {
+        "id": "rest_between_shifts",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_rest_36",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_30",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_stretch_15",
+        "status": "within_limit"
+      },
+      {
+        "id": "desistimiento_cause",
+        "status": "within_limit"
+      },
+      {
+        "id": "desistimiento_written",
+        "status": "within_limit"
+      },
+      {
+        "id": "dismissal_presumed",
+        "status": "review_it"
+      },
+      {
+        "id": "desistimiento_severance",
+        "status": "depends",
+        "question": "incomplete_year",
+        "readings": [
+          {
+            "when": "complete_years_only",
+            "id": "desistimiento_severance",
+            "status": "below_minimum",
+            "amount": {
+              "min": 590.41,
+              "max": 590.41
+            }
+          },
+          {
+            "when": "prorated_by_months",
+            "id": "desistimiento_severance",
+            "status": "below_minimum",
+            "amount": {
+              "min": 647.95,
+              "max": 647.95
+            }
+          }
+        ]
+      },
+      {
+        "id": "desistimiento_notice",
+        "status": "depends",
+        "question": "notice_service_date",
+        "readings": [
+          {
+            "when": "measured_at_notice",
+            "id": "desistimiento_notice",
+            "status": "within_limit"
+          },
+          {
+            "when": "measured_at_termination",
+            "id": "desistimiento_notice",
+            "status": "missing_requirement",
+            "amount": {
+              "min": 747.95,
+              "max": 747.95
+            }
+          }
+        ]
+      },
+      {
+        "id": "desistimiento_leave",
+        "status": "information"
+      },
+      {
+        "id": "unemployment_situation",
+        "status": "information"
+      }
+    ],
+    "finalPay": {
+      "kind": "monthly",
+      "items": [
+        {
+          "id": "pending_salary",
+          "range": {
+            "min": 338.71,
+            "max": 350
+          }
+        },
+        {
+          "id": "holiday_pay",
+          "range": null
+        },
+        {
+          "id": "extra_pay",
+          "range": {
+            "min": 546.96,
+            "max": 558.33
+          }
+        }
+      ]
+    }
+  }
+}

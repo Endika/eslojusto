@@ -3566,6 +3566,142 @@ export const es = {
   'client.rental.calculation.deposit.interest_total': 'Intereses: {total}.',
   'client.rental.calculation.deposit.interest_rate_not_loaded':
     'El interés legal de {year} aún no está en esta revisión: desde ese año no se cuenta.',
+  // The household domestic worker review: no page uses these yet.
+  'client.household.calculation.minimum_wage.not_published':
+    'El SMI de {year} aún no se ha publicado en el BOE. Como referencia, el de {referenceYear}: {reference}. Para {year} no se calcula ninguna diferencia.',
+  'client.household.calculation.minimum_wage.not_loaded':
+    'Esta revisión no tiene el SMI de ese año: no se compara.',
+  'client.household.calculation.minimum_wage.minimum':
+    'SMI de {year}: {monthly} al mes en 14 pagas, {annual} al año, para 40 horas a la semana. Con {hours} horas a la semana se aplica en proporción ({coefficient}): {requiredMonthly} al mes, {requiredAnnual} al año.',
+  'client.household.calculation.minimum_wage.twelve_payments_enough':
+    'Solo con las doce mensualidades cobras {paid} al año en dinero: llegas al mínimo aunque no se sumen las pagas extra.',
+  'client.household.calculation.minimum_wage.extra_pays_unknown':
+    'Con las doce mensualidades cobras {paid} al año y no se sabe el importe de las pagas extra: no se puede decir si llegas al mínimo.',
+  'client.household.calculation.minimum_wage.paid_prorated':
+    'Cobras {monthly} al mes en dinero, con las pagas extra incluidas: {annual} al año.',
+  'client.household.calculation.minimum_wage.paid_apart':
+    'Cobras {monthly} al mes en dinero y {extras} al año en pagas extra: {annual} al año.',
+  'client.household.calculation.minimum_wage.shortfall':
+    'Podrían faltarte {annual} al año, unos {monthly} al mes.',
+  'client.household.calculation.minimum_wage.hourly':
+    'Mínimo por hora de {year} para quien trabaja por horas y no vive en la casa: {minimum}. Cobras {paid} la hora.',
+  'client.household.calculation.minimum_wage.hourly_includes_everything':
+    'Ese precio incluye todos los conceptos, también las vacaciones y las pagas extra, y se paga en dinero: no se reclaman aparte.',
+  'client.household.calculation.minimum_wage.hourly_shortfall':
+    'Te faltan {difference} por cada hora trabajada.',
+  'client.household.calculation.in_kind.share':
+    'El salario en especie ({inKind}) es el {share} % de tu salario total ({total}). El máximo es el {cap} %.',
+  'client.household.calculation.in_kind.share_annual':
+    'Contando el año entero con las pagas extra, el salario en especie ({inKind}) es el {share} % de tu salario total ({total}). El máximo es el {cap} %.',
+  'client.household.calculation.in_kind.extra_pays_unknown':
+    'Sin el importe de las pagas extra no se puede medir el año entero, y con ellas el porcentaje podría quedar dentro del límite: no se cuenta como superado.',
+  'client.household.calculation.in_kind.cash_only':
+    'El mínimo se compara con lo que cobras en dinero: la manutención y el alojamiento no cuentan para llegar a él.',
+  'client.household.calculation.extra_pays.prorated':
+    'Tus pagas extra están repartidas en las doce mensualidades. La norma las fija al final de cada semestre salvo pacto en otro sentido: conviene comprobar que lo pactaste así.',
+  'client.household.calculation.extra_pays.fewer_than_two':
+    'Tienes {count} al año y la norma prevé dos pagas extra, una al final de cada semestre.',
+  'client.household.calculation.extra_pays.once_a_year':
+    'La norma fija las pagas extra al final de cada semestre salvo pacto: pagarlas de otra forma podría ser válido si lo pactaste.',
+  'client.household.calculation.extra_pays.two_or_more':
+    'Tienes {count} pagas extra al año; la norma prevé al menos dos, al final de cada semestre salvo pacto.',
+  'client.household.calculation.working_time.weekly_hours':
+    'Trabajas {hours} horas a la semana de trabajo efectivo; el máximo es de {limit}.',
+  'client.household.calculation.working_time.presence_apart':
+    'El tiempo de presencia se cuenta aparte y no suma a ese máximo.',
+  'client.household.calculation.working_time.rest':
+    'Descansas {hours} horas entre jornadas; el mínimo es de {limit}.',
+  'client.household.calculation.working_time.rest_live_in':
+    'Descansas {hours} horas entre jornadas. Si vives en la casa, el descanso puede bajar hasta {limit} horas.',
+  'client.household.calculation.working_time.rest_made_up':
+    'La diferencia hasta las 12 horas se compensa en el plazo de cuatro semanas.',
+  'client.household.calculation.working_time.rest_not_made_up':
+    'La diferencia hasta las 12 horas no se compensa en el plazo de cuatro semanas.',
+  'client.household.calculation.working_time.rest_made_up_unknown':
+    'No consta si la diferencia hasta las 12 horas se compensa en el plazo de cuatro semanas.',
+  'client.household.calculation.working_time.rest_below':
+    'Descansas {hours} horas entre jornadas y el mínimo es de {limit}.',
+  'client.household.calculation.working_time.rest_below_live_in':
+    'Descansas {hours} horas entre jornadas: menos de las {liveInLimit} a las que, como mucho, puede bajar el descanso de quien vive en la casa, y menos de las {limit} generales.',
+  'client.household.calculation.working_time.weekly_rest':
+    'Tu descanso semanal es de {hours} horas; el mínimo es de {limit}.',
+  'client.household.calculation.holidays.days':
+    'Tienes {days} días naturales de vacaciones al año; el mínimo es de {limit}.',
+  'client.household.calculation.holidays.stretch':
+    'Tu periodo de vacaciones más largo es de {days} días seguidos; al menos uno ha de ser de {limit}.',
+  'client.household.calculation.termination.et_cause':
+    'La relación termina por una causa del artículo 49.1 del Estatuto de los Trabajadores. Esta revisión no valora esa causa ni la hora a la que se comunicó la decisión de terminar (artículo 11.4), que solo mira en el desistimiento.',
+  'client.household.calculation.termination.cause.income_drop_or_expense_rise':
+    'La causa indicada es una disminución de los ingresos de la familia o un aumento de sus gastos.',
+  'client.household.calculation.termination.cause.family_needs_change':
+    'La causa indicada es un cambio sustancial en las necesidades de la familia.',
+  'client.household.calculation.termination.cause.loss_of_trust':
+    'La causa indicada es la pérdida de confianza, que ha de ser razonable y proporcionada.',
+  'client.household.calculation.termination.cause_truth_not_judged':
+    'La revisión mira solo la categoría de la causa; no valora si es cierta.',
+  'client.household.calculation.termination.cause_none':
+    'El desistimiento no indica ninguna causa y la norma exige una de tres.',
+  'client.household.calculation.termination.cause_other':
+    'La causa indicada no es una de las tres que admite la norma: menos ingresos o más gastos de la familia, cambio sustancial de sus necesidades o pérdida de confianza razonable y proporcionada.',
+  'client.household.calculation.termination.not_in_writing':
+    'El desistimiento no se comunicó por escrito y la norma lo exige.',
+  'client.household.calculation.termination.cause_not_in_writing':
+    'El escrito no expresa la causa y la norma exige que la exprese.',
+  'client.household.calculation.termination.in_writing':
+    'El desistimiento se comunicó por escrito y con su causa.',
+  'client.household.calculation.termination.writing_unknown':
+    'No consta si se comunicó por escrito y con su causa.',
+  'client.household.calculation.dismissal.no_written_notice':
+    'Sin la comunicación por escrito, la norma presume que se trata de un despido y podrían aplicarse sus reglas.',
+  'client.household.calculation.dismissal.no_severance':
+    'Sin la indemnización puesta a tu disposición a la vez que el preaviso, la norma presume que se trata de un despido y podrían aplicarse sus reglas.',
+  'client.household.calculation.dismissal.unknown':
+    'Según lo que contestas no se puede descartar que falten el escrito o la indemnización, y sin ellos la norma presume que se trata de un despido.',
+  'client.household.calculation.dismissal.none_of_the_two':
+    'Hubo escrito y se puso a tu disposición la indemnización: por esos dos motivos la norma no presume el despido.',
+  'client.household.calculation.dismissal.none_of_the_two_no_severance_due':
+    'Hubo escrito y, con esta forma de contar el año incompleto, no se debía indemnización: no faltó ponerla a tu disposición y la norma no presume el despido.',
+  'client.household.calculation.dismissal.short_notice':
+    'Un preaviso más corto no lleva a esa presunción, pero se te debe la diferencia.',
+  'client.household.calculation.dismissal.figure_difference':
+    'Un error disculpable en el importe de la indemnización no lleva a esa presunción, pero se te debe la diferencia; si el importe fuera muy inferior, podría valorarse de otro modo.',
+  'client.household.calculation.night.notice_time':
+    'Te comunicaron el fin de la relación a las {time}.',
+  'client.household.calculation.night.on_the_hour':
+    'La norma no permite avisar entre las 17:00 y las 08:00 a quien vive en la casa. A las 17:00 o a las 08:00 en punto no queda claro si esa hora está dentro, y no se cuenta.',
+  'client.household.calculation.night.serious_breach_alleged':
+    'Entre las 17:00 y las 08:00 solo cabe avisar si hay un incumplimiento muy grave de la lealtad y la confianza; esta revisión no valora si lo hubo.',
+  'client.household.calculation.night.inside':
+    'La norma no permite comunicar el fin de la relación a quien vive en la casa entre las 17:00 y las 08:00, salvo incumplimiento muy grave de la lealtad y la confianza.',
+  'client.household.calculation.severance.figure':
+    'Indemnización: 12 días de salario por año de servicio. Son {days} a {daily} al día: {amount}.',
+  'client.household.calculation.severance.capped':
+    'La indemnización tiene un tope de {months} mensualidades: queda en {amount}.',
+  'client.household.calculation.severance.not_made_available':
+    'No se puso a tu disposición a la vez que el preaviso: se te debe entera.',
+  'client.household.calculation.severance.shortfall':
+    'Se puso a tu disposición {offered}: faltan {difference}.',
+  'client.household.calculation.severance.offered_unknown':
+    'No consta qué importe se puso a tu disposición.',
+  'client.household.calculation.severance.salary_unknown':
+    'Sin tu salario en dinero no se puede calcular la indemnización.',
+  'client.household.calculation.severance.prorated_note':
+    'Esta lectura cuenta como un día cada mes empezado. La norma no dice cómo contar un año incompleto: solo cuenta la lectura con los {years} años completos, y esta es lo más que podría salir.',
+  'client.household.calculation.notice.days':
+    'Preaviso: {required} días naturales, contados desde el día siguiente al aviso. Se dieron {given} y faltan {missing}.',
+  'client.household.calculation.notice.salary_unknown':
+    'Sin tu salario en dinero no se puede valorar en euros lo que falta de preaviso.',
+  'client.household.calculation.notice.substitute':
+    'Los {missing} días que faltan se pueden sustituir por su salario: a {daily} al día, {amount}.',
+  'client.household.calculation.notice.substitute_paid': 'Se te pagaron {paid}: cubren esos días.',
+  'client.household.calculation.notice.substitute_short':
+    'Se te pagaron {paid}: faltan {difference}.',
+  'client.household.calculation.notice.leave':
+    'Durante el preaviso, la norma da a quien trabaja a tiempo completo {hours} horas semanales retribuidas para buscar trabajo.',
+  'client.household.calculation.unemployment.situation':
+    'El desistimiento del artículo 11.2 es una situación legal de desempleo: podrías pedir la prestación por desempleo.',
+  'client.household.calculation.unemployment.general_rules':
+    'Desde el 1 de octubre de 2022 el desempleo se cotiza y se aplican las reglas generales: 360 días cotizados en los últimos seis años (art. 266.b LGSS) que no hayas usado ya para otra prestación (art. 269.2 LGSS), y una prestación del 70 % y después del 60 %. Esta revisión no calcula la prestación.',
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof es;

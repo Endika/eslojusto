@@ -1,0 +1,53 @@
+{
+  "id": "hourly-external-below-2024",
+  "description": "Art. 8.5: an external worker paid 8,50 € an hour in 2024, under the 8,87 € minimum that already includes holidays and extra payments.",
+  "today": "2026-10-08",
+  "input": {
+    "startDate": "2024-03-01",
+    "payYear": 2024,
+    "liveIn": false,
+    "regime": "hourly_external",
+    "weeklyHours": 40,
+    "monthlyCash": null,
+    "inKindMonthly": null,
+    "extraPays": null,
+    "hourlyRate": 8.5,
+    "shortestRestHours": 12,
+    "restMadeUpWithinFourWeeks": null,
+    "weeklyRestHours": 36,
+    "holidays": null,
+    "termination": null
+  },
+  "expected": {
+    "scope": {
+      "inScope": true
+    },
+    "items": [
+      {
+        "id": "smi_hourly_external",
+        "status": "below_minimum"
+      },
+      {
+        "id": "weekly_40",
+        "status": "within_limit"
+      },
+      {
+        "id": "rest_between_shifts",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_rest_36",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_30",
+        "status": "not_entered"
+      },
+      {
+        "id": "holidays_stretch_15",
+        "status": "not_entered"
+      }
+    ],
+    "finalPay": null
+  }
+}

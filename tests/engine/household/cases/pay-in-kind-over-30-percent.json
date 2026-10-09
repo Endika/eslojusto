@@ -1,0 +1,74 @@
+{
+  "id": "pay-in-kind-over-30-percent",
+  "description": "Art. 8.2: 600 € in kind against 900 € in money is 40 % of the total salary, over the 30 % limit; the 900 € in money are also under the minimum.",
+  "today": "2026-10-08",
+  "input": {
+    "startDate": "2024-03-01",
+    "payYear": 2026,
+    "liveIn": false,
+    "regime": "monthly",
+    "weeklyHours": 40,
+    "monthlyCash": 900,
+    "inKindMonthly": 600,
+    "extraPays": {
+      "count": 2,
+      "amount": 900,
+      "prorated": false,
+      "accrual": "semiannual"
+    },
+    "hourlyRate": null,
+    "shortestRestHours": 12,
+    "restMadeUpWithinFourWeeks": null,
+    "weeklyRestHours": 36,
+    "holidays": {
+      "days": 30,
+      "longestStretch": 15,
+      "taken": 10
+    },
+    "termination": null
+  },
+  "expected": {
+    "scope": {
+      "inScope": true
+    },
+    "items": [
+      {
+        "id": "smi_monthly",
+        "status": "below_minimum",
+        "amount": {
+          "min": 4494,
+          "max": 4494
+        }
+      },
+      {
+        "id": "smi_in_kind_cap",
+        "status": "over_legal_limit"
+      },
+      {
+        "id": "extra_pays",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_40",
+        "status": "within_limit"
+      },
+      {
+        "id": "rest_between_shifts",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_rest_36",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_30",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_stretch_15",
+        "status": "within_limit"
+      }
+    ],
+    "finalPay": null
+  }
+}

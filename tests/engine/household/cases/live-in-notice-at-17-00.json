@@ -1,0 +1,134 @@
+{
+  "id": "live-in-notice-at-17-00",
+  "description": "Art. 11.4: told at exactly 17:00, which the text does not settle: review, never counted.",
+  "today": "2026-10-08",
+  "input": {
+    "startDate": "2024-03-01",
+    "payYear": 2026,
+    "liveIn": true,
+    "regime": "monthly",
+    "weeklyHours": 40,
+    "monthlyCash": 1500,
+    "inKindMonthly": null,
+    "extraPays": {
+      "count": 2,
+      "amount": 1500,
+      "prorated": false,
+      "accrual": "semiannual"
+    },
+    "hourlyRate": null,
+    "shortestRestHours": 12,
+    "restMadeUpWithinFourWeeks": null,
+    "weeklyRestHours": 36,
+    "holidays": {
+      "days": 30,
+      "longestStretch": 15,
+      "taken": 10
+    },
+    "termination": {
+      "route": "desistimiento",
+      "noticeGivenOn": "2026-09-01",
+      "effectiveOn": "2026-09-21",
+      "noticeTime": "17:00",
+      "inWriting": true,
+      "cause": "family_needs_change",
+      "severanceAvailable": true,
+      "severanceOffered": 100000,
+      "substitutePaid": null,
+      "seriousBreachAlleged": null
+    }
+  },
+  "expected": {
+    "scope": {
+      "inScope": true
+    },
+    "items": [
+      {
+        "id": "smi_monthly",
+        "status": "within_limit"
+      },
+      {
+        "id": "extra_pays",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_40",
+        "status": "within_limit"
+      },
+      {
+        "id": "rest_between_shifts",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_rest_36",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_30",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_stretch_15",
+        "status": "within_limit"
+      },
+      {
+        "id": "desistimiento_cause",
+        "status": "within_limit"
+      },
+      {
+        "id": "desistimiento_written",
+        "status": "within_limit"
+      },
+      {
+        "id": "dismissal_presumed",
+        "status": "within_limit"
+      },
+      {
+        "id": "live_in_night_notice",
+        "status": "review_it"
+      },
+      {
+        "id": "desistimiento_severance",
+        "status": "within_limit"
+      },
+      {
+        "id": "desistimiento_notice",
+        "status": "within_limit"
+      },
+      {
+        "id": "desistimiento_leave",
+        "status": "information"
+      },
+      {
+        "id": "unemployment_situation",
+        "status": "information"
+      }
+    ],
+    "finalPay": {
+      "kind": "monthly",
+      "items": [
+        {
+          "id": "pending_salary",
+          "range": {
+            "min": 1050,
+            "max": 1050
+          }
+        },
+        {
+          "id": "holiday_pay",
+          "range": {
+            "min": 584.93,
+            "max": 676.03
+          }
+        },
+        {
+          "id": "extra_pay",
+          "range": {
+            "min": 675,
+            "max": 676.63
+          }
+        }
+      ]
+    }
+  }
+}

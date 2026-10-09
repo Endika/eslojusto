@@ -1,0 +1,49 @@
+{
+  "id": "ended-before-the-reform",
+  "description": "RDL 16/2022, DT 1.ª: a relationship that ended on 20-08-2022 followed the earlier regime and is out of the review.",
+  "today": "2026-10-08",
+  "input": {
+    "startDate": "2019-01-01",
+    "payYear": 2022,
+    "liveIn": false,
+    "regime": "monthly",
+    "weeklyHours": 40,
+    "monthlyCash": 1500,
+    "inKindMonthly": null,
+    "extraPays": {
+      "count": 2,
+      "amount": 1500,
+      "prorated": false,
+      "accrual": "semiannual"
+    },
+    "hourlyRate": null,
+    "shortestRestHours": 12,
+    "restMadeUpWithinFourWeeks": null,
+    "weeklyRestHours": 36,
+    "holidays": {
+      "days": 30,
+      "longestStretch": 15,
+      "taken": 10
+    },
+    "termination": {
+      "route": "desistimiento",
+      "noticeGivenOn": "2022-08-01",
+      "effectiveOn": "2022-08-20",
+      "noticeTime": "12:00",
+      "inWriting": true,
+      "cause": "family_needs_change",
+      "severanceAvailable": true,
+      "severanceOffered": 100000,
+      "substitutePaid": null,
+      "seriousBreachAlleged": null
+    }
+  },
+  "expected": {
+    "scope": {
+      "inScope": false,
+      "reason": "before_reform"
+    },
+    "items": [],
+    "finalPay": null
+  }
+}

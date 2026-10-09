@@ -1,0 +1,70 @@
+{
+  "id": "part-time-20-hours-below-minimum-2025",
+  "description": "Art. 8.1: 20 hours a week need half of the 2025 minimum; 550 € twice over 14 payments leaves a gap of 588 € a year.",
+  "today": "2026-10-08",
+  "input": {
+    "startDate": "2024-03-01",
+    "payYear": 2025,
+    "liveIn": false,
+    "regime": "monthly",
+    "weeklyHours": 20,
+    "monthlyCash": 550,
+    "inKindMonthly": null,
+    "extraPays": {
+      "count": 2,
+      "amount": 550,
+      "prorated": false,
+      "accrual": "semiannual"
+    },
+    "hourlyRate": null,
+    "shortestRestHours": 12,
+    "restMadeUpWithinFourWeeks": null,
+    "weeklyRestHours": 36,
+    "holidays": {
+      "days": 30,
+      "longestStretch": 15,
+      "taken": 10
+    },
+    "termination": null
+  },
+  "expected": {
+    "scope": {
+      "inScope": true
+    },
+    "items": [
+      {
+        "id": "smi_monthly",
+        "status": "below_minimum",
+        "amount": {
+          "min": 588,
+          "max": 588
+        }
+      },
+      {
+        "id": "extra_pays",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_40",
+        "status": "within_limit"
+      },
+      {
+        "id": "rest_between_shifts",
+        "status": "within_limit"
+      },
+      {
+        "id": "weekly_rest_36",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_30",
+        "status": "within_limit"
+      },
+      {
+        "id": "holidays_stretch_15",
+        "status": "within_limit"
+      }
+    ],
+    "finalPay": null
+  }
+}
