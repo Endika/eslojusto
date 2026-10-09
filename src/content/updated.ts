@@ -7,6 +7,8 @@ import { PATH as RENT_INDICES, lastChanged } from './rent-indices';
 const rentalBuild = process.env['PUBLIC_RENTAL'] === '1';
 // /contrato/ likewise exists only in a PUBLIC_EMPLOYMENT=1 build.
 const employmentBuild = process.env['PUBLIC_EMPLOYMENT'] === '1';
+// /paro/erte/ likewise exists only in a PUBLIC_ERTE=1 build.
+const erteBuild = process.env['PUBLIC_ERTE'] === '1';
 
 export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/': '2026-10-07',
@@ -36,4 +38,5 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
       }
     : {}),
   ...(employmentBuild ? { '/contrato/': '2026-10-08' } : {}),
+  ...(erteBuild ? { '/paro/erte/': '2026-10-09' } : {}),
 };

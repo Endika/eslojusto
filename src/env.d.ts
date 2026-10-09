@@ -11,4 +11,6 @@ interface ImportMetaEnv {
   readonly PUBLIC_RENTAL?: string;
   // '1' builds the employment contract review at /contrato/; anything else leaves it out.
   readonly PUBLIC_EMPLOYMENT?: string;
+  // '1' builds the benefit during an ERTE at /paro/erte/; anything else leaves it out.
+  readonly PUBLIC_ERTE?: string;
 }

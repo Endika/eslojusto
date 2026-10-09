@@ -18,6 +18,7 @@ export default defineConfig({
       'tests/documents/**/*.test.ts',
       'tests/rental/**/*.test.ts',
       'tests/employment/**/*.test.ts',
+      'tests/erte/**/*.test.ts',
       'tests/content/**/*.test.ts',
     ],
   },
