@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.30.0](https://github.com/Endika/eslojusto/compare/v1.29.0...v1.30.0) (2026-10-09)
+
+
+### Features
+
+* **engine:** estimate the benefit during an ERTE ([a2864cb](https://github.com/Endika/eslojusto/commit/a2864cb260f53e86cb8ed8f7af70ac8a626621dd))
+* **final-pay:** extend the seniority table with 2 and 5 years and the objective column ([fa88ab1](https://github.com/Endika/eslojusto/commit/fa88ab11f8ab3f68b144937f366d4349c16281c0))
+* **household:** add the household worker norms, rules and pure engine ([24c1910](https://github.com/Endika/eslojusto/commit/24c1910b182bd4d6f133ec1dc9ede8d217157845))
+* **paro:** add the benefit during an ERTE at /paro/erte/ behind PUBLIC_ERTE ([77fcb5e](https://github.com/Endika/eslojusto/commit/77fcb5efe158bff3583648e1b05b9cdd27f54e18))
+
 ## [1.29.0](https://github.com/Endika/eslojusto/compare/v1.28.2...v1.29.0) (2026-10-09)
 
 
