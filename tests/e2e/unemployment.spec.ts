@@ -245,3 +245,23 @@ test('removing a row, its error stays with the row that has it', async ({ page }
     page.getByRole('heading', { name: '¿Te han pagado ya el finiquito?' }),
   ).toBeVisible();
 });
+
+// The default build has no PUBLIC_ERTE: the ERTE page does not exist and nothing points at it.
+test.describe('without the ERTE switch', () => {
+  test('/paro/erte/ does not exist', async ({ page }) => {
+    const response = await page.goto('paro/erte/');
+    expect(response?.status()).toBe(404);
+  });
+
+  test('/paro/ does not mention the ERTE benefit page', async ({ page }) => {
+    await page.goto('paro/');
+    const html = await page.content();
+    expect(html).not.toContain('paro/erte');
+    expect(html).not.toContain('Si estás en un ERTE');
+  });
+
+  test('the sitemap does not list it', async ({ request }) => {
+    const sitemap = await request.get('sitemap-0.xml');
+    expect(await sitemap.text()).not.toContain('/paro/erte/');
+  });
+});

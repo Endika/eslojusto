@@ -9,7 +9,8 @@
 - **Unemployment benefit (paro)** — an estimate of how much and for how long, with the article
   behind every figure.
 - **Rent and employment contracts** — built behind build switches (`PUBLIC_RENTAL`,
-  `PUBLIC_EMPLOYMENT`) and not yet published.
+  `PUBLIC_EMPLOYMENT`) and not yet published. The benefit during an ERTE at `/paro/erte/` is built
+  only with `PUBLIC_ERTE=1`.
 
 The calculators run in your browser and nothing you type is sent anywhere. Reading your documents
 is optional: with your explicit consent, the pages go to the API in Spain, are read by a model in
