@@ -1,0 +1,138 @@
+---
+import { INSURANCE_NORMS } from '../engine/insurance/data/norms';
+import { RULES, type InsuranceRuleId } from '../engine/insurance/rules';
+import { formatLongDay } from '../content/rent-indices';
+import { insuranceFaqEntries } from '../content/insurance-faq';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+  // The day the page's rules were last checked, ISO.
+  checkedOn: string;
+}
+const { lang, checkedOn } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+// Each block: its text keys, the articles it rests on and any list it shows.
+const blocks: readonly {
+  id: string;
+  anchor: string;
+  paragraphs: readonly Key[];
+  rules?: readonly InsuranceRuleId[];
+  list?: readonly Key[];
+}[] = [
+  {
+    id: 'non_renewal',
+    anchor: 'g-no-renovar',
+    paragraphs: ['insurance.guide.non_renewal.p1', 'insurance.guide.non_renewal.p2'],
+    rules: ['non_renewal'],
+  },
+  {
+    id: 'change_notice',
+    anchor: 'g-aviso',
+    paragraphs: ['insurance.guide.change_notice.p1', 'insurance.guide.change_notice.p2'],
+    rules: ['change_notice'],
+  },
+  {
+    id: 'withdrawal',
+    anchor: 'g-desistimiento',
+    paragraphs: ['insurance.guide.withdrawal.p1', 'insurance.guide.withdrawal.p2'],
+    rules: ['distance_withdrawal', 'distance_withdrawal_excluded'],
+  },
+  {
+    id: 'proportional',
+    anchor: 'g-regla-proporcional',
+    paragraphs: ['insurance.guide.proportional.p1', 'insurance.guide.proportional.p2'],
+    rules: ['proportional_rule', 'overinsurance'],
+  },
+  {
+    id: 'policy',
+    anchor: 'g-poliza',
+    paragraphs: ['insurance.guide.policy.p1', 'insurance.guide.policy.p2'],
+    rules: ['questionnaire', 'policy_correction'],
+  },
+  {
+    id: 'channels',
+    anchor: 'g-informarte',
+    paragraphs: [],
+    list: [
+      'insurance.result.channels_dgsfp',
+      'insurance.result.channels_service',
+      'insurance.result.channels_consumer',
+    ],
+  },
+  {
+    id: 'unchecked',
+    anchor: 'g-sin-revisar',
+    paragraphs: [],
+    list: [
+      'client.insurance.unchecked.clause_transparency',
+      'client.insurance.unchecked.premium_price',
+      'client.insurance.unchecked.insured_value',
+      'client.insurance.unchecked.claims',
+    ],
+  },
+];
+const faq = insuranceFaqEntries(lang);
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('insurance.guide.title')}
+    </h2>
+    <p class="guide__lead">{tx('insurance.guide.lead')}</p>
+    <p class="guide__sources">
+      <span>{t(lang, 'insurance.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>
+        {tx('insurance.guide.sources')}:{' '}
+        <a href={INSURANCE_NORMS.lcs.url}>{tx('insurance.guide.source_lcs')}</a> ·{' '}
+        <a href={INSURANCE_NORMS.law22_2007.url}>{tx('insurance.guide.source_law22_2007')}</a>
+      </span>
+      <a href={link('es', 'aviso-legal/')}>{tx('insurance.guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    {blocks.map(({ id, anchor, paragraphs, rules = [], list }) => (
+      <section class="sheet sheet--text" data-guide={id}>
+        <h3 id={anchor}>{tx(`insurance.guide.${id}.title` as Key)}</h3>
+        {paragraphs.map((key) => (
+          <p>{tx(key)}</p>
+        ))}
+        {list && (
+          <ul>
+            {list.map((key) => (
+              <li>{tx(key)}</li>
+            ))}
+          </ul>
+        )}
+        {rules.length > 0 && (
+          <>
+            <h4 class="rules__title">{tx('insurance.guide.rules')}</h4>
+            <ul class="sources sources--wrap">
+              {rules.map((r) => (
+                <li>
+                  <a href={RULES[r].url}>{RULES[r].article}</a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+    ))}
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('insurance.guide.faq')}</h2>
+      <div class="faq-list">
+        {faq.map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>

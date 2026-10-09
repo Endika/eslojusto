@@ -138,7 +138,14 @@ export const STATUTE_RULES: Readonly<Record<StatuteRuleId, StatuteRule>> = {
   ),
   // 1: a loan at an interest notably higher than the normal one and manifestly disproportionate is
   // void. The average-rate criteria read it; the law itself fixes no threshold.
-  usury_law: rule('usury_law', 'lru', 'Ley de Usura, art. 1', `${LRU}#a1`, '1908-08-13', 'info'),
+  usury_law: rule(
+    'usury_law',
+    'lru',
+    'Ley de 23 de julio de 1908, art. 1',
+    `${LRU}#a1`,
+    '1908-08-13',
+    'info',
+  ),
   // Código Civil 5.1: days run from the day after; months run date to date.
   period_count: rule(
     'period_count',

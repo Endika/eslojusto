@@ -1,0 +1,190 @@
+---
+import { CREDIT_NORMS } from '../engine/credit/data/norms';
+import { CREDIT_SOURCES } from '../engine/credit/data/sources';
+import type { CreditNormId, CreditSourceId } from '../engine/credit/norms';
+import { STATUTE_RULES, type StatuteRuleId } from '../engine/credit/rules';
+import type { LawSource } from '../engine/law/sources';
+import { formatLongDay } from '../content/rent-indices';
+import { creditFaqEntries } from '../content/credit-faq';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+  // The day the page's rules were last checked, ISO.
+  checkedOn: string;
+}
+const { lang, checkedOn } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+// Each block: its text keys, the articles it rests on, the court criteria and official data it
+// cites, the norms still in the making it announces, and any list it shows.
+const blocks: readonly {
+  id: string;
+  anchor: string;
+  paragraphs: readonly Key[];
+  rules?: readonly StatuteRuleId[];
+  sources?: readonly CreditSourceId[];
+  drafts?: readonly CreditNormId[];
+  list?: readonly Key[];
+}[] = [
+  {
+    id: 'apr',
+    anchor: 'g-tae',
+    paragraphs: ['credit.guide.apr.p1', 'credit.guide.apr.p2', 'credit.guide.apr.p3'],
+    rules: ['tae_formula', 'tae_assumptions', 'tae_missing', 'tae_inexact'],
+  },
+  {
+    id: 'contract',
+    anchor: 'g-contrato',
+    paragraphs: ['credit.guide.contract.p1', 'credit.guide.contract.p2'],
+    rules: ['contract_mentions', 'cash_option'],
+  },
+  {
+    id: 'withdrawal',
+    anchor: 'g-desistimiento',
+    paragraphs: ['credit.guide.withdrawal.p1', 'credit.guide.withdrawal.p2'],
+    rules: ['withdrawal', 'period_count'],
+  },
+  {
+    id: 'early',
+    anchor: 'g-amortizacion',
+    paragraphs: ['credit.guide.early.p1', 'credit.guide.early.p2', 'credit.guide.early.p3'],
+    rules: [
+      'early_repayment_cap',
+      'early_repayment_none',
+      'early_repayment_losses',
+      'early_repayment_interest_cap',
+      'unused_premium',
+    ],
+  },
+  {
+    id: 'indicator',
+    anchor: 'g-tipo-medio',
+    paragraphs: [
+      'credit.guide.indicator.p1',
+      'credit.guide.indicator.p2',
+      'credit.guide.indicator.p3',
+      'credit.guide.indicator.p4',
+    ],
+    rules: ['usury_law'],
+    sources: ['sts258_2023', 'sts366_2026', 'bde_be1904'],
+  },
+  {
+    id: 'revolving',
+    anchor: 'g-revolving',
+    paragraphs: ['credit.guide.revolving.p1', 'credit.guide.revolving.p2'],
+    rules: ['tae_assumptions', 'revolving_info'],
+  },
+  {
+    id: 'law_change',
+    anchor: 'g-ley-nueva',
+    paragraphs: ['credit.guide.law_change.p1'],
+    rules: ['consumer'],
+    drafts: ['dcc_2023', 'consumer_credit_bill'],
+  },
+  {
+    id: 'channels',
+    anchor: 'g-informarte',
+    paragraphs: ['credit.guide.channels.p1'],
+    list: [
+      'credit.result.channels_portal',
+      'credit.result.channels_service',
+      'credit.result.channels_consumer',
+    ],
+  },
+  {
+    id: 'unchecked',
+    anchor: 'g-sin-revisar',
+    paragraphs: [],
+    list: [
+      'client.credit.unchecked.clause_transparency',
+      'client.credit.unchecked.insurance_required',
+      'client.credit.unchecked.default_charges',
+      'client.credit.unchecked.limit_changes',
+      'client.credit.unchecked.new_law',
+    ],
+  },
+];
+
+// A court's criterion is never shown as law, and one not yet read in its text says so.
+const sourceLabel = (s: LawSource): Key =>
+  s.basis === 'case_law'
+    ? s.verified
+      ? 'credit.guide.case_law'
+      : 'credit.guide.case_law_unverified'
+    : 'credit.guide.official_data';
+const faq = creditFaqEntries(lang);
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('credit.guide.title')}
+    </h2>
+    <p class="guide__lead">{tx('credit.guide.lead')}</p>
+    <p class="guide__sources">
+      <span>{t(lang, 'credit.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>
+        {tx('credit.guide.sources')}:{' '}
+        <a href={CREDIT_NORMS.lcc.url}>{tx('credit.guide.source_lcc')}</a> ·{' '}
+        <a href={CREDIT_SOURCES.bde_be1904.url}>{tx('credit.guide.source_bde')}</a>
+      </span>
+      <a href={link('es', 'aviso-legal/')}>{tx('credit.guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    {blocks.map(({ id, anchor, paragraphs, rules = [], sources = [], drafts = [], list }) => (
+      <section class="sheet sheet--text" data-guide={id}>
+        <h3 id={anchor}>{tx(`credit.guide.${id}.title` as Key)}</h3>
+        {paragraphs.map((key) => (
+          <p>{tx(key)}</p>
+        ))}
+        {list && (
+          <ul>
+            {list.map((key) => (
+              <li>{tx(key)}</li>
+            ))}
+          </ul>
+        )}
+        {rules.length + sources.length + drafts.length > 0 && (
+          <>
+            <h4 class="rules__title">{tx('credit.guide.rules')}</h4>
+            <ul class="sources sources--wrap">
+              {rules.map((r) => (
+                <li>
+                  <a href={STATUTE_RULES[r].url}>{STATUTE_RULES[r].article}</a>
+                </li>
+              ))}
+              {sources.map((s) => (
+                <li>
+                  <a href={CREDIT_SOURCES[s].url}>{CREDIT_SOURCES[s].citation}</a> ·{' '}
+                  {tx(sourceLabel(CREDIT_SOURCES[s]))}
+                </li>
+              ))}
+              {drafts.map((n) => (
+                <li>
+                  <a href={CREDIT_NORMS[n].url}>{CREDIT_NORMS[n].citation}</a> ·{' '}
+                  {tx('credit.guide.draft')}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+    ))}
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('credit.guide.faq')}</h2>
+      <div class="faq-list">
+        {faq.map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>

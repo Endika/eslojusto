@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
+import { capturePosthog } from '../support/posthog';
 import { fitsScreen, nextSheet, noSideScroll } from '../support/sheets';
 
 const SIZES = [
@@ -225,9 +226,85 @@ test('the page shows when it was reviewed and makes no request', async ({ page }
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Las fechas de tu seguro de hogar o de coche',
   );
-  await expect(page.getByText(/^Revisado el /)).toBeVisible();
+  await expect(page.locator('.desk__reviewed')).toContainText('Revisado el');
   await page.goto('');
   await page.getByRole('link', { name: 'Seguros', exact: true }).click();
   await expect(page).toHaveURL(/seguros\/(#poliza)?$/);
   expect(requests).toEqual([]);
+});
+
+test('the page has its title, heading, canonical, JSON-LD, guide and questions', async ({
+  page,
+}) => {
+  await open(page, '2026-10-09', { width: 1280, height: 800 });
+  await expect(page).toHaveTitle(/Fechas de tu seguro: renovación y desistimiento/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://eslojusto.es/seguros/',
+  );
+  const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
+  const graph = JSON.parse(jsonLd ?? '{}') as {
+    '@graph': { '@type': string; mainEntity?: { name: string }[] }[];
+  };
+  expect(graph['@graph'].map((n) => n['@type'])).toEqual([
+    'WebApplication',
+    'BreadcrumbList',
+    'FAQPage',
+  ]);
+  const questions = graph['@graph'][2]?.mainEntity?.map((q) => q.name) ?? [];
+  expect(questions).toContain('¿Hasta cuándo puedo decir que no renuevo mi seguro?');
+  await expect(page.locator('.faq-item summary')).toHaveText(questions);
+
+  const guide = page.locator('.guide');
+  await expect(guide.getByRole('heading', { name: 'Decir que no renuevas' })).toBeVisible();
+  await expect(guide).toContainText('Ley de Contrato de Seguro, art. 22.2');
+  await expect(guide).toContainText(
+    'El Servicio de Reclamaciones de la Dirección General de Seguros y Fondos de Pensiones.',
+  );
+  await guide.getByText('¿Qué pasa si aseguro mi casa por menos de lo que vale?').click();
+  await expect(page.locator('#faq-seguro-regla-proporcional')).toContainText('15.000 €');
+  await expect(page.getByText('informa sobre tus derechos y no da asesoramiento')).toBeVisible();
+});
+
+test('the guide and its open questions fit a 360 px screen', async ({ page }) => {
+  await open(page, '2026-10-09', { width: 360, height: 640 });
+  const questions = page.locator('.faq-item');
+  await expect(questions.first()).toBeVisible();
+  for (const q of await questions.all()) {
+    await q.locator('summary').click();
+    await expect(q).toHaveAttribute('open', '');
+  }
+  await noSideScroll(page);
+});
+
+test('analytics carry codes and buckets, never a typed value', async ({ page }) => {
+  const { bodies, named } = await capturePosthog(page);
+  await open(page, '2026-10-09', { width: 1280, height: 800 });
+  // A rejected answer first: its field is named, never what was typed.
+  await nextSheet(page);
+  await fill(page, {
+    expires: '2027-03-01',
+    notice: { on: '2026-10-01', previous: '300,00', next: '345,00' },
+  });
+  await page
+    .getByText('¿Con cuánta antelación me tienen que avisar de un cambio en la póliza?')
+    .click();
+
+  await expect.poll(() => named('insurance_review_completed').length, { timeout: 15_000 }).toBe(1);
+  await expect.poll(() => named('help_opened').length, { timeout: 15_000 }).toBe(1);
+  expect(named('validation_error').map((e) => e.properties['field'])).toEqual(['line']);
+  expect(named('insurance_review_completed')[0]?.properties).toMatchObject({
+    line: 'home',
+    distance: 'no',
+    renewal: 'open',
+    notice: 'on_time',
+    premium: 'up',
+    withdrawal: 'not_applicable',
+  });
+  expect(named('help_opened')[0]?.properties['topic']).toBe('faq-seguro-aviso');
+
+  // Nothing typed leaves in any request: not a premium nor a date.
+  const everything = bodies.join('\n');
+  for (const typed of ['300,00', '345,00', '2027-03-01', '01-03-2027', '2026-10-01'])
+    expect(everything, typed).not.toContain(typed);
 });
