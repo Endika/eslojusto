@@ -2,6 +2,7 @@ import { test, expect, type Locator, type Page, type Request } from '@playwright
 import { readFileSync } from 'node:fs';
 import { syntheticPhoto } from '../support/synthetic-photo';
 import { nextSheet } from '../support/sheets';
+import { expectShownAndFocused } from '../support/reads';
 
 // Runs only against a TEST_DOCUMENTS=1 build, which has /contrato/ too: every request to the fake
 // API, to Turnstile and to Stripe is answered here. The documents, companies and figures are
@@ -251,9 +252,7 @@ async function upload(page: Page, files: readonly string[]) {
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
   // Several photos take a while to draw and encode.
-  await expect(page.getByRole('heading', { name: 'Datos leídos' })).toBeFocused({
-    timeout: 30_000,
-  });
+  await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }));
 }
 
 const sheet = (page: Page, name: string) => page.getByRole('group', { name, exact: true });
@@ -548,9 +547,9 @@ test('a read that finds nothing says why for each file and spends no read', asyn
     .setInputFiles(['contrato-movido.png', 'factura-luz.png'].map(photo));
   await page.getByLabel(/Doy mi consentimiento explícito/).check();
   await page.getByRole('button', { name: 'Leer los documentos' }).click();
-  await expect(
+  await expectShownAndFocused(
     page.getByText('No se ha leído ningún dato, así que esta lectura no cuenta.'),
-  ).toBeFocused();
+  );
   await expect(
     page.getByText('contrato-movido.png: sale borrosa. Prueba con más luz y el móvil quieto.'),
   ).toBeVisible();
