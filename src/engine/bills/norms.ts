@@ -22,7 +22,10 @@ export type BillsNormId =
   | 'rdl25_2026_november'
   | 'rdl25_2026_december'
   | 'order_iet1491_2013'
-  | 'rd897_2017';
+  | 'rd897_2017'
+  | 'rd88_2026'
+  | 'rd216_2014'
+  | 'trlgdcu';
 
 export type Norm = LawNorm<BillsNormId, NormStatus>;
 

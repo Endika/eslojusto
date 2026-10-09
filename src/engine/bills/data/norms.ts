@@ -227,6 +227,35 @@ export const BILLS_NORMS: NormTable = {
     inForceSince: '2017-10-08',
     ...inForce,
   },
+  // The regulation of supply, retail and aggregation of electricity. Final provision 9.ª.1: in
+  // force the day of its publication; 9.ª.4: arts. 6, 13, 28, 29, 30, 43, 44 and 45 take effect
+  // four months later, on 12-06-2026 (rules.ts).
+  rd88_2026: {
+    id: 'rd88_2026',
+    citation:
+      'Real Decreto 88/2026, por el que se aprueba el Reglamento general de suministro, comercialización y agregación de energía eléctrica',
+    url: `${ACT}BOE-A-2026-3212`,
+    inForceSince: '2026-02-12',
+    ...inForce,
+  },
+  // The PVPC: who may take it and what its bills may carry.
+  rd216_2014: {
+    id: 'rd216_2014',
+    citation:
+      'Real Decreto 216/2014, de 28 de marzo, por el que se establece la metodología de cálculo de los precios voluntarios para el pequeño consumidor de energía eléctrica y su régimen jurídico de contratación',
+    url: `${ACT}BOE-A-2014-3376`,
+    inForceSince: '2014-03-30',
+    ...inForce,
+  },
+  // Art. 62.5: a commitment penalty in proportion to the days left, for exits from 01-01-2022.
+  trlgdcu: {
+    id: 'trlgdcu',
+    citation:
+      'Texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios (Real Decreto Legislativo 1/2007, de 16 de noviembre)',
+    url: `${ACT}BOE-A-2007-20555`,
+    inForceSince: '2007-12-01',
+    ...inForce,
+  },
 };
 
 export const NORM_REVIEW: NormReview = {
@@ -247,4 +276,7 @@ export const NORM_REVIEW: NormReview = {
   rdl25_2026_december: null,
   order_iet1491_2013: null,
   rd897_2017: null,
+  rd88_2026: null,
+  rd216_2014: null,
+  trlgdcu: null,
 };
