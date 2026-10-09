@@ -1,3 +1,4 @@
+import { toIso, type CivilDate } from '../engine/date';
 import { formatCalculationEuros, formatDays, formatInteger } from '../calculator/number';
 import type {
   InsuranceCalculation,
@@ -14,6 +15,7 @@ import type { FieldError } from './form';
 
 // «2027-02-01» → «01-02-2027».
 export const dayText = (iso: string): string => iso.split('-').reverse().join('-');
+export const civilDayText = (d: CivilDate): string => dayText(toIso(d));
 
 const PERCENT = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2, useGrouping: 'always' });
 

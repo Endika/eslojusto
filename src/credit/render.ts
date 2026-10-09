@@ -1,3 +1,4 @@
+import { toIso, type CivilDate } from '../engine/date';
 import { formatCalculationEuros, formatDays, formatInteger } from '../calculator/number';
 import type {
   CreditCalculation,
@@ -18,6 +19,7 @@ import type { FieldError } from './form';
 
 // «2027-02-01» → «01-02-2027».
 export const dayText = (iso: string): string => iso.split('-').reverse().join('-');
+export const civilDayText = (d: CivilDate): string => dayText(toIso(d));
 
 // An APR to two decimals, «16,61 %»; a Bank of Spain average with the four it is published with.
 const PERCENT = new Intl.NumberFormat('es-ES', {
@@ -296,7 +298,7 @@ function renderCard(container: ParentNode, c: Card, position: number, tr: Transl
 }
 
 // «Si el seguro era obligatorio · Si va un mes después» for a reading across two points.
-const readingTitle = (when: DoubtReading, tr: Translate): string =>
+export const readingTitle = (when: DoubtReading, tr: Translate): string =>
   when
     .split('.')
     .map((part) =>

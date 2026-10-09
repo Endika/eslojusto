@@ -34,7 +34,13 @@ describe.skipIf(!withInsurance)('a build with the insurance switch', () => {
     expect(read('dist/index.html')).toContain('href="/seguros/"');
     const page = read('dist/seguros/index.html');
     expect(page).toContain('Día en que vence según tu póliza');
-    expect(page).toContain("connect-src 'self';");
+    // Closed to every other origin; a build with the documents API opens it to that API and
+    // Turnstile, for the letters and the pass.
+    expect(page).toMatch(
+      page.includes('data-pass-offer')
+        ? /connect-src 'self'( https:\/\/[\w.-]+)* https:\/\/challenges\.cloudflare\.com;/
+        : /connect-src 'self';/,
+    );
   });
   it('ships its strings only on its own page', () => {
     expect(read('dist/seguros/index.html')).toContain('client.insurance.status.open');

@@ -530,6 +530,7 @@ export const es = {
   'documents.letter.company': 'Empresa',
   'documents.letter.place': 'Localidad',
   'documents.letter.date': 'Fecha',
+  'documents.letter.reference': 'Número de contrato o de póliza',
   'documents.letter.privacy':
     'Estos datos solo se usan para rellenar la carta en tu dispositivo; no se envían ni se guardan.',
   'documents.notice.letter_details':
@@ -4223,6 +4224,22 @@ export const es = {
   'insurance.result.channels_consumer':
     'Las oficinas municipales de información al consumidor (OMIC) y los servicios de consumo de tu comunidad autónoma.',
   'insurance.result.restart': 'Empezar de nuevo',
+  'insurance.pass.title': 'El informe y la carta',
+  'insurance.pass.text':
+    'Con tu pase descargas el informe de esta revisión en PDF. La carta para comunicar que no renuevas es gratis. Se generan en tu dispositivo.',
+  'insurance.pass.download_non_renewal_letter':
+    'Descargar la carta para comunicar que no renuevas (PDF, gratis)',
+  'insurance.pass.letter_note':
+    'La carta es una plantilla. Se descarga en tu dispositivo y no se envía desde aquí: usarla o no, y cómo, es decisión tuya. El último día para que llegue a la aseguradora es el que ves arriba, con sus notas.',
+  'insurance.letters.title': 'Carta que puedes descargar gratis',
+  'insurance.letters.text':
+    'Mientras sigues a tiempo, puedes descargar gratis una carta para comunicar a tu aseguradora que no renuevas tu póliza. Se genera en tu dispositivo.',
+  'insurance.letter.legend': 'Tus datos para la carta (opcional)',
+  'insurance.letter.id': 'DNI o NIE (opcional)',
+  'insurance.letter.company': 'Aseguradora',
+  'insurance.letter.reference': 'Número de póliza',
+  'insurance.letter.privacy':
+    'Estos datos solo se usan para rellenar la carta en tu dispositivo; no se envían ni se guardan.',
 
   'client.insurance.result.lead':
     'Cada fecha, con la cuenta que lleva a ella y la norma en que se apoya. Los días que quedan se cuentan desde hoy.',
@@ -4355,6 +4372,48 @@ export const es = {
   'client.insurance.norm.pending_validation': 'pendiente de convalidación',
   'client.insurance.norm.repealed': 'derogada el {fecha}',
   'client.insurance.source.since': 'con efectos desde el {desde}',
+  'client.insurance.answer.yes': 'Sí',
+  'client.insurance.answer.no': 'No',
+  'client.insurance.answer.unknown': 'No lo sé',
+
+  'client.insurance.letter.title': 'Comunicación de que no prorrogo mi póliza',
+  'client.insurance.letter.insurer': 'Aseguradora',
+  'client.insurance.letter.reference': 'Número de póliza',
+  'client.insurance.letter.body_home':
+    'Te comunico que no deseo prorrogar mi póliza de seguro de hogar, cuyo periodo en curso vence el {vencimiento}.',
+  'client.insurance.letter.body_car':
+    'Te comunico que no deseo prorrogar mi póliza de seguro del coche, cuyo periodo en curso vence el {vencimiento}.',
+  'client.insurance.letter.rule':
+    'Lo hago por escrito, como prevé la {cita}, que pide comunicarlo con al menos un mes de antelación a la conclusión del periodo en curso.',
+  'client.insurance.letter.confirm': 'Te pido que me confirmes por escrito que la has recibido.',
+  'client.insurance.letter.regards': 'Un saludo.',
+  'client.insurance.letter.filename': 'eslojusto-carta-no-renovacion-seguro.pdf',
+
+  'client.insurance.report.title': 'Revisión de las fechas de tu seguro',
+  'client.insurance.report.intro':
+    'Este informe recoge las fechas de tu póliza que marca la ley, con los datos que confirmaste en la revisión: hasta cuándo puedes comunicar que no renuevas, con cuánta antelación llegó el aviso de cambios y el plazo para desistir si la contrataste a distancia. Informa sobre la ley y no es asesoramiento jurídico.',
+  'client.insurance.report.footer':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Normas según su estado el {fecha}.',
+  'client.insurance.report.filename': 'eslojusto-informe-seguro.pdf',
+  'client.insurance.report.your_data': 'Tus datos',
+  'client.insurance.report.line': 'Tipo de seguro',
+  'client.insurance.report.line.home': 'Hogar',
+  'client.insurance.report.line.car': 'Coche',
+  'client.insurance.report.line.life': 'Vida',
+  'client.insurance.report.line.health': 'Salud',
+  'client.insurance.report.line.funeral': 'Decesos',
+  'client.insurance.report.line.other': 'Otro',
+  'client.insurance.report.expires': 'Vencimiento del periodo en curso',
+  'client.insurance.report.renews': 'Se renueva sola',
+  'client.insurance.report.distance': 'Contratada a distancia',
+  'client.insurance.report.concluded': 'Cuando la contrataste',
+  'client.insurance.report.notice': 'Aviso de renovación recibido el',
+  'client.insurance.report.previous': 'Prima anterior',
+  'client.insurance.report.next': 'Prima nueva',
+  'client.insurance.report.items': 'Fecha por fecha',
+  'client.insurance.report.norms': 'Las normas y su estado',
+  'client.insurance.report.information': 'Para que lo tengas en cuenta',
+  'client.insurance.report.unchecked': 'Lo que esta revisión no comprueba',
 
   'client.insurance.error.missing_value': 'Falta este dato',
   'client.insurance.error.missing_choice': 'Elige una respuesta',
@@ -4531,6 +4590,26 @@ export const es = {
   'credit.result.channels_consumer':
     'Las oficinas municipales de información al consumidor (OMIC) y los servicios de consumo de tu comunidad autónoma.',
   'credit.result.restart': 'Empezar de nuevo',
+  'credit.pass.title': 'El informe y la carta',
+  'credit.pass.text':
+    'Por 4,99 € descargas el informe en PDF, con la tabla de pagos con que se calcula la TAE, lo que añade cada gasto y el tope por devolverlo antes, y, si tu revisión tiene cifras para ella, la carta sobre la compensación por devolverlo antes. Se generan en tu dispositivo.',
+  'credit.pass.price':
+    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para las demás revisiones de la web: en ese tiempo puedes rehacer o corregir tu revisión y volver a descargar el informe y la carta sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
+  'credit.pass.download_information_letter':
+    'Descargar la carta que pide la información de tu crédito (PDF, gratis)',
+  'credit.pass.download_repayment_letter':
+    'Descargar la carta sobre la compensación por devolverlo antes (PDF)',
+  'credit.pass.letter_note':
+    'Las cartas son plantillas. Se descargan en tu dispositivo y no se envían desde aquí: usarlas o no, y cómo, es decisión tuya.',
+  'credit.letters.title': 'Carta que puedes descargar gratis',
+  'credit.letters.text':
+    'Esta carta solo pide información a la entidad que te dio el crédito y se descarga gratis. Se genera en tu dispositivo.',
+  'credit.letter.legend': 'Tus datos para las cartas (opcional)',
+  'credit.letter.id': 'DNI o NIE (opcional)',
+  'credit.letter.company': 'Entidad que te dio el crédito',
+  'credit.letter.reference': 'Número de contrato',
+  'credit.letter.privacy':
+    'Estos datos solo se usan para rellenar las cartas en tu dispositivo; no se envían ni se guardan.',
 
   'client.credit.result.lead':
     'Cada partida, con la cuenta que lleva a ella y la norma o el criterio en que se apoya. Los días que quedan se cuentan desde hoy.',
@@ -4800,6 +4879,125 @@ export const es = {
   'client.credit.error.count_range': 'Escribe entre 1 y 600 cuotas',
   'client.credit.error.above_principal': 'Es más que el importe del préstamo',
   'client.credit.error.in_schedule': 'Esa cuota ya está en el cuadro',
+
+  'client.credit.answer.yes': 'Sí',
+  'client.credit.answer.no': 'No',
+  'client.credit.answer.unknown': 'No lo sé',
+
+  'client.credit.letter.lender': 'Entidad',
+  'client.credit.letter.reference': 'Número de contrato',
+  'client.credit.letter.regards': 'Un saludo.',
+  'client.credit.letter.about.personal_loan':
+    'Te escribo por mi préstamo personal, que contraté el {fecha}.',
+  'client.credit.letter.about.car_loan':
+    'Te escribo por el préstamo con el que financié la compra de un coche, que contraté el {fecha}.',
+  'client.credit.letter.about.revolving':
+    'Te escribo por mi tarjeta de pago aplazado (revolving), que contraté el {fecha}.',
+  'client.credit.letter.information.title': 'Petición de información de mi crédito',
+  'client.credit.letter.information.schedule':
+    'El art. 16.2.i de la Ley 16/2011, de contratos de crédito al consumo, recoge el derecho a recibir, si se pide, de forma gratuita y en cualquier momento del contrato, un extracto en forma de cuadro de amortización. Te pido el cuadro de amortización de mi crédito.',
+  'client.credit.letter.information.breakdown':
+    'Te pido el desglose de lo que he pagado hasta hoy, con la parte que ha ido a intereses, a comisiones y a capital, y de lo que queda por pagar. La orden de transparencia bancaria prevé este desglose para las tarjetas de pago aplazado.',
+  'client.credit.letter.information.reply':
+    'Puedes enviármelo por escrito, por el medio que uses para comunicarte conmigo.',
+  'client.credit.letter.information.filename': 'eslojusto-carta-informacion-credito.pdf',
+  'client.credit.letter.repayment.title':
+    'Revisión de la compensación por devolver antes el crédito',
+  'client.credit.letter.repayment.body':
+    'El {fecha} devolví antes de tiempo {capital} de capital y me cobraste {cobrado} como compensación por ese reembolso anticipado. El final pactado del crédito era el {fin}.',
+  'client.credit.letter.repayment.over_a_year':
+    'Entre ese día y el final pactado quedaba más de un año, contado de fecha a fecha, así que la ley fija como tope el 1 % del importe reembolsado (art. 30.2 de la Ley 16/2011, de contratos de crédito al consumo).',
+  'client.credit.letter.repayment.up_to_a_year':
+    'Entre ese día y el final pactado quedaba un año o menos, contado de fecha a fecha, así que la ley fija como tope el 0,5 % del importe reembolsado (art. 30.2 de la Ley 16/2011, de contratos de crédito al consumo).',
+  'client.credit.letter.repayment.base_with_interest':
+    'Sobre {base}, el capital más los intereses liquidados ese día, el tope es de {tope}.',
+  'client.credit.letter.repayment.base_principal':
+    'Sobre {base}, el capital devuelto, el tope es de {tope}.',
+  'client.credit.letter.repayment.interest_cap':
+    'Además, la compensación no puede pasar de los intereses que quedaban por pagar (art. 30.5): el tope queda en {tope}.',
+  'client.credit.letter.repayment.over':
+    'La compensación cobrada pasa de ese tope en {diferencia}.',
+  'client.credit.letter.repayment.ask':
+    'Te pido que revises esta compensación o, si se basa en una pérdida mayor por el reembolso, que me la justifiques, como prevé el art. 30.4.',
+  'client.credit.letter.repayment.paid_by_insurance':
+    'El reembolso lo pagó un seguro, y para ese caso la ley no permite cobrar compensación (art. 30.3 de la Ley 16/2011, de contratos de crédito al consumo).',
+  'client.credit.letter.repayment.variable_rate':
+    'En ese periodo el tipo de interés no era fijo, y para ese caso la ley no permite cobrar compensación (art. 30.3 de la Ley 16/2011, de contratos de crédito al consumo).',
+  'client.credit.letter.repayment.ask_no_basis': 'Te pido que revises este cobro.',
+  'client.credit.letter.repayment.lowest':
+    'Sobre qué importe se calcula el tope admite dos lecturas: estas cifras son las de la que da menos diferencia.',
+  'client.credit.letter.repayment.filename': 'eslojusto-carta-compensacion-credito.pdf',
+
+  'client.credit.report.title': 'Revisión de tu préstamo o tu tarjeta',
+  'client.credit.report.intro':
+    'Este informe compara las cifras de tu crédito con lo que dice la ley, partida por partida, con los datos que confirmaste en la revisión: la TAE que sale de ellas, cómo queda frente al tipo medio del Banco de España, el tope por devolverlo antes y el plazo para desistir. Donde el resultado depende de un dato que no sabes, da cada lectura. Informa sobre la ley y no es asesoramiento jurídico.',
+  'client.credit.report.footer':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Normas, criterios y tipos medios según su estado el {fecha}.',
+  'client.credit.report.filename': 'eslojusto-informe-credito.pdf',
+  'client.credit.report.your_data': 'Tus datos',
+  'client.credit.report.no_figure': 'Sin dato',
+  'client.credit.report.product': 'Tu crédito',
+  'client.credit.report.product.personal_loan': 'Préstamo personal',
+  'client.credit.report.product.car_loan': 'Financiación de coche',
+  'client.credit.report.product.revolving': 'Tarjeta revolving',
+  'client.credit.report.agreed': 'Cuando lo contrataste',
+  'client.credit.report.drawn': 'Cuando recibiste el dinero',
+  'client.credit.report.principal': 'Importe del préstamo',
+  'client.credit.report.limit': 'Límite de la tarjeta',
+  'client.credit.report.net': 'Lo que recibiste',
+  'client.credit.report.nominal_rate': 'Tipo de interés nominal (TIN)',
+  'client.credit.report.rate_type': 'Tipo de interés',
+  'client.credit.report.rate.fixed': 'Fijo',
+  'client.credit.report.rate.variable': 'Variable',
+  'client.credit.report.declared_apr': 'TAE que dice tu contrato',
+  'client.credit.report.declared_total': 'Importe total adeudado que dice tu contrato',
+  'client.credit.report.instalments': 'Cuotas',
+  'client.credit.report.instalments_regular': '{n} cuotas de {importe}, la primera el {fecha}',
+  'client.credit.report.instalments_schedule': 'Cuadro de {n} cuotas',
+  'client.credit.report.balloon': 'Cuota final',
+  'client.credit.report.balloon_on': '{importe}, el {fecha}',
+  'client.credit.report.charge.opening': 'Comisión de apertura',
+  'client.credit.report.charge.study': 'Comisión de estudio',
+  'client.credit.report.charge.management': 'Gastos de gestión',
+  'client.credit.report.charge.other': 'Otros gastos',
+  'client.credit.report.charge_how.deducted': '{importe}, descontados de lo que recibiste',
+  'client.credit.report.charge_how.financed': '{importe}, sumados al préstamo',
+  'client.credit.report.charge_how.paid': '{importe}, pagados aparte',
+  'client.credit.report.insurance': 'Seguro ligado al crédito',
+  'client.credit.report.insurance_single': 'Prima única de {importe}',
+  'client.credit.report.insurance_periodic': 'Prima de {importe} con cada cuota',
+  'client.credit.report.insurance_required': 'Obligatorio para darte el crédito',
+  'client.credit.report.balance': 'Deuda de la tarjeta',
+  'client.credit.report.payment': 'Cuota mensual',
+  'client.credit.report.annual_fee': 'Cuota anual',
+  'client.credit.report.repaid_on': 'Devolución anticipada',
+  'client.credit.report.repaid': 'Capital devuelto',
+  'client.credit.report.compensation': 'Compensación cobrada',
+  'client.credit.report.agreed_end': 'Final pactado',
+  'client.credit.report.summary_title': 'Resumen',
+  'client.credit.report.summary_none':
+    'Esta revisión no cuenta ningún importe cobrado por encima de un tope legal.',
+  'client.credit.report.summary':
+    'Por devolverlo antes, te cobraron {importe} por encima de los topes del art. 30.',
+  'client.credit.report.summary_up_to':
+    'Por devolverlo antes, te cobraron {importe} por encima de los topes del art. 30, y hasta {maximo} según cómo se lea un dato.',
+  'client.credit.report.summary_doubtful':
+    'Por devolverlo antes, según cómo se lea un dato, la compensación pasaría de los topes del art. 30 hasta en {maximo}; no se cuenta porque no pasa en todas las lecturas.',
+  'client.credit.report.items': 'Partida por partida',
+  'client.credit.report.how': 'Cómo se calcula',
+  'client.credit.report.flows.normalised_months':
+    'Pagos con que se calcula la TAE, con su momento en años desde que recibiste el dinero: lo que recibes en positivo y lo que pagas en negativo. Como las cuotas son mensuales, cada mes cuenta como un doceavo de año (anexo I de la ley).',
+  'client.credit.report.flows.days':
+    'Pagos con que se calcula la TAE, con su momento en años desde que recibiste el dinero: lo que recibes en positivo y lo que pagas en negativo. Como las fechas no son regulares, el tiempo se cuenta en días, sobre 365 o 366 en un año bisiesto (anexo I de la ley).',
+  'client.credit.report.flow': '{fecha} (t = {t})',
+  'client.credit.report.flows_solved':
+    'La TAE es el tipo anual que hace que todos estos pagos, descontados a su momento, sumen cero: {tae}.',
+  'client.credit.report.norms': 'Las normas y criterios, y su estado',
+  'client.credit.report.information': 'Para que lo tengas en cuenta',
+  'client.credit.report.unchecked': 'Lo que esta revisión no comprueba',
+  'client.credit.report.channels': 'Dónde informarte gratis',
+  'client.credit.report.channels_text':
+    'En el Portal del Cliente Bancario del Banco de España, en el Servicio de Reclamaciones del Banco de España, y en las oficinas municipales de información al consumidor (OMIC) y los servicios de consumo de tu comunidad autónoma.',
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof es;

@@ -6,6 +6,7 @@ import InsuranceResult from '../components/InsuranceResult.astro';
 import { INSURANCE_BETA } from '../content/sections';
 import { formatLongDay } from '../content/rent-indices';
 import { breadcrumbList, trail } from '../content/structured-data';
+import { DOCUMENTS } from '../documents/config';
 import { LAST_UPDATED } from '../content/updated';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
@@ -15,6 +16,8 @@ interface Props {
 }
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
+// A build with the documents API offers the letters and, when there is one to sell, the pass.
+const documents = DOCUMENTS !== null;
 
 // Each tab's share of the rail follows how many sheets its section holds (the result counts two).
 // The second column is the section's first step, whose id is its URL fragment.
@@ -39,6 +42,7 @@ const crumbs = trail(lang, { name: tx('home.insurance'), path: '/seguros/' });
   lang={lang}
   section="cause"
   structuredData={[breadcrumbList(home, lang, crumbs)]}
+  calculator={documents}
 >
   <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
     <ol>
@@ -84,7 +88,7 @@ const crumbs = trail(lang, { name: tx('home.insurance'), path: '/seguros/' });
         </div>
       </noscript>
       <InsuranceForm lang={lang} />
-      <InsuranceResult lang={lang} />
+      <InsuranceResult lang={lang} documents={documents} />
     </div>
   </main>
 </Base>

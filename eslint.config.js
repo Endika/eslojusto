@@ -72,7 +72,7 @@ const analyticsReach = {
 // Every review section walks its sheets on the same navigation, tabs and sheet walk, which learn a
 // section's steps from the Flow they are given, so a new section plugs in without touching them.
 const flowOnly = {
-  regex: `^(?!\\./(dom|flow|navigation|tabs)$|\\.\\./engine/date$)|${notCanonical}`,
+  regex: `^(?!\\./(dom|fill|flow|navigation|tabs)$|\\.\\./engine/date$)|${notCanonical}`,
   message:
     'Navigation, tabs and the sheet walk serve every section: its specifics come in through a Flow.',
 };
@@ -101,16 +101,16 @@ const employmentReach = {
 // The insurance review reaches the insurance engine through its modules, never its tables, which
 // its composition root passes in; of the calculator, only what every section shares.
 const insuranceReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|calculation|law/sources|insurance/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|flow|navigation|number|section)$|\\.\\./i18n/client$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|calculation|law/sources|insurance/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|fill|flow|navigation|number|section)$|\\.\\./documents/(letter|ports)$|\\.\\./i18n/client$)|${notCanonical}`,
   message:
-    'src/insurance reaches the insurance engine (its tables come from the composition root), the shared sheets and the translator type.',
+    'src/insurance reaches the insurance engine (its tables come from the composition root), the shared sheets, the documents ports and letter details, and the translator type.',
 };
 // The credit review reaches the credit engine through its modules, never its tables, which its
 // composition root passes in; of the calculator, only what every section shares.
 const creditReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|calculation|law/sources|credit/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|flow|navigation|number|section)$|\\.\\./i18n/client$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|calculation|law/sources|credit/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|fill|flow|navigation|number|section)$|\\.\\./documents/(letter|ports)$|\\.\\./i18n/client$)|${notCanonical}`,
   message:
-    'src/credit reaches the credit engine (its tables come from the composition root), the shared sheets and the translator type.',
+    'src/credit reaches the credit engine (its tables come from the composition root), the shared sheets, the documents ports and letter details, and the translator type.',
 };
 const noCredit = {
   regex: '(^|/)credit/',

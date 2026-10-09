@@ -4,16 +4,27 @@ import { LETTER_MAX_LENGTH } from '../documents/letter';
 
 // The letter's optional details and a button for each letter the review can give, worded in its
 // section's own copy. On the final pay's and the rental pages it sits among the paid downloads; on
-// the contract review's, below them, because two of its letters are free.
+// the contract, credit and insurance reviews', below them, because some of their letters are free.
 interface Props {
-  review: 'final_pay' | 'rental' | 'employment';
+  review: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance';
   tx: (key: Key) => string;
 }
 const { review, tx } = Astro.props;
 const rental = review === 'rental';
 const employment = review === 'employment';
+const finance = review === 'credit' || review === 'insurance';
 type LetterField = readonly [
-  id: 'name' | 'id' | 'company' | 'workplace' | 'landlord' | 'address' | 'place' | 'iban' | 'date',
+  id:
+    | 'name'
+    | 'id'
+    | 'company'
+    | 'workplace'
+    | 'landlord'
+    | 'address'
+    | 'place'
+    | 'iban'
+    | 'reference'
+    | 'date',
   label: Key,
   autocomplete: string,
   type: 'text' | 'date',
@@ -37,13 +48,22 @@ const letterFields: readonly LetterField[] = rental
         ['place', 'documents.letter.place', 'address-level2', 'text'],
         ['date', 'documents.letter.date', 'off', 'date'],
       ]
-    : [
-        ['name', 'documents.letter.name', 'name', 'text'],
-        ['id', 'documents.letter.id', 'off', 'text'],
-        ['company', 'documents.letter.company', 'organization', 'text'],
-        ['place', 'documents.letter.place', 'address-level2', 'text'],
-        ['date', 'documents.letter.date', 'off', 'date'],
-      ];
+    : finance
+      ? [
+          ['name', 'documents.letter.name', 'name', 'text'],
+          ['id', 'documents.letter.id', 'off', 'text'],
+          ['company', 'documents.letter.company', 'organization', 'text'],
+          ['reference', 'documents.letter.reference', 'off', 'text'],
+          ['place', 'documents.letter.place', 'address-level2', 'text'],
+          ['date', 'documents.letter.date', 'off', 'date'],
+        ]
+      : [
+          ['name', 'documents.letter.name', 'name', 'text'],
+          ['id', 'documents.letter.id', 'off', 'text'],
+          ['company', 'documents.letter.company', 'organization', 'text'],
+          ['place', 'documents.letter.place', 'address-level2', 'text'],
+          ['date', 'documents.letter.date', 'off', 'date'],
+        ];
 // The rental letters, each with its own button; the account goes only on the deposit's.
 const rentalLetters = [
   ['deposit_return', 'rental.pass.download_deposit_letter'],
@@ -55,7 +75,22 @@ const employmentLetters = [
   ['temporary_contracts_certificate', 'employment.pass.download_certificate_request'],
   ['employment', 'employment.pass.download_company_letter'],
 ] as const;
-const letterButtons = rental ? rentalLetters : employment ? employmentLetters : null;
+// The credit review's: the free request for its information first, then the one the pass pays for.
+const creditLetters = [
+  ['credit_information', 'credit.pass.download_information_letter'],
+  ['early_repayment_review', 'credit.pass.download_repayment_letter'],
+] as const;
+// The insurance review's one letter, always free.
+const insuranceLetters = [
+  ['insurance_non_renewal', 'insurance.pass.download_non_renewal_letter'],
+] as const;
+const letterButtons = {
+  final_pay: null,
+  rental: rentalLetters,
+  employment: employmentLetters,
+  credit: creditLetters,
+  insurance: insuranceLetters,
+}[review];
 const describedBy = (id: LetterField[0]) =>
   id === 'id' ? 'error-letter-id' : id === 'iban' ? 'hint-letter-iban' : undefined;
 ---
