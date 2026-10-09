@@ -2,7 +2,7 @@ import type { FormEntries } from '../calculator/fill';
 import type { Detail } from '../calculator/flow';
 import { createApi } from '../documents/api';
 import { TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/config';
-import type { ExtractionShape } from '../documents/contract';
+import type { ExtractionShape, PassApi, ReviewKind } from '../documents/contract';
 import { fitWithin } from '../documents/files';
 import { canvasJpeg, whiteCanvas } from './jpeg';
 import { photoQuality } from './quality';
@@ -167,12 +167,8 @@ export interface ReviewHooks<R> {
   detail(state: () => Detail): void;
 }
 
-// What a section brings to reading documents and to the pass; the rest is the same for all.
-export interface DocumentsSection<R, F extends string, L extends string> {
-  readonly extraction: ExtractionShape<F, L>;
-  readonly reading: DocumentReading<F, L>;
-  // The fragments that open the form itself rather than the start sheet.
-  readonly steps: readonly string[];
+// What a section brings to the pass; the rest is the same for all.
+export interface PassSection<R> {
   // Where the review's answers wait while the person is on Stripe's page; read back and deleted
   // on return.
   readonly keptReviewKey: string;
@@ -181,6 +177,14 @@ export interface DocumentsSection<R, F extends string, L extends string> {
   decorateResult(result: ParentNode): void;
   // Answers kept by an earlier version of the page, as the form takes them now.
   restore(saved: FormEntries): FormEntries;
+}
+
+// What a section brings to reading documents and to the pass.
+export interface DocumentsSection<R, F extends string, L extends string> extends PassSection<R> {
+  readonly extraction: ExtractionShape<F, L>;
+  readonly reading: DocumentReading<F, L>;
+  // The fragments that open the form itself rather than the start sheet.
+  readonly steps: readonly string[];
 }
 
 export interface DocumentsWiring<R, F extends string, L extends string> {
@@ -201,43 +205,37 @@ const isEntries = (v: unknown): v is FormEntries =>
     (e) => Array.isArray(e) && e.length === 2 && e.every((x: unknown) => typeof x === 'string'),
   );
 
-export function wireDocuments<R, F extends string, L extends string>({
-  form: calculator,
-  hooks,
-  arrival,
-  section,
-  config,
-  tr,
-  events,
-}: DocumentsWiring<R, F, L>): void {
-  const start = document.querySelector<HTMLElement>('[data-documents-start]');
-  const offer = document.querySelector<HTMLElement>('[data-pass-offer]');
-  const captchaBox = start?.querySelector<HTMLElement>('[data-captcha]');
-  const checkoutCaptchaBox = offer?.querySelector<HTMLElement>('[data-pass-captcha]');
-  if (!config || !start || !offer || !captchaBox || !checkoutCaptchaBox) return;
+// What the pass needs on any page: the API, the pass this browser holds and the page's session.
+interface PassContext<R> {
+  readonly calculator: ReviewForm;
+  readonly hooks: ReviewHooks<R>;
+  readonly section: PassSection<R>;
+  readonly config: DocumentsConfig;
+  readonly api: PassApi;
+  readonly loadTurnstile: () => Promise<Turnstile>;
+  readonly passes: ReturnType<typeof createPassStore>;
+  readonly session: KeyValueStore;
+  readonly tr: Translate;
+  readonly events: DocumentEvents;
+}
 
-  const api = createApi(config.endpoints, (url, init) => fetch(url, init), section.extraction);
-  const loadTurnstile = turnstileLoader();
-  const passes = createPassStore(
-    storage(() => localStorage),
-    browser.now,
-  );
-  const session = storage(() => sessionStorage);
-
-  const upload = setUpUpload(start, {
-    api,
-    reading: section.reading,
-    captcha: turnstileCaptcha(loadTurnstile, config.turnstileSiteKey, captchaBox, 'extract'),
-    encoder: canvasEncoder,
-    pdfs: pdfPages,
-    passes,
-    events,
-    outage: createOutageMemory(session, browser.now),
-    now: browser.now,
-    tr,
+// The pass offer in the result: it follows each review shown and each start over.
+function setUpPass<R>(
+  offer: HTMLElement,
+  checkoutCaptchaBox: HTMLElement,
+  {
     calculator,
-    tabs: document.querySelector<HTMLElement>('.tabs'),
-  });
+    hooks,
+    section,
+    config,
+    api,
+    loadTurnstile,
+    passes,
+    session,
+    tr,
+    events,
+  }: PassContext<R>,
+) {
   const payment = setUpPayment(offer, {
     notice: document.querySelector<HTMLElement>('[data-pass-notice]'),
     api,
@@ -266,9 +264,12 @@ export function wireDocuments<R, F extends string, L extends string>({
     section.decorateResult(document);
   });
   hooks.onRestart(() => payment.hide());
+  return payment;
+}
 
-  // The answers kept for the trip to Stripe come back on any return, paid or not (cancelling or
-  // the browser's back button arrive without a session id), and are deleted at once.
+// The answers kept for the trip to Stripe come back on any return, paid or not (cancelling or
+// the browser's back button arrive without a session id), and are deleted at once.
+function keptReview<R>(session: KeyValueStore, section: PassSection<R>): FormEntries | null {
   let saved: unknown = null;
   try {
     saved = JSON.parse(session.get(section.keptReviewKey) ?? 'null');
@@ -276,10 +277,71 @@ export function wireDocuments<R, F extends string, L extends string>({
     // A damaged entry is dropped below like any other.
   }
   session.remove(section.keptReviewKey);
-  const review = isEntries(saved) ? section.restore(saved) : null;
+  return isEntries(saved) ? section.restore(saved) : null;
+}
 
+// The payment's session id on the way back from Stripe, taken off the address at once.
+function returnedSession(arrival: { readonly search: string }): string | null {
   const sessionId = new URLSearchParams(arrival.search).get('session_id');
   if (sessionId !== null) history.replaceState(null, '', `${location.pathname}${location.hash}`);
+  return sessionId;
+}
+
+const passStore = () =>
+  createPassStore(
+    storage(() => localStorage),
+    browser.now,
+  );
+
+export function wireDocuments<R, F extends string, L extends string>({
+  form: calculator,
+  hooks,
+  arrival,
+  section,
+  config,
+  tr,
+  events,
+}: DocumentsWiring<R, F, L>): void {
+  const start = document.querySelector<HTMLElement>('[data-documents-start]');
+  const offer = document.querySelector<HTMLElement>('[data-pass-offer]');
+  const captchaBox = start?.querySelector<HTMLElement>('[data-captcha]');
+  const checkoutCaptchaBox = offer?.querySelector<HTMLElement>('[data-pass-captcha]');
+  if (!config || !start || !offer || !captchaBox || !checkoutCaptchaBox) return;
+
+  const api = createApi(config.endpoints, (url, init) => fetch(url, init), section.extraction);
+  const loadTurnstile = turnstileLoader();
+  const passes = passStore();
+  const session = storage(() => sessionStorage);
+
+  const upload = setUpUpload(start, {
+    api,
+    reading: section.reading,
+    captcha: turnstileCaptcha(loadTurnstile, config.turnstileSiteKey, captchaBox, 'extract'),
+    encoder: canvasEncoder,
+    pdfs: pdfPages,
+    passes,
+    events,
+    outage: createOutageMemory(session, browser.now),
+    now: browser.now,
+    tr,
+    calculator,
+    tabs: document.querySelector<HTMLElement>('.tabs'),
+  });
+  const payment = setUpPass(offer, checkoutCaptchaBox, {
+    calculator,
+    hooks,
+    section,
+    config,
+    api,
+    loadTurnstile,
+    passes,
+    session,
+    tr,
+    events,
+  });
+
+  const review = keptReview(session, section);
+  const sessionId = returnedSession(arrival);
 
   if (review) {
     calculator.fill(review);
@@ -299,4 +361,59 @@ export function wireDocuments<R, F extends string, L extends string>({
             : tr(`client.documents.error.${outcome}`),
         );
     });
+}
+
+export interface PassWiring<R> {
+  readonly form: ReviewForm;
+  readonly hooks: ReviewHooks<R>;
+  readonly arrival: { readonly search: string };
+  // The review the checkout sends the person back to.
+  readonly review: ReviewKind;
+  readonly section: PassSection<R>;
+  readonly config: DocumentsConfig | null;
+  readonly tr: Translate;
+  readonly events: DocumentEvents;
+}
+
+// The pass, the report and the letters on a page that reads no documents yet: the same offer and
+// downloads, with the form always open.
+export function wirePass<R>({
+  form: calculator,
+  hooks,
+  arrival,
+  review: kind,
+  section,
+  config,
+  tr,
+  events,
+}: PassWiring<R>): void {
+  const offer = document.querySelector<HTMLElement>('[data-pass-offer]');
+  const checkoutCaptchaBox = offer?.querySelector<HTMLElement>('[data-pass-captcha]');
+  if (!config || !offer || !checkoutCaptchaBox) return;
+  const api = createApi(config.endpoints, (url, init) => fetch(url, init), {
+    review: kind,
+    fields: [],
+    lists: [],
+  });
+  const session = storage(() => sessionStorage);
+  const payment = setUpPass(offer, checkoutCaptchaBox, {
+    calculator,
+    hooks,
+    section,
+    config,
+    api,
+    loadTurnstile: turnstileLoader(),
+    passes: passStore(),
+    session,
+    tr,
+    events,
+  });
+  const review = keptReview(session, section);
+  const sessionId = returnedSession(arrival);
+  if (review) {
+    calculator.fill(review);
+    calculator.review();
+  }
+  // Back from Stripe: the pass is asked for, so a review shown again offers the downloads.
+  if (sessionId !== null) void payment.returned(sessionId);
 }
