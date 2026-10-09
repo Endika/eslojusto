@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.29.0](https://github.com/Endika/eslojusto/compare/v1.28.2...v1.29.0) (2026-10-09)
+
+
+### Features
+
+* **rental:** add the rise, decree, fees, deposit, deposit return and charges pages ([4dddd0f](https://github.com/Endika/eslojusto/commit/4dddd0f3d347bcd06147ef29dba3e7f038e0c971))
+
 ## [1.28.2](https://github.com/Endika/eslojusto/compare/v1.28.1...v1.28.2) (2026-10-08)
 
 
