@@ -678,52 +678,76 @@ test('the contract review sends sheets, field names and its outcome in codes, ne
     scope.getByRole('group', { name, exact: true }).getByLabel(value, { exact: true }).check();
 
   await next(); // nothing answered: validation errors, by field name
-  const relation = sheet('Tu relación laboral');
-  await relation.getByLabel('Trabajo por cuenta ajena', { exact: true }).check();
-  await choose(
-    relation,
-    '¿Te contrató una empresa de trabajo temporal para trabajar en otra?',
-    'No',
-  );
-  await choose(relation, '¿Es un contrato de relevo?', 'No');
-  await choose(relation, '¿Tienes menos de 18 años?', 'No');
-  await choose(relation, '¿Tienes el contrato por escrito?', 'Sí');
-  await relation.getByLabel('Fecha de inicio', { exact: true }).fill('2026-01-01');
+  const kind = '¿Qué relación tienes con la empresa?';
+  await sheet('Tu relación laboral')
+    .getByLabel(kind)
+    .selectOption({ label: 'Trabajo por cuenta ajena' });
   await next();
-  await sheet('Tu tipo de contrato').getByLabel('Indefinido', { exact: true }).check();
+  const hiring = sheet('Cómo te contrataron');
+  await choose(hiring, '¿Te contrató una empresa de trabajo temporal para trabajar en otra?', 'No');
+  await choose(hiring, '¿Es un contrato de relevo?', 'No');
   await next();
-  const salary = sheet('Tu salario');
-  await salary.getByLabel('Salario bruto', { exact: true }).fill('1.150,00');
-  await choose(salary, '¿Por qué periodo es esa cifra?', 'Al mes');
-  await salary.getByLabel('Pagas extra al año', { exact: true }).fill('2');
-  await choose(salary, '¿Las pagas extra van prorrateadas en cada nómina?', 'No');
-  await salary.getByLabel('Horas a la semana', { exact: true }).fill('40');
-  await choose(salary, '¿El contrato nombra tu convenio colectivo?', 'Sí');
+  const written = sheet('Tu edad y tu contrato');
+  await choose(written, '¿Tienes menos de 18 años?', 'No');
+  await choose(written, '¿Tienes el contrato por escrito?', 'Sí');
+  await next();
+  const dates = sheet('Fechas del contrato');
+  await dates.getByLabel('Fecha de inicio', { exact: true }).fill('2026-01-01');
+  await next();
+  await sheet('Tu tipo de contrato')
+    .getByLabel('¿Qué tipo de contrato es?')
+    .selectOption({ label: 'Indefinido' });
+  await next();
+  await sheet('Tu salario').getByLabel('Salario bruto', { exact: true }).fill('1.150,00');
+  await next();
+  await choose(sheet('El periodo del salario'), '¿Por qué periodo es esa cifra?', 'Al mes');
+  await next();
+  await sheet('Horas del contrato').getByLabel('Horas a la semana', { exact: true }).fill('40');
+  await next();
+  const extras = sheet('Tus pagas extra');
+  await extras.getByLabel('Pagas extra al año', { exact: true }).fill('2');
+  await choose(extras, '¿Las pagas extra van prorrateadas en cada nómina?', 'No');
   await next();
   await next();
-  const time = sheet('Tu jornada');
-  await choose(time, '¿Trabajas a turnos?', 'No');
-  await choose(time, '¿Trabajas de noche?', 'No');
-  await choose(time, '¿El contrato reparte la jornada de forma irregular en el año?', 'No');
-  await choose(time, '¿Es un contrato a tiempo parcial?', 'No');
+  await choose(sheet('Tu convenio'), '¿El contrato nombra tu convenio colectivo?', 'Sí');
+  await next();
+  await next();
+  await next();
+  await choose(sheet('Tu jornada'), '¿Trabajas a turnos?', 'No');
+  await next();
+  const night = sheet('Noche y jornada irregular');
+  await choose(night, '¿Trabajas de noche?', 'No');
+  await choose(night, '¿El contrato reparte la jornada de forma irregular en el año?', 'No');
+  await next();
+  await next();
+  await choose(sheet('Teletrabajo y tiempo parcial'), '¿Es un contrato a tiempo parcial?', 'No');
   await next();
   const trial = sheet('Tu periodo de prueba');
-  await choose(trial, '¿El contrato tiene periodo de prueba?', 'Sí');
-  await trial.getByLabel('Duración', { exact: true }).fill('2');
-  await choose(trial, 'En', 'Meses');
   await choose(trial, '¿Eres técnico titulado?', 'No');
-  await choose(trial, '¿Tu empresa tiene menos de 25 personas en plantilla?', 'No lo sé');
-  await choose(trial, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
-  await choose(trial, '¿Vienes de un contrato formativo en esta empresa?', 'No');
+  await choose(trial, '¿El contrato tiene periodo de prueba?', 'Sí');
+  await next();
+  const length = sheet('Duración de la prueba');
+  await length.getByLabel('Duración', { exact: true }).fill('2');
+  await choose(length, 'En', 'Meses');
+  await choose(length, '¿Tu empresa tiene menos de 25 personas en plantilla?', 'No lo sé');
+  await next();
+  const before = sheet('Más sobre la prueba');
+  await choose(before, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
+  await choose(before, '¿Vienes de un contrato formativo en esta empresa?', 'No');
   await next();
   const holidays = sheet('Tus vacaciones');
   await choose(holidays, '¿El contrato dice cuántos días de vacaciones tienes?', 'Sí');
   await holidays.getByLabel('Días de vacaciones al año', { exact: true }).fill('30');
   await choose(holidays, '¿Qué días son?', 'Naturales');
-  await choose(holidays, '¿Dice que las vacaciones van incluidas en el salario?', 'No');
   await next();
-  await next();
-  await next();
+  await choose(
+    sheet('Cómo se cuentan y se pagan'),
+    '¿Dice que las vacaciones van incluidas en el salario?',
+    'No',
+  );
+  // On to the last sheet: the agreement's figures, the clauses, the offer and what the contract
+  // has to say keep their answers.
+  for (let i = 0; i < 9; i++) await next();
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
   await page
@@ -737,12 +761,11 @@ test('the contract review sends sheets, field names and its outcome in codes, ne
     .poll(() => spy.named('employment_review_completed').length, { timeout: 15_000 })
     .toBe(1);
 
-  // A gate: household employment stops at the first sheet.
+  // A gate: household employment stops once its dates are in.
   await page.getByRole('button', { name: 'Empezar de nuevo' }).click();
-  await sheet('Tu relación laboral').getByLabel('Empleo del hogar', { exact: true }).check();
-  await sheet('Tu relación laboral')
-    .getByLabel('Fecha de inicio', { exact: true })
-    .fill('2025-03-01');
+  await sheet('Tu relación laboral').getByLabel(kind).selectOption({ label: 'Empleo del hogar' });
+  await next();
+  await dates.getByLabel('Fecha de inicio', { exact: true }).fill('2025-03-01');
   await next();
   await expect.poll(() => spy.named('employment_out_of_scope').length, { timeout: 15_000 }).toBe(1);
 
@@ -752,17 +775,39 @@ test('the contract review sends sheets, field names and its outcome in codes, ne
   expect(spy.named('validation_error').map((e) => e.properties['field'])).toContain('relationship');
   expect(spy.named('section_viewed').map((e) => e.properties['section'])).toEqual([
     'relacion',
+    'contratacion',
+    'escrito',
+    'fechas',
     'modalidad',
     'salario',
+    'periodo',
+    'horas',
+    'pagas-extra',
+    'desglose',
+    'convenio',
+    'convenio-cifras',
     'nominas',
     'jornada',
+    'noche',
+    'horas-extra',
+    'parcial',
     'prueba',
+    'prueba-duracion',
+    'prueba-antes',
     'vacaciones',
+    'vacaciones-pago',
+    'convenio-condiciones',
     'clausulas',
-    'informacion',
     'oferta',
+    'informacion',
+    'informacion-puesto',
+    'informacion-salario',
+    'informacion-duracion',
+    'informacion-igualdad',
+    'informacion-otros',
     'resultado',
     'relacion',
+    'fechas',
     'resultado',
   ]);
   expect(spy.named('detail_opened').map((e) => e.properties['item'])).toEqual(['minimum_wage']);

@@ -65,17 +65,46 @@ const RENTAL_SECTIONS = [
   'fianza',
   'gastos',
 ] as const satisfies readonly RentalStep[];
-// The contract review's sheets; «salario» and «vacaciones» are already the final pay's.
+// The contract review's sheets; «fechas», «causa», «salario» and «vacaciones» are already the final
+// pay's, and «escrito» and «noche» the household review's.
 const EMPLOYMENT_SECTIONS = [
   'relacion',
+  'contratacion',
   'modalidad',
+  'prorrogas',
+  'sustitucion',
+  'discontinuo',
+  'formacion',
+  'formacion-datos',
   'historial',
+  'periodo',
+  'horas',
+  'pagas-extra',
+  'desglose',
+  'convenio',
+  'convenio-cifras',
   'nominas',
   'jornada',
+  'horas-extra',
+  'horas-extra-pacto',
+  'parcial',
+  'parcial-horas',
+  'complementarias',
   'prueba',
+  'prueba-duracion',
+  'prueba-antes',
+  'vacaciones-pago',
+  'convenio-condiciones',
   'clausulas',
-  'informacion',
   'oferta',
+  'oferta-salario',
+  'oferta-contrato',
+  'informacion',
+  'informacion-puesto',
+  'informacion-salario',
+  'informacion-duracion',
+  'informacion-igualdad',
+  'informacion-otros',
 ] as const satisfies readonly EmploymentStep[];
 // The household review's sheets; «fechas», «pagas», «jornada», «vacaciones» and «preaviso» are
 // already other reviews'.
