@@ -528,12 +528,9 @@ function readUpdate(
   const written =
     WRITTEN.has(update.notice) ||
     (ELECTRONIC.has(update.notice) && world[frame.ids.notice] === true);
-  // Without written notice, paying a rise the clause and the cap allow may have accepted it; a rise
-  // over them is never read so.
-  const acceptedByPaying =
-    UNWRITTEN.has(update.notice) &&
-    world[frame.ids.notice] === true &&
-    update.newRent <= allowed.maxRent + TOLERANCE;
+  // Without written notice, paying a rise may have accepted it up to what the clause and the cap
+  // allow; what goes over them stays paid over either way.
+  const acceptedByPaying = UNWRITTEN.has(update.notice) && world[frame.ids.notice] === true;
   const dueFrom = acceptedByPaying
     ? effectiveMonth
     : written && update.noticeOn !== null
@@ -567,7 +564,14 @@ function readUpdate(
         base: { euros: base.rent },
       }),
     );
-  if (acceptedByPaying) phrases.push(rentalPhrase('rent_update.accepted_by_paying'));
+  if (acceptedByPaying)
+    phrases.push(
+      rentalPhrase(
+        update.newRent > allowed.maxRent + TOLERANCE
+          ? 'rent_update.accepted_by_paying_up_to_max'
+          : 'rent_update.accepted_by_paying',
+      ),
+    );
   if (monthsBeforeDue > 0)
     phrases.push(
       rentalPhrase(

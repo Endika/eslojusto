@@ -689,19 +689,27 @@ describe('when the new rent is due (LAU art. 18.2)', () => {
     expect(counted(r)).toBe(152);
   });
 
-  it('a verbal notice: the whole rise is paid over every month', () => {
-    const v = single(
-      first(
-        check(
-          contract({
-            ...base,
-            updates: [update('2025-03-20', 1000, 1030, { notice: 'verbal', noticeOn: null })],
-          }),
-        ),
+  it('a verbal notice over the cap: only what passes the cap counts, the whole rise is «y hasta»', () => {
+    const r = first(
+      check(
+        contract({
+          ...base,
+          updates: [update('2025-03-20', 1000, 1030, { notice: 'verbal', noticeOn: null })],
+        }),
       ),
     );
-    expect(figures(v)).toMatchObject({ monthly: 9.2, accumulated: 360 });
-    expect(v.calculation.map((p) => p.key)).toContain('rent_update.notice_not_written');
+    const d = depends(r);
+    expect(d.reasons).toEqual(['notice_missing_paid']);
+    // Paying accepted the rise up to 1.020,80: 9,20 a month over it for twelve months.
+    expect(figures(d.low)).toMatchObject({ status: 'paid_over', monthly: 9.2, accumulated: 110.4 });
+    expect(d.low.calculation.map((p) => p.key)).toContain(
+      'rent_update.accepted_by_paying_up_to_max',
+    );
+    // Not accepted: the whole rise, 30 a month.
+    expect(d.high.accumulated).toBe(360);
+    expect(d.high.calculation.map((p) => p.key)).toContain('rent_update.notice_not_written');
+    expect(counted(r)).toBe(110.4);
+    expect(letterAmount(r.outcome, rentUpdateAmount)).toBe(110.4);
   });
 });
 
@@ -730,7 +738,7 @@ describe('a rise paid without written notice, within the clause and the cap', ()
     },
   );
 
-  it('over the cap, the whole rise stays paid over in every reading', () => {
+  it('over the cap, counts only what passes it; the rest of the rise is the higher reading', () => {
     const over = first(
       check(
         contract({
@@ -739,7 +747,10 @@ describe('a rise paid without written notice, within the clause and the cap', ()
         }),
       ),
     );
-    expect(figures(single(over))).toMatchObject({ monthly: 10, accumulated: 480 });
+    const d = depends(over);
+    expect(figures(d.low)).toMatchObject({ monthly: 10, accumulated: 120 });
+    expect(d.high.accumulated).toBe(480);
+    expect(counted(over)).toBe(120);
   });
 });
 
