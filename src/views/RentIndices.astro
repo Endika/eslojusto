@@ -23,6 +23,7 @@ import {
 } from '../content/rent-indices';
 import { capsCopy } from '../content/rent-caps';
 import { NORMS } from '../engine/rental/data/norms';
+import { RENTAL_BUILD } from '../content/sections';
 
 interface Props {
   lang: Lang;
@@ -287,10 +288,20 @@ const structuredData = [
         {caps.exampleLater && <p class="example">{caps.exampleLater}</p>}
       </section>
 
-      <section class="sheet sheet--text" aria-labelledby="proximamente">
-        <h2 id="proximamente">{tx('rent_indices.soon_title')}</h2>
-        <p>{tx('rent_indices.soon')}</p>
-      </section>
+      {RENTAL_BUILD ? (
+        <section class="sheet sheet--text" aria-labelledby="revisa">
+          <h2 id="revisa">{tx('rent_indices.check_title')}</h2>
+          <p>
+            {tx('rent_indices.check')}{' '}
+            <a href={link(lang, 'alquiler/')}>{tx('rent_indices.check_link')}</a>
+          </p>
+        </section>
+      ) : (
+        <section class="sheet sheet--text" aria-labelledby="proximamente">
+          <h2 id="proximamente">{tx('rent_indices.soon_title')}</h2>
+          <p>{tx('rent_indices.soon')}</p>
+        </section>
+      )}
 
       <section class="sheet sheet--text" aria-labelledby="preguntas">
         <h2 id="preguntas">{tx('rent_indices.faq')}</h2>

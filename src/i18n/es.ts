@@ -112,6 +112,10 @@ export const es = {
   'rent_indices.example_later':
     'Si se cumpliera el {dia}, sin nuevo pacto el tope sería el 2 %, o el IRAV si fuera más bajo, mientras rija el {norma}: {maximo} como mucho. Y si tu vivienda estuviera en una zona de mercado tensionado y esos {renta} superaran el límite de precio que fija allí el sistema de índices de referencia, la renta no podría subir.',
 
+  'rent_indices.check_title': 'Comprueba tu subida',
+  'rent_indices.check':
+    'Revisa si tu casero te ha subido la renta más de lo que permite la ley, con la fecha de tu contrato y el índice de cada mes.',
+  'rent_indices.check_link': 'Revisar mi alquiler',
   'rent_indices.soon_title': 'Próximamente: comprueba tu subida',
   'rent_indices.soon':
     'Estamos preparando una calculadora que compruebe tu subida con la fecha de tu contrato y el índice de cada mes. Aún no está disponible.',
