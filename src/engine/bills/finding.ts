@@ -17,10 +17,18 @@ export type BillsItemId =
   | 'pvpc_power_p1'
   | 'pvpc_power_p2'
   | 'social_bonus_funding'
-  | 'meter';
+  | 'meter'
+  | 'social_bonus'
+  | 'electricity_tax'
+  | 'vat'
+  | 'excess_power'
+  | 'service'
+  | 'exit_penalty'
+  | 'power_used';
 
 // `does_not_add_up` is the bill against its own figures; `differs_from_official` and
-// `above_regulated_price` against a table; `pending_official_data` a day no row covers.
+// `above_regulated_price` against a table; `pending_official_data` a day no row covers;
+// `information` a figure shown with no verdict.
 export type BillsStatus =
   | 'matches'
   | 'does_not_add_up'
@@ -28,9 +36,16 @@ export type BillsStatus =
   | 'not_on_bill'
   | 'tariff_not_allowed'
   | 'above_regulated_price'
+  | 'wrong_rate_for_date'
+  | 'different_base'
+  | 'discount_lower'
+  | 'not_allowed_in_pvpc'
+  | 'not_allowed'
+  | 'paid_over'
   | 'review_it'
   | 'not_checkable'
-  | 'pending_official_data';
+  | 'pending_official_data'
+  | 'information';
 
 export interface BillFinding {
   readonly id: BillsItemId;
@@ -49,6 +64,9 @@ export interface BillFinding {
   readonly rows: readonly RowCitation[];
   // Norms the official figure rests on that are not settled yet: nothing it gives is counted.
   readonly pendingOn: readonly BillsNormId[];
+  // Norms not settled yet that choose between readings which each have their figure, as a tax
+  // rate does: the lowest reading counts.
+  readonly dependsOn: readonly BillsNormId[];
 }
 
 // While a norm a figure rests on is not settled, the lowest and the highest official value.
@@ -94,6 +112,7 @@ interface FindingParts {
   readonly direction?: 'over' | 'under' | null;
   readonly recurring?: boolean;
   readonly rows?: readonly RowCitation[];
+  readonly dependsOn?: readonly BillsNormId[];
 }
 
 export const billFinding = (
@@ -114,6 +133,7 @@ export const billFinding = (
   sources: [...new Set(rules)].map((rule) => ruleSource(rule, norms)),
   rows: parts.rows ?? [],
   pendingOn: [],
+  dependsOn: parts.dependsOn ?? [],
 });
 
 // A day of the period no row covers: no figure, never the one before in its place.
@@ -164,7 +184,15 @@ export function acrossOfficial(
 }
 
 // The statuses whose euros reach what the person pays over.
-export const COUNTED: ReadonlySet<BillsStatus> = new Set(['above_regulated_price']);
+export const COUNTED: ReadonlySet<BillsStatus> = new Set([
+  'above_regulated_price',
+  'wrong_rate_for_date',
+  'different_base',
+  'discount_lower',
+  'not_allowed_in_pvpc',
+  'not_allowed',
+  'paid_over',
+]);
 
 // What an item counts: only what holds in every reading, so the lowest; nothing charged under, and
 // nothing that is shown without a figure the norms back.

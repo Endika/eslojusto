@@ -15,7 +15,7 @@ import type { NormTable } from './norms';
 import { periodDays } from './period';
 import type { ElectricityBillInput, EnergyLine, PowerLine } from './types';
 
-const sum = (values: readonly number[]): number => values.reduce((a, b) => a + b, 0);
+export const sum = (values: readonly number[]): number => values.reduce((a, b) => a + b, 0);
 
 // The years a per-year price may be shared out by: 365, and 366 when the period touches a leap
 // year, since no norm says which.
@@ -49,7 +49,7 @@ function lineResult(
 }
 
 // A sum that does not add up is settled in the next bill; one charged short may be charged later.
-const differenceNote = (difference: number): readonly BillsPhrase[] =>
+export const differenceNote = (difference: number): readonly BillsPhrase[] =>
   difference > 0
     ? [billsPhrase('arithmetic.refund_next_bill')]
     : [billsPhrase('arithmetic.under_settled_later')];
