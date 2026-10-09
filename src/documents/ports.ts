@@ -18,6 +18,7 @@ import type {
   LetterPrefilled,
   TypedDetails,
 } from './letter';
+import type { ListSpecs } from './merge';
 import type { QualityProblem, QualitySignals } from './quality';
 
 export { ERROR_CODES, PAGE_KINDS, SKIP_REASONS } from './contract';
@@ -194,6 +195,8 @@ export interface ReadMark {
   readonly confidence: Confidence;
   // Worked out from what was read rather than read as such.
   readonly derived?: true;
+  // An earlier read's value, kept, that a later read states otherwise.
+  readonly conflict?: true;
 }
 
 export interface ReadPrefill {
@@ -218,6 +221,8 @@ export interface DocumentReading<F extends string, L extends string> {
   // A reading that words every check, even one named like the final pay's, which the upload
   // otherwise words.
   readonly wordsEveryCheck?: true;
+  // The form's lists a read fills, so a later read adds to their rows instead of replacing them.
+  readonly lists?: ListSpecs;
 }
 
 export interface Browser {
