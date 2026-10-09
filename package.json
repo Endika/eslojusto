@@ -21,6 +21,8 @@
     "law:review": "vitest run tests/law/review-list.test.ts --reporter=verbose",
     "employment:review": "vitest run tests/engine/employment/monthly-review.test.ts --reporter=verbose",
     "indices:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indices.mjs --check",
+    "bde:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/bde-series.mjs --check",
+    "bde:write": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/bde-series.mjs --write",
     "rental-bank": "node scripts/rental-bank/render.mjs",
     "employment-bank": "node scripts/rental-bank/render.mjs --cases api/eval/cases/employment --out api/eval/out/employment"
   },

@@ -368,6 +368,7 @@ describe('import boundaries', () => {
     ['src/engine/employment/data/x.ts', "import type { NormTable } from '../norms';"],
     ['src/engine/credit/x.ts', "import { normStanding } from '../law/norms';"],
     ['src/engine/credit/data/x.ts', "import type { NormTable } from '../norms';"],
+    ['src/engine/credit/data/x.ts', "import type { DataSeries } from '../rates';"],
     ['src/engine/insurance/x.ts', "import { normStanding } from '../law/norms';"],
     ['src/engine/insurance/x.ts', "import { addDays } from '../date';"],
     ['src/engine/insurance/x.ts', "import { activeRules } from '../law/rules';"],
