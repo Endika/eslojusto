@@ -49,6 +49,35 @@ describe('norm standing', () => {
     expect(normStanding(never, '2030-03-01')).toBe('not_in_force');
   });
 
+  const conditional = norm({
+    status: 'conditional',
+    inForceUntil: '2030-03-31',
+    condition: {
+      text: 'Que el dato de prueba supere el 15 %',
+      decidesOn: '2030-02-15',
+      source: 's',
+      met: null,
+    },
+  });
+
+  it.each([
+    ['2030-02-28', 'not_in_force'],
+    ['2030-03-01', 'conditional'],
+    ['2030-03-31', 'conditional'],
+    ['2030-04-01', 'not_in_force'],
+  ])('a measure resting on an open condition, on %s', (day, expected) => {
+    expect(normStanding(conditional, day)).toBe(expected);
+  });
+
+  it('a condition settled as not met never stands; settled as met, the measure is in force', () => {
+    const { condition } = conditional;
+    if (condition === undefined) throw new Error('no condition');
+    const settled = (met: boolean) => ({ ...conditional, condition: { ...condition, met } });
+    expect(normStanding(settled(false), '2030-03-15')).toBe('not_in_force');
+    expect(normStanding(settled(true), '2030-03-15')).toBe('in_force');
+    expect(normStanding(settled(true), '2030-04-01')).toBe('not_in_force');
+  });
+
   it.each(['2030-02-28', '2030-03-01', '2099-12-31'])('a draft never stands, on %s', (day) => {
     expect(normStanding(norm({ status: 'draft' }), day)).toBe('not_in_force');
   });
