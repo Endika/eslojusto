@@ -1617,7 +1617,7 @@ export const es = {
 
   'employment.salary.question': 'Tu salario',
   'employment.salary.help':
-    'Lo que dice el contrato, en bruto. Se compara con el SMI del año en que empezó; para los años siguientes hacen falta tus nóminas, porque te lo pueden haber subido. Si no tienes un dato opcional, déjalo en blanco.',
+    'Lo que dice el contrato, en bruto. Se compara con el SMI del año en que se firmó o empezó, el más tardío; para los años siguientes hacen falta tus nóminas, porque te lo pueden haber subido. Si no tienes un dato opcional, déjalo en blanco.',
   'employment.salary.amount': 'Salario bruto',
   'employment.salary.amount_hint': 'En euros, antes de impuestos y cotizaciones.',
   'employment.salary.period': '¿Por qué periodo es esa cifra?',
@@ -3280,9 +3280,9 @@ export const es = {
   'client.rental.out_of_scope.before_2019':
     'Esta versión no revisa contratos firmados antes del 6 de marzo de 2019: siguen otras reglas para actualizar la renta.',
   'client.rental.out_of_scope.seasonal':
-    'Esta revisión aún no cubre los contratos de temporada. El Real Decreto-ley 29/2026, en vigor desde el 8 de octubre de 2026 y pendiente de convalidación, trata como de vivienda habitual el contrato temporal que no recoge una causa de temporalidad real y acreditable.',
+    'Esta revisión aún no cubre los contratos de temporada. En los firmados desde el 8 de octubre de 2026, el Real Decreto-ley 29/2026, pendiente de convalidación, trata como de vivienda habitual el contrato temporal que no recoge una causa de temporalidad real y acreditable. Los firmados antes siguen con las reglas de entonces hasta que acaba el plazo pactado (disposición transitoria 8.ª de la Ley de Arrendamientos Urbanos).',
   'client.rental.out_of_scope.room':
-    'Esta revisión aún no cubre los alquileres por habitaciones. El Real Decreto-ley 29/2026, en vigor desde el 8 de octubre de 2026 y pendiente de convalidación, los incluye en el alquiler de vivienda habitual.',
+    'Esta revisión aún no cubre los alquileres por habitaciones. El Real Decreto-ley 29/2026, en vigor desde el 8 de octubre de 2026 y pendiente de convalidación, los incluye en el alquiler de vivienda, habitual o temporal según la necesidad que cubran.',
   'client.rental.out_of_scope.other_use':
     'Un contrato para un uso distinto del de vivienda tiene sus propias reglas.',
   'client.rental.out_of_scope.protected':
@@ -3404,7 +3404,7 @@ export const es = {
     'Si la vivienda está en una zona tensionada, la renta inicial puede tener tope (art. 17.6 y 17.7 LAU). Las zonas las declara cada comunidad; el precio de referencia está en SERPAVI.',
   'client.rental.info.reference_price.title': 'Precio de referencia',
   'client.rental.info.reference_price.text':
-    'En las actualizaciones hasta el 31 de diciembre de 2027, el Real Decreto-ley 29/2026, pendiente de convalidación, dice que no cabe ninguna subida si la renta supera el límite de precio que le sea aplicable según el sistema de índices de referencia; no dice en qué casos se aplica ese límite. Esta revisión no lo calcula; el precio está en SERPAVI.',
+    'En las actualizaciones del 8 de octubre de 2026 al 31 de diciembre de 2027, el Real Decreto-ley 29/2026, pendiente de convalidación, dice que no cabe ninguna subida si la renta supera el límite de precio que le sea aplicable según el sistema de índices de referencia; no dice en qué casos se aplica ese límite. Esta revisión no lo calcula; el precio está en SERPAVI.',
   'client.rental.info.minimum_term.title': 'Hasta cuándo dura tu contrato',
   'client.rental.info.minimum_term.text':
     'Tu contrato acaba el {contractEnd}. Con la prórroga obligatoria, tu plazo mínimo acaba el {mandatoryEnd}.',
