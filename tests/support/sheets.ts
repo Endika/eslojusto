@@ -18,8 +18,10 @@ export async function noSideScroll(page: Page): Promise<void> {
 }
 
 // On a 360 × 640 phone, the sheet on screen sits whole above the buttons and inside the screen:
-// nothing to scroll to. On a wider screen, only that nothing is wider than it.
-export async function fitsScreen(page: Page): Promise<void> {
+// nothing to scroll to. On a wider screen, only that nothing is wider than it. A sheet a read
+// filled also carries what was read and its folded clauses, so it may scroll under the buttons:
+// `whole: false` checks only that the buttons stay on screen.
+export async function fitsScreen(page: Page, { whole = true } = {}): Promise<void> {
   await noSideScroll(page);
   if ((page.viewportSize()?.width ?? 0) > 360) return;
   const box = await page.evaluate(() => {
@@ -41,9 +43,10 @@ export async function fitsScreen(page: Page): Promise<void> {
   });
   expect(box).not.toBeNull();
   if (box) {
-    expect
-      .soft(box.bottom, `the ${box.id} sheet (${box.height} px) ends above the buttons`)
-      .toBeLessThanOrEqual(box.actionsTop + 1);
+    if (whole)
+      expect
+        .soft(box.bottom, `the ${box.id} sheet (${box.height} px) ends above the buttons`)
+        .toBeLessThanOrEqual(box.actionsTop + 1);
     expect
       .soft(box.actionsBottom, `the buttons are on screen on the ${box.id} sheet`)
       .toBeLessThanOrEqual(box.screen + 1);

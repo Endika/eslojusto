@@ -1,31 +1,9 @@
 import type { ExtractedRow, RentalFieldName, RentalListName } from '../documents/contract';
 import type { DocumentReading } from '../documents/ports';
+import { removeQuotes, showQuote } from '../documents/quote';
 import type { Translate } from '../i18n/client';
-import { QUOTED, rentalPrefill, type Quoted } from './prefill';
+import { QUOTED, rentalPrefill } from './prefill';
 import { ROW_MAX } from './rows';
-
-// The contract's own words under a question, before its choices, with what they are.
-function showQuote(form: HTMLFormElement, question: Quoted, text: string, tr: Translate) {
-  const box = form.querySelector<HTMLElement>(`[data-field="${question}"]`);
-  if (!box) return;
-  box.querySelector(`:scope > [data-read-quote]`)?.remove();
-  const figure = document.createElement('figure');
-  figure.className = 'read-quote';
-  figure.dataset['readQuote'] = question;
-  const caption = document.createElement('figcaption');
-  caption.className = 'read-quote__label';
-  caption.textContent = tr(`client.rental.documents.quote.${question}`);
-  const quote = document.createElement('blockquote');
-  quote.className = 'read-quote__text';
-  quote.textContent = text;
-  const note = document.createElement('p');
-  note.className = 'read-quote__note';
-  note.textContent = tr('client.rental.documents.quote_note');
-  figure.append(caption, quote, note);
-  const choices = box.querySelector(':scope > .options, :scope > .chips');
-  if (choices) choices.before(figure);
-  else box.append(figure);
-}
 
 // The rows of an earlier read, then the new read's that are not one of them again.
 function together(earlier: readonly ExtractedRow[], read: readonly ExtractedRow[]) {
@@ -47,7 +25,7 @@ export function rentalReading(
     notices: [],
   };
   form.addEventListener('reset', () => {
-    for (const quote of form.querySelectorAll('[data-read-quote]')) quote.remove();
+    removeQuotes(form);
     earlier = { receipts: [], notices: [] };
   });
   return {
@@ -61,7 +39,11 @@ export function rentalReading(
       const p = rentalPrefill(extraction, answers, tr, checks);
       for (const question of QUOTED) {
         const text = p.quotes[question];
-        if (text) showQuote(form, question, text, tr);
+        if (text)
+          showQuote(form, question, text, {
+            label: tr(`client.rental.documents.quote.${question}`),
+            note: tr('client.rental.documents.quote_note'),
+          });
       }
       return p;
     },

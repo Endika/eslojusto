@@ -7,7 +7,7 @@ import { link, type Lang } from '../i18n/languages';
 // Each review names the documents it reads in its own words.
 interface Props {
   lang: Lang;
-  review?: 'final_pay' | 'rental' | 'employment';
+  review?: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance';
 }
 const { lang, review = 'final_pay' } = Astro.props;
 const RENTAL: Partial<Record<Key, Key>> = {
@@ -22,9 +22,25 @@ const EMPLOYMENT: Partial<Record<Key, Key>> = {
   'documents.upload.files_hint': 'employment.documents.files_hint',
   'documents.upload.consent': 'employment.documents.consent',
 };
-const OWN: Partial<Record<Key, Key>> = { final_pay: {}, rental: RENTAL, employment: EMPLOYMENT }[
-  review
-];
+const CREDIT: Partial<Record<Key, Key>> = {
+  'documents.start.help': 'credit.documents.start_help',
+  'documents.start.upload': 'credit.documents.upload',
+  'documents.upload.files_hint': 'credit.documents.files_hint',
+  'documents.upload.consent': 'credit.documents.consent',
+};
+const INSURANCE: Partial<Record<Key, Key>> = {
+  'documents.start.help': 'insurance.documents.start_help',
+  'documents.start.upload': 'insurance.documents.upload',
+  'documents.upload.files_hint': 'insurance.documents.files_hint',
+  'documents.upload.consent': 'insurance.documents.consent',
+};
+const OWN: Partial<Record<Key, Key>> = {
+  final_pay: {},
+  rental: RENTAL,
+  employment: EMPLOYMENT,
+  credit: CREDIT,
+  insurance: INSURANCE,
+}[review];
 const tx = (key: Key) => t(lang, OWN[key] ?? key);
 const arrow = 'M4 12h15m-6-6 6 6-6 6';
 ---

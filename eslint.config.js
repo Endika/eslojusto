@@ -81,9 +81,9 @@ const flowOnly = {
 // documents, only the shared contract, ports, letter details and summary lines, never the final
 // pay's pieces.
 const rentalReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|rental/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|dom|fill|flow|navigation|number)$|\\.\\./documents/(contract|letter|ports|summary)$|\\.\\./i18n/client$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|rental/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|dom|fill|flow|navigation|number)$|\\.\\./documents/(contract|letter|ports|quote|summary)$|\\.\\./i18n/client$)|${notCanonical}`,
   message:
-    'src/rental reaches the rental engine (its tables come from the composition root), the shared sheets, the documents contract, ports and letter details, and the translator type.',
+    'src/rental reaches the rental engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes and letter details, and the translator type.',
 };
 const noRental = {
   regex: '(^|/)rental/',
@@ -94,23 +94,25 @@ const noRental = {
 // of reading documents, only the shared contract, ports, letter details and summary lines, never
 // the final pay's pieces.
 const employmentReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|calculation|sources|law/sources|employment/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|dom|fill|flow|navigation|number)$|\\.\\./documents/(contract|letter|ports|summary)$|\\.\\./i18n/client$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|calculation|sources|law/sources|employment/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|dom|fill|flow|navigation|number)$|\\.\\./documents/(contract|letter|ports|quote|summary)$|\\.\\./i18n/client$)|${notCanonical}`,
   message:
-    'src/employment reaches the employment engine (its tables come from the composition root), the shared sheets, the documents contract, ports and letter details, and the translator type.',
+    'src/employment reaches the employment engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes and letter details, and the translator type.',
 };
 // The insurance review reaches the insurance engine through its modules, never its tables, which
-// its composition root passes in; of the calculator, only what every section shares.
+// its composition root passes in; of the calculator, only what every section shares; of reading
+// documents, only the shared contract, ports, quotes, summary lines and letter details.
 const insuranceReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|calculation|law/sources|insurance/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|fill|flow|navigation|number|section)$|\\.\\./documents/(letter|ports)$|\\.\\./i18n/client$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|calculation|law/sources|insurance/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|fill|flow|navigation|number|section)$|\\.\\./documents/(contract|letter|ports|quote|summary)$|\\.\\./i18n/client$)|${notCanonical}`,
   message:
-    'src/insurance reaches the insurance engine (its tables come from the composition root), the shared sheets, the documents ports and letter details, and the translator type.',
+    'src/insurance reaches the insurance engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes, summary lines and letter details, and the translator type.',
 };
 // The credit review reaches the credit engine through its modules, never its tables, which its
-// composition root passes in; of the calculator, only what every section shares.
+// composition root passes in; of the calculator, only what every section shares; of reading
+// documents, only the shared contract, ports, quotes, summary lines and letter details.
 const creditReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|calculation|law/sources|credit/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|fill|flow|navigation|number|section)$|\\.\\./documents/(letter|ports)$|\\.\\./i18n/client$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|calculation|law/sources|credit/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|fill|flow|navigation|number|section)$|\\.\\./documents/(contract|letter|ports|quote|summary)$|\\.\\./i18n/client$)|${notCanonical}`,
   message:
-    'src/credit reaches the credit engine (its tables come from the composition root), the shared sheets, the documents ports and letter details, and the translator type.',
+    'src/credit reaches the credit engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes, summary lines and letter details, and the translator type.',
 };
 const noCredit = {
   regex: '(^|/)credit/',
@@ -141,7 +143,7 @@ const noHousehold = {
 // that section's composition root. Allowlists, so no spelling of a path gets around them.
 const FINAL_PAY_DOCUMENTS = ['case', 'final-pay-reading', 'prefill', 'report'];
 const sharedDocuments =
-  'api|config|contract|files|letter|merge|notice|outage|pass|pdf|pdf-pages|pdf-writer|ports|quality|skipped|summary|upload';
+  'api|config|contract|files|letter|merge|notice|outage|pass|pdf|pdf-pages|pdf-writer|ports|quality|quote|skipped|summary|upload';
 // The contract mirrors one constant of the API package, two levels up.
 const apiMirror = '\\.\\./\\.\\./api/src/domain/image-limit$';
 const documentsPlatform = {
