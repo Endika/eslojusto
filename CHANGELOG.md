@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.34.0](https://github.com/Endika/eslojusto/compare/v1.33.0...v1.34.0) (2026-10-09)
+
+
+### Features
+
+* **engine:** add consumer credit input, scope gate and rules with their sources ([515f20f](https://github.com/Endika/eslojusto/commit/515f20f226f96fe52342c0bdaf11e936ef4dd0c7))
+* **engine:** version the Bank of Spain consumer and revolving rate series with their source ([da40133](https://github.com/Endika/eslojusto/commit/da40133ec827c16dedce70c5a93f2ee412581e96))
+
 ## [1.33.0](https://github.com/Endika/eslojusto/compare/v1.32.0...v1.33.0) (2026-10-09)
 
 
