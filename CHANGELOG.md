@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.39.0](https://github.com/Endika/eslojusto/compare/v1.38.0...v1.39.0) (2026-10-09)
+
+
+### Features
+
+* **api:** read credit agreements, schedules, statements and insurance policies ([e4c002e](https://github.com/Endika/eslojusto/commit/e4c002e2720ab29a30b17948ce90460dafe670c6))
+* **engine:** add mortgage input, scope gate and the section's forbidden wording ([392916f](https://github.com/Endika/eslojusto/commit/392916f065c91e4cabde77349940f287cfdebb20))
+* **engine:** split mortgage set-up costs into what the law says and what the Supreme Court applies ([c5f8d1b](https://github.com/Endika/eslojusto/commit/c5f8d1b5b0e9457c6a0fe05048e68dbf095a9343))
+
 ## [1.38.0](https://github.com/Endika/eslojusto/compare/v1.37.1...v1.38.0) (2026-10-09)
 
 
