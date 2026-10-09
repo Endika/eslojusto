@@ -43,11 +43,12 @@ const buildEnv = {
   ...(rental || documents || analytics ? { PUBLIC_RENTAL: '1' } : {}),
   ...(employment || documents || analytics ? { PUBLIC_EMPLOYMENT: '1' } : {}),
   ...(erte ? { PUBLIC_ERTE: '1' } : {}),
-  // The household project also measures its own events, so its build has a test analytics key.
+  // The household, insurance and credit projects also measure their own events, so their builds
+  // have a test analytics key.
   ...(household ? { PUBLIC_HOUSEHOLD: '1' } : {}),
   ...(insurance || documents ? { PUBLIC_INSURANCE: '1' } : {}),
   ...(credit || documents ? { PUBLIC_CREDIT: '1' } : {}),
-  ...(analytics || household ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
+  ...(analytics || household || insurance || credit ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
     ? {
         PUBLIC_API_EXTRACT_URL: 'https://extract.api.eslojusto.test/',

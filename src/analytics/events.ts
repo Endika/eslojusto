@@ -30,6 +30,22 @@ import {
   type OutOfScopeReason as EmploymentOutOfScopeReason,
   type Step as EmploymentStep,
 } from '../employment/ports';
+import { CREDIT_FAQ_TOPICS } from '../content/credit-faq-topics';
+import type { FindingStatus as CreditFindingStatus } from '../engine/credit/finding';
+import type { IndicatorStatus } from '../engine/credit/indicator';
+import type { CreditProduct } from '../engine/credit/types';
+import {
+  CREDIT_FIELDS,
+  type OutOfScopeReason as CreditOutOfScopeReason,
+  type Step as CreditStep,
+} from '../credit/ports';
+import { INSURANCE_FAQ_TOPICS } from '../content/insurance-faq-topics';
+import type { FindingStatus as InsuranceFindingStatus } from '../engine/insurance/types';
+import {
+  INSURANCE_FIELDS,
+  type OutOfScopeReason as InsuranceOutOfScopeReason,
+  type Step as InsuranceStep,
+} from '../insurance/ports';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import {
   DOWNLOADS,
@@ -118,6 +134,41 @@ const HOUSEHOLD_SECTIONS = [
   'indemnizacion',
   'noche',
 ] as const satisfies readonly HouseholdStep[];
+// The consumer credit review's sheets; «contrato» and «desistimiento» are already other reviews'.
+const CREDIT_SECTIONS = [
+  'producto',
+  'uso',
+  'importe',
+  'interes',
+  'tae',
+  'cuotas',
+  'cuota-final',
+  'apertura',
+  'otros-gastos',
+  'seguro',
+  'seguro-pago',
+  'tarjeta',
+  'comparar',
+  'amortizacion',
+  'compensacion',
+  'fin-pactado',
+  'detalles',
+] as const satisfies readonly CreditStep[];
+// The insurance review's sheets; «contratacion» is already another review's.
+const INSURANCE_SECTIONS = [
+  'poliza',
+  'cobertura',
+  'vencimiento',
+  'condiciones',
+  'renovacion',
+  'primas',
+  'cambios',
+] as const satisfies readonly InsuranceStep[];
+// The credit and insurance reviews exist only in a build with their switch; elsewhere their sheets,
+// questions and events are dropped from the bundle (the variables are read inline so the bundler can
+// fold them) and refused like any unknown event.
+const CREDIT_ON = import.meta.env.PUBLIC_CREDIT === '1';
+const INSURANCE_ON = import.meta.env.PUBLIC_INSURANCE === '1';
 export const SECTIONS = [
   'causa',
   'temporal',
@@ -137,6 +188,8 @@ export const SECTIONS = [
   ...RENTAL_SECTIONS,
   ...EMPLOYMENT_SECTIONS,
   ...HOUSEHOLD_SECTIONS,
+  ...(CREDIT_ON ? CREDIT_SECTIONS : []),
+  ...(INSURANCE_ON ? INSURANCE_SECTIONS : []),
 ] as const;
 export type Section = (typeof SECTIONS)[number];
 
@@ -185,6 +238,10 @@ const _allEmploymentSteps: CoversAll<EmploymentStep, Section> = true;
 void _allEmploymentSteps;
 const _allHouseholdSteps: CoversAll<HouseholdStep, Section> = true;
 void _allHouseholdSteps;
+const _allCreditSteps: CoversAll<CreditStep, Section> = true;
+void _allCreditSteps;
+const _allInsuranceSteps: CoversAll<InsuranceStep, Section> = true;
+void _allInsuranceSteps;
 
 // The benefit answers, by name only: an error on one of them names the field, never the answer.
 // They are left out of `snapshot`, so `changed_fields` never lists them either.
@@ -208,11 +265,17 @@ export const EMPLOYMENT_TRACKABLE_FIELDS = EMPLOYMENT_FIELDS;
 // The household questions by name; never what was answered.
 export const HOUSEHOLD_TRACKABLE_FIELDS = HOUSEHOLD_FIELDS;
 
+// The credit and insurance questions by name; never what was answered.
+export const CREDIT_TRACKABLE_FIELDS = CREDIT_FIELDS;
+export const INSURANCE_TRACKABLE_FIELDS = INSURANCE_FIELDS;
+
 export const HELP_TOPICS = [
   ...FAQ_TOPICS,
   ...RENTAL_FAQ_TOPICS,
   ...EMPLOYMENT_FAQ_TOPICS,
   ...HOUSEHOLD_FAQ_TOPICS,
+  ...(CREDIT_ON ? CREDIT_FAQ_TOPICS : []),
+  ...(INSURANCE_ON ? INSURANCE_FAQ_TOPICS : []),
 ].map(([, anchor]) => anchor);
 
 // What a rental result card is about. A card is a kind of item, never its concept as written.
@@ -389,6 +452,96 @@ export const HOUSEHOLD_ENDINGS = [
 export const HOUSEHOLD_PERIODS = ['2022-2023', '2024-2025', '2026+'] as const;
 export const HOUSEHOLD_EXTRA_PAYS = ['not_applicable', 'none', 'prorated', 'apart'] as const;
 
+const CREDIT_PRODUCTS = [
+  'personal_loan',
+  'car_loan',
+  'revolving',
+] as const satisfies readonly CreditProduct[];
+const _allCreditProducts: CoversAll<CreditProduct, (typeof CREDIT_PRODUCTS)[number]> = true;
+void _allCreditProducts;
+
+export const CREDIT_OUT_OF_SCOPE_REASONS = [
+  'mortgage',
+  'lease_without_purchase',
+  'business',
+  'under_200',
+  'before_lcc',
+] as const satisfies readonly CreditOutOfScopeReason[];
+const _allCreditReasons: CoversAll<
+  CreditOutOfScopeReason,
+  (typeof CREDIT_OUT_OF_SCOPE_REASONS)[number]
+> = true;
+void _allCreditReasons;
+
+// A credit point by its status; one whose readings of a «No lo sé» disagree counts as `readings`.
+export const CREDIT_STATUSES = [
+  'matches',
+  'contract_lower',
+  'contract_higher',
+  'contract_missing',
+  'unsolvable',
+  'above_general_cap',
+  'within_cap',
+  'charged_without_basis',
+  'nothing_charged',
+  'open',
+  'ended',
+  'not_started',
+  'review_it',
+  'not_entered',
+  'readings',
+] as const satisfies readonly (CreditFindingStatus | 'readings')[];
+const _allCreditStatuses: CoversAll<CreditFindingStatus, (typeof CREDIT_STATUSES)[number]> = true;
+void _allCreditStatuses;
+
+export const INDICATOR_STATUSES = [
+  'above',
+  'edge',
+  'below',
+  'distance_only',
+  'not_published',
+  'no_data',
+  'not_entered',
+] as const satisfies readonly IndicatorStatus[];
+const _allIndicatorStatuses: CoversAll<IndicatorStatus, (typeof INDICATOR_STATUSES)[number]> = true;
+void _allIndicatorStatuses;
+
+// By the year the contract was concluded: the 2011 law applies from 25-09-2011; a revolving card
+// from before it gets only the indicator.
+export const CREDIT_PERIODS = ['before_2011', '2011-2015', '2016-2020', '2021+'] as const;
+
+export const INSURANCE_OUT_OF_SCOPE_REASONS = [
+  'life',
+  'health',
+  'funeral',
+  'other_line',
+  'before_2016',
+] as const satisfies readonly InsuranceOutOfScopeReason[];
+const _allInsuranceReasons: CoversAll<
+  InsuranceOutOfScopeReason,
+  (typeof INSURANCE_OUT_OF_SCOPE_REASONS)[number]
+> = true;
+void _allInsuranceReasons;
+
+export const INSURANCE_STATUSES = [
+  'open',
+  'ended',
+  'not_started',
+  'not_applicable',
+  'review_it',
+  'not_entered',
+  'on_time',
+  'late',
+  'up',
+  'same',
+  'down',
+] as const satisfies readonly InsuranceFindingStatus[];
+const _allInsuranceStatuses: CoversAll<
+  InsuranceFindingStatus,
+  (typeof INSURANCE_STATUSES)[number]
+> = true;
+void _allInsuranceStatuses;
+
 // From the status that weighs most on a family of points to the one that weighs least; a point
 // whose verdict changes with a «No lo sé» counts as `readings`, after the concrete findings.
 export const POINT_STATUSES = [
@@ -512,6 +665,8 @@ const BASE_CATALOGUE = {
       ...RENTAL_TRACKABLE_FIELDS,
       ...EMPLOYMENT_TRACKABLE_FIELDS,
       ...HOUSEHOLD_TRACKABLE_FIELDS,
+      ...(CREDIT_ON ? CREDIT_TRACKABLE_FIELDS : []),
+      ...(INSURANCE_ON ? INSURANCE_TRACKABLE_FIELDS : []),
     ]),
   },
   help_opened: { topic: oneOf(HELP_TOPICS) },
@@ -624,6 +779,48 @@ const BASE_CATALOGUE = {
   js_error: { kind: oneOf(ERROR_TYPES), source: SOURCE_RULE },
 } as const satisfies Record<string, Record<string, Rule>>;
 
+// Built only in a build with the review, so one without it carries none of its codes.
+const creditCatalogue = () => {
+  const CREDIT_RESULT = oneOf([...CREDIT_STATUSES, 'none']);
+  return {
+    // Why a credit stopped at the credit review's door.
+    credit_out_of_scope: { reason: oneOf(CREDIT_OUT_OF_SCOPE_REASONS) },
+    credit_review_completed: {
+      product: oneOf(CREDIT_PRODUCTS),
+      period: oneOf(CREDIT_PERIODS),
+      // Each point by its status, or none when the review did not reach it.
+      apr: CREDIT_RESULT,
+      early_repayment: CREDIT_RESULT,
+      dealer_discount: CREDIT_RESULT,
+      withdrawal: CREDIT_RESULT,
+      indicator: oneOf([...INDICATOR_STATUSES, 'none']),
+      // Which APR the indicator compared: the one worked out from the figures or the stated one.
+      compared_apr: oneOf(['recalculated', 'declared', 'none']),
+      attempt: oneOf(ATTEMPT_BUCKETS),
+      seconds: oneOf(REVIEW_SECONDS),
+    },
+  } as const satisfies Record<string, Record<string, Rule>>;
+};
+
+const insuranceCatalogue = () => {
+  const INSURANCE_RESULT = oneOf([...INSURANCE_STATUSES, 'none']);
+  return {
+    // Why a policy stopped at the insurance review's door.
+    insurance_out_of_scope: { reason: oneOf(INSURANCE_OUT_OF_SCOPE_REASONS) },
+    insurance_review_completed: {
+      line: oneOf(['home', 'car']),
+      distance: oneOf(ANSWERS),
+      // Each date or fact by its status, or none.
+      renewal: INSURANCE_RESULT,
+      notice: INSURANCE_RESULT,
+      premium: INSURANCE_RESULT,
+      withdrawal: INSURANCE_RESULT,
+      attempt: oneOf(ATTEMPT_BUCKETS),
+      seconds: oneOf(REVIEW_SECONDS),
+    },
+  } as const satisfies Record<string, Record<string, Rule>>;
+};
+
 // Reading documents and the pass: never a value read from a document, only the kinds found, how
 // many fields they filled and how sure the reading was.
 const DOCUMENT_CATALOGUE = {
@@ -681,7 +878,12 @@ export const CATALOGUE = {
   ) && DOCUMENTS_BUILD
     ? DOCUMENT_CATALOGUE
     : {}),
-} as typeof BASE_CATALOGUE & typeof DOCUMENT_CATALOGUE;
+  ...(CREDIT_ON ? creditCatalogue() : {}),
+  ...(INSURANCE_ON ? insuranceCatalogue() : {}),
+} as typeof BASE_CATALOGUE &
+  typeof DOCUMENT_CATALOGUE &
+  ReturnType<typeof creditCatalogue> &
+  ReturnType<typeof insuranceCatalogue>;
 
 export type EventName = keyof typeof CATALOGUE;
 
