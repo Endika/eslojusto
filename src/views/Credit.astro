@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CreditForm from '../components/CreditForm.astro';
 import CreditResult from '../components/CreditResult.astro';
+import DocumentStart from '../components/DocumentStart.astro';
 import { CREDIT_BETA } from '../content/sections';
 import { formatLongDay } from '../content/rent-indices';
 import { breadcrumbList, trail } from '../content/structured-data';
@@ -16,7 +17,9 @@ interface Props {
 }
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
-// A build with the documents API offers the letters and, when there is one to sell, the pass.
+// With the documents API the visit opens on the choice between uploading and typing; the tabs and
+// the form wait until it is made. The result then offers the letters and, when there is one to
+// sell, the pass.
 const documents = DOCUMENTS !== null;
 
 // Each tab's share of the rail follows how much its section asks, kept close so that every name
@@ -46,7 +49,7 @@ const crumbs = trail(lang, { name: tx('home.credit'), path: '/financiacion/' });
   structuredData={[breadcrumbList(home, lang, crumbs)]}
   calculator={documents}
 >
-  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
     <ol>
       {/* Only a section already reached is a link; one still ahead is plain text until then. */}
       {sections.map(([id, step, number, weight], i) => (
@@ -89,7 +92,8 @@ const crumbs = trail(lang, { name: tx('home.credit'), path: '/financiacion/' });
           <p class="help">{tx('credit.no_js')}</p>
         </div>
       </noscript>
-      <CreditForm lang={lang} />
+      {documents && <DocumentStart lang={lang} review="credit" />}
+      <CreditForm lang={lang} hidden={documents} />
       <CreditResult lang={lang} documents={documents} />
     </div>
   </main>

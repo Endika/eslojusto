@@ -38,9 +38,11 @@ describe.skipIf(!withCredit)('a build with the credit switch', () => {
     const page = read('dist/financiacion/index.html');
     expect(page).toContain('¿Cuándo lo contrataste?');
     // Closed to every other origin; a build with the documents API opens it to that API and
-    // Turnstile, for the letters and the pass.
+    // Turnstile, to read documents and for the letters and the pass.
+    const documents = page.includes('data-documents-start');
+    expect(page.includes('data-pass-offer')).toBe(documents);
     expect(page).toMatch(
-      page.includes('data-pass-offer')
+      documents
         ? /connect-src 'self'( https:\/\/[\w.-]+)* https:\/\/challenges\.cloudflare\.com;/
         : /connect-src 'self';/,
     );

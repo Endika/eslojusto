@@ -4176,6 +4176,13 @@ export const es = {
   'insurance.no_js':
     'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
   'insurance.reviewed': 'Revisado el {fecha}',
+  'insurance.documents.start_help':
+    'Puedes subir tu póliza y el aviso de renovación para rellenar los datos con lo que se lea en ellos, o escribirlos tú. Antes de revisar nada, confirmas cada dato.',
+  'insurance.documents.upload': 'Sube tu póliza y, si lo tienes, el aviso de renovación',
+  'insurance.documents.files_hint':
+    'Las condiciones particulares de tu póliza o su recibo y, si lo tienes, el aviso de renovación o de cambios, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+  'insurance.documents.consent':
+    'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, DNI, direcciones, matrículas o números de cuenta. Se leen en la Unión Europea y no se guardan.',
   'insurance.form_aria': 'Revisión de las fechas de tu seguro',
   'insurance.tab.poliza': 'Póliza',
   'insurance.tab.contratacion': 'Contratación',
@@ -4279,6 +4286,21 @@ export const es = {
   'client.insurance.item.non_renewal': 'Comunicar que no renuevas',
   'client.insurance.item.change_notice': 'Aviso de cambios antes del vencimiento',
   'client.insurance.item.premium': 'Prima del periodo siguiente',
+  'client.insurance.documents.mark_derived':
+    'Sale de lo leído en tus documentos · confianza {nivel}',
+  'client.insurance.documents.quote.renews':
+    'Lo que dice tu póliza sobre su duración y su prórroga',
+  'client.insurance.documents.quote.changes': 'Lo que dice el aviso que cambia',
+  'client.insurance.documents.quote_note':
+    'Copiado tal cual del documento: compáralo con lo que marcas aquí.',
+  'client.insurance.documents.notice_date':
+    'La fecha del aviso es la que lleva el documento. Si te llegó otro día, pon el día en que lo recibiste, que es lo que pregunta la hoja.',
+  'client.insurance.documents.check.expiry_before_effect':
+    'La fecha de vencimiento leída es anterior a la de efecto: revisa las dos.',
+  'client.insurance.documents.check.notice_after_expiry':
+    'El aviso leído tiene una fecha posterior al vencimiento: revisa las dos fechas.',
+  'client.insurance.documents.check.premium_parts_do_not_sum':
+    'La prima neta, los recargos y los impuestos leídos no suman la prima total: revisa esas cifras.',
   'client.insurance.item.distance_withdrawal': 'Desistir de un seguro contratado a distancia',
   'client.insurance.item.distance_withdrawal_compulsory': 'Desistir: seguro obligatorio del coche',
   'client.insurance.item.distance_withdrawal_voluntary':
@@ -4465,6 +4487,14 @@ export const es = {
   'credit.no_js':
     'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
   'credit.reviewed': 'Revisado el {fecha}',
+  'credit.documents.start_help':
+    'Puedes subir tu contrato y los demás papeles del crédito para rellenar los datos con lo que se lea en ellos, o escribirlos tú. Antes de revisar nada, confirmas cada dato.',
+  'credit.documents.upload':
+    'Sube tu contrato y, si los tienes, la información previa, el cuadro de amortización, la liquidación de la amortización o un extracto',
+  'credit.documents.files_hint':
+    'El contrato y, si los tienes, la información normalizada europea (INE), el cuadro de amortización, la liquidación de una amortización anticipada o los extractos de la tarjeta, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+  'credit.documents.consent':
+    'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, DNI o números de cuenta, y, si hay un seguro vinculado, datos de salud. Se leen en la Unión Europea y no se guardan.',
   'credit.form_aria': 'Revisión de tu préstamo o tu tarjeta',
   'credit.tab.producto': 'Contrato',
   'credit.tab.interes': 'Coste',
@@ -4656,6 +4686,40 @@ export const es = {
   'client.credit.item.withdrawal': 'Desistir del crédito',
 
   'client.credit.status.matches': 'Coincide',
+  'client.credit.documents.mark_derived': 'Sale de lo leído en tus documentos · confianza {nivel}',
+  'client.credit.documents.quote.compensation':
+    'Lo que dice tu contrato sobre devolver el préstamo antes de tiempo',
+  'client.credit.documents.quote.infoReceived': 'Lo que dice tu contrato sobre el desistimiento',
+  'client.credit.documents.quote_note':
+    'Copiado tal cual del documento: compáralo con lo que marcas aquí.',
+  'client.credit.documents.schedule':
+    'Alguna cifra de las cuotas sale del cuadro de amortización: compárala con tu contrato.',
+  'client.credit.documents.schedule_uneven':
+    'Las cuotas del cuadro no son todas iguales, así que su importe no se ha pasado: escribe tú el de las cuotas normales y, si la última es más grande, márcala como cuota final.',
+  'client.credit.documents.charges_apart':
+    'Tus documentos traen varios gastos del mismo tipo que se pagaron de forma distinta, así que no se han sumado: escríbelos tú en su hoja.',
+  'client.credit.documents.premium_periodic':
+    'La prima leída es la de un seguro que se paga a plazos: comprueba que es lo que pagas con cada cuota.',
+  'client.credit.documents.card_statement':
+    'Lo que pagas cada mes y lo que debes salen del extracto más reciente que has subido: compruébalos.',
+  'client.credit.documents.minimum_payment':
+    'Lo que pagas cada mes sale de la cuota mínima que dice el contrato: si pagas otra cantidad, cámbiala.',
+  'client.credit.documents.remaining_interest':
+    'Los intereses que quedaban por pagar suman los de las filas del cuadro posteriores al día en que lo devolviste: compruébalos.',
+  'client.credit.documents.rows_cut':
+    'Tus documentos traen más filas de las que se leen de una vez, así que no se ha contado nada con el cuadro: compara las cuotas y los extractos con tus documentos.',
+  'client.credit.documents.check.net_above_principal':
+    'El importe entregado leído es mayor que el importe del préstamo: revisa los dos.',
+  'client.credit.documents.check.declared_total_mismatch':
+    'Las cuotas leídas suman más que el importe total adeudado que dice el documento: revisa esas cifras.',
+  'client.credit.documents.check.schedule_rows_do_not_sum':
+    'En alguna fila del cuadro, los intereses y el capital no suman la cuota: revisa las cifras del cuadro.',
+  'client.credit.documents.check.schedule_balance_jump':
+    'En el cuadro, el capital pendiente no baja lo que amortiza cada cuota: revisa sus filas.',
+  'client.credit.documents.check.repayment_after_end':
+    'El día de la amortización leído es posterior al final pactado: revisa las dos fechas.',
+  'client.credit.documents.check.statement_total_below_balance':
+    'En algún extracto, el total a pagar es menor que lo que debes: revisa sus cifras.',
   'client.credit.status.contract_lower':
     'La TAE de tu contrato es más baja que la que sale de sus cifras ({declarada} frente a {calculada})',
   'client.credit.status.contract_higher':

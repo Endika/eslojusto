@@ -36,9 +36,9 @@ const optInSpecs = [
 ];
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
-// The documents project reads documents on /alquiler/ and /contrato/ too, and offers the letters
-// on /seguros/ and /financiacion/, so its build has them; the analytics project measures the first
-// two too.
+// The documents project reads documents on /alquiler/, /contrato/, /financiacion/ and /seguros/
+// too, and offers the letters on the last two, so its build has them; the analytics project
+// measures the first two too.
 const buildEnv = {
   ...(rental || documents || analytics ? { PUBLIC_RENTAL: '1' } : {}),
   ...(employment || documents || analytics ? { PUBLIC_EMPLOYMENT: '1' } : {}),
@@ -122,6 +122,8 @@ export default defineConfig({
             name: 'insurance',
             use: { ...devices['Desktop Chrome'] },
             testMatch: insuranceSpecs,
+            // Reading documents on /seguros/ needs the documents project's build.
+            testIgnore: /documents\.spec\.ts/,
           },
         ]
       : []),
@@ -131,6 +133,8 @@ export default defineConfig({
             name: 'credit',
             use: { ...devices['Desktop Chrome'] },
             testMatch: creditSpecs,
+            // Reading documents on /financiacion/ needs the documents project's build.
+            testIgnore: /documents\.spec\.ts/,
           },
         ]
       : []),

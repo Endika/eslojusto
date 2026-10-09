@@ -8,9 +8,10 @@ import { pageTranslator } from '../i18n/client';
 import { localToday } from './clock';
 
 // The review's address as it arrived, before the form rewrites its fragment.
-const arrival = { search: location.search };
+const arrival = { hash: location.hash, search: location.search };
 
-// Read inline, as on the other reviews' pages, so a build without the API drops the pass.
+// Read inline, as on the other reviews' pages, so a build without the API drops every document
+// branch.
 const documentsBuild =
   !!(
     import.meta.env.PUBLIC_API_EXTRACT_URL &&
@@ -66,6 +67,11 @@ if (documentsBuild) {
         tables.norms,
       ),
     )
-    // Without the pass module the page is still the review.
-    .catch(() => {});
+    // Without the document module the page is still the review.
+    .catch(() => {
+      credit.form.hidden = false;
+      const tabs = document.querySelector<HTMLElement>('.tabs');
+      if (tabs) tabs.hidden = false;
+      document.querySelector<HTMLElement>('[data-documents-start]')?.remove();
+    });
 }

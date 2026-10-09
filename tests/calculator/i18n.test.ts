@@ -2,13 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { es, type Key } from '../../src/i18n/es';
-import { DICTIONARIES, clientStrings, t } from '../../src/i18n';
+import { CREDIT_READING, DICTIONARIES, INSURANCE_READING, clientStrings, t } from '../../src/i18n';
 import { LANGS, builtLangs, type Lang } from '../../src/i18n/languages';
 import { translator } from '../../src/i18n/client';
 import { statusText } from '../../src/calculator/render';
 import { reviewFinalPay } from '../../src/engine/review';
 import { validate, validateOtherContracts } from '../../src/engine/validate';
 import type { FinalPayInput } from '../../src/engine/types';
+import { forbiddenIn } from '../support/forbidden';
 
 const langs = Object.keys(LANGS) as Lang[];
 const keys = Object.keys(es) as Key[];
@@ -227,6 +228,49 @@ describe('client strings', () => {
     expect(keys).toContain('client.theme.to_dark');
     expect(keys).toContain('client.other_language.text');
     expect(keys.filter((k) => k.startsWith('client.warning.'))).toEqual([]);
+  });
+
+  it('the credit page reads documents in words its own copy allows, without the report', () => {
+    const strings = clientStrings('es', { credit: true, documents: true });
+    const keys = Object.keys(strings);
+    expect(keys).toContain('client.documents.kind.credit_agreement');
+    expect(keys).toContain('client.documents.error.daily_limit_reached');
+    expect(
+      keys.filter((k) => /^client\.documents\.(report|letter|notice|verify)\./.test(k)),
+    ).toEqual([]);
+    expect(
+      Object.values(strings).flatMap((text) =>
+        forbiddenIn('dist/financiacion/index.html', text ?? '').map(String),
+      ),
+    ).toEqual([]);
+  });
+
+  it('ships the credit and the insurance documents’ words only on their own page', () => {
+    const named = (set: ReadonlySet<string>) => [...set].filter((k) => k in es);
+    expect(named(CREDIT_READING)).toEqual([...CREDIT_READING]);
+    expect(named(INSURANCE_READING)).toEqual([...INSURANCE_READING]);
+    // Every document word that names one of their kinds is in one of the two sets.
+    expect(
+      keys.filter(
+        (k) =>
+          /^client\.documents\.(kind|source|field|skipped)\..*(credit|amortization|early_repayment|revolving|card_|insurance)/.test(
+            k,
+          ) &&
+          !CREDIT_READING.has(k) &&
+          !INSURANCE_READING.has(k),
+      ),
+    ).toEqual([]);
+    const shipped = (flags: Parameters<typeof clientStrings>[1]) =>
+      Object.keys(clientStrings('es', { documents: true, ...flags }));
+    const sectionWords = (k: string) => CREDIT_READING.has(k) || INSURANCE_READING.has(k);
+    for (const flags of [{}, { rental: true }, { employment: true }])
+      expect(shipped(flags).filter(sectionWords)).toEqual([]);
+    expect(shipped({ credit: true }).filter(sectionWords).sort()).toEqual(
+      [...CREDIT_READING].sort(),
+    );
+    expect(shipped({ insurance: true }).filter(sectionWords).sort()).toEqual(
+      [...INSURANCE_READING].sort(),
+    );
   });
 
   it('a build with it ships them', () => {

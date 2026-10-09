@@ -1,31 +1,50 @@
 import { documentsAnalytics } from '../analytics/documents';
 import { track } from '../analytics/posthog';
-import { DOCUMENTS } from '../documents/config';
 import type { SectionForm } from '../calculator/section';
 import { creditCase } from '../credit/case';
 import type { CompletedCreditReview } from '../credit/ports';
+import { creditReading } from '../credit/reading';
+import { STEPS } from '../credit/steps';
+import { DOCUMENTS } from '../documents/config';
+import { CREDIT_EXTRACTION } from '../documents/contract';
 import type { NormTable } from '../engine/credit/norms';
-import { pageTranslator } from '../i18n/client';
-import { wirePass, type ReviewHooks } from './documents';
+import { pageTranslator, type ClientKey, type Translate } from '../i18n/client';
+import { READS_UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
 
-// The pass, the report and the letters on the credit review's page, which reads no documents yet.
-// The pass unlocks the report and the early repayment letter; the request for the credit's
-// information downloads without it. The norms are the ones the review read.
+// The shared message the credit page words its own way: what a value worked out from the
+// documents comes from.
+const CREDIT_COPY: Partial<Record<ClientKey, ClientKey>> = {
+  'client.documents.mark_derived': 'client.credit.documents.mark_derived',
+};
+
+const creditCopy =
+  (tr: Translate): Translate =>
+  (key, vars) =>
+    tr(CREDIT_COPY[key] ?? key, vars);
+
+// Document reading, the pass, the report and the letters on the credit review's page. The pass
+// unlocks the report and the early repayment letter; the request for the credit's information
+// downloads without it. The norms are the ones the review read.
 export function wireCreditDocuments(
   credit: SectionForm,
   hooks: ReviewHooks<CompletedCreditReview>,
-  arrival: { search: string },
+  arrival: { hash: string; search: string },
   norms: NormTable,
 ): void {
-  wirePass({
+  const tr = creditCopy(pageTranslator());
+  wireDocuments({
     form: credit,
     hooks,
     arrival,
-    review: 'credit',
     config: DOCUMENTS,
-    tr: pageTranslator(),
-    events: documentsAnalytics(track),
+    tr,
+    // The review measures nothing yet, so neither do its reads: no event of it is in the
+    // analytics catalogue. The pass is measured as on every page.
+    events: { ...documentsAnalytics(track), ...READS_UNMEASURED },
     section: {
+      extraction: CREDIT_EXTRACTION,
+      reading: creditReading(credit.form, tr),
+      steps: STEPS,
       keptReviewKey: 'eslojusto-revision-financiacion-en-pago',
       paidReview: (r) => creditCase(r, norms),
       decorateResult: () => {},

@@ -2,7 +2,7 @@ import type { FormEntries } from '../calculator/fill';
 import type { Detail } from '../calculator/flow';
 import { createApi } from '../documents/api';
 import { TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/config';
-import type { Api, ExtractionShape, PassApi, ReviewKind } from '../documents/contract';
+import type { Api, ExtractionShape, PassApi } from '../documents/contract';
 import { fitWithin } from '../documents/files';
 import { canvasJpeg, whiteCanvas } from './jpeg';
 import { photoQuality } from './quality';
@@ -190,6 +190,27 @@ export interface ReadingSection<F extends string, L extends string> {
 // What a section brings to reading documents and to the pass.
 export interface DocumentsSection<R, F extends string, L extends string>
   extends PassSection<R>, ReadingSection<F, L> {}
+
+// For a page whose review measures nothing yet: its reads send no event either, while the pass
+// it shares with every page still does.
+export const READS_UNMEASURED: Pick<
+  DocumentEvents,
+  | 'startChosen'
+  | 'uploadStarted'
+  | 'extractionCompleted'
+  | 'extractionFailed'
+  | 'nothingRead'
+  | 'qualityWarned'
+  | 'qualityOverridden'
+> = {
+  startChosen() {},
+  uploadStarted() {},
+  extractionCompleted() {},
+  extractionFailed() {},
+  nothingRead() {},
+  qualityWarned() {},
+  qualityOverridden() {},
+};
 
 export interface DocumentsWiring<R, F extends string, L extends string> {
   readonly form: ReviewForm;
@@ -409,59 +430,4 @@ export function wireDocuments<R, F extends string, L extends string>({
             : tr(`client.documents.error.${outcome}`),
         );
     });
-}
-
-export interface PassWiring<R> {
-  readonly form: ReviewForm;
-  readonly hooks: ReviewHooks<R>;
-  readonly arrival: { readonly search: string };
-  // The review the checkout sends the person back to.
-  readonly review: ReviewKind;
-  readonly section: PassSection<R>;
-  readonly config: DocumentsConfig | null;
-  readonly tr: Translate;
-  readonly events: DocumentEvents;
-}
-
-// The pass, the report and the letters on a page that reads no documents yet: the same offer and
-// downloads, with the form always open.
-export function wirePass<R>({
-  form: calculator,
-  hooks,
-  arrival,
-  review: kind,
-  section,
-  config,
-  tr,
-  events,
-}: PassWiring<R>): void {
-  const offer = document.querySelector<HTMLElement>('[data-pass-offer]');
-  const checkoutCaptchaBox = offer?.querySelector<HTMLElement>('[data-pass-captcha]');
-  if (!config || !offer || !checkoutCaptchaBox) return;
-  const api = createApi(config.endpoints, (url, init) => fetch(url, init), {
-    review: kind,
-    fields: [],
-    lists: [],
-  });
-  const session = storage(() => sessionStorage);
-  const payment = setUpPass(offer, checkoutCaptchaBox, {
-    calculator,
-    hooks,
-    section,
-    config,
-    api,
-    loadTurnstile: turnstileLoader(),
-    passes: passStore(),
-    session,
-    tr,
-    events,
-  });
-  const review = keptReview(session, section);
-  const sessionId = returnedSession(arrival);
-  if (review) {
-    calculator.fill(review);
-    calculator.review();
-  }
-  // Back from Stripe: the pass is asked for, so a review shown again offers the downloads.
-  if (sessionId !== null) void payment.returned(sessionId);
 }
