@@ -6,6 +6,7 @@ export type MortgageField =
   | 'deedOn'
   | 'fixedUntil'
   | 'rateRevisionMonths'
+  | 'loanAmount'
   | 'invoices.total'
   | 'invoices.paidOn'
   | 'invoices.supplied'
@@ -17,7 +18,9 @@ export type MortgageField =
   | 'operations.feeCharged'
   | 'clauses.floorPercent'
   | 'clauses.defaultRate'
-  | 'clauses.ordinaryRate';
+  | 'clauses.ordinaryRate'
+  | 'clauses.missedInstalments'
+  | 'clauses.feeAmount';
 
 export type ValidationCode =
   | 'invalid_date'
@@ -86,6 +89,7 @@ export function validate(input: MortgageInput, today: CivilDate): readonly Valid
     fail('fixedUntil', 'invalid_date');
   if (input.rateRevisionMonths !== null && !isCount(input.rateRevisionMonths))
     fail('rateRevisionMonths', 'count_range');
+  if (input.loanAmount !== null && !isAmount(input.loanAmount)) fail('loanAmount', 'amount_range');
 
   input.invoices.forEach((invoice, i) => {
     if (invoice.total !== null && !isAmount(invoice.total))
@@ -127,6 +131,10 @@ export function validate(input: MortgageInput, today: CivilDate): readonly Valid
       const value = clause[key];
       if (value !== undefined && !isPercent(value)) fail(`clauses.${key}`, 'percent_range', i);
     }
+    if (clause.missedInstalments !== undefined && !isCount(clause.missedInstalments))
+      fail('clauses.missedInstalments', 'count_range', i);
+    if (clause.feeAmount !== undefined && !isAmount(clause.feeAmount))
+      fail('clauses.feeAmount', 'amount_range', i);
   });
 
   return errors;

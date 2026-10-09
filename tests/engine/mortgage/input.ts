@@ -22,6 +22,7 @@ export const mortgage = (change: Partial<MortgageInput> = {}): MortgageInput => 
   rateType: 'variable',
   fixedUntil: null,
   rateRevisionMonths: 12,
+  loanAmount: null,
   expensesClause: 'present',
   invoices: [],
   alreadyReturned: null,
