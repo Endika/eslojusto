@@ -1,6 +1,12 @@
 import type { Norm } from '../../../src/engine/law/norms';
 import type { RuleBase } from '../../../src/engine/law/rules';
 import type { LawSource } from '../../../src/engine/law/sources';
+import {
+  CREDIT_NORMS,
+  NORM_REVIEW as CREDIT_NORM_REVIEW,
+} from '../../../src/engine/credit/data/norms';
+import { CREDIT_SOURCES } from '../../../src/engine/credit/data/sources';
+import { RULES as CREDIT_RULES } from '../../../src/engine/credit/rules';
 import { EMPLOYMENT_NORMS, NORM_REVIEW } from '../../../src/engine/employment/data/norms';
 import {
   HOUSEHOLD_NORMS,
@@ -46,5 +52,12 @@ export const LAW_SECTIONS: readonly LawSection[] = [
     normReview: INSURANCE_NORM_REVIEW,
     sources: {},
     rules: INSURANCE_RULES,
+  },
+  {
+    name: 'credit',
+    norms: CREDIT_NORMS,
+    normReview: CREDIT_NORM_REVIEW,
+    sources: CREDIT_SOURCES,
+    rules: CREDIT_RULES,
   },
 ];
