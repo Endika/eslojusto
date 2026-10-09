@@ -69,6 +69,11 @@ describe('import boundaries', () => {
     ['src/engine/insurance/x.ts', "import { NORMS } from './data/norms';"],
     ['src/engine/insurance/x.ts', "import { RULES } from '../credit/rules';"],
     ['src/engine/credit/data/x.ts', "import { t } from '../../../i18n';"],
+    ['src/engine/insurance/x.ts', "import { t } from '../../i18n';"],
+    ['src/engine/insurance/x.ts', "import { INSURANCE_NORMS } from './data/norms';"],
+    ['src/engine/insurance/x.ts', "import { RULES } from '../employment/rules';"],
+    ['src/engine/rental/x.ts', "import type { NormTable } from '../insurance/norms';"],
+    ['src/engine/insurance/data/x.ts', "import type { NormTable } from '../../law/norms';"],
     ['src/engine/law/x.ts', "import type { NormId } from '../rental/norms';"],
     ['src/engine/law/x.ts', "import type { Phrase } from '../calculation';"],
     ['src/engine/law/x.ts', "import { t } from '../../i18n';"],
@@ -219,6 +224,7 @@ describe('import boundaries', () => {
     "export * from './rental/data/norms';",
     "export type { NormTable } from './employment/norms';",
     "export * from './employment';",
+    "export * from './insurance/review';",
   ])('the engine root cannot reach into a section: %s', async (code) => {
     expect(await violations('src/engine/x.ts', code)).toContain('no-restricted-imports');
   });
@@ -271,6 +277,8 @@ describe('import boundaries', () => {
     'src/engine/rental/data/x.ts',
     'src/engine/employment/x.ts',
     'src/engine/employment/data/x.ts',
+    'src/engine/insurance/x.ts',
+    'src/engine/insurance/data/x.ts',
     'src/engine/law/x.ts',
   ])('%s cannot read the clock', async (filePath) => {
     expect(await violations(filePath, 'export const now = () => new Date();')).toContain(
@@ -361,6 +369,10 @@ describe('import boundaries', () => {
     ['src/engine/credit/x.ts', "import { normStanding } from '../law/norms';"],
     ['src/engine/credit/data/x.ts', "import type { NormTable } from '../norms';"],
     ['src/engine/insurance/x.ts', "import { normStanding } from '../law/norms';"],
+    ['src/engine/insurance/x.ts', "import { addDays } from '../date';"],
+    ['src/engine/insurance/x.ts', "import { activeRules } from '../law/rules';"],
+    ['src/engine/insurance/x.ts', "import type { NormTable } from './norms';"],
+    ['src/engine/insurance/data/x.ts', "import type { NormTable } from '../norms';"],
     ['src/engine/law/x.ts', "import { toIso } from '../date';"],
     ['src/engine/law/x.ts', "import { round2 } from '../money';"],
     ['src/engine/law/x.ts', "import type { Source } from '../sources';"],

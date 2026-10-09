@@ -6,6 +6,11 @@ import {
   HOUSEHOLD_NORMS,
   NORM_REVIEW as HOUSEHOLD_NORM_REVIEW,
 } from '../../../src/engine/household/data/norms';
+import {
+  INSURANCE_NORMS,
+  NORM_REVIEW as INSURANCE_NORM_REVIEW,
+} from '../../../src/engine/insurance/data/norms';
+import { RULES as INSURANCE_RULES } from '../../../src/engine/insurance/rules';
 import { NORMS as RENTAL_NORMS } from '../../../src/engine/rental/data/norms';
 
 // Every section's law tables, for the checks that span them all and the monthly review list.
@@ -13,8 +18,8 @@ import { NORMS as RENTAL_NORMS } from '../../../src/engine/rental/data/norms';
 export interface LawSection {
   readonly name: string;
   readonly norms: Readonly<Record<string, Norm<string>>>;
-  // Day each norm was last read in the BOE, where the section keeps it.
-  readonly normReview: Readonly<Record<string, string>> | null;
+  // Day each norm was last read in the BOE, where the section keeps it; null before its first reading.
+  readonly normReview: Readonly<Record<string, string | null>> | null;
   readonly sources: Readonly<Record<string, LawSource>>;
   readonly rules: Readonly<Record<string, RuleBase>>;
 }
@@ -34,5 +39,12 @@ export const LAW_SECTIONS: readonly LawSection[] = [
     normReview: HOUSEHOLD_NORM_REVIEW,
     sources: {},
     rules: {},
+  },
+  {
+    name: 'insurance',
+    norms: INSURANCE_NORMS,
+    normReview: INSURANCE_NORM_REVIEW,
+    sources: {},
+    rules: INSURANCE_RULES,
   },
 ];
