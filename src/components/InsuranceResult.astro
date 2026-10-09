@@ -1,11 +1,14 @@
 ---
+import PassOffer from './PassOffer.astro';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
 
 interface Props {
   lang: Lang;
+  // A build with the documents API offers the letters and, when there is one to sell, the pass.
+  documents?: boolean;
 }
-const { lang } = Astro.props;
+const { lang, documents = false } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 
 // Every state has its own mark beside its words, so none rests on colour alone.
@@ -77,6 +80,8 @@ const channels: readonly Key[] = [
     </section>
 
     <div class="review__items" data-items></div>
+
+    {documents && <PassOffer lang={lang} review="insurance" />}
 
     <section class="item" data-in-scope aria-labelledby="information-title">
       <div class="sheet">

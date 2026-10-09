@@ -1,5 +1,6 @@
 import type { CivilDate } from '../engine/date';
 import { required } from './dom';
+import { formEntries, setEntry, type FormEntries } from './fill';
 import { firstIncomplete, indexOfHash, lastSheet, resultStep, stepFrom, type Flow } from './flow';
 import { createNavigation, type NavigationEvents } from './navigation';
 
@@ -20,6 +21,21 @@ export interface Section<S extends string, Sheet extends S, E extends { readonly
   stopsAtGate(form: HTMLFormElement, result: HTMLElement): boolean;
   // Reviews the answers into the result, or returns the errors that keep it from doing so.
   review(form: HTMLFormElement, result: HTMLElement, today: CivilDate): readonly E[];
+  // Told when the person starts over from the result.
+  restarted?(): void;
+}
+
+// The section's form as reading documents and the pass drive it. These sections lock nothing in
+// their result, so a pass verified or dropped leaves it as it is.
+export interface SectionForm {
+  readonly form: HTMLFormElement;
+  // Sets the answers and returns the names it could not set.
+  fill(entries: FormEntries): string[];
+  entries(): FormEntries;
+  open(): void;
+  // Reviews the answers as the «Revisar» button does; false when a sheet still needs an answer.
+  review(): boolean;
+  refreshResult(): void;
 }
 
 // A review's sheets, the gate after the first ones and the result.
@@ -27,7 +43,7 @@ export function setUpSection<
   S extends string,
   Sheet extends S,
   E extends { readonly field: string },
->(root: HTMLElement, section: Section<S, Sheet, E>): HTMLFormElement {
+>(root: HTMLElement, section: Section<S, Sheet, E>): SectionForm {
   const { flow, sheets, today } = section;
   const LAST_SHEET = lastSheet(flow);
   const RESULT_STEP = resultStep(flow);
@@ -103,15 +119,16 @@ export function setUpSection<
     nav.show(next, { history: 'push', focus: true });
   }
 
-  function submitReview() {
-    if (stopAtGate()) return;
+  function submitReview(): boolean {
+    if (stopAtGate()) return true;
     const errors = section.review(form, result, today());
     if (errors.length > 0) {
       goToError(errors);
-      return;
+      return false;
     }
     section.renderErrors(form, []);
     showResult();
+    return true;
   }
 
   form.addEventListener('submit', (e) => {
@@ -146,6 +163,7 @@ export function setUpSection<
   required(result.querySelector('[data-restart]'), 'the restart button').addEventListener(
     'click',
     () => {
+      section.restarted?.();
       form.reset();
       section.renderErrors(form, []);
       conditions();
@@ -157,5 +175,22 @@ export function setUpSection<
   conditions();
   nav.reached = firstIncomplete(flow, form, today());
   nav.show(Math.min(indexOfHash(flow, location.hash), nav.reached), { history: 'replace' });
-  return form;
+  return {
+    form,
+    fill(entries) {
+      const missed = entries.filter(([name, value]) => !setEntry(form, name, value));
+      conditions();
+      return missed.map(([name]) => name);
+    },
+    entries: () => formEntries(form),
+    open() {
+      nav.reached = 0;
+      nav.show(0, { history: 'replace', focus: true });
+    },
+    review() {
+      nav.reached = LAST_SHEET;
+      return submitReview();
+    },
+    refreshResult() {},
+  };
 }

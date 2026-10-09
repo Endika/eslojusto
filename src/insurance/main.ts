@@ -1,4 +1,4 @@
-import { setUpSection } from '../calculator/section';
+import { setUpSection, type SectionForm } from '../calculator/section';
 import { reviewInsurance } from '../engine/insurance/review';
 import { applyConditions, gate } from './conditions';
 import { SHEETS, onQuestions, readInsuranceForm, sheetErrors, sheetOfField } from './form';
@@ -10,7 +10,7 @@ import { INSURANCE_FLOW as flow } from './steps';
 export const setUpInsurance = (
   root: HTMLElement,
   { events, today, tr, tables }: InsuranceSetup,
-): HTMLFormElement =>
+): SectionForm =>
   setUpSection(root, {
     formId: 'insurance',
     flow,
@@ -25,6 +25,7 @@ export const setUpInsurance = (
       const g = gate(form);
       if (g.inScope) return false;
       renderOutOfScope(result, g.reason, tr);
+      events.reviewCleared();
       return true;
     },
     review(form, result, day) {
@@ -33,8 +34,14 @@ export const setUpInsurance = (
       const r = reviewInsurance(parsed.input, day, tables);
       // The form already ran the engine's checks; this only guards against the two drifting apart.
       if (!r.ok) return onQuestions(r.errors);
-      if (r.review.scope.inScope) renderInsuranceResult(result, r.review, tr);
-      else renderOutOfScope(result, r.review.scope.reason, tr);
+      if (r.review.scope.inScope) {
+        renderInsuranceResult(result, r.review, tr);
+        events.reviewCompleted({ input: parsed.input, review: r.review });
+      } else {
+        renderOutOfScope(result, r.review.scope.reason, tr);
+        events.reviewCleared();
+      }
       return [];
     },
+    restarted: () => events.reviewCleared(),
   });

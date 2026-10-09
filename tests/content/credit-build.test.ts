@@ -37,7 +37,13 @@ describe.skipIf(!withCredit)('a build with the credit switch', () => {
     expect(read('dist/index.html')).toContain('href="/financiacion/"');
     const page = read('dist/financiacion/index.html');
     expect(page).toContain('¿Cuándo lo contrataste?');
-    expect(page).toContain("connect-src 'self';");
+    // Closed to every other origin; a build with the documents API opens it to that API and
+    // Turnstile, for the letters and the pass.
+    expect(page).toMatch(
+      page.includes('data-pass-offer')
+        ? /connect-src 'self'( https:\/\/[\w.-]+)* https:\/\/challenges\.cloudflare\.com;/
+        : /connect-src 'self';/,
+    );
   });
   it('ships its strings only on its own page', () => {
     expect(read('dist/financiacion/index.html')).toContain('client.credit.status.matches');

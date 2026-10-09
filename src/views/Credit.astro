@@ -6,6 +6,7 @@ import CreditResult from '../components/CreditResult.astro';
 import { CREDIT_BETA } from '../content/sections';
 import { formatLongDay } from '../content/rent-indices';
 import { breadcrumbList, trail } from '../content/structured-data';
+import { DOCUMENTS } from '../documents/config';
 import { LAST_UPDATED } from '../content/updated';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
@@ -15,6 +16,8 @@ interface Props {
 }
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
+// A build with the documents API offers the letters and, when there is one to sell, the pass.
+const documents = DOCUMENTS !== null;
 
 // Each tab's share of the rail follows how much its section asks, kept close so that every name
 // still fits on a phone.
@@ -41,6 +44,7 @@ const crumbs = trail(lang, { name: tx('home.credit'), path: '/financiacion/' });
   lang={lang}
   section="cause"
   structuredData={[breadcrumbList(home, lang, crumbs)]}
+  calculator={documents}
 >
   <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
     <ol>
@@ -86,7 +90,7 @@ const crumbs = trail(lang, { name: tx('home.credit'), path: '/financiacion/' });
         </div>
       </noscript>
       <CreditForm lang={lang} />
-      <CreditResult lang={lang} />
+      <CreditResult lang={lang} documents={documents} />
     </div>
   </main>
 </Base>

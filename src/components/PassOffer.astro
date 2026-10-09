@@ -4,14 +4,15 @@ import { link, type Lang } from '../i18n/languages';
 import PassLetter from './PassLetter.astro';
 
 // The pass for the PDF report and the letter, offered in the result when an item falls short.
-// Rendered only in a build with the documents API; DocumentStart carries its styles. On the rental
-// review the same pass unlocks each item's detail too, and its letters are two, each shown only
-// when the review has figures for it. On the contract review it unlocks the detail, the report and
-// the letter to the company; the letters that only ask for information sit outside the paid part
-// and download without a pass, under their own title when there is nothing to sell.
+// Rendered only in a build with the documents API, with its own styles. On the rental review the
+// same pass unlocks each item's detail too, and its letters are two, each shown only when the
+// review has figures for it. On the contract and credit reviews the letters that only ask for
+// information sit outside the paid part and download without a pass, under their own title when
+// there is nothing to sell. The insurance review never sells the pass: its one letter only tells
+// the insurer, and a pass already held downloads the report.
 interface Props {
   lang: Lang;
-  review?: 'final_pay' | 'rental' | 'employment';
+  review?: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance';
 }
 const { lang, review = 'final_pay' } = Astro.props;
 const RENTAL: Partial<Record<Key, Key>> = {
@@ -35,23 +36,54 @@ const EMPLOYMENT: Partial<Record<Key, Key>> = {
   'documents.letter.privacy': 'employment.letter.privacy',
   'documents.letter.id': 'employment.letter.id',
 };
-const OWN: Partial<Record<Key, Key>> = { final_pay: {}, rental: RENTAL, employment: EMPLOYMENT }[
-  review
-];
+const CREDIT: Partial<Record<Key, Key>> = {
+  'documents.pass.title': 'credit.pass.title',
+  'documents.pass.text': 'credit.pass.text',
+  'documents.pass.price': 'credit.pass.price',
+  'documents.pass.letter_note': 'credit.pass.letter_note',
+  'documents.letter.legend': 'credit.letter.legend',
+  'documents.letter.privacy': 'credit.letter.privacy',
+  'documents.letter.id': 'credit.letter.id',
+  'documents.letter.company': 'credit.letter.company',
+  'documents.letter.reference': 'credit.letter.reference',
+};
+const INSURANCE: Partial<Record<Key, Key>> = {
+  'documents.pass.title': 'insurance.pass.title',
+  'documents.pass.text': 'insurance.pass.text',
+  'documents.pass.letter_note': 'insurance.pass.letter_note',
+  'documents.letter.legend': 'insurance.letter.legend',
+  'documents.letter.privacy': 'insurance.letter.privacy',
+  'documents.letter.id': 'insurance.letter.id',
+  'documents.letter.company': 'insurance.letter.company',
+  'documents.letter.reference': 'insurance.letter.reference',
+};
+const OWN: Partial<Record<Key, Key>> = {
+  final_pay: {},
+  rental: RENTAL,
+  employment: EMPLOYMENT,
+  credit: CREDIT,
+  insurance: INSURANCE,
+}[review];
 const tx = (key: Key) => t(lang, OWN[key] ?? key);
-const employment = review === 'employment';
+// The title and lead shown when only the free letters are on offer.
+const FREE_ONLY = {
+  employment: ['employment.letters.title', 'employment.letters.text'],
+  credit: ['credit.letters.title', 'credit.letters.text'],
+  insurance: ['insurance.letters.title', 'insurance.letters.text'],
+} as const satisfies Record<string, readonly [Key, Key]>;
+const freeOnly = review in FREE_ONLY ? FREE_ONLY[review as keyof typeof FREE_ONLY] : null;
 // Marks what is about buying the pass, hidden when only the free letters are on offer.
-const pitch = employment ? '' : undefined;
+const pitch = freeOnly ? '' : undefined;
 ---
 
 <section class="item pass" data-pass-offer aria-labelledby="pass-title" hidden>
   <div class="sheet">
     <h3 class="item__title" id="pass-title">
-      {employment ? (
+      {freeOnly ? (
         <>
           <span data-pass-pitch>{tx('documents.pass.title')}</span>
           <span data-pass-free-only hidden>
-            {tx('employment.letters.title')}
+            {tx(freeOnly[0])}
           </span>
         </>
       ) : (
@@ -61,9 +93,9 @@ const pitch = employment ? '' : undefined;
     <p class="help" data-pass-pitch={pitch}>
       {tx('documents.pass.text')}
     </p>
-    {employment && (
+    {freeOnly && (
       <p class="help" data-pass-free-only hidden>
-        {tx('employment.letters.text')}
+        {tx(freeOnly[1])}
       </p>
     )}
     <div data-pass-buy>
@@ -121,9 +153,9 @@ const pitch = employment ? '' : undefined;
           {tx('documents.pass.download_report')}
         </button>
       </div>
-      {!employment && <PassLetter review={review} tx={tx} />}
+      {!freeOnly && <PassLetter review={review} tx={tx} />}
     </div>
-    {employment && <PassLetter review={review} tx={tx} />}
+    {freeOnly && <PassLetter review={review} tx={tx} />}
     <p class="pass__status" role="status" aria-live="polite" data-pass-status></p>
     <p class="errata" role="alert" data-pass-error hidden></p>
     <button class="button button--sheet" type="button" data-pass-verify-retry hidden>
@@ -131,3 +163,43 @@ const pitch = employment ? '' : undefined;
     </button>
   </div>
 </section>
+
+<style is:inline>
+  .pass__captcha:empty {
+    display: none;
+  }
+  .pass__captcha {
+    margin-top: 0.75rem;
+    max-inline-size: 100%;
+    overflow: hidden;
+  }
+  .pass__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.75rem 0;
+  }
+  .pass .checkbox {
+    align-items: flex-start;
+    margin-top: 0.5rem;
+  }
+  .pass .checkbox label {
+    font: 400 0.9375rem / 1.4 var(--f-serif);
+  }
+  .pass__status:empty {
+    display: none;
+  }
+  .pass__status {
+    margin: 0.5rem 0 0;
+    font: 400 var(--t-small) / 1.4 var(--f-serif);
+  }
+  .pass .field {
+    margin-top: 0.5rem;
+  }
+  .pass__letter {
+    margin: 1.25rem 0 0;
+  }
+  .pass__letter .field__input {
+    max-inline-size: 24rem;
+  }
+</style>

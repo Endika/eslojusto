@@ -16,6 +16,8 @@ export interface LetterDetails {
   readonly iban?: string;
   // Only the contract review's letters ask for the workplace.
   readonly workplace?: string;
+  // Only the credit and insurance letters ask for the contract or policy number.
+  readonly reference?: string;
 }
 
 // The fields a person types on the final pay's letter; the date comes from a date picker.
@@ -24,12 +26,20 @@ export const LETTER_FIELDS = ['name', 'id', 'company', 'place'] as const;
 export const RENTAL_LETTER_FIELDS = ['name', 'id', 'landlord', 'address', 'place', 'iban'] as const;
 // And on the contract review's.
 export const EMPLOYMENT_LETTER_FIELDS = ['name', 'id', 'company', 'workplace', 'place'] as const;
+// And on the credit and insurance letters, where the company is the lender or the insurer.
+export const FINANCE_LETTER_FIELDS = ['name', 'id', 'company', 'reference', 'place'] as const;
 export type LetterField =
   | (typeof LETTER_FIELDS)[number]
   | (typeof RENTAL_LETTER_FIELDS)[number]
-  | (typeof EMPLOYMENT_LETTER_FIELDS)[number];
+  | (typeof EMPLOYMENT_LETTER_FIELDS)[number]
+  | (typeof FINANCE_LETTER_FIELDS)[number];
 export const ALL_LETTER_FIELDS: readonly LetterField[] = [
-  ...new Set<LetterField>([...LETTER_FIELDS, ...RENTAL_LETTER_FIELDS, ...EMPLOYMENT_LETTER_FIELDS]),
+  ...new Set<LetterField>([
+    ...LETTER_FIELDS,
+    ...RENTAL_LETTER_FIELDS,
+    ...EMPLOYMENT_LETTER_FIELDS,
+    ...FINANCE_LETTER_FIELDS,
+  ]),
 ];
 // The typed fields of a letter: the final pay's always, another section's when its form has them.
 export type TypedDetails = Record<(typeof LETTER_FIELDS)[number], string> &
@@ -46,6 +56,7 @@ export const LETTER_MAX_LENGTH: Record<LetterField, number> = {
   // 34 characters at most (ISO 13616), with a space every four.
   iban: 42,
   workplace: 120,
+  reference: 40,
 };
 
 // The letters a review can offer: the final pay's lists what falls short (`items`) or only
@@ -53,7 +64,10 @@ export const LETTER_MAX_LENGTH: Record<LetterField, number> = {
 // (`deposit_return`) or for a rise to be looked at again (`rent_review`); the contract review's asks
 // the company for the information it owes in writing (`information_request`) or to look again at
 // what does not match the law (`employment`), and the public employment service for the
-// certificate of temporary contracts (`temporary_contracts_certificate`).
+// certificate of temporary contracts (`temporary_contracts_certificate`); the credit review's asks
+// the lender for the credit's information (`credit_information`) or to look again at an early
+// repayment's compensation (`early_repayment_review`); the insurance review's tells the insurer the
+// policy is not to be extended (`insurance_non_renewal`).
 export const LETTER_KINDS = [
   'items',
   'general',
@@ -62,6 +76,9 @@ export const LETTER_KINDS = [
   'information_request',
   'employment',
   'temporary_contracts_certificate',
+  'credit_information',
+  'early_repayment_review',
+  'insurance_non_renewal',
 ] as const;
 export type LetterKind = (typeof LETTER_KINDS)[number];
 

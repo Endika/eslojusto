@@ -1,4 +1,4 @@
-import { setUpSection } from '../calculator/section';
+import { setUpSection, type SectionForm } from '../calculator/section';
 import { reviewCredit } from '../engine/credit/review';
 import { applyConditions, gate } from './conditions';
 import { SHEETS, onQuestions, readCreditForm, sheetErrors, sheetOfField } from './form';
@@ -10,7 +10,7 @@ import { CREDIT_FLOW as flow } from './steps';
 export const setUpCredit = (
   root: HTMLElement,
   { events, today, tr, tables }: CreditSetup,
-): HTMLFormElement =>
+): SectionForm =>
   setUpSection(root, {
     formId: 'credit',
     flow,
@@ -25,6 +25,7 @@ export const setUpCredit = (
       const g = gate(form);
       if (g.inScope) return false;
       renderOutOfScope(result, g, tr);
+      events.reviewCleared();
       return true;
     },
     review(form, result, day) {
@@ -33,8 +34,14 @@ export const setUpCredit = (
       const r = reviewCredit(parsed.input, day, tables);
       // The form already ran the engine's checks; this only guards against the two drifting apart.
       if (!r.ok) return onQuestions(r.errors, parsed.input);
-      if (r.review.scope.inScope) renderCreditResult(result, r.review, tr);
-      else renderOutOfScope(result, r.review.scope, tr);
+      if (r.review.scope.inScope) {
+        renderCreditResult(result, r.review, tr);
+        events.reviewCompleted({ input: parsed.input, review: r.review });
+      } else {
+        renderOutOfScope(result, r.review.scope, tr);
+        events.reviewCleared();
+      }
       return [];
     },
+    restarted: () => events.reviewCleared(),
   });
