@@ -194,26 +194,28 @@ const markOf = (page: Page, field: string) => page.locator(`[data-field="${field
 async function confirmPack(page: Page) {
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
 
-  const contract = sheet(page, 'Tu contrato');
-  await expect(contract.getByLabel('Vivienda habitual', { exact: true })).toBeChecked();
-  await expect(contract.getByLabel('Fecha del contrato', { exact: true })).toHaveValue(
-    '2024-03-15',
-  );
-  await expect(contract.getByLabel('Fecha de entrada', { exact: true })).toHaveValue('2024-03-20');
+  await expect(
+    sheet(page, 'Tu contrato').getByLabel('¿Qué tipo de contrato es?', { exact: true }),
+  ).toHaveValue('main_home');
+  await next(page);
+
+  const dates = sheet(page, 'Las fechas del contrato');
+  await expect(dates.getByLabel('Fecha del contrato', { exact: true })).toHaveValue('2024-03-15');
+  await expect(dates.getByLabel('Fecha de entrada', { exact: true })).toHaveValue('2024-03-20');
   await expect(markOf(page, 'signedOn')).toHaveText('Leído del documento · confianza alta');
   await next(page);
 
-  const landlord = sheet(page, 'Tu casero');
-  await expect(landlord.getByLabel('Una persona', { exact: true })).toBeChecked();
-  await expect(landlord.getByLabel('Comunidad autónoma', { exact: true })).toHaveValue('MD');
+  await expect(sheet(page, 'Tu casero').getByLabel('Una persona', { exact: true })).toBeChecked();
+  await next(page);
+  await sheet(page, 'Gran tenedor').getByLabel('No', { exact: true }).check();
+  await next(page);
+
+  const home = sheet(page, 'Dónde está la vivienda');
+  await expect(home.getByLabel('Comunidad autónoma', { exact: true })).toHaveValue('MD');
   await expect(markOf(page, 'region')).toHaveText(
     'Sale de lo leído en tus documentos · confianza alta',
   );
-  await landlord
-    .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
-    .getByLabel('No', { exact: true })
-    .check();
-  await landlord
+  await home
     .getByRole('group', { name: '¿Está la vivienda en una zona tensionada?' })
     .getByLabel('No', { exact: true })
     .check();
@@ -222,10 +224,14 @@ async function confirmPack(page: Page) {
   const entry = sheet(page, 'Lo que pagaste al entrar');
   await expect(entry.getByLabel('Fianza', { exact: true })).toHaveValue('1.000,00');
   await expect(entry.getByLabel('Mensualidades por adelantado', { exact: true })).toHaveValue('1');
-  const guarantee = entry.getByRole('group', { name: 'Garantía 1' });
+  await next(page);
+
+  const guarantee = sheet(page, 'Otras garantías').getByRole('group', { name: 'Garantía 1' });
   await expect(guarantee.getByLabel('Tipo', { exact: true })).toHaveValue('cash');
   await expect(guarantee.getByLabel('Importe', { exact: true })).toHaveValue('1.000,00');
-  const fee = entry.getByRole('group', { name: 'Pago 1' });
+  await next(page);
+
+  const fee = sheet(page, 'Otros pagos al entrar').getByRole('group', { name: 'Pago 1' });
   await expect(fee.getByLabel('Concepto', { exact: true })).toHaveValue('solvency_check');
   await expect(fee.getByLabel('Importe', { exact: true })).toHaveValue('242,00');
   await fee
@@ -237,9 +243,14 @@ async function confirmPack(page: Page) {
   const rent = sheet(page, 'La renta');
   await expect(rent.getByLabel('Renta al empezar', { exact: true })).toHaveValue('1.000,00');
   await expect(rent.getByLabel('Duración pactada, en meses', { exact: true })).toHaveValue('60');
-  await expect(rent.getByLabel('El IPC', { exact: true })).toBeChecked();
+  await next(page);
+
+  const update = sheet(page, 'La actualización de la renta');
+  await expect(
+    update.getByLabel('¿Qué dice el contrato sobre actualizar la renta?', { exact: true }),
+  ).toHaveValue('ipc');
   // The clause as the contract words it, beside the label to confirm against it.
-  await expect(rent.locator('[data-read-quote="updateClause"] blockquote')).toHaveText(
+  await expect(update.locator('[data-read-quote="updateClause"] blockquote')).toHaveText(
     'La renta se actualizará cada año, en la fecha en que se cumpla cada año de vigencia del contrato, conforme al IPC general.',
   );
   await next(page);
@@ -261,6 +272,22 @@ async function confirmPack(page: Page) {
     .check();
   await next(page);
 
+  const exit = sheet(page, 'La salida');
+  await expect(exit.getByLabel('Sí', { exact: true })).toBeChecked();
+  await expect(exit.getByLabel('Día en que devolviste las llaves', { exact: true })).toHaveValue(
+    '2026-06-30',
+  );
+  await next(page);
+
+  const deposit = sheet(page, 'La devolución de la fianza');
+  await expect(
+    deposit.getByRole('group', { name: 'Devolución 1' }).getByLabel('Importe', { exact: true }),
+  ).toHaveValue('850,00');
+  await expect(
+    deposit.getByRole('group', { name: 'Descuento 1' }).getByLabel('Motivo', { exact: true }),
+  ).toHaveValue('cleaning');
+  await next(page);
+
   const charges = sheet(page, 'Los gastos');
   await expect(charges.locator('[data-read-quote="hasCharges"] blockquote')).toHaveText(
     'Los gastos de comunidad corren a cargo de la parte arrendataria.',
@@ -276,19 +303,6 @@ async function confirmPack(page: Page) {
   await expect(
     charge.getByLabel('Importe al año que fija el contrato', { exact: true }),
   ).toHaveValue('600,00');
-  await next(page);
-
-  const exit = sheet(page, 'La salida');
-  await expect(exit.getByLabel('Sí', { exact: true })).toBeChecked();
-  await expect(exit.getByLabel('Día en que devolviste las llaves', { exact: true })).toHaveValue(
-    '2026-06-30',
-  );
-  await expect(
-    exit.getByRole('group', { name: 'Devolución 1' }).getByLabel('Importe', { exact: true }),
-  ).toHaveValue('850,00');
-  await expect(
-    exit.getByRole('group', { name: 'Descuento 1' }).getByLabel('Motivo', { exact: true }),
-  ).toHaveValue('cleaning');
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
 }
@@ -393,7 +407,10 @@ test('a page that is no rental document is set aside, with why', async ({ page }
   ).toBeVisible();
   // A seasonal contract read is preselected, and the gate stops it as if typed.
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
-  await expect(page.getByLabel('De temporada', { exact: true })).toBeChecked();
+  await expect(page.getByLabel('¿Qué tipo de contrato es?', { exact: true })).toHaveValue(
+    'seasonal',
+  );
+  await next(page);
   await page.getByLabel('Fecha de entrada').fill('2025-09-01');
   await next(page);
   await expect(page.getByText('Esta revisión no cubre tu tipo de contrato')).toBeVisible();
@@ -433,29 +450,36 @@ test('a read that finds nothing says why for each file and spends no read', asyn
 async function fillByHand(page: Page) {
   await page.goto('alquiler/');
   await page.getByRole('button', { name: /Rellenar a mano/ }).click();
-  const contract = sheet(page, 'Tu contrato');
-  await contract.getByLabel('Vivienda habitual', { exact: true }).check();
-  await contract.getByLabel('Fecha del contrato', { exact: true }).fill('2024-03-15');
-  await contract.getByLabel('Fecha de entrada', { exact: true }).fill('2024-03-20');
+  await sheet(page, 'Tu contrato')
+    .getByLabel('¿Qué tipo de contrato es?')
+    .selectOption({ label: 'Vivienda habitual' });
   await next(page);
-  const landlord = sheet(page, 'Tu casero');
-  await landlord.getByLabel('Una persona').check();
-  await landlord
-    .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
-    .getByLabel('No', { exact: true })
-    .check();
-  await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
-  await landlord
+  const dates = sheet(page, 'Las fechas del contrato');
+  await dates.getByLabel('Fecha del contrato', { exact: true }).fill('2024-03-15');
+  await dates.getByLabel('Fecha de entrada', { exact: true }).fill('2024-03-20');
+  await next(page);
+  await sheet(page, 'Tu casero').getByLabel('Una persona').check();
+  await next(page);
+  await sheet(page, 'Gran tenedor').getByLabel('No', { exact: true }).check();
+  await next(page);
+  const home = sheet(page, 'Dónde está la vivienda');
+  await home.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
+  await home
     .getByRole('group', { name: '¿Está la vivienda en una zona tensionada?' })
     .getByLabel('No', { exact: true })
     .check();
   await next(page);
   await sheet(page, 'Lo que pagaste al entrar').getByLabel('Fianza', { exact: true }).fill('1000');
   await next(page);
+  await next(page);
+  await next(page);
   const rent = sheet(page, 'La renta');
   await rent.getByLabel('Renta al empezar').fill('1.000,00');
   await rent.getByLabel('Duración pactada, en meses').fill('60');
-  await rent.getByLabel('El IPC', { exact: true }).check();
+  await next(page);
+  await sheet(page, 'La actualización de la renta')
+    .getByLabel('¿Qué dice el contrato sobre actualizar la renta?')
+    .selectOption({ label: 'El IPC' });
   await next(page);
   const rises = sheet(page, 'Las subidas');
   await rises.getByLabel('Sí, añadirlas').check();
@@ -471,15 +495,17 @@ async function fillByHand(page: Page) {
     .getByLabel('No', { exact: true })
     .check();
   await next(page);
-  await expect(sheet(page, 'Los gastos')).toBeVisible();
-  await next(page);
   const exit = sheet(page, 'La salida');
   await exit.getByLabel('Sí', { exact: true }).check();
   await exit.getByLabel('Día en que devolviste las llaves', { exact: true }).fill('2026-06-30');
-  await exit.getByRole('button', { name: 'Añadir devolución' }).click();
-  const returned = exit.getByRole('group', { name: 'Devolución 1' });
+  await next(page);
+  const deposit = sheet(page, 'La devolución de la fianza');
+  await deposit.getByRole('button', { name: 'Añadir devolución' }).click();
+  const returned = deposit.getByRole('group', { name: 'Devolución 1' });
   await returned.getByLabel('Fecha', { exact: true }).fill('2026-08-14');
   await returned.getByLabel('Importe', { exact: true }).fill('850');
+  await next(page);
+  await expect(sheet(page, 'Los gastos')).toBeVisible();
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
 }
@@ -548,9 +574,13 @@ test('without a deposit owed, only the rent letter and no account to ask for', a
   await fillByHand(page);
   // Back to the exit: the whole deposit came back.
   await page.getByRole('link', { name: /Salida/ }).click();
-  const returned = sheet(page, 'La salida').getByRole('group', { name: 'Devolución 1' });
+  await next(page);
+  const returned = sheet(page, 'La devolución de la fianza').getByRole('group', {
+    name: 'Devolución 1',
+  });
   await returned.getByLabel('Importe', { exact: true }).fill('1000');
   await returned.getByLabel('Fecha', { exact: true }).fill('2026-07-10');
+  await next(page);
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
 

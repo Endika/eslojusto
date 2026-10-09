@@ -10,14 +10,37 @@ export type Step = (typeof STEPS)[number];
 
 export const SECTION_OF_STEP: Record<Step, string> = {
   contrato: 'cause',
+  fechas: 'cause',
   casero: 'cause',
+  'gran-tenedor': 'cause',
+  vivienda: 'cause',
   entrada: 'dates',
+  garantias: 'dates',
+  pagos: 'dates',
   renta: 'salary',
+  actualizacion: 'salary',
   subidas: 'salary',
-  gastos: 'holidays',
   salida: 'settlement',
+  fianza: 'settlement',
+  gastos: 'holidays',
   resultado: 'result',
 };
+
+// The tabs in order: the ground colour, the first step (its URL fragment), the number it shows and
+// its share of the rail, which follows how many sheets it holds (the result counts two). The
+// move-out comes before the charges, as the walk does.
+export const TABS = [
+  ['cause', 'contrato', '01', 5],
+  ['dates', 'entrada', '02', 3],
+  ['salary', 'renta', '03', 3],
+  ['settlement', 'salida', '04', 2],
+  ['holidays', 'gastos', '05', 1],
+  ['result', 'resultado', '06', 2],
+] as const;
+
+export const TAB_NUMBER: Readonly<Record<string, string>> = Object.fromEntries(
+  TABS.map(([tone, , number]) => [tone, number]),
+);
 
 const isSheet = (step: Step): step is Sheet => step !== 'resultado';
 

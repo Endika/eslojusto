@@ -504,28 +504,35 @@ test('the rental review sends sheets, field names and its outcome in codes, neve
   const sheet = (name: string) => page.getByRole('group', { name, exact: true });
 
   await next(); // nothing answered: validation errors, by field name
-  const contract = sheet('Tu contrato');
-  await contract.getByLabel('Vivienda habitual', { exact: true }).check();
-  await contract.getByLabel('Fecha del contrato', { exact: true }).fill('2024-03-15');
-  await contract.getByLabel('Fecha de entrada', { exact: true }).fill('2024-03-20');
+  const type = '¿Qué tipo de contrato es?';
+  await sheet('Tu contrato').getByLabel(type).selectOption({ label: 'Vivienda habitual' });
   await next();
-  const landlord = sheet('Tu casero');
-  await landlord.getByLabel('Una persona').check();
-  await landlord
-    .getByRole('group', { name: '¿Tu casero es gran tenedor?' })
-    .getByLabel('No lo sé', { exact: true })
-    .check();
-  await landlord.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
-  await landlord
+  await next(); // no dates yet: more validation errors
+  const dates = sheet('Las fechas del contrato');
+  await dates.getByLabel('Fecha del contrato', { exact: true }).fill('2024-03-15');
+  await dates.getByLabel('Fecha de entrada', { exact: true }).fill('2024-03-20');
+  await next();
+  await sheet('Tu casero').getByLabel('Una persona').check();
+  await next();
+  await sheet('Gran tenedor').getByLabel('No lo sé', { exact: true }).check();
+  await next();
+  const home = sheet('Dónde está la vivienda');
+  await home.getByLabel('Comunidad autónoma').selectOption({ label: 'Comunidad de Madrid' });
+  await home
     .getByRole('group', { name: '¿Está la vivienda en una zona tensionada?' })
     .getByLabel('No', { exact: true })
     .check();
   await next();
   await next();
+  await next();
+  await next();
   const rent = sheet('La renta');
   await rent.getByLabel('Renta al empezar').fill('1.000,00');
   await rent.getByLabel('Duración pactada, en meses').fill('60');
-  await rent.getByLabel('El IPC', { exact: true }).check();
+  await next();
+  await sheet('La actualización de la renta')
+    .getByLabel('¿Qué dice el contrato sobre actualizar la renta?')
+    .selectOption({ label: 'El IPC' });
   await next();
   const rises = sheet('Las subidas');
   await rises.getByLabel('Sí, añadirlas').check();
@@ -555,28 +562,40 @@ test('the rental review sends sheets, field names and its outcome in codes, neve
 
   // A gate: a seasonal lease stops at the first sheet.
   await page.getByRole('button', { name: 'Empezar de nuevo' }).click();
-  await sheet('Tu contrato').getByLabel('De temporada', { exact: true }).check();
-  await sheet('Tu contrato').getByLabel('Fecha del contrato', { exact: true }).fill('2025-09-01');
-  await sheet('Tu contrato').getByLabel('Fecha de entrada', { exact: true }).fill('2025-09-01');
+  await sheet('Tu contrato').getByLabel(type).selectOption({ label: 'De temporada' });
+  await next();
+  await dates.getByLabel('Fecha del contrato', { exact: true }).fill('2025-09-01');
+  await dates.getByLabel('Fecha de entrada', { exact: true }).fill('2025-09-01');
   await next();
   await expect.poll(() => spy.named('rental_out_of_scope').length, { timeout: 15_000 }).toBe(1);
 
   expect(new Set(spy.named('validation_error').map((e) => e.properties['field']))).toEqual(
     new Set(['contractType', 'signedOn', 'startDate']),
   );
-  expect(spy.named('validation_error').every((e) => e.properties['section'] === 'contrato')).toBe(
-    true,
-  );
+  expect(
+    spy.named('validation_error').map((e) => [e.properties['field'], e.properties['section']]),
+  ).toEqual([
+    ['contractType', 'contrato'],
+    ['signedOn', 'fechas'],
+    ['startDate', 'fechas'],
+  ]);
   expect(spy.named('section_viewed').map((e) => e.properties['section'])).toEqual([
     'contrato',
+    'fechas',
     'casero',
+    'gran-tenedor',
+    'vivienda',
     'entrada',
+    'garantias',
+    'pagos',
     'renta',
+    'actualizacion',
     'subidas',
-    'gastos',
     'salida',
+    'gastos',
     'resultado',
     'contrato',
+    'fechas',
     'resultado',
   ]);
   expect(spy.named('detail_opened').map((e) => e.properties['item'])).toEqual(['rent_update']);
@@ -640,7 +659,7 @@ test('the rental review sends sheets, field names and its outcome in codes, neve
   }
   for (const e of spy.events())
     expect(String(e.properties['$current_url'])).toMatch(
-      new RegExp(`^${ORIGIN}/alquiler/(#[a-z]+)?$`),
+      new RegExp(`^${ORIGIN}/alquiler/(#[a-z-]+)?$`),
     );
   expect(spy.external).toEqual([]);
   expect(await context.cookies()).toEqual([]);
@@ -825,7 +844,7 @@ test('the contract review sends sheets, field names and its outcome in codes, ne
   }
   for (const e of spy.events())
     expect(String(e.properties['$current_url'])).toMatch(
-      new RegExp(`^${ORIGIN}/contrato/(#[a-z]+)?$`),
+      new RegExp(`^${ORIGIN}/contrato/(#[a-z-]+)?$`),
     );
   expect(spy.external).toEqual([]);
   expect(await context.cookies()).toEqual([]);

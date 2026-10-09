@@ -1,5 +1,6 @@
 ---
 import Field from './Field.astro';
+import SelectField from './SelectField.astro';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
 import { REGION_CODES } from '../engine/rental/types';
@@ -58,27 +59,22 @@ const cross = 'M6 6l12 12M18 6 6 18';
         {tx('rental.contract.question')}
       </h2>
       <p class="help help--short">{tx('rental.contract.help')}</p>
-      <fieldset class="group" data-field="contractType">
-        <legend>{tx('rental.contract.type')}</legend>
-        <div class="options options--compact">
-          {CONTRACT_TYPES.map((value) => (
-            <div class="option">
-              <input
-                type="radio"
-                name="contractType"
-                id={`contract-type-${value}`}
-                value={value}
-                aria-describedby={`hint-contract-type-${value} error-contractType`}
-              />
-              <label for={`contract-type-${value}`}>{tx(`rental.contract_type.${value}`)}</label>
-              <p class="hint" id={`hint-contract-type-${value}`}>
-                {tx(`rental.contract_type.${value}_hint`)}
-              </p>
-            </div>
-          ))}
-        </div>
-        <p class="errata" id="error-contractType" data-error-for="contractType" hidden></p>
-      </fieldset>
+      <SelectField
+        name="contractType"
+        label={tx('rental.contract.type')}
+        choose={tx('rental.choose')}
+        options={CONTRACT_TYPES.map((value) => ({
+          value,
+          label: tx(`rental.contract_type.${value}`),
+          hint: tx(`rental.contract_type.${value}_hint`),
+        }))}
+      />
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-fechas" data-sheet="fechas" aria-labelledby="question-fechas">
+      <h2 class="question" id="question-fechas" tabindex="-1">
+        {tx('rental.dates.question')}
+      </h2>
       <div class="pair">
         <Field
           name="signedOn"
@@ -120,6 +116,17 @@ const cross = 'M6 6l12 12M18 6 6 18';
         </div>
         <p class="errata" id="error-landlordType" data-error-for="landlordType" hidden></p>
       </fieldset>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-gran-tenedor"
+      data-sheet="gran-tenedor"
+      aria-labelledby="question-gran-tenedor"
+    >
+      <h2 class="question" id="question-gran-tenedor" tabindex="-1">
+        {tx('rental.large.question')}
+      </h2>
       <fieldset class="group" data-field="largeLandlord">
         <legend>{tx('rental.landlord.large')}</legend>
         <p class="hint" id="hint-largeLandlord">
@@ -141,6 +148,17 @@ const cross = 'M6 6l12 12M18 6 6 18';
         </div>
         <p class="errata" id="error-largeLandlord" data-error-for="largeLandlord" hidden></p>
       </fieldset>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-vivienda"
+      data-sheet="vivienda"
+      aria-labelledby="question-vivienda"
+    >
+      <h2 class="question" id="question-vivienda" tabindex="-1">
+        {tx('rental.home.question')}
+      </h2>
       <div class="field" data-field="region">
         <label class="field__label" for="region">
           {tx('rental.landlord.region')}
@@ -208,7 +226,17 @@ const cross = 'M6 6l12 12M18 6 6 18';
           kind="days"
         />
       </div>
+    </fieldset>
 
+    <fieldset
+      class="sheet"
+      id="sheet-garantias"
+      data-sheet="garantias"
+      aria-labelledby="question-garantias"
+    >
+      <h2 class="question" id="question-garantias" tabindex="-1">
+        {tx('rental.guarantees.question')}
+      </h2>
       <fieldset class="group" data-field="hasGuarantees">
         <legend>{tx('rental.entry.guarantees')}</legend>
         <p class="hint" id="hint-hasGuarantees">
@@ -298,7 +326,12 @@ const cross = 'M6 6l12 12M18 6 6 18';
           </li>
         </template>
       </div>
+    </fieldset>
 
+    <fieldset class="sheet" id="sheet-pagos" data-sheet="pagos" aria-labelledby="question-pagos">
+      <h2 class="question" id="question-pagos" tabindex="-1">
+        {tx('rental.fees.question')}
+      </h2>
       <fieldset class="group" data-field="hasFees">
         <legend>{tx('rental.entry.fees')}</legend>
         <p class="hint" id="hint-hasFees">
@@ -435,27 +468,24 @@ const cross = 'M6 6l12 12M18 6 6 18';
           kind="days"
         />
       </div>
-      <fieldset class="group" data-field="updateClause">
-        <legend>{tx('rental.rent.clause')}</legend>
-        <p class="hint" id="hint-updateClause">
-          {tx('rental.rent.clause_help')}
-        </p>
-        <div class="options options--compact">
-          {UPDATE_CLAUSES.map((value) => (
-            <div class="option">
-              <input
-                type="radio"
-                name="updateClause"
-                id={`clause-${value}`}
-                value={value}
-                aria-describedby="hint-updateClause error-updateClause"
-              />
-              <label for={`clause-${value}`}>{tx(`rental.clause.${value}`)}</label>
-            </div>
-          ))}
-        </div>
-        <p class="errata" id="error-updateClause" data-error-for="updateClause" hidden></p>
-      </fieldset>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-actualizacion"
+      data-sheet="actualizacion"
+      aria-labelledby="question-actualizacion"
+    >
+      <h2 class="question" id="question-actualizacion" tabindex="-1">
+        {tx('rental.clause.question')}
+      </h2>
+      <SelectField
+        name="updateClause"
+        label={tx('rental.rent.clause')}
+        hint={tx('rental.rent.clause_help')}
+        choose={tx('rental.choose')}
+        options={UPDATE_CLAUSES.map((value) => ({ value, label: tx(`rental.clause.${value}`) }))}
+      />
       <Field
         name="fixedPercent"
         label={tx('rental.rent.percent')}
@@ -639,6 +669,158 @@ const cross = 'M6 6l12 12M18 6 6 18';
       </div>
     </fieldset>
 
+    <fieldset class="sheet" id="sheet-salida" data-sheet="salida" aria-labelledby="question-salida">
+      <h2 class="question" id="question-salida" tabindex="-1">
+        {tx('rental.moveout.question')}
+      </h2>
+      <fieldset class="group" data-field="movedOut">
+        <legend>{tx('rental.moveout.ask')}</legend>
+        <div class="chips chips--pair">
+          {(['no', 'yes'] as const).map((value) => (
+            <div class="chip">
+              <input
+                type="radio"
+                name="movedOut"
+                id={`moved-out-${value}`}
+                value={value}
+                checked={value === 'no'}
+                aria-describedby="error-movedOut"
+              />
+              <label for={`moved-out-${value}`}>{answer(value)}</label>
+            </div>
+          ))}
+        </div>
+        <p class="errata" id="error-movedOut" data-error-for="movedOut" hidden></p>
+      </fieldset>
+      <div class="moveout" data-if="movedOut:yes" hidden>
+        <Field name="keysReturnedOn" label={tx('rental.moveout.keys')} kind="date" />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-fianza" data-sheet="fianza" aria-labelledby="question-fianza">
+      <h2 class="question" id="question-fianza" tabindex="-1">
+        {tx('rental.deposit.question')}
+      </h2>
+      <div class="moveout" data-if="movedOut:yes" hidden>
+        <div class="rows" data-rows="returns" data-min="0" data-max={ROW_MAX.returns}>
+          <p class="field__label">{tx('rental.moveout.returns')}</p>
+          <p class="hint">{tx('rental.moveout.returns_hint')}</p>
+          <ol class="rows__list" data-rows-list aria-label={tx('rental.moveout.returns')}></ol>
+          <button class="button button--sheet" type="button" data-rows-add>
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+              <path d={plus}></path>
+            </svg>
+            {tx('rental.moveout.returns_add')}
+          </button>
+          <template data-rows-template>
+            <li class="row" data-row>
+              <fieldset class="group row__group">
+                <legend data-row-legend></legend>
+                <div class="row__fields">
+                  <div class="field" data-row-box="on">
+                    <label class="field__label" data-row-label="on">
+                      {tx('rental.moveout.return_on')}
+                    </label>
+                    <input
+                      class="field__input field__input--figure"
+                      type="date"
+                      dir="ltr"
+                      data-row-field="on"
+                    />
+                    <p class="errata" data-row-error="on" hidden></p>
+                  </div>
+                  <div class="field" data-row-box="amount">
+                    <label class="field__label" data-row-label="amount">
+                      {tx('rental.moveout.return_amount')}
+                    </label>
+                    <input
+                      class="field__input field__input--figure"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      spellcheck="false"
+                      dir="ltr"
+                      data-row-field="amount"
+                    />
+                    <p class="errata" data-row-error="amount" hidden></p>
+                  </div>
+                </div>
+                <button class="row__remove" type="button" data-row-remove>
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d={cross}></path>
+                  </svg>
+                  {tx('client.rental.rows.remove')}
+                </button>
+              </fieldset>
+            </li>
+          </template>
+        </div>
+        <div class="rows" data-rows="deductions" data-min="0" data-max={ROW_MAX.deductions}>
+          <p class="field__label">{tx('rental.moveout.deductions')}</p>
+          <ol class="rows__list" data-rows-list aria-label={tx('rental.moveout.deductions')}></ol>
+          <button class="button button--sheet" type="button" data-rows-add>
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+              <path d={plus}></path>
+            </svg>
+            {tx('rental.moveout.deductions_add')}
+          </button>
+          <template data-rows-template>
+            <li class="row" data-row>
+              <fieldset class="group row__group">
+                <legend data-row-legend></legend>
+                <div class="row__fields">
+                  <div class="field" data-row-box="kind">
+                    <label class="field__label" data-row-label="kind">
+                      {tx('rental.moveout.deduction_kind')}
+                    </label>
+                    <select class="field__input field__input--select" data-row-field="kind">
+                      {DEDUCTION_KINDS.map((kind) => (
+                        <option value={kind}>{tx(`rental.deduction.${kind}`)}</option>
+                      ))}
+                    </select>
+                    <p class="errata" data-row-error="kind" hidden></p>
+                  </div>
+                  <div class="field" data-row-box="amount">
+                    <label class="field__label" data-row-label="amount">
+                      {tx('rental.moveout.deduction_amount')}
+                    </label>
+                    <input
+                      class="field__input field__input--figure"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      spellcheck="false"
+                      dir="ltr"
+                      data-row-field="amount"
+                    />
+                    <p class="errata" data-row-error="amount" hidden></p>
+                  </div>
+                </div>
+                <button class="row__remove" type="button" data-row-remove>
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d={cross}></path>
+                  </svg>
+                  {tx('client.rental.rows.remove')}
+                </button>
+              </fieldset>
+            </li>
+          </template>
+        </div>
+      </div>
+    </fieldset>
+
     <fieldset class="sheet" id="sheet-gastos" data-sheet="gastos" aria-labelledby="question-gastos">
       <h2 class="question" id="question-gastos" tabindex="-1">
         {tx('rental.charges.question')}
@@ -776,150 +958,6 @@ const cross = 'M6 6l12 12M18 6 6 18';
             </fieldset>
           </li>
         </template>
-      </div>
-    </fieldset>
-
-    <fieldset class="sheet" id="sheet-salida" data-sheet="salida" aria-labelledby="question-salida">
-      <h2 class="question" id="question-salida" tabindex="-1">
-        {tx('rental.moveout.question')}
-      </h2>
-      <fieldset class="group" data-field="movedOut">
-        <legend>{tx('rental.moveout.ask')}</legend>
-        <div class="chips chips--pair">
-          {(['no', 'yes'] as const).map((value) => (
-            <div class="chip">
-              <input
-                type="radio"
-                name="movedOut"
-                id={`moved-out-${value}`}
-                value={value}
-                checked={value === 'no'}
-                aria-describedby="error-movedOut"
-              />
-              <label for={`moved-out-${value}`}>{answer(value)}</label>
-            </div>
-          ))}
-        </div>
-        <p class="errata" id="error-movedOut" data-error-for="movedOut" hidden></p>
-      </fieldset>
-      <div class="moveout" data-if="movedOut:yes" hidden>
-        <Field name="keysReturnedOn" label={tx('rental.moveout.keys')} kind="date" />
-        <div class="rows" data-rows="returns" data-min="0" data-max={ROW_MAX.returns}>
-          <p class="field__label">{tx('rental.moveout.returns')}</p>
-          <p class="hint">{tx('rental.moveout.returns_hint')}</p>
-          <ol class="rows__list" data-rows-list aria-label={tx('rental.moveout.returns')}></ol>
-          <button class="button button--sheet" type="button" data-rows-add>
-            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
-              <path d={plus}></path>
-            </svg>
-            {tx('rental.moveout.returns_add')}
-          </button>
-          <template data-rows-template>
-            <li class="row" data-row>
-              <fieldset class="group row__group">
-                <legend data-row-legend></legend>
-                <div class="row__fields">
-                  <div class="field" data-row-box="on">
-                    <label class="field__label" data-row-label="on">
-                      {tx('rental.moveout.return_on')}
-                    </label>
-                    <input
-                      class="field__input field__input--figure"
-                      type="date"
-                      dir="ltr"
-                      data-row-field="on"
-                    />
-                    <p class="errata" data-row-error="on" hidden></p>
-                  </div>
-                  <div class="field" data-row-box="amount">
-                    <label class="field__label" data-row-label="amount">
-                      {tx('rental.moveout.return_amount')}
-                    </label>
-                    <input
-                      class="field__input field__input--figure"
-                      type="text"
-                      inputmode="decimal"
-                      autocomplete="off"
-                      spellcheck="false"
-                      dir="ltr"
-                      data-row-field="amount"
-                    />
-                    <p class="errata" data-row-error="amount" hidden></p>
-                  </div>
-                </div>
-                <button class="row__remove" type="button" data-row-remove>
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="18"
-                    height="18"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path d={cross}></path>
-                  </svg>
-                  {tx('client.rental.rows.remove')}
-                </button>
-              </fieldset>
-            </li>
-          </template>
-        </div>
-        <div class="rows" data-rows="deductions" data-min="0" data-max={ROW_MAX.deductions}>
-          <p class="field__label">{tx('rental.moveout.deductions')}</p>
-          <ol class="rows__list" data-rows-list aria-label={tx('rental.moveout.deductions')}></ol>
-          <button class="button button--sheet" type="button" data-rows-add>
-            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
-              <path d={plus}></path>
-            </svg>
-            {tx('rental.moveout.deductions_add')}
-          </button>
-          <template data-rows-template>
-            <li class="row" data-row>
-              <fieldset class="group row__group">
-                <legend data-row-legend></legend>
-                <div class="row__fields">
-                  <div class="field" data-row-box="kind">
-                    <label class="field__label" data-row-label="kind">
-                      {tx('rental.moveout.deduction_kind')}
-                    </label>
-                    <select class="field__input field__input--select" data-row-field="kind">
-                      {DEDUCTION_KINDS.map((kind) => (
-                        <option value={kind}>{tx(`rental.deduction.${kind}`)}</option>
-                      ))}
-                    </select>
-                    <p class="errata" data-row-error="kind" hidden></p>
-                  </div>
-                  <div class="field" data-row-box="amount">
-                    <label class="field__label" data-row-label="amount">
-                      {tx('rental.moveout.deduction_amount')}
-                    </label>
-                    <input
-                      class="field__input field__input--figure"
-                      type="text"
-                      inputmode="decimal"
-                      autocomplete="off"
-                      spellcheck="false"
-                      dir="ltr"
-                      data-row-field="amount"
-                    />
-                    <p class="errata" data-row-error="amount" hidden></p>
-                  </div>
-                </div>
-                <button class="row__remove" type="button" data-row-remove>
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="18"
-                    height="18"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path d={cross}></path>
-                  </svg>
-                  {tx('client.rental.rows.remove')}
-                </button>
-              </fieldset>
-            </li>
-          </template>
-        </div>
       </div>
     </fieldset>
   </div>

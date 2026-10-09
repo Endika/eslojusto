@@ -7,6 +7,7 @@ import DocumentStart from '../components/DocumentStart.astro';
 import RentalGuide from '../components/RentalGuide.astro';
 import { DOCUMENTS } from '../documents/config';
 import { NORMS } from '../engine/rental/data/norms';
+import { TABS } from '../rental/steps';
 import { formatLongDay } from '../content/rent-indices';
 import { rentalFaqEntries } from '../content/rental-faq';
 import { faqNode } from '../content/faq';
@@ -21,16 +22,6 @@ interface Props {
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 
-// Each tab's share of the rail follows how many sheets its section holds (the result counts two).
-// The second column is the section's first step, whose id is its URL fragment.
-const sections = [
-  ['cause', 'contrato', '01', 2],
-  ['dates', 'entrada', '02', 1],
-  ['salary', 'renta', '03', 2],
-  ['holidays', 'gastos', '04', 1],
-  ['settlement', 'salida', '05', 1],
-  ['result', 'resultado', '06', 2],
-] as const;
 // With the documents API the visit opens on the choice between uploading and typing; the tabs and
 // the form wait until it is made.
 const documents = DOCUMENTS !== null;
@@ -60,7 +51,7 @@ const structuredData = [
   <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
     <ol>
       {/* Only a section already reached is a link; one still ahead is plain text until then. */}
-      {sections.map(([id, step, number, weight], i) => (
+      {TABS.map(([id, step, number, weight], i) => (
         <li style={`--weight: ${weight}`} data-tone={id}>
           {i === 0 ? (
             <a class="tab" data-tab={id} data-state="current" href={`#${step}`} aria-current="step">
