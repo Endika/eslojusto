@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { ERTE_LEGAL } from '../../src/content/erte';
 import { ERTE_BUILD } from '../../src/content/sections';
 
 const read = (p: string) => readFileSync(p, 'utf8');
@@ -25,6 +26,9 @@ describe.skipIf(!built || withErte)('a build without the ERTE switch', () => {
     expect(html).not.toContain('paro/erte');
     expect(html).not.toContain('Si estás en un ERTE');
   });
+  it('leaves the legal notice without its section', () => {
+    expect(read('dist/aviso-legal/index.html')).not.toContain(ERTE_LEGAL.title);
+  });
 });
 
 describe.skipIf(!withErte)('a build with the ERTE switch', () => {
@@ -34,5 +38,10 @@ describe.skipIf(!withErte)('a build with the ERTE switch', () => {
     const page = read('dist/paro/erte/index.html');
     expect(page).toContain('¿Qué tipo de ERTE tienes?');
     expect(page).toContain("connect-src 'none'");
+  });
+  it('gives it a beta section in the legal notice, like the other beta reviews', () => {
+    const notice = read('dist/aviso-legal/index.html');
+    expect(notice).toContain('id="al-erte"');
+    expect(notice).toContain(ERTE_LEGAL.title);
   });
 });
