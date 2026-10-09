@@ -1,0 +1,23 @@
+---
+import type { GetStaticPaths } from 'astro';
+import RentalTopic from '../../../views/RentalTopic.astro';
+import DepositSections from '../../../views/rental/DepositSections.astro';
+import DepositReturnSections from '../../../views/rental/DepositReturnSections.astro';
+import ChargesSections from '../../../views/rental/ChargesSections.astro';
+import { RENTAL_BUILD } from '../../../content/sections';
+import { RENTAL_PAGES, RENTAL_PAGE_IDS, type RentalPageId } from '../../../content/rental-pages';
+
+// Without PUBLIC_RENTAL=1 the build has none of these pages.
+export const getStaticPaths = (() =>
+  RENTAL_BUILD
+    ? RENTAL_PAGE_IDS.map((id) => ({ params: { topic: RENTAL_PAGES[id].slug }, props: { id } }))
+    : []) satisfies GetStaticPaths;
+
+const { id } = Astro.props as { id: RentalPageId };
+---
+
+<RentalTopic id={id}>
+  {id === 'deposit' && <DepositSections />}
+  {id === 'deposit_return' && <DepositReturnSections />}
+  {id === 'charges' && <ChargesSections />}
+</RentalTopic>

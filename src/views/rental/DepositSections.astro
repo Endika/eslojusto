@@ -1,0 +1,89 @@
+---
+import { NORMS } from '../../engine/rental/data/norms';
+import { REVIEW, RENTAL_PAGES, depositExample, pageDecree } from '../../content/rental-pages';
+import { formatEuros } from '../../content/rent-indices';
+import { link } from '../../i18n/languages';
+
+const ex = depositExample();
+// Until the Congress votes the decree down, the insurance ban stands as pending.
+const banStands = NORMS.rdl29_2026.status !== 'repealed';
+const href = (path: string) => link('es', path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="fianza-legal">
+  <h2 id="fianza-legal">La fianza: una mensualidad</h2>
+  <p>
+    La fianza es obligatoria y, en un alquiler de vivienda, es de una mensualidad de renta en
+    metálico (art. 36.1 LAU).
+  </p>
+  <p>
+    Cuando acabe el contrato y entregues las llaves, te la deben devolver en un mes:{' '}
+    <a href={href(RENTAL_PAGES.deposit_return.path)}>{RENTAL_PAGES.deposit_return.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.1</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="garantia-adicional">
+  <h2 id="garantia-adicional">Otras garantías: hasta dos mensualidades más</h2>
+  <p>
+    Además de la fianza, el contrato puede pedir otra garantía: más dinero o un aval. En los
+    contratos firmados desde el 6 de marzo de 2019 de hasta cinco años, o hasta siete si el casero
+    es una empresa, esa garantía adicional no puede pasar de dos mensualidades de renta (art. 36.5
+    LAU).
+  </p>
+  <p>La revisión compara con el tope el dinero que pagaste.</p>
+  {banStands && (
+    <p>
+      Un seguro de impago ya no puede exigírtelo el casero, según el decreto: lo explica
+      <a href="#seguro">la sección del seguro</a>, más abajo.
+    </p>
+  )}
+  <p class="folio">
+    Art. <span>36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="adelantado">
+  <h2 id="adelantado">Por adelantado: una mensualidad</h2>
+  <p>Por adelantado, el casero no puede exigir más de una mensualidad de renta (art. 17 LAU).</p>
+  <p class="folio">
+    Art. <span>17</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="seguro">
+  <h2 id="seguro">
+    {banStands ? 'Seguro de impago: el decreto prohíbe exigírtelo' : 'Seguro de impago'}
+  </h2>
+  <p>{pageDecree('deposit', 'rental.page.decree.insurance')}</p>
+  <p class="folio">
+    Art. <span>36.5</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Ejemplo resuelto</h2>
+  <p>
+    Con una renta de {formatEuros(ex.rent)}, un casero pide {formatEuros(ex.asked)} en dinero antes
+    de entrar: la fianza y garantías adicionales.
+  </p>
+  <p class="example">
+    <span class="example__label">Las cuentas</span> La fianza es una mensualidad,{' '}
+    {formatEuros(ex.rent)}, y la garantía adicional puede ser de dos, {formatEuros(2 * ex.rent)}. Lo
+    máximo es {formatEuros(ex.allowed)}. Te piden {formatEuros(ex.asked)}: {formatEuros(ex.over)}{' '}
+    por encima del tope.
+  </p>
+  <p class="folio">
+    Art. <span>36.1 · 36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Comprueba lo que te han pedido</h2>
+  <p>
+    La <a href={href(REVIEW.path)}>revisión del alquiler</a> compara con estos topes la fianza, las
+    garantías y el pago por adelantado de tu contrato, y te dice cuánto pasa de cada tope.
+  </p>
+</section>

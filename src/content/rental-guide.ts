@@ -132,6 +132,7 @@ export function rentalGuide(
         tx('rental.guide.charges.increase'),
         tx('rental.guide.charges.meters'),
         withDecree('rental.guide.charges.taxes', 'rdl29_2026'),
+        tx('rental.guide.charges.taxes_before', { desde: rdl29Since }),
       ],
       rules: ['charges_pact', 'charges_increase', 'charges_meters', 'taxes_ban'],
     }),
@@ -176,7 +177,7 @@ export function rentalGuide(
 
 // «el Real Decreto-ley 29/2026, en vigor desde el 8 de octubre de 2026 y pendiente de que el
 // Congreso lo convalide,»: the decree with how it stands on the day the page was checked.
-function decreeClause(lang: Lang, norms: NormTable, id: Decree, checkedOn: string): string {
+export function decreeClause(lang: Lang, norms: NormTable, id: Decree, checkedOn: string): string {
   const norm = norms[id];
   return t(
     lang,

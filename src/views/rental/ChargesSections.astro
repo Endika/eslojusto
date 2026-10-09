@@ -1,0 +1,77 @@
+---
+import { NORMS } from '../../engine/rental/data/norms';
+import { REVIEW, chargesExample, pageDecree } from '../../content/rental-pages';
+import { formatEuros, formatLongDay } from '../../content/rent-indices';
+import { t } from '../../i18n';
+import { link } from '../../i18n/languages';
+
+const ex = chargesExample();
+const href = (path: string) => link('es', path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="pacto">
+  <h2 id="pacto">Solo con pacto por escrito y su importe anual</h2>
+  <p>
+    El casero solo puede cobrarte los gastos generales del edificio o los servicios sin contador si
+    lo pactasteis por escrito y con su importe anual a la fecha del contrato (art. 20.1 LAU). Los
+    tributos, como el IBI, tienen su regla aparte: mira «El IBI y las tasas» más abajo.
+  </p>
+  <p>
+    Si el contrato no los menciona o no da un importe al año, la revisión lo señala para que lo
+    mires.
+  </p>
+  <p>{pageDecree('charges', 'rental.page.charges.community')}</p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="subida">
+  <h2 id="subida">Cuánto pueden subir: hasta el doble que la renta</h2>
+  <p>
+    En los cinco primeros años de contrato, o siete si el casero es una empresa, esos gastos, salvo
+    los tributos, solo pueden subir una vez al año, por acuerdo, y nunca más del doble de lo que
+    puede subir la renta (art. 20.3 LAU, o art. 20.2 en los contratos anteriores al Real Decreto-ley
+    29/2026). La revisión compara cada gasto de cada año con ese tope.
+  </p>
+  <p class="folio">
+    Art. <span>20.3</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ibi">
+  <h2 id="ibi">El IBI y las tasas</h2>
+  <p>{pageDecree('charges', 'rental.page.decree.taxes')}</p>
+  <p>
+    {t('es', 'rental.guide.charges.taxes_before', {
+      desde: formatLongDay(NORMS.rdl29_2026.inForceSince),
+    })}
+  </p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Ejemplo resuelto</h2>
+  <p>
+    Un contrato fija {formatEuros(ex.agreed)} al año de comunidad. El primer año, el casero cobra{' '}
+    {formatEuros(ex.charged)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Las cuentas</span> Aún no ha podido haber ninguna subida, así que
+    el máximo es lo pactado, {formatEuros(ex.agreed)}. {formatEuros(ex.charged)} −{' '}
+    {formatEuros(ex.agreed)} = {formatEuros(ex.over)} de más.
+  </p>
+  <p class="folio">
+    Art. <span>20</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Comprueba lo que te cobran</h2>
+  <p>
+    La <a href={href(REVIEW.path)}>revisión del alquiler</a> compara cada gasto de cada año con lo
+    pactado y con el tope de subida, y te dice cuánto has pagado de más.
+  </p>
+</section>

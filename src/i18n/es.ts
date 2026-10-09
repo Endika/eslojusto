@@ -2799,13 +2799,15 @@ export const es = {
 
   'rental.guide.charges.title': 'Gastos: comunidad, IBI y basura',
   'rental.guide.charges.pact':
-    'El casero solo puede cobrarte los gastos generales del edificio, los tributos o los servicios sin contador si lo pactasteis por escrito y con su importe anual a la fecha del contrato (art. 20.1 LAU, en su redacción anterior al Real Decreto-ley 29/2026).',
+    'El casero solo puede cobrarte los gastos generales del edificio o los servicios sin contador si lo pactasteis por escrito y con su importe anual a la fecha del contrato (art. 20.1 LAU). Los tributos, como el IBI, tienen su regla aparte, más abajo.',
   'rental.guide.charges.increase':
     'En los cinco primeros años de contrato, o siete si el casero es una empresa, esos gastos, salvo los tributos, solo pueden subir una vez al año, por acuerdo, y nunca más del doble de lo que puede subir la renta (art. 20.2 LAU, que el Real Decreto-ley 29/2026 numera como 20.3).',
   'rental.guide.charges.meters':
     'Lo que se mide con un contador propio de la vivienda, como el agua o la luz, lo pagas tú (art. 20.3 LAU, que el Real Decreto-ley 29/2026 numera como 20.4).',
   'rental.guide.charges.taxes':
     'Además, {decreto} dice que los tributos de la vivienda, como el IBI, no pueden cargarse al inquilino, salvo que sea el inquilino quien tiene que pagarlos. La revisión lo aplica a los contratos firmados desde esa fecha; en los anteriores, lo da como información.',
+  'rental.guide.charges.taxes_before':
+    'En los contratos firmados antes del {desde}, los tributos, como el IBI, solo podían pasarse al inquilino con un pacto por escrito y con su importe anual a la fecha del contrato (art. 20.1 LAU, en su redacción anterior).',
 
   'rental.guide.return.title': 'Devolución de la fianza',
   'rental.guide.return.month':
@@ -2815,7 +2817,7 @@ export const es = {
   'rental.guide.return.deductions':
     'El casero puede descontar desperfectos o deudas. La revisión no valora si un descuento procede: compara lo devuelto con la fianza y los descuentos que anotes, y calcula el interés del retraso.',
   'rental.guide.return.closing':
-    'Además, {decreto} prevé un documento de finalización del contrato que suscriben las dos partes; si no se hace o no recoge desperfectos, se presume, salvo prueba en contrario, que la vivienda se entregó en buen estado.',
+    'Además, {decreto} prevé un documento de finalización del contrato que suscriben las dos partes; si no se hace o no recoge desperfectos, se presume, salvo prueba en contrario, que la vivienda se entregó en buen estado (art. 36.7 LAU).',
 
   'rental.guide.zones.title': 'Zonas tensionadas',
   'rental.guide.zones.declared':
@@ -2844,6 +2846,21 @@ export const es = {
   'rental.guide.regional.lodging':
     'Las comunidades pueden obligar al casero a depositar la fianza en un organismo público (disposición adicional 3.ª LAU). Es una obligación del casero con la administración: no cambia lo que pagas.',
 
+  'rental.guide.pages': 'Guías',
+  'rental.page.decree.rise':
+    '{decreto} dice que, hasta el 31 de diciembre de 2027 y sin un nuevo pacto entre las partes, la renta no puede subir más del 2 % (disposición final 6.ª), y que el IRAV rige en todos los contratos (art. 4.Dos).',
+  'rental.page.decree.zones':
+    '{decreto} dice que, hasta el 31 de diciembre de 2027, si la renta supera el límite máximo de precio que le sea aplicable según el sistema de índices de precios de referencia, no cabe ninguna subida. El decreto no dice en qué casos se aplica ese límite; la ley lo fija para algunos contratos nuevos en zonas tensionadas (art. 17.7 LAU).',
+  'rental.page.decree.fees':
+    '{decreto} dice que, en los contratos firmados desde el {desde}, los gastos de gestión inmobiliaria y de formalización del contrato no pueden cobrarse al inquilino ni directa ni indirectamente, con ningún concepto o nombre (art. 20.2 LAU).',
+  'rental.page.decree.insurance':
+    '{decreto} dice que no se puede exigir al inquilino que contrate un seguro de impago de la renta ni otra cobertura parecida (art. 36.5 LAU).',
+  'rental.page.decree.taxes':
+    '{decreto} dice que los tributos de la vivienda, como el IBI, no pueden cargarse al inquilino, salvo que sea el inquilino quien tiene que pagarlos (art. 20.1 LAU). La revisión lo aplica a los contratos firmados desde esa fecha; en los anteriores, lo da como información.',
+  'rental.page.decree.closing':
+    '{decreto} prevé un documento de finalización del contrato que suscriben las dos partes; si no se hace o no recoge desperfectos, se presume, salvo prueba en contrario, que la vivienda se entregó en buen estado (art. 36.7 LAU).',
+  'rental.page.charges.community':
+    '{decreto} dice que, en los edificios que no están en propiedad horizontal, no se pueden imputar los gastos de comunidad al inquilino (art. 20.1 LAU).',
   'rental.guide.faq': 'Preguntas frecuentes',
   'rental.faq.agency_fees': '¿Me pueden cobrar honorarios de agencia?',
   'rental.faq.agency_fees_answer':
