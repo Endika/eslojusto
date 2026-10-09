@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.38.0](https://github.com/Endika/eslojusto/compare/v1.37.1...v1.38.0) (2026-10-09)
+
+
+### Features
+
+* **breadcrumbs:** show the trail and its JSON-LD on every page below the home ([65dca6f](https://github.com/Endika/eslojusto/commit/65dca6f9a29036f5744a968b817b1446fdef2a2b))
+* **engine:** add electricity and telecom bill input with its scope gate ([d9e702b](https://github.com/Endika/eslojusto/commit/d9e702b3fad7a911bf5232daaa3e11ecb21fc78b))
+* **engine:** check electricity bill arithmetic, tolls and charges, PVPC terms and meter rental ([1e41af3](https://github.com/Endika/eslojusto/commit/1e41af3665c39e2aa38aac5c7f7f255c4fd30169))
+
 ## [1.37.1](https://github.com/Endika/eslojusto/compare/v1.37.0...v1.37.1) (2026-10-09)
 
 
