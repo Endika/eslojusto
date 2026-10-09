@@ -85,14 +85,19 @@ describe('forbidden words', () => {
   });
 
   it.each([
-    ['src/credit/x.ts', ['/\\bes usura\\b/']],
-    ['src/engine/credit/x.ts', ['/\\bes usura\\b/']],
-    ['credit.result.indicator', ['/\\bes usura\\b/']],
+    ['src/credit/x.ts', ['/\\bes usura\\b/', '/\\busura\\b/']],
+    ['src/engine/credit/x.ts', ['/\\bes usura\\b/', '/\\busura\\b/']],
+    ['credit.result.indicator', ['/\\bes usura\\b/', '/\\busura\\b/']],
     ['dist/financiacion/index.html', ['/\\bes usura\\b/']],
     ['src/rental/x.ts', []],
     ['src/employment/x.ts', []],
   ])('«esto es usura» at %s breaks %j', (where, broken) => {
     expect(forbiddenIn(where, 'esto es usura').map(String)).toEqual(broken);
+  });
+
+  it('«usura» is never in the credit copy own voice, only in its official name', () => {
+    expect(forbiddenIn('credit.guide.x', 'ni la usura')).not.toEqual([]);
+    expect(forbiddenIn('dist/financiacion/index.html', 'qué es la usura')).toEqual([]);
   });
 
   it('«recupera» is the credit copy own word to avoid, not its pages shared pass copy', () => {

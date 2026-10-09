@@ -4184,6 +4184,62 @@ export const es = {
   'insurance.documents.consent':
     'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, DNI, direcciones, matrículas o números de cuenta. Se leen en la Unión Europea y no se guardan.',
   'insurance.form_aria': 'Revisión de las fechas de tu seguro',
+  'insurance.app_name': 'Revisión de las fechas de tu seguro',
+  'insurance.guide.title': 'Qué dice la ley de las fechas de tu seguro',
+  'insurance.guide.lead':
+    'Hasta cuándo puedes decir que no renuevas, con cuánta antelación te tienen que avisar de cambios y cuándo puedes desistir, con el artículo del que sale cada fecha. Y qué pasa si aseguras por menos de lo que vale.',
+  'insurance.guide.sources': 'Fuentes',
+  'insurance.guide.source_lcs': 'Ley 50/1980',
+  'insurance.guide.source_law22_2007': 'Ley 22/2007',
+  'insurance.guide.who': 'Quién está detrás',
+  'insurance.guide.rules': 'Normas',
+  'insurance.guide.faq': 'Preguntas frecuentes',
+  'insurance.guide.non_renewal.title': 'Decir que no renuevas',
+  'insurance.guide.non_renewal.p1':
+    'Si tu póliza se renueva sola cada año, puedes oponerte a que se prorrogue. La ley pide comunicarlo por escrito a la aseguradora con al menos un mes de antelación al final del periodo en curso (art. 22.2 de la Ley de Contrato de Seguro, en su redacción vigente desde el 01-01-2016).',
+  'insurance.guide.non_renewal.p2':
+    'No está aclarado si basta con enviar tu escrito ese último día o si tiene que haber llegado, así que la revisión te da el día en que debe haber llegado. Si el mes anterior al vencimiento no tiene ese mismo día, se toma su último día: ninguna norma resuelve ese caso al contar hacia atrás, así que es una interpretación y se da el día más temprano.',
+  'insurance.guide.change_notice.title': 'El aviso de cambios',
+  'insurance.guide.change_notice.p1':
+    'La aseguradora tiene que comunicarte cualquier modificación del contrato con al menos dos meses de antelación al final del periodo en curso (art. 22.3). La revisión te dice con cuántos días de antelación te llegó el aviso y, como dato, cuánto sube o baja la prima.',
+  'insurance.guide.change_notice.p2':
+    'Qué consecuencia tiene un aviso que llega tarde no se dice aquí: no se ha encontrado en una fuente oficial. Y si lo único que cambia es la prima, no se afirma si eso cuenta como modificación del contrato a estos efectos.',
+  'insurance.guide.withdrawal.title': 'Desistir de un seguro contratado a distancia',
+  'insurance.guide.withdrawal.p1':
+    'Si contrataste el seguro por internet o por teléfono sin ver a nadie, tienes 14 días naturales para desistir, desde que lo contrataste o, si recibiste las condiciones del contrato después, desde ese día (art. 10.1 de la Ley 22/2007).',
+  'insurance.guide.withdrawal.p2':
+    'La ley deja fuera los seguros con los que cumples una obligación de asegurarte, como el seguro obligatorio del coche. No está comprobado en una fuente oficial si se puede desistir solo de las coberturas voluntarias del coche, ni si queda fuera un seguro de hogar que te pide tu hipoteca: en esos casos la revisión no da una fecha.',
+  'insurance.guide.proportional.title': 'Asegurar por menos o por más de lo que vale',
+  'insurance.guide.proportional.p1':
+    'Si la suma asegurada es menor que lo que vale lo asegurado, la aseguradora paga el daño en la misma proporción, salvo que la póliza lo excluya (art. 30). Por ejemplo, una vivienda que vale 200.000 € asegurada por 150.000 €: ante un daño de 20.000 €, la aseguradora paga 15.000 €.',
+  'insurance.guide.proportional.p2':
+    'Si la suma asegurada supera mucho lo que vale lo asegurado, cualquiera de las partes puede pedir que se reduzca, junto con la prima; y en un siniestro se paga el daño que hubo (art. 31).',
+  'insurance.guide.policy.title': 'Lo que declaras y lo que dice la póliza',
+  'insurance.guide.policy.p1':
+    'Antes de contratar, la ley te pide declarar lo que te pregunta la aseguradora en su cuestionario y que conozcas; lo que el cuestionario no pregunta no tienes el deber de declararlo (art. 10).',
+  'insurance.guide.policy.p2':
+    'Si la póliza no coincide con lo que pediste o con lo que acordaste, la ley da un mes desde que te la entregan para pedir a la aseguradora que lo corrija; pasado ese mes, vale lo que dice la póliza (art. 8).',
+  'insurance.guide.channels.title': 'Dónde informarte gratis',
+  'insurance.guide.unchecked.title': 'Lo que la revisión no mira',
+  'insurance.faq.non_renewal': '¿Hasta cuándo puedo decir que no renuevo mi seguro?',
+  'insurance.faq.non_renewal_answer':
+    'La ley pide comunicarlo por escrito a la aseguradora con al menos un mes de antelación al final del periodo en curso (art. 22.2 de la Ley de Contrato de Seguro). Como no está aclarado si basta con enviarlo ese día, lo prudente es que tu escrito haya llegado para entonces. La revisión calcula ese último día con el vencimiento de tu póliza.',
+  'insurance.faq.change_notice':
+    '¿Con cuánta antelación me tienen que avisar de un cambio en la póliza?',
+  'insurance.faq.change_notice_answer':
+    'La aseguradora tiene que comunicarte cualquier modificación del contrato con al menos dos meses de antelación al final del periodo en curso (art. 22.3 de la Ley de Contrato de Seguro). Qué consecuencia tiene un aviso que llega tarde no se dice aquí: no se ha encontrado en una fuente oficial.',
+  'insurance.faq.withdrawal': '¿Puedo desistir de un seguro contratado por internet?',
+  'insurance.faq.withdrawal_answer':
+    'Si lo contrataste por internet o por teléfono sin ver a nadie, tienes 14 días naturales desde que lo contrataste o, si recibiste las condiciones del contrato después, desde ese día (art. 10.1 de la Ley 22/2007). No vale para los seguros con los que cumples una obligación de asegurarte, como el seguro obligatorio del coche.',
+  'insurance.faq.proportional_rule': '¿Qué pasa si aseguro mi casa por menos de lo que vale?',
+  'insurance.faq.proportional_rule_answer':
+    'La aseguradora paga el daño en la misma proporción que hay entre la suma asegurada y lo que vale lo asegurado, salvo que la póliza lo excluya (art. 30 de la Ley de Contrato de Seguro). Por ejemplo, una vivienda que vale 200.000 € asegurada por 150.000 €: ante un daño de 20.000 €, la aseguradora paga 15.000 €.',
+  'insurance.faq.questionnaire': '¿Qué tengo que declarar al contratar un seguro?',
+  'insurance.faq.questionnaire_answer':
+    'Lo que te pregunta la aseguradora en su cuestionario y que conozcas; lo que el cuestionario no pregunta no tienes el deber de declararlo (art. 10 de la Ley de Contrato de Seguro).',
+  'insurance.faq.data': '¿Qué pasa con los datos que escribo?',
+  'insurance.faq.data_answer':
+    'Todo se calcula en tu dispositivo: lo que escribes no sale de él ni se guarda. La revisión no pide tu nombre, tu DNI ni tu número de póliza. De tu visita solo se mide, sin cookies, por qué hojas pasas y el resultado en códigos de una lista cerrada, nunca tus fechas, tus primas ni el nombre de la aseguradora.',
   'insurance.tab.poliza': 'Póliza',
   'insurance.tab.contratacion': 'Contratación',
   'insurance.tab.renovacion': 'Renovación',
@@ -4496,6 +4552,90 @@ export const es = {
   'credit.documents.consent':
     'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, DNI o números de cuenta, y, si hay un seguro vinculado, datos de salud. Se leen en la Unión Europea y no se guardan.',
   'credit.form_aria': 'Revisión de tu préstamo o tu tarjeta',
+  'credit.app_name': 'Revisión de la TAE y los plazos de tu crédito',
+  'credit.guide.title': 'Qué dice la ley de tu préstamo o tu tarjeta',
+  'credit.guide.lead':
+    'Qué es la TAE, qué tiene que decir tu contrato, cuánto tiempo tienes para desistir y qué te pueden cobrar si lo devuelves antes, con la norma de la que sale cada cosa. Y qué es el tipo medio del Banco de España con el que se compara tu interés.',
+  'credit.guide.sources': 'Fuentes',
+  'credit.guide.source_lcc': 'Ley 16/2011',
+  'credit.guide.source_bde': 'Banco de España, cuadro 19.4',
+  'credit.guide.who': 'Quién está detrás',
+  'credit.guide.rules': 'Normas y criterios',
+  'credit.guide.faq': 'Preguntas frecuentes',
+  'credit.guide.case_law': 'criterio del Tribunal Supremo',
+  'credit.guide.case_law_unverified':
+    'criterio del Tribunal Supremo, sin comprobar en el texto de la sentencia',
+  'credit.guide.official_data': 'dato oficial',
+  'credit.guide.draft': 'en tramitación: no se aplica',
+  'credit.guide.apr.title': 'Qué es la TAE y qué entra en ella',
+  'credit.guide.apr.p1':
+    'La TAE, la tasa anual equivalente, expresa en un porcentaje anual el coste total del crédito: los intereses, las comisiones y gastos que pagas por él y la prima de un seguro cuando es obligatorio para obtenerlo. La ley fija cómo se calcula, con una fórmula y unos supuestos (art. 32 y anexo I de la Ley 16/2011).',
+  'credit.guide.apr.p2':
+    'La revisión la vuelve a calcular con las cifras de tu contrato y la compara con la que dice tu contrato, las dos redondeadas a un decimal con la regla del anexo I. Si falta algún gasto o seguro en lo que metes, la cifra cambia: por eso una TAE distinta se presenta como algo que revisar.',
+  'credit.guide.apr.p3':
+    'Si tu contrato no dice la TAE, la ley dice que tu obligación se reduce a pagar el interés legal en los plazos convenidos (art. 21.2). Si dice una TAE más baja que la que sale de sus cifras, la ley dice que sus consecuencias se modularán (art. 21.4). En ninguno de los dos casos se calcula aquí un importe.',
+  'credit.guide.contract.title': 'Lo que tiene que decir tu contrato',
+  'credit.guide.contract.p1':
+    'La ley lista lo que tiene que decir un contrato de crédito al consumo, como el tipo de interés, la TAE, el importe total o el derecho a desistir (art. 16.2). Lo que pasa si falta alguna de esas menciones lo dice el art. 21.',
+  'credit.guide.contract.p2':
+    'Si financias una compra, como un coche, el contrato tiene que decir el bien y su precio al contado. Y puedes no financiar la compra y pagarla como acordaste con el vendedor (art. 26.3).',
+  'credit.guide.withdrawal.title': 'Desistir del crédito en 14 días',
+  'credit.guide.withdrawal.p1':
+    'Tienes 14 días naturales para desistir del crédito sin tener que explicar por qué. Se cuentan desde el día en que lo contrataste o, si recibiste el contrato y su información después, desde ese día, sin contar el primero (art. 28 de la Ley 16/2011 y art. 5 del Código Civil).',
+  'credit.guide.withdrawal.p2':
+    'Basta con enviar tu comunicación como tarde el último día, en papel o en otro soporte duradero (art. 28.2). Si desistes, devuelves el capital y los intereses de los días que lo tuviste en 30 días como mucho, y los servicios accesorios ligados al crédito, como un seguro, quedan sin efecto.',
+  'credit.guide.early.title': 'Devolverlo antes: el tope de la compensación',
+  'credit.guide.early.p1':
+    'Puedes devolver el crédito antes, en todo o en parte (art. 30.1). El prestamista puede cobrarte una compensación con un tope: el 1 % de lo que devuelves si quedaba más de un año hasta el final pactado, y el 0,5 % si quedaba un año o menos (art. 30.2). Nunca más que los intereses que quedaban por pagar (art. 30.5).',
+  'credit.guide.early.p2':
+    'No cabe compensación si el reembolso lo paga un seguro destinado a ello, ni en un periodo con interés variable (art. 30.3). El prestamista solo puede cobrar más que el tope si demuestra que el reembolso le hizo perder más (art. 30.4).',
+  'credit.guide.early.p3':
+    'Si tenías un seguro ligado al crédito, el art. 30.6 se ocupa de la parte de la prima que no se ha consumido. Lo que cobre un concesionario por perder un descuento por financiar no es la compensación del prestamista: la revisión no lo compara con el tope y te pide que mires qué dice tu contrato.',
+  'credit.guide.indicator.title': 'El tipo medio del Banco de España',
+  'credit.guide.indicator.p1':
+    'El Banco de España publica cada mes el tipo medio de los créditos al consumo, según su plazo, y el de las tarjetas revolving, cuya serie empieza en junio de 2010 (Boletín Estadístico, cuadro 19.4). Son tipos sin comisiones. La revisión compara tu TAE con el del mes en que lo contrataste y, si ese mes aún no está publicado, lo dice: nunca usa el mes anterior.',
+  'credit.guide.indicator.p2':
+    'La Ley de 23 de julio de 1908 sobre nulidad de los contratos de préstamos usurarios no fija ninguna cifra. Para las tarjetas revolving, el Tribunal Supremo toma como referencia una diferencia de más de 6 puntos porcentuales sobre el tipo medio y, para las anteriores a junio de 2010, el 19,32 % (STS 258/2023, de 15 de febrero, del Pleno). Es un criterio del tribunal, no una norma.',
+  'credit.guide.indicator.p3':
+    'Entre 6 y 6,30 puntos el resultado queda en el borde: el tipo medio no incluye comisiones y la STS 258/2023 estima esa diferencia en 20-30 centésimas. Para los préstamos personales y de coche, el criterio del Tribunal Supremo aún no se ha comprobado en el texto de la sentencia, así que la revisión solo da la diferencia en puntos, sin compararla con ningún umbral.',
+  'credit.guide.indicator.p4':
+    'Es una referencia, no una conclusión: un juez valora además las circunstancias del caso. La revisión no calcula ningún importe por esta diferencia.',
+  'credit.guide.revolving.title': 'Las tarjetas revolving',
+  'credit.guide.revolving.p1':
+    'Con una tarjeta revolving devuelves lo que gastas en cuotas mensuales, fijas o en un porcentaje de la deuda, y lo que devuelves vuelve a estar disponible. Los intereses se cobran sobre lo que debes: con una cuota baja, la deuda puede tardar años en bajar, o no bajar. La revisión te dice cuántos meses tardarías en pagarla sin nuevas compras.',
+  'credit.guide.revolving.p2':
+    'Para calcular su TAE, la ley supone que dispones de todo el límite y lo devuelves en un año, en 12 cuotas (anexo I, parte II). La orden de transparencia bancaria prevé que una tarjeta revolving informe al menos cada trimestre de lo pagado y lo que se debe, y que, si lo pides, te den el desglose y un cuadro de pagos en 5 días hábiles; no se ha comprobado a qué entidades y contratos anteriores llega.',
+  'credit.guide.law_change.title': 'La ley va a cambiar',
+  'credit.guide.law_change.p1':
+    'La Directiva (UE) 2023/2225, de crédito al consumo, se aplicará a partir del 20-11-2026, y la ley que la traspone a España aún está en tramitación: hay un anteproyecto de 7 de enero de 2026. Mientras no se publique, la revisión aplica la Ley 16/2011 a los contratos celebrados desde el 25-09-2011, y nada de lo que prevé el anteproyecto cambia un resultado.',
+  'credit.guide.channels.title': 'Dónde informarte gratis',
+  'credit.guide.channels.p1':
+    'Solo canales oficiales y gratuitos: esta página no enlaza a despachos ni a empresas que gestionan casos.',
+  'credit.guide.unchecked.title': 'Lo que la revisión no mira',
+  'credit.faq.apr': '¿Qué es la TAE?',
+  'credit.faq.apr_answer':
+    'Es el coste total del crédito expresado en un porcentaje anual: incluye los intereses, las comisiones y gastos que pagas por el crédito y la prima de un seguro cuando es obligatorio para obtenerlo. La ley fija cómo se calcula (art. 32 y anexo I de la Ley 16/2011). Esta página la vuelve a calcular con las cifras de tu contrato y la compara con la que dice, las dos redondeadas a un decimal con la regla del anexo I.',
+  'credit.faq.revolving': '¿Qué es una tarjeta revolving?',
+  'credit.faq.revolving_answer':
+    'Una tarjeta en la que devuelves lo que gastas en cuotas mensuales, fijas o en un porcentaje de la deuda, y lo que devuelves vuelve a estar disponible. Los intereses se cobran sobre lo que debes, así que con una cuota baja la deuda puede tardar años en bajar. La revisión calcula su TAE con los supuestos de la ley y cuántos meses tardarías en pagarla sin nuevas compras.',
+  'credit.faq.average_rate': '¿Qué es el tipo medio del Banco de España?',
+  'credit.faq.average_rate_answer':
+    'Es el tipo de interés medio que el Banco de España publica cada mes para los créditos al consumo, según su plazo, y para las tarjetas revolving, sin comisiones (cuadro 19.4 de su Boletín Estadístico). Para las tarjetas revolving, el Tribunal Supremo toma como referencia una diferencia de más de 6 puntos porcentuales sobre ese tipo (STS 258/2023); es un criterio del tribunal, no una norma. Para los préstamos, la revisión da solo la diferencia en puntos. En ningún caso calcula un importe: un juez valora además las circunstancias del caso.',
+  'credit.faq.early_repayment': '¿Cuánto me pueden cobrar por devolver el préstamo antes?',
+  'credit.faq.early_repayment_answer':
+    'Como mucho, el 1 % de lo que devuelves si quedaba más de un año hasta el final pactado, y el 0,5 % si quedaba un año o menos (art. 30.2 de la Ley 16/2011), y nunca más que los intereses que quedaban por pagar (art. 30.5). Nada si lo paga un seguro destinado a ello o en un periodo con interés variable (art. 30.3). El prestamista solo puede cobrar más si demuestra que el reembolso le hizo perder más (art. 30.4).',
+  'credit.faq.withdrawal': '¿Cuántos días tengo para desistir de un crédito?',
+  'credit.faq.withdrawal_answer':
+    '14 días naturales desde que lo contrataste o, si recibiste el contrato y su información después, desde ese día, sin contar el primero (art. 28 de la Ley 16/2011). Basta con enviar tu comunicación como tarde el último día, en papel o en otro soporte duradero. Después devuelves el capital y los intereses de los días que lo tuviste en 30 días como mucho.',
+  'credit.faq.before_2011': '¿Y si mi contrato es anterior a 2011?',
+  'credit.faq.before_2011_answer':
+    'La Ley 16/2011 se aplica a los contratos celebrados desde el 25-09-2011; los anteriores los regían otras reglas, que aquí no se calculan. A una tarjeta revolving anterior sí se le compara la TAE con el tipo medio, porque el criterio del Tribunal Supremo no depende de la fecha del contrato; si es anterior a junio de 2010, con el 19,32 % que tomó el tribunal para esos contratos.',
+  'credit.faq.new_law': '¿Va a cambiar la ley de crédito al consumo?',
+  'credit.faq.new_law_answer':
+    'Sí. La Directiva (UE) 2023/2225 se aplicará a partir del 20-11-2026 y la ley que la traspone a España aún está en tramitación. Mientras no se publique, la revisión aplica la Ley 16/2011.',
+  'credit.faq.data': '¿Qué pasa con los datos que escribo?',
+  'credit.faq.data_answer':
+    'Todo se calcula en tu dispositivo: lo que escribes no sale de él ni se guarda. La revisión no pide tu nombre, tu DNI ni tu número de cuenta. De tu visita solo se mide, sin cookies, por qué hojas pasas y el resultado en códigos de una lista cerrada, nunca tus cifras, tus fechas ni el nombre del prestamista.',
   'credit.tab.producto': 'Contrato',
   'credit.tab.interes': 'Coste',
   'credit.tab.amortizacion': 'Devolución',

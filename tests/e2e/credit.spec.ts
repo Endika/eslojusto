@@ -1,8 +1,10 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
+import { capturePosthog } from '../support/posthog';
 import { fitsScreen, noSideScroll } from '../support/sheets';
 
-// Runs only against a build with /financiacion/ (TEST_CREDIT=1). The norms and the Bank of Spain
-// series are read as loaded on this day, so the clock is fixed.
+// Runs only against a build with /financiacion/ (TEST_CREDIT=1), which also carries a test
+// analytics key. The norms and the Bank of Spain series are read as loaded on this day, so the
+// clock is fixed.
 const TODAY = '2026-10-09';
 
 const SIZES = [
@@ -450,9 +452,104 @@ test('the page shows when it was reviewed and makes no request', async ({ page }
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'La TAE y los plazos de tu préstamo o tu tarjeta',
   );
-  await expect(page.getByText(/^Revisado el /)).toBeVisible();
+  await expect(page.locator('.desk__reviewed')).toContainText('Revisado el');
   await page.goto('');
   await page.getByRole('link', { name: 'Financiación', exact: true }).click();
   await expect(page).toHaveURL(/financiacion\/(#producto)?$/);
   expect(requests).toEqual([]);
+});
+
+test('the page has its title, heading, canonical, JSON-LD, guide and questions', async ({
+  page,
+}) => {
+  await open(page, { width: 1280, height: 800 });
+  await expect(page).toHaveTitle(/Comprueba la TAE de tu préstamo o tu tarjeta/);
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    'content',
+    /tipo medio del Banco de España/,
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://eslojusto.es/financiacion/',
+  );
+  const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
+  const graph = JSON.parse(jsonLd ?? '{}') as {
+    '@graph': { '@type': string; mainEntity?: { name: string }[] }[];
+  };
+  expect(graph['@graph'].map((n) => n['@type'])).toEqual([
+    'WebApplication',
+    'BreadcrumbList',
+    'FAQPage',
+  ]);
+  const questions = graph['@graph'][2]?.mainEntity?.map((q) => q.name) ?? [];
+  expect(questions).toContain('¿Qué es la TAE?');
+  await expect(page.locator('.faq-item summary')).toHaveText(questions);
+
+  const guide = page.locator('.guide');
+  await expect(
+    guide.getByRole('heading', { name: 'El tipo medio del Banco de España' }),
+  ).toBeVisible();
+  await expect(guide).toContainText(
+    'STS 258/2023, de 15 de febrero (Pleno) · criterio del Tribunal Supremo',
+  );
+  await expect(guide).toContainText(
+    'STS 366/2026, de 9 de marzo · criterio del Tribunal Supremo, sin comprobar en el texto de la sentencia',
+  );
+  await expect(guide).toContainText('en tramitación: no se aplica');
+  await expect(guide).toContainText('El Servicio de Reclamaciones del Banco de España.');
+  await guide.getByText('¿Cuánto me pueden cobrar por devolver el préstamo antes?').click();
+  await expect(page.locator('#faq-credito-amortizar')).toContainText('art. 30.2');
+  await expect(page.getByText('informa sobre tus derechos y no da asesoramiento')).toBeVisible();
+});
+
+test('the guide and its open questions fit a 360 px screen', async ({ page }) => {
+  await open(page, { width: 360, height: 640 });
+  const questions = page.locator('.faq-item');
+  await expect(questions.first()).toBeVisible();
+  for (const q of await questions.all()) {
+    await q.locator('summary').click();
+    await expect(q).toHaveAttribute('open', '');
+  }
+  await noSideScroll(page);
+});
+
+test('analytics carry codes and buckets, never a typed value', async ({ page }) => {
+  const { bodies, named } = await capturePosthog(page);
+  await open(page, { width: 1280, height: 800 });
+  // A rejected answer first: its field is named, never what was typed.
+  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await fill(page, COURT_LOAN);
+  await reviewed(page);
+  await page.getByText('¿Qué es el tipo medio del Banco de España?').click();
+
+  await expect.poll(() => named('credit_review_completed').length, { timeout: 15_000 }).toBe(1);
+  await expect.poll(() => named('help_opened').length, { timeout: 15_000 }).toBe(1);
+  expect(named('validation_error').map((e) => e.properties['field'])).toEqual(['product']);
+  expect(named('section_viewed').map((e) => e.properties['section'])).toContain('cuota-final');
+  expect(named('credit_review_completed')[0]?.properties).toMatchObject({
+    product: 'personal_loan',
+    period: '2016-2020',
+    apr: 'contract_lower',
+    withdrawal: 'ended',
+    indicator: 'distance_only',
+    compared_apr: 'recalculated',
+  });
+  expect(named('help_opened')[0]?.properties['topic']).toBe('faq-credito-tipo-medio');
+
+  // Nothing typed leaves in any request: not an amount, a rate nor a date.
+  const everything = bodies.join('\n');
+  for (const typed of [
+    '10.500,00',
+    '273,35',
+    '273.35',
+    '761,25',
+    '761.25',
+    '13.120,80',
+    '16,61',
+    '16.61',
+    '2019-02-15',
+    '15-02-2019',
+    '2019-03-15',
+  ])
+    expect(everything, typed).not.toContain(typed);
 });

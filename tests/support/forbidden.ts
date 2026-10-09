@@ -29,7 +29,7 @@ export const EMPLOYMENT_FORBIDDEN = [
 ];
 
 // The credit review places a rate against a reference and never calls it usury nor promises money
-// back. «Usura» alone stays allowed: it is what people search for and the name of the 1908 law.
+// back. On its pages, «usura» alone stays allowed: it is what people search for.
 const CREDIT_FORBIDDEN = [
   /\bes usura\b/,
   /\bhay usura\b/,
@@ -42,9 +42,9 @@ const CREDIT_FORBIDDEN = [
   /\breclam(as|an|e[ns]?|ar[aá][ns]?|ando|ad[oa]s?)\b/,
   /\bdemand(ar(l[aeo]s?)?|as|an|e[ns]?|ar[aá][ns]?|ando)\b/,
 ];
-// Its own copy never says «recupera»; its pages may, in the shared pass copy («recupera aquí tu
-// pase»).
-const CREDIT_OWN_FORBIDDEN = [...CREDIT_FORBIDDEN, /\brecupera(r)?\b/];
+// Its own copy never says «recupera» nor «usura» in its own voice; the 1908 law is named only as an
+// official name. Its pages may say «recupera» in the shared pass copy («recupera aquí tu pase»).
+const CREDIT_OWN_FORBIDDEN = [...CREDIT_FORBIDDEN, /\brecupera(r)?\b/, /\busura\b/];
 
 // The mortgage review separates what the law says from what depends on a judge and never sounds
 // like a firm chasing cases: no money back promised, no ceiling of euros, no count of people

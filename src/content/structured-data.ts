@@ -82,6 +82,32 @@ export const householdApp = (home: URL, page: URL, lang: Lang) => ({
   publisher: organization(home),
 });
 
+export const creditApp = (home: URL, page: URL, lang: Lang) => ({
+  '@type': 'WebApplication',
+  name: t(lang, 'credit.app_name'),
+  url: page.href,
+  description: t(lang, 'credit.description'),
+  applicationCategory: 'FinanceApplication',
+  operatingSystem: 'Any',
+  browserRequirements: 'Requires JavaScript',
+  isAccessibleForFree: true,
+  inLanguage: lang,
+  publisher: organization(home),
+});
+
+export const insuranceApp = (home: URL, page: URL, lang: Lang) => ({
+  '@type': 'WebApplication',
+  name: t(lang, 'insurance.app_name'),
+  url: page.href,
+  description: t(lang, 'insurance.description'),
+  applicationCategory: 'FinanceApplication',
+  operatingSystem: 'Any',
+  browserRequirements: 'Requires JavaScript',
+  isAccessibleForFree: true,
+  inLanguage: lang,
+  publisher: organization(home),
+});
+
 export interface Crumb {
   readonly name: string;
   // From the site root, with its trailing slash.
