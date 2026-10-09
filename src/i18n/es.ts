@@ -4164,6 +4164,70 @@ export const es = {
     'No valora si la causa de un desistimiento es cierta, ni lo que hayas pactado con la familia, ni las cotizaciones, ni lo que cobras en neto. No pide nombre, DNI, domicilio, nacionalidad, situación administrativa, salud ni embarazo. Informa sobre la ley y no es asesoramiento jurídico.',
   'legal_notice.household.beta':
     'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves un punto que no cuadra con la ley, puedes escribir a',
+  'privacy.insurance.summary':
+    'La revisión de las fechas de tu seguro funciona igual: lo que escribes se calcula en tu navegador y no se guarda. Sus preguntas no piden nombre, DNI, número de póliza ni el nombre de tu aseguradora.',
+  'privacy.insurance.data_review': 'Lo que escribes en la revisión de tu seguro',
+  'privacy.insurance.data_review_where':
+    'Solo en tu navegador, mientras la página está abierta. Las fechas de tu póliza y del aviso de renovación y sus primas se calculan en tu dispositivo y no se envían a ningún servidor ni se guardan. Al cerrar o recargar la página, desaparecen.',
+  'privacy.insurance.tracked_sheets': 'En la revisión de tu seguro',
+  'privacy.insurance.tracked_sheets_what':
+    'Lo mismo que en el finiquito con cada una de sus hojas, de la póliza al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «día en que vence», nunca lo que escribiste. Qué pregunta frecuente abres.',
+  'privacy.insurance.tracked_scope': 'Si tu póliza queda fuera de la revisión de tu seguro',
+  'privacy.insurance.tracked_scope_what':
+    'El motivo, de una lista cerrada: un seguro de vida, de salud, de decesos u otro que no es de hogar ni de coche, o una póliza que venció antes del 01-01-2016.',
+  'privacy.insurance.tracked_review': 'Al revisar tu seguro',
+  'privacy.insurance.tracked_review_what':
+    'Si es de hogar o de coche y si lo contrataste a distancia (sí, no o no lo sabes). Del plazo para decir que no renuevas, del aviso de cambios, de la prima y del desistimiento, su resultado en un código: por ejemplo, plazo abierto o terminado, aviso a tiempo o tarde, prima que sube, sigue igual o baja. Cuántas veces revisas y cuánto tardas, en tramos. Nunca una fecha, una prima ni el nombre de la aseguradora.',
+  'privacy.insurance.data_documents': 'Los documentos del seguro que subes',
+  'privacy.insurance.data_documents_where':
+    'Solo si eliges subirlos y das tu consentimiento: las condiciones particulares de tu póliza o su recibo y el aviso de renovación o de cambios. Siguen el mismo camino que los demás documentos, por el mismo servidor en España y el mismo modelo en la Unión Europea, y tampoco se guardan. Una póliza lleva datos tuyos y de otras personas: nombres, DNI, la dirección asegurada, la matrícula, cuentas bancarias y a veces datos de salud o de siniestros. El modelo tiene orden de no copiar nombres de personas, DNI, NIE, direcciones, teléfonos, correos, cuentas, números de póliza, matrículas ni firmas, ni nada sobre salud o siniestros; sí copia el nombre de la aseguradora.',
+  'privacy.insurance.data_letters': 'Los datos de la carta del seguro',
+  'privacy.insurance.data_letters_where':
+    'Lo que añades a la carta para decir que no renuevas (tu nombre, tu DNI o NIE, la aseguradora, el número de póliza y la localidad) solo rellena la carta en tu navegador. La carta no sale de tu dispositivo ni se guarda.',
+  'privacy.insurance.consent':
+    'En el seguro, la póliza y el aviso pueden llevar datos tuyos y de terceros, como quien conduce o vive en la casa, y a veces datos de salud. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. El modelo tiene orden de no copiar esos datos; nada se guarda.',
+  'privacy.insurance.tracked_documents': 'Al leer documentos del seguro',
+  'privacy.insurance.tracked_documents_what':
+    'Los mismos avisos que con los demás documentos, con los tipos del seguro (póliza o aviso de renovación). Al descargar, si es el informe o la carta para decir que no renuevas y, de la carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en la carta.',
+  'legal_notice.insurance': 'La revisión de las fechas de tu seguro',
+  'legal_notice.insurance.does':
+    'Calcula, para una póliza de hogar o de coche, el último día para comunicar que no la renuevas y si el aviso de cambios llegó con la antelación que pide la Ley de Contrato de Seguro, y, si la contrataste a distancia, el plazo para desistir de la Ley 22/2007. Cada fecha lleva el artículo del que sale.',
+  'legal_notice.insurance.does_not':
+    'No valora si el precio de tu seguro es caro o barato, ni las coberturas, ni si la suma asegurada se ajusta a lo que vale lo asegurado, ni cómo se valora un siniestro. No pide nombre, DNI ni número de póliza. Informa sobre la ley y no es asesoramiento jurídico.',
+  'legal_notice.insurance.beta':
+    'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves una fecha que no cuadra con la ley, puedes escribir a',
+  'privacy.credit.summary':
+    'La revisión de la TAE y los plazos de tu crédito funciona igual: lo que escribes se calcula en tu navegador y no se guarda. Sus preguntas no piden nombre, DNI, número de cuenta ni el nombre del prestamista.',
+  'privacy.credit.data_review': 'Lo que escribes en la revisión de tu crédito',
+  'privacy.credit.data_review_where':
+    'Solo en tu navegador, mientras la página está abierta. Los importes, los tipos de interés, las cuotas, los gastos y las fechas de tu crédito se calculan en tu dispositivo y no se envían a ningún servidor ni se guardan. Al cerrar o recargar la página, desaparecen.',
+  'privacy.credit.tracked_sheets': 'En la revisión de tu crédito',
+  'privacy.credit.tracked_sheets_what':
+    'Lo mismo que en el finiquito con cada una de sus hojas, del tipo de crédito al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «cuándo lo contrataste», nunca lo que escribiste. Qué pregunta frecuente abres.',
+  'privacy.credit.tracked_scope': 'Si tu crédito queda fuera de la revisión',
+  'privacy.credit.tracked_scope_what':
+    'El motivo, de una lista cerrada: una hipoteca, un renting sin compra, un crédito para un negocio, menos de 200 € o un contrato anterior al 25-09-2011.',
+  'privacy.credit.tracked_review': 'Al revisar tu crédito',
+  'privacy.credit.tracked_review_what':
+    'El tipo de crédito (préstamo personal, de coche o tarjeta revolving) y el tramo de años en que lo contrataste (antes de 2011, de 2011 a 2015, de 2016 a 2020 o desde 2021). De cada partida (la TAE, la compensación por devolverlo antes, el descuento del concesionario y el desistimiento), su resultado en un código; de la comparación con el tipo medio, su franja y si se comparó la TAE que sale de las cifras o la del contrato. Cuántas veces revisas y cuánto tardas, en tramos. Nunca un importe, un tipo de interés, una fecha ni el nombre del prestamista.',
+  'privacy.credit.data_documents': 'Los documentos del crédito que subes',
+  'privacy.credit.data_documents_where':
+    'Solo si eliges subirlos y das tu consentimiento: el contrato, la información previa, el cuadro de amortización, la liquidación de una amortización anticipada o los extractos de la tarjeta. Siguen el mismo camino que los demás documentos, por el mismo servidor en España y el mismo modelo en la Unión Europea, y tampoco se guardan. Un contrato de crédito lleva tu nombre, tu DNI, tu dirección y cuentas o tarjetas, y si hay un seguro vinculado, a veces datos de salud. El modelo tiene orden de no copiar nombres de personas, DNI, NIE, direcciones, teléfonos, correos, cuentas, números de tarjeta ni firmas, ni nada sobre salud; sí copia el nombre del prestamista.',
+  'privacy.credit.data_letters': 'Los datos de las cartas del crédito',
+  'privacy.credit.data_letters_where':
+    'Lo que añades a las cartas (tu nombre, tu DNI o NIE, el prestamista, el número de contrato y la localidad) solo rellena la carta en tu navegador. Las cartas no salen de tu dispositivo ni se guardan.',
+  'privacy.credit.consent':
+    'En el crédito, el contrato y los demás papeles llevan tus datos personales y, si hay un seguro vinculado, pueden llevar datos de salud de su cuestionario. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. El modelo tiene orden de no copiar esos datos; nada se guarda.',
+  'privacy.credit.tracked_documents': 'Al leer documentos del crédito',
+  'privacy.credit.tracked_documents_what':
+    'Los mismos avisos que con los demás documentos, con los tipos del crédito (contrato, información previa, cuadro de amortización, liquidación de una amortización o extracto de la tarjeta). Al descargar, si es el informe, la carta para pedir la información del crédito o la de la compensación por devolverlo antes y, de una carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en las cartas.',
+  'legal_notice.credit': 'La revisión de la TAE y los plazos de tu crédito',
+  'legal_notice.credit.does':
+    'Vuelve a calcular la TAE de un préstamo personal, una financiación de coche o una tarjeta revolving con las cifras de su contrato, como fija la Ley 16/2011; compara esa TAE con el tipo medio que publica el Banco de España para el mes del contrato; comprueba si lo cobrado por devolverlo antes pasa del tope del art. 30 y calcula el plazo para desistir. Cada resultado lleva la norma, el criterio o el dato oficial del que sale.',
+  'legal_notice.credit.does_not':
+    'No valora la transparencia de las cláusulas ni califica tu tipo de interés: la comparación con el tipo medio es una referencia, con su fuente, y un juez valora además las circunstancias del caso. No calcula ningún importe por esa comparación ni enlaza a despachos. No pide nombre, DNI ni número de cuenta. Informa sobre la ley y no es asesoramiento jurídico.',
+  'legal_notice.credit.beta':
+    'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves una cifra que no cuadra con la ley, puedes escribir a',
   'insurance.title': 'Fechas de tu seguro: renovación y desistimiento',
   'insurance.description':
     'Con las fechas de tu seguro de hogar o de coche: último día para decir que no lo renuevas, si el aviso de cambios llegó a tiempo y plazo para desistir.',

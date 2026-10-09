@@ -6,9 +6,13 @@ import { t, type Key } from '../../i18n';
 import { DOCUMENTS } from '../../documents/config';
 import { PASS_DAYS, PASS_READS } from '../../documents/contract';
 import {
+  CREDIT_BETA,
+  CREDIT_BUILD,
   EMPLOYMENT_BUILD,
   ERTE_BUILD,
   HOUSEHOLD_BUILD,
+  INSURANCE_BETA,
+  INSURANCE_BUILD,
   RENTAL_BUILD,
 } from '../../content/sections';
 import { ERTE_LEGAL, ERTE_PAGE } from '../../content/erte';
@@ -35,6 +39,10 @@ const employment = EMPLOYMENT_BUILD;
 const household = HOUSEHOLD_BUILD;
 // The ERTE page exists only in a PUBLIC_ERTE=1 build; so do the paragraphs about it.
 const erte = ERTE_BUILD;
+// The credit and insurance reviews exist only in a PUBLIC_CREDIT=1 or PUBLIC_INSURANCE=1 build; so
+// do the paragraphs about each.
+const credit = CREDIT_BUILD;
+const insurance = INSURANCE_BUILD;
 ---
 
 <Base
@@ -161,6 +169,38 @@ const erte = ERTE_BUILD;
           <p>
             {tx('legal_notice.household.beta')} <a href={`mailto:${email}`}>{email}</a>.
           </p>
+        </section>
+      )}
+
+      {credit && (
+        <section class="sheet sheet--text">
+          <h2 id="al-financiacion">
+            {tx('legal_notice.credit')}
+            {CREDIT_BETA && <span class="beta">{tx('credit.beta')}</span>}
+          </h2>
+          <p>{tx('legal_notice.credit.does')}</p>
+          <p>{tx('legal_notice.credit.does_not')}</p>
+          {CREDIT_BETA && (
+            <p>
+              {tx('legal_notice.credit.beta')} <a href={`mailto:${email}`}>{email}</a>.
+            </p>
+          )}
+        </section>
+      )}
+
+      {insurance && (
+        <section class="sheet sheet--text">
+          <h2 id="al-seguros">
+            {tx('legal_notice.insurance')}
+            {INSURANCE_BETA && <span class="beta">{tx('insurance.beta')}</span>}
+          </h2>
+          <p>{tx('legal_notice.insurance.does')}</p>
+          <p>{tx('legal_notice.insurance.does_not')}</p>
+          {INSURANCE_BETA && (
+            <p>
+              {tx('legal_notice.insurance.beta')} <a href={`mailto:${email}`}>{email}</a>.
+            </p>
+          )}
         </section>
       )}
 

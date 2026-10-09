@@ -39,6 +39,10 @@ describe.skipIf(!built || withCredit)('a build without the credit switch', () =>
     expect(html).not.toContain('financiacion/');
     expect(html).not.toContain('client.credit.');
   });
+  it('says nothing of it in the privacy and legal notices', () => {
+    expect(read('dist/privacidad/index.html')).not.toContain('revisión de tu crédito');
+    expect(read('dist/aviso-legal/index.html')).not.toContain('al-financiacion');
+  });
 });
 
 describe.skipIf(!withCredit)('a build with the credit switch', () => {
@@ -56,6 +60,18 @@ describe.skipIf(!withCredit)('a build with the credit switch', () => {
         ? /connect-src 'self'( https:\/\/[\w.-]+)* https:\/\/challenges\.cloudflare\.com;/
         : /connect-src 'self';/,
     );
+  });
+  it('carries its guide, its questions and their FAQPage JSON-LD', () => {
+    const page = read('dist/financiacion/index.html');
+    expect(page).toContain('Qué dice la ley de tu préstamo o tu tarjeta');
+    expect(page).toContain('id="faq-credito-tipo-medio"');
+    expect(page).toContain('"@type":"FAQPage"');
+  });
+  it('describes the review in the privacy and legal notices', () => {
+    expect(read('dist/privacidad/index.html')).toContain(
+      'Lo que escribes en la revisión de tu crédito',
+    );
+    expect(read('dist/aviso-legal/index.html')).toContain('id="al-financiacion"');
   });
   it('ships its strings only on its own page', () => {
     expect(read('dist/financiacion/index.html')).toContain('client.credit.status.matches');

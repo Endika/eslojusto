@@ -6,7 +6,13 @@ import { t, type Key } from '../../i18n';
 import { DOCUMENTS } from '../../documents/config';
 import { OUTAGE_KEY } from '../../documents/outage';
 import { STORAGE_KEYS } from '../../documents/pass';
-import { EMPLOYMENT_BUILD, HOUSEHOLD_BUILD, RENTAL_BUILD } from '../../content/sections';
+import {
+  CREDIT_BUILD,
+  EMPLOYMENT_BUILD,
+  HOUSEHOLD_BUILD,
+  INSURANCE_BUILD,
+  RENTAL_BUILD,
+} from '../../content/sections';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
 const tx = (key: Key) => t('es', key);
@@ -22,6 +28,10 @@ const rental = RENTAL_BUILD;
 const employment = EMPLOYMENT_BUILD;
 // The household review exists only in a PUBLIC_HOUSEHOLD=1 build; so do the paragraphs about it.
 const household = HOUSEHOLD_BUILD;
+// The credit and insurance reviews exist only in a PUBLIC_CREDIT=1 or PUBLIC_INSURANCE=1 build; so
+// do the paragraphs about each.
+const credit = CREDIT_BUILD;
+const insurance = INSURANCE_BUILD;
 
 // One entry per thing that is stored or processed; a new tool adds a row here.
 const stored = [
@@ -46,6 +56,17 @@ const stored = [
         {
           what: tx('privacy.household.data_review'),
           where: tx('privacy.household.data_review_where'),
+        },
+      ]
+    : []),
+  ...(credit
+    ? [{ what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') }]
+    : []),
+  ...(insurance
+    ? [
+        {
+          what: tx('privacy.insurance.data_review'),
+          where: tx('privacy.insurance.data_review_where'),
         },
       ]
     : []),
@@ -82,6 +103,30 @@ const stored = [
               {
                 what: tx('privacy.employment.data_letters'),
                 where: tx('privacy.employment.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(credit
+          ? [
+              {
+                what: tx('privacy.credit.data_documents'),
+                where: tx('privacy.credit.data_documents_where'),
+              },
+              {
+                what: tx('privacy.credit.data_letters'),
+                where: tx('privacy.credit.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(insurance
+          ? [
+              {
+                what: tx('privacy.insurance.data_documents'),
+                where: tx('privacy.insurance.data_documents_where'),
+              },
+              {
+                what: tx('privacy.insurance.data_letters'),
+                where: tx('privacy.insurance.data_letters_where'),
               },
             ]
           : []),
@@ -195,6 +240,38 @@ const tracked = [
         },
       ]
     : []),
+  ...(credit
+    ? [
+        {
+          when: tx('privacy.credit.tracked_sheets'),
+          what: tx('privacy.credit.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_scope'),
+          what: tx('privacy.credit.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_review'),
+          what: tx('privacy.credit.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(insurance
+    ? [
+        {
+          when: tx('privacy.insurance.tracked_sheets'),
+          what: tx('privacy.insurance.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_scope'),
+          what: tx('privacy.insurance.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_review'),
+          what: tx('privacy.insurance.tracked_review_what'),
+        },
+      ]
+    : []),
   ...(documents
     ? [
         {
@@ -222,6 +299,22 @@ const tracked = [
               {
                 when: tx('privacy.employment.tracked_documents'),
                 what: tx('privacy.employment.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(credit
+          ? [
+              {
+                when: tx('privacy.credit.tracked_documents'),
+                what: tx('privacy.credit.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(insurance
+          ? [
+              {
+                when: tx('privacy.insurance.tracked_documents'),
+                what: tx('privacy.insurance.tracked_documents_what'),
               },
             ]
           : []),
@@ -261,6 +354,8 @@ const tracked = [
         {rental && <p>{tx('privacy.rental.summary')}</p>}
         {employment && <p>{tx('privacy.employment.summary')}</p>}
         {household && <p>{tx('privacy.household.summary')}</p>}
+        {credit && <p>{tx('privacy.credit.summary')}</p>}
+        {insurance && <p>{tx('privacy.insurance.summary')}</p>}
         {documents && (
           <p>
             Si decides subir un documento para rellenar los datos, se lee con IA en la Unión Europea
@@ -349,6 +444,8 @@ const tracked = [
           </p>
           {rental && <p>{tx('privacy.rental.consent')}</p>}
           {employment && <p>{tx('privacy.employment.consent')}</p>}
+          {credit && <p>{tx('privacy.credit.consent')}</p>}
+          {insurance && <p>{tx('privacy.insurance.consent')}</p>}
           <p>
             Los documentos los procesa Amazon Web Services EMEA SARL (Luxemburgo), encargada del
             tratamiento: el servidor (AWS Lambda) está en España y el modelo de IA se usa a través

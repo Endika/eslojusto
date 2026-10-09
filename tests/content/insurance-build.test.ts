@@ -36,6 +36,10 @@ describe.skipIf(!built || withInsurance)('a build without the insurance switch',
     expect(html).toContain('Financiación y seguros');
     expect(html).not.toContain('client.insurance.');
   });
+  it('says nothing of it in the privacy and legal notices', () => {
+    expect(read('dist/privacidad/index.html')).not.toContain('revisión de tu seguro');
+    expect(read('dist/aviso-legal/index.html')).not.toContain('al-seguros');
+  });
 });
 
 describe.skipIf(!withInsurance)('a build with the insurance switch', () => {
@@ -53,6 +57,18 @@ describe.skipIf(!withInsurance)('a build with the insurance switch', () => {
         ? /connect-src 'self'( https:\/\/[\w.-]+)* https:\/\/challenges\.cloudflare\.com;/
         : /connect-src 'self';/,
     );
+  });
+  it('carries its guide, its questions and their FAQPage JSON-LD', () => {
+    const page = read('dist/seguros/index.html');
+    expect(page).toContain('Qué dice la ley de las fechas de tu seguro');
+    expect(page).toContain('id="faq-seguro-no-renovar"');
+    expect(page).toContain('"@type":"FAQPage"');
+  });
+  it('describes the review in the privacy and legal notices', () => {
+    expect(read('dist/privacidad/index.html')).toContain(
+      'Lo que escribes en la revisión de tu seguro',
+    );
+    expect(read('dist/aviso-legal/index.html')).toContain('id="al-seguros"');
   });
   it('ships its strings only on its own page', () => {
     expect(read('dist/seguros/index.html')).toContain('client.insurance.status.open');
