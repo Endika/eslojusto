@@ -48,7 +48,7 @@ test('the final pay page declares a free application, with no ratings or prices'
 }) => {
   await page.goto('finiquito/');
   const graph = (await data(page))['@graph'];
-  expect(graph.map((n) => n['@type'])).toEqual(['WebApplication', 'FAQPage']);
+  expect(graph.map((n) => n['@type'])).toEqual(['WebApplication', 'BreadcrumbList', 'FAQPage']);
   expect(graph[0]).toMatchObject({ isAccessibleForFree: true });
   const text = JSON.stringify(graph);
   for (const field of ['aggregateRating', 'review', 'offers', 'price'])

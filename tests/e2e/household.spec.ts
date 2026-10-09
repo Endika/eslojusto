@@ -528,7 +528,11 @@ test('the page has its title, heading, canonical, JSON-LD, review date and guide
   await expect(page.locator('.desk__reviewed')).toContainText('Revisado el');
   const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
   const graph = JSON.parse(jsonLd ?? '{}') as { '@graph': { '@type': string }[] };
-  expect(graph['@graph'].map((n) => n['@type'])).toEqual(['WebApplication', 'FAQPage']);
+  expect(graph['@graph'].map((n) => n['@type'])).toEqual([
+    'WebApplication',
+    'BreadcrumbList',
+    'FAQPage',
+  ]);
   await expect(page.getByRole('heading', { name: 'El desistimiento de la familia' })).toBeVisible();
   await page.getByText('¿Cuál es el sueldo mínimo en el servicio del hogar?').click();
   await expect(page.locator('#faq-hogar-smi')).toContainText('9,55 €');
