@@ -1,5 +1,5 @@
-import { gunzipSync } from 'node:zlib';
-import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
+import { capturePosthog } from '../support/posthog';
 import { fitsScreen, noSideScroll } from '../support/sheets';
 
 // Runs only against a build with /empleada-de-hogar/ (TEST_HOUSEHOLD=1), which also carries a test
@@ -540,55 +540,8 @@ test('the form asks for no name, identifier, address, nationality, status, healt
 
 // ---------- Analytics ----------
 
-const POSTHOG = 'https://eu.i.posthog.com';
-
-interface Captured {
-  event: string;
-  properties: Record<string, unknown>;
-}
-
-function decode(r: Request): string {
-  const body = r.postDataBuffer();
-  if (!body) return '';
-  const compression = new URL(r.url()).searchParams.get('compression');
-  if (compression === 'gzip-js' || (body[0] === 0x1f && body[1] === 0x8b))
-    return gunzipSync(body).toString('utf8');
-  const raw = body.toString('utf8');
-  if (compression === 'base64' || raw.startsWith('data=')) {
-    const data = new URLSearchParams(raw).get('data') ?? '';
-    return Buffer.from(data, 'base64').toString('utf8');
-  }
-  return raw;
-}
-
-function eventsIn(body: string): Captured[] {
-  if (!body) return [];
-  const json: unknown = JSON.parse(body);
-  const list = Array.isArray(json)
-    ? json
-    : json && typeof json === 'object' && 'batch' in json && Array.isArray(json.batch)
-      ? json.batch
-      : [json];
-  return list as Captured[];
-}
-
 test('analytics carry codes and buckets, never a typed value', async ({ page }) => {
-  await page.addInitScript(() => {
-    // PostHog drops events from automated browsers; the page must look like a person's.
-    Object.defineProperty(navigator, 'webdriver', { get: () => false });
-    Object.defineProperty(navigator, 'userAgentData', { get: () => undefined });
-    // Playwright cannot route a beacon, which PostHog uses on pagehide; a fetch it can.
-    navigator.sendBeacon = (url, data) => {
-      void fetch(url, { method: 'POST', body: data ?? null });
-      return true;
-    };
-  });
-  const bodies: string[] = [];
-  await page.route(`${POSTHOG}/**`, async (route) => {
-    bodies.push(decode(route.request()));
-    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"status":1}' });
-  });
-  const named = (n: string) => bodies.flatMap(eventsIn).filter((e) => e.event === n);
+  const { bodies, named } = await capturePosthog(page);
 
   await open(page, { width: 360, height: 640 });
   // A rejected answer first: its field is named, never what was typed.
