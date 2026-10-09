@@ -15,6 +15,7 @@ import type { MortgageNormId, MortgageSourceId, NormStatus, NormTable, SourceTab
 export type Basis = 'statute' | 'case_law';
 
 export type StatuteRuleId =
+  | 'binding_terms'
   | 'expenses_lcci'
   | 'transparency_act_free'
   | 'ajd_lender'
@@ -124,6 +125,8 @@ const lcci = (id: StatuteRuleId, article: string, output: RuleOutput): StatuteRu
   );
 
 export const STATUTE_RULES: Readonly<Record<StatuteRuleId, StatuteRule>> = {
+  // 3: the law binds both parties; an agreement cannot set aside what it puts on the lender.
+  binding_terms: lcci('binding_terms', '3', 'info'),
   // 14.1.e: the lender pays the notary of the loan, the registry and the agency; the valuation is
   // the borrower's, and the copies are paid by whoever asks for them.
   expenses_lcci: lcci('expenses_lcci', '14.1.e', 'amount'),
@@ -339,6 +342,11 @@ export const RULES: Readonly<Record<MortgageRuleId, MortgageRule>> = {
 export function ruleSource(id: StatuteRuleId, norms: NormTable): NormSource<NormStatus> {
   return lawRuleSource(STATUTE_RULES, id, norms);
 }
+
+// A court's criterion gives a figure only when it is marked to and every ruling it rests on was
+// read at its source.
+export const criterionCounts = (rule: CaseLawRule, sources: SourceTable): boolean =>
+  rule.output === 'amount' && rule.sources.every((id) => sources[id].verified);
 
 export const caseLawSources = (id: CaseLawRuleId, sources: SourceTable): readonly LawSource[] =>
   CASE_LAW_RULES[id].sources.map((s) => sources[s]);
