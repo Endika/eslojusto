@@ -1,0 +1,221 @@
+{
+  "id": "car-loan-balloon-and-single-premium",
+  "description": "LCC arts. 6.a and 32, annex I: a car financed with a last payment of 9.500,00 € due on 15-06-2027 and a required single premium of 900,00 € added to the capital, which the APR counts. 20.900 € at 6,99 % in 36 × 408,66 €, the last payment and an opening charge of 400,00 € paid apart give 10,62 %, as stated. The contract states the cash price (art. 16.2) and the dealer acts as a credit intermediary.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/car-loan-es",
+      "data": {
+        "contractRef": "PF-2024-020900",
+        "lenderBlock": "Ficticia Motor Finanzas, E. F. C., S. A., con CIF A34567894 y domicilio en Calle de la Prueba Ficticia, 1, Madrid. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia H",
+        "borrowerDni": "40876536V",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 10, Sevilla",
+        "dealerBlock": "Ficticia Automoción Ejemplo, S. L., con CIF B41001044, concesionario situado en Avenida de la Prueba Ficticia, 7, Getafe, que actúa como intermediario de crédito vinculado a la entidad financiera.",
+        "goodsText": "Turismo Ficticio Modelo Prueba 1.5, nuevo",
+        "discountText": "El precio al contado del vehículo es de 24.000,00 €. La persona compradora entrega 4.000,00 € a cuenta y financia el resto.",
+        "terms": [
+          {
+            "label": "Precio al contado del vehículo",
+            "value": "24.000,00 €"
+          },
+          {
+            "label": "Entrada",
+            "value": "4.000,00 €"
+          },
+          {
+            "label": "Importe total del crédito",
+            "value": "20.000,00 €"
+          },
+          {
+            "label": "Prima del seguro financiada",
+            "value": "900,00 €"
+          },
+          {
+            "label": "Capital total financiado",
+            "value": "20.900,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "6,99 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "10,62 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "36 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "408,66 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "15/06/2024"
+          },
+          {
+            "label": "Cuota final (valor futuro garantizado)",
+            "value": "9.500,00 €"
+          },
+          {
+            "label": "Fecha de la cuota final",
+            "value": "15/06/2027"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "15/06/2027"
+          },
+          {
+            "label": "Importe total adeudado",
+            "value": "24.611,76 €"
+          }
+        ],
+        "charges": [
+          {
+            "concept": "Comisión de apertura",
+            "amount": "400,00 €",
+            "howText": "Pagada aparte a la firma"
+          }
+        ],
+        "chargesNote": "",
+        "insuranceText": "Para la concesión del crédito es obligatorio un seguro de protección de pagos con Ficticia Seguros de Prueba, S. A. Su prima única de 900,00 € se financia y se suma al capital.",
+        "iban": "ES94 2100 1296 1810 6123 4568",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente, total o parcialmente, el crédito en cualquier momento. El prestamista percibirá una compensación del 1 % del importe reembolsado si el periodo restante hasta la terminación pactada es superior a un año, y del 0,5 % en otro caso.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Getafe",
+        "agreedOnText": "15 de mayo de 2024"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "car_loan",
+        "intermediaryType": "company",
+        "agreedOn": "2024-05-15",
+        "principal": 20000,
+        "cashPrice": 24000,
+        "nominalRate": 6.99,
+        "rateType": "fixed",
+        "declaredApr": 10.62,
+        "declaredTotalPayable": 24611.76,
+        "instalmentCount": 36,
+        "instalmentAmount": 408.66,
+        "firstDueOn": "2024-06-15",
+        "balloonAmount": 9500,
+        "balloonDueOn": "2027-06-15",
+        "agreedEndOn": "2027-06-15",
+        "insurancePremium": 900,
+        "insuranceSingle": true,
+        "insuranceFinanced": true,
+        "insuranceRequired": true
+      },
+      "lists": {
+        "charges": [
+          {
+            "kind": "opening",
+            "amount": 400,
+            "how": "paid"
+          }
+        ]
+      }
+    },
+    "input": {
+      "product": "car_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2024-05-15",
+      "drawnOn": "2024-05-15",
+      "principal": 20000,
+      "netDisbursed": null,
+      "nominalRate": 6.99,
+      "rateType": "fixed",
+      "declaredApr": 10.62,
+      "declaredTotalPayable": 24611.76,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 36,
+        "amount": 408.66,
+        "frequency": "monthly",
+        "firstDueOn": "2024-06-15"
+      },
+      "balloon": {
+        "amount": 9500,
+        "dueOn": "2027-06-15"
+      },
+      "charges": [
+        {
+          "kind": "opening",
+          "amount": 400,
+          "paidOn": "2024-05-15",
+          "how": "paid"
+        }
+      ],
+      "insurance": {
+        "premium": 900,
+        "single": true,
+        "financed": true,
+        "required": true
+      },
+      "card": null,
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 10.62
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2024-05-29"
+        }
+      ],
+      "indicator": {
+        "status": "distance_only",
+        "apr": 10.62,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.10",
+          "month": "2024-05",
+          "value": 7.9919
+        },
+        "points": 2.63
+      },
+      "information": ["contract_mentions", "linked_insurance", "cash_price", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

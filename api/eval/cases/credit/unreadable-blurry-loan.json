@@ -1,0 +1,145 @@
+{
+  "id": "unreadable-blurry-loan",
+  "description": "No rule can be read from a photo this blurry: a read must give nothing_read rather than guess. The facts behind it: 9.500 € at 8,25 % in 48 × 233,04 € give 8,57 %, the APR stated (LCC art. 32).",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/loan-es",
+      "data": {
+        "contractRef": "PF-2024-009500",
+        "lenderBlock": "Ficticia Banca de Prueba, S. A., con CIF A23456786 y domicilio en Calle de la Prueba Ficticia, 1, Sevilla. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia W",
+        "borrowerDni": "59395041A",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 25, Valencia",
+        "purposeText": "Gastos personales",
+        "terms": [
+          {
+            "label": "Importe total del crédito",
+            "value": "9.500,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "8,25 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "8,57 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "48 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "233,04 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "21/11/2024"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "21/10/2028"
+          }
+        ],
+        "charges": [],
+        "chargesNote": "El contrato no devenga comisiones de apertura, estudio ni gestión.",
+        "insuranceText": "La concesión del crédito no está condicionada a la contratación de ningún seguro.",
+        "guaranteeText": "El préstamo no cuenta con garantía real. La persona prestataria responde del pago con todos sus bienes presentes y futuros.",
+        "infoText": "La persona prestataria declara haber recibido, antes de la celebración del contrato, la Información Normalizada Europea, y en este acto un ejemplar del contrato.",
+        "iban": "ES21 2100 1851 3311 7604 9383",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente, total o parcialmente, el crédito en cualquier momento. El prestamista percibirá una compensación del 1 % del importe reembolsado si el periodo restante hasta la terminación pactada es superior a un año, y del 0,5 % en otro caso.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Sevilla",
+        "agreedOnText": "21 de octubre de 2024"
+      },
+      "degrade": {
+        "rotate": -6,
+        "shadow": 0.4,
+        "blur": 9,
+        "dark": 0.3,
+        "crop": 0.18,
+        "jpegQuality": 0.3
+      },
+      "readability": "blurry"
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "nothing_read",
+      "fields": {},
+      "lists": {}
+    },
+    "input": {
+      "product": "personal_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2024-10-21",
+      "drawnOn": "2024-10-21",
+      "principal": 9500,
+      "netDisbursed": null,
+      "nominalRate": 8.25,
+      "rateType": "fixed",
+      "declaredApr": 8.57,
+      "declaredTotalPayable": 11185.92,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 48,
+        "amount": 233.04,
+        "frequency": "monthly",
+        "firstDueOn": "2024-11-21"
+      },
+      "balloon": null,
+      "charges": [],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 8.57
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2024-11-04"
+        }
+      ],
+      "indicator": {
+        "status": "distance_only",
+        "apr": 8.57,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.10",
+          "month": "2024-10",
+          "value": 7.3689
+        },
+        "points": 1.2
+      },
+      "information": ["contract_mentions", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "id": "revolving-card-edge-august-2026",
+  "description": "LCC annex I, part II (one year, twelve equal instalments): a revolving card at 21,94 % with no fee gives 24,29 %, as stated. Against the 18,2578 % average of August 2026 (BdE BE_19_4.7) it is 6,03 points above the more-than-6-points criterion of STS 258/2023: «en el borde», within the 6,00-6,30 band the review keeps because the series leaves charges out. A judge also weighs the circumstances.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/revolving-es",
+      "data": {
+        "contractRef": "TF-2026-000824",
+        "lenderBlock": "Ficticia Tarjetas de Prueba, E. F. C., S. A., con CIF A45678904 y domicilio en Calle de la Prueba Ficticia, 1, Madrid. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia L",
+        "borrowerDni": "45814804R",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 14, Murcia",
+        "iban": "ES81 2100 1444 2210 9185 1852",
+        "terms": [
+          {
+            "label": "Límite de crédito",
+            "value": "2.000,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) anual",
+            "value": "21,94 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "24,29 %"
+          },
+          {
+            "label": "Cuota anual",
+            "value": "Gratuita"
+          }
+        ],
+        "paymentText": "Modalidad de pago: pago aplazado con una cuota fija mensual de 60,00 €, que incluye intereses y amortización del capital dispuesto.",
+        "charges": [],
+        "chargesNote": "La tarjeta no tiene comisión de emisión ni de mantenimiento.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Madrid",
+        "agreedOnText": "20 de agosto de 2026"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "credit/card-statement-es",
+      "data": {
+        "lenderName": "Ficticia Tarjetas de Prueba, E. F. C., S. A.",
+        "statementOnText": "30 de septiembre de 2026",
+        "borrowerName": "Persona Prestataria Ficticia L",
+        "cardText": "Tarjeta Ficticia terminada en 0000",
+        "periodText": "Hasta el 30/09/2026",
+        "iban": "ES81 2100 1444 2210 9185 1852",
+        "moves": [
+          {
+            "on": "12/09/2026",
+            "concept": "Compra en comercio de prueba",
+            "amount": "80,00 €"
+          },
+          {
+            "on": "30/09/2026",
+            "concept": "Intereses del periodo",
+            "amount": "21,03 €"
+          },
+          {
+            "on": "30/09/2026",
+            "concept": "Cuota del mes",
+            "amount": "-60,00 €"
+          }
+        ],
+        "terms": [
+          {
+            "label": "Saldo dispuesto",
+            "value": "1.191,03 €"
+          },
+          {
+            "label": "Intereses del periodo",
+            "value": "21,03 €"
+          },
+          {
+            "label": "Cuota del mes",
+            "value": "60,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) anual",
+            "value": "21,94 %"
+          }
+        ],
+        "estimateText": "Con la cuota actual y sin nuevas disposiciones, la deuda quedaría pagada el 30/10/2028, con un importe total a pagar estimado de 1.493,19 €."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "agreedOn": "2026-08-20",
+        "creditLimit": 2000,
+        "nominalRate": 21.94,
+        "declaredApr": 24.29,
+        "minimumPayment": 60,
+        "paymentMode": "fixed_amount"
+      },
+      "lists": {
+        "statements": [
+          {
+            "statementOn": "2026-09-30",
+            "balance": 1191.03,
+            "interest": 21.03,
+            "payment": 60,
+            "nominalRate": 21.94,
+            "estimatedEndOn": "2028-10-30",
+            "totalToPay": 1493.19
+          }
+        ]
+      }
+    },
+    "input": {
+      "product": "revolving",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2026-08-20",
+      "drawnOn": "2026-08-20",
+      "principal": 2000,
+      "netDisbursed": null,
+      "nominalRate": 21.94,
+      "rateType": "fixed",
+      "declaredApr": 24.29,
+      "declaredTotalPayable": null,
+      "confirmedApr": false,
+      "instalments": null,
+      "balloon": null,
+      "charges": [],
+      "insurance": null,
+      "card": {
+        "limit": 2000,
+        "nominalRate": 21.94,
+        "annualFee": 0,
+        "minimumPayment": 60,
+        "balance": 1191.03
+      },
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 24.29
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2026-09-03"
+        }
+      ],
+      "indicator": {
+        "status": "edge",
+        "apr": 24.29,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.7",
+          "month": "2026-08",
+          "value": 18.2578
+        },
+        "points": 6.03
+      },
+      "information": ["contract_mentions", "revolving_info", "card_payoff", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

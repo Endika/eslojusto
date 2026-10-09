@@ -1,0 +1,176 @@
+{
+  "id": "unreadable-dark-card-pack",
+  "description": "No rule can be read from photos this dark: a read must give nothing_read rather than guess. The facts behind it: a card at 23,50 % (26,20 % APR, LCC annex I part II) concluded in February 2023, against the 18,0344 % average of its month (BdE BE_19_4.7).",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/revolving-es",
+      "data": {
+        "contractRef": "TF-2023-000217",
+        "lenderBlock": "Ficticia Tarjetas de Prueba, E. F. C., S. A., con CIF A45678904 y domicilio en Calle de la Prueba Ficticia, 1, Madrid. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia X",
+        "borrowerDni": "60629608E",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 26, Bilbao",
+        "iban": "ES42 2100 1888 3411 8370 3704",
+        "terms": [
+          {
+            "label": "Límite de crédito",
+            "value": "2.500,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) anual",
+            "value": "23,50 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "26,20 %"
+          }
+        ],
+        "paymentText": "Modalidad de pago: aplazado, con una cuota mensual fija de 75,00 €.",
+        "charges": [],
+        "chargesNote": "Sin cuota anual.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Murcia",
+        "agreedOnText": "17 de febrero de 2023"
+      },
+      "degrade": {
+        "rotate": 4.5,
+        "shadow": 0.7,
+        "blur": 2.5,
+        "dark": 0.82,
+        "crop": 0.1,
+        "jpegQuality": 0.35
+      },
+      "readability": "dark"
+    },
+    {
+      "template": "credit/card-statement-es",
+      "data": {
+        "lenderName": "Ficticia Tarjetas de Prueba, E. F. C., S. A.",
+        "statementOnText": "25 de septiembre de 2026",
+        "borrowerName": "Persona Prestataria Ficticia X",
+        "cardText": "Tarjeta Ficticia terminada en 0000",
+        "periodText": "Hasta el 25/09/2026",
+        "iban": "ES42 2100 1888 3411 8370 3704",
+        "moves": [
+          {
+            "on": "25/09/2026",
+            "concept": "Intereses del periodo",
+            "amount": "35,84 €"
+          },
+          {
+            "on": "25/09/2026",
+            "concept": "Cuota del mes",
+            "amount": "-75,00 €"
+          }
+        ],
+        "terms": [
+          {
+            "label": "Saldo dispuesto",
+            "value": "1.790,84 €"
+          },
+          {
+            "label": "Intereses del periodo",
+            "value": "35,84 €"
+          },
+          {
+            "label": "Cuota del mes",
+            "value": "75,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) anual",
+            "value": "23,50 %"
+          }
+        ],
+        "estimateText": "Con la cuota actual y sin nuevas disposiciones, la deuda quedaría pagada el 25/06/2029, con un importe total a pagar estimado de 2.437,95 €."
+      },
+      "degrade": {
+        "rotate": 4.5,
+        "shadow": 0.7,
+        "blur": 2.5,
+        "dark": 0.82,
+        "crop": 0.1,
+        "jpegQuality": 0.35
+      },
+      "readability": "dark"
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "nothing_read",
+      "fields": {},
+      "lists": {}
+    },
+    "input": {
+      "product": "revolving",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2023-02-17",
+      "drawnOn": "2023-02-17",
+      "principal": 2500,
+      "netDisbursed": null,
+      "nominalRate": 23.5,
+      "rateType": "fixed",
+      "declaredApr": 26.2,
+      "declaredTotalPayable": null,
+      "confirmedApr": false,
+      "instalments": null,
+      "balloon": null,
+      "charges": [],
+      "insurance": null,
+      "card": {
+        "limit": 2500,
+        "nominalRate": 23.5,
+        "annualFee": 0,
+        "minimumPayment": 75,
+        "balance": 1790.84
+      },
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 26.2
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2023-03-03"
+        }
+      ],
+      "indicator": {
+        "status": "above",
+        "apr": 26.2,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.7",
+          "month": "2023-02",
+          "value": 18.0344
+        },
+        "points": 8.17
+      },
+      "information": ["contract_mentions", "revolving_info", "card_payoff", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

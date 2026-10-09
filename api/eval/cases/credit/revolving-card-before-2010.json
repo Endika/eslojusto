@@ -1,0 +1,176 @@
+{
+  "id": "revolving-card-before-2010",
+  "description": "STS 258/2023: a revolving card concluded in May 2008, before the consumer credit law (LCC) and before the BdE revolving series starts in June 2010, is compared with the 19,32 % the Supreme Court takes for those years. Its stated 26,82 % is 7,50 points above: «más de 6 puntos», never «usura» and never an amount; the rest of the review is another law's.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/revolving-es",
+      "data": {
+        "contractRef": "TF-2008-000510",
+        "lenderBlock": "Ficticia Tarjetas de Prueba, E. F. C., S. A., con CIF A45678904 y domicilio en Calle de la Prueba Ficticia, 1, Madrid. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia M",
+        "borrowerDni": "47049371C",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 15, Oviedo",
+        "iban": "ES05 2100 1481 2310 9950 6173",
+        "terms": [
+          {
+            "label": "Límite de crédito",
+            "value": "3.000,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) anual",
+            "value": "24,00 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "26,82 %"
+          }
+        ],
+        "paymentText": "Modalidad de pago: aplazado, con una cuota mensual de 90,00 €.",
+        "charges": [],
+        "chargesNote": "Sin cuota anual.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Sevilla",
+        "agreedOnText": "10 de mayo de 2008"
+      },
+      "degrade": {
+        "rotate": -2.8,
+        "shadow": 0.45,
+        "blur": 1.3,
+        "dark": 0.18,
+        "crop": 0.03,
+        "jpegQuality": 0.6
+      }
+    },
+    {
+      "template": "credit/card-statement-es",
+      "data": {
+        "lenderName": "Ficticia Tarjetas de Prueba, E. F. C., S. A.",
+        "statementOnText": "28 de septiembre de 2026",
+        "borrowerName": "Persona Prestataria Ficticia M",
+        "cardText": "Tarjeta Ficticia terminada en 0000",
+        "periodText": "Hasta el 28/09/2026",
+        "iban": "ES05 2100 1481 2310 9950 6173",
+        "moves": [
+          {
+            "on": "28/09/2026",
+            "concept": "Intereses del periodo",
+            "amount": "48,40 €"
+          },
+          {
+            "on": "28/09/2026",
+            "concept": "Cuota del mes",
+            "amount": "-90,00 €"
+          }
+        ],
+        "terms": [
+          {
+            "label": "Saldo dispuesto",
+            "value": "2.378,40 €"
+          },
+          {
+            "label": "Intereses del periodo",
+            "value": "48,40 €"
+          },
+          {
+            "label": "Cuota del mes",
+            "value": "90,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) anual",
+            "value": "24,00 %"
+          }
+        ],
+        "estimateText": "Con la cuota actual y sin nuevas disposiciones, la deuda quedaría pagada el 28/11/2029, con un importe total a pagar estimado de 3.417,33 €."
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "agreedOn": "2008-05-10",
+        "creditLimit": 3000,
+        "nominalRate": 24,
+        "declaredApr": 26.82,
+        "minimumPayment": 90,
+        "paymentMode": "fixed_amount"
+      },
+      "lists": {
+        "statements": [
+          {
+            "statementOn": "2026-09-28",
+            "balance": 2378.4,
+            "interest": 48.4,
+            "payment": 90,
+            "nominalRate": 24,
+            "estimatedEndOn": "2029-11-28",
+            "totalToPay": 3417.33
+          }
+        ]
+      }
+    },
+    "input": {
+      "product": "revolving",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2008-05-10",
+      "drawnOn": "2008-05-10",
+      "principal": 3000,
+      "netDisbursed": null,
+      "nominalRate": 24,
+      "rateType": "fixed",
+      "declaredApr": 26.82,
+      "declaredTotalPayable": null,
+      "confirmedApr": false,
+      "instalments": null,
+      "balloon": null,
+      "charges": [],
+      "insurance": null,
+      "card": {
+        "limit": 3000,
+        "nominalRate": 24,
+        "annualFee": 0,
+        "minimumPayment": 90,
+        "balance": 2378.4
+      },
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": true
+      },
+      "items": [],
+      "indicator": {
+        "status": "above",
+        "apr": 26.82,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "ruling_2010",
+          "value": 19.32
+        },
+        "points": 7.5
+      },
+      "information": ["card_payoff"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

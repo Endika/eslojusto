@@ -1,0 +1,770 @@
+{
+  "id": "early-repayment-interest-left-binds",
+  "description": "LCC art. 30.2 and 30.5: a loan at 0,99 % repaid in full on 05-07-2026 with more than a year left to 05/11/2027. 1 % of the 4.033,07 € repaid is 40,33 €, which the lender charged, but the schedule had only 28,34 € of interest left: art. 30.5 caps it there, 11,99 € over.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/loan-es",
+      "data": {
+        "contractRef": "PF-2024-009000",
+        "lenderBlock": "Ficticia Banca de Prueba, S. A., con CIF A23456786 y domicilio en Calle de la Prueba Ficticia, 1, Madrid. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia P",
+        "borrowerDni": "50753072P",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 18, Valencia",
+        "purposeText": "Compra de electrodomésticos",
+        "terms": [
+          {
+            "label": "Importe total del crédito",
+            "value": "9.000,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "0,99 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "0,99 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "36 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "253,83 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "05/12/2024"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "05/11/2027"
+          },
+          {
+            "label": "Importe total adeudado",
+            "value": "9.138,01 €"
+          }
+        ],
+        "charges": [],
+        "chargesNote": "El contrato no devenga comisiones de apertura, estudio ni gestión.",
+        "insuranceText": "La concesión del crédito no está condicionada a la contratación de ningún seguro.",
+        "guaranteeText": "El préstamo no cuenta con garantía real. La persona prestataria responde del pago con todos sus bienes presentes y futuros.",
+        "infoText": "La persona prestataria declara haber recibido, antes de la celebración del contrato, la Información Normalizada Europea, y en este acto un ejemplar del contrato.",
+        "iban": "ES68 2100 1592 2611 2246 9136",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente, total o parcialmente, el crédito en cualquier momento. El prestamista percibirá una compensación del 1 % del importe reembolsado si el periodo restante hasta la terminación pactada es superior a un año, y del 0,5 % en otro caso.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Madrid",
+        "agreedOnText": "5 de noviembre de 2024"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "credit/schedule-es",
+      "data": {
+        "lenderName": "Ficticia Banca de Prueba, S. A.",
+        "contractRef": "PF-2024-009000",
+        "borrowerName": "Persona Prestataria Ficticia P",
+        "scheduleNote": "Cuadro de amortización a la fecha del contrato.",
+        "rows": [
+          {
+            "n": 1,
+            "dueOn": "05/12/2024",
+            "amount": "253,83 €",
+            "interest": "7,43 €",
+            "principal": "246,40 €",
+            "balance": "8.753,60 €"
+          },
+          {
+            "n": 2,
+            "dueOn": "05/01/2025",
+            "amount": "253,83 €",
+            "interest": "7,22 €",
+            "principal": "246,61 €",
+            "balance": "8.506,99 €"
+          },
+          {
+            "n": 3,
+            "dueOn": "05/02/2025",
+            "amount": "253,83 €",
+            "interest": "7,02 €",
+            "principal": "246,81 €",
+            "balance": "8.260,18 €"
+          },
+          {
+            "n": 4,
+            "dueOn": "05/03/2025",
+            "amount": "253,83 €",
+            "interest": "6,81 €",
+            "principal": "247,02 €",
+            "balance": "8.013,16 €"
+          },
+          {
+            "n": 5,
+            "dueOn": "05/04/2025",
+            "amount": "253,83 €",
+            "interest": "6,61 €",
+            "principal": "247,22 €",
+            "balance": "7.765,94 €"
+          },
+          {
+            "n": 6,
+            "dueOn": "05/05/2025",
+            "amount": "253,83 €",
+            "interest": "6,41 €",
+            "principal": "247,42 €",
+            "balance": "7.518,52 €"
+          },
+          {
+            "n": 7,
+            "dueOn": "05/06/2025",
+            "amount": "253,83 €",
+            "interest": "6,20 €",
+            "principal": "247,63 €",
+            "balance": "7.270,89 €"
+          },
+          {
+            "n": 8,
+            "dueOn": "05/07/2025",
+            "amount": "253,83 €",
+            "interest": "6,00 €",
+            "principal": "247,83 €",
+            "balance": "7.023,06 €"
+          },
+          {
+            "n": 9,
+            "dueOn": "05/08/2025",
+            "amount": "253,83 €",
+            "interest": "5,79 €",
+            "principal": "248,04 €",
+            "balance": "6.775,02 €"
+          },
+          {
+            "n": 10,
+            "dueOn": "05/09/2025",
+            "amount": "253,83 €",
+            "interest": "5,59 €",
+            "principal": "248,24 €",
+            "balance": "6.526,78 €"
+          },
+          {
+            "n": 11,
+            "dueOn": "05/10/2025",
+            "amount": "253,83 €",
+            "interest": "5,38 €",
+            "principal": "248,45 €",
+            "balance": "6.278,33 €"
+          },
+          {
+            "n": 12,
+            "dueOn": "05/11/2025",
+            "amount": "253,83 €",
+            "interest": "5,18 €",
+            "principal": "248,65 €",
+            "balance": "6.029,68 €"
+          },
+          {
+            "n": 13,
+            "dueOn": "05/12/2025",
+            "amount": "253,83 €",
+            "interest": "4,97 €",
+            "principal": "248,86 €",
+            "balance": "5.780,82 €"
+          },
+          {
+            "n": 14,
+            "dueOn": "05/01/2026",
+            "amount": "253,83 €",
+            "interest": "4,77 €",
+            "principal": "249,06 €",
+            "balance": "5.531,76 €"
+          },
+          {
+            "n": 15,
+            "dueOn": "05/02/2026",
+            "amount": "253,83 €",
+            "interest": "4,56 €",
+            "principal": "249,27 €",
+            "balance": "5.282,49 €"
+          },
+          {
+            "n": 16,
+            "dueOn": "05/03/2026",
+            "amount": "253,83 €",
+            "interest": "4,36 €",
+            "principal": "249,47 €",
+            "balance": "5.033,02 €"
+          },
+          {
+            "n": 17,
+            "dueOn": "05/04/2026",
+            "amount": "253,83 €",
+            "interest": "4,15 €",
+            "principal": "249,68 €",
+            "balance": "4.783,34 €"
+          },
+          {
+            "n": 18,
+            "dueOn": "05/05/2026",
+            "amount": "253,83 €",
+            "interest": "3,95 €",
+            "principal": "249,88 €",
+            "balance": "4.533,46 €"
+          },
+          {
+            "n": 19,
+            "dueOn": "05/06/2026",
+            "amount": "253,83 €",
+            "interest": "3,74 €",
+            "principal": "250,09 €",
+            "balance": "4.283,37 €"
+          },
+          {
+            "n": 20,
+            "dueOn": "05/07/2026",
+            "amount": "253,83 €",
+            "interest": "3,53 €",
+            "principal": "250,30 €",
+            "balance": "4.033,07 €"
+          },
+          {
+            "n": 21,
+            "dueOn": "05/08/2026",
+            "amount": "253,83 €",
+            "interest": "3,33 €",
+            "principal": "250,50 €",
+            "balance": "3.782,57 €"
+          },
+          {
+            "n": 22,
+            "dueOn": "05/09/2026",
+            "amount": "253,83 €",
+            "interest": "3,12 €",
+            "principal": "250,71 €",
+            "balance": "3.531,86 €"
+          },
+          {
+            "n": 23,
+            "dueOn": "05/10/2026",
+            "amount": "253,83 €",
+            "interest": "2,91 €",
+            "principal": "250,92 €",
+            "balance": "3.280,94 €"
+          },
+          {
+            "n": 24,
+            "dueOn": "05/11/2026",
+            "amount": "253,83 €",
+            "interest": "2,71 €",
+            "principal": "251,12 €",
+            "balance": "3.029,82 €"
+          },
+          {
+            "n": 25,
+            "dueOn": "05/12/2026",
+            "amount": "253,83 €",
+            "interest": "2,50 €",
+            "principal": "251,33 €",
+            "balance": "2.778,49 €"
+          },
+          {
+            "n": 26,
+            "dueOn": "05/01/2027",
+            "amount": "253,83 €",
+            "interest": "2,29 €",
+            "principal": "251,54 €",
+            "balance": "2.526,95 €"
+          },
+          {
+            "n": 27,
+            "dueOn": "05/02/2027",
+            "amount": "253,83 €",
+            "interest": "2,08 €",
+            "principal": "251,75 €",
+            "balance": "2.275,20 €"
+          },
+          {
+            "n": 28,
+            "dueOn": "05/03/2027",
+            "amount": "253,83 €",
+            "interest": "1,88 €",
+            "principal": "251,95 €",
+            "balance": "2.023,25 €"
+          },
+          {
+            "n": 29,
+            "dueOn": "05/04/2027",
+            "amount": "253,83 €",
+            "interest": "1,67 €",
+            "principal": "252,16 €",
+            "balance": "1.771,09 €"
+          },
+          {
+            "n": 30,
+            "dueOn": "05/05/2027",
+            "amount": "253,83 €",
+            "interest": "1,46 €",
+            "principal": "252,37 €",
+            "balance": "1.518,72 €"
+          },
+          {
+            "n": 31,
+            "dueOn": "05/06/2027",
+            "amount": "253,83 €",
+            "interest": "1,25 €",
+            "principal": "252,58 €",
+            "balance": "1.266,14 €"
+          },
+          {
+            "n": 32,
+            "dueOn": "05/07/2027",
+            "amount": "253,83 €",
+            "interest": "1,04 €",
+            "principal": "252,79 €",
+            "balance": "1.013,35 €"
+          },
+          {
+            "n": 33,
+            "dueOn": "05/08/2027",
+            "amount": "253,83 €",
+            "interest": "0,84 €",
+            "principal": "252,99 €",
+            "balance": "760,36 €"
+          },
+          {
+            "n": 34,
+            "dueOn": "05/09/2027",
+            "amount": "253,83 €",
+            "interest": "0,63 €",
+            "principal": "253,20 €",
+            "balance": "507,16 €"
+          },
+          {
+            "n": 35,
+            "dueOn": "05/10/2027",
+            "amount": "253,83 €",
+            "interest": "0,42 €",
+            "principal": "253,41 €",
+            "balance": "253,75 €"
+          },
+          {
+            "n": 36,
+            "dueOn": "05/11/2027",
+            "amount": "253,96 €",
+            "interest": "0,21 €",
+            "principal": "253,75 €",
+            "balance": "0,00 €"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "credit/early-repayment-es",
+      "data": {
+        "lenderName": "Ficticia Banca de Prueba, S. A.",
+        "contractRef": "PF-2024-009000",
+        "borrowerName": "Persona Prestataria Ficticia P",
+        "repaidOnText": "5 de julio de 2026",
+        "kindText": "Total",
+        "endText": "5 de noviembre de 2027",
+        "iban": "ES68 2100 1592 2611 2246 9136",
+        "noteText": "Liquidación practicada a petición de la persona prestataria.",
+        "lines": [
+          {
+            "concept": "Capital amortizado",
+            "amount": "4.033,07 €"
+          },
+          {
+            "concept": "Comisión por amortización anticipada (1 %)",
+            "amount": "40,33 €"
+          },
+          {
+            "concept": "Total",
+            "amount": "4.073,40 €"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "personal_loan",
+        "agreedOn": "2024-11-05",
+        "principal": 9000,
+        "nominalRate": 0.99,
+        "rateType": "fixed",
+        "declaredApr": 0.99,
+        "declaredTotalPayable": 9138.01,
+        "instalmentCount": 36,
+        "instalmentAmount": 253.83,
+        "firstDueOn": "2024-12-05",
+        "agreedEndOn": "2027-11-05",
+        "repaidOn": "2026-07-05",
+        "principalRepaid": 4033.07,
+        "compensationCharged": 40.33
+      },
+      "lists": {
+        "schedule": [
+          {
+            "dueOn": "2024-12-05",
+            "amount": 253.83,
+            "interest": 7.43,
+            "principal": 246.4,
+            "balance": 8753.6
+          },
+          {
+            "dueOn": "2025-01-05",
+            "amount": 253.83,
+            "interest": 7.22,
+            "principal": 246.61,
+            "balance": 8506.99
+          },
+          {
+            "dueOn": "2025-02-05",
+            "amount": 253.83,
+            "interest": 7.02,
+            "principal": 246.81,
+            "balance": 8260.18
+          },
+          {
+            "dueOn": "2025-03-05",
+            "amount": 253.83,
+            "interest": 6.81,
+            "principal": 247.02,
+            "balance": 8013.16
+          },
+          {
+            "dueOn": "2025-04-05",
+            "amount": 253.83,
+            "interest": 6.61,
+            "principal": 247.22,
+            "balance": 7765.94
+          },
+          {
+            "dueOn": "2025-05-05",
+            "amount": 253.83,
+            "interest": 6.41,
+            "principal": 247.42,
+            "balance": 7518.52
+          },
+          {
+            "dueOn": "2025-06-05",
+            "amount": 253.83,
+            "interest": 6.2,
+            "principal": 247.63,
+            "balance": 7270.89
+          },
+          {
+            "dueOn": "2025-07-05",
+            "amount": 253.83,
+            "interest": 6,
+            "principal": 247.83,
+            "balance": 7023.06
+          },
+          {
+            "dueOn": "2025-08-05",
+            "amount": 253.83,
+            "interest": 5.79,
+            "principal": 248.04,
+            "balance": 6775.02
+          },
+          {
+            "dueOn": "2025-09-05",
+            "amount": 253.83,
+            "interest": 5.59,
+            "principal": 248.24,
+            "balance": 6526.78
+          },
+          {
+            "dueOn": "2025-10-05",
+            "amount": 253.83,
+            "interest": 5.38,
+            "principal": 248.45,
+            "balance": 6278.33
+          },
+          {
+            "dueOn": "2025-11-05",
+            "amount": 253.83,
+            "interest": 5.18,
+            "principal": 248.65,
+            "balance": 6029.68
+          },
+          {
+            "dueOn": "2025-12-05",
+            "amount": 253.83,
+            "interest": 4.97,
+            "principal": 248.86,
+            "balance": 5780.82
+          },
+          {
+            "dueOn": "2026-01-05",
+            "amount": 253.83,
+            "interest": 4.77,
+            "principal": 249.06,
+            "balance": 5531.76
+          },
+          {
+            "dueOn": "2026-02-05",
+            "amount": 253.83,
+            "interest": 4.56,
+            "principal": 249.27,
+            "balance": 5282.49
+          },
+          {
+            "dueOn": "2026-03-05",
+            "amount": 253.83,
+            "interest": 4.36,
+            "principal": 249.47,
+            "balance": 5033.02
+          },
+          {
+            "dueOn": "2026-04-05",
+            "amount": 253.83,
+            "interest": 4.15,
+            "principal": 249.68,
+            "balance": 4783.34
+          },
+          {
+            "dueOn": "2026-05-05",
+            "amount": 253.83,
+            "interest": 3.95,
+            "principal": 249.88,
+            "balance": 4533.46
+          },
+          {
+            "dueOn": "2026-06-05",
+            "amount": 253.83,
+            "interest": 3.74,
+            "principal": 250.09,
+            "balance": 4283.37
+          },
+          {
+            "dueOn": "2026-07-05",
+            "amount": 253.83,
+            "interest": 3.53,
+            "principal": 250.3,
+            "balance": 4033.07
+          },
+          {
+            "dueOn": "2026-08-05",
+            "amount": 253.83,
+            "interest": 3.33,
+            "principal": 250.5,
+            "balance": 3782.57
+          },
+          {
+            "dueOn": "2026-09-05",
+            "amount": 253.83,
+            "interest": 3.12,
+            "principal": 250.71,
+            "balance": 3531.86
+          },
+          {
+            "dueOn": "2026-10-05",
+            "amount": 253.83,
+            "interest": 2.91,
+            "principal": 250.92,
+            "balance": 3280.94
+          },
+          {
+            "dueOn": "2026-11-05",
+            "amount": 253.83,
+            "interest": 2.71,
+            "principal": 251.12,
+            "balance": 3029.82
+          },
+          {
+            "dueOn": "2026-12-05",
+            "amount": 253.83,
+            "interest": 2.5,
+            "principal": 251.33,
+            "balance": 2778.49
+          },
+          {
+            "dueOn": "2027-01-05",
+            "amount": 253.83,
+            "interest": 2.29,
+            "principal": 251.54,
+            "balance": 2526.95
+          },
+          {
+            "dueOn": "2027-02-05",
+            "amount": 253.83,
+            "interest": 2.08,
+            "principal": 251.75,
+            "balance": 2275.2
+          },
+          {
+            "dueOn": "2027-03-05",
+            "amount": 253.83,
+            "interest": 1.88,
+            "principal": 251.95,
+            "balance": 2023.25
+          },
+          {
+            "dueOn": "2027-04-05",
+            "amount": 253.83,
+            "interest": 1.67,
+            "principal": 252.16,
+            "balance": 1771.09
+          },
+          {
+            "dueOn": "2027-05-05",
+            "amount": 253.83,
+            "interest": 1.46,
+            "principal": 252.37,
+            "balance": 1518.72
+          },
+          {
+            "dueOn": "2027-06-05",
+            "amount": 253.83,
+            "interest": 1.25,
+            "principal": 252.58,
+            "balance": 1266.14
+          },
+          {
+            "dueOn": "2027-07-05",
+            "amount": 253.83,
+            "interest": 1.04,
+            "principal": 252.79,
+            "balance": 1013.35
+          },
+          {
+            "dueOn": "2027-08-05",
+            "amount": 253.83,
+            "interest": 0.84,
+            "principal": 252.99,
+            "balance": 760.36
+          },
+          {
+            "dueOn": "2027-09-05",
+            "amount": 253.83,
+            "interest": 0.63,
+            "principal": 253.2,
+            "balance": 507.16
+          },
+          {
+            "dueOn": "2027-10-05",
+            "amount": 253.83,
+            "interest": 0.42,
+            "principal": 253.41,
+            "balance": 253.75
+          },
+          {
+            "dueOn": "2027-11-05",
+            "amount": 253.96,
+            "interest": 0.21,
+            "principal": 253.75,
+            "balance": 0
+          }
+        ]
+      }
+    },
+    "input": {
+      "product": "personal_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2024-11-05",
+      "drawnOn": "2024-11-05",
+      "principal": 9000,
+      "netDisbursed": null,
+      "nominalRate": 0.99,
+      "rateType": "fixed",
+      "declaredApr": 0.99,
+      "declaredTotalPayable": 9138.01,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 36,
+        "amount": 253.83,
+        "frequency": "monthly",
+        "firstDueOn": "2024-12-05"
+      },
+      "balloon": null,
+      "charges": [],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": {
+        "on": "2026-07-05",
+        "principalRepaid": 4033.07,
+        "interestSettled": null,
+        "compensationCharged": 40.33,
+        "paidByInsurance": false,
+        "agreedEndOn": "2027-11-05",
+        "remainingInterest": 28.34,
+        "discountLost": null
+      },
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 0.99
+        },
+        {
+          "id": "early_repayment",
+          "status": "above_general_cap",
+          "amount": 11.99
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2024-11-19"
+        }
+      ],
+      "indicator": {
+        "status": "distance_only",
+        "apr": 0.99,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.10",
+          "month": "2024-11",
+          "value": 7.3304
+        },
+        "points": -6.34
+      },
+      "information": ["contract_mentions", "law_change"],
+      "overCharged": {
+        "counted": 11.99,
+        "upTo": 11.99
+      },
+      "offerPass": true
+    }
+  }
+}

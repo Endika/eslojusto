@@ -1,0 +1,235 @@
+{
+  "id": "personal-loan-opening-deducted-2019",
+  "description": "LCC art. 32 and annex I (the loan of STS 366/2026): 10.500 € with 761,25 € of opening charge taken off the amount handed over and 48 × 273,35 € give an APR of 16,61 %, while the contract states 12,00 %, the figure without the charge: «más baja que la que sale de sus cifras» (art. 21.4), with no amount. The charge adds 4,6 points.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/loan-es",
+      "data": {
+        "contractRef": "PF-2019-000366",
+        "lenderBlock": "Ficticia Crédito Ejemplo, E. F. C., S. A., con CIF A12345677 y domicilio en Calle de la Prueba Ficticia, 1, Madrid. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia A",
+        "borrowerDni": "32234567E",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 3, Sevilla",
+        "purposeText": "Gastos personales",
+        "terms": [
+          {
+            "label": "Importe total del crédito",
+            "value": "10.500,00 €"
+          },
+          {
+            "label": "Importe entregado a la persona prestataria",
+            "value": "9.738,75 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "12,00 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "12,00 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "48 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "273,35 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "15/03/2019"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "15/02/2023"
+          },
+          {
+            "label": "Importe total adeudado",
+            "value": "13.120,80 €"
+          }
+        ],
+        "charges": [
+          {
+            "concept": "Comisión de apertura",
+            "amount": "761,25 €",
+            "howText": "Descontada del importe entregado"
+          }
+        ],
+        "chargesNote": "",
+        "insuranceText": "La concesión del crédito no está condicionada a la contratación de ningún seguro.",
+        "guaranteeText": "El préstamo no cuenta con garantía real. La persona prestataria responde del pago con todos sus bienes presentes y futuros.",
+        "infoText": "La persona prestataria declara haber recibido, antes de la celebración del contrato, la Información Normalizada Europea, y en este acto un ejemplar del contrato.",
+        "iban": "ES44 2100 1037 1110 0765 4321",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente, total o parcialmente, el crédito en cualquier momento. El prestamista percibirá una compensación del 1 % del importe reembolsado si el periodo restante hasta la terminación pactada es superior a un año, y del 0,5 % en otro caso.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Madrid",
+        "agreedOnText": "15 de febrero de 2019"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "credit/precontract-es",
+      "data": {
+        "deliveredOnText": "8 de febrero de 2019",
+        "lenderBlock": "Ficticia Crédito Ejemplo, E. F. C., S. A., con CIF A12345677 y domicilio en Calle de la Prueba Ficticia, 1, Madrid. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "exampleText": "Las cifras siguientes corresponden al crédito que usted ha solicitado.",
+        "terms": [
+          {
+            "label": "Importe total del crédito",
+            "value": "10.500,00 €"
+          },
+          {
+            "label": "Importe entregado a la persona prestataria",
+            "value": "9.738,75 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "12,00 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "12,00 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "48 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "273,35 €"
+          },
+          {
+            "label": "Importe total adeudado",
+            "value": "13.120,80 €"
+          }
+        ],
+        "costsText": "Comisión de apertura: 761,25 €, que se descontará del importe entregado.",
+        "borrowerName": "Persona Prestataria Ficticia A"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "personal_loan",
+        "agreedOn": "2019-02-15",
+        "principal": 10500,
+        "netDisbursed": 9738.75,
+        "nominalRate": 12,
+        "rateType": "fixed",
+        "declaredApr": 12,
+        "declaredTotalPayable": 13120.8,
+        "instalmentCount": 48,
+        "instalmentAmount": 273.35,
+        "firstDueOn": "2019-03-15",
+        "agreedEndOn": "2023-02-15",
+        "precontractDeliveredOn": "2019-02-08"
+      },
+      "lists": {
+        "charges": [
+          {
+            "kind": "opening",
+            "amount": 761.25,
+            "how": "deducted"
+          }
+        ]
+      }
+    },
+    "input": {
+      "product": "personal_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2019-02-15",
+      "drawnOn": "2019-02-15",
+      "principal": 10500,
+      "netDisbursed": 9738.75,
+      "nominalRate": 12,
+      "rateType": "fixed",
+      "declaredApr": 12,
+      "declaredTotalPayable": 13120.8,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 48,
+        "amount": 273.35,
+        "frequency": "monthly",
+        "firstDueOn": "2019-03-15"
+      },
+      "balloon": null,
+      "charges": [
+        {
+          "kind": "opening",
+          "amount": 761.25,
+          "paidOn": "2019-02-15",
+          "how": "deducted"
+        }
+      ],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "contract_lower",
+          "apr": 16.61
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2019-03-01"
+        }
+      ],
+      "indicator": {
+        "status": "distance_only",
+        "apr": 12,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.10",
+          "month": "2019-02",
+          "value": 8.0989
+        },
+        "points": 3.9
+      },
+      "information": ["contract_mentions", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": true
+    }
+  }
+}

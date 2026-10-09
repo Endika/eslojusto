@@ -1,0 +1,207 @@
+{
+  "id": "car-loan-first-instalment-at-45-days",
+  "description": "LCC annex I, observation c: the first of 48 instalments falls 45 days after the drawdown, so time runs in days. 15.000 € at 8,90 % with 150,00 € of study charge taken off the amount handed over give 9,63 %, as stated. A gym leaflet in the pack is read as other.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/car-loan-es",
+      "data": {
+        "contractRef": "PF-2023-015000",
+        "lenderBlock": "Ficticia Motor Finanzas, E. F. C., S. A., con CIF A34567894 y domicilio en Calle de la Prueba Ficticia, 1, Madrid. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia J",
+        "borrowerDni": "43345670D",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 12, Bilbao",
+        "dealerBlock": "Ficticia Automoción Ejemplo, S. L., con CIF B41001309, concesionario situado en Avenida de la Prueba Ficticia, 7, Oviedo, que actúa como intermediario de crédito vinculado a la entidad financiera.",
+        "goodsText": "Turismo Ficticio Modelo Muestra, de ocasión",
+        "discountText": "El precio al contado del vehículo es de 15.000,00 €, que se financia íntegramente.",
+        "terms": [
+          {
+            "label": "Precio al contado del vehículo",
+            "value": "15.000,00 €"
+          },
+          {
+            "label": "Importe total del crédito",
+            "value": "15.000,00 €"
+          },
+          {
+            "label": "Importe entregado",
+            "value": "14.850,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "8,90 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "9,63 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "48 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "372,56 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "16/10/2023"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "16/09/2027"
+          },
+          {
+            "label": "Importe total adeudado",
+            "value": "17.882,88 €"
+          }
+        ],
+        "charges": [
+          {
+            "concept": "Comisión de estudio",
+            "amount": "150,00 €",
+            "howText": "Descontada del importe entregado"
+          }
+        ],
+        "chargesNote": "",
+        "insuranceText": "La concesión del crédito no está condicionada a la contratación de ningún seguro.",
+        "iban": "ES39 2100 1370 2010 7654 3210",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente, total o parcialmente, el crédito en cualquier momento. El prestamista percibirá una compensación del 1 % del importe reembolsado si el periodo restante hasta la terminación pactada es superior a un año, y del 0,5 % en otro caso.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Oviedo",
+        "agreedOnText": "1 de septiembre de 2023"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "kind": "other",
+      "data": {
+        "variant": "gym"
+      },
+      "degrade": {
+        "rotate": -2.8,
+        "shadow": 0.45,
+        "blur": 1.3,
+        "dark": 0.18,
+        "crop": 0.03,
+        "jpegQuality": 0.6
+      },
+      "readability": "not_credit_document"
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "car_loan",
+        "intermediaryType": "company",
+        "agreedOn": "2023-09-01",
+        "principal": 15000,
+        "netDisbursed": 14850,
+        "cashPrice": 15000,
+        "nominalRate": 8.9,
+        "rateType": "fixed",
+        "declaredApr": 9.63,
+        "declaredTotalPayable": 17882.88,
+        "instalmentCount": 48,
+        "instalmentAmount": 372.56,
+        "firstDueOn": "2023-10-16",
+        "agreedEndOn": "2027-09-16"
+      },
+      "lists": {
+        "charges": [
+          {
+            "kind": "study",
+            "amount": 150,
+            "how": "deducted"
+          }
+        ]
+      }
+    },
+    "input": {
+      "product": "car_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2023-09-01",
+      "drawnOn": "2023-09-01",
+      "principal": 15000,
+      "netDisbursed": 14850,
+      "nominalRate": 8.9,
+      "rateType": "fixed",
+      "declaredApr": 9.63,
+      "declaredTotalPayable": 17882.88,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 48,
+        "amount": 372.56,
+        "frequency": "monthly",
+        "firstDueOn": "2023-10-16"
+      },
+      "balloon": null,
+      "charges": [
+        {
+          "kind": "study",
+          "amount": 150,
+          "paidOn": "2023-09-01",
+          "how": "deducted"
+        }
+      ],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 9.63
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2023-09-15"
+        }
+      ],
+      "indicator": {
+        "status": "distance_only",
+        "apr": 9.63,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.10",
+          "month": "2023-09",
+          "value": 8.4318
+        },
+        "points": 1.2
+      },
+      "information": ["contract_mentions", "cash_price", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}

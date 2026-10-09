@@ -1,0 +1,246 @@
+{
+  "id": "car-loan-early-repayment-discount-lost",
+  "description": "LCC art. 30.2: 8.000,00 € repaid on 15-09-2026 with more than a year left to 01-03-2028, so the cap is 1 %: 80,00 € on the capital, 80,35 € with the 35,00 € of interest settled that day. 160,00 € charged is over it by 79,65 € in every reading, up to 80,00 €. The dealer also takes back 1.200,00 € of discount for financing: «revísalo», with no figure.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/car-loan-es",
+      "data": {
+        "contractRef": "PF-2023-016000",
+        "lenderBlock": "Ficticia Motor Finanzas, E. F. C., S. A., con CIF A34567894 y domicilio en Calle de la Prueba Ficticia, 1, Madrid. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia K",
+        "borrowerDni": "44580237M",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 13, Zaragoza",
+        "dealerBlock": "Ficticia Automoción Ejemplo, S. L., con CIF B41001432, concesionario situado en Avenida de la Prueba Ficticia, 7, Murcia, que actúa como intermediario de crédito vinculado a la entidad financiera.",
+        "goodsText": "Turismo Ficticio Modelo Prueba 1.0, nuevo",
+        "discountText": "El precio al contado del vehículo es de 17.200,00 €. Por financiar la compra con la entidad financiera, el concesionario aplica un descuento de 1.200,00 €, que la persona compradora deberá abonar si cancela la financiación antes de 36 meses.",
+        "terms": [
+          {
+            "label": "Precio al contado del vehículo",
+            "value": "17.200,00 €"
+          },
+          {
+            "label": "Descuento por financiación",
+            "value": "1.200,00 €"
+          },
+          {
+            "label": "Importe total del crédito",
+            "value": "16.000,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "7,49 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "7,75 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "60 cuotas mensuales"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "320,53 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "01/04/2023"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "01/03/2028"
+          },
+          {
+            "label": "Importe total adeudado",
+            "value": "19.231,80 €"
+          }
+        ],
+        "charges": [],
+        "chargesNote": "El contrato no devenga comisiones de apertura, estudio ni gestión.",
+        "insuranceText": "La concesión del crédito no está condicionada a la contratación de ningún seguro.",
+        "iban": "ES60 2100 1407 2110 8419 7531",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente el crédito en cualquier momento, abonando una comisión del 2 % sobre el capital reembolsado.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Murcia",
+        "agreedOnText": "1 de marzo de 2023"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "credit/early-repayment-es",
+      "data": {
+        "lenderName": "Ficticia Motor Finanzas, E. F. C., S. A.",
+        "contractRef": "PF-2023-016000",
+        "borrowerName": "Persona Prestataria Ficticia K",
+        "repaidOnText": "15 de septiembre de 2026",
+        "kindText": "Parcial",
+        "endText": "1 de marzo de 2028",
+        "iban": "ES60 2100 1407 2110 8419 7531",
+        "noteText": "Liquidación practicada a petición de la persona prestataria.",
+        "lines": [
+          {
+            "concept": "Capital amortizado",
+            "amount": "8.000,00 €"
+          },
+          {
+            "concept": "Intereses liquidados hasta la fecha",
+            "amount": "35,00 €"
+          },
+          {
+            "concept": "Comisión por amortización anticipada (2 %)",
+            "amount": "160,00 €"
+          },
+          {
+            "concept": "Pérdida de la bonificación por financiación del vehículo",
+            "amount": "1.200,00 €"
+          },
+          {
+            "concept": "Total",
+            "amount": "9.395,00 €"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "car_loan",
+        "intermediaryType": "company",
+        "agreedOn": "2023-03-01",
+        "principal": 16000,
+        "cashPrice": 17200,
+        "nominalRate": 7.49,
+        "rateType": "fixed",
+        "declaredApr": 7.75,
+        "declaredTotalPayable": 19231.8,
+        "instalmentCount": 60,
+        "instalmentAmount": 320.53,
+        "firstDueOn": "2023-04-01",
+        "agreedEndOn": "2028-03-01",
+        "repaidOn": "2026-09-15",
+        "principalRepaid": 8000,
+        "interestSettled": 35,
+        "compensationCharged": 160,
+        "discountLost": true
+      },
+      "lists": {}
+    },
+    "input": {
+      "product": "car_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2023-03-01",
+      "drawnOn": "2023-03-01",
+      "principal": 16000,
+      "netDisbursed": null,
+      "nominalRate": 7.49,
+      "rateType": "fixed",
+      "declaredApr": 7.75,
+      "declaredTotalPayable": 19231.8,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "regular",
+        "count": 60,
+        "amount": 320.53,
+        "frequency": "monthly",
+        "firstDueOn": "2023-04-01"
+      },
+      "balloon": null,
+      "charges": [],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": {
+        "on": "2026-09-15",
+        "principalRepaid": 8000,
+        "interestSettled": 35,
+        "compensationCharged": 160,
+        "paidByInsurance": false,
+        "agreedEndOn": "2028-03-01",
+        "remainingInterest": null,
+        "discountLost": true
+      },
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 7.75
+        },
+        {
+          "id": "early_repayment",
+          "status": "depends",
+          "question": "repayment_base",
+          "readings": [
+            {
+              "when": "principal_and_interest",
+              "id": "early_repayment",
+              "status": "above_general_cap",
+              "amount": 79.65
+            },
+            {
+              "when": "principal_only",
+              "id": "early_repayment",
+              "status": "above_general_cap",
+              "amount": 80
+            }
+          ]
+        },
+        {
+          "id": "dealer_discount",
+          "status": "review_it"
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2023-03-15"
+        }
+      ],
+      "indicator": {
+        "status": "distance_only",
+        "apr": 7.75,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.10",
+          "month": "2023-03",
+          "value": 8.2058
+        },
+        "points": -0.46
+      },
+      "information": ["contract_mentions", "cash_price", "law_change"],
+      "overCharged": {
+        "counted": 79.65,
+        "upTo": 80
+      },
+      "offerPass": true
+    }
+  }
+}

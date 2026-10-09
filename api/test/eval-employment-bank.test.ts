@@ -6,22 +6,8 @@ import {
   isEmploymentTemplatePage,
   type EmploymentBankCase,
 } from '../eval/employment-schema';
-import { FOOTER, PLACEHOLDER, SECTION, SHEET } from '../eval/schema';
-import { EMPLOYMENT_BANK, employmentTemplate, withoutComments } from './support/bank';
-
-// The placeholders a template fills from the page itself, and those each repeated block fills
-// from its rows.
-function placeholders(html: string): { page: string[]; lists: Map<string, string[]> } {
-  const lists = new Map<string, string[]>();
-  const rest = withoutComments(html).replace(SECTION, (_, name: string, block: string) => {
-    lists.set(
-      name,
-      [...block.matchAll(PLACEHOLDER)].map((m) => m[1] ?? ''),
-    );
-    return '';
-  });
-  return { page: [...rest.matchAll(PLACEHOLDER)].map((m) => m[1] ?? ''), lists };
-}
+import { FOOTER, SHEET } from '../eval/schema';
+import { EMPLOYMENT_BANK, employmentTemplate, placeholders } from './support/bank';
 
 const templatesOf = (c: EmploymentBankCase) =>
   c.pages.filter(isEmploymentTemplatePage).map((p) => p.template);

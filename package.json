@@ -27,7 +27,9 @@
     "bde:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/bde-series.mjs --check",
     "bde:write": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/bde-series.mjs --write",
     "rental-bank": "node scripts/rental-bank/render.mjs",
-    "employment-bank": "node scripts/rental-bank/render.mjs --cases api/eval/cases/employment --out api/eval/out/employment"
+    "employment-bank": "node scripts/rental-bank/render.mjs --cases api/eval/cases/employment --out api/eval/out/employment",
+    "credit-bank": "node scripts/rental-bank/render.mjs --cases api/eval/cases/credit --out api/eval/out/credit",
+    "insurance-bank": "node scripts/rental-bank/render.mjs --cases api/eval/cases/insurance --out api/eval/out/insurance"
   },
   "dependencies": {
     "@fontsource-variable/golos-text": "^5.3.0",

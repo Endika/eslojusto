@@ -1,0 +1,408 @@
+{
+  "id": "personal-loan-irregular-schedule-leap-year",
+  "description": "LCC annex I, observation c: a schedule whose dues move to working days and cross 29-02-2024, so time runs in days over 365, and 366 within 2024. 4.800 € at 7,25 % in twelve rows give 7,46 %, the APR stated.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "credit/loan-es",
+      "data": {
+        "contractRef": "PF-2023-004800",
+        "lenderBlock": "Ficticia Crédito Ejemplo, E. F. C., S. A., con CIF A12345677 y domicilio en Calle de la Prueba Ficticia, 1, Murcia. Inscrita en el registro de entidades del Banco de España con un número ficticio de prueba.",
+        "borrowerName": "Persona Prestataria Ficticia G",
+        "borrowerDni": "39641969K",
+        "borrowerAddress": "Calle de la Prueba Ficticia, 9, Madrid",
+        "purposeText": "Gastos de estudios",
+        "terms": [
+          {
+            "label": "Importe total del crédito",
+            "value": "4.800,00 €"
+          },
+          {
+            "label": "Tipo deudor (TIN) fijo",
+            "value": "7,25 %"
+          },
+          {
+            "label": "Tasa anual equivalente (TAE)",
+            "value": "7,46 %"
+          },
+          {
+            "label": "Número de cuotas",
+            "value": "12 cuotas, según el cuadro de amortización"
+          },
+          {
+            "label": "Importe de cada cuota",
+            "value": "415,88 €"
+          },
+          {
+            "label": "Fecha de la primera cuota",
+            "value": "20/12/2023"
+          },
+          {
+            "label": "Vencimiento final",
+            "value": "20/11/2024"
+          },
+          {
+            "label": "Importe total adeudado",
+            "value": "4.990,59 €"
+          }
+        ],
+        "charges": [],
+        "chargesNote": "El contrato no devenga comisiones de apertura, estudio ni gestión.",
+        "insuranceText": "La concesión del crédito no está condicionada a la contratación de ningún seguro.",
+        "guaranteeText": "El préstamo no cuenta con garantía real. La persona prestataria responde del pago con todos sus bienes presentes y futuros.",
+        "infoText": "La persona prestataria declara haber recibido, antes de la celebración del contrato, la Información Normalizada Europea, y en este acto un ejemplar del contrato.",
+        "iban": "ES73 2100 1259 1710 5358 0247",
+        "earlyRepaymentText": "La persona prestataria podrá reembolsar anticipadamente, total o parcialmente, el crédito en cualquier momento. El prestamista percibirá una compensación del 1 % del importe reembolsado si el periodo restante hasta la terminación pactada es superior a un año, y del 0,5 % en otro caso.",
+        "withdrawalText": "La persona prestataria dispone de un plazo de catorce días naturales para desistir del contrato sin indicar el motivo, comunicándolo al prestamista en papel u otro soporte duradero.",
+        "city": "Murcia",
+        "agreedOnText": "20 de noviembre de 2023"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "credit/schedule-es",
+      "data": {
+        "lenderName": "Ficticia Crédito Ejemplo, E. F. C., S. A.",
+        "contractRef": "PF-2023-004800",
+        "borrowerName": "Persona Prestataria Ficticia G",
+        "scheduleNote": "Los vencimientos que caen en día inhábil se trasladan al día hábil siguiente.",
+        "rows": [
+          {
+            "n": 1,
+            "dueOn": "20/12/2023",
+            "amount": "415,88 €",
+            "interest": "29,00 €",
+            "principal": "386,88 €",
+            "balance": "4.413,12 €"
+          },
+          {
+            "n": 2,
+            "dueOn": "22/01/2024",
+            "amount": "415,88 €",
+            "interest": "26,66 €",
+            "principal": "389,22 €",
+            "balance": "4.023,90 €"
+          },
+          {
+            "n": 3,
+            "dueOn": "29/02/2024",
+            "amount": "415,88 €",
+            "interest": "24,31 €",
+            "principal": "391,57 €",
+            "balance": "3.632,33 €"
+          },
+          {
+            "n": 4,
+            "dueOn": "20/03/2024",
+            "amount": "415,88 €",
+            "interest": "21,95 €",
+            "principal": "393,93 €",
+            "balance": "3.238,40 €"
+          },
+          {
+            "n": 5,
+            "dueOn": "22/04/2024",
+            "amount": "415,88 €",
+            "interest": "19,57 €",
+            "principal": "396,31 €",
+            "balance": "2.842,09 €"
+          },
+          {
+            "n": 6,
+            "dueOn": "20/05/2024",
+            "amount": "415,88 €",
+            "interest": "17,17 €",
+            "principal": "398,71 €",
+            "balance": "2.443,38 €"
+          },
+          {
+            "n": 7,
+            "dueOn": "20/06/2024",
+            "amount": "415,88 €",
+            "interest": "14,76 €",
+            "principal": "401,12 €",
+            "balance": "2.042,26 €"
+          },
+          {
+            "n": 8,
+            "dueOn": "22/07/2024",
+            "amount": "415,88 €",
+            "interest": "12,34 €",
+            "principal": "403,54 €",
+            "balance": "1.638,72 €"
+          },
+          {
+            "n": 9,
+            "dueOn": "20/08/2024",
+            "amount": "415,88 €",
+            "interest": "9,90 €",
+            "principal": "405,98 €",
+            "balance": "1.232,74 €"
+          },
+          {
+            "n": 10,
+            "dueOn": "20/09/2024",
+            "amount": "415,88 €",
+            "interest": "7,45 €",
+            "principal": "408,43 €",
+            "balance": "824,31 €"
+          },
+          {
+            "n": 11,
+            "dueOn": "21/10/2024",
+            "amount": "415,88 €",
+            "interest": "4,98 €",
+            "principal": "410,90 €",
+            "balance": "413,41 €"
+          },
+          {
+            "n": 12,
+            "dueOn": "20/11/2024",
+            "amount": "415,91 €",
+            "interest": "2,50 €",
+            "principal": "413,41 €",
+            "balance": "0,00 €"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "product": "personal_loan",
+        "agreedOn": "2023-11-20",
+        "principal": 4800,
+        "nominalRate": 7.25,
+        "rateType": "fixed",
+        "declaredApr": 7.46,
+        "declaredTotalPayable": 4990.59,
+        "instalmentCount": 12,
+        "instalmentAmount": 415.88,
+        "firstDueOn": "2023-12-20",
+        "agreedEndOn": "2024-11-20"
+      },
+      "lists": {
+        "schedule": [
+          {
+            "dueOn": "2023-12-20",
+            "amount": 415.88,
+            "interest": 29,
+            "principal": 386.88,
+            "balance": 4413.12
+          },
+          {
+            "dueOn": "2024-01-22",
+            "amount": 415.88,
+            "interest": 26.66,
+            "principal": 389.22,
+            "balance": 4023.9
+          },
+          {
+            "dueOn": "2024-02-29",
+            "amount": 415.88,
+            "interest": 24.31,
+            "principal": 391.57,
+            "balance": 3632.33
+          },
+          {
+            "dueOn": "2024-03-20",
+            "amount": 415.88,
+            "interest": 21.95,
+            "principal": 393.93,
+            "balance": 3238.4
+          },
+          {
+            "dueOn": "2024-04-22",
+            "amount": 415.88,
+            "interest": 19.57,
+            "principal": 396.31,
+            "balance": 2842.09
+          },
+          {
+            "dueOn": "2024-05-20",
+            "amount": 415.88,
+            "interest": 17.17,
+            "principal": 398.71,
+            "balance": 2443.38
+          },
+          {
+            "dueOn": "2024-06-20",
+            "amount": 415.88,
+            "interest": 14.76,
+            "principal": 401.12,
+            "balance": 2042.26
+          },
+          {
+            "dueOn": "2024-07-22",
+            "amount": 415.88,
+            "interest": 12.34,
+            "principal": 403.54,
+            "balance": 1638.72
+          },
+          {
+            "dueOn": "2024-08-20",
+            "amount": 415.88,
+            "interest": 9.9,
+            "principal": 405.98,
+            "balance": 1232.74
+          },
+          {
+            "dueOn": "2024-09-20",
+            "amount": 415.88,
+            "interest": 7.45,
+            "principal": 408.43,
+            "balance": 824.31
+          },
+          {
+            "dueOn": "2024-10-21",
+            "amount": 415.88,
+            "interest": 4.98,
+            "principal": 410.9,
+            "balance": 413.41
+          },
+          {
+            "dueOn": "2024-11-20",
+            "amount": 415.91,
+            "interest": 2.5,
+            "principal": 413.41,
+            "balance": 0
+          }
+        ]
+      }
+    },
+    "input": {
+      "product": "personal_loan",
+      "purpose": "personal",
+      "secured": "none",
+      "leaseWithoutPurchase": false,
+      "agreedOn": "2023-11-20",
+      "drawnOn": "2023-11-20",
+      "principal": 4800,
+      "netDisbursed": null,
+      "nominalRate": 7.25,
+      "rateType": "fixed",
+      "declaredApr": 7.46,
+      "declaredTotalPayable": 4990.59,
+      "confirmedApr": false,
+      "instalments": {
+        "kind": "schedule",
+        "rows": [
+          {
+            "dueOn": "2023-12-20",
+            "amount": 415.88
+          },
+          {
+            "dueOn": "2024-01-22",
+            "amount": 415.88
+          },
+          {
+            "dueOn": "2024-02-29",
+            "amount": 415.88
+          },
+          {
+            "dueOn": "2024-03-20",
+            "amount": 415.88
+          },
+          {
+            "dueOn": "2024-04-22",
+            "amount": 415.88
+          },
+          {
+            "dueOn": "2024-05-20",
+            "amount": 415.88
+          },
+          {
+            "dueOn": "2024-06-20",
+            "amount": 415.88
+          },
+          {
+            "dueOn": "2024-07-22",
+            "amount": 415.88
+          },
+          {
+            "dueOn": "2024-08-20",
+            "amount": 415.88
+          },
+          {
+            "dueOn": "2024-09-20",
+            "amount": 415.88
+          },
+          {
+            "dueOn": "2024-10-21",
+            "amount": 415.88
+          },
+          {
+            "dueOn": "2024-11-20",
+            "amount": 415.91
+          }
+        ]
+      },
+      "balloon": null,
+      "charges": [],
+      "insurance": null,
+      "card": null,
+      "earlyRepayment": null,
+      "infoReceivedOn": null,
+      "infoReceived": true,
+      "mentions": {}
+    },
+    "review": {
+      "scope": {
+        "inScope": true,
+        "indicatorOnly": false
+      },
+      "items": [
+        {
+          "id": "apr",
+          "status": "matches",
+          "apr": 7.46
+        },
+        {
+          "id": "early_repayment",
+          "status": "not_entered"
+        },
+        {
+          "id": "withdrawal",
+          "status": "ended",
+          "lastDay": "2023-12-04"
+        }
+      ],
+      "indicator": {
+        "status": "distance_only",
+        "apr": 7.46,
+        "aprOrigin": "declared",
+        "reference": {
+          "kind": "series",
+          "series": "BE_19_4.9",
+          "month": "2023-11",
+          "value": 3.2725
+        },
+        "points": 4.19
+      },
+      "information": ["contract_mentions", "law_change"],
+      "overCharged": {
+        "counted": 0,
+        "upTo": 0
+      },
+      "offerPass": false
+    }
+  }
+}
