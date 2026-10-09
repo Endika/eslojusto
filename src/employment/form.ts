@@ -30,22 +30,77 @@ import { parseAmount } from '../calculator/number';
 import type { EmploymentFormField } from './ports';
 import { ROW_LISTS, parseRowField, rowField, type RowList } from './rows';
 
-// The sheets in order. The work history sits right after the modality: both are about how long
-// the contract may be fixed-term, and its tab holds both.
+// The sheets in order, each small enough for a phone's screen. The work history sits right after
+// the modality: both are about how long the contract may be fixed-term, and its tab holds both.
+// What the contract has to say comes last, so the walk always ends on a sheet that is asked.
 export const SHEETS = [
   'relacion',
+  'contratacion',
+  'escrito',
+  'fechas',
   'modalidad',
+  'prorrogas',
+  'causa',
+  'sustitucion',
+  'discontinuo',
+  'formacion',
+  'formacion-datos',
   'historial',
   'salario',
+  'periodo',
+  'horas',
+  'pagas-extra',
+  'desglose',
+  'convenio',
+  'convenio-cifras',
   'nominas',
   'jornada',
+  'noche',
+  'horas-extra',
+  'horas-extra-pacto',
+  'parcial',
+  'parcial-horas',
+  'complementarias',
   'prueba',
+  'prueba-duracion',
+  'prueba-antes',
   'vacaciones',
+  'vacaciones-pago',
+  'convenio-condiciones',
   'clausulas',
-  'informacion',
   'oferta',
+  'oferta-salario',
+  'oferta-contrato',
+  'informacion',
+  'informacion-puesto',
+  'informacion-salario',
+  'informacion-duracion',
+  'informacion-igualdad',
+  'informacion-otros',
 ] as const;
 export type Sheet = (typeof SHEETS)[number];
+
+// What the contract has to say, three points a sheet by topic; the first sheet carries the help.
+export const INFO_SHEETS = [
+  ['informacion', ['a', 'i']],
+  ['informacion-puesto', ['c', 'd', 'e']],
+  ['informacion-salario', ['f', 'g', 'h']],
+  ['informacion-duracion', ['b', 'n', 'q']],
+  ['informacion-igualdad', ['l', 'm', 'o']],
+  ['informacion-otros', ['j', 'k', 'p']],
+] as const satisfies readonly (readonly [Sheet, readonly InfoElement[]])[];
+// The sheets that ask about the relationship: the gate reads them all before it decides.
+const RELATION_SHEETS: readonly Sheet[] = ['relacion', 'contratacion', 'escrito', 'fechas'];
+// The modality's sheets, skipped with it when the review is partial.
+const MODALITY_SHEETS: readonly Sheet[] = [
+  'modalidad',
+  'prorrogas',
+  'causa',
+  'sustitucion',
+  'discontinuo',
+  'formacion',
+  'formacion-datos',
+];
 
 export const RELATIONSHIPS: readonly Relationship[] = [
   'common',
@@ -133,92 +188,54 @@ export interface FieldError {
   readonly code: FieldErrorCode;
 }
 
+const infoFields = (sheet: Sheet): EmploymentFormField[] =>
+  INFO_SHEETS.find(([s]) => s === sheet)?.[1].map(infoField) ?? [];
+
 // The questions each sheet asks; a row list counts by its name.
 export const SHEET_FIELDS: Record<Sheet, readonly EmploymentFormField[]> = {
-  relacion: [
-    'relationship',
-    'viaTempAgency',
-    'relief',
-    'under18',
-    'writtenContract',
-    'startDate',
-    'signedOn',
-    'endDate',
-  ],
-  modalidad: [
-    'modality',
-    'extensions',
-    'causeStated',
-    'circumstancesStated',
-    'replacedPersonNamed',
-    'replacementCauseStated',
-    'activityPeriod',
-    'discontinuousHours',
-    'distribution',
-    'studiesEndedOn',
-    'disability',
-    'planAttached',
-    'effectiveYear1',
-    'effectiveYear2',
-  ],
+  relacion: ['relationship'],
+  contratacion: ['viaTempAgency', 'relief'],
+  escrito: ['under18', 'writtenContract'],
+  fechas: ['signedOn', 'startDate', 'endDate'],
+  modalidad: ['modality'],
+  prorrogas: ['extensions'],
+  causa: ['causeStated', 'circumstancesStated'],
+  sustitucion: ['replacedPersonNamed', 'replacementCauseStated'],
+  discontinuo: ['activityPeriod', 'discontinuousHours', 'distribution'],
+  formacion: ['planAttached', 'studiesEndedOn'],
+  'formacion-datos': ['disability', 'effectiveYear1', 'effectiveYear2'],
   historial: ['hasHistory', 'history', 'historyIncomplete'],
-  salario: [
-    'salaryAmount',
-    'salaryPeriod',
-    'extraPays',
-    'extraProrated',
-    'hasBreakdown',
-    'parts',
-    'inKind',
-    'weeklyHours',
-    'annualHours',
-    'fullTimeHours',
-    'agreementNamed',
-    'categorySalary',
-    'agreementAnnualHours',
-  ],
+  salario: ['salaryAmount'],
+  periodo: ['salaryPeriod', 'inKind'],
+  horas: ['weeklyHours', 'annualHours'],
+  'pagas-extra': ['extraPays', 'extraProrated'],
+  desglose: ['hasBreakdown', 'parts'],
+  convenio: ['agreementNamed'],
+  'convenio-cifras': ['fullTimeHours', 'categorySalary', 'agreementAnnualHours'],
   nominas: ['hasPayslips', 'payslips'],
-  jornada: [
-    'hasSchedule',
-    'schedule',
-    'shifts',
-    'nightWorker',
-    'irregular',
-    'hasOvertime',
-    'overtimeKind',
-    'overtimeHours',
-    'overtimePaid',
-    'isPartTime',
-    'hoursStated',
-    'distributionStated',
-    'hasComplementary',
-    'complementaryPercent',
-    'complementaryNotice',
-    'voluntaryPercent',
-    'remoteShare',
-    'realWeeklyHours',
-  ],
-  prueba: [
-    'hasTrial',
-    'trialAmount',
-    'trialUnit',
-    'technical',
-    'smallCompany',
-    'sameDutiesBefore',
-    'afterTraining',
-    'agreementTrialMonths',
-  ],
-  vacaciones: [
-    'hasHolidays',
-    'holidayDays',
-    'holidayUnit',
-    'workDaysPerWeek',
-    'holidaysInSalary',
-    'agreementHolidayDays',
-  ],
+  jornada: ['hasSchedule', 'schedule', 'shifts'],
+  noche: ['nightWorker', 'irregular'],
+  'horas-extra': ['hasOvertime', 'overtimePaid'],
+  'horas-extra-pacto': ['overtimeKind', 'overtimeHours'],
+  parcial: ['remoteShare', 'realWeeklyHours', 'isPartTime'],
+  'parcial-horas': ['hoursStated', 'distributionStated', 'hasComplementary'],
+  complementarias: ['complementaryPercent', 'complementaryNotice', 'voluntaryPercent'],
+  prueba: ['technical', 'hasTrial'],
+  'prueba-duracion': ['trialAmount', 'trialUnit', 'smallCompany'],
+  'prueba-antes': ['sameDutiesBefore', 'afterTraining'],
+  vacaciones: ['hasHolidays', 'holidayDays', 'holidayUnit'],
+  'vacaciones-pago': ['workDaysPerWeek', 'holidaysInSalary'],
+  'convenio-condiciones': ['agreementTrialMonths', 'agreementHolidayDays'],
   clausulas: ['hasClauses', 'clauses'],
-  informacion: INFO_ELEMENTS.map(infoField),
-  oferta: ['hasOffer', 'offerGross', 'offerNet', 'offerHours', 'offerModality', 'offerRemote'],
+  oferta: ['hasOffer'],
+  'oferta-salario': ['offerGross', 'offerHours', 'offerNet'],
+  'oferta-contrato': ['offerModality', 'offerRemote'],
+  informacion: infoFields('informacion'),
+  'informacion-puesto': infoFields('informacion-puesto'),
+  'informacion-salario': infoFields('informacion-salario'),
+  'informacion-duracion': infoFields('informacion-duracion'),
+  'informacion-igualdad': infoFields('informacion-igualdad'),
+  'informacion-otros': infoFields('informacion-otros'),
 };
 
 // «payslips.0.salary» belongs to «payslips».
@@ -320,10 +337,10 @@ const MONTH = /^(\d{4})-(\d{2})$/;
 
 // The questions on the relationship decide the reach; the rest of the sheets follow from it.
 function sheetsFor(reach: Scope | null, modality: Modality | undefined): Set<Sheet> {
-  if (reach === null || !reach.inScope) return new Set(['relacion']);
+  if (reach === null || !reach.inScope) return new Set(RELATION_SHEETS);
   return new Set(
     SHEETS.filter((s) => {
-      if (s === 'modalidad') return !reach.partial;
+      if (MODALITY_SHEETS.includes(s)) return !reach.partial;
       if (s === 'historial')
         return !reach.partial && (modality === undefined || !OPEN_ENDED.includes(modality));
       return true;

@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { contractAnnualPay } from '../../src/engine/employment/minimum-wage';
 import { INFO_ELEMENTS } from '../../src/engine/employment/types';
-import { applyConditions, gate } from '../../src/employment/conditions';
+import { applies, applyConditions, gate } from '../../src/employment/conditions';
 import { readEmploymentForm, sheetApplies, sheetErrors } from '../../src/employment/form';
 import { TODAY } from './fixtures';
 
@@ -131,6 +131,27 @@ describe('the employment form', () => {
     expect(sheetApplies(el, 'salario')).toBe(true);
     // The modality left unanswered on a skipped sheet never blocks the review.
     expect('input' in readEmploymentForm(el, TODAY)).toBe(true);
+  });
+
+  it('keeps to the relationship’s sheets until the gate has all their answers', () => {
+    const el = form({ startDate: '' });
+    expect(sheetApplies(el, 'fechas')).toBe(true);
+    expect(sheetApplies(el, 'modalidad')).toBe(false);
+  });
+
+  it('skips a sheet whose every question waits on an answer that did not open it', () => {
+    const el = form({ modality: 'production' });
+    el.insertAdjacentHTML(
+      'beforeend',
+      `<fieldset data-sheet="causa"><div data-if="modality:production eventual">
+        <input type="radio" name="causeStated" value="yes" /></div></fieldset>`,
+    );
+    applyConditions(el);
+    expect(applies(el, 'causa')).toBe(true);
+    const modality = el.querySelector<HTMLInputElement>('[name="modality"]');
+    if (modality) modality.value = 'permanent';
+    applyConditions(el);
+    expect(applies(el, 'causa')).toBe(false);
   });
 
   it('asks for the work history only of a contract that is not open-ended', () => {

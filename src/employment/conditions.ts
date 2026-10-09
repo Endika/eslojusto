@@ -62,6 +62,12 @@ export function gate(form: HTMLFormElement): Scope {
   return formScope(form) ?? { inScope: true, partial: false };
 }
 
-// The relationship sheet and the result always; the rest as the gate and the modality allow.
+// Whether a sheet has a question on: one whose every question waits on an answer that did not
+// open it is skipped.
+const asks = (form: HTMLFormElement, sheet: Sheet): boolean =>
+  form.querySelector(`[data-sheet="${sheet}"] :is(input, select, textarea):not(:disabled)`) !==
+  null;
+
+// The result always; a sheet as the gate, the modality and the answers before it allow.
 export const applies = (form: HTMLFormElement, step: Sheet | 'resultado'): boolean =>
-  step === 'resultado' || sheetApplies(form, step);
+  step === 'resultado' || (sheetApplies(form, step) && asks(form, step));

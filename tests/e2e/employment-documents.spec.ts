@@ -263,53 +263,84 @@ const markOf = (page: Page, field: string) => page.locator(`[data-field="${field
 
 const next = nextSheet;
 
+// Moves on until the last sheet, whose button reviews.
+async function toLastSheet(page: Page) {
+  while (!(await page.getByRole('button', { name: 'Revisar' }).isVisible())) await next(page);
+}
+
 // The relationship and the contract's type, read; the answers no document gives.
 async function confirmStart(page: Page) {
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
   const relation = sheet(page, 'Tu relación laboral');
-  await expect(relation.getByLabel('Trabajo por cuenta ajena', { exact: true })).toBeChecked();
+  await expect(
+    relation.getByLabel('¿Qué relación tienes con la empresa?', { exact: true }),
+  ).toHaveValue('common');
   await expect(markOf(page, 'relationship')).toHaveText(
     'Sale de lo leído en tus documentos · confianza media',
   );
-  await expect(relation.getByLabel('Fecha de inicio', { exact: true })).toHaveValue('2025-04-01');
-  await expect(relation.getByLabel('Fecha de fin', { exact: true })).toHaveValue('2025-12-31');
+  await next(page);
+  await expect(sheet(page, 'Cómo te contrataron')).toBeVisible();
+  await next(page);
+  await choose(sheet(page, 'Tu edad y tu contrato'), '¿Tienes menos de 18 años?', 'No');
+  await next(page);
+
+  const dates = sheet(page, 'Fechas del contrato');
+  await expect(dates.getByLabel('Fecha de inicio', { exact: true })).toHaveValue('2025-04-01');
+  await expect(dates.getByLabel('Fecha de fin', { exact: true })).toHaveValue('2025-12-31');
   await expect(markOf(page, 'startDate')).toHaveText('Leído del documento · confianza alta');
-  await choose(relation, '¿Tienes menos de 18 años?', 'No');
   await next(page);
 
   const modality = sheet(page, 'Tu tipo de contrato');
-  await expect(
-    modality.getByLabel('Por circunstancias de la producción', { exact: true }),
-  ).toBeChecked();
+  await expect(modality.getByLabel('¿Qué tipo de contrato es?', { exact: true })).toHaveValue(
+    'production',
+  );
   await expect(modality.locator('[data-read-quote="modality"] blockquote')).toHaveText(
     'Contrato temporal por circunstancias de la producción',
   );
+  await next(page);
+  await expect(sheet(page, 'Las prórrogas')).toBeVisible();
+  await next(page);
+
+  const cause = sheet(page, 'La causa del contrato');
   // The cause as the contract words it, beside the question the person answers.
-  await expect(modality.locator('[data-read-quote="causeStated"] blockquote')).toHaveText(
+  await expect(cause.locator('[data-read-quote="causeStated"] blockquote')).toHaveText(
     'Aumento de pedidos por la campaña de otoño de la línea de montaje.',
   );
-  await choose(modality, '¿El contrato explica la causa de que sea temporal?', 'Sí');
+  await choose(cause, '¿El contrato explica la causa de que sea temporal?', 'Sí');
   await choose(
-    modality,
+    cause,
     '¿Y explica las circunstancias concretas y su relación con la duración?',
     'Sí',
   );
   await next(page);
 }
 
-// The rest of the sheets after the work history, as a whole contract fills them.
+// The rest of the sheets after the work history, as a whole contract fills them, up to the
+// clauses.
 async function confirmRest(page: Page) {
   const salary = sheet(page, 'Tu salario');
   await expect(salary.getByLabel('Salario bruto', { exact: true })).toHaveValue('1.400,00');
-  await expect(salary.getByLabel('Al mes', { exact: true })).toBeChecked();
-  await expect(salary.getByLabel('Pagas extra al año', { exact: true })).toHaveValue('2');
+  await next(page);
+  await expect(
+    sheet(page, 'El periodo del salario').getByLabel('Al mes', { exact: true }),
+  ).toBeChecked();
+  await next(page);
+  await expect(
+    sheet(page, 'Horas del contrato').getByLabel('Horas a la semana', { exact: true }),
+  ).toHaveValue('40,00');
+  await next(page);
+  await expect(
+    sheet(page, 'Tus pagas extra').getByLabel('Pagas extra al año', { exact: true }),
+  ).toHaveValue('2');
   await expect(markOf(page, 'extraPays')).toHaveText(
     'Sale de lo leído en tus documentos · confianza alta',
   );
-  await expect(salary.getByLabel('Horas a la semana', { exact: true })).toHaveValue('40,00');
-  await expect(salary.locator('[data-read-quote="categorySalary"] blockquote')).toHaveText(
-    'Oficial de segunda',
-  );
+  await next(page);
+  await next(page);
+  await next(page);
+  await expect(
+    sheet(page, 'Cifras de tu convenio').locator('[data-read-quote="categorySalary"] blockquote'),
+  ).toHaveText('Oficial de segunda');
   await next(page);
 
   const payslips = sheet(page, 'Tus nóminas');
@@ -335,22 +366,37 @@ async function confirmRest(page: Page) {
   await expect(
     question(time, '¿Trabajas a turnos?').getByLabel('No', { exact: true }),
   ).toBeChecked();
-  await choose(time, '¿El contrato reparte la jornada de forma irregular en el año?', 'No');
   await next(page);
-
-  const trial = sheet(page, 'Tu periodo de prueba');
-  await expect(trial.getByLabel('Duración', { exact: true })).toHaveValue('1,00');
-  await choose(trial, '¿Eres técnico titulado?', 'No');
-  await choose(trial, '¿Tu empresa tiene menos de 25 personas en plantilla?', 'No');
-  await choose(trial, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
-  await choose(trial, '¿Vienes de un contrato formativo en esta empresa?', 'No');
-  await next(page);
-
-  const holidays = sheet(page, 'Tus vacaciones');
-  await expect(holidays.getByLabel('Días de vacaciones al año', { exact: true })).toHaveValue(
-    '30,00',
+  await choose(
+    sheet(page, 'Noche y jornada irregular'),
+    '¿El contrato reparte la jornada de forma irregular en el año?',
+    'No',
   );
-  await choose(holidays, '¿Dice que las vacaciones van incluidas en el salario?', 'No');
+  await next(page);
+  await next(page);
+  await next(page);
+
+  await choose(sheet(page, 'Tu periodo de prueba'), '¿Eres técnico titulado?', 'No');
+  await next(page);
+  const length = sheet(page, 'Duración de la prueba');
+  await expect(length.getByLabel('Duración', { exact: true })).toHaveValue('1,00');
+  await choose(length, '¿Tu empresa tiene menos de 25 personas en plantilla?', 'No');
+  await next(page);
+  const before = sheet(page, 'Más sobre la prueba');
+  await choose(before, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
+  await choose(before, '¿Vienes de un contrato formativo en esta empresa?', 'No');
+  await next(page);
+
+  await expect(
+    sheet(page, 'Tus vacaciones').getByLabel('Días de vacaciones al año', { exact: true }),
+  ).toHaveValue('30,00');
+  await next(page);
+  await choose(
+    sheet(page, 'Cómo se cuentan y se pagan'),
+    '¿Dice que las vacaciones van incluidas en el salario?',
+    'No',
+  );
+  await next(page);
   await next(page);
 }
 
@@ -363,18 +409,24 @@ async function confirmClausesAndOffer(page: Page) {
     'Durante un año tras el fin del contrato no trabajarás para empresas del sector.',
   );
   await next(page);
+  await next(page);
+  await expect(
+    sheet(page, 'El salario de la oferta').getByLabel('Salario al año de la oferta', {
+      exact: true,
+    }),
+  ).toHaveValue('20.000,00');
+  await next(page);
+  await expect(
+    sheet(page, 'El contrato de la oferta').getByLabel('Tipo de contrato de la oferta', {
+      exact: true,
+    }),
+  ).toHaveValue('permanent');
+  await next(page);
   const info = sheet(page, 'Lo que el contrato tiene que decir');
   await expect(info.locator('[data-field="info_a"] > .read-mark')).toHaveText(
     'Leído del documento · confianza alta',
   );
-  await next(page);
-  const offer = sheet(page, 'La oferta de empleo');
-  await expect(offer.getByLabel('Salario al año de la oferta', { exact: true })).toHaveValue(
-    '20.000,00',
-  );
-  await expect(offer.getByLabel('Tipo de contrato de la oferta', { exact: true })).toHaveValue(
-    'permanent',
-  );
+  await toLastSheet(page);
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
 }
@@ -506,9 +558,7 @@ test('a work history cut to its most recent rows never reads as within the limit
   }
   await next(page);
   await confirmRest(page);
-  await next(page);
-  await next(page);
-  await expect(sheet(page, 'La oferta de empleo')).toBeVisible();
+  await toLastSheet(page);
   // With a pass already held, the detail shows why.
   await page.evaluate(
     (pass) => localStorage.setItem('eslojusto-pase', pass),
@@ -571,63 +621,101 @@ interface ByHand {
 async function fillByHand(page: Page, c: ByHand) {
   await page.goto('contrato/');
   await page.getByRole('button', { name: /Rellenar a mano/ }).click();
-  const relation = sheet(page, 'Tu relación laboral');
-  await relation.getByLabel('Trabajo por cuenta ajena', { exact: true }).check();
-  await choose(
-    relation,
-    '¿Te contrató una empresa de trabajo temporal para trabajar en otra?',
-    'No',
-  );
-  await choose(relation, '¿Es un contrato de relevo?', 'No');
-  await choose(relation, '¿Tienes menos de 18 años?', 'No');
-  await choose(relation, '¿Tienes el contrato por escrito?', 'Sí');
-  await relation.getByLabel('Fecha de inicio', { exact: true }).fill(c.start);
+  await sheet(page, 'Tu relación laboral')
+    .getByLabel('¿Qué relación tienes con la empresa?')
+    .selectOption({ label: 'Trabajo por cuenta ajena' });
+  await next(page);
+  const hiring = sheet(page, 'Cómo te contrataron');
+  await choose(hiring, '¿Te contrató una empresa de trabajo temporal para trabajar en otra?', 'No');
+  await choose(hiring, '¿Es un contrato de relevo?', 'No');
+  await next(page);
+  const written = sheet(page, 'Tu edad y tu contrato');
+  await choose(written, '¿Tienes menos de 18 años?', 'No');
+  await choose(written, '¿Tienes el contrato por escrito?', 'Sí');
+  await next(page);
+  await sheet(page, 'Fechas del contrato')
+    .getByLabel('Fecha de inicio', { exact: true })
+    .fill(c.start);
   await next(page);
   await sheet(page, 'Tu tipo de contrato')
-    .getByLabel(c.modality ?? 'Indefinido', { exact: true })
-    .check();
+    .getByLabel('¿Qué tipo de contrato es?')
+    .selectOption({ label: c.modality ?? 'Indefinido' });
   await next(page);
   if (c.modality !== undefined) {
     await expect(sheet(page, 'Tus contratos anteriores')).toBeVisible();
     await next(page);
   }
-  const salary = sheet(page, 'Tu salario');
-  await salary.getByLabel('Salario bruto', { exact: true }).fill(c.salary ?? '1.500,00');
-  await choose(salary, '¿Por qué periodo es esa cifra?', 'Al mes');
-  await salary.getByLabel('Pagas extra al año', { exact: true }).fill('2');
-  await choose(salary, '¿Las pagas extra van prorrateadas en cada nómina?', 'No');
-  await salary.getByLabel('Horas a la semana', { exact: true }).fill('40');
-  await choose(salary, '¿El contrato nombra tu convenio colectivo?', 'Sí');
+  await sheet(page, 'Tu salario')
+    .getByLabel('Salario bruto', { exact: true })
+    .fill(c.salary ?? '1.500,00');
+  await next(page);
+  await choose(sheet(page, 'El periodo del salario'), '¿Por qué periodo es esa cifra?', 'Al mes');
+  await next(page);
+  await sheet(page, 'Horas del contrato')
+    .getByLabel('Horas a la semana', { exact: true })
+    .fill('40');
+  await next(page);
+  const extras = sheet(page, 'Tus pagas extra');
+  await extras.getByLabel('Pagas extra al año', { exact: true }).fill('2');
+  await choose(extras, '¿Las pagas extra van prorrateadas en cada nómina?', 'No');
+  await next(page);
+  await next(page);
+  await choose(sheet(page, 'Tu convenio'), '¿El contrato nombra tu convenio colectivo?', 'Sí');
+  await next(page);
   await next(page);
   await expect(sheet(page, 'Tus nóminas')).toBeVisible();
   await next(page);
-  const time = sheet(page, 'Tu jornada');
-  await choose(time, '¿Trabajas a turnos?', 'No');
-  await choose(time, '¿Trabajas de noche?', 'No');
-  await choose(time, '¿El contrato reparte la jornada de forma irregular en el año?', 'No');
-  await choose(time, '¿Es un contrato a tiempo parcial?', 'No');
+  await choose(sheet(page, 'Tu jornada'), '¿Trabajas a turnos?', 'No');
+  await next(page);
+  const night = sheet(page, 'Noche y jornada irregular');
+  await choose(night, '¿Trabajas de noche?', 'No');
+  await choose(night, '¿El contrato reparte la jornada de forma irregular en el año?', 'No');
+  await next(page);
+  await next(page);
+  await choose(
+    sheet(page, 'Teletrabajo y tiempo parcial'),
+    '¿Es un contrato a tiempo parcial?',
+    'No',
+  );
   await next(page);
   const trial = sheet(page, 'Tu periodo de prueba');
-  await choose(trial, '¿El contrato tiene periodo de prueba?', 'Sí');
-  await trial.getByLabel('Duración', { exact: true }).fill('2');
-  await choose(trial, 'En', 'Meses');
   await choose(trial, '¿Eres técnico titulado?', 'No');
-  await choose(trial, '¿Tu empresa tiene menos de 25 personas en plantilla?', 'No');
-  await choose(trial, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
-  await choose(trial, '¿Vienes de un contrato formativo en esta empresa?', 'No');
+  await choose(trial, '¿El contrato tiene periodo de prueba?', 'Sí');
+  await next(page);
+  const length = sheet(page, 'Duración de la prueba');
+  await length.getByLabel('Duración', { exact: true }).fill('2');
+  await choose(length, 'En', 'Meses');
+  await choose(length, '¿Tu empresa tiene menos de 25 personas en plantilla?', 'No');
+  await next(page);
+  const before = sheet(page, 'Más sobre la prueba');
+  await choose(before, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
+  await choose(before, '¿Vienes de un contrato formativo en esta empresa?', 'No');
   await next(page);
   const holidays = sheet(page, 'Tus vacaciones');
   await choose(holidays, '¿El contrato dice cuántos días de vacaciones tienes?', 'Sí');
   await holidays.getByLabel('Días de vacaciones al año', { exact: true }).fill('30');
   await choose(holidays, '¿Qué días son?', 'Naturales');
-  await choose(holidays, '¿Dice que las vacaciones van incluidas en el salario?', 'No');
+  await next(page);
+  await choose(
+    sheet(page, 'Cómo se cuentan y se pagan'),
+    '¿Dice que las vacaciones van incluidas en el salario?',
+    'No',
+  );
+  await next(page);
   await next(page);
   await expect(sheet(page, 'Cláusulas')).toBeVisible();
   await next(page);
-  const info = sheet(page, 'Lo que el contrato tiene que decir');
-  for (const element of c.missing ?? []) await choose(info, element, 'No está');
-  await next(page);
   await expect(sheet(page, 'La oferta de empleo')).toBeVisible();
+  await next(page);
+  // What the contract has to say, a few points a sheet: each one missing is marked where it is.
+  for (;;) {
+    for (const element of c.missing ?? []) {
+      const field = page.getByLabel(element, { exact: true });
+      if (await field.isVisible()) await field.selectOption({ label: 'No está' });
+    }
+    if (await page.getByRole('button', { name: 'Revisar' }).isVisible()) break;
+    await next(page);
+  }
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
 }

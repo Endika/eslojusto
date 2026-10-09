@@ -932,10 +932,6 @@
   display: grid;
   margin-top: 0.25rem;
 }
-.subhead {
-  margin: 1rem 0 0.25rem;
-  font: 620 1.0625rem / 1.3 var(--f-grotesque);
-}
 .field__input--text {
   min-block-size: 5rem;
   padding-block: 0.5rem;

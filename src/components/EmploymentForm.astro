@@ -1,17 +1,19 @@
 ---
 import Field from './Field.astro';
+import SelectField from './SelectField.astro';
 import EmploymentChoice from './EmploymentChoice.astro';
 import EmploymentRowChoice from './EmploymentRowChoice.astro';
 import EmploymentRowField from './EmploymentRowField.astro';
 import EmploymentRows from './EmploymentRows.astro';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
-import { INFO_ELEMENTS } from '../engine/employment/types';
 import {
   CAUSED,
   CLAUSE_LABELS,
   EMPLOYERS,
   EXTENDABLE,
+  INFO_PRESENCES,
+  INFO_SHEETS,
   MODALITIES,
   PART_KINDS,
   PERIOD_KINDS,
@@ -19,6 +21,7 @@ import {
   REMOTE_KINDS,
   REPLACEMENTS,
   SALARY_PERIODS,
+  TRAINING,
   TRIAL_UNITS,
   WAIVED_RIGHTS,
   WEEKDAYS,
@@ -40,6 +43,8 @@ const answer = (v: 'yes' | 'no' | 'unknown') => ({
 });
 const yesNo = [answer('yes'), answer('no')];
 const yesNoUnknown = [answer('yes'), answer('no'), answer('unknown')];
+// Asked only of a common relationship: any other is outside the review whatever they say.
+const common = { 'data-if': 'relationship:common', hidden: '' };
 // «No» first and checked: the list behind «Sí» opens only when asked for.
 const noOr = (yes: Key) => [answer('no'), { value: 'yes', label: tx(yes) }];
 
@@ -64,17 +69,28 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         {tx('employment.relation.question')}
       </h2>
       <p class="help help--short">{tx('employment.relation.help')}</p>
-      <EmploymentChoice
+      <SelectField
         name="relationship"
-        legend={tx('employment.relation.kind')}
-        layout="list"
+        label={tx('employment.relation.kind')}
+        choose={tx('employment.choose')}
         options={RELATIONSHIPS.map((r) => ({
           value: r,
           label: tx(`employment.relationship.${r}`),
           hint: tx(`employment.relationship.${r}_hint`),
         }))}
       />
-      <div class="subquestions" data-if="relationship:common" hidden>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-contratacion"
+      data-sheet="contratacion"
+      aria-labelledby="question-contratacion"
+    >
+      <h2 class="question" id="question-contratacion" tabindex="-1">
+        {tx('employment.hiring.question')}
+      </h2>
+      <div class="subquestions" {...common}>
         <EmploymentChoice
           name="viaTempAgency"
           legend={tx('employment.relation.agency')}
@@ -89,6 +105,19 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           layout="pair"
           options={yesNo}
         />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-escrito"
+      data-sheet="escrito"
+      aria-labelledby="question-escrito"
+    >
+      <h2 class="question" id="question-escrito" tabindex="-1">
+        {tx('employment.written.question')}
+      </h2>
+      <div class="subquestions" {...common}>
         <EmploymentChoice
           name="under18"
           legend={tx('employment.relation.minor')}
@@ -102,6 +131,18 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           options={yesNoUnknown}
         />
       </div>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-fechas" data-sheet="fechas" aria-labelledby="question-fechas">
+      <h2 class="question" id="question-fechas" tabindex="-1">
+        {tx('employment.dates.question')}
+      </h2>
+      <Field
+        name="signedOn"
+        label={tx('employment.relation.signed')}
+        hint={tx('employment.relation.signed_hint')}
+        kind="date"
+      />
       <div class="pair">
         <Field
           name="startDate"
@@ -116,12 +157,6 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           kind="date"
         />
       </div>
-      <Field
-        name="signedOn"
-        label={tx('employment.relation.signed')}
-        hint={tx('employment.relation.signed_hint')}
-        kind="date"
-      />
     </fieldset>
 
     <fieldset
@@ -134,16 +169,27 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         {tx('employment.modality.question')}
       </h2>
       <p class="help help--short">{tx('employment.modality.help')}</p>
-      <EmploymentChoice
+      <SelectField
         name="modality"
-        legend={tx('employment.modality.kind')}
-        layout="list"
+        label={tx('employment.modality.kind')}
+        choose={tx('employment.choose')}
         options={MODALITIES.map((m) => ({
           value: m,
           label: tx(`client.employment.modality.${m}`),
           hint: tx(`employment.modality.${m}_hint`),
         }))}
       />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-prorrogas"
+      data-sheet="prorrogas"
+      aria-labelledby="question-prorrogas"
+    >
+      <h2 class="question" id="question-prorrogas" tabindex="-1">
+        {tx('employment.extensions.question')}
+      </h2>
       <div class="subquestions" data-if={`modality:${EXTENDABLE.join(' ')}`} hidden>
         <Field
           name="extensions"
@@ -152,6 +198,12 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           kind="days"
         />
       </div>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-causa" data-sheet="causa" aria-labelledby="question-causa">
+      <h2 class="question" id="question-causa" tabindex="-1">
+        {tx('employment.cause.question')}
+      </h2>
       <div class="subquestions" data-if={`modality:${CAUSED.join(' ')}`} hidden>
         <EmploymentChoice
           name="causeStated"
@@ -165,6 +217,17 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           options={yesNoUnknown}
         />
       </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-sustitucion"
+      data-sheet="sustitucion"
+      aria-labelledby="question-sustitucion"
+    >
+      <h2 class="question" id="question-sustitucion" tabindex="-1">
+        {tx('employment.replacement.question')}
+      </h2>
       <div class="subquestions" data-if={`modality:${REPLACEMENTS.join(' ')}`} hidden>
         <EmploymentChoice
           name="replacedPersonNamed"
@@ -177,6 +240,17 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           options={yesNoUnknown}
         />
       </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-discontinuo"
+      data-sheet="discontinuo"
+      aria-labelledby="question-discontinuo"
+    >
+      <h2 class="question" id="question-discontinuo" tabindex="-1">
+        {tx('employment.discontinuous.question')}
+      </h2>
       <div class="subquestions" data-if="modality:discontinuous" hidden>
         <p class="help help--short">{tx('employment.modality.discontinuous_help')}</p>
         <EmploymentChoice
@@ -195,7 +269,18 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           options={yesNoUnknown}
         />
       </div>
-      <div class="subquestions" data-if="modality:training_alternance training_practice" hidden>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-formacion"
+      data-sheet="formacion"
+      aria-labelledby="question-formacion"
+    >
+      <h2 class="question" id="question-formacion" tabindex="-1">
+        {tx('employment.training.question')}
+      </h2>
+      <div class="subquestions" data-if={`modality:${TRAINING.join(' ')}`} hidden>
         <EmploymentChoice
           name="planAttached"
           legend={tx('employment.modality.plan')}
@@ -208,26 +293,35 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
             hint={tx('employment.modality.studies_end_hint')}
             kind="date"
           />
-          <EmploymentChoice
-            name="disability"
-            legend={tx('employment.modality.disability')}
-            hint={tx('employment.modality.disability_hint')}
-            options={yesNoUnknown}
-          />
         </div>
-        <div class="pair" data-if="modality:training_alternance" hidden>
-          <Field
-            name="effectiveYear1"
-            label={tx('employment.modality.effective_1')}
-            hint={tx('employment.modality.effective_hint')}
-            kind="amount"
-          />
-          <Field
-            name="effectiveYear2"
-            label={tx('employment.modality.effective_2')}
-            kind="amount"
-          />
-        </div>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-formacion-datos"
+      data-sheet="formacion-datos"
+      aria-labelledby="question-formacion-datos"
+    >
+      <h2 class="question" id="question-formacion-datos" tabindex="-1">
+        {tx('employment.training.more')}
+      </h2>
+      <div class="subquestions" data-if="modality:training_practice" hidden>
+        <EmploymentChoice
+          name="disability"
+          legend={tx('employment.modality.disability')}
+          hint={tx('employment.modality.disability_hint')}
+          options={yesNoUnknown}
+        />
+      </div>
+      <div class="pair" data-if="modality:training_alternance" hidden>
+        <Field
+          name="effectiveYear1"
+          label={tx('employment.modality.effective_1')}
+          hint={tx('employment.modality.effective_hint')}
+          kind="amount"
+        />
+        <Field name="effectiveYear2" label={tx('employment.modality.effective_2')} kind="amount" />
       </div>
     </fieldset>
 
@@ -319,25 +413,65 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         hint={tx('employment.salary.amount_hint')}
         kind="amount"
       />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-periodo"
+      data-sheet="periodo"
+      aria-labelledby="question-periodo"
+    >
+      <h2 class="question" id="question-periodo" tabindex="-1">
+        {tx('employment.period.question')}
+      </h2>
       <EmploymentChoice
         name="salaryPeriod"
         legend={tx('employment.salary.period')}
         options={SALARY_PERIODS.map((p) => ({ value: p, label: tx(`employment.period.${p}`) }))}
       />
+      <Field
+        name="inKind"
+        label={tx('employment.salary.in_kind')}
+        hint={tx('employment.salary.in_kind_hint')}
+        kind="amount"
+      />
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-horas" data-sheet="horas" aria-labelledby="question-horas">
+      <h2 class="question" id="question-horas" tabindex="-1">
+        {tx('employment.hours.question')}
+      </h2>
       <div class="pair">
         <Field
-          name="extraPays"
-          label={tx('employment.salary.extra_pays')}
-          hint={tx('employment.salary.extra_pays_hint')}
-          kind="days"
+          name="weeklyHours"
+          label={tx('employment.salary.weekly_hours')}
+          hint={tx('employment.salary.weekly_hours_hint')}
+          kind="amount"
         />
         <Field
-          name="inKind"
-          label={tx('employment.salary.in_kind')}
-          hint={tx('employment.salary.in_kind_hint')}
+          name="annualHours"
+          label={tx('employment.salary.annual_hours')}
+          hint={tx('employment.salary.annual_hours_hint')}
           kind="amount"
         />
       </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-pagas-extra"
+      data-sheet="pagas-extra"
+      aria-labelledby="question-pagas-extra"
+    >
+      <h2 class="question" id="question-pagas-extra" tabindex="-1">
+        {tx('employment.extras.question')}
+      </h2>
+      <Field
+        name="extraPays"
+        label={tx('employment.salary.extra_pays')}
+        hint={tx('employment.salary.extra_pays_hint')}
+        kind="days"
+      />
       <EmploymentChoice
         name="extraProrated"
         legend={tx('employment.salary.prorated')}
@@ -346,6 +480,17 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         options={yesNo}
         attributes={{ 'data-if-above0': 'extraPays', hidden: '' }}
       />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-desglose"
+      data-sheet="desglose"
+      aria-labelledby="question-desglose"
+    >
+      <h2 class="question" id="question-desglose" tabindex="-1">
+        {tx('employment.parts.question')}
+      </h2>
       <EmploymentChoice
         name="hasBreakdown"
         legend={tx('employment.salary.breakdown')}
@@ -383,21 +528,17 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           />
         </div>
       </EmploymentRows>
-      <div class="pair">
-        <Field
-          name="weeklyHours"
-          label={tx('employment.salary.weekly_hours')}
-          hint={tx('employment.salary.weekly_hours_hint')}
-          kind="amount"
-        />
-        <Field
-          name="annualHours"
-          label={tx('employment.salary.annual_hours')}
-          hint={tx('employment.salary.annual_hours_hint')}
-          kind="amount"
-        />
-      </div>
-      <h3 class="subhead">{tx('employment.agreement.title')}</h3>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-convenio"
+      data-sheet="convenio"
+      aria-labelledby="question-convenio"
+    >
+      <h2 class="question" id="question-convenio" tabindex="-1">
+        {tx('employment.agreement.title')}
+      </h2>
       <p class="help help--short">{tx('employment.agreement.help')}</p>
       <EmploymentChoice
         name="agreementNamed"
@@ -405,6 +546,17 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         layout="pair"
         options={yesNo}
       />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-convenio-cifras"
+      data-sheet="convenio-cifras"
+      aria-labelledby="question-convenio-cifras"
+    >
+      <h2 class="question" id="question-convenio-cifras" tabindex="-1">
+        {tx('employment.agreement.figures')}
+      </h2>
       <Field
         name="fullTimeHours"
         label={tx('employment.agreement.full_time')}
@@ -544,6 +696,12 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         layout="pair"
         options={yesNo}
       />
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-noche" data-sheet="noche" aria-labelledby="question-noche">
+      <h2 class="question" id="question-noche" tabindex="-1">
+        {tx('employment.night.question')}
+      </h2>
       <EmploymentChoice
         name="nightWorker"
         legend={tx('employment.time.night')}
@@ -557,6 +715,17 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         layout="pair"
         options={yesNo}
       />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-horas-extra"
+      data-sheet="horas-extra"
+      aria-labelledby="question-horas-extra"
+    >
+      <h2 class="question" id="question-horas-extra" tabindex="-1">
+        {tx('employment.overtime.question')}
+      </h2>
       <EmploymentChoice
         name="hasOvertime"
         legend={tx('employment.time.overtime')}
@@ -564,6 +733,25 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         options={noOr('employment.time.overtime_yes')}
         checked="no"
       />
+      <div class="subquestions" data-if="hasOvertime:yes" hidden>
+        <EmploymentChoice
+          name="overtimePaid"
+          legend={tx('employment.time.overtime_paid')}
+          hint={tx('employment.time.overtime_paid_hint')}
+          options={yesNoUnknown}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-horas-extra-pacto"
+      data-sheet="horas-extra-pacto"
+      aria-labelledby="question-horas-extra-pacto"
+    >
+      <h2 class="question" id="question-horas-extra-pacto" tabindex="-1">
+        {tx('employment.overtime.agreed')}
+      </h2>
       <div class="subquestions" data-if="hasOvertime:yes" hidden>
         <EmploymentChoice
           name="overtimeKind"
@@ -576,11 +764,30 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         <div data-if="overtimeKind:hours" hidden>
           <Field name="overtimeHours" label={tx('employment.time.overtime_hours')} kind="amount" />
         </div>
-        <EmploymentChoice
-          name="overtimePaid"
-          legend={tx('employment.time.overtime_paid')}
-          hint={tx('employment.time.overtime_paid_hint')}
-          options={yesNoUnknown}
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-parcial"
+      data-sheet="parcial"
+      aria-labelledby="question-parcial"
+    >
+      <h2 class="question" id="question-parcial" tabindex="-1">
+        {tx('employment.part_time.question')}
+      </h2>
+      <div class="pair">
+        <Field
+          name="remoteShare"
+          label={tx('employment.time.remote')}
+          hint={tx('employment.time.remote_hint')}
+          kind="amount"
+        />
+        <Field
+          name="realWeeklyHours"
+          label={tx('employment.time.real_hours')}
+          hint={tx('employment.time.real_hours_hint')}
+          kind="amount"
         />
       </div>
       <EmploymentChoice
@@ -589,6 +796,17 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         layout="pair"
         options={yesNo}
       />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-parcial-horas"
+      data-sheet="parcial-horas"
+      aria-labelledby="question-parcial-horas"
+    >
+      <h2 class="question" id="question-parcial-horas" tabindex="-1">
+        {tx('employment.part_time.hours')}
+      </h2>
       <div class="subquestions" data-if="isPartTime:yes" hidden>
         <EmploymentChoice
           name="hoursStated"
@@ -609,6 +827,19 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           layout="pair"
           options={yesNo}
         />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-complementarias"
+      data-sheet="complementarias"
+      aria-labelledby="question-complementarias"
+    >
+      <h2 class="question" id="question-complementarias" tabindex="-1">
+        {tx('employment.complementary.question')}
+      </h2>
+      <div class="subquestions" data-if="isPartTime:yes" hidden>
         <div class="pair" data-if="hasComplementary:yes" hidden>
           <Field
             name="complementaryPercent"
@@ -625,20 +856,6 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           name="voluntaryPercent"
           label={tx('employment.time.voluntary_percent')}
           hint={tx('employment.time.voluntary_hint')}
-          kind="amount"
-        />
-      </div>
-      <div class="pair">
-        <Field
-          name="remoteShare"
-          label={tx('employment.time.remote')}
-          hint={tx('employment.time.remote_hint')}
-          kind="amount"
-        />
-        <Field
-          name="realWeeklyHours"
-          label={tx('employment.time.real_hours')}
-          hint={tx('employment.time.real_hours_hint')}
           kind="amount"
         />
       </div>
@@ -660,20 +877,42 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         layout="pair"
         options={yesNo}
       />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-prueba-duracion"
+      data-sheet="prueba-duracion"
+      aria-labelledby="question-prueba-duracion"
+    >
+      <h2 class="question" id="question-prueba-duracion" tabindex="-1">
+        {tx('employment.trial.length')}
+      </h2>
       <div class="subquestions" data-if="hasTrial:yes" hidden>
-        <div class="pair">
-          <Field name="trialAmount" label={tx('employment.trial.amount')} kind="amount" />
-          <EmploymentChoice
-            name="trialUnit"
-            legend={tx('employment.trial.unit')}
-            options={TRIAL_UNITS.map((u) => ({ value: u, label: tx(`employment.unit.${u}`) }))}
-          />
-        </div>
+        <Field name="trialAmount" label={tx('employment.trial.amount')} kind="amount" />
+        <EmploymentChoice
+          name="trialUnit"
+          legend={tx('employment.trial.unit')}
+          options={TRIAL_UNITS.map((u) => ({ value: u, label: tx(`employment.unit.${u}`) }))}
+        />
         <EmploymentChoice
           name="smallCompany"
           legend={tx('employment.trial.small_company')}
           options={yesNoUnknown}
         />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-prueba-antes"
+      data-sheet="prueba-antes"
+      aria-labelledby="question-prueba-antes"
+    >
+      <h2 class="question" id="question-prueba-antes" tabindex="-1">
+        {tx('employment.trial.before')}
+      </h2>
+      <div class="subquestions" data-if="hasTrial:yes" hidden>
         <EmploymentChoice
           name="sameDutiesBefore"
           legend={tx('employment.trial.same_duties')}
@@ -683,12 +922,6 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           name="afterTraining"
           legend={tx('employment.trial.after_training')}
           options={yesNoUnknown}
-        />
-        <Field
-          name="agreementTrialMonths"
-          label={tx('employment.trial.agreement')}
-          hint={tx('employment.agreement.your_figure')}
-          kind="amount"
         />
       </div>
     </fieldset>
@@ -718,6 +951,19 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
             { value: 'working', label: tx('employment.holidays.working') },
           ]}
         />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-vacaciones-pago"
+      data-sheet="vacaciones-pago"
+      aria-labelledby="question-vacaciones-pago"
+    >
+      <h2 class="question" id="question-vacaciones-pago" tabindex="-1">
+        {tx('employment.holidays.more')}
+      </h2>
+      <div class="subquestions" data-if="hasHolidays:yes" hidden>
         <div data-if="holidayUnit:working" hidden>
           <Field
             name="workDaysPerWeek"
@@ -732,6 +978,25 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           hint={tx('employment.holidays.in_salary_hint')}
           layout="pair"
           options={yesNo}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-convenio-condiciones"
+      data-sheet="convenio-condiciones"
+      aria-labelledby="question-convenio-condiciones"
+    >
+      <h2 class="question" id="question-convenio-condiciones" tabindex="-1">
+        {tx('employment.agreement.terms')}
+      </h2>
+      <div data-if="hasTrial:yes" hidden>
+        <Field
+          name="agreementTrialMonths"
+          label={tx('employment.trial.agreement')}
+          hint={tx('employment.agreement.your_figure')}
+          kind="amount"
         />
       </div>
       <Field
@@ -830,33 +1095,6 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
       </EmploymentRows>
     </fieldset>
 
-    <fieldset
-      class="sheet"
-      id="sheet-informacion"
-      data-sheet="informacion"
-      aria-labelledby="question-informacion"
-    >
-      <h2 class="question" id="question-informacion" tabindex="-1">
-        {tx('employment.info.question')}
-      </h2>
-      <p class="help help--short">{tx('employment.info.help')}</p>
-      <div class="information-list">
-        {INFO_ELEMENTS.map((e) => (
-          <EmploymentChoice
-            name={infoField(e)}
-            legend={tx(`client.employment.info.${e}`)}
-            checked="unknown"
-            options={[
-              { value: 'present', label: tx('employment.info.present') },
-              { value: 'by_reference', label: tx('employment.info.by_reference') },
-              { value: 'absent', label: tx('employment.info.absent') },
-              { value: 'unknown', label: tx('employment.answer.unknown') },
-            ]}
-          />
-        ))}
-      </div>
-    </fieldset>
-
     <fieldset class="sheet" id="sheet-oferta" data-sheet="oferta" aria-labelledby="question-oferta">
       <h2 class="question" id="question-oferta" tabindex="-1">
         {tx('employment.offer.question')}
@@ -868,6 +1106,17 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         options={noOr('employment.offer.yes')}
         checked="no"
       />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-oferta-salario"
+      data-sheet="oferta-salario"
+      aria-labelledby="question-oferta-salario"
+    >
+      <h2 class="question" id="question-oferta-salario" tabindex="-1">
+        {tx('employment.offer.salary_question')}
+      </h2>
       <div class="subquestions" data-if="hasOffer:yes" hidden>
         <div class="pair">
           <Field
@@ -884,6 +1133,19 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           layout="pair"
           options={yesNo}
         />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-oferta-contrato"
+      data-sheet="oferta-contrato"
+      aria-labelledby="question-oferta-contrato"
+    >
+      <h2 class="question" id="question-oferta-contrato" tabindex="-1">
+        {tx('employment.offer.contract_question')}
+      </h2>
+      <div class="subquestions" data-if="hasOffer:yes" hidden>
         <div class="field" data-field="offerModality">
           <label class="field__label" for="offerModality">
             {tx('employment.offer.modality')}
@@ -920,6 +1182,34 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         </div>
       </div>
     </fieldset>
+
+    {INFO_SHEETS.map(([sheet, elements], i) => (
+      <fieldset
+        class="sheet"
+        id={`sheet-${sheet}`}
+        data-sheet={sheet}
+        aria-labelledby={`question-${sheet}`}
+      >
+        <h2 class="question" id={`question-${sheet}`} tabindex="-1">
+          {tx(`employment.info.title.${sheet}`)}
+        </h2>
+        {i === 0 && <p class="help help--short">{tx('employment.info.help')}</p>}
+        {elements.map((e) => (
+          <SelectField
+            name={infoField(e)}
+            label={tx(`client.employment.info.${e}`)}
+            selected="unknown"
+            options={INFO_PRESENCES.map((value) => ({
+              value,
+              label:
+                value === 'unknown'
+                  ? tx('employment.answer.unknown')
+                  : tx(`employment.info.${value}`),
+            }))}
+          />
+        ))}
+      </fieldset>
+    ))}
   </div>
 
   <div class="actions">
