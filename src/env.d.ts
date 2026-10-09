@@ -17,4 +17,6 @@ interface ImportMetaEnv {
   readonly PUBLIC_HOUSEHOLD?: string;
   // '1' builds the review of a policy's dates at /seguros/; anything else leaves it out.
   readonly PUBLIC_INSURANCE?: string;
+  // '1' builds the consumer credit review at /financiacion/; anything else leaves it out.
+  readonly PUBLIC_CREDIT?: string;
 }

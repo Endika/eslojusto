@@ -1,0 +1,17 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { CREDIT_BUILD } from '../../content/sections';
+
+// Without PUBLIC_CREDIT=1 the build has no /financiacion/ at all, and the page's code stays out of it.
+export const getStaticPaths = (() =>
+  CREDIT_BUILD ? [{ params: { path: undefined } }] : []) satisfies GetStaticPaths;
+
+// The literal switch, not CREDIT_BUILD: the bundler drops the page and its script from a build
+// without it, which keeps that build identical to one without this page.
+/* eslint-disable no-restricted-syntax -- a fixed path into src/views, not a boundary escape */
+const Credit =
+  import.meta.env.PUBLIC_CREDIT === '1' ? (await import('../../views/Credit.astro')).default : null;
+/* eslint-enable no-restricted-syntax */
+---
+
+{Credit && <Credit lang="es" />}

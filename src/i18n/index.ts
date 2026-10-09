@@ -20,8 +20,14 @@ export function t(lang: Lang, key: Key, vars?: Variables): string {
   return interpolate(DICTIONARIES[lang][key], vars);
 }
 
+// The credit page's strings: its own, and the theme switch and other-language notice every page
+// reads.
+const CREDIT_PAGE = ['client.credit.', 'client.theme.', 'client.other_language.'];
+
 // The strings the browser scripts need, for the page to ship as JSON. Those of document reading
 // and the pass ship only in a build that has them, and each review section's only on its page.
+// The credit page ships only its own and what every page reads: the rest speak of claiming what
+// a final pay owes, which the credit copy never does.
 export const clientStrings = (
   lang: Lang,
   {
@@ -30,12 +36,14 @@ export const clientStrings = (
     employment = false,
     household = false,
     insurance = false,
+    credit = false,
   }: {
     documents?: boolean;
     rental?: boolean;
     employment?: boolean;
     household?: boolean;
     insurance?: boolean;
+    credit?: boolean;
   } = {},
 ): Partial<Record<Key, string>> =>
   Object.fromEntries(
@@ -46,6 +54,9 @@ export const clientStrings = (
         (rental || !key.startsWith('client.rental.')) &&
         (employment || !key.startsWith('client.employment.')) &&
         (household || !key.startsWith('client.household.')) &&
-        (insurance || !key.startsWith('client.insurance.')),
+        (insurance || !key.startsWith('client.insurance.')) &&
+        (credit
+          ? CREDIT_PAGE.some((prefix) => key.startsWith(prefix))
+          : !key.startsWith('client.credit.')),
     ),
   );

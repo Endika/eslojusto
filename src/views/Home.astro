@@ -5,6 +5,8 @@ import { link, type Lang } from '../i18n/languages';
 import { homeGraph } from '../content/structured-data';
 import { DOCUMENTS } from '../documents/config';
 import {
+  CREDIT_BETA,
+  CREDIT_BUILD,
   EMPLOYMENT_BETA,
   EMPLOYMENT_BUILD,
   HOUSEHOLD_BETA,
@@ -108,7 +110,8 @@ const groups: Group[] = [
     id: 'money',
     tone: 'salary',
     label: 'home.group_money',
-    // With the insurance review live, credit alone is still to come.
+    // Credit and insurance share one name on the «próximamente» line until either is live; then
+    // the other one is still to come under its own name.
     sections: [
       ...(INSURANCE_BUILD
         ? [
@@ -120,9 +123,27 @@ const groups: Group[] = [
               citation: 'home.insurance_citation',
               beta: INSURANCE_BETA,
             } satisfies Review,
-            'home.credit' as const,
           ]
-        : ['home.finance' as const]),
+        : []),
+      ...(CREDIT_BUILD
+        ? [
+            {
+              id: 'credit',
+              name: 'home.credit',
+              href: link(lang, 'financiacion/'),
+              situation: 'home.credit_situation',
+              citation: 'home.credit_citation',
+              beta: CREDIT_BETA,
+            } satisfies Review,
+          ]
+        : []),
+      ...(INSURANCE_BUILD && CREDIT_BUILD
+        ? []
+        : INSURANCE_BUILD
+          ? ['home.credit' as const]
+          : CREDIT_BUILD
+            ? ['home.insurance' as const]
+            : ['home.finance' as const]),
       'home.bills',
     ],
   },
