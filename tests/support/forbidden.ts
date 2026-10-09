@@ -46,6 +46,10 @@ const CREDIT_FORBIDDEN = [
 // pase»).
 const CREDIT_OWN_FORBIDDEN = [...CREDIT_FORBIDDEN, /\brecupera(r)?\b/];
 
+// The household review speaks to the worker but never says what she is entitled to: where the law
+// is not decisive it says «podría».
+const HOUSEHOLD_FORBIDDEN = [/\btienes derecho\b/, /\btienen derecho\b/];
+
 // What each section adds, by where its copy lives: a source folder, a built page or a prefix of
 // its translation keys. What is forbidden in one section may be the law's own words in another.
 export const SECTION_FORBIDDEN: Readonly<Record<string, readonly RegExp[]>> = {
@@ -61,6 +65,14 @@ export const SECTION_FORBIDDEN: Readonly<Record<string, readonly RegExp[]>> = {
   'credit.': CREDIT_OWN_FORBIDDEN,
   'client.credit.': CREDIT_OWN_FORBIDDEN,
   'dist/financiacion': CREDIT_FORBIDDEN,
+  'src/household': HOUSEHOLD_FORBIDDEN,
+  'dist/empleada-de-hogar': HOUSEHOLD_FORBIDDEN,
+  'household.': HOUSEHOLD_FORBIDDEN,
+  'client.household.': HOUSEHOLD_FORBIDDEN,
+  'privacy.household.': HOUSEHOLD_FORBIDDEN,
+  'legal_notice.household': HOUSEHOLD_FORBIDDEN,
+  'home.household': HOUSEHOLD_FORBIDDEN,
+  'footer.note_household': HOUSEHOLD_FORBIDDEN,
 };
 
 const sectionsOf = (where: string) =>

@@ -10,6 +10,8 @@ export const es = {
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen la Ley de Arrendamientos Urbanos (Ley 29/1994), la Ley 12/2023 y el IRAV y el IPC del INE.',
   'footer.note_employment':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen el Estatuto de los Trabajadores, el Real Decreto 723/2026 y los reales decretos del SMI de cada año.',
+  'footer.note_household':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen el Real Decreto 1620/2011, el Real Decreto-ley 16/2022 y los reales decretos del SMI de cada año.',
   'footer.note_general':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Cada cifra lleva la norma de la que sale.',
   'footer.note_benefit':
@@ -1243,6 +1245,9 @@ export const es = {
   'home.beta': 'Beta',
 
   'home.contract_citation': 'Estatuto de los Trabajadores · SMI 2026 · RD 723/2026',
+  'home.household': 'Empleada de hogar',
+  'home.household_situation': 'Trabajas en una casa: tu sueldo y el desistimiento frente a la ley',
+  'home.household_citation': 'RD 1620/2011 · RDL 16/2022 · SMI de cada año',
 
   'employment.title': 'Revisa tu contrato de trabajo: SMI, temporalidad y prueba',
   'employment.description':
@@ -1763,6 +1768,8 @@ export const es = {
 
   'employment.result.title': 'Resultado',
   'employment.result.out_of_scope': 'Fuera de esta revisión',
+  'employment.result.household_link':
+    'Si trabajas en una casa, revisa tu caso como empleada de hogar',
   'employment.result.summary': 'Resumen',
   'employment.result.information': 'Para que lo sepas',
   'employment.result.unchecked': 'Lo que esta revisión no mira',
@@ -3569,7 +3576,7 @@ export const es = {
   'client.rental.calculation.deposit.interest_total': 'Intereses: {total}.',
   'client.rental.calculation.deposit.interest_rate_not_loaded':
     'El interés legal de {year} aún no está en esta revisión: desde ese año no se cuenta.',
-  // The household domestic worker review: no page uses these yet.
+  // The household domestic worker review's engine phrases, shown only with PUBLIC_HOUSEHOLD=1.
   'client.household.calculation.minimum_wage.not_published':
     'El SMI de {year} aún no se ha publicado en el BOE. Como referencia, el de {referenceYear}: {reference}. Para {year} no se calcula ninguna diferencia.',
   'client.household.calculation.minimum_wage.not_loaded':
@@ -3609,9 +3616,9 @@ export const es = {
   'client.household.calculation.extra_pays.two_or_more':
     'Tienes {count} pagas extra al año; la norma prevé al menos dos, al final de cada semestre salvo pacto.',
   'client.household.calculation.working_time.weekly_hours':
-    'Trabajas {hours} horas a la semana de trabajo efectivo; el máximo es de {limit}.',
+    'Trabajas {hours} horas a la semana de trabajo efectivo; la jornada ordinaria es de {limit} como máximo, y lo que pase de ahí serían horas extraordinarias.',
   'client.household.calculation.working_time.presence_apart':
-    'El tiempo de presencia se cuenta aparte y no suma a ese máximo.',
+    'El tiempo de presencia se cuenta aparte y no suma a esa jornada.',
   'client.household.calculation.working_time.rest':
     'Descansas {hours} horas entre jornadas; el mínimo es de {limit}.',
   'client.household.calculation.working_time.rest_live_in':
@@ -3635,7 +3642,7 @@ export const es = {
   'client.household.calculation.termination.et_cause':
     'La relación termina por una causa del artículo 49.1 del Estatuto de los Trabajadores. Esta revisión no valora esa causa ni la hora a la que se comunicó la decisión de terminar (artículo 11.4), que solo mira en el desistimiento.',
   'client.household.calculation.termination.cause.income_drop_or_expense_rise':
-    'La causa indicada es una disminución de los ingresos de la familia o un aumento de sus gastos.',
+    'La causa indicada es una disminución de los ingresos de la familia o un aumento de sus gastos por una circunstancia sobrevenida.',
   'client.household.calculation.termination.cause.family_needs_change':
     'La causa indicada es un cambio sustancial en las necesidades de la familia.',
   'client.household.calculation.termination.cause.loss_of_trust':
@@ -3645,7 +3652,7 @@ export const es = {
   'client.household.calculation.termination.cause_none':
     'El desistimiento no indica ninguna causa y la norma exige una de tres.',
   'client.household.calculation.termination.cause_other':
-    'La causa indicada no es una de las tres que admite la norma: menos ingresos o más gastos de la familia, cambio sustancial de sus necesidades o pérdida de confianza razonable y proporcionada.',
+    'La causa indicada no es una de las tres que admite la norma: menos ingresos o más gastos de la familia por una circunstancia sobrevenida, cambio sustancial de sus necesidades o pérdida de confianza razonable y proporcionada.',
   'client.household.calculation.termination.not_in_writing':
     'El desistimiento no se comunicó por escrito y la norma lo exige.',
   'client.household.calculation.termination.cause_not_in_writing':
@@ -3657,7 +3664,7 @@ export const es = {
   'client.household.calculation.dismissal.no_written_notice':
     'Sin la comunicación por escrito, la norma presume que se trata de un despido y podrían aplicarse sus reglas.',
   'client.household.calculation.dismissal.no_severance':
-    'Sin la indemnización puesta a tu disposición a la vez que el preaviso, la norma presume que se trata de un despido y podrían aplicarse sus reglas.',
+    'Sin la indemnización puesta a tu disposición a la vez que te comunicaron la extinción, la norma presume que se trata de un despido y podrían aplicarse sus reglas.',
   'client.household.calculation.dismissal.unknown':
     'Según lo que contestas no se puede descartar que falten el escrito o la indemnización, y sin ellos la norma presume que se trata de un despido.',
   'client.household.calculation.dismissal.none_of_the_two':
@@ -3671,17 +3678,17 @@ export const es = {
   'client.household.calculation.night.notice_time':
     'Te comunicaron el fin de la relación a las {time}.',
   'client.household.calculation.night.on_the_hour':
-    'La norma no permite avisar entre las 17:00 y las 08:00 a quien vive en la casa. A las 17:00 o a las 08:00 en punto no queda claro si esa hora está dentro, y no se cuenta.',
+    'Con quien vive en la casa, la decisión de terminar no podrá llevarse a cabo entre las 17:00 y las 08:00; la revisión lo mira por la hora del aviso. A las 17:00 o a las 08:00 en punto no queda claro si esa hora está dentro, y no se cuenta.',
   'client.household.calculation.night.serious_breach_alleged':
-    'Entre las 17:00 y las 08:00 solo cabe avisar si hay un incumplimiento muy grave de la lealtad y la confianza; esta revisión no valora si lo hubo.',
+    'Entre las 17:00 y las 08:00 solo cabe si la terminación se debe a una falta muy grave a los deberes de lealtad y confianza; esta revisión no valora si la hubo.',
   'client.household.calculation.night.inside':
-    'La norma no permite comunicar el fin de la relación a quien vive en la casa entre las 17:00 y las 08:00, salvo incumplimiento muy grave de la lealtad y la confianza.',
+    'Con quien vive en la casa, la decisión de terminar no podrá llevarse a cabo entre las 17:00 y las 08:00, salvo falta muy grave a los deberes de lealtad y confianza; la revisión lo mira por la hora a la que te lo comunicaron.',
   'client.household.calculation.severance.figure':
     'Indemnización: 12 días de salario por año de servicio. Son {days} a {daily} al día: {amount}.',
   'client.household.calculation.severance.capped':
     'La indemnización tiene un tope de {months} mensualidades: queda en {amount}.',
   'client.household.calculation.severance.not_made_available':
-    'No se puso a tu disposición a la vez que el preaviso: se te debe entera.',
+    'No se puso a tu disposición a la vez que te comunicaron la extinción: se te debe entera.',
   'client.household.calculation.severance.shortfall':
     'Se puso a tu disposición {offered}: faltan {difference}.',
   'client.household.calculation.severance.offered_unknown':
@@ -3705,6 +3712,362 @@ export const es = {
     'El desistimiento del artículo 11.2 es una situación legal de desempleo: podrías pedir la prestación por desempleo.',
   'client.household.calculation.unemployment.general_rules':
     'Desde el 1 de octubre de 2022 el desempleo se cotiza y se aplican las reglas generales: 360 días cotizados en los últimos seis años (art. 266.b LGSS) que no hayas usado ya para otra prestación (art. 269.2 LGSS), y una prestación del 70 % y después del 60 %. Esta revisión no calcula la prestación.',
+
+  // The household domestic worker review, built only with PUBLIC_HOUSEHOLD=1.
+  'household.title': 'Empleada de hogar: revisa tu sueldo y el desistimiento frente a la ley',
+  'household.description':
+    'Comprueba el sueldo, la jornada, las vacaciones, el finiquito y el desistimiento de tu trabajo en una casa frente a la ley, cifra a cifra y con su artículo.',
+  'household.h1': 'Comprueba si lo que te pagan en casa es justo',
+  'household.lead':
+    'Trabajas en una casa: pon tu sueldo, tu jornada y, si ha terminado, cómo terminó, al lado de lo que marca la ley. Cada cifra lleva el artículo del que sale.',
+  'household.beta': 'Beta',
+  'household.beta_note':
+    'Sección en pruebas. Lo que hayas pactado con la familia puede mejorar lo que dice la ley: lo que depende de ello se dice siempre.',
+  'household.no_js':
+    'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
+  'household.reviewed': 'Revisado el {fecha}',
+  'household.app_name': 'Revisión de empleada de hogar',
+  'household.form_aria': 'Revisión de empleada de hogar',
+  'household.tab.trabajo': 'Trabajo',
+  'household.tab.fechas': 'Fechas',
+  'household.tab.desistimiento': 'El final',
+  'household.tab.sueldo': 'Sueldo',
+  'household.tab.jornada': 'Jornada',
+  'household.tab.resultado': 'Resultado',
+  'household.answer.yes': 'Sí',
+  'household.answer.no': 'No',
+  'household.answer.unknown': 'No lo sé',
+
+  'household.work.question': '¿Cómo trabajas en la casa?',
+  'household.work.legend': 'Tipo de trabajo',
+  'household.work.hourly_external': 'Por horas, sin vivir en la casa',
+  'household.work.monthly': 'Por meses, sin vivir en la casa',
+  'household.work.live_in': 'Viviendo en la casa',
+
+  'household.dates.question': '¿Sigues trabajando?',
+  'household.dates.start': 'Fecha de inicio',
+  'household.dates.ending': 'Tu situación',
+  'household.dates.working': 'Sí, sigo trabajando',
+  'household.dates.desistimiento': 'No: la familia ha desistido',
+  'household.dates.et_cause': 'No: terminó por otra causa',
+  'household.dates.unknown': 'No: no sé cómo terminó',
+  'household.dates.end': 'Último día de trabajo',
+
+  'household.pay.question': '¿Cuánto cobras?',
+  'household.pay.monthly': 'Sueldo al mes en dinero (bruto)',
+  'household.pay.monthly_hint':
+    'Antes de descuentos. Si las pagas extra van repartidas, cuéntalas.',
+  'household.pay.in_kind': 'Pago en especie al mes',
+  'household.pay.in_kind_hint': 'Comida y alojamiento. En blanco si no hay.',
+  'household.pay.hourly': 'Precio por hora (bruto)',
+  'household.pay.hourly_hint': 'Antes de descuentos, con vacaciones y pagas extra dentro.',
+  'household.pay.average': 'Lo que cobras al mes de media (bruto)',
+  'household.pay.average_hint': 'Para la indemnización y el preaviso. En blanco si no lo sabes.',
+
+  'household.extras.question': '¿Y las pagas extra?',
+  'household.extras.count': 'Pagas extra al año',
+  'household.extras.count_hint': '0 si no tienes. La norma prevé dos.',
+  'household.extras.prorated': '¿Van repartidas en las doce mensualidades?',
+  'household.extras.amount': 'Importe de cada paga extra (bruto)',
+  'household.extras.amount_hint': 'En blanco si no lo sabes.',
+  'household.extras.when_question': '¿Y cuándo las cobras?',
+  'household.time.rest_question': '¿Y los descansos?',
+  'household.severance.writing_question': '¿Cómo te lo comunicaron?',
+  'household.notice.night_question': '¿A qué hora te avisaron?',
+  'household.extras.accrual': '¿Cuándo se pagan?',
+  'household.extras.semiannual': 'Al final de cada semestre',
+  'household.extras.annual': 'Una vez al año',
+
+  'household.time.question': '¿Cuántas horas trabajas?',
+  'household.time.hours': 'Horas de trabajo a la semana',
+  'household.time.hours_hint':
+    'Trabajo efectivo; la presencia se cuenta aparte. En blanco si no lo sabes.',
+  'household.time.rest': 'Descanso más corto entre jornadas (horas)',
+  'household.time.rest_made_up': 'Si descansas menos de 12 horas, ¿se compensa en cuatro semanas?',
+  'household.time.weekly_rest': 'Descanso semanal seguido (horas)',
+  'household.time.weekly_rest_hint': 'Por ejemplo, 36.',
+
+  'household.holidays.question': '¿Y las vacaciones?',
+  'household.holidays.days': 'Días naturales de vacaciones al año',
+  'household.holidays.stretch': 'Vacaciones seguidas más largas (días)',
+  'household.holidays.taken': 'Días ya disfrutados este año',
+  'household.holidays.taken_hint': 'Para el finiquito. En blanco si no lo sabes.',
+
+  'household.desistimiento.question': '¿Qué decía el desistimiento?',
+  'household.desistimiento.cause': '¿Qué causa indicaba?',
+  'household.desistimiento.income_drop_or_expense_rise': 'Menos ingresos o más gastos sobrevenidos',
+  'household.desistimiento.family_needs_change': 'Un cambio sustancial de sus necesidades',
+  'household.desistimiento.loss_of_trust': 'Pérdida de confianza',
+  'household.desistimiento.other': 'Otra causa',
+  'household.desistimiento.none': 'Ninguna causa',
+  'household.desistimiento.writing': '¿Te lo comunicaron por escrito?',
+
+  'household.severance.question': '¿Y la indemnización?',
+  'household.severance.available': '¿Pusieron la indemnización a tu disposición al avisarte?',
+  'household.severance.offered': 'Importe a tu disposición (bruto)',
+
+  'household.notice.question': '¿Con cuánta antelación te avisaron?',
+  'household.notice.days': 'Días de antelación',
+  'household.notice.days_hint':
+    'Los días naturales entre el aviso y tu último día. En blanco si no lo sabes.',
+  'household.notice.substitute': 'Pago por los días de preaviso que faltaron',
+  'household.notice.substitute_hint':
+    'Si te pagaron esos días en lugar de avisarte. En blanco si no te pagaron nada.',
+  'household.notice.night': '¿Fue entre las 17:00 y las 08:00?',
+  'household.notice.serious': '¿Alegaron una falta muy grave a la lealtad y la confianza?',
+
+  'household.result.title': 'Resultado',
+  'household.result.summary': 'Resumen',
+  'household.result.out_of_scope': 'Fuera de esta revisión',
+  'household.result.rules': 'Norma',
+  'household.result.how': 'Cómo se calcula',
+  'household.result.sources': 'Fuentes',
+  'household.result.final_pay': 'Lo que queda por cobrar al terminar',
+  'household.result.unemployment': 'Paro',
+  'household.result.unemployment_text':
+    'Desde el Real Decreto-ley 16/2022, las personas empleadas de hogar pueden cobrar el paro si reúnen los requisitos generales, entre ellos 360 días cotizados por desempleo en los seis años anteriores (arts. 266 y 269.1 de la Ley General de la Seguridad Social). El desistimiento del artículo 11.2 es una situación legal de desempleo (art. 267.1.a) 8.º) y el desempleo se cotiza desde el 1 de octubre de 2022 (disposición transitoria 2.ª del Real Decreto-ley 16/2022).',
+  'household.result.unemployment_link': 'Estima cuánto cobrarías de paro',
+  'household.result.unchecked': 'Lo que esta revisión no mira',
+  'household.result.restart': 'Empezar de nuevo',
+
+  'household.guide.title': 'Qué marca la ley en el trabajo del hogar',
+  'household.guide.lead':
+    'Lo esencial de lo que la revisión comprueba, con la norma de la que sale cada cosa. Es información sobre la ley, no asesoramiento.',
+  'household.guide.sources': 'Fuentes',
+  'household.guide.who': 'Quién está detrás',
+  'household.guide.norms': 'Normas',
+  'household.guide.faq': 'Preguntas frecuentes',
+  'household.guide.pay.title': 'Tu sueldo',
+  'household.guide.pay.p1':
+    'El salario mínimo interprofesional se aplica también en el servicio del hogar: con jornada completa, de 40 horas a la semana, es la cifra mensual del real decreto del año en 14 pagas y, con menos horas, se aplica en proporción (art. 8.1 del Real Decreto 1620/2011).',
+  'household.guide.pay.p2':
+    'Quien trabaja por horas y no vive en la casa cobra como mínimo el precio por hora del real decreto del SMI del año. Ese precio incluye todos los conceptos, también las vacaciones y las pagas extra, y se paga en dinero (art. 8.5).',
+  'household.guide.pay.p3':
+    'El alojamiento y la manutención pueden pactarse como pago en especie, hasta el 30 % del salario total, y no cuentan para llegar al mínimo en dinero (art. 8.2). Hay dos pagas extra al año, una al final de cada semestre salvo pacto en otro sentido (art. 8.4).',
+  'household.guide.time.title': 'Jornada, descansos y vacaciones',
+  'household.guide.time.p1':
+    'La jornada ordinaria es de 40 horas de trabajo efectivo a la semana, y el tiempo de presencia se cuenta aparte (art. 9.1); lo que pase de ahí serían horas extraordinarias (art. 9.3). Entre una jornada y la siguiente hay 12 horas de descanso, que a quien vive en la casa pueden quedar en 10 si la diferencia se compensa en cuatro semanas. El descanso semanal es de 36 horas seguidas.',
+  'household.guide.time.p2':
+    'Las vacaciones son de 30 días naturales al año, y al menos un periodo ha de ser de 15 días seguidos (art. 9). Si no se cumple, la revisión lo señala como aviso: un aviso no suma importes.',
+  'household.guide.desistimiento.title': 'El desistimiento de la familia',
+  'household.guide.desistimiento.p1':
+    'La familia puede terminar la relación por desistimiento solo por una de tres causas, y siempre que estén justificadas: menos ingresos o más gastos de la familia por una circunstancia sobrevenida, un cambio sustancial de sus necesidades o una pérdida de confianza razonable y proporcionada. Se comunica por escrito, con la causa (art. 11.2).',
+  'household.guide.desistimiento.p2':
+    'La indemnización es de 12 días de salario por año de servicio, con un tope de seis mensualidades, y se pone a disposición simultáneamente a la comunicación de la extinción (art. 11.2). El preaviso es de 20 días si llevas más de un año y de 7 si no, contados desde que te comunican la decisión, y se puede sustituir por el salario de esos días. Son días naturales: en los plazos civiles no se excluyen los inhábiles (art. 5 del Código Civil). Quien trabaja a tiempo completo tiene seis horas semanales pagadas para buscar trabajo durante el preaviso.',
+  'household.guide.desistimiento.p3':
+    'La revisión mira la categoría de la causa que se indica, no si es cierta: eso lo decide un juzgado.',
+  'household.guide.dismissal.title': 'Sin escrito o sin indemnización',
+  'household.guide.dismissal.p1':
+    'Si falta el escrito, o la indemnización no se puso a disposición con el aviso, la norma presume que no es un desistimiento sino un despido, y podrían aplicarse sus reglas (art. 11.3). Un preaviso más corto o un error disculpable en el importe no llevan a esa presunción: se debe la diferencia.',
+  'household.guide.dismissal.p2':
+    'Con quien vive en la casa, la decisión de terminar no podrá llevarse a cabo entre las 17:00 y las 08:00 del día siguiente, salvo que se deba a una falta muy grave a los deberes de lealtad y confianza (art. 11.4). La revisión lo mira por la hora a la que te lo comunicaron.',
+  'household.guide.incomplete.title': 'Cómo se cuenta un año incompleto',
+  'household.guide.incomplete.p1':
+    'El texto no dice cómo contar un año incompleto en la indemnización. La revisión cuenta los años completos; la lectura que cuenta un día por cada mes empezado se da solo como «y hasta». El salario diario es el salario anual entre 365.',
+  'household.guide.unemployment.title': 'Paro',
+  'household.guide.unemployment.p1':
+    'Desde el Real Decreto-ley 16/2022, las personas empleadas de hogar pueden cobrar el paro si reúnen los requisitos generales, entre ellos 360 días cotizados por desempleo en los seis años anteriores (arts. 266 y 269.1 de la Ley General de la Seguridad Social). El desistimiento es una situación legal de desempleo (art. 267.1.a) 8.º) y el desempleo se cotiza desde el 1 de octubre de 2022 (disposición transitoria 2.ª del Real Decreto-ley 16/2022).',
+  'household.guide.unemployment.link': 'Estima cuánto cobrarías de paro',
+  'household.guide.unchecked.title': 'Lo que la revisión no mira',
+  'household.guide.unchecked.p1':
+    'Si la causa del desistimiento es cierta, lo que hayas pactado con la familia, las cotizaciones y lo que cobras en neto. Tampoco pide nombre, DNI, domicilio, nacionalidad, situación administrativa, salud ni embarazo: no los necesita.',
+
+  'household.faq.minimum_wage': '¿Cuál es el sueldo mínimo en el servicio del hogar?',
+  'household.faq.minimum_wage_answer':
+    'En {anio}, el SMI es de {mensual} al mes en 14 pagas ({anual} al año) para 40 horas a la semana, y en proporción con menos horas (art. 8.1 del Real Decreto 1620/2011). Quien trabaja por horas y no vive en la casa cobra al menos {hora} la hora, con vacaciones y pagas extra incluidas (art. 8.5).',
+  'household.faq.minimum_wage_not_published':
+    'El real decreto del SMI de {anio} aún no está en el BOE. Como referencia, el de {referencia} fija {mensual} al mes en 14 pagas ({anual} al año) para 40 horas a la semana, y {hora} la hora para quien trabaja por horas y no vive en la casa (arts. 8.1 y 8.5 del Real Decreto 1620/2011). Para {anio} no se calcula ninguna diferencia.',
+  'household.faq.hourly': '¿Qué incluye el precio por hora?',
+  'household.faq.hourly_answer':
+    'Quien trabaja por horas y no vive en la casa cobra un precio que incluye todos los conceptos: también las vacaciones y las pagas extra, y se paga en dinero. Por eso la revisión no calcula esas partidas aparte en su finiquito (art. 8.5 del Real Decreto 1620/2011). Por encima del mínimo, lo que hayáis pactado decide.',
+  'household.faq.desistimiento': '¿Qué es el desistimiento y qué tiene que cumplir?',
+  'household.faq.desistimiento_answer':
+    'Es la forma en que la familia termina la relación sin despido. Ha de tener una de tres causas, y estar justificada: menos ingresos o más gastos de la familia por una circunstancia sobrevenida, cambio sustancial de sus necesidades o pérdida de confianza razonable y proporcionada. Se comunica por escrito con la causa, y la indemnización se pone a disposición con el aviso: 12 días de salario por año de servicio, con un tope de seis mensualidades. El preaviso es de 20 días si llevas más de un año y de 7 si no (art. 11.2 del Real Decreto 1620/2011); son días naturales, porque en los plazos civiles no se excluyen los inhábiles (art. 5 del Código Civil).',
+  'household.faq.dismissal': '¿Cuándo se presume que es un despido?',
+  'household.faq.dismissal_answer':
+    'Cuando no hay escrito o cuando la indemnización no se puso a disposición con el aviso, la norma presume que es un despido y podrían aplicarse sus reglas (art. 11.3 del Real Decreto 1620/2011). Un preaviso corto o un error disculpable en el importe no lo provocan: se debe la diferencia.',
+  'household.faq.night': '¿Pueden avisarme de noche si vivo en la casa?',
+  'household.faq.night_answer':
+    'La norma dice que, con quien vive en la casa, la decisión de terminar no podrá llevarse a cabo entre las 17:00 y las 08:00 del día siguiente, salvo falta muy grave a los deberes de lealtad y confianza (art. 11.4 del Real Decreto 1620/2011). La revisión lo mira por la hora a la que te lo comunicaron; a las 17:00 o a las 08:00 en punto el texto no aclara si esa hora cuenta, y no la cuenta como infracción.',
+  'household.faq.incomplete': '¿Cómo cuenta la revisión un año incompleto?',
+  'household.faq.incomplete_answer':
+    'El texto no lo dice. La revisión cuenta los años completos de servicio y da la lectura que cuenta un día por cada mes empezado solo como «y hasta», sin sumarla a lo que cuenta. El salario diario es el anual entre 365.',
+  'household.faq.working_time': '¿Qué pasa si trabajo más de 40 horas?',
+  'household.faq.working_time_answer':
+    'La revisión lo señala como aviso. La jornada ordinaria es de 40 horas a la semana de trabajo efectivo, con el tiempo de presencia aparte (art. 9.1 del Real Decreto 1620/2011), y lo que pase de ahí serían horas extraordinarias (art. 9.3). Entre jornadas hay 12 horas de descanso (10 para quien vive en la casa, si se compensa en cuatro semanas) y el descanso semanal es de 36 horas seguidas (arts. 9.4 y 9.5). Un aviso no suma importes.',
+  'household.faq.unemployment': '¿Tengo paro como empleada de hogar?',
+  'household.faq.unemployment_answer':
+    'Desde el Real Decreto-ley 16/2022, las personas empleadas de hogar pueden cobrar el paro si reúnen los requisitos generales, entre ellos 360 días cotizados por desempleo en los seis años anteriores (arts. 266 y 269.1 de la Ley General de la Seguridad Social). El desistimiento es situación legal de desempleo (art. 267.1.a) 8.º) y el desempleo se cotiza desde el 1 de octubre de 2022 (disposición transitoria 2.ª del Real Decreto-ley 16/2022). Con la estimación del paro puedes ver cuánto y durante cuánto tiempo.',
+  'household.faq.data': '¿Qué datos pide la revisión?',
+  'household.faq.data_answer':
+    'Solo fechas, cifras y respuestas sobre el trabajo y su final. No pide nombre, DNI, domicilio, nacionalidad, situación administrativa, salud ni embarazo. Todo se calcula en tu dispositivo y lo que escribes no sale de él.',
+
+  'client.household.about': 'unos {importe}',
+  'client.household.status.below_minimum': 'Por debajo de lo que marca la norma',
+  'client.household.status.over_legal_limit': 'Por encima del límite de la norma',
+  'client.household.status.missing_requirement': 'Falta un requisito de la norma',
+  'client.household.status.warning': 'Aviso: conviene revisarlo',
+  'client.household.status.dismissal_regime_presumed': 'La norma presume que es un despido',
+  'client.household.status.within_limit': 'Dentro de lo que marca la norma',
+  'client.household.status.review_it': 'Conviene revisarlo',
+  'client.household.status.information': 'Información',
+  'client.household.status.not_entered': 'No has indicado este dato',
+  'client.household.status.not_published': 'El dato de ese año aún no está publicado',
+  'client.household.status.not_reviewed_in_this_version': 'No se revisa en esta versión',
+  'client.household.status.depends': 'Depende de cómo se cuente',
+  'client.household.status.owed': 'Podrían faltarte {importe}',
+  'client.household.status.owed_up_to': 'Podrían faltarte {importe}, y hasta {maximo}',
+  'client.household.status.depends_up_to':
+    'Depende de cómo se cuente: en una lectura podrían faltarte hasta {maximo}',
+  'client.household.reading_status.below_minimum': 'por debajo de lo que marca la norma',
+  'client.household.reading_status.over_legal_limit': 'por encima del límite de la norma',
+  'client.household.reading_status.missing_requirement': 'falta un requisito de la norma',
+  'client.household.reading_status.warning': 'aviso',
+  'client.household.reading_status.dismissal_regime_presumed': 'la norma presume que es un despido',
+  'client.household.reading_status.within_limit': 'dentro de lo que marca la norma',
+  'client.household.reading_status.review_it': 'conviene revisarlo',
+  'client.household.reading_status.information': 'información',
+  'client.household.reading_status.not_entered': 'sin dato',
+  'client.household.reading_status.not_published': 'dato aún sin publicar',
+  'client.household.reading_status.not_reviewed_in_this_version': 'no se revisa en esta versión',
+  'client.household.reading_status.owed': 'podrían faltarte {importe}',
+  'client.household.reading_line': '{cuando}: {resultado}',
+  'client.household.question.incomplete_year':
+    'La norma no dice cómo contar un año incompleto. Según la lectura:',
+  'client.household.question.notice_service_date':
+    'La norma no dice hasta qué día se cuenta el tiempo de servicio para el preaviso. Según la lectura:',
+  'client.household.question.in_kind_base':
+    'La norma no dice si el 30 % se mide sobre el mes o sobre el año. Según la lectura:',
+  'client.household.reading.complete_years_only': 'contando solo los años completos',
+  'client.household.reading.prorated_by_months': 'contando un día por cada mes empezado',
+  'client.household.reading.measured_at_notice': 'contando el servicio hasta el aviso',
+  'client.household.reading.measured_at_termination': 'contando el servicio hasta el último día',
+  'client.household.reading.month_without_extra_pays': 'midiendo el mes sin pagas extra',
+  'client.household.reading.year_with_extra_pays': 'midiendo el año con las pagas extra',
+  'client.household.note.your_answer':
+    'Este punto se apoya en lo que has contestado, no en un documento.',
+  'client.household.note.agreement':
+    'Lo que hayas pactado con la familia puede fijar otra cosa; la revisión no lo conoce.',
+  'client.household.norm.in_force': 'en vigor',
+  'client.household.norm.pending_validation': 'pendiente de convalidación',
+  'client.household.norm.repealed': 'derogada el {fecha}',
+  'client.household.source.since': 'con efectos desde el {desde}',
+  'client.household.source.between': 'con efectos del {desde} al {hasta}',
+
+  'client.household.finding.smi_monthly': 'Sueldo frente al SMI',
+  'client.household.finding.smi_hourly_external': 'Precio por hora frente al mínimo',
+  'client.household.finding.smi_in_kind_cap': 'Pago en especie',
+  'client.household.finding.extra_pays': 'Pagas extra',
+  'client.household.finding.weekly_40': 'Horas a la semana',
+  'client.household.finding.rest_between_shifts': 'Descanso entre jornadas',
+  'client.household.finding.weekly_rest_36': 'Descanso semanal',
+  'client.household.finding.holidays_30': 'Días de vacaciones',
+  'client.household.finding.holidays_stretch_15': 'Vacaciones seguidas',
+  'client.household.finding.termination_causes': 'Causa de la terminación',
+  'client.household.finding.desistimiento_cause': 'Causa del desistimiento',
+  'client.household.finding.desistimiento_written': 'Desistimiento por escrito',
+  'client.household.finding.dismissal_presumed': 'Presunción de despido',
+  'client.household.finding.live_in_night_notice': 'Aviso entre las 17:00 y las 08:00',
+  'client.household.finding.desistimiento_severance': 'Indemnización del desistimiento',
+  'client.household.finding.desistimiento_notice': 'Preaviso',
+  'client.household.finding.desistimiento_leave': 'Horas para buscar trabajo',
+  'client.household.finding.unemployment_situation': 'Paro',
+  'client.household.finding.transitional_application': 'Aplicación de la reforma',
+  'client.household.finding.et_termination_causes': 'Causa de la terminación',
+  'client.household.finding.notice_calendar_days': 'Cómo se cuentan los días',
+  'client.household.finding.unemployment_contribution': 'Cotización por desempleo',
+  'client.household.finding.unemployment_general': 'Paro',
+
+  'client.household.headline.found': 'Hay puntos que quedan por debajo de lo que marca la norma.',
+  'client.household.headline.to_review': 'Hay puntos que conviene revisar.',
+  'client.household.headline.nothing_found':
+    'Con lo que has contestado, no se ve nada por debajo de lo que marca la norma.',
+  'client.household.headline.nothing_entered':
+    'Con lo que has contestado no hay nada que comparar: faltan datos.',
+  'client.household.total.counted': 'Lo que cuenta en todas las lecturas: {importe}.',
+  'client.household.total.up_to':
+    'Según cómo se cuenten los puntos que la norma deja abiertos, podría llegar a {maximo}.',
+  'client.household.total.only_up_to':
+    'En la lectura que cuenta no falta nada; en otra, podrían faltar hasta {maximo}.',
+  'client.household.total.none': 'No hay importes que sumar.',
+  'client.household.total.found_without_amount':
+    'Lo que se ha encontrado no lleva un importe que sumar: cada punto explica por qué.',
+  'client.household.warning.working_time':
+    'Tu jornada pasa de la ordinaria o tus descansos quedan por debajo de lo que marca la norma. Es un aviso: no suma importes.',
+  'client.household.warning.holidays':
+    'Tus vacaciones quedan por debajo de lo que marca la norma. Es un aviso: no suma importes.',
+  'client.household.warning.presumed':
+    'Sin escrito o sin la indemnización a tu disposición, la norma presume que es un despido (art. 11.3).',
+  'client.household.warning.night_notice':
+    'Con quien vive en la casa, la decisión de terminar no podrá llevarse a cabo entre las 17:00 y las 08:00, salvo falta muy grave a los deberes de lealtad y confianza (art. 11.4). La revisión lo mira por la hora a la que te lo comunicaron.',
+  'client.household.ending_unknown':
+    'Como no sabes cómo terminó, no se ha revisado el final: ni el desistimiento, ni la indemnización, ni el preaviso, ni lo que queda por cobrar.',
+  'client.household.result.lead':
+    'Cada punto lleva el artículo del que sale. Es información sobre la ley, no asesoramiento.',
+  'client.household.result.lead_out_of_scope':
+    'Esta relación queda fuera de la revisión. Es información sobre la ley, no asesoramiento.',
+  'client.household.out_of_scope.status': 'Fuera de esta revisión',
+  'client.household.out_of_scope.before_reform':
+    'La relación terminó antes del 9 de septiembre de 2022, cuando entró en vigor la reforma del Real Decreto-ley 16/2022 (disposición final 7.ª; disposición transitoria 1.ª). Antes se aplicaba otro régimen, que esta revisión no cubre.',
+  'client.household.final_pay.pending_salary': 'Salario pendiente',
+  'client.household.final_pay.holiday_pay': 'Vacaciones sin disfrutar',
+  'client.household.final_pay.extra_pay': 'Pagas extra',
+  'client.household.final_pay.severance': 'Indemnización',
+  'client.household.final_pay.employer_notice': 'Preaviso',
+  'client.household.final_pay.notice_deduction': 'Descuento por preaviso',
+  'client.household.final_pay.no_figure': 'No se puede calcular con lo que has contestado',
+  'client.household.final_pay.up_to': '{importe}, y hasta {maximo}',
+  'client.household.final_pay.extra_missing':
+    'No se han calculado las pagas extra porque no has indicado su importe.',
+  'client.household.final_pay.hourly_included':
+    'Con el precio por hora, las vacaciones y las pagas extra ya van incluidas (art. 8.5): no se calculan aparte.',
+  'client.household.final_pay.not_entered':
+    'Sin el sueldo mensual no se puede calcular lo que queda por cobrar.',
+  'client.household.unchecked.cause_truth':
+    'Si la causa que se indica en el desistimiento es cierta.',
+  'client.household.unchecked.in_kind_in_severance':
+    'Si el pago en especie cuenta en la indemnización: la revisión solo cuenta el dinero.',
+  'client.household.unchecked.contributions': 'Las cotizaciones a la Seguridad Social.',
+  'client.household.unchecked.net_pay': 'Lo que cobras en neto, tras los descuentos.',
+
+  'client.household.error.invalid_date': 'Escribe una fecha válida.',
+  'client.household.error.too_far_ahead': 'Esa fecha queda demasiado lejos.',
+  'client.household.error.before_start': 'La fecha es anterior a la de inicio.',
+  'client.household.error.after_end': 'La fecha es posterior al último día.',
+  'client.household.error.amount_range':
+    'Escribe un importe razonable y sin signo menos; el sueldo, mayor que cero.',
+  'client.household.error.hours_range': 'Escribe un número de horas razonable.',
+  'client.household.error.count_range': 'Escribe un número entero razonable.',
+  'client.household.error.invalid_time': 'Escribe una hora válida.',
+  'client.household.error.year_range': 'Ese año no es válido.',
+  'client.household.error.regime_mismatch': 'Quien vive en la casa no cobra por horas.',
+  'client.household.error.notice_before_start':
+    'Ese preaviso empieza antes de que empezaras a trabajar.',
+  'client.household.error.missing_value': 'Falta este dato.',
+  'client.household.error.missing_choice': 'Elige una respuesta.',
+  'client.household.error.invalid_amount': 'Escribe una cifra, por ejemplo 1.250,00.',
+  'client.household.error.invalid_number': 'Escribe un número entero.',
+  'privacy.household.summary':
+    'La revisión de empleada de hogar funciona igual: lo que escribes se calcula en tu navegador y no se guarda. No te pide nombre, DNI, domicilio, nacionalidad, situación administrativa, salud ni embarazo.',
+  'privacy.household.data_review': 'Lo que escribes en la revisión de empleada de hogar',
+  'privacy.household.data_review_where':
+    'Solo en tu navegador, mientras la página está abierta. Tus fechas, tu sueldo, tu jornada, tus vacaciones y tus respuestas sobre cómo terminó la relación se calculan en tu dispositivo y no se envían a ningún servidor ni se guardan. Al cerrar o recargar la página, desaparecen.',
+  'privacy.household.tracked_sheets': 'En la revisión de empleada de hogar',
+  'privacy.household.tracked_sheets_what':
+    'Lo mismo que en el finiquito con cada una de sus hojas, del trabajo al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha de inicio», nunca lo que escribiste. Qué pregunta frecuente abres y de qué punto del resultado abres el cálculo, por su tipo.',
+  'privacy.household.tracked_scope': 'Si tu caso queda fuera de la revisión de empleada de hogar',
+  'privacy.household.tracked_scope_what':
+    'El motivo, de una lista cerrada: que la relación terminó antes de la reforma de septiembre de 2022.',
+  'privacy.household.tracked_review': 'Al revisar la empleada de hogar',
+  'privacy.household.tracked_review_what':
+    'Cómo trabajas (por horas, por meses o viviendo en la casa), el tramo del año del sueldo (2022 o 2023, 2024 o 2025, o desde 2026), cómo va la relación (sigue, desistimiento, otra causa o no lo sabes), si hay pagas extra y cómo (ninguna, repartidas o aparte), si hay pago en especie, y si el desistimiento fue por escrito y con la indemnización a disposición (sí, no o no lo sabes). De cada grupo de puntos (sueldo, jornada, vacaciones, terminación, indemnización y preaviso), el estado que más pesa. Cuánto falta, en un tramo, nunca el importe; cuántas veces revisas y cuánto tardas, en tramos.',
+  'legal_notice.household': 'La revisión de empleada de hogar',
+  'legal_notice.household.does':
+    'Compara el sueldo, la jornada, las vacaciones, el finiquito y el desistimiento de una persona empleada de hogar con lo que fijan el Real Decreto 1620/2011, el Real Decreto-ley 16/2022 y los reales decretos del SMI de cada año, cifra a cifra y con el artículo del que sale cada una.',
+  'legal_notice.household.does_not':
+    'No valora si la causa de un desistimiento es cierta, ni lo que hayas pactado con la familia, ni las cotizaciones, ni lo que cobras en neto. No pide nombre, DNI, domicilio, nacionalidad, situación administrativa, salud ni embarazo. Informa sobre la ley y no es asesoramiento jurídico.',
+  'legal_notice.household.beta':
+    'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves un punto que no cuadra con la ley, puedes escribir a',
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof es;

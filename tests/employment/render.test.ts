@@ -24,6 +24,7 @@ function result(): HTMLElement {
     <p data-lead></p>
     <section data-out-of-scope hidden>
       <span data-out-of-scope-status></span><p data-out-of-scope-reason></p>
+      <p data-out-of-scope-household hidden><a></a></p>
     </section>
     <section data-in-scope data-summary>
       <p data-partial hidden></p><p data-headline></p><ul data-warnings></ul>
@@ -213,6 +214,15 @@ describe('the employment result', () => {
   it('marks a partial review of a contract from before the reform', () => {
     const root = render(contract({ startDate: f('2021-06-01'), signedOn: null }), false);
     expect(root.querySelector<HTMLElement>('[data-partial]')?.hidden).toBe(false);
+  });
+
+  it('points a household worker, and only her, to the household review', () => {
+    const root = result();
+    const household = () => root.querySelector<HTMLElement>('[data-out-of-scope-household]');
+    renderOutOfScope(root, 'special_relationship', [], tr, true);
+    expect(household()?.hidden).toBe(false);
+    renderOutOfScope(root, 'special_relationship', [], tr, false);
+    expect(household()?.hidden).toBe(true);
   });
 
   it('gives a minor the rules that apply, as information', () => {

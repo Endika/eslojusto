@@ -1,0 +1,11 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Household from '../../views/Household.astro';
+import { HOUSEHOLD_BUILD } from '../../content/sections';
+
+// Without PUBLIC_HOUSEHOLD=1 the build has no /empleada-de-hogar/ at all.
+export const getStaticPaths = (() =>
+  HOUSEHOLD_BUILD ? [{ params: { path: undefined } }] : []) satisfies GetStaticPaths;
+---
+
+<Household lang="es" />

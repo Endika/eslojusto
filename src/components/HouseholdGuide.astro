@@ -1,0 +1,133 @@
+---
+import { HOUSEHOLD_NORMS } from '../engine/household/data/norms';
+import type { HouseholdNormId } from '../engine/household/norms';
+import { MINIMUM_WAGE } from '../engine/employment/data/minimum-wage';
+import { formatLongDay } from '../content/rent-indices';
+import { householdFaqEntries } from '../content/household-faq';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+  // The day the page's rules were last checked, ISO.
+  checkedOn: string;
+}
+const { lang, checkedOn } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+// Each block: its text keys and the norms it rests on.
+const blocks: readonly {
+  id: string;
+  anchor: string;
+  paragraphs: readonly Key[];
+  norms: readonly HouseholdNormId[];
+  paro?: boolean;
+}[] = [
+  {
+    id: 'pay',
+    anchor: 'g-sueldo',
+    paragraphs: ['household.guide.pay.p1', 'household.guide.pay.p2', 'household.guide.pay.p3'],
+    norms: ['rd1620_2011'],
+  },
+  {
+    id: 'time',
+    anchor: 'g-jornada',
+    paragraphs: ['household.guide.time.p1', 'household.guide.time.p2'],
+    norms: ['rd1620_2011'],
+  },
+  {
+    id: 'desistimiento',
+    anchor: 'g-desistimiento',
+    paragraphs: [
+      'household.guide.desistimiento.p1',
+      'household.guide.desistimiento.p2',
+      'household.guide.desistimiento.p3',
+    ],
+    norms: ['rd1620_2011', 'rdl16_2022', 'cc'],
+  },
+  {
+    id: 'dismissal',
+    anchor: 'g-despido',
+    paragraphs: ['household.guide.dismissal.p1', 'household.guide.dismissal.p2'],
+    norms: ['rd1620_2011', 'et'],
+  },
+  {
+    id: 'incomplete',
+    anchor: 'g-anio-incompleto',
+    paragraphs: ['household.guide.incomplete.p1'],
+    norms: ['rd1620_2011'],
+  },
+  {
+    id: 'unemployment',
+    anchor: 'g-paro',
+    paragraphs: ['household.guide.unemployment.p1'],
+    norms: ['rdl16_2022', 'lgss'],
+    paro: true,
+  },
+  {
+    id: 'unchecked',
+    anchor: 'g-sin-revisar',
+    paragraphs: ['household.guide.unchecked.p1'],
+    norms: [],
+  },
+];
+const faq = householdFaqEntries(lang, { checkedOn, minimumWage: MINIMUM_WAGE });
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('household.guide.title')}
+    </h2>
+    <p class="guide__lead">{tx('household.guide.lead')}</p>
+    <p class="guide__sources">
+      <span>{t(lang, 'household.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>
+        {tx('household.guide.sources')}:{' '}
+        <a href={HOUSEHOLD_NORMS.rd1620_2011.url}>Real Decreto 1620/2011</a> ·{' '}
+        <a href={HOUSEHOLD_NORMS.rdl16_2022.url}>Real Decreto-ley 16/2022</a>
+      </span>
+      <a href={link('es', 'aviso-legal/')}>{tx('household.guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    {blocks.map(({ id, anchor, paragraphs, norms, paro }) => (
+      <section class="sheet sheet--text" data-guide={id}>
+        <h3 id={anchor}>{tx(`household.guide.${id}.title` as Key)}</h3>
+        {paragraphs.map((key) => (
+          <p>{tx(key)}</p>
+        ))}
+        {paro && (
+          <p>
+            <a href={link('es', 'paro/')}>{tx('household.guide.unemployment.link')}</a>
+          </p>
+        )}
+        {norms.length > 0 && (
+          <>
+            <h4 class="rules__title">{tx('household.guide.norms')}</h4>
+            <ul class="sources sources--wrap">
+              {norms.map((n) => (
+                <li>
+                  <a href={HOUSEHOLD_NORMS[n].url}>{HOUSEHOLD_NORMS[n].citation}</a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+    ))}
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('household.guide.faq')}</h2>
+      <div class="faq-list">
+        {faq.map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>

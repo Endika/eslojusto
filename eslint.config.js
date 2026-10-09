@@ -54,9 +54,9 @@ const noPosthogAdapter = {
   message: 'Only the composition root (src/scripts) imports the PostHog adapter.',
 };
 const analyticsReach = {
-  regex: `^\\.\\./(?!engine/|content/(rental-|employment-)?faq-topics$|i18n/client$|calculator/ports$|rental/ports$|employment/ports$|documents/ports$|documents/config$)|${notCanonical}`,
+  regex: `^\\.\\./(?!engine/|content/(rental-|employment-|household-)?faq-topics$|i18n/client$|calculator/ports$|rental/ports$|employment/ports$|household/ports$|documents/ports$|documents/config$)|${notCanonical}`,
   message:
-    'src/analytics reaches only the engine, the help topics, the translator type, the calculator, rental, employment and documents ports and the documents switch.',
+    'src/analytics reaches only the engine, the help topics, the translator type, the calculator, rental, employment, household and documents ports and the documents switch.',
 };
 // Every review section walks its sheets on the same navigation and tabs, which learn a section's
 // steps from the Flow they are given, so a new section plugs in without touching them.
@@ -89,6 +89,18 @@ const employmentReach = {
 const noEmployment = {
   regex: '(^|/)employment/',
   message: 'The final pay never reaches into the employment contract review.',
+};
+// The household worker review reaches the household engine through its modules, never its tables,
+// which its composition root passes in; of the calculator, only what every section shares. It
+// reads no documents.
+const householdReach = {
+  regex: `^(?!\\./|\\.\\./engine/(date|money|types|calculation|sources|law/sources|household/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|calculation|dom|flow|navigation|number)$|\\.\\./i18n/client$)|${notCanonical}`,
+  message:
+    'src/household reaches the household engine (its tables come from the composition root), the shared sheets and the translator type.',
+};
+const noHousehold = {
+  regex: '(^|/)household/',
+  message: 'The final pay never reaches into the household worker review.',
 };
 // Reading documents and the pass serve every review section the same way: what is particular to
 // one (the final pay's case, reading, prefill and report) comes in through their ports, wired by
@@ -228,11 +240,16 @@ export default tseslint.config(
     ['src/calculator/{flow,navigation,tabs}.ts'],
     [noAnalytics, noRoot, noPosthogSdk, flowOnly],
   ),
-  boundary(['src/calculator/**'], [noAnalytics, noRoot, noPosthogSdk, noRental, noEmployment], {
-    ignores: ['src/calculator/{flow,navigation,tabs}.ts'],
-  }),
+  boundary(
+    ['src/calculator/**'],
+    [noAnalytics, noRoot, noPosthogSdk, noRental, noEmployment, noHousehold],
+    {
+      ignores: ['src/calculator/{flow,navigation,tabs}.ts'],
+    },
+  ),
   boundary(['src/rental/**'], [noAnalytics, noRoot, noPosthogSdk, rentalReach]),
   boundary(['src/employment/**'], [noAnalytics, noRoot, noPosthogSdk, employmentReach]),
+  boundary(['src/household/**'], [noAnalytics, noRoot, noPosthogSdk, householdReach]),
   boundary(['src/documents/*.ts'], [noAnalytics, noRoot, noPosthogSdk, documentsPlatform], {
     ignores: FINAL_PAY_DOCUMENTS.map((name) => `src/documents/${name}.ts`),
   }),

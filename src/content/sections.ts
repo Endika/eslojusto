@@ -8,3 +8,7 @@ export const EMPLOYMENT_BETA = true;
 
 // /paro/erte/, the benefit during an ERTE, is built only when PUBLIC_ERTE=1, on the same terms.
 export const ERTE_BUILD = import.meta.env.PUBLIC_ERTE === '1';
+// /empleada-de-hogar/ is built only when PUBLIC_HOUSEHOLD=1, on the same terms: without it there is
+// no route, no home card, no sitemap entry and no link or text about it.
+export const HOUSEHOLD_BUILD = import.meta.env.PUBLIC_HOUSEHOLD === '1';
+export const HOUSEHOLD_BETA = true;

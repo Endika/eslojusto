@@ -7,52 +7,35 @@ import {
   stepAt,
   stepFrom,
 } from '../calculator/flow';
-import type { FormEntries } from '../calculator/fill';
 import { createNavigation } from '../calculator/navigation';
-import { reviewEmployment } from '../engine/employment/review';
+import { reviewHousehold } from '../engine/household/review';
 import { applyConditions, gate } from './conditions';
 import {
   SHEETS,
-  answersSoFar,
-  baseField,
-  readEmploymentForm,
+  endingOf,
+  readHouseholdForm,
   sheetErrors,
   sheetOfField,
   type FieldError,
 } from './form';
-import type { EmploymentItemKind, EmploymentReviewDeps } from './ports';
+import type { HouseholdItemKind, HouseholdPageDeps } from './ports';
 import {
-  renderEmploymentResult,
   renderErrors,
+  renderHouseholdResult,
   renderOutOfScope,
-  type EmploymentResultData,
+  type HouseholdResultData,
 } from './render';
-import { employmentEntries, rowsNeeded, setControl } from './fill';
-import { ROW_LISTS, setUpRows } from './rows';
-import { EMPLOYMENT_FLOW } from './steps';
+import { HOUSEHOLD_FLOW } from './steps';
 
-// What the page's other parts can do with the review: set or read its answers, open it, review
-// it, and show its last result again when the detail is locked or unlocked.
-export interface EmploymentCalculator {
-  readonly form: HTMLFormElement;
-  // Sets the answers, with the rows they name, and returns the names it could not set.
-  fill(entries: FormEntries): string[];
-  entries(): FormEntries;
-  open(): void;
-  review(): boolean;
-  refreshResult(): void;
-}
-
-export function setUpEmployment(
+export function setUpHousehold(
   root: HTMLElement,
-  { events, today, tr, tables, detail = () => 'unlocked' }: EmploymentReviewDeps,
-): EmploymentCalculator {
-  const flow = EMPLOYMENT_FLOW;
+  { events, today, tr, tables }: HouseholdPageDeps,
+): void {
+  const flow = HOUSEHOLD_FLOW;
   const LAST_SHEET = lastSheet(flow);
   const RESULT_STEP = resultStep(flow);
-  const form = required(root.querySelector<HTMLFormElement>('#employment'), 'the form');
+  const form = required(root.querySelector<HTMLFormElement>('#household'), 'the form');
   const result = required(root.querySelector<HTMLElement>('#resultado'), 'the result');
-  let shown: EmploymentResultData | null = null;
   const backButton = required(form.querySelector<HTMLButtonElement>('[data-back]'), 'Back');
   const nextButton = required(form.querySelector<HTMLButtonElement>('[data-next]'), 'Next');
   const nav = createNavigation(
@@ -76,7 +59,7 @@ export function setUpEmployment(
   const conditions = () => applyConditions(form);
 
   function trackErrors(errors: readonly FieldError[]) {
-    for (const { field } of errors) events.fieldRejected(sheetOfField(field), baseField(field));
+    for (const { field } of errors) events.fieldRejected(sheetOfField(field), field);
   }
 
   function focusError(errors: readonly FieldError[]) {
@@ -85,8 +68,6 @@ export function setUpEmployment(
     form
       .querySelector<HTMLElement>(`[name="${first.field}"]:not([disabled])`)
       ?.focus({ preventScroll: true });
-    // Inside a scrolling list of rows, the slip sits below its control.
-    form.querySelector(`[data-error-for="${first.field}"]`)?.scrollIntoView({ block: 'nearest' });
   }
 
   function goToError(errors: readonly FieldError[]): false {
@@ -104,20 +85,11 @@ export function setUpEmployment(
     nav.show(RESULT_STEP, { history: 'push', focus: true });
   }
 
-  // The gate: a relationship outside the review goes from the first sheet to the result, with why.
+  // The gate: a relationship that ended before the reform goes to the result, with why.
   function stopAtGate(): boolean {
     const g = gate(form);
     if (g.inScope) return false;
-    shown = null;
-    const answers = answersSoFar(form);
-    const r = reviewEmployment(answers, today(), tables);
-    renderOutOfScope(
-      result,
-      g.reason,
-      r.ok ? r.review.information : [],
-      tr,
-      answers.relationship === 'household',
-    );
+    renderOutOfScope(result, g.reason, tr);
     events.outOfScope(g.reason);
     showResult();
     return true;
@@ -142,17 +114,21 @@ export function setUpEmployment(
 
   function submitReview(): boolean {
     if (stopAtGate()) return true;
-    const parsed = readEmploymentForm(form, today());
+    const parsed = readHouseholdForm(form, today());
     if ('errors' in parsed) return goToError(parsed.errors);
-    const r = reviewEmployment(parsed.input, today(), tables);
+    const r = reviewHousehold(parsed.input, today(), tables);
     // The form already ran the engine's checks; this only guards against the two drifting apart.
     if (!r.ok) return goToError(r.errors.map(({ field, code }) => ({ field, code })));
     renderErrors(form, [], tr);
-    shown = { review: r.review, input: parsed.input };
-    const state = detail();
-    renderEmploymentResult(result, shown, state === 'locked', tr);
+    const ending = endingOf(form);
+    const shown: HouseholdResultData = {
+      review: r.review,
+      input: parsed.input,
+      endingUnknown: ending === 'unknown',
+    };
+    renderHouseholdResult(result, shown, tr);
     events.stepCompleted(stepAt(flow, nav.current));
-    events.reviewCompleted({ review: r.review, input: parsed.input, detail: state });
+    events.reviewCompleted({ review: r.review, input: parsed.input, ending });
     showResult();
     return true;
   }
@@ -168,7 +144,7 @@ export function setUpEmployment(
   );
 
   form.addEventListener('change', conditions);
-  // A typed figure can open or close a question too, such as the extra pays and their proration.
+  // A typed figure can open or close a question too, such as the extra payments and their proration.
   form.addEventListener('input', conditions);
   // A changed answer reopens the sheets: the furthest one reachable is the first that still needs
   // an answer, so a stop at the gate never opens the sheets it skipped.
@@ -188,8 +164,6 @@ export function setUpEmployment(
 
   window.addEventListener('popstate', () => nav.goBack(indexOfHash(flow, location.hash), {}));
 
-  const rows = setUpRows(form, tr, conditions);
-
   // Which question or point detail a visitor opens; `toggle` does not bubble, so it is caught on
   // the way down.
   root.addEventListener(
@@ -199,7 +173,7 @@ export function setUpEmployment(
       if (!(d instanceof HTMLDetailsElement) || !d.open) return;
       if (d.hasAttribute('data-help')) events.helpOpened(d.id);
       const kind = d.closest<HTMLElement>('[data-item]')?.dataset['kind'];
-      if (d.hasAttribute('data-detail') && kind) events.detailOpened(kind as EmploymentItemKind);
+      if (d.hasAttribute('data-detail') && kind) events.detailOpened(kind as HouseholdItemKind);
     },
     true,
   );
@@ -208,9 +182,7 @@ export function setUpEmployment(
     'click',
     () => {
       events.startedOver();
-      shown = null;
       form.reset();
-      for (const list of Object.values(rows)) list.reset();
       renderErrors(form, [], tr);
       conditions();
       nav.reached = 0;
@@ -221,30 +193,4 @@ export function setUpEmployment(
   conditions();
   nav.reached = firstIncomplete(flow, form, today());
   nav.show(Math.min(indexOfHash(flow, location.hash), nav.reached), { history: 'replace' });
-
-  return {
-    form,
-    fill(entries) {
-      const needed = rowsNeeded(entries);
-      for (const list of ROW_LISTS) {
-        const n = needed[list];
-        if (n !== undefined) rows[list].setRows(n);
-      }
-      const missed = entries.filter(([name, value]) => !setControl(form, name, value));
-      conditions();
-      return missed.map(([name]) => name);
-    },
-    entries: () => employmentEntries(form),
-    open() {
-      nav.reached = 0;
-      nav.show(0, { history: 'replace', focus: true });
-    },
-    review: () => {
-      nav.reached = LAST_SHEET;
-      return submitReview();
-    },
-    refreshResult() {
-      if (shown) renderEmploymentResult(result, shown, detail() === 'locked', tr);
-    },
-  };
 }

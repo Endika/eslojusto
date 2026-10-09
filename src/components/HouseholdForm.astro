@@ -1,0 +1,337 @@
+---
+import EmploymentChoice from './EmploymentChoice.astro';
+import Field from './Field.astro';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+import { ACCRUALS, CAUSES, ENDINGS, WORKS } from '../household/form';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+const yesNo = (['yes', 'no'] as const).map((value) => ({
+  value,
+  label: tx(`household.answer.${value}`),
+}));
+const yesNoUnknown = (['yes', 'no', 'unknown'] as const).map((value) => ({
+  value,
+  label: tx(`household.answer.${value}`),
+}));
+
+const works = WORKS.map((value) => ({ value, label: tx(`household.work.${value}`) }));
+const endings = ENDINGS.map((value) => ({ value, label: tx(`household.dates.${value}`) }));
+const causes = [
+  ...CAUSES.map((value) => ({ value, label: tx(`household.desistimiento.${value}`) })),
+  { value: 'unknown', label: tx('household.answer.unknown') },
+];
+const accruals = ACCRUALS.map((value) => ({
+  value,
+  label: value === 'unknown' ? tx('household.answer.unknown') : tx(`household.extras.${value}`),
+}));
+
+const arrow = 'M4 12h15m-6-6 6 6-6 6';
+---
+
+<form class="calculator" id="household" novalidate aria-label={tx('household.form_aria')}>
+  <div class="stack">
+    <fieldset
+      class="sheet"
+      id="sheet-trabajo"
+      data-sheet="trabajo"
+      aria-labelledby="question-trabajo"
+    >
+      <h2 class="question" id="question-trabajo" tabindex="-1">
+        {tx('household.work.question')}
+      </h2>
+      <EmploymentChoice
+        name="work"
+        legend={tx('household.work.legend')}
+        options={works}
+        layout="list"
+      />
+      <Field name="startDate" label={tx('household.dates.start')} kind="date" />
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-fechas" data-sheet="fechas" aria-labelledby="question-fechas">
+      <h2 class="question" id="question-fechas" tabindex="-1">
+        {tx('household.dates.question')}
+      </h2>
+      <EmploymentChoice
+        name="ending"
+        legend={tx('household.dates.ending')}
+        options={endings}
+        layout="list"
+      />
+      <div data-if="ending:desistimiento et_cause">
+        <Field name="endDate" label={tx('household.dates.end')} kind="date" />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-desistimiento"
+      data-sheet="desistimiento"
+      aria-labelledby="question-desistimiento"
+    >
+      <h2 class="question" id="question-desistimiento" tabindex="-1">
+        {tx('household.desistimiento.question')}
+      </h2>
+      <EmploymentChoice
+        name="cause"
+        legend={tx('household.desistimiento.cause')}
+        options={causes}
+        layout="list"
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-escrito"
+      data-sheet="escrito"
+      aria-labelledby="question-escrito"
+    >
+      <h2 class="question" id="question-escrito" tabindex="-1">
+        {tx('household.severance.writing_question')}
+      </h2>
+      <EmploymentChoice
+        name="inWriting"
+        legend={tx('household.desistimiento.writing')}
+        options={yesNoUnknown}
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-indemnizacion"
+      data-sheet="indemnizacion"
+      aria-labelledby="question-indemnizacion"
+    >
+      <h2 class="question" id="question-indemnizacion" tabindex="-1">
+        {tx('household.severance.question')}
+      </h2>
+      <EmploymentChoice
+        name="severanceAvailable"
+        legend={tx('household.severance.available')}
+        options={yesNoUnknown}
+      />
+      <div data-if="severanceAvailable:yes">
+        <Field name="severanceOffered" label={tx('household.severance.offered')} kind="amount" />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-preaviso"
+      data-sheet="preaviso"
+      aria-labelledby="question-preaviso"
+    >
+      <h2 class="question" id="question-preaviso" tabindex="-1">
+        {tx('household.notice.question')}
+      </h2>
+      <Field
+        name="noticeDays"
+        label={tx('household.notice.days')}
+        hint={tx('household.notice.days_hint')}
+        kind="days"
+      />
+      <div data-if-below="noticeDays:20">
+        <Field
+          name="substitutePaid"
+          label={tx('household.notice.substitute')}
+          hint={tx('household.notice.substitute_hint')}
+          kind="amount"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-noche" data-sheet="noche" aria-labelledby="question-noche">
+      <h2 class="question" id="question-noche" tabindex="-1">
+        {tx('household.notice.night_question')}
+      </h2>
+      {/* Only a live-in worker is asked; for the rest the controls stay off and never block. */}
+      <div data-if="work:live_in">
+        <EmploymentChoice
+          name="nightNotice"
+          legend={tx('household.notice.night')}
+          options={yesNoUnknown}
+        />
+        <div data-if="nightNotice:yes">
+          <EmploymentChoice
+            name="seriousBreach"
+            legend={tx('household.notice.serious')}
+            options={yesNoUnknown}
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-sueldo" data-sheet="sueldo" aria-labelledby="question-sueldo">
+      <h2 class="question" id="question-sueldo" tabindex="-1">
+        {tx('household.pay.question')}
+      </h2>
+      <div data-if="work:monthly live_in">
+        <Field
+          name="monthlyPay"
+          label={tx('household.pay.monthly')}
+          hint={tx('household.pay.monthly_hint')}
+          kind="amount"
+        />
+        <Field
+          name="inKind"
+          label={tx('household.pay.in_kind')}
+          hint={tx('household.pay.in_kind_hint')}
+          kind="amount"
+        />
+      </div>
+      <div data-if="work:hourly_external">
+        <Field
+          name="hourlyRate"
+          label={tx('household.pay.hourly')}
+          hint={tx('household.pay.hourly_hint')}
+          kind="amount"
+        />
+        <div data-if="ending:desistimiento">
+          <Field
+            name="monthlyAverage"
+            label={tx('household.pay.average')}
+            hint={tx('household.pay.average_hint')}
+            kind="amount"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" id="sheet-pagas" data-sheet="pagas" aria-labelledby="question-pagas">
+      <h2 class="question" id="question-pagas" tabindex="-1">
+        {tx('household.extras.question')}
+      </h2>
+      <Field
+        name="extraCount"
+        label={tx('household.extras.count')}
+        hint={tx('household.extras.count_hint')}
+        kind="days"
+      />
+      <div data-if-above0="extraCount">
+        <EmploymentChoice
+          name="extraProrated"
+          legend={tx('household.extras.prorated')}
+          layout="pair"
+          options={yesNo}
+        />
+        <div data-if="extraProrated:no">
+          <Field
+            name="extraAmount"
+            label={tx('household.extras.amount')}
+            hint={tx('household.extras.amount_hint')}
+            kind="amount"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-pagas-cuando"
+      data-sheet="pagas-cuando"
+      aria-labelledby="question-pagas-cuando"
+    >
+      <h2 class="question" id="question-pagas-cuando" tabindex="-1">
+        {tx('household.extras.when_question')}
+      </h2>
+      <EmploymentChoice
+        name="extraAccrual"
+        legend={tx('household.extras.accrual')}
+        options={accruals}
+        layout="list"
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-jornada"
+      data-sheet="jornada"
+      aria-labelledby="question-jornada"
+    >
+      <h2 class="question" id="question-jornada" tabindex="-1">
+        {tx('household.time.question')}
+      </h2>
+      <Field
+        name="weeklyHours"
+        label={tx('household.time.hours')}
+        hint={tx('household.time.hours_hint')}
+        kind="amount"
+      />
+      <Field
+        name="weeklyRest"
+        label={tx('household.time.weekly_rest')}
+        hint={tx('household.time.weekly_rest_hint')}
+        kind="amount"
+      />
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-descansos"
+      data-sheet="descansos"
+      aria-labelledby="question-descansos"
+    >
+      <h2 class="question" id="question-descansos" tabindex="-1">
+        {tx('household.time.rest_question')}
+      </h2>
+      <Field name="shortestRest" label={tx('household.time.rest')} kind="amount" />
+      <div data-if="work:live_in">
+        <EmploymentChoice
+          name="restMadeUp"
+          legend={tx('household.time.rest_made_up')}
+          options={yesNoUnknown}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset
+      class="sheet"
+      id="sheet-vacaciones"
+      data-sheet="vacaciones"
+      aria-labelledby="question-vacaciones"
+    >
+      <h2 class="question" id="question-vacaciones" tabindex="-1">
+        {tx('household.holidays.question')}
+      </h2>
+      <Field name="holidayDays" label={tx('household.holidays.days')} kind="days" />
+      <Field name="holidayStretch" label={tx('household.holidays.stretch')} kind="days" />
+      <div data-if="ending:desistimiento et_cause">
+        <Field
+          name="holidayTaken"
+          label={tx('household.holidays.taken')}
+          hint={tx('household.holidays.taken_hint')}
+          kind="days"
+        />
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="actions">
+    <div class="actions__inner">
+      <button class="button button--back" type="button" data-back hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow} transform="rotate(180 12 12)"></path>
+        </svg>
+        {tx('form.back')}
+      </button>
+      <button class="button button--forward" type="button" data-next>
+        {tx('form.next')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+      <button class="button button--forward" type="submit" data-submit hidden>
+        {tx('form.review')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</form>

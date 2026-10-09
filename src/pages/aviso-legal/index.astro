@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { t, type Key } from '../../i18n';
 import { DOCUMENTS } from '../../documents/config';
 import { PASS_DAYS, PASS_READS } from '../../documents/contract';
-import { EMPLOYMENT_BUILD, RENTAL_BUILD } from '../../content/sections';
+import { EMPLOYMENT_BUILD, HOUSEHOLD_BUILD, RENTAL_BUILD } from '../../content/sections';
 
 // Legal prose, published only in Spanish: the headings and metadata come from the dictionary.
 const tx = (key: Key, vars?: Record<string, string>) => t('es', key, vars);
@@ -21,6 +21,8 @@ const documents = DOCUMENTS !== null;
 const rental = RENTAL_BUILD;
 // The contract review exists only in a PUBLIC_EMPLOYMENT=1 build; so do the paragraphs about it.
 const employment = EMPLOYMENT_BUILD;
+// The household review exists only in a PUBLIC_HOUSEHOLD=1 build; so do the paragraphs about it.
+const household = HOUSEHOLD_BUILD;
 ---
 
 <Base
@@ -131,6 +133,19 @@ const employment = EMPLOYMENT_BUILD;
           <p>{tx('legal_notice.employment.does_not')}</p>
           <p>
             {tx('legal_notice.employment.beta')} <a href={`mailto:${email}`}>{email}</a>.
+          </p>
+        </section>
+      )}
+
+      {household && (
+        <section class="sheet sheet--text">
+          <h2 id="al-hogar">
+            {tx('legal_notice.household')} <span class="beta">{tx('household.beta')}</span>
+          </h2>
+          <p>{tx('legal_notice.household.does')}</p>
+          <p>{tx('legal_notice.household.does_not')}</p>
+          <p>
+            {tx('legal_notice.household.beta')} <a href={`mailto:${email}`}>{email}</a>.
           </p>
         </section>
       )}

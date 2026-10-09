@@ -69,6 +69,19 @@ export const employmentApp = (home: URL, page: URL, lang: Lang) => ({
   publisher: organization(home),
 });
 
+export const householdApp = (home: URL, page: URL, lang: Lang) => ({
+  '@type': 'WebApplication',
+  name: t(lang, 'household.app_name'),
+  url: page.href,
+  description: t(lang, 'household.description'),
+  applicationCategory: 'FinanceApplication',
+  operatingSystem: 'Any',
+  browserRequirements: 'Requires JavaScript',
+  isAccessibleForFree: true,
+  inLanguage: lang,
+  publisher: organization(home),
+});
+
 // The trail from the home page to this one; the last crumb is the page itself.
 export const breadcrumbList = (home: URL, crumbs: readonly { name: string; path: string }[]) => ({
   '@type': 'BreadcrumbList',

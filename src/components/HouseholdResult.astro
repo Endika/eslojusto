@@ -1,39 +1,32 @@
 ---
-import PassOffer from './PassOffer.astro';
-import { HOUSEHOLD_BUILD } from '../content/sections';
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
 
 interface Props {
   lang: Lang;
-  // A build with the documents API offers the pass that unlocks the detail.
-  documents?: boolean;
 }
-const { lang, documents = false } = Astro.props;
+const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 
 // Every state has its own mark beside its words, so none rests on colour alone.
 const MARKS: readonly (readonly [string, readonly string[]])[] = [
   ['below-minimum', ['M12 4v16m-5-5 5 5 5-5M3 9h18']],
   ['over-legal-limit', ['M12 21V4m-5 5 5-5 5 5M3 14h18']],
-  ['clause-void', ['M5 4h14v16H5z', 'm8 9 8 8m0-8-8 8']],
-  ['becomes-permanent', ['M4 12h16M14 6l6 6-6 6', 'M4 5v14']],
   ['missing-requirement', ['M5 4h14v16H5z', 'M9 12h6']],
+  ['warning', ['M12 4 3 19h18z', 'M12 10v4', 'M12 16.5v.5']],
+  ['dismissal-regime-presumed', ['M5 4h14v16H5z', 'M9 9h6', 'M9 13h4']],
   ['within-limit', ['M4 7h16M4 17h16']],
-  ['depends-on-agreement', ['M4 7h16', 'M4 17h16', 'M12 4v16']],
   ['review-it', ['M12 7v6M12 16v1']],
-  ['not-applicable-to-date', ['M8 12h8']],
+  ['information', ['M12 11v5M12 8v.5']],
   ['not-entered', ['M4 7h16']],
   ['not-reviewed-in-this-version', ['M8 9h8M8 15h8']],
   ['not-published', ['M12 7v5l3 3']],
   ['depends', ['M4 12h6m0 0 8-6m-8 6 8 6']],
-  ['not-assessed', ['M8 12h1m3 0h1m3 0h1']],
-  ['no-verdict', ['M4 9h7M13 15h7']],
 ];
-// Those that sit in a circle, as the rental review draws them.
+// Those that sit in a circle, as the other reviews draw them.
 const CIRCLED = new Set([
   'review-it',
-  'not-applicable-to-date',
+  'information',
   'not-published',
   'not-reviewed-in-this-version',
 ]);
@@ -42,14 +35,14 @@ const CIRCLED = new Set([
 <section class="result" id="resultado" aria-labelledby="result-title" hidden>
   <svg class="marks" aria-hidden="true" focusable="false">
     {MARKS.map(([id, paths]) => (
-      <symbol id={`employment-mark-${id}`} viewBox="0 0 24 24">
+      <symbol id={`household-mark-${id}`} viewBox="0 0 24 24">
         {CIRCLED.has(id) && <circle cx="12" cy="12" r="8" />}
         {paths.map((d) => (
           <path d={d} />
         ))}
       </symbol>
     ))}
-    <symbol id="employment-mark-out-of-scope" viewBox="0 0 24 24">
+    <symbol id="household-mark-out-of-scope" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="8"></circle>
       <path d="m6.5 6.5 11 11"></path>
     </symbol>
@@ -57,7 +50,7 @@ const CIRCLED = new Set([
 
   <header class="result__header">
     <h2 class="result__title" id="result-title" tabindex="-1">
-      {tx('employment.result.title')}
+      {tx('household.result.title')}
     </h2>
     <p class="result__lead" data-lead></p>
   </header>
@@ -72,53 +65,65 @@ const CIRCLED = new Set([
     >
       <div class="sheet">
         <h3 class="item__title" id="out-of-scope-title">
-          {tx('employment.result.out_of_scope')}
+          {tx('household.result.out_of_scope')}
         </h3>
         <p class="item__status">
           <svg class="item__mark" viewBox="0 0 24 24" aria-hidden="true">
-            <use href="#employment-mark-out-of-scope"></use>
+            <use href="#household-mark-out-of-scope"></use>
           </svg>
           <span data-out-of-scope-status></span>
         </p>
         <p class="help" data-out-of-scope-reason></p>
-        {HOUSEHOLD_BUILD && (
-          <p class="help" data-out-of-scope-household hidden>
-            <a href={link(lang, 'empleada-de-hogar/')}>{tx('employment.result.household_link')}</a>
-          </p>
-        )}
       </div>
     </section>
 
     <section class="item summary" data-in-scope aria-labelledby="summary-title">
       <div class="sheet">
         <h3 class="item__title" id="summary-title">
-          {tx('employment.result.summary')}
+          {tx('household.result.summary')}
         </h3>
-        <p class="help notice" data-partial hidden>
-          {tx('client.employment.partial.notice')}
-        </p>
         <p class="help" data-headline></p>
+        <ul class="list" data-totals></ul>
         <ul class="list" data-warnings></ul>
+        <p class="help notice" data-ending-unknown hidden></p>
       </div>
     </section>
 
     <div class="review__items" data-items></div>
 
-    {documents && <PassOffer lang={lang} review="employment" />}
-
-    <section class="item" data-information-section aria-labelledby="information-title">
+    <section class="item" data-in-scope data-final-pay aria-labelledby="final-pay-title" hidden>
       <div class="sheet">
-        <h3 class="item__title" id="information-title">
-          {tx('employment.result.information')}
+        <h3 class="item__title" id="final-pay-title">
+          {tx('household.result.final_pay')}
         </h3>
-        <div class="information" data-information></div>
+        <p class="item__note" data-final-pay-note hidden></p>
+        <ul class="list" data-final-pay-lines></ul>
+        <ul class="sources rules" data-final-pay-rules></ul>
+      </div>
+    </section>
+
+    <section class="item" data-in-scope aria-labelledby="unemployment-title">
+      <div class="sheet">
+        <h3 class="item__title" id="unemployment-title">
+          {tx('household.result.unemployment')}
+        </h3>
+        <p class="help" data-unemployment-text>
+          {tx('household.result.unemployment_text')}
+        </p>
+        <div data-unemployment-engine hidden>
+          <ul class="list" data-unemployment-lines></ul>
+          <ul class="sources rules" data-rules></ul>
+        </div>
+        <p class="help">
+          <a href={link('es', 'paro/')}>{tx('household.result.unemployment_link')}</a>
+        </p>
       </div>
     </section>
 
     <section class="item" data-in-scope aria-labelledby="unchecked-title">
       <div class="sheet">
         <h3 class="item__title" id="unchecked-title">
-          {tx('employment.result.unchecked')}
+          {tx('household.result.unchecked')}
         </h3>
         <ul class="list" data-unchecked></ul>
       </div>
@@ -129,32 +134,17 @@ const CIRCLED = new Set([
         <span class="item__tab" aria-hidden="true" data-tab-number></span>
         <div class="sheet">
           <h3 class="item__title" data-title></h3>
-          <blockquote class="quote" data-clause-words hidden>
-            <p data-clause-text></p>
-          </blockquote>
           <p class="item__status">
             <svg class="item__mark" data-mark viewBox="0 0 24 24" aria-hidden="true">
-              <use href="#employment-mark-within-limit"></use>
+              <use href="#household-mark-within-limit"></use>
             </svg>
             <span data-status-text></span>
           </p>
           <p class="item__note" data-question hidden></p>
           <ul class="list readings-list" data-readings hidden></ul>
-          <p class="item__note" data-total hidden></p>
           <p class="item__note" data-answer-note hidden></p>
           <p class="item__note" data-agreement-note hidden></p>
-          <div class="literal" data-literal hidden>
-            <p class="literal__intro" data-literal-intro></p>
-            <blockquote class="quote">
-              <p data-literal-text></p>
-            </blockquote>
-            <p class="literal__link">
-              <a data-literal-link rel="noopener" target="_blank"></a>
-            </p>
-          </div>
-          <h4 class="rules__title" data-rules-title>
-            {tx('employment.result.rules')}
-          </h4>
+          <h4 class="rules__title">{tx('household.result.rules')}</h4>
           <ul class="sources rules" data-rules></ul>
           <div data-detail-slot></div>
         </div>
@@ -166,12 +156,11 @@ const CIRCLED = new Set([
         <span class="rules__status" data-rule-status></span>
       </li>
     </template>
-    {/* The detail is cloned in only once it may be shown: never present, even hidden, before. */}
     <template data-template="detail">
       <details class="item__detail" data-detail>
-        <summary>{tx('employment.result.how')}</summary>
+        <summary>{tx('household.result.how')}</summary>
         <div class="readings" data-readings-detail></div>
-        <h4 class="rules__title">{tx('employment.result.sources')}</h4>
+        <h4 class="rules__title">{tx('household.result.sources')}</h4>
         <ul class="sources sources--wrap" data-sources></ul>
       </details>
     </template>
@@ -187,50 +176,21 @@ const CIRCLED = new Set([
         <span class="sources__in-force" data-in-force></span>
       </li>
     </template>
-    <template data-template="duty-detail">
-      <details class="item__detail" data-detail>
-        <summary>{tx('employment.result.duty_list')}</summary>
-        <ul class="duty" data-duty-elements></ul>
-      </details>
-    </template>
-    <template data-template="duty-element">
-      <li class="duty__element">
-        <p class="duty__name" data-element-name></p>
-        <p class="duty__status">
-          <svg class="item__mark" data-mark viewBox="0 0 24 24" aria-hidden="true">
-            <use href="#employment-mark-within-limit"></use>
-          </svg>
-          <span data-element-status></span>
+    <template data-template="final-pay-item">
+      <li>
+        <p class="duty__name" data-final-pay-title></p>
+        <p class="item__status">
+          <span data-final-pay-amount></span>
         </p>
-        <ul class="list reading__calculation" data-element-lines></ul>
+        <p class="item__note" data-final-pay-calculation></p>
+        <ul class="sources rules" data-rules></ul>
       </li>
-    </template>
-    <template data-template="offer-detail">
-      <details class="item__detail" data-detail>
-        <summary>{tx('employment.result.offer_detail')}</summary>
-        <ul class="list" data-offer-differences></ul>
-        <ul class="list" data-offer-not-compared></ul>
-      </details>
-    </template>
-    <template data-template="reference-detail">
-      <div class="reference">
-        <ul class="list" data-reference-figures></ul>
-        <h4 class="rules__title">{tx('employment.result.sources')}</h4>
-        <ul class="sources sources--wrap" data-reference-sources></ul>
-      </div>
-    </template>
-    <template data-template="information">
-      <details class="information__block">
-        <summary data-info-title></summary>
-        <ul class="list" data-info-text></ul>
-        <ul class="sources sources--wrap" data-info-links></ul>
-      </details>
     </template>
   </div>
 
   <div class="restart">
     <button class="button button--restart" type="button" data-restart>
-      {tx('employment.result.restart')}
+      {tx('household.result.restart')}
     </button>
   </div>
 </section>

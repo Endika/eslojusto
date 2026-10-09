@@ -1,0 +1,93 @@
+---
+import Base from '../layouts/Base.astro';
+import HouseholdForm from '../components/HouseholdForm.astro';
+import HouseholdResult from '../components/HouseholdResult.astro';
+import HouseholdGuide from '../components/HouseholdGuide.astro';
+import { MINIMUM_WAGE } from '../engine/employment/data/minimum-wage';
+import { HOUSEHOLD_BETA } from '../content/sections';
+import { TABS } from '../household/steps';
+import { formatLongDay } from '../content/rent-indices';
+import { householdFaqEntries } from '../content/household-faq';
+import { faqNode } from '../content/faq';
+import { householdApp } from '../content/structured-data';
+import { LAST_UPDATED } from '../content/updated';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+// The day the page's rules and norms were last checked; it exists only in a build with the page.
+const checkedOn = LAST_UPDATED['/empleada-de-hogar/'];
+if (!checkedOn) throw new Error('/empleada-de-hogar/ needs its date in LAST_UPDATED.');
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const page = new URL(link(lang, 'empleada-de-hogar/'), Astro.site);
+const structuredData = [
+  householdApp(home, page, lang),
+  faqNode(householdFaqEntries(lang, { checkedOn, minimumWage: MINIMUM_WAGE })),
+];
+---
+
+<Base
+  title={tx('household.title')}
+  description={tx('household.description')}
+  path="/empleada-de-hogar/"
+  lang={lang}
+  section="cause"
+  structuredData={structuredData}
+>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
+    <ol>
+      {/* Only a section already reached is a link; one still ahead is plain text until then. */}
+      {TABS.map(([id, step, number, weight], i) => (
+        <li style={`--weight: ${weight}`} data-tone={id}>
+          {i === 0 ? (
+            <a class="tab" data-tab={id} data-state="current" href={`#${step}`} aria-current="step">
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`household.tab.${step}`)}</span>
+            </a>
+          ) : (
+            <span class="tab" data-tab={id} data-state="pending" aria-disabled="true">
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`household.tab.${step}`)}</span>
+            </span>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+  <main id="content">
+    <div class="desk">
+      <header class="desk__head">
+        <h1 class="desk__title">{tx('household.h1')}</h1>
+        <p class="desk__lead">{tx('household.lead')}</p>
+        {HOUSEHOLD_BETA && (
+          <p class="desk__beta">
+            <span class="beta">{tx('household.beta')}</span>
+            {tx('household.beta_note')}
+          </p>
+        )}
+        <p class="desk__reviewed">
+          <time datetime={checkedOn}>
+            {t(lang, 'household.reviewed', { fecha: formatLongDay(checkedOn) })}
+          </time>
+        </p>
+      </header>
+      <noscript>
+        <div class="sheet sheet--notice">
+          <p class="help">{tx('household.no_js')}</p>
+        </div>
+      </noscript>
+      <HouseholdForm lang={lang} />
+      <HouseholdResult lang={lang} />
+    </div>
+    <HouseholdGuide lang={lang} checkedOn={checkedOn} />
+  </main>
+</Base>
+
+<script>
+  import '../scripts/household';
+</script>

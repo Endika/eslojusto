@@ -16,7 +16,16 @@ const employmentSpecs = /[\\/]employment[^\\/]*\.spec\.ts$/;
 // The ERTE project needs a build with /paro/erte/, which a normal build leaves out.
 const erte = process.env['TEST_ERTE'] === '1';
 const erteSpecs = /[\\/]erte[^\\/]*\.spec\.ts$/;
-const optInSpecs = [/(rtl|analytics|documents)\.spec\.ts/, rentalSpecs, employmentSpecs, erteSpecs];
+// The household project needs a build with /empleada-de-hogar/, which a normal build leaves out.
+const household = process.env['TEST_HOUSEHOLD'] === '1';
+const householdSpecs = /[\\/]household[^\\/]*\.spec\.ts$/;
+const optInSpecs = [
+  /(rtl|analytics|documents)\.spec\.ts/,
+  rentalSpecs,
+  employmentSpecs,
+  erteSpecs,
+  householdSpecs,
+];
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
 // The documents project reads documents on /alquiler/ and /contrato/ too, so its build has them;
@@ -25,7 +34,9 @@ const buildEnv = {
   ...(rental || documents || analytics ? { PUBLIC_RENTAL: '1' } : {}),
   ...(employment || documents || analytics ? { PUBLIC_EMPLOYMENT: '1' } : {}),
   ...(erte ? { PUBLIC_ERTE: '1' } : {}),
-  ...(analytics ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
+  // The household project also measures its own events, so its build has a test analytics key.
+  ...(household ? { PUBLIC_HOUSEHOLD: '1' } : {}),
+  ...(analytics || household ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
     ? {
         PUBLIC_API_EXTRACT_URL: 'https://extract.api.eslojusto.test/',
@@ -84,6 +95,15 @@ export default defineConfig({
       : []),
     ...(erte
       ? [{ name: 'erte', use: { ...devices['Desktop Chrome'] }, testMatch: erteSpecs }]
+      : []),
+    ...(household
+      ? [
+          {
+            name: 'household',
+            use: { ...devices['Desktop Chrome'] },
+            testMatch: householdSpecs,
+          },
+        ]
       : []),
     ...(documents
       ? [
