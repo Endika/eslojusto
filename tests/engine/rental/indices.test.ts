@@ -3,7 +3,6 @@ import { parseDate } from '../../../src/engine/date';
 import { IGC } from '../../../src/engine/rental/data/igc';
 import { IPC, flashReleaseUrl } from '../../../src/engine/rental/data/ipc';
 import { IRAV } from '../../../src/engine/rental/data/irav';
-import { LEGAL_INTEREST } from '../../../src/engine/rental/data/legal-interest';
 import {
   referenceMonth,
   type IndexSeries,
@@ -12,7 +11,6 @@ import {
 
 const INE = 'https://servicios.ine.es/';
 const INE_PRESS = 'https://www.ine.es/';
-const BDE = 'https://clientebancario.bde.es/';
 
 const nextMonth = (month: string): string => {
   const [y, m] = month.split('-').map(Number) as [number, number];
@@ -204,21 +202,5 @@ describe('reference month', () => {
       const s = series([value('2030-01', '2030-01-31')]);
       expect(lookup(s, '2030-01-31')).toEqual({ kind: 'not_loaded' });
     });
-  });
-});
-
-describe('legal interest', () => {
-  it('covers every year from 2019 to 2026 once, each with its source', () => {
-    const years = LEGAL_INTEREST.map((y) => y.year);
-    for (let year = 2019; year <= 2026; year++)
-      expect(years.filter((y) => y === year)).toHaveLength(1);
-    for (const y of LEGAL_INTEREST) expect(y.url.startsWith(BDE)).toBe(true);
-  });
-
-  it('is 3 % until 2022 and 3,25 % from 2023', () => {
-    const rate = (year: number) => LEGAL_INTEREST.find((y) => y.year === year)?.rate;
-    expect(rate(2022)).toBe(3);
-    expect(rate(2023)).toBe(3.25);
-    expect(rate(2026)).toBe(3.25);
   });
 });

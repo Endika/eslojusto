@@ -20,6 +20,12 @@ const sectionOnly = (name) => ({
   regex: `^(?!\\.\\.?/)|${notCanonical}`,
   message: `src/engine/${name} imports only from src/engine.`,
 });
+// A section's data/ may also reach the tables every section shares, in src/engine/law/data.
+const lawData = '\\.\\./\\.\\./law/data/[\\w-]+$';
+const sectionDataOnly = (name) => ({
+  regex: `^(?!\\.\\.?/)|^(?!${lawData})(\\.\\.?/(.*/)?\\.\\.?(/|$)|.*//)`,
+  message: `src/engine/${name}/data imports only from src/engine and the shared tables in src/engine/law/data.`,
+});
 const noSectionData = (name) => ({
   regex: '(^|/)data(/|$)',
   message: `src/engine/${name} takes its tables as arguments; only its data/ holds them.`,
@@ -36,6 +42,11 @@ const noSectionFromRoot = {
 const lawOnly = {
   regex: `^(?!\\./|\\.\\./(date|money|sources)$)|${notCanonical}`,
   message: 'src/engine/law imports only from itself and src/engine/{date,money,sources}.',
+};
+// The shared tables reach only the law module that types them.
+const lawDataOnly = {
+  regex: `^(?!\\.\\./[\\w-]+$)|${notCanonical}`,
+  message: 'src/engine/law/data imports only from src/engine/law.',
 };
 const noAnalytics = {
   regex: '(^|/)analytics/',
@@ -224,14 +235,18 @@ export default tseslint.config(
     ignores: ['src/engine/law/**', ...SECTIONS.map((name) => `src/engine/${name}/**`)],
     rules: engineGlobals,
   }),
-  boundary(['src/engine/law/**'], [lawOnly], { rules: engineGlobals }),
+  boundary(['src/engine/law/**'], [lawOnly], {
+    ignores: ['src/engine/law/data/**'],
+    rules: engineGlobals,
+  }),
+  boundary(['src/engine/law/data/**'], [lawDataOnly], { rules: engineGlobals }),
   ...SECTIONS.flatMap((name) => [
     boundary(
       [`src/engine/${name}/**`],
       [sectionOnly(name), noSectionData(name), noOtherSection(name)],
       { ignores: [`src/engine/${name}/data/**`], rules: engineGlobals },
     ),
-    boundary([`src/engine/${name}/data/**`], [sectionOnly(name)], { rules: engineGlobals }),
+    boundary([`src/engine/${name}/data/**`], [sectionDataOnly(name)], { rules: engineGlobals }),
   ]),
   boundary(['src/i18n/**'], [localOnly('i18n')]),
   boundary(['src/analytics/**'], [analyticsReach, noPosthogAdapter], {

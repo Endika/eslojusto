@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { RENTAL_FAQ_TOPICS } from '../../src/content/rental-faq-topics';
 import { rentalFaqEntries } from '../../src/content/rental-faq';
 import { legalInterestSummary, rentalGuide } from '../../src/content/rental-guide';
-import { LEGAL_INTEREST } from '../../src/engine/rental/data/legal-interest';
+import { LEGAL_INTEREST } from '../../src/engine/law/data/legal-interest';
 import { NORMS } from '../../src/engine/rental/data/norms';
 import type { NormTable } from '../../src/engine/rental/norms';
 

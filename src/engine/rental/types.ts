@@ -1,6 +1,6 @@
 import type { CivilDate } from '../date';
 import type { IndexTables } from './indices';
-import type { LegalInterestYear } from './legal-interest';
+import type { LegalInterestTable } from '../law/interest';
 import type { NormTable } from './norms';
 
 export type ContractType =
@@ -125,7 +125,7 @@ export interface RentalDeps {
 
 // Everything a whole review reads.
 export interface ReviewDeps extends RentalDeps {
-  readonly legalInterest: readonly LegalInterestYear[];
+  readonly legalInterest: LegalInterestTable;
 }
 
 // The results an item can have. `not_yet_due` is a balance the landlord still has time to return

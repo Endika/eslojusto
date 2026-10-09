@@ -1,4 +1,5 @@
 import { addDays, parseDate, toIso } from '../engine/date';
+import type { LegalInterestTable } from '../engine/law/interest';
 import type { Norm, NormTable } from '../engine/rental/norms';
 import { ruleSource, type RuleId } from '../engine/rental/rules';
 import { t, type Key } from '../i18n';
@@ -224,13 +225,11 @@ export interface LegalInterestSummary {
   readonly url: string;
 }
 
-export function legalInterestSummary(
-  years: readonly { readonly year: number; readonly rate: number; readonly url: string }[],
-): LegalInterestSummary {
-  const latest = years.at(-1);
+export function legalInterestSummary(periods: LegalInterestTable): LegalInterestSummary {
+  const latest = periods.at(-1);
   if (!latest) throw new Error('The rental guide needs the legal interest table.');
-  let since = latest.year;
-  for (let i = years.length - 2; i >= 0 && years[i]?.rate === latest.rate; i -= 1)
-    since = years[i]?.year ?? since;
-  return { rate: latest.rate, since, url: latest.url };
+  let since = latest.from;
+  for (let i = periods.length - 2; i >= 0 && periods[i]?.rate === latest.rate; i -= 1)
+    since = periods[i]?.from ?? since;
+  return { rate: latest.rate, since: Number(since.slice(0, 4)), url: latest.url };
 }

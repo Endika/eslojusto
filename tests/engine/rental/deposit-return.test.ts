@@ -11,7 +11,8 @@ import {
 } from '../../../src/engine/date';
 import { RENTAL_TABLES } from '../../../src/engine/rental/data/tables';
 import { reviewRental } from '../../../src/engine/rental/review';
-import { LEGAL_INTEREST } from '../../../src/engine/rental/data/legal-interest';
+import { LEGAL_INTEREST } from '../../../src/engine/law/data/legal-interest';
+import { rateOn } from '../../../src/engine/law/interest';
 import { NORMS } from '../../../src/engine/rental/data/norms';
 import { checkDepositReturn } from '../../../src/engine/rental/deposit-return';
 import { itemAmount, type ItemResult } from '../../../src/engine/rental/item';
@@ -400,7 +401,7 @@ describe('the part of the deposit above one month', () => {
       compareDates(d, until) < 0;
       d = addDays(d, 1)
     ) {
-      const rate = LEGAL_INTEREST.find((y) => y.year === d.y)?.rate ?? NaN;
+      const rate = rateOn(d, LEGAL_INTEREST) ?? NaN;
       total += (amount * rate) / 100 / daysInYear(d.y);
     }
     return total;
