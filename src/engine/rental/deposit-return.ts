@@ -1,12 +1,5 @@
-import {
-  addDays,
-  addMonthsClamped,
-  compareDates,
-  daysInYear,
-  ordinal,
-  toIso,
-  type CivilDate,
-} from '../date';
+import { addDays, addMonthsClamped, compareDates, toIso, type CivilDate } from '../date';
+import { interestByYear } from '../law/interest';
 import { round2 } from '../money';
 import { rentalPhrase as p, type RentalPhrase } from './calculation';
 import {
@@ -91,32 +84,23 @@ function interestIn(
   // A year with no rate loaded: what came before it is counted, the rest is not checkable.
   let missingYear: number | null = null;
   for (const s of stretches) {
-    let from = s.from;
-    while (compareDates(from, s.until) < 0) {
-      const yearEnd: CivilDate = { y: from.y + 1, m: 1, d: 1 };
-      const to = compareDates(yearEnd, s.until) < 0 ? yearEnd : s.until;
-      const rate = rates.find((r) => r.year === from.y)?.rate;
-      if (rate === undefined) {
-        missingYear = Math.min(missingYear ?? from.y, from.y);
-        break;
-      }
-      const days = ordinal(to) - ordinal(from);
-      const yearDays = commercial ? 360 : daysInYear(from.y);
-      const interest = (s.amount * rate * days) / (100 * yearDays);
-      total += interest;
+    const counted = interestByYear(s.amount, s.from, s.until, rates, commercial ? 360 : 'actual');
+    for (const segment of counted.segments) {
+      total += segment.interest;
       phrases.push(
         p('deposit.interest_stretch', {
           amount: { euros: s.amount },
-          from: { date: toIso(from) },
-          to: { date: toIso(addDays(to, -1)) },
-          days: { days },
-          rate: { percent: rate },
-          yearDays: { integer: yearDays },
-          interest: { euros: round2(interest) },
+          from: { date: toIso(segment.from) },
+          to: { date: toIso(addDays(segment.to, -1)) },
+          days: { days: segment.days },
+          rate: { percent: segment.rate },
+          yearDays: { integer: segment.yearDays },
+          interest: { euros: round2(segment.interest) },
         }),
       );
-      from = to;
     }
+    if (counted.kind !== 'complete')
+      missingYear = Math.min(missingYear ?? counted.missingYear, counted.missingYear);
   }
   total = round2(total);
   phrases.push(
