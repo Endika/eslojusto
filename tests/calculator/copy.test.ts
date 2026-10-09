@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { es } from '../../src/i18n/es';
-import { forbiddenIn, hasSectionWords, publishedCopy } from '../support/forbidden';
+import { FORBIDDEN, forbiddenIn, hasSectionWords, publishedCopy } from '../support/forbidden';
 
 const filesUnder = (dir: string, ext: string): string[] =>
   readdirSync(dir).flatMap((n) => {
@@ -33,6 +33,7 @@ const sources = [
     'src/rental',
     'src/employment',
     'src/credit',
+    'src/mortgage',
     'src/insurance',
     'src/household',
     'src/bills',
@@ -111,6 +112,48 @@ describe('forbidden words', () => {
     expect(forbiddenIn('src/credit/x.ts', text)).not.toEqual([]);
     expect(forbiddenIn('dist/financiacion/index.html', text)).not.toEqual([]);
     expect(forbiddenIn('src/employment/x.ts', text)).toEqual([]);
+  });
+
+  it.each([
+    'recupera tus gastos',
+    'lo que puedes recuperar',
+    'te devuelven 300 €',
+    'te deben 300 €',
+    'hasta 3.000 €',
+    'hasta {amount} €',
+    'miles de afectados',
+    'sin coste para ti',
+    'aún no ha prescrito',
+    'la cláusula es nula',
+    'la fecha de firma',
+    'antes de que sea tarde',
+    'si reclamas al banco',
+  ])('the mortgage copy never says «%s»; elsewhere only the shared words apply', (text) => {
+    expect(forbiddenIn('src/mortgage/x.ts', text)).not.toEqual([]);
+    expect(forbiddenIn('src/engine/mortgage/x.ts', text)).not.toEqual([]);
+    expect(forbiddenIn('client.mortgage.x', text)).not.toEqual([]);
+    expect(forbiddenIn('src/rental/x.ts', text).every((r) => FORBIDDEN.includes(r))).toBe(true);
+  });
+
+  it('«recupera» and «hasta X €» break the mortgage copy only', () => {
+    expect(forbiddenIn('src/mortgage/x.ts', 'recupera tus gastos')).not.toEqual([]);
+    expect(forbiddenIn('src/rental/x.ts', 'recupera tus gastos')).toEqual([]);
+    expect(forbiddenIn('src/mortgage/x.ts', 'hasta 3.000 €')).not.toEqual([]);
+    expect(forbiddenIn('src/employment/x.ts', 'hasta 3.000 €')).toEqual([]);
+  });
+
+  it('the mortgage pages keep the shared pass copy and the plain words of the law', () => {
+    expect(forbiddenIn('dist/hipoteca/index.html', 'recupera aquí tu pase')).toEqual([]);
+    expect(forbiddenIn('dist/hipoteca/index.html', 'el dinero a recuperar')).not.toEqual([]);
+    for (const text of [
+      'hace falta que el banco lo acepte o que un juez anule la cláusula de gastos',
+      'la ley pone este gasto a cargo del banco',
+      'fecha de la escritura',
+      'paso previo del art. 439 bis de la Ley de Enjuiciamiento Civil',
+      'el Servicio de Reclamaciones del Banco de España',
+      'leer hasta 15 paquetes de documentos',
+    ])
+      expect(forbiddenIn('client.mortgage.x', text), text).toEqual([]);
   });
 
   it('«te deben» stays forbidden in the employment review', () => {

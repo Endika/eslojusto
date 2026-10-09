@@ -21,6 +21,7 @@ export default defineConfig({
       'tests/erte/**/*.test.ts',
       'tests/household/**/*.test.ts',
       'tests/insurance/**/*.test.ts',
+      'tests/mortgage/**/*.test.ts',
       'tests/content/**/*.test.ts',
       'tests/law/**/*.test.ts',
     ],
