@@ -46,8 +46,8 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm run type:check
-      # With /alquiler/, /contrato/, /paro/erte/, /empleada-de-hogar/ and /seguros/ in the build, so
-      # the copy test reads their pages too.
+      # With /alquiler/, /contrato/, /paro/erte/, /empleada-de-hogar/, /seguros/ and /financiacion/
+      # in the build, so the copy test reads their pages too.
       - run: npm run build
         env:
           {
@@ -56,6 +56,7 @@ jobs:
             PUBLIC_ERTE: '1',
             PUBLIC_HOUSEHOLD: '1',
             PUBLIC_INSURANCE: '1',
+            PUBLIC_CREDIT: '1',
           }
       - run: npm run test:run
       - run: npx playwright install --with-deps chromium
@@ -82,6 +83,9 @@ jobs:
       - name: insurance dates review (built with /seguros/)
         run: npm run test:e2e -- --project=insurance
         env: { CI: 'true', TEST_INSURANCE: '1' }
+      - name: consumer credit review (built with /financiacion/)
+        run: npm run test:e2e -- --project=credit
+        env: { CI: 'true', TEST_CREDIT: '1' }
       - name: documents (fake API origins, routed by the page)
         run: npm run test:e2e -- --project=documents
         env: { CI: 'true', TEST_DOCUMENTS: '1' }

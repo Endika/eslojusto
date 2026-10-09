@@ -215,6 +215,20 @@ describe('client strings', () => {
     );
   });
 
+  it('the credit review ships its strings only on its own page', () => {
+    expect(Object.keys(clientStrings('es')).some((k) => k.startsWith('client.credit.'))).toBe(
+      false,
+    );
+    expect(clientStrings('es', { credit: true })['client.credit.status.matches']).toBe('Coincide');
+  });
+
+  it('the credit page ships none of the final pay strings, only what every page reads', () => {
+    const keys = Object.keys(clientStrings('es', { credit: true }));
+    expect(keys).toContain('client.theme.to_dark');
+    expect(keys).toContain('client.other_language.text');
+    expect(keys.filter((k) => k.startsWith('client.warning.'))).toEqual([]);
+  });
+
   it('a build with it ships them', () => {
     expect(clientStrings('es', { documents: true })['client.documents.mark']).toBe(
       'Leído del documento · confianza {nivel}',

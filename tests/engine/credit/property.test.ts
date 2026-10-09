@@ -19,6 +19,9 @@ import type { CreditInput } from '../../../src/engine/credit/types';
 import { loan, repayment, TODAY } from './input';
 
 const CASES = 150;
+// The generator is seeded, so each run is the same; the cases solve hundreds of APRs and take
+// about 3 s alone, which a full parallel run can push past the default 5 s.
+const SLOW = { timeout: 30_000 };
 const DEPS: CreditDeps = { norms: CREDIT_NORMS, sources: CREDIT_SOURCES, rates: BE1904 };
 
 // mulberry32: small, seeded and deterministic.
@@ -100,7 +103,7 @@ const outcome = (r: CreditReview) => ({
 });
 
 describe('credit review properties', () => {
-  it('never counts more than the highest reading, nor the indicator in a total', () => {
+  it('never counts more than the highest reading, nor the indicator in a total', SLOW, () => {
     const g = prng(16_2011);
     for (let n = 0; n < CASES; n++) {
       const input = randomInput(g);
@@ -125,7 +128,7 @@ describe('credit review properties', () => {
     }
   });
 
-  it('changes nothing for contracts concluded before the bill would take effect', () => {
+  it('changes nothing for contracts concluded before the bill would take effect', SLOW, () => {
     const g = prng(2026);
     const since = '2020-01-01';
     const enacted = {

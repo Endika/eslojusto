@@ -22,6 +22,9 @@ const householdSpecs = /[\\/]household[^\\/]*\.spec\.ts$/;
 // The insurance project needs a build with /seguros/, which a normal build leaves out.
 const insurance = process.env['TEST_INSURANCE'] === '1';
 const insuranceSpecs = /[\\/]insurance[^\\/]*\.spec\.ts$/;
+// The credit project needs a build with /financiacion/, which a normal build leaves out.
+const credit = process.env['TEST_CREDIT'] === '1';
+const creditSpecs = /[\\/]credit[^\\/]*\.spec\.ts$/;
 const optInSpecs = [
   /(rtl|analytics|documents)\.spec\.ts/,
   rentalSpecs,
@@ -29,6 +32,7 @@ const optInSpecs = [
   erteSpecs,
   householdSpecs,
   insuranceSpecs,
+  creditSpecs,
 ];
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
@@ -41,6 +45,7 @@ const buildEnv = {
   // The household project also measures its own events, so its build has a test analytics key.
   ...(household ? { PUBLIC_HOUSEHOLD: '1' } : {}),
   ...(insurance ? { PUBLIC_INSURANCE: '1' } : {}),
+  ...(credit ? { PUBLIC_CREDIT: '1' } : {}),
   ...(analytics || household ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
     ? {
@@ -116,6 +121,15 @@ export default defineConfig({
             name: 'insurance',
             use: { ...devices['Desktop Chrome'] },
             testMatch: insuranceSpecs,
+          },
+        ]
+      : []),
+    ...(credit
+      ? [
+          {
+            name: 'credit',
+            use: { ...devices['Desktop Chrome'] },
+            testMatch: creditSpecs,
           },
         ]
       : []),
