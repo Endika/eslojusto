@@ -10,7 +10,7 @@ import {
   type ErrorCode,
   type Extraction,
 } from './contract';
-import { mergeRead, type Applied } from './merge';
+import { heldEntries, mergeRead, type Applied } from './merge';
 import { admit, cannotFit, checkSelection, filesBucket, photoShare, requestBytes } from './files';
 import type { OutageMemory } from './outage';
 import { passClaims, passState, type PassStore, type StoredPass } from './pass';
@@ -419,15 +419,15 @@ export function setUpUpload<F extends string, L extends string>(
   // Fills the form with a read on top of what earlier reads or the person put there; the notes
   // say what the read could not set as it came.
   function apply(prefill: ReadPrefill): string[] {
-    const held = calculator
-      .entries()
-      .filter(([name, value]) => applied.get(name)?.value === value || !atDefault(name, value));
-    const merged = mergeRead(prefill, held, applied, deps.reading.lists ?? {});
+    const lists = deps.reading.lists ?? {};
+    const held = heldEntries(calculator.entries(), applied, atDefault, lists);
+    const merged = mergeRead(prefill, held, applied, lists);
     calculator.fill(merged.entries);
     markForm(merged.marks);
     for (const [name, value] of merged.applied) applied.set(name, value);
     return [
       ...(merged.differ ? [tr('client.documents.reads_differ')] : []),
+      ...(merged.typedDiffers ? [tr('client.documents.typed_differs')] : []),
       ...(merged.recalculated ? [tr('client.documents.recalculated')] : []),
       ...(merged.full ? [tr('client.documents.rows_full')] : []),
     ];

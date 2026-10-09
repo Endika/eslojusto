@@ -25,8 +25,10 @@ export interface Merged {
   readonly marks: readonly ReadMark[];
   // The values this read put in the form, for the next read to know.
   readonly applied: readonly (readonly [string, Applied])[];
-  // A value already in the form that the read states otherwise, kept as it was.
+  // A value an earlier read gave that the read states otherwise, kept as it was and marked.
   readonly differ: boolean;
+  // A value the person typed that the read states otherwise, kept as it was, with no mark.
+  readonly typedDiffers: boolean;
   // A value an earlier read worked out, worked out again otherwise.
   readonly recalculated: boolean;
   // A list with no room left for every row read.
@@ -47,6 +49,29 @@ function sameDocument(identity: readonly string[], a: Row, b: Row): boolean {
   return shared;
 }
 
+// What of the form is somebody's answer: what an earlier read put there, what the person changed,
+// and every other value of a list row the person changed. A row typed with a list's first
+// choice, which looks untouched, keeps that choice, so a read never takes it for another kind's
+// row; a read row's value the read did not give stays open for a later read to give.
+export function heldEntries(
+  entries: FormEntries,
+  applied: ReadonlyMap<string, Applied>,
+  atDefault: (name: string, value: string) => boolean,
+  lists: ListSpecs,
+): FormEntries {
+  const rowOf = (name: string) => {
+    const m = ROW.exec(name);
+    return m && m[3] !== undefined && lists[m[1] ?? ''] ? `${m[1]}.${m[2]}` : null;
+  };
+  const read = (name: string, value: string) => applied.get(name)?.value === value;
+  const typed = (name: string, value: string) => !read(name, value) && !atDefault(name, value);
+  const touched = new Set(entries.filter(([n, v]) => typed(n, v)).map(([name]) => rowOf(name)));
+  return entries.filter(([name, value]) => {
+    const row = rowOf(name);
+    return read(name, value) || typed(name, value) || (row !== null && touched.has(row));
+  });
+}
+
 const moved = (mark: ReadMark, id: string, container = mark.container): ReadMark => ({
   ...mark,
   id,
@@ -57,7 +82,8 @@ const moved = (mark: ReadMark, id: string, container = mark.container): ReadMark
 // form's answers that are not its defaults; `applied`, what earlier reads put there.
 //
 // A value the form does not hold yet is set. One the form holds already is kept when the read
-// states it otherwise and it was read as such, or typed: the read only marks it as differing.
+// states it otherwise and it was read as such, which is marked as differing, or typed, which
+// is not.
 // One an earlier read worked out is worked out again. An answer the read only opens a list with
 // is always set. A row is added to its list unless the list holds the same document's row
 // already, whose values are then taken one by one as above; a full list keeps its rows and takes
@@ -74,6 +100,7 @@ export function mergeRead(
   const outMarks: ReadMark[] = [];
   const done: [string, Applied][] = [];
   let differ = false;
+  let typedDiffers = false;
   let recalculated = false;
   let full = false;
 
@@ -84,7 +111,8 @@ export function mergeRead(
     const earlier = applied.get(target);
     const fromRead = earlier !== undefined && earlier.value === held;
     if (mark && held !== undefined && held !== value && !(fromRead && earlier.derived)) {
-      differ = true;
+      if (fromRead) differ = true;
+      else typedDiffers = true;
       return fromRead ? 'kept' : 'typed';
     }
     if (mark && held !== undefined && held !== value) recalculated = true;
@@ -178,6 +206,7 @@ export function mergeRead(
     marks: [...outMarks, ...read.marks.filter((m) => !owned.has(m.id))],
     applied: done,
     differ,
+    typedDiffers,
     recalculated,
     full,
   };

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { FormEntries } from '../../src/calculator/fill';
-import { mergeRead, type Applied, type ListSpecs } from '../../src/documents/merge';
+import { heldEntries, mergeRead, type Applied, type ListSpecs } from '../../src/documents/merge';
 import type { ReadMark } from '../../src/documents/ports';
 
 const LISTS: ListSpecs = {
@@ -33,7 +33,12 @@ describe('mergeRead', () => {
     expect(m.entries).toEqual(r.entries);
     expect(m.marks).toEqual(r.marks);
     expect(m.applied.map(([name]) => name)).toEqual(['startDate', 'receipts.0.month']);
-    expect([m.differ, m.recalculated, m.full]).toEqual([false, false, false]);
+    expect([m.differ, m.typedDiffers, m.recalculated, m.full]).toEqual([
+      false,
+      false,
+      false,
+      false,
+    ]);
   });
 
   it('keeps an earlier read value the new read states otherwise, and marks it', () => {
@@ -79,7 +84,7 @@ describe('mergeRead', () => {
     );
     expect(m.entries).toEqual([]);
     expect(m.marks).toEqual([]);
-    expect(m.differ).toBe(true);
+    expect([m.differ, m.typedDiffers]).toEqual([false, true]);
   });
 
   it('always sets an answer that only opens a list', () => {
@@ -202,5 +207,57 @@ describe('mergeRead', () => {
   it('passes on a mark about no value the read sets', () => {
     const lone: ReadMark = { id: 'note', container: '[data-note]', confidence: 'high' };
     expect(mergeRead({ entries: [], marks: [lone] }, [], new Map(), LISTS).marks).toEqual([lone]);
+  });
+});
+
+describe('heldEntries', () => {
+  const CHARGES: ListSpecs = { charges: { identity: ['kind', 'year'], max: 6 } };
+  // The kind starts on its first choice, so a row typed with it looks untouched there.
+  const typed: FormEntries = [
+    ['startDate', '2024-03-20'],
+    ['charges.0.kind', 'community'],
+    ['charges.0.year', '2025'],
+    ['charges.0.amount', '700,00'],
+    ['charges.0.annualAgreed', '600,00'],
+    ['charges.1.kind', 'community'],
+  ];
+  const DEFAULTS = new Map([
+    ['charges.0.kind', 'community'],
+    ['charges.1.kind', 'community'],
+  ]);
+  const atDefault = (name: string, value: string) => DEFAULTS.get(name) === value;
+  const ibi = read([
+    ['charges.0.kind', 'property_tax'],
+    ['charges.0.year', '2025'],
+    ['charges.0.amount', '300,00'],
+  ]);
+
+  it('keeps every value of a typed row, its first-choice kind too, and no untouched row', () => {
+    expect(heldEntries(typed, new Map(), atDefault, CHARGES)).toEqual(typed.slice(0, 5));
+  });
+
+  it('so a read of another kind for the same year never lands on the typed row', () => {
+    const held = heldEntries(typed, new Map(), atDefault, CHARGES);
+    const m = mergeRead(ibi, held, new Map(), CHARGES);
+    expect(m.entries).toEqual([
+      ...typed.slice(1, 5),
+      ['charges.1.kind', 'property_tax'],
+      ['charges.1.year', '2025'],
+      ['charges.1.amount', '300,00'],
+    ]);
+    expect([m.differ, m.typedDiffers]).toEqual([false, false]);
+  });
+
+  it('leaves open a value an earlier read did not give, for a later read to give', () => {
+    const before: FormEntries = [
+      ['charges.0.year', '2025'],
+      ['charges.0.amount', '300,00'],
+    ];
+    const form: FormEntries = [['charges.0.kind', 'community'], ...before];
+    const held = heldEntries(form, earlier(before), atDefault, CHARGES);
+    expect(held).toEqual(before);
+    const m = mergeRead(ibi, held, earlier(before), CHARGES);
+    expect(m.entries).toContainEqual(['charges.0.kind', 'property_tax']);
+    expect(m.entries.filter(([name]) => name.startsWith('charges.1'))).toEqual([]);
   });
 });
