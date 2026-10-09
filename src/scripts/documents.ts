@@ -2,7 +2,7 @@ import type { FormEntries } from '../calculator/fill';
 import type { Detail } from '../calculator/flow';
 import { createApi } from '../documents/api';
 import { TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/config';
-import type { ExtractionShape, PassApi, ReviewKind } from '../documents/contract';
+import type { Api, ExtractionShape, PassApi, ReviewKind } from '../documents/contract';
 import { fitWithin } from '../documents/files';
 import { canvasJpeg, whiteCanvas } from './jpeg';
 import { photoQuality } from './quality';
@@ -179,13 +179,17 @@ export interface PassSection<R> {
   restore(saved: FormEntries): FormEntries;
 }
 
-// What a section brings to reading documents and to the pass.
-export interface DocumentsSection<R, F extends string, L extends string> extends PassSection<R> {
+// What a section brings to reading documents, whether or not its page sells the pass.
+export interface ReadingSection<F extends string, L extends string> {
   readonly extraction: ExtractionShape<F, L>;
   readonly reading: DocumentReading<F, L>;
   // The fragments that open the form itself rather than the start sheet.
   readonly steps: readonly string[];
 }
+
+// What a section brings to reading documents and to the pass.
+export interface DocumentsSection<R, F extends string, L extends string>
+  extends PassSection<R>, ReadingSection<F, L> {}
 
 export interface DocumentsWiring<R, F extends string, L extends string> {
   readonly form: ReviewForm;
@@ -287,6 +291,53 @@ function returnedSession(arrival: { readonly search: string }): string | null {
   return sessionId;
 }
 
+// What reading documents needs on any page: the API, the pass that pays for the reads and the
+// page's session.
+interface ReadingContext<F extends string, L extends string> {
+  readonly calculator: ReviewForm;
+  readonly section: ReadingSection<F, L>;
+  readonly config: DocumentsConfig;
+  readonly api: Api<F, L>;
+  readonly loadTurnstile: () => Promise<Turnstile>;
+  readonly passes: ReturnType<typeof createPassStore>;
+  readonly session: KeyValueStore;
+  readonly tr: Translate;
+  readonly events: DocumentEvents;
+}
+
+// The start sheet's upload, on the page's form. A pass bought on another page still pays for its
+// reads here.
+function setUpReading<F extends string, L extends string>(
+  start: HTMLElement,
+  captchaBox: HTMLElement,
+  {
+    calculator,
+    section,
+    config,
+    api,
+    loadTurnstile,
+    passes,
+    session,
+    tr,
+    events,
+  }: ReadingContext<F, L>,
+) {
+  return setUpUpload(start, {
+    api,
+    reading: section.reading,
+    captcha: turnstileCaptcha(loadTurnstile, config.turnstileSiteKey, captchaBox, 'extract'),
+    encoder: canvasEncoder,
+    pdfs: pdfPages,
+    passes,
+    events,
+    outage: createOutageMemory(session, browser.now),
+    now: browser.now,
+    tr,
+    calculator,
+    tabs: document.querySelector<HTMLElement>('.tabs'),
+  });
+}
+
 const passStore = () =>
   createPassStore(
     storage(() => localStorage),
@@ -313,19 +364,16 @@ export function wireDocuments<R, F extends string, L extends string>({
   const passes = passStore();
   const session = storage(() => sessionStorage);
 
-  const upload = setUpUpload(start, {
-    api,
-    reading: section.reading,
-    captcha: turnstileCaptcha(loadTurnstile, config.turnstileSiteKey, captchaBox, 'extract'),
-    encoder: canvasEncoder,
-    pdfs: pdfPages,
-    passes,
-    events,
-    outage: createOutageMemory(session, browser.now),
-    now: browser.now,
-    tr,
+  const upload = setUpReading(start, captchaBox, {
     calculator,
-    tabs: document.querySelector<HTMLElement>('.tabs'),
+    section,
+    config,
+    api,
+    loadTurnstile,
+    passes,
+    session,
+    tr,
+    events,
   });
   const payment = setUpPass(offer, checkoutCaptchaBox, {
     calculator,
