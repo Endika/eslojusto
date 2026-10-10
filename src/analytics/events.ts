@@ -46,6 +46,15 @@ import {
   type OutOfScopeReason as InsuranceOutOfScopeReason,
   type Step as InsuranceStep,
 } from '../insurance/ports';
+import { MORTGAGE_FAQ_TOPICS } from '../content/mortgage-faq-topics';
+import type { ExpenseStatus } from '../engine/mortgage/expenses';
+import type { FeeStatus } from '../engine/mortgage/fees';
+import { FLAG_LABELS } from '../engine/mortgage/flags';
+import {
+  MORTGAGE_FIELDS,
+  type OutOfScopeReason as MortgageOutOfScopeReason,
+  type Step as MortgageStep,
+} from '../mortgage/ports';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import {
   DOWNLOADS,
@@ -164,11 +173,42 @@ const INSURANCE_SECTIONS = [
   'primas',
   'cambios',
 ] as const satisfies readonly InsuranceStep[];
-// The credit and insurance reviews exist only in a build with their switch; elsewhere their sheets,
+// The mortgage review's sheets that no other review has; «pago» is already the final pay's.
+const MORTGAGE_SECTIONS = [
+  'hipoteca',
+  'titular',
+  'escritura',
+  'tipo',
+  'clausula-gastos',
+  'suelo',
+  'indice',
+  'demora',
+  'otras',
+  'facturas',
+  'notaria',
+  'registro',
+  'gestoria',
+  'tasacion',
+  'impuesto',
+  'acuerdo',
+  'operacion',
+] as const satisfies readonly MortgageStep[];
+// Its sheets that the credit and the insurance reviews also have, listed once whichever is built.
+const MORTGAGE_CREDIT_SECTIONS = [
+  'apertura',
+  'amortizacion',
+  'seguro',
+] as const satisfies readonly MortgageStep[];
+const MORTGAGE_INSURANCE_SECTIONS = [
+  'vencimiento',
+  'condiciones',
+] as const satisfies readonly MortgageStep[];
+// The credit, insurance and mortgage reviews exist only in a build with their switch; elsewhere their sheets,
 // questions and events are dropped from the bundle (the variables are read inline so the bundler can
 // fold them) and refused like any unknown event.
 const CREDIT_ON = import.meta.env.PUBLIC_CREDIT === '1';
 const INSURANCE_ON = import.meta.env.PUBLIC_INSURANCE === '1';
+const MORTGAGE_ON = import.meta.env.PUBLIC_MORTGAGE === '1';
 export const SECTIONS = [
   'causa',
   'temporal',
@@ -190,6 +230,9 @@ export const SECTIONS = [
   ...HOUSEHOLD_SECTIONS,
   ...(CREDIT_ON ? CREDIT_SECTIONS : []),
   ...(INSURANCE_ON ? INSURANCE_SECTIONS : []),
+  ...(MORTGAGE_ON ? MORTGAGE_SECTIONS : []),
+  ...(MORTGAGE_ON && !CREDIT_ON ? MORTGAGE_CREDIT_SECTIONS : []),
+  ...(MORTGAGE_ON && !INSURANCE_ON ? MORTGAGE_INSURANCE_SECTIONS : []),
 ] as const;
 export type Section = (typeof SECTIONS)[number];
 
@@ -242,6 +285,8 @@ const _allCreditSteps: CoversAll<CreditStep, Section> = true;
 void _allCreditSteps;
 const _allInsuranceSteps: CoversAll<InsuranceStep, Section> = true;
 void _allInsuranceSteps;
+const _allMortgageSteps: CoversAll<MortgageStep, Section> = true;
+void _allMortgageSteps;
 
 // The benefit answers, by name only: an error on one of them names the field, never the answer.
 // They are left out of `snapshot`, so `changed_fields` never lists them either.
@@ -268,6 +313,8 @@ export const HOUSEHOLD_TRACKABLE_FIELDS = HOUSEHOLD_FIELDS;
 // The credit and insurance questions by name; never what was answered.
 export const CREDIT_TRACKABLE_FIELDS = CREDIT_FIELDS;
 export const INSURANCE_TRACKABLE_FIELDS = INSURANCE_FIELDS;
+// The mortgage questions by name; never what was answered.
+export const MORTGAGE_TRACKABLE_FIELDS = MORTGAGE_FIELDS;
 
 export const HELP_TOPICS = [
   ...FAQ_TOPICS,
@@ -276,6 +323,7 @@ export const HELP_TOPICS = [
   ...HOUSEHOLD_FAQ_TOPICS,
   ...(CREDIT_ON ? CREDIT_FAQ_TOPICS : []),
   ...(INSURANCE_ON ? INSURANCE_FAQ_TOPICS : []),
+  ...(MORTGAGE_ON ? MORTGAGE_FAQ_TOPICS : []),
 ].map(([, anchor]) => anchor);
 
 // What a rental result card is about. A card is a kind of item, never its concept as written.
@@ -542,6 +590,56 @@ const _allInsuranceStatuses: CoversAll<
 > = true;
 void _allInsuranceStatuses;
 
+export const MORTGAGE_OUT_OF_SCOPE_REASONS = [
+  'company',
+  'business_purpose',
+  'developer_subrogation',
+  'multicurrency',
+  'reverse',
+  'not_mortgage',
+] as const satisfies readonly MortgageOutOfScopeReason[];
+const _allMortgageReasons: CoversAll<
+  MortgageOutOfScopeReason,
+  (typeof MORTGAGE_OUT_OF_SCOPE_REASONS)[number]
+> = true;
+void _allMortgageReasons;
+
+// From the status of a set-up cost that weighs most to the one that weighs least.
+export const MORTGAGE_EXPENSE_STATUSES = [
+  'lender_bears',
+  'not_chargeable',
+  'split_explained',
+  'review_it',
+  'borrower_bears',
+  'paid_by_bank',
+  'not_applicable_to_date',
+  'not_applicable',
+  'not_entered',
+] as const satisfies readonly ExpenseStatus[];
+const _allExpenseStatuses: CoversAll<ExpenseStatus, (typeof MORTGAGE_EXPENSE_STATUSES)[number]> =
+  true;
+void _allExpenseStatuses;
+
+// Likewise for a fee; one whose readings of a «No lo sé» disagree counts as `readings`.
+export const MORTGAGE_FEE_STATUSES = [
+  'above_cap',
+  'readings',
+  'review_it',
+  'not_checkable',
+  'within_cap',
+] as const satisfies readonly (FeeStatus | 'readings')[];
+const _allFeeStatuses: CoversAll<FeeStatus, (typeof MORTGAGE_FEE_STATUSES)[number]> = true;
+void _allFeeStatuses;
+
+// By the days that change what the review reads in a deed.
+export const DEED_PERIODS = [
+  'before_2007',
+  '2007_2013',
+  '2013_2018',
+  '2018_2019',
+  '2019_plus',
+] as const;
+
 // From the status that weighs most on a family of points to the one that weighs least; a point
 // whose verdict changes with a «No lo sé» counts as `readings`, after the concrete findings.
 export const POINT_STATUSES = [
@@ -667,6 +765,7 @@ const BASE_CATALOGUE = {
       ...HOUSEHOLD_TRACKABLE_FIELDS,
       ...(CREDIT_ON ? CREDIT_TRACKABLE_FIELDS : []),
       ...(INSURANCE_ON ? INSURANCE_TRACKABLE_FIELDS : []),
+      ...(MORTGAGE_ON ? MORTGAGE_TRACKABLE_FIELDS : []),
     ]),
   },
   help_opened: { topic: oneOf(HELP_TOPICS) },
@@ -821,6 +920,30 @@ const insuranceCatalogue = () => {
   } as const satisfies Record<string, Record<string, Rule>>;
 };
 
+const mortgageCatalogue = () => {
+  const EXPENSES_RESULT = oneOf([...MORTGAGE_EXPENSE_STATUSES, 'none']);
+  return {
+    // Why a loan stopped at the mortgage review's door.
+    mortgage_out_of_scope: { reason: oneOf(MORTGAGE_OUT_OF_SCOPE_REASONS) },
+    mortgage_review_completed: {
+      deed_period: oneOf(DEED_PERIODS),
+      consumer: oneOf(ANSWERS),
+      // The set-up costs on each basis by the status that weighs most, or none.
+      expenses_statute: EXPENSES_RESULT,
+      expenses_case_law: EXPENSES_RESULT,
+      invoices: oneOf(['0', '1-2', '3+']),
+      fees: oneOf([...MORTGAGE_FEE_STATUSES, 'none']),
+      // The clauses found in the deed, each once; never what they say.
+      flags: { list: FLAG_LABELS },
+      difference: oneOf(DIFFERENCE_BUCKETS),
+      offered: { boolean: true },
+      detail: oneOf(['locked', 'unlocked']),
+      attempt: oneOf(ATTEMPT_BUCKETS),
+      seconds: oneOf(REVIEW_SECONDS),
+    },
+  } as const satisfies Record<string, Record<string, Rule>>;
+};
+
 // Reading documents and the pass: never a value read from a document, only the kinds found, how
 // many fields they filled and how sure the reading was.
 const DOCUMENT_CATALOGUE = {
@@ -880,10 +1003,12 @@ export const CATALOGUE = {
     : {}),
   ...(CREDIT_ON ? creditCatalogue() : {}),
   ...(INSURANCE_ON ? insuranceCatalogue() : {}),
+  ...(MORTGAGE_ON ? mortgageCatalogue() : {}),
 } as typeof BASE_CATALOGUE &
   typeof DOCUMENT_CATALOGUE &
   ReturnType<typeof creditCatalogue> &
-  ReturnType<typeof insuranceCatalogue>;
+  ReturnType<typeof insuranceCatalogue> &
+  ReturnType<typeof mortgageCatalogue>;
 
 export type EventName = keyof typeof CATALOGUE;
 

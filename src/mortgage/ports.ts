@@ -1,11 +1,59 @@
 import type { SectionEvents } from '../calculator/section';
 import type { CivilDate } from '../engine/date';
 import type { MortgageReview } from '../engine/mortgage/review';
-import type { MortgageDeps, MortgageInput } from '../engine/mortgage/types';
+import type { MortgageDeps, MortgageInput, OutOfScopeReason } from '../engine/mortgage/types';
 import type { Translate } from '../i18n/client';
 import type { Step } from './steps';
 
 export type { Step } from './steps';
+export type { OutOfScopeReason } from '../engine/mortgage/types';
+
+// The names of the questions, as a rejected answer is reported.
+export const MORTGAGE_FIELDS = [
+  'loanKind',
+  'borrower',
+  'purpose',
+  'deedOn',
+  'loanAmount',
+  'consumer',
+  'rateType',
+  'revisionMonths',
+  'expensesClause',
+  'floor',
+  'floorPercent',
+  'irph',
+  'defaultInterest',
+  'defaultRate',
+  'ordinaryRate',
+  'earlyTermination',
+  'missedInstalments',
+  'openingFee',
+  'openingFeeAmount',
+  'duplicateFee',
+  'roundingUp',
+  'insuranceRequired',
+  'hasInvoices',
+  'notaryLoan',
+  'notaryMixed',
+  'registryMortgage',
+  'registryMixed',
+  'agency',
+  'agencyTax',
+  'agencyRegistry',
+  'valuation',
+  'transparencyDeed',
+  'ajdLoan',
+  'paidOn',
+  'agreement',
+  'returned',
+  'operation',
+  'operationOn',
+  'operationPrincipal',
+  'operationFee',
+  'prepaymentOption',
+  'hadInsurance',
+] as const;
+export type MortgageFormField = (typeof MORTGAGE_FIELDS)[number];
 
 export interface CompletedMortgageReview {
   readonly review: MortgageReview;
@@ -14,6 +62,7 @@ export interface CompletedMortgageReview {
 
 // What happens during a visit, for whoever listens; the review does not know who does.
 export interface MortgageEvents extends SectionEvents<Step> {
+  outOfScope(reason: OutOfScopeReason): void;
   // A review shown in the result, with the answers it was worked out from.
   reviewCompleted(r: CompletedMortgageReview): void;
   // The result shows no review any more: the answers fell outside it or the person started over.

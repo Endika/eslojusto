@@ -195,6 +195,8 @@ describe('the catalogue guard', () => {
         'credit_review_completed',
         'insurance_out_of_scope',
         'insurance_review_completed',
+        'mortgage_out_of_scope',
+        'mortgage_review_completed',
         'section_completed',
         'section_viewed',
         'start_chosen',

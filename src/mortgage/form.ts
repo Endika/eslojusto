@@ -20,6 +20,9 @@ import {
   type ValidationCode,
   type ValidationError,
 } from '../engine/mortgage/validate';
+import type { MortgageFormField } from './ports';
+
+export { MORTGAGE_FIELDS, type MortgageFormField } from './ports';
 
 // The sheets in order. Step ids are also the URL fragments, so they keep their Spanish names.
 export const SHEETS = [
@@ -69,52 +72,6 @@ export const OPERATION_KINDS = [
   'creditor_subrogation',
 ] as const;
 export const PREPAYMENT_OPTIONS: readonly PrepaymentOption[] = ['a_015_5y', 'b_025_3y', 'unknown'];
-
-export const MORTGAGE_FIELDS = [
-  'loanKind',
-  'borrower',
-  'purpose',
-  'deedOn',
-  'loanAmount',
-  'consumer',
-  'rateType',
-  'revisionMonths',
-  'expensesClause',
-  'floor',
-  'floorPercent',
-  'irph',
-  'defaultInterest',
-  'defaultRate',
-  'ordinaryRate',
-  'earlyTermination',
-  'missedInstalments',
-  'openingFee',
-  'openingFeeAmount',
-  'duplicateFee',
-  'roundingUp',
-  'insuranceRequired',
-  'hasInvoices',
-  'notaryLoan',
-  'notaryMixed',
-  'registryMortgage',
-  'registryMixed',
-  'agency',
-  'agencyTax',
-  'agencyRegistry',
-  'valuation',
-  'transparencyDeed',
-  'ajdLoan',
-  'paidOn',
-  'agreement',
-  'returned',
-  'operation',
-  'operationOn',
-  'operationPrincipal',
-  'operationFee',
-  'prepaymentOption',
-  'hadInsurance',
-] as const;
-export type MortgageFormField = (typeof MORTGAGE_FIELDS)[number];
 
 export const SHEET_FIELDS: Readonly<Record<Sheet, readonly MortgageFormField[]>> = {
   hipoteca: ['loanKind'],
