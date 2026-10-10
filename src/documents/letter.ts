@@ -1,4 +1,6 @@
 import type { CivilDate } from '../engine/date';
+import type { Translate } from '../i18n/client';
+import type { Block } from './ports';
 
 // What the person adds to the letter right before downloading it. It lives in the page only: it is
 // never sent, stored or tracked, and a field left empty keeps its line to write by hand.
@@ -84,6 +86,22 @@ export const longDate = (d: CivilDate) =>
     month: 'long',
     year: 'numeric',
   });
+
+// A line of the letter with what the person typed, which wraps rather than shrinking (an address
+// can be long); left empty, it stays a line to write by hand.
+export const detailLine = (label: string, value = ''): Block => {
+  const v = value.trim();
+  return v === '' ? { type: 'blank', label } : { type: 'blank', label, value: v, wrap: true };
+};
+
+// «En Teruel, a 9 de octubre de 2026», with blanks for what the person left empty.
+export const placeAndDate = (details: LetterDetails, tr: Translate): Block => ({
+  type: 'text',
+  text: tr('client.documents.letter.place_date', {
+    lugar: details.place.trim() || tr('client.documents.letter.place_blank'),
+    fecha: details.date ? longDate(details.date) : tr('client.documents.letter.date_blank'),
+  }),
+});
 
 const CHECK_LETTERS = 'TRWAGMYFPDXBNJZSQVHLCKE';
 

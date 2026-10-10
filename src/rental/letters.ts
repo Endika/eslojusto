@@ -9,19 +9,13 @@ import {
 import type { RentalReview, RentUpdateItem } from '../engine/rental/review';
 import type { MoveOut } from '../engine/rental/types';
 import { formatEuros } from '../calculator/number';
-import { longDate, type LetterDetails, type LetterKind } from '../documents/letter';
+import { detailLine, placeAndDate, type LetterDetails, type LetterKind } from '../documents/letter';
 import type { Block, DocumentModel } from '../documents/ports';
 import type { Translate } from '../i18n/client';
 import type { CompletedRentalReview } from './ports';
 import { dayText, monthText, percentText } from './render';
 
 const day = (d: CivilDate) => dayText(toIso(d));
-
-// What the person typed wraps on its line rather than shrinking: an address can be long.
-const blank = (label: string, value = ''): Block => {
-  const v = value.trim();
-  return v === '' ? { type: 'blank', label } : { type: 'blank', label, value: v, wrap: true };
-};
 
 const itemOf = (review: RentalReview, kind: ItemResult['kind']): ItemResult | undefined =>
   review.items.find((i): i is ItemResult => i.kind === kind);
@@ -74,24 +68,18 @@ export function rentalLetterKinds(review: RentalReview): LetterKind[] {
 function header(title: string, details: LetterDetails, tr: Translate): Block[] {
   return [
     { type: 'title', text: title },
-    blank(tr('client.documents.letter.name'), details.name),
-    blank(tr('client.documents.letter.id'), details.id),
-    blank(tr('client.rental.letter.landlord'), details.landlord),
-    blank(tr('client.rental.letter.address'), details.address),
+    detailLine(tr('client.documents.letter.name'), details.name),
+    detailLine(tr('client.documents.letter.id'), details.id),
+    detailLine(tr('client.rental.letter.landlord'), details.landlord),
+    detailLine(tr('client.rental.letter.address'), details.address),
   ];
 }
 
 function closing(details: LetterDetails, tr: Translate): Block[] {
   return [
     { type: 'text', text: tr('client.rental.letter.regards') },
-    {
-      type: 'text',
-      text: tr('client.documents.letter.place_date', {
-        lugar: details.place.trim() || tr('client.documents.letter.place_blank'),
-        fecha: details.date ? longDate(details.date) : tr('client.documents.letter.date_blank'),
-      }),
-    },
-    blank(tr('client.documents.letter.name'), details.name),
+    placeAndDate(details, tr),
+    detailLine(tr('client.documents.letter.name'), details.name),
   ];
 }
 
@@ -173,7 +161,7 @@ export function depositLetter(
     blocks: [
       ...header(title, details, tr),
       ...body,
-      blank(tr('client.rental.letter.iban'), details.iban),
+      detailLine(tr('client.rental.letter.iban'), details.iban),
       ...closing(details, tr),
     ],
   };
