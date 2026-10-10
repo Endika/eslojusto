@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.46.0](https://github.com/Endika/eslojusto/compare/v1.45.0...v1.46.0) (2026-10-10)
+
+
+### Features
+
+* **api:** read electricity and telecom bills, several per pack ([bdbbf1d](https://github.com/Endika/eslojusto/commit/bdbbf1dfc7864798d8a14e6bcc3029050ec90f9b))
+* **api:** return supply numbers only as fingerprints ([52fe0c0](https://github.com/Endika/eslojusto/commit/52fe0c06f2ec878724f0be9531d72684f76ffa1e))
+* **mortgage:** add the mortgage review at /hipoteca/ behind PUBLIC_MORTGAGE ([6f1741a](https://github.com/Endika/eslojusto/commit/6f1741aeceab4198492e480e2635f51260d9dd98))
+
 ## [1.45.0](https://github.com/Endika/eslojusto/compare/v1.44.0...v1.45.0) (2026-10-10)
 
 
