@@ -51,6 +51,9 @@ export const CONFLICT_FIELDS = [
 // Of the rental documents, only the contract and the deposit return both state the deposit.
 export const RENTAL_CONFLICT_FIELDS = ['deposit'] as const;
 
+// Of the mortgage documents, the deed and the FEIN both state the capital and the initial rate.
+export const MORTGAGE_CONFLICT_FIELDS = ['principal', 'initialRate'] as const;
+
 // One plain sentence per field the documents state differently, naming the one that was used.
 export function conflictLines<F extends string>(
   conflicts: readonly Conflict<F>[],

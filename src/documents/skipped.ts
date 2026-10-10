@@ -1,5 +1,5 @@
 import type { ClientKey, Translate } from '../i18n/client';
-import { SKIP_REASONS, type ReadPage, type SkipReason } from './contract';
+import { SKIP_REASONS, type FailedCheck, type ReadPage, type SkipReason } from './contract';
 
 export interface SkippedPage {
   // 1-based, in the order sent.
@@ -46,3 +46,23 @@ export function skippedLines(
     }),
   );
 }
+
+// The page a read needed and did not find, by the check that says so: a deed read without the
+// page of its expenses clause.
+const MISSING_PAGES: Partial<Record<FailedCheck, 'expenses_clause'>> = {
+  missing_key_page: 'expenses_clause',
+};
+
+// «No se ha encontrado la cláusula de gastos de tu escritura…», with how to tell that page.
+export const missingPageLines = (checks: readonly FailedCheck[], tr: Translate): string[] =>
+  checks.flatMap((c) => {
+    const page = MISSING_PAGES[c];
+    return page
+      ? [
+          tr('client.documents.missing_key_page', {
+            pagina: tr(`client.documents.key_page.${page}`),
+            pista: tr(`client.documents.key_page_hint.${page}`),
+          }),
+        ]
+      : [];
+  });

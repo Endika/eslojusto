@@ -3,7 +3,8 @@
 import { MAX_IMAGE_LONG_SIDE } from '../../api/src/domain/image-limit';
 
 // Which review a request is for; a request without one is the final pay's.
-export type ReviewKind = 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance';
+export type ReviewKind =
+  'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance' | 'mortgage';
 
 // What the API says each page is; `other` is a page the review has no use for.
 export const PAGE_KINDS = [
@@ -29,6 +30,16 @@ export const PAGE_KINDS = [
   'card_statement',
   'insurance_policy',
   'insurance_renewal_notice',
+  'mortgage_deed',
+  'notary_invoice',
+  'registry_invoice',
+  'agency_invoice_mortgage',
+  'valuation_invoice',
+  'ajd_form',
+  'fein',
+  'fiae',
+  'transparency_deed',
+  'prepayment_statement',
 ] as const;
 export type PageKind = (typeof PAGE_KINDS)[number];
 export type SourceKind = Exclude<PageKind, 'other'>;
@@ -46,6 +57,7 @@ export const READABILITY = [
   'unknown_format',
   'not_credit_document',
   'not_insurance_document',
+  'not_mortgage_document',
 ] as const;
 export type Readability = (typeof READABILITY)[number];
 
@@ -62,6 +74,7 @@ export const SKIP_REASONS = [
   'unknown_format',
   'not_credit_document',
   'not_insurance_document',
+  'not_mortgage_document',
   'no_data',
   'unread',
 ] as const satisfies readonly (Exclude<Readability, 'ok'> | 'no_data' | 'unread')[];
@@ -421,6 +434,62 @@ export const INSURANCE_EXTRACTION: ExtractionShape<InsuranceFieldName, Insurance
 
 export type InsuranceExtraction = Extraction<InsuranceFieldName, InsuranceListName>;
 
+// The fields the API merges from mortgage documents (api/src/domain/mortgage-merge.ts).
+export const MORTGAGE_FIELDS = [
+  'deedOn',
+  'lenderName',
+  'borrowerType',
+  'purpose',
+  'loanKind',
+  'principal',
+  'termMonths',
+  'rateType',
+  'fixedUntil',
+  'initialRate',
+  'index',
+  'spread',
+  'rateRevisionMonths',
+  'floorPercent',
+  'defaultRate',
+  'defaultMarginPoints',
+  'earlyTerminationInstalments',
+  'prepaymentOption',
+  'variablePrepaymentFeePercent',
+  'fixedPrepaymentFeePercent',
+  'openingFee',
+  'openingFeePercent',
+  'otherSetUpFee',
+  'transparencyActStated',
+  'handwrittenStatement',
+  'feinDeliveredOn',
+  'fiaeDeliveredOn',
+  'transparencyActOn',
+  'transparencyActCharged',
+] as const;
+export type MortgageFieldName = (typeof MORTGAGE_FIELDS)[number];
+
+// Their lists, each row with the kind of document it came from (api/src/domain/mortgage-schema.ts):
+// the deed's clauses, word for word, and every invoice, return and statement.
+export const MORTGAGE_LISTS = [
+  'clauses',
+  'notaryInvoices',
+  'registryInvoices',
+  'agencyInvoices',
+  'agencySupplied',
+  'valuationInvoices',
+  'ajdForms',
+  'operations',
+] as const;
+export type MortgageListName = (typeof MORTGAGE_LISTS)[number];
+
+export const MORTGAGE_EXTRACTION: ExtractionShape<MortgageFieldName, MortgageListName> = {
+  review: 'mortgage',
+  fields: MORTGAGE_FIELDS,
+  lists: MORTGAGE_LISTS,
+};
+
+export type MortgageExtraction = Extraction<MortgageFieldName, MortgageListName>;
+
 export interface SourcedField extends ExtractedField {
   readonly source: SourceKind;
 }
@@ -505,9 +574,20 @@ export const INSURANCE_CHECKS = [
 ] as const;
 export type InsuranceCheck = (typeof INSURANCE_CHECKS)[number];
 
+// What the API finds incoherent in mortgage documents, and a deed read without the page its
+// expenses clause is on (api/src/domain/mortgage-checks.ts).
+export const MORTGAGE_CHECKS = [
+  'invoice_parts_do_not_sum',
+  'invoice_mixes_purchase_and_loan',
+  'duplicate_supplied_amount',
+  'ajd_purchase_not_loan',
+  'missing_key_page',
+] as const;
+export type MortgageCheck = (typeof MORTGAGE_CHECKS)[number];
+
 // The final pay's checks are worded by the upload; any other review's, by its own reading.
 export type FailedCheck =
-  CoherenceCheck | RentalCheck | EmploymentCheck | CreditCheck | InsuranceCheck;
+  CoherenceCheck | RentalCheck | EmploymentCheck | CreditCheck | InsuranceCheck | MortgageCheck;
 export const isCoherenceCheck = (c: FailedCheck): c is CoherenceCheck =>
   (COHERENCE_CHECKS as readonly string[]).includes(c);
 

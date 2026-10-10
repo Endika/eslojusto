@@ -25,8 +25,7 @@ export function t(lang: Lang, key: Key, vars?: Variables): string {
 const CREDIT_PAGE = ['client.credit.', 'client.theme.', 'client.other_language.'];
 // The mortgage page's likewise.
 const MORTGAGE_PAGE = ['client.mortgage.', 'client.theme.', 'client.other_language.'];
-// What it takes of document reading: none of the final pay's report, letter or pass notices, as
-// the page sells no pass.
+// What they take of document reading: none of the final pay's report, letter or pass notices.
 const NOT_READING = [
   'client.documents.report.',
   'client.documents.letter.',
@@ -36,9 +35,10 @@ const NOT_READING = [
 const readingString = (key: string): boolean =>
   key.startsWith('client.documents.') && !NOT_READING.some((prefix) => key.startsWith(prefix));
 
-// The words document reading has only for the credit or the insurance review's documents: what
-// each kind is called, the figures their summary names, and why a page was set aside. Each ships
-// only on its review's page, so no other page changes while those reviews wait behind a switch.
+// The words document reading has only for the credit, the insurance or the mortgage review's
+// documents: what each kind is called, the figures their summary names, why a page was set aside
+// and which page a read missed. Each ships only on its reviews' pages, so no other page changes
+// while those reviews wait behind a switch.
 const sectionReading = (
   kinds: readonly string[],
   fields: readonly string[],
@@ -75,12 +75,34 @@ export const INSURANCE_READING = sectionReading(
   ['expiresOn'],
   ['client.documents.skipped.not_insurance_document'],
 );
+export const MORTGAGE_READING = sectionReading(
+  [
+    'mortgage_deed',
+    'notary_invoice',
+    'registry_invoice',
+    'agency_invoice_mortgage',
+    'valuation_invoice',
+    'ajd_form',
+    'fein',
+    'fiae',
+    'transparency_deed',
+    'prepayment_statement',
+  ],
+  ['principal', 'initialRate'],
+  [
+    'client.documents.skipped.not_mortgage_document',
+    'client.documents.missing_key_page',
+    'client.documents.key_page.expenses_clause',
+    'client.documents.key_page_hint.expenses_clause',
+  ],
+);
+const SECTION_READING = [CREDIT_READING, INSURANCE_READING, MORTGAGE_READING] as const;
 
 // The strings the browser scripts need, for the page to ship as JSON. Those of document reading
 // and the pass ship only in a build that has them, and each review section's only on its page.
 // The credit page ships only its own, what every page reads and, with documents, what reading them
 // says: the rest speak of claiming what a final pay owes, which the credit copy never does. The
-// mortgage page ships only its own and what every page reads.
+// mortgage page likewise.
 export const clientStrings = (
   lang: Lang,
   {
@@ -100,14 +122,19 @@ export const clientStrings = (
     credit?: boolean;
     mortgage?: boolean;
   } = {},
-): Partial<Record<Key, string>> =>
-  Object.fromEntries(
+): Partial<Record<Key, string>> => {
+  // A word of some reviews' documents ships on any of their pages, and on no other.
+  const onPage = [credit, insurance, mortgage];
+  const sectionWord = (key: string) => {
+    const owners = SECTION_READING.flatMap((words, i) => (words.has(key) ? [onPage[i]] : []));
+    return owners.length === 0 || owners.includes(true);
+  };
+  return Object.fromEntries(
     Object.entries(DICTIONARIES[lang]).filter(
       ([key]) =>
         key.startsWith('client.') &&
         (documents || !key.startsWith('client.documents.')) &&
-        (credit || !CREDIT_READING.has(key)) &&
-        (insurance || !INSURANCE_READING.has(key)) &&
+        sectionWord(key) &&
         (rental || !key.startsWith('client.rental.')) &&
         (employment || !key.startsWith('client.employment.')) &&
         (household || !key.startsWith('client.household.')) &&
@@ -117,7 +144,9 @@ export const clientStrings = (
             (documents && readingString(key))
           : !key.startsWith('client.credit.')) &&
         (mortgage
-          ? MORTGAGE_PAGE.some((prefix) => key.startsWith(prefix))
+          ? MORTGAGE_PAGE.some((prefix) => key.startsWith(prefix)) ||
+            (documents && readingString(key))
           : !key.startsWith('client.mortgage.')),
     ),
   );
+};
