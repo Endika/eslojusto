@@ -36,7 +36,7 @@ API never returns prose. All requests are `POST` with a JSON body.
   "captchaToken": "<Turnstile token, widget action 'extract'>",
   "quota": "<token from the last free read, or null>", // free read
   "pass": "<pass token>", // or a pass read
-  "review": "rental" // optional: "rental", "employment", "credit" or "insurance"; none is the final pay
+  "review": "rental" // optional: "rental", "employment", "credit", "insurance" or "mortgage"; none is the final pay
 }
 ```
 
@@ -45,8 +45,9 @@ is `final_pay`, exactly as before the field existed (`test/fixtures/final-pay-to
 `final-pay-prompt.txt` pin its schema and prompt, and the other reviews' fixtures beside them
 pin theirs); `rental` reads a tenancy pack (below, «Rental review»), `employment` an employment
 contract and the documents around it (below, «Employment review»), `credit` a consumer credit
-pack (below, «Credit review») and `insurance` a home or motor policy and its renewal notice
-(below, «Insurance review»); anything else is `invalid_request`. Each review's system prompt
+pack (below, «Credit review»), `insurance` a home or motor policy and its renewal notice
+(below, «Insurance review») and `mortgage` a mortgage deed and the bills around it (below,
+«Mortgage review»); anything else is `invalid_request`. Each review's system prompt
 lives in a module of its own, `src/adapters/prompts/`. The log line carries `review` only when the request
 named one.
 
@@ -165,8 +166,8 @@ each of them). An `ok` read can still list pages set aside; the site says which 
 `{ "code": "ok", "sessionId": "cs_…", "url": "https://checkout.stripe.com/…" }`. Keep the
 session id and nonce before redirecting; Stripe returns to
 `/finiquito/?session_id={CHECKOUT_SESSION_ID}`, to `/alquiler/` with `"returnTo": "rental"`, to
-`/contrato/` with `"returnTo": "employment"` or to `/financiacion/` with `"returnTo": "credit"`
-(`CHECKOUT_PATHS` in `src/config.ts`); any other `returnTo` is `invalid_request`, `insurance`
+`/contrato/` with `"returnTo": "employment"`, to `/financiacion/` with `"returnTo": "credit"` or
+to `/hipoteca/` with `"returnTo": "mortgage"` (`CHECKOUT_PATHS` in `src/config.ts`); any other `returnTo` is `invalid_request`, `insurance`
 included: that review offers no pass. The pass is the
 same product either way and unlocks every review.
 
@@ -378,6 +379,59 @@ number has no fixed shape, so only the prompt keeps it out.
 with no `expiresOn` is worth a second read. The insurance review offers no pass, so no checkout
 starts from it.
 
+### Mortgage review
+
+With `"review": "mortgage"` the model sorts a mortgage deed and the documents around it
+(`src/domain/mortgage-schema.ts`). Page kinds: `mortgage_deed`, `notary_invoice`,
+`registry_invoice`, `agency_invoice_mortgage`, `valuation_invoice`, `ajd_form` (modelo 600),
+`fein`, `fiae`, `transparency_deed`, `prepayment_statement` and `other` (a purchase deed without a
+loan, a property tax receipt); readability with `not_mortgage_document`.
+
+| Section                   | Fields                                                                                                                                                                                                                                                                                                                                                                                                                                                | Lists (most rows)                                                                                     |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `mortgage_deed`           | `deedOn`, `lenderName`, `borrowerType`, `purpose`, `loanKind`, `principal`, `termMonths`, `rateType`, `fixedUntil`, `initialRate`, `index`, `spread`, `rateRevisionMonths`, `floorPercent`, `defaultRate`, `defaultMarginPoints`, `earlyTerminationInstalments`, `prepaymentOption`, `variablePrepaymentFeePercent`, `fixedPrepaymentFeePercent`, `openingFee`, `openingFeePercent`, `otherSetUpFee`, `transparencyActStated`, `handwrittenStatement` | `clauses` [`label`, `text` (literal, ≤ 1,500), `page`] (12, the first)                                |
+| `notary_invoice`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `notaryInvoices` [`invoiceOn`, `concept`, `mixed`, `base`, `vat`, `supplied`, `total`] (6)            |
+| `registry_invoice`        |                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `registryInvoices` [`invoiceOn`, `concept`, `mixed`, `base`, `vat`, `total`] (6)                      |
+| `agency_invoice_mortgage` |                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `agencyInvoices` [`invoiceOn`, `fee`, `vat`, `total`] (3), `agencySupplied` [`concept`, `amount`] (6) |
+| `valuation_invoice`       |                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `valuationInvoices` [`invoiceOn`, `base`, `vat`, `total`] (3)                                         |
+| `ajd_form`                |                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `ajdForms` [`concept`, `accruedOn`, `taxBase`, `amountPaid`, `paidOn`, `paidByLender`] (3)            |
+| `fein`                    | `deliveredOn` (returned as `feinDeliveredOn`), `principal`, `initialRate`                                                                                                                                                                                                                                                                                                                                                                             |                                                                                                       |
+| `fiae`                    | `deliveredOn` (returned as `fiaeDeliveredOn`)                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                       |
+| `transparency_deed`       | `actOn` and `amountCharged` (returned as `transparencyActOn` and `transparencyActCharged`)                                                                                                                                                                                                                                                                                                                                                            |                                                                                                       |
+| `prepayment_statement`    |                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `operations` [`on`, `kind`, `principal`, `feeCharged`, `feeConcept`, `premiumRefunded`] (6)           |
+
+`src/domain/mortgage-merge.ts` takes the deed's capital and rate before the FEIN's, so a FEIN
+that offered another capital shows as a conflict. A clause comes as a closed `label` (`floor_clause`,
+`irph`, `euribor`, `default_interest`, `early_termination`, `rounding_up`, `opening_fee`,
+`prepayment_fee`, `expenses_clause`, `insurance_required`) and its literal text, for the person
+to confirm on the site; the model never says whether a clause is abusive, void or transparent,
+who should pay a cost or whether a fee is above a limit: the site's engine does that. A notary or
+registry invoice says whether it bills the loan or the purchase, one row per part when it prints
+them apart and `mixed: true` when it does not, and a modelo 600 whether it taxes the loan or the
+purchase. Rates and spreads take up to three decimals (Euríbor + 0,875). `borrowerType`,
+`purpose`, `loanKind`, `rateType`, `prepaymentOption`, an operation's `kind`, a clause's `label`
+and the invoice concepts (as `notary_…`, `registry_…` and `ajd_…`) mirror the site's mortgage
+engine (`test/mortgage-contract.test.ts`).
+
+A deed names its borrowers and guarantors, their documents and addresses, and a life insurance
+it requires can bring in health. The prompt tells the model never to record any of it, nor the
+notary's name; the API does not take that on trust: a copied text (`lenderName`, a clause's
+`text`, an operation's `feeConcept`) that holds an identifier, a payment card number, a number
+plate, a word about health, leave, union membership or debts, or a person's name after a
+courtesy title as deeds write them («Don …», «D.ª …», `hasPersonTitle` in
+`src/domain/identifiers.ts`) is dropped, each as a discard; a clause keeps its label without its
+text. `truncated: true` says the clauses or another list came back at its maximum.
+
+`failedChecks` (`src/domain/mortgage-checks.ts`): `invoice_parts_do_not_sum` (an invoice's base,
+VAT and outlays more than 5 cents from its total; an agency's outlays count against its only
+invoice), `invoice_mixes_purchase_and_loan`, `duplicate_supplied_amount` (an agency outlay for
+the tax or the registry within 5 cents of a return or a registry invoice in the pack),
+`ajd_purchase_not_loan` (a modelo 600 of the purchase) and `missing_key_page` (a legible deed
+dated before 16-06-2019, or of no date read, without its expenses clause: the pages that carry it
+were likely not sent; from that day art. 14.1.e Ley 5/2019 shares out the costs, so a later deed
+needs no such clause). A legible deed with
+neither `deedOn` nor `principal` is worth a second read, as a failed check is.
+
 ### Fields and the site's engine
 
 The model transcribes each kind of document into its own section of the tool input
@@ -540,9 +594,9 @@ Cheapest first, and nothing that parses what the person sent runs before the cap
 
 - **The input is known before any call.** Every image is priced by its pixels, at
   w × h / 750 tokens (Anthropic's formula) or one per 28 × 28 patch if that is more, and the
-  prompt and schema at 14,000 for the final pay, the employment and the credit review, 11,000
-  for a rental review and 8,000 for an insurance review (about 27,000, 28,000, 28,000, 21,000
-  and 14,000 characters at two per token,
+  prompt and schema at 14,000 for the final pay, the employment, the credit and the mortgage
+  review, 11,000 for a rental review and 8,000 for an insurance review (about 27,000, 28,000,
+  28,000, 28,000, 21,000 and 14,000 characters at two per token,
   `PROMPT_TOKENS_BY_REVIEW`; `test/tokens.test.ts` keeps them honest). Bedrock's CountTokens does not serve Claude models
   offered only through cross-Region profiles, so this is computed, not asked. The largest pack
   the API accepts, twenty-five 1568 × 1568 images, comes to 14,000 + 25 × 3,279 = 95,975 (92,975
@@ -796,11 +850,14 @@ A credit read has the employment review's bounds: a prompt of 14,000 tokens (lar
 95,975 in) and `max_tokens` 12,000, so its worst case is the same **0.51 USD**. Every list at its
 maximum (a 96-row schedule, a year of card statements, both contracts' charges) with texts of
 the usual length is about 10,700 tokens, a tenth under the cap; with every copied text at its
-limit as well, about 12,200, which stops at `max_tokens`. An insurance read keeps `max_tokens`
+limit as well, about 12,200, which stops at `max_tokens`. A mortgage read has the same bounds
+too: twelve clauses copied word for word need the room. Every list at its maximum with clauses of
+the usual length (800 characters) is about 9,600 tokens; with every clause at its 1,500 and every
+text at its limit, about 14,000, which stops at `max_tokens`. An insurance read keeps `max_tokens`
 at 5,000 with an 8,000-token prompt: its largest pack is 89,975 in, 0.38 USD.
 
 **Worst case: 0.40 USD per read** for the final pay, the rental and the insurance review (95,975 × 3.30 USD/M +
-5,000 × 16.50 USD/M = 0.399), and an upper bound of about **0.51 USD** for the employment and the credit review
+5,000 × 16.50 USD/M = 0.399), and an upper bound of about **0.51 USD** for the employment, the credit and the mortgage review
 (95,975 × 3.30 USD/M + 12,000 × 16.50 USD/M = 0.5147), for any input: the API takes images only, priced by their pixels, and refuses anything above 96,000
 estimated tokens (0.40 USD) before a call. The bound counts every page at 1568 px, since the
 API accepts that size at any count; the browser stepping a large pack down only lowers it. A PDF never reaches it; the browser renders its pages

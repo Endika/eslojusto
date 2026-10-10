@@ -32,6 +32,8 @@ import {
 } from './insurance-checks';
 import { insuranceMerge, type InsuranceMerged } from './insurance-merge';
 import { merge, type Merged } from './merge';
+import { mortgageFailedChecks, mortgageIncomplete, type MortgageCheck } from './mortgage-checks';
+import { mortgageMerge, type MortgageMerged } from './mortgage-merge';
 import { rentalFailedChecks, rentalIncomplete, type RentalCheck } from './rental-checks';
 import { rentalMerge, type RentalMerged } from './rental-merge';
 import type {
@@ -86,7 +88,9 @@ type ExtractionOf<R extends ReviewKind> = R extends 'rental'
       ? Omit<CreditMerged, 'discarded'>
       : R extends 'insurance'
         ? Omit<InsuranceMerged, 'discarded'>
-        : Omit<Merged, 'discarded'>;
+        : R extends 'mortgage'
+          ? Omit<MortgageMerged, 'discarded'>
+          : Omit<Merged, 'discarded'>;
 type CheckOf<R extends ReviewKind> = R extends 'rental'
   ? RentalCheck
   : R extends 'employment'
@@ -95,10 +99,14 @@ type CheckOf<R extends ReviewKind> = R extends 'rental'
       ? CreditCheck
       : R extends 'insurance'
         ? InsuranceCheck
-        : CoherenceCheck;
+        : R extends 'mortgage'
+          ? MortgageCheck
+          : CoherenceCheck;
 
-type AnyMerged = Merged | RentalMerged | EmploymentMerged | CreditMerged | InsuranceMerged;
-type AnyCheck = CoherenceCheck | RentalCheck | EmploymentCheck | CreditCheck | InsuranceCheck;
+type AnyMerged =
+  Merged | RentalMerged | EmploymentMerged | CreditMerged | InsuranceMerged | MortgageMerged;
+type AnyCheck =
+  CoherenceCheck | RentalCheck | EmploymentCheck | CreditCheck | InsuranceCheck | MortgageCheck;
 
 export type ExtractResponse<R extends ReviewKind = 'final_pay'> =
   | {
@@ -217,11 +225,21 @@ function checkInsurance(reading: Reading): Checked {
   };
 }
 
+function checkMortgage(reading: Reading, toolInput: unknown): Checked {
+  const extraction = mortgageMerge(reading, toolInput);
+  return {
+    extraction,
+    failed: mortgageFailedChecks(reading),
+    incomplete: mortgageIncomplete(reading, extraction),
+  };
+}
+
 function check(reading: Reading, review: ReviewKind, toolInput: unknown): Checked {
   if (review === 'rental') return checkRental(reading);
   if (review === 'employment') return checkEmployment(reading, toolInput);
   if (review === 'credit') return checkCredit(reading, toolInput);
   if (review === 'insurance') return checkInsurance(reading);
+  if (review === 'mortgage') return checkMortgage(reading, toolInput);
   return checkFinalPay(reading);
 }
 

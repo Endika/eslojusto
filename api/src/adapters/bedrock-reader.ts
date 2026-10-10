@@ -11,6 +11,7 @@ export { CREDIT_SYSTEM_PROMPT } from './prompts/credit';
 export { EMPLOYMENT_SYSTEM_PROMPT } from './prompts/employment';
 export { SYSTEM_PROMPT } from './prompts/final-pay';
 export { INSURANCE_SYSTEM_PROMPT } from './prompts/insurance';
+export { MORTGAGE_SYSTEM_PROMPT } from './prompts/mortgage';
 export { RENTAL_SYSTEM_PROMPT } from './prompts/rental';
 export { SYSTEM_PROMPTS };
 
