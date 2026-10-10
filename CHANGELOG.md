@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.45.0](https://github.com/Endika/eslojusto/compare/v1.44.0...v1.45.0) (2026-10-10)
+
+
+### Features
+
+* **engine:** add up a year of bills and decide when the pass is worth offering ([f92b6ec](https://github.com/Endika/eslojusto/commit/f92b6ec61fc2dbb137cb27e72a6639ae69dcbdd1))
+* **engine:** check telecom commitment penalties, exits after a change and charges after leaving ([0eddf05](https://github.com/Endika/eslojusto/commit/0eddf054ab7d0a52fa6d4980e6999ead16b66c17))
+
 ## [1.44.0](https://github.com/Endika/eslojusto/compare/v1.43.0...v1.44.0) (2026-10-10)
 
 
