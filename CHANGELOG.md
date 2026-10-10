@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.48.0](https://github.com/Endika/eslojusto/compare/v1.47.0...v1.48.0) (2026-10-10)
+
+
+### Features
+
+* **mortgage:** add the report, a free document request and the statute-only amounts letter ([f8e8bc4](https://github.com/Endika/eslojusto/commit/f8e8bc491daf66ebbc54bde9482e0fab5a213a39))
+
 ## [1.47.0](https://github.com/Endika/eslojusto/compare/v1.46.1...v1.47.0) (2026-10-10)
 
 
