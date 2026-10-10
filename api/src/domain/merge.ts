@@ -224,6 +224,27 @@ export function listsReachedMaximum(
   });
 }
 
+// Every list of the sections read, each row with the kind of document it came from.
+export function sourcedLists<L extends string>(
+  reading: Reading,
+  sections: Readonly<Partial<Record<SectionKind, SectionSchema>>>,
+): Partial<Record<L, readonly MergedRow[]>> {
+  const lists: Partial<Record<L, MergedRow[]>> = {};
+  for (const [kind, schema] of Object.entries(sections) as [SectionKind, SectionSchema][]) {
+    const section = reading.sections[kind];
+    if (!section) continue;
+    for (const name of Object.keys(schema.lists) as L[]) {
+      const rows = section.lists[name];
+      if (rows && rows.length > 0)
+        lists[name] = [
+          ...(lists[name] ?? []),
+          ...rows.map((row) => ({ ...row, source: schema.source })),
+        ];
+    }
+  }
+  return lists;
+}
+
 export function merge(read: Reading): Merged {
   const reading = withLineTotals(read);
   const { fields, conflicts, discarded } = mergeFields(reading, MERGE_RULES);

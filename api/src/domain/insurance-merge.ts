@@ -6,6 +6,7 @@ import {
   groupDocuments,
   mergeFields,
   own,
+  sourcedLists,
   withoutIdentifiers,
   type Conflict,
   type From,
@@ -105,18 +106,7 @@ export function insuranceMerge(read: Reading): InsuranceMerged {
   }
   const reading: Reading = { ...read, sections };
   const { fields, conflicts, discarded } = mergeFields(reading, INSURANCE_MERGE_RULES);
-  const lists: Partial<Record<InsuranceListName, MergedRow[]>> = {};
-  for (const [kind, schema] of Object.entries(INSURANCE_SECTIONS) as [
-    InsuranceSectionKind,
-    (typeof INSURANCE_SECTIONS)[InsuranceSectionKind],
-  ][]) {
-    const section = reading.sections[kind];
-    if (!section) continue;
-    for (const name of Object.keys(schema.lists) as InsuranceListName[]) {
-      const rows = section.lists[name];
-      if (rows && rows.length > 0) lists[name] = rows.map((row) => ({ ...row, source: kind }));
-    }
-  }
+  const lists = sourcedLists<InsuranceListName>(reading, INSURANCE_SECTIONS);
   return {
     pages: reading.pages,
     documents: groupDocuments(reading.pages),
