@@ -57,3 +57,9 @@ export const hasPersonTitle = (text: string): boolean => PERSON_TITLE.test(text)
 const SUPPLY_NUMBER = /(?<![A-Z\d])ES[\s.-]?(?:\d[\s.-]?){16}[A-Z]{2}(?![A-Z])/i;
 
 export const hasSupplyNumber = (text: string): boolean => SUPPLY_NUMBER.test(text);
+
+// A handset's IMEI: fifteen digits, in one piece or grouped 2-6-6-1. Only the telecom review looks
+// for it, since only a phone bill or contract carries one; its sixteen-digit form is a card's shape.
+const DEVICE_NUMBER = /(?<![\d.,])\d{2}[\s-]?\d{6}[\s-]?\d{6}[\s-]?\d(?![\d]|[.,]\d)/;
+
+export const hasDeviceNumber = (text: string): boolean => DEVICE_NUMBER.test(text);

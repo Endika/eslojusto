@@ -9,6 +9,13 @@ import { creditFailedChecks, creditIncomplete, type CreditCheck } from './credit
 import { creditMerge, type CreditMerged } from './credit-merge';
 import { checkFileShapes, imageSizes, type DocumentFile } from './documents';
 import {
+  electricityFailedChecks,
+  electricityIncomplete,
+  PACK_CHECKS,
+  type ElectricityCheck,
+} from './electricity-checks';
+import { electricityMerge, type ElectricityMerged } from './electricity-merge';
+import {
   employmentFailedChecks,
   employmentIncomplete,
   type EmploymentCheck,
@@ -55,6 +62,8 @@ import {
   UNDERESTIMATE_FACTOR,
 } from './tokens';
 import type { ReviewKind } from './reviews';
+import { telecomFailedChecks, telecomIncomplete, type TelecomCheck } from './telecom-checks';
+import { telecomMerge, type TelecomMerged } from './telecom-merge';
 
 // Every model read, retries included, is abandoned this long after the request started, which
 // leaves the function's 180 s room to count a pass read and answer.
@@ -90,7 +99,11 @@ type ExtractionOf<R extends ReviewKind> = R extends 'rental'
         ? Omit<InsuranceMerged, 'discarded'>
         : R extends 'mortgage'
           ? Omit<MortgageMerged, 'discarded'>
-          : Omit<Merged, 'discarded'>;
+          : R extends 'electricity'
+            ? Omit<ElectricityMerged, 'discarded'>
+            : R extends 'telecom'
+              ? Omit<TelecomMerged, 'discarded'>
+              : Omit<Merged, 'discarded'>;
 type CheckOf<R extends ReviewKind> = R extends 'rental'
   ? RentalCheck
   : R extends 'employment'
@@ -101,12 +114,30 @@ type CheckOf<R extends ReviewKind> = R extends 'rental'
         ? InsuranceCheck
         : R extends 'mortgage'
           ? MortgageCheck
-          : CoherenceCheck;
+          : R extends 'electricity'
+            ? ElectricityCheck
+            : R extends 'telecom'
+              ? TelecomCheck
+              : CoherenceCheck;
 
 type AnyMerged =
-  Merged | RentalMerged | EmploymentMerged | CreditMerged | InsuranceMerged | MortgageMerged;
+  | Merged
+  | RentalMerged
+  | EmploymentMerged
+  | CreditMerged
+  | InsuranceMerged
+  | MortgageMerged
+  | ElectricityMerged
+  | TelecomMerged;
 type AnyCheck =
-  CoherenceCheck | RentalCheck | EmploymentCheck | CreditCheck | InsuranceCheck | MortgageCheck;
+  | CoherenceCheck
+  | RentalCheck
+  | EmploymentCheck
+  | CreditCheck
+  | InsuranceCheck
+  | MortgageCheck
+  | ElectricityCheck
+  | TelecomCheck;
 
 export type ExtractResponse<R extends ReviewKind = 'final_pay'> =
   | {
@@ -234,12 +265,32 @@ function checkMortgage(reading: Reading, toolInput: unknown): Checked {
   };
 }
 
+function checkElectricity(reading: Reading, toolInput: unknown): Checked {
+  const extraction = electricityMerge(reading, toolInput);
+  return {
+    extraction,
+    failed: electricityFailedChecks(reading),
+    incomplete: electricityIncomplete(reading, extraction),
+  };
+}
+
+function checkTelecom(reading: Reading, toolInput: unknown): Checked {
+  const extraction = telecomMerge(reading, toolInput);
+  return {
+    extraction,
+    failed: telecomFailedChecks(reading),
+    incomplete: telecomIncomplete(reading, extraction),
+  };
+}
+
 function check(reading: Reading, review: ReviewKind, toolInput: unknown): Checked {
   if (review === 'rental') return checkRental(reading);
   if (review === 'employment') return checkEmployment(reading, toolInput);
   if (review === 'credit') return checkCredit(reading, toolInput);
   if (review === 'insurance') return checkInsurance(reading);
   if (review === 'mortgage') return checkMortgage(reading, toolInput);
+  if (review === 'electricity') return checkElectricity(reading, toolInput);
+  if (review === 'telecom') return checkTelecom(reading, toolInput);
   return checkFinalPay(reading);
 }
 
@@ -252,7 +303,7 @@ export function assess(read: ModelRead, pageCount: number, review: ReviewKind): 
     noOutput ||
     reading.unclassified > 0 ||
     reading.dropped > 0 ||
-    failed.length > 0 ||
+    failed.some((c) => !PACK_CHECKS.has(c)) ||
     hasLowConfidence(reading) ||
     extraction.discarded > 0 ||
     incomplete;

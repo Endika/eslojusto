@@ -203,6 +203,16 @@ describe('Stripe adapter', () => {
     expect(options).toEqual({ idempotencyKey: `checkout-mortgage-${NONCE}` });
   });
 
+  it.each([
+    ['electricity', '/facturas/luz/'],
+    ['telecom', '/facturas/permanencia/'],
+  ] as const)('returns a %s payment to %s, under a key of its own', (review, path) => {
+    const [params, options] = checkoutParams(NONCE, PRICE, review);
+    expect(params.success_url).toBe(`https://eslojusto.es${path}?session_id={CHECKOUT_SESSION_ID}`);
+    expect(params.cancel_url).toBe(`https://eslojusto.es${path}`);
+    expect(options).toEqual({ idempotencyKey: `checkout-${review}-${NONCE}` });
+  });
+
   const session = (extra: Record<string, unknown> = {}) =>
     ({
       id: 'cs_test_paid',

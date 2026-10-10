@@ -8,9 +8,9 @@ import { INSURANCE_MERGE_RULES } from '../../api/src/domain/insurance-merge';
 import { INSURANCE_SECTIONS } from '../../api/src/domain/insurance-schema';
 import {
   LIMITS as API_LIMITS,
-  ALL_PAGE_KINDS as API_PAGE_KINDS,
+  SITE_PAGE_KINDS as API_PAGE_KINDS,
 } from '../../api/src/domain/documents';
-import { ALL_READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
+import { SITE_READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
 import { EMPLOYMENT_SECTIONS } from '../../api/src/domain/employment-schema';
 import { RENTAL_SECTIONS } from '../../api/src/domain/rental-schema';
 import { API_TIMEOUT_MS, createApi, parseExtraction, type Fetch } from '../../src/documents/api';

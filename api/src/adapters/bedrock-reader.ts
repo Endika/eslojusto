@@ -8,11 +8,13 @@ import { EXTRA_OUTPUT_TOKENS_BY_REVIEW } from '../domain/tokens';
 import { SYSTEM_PROMPTS } from './prompts';
 
 export { CREDIT_SYSTEM_PROMPT } from './prompts/credit';
+export { ELECTRICITY_SYSTEM_PROMPT } from './prompts/electricity';
 export { EMPLOYMENT_SYSTEM_PROMPT } from './prompts/employment';
 export { SYSTEM_PROMPT } from './prompts/final-pay';
 export { INSURANCE_SYSTEM_PROMPT } from './prompts/insurance';
 export { MORTGAGE_SYSTEM_PROMPT } from './prompts/mortgage';
 export { RENTAL_SYSTEM_PROMPT } from './prompts/rental';
+export { TELECOM_SYSTEM_PROMPT } from './prompts/telecom';
 export { SYSTEM_PROMPTS };
 
 const base64 = (bytes: Uint8Array): string => Buffer.from(bytes).toString('base64');

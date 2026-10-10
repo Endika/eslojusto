@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   hasIdentifier,
+  hasDeviceNumber,
   hasNumberPlate,
   hasPersonTitle,
   hasPaymentCardNumber,
@@ -168,5 +169,24 @@ describe('hasSupplyNumber', () => {
     ['a bill number', 'FE26-000000123'],
   ])('finds nothing in %s', (_, text) => {
     expect(hasSupplyNumber(text)).toBe(false);
+  });
+});
+
+describe('hasDeviceNumber', () => {
+  it.each([
+    ['in one piece', 'Plazo terminal IMEI 350000111111112'],
+    ['in groups', 'IMEI: 35-000011-111111-2'],
+    ['with spaces', 'IMEI 35 000011 111111 2'],
+  ])('finds one %s', (_, text) => {
+    expect(hasDeviceNumber(text)).toBe(true);
+  });
+
+  it.each([
+    ['a phone number', 'Llamadas a 600 123 456'],
+    ['an amount', '1.234,56 €'],
+    ['a date and a period', 'Del 01/08/2026 al 31/08/2026'],
+    ['sixteen digits', '3500001111111123'],
+  ])('finds nothing in %s', (_, text) => {
+    expect(hasDeviceNumber(text)).toBe(false);
   });
 });

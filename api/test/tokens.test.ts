@@ -16,6 +16,7 @@ import {
   MAX_ESTIMATED_INPUT_TOKENS,
   PROMPT_TOKENS_BY_REVIEW,
 } from '../src/domain/tokens';
+import { electricityRecord, telecomRecord } from './support/bills-largest';
 import { creditRecord } from './support/credit-largest';
 import { employmentRecord, LARGEST } from './support/employment-largest';
 import { mortgageRecord } from './support/mortgage-largest';
@@ -91,7 +92,7 @@ describe('cost of a read', () => {
     expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'employment')).toBeLessThanOrEqual(0.515);
   });
 
-  it('gives only the employment, the credit and the mortgage review more room to write', () => {
+  it('gives the final pay, the rental and the insurance review no more room to write', () => {
     expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.final_pay).toBe(0);
     expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.rental).toBe(0);
     expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.insurance).toBe(0);
@@ -106,6 +107,14 @@ describe('cost of a read', () => {
     expect(maxOutput(SONNET_4_6, 'mortgage')).toBe(12_000);
     expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'mortgage')).toBeLessThanOrEqual(0.515);
   });
+
+  it.each(['electricity', 'telecom'] as const)(
+    'stays under 0.515 USD for a %s read, with the employment review’s room to write',
+    (review) => {
+      expect(maxOutput(SONNET_4_6, review)).toBe(12_000);
+      expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, review)).toBeLessThanOrEqual(0.515);
+    },
+  );
 
   it('stays at or under 0.40 USD for an insurance read', () => {
     expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'insurance')).toBeLessThanOrEqual(0.4);
@@ -179,5 +188,37 @@ describe('what a mortgage read records', () => {
 
   it('does not fit every list and every copied text at its limit', () => {
     expect(recordTokens(mortgageRecord('largest'))).toBe(14_001);
+  });
+});
+
+// api/README.md, «Cost», quotes these sizes.
+describe('what an electricity read records', () => {
+  const room = maxOutput(SONNET_4_6, 'electricity');
+
+  it('fits a year of bills and its contract, a tenth under max_tokens', () => {
+    const year = recordTokens(electricityRecord('year'));
+    expect(year).toBe(10_747);
+    expect(year).toBeLessThanOrEqual(0.91 * room);
+  });
+
+  it('does not fit every list, every field and every copied text at its limit', () => {
+    expect(recordTokens(electricityRecord('largest'))).toBe(15_178);
+  });
+});
+
+// api/README.md, «Cost», quotes these sizes.
+describe('what a telecom read records', () => {
+  const room = maxOutput(SONNET_4_6, 'telecom');
+
+  it('fits a contract and a year of bills with every line, a tenth under max_tokens', () => {
+    const full = recordTokens(telecomRecord('typical'));
+    expect(full).toBe(7_624);
+    expect(full).toBeLessThanOrEqual(0.91 * room);
+  });
+
+  it('fits them with every copied text at its limit too', () => {
+    const limit = recordTokens(telecomRecord('largest'));
+    expect(limit).toBe(9_741);
+    expect(limit).toBeLessThanOrEqual(room);
   });
 });

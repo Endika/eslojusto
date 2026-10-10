@@ -97,6 +97,8 @@ const cases = [
   ['credit', 'credit-personal-loan', 'credit_agreement', 5],
   ['insurance', 'insurance-home-renewal', 'insurance_policy', 3],
   ['mortgage', 'mortgage-deed-2012', 'mortgage_deed', 6],
+  ['electricity', 'electricity-free-service', 'electricity_bill', 2],
+  ['telecom', 'telecom-contract-commitment', 'telecom_contract', 2],
 ] as const;
 
 describe('a read whose tool input has a section of the wrong type', () => {

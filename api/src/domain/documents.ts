@@ -66,6 +66,16 @@ export const MORTGAGE_PAGE_KINDS = [
   'prepayment_statement',
   'other',
 ] as const;
+// A household electricity review's documents: bills, the supply contract and a notice that its
+// prices change; a gas bill or a phone bill is `other`.
+export const ELECTRICITY_PAGE_KINDS = [
+  'electricity_bill',
+  'electricity_contract',
+  'price_change_notice',
+  'other',
+] as const;
+// A phone or internet review's documents; an electricity bill is `other`.
+export const TELECOM_PAGE_KINDS = ['telecom_bill', 'telecom_contract', 'other'] as const;
 // Every kind the final pay, the rental and the employment review can give a page.
 export const PAGE_KINDS = [
   'settlement_proposal',
@@ -87,9 +97,9 @@ export const PAGE_KINDS = [
   | (typeof RENTAL_PAGE_KINDS)[number]
   | (typeof EMPLOYMENT_PAGE_KINDS)[number]
 )[];
-// Every kind any review can give a page: the credit and the insurance review's too. The site's
-// documents client mirrors this list (src/documents/contract.ts).
-export const ALL_PAGE_KINDS = [
+// Every kind the reviews the site reads can give a page: the credit and the insurance review's
+// too. The site's documents client mirrors this list (src/documents/contract.ts).
+export const SITE_PAGE_KINDS = [
   ...PAGE_KINDS,
   'credit_agreement',
   'credit_precontract_info',
@@ -104,7 +114,21 @@ export const ALL_PAGE_KINDS = [
   | (typeof CREDIT_PAGE_KINDS)[number]
   | (typeof INSURANCE_PAGE_KINDS)[number]
 )[];
-// The mortgage review's kinds join that list once the site reads its documents.
+// Every kind any review can give a page: the electricity and the telecom review's too, which the
+// site mirrors once it reads them.
+export const ALL_PAGE_KINDS = [
+  ...SITE_PAGE_KINDS,
+  'electricity_bill',
+  'electricity_contract',
+  'price_change_notice',
+  'telecom_bill',
+  'telecom_contract',
+] as const satisfies readonly (
+  | (typeof SITE_PAGE_KINDS)[number]
+  | (typeof ELECTRICITY_PAGE_KINDS)[number]
+  | (typeof TELECOM_PAGE_KINDS)[number]
+)[];
+// The mortgage review's kinds join these once the site reads its documents.
 export type PageKind = (typeof ALL_PAGE_KINDS)[number] | (typeof MORTGAGE_PAGE_KINDS)[number];
 // The documents a value can come from.
 export type SourceKind = Exclude<PageKind, 'other'>;

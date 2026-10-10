@@ -56,6 +56,15 @@ describe.each(['credit', 'insurance', 'mortgage'] as const)('the %s read', (revi
     expect(SYSTEM_PROMPTS[review]).toBe(fixture(`${review}-prompt.txt`));
   });
 });
+describe.each(['credit', 'insurance', 'electricity', 'telecom'] as const)(
+  'the %s read',
+  (review) => {
+    it('asks for exactly what it asked when it shipped', () => {
+      expect(toolInputSchema(review)).toEqual(JSON.parse(fixture(`${review}-tool-schema.json`)));
+      expect(SYSTEM_PROMPTS[review]).toBe(fixture(`${review}-prompt.txt`));
+    });
+  },
+);
 
 describe('toolInputSchema', () => {
   it('is closed at every level', () => {
@@ -163,12 +172,16 @@ function optionalParameters(node: unknown): number {
 }
 
 describe('strict tool use', () => {
-  it.each(REVIEWS)(
-    'is off for a %s read, whose schema has more optional parameters than it allows',
+  it.each(REVIEWS)('is off for a %s read', (review) => {
+    const [tool] = buildRequestBody(SONNET_4_6, [], review)['tools'] as Record<string, unknown>[];
+    expect(tool).not.toHaveProperty('strict');
+  });
+
+  // The telecom schema alone would fit: one request shape serves every review.
+  it.each(REVIEWS.filter((r) => r !== 'telecom'))(
+    'could not be on for a %s read, whose schema has more optional parameters than it allows',
     (review) => {
       expect(optionalParameters(toolInputSchema(review))).toBeGreaterThan(24);
-      const [tool] = buildRequestBody(SONNET_4_6, [], review)['tools'] as Record<string, unknown>[];
-      expect(tool).not.toHaveProperty('strict');
     },
   );
 });

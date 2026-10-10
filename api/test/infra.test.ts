@@ -210,7 +210,7 @@ describe('dashboard', () => {
     );
   });
 
-  it('counts the reasons only the credit and the insurance review give too', () => {
+  it('counts the reasons only the later reviews give too', () => {
     const byReason = byTitle('Lecturas sin datos por revisión y motivo (páginas)');
     for (const reason of ALL_READABILITY)
       expect(byReason).toContain(`sum(readability.${reason}) as`);
