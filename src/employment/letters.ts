@@ -14,7 +14,7 @@ import type {
   InfoElement,
 } from '../engine/employment/types';
 import { formatEuros } from '../calculator/number';
-import { longDate, type LetterDetails, type LetterKind } from '../documents/letter';
+import { detailLine, placeAndDate, type LetterDetails, type LetterKind } from '../documents/letter';
 import type { Block, DocumentModel } from '../documents/ports';
 import type { ClientKey, Translate } from '../i18n/client';
 import type { CompletedEmploymentReview } from './ports';
@@ -156,22 +156,11 @@ export function employmentLetterKinds(
 
 const day = (d: CivilDate) => dayText(toIso(d));
 
-const blank = (label: string, value = ''): Block => {
-  const v = value.trim();
-  return v === '' ? { type: 'blank', label } : { type: 'blank', label, value: v, wrap: true };
-};
-
 function closing(details: LetterDetails, tr: Translate): Block[] {
   return [
     { type: 'text', text: tr('client.employment.letter.regards') },
-    {
-      type: 'text',
-      text: tr('client.documents.letter.place_date', {
-        lugar: details.place.trim() || tr('client.documents.letter.place_blank'),
-        fecha: details.date ? longDate(details.date) : tr('client.documents.letter.date_blank'),
-      }),
-    },
-    blank(tr('client.documents.letter.name'), details.name),
+    placeAndDate(details, tr),
+    detailLine(tr('client.documents.letter.name'), details.name),
   ];
 }
 
@@ -271,11 +260,11 @@ export function companyLetter(
     footer: null,
     blocks: [
       { type: 'title', text: title },
-      blank(tr('client.documents.letter.name'), details.name),
+      detailLine(tr('client.documents.letter.name'), details.name),
       // The company knows who writes: the DNI goes only when typed.
-      ...(id === '' ? [] : [blank(tr('client.documents.letter.id'), id)]),
-      blank(tr('client.documents.letter.company'), details.company),
-      blank(tr('client.employment.letter.workplace'), details.workplace),
+      ...(id === '' ? [] : [detailLine(tr('client.documents.letter.id'), id)]),
+      detailLine(tr('client.documents.letter.company'), details.company),
+      detailLine(tr('client.employment.letter.workplace'), details.workplace),
       {
         type: 'text',
         text: tr('client.employment.letter.company.body', { inicio: day(input.startDate) }),
@@ -303,9 +292,9 @@ export function certificateRequest(
     blocks: [
       { type: 'title', text: title },
       { type: 'text', text: tr('client.employment.letter.certificate.to') },
-      blank(tr('client.documents.letter.name'), details.name),
-      blank(tr('client.documents.letter.id'), details.id),
-      blank(tr('client.employment.letter.certificate.company'), details.company),
+      detailLine(tr('client.documents.letter.name'), details.name),
+      detailLine(tr('client.documents.letter.id'), details.id),
+      detailLine(tr('client.employment.letter.certificate.company'), details.company),
       {
         type: 'text',
         text: tr('client.employment.letter.certificate.body', { cita: source.citation }),
