@@ -894,3 +894,205 @@ test('the contract review sends sheets, field names and its outcome in codes, ne
   expect(spy.external).toEqual([]);
   expect(await context.cookies()).toEqual([]);
 });
+
+test('the mortgage review sends sheets, field names and its outcome in codes, never an amount, a date or a bank', async ({
+  page,
+  context,
+}) => {
+  const spy = await spyOn(page);
+  await page.clock.setFixedTime(new Date('2026-10-10T12:00:00'));
+  await page.goto('hipoteca/');
+  const sheet = (name: string) => page.getByRole('group', { name, exact: true });
+  const choose = (scope: string, question: string, answer: string) =>
+    sheet(scope)
+      .getByRole('group', { name: question, exact: true })
+      .getByLabel(answer, { exact: true })
+      .check();
+  const type = (scope: string, label: string, value: string) =>
+    sheet(scope).getByLabel(label, { exact: true }).fill(value);
+  const next = () => nextSheet(page);
+
+  await next(); // nothing answered: a validation error, by field name
+  await choose('Tu hipoteca', '¿Qué es?', 'Hipoteca sobre una vivienda');
+  await next();
+  await choose('Quién y sobre qué', '¿Quién la pidió?', 'Yo, como persona');
+  await choose(
+    'Quién y sobre qué',
+    '¿Sobre qué es la hipoteca?',
+    'Una vivienda, con su garaje o trastero',
+  );
+  await next();
+  await type('La escritura', 'Fecha de la escritura', '2021-05-10');
+  await choose('La escritura', '¿Pediste la hipoteca como particular, para tu casa?', 'Sí');
+  await next();
+  await choose('El tipo de interés', '¿Qué tipo tiene?', 'Variable');
+  await next();
+  await choose(
+    'La cláusula de gastos',
+    '¿Tu escritura tiene una cláusula que pone los gastos a cargo de quien pide el préstamo?',
+    'Sí, la tiene',
+  );
+  await next();
+  const floor = '¿Tu escritura fija un tipo mínimo, por debajo del cual el interés no baja?';
+  await choose('La cláusula suelo', floor, 'Sí');
+  await type('La cláusula suelo', 'Tipo mínimo que fija', '1');
+  await next();
+  await choose('El índice', '¿El tipo variable se calcula con el IRPH?', 'No');
+  await next();
+  await choose('La demora', '¿Tu escritura fija un interés de demora?', 'No');
+  await next();
+  await choose(
+    'El vencimiento anticipado',
+    '¿Tu escritura permite al banco pedir todo el préstamo si dejas de pagar?',
+    'No lo sé',
+  );
+  await next();
+  await choose('La comisión de apertura', '¿Te cobraron comisión de apertura?', 'No');
+  await next();
+  await choose(
+    'Otras cláusulas',
+    '¿El tipo se redondea al alza, por ejemplo al cuarto de punto?',
+    'No',
+  );
+  await choose(
+    'Otras cláusulas',
+    '¿La escritura te pide contratar un seguro u otro producto con el banco?',
+    'No',
+  );
+  await next();
+  await choose(
+    'Tus facturas',
+    '¿Tienes las facturas o los importes de los gastos de la hipoteca?',
+    'Sí',
+  );
+  await next();
+  const mixed = '¿Esa factura incluye también la compraventa, sin separarla?';
+  await type('La notaría', 'Notaría del préstamo', '700,00');
+  await choose('La notaría', mixed, 'No');
+  await next();
+  await type('El registro', 'Registro de la hipoteca', '450,00');
+  await choose('El registro', mixed, 'No');
+  await next();
+  await next();
+  await type('La tasación y el acta', 'Tasación', '400,00');
+  await next();
+  await next();
+  await type('Cuándo pagaste', 'Día en que pagaste esas facturas', '2021-05-12');
+  await next();
+  await choose('Lo que ya hubo', '¿Llegaste a un acuerdo con el banco sobre estos gastos?', 'No');
+  await next();
+  await choose(
+    'Amortizaciones y cambios',
+    '¿Has amortizado antes de tiempo o cambiado tu hipoteca?',
+    'No',
+  );
+  await next(); // the last sheet that applies closes the walk with the review
+  await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
+  await page.getByText('¿Qué es una cláusula suelo?').click();
+
+  await expect.poll(() => spy.named('help_opened').length, { timeout: 15_000 }).toBe(1);
+  await expect
+    .poll(() => spy.named('mortgage_review_completed').length, { timeout: 15_000 })
+    .toBe(1);
+
+  // A gate: a company's mortgage stops at its second sheet.
+  await page.getByRole('button', { name: 'Empezar de nuevo' }).click();
+  await choose('Tu hipoteca', '¿Qué es?', 'Hipoteca sobre una vivienda');
+  await next();
+  await choose('Quién y sobre qué', '¿Quién la pidió?', 'Una empresa o sociedad');
+  await next();
+  await expect.poll(() => spy.named('mortgage_out_of_scope').length, { timeout: 15_000 }).toBe(1);
+
+  expect(
+    spy.named('validation_error').map((e) => [e.properties['field'], e.properties['section']]),
+  ).toEqual([['loanKind', 'hipoteca']]);
+  expect(spy.named('section_viewed').map((e) => e.properties['section'])).toEqual([
+    'hipoteca',
+    'titular',
+    'escritura',
+    'tipo',
+    'clausula-gastos',
+    'suelo',
+    'indice',
+    'demora',
+    'vencimiento',
+    'apertura',
+    'otras',
+    'facturas',
+    'notaria',
+    'registro',
+    'gestoria',
+    'tasacion',
+    'impuesto',
+    'pago',
+    'acuerdo',
+    'amortizacion',
+    'resultado',
+    'hipoteca',
+    'titular',
+    'resultado',
+  ]);
+  expect(spy.named('help_opened').map((e) => e.properties['topic'])).toEqual([
+    'faq-hipoteca-suelo',
+  ]);
+  expect(spy.named('started_over')).toHaveLength(1);
+
+  const completed = spy.named('mortgage_review_completed')[0];
+  expect(completed?.properties).toMatchObject({
+    deed_period: '2019_plus',
+    consumer: 'yes',
+    expenses_statute: 'lender_bears',
+    expenses_case_law: 'none',
+    invoices: '3+',
+    fees: 'none',
+    flags: ['floor_clause'],
+    difference: '500-2000',
+    offered: true,
+    detail: 'unlocked',
+    attempt: '1',
+  });
+  expect(ownKeys(completed)).toEqual(
+    [
+      'deed_period',
+      'consumer',
+      'expenses_statute',
+      'expenses_case_law',
+      'invoices',
+      'fees',
+      'flags',
+      'difference',
+      'offered',
+      'detail',
+      'attempt',
+      'seconds',
+    ].toSorted(),
+  );
+  const outOfScope = spy.named('mortgage_out_of_scope')[0];
+  expect(outOfScope?.properties['reason']).toBe('company');
+  expect(ownKeys(outOfScope)).toEqual(['reason']);
+
+  for (const e of spy.events()) {
+    const text = withoutRandom(e);
+    for (const forbidden of [
+      '700,00',
+      '700.00',
+      '450,00',
+      '450.00',
+      '400,00',
+      '400.00',
+      '1.150',
+      '1150',
+      '2021-05-10',
+      '2021-05-12',
+      '10-05-2021',
+      '12-05-2021',
+    ])
+      expect(text, `${e.event}: ${forbidden}`).not.toContain(forbidden);
+  }
+  for (const e of spy.events())
+    expect(String(e.properties['$current_url'])).toMatch(
+      new RegExp(`^${ORIGIN}/hipoteca/(#[a-z-]+)?$`),
+    );
+  expect(spy.external).toEqual([]);
+  expect(await context.cookies()).toEqual([]);
+});

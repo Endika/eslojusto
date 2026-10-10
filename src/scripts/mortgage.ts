@@ -2,6 +2,9 @@ import { LEGAL_INTEREST } from '../engine/law/data/legal-interest';
 import { MORTGAGE_NORMS } from '../engine/mortgage/data/norms';
 import { MORTGAGE_SOURCES } from '../engine/mortgage/data/sources';
 import { CASE_LAW_RULES } from '../engine/mortgage/rules';
+import { mortgageAnalytics } from '../analytics/mortgage';
+import { track } from '../analytics/posthog';
+import type { Detail } from '../calculator/ports';
 import { setUpMortgage } from '../mortgage/main';
 import type { CompletedMortgageReview, MortgageEvents } from '../mortgage/ports';
 import { DOCUMENTS_BUILD } from '../documents/config';
@@ -21,19 +24,22 @@ const documentsBuild =
     import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
   ) && DOCUMENTS_BUILD;
 
+// Until the document module says whether a pass is there, the report counts as shown; without
+// the documents API there is no pass to lock it.
+let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedMortgageReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
-// The mortgage review measures nothing yet: no event of it is in the analytics catalogue. The pass
-// listens to each review shown and each one cleared.
+const analytics = mortgageAnalytics(
+  track,
+  () => performance.now(),
+  () => detail(),
+);
+// The measurement hears every event; the pass listens to each review shown and each one cleared.
 const events: MortgageEvents = {
-  stepShown() {},
-  wentBack() {},
-  stepCompleted() {},
-  fieldRejected() {},
-  helpOpened() {},
-  startedOver() {},
+  ...analytics,
   reviewCompleted(r) {
+    analytics.reviewCompleted(r);
     for (const listener of reviewed) listener(r);
   },
   reviewCleared() {
@@ -61,8 +67,8 @@ if (documentsBuild) {
         {
           onReview: (listener) => reviewed.push(listener),
           onRestart: (listener) => cleared.push(listener),
-          // Nothing in the mortgage result is locked.
-          detail: () => {},
+          // Nothing in the result is locked; the pass unlocks the report and the amounts letter.
+          detail: (state) => (detail = state),
         },
         arrival,
         LEGAL_INTEREST,

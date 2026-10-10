@@ -65,9 +65,9 @@ const noPosthogAdapter = {
   message: 'Only the composition root (src/scripts) imports the PostHog adapter.',
 };
 const analyticsReach = {
-  regex: `^\\.\\./(?!engine/|content/(rental-|employment-|household-|credit-|insurance-)?faq-topics$|i18n/client$|calculator/ports$|rental/ports$|employment/ports$|household/ports$|credit/ports$|insurance/ports$|documents/ports$|documents/config$)|${notCanonical}`,
+  regex: `^\\.\\./(?!engine/|content/(rental-|employment-|household-|credit-|insurance-|mortgage-)?faq-topics$|i18n/client$|calculator/ports$|rental/ports$|employment/ports$|household/ports$|credit/ports$|insurance/ports$|mortgage/ports$|documents/ports$|documents/config$)|${notCanonical}`,
   message:
-    'src/analytics reaches only the engine, the help topics, the translator type, the calculator, rental, employment, household, credit, insurance and documents ports and the documents switch.',
+    'src/analytics reaches only the engine, the help topics, the translator type, the calculator, rental, employment, household, credit, insurance, mortgage and documents ports and the documents switch.',
 };
 // Every review section walks its sheets on the same navigation, tabs and sheet walk, which learn a
 // section's steps from the Flow they are given, so a new section plugs in without touching them.
