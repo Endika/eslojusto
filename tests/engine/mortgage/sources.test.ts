@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MORTGAGE_SOURCES } from '../../../src/engine/mortgage/data/sources';
+import { MORTGAGE_TEXTS } from '../../../src/engine/mortgage/data/texts';
 import { CASE_LAW_RULES } from '../../../src/engine/mortgage/rules';
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
@@ -43,4 +44,17 @@ describe('mortgage case-law sources', () => {
   it('quotes nothing yet: a passage is added only when read word for word', () => {
     for (const s of Object.values(MORTGAGE_SOURCES)) expect(s.quotes).toEqual([]);
   });
+});
+
+describe('mortgage norm passages', () => {
+  it.each(Object.entries(MORTGAGE_TEXTS))(
+    '%s is a statute read word for word in the BOE',
+    (id, s) => {
+      expect(s.id).toBe(id);
+      expect(s).toMatchObject({ basis: 'statute', verified: true });
+      expect(s.lastVerified).toMatch(ISO);
+      expect(s.url).toMatch(/^https:\/\/www\.boe\.es\/buscar\/act\.php\?id=BOE-A-\d{4}-\d+#a/);
+      expect(s.quotes.length).toBeGreaterThan(0);
+    },
+  );
 });

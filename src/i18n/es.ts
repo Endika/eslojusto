@@ -5337,6 +5337,111 @@ export const es = {
   'mortgage.no_js':
     'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
   'mortgage.reviewed': 'Revisado el {fecha}',
+  'mortgage.app_name': 'Revisión de los gastos y las comisiones de tu hipoteca',
+  'mortgage.guide.title': 'Qué dicen la ley y los tribunales de tu hipoteca',
+  'mortgage.guide.lead':
+    'Qué gastos de la constitución pone la ley a cargo del banco desde 2019, qué depende de un juez, qué topes tienen las comisiones por amortizar o pasar a tipo fijo y qué te tienen que dar antes de la escritura, con la norma o la sentencia de la que sale cada cosa.',
+  'mortgage.guide.sources': 'Fuentes',
+  'mortgage.guide.source_lcci': 'Ley 5/2019',
+  'mortgage.guide.who': 'Quién está detrás',
+  'mortgage.guide.rules': 'Normas y criterios',
+  'mortgage.guide.faq': 'Preguntas frecuentes',
+  'mortgage.guide.case_law': 'criterio del {tribunal}',
+  'mortgage.guide.case_law_unverified':
+    'criterio del {tribunal}, sin comprobar en el texto de la sentencia',
+  'mortgage.guide.as_of': 'Lo que han dicho los tribunales, estado a {fecha}.',
+  'mortgage.guide.table.caption': 'Quién paga cada gasto de una escritura desde el 16-06-2019',
+  'mortgage.guide.table.cost': 'Gasto',
+  'mortgage.guide.table.who': 'A cargo de',
+  'mortgage.guide.table.notary': 'Notaría de la escritura del préstamo',
+  'mortgage.guide.table.copies': 'Copias de la escritura',
+  'mortgage.guide.table.registry': 'Registro de la hipoteca',
+  'mortgage.guide.table.agency': 'Gestoría',
+  'mortgage.guide.table.valuation': 'Tasación',
+  'mortgage.guide.table.tax': 'Impuesto del préstamo (AJD)',
+  'mortgage.guide.table.act': 'Acta notarial previa',
+  'mortgage.guide.table.lender': 'El banco',
+  'mortgage.guide.table.requester': 'Quien las pide',
+  'mortgage.guide.table.borrower': 'Quien pide el préstamo',
+  'mortgage.guide.table.lender_since': 'El banco, desde el 10-11-2018',
+  'mortgage.guide.table.nobody': 'Nadie: no se cobra',
+  'mortgage.guide.law.title': 'Desde el 16-06-2019, lo dice la ley',
+  'mortgage.guide.law.p1':
+    'Para las escrituras desde el 16-06-2019, la Ley 5/2019 reparte los gastos de constituir la hipoteca: el banco paga la notaría de la escritura del préstamo, el registro y la gestoría; la tasación la paga quien pide el préstamo, y cada copia, quien la pide (art. 14.1.e). Sus reglas son imperativas: un acuerdo con el banco no las cambia (art. 3).',
+  'mortgage.guide.law.p2':
+    'Es una regla de la ley y no depende de un juez: si la factura de un gasto del préstamo muestra que lo pagaste tú, la revisión da la cifra en el total «Por ley». El acta notarial previa no se cobra (art. 15.8): si la pagaste, la revisión lo cuenta aparte, como algo que no debía cobrarse.',
+  'mortgage.guide.tax.title': 'El impuesto del préstamo (AJD)',
+  'mortgage.guide.tax.p1':
+    'Desde el 10-11-2018, el impuesto de actos jurídicos documentados de la escritura del préstamo lo paga el banco: el Real Decreto-ley 17/2018 cambió el art. 29 de la ley del impuesto para las escrituras desde ese día. En las anteriores, esta revisión no lo cuenta. El impuesto de la compraventa de la vivienda es otro y no entra aquí.',
+  'mortgage.guide.before_2019.title': 'Antes del 16-06-2019, lo que han dicho los tribunales',
+  'mortgage.guide.before_2019.p1':
+    'Para las escrituras anteriores no hay una ley que reparta estos gastos. Cuando la escritura de un consumidor tenía una cláusula que ponía los gastos a su cargo, el Tribunal Supremo aplica un reparto: al banco le correspondían la mitad de la notaría de la escritura del préstamo y todo el registro de la hipoteca, la gestoría y la tasación (STS 35/2021 y STS 816/2023). Antes, en 2020, el Tribunal de Justicia de la Unión Europea dijo que, si un juez anula esa cláusula, lo pagado por ella se devuelve salvo lo que el Derecho nacional, sin la cláusula, ponga a cargo del consumidor (C-224/19).',
+  'mortgage.guide.before_2019.p2':
+    'Es lo que han dicho los tribunales, no la ley: para que se devuelva hace falta que el banco lo acepte o que un juez anule la cláusula de gastos. Y es solo para quien pidió la hipoteca como particular, para su casa.',
+  'mortgage.guide.before_2019.p3':
+    'Esas dos sentencias del Tribunal Supremo aún no se han comprobado en su texto, así que, por ahora, la revisión explica el reparto factura a factura sin dar cifra. Según el Tribunal Supremo, a lo que se devuelve se suma el interés legal desde el día de cada pago (art. 1303 del Código Civil); esa sentencia tampoco se ha comprobado aún, y la revisión no lo calcula.',
+  'mortgage.guide.floor.title': 'La cláusula suelo',
+  'mortgage.guide.floor.p1':
+    'Una cláusula suelo fija un tipo mínimo: aunque el índice baje, el interés no baja de ahí. Desde el 16-06-2019, la ley prohíbe ese límite en las hipotecas de tipo variable (art. 21.3); que el interés nunca sea negativo sí lo permite (art. 21.4).',
+  'mortgage.guide.floor.p2':
+    'Para las escrituras anteriores, lo que hay es criterio de los tribunales. El Tribunal de Justicia de la Unión Europea dijo en 2016 que, cuando un juez anula una cláusula suelo, lo que se devuelve no puede limitarse a lo pagado después de su sentencia (C-154/15), y en 2020, que una cláusula suelo puede cambiarse por un acuerdo posterior si se acepta de forma libre e informada (C-452/18).',
+  'mortgage.guide.floor.p3':
+    'Si tu cláusula se explicó con claridad lo examina un juez en cada caso: esta revisión te dice si aparece en tu escritura, pero no la valora ni calcula lo que supuso en tus cuotas.',
+  'mortgage.guide.irph.title': 'El IRPH',
+  'mortgage.guide.irph.p1':
+    'El IRPH, el índice de referencia de préstamos hipotecarios, es un índice oficial con el que algunas hipotecas calculan su tipo variable en lugar del Euríbor.',
+  'mortgage.guide.irph.p2':
+    'Según el Tribunal de Justicia de la Unión Europea, el juez examina caso por caso si se explicó con claridad cómo se calculaba el interés y qué suponía, y cuenta, por ejemplo, si se dio información sobre cómo había evolucionado el índice (C-125/18 y C-265/22). Hay más preguntas pendientes ante ese tribunal. Depende de cada caso y de un juez: esta revisión no lo valora ni calcula ningún importe.',
+  'mortgage.guide.fees.title': 'Comisiones por amortizar o pasar a tipo fijo',
+  'mortgage.guide.fees.p1':
+    'Desde el 16-06-2019, con tipo variable la escritura puede fijar una compensación por amortizar antes de tiempo con un tope del 0,15 % de lo amortizado en los 5 primeros años o del 0,25 % en los 3 primeros, y después ninguna (art. 23.5). Con tipo fijo, el tope es del 2 % en los 10 primeros años y del 1,5 % después (art. 23.7). En todos los casos, nunca más que la pérdida que sufre el banco (art. 23.8), que aquí no se puede calcular.',
+  'mortgage.guide.fees.p2':
+    'Por pasar de variable a fijo, el tope es hoy del 0,05 % de lo amortizado en los 3 primeros años del préstamo; sin amortizar capital no se puede cobrar nada, y pasados esos 3 años, tampoco (art. 23.6). Entre el 24-11-2022 y el 31-12-2024 no se podía cobrar compensación por amortizar una hipoteca de tipo variable ni por pasarla a fijo (Real Decreto-ley 19/2022, disposición adicional primera).',
+  'mortgage.guide.fees.p3':
+    'Para escrituras entre el 09-12-2007 y el 15-06-2019, la Ley 41/2007 fija como tope el 0,5 % de lo amortizado en los 5 primeros años y el 0,25 % después (art. 8); con tipo fijo, o si el tipo se revisa con menos frecuencia que cada 12 meses, permite además la compensación por riesgo de tipo de interés que fije la escritura (art. 9). Si el art. 23.6 y la ventana de 2022 a 2024 alcanzan a estas escrituras no está claro: la revisión da las dos cuentas y el total cuenta la más baja. Las anteriores al 09-12-2007 las regía otra norma, que aquí no se comprueba.',
+  'mortgage.guide.fein.title': 'Lo que te tienen que dar antes de la escritura',
+  'mortgage.guide.fein.p1':
+    'Desde el 16-06-2019, el banco te entrega, al menos 10 días naturales antes de la escritura, la ficha europea de información normalizada (FEIN), que es una oferta vinculante; la ficha de advertencias estandarizadas (FiAE); si el tipo es variable, un documento con las cuotas en distintos escenarios; el proyecto de contrato, con todos los gastos desglosados, y el reparto de los gastos (art. 14.1).',
+  'mortgage.guide.fein.p2':
+    'Como tarde el día anterior a la escritura, vas al notario que elijas, que te asesora sobre cada cláusula de esas fichas y lo deja en un acta. Sin esa acta no se puede hacer la escritura, que la menciona, y el acta no se cobra (art. 15).',
+  'mortgage.guide.limits.title': 'Desde cuándo cuentan los plazos',
+  'mortgage.guide.limits.p1':
+    'Según el Tribunal de Justicia de la Unión Europea, el plazo para pedir lo pagado por una cláusula de gastos puede empezar a contar cuando es firme la sentencia que la anula, salvo que el banco pruebe que ya se podía conocer antes que la cláusula no era válida (C-561/21). El Tribunal Supremo lo aplica a los gastos de la hipoteca (STS 857/2024).',
+  'mortgage.guide.limits.p2':
+    'Es la regla, no un cálculo de tu caso: esta revisión no dice si en tu caso ha pasado algún plazo.',
+  'mortgage.guide.prior_step.title': 'El paso previo del art. 439 bis',
+  'mortgage.guide.prior_step.p1':
+    'Desde el 03-04-2025, antes de acudir a un juzgado por cláusulas de una hipoteca, la ley regula un paso previo del consumidor ante el banco (art. 439 bis de la Ley de Enjuiciamiento Civil): el banco hace un cálculo desglosado, con los intereses, el plazo para llegar a un acuerdo es de un mes como máximo y no se cobra.',
+  'mortgage.guide.prior_step.p2':
+    'Las cartas de esta web no están pensadas para ese paso. En el enlace tienes el texto de la ley.',
+  'mortgage.guide.channels.title': 'Dónde informarte gratis',
+  'mortgage.guide.channels.p1':
+    'Solo canales oficiales y gratuitos: esta página no enlaza a despachos ni a empresas que gestionan casos.',
+  'mortgage.guide.unchecked.title': 'Lo que la revisión no mira',
+  'mortgage.faq.expenses': '¿Quién paga la notaría, el registro, la gestoría y la tasación?',
+  'mortgage.faq.expenses_answer':
+    'Si tu escritura es del 16-06-2019 o posterior, lo dice la ley: el banco paga la notaría de la escritura del préstamo, el registro y la gestoría; la tasación la paga quien pide el préstamo, y cada copia, quien la pide (art. 14.1.e de la Ley 5/2019). Si es anterior, no hay una ley que los reparta: lo que hay es el reparto que aplica el Tribunal Supremo cuando la escritura de un consumidor ponía los gastos a su cargo, y para que se devuelva hace falta que el banco lo acepte o que un juez anule la cláusula.',
+  'mortgage.faq.before_2019': '¿Qué cambia si mi hipoteca es anterior a 2019?',
+  'mortgage.faq.before_2019_answer':
+    'La Ley 5/2019 se aplica a las escrituras desde el 16-06-2019. En las anteriores, el reparto de los gastos sale de lo que han dicho los tribunales: según el Tribunal Supremo, si eras consumidor y tu escritura ponía los gastos a tu cargo, al banco le correspondían la mitad de la notaría y todo el registro, la gestoría y la tasación. Hace falta que el banco lo acepte o que un juez anule la cláusula. Las sentencias en que se apoya aún no se han comprobado en su texto, así que, por ahora, la revisión lo explica sin dar cifra. Las comisiones por amortizar de las escrituras desde el 09-12-2007 tienen los topes de la Ley 41/2007.',
+  'mortgage.faq.tax': '¿Quién paga el impuesto (AJD)?',
+  'mortgage.faq.tax_answer':
+    'El impuesto de actos jurídicos documentados de la escritura del préstamo lo paga el banco en las escrituras desde el 10-11-2018 (art. 29 de la ley del impuesto, en la redacción del Real Decreto-ley 17/2018). En las anteriores, esta revisión no lo cuenta. El impuesto de la compraventa de la vivienda es otro y no entra aquí.',
+  'mortgage.faq.prepayment': '¿Cuánto me pueden cobrar por amortizar?',
+  'mortgage.faq.prepayment_answer':
+    'Depende de la fecha de la escritura y del tipo. Desde el 16-06-2019: con tipo variable, como mucho el 0,15 % de lo amortizado en los 5 primeros años o el 0,25 % en los 3 primeros, según diga la escritura, y después nada; con tipo fijo, el 2 % en los 10 primeros años y el 1,5 % después (art. 23 de la Ley 5/2019), y nunca más que la pérdida que sufre el banco. Entre el 09-12-2007 y el 15-06-2019, la Ley 41/2007 fija el 0,5 % en los 5 primeros años y el 0,25 % después. Entre el 24-11-2022 y el 31-12-2024 no se podía cobrar nada por amortizar una hipoteca de tipo variable; si eso alcanza a las escrituras anteriores a 2019 no está claro.',
+  'mortgage.faq.floor': '¿Qué es una cláusula suelo?',
+  'mortgage.faq.floor_answer':
+    'Una cláusula que fija un tipo mínimo: aunque el índice baje, el interés de tu hipoteca no baja de ahí. Desde el 16-06-2019, la ley la prohíbe en las hipotecas de tipo variable (art. 21.3 de la Ley 5/2019). En las anteriores, si se explicó con claridad lo examina un juez en cada caso, según lo que han dicho los tribunales. Esta revisión te dice si aparece en tu escritura, pero no la valora ni calcula lo que supuso en tus cuotas.',
+  'mortgage.faq.irph': '¿Qué es el IRPH?',
+  'mortgage.faq.irph_answer':
+    'El índice de referencia de préstamos hipotecarios: un índice oficial con el que algunas hipotecas calculan su tipo variable en lugar del Euríbor. Según el Tribunal de Justicia de la Unión Europea, el juez examina caso por caso si se explicó con claridad, y hay más preguntas pendientes ante ese tribunal. Esta revisión te dice si tu hipoteca lo usa, con la fecha de lo que se sabe, pero no lo valora ni calcula ningún importe.',
+  'mortgage.faq.documents': '¿Qué pasa con mis documentos?',
+  'mortgage.faq.documents_answer':
+    'Si subes páginas de tu escritura y tus facturas, se envían cifradas a un servidor de Amazon Web Services en España, que se las pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo indica qué es cada página y copia solo los datos que necesita el formulario y el texto de cada cláusula, para que lo confirmes. Una escritura lleva DNI, domicilios, datos de avalistas y, si hay un seguro de vida vinculado, a veces datos de salud: el modelo tiene orden de no copiar nombres de personas, DNI, NIE, domicilios, teléfonos, correos, cuentas ni firmas, ni nada sobre salud, y el servidor descarta cualquier texto copiado que aún lleve un DNI, una cuenta, un correo o un teléfono. No se guarda nada. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
+  'mortgage.faq.pass': '¿Qué incluye el pase de 4,99 €?',
+  'mortgage.faq.pass_answer':
+    'El pase vale para cualquier revisión de la web durante 7 días, solo en el navegador con el que pagas. Aquí se ofrece solo si algún gasto o comisión de tu revisión tiene cifra: las cláusulas solas no lo abren. Te deja descargar el informe en PDF, con cada gasto y comisión, su cuenta y cada norma y sentencia con su estado, y, si tu revisión tiene importes que fija la ley, la carta que pide al banco que los revise. La carta que pide la documentación de tu hipoteca es gratis. En otro dispositivo, en una ventana privada o si borras los datos de navegación, el pase se pierde.',
   'mortgage.documents.start_help':
     'Puedes subir tu escritura y tus facturas para rellenar los datos con lo que se lea en ellas, o escribirlos tú. Antes de revisar nada, confirmas cada dato y lees cada cláusula tal como está escrita.',
   'mortgage.documents.upload':

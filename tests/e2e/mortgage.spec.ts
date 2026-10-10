@@ -428,9 +428,82 @@ test('the page shows when it was reviewed and makes no request', async ({ page }
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Los gastos, las comisiones y las cláusulas de tu hipoteca',
   );
-  await expect(page.getByText(/^Revisado el /)).toBeVisible();
+  await expect(page.locator('.desk__reviewed')).toContainText('Revisado el 10 de octubre de 2026');
+  await expect(page.locator('.desk__reviewed time')).toHaveAttribute('datetime', TODAY);
   await page.goto('');
   await page.getByRole('link', { name: 'Hipoteca', exact: true }).click();
   await expect(page).toHaveURL(/hipoteca\/(#hipoteca)?$/);
   expect(requests).toEqual([]);
+});
+
+test('the page has its title, heading, canonical, JSON-LD, guide and questions', async ({
+  page,
+}) => {
+  await open(page, { width: 1280, height: 800 });
+  const title = await page.title();
+  expect(title).toBe('Gastos y comisiones de tu hipoteca: qué dice la ley');
+  expect([...title].length).toBeLessThanOrEqual(60);
+  const description = await page.locator('meta[name="description"]').getAttribute('content');
+  expect(description).toContain('Tribunal Supremo');
+  expect([...(description ?? '')].length).toBeLessThanOrEqual(155);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://eslojusto.es/hipoteca/',
+  );
+  const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
+  const graph = JSON.parse(jsonLd ?? '{}') as {
+    '@graph': { '@type': string; name?: string; mainEntity?: { name: string }[] }[];
+  };
+  expect(graph['@graph'].map((n) => n['@type'])).toEqual([
+    'WebApplication',
+    'BreadcrumbList',
+    'FAQPage',
+  ]);
+  expect(graph['@graph'][0]?.name).toBe('Revisión de los gastos y las comisiones de tu hipoteca');
+  const questions = graph['@graph'][2]?.mainEntity?.map((q) => q.name) ?? [];
+  expect(questions).toEqual([
+    '¿Quién paga la notaría, el registro, la gestoría y la tasación?',
+    '¿Qué cambia si mi hipoteca es anterior a 2019?',
+    '¿Quién paga el impuesto (AJD)?',
+    '¿Cuánto me pueden cobrar por amortizar?',
+    '¿Qué es una cláusula suelo?',
+    '¿Qué es el IRPH?',
+  ]);
+  await expect(page.locator('.faq-item summary')).toHaveText(questions);
+
+  const guide = page.locator('.guide');
+  await expect(guide.locator('.guide__sources')).toContainText('Revisado el 10 de octubre de 2026');
+  await expect(
+    guide.getByRole('heading', { name: 'Desde el 16-06-2019, lo dice la ley' }),
+  ).toBeVisible();
+  await expect(guide.getByRole('table')).toContainText('Nadie: no se cobra');
+  // Quotes of the law only inside <LegalQuote>, each with its source.
+  await expect(guide.locator('[data-legal-quote]')).toHaveCount(6);
+  await expect(guide).toContainText(
+    'Fuente: Ley del Impuesto sobre Transmisiones Patrimoniales y Actos Jurídicos Documentados, art. 29',
+  );
+  // What the courts have said is dated and never shown as law.
+  await expect(guide.locator('[data-guide="before_2019"]')).toContainText(
+    'Lo que han dicho los tribunales, estado a 07-10-2026.',
+  );
+  await expect(guide).toContainText(
+    'STS 35/2021, de 27 de enero (Pleno) · criterio del Tribunal Supremo, Sala de lo Civil, sin comprobar en el texto de la sentencia',
+  );
+  await expect(guide).toContainText(
+    'asuntos acumulados C-154/15, C-307/15 y C-308/15 · criterio del Tribunal de Justicia de la Unión Europea',
+  );
+  await expect(guide).toContainText('El Servicio de Reclamaciones del Banco de España.');
+  await guide.getByText('¿Cuánto me pueden cobrar por amortizar?').click();
+  await expect(page.locator('#faq-hipoteca-amortizar')).toContainText('0,15 %');
+});
+
+test('the guide and its open questions fit a 360 px screen', async ({ page }) => {
+  await open(page, { width: 360, height: 640 });
+  const questions = page.locator('.faq-item');
+  await expect(questions.first()).toBeVisible();
+  for (const q of await questions.all()) {
+    await q.locator('summary').click();
+    await expect(q).toHaveAttribute('open', '');
+  }
+  await noSideScroll(page);
 });

@@ -290,7 +290,9 @@ test('a full pack fills every sheet, each clause shown word for word to be confi
   await expect(notes(page).filter({ hasText: /^No se ha encontrado/ })).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
-  await expect(page.getByRole('heading', { name: 'Tu hipoteca', level: 2 })).toBeFocused();
+  await expect(
+    page.getByRole('heading', { name: 'Tu hipoteca', level: 2, exact: true }),
+  ).toBeFocused();
   await expect(sheet(page, 'Tu hipoteca').getByLabel('Hipoteca sobre una vivienda')).toBeChecked();
   await next(page);
   await expect(sheet(page, 'Quién y sobre qué').getByLabel('Yo, como persona')).toBeChecked();
@@ -433,7 +435,9 @@ test('an invoice that bills the purchase and the loan together is marked as such
     }),
   ).toHaveCount(1);
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
-  await expect(page.getByRole('heading', { name: 'Tu hipoteca', level: 2 })).toBeFocused();
+  await expect(
+    page.getByRole('heading', { name: 'Tu hipoteca', level: 2, exact: true }),
+  ).toBeFocused();
   // The invoice sheets open once the door's answers are given; the read gave the rest.
   const form = page.locator('#mortgage');
   await expect(form.locator('[name="notaryLoan"]')).toHaveValue('1.480,00');
