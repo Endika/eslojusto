@@ -25,6 +25,9 @@ const insuranceSpecs = /[\\/]insurance[^\\/]*\.spec\.ts$/;
 // The credit project needs a build with /financiacion/, which a normal build leaves out.
 const credit = process.env['TEST_CREDIT'] === '1';
 const creditSpecs = /[\\/]credit[^\\/]*\.spec\.ts$/;
+// The mortgage project needs a build with /hipoteca/, which a normal build leaves out.
+const mortgage = process.env['TEST_MORTGAGE'] === '1';
+const mortgageSpecs = /[\\/]mortgage[^\\/]*\.spec\.ts$/;
 const optInSpecs = [
   /(rtl|analytics|documents)\.spec\.ts/,
   rentalSpecs,
@@ -33,6 +36,7 @@ const optInSpecs = [
   householdSpecs,
   insuranceSpecs,
   creditSpecs,
+  mortgageSpecs,
 ];
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
@@ -48,6 +52,7 @@ const buildEnv = {
   ...(household ? { PUBLIC_HOUSEHOLD: '1' } : {}),
   ...(insurance || documents ? { PUBLIC_INSURANCE: '1' } : {}),
   ...(credit || documents ? { PUBLIC_CREDIT: '1' } : {}),
+  ...(mortgage ? { PUBLIC_MORTGAGE: '1' } : {}),
   ...(analytics || household || insurance || credit ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
     ? {
@@ -136,6 +141,15 @@ export default defineConfig({
             testMatch: creditSpecs,
             // Reading documents on /financiacion/ needs the documents project's build.
             testIgnore: /documents\.spec\.ts/,
+          },
+        ]
+      : []),
+    ...(mortgage
+      ? [
+          {
+            name: 'mortgage',
+            use: { ...devices['Desktop Chrome'] },
+            testMatch: mortgageSpecs,
           },
         ]
       : []),
