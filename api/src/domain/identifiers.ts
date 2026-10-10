@@ -43,3 +43,11 @@ const PLATES: readonly RegExp[] = [
 ];
 
 export const hasNumberPlate = (text: string): boolean => PLATES.some((p) => p.test(text));
+
+// A natural person's name as a deed introduces it: a courtesy title before a capitalised word
+// («Don Fulano», «D.ª Mengana», «Sra. Zutana»). Only the mortgage review looks for it, since a
+// deed names the borrowers and their guarantors that way; «D. [nombre]» says nothing.
+const PERSON_TITLE =
+  /(?<![\p{L}\p{N}])(?:Don|Doña|Dona|D\.|Dª|D\.ª|Dña\.?|Sr\.|Sra\.)\s+\p{Lu}\p{Ll}+/u;
+
+export const hasPersonTitle = (text: string): boolean => PERSON_TITLE.test(text);

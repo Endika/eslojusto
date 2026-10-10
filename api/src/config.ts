@@ -8,6 +8,7 @@ export const CHECKOUT_PATHS = {
   rental: '/alquiler/',
   employment: '/contrato/',
   credit: '/financiacion/',
+  mortgage: '/hipoteca/',
 } as const;
 
 // EU geographic inference profiles, as listed by `aws bedrock list-inference-profiles --region eu-south-2`.

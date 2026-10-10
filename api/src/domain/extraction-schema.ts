@@ -23,6 +23,12 @@ import {
   type InsuranceSectionKind,
 } from './insurance-schema';
 import {
+  MORTGAGE_READABILITY,
+  MORTGAGE_SCHEMA,
+  MORTGAGE_SECTIONS,
+  type MortgageSectionKind,
+} from './mortgage-schema';
+import {
   RENTAL_READABILITY,
   RENTAL_SCHEMA,
   RENTAL_SECTIONS,
@@ -69,6 +75,8 @@ export type FieldType =
   | { readonly type: 'decimal'; readonly min: number; readonly max: number }
   // 0 to 100, at most two decimals.
   | { readonly type: 'percent' }
+  // An interest rate or its spread: 0 to 100, at most three decimals (Euríbor + 0,875 %).
+  | { readonly type: 'rate' }
   // YYYY-MM.
   | { readonly type: 'month' }
   | { readonly type: 'boolean' }
@@ -303,7 +311,8 @@ export type SectionKind =
   | RentalSectionKind
   | EmploymentSectionKind
   | CreditSectionKind
-  | InsuranceSectionKind;
+  | InsuranceSectionKind
+  | MortgageSectionKind;
 export const SECTION_KINDS = Object.keys(SECTIONS) as readonly FinalPaySectionKind[];
 
 export const PAGES_DESCRIPTION =
@@ -345,7 +354,8 @@ export const ALL_READABILITY = [
   | (typeof CREDIT_READABILITY)[number]
   | (typeof INSURANCE_READABILITY)[number]
 )[];
-export type Readability = (typeof ALL_READABILITY)[number];
+// The mortgage review's reason joins that list once the site reads its documents.
+export type Readability = (typeof ALL_READABILITY)[number] | (typeof MORTGAGE_READABILITY)[number];
 
 export const READABILITY_DESCRIPTION =
   'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_labour_document (not about a job), foreign_jurisdiction (an employment document from another country, where Spanish law does not apply; never because of its language), unknown_format (about a job, but no kind of document you know).';
@@ -387,6 +397,7 @@ export const REVIEW_SCHEMAS: Readonly<Record<ReviewKind, ReviewSchema>> = {
   },
   credit: CREDIT_SCHEMA,
   insurance: INSURANCE_SCHEMA,
+  mortgage: MORTGAGE_SCHEMA,
 };
 
 // Every review's sections, by kind.
@@ -396,6 +407,7 @@ export const ALL_SECTIONS: Readonly<Record<SectionKind, SectionSchema>> = {
   ...EMPLOYMENT_SECTIONS,
   ...CREDIT_SECTIONS,
   ...INSURANCE_SECTIONS,
+  ...MORTGAGE_SECTIONS,
 };
 
 export const sectionsOf = (review: ReviewKind): readonly [SectionKind, SectionSchema][] =>
@@ -425,6 +437,7 @@ function valueSchema(type: FieldType): JsonSchema {
     case 'decimal':
       return { type: 'number', minimum: type.min, maximum: type.max };
     case 'percent':
+    case 'rate':
       return { type: 'number', minimum: 0, maximum: 100 };
     case 'month':
       return { type: 'string', pattern: '^[0-9]{4}-[0-9]{2}$' };

@@ -51,6 +51,21 @@ export const INSURANCE_PAGE_KINDS = [
   'insurance_renewal_notice',
   'other',
 ] as const;
+// A mortgage review's documents: the deed, the bills of the deed's day and what came before and
+// after it. The purchase's own deed is `other`; its invoices keep their kind and say what they bill.
+export const MORTGAGE_PAGE_KINDS = [
+  'mortgage_deed',
+  'notary_invoice',
+  'registry_invoice',
+  'agency_invoice_mortgage',
+  'valuation_invoice',
+  'ajd_form',
+  'fein',
+  'fiae',
+  'transparency_deed',
+  'prepayment_statement',
+  'other',
+] as const;
 // Every kind the final pay, the rental and the employment review can give a page.
 export const PAGE_KINDS = [
   'settlement_proposal',
@@ -89,7 +104,8 @@ export const ALL_PAGE_KINDS = [
   | (typeof CREDIT_PAGE_KINDS)[number]
   | (typeof INSURANCE_PAGE_KINDS)[number]
 )[];
-export type PageKind = (typeof ALL_PAGE_KINDS)[number];
+// The mortgage review's kinds join that list once the site reads its documents.
+export type PageKind = (typeof ALL_PAGE_KINDS)[number] | (typeof MORTGAGE_PAGE_KINDS)[number];
 // The documents a value can come from.
 export type SourceKind = Exclude<PageKind, 'other'>;
 

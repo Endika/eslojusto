@@ -132,6 +132,7 @@ const REVIEW_LABELS: Readonly<Record<string, string>> = {
   employment: 'contrato',
   credit: 'financiacion',
   insurance: 'seguros',
+  mortgage: 'hipoteca',
 };
 const byReview = 'fields coalesce(review, "final_pay") as revision';
 
@@ -303,6 +304,7 @@ export function addDashboard(
     ['not_rental_document', 'noAlquiler'],
     ['not_credit_document', 'noCredito'],
     ['not_insurance_document', 'noSeguro'],
+    ['not_mortgage_document', 'noHipoteca'],
     ['foreign_jurisdiction', 'otroPais'],
     ['unknown_format', 'formatoDesconocido'],
     ['ok', 'legibleSinDatos'],

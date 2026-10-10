@@ -85,7 +85,11 @@ function isCalendarDate(v: string): boolean {
 const isMonth = (v: unknown): v is string =>
   typeof v === 'string' && /^\d{4}-\d{2}$/.test(v) && isCalendarDate(`${v}-01`);
 
-const hasAtMostTwoDecimals = (n: number): boolean => Math.abs(n * 100 - Math.round(n * 100)) < 1e-6;
+const hasAtMostDecimals = (n: number, decimals: number): boolean => {
+  const scaled = n * 10 ** decimals;
+  return Math.abs(scaled - Math.round(scaled)) < 1e-6;
+};
+const hasAtMostTwoDecimals = (n: number): boolean => hasAtMostDecimals(n, 2);
 
 const isWhole = (v: unknown, min: number, max: number): v is number =>
   typeof v === 'number' && Number.isInteger(v) && v >= min && v <= max;
@@ -124,6 +128,10 @@ function isValidValue(type: FieldType, v: unknown): v is ExtractedValue {
     case 'percent':
       return (
         typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100 && hasAtMostTwoDecimals(v)
+      );
+    case 'rate':
+      return (
+        typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100 && hasAtMostDecimals(v, 3)
       );
     case 'month':
       return isMonth(v);
