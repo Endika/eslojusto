@@ -124,7 +124,7 @@ function isValidValue(type: FieldType, v: unknown): v is ExtractedValue {
         Number.isFinite(v) &&
         v >= type.min &&
         v <= type.max &&
-        hasAtMostTwoDecimals(v)
+        hasAtMostDecimals(v, type.decimals ?? 2)
       );
     case 'percent':
       return (

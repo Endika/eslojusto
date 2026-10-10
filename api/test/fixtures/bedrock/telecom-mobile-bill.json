@@ -1,0 +1,82 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "telecom_bill",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "telecom_bill",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "telecom_bill": {
+          "bills": [
+            {
+              "document": 1,
+              "operatorName": "Operador Ficticio de Telecomunicaciones, S.A.",
+              "issuedOn": "2026-09-01",
+              "periodFrom": "2026-08-01",
+              "periodTo": "2026-08-31",
+              "vatAmount": 25.68,
+              "total": 147.97,
+              "confidence": "high"
+            }
+          ],
+          "lines": [
+            {
+              "document": 1,
+              "concept": "Tarifa Móvil Ilimitada",
+              "kind": "fixed_fee",
+              "from": "2026-08-01",
+              "to": "2026-08-31",
+              "amount": 20.66,
+              "confidence": "high"
+            },
+            {
+              "document": 1,
+              "concept": "Mensajes premium suscripción juegos",
+              "kind": "premium_rate",
+              "amount": 1.63,
+              "confidence": "high"
+            },
+            {
+              "document": 1,
+              "concept": "Penalización por baja anticipada",
+              "kind": "penalty",
+              "amount": 100,
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 9400,
+    "output_tokens": 600
+  }
+}

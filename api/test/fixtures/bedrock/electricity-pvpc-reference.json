@@ -1,0 +1,129 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "electricity_bill",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "electricity_bill",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "electricity_bill": {
+          "bills": [
+            {
+              "document": 1,
+              "retailerName": "Comercializadora de Referencia Ficticia, S.A.U.",
+              "market": "pvpc",
+              "invoiceNumber": "PV26-0000123",
+              "issuedOn": "2026-07-02",
+              "dueOn": "2026-07-09",
+              "readingFrom": "2026-05-31",
+              "readingTo": "2026-06-30",
+              "billedDays": 30,
+              "readingKind": "real",
+              "supplyFingerprint": "ES 0000 0000 0000 0000 AA 0F",
+              "postcode": "28001",
+              "accessTariff": "2.0TD",
+              "selfConsumption": "none",
+              "contractedPowerP1": 4.6,
+              "contractedPowerP2": 4.6,
+              "maxPowerUsedP1": 3.412,
+              "maxPowerUsedP2": 2.105,
+              "tollsAndChargesPower": 10.75,
+              "tollsAndChargesEnergy": 10.22,
+              "socialBonusFunding": 0.6,
+              "electricityTaxBase": 44.12,
+              "electricityTaxPercent": 5.11269632,
+              "electricityTaxAmount": 2.26,
+              "meterAmount": 0.8,
+              "meterDays": 30,
+              "meterPhase": "single",
+              "vatBase": 47.18,
+              "vatPercent": 21,
+              "vatAmount": 9.91,
+              "total": 57.09,
+              "confidence": "high"
+            }
+          ],
+          "powerLines": [
+            {
+              "document": 1,
+              "period": "p1",
+              "kw": 4.6,
+              "price": 30.817413,
+              "unit": "per_kw_year",
+              "days": 30,
+              "amount": 11.65,
+              "confidence": "high"
+            },
+            {
+              "document": 1,
+              "period": "p2",
+              "kw": 4.6,
+              "price": 0.725423,
+              "unit": "per_kw_year",
+              "days": 30,
+              "amount": 0.27,
+              "confidence": "high"
+            }
+          ],
+          "energyLines": [
+            {
+              "document": 1,
+              "period": "p1",
+              "kwh": 80,
+              "price": 0.18,
+              "amount": 14.4,
+              "confidence": "high"
+            },
+            {
+              "document": 1,
+              "period": "p2",
+              "kwh": 70,
+              "price": 0.12,
+              "amount": 8.4,
+              "confidence": "high"
+            },
+            {
+              "document": 1,
+              "period": "p3",
+              "kwh": 110,
+              "price": 0.08,
+              "amount": 8.8,
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 9800,
+    "output_tokens": 1400
+  }
+}

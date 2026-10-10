@@ -1,0 +1,202 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "electricity_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "electricity_bill",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "electricity_contract": {
+          "signedOn": {
+            "value": "2026-05-20",
+            "confidence": "high"
+          },
+          "retailerName": {
+            "value": "Energía Imaginaria, S.L.",
+            "confidence": "high"
+          },
+          "priceType": {
+            "value": "fixed",
+            "confidence": "high"
+          },
+          "durationMonths": {
+            "value": 12,
+            "confidence": "high"
+          },
+          "renews": {
+            "value": true,
+            "confidence": "high"
+          },
+          "exitPenaltyText": {
+            "value": "Si el cliente resuelve el contrato antes de su vencimiento abonará una penalización del 5 % del precio del contrato por la energía estimada pendiente de suministro.",
+            "confidence": "high"
+          },
+          "agreedPrices": [
+            {
+              "term": "power",
+              "period": "p1",
+              "price": 0.09,
+              "unit": "per_kw_day",
+              "confidence": "high"
+            },
+            {
+              "term": "power",
+              "period": "p2",
+              "price": 0.01,
+              "unit": "per_kw_day",
+              "confidence": "high"
+            },
+            {
+              "term": "energy",
+              "period": "p1",
+              "price": 0.129876,
+              "unit": "per_kwh",
+              "confidence": "high"
+            }
+          ],
+          "services": [
+            {
+              "concept": "Servicio Mantenimiento Hogar Plus",
+              "serviceLabel": "maintenance",
+              "amount": 6.95,
+              "confidence": "high"
+            }
+          ]
+        },
+        "electricity_bill": {
+          "bills": [
+            {
+              "document": 2,
+              "retailerName": "Energía Imaginaria, S.L.",
+              "market": "free",
+              "invoiceNumber": "EI-2026-07-0456",
+              "issuedOn": "2026-08-03",
+              "dueOn": "2026-08-10",
+              "readingFrom": "2026-06-30",
+              "readingTo": "2026-07-31",
+              "billedDays": 31,
+              "readingKind": "estimated",
+              "supplyFingerprint": "ES0000111122223333BB",
+              "postcode": "46001",
+              "accessTariff": "2.0TD",
+              "selfConsumption": "none",
+              "contractedPowerP1": 3.45,
+              "contractedPowerP2": 3.45,
+              "maxPowerUsedP1": 2.874,
+              "maxPowerUsedP2": 1.502,
+              "socialBonusFunding": 0.77,
+              "electricityTaxBase": 55.63,
+              "electricityTaxPercent": 5.11269632,
+              "electricityTaxAmount": 2.84,
+              "meterAmount": 0.83,
+              "meterDays": 31,
+              "meterPhase": "single",
+              "vatBase": 64.25,
+              "vatPercent": 21,
+              "vatAmount": 13.49,
+              "total": 77.74,
+              "commitmentEndOn": "2027-05-31",
+              "confidence": "high"
+            }
+          ],
+          "powerLines": [
+            {
+              "document": 2,
+              "period": "p1",
+              "kw": 3.45,
+              "price": 0.09,
+              "unit": "per_kw_day",
+              "days": 31,
+              "amount": 9.63,
+              "confidence": "high"
+            },
+            {
+              "document": 2,
+              "period": "p2",
+              "kw": 3.45,
+              "price": 0.01,
+              "unit": "per_kw_day",
+              "days": 31,
+              "amount": 1.07,
+              "confidence": "high"
+            }
+          ],
+          "energyLines": [
+            {
+              "document": 2,
+              "period": "p1",
+              "kwh": 100,
+              "price": 0.129876,
+              "amount": 12.99,
+              "confidence": "high"
+            },
+            {
+              "document": 2,
+              "period": "p2",
+              "kwh": 90,
+              "price": 0.129876,
+              "amount": 11.69,
+              "confidence": "high"
+            },
+            {
+              "document": 2,
+              "period": "p3",
+              "kwh": 150,
+              "price": 0.129876,
+              "amount": 19.48,
+              "confidence": "high"
+            }
+          ],
+          "otherLines": [
+            {
+              "document": 2,
+              "concept": "Servicio Mantenimiento Hogar Plus",
+              "kind": "service",
+              "serviceLabel": "maintenance",
+              "amount": 6.95,
+              "confidence": "high"
+            },
+            {
+              "document": 2,
+              "concept": "Descuento bienvenida",
+              "kind": "discount",
+              "amount": 2,
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 8600,
+    "output_tokens": 1500
+  }
+}

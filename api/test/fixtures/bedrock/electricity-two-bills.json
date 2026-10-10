@@ -1,0 +1,119 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "electricity_bill",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "electricity_bill",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "electricity_bill",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 4,
+            "kind": "electricity_bill",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "electricity_bill": {
+          "bills": [
+            {
+              "document": 1,
+              "retailerName": "Energía Imaginaria, S.L.",
+              "market": "free",
+              "invoiceNumber": "EI-2026-08-0789",
+              "readingFrom": "2026-07-31",
+              "readingTo": "2026-08-31",
+              "billedDays": 31,
+              "supplyFingerprint": "es0000111122223333bb",
+              "accessTariff": "2.0TD",
+              "contractedPowerP1": 3.45,
+              "contractedPowerP2": 3.45,
+              "vatPercent": 21,
+              "total": 71.2,
+              "confidence": "high",
+              "issuedOn": "2026-09-02"
+            },
+            {
+              "document": 2,
+              "retailerName": "Energía Imaginaria, S.L.",
+              "market": "free",
+              "invoiceNumber": "EI-2026-09-1011",
+              "readingFrom": "2026-08-31",
+              "readingTo": "2026-09-30",
+              "billedDays": 30,
+              "supplyFingerprint": "es0000111122223333bb",
+              "accessTariff": "2.0TD",
+              "contractedPowerP1": 3.45,
+              "contractedPowerP2": 3.45,
+              "vatPercent": 21,
+              "total": 64.85,
+              "confidence": "high",
+              "issuedOn": "2026-10-02"
+            }
+          ],
+          "energyLines": [
+            {
+              "document": 1,
+              "period": "p1",
+              "kwh": 95,
+              "price": 0.129876,
+              "amount": 12.34,
+              "confidence": "high"
+            },
+            {
+              "document": 2,
+              "period": "p1",
+              "kwh": 88,
+              "price": 0.141234,
+              "amount": 12.43,
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 15800,
+    "output_tokens": 1100
+  }
+}

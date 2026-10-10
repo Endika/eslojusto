@@ -53,7 +53,17 @@ export type Recording =
   | 'mortgage-deed-without-expenses'
   | 'mortgage-identifiers'
   | 'mortgage-injected'
-  | 'mortgage-not-mortgage';
+  | 'mortgage-not-mortgage'
+  | 'electricity-pvpc-reference'
+  | 'electricity-free-service'
+  | 'electricity-two-bills'
+  | 'electricity-price-notice'
+  | 'electricity-injected'
+  | 'electricity-not-electricity'
+  | 'electricity-identifiers'
+  | 'telecom-mobile-bill'
+  | 'telecom-contract-commitment'
+  | 'telecom-not-telecom';
 
 export const recording = (name: Recording): string =>
   readFileSync(new URL(`../fixtures/bedrock/${name}.json`, import.meta.url), 'utf8');

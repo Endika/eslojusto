@@ -1,0 +1,85 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "telecom_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "telecom_contract",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "telecom_contract": {
+          "signedOn": {
+            "value": "2025-03-01",
+            "confidence": "high"
+          },
+          "operatorName": {
+            "value": "Operador Ficticio de Telecomunicaciones, S.A.",
+            "confidence": "high"
+          },
+          "commitmentStartsOn": {
+            "value": "2025-03-01",
+            "confidence": "high"
+          },
+          "commitmentMonths": {
+            "value": 18,
+            "confidence": "high"
+          },
+          "agreedPenalty": {
+            "value": 150,
+            "confidence": "high"
+          },
+          "penaltyText": {
+            "value": "Si causas baja antes de que finalice el periodo de permanencia de 18 meses abonarás una penalización de 150 € proporcional al tiempo que reste.",
+            "confidence": "high"
+          },
+          "handsetSubsidised": {
+            "value": true,
+            "confidence": "high"
+          },
+          "handsetValue": {
+            "value": 240,
+            "confidence": "high"
+          },
+          "priceReviewText": {
+            "value": "Las cuotas se actualizarán cada mes de enero conforme al IPC general publicado por el INE más un 2 %.",
+            "confidence": "high"
+          },
+          "priceReviewIndex": {
+            "value": "ipc_plus",
+            "confidence": "high"
+          }
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 9300,
+    "output_tokens": 700
+  }
+}

@@ -6,6 +6,8 @@ export const REVIEWS = [
   'credit',
   'insurance',
   'mortgage',
+  'electricity',
+  'telecom',
 ] as const;
 export type ReviewKind = (typeof REVIEWS)[number];
 
@@ -19,6 +21,8 @@ export const CHECKOUT_REVIEWS = [
   'employment',
   'credit',
   'mortgage',
+  'electricity',
+  'telecom',
 ] as const;
 export type CheckoutReview = (typeof CHECKOUT_REVIEWS)[number];
 

@@ -17,6 +17,12 @@ import {
   type CreditSectionKind,
 } from './credit-schema';
 import {
+  ELECTRICITY_READABILITY,
+  ELECTRICITY_SCHEMA,
+  ELECTRICITY_SECTIONS,
+  type ElectricitySectionKind,
+} from './electricity-schema';
+import {
   INSURANCE_READABILITY,
   INSURANCE_SCHEMA,
   INSURANCE_SECTIONS,
@@ -35,6 +41,12 @@ import {
   type RentalSectionKind,
 } from './rental-schema';
 import type { ReviewKind } from './reviews';
+import {
+  TELECOM_READABILITY,
+  TELECOM_SCHEMA,
+  TELECOM_SECTIONS,
+  type TelecomSectionKind,
+} from './telecom-schema';
 
 // Mirrors of the site's engine unions (src/engine/types.ts); test/engine-contract.test.ts keeps them equal.
 export const CAUSES = [
@@ -71,8 +83,13 @@ export type FieldType =
   | { readonly type: 'money' }
   | { readonly type: 'days' }
   | { readonly type: 'integer'; readonly min: number; readonly max: number }
-  // At most two decimals.
-  | { readonly type: 'decimal'; readonly min: number; readonly max: number }
+  // At most two decimals, or as many as `decimals` says: a unit price can carry six.
+  | {
+      readonly type: 'decimal';
+      readonly min: number;
+      readonly max: number;
+      readonly decimals?: number;
+    }
   // 0 to 100, at most two decimals.
   | { readonly type: 'percent' }
   // An interest rate or its spread: 0 to 100, at most three decimals (Euríbor + 0,875 %).
@@ -317,7 +334,9 @@ export type SectionKind =
   | EmploymentSectionKind
   | CreditSectionKind
   | InsuranceSectionKind
-  | MortgageSectionKind;
+  | MortgageSectionKind
+  | ElectricitySectionKind
+  | TelecomSectionKind;
 export const SECTION_KINDS = Object.keys(SECTIONS) as readonly FinalPaySectionKind[];
 
 export const PAGES_DESCRIPTION =
@@ -348,9 +367,9 @@ export const READABILITY = [
 ] as const satisfies readonly (
   (typeof FINAL_PAY_READABILITY)[number] | (typeof RENTAL_READABILITY)[number]
 )[];
-// Every reason any review can give: the credit and the insurance review's too. The site's
-// documents client mirrors this list (src/documents/contract.ts).
-export const ALL_READABILITY = [
+// Every reason the reviews the site reads can give: the credit and the insurance review's too. The
+// site's documents client mirrors this list (src/documents/contract.ts).
+export const SITE_READABILITY = [
   ...READABILITY,
   'not_credit_document',
   'not_insurance_document',
@@ -359,7 +378,18 @@ export const ALL_READABILITY = [
   | (typeof CREDIT_READABILITY)[number]
   | (typeof INSURANCE_READABILITY)[number]
 )[];
-// The mortgage review's reason joins that list once the site reads its documents.
+// Every reason any review can give: the electricity and the telecom review's too, which the site
+// mirrors once it reads them.
+export const ALL_READABILITY = [
+  ...SITE_READABILITY,
+  'not_electricity_document',
+  'not_telecom_document',
+] as const satisfies readonly (
+  | (typeof SITE_READABILITY)[number]
+  | (typeof ELECTRICITY_READABILITY)[number]
+  | (typeof TELECOM_READABILITY)[number]
+)[];
+// The mortgage review's reason joins these once the site reads its documents.
 export type Readability = (typeof ALL_READABILITY)[number] | (typeof MORTGAGE_READABILITY)[number];
 
 export const READABILITY_DESCRIPTION =
@@ -403,6 +433,8 @@ export const REVIEW_SCHEMAS: Readonly<Record<ReviewKind, ReviewSchema>> = {
   credit: CREDIT_SCHEMA,
   insurance: INSURANCE_SCHEMA,
   mortgage: MORTGAGE_SCHEMA,
+  electricity: ELECTRICITY_SCHEMA,
+  telecom: TELECOM_SCHEMA,
 };
 
 // Every review's sections, by kind.
@@ -413,6 +445,8 @@ export const ALL_SECTIONS: Readonly<Record<SectionKind, SectionSchema>> = {
   ...CREDIT_SECTIONS,
   ...INSURANCE_SECTIONS,
   ...MORTGAGE_SECTIONS,
+  ...ELECTRICITY_SECTIONS,
+  ...TELECOM_SECTIONS,
 };
 
 export const sectionsOf = (review: ReviewKind): readonly [SectionKind, SectionSchema][] =>

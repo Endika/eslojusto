@@ -321,6 +321,104 @@ describe('the review a read is for', () => {
     },
   );
 
+  it.each([
+    ['electricity', 'electricity_bill', 'readingTo', 'total'],
+    ['telecom', 'telecom_bill', 'periodTo', 'total'],
+  ] as const)(
+    'reads a %s pack as one and logs only that it was one',
+    async (review, section, day, field) => {
+      const { deps, logger, reader } = extractDeps({
+        pages: [page(1, section)],
+        [section]: {
+          bills: [{ document: 1, [day]: '2026-10-07', [field]: 98765.43, confidence: 'high' }],
+        },
+      });
+      const response = await handleExtract(post(extractBody({ review })), deps);
+      expect(json(response)).toMatchObject({
+        code: 'ok',
+        extraction: { lists: { bills: [{ values: { [field]: 98765.43 }, source: section }] } },
+      });
+      expect(reader.calls.map((c) => c.review)).toEqual([review]);
+      expect(logger.events).toEqual([
+        {
+          op: 'extract',
+          code: 'ok',
+          latencyMs: 0,
+          pages: 1,
+          inputTokens: 1000,
+          outputTokens: 200,
+          escalated: false,
+          retried: false,
+          conflicts: 0,
+          review,
+        },
+      ]);
+      expect(JSON.stringify(logger.events)).not.toMatch(/98765|2026-10-07/);
+    },
+  );
+
+  // Made-up supply codes: their check letters are not valid.
+  it('answers and logs a supply code only as its fingerprint, the same for each copy', async () => {
+    const bill = (document: number, supply: string) => ({
+      document,
+      readingFrom: '2026-06-30',
+      readingTo: '2026-07-31',
+      supplyFingerprint: supply,
+      total: 77.74,
+      confidence: 'high',
+    });
+    const { deps, logger } = extractDeps({
+      pages: [page(1, 'electricity_bill'), page(2, 'electricity_bill')],
+      electricity_bill: {
+        bills: [bill(1, 'ES0000111122223333BB'), bill(2, 'ES 0000 1111 2222 3333 BB 0F')],
+        otherLines: [
+          {
+            document: 1,
+            concept: 'Suministro ES0000111122223333BB',
+            kind: 'other',
+            amount: 1.5,
+            confidence: 'high',
+          },
+        ],
+      },
+    });
+    const response = await handleExtract(
+      post(extractBody({ review: 'electricity', files: Array(2).fill(extractBody().files[0]) })),
+      deps,
+    );
+    const body = json(response);
+    const prints = (
+      body['extraction'] as { lists: { bills: { values: { supplyFingerprint: string } }[] } }
+    ).lists.bills.map((b) => b.values.supplyFingerprint);
+    expect(prints[0]).toMatch(/^[0-9a-f]{16}$/);
+    expect(prints[1]).toBe(prints[0]);
+    expect(body['failedChecks']).toEqual(['duplicate_bill']);
+    for (const text of [response.body, JSON.stringify(logger.events)])
+      expect(text).not.toMatch(/ES ?0000|1111 ?2222|3333/);
+  });
+
+  it('reads a bill sent twice once: the copy is no reason for a second read', async () => {
+    const bill = (document: number) => ({
+      document,
+      readingFrom: '2026-06-30',
+      readingTo: '2026-07-31',
+      supplyFingerprint: 'ES0000111122223333BB',
+      total: 77.74,
+      confidence: 'high',
+    });
+    const { deps, reader, logger } = extractDeps({
+      pages: [page(1, 'electricity_bill'), page(2, 'electricity_bill')],
+      electricity_bill: { bills: [bill(1), bill(2)] },
+    });
+    const response = await handleExtract(
+      post(extractBody({ review: 'electricity', files: Array(2).fill(extractBody().files[0]) })),
+      deps,
+    );
+    expect(json(response)['failedChecks']).toEqual(['duplicate_bill']);
+    expect(reader.calls.map((c) => c.model)).toEqual([PRIMARY]);
+    expect(logger.events[0]).toMatchObject({ escalated: false });
+  });
+
   it('refuses a review it does not know', async () => {
     const { deps, reader } = extractDeps();
     const response = await handleExtract(post(extractBody({ review: 'contract' })), deps);
@@ -560,6 +658,14 @@ describe('payment handlers', () => {
     });
     expect(json(refused)).toEqual({ code: 'invalid_request' });
     expect(checkout.returns).toEqual(['credit', 'mortgage']);
+  });
+
+  it('sends an electricity or a telecom checkout back to its page', async () => {
+    const checkout = new FakeCheckout();
+    const body = { nonce: 'n0nce-generated-by-the-browser', captchaToken: 'turnstile-token' };
+    await handleCheckout(post({ ...body, returnTo: 'electricity' }), { ...deps(), checkout });
+    await handleCheckout(post({ ...body, returnTo: 'telecom' }), { ...deps(), checkout });
+    expect(checkout.returns).toEqual(['electricity', 'telecom']);
   });
 
   it('refuses a malformed session id', async () => {

@@ -1,0 +1,361 @@
+{
+  "type": "object",
+  "properties": {
+    "pages": {
+      "type": "array",
+      "description": "One entry per attached page, in order: its kind, the number of its document and its readability.",
+      "maxItems": 25,
+      "items": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25,
+            "description": "The number given before the page."
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["telecom_bill", "telecom_contract", "other"],
+            "description": "telecom_bill: a phone, mobile or internet bill, any of its pages. telecom_contract: the contract of such a service, its conditions or its commitment. other: anything else, such as an electricity bill, a handset receipt or an ID card."
+          },
+          "document": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25,
+            "description": "Number the documents in order of appearance; all pages of one document get the same number."
+          },
+          "readability": {
+            "type": "object",
+            "description": "ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_telecom_document (not about a phone, mobile or internet service), foreign_jurisdiction (a service contracted outside Spain; never because of its language), unknown_format (about such a service, but no kind of document you know).",
+            "properties": {
+              "value": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "handwritten",
+                  "blurry",
+                  "dark",
+                  "cropped",
+                  "not_telecom_document",
+                  "foreign_jurisdiction",
+                  "unknown_format"
+                ]
+              },
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              }
+            },
+            "required": ["value", "confidence"],
+            "additionalProperties": false
+          },
+          "month": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}$",
+            "description": "Leave it out: each bill gives its own period in its fields."
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          }
+        },
+        "required": ["page", "kind", "document", "readability", "confidence"],
+        "additionalProperties": false
+      }
+    },
+    "telecom_bill": {
+      "type": "object",
+      "description": "Phone, mobile or internet bills (facturas de teléfono, móvil o fibra). Leave the section out when no attached document is one.",
+      "properties": {
+        "bills": {
+          "type": "array",
+          "description": "Every bill, one entry each; past twelve, the twelve most recent.",
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "document": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 25,
+                "description": "The number of the document (as given in pages) of the bill this row belongs to."
+              },
+              "operatorName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "description": "The operator (operador): its company name as printed."
+              },
+              "issuedOn": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Date the bill was issued."
+              },
+              "periodFrom": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "First day of the period billed."
+              },
+              "periodTo": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Last day of the period billed."
+              },
+              "vatAmount": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "VAT or other indirect tax (IVA, IGIC, IPSI), its amount."
+              },
+              "total": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Total of the bill (total factura, total a pagar)."
+              }
+            },
+            "required": ["document", "confidence"],
+            "additionalProperties": false
+          }
+        },
+        "lines": {
+          "type": "array",
+          "description": "Every charge or discount of the bills, one entry per line, with its own dates when it prints them.",
+          "maxItems": 60,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "document": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 25,
+                "description": "The number of the document (as given in pages) of the bill this row belongs to."
+              },
+              "concept": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "description": "The concept exactly as printed."
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "fixed_fee",
+                  "premium_rate",
+                  "third_party",
+                  "penalty",
+                  "handset",
+                  "discount",
+                  "other"
+                ],
+                "description": "fixed_fee (cuota mensual de un servicio), premium_rate (tarificación adicional, números 80x, 90x, SMS premium), third_party (servicios de terceros, compras con cargo a la factura), penalty (penalización por permanencia o por baja), handset (plazo de un terminal), discount (descuento), other."
+              },
+              "from": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "First day the line is for, if printed."
+              },
+              "to": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Last day the line is for, if printed."
+              },
+              "amount": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Its amount, as a positive."
+              }
+            },
+            "required": ["document", "kind", "amount", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "telecom_contract": {
+      "type": "object",
+      "description": "The contract of a phone, mobile or internet service, its conditions or its commitment (compromiso de permanencia). Leave the section out when no attached document is one.",
+      "properties": {
+        "signedOn": {
+          "type": "object",
+          "description": "Date of the contract.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "operatorName": {
+          "type": "object",
+          "description": "The operator (operador): its company name as printed.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "commitmentStartsOn": {
+          "type": "object",
+          "description": "Date the commitment starts (inicio de la permanencia), if printed.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "commitmentMonths": {
+          "type": "object",
+          "description": "Months of the commitment (permanencia).",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "agreedPenalty": {
+          "type": "object",
+          "description": "The penalty for leaving before the commitment ends, as stated for leaving at its start (penalización máxima).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "penaltyText": {
+          "type": "object",
+          "description": "The clause that sets that penalty and how it is worked out. Copy it word for word, at most the first characters that fit; never summarise or judge it.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "handsetSubsidised": {
+          "type": "object",
+          "description": "true when the contract gives a handset or device at a reduced price tied to the commitment (terminal subvencionado); false when it says there is none.",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "handsetValue": {
+          "type": "object",
+          "description": "The value it states for that handset or device.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "priceReviewText": {
+          "type": "object",
+          "description": "The clause on how prices can change (revisión de precios, actualización de tarifas). Copy it word for word, at most the first characters that fit; never summarise or judge it.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "priceReviewIndex": {
+          "type": "object",
+          "description": "What that clause ties a price rise to: ipc (the consumer price index, IPC, alone), ipc_plus (the IPC plus some points), fixed_amount (a fixed amount or percentage), none (it says prices do not change), other.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["ipc", "ipc_plus", "fixed_amount", "none", "other"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["pages"],
+  "additionalProperties": false
+}

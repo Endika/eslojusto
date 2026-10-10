@@ -36,7 +36,7 @@ API never returns prose. All requests are `POST` with a JSON body.
   "captchaToken": "<Turnstile token, widget action 'extract'>",
   "quota": "<token from the last free read, or null>", // free read
   "pass": "<pass token>", // or a pass read
-  "review": "rental" // optional: "rental", "employment", "credit", "insurance" or "mortgage"; none is the final pay
+  "review": "rental" // optional: "rental", "employment", "credit", "insurance", "mortgage", "electricity" or "telecom"; none is the final pay
 }
 ```
 
@@ -46,8 +46,10 @@ is `final_pay`, exactly as before the field existed (`test/fixtures/final-pay-to
 pin theirs); `rental` reads a tenancy pack (below, «Rental review»), `employment` an employment
 contract and the documents around it (below, «Employment review»), `credit` a consumer credit
 pack (below, «Credit review»), `insurance` a home or motor policy and its renewal notice
-(below, «Insurance review») and `mortgage` a mortgage deed and the bills around it (below,
-«Mortgage review»); anything else is `invalid_request`. Each review's system prompt
+(below, «Insurance review»), `mortgage` a mortgage deed and the bills around it (below,
+«Mortgage review»), `electricity` household electricity bills and their contract
+(below, «Electricity review») and `telecom` phone and internet bills and their contract (below,
+«Telecom review»); anything else is `invalid_request`. Each review's system prompt
 lives in a module of its own, `src/adapters/prompts/`. The log line carries `review` only when the request
 named one.
 
@@ -166,8 +168,9 @@ each of them). An `ok` read can still list pages set aside; the site says which 
 `{ "code": "ok", "sessionId": "cs_…", "url": "https://checkout.stripe.com/…" }`. Keep the
 session id and nonce before redirecting; Stripe returns to
 `/finiquito/?session_id={CHECKOUT_SESSION_ID}`, to `/alquiler/` with `"returnTo": "rental"`, to
-`/contrato/` with `"returnTo": "employment"`, to `/financiacion/` with `"returnTo": "credit"` or
-to `/hipoteca/` with `"returnTo": "mortgage"` (`CHECKOUT_PATHS` in `src/config.ts`); any other `returnTo` is `invalid_request`, `insurance`
+`/contrato/` with `"returnTo": "employment"`, to `/financiacion/` with `"returnTo": "credit"`, to
+`/hipoteca/` with `"returnTo": "mortgage"`, to `/facturas/luz/` with `"returnTo": "electricity"` or to `/facturas/permanencia/` with
+`"returnTo": "telecom"` (`CHECKOUT_PATHS` in `src/config.ts`); any other `returnTo` is `invalid_request`, `insurance`
 included: that review offers no pass. The pass is the
 same product either way and unlocks every review.
 
@@ -432,6 +435,76 @@ were likely not sent; from that day art. 14.1.e Ley 5/2019 shares out the costs,
 needs no such clause). A legible deed with
 neither `deedOn` nor `principal` is worth a second read, as a failed check is.
 
+### Electricity review
+
+With `"review": "electricity"` the model sorts household electricity documents
+(`src/domain/electricity-schema.ts`). Page kinds: `electricity_bill`, `electricity_contract`,
+`price_change_notice` and `other` (a gas or a phone bill is `other`); readability with
+`not_electricity_document`. One read takes several bills: each is a document of its own, and a
+pack of 25 pages holds a year of them.
+
+| Section                | Fields                                                                                                  | Lists (most rows)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `electricity_bill`     |                                                                                                         | `bills` [`document`, `retailerName`, `market`, `invoiceNumber`, `issuedOn`, `dueOn`, `readingFrom`, `readingTo`, `billedDays`, `readingKind`, `supplyFingerprint`, `postcode`, `accessTariff`, `selfConsumption`, `contractedPowerP1`/`P2`, `maxPowerUsedP1`/`P2`, `tollsAndChargesPower`/`Energy`, `socialBonusFunding`, `socialBonusCategory`, `socialBonusPercent`, `socialBonusKwh`, `socialBonusAmount`, `excessPowerAmount`, `electricityTax{Base,Percent,Amount}`, `meterAmount`, `meterDays`, `meterPhase`, `exitPenaltyAmount`, `vat{Base,Percent,Amount}`, `total`, `commitmentEndOn`] (12, the most recent by `readingTo`); `powerLines` [`document`, `period`, `kw`, `price`, `unit`, `days`, `amount`] (24); `energyLines` [`document`, `period`, `kwh`, `price`, `amount`] (36); `otherLines` [`document`, `concept`, `kind`, `serviceLabel`, `amount`] (24) |
+| `electricity_contract` | `signedOn`, `retailerName`, `priceType`, `durationMonths`, `renews`, `exitPenaltyText` (literal, ≤ 600) | `agreedPrices` [`term`, `period`, `price`, `unit`] (10); `services` [`concept`, `serviceLabel`, `amount`] (6)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `price_change_notice`  | `sentOn` and `appliesFrom` (returned as `noticeSentOn`, `noticeAppliesFrom`), `separateFromBill`        | `priceChanges` [`term`, `period`, `before`, `after`, `unit`] (10)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+
+Every row of a bill's lists names its bill by `document`, the number the page list gives it.
+Each bill stays a row of `bills`, so two bills are two periods and never a conflict. Unit
+prices, kW and kWh keep every decimal the bill prints (a `decimal` field with `decimals`: six for
+a price, three for kW and kWh, eight for the electricity tax rate). `market`, the periods, the
+units, `accessTariff`, `selfConsumption`, `socialBonusCategory`, `meterPhase`, `serviceLabel` and
+`priceType` mirror the site's bills engine (`test/electricity-contract.test.ts`). The model copies
+and labels; it never works out a price, a tax, a total or the days of a period, compares any
+figure with a regulated price or a tax rate, or says whether a charge is allowed or a service
+was asked for: the site's engine and the person do.
+
+**The supply code (CUPS) is a fingerprint only.** The schema asks for it as `supplyFingerprint`, a
+field of type `fingerprint`; while the read is parsed, `src/domain/fingerprint.ts` normalises it
+(upper case, without spaces, dots or dashes, without a border point's last two characters) and
+keeps only the first 16 hex digits of its SHA-256, so the code itself never reaches the merge,
+the response or the log, and two copies of one bill print the same fingerprint. A value that is
+no CUPS fails validation like any other. The domain imports nothing, so SHA-256 is written out
+there and `test/fingerprint.test.ts` checks it against `node:crypto`. The prompt asks for the
+supply address's postcode only, and never for the IBAN, which is not in the schema. Any copied
+text (`retailerName`, `invoiceNumber`, `exitPenaltyText`, a `concept`) holding an identifier, a
+payment card number, a CUPS or a word about health, leave, union membership or debts is dropped
+as a discard, as in the credit review; `test/free-text-guards.test.ts` walks this schema too.
+
+`failedChecks` are coherence checks only (`src/domain/electricity-checks.ts`):
+`period_end_before_start`, `days_mismatch` (`billedDays` other than the days between the
+readings, the first not counted), `lines_do_not_sum` (a bill's power and energy lines, social
+bonus funding less its discount, excess power, electricity tax, meter and other lines, less
+discounts and refunds, more than 1 € from its VAT base; a bill with an exit penalty is left
+alone), `vat_base_mismatch` (base plus VAT more than 1 € above the total, which may hold amounts
+outside VAT) and `duplicate_bill` (the same fingerprint and readings twice: about what the person
+sent, not how it was read, so it never calls for a second read). A legible bill that
+yields no bill with its total, or a legible contract with neither `priceType` nor an agreed
+price, is worth a second read. `truncated: true` says a list came back at its maximum.
+
+### Telecom review
+
+With `"review": "telecom"` the model sorts phone, mobile and internet documents
+(`src/domain/telecom-schema.ts`). Page kinds: `telecom_bill`, `telecom_contract` and `other`;
+readability with `not_telecom_document`.
+
+| Section            | Fields                                                                                                                                                                                                                                                    | Lists (most rows)                                                                                                                                                                            |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `telecom_bill`     |                                                                                                                                                                                                                                                           | `bills` [`document`, `operatorName`, `issuedOn`, `periodFrom`, `periodTo`, `vatAmount`, `total`] (12, the most recent); `lines` [`document`, `concept`, `kind`, `from`, `to`, `amount`] (60) |
+| `telecom_contract` | `signedOn`, `operatorName`, `commitmentStartsOn`, `commitmentMonths`, `agreedPenalty`, `penaltyText` and `priceReviewText` (literal, ≤ 600), `handsetSubsidised`, `handsetValue`, `priceReviewIndex` (`ipc`, `ipc_plus`, `fixed_amount`, `none`, `other`) |                                                                                                                                                                                              |
+
+A line's `kind` is `fixed_fee`, `premium_rate`, `third_party`, `penalty`, `handset`, `discount` or
+`other`. `priceReviewIndex` mirrors the site's bills engine (`test/telecom-contract.test.ts`); the
+literal clause travels beside it so the person can check the label. The model never works out a
+penalty or the days left of a commitment, or says whether a commitment, a penalty, a price rise
+or a charge is allowed. The prompt keeps out the holder, every number called, customer and
+contract numbers and the IMEI; copied texts carry the credit review's guards but number plates,
+and drop an IMEI that slips through.
+`failedChecks`: `period_end_before_start` (a bill's or a line's) and `lines_above_total` (a
+bill's charges less its discounts more than 1 € above its total). A legible contract with no
+commitment, penalty or price clause, or a legible bill that yields no bill, is worth a second
+read.
+
 ### Fields and the site's engine
 
 The model transcribes each kind of document into its own section of the tool input
@@ -595,8 +668,9 @@ Cheapest first, and nothing that parses what the person sent runs before the cap
 - **The input is known before any call.** Every image is priced by its pixels, at
   w × h / 750 tokens (Anthropic's formula) or one per 28 × 28 patch if that is more, and the
   prompt and schema at 14,000 for the final pay, the employment, the credit and the mortgage
-  review, 11,000 for a rental review and 8,000 for an insurance review (about 27,000, 28,000,
-  28,000, 28,000, 21,000 and 14,000 characters at two per token,
+  review, 11,000 for a rental and an electricity review, 8,000 for an insurance review and 6,000
+  for a telecom review (about 27,000, 28,000, 28,000, 28,000, 21,000, 20,500, 14,000 and 11,500
+  characters at two per token,
   `PROMPT_TOKENS_BY_REVIEW`; `test/tokens.test.ts` keeps them honest). Bedrock's CountTokens does not serve Claude models
   offered only through cross-Region profiles, so this is computed, not asked. The largest pack
   the API accepts, twenty-five 1568 × 1568 images, comes to 14,000 + 25 × 3,279 = 95,975 (92,975
@@ -853,11 +927,18 @@ the usual length is about 10,700 tokens, a tenth under the cap; with every copie
 limit as well, about 12,200, which stops at `max_tokens`. A mortgage read has the same bounds
 too: twelve clauses copied word for word need the room. Every list at its maximum with clauses of
 the usual length (800 characters) is about 9,600 tokens; with every clause at its 1,500 and every
-text at its limit, about 14,000, which stops at `max_tokens`. An insurance read keeps `max_tokens`
+text at its limit, about 14,000, which stops at `max_tokens`. An electricity or a telecom read has
+the same `max_tokens`, 12,000, and so the same **0.51 USD** bound, with smaller prompts (11,000
+and 6,000 tokens: largest packs of 92,975 and 87,975 in). A year of electricity bills (twelve
+two-page bills, each with two power lines, three energy lines and one other line, and their
+contract) records about 10,750 tokens, a tenth under the cap; every list, field and text at its
+limit, about 15,200, which stops at `max_tokens` and answers `document_unreadable`. A telecom
+contract and a year of bills with every line is about 7,600 tokens, and about 9,750 with every
+text at its limit. An insurance read keeps `max_tokens`
 at 5,000 with an 8,000-token prompt: its largest pack is 89,975 in, 0.38 USD.
 
 **Worst case: 0.40 USD per read** for the final pay, the rental and the insurance review (95,975 × 3.30 USD/M +
-5,000 × 16.50 USD/M = 0.399), and an upper bound of about **0.51 USD** for the employment, the credit and the mortgage review
+5,000 × 16.50 USD/M = 0.399), and an upper bound of about **0.51 USD** for the employment, credit, mortgage, electricity and telecom reviews
 (95,975 × 3.30 USD/M + 12,000 × 16.50 USD/M = 0.5147), for any input: the API takes images only, priced by their pixels, and refuses anything above 96,000
 estimated tokens (0.40 USD) before a call. The bound counts every page at 1568 px, since the
 API accepts that size at any count; the browser stepping a large pack down only lowers it. A PDF never reaches it; the browser renders its pages
@@ -955,6 +1036,9 @@ the owner's written approval and that figure.
   well inside the 160 s deadline) and of an escalated one (the 180 s timeout is a guess), and
   whether Bedrock bills a 1568-px photo at about 1,600 tokens, as Anthropic's resizing
   suggests, or at its full 2,459.
+- Whether a real year of electricity bills reads into twelve rows that fit `max_tokens` and the
+  deadline: the record sizes are measured on synthetic records, and the electricity and telecom
+  fixtures are hand-written, as below.
 - Model accuracy: the Bedrock fixtures are hand-written in Bedrock's response shape, not
   recordings. Choosing the models, how well they sort a mixed pack, and whether 1568 px reads
   better than about 1100 px on small print still need a comparison on real, anonymised packs
