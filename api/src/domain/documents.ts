@@ -97,8 +97,8 @@ export const PAGE_KINDS = [
   | (typeof RENTAL_PAGE_KINDS)[number]
   | (typeof EMPLOYMENT_PAGE_KINDS)[number]
 )[];
-// Every kind the reviews the site reads can give a page: the credit and the insurance review's
-// too. The site's documents client mirrors this list (src/documents/contract.ts).
+// Every kind the reviews the site reads can give a page: the credit, the insurance and the
+// mortgage review's too. The site's documents client mirrors this list (src/documents/contract.ts).
 export const SITE_PAGE_KINDS = [
   ...PAGE_KINDS,
   'credit_agreement',
@@ -109,10 +109,21 @@ export const SITE_PAGE_KINDS = [
   'card_statement',
   'insurance_policy',
   'insurance_renewal_notice',
+  'mortgage_deed',
+  'notary_invoice',
+  'registry_invoice',
+  'agency_invoice_mortgage',
+  'valuation_invoice',
+  'ajd_form',
+  'fein',
+  'fiae',
+  'transparency_deed',
+  'prepayment_statement',
 ] as const satisfies readonly (
   | (typeof PAGE_KINDS)[number]
   | (typeof CREDIT_PAGE_KINDS)[number]
   | (typeof INSURANCE_PAGE_KINDS)[number]
+  | (typeof MORTGAGE_PAGE_KINDS)[number]
 )[];
 // Every kind any review can give a page: the electricity and the telecom review's too, which the
 // site mirrors once it reads them.
@@ -128,8 +139,7 @@ export const ALL_PAGE_KINDS = [
   | (typeof ELECTRICITY_PAGE_KINDS)[number]
   | (typeof TELECOM_PAGE_KINDS)[number]
 )[];
-// The mortgage review's kinds join these once the site reads its documents.
-export type PageKind = (typeof ALL_PAGE_KINDS)[number] | (typeof MORTGAGE_PAGE_KINDS)[number];
+export type PageKind = (typeof ALL_PAGE_KINDS)[number];
 // The documents a value can come from.
 export type SourceKind = Exclude<PageKind, 'other'>;
 

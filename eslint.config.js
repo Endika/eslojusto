@@ -115,11 +115,12 @@ const creditReach = {
     'src/credit reaches the credit engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes, summary lines and letter details, and the translator type.',
 };
 // The mortgage review reaches the mortgage engine through its modules, never its tables, which its
-// composition root passes in; of the calculator, only what every section shares.
+// composition root passes in; of the calculator, only what every section shares; of reading
+// documents, only the shared contract, ports, quotes and summary lines.
 const mortgageReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|law/sources|mortgage/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|flow|navigation|number|review-form|review-result|section)$|\\.\\./i18n/client$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|law/sources|mortgage/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|flow|navigation|number|review-form|review-result|section)$|\\.\\./documents/(contract|ports|quote|summary)$|\\.\\./i18n/client$)|${notCanonical}`,
   message:
-    'src/mortgage reaches the mortgage engine (its tables come from the composition root), the shared sheets and the translator type.',
+    'src/mortgage reaches the mortgage engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes and summary lines, and the translator type.',
 };
 const noMortgage = {
   regex: '(^|/)mortgage/',

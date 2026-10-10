@@ -15,7 +15,7 @@ import { admit, cannotFit, checkSelection, filesBucket, photoShare, requestBytes
 import type { OutageMemory } from './outage';
 import { passClaims, passState, type PassStore, type StoredPass } from './pass';
 import { qualityProblem, type QualityProblem } from './quality';
-import { reasonsOf, skippedLines, skippedPages } from './skipped';
+import { missingPageLines, reasonsOf, skippedLines, skippedPages } from './skipped';
 import type {
   Captcha,
   DocumentEvents,
@@ -453,6 +453,7 @@ export function setUpUpload<F extends string, L extends string>(
           : tr('client.documents.done', { n });
     const lines = [
       ...skipped,
+      ...missingPageLines(checks, tr),
       ...p.notes,
       ...(deps.reading.wordsEveryCheck ? [] : checks.filter(isCoherenceCheck)).map((c) =>
         tr(`client.documents.check.${c}`),

@@ -1,12 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import DocumentStart from '../components/DocumentStart.astro';
 import MortgageForm from '../components/MortgageForm.astro';
 import MortgageResult from '../components/MortgageResult.astro';
 import { MORTGAGE_BETA } from '../content/sections';
 import { formatLongDay } from '../content/rent-indices';
 import { breadcrumbList, trail } from '../content/structured-data';
 import { LAST_UPDATED } from '../content/updated';
+import { DOCUMENTS } from '../documents/config';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
 
@@ -15,6 +17,31 @@ interface Props {
 }
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
+// With the documents API the visit opens on the choice between uploading and typing; the tabs and
+// the form wait until it is made. A deed runs past what one read takes, so the upload says which
+// of its pages to send and how to tell them.
+const documents = DOCUMENTS !== null;
+const pageGuide = {
+  lead: tx('mortgage.documents.guide.lead'),
+  pages: [
+    {
+      name: tx('mortgage.documents.guide.first'),
+      signs: tx('mortgage.documents.guide.first_signs'),
+      figure: 'cover',
+    },
+    {
+      name: tx('mortgage.documents.guide.clauses'),
+      signs: tx('mortgage.documents.guide.clauses_signs'),
+      figure: 'clauses',
+    },
+    {
+      name: tx('mortgage.documents.guide.invoices'),
+      signs: tx('mortgage.documents.guide.invoices_signs'),
+      figure: 'invoice',
+    },
+  ],
+  caption: tx('mortgage.documents.guide.caption'),
+} as const;
 
 // Each tab's share of the rail follows how much its section asks, kept close so that every name
 // still fits on a phone.
@@ -41,8 +68,9 @@ const crumbs = trail(lang, { name: tx('home.mortgage'), path: '/hipoteca/' });
   lang={lang}
   section="cause"
   structuredData={[breadcrumbList(home, lang, crumbs)]}
+  calculator={documents}
 >
-  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
     <ol>
       {/* Only a section already reached is a link; one still ahead is plain text until then. */}
       {sections.map(([id, step, number, weight], i) => (
@@ -85,7 +113,8 @@ const crumbs = trail(lang, { name: tx('home.mortgage'), path: '/hipoteca/' });
           <p class="help">{tx('mortgage.no_js')}</p>
         </div>
       </noscript>
-      <MortgageForm lang={lang} />
+      {documents && <DocumentStart lang={lang} review="mortgage" pageGuide={pageGuide} />}
+      <MortgageForm lang={lang} hidden={documents} />
       <MortgageResult lang={lang} />
     </div>
   </main>

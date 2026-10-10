@@ -367,16 +367,18 @@ export const READABILITY = [
 ] as const satisfies readonly (
   (typeof FINAL_PAY_READABILITY)[number] | (typeof RENTAL_READABILITY)[number]
 )[];
-// Every reason the reviews the site reads can give: the credit and the insurance review's too. The
-// site's documents client mirrors this list (src/documents/contract.ts).
+// Every reason the reviews the site reads can give: the credit, the insurance and the mortgage
+// review's too. The site's documents client mirrors this list (src/documents/contract.ts).
 export const SITE_READABILITY = [
   ...READABILITY,
   'not_credit_document',
   'not_insurance_document',
+  'not_mortgage_document',
 ] as const satisfies readonly (
   | (typeof READABILITY)[number]
   | (typeof CREDIT_READABILITY)[number]
   | (typeof INSURANCE_READABILITY)[number]
+  | (typeof MORTGAGE_READABILITY)[number]
 )[];
 // Every reason any review can give: the electricity and the telecom review's too, which the site
 // mirrors once it reads them.
@@ -389,8 +391,7 @@ export const ALL_READABILITY = [
   | (typeof ELECTRICITY_READABILITY)[number]
   | (typeof TELECOM_READABILITY)[number]
 )[];
-// The mortgage review's reason joins these once the site reads its documents.
-export type Readability = (typeof ALL_READABILITY)[number] | (typeof MORTGAGE_READABILITY)[number];
+export type Readability = (typeof ALL_READABILITY)[number];
 
 export const READABILITY_DESCRIPTION =
   'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_labour_document (not about a job), foreign_jurisdiction (an employment document from another country, where Spanish law does not apply; never because of its language), unknown_format (about a job, but no kind of document you know).';

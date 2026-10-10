@@ -4,12 +4,24 @@ import { link, type Lang } from '../i18n/languages';
 
 // Rendered only in a build with the documents API: the first sheet offers reading a document or
 // filling the form by hand. Its styles live here, inline, so a build without the API ships none.
-// Each review names the documents it reads in its own words.
+// Each review names the documents it reads in its own words. A review whose main document runs
+// past what one read takes shows a guide to the pages worth sending, each with how to tell it.
+interface GuidePage {
+  name: string;
+  signs: string;
+  figure: 'cover' | 'clauses' | 'invoice';
+}
+interface PageGuide {
+  lead: string;
+  pages: readonly GuidePage[];
+  caption: string;
+}
 interface Props {
   lang: Lang;
-  review?: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance';
+  review?: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance' | 'mortgage';
+  pageGuide?: PageGuide;
 }
-const { lang, review = 'final_pay' } = Astro.props;
+const { lang, review = 'final_pay', pageGuide } = Astro.props;
 const RENTAL: Partial<Record<Key, Key>> = {
   'documents.start.help': 'rental.documents.start_help',
   'documents.start.upload': 'rental.documents.upload',
@@ -34,12 +46,19 @@ const INSURANCE: Partial<Record<Key, Key>> = {
   'documents.upload.files_hint': 'insurance.documents.files_hint',
   'documents.upload.consent': 'insurance.documents.consent',
 };
+const MORTGAGE: Partial<Record<Key, Key>> = {
+  'documents.start.help': 'mortgage.documents.start_help',
+  'documents.start.upload': 'mortgage.documents.upload',
+  'documents.upload.files_hint': 'mortgage.documents.files_hint',
+  'documents.upload.consent': 'mortgage.documents.consent',
+};
 const OWN: Partial<Record<Key, Key>> = {
   final_pay: {},
   rental: RENTAL,
   employment: EMPLOYMENT,
   credit: CREDIT,
   insurance: INSURANCE,
+  mortgage: MORTGAGE,
 }[review];
 const tx = (key: Key) => t(lang, OWN[key] ?? key);
 const arrow = 'M4 12h15m-6-6 6 6-6 6';
@@ -77,6 +96,66 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
     <h2 class="question" id="question-upload" tabindex="-1">
       {tx('documents.upload.question')}
     </h2>
+    {pageGuide && (
+      <figure class="start__guide" aria-labelledby="page-guide-lead">
+        <p class="start__guide-lead" id="page-guide-lead">
+          {pageGuide.lead}
+        </p>
+        <ol class="start__guide-pages">
+          {pageGuide.pages.map((p) => (
+            <li class="start__guide-page">
+              <svg
+                class="start__guide-sheet"
+                viewBox="0 0 30 40"
+                width="30"
+                height="40"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <rect class="start__guide-paper" x="0.5" y="0.5" width="29" height="39" rx="1.5" />
+                {p.figure === 'cover' && (
+                  <>
+                    <rect class="start__guide-strong" x="8" y="5" width="14" height="3" />
+                    {[12, 16, 20, 24, 28].map((y) => (
+                      <rect x="5" y={y} width="20" height="1.5" />
+                    ))}
+                  </>
+                )}
+                {p.figure === 'clauses' && (
+                  <>
+                    {[4, 21].map((y) => (
+                      <>
+                        <rect class="start__guide-strong" x="4" y={y} width="12" height="2.5" />
+                        {[y + 5, y + 9, y + 13].map((line) => (
+                          <rect x="4" y={line} width="22" height="1.5" />
+                        ))}
+                      </>
+                    ))}
+                  </>
+                )}
+                {p.figure === 'invoice' && (
+                  <>
+                    <rect class="start__guide-strong" x="4" y="4" width="10" height="3" />
+                    {[12, 16, 20, 24].map((y) => (
+                      <>
+                        <rect x="4" y={y} width="13" height="1.5" />
+                        <rect x="20" y={y} width="6" height="1.5" />
+                      </>
+                    ))}
+                    <rect class="start__guide-strong" x="16" y="31" width="10" height="3" />
+                  </>
+                )}
+              </svg>
+              <span class="start__guide-text">
+                <span class="start__guide-name">{p.name}</span>
+                <span class="hint">{p.signs}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+        <figcaption class="hint">{pageGuide.caption}</figcaption>
+      </figure>
+    )}
     <div
       class="field"
       role="group"
@@ -333,6 +412,49 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
   .start__recognised {
     font-weight: 600;
   }
+  .start__guide {
+    margin: 0 0 1rem;
+    padding: 0.75rem 0.875rem;
+    border-inline-start: 3px solid var(--sheet-ink);
+    background: color-mix(in oklab, var(--field-fill) 55%, transparent);
+  }
+  .start__guide-lead {
+    margin: 0 0 0.75rem;
+    font: 500 0.9375rem / 1.45 var(--f-serif);
+  }
+  .start__guide-pages {
+    display: grid;
+    gap: 0.625rem;
+    margin: 0 0 0.75rem;
+    padding: 0;
+    list-style: none;
+  }
+  .start__guide-page {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 0.75rem;
+  }
+  .start__guide-sheet {
+    fill: color-mix(in oklab, var(--sheet-ink) 40%, transparent);
+  }
+  .start__guide-paper {
+    fill: var(--field-fill);
+    stroke: var(--sheet-ink);
+  }
+  .start__guide-strong {
+    fill: var(--sheet-ink);
+  }
+  .start__guide-text {
+    display: grid;
+    gap: 0.125rem;
+  }
+  .start__guide-name {
+    font: 640 0.9375rem / 1.4 var(--f-grotesque);
+  }
+  .start__guide figcaption {
+    margin: 0;
+  }
   .start__consent {
     margin: 0 0 0.75rem;
   }
@@ -434,6 +556,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
   }
   .read-quote__text {
     margin: 0.25rem 0;
+    white-space: pre-line;
     font: italic 400 0.9375rem / 1.45 var(--f-serif);
     color: var(--sheet-ink);
     overflow-wrap: anywhere;

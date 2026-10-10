@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { es, type Key } from '../../src/i18n/es';
-import { CREDIT_READING, DICTIONARIES, INSURANCE_READING, clientStrings, t } from '../../src/i18n';
+import {
+  CREDIT_READING,
+  DICTIONARIES,
+  INSURANCE_READING,
+  MORTGAGE_READING,
+  clientStrings,
+  t,
+} from '../../src/i18n';
 import { LANGS, builtLangs, type Lang } from '../../src/i18n/languages';
 import { translator } from '../../src/i18n/client';
 import { statusText } from '../../src/calculator/render';
@@ -288,6 +295,37 @@ describe('client strings', () => {
     expect(keys).toContain('client.other_language.text');
     expect(keys.filter((k) => k.startsWith('client.warning.'))).toEqual([]);
     expect(keys.filter((k) => k.startsWith('client.credit.'))).toEqual([]);
+  });
+
+  it('the mortgage page reads documents in words its own copy allows, without the report', () => {
+    const strings = clientStrings('es', { mortgage: true, documents: true });
+    const keys = Object.keys(strings);
+    expect(keys).toContain('client.documents.kind.mortgage_deed');
+    expect(keys).toContain('client.documents.missing_key_page');
+    expect(keys).toContain('client.mortgage.documents.quote_note');
+    expect(
+      keys.filter((k) => /^client\.documents\.(report|letter|notice|verify)\./.test(k)),
+    ).toEqual([]);
+    expect(keys.filter((k) => CREDIT_READING.has(k) && !MORTGAGE_READING.has(k))).toEqual([]);
+    expect(
+      Object.values(strings).flatMap((text) =>
+        forbiddenIn('dist/hipoteca/index.html', text ?? '').map(String),
+      ),
+    ).toEqual([]);
+  });
+
+  it('ships the mortgage documents’ words only on its own page', () => {
+    expect([...MORTGAGE_READING].filter((k) => !(k in es))).toEqual([]);
+    for (const flags of [{}, { rental: true }, { employment: true }, { insurance: true }])
+      expect(
+        Object.keys(clientStrings('es', { documents: true, ...flags })).filter((k) =>
+          MORTGAGE_READING.has(k),
+        ),
+      ).toEqual([]);
+    // The capital's name is the credit's too, so it ships on both.
+    expect(clientStrings('es', { documents: true, credit: true })).toHaveProperty([
+      'client.documents.field.principal',
+    ]);
   });
 
   it('a build with it ships them', () => {

@@ -1061,6 +1061,7 @@ export const es = {
   'client.documents.field.instalmentAmount': 'Importe de cada cuota',
   'client.documents.field.agreedEndOn': 'Día en que acababa el préstamo',
   'client.documents.field.expiresOn': 'Fecha de vencimiento de la póliza',
+  'client.documents.field.initialRate': 'Tipo de interés inicial',
   'client.documents.kind.credit_agreement': 'Contrato del crédito',
   'client.documents.kind.credit_precontract_info': 'Información previa (INE)',
   'client.documents.kind.amortization_schedule': 'Cuadro de amortización',
@@ -1070,6 +1071,16 @@ export const es = {
   'client.documents.kind.card_statement_month': 'Extracto de {mes}',
   'client.documents.kind.insurance_policy': 'Póliza del seguro',
   'client.documents.kind.insurance_renewal_notice': 'Aviso de renovación del seguro',
+  'client.documents.kind.mortgage_deed': 'Escritura del préstamo hipotecario',
+  'client.documents.kind.notary_invoice': 'Factura de la notaría',
+  'client.documents.kind.registry_invoice': 'Factura del registro',
+  'client.documents.kind.agency_invoice_mortgage': 'Factura de la gestoría',
+  'client.documents.kind.valuation_invoice': 'Factura de la tasación',
+  'client.documents.kind.ajd_form': 'Impuesto del préstamo o de la compra (modelo 600)',
+  'client.documents.kind.fein': 'Ficha europea de información normalizada (FEIN)',
+  'client.documents.kind.fiae': 'Ficha de advertencias estandarizadas (FiAE)',
+  'client.documents.kind.transparency_deed': 'Acta notarial previa',
+  'client.documents.kind.prepayment_statement': 'Liquidación de una amortización o un cambio',
   'client.documents.kind.lease': 'Contrato de alquiler',
   'client.documents.kind.rent_update_notice': 'Aviso de subida de la renta',
   'client.documents.kind.rent_receipt': 'Recibo del alquiler',
@@ -1089,6 +1100,16 @@ export const es = {
   'client.documents.source.card_statement': 'el extracto',
   'client.documents.source.insurance_policy': 'la póliza',
   'client.documents.source.insurance_renewal_notice': 'el aviso de renovación',
+  'client.documents.source.mortgage_deed': 'la escritura',
+  'client.documents.source.notary_invoice': 'la factura de la notaría',
+  'client.documents.source.registry_invoice': 'la factura del registro',
+  'client.documents.source.agency_invoice_mortgage': 'la factura de la gestoría',
+  'client.documents.source.valuation_invoice': 'la factura de la tasación',
+  'client.documents.source.ajd_form': 'el modelo 600',
+  'client.documents.source.fein': 'la FEIN',
+  'client.documents.source.fiae': 'la FiAE',
+  'client.documents.source.transparency_deed': 'el acta notarial previa',
+  'client.documents.source.prepayment_statement': 'la liquidación',
   'client.documents.agreement_offer': 'El acuerdo que has subido ofrece {importe} en total.',
   'client.documents.conflict':
     '{dato}: los documentos no dicen lo mismo. Se ha usado lo que pone {fuente}; compáralo con los demás.',
@@ -1135,6 +1156,12 @@ export const es = {
   'client.documents.skipped.not_rental_document': 'no parece un documento del alquiler.',
   'client.documents.skipped.not_credit_document': 'no parece un documento del crédito.',
   'client.documents.skipped.not_insurance_document': 'no parece un documento del seguro.',
+  'client.documents.skipped.not_mortgage_document': 'no parece un documento de la hipoteca.',
+  'client.documents.missing_key_page':
+    'No se ha encontrado {pagina}. Si tu escritura la tiene, puede que esa página no esté entre las que has subido: {pista}',
+  'client.documents.key_page.expenses_clause': 'la cláusula de gastos de tu escritura',
+  'client.documents.key_page_hint.expenses_clause':
+    'suele estar entre las cláusulas financieras, con un título como «Gastos», y dice quién paga la notaría, el registro, la gestoría, la tasación y los impuestos. Puedes añadirla con «Subir más documentos».',
   'client.documents.skipped.foreign_jurisdiction':
     'es de otro país. Esta revisión aplica la ley española.',
   'client.documents.skipped.unknown_format': 'es un tipo de documento que no se reconoce.',
@@ -5310,6 +5337,27 @@ export const es = {
   'mortgage.no_js':
     'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
   'mortgage.reviewed': 'Revisado el {fecha}',
+  'mortgage.documents.start_help':
+    'Puedes subir tu escritura y tus facturas para rellenar los datos con lo que se lea en ellas, o escribirlos tú. Antes de revisar nada, confirmas cada dato y lees cada cláusula tal como está escrita.',
+  'mortgage.documents.upload':
+    'Sube las páginas útiles de tu escritura y, si las tienes, tus facturas',
+  'mortgage.documents.files_hint':
+    'Las páginas de la escritura que dice la guía y, si los tienes, las facturas de notaría, registro, gestoría y tasación, el modelo 600, la FEIN o la liquidación de una amortización, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+  'mortgage.documents.consent':
+    'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, DNI o domicilios, también de avalistas, y, si hay un seguro de vida vinculado, datos de salud. Se leen en la Unión Europea y no se guardan.',
+  'mortgage.documents.guide.lead':
+    'Tu escritura puede tener 25-60 páginas. Sube la primera, las de cláusulas financieras (intereses, comisiones, gastos, demora, vencimiento) y tus facturas.',
+  'mortgage.documents.guide.first': 'La primera página',
+  'mortgage.documents.guide.first_signs':
+    'Empieza con el número de la escritura, el lugar, la fecha y el nombre del notario.',
+  'mortgage.documents.guide.clauses': 'Las cláusulas financieras',
+  'mortgage.documents.guide.clauses_signs':
+    'Suelen ir seguidas, cada una con su título: «Intereses», «Comisiones», «Gastos», «Intereses de demora», «Vencimiento anticipado».',
+  'mortgage.documents.guide.invoices': 'Tus facturas',
+  'mortgage.documents.guide.invoices_signs':
+    'Las de notaría, registro, gestoría y tasación, y el modelo 600 del impuesto, si los tienes.',
+  'mortgage.documents.guide.caption':
+    'El resto de la escritura, como la descripción de la vivienda o los anexos, no hace falta.',
   'mortgage.form_aria': 'Revisión de tu hipoteca',
   'mortgage.tab.hipoteca': 'Hipoteca',
   'mortgage.tab.clausula-gastos': 'Cláusulas',
@@ -5823,6 +5871,61 @@ export const es = {
   'client.mortgage.error.count_range': 'Escribe un número entre 1 y 600',
   'client.mortgage.error.not_agency': 'Solo la factura de la gestoría lleva pagos hechos por ti',
   'client.mortgage.error.above_total': 'Suman más que el total de su factura',
+  'client.mortgage.documents.mark_derived':
+    'Sale de lo leído en tus documentos · confianza {nivel}',
+  'client.mortgage.documents.quote.expensesClause': 'Lo que dice tu escritura sobre los gastos',
+  'client.mortgage.documents.quote.floor': 'Lo que dice tu escritura sobre el tipo mínimo',
+  'client.mortgage.documents.quote.irph': 'Lo que dice tu escritura sobre el índice',
+  'client.mortgage.documents.quote.defaultInterest':
+    'Lo que dice tu escritura sobre el interés de demora',
+  'client.mortgage.documents.quote.earlyTermination':
+    'Lo que dice tu escritura sobre el vencimiento anticipado',
+  'client.mortgage.documents.quote.openingFee':
+    'Lo que dice tu escritura sobre la comisión de apertura',
+  'client.mortgage.documents.quote.roundingUp':
+    'Lo que dice tu escritura sobre el redondeo del tipo',
+  'client.mortgage.documents.quote.insuranceRequired':
+    'Lo que dice tu escritura sobre seguros u otros productos',
+  'client.mortgage.documents.quote.operation':
+    'Lo que dice tu escritura sobre amortizar antes de tiempo',
+  'client.mortgage.documents.quote_note':
+    'Copiado tal cual de tu escritura (de una cláusula muy larga, solo su comienzo): léelo y confirma con él lo que marcas aquí.',
+  'client.mortgage.documents.clauses':
+    'Cláusulas encontradas en tu escritura: {clausulas}. Cada una aparece copiada tal cual junto a su pregunta: léela y confirma allí tu respuesta.',
+  'client.mortgage.documents.clause.floor_clause': 'tipo mínimo (cláusula suelo)',
+  'client.mortgage.documents.clause.irph': 'índice IRPH',
+  'client.mortgage.documents.clause.euribor': 'índice Euríbor',
+  'client.mortgage.documents.clause.default_interest': 'interés de demora',
+  'client.mortgage.documents.clause.early_termination': 'vencimiento anticipado',
+  'client.mortgage.documents.clause.rounding_up': 'redondeo del tipo',
+  'client.mortgage.documents.clause.opening_fee': 'comisión de apertura',
+  'client.mortgage.documents.clause.prepayment_fee': 'comisión por amortizar antes de tiempo',
+  'client.mortgage.documents.clause.expenses_clause': 'gastos',
+  'client.mortgage.documents.clause.insurance_required': 'seguros u otros productos exigidos',
+  'client.mortgage.documents.default_points':
+    'El interés de demora sale de sumar al interés inicial los puntos que fija la escritura: compruébalo.',
+  'client.mortgage.documents.opening_percent':
+    'La comisión de apertura sale del porcentaje que fija la escritura sobre el capital: compárala con lo que te cobraron.',
+  'client.mortgage.documents.invoices':
+    'Cada factura leída se ha pasado a la hoja de su concepto (notaría, registro, gestoría, tasación, impuesto): compara cada importe con tu factura.',
+  'client.mortgage.documents.invoices_added':
+    'Había varias facturas del mismo concepto y se han sumado en su hoja: compruébalo.',
+  'client.mortgage.documents.invoices_left_out':
+    'Alguna factura cobra algo que esta revisión no cuenta (la compraventa, una copia o una cancelación) o no dice qué cobra, así que no se ha pasado: si es de la hipoteca, escribe su importe a mano.',
+  'client.mortgage.documents.ajd_lender_paid':
+    'Según el modelo 600, el impuesto del préstamo lo pagó el banco, así que no se ha pasado como gasto tuyo.',
+  'client.mortgage.documents.operations_many':
+    'Tus documentos traen varias amortizaciones o cambios: se ha pasado el más reciente. Si quieres revisar otro, cámbialo.',
+  'client.mortgage.documents.rows_cut':
+    'Tus documentos traen más cláusulas o facturas de las que se leen de una vez: compara cada hoja con tus documentos.',
+  'client.mortgage.documents.check.invoice_parts_do_not_sum':
+    'En alguna factura, la base, el IVA y los suplidos no suman el total: compara su importe con la factura.',
+  'client.mortgage.documents.check.invoice_mixes_purchase_and_loan':
+    'Una factura de notaría o de registro cobra juntas la compraventa y la hipoteca, sin separarlas: está marcada así en su hoja, y la revisión no le pone cifra.',
+  'client.mortgage.documents.check.duplicate_supplied_amount':
+    'La gestoría cobra como suplido el impuesto o el registro por el mismo importe que otro documento que has subido: puede ser el mismo pago contado dos veces. Revisa la hoja de la gestoría.',
+  'client.mortgage.documents.check.ajd_purchase_not_loan':
+    'El modelo 600 que has subido es el de la compraventa, no el del préstamo, así que no se ha pasado como impuesto de la hipoteca.',
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof es;

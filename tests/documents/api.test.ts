@@ -6,6 +6,9 @@ import { CREDIT_SECTIONS } from '../../api/src/domain/credit-schema';
 import type { InsuranceCheck as ApiInsuranceCheck } from '../../api/src/domain/insurance-checks';
 import { INSURANCE_MERGE_RULES } from '../../api/src/domain/insurance-merge';
 import { INSURANCE_SECTIONS } from '../../api/src/domain/insurance-schema';
+import type { MortgageCheck as ApiMortgageCheck } from '../../api/src/domain/mortgage-checks';
+import { MORTGAGE_MERGE_RULES } from '../../api/src/domain/mortgage-merge';
+import { MORTGAGE_SECTIONS } from '../../api/src/domain/mortgage-schema';
 import {
   LIMITS as API_LIMITS,
   SITE_PAGE_KINDS as API_PAGE_KINDS,
@@ -23,6 +26,8 @@ import {
   INSURANCE_CHECKS,
   INSURANCE_EXTRACTION,
   LIMITS,
+  MORTGAGE_CHECKS,
+  MORTGAGE_EXTRACTION,
   PAGE_KINDS,
   READABILITY,
   RENTAL_EXTRACTION,
@@ -189,9 +194,19 @@ describe('extract', () => {
     );
     expect([...INSURANCE_EXTRACTION.lists].sort()).toEqual(lists(INSURANCE_SECTIONS));
   });
-  it('knows every check the API makes of credit and insurance documents, and only those', () => {
+  it('reads every mortgage field the API merges, and the lists of every section', () => {
+    const lists = [
+      ...new Set(Object.values(MORTGAGE_SECTIONS).flatMap((s) => Object.keys(s.lists))),
+    ].sort();
+    expect([...MORTGAGE_EXTRACTION.fields].sort()).toEqual(
+      Object.keys(MORTGAGE_MERGE_RULES).sort(),
+    );
+    expect([...MORTGAGE_EXTRACTION.lists].sort()).toEqual(lists);
+  });
+  it('knows every check the API makes of credit, insurance and mortgage documents, and only those', () => {
     expectTypeOf<(typeof CREDIT_CHECKS)[number]>().toEqualTypeOf<ApiCreditCheck>();
     expectTypeOf<(typeof INSURANCE_CHECKS)[number]>().toEqualTypeOf<ApiInsuranceCheck>();
+    expectTypeOf<(typeof MORTGAGE_CHECKS)[number]>().toEqualTypeOf<ApiMortgageCheck>();
   });
   it('takes as many images and as large a request as the API', () => {
     expect(LIMITS.maxImages).toBe(API_LIMITS.maxImages);

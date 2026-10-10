@@ -4,6 +4,7 @@ import {
   CREDIT_CHECKS,
   EMPLOYMENT_CHECKS,
   INSURANCE_CHECKS,
+  MORTGAGE_CHECKS,
   RENTAL_CHECKS,
   CONFIDENCES,
   LIMITS,
@@ -30,6 +31,7 @@ const CHECKS_SET: ReadonlySet<unknown> = new Set([
   ...EMPLOYMENT_CHECKS,
   ...CREDIT_CHECKS,
   ...INSURANCE_CHECKS,
+  ...MORTGAGE_CHECKS,
 ]);
 
 export type Fetch = (url: string, init: RequestInit) => Promise<Response>;

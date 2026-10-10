@@ -431,3 +431,43 @@ export function wireDocuments<R, F extends string, L extends string>({
         );
     });
 }
+
+export interface ReadingWiring<F extends string, L extends string> {
+  readonly form: ReviewForm;
+  // The address the visit arrived at, before the form rewrote its fragment.
+  readonly arrival: { readonly hash: string };
+  readonly section: ReadingSection<F, L>;
+  readonly config: DocumentsConfig | null;
+  // The section's copy: its root may word some messages its own way.
+  readonly tr: Translate;
+  readonly events: DocumentEvents;
+}
+
+// Document reading on a page that sells no pass yet: the same start sheet and upload, and a pass
+// bought on another page still pays for its reads here.
+export function wireReading<F extends string, L extends string>({
+  form: calculator,
+  arrival,
+  section,
+  config,
+  tr,
+  events,
+}: ReadingWiring<F, L>): void {
+  const start = document.querySelector<HTMLElement>('[data-documents-start]');
+  const captchaBox = start?.querySelector<HTMLElement>('[data-captcha]');
+  if (!config || !start || !captchaBox) return;
+
+  const upload = setUpReading(start, captchaBox, {
+    calculator,
+    section,
+    config,
+    api: createApi(config.endpoints, (url, init) => fetch(url, init), section.extraction),
+    loadTurnstile: turnstileLoader(),
+    passes: passStore(),
+    session: storage(() => sessionStorage),
+    tr,
+    events,
+  });
+  if (section.steps.includes(arrival.hash.slice(1))) upload.showCalculator(false);
+  else upload.showStart();
+}
