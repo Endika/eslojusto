@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   hasIdentifier,
   hasNumberPlate,
+  hasPersonTitle,
   hasPaymentCardNumber,
   hasSocialSecurityNumber,
 } from '../src/domain/identifiers';
@@ -123,5 +124,28 @@ describe('hasNumberPlate', () => {
     ['a company tax number', 'NIF B12345678'],
   ])('finds nothing in %s', (_, text) => {
     expect(hasNumberPlate(text)).toBe(false);
+  });
+});
+
+describe('hasPersonTitle', () => {
+  it.each([
+    ['Don', 'con la fianza de Don Mengano Inventado'],
+    ['Doña', 'comparece Doña Zutana Ficticia'],
+    ['D.', 'responde D. Fulano Inventado'],
+    ['D.ª', 'y D.ª María Imaginaria'],
+    ['Dña.', 'Dña. Perengana Ficticia, mayor de edad'],
+    ['Sra.', 'la Sra. Mengana Inventada'],
+  ])('finds a name after %s', (_, text) => {
+    expect(hasPersonTitle(text)).toBe(true);
+  });
+
+  it.each([
+    ['a placeholder', 'responde D. [nombre] como fiador'],
+    ['a title in lower case', 'don de gentes'],
+    ['a word that ends like one', 'Mondon Fulano'],
+    ['a lender', 'Banco Imaginario, S.A.'],
+    ['a law', 'Disposición transitoria primera de la Ley 5/2019'],
+  ])('finds nothing in %s', (_, text) => {
+    expect(hasPersonTitle(text)).toBe(false);
   });
 });

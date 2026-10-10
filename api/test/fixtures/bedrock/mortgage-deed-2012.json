@@ -1,0 +1,222 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "mortgage_deed",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "mortgage_deed",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "mortgage_deed",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 4,
+            "kind": "notary_invoice",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 5,
+            "kind": "registry_invoice",
+            "document": 3,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 6,
+            "kind": "valuation_invoice",
+            "document": 4,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "mortgage_deed": {
+          "deedOn": {
+            "value": "2012-04-17",
+            "confidence": "high"
+          },
+          "lenderName": {
+            "value": "Banco Imaginario, S.A.",
+            "confidence": "high"
+          },
+          "borrowerType": {
+            "value": "individual",
+            "confidence": "high"
+          },
+          "purpose": {
+            "value": "housing",
+            "confidence": "high"
+          },
+          "loanKind": {
+            "value": "standard",
+            "confidence": "high"
+          },
+          "principal": {
+            "value": 150000,
+            "confidence": "high"
+          },
+          "termMonths": {
+            "value": 360,
+            "confidence": "high"
+          },
+          "rateType": {
+            "value": "variable",
+            "confidence": "high"
+          },
+          "initialRate": {
+            "value": 3.95,
+            "confidence": "high"
+          },
+          "index": {
+            "value": "euribor",
+            "confidence": "high"
+          },
+          "spread": {
+            "value": 0.875,
+            "confidence": "high"
+          },
+          "rateRevisionMonths": {
+            "value": 12,
+            "confidence": "high"
+          },
+          "floorPercent": {
+            "value": 3,
+            "confidence": "high"
+          },
+          "defaultRate": {
+            "value": 19,
+            "confidence": "high"
+          },
+          "openingFee": {
+            "value": 1500,
+            "confidence": "high"
+          },
+          "openingFeePercent": {
+            "value": 1,
+            "confidence": "high"
+          },
+          "clauses": [
+            {
+              "label": "euribor",
+              "text": "TIPO DE INTERÉS VARIABLE. A partir del primer periodo, el tipo de interés será el resultado de adicionar un diferencial de 0,875 puntos al Euríbor a doce meses publicado en el BOE.",
+              "page": 2,
+              "confidence": "high"
+            },
+            {
+              "label": "floor_clause",
+              "text": "LÍMITE A LA VARIACIÓN DEL TIPO DE INTERÉS. No obstante lo previsto en la cláusula anterior, el tipo de interés aplicable en cada periodo de revisión no podrá ser inferior al 3,00 % nominal anual.",
+              "page": 2,
+              "confidence": "high"
+            },
+            {
+              "label": "default_interest",
+              "text": "INTERESES DE DEMORA. Las obligaciones vencidas y no satisfechas devengarán desde el día siguiente a su vencimiento un interés de demora del 19,00 % nominal anual.",
+              "page": 3,
+              "confidence": "high"
+            },
+            {
+              "label": "expenses_clause",
+              "text": "GASTOS A CARGO DE LA PARTE PRESTATARIA. Serán de cuenta exclusiva de la parte prestataria todos los gastos de tasación del inmueble, aranceles notariales y registrales relativos a la constitución, modificación o cancelación de la hipoteca, los impuestos que graven este contrato y los gastos de gestoría para su tramitación.",
+              "page": 3,
+              "confidence": "high"
+            }
+          ]
+        },
+        "notary_invoice": {
+          "notaryInvoices": [
+            {
+              "invoiceOn": "2012-04-17",
+              "concept": "loan",
+              "mixed": false,
+              "base": 520.4,
+              "vat": 93.67,
+              "supplied": 12.5,
+              "total": 626.57,
+              "confidence": "high"
+            },
+            {
+              "invoiceOn": "2012-04-17",
+              "concept": "purchase",
+              "mixed": false,
+              "base": 610.2,
+              "vat": 109.84,
+              "total": 720.04,
+              "confidence": "high"
+            }
+          ]
+        },
+        "registry_invoice": {
+          "registryInvoices": [
+            {
+              "invoiceOn": "2012-05-08",
+              "concept": "mortgage",
+              "mixed": false,
+              "base": 310.0,
+              "vat": 55.8,
+              "total": 365.8,
+              "confidence": "high"
+            }
+          ]
+        },
+        "valuation_invoice": {
+          "valuationInvoices": [
+            {
+              "invoiceOn": "2012-03-20",
+              "base": 300,
+              "vat": 54,
+              "total": 354,
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 31200,
+    "output_tokens": 1900
+  }
+}

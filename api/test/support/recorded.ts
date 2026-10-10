@@ -46,7 +46,14 @@ export type Recording =
   | 'credit-identifiers'
   | 'insurance-home-renewal'
   | 'insurance-car-online'
-  | 'insurance-not-insurance';
+  | 'insurance-not-insurance'
+  | 'mortgage-deed-2012'
+  | 'mortgage-mixed-agency'
+  | 'mortgage-deed-2020-floor'
+  | 'mortgage-deed-without-expenses'
+  | 'mortgage-identifiers'
+  | 'mortgage-injected'
+  | 'mortgage-not-mortgage';
 
 export const recording = (name: Recording): string =>
   readFileSync(new URL(`../fixtures/bedrock/${name}.json`, import.meta.url), 'utf8');

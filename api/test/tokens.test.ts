@@ -18,6 +18,7 @@ import {
 } from '../src/domain/tokens';
 import { creditRecord } from './support/credit-largest';
 import { employmentRecord, LARGEST } from './support/employment-largest';
+import { mortgageRecord } from './support/mortgage-largest';
 
 const PROMPT_TOKENS = PROMPT_TOKENS_BY_REVIEW.final_pay;
 
@@ -90,7 +91,7 @@ describe('cost of a read', () => {
     expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'employment')).toBeLessThanOrEqual(0.515);
   });
 
-  it('gives only the employment and the credit review more room to write', () => {
+  it('gives only the employment, the credit and the mortgage review more room to write', () => {
     expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.final_pay).toBe(0);
     expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.rental).toBe(0);
     expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.insurance).toBe(0);
@@ -99,6 +100,11 @@ describe('cost of a read', () => {
   it('stays under 0.515 USD for a credit read, with the employment review’s room to write', () => {
     expect(maxOutput(SONNET_4_6, 'credit')).toBe(12_000);
     expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'credit')).toBeLessThanOrEqual(0.515);
+  });
+
+  it('stays under 0.515 USD for a mortgage read, with the employment review’s room to write', () => {
+    expect(maxOutput(SONNET_4_6, 'mortgage')).toBe(12_000);
+    expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'mortgage')).toBeLessThanOrEqual(0.515);
   });
 
   it('stays at or under 0.40 USD for an insurance read', () => {
@@ -158,5 +164,20 @@ describe('what a credit read records', () => {
 
   it('does not fit every list and every copied text at its limit', () => {
     expect(recordTokens(creditRecord('largest'))).toBe(12_216);
+  });
+});
+
+// api/README.md, «Cost», quotes these sizes.
+describe('what a mortgage read records', () => {
+  const room = maxOutput(SONNET_4_6, 'mortgage');
+
+  it('fits every list at its maximum, with clauses of the usual length, a tenth under max_tokens', () => {
+    const full = recordTokens(mortgageRecord('typical'));
+    expect(full).toBe(9_622);
+    expect(full).toBeLessThanOrEqual(0.91 * room);
+  });
+
+  it('does not fit every list and every copied text at its limit', () => {
+    expect(recordTokens(mortgageRecord('largest'))).toBe(14_001);
   });
 });

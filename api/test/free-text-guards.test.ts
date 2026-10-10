@@ -5,11 +5,13 @@ import { parseReading } from '../src/domain/extraction';
 import type { FieldSpec, SectionSchema } from '../src/domain/extraction-schema';
 import { insuranceMerge } from '../src/domain/insurance-merge';
 import { INSURANCE_SECTIONS } from '../src/domain/insurance-schema';
+import { mortgageMerge } from '../src/domain/mortgage-merge';
+import { MORTGAGE_SECTIONS } from '../src/domain/mortgage-schema';
 import type { ReviewKind } from '../src/domain/reviews';
 import { f, page } from './support/fields';
 
-// Every text the credit and the insurance schema let the model copy, walked from the schemas
-// themselves: a text field added later is covered without naming it here. Made-up values only.
+// Every text the credit, the insurance and the mortgage schema let the model copy, walked from
+// the schemas themselves: a text field added later is covered without naming it here. Made-up values only.
 const CLEAN = 'Texto copiado del documento';
 const LEAKS = [
   ['a DNI', 'Firmado por el titular, DNI 12345678A'],
@@ -20,6 +22,10 @@ const LEAKS = [
   ['a number plate', 'Turismo matrícula 1234 BCD'],
   ['health', 'Cuestionario de salud sin enfermedad previa'],
   ['a disability', 'Incapacidad permanente del asegurado'],
+] as const;
+// A deed names its borrowers and guarantors with a title before their name.
+const DEED_LEAKS = [
+  ['a person a deed names', 'Con la fianza solidaria de Don Mengano Inventado'],
 ] as const;
 
 const sample = ({ type }: FieldSpec, text: string): unknown => {
@@ -86,23 +92,33 @@ const REVIEWS = [
     CREDIT_SECTIONS,
     (toolInput: Record<string, unknown>) =>
       creditMerge(parseReading(toolInput, 1, 'credit'), toolInput),
+    LEAKS,
   ],
   [
     'insurance',
     INSURANCE_SECTIONS,
     (toolInput: Record<string, unknown>) => insuranceMerge(parseReading(toolInput, 1, 'insurance')),
+    LEAKS,
+  ],
+  [
+    'mortgage',
+    MORTGAGE_SECTIONS,
+    (toolInput: Record<string, unknown>) =>
+      mortgageMerge(parseReading(toolInput, 1, 'mortgage'), toolInput),
+    [...LEAKS, ...DEED_LEAKS],
   ],
 ] as const satisfies readonly (readonly [
   ReviewKind,
   Readonly<Record<string, SectionSchema>>,
   (toolInput: Record<string, unknown>) => { readonly discarded: number },
+  readonly (readonly [string, string])[],
 ])[];
 
-describe.each(REVIEWS)('every text a %s read copies', (_, sections, merge) => {
+describe.each(REVIEWS)('every text a %s read copies', (review, sections, merge, leaks) => {
   const all = targets(sections);
 
   it('is walked from the schema', () => {
-    expect(all.length).toBeGreaterThanOrEqual(4);
+    expect(all.length).toBeGreaterThanOrEqual(review === 'mortgage' ? 3 : 4);
   });
 
   it.each(all.map((t): [string, Target] => [label(t), t]))(
@@ -116,7 +132,7 @@ describe.each(REVIEWS)('every text a %s read copies', (_, sections, merge) => {
 
   it.each(
     all.flatMap((t) =>
-      LEAKS.map(([what, text]): [string, string, Target, string] => [label(t), what, t, text]),
+      leaks.map(([what, text]): [string, string, Target, string] => [label(t), what, t, text]),
     ),
   )('drops %s when it carries %s', (_label, _what, target, text) => {
     const merged = merge(input(sections, target, text));

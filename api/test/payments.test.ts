@@ -194,6 +194,15 @@ describe('Stripe adapter', () => {
     expect(options).toEqual({ idempotencyKey: `checkout-credit-${NONCE}` });
   });
 
+  it('returns a mortgage payment to /hipoteca/, under a key of its own', () => {
+    const [params, options] = checkoutParams(NONCE, PRICE, 'mortgage');
+    expect(params.success_url).toBe(
+      'https://eslojusto.es/hipoteca/?session_id={CHECKOUT_SESSION_ID}',
+    );
+    expect(params.cancel_url).toBe('https://eslojusto.es/hipoteca/');
+    expect(options).toEqual({ idempotencyKey: `checkout-mortgage-${NONCE}` });
+  });
+
   const session = (extra: Record<string, unknown> = {}) =>
     ({
       id: 'cs_test_paid',
