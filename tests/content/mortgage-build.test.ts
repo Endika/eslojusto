@@ -39,6 +39,10 @@ describe.skipIf(!built || withMortgage)('a build without the mortgage switch', (
     expect(html).not.toContain('hipoteca/');
     expect(html).not.toContain('client.mortgage.');
   });
+  it('says nothing of it in the privacy and legal notices', () => {
+    expect(read('dist/privacidad/index.html')).not.toContain('revisión de tu hipoteca');
+    expect(read('dist/aviso-legal/index.html')).not.toContain('al-hipoteca');
+  });
 });
 
 describe.skipIf(!withMortgage)('a build with the mortgage switch', () => {
@@ -55,6 +59,14 @@ describe.skipIf(!withMortgage)('a build with the mortgage switch', () => {
     expect(page).toContain('id="faq-hipoteca-suelo"');
     expect(page).toContain('"@type":"FAQPage"');
     expect(page).toContain('data-legal-quote');
+  });
+  it('describes the review in the privacy and legal notices', () => {
+    expect(read('dist/privacidad/index.html')).toContain(
+      'Lo que escribes en la revisión de tu hipoteca',
+    );
+    const notice = read('dist/aviso-legal/index.html');
+    expect(notice).toContain('id="al-hipoteca"');
+    expect(notice).toContain('No valora si las cláusulas de tu escritura son transparentes');
   });
   it('ships its strings only on its own page', () => {
     expect(read('dist/hipoteca/index.html')).toContain(

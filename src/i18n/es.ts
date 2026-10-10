@@ -4259,6 +4259,40 @@ export const es = {
     'No valora la transparencia de las cláusulas ni califica tu tipo de interés: la comparación con el tipo medio es una referencia, con su fuente, y un juez valora además las circunstancias del caso. No calcula ningún importe por esa comparación ni enlaza a despachos. No pide nombre, DNI ni número de cuenta. Informa sobre la ley y no es asesoramiento jurídico.',
   'legal_notice.credit.beta':
     'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves una cifra que no cuadra con la ley, puedes escribir a',
+  'privacy.mortgage.summary':
+    'La revisión de tu hipoteca funciona igual: lo que escribes se calcula en tu navegador y no se guarda. Sus preguntas no piden nombre, DNI, domicilio ni el nombre de tu banco.',
+  'privacy.mortgage.data_review': 'Lo que escribes en la revisión de tu hipoteca',
+  'privacy.mortgage.data_review_where':
+    'Solo en tu navegador, mientras la página está abierta. La fecha de la escritura, sus cláusulas, los importes de tus facturas y de tus amortizaciones y sus fechas se calculan en tu dispositivo y no se envían a ningún servidor ni se guardan. Al cerrar o recargar la página, desaparecen.',
+  'privacy.mortgage.tracked_sheets': 'En la revisión de tu hipoteca',
+  'privacy.mortgage.tracked_sheets_what':
+    'Lo mismo que en el finiquito con cada una de sus hojas, de la hipoteca al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha de la escritura», nunca lo que escribiste. Qué pregunta frecuente abres.',
+  'privacy.mortgage.tracked_scope': 'Si tu hipoteca queda fuera de la revisión',
+  'privacy.mortgage.tracked_scope_what':
+    'El motivo, de una lista cerrada: la pidió una empresa, es sobre un inmueble de un negocio, es la del promotor subrogada al comprar, es multidivisa o inversa, o es un préstamo sin hipoteca.',
+  'privacy.mortgage.tracked_review': 'Al revisar tu hipoteca',
+  'privacy.mortgage.tracked_review_what':
+    'El tramo de fechas de la escritura (antes del 09-12-2007, hasta el 14-05-2013, hasta el 09-11-2018, hasta el 15-06-2019 o desde el 16-06-2019) y si la pediste como particular (sí, no o no lo sabes). De los gastos por ley, de los del reparto del Tribunal Supremo y de las comisiones, su resultado en un código; cuántas facturas metes, en tramos (ninguna, 1-2 o 3 o más); qué cláusulas aparecen en tu escritura, por su tipo (por ejemplo, cláusula suelo o IRPH), nunca su texto; la cifra más alta de las tres líneas, en tramos y sin sumarlas; si se te ofreció el pase y si ves el informe con él. Cuántas veces revisas y cuánto tardas, en tramos. Nunca un importe, un tipo de interés, una fecha ni el nombre del banco.',
+  'privacy.mortgage.data_documents': 'Los documentos de la hipoteca que subes',
+  'privacy.mortgage.data_documents_where':
+    'Solo si eliges subirlos y das tu consentimiento: las páginas de tu escritura y, si las tienes, las facturas de notaría, registro, gestoría y tasación, el modelo 600 del impuesto, la FEIN o la liquidación de una amortización. Siguen el mismo camino que los demás documentos, por el mismo servidor en España y el mismo modelo en la Unión Europea, y tampoco se guardan. Una escritura lleva tu nombre, tu DNI, tu domicilio y los datos de los avalistas, y, si hay un seguro de vida vinculado, a veces datos de salud. El modelo tiene orden de no copiar nombres de personas, DNI, NIE, domicilios, teléfonos, correos, cuentas ni firmas, ni nada sobre salud, tampoco dentro del texto de una cláusula; sí copia el nombre del banco.',
+  'privacy.mortgage.data_letters': 'Los datos de las cartas de la hipoteca',
+  'privacy.mortgage.data_letters_where':
+    'Lo que añades a las cartas (tu nombre, tu DNI o NIE, el banco, el número de préstamo y la localidad) solo rellena la carta en tu navegador. Las cartas no salen de tu dispositivo ni se guardan.',
+  'privacy.mortgage.consent':
+    'En la hipoteca, la escritura lleva tus datos personales y los de los avalistas y, si hay un seguro de vida vinculado, puede llevar datos de salud. Por eso también te pedimos tu consentimiento explícito antes de subirla, con la misma base jurídica. El modelo tiene orden de no copiar esos datos; nada se guarda.',
+  'privacy.mortgage.tracked_documents': 'Al leer documentos de la hipoteca',
+  'privacy.mortgage.tracked_documents_what':
+    'La lectura de la escritura y de las facturas no envía ningún aviso. Al descargar, si es el informe, la carta que pide la documentación de la hipoteca o la que pide revisar los importes y, de una carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en las cartas.',
+  'legal_notice.mortgage': 'La revisión de los gastos y las comisiones de tu hipoteca',
+  'legal_notice.mortgage.does':
+    'Para la hipoteca de una persona sobre su vivienda, separa los gastos de la constitución que la Ley 5/2019 pone a cargo del banco en las escrituras desde el 16-06-2019, y el impuesto desde el 10-11-2018, de lo que corresponde según el reparto que aplica el Tribunal Supremo a las anteriores, sin sumarlos nunca; comprueba si lo cobrado por amortizar o por pasar a tipo fijo pasa del tope legal, y dice qué han dicho la ley y los tribunales de las cláusulas de la escritura, con su fuente y su fecha. Cada resultado lleva la norma o el criterio del que sale.',
+  'legal_notice.mortgage.does_not':
+    'No valora si las cláusulas de tu escritura son transparentes ni su abusividad, no calcula lo que supusieron una cláusula suelo o el IRPH en tus cuotas y no dice si en tu caso ha pasado algún plazo. No enlaza a despachos. No pide nombre, DNI ni domicilio. Informa sobre la ley y no es asesoramiento jurídico.',
+  'legal_notice.mortgage.beta':
+    'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves una cifra que no cuadra con la ley, puedes escribir a',
+  'legal_notice.mortgage.pass':
+    'En la revisión de la hipoteca, el mismo pase permite descargar un informe en PDF y, si la revisión tiene importes que fija la ley, la carta que pide al banco que los revise, también generados en tu dispositivo. Se ofrece solo si algún gasto o comisión tiene cifra. La carta que pide la documentación de la hipoteca se descarga gratis. El pase vale para cualquier revisión durante sus {dias} días.',
   'insurance.title': 'Fechas de tu seguro: renovación y desistimiento',
   'insurance.description':
     'Con las fechas de tu seguro de hogar o de coche: último día para decir que no lo renuevas, si el aviso de cambios llegó a tiempo y plazo para desistir.',

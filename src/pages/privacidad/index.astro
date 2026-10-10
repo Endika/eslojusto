@@ -11,6 +11,7 @@ import {
   EMPLOYMENT_BUILD,
   HOUSEHOLD_BUILD,
   INSURANCE_BUILD,
+  MORTGAGE_BUILD,
   RENTAL_BUILD,
 } from '../../content/sections';
 
@@ -32,6 +33,8 @@ const household = HOUSEHOLD_BUILD;
 // do the paragraphs about each.
 const credit = CREDIT_BUILD;
 const insurance = INSURANCE_BUILD;
+// The mortgage review exists only in a PUBLIC_MORTGAGE=1 build; so do the paragraphs about it.
+const mortgage = MORTGAGE_BUILD;
 
 // One entry per thing that is stored or processed; a new tool adds a row here.
 const stored = [
@@ -67,6 +70,14 @@ const stored = [
         {
           what: tx('privacy.insurance.data_review'),
           where: tx('privacy.insurance.data_review_where'),
+        },
+      ]
+    : []),
+  ...(mortgage
+    ? [
+        {
+          what: tx('privacy.mortgage.data_review'),
+          where: tx('privacy.mortgage.data_review_where'),
         },
       ]
     : []),
@@ -127,6 +138,18 @@ const stored = [
               {
                 what: tx('privacy.insurance.data_letters'),
                 where: tx('privacy.insurance.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(mortgage
+          ? [
+              {
+                what: tx('privacy.mortgage.data_documents'),
+                where: tx('privacy.mortgage.data_documents_where'),
+              },
+              {
+                what: tx('privacy.mortgage.data_letters'),
+                where: tx('privacy.mortgage.data_letters_where'),
               },
             ]
           : []),
@@ -272,6 +295,22 @@ const tracked = [
         },
       ]
     : []),
+  ...(mortgage
+    ? [
+        {
+          when: tx('privacy.mortgage.tracked_sheets'),
+          what: tx('privacy.mortgage.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_scope'),
+          what: tx('privacy.mortgage.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_review'),
+          what: tx('privacy.mortgage.tracked_review_what'),
+        },
+      ]
+    : []),
   ...(documents
     ? [
         {
@@ -318,6 +357,14 @@ const tracked = [
               },
             ]
           : []),
+        ...(mortgage
+          ? [
+              {
+                when: tx('privacy.mortgage.tracked_documents'),
+                what: tx('privacy.mortgage.tracked_documents_what'),
+              },
+            ]
+          : []),
       ]
     : []),
   {
@@ -356,6 +403,7 @@ const tracked = [
         {household && <p>{tx('privacy.household.summary')}</p>}
         {credit && <p>{tx('privacy.credit.summary')}</p>}
         {insurance && <p>{tx('privacy.insurance.summary')}</p>}
+        {mortgage && <p>{tx('privacy.mortgage.summary')}</p>}
         {documents && (
           <p>
             Si decides subir un documento para rellenar los datos, se lee con IA en la Unión Europea
@@ -446,6 +494,7 @@ const tracked = [
           {employment && <p>{tx('privacy.employment.consent')}</p>}
           {credit && <p>{tx('privacy.credit.consent')}</p>}
           {insurance && <p>{tx('privacy.insurance.consent')}</p>}
+          {mortgage && <p>{tx('privacy.mortgage.consent')}</p>}
           <p>
             Los documentos los procesa Amazon Web Services EMEA SARL (Luxemburgo), encargada del
             tratamiento: el servidor (AWS Lambda) está en España y el modelo de IA se usa a través
