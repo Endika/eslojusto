@@ -1,5 +1,6 @@
 import { parseAmount } from '../calculator/number';
-import { compareDates, parseDate, type CivilDate } from '../engine/date';
+import { pick, triState, tryDate } from '../calculator/review-form';
+import { compareDates, type CivilDate } from '../engine/date';
 import { MIN_PRINCIPAL, scope } from '../engine/credit/scope';
 import type {
   Balloon,
@@ -99,21 +100,6 @@ export interface FieldError {
 const LOANS: readonly ProductAnswer[] = ['personal_loan', 'car_loan'];
 // Any day: the scope reads it only once the earlier reasons are settled.
 const NO_DATE: CivilDate = { y: 1, m: 1, d: 1 };
-
-const pick = <T extends string>(value: string | null, options: readonly T[]): T | null =>
-  value !== null && (options as readonly string[]).includes(value) ? (value as T) : null;
-
-// «Sí», «No» and «No lo sé»; undefined while unanswered.
-const triState = (value: string | null): boolean | null | undefined =>
-  value === 'yes' ? true : value === 'no' ? false : value === 'unknown' ? null : undefined;
-
-const tryDate = (text: string): CivilDate | null => {
-  try {
-    return parseDate(text);
-  } catch {
-    return null;
-  }
-};
 
 const textOf = (data: FormData, field: CreditFormField): string | null => {
   const v = data.get(field);
