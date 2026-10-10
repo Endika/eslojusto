@@ -5,6 +5,7 @@ import {
   hasPersonTitle,
   hasPaymentCardNumber,
   hasSocialSecurityNumber,
+  hasSupplyNumber,
 } from '../src/domain/identifiers';
 
 // Made-up identifiers: control letters and check digits are not valid.
@@ -147,5 +148,25 @@ describe('hasPersonTitle', () => {
     ['a law', 'Disposición transitoria primera de la Ley 5/2019'],
   ])('finds nothing in %s', (_, text) => {
     expect(hasPersonTitle(text)).toBe(false);
+  });
+});
+
+describe('hasSupplyNumber', () => {
+  it.each([
+    ['in one piece', 'Suministro ES0000111122223333BB'],
+    ['in groups', 'CUPS: ES 0000 1111 2222 3333 BB'],
+    ['with a border point', 'ES0000111122223333BB0F'],
+    ['in lower case', 'cups es0000111122223333bb'],
+  ])('finds one %s', (_, text) => {
+    expect(hasSupplyNumber(text)).toBe(true);
+  });
+
+  it.each([
+    ['an IBAN', 'ES00 2100 0418 4502 0005 1332'],
+    ['an access tariff', 'Peaje 2.0TD'],
+    ['an amount', '1.234,56 €'],
+    ['a bill number', 'FE26-000000123'],
+  ])('finds nothing in %s', (_, text) => {
+    expect(hasSupplyNumber(text)).toBe(false);
   });
 });
