@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.46.1](https://github.com/Endika/eslojusto/compare/v1.46.0...v1.46.1) (2026-10-10)
+
+
+### Bug Fixes
+
+* **credit:** say the APR comparison follows annex I's rule, not that annex I asks for it ([157062e](https://github.com/Endika/eslojusto/commit/157062ea8cf0203472e38e7f5119f4d933c7f02d))
+
 ## [1.46.0](https://github.com/Endika/eslojusto/compare/v1.45.0...v1.46.0) (2026-10-10)
 
 
