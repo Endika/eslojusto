@@ -256,6 +256,26 @@ export const BILLS_NORMS: NormTable = {
     inForceSince: '2007-12-01',
     ...inForce,
   },
+  // Arts. 67.7, 67.8 and 67.10: the longest commitment, the right to leave after a change of
+  // conditions and what is still owed for a subsidised handset. In force the day after
+  // publication.
+  lgtel: {
+    id: 'lgtel',
+    citation: 'Ley 11/2022, de 28 de junio, General de Telecomunicaciones',
+    url: `${ACT}BOE-A-2022-10757`,
+    inForceSince: '2022-06-30',
+    ...inForce,
+  },
+  // Art. 7: an exit takes effect within two working days of the request. Kept in force by the
+  // first transitional provision of Ley 11/2022 until the regulation of its art. 65.
+  rd899_2009: {
+    id: 'rd899_2009',
+    citation:
+      'Real Decreto 899/2009, de 22 de mayo, por el que se aprueba la carta de derechos del usuario de los servicios de comunicaciones electrónicas',
+    url: `${ACT}BOE-A-2009-8961`,
+    inForceSince: '2009-08-30',
+    ...inForce,
+  },
 };
 
 export const NORM_REVIEW: NormReview = {
@@ -279,4 +299,6 @@ export const NORM_REVIEW: NormReview = {
   rd88_2026: null,
   rd216_2014: null,
   trlgdcu: null,
+  lgtel: null,
+  rd899_2009: null,
 };

@@ -24,7 +24,11 @@ export type BillsItemId =
   | 'excess_power'
   | 'service'
   | 'exit_penalty'
-  | 'power_used';
+  | 'power_used'
+  | 'commitment_length'
+  | 'commitment_penalty'
+  | 'change_exit'
+  | 'charge_after_exit';
 
 // `does_not_add_up` is the bill against its own figures; `differs_from_official` and
 // `above_regulated_price` against a table; `pending_official_data` a day no row covers;
@@ -42,6 +46,10 @@ export type BillsStatus =
   | 'not_allowed_in_pvpc'
   | 'not_allowed'
   | 'paid_over'
+  | 'above_legal_maximum'
+  | 'within_limit'
+  | 'charged_after_exit'
+  | 'not_applicable'
   | 'review_it'
   | 'not_checkable'
   | 'pending_official_data'
@@ -73,7 +81,16 @@ export interface BillFinding {
 export type OfficialQuestion = 'official_value';
 export type OfficialReading = 'lower_value' | 'higher_value';
 
-export type BillItem = Across<OfficialQuestion, OfficialReading, BillFinding>;
+// A subsidised handset kept after leaving over a change of conditions: whether its whole value is
+// still owed, or only the share of the commitment left.
+export type HandsetQuestion = 'handset_share';
+export type HandsetReading = 'whole_value' | 'prorated_value';
+
+export type BillItem = Across<
+  OfficialQuestion | HandsetQuestion,
+  OfficialReading | HandsetReading,
+  BillFinding
+>;
 
 // No norm fixes how a bill rounds: a line within a cent and a total within two cents match.
 export const LINE_TOLERANCE = 0.01;
@@ -101,6 +118,12 @@ export function compare(
     matches: Math.abs(nearest) <= tolerance + EPSILON,
     difference: round2(nearest),
   };
+}
+
+// A charge up to a legal cap, within a cent of it, is within the limit.
+export function withinCap(charged: number, cap: number): boolean {
+  const { matches, difference } = compare(charged, [cap], LINE_TOLERANCE);
+  return matches || difference < 0;
 }
 
 export const directionOf = (difference: number): 'over' | 'under' =>
@@ -192,6 +215,7 @@ export const COUNTED: ReadonlySet<BillsStatus> = new Set([
   'not_allowed_in_pvpc',
   'not_allowed',
   'paid_over',
+  'charged_after_exit',
 ]);
 
 // What an item counts: only what holds in every reading, so the lowest; nothing charged under, and
@@ -203,4 +227,40 @@ export function countedAmount(item: BillItem): number {
       : 0,
   );
   return round2(Math.min(...amounts));
+}
+
+export interface BillTotals {
+  // What the person pays over in every reading: the lowest.
+  readonly counted: number;
+  // The most any reading gives, for «y hasta … si …».
+  readonly upTo: number;
+  // Charged short, in every reading: shown as plainly and never set against what is paid over.
+  readonly under: number;
+}
+
+// The total repeats its lines, and tolls and charges are a breakdown within the power and energy
+// terms: neither is money charged short of its own.
+const NOT_UNDER: ReadonlySet<BillsItemId> = new Set([
+  'total',
+  'tolls_and_charges_power',
+  'tolls_and_charges_energy',
+]);
+
+const overAmount = (f: BillFinding): number =>
+  COUNTED.has(f.status) && f.direction === 'over' && f.pendingOn.length === 0 ? (f.amount ?? 0) : 0;
+
+const underAmount = (f: BillFinding): number =>
+  f.direction === 'under' && !NOT_UNDER.has(f.id) && f.pendingOn.length === 0 ? (f.amount ?? 0) : 0;
+
+export function totalsOf(items: readonly BillItem[]): BillTotals {
+  let counted = 0;
+  let upTo = 0;
+  let under = 0;
+  for (const item of items) {
+    const findings = findingsOf(item);
+    counted += countedAmount(item);
+    upTo += Math.max(...findings.map(overAmount));
+    under += Math.min(...findings.map(underAmount));
+  }
+  return { counted: round2(counted), upTo: round2(upTo), under: round2(under) };
 }

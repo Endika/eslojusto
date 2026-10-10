@@ -80,6 +80,11 @@ describe('the bills rules', () => {
       'unsolicited_services',
       'exit_penalty',
       'power_change',
+      'commitment_maximum',
+      'change_exit',
+      'handset_after_change',
+      'indexed_price_rise',
+      'exit_effective',
     ]);
   });
 

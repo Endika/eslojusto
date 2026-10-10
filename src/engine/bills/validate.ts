@@ -34,6 +34,7 @@ export type TelecomField =
   | 'penaltyCharged'
   | 'handset.value'
   | 'changeNotice.sentOn'
+  | 'changeNotice.appliesOn'
   | 'lines';
 
 export type ValidationCode =
@@ -230,7 +231,10 @@ export function validateTelecom(
     check('penaltyCharged', isAmount(input.penaltyCharged), 'amount_range');
   if (input.handset !== null) check('handset.value', isAmount(input.handset.value), 'amount_range');
   const sent = input.changeNotice?.sentOn ?? null;
-  if (sent !== null) past('changeNotice.sentOn', sent);
+  const sentOk = sent !== null && past('changeNotice.sentOn', sent);
+  const applies = input.changeNotice?.appliesOn ?? null;
+  if (applies !== null && date('changeNotice.appliesOn', applies) && sentOk)
+    check('changeNotice.appliesOn', compareDates(sent, applies) <= 0, 'not_after_start');
   for (const line of input.lines) {
     if (!date('lines', line.from) || !date('lines', line.to)) continue;
     check('lines', compareDates(line.from, line.to) <= 0, 'not_after_start');
