@@ -13,6 +13,8 @@ import {
   HOUSEHOLD_BUILD,
   INSURANCE_BETA,
   INSURANCE_BUILD,
+  MORTGAGE_BETA,
+  MORTGAGE_BUILD,
   RENTAL_BUILD,
 } from '../content/sections';
 
@@ -102,7 +104,16 @@ const groups: Group[] = [
             beta: true,
           }
         : 'home.rent',
-      'home.mortgage',
+      MORTGAGE_BUILD
+        ? {
+            id: 'mortgage',
+            name: 'home.mortgage',
+            href: link(lang, 'hipoteca/'),
+            situation: 'home.mortgage_situation',
+            citation: 'home.mortgage_citation',
+            beta: MORTGAGE_BETA,
+          }
+        : 'home.mortgage',
     ],
     more: { href: link(lang, 'alquiler/irav-ipc/'), label: 'home.rent_indices' },
   },

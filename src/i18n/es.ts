@@ -18,6 +18,8 @@ export const es = {
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las fechas siguen la Ley de Contrato de Seguro (Ley 50/1980) y la Ley 22/2007, de comercialización a distancia de servicios financieros.',
   'footer.note_credit':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen la Ley 16/2011, de contratos de crédito al consumo, y los tipos medios que publica el Banco de España.',
+  'footer.note_mortgage':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen la Ley 5/2019, de contratos de crédito inmobiliario, la Ley 41/2007 y la ley del impuesto de actos jurídicos documentados; lo que depende de un juez va siempre aparte.',
   'footer.note_benefit':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras del paro siguen la Ley General de la Seguridad Social (arts. 262 a 277) y el IPREM; las del finiquito, el Estatuto de los Trabajadores y la guía del CGPJ (v0.6, julio de 2026).',
   'footer.nav': 'Información legal',
@@ -177,6 +179,7 @@ export const es = {
   'home.credit': 'Financiación',
   'home.insurance': 'Seguros',
   'home.insurance_situation': 'Renuevas tu seguro de hogar o de coche: sus plazos frente a la ley',
+  'home.mortgage_situation': 'Tienes una hipoteca: sus gastos y comisiones frente a la ley',
   'home.credit_situation': 'Tienes un préstamo o una tarjeta: su TAE y sus plazos frente a la ley',
   'home.bills': 'Facturas',
   'home.coming_soon': 'Próximamente: {secciones}',
@@ -1294,6 +1297,7 @@ export const es = {
   'client.documents.letter.received': 'Recibí no conforme,',
   'client.documents.letter.filename': 'eslojusto-recibi-no-conforme.pdf',
   'home.insurance_citation': 'Ley de Contrato de Seguro · Ley 22/2007',
+  'home.mortgage_citation': 'Ley 5/2019 de crédito inmobiliario · Ley 41/2007',
   'home.credit_citation': 'Ley 16/2011 de crédito al consumo · tipos medios del Banco de España',
   'home.rent_citation': 'Ley de Arrendamientos Urbanos · Ley 12/2023 · IRAV e IPC del INE',
   'home.beta': 'Beta',
@@ -5294,6 +5298,531 @@ export const es = {
   'client.credit.report.channels': 'Dónde informarte gratis',
   'client.credit.report.channels_text':
     'En el Portal del Cliente Bancario del Banco de España, en el Servicio de Reclamaciones del Banco de España, y en las oficinas municipales de información al consumidor (OMIC) y los servicios de consumo de tu comunidad autónoma.',
+  'mortgage.title': 'Gastos y comisiones de tu hipoteca: qué dice la ley',
+  'mortgage.description':
+    'Qué gastos de tu hipoteca pone la ley a cargo del banco, qué reparto aplica el Tribunal Supremo a los anteriores a 2019 y los topes de sus comisiones.',
+  'mortgage.h1': 'Los gastos, las comisiones y las cláusulas de tu hipoteca',
+  'mortgage.lead':
+    'Con los datos de tu escritura y de tus facturas: qué gastos de la constitución pone la ley a cargo del banco, qué reparto aplica el Tribunal Supremo a las escrituras anteriores a 2019, si una comisión por amortizar o por pasar a tipo fijo pasó del tope legal y qué dicen la ley y los tribunales de las cláusulas de tu escritura. Para la hipoteca de una persona sobre su vivienda.',
+  'mortgage.beta': 'Beta',
+  'mortgage.beta_note':
+    'Sección en pruebas. Las cifras salen de lo que escribes y de la ley; lo que depende de un juez va siempre aparte.',
+  'mortgage.no_js':
+    'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
+  'mortgage.reviewed': 'Revisado el {fecha}',
+  'mortgage.form_aria': 'Revisión de tu hipoteca',
+  'mortgage.tab.hipoteca': 'Hipoteca',
+  'mortgage.tab.clausula-gastos': 'Cláusulas',
+  'mortgage.tab.facturas': 'Gastos',
+  'mortgage.tab.amortizacion': 'Comisiones',
+  'mortgage.tab.resultado': 'Resultado',
+  'mortgage.answer.yes': 'Sí',
+  'mortgage.answer.no': 'No',
+  'mortgage.answer.unknown': 'No lo sé',
+
+  'mortgage.loan.question': 'Tu hipoteca',
+  'mortgage.loan.help': 'Ten a mano la escritura y, si las tienes, sus facturas.',
+  'mortgage.loan.kind': '¿Qué es?',
+  'mortgage.loan.kind.standard': 'Hipoteca sobre una vivienda',
+  'mortgage.loan.kind.developer_subrogation': 'La del promotor, subrogada al comprar',
+  'mortgage.loan.kind.multicurrency': 'Hipoteca multidivisa',
+  'mortgage.loan.kind.reverse': 'Hipoteca inversa',
+  'mortgage.loan.kind.not_mortgage': 'Préstamo sin hipoteca',
+
+  'mortgage.holder.question': 'Quién y sobre qué',
+  'mortgage.holder.borrower': '¿Quién la pidió?',
+  'mortgage.holder.borrower.individual': 'Yo, como persona',
+  'mortgage.holder.borrower.company': 'Una empresa o sociedad',
+  'mortgage.holder.purpose': '¿Sobre qué es la hipoteca?',
+  'mortgage.holder.purpose.housing': 'Una vivienda, con su garaje o trastero',
+  'mortgage.holder.purpose.business': 'Un local, una nave u otro inmueble de un negocio',
+
+  'mortgage.deed.question': 'La escritura',
+  'mortgage.deed.on': 'Fecha de la escritura',
+  'mortgage.deed.on_hint': 'La de la escritura del préstamo ante el notario.',
+  'mortgage.deed.amount': 'Capital del préstamo',
+  'mortgage.deed.amount_hint': 'En euros. Si no lo sabes, déjalo en blanco.',
+  'mortgage.deed.consumer': '¿Pediste la hipoteca como particular, para tu casa?',
+  'mortgage.deed.consumer_hint':
+    'Tu escritura suele decir para qué es el préstamo. El reparto del Tribunal Supremo es solo para quien la pidió como particular.',
+
+  'mortgage.rate.question': 'El tipo de interés',
+  'mortgage.rate.type': '¿Qué tipo tiene?',
+  'mortgage.rate.type.fixed': 'Fijo',
+  'mortgage.rate.type.variable': 'Variable',
+  'mortgage.rate.type.mixed': 'Mixto',
+  'mortgage.rate.revision': 'Cada cuántos meses se revisa el tipo',
+  'mortgage.rate.revision_hint': 'Suele ser 6 o 12. Si no lo sabes, en blanco.',
+
+  'mortgage.expenses_clause.question': 'La cláusula de gastos',
+  'mortgage.expenses_clause.present':
+    '¿Tu escritura tiene una cláusula que pone los gastos a cargo de quien pide el préstamo?',
+  'mortgage.expenses_clause.present_hint':
+    'Suele estar entre las cláusulas financieras, con un título como «Gastos a cargo de la parte prestataria».',
+  'mortgage.expenses_clause.present.present': 'Sí, la tiene',
+  'mortgage.expenses_clause.present.absent': 'No la tiene',
+  'mortgage.expenses_clause.present.unknown': 'No lo sé',
+
+  'mortgage.floor.question': 'La cláusula suelo',
+  'mortgage.floor.present':
+    '¿Tu escritura fija un tipo mínimo, por debajo del cual el interés no baja?',
+  'mortgage.floor.percent': 'Tipo mínimo que fija',
+  'mortgage.floor.percent_hint':
+    'En %, por ejemplo 3. Si solo dice que el interés nunca será negativo, escribe 0.',
+
+  'mortgage.index.question': 'El índice',
+  'mortgage.index.irph': '¿El tipo variable se calcula con el IRPH?',
+  'mortgage.index.irph_hint':
+    'El índice de referencia de préstamos hipotecarios. Lo más habitual es el Euríbor.',
+
+  'mortgage.default.question': 'La demora',
+  'mortgage.default.present': '¿Tu escritura fija un interés de demora?',
+  'mortgage.default.present_hint': 'El de las cuotas que se pagan tarde.',
+  'mortgage.default.rate': 'Interés de demora',
+  'mortgage.default.ordinary': 'Interés ordinario',
+  'mortgage.default.rates_hint': 'En % al año, como dice la escritura. Si no lo sabes, en blanco.',
+
+  'mortgage.termination.question': 'El vencimiento anticipado',
+  'mortgage.termination.present':
+    '¿Tu escritura permite al banco pedir todo el préstamo si dejas de pagar?',
+  'mortgage.termination.instalments': 'Cuotas impagadas que pide la escritura',
+  'mortgage.termination.instalments_hint': 'Si no lo dice o no lo sabes, déjalo en blanco.',
+
+  'mortgage.opening.question': 'La comisión de apertura',
+  'mortgage.opening.present': '¿Te cobraron comisión de apertura?',
+  'mortgage.opening.amount': 'Comisión de apertura',
+  'mortgage.opening.amount_hint': 'Si no lo sabes, en blanco.',
+  'mortgage.opening.duplicate': '¿Y por estudio o tramitación?',
+
+  'mortgage.other.question': 'Otras cláusulas',
+  'mortgage.other.rounding': '¿El tipo se redondea al alza, por ejemplo al cuarto de punto?',
+  'mortgage.other.insurance':
+    '¿La escritura te pide contratar un seguro u otro producto con el banco?',
+
+  'mortgage.invoices.question': 'Tus facturas',
+  'mortgage.invoices.has': '¿Tienes las facturas o los importes de los gastos de la hipoteca?',
+  'mortgage.invoices.has_hint':
+    'Notaría, registro, gestoría, tasación e impuesto del préstamo. Sin factura ni importe no se estima nada.',
+  'mortgage.invoices.paid_hint': 'Lo que pagaste tú, en euros. Si no la tienes, déjalo en blanco.',
+  'mortgage.invoices.mixed': '¿Esa factura incluye también la compraventa, sin separarla?',
+  'mortgage.notary.question': 'La notaría',
+  'mortgage.notary.loan': 'Notaría del préstamo',
+  'mortgage.registry.question': 'El registro',
+  'mortgage.registry.mortgage': 'Registro de la hipoteca',
+  'mortgage.agency.question': 'La gestoría',
+  'mortgage.agency.total': 'Gestoría',
+  'mortgage.agency.total_hint': 'El total de su factura, en euros.',
+  'mortgage.agency.tax': 'Impuesto pagado por la gestoría',
+  'mortgage.agency.registry': 'Registro pagado por la gestoría',
+  'mortgage.agency.supplied_hint':
+    'Si su factura incluye esos pagos hechos por ti, sus importes. Si no, en blanco.',
+  'mortgage.valuation.question': 'La tasación y el acta',
+  'mortgage.valuation.total': 'Tasación',
+  'mortgage.valuation.act': 'Acta notarial previa',
+  'mortgage.valuation.act_hint':
+    'Solo existe en escrituras desde el 16-06-2019. Si no te la cobraron, déjalo en blanco.',
+  'mortgage.tax.question': 'El impuesto',
+  'mortgage.tax.loan': 'Impuesto del préstamo (actos jurídicos documentados)',
+  'mortgage.tax.loan_hint':
+    'El de la hipoteca (modelo 600), no el de la compraventa. Si lo pagó el banco, déjalo en blanco.',
+  'mortgage.paid.question': 'Cuándo pagaste',
+  'mortgage.paid.on': 'Día en que pagaste esas facturas',
+  'mortgage.paid.on_hint':
+    'Si fueron días distintos, el último. Si no lo sabes, déjalo en blanco: se toma el de la escritura.',
+  'mortgage.agreement.question': 'Lo que ya hubo',
+  'mortgage.agreement.agreement': '¿Llegaste a un acuerdo con el banco sobre estos gastos?',
+  'mortgage.agreement.returned': 'Lo que el banco ya te dio de estos gastos',
+  'mortgage.agreement.returned_hint': 'En euros. Si no te dio nada, déjalo en blanco.',
+
+  'mortgage.operation.question': 'Amortizaciones y cambios',
+  'mortgage.operation.kind': '¿Has amortizado antes de tiempo o cambiado tu hipoteca?',
+  'mortgage.operation.kind_hint': 'Si fueron varias, una de ellas.',
+  'mortgage.operation.kind.none': 'No',
+  'mortgage.operation.kind.partial_prepayment': 'Amorticé una parte',
+  'mortgage.operation.kind.full_prepayment': 'La cancelé entera',
+  'mortgage.operation.kind.fixed_rate_novation': 'La pasé a tipo fijo',
+  'mortgage.operation.kind.creditor_subrogation': 'Me la llevé a otro banco',
+  'mortgage.operation.details': 'La operación',
+  'mortgage.operation.on': 'Día de la operación',
+  'mortgage.operation.principal': 'Capital amortizado',
+  'mortgage.operation.principal_hint': 'En euros. Si no amortizaste nada, escribe 0.',
+  'mortgage.operation.fee': 'Comisión que te cobraron',
+  'mortgage.operation.fee_hint': 'En euros. Si no te cobraron nada, escribe 0.',
+  'mortgage.operation.terms': 'Más sobre la operación',
+  'mortgage.operation.option': '¿Qué comisión por amortizar fija tu escritura?',
+  'mortgage.operation.option_hint': 'Para el tipo variable, en escrituras desde el 16-06-2019.',
+  'mortgage.operation.option.a_015_5y': '0,15 % en 5 años',
+  'mortgage.operation.option.b_025_3y': '0,25 % en 3 años',
+  'mortgage.operation.option.unknown': 'No lo sé',
+  'mortgage.operation.insurance_question': 'El seguro',
+  'mortgage.operation.insurance': '¿Tenías un seguro ligado a la hipoteca?',
+
+  'mortgage.result.title': 'Resultado',
+  'mortgage.result.out_of_scope': 'Fuera de esta revisión',
+  'mortgage.result.totals': 'Lo que sale de tus gastos y comisiones',
+  'mortgage.result.total_statute': 'Por ley',
+  'mortgage.result.total_statute_note':
+    'Lo que la ley pone a cargo del banco y pagaste tú: los gastos de escrituras desde el 16-06-2019 y el impuesto desde el 10-11-2018.',
+  'mortgage.result.total_case_law': 'Según el reparto del Tribunal Supremo',
+  'mortgage.result.total_case_law_note':
+    'Para escrituras anteriores al 16-06-2019 de un consumidor. Para que se devuelva hace falta que el banco lo acepte o que un juez anule la cláusula de gastos.',
+  'mortgage.result.total_case_law_explained':
+    'Las sentencias en que se apoya este reparto aún no se han comprobado en su texto: cada factura explica qué parte le correspondía al banco, sin cifra.',
+  'mortgage.result.total_fees': 'Comisiones por encima del tope legal',
+  'mortgage.result.total_fees_note': 'Lo que te cobraron por encima del tope que fija la ley.',
+  'mortgage.result.total_fees_more':
+    'Si una comisión depende de un dato que no sabes, aquí cuenta la lectura más baja; las demás las ves en esa comisión.',
+  'mortgage.result.totals_apart':
+    'Estas cifras no se suman: lo que dice la ley no depende de un juez, y el reparto del Tribunal Supremo sí.',
+  'mortgage.result.expenses': 'Gastos de la constitución',
+  'mortgage.result.fees': 'Comisiones',
+  'mortgage.result.flags': 'Cláusulas de tu escritura',
+  'mortgage.result.flags_note':
+    'Qué dicen la ley o los tribunales de cada cláusula, con su fuente. Aquí no se valora tu cláusula.',
+  'mortgage.result.information': 'Para que lo sepas',
+  'mortgage.result.unchecked': 'Lo que esta revisión no mira',
+  'mortgage.result.rules': 'Normas y criterios',
+  'mortgage.result.how': 'Cómo se calcula',
+  'mortgage.result.channels': 'Dónde informarte gratis',
+  'mortgage.result.channels_portal':
+    'El Portal del Cliente Bancario del Banco de España, que explica tus derechos como cliente.',
+  'mortgage.result.channels_service': 'El Servicio de Reclamaciones del Banco de España.',
+  'mortgage.result.channels_consumer':
+    'Las oficinas municipales de información al consumidor (OMIC) y los servicios de consumo de tu comunidad autónoma.',
+  'mortgage.result.restart': 'Empezar de nuevo',
+
+  'client.mortgage.result.lead':
+    'Cada gasto, comisión y cláusula, con la cuenta que lleva a ella y la norma o el criterio en que se apoya. Lo que dice la ley y lo que depende de un juez van siempre por separado.',
+  'client.mortgage.result.lead_out_of_scope':
+    'Esta hipoteca queda fuera de lo que revisa esta página.',
+  'client.mortgage.about': 'unos {importe}',
+  'client.mortgage.total.nothing': 'Nada con lo que has metido',
+  'client.mortgage.total.nothing_lowest': 'Nada en la lectura más baja',
+  'client.mortgage.total.no_figure_yet': 'Sin cifra por ahora',
+  'client.mortgage.total.transparency_free':
+    'Aparte, el acta notarial previa, que no debía cobrarse: unos {importe}.',
+  'client.mortgage.total.interest': 'Interés legal hasta el {fecha}: unos {importe}.',
+  'client.mortgage.total.interest_estimated':
+    'Interés legal hasta el {fecha}, contado en parte desde la escritura como estimación: unos {importe}.',
+
+  'client.mortgage.invoice.notary_loan': 'Notaría del préstamo',
+  'client.mortgage.invoice.notary_purchase': 'Notaría de la compraventa',
+  'client.mortgage.invoice.notary_copy_bank': 'Copia de la escritura para el banco',
+  'client.mortgage.invoice.notary_copy_borrower': 'Copia de la escritura para ti',
+  'client.mortgage.invoice.notary_cancellation': 'Notaría de la cancelación',
+  'client.mortgage.invoice.registry_mortgage': 'Registro de la hipoteca',
+  'client.mortgage.invoice.registry_purchase': 'Registro de la compraventa',
+  'client.mortgage.invoice.registry_cancellation': 'Registro de la cancelación',
+  'client.mortgage.invoice.agency': 'Gestoría',
+  'client.mortgage.invoice.valuation': 'Tasación',
+  'client.mortgage.invoice.ajd_loan': 'Impuesto del préstamo (AJD)',
+  'client.mortgage.invoice.ajd_purchase': 'Impuesto de la compraventa',
+  'client.mortgage.invoice.transparency_deed': 'Acta notarial previa',
+
+  'client.mortgage.operation.partial_prepayment': 'Amortización parcial',
+  'client.mortgage.operation.full_prepayment': 'Cancelación antes de tiempo',
+  'client.mortgage.operation.fixed_rate_novation': 'Paso a tipo fijo',
+  'client.mortgage.operation.creditor_subrogation': 'Cambio de banco',
+
+  'client.mortgage.clause.floor_clause': 'Cláusula suelo',
+  'client.mortgage.clause.irph': 'IRPH',
+  'client.mortgage.clause.default_interest': 'Intereses de demora',
+  'client.mortgage.clause.early_termination': 'Vencimiento anticipado',
+  'client.mortgage.clause.rounding_up': 'Redondeo al alza',
+  'client.mortgage.clause.opening_fee': 'Comisión de apertura',
+  'client.mortgage.clause.insurance_required': 'Seguros y otros productos vinculados',
+
+  'client.mortgage.status.lender_bears.statute': 'La ley lo pone a cargo del banco: {importe}',
+  'client.mortgage.status.lender_bears.case_law':
+    'Según el reparto del Tribunal Supremo, le correspondía al banco: {importe}',
+  'client.mortgage.status.not_chargeable': 'No debía cobrarse: {importe}',
+  'client.mortgage.status.split_explained':
+    'Según el reparto del Tribunal Supremo, el {parte} le correspondía al banco (sin cifra por ahora)',
+  'client.mortgage.status.borrower_bears': 'A tu cargo',
+  'client.mortgage.status.not_applicable': 'No aplica',
+  'client.mortgage.status.not_applicable_to_date': 'No aplica a tu fecha',
+  'client.mortgage.status.paid_by_bank': 'Lo pagó el banco',
+  'client.mortgage.status.not_entered': 'No lo has metido',
+  'client.mortgage.status.review_it': 'Revísalo',
+  'client.mortgage.status.above_cap': 'Por encima del tope legal ({importe})',
+  'client.mortgage.status.within_cap': 'Dentro del tope',
+  'client.mortgage.status.not_checkable': 'No se puede comprobar',
+  'client.mortgage.status.depends': 'Depende de un dato que no sabes',
+  'client.mortgage.status.out_of_scope': 'Esta revisión no cubre tu tipo de hipoteca',
+
+  'client.mortgage.flag.in_deed': 'Aparece en tu escritura',
+  'client.mortgage.flag.not_in_deed': 'No aparece en tu escritura',
+  'client.mortgage.flag.unreadable': 'No sabes si aparece',
+  'client.mortgage.basis.statute': 'Lo que dice la ley',
+  'client.mortgage.basis.case_law': 'Lo que dicen los tribunales · estado a {fecha}',
+
+  'client.mortgage.depends.rate_type':
+    'Tu hipoteca es mixta: el tope cambia si se lee como de tipo fijo o variable.',
+  'client.mortgage.depends.prepayment_option':
+    'Depende de la comisión que fija tu escritura para el tipo variable, que no sabes.',
+  'client.mortgage.depends.earlier_deed':
+    'No está claro si esta regla de la ley de 2019 llega a una escritura anterior: el total cuenta la lectura más baja.',
+  'client.mortgage.depends.rate_revision':
+    'Depende de cada cuánto se revisa tu tipo, que no sabes.',
+  'client.mortgage.depends.rate_type_and_prepayment_option':
+    'Depende de si se lee como de tipo fijo o variable y de la comisión que fija tu escritura, que no sabes.',
+  'client.mortgage.depends.rate_type_and_earlier_deed':
+    'Depende de si se lee como de tipo fijo o variable y de si la ley de 2019 llega a tu escritura, algo que no está claro: el total cuenta la lectura más baja.',
+  'client.mortgage.depends.rate_type_and_rate_revision':
+    'Depende de si se lee como de tipo fijo o variable y de cada cuánto se revisa tu tipo, que no sabes.',
+  'client.mortgage.depends.earlier_deed_and_rate_revision':
+    'Depende de si la ley de 2019 llega a tu escritura, algo que no está claro, y de cada cuánto se revisa tu tipo: el total cuenta la lectura más baja.',
+  'client.mortgage.depends.rate_type_and_earlier_deed_and_rate_revision':
+    'Depende de si se lee como de tipo fijo o variable, de si la ley de 2019 llega a tu escritura y de cada cuánto se revisa tu tipo: el total cuenta la lectura más baja.',
+  'client.mortgage.reading.fixed': 'Si se lee como fijo',
+  'client.mortgage.reading.variable': 'Si se lee como variable',
+  'client.mortgage.reading.option_a': 'Con el 0,15 % durante 5 años',
+  'client.mortgage.reading.option_b': 'Con el 0,25 % durante 3 años',
+  'client.mortgage.reading.deed_regime': 'Con la norma de la fecha de tu escritura',
+  'client.mortgage.reading.lcci_reach': 'Si la ley de 2019 llega a tu escritura',
+  'client.mortgage.reading.revised_yearly': 'Si se revisa cada 12 meses o menos',
+  'client.mortgage.reading.revised_less_often': 'Si se revisa con menos frecuencia',
+
+  'client.mortgage.calculation.scope.company':
+    'Esta revisión es para la hipoteca que pide una persona sobre su vivienda: un préstamo a una empresa tiene otras reglas, que aquí no se calculan.',
+  'client.mortgage.calculation.scope.business_purpose':
+    'Esta revisión es para hipotecas sobre una vivienda, con su garaje o trastero: la de un local o un inmueble de un negocio tiene otras reglas, que aquí no se calculan.',
+  'client.mortgage.calculation.scope.developer_subrogation':
+    'Si te subrogaste en el préstamo del promotor al comprar, los gastos de constituir esa hipoteca los pagó el promotor, no tú: esta revisión no los cubre.',
+  'client.mortgage.calculation.scope.multicurrency':
+    'Una hipoteca en divisas tiene reglas propias, que esta revisión no cubre.',
+  'client.mortgage.calculation.scope.reverse':
+    'Una hipoteca inversa tiene reglas propias, que esta revisión no cubre.',
+  'client.mortgage.calculation.scope.not_mortgage':
+    'Esta revisión es para préstamos con hipoteca: uno sin garantía hipotecaria tiene otras reglas, que aquí no se calculan.',
+  'client.mortgage.calculation.item.not_entered':
+    'No has metido este importe, así que no se calcula: sin factura ni importe no se estima nada.',
+
+  'client.mortgage.calculation.expenses.statute':
+    'La ley pone este gasto a cargo del banco. Lo pagaste tú: {euros}.',
+  'client.mortgage.calculation.expenses.transparency_free':
+    'La ley dice que el acta notarial previa no se cobra a quien pide el préstamo (art. 15.8). Lo pagaste tú: {euros}.',
+  'client.mortgage.calculation.expenses.case_law':
+    'Según el reparto que aplica el Tribunal Supremo, al banco le correspondía el {share} de esta factura: {euros}.',
+  'client.mortgage.calculation.expenses.case_law_condition':
+    'Para que se devuelva hace falta que el banco lo acepte o que un juez anule la cláusula de gastos.',
+  'client.mortgage.calculation.expenses.case_law_explained':
+    'Según el reparto que aplica el Tribunal Supremo, al banco le correspondía el {share} de esta factura. Aquí aún no se da la cifra: las sentencias en que se apoya no se han comprobado todavía en su texto.',
+  'client.mortgage.calculation.expenses.valuation_borrower':
+    'Desde el 16-06-2019, la ley pone la tasación a cargo de quien pide el préstamo (art. 14.1.e).',
+  'client.mortgage.calculation.expenses.copy_borrower':
+    'Las copias de la escritura las paga quien las pide: las tuyas, tú.',
+  'client.mortgage.calculation.expenses.purchase':
+    'Es un gasto de la compraventa, no del préstamo: esta revisión no lo cuenta.',
+  'client.mortgage.calculation.expenses.cancellation':
+    'Es un gasto de cancelar la hipoteca, no de constituirla: esta revisión no lo cuenta.',
+  'client.mortgage.calculation.expenses.registry_cancellation':
+    'Quién paga la inscripción de la cancelación en el registro no está resuelto con claridad: aquí no se da cifra.',
+  'client.mortgage.calculation.expenses.ajd_before_2018':
+    'El impuesto del préstamo pasó a cargo del banco con las escrituras desde el 10-11-2018 (art. 29 de la ley del impuesto). A tu fecha no aplica.',
+  'client.mortgage.calculation.expenses.not_consumer':
+    'El reparto del Tribunal Supremo sale de cláusulas en contratos con consumidores: si no pediste la hipoteca como particular, no aplica.',
+  'client.mortgage.calculation.expenses.consumer_unknown':
+    'Depende de si pediste la hipoteca como particular, para tu casa, que no sabes: el reparto del Tribunal Supremo es para consumidores.',
+  'client.mortgage.calculation.expenses.no_clause':
+    'Has indicado que tu escritura no tiene cláusula de gastos: si no existe, el reparto del Tribunal Supremo no se aplica igual.',
+  'client.mortgage.calculation.expenses.clause_unknown':
+    'No sabes si tu escritura tiene cláusula de gastos, y el reparto del Tribunal Supremo parte de ella. Suele estar entre las cláusulas financieras.',
+  'client.mortgage.calculation.expenses.transparency_before_lcci':
+    'El acta notarial previa existe en las escrituras desde el 16-06-2019: en una anterior, mira qué concepto es.',
+  'client.mortgage.calculation.expenses.doubtful_norm':
+    'La norma que regula este gasto está pendiente de una condición o de su convalidación: aquí no se da cifra.',
+  'client.mortgage.calculation.expenses.mixed':
+    'Esta factura incluye también la compraventa sin separarla: sin ese desglose, aquí no se da cifra.',
+  'client.mortgage.calculation.expenses.paid_by_bank': 'Lo pagó el banco: no hay nada que contar.',
+  'client.mortgage.calculation.expenses.payer_unknown':
+    'No sabes quién lo pagó: aquí no se da cifra.',
+  'client.mortgage.calculation.expenses.supplied_own_line':
+    'La gestoría incluyó {euros} que ya están en su propia línea, la del impuesto o la del registro: se cuentan una sola vez.',
+  'client.mortgage.calculation.expenses.supplied_left_out':
+    'La gestoría incluyó otros {euros} de pagos hechos por ti que no se identifican: se dejan fuera.',
+  'client.mortgage.calculation.expenses.agreement_statute':
+    'Has indicado un acuerdo con el banco sobre los gastos: lo que la ley pone a cargo del banco no cambia por un acuerdo (art. 3).',
+  'client.mortgage.calculation.expenses.agreement_case_law':
+    'Has indicado un acuerdo con el banco sobre los gastos: lo que diga ese acuerdo puede cambiar el reparto, así que aquí no se da cifra.',
+  'client.mortgage.calculation.expenses.agreement_ajd':
+    'Has indicado un acuerdo con el banco sobre los gastos, y tu escritura es anterior a la ley de 2019: lo que diga ese acuerdo puede cambiar este importe, así que aquí no se da cifra.',
+  'client.mortgage.calculation.expenses.agreement_unknown':
+    'No sabes si hubo un acuerdo con el banco sobre los gastos: si lo hubo, puede cambiar este importe, así que aquí no se da cifra.',
+  'client.mortgage.calculation.expenses.returned':
+    'El banco ya te dio {euros} de estos gastos: como no se sabe de cuál, se descuentan enteros de cada total.',
+
+  'client.mortgage.calculation.interest.counted':
+    'Interés legal del dinero desde el {from} hasta el {until}: {euros}.',
+  'client.mortgage.calculation.interest.not_published':
+    'El interés legal de {year} aún no se ha publicado: se cuenta hasta el 31 de diciembre anterior.',
+  'client.mortgage.calculation.interest.estimated':
+    'No sabes el día del pago: se cuenta desde el de la escritura, como estimación.',
+  'client.mortgage.calculation.interest.explained':
+    'Según el Tribunal Supremo, a lo que se devuelve se suma el interés legal desde el día de cada pago (art. 1303 del Código Civil). Aquí aún no se calcula: esa sentencia no se ha comprobado todavía en su texto.',
+  'client.mortgage.calculation.interest.returned':
+    'Como el banco ya te dio una parte y no se sabe cuándo, aquí no se calcula el interés.',
+  'client.mortgage.calculation.interest.before_table':
+    'El pago es anterior a 1995, donde empieza la tabla de interés legal que se usa aquí: no se calcula el interés.',
+
+  'client.mortgage.calculation.fees.lcci_variable':
+    'Con tipo variable, la ley fija como tope el {percent} del capital amortizado en los {years} primeros años (art. 23.5).',
+  'client.mortgage.calculation.fees.lcci_fixed_first':
+    'Con tipo fijo, la ley fija como tope el 2 % del capital amortizado en los {years} primeros años (art. 23.7).',
+  'client.mortgage.calculation.fees.lcci_fixed_after':
+    'Con tipo fijo, pasados los {years} primeros años, la ley fija como tope el 1,5 % del capital amortizado (art. 23.7).',
+  'client.mortgage.calculation.fees.law41_first':
+    'Para tu escritura, la Ley 41/2007 fija como tope el 0,5 % del capital amortizado en los {years} primeros años (art. 8).',
+  'client.mortgage.calculation.fees.law41_after':
+    'Para tu escritura, la Ley 41/2007 fija como tope el 0,25 % del capital amortizado pasados los {years} primeros años (art. 8).',
+  'client.mortgage.calculation.fees.law41_fixed':
+    'Con tipo fijo, la Ley 41/2007 permite además la compensación por riesgo de tipo de interés que fije la escritura (art. 9): aquí no se puede comprobar el tope.',
+  'client.mortgage.calculation.fees.law41_revised_less_often':
+    'Si el tipo se revisa con menos frecuencia que cada 12 meses, la Ley 41/2007 permite la compensación por riesgo de tipo de interés que fije la escritura (art. 9): aquí no se puede comprobar el tope.',
+  'client.mortgage.calculation.fees.before_2007':
+    'Tu escritura es anterior al 09-12-2007: sus comisiones las regía otra norma, que aquí no se comprueba.',
+  'client.mortgage.calculation.fees.conversion':
+    'Por pasar de variable a fijo, la ley fija como tope el {percent} del capital amortizado en los {years} primeros años (art. 23.6).',
+  'client.mortgage.calculation.fees.conversion_no_repayment':
+    'Desde el 24-11-2022, pasar de variable a fijo sin amortizar capital no permite cobrar compensación (art. 23.6).',
+  'client.mortgage.calculation.fees.conversion_no_repayment_2019':
+    'En su redacción de 2019, el art. 23.6 solo limitaba la compensación por lo amortizado: lo cobrado sin amortizar capital no se puede comprobar aquí.',
+  'client.mortgage.calculation.fees.after_period':
+    'Pasados los {years} primeros años, la ley no permite compensación: el tope es 0 €.',
+  'client.mortgage.calculation.fees.window':
+    'Entre el 24-11-2022 y el 31-12-2024 no se podía cobrar compensación por amortizar una hipoteca de tipo variable o pasarla a fijo (Real Decreto-ley 19/2022, disposición adicional primera).',
+  'client.mortgage.calculation.fees.already_fixed':
+    'Tu hipoteca ya era de tipo fijo: no hay paso de variable a fijo que comprobar.',
+  'client.mortgage.calculation.fees.earlier_deed_novation':
+    'Tu escritura es anterior al 16-06-2019 y este cambio queda fuera de lo que la ley de 2019 dice para ellas: aquí no se comprueba.',
+  'client.mortgage.calculation.fees.doubtful_norm':
+    'La norma que fija este tope está pendiente de una condición o de su convalidación: aquí no se comprueba.',
+  'client.mortgage.calculation.fees.above_cap':
+    'Sobre {principal} amortizados, el tope es {cap}. Te cobraron {charged}: {over} por encima del tope.',
+  'client.mortgage.calculation.fees.within_cap':
+    'Sobre {principal} amortizados, el tope es {cap}. Te cobraron {charged}: no pasa del tope.',
+  'client.mortgage.calculation.fees.financial_loss':
+    'La ley también limita la compensación a la pérdida que sufre el banco (art. 23.8), que aquí no se puede calcular.',
+  'client.mortgage.calculation.fees.subrogation':
+    'Si el nuevo banco la pasó además a tipo fijo, se aplica el tope de ese cambio, que es más bajo.',
+  'client.mortgage.calculation.fees.unused_premium':
+    'Al cancelar la hipoteca entera, la ley dice que tienes derecho a la parte de la prima del seguro accesorio que no se ha consumido (art. 23.3). Aquí no se calcula.',
+
+  'client.mortgage.calculation.flags.floor_statute':
+    'Desde el 16-06-2019, la ley prohíbe que una hipoteca de tipo variable tenga un límite a la baja del interés (art. 21.3). Tu escritura fija un tipo mínimo del {floor}.',
+  'client.mortgage.calculation.flags.floor_statute_no_figure':
+    'Desde el 16-06-2019, la ley prohíbe que una hipoteca de tipo variable tenga un límite a la baja del interés (art. 21.3).',
+  'client.mortgage.calculation.flags.floor_statute_mixed':
+    'Desde el 16-06-2019, la ley prohíbe un límite a la baja del interés en el tramo variable de una hipoteca (art. 21.3). Tu escritura fija un tipo mínimo del {floor}.',
+  'client.mortgage.calculation.flags.floor_statute_mixed_no_figure':
+    'Desde el 16-06-2019, la ley prohíbe un límite a la baja del interés en el tramo variable de una hipoteca (art. 21.3).',
+  'client.mortgage.calculation.flags.floor_fixed':
+    'Con tipo fijo, un límite a la baja del interés no cambia nada.',
+  'client.mortgage.calculation.flags.floor_case_law':
+    'Tu escritura fija un tipo mínimo del {floor}. Sobre las cláusulas suelo anteriores a 2019, el Tribunal de Justicia de la Unión Europea dice que el juez examina si se explicaron con claridad y qué efectos tiene: depende de cada caso y de un juez.',
+  'client.mortgage.calculation.flags.floor_case_law_no_figure':
+    'Sobre las cláusulas suelo anteriores a 2019, el Tribunal de Justicia de la Unión Europea dice que el juez examina si se explicaron con claridad y qué efectos tiene: depende de cada caso y de un juez.',
+  'client.mortgage.calculation.flags.floor_zero':
+    'Que el interés nunca sea negativo no es una cláusula suelo: la ley lo permite (art. 21.4).',
+  'client.mortgage.calculation.flags.irph':
+    'Según el Tribunal de Justicia de la Unión Europea, el juez examina caso por caso si el IRPH se explicó con claridad; hay más preguntas pendientes ante ese tribunal. Depende de cada caso y de un juez.',
+  'client.mortgage.calculation.flags.default_interest_lcci':
+    'Desde el 16-06-2019, la ley fija el interés de demora: el ordinario más 3 puntos (art. 25).',
+  'client.mortgage.calculation.flags.default_interest_lcci_differs':
+    'Tu escritura dice {default} con un ordinario del {ordinary}: por ley serían {legal}.',
+  'client.mortgage.calculation.flags.default_interest_lcci_matches':
+    'Tu escritura dice {default} con un ordinario del {ordinary}: coincide con lo que da la ley ({legal}).',
+  'client.mortgage.calculation.flags.default_interest_lh114':
+    'Entre el 15-05-2013 y el 15-06-2019, en un préstamo para comprar tu vivienda habitual con hipoteca sobre ella, la ley limitaba el interés de demora a tres veces el interés legal del dinero (art. 114 de la Ley Hipotecaria).',
+  'client.mortgage.calculation.flags.default_interest_lh114_above':
+    'Tu escritura dice {default}: más que tres veces el interés legal más alto de esos años ({limit}).',
+  'client.mortgage.calculation.flags.default_interest_case_law':
+    'Para las escrituras anteriores al 16-06-2019 con consumidores, el Tribunal de Justicia de la Unión Europea admite que un tribunal tome como referencia el interés ordinario más 2 puntos para valorar el de demora. Depende de un juez.',
+  'client.mortgage.calculation.flags.default_interest_case_law_above':
+    'Tu escritura dice {default} con un ordinario del {ordinary}: más que esa referencia ({reference}).',
+  'client.mortgage.calculation.flags.early_termination':
+    'La ley fija lo mínimo que tiene que deberse para que el banco pueda pedir todo el préstamo: en la primera mitad del plazo, el 3 % del capital o 12 cuotas mensuales; en la segunda, el 7 % o 15 cuotas; y antes, un mes de aviso para pagar (art. 24).',
+  'client.mortgage.calculation.flags.early_termination_earlier_deed':
+    'A las escrituras anteriores al 16-06-2019 se les aplican hoy esos mínimos, salvo que su cláusula sea más favorable para ti (disposición transitoria primera, 4).',
+  'client.mortgage.calculation.flags.early_termination_fewer':
+    'Cuotas impagadas que pide tu escritura: {instalments}, menos de las que fija la ley.',
+  'client.mortgage.calculation.flags.early_termination_case_law':
+    'Sobre las cláusulas de vencimiento anticipado de escrituras anteriores a 2019 hay criterio del Tribunal de Justicia de la Unión Europea; cómo se aplica a la tuya depende de un juez.',
+  'client.mortgage.calculation.flags.rounding_up':
+    'Un redondeo que solo va al alza siempre favorece al banco. La ley de consumidores se ocupa de los redondeos al alza (art. 87.5 del texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios); aquí no se valora tu cláusula.',
+  'client.mortgage.calculation.flags.opening_fee_amount':
+    'Tu escritura fija una comisión de apertura de {fee}.',
+  'client.mortgage.calculation.flags.opening_fee_share': 'Es el {share} del capital del préstamo.',
+  'client.mortgage.calculation.flags.opening_fee_duplicate':
+    'Desde el 16-06-2019, la ley no permite cobrar aparte por servicios que ya cubre la comisión de apertura, como el estudio o la tramitación (art. 14.4).',
+  'client.mortgage.calculation.flags.opening_fee_case_law':
+    'Sobre la comisión de apertura, el Tribunal de Justicia de la Unión Europea dice que el juez examina caso por caso si se explicó con claridad; depende de un juez.',
+  'client.mortgage.calculation.flags.insurance_tied':
+    'La ley regula cuándo el banco puede pedirte un seguro u otro producto para darte el préstamo y te deja contratar ese seguro con otra entidad (art. 17).',
+  'client.mortgage.calculation.flags.insurance_before_lcci':
+    'Tu escritura es anterior al 16-06-2019, cuando la ley empezó a regular los productos vinculados: aquí no se valora.',
+
+  'client.mortgage.calculation.information.fein_timing':
+    'Desde el 16-06-2019, el banco te entrega la ficha europea de información normalizada (FEIN) y la ficha de advertencias (FiAE) al menos 10 días naturales antes de la escritura (arts. 14 y 15).',
+  'client.mortgage.calculation.information.transparency_act':
+    'Como tarde el día anterior a la escritura, el notario te asesora y lo deja en un acta que no se te cobra, y la escritura lo menciona (art. 15).',
+  'client.mortgage.calculation.information.handwritten_statement':
+    'Entre el 15-05-2013 y el 15-06-2019, si tu hipoteca tenía límites a la variación del tipo, como un suelo, la escritura debía llevar una expresión escrita a mano en la que decías comprender sus riesgos (art. 6 de la Ley 1/2013).',
+  'client.mortgage.calculation.information.limitation_rule':
+    'Según el Tribunal de Justicia de la Unión Europea, el plazo para pedir lo pagado por una cláusula de gastos no puede empezar a contar el día del pago, sino cuando se pudo conocer que la cláusula no era válida. Es la regla, no un cálculo de tu caso.',
+  'client.mortgage.calculation.information.prior_step_439bis':
+    'Desde el 03-04-2025, la ley regula un paso previo concreto antes de acudir a un juzgado por cláusulas de una hipoteca (art. 439 bis de la Ley de Enjuiciamiento Civil). En el enlace tienes el texto de la ley.',
+  'client.mortgage.calculation.information.loan_assignment':
+    'Desde el 08-10-2026, el Real Decreto-ley 29/2026 añade a la ley un art. 25 bis: si el banco cede tu préstamo a otro, te lo tiene que comunicar y conservas frente al nuevo titular lo que podías oponer al banco. Está pendiente de convalidación.',
+  'client.mortgage.calculation.information.complaints_service':
+    'El Servicio de Reclamaciones del Banco de España atiende consultas y quejas sobre bancos (art. 30 de la Ley 44/2002), y las oficinas públicas de consumo informan gratis.',
+
+  'client.mortgage.info.fein_timing': 'La información antes de la escritura',
+  'client.mortgage.info.handwritten_statement': 'La expresión escrita a mano',
+  'client.mortgage.info.limitation_rule': 'Desde cuándo cuenta el plazo',
+  'client.mortgage.info.prior_step_439bis': 'El paso previo del art. 439 bis',
+  'client.mortgage.info.loan_assignment': 'Si el banco cede tu préstamo',
+  'client.mortgage.info.complaints_service': 'El Banco de España',
+  'client.mortgage.info.as_of': 'Estado a {fecha}.',
+
+  'client.mortgage.unchecked.clause_transparency':
+    'Si las cláusulas de tu escritura se explicaron con claridad y son válidas',
+  'client.mortgage.unchecked.floor_irph_paid':
+    'Cuánto supusieron en tus cuotas una cláusula suelo o el IRPH',
+  'client.mortgage.unchecked.time_limits': 'Los plazos de tu caso',
+  'client.mortgage.unchecked.novations':
+    'Los gastos de novaciones y subrogaciones anteriores a 2019',
+  'client.mortgage.unchecked.insurance': 'Los seguros ligados a la hipoteca y lo que cuestan',
+  'client.mortgage.unchecked.purchase':
+    'Los gastos de la compraventa: su notaría, su registro y su gestoría',
+  'client.mortgage.unchecked.purchase_taxes':
+    'Los impuestos de la compra (ITP o IVA), la plusvalía y el IRPF',
+
+  'client.mortgage.norm.in_force': 'en vigor',
+  'client.mortgage.norm.pending_validation': 'pendiente de convalidación',
+  'client.mortgage.norm.repealed': 'derogada el {fecha}',
+  'client.mortgage.norm.draft': 'en tramitación: no se aplica',
+  'client.mortgage.norm.conditional': 'pendiente de una condición',
+  'client.mortgage.source.since': 'con efectos desde el {desde}',
+  'client.mortgage.source.checked': 'estado a {fecha}',
+  'client.mortgage.source.case_law_unverified': 'sin comprobar en el texto de la sentencia',
+  'client.mortgage.source.official_data': 'dato oficial',
+  'client.mortgage.source.statute': 'norma',
+
+  'client.mortgage.error.missing_value': 'Falta este dato',
+  'client.mortgage.error.missing_choice': 'Elige una respuesta',
+  'client.mortgage.error.invalid_date': 'La fecha no es válida',
+  'client.mortgage.error.invalid_amount': 'No se entiende la cifra: escríbela como 1.234,56',
+  'client.mortgage.error.invalid_rate': 'No se entiende el porcentaje: escríbelo como 3,25',
+  'client.mortgage.error.invalid_count': 'Escribe un número entero, como 12',
+  'client.mortgage.error.in_future': 'Esa fecha aún no ha llegado',
+  'client.mortgage.error.before_table': 'Esta revisión empieza en las escrituras de 1995',
+  'client.mortgage.error.before_deed': 'Esa fecha es anterior a la escritura',
+  'client.mortgage.error.amount_range': 'Escribe una cifra mayor que 0 y no más de 1.000.000',
+  'client.mortgage.error.percent_range': 'Escribe un porcentaje entre 0 y 30',
+  'client.mortgage.error.count_range': 'Escribe un número entre 1 y 600',
+  'client.mortgage.error.not_agency': 'Solo la factura de la gestoría lleva pagos hechos por ti',
+  'client.mortgage.error.above_total': 'Suman más que el total de su factura',
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof es;

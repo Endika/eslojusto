@@ -23,6 +23,8 @@ export function t(lang: Lang, key: Key, vars?: Variables): string {
 // The credit page's strings: its own, and the theme switch and other-language notice every page
 // reads.
 const CREDIT_PAGE = ['client.credit.', 'client.theme.', 'client.other_language.'];
+// The mortgage page's likewise.
+const MORTGAGE_PAGE = ['client.mortgage.', 'client.theme.', 'client.other_language.'];
 // What it takes of document reading: none of the final pay's report, letter or pass notices, as
 // the page sells no pass.
 const NOT_READING = [
@@ -77,7 +79,8 @@ export const INSURANCE_READING = sectionReading(
 // The strings the browser scripts need, for the page to ship as JSON. Those of document reading
 // and the pass ship only in a build that has them, and each review section's only on its page.
 // The credit page ships only its own, what every page reads and, with documents, what reading them
-// says: the rest speak of claiming what a final pay owes, which the credit copy never does.
+// says: the rest speak of claiming what a final pay owes, which the credit copy never does. The
+// mortgage page ships only its own and what every page reads.
 export const clientStrings = (
   lang: Lang,
   {
@@ -87,6 +90,7 @@ export const clientStrings = (
     household = false,
     insurance = false,
     credit = false,
+    mortgage = false,
   }: {
     documents?: boolean;
     rental?: boolean;
@@ -94,6 +98,7 @@ export const clientStrings = (
     household?: boolean;
     insurance?: boolean;
     credit?: boolean;
+    mortgage?: boolean;
   } = {},
 ): Partial<Record<Key, string>> =>
   Object.fromEntries(
@@ -110,6 +115,9 @@ export const clientStrings = (
         (credit
           ? CREDIT_PAGE.some((prefix) => key.startsWith(prefix)) ||
             (documents && readingString(key))
-          : !key.startsWith('client.credit.')),
+          : !key.startsWith('client.credit.')) &&
+        (mortgage
+          ? MORTGAGE_PAGE.some((prefix) => key.startsWith(prefix))
+          : !key.startsWith('client.mortgage.')),
     ),
   );
