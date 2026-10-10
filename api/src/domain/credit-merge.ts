@@ -4,6 +4,7 @@ import type { SectionKind } from './extraction-schema';
 import { hasIdentifier, hasNumberPlate, hasPaymentCardNumber } from './identifiers';
 import {
   groupDocuments,
+  listsReachedMaximum,
   mergeFields,
   own,
   withoutIdentifiers,
@@ -129,27 +130,6 @@ function ownFigures(section: Section): Section {
   return { ...section, fields: deliveredOn === undefined ? {} : { deliveredOn } };
 }
 
-const isRecord = (v: unknown): v is Record<string, unknown> =>
-  typeof v === 'object' && v !== null && !Array.isArray(v);
-
-// Whether the model filled a list of a section it read up to the list's maximum. Counted on what
-// it sent, before rows that failed validation were left out.
-function reachedMaximum(toolInput: unknown, reading: Reading): boolean {
-  if (!isRecord(toolInput)) return false;
-  return (
-    Object.entries(CREDIT_SECTIONS) as [
-      CreditSectionKind,
-      (typeof CREDIT_SECTIONS)[CreditSectionKind],
-    ][]
-  ).some(([kind, schema]) => {
-    const raw = toolInput[kind];
-    if (!reading.sections[kind] || !isRecord(raw)) return false;
-    return Object.entries(schema.lists).some(
-      ([name, list]) => Array.isArray(raw[name]) && raw[name].length >= list.maxItems,
-    );
-  });
-}
-
 export function creditMerge(read: Reading, toolInput: unknown): CreditMerged {
   let dropped = 0;
   const sections: Partial<Record<SectionKind, Section>> = {};
@@ -182,7 +162,7 @@ export function creditMerge(read: Reading, toolInput: unknown): CreditMerged {
     fields,
     lists,
     conflicts,
-    truncated: reachedMaximum(toolInput, read),
+    truncated: listsReachedMaximum(toolInput, read, CREDIT_SECTIONS),
     discarded: discarded + dropped,
   };
 }

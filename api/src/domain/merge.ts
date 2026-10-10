@@ -1,5 +1,10 @@
 import type { PageKind, SourceKind } from './documents';
-import { ALL_SECTIONS, type Confidence, type SectionKind } from './extraction-schema';
+import {
+  ALL_SECTIONS,
+  type Confidence,
+  type SectionKind,
+  type SectionSchema,
+} from './extraction-schema';
 import { hasIdentifier } from './identifiers';
 import {
   withLineTotals,
@@ -197,6 +202,26 @@ export function withoutIdentifiers(
     ]),
   );
   return { section: { fields, lists }, dropped };
+}
+
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  typeof v === 'object' && v !== null && !Array.isArray(v);
+
+// Whether the model filled a list of a section it read up to the list's maximum. Counted on what
+// it sent, before rows that failed validation were left out.
+export function listsReachedMaximum(
+  toolInput: unknown,
+  reading: Reading,
+  sections: Readonly<Partial<Record<SectionKind, SectionSchema>>>,
+): boolean {
+  if (!isRecord(toolInput)) return false;
+  return (Object.entries(sections) as [SectionKind, SectionSchema][]).some(([kind, schema]) => {
+    const raw = toolInput[kind];
+    if (!reading.sections[kind] || !isRecord(raw)) return false;
+    return Object.entries(schema.lists).some(
+      ([name, list]) => Array.isArray(raw[name]) && raw[name].length >= list.maxItems,
+    );
+  });
 }
 
 export function merge(read: Reading): Merged {
