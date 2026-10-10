@@ -28,6 +28,7 @@ import {
   NORM_REVIEW as MORTGAGE_NORM_REVIEW,
 } from '../../../src/engine/mortgage/data/norms';
 import { MORTGAGE_SOURCES } from '../../../src/engine/mortgage/data/sources';
+import { MORTGAGE_TEXTS } from '../../../src/engine/mortgage/data/texts';
 import { RULES as MORTGAGE_RULES } from '../../../src/engine/mortgage/rules';
 import { NORMS as RENTAL_NORMS } from '../../../src/engine/rental/data/norms';
 
@@ -76,7 +77,7 @@ export const LAW_SECTIONS: readonly LawSection[] = [
     name: 'mortgage',
     norms: MORTGAGE_NORMS,
     normReview: MORTGAGE_NORM_REVIEW,
-    sources: MORTGAGE_SOURCES,
+    sources: { ...MORTGAGE_SOURCES, ...MORTGAGE_TEXTS },
     rules: MORTGAGE_RULES,
   },
   {

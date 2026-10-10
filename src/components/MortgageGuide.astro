@@ -1,0 +1,265 @@
+---
+import FigureTable from './FigureTable.astro';
+import LegalQuote from './LegalQuote.astro';
+import { MORTGAGE_NORMS } from '../engine/mortgage/data/norms';
+import { MORTGAGE_SOURCES } from '../engine/mortgage/data/sources';
+import { MORTGAGE_TEXTS } from '../engine/mortgage/data/texts';
+import type { MortgageSourceId } from '../engine/mortgage/norms';
+import { STATUTE_RULES, type StatuteRuleId } from '../engine/mortgage/rules';
+import type { LawSource } from '../engine/law/sources';
+import { dayText } from '../calculator/review-result';
+import { formatLongDay } from '../content/rent-indices';
+import { mortgageFaqEntries } from '../content/mortgage-faq';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+  // The day the page's rules were last checked, ISO.
+  checkedOn: string;
+  // Whether the build reads documents, which brings their questions and the pass.
+  documents: boolean;
+}
+const { lang, checkedOn, documents } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+// Each block: its text keys, the articles it rests on, the court criteria it cites and any list
+// it shows. Its verbatim quotes follow its paragraphs below.
+const blocks: readonly {
+  id: string;
+  anchor: string;
+  paragraphs: readonly Key[];
+  rules?: readonly StatuteRuleId[];
+  sources?: readonly MortgageSourceId[];
+  list?: readonly Key[];
+}[] = [
+  {
+    id: 'law',
+    anchor: 'g-ley-2019',
+    paragraphs: ['mortgage.guide.law.p1', 'mortgage.guide.law.p2'],
+    rules: ['expenses_lcci', 'binding_terms', 'transparency_act_free'],
+  },
+  {
+    id: 'tax',
+    anchor: 'g-impuesto',
+    paragraphs: ['mortgage.guide.tax.p1'],
+    rules: ['ajd_lender'],
+  },
+  {
+    id: 'before_2019',
+    anchor: 'g-antes-2019',
+    paragraphs: [
+      'mortgage.guide.before_2019.p1',
+      'mortgage.guide.before_2019.p2',
+      'mortgage.guide.before_2019.p3',
+    ],
+    rules: ['restitution'],
+    sources: ['sts35_2021', 'sts816_2023', 'tjue_c224_19', 'sts725_2018'],
+  },
+  {
+    id: 'floor',
+    anchor: 'g-suelo',
+    paragraphs: ['mortgage.guide.floor.p1', 'mortgage.guide.floor.p2', 'mortgage.guide.floor.p3'],
+    rules: ['floor_statute'],
+    sources: ['tjue_c154_15', 'tjue_c452_18', 'sts241_2013'],
+  },
+  {
+    id: 'irph',
+    anchor: 'g-irph',
+    paragraphs: ['mortgage.guide.irph.p1', 'mortgage.guide.irph.p2'],
+    sources: ['tjue_c125_18', 'tjue_c265_22'],
+  },
+  {
+    id: 'fees',
+    anchor: 'g-comisiones',
+    paragraphs: ['mortgage.guide.fees.p1', 'mortgage.guide.fees.p2', 'mortgage.guide.fees.p3'],
+    rules: [
+      'prepayment_lcci_variable',
+      'prepayment_lcci_fixed',
+      'conversion_cap_2023',
+      'financial_loss_cap',
+      'fee_free_window',
+      'prepayment_law41',
+    ],
+  },
+  {
+    id: 'fein',
+    anchor: 'g-fein',
+    paragraphs: ['mortgage.guide.fein.p1', 'mortgage.guide.fein.p2'],
+    rules: ['fein_timing'],
+  },
+  {
+    id: 'limits',
+    anchor: 'g-plazos',
+    paragraphs: ['mortgage.guide.limits.p1', 'mortgage.guide.limits.p2'],
+    sources: ['tjue_c561_21', 'sts857_2024'],
+  },
+  {
+    id: 'prior_step',
+    anchor: 'g-paso-previo',
+    paragraphs: ['mortgage.guide.prior_step.p1', 'mortgage.guide.prior_step.p2'],
+    rules: ['prior_step_439bis'],
+  },
+  {
+    id: 'channels',
+    anchor: 'g-informarte',
+    paragraphs: ['mortgage.guide.channels.p1'],
+    rules: ['complaints_service'],
+    list: [
+      'mortgage.result.channels_portal',
+      'mortgage.result.channels_service',
+      'mortgage.result.channels_consumer',
+    ],
+  },
+  {
+    id: 'unchecked',
+    anchor: 'g-sin-revisar',
+    paragraphs: [],
+    list: [
+      'client.mortgage.unchecked.clause_transparency',
+      'client.mortgage.unchecked.floor_irph_paid',
+      'client.mortgage.unchecked.time_limits',
+      'client.mortgage.unchecked.novations',
+      'client.mortgage.unchecked.insurance',
+      'client.mortgage.unchecked.purchase',
+      'client.mortgage.unchecked.purchase_taxes',
+    ],
+  },
+];
+
+// Who bears each cost of a deed from 16-06-2019, as the law sets it.
+const costs: readonly (readonly [Key, Key])[] = [
+  ['mortgage.guide.table.notary', 'mortgage.guide.table.lender'],
+  ['mortgage.guide.table.copies', 'mortgage.guide.table.requester'],
+  ['mortgage.guide.table.registry', 'mortgage.guide.table.lender'],
+  ['mortgage.guide.table.agency', 'mortgage.guide.table.lender'],
+  ['mortgage.guide.table.valuation', 'mortgage.guide.table.borrower'],
+  ['mortgage.guide.table.tax', 'mortgage.guide.table.lender_since'],
+  ['mortgage.guide.table.act', 'mortgage.guide.table.nobody'],
+];
+
+// A court's criterion is never shown as law, and one not yet read in its text says so.
+const sourceLabel = (s: LawSource): string =>
+  s.basis === 'case_law'
+    ? t(lang, s.verified ? 'mortgage.guide.case_law' : 'mortgage.guide.case_law_unverified', {
+        tribunal: s.court,
+      })
+    : '';
+// What the courts have said is given as of the oldest day any of the block's rulings was read.
+const asOf = (ids: readonly MortgageSourceId[]): string =>
+  ids.map((id) => MORTGAGE_SOURCES[id].lastVerified).reduce((a, b) => (a < b ? a : b));
+const faq = mortgageFaqEntries(lang, { documents });
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('mortgage.guide.title')}
+    </h2>
+    <p class="guide__lead">{tx('mortgage.guide.lead')}</p>
+    <p class="guide__sources">
+      <span>{t(lang, 'mortgage.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>
+        {tx('mortgage.guide.sources')}:{' '}
+        <a href={MORTGAGE_NORMS.lcci.url}>{tx('mortgage.guide.source_lcci')}</a>
+      </span>
+      <a href={link('es', 'aviso-legal/')}>{tx('mortgage.guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    {blocks.map(({ id, anchor, paragraphs, rules = [], sources = [], list }) => (
+      <section class="sheet sheet--text" data-guide={id}>
+        <h3 id={anchor}>{tx(`mortgage.guide.${id}.title` as Key)}</h3>
+        {paragraphs.map((key, i) => (
+          <>
+            <p>{tx(key)}</p>
+            {id === 'law' && i === 0 && (
+              <FigureTable id="g-ley-2019-tabla">
+                <Fragment slot="caption">{tx('mortgage.guide.table.caption')}</Fragment>
+                <thead>
+                  <tr>
+                    <th scope="col">{tx('mortgage.guide.table.cost')}</th>
+                    <th scope="col">{tx('mortgage.guide.table.who')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {costs.map(([cost, who]) => (
+                    <tr>
+                      <th scope="row">{tx(cost)}</th>
+                      <td>{tx(who)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </FigureTable>
+            )}
+          </>
+        ))}
+        {id === 'law' && (
+          <>
+            <LegalQuote lang={lang} source={MORTGAGE_TEXTS.lcci_14} quote="mortgage_notary" />
+            <LegalQuote lang={lang} source={MORTGAGE_TEXTS.lcci_14} quote="mortgage_registry" />
+            <LegalQuote
+              lang={lang}
+              source={MORTGAGE_TEXTS.lcci_14}
+              quote="mortgage_valuation_agency"
+            />
+          </>
+        )}
+        {id === 'tax' && (
+          <LegalQuote lang={lang} source={MORTGAGE_TEXTS.trlitpajd_29} quote="mortgage_tax" />
+        )}
+        {id === 'floor' && (
+          <LegalQuote lang={lang} source={MORTGAGE_TEXTS.lcci_21} quote="mortgage_floor" />
+        )}
+        {id === 'fein' && (
+          <LegalQuote
+            lang={lang}
+            source={MORTGAGE_TEXTS.lcci_15}
+            quote="mortgage_transparency_deed"
+          />
+        )}
+        {list && (
+          <ul>
+            {list.map((key) => (
+              <li>{tx(key)}</li>
+            ))}
+          </ul>
+        )}
+        {sources.length > 0 && (
+          <p>{t(lang, 'mortgage.guide.as_of', { fecha: dayText(asOf(sources)) })}</p>
+        )}
+        {rules.length + sources.length > 0 && (
+          <>
+            <h4 class="rules__title">{tx('mortgage.guide.rules')}</h4>
+            <ul class="sources sources--wrap">
+              {rules.map((r) => (
+                <li>
+                  <a href={STATUTE_RULES[r].url}>{STATUTE_RULES[r].article}</a>
+                </li>
+              ))}
+              {sources.map((s) => (
+                <li>
+                  <a href={MORTGAGE_SOURCES[s].url}>{MORTGAGE_SOURCES[s].citation}</a> ·{' '}
+                  {sourceLabel(MORTGAGE_SOURCES[s])}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+    ))}
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('mortgage.guide.faq')}</h2>
+      <div class="faq-list">
+        {faq.map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>

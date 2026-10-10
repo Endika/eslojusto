@@ -108,6 +108,19 @@ export const insuranceApp = (home: URL, page: URL, lang: Lang) => ({
   publisher: organization(home),
 });
 
+export const mortgageApp = (home: URL, page: URL, lang: Lang) => ({
+  '@type': 'WebApplication',
+  name: t(lang, 'mortgage.app_name'),
+  url: page.href,
+  description: t(lang, 'mortgage.description'),
+  applicationCategory: 'FinanceApplication',
+  operatingSystem: 'Any',
+  browserRequirements: 'Requires JavaScript',
+  isAccessibleForFree: true,
+  inLanguage: lang,
+  publisher: organization(home),
+});
+
 export interface Crumb {
   readonly name: string;
   // From the site root, with its trailing slash.

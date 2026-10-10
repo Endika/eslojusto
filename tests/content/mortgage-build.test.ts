@@ -39,6 +39,13 @@ describe.skipIf(!withMortgage)('a build with the mortgage switch', () => {
     expect(page).toContain('Fecha de la escritura');
     expect(page).toContain("connect-src 'self';");
   });
+  it('carries its guide, its questions and their FAQPage JSON-LD', () => {
+    const page = read('dist/hipoteca/index.html');
+    expect(page).toContain('Qué dicen la ley y los tribunales de tu hipoteca');
+    expect(page).toContain('id="faq-hipoteca-suelo"');
+    expect(page).toContain('"@type":"FAQPage"');
+    expect(page).toContain('data-legal-quote');
+  });
   it('ships its strings only on its own page', () => {
     expect(read('dist/hipoteca/index.html')).toContain(
       'client.mortgage.status.lender_bears.statute',

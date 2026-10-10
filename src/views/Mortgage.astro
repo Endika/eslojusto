@@ -4,13 +4,16 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import DocumentStart from '../components/DocumentStart.astro';
 import MortgageForm from '../components/MortgageForm.astro';
 import MortgageResult from '../components/MortgageResult.astro';
+import MortgageGuide from '../components/MortgageGuide.astro';
 import { MORTGAGE_BETA } from '../content/sections';
 import { formatLongDay } from '../content/rent-indices';
-import { breadcrumbList, trail } from '../content/structured-data';
+import { faqNode } from '../content/faq';
+import { mortgageFaqEntries } from '../content/mortgage-faq';
+import { breadcrumbList, mortgageApp, trail } from '../content/structured-data';
 import { LAST_UPDATED } from '../content/updated';
 import { DOCUMENTS } from '../documents/config';
 import { t, type Key } from '../i18n';
-import type { Lang } from '../i18n/languages';
+import { link, type Lang } from '../i18n/languages';
 
 interface Props {
   lang: Lang;
@@ -59,7 +62,13 @@ const sections = [
 const checkedOn = LAST_UPDATED['/hipoteca/'];
 if (!checkedOn) throw new Error('/hipoteca/ needs its date in LAST_UPDATED.');
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const page = new URL(link(lang, 'hipoteca/'), Astro.site);
 const crumbs = trail(lang, { name: tx('home.mortgage'), path: '/hipoteca/' });
+const structuredData = [
+  mortgageApp(home, page, lang),
+  breadcrumbList(home, lang, crumbs),
+  faqNode(mortgageFaqEntries(lang, { documents })),
+];
 ---
 
 <Base
@@ -68,7 +77,7 @@ const crumbs = trail(lang, { name: tx('home.mortgage'), path: '/hipoteca/' });
   path="/hipoteca/"
   lang={lang}
   section="cause"
-  structuredData={[breadcrumbList(home, lang, crumbs)]}
+  structuredData={structuredData}
   calculator={documents}
 >
   <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
@@ -118,6 +127,7 @@ const crumbs = trail(lang, { name: tx('home.mortgage'), path: '/hipoteca/' });
       <MortgageForm lang={lang} hidden={documents} />
       <MortgageResult lang={lang} documents={documents} />
     </div>
+    <MortgageGuide lang={lang} checkedOn={checkedOn} documents={documents} />
   </main>
 </Base>
 
