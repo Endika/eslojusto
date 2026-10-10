@@ -13,6 +13,8 @@ import {
   HOUSEHOLD_BUILD,
   INSURANCE_BETA,
   INSURANCE_BUILD,
+  MORTGAGE_BETA,
+  MORTGAGE_BUILD,
   RENTAL_BUILD,
 } from '../../content/sections';
 import { ERTE_LEGAL, ERTE_PAGE } from '../../content/erte';
@@ -43,6 +45,8 @@ const erte = ERTE_BUILD;
 // do the paragraphs about each.
 const credit = CREDIT_BUILD;
 const insurance = INSURANCE_BUILD;
+// The mortgage review exists only in a PUBLIC_MORTGAGE=1 build; so do the paragraphs about it.
+const mortgage = MORTGAGE_BUILD;
 ---
 
 <Base
@@ -204,6 +208,22 @@ const insurance = INSURANCE_BUILD;
         </section>
       )}
 
+      {mortgage && (
+        <section class="sheet sheet--text">
+          <h2 id="al-hipoteca">
+            {tx('legal_notice.mortgage')}
+            {MORTGAGE_BETA && <span class="beta">{tx('mortgage.beta')}</span>}
+          </h2>
+          <p>{tx('legal_notice.mortgage.does')}</p>
+          <p>{tx('legal_notice.mortgage.does_not')}</p>
+          {MORTGAGE_BETA && (
+            <p>
+              {tx('legal_notice.mortgage.beta')} <a href={`mailto:${email}`}>{email}</a>.
+            </p>
+          )}
+        </section>
+      )}
+
       {erte && (
         <section class="sheet sheet--text">
           <h2 id="al-erte">
@@ -239,6 +259,7 @@ const insurance = INSURANCE_BUILD;
             {employment && (
               <li>{tx('legal_notice.employment.pass', { dias: String(PASS_DAYS) })}</li>
             )}
+            {mortgage && <li>{tx('legal_notice.mortgage.pass', { dias: String(PASS_DAYS) })}</li>}
             <li>
               Dónde vale: el pase se guarda solo en ese navegador. En otro dispositivo, en una
               ventana privada o si borras los datos de navegación, se pierde.

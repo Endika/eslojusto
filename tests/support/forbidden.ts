@@ -92,6 +92,8 @@ export const SECTION_FORBIDDEN: Readonly<Record<string, readonly RegExp[]>> = {
   'src/engine/mortgage': MORTGAGE_OWN_FORBIDDEN,
   'mortgage.': MORTGAGE_OWN_FORBIDDEN,
   'client.mortgage.': MORTGAGE_OWN_FORBIDDEN,
+  'privacy.mortgage.': MORTGAGE_OWN_FORBIDDEN,
+  'legal_notice.mortgage': MORTGAGE_OWN_FORBIDDEN,
   'dist/hipoteca': MORTGAGE_FORBIDDEN,
   'src/household': HOUSEHOLD_FORBIDDEN,
   'dist/empleada-de-hogar': HOUSEHOLD_FORBIDDEN,
