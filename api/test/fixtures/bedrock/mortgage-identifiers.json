@@ -1,0 +1,85 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "mortgage_deed",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "prepayment_statement",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "mortgage_deed": {
+          "deedOn": {
+            "value": "2016-11-21",
+            "confidence": "high"
+          },
+          "principal": {
+            "value": 95000,
+            "confidence": "high"
+          },
+          "clauses": [
+            {
+              "label": "expenses_clause",
+              "text": "GASTOS A CARGO DE LA PARTE PRESTATARIA. Serán de cuenta exclusiva de la parte prestataria todos los gastos de tasación del inmueble, aranceles notariales y registrales relativos a la constitución, modificación o cancelación de la hipoteca, los impuestos que graven este contrato y los gastos de gestoría para su tramitación.",
+              "page": 1,
+              "confidence": "high"
+            },
+            {
+              "label": "early_termination",
+              "text": "VENCIMIENTO ANTICIPADO. Con la fianza solidaria de Don Mengano Inventado, que responde de todas las cuotas.",
+              "page": 1,
+              "confidence": "high"
+            },
+            {
+              "label": "insurance_required",
+              "text": "SEGURO DE VIDA. La parte prestataria, con DNI 12345678A, suscribe un seguro de vida tras responder al cuestionario de salud sin enfermedad previa.",
+              "page": 1,
+              "confidence": "high"
+            }
+          ]
+        },
+        "prepayment_statement": {
+          "operations": [
+            {
+              "on": "2021-06-01",
+              "kind": "full_prepayment",
+              "principal": 60000,
+              "feeCharged": 300,
+              "feeConcept": "Comisión cancelación D. Fulano Inventado",
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 9900,
+    "output_tokens": 640
+  }
+}

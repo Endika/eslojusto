@@ -1,0 +1,1015 @@
+{
+  "type": "object",
+  "properties": {
+    "pages": {
+      "type": "array",
+      "description": "One entry per attached page, in order: its kind, the number of its document and its readability.",
+      "maxItems": 25,
+      "items": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25,
+            "description": "The number given before the page."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "mortgage_deed",
+              "notary_invoice",
+              "registry_invoice",
+              "agency_invoice_mortgage",
+              "valuation_invoice",
+              "ajd_form",
+              "fein",
+              "fiae",
+              "transparency_deed",
+              "prepayment_statement",
+              "other"
+            ],
+            "description": "mortgage_deed: a page of the mortgage loan deed (escritura de préstamo hipotecario), the purchase and the loan in one deed included. notary_invoice: a notary invoice. registry_invoice: a land registry invoice. agency_invoice_mortgage: an agency invoice (gestoría) for the deed. valuation_invoice: a valuation invoice (tasación). ajd_form: a stamp duty or transfer tax return (modelo 600). fein: the FEIN. fiae: the FiAE. transparency_deed: the notarial act on the information given before the loan (acta de transparencia). prepayment_statement: a statement of an early repayment, a change to a fixed rate or a move to another lender. other: anything else, such as an ID card, a purchase deed without a loan, a property tax receipt or a payslip."
+          },
+          "document": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25,
+            "description": "Number the documents in order of appearance; all pages of one document get the same number."
+          },
+          "readability": {
+            "type": "object",
+            "description": "ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand; a handwritten statement beside a printed deed is no reason), blurry, dark, cropped (the part with the values is cut off), not_mortgage_document (not about a mortgage loan), foreign_jurisdiction (a mortgage under the law of another country; never because of its language), unknown_format (about a mortgage loan, but no kind of document you know).",
+            "properties": {
+              "value": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "handwritten",
+                  "blurry",
+                  "dark",
+                  "cropped",
+                  "not_mortgage_document",
+                  "foreign_jurisdiction",
+                  "unknown_format"
+                ]
+              },
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              }
+            },
+            "required": ["value", "confidence"],
+            "additionalProperties": false
+          },
+          "month": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}$",
+            "description": "Leave it out: no mortgage page has a month of its own."
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          }
+        },
+        "required": ["page", "kind", "document", "readability", "confidence"],
+        "additionalProperties": false
+      }
+    },
+    "mortgage_deed": {
+      "type": "object",
+      "description": "The mortgage loan deed (escritura de préstamo hipotecario), alone or after the purchase in one deed. Leave the section out when no attached document is one.",
+      "properties": {
+        "deedOn": {
+          "type": "object",
+          "description": "Date of the deed before the notary («En …, a … de …»).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "lenderName": {
+          "type": "object",
+          "description": "The lender (entidad acreedora, prestamista): its name as printed.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "borrowerType": {
+          "type": "object",
+          "description": "Who borrows: individual (one or more natural persons) or company (a company, sociedad).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["individual", "company"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "purpose": {
+          "type": "object",
+          "description": "What the deed says the loan is for, only if it says so: housing (buying, building or renovating a home, its garage or storage room) or business (a business, professional activity or premises).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["housing", "business"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "loanKind": {
+          "type": "object",
+          "description": "standard; developer_subrogation (the buyer takes over the developer’s loan, subrogación en el préstamo del promotor); multicurrency (multidivisa, a loan in another currency); reverse (hipoteca inversa).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["standard", "developer_subrogation", "multicurrency", "reverse"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "principal": {
+          "type": "object",
+          "description": "Capital lent (capital del préstamo, principal).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "termMonths": {
+          "type": "object",
+          "description": "Term in months (plazo); 25 years is 300.",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "rateType": {
+          "type": "object",
+          "description": "As the deed names it: fixed (tipo fijo for the whole term), variable (tipo variable, revised by an index, even after an initial rate) or mixed (tipo mixto: a fixed stretch the deed calls so, then variable). Leave it out when the deed does not say which.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["fixed", "variable", "mixed"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "fixedUntil": {
+          "type": "object",
+          "description": "For a mixed rate: the last day of its fixed stretch, if printed.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "initialRate": {
+          "type": "object",
+          "description": "Initial or fixed nominal annual rate (tipo de interés inicial), 2,5 % is 2.5.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "index": {
+          "type": "object",
+          "description": "The reference index of a variable rate: euribor (Euríbor), irph (IRPH, of the entities, savings banks or banks), other.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["euribor", "irph", "other"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "spread": {
+          "type": "object",
+          "description": "Points added to the index (diferencial), 0,875 is 0.875.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "rateRevisionMonths": {
+          "type": "object",
+          "description": "Months between two revisions of a variable rate (revisión semestral is 6).",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "floorPercent": {
+          "type": "object",
+          "description": "The lowest rate the deed lets the variable rate reach (tipo mínimo, límite a la variación a la baja); 0 when it says only that the rate can never be negative.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "defaultRate": {
+          "type": "object",
+          "description": "Default interest (interés de demora), when printed as a rate.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "defaultMarginPoints": {
+          "type": "object",
+          "description": "Default interest when printed as points over the ordinary rate (interés remuneratorio más 2 puntos is 2).",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "earlyTerminationInstalments": {
+          "type": "object",
+          "description": "Monthly instalments left unpaid after which the lender may call in the whole loan (vencimiento anticipado); one instalment is 1.",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "prepaymentOption": {
+          "type": "object",
+          "description": "For a variable rate, the compensation for repaying early the deed picks (art. 23.5 Ley 5/2019): a_015_5y (0,15 % in the first five years) or b_025_3y (0,25 % in the first three years).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["a_015_5y", "b_025_3y"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "variablePrepaymentFeePercent": {
+          "type": "object",
+          "description": "Compensation for repaying early in a variable stretch, as a percentage of the capital repaid.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "fixedPrepaymentFeePercent": {
+          "type": "object",
+          "description": "Compensation for repaying early in a fixed stretch, as a percentage of the capital repaid; the first one printed when it has two periods.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "openingFee": {
+          "type": "object",
+          "description": "Opening fee (comisión de apertura), in euros.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "openingFeePercent": {
+          "type": "object",
+          "description": "Opening fee as a percentage of the capital.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "otherSetUpFee": {
+          "type": "object",
+          "description": "true when, besides the opening fee, the deed charges a study, processing or similar fee for granting the loan (comisión de estudio, de tramitación); false when it charges none.",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "transparencyActStated": {
+          "type": "object",
+          "description": "true when the deed states that the notarial act on the information given before it was drawn up (acta previa, art. 15 Ley 5/2019); false when it says nothing of it.",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "handwrittenStatement": {
+          "type": "object",
+          "description": "true when the deed holds or mentions a statement written by the borrower’s own hand about the risks of the loan (expresión manuscrita); false when it does not.",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "clauses": {
+          "type": "array",
+          "description": "Each clause of the deed that matches one of the labels, one entry each, in the order printed; past twelve, the first twelve. Leave out clauses that match none.",
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "label": {
+                "type": "string",
+                "enum": [
+                  "floor_clause",
+                  "irph",
+                  "euribor",
+                  "default_interest",
+                  "early_termination",
+                  "rounding_up",
+                  "opening_fee",
+                  "prepayment_fee",
+                  "expenses_clause",
+                  "insurance_required"
+                ],
+                "description": "floor_clause (a lowest rate, límite a la baja, cláusula suelo), irph (an IRPH index), euribor (a Euríbor index), default_interest (interés de demora), early_termination (vencimiento anticipado), rounding_up (rounding the rate up, redondeo al alza), opening_fee (comisión de apertura, de estudio o de tramitación), prepayment_fee (compensation for repaying early or for changing to a fixed rate), expenses_clause (who pays the costs of the deed: notary, registry, agency, valuation, taxes), insurance_required (an insurance or another product the loan requires)."
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1500,
+                "description": "The clause. Copy it word for word, at most the first characters that fit; never summarise or judge it."
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 25,
+                "description": "The number of the page it starts on."
+              }
+            },
+            "required": ["label", "text", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "notary_invoice": {
+      "type": "object",
+      "description": "Every notary invoice (factura de notaría). Leave the section out when no attached document is one.",
+      "properties": {
+        "notaryInvoices": {
+          "type": "array",
+          "description": "Every notary invoice, one entry each. When one invoice prints separate amounts for the purchase and for the loan, one entry for each part; when it bills both in one amount, one entry with mixed true.",
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "invoiceOn": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Date of the invoice."
+              },
+              "concept": {
+                "type": "string",
+                "enum": ["loan", "purchase", "copy_bank", "copy_borrower", "cancellation"],
+                "description": "What it bills: loan (the mortgage loan deed), purchase (the purchase deed, compraventa), copy_bank (a copy for the lender, copia autorizada para la entidad), copy_borrower (a copy for the borrower, copia simple), cancellation (the deed that cancels a mortgage)."
+              },
+              "mixed": {
+                "type": "boolean",
+                "description": "true when the invoice bills the purchase (compraventa) and the mortgage loan together without splitting their amounts; false when it bills only one of them."
+              },
+              "base": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Taxable base (base imponible, honorarios, derechos de arancel)."
+              },
+              "vat": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "VAT (IVA) of the invoice."
+              },
+              "supplied": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Outlays the notary passed on (suplidos), added up as printed."
+              },
+              "total": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Total of the invoice (total factura), outlays included."
+              }
+            },
+            "required": ["total", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "registry_invoice": {
+      "type": "object",
+      "description": "Every land registry invoice (factura del Registro de la Propiedad). Leave the section out when no attached document is one.",
+      "properties": {
+        "registryInvoices": {
+          "type": "array",
+          "description": "Every land registry invoice, one entry each. When one invoice prints separate amounts for the purchase and for the loan, one entry for each part; when it bills both in one amount, one entry with mixed true.",
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "invoiceOn": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Date of the invoice."
+              },
+              "concept": {
+                "type": "string",
+                "enum": ["mortgage", "purchase", "cancellation"],
+                "description": "What it registers: mortgage (the mortgage, inscripción de la hipoteca), purchase (the purchase, inscripción de la compraventa), cancellation (the cancellation of a mortgage)."
+              },
+              "mixed": {
+                "type": "boolean",
+                "description": "true when the invoice bills the purchase (compraventa) and the mortgage loan together without splitting their amounts; false when it bills only one of them."
+              },
+              "base": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Taxable base (base imponible, honorarios, derechos de arancel)."
+              },
+              "vat": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "VAT (IVA) of the invoice."
+              },
+              "total": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Total of the invoice (total factura), outlays included."
+              }
+            },
+            "required": ["total", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "agency_invoice_mortgage": {
+      "type": "object",
+      "description": "Every invoice of the agency that handled the deed (gestoría), with the outlays it passed on. Leave the section out when no attached document is one.",
+      "properties": {
+        "agencyInvoices": {
+          "type": "array",
+          "description": "Every agency invoice, one entry each.",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "invoiceOn": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Date of the invoice."
+              },
+              "fee": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "The agency’s own fee (honorarios), before VAT."
+              },
+              "vat": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "VAT (IVA) of the invoice."
+              },
+              "total": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Total of the invoice (total factura), outlays included."
+              }
+            },
+            "required": ["total", "confidence"],
+            "additionalProperties": false
+          }
+        },
+        "agencySupplied": {
+          "type": "array",
+          "description": "Every outlay the agency paid and passed on (suplidos, provisión de fondos aplicada), one entry each.",
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "concept": {
+                "type": "string",
+                "enum": ["ajd", "registry", "notary", "valuation", "other"],
+                "description": "ajd (the stamp duty, Actos Jurídicos Documentados, modelo 600), registry (the land registry), notary, valuation (tasación), other."
+              },
+              "amount": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Its amount, in euros."
+              }
+            },
+            "required": ["concept", "amount", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "valuation_invoice": {
+      "type": "object",
+      "description": "Every invoice for the valuation of the home (tasación). Leave the section out when no attached document is one.",
+      "properties": {
+        "valuationInvoices": {
+          "type": "array",
+          "description": "Every valuation invoice, one entry each.",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "invoiceOn": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Date of the invoice."
+              },
+              "base": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Taxable base (base imponible, honorarios, derechos de arancel)."
+              },
+              "vat": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "VAT (IVA) of the invoice."
+              },
+              "total": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Total of the invoice (total factura), outlays included."
+              }
+            },
+            "required": ["total", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ajd_form": {
+      "type": "object",
+      "description": "Every stamp duty or transfer tax return (modelo 600, autoliquidación de Actos Jurídicos Documentados o de Transmisiones Patrimoniales). Leave the section out when no attached document is one.",
+      "properties": {
+        "ajdForms": {
+          "type": "array",
+          "description": "Every return, one entry each.",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "concept": {
+                "type": "string",
+                "enum": ["loan", "purchase"],
+                "description": "What it taxes: loan (the mortgage loan, préstamo hipotecario, constitución de hipoteca) or purchase (the purchase of the home, compraventa)."
+              },
+              "accruedOn": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Date the tax accrued (fecha de devengo)."
+              },
+              "taxBase": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Taxable base (base imponible)."
+              },
+              "amountPaid": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Amount paid (total a ingresar, cuota)."
+              },
+              "paidOn": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Date it was paid, if printed."
+              },
+              "paidByLender": {
+                "type": "boolean",
+                "description": "true when it shows the lender as the taxpayer (sujeto pasivo); false when it shows the borrower or buyer."
+              }
+            },
+            "required": ["concept", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "fein": {
+      "type": "object",
+      "description": "The European Standardised Information Sheet (Ficha Europea de Información Normalizada, FEIN). Leave the section out when no attached document is one.",
+      "properties": {
+        "deliveredOn": {
+          "type": "object",
+          "description": "Date it was handed over (fecha de entrega), if stated.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "principal": {
+          "type": "object",
+          "description": "Capital of the loan it offers.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "initialRate": {
+          "type": "object",
+          "description": "Initial nominal annual rate it offers.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "fiae": {
+      "type": "object",
+      "description": "The Standardised Warnings Sheet (Ficha de Advertencias Estandarizadas, FiAE). Leave the section out when no attached document is one.",
+      "properties": {
+        "deliveredOn": {
+          "type": "object",
+          "description": "Date it was handed over (fecha de entrega), if stated.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "transparency_deed": {
+      "type": "object",
+      "description": "The notarial act on the information given before the loan (acta notarial de transparencia, art. 15 Ley 5/2019). Leave the section out when no attached document is one.",
+      "properties": {
+        "actOn": {
+          "type": "object",
+          "description": "Date of the act.",
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
+        "amountCharged": {
+          "type": "object",
+          "description": "What it bills the borrower (honorarios del acta), only if printed.",
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "prepayment_statement": {
+      "type": "object",
+      "description": "Every statement of an early repayment, a change to a fixed rate or a move to another lender (liquidación de amortización anticipada, novación, subrogación). Leave the section out when no attached document is one.",
+      "properties": {
+        "operations": {
+          "type": "array",
+          "description": "Every operation, one entry each.",
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "on": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "Date of the operation."
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "partial_prepayment",
+                  "full_prepayment",
+                  "fixed_rate_novation",
+                  "creditor_subrogation"
+                ],
+                "description": "partial_prepayment (amortización parcial), full_prepayment (cancelación, amortización total), fixed_rate_novation (novación a tipo fijo), creditor_subrogation (subrogación a otra entidad)."
+              },
+              "principal": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Capital repaid or switched (capital amortizado)."
+              },
+              "feeCharged": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Compensation or fee charged for it (compensación, comisión por amortización anticipada o por conversión)."
+              },
+              "feeConcept": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "description": "The concept of that charge exactly as printed."
+              },
+              "premiumRefunded": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000,
+                "description": "Insurance premium refunded (prima no consumida, extorno), if printed."
+              }
+            },
+            "required": ["on", "kind", "confidence"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["pages"],
+  "additionalProperties": false
+}

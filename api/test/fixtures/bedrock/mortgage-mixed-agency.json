@@ -1,0 +1,121 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "notary_invoice",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "agency_invoice_mortgage",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "ajd_form",
+            "document": 3,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 4,
+            "kind": "ajd_form",
+            "document": 4,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "notary_invoice": {
+          "notaryInvoices": [
+            {
+              "invoiceOn": "2015-09-02",
+              "concept": "loan",
+              "mixed": true,
+              "base": 980.0,
+              "vat": 205.8,
+              "total": 1185.8,
+              "confidence": "high"
+            }
+          ]
+        },
+        "agency_invoice_mortgage": {
+          "agencyInvoices": [
+            {
+              "invoiceOn": "2015-09-20",
+              "fee": 250,
+              "vat": 52.5,
+              "total": 2302.5,
+              "confidence": "high"
+            }
+          ],
+          "agencySupplied": [
+            {
+              "concept": "ajd",
+              "amount": 1800,
+              "confidence": "high"
+            },
+            {
+              "concept": "other",
+              "amount": 200,
+              "confidence": "high"
+            }
+          ]
+        },
+        "ajd_form": {
+          "ajdForms": [
+            {
+              "concept": "loan",
+              "accruedOn": "2015-09-02",
+              "taxBase": 180000,
+              "amountPaid": 1800,
+              "paidOn": "2015-09-18",
+              "paidByLender": false,
+              "confidence": "high"
+            },
+            {
+              "concept": "purchase",
+              "accruedOn": "2015-09-02",
+              "taxBase": 200000,
+              "amountPaid": 14000,
+              "paidOn": "2015-09-18",
+              "paidByLender": false,
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 19800,
+    "output_tokens": 900
+  }
+}

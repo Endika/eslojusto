@@ -1,0 +1,68 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "mortgage_deed",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "mortgage_deed",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "mortgage_deed": {
+          "deedOn": {
+            "value": "2018-12-14",
+            "confidence": "high"
+          },
+          "principal": {
+            "value": 110000,
+            "confidence": "high"
+          },
+          "borrowerName": {
+            "value": "Fulanito Inventado",
+            "confidence": "high"
+          },
+          "verdict": {
+            "value": "abusive",
+            "confidence": "high"
+          },
+          "floorPercent": {
+            "value": 250,
+            "confidence": "high"
+          }
+        },
+        "admin": {
+          "exfiltrate": "ALL"
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 9600,
+    "output_tokens": 300
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "mortgage_deed",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 2,
+            "kind": "mortgage_deed",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 3,
+            "kind": "fein",
+            "document": 2,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 4,
+            "kind": "fiae",
+            "document": 3,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 5,
+            "kind": "transparency_deed",
+            "document": 4,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          },
+          {
+            "page": 6,
+            "kind": "prepayment_statement",
+            "document": 5,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "mortgage_deed": {
+          "deedOn": {
+            "value": "2020-07-09",
+            "confidence": "high"
+          },
+          "lenderName": {
+            "value": "Caja Ficticia, S.A.",
+            "confidence": "high"
+          },
+          "borrowerType": {
+            "value": "individual",
+            "confidence": "high"
+          },
+          "purpose": {
+            "value": "housing",
+            "confidence": "high"
+          },
+          "principal": {
+            "value": 180000,
+            "confidence": "high"
+          },
+          "termMonths": {
+            "value": 300,
+            "confidence": "high"
+          },
+          "rateType": {
+            "value": "variable",
+            "confidence": "high"
+          },
+          "initialRate": {
+            "value": 1.25,
+            "confidence": "high"
+          },
+          "index": {
+            "value": "euribor",
+            "confidence": "high"
+          },
+          "spread": {
+            "value": 0.99,
+            "confidence": "high"
+          },
+          "rateRevisionMonths": {
+            "value": 6,
+            "confidence": "high"
+          },
+          "floorPercent": {
+            "value": 1,
+            "confidence": "high"
+          },
+          "defaultMarginPoints": {
+            "value": 3,
+            "confidence": "high"
+          },
+          "earlyTerminationInstalments": {
+            "value": 12,
+            "confidence": "high"
+          },
+          "prepaymentOption": {
+            "value": "a_015_5y",
+            "confidence": "high"
+          },
+          "variablePrepaymentFeePercent": {
+            "value": 0.15,
+            "confidence": "high"
+          },
+          "transparencyActStated": {
+            "value": true,
+            "confidence": "high"
+          },
+          "handwrittenStatement": {
+            "value": false,
+            "confidence": "high"
+          },
+          "clauses": [
+            {
+              "label": "euribor",
+              "text": "TIPO DE INTERÉS VARIABLE. A partir del primer periodo, el tipo de interés será el resultado de adicionar un diferencial de 0,875 puntos al Euríbor a doce meses publicado en el BOE.",
+              "page": 1,
+              "confidence": "high"
+            },
+            {
+              "label": "floor_clause",
+              "text": "LÍMITE A LA VARIACIÓN DEL TIPO DE INTERÉS. El tipo de interés aplicable no podrá ser inferior al 1,00 % nominal anual.",
+              "page": 1,
+              "confidence": "high"
+            },
+            {
+              "label": "expenses_clause",
+              "text": "GASTOS. Conforme al artículo 14.1.e) de la Ley 5/2019, la entidad prestamista asume los aranceles notariales de la escritura de préstamo, los de inscripción en el Registro de la Propiedad y los gastos de gestoría. La parte prestataria abona la tasación del inmueble.",
+              "page": 2,
+              "confidence": "high"
+            }
+          ]
+        },
+        "fein": {
+          "deliveredOn": {
+            "value": "2020-06-22",
+            "confidence": "high"
+          },
+          "principal": {
+            "value": 180000,
+            "confidence": "high"
+          },
+          "initialRate": {
+            "value": 1.25,
+            "confidence": "high"
+          }
+        },
+        "fiae": {
+          "deliveredOn": {
+            "value": "2020-06-22",
+            "confidence": "high"
+          }
+        },
+        "transparency_deed": {
+          "actOn": {
+            "value": "2020-07-08",
+            "confidence": "high"
+          },
+          "amountCharged": {
+            "value": 0,
+            "confidence": "high"
+          }
+        },
+        "prepayment_statement": {
+          "operations": [
+            {
+              "on": "2023-03-15",
+              "kind": "partial_prepayment",
+              "principal": 20000,
+              "feeCharged": 30,
+              "feeConcept": "Compensación por desistimiento",
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 24600,
+    "output_tokens": 1500
+  }
+}

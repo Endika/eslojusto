@@ -50,7 +50,7 @@ describe('the employment read', () => {
   });
 });
 
-describe.each(['credit', 'insurance'] as const)('the %s read', (review) => {
+describe.each(['credit', 'insurance', 'mortgage'] as const)('the %s read', (review) => {
   it('asks for exactly what it asked when it shipped', () => {
     expect(toolInputSchema(review)).toEqual(JSON.parse(fixture(`${review}-tool-schema.json`)));
     expect(SYSTEM_PROMPTS[review]).toBe(fixture(`${review}-prompt.txt`));
