@@ -167,6 +167,8 @@ export interface Handset {
 export interface ChangeNotice {
   // Null when no notice came.
   readonly sentOn: CivilDate | null;
+  // The day the change takes effect; null when the person does not know it.
+  readonly appliesOn: CivilDate | null;
   readonly change: ChangeKind;
   readonly index: PriceIndex;
 }

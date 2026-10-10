@@ -126,6 +126,21 @@ describe('validating a telecom exit', () => {
     ]);
   });
 
+  it('refuses a change that applies before it was notified', () => {
+    const errors = validateTelecom(
+      telecom({
+        changeNotice: {
+          sentOn: parseDate('2026-02-10'),
+          appliesOn: parseDate('2026-02-09'),
+          change: 'price_up',
+          index: 'none',
+        },
+      }),
+      TODAY,
+    );
+    expect(codes(errors)).toEqual(['changeNotice.appliesOn:not_after_start']);
+  });
+
   it('refuses a line that ends before it starts and an exit not yet asked for', () => {
     const errors = validateTelecom(
       telecom({

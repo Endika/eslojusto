@@ -95,7 +95,27 @@ export type BillsPhraseKey =
   | 'power.max_used'
   | 'power.max_used_unknown'
   | 'power.p1_cost_year'
-  | 'power.change_once_a_year';
+  | 'power.change_once_a_year'
+  | 'commitment.over_maximum'
+  | 'commitment.agreed_unknown'
+  | 'commitment.proportional'
+  | 'commitment.ended'
+  | 'commitment.over_maximum_penalty'
+  | 'change.before_rules'
+  | 'change.no_notice'
+  | 'change.short_notice'
+  | 'change.exit_before_notice'
+  | 'change.exit_after_month'
+  | 'change.index_cpi'
+  | 'change.index_unsettled'
+  | 'change.other_unsettled'
+  | 'change.no_penalty'
+  | 'change.handset_whole'
+  | 'change.handset_prorated'
+  | 'after_exit.effective'
+  | 'after_exit.calendar_missing'
+  | 'after_exit.charged'
+  | 'after_exit.margin_day';
 
 // The UI words a phrase through the dictionary key `client.bills.calculation.<key>`.
 export interface BillsPhrase {

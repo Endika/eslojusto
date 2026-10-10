@@ -25,7 +25,9 @@ export type BillsNormId =
   | 'rd897_2017'
   | 'rd88_2026'
   | 'rd216_2014'
-  | 'trlgdcu';
+  | 'trlgdcu'
+  | 'lgtel'
+  | 'rd899_2009';
 
 export type Norm = LawNorm<BillsNormId, NormStatus>;
 
@@ -35,6 +37,6 @@ export type NormTable = LawNormTable<BillsNormId, NormStatus>;
 export type NormReview = Readonly<Record<BillsNormId, string | null>>;
 
 // Official figures the tables rest on besides their norms.
-export type BillsSourceId = 'ine_cpi_electricity';
+export type BillsSourceId = 'ine_cpi_electricity' | 'tjue_c326_14';
 
 export type SourceTable = LawSourceTable<BillsSourceId>;

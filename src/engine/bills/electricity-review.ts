@@ -1,5 +1,4 @@
 import type { CivilDate } from '../date';
-import { round2 } from '../money';
 import { checkArithmetic } from './electricity-arithmetic';
 import { checkExcessPower, checkServices } from './electricity-disallowed';
 import { checkExitPenalty } from './electricity-exit-penalty';
@@ -10,14 +9,7 @@ import { checkSocialBonus } from './electricity-social-bonus';
 import { checkElectricityTax } from './electricity-tax';
 import { checkTollsAndCharges } from './electricity-tolls';
 import { checkVat } from './electricity-vat';
-import {
-  COUNTED,
-  countedAmount,
-  findingsOf,
-  type BillFinding,
-  type BillItem,
-  type BillsItemId,
-} from './finding';
+import { countedAmount, findingsOf, totalsOf, type BillItem, type BillTotals } from './finding';
 import type { NormTable } from './norms';
 import { electricityScope } from './scope';
 import type { BillsTables } from './tables';
@@ -47,14 +39,7 @@ export interface ElectricityDeps {
   readonly tables: BillsTables;
 }
 
-export interface ElectricityTotals {
-  // What the person pays over in every reading: the lowest.
-  readonly counted: number;
-  // The most any reading gives, for «y hasta … si …».
-  readonly upTo: number;
-  // Charged short, in every reading: shown as plainly and never set against what is paid over.
-  readonly under: number;
-}
+export type ElectricityTotals = BillTotals;
 
 export interface ElectricityReview {
   readonly scope: ElectricityScope;
@@ -68,33 +53,6 @@ export interface ElectricityReview {
 export type ElectricityResult =
   | { readonly ok: false; readonly errors: readonly ValidationError<ElectricityField>[] }
   | { readonly ok: true; readonly review: ElectricityReview };
-
-// The total repeats its lines, and tolls and charges are a breakdown within the power and energy
-// terms: neither is money charged short of its own.
-const NOT_UNDER: ReadonlySet<BillsItemId> = new Set([
-  'total',
-  'tolls_and_charges_power',
-  'tolls_and_charges_energy',
-]);
-
-const overAmount = (f: BillFinding): number =>
-  COUNTED.has(f.status) && f.direction === 'over' && f.pendingOn.length === 0 ? (f.amount ?? 0) : 0;
-
-const underAmount = (f: BillFinding): number =>
-  f.direction === 'under' && !NOT_UNDER.has(f.id) && f.pendingOn.length === 0 ? (f.amount ?? 0) : 0;
-
-function totalsOf(items: readonly BillItem[]): ElectricityTotals {
-  let counted = 0;
-  let upTo = 0;
-  let under = 0;
-  for (const item of items) {
-    const findings = findingsOf(item);
-    counted += countedAmount(item);
-    upTo += Math.max(...findings.map(overAmount));
-    under += Math.min(...findings.map(underAmount));
-  }
-  return { counted: round2(counted), upTo: round2(upTo), under: round2(under) };
-}
 
 const present = (item: BillItem | null): readonly BillItem[] => (item === null ? [] : [item]);
 

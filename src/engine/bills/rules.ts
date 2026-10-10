@@ -28,7 +28,12 @@ export type BillsRuleId =
   | 'unsolicited_services'
   | 'exit_penalty'
   | 'power_change'
-  | 'commitment_proportional';
+  | 'commitment_proportional'
+  | 'commitment_maximum'
+  | 'change_exit'
+  | 'handset_after_change'
+  | 'indexed_price_rise'
+  | 'exit_effective';
 
 export type BillsRule = LawRule<BillsRuleId, BillsNormId> & RuleBase<BillsSourceId>;
 
@@ -69,6 +74,9 @@ const RD216_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2014-3376#a5';
 const TRLGDCU_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555#a62';
 // The blocks of arts. 60 bis and 66 quáter have not been read: the link opens on the whole text.
 const TRLGDCU_TEXT_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555';
+// Neither consolidated text's blocks have been read: the links open on the whole text.
+const LGTEL_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2022-10757';
+const RD899_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2009-8961';
 
 export const RULES: Readonly<Record<BillsRuleId, BillsRule>> = {
   // Arts. 43 to 45: reading and billing, and what was charged wrong is settled in the next bill.
@@ -255,6 +263,62 @@ export const RULES: Readonly<Record<BillsRuleId, BillsRule>> = {
     'Texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios, art. 62.5',
     TRLGDCU_URL,
     '2022-01-01',
+    null,
+    'amount',
+  ),
+  // Art. 67.7: a consumer's commitment lasts 24 months at most. Shown without a figure.
+  commitment_maximum: rule(
+    'commitment_maximum',
+    'lgtel',
+    'Ley 11/2022, art. 67.7',
+    LGTEL_URL,
+    '2022-06-30',
+    null,
+    'info',
+  ),
+  // Art. 67.8: a change of conditions is notified a month ahead, and the subscriber may leave
+  // within the month after without paying for it.
+  change_exit: rule(
+    'change_exit',
+    'lgtel',
+    'Ley 11/2022, art. 67.8',
+    LGTEL_URL,
+    '2022-06-30',
+    null,
+    'amount',
+  ),
+  // Art. 67.10: leaving that way, what is still owed is the subsidised handset the subscriber keeps.
+  handset_after_change: rule(
+    'handset_after_change',
+    'lgtel',
+    'Ley 11/2022, art. 67.10',
+    LGTEL_URL,
+    '2022-06-30',
+    null,
+    'amount',
+  ),
+  // A rise under a clause tied to a public price index, which the Court of Justice did not take
+  // as a change of conditions. Never an amount: not read against the current law.
+  indexed_price_rise: {
+    ...rule(
+      'indexed_price_rise',
+      'lgtel',
+      'Ley 11/2022, art. 67.8',
+      LGTEL_URL,
+      '2022-06-30',
+      null,
+      'info',
+    ),
+    sources: ['tjue_c326_14'],
+  },
+  // Art. 7: an exit takes effect within two working days of the request; nothing that accrues
+  // later for a cause not the subscriber's may be billed.
+  exit_effective: rule(
+    'exit_effective',
+    'rd899_2009',
+    'Real Decreto 899/2009, art. 7',
+    RD899_URL,
+    '2009-08-30',
     null,
     'amount',
   ),

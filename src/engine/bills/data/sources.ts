@@ -16,4 +16,23 @@ export const BILLS_SOURCES: SourceTable = {
     verified: false,
     quotes: [],
   },
+  // A rise under a clause tied to an official consumer price index is not a change of conditions
+  // that lets the subscriber leave without penalty (Directive 2002/22/EC, art. 20.2). Read in its
+  // summaries only, and on a directive since replaced: shown as the court's criterion, never as a
+  // figure.
+  tjue_c326_14: {
+    id: 'tjue_c326_14',
+    basis: 'case_law',
+    citation: 'Sentencia del Tribunal de Justicia de la Unión Europea de 26 de noviembre de 2015',
+    article: 'asunto C-326/14, Verein für Konsumenteninformation',
+    url: 'https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:62014CJ0326',
+    inForceSince: '2015-11-26',
+    court: 'Tribunal de Justicia de la Unión Europea',
+    number: 'C-326/14',
+    decidedOn: '2015-11-26',
+    ecli: null,
+    lastVerified: '2026-10-10',
+    verified: false,
+    quotes: [],
+  },
 };
