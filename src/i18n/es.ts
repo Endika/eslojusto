@@ -4997,7 +4997,7 @@ export const es = {
   'client.credit.calculation.apr.unsolvable':
     'Con estas cifras no sale una sola TAE: revisa los importes y las fechas que has metido.',
   'client.credit.calculation.apr.one_decimal':
-    'Las dos se comparan redondeadas a un decimal, como pide el anexo I de la ley; aquí se muestran con dos.',
+    'Las dos se comparan redondeadas a un decimal con la regla del anexo I; aquí se muestran con dos.',
   'client.credit.calculation.apr.revolving_assumption':
     'Para una tarjeta, la TAE se calcula con los supuestos de la ley (anexo I, parte II): dispones de todo el límite, {limit}, y lo devuelves en un año, en 12 cuotas mensuales con la misma parte de capital más los intereses de lo pendiente; la cuota anual y las comisiones se pagan al principio.',
   'client.credit.calculation.apr.revolving_before_2013':
