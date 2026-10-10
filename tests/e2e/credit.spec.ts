@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
+import { fitsScreen, noSideScroll } from '../support/sheets';
 
 // Runs only against a build with /financiacion/ (TEST_CREDIT=1). The norms and the Bank of Spain
 // series are read as loaded on this day, so the clock is fixed.
@@ -55,50 +56,6 @@ const card = (page: Page, title: string) =>
   result(page)
     .locator('[data-item]')
     .filter({ has: page.getByRole('heading', { name: title }) });
-
-// No page is ever wider than the screen.
-async function noSideScroll(page: Page) {
-  const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-  );
-  expect(overflow).toBeLessThanOrEqual(0);
-}
-
-// On a 360 × 640 phone, the sheet on screen sits whole above the buttons and inside the screen:
-// nothing to scroll to.
-async function fitsScreen(page: Page) {
-  await noSideScroll(page);
-  if ((page.viewportSize()?.width ?? 0) > 360) return;
-  const box = await page.evaluate(() => {
-    const visible = [...document.querySelectorAll<HTMLElement>('[data-sheet]')].find(
-      (s) => !s.hidden,
-    );
-    const actions = document.querySelector<HTMLElement>('.actions');
-    if (!visible || !actions) return null;
-    const s = visible.getBoundingClientRect();
-    const a = actions.getBoundingClientRect();
-    return {
-      id: visible.dataset['sheet'],
-      parts: [...visible.querySelectorAll<HTMLElement>('h2, .field, .group')]
-        .filter((c) => c.offsetParent !== null)
-        .map((c) => `${c.tagName}${Math.round(c.getBoundingClientRect().height)}`)
-        .join(' '),
-      bottom: s.bottom,
-      actionsTop: a.top,
-      actionsBottom: a.bottom,
-      height: innerHeight,
-    };
-  });
-  expect(box).not.toBeNull();
-  if (box) {
-    expect
-      .soft(box.bottom, `the ${box.id} sheet ends above the buttons (${box.parts})`)
-      .toBeLessThanOrEqual(box.actionsTop + 1);
-    expect
-      .soft(box.actionsBottom, `the buttons are on screen on the ${box.id} sheet`)
-      .toBeLessThanOrEqual(box.height + 1);
-  }
-}
 
 // Checks the sheet fits, then moves on with whichever button the sheet shows, and waits out the
 // page turn: it moves in steps, so a click during it can land beside its target.

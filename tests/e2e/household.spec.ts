@@ -1,5 +1,6 @@
 import { gunzipSync } from 'node:zlib';
 import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
+import { fitsScreen, noSideScroll } from '../support/sheets';
 
 // Runs only against a build with /empleada-de-hogar/ (TEST_HOUSEHOLD=1), which also carries a test
 // analytics key. Every case reads the minimum wage and the norms as loaded on this day, so the
@@ -18,48 +19,6 @@ const choose = (scope: Locator, name: string, value: string) =>
   question(scope, name).getByLabel(value, { exact: true }).check();
 const type = (scope: Locator, label: string, value: string) =>
   scope.getByLabel(label, { exact: true }).fill(value);
-
-// No page is ever wider than the screen.
-async function noSideScroll(page: Page) {
-  const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-  );
-  expect(overflow).toBeLessThanOrEqual(0);
-}
-
-// The sheet on screen sits whole above the buttons and inside the screen: nothing to scroll to.
-async function fitsScreen(page: Page) {
-  await noSideScroll(page);
-  const box = await page.evaluate(() => {
-    const visible = [...document.querySelectorAll<HTMLElement>('[data-sheet]')].find(
-      (s) => !s.hidden,
-    );
-    const actions = document.querySelector<HTMLElement>('.actions');
-    if (!visible || !actions) return null;
-    const s = visible.getBoundingClientRect();
-    const a = actions.getBoundingClientRect();
-    return {
-      id: visible.dataset['sheet'],
-      parts: [...visible.children]
-        .filter((c) => !(c as HTMLElement).hidden)
-        .map((c) => `${c.tagName}${Math.round(c.getBoundingClientRect().height)}`)
-        .join(' '),
-      bottom: s.bottom,
-      actionsTop: a.top,
-      actionsBottom: a.bottom,
-      height: innerHeight,
-    };
-  });
-  expect(box).not.toBeNull();
-  if (box) {
-    expect
-      .soft(box.bottom, `the ${box.id} sheet ends above the buttons (${box.parts})`)
-      .toBeLessThanOrEqual(box.actionsTop + 1);
-    expect
-      .soft(box.actionsBottom, `the buttons are on screen on the ${box.id} sheet`)
-      .toBeLessThanOrEqual(box.height + 1);
-  }
-}
 
 async function next(page: Page, fit: boolean) {
   if (fit) await fitsScreen(page);

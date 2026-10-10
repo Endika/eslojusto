@@ -1,5 +1,5 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import { nextSheet } from '../support/sheets';
+import { fitsScreen, nextSheet, noSideScroll } from '../support/sheets';
 
 const SIZES = [
   { name: 'desktop', viewport: { width: 1280, height: 800 } },
@@ -28,47 +28,6 @@ const card = (page: Page, title: string) =>
   result(page)
     .locator('[data-item]')
     .filter({ has: page.getByRole('heading', { name: title }) });
-
-// No sheet is ever wider than the screen.
-async function fits(page: Page) {
-  const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-  );
-  expect(overflow).toBeLessThanOrEqual(0);
-}
-
-// On a 360 × 640 phone, the sheet on screen sits whole above the buttons and inside the screen:
-// nothing to scroll to.
-async function fitsScreen(page: Page) {
-  await fits(page);
-  if ((page.viewportSize()?.width ?? 0) > 360) return;
-  const box = await page.evaluate(() => {
-    const visible = [...document.querySelectorAll<HTMLElement>('[data-sheet]')].find(
-      (s) => !s.hidden,
-    );
-    const actions = document.querySelector<HTMLElement>('.actions');
-    if (!visible || !actions) return null;
-    const s = visible.getBoundingClientRect();
-    const a = actions.getBoundingClientRect();
-    return {
-      id: visible.dataset['sheet'],
-      sheetHeight: Math.round(s.height),
-      bottom: s.bottom,
-      actionsTop: a.top,
-      actionsBottom: a.bottom,
-      height: innerHeight,
-    };
-  });
-  expect(box).not.toBeNull();
-  if (box) {
-    expect
-      .soft(box.bottom, `the ${box.id} sheet (${box.sheetHeight} px) ends above the buttons`)
-      .toBeLessThanOrEqual(box.actionsTop + 1);
-    expect
-      .soft(box.actionsBottom, `the buttons are on screen on the ${box.id} sheet`)
-      .toBeLessThanOrEqual(box.height + 1);
-  }
-}
 
 async function open(page: Page, today: string, viewport: { width: number; height: number }) {
   await page.clock.setFixedTime(new Date(`${today}T12:00:00`));
@@ -151,7 +110,7 @@ async function fill(page: Page, p: Policy) {
     await page.getByRole('button', { name: 'Siguiente' }).click();
   }
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
-  await fits(page);
+  await noSideScroll(page);
 }
 
 for (const { name, viewport } of SIZES) {
@@ -240,7 +199,7 @@ test('a life policy stops at the first sheet, with why', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
   await expect(result(page)).toContainText('los seguros de vida tienen reglas propias');
   await expect(result(page).locator('[data-item]')).toHaveCount(0);
-  await fits(page);
+  await noSideScroll(page);
 });
 
 test('a missing expiry date is named and the visit stays on the sheet', async ({ page }) => {
