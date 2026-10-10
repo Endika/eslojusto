@@ -1,5 +1,6 @@
 import { toIso, type CivilDate } from '../engine/date';
 import { formatCalculationEuros, formatDays, formatInteger } from '../calculator/number';
+import { dayText, find, template, renderFieldErrors } from '../calculator/review-result';
 import type {
   InsuranceCalculation,
   InsuranceFigure,
@@ -13,8 +14,6 @@ import type { NormSource } from '../engine/law/sources';
 import type { ClientKey, Translate } from '../i18n/client';
 import type { FieldError } from './form';
 
-// «2027-02-01» → «01-02-2027».
-export const dayText = (iso: string): string => iso.split('-').reverse().join('-');
 export const civilDayText = (d: CivilDate): string => dayText(toIso(d));
 
 const PERCENT = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2, useGrouping: 'always' });
@@ -58,18 +57,6 @@ export function phraseText(p: InsurancePhrase, tr: Translate): string {
 
 export const calculationLines = (c: InsuranceCalculation, tr: Translate): string[] =>
   c.map((p) => phraseText(p, tr));
-
-function template(container: ParentNode, name: string): DocumentFragment {
-  const t = container.querySelector<HTMLTemplateElement>(`template[data-template="${name}"]`);
-  if (!t) throw new Error(`Missing template ${name}`);
-  return t.content.cloneNode(true) as DocumentFragment;
-}
-
-function find<T extends Element = HTMLElement>(root: ParentNode, selector: string): T {
-  const el = root.querySelector<T>(selector);
-  if (!el) throw new Error(`Missing ${selector}`);
-  return el;
-}
 
 // ---------- Findings ----------
 
@@ -264,26 +251,8 @@ export function renderOutOfScope(root: HTMLElement, reason: OutOfScopeReason, tr
   );
 }
 
-export function renderErrors(
+export const renderErrors = (
   form: HTMLFormElement,
   errors: readonly FieldError[],
   tr: Translate,
-): void {
-  for (const p of form.querySelectorAll<HTMLElement>('[data-error-for]')) {
-    p.textContent = '';
-    p.hidden = true;
-  }
-  for (const el of form.querySelectorAll('[aria-invalid]')) el.removeAttribute('aria-invalid');
-  for (const el of form.querySelectorAll<HTMLElement>('[data-has-error]'))
-    delete el.dataset['hasError'];
-  for (const { field, code } of errors) {
-    const p = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
-    if (p) {
-      p.textContent = tr(`client.insurance.error.${code}`);
-      p.hidden = false;
-      p.closest<HTMLElement>('[data-field]')?.setAttribute('data-has-error', '');
-    }
-    for (const el of form.querySelectorAll(`[name="${field}"]`))
-      el.setAttribute('aria-invalid', 'true');
-  }
-}
+): void => renderFieldErrors(form, errors, (code) => tr(`client.insurance.error.${code}`));

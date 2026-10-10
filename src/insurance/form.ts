@@ -1,4 +1,5 @@
 import { parseAmount } from '../calculator/number';
+import { pick, triState } from '../calculator/review-form';
 import { parseDate, type CivilDate } from '../engine/date';
 import { scope } from '../engine/insurance/scope';
 import type {
@@ -75,13 +76,6 @@ const FIELD_OF: Readonly<Record<InsuranceField, InsuranceFormField>> = {
 
 const COVERED: readonly InsuranceLine[] = ['home', 'car'];
 const NO_DATE: CivilDate = { y: 1, m: 1, d: 1 };
-
-const pick = <T extends string>(value: string | null, options: readonly T[]): T | null =>
-  value !== null && (options as readonly string[]).includes(value) ? (value as T) : null;
-
-// «Sí», «No» and «No lo sé»; undefined while unanswered.
-const triState = (value: string | null): boolean | null | undefined =>
-  value === 'yes' ? true : value === 'no' ? false : value === 'unknown' ? null : undefined;
 
 interface Reading {
   readonly errors: FieldError[];

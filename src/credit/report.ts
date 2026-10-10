@@ -7,6 +7,7 @@ import { scopePhrases } from '../engine/credit/scope';
 import type { CreditInput } from '../engine/credit/types';
 import type { LawSource, NormSource } from '../engine/law/sources';
 import { formatEuros, formatInteger } from '../calculator/number';
+import { dayText } from '../calculator/review-result';
 import { longDate } from '../documents/letter';
 import type { Block, DocumentModel } from '../documents/ports';
 import type { Translate } from '../i18n/client';
@@ -14,7 +15,6 @@ import type { CompletedCreditReview } from './ports';
 import {
   calculationLines,
   civilDayText as day,
-  dayText,
   indicatorStatusText,
   lawSourceText,
   normStatusText,

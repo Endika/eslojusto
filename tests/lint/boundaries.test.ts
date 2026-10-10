@@ -474,6 +474,8 @@ describe('import boundaries', () => {
     ['src/rental/x.ts', "import { showQuote } from '../documents/quote';"],
     ['src/employment/x.ts', "import { removeQuotes } from '../documents/quote';"],
     ['src/scripts/x.ts', "import { BE1904 } from '../engine/credit/data/be1904';"],
+    ['src/credit/x.ts', "import { pick } from '../calculator/review-form';"],
+    ['src/insurance/x.ts', "import { find } from '../calculator/review-result';"],
     ['src/rental/x.ts', "import { reviewRental } from '../engine/rental/review';"],
     ['src/rental/x.ts', "import { parseDate } from '../engine/date';"],
     ['src/rental/x.ts', "import { createNavigation } from '../calculator/navigation';"],

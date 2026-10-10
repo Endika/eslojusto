@@ -1,6 +1,7 @@
+import { applyConditions } from '../calculator/review-form';
 import { setUpSection, type SectionForm } from '../calculator/section';
 import { reviewCredit } from '../engine/credit/review';
-import { applyConditions, gate } from './conditions';
+import { gate } from './conditions';
 import { SHEETS, onQuestions, readCreditForm, sheetErrors, sheetOfField } from './form';
 import type { CreditSetup } from './ports';
 import { renderCreditResult, renderErrors, renderOutOfScope } from './render';
