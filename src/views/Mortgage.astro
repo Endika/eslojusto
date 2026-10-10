@@ -18,8 +18,9 @@ interface Props {
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 // With the documents API the visit opens on the choice between uploading and typing; the tabs and
-// the form wait until it is made. A deed runs past what one read takes, so the upload says which
-// of its pages to send and how to tell them.
+// the form wait until it is made, and the result offers the letters and, when there is one to sell,
+// the pass. A deed runs past what one read takes, so the upload says which of its pages to send
+// and how to tell them.
 const documents = DOCUMENTS !== null;
 const pageGuide = {
   lead: tx('mortgage.documents.guide.lead'),
@@ -115,7 +116,7 @@ const crumbs = trail(lang, { name: tx('home.mortgage'), path: '/hipoteca/' });
       </noscript>
       {documents && <DocumentStart lang={lang} review="mortgage" pageGuide={pageGuide} />}
       <MortgageForm lang={lang} hidden={documents} />
-      <MortgageResult lang={lang} />
+      <MortgageResult lang={lang} documents={documents} />
     </div>
   </main>
 </Base>

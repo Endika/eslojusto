@@ -8,11 +8,12 @@ import PassLetter from './PassLetter.astro';
 // same pass unlocks each item's detail too, and its letters are two, each shown only when the
 // review has figures for it. On the contract and credit reviews the letters that only ask for
 // information sit outside the paid part and download without a pass, under their own title when
-// there is nothing to sell. The insurance review never sells the pass: its one letter only tells
-// the insurer, and a pass already held downloads the report.
+// there is nothing to sell; so does the mortgage review's request for its documents. The insurance
+// review never sells the pass: its one letter only tells the insurer, and a pass already held
+// downloads the report.
 interface Props {
   lang: Lang;
-  review?: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance';
+  review?: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance' | 'mortgage';
 }
 const { lang, review = 'final_pay' } = Astro.props;
 const RENTAL: Partial<Record<Key, Key>> = {
@@ -57,12 +58,24 @@ const INSURANCE: Partial<Record<Key, Key>> = {
   'documents.letter.company': 'insurance.letter.company',
   'documents.letter.reference': 'insurance.letter.reference',
 };
+const MORTGAGE: Partial<Record<Key, Key>> = {
+  'documents.pass.title': 'mortgage.pass.title',
+  'documents.pass.text': 'mortgage.pass.text',
+  'documents.pass.price': 'mortgage.pass.price',
+  'documents.pass.letter_note': 'mortgage.pass.letter_note',
+  'documents.letter.legend': 'mortgage.letter.legend',
+  'documents.letter.privacy': 'mortgage.letter.privacy',
+  'documents.letter.id': 'mortgage.letter.id',
+  'documents.letter.company': 'mortgage.letter.company',
+  'documents.letter.reference': 'mortgage.letter.reference',
+};
 const OWN: Partial<Record<Key, Key>> = {
   final_pay: {},
   rental: RENTAL,
   employment: EMPLOYMENT,
   credit: CREDIT,
   insurance: INSURANCE,
+  mortgage: MORTGAGE,
 }[review];
 const tx = (key: Key) => t(lang, OWN[key] ?? key);
 // The title and lead shown when only the free letters are on offer.
@@ -70,6 +83,7 @@ const FREE_ONLY = {
   employment: ['employment.letters.title', 'employment.letters.text'],
   credit: ['credit.letters.title', 'credit.letters.text'],
   insurance: ['insurance.letters.title', 'insurance.letters.text'],
+  mortgage: ['mortgage.letters.title', 'mortgage.letters.text'],
 } as const satisfies Record<string, readonly [Key, Key]>;
 const freeOnly = review in FREE_ONLY ? FREE_ONLY[review as keyof typeof FREE_ONLY] : null;
 // Marks what is about buying the pass, hidden when only the free letters are on offer.

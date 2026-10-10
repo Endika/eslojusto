@@ -305,7 +305,7 @@ const POINT_OF: Record<ReadingPart, string> = {
 };
 
 // «Con la norma de la fecha de tu escritura · Si se revisa cada 12 meses o menos».
-const readingTitle = (when: FeeReading, question: FeeQuestion, tr: Translate): string => {
+export const readingTitle = (when: FeeReading, question: FeeQuestion, tr: Translate): string => {
   const open = question.split('_and_');
   return (when.split('.') as ReadingPart[])
     .filter((part) => open.includes(POINT_OF[part]))
@@ -348,7 +348,7 @@ function feeCard(item: FeeItem, tr: Translate): Card {
 
 // What a law says is told as such; a court's criterion carries the court and the day its state
 // is given as of.
-const partTitle = (part: FlagPart, tr: Translate): string =>
+export const partTitle = (part: FlagPart, tr: Translate): string =>
   part.basis === 'statute'
     ? tr('client.mortgage.basis.statute')
     : tr('client.mortgage.basis.case_law', { fecha: dayText(part.statusAsOf ?? '') });

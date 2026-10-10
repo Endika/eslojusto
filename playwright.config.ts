@@ -41,8 +41,8 @@ const optInSpecs = [
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
 // The documents project reads documents on /alquiler/, /contrato/, /financiacion/, /seguros/ and
-// /hipoteca/ too, and offers the letters on /financiacion/ and /seguros/, so its build has them;
-// the analytics project measures the first two too.
+// /hipoteca/ too, and offers the letters on /financiacion/, /seguros/ and /hipoteca/, so its build
+// has them; the analytics project measures the first two too.
 const buildEnv = {
   ...(rental || documents || analytics ? { PUBLIC_RENTAL: '1' } : {}),
   ...(employment || documents || analytics ? { PUBLIC_EMPLOYMENT: '1' } : {}),

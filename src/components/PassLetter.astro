@@ -1,18 +1,20 @@
 ---
 import type { Key } from '../i18n';
 import { LETTER_MAX_LENGTH } from '../documents/letter';
+import { STATUTE_RULES } from '../engine/mortgage/rules';
 
 // The letter's optional details and a button for each letter the review can give, worded in its
 // section's own copy. On the final pay's and the rental pages it sits among the paid downloads; on
-// the contract, credit and insurance reviews', below them, because some of their letters are free.
+// the contract, credit, insurance and mortgage reviews', below them, because some of their letters
+// are free.
 interface Props {
-  review: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance';
+  review: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance' | 'mortgage';
   tx: (key: Key) => string;
 }
 const { review, tx } = Astro.props;
 const rental = review === 'rental';
 const employment = review === 'employment';
-const finance = review === 'credit' || review === 'insurance';
+const finance = review === 'credit' || review === 'insurance' || review === 'mortgage';
 type LetterField = readonly [
   id:
     | 'name'
@@ -84,13 +86,22 @@ const creditLetters = [
 const insuranceLetters = [
   ['insurance_non_renewal', 'insurance.pass.download_non_renewal_letter'],
 ] as const;
+// The mortgage review's: the free request for its documents first, then the one the pass pays for.
+const mortgageLetters = [
+  ['mortgage_documents', 'mortgage.pass.download_documents_letter'],
+  ['mortgage_amounts', 'mortgage.pass.download_amounts_letter'],
+] as const;
 const letterButtons = {
   final_pay: null,
   rental: rentalLetters,
   employment: employmentLetters,
   credit: creditLetters,
   insurance: insuranceLetters,
+  mortgage: mortgageLetters,
 }[review];
+// Beside the amounts letter, always: the step the law sets before going to court over a mortgage's
+// clauses is another thing, and its text is a link away.
+const priorStep = review === 'mortgage' ? STATUTE_RULES.prior_step_439bis : null;
 const describedBy = (id: LetterField[0]) =>
   id === 'id' ? 'error-letter-id' : id === 'iban' ? 'hint-letter-iban' : undefined;
 ---
@@ -147,6 +158,14 @@ const describedBy = (id: LetterField[0]) =>
       </button>
     )}
   </div>
+  {priorStep && (
+    <p class="item__note" data-letter-kind="mortgage_amounts">
+      {tx('mortgage.pass.prior_step')}{' '}
+      <a href={priorStep.url} rel="noopener" target="_blank">
+        {priorStep.article}
+      </a>
+    </p>
+  )}
   <p class="item__note" data-letter-note>
     {tx('documents.pass.letter_note')}
   </p>
