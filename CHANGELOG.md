@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.41.0](https://github.com/Endika/eslojusto/compare/v1.40.0...v1.41.0) (2026-10-10)
+
+
+### Features
+
+* **engine:** check mortgage prepayment and fixed-rate switch fees against their caps ([12929a1](https://github.com/Endika/eslojusto/commit/12929a104c01f182560d9b4ce88cef3805f3aab6))
+* **engine:** flag mortgage clauses with dated sources and review a deed end to end ([8a4ccf6](https://github.com/Endika/eslojusto/commit/8a4ccf6a23a9927e8ecad1e9a311348d3a287aea))
+
 ## [1.40.0](https://github.com/Endika/eslojusto/compare/v1.39.0...v1.40.0) (2026-10-09)
 
 
