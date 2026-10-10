@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.42.0](https://github.com/Endika/eslojusto/compare/v1.41.0...v1.42.0) (2026-10-10)
+
+
+### Features
+
+* **credit:** add the credit report and letters and the free insurance non-renewal letter ([564996c](https://github.com/Endika/eslojusto/commit/564996c8509c9910930321230ac67efa61393f6b))
+* **employment:** split the review's long sheets so each fits a 360×640 screen ([d3a8335](https://github.com/Endika/eslojusto/commit/d3a8335585ba5cc5fc852e1a062dd1e14e3ed63c))
+* **rental:** split the review's long sheets so each fits a 360×640 screen ([c71da01](https://github.com/Endika/eslojusto/commit/c71da01933a3d9e33ec164e97184cb5f2867b05a))
+
 ## [1.41.0](https://github.com/Endika/eslojusto/compare/v1.40.0...v1.41.0) (2026-10-10)
 
 
