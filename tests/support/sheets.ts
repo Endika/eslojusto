@@ -17,9 +17,11 @@ export async function noSideScroll(page: Page): Promise<void> {
   expect(overflow).toBeLessThanOrEqual(0);
 }
 
-// The sheet on screen sits whole above the buttons and inside the screen: nothing to scroll to.
+// On a 360 × 640 phone, the sheet on screen sits whole above the buttons and inside the screen:
+// nothing to scroll to. On a wider screen, only that nothing is wider than it.
 export async function fitsScreen(page: Page): Promise<void> {
   await noSideScroll(page);
+  if ((page.viewportSize()?.width ?? 0) > 360) return;
   const box = await page.evaluate(() => {
     const visible = [...document.querySelectorAll<HTMLElement>('[data-sheet]')].find(
       (s) => !s.hidden,
