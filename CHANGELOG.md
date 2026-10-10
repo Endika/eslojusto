@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.43.0](https://github.com/Endika/eslojusto/compare/v1.42.0...v1.43.0) (2026-10-10)
+
+
+### Features
+
+* **credit:** read credit and insurance documents and prefill both reviews ([7f00006](https://github.com/Endika/eslojusto/commit/7f00006fd5fe8fdf233e745434704798c33e0e9b))
+* **documents:** mirror the credit and insurance reads the API gives ([7b2810d](https://github.com/Endika/eslojusto/commit/7b2810d297758ccc531239342def12bd9306e107))
+
 ## [1.42.0](https://github.com/Endika/eslojusto/compare/v1.41.0...v1.42.0) (2026-10-10)
 
 
