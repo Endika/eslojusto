@@ -15,6 +15,7 @@ import {
   type ReviewSchema,
   type SectionSchema,
 } from './extraction-schema';
+import { fingerprint, supplyNumber } from './fingerprint';
 import type { ReviewKind } from './reviews';
 
 export type ExtractedValue = string | number | boolean;
@@ -139,8 +140,17 @@ function isValidValue(type: FieldType, v: unknown): v is ExtractedValue {
       return typeof v === 'boolean';
     case 'enum':
       return typeof v === 'string' && type.values.includes(v);
+    case 'fingerprint':
+      return typeof v === 'string' && supplyNumber(v) !== null;
   }
 }
+
+// What the read keeps of a valid value: itself, or a supply number's fingerprint.
+const kept = (type: FieldType, v: ExtractedValue): ExtractedValue => {
+  if (type.type !== 'fingerprint' || typeof v !== 'string') return v;
+  const normalised = supplyNumber(v);
+  return normalised === null ? v : fingerprint(normalised);
+};
 
 const sortKey = (row: unknown, field: string): string => {
   const v = isRecord(row) ? row[field] : undefined;
@@ -180,7 +190,7 @@ export function parseSection(
       isConfidence(raw['confidence']) &&
       isValidValue(spec.type, raw['value'])
     )
-      fields[name] = { value: raw['value'], confidence: raw['confidence'] };
+      fields[name] = { value: kept(spec.type, raw['value']), confidence: raw['confidence'] };
     else dropped += 1;
   }
 
@@ -207,7 +217,7 @@ export function parseSection(
         const v = rawRow[field];
         if (v === undefined || v === null) {
           if (list.required.includes(field)) rowValid = false;
-        } else if (isValidValue(spec.type, v)) values[field] = v;
+        } else if (isValidValue(spec.type, v)) values[field] = kept(spec.type, v);
         else rowValid = false;
       }
       if (rowValid) rows.push({ values, confidence: rawRow['confidence'] });

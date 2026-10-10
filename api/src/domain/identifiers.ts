@@ -51,3 +51,9 @@ const PERSON_TITLE =
   /(?<![\p{L}\p{N}])(?:Don|Doña|Dona|D\.|Dª|D\.ª|Dña\.?|Sr\.|Sra\.)\s+\p{Lu}\p{Ll}+/u;
 
 export const hasPersonTitle = (text: string): boolean => PERSON_TITLE.test(text);
+
+// A supply point code (CUPS): ES, sixteen digits and two check letters, grouped or not. Only the
+// electricity review looks for it, since only a bill or a contract for a supply carries one.
+const SUPPLY_NUMBER = /(?<![A-Z\d])ES[\s.-]?(?:\d[\s.-]?){16}[A-Z]{2}(?![A-Z])/i;
+
+export const hasSupplyNumber = (text: string): boolean => SUPPLY_NUMBER.test(text);

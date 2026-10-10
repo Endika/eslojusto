@@ -80,7 +80,10 @@ export type FieldType =
   // YYYY-MM.
   | { readonly type: 'month' }
   | { readonly type: 'boolean' }
-  | { readonly type: 'enum'; readonly values: readonly string[] };
+  | { readonly type: 'enum'; readonly values: readonly string[] }
+  // A supply point code (CUPS): the model copies it, the read keeps only its fingerprint
+  // (src/domain/fingerprint.ts), so the code itself never leaves the parse.
+  | { readonly type: 'fingerprint' };
 
 export interface FieldSpec {
   readonly type: FieldType;
@@ -111,6 +114,8 @@ const days = (description: string): FieldSpec => ({ type: { type: 'days' }, desc
 const flag = (description: string): FieldSpec => ({ type: { type: 'boolean' }, description });
 
 export const MAX_MONEY = 1_000_000;
+// A CUPS is 20 to 22 characters; a bill may print it in groups.
+export const MAX_SUPPLY_NUMBER_LENGTH = 32;
 export const MAX_DAYS = 366;
 
 // What each earnings line of a payslip pays for. Only `salary` lines make up the salary of the
@@ -445,6 +450,8 @@ function valueSchema(type: FieldType): JsonSchema {
       return { type: 'boolean' };
     case 'enum':
       return { type: 'string', enum: type.values };
+    case 'fingerprint':
+      return { type: 'string', minLength: 1, maxLength: MAX_SUPPLY_NUMBER_LENGTH };
   }
 }
 
