@@ -114,6 +114,17 @@ const creditReach = {
   message:
     'src/credit reaches the credit engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes, summary lines and letter details, and the translator type.',
 };
+// The mortgage review reaches the mortgage engine through its modules, never its tables, which its
+// composition root passes in; of the calculator, only what every section shares.
+const mortgageReach = {
+  regex: `^(?!\\./|\\.\\./engine/(date|law/sources|mortgage/(?!data$)[\\w-]+)$|\\.\\./calculator/(dom|flow|navigation|number|review-form|review-result|section)$|\\.\\./i18n/client$)|${notCanonical}`,
+  message:
+    'src/mortgage reaches the mortgage engine (its tables come from the composition root), the shared sheets and the translator type.',
+};
+const noMortgage = {
+  regex: '(^|/)mortgage/',
+  message: 'The final pay never reaches into the mortgage review.',
+};
 const noCredit = {
   regex: '(^|/)credit/',
   message: 'The final pay never reaches into the credit review.',
@@ -282,7 +293,17 @@ export default tseslint.config(
   ),
   boundary(
     ['src/calculator/**'],
-    [noAnalytics, noRoot, noPosthogSdk, noRental, noEmployment, noHousehold, noInsurance, noCredit],
+    [
+      noAnalytics,
+      noRoot,
+      noPosthogSdk,
+      noRental,
+      noEmployment,
+      noHousehold,
+      noInsurance,
+      noCredit,
+      noMortgage,
+    ],
     {
       ignores: ['src/calculator/{flow,navigation,section,tabs}.ts'],
     },
@@ -292,6 +313,7 @@ export default tseslint.config(
   boundary(['src/household/**'], [noAnalytics, noRoot, noPosthogSdk, householdReach]),
   boundary(['src/insurance/**'], [noAnalytics, noRoot, noPosthogSdk, insuranceReach]),
   boundary(['src/credit/**'], [noAnalytics, noRoot, noPosthogSdk, creditReach]),
+  boundary(['src/mortgage/**'], [noAnalytics, noRoot, noPosthogSdk, mortgageReach]),
   boundary(['src/documents/*.ts'], [noAnalytics, noRoot, noPosthogSdk, documentsPlatform], {
     ignores: FINAL_PAY_DOCUMENTS.map((name) => `src/documents/${name}.ts`),
   }),

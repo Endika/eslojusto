@@ -1,0 +1,497 @@
+---
+import Field from './Field.astro';
+import Choice from './EmploymentChoice.astro';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+import {
+  BORROWERS,
+  EXPENSES_CLAUSE,
+  LOAN_KINDS,
+  OPERATION_KINDS,
+  PREPAYMENT_OPTIONS,
+  PURPOSES,
+  RATE_TYPES,
+} from '../mortgage/form';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+const answers = (values: readonly ('yes' | 'no' | 'unknown')[]) =>
+  values.map((value) => ({ value, label: tx(`mortgage.answer.${value}`) }));
+const yesNo = answers(['yes', 'no']);
+const yesNoUnknown = answers(['yes', 'no', 'unknown']);
+
+// The figures of a clause are asked only once it is in the deed; the invoices only of someone who
+// has them; an operation's details only once there was one.
+const when = (condition: string) => ({ 'data-if': condition });
+const invoices = when('hasInvoices:yes');
+const operation = when(
+  'operation:partial_prepayment full_prepayment fixed_rate_novation creditor_subrogation',
+);
+
+// Each sheet in order: its step id, which is also the URL fragment, and its heading.
+const sheet = (step: string) => ({
+  class: 'sheet',
+  id: `sheet-${step}`,
+  'data-sheet': step,
+  'aria-labelledby': `question-${step}`,
+});
+
+const arrow = 'M4 12h15m-6-6 6 6-6 6';
+---
+
+<form class="calculator" id="mortgage" novalidate aria-label={tx('mortgage.form_aria')}>
+  <div class="stack">
+    <fieldset {...sheet('hipoteca')}>
+      <h2 class="question" id="question-hipoteca" tabindex="-1">
+        {tx('mortgage.loan.question')}
+      </h2>
+      <p class="help help--short">{tx('mortgage.loan.help')}</p>
+      <Choice
+        name="loanKind"
+        legend={tx('mortgage.loan.kind')}
+        options={LOAN_KINDS.map((value) => ({ value, label: tx(`mortgage.loan.kind.${value}`) }))}
+        layout="list"
+      />
+    </fieldset>
+
+    <fieldset {...sheet('titular')}>
+      <h2 class="question" id="question-titular" tabindex="-1">
+        {tx('mortgage.holder.question')}
+      </h2>
+      <Choice
+        name="borrower"
+        legend={tx('mortgage.holder.borrower')}
+        options={BORROWERS.map((value) => ({
+          value,
+          label: tx(`mortgage.holder.borrower.${value}`),
+        }))}
+        layout="list"
+      />
+      <Choice
+        name="purpose"
+        legend={tx('mortgage.holder.purpose')}
+        options={PURPOSES.map((value) => ({
+          value,
+          label: tx(`mortgage.holder.purpose.${value}`),
+        }))}
+        layout="list"
+        attributes={when('borrower:individual')}
+      />
+    </fieldset>
+
+    <fieldset {...sheet('escritura')}>
+      <h2 class="question" id="question-escritura" tabindex="-1">
+        {tx('mortgage.deed.question')}
+      </h2>
+      <Field
+        name="deedOn"
+        label={tx('mortgage.deed.on')}
+        hint={tx('mortgage.deed.on_hint')}
+        kind="date"
+      />
+      <Field
+        name="loanAmount"
+        label={tx('mortgage.deed.amount')}
+        hint={tx('mortgage.deed.amount_hint')}
+        kind="amount"
+      />
+      <Choice
+        name="consumer"
+        legend={tx('mortgage.deed.consumer')}
+        hint={tx('mortgage.deed.consumer_hint')}
+        options={yesNoUnknown}
+      />
+    </fieldset>
+
+    <fieldset {...sheet('tipo')}>
+      <h2 class="question" id="question-tipo" tabindex="-1">
+        {tx('mortgage.rate.question')}
+      </h2>
+      <Choice
+        name="rateType"
+        legend={tx('mortgage.rate.type')}
+        options={RATE_TYPES.map((value) => ({ value, label: tx(`mortgage.rate.type.${value}`) }))}
+      />
+      <Field
+        name="revisionMonths"
+        label={tx('mortgage.rate.revision')}
+        hint={tx('mortgage.rate.revision_hint')}
+        kind="days"
+        attributes={when('rateType:variable mixed')}
+      />
+    </fieldset>
+
+    <fieldset {...sheet('clausula-gastos')}>
+      <h2 class="question" id="question-clausula-gastos" tabindex="-1">
+        {tx('mortgage.expenses_clause.question')}
+      </h2>
+      <Choice
+        name="expensesClause"
+        legend={tx('mortgage.expenses_clause.present')}
+        hint={tx('mortgage.expenses_clause.present_hint')}
+        options={EXPENSES_CLAUSE.map((value) => ({
+          value,
+          label: tx(`mortgage.expenses_clause.present.${value}`),
+        }))}
+        layout="list"
+      />
+    </fieldset>
+
+    <fieldset {...sheet('suelo')}>
+      <h2 class="question" id="question-suelo" tabindex="-1">
+        {tx('mortgage.floor.question')}
+      </h2>
+      <div {...when('rateType:variable mixed')}>
+        <Choice name="floor" legend={tx('mortgage.floor.present')} options={yesNoUnknown} />
+        <Field
+          name="floorPercent"
+          label={tx('mortgage.floor.percent')}
+          hint={tx('mortgage.floor.percent_hint')}
+          kind="amount"
+          attributes={when('floor:yes')}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('indice')}>
+      <h2 class="question" id="question-indice" tabindex="-1">
+        {tx('mortgage.index.question')}
+      </h2>
+      <div {...when('rateType:variable mixed')}>
+        <Choice
+          name="irph"
+          legend={tx('mortgage.index.irph')}
+          hint={tx('mortgage.index.irph_hint')}
+          options={yesNoUnknown}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('demora')}>
+      <h2 class="question" id="question-demora" tabindex="-1">
+        {tx('mortgage.default.question')}
+      </h2>
+      <Choice
+        name="defaultInterest"
+        legend={tx('mortgage.default.present')}
+        hint={tx('mortgage.default.present_hint')}
+        options={yesNoUnknown}
+      />
+      <div {...when('defaultInterest:yes')}>
+        <div class="pair">
+          <Field
+            name="defaultRate"
+            label={tx('mortgage.default.rate')}
+            kind="amount"
+            extraHints={['hint-default-rates']}
+          />
+          <Field
+            name="ordinaryRate"
+            label={tx('mortgage.default.ordinary')}
+            kind="amount"
+            extraHints={['hint-default-rates']}
+          />
+        </div>
+        <p class="hint" id="hint-default-rates">
+          {tx('mortgage.default.rates_hint')}
+        </p>
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('vencimiento')}>
+      <h2 class="question" id="question-vencimiento" tabindex="-1">
+        {tx('mortgage.termination.question')}
+      </h2>
+      <Choice
+        name="earlyTermination"
+        legend={tx('mortgage.termination.present')}
+        options={yesNoUnknown}
+      />
+      <Field
+        name="missedInstalments"
+        label={tx('mortgage.termination.instalments')}
+        hint={tx('mortgage.termination.instalments_hint')}
+        kind="days"
+        attributes={when('earlyTermination:yes')}
+      />
+    </fieldset>
+
+    <fieldset {...sheet('apertura')}>
+      <h2 class="question" id="question-apertura" tabindex="-1">
+        {tx('mortgage.opening.question')}
+      </h2>
+      <Choice name="openingFee" legend={tx('mortgage.opening.present')} options={yesNoUnknown} />
+      <div {...when('openingFee:yes')}>
+        <Field
+          name="openingFeeAmount"
+          label={tx('mortgage.opening.amount')}
+          hint={tx('mortgage.opening.amount_hint')}
+          kind="amount"
+        />
+        <Choice
+          name="duplicateFee"
+          legend={tx('mortgage.opening.duplicate')}
+          options={yesNoUnknown}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('otras')}>
+      <h2 class="question" id="question-otras" tabindex="-1">
+        {tx('mortgage.other.question')}
+      </h2>
+      <Choice name="roundingUp" legend={tx('mortgage.other.rounding')} options={yesNoUnknown} />
+      <Choice
+        name="insuranceRequired"
+        legend={tx('mortgage.other.insurance')}
+        options={yesNoUnknown}
+      />
+    </fieldset>
+
+    <fieldset {...sheet('facturas')}>
+      <h2 class="question" id="question-facturas" tabindex="-1">
+        {tx('mortgage.invoices.question')}
+      </h2>
+      <Choice
+        name="hasInvoices"
+        legend={tx('mortgage.invoices.has')}
+        hint={tx('mortgage.invoices.has_hint')}
+        options={yesNo}
+        layout="pair"
+      />
+    </fieldset>
+
+    <fieldset {...sheet('notaria')}>
+      <h2 class="question" id="question-notaria" tabindex="-1">
+        {tx('mortgage.notary.question')}
+      </h2>
+      <div {...invoices}>
+        <Field
+          name="notaryLoan"
+          label={tx('mortgage.notary.loan')}
+          hint={tx('mortgage.invoices.paid_hint')}
+          kind="amount"
+        />
+        <Choice
+          name="notaryMixed"
+          legend={tx('mortgage.invoices.mixed')}
+          options={yesNo}
+          layout="pair"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('registro')}>
+      <h2 class="question" id="question-registro" tabindex="-1">
+        {tx('mortgage.registry.question')}
+      </h2>
+      <div {...invoices}>
+        <Field
+          name="registryMortgage"
+          label={tx('mortgage.registry.mortgage')}
+          hint={tx('mortgage.invoices.paid_hint')}
+          kind="amount"
+        />
+        <Choice
+          name="registryMixed"
+          legend={tx('mortgage.invoices.mixed')}
+          options={yesNo}
+          layout="pair"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('gestoria')}>
+      <h2 class="question" id="question-gestoria" tabindex="-1">
+        {tx('mortgage.agency.question')}
+      </h2>
+      <div {...invoices}>
+        <Field
+          name="agency"
+          label={tx('mortgage.agency.total')}
+          hint={tx('mortgage.agency.total_hint')}
+          kind="amount"
+        />
+        <div class="pair">
+          <Field
+            name="agencyTax"
+            label={tx('mortgage.agency.tax')}
+            kind="amount"
+            extraHints={['hint-agency-supplied']}
+          />
+          <Field
+            name="agencyRegistry"
+            label={tx('mortgage.agency.registry')}
+            kind="amount"
+            extraHints={['hint-agency-supplied']}
+          />
+        </div>
+        <p class="hint" id="hint-agency-supplied">
+          {tx('mortgage.agency.supplied_hint')}
+        </p>
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('tasacion')}>
+      <h2 class="question" id="question-tasacion" tabindex="-1">
+        {tx('mortgage.valuation.question')}
+      </h2>
+      <div {...invoices}>
+        <Field
+          name="valuation"
+          label={tx('mortgage.valuation.total')}
+          hint={tx('mortgage.invoices.paid_hint')}
+          kind="amount"
+        />
+        <Field
+          name="transparencyDeed"
+          label={tx('mortgage.valuation.act')}
+          hint={tx('mortgage.valuation.act_hint')}
+          kind="amount"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('impuesto')}>
+      <h2 class="question" id="question-impuesto" tabindex="-1">
+        {tx('mortgage.tax.question')}
+      </h2>
+      <div {...invoices}>
+        <Field
+          name="ajdLoan"
+          label={tx('mortgage.tax.loan')}
+          hint={tx('mortgage.tax.loan_hint')}
+          kind="amount"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('pago')}>
+      <h2 class="question" id="question-pago" tabindex="-1">
+        {tx('mortgage.paid.question')}
+      </h2>
+      <div {...invoices}>
+        <Field
+          name="paidOn"
+          label={tx('mortgage.paid.on')}
+          hint={tx('mortgage.paid.on_hint')}
+          kind="date"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('acuerdo')}>
+      <h2 class="question" id="question-acuerdo" tabindex="-1">
+        {tx('mortgage.agreement.question')}
+      </h2>
+      <div {...invoices}>
+        <Choice
+          name="agreement"
+          legend={tx('mortgage.agreement.agreement')}
+          options={yesNoUnknown}
+        />
+        <Field
+          name="returned"
+          label={tx('mortgage.agreement.returned')}
+          hint={tx('mortgage.agreement.returned_hint')}
+          kind="amount"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('amortizacion')}>
+      <h2 class="question" id="question-amortizacion" tabindex="-1">
+        {tx('mortgage.operation.question')}
+      </h2>
+      <Choice
+        name="operation"
+        legend={tx('mortgage.operation.kind')}
+        hint={tx('mortgage.operation.kind_hint')}
+        options={OPERATION_KINDS.map((value) => ({
+          value,
+          label: tx(`mortgage.operation.kind.${value}`),
+        }))}
+        layout="list"
+      />
+    </fieldset>
+
+    <fieldset {...sheet('operacion')}>
+      <h2 class="question" id="question-operacion" tabindex="-1">
+        {tx('mortgage.operation.details')}
+      </h2>
+      <div {...operation}>
+        <Field name="operationOn" label={tx('mortgage.operation.on')} kind="date" />
+        <Field
+          name="operationPrincipal"
+          label={tx('mortgage.operation.principal')}
+          hint={tx('mortgage.operation.principal_hint')}
+          kind="amount"
+        />
+        <Field
+          name="operationFee"
+          label={tx('mortgage.operation.fee')}
+          hint={tx('mortgage.operation.fee_hint')}
+          kind="amount"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('condiciones')}>
+      <h2 class="question" id="question-condiciones" tabindex="-1">
+        {tx('mortgage.operation.terms')}
+      </h2>
+      <div {...when('operation:partial_prepayment full_prepayment creditor_subrogation')}>
+        <Choice
+          name="prepaymentOption"
+          legend={tx('mortgage.operation.option')}
+          hint={tx('mortgage.operation.option_hint')}
+          options={PREPAYMENT_OPTIONS.map((value) => ({
+            value,
+            label: tx(`mortgage.operation.option.${value}`),
+          }))}
+          layout="list"
+          attributes={when('rateType:variable mixed')}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset {...sheet('seguro')}>
+      <h2 class="question" id="question-seguro" tabindex="-1">
+        {tx('mortgage.operation.insurance_question')}
+      </h2>
+      <Choice
+        name="hadInsurance"
+        legend={tx('mortgage.operation.insurance')}
+        options={yesNoUnknown}
+        attributes={when('operation:full_prepayment')}
+      />
+    </fieldset>
+  </div>
+
+  <div class="actions">
+    <div class="actions__inner">
+      <button class="button button--back" type="button" data-back hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow} transform="rotate(180 12 12)"></path>
+        </svg>
+        {tx('form.back')}
+      </button>
+      <button class="button button--forward" type="button" data-next>
+        {tx('form.next')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+      <button class="button button--forward" type="submit" data-submit hidden>
+        {tx('form.review')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</form>

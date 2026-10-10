@@ -22,3 +22,9 @@ export const INSURANCE_BETA = true;
 // PUBLIC_CREDIT=1, on the same terms; it opens as a beta.
 export const CREDIT_BUILD = import.meta.env.PUBLIC_CREDIT === '1';
 export const CREDIT_BETA = true;
+
+// /hipoteca/, a home mortgage's set-up costs by law and by the Supreme Court's split, its fee caps
+// and its clauses with dated sources, is built only when PUBLIC_MORTGAGE=1, on the same terms; it
+// opens as a beta.
+export const MORTGAGE_BUILD = import.meta.env.PUBLIC_MORTGAGE === '1';
+export const MORTGAGE_BETA = true;

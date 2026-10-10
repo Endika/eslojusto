@@ -19,4 +19,6 @@ interface ImportMetaEnv {
   readonly PUBLIC_INSURANCE?: string;
   // '1' builds the consumer credit review at /financiacion/; anything else leaves it out.
   readonly PUBLIC_CREDIT?: string;
+  // '1' builds the mortgage review at /hipoteca/; anything else leaves it out.
+  readonly PUBLIC_MORTGAGE?: string;
 }

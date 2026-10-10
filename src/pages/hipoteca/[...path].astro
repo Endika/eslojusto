@@ -1,0 +1,19 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { MORTGAGE_BUILD } from '../../content/sections';
+
+// Without PUBLIC_MORTGAGE=1 the build has no /hipoteca/ at all, and the page's code stays out of it.
+export const getStaticPaths = (() =>
+  MORTGAGE_BUILD ? [{ params: { path: undefined } }] : []) satisfies GetStaticPaths;
+
+// The literal switch, not MORTGAGE_BUILD: the bundler drops the page and its script from a build
+// without it, which keeps that build identical to one without this page.
+/* eslint-disable no-restricted-syntax -- a fixed path into src/views, not a boundary escape */
+const Mortgage =
+  import.meta.env.PUBLIC_MORTGAGE === '1'
+    ? (await import('../../views/Mortgage.astro')).default
+    : null;
+/* eslint-enable no-restricted-syntax */
+---
+
+{Mortgage && <Mortgage lang="es" />}

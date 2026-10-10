@@ -20,6 +20,10 @@
   insurance policy at `/seguros/` are built only with `PUBLIC_INSURANCE=1`, and the APR, the
   average-rate indicator and the dates of a consumer credit at `/financiacion/` only with
   `PUBLIC_CREDIT=1`.
+- **Mortgage (hipoteca)** — in development, not yet published; the set-up costs the law or the
+  Supreme Court's split puts on the lender, never added together, the caps on prepayment and
+  fixed-rate switch fees and the deed's clauses with dated sources, at `/hipoteca/`, are built
+  only with `PUBLIC_MORTGAGE=1`.
 
 The calculators run in your browser and nothing you type is sent anywhere. Reading your documents
 is optional: with your explicit consent, the pages go to the API in Spain, are read by a model in
