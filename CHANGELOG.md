@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.44.0](https://github.com/Endika/eslojusto/compare/v1.43.0...v1.44.0) (2026-10-10)
+
+
+### Features
+
+* **analytics:** measure the credit and insurance reviews with closed codes ([204666a](https://github.com/Endika/eslojusto/commit/204666a9435ab621184a694859eb2364e954f11e))
+* **api:** read mortgage deeds, set-up invoices and prepayment statements ([b2aa0e6](https://github.com/Endika/eslojusto/commit/b2aa0e695306a1bb5ce76d92a459bb6c587d1894))
+* **credit:** explain APR, the average-rate indicator and insurance dates with their FAQ ([2708369](https://github.com/Endika/eslojusto/commit/27083692d75eb64967bec6bf94a6574f14108d10))
+
 ## [1.43.0](https://github.com/Endika/eslojusto/compare/v1.42.0...v1.43.0) (2026-10-10)
 
 
