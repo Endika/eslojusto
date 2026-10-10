@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.49.0](https://github.com/Endika/eslojusto/compare/v1.48.0...v1.49.0) (2026-10-10)
+
+
+### Features
+
+* **analytics:** measure the mortgage review with closed codes ([54568c9](https://github.com/Endika/eslojusto/commit/54568c9011988ada550005a726b581447d421076))
+* **mortgage:** explain what the law and the courts say about mortgage costs and clauses ([c0ea102](https://github.com/Endika/eslojusto/commit/c0ea1029f027f1f9f475042cba71eb08f3c1910b))
+
 ## [1.48.0](https://github.com/Endika/eslojusto/compare/v1.47.0...v1.48.0) (2026-10-10)
 
 
