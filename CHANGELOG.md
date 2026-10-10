@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.47.0](https://github.com/Endika/eslojusto/compare/v1.46.1...v1.47.0) (2026-10-10)
+
+
+### Features
+
+* **mortgage:** read deeds and invoices with a guide to the pages that matter ([006c38d](https://github.com/Endika/eslojusto/commit/006c38d94a5d446b25eca526d0d8cf77793fdb26))
+
 ## [1.46.1](https://github.com/Endika/eslojusto/compare/v1.46.0...v1.46.1) (2026-10-10)
 
 
