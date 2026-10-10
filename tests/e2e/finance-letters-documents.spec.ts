@@ -1,9 +1,9 @@
 import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
-// Runs only against a TEST_DOCUMENTS=1 build, which has /financiacion/ and /seguros/ too: every
-// request to the fake API, to Turnstile and to Stripe is answered here. The credit, the policy and
-// the companies are synthetic.
+// Runs only against a TEST_DOCUMENTS=1 build, which has /financiacion/, /seguros/ and /hipoteca/
+// too: every request to the fake API, to Turnstile and to Stripe is answered here. The credit, the
+// policy, the mortgage and the companies are synthetic.
 
 const ORIGIN = `http://localhost:${process.env['E2E_PORT'] ?? 4321}`;
 const API = {
@@ -62,6 +62,32 @@ const POLICY: Entries = [
   ['hasNotice', 'no'],
 ];
 
+// A fixed-rate mortgage on a home, deed of 10-03-2021: the law puts the notary, the registry and the
+// agency on the lender (1.300 €), and the valuation on the borrower.
+const MORTGAGE: Entries = [
+  ['loanKind', 'standard'],
+  ['borrower', 'individual'],
+  ['purpose', 'housing'],
+  ['deedOn', '2021-03-10'],
+  ['consumer', 'yes'],
+  ['rateType', 'fixed'],
+  ['expensesClause', 'present'],
+  ['defaultInterest', 'no'],
+  ['earlyTermination', 'no'],
+  ['openingFee', 'no'],
+  ['roundingUp', 'no'],
+  ['insuranceRequired', 'no'],
+  ['hasInvoices', 'yes'],
+  ['notaryLoan', '600,00'],
+  ['notaryMixed', 'no'],
+  ['registryMortgage', '400,00'],
+  ['registryMixed', 'no'],
+  ['agency', '300,00'],
+  ['valuation', '350,00'],
+  ['agreement', 'no'],
+  ['operation', 'none'],
+];
+
 interface Fake {
   readonly checkout: Request[];
   readonly pass: Request[];
@@ -69,7 +95,7 @@ interface Fake {
   readonly outside: string[];
 }
 
-async function fakeServices(page: Page): Promise<Fake> {
+async function fakeServices(page: Page, returnTo = 'financiacion/'): Promise<Fake> {
   const fake: Fake = { checkout: [], pass: [], outside: [] };
   await page.clock.setFixedTime(TODAY);
   page.on('request', (r) => {
@@ -94,7 +120,7 @@ async function fakeServices(page: Page): Promise<Fake> {
   await page.route('https://checkout.stripe.com/**', (route) =>
     route.fulfill({
       status: 302,
-      headers: { location: `${ORIGIN}/financiacion/?session_id=cs_test_e2e` },
+      headers: { location: `${ORIGIN}/${returnTo}?session_id=cs_test_e2e` },
     }),
   );
   return fake;
@@ -233,4 +259,91 @@ test('a credit with nothing to sell offers only the free letter', async ({ page 
       name: 'Descargar la carta que pide la información de tu crédito (PDF, gratis)',
     }),
   ).toBeVisible();
+});
+
+test('the mortgage documents letter is free; the pass unlocks the report and the amounts letter', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page, 'hipoteca/');
+  await page.setViewportSize({ width: 360, height: 640 });
+  await arriveWith(page, 'hipoteca/', 'eslojusto-revision-hipoteca-en-pago', MORTGAGE);
+  const offer = page.locator('[data-pass-offer]');
+  await expect(offer.getByRole('heading', { name: 'El informe y la carta' })).toBeVisible();
+  const free = offer.getByRole('button', {
+    name: 'Descargar la carta que pide la documentación de tu hipoteca (PDF, gratis)',
+  });
+  const paid = offer.getByRole('button', {
+    name: 'Descargar la carta que pide revisar los importes que fija la ley (PDF)',
+  });
+  const priorStep = offer.getByText(/art\. 439 bis LEC\)\. Esta carta no está pensada para eso/);
+  await expect(paid).toBeHidden();
+  await expect(priorStep).toBeHidden();
+  await expect(offer.getByRole('button', { name: 'Descargar el informe (PDF)' })).toBeHidden();
+  await offer.getByLabel('Banco', { exact: true }).fill('Banco Ficticio');
+  await offer.getByLabel('Número de préstamo', { exact: true }).fill('PH-0000-TEST');
+  await fits(page);
+  expect(await downloadOf(page, free)).toBe('eslojusto-carta-documentacion-hipoteca.pdf');
+  expect(fake.outside).toEqual([]);
+
+  // The pass: paid on Stripe and back to the review, with its answers.
+  await offer.getByLabel(/Quiero el informe ahora/).check();
+  await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
+  await expect(paid).toBeVisible();
+  await expect(page).toHaveURL(`${ORIGIN}/hipoteca/#resultado`);
+  expect(fake.checkout).toHaveLength(1);
+  expect(fake.checkout[0]?.postDataJSON()).toMatchObject({ returnTo: 'mortgage' });
+  // Beside the amounts letter, the step the law sets before going to court, with its text.
+  await expect(priorStep).toBeVisible();
+  await expect(
+    offer.getByRole('link', { name: 'Ley de Enjuiciamiento Civil, art. 439 bis' }),
+  ).toHaveAttribute('href', /BOE-A-2000-323/);
+  expect(
+    await downloadOf(page, offer.getByRole('button', { name: 'Descargar el informe (PDF)' })),
+  ).toBe('eslojusto-informe-hipoteca.pdf');
+  await fits(page);
+  expect(await downloadOf(page, paid)).toBe('eslojusto-carta-importes-hipoteca.pdf');
+  expect(await downloadOf(page, free)).toBe('eslojusto-carta-documentacion-hipoteca.pdf');
+  expect(
+    await page.evaluate(() => sessionStorage.getItem('eslojusto-revision-hipoteca-en-pago')),
+  ).toBeNull();
+});
+
+test('a mortgage with nothing a law settles offers only the free letter', async ({ page }) => {
+  await fakeServices(page, 'hipoteca/');
+  // A deed of 2012: the costs follow the Supreme Court split, which gives no figure here.
+  await arriveWith(page, 'hipoteca/', 'eslojusto-revision-hipoteca-en-pago', [
+    ...MORTGAGE.filter(([name]) => name !== 'deedOn'),
+    ['deedOn', '2012-05-10'],
+  ]);
+  const offer = page.locator('[data-pass-offer]');
+  await expect(
+    offer.getByRole('heading', { name: 'Carta que puedes descargar gratis' }),
+  ).toBeVisible();
+  await expect(offer.getByRole('button', { name: 'Pagar 4,99 €' })).toBeHidden();
+  await expect(
+    offer.getByRole('button', {
+      name: 'Descargar la carta que pide la documentación de tu hipoteca (PDF, gratis)',
+    }),
+  ).toBeVisible();
+  await expect(
+    offer.getByRole('button', {
+      name: 'Descargar la carta que pide revisar los importes que fija la ley (PDF)',
+    }),
+  ).toBeHidden();
+  expect(
+    await downloadOf(
+      page,
+      offer.getByRole('button', {
+        name: 'Descargar la carta que pide la documentación de tu hipoteca (PDF, gratis)',
+      }),
+    ),
+  ).toBe('eslojusto-carta-documentacion-hipoteca.pdf');
+});
+
+test('a mortgage outside the review offers no letter', async ({ page }) => {
+  await fakeServices(page, 'hipoteca/');
+  await arriveWith(page, 'hipoteca/', 'eslojusto-revision-hipoteca-en-pago', [
+    ['loanKind', 'reverse'],
+  ]);
+  await expect(page.locator('[data-pass-offer]')).toBeHidden();
 });

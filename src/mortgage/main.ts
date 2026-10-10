@@ -26,6 +26,7 @@ export const setUpMortgage = (
       const g = gate(form);
       if (g.inScope) return false;
       renderOutOfScope(result, g, tr);
+      events.reviewCleared();
       return true;
     },
     review(form, result, day) {
@@ -34,8 +35,14 @@ export const setUpMortgage = (
       const r = reviewMortgage(parsed.input, day, tables);
       // The form already ran the engine's checks; this only guards against the two drifting apart.
       if (!r.ok) return onQuestions(r.errors, parsed.invoiceFields);
-      if (r.review.scope.inScope) renderMortgageResult(result, r.review, tr);
-      else renderOutOfScope(result, r.review.scope, tr);
+      if (r.review.scope.inScope) {
+        renderMortgageResult(result, r.review, tr);
+        events.reviewCompleted({ review: r.review, input: parsed.input });
+      } else {
+        renderOutOfScope(result, r.review.scope, tr);
+        events.reviewCleared();
+      }
       return [];
     },
+    restarted: () => events.reviewCleared(),
   });

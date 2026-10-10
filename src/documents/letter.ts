@@ -16,7 +16,7 @@ export interface LetterDetails {
   readonly iban?: string;
   // Only the contract review's letters ask for the workplace.
   readonly workplace?: string;
-  // Only the credit and insurance letters ask for the contract or policy number.
+  // Only the credit, insurance and mortgage letters ask for the contract, policy or loan number.
   readonly reference?: string;
 }
 
@@ -26,7 +26,8 @@ export const LETTER_FIELDS = ['name', 'id', 'company', 'place'] as const;
 export const RENTAL_LETTER_FIELDS = ['name', 'id', 'landlord', 'address', 'place', 'iban'] as const;
 // And on the contract review's.
 export const EMPLOYMENT_LETTER_FIELDS = ['name', 'id', 'company', 'workplace', 'place'] as const;
-// And on the credit and insurance letters, where the company is the lender or the insurer.
+// And on the credit, insurance and mortgage letters, where the company is the lender, the insurer or
+// the bank.
 export const FINANCE_LETTER_FIELDS = ['name', 'id', 'company', 'reference', 'place'] as const;
 export type LetterField =
   | (typeof LETTER_FIELDS)[number]
@@ -67,7 +68,9 @@ export const LETTER_MAX_LENGTH: Record<LetterField, number> = {
 // certificate of temporary contracts (`temporary_contracts_certificate`); the credit review's asks
 // the lender for the credit's information (`credit_information`) or to look again at an early
 // repayment's compensation (`early_repayment_review`); the insurance review's tells the insurer the
-// policy is not to be extended (`insurance_non_renewal`).
+// policy is not to be extended (`insurance_non_renewal`); the mortgage review's asks the bank for the
+// mortgage's documents (`mortgage_documents`) or to look again at what the law puts on it
+// (`mortgage_amounts`).
 export const LETTER_KINDS = [
   'items',
   'general',
@@ -79,6 +82,8 @@ export const LETTER_KINDS = [
   'credit_information',
   'early_repayment_review',
   'insurance_non_renewal',
+  'mortgage_documents',
+  'mortgage_amounts',
 ] as const;
 export type LetterKind = (typeof LETTER_KINDS)[number];
 

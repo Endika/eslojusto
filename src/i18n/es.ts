@@ -5538,6 +5538,28 @@ export const es = {
   'mortgage.result.channels_consumer':
     'Las oficinas municipales de información al consumidor (OMIC) y los servicios de consumo de tu comunidad autónoma.',
   'mortgage.result.restart': 'Empezar de nuevo',
+  'mortgage.pass.title': 'El informe y la carta',
+  'mortgage.pass.text':
+    'Por 4,99 € descargas el informe en PDF, con cada gasto y comisión, su cuenta y cada norma y sentencia con su estado, y, si tu revisión tiene importes que fija la ley, la carta que pide al banco que los revise. Se generan en tu dispositivo.',
+  'mortgage.pass.price':
+    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para las demás revisiones de la web: en ese tiempo puedes rehacer o corregir tu revisión y volver a descargar el informe y la carta sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
+  'mortgage.pass.download_documents_letter':
+    'Descargar la carta que pide la documentación de tu hipoteca (PDF, gratis)',
+  'mortgage.pass.download_amounts_letter':
+    'Descargar la carta que pide revisar los importes que fija la ley (PDF)',
+  'mortgage.pass.prior_step':
+    'La ley regula un paso previo concreto antes de acudir a un juzgado por cláusulas de una hipoteca (art. 439 bis LEC). Esta carta no está pensada para eso; aquí tienes el texto.',
+  'mortgage.pass.letter_note':
+    'Las cartas son plantillas. Se descargan en tu dispositivo y no se envían desde aquí: usarlas o no, y cómo, es decisión tuya.',
+  'mortgage.letters.title': 'Carta que puedes descargar gratis',
+  'mortgage.letters.text':
+    'Esta carta solo pide al banco la documentación de tu hipoteca y se descarga gratis. Se genera en tu dispositivo.',
+  'mortgage.letter.legend': 'Tus datos para las cartas (opcional)',
+  'mortgage.letter.id': 'DNI o NIE (opcional)',
+  'mortgage.letter.company': 'Banco',
+  'mortgage.letter.reference': 'Número de préstamo',
+  'mortgage.letter.privacy':
+    'Estos datos solo se usan para rellenar las cartas en tu dispositivo; no se envían ni se guardan.',
 
   'client.mortgage.result.lead':
     'Cada gasto, comisión y cláusula, con la cuenta que lleva a ella y la norma o el criterio en que se apoya. Lo que dice la ley y lo que depende de un juez van siempre por separado.',
@@ -5856,6 +5878,111 @@ export const es = {
   'client.mortgage.source.case_law_unverified': 'sin comprobar en el texto de la sentencia',
   'client.mortgage.source.official_data': 'dato oficial',
   'client.mortgage.source.statute': 'norma',
+
+  'client.mortgage.answer.yes': 'Sí',
+  'client.mortgage.answer.no': 'No',
+  'client.mortgage.answer.unknown': 'No lo sé',
+
+  'client.mortgage.letter.bank': 'Banco',
+  'client.mortgage.letter.reference': 'Número de préstamo',
+  'client.mortgage.letter.regards': 'Un saludo.',
+  'client.mortgage.letter.about':
+    'Te escribo por mi préstamo hipotecario, formalizado en la escritura del {fecha}.',
+  'client.mortgage.letter.documents.title': 'Petición de documentación de mi hipoteca',
+  'client.mortgage.letter.documents.ask': 'Te pido una copia de estos documentos:',
+  'client.mortgage.letter.documents.deed': 'La escritura del préstamo hipotecario.',
+  'client.mortgage.letter.documents.invoices':
+    'Las facturas de notaría, registro, gestoría y tasación que se pagaron al constituir la hipoteca.',
+  'client.mortgage.letter.documents.tax':
+    'La liquidación del impuesto de actos jurídicos documentados (AJD) del préstamo.',
+  'client.mortgage.letter.documents.fein':
+    'La Ficha Europea de Información Normalizada (FEIN) y la Ficha de Advertencias Estandarizadas (FiAE) que se me entregaron antes de la escritura.',
+  'client.mortgage.letter.documents.prepayment':
+    'La liquidación de cada amortización anticipada que haya hecho, si la hubo.',
+  'client.mortgage.letter.documents.missing':
+    'Si alguno de ellos no existe en mi caso o no lo tienes, te pido que me lo indiques.',
+  'client.mortgage.letter.documents.reply':
+    'Puedes enviármelos por escrito o en formato electrónico, por el medio que uses para comunicarte conmigo.',
+  'client.mortgage.letter.documents.filename': 'eslojusto-carta-documentacion-hipoteca.pdf',
+  'client.mortgage.letter.amounts.title': 'Revisión de los importes de mi hipoteca que fija la ley',
+  'client.mortgage.letter.amounts.intro':
+    'Estos son los importes que pagué y la norma que se aplica a cada uno:',
+  'client.mortgage.letter.amounts.expense':
+    '{gasto}: pagué {importe}. La ley pone este gasto a cargo del banco.',
+  'client.mortgage.letter.amounts.not_chargeable':
+    '{gasto}: pagué {importe}. La ley dice que esta acta no se cobra a quien pide el préstamo.',
+  'client.mortgage.letter.amounts.returned':
+    'De los gastos de la constitución ya me diste {importe}, sin indicar de cuáles: descontados enteros de los que la ley pone a cargo del banco, quedan {resto}.',
+  'client.mortgage.letter.amounts.fee':
+    '{operacion} del {fecha}: me cobraste {cobrado} de comisión. Sobre {capital} de capital amortizado, el tope que fija la ley es de {tope}, así que la comisión pasa de ese tope en {diferencia}.',
+  'client.mortgage.letter.amounts.lowest':
+    'El tope de esta comisión depende de un dato que admite más de una lectura: estas cifras son las de la que da menos diferencia.',
+  'client.mortgage.letter.amounts.ask': 'Te pido que lo revises y me respondas.',
+  'client.mortgage.letter.amounts.filename': 'eslojusto-carta-importes-hipoteca.pdf',
+
+  'client.mortgage.report.title': 'Revisión de los gastos y comisiones de tu hipoteca',
+  'client.mortgage.report.intro':
+    'Este informe compara los gastos y comisiones de tu hipoteca con lo que dicen la ley y los tribunales, partida por partida, con los datos que confirmaste en la revisión. Lo que dice la ley y lo que depende de un juez van siempre por separado y no se suman. Informa sobre la ley y no es asesoramiento jurídico.',
+  'client.mortgage.report.footer':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Normas y criterios según su estado el {fecha}.',
+  'client.mortgage.report.filename': 'eslojusto-informe-hipoteca.pdf',
+  'client.mortgage.report.your_data': 'Tus datos',
+  'client.mortgage.report.no_figure': 'Sin importe',
+  'client.mortgage.report.deed_on': 'Fecha de la escritura',
+  'client.mortgage.report.loan_amount': 'Capital del préstamo',
+  'client.mortgage.report.consumer': 'La pediste como particular, para tu casa',
+  'client.mortgage.report.rate_type': 'Tipo de interés',
+  'client.mortgage.report.rate.fixed': 'Fijo',
+  'client.mortgage.report.rate.variable': 'Variable',
+  'client.mortgage.report.rate.mixed': 'Mixto',
+  'client.mortgage.report.revision': 'Revisión del tipo',
+  'client.mortgage.report.revision_months': 'Cada {meses} meses',
+  'client.mortgage.report.expenses_clause': 'Cláusula de gastos en la escritura',
+  'client.mortgage.report.expenses_clause.present': 'La tiene',
+  'client.mortgage.report.expenses_clause.absent': 'No la tiene',
+  'client.mortgage.report.expenses_clause.unknown': 'No lo sé',
+  'client.mortgage.report.invoice': '{importe} · {pagador}',
+  'client.mortgage.report.invoice_mixed': '{importe} · {pagador} · incluye la compraventa',
+  'client.mortgage.report.paid_by.me': 'lo pagaste tú',
+  'client.mortgage.report.paid_by.bank': 'lo pagó el banco',
+  'client.mortgage.report.paid_by.unknown': 'no sabes quién lo pagó',
+  'client.mortgage.report.paid_on': 'Día del pago',
+  'client.mortgage.report.agreement': 'Acuerdo con el banco sobre los gastos',
+  'client.mortgage.report.returned': 'Lo que el banco ya te dio de los gastos',
+  'client.mortgage.report.operation': '{fecha}: {capital} amortizados, {comision} de comisión',
+  'client.mortgage.report.prepayment_option':
+    'Comisión que fija tu escritura para el tipo variable',
+  'client.mortgage.report.prepayment_option.a_015_5y': '0,15 % durante 5 años',
+  'client.mortgage.report.prepayment_option.b_025_3y': '0,25 % durante 3 años',
+  'client.mortgage.report.prepayment_option.unknown': 'No lo sé',
+  'client.mortgage.report.summary': 'Resumen',
+  'client.mortgage.report.total_statute': 'Por ley',
+  'client.mortgage.report.total_not_chargeable':
+    'Aparte, el acta notarial previa, que no debía cobrarse',
+  'client.mortgage.report.total_case_law': 'Según el reparto del Tribunal Supremo',
+  'client.mortgage.report.total_interest': 'Interés legal hasta el {fecha}',
+  'client.mortgage.report.total_interest_estimated':
+    'Interés legal hasta el {fecha}, contado en parte desde la escritura como estimación',
+  'client.mortgage.report.case_law_condition':
+    'El reparto del Tribunal Supremo es para escrituras anteriores al 16-06-2019 de un consumidor. Para que se devuelva hace falta que el banco lo acepte o que un juez anule la cláusula de gastos.',
+  'client.mortgage.report.total_fees': 'Comisiones por encima del tope legal',
+  'client.mortgage.report.fees_up_to':
+    'Alguna comisión depende de un dato que admite más de una lectura: la más alta da {maximo} por encima del tope. Aquí cuenta la más baja.',
+  'client.mortgage.report.totals_apart':
+    'Estas cifras no se suman: lo que dice la ley no depende de un juez, y el reparto del Tribunal Supremo sí.',
+  'client.mortgage.report.expenses': 'Gasto por gasto',
+  'client.mortgage.report.interest_by_year': 'Interés legal sobre la parte del banco, año por año:',
+  'client.mortgage.report.interest_year': '{anio}: {dias} días al {tipo}',
+  'client.mortgage.report.fees': 'Comisiones',
+  'client.mortgage.report.flags': 'Cláusulas de tu escritura',
+  'client.mortgage.report.flags_note':
+    'Qué dicen la ley o los tribunales de cada cláusula, con su fuente y, si es un criterio de los tribunales, la fecha de su estado. Aquí no se valora tu cláusula.',
+  'client.mortgage.report.sources': 'Las normas y criterios, y su estado',
+  'client.mortgage.report.information': 'Para que lo sepas',
+  'client.mortgage.report.unchecked': 'Lo que esta revisión no mira',
+  'client.mortgage.report.channels': 'Dónde informarte gratis',
+  'client.mortgage.report.channels_text':
+    'En el Portal del Cliente Bancario del Banco de España, en el Servicio de Reclamaciones del Banco de España, y en las oficinas municipales de información al consumidor (OMIC) y los servicios de consumo de tu comunidad autónoma.',
 
   'client.mortgage.error.missing_value': 'Falta este dato',
   'client.mortgage.error.missing_choice': 'Elige una respuesta',

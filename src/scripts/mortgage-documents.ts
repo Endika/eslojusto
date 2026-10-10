@@ -1,11 +1,15 @@
+import { documentsAnalytics } from '../analytics/documents';
+import { track } from '../analytics/posthog';
 import type { SectionForm } from '../calculator/section';
 import { DOCUMENTS } from '../documents/config';
 import { MORTGAGE_EXTRACTION } from '../documents/contract';
-import type { DocumentEvents } from '../documents/ports';
+import type { LegalInterestTable } from '../engine/law/interest';
 import { pageTranslator, type ClientKey, type Translate } from '../i18n/client';
+import { mortgageCase } from '../mortgage/case';
+import type { CompletedMortgageReview } from '../mortgage/ports';
 import { mortgageReading } from '../mortgage/reading';
 import { STEPS } from '../mortgage/steps';
-import { READS_UNMEASURED, wireReading } from './documents';
+import { READS_UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
 
 // The shared message the mortgage page words its own way: what a value worked out from the
 // documents comes from.
@@ -18,30 +22,34 @@ const mortgageCopy =
   (key, vars) =>
     tr(MORTGAGE_COPY[key] ?? key, vars);
 
-// The review measures nothing yet, so neither do its reads: no event of it is in the analytics
-// catalogue. The page sells no pass, so nothing of one is measured either.
-const UNMEASURED: DocumentEvents = {
-  ...READS_UNMEASURED,
-  checkoutStarted() {},
-  passIssued() {},
-  passFailed() {},
-  passVerified() {},
-  downloaded() {},
-};
-
-// Document reading on the mortgage review's page: the deed and the invoices fill its sheets.
-export function wireMortgageDocuments(mortgage: SectionForm, arrival: { hash: string }): void {
+// Document reading, the pass, the report and the letters on the mortgage review's page: the deed
+// and the invoices fill its sheets. The pass unlocks the report and the amounts letter; the request
+// for the mortgage's documents downloads without it. The legal interest table is the one the review
+// read.
+export function wireMortgageDocuments(
+  mortgage: SectionForm,
+  hooks: ReviewHooks<CompletedMortgageReview>,
+  arrival: { hash: string; search: string },
+  legalInterest: LegalInterestTable,
+): void {
   const tr = mortgageCopy(pageTranslator());
-  wireReading({
+  wireDocuments({
     form: mortgage,
+    hooks,
     arrival,
     config: DOCUMENTS,
     tr,
-    events: UNMEASURED,
+    // The review measures nothing yet, so neither do its reads: no event of it is in the
+    // analytics catalogue. The pass is measured as on every page.
+    events: { ...documentsAnalytics(track), ...READS_UNMEASURED },
     section: {
       extraction: MORTGAGE_EXTRACTION,
       reading: mortgageReading(mortgage.form, tr),
       steps: STEPS,
+      keptReviewKey: 'eslojusto-revision-hipoteca-en-pago',
+      paidReview: (r) => mortgageCase(r, legalInterest),
+      decorateResult: () => {},
+      restore: (saved) => saved,
     },
   });
 }
