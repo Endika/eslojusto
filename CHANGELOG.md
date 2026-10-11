@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.52.1](https://github.com/Endika/eslojusto/compare/v1.52.0...v1.52.1) (2026-10-11)
+
+
+### Bug Fixes
+
+* **seo:** give the rent indices dataset the INE's CC BY 4.0 license ([a0c4dac](https://github.com/Endika/eslojusto/commit/a0c4dacb1b77e4979775057462e62e0b0e5d08e6))
+
 ## [1.52.0](https://github.com/Endika/eslojusto/compare/v1.51.2...v1.52.0) (2026-10-11)
 
 
