@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.52.0](https://github.com/Endika/eslojusto/compare/v1.51.2...v1.52.0) (2026-10-11)
+
+
+### Features
+
+* publish the mortgage review in beta ([61c21a2](https://github.com/Endika/eslojusto/commit/61c21a2b6eed50bd4895b96cab8b1013f1efc0bf))
+
 ## [1.51.2](https://github.com/Endika/eslojusto/compare/v1.51.1...v1.51.2) (2026-10-11)
 
 
