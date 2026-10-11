@@ -63,7 +63,8 @@ const courtOfJustice = (
 
 // Court criteria are shown as such, never as law, each with the day it was last read.
 export const MORTGAGE_SOURCES: SourceTable = {
-  // The tax on the mortgage deed fell on the borrower before RDL 17/2018. The ECLI is the 147's.
+  // The tax on the mortgage deed fell on the borrower before RDL 17/2018. ECLI and PDF are the
+  // 147's; the 148 (ECLI:ES:TS:2018:849) was read too.
   sts147_148_2018: supreme(
     'sts147_148_2018',
     '147/2018 y 148/2018',
