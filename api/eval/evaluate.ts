@@ -39,6 +39,13 @@ import {
   type InsuranceTemplateId,
 } from './insurance-schema';
 import {
+  isMortgageTemplatePage,
+  MORTGAGE_PERSON_KEYS,
+  mortgagePageKind,
+  type MortgageBankCase,
+  type MortgageTemplateId,
+} from './mortgage-schema';
+import {
   isTemplatePage,
   pageKind,
   PERSON_KEYS,
@@ -219,6 +226,17 @@ export const expectedInsurancePages = (
     sheetsOf,
   );
 
+export const expectedMortgagePages = (
+  bankCase: MortgageBankCase,
+  sheetsOf: (template: MortgageTemplateId) => number,
+): readonly ExpectedPage[] =>
+  templatedPages(
+    bankCase.pages,
+    (p) => (isMortgageTemplatePage(p) ? p.template : null),
+    mortgagePageKind,
+    sheetsOf,
+  );
+
 export const rentalBank = (sheetsOf: (template: TemplateId) => number): EvalBank<BankCase> => ({
   review: 'rental',
   pagesOf: (c) => expectedPages(c, sheetsOf),
@@ -247,6 +265,14 @@ export const insuranceBank = (
   review: 'insurance',
   pagesOf: (c) => expectedInsurancePages(c, sheetsOf),
   personKeys: INSURANCE_PERSON_KEYS,
+});
+
+export const mortgageBank = (
+  sheetsOf: (template: MortgageTemplateId) => number,
+): EvalBank<MortgageBankCase> => ({
+  review: 'mortgage',
+  pagesOf: (c) => expectedMortgagePages(c, sheetsOf),
+  personKeys: MORTGAGE_PERSON_KEYS,
 });
 
 function diagnose(
@@ -304,7 +330,8 @@ type AnyResponse =
   | ExtractResponse<'rental'>
   | ExtractResponse<'employment'>
   | ExtractResponse<'credit'>
-  | ExtractResponse<'insurance'>;
+  | ExtractResponse<'insurance'>
+  | ExtractResponse<'mortgage'>;
 interface Scored {
   readonly fields: Readonly<Record<string, { readonly value: unknown } | undefined>>;
   readonly lists: Readonly<

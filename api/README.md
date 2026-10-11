@@ -949,7 +949,7 @@ run at once, and the budget action caps the month.
 
 ## Evaluation
 
-`eval/` holds four synthetic banks. The rental one has 35 lease packs: each case
+`eval/` holds five synthetic banks. The rental one has 35 lease packs: each case
 (`eval/cases/*.json`, shape in `eval/schema.ts`) lists its pages, drawn from the lease templates in
 `eval/templates/` or as notices, receipts, invoices and deposit returns, with how each photo is
 spoiled; what a read should find in them; and the facts and review the site's engine should give
@@ -966,7 +966,14 @@ statements; the insurance one has 10 (`eval/cases/insurance/*.json`, shape in
 `eval/insurance-schema.ts`) drawn from `eval/templates/insurance/`: home (one in Galician), motor
 and life policies and renewal notices. `tests/engine/credit/bank.test.ts` and
 `tests/engine/insurance/bank.test.ts` run `reviewCredit` and `reviewInsurance` on each case's facts,
-at no cost. Every person, company and identifier in every bank is invented, and
+at no cost. The mortgage one has 31 packs (`eval/cases/mortgage/*.json`, shape in
+`eval/mortgage-schema.ts`) drawn from `eval/templates/mortgage/`: mortgage deeds from 2005 to 2024
+(fixed, variable and mixed rate, Euríbor and IRPH, with and without a clause on costs, one in
+Catalan and one in Galician, two of forty folios of which the useful pages were uploaded), notary,
+registry, agency and valuation invoices, apart and mixed, modelo 600 returns of the loan and of the
+purchase, the notary's act of art. 15 LCCI and statements of early repayments, a switch to a fixed
+rate and a change of lender; `tests/engine/mortgage/bank.test.ts` runs `reviewMortgage` on each
+case's facts, at no cost. Every person, company and identifier in every bank is invented, and
 `test/eval-synthetic.test.ts` proves that each DNI, NIE, IBAN, Social Security number, employer
 account code and CIF fails its check digits, and that each policy number starts with `PRUEBA-`.
 
@@ -975,41 +982,45 @@ npm run rental-bank                          # at the root: renders the lease ph
 npm run employment-bank                      # at the root: the employment ones to api/eval/out/employment/
 npm run credit-bank                          # at the root: the credit ones to api/eval/out/credit/
 npm run insurance-bank                       # at the root: the insurance ones to api/eval/out/insurance/
+npm run mortgage-bank                        # at the root: the mortgage ones to api/eval/out/mortgage/
 EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval # here: reads the lease photos with Bedrock, never in CI
 EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval -- --review employment --cases eval/cases/employment
 EVAL_CONFIRM=yes EVAL_MAX_USD=2 npm run eval -- --review credit
 EVAL_CONFIRM=yes EVAL_MAX_USD=1 npm run eval -- --review insurance
+EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval -- --review mortgage
 ```
 
 The renderer is deterministic: the same seed (`--seed`, by default 20261008) gives the same
 bytes, and it prints the hash of what it wrote; `--cases` and `--out` point it at another bank.
 The run (`eval/run.ts`, with `tsx`, outside vitest) refuses to start without `EVAL_CONFIRM=yes`
 and a positive `EVAL_MAX_USD`, and exits before it loads any AWS adapter. `--review` picks the
-bank (`rental` by default, `employment`, `credit` or `insurance`) and `--cases` its folder, by
-default that bank's. It reads, by default, the packs marked `eval: true` (bad photos, doubtful
-cases, long documents): 15 of the rental and of the employment bank, and 15 between the credit (10)
-and the insurance (5) banks; `EVAL_CASES=all` or a
+bank (`rental` by default, `employment`, `credit`, `insurance` or `mortgage`) and `--cases` its
+folder, by default that bank's. It reads, by default, the packs marked `eval: true` (bad photos,
+doubtful cases, long documents): 15 of the rental, of the employment and of the mortgage bank (four
+of them with more than nine photos: the two long deeds and two full deeds with their bills), and 15
+between the credit (10) and the insurance (5) banks; `EVAL_CASES=all` or a
 comma-separated list of ids picks others, and so does `--only id1,id2`. Each pack goes through the Lambda's own domain (`extract`
 with that review) and the real `createBedrockReader`, with the models of `src/config.ts`. Before
 each pack it adds the cost measured so far (tokens × `MODEL_PRICES_USD_PER_MTOK`) to the worst
 case of one more pack and stops if that could pass `EVAL_MAX_USD`. It writes `report.json` next to
-the bank's photos (`eval/out/`, `eval/out/employment/`, `eval/out/credit/` or
-`eval/out/insurance/`): accuracy by field and by page kind,
+the bank's photos (`eval/out/`, `eval/out/employment/`, `eval/out/credit/`, `eval/out/insurance/`
+or `eval/out/mortgage/`): accuracy by field and by page kind,
 `nothing_read` expected and got, conflicts, escalations, corrective retries, reads cut at `max_tokens`, values of a
 person found in what the model wrote (it must be 0; for employment the person replaced and a
-household employer count too) and the total cost. For a pack that missed any field it keeps, per
+household employer count too, for a mortgage the notary) and the total cost. For a pack that missed any field it keeps, per
 read, the tool input exactly as the model wrote it (the bank is synthetic), what validation left
 out, which sections survived and the merged extraction, so a miss can be traced without paying for
 the read again. A run with `--only` writes its report over the last one.
 
-**How much.** 15 packs of 1 to 8 photos, one pass with Sonnet 4.6, per bank; the credit and the
+**How much.** 15 packs of 1 to 16 photos, one pass with Sonnet 4.6, per bank; the credit and the
 insurance banks share their 15, and their 3 USD. A rental pack is at
 most **0.40 USD** (96,000 tokens in and 5,000 out); an employment pack at most **0.51 USD**
-(96,000 in and 12,000 out, `EXTRA_OUTPUT_TOKENS_BY_REVIEW`), and so is a credit pack; an
-insurance pack is at most **0.40 USD**. So `EVAL_MAX_USD=3` stops the rental or the employment run
-before it could pass 3 USD, and `EVAL_MAX_USD=2` for credit with `EVAL_MAX_USD=1` for insurance
-keep both runs together under 3 USD; about **2–2.50 USD** is expected for the rental and for the
-employment run, and as much for the credit and the insurance runs together. Nothing runs without
+(96,000 in and 12,000 out, `EXTRA_OUTPUT_TOKENS_BY_REVIEW`), and so is a credit or a mortgage
+pack; an insurance pack is at most **0.40 USD**. So `EVAL_MAX_USD=3` stops the rental, the
+employment or the mortgage run before it could pass 3 USD, and `EVAL_MAX_USD=2` for credit with
+`EVAL_MAX_USD=1` for insurance keep both runs together under 3 USD; about **2–2.50 USD** is
+expected for the rental, the employment and the mortgage run (the 15 mortgage packs hold 130
+photos, about 460,000 tokens in), and as much for the credit and the insurance runs together. Nothing runs without
 the owner's written approval and that figure.
 
 ## Unverified
