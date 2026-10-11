@@ -16,8 +16,10 @@ import {
   expectedCreditPages,
   expectedEmploymentPages,
   expectedInsurancePages,
+  expectedMortgagePages,
   expectedPages,
   insuranceBank,
+  mortgageBank,
   rentalBank,
   type EvalBank,
   type EvalCase,
@@ -26,10 +28,12 @@ import {
   type ExpectedPage,
 } from '../eval/evaluate';
 import type { InsuranceBankCase } from '../eval/insurance-schema';
+import type { MortgageBankCase } from '../eval/mortgage-schema';
 import type { BankCase } from '../eval/schema';
 import { CREDIT_MERGE_RULES } from '../src/domain/credit-merge';
 import { INSURANCE_MERGE_RULES } from '../src/domain/insurance-merge';
 import type { From } from '../src/domain/merge';
+import { MORTGAGE_MERGE_RULES } from '../src/domain/mortgage-merge';
 import {
   BANK,
   bankSheetsOf,
@@ -37,6 +41,7 @@ import {
   EMPLOYMENT_BANK,
   employmentSheetsOf,
   INSURANCE_BANK,
+  MORTGAGE_BANK,
   sheetsOf,
 } from './support/bank';
 import { FakeClock } from './support/fakes';
@@ -109,6 +114,10 @@ describe('starting an evaluation run', () => {
       review: 'insurance',
       cases: 'eval/cases/insurance',
     });
+    expect(parseEvalArgs(['--review', 'mortgage'])).toEqual({
+      review: 'mortgage',
+      cases: 'eval/cases/mortgage',
+    });
     expect(
       parseEvalArgs(['--review', 'employment', '--only', 'replacement-named,household-gate']),
     ).toEqual({
@@ -119,7 +128,7 @@ describe('starting an evaluation run', () => {
   });
 
   it.each([
-    [['--review', 'final_pay'], 'rental, employment, credit or insurance'],
+    [['--review', 'final_pay'], 'rental, employment, credit, insurance or mortgage'],
     [['--review'], '--review takes a value'],
     [['--review', 'employment', '--cases'], '--cases takes a value'],
     [['--cases', '--review', 'employment'], '--cases takes a value'],
@@ -727,5 +736,113 @@ describe('an evaluation run over the credit and insurance banks', () => {
       ),
     );
     expect(insurance.personsTranscribed).toBe(1);
+  });
+});
+
+const MORTGAGE_LISTS = {
+  clauses: ['mortgage_deed'],
+  notaryInvoices: ['notary_invoice'],
+  registryInvoices: ['registry_invoice'],
+  agencyInvoices: ['agency_invoice_mortgage'],
+  agencySupplied: ['agency_invoice_mortgage'],
+  valuationInvoices: ['valuation_invoice'],
+  ajdForms: ['ajd_form'],
+  operations: ['prepayment_statement'],
+};
+
+const mortgageBankOf = mortgageBank(bankSheetsOf);
+
+// A clause is only kept with its words, which no case expects: any will do.
+function perfectMortgageRead(c: MortgageBankCase): Record<string, unknown> {
+  const read = perfectFinanceRead(
+    expectedMortgagePages(c, bankSheetsOf),
+    c.expected.extraction,
+    MORTGAGE_MERGE_RULES,
+    MORTGAGE_LISTS,
+  );
+  const deed = read['mortgage_deed'] as { clauses?: Record<string, unknown>[] } | undefined;
+  if (deed?.clauses)
+    deed.clauses = deed.clauses.map((row) => ({ ...row, text: 'Cláusula de la escritura.' }));
+  return read;
+}
+
+describe('an evaluation run over the mortgage bank', () => {
+  const hard = MORTGAGE_BANK.filter((c) => c.eval);
+
+  it('reads the fifteen hard packs by default', () => {
+    expect(selectCases(MORTGAGE_BANK, undefined)).toHaveLength(15);
+  });
+
+  it('stops before a pack whose worst case would cross the 3 USD cap', async () => {
+    // A mortgage read gets the employment room to write: 60.000 in and 8.000 out is 0,33 USD a
+    // pack, against a worst case of 0,5148 USD.
+    const reader = new FixedReader(() => ({
+      toolInput: null,
+      inputTokens: 60_000,
+      outputTokens: 8000,
+    }));
+    const report = await evaluate(
+      hard.map(packFor(mortgageBankOf)),
+      mortgageBankOf,
+      employmentDeps(reader, 3),
+    );
+    // After eight packs 2,64 USD is spent, and 2,64 + 0,5148 > 3.
+    expect(reader.calls).toHaveLength(8);
+    expect(report.stoppedBefore).toBe(hard[8]?.id);
+    expect(report.costUsd).toBeCloseTo(2.64, 10);
+    expect(report.costUsd).toBeLessThanOrEqual(3);
+    for (const call of reader.calls) expect(call.review).toBe('mortgage');
+  });
+
+  it('a read that states what each case expects scores every field and page right', async () => {
+    const readable = MORTGAGE_BANK.filter((c) => c.expected.extraction.outcome === 'ok');
+    const reader = new FixedReader((n) => {
+      const c = readable[n - 1];
+      if (c === undefined) throw new Error('no case');
+      return { toolInput: perfectMortgageRead(c), inputTokens: 20_000, outputTokens: 3000 };
+    });
+    const report = await evaluate(
+      readable.map(packFor(mortgageBankOf)),
+      mortgageBankOf,
+      employmentDeps(reader, 100),
+    );
+    expect(report.read).toBe(readable.length);
+    for (const [name, t] of Object.entries(report.accuracy.byField))
+      expect(t.accuracy, name).toBe(1);
+    for (const [kind, t] of Object.entries(report.accuracy.byPageKind)) {
+      expect(t.accuracy, kind).toBe(1);
+      expect(t.readabilityCorrect, kind).toBe(t.expected);
+    }
+    expect(report.conflicts).toBe(0);
+    expect(report.personsTranscribed).toBe(0);
+  });
+
+  it("counts a borrower's DNI and the notary's name the model wrote", async () => {
+    const c = MORTGAGE_BANK.find((x) => x.id === 'deed-2019-06-16-first-day-of-lcci');
+    if (c === undefined) throw new Error('no case');
+    const notary = String(c.pages[0]?.data['notaryName']);
+    const read = perfectMortgageRead(c);
+    const deed = read['mortgage_deed'] as { clauses: Record<string, unknown>[] };
+    const report = await evaluate(
+      [packFor(mortgageBankOf)(c)],
+      mortgageBankOf,
+      employmentDeps(
+        new FixedReader(() => ({
+          toolInput: {
+            ...read,
+            mortgage_deed: {
+              ...deed,
+              clauses: deed.clauses.map((row, i) =>
+                i === 0 ? { ...row, text: `Ante mí, ${notary}, Notario.` } : row,
+              ),
+            },
+          },
+          inputTokens: 20_000,
+          outputTokens: 3000,
+        })),
+        100,
+      ),
+    );
+    expect(report.personsTranscribed).toBe(1);
   });
 });

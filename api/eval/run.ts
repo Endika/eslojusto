@@ -1,6 +1,6 @@
 // Composition root of an evaluation run over a synthetic bank: the real Bedrock reader, the
 // Lambda's own domain, a spending cap. Outside vitest and CI; see api/README.md, «Evaluation».
-//   EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval [-- --review employment|credit|insurance --only id1,id2]
+//   EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval [-- --review employment|credit|insurance|mortgage --only id1,id2]
 import { randomBytes } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import {
@@ -16,6 +16,7 @@ import {
   employmentBank,
   evaluate,
   insuranceBank,
+  mortgageBank,
   rentalBank,
   type EvalBank,
   type EvalCase,
@@ -51,6 +52,7 @@ const BANK_OUT: Readonly<Record<EvalReview, { readonly out: string; readonly ren
   employment: { out: 'out/employment/', render: 'employment-bank' },
   credit: { out: 'out/credit/', render: 'credit-bank' },
   insurance: { out: 'out/insurance/', render: 'insurance-bank' },
+  mortgage: { out: 'out/mortgage/', render: 'mortgage-bank' },
 };
 const OUT = new URL(BANK_OUT[args.review].out, EVAL);
 const RENDER = BANK_OUT[args.review].render;
@@ -100,6 +102,7 @@ const runs: Readonly<Record<EvalReview, () => (deps: EvalDeps) => Promise<EvalRe
   employment: () => prepared(employmentBank(sheetsOf)),
   credit: () => prepared(creditBank(sheetsOf)),
   insurance: () => prepared(insuranceBank(sheetsOf)),
+  mortgage: () => prepared(mortgageBank(sheetsOf)),
 };
 const run = runs[args.review]();
 
