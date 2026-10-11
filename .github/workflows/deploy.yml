@@ -43,6 +43,8 @@ jobs:
           PUBLIC_ERTE: '1'
           PUBLIC_HOUSEHOLD: '1'
           PUBLIC_MORTGAGE: '1'
+          PUBLIC_INSURANCE: '1'
+          PUBLIC_CREDIT: '1'
           # Unset, the build measures nothing and keeps connect-src 'none'.
           PUBLIC_POSTHOG_KEY: ${{ vars.PUBLIC_POSTHOG_KEY }}
           # Unset, document reading and the pass stay out of the build.
