@@ -453,6 +453,19 @@ export function addDashboard(
 
   dashboard.addWidgets(
     logQuery(
+      'Hipoteca: escrituras sin la página de gastos (por día)',
+      ['extract'],
+      [
+        `${extract} and review = "mortgage" and code = "ok" and ispresent(missingKeyPage)`,
+        `stats count(*) as escrituras, ${flag('missingKeyPage')} as sinPaginaDeGastos by bin(1d)`,
+        'sort @timestamp desc',
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+    ),
+  );
+
+  dashboard.addWidgets(
+    logQuery(
       'Tokens p95 por revisión',
       ['extract'],
       [

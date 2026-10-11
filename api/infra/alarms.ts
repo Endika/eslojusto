@@ -64,20 +64,25 @@ export function addAlarms(
     return a;
   };
 
-  // One metric per review, 1 for a read with nothing read and 0 for an ok one: its Sum counts the
-  // unread and its SampleCount the answered, so a review costs one custom metric, not two.
+  // One metric per alarm, 1 for a read that counts against it and 0 for one that does not: its Sum
+  // counts the first and its SampleCount both, so a share costs one custom metric, not two.
   const sixHours = Duration.hours(6);
-  const unreadShare = (review: 'rental' | 'employment', id: string, section: string) => {
+  const share = (
+    name: string,
+    id: string,
+    patterns: { readonly hit: string; readonly miss: string },
+    description: string,
+    label: string,
+    threshold: number,
+  ) => {
     const metricName = `${id}Answered`;
-    for (const [code, value] of [
-      ['nothing_read', '1'],
-      ['ok', '0'],
+    for (const [pattern, value, suffix] of [
+      [patterns.hit, '1', 'Unread'],
+      [patterns.miss, '0', 'Ok'],
     ] as const)
-      new logs.MetricFilter(stack, `${id}${code === 'ok' ? 'Ok' : 'Unread'}Filter`, {
+      new logs.MetricFilter(stack, `${id}${suffix}Filter`, {
         logGroup: extractLogGroup,
-        filterPattern: logs.FilterPattern.literal(
-          `{ $.op = "extract" && $.review = "${review}" && $.code = "${code}" }`,
-        ),
+        filterPattern: logs.FilterPattern.literal(pattern),
         metricNamespace: METRIC_NAMESPACE,
         metricName,
         metricValue: value,
@@ -85,18 +90,40 @@ export function addAlarms(
     const metric = (statistic: string) =>
       new cw.Metric({ namespace: METRIC_NAMESPACE, metricName, statistic, period: sixHours });
     return alarm(
-      `${review}-unread-share`,
-      `Beta de ${section}: más del 40 % de las lecturas respondidas en 6 h no han sacado ningún dato (con 5 o más lecturas).`,
+      name,
+      description,
       new cw.MathExpression({
         expression: 'IF(FILL(answered, 0) >= 5, 100 * FILL(unread, 0) / answered, 0)',
         usingMetrics: { answered: metric('SampleCount'), unread: metric('Sum') },
         period: sixHours,
-        label: `% lecturas sin datos de ${section}`,
+        label,
       }),
-      40,
+      threshold,
       cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
     );
   };
+  const read = (review: string, code: string) =>
+    `{ $.op = "extract" && $.review = "${review}" && $.code = "${code}" }`;
+  const unreadShare = (review: 'rental' | 'employment' | 'mortgage', id: string, section: string) =>
+    share(
+      `${review}-unread-share`,
+      id,
+      { hit: read(review, 'nothing_read'), miss: read(review, 'ok') },
+      `Beta de ${section}: más del 40 % de las lecturas respondidas en 6 h no han sacado ningún dato (con 5 o más lecturas).`,
+      `% lecturas sin datos de ${section}`,
+      40,
+    );
+  // A deed read without the clause the costs before 16-06-2019 hang on: its pages were not sent.
+  const deedRead = (missing: boolean) =>
+    `{ $.op = "extract" && $.review = "mortgage" && $.code = "ok" && $.missingKeyPage IS ${missing ? 'TRUE' : 'FALSE'} }`;
+  const missingKeyPage = share(
+    'mortgage-missing-key-page',
+    'MortgageDeed',
+    { hit: deedRead(true), miss: deedRead(false) },
+    'Beta de hipoteca: en más del 50 % de las escrituras leídas en 6 h falta la cláusula de gastos que una escritura anterior al 16-06-2019 necesita (con 5 o más lecturas).',
+    '% escrituras sin la página de gastos',
+    50,
+  );
 
   const quarter = Duration.minutes(15);
   const hour = Duration.hours(1);
@@ -163,5 +190,7 @@ export function addAlarms(
     ),
     unreadShare('rental', 'Rental', 'alquiler'),
     unreadShare('employment', 'Employment', 'contrato'),
+    unreadShare('mortgage', 'Mortgage', 'hipoteca'),
+    missingKeyPage,
   ];
 }

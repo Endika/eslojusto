@@ -225,6 +225,12 @@ describe('dashboard', () => {
     expect(truncated).toContain('sum(@message like /"truncated":true/) as recortadas');
   });
 
+  it('counts the mortgage deeds read without their costs clause', () => {
+    const missing = byTitle('Hipoteca: escrituras sin la página de gastos (por día)');
+    expect(missing).toContain('review = "mortgage" and code = "ok" and ispresent(missingKeyPage)');
+    expect(missing).toContain('sum(@message like /"missingKeyPage":true/) as sinPaginaDeGastos');
+  });
+
   it('charts p95 tokens and prices each review’s reads from the config', () => {
     const tokens = byTitle('Tokens p95 por revisión');
     expect(tokens).toContain('pct(inputTokens, 95)');
@@ -278,16 +284,18 @@ describe('alerts', () => {
     );
     quiet.resourceCountIs('AWS::SNS::Topic', 1);
     quiet.resourceCountIs('AWS::SNS::Subscription', 0);
-    quiet.resourceCountIs('AWS::CloudWatch::Alarm', 7);
+    quiet.resourceCountIs('AWS::CloudWatch::Alarm', 9);
   });
 
-  it('raises seven standard alarms that email on trouble and on recovery', () => {
+  it('raises nine standard alarms that email on trouble and on recovery', () => {
     expect(alarms.map((a) => a.Properties.AlarmName).sort()).toEqual(
       [
         'employment-unread-share',
         'extract-5xx',
         'extract-errors',
         'extract-no-success',
+        'mortgage-missing-key-page',
+        'mortgage-unread-share',
         'payments-errors',
         'rental-unread-share',
         'throttles',
@@ -298,7 +306,7 @@ describe('alerts', () => {
       expect(p['OKActions']).toEqual([topicRef]);
       expect(p['TreatMissingData']).toBe('notBreaching');
       expect(p['ComparisonOperator']).toBe(
-        p.AlarmName.endsWith('-unread-share')
+        p.AlarmName.endsWith('-unread-share') || p.AlarmName.endsWith('-missing-key-page')
           ? 'GreaterThanThreshold'
           : 'GreaterThanOrEqualToThreshold',
       );
@@ -307,18 +315,19 @@ describe('alerts', () => {
   });
 
   // CloudWatch's free tier covers 10 alarm metrics; a metric-math alarm counts each metric. The
-  // two beta alarms take it to 13: 0.30 USD a month over the free tier.
-  it('keeps to 13 alarm metrics', () => {
+  // four beta alarms take it to 17: 0.70 USD a month over the free tier.
+  it('keeps to 17 alarm metrics', () => {
     const count = alarms.reduce((n, { Properties: p }) => {
       const metrics = p['Metrics'] as { MetricStat?: unknown }[] | undefined;
       return n + (metrics ? metrics.filter((m) => m.MetricStat).length : 1);
     }, 0);
-    expect(count).toBeLessThanOrEqual(13);
+    expect(count).toBeLessThanOrEqual(17);
   });
 
   it.each([
     ['rental', 'Rental'],
     ['employment', 'Employment'],
+    ['mortgage', 'Mortgage'],
   ])('%s beta: over 40%% of 5 or more answered reads in 6 h with nothing read', (review, id) => {
     const p = byName(`${review}-unread-share`);
     expect(p['Threshold']).toBe(40);
@@ -397,8 +406,31 @@ describe('alerts', () => {
     expect(json).toContain('"Period":3600');
   });
 
-  it('adds a metric filter for successful reads, and two per beta review', () => {
-    apiTemplate.resourceCountIs('AWS::Logs::MetricFilter', 5);
+  it('mortgage beta: over 50 % of 5 or more deeds read in 6 h without their costs clause', () => {
+    const p = byName('mortgage-missing-key-page');
+    expect(p['Threshold']).toBe(50);
+    const json = JSON.stringify(p['Metrics']);
+    expect(json).toContain('IF(FILL(answered, 0) >= 5, 100 * FILL(unread, 0) / answered, 0)');
+    expect(json).toContain('"MetricName":"MortgageDeedAnswered"');
+    expect(json).toContain('"Period":21600');
+    for (const [missing, value] of [
+      ['TRUE', '1'],
+      ['FALSE', '0'],
+    ])
+      apiTemplate.hasResourceProperties('AWS::Logs::MetricFilter', {
+        FilterPattern: `{ $.op = "extract" && $.review = "mortgage" && $.code = "ok" && $.missingKeyPage IS ${missing} }`,
+        MetricTransformations: [
+          {
+            MetricNamespace: 'Eslojusto/Api',
+            MetricName: 'MortgageDeedAnswered',
+            MetricValue: value,
+          },
+        ],
+      });
+  });
+
+  it('adds a metric filter for successful reads, and two per beta alarm', () => {
+    apiTemplate.resourceCountIs('AWS::Logs::MetricFilter', 9);
     apiTemplate.hasResourceProperties('AWS::Logs::MetricFilter', {
       FilterPattern: '{ $.op = "extract" && $.code = "ok" }',
       MetricTransformations: [

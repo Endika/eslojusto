@@ -772,25 +772,28 @@ dashboard's range, 24 h by default, so that share covers whatever range is chose
 configured models; synth fails if a configured model has no price. It charts only AWS metrics
 and inline queries, with the alarms' state on top.
 
-**Alerts** (`infra/alarms.ts`): five standard alarms email the `eslojusto-api-alerts` SNS topic
+**Alerts** (`infra/alarms.ts`): nine standard alarms email the `eslojusto-api-alerts` SNS topic
 on ALARM and again on OK, missing data counting as fine. Thresholds catch repeated failures,
 not a single one:
 
-| Alarm                              | Fires when                                                                |
-| ---------------------------------- | ------------------------------------------------------------------------- |
-| `eslojusto-api-payments-errors`    | `checkout` + `pass` Lambda errors and 5xx answers ≥ 2 in 15 min           |
-| `eslojusto-api-extract-errors`     | `extract` Lambda errors (crash, timeout) ≥ 3 in 15 min                    |
-| `eslojusto-api-extract-5xx`        | `extract` 503s (`model_unavailable`, `service_unavailable`) ≥ 3 in 30 min |
-| `eslojusto-api-extract-no-success` | ≥ 5 calls to the primary model in 1 h and not one `ok` read               |
-| `eslojusto-api-throttles`          | ≥ 1 throttled invocation on any function in 5 min (account limit: 10)     |
+| Alarm                                                             | Fires when                                                                                                            |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `eslojusto-api-payments-errors`                                   | `checkout` + `pass` Lambda errors and 5xx answers ≥ 2 in 15 min                                                       |
+| `eslojusto-api-extract-errors`                                    | `extract` Lambda errors (crash, timeout) ≥ 3 in 15 min                                                                |
+| `eslojusto-api-extract-5xx`                                       | `extract` 503s (`model_unavailable`, `service_unavailable`) ≥ 3 in 30 min                                             |
+| `eslojusto-api-extract-no-success`                                | ≥ 5 calls to the primary model in 1 h and not one `ok` read                                                           |
+| `eslojusto-api-throttles`                                         | ≥ 1 throttled invocation on any function in 5 min (account limit: 10)                                                 |
+| `eslojusto-api-rental-unread-share`, `-employment-`, `-mortgage-` | > 40 % of ≥ 5 answered reads of that beta in 6 h read nothing                                                         |
+| `eslojusto-api-mortgage-missing-key-page`                         | > 50 % of ≥ 5 legible deeds in 6 h lack the costs clause a deed before 16-06-2019 needs (`missingKeyPage` in the log) |
 
 Lambda counts a function URL's own 5xx answers in `Url5xxCount`, which is free, so no log
-filter is needed for `model_unavailable`. The one metric filter, `Eslojusto/Api ExtractOk` on
-the `extract` log group, exists because no AWS metric counts successful reads. Bedrock's
+filter is needed for `model_unavailable`. The metric filter `Eslojusto/Api ExtractOk` on the
+`extract` log group exists because no AWS metric counts successful reads. Bedrock's
 `Invocations` for the primary model count the attempts, so console playground calls count too.
 `countNotSaved` and `pass_revoked` have no alarm: each would need a filter of its own; the
-dashboard counts them. Neither has `nothing_read`: a rate alarm needs its own metric filter and
-two more alarm metrics, past the free 10, and a run of reads where nothing is read already trips
+dashboard counts them. Each beta share feeds one custom metric from two filters, 1 for a read
+that counts against it and 0 for one that does not, so its Sum over its SampleCount is the share.
+Outside the betas `nothing_read` has no alarm: a run of reads where nothing is read already trips
 `extract-no-success`, which counts only `ok` reads as a success on purpose: that is what a broken
 prompt or model looks like. The address comes from the `alertEmail` context, which CI takes from the
 repository variable `ALERT_EMAIL`; without it the topic exists with no subscribers.
@@ -859,9 +862,10 @@ two budgets with actions cost nothing; the bootstrap bucket holds about 1 MB; lo
 KB a day. The dashboard is within CloudWatch's free tier (3 dashboards of up to 50 metrics; a
 test keeps it under 50, and it is the account's only one) and reads only free AWS metrics; its
 Logs Insights widgets bill 0.0057 USD per GB scanned each time the page loads or refreshes, and
-14 days of these logs are well under 1 MB. The alarms use 9 alarm metrics, within the free 10
-(a test keeps them there); the `ExtractOk` metric is one custom metric, within the free 10, and
-otherwise about 0.30 USD a month at most, prorated by the hours it receives data; alert emails
+14 days of these logs are well under 1 MB. The alarms use 17 alarm metrics, 7 past the free 10
+(0.70 USD a month; a test keeps them at 17); `ExtractOk` and the four beta shares are five custom
+metrics, within the free 10, and otherwise about 0.30 USD a month each at most, prorated by the
+hours they receive data; alert emails
 are free up to 1,000 a month.
 
 Per read, from the eu-south-2 Price List (07-10-2026): Sonnet 4.6 at 3.30 / 16.50 USD per

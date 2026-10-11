@@ -313,6 +313,8 @@ describe('the review a read is for', () => {
           retried: false,
           conflicts: 0,
           review,
+          // A deed of 2026 needs no costs clause: its key page is there.
+          ...(review === 'mortgage' && { missingKeyPage: false }),
         },
       ]);
       expect(JSON.stringify(logger.events)).not.toMatch(
