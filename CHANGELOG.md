@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.53.0](https://github.com/Endika/eslojusto/compare/v1.52.1...v1.53.0) (2026-10-11)
+
+
+### Features
+
+* publish the insurance and credit reviews in beta ([988b89c](https://github.com/Endika/eslojusto/commit/988b89c0cc76b2c19d624205acfc53743bc1816c))
+
 ## [1.52.1](https://github.com/Endika/eslojusto/compare/v1.52.0...v1.52.1) (2026-10-11)
 
 
