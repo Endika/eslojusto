@@ -20,12 +20,23 @@ describe('mortgage case-law sources', () => {
     expect(Object.keys(MORTGAGE_SOURCES).filter((id) => !cited.has(id as never))).toEqual([]);
   });
 
-  it('no Supreme Court ruling counts as read until it is opened in CENDOJ', () => {
+  it('every Supreme Court ruling is read in CENDOJ, at the PDF of its own text', () => {
     for (const s of Object.values(MORTGAGE_SOURCES)) {
       if (s.basis !== 'case_law' || !s.court.startsWith('Tribunal Supremo')) continue;
-      expect(s, s.id).toMatchObject({ verified: false, ecli: null });
-      expect(s.url).toBe('https://www.poderjudicial.es/search/indexAN.jsp');
+      expect(s, s.id).toMatchObject({ verified: true, lastVerified: '2026-10-10' });
+      expect(s.ecli, s.id).toMatch(/^ECLI:ES:TS:\d{4}:\d+$/);
+      expect(s.url, s.id).toMatch(
+        /^https:\/\/www\.poderjudicial\.es\/search\/contenidos\.action\?action=accessToPDF&.*&reference=[0-9a-f]+&/,
+      );
     }
+  });
+
+  it('the plenary rulings say so in their citation and court', () => {
+    for (const s of Object.values(MORTGAGE_SOURCES)) {
+      if (s.basis !== 'case_law' || !s.court.startsWith('Tribunal Supremo')) continue;
+      expect(s.citation.endsWith('(Pleno)'), s.id).toBe(s.court.endsWith('(Pleno)'));
+    }
+    expect(MORTGAGE_SOURCES.sts816_2023.citation).not.toContain('Pleno');
   });
 
   it('the Court of Justice judgments link to EUR-Lex by their number', () => {
@@ -41,8 +52,11 @@ describe('mortgage case-law sources', () => {
     }
   });
 
-  it('quotes nothing yet: a passage is added only when read word for word', () => {
-    for (const s of Object.values(MORTGAGE_SOURCES)) expect(s.quotes).toEqual([]);
+  it('quotes only the Supreme Court passages the costs, their interest and their time limit rest on', () => {
+    const quoting = Object.values(MORTGAGE_SOURCES)
+      .filter((s) => s.quotes.length > 0)
+      .map((s) => s.id);
+    expect(quoting).toEqual(['sts725_2018', 'sts35_2021', 'sts816_2023', 'sts857_2024']);
   });
 });
 

@@ -1,34 +1,39 @@
 import type { MortgageSourceId, SourceTable } from '../norms';
 
-const CENDOJ = 'https://www.poderjudicial.es/search/indexAN.jsp';
+const CENDOJ_PDF =
+  'https://www.poderjudicial.es/search/contenidos.action?action=accessToPDF&publicinterface=true&tab=AN';
 const SUPREME_CIVIL = 'Tribunal Supremo, Sala de lo Civil';
 const COURT_OF_JUSTICE = 'Tribunal de Justicia de la Unión Europea';
 const EUR_LEX = 'https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:';
-// The day these criteria were last looked up at their source.
+// The days these criteria were last read at their source.
 const READ_ON = '2026-10-07';
+const SUPREME_READ_ON = '2026-10-10';
 
-// A Supreme Court ruling not yet opened in CENDOJ: its number and date come from official notes,
-// so nothing that rests on it gives an amount.
+// A Supreme Court ruling read in CENDOJ, at the PDF of its own text.
 const supreme = (
   id: MortgageSourceId,
   number: string,
   decidedOn: string,
   citation: string,
   article: string,
+  ecli: string,
+  pdf: { readonly reference: string; readonly published: string },
+  plenary: boolean,
+  quotes: readonly string[] = [],
 ): SourceTable[MortgageSourceId] => ({
   id,
   basis: 'case_law',
   citation,
   article,
-  url: CENDOJ,
+  url: `${CENDOJ_PDF}&reference=${pdf.reference}&encode=true&optimize=${pdf.published}&databasematch=AN`,
   inForceSince: decidedOn,
-  court: SUPREME_CIVIL,
+  court: plenary ? `${SUPREME_CIVIL} (Pleno)` : SUPREME_CIVIL,
   number,
   decidedOn,
-  ecli: null,
-  lastVerified: READ_ON,
-  verified: false,
-  quotes: [],
+  ecli,
+  lastVerified: SUPREME_READ_ON,
+  verified: true,
+  quotes,
 });
 
 // A judgment of the Court of Justice, read in EUR-Lex; `celex` is its document number there.
@@ -58,39 +63,60 @@ const courtOfJustice = (
 
 // Court criteria are shown as such, never as law, each with the day it was last read.
 export const MORTGAGE_SOURCES: SourceTable = {
-  // The tax on the mortgage deed fell on the borrower before RDL 17/2018.
+  // The tax on the mortgage deed fell on the borrower before RDL 17/2018. The ECLI is the 147's.
   sts147_148_2018: supreme(
     'sts147_148_2018',
     '147/2018 y 148/2018',
     '2018-03-15',
-    'SSTS 147/2018 y 148/2018, de 15 de marzo',
+    'SSTS 147/2018 y 148/2018, de 15 de marzo (Pleno)',
     'impuesto de actos jurídicos documentados del préstamo hipotecario',
+    'ECLI:ES:TS:2018:848',
+    { reference: 'daa021479a4e0f93', published: '20180320' },
+    true,
   ),
-  // Interest on each set-up cost runs from the day it was paid (art. 1303 CC).
+  // Interest on each set-up cost runs from the day it was paid, by analogy with art. 1896 CC.
   sts725_2018: supreme(
     'sts725_2018',
     '725/2018',
     '2018-12-19',
-    'STS 725/2018, de 19 de diciembre',
+    'STS 725/2018, de 19 de diciembre (Pleno)',
     'intereses de las cantidades pagadas por gastos',
+    'ECLI:ES:TS:2018:4236',
+    { reference: '89beca0c06cc5c18', published: '20181226' },
+    true,
+    [
+      'cuando haya de restituirse una cantidad de dinero deberá abonarse el interés legal desde el momento en que se recibió el pago indebido',
+    ],
   ),
   // Valuation, registry and agency costs to the lender, the notary by halves, before the LCCI.
-  // ECLI:ES:TS:2021:61 per the official note, to be confirmed in CENDOJ.
   sts35_2021: supreme(
     'sts35_2021',
     '35/2021',
     '2021-01-27',
     'STS 35/2021, de 27 de enero (Pleno)',
     'reparto de los gastos de constitución de la hipoteca',
+    'ECLI:ES:TS:2021:61',
+    { reference: 'a83f54a49332b0d0', published: '20210202' },
+    true,
+    [
+      'se mantiene la condena al banco a reintegrar a los prestatarios los gastos registrales (226,56 euros), los gastos de gestoría (508,20 euros) y los gastos de tasación (296,53 euros)',
+      'respecto de los notariales, como se refieren al otorgamiento de la escritura de préstamo hipotecario, se reduce la condena al banco al pago de la mitad (304,60 euros), pues fue otorgada en interés de ambas partes',
+    ],
   ),
-  // The notary by halves; the opening fee assessed case by case.
-  // ECLI:ES:TS:2023:2131 per the official note, to be confirmed in CENDOJ.
+  // The notary by halves and the agency to the lender; the opening fee assessed case by case.
   sts816_2023: supreme(
     'sts816_2023',
     '816/2023',
     '2023-05-29',
     'STS 816/2023, de 29 de mayo',
     'gastos de notaría y comisión de apertura',
+    'ECLI:ES:TS:2023:2131',
+    { reference: 'a288d359a8b9efdea0a8778d75e36f0d', published: '20230601' },
+    false,
+    [
+      'deben ser abonados por los interesados, que en el caso del préstamo hipotecario son ambas partes, por lo que deben abonarse por mitad',
+      'su pago debe atribuirse íntegramente a la entidad prestamista',
+    ],
   ),
   // Floor clauses and their transparency.
   sts241_2013: supreme(
@@ -99,14 +125,20 @@ export const MORTGAGE_SOURCES: SourceTable = {
     '2013-05-09',
     'STS 241/2013, de 9 de mayo (Pleno)',
     'cláusulas suelo',
+    'ECLI:ES:TS:2013:1916',
+    { reference: '570e169140ea0a5f', published: '20130510' },
+    true,
   ),
   // Late interest over the ordinary rate plus 2 points, in loans to consumers.
   sts364_2016: supreme(
     'sts364_2016',
     '364/2016',
     '2016-06-03',
-    'STS 364/2016, de 3 de junio',
+    'STS 364/2016, de 3 de junio (Pleno)',
     'intereses de demora',
+    'ECLI:ES:TS:2016:2401',
+    { reference: '125990fc88e67039', published: '20160608' },
+    true,
   ),
   // Early termination clauses after the Court of Justice's judgment of 26-03-2019.
   sts463_2019: supreme(
@@ -115,14 +147,23 @@ export const MORTGAGE_SOURCES: SourceTable = {
     '2019-09-11',
     'STS 463/2019, de 11 de septiembre (Pleno)',
     'vencimiento anticipado',
+    'ECLI:ES:TS:2019:2761',
+    { reference: '318f8c8c027e558d', published: '20190911' },
+    true,
   ),
   // When the time limit for the set-up costs starts to run.
   sts857_2024: supreme(
     'sts857_2024',
     '857/2024',
     '2024-06-14',
-    'STS 857/2024, de 14 de junio',
+    'STS 857/2024, de 14 de junio (Pleno)',
     'plazo de la acción de restitución de gastos',
+    'ECLI:ES:TS:2024:3076',
+    { reference: 'fd5fddc5d46df4c4a0a8778d75e36f0d', published: '20240619' },
+    true,
+    [
+      'el día inicial del plazo de prescripción de la acción de restitución de gastos hipotecarios indebidamente pagados por un consumidor será el de la firmeza de la sentencia que declara la nulidad de la cláusula que obligaba a tales pagos',
+    ],
   ),
   tjue_c154_15: courtOfJustice(
     'tjue_c154_15',

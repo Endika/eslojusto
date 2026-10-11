@@ -18,7 +18,7 @@ import {
 import type { CompletedMortgageReview } from '../../src/mortgage/ports';
 import { mortgageReport } from '../../src/mortgage/report';
 import { FORBIDDEN, forbiddenIn } from '../support/forbidden';
-import { DEPS, invoice, mortgage, READ_DEPS, TODAY } from '../engine/mortgage/input';
+import { DEPS, invoice, mortgage, TODAY } from '../engine/mortgage/input';
 
 const tr: Translate = (key, vars) => t('es', key, vars);
 const d = parseDate;
@@ -115,7 +115,7 @@ describe('which mortgage letters a review offers', () => {
   it('does not offer it when only the Supreme Court split carries euros, though the pass is', () => {
     const r = completed(
       { invoices: [invoice('notary_loan', 800), invoice('registry_mortgage', 400)] },
-      READ_DEPS,
+      DEPS,
     );
     expect(r.review.totals.caseLaw.principal).toBe(800);
     expect(r.review.offerPass).toBe(true);
@@ -147,7 +147,7 @@ describe('which mortgage letters a review offers', () => {
 
 describe('the lines of the amounts letter', () => {
   it('never carries an item of the Supreme Court split, even with a figure', () => {
-    const r = completed(SPLIT_DEED, READ_DEPS);
+    const r = completed(SPLIT_DEED, DEPS);
     expect(r.review.expenses.items.map((i) => [i.kind, i.basis, i.amount])).toEqual([
       ['notary_loan', 'case_law', 400],
       ['registry_mortgage', 'case_law', 400],
@@ -263,7 +263,7 @@ describe('the letters', () => {
     [{}, DEPS],
     [LCCI_DEED, DEPS],
     [{ ...LCCI_DEED, alreadyReturned: 300, agreementOnExpenses: true }, DEPS],
-    [SPLIT_DEED, READ_DEPS],
+    [SPLIT_DEED, DEPS],
     [{ deedOn: d('2021-03-10'), operations: [prepayment()] }, DEPS],
     [
       {
@@ -271,7 +271,7 @@ describe('the letters', () => {
         invoices: [invoice('notary_loan', 800, { paidOn: d('2005-03-01') })],
         clauses: [{ label: 'irph', present: true }],
       },
-      READ_DEPS,
+      DEPS,
     ],
   ];
   const models = cases.flatMap(([input, deps]) => {

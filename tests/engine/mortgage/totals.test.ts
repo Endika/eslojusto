@@ -6,7 +6,7 @@ import {
   type BasisAmounts,
   type BasisTotals,
 } from '../../../src/engine/mortgage/totals';
-import { invoice, mortgage, READ_DEPS, TODAY } from './input';
+import { invoice, mortgage, DEPS, TODAY } from './input';
 
 // Every number anywhere inside `value`.
 const numbers = (value: unknown): number[] => {
@@ -35,7 +35,7 @@ describe('totals by basis', () => {
         ],
       }),
       TODAY,
-      READ_DEPS,
+      DEPS,
     );
     const { statute, caseLaw } = r.totals;
     // 612,40 × 50 % + 389,15.

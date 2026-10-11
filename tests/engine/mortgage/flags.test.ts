@@ -3,7 +3,7 @@ import { parseDate } from '../../../src/engine/date';
 import { reviewFlags, type ClauseFlag } from '../../../src/engine/mortgage/flags';
 import type { SourceTable } from '../../../src/engine/mortgage/norms';
 import type { Clause, MortgageInput } from '../../../src/engine/mortgage/types';
-import { DEPS, mortgage, TODAY } from './input';
+import { DEPS, mortgage, TODAY, UNREAD_DEPS } from './input';
 
 const d = parseDate;
 
@@ -40,8 +40,7 @@ describe('floor clause', () => {
         'case_law',
         'floor_case_law',
         ['flags.floor_case_law'],
-        // STS 241/2013 stays out until it is opened in CENDOJ.
-        ['tjue_c154_15', 'tjue_c452_18'],
+        ['tjue_c154_15', 'tjue_c452_18', 'sts241_2013'],
         '2026-10-07',
       ],
     ]);
@@ -160,7 +159,7 @@ describe('late interest', () => {
         'case_law',
         'default_interest_case_law',
         ['flags.default_interest_case_law', 'flags.default_interest_case_law_above'],
-        ['tjue_c96_16'],
+        ['tjue_c96_16', 'sts364_2016'],
         '2026-10-07',
       ],
     ]);
@@ -190,7 +189,7 @@ describe('late interest', () => {
         'case_law',
         'default_interest_case_law',
         ['flags.default_interest_case_law'],
-        ['tjue_c96_16'],
+        ['tjue_c96_16', 'sts364_2016'],
         '2026-10-07',
       ],
     ]);
@@ -222,7 +221,7 @@ describe('early termination', () => {
         'case_law',
         'early_termination_case_law',
         ['flags.early_termination_case_law'],
-        ['tjue_c70_17'],
+        ['tjue_c70_17', 'sts463_2019'],
         '2026-10-07',
       ],
     ]);
@@ -261,7 +260,7 @@ describe('other clauses', () => {
         'case_law',
         'opening_fee_case_law',
         ['flags.opening_fee_case_law'],
-        ['tjue_c565_21'],
+        ['tjue_c565_21', 'sts816_2023'],
         '2026-10-07',
       ],
     ]);
@@ -318,7 +317,7 @@ describe('flag states', () => {
     expect(flags.map((f) => [f.label, f.state])).toEqual([['irph', 'in_deed']]);
   });
 
-  it('never cite a Supreme Court ruling not yet opened in CENDOJ', () => {
+  it('cite each Supreme Court ruling only while it stays read in CENDOJ', () => {
     const all = flagsOf('2016-03-01', [
       clause('floor_clause', { floorPercent: 3 }),
       clause('irph'),
@@ -327,6 +326,26 @@ describe('flag states', () => {
       clause('opening_fee', { duplicateFee: true }),
     ]);
     const cited = all.flatMap((f) => f.parts.flatMap((x) => x.sources.map((s) => s.id)));
-    expect(cited.filter((id) => id.startsWith('sts'))).toEqual([]);
+    expect(cited.filter((id) => id.startsWith('sts'))).toEqual([
+      'sts241_2013',
+      'sts364_2016',
+      'sts463_2019',
+      'sts816_2023',
+    ]);
+    const unread = reviewFlags(
+      mortgage({
+        deedOn: d('2016-03-01'),
+        clauses: [
+          clause('floor_clause', { floorPercent: 3 }),
+          clause('default_interest', { defaultRate: 20, ordinaryRate: 2 }),
+          clause('early_termination', { missedInstalments: 1 }),
+          clause('opening_fee', { duplicateFee: true }),
+        ],
+      }),
+      TODAY,
+      UNREAD_DEPS,
+    );
+    const citedUnread = unread.flatMap((f) => f.parts.flatMap((x) => x.sources.map((s) => s.id)));
+    expect(citedUnread.filter((id) => id.startsWith('sts'))).toEqual([]);
   });
 });

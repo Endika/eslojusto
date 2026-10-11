@@ -71,7 +71,7 @@ export const MORTGAGE_NORMS: NormTable = {
     inForceSince: '2013-05-15',
     ...inForce,
   },
-  // Art. 1303: what is given back when a clause is set aside.
+  // Art. 1896: the interest on what was paid unduly.
   cc: {
     id: 'cc',
     citation: 'Código Civil',

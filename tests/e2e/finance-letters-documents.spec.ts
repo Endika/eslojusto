@@ -310,10 +310,11 @@ test('the mortgage documents letter is free; the pass unlocks the report and the
 
 test('a mortgage with nothing a law settles offers only the free letter', async ({ page }) => {
   await fakeServices(page, 'hipoteca/');
-  // A deed of 2012: the costs follow the Supreme Court split, which gives no figure here.
+  // A deed of 2012 whose costs clause is not known: the Supreme Court split gives no figure.
   await arriveWith(page, 'hipoteca/', 'eslojusto-revision-hipoteca-en-pago', [
-    ...MORTGAGE.filter(([name]) => name !== 'deedOn'),
+    ...MORTGAGE.filter(([name]) => name !== 'deedOn' && name !== 'expensesClause'),
     ['deedOn', '2012-05-10'],
+    ['expensesClause', 'unknown'],
   ]);
   const offer = page.locator('[data-pass-offer]');
   await expect(

@@ -7,7 +7,7 @@ import {
   type MortgageTotals,
 } from '../../../src/engine/mortgage/review';
 import type { MortgageDeps, MortgageInput } from '../../../src/engine/mortgage/types';
-import { DEPS, invoice, mortgage, READ_DEPS, TODAY } from './input';
+import { DEPS, invoice, mortgage, TODAY, UNREAD_DEPS } from './input';
 
 const d = parseDate;
 
@@ -104,33 +104,36 @@ describe('reviewMortgage', () => {
       invoice('registry_mortgage', 400, paid(deedOn)),
       invoice('ajd_loan', 1_500, paid(deedOn)),
     ];
-    const unread = reviewOf({ deedOn: d(deedOn), invoices });
+    const unread = reviewOf({ deedOn: d(deedOn), invoices }, UNREAD_DEPS);
     expect(unread.totals.statute.principal).toBe(1_500);
     expect(unread.totals.caseLaw.principal).toBe(0);
-    const read = reviewOf({ deedOn: d(deedOn), invoices }, READ_DEPS);
+    const read = reviewOf({ deedOn: d(deedOn), invoices }, DEPS);
     expect(read.totals.statute.principal).toBe(1_500);
     // 50 % of 600 + 400.
     expect(read.totals.caseLaw.principal).toBe(700);
   });
 
   it('a 2012 deed with flags and costs only explained offers no pass', () => {
-    const r = reviewOf({
-      deedOn: d('2012-05-10'),
-      invoices: [invoice('notary_loan', 600, paid('2012-05-10'))],
-      clauses: [
-        { label: 'floor_clause', present: true, floorPercent: 3 },
-        { label: 'irph', present: true },
-      ],
-    });
+    const r = reviewOf(
+      {
+        deedOn: d('2012-05-10'),
+        invoices: [invoice('notary_loan', 600, paid('2012-05-10'))],
+        clauses: [
+          { label: 'floor_clause', present: true, floorPercent: 3 },
+          { label: 'irph', present: true },
+        ],
+      },
+      UNREAD_DEPS,
+    );
     expect(r.expenses.items.map((i) => i.status)).toEqual(['split_explained']);
     expect(r.flags).toHaveLength(2);
     expect(r.offerPass).toBe(false);
   });
 
-  it('the same 2012 deed offers it once the split gives figures', () => {
+  it('the same 2012 deed offers it with the split giving figures', () => {
     const r = reviewOf(
       { deedOn: d('2012-05-10'), invoices: [invoice('notary_loan', 600, paid('2012-05-10'))] },
-      READ_DEPS,
+      DEPS,
     );
     expect(r.totals.caseLaw.principal).toBe(300);
     expect(r.offerPass).toBe(true);
@@ -157,7 +160,7 @@ describe('reviewMortgage', () => {
 describe('totals by basis', () => {
   it('have a line by law, one by the Supreme Court and one for fees, and nothing that adds them', () => {
     expectTypeOf<keyof MortgageTotals>().toEqualTypeOf<'statute' | 'caseLaw' | 'fees'>();
-    const r = reviewOf(deed2021(), READ_DEPS);
+    const r = reviewOf(deed2021(), DEPS);
     expect(Object.keys(r.totals).sort()).toEqual(['caseLaw', 'fees', 'statute']);
     expect(Object.keys(r.totals.statute).sort()).toEqual(['interest', 'principal']);
     expect(Object.keys(r.totals.caseLaw).sort()).toEqual(['interest', 'principal']);

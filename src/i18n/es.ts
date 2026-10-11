@@ -5413,7 +5413,7 @@ export const es = {
   'mortgage.guide.before_2019.p2':
     'Es lo que han dicho los tribunales, no la ley: para que se devuelva hace falta que el banco lo acepte o que un juez anule la cláusula de gastos. Y es solo para quien pidió la hipoteca como particular, para su casa.',
   'mortgage.guide.before_2019.p3':
-    'Esas dos sentencias del Tribunal Supremo aún no se han comprobado en su texto, así que, por ahora, la revisión explica el reparto factura a factura sin dar cifra. Según el Tribunal Supremo, a lo que se devuelve se suma el interés legal desde el día de cada pago (art. 1303 del Código Civil); esa sentencia tampoco se ha comprobado aún, y la revisión no lo calcula.',
+    'La revisión aplica ese reparto factura a factura y da la cifra en un total aparte del de la ley. Según el Tribunal Supremo, a lo que se devuelve se suma el interés legal desde el día de cada pago, por analogía con el art. 1896 del Código Civil (STS 725/2018); la revisión también lo calcula.',
   'mortgage.guide.floor.title': 'La cláusula suelo',
   'mortgage.guide.floor.p1':
     'Una cláusula suelo fija un tipo mínimo: aunque el índice baje, el interés no baja de ahí. Desde el 16-06-2019, la ley prohíbe ese límite en las hipotecas de tipo variable (art. 21.3); que el interés nunca sea negativo sí lo permite (art. 21.4).',
@@ -5868,7 +5868,7 @@ export const es = {
   'client.mortgage.calculation.interest.estimated':
     'No sabes el día del pago: se cuenta desde el de la escritura, como estimación.',
   'client.mortgage.calculation.interest.explained':
-    'Según el Tribunal Supremo, a lo que se devuelve se suma el interés legal desde el día de cada pago (art. 1303 del Código Civil). Aquí aún no se calcula: esa sentencia no se ha comprobado todavía en su texto.',
+    'Según el Tribunal Supremo, a lo que se devuelve se suma el interés legal desde el día de cada pago, por analogía con el art. 1896 del Código Civil. Aquí aún no se calcula: esa sentencia no se ha comprobado todavía en su texto.',
   'client.mortgage.calculation.interest.returned':
     'Como el banco ya te dio una parte y no se sabe cuándo, aquí no se calcula el interés.',
   'client.mortgage.calculation.interest.before_table':

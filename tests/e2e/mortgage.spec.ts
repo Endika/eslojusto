@@ -234,7 +234,7 @@ for (const { name, viewport } of SIZES) {
       await expect(result(page)).not.toContainText('pase');
     });
 
-    test('a 2012 deed: the Supreme Court’s split, explained without a figure', async ({ page }) => {
+    test('a 2012 deed: the Supreme Court’s split, in euros with its interest', async ({ page }) => {
       await open(page, viewport);
       await fill(page, {
         on: '2012-05-10',
@@ -242,15 +242,18 @@ for (const { name, viewport } of SIZES) {
       });
       await reviewed(page);
       await expect(total(page, 'statute')).toContainText('Nada con lo que has metido');
-      await expect(total(page, 'case_law')).toContainText('Sin cifra por ahora');
+      // 50 % of 800 + 500 + 300.
+      await expect(total(page, 'case_law')).toContainText('unos 1.200 €');
+      await expect(total(page, 'case_law')).toContainText('Interés legal hasta el');
       await expect(total(page, 'case_law')).toContainText(
         'hace falta que el banco lo acepte o que un juez anule la cláusula de gastos',
       );
       const notary = card(page, 'Notaría del préstamo');
       await expect(notary).toContainText(
-        'Según el reparto del Tribunal Supremo, el 50 % le correspondía al banco (sin cifra por ahora)',
+        'Según el reparto del Tribunal Supremo, le correspondía al banco: 400,00 €',
       );
-      await expect(notary).toContainText('sin comprobar en el texto de la sentencia');
+      await expect(notary).toContainText('STS 35/2021, de 27 de enero (Pleno)');
+      await expect(notary).not.toContainText('sin comprobar en el texto de la sentencia');
       await expect(card(page, 'Impuesto del préstamo (AJD)')).toContainText('No aplica a tu fecha');
     });
 
@@ -262,7 +265,7 @@ for (const { name, viewport } of SIZES) {
       });
       await reviewed(page);
       await expect(total(page, 'statute')).toContainText('unos 1.100 €');
-      await expect(total(page, 'case_law')).toContainText('Sin cifra por ahora');
+      await expect(total(page, 'case_law')).toContainText('unos 300 €');
       await expect(result(page).getByText('Estas cifras no se suman')).toBeVisible();
       await expect(card(page, 'Impuesto del préstamo (AJD)')).toContainText(
         'La ley lo pone a cargo del banco: 1.100,00 €',
@@ -487,8 +490,10 @@ test('the page has its title, heading, canonical, JSON-LD, guide and questions',
     'Lo que han dicho los tribunales, estado a 07-10-2026.',
   );
   await expect(guide).toContainText(
-    'STS 35/2021, de 27 de enero (Pleno) · criterio del Tribunal Supremo, Sala de lo Civil, sin comprobar en el texto de la sentencia',
+    'STS 35/2021, de 27 de enero (Pleno) · criterio del Tribunal Supremo, Sala de lo Civil (Pleno)',
   );
+  await expect(guide).not.toContainText('sin comprobar en el texto de la sentencia');
+  await expect(guide).toContainText('por analogía con el art. 1896 del Código Civil');
   await expect(guide).toContainText(
     'asuntos acumulados C-154/15, C-307/15 y C-308/15 · criterio del Tribunal de Justicia de la Unión Europea',
   );

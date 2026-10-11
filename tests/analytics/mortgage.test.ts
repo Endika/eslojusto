@@ -95,7 +95,7 @@ describe('mortgage events', () => {
     );
   });
 
-  it('keeps the split before 2019 on its own basis, and flags alone offer no pass', () => {
+  it('keeps the split before 2019 on its own basis, and offers the pass once it gives euros', () => {
     expect(
       props(mortgage({ invoices: [invoice('notary_loan', 800)], consumer: null })),
     ).toMatchObject({
@@ -109,8 +109,8 @@ describe('mortgage events', () => {
       offered: false,
     });
     expect(props(mortgage({ invoices: [invoice('notary_loan', 800)] }))).toMatchObject({
-      expenses_case_law: 'split_explained',
-      offered: false,
+      expenses_case_law: 'lender_bears',
+      offered: true,
     });
   });
 

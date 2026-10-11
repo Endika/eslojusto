@@ -228,12 +228,13 @@ export const STATUTE_RULES: Readonly<Record<StatuteRuleId, StatuteRule>> = {
     LCCI_EVE,
     'info',
   ),
-  // Art. 1303: what each party gives back, with its interest.
+  // Art. 1896: the legal interest on what was paid unduly, which STS 725/2018 applies by analogy to
+  // the set-up costs.
   restitution: rule(
     'restitution',
     'cc',
-    'Código Civil, art. 1303',
-    `${CC}#art1303`,
+    'Código Civil, art. 1896, por analogía',
+    `${CC}#art1896`,
     '1889-08-16',
     null,
     'info',
@@ -276,6 +277,8 @@ const criterion = (
   sources: readonly MortgageSourceId[],
   from: string | null,
   until: string | null,
+  // A figure is given only while every ruling it rests on stays verified (see criterionCounts).
+  output: RuleOutput = 'info',
 ): CaseLawRule => ({
   id,
   norm: null,
@@ -283,9 +286,7 @@ const criterion = (
   sources,
   from,
   until,
-  // Information until every ruling it rests on is opened at its source; only then may the
-  // engine give a figure (see amount-rules).
-  output: 'info',
+  output,
 });
 
 export const CASE_LAW_RULES: Readonly<Record<CaseLawRuleId, CaseLawRule>> = {
@@ -295,9 +296,10 @@ export const CASE_LAW_RULES: Readonly<Record<CaseLawRuleId, CaseLawRule>> = {
     ['sts35_2021', 'sts816_2023', 'tjue_c224_19'],
     null,
     LCCI_EVE,
+    'amount',
   ),
   // Legal interest on each cost from the day it was paid.
-  expenses_interest: criterion('expenses_interest', ['sts725_2018'], null, LCCI_EVE),
+  expenses_interest: criterion('expenses_interest', ['sts725_2018'], null, LCCI_EVE, 'amount'),
   // The tax on the deed was the borrower's before 10-11-2018.
   ajd_borrower_before_2018: criterion(
     'ajd_borrower_before_2018',

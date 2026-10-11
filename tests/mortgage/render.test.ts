@@ -12,7 +12,7 @@ import {
   renderOutOfScope,
   sourceText,
 } from '../../src/mortgage/render';
-import { DEPS, invoice, mortgage, READ_DEPS, TODAY } from '../engine/mortgage/input';
+import { DEPS, invoice, mortgage, TODAY, UNREAD_DEPS } from '../engine/mortgage/input';
 
 const tr: Translate = (key, vars) => t('es', key, vars);
 const d = parseDate;
@@ -99,7 +99,7 @@ const deed2018 = (): Partial<MortgageInput> => ({
 
 describe('the mortgage result', () => {
   it('gives what the law says and what the split gives on lines that are never added', () => {
-    const r = review(deed2018(), READ_DEPS);
+    const r = review(deed2018(), DEPS);
     const root = rendered(r);
     const statute = r.totals.statute.principal;
     const caseLaw = r.totals.caseLaw.principal;
@@ -112,8 +112,8 @@ describe('the mortgage result', () => {
     expect(text(root, '[data-total-interest]')).toMatch(/^Interés legal hasta el 08-10-2026: unos/);
   });
 
-  it('explains the split without a figure while its rulings are unread', () => {
-    const root = rendered(review(deed2018()));
+  it('explains the split without a figure if its rulings were unread', () => {
+    const root = rendered(review(deed2018(), UNREAD_DEPS));
     expect(text(root, '[data-total="statute"] [data-total-amount]')).toBe(about(1_100));
     expect(text(root, '[data-total="case_law"] [data-total-amount]')).toBe('Sin cifra por ahora');
     expect(root.querySelector('[data-total-explained]')?.hasAttribute('hidden')).toBe(false);
@@ -206,7 +206,7 @@ describe('the mortgage result', () => {
       'Lo que dicen los tribunales · estado a 07-10-2026',
     );
     expect(floor?.textContent).toContain('Tu escritura fija un tipo mínimo del 3 %.');
-    expect(floor?.textContent).not.toContain('STS 241/2013');
+    expect(floor?.textContent).toContain('STS 241/2013, de 9 de mayo (Pleno)');
     expect(text(root, '[data-item="irph"] [data-status-text]')).toBe('No sabes si aparece');
   });
 
@@ -249,8 +249,18 @@ describe('the mortgage sources', () => {
     expect(tax && sourceText(tax, tr)).toBe('con efectos desde el 10-11-2018 · en vigor');
     const sources = r.expenses.items.find((i) => i.kind === 'notary_loan')?.sources ?? [];
     expect(sources.map((s) => sourceText(s, tr))).toEqual([
-      'Tribunal Supremo, Sala de lo Civil · estado a 07-10-2026 · sin comprobar en el texto de la sentencia',
-      'Tribunal Supremo, Sala de lo Civil · estado a 07-10-2026 · sin comprobar en el texto de la sentencia',
+      'con efectos desde el 16-08-1889 · en vigor',
+      'Tribunal Supremo, Sala de lo Civil (Pleno) · estado a 10-10-2026',
+      'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026',
+      'Tribunal de Justicia de la Unión Europea · estado a 07-10-2026',
+      'Tribunal Supremo, Sala de lo Civil (Pleno) · estado a 10-10-2026',
+    ]);
+    const unread = review(deed2018(), UNREAD_DEPS).expenses.items.find(
+      (i) => i.kind === 'notary_loan',
+    );
+    expect((unread?.sources ?? []).map((s) => sourceText(s, tr))).toEqual([
+      'Tribunal Supremo, Sala de lo Civil (Pleno) · estado a 10-10-2026 · sin comprobar en el texto de la sentencia',
+      'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026 · sin comprobar en el texto de la sentencia',
       'Tribunal de Justicia de la Unión Europea · estado a 07-10-2026',
     ]);
   });
