@@ -3,7 +3,7 @@ import { parseDate, type CivilDate } from '../../../src/engine/date';
 import { reviewExpenses, type ExpenseItem } from '../../../src/engine/mortgage/expenses';
 import type { SourceTable } from '../../../src/engine/mortgage/norms';
 import type { Invoice, MortgageDeps, MortgageInput } from '../../../src/engine/mortgage/types';
-import { DEPS, invoice, mortgage, READ_DEPS, TODAY } from './input';
+import { DEPS, invoice, mortgage, TODAY, UNREAD_DEPS } from './input';
 
 const d = parseDate;
 
@@ -32,8 +32,8 @@ const NOTHING = { principal: 0, interest: null };
 describe('set-up costs of a 2012 deed, consumer, with a costs clause', () => {
   const deed = { deedOn: d('2012-05-10'), invoices: setUp('2012-05-10') };
 
-  it('explains the Supreme Court split without a figure while its rulings are unread', () => {
-    const r = run(deed);
+  it('explains the Supreme Court split without a figure if its rulings were unread', () => {
+    const r = run(deed, UNREAD_DEPS);
     expect(statuses(r.items)).toEqual([
       ['notary_loan', 'case_law', 'split_explained', 50, null],
       ['registry_mortgage', 'case_law', 'split_explained', 100, null],
@@ -51,12 +51,23 @@ describe('set-up costs of a 2012 deed, consumer, with a costs clause', () => {
     expect(r.totals).toEqual({ statute: NOTHING, caseLaw: NOTHING });
   });
 
-  it('cites rulings 35/2021 and 816/2023 and C-224/19 for the split, nothing else', () => {
-    expect(sourceIds(run(deed).items[0])).toEqual(['sts35_2021', 'sts816_2023', 'tjue_c224_19']);
+  it('cites rulings 35/2021 and 816/2023 and C-224/19 for the split, and 725/2018 for its interest', () => {
+    expect(sourceIds(run(deed).items[0])).toEqual([
+      'restitution',
+      'sts35_2021',
+      'sts816_2023',
+      'tjue_c224_19',
+      'sts725_2018',
+    ]);
+    expect(sourceIds(run(deed, UNREAD_DEPS).items[0])).toEqual([
+      'sts35_2021',
+      'sts816_2023',
+      'tjue_c224_19',
+    ]);
   });
 
-  it('gives the split in euros once those rulings are read: 300 + 400 + 300 + 350', () => {
-    const r = run(deed, READ_DEPS);
+  it('gives the split in euros, its rulings read: 300 + 400 + 300 + 350', () => {
+    const r = run(deed);
     expect(statuses(r.items)).toEqual([
       ['notary_loan', 'case_law', 'lender_bears', 50, 300],
       ['registry_mortgage', 'case_law', 'lender_bears', 100, 400],
@@ -72,14 +83,21 @@ describe('set-up costs of a 2012 deed, consumer, with a costs clause', () => {
     expect(r.totals.statute).toEqual(NOTHING);
   });
 
-  it('a split marked to give figures still gives none while a ruling is unread', () => {
-    const r = run(deed, { ...DEPS, criteria: READ_DEPS.criteria });
+  it('a split marked to give figures gives none if a ruling were unread', () => {
+    const r = run(deed, UNREAD_DEPS);
     expect(r.items.map((i) => i.status)).not.toContain('lender_bears');
     expect(r.totals.caseLaw).toEqual(NOTHING);
   });
 
   it('read rulings alone give no figure while the split is still marked as information', () => {
-    const r = run(deed, { ...DEPS, sources: READ_DEPS.sources });
+    const r = run(deed, {
+      ...DEPS,
+      criteria: {
+        ...DEPS.criteria,
+        expenses_ts_split: { ...DEPS.criteria.expenses_ts_split, output: 'info' },
+        expenses_interest: { ...DEPS.criteria.expenses_interest, output: 'info' },
+      },
+    });
     expect(r.items.map((i) => i.status)).not.toContain('lender_bears');
   });
 });
@@ -95,14 +113,15 @@ describe('a 2018-12 deed, before the LCCI with the lender bearing the tax', () =
       vars: { euros: { euros: 1_500 } },
     });
     expect(sourceIds(r.items.at(-1))).toEqual(['ajd_lender']);
-    expect(r.items.slice(0, 4).map((i) => i.status)).toEqual(Array(4).fill('split_explained'));
-    expect(r.totals).toEqual({ statute: { principal: 1_500, interest: null }, caseLaw: NOTHING });
+    expect(r.items.slice(0, 4).map((i) => i.status)).toEqual(Array(4).fill('lender_bears'));
+    expect(r.totals.statute).toEqual({ principal: 1_500, interest: null });
+    expect(r.totals.caseLaw.principal).toBe(1_350);
   });
 
   // Interest on these costs rests on ruling 725/2018, a court's criterion: it never rides on the
   // tax the law puts on the lender, read or not.
   it('works out no interest on the tax by law, whether ruling 725/2018 is read or not', () => {
-    for (const deps of [DEPS, READ_DEPS]) {
+    for (const deps of [UNREAD_DEPS, DEPS]) {
       const tax = run(deed, deps).items.at(-1);
       expect([tax?.interest, keys(tax), sourceIds(tax)]).toEqual([
         null,
@@ -110,7 +129,7 @@ describe('a 2018-12 deed, before the LCCI with the lender bearing the tax', () =
         ['ajd_lender'],
       ]);
     }
-    const r = run(deed, READ_DEPS);
+    const r = run(deed, DEPS);
     expect(r.totals.statute).toEqual({ principal: 1_500, interest: null });
     expect(r.totals.caseLaw.principal).toBe(1_350);
     expect(r.totals.caseLaw.interest?.amount).toBeGreaterThan(0);
@@ -121,16 +140,16 @@ describe('the LCCI regime starts with deeds of 16-06-2019', () => {
   it('a deed of 15-06-2019 still falls under the split; the tax, by law', () => {
     const r = run({ deedOn: d('2019-06-15'), invoices: setUp('2019-06-15') });
     expect(r.items.map((i) => [i.basis, i.status])).toEqual([
-      ['case_law', 'split_explained'],
-      ['case_law', 'split_explained'],
-      ['case_law', 'split_explained'],
-      ['case_law', 'split_explained'],
+      ['case_law', 'lender_bears'],
+      ['case_law', 'lender_bears'],
+      ['case_law', 'lender_bears'],
+      ['case_law', 'lender_bears'],
       ['statute', 'lender_bears'],
     ]);
   });
 
   it('a deed of 16-06-2019 puts it all on the lender by law but the valuation', () => {
-    const r = run({ deedOn: d('2019-06-16'), invoices: setUp('2019-06-16') }, READ_DEPS);
+    const r = run({ deedOn: d('2019-06-16'), invoices: setUp('2019-06-16') }, DEPS);
     expect(statuses(r.items)).toEqual([
       ['notary_loan', 'statute', 'lender_bears', 100, 600],
       ['registry_mortgage', 'statute', 'lender_bears', 100, 400],
@@ -201,7 +220,7 @@ describe('a 2021 deed', () => {
         deedOn: d('2017-03-01'),
         invoices: [invoice('agency', 1_900, { supplied: [1_500] }), invoice('ajd_loan', 1_500)],
       },
-      READ_DEPS,
+      DEPS,
     );
     // 1.900 − 1.500 of the tax, which is the borrower's before 10-11-2018.
     expect(statuses(r.items)).toEqual([
@@ -224,7 +243,7 @@ describe('what stays out of the figures', () => {
     'the purchase cost %s',
     (kind) => {
       for (const deedOn of ['2012-05-10', '2021-04-20']) {
-        const [item] = run({ deedOn: d(deedOn), invoices: [invoice(kind, 900)] }, READ_DEPS).items;
+        const [item] = run({ deedOn: d(deedOn), invoices: [invoice(kind, 900)] }, DEPS).items;
         expect([item?.basis, item?.status, keys(item)]).toEqual([
           null,
           'not_applicable',
@@ -238,7 +257,7 @@ describe('what stays out of the figures', () => {
     for (const deedOn of ['2012-05-10', '2021-04-20']) {
       const r = run(
         { deedOn: d(deedOn), invoices: [invoice('notary_loan', 1_400, { mixed: true })] },
-        READ_DEPS,
+        DEPS,
       );
       expect([r.items[0]?.status, r.items[0]?.amount, keys(r.items[0])]).toEqual([
         'review_it',
@@ -256,7 +275,7 @@ describe('what stays out of the figures', () => {
     ['paid by the lender', { paidBy: 'bank' }, 'paid_by_bank', 'expenses.paid_by_bank'],
     ['of an unknown payer', { paidBy: 'unknown' }, 'review_it', 'expenses.payer_unknown'],
   ] as const)('an invoice %s under the split shows no share', (_, change, status, key) => {
-    for (const deps of [DEPS, READ_DEPS]) {
+    for (const deps of [UNREAD_DEPS, DEPS]) {
       const [item] = run({ invoices: [invoice('notary_loan', 900, change)] }, deps).items;
       expect([item?.status, item?.share, item?.amount, keys(item)]).toEqual([
         status,
@@ -270,7 +289,7 @@ describe('what stays out of the figures', () => {
   it('the copies: the lender pays its own, the borrower whichever it asks for', () => {
     const r = run(
       { invoices: [invoice('notary_copy_bank', 30), invoice('notary_copy_borrower', 25)] },
-      READ_DEPS,
+      DEPS,
     );
     expect(statuses(r.items)).toEqual([
       ['notary_copy_bank', 'case_law', 'lender_bears', 100, 30],
@@ -285,7 +304,7 @@ describe('what stays out of the figures', () => {
           deedOn: d(deedOn),
           invoices: [invoice('notary_cancellation', 300), invoice('registry_cancellation', 80)],
         },
-        READ_DEPS,
+        DEPS,
       );
       expect(r.items.map((i) => [i.status, keys(i)])).toEqual([
         ['not_applicable', ['expenses.cancellation']],
@@ -295,7 +314,7 @@ describe('what stays out of the figures', () => {
   });
 
   it('a notary record of the advice on a deed before the LCCI', () => {
-    const [item] = run({ invoices: [invoice('transparency_deed', 60)] }, READ_DEPS).items;
+    const [item] = run({ invoices: [invoice('transparency_deed', 60)] }, DEPS).items;
     expect([item?.status, keys(item)]).toEqual([
       'review_it',
       ['expenses.transparency_before_lcci'],
@@ -303,7 +322,7 @@ describe('what stays out of the figures', () => {
   });
 
   it('a person who is not a consumer, before 2019: the split does not apply', () => {
-    const r = run({ consumer: false, invoices: setUp('2012-05-10') }, READ_DEPS);
+    const r = run({ consumer: false, invoices: setUp('2012-05-10') }, DEPS);
     expect(r.items.slice(0, 4).map((i) => [i.status, keys(i)])).toEqual(
       Array(4).fill(['not_applicable', ['expenses.not_consumer']]),
     );
@@ -311,10 +330,7 @@ describe('what stays out of the figures', () => {
   });
 
   it('a person who does not know: both answers differ, so it is left to check', () => {
-    const r = run(
-      { deedOn: d('2018-12-14'), consumer: null, invoices: setUp('2018-12-14') },
-      READ_DEPS,
-    );
+    const r = run({ deedOn: d('2018-12-14'), consumer: null, invoices: setUp('2018-12-14') }, DEPS);
     expect(r.items.map((i) => [i.status, keys(i)?.[0]])).toEqual([
       ...Array(4).fill(['review_it', 'expenses.consumer_unknown']),
       ['lender_bears', 'expenses.statute'],
@@ -325,7 +341,7 @@ describe('what stays out of the figures', () => {
     ['absent', 'expenses.no_clause'],
     ['unknown', 'expenses.clause_unknown'],
   ] as const)('a costs clause %s', (expensesClause, key) => {
-    const r = run({ expensesClause, invoices: [invoice('registry_mortgage', 400)] }, READ_DEPS);
+    const r = run({ expensesClause, invoices: [invoice('registry_mortgage', 400)] }, DEPS);
     expect([r.items[0]?.status, keys(r.items[0])]).toEqual(['review_it', [key]]);
   });
 
@@ -336,7 +352,7 @@ describe('what stays out of the figures', () => {
         agreementOnExpenses: true,
         invoices: [invoice('registry_mortgage', 400), invoice('ajd_loan', 1_500)],
       },
-      READ_DEPS,
+      DEPS,
     );
     expect(r.items.map((i) => [i.status, keys(i)])).toEqual([
       ['review_it', ['expenses.agreement_case_law']],
@@ -351,7 +367,7 @@ describe('what stays out of the figures', () => {
         agreementOnExpenses: null,
         invoices: [invoice('registry_mortgage', 400), invoice('ajd_loan', 1_500)],
       },
-      READ_DEPS,
+      DEPS,
     );
     expect(before.items.map((i) => [i.status, keys(i)])).toEqual(
       Array(2).fill(['review_it', ['expenses.agreement_unknown']]),
@@ -391,7 +407,7 @@ describe('legal interest on the split, once ruling 725/2018 is read', () => {
         deedOn: d('2009-02-15'),
         invoices: [invoice('registry_mortgage', 1_000, { paidOn: d('2009-02-15') })],
       },
-      READ_DEPS,
+      DEPS,
       d('2010-02-15'),
     );
     expect(r.items[0]?.interest).toEqual({
@@ -416,7 +432,7 @@ describe('legal interest on the split, once ruling 725/2018 is read', () => {
   it('stops at 31-12 of the last published year, never using the year before', () => {
     const r = run(
       { invoices: [invoice('registry_mortgage', 400, { paidOn: d('2012-05-10') })] },
-      READ_DEPS,
+      DEPS,
       d('2027-03-01'),
     );
     expect(r.items[0]?.interest).toEqual({
@@ -429,7 +445,7 @@ describe('legal interest on the split, once ruling 725/2018 is read', () => {
   });
 
   it('counts from the deed day, marked as an estimate, when the day of payment is unknown', () => {
-    const r = run({ invoices: [invoice('registry_mortgage', 400)] }, READ_DEPS);
+    const r = run({ invoices: [invoice('registry_mortgage', 400)] }, DEPS);
     expect(r.items[0]?.interest?.estimated).toBe(true);
     expect(keys(r.items[0])).toContain('interest.estimated');
     expect(r.totals.caseLaw.interest?.estimated).toBe(true);
@@ -438,7 +454,7 @@ describe('legal interest on the split, once ruling 725/2018 is read', () => {
   it('works out no interest once something has come back, and takes it off each line', () => {
     const r = run(
       { deedOn: d('2018-12-14'), invoices: setUp('2018-12-14'), alreadyReturned: 200 },
-      READ_DEPS,
+      DEPS,
     );
     expect(r.items.map((i) => i.interest)).toEqual(Array(5).fill(null));
     expect(keys(r.items[0])).toContain('interest.returned');
@@ -453,14 +469,14 @@ describe('legal interest on the split, once ruling 725/2018 is read', () => {
 describe('a court criterion never moves what the law settles', () => {
   const deed = { deedOn: d('2018-12-14'), invoices: setUp('2018-12-14') };
   const unread = (id: keyof SourceTable): MortgageDeps => ({
-    ...READ_DEPS,
-    sources: { ...READ_DEPS.sources, [id]: { ...READ_DEPS.sources[id], verified: false } },
+    ...DEPS,
+    sources: { ...DEPS.sources, [id]: { ...DEPS.sources[id], verified: false } },
   });
 
   it.each(['sts35_2021', 'sts816_2023', 'tjue_c224_19', 'sts725_2018'] as const)(
     'taking %s back to unread leaves the tax by law as it was',
     (id) => {
-      const read = run(deed, READ_DEPS);
+      const read = run(deed, DEPS);
       const back = run(deed, unread(id));
       expect(back.items.at(-1)).toEqual(read.items.at(-1));
       expect(back.totals.statute).toEqual(read.totals.statute);
@@ -468,7 +484,12 @@ describe('a court criterion never moves what the law settles', () => {
   );
 
   it('the line by law is the same with every ruling unread, read, or the criteria as information', () => {
-    const lines = [DEPS, READ_DEPS, { ...READ_DEPS, criteria: DEPS.criteria }].map((deps) => {
+    const info = {
+      ...DEPS.criteria,
+      expenses_ts_split: { ...DEPS.criteria.expenses_ts_split, output: 'info' as const },
+      expenses_interest: { ...DEPS.criteria.expenses_interest, output: 'info' as const },
+    };
+    const lines = [UNREAD_DEPS, DEPS, { ...DEPS, criteria: info }].map((deps) => {
       const r = run(deed, deps);
       return [r.totals.statute, r.items.filter((i) => i.basis === 'statute')];
     });

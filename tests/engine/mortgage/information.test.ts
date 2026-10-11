@@ -45,7 +45,7 @@ describe('information blocks', () => {
     ]);
   });
 
-  it('a 2012 deed: the time limit as a rule, with the Court of Justice ruling only', () => {
+  it('a 2012 deed: the time limit as a rule, with the Court of Justice and Supreme Court rulings', () => {
     const blocks = brief('2012-05-10');
     expect(blocks.map((b) => b[0])).toEqual([
       'limitation_rule',
@@ -57,7 +57,7 @@ describe('information blocks', () => {
       'limitation_rule',
       'case_law',
       ['information.limitation_rule'],
-      ['tjue_c561_21'],
+      ['tjue_c561_21', 'sts857_2024'],
       '2026-10-07',
     ]);
   });

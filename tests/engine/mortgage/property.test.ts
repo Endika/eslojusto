@@ -10,7 +10,7 @@ import {
   type MortgageInput,
   type Operation,
 } from '../../../src/engine/mortgage/types';
-import { DEPS, invoice, mortgage, READ_DEPS, TODAY } from './input';
+import { DEPS, invoice, mortgage, TODAY, UNREAD_DEPS } from './input';
 
 const CASES = 300;
 
@@ -116,8 +116,8 @@ describe('mortgage review properties', () => {
     const g = prng(16_06_2019);
     for (let n = 0; n < CASES; n++) {
       const input = { ...randomInput(g), invoices: [], operations: [] };
+      expect(reviewOf(input, UNREAD_DEPS).offerPass, JSON.stringify(input)).toBe(false);
       expect(reviewOf(input, DEPS).offerPass, JSON.stringify(input)).toBe(false);
-      expect(reviewOf(input, READ_DEPS).offerPass, JSON.stringify(input)).toBe(false);
     }
   });
 
@@ -126,7 +126,7 @@ describe('mortgage review properties', () => {
     for (let n = 0; n < CASES; n++) {
       const input = randomInput(g);
       const before = statuteSide(reviewOf(input, DEPS));
-      const after = statuteSide(reviewOf(input, { ...READ_DEPS, sources: alteredSources(g) }));
+      const after = statuteSide(reviewOf(input, { ...DEPS, sources: alteredSources(g) }));
       expect(after, JSON.stringify(input)).toEqual(before);
     }
   });
@@ -135,7 +135,7 @@ describe('mortgage review properties', () => {
     const g = prng(24_11_2022);
     for (let n = 0; n < CASES; n++) {
       const input = randomInput(g);
-      for (const deps of [DEPS, READ_DEPS]) {
+      for (const deps of [UNREAD_DEPS, DEPS]) {
         const r = reviewOf(input, deps);
         const counted =
           r.totals.statute.principal > 0 ||

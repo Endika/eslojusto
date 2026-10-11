@@ -57,18 +57,16 @@ export const DEPS: MortgageDeps = {
   legalInterest: LEGAL_INTEREST,
 };
 
-const allRead = Object.fromEntries(
-  Object.entries(MORTGAGE_SOURCES).map(([id, s]) => [id, { ...s, verified: true }]),
-) as SourceTable;
-
-// The tables as they will stand once the Supreme Court rulings are opened in CENDOJ and the split
-// and its interest are marked to give figures.
-export const READ_DEPS: MortgageDeps = {
+// The tables as they would stand if the Supreme Court rulings were unread again: the split and its
+// interest fall back to explaining, without a figure.
+export const UNREAD_DEPS: MortgageDeps = {
   ...DEPS,
-  sources: allRead,
-  criteria: {
-    ...CASE_LAW_RULES,
-    expenses_ts_split: { ...CASE_LAW_RULES.expenses_ts_split, output: 'amount' },
-    expenses_interest: { ...CASE_LAW_RULES.expenses_interest, output: 'amount' },
-  },
+  sources: Object.fromEntries(
+    Object.entries(MORTGAGE_SOURCES).map(([id, s]) => [
+      id,
+      s.basis === 'case_law' && s.court.startsWith('Tribunal Supremo')
+        ? { ...s, verified: false }
+        : s,
+    ]),
+  ) as SourceTable,
 };

@@ -7,7 +7,7 @@ import type { Block, DocumentModel } from '../../src/documents/ports';
 import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { mortgageReport } from '../../src/mortgage/report';
-import { DEPS, invoice, mortgage, READ_DEPS, TODAY } from '../engine/mortgage/input';
+import { DEPS, invoice, mortgage, TODAY, UNREAD_DEPS } from '../engine/mortgage/input';
 
 const tr: Translate = (key, vars) => t('es', key, vars);
 const d = parseDate;
@@ -50,7 +50,7 @@ const SPLIT: Partial<MortgageInput> = {
 };
 
 describe('the mortgage report', () => {
-  const model = report(SPLIT, READ_DEPS);
+  const model = report(SPLIT, DEPS);
 
   it('dates the report and gives the data the person confirmed', () => {
     expect(model.title).toBe('Revisión de los gastos y comisiones de tu hipoteca');
@@ -116,8 +116,8 @@ describe('the mortgage report', () => {
     );
   });
 
-  it('gives no figure for the split while its rulings are unread', () => {
-    const summary = rows(between(report(SPLIT), 'Resumen'));
+  it('gives no figure for the split if its rulings were unread', () => {
+    const summary = rows(between(report(SPLIT, UNREAD_DEPS), 'Resumen'));
     expect(summary).toContainEqual([
       'Según el reparto del Tribunal Supremo',
       'Sin cifra por ahora',

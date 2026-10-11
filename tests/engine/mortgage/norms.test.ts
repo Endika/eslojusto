@@ -152,7 +152,7 @@ describe('mortgage statute rules', () => {
     });
   });
 
-  it('only the set-up costs by law, the deed tax and the fee caps yield euros', () => {
+  it('only the set-up costs, the deed tax and the fee caps yield euros', () => {
     expect(
       Object.values(RULES)
         .filter((r) => r.output === 'amount')
@@ -168,6 +168,8 @@ describe('mortgage statute rules', () => {
       ['conversion_cap_2023', 'statute'],
       ['fee_free_window', 'statute'],
       ['prepayment_law41', 'statute'],
+      ['expenses_ts_split', 'case_law'],
+      ['expenses_interest', 'case_law'],
     ]);
   });
 });
@@ -252,20 +254,32 @@ describe('mortgage case-law rules', () => {
       const unverified = caseLawSources(r.id, MORTGAGE_SOURCES).some((s) => !s.verified);
       if (unverified) expect(r.output, r.id).toBe('info');
     }
-    expect(CASE_LAW_RULES.expenses_ts_split.output).toBe('info');
-    expect(CASE_LAW_RULES.expenses_interest.output).toBe('info');
   });
 
-  // Once the rulings are opened in CENDOJ the split and its interest may give a figure again.
-  it.each(['expenses_ts_split', 'expenses_interest'] as const)(
-    '%s may yield an amount once its rulings are verified',
+  // The split and its interest give euros now that their rulings are read in CENDOJ; unreading
+  // any of them is a breach.
+  it.each([
+    ['expenses_ts_split', 'sts816_2023'],
+    ['expenses_interest', 'sts725_2018'],
+  ] as const)('%s yields an amount only while %s stays verified', (id, ruling) => {
+    expect(CASE_LAW_RULES[id].output).toBe('amount');
+    expect(amountRuleBreaches(RULES, MORTGAGE_SOURCES, MORTGAGE_NORMS)).toEqual([]);
+    const unread: SourceTable = {
+      ...MORTGAGE_SOURCES,
+      [ruling]: { ...MORTGAGE_SOURCES[ruling], verified: false },
+    };
+    expect(amountRuleBreaches(RULES, unread, MORTGAGE_NORMS)).not.toEqual([]);
+  });
+
+  it.each(['sts35_2021', 'sts816_2023', 'sts725_2018', 'sts857_2024'] as const)(
+    '%s carries its ECLI and the passages quoted from it',
     (id) => {
-      const rules = { ...RULES, [id]: { ...CASE_LAW_RULES[id], output: 'amount' as const } };
-      const read: SourceTable = Object.fromEntries(
-        Object.entries(MORTGAGE_SOURCES).map(([k, s]) => [k, { ...s, verified: true }]),
-      ) as SourceTable;
-      expect(amountRuleBreaches(rules, read, MORTGAGE_NORMS)).toEqual([]);
-      expect(amountRuleBreaches(rules, MORTGAGE_SOURCES, MORTGAGE_NORMS)).not.toEqual([]);
+      const s = MORTGAGE_SOURCES[id];
+      expect(s.basis).toBe('case_law');
+      if (s.basis !== 'case_law') return;
+      expect(s.ecli).toMatch(/^ECLI:ES:TS:\d{4}:\d+$/);
+      expect(s.lastVerified).toBe('2026-10-10');
+      expect(s.quotes.length).toBeGreaterThan(0);
     },
   );
 
