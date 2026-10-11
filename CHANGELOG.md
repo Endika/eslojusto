@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.51.0](https://github.com/Endika/eslojusto/compare/v1.50.0...v1.51.0) (2026-10-11)
+
+
+### Features
+
+* **api:** chart mortgage reads and alert on missing key pages during the beta ([37bf19e](https://github.com/Endika/eslojusto/commit/37bf19e63fa0dcf045437126c9c56ac2ba72c36e))
+
 ## [1.50.0](https://github.com/Endika/eslojusto/compare/v1.49.0...v1.50.0) (2026-10-11)
 
 
