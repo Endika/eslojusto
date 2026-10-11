@@ -3,8 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { CREDIT_PERSON_KEYS } from '../eval/credit-schema';
 import { EMPLOYMENT_PERSON_KEYS } from '../eval/employment-schema';
 import { INSURANCE_PERSON_KEYS } from '../eval/insurance-schema';
+import { MORTGAGE_PERSON_KEYS } from '../eval/mortgage-schema';
 import { PERSON_KEYS } from '../eval/schema';
-import { BANK, CREDIT_BANK, EMPLOYMENT_BANK, INSURANCE_BANK } from './support/bank';
+import { BANK, CREDIT_BANK, EMPLOYMENT_BANK, INSURANCE_BANK, MORTGAGE_BANK } from './support/bank';
 
 // Every person and company in the banks is invented, and so are their identifiers: each DNI or NIE
 // carries a wrong check letter, and each IBAN, Social Security number (NAF), employer account code
@@ -72,6 +73,7 @@ function filesUnder(root: string, dir: URL): { name: string; text: string }[] {
 const FILES = ROOTS.flatMap((root) => filesUnder(root, new URL(root, import.meta.url)));
 const EMPLOYMENT_FILES = FILES.filter((f) => f.name.includes('/employment/'));
 const FINANCE_FILES = FILES.filter((f) => /\/(credit|insurance)\//.test(f.name));
+const MORTGAGE_FILES = FILES.filter((f) => f.name.includes('/mortgage/'));
 // The household cases are golden inputs of the engine, kept beside its tests, not eval packs.
 const HOUSEHOLD_ROOT = '../../tests/engine/household/cases/';
 const HOUSEHOLD_FILES = filesUnder(HOUSEHOLD_ROOT, new URL(HOUSEHOLD_ROOT, import.meta.url));
@@ -185,6 +187,17 @@ describe('the synthetic bank', () => {
     for (const { file, id } of cifs) expect(validCif(id), `${file}: ${id}`).toBe(false);
   });
 
+  it('holds mortgage DNIs, IBANs and CIFs to check, and every one of them is invalid', () => {
+    const dnis = found(MORTGAGE_FILES, DNI_LIKE);
+    const ibans = found(MORTGAGE_FILES, IBAN_LIKE);
+    const cifs = found(MORTGAGE_FILES, CIF_LIKE);
+    for (const list of [dnis, ibans, cifs])
+      expect(list.length).toBeGreaterThanOrEqual(MORTGAGE_BANK.length);
+    for (const { file, id } of dnis) expect(validDni(id), `${file}: ${id}`).toBe(false);
+    for (const { file, id } of ibans) expect(validIban(id), `${file}: ${id}`).toBe(false);
+    for (const { file, id } of cifs) expect(validCif(id), `${file}: ${id}`).toBe(false);
+  });
+
   it('holds household cases with no identifier of any kind, valid or not', () => {
     expect(HOUSEHOLD_FILES.length).toBeGreaterThanOrEqual(15);
     for (const pattern of [DNI_LIKE, IBAN_LIKE, NAF_LIKE, CCC_LIKE, CIF_LIKE])
@@ -213,12 +226,12 @@ describe('the synthetic bank', () => {
         }
   });
 
-  it('names only invented borrowers, policyholders and insurer staff', () => {
-    const pages = [...CREDIT_BANK, ...INSURANCE_BANK].flatMap((c) =>
+  it('names only invented borrowers, policyholders, insurer staff and notaries', () => {
+    const pages = [...CREDIT_BANK, ...INSURANCE_BANK, ...MORTGAGE_BANK].flatMap((c) =>
       c.pages.map((p) => ({ id: c.id, data: p.data })),
     );
     for (const { id, data } of pages)
-      for (const key of ['borrowerName', 'holderName', 'contactName'] as const) {
+      for (const key of ['borrowerName', 'holderName', 'contactName', 'notaryName'] as const) {
         const name = data[key];
         if (name !== undefined)
           expect(name, `${id}: ${key}`).toMatch(/^Persona \w+ Ficticia [A-Z]$/);
@@ -226,7 +239,7 @@ describe('the synthetic bank', () => {
   });
 
   it('names only lenders, dealers and insurers that say they are invented', () => {
-    const pages = [...CREDIT_BANK, ...INSURANCE_BANK].flatMap((c) =>
+    const pages = [...CREDIT_BANK, ...INSURANCE_BANK, ...MORTGAGE_BANK].flatMap((c) =>
       c.pages.map((p) => ({ id: c.id, data: p.data })),
     );
     for (const { id, data } of pages)
@@ -262,6 +275,11 @@ describe('the synthetic bank', () => {
   it('keeps the person keys it scans for in the AI pass', () => {
     const keys = new Set(BANK.flatMap((c) => c.pages.flatMap((p) => Object.keys(p.data))));
     for (const key of PERSON_KEYS) expect(keys).toContain(key);
+  });
+
+  it('keeps the mortgage person keys it scans for in the AI pass', () => {
+    const keys = new Set(MORTGAGE_BANK.flatMap((c) => c.pages.flatMap((p) => Object.keys(p.data))));
+    for (const key of MORTGAGE_PERSON_KEYS) expect(keys).toContain(key);
   });
 
   it('keeps the credit and insurance person keys it scans for in the AI pass', () => {

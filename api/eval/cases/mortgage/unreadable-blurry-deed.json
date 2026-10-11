@@ -1,0 +1,288 @@
+{
+  "id": "unreadable-blurry-deed",
+  "description": "No rule can be read from photos this blurry: a read must give nothing_read rather than guess. The facts behind them: a deed of 10-06-2014 under the Supreme Court split (STS 35/2021), half its notary on the lender with legal interest (STS 725/2018).",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "mortgage/deed-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4140610",
+        "folioText": "Folio 1",
+        "protocolNumber": "1.402",
+        "deedTitle": "PRÉSTAMO CON GARANTÍA HIPOTECARIA",
+        "city": "Pamplona",
+        "deedOnText": "diez de junio de dos mil catorce",
+        "notaryName": "Persona Notaria Ficticia A",
+        "college": "Navarra",
+        "borrowerBlock": "Persona Prestataria Ficticia T, mayor de edad, con domicilio en Calle de la Prueba Ficticia, 7, Pamplona y con DNI 91669782K, en concepto de parte prestataria e hipotecante.",
+        "lenderBlock": "Ficticia Banca Hipotecaria de Prueba, S. A., con CIF A02346131 y domicilio en Calle de la Prueba Ficticia, 1, Pamplona, representada por persona apoderada con poder bastante, en concepto de parte acreedora.",
+        "statements": [
+          {
+            "text": "I. Que Persona Prestataria Ficticia T es dueña en pleno dominio de la finca siguiente: vivienda situada en Calle de la Prueba Ficticia, 7, Pamplona, con una superficie construida de ochenta y cinco metros cuadrados, inscrita en el Registro de la Propiedad Ficticio número 2 de Pamplona, finca registral ficticia número 12.345."
+          },
+          {
+            "text": "II. Que la parte prestataria destina el importe del préstamo a la adquisición de su vivienda habitual."
+          }
+        ],
+        "terms": [
+          {
+            "label": "Capital del préstamo",
+            "value": "135.000,00 €"
+          },
+          {
+            "label": "Plazo",
+            "value": "300 meses"
+          },
+          {
+            "label": "Tipo de interés inicial (12 meses)",
+            "value": "2,45 %"
+          },
+          {
+            "label": "Índice de referencia",
+            "value": "Euríbor a un año"
+          },
+          {
+            "label": "Diferencial",
+            "value": "1,00 puntos"
+          },
+          {
+            "label": "Periodicidad de revisión",
+            "value": "12 meses"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -6,
+        "shadow": 0.4,
+        "blur": 9,
+        "dark": 0.3,
+        "crop": 0.18,
+        "jpegQuality": 0.3
+      },
+      "readability": "blurry"
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4140611",
+        "folioText": "Folio 2",
+        "sectionTitle": "ESTIPULACIONES FINANCIERAS",
+        "clauses": [
+          {
+            "title": "PRIMERA. Capital.",
+            "text": "Ficticia Banca Hipotecaria de Prueba, S. A. concede a la parte prestataria, que acepta, un préstamo de 135.000,00 €, que esta declara recibir en este acto mediante abono en su cuenta. La parte prestataria se obliga a devolverlo en el plazo de 300 meses, contados desde hoy, mediante 300 cuotas mensuales comprensivas de capital e intereses, la primera de ellas el día 10 de julio de 2014 y la última el día 10 de junio de 2039."
+          },
+          {
+            "title": "SEGUNDA. Interés ordinario variable.",
+            "text": "Durante los primeros 12 meses el capital devengará un tipo de interés nominal anual del 2,45 %. A partir de entonces el tipo de interés será variable y se revisará cada 12 meses, resultando de sumar al índice de referencia un diferencial de 1,00 puntos porcentuales, sin redondeo. Se toma como índice de referencia el Euríbor a un año, definido como la media aritmética simple de los valores diarios del índice del mes, publicado mensualmente por el Banco de España en el Boletín Oficial del Estado, del segundo mes anterior a cada revisión."
+          },
+          {
+            "title": "TERCERA. Reembolso anticipado.",
+            "text": "Conforme a los artículos 8 y 9 de la Ley 41/2007, la parte prestataria satisfará por el reembolso anticipado, total o parcial, una compensación por desistimiento del 0,50 % del capital reembolsado si se produce dentro de los cinco primeros años de vida del préstamo y del 0,25 % en otro caso."
+          },
+          {
+            "title": "CUARTA. Imputación de pagos.",
+            "text": "Las cantidades que perciba la entidad acreedora se imputarán, por este orden, a gastos y comisiones exigibles, intereses de demora, intereses ordinarios vencidos y amortización del capital."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -6,
+        "shadow": 0.4,
+        "blur": 9,
+        "dark": 0.3,
+        "crop": 0.18,
+        "jpegQuality": 0.3
+      },
+      "readability": "blurry"
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4140612",
+        "folioText": "Folio 3",
+        "sectionTitle": "OTRAS ESTIPULACIONES",
+        "clauses": [
+          {
+            "title": "QUINTA. Gastos y tributos.",
+            "text": "Serán de cuenta exclusiva de la parte prestataria todos los gastos y tributos que se deriven de la preparación, formalización, subsanación, inscripción y cancelación de esta escritura, incluidos los aranceles notariales y registrales, los honorarios de la gestoría que tramite su inscripción, los de la tasación de la finca y el Impuesto sobre Actos Jurídicos Documentados, así como los de las copias de esta escritura que se expidan para la entidad acreedora."
+          },
+          {
+            "title": "SEXTA. Constitución de hipoteca.",
+            "text": "En garantía de la devolución del capital, de los intereses ordinarios de tres años, de los intereses de demora y de las costas, la parte prestataria constituye hipoteca sobre la finca descrita en la parte expositiva, que responderá de 135.000,00 € de principal y de las demás cantidades que resultan de esta escritura."
+          },
+          {
+            "title": "SÉPTIMA. Tasación a efectos de subasta.",
+            "text": "Las partes tasan la finca hipotecada, a efectos de subasta, en 195.750,00 €, valor que no es inferior al de tasación realizada conforme a la normativa del mercado hipotecario."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -6,
+        "shadow": 0.4,
+        "blur": 9,
+        "dark": 0.3,
+        "crop": 0.18,
+        "jpegQuality": 0.3
+      },
+      "readability": "blurry"
+    },
+    {
+      "template": "mortgage/deed-closing-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4140613",
+        "folioText": "Folio 4",
+        "sectionTitle": "ESTIPULACIONES FINALES",
+        "clauses": [
+          {
+            "title": "Domicilio.",
+            "text": "Para la práctica de requerimientos y notificaciones, la parte prestataria señala como domicilio el de la finca hipotecada."
+          },
+          {
+            "title": "Copias.",
+            "text": "Se expedirá copia autorizada de esta escritura para la entidad acreedora, con eficacia ejecutiva, y copia simple para la parte prestataria."
+          }
+        ],
+        "iban": "ES65 2100 1985 6095 3559 8538",
+        "notaryStatements": [
+          {
+            "text": "Hago las reservas y advertencias legales, y en particular las de carácter fiscal y las relativas al alcance de la responsabilidad hipotecaria y a las consecuencias del impago."
+          },
+          {
+            "text": "La parte prestataria ha extendido de su puño y letra, en mi presencia, la expresión manuscrita prevista en el artículo 6 de la Ley 1/2013, de 14 de mayo, que queda incorporada a esta matriz."
+          }
+        ],
+        "folioCount": "12",
+        "borrowerName": "Persona Prestataria Ficticia T",
+        "notaryName": "Persona Notaria Ficticia A"
+      },
+      "degrade": {
+        "rotate": -6,
+        "shadow": 0.4,
+        "blur": 9,
+        "dark": 0.3,
+        "crop": 0.18,
+        "jpegQuality": 0.3
+      },
+      "readability": "blurry"
+    },
+    {
+      "template": "mortgage/notary-invoice-es",
+      "data": {
+        "number": "N-2014/0521",
+        "issuedOnText": "10 de junio de 2014",
+        "borrowerName": "Persona Prestataria Ficticia T",
+        "borrowerDni": "91669782K",
+        "vatRate": "21 %",
+        "issuer": "Notaría Ficticia de Prueba de Pamplona",
+        "issuerLine": "Notario: Persona Notaria Ficticia A · Calle de la Prueba Ficticia, 3, Pamplona",
+        "documentText": "Escritura de préstamo hipotecario, protocolo n.º 1.402, de 10-06-2014.",
+        "lines": [
+          {
+            "concept": "Derechos de arancel (número 2: escritura de préstamo)",
+            "amount": "406,11 €"
+          },
+          {
+            "concept": "Folios de matriz y copias",
+            "amount": "114,55 €"
+          }
+        ],
+        "base": "520,66 €",
+        "vat": "109,34 €",
+        "supplied": "0,00 €",
+        "total": "630,00 €",
+        "note": "Honorarios conforme al arancel de los notarios (Real Decreto 1426/1989). Documento sin validez fiscal fuera de este banco de pruebas."
+      },
+      "degrade": {
+        "rotate": -6,
+        "shadow": 0.4,
+        "blur": 9,
+        "dark": 0.3,
+        "crop": 0.18,
+        "jpegQuality": 0.3
+      },
+      "readability": "blurry"
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "nothing_read",
+      "fields": {},
+      "lists": {}
+    },
+    "input": {
+      "deedOn": "2014-06-10",
+      "borrower": "individual",
+      "purpose": "housing",
+      "consumer": true,
+      "loanKind": "standard",
+      "rateType": "variable",
+      "fixedUntil": null,
+      "rateRevisionMonths": 12,
+      "loanAmount": 135000,
+      "expensesClause": "present",
+      "invoices": [
+        {
+          "kind": "notary_loan",
+          "total": 630,
+          "paidBy": "me",
+          "paidOn": "2014-06-10",
+          "mixed": false,
+          "supplied": []
+        }
+      ],
+      "alreadyReturned": null,
+      "agreementOnExpenses": false,
+      "prepaymentOption": null,
+      "deedPercents": {},
+      "operations": [],
+      "clauses": []
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "expenses": [
+        {
+          "kind": "notary_loan",
+          "basis": "case_law",
+          "status": "lender_bears",
+          "share": 50,
+          "amount": 315,
+          "interest": {
+            "amount": 122.93,
+            "until": "2026-10-08",
+            "estimated": false,
+            "missingYear": null
+          },
+          "phrases": ["expenses.case_law", "expenses.case_law_condition", "interest.counted"]
+        }
+      ],
+      "fees": [],
+      "flags": [],
+      "information": [
+        "handwritten_statement",
+        "limitation_rule",
+        "prior_step_439bis",
+        "loan_assignment",
+        "complaints_service"
+      ],
+      "totals": {
+        "statute": 0,
+        "caseLaw": 315,
+        "caseLawInterest": {
+          "amount": 122.93,
+          "until": "2026-10-08",
+          "estimated": false,
+          "missingYear": null
+        },
+        "fees": {
+          "counted": 0,
+          "upTo": 0
+        }
+      },
+      "offerPass": true
+    }
+  }
+}

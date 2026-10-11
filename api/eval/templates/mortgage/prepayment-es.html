@@ -1,0 +1,123 @@
+<!--
+  Mortgage template «prepayment-es»: a lender's statement in Spanish of an early repayment, a switch
+  to a fixed rate or a change of lender, with what it charged.
+  Source: written for this bank, with invented wording, layout and figures, after the
+  items such a statement usually prints; it copies no lender's model.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1b1b1b;
+        font:
+          16px/1.45 'DejaVu Sans',
+          sans-serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 60px 70px 90px;
+        position: relative;
+        overflow: hidden;
+        background: #fdfdfb;
+      }
+      .head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 2px solid #333;
+        padding-bottom: 12px;
+        margin-bottom: 20px;
+      }
+      .head h1 {
+        font-size: 22px;
+        margin: 0 0 4px;
+      }
+      .head .meta {
+        text-align: right;
+        font-size: 15px;
+      }
+      .muted {
+        color: #555;
+        font-size: 14px;
+      }
+      h2 {
+        font-size: 14px;
+        text-transform: uppercase;
+        margin: 20px 0 6px;
+        letter-spacing: 0.5px;
+      }
+      p {
+        margin: 0 0 8px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 6px 0 14px;
+      }
+      td,
+      th {
+        border: 1px solid #777;
+        padding: 6px 10px;
+        text-align: left;
+        vertical-align: top;
+      }
+      td.n,
+      th.n {
+        text-align: right;
+        white-space: nowrap;
+      }
+      tr.total th {
+        background: #ececec;
+        font-size: 17px;
+      }
+      .box {
+        border: 1.5px solid #333;
+        padding: 10px 14px;
+        margin: 12px 0;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <div class="head">
+        <div>
+          <h1>{{lenderName}}</h1>
+          <div class="muted">{{lenderLine}}</div>
+        </div>
+        <div class="meta">Fecha: {{issuedOnText}}</div>
+      </div>
+      <h2>{{title}}</h2>
+      <p>Titular: {{borrowerName}} · Préstamo hipotecario n.º {{loanRef}}</p>
+      <p>Fecha de la operación: {{onText}}</p>
+      <table>
+        {{#rows}}
+        <tr>
+          <td>{{label}}</td>
+          <td class="n">{{value}}</td>
+        </tr>
+        {{/rows}}
+      </table>
+      <p>Cargo en la cuenta {{iban}}.</p>
+      <p class="muted">{{note}}</p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

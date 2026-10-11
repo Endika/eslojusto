@@ -1,0 +1,506 @@
+{
+  "id": "deed-2012-fixed-no-expenses-clause",
+  "description": "Fixed-rate deed of 20-11-2012 with no clause on who pays the costs: the Supreme Court split (STS 35/2021) comes from setting such a clause aside, so without one every cost is to review and none is counted; the tax stays the borrower's before 10-11-2018 (STS 147/2018). Late interest at the ordinary rate plus three points is above the two points of STS 364/2016.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "mortgage/deed-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4121120",
+        "folioText": "Folio 1",
+        "protocolNumber": "3.088",
+        "deedTitle": "PRÉSTAMO CON GARANTÍA HIPOTECARIA",
+        "city": "Sevilla",
+        "deedOnText": "veinte de noviembre de dos mil doce",
+        "notaryName": "Persona Notaria Ficticia A",
+        "college": "Andalucía",
+        "borrowerBlock": "Persona Prestataria Ficticia C, mayor de edad, con domicilio en Calle de la Prueba Ficticia, 7, Sevilla y con DNI 18528347N, en concepto de parte prestataria e hipotecante.",
+        "lenderBlock": "Ficticia Caja de Ahorros de Prueba, con CIF A70931780 y domicilio en Calle de la Prueba Ficticia, 1, Sevilla, representada por persona apoderada con poder bastante, en concepto de parte acreedora.",
+        "statements": [
+          {
+            "text": "I. Que Persona Prestataria Ficticia C es dueña en pleno dominio de la finca siguiente: vivienda situada en Calle de la Prueba Ficticia, 7, Sevilla, con una superficie construida de ochenta y cinco metros cuadrados, inscrita en el Registro de la Propiedad Ficticio número 2 de Sevilla, finca registral ficticia número 12.345."
+          },
+          {
+            "text": "II. Que la parte prestataria destina el importe del préstamo a la adquisición de su vivienda habitual."
+          }
+        ],
+        "terms": [
+          {
+            "label": "Capital del préstamo",
+            "value": "120.000,00 €"
+          },
+          {
+            "label": "Plazo",
+            "value": "300 meses"
+          },
+          {
+            "label": "Tipo de interés fijo",
+            "value": "4,10 %"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4121121",
+        "folioText": "Folio 2",
+        "sectionTitle": "ESTIPULACIONES FINANCIERAS",
+        "clauses": [
+          {
+            "title": "PRIMERA. Capital.",
+            "text": "Ficticia Caja de Ahorros de Prueba concede a la parte prestataria, que acepta, un préstamo de 120.000,00 €, que esta declara recibir en este acto mediante abono en su cuenta. La parte prestataria se obliga a devolverlo en el plazo de 300 meses, contados desde hoy, mediante 300 cuotas mensuales comprensivas de capital e intereses, la primera de ellas el día 20 de diciembre de 2012 y la última el día 20 de noviembre de 2037."
+          },
+          {
+            "title": "SEGUNDA. Interés ordinario.",
+            "text": "El capital pendiente devengará, durante toda la vida del préstamo, un tipo de interés fijo del 4,10 % nominal anual, que se liquidará por meses vencidos."
+          },
+          {
+            "title": "TERCERA. Reembolso anticipado.",
+            "text": "La parte prestataria satisfará por el reembolso anticipado una compensación por desistimiento del 0,50 % del capital reembolsado durante los cinco primeros años y del 0,25 % después, y una compensación por riesgo de tipo de interés del 1,00 % cuando el reembolso genere una pérdida de capital a la entidad."
+          },
+          {
+            "title": "CUARTA. Imputación de pagos.",
+            "text": "Las cantidades que perciba la entidad acreedora se imputarán, por este orden, a gastos y comisiones exigibles, intereses de demora, intereses ordinarios vencidos y amortización del capital."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4121122",
+        "folioText": "Folio 3",
+        "sectionTitle": "OTRAS ESTIPULACIONES",
+        "clauses": [
+          {
+            "title": "QUINTA. Intereses de demora.",
+            "text": "Las cantidades vencidas y no satisfechas devengarán, desde el día siguiente a su vencimiento y sin necesidad de requerimiento, un interés de demora igual al tipo de interés remuneratorio vigente en cada momento incrementado en tres puntos porcentuales, que se liquidará diariamente sobre el principal vencido y pendiente de pago."
+          },
+          {
+            "title": "SEXTA. Vencimiento anticipado.",
+            "text": "La entidad acreedora podrá dar por vencido anticipadamente el préstamo y exigir judicial o extrajudicialmente la totalidad del capital pendiente, con sus intereses, si la parte prestataria dejase de pagar a su vencimiento una cualquiera de las cuotas."
+          },
+          {
+            "title": "SÉPTIMA. Constitución de hipoteca.",
+            "text": "En garantía de la devolución del capital, de los intereses ordinarios de tres años, de los intereses de demora y de las costas, la parte prestataria constituye hipoteca sobre la finca descrita en la parte expositiva, que responderá de 120.000,00 € de principal y de las demás cantidades que resultan de esta escritura."
+          },
+          {
+            "title": "OCTAVA. Tasación a efectos de subasta.",
+            "text": "Las partes tasan la finca hipotecada, a efectos de subasta, en 174.000,00 €, valor que no es inferior al de tasación realizada conforme a la normativa del mercado hipotecario."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-closing-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4121123",
+        "folioText": "Folio 4",
+        "sectionTitle": "ESTIPULACIONES FINALES",
+        "clauses": [
+          {
+            "title": "Domicilio.",
+            "text": "Para la práctica de requerimientos y notificaciones, la parte prestataria señala como domicilio el de la finca hipotecada."
+          },
+          {
+            "title": "Copias.",
+            "text": "Se expedirá copia autorizada de esta escritura para la entidad acreedora, con eficacia ejecutiva, y copia simple para la parte prestataria."
+          }
+        ],
+        "iban": "ES24 2100 3550 7122 2145 5095",
+        "notaryStatements": [
+          {
+            "text": "Hago las reservas y advertencias legales, y en particular las de carácter fiscal y las relativas al alcance de la responsabilidad hipotecaria y a las consecuencias del impago."
+          }
+        ],
+        "folioCount": "12",
+        "borrowerName": "Persona Prestataria Ficticia C",
+        "notaryName": "Persona Notaria Ficticia A"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/notary-invoice-es",
+      "data": {
+        "number": "N-2012/0488",
+        "issuedOnText": "20 de noviembre de 2012",
+        "borrowerName": "Persona Prestataria Ficticia C",
+        "borrowerDni": "18528347N",
+        "vatRate": "21 %",
+        "issuer": "Notaría Ficticia de Prueba de Sevilla",
+        "issuerLine": "Notario: Persona Notaria Ficticia A · Calle de la Prueba Ficticia, 3, Sevilla",
+        "documentText": "Escritura de préstamo hipotecario, protocolo n.º 3.088, de 20-11-2012.",
+        "lines": [
+          {
+            "concept": "Derechos de arancel (número 2: escritura de préstamo)",
+            "amount": "380,33 €"
+          },
+          {
+            "concept": "Folios de matriz y copias",
+            "amount": "107,27 €"
+          }
+        ],
+        "base": "487,60 €",
+        "vat": "102,40 €",
+        "supplied": "0,00 €",
+        "total": "590,00 €",
+        "note": "Honorarios conforme al arancel de los notarios (Real Decreto 1426/1989). Documento sin validez fiscal fuera de este banco de pruebas."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/registry-invoice-es",
+      "data": {
+        "number": "R-2012/00942",
+        "issuedOnText": "4 de diciembre de 2012",
+        "borrowerName": "Persona Prestataria Ficticia C",
+        "borrowerDni": "18528347N",
+        "vatRate": "21 %",
+        "issuer": "Registro de la Propiedad Ficticio n.º 2 de Sevilla",
+        "issuerLine": "Calle de la Prueba Ficticia, 9, Sevilla",
+        "documentText": "Inscripción de la hipoteca constituida en escritura de 20-11-2012.",
+        "lines": [
+          {
+            "concept": "Inscripción de hipoteca (número 2 del arancel)",
+            "amount": "244,96 €"
+          },
+          {
+            "concept": "Notas, asientos y certificaciones",
+            "amount": "69,09 €"
+          }
+        ],
+        "base": "314,05 €",
+        "vat": "65,95 €",
+        "total": "380,00 €",
+        "note": "Honorarios conforme al arancel de los registradores (Real Decreto 1427/1989)."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/valuation-invoice-es",
+      "data": {
+        "number": "T-2012/02727",
+        "issuedOnText": "2 de noviembre de 2012",
+        "borrowerName": "Persona Prestataria Ficticia C",
+        "borrowerDni": "18528347N",
+        "vatRate": "21 %",
+        "issuer": "Ficticia Tasaciones de Prueba, S. A.",
+        "issuerLine": "CIF A29318006 · Inscrita en el registro de sociedades de tasación con un número ficticio",
+        "documentText": "Informe de tasación de la vivienda sita en Calle de la Prueba Ficticia, 7, Sevilla, a petición de Ficticia Caja de Ahorros de Prueba.",
+        "concept": "Honorarios del informe de tasación",
+        "base": "247,93 €",
+        "vat": "52,07 €",
+        "total": "300,00 €",
+        "note": "Tasación realizada conforme a la Orden ECO/805/2003."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/ajd-form-es",
+      "data": {
+        "office": "Oficina liquidadora ficticia de Sevilla",
+        "number": "600-2012-7731",
+        "taxpayerText": "Persona Prestataria Ficticia C, NIF 18528347N, Calle de la Prueba Ficticia, 7, Sevilla",
+        "borrowerName": "Persona Prestataria Ficticia C",
+        "borrowerDni": "18528347N",
+        "documentText": "Escritura autorizada por Persona Notaria Ficticia A, protocolo n.º 3.088, de 20 de noviembre de 2012.",
+        "conceptText": "Actos Jurídicos Documentados · Constitución de préstamo con garantía hipotecaria",
+        "accruedOnText": "20/11/2012",
+        "taxBase": "144.000,00 €",
+        "taxRate": "1,00 %",
+        "quota": "1.440,00 €",
+        "amountPaid": "1.440,00 €",
+        "paidOnText": "28/11/2012"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "deedOn": "2012-11-20",
+        "borrowerType": "individual",
+        "purpose": "housing",
+        "principal": 120000,
+        "termMonths": 300,
+        "rateType": "fixed",
+        "initialRate": 4.1,
+        "defaultMarginPoints": 3,
+        "earlyTerminationInstalments": 1
+      },
+      "lists": {
+        "clauses": [
+          {
+            "label": "prepayment_fee"
+          },
+          {
+            "label": "default_interest"
+          },
+          {
+            "label": "early_termination"
+          }
+        ],
+        "notaryInvoices": [
+          {
+            "invoiceOn": "2012-11-20",
+            "concept": "loan",
+            "mixed": false,
+            "base": 487.6,
+            "vat": 102.4,
+            "total": 590
+          }
+        ],
+        "registryInvoices": [
+          {
+            "invoiceOn": "2012-12-04",
+            "concept": "mortgage",
+            "mixed": false,
+            "base": 314.05,
+            "vat": 65.95,
+            "total": 380
+          }
+        ],
+        "valuationInvoices": [
+          {
+            "invoiceOn": "2012-11-02",
+            "base": 247.93,
+            "vat": 52.07,
+            "total": 300
+          }
+        ],
+        "ajdForms": [
+          {
+            "concept": "loan",
+            "accruedOn": "2012-11-20",
+            "taxBase": 144000,
+            "amountPaid": 1440
+          }
+        ]
+      }
+    },
+    "input": {
+      "deedOn": "2012-11-20",
+      "borrower": "individual",
+      "purpose": "housing",
+      "consumer": true,
+      "loanKind": "standard",
+      "rateType": "fixed",
+      "fixedUntil": null,
+      "rateRevisionMonths": null,
+      "loanAmount": 120000,
+      "expensesClause": "absent",
+      "invoices": [
+        {
+          "kind": "notary_loan",
+          "total": 590,
+          "paidBy": "me",
+          "paidOn": "2012-11-20",
+          "mixed": false,
+          "supplied": []
+        },
+        {
+          "kind": "registry_mortgage",
+          "total": 380,
+          "paidBy": "me",
+          "paidOn": "2012-11-20",
+          "mixed": false,
+          "supplied": []
+        },
+        {
+          "kind": "valuation",
+          "total": 300,
+          "paidBy": "me",
+          "paidOn": "2012-11-20",
+          "mixed": false,
+          "supplied": []
+        },
+        {
+          "kind": "ajd_loan",
+          "total": 1440,
+          "paidBy": "me",
+          "paidOn": "2012-11-20",
+          "mixed": false,
+          "supplied": []
+        }
+      ],
+      "alreadyReturned": null,
+      "agreementOnExpenses": false,
+      "prepaymentOption": null,
+      "deedPercents": {},
+      "operations": [],
+      "clauses": [
+        {
+          "label": "default_interest",
+          "present": true,
+          "defaultRate": 7.1,
+          "ordinaryRate": 4.1
+        },
+        {
+          "label": "early_termination",
+          "present": true,
+          "missedInstalments": 1
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "expenses": [
+        {
+          "kind": "notary_loan",
+          "basis": "case_law",
+          "status": "review_it",
+          "share": null,
+          "amount": null,
+          "interest": null,
+          "phrases": ["expenses.no_clause"]
+        },
+        {
+          "kind": "registry_mortgage",
+          "basis": "case_law",
+          "status": "review_it",
+          "share": null,
+          "amount": null,
+          "interest": null,
+          "phrases": ["expenses.no_clause"]
+        },
+        {
+          "kind": "valuation",
+          "basis": "case_law",
+          "status": "review_it",
+          "share": null,
+          "amount": null,
+          "interest": null,
+          "phrases": ["expenses.no_clause"]
+        },
+        {
+          "kind": "ajd_loan",
+          "basis": null,
+          "status": "not_applicable_to_date",
+          "share": null,
+          "amount": null,
+          "interest": null,
+          "phrases": ["expenses.ajd_before_2018"]
+        }
+      ],
+      "fees": [],
+      "flags": [
+        {
+          "label": "default_interest",
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "case_law",
+              "rule": "default_interest_case_law",
+              "phrases": [
+                "flags.default_interest_case_law",
+                "flags.default_interest_case_law_above"
+              ]
+            }
+          ]
+        },
+        {
+          "label": "early_termination",
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "statute",
+              "rule": "early_termination",
+              "phrases": [
+                "flags.early_termination",
+                "flags.early_termination_earlier_deed",
+                "flags.early_termination_fewer"
+              ]
+            },
+            {
+              "basis": "case_law",
+              "rule": "early_termination_case_law",
+              "phrases": ["flags.early_termination_case_law"]
+            }
+          ]
+        }
+      ],
+      "information": [
+        "limitation_rule",
+        "prior_step_439bis",
+        "loan_assignment",
+        "complaints_service"
+      ],
+      "totals": {
+        "statute": 0,
+        "caseLaw": 0,
+        "caseLawInterest": null,
+        "fees": {
+          "counted": 0,
+          "upTo": 0
+        }
+      },
+      "offerPass": false
+    }
+  }
+}

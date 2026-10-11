@@ -1,0 +1,203 @@
+{
+  "id": "deed-2008-revision-unknown",
+  "description": "Variable-rate deed of 23-09-2008 of which only the first sheet was kept, so how often the rate is revised is unknown: under art. 9 Ley 41/2007 a rate revised at most yearly has only the 0,25 % of art. 8 after five years, which a 1 % fee passes, while one revised less often may add a compensation the review cannot weigh.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "mortgage/deed-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4080923",
+        "folioText": "Folio 1",
+        "protocolNumber": "2.205",
+        "deedTitle": "PRÉSTAMO CON GARANTÍA HIPOTECARIA",
+        "city": "Cáceres",
+        "deedOnText": "veintitrés de septiembre de dos mil ocho",
+        "notaryName": "Persona Notaria Ficticia A",
+        "college": "Extremadura",
+        "borrowerBlock": "Persona Prestataria Ficticia Y, mayor de edad, con domicilio en Calle de la Prueba Ficticia, 7, Cáceres y con DNI 89652557B, en concepto de parte prestataria e hipotecante.",
+        "lenderBlock": "Ficticia Caja de Ahorros de Prueba, con CIF A82173884 y domicilio en Calle de la Prueba Ficticia, 1, Cáceres, representada por persona apoderada con poder bastante, en concepto de parte acreedora.",
+        "statements": [
+          {
+            "text": "I. Que Persona Prestataria Ficticia Y es dueña en pleno dominio de la finca siguiente: vivienda situada en Calle de la Prueba Ficticia, 7, Cáceres, con una superficie construida de ochenta y cinco metros cuadrados, inscrita en el Registro de la Propiedad Ficticio número 2 de Cáceres, finca registral ficticia número 12.345."
+          },
+          {
+            "text": "II. Que la parte prestataria destina el importe del préstamo a la adquisición de su vivienda habitual."
+          }
+        ],
+        "terms": [
+          {
+            "label": "Capital del préstamo",
+            "value": "80.000,00 €"
+          },
+          {
+            "label": "Plazo",
+            "value": "300 meses"
+          },
+          {
+            "label": "Tipo de interés inicial (12 meses)",
+            "value": "5,35 %"
+          },
+          {
+            "label": "Índice de referencia",
+            "value": "Euríbor a un año"
+          },
+          {
+            "label": "Diferencial",
+            "value": "0,60 puntos"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/prepayment-es",
+      "data": {
+        "lenderName": "Ficticia Caja de Ahorros de Prueba",
+        "lenderLine": "CIF A82173884 · Calle de la Prueba Ficticia, 1, Cáceres",
+        "issuedOnText": "14 de junio de 2021",
+        "title": "Liquidación de amortización anticipada parcial",
+        "borrowerName": "Persona Prestataria Ficticia Y",
+        "loanRef": "PH-2008-080000",
+        "onText": "14 de junio de 2021",
+        "rows": [
+          {
+            "label": "Capital pendiente antes de la operación",
+            "value": "52.310,80 €"
+          },
+          {
+            "label": "Capital amortizado",
+            "value": "10.000,00 €"
+          },
+          {
+            "label": "Intereses ordinarios liquidados",
+            "value": "0,00 €"
+          },
+          {
+            "label": "Comisión por amortización anticipada",
+            "value": "100,00 €"
+          }
+        ],
+        "iban": "ES92 2100 9760 2093 3387 6025",
+        "note": "Liquidación practicada conforme a las condiciones de la escritura de préstamo."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "deedOn": "2008-09-23",
+        "borrowerType": "individual",
+        "purpose": "housing",
+        "principal": 80000,
+        "termMonths": 300,
+        "rateType": "variable",
+        "initialRate": 5.35,
+        "index": "euribor",
+        "spread": 0.6
+      },
+      "lists": {
+        "operations": [
+          {
+            "on": "2021-06-14",
+            "kind": "partial_prepayment",
+            "principal": 10000,
+            "feeCharged": 100
+          }
+        ]
+      }
+    },
+    "input": {
+      "deedOn": "2008-09-23",
+      "borrower": "individual",
+      "purpose": "housing",
+      "consumer": true,
+      "loanKind": "standard",
+      "rateType": "variable",
+      "fixedUntil": null,
+      "rateRevisionMonths": null,
+      "loanAmount": 80000,
+      "expensesClause": "unknown",
+      "invoices": [],
+      "alreadyReturned": null,
+      "agreementOnExpenses": null,
+      "prepaymentOption": "unknown",
+      "deedPercents": {},
+      "operations": [
+        {
+          "on": "2021-06-14",
+          "kind": "partial_prepayment",
+          "principal": 10000,
+          "feeCharged": 100,
+          "hadInsurance": null
+        }
+      ],
+      "clauses": []
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "expenses": [],
+      "fees": [
+        {
+          "status": "depends",
+          "question": "rate_revision",
+          "readings": [
+            {
+              "when": "variable.revised_yearly",
+              "kind": "partial_prepayment",
+              "status": "above_cap",
+              "capPercent": 0.25,
+              "cap": 25,
+              "amount": 75,
+              "phrases": ["fees.law41_after", "fees.above_cap"]
+            },
+            {
+              "when": "variable.revised_less_often",
+              "kind": "partial_prepayment",
+              "status": "not_checkable",
+              "capPercent": null,
+              "cap": null,
+              "amount": null,
+              "phrases": ["fees.law41_revised_less_often"]
+            }
+          ]
+        }
+      ],
+      "flags": [],
+      "information": [
+        "limitation_rule",
+        "prior_step_439bis",
+        "loan_assignment",
+        "complaints_service"
+      ],
+      "totals": {
+        "statute": 0,
+        "caseLaw": 0,
+        "caseLawInterest": null,
+        "fees": {
+          "counted": 0,
+          "upTo": 75
+        }
+      },
+      "offerPass": false
+    }
+  }
+}

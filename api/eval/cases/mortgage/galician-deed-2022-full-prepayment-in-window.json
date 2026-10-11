@@ -1,0 +1,494 @@
+{
+  "id": "galician-deed-2022-full-prepayment-in-window",
+  "description": "Deed in Galician of 24-05-2022 paid off on 28-03-2023: inside the window of RDL 19/2022 no compensation is allowed on a variable rate, so the 0,15 % charged is over it, and art. 23.3 LCCI gives back the unused premium of the insurance. The notary and the registry of the loan are the lender's (art. 14.1.e); those of the cancellation are not this review's.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "mortgage/deed-gl",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 5220524",
+        "folioText": "Folio 1",
+        "protocolNumber": "0.874",
+        "deedTitle": "PRÉSTAMO CON GARANTÍA HIPOTECARIA",
+        "city": "Lugo",
+        "deedOnText": "24 de maio de 2022",
+        "notaryName": "Persona Notaria Ficticia A",
+        "college": "Galicia",
+        "borrowerBlock": "Persona Prestataria Ficticia P, maior de idade, con domicilio en Calle de la Prueba Ficticia, 7, Lugo e con DNI 33283562Z, en concepto de parte prestataria e hipotecante.",
+        "lenderBlock": "Ficticia Banca Galega de Proba, S. A., con CIF A18483936 e domicilio na rúa da Proba Ficticia, 1, Lugo, representada por persoa apoderada con poder bastante, en concepto de parte acredora.",
+        "statements": [
+          {
+            "text": "I. Que Persona Prestataria Ficticia P é propietaria da vivenda situada en Calle de la Prueba Ficticia, 7, Lugo, inscrita no Rexistro da Propiedade Ficticio número 1 de Lugo."
+          },
+          {
+            "text": "II. Que a parte prestataria destina o importe do préstamo á adquisición da súa vivenda habitual."
+          },
+          {
+            "text": "III. Que a parte prestataria recibiu da entidade a Ficha Europea de Información Normalizada e a Ficha de Advertencias Estandarizadas o 6 de maio de 2022, e que o 20 de maio de 2022 compareceu ante min para a acta previa prevista no artigo 15 da Lei 5/2019."
+          }
+        ],
+        "terms": [
+          {
+            "label": "Capital do préstamo",
+            "value": "95.000,00 €"
+          },
+          {
+            "label": "Prazo",
+            "value": "300 meses"
+          },
+          {
+            "label": "Tipo de xuro inicial (12 meses)",
+            "value": "0,89 %"
+          },
+          {
+            "label": "Índice de referencia",
+            "value": "Euríbor a un ano"
+          },
+          {
+            "label": "Diferencial",
+            "value": "0,79 puntos"
+          },
+          {
+            "label": "Periodicidade de revisión",
+            "value": "12 meses"
+          }
+        ],
+        "financialClauses": [
+          {
+            "title": "PRIMEIRA. Capital.",
+            "text": "Ficticia Banca Galega de Proba, S. A. concede á parte prestataria, que o acepta, un préstamo de 95.000,00 €, que esta declara recibir neste acto mediante aboamento na súa conta, e obrígase a devolvelo no prazo de 300 meses mediante 300 cotas mensuais."
+          },
+          {
+            "title": "SEGUNDA. Xuro ordinario variable.",
+            "text": "Durante os primeiros 12 meses o capital devengará un tipo de xuro nominal anual do 0,89 %. Desde entón o tipo será variable, revisarase cada 12 meses e resultará de sumar ao índice de referencia un diferencial de 0,79 puntos porcentuais. Tómase como índice de referencia o Euríbor a un ano publicado mensualmente polo Banco de España no Boletín Oficial do Estado. En ningún caso o tipo de xuro resultante poderá ser negativo."
+          },
+          {
+            "title": "TERCEIRA. Reembolso anticipado.",
+            "text": "Conforme ao artigo 23.5.a) da Lei 5/2019, o reembolso anticipado durante os cinco primeiros anos de vixencia do préstamo devengará unha compensación do 0,15 % do capital reembolsado; despois, ningunha."
+          }
+        ],
+        "otherClauses": [
+          {
+            "title": "CUARTA. Gastos.",
+            "text": "Conforme ao artigo 14.1.e) da Lei 5/2019, a entidade acredora asumirá os aranceis notariais desta escritura, os da súa inscrición no Rexistro da Propiedade, os gastos de xestoría e o Imposto sobre Actos Xurídicos Documentados. Serán por conta da parte prestataria os gastos de taxación do inmoble."
+          },
+          {
+            "title": "QUINTA. Xuros de mora.",
+            "text": "As cantidades vencidas e non satisfeitas devengarán un xuro de mora igual ao xuro remuneratorio vixente en cada momento incrementado en tres puntos porcentuais, conforme ao artigo 25 da Lei 5/2019."
+          },
+          {
+            "title": "SEXTA. Constitución de hipoteca.",
+            "text": "En garantía da devolución do capital, dos xuros e das custas, a parte prestataria constitúe hipoteca sobre a leira descrita, que responderá de 95.000,00 € de principal."
+          }
+        ],
+        "iban": "ES88 2100 7765 6536 9697 6558",
+        "notaryStatements": [
+          {
+            "text": "Fago as reservas e advertencias legais, en particular as de carácter fiscal."
+          }
+        ],
+        "folioCount": "9",
+        "borrowerName": "Persona Prestataria Ficticia P"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/notary-invoice-es",
+      "data": {
+        "number": "N-2022/0570",
+        "issuedOnText": "24 de mayo de 2022",
+        "borrowerName": "Persona Prestataria Ficticia P",
+        "borrowerDni": "33283562Z",
+        "vatRate": "21 %",
+        "issuer": "Notaría Ficticia de Prueba de Lugo",
+        "issuerLine": "Notario: Persona Notaria Ficticia A · Calle de la Prueba Ficticia, 3, Lugo",
+        "documentText": "Escritura de préstamo hipotecario, protocolo n.º 0.874, de 24-05-2022.",
+        "lines": [
+          {
+            "concept": "Derechos de arancel (número 2: escritura de préstamo)",
+            "amount": "444,80 €"
+          },
+          {
+            "concept": "Folios de matriz y copias",
+            "amount": "125,45 €"
+          }
+        ],
+        "base": "570,25 €",
+        "vat": "119,75 €",
+        "supplied": "0,00 €",
+        "total": "690,00 €",
+        "note": "Honorarios conforme al arancel de los notarios (Real Decreto 1426/1989). Documento sin validez fiscal fuera de este banco de pruebas."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/registry-invoice-es",
+      "data": {
+        "number": "R-2022/01066",
+        "issuedOnText": "10 de junio de 2022",
+        "borrowerName": "Persona Prestataria Ficticia P",
+        "borrowerDni": "33283562Z",
+        "vatRate": "21 %",
+        "issuer": "Registro de la Propiedad Ficticio n.º 2 de Lugo",
+        "issuerLine": "Calle de la Prueba Ficticia, 9, Lugo",
+        "documentText": "Inscripción de la hipoteca constituida en escritura de 24-05-2022.",
+        "lines": [
+          {
+            "concept": "Inscripción de hipoteca (número 2 del arancel)",
+            "amount": "277,19 €"
+          },
+          {
+            "concept": "Notas, asientos y certificaciones",
+            "amount": "78,18 €"
+          }
+        ],
+        "base": "355,37 €",
+        "vat": "74,63 €",
+        "total": "430,00 €",
+        "note": "Honorarios conforme al arancel de los registradores (Real Decreto 1427/1989)."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/prepayment-es",
+      "data": {
+        "lenderName": "Ficticia Banca Galega de Proba, S. A.",
+        "lenderLine": "CIF A18483936 · Calle de la Prueba Ficticia, 1, Lugo",
+        "issuedOnText": "28 de marzo de 2023",
+        "title": "Liquidación de cancelación anticipada total",
+        "borrowerName": "Persona Prestataria Ficticia P",
+        "loanRef": "PH-2022-095000",
+        "onText": "28 de marzo de 2023",
+        "rows": [
+          {
+            "label": "Capital pendiente antes de la operación",
+            "value": "93.500,00 €"
+          },
+          {
+            "label": "Capital amortizado",
+            "value": "93.500,00 €"
+          },
+          {
+            "label": "Intereses ordinarios liquidados",
+            "value": "61,20 €"
+          },
+          {
+            "label": "Comisión por amortización anticipada",
+            "value": "140,25 €"
+          },
+          {
+            "label": "Extorno de prima no consumida del seguro",
+            "value": "112,40 €"
+          }
+        ],
+        "iban": "ES88 2100 7765 6536 9697 6558",
+        "note": "Liquidación practicada conforme a las condiciones de la escritura de préstamo."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/notary-invoice-es",
+      "data": {
+        "number": "N-2023/0231",
+        "issuedOnText": "12 de abril de 2023",
+        "borrowerName": "Persona Prestataria Ficticia P",
+        "borrowerDni": "33283562Z",
+        "vatRate": "21 %",
+        "issuer": "Notaría Ficticia de Prueba de Lugo",
+        "issuerLine": "Notario: Persona Notaria Ficticia A · Calle de la Prueba Ficticia, 3, Lugo",
+        "documentText": "Escritura de cancelación de hipoteca, protocolo n.º 0.512, de 12-04-2023.",
+        "lines": [
+          {
+            "concept": "Derechos de arancel (cancelación de hipoteca)",
+            "amount": "180,49 €"
+          },
+          {
+            "concept": "Folios de matriz y copias",
+            "amount": "50,91 €"
+          }
+        ],
+        "base": "231,40 €",
+        "vat": "48,59 €",
+        "supplied": "0,00 €",
+        "total": "279,99 €",
+        "note": "Honorarios conforme al arancel de los notarios (Real Decreto 1426/1989). Documento sin validez fiscal fuera de este banco de pruebas."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/registry-invoice-es",
+      "data": {
+        "number": "R-2023/00236",
+        "issuedOnText": "28 de abril de 2023",
+        "borrowerName": "Persona Prestataria Ficticia P",
+        "borrowerDni": "33283562Z",
+        "vatRate": "21 %",
+        "issuer": "Registro de la Propiedad Ficticio n.º 2 de Lugo",
+        "issuerLine": "Calle de la Prueba Ficticia, 9, Lugo",
+        "documentText": "Cancelación de la hipoteca inscrita, por escritura de 12-04-2023.",
+        "lines": [
+          {
+            "concept": "Cancelación de hipoteca",
+            "amount": "61,24 €"
+          },
+          {
+            "concept": "Notas y asientos",
+            "amount": "17,27 €"
+          }
+        ],
+        "base": "78,51 €",
+        "vat": "16,49 €",
+        "total": "95,00 €",
+        "note": "Honorarios conforme al arancel de los registradores (Real Decreto 1427/1989)."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "deedOn": "2022-05-24",
+        "borrowerType": "individual",
+        "purpose": "housing",
+        "principal": 95000,
+        "termMonths": 300,
+        "rateType": "variable",
+        "initialRate": 0.89,
+        "index": "euribor",
+        "spread": 0.79,
+        "rateRevisionMonths": 12,
+        "floorPercent": 0,
+        "defaultMarginPoints": 3,
+        "prepaymentOption": "a_015_5y",
+        "variablePrepaymentFeePercent": 0.15,
+        "transparencyActStated": true
+      },
+      "lists": {
+        "clauses": [
+          {
+            "label": "euribor"
+          },
+          {
+            "label": "prepayment_fee"
+          },
+          {
+            "label": "expenses_clause"
+          },
+          {
+            "label": "default_interest"
+          }
+        ],
+        "notaryInvoices": [
+          {
+            "invoiceOn": "2022-05-24",
+            "concept": "loan",
+            "mixed": false,
+            "base": 570.25,
+            "vat": 119.75,
+            "total": 690
+          },
+          {
+            "invoiceOn": "2023-04-12",
+            "concept": "cancellation",
+            "mixed": false,
+            "base": 231.4,
+            "vat": 48.59,
+            "total": 279.99
+          }
+        ],
+        "registryInvoices": [
+          {
+            "invoiceOn": "2022-06-10",
+            "concept": "mortgage",
+            "mixed": false,
+            "base": 355.37,
+            "vat": 74.63,
+            "total": 430
+          },
+          {
+            "invoiceOn": "2023-04-28",
+            "concept": "cancellation",
+            "mixed": false,
+            "base": 78.51,
+            "vat": 16.49,
+            "total": 95
+          }
+        ],
+        "operations": [
+          {
+            "on": "2023-03-28",
+            "kind": "full_prepayment",
+            "principal": 93500,
+            "feeCharged": 140.25
+          }
+        ]
+      }
+    },
+    "input": {
+      "deedOn": "2022-05-24",
+      "borrower": "individual",
+      "purpose": "housing",
+      "consumer": true,
+      "loanKind": "standard",
+      "rateType": "variable",
+      "fixedUntil": null,
+      "rateRevisionMonths": 12,
+      "loanAmount": 95000,
+      "expensesClause": "present",
+      "invoices": [
+        {
+          "kind": "notary_loan",
+          "total": 690,
+          "paidBy": "me",
+          "paidOn": "2022-05-24",
+          "mixed": false,
+          "supplied": []
+        },
+        {
+          "kind": "registry_mortgage",
+          "total": 430,
+          "paidBy": "me",
+          "paidOn": "2022-05-24",
+          "mixed": false,
+          "supplied": []
+        }
+      ],
+      "alreadyReturned": null,
+      "agreementOnExpenses": false,
+      "prepaymentOption": "a_015_5y",
+      "deedPercents": {},
+      "operations": [
+        {
+          "on": "2023-03-28",
+          "kind": "full_prepayment",
+          "principal": 93500,
+          "feeCharged": 140.25,
+          "hadInsurance": true
+        }
+      ],
+      "clauses": [
+        {
+          "label": "floor_clause",
+          "present": true,
+          "floorPercent": 0
+        },
+        {
+          "label": "default_interest",
+          "present": true,
+          "defaultRate": 3.89,
+          "ordinaryRate": 0.89
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "expenses": [
+        {
+          "kind": "notary_loan",
+          "basis": "statute",
+          "status": "lender_bears",
+          "share": 100,
+          "amount": 690,
+          "interest": null,
+          "phrases": ["expenses.statute"]
+        },
+        {
+          "kind": "registry_mortgage",
+          "basis": "statute",
+          "status": "lender_bears",
+          "share": 100,
+          "amount": 430,
+          "interest": null,
+          "phrases": ["expenses.statute"]
+        }
+      ],
+      "fees": [
+        {
+          "kind": "full_prepayment",
+          "status": "above_cap",
+          "capPercent": 0,
+          "cap": 0,
+          "amount": 140.25,
+          "phrases": ["fees.window", "fees.above_cap", "fees.unused_premium"]
+        }
+      ],
+      "flags": [
+        {
+          "label": "floor_clause",
+          "state": "not_in_deed",
+          "phrases": ["flags.floor_zero"],
+          "parts": []
+        },
+        {
+          "label": "default_interest",
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "statute",
+              "rule": "default_interest_statute",
+              "phrases": ["flags.default_interest_lcci", "flags.default_interest_lcci_matches"]
+            }
+          ]
+        }
+      ],
+      "information": ["fein_timing", "prior_step_439bis", "loan_assignment", "complaints_service"],
+      "totals": {
+        "statute": 1120,
+        "caseLaw": 0,
+        "caseLawInterest": null,
+        "fees": {
+          "counted": 140.25,
+          "upTo": 140.25
+        }
+      },
+      "offerPass": true
+    }
+  }
+}

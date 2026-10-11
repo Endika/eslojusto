@@ -1,0 +1,202 @@
+{
+  "id": "developer-subrogation-gate",
+  "description": "Purchase of 20-02-2007 taking over the developer's loan: the deed's costs were the developer's, so neither the Supreme Court split (STS 35/2021) nor Ley 41/2007 is applied and the review stops at the door.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "mortgage/deed-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4070220",
+        "folioText": "Folio 1",
+        "protocolNumber": "0.509",
+        "deedTitle": "COMPRAVENTA CON SUBROGACIÓN EN PRÉSTAMO HIPOTECARIO",
+        "city": "Almería",
+        "deedOnText": "veinte de febrero de dos mil siete",
+        "notaryName": "Persona Notaria Ficticia A",
+        "college": "Andalucía",
+        "borrowerBlock": "Persona Prestataria Ficticia S, mayor de edad, con domicilio en Calle de la Prueba Ficticia, 7, Almería y con DNI 52073227J, en concepto de parte prestataria e hipotecante.",
+        "lenderBlock": "Ficticia Caja de Ahorros de Prueba, con CIF A06380581 y domicilio en Calle de la Prueba Ficticia, 1, Almería, representada por persona apoderada con poder bastante, en concepto de parte acreedora.",
+        "statements": [
+          {
+            "text": "I. Que Persona Prestataria Ficticia S es dueña en pleno dominio de la finca siguiente: vivienda situada en Calle de la Prueba Ficticia, 7, Almería, con una superficie construida de ochenta y cinco metros cuadrados, inscrita en el Registro de la Propiedad Ficticio número 2 de Almería, finca registral ficticia número 12.345."
+          },
+          {
+            "text": "II. Que la parte compradora adquiere la vivienda descrita de la sociedad promotora y se subroga en la parte del préstamo hipotecario que la promotora concertó con la entidad acreedora y que grava la finca, con las condiciones que se transcriben a continuación."
+          }
+        ],
+        "terms": [
+          {
+            "label": "Capital del préstamo",
+            "value": "118.000,00 €"
+          },
+          {
+            "label": "Plazo",
+            "value": "360 meses"
+          },
+          {
+            "label": "Tipo de interés inicial (12 meses)",
+            "value": "4,25 %"
+          },
+          {
+            "label": "Índice de referencia",
+            "value": "Euríbor a un año"
+          },
+          {
+            "label": "Diferencial",
+            "value": "0,60 puntos"
+          },
+          {
+            "label": "Periodicidad de revisión",
+            "value": "12 meses"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4070221",
+        "folioText": "Folio 2",
+        "sectionTitle": "ESTIPULACIONES FINANCIERAS",
+        "clauses": [
+          {
+            "title": "PRIMERA. Capital.",
+            "text": "Ficticia Caja de Ahorros de Prueba concede a la parte prestataria, que acepta, un préstamo de 118.000,00 €, que esta declara recibir en este acto mediante abono en su cuenta. La parte prestataria se obliga a devolverlo en el plazo de 360 meses, contados desde hoy, mediante 360 cuotas mensuales comprensivas de capital e intereses, la primera de ellas el día 20 de marzo de 2007 y la última el día 20 de febrero de 2037."
+          },
+          {
+            "title": "SEGUNDA. Interés ordinario variable.",
+            "text": "Durante los primeros 12 meses el capital devengará un tipo de interés nominal anual del 4,25 %. A partir de entonces el tipo de interés será variable y se revisará cada 12 meses, resultando de sumar al índice de referencia un diferencial de 0,60 puntos porcentuales, sin redondeo. Se toma como índice de referencia el Euríbor a un año, definido como la media aritmética simple de los valores diarios del índice del mes, publicado mensualmente por el Banco de España en el Boletín Oficial del Estado, del segundo mes anterior a cada revisión."
+          },
+          {
+            "title": "TERCERA. Reembolso anticipado.",
+            "text": "La parte prestataria podrá reembolsar anticipadamente, total o parcialmente, el capital pendiente, satisfaciendo una comisión del 1,00 % sobre el capital reembolsado."
+          },
+          {
+            "title": "CUARTA. Imputación de pagos.",
+            "text": "Las cantidades que perciba la entidad acreedora se imputarán, por este orden, a gastos y comisiones exigibles, intereses de demora, intereses ordinarios vencidos y amortización del capital."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-closing-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4070223",
+        "folioText": "Folio 4",
+        "sectionTitle": "ESTIPULACIONES FINALES",
+        "clauses": [
+          {
+            "title": "Domicilio.",
+            "text": "Para la práctica de requerimientos y notificaciones, la parte prestataria señala como domicilio el de la finca hipotecada."
+          },
+          {
+            "title": "Copias.",
+            "text": "Se expedirá copia autorizada de esta escritura para la entidad acreedora, con eficacia ejecutiva, y copia simple para la parte prestataria."
+          }
+        ],
+        "iban": "ES16 2100 5430 5055 7594 3047",
+        "notaryStatements": [
+          {
+            "text": "Hago las reservas y advertencias legales, y en particular las de carácter fiscal y las relativas al alcance de la responsabilidad hipotecaria y a las consecuencias del impago."
+          }
+        ],
+        "folioCount": "12",
+        "borrowerName": "Persona Prestataria Ficticia S",
+        "notaryName": "Persona Notaria Ficticia A"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "deedOn": "2007-02-20",
+        "borrowerType": "individual",
+        "purpose": "housing",
+        "loanKind": "developer_subrogation",
+        "principal": 118000,
+        "termMonths": 360,
+        "rateType": "variable",
+        "initialRate": 4.25,
+        "index": "euribor",
+        "spread": 0.6,
+        "rateRevisionMonths": 12,
+        "variablePrepaymentFeePercent": 1
+      },
+      "lists": {
+        "clauses": [
+          {
+            "label": "euribor"
+          },
+          {
+            "label": "prepayment_fee"
+          }
+        ]
+      }
+    },
+    "input": {
+      "deedOn": "2007-02-20",
+      "borrower": "individual",
+      "purpose": "housing",
+      "consumer": true,
+      "loanKind": "developer_subrogation",
+      "rateType": "variable",
+      "fixedUntil": null,
+      "rateRevisionMonths": 12,
+      "loanAmount": 118000,
+      "expensesClause": "present",
+      "invoices": [],
+      "alreadyReturned": null,
+      "agreementOnExpenses": null,
+      "prepaymentOption": null,
+      "deedPercents": {},
+      "operations": [],
+      "clauses": []
+    },
+    "review": {
+      "scope": {
+        "inScope": false,
+        "reason": "developer_subrogation"
+      },
+      "expenses": [],
+      "fees": [],
+      "flags": [],
+      "information": [],
+      "totals": {
+        "statute": 0,
+        "caseLaw": 0,
+        "caseLawInterest": null,
+        "fees": {
+          "counted": 0,
+          "upTo": 0
+        }
+      },
+      "offerPass": false
+    }
+  }
+}

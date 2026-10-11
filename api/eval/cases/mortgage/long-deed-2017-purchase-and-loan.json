@@ -1,0 +1,794 @@
+{
+  "id": "long-deed-2017-purchase-and-loan",
+  "description": "Purchase and loan of 27-06-2017 in a forty-folio deed, of which the person uploaded sixteen pages: the notary billed the loan apart (half of it on the lender by the Supreme Court split, STS 35/2021, with legal interest of STS 725/2018), the registry billed both together (no share of a mixed invoice), and the transfer tax of the purchase is not this review's.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "mortgage/deed-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4170627",
+        "folioText": "Folio 1 de 40",
+        "protocolNumber": "2.871",
+        "deedTitle": "COMPRAVENTA Y PRÉSTAMO CON GARANTÍA HIPOTECARIA",
+        "city": "Madrid",
+        "deedOnText": "veintisiete de junio de dos mil diecisiete",
+        "notaryName": "Persona Notaria Ficticia A",
+        "college": "Madrid",
+        "borrowerBlock": "Persona Prestataria Ficticia V, mayor de edad, con domicilio en Calle de la Prueba Ficticia, 7, Madrid y con DNI 70862892N, en concepto de parte prestataria e hipotecante.",
+        "lenderBlock": "Ficticia Banca Hipotecaria de Prueba, S. A., con CIF A94277236 y domicilio en Calle de la Prueba Ficticia, 1, Madrid, representada por persona apoderada con poder bastante, en concepto de parte acreedora.",
+        "statements": [
+          {
+            "text": "I. Que Persona Prestataria Ficticia V es dueña en pleno dominio de la finca siguiente: vivienda situada en Calle de la Prueba Ficticia, 7, Madrid, con una superficie construida de ochenta y cinco metros cuadrados, inscrita en el Registro de la Propiedad Ficticio número 2 de Madrid, finca registral ficticia número 12.345."
+          },
+          {
+            "text": "II. Que en este mismo acto la parte prestataria compra la finca descrita y destina el importe del préstamo al pago de su precio, para su vivienda habitual."
+          }
+        ],
+        "terms": [
+          {
+            "label": "Capital del préstamo",
+            "value": "210.000,00 €"
+          },
+          {
+            "label": "Plazo",
+            "value": "360 meses"
+          },
+          {
+            "label": "Tipo de interés inicial (12 meses)",
+            "value": "1,85 %"
+          },
+          {
+            "label": "Índice de referencia",
+            "value": "Euríbor a un año"
+          },
+          {
+            "label": "Diferencial",
+            "value": "0,99 puntos"
+          },
+          {
+            "label": "Periodicidad de revisión",
+            "value": "12 meses"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4170628",
+        "folioText": "Folio 2 de 40",
+        "sectionTitle": "DESCRIPCIÓN DE LA FINCA",
+        "clauses": [
+          {
+            "title": "",
+            "text": "URBANA. Vivienda unifamiliar en planta tercera, puerta B, del edificio situado en la Calle de la Prueba Ficticia, con acceso por el portal número 7. Tiene una superficie construida de noventa y dos metros cuadrados y útil de setenta y ocho metros cuadrados, distribuida en vestíbulo, salón comedor, cocina, tres dormitorios, dos baños y terraza."
+          },
+          {
+            "title": "",
+            "text": "Linda: por su frente, con rellano y caja de escalera; por la derecha entrando, con la vivienda puerta A de su misma planta; por la izquierda, con patio de luces; y por el fondo, con la calle de su situación."
+          },
+          {
+            "title": "",
+            "text": "Cuota de participación en los elementos comunes del edificio: cuatro enteros y doce centésimas por ciento. Referencia catastral: ficticia, no corresponde a inmueble alguno."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4170629",
+        "folioText": "Folio 3 de 40",
+        "sectionTitle": "TÍTULO, CARGAS Y ARRENDAMIENTOS",
+        "clauses": [
+          {
+            "title": "",
+            "text": "TÍTULO. Pertenece a la parte vendedora por título de compra, en virtud de escritura autorizada por notario de esta ciudad, inscrita en el Registro de la Propiedad Ficticio correspondiente."
+          },
+          {
+            "title": "",
+            "text": "CARGAS. Según manifiestan las partes y resulta de la nota simple informativa que se incorpora a esta matriz, la finca se encuentra libre de cargas, gravámenes y arrendamientos, salvo las afecciones fiscales."
+          },
+          {
+            "title": "",
+            "text": "ARRENDAMIENTOS. La parte vendedora manifiesta que la finca no se encuentra arrendada y que se entrega libre de ocupantes."
+          },
+          {
+            "title": "",
+            "text": "SITUACIÓN URBANÍSTICA. Se advierte a los comparecientes de la conveniencia de obtener la información urbanística de la finca ante el Ayuntamiento."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4170630",
+        "folioText": "Folio 4 de 40",
+        "sectionTitle": "COMUNIDAD DE PROPIETARIOS Y CERTIFICACIONES",
+        "clauses": [
+          {
+            "title": "",
+            "text": "La parte vendedora acredita estar al corriente en el pago de los gastos de la comunidad de propietarios mediante certificación expedida por su secretario, que se incorpora a esta matriz."
+          },
+          {
+            "title": "",
+            "text": "Se incorpora asimismo el certificado de eficiencia energética del edificio, del que la parte compradora declara haber recibido copia."
+          },
+          {
+            "title": "",
+            "text": "Las partes manifiestan que la finca está al corriente del Impuesto sobre Bienes Inmuebles, cuyo último recibo se exhibe."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4170631",
+        "folioText": "Folio 6 de 40",
+        "sectionTitle": "COMPRAVENTA: ESTIPULACIONES",
+        "clauses": [
+          {
+            "title": "",
+            "text": "PRIMERA. La parte vendedora vende y transmite a la parte compradora, que compra y adquiere, el pleno dominio de la finca descrita, como cuerpo cierto, con cuanto le es inherente y accesorio, libre de cargas y al corriente en el pago de contribuciones y gastos."
+          },
+          {
+            "title": "",
+            "text": "SEGUNDA. El precio de la compraventa es de doscientos sesenta mil euros, que la parte compradora satisface en este acto en la forma que se expresa en la parte de medios de pago, del que la parte vendedora da carta de pago."
+          },
+          {
+            "title": "",
+            "text": "TERCERA. Los gastos e impuestos de esta compraventa se pagarán conforme a la ley."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4170632",
+        "folioText": "Folio 9 de 40",
+        "sectionTitle": "IMPUESTOS DE LA COMPRAVENTA",
+        "clauses": [
+          {
+            "title": "",
+            "text": "A efectos de lo previsto en la legislación del Impuesto sobre el Incremento de Valor de los Terrenos de Naturaleza Urbana, las partes manifiestan los valores de adquisición y transmisión de la finca."
+          },
+          {
+            "title": "",
+            "text": "Advierto a las partes de la afección de la finca al pago de los impuestos que gravan esta transmisión y de las obligaciones de presentación de la escritura ante las oficinas liquidadoras correspondientes."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4170633",
+        "folioText": "Folio 13 de 40",
+        "sectionTitle": "PRÉSTAMO: ESTIPULACIONES FINANCIERAS",
+        "clauses": [
+          {
+            "title": "PRIMERA. Capital.",
+            "text": "Ficticia Banca Hipotecaria de Prueba, S. A. concede a la parte prestataria, que acepta, un préstamo de 210.000,00 €, que esta declara recibir en este acto mediante abono en su cuenta. La parte prestataria se obliga a devolverlo en el plazo de 360 meses, contados desde hoy, mediante 360 cuotas mensuales comprensivas de capital e intereses, la primera de ellas el día 27 de julio de 2017 y la última el día 27 de junio de 2047."
+          },
+          {
+            "title": "SEGUNDA. Interés ordinario variable.",
+            "text": "Durante los primeros 12 meses el capital devengará un tipo de interés nominal anual del 1,85 %. A partir de entonces el tipo de interés será variable y se revisará cada 12 meses, resultando de sumar al índice de referencia un diferencial de 0,99 puntos porcentuales, sin redondeo. Se toma como índice de referencia el Euríbor a un año, definido como la media aritmética simple de los valores diarios del índice del mes, publicado mensualmente por el Banco de España en el Boletín Oficial del Estado, del segundo mes anterior a cada revisión."
+          },
+          {
+            "title": "TERCERA. Reembolso anticipado.",
+            "text": "Conforme a los artículos 8 y 9 de la Ley 41/2007, la parte prestataria satisfará por el reembolso anticipado, total o parcial, una compensación por desistimiento del 0,50 % del capital reembolsado si se produce dentro de los cinco primeros años de vida del préstamo y del 0,25 % en otro caso."
+          },
+          {
+            "title": "CUARTA. Imputación de pagos.",
+            "text": "Las cantidades que perciba la entidad acreedora se imputarán, por este orden, a gastos y comisiones exigibles, intereses de demora, intereses ordinarios vencidos y amortización del capital."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4170634",
+        "folioText": "Folio 14 de 40",
+        "sectionTitle": "OTRAS ESTIPULACIONES",
+        "clauses": [
+          {
+            "title": "QUINTA. Gastos y tributos.",
+            "text": "Serán de cuenta exclusiva de la parte prestataria todos los gastos y tributos que se deriven de la preparación, formalización, subsanación, inscripción y cancelación de esta escritura, incluidos los aranceles notariales y registrales, los honorarios de la gestoría que tramite su inscripción, los de la tasación de la finca y el Impuesto sobre Actos Jurídicos Documentados, así como los de las copias de esta escritura que se expidan para la entidad acreedora."
+          },
+          {
+            "title": "SEXTA. Intereses de demora.",
+            "text": "Las cantidades vencidas y no satisfechas devengarán, desde el día siguiente a su vencimiento y sin necesidad de requerimiento, un interés de demora igual al tipo de interés remuneratorio vigente en cada momento incrementado en dos puntos porcentuales, que se liquidará diariamente sobre el principal vencido y pendiente de pago."
+          },
+          {
+            "title": "SÉPTIMA. Vencimiento anticipado.",
+            "text": "La entidad acreedora podrá dar por vencido anticipadamente el préstamo y exigir judicial o extrajudicialmente la totalidad del capital pendiente, con sus intereses, si la parte prestataria dejase de pagar a su vencimiento doce cuotas mensuales."
+          },
+          {
+            "title": "OCTAVA. Seguro de daños.",
+            "text": "La parte prestataria se obliga a mantener asegurada la finca hipotecada contra el riesgo de incendio y otros daños por un capital no inferior a su valor de tasación a efectos de seguro, durante toda la vida del préstamo, con la entidad aseguradora que libremente elija, designando a la entidad acreedora como beneficiaria hasta el importe del préstamo pendiente."
+          },
+          {
+            "title": "NOVENA. Constitución de hipoteca.",
+            "text": "En garantía de la devolución del capital, de los intereses ordinarios de tres años, de los intereses de demora y de las costas, la parte prestataria constituye hipoteca sobre la finca descrita en la parte expositiva, que responderá de 210.000,00 € de principal y de las demás cantidades que resultan de esta escritura."
+          },
+          {
+            "title": "DÉCIMA. Tasación a efectos de subasta.",
+            "text": "Las partes tasan la finca hipotecada, a efectos de subasta, en 304.500,00 €, valor que no es inferior al de tasación realizada conforme a la normativa del mercado hipotecario."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4170635",
+        "folioText": "Folio 15 de 40",
+        "sectionTitle": "TASACIÓN Y SUBASTA",
+        "clauses": [
+          {
+            "title": "",
+            "text": "La finca ha sido tasada por sociedad de tasación homologada conforme a la Orden ECO/805/2003, cuyo certificado se incorpora a esta matriz."
+          },
+          {
+            "title": "",
+            "text": "Para el caso de ejecución, las partes pactan el procedimiento de ejecución directa sobre los bienes hipotecados y la venta extrajudicial ante notario, con las garantías previstas en la ley."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4170636",
+        "folioText": "Folio 38 de 40",
+        "sectionTitle": "ADVERTENCIAS",
+        "clauses": [
+          {
+            "title": "",
+            "text": "Advierto a la parte prestataria de las consecuencias del impago y, en particular, de que responde del préstamo no solo con la finca hipotecada sino con todos sus bienes presentes y futuros."
+          },
+          {
+            "title": "",
+            "text": "Advierto igualmente de las obligaciones que la ley impone en materia de protección de datos y de prevención del blanqueo de capitales, de cuyo cumplimiento dejo constancia."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-closing-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4170637",
+        "folioText": "Folio 40 de 40",
+        "sectionTitle": "ESTIPULACIONES FINALES",
+        "clauses": [
+          {
+            "title": "Domicilio.",
+            "text": "Para la práctica de requerimientos y notificaciones, la parte prestataria señala como domicilio el de la finca hipotecada."
+          },
+          {
+            "title": "Copias.",
+            "text": "Se expedirá copia autorizada de esta escritura para la entidad acreedora, con eficacia ejecutiva, y copia simple para la parte prestataria."
+          }
+        ],
+        "iban": "ES41 2100 3095 3574 5490 9536",
+        "notaryStatements": [
+          {
+            "text": "Hago las reservas y advertencias legales, y en particular las de carácter fiscal y las relativas al alcance de la responsabilidad hipotecaria y a las consecuencias del impago."
+          },
+          {
+            "text": "La parte prestataria ha extendido de su puño y letra, en mi presencia, la expresión manuscrita prevista en el artículo 6 de la Ley 1/2013, de 14 de mayo, que queda incorporada a esta matriz."
+          }
+        ],
+        "folioCount": 40,
+        "borrowerName": "Persona Prestataria Ficticia V",
+        "notaryName": "Persona Notaria Ficticia A"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "mortgage/notary-invoice-es",
+      "data": {
+        "number": "N-2017/0760",
+        "issuedOnText": "27 de junio de 2017",
+        "borrowerName": "Persona Prestataria Ficticia V",
+        "borrowerDni": "70862892N",
+        "vatRate": "21 %",
+        "issuer": "Notaría Ficticia de Prueba de Madrid",
+        "issuerLine": "Notario: Persona Notaria Ficticia A · Calle de la Prueba Ficticia, 3, Madrid",
+        "documentText": "Escritura de compraventa, protocolo n.º 2.871, de 27-06-2017 (parte de compraventa).",
+        "lines": [
+          {
+            "concept": "Derechos de arancel (número 2: compraventa)",
+            "amount": "593,06 €"
+          },
+          {
+            "concept": "Folios de matriz y copias",
+            "amount": "167,27 €"
+          }
+        ],
+        "base": "760,33 €",
+        "vat": "159,67 €",
+        "supplied": "0,00 €",
+        "total": "920,00 €",
+        "note": "Honorarios conforme al arancel de los notarios (Real Decreto 1426/1989). Documento sin validez fiscal fuera de este banco de pruebas."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/notary-invoice-es",
+      "data": {
+        "number": "N-2017/0669",
+        "issuedOnText": "27 de junio de 2017",
+        "borrowerName": "Persona Prestataria Ficticia V",
+        "borrowerDni": "70862892N",
+        "vatRate": "21 %",
+        "issuer": "Notaría Ficticia de Prueba de Madrid",
+        "issuerLine": "Notario: Persona Notaria Ficticia A · Calle de la Prueba Ficticia, 3, Madrid",
+        "documentText": "Escritura de préstamo hipotecario, protocolo n.º 2.871, de 27-06-2017 (parte de préstamo).",
+        "lines": [
+          {
+            "concept": "Derechos de arancel (número 2: escritura de préstamo)",
+            "amount": "522,15 €"
+          },
+          {
+            "concept": "Folios de matriz y copias",
+            "amount": "147,27 €"
+          }
+        ],
+        "base": "669,42 €",
+        "vat": "140,58 €",
+        "supplied": "0,00 €",
+        "total": "810,00 €",
+        "note": "Honorarios conforme al arancel de los notarios (Real Decreto 1426/1989). Documento sin validez fiscal fuera de este banco de pruebas."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/registry-invoice-es",
+      "data": {
+        "number": "R-2017/02355",
+        "issuedOnText": "19 de julio de 2017",
+        "borrowerName": "Persona Prestataria Ficticia V",
+        "borrowerDni": "70862892N",
+        "vatRate": "21 %",
+        "issuer": "Registro de la Propiedad Ficticio n.º 2 de Madrid",
+        "issuerLine": "Calle de la Prueba Ficticia, 9, Madrid",
+        "documentText": "Inscripción de la compraventa y de la hipoteca de la escritura de 27-06-2017.",
+        "lines": [
+          {
+            "concept": "Inscripción de dominio e hipoteca (número 2 del arancel)",
+            "amount": "612,39 €"
+          },
+          {
+            "concept": "Notas, asientos y certificaciones",
+            "amount": "172,73 €"
+          }
+        ],
+        "base": "785,12 €",
+        "vat": "164,88 €",
+        "total": "950,00 €",
+        "note": "Honorarios conforme al arancel de los registradores (Real Decreto 1427/1989)."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/ajd-form-es",
+      "data": {
+        "office": "Oficina liquidadora ficticia de Madrid",
+        "number": "600-2017-6031",
+        "taxpayerText": "Persona Prestataria Ficticia V, NIF 70862892N, Calle de la Prueba Ficticia, 7, Madrid",
+        "borrowerName": "Persona Prestataria Ficticia V",
+        "borrowerDni": "70862892N",
+        "documentText": "Escritura autorizada por Persona Notaria Ficticia A, protocolo n.º 2.871, de 27 de junio de 2017.",
+        "conceptText": "Transmisiones Patrimoniales Onerosas · Compraventa de bien inmueble (vivienda)",
+        "accruedOnText": "27/06/2017",
+        "taxBase": "260.000,00 €",
+        "taxRate": "6,00 %",
+        "quota": "15.600,00 €",
+        "amountPaid": "15.600,00 €",
+        "paidOnText": "10/07/2017"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/valuation-invoice-es",
+      "data": {
+        "number": "T-2017/03636",
+        "issuedOnText": "2 de junio de 2017",
+        "borrowerName": "Persona Prestataria Ficticia V",
+        "borrowerDni": "70862892N",
+        "vatRate": "21 %",
+        "issuer": "Ficticia Tasaciones de Prueba, S. A.",
+        "issuerLine": "CIF A52663450 · Inscrita en el registro de sociedades de tasación con un número ficticio",
+        "documentText": "Informe de tasación de la vivienda sita en Calle de la Prueba Ficticia, 7, Madrid, a petición de Ficticia Banca Hipotecaria de Prueba, S. A..",
+        "concept": "Honorarios del informe de tasación",
+        "base": "330,58 €",
+        "vat": "69,42 €",
+        "total": "400,00 €",
+        "note": "Tasación realizada conforme a la Orden ECO/805/2003."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "deedOn": "2017-06-27",
+        "borrowerType": "individual",
+        "purpose": "housing",
+        "principal": 210000,
+        "termMonths": 360,
+        "rateType": "variable",
+        "initialRate": 1.85,
+        "index": "euribor",
+        "spread": 0.99,
+        "rateRevisionMonths": 12,
+        "defaultMarginPoints": 2,
+        "earlyTerminationInstalments": 12,
+        "handwrittenStatement": true
+      },
+      "lists": {
+        "clauses": [
+          {
+            "label": "euribor"
+          },
+          {
+            "label": "prepayment_fee"
+          },
+          {
+            "label": "expenses_clause"
+          },
+          {
+            "label": "default_interest"
+          },
+          {
+            "label": "early_termination"
+          },
+          {
+            "label": "insurance_required"
+          }
+        ],
+        "notaryInvoices": [
+          {
+            "invoiceOn": "2017-06-27",
+            "concept": "purchase",
+            "mixed": false,
+            "base": 760.33,
+            "vat": 159.67,
+            "total": 920
+          },
+          {
+            "invoiceOn": "2017-06-27",
+            "concept": "loan",
+            "mixed": false,
+            "base": 669.42,
+            "vat": 140.58,
+            "total": 810
+          }
+        ],
+        "registryInvoices": [
+          {
+            "invoiceOn": "2017-07-19",
+            "mixed": true,
+            "base": 785.12,
+            "vat": 164.88,
+            "total": 950
+          }
+        ],
+        "ajdForms": [
+          {
+            "concept": "purchase",
+            "accruedOn": "2017-06-27",
+            "taxBase": 260000,
+            "amountPaid": 15600
+          }
+        ],
+        "valuationInvoices": [
+          {
+            "invoiceOn": "2017-06-02",
+            "base": 330.58,
+            "vat": 69.42,
+            "total": 400
+          }
+        ]
+      }
+    },
+    "input": {
+      "deedOn": "2017-06-27",
+      "borrower": "individual",
+      "purpose": "housing",
+      "consumer": true,
+      "loanKind": "standard",
+      "rateType": "variable",
+      "fixedUntil": null,
+      "rateRevisionMonths": 12,
+      "loanAmount": 210000,
+      "expensesClause": "present",
+      "invoices": [
+        {
+          "kind": "notary_loan",
+          "total": 810,
+          "paidBy": "me",
+          "paidOn": "2017-06-27",
+          "mixed": false,
+          "supplied": []
+        },
+        {
+          "kind": "registry_mortgage",
+          "total": 950,
+          "paidBy": "me",
+          "paidOn": "2017-06-27",
+          "mixed": true,
+          "supplied": []
+        },
+        {
+          "kind": "valuation",
+          "total": 400,
+          "paidBy": "me",
+          "paidOn": "2017-06-27",
+          "mixed": false,
+          "supplied": []
+        }
+      ],
+      "alreadyReturned": null,
+      "agreementOnExpenses": false,
+      "prepaymentOption": null,
+      "deedPercents": {},
+      "operations": [],
+      "clauses": [
+        {
+          "label": "default_interest",
+          "present": true,
+          "defaultRate": 3.85,
+          "ordinaryRate": 1.85
+        },
+        {
+          "label": "early_termination",
+          "present": true,
+          "missedInstalments": 12
+        },
+        {
+          "label": "insurance_required",
+          "present": true
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "expenses": [
+        {
+          "kind": "notary_loan",
+          "basis": "case_law",
+          "status": "lender_bears",
+          "share": 50,
+          "amount": 405,
+          "interest": {
+            "amount": 116.7,
+            "until": "2026-10-08",
+            "estimated": false,
+            "missingYear": null
+          },
+          "phrases": ["expenses.case_law", "expenses.case_law_condition", "interest.counted"]
+        },
+        {
+          "kind": "registry_mortgage",
+          "basis": "case_law",
+          "status": "review_it",
+          "share": null,
+          "amount": null,
+          "interest": null,
+          "phrases": ["expenses.mixed"]
+        },
+        {
+          "kind": "valuation",
+          "basis": "case_law",
+          "status": "lender_bears",
+          "share": 100,
+          "amount": 400,
+          "interest": {
+            "amount": 115.26,
+            "until": "2026-10-08",
+            "estimated": false,
+            "missingYear": null
+          },
+          "phrases": ["expenses.case_law", "expenses.case_law_condition", "interest.counted"]
+        }
+      ],
+      "fees": [],
+      "flags": [
+        {
+          "label": "default_interest",
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "statute",
+              "rule": "default_interest_lh114",
+              "phrases": ["flags.default_interest_lh114"]
+            },
+            {
+              "basis": "case_law",
+              "rule": "default_interest_case_law",
+              "phrases": ["flags.default_interest_case_law"]
+            }
+          ]
+        },
+        {
+          "label": "early_termination",
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "statute",
+              "rule": "early_termination",
+              "phrases": ["flags.early_termination", "flags.early_termination_earlier_deed"]
+            },
+            {
+              "basis": "case_law",
+              "rule": "early_termination_case_law",
+              "phrases": ["flags.early_termination_case_law"]
+            }
+          ]
+        },
+        {
+          "label": "insurance_required",
+          "state": "in_deed",
+          "phrases": ["flags.insurance_before_lcci"],
+          "parts": []
+        }
+      ],
+      "information": [
+        "handwritten_statement",
+        "limitation_rule",
+        "prior_step_439bis",
+        "loan_assignment",
+        "complaints_service"
+      ],
+      "totals": {
+        "statute": 0,
+        "caseLaw": 805,
+        "caseLawInterest": {
+          "amount": 231.96,
+          "until": "2026-10-08",
+          "estimated": false,
+          "missingYear": null
+        },
+        "fees": {
+          "counted": 0,
+          "upTo": 0
+        }
+      },
+      "offerPass": true
+    }
+  }
+}
