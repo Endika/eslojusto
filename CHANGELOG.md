@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.50.0](https://github.com/Endika/eslojusto/compare/v1.49.0...v1.50.0) (2026-10-11)
+
+
+### Features
+
+* **mortgage:** give the Supreme Court split and its interest in euros, its rulings read in CENDOJ ([9c8ee6a](https://github.com/Endika/eslojusto/commit/9c8ee6a1c6ec92e67bf26ab79a9af97a72348de7))
+
 ## [1.49.0](https://github.com/Endika/eslojusto/compare/v1.48.0...v1.49.0) (2026-10-10)
 
 
