@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.51.1](https://github.com/Endika/eslojusto/compare/v1.51.0...v1.51.1) (2026-10-11)
+
+
+### Bug Fixes
+
+* **mortgage:** say in the guide that the lender pays its own copy of the deed before 2019 ([d0c4153](https://github.com/Endika/eslojusto/commit/d0c4153098330499bd0f559cf5ea262912bf5c11))
+
 ## [1.51.0](https://github.com/Endika/eslojusto/compare/v1.50.0...v1.51.0) (2026-10-11)
 
 
