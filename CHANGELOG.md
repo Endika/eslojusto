@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.51.2](https://github.com/Endika/eslojusto/compare/v1.51.1...v1.51.2) (2026-10-11)
+
+
+### Bug Fixes
+
+* **api:** tell the mortgage read that a never-negative rate is no floor clause ([b7e7717](https://github.com/Endika/eslojusto/commit/b7e7717fd5640266872d3670c9bc303faaca0411))
+
 ## [1.51.1](https://github.com/Endika/eslojusto/compare/v1.51.0...v1.51.1) (2026-10-11)
 
 
