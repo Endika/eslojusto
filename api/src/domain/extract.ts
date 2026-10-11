@@ -173,6 +173,8 @@ export interface ExtractMetrics {
   review?: ReviewKind;
   // A list came back at its maximum.
   truncated?: boolean;
+  // Only on a mortgage read with a legible deed: whether the costs clause it needs was missing.
+  missingKeyPage?: boolean;
 }
 
 export interface Assessment {
@@ -451,6 +453,11 @@ export async function extract<R extends ReviewKind = 'final_pay'>(
   // A count, never which values: the log carries nothing a document said.
   metrics.conflicts = result.extraction.conflicts.length;
   if ('truncated' in result.extraction && result.extraction.truncated) metrics.truncated = true;
+  if (
+    request.review === 'mortgage' &&
+    pages.some((p) => p.kind === 'mortgage_deed' && isReadable(p))
+  )
+    metrics.missingKeyPage = result.failed.includes('missing_key_page');
   const { discarded: _discarded, ...extraction } = result.extraction;
   // The review chose the schema, so the extraction is that review's.
   const ok = {

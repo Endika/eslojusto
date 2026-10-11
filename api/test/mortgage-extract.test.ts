@@ -101,11 +101,16 @@ describe('a mortgage read', () => {
     });
     expect(extraction.truncated).toBe(false);
     expect(failedChecks).toEqual([]);
-    expect(metrics).toMatchObject({ review: 'mortgage', pages: 6, escalated: false });
+    expect(metrics).toMatchObject({
+      review: 'mortgage',
+      pages: 6,
+      escalated: false,
+      missingKeyPage: false,
+    });
   });
 
   it('flags a mixed notary bill, an agency outlay paid twice and the purchase’s tax', async () => {
-    const { extraction, failedChecks } = await ok('mortgage-mixed-agency', 4);
+    const { extraction, failedChecks, metrics } = await ok('mortgage-mixed-agency', 4);
     expect(extraction.lists.agencySupplied?.map((r) => r.values)).toEqual([
       { concept: 'ajd', amount: 1800 },
       { concept: 'other', amount: 200 },
@@ -119,6 +124,8 @@ describe('a mortgage read', () => {
       'duplicate_supplied_amount',
       'ajd_purchase_not_loan',
     ]);
+    // No deed among the invoices: the read says nothing on its key page.
+    expect(metrics.missingKeyPage).toBeUndefined();
   });
 
   it('reads a 2020 deed with a 1 % floor, the information before it and a later repayment', async () => {
@@ -150,9 +157,10 @@ describe('a mortgage read', () => {
   });
 
   it('says which page is missing when the deed comes without its expenses clause', async () => {
-    const { extraction, failedChecks } = await ok('mortgage-deed-without-expenses', 2);
+    const { extraction, failedChecks, metrics } = await ok('mortgage-deed-without-expenses', 2);
     expect(extraction.fields).toMatchObject({ earlyTerminationInstalments: value(1) });
     expect(failedChecks).toEqual(['missing_key_page']);
+    expect(metrics.missingKeyPage).toBe(true);
   });
 
   it('drops copied texts that name a guarantor or carry a DNI or health, and keeps the rest', async () => {
@@ -191,6 +199,7 @@ describe('a mortgage read', () => {
       pages: [{ page: 1, kind: 'other', readability: f('not_mortgage_document') }],
     });
     expect(metrics.readability).toEqual({ not_mortgage_document: 1 });
+    expect(metrics.missingKeyPage).toBeUndefined();
   });
 
   it('refuses a twenty-sixth page before reading anything', async () => {
