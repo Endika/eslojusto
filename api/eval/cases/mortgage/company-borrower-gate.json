@@ -1,0 +1,303 @@
+{
+  "id": "company-borrower-gate",
+  "description": "A company borrows to buy business premises, deed of 14-09-2016: the Supreme Court split (STS 35/2021) and the LCCI protect natural persons, so the review stops at the door and works nothing out.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "mortgage/deed-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4160914",
+        "folioText": "Folio 1",
+        "protocolNumber": "3.540",
+        "deedTitle": "PRÉSTAMO CON GARANTÍA HIPOTECARIA",
+        "city": "Valencia",
+        "deedOnText": "catorce de septiembre de dos mil dieciséis",
+        "notaryName": "Persona Notaria Ficticia A",
+        "college": "Valencia",
+        "borrowerBlock": "Ficticia Inversiones de Prueba, S. L., con CIF B98765435 y domicilio en Calle de la Prueba Ficticia, 40, Valencia, representada por Persona Administradora Ficticia R, con DNI 12476672M, en su condición de administradora única, en concepto de parte prestataria e hipotecante.",
+        "lenderBlock": "Ficticia Banca Hipotecaria de Prueba, S. A., con CIF A10415035 y domicilio en Calle de la Prueba Ficticia, 1, Valencia, representada por persona apoderada con poder bastante, en concepto de parte acreedora.",
+        "statements": [
+          {
+            "text": "I. Que Ficticia Inversiones de Prueba, S. L., es dueña en pleno dominio de la finca siguiente: local comercial situado en Calle de la Prueba Ficticia, 40, bajo, Valencia, inscrito en el Registro de la Propiedad Ficticio número 4 de Valencia, finca registral ficticia número 54.321."
+          },
+          {
+            "text": "II. Que la parte prestataria destina el importe del préstamo a la adquisición del local descrito, para el ejercicio de su actividad empresarial."
+          }
+        ],
+        "terms": [
+          {
+            "label": "Capital del préstamo",
+            "value": "240.000,00 €"
+          },
+          {
+            "label": "Plazo",
+            "value": "180 meses"
+          },
+          {
+            "label": "Tipo de interés inicial (12 meses)",
+            "value": "2,60 %"
+          },
+          {
+            "label": "Índice de referencia",
+            "value": "Euríbor a un año"
+          },
+          {
+            "label": "Diferencial",
+            "value": "1,90 puntos"
+          },
+          {
+            "label": "Periodicidad de revisión",
+            "value": "12 meses"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4160915",
+        "folioText": "Folio 2",
+        "sectionTitle": "ESTIPULACIONES FINANCIERAS",
+        "clauses": [
+          {
+            "title": "PRIMERA. Capital.",
+            "text": "Ficticia Banca Hipotecaria de Prueba, S. A. concede a la parte prestataria, que acepta, un préstamo de 240.000,00 €, que esta declara recibir en este acto mediante abono en su cuenta. La parte prestataria se obliga a devolverlo en el plazo de 180 meses, contados desde hoy, mediante 180 cuotas mensuales comprensivas de capital e intereses, la primera de ellas el día 14 de octubre de 2016 y la última el día 14 de septiembre de 2031."
+          },
+          {
+            "title": "SEGUNDA. Interés ordinario variable.",
+            "text": "Durante los primeros 12 meses el capital devengará un tipo de interés nominal anual del 2,60 %. A partir de entonces el tipo de interés será variable y se revisará cada 12 meses, resultando de sumar al índice de referencia un diferencial de 1,90 puntos porcentuales, sin redondeo. Se toma como índice de referencia el Euríbor a un año, definido como la media aritmética simple de los valores diarios del índice del mes, publicado mensualmente por el Banco de España en el Boletín Oficial del Estado, del segundo mes anterior a cada revisión."
+          },
+          {
+            "title": "TERCERA. Reembolso anticipado.",
+            "text": "Conforme a los artículos 8 y 9 de la Ley 41/2007, la parte prestataria satisfará por el reembolso anticipado, total o parcial, una compensación por desistimiento del 0,50 % del capital reembolsado si se produce dentro de los cinco primeros años de vida del préstamo y del 0,25 % en otro caso."
+          },
+          {
+            "title": "CUARTA. Imputación de pagos.",
+            "text": "Las cantidades que perciba la entidad acreedora se imputarán, por este orden, a gastos y comisiones exigibles, intereses de demora, intereses ordinarios vencidos y amortización del capital."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4160916",
+        "folioText": "Folio 3",
+        "sectionTitle": "OTRAS ESTIPULACIONES",
+        "clauses": [
+          {
+            "title": "QUINTA. Gastos y tributos.",
+            "text": "Serán de cuenta exclusiva de la parte prestataria todos los gastos y tributos que se deriven de la preparación, formalización, subsanación, inscripción y cancelación de esta escritura, incluidos los aranceles notariales y registrales, los honorarios de la gestoría que tramite su inscripción, los de la tasación de la finca y el Impuesto sobre Actos Jurídicos Documentados, así como los de las copias de esta escritura que se expidan para la entidad acreedora."
+          },
+          {
+            "title": "SEXTA. Intereses de demora.",
+            "text": "Las cantidades vencidas y no satisfechas devengarán, desde el día siguiente a su vencimiento y sin necesidad de requerimiento, un interés de demora igual al tipo de interés remuneratorio vigente en cada momento incrementado en tres puntos porcentuales, que se liquidará diariamente sobre el principal vencido y pendiente de pago."
+          },
+          {
+            "title": "SÉPTIMA. Constitución de hipoteca.",
+            "text": "En garantía de la devolución del capital, de los intereses ordinarios de tres años, de los intereses de demora y de las costas, la parte prestataria constituye hipoteca sobre la finca descrita en la parte expositiva, que responderá de 240.000,00 € de principal y de las demás cantidades que resultan de esta escritura."
+          },
+          {
+            "title": "OCTAVA. Tasación a efectos de subasta.",
+            "text": "Las partes tasan la finca hipotecada, a efectos de subasta, en 348.000,00 €, valor que no es inferior al de tasación realizada conforme a la normativa del mercado hipotecario."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "mortgage/deed-closing-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4160917",
+        "folioText": "Folio 4",
+        "sectionTitle": "ESTIPULACIONES FINALES",
+        "clauses": [
+          {
+            "title": "Domicilio.",
+            "text": "Para la práctica de requerimientos y notificaciones, la parte prestataria señala como domicilio el de la finca hipotecada."
+          },
+          {
+            "title": "Copias.",
+            "text": "Se expedirá copia autorizada de esta escritura para la entidad acreedora, con eficacia ejecutiva, y copia simple para la parte prestataria."
+          }
+        ],
+        "iban": "ES64 2100 8875 4016 1628 7556",
+        "notaryStatements": [
+          {
+            "text": "Hago las reservas y advertencias legales, y en particular las de carácter fiscal y las relativas al alcance de la responsabilidad hipotecaria y a las consecuencias del impago."
+          }
+        ],
+        "folioCount": "12",
+        "borrowerName": "Persona Administradora Ficticia R",
+        "notaryName": "Persona Notaria Ficticia A"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "mortgage/notary-invoice-es",
+      "data": {
+        "number": "N-2016/0496",
+        "issuedOnText": "14 de septiembre de 2016",
+        "borrowerName": "Persona Administradora Ficticia R",
+        "borrowerDni": "12476672M",
+        "vatRate": "21 %",
+        "issuer": "Notaría Ficticia de Prueba de Valencia",
+        "issuerLine": "Notario: Persona Notaria Ficticia A · Calle de la Prueba Ficticia, 3, Valencia",
+        "documentText": "Escritura de préstamo hipotecario, protocolo n.º 3.540, de 14-09-2016.",
+        "lines": [
+          {
+            "concept": "Derechos de arancel (número 2: escritura de préstamo)",
+            "amount": "386,78 €"
+          },
+          {
+            "concept": "Folios de matriz y copias",
+            "amount": "109,09 €"
+          }
+        ],
+        "base": "495,87 €",
+        "vat": "104,13 €",
+        "supplied": "0,00 €",
+        "total": "600,00 €",
+        "note": "Honorarios conforme al arancel de los notarios (Real Decreto 1426/1989). Documento sin validez fiscal fuera de este banco de pruebas."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "deedOn": "2016-09-14",
+        "borrowerType": "company",
+        "purpose": "business",
+        "principal": 240000,
+        "termMonths": 180,
+        "rateType": "variable",
+        "initialRate": 2.6,
+        "index": "euribor",
+        "spread": 1.9,
+        "rateRevisionMonths": 12,
+        "defaultMarginPoints": 3
+      },
+      "lists": {
+        "clauses": [
+          {
+            "label": "euribor"
+          },
+          {
+            "label": "prepayment_fee"
+          },
+          {
+            "label": "expenses_clause"
+          },
+          {
+            "label": "default_interest"
+          }
+        ],
+        "notaryInvoices": [
+          {
+            "invoiceOn": "2016-09-14",
+            "concept": "loan",
+            "mixed": false,
+            "base": 495.87,
+            "vat": 104.13,
+            "total": 600
+          }
+        ]
+      }
+    },
+    "input": {
+      "deedOn": "2016-09-14",
+      "borrower": "company",
+      "purpose": "business",
+      "consumer": true,
+      "loanKind": "standard",
+      "rateType": "variable",
+      "fixedUntil": null,
+      "rateRevisionMonths": 12,
+      "loanAmount": 240000,
+      "expensesClause": "present",
+      "invoices": [
+        {
+          "kind": "notary_loan",
+          "total": 600,
+          "paidBy": "me",
+          "paidOn": "2016-09-14",
+          "mixed": false,
+          "supplied": []
+        }
+      ],
+      "alreadyReturned": null,
+      "agreementOnExpenses": false,
+      "prepaymentOption": null,
+      "deedPercents": {},
+      "operations": [],
+      "clauses": [
+        {
+          "label": "default_interest",
+          "present": true,
+          "defaultRate": 5.6,
+          "ordinaryRate": 2.6
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": false,
+        "reason": "company"
+      },
+      "expenses": [],
+      "fees": [],
+      "flags": [],
+      "information": [],
+      "totals": {
+        "statute": 0,
+        "caseLaw": 0,
+        "caseLawInterest": null,
+        "fees": {
+          "counted": 0,
+          "upTo": 0
+        }
+      },
+      "offerPass": false
+    }
+  }
+}

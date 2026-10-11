@@ -1,0 +1,678 @@
+{
+  "id": "deed-2010-floor-three-percent-mixed-notary",
+  "description": "Purchase and loan in one deed of 08-07-2010 with a 3 % floor (STS 241/2013) and late interest of the ordinary rate plus two points. The notary billed both in one amount: no share of a mixed invoice is given. The 2023-03 repayment, at 0,25 % after five years under art. 8 Ley 41/2007, reads as charged within the cap by the deed's regime and as charged in full if the window of RDL 19/2022 reaches the deed.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "mortgage/deed-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4100708",
+        "folioText": "Folio 1",
+        "protocolNumber": "2.317",
+        "deedTitle": "COMPRAVENTA Y PRÉSTAMO CON GARANTÍA HIPOTECARIA",
+        "city": "Zaragoza",
+        "deedOnText": "ocho de julio de dos mil diez",
+        "notaryName": "Persona Notaria Ficticia A",
+        "college": "Aragón",
+        "borrowerBlock": "Persona Prestataria Ficticia B, mayor de edad, con domicilio en Calle de la Prueba Ficticia, 7, Zaragoza y con DNI 78931792Y, en concepto de parte prestataria e hipotecante.",
+        "lenderBlock": "Ficticia Banca Hipotecaria de Prueba, S. A., con CIF A74966238 y domicilio en Calle de la Prueba Ficticia, 1, Zaragoza, representada por persona apoderada con poder bastante, en concepto de parte acreedora.",
+        "statements": [
+          {
+            "text": "I. Que Persona Prestataria Ficticia B es dueña en pleno dominio de la finca siguiente: vivienda situada en Calle de la Prueba Ficticia, 7, Zaragoza, con una superficie construida de ochenta y cinco metros cuadrados, inscrita en el Registro de la Propiedad Ficticio número 2 de Zaragoza, finca registral ficticia número 12.345."
+          },
+          {
+            "text": "II. Que en este mismo acto la parte prestataria compra la finca descrita y destina el importe del préstamo al pago de su precio, para su vivienda habitual."
+          }
+        ],
+        "terms": [
+          {
+            "label": "Capital del préstamo",
+            "value": "180.000,00 €"
+          },
+          {
+            "label": "Plazo",
+            "value": "300 meses"
+          },
+          {
+            "label": "Tipo de interés inicial (6 meses)",
+            "value": "2,15 %"
+          },
+          {
+            "label": "Índice de referencia",
+            "value": "Euríbor a un año"
+          },
+          {
+            "label": "Diferencial",
+            "value": "0,90 puntos"
+          },
+          {
+            "label": "Periodicidad de revisión",
+            "value": "6 meses"
+          },
+          {
+            "label": "Tipo mínimo aplicable",
+            "value": "3,00 %"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4100709",
+        "folioText": "Folio 2",
+        "sectionTitle": "ESTIPULACIONES FINANCIERAS",
+        "clauses": [
+          {
+            "title": "PRIMERA. Capital.",
+            "text": "Ficticia Banca Hipotecaria de Prueba, S. A. concede a la parte prestataria, que acepta, un préstamo de 180.000,00 €, que esta declara recibir en este acto mediante abono en su cuenta. La parte prestataria se obliga a devolverlo en el plazo de 300 meses, contados desde hoy, mediante 300 cuotas mensuales comprensivas de capital e intereses, la primera de ellas el día 8 de agosto de 2010 y la última el día 8 de julio de 2035."
+          },
+          {
+            "title": "SEGUNDA. Interés ordinario variable.",
+            "text": "Durante los primeros 6 meses el capital devengará un tipo de interés nominal anual del 2,15 %. A partir de entonces el tipo de interés será variable y se revisará cada 6 meses, resultando de sumar al índice de referencia un diferencial de 0,90 puntos porcentuales, sin redondeo. Se toma como índice de referencia el Euríbor a un año, definido como la media aritmética simple de los valores diarios del índice del mes, publicado mensualmente por el Banco de España en el Boletín Oficial del Estado, del segundo mes anterior a cada revisión."
+          },
+          {
+            "title": "TERCERA. Límites a la variación del tipo de interés.",
+            "text": "No obstante lo pactado en la estipulación anterior, el tipo de interés aplicable en cada periodo no podrá ser, en ningún caso, inferior al 3,00 % nominal anual ni superior al 12,00 % nominal anual."
+          },
+          {
+            "title": "CUARTA. Reembolso anticipado.",
+            "text": "Conforme a los artículos 8 y 9 de la Ley 41/2007, la parte prestataria satisfará por el reembolso anticipado, total o parcial, una compensación por desistimiento del 0,50 % del capital reembolsado si se produce dentro de los cinco primeros años de vida del préstamo y del 0,25 % en otro caso."
+          },
+          {
+            "title": "QUINTA. Imputación de pagos.",
+            "text": "Las cantidades que perciba la entidad acreedora se imputarán, por este orden, a gastos y comisiones exigibles, intereses de demora, intereses ordinarios vencidos y amortización del capital."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4100710",
+        "folioText": "Folio 3",
+        "sectionTitle": "OTRAS ESTIPULACIONES",
+        "clauses": [
+          {
+            "title": "SEXTA. Gastos y tributos.",
+            "text": "Serán de cuenta exclusiva de la parte prestataria todos los gastos y tributos que se deriven de la preparación, formalización, subsanación, inscripción y cancelación de esta escritura, incluidos los aranceles notariales y registrales, los honorarios de la gestoría que tramite su inscripción, los de la tasación de la finca y el Impuesto sobre Actos Jurídicos Documentados, así como los de las copias de esta escritura que se expidan para la entidad acreedora."
+          },
+          {
+            "title": "SÉPTIMA. Intereses de demora.",
+            "text": "Las cantidades vencidas y no satisfechas devengarán, desde el día siguiente a su vencimiento y sin necesidad de requerimiento, un interés de demora igual al tipo de interés remuneratorio vigente en cada momento incrementado en dos puntos porcentuales, que se liquidará diariamente sobre el principal vencido y pendiente de pago."
+          },
+          {
+            "title": "OCTAVA. Vencimiento anticipado.",
+            "text": "La entidad acreedora podrá dar por vencido anticipadamente el préstamo y exigir judicial o extrajudicialmente la totalidad del capital pendiente, con sus intereses, si la parte prestataria dejase de pagar a su vencimiento tres cuotas mensuales."
+          },
+          {
+            "title": "NOVENA. Constitución de hipoteca.",
+            "text": "En garantía de la devolución del capital, de los intereses ordinarios de tres años, de los intereses de demora y de las costas, la parte prestataria constituye hipoteca sobre la finca descrita en la parte expositiva, que responderá de 180.000,00 € de principal y de las demás cantidades que resultan de esta escritura."
+          },
+          {
+            "title": "DÉCIMA. Tasación a efectos de subasta.",
+            "text": "Las partes tasan la finca hipotecada, a efectos de subasta, en 261.000,00 €, valor que no es inferior al de tasación realizada conforme a la normativa del mercado hipotecario."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "mortgage/deed-closing-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4100711",
+        "folioText": "Folio 4",
+        "sectionTitle": "ESTIPULACIONES FINALES",
+        "clauses": [
+          {
+            "title": "Domicilio.",
+            "text": "Para la práctica de requerimientos y notificaciones, la parte prestataria señala como domicilio el de la finca hipotecada."
+          },
+          {
+            "title": "Copias.",
+            "text": "Se expedirá copia autorizada de esta escritura para la entidad acreedora, con eficacia ejecutiva, y copia simple para la parte prestataria."
+          }
+        ],
+        "iban": "ES15 2100 7995 1782 6179 9588",
+        "notaryStatements": [
+          {
+            "text": "Hago las reservas y advertencias legales, y en particular las de carácter fiscal y las relativas al alcance de la responsabilidad hipotecaria y a las consecuencias del impago."
+          }
+        ],
+        "folioCount": "12",
+        "borrowerName": "Persona Prestataria Ficticia B",
+        "notaryName": "Persona Notaria Ficticia A"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/notary-invoice-es",
+      "data": {
+        "number": "N-2010/1133",
+        "issuedOnText": "8 de julio de 2010",
+        "borrowerName": "Persona Prestataria Ficticia B",
+        "borrowerDni": "78931792Y",
+        "vatRate": "18 %",
+        "issuer": "Notaría Ficticia de Prueba de Zaragoza",
+        "issuerLine": "Notario: Persona Notaria Ficticia A · Calle de la Prueba Ficticia, 3, Zaragoza",
+        "documentText": "Escritura de compraventa y préstamo hipotecario, protocolo n.º 2.317, de 08-07-2010.",
+        "lines": [
+          {
+            "concept": "Derechos de arancel (compraventa y préstamo hipotecario)",
+            "amount": "883,78 €"
+          },
+          {
+            "concept": "Folios de matriz y copias",
+            "amount": "249,27 €"
+          }
+        ],
+        "base": "1.133,05 €",
+        "vat": "203,95 €",
+        "supplied": "0,00 €",
+        "total": "1.337,00 €",
+        "note": "Honorarios conforme al arancel de los notarios (Real Decreto 1426/1989). Documento sin validez fiscal fuera de este banco de pruebas."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/registry-invoice-es",
+      "data": {
+        "number": "R-2010/00989",
+        "issuedOnText": "30 de julio de 2010",
+        "borrowerName": "Persona Prestataria Ficticia B",
+        "borrowerDni": "78931792Y",
+        "vatRate": "18 %",
+        "issuer": "Registro de la Propiedad Ficticio n.º 2 de Zaragoza",
+        "issuerLine": "Calle de la Prueba Ficticia, 9, Zaragoza",
+        "documentText": "Inscripción de la compraventa de 08-07-2010.",
+        "lines": [
+          {
+            "concept": "Inscripción de dominio (número 2 del arancel)",
+            "amount": "257,21 €"
+          },
+          {
+            "concept": "Notas, asientos y certificaciones",
+            "amount": "72,54 €"
+          }
+        ],
+        "base": "329,75 €",
+        "vat": "59,36 €",
+        "total": "389,11 €",
+        "note": "Honorarios conforme al arancel de los registradores (Real Decreto 1427/1989)."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/registry-invoice-es",
+      "data": {
+        "number": "R-2010/01048",
+        "issuedOnText": "30 de julio de 2010",
+        "borrowerName": "Persona Prestataria Ficticia B",
+        "borrowerDni": "78931792Y",
+        "vatRate": "18 %",
+        "issuer": "Registro de la Propiedad Ficticio n.º 2 de Zaragoza",
+        "issuerLine": "Calle de la Prueba Ficticia, 9, Zaragoza",
+        "documentText": "Inscripción de la hipoteca constituida en escritura de 08-07-2010.",
+        "lines": [
+          {
+            "concept": "Inscripción de hipoteca (número 2 del arancel)",
+            "amount": "272,58 €"
+          },
+          {
+            "concept": "Notas, asientos y certificaciones",
+            "amount": "76,88 €"
+          }
+        ],
+        "base": "349,46 €",
+        "vat": "62,90 €",
+        "total": "412,36 €",
+        "note": "Honorarios conforme al arancel de los registradores (Real Decreto 1427/1989)."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/ajd-form-es",
+      "data": {
+        "office": "Oficina liquidadora ficticia de Zaragoza",
+        "number": "600-2010-2210",
+        "taxpayerText": "Persona Prestataria Ficticia B, NIF 78931792Y, Calle de la Prueba Ficticia, 7, Zaragoza",
+        "borrowerName": "Persona Prestataria Ficticia B",
+        "borrowerDni": "78931792Y",
+        "documentText": "Escritura autorizada por Persona Notaria Ficticia A, protocolo n.º 2.317, de 8 de julio de 2010.",
+        "conceptText": "Transmisiones Patrimoniales Onerosas · Compraventa de bien inmueble (vivienda)",
+        "accruedOnText": "08/07/2010",
+        "taxBase": "150.000,00 €",
+        "taxRate": "7,00 %",
+        "quota": "10.500,00 €",
+        "amountPaid": "10.500,00 €",
+        "paidOnText": "20/07/2010"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/valuation-invoice-es",
+      "data": {
+        "number": "T-2010/02703",
+        "issuedOnText": "2 de julio de 2010",
+        "borrowerName": "Persona Prestataria Ficticia B",
+        "borrowerDni": "78931792Y",
+        "vatRate": "18 %",
+        "issuer": "Ficticia Tasaciones de Prueba, S. A.",
+        "issuerLine": "CIF A33352454 · Inscrita en el registro de sociedades de tasación con un número ficticio",
+        "documentText": "Informe de tasación de la vivienda sita en Calle de la Prueba Ficticia, 7, Zaragoza, a petición de Ficticia Banca Hipotecaria de Prueba, S. A..",
+        "concept": "Honorarios del informe de tasación",
+        "base": "245,76 €",
+        "vat": "44,24 €",
+        "total": "290,00 €",
+        "note": "Tasación realizada conforme a la Orden ECO/805/2003."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/prepayment-es",
+      "data": {
+        "lenderName": "Ficticia Banca Hipotecaria de Prueba, S. A.",
+        "lenderLine": "CIF A74966238 · Calle de la Prueba Ficticia, 1, Zaragoza",
+        "issuedOnText": "15 de marzo de 2023",
+        "title": "Liquidación de amortización anticipada parcial",
+        "borrowerName": "Persona Prestataria Ficticia B",
+        "loanRef": "PH-2010-180000",
+        "onText": "15 de marzo de 2023",
+        "rows": [
+          {
+            "label": "Capital pendiente antes de la operación",
+            "value": "118.432,10 €"
+          },
+          {
+            "label": "Capital amortizado",
+            "value": "20.000,00 €"
+          },
+          {
+            "label": "Intereses ordinarios liquidados",
+            "value": "0,00 €"
+          },
+          {
+            "label": "Comisión por amortización anticipada",
+            "value": "50,00 €"
+          }
+        ],
+        "iban": "ES15 2100 7995 1782 6179 9588",
+        "note": "Liquidación practicada conforme a las condiciones de la escritura de préstamo."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "deedOn": "2010-07-08",
+        "borrowerType": "individual",
+        "purpose": "housing",
+        "principal": 180000,
+        "termMonths": 300,
+        "rateType": "variable",
+        "initialRate": 2.15,
+        "index": "euribor",
+        "spread": 0.9,
+        "rateRevisionMonths": 6,
+        "floorPercent": 3,
+        "defaultMarginPoints": 2,
+        "earlyTerminationInstalments": 3
+      },
+      "lists": {
+        "clauses": [
+          {
+            "label": "euribor"
+          },
+          {
+            "label": "floor_clause"
+          },
+          {
+            "label": "prepayment_fee"
+          },
+          {
+            "label": "expenses_clause"
+          },
+          {
+            "label": "default_interest"
+          },
+          {
+            "label": "early_termination"
+          }
+        ],
+        "notaryInvoices": [
+          {
+            "invoiceOn": "2010-07-08",
+            "mixed": true,
+            "base": 1133.05,
+            "vat": 203.95,
+            "total": 1337
+          }
+        ],
+        "registryInvoices": [
+          {
+            "invoiceOn": "2010-07-30",
+            "concept": "purchase",
+            "mixed": false,
+            "base": 329.75,
+            "vat": 59.36,
+            "total": 389.11
+          },
+          {
+            "invoiceOn": "2010-07-30",
+            "concept": "mortgage",
+            "mixed": false,
+            "base": 349.46,
+            "vat": 62.9,
+            "total": 412.36
+          }
+        ],
+        "ajdForms": [
+          {
+            "concept": "purchase",
+            "accruedOn": "2010-07-08",
+            "taxBase": 150000,
+            "amountPaid": 10500
+          }
+        ],
+        "valuationInvoices": [
+          {
+            "invoiceOn": "2010-07-02",
+            "base": 245.76,
+            "vat": 44.24,
+            "total": 290
+          }
+        ],
+        "operations": [
+          {
+            "on": "2023-03-15",
+            "kind": "partial_prepayment",
+            "principal": 20000,
+            "feeCharged": 50
+          }
+        ]
+      }
+    },
+    "input": {
+      "deedOn": "2010-07-08",
+      "borrower": "individual",
+      "purpose": "housing",
+      "consumer": true,
+      "loanKind": "standard",
+      "rateType": "variable",
+      "fixedUntil": null,
+      "rateRevisionMonths": 6,
+      "loanAmount": 180000,
+      "expensesClause": "present",
+      "invoices": [
+        {
+          "kind": "notary_loan",
+          "total": 1337,
+          "paidBy": "me",
+          "paidOn": "2010-07-30",
+          "mixed": true,
+          "supplied": []
+        },
+        {
+          "kind": "registry_mortgage",
+          "total": 412.36,
+          "paidBy": "me",
+          "paidOn": "2010-07-30",
+          "mixed": false,
+          "supplied": []
+        },
+        {
+          "kind": "valuation",
+          "total": 290,
+          "paidBy": "me",
+          "paidOn": "2010-07-30",
+          "mixed": false,
+          "supplied": []
+        }
+      ],
+      "alreadyReturned": null,
+      "agreementOnExpenses": false,
+      "prepaymentOption": "unknown",
+      "deedPercents": {},
+      "operations": [
+        {
+          "on": "2023-03-15",
+          "kind": "partial_prepayment",
+          "principal": 20000,
+          "feeCharged": 50,
+          "hadInsurance": null
+        }
+      ],
+      "clauses": [
+        {
+          "label": "floor_clause",
+          "present": true,
+          "floorPercent": 3
+        },
+        {
+          "label": "default_interest",
+          "present": true,
+          "defaultRate": 4.15,
+          "ordinaryRate": 2.15
+        },
+        {
+          "label": "early_termination",
+          "present": true,
+          "missedInstalments": 3
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "expenses": [
+        {
+          "kind": "notary_loan",
+          "basis": "case_law",
+          "status": "review_it",
+          "share": null,
+          "amount": null,
+          "interest": null,
+          "phrases": ["expenses.mixed"]
+        },
+        {
+          "kind": "registry_mortgage",
+          "basis": "case_law",
+          "status": "lender_bears",
+          "share": 100,
+          "amount": 412.36,
+          "interest": {
+            "amount": 224.68,
+            "until": "2026-10-08",
+            "estimated": false,
+            "missingYear": null
+          },
+          "phrases": ["expenses.case_law", "expenses.case_law_condition", "interest.counted"]
+        },
+        {
+          "kind": "valuation",
+          "basis": "case_law",
+          "status": "lender_bears",
+          "share": 100,
+          "amount": 290,
+          "interest": {
+            "amount": 158.01,
+            "until": "2026-10-08",
+            "estimated": false,
+            "missingYear": null
+          },
+          "phrases": ["expenses.case_law", "expenses.case_law_condition", "interest.counted"]
+        }
+      ],
+      "fees": [
+        {
+          "status": "depends",
+          "question": "earlier_deed",
+          "readings": [
+            {
+              "when": "variable.deed_regime",
+              "kind": "partial_prepayment",
+              "status": "within_cap",
+              "capPercent": 0.25,
+              "cap": 50,
+              "amount": null,
+              "phrases": ["fees.law41_after", "fees.within_cap"]
+            },
+            {
+              "when": "variable.lcci_reach",
+              "kind": "partial_prepayment",
+              "status": "above_cap",
+              "capPercent": 0,
+              "cap": 0,
+              "amount": 50,
+              "phrases": ["fees.window", "fees.above_cap"]
+            }
+          ]
+        }
+      ],
+      "flags": [
+        {
+          "label": "floor_clause",
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "case_law",
+              "rule": "floor_case_law",
+              "phrases": ["flags.floor_case_law"]
+            }
+          ]
+        },
+        {
+          "label": "default_interest",
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "case_law",
+              "rule": "default_interest_case_law",
+              "phrases": ["flags.default_interest_case_law"]
+            }
+          ]
+        },
+        {
+          "label": "early_termination",
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "statute",
+              "rule": "early_termination",
+              "phrases": [
+                "flags.early_termination",
+                "flags.early_termination_earlier_deed",
+                "flags.early_termination_fewer"
+              ]
+            },
+            {
+              "basis": "case_law",
+              "rule": "early_termination_case_law",
+              "phrases": ["flags.early_termination_case_law"]
+            }
+          ]
+        }
+      ],
+      "information": [
+        "limitation_rule",
+        "prior_step_439bis",
+        "loan_assignment",
+        "complaints_service"
+      ],
+      "totals": {
+        "statute": 0,
+        "caseLaw": 702.36,
+        "caseLawInterest": {
+          "amount": 382.69,
+          "until": "2026-10-08",
+          "estimated": false,
+          "missingYear": null
+        },
+        "fees": {
+          "counted": 0,
+          "upTo": 50
+        }
+      },
+      "offerPass": true
+    }
+  }
+}

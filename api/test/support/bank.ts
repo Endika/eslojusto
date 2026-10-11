@@ -3,6 +3,7 @@ import { expect } from 'vitest';
 import type { CreditBankCase, CreditTemplateId } from '../../eval/credit-schema';
 import type { EmploymentBankCase, EmploymentTemplateId } from '../../eval/employment-schema';
 import type { InsuranceBankCase, InsuranceTemplateId } from '../../eval/insurance-schema';
+import type { MortgageBankCase, MortgageTemplateId } from '../../eval/mortgage-schema';
 import {
   PLACEHOLDER,
   SECTION,
@@ -40,12 +41,15 @@ export const employmentSheetsOf = (id: EmploymentTemplateId): number =>
 
 export const CREDIT_BANK: readonly CreditBankCase[] = casesIn('cases/credit/');
 export const INSURANCE_BANK: readonly InsuranceBankCase[] = casesIn('cases/insurance/');
+export const MORTGAGE_BANK: readonly MortgageBankCase[] = casesIn('cases/mortgage/');
 
-// A template of the credit or the insurance bank, named with its folder.
-export const bankTemplate = (id: CreditTemplateId | InsuranceTemplateId): string =>
+type BankTemplateId = CreditTemplateId | InsuranceTemplateId | MortgageTemplateId;
+
+// A template of the credit, the insurance or the mortgage bank, named with its folder.
+export const bankTemplate = (id: BankTemplateId): string =>
   readFileSync(new URL(`templates/${id}.html`, EVAL_DIR), 'utf8');
 
-export const bankSheetsOf = (id: CreditTemplateId | InsuranceTemplateId): number =>
+export const bankSheetsOf = (id: BankTemplateId): number =>
   bankTemplate(id).match(SHEET)?.length ?? 0;
 
 // Cut every comment by position, so a nested or unclosed «<!--» never survives the cut.

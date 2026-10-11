@@ -1,0 +1,465 @@
+{
+  "id": "deed-2023-fixed-registry-mixed-with-receipt",
+  "description": "Purchase and fixed-rate loan of 12-09-2023: the notary billed the loan apart, the lender's by art. 14.1.e LCCI; the registry billed the purchase and the mortgage in one amount, so no share of it is given; the transfer tax of the purchase is not this review's, and a supermarket receipt in the pack is nothing to read.",
+  "eval": true,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "mortgage/deed-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4230912",
+        "folioText": "Folio 1",
+        "protocolNumber": "2.288",
+        "deedTitle": "COMPRAVENTA Y PRÉSTAMO CON GARANTÍA HIPOTECARIA",
+        "city": "Murcia",
+        "deedOnText": "doce de septiembre de dos mil veintitrés",
+        "notaryName": "Persona Notaria Ficticia A",
+        "college": "Murcia",
+        "borrowerBlock": "Persona Hipotecante Ficticia E, mayor de edad, con domicilio en Calle de la Prueba Ficticia, 7, Murcia y con DNI 27231887F, en concepto de parte prestataria e hipotecante.",
+        "lenderBlock": "Ficticia Banca Hipotecaria de Prueba, S. A., con CIF A57967187 y domicilio en Calle de la Prueba Ficticia, 1, Murcia, representada por persona apoderada con poder bastante, en concepto de parte acreedora.",
+        "statements": [
+          {
+            "text": "I. Que Persona Hipotecante Ficticia E es dueña en pleno dominio de la finca siguiente: vivienda situada en Calle de la Prueba Ficticia, 7, Murcia, con una superficie construida de ochenta y cinco metros cuadrados, inscrita en el Registro de la Propiedad Ficticio número 2 de Murcia, finca registral ficticia número 12.345."
+          },
+          {
+            "text": "II. Que en este mismo acto la parte prestataria compra la finca descrita y destina el importe del préstamo al pago de su precio, para su vivienda habitual."
+          },
+          {
+            "text": "III. Que la parte prestataria recibió de la entidad acreedora la Ficha Europea de Información Normalizada y la Ficha de Advertencias Estandarizadas el día 28 de agosto de 2023, y que el día 8 de septiembre de 2023 compareció ante mí para el otorgamiento del acta previa prevista en el artículo 15 de la Ley 5/2019."
+          }
+        ],
+        "terms": [
+          {
+            "label": "Capital del préstamo",
+            "value": "145.000,00 €"
+          },
+          {
+            "label": "Plazo",
+            "value": "300 meses"
+          },
+          {
+            "label": "Tipo de interés fijo",
+            "value": "3,20 %"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4230913",
+        "folioText": "Folio 2",
+        "sectionTitle": "ESTIPULACIONES FINANCIERAS",
+        "clauses": [
+          {
+            "title": "PRIMERA. Capital.",
+            "text": "Ficticia Banca Hipotecaria de Prueba, S. A. concede a la parte prestataria, que acepta, un préstamo de 145.000,00 €, que esta declara recibir en este acto mediante abono en su cuenta. La parte prestataria se obliga a devolverlo en el plazo de 300 meses, contados desde hoy, mediante 300 cuotas mensuales comprensivas de capital e intereses, la primera de ellas el día 12 de octubre de 2023 y la última el día 12 de septiembre de 2048."
+          },
+          {
+            "title": "SEGUNDA. Interés ordinario.",
+            "text": "El capital pendiente devengará, durante toda la vida del préstamo, un tipo de interés fijo del 3,20 % nominal anual, que se liquidará por meses vencidos."
+          },
+          {
+            "title": "TERCERA. Reembolso anticipado.",
+            "text": "Conforme al artículo 23.7 de la Ley 5/2019, el reembolso anticipado, total o parcial, devengará una compensación del 2,00 % del capital reembolsado durante los diez primeros años de vigencia del préstamo y del 1,50 % después."
+          },
+          {
+            "title": "CUARTA. Imputación de pagos.",
+            "text": "Las cantidades que perciba la entidad acreedora se imputarán, por este orden, a gastos y comisiones exigibles, intereses de demora, intereses ordinarios vencidos y amortización del capital."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4230914",
+        "folioText": "Folio 3",
+        "sectionTitle": "OTRAS ESTIPULACIONES",
+        "clauses": [
+          {
+            "title": "QUINTA. Gastos.",
+            "text": "Conforme al artículo 14.1.e) de la Ley 5/2019, de 15 de marzo, la entidad acreedora asumirá los aranceles notariales de esta escritura y de las copias que solicite, los de su inscripción en el Registro de la Propiedad, los gastos de gestoría y el Impuesto sobre Actos Jurídicos Documentados. Serán de cuenta de la parte prestataria los gastos de tasación del inmueble y los de las copias que ella misma solicite."
+          },
+          {
+            "title": "SEXTA. Intereses de demora.",
+            "text": "Las cantidades vencidas y no satisfechas devengarán, desde el día siguiente a su vencimiento y sin necesidad de requerimiento, un interés de demora igual al tipo de interés remuneratorio vigente en cada momento incrementado en tres puntos porcentuales, que se liquidará diariamente sobre el principal vencido y pendiente de pago, conforme al artículo 25 de la Ley 5/2019."
+          },
+          {
+            "title": "SÉPTIMA. Constitución de hipoteca.",
+            "text": "En garantía de la devolución del capital, de los intereses ordinarios de tres años, de los intereses de demora y de las costas, la parte prestataria constituye hipoteca sobre la finca descrita en la parte expositiva, que responderá de 145.000,00 € de principal y de las demás cantidades que resultan de esta escritura."
+          },
+          {
+            "title": "OCTAVA. Tasación a efectos de subasta.",
+            "text": "Las partes tasan la finca hipotecada, a efectos de subasta, en 210.250,00 €, valor que no es inferior al de tasación realizada conforme a la normativa del mercado hipotecario."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "mortgage/deed-closing-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4230915",
+        "folioText": "Folio 4",
+        "sectionTitle": "ESTIPULACIONES FINALES",
+        "clauses": [
+          {
+            "title": "Domicilio.",
+            "text": "Para la práctica de requerimientos y notificaciones, la parte prestataria señala como domicilio el de la finca hipotecada."
+          },
+          {
+            "title": "Copias.",
+            "text": "Se expedirá copia autorizada de esta escritura para la entidad acreedora, con eficacia ejecutiva, y copia simple para la parte prestataria."
+          }
+        ],
+        "iban": "ES05 2100 4090 3430 9180 9019",
+        "notaryStatements": [
+          {
+            "text": "Hago las reservas y advertencias legales, y en particular las de carácter fiscal y las relativas al alcance de la responsabilidad hipotecaria y a las consecuencias del impago."
+          }
+        ],
+        "folioCount": "12",
+        "borrowerName": "Persona Hipotecante Ficticia E",
+        "notaryName": "Persona Notaria Ficticia A"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/notary-invoice-es",
+      "data": {
+        "number": "N-2023/0595",
+        "issuedOnText": "12 de septiembre de 2023",
+        "borrowerName": "Persona Hipotecante Ficticia E",
+        "borrowerDni": "27231887F",
+        "vatRate": "21 %",
+        "issuer": "Notaría Ficticia de Prueba de Murcia",
+        "issuerLine": "Notario: Persona Notaria Ficticia A · Calle de la Prueba Ficticia, 3, Murcia",
+        "documentText": "Escritura de compraventa y préstamo hipotecario, protocolo n.º 2.288, de 12-09-2023 (parte de préstamo).",
+        "lines": [
+          {
+            "concept": "Derechos de arancel (número 2: escritura de préstamo)",
+            "amount": "464,13 €"
+          },
+          {
+            "concept": "Folios de matriz y copias",
+            "amount": "130,91 €"
+          }
+        ],
+        "base": "595,04 €",
+        "vat": "124,96 €",
+        "supplied": "0,00 €",
+        "total": "720,00 €",
+        "note": "Honorarios conforme al arancel de los notarios (Real Decreto 1426/1989). Documento sin validez fiscal fuera de este banco de pruebas."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/notary-invoice-es",
+      "data": {
+        "number": "N-2023/0702",
+        "issuedOnText": "12 de septiembre de 2023",
+        "borrowerName": "Persona Hipotecante Ficticia E",
+        "borrowerDni": "27231887F",
+        "vatRate": "21 %",
+        "issuer": "Notaría Ficticia de Prueba de Murcia",
+        "issuerLine": "Notario: Persona Notaria Ficticia A · Calle de la Prueba Ficticia, 3, Murcia",
+        "documentText": "Escritura de compraventa y préstamo hipotecario, protocolo n.º 2.288, de 12-09-2023 (parte de compraventa).",
+        "lines": [
+          {
+            "concept": "Derechos de arancel (número 2: compraventa)",
+            "amount": "547,93 €"
+          },
+          {
+            "concept": "Folios de matriz y copias",
+            "amount": "154,55 €"
+          }
+        ],
+        "base": "702,48 €",
+        "vat": "147,52 €",
+        "supplied": "0,00 €",
+        "total": "850,00 €",
+        "note": "Honorarios conforme al arancel de los notarios (Real Decreto 1426/1989). Documento sin validez fiscal fuera de este banco de pruebas."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/registry-invoice-es",
+      "data": {
+        "number": "R-2023/02083",
+        "issuedOnText": "2 de octubre de 2023",
+        "borrowerName": "Persona Hipotecante Ficticia E",
+        "borrowerDni": "27231887F",
+        "vatRate": "21 %",
+        "issuer": "Registro de la Propiedad Ficticio n.º 2 de Murcia",
+        "issuerLine": "Calle de la Prueba Ficticia, 9, Murcia",
+        "documentText": "Inscripción de la compraventa y de la hipoteca de la escritura de 12-09-2023.",
+        "lines": [
+          {
+            "concept": "Inscripción de dominio e hipoteca (número 2 del arancel)",
+            "amount": "541,48 €"
+          },
+          {
+            "concept": "Notas, asientos y certificaciones",
+            "amount": "152,73 €"
+          }
+        ],
+        "base": "694,21 €",
+        "vat": "145,78 €",
+        "total": "839,99 €",
+        "note": "Honorarios conforme al arancel de los registradores (Real Decreto 1427/1989)."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/ajd-form-es",
+      "data": {
+        "office": "Oficina liquidadora ficticia de Murcia",
+        "number": "600-2023-8890",
+        "taxpayerText": "Persona Hipotecante Ficticia E, NIF 27231887F, Calle de la Prueba Ficticia, 7, Murcia",
+        "borrowerName": "Persona Hipotecante Ficticia E",
+        "borrowerDni": "27231887F",
+        "documentText": "Escritura autorizada por Persona Notaria Ficticia A, protocolo n.º 2.288, de 12 de septiembre de 2023.",
+        "conceptText": "Transmisiones Patrimoniales Onerosas · Compraventa de bien inmueble (vivienda)",
+        "accruedOnText": "12/09/2023",
+        "taxBase": "180.000,00 €",
+        "taxRate": "8,00 %",
+        "quota": "14.400,00 €",
+        "amountPaid": "14.400,00 €",
+        "paidOnText": "25/09/2023"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "kind": "other",
+      "data": {
+        "variant": "supermarket"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "deedOn": "2023-09-12",
+        "borrowerType": "individual",
+        "purpose": "housing",
+        "principal": 145000,
+        "termMonths": 300,
+        "rateType": "fixed",
+        "initialRate": 3.2,
+        "defaultMarginPoints": 3,
+        "fixedPrepaymentFeePercent": 2,
+        "transparencyActStated": true
+      },
+      "lists": {
+        "clauses": [
+          {
+            "label": "prepayment_fee"
+          },
+          {
+            "label": "expenses_clause"
+          },
+          {
+            "label": "default_interest"
+          }
+        ],
+        "notaryInvoices": [
+          {
+            "invoiceOn": "2023-09-12",
+            "concept": "loan",
+            "mixed": false,
+            "base": 595.04,
+            "vat": 124.96,
+            "total": 720
+          },
+          {
+            "invoiceOn": "2023-09-12",
+            "concept": "purchase",
+            "mixed": false,
+            "base": 702.48,
+            "vat": 147.52,
+            "total": 850
+          }
+        ],
+        "registryInvoices": [
+          {
+            "invoiceOn": "2023-10-02",
+            "mixed": true,
+            "base": 694.21,
+            "vat": 145.78,
+            "total": 839.99
+          }
+        ],
+        "ajdForms": [
+          {
+            "concept": "purchase",
+            "accruedOn": "2023-09-12",
+            "taxBase": 180000,
+            "amountPaid": 14400
+          }
+        ]
+      }
+    },
+    "input": {
+      "deedOn": "2023-09-12",
+      "borrower": "individual",
+      "purpose": "housing",
+      "consumer": true,
+      "loanKind": "standard",
+      "rateType": "fixed",
+      "fixedUntil": null,
+      "rateRevisionMonths": null,
+      "loanAmount": 145000,
+      "expensesClause": "present",
+      "invoices": [
+        {
+          "kind": "notary_loan",
+          "total": 720,
+          "paidBy": "me",
+          "paidOn": "2023-09-12",
+          "mixed": false,
+          "supplied": []
+        },
+        {
+          "kind": "registry_mortgage",
+          "total": 839.99,
+          "paidBy": "me",
+          "paidOn": "2023-09-12",
+          "mixed": true,
+          "supplied": []
+        }
+      ],
+      "alreadyReturned": null,
+      "agreementOnExpenses": false,
+      "prepaymentOption": null,
+      "deedPercents": {},
+      "operations": [],
+      "clauses": [
+        {
+          "label": "default_interest",
+          "present": true,
+          "defaultRate": 6.2,
+          "ordinaryRate": 3.2
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "expenses": [
+        {
+          "kind": "notary_loan",
+          "basis": "statute",
+          "status": "lender_bears",
+          "share": 100,
+          "amount": 720,
+          "interest": null,
+          "phrases": ["expenses.statute"]
+        },
+        {
+          "kind": "registry_mortgage",
+          "basis": "statute",
+          "status": "review_it",
+          "share": null,
+          "amount": null,
+          "interest": null,
+          "phrases": ["expenses.mixed"]
+        }
+      ],
+      "fees": [],
+      "flags": [
+        {
+          "label": "default_interest",
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "statute",
+              "rule": "default_interest_statute",
+              "phrases": ["flags.default_interest_lcci", "flags.default_interest_lcci_matches"]
+            }
+          ]
+        }
+      ],
+      "information": ["fein_timing", "prior_step_439bis", "loan_assignment", "complaints_service"],
+      "totals": {
+        "statute": 720,
+        "caseLaw": 0,
+        "caseLawInterest": null,
+        "fees": {
+          "counted": 0,
+          "upTo": 0
+        }
+      },
+      "offerPass": true
+    }
+  }
+}

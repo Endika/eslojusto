@@ -1,0 +1,139 @@
+<!--
+  Mortgage template «deed-closing-es»: the last sheet of a mortgage loan deed in Spanish: direct debit,
+  the notary's statements, the grant and authorisation, and the signatures.
+  Source: written for this bank, with invented wording and layout, in the usual order of a
+  Spanish notarial deed (appearance, statements, financial and other clauses, grant and
+  authorisation); it copies no notary's or lender's deed.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1b1b1b;
+        font:
+          16px/1.5 'DejaVu Serif',
+          serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 56px 90px 90px 110px;
+        position: relative;
+        overflow: hidden;
+        background: #fbfaf5;
+      }
+      .folio {
+        display: flex;
+        justify-content: space-between;
+        font:
+          12px/1.3 'DejaVu Sans',
+          sans-serif;
+        color: #6a5d3a;
+        border-bottom: 1px solid #b9ab80;
+        padding-bottom: 6px;
+        margin-bottom: 22px;
+      }
+      h1 {
+        font-size: 21px;
+        text-align: center;
+        margin: 0 0 6px;
+        letter-spacing: 0.6px;
+      }
+      h2 {
+        font-size: 16px;
+        text-align: center;
+        margin: 18px 0 10px;
+        letter-spacing: 1.5px;
+      }
+      .sub {
+        text-align: center;
+        font-size: 15px;
+        margin-bottom: 18px;
+      }
+      p {
+        margin: 0 0 10px;
+        text-align: justify;
+      }
+      .clause b {
+        text-transform: uppercase;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8px 0;
+        font-size: 15px;
+      }
+      td,
+      th {
+        border: 1px solid #8a8a8a;
+        padding: 5px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      td.n {
+        text-align: right;
+        white-space: nowrap;
+      }
+      .sign {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 46px;
+        gap: 24px;
+      }
+      .sign div {
+        flex: 1;
+        border-top: 1px solid #333;
+        padding-top: 6px;
+        text-align: center;
+        font-size: 14px;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font:
+          13px 'DejaVu Sans',
+          sans-serif;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <div class="folio"><span>{{paperText}}</span><span>{{folioText}}</span></div>
+      <h2>{{sectionTitle}}</h2>
+      {{#clauses}}
+      <p class="clause"><b>{{title}}</b> {{text}}</p>
+      {{/clauses}}
+      <p class="clause">
+        <b>Domiciliación.</b> Los pagos se cargarán en la cuenta {{iban}}, abierta a nombre de la
+        parte prestataria en la entidad acreedora.
+      </p>
+      <h2>OTORGAMIENTO Y AUTORIZACIÓN</h2>
+      {{#notaryStatements}}
+      <p>{{text}}</p>
+      {{/notaryStatements}}
+      <p>
+        Así lo dicen y otorgan. Leída por mí esta escritura a los comparecientes, la aprueban y
+        firman conmigo. De todo lo consignado en este instrumento público, extendido en
+        {{folioCount}} folios de papel exclusivo para documentos notariales, yo, el Notario, doy fe.
+      </p>
+      <div class="sign">
+        <div>{{borrowerName}}</div>
+        <div>Por la entidad acreedora</div>
+        <div>{{notaryName}}</div>
+      </div>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

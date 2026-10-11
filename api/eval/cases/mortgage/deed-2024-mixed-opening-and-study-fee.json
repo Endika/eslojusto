@@ -1,0 +1,626 @@
+{
+  "id": "deed-2024-mixed-opening-and-study-fee",
+  "description": "Mixed-rate deed of 17-01-2024 that charges an opening fee and a study fee: art. 14.4 LCCI allows no fee for a service the opening fee already covers, and the opening fee follows TJUE C-565/21 and STS 816/2023. A 2 % fee on a repayment a month later is within art. 23.7 if the rate was fixed then, and over the nothing the window of RDL 19/2022 allows if it was variable.",
+  "eval": false,
+  "today": "2026-10-09",
+  "pages": [
+    {
+      "template": "mortgage/deed-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4240117",
+        "folioText": "Folio 1",
+        "protocolNumber": "0.233",
+        "deedTitle": "PRÉSTAMO CON GARANTÍA HIPOTECARIA",
+        "city": "Madrid",
+        "deedOnText": "diecisiete de enero de dos mil veinticuatro",
+        "notaryName": "Persona Notaria Ficticia A",
+        "college": "Madrid",
+        "borrowerBlock": "Persona Prestataria Ficticia M, mayor de edad, con domicilio en Calle de la Prueba Ficticia, 7, Madrid y con DNI 14493897S, en concepto de parte prestataria e hipotecante.",
+        "lenderBlock": "Ficticia Entidad de Crédito Inmobiliario, S. A., con CIF A30587284 y domicilio en Calle de la Prueba Ficticia, 1, Madrid, representada por persona apoderada con poder bastante, en concepto de parte acreedora.",
+        "statements": [
+          {
+            "text": "I. Que Persona Prestataria Ficticia M es dueña en pleno dominio de la finca siguiente: vivienda situada en Calle de la Prueba Ficticia, 7, Madrid, con una superficie construida de ochenta y cinco metros cuadrados, inscrita en el Registro de la Propiedad Ficticio número 2 de Madrid, finca registral ficticia número 12.345."
+          },
+          {
+            "text": "II. Que la parte prestataria destina el importe del préstamo a la adquisición de su vivienda habitual."
+          },
+          {
+            "text": "III. Que la parte prestataria recibió de la entidad acreedora la Ficha Europea de Información Normalizada y la Ficha de Advertencias Estandarizadas el día 2 de enero de 2024, y que el día 12 de enero de 2024 compareció ante mí para el otorgamiento del acta previa prevista en el artículo 15 de la Ley 5/2019."
+          }
+        ],
+        "terms": [
+          {
+            "label": "Capital del préstamo",
+            "value": "180.000,00 €"
+          },
+          {
+            "label": "Plazo",
+            "value": "360 meses"
+          },
+          {
+            "label": "Tipo fijo hasta el 31/01/2027",
+            "value": "2,95 %"
+          },
+          {
+            "label": "Después: Euríbor a un año más",
+            "value": "0,85 puntos"
+          },
+          {
+            "label": "Periodicidad de revisión",
+            "value": "12 meses"
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4240118",
+        "folioText": "Folio 2",
+        "sectionTitle": "ESTIPULACIONES FINANCIERAS",
+        "clauses": [
+          {
+            "title": "PRIMERA. Capital.",
+            "text": "Ficticia Entidad de Crédito Inmobiliario, S. A. concede a la parte prestataria, que acepta, un préstamo de 180.000,00 €, que esta declara recibir en este acto mediante abono en su cuenta. La parte prestataria se obliga a devolverlo en el plazo de 360 meses, contados desde hoy, mediante 360 cuotas mensuales comprensivas de capital e intereses, la primera de ellas el día 17 de febrero de 2024 y la última el día 17 de enero de 2054."
+          },
+          {
+            "title": "SEGUNDA. Interés ordinario mixto.",
+            "text": "Desde hoy y hasta el día 31 de enero de 2027, ambos inclusive, el capital devengará un tipo de interés fijo del 2,95 % nominal anual. Desde el día siguiente y hasta el vencimiento, el tipo de interés será variable, se revisará cada 12 meses y resultará de sumar al índice de referencia un diferencial de 0,85 puntos porcentuales, sin redondeo. Se toma como índice de referencia el Euríbor a un año, definido como la media aritmética simple de los valores diarios del índice del mes, publicado mensualmente por el Banco de España en el Boletín Oficial del Estado. En ningún caso el tipo de interés resultante podrá ser negativo."
+          },
+          {
+            "title": "TERCERA. Comisiones.",
+            "text": "La parte prestataria satisface en este acto una comisión de apertura del 1,00 % sobre el capital del préstamo, que asciende a 1.800,00 €, y que se devenga por una sola vez. Asimismo, satisface una comisión de estudio y tramitación de la operación de 300,00 €. No se devengará ninguna otra comisión por la concesión del préstamo."
+          },
+          {
+            "title": "CUARTA. Reembolso anticipado.",
+            "text": "Durante el periodo de interés fijo, el reembolso anticipado devengará una compensación del 2,00 % del capital reembolsado en los diez primeros años y del 1,50 % después (artículo 23.7 de la Ley 5/2019); durante el periodo de interés variable, conforme al artículo 23.5.b), una compensación del 0,25 % en los tres primeros años de vigencia del préstamo y ninguna después."
+          },
+          {
+            "title": "QUINTA. Imputación de pagos.",
+            "text": "Las cantidades que perciba la entidad acreedora se imputarán, por este orden, a gastos y comisiones exigibles, intereses de demora, intereses ordinarios vencidos y amortización del capital."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-clauses-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4240119",
+        "folioText": "Folio 3",
+        "sectionTitle": "OTRAS ESTIPULACIONES",
+        "clauses": [
+          {
+            "title": "SEXTA. Gastos.",
+            "text": "Conforme al artículo 14.1.e) de la Ley 5/2019, de 15 de marzo, la entidad acreedora asumirá los aranceles notariales de esta escritura y de las copias que solicite, los de su inscripción en el Registro de la Propiedad, los gastos de gestoría y el Impuesto sobre Actos Jurídicos Documentados. Serán de cuenta de la parte prestataria los gastos de tasación del inmueble y los de las copias que ella misma solicite."
+          },
+          {
+            "title": "SÉPTIMA. Intereses de demora.",
+            "text": "Las cantidades vencidas y no satisfechas devengarán, desde el día siguiente a su vencimiento y sin necesidad de requerimiento, un interés de demora igual al tipo de interés remuneratorio vigente en cada momento incrementado en tres puntos porcentuales, que se liquidará diariamente sobre el principal vencido y pendiente de pago, conforme al artículo 25 de la Ley 5/2019."
+          },
+          {
+            "title": "OCTAVA. Constitución de hipoteca.",
+            "text": "En garantía de la devolución del capital, de los intereses ordinarios de tres años, de los intereses de demora y de las costas, la parte prestataria constituye hipoteca sobre la finca descrita en la parte expositiva, que responderá de 180.000,00 € de principal y de las demás cantidades que resultan de esta escritura."
+          },
+          {
+            "title": "NOVENA. Tasación a efectos de subasta.",
+            "text": "Las partes tasan la finca hipotecada, a efectos de subasta, en 261.000,00 €, valor que no es inferior al de tasación realizada conforme a la normativa del mercado hipotecario."
+          }
+        ]
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/deed-closing-es",
+      "data": {
+        "paperText": "Papel notarial ficticio · Serie PR 4240120",
+        "folioText": "Folio 4",
+        "sectionTitle": "ESTIPULACIONES FINALES",
+        "clauses": [
+          {
+            "title": "Domicilio.",
+            "text": "Para la práctica de requerimientos y notificaciones, la parte prestataria señala como domicilio el de la finca hipotecada."
+          },
+          {
+            "title": "Copias.",
+            "text": "Se expedirá copia autorizada de esta escritura para la entidad acreedora, con eficacia ejecutiva, y copia simple para la parte prestataria."
+          }
+        ],
+        "iban": "ES37 2100 1100 8018 1801 0069",
+        "notaryStatements": [
+          {
+            "text": "Hago las reservas y advertencias legales, y en particular las de carácter fiscal y las relativas al alcance de la responsabilidad hipotecaria y a las consecuencias del impago."
+          }
+        ],
+        "folioCount": "12",
+        "borrowerName": "Persona Prestataria Ficticia M",
+        "notaryName": "Persona Notaria Ficticia A"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/notary-invoice-es",
+      "data": {
+        "number": "N-2024/0607",
+        "issuedOnText": "17 de enero de 2024",
+        "borrowerName": "Persona Prestataria Ficticia M",
+        "borrowerDni": "14493897S",
+        "vatRate": "21 %",
+        "issuer": "Notaría Ficticia de Prueba de Madrid",
+        "issuerLine": "Notario: Persona Notaria Ficticia A · Calle de la Prueba Ficticia, 3, Madrid",
+        "documentText": "Escritura de préstamo hipotecario, protocolo n.º 0.233, de 17-01-2024.",
+        "lines": [
+          {
+            "concept": "Derechos de arancel (número 2: escritura de préstamo)",
+            "amount": "473,80 €"
+          },
+          {
+            "concept": "Folios de matriz y copias",
+            "amount": "133,64 €"
+          }
+        ],
+        "base": "607,44 €",
+        "vat": "127,56 €",
+        "supplied": "0,00 €",
+        "total": "735,00 €",
+        "note": "Honorarios conforme al arancel de los notarios (Real Decreto 1426/1989). Documento sin validez fiscal fuera de este banco de pruebas."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/registry-invoice-es",
+      "data": {
+        "number": "R-2024/01128",
+        "issuedOnText": "1 de febrero de 2024",
+        "borrowerName": "Persona Prestataria Ficticia M",
+        "borrowerDni": "14493897S",
+        "vatRate": "21 %",
+        "issuer": "Registro de la Propiedad Ficticio n.º 2 de Madrid",
+        "issuerLine": "Calle de la Prueba Ficticia, 9, Madrid",
+        "documentText": "Inscripción de la hipoteca constituida en escritura de 17-01-2024.",
+        "lines": [
+          {
+            "concept": "Inscripción de hipoteca (número 2 del arancel)",
+            "amount": "293,30 €"
+          },
+          {
+            "concept": "Notas, asientos y certificaciones",
+            "amount": "82,73 €"
+          }
+        ],
+        "base": "376,03 €",
+        "vat": "78,97 €",
+        "total": "455,00 €",
+        "note": "Honorarios conforme al arancel de los registradores (Real Decreto 1427/1989)."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/agency-invoice-es",
+      "data": {
+        "number": "G-2024/02256",
+        "issuedOnText": "5 de febrero de 2024",
+        "borrowerName": "Persona Prestataria Ficticia M",
+        "borrowerDni": "14493897S",
+        "vatRate": "21 %",
+        "issuer": "Gestoría Ficticia de Prueba, S. L.",
+        "issuerLine": "CIF B09780399 · Calle de la Prueba Ficticia, 5, Madrid",
+        "documentText": "Tramitación de la escritura de préstamo hipotecario de 17-01-2024.",
+        "lines": [
+          {
+            "concept": "Tramitación de la escritura, liquidación del impuesto e inscripción registral",
+            "amount": "322,31 €"
+          }
+        ],
+        "fee": "322,31 €",
+        "vat": "67,69 €",
+        "supplied": [],
+        "suppliedNote": "Sin suplidos",
+        "suppliedTotal": "0,00 €",
+        "total": "390,00 €"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/valuation-invoice-es",
+      "data": {
+        "number": "T-2023/03182",
+        "issuedOnText": "20 de diciembre de 2023",
+        "borrowerName": "Persona Prestataria Ficticia M",
+        "borrowerDni": "14493897S",
+        "vatRate": "21 %",
+        "issuer": "Ficticia Tasaciones de Prueba, S. A.",
+        "issuerLine": "CIF A88973501 · Inscrita en el registro de sociedades de tasación con un número ficticio",
+        "documentText": "Informe de tasación de la vivienda sita en Calle de la Prueba Ficticia, 7, Madrid, a petición de Ficticia Entidad de Crédito Inmobiliario, S. A..",
+        "concept": "Honorarios del informe de tasación",
+        "base": "289,26 €",
+        "vat": "60,74 €",
+        "total": "350,00 €",
+        "note": "Tasación realizada conforme a la Orden ECO/805/2003."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "mortgage/prepayment-es",
+      "data": {
+        "lenderName": "Ficticia Entidad de Crédito Inmobiliario, S. A.",
+        "lenderLine": "CIF A30587284 · Calle de la Prueba Ficticia, 1, Madrid",
+        "issuedOnText": "26 de febrero de 2024",
+        "title": "Liquidación de amortización anticipada parcial",
+        "borrowerName": "Persona Prestataria Ficticia M",
+        "loanRef": "PH-2024-180000",
+        "onText": "26 de febrero de 2024",
+        "rows": [
+          {
+            "label": "Capital pendiente antes de la operación",
+            "value": "179.712,40 €"
+          },
+          {
+            "label": "Capital amortizado",
+            "value": "10.000,00 €"
+          },
+          {
+            "label": "Intereses ordinarios liquidados",
+            "value": "0,00 €"
+          },
+          {
+            "label": "Comisión por amortización anticipada",
+            "value": "200,00 €"
+          }
+        ],
+        "iban": "ES37 2100 1100 8018 1801 0069",
+        "note": "Liquidación practicada conforme a las condiciones de la escritura de préstamo."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "deedOn": "2024-01-17",
+        "borrowerType": "individual",
+        "purpose": "housing",
+        "principal": 180000,
+        "termMonths": 360,
+        "rateType": "mixed",
+        "fixedUntil": "2027-01-31",
+        "initialRate": 2.95,
+        "index": "euribor",
+        "spread": 0.85,
+        "rateRevisionMonths": 12,
+        "floorPercent": 0,
+        "defaultMarginPoints": 3,
+        "openingFee": 1800,
+        "openingFeePercent": 1,
+        "otherSetUpFee": true,
+        "prepaymentOption": "b_025_3y",
+        "variablePrepaymentFeePercent": 0.25,
+        "fixedPrepaymentFeePercent": 2,
+        "transparencyActStated": true
+      },
+      "lists": {
+        "clauses": [
+          {
+            "label": "euribor"
+          },
+          {
+            "label": "opening_fee"
+          },
+          {
+            "label": "prepayment_fee"
+          },
+          {
+            "label": "expenses_clause"
+          },
+          {
+            "label": "default_interest"
+          }
+        ],
+        "notaryInvoices": [
+          {
+            "invoiceOn": "2024-01-17",
+            "concept": "loan",
+            "mixed": false,
+            "base": 607.44,
+            "vat": 127.56,
+            "total": 735
+          }
+        ],
+        "registryInvoices": [
+          {
+            "invoiceOn": "2024-02-01",
+            "concept": "mortgage",
+            "mixed": false,
+            "base": 376.03,
+            "vat": 78.97,
+            "total": 455
+          }
+        ],
+        "agencyInvoices": [
+          {
+            "invoiceOn": "2024-02-05",
+            "fee": 322.31,
+            "vat": 67.69,
+            "total": 390
+          }
+        ],
+        "valuationInvoices": [
+          {
+            "invoiceOn": "2023-12-20",
+            "base": 289.26,
+            "vat": 60.74,
+            "total": 350
+          }
+        ],
+        "operations": [
+          {
+            "on": "2024-02-26",
+            "kind": "partial_prepayment",
+            "principal": 10000,
+            "feeCharged": 200
+          }
+        ]
+      }
+    },
+    "input": {
+      "deedOn": "2024-01-17",
+      "borrower": "individual",
+      "purpose": "housing",
+      "consumer": true,
+      "loanKind": "standard",
+      "rateType": "mixed",
+      "fixedUntil": null,
+      "rateRevisionMonths": 12,
+      "loanAmount": 180000,
+      "expensesClause": "present",
+      "invoices": [
+        {
+          "kind": "notary_loan",
+          "total": 735,
+          "paidBy": "me",
+          "paidOn": "2024-01-17",
+          "mixed": false,
+          "supplied": []
+        },
+        {
+          "kind": "registry_mortgage",
+          "total": 455,
+          "paidBy": "me",
+          "paidOn": "2024-01-17",
+          "mixed": false,
+          "supplied": []
+        },
+        {
+          "kind": "agency",
+          "total": 390,
+          "paidBy": "me",
+          "paidOn": "2024-01-17",
+          "mixed": false,
+          "supplied": []
+        },
+        {
+          "kind": "valuation",
+          "total": 350,
+          "paidBy": "me",
+          "paidOn": "2024-01-17",
+          "mixed": false,
+          "supplied": []
+        }
+      ],
+      "alreadyReturned": null,
+      "agreementOnExpenses": false,
+      "prepaymentOption": "b_025_3y",
+      "deedPercents": {},
+      "operations": [
+        {
+          "on": "2024-02-26",
+          "kind": "partial_prepayment",
+          "principal": 10000,
+          "feeCharged": 200,
+          "hadInsurance": null
+        }
+      ],
+      "clauses": [
+        {
+          "label": "floor_clause",
+          "present": true,
+          "floorPercent": 0
+        },
+        {
+          "label": "default_interest",
+          "present": true,
+          "defaultRate": 5.95,
+          "ordinaryRate": 2.95
+        },
+        {
+          "label": "opening_fee",
+          "present": true,
+          "feeAmount": 1800,
+          "duplicateFee": true
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "expenses": [
+        {
+          "kind": "notary_loan",
+          "basis": "statute",
+          "status": "lender_bears",
+          "share": 100,
+          "amount": 735,
+          "interest": null,
+          "phrases": ["expenses.statute"]
+        },
+        {
+          "kind": "registry_mortgage",
+          "basis": "statute",
+          "status": "lender_bears",
+          "share": 100,
+          "amount": 455,
+          "interest": null,
+          "phrases": ["expenses.statute"]
+        },
+        {
+          "kind": "agency",
+          "basis": "statute",
+          "status": "lender_bears",
+          "share": 100,
+          "amount": 390,
+          "interest": null,
+          "phrases": ["expenses.statute"]
+        },
+        {
+          "kind": "valuation",
+          "basis": "statute",
+          "status": "borrower_bears",
+          "share": 0,
+          "amount": null,
+          "interest": null,
+          "phrases": ["expenses.valuation_borrower"]
+        }
+      ],
+      "fees": [
+        {
+          "status": "depends",
+          "question": "rate_type",
+          "readings": [
+            {
+              "when": "fixed",
+              "kind": "partial_prepayment",
+              "status": "within_cap",
+              "capPercent": 2,
+              "cap": 200,
+              "amount": null,
+              "phrases": ["fees.lcci_fixed_first", "fees.within_cap", "fees.financial_loss"]
+            },
+            {
+              "when": "variable.option_b",
+              "kind": "partial_prepayment",
+              "status": "above_cap",
+              "capPercent": 0,
+              "cap": 0,
+              "amount": 200,
+              "phrases": ["fees.window", "fees.above_cap"]
+            }
+          ]
+        }
+      ],
+      "flags": [
+        {
+          "label": "floor_clause",
+          "state": "not_in_deed",
+          "phrases": ["flags.floor_zero"],
+          "parts": []
+        },
+        {
+          "label": "default_interest",
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "statute",
+              "rule": "default_interest_statute",
+              "phrases": ["flags.default_interest_lcci", "flags.default_interest_lcci_matches"]
+            }
+          ]
+        },
+        {
+          "label": "opening_fee",
+          "state": "in_deed",
+          "phrases": ["flags.opening_fee_amount", "flags.opening_fee_share"],
+          "parts": [
+            {
+              "basis": "statute",
+              "rule": "opening_fee_duplicate",
+              "phrases": ["flags.opening_fee_duplicate"]
+            },
+            {
+              "basis": "case_law",
+              "rule": "opening_fee_case_law",
+              "phrases": ["flags.opening_fee_case_law"]
+            }
+          ]
+        }
+      ],
+      "information": ["fein_timing", "prior_step_439bis", "loan_assignment", "complaints_service"],
+      "totals": {
+        "statute": 1580,
+        "caseLaw": 0,
+        "caseLawInterest": null,
+        "fees": {
+          "counted": 0,
+          "upTo": 200
+        }
+      },
+      "offerPass": true
+    }
+  }
+}
