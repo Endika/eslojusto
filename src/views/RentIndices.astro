@@ -108,6 +108,8 @@ const structuredData = [
       name: 'Instituto Nacional de Estadística (INE)',
       url: 'https://www.ine.es/',
     },
+    // The INE's legal notice licenses its statistics under CC BY 4.0.
+    license: 'https://creativecommons.org/licenses/by/4.0/',
     publisher: { '@type': 'Organization', name: 'eslojusto.es', url: home.href },
     isBasedOn: [SERIES.irav, SERIES.ipc, SERIES.igc].map(inePage),
     variableMeasured: [

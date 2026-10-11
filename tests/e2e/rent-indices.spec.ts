@@ -51,6 +51,7 @@ test('the rent indices page declares its data, its path and its questions', asyn
   const json = (await page.locator('script[type="application/ld+json"]').textContent()) ?? '';
   const graph = (JSON.parse(json) as { '@graph': Record<string, unknown>[] })['@graph'];
   expect(graph.map((n) => n['@type'])).toEqual(['Dataset', 'BreadcrumbList', 'FAQPage']);
+  expect(graph[0]?.['license']).toBe('https://creativecommons.org/licenses/by/4.0/');
   const faq = graph[2] as { mainEntity: { name: string }[] };
   await expect(page.locator('.faq-item summary')).toHaveText(faq.mainEntity.map((q) => q.name));
 });
