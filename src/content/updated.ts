@@ -48,7 +48,7 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   ...(employmentBuild ? { '/contrato/': '2026-10-09' } : {}),
   ...(erteBuild ? { '/paro/erte/': '2026-10-09' } : {}),
   ...(householdBuild ? { '/empleada-de-hogar/': '2026-10-09' } : {}),
-  ...(insuranceBuild ? { '/seguros/': '2026-10-09' } : {}),
-  ...(creditBuild ? { '/financiacion/': '2026-10-09' } : {}),
+  ...(insuranceBuild ? { '/seguros/': '2026-10-11' } : {}),
+  ...(creditBuild ? { '/financiacion/': '2026-10-11' } : {}),
   ...(mortgageBuild ? { '/hipoteca/': '2026-10-11' } : {}),
 };
