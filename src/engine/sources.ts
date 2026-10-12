@@ -43,19 +43,19 @@ export const SOURCES: Record<
     id: 'et49',
     citation: 'Estatuto de los Trabajadores, art. 49',
     url: `${ET}#a49`,
-    inForceSince: '2015-11-13',
+    inForceSince: '2025-05-01',
   },
   et49_1c: {
     id: 'et49_1c',
     citation: 'Estatuto de los Trabajadores, art. 49.1.c',
     url: `${ET}#a49`,
-    inForceSince: '2015-11-13',
+    inForceSince: '2025-05-01',
   },
   et49_1d: {
     id: 'et49_1d',
     citation: 'Estatuto de los Trabajadores, art. 49.1.d',
     url: `${ET}#a49`,
-    inForceSince: '2015-11-13',
+    inForceSince: '2025-05-01',
   },
   et55: {
     id: 'et55',
@@ -67,7 +67,7 @@ export const SOURCES: Record<
     id: 'et53',
     citation: 'Estatuto de los Trabajadores, art. 53',
     url: `${ET}#a53`,
-    inForceSince: '2015-11-13',
+    inForceSince: '2025-04-03',
   },
   et56: {
     id: 'et56',
@@ -115,7 +115,7 @@ export const SOURCES: Record<
     id: 'et51',
     citation: 'Estatuto de los Trabajadores, art. 51',
     url: `${ET}#a51`,
-    inForceSince: '2015-11-13',
+    inForceSince: '2023-03-02',
   },
   // Letter b in the wording of LO 1/2025.
   et55_5: {

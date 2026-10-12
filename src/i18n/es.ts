@@ -437,7 +437,7 @@ export const es = {
     'Son 20 días de salario por año trabajado, con un tope de 12 mensualidades (360 días), y 15 días de preaviso (art. 53 ET). Si la empresa no da el preaviso, los días que falten se pagan.',
   'faq.collective_dismissal': '¿Cuánto es la indemnización en un despido colectivo (ERE)?',
   'faq.collective_dismissal_answer':
-    'Como mínimo, la de un despido objetivo: 20 días de salario por año trabajado, con un tope de 12 mensualidades, y 15 días de preaviso (arts. 51.4 y 53.1 ET). El acuerdo del periodo de consultas puede mejorar ese mínimo, y suele hacerlo (art. 51.2 ET). La revisión no conoce tu acuerdo, así que da el mínimo legal «o más, según el acuerdo del ERE».',
+    'Como mínimo, la de un despido objetivo: 20 días de salario por año trabajado, con un tope de 12 mensualidades, y 15 días de preaviso (arts. 51.4 y 53.1 ET). El acuerdo del periodo de consultas puede mejorar ese mínimo (art. 51.2 ET). La revisión no conoce tu acuerdo, así que da el mínimo legal «o más, según el acuerdo del ERE».',
   'faq.daily_salary': '¿Cómo se calcula el salario diario?',
   'faq.daily_salary_answer':
     'Es tu salario bruto anual, con las pagas extra, entre 365. Así lo calcula la guía del CGPJ para las indemnizaciones.',
@@ -446,7 +446,7 @@ export const es = {
     'La indemnización debería calcularse con el salario completo de antes del ERTE, no con el de tus últimas nóminas. Con jornada reducida, con el de antes de la reducción (STS 678/2018, de 27 de junio); con el contrato suspendido, con lo cobrado en los meses trabajados (STS 638/2022, de 7 de julio). La revisión te pide ese salario, y sin él no da una cifra.',
   'faq.fixed_term': '¿Hay indemnización al acabar un contrato temporal?',
   'faq.fixed_term_answer':
-    'Sí, 12 días por año, en proporción a los días trabajados (art. 49.1.c ET). Para contratos que empezaron entre 2011 y 2014 son de 8 a 11 días (disposición transitoria 8.ª ET). Los contratos de sustitución y los formativos no tienen indemnización, ni los firmados antes del 4 de marzo de 2001 (disposición transitoria 8.ª.2 ET).',
+    'Sí, 12 días por año, en proporción a los días trabajados (art. 49.1.c ET). Si empezó en 2011 o antes son 8 días; en 2012, 9; en 2013, 10; y en 2014, 11 (disposición transitoria 8.ª ET). Los contratos de sustitución y los formativos no tienen indemnización, ni los firmados antes del 4 de marzo de 2001 (disposición transitoria 8.ª.2 ET).',
   'faq.unknown_cause': '¿Y si no sé cómo terminó mi contrato?',
   'faq.unknown_cause_answer':
     'Marca «No lo sé». Se revisan las partidas que no dependen de la causa: el salario del mes de la baja, las vacaciones y las pagas extra. La indemnización depende de la causa y sin ella no se calcula. La causa está en la carta de despido y en el certificado de empresa, en la casilla «causa de la situación legal de desempleo».',
@@ -757,7 +757,7 @@ export const es = {
   'client.no_figure': 'Sin cifra',
   'client.agreement_may_improve': 'Tu convenio puede mejorar esta cifra (más días, otro devengo).',
   'client.or_more.ere_agreement':
-    'O más, según el acuerdo del ERE: el acuerdo del periodo de consultas puede mejorar este mínimo, y suele hacerlo (art. 51.2 ET). Esta revisión no lo conoce.',
+    'O más, según el acuerdo del ERE: el acuerdo del periodo de consultas puede mejorar este mínimo (art. 51.2 ET). Esta revisión no lo conoce.',
   'client.source.in_force': 'en vigor desde {fecha}',
   'client.unfair_reference':
     'Si un juzgado declarase improcedente el despido, la indemnización sería de {importe}.',
@@ -921,9 +921,9 @@ export const es = {
   'client.warning.null_dismissal.sick_leave':
     'Despedir a alguien de baja médica podría ser nulo si el motivo es la enfermedad: la Ley 15/2022 prohíbe discriminar por enfermedad o condición de salud y hace nulos esos actos (arts. 2.1 y 26). Los tribunales todavía no lo aplican de forma uniforme.',
   'client.warning.null_dismissal.effects':
-    'Si un juzgado lo declarase nulo, la empresa tendría que readmitirte y pagarte los salarios que dejaste de cobrar (arts. 55.6 y 53.4 ET). Esta revisión no calcula cifras para ese caso.',
+    'Si un juzgado lo declarase nulo, la empresa tendría que readmitirte y pagarte los salarios que dejaste de cobrar (arts. 55.6 y 53.5 ET). Esta revisión no calcula cifras para ese caso.',
   'client.warning.null_dismissal.deadline':
-    'Para impugnar el despido hay 20 días hábiles desde la fecha de baja (art. 59.3 ET); presentar la papeleta de conciliación interrumpe el plazo. Consulta a un abogado laboralista o a un sindicato antes de que pasen.',
+    'Para impugnar el despido hay 20 días hábiles desde la fecha de baja (art. 59.3 ET); presentar la papeleta de conciliación interrumpe el plazo. Un despacho laboralista, una asesoría laboral o un sindicato pueden decirte cómo se aplica a tu caso.',
   'client.warning.erte_unknown.title': 'Si estabas en un ERTE',
   'client.warning.erte_unknown':
     'Con un ERTE, la indemnización debería calcularse con el salario completo de antes del ERTE: con jornada reducida, el de antes de la reducción (STS 678/2018); con el contrato suspendido, lo cobrado en los meses trabajados (STS 638/2022). Si alguna de tus últimas nóminas es de un ERTE, la indemnización de esta revisión puede quedarse corta.',
