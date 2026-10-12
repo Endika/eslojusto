@@ -1,5 +1,6 @@
 import type { Range } from '../engine/money';
 import {
+  belowFullTimeMinimum,
   RED_MONTHLY_CAP,
   type ErteEstimate,
   type ErteInput,
@@ -73,7 +74,7 @@ export const ERTE_QUESTIONS = {
     label: 'Base reguladora al mes',
     hint: 'Bruto en euros al mes: la media de lo cotizado por desempleo en los últimos 180 días, sin horas extra.',
     hintRed:
-      'Bruto en euros al mes: la media de las bases de cotización por accidentes de trabajo y enfermedades profesionales en esa empresa en los 180 días anteriores a la medida, o en los que lleves si son menos.',
+      'Bruto en euros al mes: la media de las bases de cotización por accidentes de trabajo y enfermedades profesionales en esa empresa en los 180 días anteriores a la medida, o en los que lleves si son menos, sin horas extra.',
   },
   children: {
     question: '¿Cuántos hijos o hijas tienes a tu cargo?',
@@ -96,6 +97,9 @@ function amount(r: Range): string {
   const hi = Math.round(r.max);
   return lo === hi ? `unos ${wholeEuros(lo)}` : `entre ${wholeEuros(lo)} y ${wholeEuros(hi)}`;
 }
+
+// A cap reads to the euro when it is whole, never rounded past the law.
+const capText = (n: number): string => (Number.isInteger(n) ? wholeEuros(n) : euros(n));
 
 const percentText = (n: number): string => `${Number(n.toFixed(2)).toLocaleString('es-ES')}\u00a0%`;
 
@@ -121,20 +125,27 @@ function amountBlock(input: ErteInput, e: ErteEstimate): ErteBlock {
     input.regime === 'etop'
       ? `Es el 70\u00a0% de tu base los primeros 180 días de prestación y el 60\u00a0% desde el día 181 (art. 270.2 LGSS).`
       : `Es el 70\u00a0% de tu base durante todo el ERTE (${input.regime === 'red' ? 'DA 41.ª.4' : 'DA 46.ª'} LGSS).`;
-  const figure =
-    e.secondStretch === null
-      ? `${capitalise(amount(e.firstStretch))} al mes.`
-      : `${capitalise(amount(e.firstStretch))} al mes los primeros 180 días y ${amount(e.secondStretch)} desde el día 181.`;
+  const first = amount(e.firstStretch);
+  const second = e.secondStretch === null ? null : amount(e.secondStretch);
+  const figure = belowFullTimeMinimum(input)
+    ? `Con una base por debajo de la mínima de una jornada completa (${euros(BENEFIT_2026.minBaseAtep)}), la jornada es parcial, y entonces el mínimo y el máximo bajan en proporción a tus horas (art. 270.3 LGSS). Sin tus horas, esta estimación no da una cifra.`
+    : second === null
+      ? `${capitalise(first)} al mes.`
+      : second === first
+        ? `${capitalise(first)} al mes, antes y después del día 181.`
+        : `${capitalise(first)} al mes los primeros 180 días y ${second} desde el día 181.`;
   const limit =
     input.regime === 'red'
-      ? `Con un tope de ${euros(RED_MONTHLY_CAP)} al mes, el 225\u00a0% del IPREM más un sexto, y sin mínimo propio (DA 41.ª.4 LGSS).`
-      : `Con el mínimo y el máximo según tus hijos o hijas a cargo (art. 270.3 LGSS): ${capCopy(input.children)} al mes con jornada completa.`;
+      ? `Con un tope de ${capText(RED_MONTHLY_CAP)} al mes, el 225\u00a0% del IPREM más un sexto, y sin mínimo propio (DA 41.ª.4 LGSS).`
+      : belowFullTimeMinimum(input)
+        ? ''
+        : `Con el mínimo y el máximo según tus hijos o hijas a cargo (art. 270.3 LGSS): ${capCopy(input.children)} al mes con jornada completa.`;
   const proportion = reduction
     ? ` Como el ERTE reduce tu jornada un ${percentText(reduction.percent)}, la prestación es proporcional a esa reducción (art. 270.5 LGSS); solo cuenta la reducción temporal del art. 47 ET.`
     : '';
   return {
     title: 'Cuánto cobrarías',
-    text: `${figure} ${rate} ${limit}${proportion}`,
+    text: [figure, rate, limit].filter(Boolean).join(' ') + proportion,
     source:
       input.regime === 'etop' ? 'Arts. 270.2, 270.3 y 270.5 LGSS' : REGIME_SOURCE[input.regime],
   };
@@ -142,7 +153,13 @@ function amountBlock(input: ErteInput, e: ErteEstimate): ErteBlock {
 
 const capitalise = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
-function unemploymentBlock(e: ErteEstimate): ErteBlock {
+function unemploymentBlock(regime: ErteRegime, e: ErteEstimate): ErteBlock {
+  if (regime === 'red')
+    return {
+      title: 'Qué prestación es',
+      text: 'En el mecanismo RED se cobra su propia prestación, tanto si suspende el contrato como si reduce la jornada, y no la prestación por desempleo general.',
+      source: 'DA 41.ª.1 LGSS',
+    };
   return e.unemployment === 'total'
     ? {
         title: 'Qué tipo de desempleo es',
@@ -151,8 +168,8 @@ function unemploymentBlock(e: ErteEstimate): ErteBlock {
       }
     : {
         title: 'Qué tipo de desempleo es',
-        text: 'Un ERTE que reduce tu jornada es una situación legal de desempleo parcial.',
-        source: 'Arts. 262.3 y 267.1.c LGSS',
+        text: 'Un ERTE que reduce tu jornada es una situación legal de desempleo parcial. Si la reducción se aplica en días completos, esos días son desempleo total.',
+        source: 'Arts. 262.2, 262.3 y 267.1.c LGSS',
       };
 }
 
@@ -164,7 +181,7 @@ function consumptionBlock(input: ErteInput, e: ErteEstimate): ErteBlock {
       text:
         input.regime === 'red'
           ? 'No. El tiempo que cobres en el mecanismo RED no se considera consumido.'
-          : 'No. Cobrar el paro por un ERTE de fuerza mayor no gasta las cotizaciones que ya tenías.',
+          : 'Cobrarlo no gasta las cotizaciones que ya tenías: «el acceso a esta prestación no implicará el consumo de las cotizaciones previamente efectuadas a ningún efecto».',
       source: input.regime === 'red' ? 'DA 41.ª.8 LGSS' : 'DA 46.ª.b LGSS',
     };
   if (input.measure.kind === 'reduction')
@@ -200,15 +217,15 @@ export function ertePositiveView(input: ErteInput, e: ErteEstimate): ErteView {
     lead: LEAD,
     blocks: [
       amountBlock(input, e),
-      unemploymentBlock(e),
+      unemploymentBlock(input.regime, e),
       consumptionBlock(input, e),
       contributionBlock(input.regime, e),
       ...(e.jobSeekerRegistration
         ? [
             {
               title: 'Cómo pedirlo',
-              text: 'Para cobrarlo en el mecanismo RED tienes que estar inscrito como demandante de empleo.',
-              source: 'DA 41.ª.2.c LGSS',
+              text: 'La solicitud la presenta la empresa en tu nombre, en el plazo de un mes desde que la autoridad laboral autoriza la medida. Para cobrarlo tienes que estar inscrito como demandante de empleo.',
+              source: 'DA 41.ª.2 LGSS',
             },
           ]
         : []),
@@ -232,7 +249,7 @@ export const erteUnknownView = (): ErteView => ({
     },
     {
       title: 'Mecanismo RED',
-      text: `El 70\u00a0% de tu base durante todo el ERTE, con un tope de ${euros(RED_MONTHLY_CAP)} al mes, el 225\u00a0% del IPREM más un sexto. El tiempo que cobres no se considera consumido, no hace falta un período mínimo de cotización y tienes que estar inscrito como demandante de empleo.`,
+      text: `El 70\u00a0% de tu base durante todo el ERTE, con un tope de ${capText(RED_MONTHLY_CAP)} al mes, el 225\u00a0% del IPREM más un sexto. El tiempo que cobres no se considera consumido, no hace falta un período mínimo de cotización y tienes que estar inscrito como demandante de empleo.`,
       source: 'DA 41.ª LGSS',
     },
   ],
@@ -252,7 +269,7 @@ export const ERTE_FAQ: readonly { question: string; answer: string }[] = [
   {
     question: '¿Cobro paro si mi ERTE reduce la jornada?',
     answer:
-      'Sí, como desempleo parcial, cuando la reducción temporal de tu jornada diaria ordinaria es de entre un 10 y un 70\u00a0% (arts. 262.3 LGSS y 47.7.a ET). La prestación es proporcional a esa reducción (art. 270.5 LGSS).',
+      'Sí, si cumples los requisitos de tu tipo de ERTE, como desempleo parcial cuando la reducción temporal de tu jornada diaria ordinaria es de entre un 10 y un 70\u00a0% (arts. 262.3 LGSS y 47.7.a ET). La prestación es proporcional a esa reducción (art. 270.5 LGSS).',
   },
   {
     question: '¿Un ERTE gasta mi paro para más adelante?',

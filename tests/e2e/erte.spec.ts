@@ -71,12 +71,12 @@ test('RED reduction: capped, proportional, no children question, registration no
   await calculate(page);
   const r = result(page);
   await expect(r).toContainText('Unos 788 € al mes.');
-  await expect(r).toContainText('tope de 1.575,00 €');
+  await expect(r).toContainText('tope de 1.575 € al mes');
   await expect(r).toContainText('proporcional a esa reducción (art. 270.5 LGSS)');
   await expect(r).toContainText('no se considera consumido');
   await expect(r).toContainText('DA 41.ª.1 LGSS');
   await expect(r).toContainText('inscrito como demandante de empleo');
-  await expect(r).toContainText('DA 41.ª.2.c LGSS');
+  await expect(r).toContainText('DA 41.ª.2 LGSS');
 });
 
 test('«No lo sé» explains the three regimes and gives no single figure', async ({ page }) => {

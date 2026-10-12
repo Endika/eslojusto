@@ -39,7 +39,7 @@ describe('ERTE result copy', () => {
     const t = text({ ...base, regime: 'force_majeure' });
     expect(t).toContain('Unos 1.050 € al mes.');
     expect(t).toContain(
-      'No. Cobrar el paro por un ERTE de fuerza mayor no gasta las cotizaciones que ya tenías',
+      'Cobrarlo no gasta las cotizaciones que ya tenías: «el acceso a esta prestación no implicará el consumo de las cotizaciones previamente efectuadas a ningún efecto».',
     );
     expect(t).toContain('DA 46.ª.b LGSS');
     expect(t).toContain('No hace falta un período mínimo de cotización');
@@ -61,9 +61,12 @@ describe('ERTE result copy', () => {
   it('RED shows the cap, no consumption, no minimum period and the registration notice', () => {
     const t = text({ ...base, regime: 'red', base: 3000 });
     expect(t).toContain('Unos 1.575 € al mes.');
-    expect(t).toContain('tope de 1.575,00 €');
+    expect(t).toContain('tope de 1.575 € al mes');
     expect(t).toContain('inscrito como demandante de empleo');
-    expect(t).toContain('DA 41.ª.2.c LGSS');
+    expect(t).toContain('La solicitud la presenta la empresa en tu nombre, en el plazo de un mes');
+    expect(t).toContain('DA 41.ª.2 LGSS');
+    expect(t).toContain('su propia prestación');
+    expect(t).not.toContain('262');
     expect(t).toContain('No hace falta un período mínimo de cotización');
     expect(t).toContain('DA 41.ª.1 LGSS');
     expect(t).toContain('El tiempo que cobres en el mecanismo RED no se considera consumido');
@@ -75,6 +78,22 @@ describe('ERTE result copy', () => {
     expect(t).toContain('por horas');
     expect(t).toContain('Art. 269.5 LGSS');
     expect(t).toContain('desempleo parcial');
+  });
+  it('a base under the full-time minimum gives no figure: the limits fall with the hours', () => {
+    const t = text({ ...base, base: 700 });
+    expect(t).toContain('bajan en proporción a tus horas (art. 270.3 LGSS)');
+    expect(t).not.toMatch(/unos \d|entre \d/i);
+    expect(text({ ...base, regime: 'red', base: 700 })).toContain('Unos 490 € al mes.');
+  });
+  it('the same figure in both stretches is written once', () => {
+    const t = text({ ...base, base: 3000 });
+    expect(t).toContain('Unos 1.225 € al mes, antes y después del día 181.');
+  });
+  it('a reduction in full days is total unemployment', () => {
+    const t = text({ ...base, measure: { kind: 'reduction', percent: 40 } });
+    expect(t).toContain(
+      'Si la reducción se aplica en días completos, esos días son desempleo total.',
+    );
   });
   it('an unknown type explains three regimes and gives no single figure', () => {
     const v = erteUnknownView();
