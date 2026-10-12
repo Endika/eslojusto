@@ -167,10 +167,7 @@ export function assessSeverance(input: HouseholdInput, norms: NormTable): Assess
             ...r,
             finding: {
               ...r.finding,
-              calculation: [
-                ...r.finding.calculation,
-                phrase('severance.prorated_note', { years: figures.completeYears }),
-              ],
+              calculation: [...r.finding.calculation, phrase('severance.prorated_note')],
             },
           }
         : r,

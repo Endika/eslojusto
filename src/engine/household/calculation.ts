@@ -30,6 +30,7 @@ type MinimumWagePhraseKey =
   | 'minimum_wage.paid_prorated'
   | 'minimum_wage.paid_apart'
   | 'minimum_wage.shortfall'
+  | 'minimum_wage.shortfall_accrued'
   | 'minimum_wage.hourly'
   | 'minimum_wage.hourly_includes_everything'
   | 'minimum_wage.hourly_shortfall'

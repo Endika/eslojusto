@@ -3727,6 +3727,8 @@ export const es = {
     'Cobras {monthly} al mes en dinero y {extras} al año en pagas extra: {annual} al año.',
   'client.household.calculation.minimum_wage.shortfall':
     'Podrían faltarte {annual} al año, unos {monthly} al mes.',
+  'client.household.calculation.minimum_wage.shortfall_accrued':
+    'En los {days} días de {year} que cuenta la revisión, unos {accrued}.',
   'client.household.calculation.minimum_wage.hourly':
     'Mínimo por hora de {year} para quien trabaja por horas y no vive en la casa: {minimum}. Cobras {paid} la hora.',
   'client.household.calculation.minimum_wage.hourly_includes_everything':
@@ -3742,7 +3744,7 @@ export const es = {
   'client.household.calculation.in_kind.cash_only':
     'El mínimo se compara con lo que cobras en dinero: la manutención y el alojamiento no cuentan para llegar a él.',
   'client.household.calculation.extra_pays.prorated':
-    'Tus pagas extra están repartidas en las doce mensualidades. La norma las fija al final de cada semestre salvo pacto en otro sentido: conviene comprobar que lo pactaste así.',
+    'Tus pagas extra están repartidas en las doce mensualidades. La norma las fija al final de cada semestre salvo pacto en otro sentido, así que repartirlas así requiere ese pacto.',
   'client.household.calculation.extra_pays.fewer_than_two':
     'Tienes {count} al año y la norma prevé dos pagas extra, una al final de cada semestre.',
   'client.household.calculation.extra_pays.once_a_year':
@@ -3818,7 +3820,7 @@ export const es = {
   'client.household.calculation.night.inside':
     'Con quien vive en la casa, la decisión de terminar no podrá llevarse a cabo entre las 17:00 y las 08:00, salvo falta muy grave a los deberes de lealtad y confianza; la revisión lo mira por la hora a la que te lo comunicaron.',
   'client.household.calculation.severance.figure':
-    'Indemnización: 12 días de salario por año de servicio. Son {days} a {daily} al día: {amount}.',
+    'Indemnización: 12 días de salario por año de servicio. Son {days} días a {daily} al día: {amount}.',
   'client.household.calculation.severance.capped':
     'La indemnización tiene un tope de {months} mensualidades: queda en {amount}.',
   'client.household.calculation.severance.not_made_available':
@@ -3830,7 +3832,7 @@ export const es = {
   'client.household.calculation.severance.salary_unknown':
     'Sin tu salario en dinero no se puede calcular la indemnización.',
   'client.household.calculation.severance.prorated_note':
-    'Esta lectura cuenta como un día cada mes empezado. La norma no dice cómo contar un año incompleto: solo cuenta la lectura con los {years} años completos, y esta es lo más que podría salir.',
+    'Esta lectura cuenta como un día cada mes empezado. La norma no dice cómo contar un año incompleto: solo cuenta la lectura que usa los años completos, y esta es lo más que podría salir.',
   'client.household.calculation.notice.days':
     'Preaviso: {required} días naturales, contados desde el día siguiente al aviso. Se dieron {given} y faltan {missing}.',
   'client.household.calculation.notice.salary_unknown':

@@ -104,13 +104,17 @@ export const RULES: Readonly<Record<HouseholdRuleId, Rule>> = {
   // 11.1: the causes of art. 49.1 ET end the relationship.
   termination_causes: reform('termination_causes', '11.1'),
   // Art. 49.1 ET, which art. 11.1 sends the causes of termination to.
-  et_termination_causes: rule(
-    'et_termination_causes',
-    'et',
-    'Estatuto de los Trabajadores, art. 49.1',
-    `${ET}#a49`,
-    REFORM_SINCE,
-  ),
+  et_termination_causes: {
+    ...rule(
+      'et_termination_causes',
+      'et',
+      'Estatuto de los Trabajadores, art. 49.1',
+      `${ET}#a49`,
+      REFORM_SINCE,
+    ),
+    // Art. 49's wording in force since 01-05-2025 (BOE open data, 13-10-2026).
+    wordingSince: '2025-05-01',
+  },
   // 11.2: desistimiento needs one of three causes.
   desistimiento_cause: reform('desistimiento_cause', '11.2'),
   // 11.2: in writing, stating the cause.

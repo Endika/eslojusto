@@ -1,3 +1,4 @@
+import { calendarDays, compareDates, daysInYear, max, min, type CivilDate } from '../date';
 import type { NormSource } from '../law/sources';
 import {
   minimumWageFor,
@@ -39,8 +40,10 @@ function decreeSource(row: MinimumWageRow, article: string, norms: NormTable): N
     id: norm.id,
     citation: `${norm.citation}, ${article}`,
     url: row.url,
-    inForceSince: norm.inForceSince,
-    inForceUntil: norm.inForceUntil,
+    // The decree comes into force after it is published, but its amounts take effect for the whole
+    // year (its final provision), and the source reads «con efectos».
+    inForceSince: row.effectsFrom,
+    inForceUntil: row.effectsUntil,
     endUncertainUntil: norm.endUncertainUntil ?? null,
     status: norm.status,
     statusSince: norm.statusSince,
@@ -89,7 +92,21 @@ function unavailable(
 
 // Art. 8.1 and 8.4: the pay in money, extra payments included, against the minimum wage of the
 // year in proportion to the hours. The yearly comparison is the one the decree states.
-function monthlyPay(input: HouseholdInput, deps: MinimumWageDeps, make: FindingMaker): Assessed {
+// Days of the pay year the relationship covered, up to its end or today: a shortfall counts only
+// for them.
+function daysCovered(input: HouseholdInput, today: CivilDate): number {
+  const end = min(input.termination?.effectiveOn ?? today, today);
+  const from = max(input.startDate, { y: input.payYear, m: 1, d: 1 });
+  const to = min(end, { y: input.payYear, m: 12, d: 31 });
+  return compareDates(from, to) > 0 ? 0 : calendarDays(from, to);
+}
+
+function monthlyPay(
+  input: HouseholdInput,
+  deps: MinimumWageDeps,
+  make: FindingMaker,
+  today: CivilDate,
+): Assessed {
   const { norms } = deps;
   const lookup = minimumWageFor(input.payYear, deps.minimumWage);
   if (lookup.kind !== 'published')
@@ -108,7 +125,7 @@ function monthlyPay(input: HouseholdInput, deps: MinimumWageDeps, make: FindingM
       withDecree(
         make('smi_monthly', { alsoCites: ['extra_pays'], ...verdict }, norms),
         row,
-        'art. 1',
+        'arts. 1 y 3.1',
         norms,
       ),
     );
@@ -145,9 +162,12 @@ function monthlyPay(input: HouseholdInput, deps: MinimumWageDeps, make: FindingM
   if (cents(paidAnnual) >= cents(requiredAnnual))
     return done({ status: 'within_limit', calculation: [minimum, paid] });
   const shortfall = requiredAnnual - paidAnnual;
+  const days = daysCovered(input, today);
+  const yearDays = daysInYear(input.payYear);
+  const accrued = days >= yearDays ? shortfall : (shortfall * days) / yearDays;
   return done({
     status: 'below_minimum',
-    amount: exact(shortfall),
+    amount: exact(round2(accrued)),
     calculation: [
       minimum,
       paid,
@@ -155,6 +175,15 @@ function monthlyPay(input: HouseholdInput, deps: MinimumWageDeps, make: FindingM
         annual: euros(shortfall),
         monthly: euros(shortfall / MONTHS_IN_YEAR),
       }),
+      ...(days < yearDays
+        ? [
+            phrase('minimum_wage.shortfall_accrued', {
+              year: input.payYear,
+              days,
+              accrued: euros(accrued),
+            }),
+          ]
+        : []),
     ],
   });
 }
@@ -303,12 +332,13 @@ function extraPayments(
 export function assessMinimumWage(
   input: HouseholdInput,
   deps: MinimumWageDeps,
+  today: CivilDate,
 ): readonly Assessed[] {
   const make = findingsFor('minimum_wage');
   const { norms } = deps;
   if (input.regime === 'hourly_external') return [hourlyPay(input, deps, make)];
   return [
-    monthlyPay(input, deps, make),
+    monthlyPay(input, deps, make, today),
     inKind(input, norms, make),
     extraPayments(input, norms, make),
   ].filter((a): a is Assessed => a !== null);
