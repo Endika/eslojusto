@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.53.7](https://github.com/Endika/eslojusto/compare/v1.53.6...v1.53.7) (2026-10-12)
+
+
+### Bug Fixes
+
+* **household:** count the minimum wage shortfall for the days worked ([21e9574](https://github.com/Endika/eslojusto/commit/21e957496400b5627e16ed492b8c0d0d04ae831f))
+
 ## [1.53.6](https://github.com/Endika/eslojusto/compare/v1.53.5...v1.53.6) (2026-10-12)
 
 
