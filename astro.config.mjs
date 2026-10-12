@@ -29,5 +29,18 @@ export default defineConfig({
   // The stylesheet goes inline so the first paint waits on the HTML alone; the CSP allows inline
   // styles. Inlined fonts or scripts would land as data: or inline code that the CSP rejects.
   build: { inlineStylesheets: 'always' },
-  vite: { build: { assetsInlineLimit: 0 } },
+  vite: {
+    build: { assetsInlineLimit: 0 },
+    // A face that misses the first paint stays out of that page instead of swapping in late,
+    // which would reflow the text and shift everything below it.
+    plugins: [
+      {
+        name: 'font-display-optional',
+        transform: (code, id) =>
+          /@fontsource-variable\/.+\.css$/.test(id)
+            ? code.replaceAll('font-display: swap', 'font-display: optional')
+            : undefined,
+      },
+    ],
+  },
 });

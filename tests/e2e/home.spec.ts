@@ -60,13 +60,17 @@ test('the title, text and citation faces are preloaded, and nothing shifts as th
     .evaluateAll((links) => links.map((l) => l.getAttribute('href') ?? ''));
   for (const face of [
     /golos-text-latin-wght-normal\..+\.woff2$/,
-    /source-serif-4-latin-opsz-normal\..+\.woff2$/,
+    /source-serif-4-latin-wght-normal\..+\.woff2$/,
     /martian-mono-latin-standard-normal\..+\.woff2$/,
   ])
     expect(
       preloaded.some((href) => face.test(href)),
       String(face),
     ).toBe(true);
+  const swaps = await page
+    .locator('style')
+    .evaluateAll((styles) => styles.some((s) => /font-display:\s*swap/.test(s.textContent ?? '')));
+  expect(swaps, 'a face that swaps in late reflows the page').toBe(false);
 
   const shift = await page.evaluate(async () => {
     await document.fonts.ready;
