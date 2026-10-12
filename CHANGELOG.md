@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.53.4](https://github.com/Endika/eslojusto/compare/v1.53.3...v1.53.4) (2026-10-12)
+
+
+### Bug Fixes
+
+* **erte:** quote the force majeure rule and give no figure under the minimum base ([89aafc8](https://github.com/Endika/eslojusto/commit/89aafc864cf7a3cb2264269a167af35c254d31b2))
+
 ## [1.53.3](https://github.com/Endika/eslojusto/compare/v1.53.2...v1.53.3) (2026-10-12)
 
 
