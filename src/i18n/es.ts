@@ -321,7 +321,7 @@ export const es = {
   'children.question': '¿Cuántos hijos o hijas tienes a tu cargo?',
   'children.help': 'Cambia el mínimo y el máximo de tu paro.',
   'children.who':
-    'Para el SEPE cuentan los menores de 26 años, los mayores con discapacidad y los menores en acogida que viven contigo o dependen de ti y no ingresan más del salario mínimo.',
+    'Para el SEPE cuentan tus hijos e hijas menores de 26 años, o mayores con una discapacidad del 33 % o más, que viven contigo o dependen de ti y no ingresan el salario mínimo o más.',
   'children.none': 'Ninguno',
   'children.one': '1',
   'children.two': '2 o más',
@@ -384,7 +384,7 @@ export const es = {
   'result.benefit_contributed': 'Días cotizados',
   'result.benefit_deadline': 'Cómo y cuándo pedirlo',
   'result.benefit_deadline_text':
-    'Sin inscribirte como demandante de empleo no hay paro: date de alta en el servicio de empleo de tu comunidad y pide la prestación al SEPE en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días; si lo pides tarde, pierdes los días de retraso (arts. 266 y 268 LGSS).',
+    'Sin inscribirte como demandante de empleo no hay paro: te das de alta en el servicio de empleo de tu comunidad y pides la prestación al SEPE en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días; si lo pides tarde, pierdes los días de retraso (arts. 266 y 268 LGSS).',
   'result.benefit_work_history':
     'Tu vida laboral muestra cada alta y cada baja y los días cotizados:',
   'result.benefit_work_history_link': 'informe de tu vida laboral (sede de la Seguridad Social)',
@@ -724,9 +724,15 @@ export const es = {
   'client.summary.deduction_little': '{partida}: el descuento podría pasarse en menos de 10 €.',
   'client.summary.benefit_yes':
     'Esta causa da derecho a paro: {cuantia} al mes en bruto los primeros 6 meses, si sumas al menos 360 días cotizados en los últimos 6 años.',
+  'client.summary.benefit_yes_whole':
+    'Esta causa da derecho a paro: {cuantia} al mes en bruto todo el tiempo que dure, si sumas al menos 360 días cotizados en los últimos 6 años.',
+  'client.summary.benefit_yes_up_to_six':
+    'Esta causa da derecho a paro: {cuantia} al mes en bruto, como mucho los primeros 6 meses, si sumas al menos 360 días cotizados en los últimos 6 años.',
   'client.summary.benefit_yes_no_figures':
     'Esta causa da derecho a paro si sumas al menos 360 días cotizados en los últimos 6 años; la cuantía depende de tus últimas nóminas.',
   'client.summary.benefit_no': 'Esta causa no da derecho a paro.',
+  'client.summary.benefit_no_resignation':
+    'Una baja voluntaria no da derecho a paro, salvo excepciones como un traslado, una modificación sustancial de tus condiciones que te perjudique, un incumplimiento grave de la empresa o la violencia de género o sexual (art. 267.1.a.5.º LGSS).',
   'client.summary.benefit_unknown':
     'El paro depende de la causa: un despido o el fin de un contrato temporal dan derecho si sumas al menos 360 días cotizados en los últimos 6 años; una baja voluntaria, no.',
   'client.summary.dismissal_deadline':

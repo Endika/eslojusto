@@ -283,7 +283,7 @@ export const LANDINGS: Record<LandingId, Landing> = {
       {
         question: '¿Cuánto paro se acumula por año trabajado?',
         answer:
-          'Un año cotizado (de 360 a 539 días) da 120 días de paro. Desde ahí, cada 180 días cotizados más suman 60 días de paro, hasta el máximo de 720 días con 2.160 cotizados (art. 269.1 LGSS).',
+          'De 360 a 539 días cotizados (alrededor de un año) dan 120 días de paro. Desde ahí, cada 180 días cotizados más suman 60 días de paro, hasta el máximo de 720 días con 2.160 cotizados (art. 269.1 LGSS).',
       },
       {
         question: '¿Cuentan las vacaciones no disfrutadas?',
