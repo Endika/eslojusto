@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.53.6](https://github.com/Endika/eslojusto/compare/v1.53.5...v1.53.6) (2026-10-12)
+
+
+### Bug Fixes
+
+* **employment:** date each article by its wording and skip the trial item without one ([0ad8329](https://github.com/Endika/eslojusto/commit/0ad8329d13f5cf5677b1f514ab5dd645f70d0bc4))
+
 ## [1.53.5](https://github.com/Endika/eslojusto/compare/v1.53.4...v1.53.5) (2026-10-12)
 
 
