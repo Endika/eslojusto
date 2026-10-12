@@ -469,14 +469,49 @@ export function shortfallLine(r: ItemResult, tr: Translate): Piece[] | null {
   );
 }
 
-function summaryBenefit(p: BenefitEstimate, cause: Cause, tr: Translate): Piece[] {
-  if (p.entitled === 'no') return [tr('client.summary.benefit_no')];
+const FIRST_STRETCH_DAYS = 180;
+
+// «Los primeros 6 meses» only when the benefit surely lasts longer; to the euro, so a capped
+// amount never reads above the legal cap.
+function benefitYesKey({ kind, days }: BenefitDuration): ClientKey {
+  if (days > FIRST_STRETCH_DAYS && kind !== 'up_to') return 'client.summary.benefit_yes';
+  if (days > 0 && days <= FIRST_STRETCH_DAYS && kind !== 'at_least')
+    return 'client.summary.benefit_yes_whole';
+  return 'client.summary.benefit_yes_up_to_six';
+}
+
+function summaryBenefit(
+  p: BenefitEstimate,
+  cause: Cause,
+  withDuration: boolean,
+  tr: Translate,
+): Piece[] {
+  if (p.entitled === 'no')
+    return [
+      tr(
+        cause === 'resignation'
+          ? 'client.summary.benefit_no_resignation'
+          : 'client.summary.benefit_no',
+      ),
+    ];
   if (cause === 'unknown') return [tr('client.summary.benefit_unknown')];
-  if (p.figures === null) return [tr('client.summary.benefit_yes_no_figures')];
+  const duration = withDuration
+    ? [
+        ' ',
+        tr(durationKey(p.duration), {
+          dias: formatInteger(p.duration.days),
+          meses: formatInteger(p.duration.days / 30),
+        }),
+      ]
+    : [];
+  if (p.figures === null) return [tr('client.summary.benefit_yes_no_figures'), ...duration];
   const { min, max } = p.figures.firstStretch;
-  return piecesWithAmounts(tr('client.summary.benefit_yes'), {
-    cuantia: approximate({ min: roundToTens(min), max: roundToTens(max) }, tr),
-  });
+  return [
+    ...piecesWithAmounts(tr(benefitYesKey(p.duration)), {
+      cuantia: approximate({ min: Math.round(min), max: Math.round(max) }, tr),
+    }),
+    ...duration,
+  ];
 }
 
 const DISMISSALS: readonly Cause[] = [
@@ -495,7 +530,8 @@ export function summaryDeadlines(cause: Cause, benefit: BenefitEstimate): Client
 }
 
 // The result before the pass: whether money is missing and roughly how much, the holiday days it
-// counted, one line on the benefit and the deadlines that apply. The detail is the pass's.
+// counted, one line on the benefit and the deadlines that apply. The detail is the pass's; the
+// benefit's pages, which promise how long it lasts, also show the duration.
 export function renderSummary(
   container: HTMLElement,
   r: Review,
@@ -503,6 +539,7 @@ export function renderSummary(
   cause: Cause,
   tr: Translate,
 ): void {
+  const withDuration = container.querySelector('[data-review][data-benefit-first]') !== null;
   const summary = container.querySelector<HTMLElement>('[data-summary]');
   if (!summary) return;
   setText(summary, '[data-summary-headline]', tr(`client.summary.${summaryHeadline(r)}`));
@@ -520,7 +557,7 @@ export function renderSummary(
   const note = setText(summary, '[data-summary-counted]', counted ? phraseText(counted, tr) : '');
   note.hidden = !counted;
   setText(summary, '[data-summary-benefit]', '').replaceChildren(
-    ...summaryBenefit(benefit, cause, tr),
+    ...summaryBenefit(benefit, cause, withDuration, tr),
   );
   summary.querySelector('[data-summary-deadlines]')?.replaceChildren(
     ...summaryDeadlines(cause, benefit).map((key) => {

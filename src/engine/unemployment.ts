@@ -14,8 +14,8 @@ export const BENEFIT_2026 = {
   minCap: { 0: 560, 1: 749 },
   // 175 % / 200 % / 225 % × 700; art. 270.3 LGSS.
   maxCap: { 0: 1225, 1: 1400, 2: 1575 },
-  // Orden PJC/297/2026, art. 2.2.
-  minBaseAtep: 1424.4,
+  // Orden PJC/297/2026, art. 2.2: the 2026 minimum wage (1.221 €) plus a sixth, never under 1.424,40.
+  minBaseAtep: 1424.5,
   // Orden PJC/297/2026, art. 2.1; RDL 3/2026, art. 3.
   maxBase: 5101.2,
   // Art. 270.2 LGSS (wording in force since 2023-01-01).

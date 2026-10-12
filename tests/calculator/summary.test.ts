@@ -111,11 +111,33 @@ describe('the summary before the pass', () => {
   it('keeps the holiday days it counted, and one line on the benefit', () => {
     const s = summaryOf(completed());
     expect(s.counted).toBe('Hemos contado 0 días naturales disfrutados de 30 al año.');
-    expect(s.benefit).toMatch(
-      /^Esta causa da derecho a paro: unos [\d.]+0 € al mes en bruto los primeros 6 meses, si sumas al menos 360 días cotizados en los últimos 6 años\.$/,
+    expect(s.benefit).toBe(
+      'Esta causa da derecho a paro: unos 1.225 € al mes en bruto los primeros 6 meses, si sumas al menos 360 días cotizados en los últimos 6 años.',
     );
     expect(summaryOf(completed({ ...unfairDismissal, cause: 'resignation' })).benefit).toBe(
-      'Esta causa no da derecho a paro.',
+      'Una baja voluntaria no da derecho a paro, salvo excepciones como un traslado, una modificación sustancial de tus condiciones que te perjudique, un incumplimiento grave de la empresa o la violencia de género o sexual (art. 267.1.a.5.º LGSS).',
+    );
+  });
+
+  it('a benefit that lasts 6 months or less never reads «los primeros 6 meses»', () => {
+    const short = completed({ ...unfairDismissal, startDate: { y: 2025, m: 6, d: 1 } });
+    expect(short.benefit.entitled === 'yes' && short.benefit.duration.days).toBe(120);
+    expect(summaryOf(short).benefit).toMatch(
+      /^Esta causa da derecho a paro: unos 1\.225 € al mes en bruto, (todo el tiempo que dure|como mucho los primeros 6 meses),/,
+    );
+  });
+
+  it('only the benefit pages show how long it lasts', () => {
+    const r = completed();
+    expect(summaryOf(r).benefit).not.toMatch(/días \(/);
+    const div = result();
+    div.setAttribute('data-review', '');
+    div.setAttribute('data-benefit-first', '');
+    const wrapper = document.createElement('div');
+    wrapper.append(div);
+    renderSummary(wrapper, r.review, r.benefit, r.input.cause, tr);
+    expect(div.querySelector('[data-summary-benefit]')?.textContent).toMatch(
+      /los primeros 6 meses, si sumas al menos 360 días cotizados en los últimos 6 años\. .*\d+ días \(\d+ meses\)/,
     );
   });
 });
