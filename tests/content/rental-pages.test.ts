@@ -90,7 +90,7 @@ describe('the rise, decree and fees pages', () => {
   it('dates the decree and links the pages it names', () => {
     const decree = page('decree');
     expect(text(decree)).toContain('8 de octubre de 2026');
-    expect(text(decree)).toContain('5 de noviembre de 2026');
+    expect(text(decree)).not.toContain('en torno al');
     const links = decree.sections?.flatMap((s) => s.links ?? []).map((l) => l.path);
     expect(links).toContain(RENTAL_PAGES.rise.path);
     expect(links).toContain(RENTAL_PAGES.fees.path);

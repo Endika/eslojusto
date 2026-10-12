@@ -111,6 +111,9 @@ export function outcomeFrom<T>(
     if (measure.amount(value) < measure.amount(low)) low = value;
     if (measure.amount(value) > measure.amount(high)) high = value;
   }
+  // Readings with no figure weigh the same, yet differ: the two shown are never one and the same.
+  if (measure.same(low, high))
+    high = readings.find((r) => !measure.same(r.value, low))?.value ?? high;
   return {
     kind: 'depends',
     reasons: REASON_ORDER.filter((r) => reasons.has(r)),

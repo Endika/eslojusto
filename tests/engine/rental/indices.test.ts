@@ -125,7 +125,7 @@ describe('reference month', () => {
   });
 
   it('is not loaded after the table coverage', () => {
-    expect(lookup(IRAV, '2026-10-08')).toEqual({ kind: 'not_loaded' });
+    expect(lookup(IRAV, '2026-10-14')).toEqual({ kind: 'not_loaded' });
     expect(lookup(IGC, '2018-12-31')).toEqual({ kind: 'not_loaded' });
   });
 

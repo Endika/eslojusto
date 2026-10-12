@@ -80,6 +80,16 @@ describe('evaluating across readings', () => {
     });
   });
 
+  it('shows two different readings when none carries a figure', () => {
+    const status: Measure<string> = { amount: () => 0, same: (a, b) => a === b };
+    const outcome = evaluateAcross(
+      [PENDING],
+      (w) => (w[PENDING.id] === true ? 'over_cap' : 'review_it'),
+      status,
+    );
+    expect(outcome).toMatchObject({ kind: 'depends', low: 'review_it', high: 'over_cap' });
+  });
+
   it('compares results by the measure, not by identity', () => {
     const measure: Measure<{ amount: number; note: string }> = {
       amount: (v) => v.amount,

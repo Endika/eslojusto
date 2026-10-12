@@ -206,10 +206,6 @@ const staticPages = (
   };
 };
 
-// RDL 29/2026 was promulgated on 06-10-2026; the Congress has 30 days to vote on it.
-const DECREE_PROMULGATED = '2026-10-06';
-const VOTE_DAYS = 30;
-
 // The worked examples are on made-up figures.
 export const RISE_EXAMPLE = { rent: 900, anniversary: '2026-11-01' } as const;
 export const FEE_EXAMPLE = { rent: 900, vat: 21 } as const;
@@ -415,12 +411,11 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
   }
 
   if (id === 'decree') {
-    const deadline = toIso(addDays(parseDate(DECREE_PROMULGATED), VOTE_DAYS));
     // The list gives the decree's status once, in its opening line, while it stands.
     const standing = decree.status !== 'repealed';
     const point = (key: Key, vars?: Record<string, string>) =>
       standing ? tx(key, { ...vars, decreto: 'el decreto' }) : sentence(key, vars);
-    const status = `${caps.status} El plazo de ${VOTE_DAYS} días para votarlo termina en torno al ${formatLongDay(deadline)}.`;
+    const status = caps.status;
     return {
       lead: `El Real Decreto-ley 29/2026 rige desde el ${since}. Un decreto-ley entra en vigor cuando él mismo lo dice (este, el día siguiente a publicarse), pero decae si el Congreso no lo convalida en 30 días: por eso hay que mirar siempre en qué estado está.`,
       sections: [
