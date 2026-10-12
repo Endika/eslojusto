@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.53.1](https://github.com/Endika/eslojusto/compare/v1.53.0...v1.53.1) (2026-10-12)
+
+
+### Performance Improvements
+
+* drop the optical-size serif and show web fonts only when in time ([b62dae9](https://github.com/Endika/eslojusto/commit/b62dae92f953e2fa312b6b57fdaa0c932d5a52c3))
+* keep the unemployment engine out of the analytics bundle ([5238a3f](https://github.com/Endika/eslojusto/commit/5238a3f97aa0f096a461040b9aa177ceb412f42c))
+* load the slim PostHog build once the page is idle ([511f243](https://github.com/Endika/eslojusto/commit/511f24357fa99a006793030c24a55d72d0643388))
+
 ## [1.53.0](https://github.com/Endika/eslojusto/compare/v1.52.1...v1.53.0) (2026-10-11)
 
 
