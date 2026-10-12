@@ -65,6 +65,11 @@ export function erteInputError(input: ErteInput): string | null {
   return null;
 }
 
+// Under the full-time minimum base the job is part-time, and the general limits fall with its hours
+// (art. 270.3 LGSS), which the form does not ask; RED has no minimum to inflate the figure.
+export const belowFullTimeMinimum = (input: ErteInput): boolean =>
+  input.regime !== 'red' && input.base < P.minBaseAtep;
+
 const shareOf = (m: ErteMeasure): number => (m.kind === 'reduction' ? m.percent / 100 : 1);
 
 const clamp = (x: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, x));
