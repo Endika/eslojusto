@@ -39,7 +39,7 @@ export const IPC: IndexSeries = {
   url: 'https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/IPC290750',
   table: 76134,
   series: 'IPC290750',
-  coveredUntil: '2026-10-07',
+  coveredUntil: '2026-10-13',
   loadedFromStart: false,
   values: [
     month('2018-12', 1.2, '2019-01-15', '2018-12-28'),

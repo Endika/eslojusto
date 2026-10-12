@@ -85,7 +85,7 @@ export const es = {
     'En los contratos desde el 26-05-2023, el IRAV o el IPC, el más bajo; en los anteriores, el IPC.',
   'rent_indices.cap.two.when': 'Desde el {desde}',
   'rent_indices.cap.two.rule':
-    'El IRAV en todos los contratos. Y hasta el 31-12-2027, sin nuevo pacto, como mucho un 2 %. Si tu vivienda está en una zona de mercado tensionado y tu renta supera el límite de precio que fija allí el sistema de índices de referencia, no cabe ninguna subida.',
+    'El IRAV en todos los contratos. Y hasta el 31-12-2027, sin nuevo pacto, como mucho un 2 %. Y si tu renta supera el límite de precio que le sea aplicable según el sistema de índices de referencia, no cabe ninguna subida.',
   'rent_indices.large_landlord_source':
     'art. 3.k (Ley 12/2023, de 24 de mayo, por el derecho a la vivienda)',
   'rent_indices.reference_index':
@@ -100,7 +100,7 @@ export const es = {
   'rent_indices.status_short.in_force': 'convalidado por el Congreso',
   'rent_indices.status_short.repealed': 'derogado por el Congreso',
   'rent_indices.now':
-    'Con el último IRAV ({irav}) y mientras rija el {norma}, el tope sin nuevo pacto es el {tope}: el más bajo de los dos. Si tu vivienda está en una zona de mercado tensionado y tu renta supera el límite de precio que fija allí el sistema de índices de referencia, no cabe ninguna subida.',
+    'Con el último IRAV ({irav}) y mientras rija el {norma}, el tope sin nuevo pacto es el {tope}: el más bajo de los dos. Y si tu renta supera el límite de precio que le sea aplicable según el sistema de índices de referencia, no cabe ninguna subida.',
   'rent_indices.repealed':
     'Decretos con el mismo tope del 2 % que el Congreso derogó: {lista}. Una subida de esos días es un caso dudoso.',
   'rent_indices.repealed_item': 'el {norma}, que rigió {periodo}',
