@@ -1,6 +1,6 @@
 {
   "id": "pay-in-kind-over-30-percent",
-  "description": "Art. 8.2: 600 € in kind against 900 € in money is 40 % of the total salary, over the 30 % limit; the 900 € in money are also under the minimum.",
+  "description": "Art. 8.2: 600 € in kind against 900 € in money is 40 % of the total salary, over the 30 % limit; the 900 € in money are also under the minimum. The shortfall counts the 281 days of 2026 up to today.",
   "today": "2026-10-08",
   "input": {
     "startDate": "2024-03-01",
@@ -36,8 +36,8 @@
         "id": "smi_monthly",
         "status": "below_minimum",
         "amount": {
-          "min": 4494,
-          "max": 4494
+          "min": 3459.76,
+          "max": 3459.76
         }
       },
       {

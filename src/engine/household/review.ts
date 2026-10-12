@@ -70,7 +70,7 @@ export function reviewHousehold(
     };
 
   const items = [
-    ...assessMinimumWage(input, deps),
+    ...assessMinimumWage(input, deps, today),
     ...assessWorkingTime(input, norms),
     ...assessHolidays(input, norms),
     ...assessTermination(input, norms),

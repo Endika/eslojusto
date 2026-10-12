@@ -2,9 +2,43 @@ import { describe, expect, it } from 'vitest';
 import { MINIMUM_WAGE } from '../../../src/engine/employment/data/minimum-wage';
 import { assessMinimumWage } from '../../../src/engine/household/minimum-wage';
 import { round2 } from '../../../src/engine/money';
-import { DEPS, findingOf, household, single, statusOf } from './input';
+import { parseDate } from '../../../src/engine/date';
+import { DEPS, TODAY, desistimiento, findingOf, household, single, statusOf } from './input';
 
-const run = (change: Parameters<typeof household>[0]) => assessMinimumWage(household(change), DEPS);
+// A whole pay year worked, so the shortfall counted is the year's.
+const run = (change: Parameters<typeof household>[0]) => {
+  const input = household({ startDate: parseDate('2020-01-01'), ...change });
+  return assessMinimumWage(input, DEPS, { y: input.payYear, m: 12, d: 31 });
+};
+
+describe('a shortfall counts only the days of the year worked', () => {
+  const below = { payYear: 2026, monthlyCash: 1000, extraPays: null, weeklyHours: 40 } as const;
+  const amountOf = (a: ReturnType<typeof assessMinimumWage>) =>
+    single(a, 'smi_monthly').amount?.min ?? null;
+
+  it('seven months of a relationship count seven months of the yearly shortfall', () => {
+    const whole = amountOf(run(below));
+    const part = amountOf(
+      assessMinimumWage(
+        household({ ...below, startDate: parseDate('2026-01-01') }),
+        DEPS,
+        parseDate('2026-07-31'),
+      ),
+    );
+    expect(whole).not.toBeNull();
+    expect(part).toBe(round2(((whole ?? 0) * 212) / 365));
+  });
+
+  it('ends on the last day of service, not today', () => {
+    const input = household({
+      ...below,
+      startDate: parseDate('2026-01-01'),
+      termination: desistimiento({ effectiveOn: parseDate('2026-03-31') }),
+    });
+    const a = amountOf(assessMinimumWage(input, DEPS, TODAY));
+    expect(a).toBe(round2(((amountOf(run(below)) ?? 0) * 90) / 365));
+  });
+});
 
 // Art. 8.1 and 8.4: the pay in money, extra payments included, against the year's minimum wage.
 describe('the monthly minimum wage, 2023 to 2026', () => {
@@ -83,8 +117,10 @@ describe('the monthly minimum wage, 2023 to 2026', () => {
     expect(f.sources.map((s) => s.citation.split(' (')[0])).toEqual([
       'Real Decreto 1620/2011, art. 8.1',
       'Real Decreto 1620/2011, art. 8.4',
-      'Real Decreto 126/2026, de 18 de febrero, art. 1',
+      'Real Decreto 126/2026, de 18 de febrero, arts. 1 y 3.1',
     ]);
+    const decree = f.sources.at(-1);
+    expect([decree?.inForceSince, decree?.inForceUntil]).toEqual(['2026-01-01', '2026-12-31']);
   });
 
   it('does not add extra payments of an unknown amount', () => {

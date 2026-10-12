@@ -264,12 +264,13 @@ for (const { name, viewport } of SIZES) {
       await walk(page, MONTHLY_BELOW, fit);
       await review(page, fit);
 
-      // 1.000 € × 12 + 2 × 1.000 € = 14.000 € a year; the 2026 minimum is 17.094 €.
+      // 1.000 € × 12 + 2 × 1.000 € = 14.000 € a year; the 2026 minimum is 17.094 €: 3.094 € short
+      // a year, of which the 281 days of 2026 up to the 8th of October count 2.381,96 €.
       const wage = card(page, 'Sueldo frente al SMI');
-      await expect(wage.locator('.item__status')).toHaveText(/Podrían faltarte unos 3\.090\s€/);
+      await expect(wage.locator('.item__status')).toHaveText(/Podrían faltarte unos 2\.380\s€/);
       await expect(wage.getByRole('link', { name: /art\. 8\.1/ })).toBeVisible();
       await expect(page.getByRole('region', { name: 'Resumen' })).toContainText(
-        /Lo que cuenta en todas las lecturas: unos 3\.090\s€\./,
+        /Lo que cuenta en todas las lecturas: unos 2\.380\s€\./,
       );
       await expect(card(page, 'Pagas extra').locator('.item__status')).toHaveText(
         /Dentro de lo que marca la norma/,
