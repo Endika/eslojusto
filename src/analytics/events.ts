@@ -1,4 +1,5 @@
-import { BENEFIT_STATES, benefitState, type BenefitEstimate } from '../engine/unemployment';
+import { BENEFIT_STATES, benefitState } from '../engine/benefit-state';
+import type { BenefitEstimate } from '../engine/unemployment';
 import type { EmployerFigures, Review } from '../engine/review';
 import type { Cause, FinalPayInput, HolidayUnit, ItemId, FixedTermType } from '../engine/types';
 import type { Detail } from '../calculator/ports';
