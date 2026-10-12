@@ -5466,7 +5466,7 @@ export const es = {
     'Si tu escritura es del 16-06-2019 o posterior, lo dice la ley: el banco paga la notaría de la escritura del préstamo, el registro y la gestoría; la tasación la paga quien pide el préstamo, y cada copia, quien la pide (art. 14.1.e de la Ley 5/2019). Si es anterior, no hay una ley que los reparta: lo que hay es el reparto que aplica el Tribunal Supremo cuando la escritura de un consumidor ponía los gastos a su cargo, y para que se devuelva hace falta que el banco lo acepte o que un juez anule la cláusula.',
   'mortgage.faq.before_2019': '¿Qué cambia si mi hipoteca es anterior a 2019?',
   'mortgage.faq.before_2019_answer':
-    'La Ley 5/2019 se aplica a las escrituras desde el 16-06-2019. En las anteriores, el reparto de los gastos sale de lo que han dicho los tribunales: según el Tribunal Supremo, si eras consumidor y tu escritura ponía los gastos a tu cargo, al banco le correspondían la mitad de la notaría y todo el registro, la gestoría y la tasación. Hace falta que el banco lo acepte o que un juez anule la cláusula. Las sentencias en que se apoya aún no se han comprobado en su texto, así que, por ahora, la revisión lo explica sin dar cifra. Las comisiones por amortizar de las escrituras desde el 09-12-2007 tienen los topes de la Ley 41/2007.',
+    'La Ley 5/2019 se aplica a las escrituras desde el 16-06-2019. En las anteriores, el reparto de los gastos sale de lo que han dicho los tribunales: según el Tribunal Supremo, si eras consumidor y tu escritura ponía los gastos a tu cargo, al banco le correspondían la mitad de la notaría y todo el registro, la gestoría y la tasación. Hace falta que el banco lo acepte o que un juez anule la cláusula. La revisión da la cifra de ese reparto y, según el Supremo, el interés legal desde el día de cada pago. Las comisiones por amortizar de las escrituras desde el 09-12-2007 tienen los topes de la Ley 41/2007.',
   'mortgage.faq.tax': '¿Quién paga el impuesto (AJD)?',
   'mortgage.faq.tax_answer':
     'El impuesto de actos jurídicos documentados de la escritura del préstamo lo paga el banco en las escrituras desde el 10-11-2018 (art. 29 de la ley del impuesto, en la redacción del Real Decreto-ley 17/2018). En las anteriores, esta revisión no lo cuenta. El impuesto de la compraventa de la vivienda es otro y no entra aquí.',
@@ -5714,6 +5714,7 @@ export const es = {
   'client.mortgage.result.lead_out_of_scope':
     'Esta hipoteca queda fuera de lo que revisa esta página.',
   'client.mortgage.about': 'unos {importe}',
+  'client.mortgage.about_under_one': 'menos de 1 €',
   'client.mortgage.total.nothing': 'Nada con lo que has metido',
   'client.mortgage.total.nothing_lowest': 'Nada en la lectura más baja',
   'client.mortgage.total.no_figure_yet': 'Sin cifra por ahora',
