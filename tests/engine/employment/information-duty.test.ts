@@ -113,6 +113,21 @@ describe('information duty (RD 723/2026)', () => {
     });
   });
 
+  it('the trial period element applies only when one is agreed (art. 3.2.h)', () => {
+    const none = duty(withInfo({ h: 'absent' }, { trial: null }));
+    const agreed = duty(withInfo({ h: 'absent' }));
+    if (!none.applies || !agreed.applies) throw new Error('expected the duty to apply');
+    expect(none.elements.find((e) => e.element === 'h')).toEqual({
+      element: 'h',
+      applies: false,
+      reason: 'no_trial',
+    });
+    expect(agreed.elements.find((e) => e.element === 'h')).toMatchObject({
+      applies: true,
+      finding: { status: 'missing_requirement' },
+    });
+  });
+
   it.each(['h', 'i', 'n', 'p'] as const)(
     '%s given by reference to the law or the agreement counts as present (art. 3.3)',
     (element) => {

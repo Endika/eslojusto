@@ -32,6 +32,9 @@ const ONLY_IF_USED: ReadonlySet<InfoElement> = new Set(['k', 'l', 'm']);
 // j) the temporary work agency and the user company: agency contracts are outside this review.
 const AGENCY_ONLY: InfoElement = 'j';
 
+// h) the trial period: only «cuando se concierte».
+const TRIAL_ELEMENT: InfoElement = 'h';
+
 // The agreement (o) and the category (e) first: the rest of the contract is read against them.
 const ORDER: readonly InfoElement[] = [
   'o',
@@ -45,7 +48,11 @@ export type InformationMoment = 'before_start' | 'on_request';
 
 export type ElementCheck =
   | { readonly element: InfoElement; readonly applies: true; readonly finding: Finding }
-  | { readonly element: InfoElement; readonly applies: false; readonly reason: 'temp_agency_only' };
+  | {
+      readonly element: InfoElement;
+      readonly applies: false;
+      readonly reason: 'temp_agency_only' | 'no_trial';
+    };
 
 export type InformationDuty =
   | {
@@ -139,11 +146,13 @@ export function reviewInformationDuty(input: EmploymentInput, norms: NormTable):
     elements: ORDER.map((element): ElementCheck =>
       element === AGENCY_ONLY
         ? { element, applies: false, reason: 'temp_agency_only' }
-        : {
-            element,
-            applies: true,
-            finding: check(input, element, input.info[element], moment, norms),
-          },
+        : element === TRIAL_ELEMENT && input.trial === null
+          ? { element, applies: false, reason: 'no_trial' }
+          : {
+              element,
+              applies: true,
+              finding: check(input, element, input.info[element], moment, norms),
+            },
     ),
   };
 }

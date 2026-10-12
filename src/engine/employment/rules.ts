@@ -100,18 +100,45 @@ const rule = (
   from: string,
 ): Rule => ({ id, norm, article, url, from, until: null, supersededBy: null });
 
-const et = (id: EmploymentRuleId, article: string, anchor: string): Rule =>
-  rule(id, 'et', `Estatuto de los Trabajadores, art. ${article}`, `${ET}#${anchor}`, ET_SINCE);
+// The day each cited article of the Estatuto took the wording in force, per the BOE open data on
+// 13-10-2026. Art. 37's next wording, from 23-10-2026, changes only 37.6.
+const ET_WORDING = {
+  a3: ET_SINCE,
+  a6: ET_SINCE,
+  a8: '2020-06-27',
+  a9: '2019-03-08',
+  a11: '2023-03-02',
+  a12: '2025-04-01',
+  a14: '2023-03-02',
+  a15: '2025-01-02',
+  a16: '2022-03-30',
+  a21: ET_SINCE,
+  a26: ET_SINCE,
+  a27: '2023-03-02',
+  a29: ET_SINCE,
+  a31: ET_SINCE,
+  a34: '2023-06-30',
+  a35: ET_SINCE,
+  a36: ET_SINCE,
+  a37: '2025-03-03',
+  a38: ET_SINCE,
+  a59: ET_SINCE,
+  a82: ET_SINCE,
+} as const;
+export type EtArticle = keyof typeof ET_WORDING;
 
-// Wording given to arts. 11, 15 and 16 ET by RDL 32/2021, in force from 30-03-2022.
-const reform = (id: EmploymentRuleId, article: string, anchor: string): Rule =>
-  rule(
-    id,
-    'rdl32_2021',
-    `Estatuto de los Trabajadores, art. ${article}`,
-    `${ET}#${anchor}`,
-    REFORM_SINCE,
-  );
+const etRule = (id: EmploymentRuleId, article: string, anchor: EtArticle, from: string): Rule => ({
+  ...rule(id, 'et', `Estatuto de los Trabajadores, art. ${article}`, `${ET}#${anchor}`, from),
+  wordingSince: ET_WORDING[anchor],
+});
+
+const et = (id: EmploymentRuleId, article: string, anchor: EtArticle): Rule =>
+  etRule(id, article, anchor, ET_SINCE);
+
+// Arts. 11, 15 and 16 as reworded by RDL 32/2021 apply to contracts from 30-03-2022; later laws
+// reworded 11 and 15 again.
+const reform = (id: EmploymentRuleId, article: string, anchor: EtArticle): Rule =>
+  etRule(id, article, anchor, REFORM_SINCE);
 
 const rd723 = (id: EmploymentRuleId, article: string, anchor: string): Rule =>
   rule(id, 'rd723_2026', article, `${RD723_2026}#${anchor}`, RD723_SINCE);

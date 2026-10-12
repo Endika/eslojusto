@@ -14,6 +14,8 @@ export interface Rule<RuleId extends string, NormId extends string> {
   readonly until: string | null;
   // A later rule that takes its place once that rule is certainly in force.
   readonly supersededBy: RuleId | null;
+  // When the cited article took its current wording, if after its norm came into force.
+  readonly wordingSince?: string;
 }
 
 export type RuleTable<RuleId extends string, NormId extends string> = Readonly<
@@ -37,13 +39,13 @@ export function ruleSource<RuleId extends string, NormId extends string, Status 
   id: RuleId,
   norms: NormTable<NormId, Status>,
 ): NormSource<Status> {
-  const { article, url, norm: normId } = rules[id];
+  const { article, url, norm: normId, wordingSince } = rules[id];
   const norm = norms[normId];
   return {
     id,
     citation: `${article} (${norm.citation})`,
     url,
-    inForceSince: norm.inForceSince,
+    inForceSince: wordingSince ?? norm.inForceSince,
     inForceUntil: norm.inForceUntil,
     endUncertainUntil: norm.endUncertainUntil ?? null,
     status: norm.status,
