@@ -32,9 +32,11 @@ const PERCENT = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2, useGr
 
 export const percentText = (n: number): string => `${PERCENT.format(n)} %`;
 
-// What the free summary shows of a total: whole euros, never cents.
+// What the free summary shows of a total: whole euros, never cents, and never «unos 0 €».
 const about = (euros: number, tr: Translate): string =>
-  tr('client.mortgage.about', { importe: formatWholeEuros(euros) });
+  euros < 0.5
+    ? tr('client.mortgage.about_under_one')
+    : tr('client.mortgage.about', { importe: formatWholeEuros(euros) });
 
 // A calendar year reads as it is written, «2027», never with a thousands dot.
 const YEAR_VARS: ReadonlySet<string> = new Set(['year']);
@@ -96,7 +98,9 @@ export function sourceText(s: MortgageSource, tr: Translate): string {
   }
   if (s.basis !== 'case_law') return tr(`client.mortgage.source.${s.basis}`);
   const checked = tr('client.mortgage.source.checked', { fecha: dayText(s.lastVerified) });
-  const court = `${s.court} · ${checked}`;
+  // A plenary ruling's citation already ends in «(Pleno)».
+  const name = s.citation.endsWith('(Pleno)') ? s.court.replace(/ \(Pleno\)$/, '') : s.court;
+  const court = `${name} · ${checked}`;
   return s.verified ? court : `${court} · ${tr('client.mortgage.source.case_law_unverified')}`;
 }
 

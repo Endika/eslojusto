@@ -36,10 +36,10 @@ describe('the mortgage FAQ', () => {
     expect(answer).toContain('hace falta que el banco lo acepte o que un juez anule la cláusula');
   });
 
-  it('says the split before 2019 gives no figure yet', () => {
-    expect(answerOf(entries, 'faq-hipoteca-antes-2019')).toContain(
-      'por ahora, la revisión lo explica sin dar cifra',
-    );
+  it('says the split before 2019 gives its figure and interest', () => {
+    const answer = answerOf(entries, 'faq-hipoteca-antes-2019');
+    expect(answer).toContain('La revisión da la cifra de ese reparto');
+    expect(answer).not.toContain('sin dar cifra');
   });
 
   it('dates the tax on the lender from 10-11-2018', () => {

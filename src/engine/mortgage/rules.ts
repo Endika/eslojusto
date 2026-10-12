@@ -172,15 +172,18 @@ export const STATUTE_RULES: Readonly<Record<StatuteRuleId, StatuteRule>> = {
   ),
   // Additional provision 1.ª of RDL 19/2022, as RDL 8/2023 worded it: no compensation for
   // repaying or switching a variable rate between 24-11-2022 and 31-12-2024.
-  fee_free_window: rule(
-    'fee_free_window',
-    'rdl19_2022',
-    'Real Decreto-ley 19/2022, disposición adicional primera, en la redacción del Real Decreto-ley 8/2023',
-    `${RDL19_2022}#da`,
-    RDL19_2022_SINCE,
-    '2024-12-31',
-    'amount',
-  ),
+  fee_free_window: {
+    ...rule(
+      'fee_free_window',
+      'rdl19_2022',
+      'Real Decreto-ley 19/2022, disposición adicional primera, en la redacción del Real Decreto-ley 8/2023',
+      `${RDL19_2022}#da`,
+      RDL19_2022_SINCE,
+      '2024-12-31',
+      'amount',
+    ),
+    wordingSince: RDL8_2023_SINCE,
+  },
   // Arts. 8 and 9: compensation caps for loans concluded from 09-12-2007 until the LCCI.
   prepayment_law41: rule(
     'prepayment_law41',
@@ -250,15 +253,19 @@ export const STATUTE_RULES: Readonly<Record<StatuteRuleId, StatuteRule>> = {
     'info',
   ),
   // Art. 30: the Servicio de Reclamaciones del Banco de España.
-  complaints_service: rule(
-    'complaints_service',
-    'law44_2002',
-    'Ley 44/2002, art. 30',
-    `${LAW44_2002}#a30`,
-    '2002-11-24',
-    null,
-    'info',
-  ),
+  complaints_service: {
+    ...rule(
+      'complaints_service',
+      'law44_2002',
+      'Ley 44/2002, art. 30',
+      `${LAW44_2002}#a30`,
+      '2002-11-24',
+      null,
+      'info',
+    ),
+    // Its wording in force since 28-12-2025 (BOE open data, 13-10-2026).
+    wordingSince: '2025-12-28',
+  },
   // Art. 25 bis: on an assignment of the loan the borrower keeps every defence against the new
   // holder, and is told of it. Pending validation by the Congress: only explained.
   loan_assignment: rule(

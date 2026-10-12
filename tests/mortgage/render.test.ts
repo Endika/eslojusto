@@ -190,6 +190,26 @@ describe('the mortgage result', () => {
     expect(root.querySelector('[data-total-more]')?.hasAttribute('hidden')).toBe(false);
   });
 
+  it('a total under a euro reads «menos de 1 €», never «unos 0 €»', () => {
+    const root = rendered(
+      review({
+        deedOn: d('2015-03-02'),
+        rateRevisionMonths: 12,
+        prepaymentOption: null,
+        operations: [
+          {
+            on: d('2023-05-02'),
+            kind: 'partial_prepayment',
+            principal: 20_000,
+            feeCharged: 50.4,
+            hadInsurance: null,
+          },
+        ],
+      }),
+    );
+    expect(text(root, '[data-total="fees"] [data-total-amount]')).toBe('menos de 1 €');
+  });
+
   it('flags a clause with what the law or a court says, dated, and only rulings read', () => {
     const root = rendered(
       review({
@@ -243,6 +263,7 @@ describe('the mortgage result', () => {
 });
 
 describe('the mortgage sources', () => {
+  // A plenary ruling's citation already says «(Pleno)», so the court line does not repeat it.
   it('give a norm its day and status, and a ruling its court and the day it was read', () => {
     const r = review(deed2018());
     const [tax] = r.expenses.items.find((i) => i.kind === 'ajd_loan')?.sources ?? [];
@@ -250,16 +271,16 @@ describe('the mortgage sources', () => {
     const sources = r.expenses.items.find((i) => i.kind === 'notary_loan')?.sources ?? [];
     expect(sources.map((s) => sourceText(s, tr))).toEqual([
       'con efectos desde el 16-08-1889 · en vigor',
-      'Tribunal Supremo, Sala de lo Civil (Pleno) · estado a 10-10-2026',
+      'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026',
       'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026',
       'Tribunal de Justicia de la Unión Europea · estado a 07-10-2026',
-      'Tribunal Supremo, Sala de lo Civil (Pleno) · estado a 10-10-2026',
+      'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026',
     ]);
     const unread = review(deed2018(), UNREAD_DEPS).expenses.items.find(
       (i) => i.kind === 'notary_loan',
     );
     expect((unread?.sources ?? []).map((s) => sourceText(s, tr))).toEqual([
-      'Tribunal Supremo, Sala de lo Civil (Pleno) · estado a 10-10-2026 · sin comprobar en el texto de la sentencia',
+      'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026 · sin comprobar en el texto de la sentencia',
       'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026 · sin comprobar en el texto de la sentencia',
       'Tribunal de Justicia de la Unión Europea · estado a 07-10-2026',
     ]);
