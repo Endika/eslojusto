@@ -45,14 +45,26 @@ export function asksNotToTrack(nav: Signals, win: Signals = {}): boolean {
   );
 }
 
+// The library waits for the page to load and go idle, so it never delays the first paint.
+function afterLoad(): Promise<void> {
+  return new Promise((resolve) => {
+    const idle = () =>
+      'requestIdleCallback' in window ? requestIdleCallback(() => resolve()) : setTimeout(resolve);
+    if (document.readyState === 'complete') idle();
+    else addEventListener('load', idle, { once: true });
+  });
+}
+
 // Without a key (dev, tests, forks) or with a do-not-track signal, nothing loads and every
 // call is a no-op.
 export function startAnalytics(): Promise<Client> | undefined {
   if (!POSTHOG_KEY || asksNotToTrack(navigator as Signals, window as Signals)) return undefined;
-  client ??= import('posthog-js').then(({ default: posthog }) => {
-    posthog.init(POSTHOG_KEY, POSTHOG_OPTIONS);
-    return posthog;
-  });
+  client ??= afterLoad()
+    .then(() => import('posthog-js/dist/module.slim.no-external'))
+    .then(({ default: posthog }) => {
+      posthog.init(POSTHOG_KEY, POSTHOG_OPTIONS);
+      return posthog;
+    });
   return client;
 }
 
