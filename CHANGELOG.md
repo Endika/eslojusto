@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.53.5](https://github.com/Endika/eslojusto/compare/v1.53.4...v1.53.5) (2026-10-12)
+
+
+### Bug Fixes
+
+* **rental:** cover index updates to the next release and show both insurance readings ([87a6838](https://github.com/Endika/eslojusto/commit/87a6838d6ba01d59036a89dd3a606271d0788563))
+
 ## [1.53.4](https://github.com/Endika/eslojusto/compare/v1.53.3...v1.53.4) (2026-10-12)
 
 
