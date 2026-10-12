@@ -169,8 +169,8 @@ describe('the null dismissal warning', () => {
     const text = n ? textOf(n) : [];
     expect(text).toEqual([
       'Por lo que has marcado, el despido podría ser nulo (art. 55.5 ET), salvo que el motivo no tenga nada que ver con esa situación.',
-      'Si un juzgado lo declarase nulo, la empresa tendría que readmitirte y pagarte los salarios que dejaste de cobrar (arts. 55.6 y 53.4 ET). Esta revisión no calcula cifras para ese caso.',
-      'Para impugnar el despido hay 20 días hábiles desde la fecha de baja (art. 59.3 ET); presentar la papeleta de conciliación interrumpe el plazo. Consulta a un abogado laboralista o a un sindicato antes de que pasen.',
+      'Si un juzgado lo declarase nulo, la empresa tendría que readmitirte y pagarte los salarios que dejaste de cobrar (arts. 55.6 y 53.5 ET). Esta revisión no calcula cifras para ese caso.',
+      'Para impugnar el despido hay 20 días hábiles desde la fecha de baja (art. 59.3 ET); presentar la papeleta de conciliación interrumpe el plazo. Un despacho laboralista, una asesoría laboral o un sindicato pueden decirte cómo se aplica a tu caso.',
     ]);
     expect(n?.sources.map((s) => s.id)).toEqual(['et55_5', 'et53', 'et59']);
     expect(n?.calculation).toBeNull();

@@ -532,7 +532,7 @@ test('«No lo sé» as the cause: no severance, and the null warning for what wa
   await expect(warning).toContainText('podría ser nulo (art. 55.5 ET)');
   await expect(warning).toContainText('Ley 15/2022');
   await expect(warning).toContainText('20 días hábiles');
-  await expect(warning).toContainText('abogado laboralista o a un sindicato');
+  await expect(warning).toContainText('una asesoría laboral o un sindicato pueden decirte');
   await expect(warning).not.toContainText(/\bes nulo\b/);
   await expect(page.getByRole('region', { name: 'Tu paro (estimación)' })).toContainText(
     'Depende de la causa',
