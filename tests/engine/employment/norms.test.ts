@@ -87,11 +87,23 @@ describe('employment rule table', () => {
     expect(ruleSource('permanent_on_breach', EMPLOYMENT_NORMS)).toMatchObject({
       id: 'permanent_on_breach',
       citation:
-        'Estatuto de los Trabajadores, art. 15.4 (Real Decreto-ley 32/2021, de 28 de diciembre)',
+        'Estatuto de los Trabajadores, art. 15.4 (Real Decreto Legislativo 2/2015, de 23 de octubre (Estatuto de los Trabajadores))',
       url: `${BOE}buscar/act.php?id=BOE-A-2015-11430#a15`,
-      inForceSince: '2021-12-31',
+      inForceSince: '2025-01-02',
       status: 'in_force',
     });
+  });
+
+  it('every cited article of the Estatuto shows its current wording and is watched', () => {
+    const watched = new Map(
+      ARTICLE_WATCH.articles.filter((a) => a.norm === 'et').map((a) => [a.block, a]),
+    );
+    for (const r of Object.values(RULES).filter((r) => r.norm === 'et' && r.url.includes('#a'))) {
+      const block = r.url.split('#')[1] ?? '';
+      expect(watched.has(block), block).toBe(true);
+      expect(r.wordingSince ?? r.from, r.id).toMatch(ISO);
+    }
+    expect(ruleSource('written_form', EMPLOYMENT_NORMS).inForceSince).toBe('2020-06-27');
   });
 
   it('an injected repeal moves only the rules resting on that norm', () => {

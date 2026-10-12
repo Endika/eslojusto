@@ -1416,13 +1416,13 @@ export const es = {
   'employment.guide.modalities.agrifood':
     'En los sectores agrario y agroalimentario, {norma} amplía ese límite a 120 días.',
   'employment.guide.modalities.replacement':
-    'De sustitución: para cubrir a una persona con derecho a reserva de su puesto, con su nombre y la causa en el contrato, o hasta 3 meses para cubrir un puesto durante un proceso de selección (art. 15.3).',
+    'De sustitución: para cubrir a una persona con derecho a reserva de su puesto, con su nombre y la causa en el contrato, o hasta 3 meses, o el plazo menor de tu convenio, para cubrir un puesto durante un proceso de selección o promoción (art. 15.3).',
   'employment.guide.modalities.discontinuous':
     'Fijo discontinuo: es indefinido, para trabajos de temporada o que se repiten con periodos sin actividad. El contrato dice el periodo de actividad, la jornada y su distribución, aunque sea de forma estimada (art. 16.2).',
   'employment.guide.modalities.training':
     'Formativos: el de formación en alternancia dura entre 3 meses y 2 años, y el de práctica profesional entre 6 meses y un año (art. 11).',
   'employment.guide.modalities.abolished':
-    'Los contratos de obra o servicio y los eventuales por circunstancias de la producción desaparecieron con la reforma: los hechos antes del 31 de diciembre de 2021 siguen sus reglas anteriores hasta su fin (disposición transitoria 3.ª del Real Decreto-ley 32/2021), y los hechos del 31 de diciembre de 2021 al 30 de marzo de 2022 también, pero sin pasar de 6 meses (disposición transitoria 4.ª).',
+    'Los contratos de obra o servicio y los eventuales por circunstancias de la producción desaparecieron con la reforma: los hechos antes del 31 de diciembre de 2021 siguen sus reglas anteriores hasta su duración máxima (disposición transitoria 3.ª del Real Decreto-ley 32/2021), y los hechos del 31 de diciembre de 2021 al 30 de marzo de 2022 también, pero sin pasar de 6 meses (disposición transitoria 4.ª).',
   'employment.guide.modalities.written':
     'La ley pide por escrito, entre otros, los contratos de prácticas y para la formación y el aprendizaje, a tiempo parcial, fijos discontinuos, de relevo y de trabajo a distancia, y los temporales de más de cuatro semanas (art. 8.2).',
   'employment.guide.modalities.before_reform':
@@ -1447,7 +1447,7 @@ export const es = {
 
   'employment.guide.trial.title': 'Periodo de prueba',
   'employment.guide.trial.lead':
-    'El periodo de prueba solo cabe si se pacta por escrito, y su duración la fija tu convenio. Si el convenio no dice nada, estos son los máximos (art. 14.1):',
+    'El periodo de prueba solo cabe si se pacta por escrito, dentro de los límites que fije tu convenio. Si el convenio no dice nada, estos son los máximos (art. 14.1):',
   'employment.guide.trial.technicians': '6 meses para técnicos titulados.',
   'employment.guide.trial.others': '2 meses para el resto.',
   'employment.guide.trial.small_company':
@@ -2143,6 +2143,7 @@ export const es = {
   'client.employment.duty.on_request':
     'Tu contrato ya estaba en marcha el 5 de octubre de 2026: puedes pedir esta información por escrito y la empresa tiene 30 días hábiles.',
   'client.employment.duty.temp_agency_only': 'Solo para contratos por ETT',
+  'client.employment.duty.no_trial': 'Solo si hay periodo de prueba',
 
   'client.employment.offer.title': 'La oferta frente al contrato',
   'client.employment.offer.none': 'Sin diferencias en lo que se puede comparar',

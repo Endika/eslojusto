@@ -669,7 +669,7 @@ function dutyCard(
         find(li, '[data-mark] use').setAttributeNS(null, 'href', markId(elState));
         status.textContent = e.applies
           ? tr(`client.employment.status.${e.finding.status}`)
-          : tr('client.employment.duty.temp_agency_only');
+          : tr(`client.employment.duty.${e.reason}`);
         find(li, '[data-element-lines]').replaceChildren(
           ...listItems(e.applies ? calculationLines(e.finding.calculation, tr) : []),
         );

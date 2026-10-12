@@ -240,7 +240,7 @@ function dutyBlocks(duty: InformationDuty, tr: Translate): Block[] {
         type: 'text',
         text: e.applies
           ? tr(`client.employment.status.${e.finding.status}`)
-          : tr('client.employment.duty.temp_agency_only'),
+          : tr(`client.employment.duty.${e.reason}`),
       },
       ...(e.applies ? calculationLines(e.finding.calculation, tr) : []).map((text): Block => ({
         type: 'bullet',
