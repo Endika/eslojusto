@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.53.8](https://github.com/Endika/eslojusto/compare/v1.53.7...v1.53.8) (2026-10-12)
+
+
+### Bug Fixes
+
+* **mortgage:** update the pre-2019 FAQ and never show «unos 0 €» ([0fe6732](https://github.com/Endika/eslojusto/commit/0fe67329e73c91b575203fbe34ef96fc5074d219))
+
 ## [1.53.7](https://github.com/Endika/eslojusto/compare/v1.53.6...v1.53.7) (2026-10-12)
 
 
