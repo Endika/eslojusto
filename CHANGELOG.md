@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.53.2](https://github.com/Endika/eslojusto/compare/v1.53.1...v1.53.2) (2026-10-12)
+
+
+### Bug Fixes
+
+* **final-pay:** drop advice, complete the fixed-term table and update article dates ([c939420](https://github.com/Endika/eslojusto/commit/c939420138534700adb2d30dd4ef6e63454f83e9))
+
 ## [1.53.1](https://github.com/Endika/eslojusto/compare/v1.53.0...v1.53.1) (2026-10-12)
 
 
