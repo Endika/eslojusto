@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.53.3](https://github.com/Endika/eslojusto/compare/v1.53.2...v1.53.3) (2026-10-12)
+
+
+### Bug Fixes
+
+* **unemployment:** round the benefit to the euro and show its duration on its pages ([37a1499](https://github.com/Endika/eslojusto/commit/37a1499694cb4b0a3880620c2d0dd5f68f50acfb))
+
 ## [1.53.2](https://github.com/Endika/eslojusto/compare/v1.53.1...v1.53.2) (2026-10-12)
 
 
