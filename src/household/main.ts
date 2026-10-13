@@ -162,7 +162,7 @@ export function setUpHousehold(
     nav.goBack(indexOfHash(flow, a.hash), { history: 'push', focus: true });
   });
 
-  window.addEventListener('popstate', () => nav.goBack(indexOfHash(flow, location.hash), {}));
+  window.addEventListener('popstate', () => nav.followHistory());
 
   // Which question or point detail a visitor opens; `toggle` does not bubble, so it is caught on
   // the way down.
