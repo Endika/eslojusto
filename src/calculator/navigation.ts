@@ -1,5 +1,5 @@
 import type { CivilDate } from '../engine/date';
-import { lastSheet, resultStep, stepAt, stepFrom, type Flow } from './flow';
+import { indexOfHash, lastSheet, resultStep, stepAt, stepFrom, type Flow } from './flow';
 import { setUpTabs } from './tabs';
 
 export interface Screen {
@@ -25,6 +25,8 @@ export interface Navigation {
   reached: number;
   show(i: number, options?: ShowOptions): void;
   goBack(i: number, options: ShowOptions): void;
+  // The browser's back or forward.
+  followHistory(): void;
   renderTabs(): void;
 }
 
@@ -92,6 +94,14 @@ export function createNavigation<S extends string>(
     if (current < before) events.wentBack(stepAt(flow, before), stepAt(flow, current));
   }
 
+  // The step the address names, as far as the visitor may go; when that step cannot be shown, the
+  // address is rewritten to the one that is.
+  function followHistory() {
+    goBack(indexOfHash(flow, location.hash), {});
+    const shown = `#${stepAt(flow, current)}`;
+    if (location.hash !== shown) history.replaceState(null, '', shown);
+  }
+
   return {
     get current() {
       return current;
@@ -104,6 +114,7 @@ export function createNavigation<S extends string>(
     },
     show,
     goBack,
+    followHistory,
     renderTabs,
   };
 }

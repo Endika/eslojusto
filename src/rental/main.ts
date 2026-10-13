@@ -175,7 +175,7 @@ export function setUpRental(
     nav.goBack(indexOfHash(flow, a.hash), { history: 'push', focus: true });
   });
 
-  window.addEventListener('popstate', () => nav.goBack(indexOfHash(flow, location.hash), {}));
+  window.addEventListener('popstate', () => nav.followHistory());
 
   const rows = setUpRows(form, tr, conditions);
 

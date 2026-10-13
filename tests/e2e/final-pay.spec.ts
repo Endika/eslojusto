@@ -570,3 +570,15 @@ test('an ERTE not known gives a warning only', async ({ page }) => {
   );
   await expect(page.locator('[data-item="severance"] [data-range]')).toContainText('€');
 });
+
+test('the browser back button leaves the address on the sheet shown', async ({ page }) => {
+  await page.goto('finiquito/');
+  await expect(page.locator('[data-sheet]:not([hidden])')).toHaveCount(1);
+  await page.evaluate(() => {
+    history.pushState(null, '', '#resultado');
+    history.pushState(null, '', '#causa');
+  });
+  await page.goBack();
+  await expect(page.getByLabel('Despido improcedente')).toBeVisible();
+  await expect(page).toHaveURL(/#causa$/);
+});

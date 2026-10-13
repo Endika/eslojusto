@@ -133,6 +133,44 @@ describe('a flow', () => {
     expect(tabs.map((t) => t.getAttribute('href'))).toEqual(['#a', '#b', null]);
   });
 
+  it('follows the browser history and rewrites an address it cannot show', () => {
+    const { root, form, all } = page();
+    const button = (s: string) => root.querySelector(s) as HTMLButtonElement;
+    const nav = createNavigation(
+      {
+        root,
+        form,
+        result: root.querySelector('#result') as HTMLElement,
+        resultTitle: root.querySelector('#result h2') as HTMLElement,
+        sheets: all<HTMLElement>('[data-sheet]'),
+        actions: root.querySelector('.actions') as HTMLElement,
+        backButton: button('[data-back]'),
+        nextButton: button('[data-next]'),
+        reviewButton: button('[data-submit]'),
+      },
+      { stepShown: () => undefined, wentBack: () => undefined },
+      () => today,
+      demo,
+    );
+    nav.reached = 2;
+    history.replaceState(null, '', '#b');
+    nav.followHistory();
+    expect(nav.current).toBe(2);
+    expect(location.hash).toBe('#b');
+    // Past what was reached, or a step not asked, the address says the sheet that is shown.
+    nav.reached = 0;
+    nav.followHistory();
+    expect(nav.current).toBe(0);
+    expect(location.hash).toBe('#a');
+    nav.reached = 2;
+    history.replaceState(null, '', '#extra');
+    nav.followHistory();
+    expect(location.hash).toBe('#a');
+    history.replaceState(null, '', '#nowhere');
+    nav.followHistory();
+    expect(location.hash).toBe('#a');
+  });
+
   it('marks a tab current from any of its steps', () => {
     const { root } = page();
     const render = setUpTabs(root, demo);
