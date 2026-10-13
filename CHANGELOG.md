@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.56.2](https://github.com/Endika/eslojusto/compare/v1.56.1...v1.56.2) (2026-10-13)
+
+
+### Bug Fixes
+
+* **documents:** keep the start choices disabled until their module wires them ([18f8cce](https://github.com/Endika/eslojusto/commit/18f8cce190736c0e865471a526d39d78af71a635))
+
 ## [1.56.1](https://github.com/Endika/eslojusto/compare/v1.56.0...v1.56.1) (2026-10-13)
 
 
