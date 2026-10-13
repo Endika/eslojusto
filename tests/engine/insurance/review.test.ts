@@ -29,9 +29,11 @@ describe('scope', () => {
     expect(scope(policy({ line }))).toEqual({ inScope: false, reason });
   });
 
+  // The insurer's notice is due two months before the end: its deadline has to fall in 2016.
   it.each([
-    ['2015-12-31', { inScope: false, reason: 'before_2016' }],
-    ['2016-01-01', { inScope: true }],
+    ['2016-01-01', { inScope: false, reason: 'before_2016' }],
+    ['2016-02-29', { inScope: false, reason: 'before_2016' }],
+    ['2016-03-01', { inScope: true }],
   ])('a period ending on %s', (day, expected) => {
     expect(scope(policy({ expiresOn: parseDate(day) }))).toEqual(expected);
   });

@@ -4628,7 +4628,7 @@ export const es = {
   'client.insurance.calculation.information.out_of_scope.other_line':
     'Esta revisión es solo para seguros de hogar y de coche.',
   'client.insurance.calculation.information.out_of_scope.before_2016':
-    'Tu póliza venció antes del 01-01-2016, cuando empezaron los plazos de aviso que se calculan aquí; antes regían otros.',
+    'Los plazos de aviso de tu póliza caían antes del 01-01-2016, cuando empezaron los que se calculan aquí; antes regían otros.',
 
   'client.insurance.info.policy_correction': 'Si la póliza no coincide con lo acordado',
   'client.insurance.info.questionnaire': 'Lo que declaras al contratar',
