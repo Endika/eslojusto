@@ -125,6 +125,10 @@ function dismissalPresumed(
       (world === 'complete_years_only' ? days.completeYearsOnly : days.proratedByMonths) > 0;
     const triggers: HouseholdPhrase[] = [
       ...(t.inWriting === false ? [phrase('dismissal.no_written_notice')] : []),
+      // The cause is part of the written form art. 11.2 asks for.
+      ...(t.inWriting === true && t.cause === 'none'
+        ? [phrase('dismissal.no_cause_in_writing')]
+        : []),
       ...(owed && t.severanceAvailable === false ? [phrase('dismissal.no_severance')] : []),
     ];
     const unknown = t.inWriting === null || (owed && t.severanceAvailable === null);

@@ -64,6 +64,12 @@ describe('the presumption of dismissal (art. 11.3)', () => {
     expect(keys(f)).toContain('dismissal.no_written_notice');
   });
 
+  it('is raised by a written notice that gives no cause (art. 11.2)', () => {
+    const f = single(run({}, { inWriting: true, cause: 'none' }), 'dismissal_presumed');
+    expect(f.status).toBe('dismissal_regime_presumed');
+    expect(keys(f)).toContain('dismissal.no_cause_in_writing');
+  });
+
   it('is only doubtful under a year of service: nothing was owed in the counted reading', () => {
     // 10 months of service and nothing made available: no complete year, so no severance counted.
     const a = findingOf(

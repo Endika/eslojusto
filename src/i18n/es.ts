@@ -3802,6 +3802,8 @@ export const es = {
     'No consta si se comunicó por escrito y con su causa.',
   'client.household.calculation.dismissal.no_written_notice':
     'Sin la comunicación por escrito, la norma presume que se trata de un despido y podrían aplicarse sus reglas.',
+  'client.household.calculation.dismissal.no_cause_in_writing':
+    'El escrito tiene que decir la causa (art. 11.2). Sin ella no cumple la forma escrita, y la norma presume que se trata de un despido y podrían aplicarse sus reglas (art. 11.3).',
   'client.household.calculation.dismissal.no_severance':
     'Sin la indemnización puesta a tu disposición a la vez que te comunicaron la extinción, la norma presume que se trata de un despido y podrían aplicarse sus reglas.',
   'client.household.calculation.dismissal.unknown':
@@ -4136,7 +4138,7 @@ export const es = {
   'client.household.warning.holidays':
     'Tus vacaciones quedan por debajo de lo que marca la norma. Es un aviso: no suma importes.',
   'client.household.warning.presumed':
-    'Sin escrito o sin la indemnización a tu disposición, la norma presume que es un despido (art. 11.3).',
+    'Sin escrito con su causa o sin la indemnización a tu disposición, la norma presume que es un despido (art. 11.3).',
   'client.household.warning.night_notice':
     'Con quien vive en la casa, la decisión de terminar no podrá llevarse a cabo entre las 17:00 y las 08:00, salvo falta muy grave a los deberes de lealtad y confianza (art. 11.4). La revisión lo mira por la hora a la que te lo comunicaron.',
   'client.household.ending_unknown':
