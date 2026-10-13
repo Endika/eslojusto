@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, it } from 'vitest';
+import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { EXTRACT_TIMEOUT_SECONDS } from '../../api/src/config';
 import type { CreditCheck as ApiCreditCheck } from '../../api/src/domain/credit-checks';
 import { CREDIT_MERGE_RULES } from '../../api/src/domain/credit-merge';
@@ -16,7 +16,13 @@ import {
 import { SITE_READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
 import { EMPLOYMENT_SECTIONS } from '../../api/src/domain/employment-schema';
 import { RENTAL_SECTIONS } from '../../api/src/domain/rental-schema';
-import { API_TIMEOUT_MS, createApi, parseExtraction, type Fetch } from '../../src/documents/api';
+import {
+  API_TIMEOUT_MS,
+  PAYMENT_TIMEOUT_MS,
+  createApi,
+  parseExtraction,
+  type Fetch,
+} from '../../src/documents/api';
 import {
   CREDIT_CHECKS,
   CREDIT_EXTRACTION,
@@ -252,6 +258,24 @@ describe('extract', () => {
 describe('the time the browser waits', () => {
   it('outlasts the extract function by a minute, for the upload', () => {
     expect(API_TIMEOUT_MS).toBeGreaterThanOrEqual((EXTRACT_TIMEOUT_SECONDS + 60) * 1000);
+  });
+
+  it('gives up on a checkout or a pass within seconds, not the four minutes of a read', async () => {
+    const timeout = vi.spyOn(AbortSignal, 'timeout');
+    try {
+      const api = finalPayApi(fakeFetch(200, { code: 'ok' }));
+      await api.checkout('n'.repeat(32), 'turnstile');
+      await api.pass('cs_test_1', 'n'.repeat(32));
+      await api.verify('v1.p.s');
+      expect(timeout.mock.calls).toEqual([
+        [PAYMENT_TIMEOUT_MS],
+        [PAYMENT_TIMEOUT_MS],
+        [PAYMENT_TIMEOUT_MS],
+      ]);
+      expect(PAYMENT_TIMEOUT_MS).toBeLessThanOrEqual(30_000);
+    } finally {
+      timeout.mockRestore();
+    }
   });
 });
 
