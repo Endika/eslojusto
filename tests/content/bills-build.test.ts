@@ -43,6 +43,10 @@ describe.skipIf(!built || withBills)('a build without the bills switch', () => {
         code,
       ).toEqual([]);
   });
+  it('says nothing of it in the privacy and legal notices', () => {
+    expect(read('dist/privacidad/index.html')).not.toContain('revisiones de tus facturas');
+    expect(read('dist/aviso-legal/index.html')).not.toContain('al-facturas');
+  });
 });
 
 describe.skipIf(!withBills)('a build with the bills switch', () => {
@@ -77,6 +81,14 @@ describe.skipIf(!withBills)('a build with the bills switch', () => {
       expect(html).toContain('data-legal-quote');
       expect(html).toContain(quote);
     }
+  });
+  it('describes the reviews in the privacy and legal notices', () => {
+    const privacy = read('dist/privacidad/index.html');
+    expect(privacy).toContain('Lo que escribes en las revisiones de tus facturas');
+    expect(privacy).toContain('Al revisar tu factura de la luz');
+    const notice = read('dist/aviso-legal/index.html');
+    expect(notice).toContain('id="al-facturas"');
+    expect(notice).toContain('No recalcula la energía del PVPC hora a hora');
   });
   it('ships its strings only on its review pages', () => {
     expect(read('dist/facturas/luz/index.html')).toContain('client.bills.status.matches');
