@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.56.4](https://github.com/Endika/eslojusto/compare/v1.56.3...v1.56.4) (2026-10-13)
+
+
+### Bug Fixes
+
+* **privacy:** state the basis for others' data, what Stripe keeps, and drop expired passes ([d30beb1](https://github.com/Endika/eslojusto/commit/d30beb16bc850e2ec217c2d096721ec48a267e21))
+
 ## [1.56.3](https://github.com/Endika/eslojusto/compare/v1.56.2...v1.56.3) (2026-10-13)
 
 
