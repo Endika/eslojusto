@@ -6,6 +6,7 @@ import { FINAL_PAY_FLOW, presetCauseFlow } from '../calculator/steps';
 import { pageTranslator } from '../i18n/client';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import { localToday } from './clock';
+import { withoutDocuments } from './without-documents';
 
 const analytics = calculatorAnalytics(track, () => performance.now());
 // The calculator rewrites the fragment as it opens, so the address it arrived at is kept first.
@@ -64,11 +65,5 @@ if (documentsBuild) {
         arrival,
       ),
     )
-    // Without the document module the page is still the calculator.
-    .catch(() => {
-      calculator.form.hidden = false;
-      const tabs = document.querySelector<HTMLElement>('.tabs');
-      if (tabs) tabs.hidden = false;
-      document.querySelector<HTMLElement>('[data-documents-start]')?.remove();
-    });
+    .catch((error: unknown) => withoutDocuments(calculator.form, error));
 }
