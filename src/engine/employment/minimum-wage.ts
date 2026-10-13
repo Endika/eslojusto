@@ -52,10 +52,12 @@ const SHORT_TEMPORARY_DAYS = 120;
 const MONTHS_IN_YEAR = 12;
 // Rounding allowance when matching amounts read from a payslip.
 const CENT = 0.01;
-// A day rate is carried to a year over every calendar day, an hour rate over 52 weeks; both are
-// stated with the result.
+// A day rate and a weekly schedule are carried to a year over every calendar day; both are stated
+// with the result.
 const DAYS_FOR_DAY_RATE = 365;
 const WEEKS_FOR_HOUR_RATE = 52;
+// A weekly schedule over the whole year: 365 days are 365/7 weeks, a little over 52.
+const DAYS_IN_WEEK = 7;
 // Art. 37.2 ET: at most fourteen paid public holidays a year.
 const PUBLIC_HOLIDAYS = 14;
 // Yearly effective hours leave out paid rest: thirty calendar days of holidays (art. 38.1 ET), as
@@ -170,13 +172,12 @@ function annualPay(input: EmploymentInput, rate: number, hoursWorld: HoursWorld)
     }
     case 'hour': {
       const { annual: hours, weekly } = input.contractHours;
-      // A week is carried over 52 weeks, as the decree's full-time year is.
+      // A week is carried over the 365 days of the year, as a day rate is.
       if (weekly !== null) {
-        const annual = rate * weekly * WEEKS_FOR_HOUR_RATE;
+        const annual = (rate * weekly * DAYS_FOR_DAY_RATE) / DAYS_IN_WEEK;
         const how = phrase('minimum_wage.pay.hour_weekly', {
           hourly: euros(rate),
           weekly,
-          weeks: integer(WEEKS_FOR_HOUR_RATE),
           annual: euros(annual),
         });
         return { annual, extraPaysUnknown, how };

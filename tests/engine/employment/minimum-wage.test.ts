@@ -282,16 +282,16 @@ describe('part time', () => {
 describe('day and hour rates', () => {
   const start = { startDate: day('2026-01-01') };
 
-  it('carries an hour rate over the week times 52 when the week is known', () => {
+  it('carries an hour rate over the 365 days of the year when the week is known', () => {
     const hourly = salary({ amount: 9, period: 'hour', payments: 12 });
-    // Yearly hours are ignored next to a week: 9 € × 40 h × 52 = 18.720 €.
+    // Yearly hours are ignored next to a week: 9 € × 40 h × 365 / 7 = 18.771,43 €.
     const input = contract({
       ...start,
       salary: hourly,
       contractHours: { weekly: 40, annual: 1800 },
     });
     expect(compareByYear(input, day('2026-12-31'), MINIMUM_WAGE)[0]).toMatchObject({
-      pay: 18720,
+      pay: 18771.43,
       verdict: 'within',
     });
     expect(contractFinding(input, '2026-12-31').status).toBe('within_limit');

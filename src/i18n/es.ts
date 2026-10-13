@@ -2292,7 +2292,7 @@ export const es = {
   'client.employment.calculation.minimum_wage.pay.hour':
     'Salario pactado: {hourly} la hora por {hours} h al año: {annual}.',
   'client.employment.calculation.minimum_wage.pay.hour_weekly':
-    'Salario pactado: {hourly} la hora por {weekly} h a la semana durante {weeks} semanas: {annual} al año.',
+    'Salario pactado: {hourly} la hora por {weekly} h a la semana durante los 365 días del año (365 / 7 semanas): {annual} al año.',
   'client.employment.calculation.minimum_wage.pay.hour_with_paid_rest':
     'Si tus {hours} h al año son solo de trabajo efectivo, con el descanso pagado (vacaciones y festivos, {restDays}) son {paidHours} h pagadas: {hourly} la hora, {annual} al año.',
   'client.employment.calculation.minimum_wage.pay.hours_unknown':
