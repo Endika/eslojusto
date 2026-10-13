@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.54.6](https://github.com/Endika/eslojusto/compare/v1.54.5...v1.54.6) (2026-10-13)
+
+
+### Bug Fixes
+
+* **layout:** no empty tab rail while the tabs are hidden ([87dc979](https://github.com/Endika/eslojusto/commit/87dc979865bd5ab7dbbce27678b47e10504571a1))
+
 ## [1.54.5](https://github.com/Endika/eslojusto/compare/v1.54.4...v1.54.5) (2026-10-13)
 
 
