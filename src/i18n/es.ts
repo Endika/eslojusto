@@ -2418,6 +2418,8 @@ export const es = {
     'Pasa de un año, el máximo del art. 15.2 incluso con convenio.',
   'client.employment.calculation.modality.extensions':
     'Ha tenido {prorrogas}; el art. 15.2 permite una sola.',
+  'client.employment.calculation.modality.occasional_not_continuous':
+    'La ley añade que esos días «no podrán ser utilizados de manera continuada» (art. 15.2). Con un solo contrato no se ve cómo reparte la empresa sus días del año, así que la revisión no lo comprueba.',
   'client.employment.calculation.modality.occasional_days':
     'En {anio}, {dias} de contrato; el límite para situaciones ocasionales es de {limite} al año.',
   'client.employment.calculation.modality.occasional_agrifood':

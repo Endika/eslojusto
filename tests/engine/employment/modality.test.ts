@@ -232,6 +232,12 @@ describe('reviewModality: production', () => {
 describe('reviewModality: occasional production', () => {
   const occasional = (start: string, end: string) => temporary('production_occasional', start, end);
 
+  it('within the 90 days, says the law forbids using them continuously, unchecked', () => {
+    const f = byId(occasional('2024-03-01', '2024-05-29'), 'production_occasional_90');
+    expect(f.status).toBe('within_limit');
+    expect(f.calculation.map((p) => p.key)).toContain('modality.occasional_not_continuous');
+  });
+
   it('91 days in 2024 are over the 90 a year', () => {
     const f = byId(occasional('2024-03-01', '2024-05-30'), 'production_occasional_90');
     expect(f.status).toBe('over_legal_limit');

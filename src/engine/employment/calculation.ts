@@ -99,6 +99,7 @@ type ModalityPhraseKey =
   | 'modality.production_over_year'
   | 'modality.extensions'
   | 'modality.occasional_days'
+  | 'modality.occasional_not_continuous'
   | 'modality.occasional_agrifood'
   | 'modality.replacement_stated'
   | 'modality.replacement_missing'
