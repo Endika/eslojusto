@@ -139,8 +139,27 @@ function monthlyPay(
     requiredAnnual: euros(requiredAnnual),
   });
 
+  // Art. 8.2: with board or lodging, the money paid each month reaches the minimum wage «en
+  // cómputo mensual»; extra payments apart do not make up for a month that falls short.
+  const monthlyRequired =
+    (apart === null ? row.annual / MONTHS_IN_YEAR : row.monthly) * coefficient;
+  const monthShort =
+    (input.inKindMonthly ?? 0) > 0 && cents(monthlyCash) < cents(monthlyRequired)
+      ? (monthlyRequired - monthlyCash) * MONTHS_IN_YEAR
+      : 0;
+  const monthly =
+    monthShort > 0
+      ? [
+          phrase('minimum_wage.monthly_cash', {
+            required: euros(monthlyRequired),
+            paid: euros(monthlyCash),
+          }),
+        ]
+      : [];
+
   // Extra payments apart whose amount is not known cannot be added to the year.
-  if (apart !== null && apart.count > 0 && apart.amount === null) {
+  const extrasUnknown = apart !== null && apart.count > 0 && apart.amount === null;
+  if (extrasUnknown && monthShort === 0) {
     const enough = cents(twelve) >= cents(requiredAnnual);
     return done({
       status: enough ? 'within_limit' : 'review_it',
@@ -159,9 +178,11 @@ function monthlyPay(
     apart === null ? 'minimum_wage.paid_prorated' : 'minimum_wage.paid_apart',
     { monthly: euros(monthlyCash), extras: euros(extras), annual: euros(paidAnnual) },
   );
-  if (cents(paidAnnual) >= cents(requiredAnnual))
+  const yearShort = extrasUnknown ? 0 : Math.max(0, requiredAnnual - paidAnnual);
+  if (cents(yearShort) === 0 && monthShort === 0)
     return done({ status: 'within_limit', calculation: [minimum, paid] });
-  const shortfall = requiredAnnual - paidAnnual;
+  // The yearly and the monthly shortfall are the same money: the larger one counts.
+  const shortfall = Math.max(yearShort, monthShort);
   const days = daysCovered(input, today);
   const yearDays = daysInYear(input.payYear);
   const accrued = days >= yearDays ? shortfall : (shortfall * days) / yearDays;
@@ -170,7 +191,8 @@ function monthlyPay(
     amount: exact(round2(accrued)),
     calculation: [
       minimum,
-      paid,
+      ...(extrasUnknown ? [] : [paid]),
+      ...monthly,
       phrase('minimum_wage.shortfall', {
         annual: euros(shortfall),
         monthly: euros(shortfall / MONTHS_IN_YEAR),

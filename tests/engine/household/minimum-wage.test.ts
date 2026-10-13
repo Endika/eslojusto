@@ -11,6 +11,29 @@ const run = (change: Parameters<typeof household>[0]) => {
   return assessMinimumWage(input, DEPS, { y: input.payYear, m: 12, d: 31 });
 };
 
+describe('with board or lodging, the money paid each month (art. 8.2)', () => {
+  // 1.150 € a month and two extra pays of 1.700 € apart: 17.200 € a year, over 17.094 €; but the
+  // month in money falls short of 1.221 €.
+  const h8 = {
+    payYear: 2026,
+    monthlyCash: 1150,
+    inKindMonthly: 300,
+    weeklyHours: 40,
+    extraPays: { count: 2, amount: 1700, prorated: false, accrual: 'semiannual' },
+  } as const;
+
+  it('falls short in the month even when the year is covered', () => {
+    const f = single(run(h8), 'smi_monthly');
+    expect(f.status).toBe('below_minimum');
+    expect(f.amount?.min).toBe(round2((1221 - 1150) * 12));
+    expect(f.calculation.map((p) => p.key)).toContain('minimum_wage.monthly_cash');
+  });
+
+  it('without pay in kind, the year alone decides', () => {
+    expect(statusOf(run({ ...h8, inKindMonthly: null }), 'smi_monthly')).toBe('within_limit');
+  });
+});
+
 describe('a shortfall counts only the days of the year worked', () => {
   const below = { payYear: 2026, monthlyCash: 1000, extraPays: null, weeklyHours: 40 } as const;
   const amountOf = (a: ReturnType<typeof assessMinimumWage>) =>
