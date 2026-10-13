@@ -23,14 +23,14 @@ const itemOf = (review: RentalReview, kind: ItemResult['kind']): ItemResult | un
 const owedAmount = (r: ItemReading): number => (r.status === 'owed' ? itemAmount(r) : 0);
 
 // What is still to come back of the deposit in every reading; null when nothing is owed.
-export const depositOwed = (review: RentalReview): number | null => {
+const depositOwed = (review: RentalReview): number | null => {
   const item = itemOf(review, 'deposit_return');
   return item ? letterAmount(item.outcome, owedAmount) : null;
 };
 
 // The interest for the delay in every reading: the lowest, never the day count that gives more;
 // null when there is none.
-export const interestOwed = (review: RentalReview): number | null => {
+const interestOwed = (review: RentalReview): number | null => {
   const item = itemOf(review, 'deposit_interest');
   return item ? letterAmount(item.outcome, owedAmount) : null;
 };

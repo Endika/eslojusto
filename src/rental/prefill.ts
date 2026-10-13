@@ -99,8 +99,8 @@ export function regionOfPostcode(postcode: string): RegionCode | null {
 
 // A rise first charged in the month before an anniversary belongs to it; one within this many
 // months before it may still, so its year is to be checked.
-export const EARLY_MONTHS = 1;
-export const DOUBT_MONTHS = 3;
+const EARLY_MONTHS = 1;
+const DOUBT_MONTHS = 3;
 
 // The anniversary year a rise belongs to, counted in months: the latest anniversary month on or
 // before the month it applies from (the notice's when it gives one, otherwise the first month
@@ -121,7 +121,7 @@ export function riseYear(
 
 // One receipt per month. Two that state the same month differently leave the month in doubt:
 // the receipt document's row is kept over any other, at low confidence.
-export function receiptsByMonth(receipts: readonly ExtractedRow[]): {
+function receiptsByMonth(receipts: readonly ExtractedRow[]): {
   readonly months: ReadonlyMap<string, ExtractedRow>;
   readonly disagree: boolean;
 } {
@@ -170,7 +170,7 @@ const toMonth = (d: CivilDate) => `${d.y}-${String(d.m).padStart(2, '0')}`;
 // it is a one-off, no change; a gap between receipts never hides one. The month the contract
 // started, when it did not start on the 1st, is prorated and left out, as is any before it. A
 // change after a gap in the receipts may have come in any month of the gap, so it is less sure.
-export function rentChanges(
+function rentChanges(
   months: ReadonlyMap<string, ExtractedRow>,
   start: CivilDate | null = null,
 ): RentChange[] {

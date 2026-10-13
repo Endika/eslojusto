@@ -259,7 +259,7 @@ export function readForm(
   return { input: complete(partial), figures };
 }
 
-export const situationField = (s: ProtectedSituation) => `situation_${s}`;
+const situationField = (s: ProtectedSituation) => `situation_${s}`;
 
 // The situations that may make the dismissal null, ticked on their own sheet. Read apart from
 // FinalPayInput so they reach only the result on this page, never an event or a request.

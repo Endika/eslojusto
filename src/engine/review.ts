@@ -40,7 +40,7 @@ function zeroReason(e: FinalPayInput): ZeroReason | undefined {
 // The monthly salary the severance is counted on. Under an ERTE it is the full one from before:
 // a reduced working day does not lower it (STS 678/2018) and suspended months do not count
 // (STS 638/2022). null when the person did not give it.
-export function severanceMonthlySalary(e: FinalPayInput): number | null {
+function severanceMonthlySalary(e: FinalPayInput): number | null {
   if (e.erte === 'reduced' || e.erte === 'suspended') return e.preErteMonthlySalary ?? null;
   return e.monthlySalary;
 }

@@ -36,7 +36,7 @@ const DEAD_CHECKOUT: ReadonlySet<ErrorCode> = new Set([
 // Which payments to ask about, a few calls at most: the one whose session came back from Stripe
 // or was typed, the newest redeemed one (its pass can be fetched again), and the two newest not
 // yet redeemed.
-export function passCandidates(
+function passCandidates(
   checkouts: readonly PendingCheckout[],
   sessionId: string | null,
 ): PendingCheckout[] {
@@ -51,7 +51,7 @@ export function passCandidates(
 // The answer worth showing: the one about the session the person came back with or typed;
 // otherwise a payment still settling says more than one made from another browser.
 const RANK: Partial<Record<ErrorCode, number>> = { payment_not_complete: 2, session_mismatch: 0 };
-export function reportedFailure(failures: readonly { code: ErrorCode; matches: boolean }[]) {
+function reportedFailure(failures: readonly { code: ErrorCode; matches: boolean }[]) {
   const matching = failures.find((f) => f.matches);
   if (matching) return matching.code;
   return failures.reduce<ErrorCode>(

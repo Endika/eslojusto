@@ -6,7 +6,6 @@ const P = BENEFIT_2026;
 // ETOP (art. 47.1–4 ET) follows the general rules; force majeure (art. 47.5 and 47.6 ET) is
 // LGSS DA 46.ª; the RED mechanism (art. 47 bis ET) is LGSS DA 41.ª.
 export type ErteRegime = 'etop' | 'force_majeure' | 'red';
-export const ERTE_REGIMES: readonly ErteRegime[] = ['etop', 'force_majeure', 'red'];
 
 // A suspension is total unemployment (arts. 262.2 and 267.1.b.1.º LGSS); a reduction of working
 // time, partial unemployment (arts. 262.3 and 267.1.c), by `percent` of the working time.

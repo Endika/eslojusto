@@ -14,7 +14,7 @@ import { conflictLines } from './summary';
 
 // The prefill as form answers, its rows of «Otros trabajos» numbered from 0: the upload adds them
 // to the rows the form already has.
-export function prefillEntries(p: Prefill): FormEntries {
+function prefillEntries(p: Prefill): FormEntries {
   const entries: [string, string][] = p.fields.map((f) => [f.name, f.value]);
   if (p.otherContracts && p.otherContracts.length > 0) {
     entries.push(['otherContracts', 'yes']);

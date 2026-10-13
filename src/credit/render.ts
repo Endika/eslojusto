@@ -43,7 +43,7 @@ const MONTH = new Intl.DateTimeFormat('es-ES', {
 });
 
 export const percentText = (n: number): string => `${PERCENT.format(n)} %`;
-export const pointsText = (n: number): string => POINTS.format(n);
+const pointsText = (n: number): string => POINTS.format(n);
 
 // «2019-02» → «febrero de 2019».
 export function monthText(month: string): string {

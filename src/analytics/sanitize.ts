@@ -6,7 +6,7 @@ import { CATALOGUE, SECTIONS } from './events';
 // exact key sets, and the privacy page lists these same keys in plain words.
 
 // PostHog needs these to ingest an event; ids and clocks are random or technical.
-export const TECHNICAL_KEYS = [
+const TECHNICAL_KEYS = [
   'token',
   'distinct_id',
   '$device_id',
@@ -22,7 +22,7 @@ export const TECHNICAL_KEYS = [
 ] as const;
 
 // Each one answers a product question: which page, from where, on what, how long and how far.
-export const PRODUCT_KEYS = [
+const PRODUCT_KEYS = [
   '$current_url',
   '$pathname',
   '$host',

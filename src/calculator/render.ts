@@ -18,7 +18,7 @@ import { calculationText, phraseText } from './calculation';
 import type { FieldError } from './form';
 import { formatInteger, formatEuros, formatWholeEuros } from './number';
 
-export const TONE: Record<ItemId, string> = {
+const TONE: Record<ItemId, string> = {
   pending_salary: 'salary',
   holiday_pay: 'holidays',
   extra_pay: 'salary',
@@ -462,7 +462,7 @@ export function summaryHeadline(r: Review): SummaryHeadline {
 }
 
 // One line per item that falls short: its name and roughly how much, never the range or the method.
-export function shortfallLine(r: ItemResult, tr: Translate): Piece[] | null {
+function shortfallLine(r: ItemResult, tr: Translate): Piece[] | null {
   const deduction = r.status === 'deduction_too_high';
   if (r.status !== 'below_minimum' && !deduction) return null;
   const difference = r.difference ?? 0;
@@ -526,7 +526,7 @@ const DISMISSALS: readonly Cause[] = [
 ];
 
 // The deadlines that run for the person's own case: never behind the pass.
-export function summaryDeadlines(cause: Cause, benefit: BenefitEstimate): ClientKey[] {
+function summaryDeadlines(cause: Cause, benefit: BenefitEstimate): ClientKey[] {
   return [
     ...(DISMISSALS.includes(cause) ? (['client.summary.dismissal_deadline'] as const) : []),
     // Without the cause it may still be a dismissal, whose deadline runs all the same.

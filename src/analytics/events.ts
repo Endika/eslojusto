@@ -341,7 +341,7 @@ export const RENTAL_ITEMS = [
 const _allRentalItems: CoversAll<RentalItemKind, (typeof RENTAL_ITEMS)[number]> = true;
 void _allRentalItems;
 
-export const OUT_OF_SCOPE_REASONS = [
+const OUT_OF_SCOPE_REASONS = [
   'before_2019',
   'seasonal',
   'room',
@@ -396,8 +396,8 @@ void _allClauses;
 
 const LANDLORDS = ['person', 'company'] as const satisfies readonly LandlordType[];
 // By the norms that changed who pays the agency: RDL 7/2019, Ley 12/2023 and RDL 29/2026.
-export const SIGNED_PERIODS = ['2019-2023', '2023-2026', '2026+'] as const;
-export const UPDATE_COUNTS = ['0', '1', '2', '3+'] as const;
+const SIGNED_PERIODS = ['2019-2023', '2023-2026', '2026+'] as const;
+const UPDATE_COUNTS = ['0', '1', '2', '3+'] as const;
 
 // What a contract result card is about: a checked point by its kind, never its words.
 export const EMPLOYMENT_ITEMS = [
@@ -416,7 +416,7 @@ export const EMPLOYMENT_ITEMS = [
 const _allEmploymentItems: CoversAll<EmploymentItemKind, (typeof EMPLOYMENT_ITEMS)[number]> = true;
 void _allEmploymentItems;
 
-export const EMPLOYMENT_OUT_OF_SCOPE_REASONS = [
+const EMPLOYMENT_OUT_OF_SCOPE_REASONS = [
   'special_relationship',
   'public_servant',
   'temp_agency',
@@ -459,7 +459,7 @@ export const HOUSEHOLD_ITEMS = [
 const _allHouseholdItems: CoversAll<HouseholdItemKind, (typeof HOUSEHOLD_ITEMS)[number]> = true;
 void _allHouseholdItems;
 
-export const HOUSEHOLD_OUT_OF_SCOPE_REASONS = [
+const HOUSEHOLD_OUT_OF_SCOPE_REASONS = [
   'before_reform',
 ] as const satisfies readonly HouseholdOutOfScopeReason[];
 const _allHouseholdReasons: CoversAll<
@@ -490,16 +490,16 @@ const _allHouseholdStatuses: CoversAll<
 > = true;
 void _allHouseholdStatuses;
 
-export const HOUSEHOLD_WORKS = ['hourly_external', 'monthly', 'live_in'] as const;
-export const HOUSEHOLD_ENDINGS = [
+const HOUSEHOLD_WORKS = ['hourly_external', 'monthly', 'live_in'] as const;
+const HOUSEHOLD_ENDINGS = [
   'working',
   'desistimiento',
   'et_cause',
   'unknown',
 ] as const satisfies readonly HouseholdEnding[];
 // By the years of the minimum wage decrees: the reform came in September 2022.
-export const HOUSEHOLD_PERIODS = ['2022-2023', '2024-2025', '2026+'] as const;
-export const HOUSEHOLD_EXTRA_PAYS = ['not_applicable', 'none', 'prorated', 'apart'] as const;
+const HOUSEHOLD_PERIODS = ['2022-2023', '2024-2025', '2026+'] as const;
+const HOUSEHOLD_EXTRA_PAYS = ['not_applicable', 'none', 'prorated', 'apart'] as const;
 
 const CREDIT_PRODUCTS = [
   'personal_loan',
@@ -509,7 +509,7 @@ const CREDIT_PRODUCTS = [
 const _allCreditProducts: CoversAll<CreditProduct, (typeof CREDIT_PRODUCTS)[number]> = true;
 void _allCreditProducts;
 
-export const CREDIT_OUT_OF_SCOPE_REASONS = [
+const CREDIT_OUT_OF_SCOPE_REASONS = [
   'mortgage',
   'lease_without_purchase',
   'business',
@@ -523,7 +523,7 @@ const _allCreditReasons: CoversAll<
 void _allCreditReasons;
 
 // A credit point by its status; one whose readings of a «No lo sé» disagree counts as `readings`.
-export const CREDIT_STATUSES = [
+const CREDIT_STATUSES = [
   'matches',
   'contract_lower',
   'contract_higher',
@@ -543,7 +543,7 @@ export const CREDIT_STATUSES = [
 const _allCreditStatuses: CoversAll<CreditFindingStatus, (typeof CREDIT_STATUSES)[number]> = true;
 void _allCreditStatuses;
 
-export const INDICATOR_STATUSES = [
+const INDICATOR_STATUSES = [
   'above',
   'edge',
   'below',
@@ -557,9 +557,9 @@ void _allIndicatorStatuses;
 
 // By the year the contract was concluded: the 2011 law applies from 25-09-2011; a revolving card
 // from before it gets only the indicator.
-export const CREDIT_PERIODS = ['before_2011', '2011-2015', '2016-2020', '2021+'] as const;
+const CREDIT_PERIODS = ['before_2011', '2011-2015', '2016-2020', '2021+'] as const;
 
-export const INSURANCE_OUT_OF_SCOPE_REASONS = [
+const INSURANCE_OUT_OF_SCOPE_REASONS = [
   'life',
   'health',
   'funeral',
@@ -572,7 +572,7 @@ const _allInsuranceReasons: CoversAll<
 > = true;
 void _allInsuranceReasons;
 
-export const INSURANCE_STATUSES = [
+const INSURANCE_STATUSES = [
   'open',
   'ended',
   'not_started',
@@ -591,7 +591,7 @@ const _allInsuranceStatuses: CoversAll<
 > = true;
 void _allInsuranceStatuses;
 
-export const MORTGAGE_OUT_OF_SCOPE_REASONS = [
+const MORTGAGE_OUT_OF_SCOPE_REASONS = [
   'company',
   'business_purpose',
   'developer_subrogation',
@@ -634,13 +634,7 @@ const _allFeeStatuses: CoversAll<FeeStatus, (typeof MORTGAGE_FEE_STATUSES)[numbe
 void _allFeeStatuses;
 
 // By the days that change what the review reads in a deed.
-export const DEED_PERIODS = [
-  'before_2007',
-  '2007_2013',
-  '2013_2018',
-  '2018_2019',
-  '2019_plus',
-] as const;
+const DEED_PERIODS = ['before_2007', '2007_2013', '2013_2018', '2018_2019', '2019_plus'] as const;
 
 // From the status that weighs most on a family of points to the one that weighs least; a point
 // whose verdict changes with a «No lo sé» counts as `readings`, after the concrete findings.
@@ -663,9 +657,9 @@ const _allPointStatuses: CoversAll<FindingStatus, (typeof POINT_STATUSES)[number
 void _allPointStatuses;
 
 // By the 2021 reform's start (30-03-2022) and the years of the minimum wage decrees after it.
-export const START_PERIODS = ['before_reform', '2022-2023', '2024-2025', '2026+'] as const;
-export const PAYSLIP_COUNTS = ['0', '1-3', '4+'] as const;
-export const YEAR_COUNTS = ['0', '1', '2', '3+'] as const;
+const START_PERIODS = ['before_reform', '2022-2023', '2024-2025', '2026+'] as const;
+const PAYSLIP_COUNTS = ['0', '1-3', '4+'] as const;
+const YEAR_COUNTS = ['0', '1', '2', '3+'] as const;
 
 const CAUSES = [
   'resignation',
@@ -728,12 +722,11 @@ export const sectionSecondsBucket = (s: number) => bucket(s, [10, 30, 60, 180], 
 export const reviewSecondsBucket = (s: number) => bucket(s, [60, 180, 600], REVIEW_SECONDS);
 export const differenceBucket = (euros: number) =>
   euros <= 0 ? '0' : bucket(euros, [100, 500, 2000], DIFFERENCE_BUCKETS.slice(1));
-export const FIELD_BUCKETS = ['0', '1-3', '4-8', '9+'] as const;
+const FIELD_BUCKETS = ['0', '1-3', '4-8', '9+'] as const;
 export const fieldsBucket = (n: number) =>
   n <= 0 ? '0' : n <= 3 ? '1-3' : n <= 8 ? '4-8' : ('9+' as const);
 export const attemptBucket = (n: number) => (n <= 1 ? '1' : n === 2 ? '2' : '3+');
-export const otherContractsBucket = (n: number) =>
-  n <= 0 ? '0' : n === 1 ? '1' : n === 2 ? '2' : '3+';
+const otherContractsBucket = (n: number) => (n <= 0 ? '0' : n === 1 ? '1' : n === 2 ? '2' : '3+');
 
 type Rule =
   | { readonly values: readonly string[] }

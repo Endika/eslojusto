@@ -35,7 +35,7 @@ const ITEM_IDS = [
 const HOLIDAY_FIELDS = ['annualHolidayDays', 'holidayDaysTaken'] as const;
 
 const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
-export const lowest = (...cs: Confidence[]): Confidence =>
+const lowest = (...cs: Confidence[]): Confidence =>
   cs.reduce((a, b) => (RANK[b] < RANK[a] ? b : a), 'high');
 
 const num = (f: ExtractedField | undefined): number | null =>

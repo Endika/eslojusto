@@ -81,7 +81,7 @@ export function payShortfall(
 }
 
 // Every other point that does not match the law in every reading, each to be named with its norm.
-export function pointsToReview(review: EmploymentReview): readonly Finding[] {
+function pointsToReview(review: EmploymentReview): readonly Finding[] {
   const assessed: readonly Assessed[] = [
     ...review.items,
     ...review.clauses.flatMap((c) => (c.assessed === null ? [] : [c.assessed])),

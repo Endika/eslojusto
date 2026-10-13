@@ -279,7 +279,7 @@ const NORM_STATUS: Record<NormSource['status'], ClientKey> = {
   repealed: 'client.employment.norm.repealed',
 };
 
-export const normStatusText = (s: NormSource, tr: Translate): string =>
+const normStatusText = (s: NormSource, tr: Translate): string =>
   tr(NORM_STATUS[s.status], { fecha: s.statusSince ? dayText(s.statusSince) : '' });
 
 // Each rule a point rests on: the norm and article, a link to it and how it stands today.

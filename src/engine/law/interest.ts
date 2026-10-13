@@ -50,10 +50,7 @@ export type LegalInterest =
       readonly missingYear: number;
     };
 
-export const periodOn = (
-  day: CivilDate,
-  table: LegalInterestTable,
-): LegalInterestPeriod | undefined => {
+const periodOn = (day: CivilDate, table: LegalInterestTable): LegalInterestPeriod | undefined => {
   const iso = toIso(day);
   return table.find((p) => p.from <= iso && iso <= p.until);
 };

@@ -23,7 +23,7 @@ export interface InsurancePrefill extends ReadPrefill {
 }
 
 // Of the insurance documents, only the policy and the renewal notice both state the end date.
-export const INSURANCE_CONFLICT_FIELDS = ['expiresOn'] as const;
+const INSURANCE_CONFLICT_FIELDS = ['expiresOn'] as const;
 
 const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
 const lowest = (...cs: Confidence[]): Confidence =>

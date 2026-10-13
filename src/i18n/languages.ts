@@ -21,7 +21,7 @@ export const builtLangs = (env: Record<string, string | undefined> = process.env
 ];
 
 // The prefix of a language's routes: none for the default language.
-export const prefix = (lang: Lang): string => (lang === DEFAULT_LANG ? '' : `${lang}/`);
+const prefix = (lang: Lang): string => (lang === DEFAULT_LANG ? '' : `${lang}/`);
 
 // A page's URL in a language, under the site's base.
 export const link = (lang: Lang, path = ''): string =>

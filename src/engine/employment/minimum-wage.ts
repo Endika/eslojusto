@@ -249,7 +249,7 @@ export function contractAgainstMinimum(
 
 // Art. 1 of each decree and art. 12.1 ET: a shorter working time earns the minimum pro rata to the
 // agreement's full time, else to the legal 40 hours; a longer one never raises it. Null if unknown.
-export function partTimeCoefficient(input: EmploymentInput): number | null {
+function partTimeCoefficient(input: EmploymentInput): number | null {
   const { weekly, annual } = input.contractHours;
   if (weekly !== null) return Math.min(1, weekly / (input.fullTimeHours ?? LEGAL_WEEK));
   const fullYear = input.agreement.annualHours;
@@ -523,7 +523,7 @@ const STRICTEST: PayWorld = { complement: 'complement_variable', hours: 'effecti
 // A month short of its minimum counts only when the year falls short too: the contract's salary
 // in a year it is known to apply, or, in a later year, a payslip short of the minimum for every
 // whole month the contract covered that year.
-export function payslipsAgainstYear(
+function payslipsAgainstYear(
   input: EmploymentInput,
   today: CivilDate,
   table: MinimumWageTable,

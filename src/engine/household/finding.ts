@@ -15,12 +15,7 @@ export interface Verdict {
 }
 
 // Builds a finding named after its rule.
-export function findingOf(
-  id: HouseholdRuleId,
-  item: ItemId,
-  norms: NormTable,
-  verdict: Verdict,
-): Finding {
+function findingOf(id: HouseholdRuleId, item: ItemId, norms: NormTable, verdict: Verdict): Finding {
   const cites = new Set<HouseholdRuleId>([id, ...(verdict.alsoCites ?? [])]);
   return {
     id,

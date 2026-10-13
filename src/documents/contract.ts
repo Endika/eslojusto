@@ -96,10 +96,8 @@ export const LIMITS = {
   requestBudgetBytes: 5_800_000,
 } as const;
 
-export const FREE_READS_PER_DAY = 2;
 export const PASS_READS = 15;
 export const PASS_DAYS = 7;
-export const PASS_PRICE = 4.99;
 
 export const API_ERROR_CODES = [
   'method_not_allowed',
@@ -130,7 +128,7 @@ export const API_ERROR_CODES = [
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number];
 
 // What can go wrong before or around a request, in the browser.
-export const CLIENT_ERROR_CODES = [
+const CLIENT_ERROR_CODES = [
   'network_error',
   'unexpected_response',
   'captcha_unavailable',
@@ -327,7 +325,7 @@ export const EMPLOYMENT_LIST_MAXIMA = {
   contracts: 15,
 } as const;
 export type EmploymentListName = keyof typeof EMPLOYMENT_LIST_MAXIMA;
-export const EMPLOYMENT_LISTS = Object.keys(EMPLOYMENT_LIST_MAXIMA) as EmploymentListName[];
+const EMPLOYMENT_LISTS = Object.keys(EMPLOYMENT_LIST_MAXIMA) as EmploymentListName[];
 
 export const EMPLOYMENT_EXTRACTION: ExtractionShape<EmploymentFieldName, EmploymentListName> = {
   review: 'employment',
