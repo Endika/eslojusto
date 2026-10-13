@@ -31,9 +31,11 @@
   display: none;
 }
 
-/* Pages without the tab rail span the whole width. */
+/* Pages without the tab rail span the whole width, and so do pages where it is still hidden (until
+   the person picks how to start) or never shown (without JavaScript). */
 @media (min-width: 60rem) {
-  body:not(:has(.tabs)) {
+  body:not(:has(.tabs:not([hidden]))),
+  html:not(.js) body {
     grid-template-columns: minmax(0, 1fr);
   }
   .logo--compact {
