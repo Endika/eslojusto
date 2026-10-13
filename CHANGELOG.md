@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.54.2](https://github.com/Endika/eslojusto/compare/v1.54.1...v1.54.2) (2026-10-13)
+
+
+### Bug Fixes
+
+* date a source by its own wording period, never «en vigor» once it ended ([c6b3a55](https://github.com/Endika/eslojusto/commit/c6b3a5503834476bba8bf001507c9c576c30592d))
+
 ## [1.54.1](https://github.com/Endika/eslojusto/compare/v1.54.0...v1.54.1) (2026-10-13)
 
 
