@@ -33,7 +33,7 @@ export function recognisedLine(documents: readonly RecognisedDocument[], tr: Tra
 }
 
 // The fields more than one kind of document can state, so the only ones that can disagree.
-export const CONFLICT_FIELDS = [
+const CONFLICT_FIELDS = [
   'startDate',
   'endDate',
   'cause',

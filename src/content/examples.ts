@@ -18,12 +18,12 @@ import type { Cause, FinalPayInput, ItemId, StatedCause } from '../engine/types'
 // person in them is made up: 1.500 € gross a month with two extra payments of 1.500 € that accrue
 // by half years, 21.000 € a year, as in the guide of /finiquito/.
 
-export const SALARY = 1500;
+const SALARY = 1500;
 
 const date = parseDate;
 
 // A contract that ends on `end`, with nothing of this year's holidays taken unless said otherwise.
-export const exampleInput = (
+const exampleInput = (
   cause: Cause,
   start: string,
   end: string,
@@ -44,7 +44,7 @@ export const exampleInput = (
 });
 
 // The review as the calculator would show it, on the day the contract ends.
-export function review(e: FinalPayInput, figures: EmployerFigures = {}): Review {
+function review(e: FinalPayInput, figures: EmployerFigures = {}): Review {
   const r = reviewFinalPay(e, figures, e.endDate);
   if (!r.ok) throw new Error(`An example does not validate: ${JSON.stringify(r.errors)}`);
   return r.review;
@@ -54,7 +54,7 @@ export const itemRange = (r: Review, id: ItemId): Range | null =>
   r.items.find((p) => p.item.id === id)?.item.range ?? null;
 
 // The final pay proper, the money already earned: salary, holidays and extra pay.
-export function finalPayTotal(r: Review): Range {
+function finalPayTotal(r: Review): Range {
   const ids: readonly ItemId[] = ['pending_salary', 'holiday_pay', 'extra_pay'];
   const ranges = ids.map((id) => itemRange(r, id) ?? { min: 0, max: 0 });
   return {
@@ -111,7 +111,7 @@ const fixedTermLimit = (months: number): FixedTermLimit =>
 
 // Fin de contrato temporal: contracts for production circumstances of 3, 6 and 12 months that end
 // on 30 September 2026.
-export const FIXED_TERMS = [
+const FIXED_TERMS = [
   ['3 meses', '2026-07-01', 3],
   ['6 meses', '2026-04-01', 6],
   ['12 meses', '2025-10-01', 12],
@@ -169,7 +169,7 @@ export const notAgreed = review(
 );
 
 // /paro/: what a gross salary paid in 14 payments gives, for each number of children.
-export const BENEFIT_SALARIES = [1300, 1500, 1800] as const;
+const BENEFIT_SALARIES = [1300, 1500, 1800] as const;
 export const benefitBySalary = BENEFIT_SALARIES.map((salary) => {
   const e = exampleInput('unfair_dismissal', '2022-01-01', '2026-09-30', {
     monthlySalary: salary,

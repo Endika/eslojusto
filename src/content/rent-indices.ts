@@ -16,7 +16,7 @@ export const FIRST_MONTH = '2024-11';
 export const NORMS_CHECKED_ON = '2026-10-12';
 
 // Each month the norms are read again; a check older than this is due.
-export const NORMS_REVIEW_DAYS = 35;
+const NORMS_REVIEW_DAYS = 35;
 
 export const normsReviewDue = (today: string, checkedOn: string = NORMS_CHECKED_ON): boolean =>
   ordinal(parseDate(today)) - ordinal(parseDate(checkedOn)) > NORMS_REVIEW_DAYS;
@@ -114,7 +114,7 @@ export const SERIES = { irav: IRAV, ipc: IPC, igc: IGC } as const;
 export const DECREE_CAP = 2;
 
 // A worked example on made-up figures: a rent updated by the IRAV on its anniversary.
-export const EXAMPLE = { rent: 800, anniversary: '2026-09-01', later: '2026-11-01' } as const;
+const EXAMPLE = { rent: 800, anniversary: '2026-09-01', later: '2026-11-01' } as const;
 
 export interface Example {
   readonly rent: number;

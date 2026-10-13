@@ -59,7 +59,7 @@ export interface PageMeta {
 }
 
 export const REVIEW = { path: '/alquiler/', name: 'Revisa tu alquiler' } as const;
-export const INDICES = { path: '/alquiler/irav-ipc/', name: 'IRAV e IPC de cada mes' } as const;
+const INDICES = { path: '/alquiler/irav-ipc/', name: 'IRAV e IPC de cada mes' } as const;
 
 export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
   rise: {
@@ -127,7 +127,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
 // The pages whose prose lives in a section component of its own.
 export type StaticPageId = 'deposit' | 'deposit_return' | 'charges';
 
-export const STATIC_PAGE_IDS: readonly StaticPageId[] = ['deposit', 'deposit_return', 'charges'];
+const STATIC_PAGE_IDS: readonly StaticPageId[] = ['deposit', 'deposit_return', 'charges'];
 
 // Built on demand: their answers on the decree read its status from the norm table.
 const staticPages = (
@@ -207,8 +207,8 @@ const staticPages = (
 };
 
 // The worked examples are on made-up figures.
-export const RISE_EXAMPLE = { rent: 900, anniversary: '2026-11-01' } as const;
-export const FEE_EXAMPLE = { rent: 900, vat: 21 } as const;
+const RISE_EXAMPLE = { rent: 900, anniversary: '2026-11-01' } as const;
+const FEE_EXAMPLE = { rent: 900, vat: 21 } as const;
 
 export interface PageSource extends Source {
   readonly status: string;
@@ -633,7 +633,7 @@ export interface DepositReturnExample {
   readonly totalCommercial: number;
 }
 
-export const DEPOSIT_RETURN_EXAMPLE = {
+const DEPOSIT_RETURN_EXAMPLE = {
   keysReturnedOn: '2022-11-15',
   returnedOn: '2023-03-20',
 } as const;
@@ -688,7 +688,7 @@ export interface DepositExample {
   readonly over: number;
 }
 
-export const DEPOSIT_EXAMPLE = { asked: 3600 } as const;
+const DEPOSIT_EXAMPLE = { asked: 3600 } as const;
 
 export function depositExample(): DepositExample {
   const rent = CONTRACT.initialRent;
@@ -713,7 +713,7 @@ export interface ChargesExample {
   readonly over: number;
 }
 
-export const CHARGES_EXAMPLE = { agreed: 600, charged: 720, year: 2022 } as const;
+const CHARGES_EXAMPLE = { agreed: 600, charged: 720, year: 2022 } as const;
 
 export function chargesExample(): ChargesExample {
   const { agreed, charged, year } = CHARGES_EXAMPLE;

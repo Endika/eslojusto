@@ -14,7 +14,7 @@ const sameFile = (a: Selected, b: Selected) =>
   a.size === b.size &&
   a.lastModified === b.lastModified;
 
-export const isPdf = (f: Selected) => f.type === 'application/pdf';
+const isPdf = (f: Selected) => f.type === 'application/pdf';
 // Any photo the browser can decode is re-encoded to JPEG before it leaves, so HEIC or PNG work too.
 const isImage = (f: Selected) => f.type.startsWith('image/');
 

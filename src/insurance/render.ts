@@ -18,7 +18,7 @@ export const civilDayText = (d: CivilDate): string => dayText(toIso(d));
 
 const PERCENT = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2, useGrouping: 'always' });
 
-export const percentText = (n: number): string => `${PERCENT.format(n)} %`;
+const percentText = (n: number): string => `${PERCENT.format(n)} %`;
 
 // «1 día», «115 días».
 const daysText = (n: number, tr: Translate): string =>

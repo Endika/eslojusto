@@ -16,7 +16,7 @@ export const TURNSTILE_SCRIPT = `${TURNSTILE_ORIGIN}/turnstile/v0/api.js?render=
 export const CHECKOUT_ORIGIN = 'https://checkout.stripe.com';
 
 // Each env var takes one output of the API's CDK stack: extractUrl, checkoutUrl and passUrl.
-export const ENV_NAMES: Readonly<Record<Operation, string>> = {
+const ENV_NAMES: Readonly<Record<Operation, string>> = {
   extract: 'PUBLIC_API_EXTRACT_URL',
   checkout: 'PUBLIC_API_CHECKOUT_URL',
   pass: 'PUBLIC_API_PASS_URL',

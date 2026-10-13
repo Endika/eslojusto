@@ -25,7 +25,7 @@ export interface CreditPrefill extends ReadPrefill {
 }
 
 // The fields more than one kind of credit document can state, among those the form takes.
-export const CREDIT_CONFLICT_FIELDS = [
+const CREDIT_CONFLICT_FIELDS = [
   'agreedOn',
   'principal',
   'nominalRate',

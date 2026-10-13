@@ -28,7 +28,7 @@ import {
 } from '../engine/employment/validate';
 import { parseAmount } from '../calculator/number';
 import type { EmploymentFormField } from './ports';
-import { ROW_LISTS, parseRowField, rowField, type RowList } from './rows';
+import { ROW_LISTS, rowField, type RowList } from './rows';
 
 // The sheets in order, each small enough for a phone's screen. The work history sits right after
 // the modality: both are about how long the contract may be fixed-term, and its tab holds both.
@@ -135,7 +135,7 @@ export const EXTENDABLE: readonly Modality[] = ['production', 'eventual'];
 export const REPLACEMENTS: readonly Modality[] = ['replacement', 'interim'];
 export const TRAINING: readonly Modality[] = ['training_alternance', 'training_practice'];
 // Already open-ended: the work history cannot change anything.
-export const OPEN_ENDED: readonly Modality[] = ['permanent', 'discontinuous'];
+const OPEN_ENDED: readonly Modality[] = ['permanent', 'discontinuous'];
 export const SALARY_PERIODS: readonly SalaryPeriod[] = ['year', 'month', 'day', 'hour'];
 export const PART_KINDS: readonly SalaryComponentKind[] = [
   'base',
@@ -309,7 +309,7 @@ const DEFAULTS: EmploymentInput = {
   offer: null,
 };
 
-export const completeInput = (partial: Partial<EmploymentInput>): EmploymentInput => ({
+const completeInput = (partial: Partial<EmploymentInput>): EmploymentInput => ({
   ...DEFAULTS,
   ...partial,
 });
@@ -845,11 +845,7 @@ const FIELD_OF: Partial<Record<EmploymentField, string>> = {
 const outOfPercent = (v: number | null): boolean => v !== null && (v < 0 || v > 100);
 
 // Puts an engine error on the field that asked for it.
-export function fieldOfError(
-  e: ValidationError,
-  rows: RowsOnScreen,
-  input: EmploymentInput,
-): string {
+function fieldOfError(e: ValidationError, rows: RowsOnScreen, input: EmploymentInput): string {
   const { field, index } = e;
   switch (field) {
     case 'training.effectiveWorkPercent':
@@ -918,6 +914,3 @@ export function readEmploymentForm(
   if (errors.length > 0) return { errors };
   return { input: completeInput(r.partial) };
 }
-
-// The list a row field belongs to, for focusing the right sheet.
-export const listOfField = (field: string): RowList | null => parseRowField(field)?.list ?? null;

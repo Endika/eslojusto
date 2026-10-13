@@ -78,7 +78,7 @@ function phraseKey(p: RentalPhrase): ClientKey {
   return `client.rental.calculation.${p.key}_${one ? 'one' : 'many'}`;
 }
 
-export function phraseText(p: RentalPhrase, tr: Translate): string {
+function phraseText(p: RentalPhrase, tr: Translate): string {
   const vars = Object.fromEntries(
     Object.entries(p.vars ?? {}).map(([name, v]) => [
       name,

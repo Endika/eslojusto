@@ -42,7 +42,7 @@ const figureText = (name: string, f: Figure): string => {
   return formatInteger(f.integer);
 };
 
-export function phraseText(p: HouseholdPhrase, tr: Translate): string {
+function phraseText(p: HouseholdPhrase, tr: Translate): string {
   const vars = Object.fromEntries(
     Object.entries(p.vars ?? {}).map(([name, v]) => [
       name,
@@ -394,7 +394,7 @@ export type Headline = 'found' | 'to_review' | 'nothing_found' | 'nothing_entere
 
 // The summary's first line follows the engine: a point that falls short of the norm is «found»;
 // a warning or a doubt is only to review.
-export function headline(review: HouseholdReview): Headline {
+function headline(review: HouseholdReview): Headline {
   const findings = review.items.flatMap(findingsOf);
   if (findings.some((f) => FOUND.has(f.status))) return 'found';
   if (findings.some((f) => TO_REVIEW.has(f.status))) return 'to_review';
@@ -407,7 +407,7 @@ export function headline(review: HouseholdReview): Headline {
 // the night notice.
 export type WarningCode = 'working_time' | 'holidays' | 'presumed' | 'night_notice';
 
-export function warningCodes(review: HouseholdReview): readonly WarningCode[] {
+function warningCodes(review: HouseholdReview): readonly WarningCode[] {
   const findings = review.items.flatMap(findingsOf);
   // Working time and holidays fall short of the norm with no amount to add.
   const short = (item: ItemId) =>

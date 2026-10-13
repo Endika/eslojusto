@@ -7,7 +7,7 @@ import { SHEETS, sheetErrors, type Sheet } from './form';
 export const STEPS = [...SHEETS, 'resultado'] as const;
 export type Step = (typeof STEPS)[number];
 
-export const SECTION_OF_STEP: Record<Step, string> = {
+const SECTION_OF_STEP: Record<Step, string> = {
   trabajo: 'cause',
   fechas: 'dates',
   desistimiento: 'settlement',

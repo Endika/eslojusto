@@ -1,7 +1,7 @@
 import { round2 } from './money';
 import type { Item } from './types';
 
-export const TOLERANCE_EUROS = 1;
+const TOLERANCE_EUROS = 1;
 
 export type Status =
   | 'below_minimum'

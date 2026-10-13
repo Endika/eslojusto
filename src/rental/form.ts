@@ -24,7 +24,7 @@ import {
 } from '../engine/rental/validate';
 import { parseAmount } from '../calculator/number';
 import type { RentalField } from './ports';
-import { ROW_LISTS, parseRowField, rowField, type RowList } from './rows';
+import { ROW_LISTS, rowField, type RowList } from './rows';
 
 // The sheets in order. Each fits a phone's screen, so a long topic takes more than one; the
 // charges come last because the move-out's follow-up sheet is asked only after leaving.
@@ -521,6 +521,3 @@ export function readRentalForm(
   if (errors.length > 0) return { errors };
   return { input: complete(r.partial) };
 }
-
-// The list a row field belongs to, for focusing the right sheet.
-export const listOfField = (field: string): RowList | null => parseRowField(field)?.list ?? null;

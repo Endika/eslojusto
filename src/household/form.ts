@@ -48,8 +48,8 @@ export const ACCRUALS: readonly Accrual[] = ['semiannual', 'annual', 'unknown'];
 
 // The hour a «sí» or a «no» on the night notice stands for: the engine reads a time of day, the
 // form asks only whether it fell between 17:00 and 08:00, so no typed time ever exists.
-export const NIGHT_TIME = '22:00';
-export const DAY_TIME = '12:00';
+const NIGHT_TIME = '22:00';
+const DAY_TIME = '12:00';
 
 export type FieldErrorCode =
   | 'invalid_date'

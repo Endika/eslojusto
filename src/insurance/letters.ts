@@ -7,7 +7,7 @@ import type { CompletedInsuranceReview } from './ports';
 import { civilDayText as day } from './render';
 
 // The deadline to say the policy is not to be extended, while it is still open.
-export const openNonRenewal = (review: InsuranceReview): Finding | null =>
+const openNonRenewal = (review: InsuranceReview): Finding | null =>
   review.findings.find(
     (f) => f.id === 'non_renewal' && f.status === 'open' && f.lastDay !== null,
   ) ?? null;

@@ -1,7 +1,7 @@
 import type { ScheduleDay, TimeSlot, Weekday } from './types';
 
 const DAY = 24 * 60;
-export const WEEK = 7 * DAY;
+const WEEK = 7 * DAY;
 // Art. 36.1 ET: night work is the one done between ten at night and six in the morning.
 const NIGHT_FROM = 22 * 60;
 const NIGHT_TO = 30 * 60;

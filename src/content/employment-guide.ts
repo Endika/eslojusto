@@ -82,7 +82,7 @@ const lastDayOf = (norm: Norm): string | null =>
   norm.status === 'repealed' ? (norm.endUncertainUntil ?? norm.inForceUntil) : norm.inForceUntil;
 
 // A norm the law repealed before the day it was to take effect, even at its doubtful end.
-export const neverApplied = (norm: Norm): boolean => {
+const neverApplied = (norm: Norm): boolean => {
   const last = lastDayOf(norm);
   return norm.status === 'repealed' && last !== null && last < norm.inForceSince;
 };
@@ -105,7 +105,7 @@ const STATUS_KEY: Record<NormStatusCode, Key> = {
   never_applied: 'employment.guide.norm.never_applied',
 };
 
-export function guideSource(
+function guideSource(
   lang: Lang,
   source: Pick<NormSource, 'citation' | 'url'>,
   norm: Norm,
@@ -162,7 +162,7 @@ export function normSentence(
 }
 
 // Whether a sentence resting on the norm still describes the law.
-export const normStands = (norm: Norm): boolean => norm.status !== 'repealed';
+const normStands = (norm: Norm): boolean => norm.status !== 'repealed';
 
 // One year of the minimum wage as the guide's table shows it. The twelve-payment figure is the
 // yearly one divided by twelve: the decrees give the fourteen-payment one only.

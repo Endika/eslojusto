@@ -86,7 +86,7 @@ export function worldsFor(doubts: readonly Doubt[]): readonly World[] {
   return worlds;
 }
 
-export const worldKey = (doubts: readonly Doubt[], w: World): string =>
+const worldKey = (doubts: readonly Doubt[], w: World): string =>
   doubts.map((d) => (w[d.id] === true ? '1' : '0')).join('');
 
 // Groups results by the measure into readings: one reading is a single outcome; more give the
@@ -125,7 +125,7 @@ export function outcomeFrom<T>(
 
 // Gathers results worked out in every world of `doubts`. A doubt is a reason only when flipping
 // it alone changes the result in some reading.
-export function outcomeOf<T>(
+function outcomeOf<T>(
   doubts: readonly Doubt[],
   results: readonly { readonly world: World; readonly value: T }[],
   measure: Measure<T>,

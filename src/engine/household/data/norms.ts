@@ -8,7 +8,7 @@ const inForce = {
 } as const;
 
 export const RD1620_ID = 'BOE-A-2011-17975';
-export const RDL16_ID = 'BOE-A-2022-14680';
+const RDL16_ID = 'BOE-A-2022-14680';
 
 // Dates as published in the BOE (fecha de entrada en vigor). The decrees are the minimum wage
 // ones of the employment section: art. 4.2 of each gives the household hourly rate.

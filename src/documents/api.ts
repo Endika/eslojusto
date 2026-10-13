@@ -40,7 +40,7 @@ export type Fetch = (url: string, init: RequestInit) => Promise<Response>;
 // gives up on a read the API is still able to answer.
 export const API_TIMEOUT_MS = 240_000;
 // A verify only asks Stripe; past this the page offers to try again.
-export const VERIFY_TIMEOUT_MS = 15_000;
+const VERIFY_TIMEOUT_MS = 15_000;
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
