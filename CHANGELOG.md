@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.54.4](https://github.com/Endika/eslojusto/compare/v1.54.3...v1.54.4) (2026-10-13)
+
+
+### Bug Fixes
+
+* **final-pay:** count a fixed term's year date to date and mark its notice as a criterion ([274995e](https://github.com/Endika/eslojusto/commit/274995e632880a8ccde5c01d50690c2c6a7fce18))
+* **final-pay:** dismissal deadline with an unknown cause, under 10 € before rounding, DT 11.ª.3 ([4952d4e](https://github.com/Endika/eslojusto/commit/4952d4edadc8a73e98ad1e6f8c138258bbab71c8))
+* **unemployment:** the benefit pages lead the summary with the benefit ([94d2fac](https://github.com/Endika/eslojusto/commit/94d2fac4d8183264f00135ffe8c2481b899f59ae))
+* **unemployment:** with benefit drawn before, give the last contract's days as the floor ([d0d623a](https://github.com/Endika/eslojusto/commit/d0d623a496c93acc48804e0b80f4995c35a148a5))
+
 ## [1.54.3](https://github.com/Endika/eslojusto/compare/v1.54.2...v1.54.3) (2026-10-13)
 
 
