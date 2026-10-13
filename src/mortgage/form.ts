@@ -1,6 +1,7 @@
 import { parseAmount } from '../calculator/number';
 import { pick, triState, tryDate } from '../calculator/review-form';
 import { compareDates, type CivilDate } from '../engine/date';
+import { deedPicksOption } from '../engine/mortgage/fees';
 import { scope } from '../engine/mortgage/scope';
 import type {
   Clause,
@@ -327,8 +328,10 @@ function read(form: HTMLFormElement, today: CivilDate): Reading {
     const on = date('operationOn', true, true);
     const principal = amount('operationPrincipal', true);
     const feeCharged = amount('operationFee', true);
-    // Asked only of a variable or mixed rate repaid early; left open, the review works out both.
-    prepaymentOption = choice('prepaymentOption', PREPAYMENT_OPTIONS);
+    // Asked only of a variable or mixed rate repaid early under a deed that picks one; left open,
+    // the review works out both.
+    if (deedOn !== null && deedPicksOption(deedOn))
+      prepaymentOption = choice('prepaymentOption', PREPAYMENT_OPTIONS);
     const hadInsurance = kind === 'full_prepayment' ? answer('hadInsurance') : null;
     if (on !== null && principal !== null && feeCharged !== null && hadInsurance !== undefined)
       operations.push({ on, kind, principal, feeCharged, hadInsurance });
