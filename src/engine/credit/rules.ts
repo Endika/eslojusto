@@ -18,6 +18,7 @@ export type StatuteRuleId =
   | 'tae_inexact'
   | 'contract_mentions'
   | 'cash_option'
+  | 'linked_credit'
   | 'withdrawal'
   | 'early_repayment_cap'
   | 'early_repayment_none'
@@ -105,6 +106,8 @@ export const STATUTE_RULES: Readonly<Record<StatuteRuleId, StatuteRule>> = {
   // 26.3: whoever finances a purchase may always choose not to take the credit and pay as agreed
   // with the seller.
   cash_option: lcc('cash_option', '26.3', 'info'),
+  // 29: a credit that only finances a specific purchase and forms a commercial unit with it.
+  linked_credit: lcc('linked_credit', '29', 'info'),
   // 28: fourteen calendar days to withdraw, from the contract or the later receipt of its terms.
   withdrawal: lcc('withdrawal', '28', 'date'),
   // 30.2: compensation up to 1 % of the amount repaid with over a year left, 0,5 % otherwise.

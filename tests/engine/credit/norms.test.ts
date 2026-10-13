@@ -90,6 +90,7 @@ describe('credit rule table', () => {
     );
     expect(anchors).toEqual({
       cash_option: '#a26',
+      linked_credit: '#a29',
       consumer: '#a2',
       exclusions: '#a3',
       tae_formula: '#a32',

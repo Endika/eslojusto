@@ -5230,6 +5230,8 @@ export const es = {
     'Como orientación, repartiendo la prima a partes iguales por los días del préstamo, la parte sin consumir sería de unos {euros}. Es orientativa: tu póliza fija el método.',
   'client.credit.calculation.information.cash_price':
     'En una compra financiada, el contrato tiene que decir el bien y su precio al contado (art. 16.2).',
+  'client.credit.calculation.information.linked_credit':
+    'Si el préstamo sirve solo para pagar la compra de un bien o un servicio concretos y forma una unidad con esa compra, es un crédito vinculado (art. 29.1). Entonces el contrato tiene que decir el bien y su precio al contado (art. 16.2.e); si desistes de la compra, el préstamo deja de obligarte sin penalización (art. 29.2); y si el bien no llega o no es conforme, en algunos casos esos derechos valen también frente al prestamista (art. 29.3).',
   'client.credit.calculation.information.cash_option':
     'Y puedes no financiar la compra y pagarla como acordaste con el vendedor (art. 26.3).',
   'client.credit.calculation.information.revolving_info':
@@ -5245,6 +5247,7 @@ export const es = {
   'client.credit.info.linked_insurance': 'El seguro ligado al crédito',
   'client.credit.info.unused_premium': 'La prima sin consumir',
   'client.credit.info.cash_price': 'Si financias una compra',
+  'client.credit.info.linked_credit': 'Si financia una compra concreta',
   'client.credit.info.revolving_info': 'La información de tu tarjeta',
   'client.credit.info.card_payoff': 'Cuánto tardarías en pagar la tarjeta',
   'client.credit.info.law_change': 'La ley va a cambiar',
