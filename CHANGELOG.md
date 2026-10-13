@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.54.0](https://github.com/Endika/eslojusto/compare/v1.53.10...v1.54.0) (2026-10-13)
+
+
+### Features
+
+* **credit:** read STS 366/2026 and give loans its criterion, never a band ([6a06557](https://github.com/Endika/eslojusto/commit/6a06557ff9191e15bd52079567bd421e492008aa))
+
 ## [1.53.10](https://github.com/Endika/eslojusto/compare/v1.53.9...v1.53.10) (2026-10-13)
 
 
