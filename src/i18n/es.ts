@@ -5746,6 +5746,7 @@ export const es = {
   'client.mortgage.total.nothing': 'Nada con lo que has metido',
   'client.mortgage.total.nothing_lowest': 'Nada en la lectura más baja',
   'client.mortgage.total.no_figure_yet': 'Sin cifra por ahora',
+  'client.mortgage.total.review_it': 'Sin cifra: hay gastos en «Revísalo»',
   'client.mortgage.total.transparency_free':
     'Aparte, el acta notarial previa, que no debía cobrarse: unos {importe}.',
   'client.mortgage.total.interest':
