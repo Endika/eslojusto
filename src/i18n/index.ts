@@ -27,12 +27,12 @@ const CREDIT_PAGE = ['client.credit.', 'client.theme.', 'client.other_language.'
 const MORTGAGE_PAGE = ['client.mortgage.', 'client.theme.', 'client.other_language.'];
 // The bills reviews' pages likewise; they read no documents yet.
 const BILLS_PAGE = ['client.bills.', 'client.theme.', 'client.other_language.'];
-// What they take of document reading: none of the final pay's report, letter or pass notices.
+// What they take of document reading: none of the final pay's report, letter or pass notices. The
+// check of a pass already held is shared by every page that sells one.
 const NOT_READING = [
   'client.documents.report.',
   'client.documents.letter.',
   'client.documents.notice.',
-  'client.documents.verify.',
 ];
 const readingString = (key: string): boolean =>
   key.startsWith('client.documents.') && !NOT_READING.some((prefix) => key.startsWith(prefix));
