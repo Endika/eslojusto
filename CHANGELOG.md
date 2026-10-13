@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.56.0](https://github.com/Endika/eslojusto/compare/v1.55.3...v1.56.0) (2026-10-13)
+
+
+### Features
+
+* **api:** log the class of the error a request failed on or recovered from ([6d2013c](https://github.com/Endika/eslojusto/commit/6d2013cd7706d12f1e0bfea088cb1f62264de182))
+
+
+### Bug Fixes
+
+* **analytics:** a library that fails to load no longer loops js_error forever ([fbeda72](https://github.com/Endika/eslojusto/commit/fbeda728dd7138828302db7de01d72425ce615c6))
+* **calculator:** the browser's back or forward leaves the address on the sheet shown ([d9ccf3f](https://github.com/Endika/eslojusto/commit/d9ccf3f0bfba733d31c08d02a6e37e24ba9df4f3))
+* **documents:** a hard space or hyphen in a letter field is drawn, not left blank ([ad002b2](https://github.com/Endika/eslojusto/commit/ad002b2c956f4f2f1538f518098e89d9daa4b333))
+* **documents:** a page that fails to wire its documents reports a js_error ([3851581](https://github.com/Endika/eslojusto/commit/385158159b3fb260605e51d364536a18139677b3))
+
 ## [1.55.3](https://github.com/Endika/eslojusto/compare/v1.55.2...v1.55.3) (2026-10-13)
 
 
