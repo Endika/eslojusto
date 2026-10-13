@@ -6871,9 +6871,9 @@ export const es = {
     'El precio cambió dentro del periodo y tu factura no da cada tramo aparte: sin los días de cada precio no se rehace la cuenta.',
   'client.bills.calculation.arithmetic.billed': 'Tu factura cobra {euros}.',
   'client.bills.calculation.arithmetic.refund_next_bill':
-    'El Real Decreto 88/2026 (art. 45) prevé que lo cobrado de más se devuelva en la factura siguiente, con intereses.',
+    'El Real Decreto 88/2026 (art. 45.2) prevé que lo facturado de más, de la energía o del acceso a las redes, se devuelva entero en la primera factura siguiente, sin fraccionarlo, con el interés legal del dinero más 150 puntos básicos.',
   'client.bills.calculation.arithmetic.under_settled_later':
-    'Lo cobrado de menos va aparte y no se resta de lo cobrado de más; la comercializadora puede regularizarlo en facturas siguientes (Real Decreto 88/2026, art. 45).',
+    'Lo cobrado de menos va aparte y no se resta de lo cobrado de más; según el Real Decreto 88/2026 (art. 45.2), la comercializadora puede repartir la diferencia en tantas facturas mensuales como meses pasaron desde el error, sin pasar de un año.',
   'client.bills.calculation.official.missing':
     'No hay valor oficial publicado para el {day}: no se usa el de antes en su lugar.',
   'client.bills.calculation.official.pending':
