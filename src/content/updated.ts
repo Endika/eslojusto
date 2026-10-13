@@ -17,6 +17,8 @@ const insuranceBuild = process.env['PUBLIC_INSURANCE'] === '1';
 const creditBuild = process.env['PUBLIC_CREDIT'] === '1';
 // /hipoteca/ likewise exists only in a PUBLIC_MORTGAGE=1 build.
 const mortgageBuild = process.env['PUBLIC_MORTGAGE'] === '1';
+// /facturas/ and its two reviews likewise exist only in a PUBLIC_BILLS=1 build.
+const billsBuild = process.env['PUBLIC_BILLS'] === '1';
 
 export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/': '2026-10-11',
@@ -51,4 +53,11 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   ...(insuranceBuild ? { '/seguros/': '2026-10-11' } : {}),
   ...(creditBuild ? { '/financiacion/': '2026-10-11' } : {}),
   ...(mortgageBuild ? { '/hipoteca/': '2026-10-11' } : {}),
+  ...(billsBuild
+    ? {
+        '/facturas/': '2026-10-13',
+        '/facturas/luz/': '2026-10-13',
+        '/facturas/permanencia/': '2026-10-13',
+      }
+    : {}),
 };

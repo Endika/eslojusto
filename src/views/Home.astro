@@ -5,6 +5,8 @@ import { link, type Lang } from '../i18n/languages';
 import { homeGraph } from '../content/structured-data';
 import { DOCUMENTS } from '../documents/config';
 import {
+  BILLS_BETA,
+  BILLS_BUILD,
   CREDIT_BETA,
   CREDIT_BUILD,
   EMPLOYMENT_BETA,
@@ -155,7 +157,16 @@ const groups: Group[] = [
           : CREDIT_BUILD
             ? ['home.insurance' as const]
             : ['home.finance' as const]),
-      'home.bills',
+      BILLS_BUILD
+        ? {
+            id: 'bills',
+            name: 'home.bills',
+            href: link(lang, 'facturas/'),
+            situation: 'home.bills_situation',
+            citation: 'home.bills_citation',
+            beta: BILLS_BETA,
+          }
+        : 'home.bills',
     ],
   },
 ];

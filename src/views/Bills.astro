@@ -1,0 +1,104 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { BILLS_BETA } from '../content/sections';
+import { breadcrumbList, trail } from '../content/structured-data';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+// The section's two reviews, filed behind it as the home page files every section.
+const reviews = [
+  {
+    id: 'electricity',
+    name: 'bills.hub.electricity',
+    href: link(lang, 'facturas/luz/'),
+    situation: 'bills.hub.electricity_situation',
+    citation: 'bills.hub.electricity_citation',
+  },
+  {
+    id: 'telecom',
+    name: 'bills.hub.telecom',
+    href: link(lang, 'facturas/permanencia/'),
+    situation: 'bills.hub.telecom_situation',
+    citation: 'bills.hub.telecom_citation',
+  },
+] as const satisfies readonly {
+  id: string;
+  name: Key;
+  href: string;
+  situation: Key;
+  citation: Key;
+}[];
+
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const crumbs = trail(lang, { name: tx('bills.crumb'), path: '/facturas/' });
+---
+
+<Base
+  title={tx('bills.title')}
+  description={tx('bills.description')}
+  path="/facturas/"
+  lang={lang}
+  section="salary"
+  structuredData={[breadcrumbList(home, lang, crumbs)]}
+>
+  <main class="home" id="content">
+    <div class="home__head">
+      <Breadcrumbs lang={lang} crumbs={crumbs} />
+      <h1 class="bills__title">{tx('bills.h1')}</h1>
+      <p class="home__lead">{tx('bills.lead')}</p>
+    </div>
+
+    <div class="index">
+      <section class="group" data-tone="salary" aria-labelledby="group-bills">
+        <h2 class="group__label" id="group-bills">
+          {tx('bills.hub.label')}
+        </h2>
+        <ul class="group__cards">
+          {reviews.map((review) => (
+            <li class="card">
+              <article class="sheet" data-tone="dates" aria-labelledby={`card-${review.id}`}>
+                <h3 class="card__name" id={`card-${review.id}`}>
+                  <a href={review.href}>{tx(review.name)}</a>
+                </h3>
+                <p class="card__situation">{tx(review.situation)}</p>
+                <p class="card__meta">
+                  <span class="card__citation">{tx(review.citation)}</span>
+                  <span class="card__go">
+                    {BILLS_BETA && <span class="beta">{tx('bills.beta')}</span>}
+                    <span class="card__review" aria-hidden="true">
+                      {tx('home.review')}
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M4 12h15m-6-6 6 6-6 6" />
+                      </svg>
+                    </span>
+                  </span>
+                </p>
+              </article>
+              <span class="card__tab" aria-hidden="true" />
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+
+    <p class="home__note">{tx('bills.note')}</p>
+  </main>
+</Base>
+
+<style>
+  .bills__title {
+    margin: 0 0 1rem;
+    font-size: clamp(2.25rem, 1.5rem + 3.2vw, 4rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+</style>

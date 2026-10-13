@@ -69,6 +69,16 @@ const MORTGAGE_OWN_FORBIDDEN = [...MORTGAGE_FORBIDDEN, /\brecuper/];
 // is not decisive it says «podría».
 const HOUSEHOLD_FORBIDDEN = [/\btienes derecho\b/, /\btienen derecho\b/];
 
+// The bills reviews show figures and the norm, never what to do about them: no power to lower, no
+// tariff to switch to and no offer that suits better.
+const BILLS_FORBIDDEN = [
+  /\bbaja tu potencia\b/,
+  /\bc[aá]mbiate\b/,
+  /\bte conviene\b/,
+  /\bte recomendamos\b/,
+  /\bdeber[ií]as\b/,
+];
+
 // What each section adds, by where its copy lives: a source folder, a built page or a prefix of
 // its translation keys. What is forbidden in one section may be the law's own words in another.
 export const SECTION_FORBIDDEN: Readonly<Record<string, readonly RegExp[]>> = {
@@ -103,6 +113,13 @@ export const SECTION_FORBIDDEN: Readonly<Record<string, readonly RegExp[]>> = {
   'legal_notice.household': HOUSEHOLD_FORBIDDEN,
   'home.household': HOUSEHOLD_FORBIDDEN,
   'footer.note_household': HOUSEHOLD_FORBIDDEN,
+  'src/bills': BILLS_FORBIDDEN,
+  'src/engine/bills': BILLS_FORBIDDEN,
+  'dist/facturas': BILLS_FORBIDDEN,
+  'bills.': BILLS_FORBIDDEN,
+  'client.bills.': BILLS_FORBIDDEN,
+  'home.bills': BILLS_FORBIDDEN,
+  'footer.note_bills': BILLS_FORBIDDEN,
 };
 
 const sectionsOf = (where: string) =>

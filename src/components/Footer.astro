@@ -2,6 +2,7 @@
 import { t, type Key } from '../i18n';
 import { link, LANGS, type Lang } from '../i18n/languages';
 import {
+  BILLS_BUILD,
   CREDIT_BUILD,
   EMPLOYMENT_BUILD,
   HOUSEHOLD_BUILD,
@@ -34,7 +35,8 @@ const general =
       HOUSEHOLD_BUILD ||
       INSURANCE_BUILD ||
       CREDIT_BUILD ||
-      MORTGAGE_BUILD));
+      MORTGAGE_BUILD ||
+      BILLS_BUILD));
 const note: Key = local.startsWith('/alquiler/')
   ? 'footer.note_rental'
   : local.startsWith('/contrato/')
@@ -47,11 +49,13 @@ const note: Key = local.startsWith('/alquiler/')
           ? 'footer.note_credit'
           : local.startsWith('/hipoteca/')
             ? 'footer.note_mortgage'
-            : local.startsWith('/paro/')
-              ? 'footer.note_benefit'
-              : general
-                ? 'footer.note_general'
-                : 'footer.note';
+            : local.startsWith('/facturas/')
+              ? 'footer.note_bills'
+              : local.startsWith('/paro/')
+                ? 'footer.note_benefit'
+                : general
+                  ? 'footer.note_general'
+                  : 'footer.note';
 ---
 
 <footer class="footer">

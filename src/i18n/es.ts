@@ -18,6 +18,8 @@ export const es = {
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las fechas siguen la Ley de Contrato de Seguro (Ley 50/1980) y la Ley 22/2007, de comercialización a distancia de servicios financieros.',
   'footer.note_credit':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen la Ley 16/2011, de contratos de crédito al consumo, y los tipos medios que publica el Banco de España.',
+  'footer.note_bills':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen las tablas oficiales de 2026 de la luz, el Real Decreto 88/2026, la Ley 11/2022 y el texto refundido de consumidores.',
   'footer.note_mortgage':
     'eslojusto.es informa sobre tus derechos y no da asesoramiento. Las cifras siguen la Ley 5/2019, de contratos de crédito inmobiliario, la Ley 41/2007 y la ley del impuesto de actos jurídicos documentados; lo que depende de un juez va siempre aparte.',
   'footer.note_benefit':
@@ -182,6 +184,8 @@ export const es = {
   'home.mortgage_situation': 'Tienes una hipoteca: sus gastos y comisiones frente a la ley',
   'home.credit_situation': 'Tienes un préstamo o una tarjeta: su TAE y sus plazos frente a la ley',
   'home.bills': 'Facturas',
+  'home.bills_situation': 'Tu factura de la luz o tu baja del móvil: lo cobrado frente a la norma',
+  'home.bills_citation': 'Real Decreto 88/2026 · Ley 11/2022',
   'home.coming_soon': 'Próximamente: {secciones}',
   'home.final_pay': 'Finiquito',
   'home.final_pay_citation': 'Estatuto de los Trabajadores · guía del CGPJ v0.6',
@@ -6259,6 +6263,617 @@ export const es = {
     'La gestoría cobra como suplido el impuesto o el registro por el mismo importe que otro documento que has subido: puede ser el mismo pago contado dos veces. Revisa la hoja de la gestoría.',
   'client.mortgage.documents.check.ajd_purchase_not_loan':
     'El modelo 600 que has subido es el de la compraventa, no el del préstamo, así que no se ha pasado como impuesto de la hipoteca.',
+  'bills.crumb': 'Facturas',
+  'bills.title': 'Revisa tus facturas: la luz y la permanencia del móvil o internet',
+  'bills.description':
+    'Tu factura de la luz línea por línea frente a tus precios y a la norma, y la penalización y la baja de tu contrato de móvil o internet.',
+  'bills.h1': 'Tus facturas, frente a la norma',
+  'bills.lead':
+    'Dos revisiones: tu factura de la luz, línea por línea, y la penalización y la baja de tu contrato de móvil o internet.',
+  'bills.note': 'Lo que escribes no sale de tu dispositivo.',
+  'bills.hub.label': 'Facturas',
+  'bills.hub.electricity': 'Luz',
+  'bills.hub.electricity_situation':
+    'Te llega la factura de la luz: cada línea frente a tus precios y a la norma',
+  'bills.hub.electricity_citation': 'Real Decreto 88/2026 · Ley 38/1992 · Ley 37/1992',
+  'bills.hub.telecom': 'Permanencia',
+  'bills.hub.telecom_situation':
+    'Te vas de tu compañía de móvil o internet: la penalización y lo que te cobran',
+  'bills.hub.telecom_citation': 'Ley 11/2022 · TRLGDCU, art. 62.5 · Real Decreto 899/2009',
+  'bills.beta': 'Beta',
+  'bills.beta_note':
+    'Sección en pruebas. Las cifras salen de lo que escribes, de las tablas oficiales y de la norma.',
+  'bills.no_js':
+    'La revisión necesita JavaScript. Se hace entera en tu dispositivo y lo que escribes no sale de él.',
+  'bills.reviewed': 'Revisado el {fecha}',
+  'bills.answer.yes': 'Sí',
+  'bills.answer.no': 'No',
+  'bills.answer.unknown': 'No lo sé',
+
+  'bills.electricity.crumb': 'Luz',
+  'bills.electricity.title': 'Revisa tu factura de la luz línea por línea',
+  'bills.electricity.description':
+    'Días, potencia, energía, peajes y cargos, impuestos de la fecha, contador, bono social y cargos que tu tarifa no admite, frente a tus precios y a la norma.',
+  'bills.electricity.h1': 'Tu factura de la luz, línea por línea',
+  'bills.electricity.lead':
+    'Con los datos de tu factura: si sus cuentas cuadran con tus propios precios y con lo que fija la norma en días, potencia, energía, peajes y cargos, impuestos de la fecha, contador, bono social y cargos que tu tarifa no admite. Para hogares con tarifa 2.0TD en la Península y Baleares, y facturas emitidas desde el 12-06-2026.',
+  'bills.electricity.form_aria': 'Revisión de tu factura de la luz',
+  'bills.electricity.tab.suministro': 'Factura',
+  'bills.electricity.tab.potencia': 'Consumo',
+  'bills.electricity.tab.peajes': 'Cargos',
+  'bills.electricity.tab.ajustes': 'Total',
+  'bills.electricity.tab.resultado': 'Resultado',
+  'bills.electricity.question.suministro': 'Tu suministro',
+  'bills.electricity.question.autoconsumo': 'Autoconsumo',
+  'bills.electricity.question.potencia-contratada': 'Potencia contratada',
+  'bills.electricity.question.fechas': 'Fechas de la factura',
+  'bills.electricity.question.lecturas': 'Periodo de consumo',
+  'bills.electricity.question.mercado': 'Tu tarifa',
+  'bills.electricity.question.titular': 'A nombre de quién está el contrato',
+  'bills.electricity.question.potencia': 'Término de potencia',
+  'bills.electricity.question.potencia-punta': 'Potencia en punta (P1)',
+  'bills.electricity.question.potencia-valle': 'Potencia en valle (P2)',
+  'bills.electricity.question.potencia-maxima': 'Potencia máxima que usaste',
+  'bills.electricity.question.energia-punta': 'Energía en punta (P1)',
+  'bills.electricity.question.energia-llano': 'Energía en llano (P2)',
+  'bills.electricity.question.energia-valle': 'Energía en valle (P3)',
+  'bills.electricity.question.peajes': 'Peajes y cargos',
+  'bills.electricity.question.financiacion': 'Financiación del bono social',
+  'bills.electricity.question.bono-social': 'Bono social',
+  'bills.electricity.question.bono-social-consumo': 'Consumo con descuento',
+  'bills.electricity.question.contador': 'Alquiler del contador',
+  'bills.electricity.question.contador-tipo': 'Tu contador',
+  'bills.electricity.question.servicios': 'Otros servicios',
+  'bills.electricity.question.servicio-1': 'Primer servicio',
+  'bills.electricity.question.servicio-2': 'Segundo servicio',
+  'bills.electricity.question.exceso': 'Exceso de potencia',
+  'bills.electricity.question.penalizacion': 'Penalización por baja',
+  'bills.electricity.question.penalizacion-contrato': 'Tu contrato',
+  'bills.electricity.question.ajustes': 'Descuentos y regularizaciones',
+  'bills.electricity.question.impuesto-electrico': 'Impuesto eléctrico',
+  'bills.electricity.question.iva': 'IVA',
+  'bills.electricity.question.total': 'Total',
+  'bills.electricity.postcode': 'Código postal del suministro',
+  'bills.electricity.postcode_hint': 'El de la dirección de suministro que trae tu factura.',
+  'bills.electricity.access_tariff': 'Tarifa de acceso',
+  'bills.electricity.access_tariff_hint':
+    'Viene en tu factura junto a la potencia: «2.0TD» en casi todas las casas.',
+  'bills.electricity.access_tariff.2.0TD': '2.0TD',
+  'bills.electricity.access_tariff.other': 'Otra',
+  'bills.electricity.self_consumption': '¿Tienes placas solares en el suministro?',
+  'bills.electricity.self_consumption.none': 'No',
+  'bills.electricity.self_consumption.without_surplus': 'Sí, sin verter excedentes a la red',
+  'bills.electricity.self_consumption.with_surplus':
+    'Sí, con excedentes que se compensan o se venden',
+  'bills.electricity.contracted_help': 'En kW, como la trae tu factura.',
+  'bills.electricity.power_p1': 'Punta (P1), kW',
+  'bills.electricity.power_p2': 'Valle (P2), kW',
+  'bills.electricity.issued_on': 'Fecha de emisión',
+  'bills.electricity.due_on': 'Fecha de cargo o límite de pago',
+  'bills.electricity.due_on_hint':
+    'El día en que te la cobran o el último para pagarla: fija los impuestos que se aplican.',
+  'bills.electricity.reading_from': 'Lectura anterior',
+  'bills.electricity.reading_to': 'Lectura actual',
+  'bills.electricity.billed_days': 'Días que dice tu factura',
+  'bills.electricity.billed_days_hint': 'Si no los dice, déjalo vacío.',
+  'bills.electricity.market': 'Tipo de contrato',
+  'bills.electricity.market_hint':
+    'El PVPC es la tarifa regulada; en el mercado libre el precio lo fija cada comercializadora.',
+  'bills.electricity.market.pvpc': 'PVPC',
+  'bills.electricity.market.free': 'Mercado libre',
+  'bills.electricity.retailer': '¿Tu comercializadora es de referencia?',
+  'bills.electricity.retailer_hint':
+    'Las que dan el PVPC y el bono social; tu factura dice si la tuya lo es.',
+  'bills.electricity.retailer.reference': 'Sí',
+  'bills.electricity.retailer.other': 'No',
+  'bills.electricity.retailer.unknown': 'No lo sé',
+  'bills.electricity.holder': 'Titular del contrato',
+  'bills.electricity.holder.person': 'Una persona',
+  'bills.electricity.holder.microenterprise': 'Una microempresa',
+  'bills.electricity.holder.other': 'Otra empresa',
+  'bills.electricity.holder.unknown': 'No lo sé',
+  'bills.electricity.power_unit': '¿En qué unidad da tu factura el precio de la potencia?',
+  'bills.electricity.power_unit_hint': 'Viene junto al precio de cada periodo.',
+  'bills.electricity.power_unit.per_kw_day': '€/kW y día',
+  'bills.electricity.power_unit.per_kw_year': '€/kW y año',
+  'bills.electricity.price_change': '¿Cambió algún precio dentro del periodo?',
+  'bills.electricity.price_change_hint':
+    'Si tu factura parte una línea en dos tramos con precios distintos.',
+  'bills.electricity.power_price': 'Precio',
+  'bills.electricity.line_amount': 'Importe',
+  'bills.electricity.max_used_help':
+    'Tu factura trae la potencia máxima que usaste en los últimos 12 meses. Si no la encuentras, déjalo vacío.',
+  'bills.electricity.max_used_p1': 'Punta (P1), kW',
+  'bills.electricity.max_used_p2': 'Valle (P2), kW',
+  'bills.electricity.kwh': 'Consumo, kWh',
+  'bills.electricity.energy_price': 'Precio, €/kWh',
+  'bills.electricity.tolls_shown': '¿Tu factura los desglosa?',
+  'bills.electricity.tolls_shown_hint':
+    'Suelen ir dentro de la potencia y la energía, con su propio importe.',
+  'bills.electricity.tolls_power': 'De potencia',
+  'bills.electricity.tolls_energy': 'De energía',
+  'bills.electricity.funding_shown': '¿Aparece en tu factura?',
+  'bills.electricity.funding_shown_hint': 'Una línea pequeña, de céntimos al mes.',
+  'bills.electricity.has_bonus': '¿Tienes descuento por bono social?',
+  'bills.electricity.bonus_category': 'Categoría',
+  'bills.electricity.bonus_category.vulnerable': 'Vulnerable',
+  'bills.electricity.bonus_category.severe': 'Vulnerable severo',
+  'bills.electricity.bonus_category.unknown': 'No lo sé',
+  'bills.electricity.bonus_amount': 'Descuento que trae tu factura',
+  'bills.electricity.bonus_kwh_so_far': 'kWh con descuento en tus facturas anteriores de este año',
+  'bills.electricity.bonus_kwh_so_far_hint':
+    'Sin este dato no se comprueba el tope; si no lo tienes, déjalo vacío.',
+  'bills.electricity.bonus_discounted_kwh': 'kWh con descuento en esta factura',
+  'bills.electricity.optional_hint': 'Si tu factura no lo trae, déjalo vacío.',
+  'bills.electricity.meter_charged': '¿Te cobran alquiler del contador?',
+  'bills.electricity.meter_phase': 'Tipo de contador',
+  'bills.electricity.meter_phase_hint': 'Las casas suelen tener uno monofásico.',
+  'bills.electricity.meter_phase.single': 'Monofásico',
+  'bills.electricity.meter_phase.three': 'Trifásico',
+  'bills.electricity.meter_phase.unknown': 'No lo sé',
+  'bills.electricity.meter_owned': '¿El contador es tuyo?',
+  'bills.electricity.services_help':
+    'Mantenimiento, seguros o packs que la factura cobra aparte de la luz.',
+  'bills.electricity.service_count': '¿Cuántos cobra?',
+  'bills.electricity.service_count.0': 'Ninguno',
+  'bills.electricity.service_count.1': 'Uno',
+  'bills.electricity.service_count.2': 'Dos',
+  'bills.electricity.service_label': 'Qué es',
+  'bills.electricity.service_label_choose': 'Elige uno',
+  'bills.electricity.service_requested': '¿Lo pediste?',
+  'bills.electricity.has_excess': '¿Te cobran exceso de potencia?',
+  'bills.electricity.has_excess_hint': 'Una línea aparte por pasar de la potencia contratada.',
+  'bills.electricity.maximeter': '¿Tu contador tiene maxímetro?',
+  'bills.electricity.has_penalty': '¿Te cobran una penalización por dejar el contrato?',
+  'bills.electricity.price_type': 'Precio del contrato',
+  'bills.electricity.price_type.fixed': 'Fijo',
+  'bills.electricity.price_type.variable': 'Variable',
+  'bills.electricity.price_type.indexed': 'Indexado',
+  'bills.electricity.price_type.unknown': 'No lo sé',
+  'bills.electricity.first_renewal': '¿El contrato ya se había prorrogado alguna vez?',
+  'bills.electricity.first_renewal_hint': 'Los contratos suelen durar un año y renovarse solos.',
+  'bills.electricity.discount': 'Descuentos',
+  'bills.electricity.regularization': '¿Regulariza facturas anteriores?',
+  'bills.electricity.regularization.none': 'No',
+  'bills.electricity.regularization.charged': 'Sí, cobra',
+  'bills.electricity.regularization.returned': 'Sí, devuelve',
+  'bills.electricity.regularization_amount': 'Importe de la regularización',
+  'bills.electricity.tax_amount': 'Importe',
+  'bills.electricity.tax_percent': 'Tipo, %',
+  'bills.electricity.vat_amount': 'Importe',
+  'bills.electricity.vat_percent': 'Tipo, %',
+  'bills.electricity.total': 'Total de la factura',
+
+  'bills.telecom.crumb': 'Permanencia',
+  'bills.telecom.title': 'Permanencia del móvil o internet: penalización y baja',
+  'bills.telecom.description':
+    'La penalización que permite la ley si te vas antes de tiempo, la baja tras un cambio de condiciones y lo que te cobran después de pedir la baja.',
+  'bills.telecom.h1': 'Tu permanencia y tu baja del móvil o internet',
+  'bills.telecom.lead':
+    'Con las fechas y los importes de tu contrato: la penalización que permite la ley si te vas antes de tiempo, si un cambio de condiciones te deja irte sin penalización y si te cobran días de después de la baja.',
+  'bills.telecom.form_aria': 'Revisión de tu permanencia y tu baja',
+  'bills.telecom.tab.permanencia': 'Contrato',
+  'bills.telecom.tab.baja': 'Baja',
+  'bills.telecom.tab.terminal': 'Cobros',
+  'bills.telecom.tab.resultado': 'Resultado',
+  'bills.telecom.question.permanencia': 'Tu permanencia',
+  'bills.telecom.question.penalizacion': 'Penalización pactada',
+  'bills.telecom.question.baja': 'Tu baja',
+  'bills.telecom.question.aviso': 'Cambios antes de irte',
+  'bills.telecom.question.cambio': 'Qué cambió',
+  'bills.telecom.question.terminal': 'Terminal',
+  'bills.telecom.question.cobros': 'Lo que te cobraron por irte',
+  'bills.telecom.question.despues': 'Cobros después de la baja',
+  'bills.telecom.has_commitment': '¿Tenías permanencia?',
+  'bills.telecom.started_on': 'Inicio',
+  'bills.telecom.months': 'Meses',
+  'bills.telecom.agreed_penalty': 'Penalización por irte el primer día',
+  'bills.telecom.agreed_penalty_hint':
+    'La que fija tu contrato para la permanencia entera. Si no la sabes, déjalo vacío.',
+  'bills.telecom.exit_requested_on': 'Día en que pediste la baja',
+  'bills.telecom.exit_requested_on_hint': 'El de tu solicitud, no el de la última factura.',
+  'bills.telecom.change': '¿Te cambiaron las condiciones antes de irte?',
+  'bills.telecom.change.none': 'No',
+  'bills.telecom.change.notice': 'Sí, con aviso',
+  'bills.telecom.change.no_notice': 'Sí, sin aviso',
+  'bills.telecom.sent_on': 'Día del aviso',
+  'bills.telecom.applies_on': 'Día del cambio',
+  'bills.telecom.optional_hint': 'Si no lo sabes, déjalo vacío.',
+  'bills.telecom.change_kind': 'El cambio',
+  'bills.telecom.change_kind.price_up': 'Subió el precio',
+  'bills.telecom.change_kind.service_worse': 'Empeoró el servicio',
+  'bills.telecom.change_kind.other': 'Otra cosa',
+  'bills.telecom.price_index': '¿Tu contrato liga la subida a algo?',
+  'bills.telecom.price_index_hint': 'La cláusula de revisión de precios de tu contrato.',
+  'bills.telecom.price_index.ipc': 'Al IPC',
+  'bills.telecom.price_index.ipc_plus': 'Al IPC más algo',
+  'bills.telecom.price_index.fixed_amount': 'A una cantidad fija',
+  'bills.telecom.price_index.none': 'A nada',
+  'bills.telecom.price_index.other': 'A otra cosa',
+  'bills.telecom.has_handset': '¿Te dieron un móvil u otro terminal subvencionado?',
+  'bills.telecom.handset_value': 'Valor del terminal',
+  'bills.telecom.handset_kept': '¿Te lo quedas?',
+  'bills.telecom.penalty_charged': 'Penalización cobrada',
+  'bills.telecom.penalty_charged_hint': 'Si no te cobraron nada por irte, pon 0.',
+  'bills.telecom.charged_after': '¿Te cobran días de después de pedir la baja?',
+  'bills.telecom.charged_after_hint':
+    'Una cuota o un servicio cuyo periodo pasa del día en que pediste la baja.',
+  'bills.telecom.line_from': 'Desde',
+  'bills.telecom.line_to': 'Hasta',
+  'bills.telecom.line_amount': 'Importe de ese periodo',
+
+  'bills.result.title': 'Resultado',
+  'bills.result.out_of_scope': 'Fuera de esta revisión',
+  'bills.result.totals': 'Por encima de la norma',
+  'bills.result.totals_note.electricity':
+    'La suma de lo que tu factura cobra por encima de lo que fija la norma. Lo que no cuadra con tus propios precios va en su línea, sin sumarse aquí.',
+  'bills.result.totals_note.telecom':
+    'La suma de lo que te cobran por encima de lo que permite la norma.',
+  'bills.result.recurring': 'Esa diferencia vuelve en cada factura mientras nada cambie.',
+  'bills.result.compare': 'Comparar ofertas',
+  'bills.result.compare_text':
+    'Esta revisión no compara ofertas. La CNMC tiene un comparador oficial con las ofertas que le envían las comercializadoras; tu factura trae un código QR que lleva a él.',
+  'bills.result.compare_link': 'Comparador de ofertas de la CNMC',
+  'bills.result.channels': 'Dónde informarte gratis',
+  'bills.result.channels_text':
+    'La Oficina de Atención al Usuario de Telecomunicaciones, del Ministerio, resuelve desacuerdos con operadores.',
+  'bills.result.channels_link': 'Oficina de Atención al Usuario de Telecomunicaciones',
+  'bills.result.unchecked': 'Lo que esta revisión no mira',
+  'bills.result.how': 'Cómo se calcula',
+  'bills.result.rules': 'Normas',
+  'bills.result.rows': 'Valores oficiales usados',
+  'bills.result.restart': 'Empezar de nuevo',
+
+  'client.bills.unit.day_one': '{n} día',
+  'client.bills.unit.day_many': '{n} días',
+  'client.bills.unit.month_one': '{n} mes',
+  'client.bills.unit.month_many': '{n} meses',
+  'client.bills.unit.kw': '{n} kW',
+  'client.bills.unit.kwh': '{n} kWh',
+  'client.bills.unit.per_kw_day': '{n} €/kW y día',
+  'client.bills.unit.per_kw_year': '{n} €/kW y año',
+  'client.bills.unit.per_kwh': '{n} €/kWh',
+  'client.bills.unit.single': 'monofásico',
+  'client.bills.unit.three': 'trifásico',
+  'client.bills.error.missing_value': 'Falta este dato.',
+  'client.bills.error.missing_choice': 'Elige una respuesta.',
+  'client.bills.error.invalid_number': 'Escribe una cifra, con coma para los decimales.',
+  'client.bills.error.invalid_date': 'Esa fecha no existe.',
+  'client.bills.error.in_future': 'Esa fecha aún no ha llegado.',
+  'client.bills.error.not_after_start': 'Tiene que ser posterior a la fecha de inicio.',
+  'client.bills.error.days_range': 'Una factura cubre de 1 a 62 días.',
+  'client.bills.error.kwh_range': 'Esa cantidad de kWh no cabe en una factura de una casa.',
+  'client.bills.error.price_range': 'Ese precio o ese tipo no cabe en una factura.',
+  'client.bills.error.power_range': 'La potencia va de 0,1 a 15 kW.',
+  'client.bills.error.amount_range': 'Ese importe no cabe en esta revisión.',
+  'client.bills.error.count_range': 'Esa cantidad no cabe en esta revisión.',
+  'client.bills.error.postcode': 'Escribe un código postal de 5 cifras.',
+  'client.bills.item.days': 'Días facturados',
+  'client.bills.item.power': 'Término de potencia',
+  'client.bills.item.energy': 'Término de energía',
+  'client.bills.item.total': 'Total de la factura',
+  'client.bills.item.tolls_and_charges_power': 'Peajes y cargos de potencia',
+  'client.bills.item.tolls_and_charges_energy': 'Peajes y cargos de energía',
+  'client.bills.item.pvpc_eligibility': 'Quién puede tener el PVPC',
+  'client.bills.item.pvpc_power_p1': 'Potencia del PVPC en punta',
+  'client.bills.item.pvpc_power_p2': 'Potencia del PVPC en valle',
+  'client.bills.item.social_bonus_funding': 'Financiación del bono social',
+  'client.bills.item.meter': 'Alquiler del contador',
+  'client.bills.item.social_bonus': 'Descuento del bono social',
+  'client.bills.item.electricity_tax': 'Impuesto eléctrico',
+  'client.bills.item.vat': 'IVA',
+  'client.bills.item.excess_power': 'Exceso de potencia',
+  'client.bills.item.service': 'Servicio aparte de la luz',
+  'client.bills.item.exit_penalty': 'Penalización por baja',
+  'client.bills.item.power_used': 'Potencia que usaste',
+  'client.bills.item.commitment_length': 'Duración de la permanencia',
+  'client.bills.item.commitment_penalty': 'Penalización por permanencia',
+  'client.bills.item.change_exit': 'Baja tras un cambio de condiciones',
+  'client.bills.item.charge_after_exit': 'Cobros después de la baja',
+  'client.bills.period.power.p1': 'P1 (punta)',
+  'client.bills.period.power.p2': 'P2 (valle)',
+  'client.bills.period.energy.p1': 'P1 (punta)',
+  'client.bills.period.energy.p2': 'P2 (llano)',
+  'client.bills.period.energy.p3': 'P3 (valle)',
+  'client.bills.service.maintenance': 'Mantenimiento',
+  'client.bills.service.insurance': 'Seguro',
+  'client.bills.service.pack': 'Pack',
+  'client.bills.service.other': 'Otro',
+  'client.bills.status.matches': 'Cuadra',
+  'client.bills.status.does_not_add_up': 'No cuadra',
+  'client.bills.status.does_not_add_up_over': 'No cuadra: {importe} de más',
+  'client.bills.status.does_not_add_up_under': 'No cuadra: {importe} de menos',
+  'client.bills.status.differs_from_official': 'Distinto del valor oficial',
+  'client.bills.status.differs_from_official_over': '{importe} por encima del valor oficial',
+  'client.bills.status.differs_from_official_under': '{importe} por debajo del valor oficial',
+  'client.bills.status.not_on_bill': 'No aparece en tu factura',
+  'client.bills.status.tariff_not_allowed': 'El PVPC no admite este contrato',
+  'client.bills.status.above_regulated_price': 'Por encima del precio regulado: {importe} de más',
+  'client.bills.status.wrong_rate_for_date': 'Tipo distinto del de la fecha de tu factura',
+  'client.bills.status.wrong_rate_for_date_over':
+    'Tipo distinto del de la fecha de tu factura: {importe} de más',
+  'client.bills.status.wrong_rate_for_date_under':
+    'Tipo distinto del de la fecha de tu factura: {importe} de menos',
+  'client.bills.status.different_base': 'Base distinta',
+  'client.bills.status.different_base_over': 'Base distinta: {importe} de más',
+  'client.bills.status.different_base_under': 'Base distinta: {importe} de menos',
+  'client.bills.status.discount_lower': 'Descuento menor que el de la norma: {importe} menos',
+  'client.bills.status.not_allowed_in_pvpc': 'No permitido en el PVPC: {importe}',
+  'client.bills.status.not_allowed': 'No permitida con tu contrato: {importe}',
+  'client.bills.status.paid_over': 'Por encima de lo que permite la norma: {importe} de más',
+  'client.bills.status.above_legal_maximum': 'Por encima del máximo legal',
+  'client.bills.status.within_limit': 'Dentro del límite',
+  'client.bills.status.charged_after_exit': 'Cobrado después de tu baja: {importe}',
+  'client.bills.status.not_applicable': 'No se aplica',
+  'client.bills.status.review_it': 'Revísalo',
+  'client.bills.status.review_it_amount': 'Revísalo: {importe}, sin sumar',
+  'client.bills.status.not_checkable': 'No se puede comprobar',
+  'client.bills.status.pending_official_data': 'Pendiente de un dato oficial',
+  'client.bills.status.information': 'Información',
+  'client.bills.status.depends': 'Depende de algo aún sin decidir',
+  'client.bills.status.out_of_scope': 'Esta revisión todavía no cubre tu caso',
+  'client.bills.depends.official_value':
+    'Depende de una norma o de un dato oficial que aún no está decidido: el total cuenta la lectura más baja.',
+  'client.bills.depends.handset_share':
+    'Depende de si se debe el terminal entero o solo la parte de la permanencia que faltaba: el total cuenta la lectura más baja.',
+  'client.bills.reading.lower_value': 'Con el valor oficial más bajo',
+  'client.bills.reading.higher_value': 'Con el valor oficial más alto',
+  'client.bills.reading.whole_value': 'Si se debe el terminal entero',
+  'client.bills.reading.prorated_value': 'Si se debe solo la parte que faltaba',
+  'client.bills.norm.in_force': 'en vigor',
+  'client.bills.norm.pending_validation': 'pendiente de convalidación',
+  'client.bills.norm.repealed': 'derogada el {fecha}',
+  'client.bills.norm.draft': 'en tramitación: no se aplica',
+  'client.bills.norm.conditional': 'pendiente de una condición',
+  'client.bills.source.since': 'con efectos desde el {desde}',
+  'client.bills.source.between': 'con efectos del {desde} al {hasta}',
+  'client.bills.row.condition_open': 'pendiente: {condicion}; se sabrá hacia el {fecha}',
+  'client.bills.row.condition_met': 'se aplica: se cumplió la condición ({condicion})',
+  'client.bills.row.condition_not_met': 'no se aplica: no se cumplió la condición ({condicion})',
+  'client.bills.row.doubt.ccf_not_updated_since_2016': 'valor de 2016 sin actualizar',
+  'client.bills.total.up_to':
+    'Y hasta {importe} en la lectura más alta de lo que aún no está decidido.',
+  'client.bills.total.under':
+    'Cobrado de menos: {importe}. Va aparte y no se resta de lo cobrado de más.',
+  'client.bills.result.lead_over':
+    'Con lo que has metido, tu factura cobra en alguna línea más de lo que fija la norma. Abajo está cada línea con su cálculo y su fuente.',
+  'client.bills.result.lead_open':
+    'Con lo que has metido, hay líneas que no cuadran o que no se pueden comprobar del todo. Abajo está cada línea con su cálculo y su fuente.',
+  'client.bills.result.lead_clear':
+    'Con lo que has metido, cada línea cuadra con tus propios precios y con lo que fija la norma.',
+  'client.bills.result.telecom_lead_over':
+    'Con lo que has metido, te cobran más de lo que permite la norma. Abajo está cada punto con su cálculo y su fuente.',
+  'client.bills.result.telecom_lead_open':
+    'Con lo que has metido, hay puntos que no se pueden comprobar del todo. Abajo está cada uno con su cálculo y su fuente.',
+  'client.bills.result.telecom_lead_clear':
+    'Con lo que has metido, lo que te cobran queda dentro de lo que permite la norma.',
+  'client.bills.result.telecom_lead_nothing':
+    'Con lo que has metido no hay penalización ni cobros de después de la baja que comprobar.',
+  'client.bills.result.lead_out_of_scope': 'Esta revisión todavía no cubre lo que has metido.',
+  'client.bills.unchecked.electricity.agreed_price':
+    'Si el precio que te cobran es el que pactaste: hace falta tu contrato.',
+  'client.bills.unchecked.electricity.price_notice':
+    'Si te avisaron con un mes de antelación antes de una subida de precio.',
+  'client.bills.unchecked.electricity.pvpc_hourly_energy':
+    'El término de energía del PVPC hora a hora: necesita tu consumo de cada hora.',
+  'client.bills.unchecked.electricity.other_tariff':
+    'Qué tarifa u oferta encaja con tu consumo: esta revisión no compara ofertas.',
+  'client.bills.unchecked.electricity.regional_rules': 'Las normas de tu comunidad autónoma.',
+  'client.bills.unchecked.electricity.earlier_regularizations':
+    'Las regularizaciones de facturas anteriores.',
+  'client.bills.unchecked.telecom.agreed_price': 'Si el precio que te cobran es el que pactaste.',
+  'client.bills.unchecked.telecom.service_cuts': 'Las compensaciones por cortes del servicio.',
+  'client.bills.unchecked.telecom.premium_rate_services':
+    'Los cobros de servicios de tarificación adicional.',
+  'client.bills.unchecked.telecom.unrequested_services': 'Los servicios que no pediste.',
+  'client.bills.calculation.scope.canary_ceuta_melilla':
+    'Esta revisión todavía no cubre tu territorio: en Canarias, Ceuta y Melilla la luz lleva otros impuestos y otros horarios.',
+  'client.bills.calculation.scope.over_15kw':
+    'Esta revisión todavía no cubre tu potencia: es para la tarifa 2.0TD, de hasta 15 kW.',
+  'client.bills.calculation.scope.not_2_0td':
+    'Esta revisión todavía no cubre tu tarifa: es para la tarifa 2.0TD de los hogares.',
+  'client.bills.calculation.scope.issued_before_2026_06_12':
+    'Esta revisión todavía no cubre tu factura: es para facturas emitidas desde el 12-06-2026, cuando empezaron a regir las reglas de facturación del Real Decreto 88/2026.',
+  'client.bills.calculation.scope.self_consumption_surplus':
+    'Esta revisión todavía no cubre el autoconsumo con excedentes.',
+  'client.bills.calculation.scope.exit_before_2022':
+    'Esta revisión todavía no cubre tu baja: la penalización proporcional rige para bajas desde el 01-01-2022.',
+  'client.bills.calculation.tolerance.line':
+    'Ninguna norma fija cómo se redondea: una línea a un céntimo o menos de la cuenta cuadra.',
+  'client.bills.calculation.tolerance.total':
+    'En el total se admiten hasta dos céntimos de diferencia por redondeo.',
+  'client.bills.calculation.readings.both_bases':
+    'Ninguna norma dice si un año bisiesto se divide entre 365 o 366 días: cuadra con cualquiera de las dos cuentas.',
+  'client.bills.calculation.arithmetic.days':
+    'Del {from} al {to} van {days}: el día de la lectura anterior no se factura y el de la actual sí.',
+  'client.bills.calculation.arithmetic.days_mismatch': 'Tu factura dice {billed}.',
+  'client.bills.calculation.arithmetic.power_per_day': '{kw} × {price} × {days} = {euros}.',
+  'client.bills.calculation.arithmetic.power_per_year': '{kw} × {price} × {days} / 365 = {euros}.',
+  'client.bills.calculation.arithmetic.energy': '{kwh} × {price} = {euros}.',
+  'client.bills.calculation.arithmetic.total':
+    'Las líneas que has metido, con los descuentos restados, suman {euros}.',
+  'client.bills.calculation.arithmetic.price_change_without_segments':
+    'El precio cambió dentro del periodo y tu factura no da cada tramo aparte: sin los días de cada precio no se rehace la cuenta.',
+  'client.bills.calculation.arithmetic.billed': 'Tu factura cobra {euros}.',
+  'client.bills.calculation.arithmetic.refund_next_bill':
+    'El Real Decreto 88/2026 (art. 45) prevé que lo cobrado de más se devuelva en la factura siguiente, con intereses.',
+  'client.bills.calculation.arithmetic.under_settled_later':
+    'Lo cobrado de menos va aparte y no se resta de lo cobrado de más; la comercializadora puede regularizarlo en facturas siguientes (Real Decreto 88/2026, art. 45).',
+  'client.bills.calculation.official.missing':
+    'No hay valor oficial publicado para el {day}: no se usa el de antes en su lugar.',
+  'client.bills.calculation.official.pending':
+    'El valor oficial depende de una norma que aún no está decidida: nada de esta línea se suma hasta que se sepa.',
+  'client.bills.calculation.tolls.power':
+    'Peajes y cargos de potencia de 2026 por {p1} en punta y {p2} en valle, por los días de tu factura: {euros}.',
+  'client.bills.calculation.tolls.energy':
+    'Peajes y cargos de energía de 2026 por los kWh de cada periodo: {euros}.',
+  'client.bills.calculation.tolls.not_on_bill':
+    'Tu factura no los desglosa. La Resolución de 28 de abril de 2021 de la Dirección General de Política Energética y Minas pide que la factura los muestre.',
+  'client.bills.calculation.tolls.energy_price_change':
+    'Los peajes y cargos de energía cambian dentro del periodo y no se sabe qué kWh van a cada precio: no se comprueban.',
+  'client.bills.calculation.tolls.free_market_price':
+    'En el mercado libre, que tu precio quede por debajo de los peajes y cargos no va contra ninguna norma: no se marca.',
+  'client.bills.calculation.pvpc.power_over_10kw':
+    'El PVPC es para potencias de hasta 10 kW, y tienes {p1} en punta y {p2} en valle.',
+  'client.bills.calculation.pvpc.holder_not_allowed':
+    'El PVPC es para personas físicas y microempresas.',
+  'client.bills.calculation.pvpc.holder_unknown':
+    'El PVPC es para personas físicas y microempresas; sin saber a nombre de quién está el contrato no se comprueba.',
+  'client.bills.calculation.pvpc.eligible':
+    'Tu contrato tiene la potencia y el titular que pide el PVPC.',
+  'client.bills.calculation.pvpc.not_reference_retailer':
+    'El PVPC solo lo dan las comercializadoras de referencia, y has dicho que la tuya no lo es.',
+  'client.bills.calculation.pvpc.retailer_unknown':
+    'El PVPC solo lo dan las comercializadoras de referencia; sin saber si la tuya lo es no se comprueba.',
+  'client.bills.calculation.pvpc.power_p1':
+    'Término de potencia del PVPC en punta por {kw}, por los días de tu factura: {euros}.',
+  'client.bills.calculation.pvpc.power_p2':
+    'Término de potencia del PVPC en valle por {kw}, por los días de tu factura: {euros}.',
+  'client.bills.calculation.pvpc.margin_not_updated':
+    'Incluye el margen de comercialización de 3,113 €/kW y año de la Orden ETU/1948/2016: es un valor de 2016 sin actualizar.',
+  'client.bills.calculation.pvpc.margin_differs':
+    'Si tu comercializadora usa otro margen, la diferencia sale de ahí; sin una norma de 2026 que lo fije, no se le pone cifra.',
+  'client.bills.calculation.funding.days':
+    'Financiación del bono social por los días de tu factura, con el valor de cada día: {euros}.',
+  'client.bills.calculation.funding.not_on_bill':
+    'Tu factura no muestra la financiación del bono social.',
+  'client.bills.calculation.funding.free_market_above':
+    'En el mercado libre la cobra por encima del valor de la orden; ninguna norma leída dice que tenga que ser ese valor, así que no se le pone cifra.',
+  'client.bills.calculation.meter.cap':
+    'El alquiler regulado de un contador {phase} por {days} es como mucho {euros}: el precio al mes por 12 meses, repartido por días.',
+  'client.bills.calculation.meter.owned': 'Con el contador en propiedad no hay alquiler que pagar.',
+  'client.bills.calculation.meter.three_phase_on_single':
+    'Tu factura cobra un contador trifásico y tu suministro es monofásico.',
+  'client.bills.calculation.meter.phase_unknown':
+    'Cobra más que el precio de un contador monofásico; sin saber si el tuyo es trifásico no se comprueba.',
+  'client.bills.calculation.tax.rate_depends':
+    'El tipo de esa fecha depende de una condición aún sin decidir: se hacen las dos cuentas y el total cuenta la más baja.',
+  'client.bills.calculation.tax.wrong_rate':
+    'Tu factura aplica el {percent}, que no es el tipo de su fecha de cargo o límite de pago.',
+  'client.bills.calculation.tax.wrong_rate_unprinted':
+    'La cuota sale con otro tipo de 2026, no con el de la fecha de cargo o límite de pago de tu factura.',
+  'client.bills.calculation.tax.different_base':
+    'Con el tipo de esa fecha, la diferencia sale de la base: la cuota no corresponde a las líneas que has metido.',
+  'client.bills.calculation.tax.parts_either':
+    'Ninguna norma leída dice si los descuentos, el exceso de potencia, los servicios, la penalización o las regularizaciones entran en la base: cuadra tanto si entran como si no.',
+  'client.bills.calculation.electricity_tax.not_on_bill':
+    'Tu factura no muestra el impuesto eléctrico.',
+  'client.bills.calculation.electricity_tax.rate':
+    'Tipo del impuesto eléctrico el {date}, fecha de cargo o límite de pago de tu factura: {percent}, que da {euros}.',
+  'client.bills.calculation.electricity_tax.base':
+    'Base: la potencia y la energía, con la financiación del bono social y sin el bono social: {euros}.',
+  'client.bills.calculation.electricity_tax.funding_either':
+    'Ninguna fuente leída dice si la financiación del bono social entra en la base: cuadra con ella y sin ella.',
+  'client.bills.calculation.electricity_tax.minimum':
+    'El impuesto no baja de 1 € por MWh: por {kwh}, {euros}.',
+  'client.bills.calculation.electricity_tax.meter_outside':
+    'La diferencia sale solo de meter el alquiler del contador en la base. Una consulta de la Dirección General de Tributos lo deja fuera, pero no está leída en su texto original: no se le pone cifra.',
+  'client.bills.calculation.vat.not_on_bill': 'Tu factura no muestra el IVA.',
+  'client.bills.calculation.vat.rate':
+    'IVA el {date}, fecha de cargo o límite de pago de tu factura: {percent}, que da {euros}.',
+  'client.bills.calculation.vat.base':
+    'Base: todo lo cobrado, con el impuesto eléctrico y el alquiler del contador: {euros}.',
+  'client.bills.calculation.vat.power_at_limit':
+    'Tienes {kw} contratados: un decreto rebaja el IVA con potencia «inferior a» 10 kW y el siguiente con «inferior o igual a» 10 kW, así que se hacen las dos cuentas.',
+  'client.bills.calculation.vat.power_periods_apart':
+    'Una de tus potencias queda dentro del límite del IVA reducido y la otra no: se hacen las dos cuentas.',
+  'client.bills.calculation.vat.severe_reduced':
+    'Con el bono social de vulnerable severo, el IVA reducido se aplica sea cual sea tu potencia.',
+  'client.bills.calculation.vat.severe_unknown':
+    'Con el bono social de vulnerable severo el IVA reducido puede aplicarse sea cual sea la potencia; sin saber tu categoría se hacen las dos cuentas.',
+  'client.bills.calculation.vat.meter_reduced':
+    'La diferencia sale solo del tipo del alquiler del contador. Una consulta de la Dirección General de Tributos lo pone al tipo reducido, pero no está leída en su texto original: no se le pone cifra.',
+  'client.bills.calculation.bonus.free_market':
+    'El bono social solo existe en el PVPC de una comercializadora de referencia, y tu factura no es de ese tipo.',
+  'client.bills.calculation.bonus.category_unknown':
+    'Sin saber si tu bono es de vulnerable o de vulnerable severo no se comprueba el descuento.',
+  'client.bills.calculation.bonus.kwh_so_far_unknown':
+    'El descuento tiene un tope de kWh al año; sin los kWh con descuento de tus facturas anteriores de este año no se comprueba.',
+  'client.bills.calculation.bonus.cap':
+    'kWh con descuento en esta factura según el tope más bajo del Real Decreto 897/2017, repartido por días: {kwh}.',
+  'client.bills.calculation.bonus.lowest':
+    'Con el {percent} de descuento, lo menos que puede descontar es {euros}.',
+  'client.bills.calculation.bonus.discounted_kwh': 'Tu factura dice {kwh} con descuento.',
+  'client.bills.calculation.excess.no_maximeter':
+    'Con la tarifa 2.0TD y sin maxímetro, al pasar de tu potencia salta el limitador y no se factura exceso. La circular que lo dice no está entre las normas que lee esta revisión, así que el importe se muestra sin sumarlo.',
+  'client.bills.calculation.excess.maximeter':
+    'Con maxímetro, el exceso de potencia se factura según la Circular 3/2020 de la CNMC; esta revisión no lo calcula.',
+  'client.bills.calculation.excess.maximeter_unknown':
+    'Sin saber si tu contador tiene maxímetro no se comprueba el exceso de potencia.',
+  'client.bills.calculation.service.pvpc':
+    'Una factura del PVPC solo puede cobrar el suministro de luz.',
+  'client.bills.calculation.service.requested':
+    'Dices que lo pediste: se muestra como dato y no se marca.',
+  'client.bills.calculation.service.not_requested':
+    'Un servicio aparte de la luz solo se puede cobrar si lo pediste, y dices que no lo pediste.',
+  'client.bills.calculation.service.requested_unknown':
+    'Un servicio aparte de la luz solo se puede cobrar si lo pediste, y le toca a la comercializadora acreditarlo. Como no sabes si lo pediste, se muestra su importe sin sumarlo.',
+  'client.bills.calculation.exit.before_rules':
+    'Las reglas del Real Decreto 88/2026 sobre la penalización por baja rigen desde el 12-06-2026.',
+  'client.bills.calculation.exit.not_person':
+    'La regla del Real Decreto 88/2026 es para contratos a nombre de una persona.',
+  'client.bills.calculation.exit.terms_unknown':
+    'Sin saber si tu precio era fijo y si el contrato ya se había prorrogado no se comprueba.',
+  'client.bills.calculation.exit.not_fixed':
+    'Con precio variable o indexado, una persona con tarifa 2.0TD no paga penalización por irse.',
+  'client.bills.calculation.exit.renewed':
+    'Después de la primera prórroga, una persona con tarifa 2.0TD no paga penalización por irse.',
+  'client.bills.calculation.exit.fixed_first_term':
+    'Con precio fijo y antes de la primera prórroga cabe una penalización de hasta el 5 % de la energía estimada que quedaba; la orden que fija cómo se estima aún no se ha publicado, así que no se comprueba.',
+  'client.bills.calculation.power.contracted':
+    'Potencia contratada: {p1} en punta y {p2} en valle.',
+  'client.bills.calculation.power.max_used':
+    'La potencia máxima que usaste en los últimos 12 meses, según tu factura: {p1} en punta y {p2} en valle.',
+  'client.bills.calculation.power.max_used_p1':
+    'La potencia máxima que usaste en punta en los últimos 12 meses, según tu factura: {p1}.',
+  'client.bills.calculation.power.max_used_p2':
+    'La potencia máxima que usaste en valle en los últimos 12 meses, según tu factura: {p2}.',
+  'client.bills.calculation.power.max_used_unknown':
+    'Tu factura trae también la potencia máxima que usaste en los últimos 12 meses.',
+  'client.bills.calculation.power.p1_cost_year':
+    'Cada kW de punta cuesta {euros} al año con tu precio de potencia.',
+  'client.bills.calculation.power.change_once_a_year':
+    'La potencia contratada se puede cambiar una vez cada 12 meses (Real Decreto 88/2026, art. 38).',
+  'client.bills.calculation.commitment.over_maximum':
+    'Tu permanencia es de {months}, y la ley pone un máximo de {maximum} para los consumidores.',
+  'client.bills.calculation.commitment.agreed_unknown':
+    'Sin la penalización que fija tu contrato no se calcula la parte proporcional.',
+  'client.bills.calculation.commitment.proportional':
+    'Penalización pactada {agreed} × {left} que faltaban / {total} de permanencia = {euros}.',
+  'client.bills.calculation.commitment.ended':
+    'Tu permanencia acabó el {end}: ya no cabe penalización por ella.',
+  'client.bills.calculation.commitment.over_maximum_penalty':
+    'Tu permanencia pasa del máximo de {maximum}: con una más corta el límite sería menor, así que lo cobrado no se da por dentro del límite.',
+  'client.bills.calculation.change.before_rules':
+    'La Ley 11/2022 rige para bajas desde el 30-06-2022.',
+  'client.bills.calculation.change.no_notice':
+    'Un cambio de condiciones se avisa con un mes de antelación, y en el mes siguiente puedes irte sin penalización. Sin aviso no está claro desde cuándo corre ese mes, así que no se le pone cifra.',
+  'client.bills.calculation.change.short_notice':
+    'El aviso llegó el {sent} y el cambio se aplicaba el {applies}, con menos de un mes de antelación: el derecho a irte sin penalización se mantiene, pero no está claro desde cuándo corre el mes, así que no se le pone cifra.',
+  'client.bills.calculation.change.exit_before_notice':
+    'Pediste la baja antes del aviso del cambio.',
+  'client.bills.calculation.change.exit_after_month':
+    'Pediste la baja después del {last}, pasado el mes siguiente al aviso.',
+  'client.bills.calculation.change.index_cpi':
+    'Tu contrato liga la subida al IPC. Según la sentencia del Tribunal de Justicia de la Unión Europea del {judgment}, una subida así no da derecho a irte sin penalización; esa sentencia es anterior a la ley actual.',
+  'client.bills.calculation.change.index_unsettled':
+    'La subida sigue el IPC más algo o una cantidad fija: no está claro si cuenta como cambio de condiciones, así que no se le pone cifra.',
+  'client.bills.calculation.change.other_unsettled':
+    'No todo cambio deja irse sin penalización: no lo hacen los que te benefician, los solo administrativos ni los que impone una norma. No se le pone cifra.',
+  'client.bills.calculation.change.no_penalty':
+    'Pediste la baja dentro del mes siguiente al aviso, que acaba el {last}: no cabe penalización por la permanencia.',
+  'client.bills.calculation.change.handset_whole':
+    'Lo único que se puede seguir cobrando es el terminal subvencionado que te quedas: {euros}.',
+  'client.bills.calculation.change.handset_prorated':
+    'Solo la parte de la permanencia que faltaba: {value} × {left} / {total} = {euros}.',
+  'client.bills.calculation.after_exit.effective':
+    'Pediste la baja el {requested}; tiene efecto como tarde dos días hábiles después, el {effective}, sin contar sábados, domingos ni festivos nacionales.',
+  'client.bills.calculation.after_exit.calendar_missing':
+    'Falta el calendario de festivos nacionales de {year}: no se calcula el día en que la baja tiene efecto.',
+  'client.bills.calculation.after_exit.charged':
+    'Del {from} al {to} se cobran {euros} de después del día en que tu baja tiene efecto.',
+  'client.bills.calculation.after_exit.margin_day':
+    'El {day} es el día justo después: un festivo de tu comunidad podría mover un día la baja, así que se muestra sin sumar.',
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof es;

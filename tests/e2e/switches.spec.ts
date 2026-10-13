@@ -21,3 +21,13 @@ test('without PUBLIC_HOUSEHOLD the home page, the legal pages and the sitemap sa
   const sitemap = await (await request.get('sitemap-0.xml')).text();
   expect(sitemap).not.toContain('empleada-de-hogar');
 });
+
+// Nor of the bills reviews: no route, no live card and no sitemap entry.
+test('without PUBLIC_BILLS there are no bills pages', async ({ page, request }) => {
+  for (const path of ['facturas/', 'facturas/luz/', 'facturas/permanencia/'])
+    expect((await request.get(path)).status(), path).toBe(404);
+  await page.goto('');
+  expect(await page.content()).not.toContain('facturas/');
+  const sitemap = await (await request.get('sitemap-0.xml')).text();
+  expect(sitemap).not.toContain('/facturas/');
+});

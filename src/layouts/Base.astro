@@ -65,6 +65,7 @@ const clientStringsJson = JSON.stringify(
     insurance: path === '/seguros/',
     credit: path === '/financiacion/',
     mortgage: path === '/hipoteca/',
+    bills: path === '/facturas/luz/' || path === '/facturas/permanencia/',
   }),
 ).replace(/</g, '\\u003c');
 const socialImage = new URL(`${root}/og.png`, Astro.site);
