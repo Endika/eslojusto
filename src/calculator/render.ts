@@ -458,9 +458,11 @@ export function summaryHeadline(r: Review): SummaryHeadline {
 export function shortfallLine(r: ItemResult, tr: Translate): Piece[] | null {
   const deduction = r.status === 'deduction_too_high';
   if (r.status !== 'below_minimum' && !deduction) return null;
-  const amount = roundToTens(r.difference ?? 0);
+  const difference = r.difference ?? 0;
+  const amount = roundToTens(difference);
   const partida = [tr(`client.item.${r.item.id}`)];
-  if (amount < 10)
+  // Under 10 € before rounding, so 5 € never reads «unos 10 €».
+  if (difference < 10)
     return piecesWithAmounts(
       tr(deduction ? 'client.summary.deduction_little' : 'client.summary.missing_little'),
       { partida },
@@ -528,6 +530,8 @@ const DISMISSALS: readonly Cause[] = [
 export function summaryDeadlines(cause: Cause, benefit: BenefitEstimate): ClientKey[] {
   return [
     ...(DISMISSALS.includes(cause) ? (['client.summary.dismissal_deadline'] as const) : []),
+    // Without the cause it may still be a dismissal, whose deadline runs all the same.
+    ...(cause === 'unknown' ? (['client.summary.dismissal_deadline_if'] as const) : []),
     ...(benefit.entitled === 'yes' ? (['client.summary.benefit_deadline'] as const) : []),
   ];
 }

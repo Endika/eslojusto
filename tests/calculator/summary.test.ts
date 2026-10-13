@@ -70,6 +70,14 @@ describe('the summary before the pass', () => {
     expect(s.lines).toEqual(['Indemnización: podrían faltarte menos de 10 €.']);
   });
 
+  it('5 € short is «menos de 10 €», never rounded up to «unos 10 €»', () => {
+    const r = completed();
+    const severance = r.review.items.find((p) => p.item.id === 'severance');
+    const min = severance?.item.range?.min ?? 0;
+    const s = summaryOf(completed(unfairDismissal, { severance: min - 5 }));
+    expect(s.lines).toEqual(['Indemnización: podrían faltarte menos de 10 €.']);
+  });
+
   it('a deduction above its maximum reads as such', () => {
     const s = summaryOf(
       completed(
@@ -216,6 +224,12 @@ describe('the deadlines in the summary', () => {
     expect(summaryOf(fixedTerm).deadlines[0]).toMatch(/^Para cobrar el paro/);
     expect(summaryOf(completed({ ...unfairDismissal, cause: 'resignation' })).deadlines).toEqual(
       [],
+    );
+  });
+  it('«No lo sé»: the 20 days in case it was a dismissal', () => {
+    const unknown = completed({ ...unfairDismissal, cause: 'unknown' });
+    expect(summaryOf(unknown).deadlines[0]).toBe(
+      'Si fue un despido, el plazo para impugnarlo es de 20 días hábiles (art. 59.3 ET).',
     );
   });
 });
