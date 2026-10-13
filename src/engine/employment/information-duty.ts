@@ -25,9 +25,13 @@ const BY_REFERENCE: ReadonlySet<InfoElement> = new Set(['h', 'i', 'n', 'p']);
 // (f.2.º) nor the irregular distribution and the discontinuous periods (g.5.º).
 const IN_PART_BY_REFERENCE: ReadonlySet<InfoElement> = new Set(['f', 'g']);
 
-// k) algorithmic systems, l) equality plan and harassment protocol, m) LGTBI measures: owed only
-// when the company uses or has them, which the contract alone cannot tell.
-const ONLY_IF_USED: ReadonlySet<InfoElement> = new Set(['k', 'l', 'm']);
+// k) algorithmic systems, m) LGTBI measures: owed only when the company uses or has them, which the
+// contract alone cannot tell.
+const ONLY_IF_USED: ReadonlySet<InfoElement> = new Set(['k', 'm']);
+
+// l) the equality plan only if the company has one, but the harassment protocol always («Asimismo,
+// informará sobre el protocolo de acoso»).
+const PROTOCOL_ALWAYS: InfoElement = 'l';
 
 // j) the temporary work agency and the user company: agency contracts are outside this review.
 const AGENCY_ONLY: InfoElement = 'j';
@@ -117,7 +121,10 @@ function check(
     case 'absent':
       return ONLY_IF_USED.has(element)
         ? flagged('review_it', 'information.only_if_used')
-        : flagged('missing_requirement', null);
+        : flagged(
+            'missing_requirement',
+            element === PROTOCOL_ALWAYS ? 'information.protocol_always' : null,
+          );
   }
 }
 

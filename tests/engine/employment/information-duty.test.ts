@@ -155,7 +155,7 @@ describe('information duty (RD 723/2026)', () => {
     },
   );
 
-  it.each(['k', 'l', 'm'] as const)(
+  it.each(['k', 'm'] as const)(
     '%s missing is owed only if the company uses or has it',
     (element) => {
       const f = elementOf(duty(withInfo({ [element]: 'absent' })), element);
@@ -163,6 +163,12 @@ describe('information duty (RD 723/2026)', () => {
       expect(keys(f)).toContain('information.only_if_used');
     },
   );
+
+  it('l missing is owed: the harassment protocol always is, the equality plan if there is one', () => {
+    const f = elementOf(duty(withInfo({ l: 'absent' })), 'l');
+    expect(f.status).toBe('missing_requirement');
+    expect(keys(f)).toContain('information.protocol_always');
+  });
 
   it('an element the person does not know about is left to review', () => {
     expect(elementOf(duty(withInfo({ b: 'unknown' })), 'b').status).toBe('review_it');
