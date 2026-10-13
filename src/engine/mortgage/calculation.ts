@@ -82,6 +82,7 @@ export type MortgagePhraseKey =
   | 'flags.default_interest_lcci_matches'
   | 'flags.default_interest_lh114'
   | 'flags.default_interest_lh114_above'
+  | 'flags.default_interest_lh114_earlier'
   | 'flags.default_interest_case_law'
   | 'flags.default_interest_case_law_above'
   | 'flags.early_termination'

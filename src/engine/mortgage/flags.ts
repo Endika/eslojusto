@@ -12,6 +12,7 @@ import {
   readRulings,
   ruleApplies,
   ruleSource,
+  STATUTE_RULES,
   type Basis,
   type CaseLawRuleId,
   type MortgageRuleId,
@@ -175,6 +176,18 @@ function defaultInterestParts(
       ),
     );
   }
+  // A loan made before Ley 1/2013 is told the cap reaches what accrues from then on, with no figure.
+  if (
+    toIso(deed) < STATUTE_RULES.default_interest_lh114_earlier.from &&
+    applies('default_interest_lh114_earlier', today, deps)
+  )
+    parts.push(
+      statutePart(
+        'default_interest_lh114_earlier',
+        [p('flags.default_interest_lh114_earlier')],
+        deps,
+      ),
+    );
   if (criterionReaches('default_interest_case_law', deed)) {
     const reference = known ? round2(ordinaryRate + CASE_LAW_DEFAULT_POINTS) : null;
     const above = known && reference !== null && defaultRate > reference;

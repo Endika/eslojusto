@@ -624,6 +624,11 @@
           "phrases": [],
           "parts": [
             {
+              "basis": "statute",
+              "rule": "default_interest_lh114_earlier",
+              "phrases": ["flags.default_interest_lh114_earlier"]
+            },
+            {
               "basis": "case_law",
               "rule": "default_interest_case_law",
               "phrases": ["flags.default_interest_case_law"]

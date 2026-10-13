@@ -31,6 +31,7 @@ export type StatuteRuleId =
   | 'floor_statute'
   | 'default_interest_statute'
   | 'default_interest_lh114'
+  | 'default_interest_lh114_earlier'
   | 'early_termination'
   | 'opening_fee_duplicate'
   | 'insurance_tied'
@@ -210,6 +211,19 @@ export const STATUTE_RULES: Readonly<Record<StatuteRuleId, StatuteRule>> = {
     `${LH}#a114`,
     LAW1_2013_SINCE,
     LCCI_EVE,
+    'info',
+  ),
+  // Second transitional provision: the cap of art. 114 LH also reaches late interest on loans
+  // secured on the main home made before 15-05-2013, as it accrues from that day or if it had
+  // accrued and was unpaid by then. Read against the day the interest accrues; its text is the one
+  // published (BOE open data, 13-10-2026).
+  default_interest_lh114_earlier: rule(
+    'default_interest_lh114_earlier',
+    'law1_2013',
+    'Ley 1/2013, disposición transitoria segunda',
+    `${LAW1_2013}#dtsegunda`,
+    LAW1_2013_SINCE,
+    null,
     'info',
   ),
   // 24: the minimum arrears for early termination; the first transitional provision, 4, applies
