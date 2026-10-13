@@ -89,6 +89,13 @@ describe('ERTE result copy', () => {
     const t = text({ ...base, base: 3000 });
     expect(t).toContain('Unos 1.225 € al mes, antes y después del día 181.');
   });
+  it('a RED reduction takes the proportion as a criterion of the review', () => {
+    const t = text({ ...base, regime: 'red', measure: { kind: 'reduction', percent: 50 } });
+    expect(t).toContain('es un criterio de la revisión');
+    expect(text({ ...base, measure: { kind: 'reduction', percent: 50 } })).not.toContain(
+      'criterio de la revisión',
+    );
+  });
   it('a reduction in full days is total unemployment', () => {
     const t = text({ ...base, measure: { kind: 'reduction', percent: 40 } });
     expect(t).toContain(
