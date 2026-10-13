@@ -46,7 +46,7 @@ function approximate(r: Range, tr: Translate): string {
 function sources(list: Item['sources'], tr: Translate): Block[] {
   return list.map((s) => ({
     type: 'source',
-    text: `${s.citation} · ${tr('client.source.in_force', { fecha: sourceDate(s.inForceSince) })}`,
+    text: `${s.citation} · ${tr(s.effectiveFrom ? 'client.source.effective_from' : 'client.source.in_force', { fecha: sourceDate(s.inForceSince) })}`,
     url: s.url,
   }));
 }

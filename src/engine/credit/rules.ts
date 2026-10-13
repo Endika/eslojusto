@@ -151,14 +151,7 @@ export const STATUTE_RULES: Readonly<Record<StatuteRuleId, StatuteRule>> = {
     'info',
   ),
   // Código Civil 5.1: days run from the day after; months run date to date.
-  period_count: rule(
-    'period_count',
-    'cc',
-    'Código Civil, art. 5.1',
-    `${CC}#art5`,
-    LCC_SINCE,
-    'date',
-  ),
+  period_count: rule('period_count', 'cc', 'art. 5.1', `${CC}#art5`, LCC_SINCE, 'date'),
   // The new consumer credit directive, not yet transposed: a notice, never a rule applied.
   directive_notice: rule(
     'directive_notice',

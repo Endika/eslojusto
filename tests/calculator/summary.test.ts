@@ -203,7 +203,7 @@ describe('the deadlines in the summary', () => {
   it('a dismissal: the 20 days to challenge it and the 15 to ask for the benefit', () => {
     expect(summaryOf(completed()).deadlines).toEqual([
       'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
-      'Para cobrar el paro tienes que inscribirte como demandante de empleo y pedirlo en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (arts. 266 y 268 LGSS).',
+      'Para cobrar el paro tienes que inscribirte como demandante de empleo y pedirlo en los 15 días siguientes al fin del contrato (hábiles, según el SEPE). Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (arts. 266 y 268 LGSS).',
     ]);
   });
   it('the end of a fixed-term contract: only the benefit; a resignation: none', () => {

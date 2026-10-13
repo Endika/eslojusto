@@ -87,7 +87,7 @@ describe('employment rule table', () => {
     expect(ruleSource('permanent_on_breach', EMPLOYMENT_NORMS)).toMatchObject({
       id: 'permanent_on_breach',
       citation:
-        'Estatuto de los Trabajadores, art. 15.4 (Real Decreto Legislativo 2/2015, de 23 de octubre (Estatuto de los Trabajadores))',
+        'Estatuto de los Trabajadores, art. 15.4 (Real Decreto Legislativo 2/2015, de 23 de octubre)',
       url: `${BOE}buscar/act.php?id=BOE-A-2015-11430#a15`,
       inForceSince: '2025-01-02',
       status: 'in_force',

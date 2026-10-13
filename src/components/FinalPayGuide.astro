@@ -82,10 +82,10 @@ const benefitSources = [
   SOURCES.lgss269,
   SOURCES.lgss270,
   SOURCES.sepeAmounts,
-].map(({ citation, url, inForceSince }) => ({
+].map(({ citation, url, inForceSince, effectiveFrom }) => ({
   citation,
   url,
-  inForce: t(lang, 'client.source.in_force', {
+  inForce: t(lang, effectiveFrom ? 'client.source.effective_from' : 'client.source.in_force', {
     fecha: inForceSince.split('-').reverse().join('-'),
   }),
 }));
@@ -190,11 +190,13 @@ const benefitSources = [
     <section class="sheet sheet--text">
       <h3 id="g-vacaciones">{tx('guide.holidays')}</h3>
       <p>
-        Son como mínimo treinta días naturales al año, que equivalen a 22 laborables (de lunes a
-        viernes); tu convenio o tu contrato pueden dar más. Se generan con cada día trabajado, y en
-        el finiquito entran las de este año que no has disfrutado. Muchas empresas las cuentan por
-        meses (2,5 días por mes con 30 al año) en vez de por días, y la revisión da el margen entre
-        las dos cuentas. Cada día se paga entre tu salario mensual / 30 y tu salario anual / 365.
+        Son como mínimo treinta días naturales al año (art. 38.1 ET). La revisión los toma como 22
+        laborables de lunes a viernes, 26 de lunes a sábado y 30 × días / 7 con otra semana: son
+        equivalencias, no texto de la ley. Tu convenio o tu contrato pueden dar más. Se generan con
+        cada día trabajado, y en el finiquito entran las de este año que no has disfrutado. Muchas
+        empresas las cuentan por meses (2,5 días por mes con 30 al año) en vez de por días, y la
+        revisión da el margen entre las dos cuentas. Cada día se paga entre tu salario mensual / 30
+        y tu salario anual / 365.
       </p>
       <p class="example">
         <span class="example__label">{tx('guide.example')}</span> Baja el 15 de octubre de 2026: 288
@@ -359,8 +361,7 @@ const benefitSources = [
         ampliaba el convenio sectorial (art. 15.1.a ET en su redacción anterior y disposición
         transitoria 3.ª del Real Decreto-ley 32/2021), así que ninguno acaba en septiembre de 2026
         con esta antigüedad. Un contrato temporal que pasa de su duración máxima puede ser
-        indefinido (art. 15.4 ET), y entonces su fin sería un despido. Si el tuyo duró más,
-        revísalo.
+        indefinido (art. 15.4 ET), y entonces su fin sería un despido.
       </p>
     </section>
 
@@ -525,9 +526,9 @@ const benefitSources = [
       <p>
         Sin inscribirte como demandante de empleo no hay paro (art. 266 LGSS): te das de alta en el
         servicio de empleo de tu comunidad y pides la prestación al SEPE. Se pide en los 15 días
-        hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el
-        plazo cuenta desde que terminan esos días (art. 268.1 y 268.3 LGSS). Pedirlo más tarde resta
-        del paro los días de retraso (art. 268.2 LGSS).
+        siguientes al fin del contrato, hábiles según el SEPE. Si tu finiquito paga vacaciones no
+        disfrutadas, el plazo cuenta desde que terminan esos días (art. 268.1 y 268.3 LGSS). Pedirlo
+        más tarde resta del paro los días de retraso (art. 268.2 LGSS).
       </p>
       <ul class="sources">
         {benefitSources.map(({ citation, url, inForce }) => (

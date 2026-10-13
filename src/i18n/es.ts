@@ -305,7 +305,7 @@ export const es = {
   'holidays.week_other': 'Otro',
   'holidays.week_other_days': 'Días a la semana',
   'holidays.annual_hint_working':
-    '22 laborables equivalen a los 30 naturales de la ley; 26 si trabajas de lunes a sábado.',
+    'La ley fija 30 naturales. La calculadora los toma como 22 laborables de lunes a viernes o 26 de lunes a sábado: es una equivalencia, no un texto de la ley.',
   'holidays.annual_hint_calendar': '30 es el mínimo de la ley.',
   'holidays.taken': 'Disfrutados este año',
   'holidays.taken_hint_working': 'Este año, en días laborables.',
@@ -384,7 +384,7 @@ export const es = {
   'result.benefit_contributed': 'Días cotizados',
   'result.benefit_deadline': 'Cómo y cuándo pedirlo',
   'result.benefit_deadline_text':
-    'Sin inscribirte como demandante de empleo no hay paro: te das de alta en el servicio de empleo de tu comunidad y pides la prestación al SEPE en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días; si lo pides tarde, pierdes los días de retraso (arts. 266 y 268 LGSS).',
+    'Sin inscribirte como demandante de empleo no hay paro: te das de alta en el servicio de empleo de tu comunidad y pides la prestación al SEPE en los 15 días siguientes al fin del contrato (hábiles, según el SEPE). Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días; si lo pides tarde, pierdes los días de retraso (arts. 266 y 268 LGSS).',
   'result.benefit_work_history':
     'Tu vida laboral muestra cada alta y cada baja y los días cotizados:',
   'result.benefit_work_history_link': 'informe de tu vida laboral (sede de la Seguridad Social)',
@@ -738,7 +738,7 @@ export const es = {
   'client.summary.dismissal_deadline':
     'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
   'client.summary.benefit_deadline':
-    'Para cobrar el paro tienes que inscribirte como demandante de empleo y pedirlo en los 15 días hábiles siguientes al fin del contrato. Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (arts. 266 y 268 LGSS).',
+    'Para cobrar el paro tienes que inscribirte como demandante de empleo y pedirlo en los 15 días siguientes al fin del contrato (hábiles, según el SEPE). Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (arts. 266 y 268 LGSS).',
 
   'client.status.below_minimum': 'Por debajo del mínimo legal: faltan {importe}',
   'client.status.matches': 'Coincide con el mínimo legal',
@@ -765,10 +765,11 @@ export const es = {
   'client.or_more.ere_agreement':
     'O más, según el acuerdo del ERE: el acuerdo del periodo de consultas puede mejorar este mínimo (art. 51.2 ET). Esta revisión no lo conoce.',
   'client.source.in_force': 'en vigor desde {fecha}',
+  'client.source.effective_from': 'con efectos desde {fecha}',
   'client.unfair_reference':
     'Si un juzgado declarase improcedente el despido, la indemnización sería de {importe}.',
   'client.unfair_reference_objective':
-    'Referencia: si un juzgado declarase improcedente el despido, la indemnización sería de {importe} (33 días de salario por año trabajado, 45 por el tiempo anterior al 12 de febrero de 2012, con sus topes). Es la cifra con la que suelen compararse los acuerdos de mejora.',
+    'Referencia: si un juzgado declarase improcedente el despido, la indemnización sería de {importe} (33 días de salario por año trabajado, 45 por el tiempo anterior al 12 de febrero de 2012, con sus topes).',
 
   'client.other_contracts.contract': 'Otro trabajo {n}',
   'client.other_contracts.start': 'Fecha de alta del trabajo {n}',
@@ -845,7 +846,7 @@ export const es = {
   'client.calculation.holiday_pay.pending':
     '{devengo}, menos {disfrutados} disfrutados = entre {minimo} y {maximo} días naturales pendientes × {diario_mensual} (salario mensual / 30) o {diario_anual} (salario anual / 365) al día.',
   'client.calculation.holiday_pay.pending_working':
-    '{devengo}, menos {disfrutados} disfrutados = entre {minimo} y {maximo} días laborables pendientes. {minimo_laborables} días laborables equivalen a 30 naturales, así que son entre {minimo_naturales} y {maximo_naturales} días naturales × {diario_mensual} (salario mensual / 30) o {diario_anual} (salario anual / 365) al día.',
+    '{devengo}, menos {disfrutados} disfrutados = entre {minimo} y {maximo} días laborables pendientes. La calculadora toma {minimo_laborables} días laborables como los 30 naturales de la ley (una equivalencia, no un texto de la ley), así que son entre {minimo_naturales} y {maximo_naturales} días naturales × {diario_mensual} (salario mensual / 30) o {diario_anual} (salario anual / 365) al día.',
   'client.calculation.holiday_pay.counted':
     'Hemos contado {disfrutados} días {unidad} disfrutados de {anuales} al año.',
   'client.calculation.holiday_pay.unit.working': 'laborables ({dias_semana} por semana)',
@@ -904,7 +905,7 @@ export const es = {
     'La calculadora del CGPJ y su guía cuentan distinto los meses en este caso (un mes de diferencia); por eso damos un margen entre ambas cifras.',
   'client.calculation.severance.fixed_term': '{dias} días × {dias_anuales}/365 × {diario}/día',
   'client.calculation.severance.fixed_term_before_2001':
-    'Los contratos temporales firmados antes del 4 de marzo de 2001 no tienen esta indemnización: se rigen por la norma de entonces (DT 8.ª ET). Si tu convenio la prevé, revísalo.',
+    'Los contratos temporales firmados antes del 4 de marzo de 2001 no tienen esta indemnización: se rigen por la norma de entonces (DT 8.ª ET), salvo que el convenio la prevea.',
   'client.calculation.severance.replacement':
     'Los contratos de sustitución no generan indemnización por fin de contrato.',
   'client.calculation.severance.training':
@@ -1489,7 +1490,7 @@ export const es = {
 
   'employment.guide.holidays_pay.title': 'Vacaciones y pagas extra',
   'employment.guide.holidays_pay.holidays':
-    'Las vacaciones son al menos 30 días naturales al año, retribuidos; el convenio o el contrato pueden dar más (art. 38.1). En un contrato de menos de un año, corresponde la parte proporcional.',
+    'Las vacaciones son al menos 30 días naturales al año, retribuidos; el convenio o el contrato pueden dar más (art. 38.1). En un contrato de menos de un año corresponde la parte proporcional, aunque el art. 38.1 no lo dice expresamente.',
   'employment.guide.holidays_pay.money':
     'Mientras sigue el contrato, las vacaciones no se pueden cambiar por dinero (art. 38.1).',
   'employment.guide.holidays_pay.extra_pays':
@@ -1547,7 +1548,7 @@ export const es = {
     'Lo fija tu convenio, y solo cabe si se pacta por escrito. Si el convenio no dice nada, como mucho 6 meses para técnicos titulados y 2 meses para el resto, o 3 en empresas de menos de 25 personas. En un contrato temporal de 6 meses o menos, 1 mes, salvo que el convenio diga otra cosa. Si ya habías hecho las mismas funciones en la empresa, no cabe (art. 14.1). En un contrato de formación en alternancia no hay periodo de prueba (art. 11.2.l).',
   'employment.faq.holidays': '¿Cuántas vacaciones me corresponden?',
   'employment.faq.holidays_answer':
-    'Al menos 30 días naturales al año, retribuidos; tu convenio o tu contrato pueden dar más (art. 38.1). Si tu contrato dura menos de un año, te corresponde la parte proporcional. Mientras sigue el contrato, las vacaciones no se pueden cambiar por dinero.',
+    'Al menos 30 días naturales al año, retribuidos; tu convenio o tu contrato pueden dar más (art. 38.1). Si tu contrato dura menos de un año, te corresponde la parte proporcional, aunque el art. 38.1 no lo dice expresamente. Mientras sigue el contrato, las vacaciones no se pueden cambiar por dinero.',
   'employment.faq.information': '¿Qué información me tiene que dar la empresa?',
   'employment.faq.information_answer':
     'Desde el {desde}, {norma} dice que la empresa tiene que darte por escrito los elementos esenciales de tu relación laboral: quiénes son las partes, el puesto y la categoría, el salario y sus complementos, la jornada y las vacaciones, el periodo de prueba, el convenio colectivo con su código y cómo termina el contrato, entre otros. Si tu relación empezó desde ese día, antes de empezar; si ya estaba en marcha, puedes pedirlos por escrito y la empresa tiene 30 días hábiles. No se aplica a relaciones de cuatro semanas o menos.',
@@ -1891,7 +1892,7 @@ export const es = {
   'employment.result.title': 'Resultado',
   'employment.result.out_of_scope': 'Fuera de esta revisión',
   'employment.result.household_link':
-    'Si trabajas en una casa, revisa tu caso como empleada de hogar',
+    'El trabajo en una casa tiene su propia revisión: empleo de hogar',
   'employment.result.summary': 'Resumen',
   'employment.result.information': 'Para que lo sepas',
   'employment.result.unchecked': 'Lo que esta revisión no mira',
@@ -2581,7 +2582,7 @@ export const es = {
   'client.employment.calculation.holidays.included_in_salary':
     'Las vacaciones no se pueden cambiar por dinero mientras sigue el contrato (art. 38.1).',
   'client.employment.calculation.holidays.short_temporary_exception':
-    'En contratos temporales de hasta {days}, la norma del SMI permite pagar las vacaciones con el salario de cada día.',
+    'En contratos temporales de hasta {days}, la norma del SMI permite pagar las vacaciones con el salario de cada día cuando las vacaciones no se disfrutan dentro del tiempo que dura el contrato.',
   'client.employment.calculation.extra_pays.count': 'El contrato fija {count} al año.',
   'client.employment.calculation.extra_pays.amount_by_agreement': 'Su importe lo fija tu convenio.',
   'client.employment.calculation.extra_pays.one_may_be_prorated':
@@ -2967,7 +2968,7 @@ export const es = {
   'rental.guide.term.tacit':
     'Cumplido ese plazo, si nadie avisa (el casero con cuatro meses de antelación y tú con dos), el contrato sigue un año más cada vez, hasta tres años, y puedes dejarlo al acabar cualquiera de esos años avisando con un mes de antelación (art. 10.1 LAU).',
   'rental.guide.term.extension':
-    'Además, {decreto} prevé, con requisitos y excepciones, una prórroga extraordinaria por años, hasta dos más, si la pides. Los principales: el contrato tiene que estar en vigor el {desde}; su prórroga del art. 9.1, su prórroga tácita o su tácita reconducción tiene que acabar antes del 31 de diciembre de 2028, y tienes que estar al corriente del pago de la renta y haberlo estado cada mes durante los ocho anteriores. No se aplica si pactáis otras condiciones, un contrato nuevo o una renovación con una renta al menos un 5 % más baja, ni si el casero comunica que necesita la vivienda para sí o su familia (art. 9.3 LAU). Si cabe la prórroga de las zonas tensionadas (art. 10.3 LAU), se aplica esa.',
+    'Además, {decreto} prevé, con requisitos y excepciones, una prórroga extraordinaria por años, hasta dos más, si la pides. Los principales: el contrato tiene que estar en vigor el {desde}; su prórroga del art. 9.1 tiene que acabar antes del 31 de diciembre de 2028, o tiene que acabar su prórroga tácita o su tácita reconducción, y tienes que estar al corriente del pago de la renta y haberlo estado cada mes durante los ocho anteriores. No se aplica si pactáis otras condiciones, un contrato nuevo o una renovación con una renta al menos un 5 % más baja, ni si el casero comunica que necesita la vivienda para sí o su familia (art. 9.3 LAU). Si cabe la prórroga de las zonas tensionadas (art. 10.3 LAU), se aplica esa.',
   'rental.guide.term.rdl28':
     'Por otro lado, {decreto} reescribe el art. 10 de la LAU, el de las prórrogas, y desde entonces deja fuera la prórroga extraordinaria del Real Decreto-ley 29/2026 cuando proceda la prórroga del nuevo art. 10.1.',
   'rental.guide.term.unchecked':
@@ -3070,7 +3071,7 @@ export const es = {
   'rental.large.question': 'Gran tenedor',
   'rental.landlord.large': '¿Tu casero es gran tenedor?',
   'rental.landlord.large_hint':
-    'Es gran tenedor quien tiene más de diez viviendas o más de 1.500 m² de uso residencial, sin contar garajes ni trasteros (art. 3.k de la Ley 12/2023); en una zona tensionada, la comunidad autónoma puede bajarlo a cinco o más viviendas. Ser una empresa no basta: una sociedad con pocos pisos no lo es.',
+    'Es gran tenedor quien tiene más de diez inmuebles urbanos de uso residencial o más de 1.500 m² de uso residencial, sin contar garajes ni trasteros (art. 3.k de la Ley 12/2023); en una zona tensionada, la comunidad autónoma puede bajarlo a cinco o más inmuebles. Desde el 08-10-2026, el Real Decreto-ley 29/2026, pendiente de convalidación, añade que se acredita con una certificación del Registro de la Propiedad y que cada unidad de uso residencial de un edificio cuenta como un inmueble, aunque no haya división horizontal inscrita. Ser una empresa no basta: una sociedad con pocos pisos no lo es.',
   'rental.home.question': 'Dónde está la vivienda',
   'rental.landlord.region': 'Comunidad autónoma',
   'rental.landlord.region_hint': 'Donde está la vivienda.',
@@ -3732,7 +3733,7 @@ export const es = {
   'client.household.calculation.minimum_wage.hourly':
     'Mínimo por hora de {year} para quien trabaja por horas y no vive en la casa: {minimum}. Cobras {paid} la hora.',
   'client.household.calculation.minimum_wage.hourly_includes_everything':
-    'Ese precio incluye todos los conceptos, también las vacaciones y las pagas extra, y se paga en dinero: no se reclaman aparte.',
+    'Ese salario mínimo por hora incluye todos los conceptos retributivos y se paga en dinero (art. 8.5). La norma no nombra las vacaciones ni las pagas extra; la revisión las entiende incluidas en ese mínimo y no las cuenta aparte.',
   'client.household.calculation.minimum_wage.hourly_shortfall':
     'Te faltan {difference} por cada hora trabajada.',
   'client.household.calculation.in_kind.share':
@@ -3961,7 +3962,7 @@ export const es = {
   'household.result.final_pay': 'Lo que queda por cobrar al terminar',
   'household.result.unemployment': 'Paro',
   'household.result.unemployment_text':
-    'Desde el Real Decreto-ley 16/2022, las personas empleadas de hogar pueden cobrar el paro si reúnen los requisitos generales, entre ellos 360 días cotizados por desempleo en los seis años anteriores (arts. 266 y 269.1 de la Ley General de la Seguridad Social). El desistimiento del artículo 11.2 es una situación legal de desempleo (art. 267.1.a) 8.º) y el desempleo se cotiza desde el 1 de octubre de 2022 (disposición transitoria 2.ª del Real Decreto-ley 16/2022).',
+    'Desde el Real Decreto-ley 16/2022, las personas empleadas de hogar pueden cobrar el paro si reúnen los requisitos generales, entre ellos 360 días cotizados por desempleo en los seis años anteriores (arts. 266 y 269.1 de la Ley General de la Seguridad Social). El desistimiento del artículo 11.2 es una situación legal de desempleo (art. 267.1.a) 8.º), como el despido (art. 267.1.a) 3.º), y el desempleo se cotiza desde el 1 de octubre de 2022 (disposición transitoria 2.ª del Real Decreto-ley 16/2022).',
   'household.result.unemployment_link': 'Estima cuánto cobrarías de paro',
   'household.result.unchecked': 'Lo que esta revisión no mira',
   'household.result.restart': 'Empezar de nuevo',
@@ -3977,7 +3978,7 @@ export const es = {
   'household.guide.pay.p1':
     'El salario mínimo interprofesional se aplica también en el servicio del hogar: con jornada completa, de 40 horas a la semana, es la cifra mensual del real decreto del año en 14 pagas y, con menos horas, se aplica en proporción (art. 8.1 del Real Decreto 1620/2011).',
   'household.guide.pay.p2':
-    'Quien trabaja por horas y no vive en la casa cobra como mínimo el precio por hora del real decreto del SMI del año. Ese precio incluye todos los conceptos, también las vacaciones y las pagas extra, y se paga en dinero (art. 8.5).',
+    'Quien trabaja por horas y no vive en la casa cobra como mínimo el precio por hora del real decreto del SMI del año. Ese salario mínimo incluye todos los conceptos retributivos y se paga en dinero (art. 8.5); la norma no nombra las vacaciones ni las pagas extra, y la revisión las entiende incluidas en él.',
   'household.guide.pay.p3':
     'El alojamiento y la manutención pueden pactarse como pago en especie, hasta el 30 % del salario total, y no cuentan para llegar al mínimo en dinero (art. 8.2). Hay dos pagas extra al año, una al final de cada semestre salvo pacto en otro sentido (art. 8.4).',
   'household.guide.time.title': 'Jornada, descansos y vacaciones',
@@ -4002,23 +4003,23 @@ export const es = {
     'El texto no dice cómo contar un año incompleto en la indemnización. La revisión cuenta los años completos; la lectura que cuenta un día por cada mes empezado se da solo como «y hasta». El salario diario es el salario anual entre 365.',
   'household.guide.unemployment.title': 'Paro',
   'household.guide.unemployment.p1':
-    'Desde el Real Decreto-ley 16/2022, las personas empleadas de hogar pueden cobrar el paro si reúnen los requisitos generales, entre ellos 360 días cotizados por desempleo en los seis años anteriores (arts. 266 y 269.1 de la Ley General de la Seguridad Social). El desistimiento es una situación legal de desempleo (art. 267.1.a) 8.º) y el desempleo se cotiza desde el 1 de octubre de 2022 (disposición transitoria 2.ª del Real Decreto-ley 16/2022).',
+    'Desde el Real Decreto-ley 16/2022, las personas empleadas de hogar pueden cobrar el paro si reúnen los requisitos generales, entre ellos 360 días cotizados por desempleo en los seis años anteriores (arts. 266 y 269.1 de la Ley General de la Seguridad Social). El desistimiento es una situación legal de desempleo (art. 267.1.a) 8.º), como el despido (art. 267.1.a) 3.º), y el desempleo se cotiza desde el 1 de octubre de 2022 (disposición transitoria 2.ª del Real Decreto-ley 16/2022).',
   'household.guide.unemployment.link': 'Estima cuánto cobrarías de paro',
   'household.guide.unchecked.title': 'Lo que la revisión no mira',
   'household.guide.unchecked.p1':
-    'Si la causa del desistimiento es cierta, lo que hayas pactado con la familia, las cotizaciones y lo que cobras en neto. Tampoco pide nombre, DNI, domicilio, nacionalidad, situación administrativa, salud ni embarazo: no los necesita.',
+    'Si la causa del desistimiento es cierta, lo que hayas pactado con la familia, las cotizaciones y lo que cobras en neto. Tampoco mira el tiempo de presencia (art. 9.2), las dos horas diarias para las comidas de quien vive en la casa (art. 9.4), el periodo de prueba (art. 6.2) ni la prevención de riesgos laborales (Real Decreto 893/2024). Y no pide nombre, DNI, domicilio, nacionalidad, situación administrativa, salud ni embarazo: no los necesita.',
 
   'household.faq.minimum_wage': '¿Cuál es el sueldo mínimo en el servicio del hogar?',
   'household.faq.minimum_wage_answer':
-    'En {anio}, el SMI es de {mensual} al mes en 14 pagas ({anual} al año) para 40 horas a la semana, y en proporción con menos horas (art. 8.1 del Real Decreto 1620/2011). Quien trabaja por horas y no vive en la casa cobra al menos {hora} la hora, con vacaciones y pagas extra incluidas (art. 8.5).',
+    'En {anio}, el SMI es de {mensual} al mes en 14 pagas ({anual} al año) para 40 horas a la semana, y en proporción con menos horas (art. 8.1 del Real Decreto 1620/2011). Quien trabaja por horas y no vive en la casa cobra al menos {hora} la hora, un mínimo que incluye todos los conceptos retributivos (art. 8.5).',
   'household.faq.minimum_wage_not_published':
     'El real decreto del SMI de {anio} aún no está en el BOE. Como referencia, el de {referencia} fija {mensual} al mes en 14 pagas ({anual} al año) para 40 horas a la semana, y {hora} la hora para quien trabaja por horas y no vive en la casa (arts. 8.1 y 8.5 del Real Decreto 1620/2011). Para {anio} no se calcula ninguna diferencia.',
   'household.faq.hourly': '¿Qué incluye el precio por hora?',
   'household.faq.hourly_answer':
-    'Quien trabaja por horas y no vive en la casa cobra un precio que incluye todos los conceptos: también las vacaciones y las pagas extra, y se paga en dinero. Por eso la revisión no calcula esas partidas aparte en su finiquito (art. 8.5 del Real Decreto 1620/2011). Por encima del mínimo, lo que hayáis pactado decide.',
+    'El salario mínimo por hora de quien trabaja por horas y no vive en la casa incluye todos los conceptos retributivos y se paga en dinero (art. 8.5 del Real Decreto 1620/2011). La norma no nombra las vacaciones ni las pagas extra; la revisión las entiende incluidas en ese mínimo y no las calcula aparte en el finiquito. Por encima del mínimo, lo que hayáis pactado decide.',
   'household.faq.desistimiento': '¿Qué es el desistimiento y qué tiene que cumplir?',
   'household.faq.desistimiento_answer':
-    'Es la forma en que la familia termina la relación sin despido. Ha de tener una de tres causas, y estar justificada: menos ingresos o más gastos de la familia por una circunstancia sobrevenida, cambio sustancial de sus necesidades o pérdida de confianza razonable y proporcionada. Se comunica por escrito con la causa, y la indemnización se pone a disposición con el aviso: 12 días de salario por año de servicio, con un tope de seis mensualidades. El preaviso es de 20 días si llevas más de un año y de 7 si no (art. 11.2 del Real Decreto 1620/2011); son días naturales, porque en los plazos civiles no se excluyen los inhábiles (art. 5 del Código Civil).',
+    'Es la extinción de la relación por decisión de la familia que regula el art. 11.2 del Real Decreto 1620/2011. Ha de tener una de tres causas, y estar justificada: menos ingresos o más gastos de la familia por una circunstancia sobrevenida, cambio sustancial de sus necesidades o pérdida de confianza razonable y proporcionada. Se comunica por escrito con la causa, y la indemnización se pone a disposición con el aviso: 12 días de salario por año de servicio, con un tope de seis mensualidades. El preaviso es de 20 días si llevas más de un año y de 7 si no (art. 11.2 del Real Decreto 1620/2011); son días naturales, porque en los plazos civiles no se excluyen los inhábiles (art. 5 del Código Civil).',
   'household.faq.dismissal': '¿Cuándo se presume que es un despido?',
   'household.faq.dismissal_answer':
     'Cuando no hay escrito o cuando la indemnización no se puso a disposición con el aviso, la norma presume que es un despido y podrían aplicarse sus reglas (art. 11.3 del Real Decreto 1620/2011). Un preaviso corto o un error disculpable en el importe no lo provocan: se debe la diferencia.',
@@ -4033,7 +4034,7 @@ export const es = {
     'La revisión lo señala como aviso. La jornada ordinaria es de 40 horas a la semana de trabajo efectivo, con el tiempo de presencia aparte (art. 9.1 del Real Decreto 1620/2011), y lo que pase de ahí serían horas extraordinarias (art. 9.3). Entre jornadas hay 12 horas de descanso (10 para quien vive en la casa, si se compensa en cuatro semanas) y el descanso semanal es de 36 horas seguidas (arts. 9.4 y 9.5). Un aviso no suma importes.',
   'household.faq.unemployment': '¿Tengo paro como empleada de hogar?',
   'household.faq.unemployment_answer':
-    'Desde el Real Decreto-ley 16/2022, las personas empleadas de hogar pueden cobrar el paro si reúnen los requisitos generales, entre ellos 360 días cotizados por desempleo en los seis años anteriores (arts. 266 y 269.1 de la Ley General de la Seguridad Social). El desistimiento es situación legal de desempleo (art. 267.1.a) 8.º) y el desempleo se cotiza desde el 1 de octubre de 2022 (disposición transitoria 2.ª del Real Decreto-ley 16/2022). Con la estimación del paro puedes ver cuánto y durante cuánto tiempo.',
+    'Desde el Real Decreto-ley 16/2022, las personas empleadas de hogar pueden cobrar el paro si reúnen los requisitos generales, entre ellos 360 días cotizados por desempleo en los seis años anteriores (arts. 266 y 269.1 de la Ley General de la Seguridad Social). El desistimiento es situación legal de desempleo (art. 267.1.a) 8.º), como el despido (art. 267.1.a) 3.º), y el desempleo se cotiza desde el 1 de octubre de 2022 (disposición transitoria 2.ª del Real Decreto-ley 16/2022). Con la estimación del paro puedes ver cuánto y durante cuánto tiempo.',
   'household.faq.data': '¿Qué datos pide la revisión?',
   'household.faq.data_answer':
     'Solo fechas, cifras y respuestas sobre el trabajo y su final. No pide nombre, DNI, domicilio, nacionalidad, situación administrativa, salud ni embarazo. Todo se calcula en tu dispositivo y lo que escribes no sale de él.',
@@ -4114,7 +4115,7 @@ export const es = {
   'client.household.finding.unemployment_contribution': 'Cotización por desempleo',
   'client.household.finding.unemployment_general': 'Paro',
 
-  'client.household.headline.found': 'Hay puntos que quedan por debajo de lo que marca la norma.',
+  'client.household.headline.found': 'Hay puntos que no cumplen lo que marca la norma.',
   'client.household.headline.to_review': 'Hay puntos que conviene revisar.',
   'client.household.headline.nothing_found':
     'Con lo que has contestado, no se ve nada por debajo de lo que marca la norma.',
@@ -4156,7 +4157,7 @@ export const es = {
   'client.household.final_pay.extra_missing':
     'No se han calculado las pagas extra porque no has indicado su importe.',
   'client.household.final_pay.hourly_included':
-    'Con el precio por hora, las vacaciones y las pagas extra ya van incluidas (art. 8.5): no se calculan aparte.',
+    'Con el precio por hora, la revisión entiende las vacaciones y las pagas extra incluidas en el salario mínimo, que incluye todos los conceptos retributivos (art. 8.5), y no las calcula aparte. Por encima del mínimo, depende de lo pactado.',
   'client.household.final_pay.not_entered':
     'Sin el sueldo mensual no se puede calcular lo que queda por cobrar.',
   'client.household.unchecked.cause_truth':
@@ -4165,6 +4166,14 @@ export const es = {
     'Si el pago en especie cuenta en la indemnización: la revisión solo cuenta el dinero.',
   'client.household.unchecked.contributions': 'Las cotizaciones a la Seguridad Social.',
   'client.household.unchecked.net_pay': 'Lo que cobras en neto, tras los descuentos.',
+  'client.household.unchecked.presence_time':
+    'El tiempo de presencia: como mucho 20 horas a la semana de media en un mes, pagadas al menos como las horas ordinarias, salvo que se compense con descanso (art. 9.2).',
+  'client.household.unchecked.live_in_meals':
+    'Las dos horas diarias para las comidas principales de quien vive en la casa, que no cuentan como trabajo (art. 9.4).',
+  'client.household.unchecked.trial_period':
+    'El periodo de prueba: por escrito y de dos meses como mucho, salvo convenio, con un preaviso de siete días naturales como mucho (art. 6.2).',
+  'client.household.unchecked.prevention':
+    'La prevención de riesgos laborales en el hogar (Real Decreto 893/2024).',
 
   'client.household.error.invalid_date': 'Escribe una fecha válida.',
   'client.household.error.too_far_ahead': 'Esa fecha queda demasiado lejos.',
@@ -4524,7 +4533,7 @@ export const es = {
   'client.insurance.calculation.non_renewal.arrive_by':
     'Cuenta con que tu escrito tiene que llegar a la aseguradora como tarde el {day}: no está aclarado que baste con enviarlo ese día.',
   'client.insurance.calculation.non_renewal.midnight':
-    'Si tu póliza vence a las 00:00 h de ese día, el periodo acaba el día anterior: cuenta un día menos.',
+    'Si tu póliza vence a las 00:00 h de ese día, se puede leer que el periodo acaba el día anterior, y el plazo tendría un día menos. La póliza tiene que decir el día y la hora en que terminan sus efectos (art. 8 de la Ley de Contrato de Seguro), pero ninguna norma dice cómo se cuenta este caso: es una interpretación.',
   'client.insurance.calculation.non_renewal.month_end':
     'El mes anterior al vencimiento no tiene ese mismo día, así que se toma su último día. Ninguna norma resuelve este caso al contar hacia atrás: es una interpretación, y por eso se da el día más temprano.',
   'client.insurance.calculation.non_renewal.extension_assumed':
@@ -4728,10 +4737,10 @@ export const es = {
   'credit.guide.early.p2':
     'No cabe compensación si el reembolso lo paga un seguro destinado a ello, ni en un periodo con interés variable (art. 30.3). El prestamista solo puede cobrar más que el tope si demuestra que el reembolso le hizo perder más (art. 30.4).',
   'credit.guide.early.p3':
-    'Si tenías un seguro ligado al crédito, el art. 30.6 se ocupa de la parte de la prima que no se ha consumido. Lo que cobre un concesionario por perder un descuento por financiar no es la compensación del prestamista: la revisión no lo compara con el tope y te pide que mires qué dice tu contrato.',
+    'Si tenías un seguro ligado al crédito, el art. 30.6 se ocupa de la parte de la prima que no se ha consumido. Lo que cobre un concesionario por perder un descuento por financiar no es la compensación del prestamista: la revisión no lo compara con el tope: depende de lo que diga tu contrato.',
   'credit.guide.indicator.title': 'El tipo medio del Banco de España',
   'credit.guide.indicator.p1':
-    'El Banco de España publica cada mes el tipo medio de los créditos al consumo, según su plazo, y el de las tarjetas revolving, cuya serie empieza en junio de 2010 (Boletín Estadístico, cuadro 19.4). Son tipos sin comisiones. La revisión compara tu TAE con el del mes en que lo contrataste y, si ese mes aún no está publicado, lo dice: nunca usa el mes anterior.',
+    'El Banco de España publica cada mes el tipo medio de los créditos al consumo, según el periodo en que el tipo está fijado al principio, y el de las tarjetas revolving, cuya serie empieza en junio de 2010 (Boletín Estadístico, cuadro 19.4). Son tipos sin comisiones. La revisión compara tu TAE con el del mes en que lo contrataste y, si ese mes aún no está publicado, lo dice: nunca usa el mes anterior.',
   'credit.guide.indicator.p2':
     'La Ley de 23 de julio de 1908 sobre nulidad de los contratos de préstamos usurarios no fija ninguna cifra. Para las tarjetas revolving, el Tribunal Supremo toma como referencia una diferencia de más de 6 puntos porcentuales sobre el tipo medio y, para las anteriores a junio de 2010, el 19,32 % (STS 258/2023, de 15 de febrero, del Pleno). Es un criterio del tribunal, no una norma.',
   'credit.guide.indicator.p3':
@@ -4742,10 +4751,10 @@ export const es = {
   'credit.guide.revolving.p1':
     'Con una tarjeta revolving devuelves lo que gastas en cuotas mensuales, fijas o en un porcentaje de la deuda, y lo que devuelves vuelve a estar disponible. Los intereses se cobran sobre lo que debes: con una cuota baja, la deuda puede tardar años en bajar, o no bajar. La revisión te dice cuántos meses tardarías en pagarla sin nuevas compras.',
   'credit.guide.revolving.p2':
-    'Para calcular su TAE, la ley supone que dispones de todo el límite y lo devuelves en un año, en 12 cuotas (anexo I, parte II). La orden de transparencia bancaria prevé que una tarjeta revolving informe al menos cada trimestre de lo pagado y lo que se debe, y que, si lo pides, te den el desglose y un cuadro de pagos en 5 días hábiles; no se ha comprobado a qué entidades y contratos anteriores llega.',
+    'Para calcular su TAE, la ley supone que dispones de todo el límite y lo devuelves en un año, en 12 cuotas (anexo I, parte II). La orden de transparencia bancaria prevé que una tarjeta revolving informe al menos cada trimestre de lo que se debe, el tipo, la cuota y cuándo y por cuánto acabarías de pagarla (art. 33 quinquies), y que, si lo pides, te den en 5 días hábiles lo pagado y lo que se debe, con su desglose, y un cuadro de amortización (art. 33 sexies); no se ha comprobado a qué entidades y contratos anteriores llega.',
   'credit.guide.law_change.title': 'La ley va a cambiar',
   'credit.guide.law_change.p1':
-    'La Directiva (UE) 2023/2225, de crédito al consumo, se aplicará a partir del 20-11-2026, y la ley que la traspone a España aún está en tramitación: hay un anteproyecto de 7 de enero de 2026. Mientras no se publique, la revisión aplica la Ley 16/2011 a los contratos celebrados desde el 25-09-2011, y nada de lo que prevé el anteproyecto cambia un resultado.',
+    'La Directiva (UE) 2023/2225, de crédito al consumo, se aplicará a partir del 20-11-2026, y la ley que la traspone a España aún está en tramitación: hay un anteproyecto de 7 de enero de 2026. Mientras no se publique, la revisión aplica la Ley 16/2011 a los contratos celebrados desde el 25-09-2011, cuando entró en vigor (disposición final séptima y disposición transitoria), y nada de lo que prevé el anteproyecto cambia un resultado.',
   'credit.guide.channels.title': 'Dónde informarte gratis',
   'credit.guide.channels.p1':
     'Solo canales oficiales y gratuitos: esta página no enlaza a despachos ni a empresas que gestionan casos.',
@@ -4758,7 +4767,7 @@ export const es = {
     'Una tarjeta en la que devuelves lo que gastas en cuotas mensuales, fijas o en un porcentaje de la deuda, y lo que devuelves vuelve a estar disponible. Los intereses se cobran sobre lo que debes, así que con una cuota baja la deuda puede tardar años en bajar. La revisión calcula su TAE con los supuestos de la ley y cuántos meses tardarías en pagarla sin nuevas compras.',
   'credit.faq.average_rate': '¿Qué es el tipo medio del Banco de España?',
   'credit.faq.average_rate_answer':
-    'Es el tipo de interés medio que el Banco de España publica cada mes para los créditos al consumo, según su plazo, y para las tarjetas revolving, sin comisiones (cuadro 19.4 de su Boletín Estadístico). Para las tarjetas revolving, el Tribunal Supremo toma como referencia una diferencia de más de 6 puntos porcentuales sobre ese tipo (STS 258/2023); es un criterio del tribunal, no una norma. Para los préstamos, la revisión da solo la diferencia en puntos. En ningún caso calcula un importe: un juez valora además las circunstancias del caso.',
+    'Es el tipo de interés medio que el Banco de España publica cada mes para los créditos al consumo, según el periodo en que el tipo está fijado al principio, y para las tarjetas revolving, sin comisiones (cuadro 19.4 de su Boletín Estadístico). Para las tarjetas revolving, el Tribunal Supremo toma como referencia una diferencia de más de 6 puntos porcentuales sobre ese tipo (STS 258/2023); es un criterio del tribunal, no una norma. Para los préstamos, la revisión da solo la diferencia en puntos. En ningún caso calcula un importe: un juez valora además las circunstancias del caso.',
   'credit.faq.early_repayment': '¿Cuánto me pueden cobrar por devolver el préstamo antes?',
   'credit.faq.early_repayment_answer':
     'Como mucho, el 1 % de lo que devuelves si quedaba más de un año hasta el final pactado, y el 0,5 % si quedaba un año o menos (art. 30.2 de la Ley 16/2011), y nunca más que los intereses que quedaban por pagar (art. 30.5). Nada si lo paga un seguro destinado a ello o en un periodo con interés variable (art. 30.3). El prestamista solo puede cobrar más si demuestra que el reembolso le hizo perder más (art. 30.4).',
@@ -5059,19 +5068,19 @@ export const es = {
   'client.credit.calculation.apr.matches':
     'Tu contrato dice {declared}: coincide a un decimal con la que sale de sus cifras.',
   'client.credit.calculation.apr.contract_lower':
-    'Tu contrato dice {declared}, menos que la que sale de sus cifras ({apr}). Antes, comprueba que has metido todos los gastos y seguros: si falta alguno, la cifra cambia. La ley trata este caso en su art. 21.4, que dice que sus consecuencias se modularán; aquí no se calcula ningún importe.',
+    'Tu contrato dice {declared}, menos que la que sale de sus cifras ({apr}). Si falta algún gasto o seguro en lo que has metido, la cifra cambia. La ley trata este caso en su art. 21.4, que dice que sus consecuencias se modularán; aquí no se calcula ningún importe.',
   'client.credit.calculation.apr.contract_higher':
-    'Tu contrato dice {declared}, más que la que sale de sus cifras ({apr}). Casi siempre es porque falta algún gasto o seguro en lo que has metido: revísalo.',
+    'Tu contrato dice {declared}, más que la que sale de sus cifras ({apr}). Puede deberse a algún gasto o seguro que falta en lo que has metido.',
   'client.credit.calculation.apr.contract_missing':
     'Has indicado que tu contrato no dice la TAE. Para ese caso, la ley dice que tu obligación se reduce a pagar el interés legal en los plazos convenidos (art. 21.2); aquí no se calcula ninguna cifra.',
   'client.credit.calculation.apr.unsolvable':
-    'Con estas cifras no sale una sola TAE: revisa los importes y las fechas que has metido.',
+    'Con estas cifras no sale una sola TAE: puede haber algún error en los importes o las fechas que has metido.',
   'client.credit.calculation.apr.one_decimal':
     'Las dos se comparan redondeadas a un decimal con la regla del anexo I; aquí se muestran con dos.',
   'client.credit.calculation.apr.revolving_assumption':
     'Para una tarjeta, la TAE se calcula con los supuestos de la ley (anexo I, parte II): dispones de todo el límite, {limit}, y lo devuelves en un año, en 12 cuotas mensuales con la misma parte de capital más los intereses de lo pendiente; la cuota anual y las comisiones se pagan al principio.',
   'client.credit.calculation.apr.revolving_before_2013':
-    'Tu tarjeta es anterior al 09-02-2013, cuando cambiaron los supuestos con que la ley calcula la TAE de una tarjeta. La versión anterior no se ha comprobado, así que aquí no se calcula.',
+    'Tu tarjeta es anterior al 09-02-2013, cuando cambiaron los supuestos con que la ley calcula la TAE de una tarjeta. La versión anterior del anexo también supone un año y doce plazos mensuales iguales, pero no dice desde cuándo se cuentan, así que aquí no se calcula.',
   'client.credit.calculation.apr.insurance_counted':
     'Se cuenta la prima del seguro: entra en el coste del crédito cuando el seguro es obligatorio para obtenerlo.',
   'client.credit.calculation.apr.insurance_left_out':
@@ -5164,7 +5173,7 @@ export const es = {
   'client.credit.calculation.early_repayment.within_cap':
     'Te cobraron {charged}: no pasa de ese tope.',
   'client.credit.calculation.dealer_discount.review_it':
-    'Lo que cobra el concesionario por perder un descuento por financiar no es la compensación del prestamista, así que no se compara con el tope del art. 30. El contrato tiene que decir el precio al contado (art. 16.2), y puedes no financiar la compra y pagarla como acordaste con el vendedor (art. 26.3): mira qué dice tu contrato de ese descuento.',
+    'Lo que cobra el concesionario por perder un descuento por financiar no es la compensación del prestamista, así que no se compara con el tope del art. 30. El contrato tiene que decir el precio al contado (art. 16.2), y puedes no financiar la compra y pagarla como acordaste con el vendedor (art. 26.3). Lo que pase con ese descuento depende de lo que diga tu contrato.',
 
   'client.credit.calculation.withdrawal.start':
     'Son 14 días naturales desde el día en que lo contrataste, el {day}, sin contar ese día.',
@@ -5201,7 +5210,7 @@ export const es = {
   'client.credit.calculation.information.cash_option':
     'Y puedes no financiar la compra y pagarla como acordaste con el vendedor (art. 26.3).',
   'client.credit.calculation.information.revolving_info':
-    'La orden de transparencia bancaria prevé que una tarjeta revolving informe al menos cada trimestre de lo pagado y lo que se debe, y que, si lo pides, te den el desglose y un cuadro de pagos en 5 días hábiles. No se ha comprobado a qué entidades y contratos anteriores llega, así que no se afirma que la tuya lo deba.',
+    'La orden de transparencia bancaria prevé que una tarjeta revolving informe al menos cada trimestre de lo que se debe, el tipo, la cuota y cuándo y por cuánto acabarías de pagarla (art. 33 quinquies), y que, si lo pides, te den en 5 días hábiles lo pagado y lo que se debe, con su desglose, y un cuadro de amortización (art. 33 sexies). No se ha comprobado a qué entidades y contratos anteriores llega, así que no se afirma que la tuya lo deba.',
   'client.credit.calculation.information.card_payoff.months':
     'Con una deuda de {balance} y pagando {payment} al mes sin nuevas compras, tardarías {months} en pagarla y pagarías {interest} de intereses.',
   'client.credit.calculation.information.card_payoff.never':
@@ -5419,14 +5428,14 @@ export const es = {
     'Desde el 10-11-2018, el impuesto de actos jurídicos documentados de la escritura del préstamo lo paga el banco: el Real Decreto-ley 17/2018 cambió el art. 29 de la ley del impuesto para las escrituras desde ese día. En las anteriores, esta revisión no lo cuenta. El impuesto de la compraventa de la vivienda es otro y no entra aquí.',
   'mortgage.guide.before_2019.title': 'Antes del 16-06-2019, lo que han dicho los tribunales',
   'mortgage.guide.before_2019.p1':
-    'Para las escrituras anteriores no hay una ley que reparta estos gastos. Cuando la escritura de un consumidor tenía una cláusula que ponía los gastos a su cargo, el Tribunal Supremo aplica un reparto: al banco le correspondían la mitad de la notaría de la escritura del préstamo y todo el registro de la hipoteca, la gestoría y la tasación, y cada copia de la escritura la paga quien la pide, así que la del banco es suya (STS 35/2021 y STS 816/2023). Antes, en 2020, el Tribunal de Justicia de la Unión Europea dijo que, si un juez anula esa cláusula, lo pagado por ella se devuelve salvo lo que el Derecho nacional, sin la cláusula, ponga a cargo del consumidor (C-224/19).',
+    'Para las escrituras anteriores no hay una ley que reparta estos gastos. Cuando la escritura de un consumidor tenía una cláusula que ponía los gastos a su cargo, el Tribunal Supremo aplica un reparto: al banco le correspondían la mitad de la notaría de la escritura del préstamo y todo el registro de la hipoteca, la gestoría y la tasación (STS 35/2021 y STS 816/2023), y cada copia de la escritura la paga quien la pide, así que la del banco es suya (STS 35/2021). Antes, en 2020, el Tribunal de Justicia de la Unión Europea dijo que, si un juez anula esa cláusula, lo pagado por ella se devuelve salvo lo que el Derecho nacional, sin la cláusula, ponga a cargo del consumidor (C-224/19).',
   'mortgage.guide.before_2019.p2':
     'Es lo que han dicho los tribunales, no la ley: para que se devuelva hace falta que el banco lo acepte o que un juez anule la cláusula de gastos. Y es solo para quien pidió la hipoteca como particular, para su casa.',
   'mortgage.guide.before_2019.p3':
-    'La revisión aplica ese reparto factura a factura y da la cifra en un total aparte del de la ley. Según el Tribunal Supremo, a lo que se devuelve se suma el interés legal desde el día de cada pago, por analogía con el art. 1896 del Código Civil (STS 725/2018); la revisión también lo calcula.',
+    'La revisión aplica ese reparto factura a factura y da la cifra en un total aparte del de la ley. Según el Tribunal Supremo, a lo que se devuelve se suma el interés legal desde el día de cada pago, por analogía con el art. 1896 del Código Civil (STS 725/2018); la revisión también lo calcula, solo sobre ese reparto: el total «Por ley» se da sin interés.',
   'mortgage.guide.floor.title': 'La cláusula suelo',
   'mortgage.guide.floor.p1':
-    'Una cláusula suelo fija un tipo mínimo: aunque el índice baje, el interés no baja de ahí. Desde el 16-06-2019, la ley prohíbe ese límite en las hipotecas de tipo variable (art. 21.3); que el interés nunca sea negativo sí lo permite (art. 21.4).',
+    'Una cláusula suelo fija un tipo mínimo: aunque el índice baje, el interés no baja de ahí. Desde el 16-06-2019, la ley prohíbe ese límite en las hipotecas de tipo variable (art. 21.3) y exige que el interés no sea negativo (art. 21.4).',
   'mortgage.guide.floor.p2':
     'Para las escrituras anteriores, lo que hay es criterio de los tribunales. El Tribunal de Justicia de la Unión Europea dijo en 2016 que, cuando un juez anula una cláusula suelo, lo que se devuelve no puede limitarse a lo pagado después de su sentencia (C-154/15), y en 2020, que una cláusula suelo puede cambiarse por un acuerdo posterior si se acepta de forma libre e informada (C-452/18).',
   'mortgage.guide.floor.p3':
@@ -5442,7 +5451,7 @@ export const es = {
   'mortgage.guide.fees.p2':
     'Por pasar de variable a fijo, el tope es hoy del 0,05 % de lo amortizado en los 3 primeros años del préstamo; sin amortizar capital no se puede cobrar nada, y pasados esos 3 años, tampoco (art. 23.6). Entre el 24-11-2022 y el 31-12-2024 no se podía cobrar compensación por amortizar una hipoteca de tipo variable ni por pasarla a fijo (Real Decreto-ley 19/2022, disposición adicional primera).',
   'mortgage.guide.fees.p3':
-    'Para escrituras entre el 09-12-2007 y el 15-06-2019, la Ley 41/2007 fija como tope el 0,5 % de lo amortizado en los 5 primeros años y el 0,25 % después (art. 8); con tipo fijo, o si el tipo se revisa con menos frecuencia que cada 12 meses, permite además la compensación por riesgo de tipo de interés que fije la escritura (art. 9). Si el art. 23.6 y la ventana de 2022 a 2024 alcanzan a estas escrituras no está claro: la revisión da las dos cuentas y el total cuenta la más baja. Las anteriores al 09-12-2007 las regía otra norma, que aquí no se comprueba.',
+    'Para escrituras entre el 09-12-2007 y el 15-06-2019, la Ley 41/2007 fija como tope el 0,5 % de lo amortizado en los 5 primeros años y el 0,25 % después (art. 8); con tipo fijo, o si el tipo se revisa con menos frecuencia que cada 12 meses, permite además la compensación por riesgo de tipo de interés que fije la escritura (art. 9). El derecho a pasar a tipo fijo del art. 23.6 alcanza a las escrituras de cualquier fecha (disposición transitoria primera, 3, de la Ley 5/2019); si su tope y la ventana de 2022 a 2024 alcanzan a estas escrituras no está claro: la revisión da las dos cuentas y el total cuenta la más baja. Las anteriores al 09-12-2007 las regía otra norma, que aquí no se comprueba.',
   'mortgage.guide.fein.title': 'Lo que te tienen que dar antes de la escritura',
   'mortgage.guide.fein.p1':
     'Desde el 16-06-2019, el banco te entrega, al menos 10 días naturales antes de la escritura, la ficha europea de información normalizada (FEIN), que es una oferta vinculante; la ficha de advertencias estandarizadas (FiAE); si el tipo es variable, un documento con las cuotas en distintos escenarios; el proyecto de contrato, con todos los gastos desglosados, y el reparto de los gastos (art. 14.1).',
@@ -5473,7 +5482,7 @@ export const es = {
     'El impuesto de actos jurídicos documentados de la escritura del préstamo lo paga el banco en las escrituras desde el 10-11-2018 (art. 29 de la ley del impuesto, en la redacción del Real Decreto-ley 17/2018). En las anteriores, esta revisión no lo cuenta. El impuesto de la compraventa de la vivienda es otro y no entra aquí.',
   'mortgage.faq.prepayment': '¿Cuánto me pueden cobrar por amortizar?',
   'mortgage.faq.prepayment_answer':
-    'Depende de la fecha de la escritura y del tipo. Desde el 16-06-2019: con tipo variable, como mucho el 0,15 % de lo amortizado en los 5 primeros años o el 0,25 % en los 3 primeros, según diga la escritura, y después nada; con tipo fijo, el 2 % en los 10 primeros años y el 1,5 % después (art. 23 de la Ley 5/2019), y nunca más que la pérdida que sufre el banco. Entre el 09-12-2007 y el 15-06-2019, la Ley 41/2007 fija el 0,5 % en los 5 primeros años y el 0,25 % después. Entre el 24-11-2022 y el 31-12-2024 no se podía cobrar nada por amortizar una hipoteca de tipo variable; si eso alcanza a las escrituras anteriores a 2019 no está claro.',
+    'Depende de la fecha de la escritura y del tipo. Desde el 16-06-2019: con tipo variable, como mucho el 0,15 % de lo amortizado en los 5 primeros años o el 0,25 % en los 3 primeros, según diga la escritura, y después nada; con tipo fijo, el 2 % en los 10 primeros años y el 1,5 % después (art. 23 de la Ley 5/2019), y nunca más que la pérdida que sufre el banco. Entre el 09-12-2007 y el 15-06-2019, la Ley 41/2007 fija el 0,5 % en los 5 primeros años y el 0,25 % después (art. 8); con tipo fijo, o si el tipo se revisa con menos frecuencia que cada 12 meses, permite además la compensación por riesgo de tipo de interés que fije la escritura (art. 9). Entre el 24-11-2022 y el 31-12-2024 no se podía cobrar nada por amortizar una hipoteca de tipo variable; si eso alcanza a las escrituras anteriores a 2019 no está claro.',
   'mortgage.faq.floor': '¿Qué es una cláusula suelo?',
   'mortgage.faq.floor_answer':
     'Una cláusula que fija un tipo mínimo: aunque el índice baje, el interés de tu hipoteca no baja de ahí. Desde el 16-06-2019, la ley la prohíbe en las hipotecas de tipo variable (art. 21.3 de la Ley 5/2019). En las anteriores, si se explicó con claridad lo examina un juez en cada caso, según lo que han dicho los tribunales. Esta revisión te dice si aparece en tu escritura, pero no la valora ni calcula lo que supuso en tus cuotas.',
@@ -5721,9 +5730,10 @@ export const es = {
   'client.mortgage.total.no_figure_yet': 'Sin cifra por ahora',
   'client.mortgage.total.transparency_free':
     'Aparte, el acta notarial previa, que no debía cobrarse: unos {importe}.',
-  'client.mortgage.total.interest': 'Interés legal hasta el {fecha}: unos {importe}.',
+  'client.mortgage.total.interest':
+    'Interés legal hasta el {fecha}: unos {importe}. El total «Por ley» se da sin interés.',
   'client.mortgage.total.interest_estimated':
-    'Interés legal hasta el {fecha}, contado en parte desde la escritura como estimación: unos {importe}.',
+    'Interés legal hasta el {fecha}, contado en parte desde la escritura como estimación: unos {importe}. El total «Por ley» se da sin interés.',
 
   'client.mortgage.invoice.notary_loan': 'Notaría del préstamo',
   'client.mortgage.invoice.notary_purchase': 'Notaría de la compraventa',
@@ -5781,19 +5791,19 @@ export const es = {
   'client.mortgage.depends.prepayment_option':
     'Depende de la comisión que fija tu escritura para el tipo variable, que no sabes.',
   'client.mortgage.depends.earlier_deed':
-    'No está claro si esta regla de la ley de 2019 llega a una escritura anterior: el total cuenta la lectura más baja.',
+    'La ley de 2019 da a cualquier escritura el derecho del art. 23.6 (disposición transitoria primera, 3), pero no está claro si su tope o la ventana de 2022 a 2024 llegan a una anterior: el total cuenta la lectura más baja.',
   'client.mortgage.depends.rate_revision':
     'Depende de cada cuánto se revisa tu tipo, que no sabes.',
   'client.mortgage.depends.rate_type_and_prepayment_option':
     'Depende de si se lee como de tipo fijo o variable y de la comisión que fija tu escritura, que no sabes.',
   'client.mortgage.depends.rate_type_and_earlier_deed':
-    'Depende de si se lee como de tipo fijo o variable y de si la ley de 2019 llega a tu escritura, algo que no está claro: el total cuenta la lectura más baja.',
+    'Depende de si se lee como de tipo fijo o variable y de si el tope de la ley de 2019 o la ventana de 2022 a 2024 llegan a tu escritura, algo que no está claro: el total cuenta la lectura más baja.',
   'client.mortgage.depends.rate_type_and_rate_revision':
     'Depende de si se lee como de tipo fijo o variable y de cada cuánto se revisa tu tipo, que no sabes.',
   'client.mortgage.depends.earlier_deed_and_rate_revision':
-    'Depende de si la ley de 2019 llega a tu escritura, algo que no está claro, y de cada cuánto se revisa tu tipo: el total cuenta la lectura más baja.',
+    'Depende de si el tope de la ley de 2019 o la ventana de 2022 a 2024 llegan a tu escritura, algo que no está claro, y de cada cuánto se revisa tu tipo: el total cuenta la lectura más baja.',
   'client.mortgage.depends.rate_type_and_earlier_deed_and_rate_revision':
-    'Depende de si se lee como de tipo fijo o variable, de si la ley de 2019 llega a tu escritura y de cada cuánto se revisa tu tipo: el total cuenta la lectura más baja.',
+    'Depende de si se lee como de tipo fijo o variable, de si el tope de la ley de 2019 o la ventana de 2022 a 2024 llegan a tu escritura y de cada cuánto se revisa tu tipo: el total cuenta la lectura más baja.',
   'client.mortgage.reading.fixed': 'Si se lee como fijo',
   'client.mortgage.reading.variable': 'Si se lee como variable',
   'client.mortgage.reading.option_a': 'Con el 0,15 % durante 5 años',
@@ -5839,7 +5849,7 @@ export const es = {
   'client.mortgage.calculation.expenses.registry_cancellation':
     'Quién paga la inscripción de la cancelación en el registro no está resuelto con claridad: aquí no se da cifra.',
   'client.mortgage.calculation.expenses.ajd_before_2018':
-    'El impuesto del préstamo pasó a cargo del banco con las escrituras desde el 10-11-2018 (art. 29 de la ley del impuesto). A tu fecha no aplica.',
+    'El impuesto del préstamo pasó a cargo del banco con las escrituras desde el 10-11-2018 (art. 29 de la ley del impuesto). A tu fecha no aplica. En las anteriores, según las SSTS 147 y 148/2018, la cuota variable la paga quien pide el préstamo; la cuota fija de la escritura matriz, también, salvo pacto sobre los gastos notariales y registrales (la sentencia ve «razonable distribuir por mitad» su pago), y la de cada copia, quien la pide. Esta revisión no lo cuenta.',
   'client.mortgage.calculation.expenses.not_consumer':
     'El reparto del Tribunal Supremo sale de cláusulas en contratos con consumidores: si no pediste la hipoteca como particular, no aplica.',
   'client.mortgage.calculation.expenses.consumer_unknown':
@@ -5849,7 +5859,7 @@ export const es = {
   'client.mortgage.calculation.expenses.clause_unknown':
     'No sabes si tu escritura tiene cláusula de gastos, y el reparto del Tribunal Supremo parte de ella. Suele estar entre las cláusulas financieras.',
   'client.mortgage.calculation.expenses.transparency_before_lcci':
-    'El acta notarial previa existe en las escrituras desde el 16-06-2019: en una anterior, mira qué concepto es.',
+    'El acta notarial previa existe en las escrituras desde el 16-06-2019: en una anterior, la revisión no sabe a qué concepto corresponde ese cobro.',
   'client.mortgage.calculation.expenses.doubtful_norm':
     'La norma que regula este gasto está pendiente de una condición o de su convalidación: aquí no se da cifra.',
   'client.mortgage.calculation.expenses.mixed':
@@ -5943,7 +5953,7 @@ export const es = {
   'client.mortgage.calculation.flags.floor_case_law_no_figure':
     'Sobre las cláusulas suelo anteriores a 2019, el Tribunal de Justicia de la Unión Europea dice que el juez examina si se explicaron con claridad y qué efectos tiene: depende de cada caso y de un juez.',
   'client.mortgage.calculation.flags.floor_zero':
-    'Que el interés nunca sea negativo no es una cláusula suelo: la ley lo permite (art. 21.4).',
+    'Que el interés nunca sea negativo no es una cláusula suelo: desde el 16-06-2019, la ley exige que no lo sea (art. 21.4).',
   'client.mortgage.calculation.flags.irph':
     'Según el Tribunal de Justicia de la Unión Europea, el juez examina caso por caso si el IRPH se explicó con claridad; hay más preguntas pendientes ante ese tribunal. Depende de cada caso y de un juez.',
   'client.mortgage.calculation.flags.default_interest_lcci':
@@ -5980,20 +5990,20 @@ export const es = {
   'client.mortgage.calculation.flags.insurance_tied':
     'La ley regula cuándo el banco puede pedirte un seguro u otro producto para darte el préstamo y te deja contratar ese seguro con otra entidad (art. 17).',
   'client.mortgage.calculation.flags.insurance_before_lcci':
-    'Tu escritura es anterior al 16-06-2019, cuando la ley empezó a regular los productos vinculados: aquí no se valora.',
+    'Tu escritura es anterior al 16-06-2019, cuando la ley empezó a prohibir las ventas vinculadas (art. 17). Desde 2012, la Orden EHA/2899/2011 obligaba a informar de si cada servicio vinculado podía contratarse por separado y en qué condiciones (art. 12): aquí no se valora.',
 
   'client.mortgage.calculation.information.fein_timing':
     'Desde el 16-06-2019, el banco te entrega la ficha europea de información normalizada (FEIN) y la ficha de advertencias (FiAE) al menos 10 días naturales antes de la escritura (arts. 14 y 15).',
   'client.mortgage.calculation.information.transparency_act':
     'Como tarde el día anterior a la escritura, el notario te asesora y lo deja en un acta que no se te cobra, y la escritura lo menciona (art. 15).',
   'client.mortgage.calculation.information.handwritten_statement':
-    'Entre el 15-05-2013 y el 15-06-2019, si tu hipoteca tenía límites a la variación del tipo, como un suelo, la escritura debía llevar una expresión escrita a mano en la que decías comprender sus riesgos (art. 6 de la Ley 1/2013).',
+    'Entre el 15-05-2013 y el 15-06-2019, si pediste la hipoteca como persona física, sobre una vivienda o para comprar o conservar un terreno o un edificio, y tenía límites a la variación del tipo, como un suelo y un techo, «en los cuales el límite de variabilidad a la baja sea inferior al límite de variabilidad al alza», un instrumento de cobertura del riesgo de tipo de interés o se concedía en divisas, la escritura debía llevar una expresión escrita a mano en la que constaba que te habían advertido de sus riesgos (art. 6 de la Ley 1/2013).',
   'client.mortgage.calculation.information.limitation_rule':
     'Según el Tribunal de Justicia de la Unión Europea, el plazo para pedir lo pagado por una cláusula de gastos no puede empezar a contar el día del pago, sino cuando se pudo conocer que la cláusula no era válida. Es la regla, no un cálculo de tu caso.',
   'client.mortgage.calculation.information.prior_step_439bis':
     'Desde el 03-04-2025, la ley regula un paso previo concreto antes de acudir a un juzgado por cláusulas de una hipoteca (art. 439 bis de la Ley de Enjuiciamiento Civil). En el enlace tienes el texto de la ley.',
   'client.mortgage.calculation.information.loan_assignment':
-    'Desde el 08-10-2026, el Real Decreto-ley 29/2026 añade a la ley un art. 25 bis: si el banco cede tu préstamo a otro, te lo tiene que comunicar y conservas frente al nuevo titular lo que podías oponer al banco. Está pendiente de convalidación.',
+    'Desde el 08-10-2026, el Real Decreto-ley 29/2026 añade a la ley un art. 25 bis: si el banco cede tu préstamo a otro, conservas frente al nuevo titular lo que podías oponer al banco, y se te tiene que informar de la cesión salvo que el banco, de acuerdo con el nuevo titular, siga prestando los servicios del préstamo (art. 25 bis.3). Está pendiente de convalidación.',
   'client.mortgage.calculation.information.complaints_service':
     'El Servicio de Reclamaciones del Banco de España atiende consultas y quejas sobre bancos (art. 30 de la Ley 44/2002), y las oficinas públicas de consumo informan gratis.',
 

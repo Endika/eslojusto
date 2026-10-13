@@ -38,7 +38,13 @@ describe('reviewHousehold', () => {
     ]);
     expect(findings(r).every((f) => f.status === 'within_limit')).toBe(true);
     expect(r.finalPay).toBeNull();
-    expect(r.unchecked).toEqual(['contributions', 'net_pay']);
+    expect(r.unchecked).toEqual([
+      'presence_time',
+      'trial_period',
+      'prevention',
+      'contributions',
+      'net_pay',
+    ]);
   });
 
   it('every finding carries its source, a norm in force', () => {
