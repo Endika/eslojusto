@@ -108,6 +108,9 @@ export interface MortgageInput {
   // Whether the deed has a clause putting the set-up costs on the borrower.
   readonly expensesClause: 'present' | 'absent' | 'unknown';
   readonly invoices: readonly Invoice[];
+  // Whether the person has the invoices or their amounts. Without them no cost can be put in
+  // figures; with them, one left blank was not entered.
+  readonly invoicesAtHand: boolean;
   // What the lender already gave back of the set-up costs, if anything.
   readonly alreadyReturned: number | null;
   // Whether the person and the lender reached an agreement on the set-up costs.

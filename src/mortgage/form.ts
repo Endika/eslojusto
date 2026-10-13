@@ -125,6 +125,8 @@ interface InvoiceQuestion {
   readonly mixed?: MortgageFormField;
   // Left out of the review when blank, rather than listed as not entered.
   readonly optional?: boolean;
+  // Left blank when the lender paid it, as its hint asks.
+  readonly blankIfLenderPaid?: boolean;
 }
 
 const INVOICES: readonly InvoiceQuestion[] = [
@@ -133,7 +135,7 @@ const INVOICES: readonly InvoiceQuestion[] = [
   { kind: 'agency', field: 'agency' },
   { kind: 'valuation', field: 'valuation' },
   { kind: 'transparency_deed', field: 'transparencyDeed', optional: true },
-  { kind: 'ajd_loan', field: 'ajdLoan' },
+  { kind: 'ajd_loan', field: 'ajdLoan', blankIfLenderPaid: true },
 ];
 
 // The clauses asked, each by its yes, no or «No lo sé».
@@ -295,7 +297,7 @@ function read(form: HTMLFormElement, today: CivilDate): Reading {
 
   // Whether there are invoices opens their sheets; an invoice left blank stays listed as not
   // entered.
-  answer('hasInvoices');
+  const invoicesAtHand = answer('hasInvoices') === true;
   const paidOn = date('paidOn', false, true);
   const invoices: Invoice[] = [];
   const invoiceFields: MortgageFormField[] = [];
@@ -311,7 +313,7 @@ function read(form: HTMLFormElement, today: CivilDate): Reading {
       kind: q.kind,
       total,
       // Only what the person paid is asked: what the lender paid itself is left blank.
-      paidBy: 'me',
+      paidBy: invoicesAtHand && total === null && q.blankIfLenderPaid === true ? 'bank' : 'me',
       paidOn: total === null ? null : paidOn,
       mixed: mixed === true,
       supplied,
@@ -363,6 +365,7 @@ function read(form: HTMLFormElement, today: CivilDate): Reading {
       loanAmount,
       expensesClause,
       invoices,
+      invoicesAtHand,
       alreadyReturned,
       // Not asked without invoices, when it changes nothing.
       agreementOnExpenses: agreement ?? null,

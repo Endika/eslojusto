@@ -87,7 +87,7 @@ function dataRows(input: MortgageInput, flags: readonly ClauseFlag[], tr: Transl
       ),
     ),
     ...(paidOn === null ? [] : [row(tr('client.mortgage.report.paid_on'), day(paidOn))]),
-    ...(input.invoices.length === 0
+    ...(!input.invoicesAtHand || input.invoices.length === 0
       ? []
       : [row(tr('client.mortgage.report.agreement'), answer(input.agreementOnExpenses, tr))]),
     ...(input.alreadyReturned === null || input.alreadyReturned === 0

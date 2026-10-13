@@ -5747,6 +5747,7 @@ export const es = {
   'client.mortgage.total.nothing_lowest': 'Nada en la lectura más baja',
   'client.mortgage.total.no_figure_yet': 'Sin cifra por ahora',
   'client.mortgage.total.review_it': 'Sin cifra: hay gastos en «Revísalo»',
+  'client.mortgage.total.no_invoice': 'Sin cifra: no tienes las facturas',
   'client.mortgage.total.transparency_free':
     'Aparte, el acta notarial previa, que no debía cobrarse: unos {importe}.',
   'client.mortgage.total.interest':
@@ -5792,6 +5793,7 @@ export const es = {
   'client.mortgage.status.not_applicable_to_date': 'No aplica a tu fecha',
   'client.mortgage.status.paid_by_bank': 'Lo pagó el banco',
   'client.mortgage.status.not_entered': 'No lo has metido',
+  'client.mortgage.status.no_invoice': 'Sin factura ni importe',
   'client.mortgage.status.review_it': 'Revísalo',
   'client.mortgage.status.above_cap': 'Por encima del tope legal ({importe})',
   'client.mortgage.status.within_cap': 'Dentro del tope',
@@ -5884,6 +5886,10 @@ export const es = {
   'client.mortgage.calculation.expenses.mixed':
     'Esta factura incluye también la compraventa sin separarla: sin ese desglose, aquí no se da cifra.',
   'client.mortgage.calculation.expenses.paid_by_bank': 'Lo pagó el banco: no hay nada que contar.',
+  'client.mortgage.calculation.expenses.paid_by_bank_blank':
+    'Lo has dejado en blanco, como se pide si lo pagó el banco: no hay nada que contar.',
+  'client.mortgage.calculation.expenses.no_invoice':
+    'Has indicado que no tienes las facturas ni sus importes: sin la factura, este gasto no se puede poner en cifras.',
   'client.mortgage.calculation.expenses.payer_unknown':
     'No sabes quién lo pagó: aquí no se da cifra.',
   'client.mortgage.calculation.expenses.supplied_own_line':

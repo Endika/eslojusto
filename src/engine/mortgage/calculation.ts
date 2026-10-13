@@ -34,6 +34,8 @@ export type MortgagePhraseKey =
   | 'expenses.doubtful_norm'
   | 'expenses.mixed'
   | 'expenses.paid_by_bank'
+  | 'expenses.paid_by_bank_blank'
+  | 'expenses.no_invoice'
   | 'expenses.payer_unknown'
   | 'expenses.supplied_own_line'
   | 'expenses.supplied_left_out'

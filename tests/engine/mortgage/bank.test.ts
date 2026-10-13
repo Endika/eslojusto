@@ -32,6 +32,7 @@ const toInput = (c: MortgageCaseInput): MortgageInput => ({
   deedOn: f(c.deedOn),
   fixedUntil: orNull(c.fixedUntil),
   invoices: c.invoices.map((i) => ({ ...i, paidOn: orNull(i.paidOn) })),
+  invoicesAtHand: true,
   operations: c.operations.map((o) => ({ ...o, on: f(o.on) })),
 });
 

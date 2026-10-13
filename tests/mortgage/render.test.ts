@@ -158,6 +158,36 @@ describe('the mortgage result', () => {
     expect(cards(root, '[data-expenses]').map((c) => c.status)).toEqual(['Revísalo', 'Revísalo']);
   });
 
+  it('names a cost without its invoice and the tax the lender paid apart from one left out', () => {
+    const atHand = rendered(
+      review({
+        deedOn: d('2021-05-10'),
+        invoices: [invoice('notary_loan', null), invoice('ajd_loan', null, { paidBy: 'bank' })],
+      }),
+    );
+    expect(cards(atHand, '[data-expenses]').map((c) => c.status)).toEqual([
+      'No lo has metido',
+      'Lo pagó el banco',
+    ]);
+    expect(text(atHand, '[data-item="ajd_loan"] [data-calculation]')).toBe(
+      'Lo has dejado en blanco, como se pide si lo pagó el banco: no hay nada que contar.',
+    );
+    const none = rendered(
+      review({
+        deedOn: d('2021-05-10'),
+        invoicesAtHand: false,
+        invoices: [invoice('agency', null)],
+      }),
+    );
+    expect(cards(none, '[data-expenses]').map((c) => c.status)).toEqual(['Sin factura ni importe']);
+    expect(text(none, '[data-total="statute"] [data-total-amount]')).toBe(
+      'Sin cifra: no tienes las facturas',
+    );
+    expect(text(none, '[data-item="agency"] [data-calculation]')).toContain(
+      'sin la factura, este gasto no se puede poner en cifras',
+    );
+  });
+
   it('shows the notary’s record charged apart from what the lender bears', () => {
     const root = rendered(
       review({
