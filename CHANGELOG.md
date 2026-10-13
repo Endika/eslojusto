@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.57.1](https://github.com/Endika/eslojusto/compare/v1.57.0...v1.57.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* **documents:** ship the pass check's words on the credit and mortgage pages ([f2c47f4](https://github.com/Endika/eslojusto/commit/f2c47f4c69bf17c30d5fea67bc3d24607070f045))
+
 ## [1.57.0](https://github.com/Endika/eslojusto/compare/v1.56.4...v1.57.0) (2026-10-13)
 
 
