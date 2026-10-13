@@ -786,6 +786,10 @@ export function setUpUpload<F extends string, L extends string>(
 
   return {
     showCalculator,
+    // Fills the form with what a read gave, marked as read, as a read just made does.
+    fillRead(prefill: ReadPrefill) {
+      apply(prefill);
+    },
     // A message on the start sheet, such as the outcome of a payment with no review to show.
     notice(text: string) {
       if (startStatus) startStatus.textContent = text;
