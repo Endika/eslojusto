@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.55.2](https://github.com/Endika/eslojusto/compare/v1.55.1...v1.55.2) (2026-10-13)
+
+
+### Bug Fixes
+
+* **erte:** a RED reduction's proportion is the review's criterion; record the mortgage readings ([8cda334](https://github.com/Endika/eslojusto/commit/8cda334f2fce35a21a1d41cf9953fd1a0350e66a))
+
 ## [1.55.1](https://github.com/Endika/eslojusto/compare/v1.55.0...v1.55.1) (2026-10-13)
 
 
