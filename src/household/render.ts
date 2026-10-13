@@ -409,11 +409,14 @@ export type WarningCode = 'working_time' | 'holidays' | 'presumed' | 'night_noti
 
 export function warningCodes(review: HouseholdReview): readonly WarningCode[] {
   const findings = review.items.flatMap(findingsOf);
-  const has = (item: ItemId, status: FindingStatus) =>
-    findings.some((f) => f.item === item && f.status === status);
+  // Working time and holidays fall short of the norm with no amount to add.
+  const short = (item: ItemId) =>
+    findings.some(
+      (f) => f.item === item && (f.status === 'below_minimum' || f.status === 'over_legal_limit'),
+    );
   const codes: WarningCode[] = [];
-  if (has('working_time', 'warning')) codes.push('working_time');
-  if (has('holidays', 'warning')) codes.push('holidays');
+  if (short('working_time')) codes.push('working_time');
+  if (short('holidays')) codes.push('holidays');
   if (findings.some((f) => f.status === 'dismissal_regime_presumed')) codes.push('presumed');
   if (findings.some((f) => f.id === 'live_in_night_notice' && f.status === 'missing_requirement'))
     codes.push('night_notice');

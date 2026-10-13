@@ -42,23 +42,23 @@
       },
       {
         "id": "weekly_40",
-        "status": "warning"
+        "status": "over_legal_limit"
       },
       {
         "id": "rest_between_shifts",
-        "status": "warning"
+        "status": "below_minimum"
       },
       {
         "id": "weekly_rest_36",
-        "status": "warning"
+        "status": "below_minimum"
       },
       {
         "id": "holidays_30",
-        "status": "warning"
+        "status": "below_minimum"
       },
       {
         "id": "holidays_stretch_15",
-        "status": "warning"
+        "status": "below_minimum"
       }
     ],
     "finalPay": null
