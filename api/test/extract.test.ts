@@ -224,9 +224,12 @@ describe('extract', () => {
     expect(metrics.escalated).toBe(true);
   });
 
-  it('reports the model as unavailable when both fail', async () => {
-    const { deps } = setup({ [PRIMARY]: new Error('down'), [ESCALATION]: new Error('down') });
-    expect(await extract(request(), deps, {})).toEqual({ code: 'model_unavailable' });
+  it('reports the model as unavailable when both fail, with the class of the error', async () => {
+    const throttled = Object.assign(new Error('Rate exceeded'), { name: 'ThrottlingException' });
+    const { deps } = setup({ [PRIMARY]: new Error('down'), [ESCALATION]: throttled });
+    const metrics: ExtractMetrics = {};
+    expect(await extract(request(), deps, metrics)).toEqual({ code: 'model_unavailable' });
+    expect(metrics.error).toBe('ThrottlingException');
   });
 
   it('answers nothing_read for a pack with nothing useful in it, without escalating', async () => {
