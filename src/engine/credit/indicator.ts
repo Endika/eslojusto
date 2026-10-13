@@ -53,8 +53,9 @@ export interface ComparedApr {
 
 const REVOLVING_SERIES_FROM = '2010-06';
 const RULING_2010_RATE = 19.32;
-// STS 258/2023: «superior a 6 puntos porcentuales». The series is a rate without charges (TEDR)
-// and the court adjusts it by some 0,20 to 0,30 points, so up to 6,30 the result is on the edge.
+// STS 258/2023: «superior a 6 puntos porcentuales». For the 2010 reference it adds that the TAE
+// would be «entre 20 y 30 centésimas» above the 19,32 TEDR, so against it up to 6,30 is on the edge;
+// for the monthly series it gives no such figure.
 const THRESHOLD = 6;
 const EDGE_TOP = 6.3;
 const ONE_YEAR = 12;
@@ -73,8 +74,8 @@ export function loanSeries(termMonths: number, rateType: 'fixed' | 'variable'): 
   return 'BE_19_4.11';
 }
 
-export function band(points: number): 'above' | 'edge' | 'below' {
-  if (points > EDGE_TOP) return 'above';
+export function band(points: number, withEdge: boolean): 'above' | 'edge' | 'below' {
+  if (points > (withEdge ? EDGE_TOP : THRESHOLD)) return 'above';
   if (points > THRESHOLD) return 'edge';
   return 'below';
 }
@@ -186,7 +187,7 @@ export function averageRateIndicator(
       reference,
       points,
     );
-  const status = band(points);
+  const status = band(points, reference.kind === 'ruling_2010');
   return result(
     status,
     [

@@ -4761,7 +4761,7 @@ export const es = {
   'credit.guide.indicator.p2':
     'La Ley de 23 de julio de 1908 sobre nulidad de los contratos de préstamos usurarios no fija ninguna cifra. Para las tarjetas revolving, el Tribunal Supremo toma como referencia una diferencia de más de 6 puntos porcentuales sobre el tipo medio y, para las anteriores a junio de 2010, el 19,32 % (STS 258/2023, de 15 de febrero, del Pleno). Es un criterio del tribunal, no una norma.',
   'credit.guide.indicator.p3':
-    'Entre 6 y 6,30 puntos el resultado queda en el borde: el tipo medio no incluye comisiones y la STS 258/2023 estima esa diferencia en 20-30 centésimas. Para los préstamos personales y de coche, el Tribunal Supremo dice que ese umbral no se aplica directamente, pero puede tenerse en cuenta; en el caso que juzgó, con 8,51 puntos de diferencia, lo consideró notablemente superior al normal del dinero (STS 366/2026). Por eso la revisión da la diferencia en puntos sin compararla con ningún umbral.',
+    'Para las tarjetas que se comparan con el 19,32 % de 2010, entre 6 y 6,30 puntos el resultado queda en el borde: ese tipo no incluye comisiones y la STS 258/2023 estima que la TAE sería de 20 a 30 centésimas más. Para los préstamos personales y de coche, el Tribunal Supremo dice que ese umbral no se aplica directamente, pero puede tenerse en cuenta; en el caso que juzgó, con 8,51 puntos de diferencia, lo consideró notablemente superior al normal del dinero (STS 366/2026). Por eso la revisión da la diferencia en puntos sin compararla con ningún umbral.',
   'credit.guide.indicator.p4':
     'Es una referencia, no una conclusión: un juez valora además las circunstancias del caso. La revisión no calcula ningún importe por esta diferencia.',
   'credit.guide.revolving.title': 'Las tarjetas revolving',
@@ -5160,7 +5160,7 @@ export const es = {
   'client.credit.calculation.indicator.revolving_criterion':
     'Para las tarjetas revolving, el Tribunal Supremo toma como referencia una diferencia de más de 6 puntos porcentuales sobre el tipo medio (STS 258/2023). Es un criterio del tribunal, no una norma.',
   'client.credit.calculation.indicator.edge_reason':
-    'El tipo medio del Banco de España no incluye comisiones; la STS 258/2023 estima esa diferencia en 20-30 centésimas: entre 6 y 6,30 puntos, el resultado depende de cómo se ajuste.',
+    'El tipo de 2010 no incluye comisiones; la STS 258/2023 estima que la TAE sería de 20 a 30 centésimas más: entre 6 y 6,30 puntos, el resultado depende de cómo se ajuste.',
   'client.credit.calculation.indicator.judge':
     'Es una referencia, no una conclusión: un juez valora además las circunstancias del caso.',
   'client.credit.calculation.indicator.channels':
