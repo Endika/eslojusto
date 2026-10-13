@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.55.0](https://github.com/Endika/eslojusto/compare/v1.54.6...v1.55.0) (2026-10-13)
+
+
+### Features
+
+* **mortgage:** give both counts of the ten years of art. 23.7 for a mixed rate read as fixed ([fa9be8b](https://github.com/Endika/eslojusto/commit/fa9be8b4a8441e41121e82c0cef87817dc3187ea))
+* **mortgage:** say the LH 114 cap reaches late interest on pre-2013 loans (DT 2.ª Ley 1/2013) ([86510e2](https://github.com/Endika/eslojusto/commit/86510e277ae27084de9adf5af9a2fa965ac62a64))
+
+
+### Bug Fixes
+
+* **mortgage:** a total held in «Revísalo» says so instead of «Nada con lo que has metido» ([2f4fab7](https://github.com/Endika/eslojusto/commit/2f4fab71d6f26abd1ac41ee7a3143c66358247fc))
+* **mortgage:** ask the 0,15/0,25 option only of deeds from 16-06-2019 (art. 23.5 LCCI) ([e544a24](https://github.com/Endika/eslojusto/commit/e544a24448f7f22cf754e79e772d8f3e80dc80ec))
+* **mortgage:** give costs without invoices and the tax the bank paid their own state ([7a2c409](https://github.com/Endika/eslojusto/commit/7a2c409def7757ac704498c7615a0ae051be1b53))
+
 ## [1.54.6](https://github.com/Endika/eslojusto/compare/v1.54.5...v1.54.6) (2026-10-13)
 
 
