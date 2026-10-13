@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.59.0](https://github.com/Endika/eslojusto/compare/v1.58.0...v1.59.0) (2026-10-13)
+
+
+### Features
+
+* **bills:** add the yearly report and the correction, exit and penalty letters ([1940dc2](https://github.com/Endika/eslojusto/commit/1940dc25f8cbe7bf028c1117e113744eccfff10d))
+* **bills:** keep the whole year across the payment ([7aba023](https://github.com/Endika/eslojusto/commit/7aba0237fe2ba3c44ab7c002f13e7c66901803fb))
+
+
+### Bug Fixes
+
+* **bills:** say what art. 45.2 sets for amounts billed over and under ([af820fa](https://github.com/Endika/eslojusto/commit/af820fa05dc9a46587387e08c17b20fc66651943))
+
 ## [1.58.0](https://github.com/Endika/eslojusto/compare/v1.57.1...v1.58.0) (2026-10-13)
 
 
