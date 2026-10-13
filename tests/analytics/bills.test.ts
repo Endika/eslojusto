@@ -74,10 +74,12 @@ describe('the catalogue follows the bills forms', () => {
     for (const step of [...ELECTRICITY_STEPS, ...TELECOM_STEPS]) expect(SECTIONS).toContain(step);
     expect(new Set(SECTIONS).size).toBe(SECTIONS.length);
   });
-  it('every question is a trackable field', () => {
+  it('every question is a trackable field but the social bonus details', () => {
+    const bonusOnly = ['bonusCategory', 'bonusAmount', 'bonusKwhSoFar', 'bonusDiscountedKwh'];
     for (const sheet of ELECTRICITY_SHEETS)
       for (const field of ELECTRICITY_SHEET_FIELDS[sheet])
-        expect(BILLS_TRACKABLE_FIELDS).toContain(field);
+        if (bonusOnly.includes(field)) expect(BILLS_TRACKABLE_FIELDS).not.toContain(field);
+        else expect(BILLS_TRACKABLE_FIELDS).toContain(field);
     for (const sheet of TELECOM_SHEETS)
       for (const field of TELECOM_SHEET_FIELDS[sheet])
         expect(BILLS_TRACKABLE_FIELDS).toContain(field);
@@ -203,6 +205,25 @@ describe('bills events', () => {
         findings: ['meter', FINGERPRINT],
       }),
     ).toBe(false);
+  });
+
+  it('never tells that a household has the social bonus', () => {
+    const sent: string[] = [];
+    const events = electricityAnalytics(
+      ((name: string, p: Record<string, unknown>) =>
+        void sent.push(JSON.stringify([name, p]))) as Track,
+      () => 0,
+      () => 'locked',
+    );
+    events.stepShown('bono-social');
+    events.fieldRejected('bono-social', 'bonusCategory');
+    events.stepCompleted('bono-social');
+    events.stepShown('bono-social-consumo');
+    events.fieldRejected('bono-social-consumo', 'bonusKwhSoFar');
+    events.stepCompleted('bono-social-consumo');
+    events.wentBack('bono-social-consumo', 'bono-social');
+    expect(sent.join()).not.toMatch(/bono-social-consumo|bonus(Category|Amount|KwhSoFar)/);
+    expect(sent).toHaveLength(2);
   });
 
   it('electricityAnalytics names each event as the catalogue does and counts each year', () => {

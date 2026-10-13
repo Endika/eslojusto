@@ -18,6 +18,7 @@ import {
   basketSizeBucket,
   differenceBucket,
   reviewSecondsBucket,
+  type BillsTrackedItemId,
   type Props,
   type Track,
 } from './events';
@@ -39,8 +40,13 @@ const QUIET = new Set<string>([
 ]);
 
 // The kinds of line where some reading does not match, each once.
-const findingIds = (items: readonly BillItem[]): BillsItemId[] => [
-  ...new Set(items.flatMap(findingsOf).flatMap((f) => (QUIET.has(f.status) ? [] : [f.id]))),
+const findingIds = (items: readonly BillItem[]): BillsTrackedItemId[] => [
+  ...new Set(
+    items
+      .flatMap(findingsOf)
+      .flatMap((f) => (QUIET.has(f.status) ? [] : [f.id]))
+      .filter((id): id is BillsTrackedItemId => id !== 'social_bonus'),
+  ),
 ];
 
 export function electricityBillProps({
@@ -91,6 +97,16 @@ export const basketProps = (data: {
   seconds: reviewSecondsBucket(data.seconds),
 });
 
+// Only a household with the social bonus is asked its category, its amount and its consumption,
+// so none of that is measured: a view or an error there alone would tell it has the bonus.
+const BONUS_ONLY_STEP = 'bono-social-consumo';
+const BONUS_ONLY_FIELDS: ReadonlySet<string> = new Set([
+  'bonusCategory',
+  'bonusAmount',
+  'bonusKwhSoFar',
+  'bonusDiscountedKwh',
+]);
+
 // The electricity review's events as catalogue events: steps, field names, codes and buckets
 // only; never a supply code or its fingerprint, an amount, a date, a retailer or a concept as
 // written. `detail` tells whether a pass shows the report. The pass, not the measurement, hears
@@ -107,7 +123,17 @@ export function electricityAnalytics(
     ...events,
     stepShown(step) {
       start ??= now();
-      events.stepShown(step);
+      if (step !== BONUS_ONLY_STEP) events.stepShown(step);
+    },
+    stepCompleted(step) {
+      if (step !== BONUS_ONLY_STEP) events.stepCompleted(step);
+    },
+    wentBack(from, to) {
+      if (from !== BONUS_ONLY_STEP && to !== BONUS_ONLY_STEP) events.wentBack(from, to);
+    },
+    fieldRejected(step, field) {
+      if (step !== BONUS_ONLY_STEP && !BONUS_ONLY_FIELDS.has(field))
+        events.fieldRejected(step, field);
     },
     outOfScope(reason) {
       track('bills_out_of_scope', { reason });
