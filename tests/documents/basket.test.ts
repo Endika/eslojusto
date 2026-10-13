@@ -116,7 +116,7 @@ describe('a year of electricity bills as the pass sees it', () => {
     expect(lines).toContain(
       'Estimación, no una cifra de tus facturas, y no se suma a ningún total: si lo que se repite (Alquiler del contador) siguiera igual, en un año serían unos 2\u00a0€.',
     );
-    expect(lines).toContain('Factura del 31-05-2026 al 30-06-2026');
+    expect(lines).toContain('Factura del 31\u201105\u20112026 al 30\u201106\u20112026');
     expect(lines).toContain(
       'Es la misma que otra factura de tu año (mismo suministro y periodo) y no cuenta dos veces.',
     );
