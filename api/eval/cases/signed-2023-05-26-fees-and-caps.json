@@ -1,6 +1,6 @@
 {
   "id": "signed-2023-05-26-fees-and-caps",
-  "description": "Signed 26-05-2023, the day Ley 12/2023 took effect: agency fees are the landlord's whatever the landlord (LAU art. 20.1) and a reservation fee is left to look at; the 2024 rise is capped at 3 % (DF 6.ª) and the 2025 one at the IRAV (1,99 %, LAU DA 11.ª), from the allowed 1.030 €: 72 € and 74,64 € paid over.",
+  "description": "Signed 26-05-2023, the day Ley 12/2023 took effect: agency fees are the landlord's whatever the landlord (LAU art. 20.1) and a reservation fee is left to look at; the 2024 rise is capped at 3 % (DF 6.ª) and the 2025 one at the IRAV (1,99 %, LAU DA 11.ª), from the allowed 1.030 €: 6 € a month from June 2024 to May 2025 (12 months, 72 €) and 6,22 € a month from June 2025 to September 2026 (16 months, 99,52 €) paid over.",
   "eval": false,
   "today": "2026-10-07",
   "pages": [
@@ -190,7 +190,7 @@
         {
           "id": "rent_update:1",
           "status": "paid_over",
-          "amount": 74.64
+          "amount": 99.52
         }
       ]
     }

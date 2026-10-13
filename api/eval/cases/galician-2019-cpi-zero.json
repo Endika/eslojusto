@@ -1,6 +1,6 @@
 {
   "id": "galician-2019-cpi-zero",
-  "description": "A lease in Galician signed in April 2019: the CPI of March 2020 was 0 % (LAU art. 18.1), so the 1,1 % rise on 20-04-2020 is 7,70 € a month over, 92,40 €; agency fees with a person as landlord are not the landlord's.",
+  "description": "A lease in Galician signed in April 2019: the CPI of March 2020 was 0 % (LAU art. 18.1), so the 1,1 % rise on 20-04-2020 is 7,70 € a month over; only the last five years count (CC arts. 1964.2 and 1966), October 2021 to September 2026, 60 months, 462 €; agency fees with a person as landlord are not the landlord's.",
   "eval": false,
   "today": "2026-10-07",
   "pages": [
@@ -141,7 +141,7 @@
         {
           "id": "rent_update:0",
           "status": "paid_over",
-          "amount": 92.4
+          "amount": 462
         }
       ]
     }

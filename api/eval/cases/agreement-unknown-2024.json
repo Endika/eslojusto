@@ -1,6 +1,6 @@
 {
   "id": "agreement-unknown-2024",
-  "description": "LAU art. 18.1 and Ley 12/2023 DF 6.ª: whether the 2024 rise was agreed in writing is unknown; agreed, it is not checked, and not agreed, 3 % allows 1.030 €, so 0 € or 240 € and nothing counted.",
+  "description": "LAU art. 18.1 and Ley 12/2023 DF 6.ª: whether the 2024 rise was agreed in writing is unknown; agreed, it is not checked, and not agreed, 3 % allows 1.030 €, so 20 € a month from January 2024 to September 2026, 33 months, 660 €, or 0 €, and nothing counted.",
   "eval": true,
   "today": "2026-10-07",
   "pages": [
@@ -158,7 +158,7 @@
           "id": "rent_update:0",
           "status": "depends",
           "amount": 0,
-          "upTo": 240,
+          "upTo": 660,
           "reasons": ["agreement_unknown"]
         }
       ]

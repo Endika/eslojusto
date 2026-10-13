@@ -106,6 +106,9 @@ const UNWRITTEN = new Set(['verbal', 'none']);
 const TOLERANCE = 0.01;
 // LAU art. 17.2: unless agreed otherwise, rent is paid within the first seven days of the month.
 const PAYMENT_DAY = 7;
+// Five years: the Civil Code's limit both for personal actions (art. 1964.2) and for payments by
+// months (art. 1966).
+const LIMITATION_MONTHS = 60;
 
 const monthIndex = (d: CivilDate): number => d.y * 12 + d.m - 1;
 const monthIso = (i: number): string =>
@@ -126,6 +129,10 @@ interface Frame {
   readonly ids: { readonly agreement: string; readonly notice: string };
   readonly firstYear: boolean;
   readonly endMonth: number;
+  // No later update was given, so the rent is taken to have stayed as charged until today.
+  readonly untilToday: boolean;
+  // Months before it are over five years old (arts. 1964.2 and 1966 CC).
+  readonly limitFrom: number;
 }
 
 const indexDoubtId = (index: IndexId, day: string) => `index:${index}:${day}`;
@@ -150,15 +157,18 @@ function frameOf(
   const ids = { agreement: `agreement:${day}`, notice: `notice:${day}` };
   const firstYear = update.anniversary.y === start.y + 1;
 
-  // Months charged at this rent: up to the next anniversary or the next update, while the
-  // contract lasts, and only those already due.
+  // Months charged at this rent: up to the next update, while the contract lasts, and only those
+  // already due. Without a later update the rent is taken to have stayed as charged until today,
+  // and the review says so; months over five years old are left out (arts. 1964.2 and 1966 CC).
   const next = sorted[k + 1]?.update;
   const due = monthIndex(today) - (today.d > PAYMENT_DAY ? 0 : 1);
   const nextAnniversary = anniversaryIn(start, update.anniversary.y + 1);
-  let endMonth = Math.min(monthIndex(nextAnniversary) - 1, due);
+  let endMonth = due;
   if (next && monthIndex(next.chargedFrom) > monthIndex(update.chargedFrom))
     endMonth = Math.min(endMonth, monthIndex(next.chargedFrom) - 1);
   if (input.moveOut) endMonth = Math.min(endMonth, monthIndex(input.moveOut.keysReturnedOn) - 1);
+  const untilToday = next === undefined && endMonth >= monthIndex(nextAnniversary);
+  const limitFrom = monthIndex(today) - LIMITATION_MONTHS;
 
   const active = new Map<RuleId, ActiveRule>();
   const refs = new Map<IndexId, ReferenceMonth>();
@@ -204,7 +214,20 @@ function frameOf(
     if (UNWRITTEN.has(update.notice))
       doubts.push({ id: ids.notice, reason: 'notice_missing_paid' });
   }
-  return { index, update, day, rise, active, refs, doubts, ids, firstYear, endMonth };
+  return {
+    index,
+    update,
+    day,
+    rise,
+    active,
+    refs,
+    doubts,
+    ids,
+    firstYear,
+    endMonth,
+    untilToday,
+    limitFrom,
+  };
 }
 
 type Looked =
@@ -536,7 +559,8 @@ function readUpdate(
     : written && update.noticeOn !== null
       ? Math.max(effectiveMonth, monthIndex(update.noticeOn) + 1)
       : Number.POSITIVE_INFINITY;
-  const first = monthIndex(update.chargedFrom);
+  const first = Math.max(monthIndex(update.chargedFrom), frame.limitFrom);
+  const prescribed = first > monthIndex(update.chargedFrom);
   let accumulated = 0;
   let months = 0;
   let monthsBeforeDue = 0;
@@ -587,6 +611,8 @@ function readUpdate(
         to: { month: monthIso(frame.endMonth) },
       }),
     );
+  if (months > 0 && frame.untilToday) phrases.push(rentalPhrase('rent_update.until_today'));
+  if (months > 0 && prescribed) phrases.push(rentalPhrase('rent_update.five_years'));
   const status = withinBound
     ? 'not_checkable'
     : monthly > 0 || accumulated > 0

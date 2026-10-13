@@ -17,7 +17,8 @@ export const review = (input: RentalInput): RentalReview => {
   return r.review;
 };
 
-// 20-03-2025: the IRAV of February 2025 (2,08 %) caps a 3 % rise; 9,20 € a month for 12 months.
+// 20-03-2025: the IRAV of February 2025 (2,08 %) caps a 3 % rise; 9,20 € a month from March 2025
+// to October 2026, due by 08-10-2026: 20 months = 184 €.
 export const riseAboveIrav = contract({
   signedOn: f('2024-03-15'),
   startDate: f('2024-03-20'),

@@ -1,6 +1,6 @@
 {
   "id": "large-landlord-unknown-2023",
-  "description": "RDL 20/2022 art. 67: a written agreement lifts the IGC cap unless the landlord is a large one; with a company whose size is unknown, the 8 % agreed on 20-05-2023 is 720 € over 2 % or not checkable, and nothing is counted.",
+  "description": "RDL 20/2022 art. 67: a written agreement lifts the IGC cap unless the landlord is a large one; with a company whose size is unknown, the 8 % agreed on 20-05-2023 is 60 € a month over 2 % from May 2023 to September 2026, 41 months, 2.460 €, or not checkable, and nothing is counted.",
   "eval": true,
   "today": "2026-10-07",
   "pages": [
@@ -131,7 +131,7 @@
           "id": "rent_update:0",
           "status": "depends",
           "amount": 0,
-          "upTo": 720,
+          "upTo": 2460,
           "reasons": ["large_landlord_unknown"]
         }
       ]

@@ -33,6 +33,8 @@ export type RentalPhraseKey =
   | 'rent_update.accepted_by_paying_up_to_max'
   | 'rent_update.agreed_verbally'
   | 'rent_update.months'
+  | 'rent_update.until_today'
+  | 'rent_update.five_years'
   | 'rent_update.monthly_over'
   | 'rent_update.within_limit'
   | 'rent_update.other_clause_within_cap'

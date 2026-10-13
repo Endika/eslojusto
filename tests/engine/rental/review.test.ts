@@ -139,8 +139,8 @@ describe("a deposit within the landlord's month", () => {
 
 describe('rent updates', () => {
   it('come in as items and add to the totals', () => {
-    // IPC April 2021 2,2 % (out 14-05-2021): 800 × 1,022 = 817,60; 12,40 a month over for the
-    // twelve months from May 2021 to April 2022 = 148,80.
+    // IPC April 2021 2,2 % (out 14-05-2021): 800 × 1,022 = 817,60; 12,40 a month over from
+    // October 2021, five years back, to September 2026: 60 months = 744 €.
     const r = review(
       contract({
         signedOn: f('2019-05-10'),
@@ -163,7 +163,7 @@ describe('rent updates', () => {
     );
     const update = r.items.find((i) => i.kind === 'rent_update');
     expect(update?.outcome).toMatchObject({ kind: 'single', value: { status: 'paid_over' } });
-    expect(r.totals.paidOver.counted).toBe(148.8);
+    expect(r.totals.paidOver.counted).toBe(744);
     expect(r.offerPass).toBe(true);
   });
 });

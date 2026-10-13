@@ -1,6 +1,6 @@
 {
   "id": "irav-clause-signed-2022",
-  "description": "An IRAV clause in a contract signed in 2022, before Ley 12/2023: the IRAV is what was agreed (2,08 % on 20-03-2025) and the CPI cap of LAU art. 18.1 is higher, so the 3 % taken is 8,28 € a month over, 99,36 €.",
+  "description": "An IRAV clause in a contract signed in 2022, before Ley 12/2023: the IRAV is what was agreed (2,08 % on 20-03-2025) and the CPI cap of LAU art. 18.1 is higher, so the 3 % taken is 8,28 € a month over from March 2025 to September 2026, 19 months, 157,32 €.",
   "eval": false,
   "today": "2026-10-07",
   "pages": [
@@ -130,7 +130,7 @@
         {
           "id": "rent_update:0",
           "status": "paid_over",
-          "amount": 99.36
+          "amount": 157.32
         }
       ]
     }

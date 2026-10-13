@@ -1,6 +1,6 @@
 {
   "id": "no-clause-signed-2023-05-25",
-  "description": "Signed 25-05-2023, the day before Ley 12/2023 took effect: agency fees fall on the landlord only when a company (LAU art. 20.1 as worded by RDL 7/2019), and a contract with no update clause allows no rise (LAU art. 18.1), so the 3 % taken in 2024 is 28,50 € a month over, 342 €.",
+  "description": "Signed 25-05-2023, the day before Ley 12/2023 took effect: agency fees fall on the landlord only when a company (LAU art. 20.1 as worded by RDL 7/2019), and a contract with no update clause allows no rise (LAU art. 18.1), so the 3 % taken in 2024 is 28,50 € a month over from June 2024 to September 2026, 28 months, 798 €.",
   "eval": false,
   "today": "2026-10-07",
   "pages": [
@@ -141,7 +141,7 @@
         {
           "id": "rent_update:0",
           "status": "paid_over",
-          "amount": 342
+          "amount": 798
         }
       ]
     }
