@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.58.0](https://github.com/Endika/eslojusto/compare/v1.57.1...v1.58.0) (2026-10-13)
+
+
+### Features
+
+* **bills:** read bills and review a whole year with one pass ([d403cac](https://github.com/Endika/eslojusto/commit/d403cacbb4cde6c5348325bd48c74e237118b197))
+* **documents:** build a paid review from several reads kept in memory ([03b2d03](https://github.com/Endika/eslojusto/commit/03b2d03e83455413d0b9f08ef477dddbb0a244fd))
+
+
+### Bug Fixes
+
+* **bills:** keep a bill's dates whole on a narrow screen ([cfe9f82](https://github.com/Endika/eslojusto/commit/cfe9f82118ec5f7fff21a9dc467c1be91af4d0bd))
+
 ## [1.57.1](https://github.com/Endika/eslojusto/compare/v1.57.0...v1.57.1) (2026-10-13)
 
 
