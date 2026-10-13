@@ -138,6 +138,26 @@ describe('the mortgage result', () => {
     expect(notary?.textContent).toContain('sin comprobar en el texto de la sentencia');
   });
 
+  it('with every invoice in but the agreement unknown, the total says what holds it back', () => {
+    const root = rendered(
+      review({
+        deedOn: d('2015-03-02'),
+        agreementOnExpenses: null,
+        invoices: [
+          invoice('notary_loan', 600, paid('2015-03-02')),
+          invoice('registry_mortgage', 300, paid('2015-03-02')),
+        ],
+      }),
+    );
+    expect(text(root, '[data-total="case_law"] [data-total-amount]')).toBe(
+      'Sin cifra: hay gastos en «Revísalo»',
+    );
+    expect(text(root, '[data-total="statute"] [data-total-amount]')).toBe(
+      'Nada con lo que has metido',
+    );
+    expect(cards(root, '[data-expenses]').map((c) => c.status)).toEqual(['Revísalo', 'Revísalo']);
+  });
+
   it('shows the notary’s record charged apart from what the lender bears', () => {
     const root = rendered(
       review({

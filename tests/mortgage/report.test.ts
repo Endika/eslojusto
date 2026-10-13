@@ -125,6 +125,14 @@ describe('the mortgage report', () => {
     expect(summary.some(([label]) => label?.startsWith('Interés legal'))).toBe(false);
   });
 
+  it('with the agreement unknown, says the split is held in «Revísalo», not that nothing is owed', () => {
+    const summary = rows(between(report({ ...SPLIT, agreementOnExpenses: null }, DEPS), 'Resumen'));
+    expect(summary).toContainEqual([
+      'Según el reparto del Tribunal Supremo',
+      'Sin cifra: hay gastos en «Revísalo»',
+    ]);
+  });
+
   it('gives the fees over their caps apart, with the lowest reading', () => {
     const fees = report({
       deedOn: d('2021-03-10'),

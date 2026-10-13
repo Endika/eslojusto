@@ -21,6 +21,7 @@ import type {
 import type { ClauseFlag, FlagPart } from '../engine/mortgage/flags';
 import type { InformationBlock } from '../engine/mortgage/information';
 import type { NormStatus } from '../engine/mortgage/norms';
+import type { Basis } from '../engine/mortgage/rules';
 import type { MortgageReview } from '../engine/mortgage/review';
 import { scopePhrases } from '../engine/mortgage/scope';
 import type { Scope } from '../engine/mortgage/types';
@@ -148,6 +149,15 @@ function renderRules(container: ParentNode, card: HTMLElement, lines: readonly R
 
 // ---------- Totals ----------
 
+// The words of a line that counts nothing: a split without its figure yet, a cost held in
+// «Revísalo», or nothing among what was entered.
+export function emptyTotalKey(items: readonly ExpenseItem[], basis: Basis): ClientKey {
+  const own = items.filter((i) => i.basis === basis);
+  if (own.some((i) => i.status === 'split_explained')) return 'client.mortgage.total.no_figure_yet';
+  if (own.some((i) => i.status === 'review_it')) return 'client.mortgage.total.review_it';
+  return 'client.mortgage.total.nothing';
+}
+
 // What the law puts on the lender and what the Supreme Court's split gives, each on its own, and
 // the fees over their caps: three figures that are never added together.
 function renderTotals(root: ParentNode, review: MortgageReview, tr: Translate) {
@@ -157,7 +167,7 @@ function renderTotals(root: ParentNode, review: MortgageReview, tr: Translate) {
   find(statute, '[data-total-amount]').textContent =
     totals.statute.principal > 0
       ? about(totals.statute.principal, tr)
-      : tr('client.mortgage.total.nothing');
+      : tr(emptyTotalKey(items, 'statute'));
   const notChargeable = items
     .filter((i) => i.status === 'not_chargeable')
     .reduce((s, i) => s + (i.amount ?? 0), 0);
@@ -172,9 +182,7 @@ function renderTotals(root: ParentNode, review: MortgageReview, tr: Translate) {
   find(caseLaw, '[data-total-amount]').textContent =
     totals.caseLaw.principal > 0
       ? about(totals.caseLaw.principal, tr)
-      : explained
-        ? tr('client.mortgage.total.no_figure_yet')
-        : tr('client.mortgage.total.nothing');
+      : tr(emptyTotalKey(items, 'case_law'));
   find(caseLaw, '[data-total-explained]').hidden = !explained || totals.caseLaw.principal > 0;
   const interest = find(caseLaw, '[data-total-interest]');
   const i = totals.caseLaw.interest;

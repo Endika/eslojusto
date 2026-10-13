@@ -14,6 +14,7 @@ import type { ClientKey, Translate } from '../i18n/client';
 import type { CompletedMortgageReview } from './ports';
 import {
   calculationLines,
+  emptyTotalKey,
   expenseStatusText,
   feeStatusText,
   partTitle,
@@ -124,13 +125,13 @@ function summaryBlocks({ review }: CompletedMortgageReview, tr: Translate): Bloc
   const notChargeable = round2(
     items.filter((i) => i.status === 'not_chargeable').reduce((s, i) => s + (i.amount ?? 0), 0),
   );
-  const explained = items.some((i) => i.status === 'split_explained');
-  const nothing = tr('client.mortgage.total.nothing');
   const interest = totals.caseLaw.interest;
   return [
     row(
       tr('client.mortgage.report.total_statute'),
-      totals.statute.principal > 0 ? formatEuros(totals.statute.principal) : nothing,
+      totals.statute.principal > 0
+        ? formatEuros(totals.statute.principal)
+        : tr(emptyTotalKey(items, 'statute')),
     ),
     ...(notChargeable > 0
       ? [row(tr('client.mortgage.report.total_not_chargeable'), formatEuros(notChargeable))]
@@ -139,9 +140,7 @@ function summaryBlocks({ review }: CompletedMortgageReview, tr: Translate): Bloc
       tr('client.mortgage.report.total_case_law'),
       totals.caseLaw.principal > 0
         ? formatEuros(totals.caseLaw.principal)
-        : explained
-          ? tr('client.mortgage.total.no_figure_yet')
-          : nothing,
+        : tr(emptyTotalKey(items, 'case_law')),
     ),
     ...(interest === null || totals.caseLaw.principal === 0
       ? []
@@ -162,7 +161,9 @@ function summaryBlocks({ review }: CompletedMortgageReview, tr: Translate): Bloc
       : [
           row(
             tr('client.mortgage.report.total_fees'),
-            totals.fees.counted > 0 ? formatEuros(totals.fees.counted) : nothing,
+            totals.fees.counted > 0
+              ? formatEuros(totals.fees.counted)
+              : tr('client.mortgage.total.nothing'),
           ),
           ...(totals.fees.upTo > totals.fees.counted
             ? [
