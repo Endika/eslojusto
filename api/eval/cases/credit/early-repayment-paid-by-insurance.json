@@ -214,7 +214,13 @@
         },
         "points": 1.17
       },
-      "information": ["contract_mentions", "linked_insurance", "unused_premium", "law_change"],
+      "information": [
+        "contract_mentions",
+        "linked_insurance",
+        "unused_premium",
+        "linked_credit",
+        "law_change"
+      ],
       "overCharged": {
         "counted": 0,
         "upTo": 0

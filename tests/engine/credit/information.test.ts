@@ -15,7 +15,8 @@ const card = {
 
 describe('information blocks', () => {
   it('always list the mentions of art. 16.2 and the change of law to come', () => {
-    expect(ids()).toEqual(['contract_mentions', 'law_change']);
+    // A personal loan also gets what a credit linked to one purchase means.
+    expect(ids()).toEqual(['contract_mentions', 'linked_credit', 'law_change']);
   });
 
   it('mark each mention of art. 16.2 as present, absent or not answered', () => {
@@ -42,6 +43,7 @@ describe('information blocks', () => {
       'contract_mentions',
       'linked_insurance',
       'unused_premium',
+      'linked_credit',
       'law_change',
     ]);
     const guide = blocks(insured).find((b) => b.id === 'unused_premium');

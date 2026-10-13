@@ -88,6 +88,7 @@ export type CreditPhraseKey =
   | 'information.unused_premium.guide'
   | 'information.cash_price'
   | 'information.cash_option'
+  | 'information.linked_credit'
   | 'information.revolving_info'
   | 'information.card_payoff.months'
   | 'information.card_payoff.never'

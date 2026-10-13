@@ -13,6 +13,7 @@ export type InformationBlockId =
   | 'linked_insurance'
   | 'unused_premium'
   | 'cash_price'
+  | 'linked_credit'
   | 'revolving_info'
   | 'card_payoff'
   | 'law_change';
@@ -101,6 +102,15 @@ const cashPrice = (norms: NormTable): InformationBlock =>
     norms,
   );
 
+// A personal loan may pay for one purchase: the form does not ask, so the rules are given as «si».
+const linkedCredit = (norms: NormTable): InformationBlock =>
+  block(
+    'linked_credit',
+    ['information.linked_credit', 'information.cash_option'],
+    ['linked_credit', 'contract_mentions', 'cash_option'],
+    norms,
+  );
+
 // The statement and the breakdown a revolving card owes under the transparency order. Which
 // lenders and which earlier contracts the order reaches has not been read, so it is told as what
 // the order provides, not as what a given lender owes.
@@ -153,6 +163,7 @@ export function informationBlocks(
     contractMentions(input, norms),
     ...linkedInsurance(input, norms),
     ...(input.product === 'car_loan' ? [cashPrice(norms)] : []),
+    ...(input.product === 'personal_loan' ? [linkedCredit(norms)] : []),
     ...(revolving ? [revolvingInfo(norms), ...payoffBlock(input, norms)] : []),
     lawChange(norms),
   ];
