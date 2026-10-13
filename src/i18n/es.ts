@@ -3802,6 +3802,8 @@ export const es = {
     'No consta si se comunicó por escrito y con su causa.',
   'client.household.calculation.dismissal.no_written_notice':
     'Sin la comunicación por escrito, la norma presume que se trata de un despido y podrían aplicarse sus reglas.',
+  'client.household.calculation.base.minimum_wage':
+    'Lo que cobras queda por debajo del salario mínimo de tus horas, así que la cifra se calcula sobre ese mínimo. La norma no lo dice expresamente: es una lectura.',
   'client.household.calculation.dismissal.no_cause_in_writing':
     'El escrito tiene que decir la causa (art. 11.2). Sin ella no cumple la forma escrita, y la norma presume que se trata de un despido y podrían aplicarse sus reglas (art. 11.3).',
   'client.household.calculation.dismissal.no_severance':
