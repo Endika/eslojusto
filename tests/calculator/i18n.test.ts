@@ -242,9 +242,8 @@ describe('client strings', () => {
     const keys = Object.keys(strings);
     expect(keys).toContain('client.documents.kind.credit_agreement');
     expect(keys).toContain('client.documents.error.daily_limit_reached');
-    expect(
-      keys.filter((k) => /^client\.documents\.(report|letter|notice|verify)\./.test(k)),
-    ).toEqual([]);
+    expect(keys.filter((k) => /^client\.documents\.(report|letter|notice)\./.test(k))).toEqual([]);
+    expect(keys).toContain('client.documents.verify.checking');
     expect(
       Object.values(strings).flatMap((text) =>
         forbiddenIn('dist/financiacion/index.html', text ?? '').map(String),
@@ -303,9 +302,8 @@ describe('client strings', () => {
     expect(keys).toContain('client.documents.kind.mortgage_deed');
     expect(keys).toContain('client.documents.missing_key_page');
     expect(keys).toContain('client.mortgage.documents.quote_note');
-    expect(
-      keys.filter((k) => /^client\.documents\.(report|letter|notice|verify)\./.test(k)),
-    ).toEqual([]);
+    expect(keys.filter((k) => /^client\.documents\.(report|letter|notice)\./.test(k))).toEqual([]);
+    expect(keys).toContain('client.documents.verify.checking');
     expect(keys.filter((k) => CREDIT_READING.has(k) && !MORTGAGE_READING.has(k))).toEqual([]);
     expect(
       Object.values(strings).flatMap((text) =>
