@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.53.10](https://github.com/Endika/eslojusto/compare/v1.53.9...v1.53.10) (2026-10-13)
+
+
+### Bug Fixes
+
+* **insurance:** no notice item without a notice, and the mortgage duty read in the BOE ([43e0bf9](https://github.com/Endika/eslojusto/commit/43e0bf98a8af43998cb7828003cf3ef62b2185ff))
+
 ## [1.53.9](https://github.com/Endika/eslojusto/compare/v1.53.8...v1.53.9) (2026-10-13)
 
 
