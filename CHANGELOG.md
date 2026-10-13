@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.53.9](https://github.com/Endika/eslojusto/compare/v1.53.8...v1.53.9) (2026-10-13)
+
+
+### Bug Fixes
+
+* **credit:** no early repayment item without one, and date the revolving articles ([dd4c2a7](https://github.com/Endika/eslojusto/commit/dd4c2a7b58c2fe51ad3d4c44b6dc498b43fcb279))
+
 ## [1.53.8](https://github.com/Endika/eslojusto/compare/v1.53.7...v1.53.8) (2026-10-12)
 
 
