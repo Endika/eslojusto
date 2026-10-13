@@ -22,8 +22,9 @@ import {
 
 interface Props {
   lang: Lang;
+  hidden?: boolean;
 }
-const { lang } = Astro.props;
+const { lang, hidden = false } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 
 const answers = (values: readonly ('yes' | 'no' | 'unknown')[]) =>
@@ -43,7 +44,13 @@ const sheetId = (sheet: Sheet) => ({
 const arrow = 'M4 12h15m-6-6 6 6-6 6';
 ---
 
-<form class="calculator" id="electricity" novalidate aria-label={tx('bills.electricity.form_aria')}>
+<form
+  class="calculator"
+  id="electricity"
+  novalidate
+  aria-label={tx('bills.electricity.form_aria')}
+  hidden={hidden}
+>
   <div class="stack">
     <fieldset class="sheet" {...sheetId('suministro')}>
       <h2 class="question" id="question-suministro" tabindex="-1">

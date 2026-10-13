@@ -367,8 +367,8 @@ export const READABILITY = [
 ] as const satisfies readonly (
   (typeof FINAL_PAY_READABILITY)[number] | (typeof RENTAL_READABILITY)[number]
 )[];
-// Every reason the reviews the site reads can give: the credit, the insurance and the mortgage
-// review's too. The site's documents client mirrors this list (src/documents/contract.ts).
+// Every reason the reviews before the bills can give: the credit, the insurance and the mortgage
+// review's too.
 export const SITE_READABILITY = [
   ...READABILITY,
   'not_credit_document',
@@ -380,8 +380,8 @@ export const SITE_READABILITY = [
   | (typeof INSURANCE_READABILITY)[number]
   | (typeof MORTGAGE_READABILITY)[number]
 )[];
-// Every reason any review can give: the electricity and the telecom review's too, which the site
-// mirrors once it reads them.
+// Every reason any review can give: the electricity and the telecom review's too. The site mirrors
+// this list (src/documents/contract.ts).
 export const ALL_READABILITY = [
   ...SITE_READABILITY,
   'not_electricity_document',

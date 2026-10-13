@@ -1,12 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import DocumentStart from '../components/DocumentStart.astro';
 import TelecomForm from '../components/TelecomForm.astro';
 import BillsResult from '../components/BillsResult.astro';
 import { BILLS_BETA } from '../content/sections';
 import { formatLongDay } from '../content/rent-indices';
 import { breadcrumbList, trail } from '../content/structured-data';
 import { LAST_UPDATED } from '../content/updated';
+import { DOCUMENTS } from '../documents/config';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
 
@@ -15,6 +17,9 @@ interface Props {
 }
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
+// With the documents API the visit opens on the choice between uploading and typing; the tabs and
+// the form wait until it is made, and the result offers the pass.
+const documents = DOCUMENTS !== null;
 
 // Each tab's share of the rail follows how much its section asks, kept close so that every name
 // still fits on a phone. The second column is the section's first step, whose id is its URL
@@ -44,8 +49,9 @@ const crumbs = trail(
   lang={lang}
   section="cause"
   structuredData={[breadcrumbList(home, lang, crumbs)]}
+  calculator={documents}
 >
-  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
     <ol>
       {/* Only a section already reached is a link; one still ahead is plain text until then. */}
       {sections.map(([id, step, number, weight], i) => (
@@ -88,8 +94,9 @@ const crumbs = trail(
           <p class="help">{tx('bills.no_js')}</p>
         </div>
       </noscript>
-      <TelecomForm lang={lang} />
-      <BillsResult lang={lang} review="telecom" />
+      {documents && <DocumentStart lang={lang} review="telecom" />}
+      <TelecomForm lang={lang} hidden={documents} />
+      <BillsResult lang={lang} review="telecom" documents={documents} />
     </div>
   </main>
 </Base>

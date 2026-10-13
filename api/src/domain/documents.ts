@@ -97,8 +97,8 @@ export const PAGE_KINDS = [
   | (typeof RENTAL_PAGE_KINDS)[number]
   | (typeof EMPLOYMENT_PAGE_KINDS)[number]
 )[];
-// Every kind the reviews the site reads can give a page: the credit, the insurance and the
-// mortgage review's too. The site's documents client mirrors this list (src/documents/contract.ts).
+// Every kind the reviews before the bills can give a page: the credit, the insurance and the
+// mortgage review's too.
 export const SITE_PAGE_KINDS = [
   ...PAGE_KINDS,
   'credit_agreement',
@@ -125,8 +125,8 @@ export const SITE_PAGE_KINDS = [
   | (typeof INSURANCE_PAGE_KINDS)[number]
   | (typeof MORTGAGE_PAGE_KINDS)[number]
 )[];
-// Every kind any review can give a page: the electricity and the telecom review's too, which the
-// site mirrors once it reads them.
+// Every kind any review can give a page: the electricity and the telecom review's too. The site's
+// documents client mirrors this list (src/documents/contract.ts).
 export const ALL_PAGE_KINDS = [
   ...SITE_PAGE_KINDS,
   'electricity_bill',

@@ -11,9 +11,15 @@ import { MORTGAGE_MERGE_RULES } from '../../api/src/domain/mortgage-merge';
 import { MORTGAGE_SECTIONS } from '../../api/src/domain/mortgage-schema';
 import {
   LIMITS as API_LIMITS,
-  SITE_PAGE_KINDS as API_PAGE_KINDS,
+  ALL_PAGE_KINDS as API_PAGE_KINDS,
 } from '../../api/src/domain/documents';
-import { SITE_READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
+import { ALL_READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
+import type { ElectricityCheck as ApiElectricityCheck } from '../../api/src/domain/electricity-checks';
+import { ELECTRICITY_MERGE_RULES } from '../../api/src/domain/electricity-merge';
+import { ELECTRICITY_SECTIONS } from '../../api/src/domain/electricity-schema';
+import type { TelecomCheck as ApiTelecomCheck } from '../../api/src/domain/telecom-checks';
+import { TELECOM_MERGE_RULES } from '../../api/src/domain/telecom-merge';
+import { TELECOM_SECTIONS } from '../../api/src/domain/telecom-schema';
 import { EMPLOYMENT_SECTIONS } from '../../api/src/domain/employment-schema';
 import { RENTAL_SECTIONS } from '../../api/src/domain/rental-schema';
 import {
@@ -26,6 +32,8 @@ import {
 import {
   CREDIT_CHECKS,
   CREDIT_EXTRACTION,
+  ELECTRICITY_CHECKS,
+  ELECTRICITY_EXTRACTION,
   EMPLOYMENT_EXTRACTION,
   EMPLOYMENT_LIST_MAXIMA,
   FINAL_PAY_EXTRACTION,
@@ -37,6 +45,8 @@ import {
   PAGE_KINDS,
   READABILITY,
   RENTAL_EXTRACTION,
+  TELECOM_CHECKS,
+  TELECOM_EXTRACTION,
 } from '../../src/documents/contract';
 
 interface Call {
@@ -209,10 +219,22 @@ describe('extract', () => {
     );
     expect([...MORTGAGE_EXTRACTION.lists].sort()).toEqual(lists);
   });
-  it('knows every check the API makes of credit, insurance and mortgage documents, and only those', () => {
+  it('reads every electricity and telecom field the API merges, and the lists of every section', () => {
+    const lists = (sections: Readonly<Record<string, { readonly lists: object }>>) =>
+      [...new Set(Object.values(sections).flatMap((s) => Object.keys(s.lists)))].sort();
+    expect([...ELECTRICITY_EXTRACTION.fields].sort()).toEqual(
+      Object.keys(ELECTRICITY_MERGE_RULES).sort(),
+    );
+    expect([...ELECTRICITY_EXTRACTION.lists].sort()).toEqual(lists(ELECTRICITY_SECTIONS));
+    expect([...TELECOM_EXTRACTION.fields].sort()).toEqual(Object.keys(TELECOM_MERGE_RULES).sort());
+    expect([...TELECOM_EXTRACTION.lists].sort()).toEqual(lists(TELECOM_SECTIONS));
+  });
+  it('knows every check the API makes of each review’s documents, and only those', () => {
     expectTypeOf<(typeof CREDIT_CHECKS)[number]>().toEqualTypeOf<ApiCreditCheck>();
     expectTypeOf<(typeof INSURANCE_CHECKS)[number]>().toEqualTypeOf<ApiInsuranceCheck>();
     expectTypeOf<(typeof MORTGAGE_CHECKS)[number]>().toEqualTypeOf<ApiMortgageCheck>();
+    expectTypeOf<(typeof ELECTRICITY_CHECKS)[number]>().toEqualTypeOf<ApiElectricityCheck>();
+    expectTypeOf<(typeof TELECOM_CHECKS)[number]>().toEqualTypeOf<ApiTelecomCheck>();
   });
   it('takes as many images and as large a request as the API', () => {
     expect(LIMITS.maxImages).toBe(API_LIMITS.maxImages);
