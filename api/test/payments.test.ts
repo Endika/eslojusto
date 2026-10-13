@@ -57,7 +57,11 @@ describe('issuePass', () => {
   it('is idempotent and never resets the reads used', async () => {
     const spent = paidSession({ readsUsed: 15 });
     const first = await issuePass(spent.id, NONCE, deps(spent));
-    const later = await issuePass(spent.id, NONCE, deps(spent, new FakeClock(Date.now() + 1000)));
+    const later = await issuePass(
+      spent.id,
+      NONCE,
+      deps(spent, new FakeClock(new FakeClock().ms + 1000)),
+    );
     expect(later).toEqual(first);
     // A spent pass still unlocks the report and the letter; only reads are over.
     expect(first).toMatchObject({ code: 'ok', readsLeft: 0 });
