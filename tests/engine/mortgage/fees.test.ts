@@ -126,6 +126,52 @@ describe('art. 23.7 LCCI, fixed rate', () => {
   it('the last day of the tenth year is still in the first ten', () => {
     expect(only(fixed('2029-06-30', 100_000, 0, '2019-07-01')).capPercent).toBe(2);
   });
+
+  describe('a mixed rate read as fixed', () => {
+    const mixed = (on: string, option: MortgageInput['prepaymentOption']) => ({
+      deedOn: d('2019-07-01'),
+      rateType: 'mixed' as const,
+      prepaymentOption: option,
+      operations: [operation(on, 'full_prepayment', 100_000, 1_800)],
+    });
+
+    it('in the deed’s first ten years, both counts of the ten years give 2 %', () => {
+      expect(readings(run(mixed('2029-06-30', 'a_015_5y'))[0])).toEqual([
+        'rate_type',
+        [
+          ['fixed', 'within_cap', 2, 2_000, null],
+          ['variable.option_a', 'above_cap', 0, 0, 1_800],
+        ],
+      ]);
+    });
+
+    it('past them, counted from the deed 1,5 %; from the fixed rate, unchecked; the total the lower', () => {
+      const items = run(mixed('2029-07-01', 'a_015_5y'));
+      expect(readings(items[0])).toEqual([
+        'rate_type_and_fixed_stretch',
+        [
+          ['fixed.from_deed', 'above_cap', 1.5, 1_500, 300],
+          ['fixed.from_fixed_rate', 'not_checkable', null, null, null],
+          ['variable.option_a', 'above_cap', 0, 0, 1_800],
+        ],
+      ]);
+      const fromFixed = feeFindings(items[0] as FeeItem)[1] as FeeFinding;
+      expect(keys(fromFixed)).toEqual(['fees.lcci_fixed_from_fixed_rate']);
+      expect(sourceIds(fromFixed)).toEqual(['prepayment_lcci_fixed']);
+      expect(feeTotal(items)).toEqual({ counted: 0, upTo: 1_800 });
+    });
+
+    it('with the deed’s option unknown too, every point is named', () => {
+      const [item] = run(mixed('2030-01-10', null));
+      expect(item?.kind === 'readings' && item.question).toBe(
+        'rate_type_and_prepayment_option_and_fixed_stretch',
+      );
+    });
+
+    it('a fixed rate has one count of the ten years', () => {
+      expect(only(fixed('2029-07-01', 100_000, 1_500, '2019-07-01')).capPercent).toBe(1.5);
+    });
+  });
 });
 
 describe('art. 23.6 LCCI, a switch to a fixed rate, by the day of the switch', () => {
