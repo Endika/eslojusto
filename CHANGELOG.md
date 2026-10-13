@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.56.1](https://github.com/Endika/eslojusto/compare/v1.56.0...v1.56.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* **documents:** give up on a checkout or a pass after 20 s, not four minutes ([89662f0](https://github.com/Endika/eslojusto/commit/89662f0cc2e2b99659918666cb1784d46b98c0fd))
+
 ## [1.56.0](https://github.com/Endika/eslojusto/compare/v1.55.3...v1.56.0) (2026-10-13)
 
 
