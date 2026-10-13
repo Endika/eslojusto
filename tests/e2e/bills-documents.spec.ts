@@ -5,11 +5,20 @@ import { fitsScreen, forwardButton, noSideScroll } from '../support/sheets';
 import { expectShownAndFocused } from '../support/reads';
 
 // Runs only against a TEST_DOCUMENTS=1 build, which has /facturas/ too: every request to the fake
-// API and to Turnstile is answered here. Every bill and figure is synthetic.
+// API, to Turnstile and to Stripe is answered here. Every bill and figure is synthetic.
 
 const ORIGIN = `http://localhost:${process.env['E2E_PORT'] ?? 4321}`;
-const API = { extract: 'https://extract.api.eslojusto.test/' };
+const API = {
+  extract: 'https://extract.api.eslojusto.test/',
+  checkout: 'https://checkout.api.eslojusto.test/',
+  pass: 'https://pass.api.eslojusto.test/',
+};
+const STRIPE = 'https://checkout.stripe.com/c/pay/cs_test_e2e';
 const TODAY = new Date('2026-10-13T12:00:00');
+
+const b64url = (v: object) => Buffer.from(JSON.stringify(v)).toString('base64url');
+const expiresAt = Math.floor(Date.now() / 1000) + 7 * 86400;
+const PASS = `v1.${b64url({ typ: 'pass', sid: 'cs_test_e2e', exp: expiresAt })}.c2ln`;
 
 const PHOTO = syntheticPhoto();
 const photo = (name: string) => ({ name, mimeType: 'image/png', buffer: PHOTO });
@@ -109,6 +118,33 @@ function pack(bills: readonly object[], failedChecks: readonly string[] = []) {
     failedChecks,
     allowance: 'v1.quota.e2e',
   };
+}
+
+interface Payment {
+  readonly checkout: Request[];
+  readonly pass: Request[];
+}
+
+// The checkout and the pass, and Stripe sending the person back to `returnTo` once paid.
+async function fakePayment(page: Page, returnTo: string): Promise<Payment> {
+  const payment: Payment = { checkout: [], pass: [] };
+  await page.route(API.checkout, (route) => {
+    payment.checkout.push(route.request());
+    return route.fulfill({ json: { code: 'ok', sessionId: 'cs_test_e2e', url: STRIPE } });
+  });
+  await page.route(API.pass, (route) => {
+    const body = route.request().postDataJSON() as Record<string, unknown>;
+    if ('pass' in body) return route.fulfill({ json: { code: 'ok', expiresAt, readsLeft: 15 } });
+    payment.pass.push(route.request());
+    return route.fulfill({ json: { code: 'ok', pass: PASS, expiresAt, readsLeft: 15 } });
+  });
+  await page.route('https://checkout.stripe.com/**', (route) =>
+    route.fulfill({
+      status: 302,
+      headers: { location: `${ORIGIN}/${returnTo}?session_id=cs_test_e2e` },
+    }),
+  );
+  return payment;
 }
 
 async function downloadOf(page: Page, button: Locator): Promise<string> {
@@ -327,6 +363,68 @@ test('pages that are no electricity document are said, and the read counts for n
   await expect(page.locator('[data-doc-files] li')).toHaveCount(1);
   await expect(page.locator('#electricity')).toBeHidden();
   await expect(basket(page)).toBeHidden();
+});
+
+test('a year of three bills goes to the payment and comes back whole, with its report and letter', async ({
+  page,
+}) => {
+  // Three bills confirmed sheet by sheet take close to the default timeout on a busy machine.
+  test.slow();
+  await fakeServices(page, pack([JUNE, JULY, AUGUST]));
+  const payment = await fakePayment(page, 'facturas/luz/');
+  await upload(page, ['junio.png', 'julio.png', 'agosto.png']);
+  await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }));
+  await page.getByRole('button', { name: 'Revisar los datos' }).click();
+  await confirmBill(page);
+  for (const left of ['quedan 2', 'queda 1']) {
+    await basket(page)
+      .getByRole('button', { name: `Revisar la siguiente factura leída (${left})` })
+      .click();
+    await confirmBill(page);
+  }
+  const bills = [
+    'Factura del 31\u201105\u20112026 al 30\u201106\u20112026 · por encima de la norma: 0,20 €',
+    'Factura del 30\u201106\u20112026 al 30\u201107\u20112026 · por encima de la norma: 0,20 €',
+    'Factura del 30\u201107\u20112026 al 29\u201108\u20112026 · por encima de la norma: 0,20 €',
+  ];
+  await expect(basket(page).locator('[data-basket-bills] li')).toHaveText(bills);
+  await expect(basket(page)).toContainText(
+    'Si pagas, las facturas que ya has revisado esperan en esta pestaña mientras estás en la página de pago y vuelven todas contigo',
+  );
+  const letter = offer(page).getByRole('button', {
+    name: 'Descargar la carta que pide la factura rectificativa (PDF)',
+  });
+  await expect(letter).toBeHidden();
+
+  await offer(page)
+    .getByLabel(/Quiero el informe ahora/)
+    .check();
+  await offer(page).getByRole('button', { name: 'Pagar 4,99 €' }).click();
+  await expect(letter).toBeVisible();
+  expect(payment.checkout).toHaveLength(1);
+  expect(payment.checkout[0]?.postDataJSON()).toMatchObject({ returnTo: 'electricity' });
+  expect(payment.pass).toHaveLength(1);
+  expect(page.url()).not.toContain('session_id');
+
+  // Every bill of the year is reviewed again on return, with the year added up as before; nothing
+  // waits in the session any more.
+  await expect(basket(page).locator('[data-basket-title]')).toHaveText(
+    'Tu año: 3 facturas revisadas',
+  );
+  await expect(basket(page).locator('[data-basket-bills] li')).toHaveText(bills);
+  await expect(basket(page).locator('[data-basket-counted]')).toHaveText('0,60 €');
+  await expect(page.locator('#resultado [data-total-counted]')).toHaveText('0,20 €');
+  expect(await page.evaluate(() => sessionStorage.length)).toBe(0);
+
+  expect(
+    await downloadOf(page, offer(page).getByRole('button', { name: 'Descargar el informe (PDF)' })),
+  ).toBe('eslojusto-informe-facturas-luz.pdf');
+  await offer(page)
+    .getByLabel('Comercializadora', { exact: true })
+    .fill('Comercializadora Ficticia');
+  await offer(page).getByLabel('Número de contrato', { exact: true }).fill('CT-0000-TEST');
+  expect(await downloadOf(page, letter)).toBe('eslojusto-carta-factura-rectificativa.pdf');
+  await noSideScroll(page);
 });
 
 // A change of conditions notified on 01-02-2026 and an exit asked for on 20-02-2026, within the

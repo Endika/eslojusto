@@ -3,6 +3,7 @@ import { electricityCase } from '../bills/electricity/case';
 import type { CompletedElectricityReview } from '../bills/electricity/ports';
 import { electricityReading } from '../bills/electricity/reading';
 import { STEPS } from '../bills/electricity/steps';
+import type { FormEntries } from '../calculator/fill';
 import type { SectionForm } from '../calculator/section';
 import { createBasket } from '../documents/basket';
 import { DOCUMENTS } from '../documents/config';
@@ -10,6 +11,12 @@ import { ELECTRICITY_EXTRACTION } from '../documents/contract';
 import type { NormTable } from '../engine/bills/norms';
 import { billsTranslator } from './bills-copy';
 import { UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
+
+// A bill of the year with the answers it was reviewed from, which are all the trip to Stripe keeps
+// of it.
+interface KeptBill extends CompletedElectricityReview {
+  readonly answers: FormEntries;
+}
 
 // Document reading, «tu año», the report and the letter on the electricity review's page. A read
 // can bring several bills: each fills the form in turn and, once reviewed, joins the year, which
@@ -24,12 +31,23 @@ export function wireElectricityDocuments(
   const tr = billsTranslator();
   const { form } = electricity;
   const reading = electricityReading(form, tr);
-  const year = createBasket<CompletedElectricityReview>();
+  const year = createBasket<KeptBill>();
   const show = () => renderBasket(document, year.entries(), reading.pending(), tr);
+
+  // A new bill starts on an empty form; the year keeps every bill already reviewed.
+  function startBill() {
+    year.next();
+    form.reset();
+    electricity.fill([]);
+  }
 
   // Heard before the pass, so its offer counts the bill just reviewed.
   hooks.onReview((r) => {
-    year.put({ ...r, input: { ...r.input, supplyFingerprint: reading.fingerprint() } });
+    year.put({
+      ...r,
+      input: { ...r.input, supplyFingerprint: reading.fingerprint() },
+      answers: electricity.entries(),
+    });
     reading.reviewed();
   });
   hooks.onRestart(() => {
@@ -53,16 +71,14 @@ export function wireElectricityDocuments(
       paidReview: () => electricityCase(year.entries(), norms),
       decorateResult: show,
       restore: (saved) => saved,
+      // The whole year goes on the trip to Stripe, each bill as its answers and nothing else, and
+      // each is reviewed again on return. The supply fingerprint stays behind, so a year rebuilt
+      // tells copies of a bill apart by their period alone.
+      basket: { answers: () => year.entries().map((bill) => bill.answers), startNext: startBill },
     },
   });
   if (!documents) return;
 
-  // A new bill starts on an empty form; the year keeps every bill already reviewed.
-  const startBill = () => {
-    year.next();
-    form.reset();
-    electricity.fill([]);
-  };
   document.querySelector('[data-basket-next]')?.addEventListener('click', () => {
     const bill = reading.next();
     if (!bill) return;
