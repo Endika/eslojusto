@@ -70,6 +70,7 @@ const next = nextSheet;
 // From wherever the page opens to the result, with whatever cause it marked (or a dismissal).
 async function review(page: Page) {
   const visible = (name: string) => page.locator(`[data-sheet="${name}"]:not([hidden])`);
+  await expect(page.locator('[data-sheet]:not([hidden])')).toHaveCount(1);
   if (await visible('causa').count()) {
     await page.locator('#calculator').getByLabel('Despido improcedente', { exact: true }).check();
     await next(page);

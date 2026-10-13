@@ -484,7 +484,10 @@ test('with the do-not-track signal nothing is sent', async ({ page }) => {
   await page.goto('finiquito/');
   await page.getByLabel('Baja voluntaria (dimisión)').check();
   await nextSheet(page);
-  await page.waitForTimeout(1500);
+  // Past the moment the library would load: after `load`, once the page goes idle.
+  await page.waitForLoadState('load');
+  await page.evaluate(() => new Promise((resolve) => requestIdleCallback(resolve)));
+  await page.waitForLoadState('networkidle');
   expect(spy.bodies).toEqual([]);
   expect(spy.external).toEqual([]);
 });

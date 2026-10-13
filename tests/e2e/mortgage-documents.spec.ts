@@ -1,6 +1,6 @@
 import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
 import { syntheticPhoto } from '../support/synthetic-photo';
-import { fitsScreen } from '../support/sheets';
+import { fitsScreen, forwardButton } from '../support/sheets';
 import { expectShownAndFocused } from '../support/reads';
 
 // Runs only against a TEST_DOCUMENTS=1 build, which has /hipoteca/ too: every request to the fake
@@ -220,9 +220,7 @@ const notes = (page: Page) => page.locator('[data-done-notes] li');
 // Moves on with whichever button the sheet shows, and waits out the page turn.
 async function next(page: Page) {
   await fitsScreen(page, { whole: false });
-  const review = page.getByRole('button', { name: 'Revisar', exact: true });
-  if (await review.isVisible()) await review.click();
-  else await page.getByRole('button', { name: 'Siguiente' }).click();
+  await (await forwardButton(page)).click();
   await page.waitForFunction(() =>
     document.getAnimations().every((a) => a.playState !== 'running'),
   );

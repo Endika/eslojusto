@@ -1,7 +1,7 @@
 import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { syntheticPhoto } from '../support/synthetic-photo';
-import { nextSheet } from '../support/sheets';
+import { atLastSheet, nextSheet } from '../support/sheets';
 import { expectShownAndFocused } from '../support/reads';
 
 // Runs only against a TEST_DOCUMENTS=1 build, which has /contrato/ too: every request to the fake
@@ -265,7 +265,7 @@ const next = nextSheet;
 
 // Moves on until the last sheet, whose button reviews.
 async function toLastSheet(page: Page) {
-  while (!(await page.getByRole('button', { name: 'Revisar' }).isVisible())) await next(page);
+  while (!(await atLastSheet(page))) await next(page);
 }
 
 // The relationship and the contract's type, read; the answers no document gives.
@@ -713,7 +713,7 @@ async function fillByHand(page: Page, c: ByHand) {
       const field = page.getByLabel(element, { exact: true });
       if (await field.isVisible()) await field.selectOption({ label: 'No está' });
     }
-    if (await page.getByRole('button', { name: 'Revisar' }).isVisible()) break;
+    if (await atLastSheet(page)) break;
     await next(page);
   }
   await page.getByRole('button', { name: 'Revisar' }).click();
