@@ -75,10 +75,10 @@ export const es = {
   'rent_indices.cap.ipc.rule': 'El IPC.',
   'rent_indices.cap.igc.when': 'Del 31-03-2022 al 31-12-2023',
   'rent_indices.cap.igc.rule':
-    'El IGC (como mucho un 2 %), o el IPC si es más bajo. Un nuevo pacto podía cambiar el IGC por otra subida, nunca por encima del IPC. Si tu casero es gran tenedor (más de diez inmuebles de uso residencial o más de 1.500 m² de uso residencial), la subida no puede pasar del IGC aunque pactarais otra subida.',
+    'El IGC (como mucho un 2 %), o el IPC si es más bajo. Un nuevo pacto podía cambiar el IGC por otra subida. Si tu casero es gran tenedor (más de diez inmuebles de uso residencial o más de 1.500 m² de uso residencial), la subida no puede pasar del IGC aunque pactarais otra subida.',
   'rent_indices.cap.three.when': 'En 2024',
   'rent_indices.cap.three.rule':
-    'Un 3 %, o el IPC si es más bajo. Un nuevo pacto podía cambiar el 3 % por otra subida, nunca por encima del IPC. Si tu casero es gran tenedor, la subida no puede pasar del 3 % aunque pactarais otra subida. Desde el 26-05-2023 es gran tenedor quien tiene más de diez inmuebles de uso residencial o más de 1.500 m² de uso residencial, y en una zona de mercado tensionado declarada la comunidad autónoma puede bajarlo a cinco o más inmuebles de uso residencial en esa zona.',
+    'Un 3 %, o el IPC si es más bajo. Un nuevo pacto podía cambiar el 3 % por otra subida. Si tu casero es gran tenedor, la subida no puede pasar del 3 % aunque pactarais otra subida. Desde el 26-05-2023 es gran tenedor quien tiene más de diez inmuebles de uso residencial o más de 1.500 m² de uso residencial, y en una zona de mercado tensionado declarada la comunidad autónoma puede bajarlo a cinco o más inmuebles de uso residencial en esa zona.',
   'rent_indices.cap.irav.when': 'Desde el 01-01-2025',
   'rent_indices.cap.irav.when_until': 'Del 01-01-2025 al {hasta}',
   'rent_indices.cap.irav.rule':
