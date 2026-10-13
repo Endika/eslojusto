@@ -317,7 +317,7 @@ for (const { name, viewport } of SIZES) {
       await onTab(page, 'Indemnización del desistimiento', 'El final');
       // A warning for working time never adds euros.
       await expect(card(page, 'Horas a la semana').locator('.item__status')).toHaveText(
-        /Aviso: conviene revisarlo/,
+        /Por encima del límite de la norma/,
       );
       await expect(page.getByRole('region', { name: 'Resumen' })).toContainText(
         'Es un aviso: no suma importes.',

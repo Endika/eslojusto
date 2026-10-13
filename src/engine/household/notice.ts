@@ -4,7 +4,9 @@ import { exact, round2 } from '../money';
 import { phrase, type HouseholdPhrase } from './calculation';
 import { findingsFor, single, type Verdict } from './finding';
 import type { NormTable } from './norms';
-import { dailyPay } from './salary';
+import type { MinimumWageTable } from '../law/minimum-wage';
+import { dailySalary } from '../severance';
+import { basePay, type BasePay } from './salary';
 import type { Assessed, Finding, HouseholdInput, ReadingCode } from './types';
 
 // Art. 11.2: twenty days of notice after more than a year of service, seven otherwise.
@@ -30,13 +32,18 @@ export const noticeDaysGiven = (noticeOn: CivilDate, lastDay: CivilDate): number
 const euros = (n: number) => ({ euros: round2(n) });
 
 // What the notice owes in one reading of the date the service is measured on.
-function verdictOf(required: number, given: number, input: HouseholdInput): Verdict {
+function verdictOf(
+  required: number,
+  given: number,
+  input: HouseholdInput,
+  base: BasePay | null,
+): Verdict {
   const missing = Math.max(0, required - given);
   const calculation: HouseholdPhrase[] = [phrase('notice.days', { required, given, missing })];
   const t = input.termination;
   if (missing === 0)
     return { status: 'within_limit', calculation, alsoCites: ['notice_calendar_days'] };
-  const daily = dailyPay(input);
+  const daily = base === null ? null : dailySalary(base.annual);
   if (daily === null)
     return {
       status: 'missing_requirement',
@@ -47,6 +54,7 @@ function verdictOf(required: number, given: number, input: HouseholdInput): Verd
   const paid = t?.substitutePaid ?? 0;
   const owed = round2(worth - paid);
   calculation.push(
+    ...(base?.raisedToMinimum === true ? [phrase('base.minimum_wage')] : []),
     phrase('notice.substitute', { missing, daily: euros(daily), amount: euros(worth) }),
   );
   if (owed <= 0)
@@ -81,7 +89,11 @@ export function noticeShort(input: HouseholdInput): boolean {
 
 // Art. 11.2: the notice of a desistimiento, in days from the day after it is given. Whether the
 // year is counted at the notice or at the end is not settled, so both are shown when they differ.
-export function assessNotice(input: HouseholdInput, norms: NormTable): readonly Assessed[] {
+export function assessNotice(
+  input: HouseholdInput,
+  norms: NormTable,
+  minimumWage: MinimumWageTable,
+): readonly Assessed[] {
   const t = input.termination;
   if (t === null || t.route !== 'desistimiento') return [];
   const make = findingsFor('notice');
@@ -89,6 +101,7 @@ export function assessNotice(input: HouseholdInput, norms: NormTable): readonly 
     return [single(make('desistimiento_notice', { status: 'not_entered' }, norms))];
   const given = noticeDaysGiven(t.noticeGivenOn, t.effectiveOn);
   const noticeOn = t.noticeGivenOn;
+  const base = basePay(input, minimumWage);
   const finding = (world: ReadingCode<'notice_service_date'>): Finding =>
     make(
       'desistimiento_notice',
@@ -99,6 +112,7 @@ export function assessNotice(input: HouseholdInput, norms: NormTable): readonly 
         ),
         given,
         input,
+        base,
       ),
       norms,
     );

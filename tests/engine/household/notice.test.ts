@@ -8,7 +8,7 @@ import {
 } from '../../../src/engine/household/notice';
 import { countedAmount, highestAmount } from '../../../src/engine/household/review';
 import { round2 } from '../../../src/engine/money';
-import { desistimiento, household, single } from './input';
+import { desistimiento, household, single, DEPS } from './input';
 import { NORMS } from './norms-table';
 
 const d = parseDate;
@@ -26,6 +26,7 @@ const run = (noticeOn: string, lastDay: string, termination = {}) =>
       }),
     }),
     NORMS,
+    DEPS.minimumWage,
   );
 
 describe('notice counted in calendar days (Código Civil 5.1 and 5.2)', () => {
@@ -128,7 +129,11 @@ describe('the notice finding', () => {
       'desistimiento_notice',
       'desistimiento_leave',
     ]);
-    const part = assessNotice(household({ weeklyHours: 20, termination: desistimiento() }), NORMS);
+    const part = assessNotice(
+      household({ weeklyHours: 20, termination: desistimiento() }),
+      NORMS,
+      DEPS.minimumWage,
+    );
     expect(part).toHaveLength(1);
   });
 
@@ -136,10 +141,15 @@ describe('the notice finding', () => {
     const asked = assessNotice(
       household({ termination: desistimiento({ noticeGivenOn: null }) }),
       NORMS,
+      DEPS.minimumWage,
     );
     expect(single(asked, 'desistimiento_notice').status).toBe('not_entered');
     expect(
-      assessNotice(household({ termination: desistimiento({ route: 'et_cause' }) }), NORMS),
+      assessNotice(
+        household({ termination: desistimiento({ route: 'et_cause' }) }),
+        NORMS,
+        DEPS.minimumWage,
+      ),
     ).toEqual([]);
   });
 
@@ -151,6 +161,7 @@ describe('the notice finding', () => {
           termination: desistimiento({ noticeGivenOn: d('2026-09-10') }),
         }),
         NORMS,
+        DEPS.minimumWage,
       ),
       'desistimiento_notice',
     );

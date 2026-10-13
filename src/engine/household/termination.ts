@@ -3,7 +3,8 @@ import { assessAcross } from '../law/readings';
 import { findingsFor, single, type Verdict } from './finding';
 import type { NormTable } from './norms';
 import { noticeShort } from './notice';
-import { annualPay } from './salary';
+import type { MinimumWageTable } from '../law/minimum-wage';
+import { basePay } from './salary';
 import { severanceDays, severanceFigures } from './severance';
 import { minutesOf } from './validate';
 import type {
@@ -29,20 +30,24 @@ const isLegalCause = (c: DesistimientoCause): c is keyof typeof LEGAL_CAUSE_PHRA
 
 // The severance made available is below the one the counted reading requires: an error in the
 // figure, whose difference is owed but which does not by itself bring the dismissal regime.
-function severanceShort(input: HouseholdInput): boolean {
+function severanceShort(input: HouseholdInput, minimumWage: MinimumWageTable): boolean {
   const t = input.termination;
-  const annual = annualPay(input);
-  if (t === null || annual === null || t.severanceAvailable !== true || t.severanceOffered === null)
+  const base = basePay(input, minimumWage);
+  if (t === null || base === null || t.severanceAvailable !== true || t.severanceOffered === null)
     return false;
   return (
     t.severanceOffered <
-    severanceFigures(input.startDate, t.effectiveOn, annual).completeYearsOnly.amount
+    severanceFigures(input.startDate, t.effectiveOn, base.annual).completeYearsOnly.amount
   );
 }
 
 // Art. 11.1 and 11.2: how the employer ended the relationship. The engine checks the form and the
 // category of the cause, never whether the cause is true.
-export function assessTermination(input: HouseholdInput, norms: NormTable): readonly Assessed[] {
+export function assessTermination(
+  input: HouseholdInput,
+  norms: NormTable,
+  minimumWage: MinimumWageTable,
+): readonly Assessed[] {
   const t = input.termination;
   if (t === null) return [];
   const make = findingsFor('termination');
@@ -102,7 +107,7 @@ export function assessTermination(input: HouseholdInput, norms: NormTable): read
   // available. A short notice or an error in the figure does not bring it: the difference is owed.
   // Whether a severance was owed at all depends on how an incomplete year counts, so the
   // presumption is read in both readings and counts only where it holds in both.
-  out.push(dismissalPresumed(input, t, norms));
+  out.push(dismissalPresumed(input, t, norms, minimumWage));
 
   // Art. 11.4.
   if (input.liveIn) out.push(nightNotice(input, one));
@@ -113,12 +118,13 @@ function dismissalPresumed(
   input: HouseholdInput,
   t: HouseholdTermination,
   norms: NormTable,
+  minimumWage: MinimumWageTable,
 ): Assessed {
   const make = findingsFor('termination');
   const days = severanceDays(input.startDate, t.effectiveOn);
   const differences: HouseholdPhrase[] = [
     ...(noticeShort(input) ? [phrase('dismissal.short_notice')] : []),
-    ...(severanceShort(input) ? [phrase('dismissal.figure_difference')] : []),
+    ...(severanceShort(input, minimumWage) ? [phrase('dismissal.figure_difference')] : []),
   ];
   const verdict = (world: ReadingCode<'incomplete_year'>): Verdict => {
     const owed =
@@ -145,7 +151,7 @@ function dismissalPresumed(
         basedOnYourAnswer: true,
       };
     return {
-      status: severanceShort(input) ? 'review_it' : 'within_limit',
+      status: severanceShort(input, minimumWage) ? 'review_it' : 'within_limit',
       calculation: [
         phrase(owed ? 'dismissal.none_of_the_two' : 'dismissal.none_of_the_two_no_severance_due'),
         ...differences,

@@ -85,9 +85,9 @@ export function reviewHousehold(
     ...assessMinimumWage(input, deps, today),
     ...assessWorkingTime(input, norms),
     ...assessHolidays(input, norms),
-    ...assessTermination(input, norms),
-    assessSeverance(input, norms),
-    ...assessNotice(input, norms),
+    ...assessTermination(input, norms, deps.minimumWage),
+    assessSeverance(input, norms, deps.minimumWage),
+    ...assessNotice(input, norms, deps.minimumWage),
     assessUnemployment(input, norms),
   ].filter(isAssessed);
   return {

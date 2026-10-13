@@ -2,11 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
 import { assessTermination } from '../../../src/engine/household/termination';
 import type { Finding, HouseholdInput } from '../../../src/engine/household/types';
-import { desistimiento, findingOf, household, single, singles, statusOf } from './input';
+import { desistimiento, findingOf, household, single, singles, statusOf, DEPS } from './input';
 import { NORMS } from './norms-table';
 
 const run = (change: Partial<HouseholdInput> = {}, termination = {}) =>
-  assessTermination(household({ termination: desistimiento(termination), ...change }), NORMS);
+  assessTermination(
+    household({ termination: desistimiento(termination), ...change }),
+    NORMS,
+    DEPS.minimumWage,
+  );
 
 const keys = (f: Finding) => f.calculation.map((p) => p.key);
 
@@ -49,7 +53,7 @@ describe('the cause of a desistimiento (art. 11.2)', () => {
   });
 
   it('says nothing without a termination', () => {
-    expect(assessTermination(household(), NORMS)).toEqual([]);
+    expect(assessTermination(household(), NORMS, DEPS.minimumWage)).toEqual([]);
   });
 });
 

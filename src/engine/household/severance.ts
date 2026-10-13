@@ -5,7 +5,8 @@ import { assessAcross } from '../law/readings';
 import { phrase, type HouseholdPhrase } from './calculation';
 import { findingsFor, type Verdict } from './finding';
 import type { NormTable } from './norms';
-import { annualPay } from './salary';
+import type { MinimumWageTable } from '../law/minimum-wage';
+import { basePay } from './salary';
 import type { Assessed, Finding, HouseholdInput, ReadingCode } from './types';
 
 // Art. 11.2: twelve days of salary per year of service, six monthly salaries at most. A monthly
@@ -123,12 +124,16 @@ function verdictOf(figures: HouseholdSeverance, p: SeverancePart, input: Househo
 }
 
 // Art. 11.2: the severance a desistimiento makes available with the notice.
-export function assessSeverance(input: HouseholdInput, norms: NormTable): Assessed | null {
+export function assessSeverance(
+  input: HouseholdInput,
+  norms: NormTable,
+  minimumWage: MinimumWageTable,
+): Assessed | null {
   const t = input.termination;
   if (t === null || t.route !== 'desistimiento') return null;
   const make = findingsFor('severance');
-  const annual = annualPay(input);
-  if (annual === null)
+  const base = basePay(input, minimumWage);
+  if (base === null)
     return {
       kind: 'single',
       finding: make(
@@ -137,17 +142,20 @@ export function assessSeverance(input: HouseholdInput, norms: NormTable): Assess
         norms,
       ),
     };
-  const figures = severanceFigures(input.startDate, t.effectiveOn, annual);
-  const finding = (world: ReadingCode<'incomplete_year'>): Finding =>
-    make(
+  const figures = severanceFigures(input.startDate, t.effectiveOn, base.annual);
+  const raised = base.raisedToMinimum ? [phrase('base.minimum_wage')] : [];
+  const finding = (world: ReadingCode<'incomplete_year'>): Finding => {
+    const verdict = verdictOf(
+      figures,
+      world === 'complete_years_only' ? figures.completeYearsOnly : figures.proratedByMonths,
+      input,
+    );
+    return make(
       'desistimiento_severance',
-      verdictOf(
-        figures,
-        world === 'complete_years_only' ? figures.completeYearsOnly : figures.proratedByMonths,
-        input,
-      ),
+      { ...verdict, calculation: [...raised, ...(verdict.calculation ?? [])] },
       norms,
     );
+  };
   const readings = assessAcross(
     'incomplete_year',
     ['complete_years_only', 'prorated_by_months'],

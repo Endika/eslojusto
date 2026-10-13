@@ -4,7 +4,7 @@ import { round2 } from '../../../src/engine/money';
 import { assessSeverance, severanceFigures } from '../../../src/engine/household/severance';
 import { countedAmount, highestAmount } from '../../../src/engine/household/review';
 import { NORMS } from './norms-table';
-import { desistimiento, household } from './input';
+import { desistimiento, household, DEPS } from './input';
 
 // 1.500 × 12 + 2 × 1.500 = 21.000 € a year, 21.000 / 365 a day.
 const ANNUAL = 21_000;
@@ -61,6 +61,22 @@ describe('severance of a desistimiento: 12 days a year (art. 11.2)', () => {
   });
 });
 
+describe('the base under the minimum wage', () => {
+  it('takes the minimum wage for the hours when the pay falls below it, as a reading', () => {
+    const below = household({
+      startDate: START,
+      payYear: 2026,
+      weeklyHours: 40,
+      monthlyCash: 1000,
+      extraPays: { count: 2, amount: 0, prorated: true, accrual: 'semiannual' },
+      termination: desistimiento({ effectiveOn: parseDate('2026-09-21') }),
+    });
+    const a = assessSeverance(below, NORMS, DEPS.minimumWage);
+    const f = a?.kind === 'single' ? a.finding : a?.readings[0]?.finding;
+    expect(f?.calculation[0]?.key).toBe('base.minimum_wage');
+  });
+});
+
 describe('the severance finding', () => {
   const run = (end: string, termination = {}) =>
     assessSeverance(
@@ -69,6 +85,7 @@ describe('the severance finding', () => {
         termination: desistimiento({ effectiveOn: parseDate(end), ...termination }),
       }),
       NORMS,
+      DEPS.minimumWage,
     );
 
   it('is one finding when the years are complete', () => {
@@ -112,6 +129,7 @@ describe('the severance finding', () => {
     const a = assessSeverance(
       household({ monthlyCash: null, termination: desistimiento() }),
       NORMS,
+      DEPS.minimumWage,
     );
     if (a?.kind !== 'single') throw new Error('expected one finding');
     expect(a.finding.status).toBe('not_entered');
@@ -119,9 +137,13 @@ describe('the severance finding', () => {
 
   it('does not apply to any other termination', () => {
     expect(
-      assessSeverance(household({ termination: desistimiento({ route: 'et_cause' }) }), NORMS),
+      assessSeverance(
+        household({ termination: desistimiento({ route: 'et_cause' }) }),
+        NORMS,
+        DEPS.minimumWage,
+      ),
     ).toBeNull();
-    expect(assessSeverance(household(), NORMS)).toBeNull();
+    expect(assessSeverance(household(), NORMS, DEPS.minimumWage)).toBeNull();
   });
 
   it('cites art. 11.2', () => {
