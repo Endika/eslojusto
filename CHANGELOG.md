@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.55.1](https://github.com/Endika/eslojusto/compare/v1.55.0...v1.55.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* **rental:** a review with points to check no longer reads «nada sale por encima» ([06fc2e4](https://github.com/Endika/eslojusto/commit/06fc2e49af0359069ef27493d184bd268e0dd1ce))
+* **rental:** count a rise paid over up to today, at most five years back ([005bb23](https://github.com/Endika/eslojusto/commit/005bb235b84b0976b1a436b4884e04fa1bc4fd98))
+* **rental:** no IPC limit on a new pact the law does not set ([6b29335](https://github.com/Endika/eslojusto/commit/6b2933598d40e05f54e9b1322e369e5c734d76ce))
+* **rental:** say «hasta hoy» only when the count reaches today, over exactly sixty months ([b80c095](https://github.com/Endika/eslojusto/commit/b80c095f4c8779aa98ce9252976cdac9b877bbee))
+
 ## [1.55.0](https://github.com/Endika/eslojusto/compare/v1.54.6...v1.55.0) (2026-10-13)
 
 
