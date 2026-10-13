@@ -958,6 +958,23 @@ describe('the months a rise paid over counts', () => {
     expect(keys(v)).not.toContain('rent_update.until_today');
   });
 
+  it('stopped by the keys past the anniversary, never say «hasta hoy»', () => {
+    // Keys back on 15-06-2026, past the March 2026 anniversary: the count stops at May 2026.
+    const v = single(
+      first(
+        check(
+          contract({
+            signedOn: f('2024-03-15'),
+            startDate: f('2024-03-20'),
+            updates: [update('2025-03-20', 1000, 1030)],
+            moveOut: { keysReturnedOn: f('2026-06-15'), returns: [], deductions: [] },
+          }),
+        ),
+      ),
+    );
+    expect(keys(v)).not.toContain('rent_update.until_today');
+  });
+
   it('stop at the keys and count only months already due', () => {
     const input = contract({
       updates: [update('2025-03-20', 1000, 1040)],

@@ -167,8 +167,11 @@ function frameOf(
   if (next && monthIndex(next.chargedFrom) > monthIndex(update.chargedFrom))
     endMonth = Math.min(endMonth, monthIndex(next.chargedFrom) - 1);
   if (input.moveOut) endMonth = Math.min(endMonth, monthIndex(input.moveOut.keysReturnedOn) - 1);
-  const untilToday = next === undefined && endMonth >= monthIndex(nextAnniversary);
-  const limitFrom = monthIndex(today) - LIMITATION_MONTHS;
+  // Only a count that reaches the last month due rests on the rent having stayed as charged.
+  const untilToday =
+    endMonth === due && next === undefined && endMonth >= monthIndex(nextAnniversary);
+  // The sixty months up to the last one due.
+  const limitFrom = due - LIMITATION_MONTHS + 1;
 
   const active = new Map<RuleId, ActiveRule>();
   const refs = new Map<IndexId, ReferenceMonth>();
