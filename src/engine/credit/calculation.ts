@@ -52,6 +52,7 @@ export type CreditPhraseKey =
   | 'indicator.edge'
   | 'indicator.below'
   | 'indicator.distance'
+  | 'indicator.loan_criterion'
   | 'indicator.loan_criterion_unread'
   | 'indicator.revolving_criterion'
   | 'indicator.edge_reason'

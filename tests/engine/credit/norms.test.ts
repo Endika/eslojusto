@@ -134,7 +134,7 @@ describe('average-rate criteria', () => {
     expect(r.sources).toEqual([r.source, 'bde_be1904']);
   });
 
-  it('the revolving criterion is read in its text; the loan one is not yet', () => {
+  it('both criteria are read in their text', () => {
     expect(criterionSource('usury_indicator_revolving', CREDIT_SOURCES)).toMatchObject({
       number: '258/2023',
       decidedOn: '2023-02-15',
@@ -144,8 +144,8 @@ describe('average-rate criteria', () => {
     expect(criterionSource('usury_indicator_loan', CREDIT_SOURCES)).toMatchObject({
       number: '366/2026',
       decidedOn: '2026-03-09',
-      verified: false,
-      ecli: null,
+      verified: true,
+      ecli: 'ECLI:ES:TS:2026:1013',
     });
   });
 

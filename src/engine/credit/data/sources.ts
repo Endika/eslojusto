@@ -25,7 +25,7 @@ export const CREDIT_SOURCES: SourceTable = {
     quotes: [],
   },
   // Consumer loans: the revolving threshold is not directly applicable but may be taken into
-  // account. Not yet read in CENDOJ, so the loan indicator gives only the distance in points.
+  // account, so the loan indicator gives the distance in points and the ruling, never a band.
   sts366_2026: {
     id: 'sts366_2026',
     basis: 'case_law',
@@ -36,10 +36,14 @@ export const CREDIT_SOURCES: SourceTable = {
     court: SUPREME_CIVIL,
     number: '366/2026',
     decidedOn: '2026-03-09',
-    ecli: null,
-    lastVerified: '2026-10-07',
-    verified: false,
-    quotes: [],
+    ecli: 'ECLI:ES:TS:2026:1013',
+    lastVerified: '2026-10-14',
+    verified: true,
+    quotes: [
+      'no resulta directamente aplicable a un supuesto como el presente de préstamo personal, en el que el tipo medio de mercado es inferior al 15%.',
+      'Pero, nada impide que se tenga en consideración para realizar la valoración de si el interés pactado es notablemente superior al tipo medio de mercado de estas operaciones de crédito en el momento que se pactó.',
+      'en este caso es bastante superior a los 6 puntos, siendo del 8,51%',
+    ],
   },
   // The monthly averages the indicator compares with (data/be1904.ts).
   bde_be1904: {

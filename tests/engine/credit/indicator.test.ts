@@ -29,10 +29,10 @@ const indicate = (
 
 const keys = (i: ReturnType<typeof indicate>) => i.calculation.map((p) => p.key);
 
-// The loan criterion as it will stand once read in its text.
-const loanCriterionRead: SourceTable = {
+// The loan criterion as it stood before it was read in its text.
+const loanCriterionUnread: SourceTable = {
   ...CREDIT_SOURCES,
-  sts366_2026: { ...CREDIT_SOURCES.sts366_2026, verified: true },
+  sts366_2026: { ...CREDIT_SOURCES.sts366_2026, verified: false },
 };
 
 describe('the indicator against the Bank of Spain average rate', () => {
@@ -46,14 +46,19 @@ describe('the indicator against the Bank of Spain average rate', () => {
       reference: { kind: 'series', series: 'BE_19_4.10', month: '2019-02', value: 8.0989 },
       points: 8.51,
     });
-    expect(keys(i)).toContain('indicator.loan_criterion_unread');
+    expect(keys(i)).toContain('indicator.loan_criterion');
     expect(keys(i)).not.toContain('indicator.above');
     expect(i.sources.map((s) => s.id)).toEqual(['sts366_2026', 'bde_be1904']);
   });
 
-  it('gives a loan its band once the loan criterion is read in its text', () => {
-    const deps = { ...DEPS, sources: loanCriterionRead };
-    expect(indicate('personal_loan', '2019-02-15', declared(16.61), 48, deps).status).toBe('above');
+  // STS 366/2026: the cards' 6 points are not directly applicable to a loan.
+  it('never gives a loan a band, read or not, and says when the ruling was not read', () => {
+    const unread = indicate('personal_loan', '2019-02-15', declared(16.61), 48, {
+      ...DEPS,
+      sources: loanCriterionUnread,
+    });
+    expect(unread.status).toBe('distance_only');
+    expect(keys(unread)).toContain('indicator.loan_criterion_unread');
   });
 
   it.each([
