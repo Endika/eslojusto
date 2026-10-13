@@ -7,16 +7,19 @@ import type { SectionForm } from '../calculator/section';
 import { createBasket } from '../documents/basket';
 import { DOCUMENTS } from '../documents/config';
 import { ELECTRICITY_EXTRACTION } from '../documents/contract';
+import type { NormTable } from '../engine/bills/norms';
 import { billsTranslator } from './bills-copy';
 import { UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
 
-// Document reading and «tu año» on the electricity review's page. A read can bring several bills:
-// each fills the form in turn and, once reviewed, joins the year, which lives in this page's
-// memory only. One pass is offered for the whole year, by what its bills add up to or repeat.
+// Document reading, «tu año», the report and the letter on the electricity review's page. A read
+// can bring several bills: each fills the form in turn and, once reviewed, joins the year, which
+// lives in this page's memory only. One pass is offered for the whole year, by what its bills add
+// up to or repeat. The norms are the ones the reviews read.
 export function wireElectricityDocuments(
   electricity: SectionForm,
   hooks: ReviewHooks<CompletedElectricityReview>,
   arrival: { hash: string; search: string },
+  norms: NormTable,
 ): void {
   const tr = billsTranslator();
   const { form } = electricity;
@@ -47,7 +50,7 @@ export function wireElectricityDocuments(
       reading,
       steps: STEPS,
       keptReviewKey: 'eslojusto-revision-luz-en-pago',
-      paidReview: () => electricityCase(year.entries()),
+      paidReview: () => electricityCase(year.entries(), norms),
       decorateResult: show,
       restore: (saved) => saved,
     },

@@ -39,10 +39,10 @@ const PRICE_UNIT: Record<'per_kw_day' | 'per_kw_year' | 'per_kwh', ClientKey> = 
   per_kwh: 'client.bills.unit.per_kwh',
 };
 
-const daysText = (n: number, tr: Translate): string =>
+export const daysText = (n: number, tr: Translate): string =>
   tr(n === 1 ? 'client.bills.unit.day_one' : 'client.bills.unit.day_many', { n: formatDays(n) });
 
-const monthsText = (n: number, tr: Translate): string =>
+export const monthsText = (n: number, tr: Translate): string =>
   tr(n === 1 ? 'client.bills.unit.month_one' : 'client.bills.unit.month_many', {
     n: formatInteger(n),
   });
@@ -117,6 +117,9 @@ const READING: Record<OfficialReading | HandsetReading, ClientKey> = {
   whole_value: 'client.bills.reading.whole_value',
   prorated_value: 'client.bills.reading.prorated_value',
 };
+
+export const readingText = (when: OfficialReading | HandsetReading, tr: Translate): string =>
+  tr(READING[when]);
 
 // ---------- Sources ----------
 
@@ -269,7 +272,7 @@ function itemCard(item: BillItem, norms: NormTable, tr: Translate): Card {
     calculation: [],
     depends: tr(`client.bills.depends.${item.question}`),
     readings: item.readings.map((r) => ({
-      title: tr(READING[r.when]),
+      title: readingText(r.when, tr),
       status: statusText(r.finding, tr),
       calculation: calculationLines(r.finding.calculation, tr),
     })),

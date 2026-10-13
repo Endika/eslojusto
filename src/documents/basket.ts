@@ -1,6 +1,7 @@
 import type { CivilDate } from '../engine/date';
 import type { ClientKey, Translate } from '../i18n/client';
-import type { DocumentModel, PaidReview } from './ports';
+import type { LetterDetails, LetterKind } from './letter';
+import type { DocumentModel, Download, PaidReview } from './ports';
 
 // Several reviews of one section under one pass, such as a year of bills, each confirmed on its
 // own. It lives in the page's memory only and is never stored: closing the tab empties it.
@@ -36,24 +37,48 @@ export function createBasket<T>(): ReviewBasket<T> {
   };
 }
 
+// The letters a basket can give, over every review kept: those the pass pays for and those that
+// carry no figure and download free.
+export interface BasketLetters<T> {
+  paid(entries: readonly T[]): readonly LetterKind[];
+  free?(entries: readonly T[]): readonly LetterKind[];
+  letter(
+    entries: readonly T[],
+    kind: LetterKind,
+    details: LetterDetails,
+    tr: Translate,
+  ): DocumentModel;
+  filename(kind: LetterKind): ClientKey;
+}
+
 // What a section brings to sell one pass for its whole basket: the rule that offers it, over every
-// review kept, and the report that adds them up.
+// review kept, the report that adds them up and the letters, if it has any.
 export interface BasketSection<T> {
   offer(entries: readonly T[]): boolean;
   report(entries: readonly T[], tr: Translate, today: CivilDate): DocumentModel;
   readonly reportFilename: ClientKey;
+  readonly letters?: BasketLetters<T>;
 }
 
-// A basket as the pass sees it. It has no letter of its own.
+// A basket as the pass sees it. A letter the basket does not offer is never built.
 export function basketCase<T>(entries: readonly T[], section: BasketSection<T>): PaidReview {
   const kept = [...entries];
+  const { letters } = section;
+  const letterKinds = letters?.paid(kept) ?? [];
+  const freeLetterKinds = letters?.free?.(kept) ?? [];
   return {
     offer: kept.length > 0 && section.offer(kept),
-    letterKinds: [],
+    letterKinds,
+    freeLetterKinds,
     report: (tr, today) => section.report(kept, tr, today),
-    letter() {
-      throw new Error('A basket has no letter');
+    letter(kind, details, tr) {
+      if (!letters || ![...letterKinds, ...freeLetterKinds].includes(kind))
+        throw new Error(`This basket has no ${kind} letter`);
+      return letters.letter(kept, kind, details, tr);
     },
-    filename: () => section.reportFilename,
+    filename: (document: Download, kind?: LetterKind) =>
+      document === 'letter' && kind !== undefined && letters
+        ? letters.filename(kind)
+        : section.reportFilename,
   };
 }

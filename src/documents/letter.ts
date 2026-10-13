@@ -16,7 +16,8 @@ export interface LetterDetails {
   readonly iban?: string;
   // Only the contract review's letters ask for the workplace.
   readonly workplace?: string;
-  // Only the credit, insurance and mortgage letters ask for the contract, policy or loan number.
+  // Only the credit, insurance, mortgage and bills letters ask for the contract, policy or loan
+  // number.
   readonly reference?: string;
 }
 
@@ -26,8 +27,8 @@ export const LETTER_FIELDS = ['name', 'id', 'company', 'place'] as const;
 export const RENTAL_LETTER_FIELDS = ['name', 'id', 'landlord', 'address', 'place', 'iban'] as const;
 // And on the contract review's.
 export const EMPLOYMENT_LETTER_FIELDS = ['name', 'id', 'company', 'workplace', 'place'] as const;
-// And on the credit, insurance and mortgage letters, where the company is the lender, the insurer or
-// the bank.
+// And on the credit, insurance, mortgage and bills letters, where the company is the lender, the
+// insurer, the bank, the electricity retailer or the phone operator.
 export const FINANCE_LETTER_FIELDS = ['name', 'id', 'company', 'reference', 'place'] as const;
 export type LetterField =
   | (typeof LETTER_FIELDS)[number]
@@ -70,7 +71,10 @@ export const LETTER_MAX_LENGTH: Record<LetterField, number> = {
 // repayment's compensation (`early_repayment_review`); the insurance review's tells the insurer the
 // policy is not to be extended (`insurance_non_renewal`); the mortgage review's asks the bank for the
 // mortgage's documents (`mortgage_documents`) or to look again at what the law puts on it
-// (`mortgage_amounts`).
+// (`mortgage_amounts`); the electricity review's asks the retailer for corrective invoices
+// (`bill_correction`); the telecom review's tells the operator the exit follows a change of
+// conditions (`telecom_exit_without_penalty`) or asks it to look again at a commitment penalty
+// (`telecom_penalty_review`).
 export const LETTER_KINDS = [
   'items',
   'general',
@@ -84,6 +88,9 @@ export const LETTER_KINDS = [
   'insurance_non_renewal',
   'mortgage_documents',
   'mortgage_amounts',
+  'bill_correction',
+  'telecom_exit_without_penalty',
+  'telecom_penalty_review',
 ] as const;
 export type LetterKind = (typeof LETTER_KINDS)[number];
 

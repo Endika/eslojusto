@@ -1,7 +1,7 @@
 import { formatCalculationEuros, formatWholeEuros } from '../../calculator/number';
 import { find, listOf } from '../../calculator/review-result';
 import type { Translate } from '../../i18n/client';
-import { billHeading, electricityBasket } from './case';
+import { billHeading, electricityBasket } from './year';
 import type { CompletedElectricityReview } from './ports';
 
 // «Tu año»: every bill reviewed in this tab, what those that count add up to, and the yearly

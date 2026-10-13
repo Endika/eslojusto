@@ -6549,7 +6549,32 @@ export const es = {
     'Sube tu contrato y, si las tienes, tus facturas de teléfono o internet',
   'bills.telecom.documents.files_hint':
     'El contrato o sus condiciones de permanencia y, si las tienes, las facturas con la penalización o con cobros de después de la baja, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
-  'bills.pass.title': 'El informe de tus facturas',
+  'bills.pass.title': 'El informe de tus facturas y la carta',
+  'bills.pass.letter_note':
+    'La carta es una plantilla. Se descarga en tu dispositivo y no se envía desde aquí: usarla o no, y cómo, es decisión tuya.',
+  'bills.pass.download_correction_letter':
+    'Descargar la carta que pide la factura rectificativa (PDF)',
+  'bills.letter.legend': 'Tus datos para la carta (opcional)',
+  'bills.letter.id': 'DNI o NIE (opcional)',
+  'bills.letter.company': 'Comercializadora',
+  'bills.letter.reference': 'Número de contrato',
+  'bills.letter.privacy':
+    'Estos datos solo se usan para rellenar la carta en tu dispositivo; no se envían ni se guardan.',
+  'bills.telecom.pass.title': 'El informe y las cartas',
+  'bills.telecom.pass.letter_note':
+    'Las cartas son plantillas. Se descargan en tu dispositivo y no se envían desde aquí: usarlas o no, y cómo, es decisión tuya.',
+  'bills.telecom.pass.download_exit_letter':
+    'Descargar la carta sobre la baja tras un cambio de condiciones (PDF, gratis)',
+  'bills.telecom.pass.download_penalty_letter':
+    'Descargar la carta que pide revisar la penalización (PDF)',
+  'bills.telecom.letters.title': 'Carta que puedes descargar gratis',
+  'bills.telecom.letters.text':
+    'Esta carta dice a tu operador cuándo te avisó del cambio y cuándo pediste la baja, sin cifras, y se descarga gratis. Se genera en tu dispositivo.',
+  'bills.telecom.letter.legend': 'Tus datos para las cartas (opcional)',
+  'bills.telecom.letter.company': 'Operador',
+  'bills.telecom.letter.reference': 'Número de cliente o de contrato',
+  'bills.telecom.letter.privacy':
+    'Estos datos solo se usan para rellenar las cartas en tu dispositivo; no se envían ni se guardan.',
   'bills.pass.price':
     '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador: en ese tiempo puedes leer hasta 15 paquetes de documentos, en cualquier sección, y volver a descargar el informe sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
   'bills.basket.memory':
@@ -6683,11 +6708,12 @@ export const es = {
   'client.bills.result.telecom_lead_nothing':
     'Con lo que has metido no hay penalización ni cobros de después de la baja que comprobar.',
   'client.bills.result.lead_out_of_scope': 'Esta revisión todavía no cubre lo que has metido.',
-  'client.bills.pass.issued': 'Pago recibido. Ya puedes descargar el informe.',
+  'client.bills.pass.issued':
+    'Pago recibido. Ya puedes descargar el informe y, si tu revisión tiene cifras para ella, la carta.',
   'client.bills.pass.offer':
-    'Revisa tu año entero: con un pase de 4,99 € revisas hasta ~15 lecturas durante 7 días, en cualquier sección.',
+    'Revisa tu año entero: con un pase de 4,99 € revisas hasta ~15 lecturas durante 7 días, en cualquier sección. Descargas el informe de tus facturas y, si alguna línea pasa de la norma, la carta que pide la factura rectificativa.',
   'client.bills.telecom.pass.offer':
-    'Con un pase de 4,99 € descargas el informe de tu baja y revisas hasta ~15 lecturas durante 7 días, en cualquier sección.',
+    'Con un pase de 4,99 € descargas el informe de tu baja y, si la penalización pasa de lo que permite la norma, la carta que pide revisarla, y revisas hasta ~15 lecturas durante 7 días, en cualquier sección.',
   'client.bills.basket.title_one': 'Tu año: 1 factura revisada',
   'client.bills.basket.title_many': 'Tu año: {n} facturas revisadas',
   'client.bills.basket.bill': 'Factura del {desde} al {hasta}',
@@ -6737,6 +6763,7 @@ export const es = {
   'client.bills.report.reviews': 'Línea por línea',
   'client.bills.report.year': 'Lo que suman tus facturas',
   'client.bills.report.counted': 'Por encima de la norma',
+  'client.bills.report.row': 'Valor oficial usado: {norma} · {estado}',
   'client.bills.electricity.report.title': 'Revisión de tus facturas de la luz',
   'client.bills.electricity.report.intro':
     'Este informe compara cada factura de la luz que revisaste con tus propios precios y con lo que fija la norma, con los datos que confirmaste. Cada factura cuenta una sola vez, lo cobrado de menos va aparte y la estimación a un año no se suma a ningún total. Informa sobre la norma y no es asesoramiento jurídico.',
@@ -6746,6 +6773,58 @@ export const es = {
     'Este informe compara la penalización y los cobros de tu baja con lo que permite la norma, con los datos que confirmaste en la revisión. Informa sobre la norma y no es asesoramiento jurídico.',
   'client.bills.telecom.report.exit': 'Tu baja',
   'client.bills.telecom.report.filename': 'eslojusto-informe-baja-telefono.pdf',
+  'client.bills.letter.regards': 'Un saludo.',
+  'client.bills.letter.retailer': 'Comercializadora',
+  'client.bills.letter.reference': 'Número de contrato',
+  'client.bills.letter.correction.title_one': 'Petición de factura rectificativa',
+  'client.bills.letter.correction.title_many': 'Petición de facturas rectificativas',
+  'client.bills.letter.correction.intro_one':
+    'Te escribo por una factura de la luz en la que algunas líneas pasan de lo que fija la norma. En cada una pongo lo facturado, lo que fija la norma y la diferencia:',
+  'client.bills.letter.correction.intro_many':
+    'Te escribo por {n} facturas de la luz en las que algunas líneas pasan de lo que fija la norma. En cada una pongo lo facturado, lo que fija la norma y la diferencia:',
+  'client.bills.letter.correction.line':
+    '{linea}: facturado, {facturado}; lo que fija la norma, {norma}; diferencia, {diferencia}.',
+  'client.bills.letter.correction.line_discount':
+    '{linea}: descuento aplicado, {facturado}; lo que fija la norma, {norma}; diferencia, {diferencia}.',
+  'client.bills.letter.correction.line_difference': '{linea}: diferencia, {diferencia}.',
+  'client.bills.letter.correction.total': 'En total, las diferencias suman {importe}.',
+  'client.bills.letter.correction.lowest':
+    'Alguna de estas cifras depende de un dato que admite más de una lectura: es la de la lectura que da menos diferencia.',
+  'client.bills.letter.correction.refund':
+    'El art. 45.2 del Reglamento que aprueba el Real Decreto 88/2026 dice que, si el comercializador ha facturado cantidades superiores a las debidas, en relación con la energía o con el acceso a las redes, deben devolverse todas las cantidades indebidamente facturadas en la primera facturación siguiente, sin fraccionarlas, con los intereses del tipo de interés legal del dinero más 150 puntos básicos.',
+  'client.bills.letter.correction.ask':
+    'Te pido que revises estas líneas y me envíes una factura rectificativa de cada factura, o que me expliques por escrito en qué se basa cada importe.',
+  'client.bills.letter.correction.filename': 'eslojusto-carta-factura-rectificativa.pdf',
+  'client.bills.telecom.letter.operator': 'Operador',
+  'client.bills.telecom.letter.reference': 'Número de cliente o de contrato',
+  'client.bills.telecom.letter.exit.title': 'Baja tras un cambio de condiciones',
+  'client.bills.telecom.letter.exit.notice':
+    'El {aviso} me comunicaste un cambio en las condiciones de mi contrato.',
+  'client.bills.telecom.letter.exit.notice_applies':
+    'El {aviso} me comunicaste un cambio en las condiciones de mi contrato, que se aplicaba desde el {aplica}.',
+  'client.bills.telecom.letter.exit.request':
+    'El {baja} pedí la baja, dentro del mes siguiente a esa comunicación.',
+  'client.bills.telecom.letter.exit.rule':
+    'El art. 67.8 de la Ley 11/2022, General de Telecomunicaciones, recoge el derecho a rescindir el contrato sin contraer ningún coste adicional cuando el operador anuncia cambios en las condiciones contractuales, salvo que sean exclusivamente en beneficio del usuario, de naturaleza estrictamente administrativa y sin efectos negativos, o impuestos por una norma, y dice que ese derecho puede ejercerse en el plazo de un mes a partir de la comunicación.',
+  'client.bills.telecom.letter.exit.handset_kept':
+    'Conservo el terminal subvencionado que venía con el contrato. El art. 67.10 de la misma ley dice que, cuando se tiene derecho a rescindir el contrato antes de que acabe el periodo fijado, no se abona ninguna compensación excepto por el equipo terminal subvencionado que se conserve.',
+  'client.bills.telecom.letter.exit.handset_returned':
+    'No conservo el terminal que venía con el contrato.',
+  'client.bills.telecom.letter.exit.ask':
+    'Te pido que revises la penalización que me has cobrado por esta baja.',
+  'client.bills.telecom.letter.exit.ask_handset':
+    'Te pido que revises la penalización que me has cobrado por esta baja y que me indiques cómo calculas lo que corresponde al terminal que conservo.',
+  'client.bills.telecom.letter.exit.filename': 'eslojusto-carta-baja-cambio-condiciones.pdf',
+  'client.bills.telecom.letter.penalty.title': 'Revisión de la penalización por permanencia',
+  'client.bills.telecom.letter.penalty.body':
+    'Mi contrato tenía una permanencia de {meses} desde el {inicio}, hasta el {fin}, con una penalización pactada de {pactada}. El {baja} pedí la baja: había cumplido {cumplidos} de permanencia y quedaban {pendientes}. Me cobraste {cobrada} de penalización.',
+  'client.bills.telecom.letter.penalty.rule':
+    'El art. 62.5 del texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios dice que la penalización por baja o cese prematuro será proporcional al número de días no efectivos del compromiso de permanencia acordado.',
+  'client.bills.telecom.letter.penalty.over':
+    'En proporción a los {pendientes} que quedaban de {total}, la penalización llega a {maximo}; la cobrada pasa de esa cifra en {diferencia}.',
+  'client.bills.telecom.letter.penalty.ask':
+    'Te pido que revises esta penalización y me respondas por escrito.',
+  'client.bills.telecom.letter.penalty.filename': 'eslojusto-carta-penalizacion-permanencia.pdf',
   'client.bills.unchecked.electricity.agreed_price':
     'Si el precio que te cobran es el que pactaste: hace falta tu contrato.',
   'client.bills.unchecked.electricity.price_notice':

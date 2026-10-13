@@ -66,6 +66,7 @@ if (documentsBuild) {
           detail: () => {},
         },
         arrival,
+        BILLS_NORMS,
       ),
     )
     .catch((error: unknown) => withoutDocuments(telecom.form, error));
