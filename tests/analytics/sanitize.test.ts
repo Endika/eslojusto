@@ -114,6 +114,17 @@ describe('only the listed properties leave', () => {
     );
   });
 
+  it('a campaign tag passes only as a short code, never as a name or an address', () => {
+    expect(
+      cleanProperties({
+        utm_source: 'boletin_otono-26',
+        utm_medium: 'ana.perez@correo.es',
+        utm_campaign: 'Ana Pérez',
+      }),
+    ).toEqual({ utm_source: 'boletin_otono-26' });
+    expect(cleanProperties({ utm_campaign: 'x'.repeat(41) })).toEqual({});
+  });
+
   it('$set and $set_once go through the same list and vanish when left empty', () => {
     const event = {
       uuid: 'u',

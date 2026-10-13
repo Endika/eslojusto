@@ -577,7 +577,7 @@ export const es = {
   'faq.documents_answer':
     'Si subes tus documentos (la carta de despido, el finiquito, tus nóminas, el certificado de empresa o tu vida laboral), se envían cifrados a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo indica qué es cada página, copia solo los datos que necesita el formulario y no calcula nada. Ni el servidor ni el modelo guardan el documento: se procesa en memoria y se descarta. Antes de subirlo te pedimos tu consentimiento, porque una nómina puede mostrar datos sensibles. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
 
-  'legal.updated': 'Actualizado el 11 de octubre de 2026',
+  'legal.updated': 'Actualizado el 13 de octubre de 2026',
   'legal.owner_name_label': 'Titular',
   'legal.owner_name': 'Endika Iglesias',
   'legal.owner_id_label': 'NIF',
@@ -642,7 +642,7 @@ export const es = {
   'privacy.rental.data_letters_where':
     'Lo que añades a las cartas (tu nombre, tu DNI o NIE, el nombre de tu casero, la dirección de la vivienda, la localidad y la cuenta IBAN en la que pides la fianza) solo rellena la carta en tu navegador. Las cartas y la cuenta no salen de tu dispositivo ni se guardan.',
   'privacy.rental.consent':
-    'En el alquiler, el contrato y los demás papeles llevan datos personales tuyos y de terceros, como el casero, quien avale o la agencia: nombres, DNI, la dirección de la vivienda o cuentas bancarias. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. El modelo tiene orden de no copiar esos datos y el servidor descarta lo que aún los lleve; nada se guarda.',
+    'En el alquiler, el contrato y los demás papeles llevan datos personales tuyos y de terceros, como el casero, quien avale o la agencia: nombres, DNI, la dirección de la vivienda o cuentas bancarias. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. Quien sube los documentos no puede consentir por otras personas: sus datos se tratan por interés legítimo (art. 6.1.f del RGPD), solo mientras el modelo lee, y ni se copian ni se guardan. El modelo tiene orden de no copiar esos datos y el servidor descarta lo que aún los lleve; nada se guarda.',
   'privacy.rental.tracked_sheets': 'En la revisión del alquiler',
   'privacy.rental.tracked_sheets_what':
     'Lo mismo que en el finiquito con sus hojas (contrato, casero, entrada, renta, subidas, gastos, salida y resultado): que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha del contrato», nunca lo que escribiste. Qué pregunta frecuente abres o de qué partida miras «Cómo se calcula», por su tipo (honorarios, fianza, garantía, pago por adelantado, subida, gasto, devolución o intereses de la fianza), nunca su concepto. Y si pulsas «Empezar de nuevo».',
@@ -4256,10 +4256,10 @@ export const es = {
   'privacy.insurance.data_letters_where':
     'Lo que añades a la carta para decir que no renuevas (tu nombre, tu DNI o NIE, la aseguradora, el número de póliza y la localidad) solo rellena la carta en tu navegador. La carta no sale de tu dispositivo ni se guarda.',
   'privacy.insurance.consent':
-    'En el seguro, la póliza y el aviso pueden llevar datos tuyos y de terceros, como quien conduce o vive en la casa, y a veces datos de salud. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. El modelo tiene orden de no copiar esos datos; nada se guarda.',
+    'En el seguro, la póliza y el aviso pueden llevar datos tuyos y de terceros, como quien conduce o vive en la casa, y a veces datos de salud. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. Quien sube los documentos no puede consentir por otras personas: sus datos se tratan por interés legítimo (art. 6.1.f del RGPD), solo mientras el modelo lee, y ni se copian ni se guardan. Si aparecen datos de salud de otra persona, el modelo tampoco los copia. El modelo tiene orden de no copiar esos datos; nada se guarda.',
   'privacy.insurance.tracked_documents': 'Al leer documentos del seguro',
   'privacy.insurance.tracked_documents_what':
-    'Los mismos avisos que con los demás documentos, con los tipos del seguro (póliza o aviso de renovación). Al descargar, si es el informe o la carta para decir que no renuevas y, de la carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en la carta.',
+    'La lectura de la póliza y del aviso de renovación no envía ningún aviso. Al descargar, si es el informe o la carta para decir que no renuevas y, de la carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en la carta.',
   'legal_notice.insurance': 'La revisión de las fechas de tu seguro',
   'legal_notice.insurance.does':
     'Calcula, para una póliza de hogar o de coche, el último día para comunicar que no la renuevas y si el aviso de cambios llegó con la antelación que pide la Ley de Contrato de Seguro, y, si la contrataste a distancia, el plazo para desistir de la Ley 22/2007. Cada fecha lleva el artículo del que sale.',
@@ -4288,10 +4288,10 @@ export const es = {
   'privacy.credit.data_letters_where':
     'Lo que añades a las cartas (tu nombre, tu DNI o NIE, el prestamista, el número de contrato y la localidad) solo rellena la carta en tu navegador. Las cartas no salen de tu dispositivo ni se guardan.',
   'privacy.credit.consent':
-    'En el crédito, el contrato y los demás papeles llevan tus datos personales y, si hay un seguro vinculado, pueden llevar datos de salud de su cuestionario. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. El modelo tiene orden de no copiar esos datos; nada se guarda.',
+    'En el crédito, el contrato y los demás papeles llevan tus datos personales y, si hay un seguro vinculado, pueden llevar datos de salud de su cuestionario. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. Quien sube los documentos no puede consentir por otras personas: sus datos se tratan por interés legítimo (art. 6.1.f del RGPD), solo mientras el modelo lee, y ni se copian ni se guardan. Si aparecen datos de salud de otra persona, el modelo tampoco los copia. El modelo tiene orden de no copiar esos datos; nada se guarda.',
   'privacy.credit.tracked_documents': 'Al leer documentos del crédito',
   'privacy.credit.tracked_documents_what':
-    'Los mismos avisos que con los demás documentos, con los tipos del crédito (contrato, información previa, cuadro de amortización, liquidación de una amortización o extracto de la tarjeta). Al descargar, si es el informe, la carta para pedir la información del crédito o la de la compensación por devolverlo antes y, de una carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en las cartas.',
+    'La lectura de los documentos del crédito no envía ningún aviso. Al descargar, si es el informe, la carta para pedir la información del crédito o la de la compensación por devolverlo antes y, de una carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en las cartas.',
   'legal_notice.credit': 'La revisión de la TAE y los plazos de tu crédito',
   'legal_notice.credit.does':
     'Vuelve a calcular la TAE de un préstamo personal, una financiación de coche o una tarjeta revolving con las cifras de su contrato, como fija la Ley 16/2011; compara esa TAE con el tipo medio que publica el Banco de España para el mes del contrato; comprueba si lo cobrado por devolverlo antes pasa del tope del art. 30 y calcula el plazo para desistir. Cada resultado lleva la norma, el criterio o el dato oficial del que sale.',
@@ -4320,7 +4320,7 @@ export const es = {
   'privacy.mortgage.data_letters_where':
     'Lo que añades a las cartas (tu nombre, tu DNI o NIE, el banco, el número de préstamo y la localidad) solo rellena la carta en tu navegador. Las cartas no salen de tu dispositivo ni se guardan.',
   'privacy.mortgage.consent':
-    'En la hipoteca, la escritura lleva tus datos personales y los de los avalistas y, si hay un seguro de vida vinculado, puede llevar datos de salud. Por eso también te pedimos tu consentimiento explícito antes de subirla, con la misma base jurídica. El modelo tiene orden de no copiar esos datos; nada se guarda.',
+    'En la hipoteca, la escritura lleva tus datos personales y los de los avalistas y, si hay un seguro de vida vinculado, puede llevar datos de salud. Por eso también te pedimos tu consentimiento explícito antes de subirla, con la misma base jurídica. Quien sube los documentos no puede consentir por otras personas: sus datos se tratan por interés legítimo (art. 6.1.f del RGPD), solo mientras el modelo lee, y ni se copian ni se guardan. Si aparecen datos de salud de otra persona, el modelo tampoco los copia. El modelo tiene orden de no copiar esos datos; nada se guarda.',
   'privacy.mortgage.tracked_documents': 'Al leer documentos de la hipoteca',
   'privacy.mortgage.tracked_documents_what':
     'La lectura de la escritura y de las facturas no envía ningún aviso. Al descargar, si es el informe, la carta que pide la documentación de la hipoteca o la que pide revisar los importes y, de una carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en las cartas.',

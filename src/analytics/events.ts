@@ -305,8 +305,9 @@ export type TrackableField = (typeof TRACKABLE_FIELDS)[number];
 // The rental questions by name; never what was answered.
 export const RENTAL_TRACKABLE_FIELDS = RENTAL_FIELDS;
 
-// The contract questions by name; never what was answered.
-export const EMPLOYMENT_TRACKABLE_FIELDS = EMPLOYMENT_FIELDS;
+// The contract questions by name; never what was answered. Whether the worker has a disability is
+// left out: like the null dismissal's situations, not even its name leaves the page.
+export const EMPLOYMENT_TRACKABLE_FIELDS = EMPLOYMENT_FIELDS.filter((f) => f !== 'disability');
 
 // The household questions by name; never what was answered.
 export const HOUSEHOLD_TRACKABLE_FIELDS = HOUSEHOLD_FIELDS;
