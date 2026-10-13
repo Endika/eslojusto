@@ -1,6 +1,6 @@
 {
   "id": "revolving-card-edge-august-2026",
-  "description": "LCC annex I, part II (one year, twelve equal instalments): a revolving card at 21,94 % with no fee gives 24,29 %, as stated. Against the 18,2578 % average of August 2026 (BdE BE_19_4.7) it is 6,03 points above the more-than-6-points criterion of STS 258/2023: «en el borde», within the 6,00-6,30 band the review keeps because the series leaves charges out. A judge also weighs the circumstances.",
+  "description": "LCC annex I, part II (one year, twelve equal instalments): a revolving card at 21,94 % with no fee gives 24,29 %, as stated. Against the 18,2578 % average of August 2026 (BdE BE_19_4.7) it is 6,03 points, over the more-than-6-points criterion of STS 258/2023: the 6,00-6,30 band applies only against its 2010 reference, so it reads «above». A judge also weighs the circumstances.",
   "eval": true,
   "today": "2026-10-09",
   "pages": [
@@ -176,7 +176,7 @@
         }
       ],
       "indicator": {
-        "status": "edge",
+        "status": "above",
         "apr": 24.29,
         "aprOrigin": "declared",
         "reference": {

@@ -62,7 +62,7 @@ describe('the indicator against the Bank of Spain average rate', () => {
   });
 
   it.each([
-    [24.29, 'edge', 6.03],
+    [24.29, 'above', 6.03],
     [24.6, 'above', 6.34],
     [23.9, 'below', 5.64],
   ] as const)(
@@ -81,8 +81,12 @@ describe('the indicator against the Bank of Spain average rate', () => {
     },
   );
 
-  it('explains the edge band: the average carries no charges', () => {
-    expect(keys(indicate('revolving', '2026-08-20', declared(24.29), null))).toContain(
+  it('explains the edge band against the 2010 reference: 19,32 % carries no charges', () => {
+    // 25,42 % against 19,32 %: 6,10 points.
+    const i = indicate('revolving', '2008-05-10', declared(25.42), null);
+    expect(i.status).toBe('edge');
+    expect(keys(i)).toContain('indicator.edge_reason');
+    expect(keys(indicate('revolving', '2026-08-20', declared(24.29), null))).not.toContain(
       'indicator.edge_reason',
     );
   });
@@ -93,9 +97,20 @@ describe('the indicator against the Bank of Spain average rate', () => {
     [6.01, 'edge'],
     [6, 'below'],
     [-2, 'below'],
-  ] as const)('%s points is %s', (points, expected) => {
-    expect(band(points)).toBe(expected);
+  ] as const)('against the 2010 reference, %s points is %s', (points, expected) => {
+    expect(band(points, true)).toBe(expected);
   });
+
+  it.each([
+    [6.3, 'above'],
+    [6.01, 'above'],
+    [6, 'below'],
+  ] as const)(
+    'against the monthly series, %s points is %s: six points, no edge',
+    (points, expected) => {
+      expect(band(points, false)).toBe(expected);
+    },
+  );
 
   it('takes the 19,32 % of STS 258/2023 for a card concluded before June 2010', () => {
     const i = indicate('revolving', '2008-05-10', declared(26), null);

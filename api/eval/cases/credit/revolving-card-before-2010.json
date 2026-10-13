@@ -1,6 +1,6 @@
 {
   "id": "revolving-card-before-2010",
-  "description": "STS 258/2023: a revolving card concluded in May 2008, before the consumer credit law (LCC) and before the BdE revolving series starts in June 2010, is compared with the 19,32 % the Supreme Court takes for those years. Its stated 26,82 % is 7,50 points above: «más de 6 puntos», never «usura» and never an amount; the rest of the review is another law's.",
+  "description": "STS 258/2023: a revolving card concluded in May 2008, before the consumer credit law (LCC) and before the BdE revolving series starts in June 2010, is compared with the 19,32 % the Supreme Court takes for those years. Its stated 25,41 % (TIN 22,86 % in the contract; the 2026 statement shows today's 24 %) is 6,09 points above: «en el borde», since against that 2010 reference the ruling puts the TAE «entre 20 y 30 centésimas» higher. Never «usura» and never an amount; the rest of the review is another law's.",
   "eval": true,
   "today": "2026-10-09",
   "pages": [
@@ -20,11 +20,11 @@
           },
           {
             "label": "Tipo deudor (TIN) anual",
-            "value": "24,00 %"
+            "value": "22,86 %"
           },
           {
             "label": "Tasa anual equivalente (TAE)",
-            "value": "26,82 %"
+            "value": "25,41 %"
           }
         ],
         "paymentText": "Modalidad de pago: aplazado, con una cuota mensual de 90,00 €.",
@@ -100,8 +100,8 @@
       "fields": {
         "agreedOn": "2008-05-10",
         "creditLimit": 3000,
-        "nominalRate": 24,
-        "declaredApr": 26.82,
+        "nominalRate": 22.86,
+        "declaredApr": 25.41,
         "minimumPayment": 90,
         "paymentMode": "fixed_amount"
       },
@@ -128,9 +128,9 @@
       "drawnOn": "2008-05-10",
       "principal": 3000,
       "netDisbursed": null,
-      "nominalRate": 24,
+      "nominalRate": 22.86,
       "rateType": "fixed",
-      "declaredApr": 26.82,
+      "declaredApr": 25.41,
       "declaredTotalPayable": null,
       "confirmedApr": false,
       "instalments": null,
@@ -156,14 +156,14 @@
       },
       "items": [],
       "indicator": {
-        "status": "above",
-        "apr": 26.82,
+        "status": "edge",
+        "apr": 25.41,
         "aprOrigin": "declared",
         "reference": {
           "kind": "ruling_2010",
           "value": 19.32
         },
-        "points": 7.5
+        "points": 6.09
       },
       "information": ["card_payoff"],
       "overCharged": {
