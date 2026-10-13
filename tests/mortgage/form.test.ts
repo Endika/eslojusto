@@ -103,6 +103,33 @@ describe('the mortgage form', () => {
     });
   });
 
+  it('without invoices, lists each cost as having none, and leaves the agreement out', () => {
+    const hidden = Object.fromEntries(
+      ['notaryLoan', 'notaryMixed', 'registryMortgage', 'registryMixed', 'agency']
+        .concat(['agencyTax', 'agencyRegistry', 'valuation', 'transparencyDeed', 'ajdLoan'])
+        .concat(['paidOn', 'agreement', 'returned'])
+        .map((field) => [field, null]),
+    );
+    expect(read({ ...hidden, hasInvoices: 'no' })).toMatchObject({
+      input: {
+        invoicesAtHand: false,
+        invoices: ['notary_loan', 'registry_mortgage', 'agency', 'valuation', 'ajd_loan'].map(
+          (kind) => invoiceOf(kind, null, null),
+        ),
+        agreementOnExpenses: null,
+      },
+    });
+  });
+
+  it('reads the tax left blank as paid by the lender, as its hint asks', () => {
+    const r = read({ ajdLoan: '' });
+    expect('input' in r && r.input.invoicesAtHand).toBe(true);
+    expect('input' in r && r.input.invoices.at(-1)).toEqual({
+      ...invoiceOf('ajd_loan', null, null),
+      paidBy: 'bank',
+    });
+  });
+
   it('counts the notary’s record only when it was charged', () => {
     const r = read({ transparencyDeed: '60' });
     expect('input' in r && r.input.invoices.map((i) => i.kind)).toContain('transparency_deed');

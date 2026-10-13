@@ -616,6 +616,7 @@ export const MORTGAGE_EXPENSE_STATUSES = [
   'not_applicable_to_date',
   'not_applicable',
   'not_entered',
+  'no_invoice',
 ] as const satisfies readonly ExpenseStatus[];
 const _allExpenseStatuses: CoversAll<ExpenseStatus, (typeof MORTGAGE_EXPENSE_STATUSES)[number]> =
   true;

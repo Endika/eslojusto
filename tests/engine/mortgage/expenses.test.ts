@@ -396,6 +396,34 @@ describe('what stays out of the figures', () => {
     const r = run({ deedOn: d('2021-04-20'), invoices: [invoice('notary_loan', null)] });
     expect([r.items[0]?.status, keys(r.items[0])]).toEqual(['not_entered', ['item.not_entered']]);
   });
+
+  it('without the invoices at hand, a cost has no figure, not a figure left out', () => {
+    const r = run({
+      deedOn: d('2015-03-02'),
+      invoicesAtHand: false,
+      agreementOnExpenses: null,
+      invoices: [invoice('notary_loan', null), invoice('valuation', null)],
+    });
+    expect(r.items.map((i) => [i.status, i.share, i.amount, keys(i)])).toEqual([
+      ['no_invoice', 50, null, ['expenses.no_invoice']],
+      ['no_invoice', 100, null, ['expenses.no_invoice']],
+    ]);
+    expect(r.totals).toEqual({ statute: NOTHING, caseLaw: NOTHING });
+  });
+
+  it('the tax left blank because the lender paid it says so', () => {
+    const blank = invoice('ajd_loan', null, { paidBy: 'bank' });
+    const r = run({ deedOn: d('2018-11-10'), invoices: [blank] });
+    expect([r.items[0]?.status, r.items[0]?.amount, keys(r.items[0])]).toEqual([
+      'paid_by_bank',
+      null,
+      ['expenses.paid_by_bank_blank'],
+    ]);
+    // Before 10-11-2018 the tax was not the lender's: the blank changes nothing.
+    expect(run({ deedOn: d('2018-11-09'), invoices: [blank] }).items[0]?.status).toBe(
+      'not_applicable_to_date',
+    );
+  });
 });
 
 describe('legal interest on the split, once ruling 725/2018 is read', () => {

@@ -409,7 +409,7 @@ test('flags alone give no figure', async ({ page }) => {
   await fill(page, { on: '2010-06-01', floor: { answer: 'Sí', percent: '3' } });
   await reviewed(page);
   await expect(total(page, 'statute')).toContainText('Nada con lo que has metido');
-  await expect(total(page, 'case_law')).toContainText('Nada con lo que has metido');
+  await expect(total(page, 'case_law')).toContainText('Sin cifra: no tienes las facturas');
   const floor = card(page, 'Cláusula suelo');
   await expect(floor).toContainText('Aparece en tu escritura');
   await expect(floor).toContainText('Lo que dicen los tribunales · estado a 07-10-2026');

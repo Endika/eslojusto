@@ -25,6 +25,7 @@ export const mortgage = (change: Partial<MortgageInput> = {}): MortgageInput => 
   loanAmount: null,
   expensesClause: 'present',
   invoices: [],
+  invoicesAtHand: true,
   alreadyReturned: null,
   agreementOnExpenses: false,
   prepaymentOption: null,

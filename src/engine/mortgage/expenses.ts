@@ -35,6 +35,7 @@ export type ExpenseStatus =
   | 'not_applicable_to_date'
   | 'paid_by_bank'
   | 'not_entered'
+  | 'no_invoice'
   | 'review_it';
 
 export type MortgageSource = NormSource<NormStatus> | LawSource;
@@ -354,10 +355,17 @@ function expenseItem(
     );
   // What was paid, and by whom, comes before any share: half of an invoice that also holds the
   // purchase, or a share of what the lender paid itself, would read as a figure.
+  if (invoice.paidBy === 'bank')
+    return item(
+      'paid_by_bank',
+      [p(invoice.total === null ? 'expenses.paid_by_bank_blank' : 'expenses.paid_by_bank')],
+      [rules],
+    );
   if (invoice.total === null)
-    return item('not_entered', [p('item.not_entered')], [rules], { share });
+    return input.invoicesAtHand
+      ? item('not_entered', [p('item.not_entered')], [rules], { share })
+      : item('no_invoice', [p('expenses.no_invoice')], [rules], { share });
   if (invoice.mixed) return item('review_it', [p('expenses.mixed')], [rules]);
-  if (invoice.paidBy === 'bank') return item('paid_by_bank', [p('expenses.paid_by_bank')], [rules]);
   if (invoice.paidBy === 'unknown')
     return item('review_it', [p('expenses.payer_unknown')], [rules]);
   // An agreement on the costs, or not knowing whether there was one, may have settled what the
