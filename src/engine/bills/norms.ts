@@ -40,3 +40,8 @@ export type NormReview = Readonly<Record<BillsNormId, string | null>>;
 export type BillsSourceId = 'ine_cpi_electricity' | 'tjue_c326_14';
 
 export type SourceTable = LawSourceTable<BillsSourceId>;
+
+// Passages of the norms read word for word in the BOE, which the pages may quote.
+export type BillsTextId = 'rd88_6' | 'trlgdcu_62' | 'rd899_7';
+
+export type TextTable = LawSourceTable<BillsTextId>;

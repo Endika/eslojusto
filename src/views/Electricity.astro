@@ -4,13 +4,16 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import DocumentStart from '../components/DocumentStart.astro';
 import ElectricityForm from '../components/ElectricityForm.astro';
 import BillsResult from '../components/BillsResult.astro';
+import BillsGuide from '../components/BillsGuide.astro';
 import { BILLS_BETA } from '../content/sections';
 import { formatLongDay } from '../content/rent-indices';
-import { breadcrumbList, trail } from '../content/structured-data';
+import { billsFaqEntries } from '../content/bills-faq';
+import { faqNode } from '../content/faq';
+import { billsApp, breadcrumbList, trail } from '../content/structured-data';
 import { LAST_UPDATED } from '../content/updated';
 import { DOCUMENTS } from '../documents/config';
 import { t, type Key } from '../i18n';
-import type { Lang } from '../i18n/languages';
+import { link, type Lang } from '../i18n/languages';
 
 interface Props {
   lang: Lang;
@@ -36,11 +39,17 @@ const sections = [
 const checkedOn = LAST_UPDATED['/facturas/luz/'];
 if (!checkedOn) throw new Error('/facturas/luz/ needs its date in LAST_UPDATED.');
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const page = new URL(link(lang, 'facturas/luz/'), Astro.site);
 const crumbs = trail(
   lang,
   { name: tx('bills.crumb'), path: '/facturas/' },
   { name: tx('bills.electricity.crumb'), path: '/facturas/luz/' },
 );
+const structuredData = [
+  billsApp(home, page, lang, 'electricity'),
+  breadcrumbList(home, lang, crumbs),
+  faqNode(billsFaqEntries(lang, 'electricity', { documents })),
+];
 ---
 
 <Base
@@ -49,7 +58,7 @@ const crumbs = trail(
   path="/facturas/luz/"
   lang={lang}
   section="cause"
-  structuredData={[breadcrumbList(home, lang, crumbs)]}
+  structuredData={structuredData}
   calculator={documents}
 >
   <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
@@ -99,6 +108,7 @@ const crumbs = trail(
       <ElectricityForm lang={lang} hidden={documents} />
       <BillsResult lang={lang} review="electricity" documents={documents} />
     </div>
+    <BillsGuide lang={lang} review="electricity" checkedOn={checkedOn} documents={documents} />
   </main>
 </Base>
 

@@ -6276,7 +6276,7 @@ export const es = {
   'client.mortgage.documents.check.ajd_purchase_not_loan':
     'El modelo 600 que has subido es el de la compraventa, no el del préstamo, así que no se ha pasado como impuesto de la hipoteca.',
   'bills.crumb': 'Facturas',
-  'bills.title': 'Revisa tus facturas: la luz y la permanencia del móvil o internet',
+  'bills.title': 'Factura de la luz y permanencia del móvil o internet',
   'bills.description':
     'Tu factura de la luz línea por línea frente a tus precios y a la norma, y la penalización y la baja de tu contrato de móvil o internet.',
   'bills.h1': 'Tus facturas, frente a la norma',
@@ -6301,6 +6301,136 @@ export const es = {
   'bills.answer.yes': 'Sí',
   'bills.answer.no': 'No',
   'bills.answer.unknown': 'No lo sé',
+  'bills.electricity.app_name': 'Revisión de tu factura de la luz',
+  'bills.telecom.app_name': 'Revisión de tu permanencia y tu baja del móvil o internet',
+  'bills.guide.sources': 'Fuentes',
+  'bills.guide.who': 'Quién está detrás',
+  'bills.guide.rules': 'Normas',
+  'bills.guide.faq': 'Preguntas frecuentes',
+  'bills.guide.source_rd88': 'Real Decreto 88/2026',
+  'bills.guide.source_law38': 'Ley 38/1992',
+  'bills.guide.source_law37': 'Ley 37/1992',
+  'bills.guide.source_lgtel': 'Ley 11/2022',
+  'bills.guide.source_trlgdcu': 'Ley General para la Defensa de los Consumidores y Usuarios',
+  'bills.guide.source_rd899': 'Real Decreto 899/2009',
+  'bills.guide.ref.rd88_44': 'Real Decreto 88/2026, art. 44.1',
+  'bills.guide.ref.circular3_2020': 'Circular 3/2020 de la CNMC, art. 7',
+  'bills.guide.ref.rd216_5_6': 'Real Decreto 216/2014, art. 5.6',
+  'bills.guide.ref.rd897_6': 'Real Decreto 897/2017, art. 6',
+  'bills.guide.ref.lgtel_dt1': 'Ley 11/2022, disposición transitoria primera',
+  'bills.guide.electricity.title': 'Qué dice la norma de tu factura de la luz',
+  'bills.guide.electricity.lead':
+    'Qué trae una factura de la tarifa 2.0TD, sus periodos, los peajes y cargos, el PVPC, los impuestos de 2026 con su calendario, el contador, el bono social y la potencia, y qué dice el Real Decreto 88/2026 de los avisos, la baja y la facturación, con la norma de la que sale cada cosa.',
+  'bills.guide.bill.title': 'Qué trae una factura 2.0TD',
+  'bills.guide.bill.p1':
+    'La tarifa de acceso 2.0TD es la de los suministros de hasta 15 kW de potencia contratada en redes de hasta 1 kV, como los de las casas (Circular 3/2020 de la CNMC, art. 6). Su factura cobra la potencia que contratas, por los días del periodo; la energía que usas, en kWh por periodo; la financiación del bono social; el impuesto eléctrico; el alquiler del contador, si lo alquilas, y el IVA, que se calcula sobre todo lo anterior, impuesto eléctrico incluido (Ley 37/1992, art. 78.Dos.4.º).',
+  'bills.guide.bill.p2':
+    'Dentro de los precios de la potencia y de la energía van los peajes de transporte y distribución, que fija cada año la CNMC, y los cargos del sistema, que fija el Ministerio: son precios regulados, iguales con cualquier comercializadora. La factura tiene que reflejar las variables con las que se calculan (Real Decreto 88/2026, art. 44.1). Si tu factura los desglosa, la revisión los compara con los valores de 2026.',
+  'bills.guide.periods.title': 'Los periodos: punta, llano y valle',
+  'bills.guide.periods.p1':
+    'La energía se cobra en tres periodos. De lunes a viernes laborables, en la Península, Baleares y Canarias, la punta (P1) va de 10 a 14 h y de 18 a 22 h; el llano (P2), de 8 a 10 h, de 14 a 18 h y de 22 a 24 h, y el valle (P3), de 0 a 8 h. Los sábados, los domingos, el 6 de enero y los festivos nacionales de fecha fija que no se pueden sustituir son valle todo el día (Circular 3/2020 de la CNMC, art. 7.3).',
+  'bills.guide.periods.p2':
+    'La potencia se cobra en dos periodos: punta-llano (P1), que junta la punta y el llano de la energía, y valle (P2) (art. 7.4).',
+  'bills.guide.pvpc.title': 'PVPC y mercado libre',
+  'bills.guide.pvpc.p1':
+    'El PVPC, el precio voluntario para el pequeño consumidor, es el precio regulado de la luz. Solo lo ofrecen las comercializadoras de referencia, y pueden acogerse a él personas y microempresas con 10 kW o menos de potencia contratada en cada periodo (Real Decreto 216/2014, art. 5.3). Se forma con los peajes, los cargos y un término con el coste de la energía de cada hora (art. 7).',
+  'bills.guide.pvpc.p2':
+    'En la potencia del PVPC, la revisión suma el margen de comercialización de 3,113 €/kW y año de la Orden ETU/1948/2016, un valor de 2016 sin actualizar: si tu factura usa otro, lo señala para revisar, sin ponerle cifra. No recalcula la energía del PVPC hora a hora: para eso hace falta tu consumo de cada hora.',
+  'bills.guide.pvpc.p3':
+    'En el mercado libre, el precio es el que pactas con tu comercializadora. La revisión no comprueba si te cobran ese precio, porque hace falta tu contrato, ni compara ofertas: la CNMC tiene un comparador oficial.',
+  'bills.guide.taxes.title': 'Los impuestos de 2026',
+  'bills.guide.taxes.p1':
+    'El impuesto eléctrico y el IVA son los del día en que la factura es exigible, no los de los días de consumo (Ley 38/1992, art. 95, y Ley 37/1992, arts. 75 y 90.Dos). Por regla general, el impuesto eléctrico es el 5,11269632 %, sin bajar de 1 € por MWh en una casa (Ley 38/1992, art. 99), y el IVA, el 21 % (Ley 37/1992, art. 90).',
+  'bills.guide.taxes.p2':
+    'Del 22-03-2026 al 31-05-2026, el impuesto eléctrico fue del 0,5 %, con el mismo mínimo, y el IVA del 10 % para los contratos de 10 kW o menos (hasta el 29-04-2026, de menos de 10 kW) y para quien tiene el bono social como vulnerable severo (Real Decreto-ley 7/2026, arts. 40 y 42). Las dos rebajas acababan en junio si el IPC de la electricidad de abril no subía más de un 15 % sobre el del año anterior. La Agencia Tributaria confirmó el 19-05-2026 que el impuesto eléctrico volvía al 5,11269632 % desde el 01-06-2026; la condición del IVA es la misma, y la revisión aplica el 21 % desde ese día.',
+  'bills.guide.taxes.p3':
+    'El Real Decreto-ley 18/2026 previó las mismas rebajas en agosto y en septiembre si el IPC de la electricidad de junio y de julio subía más de un 15 %. La Agencia Tributaria confirmó el 01-09-2026 que no se aplican al impuesto eléctrico; la condición del IVA es la misma, y la revisión aplica el 5,11269632 % y el 21 % en esos meses, como en julio y en octubre.',
+  'bills.guide.taxes.p4':
+    'Noviembre y diciembre de 2026 dependen de un dato que aún no se conoce. El Real Decreto-ley 25/2026 pone el impuesto eléctrico al 0,5 % y el IVA al 10 % para esos mismos contratos en noviembre si el IPC de la electricidad de septiembre sube más de un 15 % sobre el de septiembre de 2025, según lo que publique el INE en octubre, y en diciembre con el IPC de octubre, que el INE publica en noviembre (arts. 18 a 21). Hasta que se sepa, la revisión hace la cuenta con los dos tipos y no suma ninguna diferencia que dependa de ello.',
+  'bills.guide.meter.title': 'El alquiler del contador',
+  'bills.guide.meter.p1':
+    'Si alquilas el contador a la distribuidora, su precio regulado es de 0,81 € al mes si es monofásico y de 1,36 € al mes si es trifásico, «hasta que se apruebe el precio definitivo» (Orden IET/1491/2013, disposición transitoria única). En el PVPC, la factura tiene que dar ese precio aparte, con la norma que lo fija (Real Decreto 216/2014, art. 5.6).',
+  'bills.guide.meter.p2':
+    'La orden da un precio al mes: la revisión lo pasa a los días de tu factura, como precio al mes × 12 / 365 × días, y acepta un céntimo de diferencia. Si el contador es tuyo, no hay alquiler.',
+  'bills.guide.social_bonus.title': 'El bono social y su financiación',
+  'bills.guide.social_bonus.p1':
+    'El bono social es un descuento sobre el PVPC que aplica la comercializadora de referencia (Real Decreto 897/2017, art. 6). En 2026 es del 42,5 % para el consumidor vulnerable y del 57,5 % para el vulnerable severo (Real Decreto-ley 7/2026, art. 1); sin esa norma serían el 35 % y el 50 % (art. 6.3). En la energía, el descuento llega hasta un límite de kWh por factura que fija el anexo I según tu unidad familiar; lo que pasa de ese límite se paga a PVPC.',
+  'bills.guide.social_bonus.p2':
+    'La financiación del bono social es otra línea: un término del PVPC que se cobra en proporción a los días de la factura (Real Decreto 216/2014, art. 8.4) con el valor que fija una orden del Ministerio. En 2026, 6,979247 € por suministro y año hasta el 25-06-2026 (Orden TED/1524/2025) y 9,011295 € desde el 26-06-2026 (Orden TED/634/2026).',
+  'bills.guide.power.title': 'La potencia',
+  'bills.guide.power.p1':
+    'La potencia contratada se paga aunque no se use entera. Si tu factura trae la potencia máxima que usaste en los últimos 12 meses en cada periodo, la revisión te la enseña tal cual, sin decirte qué potencia contratar.',
+  'bills.guide.power.p2':
+    'La potencia contratada se puede cambiar si han pasado al menos doce meses desde el último cambio, y una bajada de potencia no tiene más coste que el regulado en el Real Decreto 1048/2013 (Real Decreto 88/2026, art. 38.1 y 38.2).',
+  'bills.guide.changes.title': 'El aviso de un mes y tu derecho a irte',
+  'bills.guide.changes.p1':
+    'Con efectos desde el 12-06-2026, el Real Decreto 88/2026 reconoce a quien consume luz el derecho a (art. 6.1.m):',
+  'bills.guide.changes.p2':
+    'Las revisiones de precio que prevé tu contrato se notifican también con al menos un mes de antelación a su aplicación (art. 6.1.n). La revisión no comprueba si te avisaron: no ve el aviso.',
+  'bills.guide.changes.p3':
+    'Una persona con la tarifa 2.0TD puede dejar su contrato en cualquier momento sin penalización, salvo en un contrato a precio fijo antes de su primera prórroga anual. En ese caso, la penalización no puede pasar del 5 % de la energía estimada pendiente de suministro, y la pérdida la tiene que probar la comercializadora (art. 28.3). Con el PVPC, el contrato se puede resolver antes de que acabe sin coste alguno (Real Decreto 216/2014, art. 5.8).',
+  'bills.guide.billing.title': 'Facturación mensual y lo cobrado de más',
+  'bills.guide.billing.p1':
+    'Con efectos desde el 12-06-2026, la lectura es mensual, y también la facturación de peajes y cargos; solo puede ser bimestral si no hay equipos con lectura remota por causas que no son de la distribuidora (Real Decreto 88/2026, arts. 43.1 y 44.1). En el mercado libre se pueden pactar otras condiciones, pero la factura con el consumo real tiene que llegar al menos una vez al año (art. 45.1).',
+  'bills.guide.billing.p2':
+    'Si la comercializadora factura de más, de la energía o del acceso a las redes, tiene que devolverlo entero en la primera factura siguiente, sin fraccionarlo, con el interés legal del dinero más 150 puntos básicos. Si factura de menos, puede repartir la diferencia en tantas facturas mensuales como meses pasaron desde el error, sin pasar de un año (art. 45.2).',
+  'bills.guide.unchecked.title': 'Lo que la revisión no mira',
+  'bills.guide.telecom.title': 'Qué dice la norma de tu permanencia y tu baja',
+  'bills.guide.telecom.lead':
+    'Cuánto puede durar un contrato de móvil o internet, cuánto te pueden cobrar si te vas antes, cuándo puedes irte sin pagar la permanencia porque cambian las condiciones y en cuántos días tiene que surtir efecto la baja, con la norma de la que sale cada cosa.',
+  'bills.guide.commitment.title': 'La permanencia y su penalización',
+  'bills.guide.commitment.p1':
+    'Un contrato de un consumidor con su operador de móvil o internet no puede durar más de veinticuatro meses (Ley 11/2022, art. 67.7, en vigor desde el 30-06-2022). Cumplido ese plazo, se prorroga solo; tras la prórroga, puedes rescindirlo en cualquier momento con un preaviso de un mes como mucho, sin más coste que el servicio que recibes durante el preaviso.',
+  'bills.guide.commitment.p2':
+    'Si te vas antes de que acabe la permanencia, la penalización tiene que ser proporcional a los días que faltaban. Lo dice el texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios, con efectos desde el 01-01-2022:',
+  'bills.guide.commitment.p3':
+    'Por ejemplo, con 180 € de penalización pactada, 549 días de permanencia y 184 días por cumplir al irte, la parte proporcional es 180 × 184 / 549 = 60,33 €. La revisión hace esa cuenta con tus fechas.',
+  'bills.guide.change.title': 'Si el operador cambia las condiciones',
+  'bills.guide.change.p1':
+    'El operador tiene que comunicarte cualquier cambio de las condiciones con al menos un mes de antelación, de forma clara y comprensible y en un soporte duradero, y decirte que puedes rescindir el contrato sin ningún coste adicional si no aceptas las nuevas. Puedes hacerlo en el mes siguiente a la comunicación. No vale para los cambios que solo te benefician, los estrictamente administrativos sin efectos negativos ni los que impone una norma (Ley 11/2022, art. 67.8).',
+  'bills.guide.change.p2':
+    'Si te vas así antes de que acabe la permanencia, no pagas ninguna compensación salvo por el terminal subvencionado que te quedes: como mucho, su valor prorrateado o lo que quedaba de cuota hasta el final del contrato, si es menos (art. 67.10). Si la subida sale de una cláusula del contrato que la ata a un índice de precios, la revisión la muestra como información, sin cifra.',
+  'bills.guide.exit.title': 'La baja en dos días hábiles',
+  'bills.guide.exit.p1':
+    'Puedes darte de baja cuando quieras, avisando al operador con al menos dos días hábiles de antelación al día en que quieres que surta efecto. Y sobre lo que se cobre después, la norma dice (Real Decreto 899/2009, art. 7):',
+  'bills.guide.exit.p2':
+    'Ese real decreto sigue vigente en lo que no se oponga a la Ley 11/2022, hasta que se apruebe su desarrollo (disposición transitoria primera). La norma no dice qué días son hábiles: la revisión no cuenta sábados, domingos ni festivos nacionales, que da el día más tardío; lo que te cobren del día siguiente lo señala para revisar, sin sumarlo, porque un festivo de tu comunidad podría moverlo, y lo de después sí lo cuenta.',
+  'bills.guide.exit.p3':
+    'Puedes poner fin al contrato en la misma forma en que lo celebraste (texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios, art. 62.3), y el procedimiento de baja tiene que dejarte constancia del contenido de tu solicitud (Real Decreto 899/2009, art. 7).',
+  'bills.guide.channels.title': 'Dónde informarte gratis',
+  'bills.faq.electricity.meter': '¿Cuánto cuesta el alquiler del contador?',
+  'bills.faq.electricity.meter_answer':
+    'Si alquilas el contador a la distribuidora, su precio regulado es de 0,81 € al mes si es monofásico y de 1,36 € al mes si es trifásico (Orden IET/1491/2013, disposición transitoria única). Si el contador es tuyo, no hay alquiler. La revisión pasa ese precio a los días de tu factura, como precio al mes × 12 / 365 × días, y acepta un céntimo de diferencia.',
+  'bills.faq.electricity.vat': '¿Qué IVA lleva mi factura?',
+  'bills.faq.electricity.vat_answer':
+    'El 21 % (Ley 37/1992, art. 90), y es el del día en que la factura es exigible, no el de los días de consumo (arts. 75 y 90.Dos). Del 22-03-2026 al 31-05-2026 fue del 10 % para los contratos de 10 kW o menos (hasta el 29-04-2026, de menos de 10 kW) y para quien tiene el bono social como vulnerable severo (Real Decreto-ley 7/2026, art. 42). En noviembre y diciembre de 2026 será del 10 % para esos mismos contratos solo si el IPC de la electricidad de septiembre, para noviembre, o de octubre, para diciembre, sube más de un 15 % sobre el del año anterior (Real Decreto-ley 25/2026, arts. 18 y 19). Hasta que el INE lo publique, la revisión hace la cuenta con los dos tipos y no suma ninguna diferencia que dependa de ello.',
+  'bills.faq.electricity.pvpc': '¿Qué es el PVPC?',
+  'bills.faq.electricity.pvpc_answer':
+    'El precio voluntario para el pequeño consumidor: el precio regulado de la luz, que solo ofrecen las comercializadoras de referencia. Pueden acogerse a él personas y microempresas con 10 kW o menos de potencia contratada en cada periodo (Real Decreto 216/2014, art. 5.3). Su energía tiene un precio distinto cada hora. La revisión comprueba su término de potencia con los peajes, los cargos y el margen fijo, pero no recalcula la energía hora a hora: para eso hace falta tu consumo de cada hora.',
+  'bills.faq.electricity.social_bonus': '¿Cuánto descuenta el bono social?',
+  'bills.faq.electricity.social_bonus_answer':
+    'En 2026, el 42,5 % al consumidor vulnerable y el 57,5 % al vulnerable severo (Real Decreto-ley 7/2026, art. 1); sin esa norma serían el 35 % y el 50 % (Real Decreto 897/2017, art. 6.3). Es un descuento sobre el PVPC que aplica la comercializadora de referencia, y en la energía llega hasta un límite de kWh que depende de tu unidad familiar: lo que pasa de ahí se paga a PVPC. La financiación del bono social que trae la factura es otra cosa: un término del PVPC con el valor que fija una orden del Ministerio.',
+  'bills.faq.electricity.leave': '¿Me pueden cobrar por irme?',
+  'bills.faq.electricity.leave_answer':
+    'Una persona con la tarifa 2.0TD puede dejar su contrato de luz en cualquier momento sin penalización, salvo en un contrato a precio fijo antes de su primera prórroga anual. En ese caso, la penalización no puede pasar del 5 % de la energía estimada pendiente de suministro, y la pérdida la tiene que probar la comercializadora (Real Decreto 88/2026, art. 28.3, con efectos desde el 12-06-2026); la revisión no calcula ese 5 %. Con el PVPC, el contrato se puede resolver sin coste alguno (Real Decreto 216/2014, art. 5.8). Y si tu comercializadora quiere cambiar las condiciones, tiene que avisarte con al menos un mes de antelación e informarte de tu derecho a rescindir el contrato sin coste alguno (Real Decreto 88/2026, art. 6.1.m).',
+  'bills.faq.electricity.documents': '¿Qué pasa con mis documentos?',
+  'bills.faq.electricity.documents_answer':
+    'Si subes tus facturas, se envían cifradas a un servidor de Amazon Web Services en España, que se las pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. Una factura de la luz lleva tu nombre, tu dirección, el código de tu suministro (CUPS) y parte de tu número de cuenta: el modelo tiene orden de no copiar nombres, DNI, direcciones, teléfonos, correos ni cuentas, y de la dirección solo copia el código postal. Del CUPS, el servidor solo devuelve una huella, un código que sirve para reconocer una misma factura subida dos veces; el CUPS no sale del servidor. No se guarda nada, y tu año vive solo en esa pestaña: desaparece al cerrarla. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
+  'bills.faq.electricity.pass': '¿Qué incluye el pase de 4,99 €?',
+  'bills.faq.electricity.pass_answer':
+    'El pase vale para cualquier revisión de la web durante 7 días, solo en el navegador con el que pagas. Aquí se ofrece si lo que tus facturas cobran por encima de la norma suma 4,99 € o más, o si una diferencia se repite de una factura a otra. Con él revisas tu año entero: descargas el informe en PDF con cada factura, cada línea, su cuenta y su norma, y, si alguna línea pasa de la norma, la carta que pide la factura rectificativa. En otro dispositivo, en una ventana privada o si borras los datos de navegación, el pase se pierde.',
+  'bills.faq.telecom.commitment': '¿Cuánto me pueden cobrar por la permanencia?',
+  'bills.faq.telecom.commitment_answer':
+    'Como mucho, la parte de la penalización pactada que corresponde a los días que faltaban: la penalización tiene que ser proporcional a los días no efectivos de la permanencia (texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios, art. 62.5, con efectos desde el 01-01-2022). Por ejemplo, con 180 € pactados, 549 días de permanencia y 184 días por cumplir, 180 × 184 / 549 = 60,33 €. El contrato de un consumidor no puede durar más de veinticuatro meses (Ley 11/2022, art. 67.7). Y si te vas en el mes siguiente a que el operador te comunique un cambio de condiciones, no pagas penalización: solo, si te lo quedas, el terminal subvencionado, como mucho por su valor prorrateado (art. 67.8 y 67.10).',
+  'bills.faq.telecom.leave': '¿Me pueden cobrar por irme?',
+  'bills.faq.telecom.leave_answer':
+    'Con permanencia, como mucho su parte proporcional a los días que faltaban (texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios, art. 62.5). Si te vas en el mes siguiente a que el operador te comunique un cambio de condiciones, ninguna compensación salvo por el terminal subvencionado que te quedes (Ley 11/2022, art. 67.8 y 67.10). Tras la prórroga de un contrato que ya cumplió su plazo, puedes irte con un preaviso de un mes como mucho, sin más coste que el servicio de ese tiempo (art. 67.7). Y lo que se devengue después del plazo de dos días hábiles en que debía surtir efecto la baja, por una causa que no es tuya, el operador no lo puede facturar ni cobrar (Real Decreto 899/2009, art. 7).',
+  'bills.faq.telecom.documents': '¿Qué pasa con mis documentos?',
+  'bills.faq.telecom.documents_answer':
+    'Si subes tu contrato y tus facturas, se envían cifradas a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. Llevan tu nombre, tu DNI, tu dirección, tus números de teléfono y tu cuenta: el modelo tiene orden de no copiar nada de eso, ni los números a los que llamas, el número de cliente o de contrato ni el IMEI; sí copia el nombre del operador. No se guarda nada. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
+  'bills.faq.telecom.pass': '¿Qué incluye el pase de 4,99 €?',
+  'bills.faq.telecom.pass_answer':
+    'El pase vale para cualquier revisión de la web durante 7 días, solo en el navegador con el que pagas. Aquí se ofrece si lo que te cobran por encima de la norma suma 4,99 € o más. Te deja descargar el informe en PDF de tu baja y, si la penalización pasa de lo que permite la norma, la carta que pide revisarla. La carta que comunica tu baja sin penalización tras un cambio de condiciones es gratis. En otro dispositivo, en una ventana privada o si borras los datos de navegación, el pase se pierde.',
 
   'bills.electricity.crumb': 'Luz',
   'bills.electricity.title': 'Revisa tu factura de la luz línea por línea',

@@ -44,6 +44,30 @@ describe.skipIf(!withBills)('a build with the bills switch', () => {
     expect(read('dist/facturas/luz/index.html')).toContain('Código postal del suministro');
     expect(read('dist/facturas/permanencia/index.html')).toContain('Día en que pediste la baja');
   });
+  it('carries each review’s guide, its questions and their FAQPage JSON-LD', () => {
+    for (const [page, title, question, quote] of [
+      [
+        'luz',
+        'Qué dice la norma de tu factura de la luz',
+        'faq-luz-iva',
+        'de manera separada a su factura',
+      ],
+      [
+        'permanencia',
+        'Qué dice la norma de tu permanencia y tu baja',
+        'faq-permanencia-penalizacion',
+        'proporcional al número de días no efectivos',
+      ],
+    ]) {
+      const html = read(`dist/facturas/${page}/index.html`);
+      expect(html).toContain(title);
+      expect(html).toContain(`id="${question}"`);
+      expect(html).toContain('"@type":"FAQPage"');
+      expect(html).toContain('"@type":"WebApplication"');
+      expect(html).toContain('data-legal-quote');
+      expect(html).toContain(quote);
+    }
+  });
   it('ships its strings only on its review pages', () => {
     expect(read('dist/facturas/luz/index.html')).toContain('client.bills.status.matches');
     expect(read('dist/facturas/permanencia/index.html')).toContain('client.bills.status.matches');

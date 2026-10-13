@@ -3,6 +3,7 @@ import {
   NORM_REVIEW as BILLS_NORM_REVIEW,
 } from '../../../src/engine/bills/data/norms';
 import { BILLS_SOURCES } from '../../../src/engine/bills/data/sources';
+import { BILLS_TEXTS } from '../../../src/engine/bills/data/texts';
 import { RULES as BILLS_RULES } from '../../../src/engine/bills/rules';
 import type { Norm } from '../../../src/engine/law/norms';
 import type { RuleBase } from '../../../src/engine/law/rules';
@@ -84,7 +85,7 @@ export const LAW_SECTIONS: readonly LawSection[] = [
     name: 'bills',
     norms: BILLS_NORMS,
     normReview: BILLS_NORM_REVIEW,
-    sources: BILLS_SOURCES,
+    sources: { ...BILLS_SOURCES, ...BILLS_TEXTS },
     rules: BILLS_RULES,
   },
 ];

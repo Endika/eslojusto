@@ -1,0 +1,272 @@
+---
+import LegalQuote from './LegalQuote.astro';
+import { BILLS_NORMS } from '../engine/bills/data/norms';
+import { BILLS_TEXTS } from '../engine/bills/data/texts';
+import type { BillsNormId } from '../engine/bills/norms';
+import { RULES, type BillsRuleId } from '../engine/bills/rules';
+import { formatLongDay } from '../content/rent-indices';
+import { billsFaqEntries } from '../content/bills-faq';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+  review: 'electricity' | 'telecom';
+  // The day the page's rules were last checked, ISO.
+  checkedOn: string;
+  // Whether the build reads documents: only then are the documents and the pass asked about.
+  documents: boolean;
+}
+const { lang, review, checkedOn, documents } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+interface Block {
+  readonly id: string;
+  readonly anchor: string;
+  readonly paragraphs: readonly Key[];
+  // After the passage quoted word for word, if the block quotes one.
+  readonly after?: readonly Key[];
+  readonly rules?: readonly BillsRuleId[];
+  // Texts it rests on that no rule of the review cites.
+  readonly refs?: readonly { readonly label: Key; readonly url: string }[];
+  readonly list?: readonly Key[];
+  // The official channel's link, under its text.
+  readonly channel?: boolean;
+}
+
+const CIRCULAR_3_2020 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2020-1066#a7';
+const RD897_ART6 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2017-11505#a6';
+const RD216_ART5 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2014-3376#a5';
+const RD88 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-3212';
+const LGTEL_DT1 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2022-10757#dt';
+
+const ELECTRICITY: readonly Block[] = [
+  {
+    id: 'bill',
+    anchor: 'g-factura',
+    paragraphs: ['bills.guide.bill.p1', 'bills.guide.bill.p2'],
+    rules: ['tolls', 'charges'],
+    refs: [{ label: 'bills.guide.ref.rd88_44', url: `${RD88}#a4-6` }],
+  },
+  {
+    id: 'periods',
+    anchor: 'g-periodos',
+    paragraphs: ['bills.guide.periods.p1', 'bills.guide.periods.p2'],
+    refs: [{ label: 'bills.guide.ref.circular3_2020', url: CIRCULAR_3_2020 }],
+  },
+  {
+    id: 'pvpc',
+    anchor: 'g-pvpc',
+    paragraphs: ['bills.guide.pvpc.p1', 'bills.guide.pvpc.p2', 'bills.guide.pvpc.p3'],
+    rules: ['pvpc_eligibility', 'pvpc_margin'],
+  },
+  {
+    id: 'taxes',
+    anchor: 'g-impuestos',
+    paragraphs: [
+      'bills.guide.taxes.p1',
+      'bills.guide.taxes.p2',
+      'bills.guide.taxes.p3',
+      'bills.guide.taxes.p4',
+    ],
+    rules: ['electricity_tax', 'vat'],
+  },
+  {
+    id: 'meter',
+    anchor: 'g-contador',
+    paragraphs: ['bills.guide.meter.p1', 'bills.guide.meter.p2'],
+    rules: ['meter_rent'],
+    refs: [{ label: 'bills.guide.ref.rd216_5_6', url: RD216_ART5 }],
+  },
+  {
+    id: 'social_bonus',
+    anchor: 'g-bono-social',
+    paragraphs: ['bills.guide.social_bonus.p1', 'bills.guide.social_bonus.p2'],
+    rules: [
+      'social_bonus_discount',
+      'social_bonus_cap',
+      'social_bonus_funding_until_june',
+      'social_bonus_funding',
+    ],
+    refs: [{ label: 'bills.guide.ref.rd897_6', url: RD897_ART6 }],
+  },
+  {
+    id: 'power',
+    anchor: 'g-potencia',
+    paragraphs: ['bills.guide.power.p1', 'bills.guide.power.p2'],
+    rules: ['power_change'],
+  },
+  {
+    id: 'changes',
+    anchor: 'g-cambios',
+    paragraphs: ['bills.guide.changes.p1'],
+    after: ['bills.guide.changes.p2', 'bills.guide.changes.p3'],
+    rules: ['exit_penalty'],
+  },
+  {
+    id: 'billing',
+    anchor: 'g-facturacion',
+    paragraphs: ['bills.guide.billing.p1', 'bills.guide.billing.p2'],
+    rules: ['billing'],
+  },
+  {
+    id: 'unchecked',
+    anchor: 'g-sin-revisar',
+    paragraphs: [],
+    list: [
+      'client.bills.unchecked.electricity.agreed_price',
+      'client.bills.unchecked.electricity.price_notice',
+      'client.bills.unchecked.electricity.pvpc_hourly_energy',
+      'client.bills.unchecked.electricity.other_tariff',
+      'client.bills.unchecked.electricity.regional_rules',
+      'client.bills.unchecked.electricity.earlier_regularizations',
+    ],
+  },
+];
+
+const TELECOM: readonly Block[] = [
+  {
+    id: 'commitment',
+    anchor: 'g-permanencia',
+    paragraphs: ['bills.guide.commitment.p1', 'bills.guide.commitment.p2'],
+    after: ['bills.guide.commitment.p3'],
+    rules: ['commitment_maximum', 'commitment_proportional'],
+  },
+  {
+    id: 'change',
+    anchor: 'g-cambio-condiciones',
+    paragraphs: ['bills.guide.change.p1', 'bills.guide.change.p2'],
+    rules: ['change_exit', 'handset_after_change'],
+  },
+  {
+    id: 'exit',
+    anchor: 'g-baja',
+    paragraphs: ['bills.guide.exit.p1'],
+    after: ['bills.guide.exit.p2', 'bills.guide.exit.p3'],
+    rules: ['exit_effective'],
+    refs: [{ label: 'bills.guide.ref.lgtel_dt1', url: LGTEL_DT1 }],
+  },
+  {
+    id: 'channels',
+    anchor: 'g-informarte',
+    paragraphs: ['bills.result.channels_text'],
+    channel: true,
+  },
+  {
+    id: 'unchecked',
+    anchor: 'g-sin-revisar',
+    paragraphs: [],
+    list: [
+      'client.bills.unchecked.telecom.agreed_price',
+      'client.bills.unchecked.telecom.service_cuts',
+      'client.bills.unchecked.telecom.premium_rate_services',
+      'client.bills.unchecked.telecom.unrequested_services',
+    ],
+  },
+];
+
+const blocks = review === 'electricity' ? ELECTRICITY : TELECOM;
+const sources: readonly [Key, BillsNormId][] =
+  review === 'electricity'
+    ? [
+        ['bills.guide.source_rd88', 'rd88_2026'],
+        ['bills.guide.source_law38', 'law38_1992'],
+        ['bills.guide.source_law37', 'law37_1992'],
+      ]
+    : [
+        ['bills.guide.source_lgtel', 'lgtel'],
+        ['bills.guide.source_trlgdcu', 'trlgdcu'],
+        ['bills.guide.source_rd899', 'rd899_2009'],
+      ];
+const faq = billsFaqEntries(lang, review, { documents });
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx(`bills.guide.${review}.title`)}
+    </h2>
+    <p class="guide__lead">{tx(`bills.guide.${review}.lead`)}</p>
+    <p class="guide__sources">
+      <span>{t(lang, 'bills.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>
+        {tx('bills.guide.sources')}:{' '}
+        {sources.map(([label, norm], i) => (
+          <>
+            {i > 0 && ' · '}
+            <a href={BILLS_NORMS[norm].url}>{tx(label)}</a>
+          </>
+        ))}
+      </span>
+      <a href={link('es', 'aviso-legal/')}>{tx('bills.guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    {blocks.map(({ id, anchor, paragraphs, after = [], rules = [], refs = [], list, channel }) => (
+      <section class="sheet sheet--text" data-guide={id}>
+        <h3 id={anchor}>{tx(`bills.guide.${id}.title` as Key)}</h3>
+        {paragraphs.map((key) => (
+          <p>{tx(key)}</p>
+        ))}
+        {id === 'changes' && (
+          <LegalQuote lang={lang} source={BILLS_TEXTS.rd88_6} quote="bills_change_notice" />
+        )}
+        {id === 'commitment' && (
+          <LegalQuote
+            lang={lang}
+            source={BILLS_TEXTS.trlgdcu_62}
+            quote="bills_commitment_proportional"
+          />
+        )}
+        {id === 'exit' && (
+          <LegalQuote lang={lang} source={BILLS_TEXTS.rd899_7} quote="bills_after_exit" />
+        )}
+        {after.map((key) => (
+          <p>{tx(key)}</p>
+        ))}
+        {channel && (
+          <p>
+            <a href="https://usuariosteleco.digital.gob.es/">{tx('bills.result.channels_link')}</a>
+          </p>
+        )}
+        {list && (
+          <ul>
+            {list.map((key) => (
+              <li>{tx(key)}</li>
+            ))}
+          </ul>
+        )}
+        {rules.length + refs.length > 0 && (
+          <>
+            <h4 class="rules__title">{tx('bills.guide.rules')}</h4>
+            <ul class="sources sources--wrap">
+              {rules.map((r) => (
+                <li>
+                  <a href={RULES[r].url}>{RULES[r].article}</a>
+                </li>
+              ))}
+              {refs.map(({ label, url }) => (
+                <li>
+                  <a href={url}>{tx(label)}</a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+    ))}
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('bills.guide.faq')}</h2>
+      <div class="faq-list">
+        {faq.map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>
