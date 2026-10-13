@@ -232,9 +232,9 @@ test('a pack of three bills is reviewed one by one into the year, offered with i
   // apart from that total.
   await expect(page.locator('#resultado [data-total-counted]')).toHaveText('0,20 €');
   await expect(basket(page).locator('[data-basket-bills] li')).toHaveText([
-    'Factura del 31-05-2026 al 30-06-2026 · por encima de la norma: 0,20 €',
-    'Factura del 30-06-2026 al 30-07-2026 · por encima de la norma: 0,20 €',
-    'Factura del 30-07-2026 al 29-08-2026 · por encima de la norma: 0,20 €',
+    'Factura del 31\u201105\u20112026 al 30\u201106\u20112026 · por encima de la norma: 0,20 €',
+    'Factura del 30\u201106\u20112026 al 30\u201107\u20112026 · por encima de la norma: 0,20 €',
+    'Factura del 30\u201107\u20112026 al 29\u201108\u20112026 · por encima de la norma: 0,20 €',
   ]);
   await expect(basket(page).locator('[data-basket-counted]')).toHaveText('0,60 €');
   await expect(basket(page).locator('[data-basket-recurring]')).toHaveText(
@@ -274,8 +274,8 @@ test('a bill sent twice is said and counts once', async ({ page }) => {
     'Tu año: 1 factura revisada',
   );
   await expect(basket(page).locator('[data-basket-bills] li')).toHaveText([
-    'Factura del 31-05-2026 al 30-06-2026 · por encima de la norma: 0,20 €',
-    'Factura del 31-05-2026 al 30-06-2026 · es la misma que otra de tu año (mismo suministro y periodo) y no cuenta dos veces.',
+    'Factura del 31\u201105\u20112026 al 30\u201106\u20112026 · por encima de la norma: 0,20 €',
+    'Factura del 31\u201105\u20112026 al 30\u201106\u20112026 · es la misma que otra de tu año (mismo suministro y periodo) y no cuenta dos veces.',
   ]);
   await expect(basket(page).locator('[data-basket-year]')).toBeHidden();
   await expect(offer(page)).toBeHidden();

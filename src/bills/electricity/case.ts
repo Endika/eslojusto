@@ -13,10 +13,13 @@ export const electricityBasket = (entries: readonly CompletedElectricityReview[]
   reviewBasket(entries, { passPrice: PASS_PRICE });
 
 // «Factura del 31-05-2026 al 30-06-2026».
+// A date never breaks at its hyphens on a narrow screen; the PDF writes them as plain hyphens.
+const unbroken = (day: string) => day.replaceAll('-', '\u2011');
+
 export const billHeading = ({ input }: CompletedElectricityReview, tr: Translate): string =>
   tr('client.bills.basket.bill', {
-    desde: dayText(toIso(input.readingFrom)),
-    hasta: dayText(toIso(input.readingTo)),
+    desde: unbroken(dayText(toIso(input.readingFrom))),
+    hasta: unbroken(dayText(toIso(input.readingTo))),
   });
 
 function reported(
