@@ -6275,6 +6275,46 @@ export const es = {
     'La gestoría cobra como suplido el impuesto o el registro por el mismo importe que otro documento que has subido: puede ser el mismo pago contado dos veces. Revisa la hoja de la gestoría.',
   'client.mortgage.documents.check.ajd_purchase_not_loan':
     'El modelo 600 que has subido es el de la compraventa, no el del préstamo, así que no se ha pasado como impuesto de la hipoteca.',
+  'privacy.bills.summary':
+    'Las revisiones de tus facturas funcionan igual: lo que escribes se calcula en tu navegador y no se guarda. Sus preguntas no piden tu nombre, tu DNI, el código de tu suministro (CUPS), tu número de cuenta ni el nombre de tu comercializadora o tu operador; del suministro, solo el código postal, para saber si la revisión cubre tu territorio.',
+  'privacy.bills.data_review': 'Lo que escribes en las revisiones de tus facturas',
+  'privacy.bills.data_review_where':
+    'Solo en tu navegador, mientras la página está abierta. El código postal, las fechas, las potencias, los consumos y los importes de tu factura de la luz, y las fechas y los importes de tu permanencia y tu baja, se calculan en tu dispositivo y no se envían a ningún servidor ni se guardan. Al cerrar o recargar la página, desaparecen.',
+  'privacy.bills.data_year': 'Tu año de facturas de la luz',
+  'privacy.bills.data_year_where':
+    'Si revisas varias facturas de la luz, cada una con sus respuestas se queda en la memoria de la pestaña para sumarlas como «tu año». No se escribe en tu dispositivo ni sale de él, salvo durante el pago, como se explica más abajo; al cerrar o recargar la pestaña, desaparece.',
+  'privacy.bills.tracked_sheets': 'En las revisiones de tus facturas',
+  'privacy.bills.tracked_sheets_what':
+    'Lo mismo que en el finiquito con cada una de sus hojas, de tu suministro o tu permanencia al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha de cargo», nunca lo que escribiste. Qué pregunta frecuente abres.',
+  'privacy.bills.tracked_scope': 'Si tu factura o tu baja quedan fuera de la revisión',
+  'privacy.bills.tracked_scope_what':
+    'El motivo, de una lista cerrada: un suministro en Canarias, Ceuta o Melilla, de más de 15 kW, con otra tarifa de acceso que la 2.0TD o con placas solares que vierten a la red, o una factura emitida antes del 12-06-2026; o, en la permanencia, una baja pedida antes de 2022.',
+  'privacy.bills.tracked_review': 'Al revisar tu factura de la luz',
+  'privacy.bills.tracked_review_what':
+    'Si es PVPC o mercado libre y si la comercializadora es de referencia, otra o no lo sabes, nunca su nombre. Qué tipos de línea no cuadran, por ejemplo el alquiler del contador, el bono social o el IVA, cada uno una vez, nunca su concepto ni su importe; si alguna línea cobra de menos, si algún resultado espera un dato oficial y si una diferencia se repite en cada factura. Nunca el código de tu suministro ni su huella, un importe, una fecha ni el nombre de tu comercializadora.',
+  'privacy.bills.tracked_telecom': 'Al revisar tu permanencia y tu baja',
+  'privacy.bills.tracked_telecom_what':
+    'De la permanencia, del cambio de condiciones y de los cobros después de la baja, su resultado en un código, por ejemplo «por encima de lo que permite la norma». Nunca un importe, una fecha ni el nombre del operador.',
+  'privacy.bills.data_documents': 'Las facturas y los contratos de luz, móvil o internet que subes',
+  'privacy.bills.data_documents_where':
+    'Solo si eliges subirlos y das tu consentimiento: tus facturas de la luz, su contrato o un aviso de cambio de precio, o el contrato y las facturas de tu móvil o internet. Siguen el mismo camino que los demás documentos, por el mismo servidor en España y el mismo modelo en la Unión Europea, y tampoco se guardan. Una factura de la luz lleva tu nombre, tu dirección, el código de tu suministro (CUPS) y parte de tu número de cuenta (IBAN); una de móvil o internet, también tus números de teléfono. El modelo tiene orden de no copiar nombres de personas, DNI, NIE, direcciones, teléfonos, correos, cuentas, números de tarjeta, de cliente o de contrato, IMEI ni firmas: ni el IBAN ni tu nombre se copian. De la dirección solo copia el código postal, y sí copia el nombre de la comercializadora o del operador. El CUPS lo lee el modelo, pero el servidor lo convierte en una huella, un código corto que solo sirve para reconocer una misma factura subida dos veces, y solo esa huella vuelve a tu navegador: el CUPS no sale del servidor.',
+  'privacy.bills.data_letters': 'Los datos de las cartas de tus facturas',
+  'privacy.bills.data_letters_where':
+    'Lo que añades a las cartas (tu nombre, tu DNI o NIE, la comercializadora o el operador, el número de contrato o de cliente y la localidad) solo rellena la carta en tu navegador. Las cartas no salen de tu dispositivo ni se guardan.',
+  'privacy.bills.consent':
+    'En las facturas, los documentos llevan tus datos personales y el código de tu suministro. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. Quien sube los documentos no puede consentir por otras personas: sus datos se tratan por interés legítimo (art. 6.1.f del RGPD), solo mientras el modelo lee, y ni se copian ni se guardan.',
+  'privacy.bills.tracked_documents': 'Al leer documentos de tus facturas',
+  'privacy.bills.tracked_documents_what':
+    'La lectura de las facturas y los contratos no envía ningún aviso. Cuando no queda ninguna factura leída por revisar, de «tu año»: cuántas facturas cuenta, en un tramo (1, de 2 a 3, de 4 a 6, de 7 a 12, o 13 o más); lo que suman por encima de la norma, en tramos (cero, menos de 100 €, de 100 a 500 €, de 500 a 2.000 € o más); si se te ofreció el pase, si ves el informe con él, cuántas veces lo completas y cuánto tardas, en tramos. Al descargar, si es el informe o qué carta es y, de una carta, si rellenaste ninguno, alguno o todos sus datos, nunca cuáles. Nunca nada de lo que ponen los documentos ni de lo que escribes en las cartas.',
+  'legal_notice.bills': 'Las revisiones de tus facturas',
+  'legal_notice.bills.does':
+    'Para una factura de la luz de un hogar con la tarifa 2.0TD, de hasta 15 kW, en la Península o Baleares y emitida desde el 12-06-2026, comprueba línea por línea si sus cuentas cuadran con tus propios precios y con lo que fija la norma: días, potencia, energía, peajes y cargos, impuestos de la fecha, alquiler del contador, bono social y cargos que tu tarifa no admite. Para un contrato de móvil o internet, calcula la penalización que permite la ley si te vas antes, si un cambio de condiciones te deja irte sin ella y si te cobran días de después de la baja. Cada resultado lleva la norma o la tabla oficial de la que sale.',
+  'legal_notice.bills.does_not':
+    'No compara ofertas ni dice qué tarifa o qué potencia contratar: para comparar ofertas, la CNMC tiene un comparador oficial. No recalcula la energía del PVPC hora a hora, porque haría falta tu consumo de cada hora. No cubre Canarias, Ceuta ni Melilla, ni facturas emitidas antes del 12-06-2026. No pide nombre, DNI, el código de tu suministro ni número de cuenta. Informa sobre la norma y no es asesoramiento jurídico.',
+  'legal_notice.bills.beta':
+    'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves una cifra que no cuadra con la norma, puedes escribir a',
+  'legal_notice.bills.pass':
+    'En las facturas de la luz, el mismo pase permite revisar tu año entero y descargar un informe en PDF con cada factura y, si alguna línea pasa de la norma, la carta que pide la factura rectificativa; en la permanencia, el informe de tu baja y, si la penalización pasa de lo que permite la norma, la carta que pide revisarla. Se generan en tu dispositivo. La carta que comunica tu baja sin penalización tras un cambio de condiciones se descarga gratis. El pase vale para cualquier revisión durante sus {dias} días.',
   'bills.crumb': 'Facturas',
   'bills.title': 'Factura de la luz y permanencia del móvil o internet',
   'bills.description':
