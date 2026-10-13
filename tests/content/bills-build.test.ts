@@ -33,6 +33,16 @@ describe.skipIf(!built || withBills)('a build without the bills switch', () => {
     expect(html).not.toContain('facturas/');
     expect(html).not.toContain('client.bills.');
   });
+  it('ships none of its analytics codes', () => {
+    const scripts = readdirSync('dist/_astro')
+      .filter((f) => f.endsWith('.js'))
+      .map((f) => read(`dist/_astro/${f}`));
+    for (const code of ['electricity_bill_reviewed', 'faq-luz-iva', 'bono-social-consumo'])
+      expect(
+        scripts.filter((js) => js.includes(`\`${code}\``) || js.includes(`"${code}"`)),
+        code,
+      ).toEqual([]);
+  });
 });
 
 describe.skipIf(!withBills)('a build with the bills switch', () => {

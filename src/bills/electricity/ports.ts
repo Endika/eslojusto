@@ -1,5 +1,6 @@
 import type { SectionEvents } from '../../calculator/section';
 import type { CivilDate } from '../../engine/date';
+import type { Basket } from '../../engine/bills/basket';
 import type { ElectricityDeps, ElectricityReview } from '../../engine/bills/electricity-review';
 import type { ElectricityBillInput, ElectricityOutOfScope } from '../../engine/bills/types';
 import type { Translate } from '../../i18n/client';
@@ -91,6 +92,11 @@ export interface ElectricityEvents extends SectionEvents<Step> {
   reviewCompleted(r: CompletedElectricityReview): void;
   // The result shows no review any more: the answers fell outside it or the person started over.
   reviewCleared(): void;
+}
+
+// «Tu año» once no bill read waits its turn any more, for whoever listens.
+export interface YearEvents {
+  basketCompleted(basket: Basket): void;
 }
 
 export interface ElectricitySetup {

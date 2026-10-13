@@ -1,8 +1,11 @@
+import { documentsAnalytics } from '../analytics/documents';
+import { track } from '../analytics/posthog';
 import { renderBasket } from '../bills/electricity/basket';
 import { electricityCase } from '../bills/electricity/case';
-import type { CompletedElectricityReview } from '../bills/electricity/ports';
+import type { CompletedElectricityReview, YearEvents } from '../bills/electricity/ports';
 import { electricityReading } from '../bills/electricity/reading';
 import { STEPS } from '../bills/electricity/steps';
+import { electricityBasket } from '../bills/electricity/year';
 import type { FormEntries } from '../calculator/fill';
 import type { SectionForm } from '../calculator/section';
 import { createBasket } from '../documents/basket';
@@ -10,7 +13,7 @@ import { DOCUMENTS } from '../documents/config';
 import { ELECTRICITY_EXTRACTION } from '../documents/contract';
 import type { NormTable } from '../engine/bills/norms';
 import { billsTranslator } from './bills-copy';
-import { UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
+import { READS_UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
 
 // A bill of the year with the answers it was reviewed from, which are all the trip to Stripe keeps
 // of it.
@@ -21,12 +24,14 @@ interface KeptBill extends CompletedElectricityReview {
 // Document reading, «tu año», the report and the letter on the electricity review's page. A read
 // can bring several bills: each fills the form in turn and, once reviewed, joins the year, which
 // lives in this page's memory only. One pass is offered for the whole year, by what its bills add
-// up to or repeat. The norms are the ones the reviews read.
+// up to or repeat. The norms are the ones the reviews read; the year is reported once no bill read
+// waits its turn.
 export function wireElectricityDocuments(
   electricity: SectionForm,
   hooks: ReviewHooks<CompletedElectricityReview>,
   arrival: { hash: string; search: string },
   norms: NormTable,
+  yearEvents: YearEvents,
 ): void {
   const tr = billsTranslator();
   const { form } = electricity;
@@ -49,6 +54,7 @@ export function wireElectricityDocuments(
       answers: electricity.entries(),
     });
     reading.reviewed();
+    if (reading.pending() === 0) yearEvents.basketCompleted(electricityBasket(year.entries()));
   });
   hooks.onRestart(() => {
     year.drop();
@@ -61,8 +67,9 @@ export function wireElectricityDocuments(
     arrival,
     config: DOCUMENTS,
     tr,
-    // The review measures nothing yet, and neither does its pass.
-    events: UNMEASURED,
+    // Its reads send no event, as on the other finance pages; the pass is measured as on every
+    // page.
+    events: { ...documentsAnalytics(track), ...READS_UNMEASURED },
     section: {
       extraction: ELECTRICITY_EXTRACTION,
       reading,
