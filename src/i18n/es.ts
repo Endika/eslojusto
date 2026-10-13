@@ -4386,7 +4386,7 @@ export const es = {
   'insurance.guide.unchecked.title': 'Lo que la revisión no mira',
   'insurance.faq.non_renewal': '¿Hasta cuándo puedo decir que no renuevo mi seguro?',
   'insurance.faq.non_renewal_answer':
-    'La ley pide comunicarlo por escrito a la aseguradora con al menos un mes de antelación al final del periodo en curso (art. 22.2 de la Ley de Contrato de Seguro). Como no está aclarado si basta con enviarlo ese día, lo prudente es que tu escrito haya llegado para entonces. La revisión calcula ese último día con el vencimiento de tu póliza.',
+    'La ley pide comunicarlo por escrito a la aseguradora con al menos un mes de antelación al final del periodo en curso (art. 22.2 de la Ley de Contrato de Seguro). Como la ley no aclara si basta con enviarlo ese día, la revisión cuenta con que el escrito tiene que haber llegado para entonces. La revisión calcula ese último día con el vencimiento de tu póliza.',
   'insurance.faq.change_notice':
     '¿Con cuánta antelación me tienen que avisar de un cambio en la póliza?',
   'insurance.faq.change_notice_answer':
@@ -4547,7 +4547,7 @@ export const es = {
   'client.insurance.calculation.non_renewal.days_left_today': 'Hoy es ese último día.',
   'client.insurance.calculation.non_renewal.ended': 'Ese plazo terminó el {day}.',
   'client.insurance.calculation.non_renewal.arrive_by':
-    'Cuenta con que tu escrito tiene que llegar a la aseguradora como tarde el {day}: no está aclarado que baste con enviarlo ese día.',
+    'La revisión cuenta con que el escrito tiene que llegar a la aseguradora como tarde el {day}: la ley no aclara si basta con enviarlo ese día.',
   'client.insurance.calculation.non_renewal.midnight':
     'Si tu póliza vence a las 00:00 h de ese día, se puede leer que el periodo acaba el día anterior, y el plazo tendría un día menos. La póliza tiene que decir el día y la hora en que terminan sus efectos (art. 8 de la Ley de Contrato de Seguro), pero ninguna norma dice cómo se cuenta este caso: es una interpretación.',
   'client.insurance.calculation.non_renewal.month_end':

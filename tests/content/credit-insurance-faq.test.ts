@@ -51,11 +51,11 @@ describe('the insurance FAQ', () => {
     expect(faqNode(entries).mainEntity).toHaveLength(INSURANCE_FAQ_TOPICS.length);
   });
 
-  it('gives the non-renewal notice with its article and the prudent reading', () => {
+  it('gives the non-renewal notice with its article and the reading the review takes', () => {
     const answer = answerOf(entries, 'faq-seguro-no-renovar');
     expect(answer).toContain('art. 22.2');
     expect(answer).toContain('un mes de antelación');
-    expect(answer).toContain('lo prudente es que tu escrito haya llegado');
+    expect(answer).toContain('la revisión cuenta con que el escrito tiene que haber llegado');
   });
 
   it('says nothing of what a late notice leads to', () => {
