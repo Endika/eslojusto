@@ -75,7 +75,7 @@ describe('the contract report', () => {
     expect(all).toContain('Cómo se calcula');
     expect(all).toMatch(/2026: SMI de 17\.094,00 €/);
     expect(all).toMatch(
-      /art\. 3\.1 \(Real Decreto 126\/2026, de 18 de febrero\) · con efectos del 20-02-2026 al 31-12-2026 · en vigor/,
+      /art\. 3\.1 \(Real Decreto 126\/2026, de 18 de febrero\) · con efectos del 01-01-2026 al 31-12-2026\n/,
     );
   });
 

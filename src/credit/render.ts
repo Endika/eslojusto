@@ -158,7 +158,13 @@ export function normStatusText(s: NormSource<NormStatus>, tr: Translate): string
     fecha: s.statusSince ? dayText(s.statusSince) : '',
   });
   if (s.status === 'draft') return status;
-  return `${tr('client.credit.source.since', { desde: dayText(s.inForceSince) })} · ${status}`;
+  const since = dayText(s.inForceSince);
+  const period =
+    s.inForceUntil === null
+      ? tr('client.credit.source.since', { desde: since })
+      : tr('client.credit.source.between', { desde: since, hasta: dayText(s.inForceUntil) });
+  // A wording with an end date says when it applied: «en vigor» would speak of the whole norm.
+  return s.inForceUntil !== null && s.status === 'in_force' ? period : `${period} · ${status}`;
 }
 
 // A court's criterion is shown as such, never as law, with the day it was last read and whether

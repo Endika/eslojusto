@@ -125,10 +125,23 @@ function renderRules(
       a.textContent = s.citation;
       const status = find(li, '[data-rule-status]');
       status.dataset['status'] = s.status;
-      status.textContent = `${tr('client.insurance.source.since', { desde: dayText(s.inForceSince) })} · ${normStatusText(s, tr)}`;
+      status.textContent = sourceText(s, tr);
       return li;
     }),
   );
+}
+
+// When a source took effect, until when, and how its norm stands today.
+function sourceText(s: NormSource, tr: Translate): string {
+  const since = dayText(s.inForceSince);
+  const period =
+    s.inForceUntil === null
+      ? tr('client.insurance.source.since', { desde: since })
+      : tr('client.insurance.source.between', { desde: since, hasta: dayText(s.inForceUntil) });
+  // A wording with an end date says when it applied: «en vigor» would speak of the whole norm.
+  return s.inForceUntil !== null && s.status === 'in_force'
+    ? period
+    : `${period} · ${normStatusText(s, tr)}`;
 }
 
 // Each finding takes the colour and number of the tab that asks for its answers.

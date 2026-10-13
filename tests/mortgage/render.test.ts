@@ -2,7 +2,9 @@
 import { describe, expect, it } from 'vitest';
 import { formatWholeEuros } from '../../src/calculator/number';
 import { parseDate } from '../../src/engine/date';
+import { MORTGAGE_NORMS } from '../../src/engine/mortgage/data/norms';
 import { reviewMortgage, type MortgageReview } from '../../src/engine/mortgage/review';
+import { ruleSource } from '../../src/engine/mortgage/rules';
 import type { MortgageDeps, MortgageInput } from '../../src/engine/mortgage/types';
 import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
@@ -263,6 +265,16 @@ describe('the mortgage result', () => {
 });
 
 describe('the mortgage sources', () => {
+  it('dates a wording that ended by its own period, never «en vigor»', () => {
+    // Art. 114 LH as worded by Ley 1/2013, replaced when the LCCI came into force.
+    expect(sourceText(ruleSource('default_interest_lh114', MORTGAGE_NORMS), tr)).toBe(
+      'con efectos del 15-05-2013 al 15-06-2019',
+    );
+    expect(sourceText(ruleSource('opening_fee_duplicate', MORTGAGE_NORMS), tr)).toMatch(
+      / · en vigor$/,
+    );
+  });
+
   // A plenary ruling's citation already says «(Pleno)», so the court line does not repeat it.
   it('give a norm its day and status, and a ruling its court and the day it was read', () => {
     const r = review(deed2018());

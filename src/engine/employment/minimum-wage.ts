@@ -560,8 +560,10 @@ const decreeSource = (row: MinimumWageRow, article: string, norms: NormTable): N
     id: row.norm,
     citation: `${article} (${norm.citation})`,
     url: row.url,
-    inForceSince: norm.inForceSince,
-    inForceUntil: norm.inForceUntil,
+    // The decree comes into force after it is published, but its amounts take effect for the whole
+    // year, as its final provision says.
+    inForceSince: row.effectsFrom,
+    inForceUntil: row.effectsUntil,
     endUncertainUntil: norm.endUncertainUntil ?? null,
     status: norm.status,
     statusSince: norm.statusSince,
