@@ -7,16 +7,18 @@ import { NORMS } from './norms-table';
 const time = (change: Partial<HouseholdInput> = {}) => assessWorkingTime(household(change), NORMS);
 const holidays = (change: Partial<HouseholdInput> = {}) => assessHolidays(household(change), NORMS);
 
-describe('art. 9 warnings', () => {
+describe('art. 9 limits', () => {
   it('limits the effective week to 40 hours', () => {
     expect(statusOf(time({ weeklyHours: 40 }), 'weekly_40')).toBe('within_limit');
-    expect(statusOf(time({ weeklyHours: 40.5 }), 'weekly_40')).toBe('warning');
+    expect(statusOf(time({ weeklyHours: 40.5 }), 'weekly_40')).toBe('over_legal_limit');
     expect(statusOf(time({ weeklyHours: null }), 'weekly_40')).toBe('not_entered');
   });
 
   it('wants 12 hours between shifts', () => {
     expect(statusOf(time({ shortestRestHours: 12 }), 'rest_between_shifts')).toBe('within_limit');
-    expect(statusOf(time({ shortestRestHours: 11.5 }), 'rest_between_shifts')).toBe('warning');
+    expect(statusOf(time({ shortestRestHours: 11.5 }), 'rest_between_shifts')).toBe(
+      'below_minimum',
+    );
     expect(statusOf(time({ shortestRestHours: null }), 'rest_between_shifts')).toBe('not_entered');
   });
 
@@ -27,9 +29,9 @@ describe('art. 9 warnings', () => {
         'rest_between_shifts',
       );
     expect(live(10, true)).toBe('within_limit');
-    expect(live(10, false)).toBe('warning');
+    expect(live(10, false)).toBe('below_minimum');
     expect(live(10, null)).toBe('review_it');
-    expect(live(9.9, true)).toBe('warning');
+    expect(live(9.9, true)).toBe('below_minimum');
     expect(live(12, null)).toBe('within_limit');
   });
 
@@ -39,12 +41,12 @@ describe('art. 9 warnings', () => {
         time({ liveIn: false, shortestRestHours: 10, restMadeUpWithinFourWeeks: true }),
         'rest_between_shifts',
       ),
-    ).toBe('warning');
+    ).toBe('below_minimum');
   });
 
   it('wants 36 hours of weekly rest', () => {
     expect(statusOf(time({ weeklyRestHours: 36 }), 'weekly_rest_36')).toBe('within_limit');
-    expect(statusOf(time({ weeklyRestHours: 35 }), 'weekly_rest_36')).toBe('warning');
+    expect(statusOf(time({ weeklyRestHours: 35 }), 'weekly_rest_36')).toBe('below_minimum');
     expect(statusOf(time({ weeklyRestHours: null }), 'weekly_rest_36')).toBe('not_entered');
   });
 
@@ -56,13 +58,13 @@ describe('art. 9 warnings', () => {
         holidays({ holidays: { days: 29, longestStretch: 14, taken: null } }),
         'holidays_30',
       ),
-    ).toBe('warning');
+    ).toBe('below_minimum');
     expect(
       statusOf(
         holidays({ holidays: { days: 30, longestStretch: 14, taken: null } }),
         'holidays_stretch_15',
       ),
-    ).toBe('warning');
+    ).toBe('below_minimum');
     expect(
       statusOf(
         holidays({ holidays: { days: 30, longestStretch: null, taken: null } }),
@@ -72,7 +74,7 @@ describe('art. 9 warnings', () => {
     expect(statusOf(holidays({ holidays: null }), 'holidays_30')).toBe('not_entered');
   });
 
-  it('never carries an amount: they are warnings, not money', () => {
+  it('never carries an amount: they fall short of the norm with no money to add', () => {
     const bad = household({
       weeklyHours: 60,
       shortestRestHours: 6,

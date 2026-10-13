@@ -23,7 +23,7 @@ export function assessWorkingTime(input: HouseholdInput, norms: NormTable): read
   else
     out.push(
       one('weekly_40', {
-        status: input.weeklyHours > WEEKLY_HOURS ? 'warning' : 'within_limit',
+        status: input.weeklyHours > WEEKLY_HOURS ? 'over_legal_limit' : 'within_limit',
         calculation: [
           phrase('working_time.weekly_hours', { hours: input.weeklyHours, limit: WEEKLY_HOURS }),
           phrase('working_time.presence_apart'),
@@ -44,7 +44,7 @@ export function assessWorkingTime(input: HouseholdInput, norms: NormTable): read
     const madeUp = input.restMadeUpWithinFourWeeks;
     out.push(
       one('rest_between_shifts', {
-        status: madeUp === true ? 'within_limit' : madeUp === false ? 'warning' : 'review_it',
+        status: madeUp === true ? 'within_limit' : madeUp === false ? 'below_minimum' : 'review_it',
         calculation: [
           phrase('working_time.rest_live_in', { hours: rest, limit: LIVE_IN_REST }),
           phrase(
@@ -61,7 +61,7 @@ export function assessWorkingTime(input: HouseholdInput, norms: NormTable): read
   } else
     out.push(
       one('rest_between_shifts', {
-        status: 'warning',
+        status: 'below_minimum',
         calculation: [
           phrase(input.liveIn ? 'working_time.rest_below_live_in' : 'working_time.rest_below', {
             hours: rest,
@@ -77,7 +77,7 @@ export function assessWorkingTime(input: HouseholdInput, norms: NormTable): read
   else
     out.push(
       one('weekly_rest_36', {
-        status: weekly >= WEEKLY_REST ? 'within_limit' : 'warning',
+        status: weekly >= WEEKLY_REST ? 'within_limit' : 'below_minimum',
         calculation: [phrase('working_time.weekly_rest', { hours: weekly, limit: WEEKLY_REST })],
       }),
     );
@@ -97,13 +97,13 @@ export function assessHolidays(input: HouseholdInput, norms: NormTable): readonl
     ];
   return [
     one('holidays_30', {
-      status: h.days >= HOLIDAY_DAYS ? 'within_limit' : 'warning',
+      status: h.days >= HOLIDAY_DAYS ? 'within_limit' : 'below_minimum',
       calculation: [phrase('holidays.days', { days: h.days, limit: HOLIDAY_DAYS })],
     }),
     h.longestStretch === null
       ? one('holidays_stretch_15', { status: 'not_entered' })
       : one('holidays_stretch_15', {
-          status: h.longestStretch >= HOLIDAY_STRETCH ? 'within_limit' : 'warning',
+          status: h.longestStretch >= HOLIDAY_STRETCH ? 'within_limit' : 'below_minimum',
           calculation: [
             phrase('holidays.stretch', { days: h.longestStretch, limit: HOLIDAY_STRETCH }),
           ],
