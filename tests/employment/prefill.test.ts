@@ -161,9 +161,10 @@ describe('the contract', () => {
         MINIMUM_WAGE,
       )
         .flatMap((a) => (a.kind === 'single' ? [a.finding] : []))
-        .find((f) => f.id === 'extra_pays')?.status;
-    expect(extraPays({ count: 0, prorated: false })).toBe('below_minimum');
-    expect(extraPays({ count: 2, prorated: true })).not.toBe('below_minimum');
+        .find((f) => f.id === 'extra_pays')
+        ?.calculation.map((p) => p.key);
+    expect(extraPays({ count: 0, prorated: false })).toContain('extra_pays.none_below_minimum');
+    expect(extraPays({ count: 2, prorated: true })).not.toContain('extra_pays.none_below_minimum');
   });
 
   it('enters the salary period once when only the annual salary comes', () => {

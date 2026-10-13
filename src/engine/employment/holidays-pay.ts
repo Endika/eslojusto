@@ -236,11 +236,12 @@ function noExtraPays(
     annual: { euros: compared.annual },
     minimum: { euros: compared.minimum },
   };
+  // The shortfall is already counted against the minimum wage: here it is not a second one.
   if (compared.annual < compared.minimum)
     return finding(
       'extra_pays',
       {
-        status: 'below_minimum',
+        status: 'depends_on_agreement',
         calculation: [count, phrase('extra_pays.none_below_minimum', vars)],
         alsoCites: ['smi_annual'],
       },

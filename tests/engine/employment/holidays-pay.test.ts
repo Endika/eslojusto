@@ -498,12 +498,11 @@ describe('extra payments (art. 31 ET)', () => {
     expect(offerPass([{ kind: 'single', finding: f }])).toBe(false);
   });
 
-  it('no payment is below the minimum only when the year falls short of it too', () => {
+  it('no payment under the minimum is not a second shortfall: the minimum wage counts it', () => {
     // 1.400 € × 12 = 16.800 €, under the 17.094 € of 2026.
-    expect(findingFor(twelve(1400), 'extra_pays')).toMatchObject({
-      status: 'below_minimum',
-      amount: null,
-    });
+    const f = findingFor(twelve(1400), 'extra_pays');
+    expect(f).toMatchObject({ status: 'depends_on_agreement', amount: null });
+    expect(f?.calculation.map((p) => p.key)).toContain('extra_pays.none_below_minimum');
   });
 
   it('no payment is to review when the yearly pay is unknown', () => {

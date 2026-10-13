@@ -2598,7 +2598,7 @@ export const es = {
   'client.employment.calculation.extra_pays.none_over_minimum':
     'Tu salario de {year}, {annual} al año, llega al SMI, que es de {minimum}. El art. 31 da derecho a dos pagas extra, pero su importe lo fija tu convenio, que también puede repartirlas en las 12 nóminas: puede que tu salario ya las lleve dentro.',
   'client.employment.calculation.extra_pays.none_below_minimum':
-    'Sin pagas extra, tu salario de {year}, {annual} al año, no llega al SMI, que es de {minimum} y ya cuenta las dos pagas (art. 31).',
+    'Sin pagas extra, tu salario de {year}, {annual} al año, no llega al SMI, que es de {minimum} y ya cuenta las dos pagas (art. 31). Esa falta se cuenta en el punto del salario mínimo; la cuantía de cada paga la fija tu convenio.',
   'client.employment.calculation.extra_pays.none_pay_unknown':
     'El art. 31 da derecho a dos pagas extra, y el convenio puede repartirlas en las 12 nóminas; sin saber tu salario al año no se puede comprobar si van dentro.',
   'client.employment.calculation.extra_pays.in_daily_minimum':
