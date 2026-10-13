@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.54.1](https://github.com/Endika/eslojusto/compare/v1.54.0...v1.54.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* align copy across sections with the BOE and drop advice ([e2ecbf3](https://github.com/Endika/eslojusto/commit/e2ecbf378ebe7629b8ba4159c665317fb640d40c))
+
 ## [1.54.0](https://github.com/Endika/eslojusto/compare/v1.53.10...v1.54.0) (2026-10-13)
 
 
