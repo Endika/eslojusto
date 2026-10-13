@@ -52,6 +52,33 @@ jobs:
           PUBLIC_API_CHECKOUT_URL: ${{ vars.PUBLIC_API_CHECKOUT_URL }}
           PUBLIC_API_PASS_URL: ${{ vars.PUBLIC_API_PASS_URL }}
           PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+      # No CI job builds with the real origins: a malformed or missing var would ship pages
+      # without document reading, the pass or analytics and nothing would fail.
+      - name: check the build carries the real origins
+        env:
+          PUBLIC_POSTHOG_KEY: ${{ vars.PUBLIC_POSTHOG_KEY }}
+          PUBLIC_API_EXTRACT_URL: ${{ vars.PUBLIC_API_EXTRACT_URL }}
+          PUBLIC_API_CHECKOUT_URL: ${{ vars.PUBLIC_API_CHECKOUT_URL }}
+          PUBLIC_API_PASS_URL: ${{ vars.PUBLIC_API_PASS_URL }}
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+        run: |
+          fail() { echo "::error::$1"; exit 1; }
+          for name in PUBLIC_POSTHOG_KEY PUBLIC_API_EXTRACT_URL PUBLIC_API_CHECKOUT_URL PUBLIC_API_PASS_URL PUBLIC_TURNSTILE_SITE_KEY; do
+            [ -n "${!name}" ] || fail "$name is not set"
+          done
+          origins="https://eu.i.posthog.com https://challenges.cloudflare.com"
+          for url in "$PUBLIC_API_EXTRACT_URL" "$PUBLIC_API_CHECKOUT_URL" "$PUBLIC_API_PASS_URL"; do
+            origins="$origins $(printf '%s' "$url" | grep -oE '^https://[^/]+')"
+          done
+          for page in finiquito paro alquiler contrato hipoteca financiacion seguros; do
+            html="dist/$page/index.html"
+            grep -q 'data-pass-buy' "$html" || fail "/$page/ has no pass"
+            grep -q 'data-documents-start' "$html" || fail "/$page/ has no document reading"
+            csp=$(grep -oE 'connect-src[^;"]*' "$html")
+            for origin in $origins; do
+              [[ " $csp " == *" $origin "* ]] || fail "/$page/ connect-src lacks $origin"
+            done
+          done
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
