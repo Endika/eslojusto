@@ -3614,6 +3614,10 @@ export const es = {
   'client.rental.calculation.rent_update.accepted_by_paying_up_to_max':
     'No te avisaron por escrito, pero pagaste la subida: si eso cuenta como aceptarla, desde el aniversario valía la subida hasta la renta máxima. Lo que pasa de ella lo pagas de más igualmente.',
   'client.rental.calculation.rent_update.months': 'Meses contados: {months}, de {from} a {to}.',
+  'client.rental.calculation.rent_update.until_today':
+    'Como no has metido una subida posterior, la cuenta supone que la renta siguió así hasta hoy. Si el casero la corrigió después, es menos.',
+  'client.rental.calculation.rent_update.five_years':
+    'Solo cuentan los últimos 5 años, el plazo de prescripción que da el Código Civil a estas acciones (arts. 1964.2 y 1966).',
   'client.rental.calculation.rent_update.monthly_over': 'Pagas {monthly} de más cada mes.',
   'client.rental.calculation.rent_update.within_limit': 'La renta nueva no pasa de la máxima.',
   'client.rental.calculation.rent_update.other_clause_within_cap':

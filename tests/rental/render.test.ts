@@ -86,8 +86,9 @@ describe('the summary of an item', () => {
   };
 
   it('words a reading with no figure by its result, never as «0 €»', () => {
+    // 30 a month from June 2023 to October 2026: 41 months = 1.230 €.
     expect(dependsText(unknownLargeLandlord)).toBe(
-      'Depende de si tu casero es gran tenedor: no se puede comprobar o pagas de más unos 360 €',
+      'Depende de si tu casero es gran tenedor: no se puede comprobar o pagas de más unos 1.230 €',
     );
   });
 
@@ -102,9 +103,11 @@ describe('the summary of an item', () => {
     };
     const s = summarise(firstRise(verbal));
     if (s.kind !== 'depends') throw new Error('expected depends');
-    expect([s.counted, s.upTo]).toEqual([110.4, 360]);
+    // March 2025 to October 2026, 20 months: 9,20 a month over the IRAV = 184 €; the whole rise,
+    // 30 a month = 600 €.
+    expect([s.counted, s.upTo]).toEqual([184, 600]);
     expect(dependsText(verbal)).toBe(
-      'Depende de si pagar la subida sin aviso por escrito cuenta como aceptarla: entre 110 € y 360 €',
+      'Depende de si pagar la subida sin aviso por escrito cuenta como aceptarla: entre 180 € y 600 €',
     );
   });
 
@@ -197,8 +200,9 @@ describe('the result', () => {
 
   it('counts the total as «al menos …»', () => {
     const root = render(riseAboveIrav, true);
+    // 184 €, to tens.
     expect(text(root.querySelector('[data-totals]'))).toBe(
-      'Pagas o has pagado de más al menos unos 110 €.',
+      'Pagas o has pagado de más al menos unos 180 €.',
     );
   });
 

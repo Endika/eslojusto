@@ -1,6 +1,6 @@
 {
   "id": "other-clause-over-cap-2022",
-  "description": "An «other» clause (a municipal price index): only the cap is known, RDL 6/2022 art. 46 at 2 %; 630 € on a 600 € rent passes that ceiling by 18 € a month, 216 €.",
+  "description": "An «other» clause (a municipal price index): only the cap is known, RDL 6/2022 art. 46 at 2 %; 630 € on a 600 € rent passes that ceiling by 18 € a month from September 2022 to September 2026, 49 months, 882 €.",
   "eval": false,
   "today": "2026-10-07",
   "pages": [
@@ -130,7 +130,7 @@
         {
           "id": "rent_update:0",
           "status": "paid_over",
-          "amount": 216
+          "amount": 882
         }
       ]
     }

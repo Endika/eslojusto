@@ -1,6 +1,6 @@
 {
   "id": "igc-cap-2022",
-  "description": "RDL 6/2022 art. 46: without a new agreement, a 20-06-2022 anniversary is capped at the IGC, which Ley 2/2015 (annex) brings down to 2 %: 1.000 € may reach 1.020 €, so 67 € a month over twelve months, 804 €, were paid over.",
+  "description": "RDL 6/2022 art. 46: without a new agreement, a 20-06-2022 anniversary is capped at the IGC, which Ley 2/2015 (annex) brings down to 2 %: 1.000 € may reach 1.020 €, so 67 € a month from June 2022 to September 2026, 52 months, 3.484 €, were paid over.",
   "eval": false,
   "today": "2026-10-07",
   "pages": [
@@ -130,7 +130,7 @@
         {
           "id": "rent_update:0",
           "status": "paid_over",
-          "amount": 804
+          "amount": 3484
         }
       ]
     }

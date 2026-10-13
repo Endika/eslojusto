@@ -58,12 +58,14 @@ describe('the rental report', () => {
 
   it('gives each item with its exact figures and its calculation', () => {
     expect(all).toContain('Subida del 20-03-2025');
-    expect(all).toMatch(/Pagas de más: 110,40\s€/);
+    // 9,20 a month from March 2025 to May 2026, the month before the keys: 15 months = 138 €.
+    expect(all).toMatch(/Pagas de más: 138,00\s€/);
     expect(all).toMatch(/Renta máxima 1\.020,80\s€/);
     expect(all).toMatch(/De más cada mes 9,20\s€/);
     expect(all).toMatch(/Pagas de más: 500,00\s€/);
     expect(all).toMatch(/Te deben 150,00\s€/);
-    expect(all).toMatch(/Pagas o has pagado de más al menos 610,40\s€\./);
+    // 138 € for the rise and 500 € of agency fee.
+    expect(all).toMatch(/Pagas o has pagado de más al menos 638,00\s€\./);
   });
 
   it('gives both readings of a doubt, and what the total takes of it', () => {

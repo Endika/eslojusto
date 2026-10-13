@@ -1,6 +1,6 @@
 {
   "id": "unspecified-index-2020",
-  "description": "LAU art. 18.1 (RDL 7/2019): a clause that names no index follows the IGC, negative in March 2020 and so 0 % by Ley 2/2015, and the CPI cap (May 2020, -0,9 %) allows no rise either: the 2 % taken on 17-06-2020 is 14 € a month over, 168 € in the year.",
+  "description": "LAU art. 18.1 (RDL 7/2019): a clause that names no index follows the IGC, negative in March 2020 and so 0 % by Ley 2/2015, and the CPI cap (May 2020, -0,9 %) allows no rise either: the 2 % taken on 17-06-2020 is 14 € a month over; only the last five years count (CC arts. 1964.2 and 1966), October 2021 to September 2026, 60 months, 840 €.",
   "eval": false,
   "today": "2026-10-07",
   "pages": [
@@ -130,7 +130,7 @@
         {
           "id": "rent_update:0",
           "status": "paid_over",
-          "amount": 168
+          "amount": 840
         }
       ]
     }

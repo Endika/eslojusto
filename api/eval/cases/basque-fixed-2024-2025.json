@@ -1,6 +1,6 @@
 {
   "id": "basque-fixed-2024-2025",
-  "description": "A lease in Basque with a fixed 3 % clause, signed after Ley 12/2023: 3 % is within in 2024 (DF 6.ª), but on 20-07-2025 the IRAV (2,1 %, LAU DA 11.ª) caps it, so 9,27 € a month, 111,24 €, were paid over.",
+  "description": "A lease in Basque with a fixed 3 % clause, signed after Ley 12/2023: 3 % is within in 2024 (DF 6.ª), but on 20-07-2025 the IRAV (2,1 %, LAU DA 11.ª) caps it, so 9,27 € a month from July 2025 to September 2026, 15 months, 139,05 €, were paid over.",
   "eval": true,
   "today": "2026-10-07",
   "pages": [
@@ -146,7 +146,7 @@
         {
           "id": "rent_update:1",
           "status": "paid_over",
-          "amount": 111.24
+          "amount": 139.05
         }
       ]
     }

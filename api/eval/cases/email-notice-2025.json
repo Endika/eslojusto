@@ -1,6 +1,6 @@
 {
   "id": "email-notice-2025",
-  "description": "LAU art. 18.2: the update is due from the month after written notice; whether an email counts as written is not settled, so July 2025 alone (20,70 €) or the whole year (248,40 €) was paid over, and 20,70 € is counted.",
+  "description": "LAU art. 18.2: the update is due from the month after written notice; whether an email counts as written is not settled, so July 2025 alone (20,70 €) or every month from July 2025 to September 2026 (15 × 20,70 = 310,50 €) was paid over, and 20,70 € is counted.",
   "eval": true,
   "today": "2026-10-07",
   "pages": [
@@ -158,7 +158,7 @@
           "id": "rent_update:0",
           "status": "depends",
           "amount": 20.7,
-          "upTo": 248.4,
+          "upTo": 310.5,
           "reasons": ["notice_form_doubtful"]
         }
       ]

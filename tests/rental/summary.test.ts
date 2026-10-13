@@ -24,25 +24,27 @@ describe('the free summary', () => {
   });
 
   it('a rise paid over carries the months it was paid over, added up', () => {
+    // 9,20 a month from March 2025 to October 2026: 20 months = 184 €.
     expect(riseOf(riseAboveIrav)).toEqual({
       kind: 'single',
-      verdict: { status: 'paid_over', amount: 110.4 },
+      verdict: { status: 'paid_over', amount: 184 },
     });
     expect(totalLines(review(riseAboveIrav))).toEqual([
-      { kind: 'paidOver', total: { counted: 110.4, upTo: 110.4 } },
+      { kind: 'paidOver', total: { counted: 184, upTo: 184 } },
     ]);
     expect(headline(review(riseAboveIrav))).toBe('found');
   });
 
   it('«No lo sé» on a large landlord: both readings, only the lower counted', () => {
     const s = riseOf(unknownLargeLandlord);
+    // Over the 2 % IGC, 30 a month from June 2023 to October 2026: 41 months = 1.230 €.
     expect(s).toMatchObject({
       kind: 'depends',
       reasons: ['large_landlord_unknown'],
       low: { status: 'not_checkable', amount: null },
-      high: { status: 'paid_over', amount: 360 },
+      high: { status: 'paid_over', amount: 1230 },
       counted: 0,
-      upTo: 360,
+      upTo: 1230,
     });
     expect(totalShare(s)).toBe('out');
     expect(headline(review(unknownLargeLandlord))).toBe('only_doubtful');

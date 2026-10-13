@@ -1,6 +1,6 @@
 {
   "id": "fixed-percent-2023-2024-long",
-  "description": "A fixed 5 % clause in a long four-sheet contract: on 15-09-2023 RDL 20/2022 art. 67 caps the rise at the IGC (2 %), and on 15-09-2024 Ley 12/2023 DF 6.ª caps it at 3 % while the CPI (2,3 %) is lower still (LAU art. 18.1); each year starts from the allowed rent, not the charged one, so 324 € and 637,68 € were paid over.",
+  "description": "A fixed 5 % clause in a long four-sheet contract: on 15-09-2023 RDL 20/2022 art. 67 caps the rise at the IGC (2 %), and on 15-09-2024 Ley 12/2023 DF 6.ª caps it at 3 % while the CPI (2,3 %) is lower still (LAU art. 18.1); each year starts from the allowed rent, not the charged one, so 27 € a month from September 2023 to August 2024 (12 months, 324 €) and 53,14 € a month from September 2024 to September 2026 (25 months, 1.328,50 €) were paid over.",
   "eval": true,
   "today": "2026-10-07",
   "pages": [
@@ -174,7 +174,7 @@
         {
           "id": "rent_update:1",
           "status": "paid_over",
-          "amount": 637.68
+          "amount": 1328.5
         }
       ]
     }

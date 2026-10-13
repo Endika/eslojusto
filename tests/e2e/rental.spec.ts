@@ -122,7 +122,8 @@ for (const { name, viewport } of SIZES) {
   test.describe(name, () => {
     test('a 2025 rise above the IRAV is paid over, counted in the total', async ({ page }) => {
       await open(page, viewport);
-      // 20-03-2025: the IRAV of February 2025 (2,08 %) caps a contract signed from 26-05-2023.
+      // 20-03-2025: the IRAV of February 2025 (2,08 %) caps a contract signed from 26-05-2023;
+      // 9,20 € a month from March 2025 to October 2026: 20 months = 184 €, about 180 €.
       await fillCase(page, {
         signed: '2024-03-15',
         start: '2024-03-20',
@@ -137,10 +138,10 @@ for (const { name, viewport } of SIZES) {
         },
       });
       const card = page.getByRole('region', { name: 'Subida del 20-03-2025' });
-      await expect(card.locator('.item__status')).toHaveText(/Pagas de más: unos 110\s€/);
+      await expect(card.locator('.item__status')).toHaveText(/Pagas de más: unos 180\s€/);
       await expect(card.getByRole('link', { name: /IRAV|INE/ }).first()).toBeVisible();
       await expect(page.getByRole('region', { name: 'Resumen' })).toContainText(
-        /al menos unos 110\s€/,
+        /al menos unos 180\s€/,
       );
       // Without the documents API the detail is all there: index, month, publication and cap.
       await card.getByText('Cómo se calcula').click();
@@ -171,7 +172,8 @@ for (const { name, viewport } of SIZES) {
 
     test('«No lo sé» on a large landlord gives two readings', async ({ page }) => {
       await open(page, viewport);
-      // 25-06-2023: a 5 % rise agreed in writing; a large landlord stays within the IGC (2 %).
+      // 25-06-2023: a 5 % rise agreed in writing; a large landlord stays within the IGC (2 %),
+      // so 30 € a month from June 2023 to October 2026: 41 months = 1.230 €.
       await fillCase(page, {
         signed: '2020-06-20',
         start: '2020-06-25',
@@ -190,14 +192,15 @@ for (const { name, viewport } of SIZES) {
       const card = page.getByRole('region', { name: 'Subida del 25-06-2023' });
       await expect(card.locator('.item__status')).toHaveText('Depende');
       await expect(card).toContainText(
-        /Depende de si tu casero es gran tenedor: no se puede comprobar o pagas de más unos 360\s€/,
+        /Depende de si tu casero es gran tenedor: no se puede comprobar o pagas de más unos 1\.230\s€/,
       );
       await expect(card).toContainText('No se suma al total');
     });
 
     test('a rise accepted by word of mouth is a doubt, out of the total', async ({ page }) => {
       await open(page, viewport);
-      // 25-06-2023: a 5 % rise against the IGC (2 %) without a new agreement.
+      // 25-06-2023: a 5 % rise against the IGC (2 %) without a new agreement: 30 € a month from
+      // June 2023 to October 2026, 41 months = 1.230 €.
       await fillCase(page, {
         signed: '2020-06-20',
         start: '2020-06-25',
@@ -215,7 +218,7 @@ for (const { name, viewport } of SIZES) {
       const card = page.getByRole('region', { name: 'Subida del 25-06-2023' });
       await expect(card.locator('.item__status')).toHaveText('Depende');
       await expect(card).toContainText(
-        /Depende de si se puede probar que la aceptaste de palabra: no se puede comprobar o pagas de más unos 360\s€/,
+        /Depende de si se puede probar que la aceptaste de palabra: no se puede comprobar o pagas de más unos 1\.230\s€/,
       );
       await expect(card).toContainText('No se suma al total');
     });
