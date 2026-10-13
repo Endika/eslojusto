@@ -71,7 +71,8 @@ export function totalShare(s: ItemSummary): TotalShare {
   return s.counted < s.upTo ? 'lowest' : 'in';
 }
 
-export type Headline = 'found' | 'only_doubtful' | 'nothing_found' | 'nothing_entered';
+export type Headline =
+  'found' | 'only_doubtful' | 'to_review' | 'nothing_found' | 'nothing_entered';
 
 // The summary's first line: something counted, something only in some readings, or nothing.
 export function headline(review: RentalReview): Headline {
@@ -83,7 +84,9 @@ export function headline(review: RentalReview): Headline {
     const s = summarise(item);
     return s.kind === 'single' ? [s.verdict.status] : [s.low.status, s.high.status];
   });
-  return statuses.every((s) => s === 'not_entered') ? 'nothing_entered' : 'nothing_found';
+  if (statuses.every((s) => s === 'not_entered')) return 'nothing_entered';
+  // A point left to review is not «nothing over the law».
+  return statuses.includes('review_it') ? 'to_review' : 'nothing_found';
 }
 
 // The total lines, in the order the summary shows them: only those with something in them.
