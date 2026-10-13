@@ -100,6 +100,25 @@ function phrasesOf(input: EmploymentInput): EmploymentPhrase[] {
     .flatMap(nested);
 }
 
+describe('the information duty of a contract already running', () => {
+  const running = (info: Partial<EmploymentInput['info']> = {}) => {
+    const base = contract({ startDate: f('2026-01-07'), signedOn: f('2026-01-07') });
+    return { ...base, info: { ...base.info, ...info } };
+  };
+  const noteOf = (root: HTMLElement) =>
+    card(root, 'Información obligatoria por escrito')?.querySelector<HTMLElement>(
+      '[data-answer-note]',
+    );
+
+  it('says nothing about asking for it when every point is already there', () => {
+    expect(noteOf(render(running(), false))?.hidden).toBe(true);
+  });
+
+  it('says it can be asked for while a point is missing', () => {
+    expect(text(noteOf(render(running({ b: 'absent' }), false)))).toMatch(/puedes pedir/);
+  });
+});
+
 describe('the employment result', () => {
   it('words every phrase it meets, with no placeholder left', () => {
     for (const input of corners)

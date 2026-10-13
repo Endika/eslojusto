@@ -652,7 +652,12 @@ function dutyCard(
       : toReview > 0
         ? count('review', toReview)
         : tr('client.employment.duty.complete');
-  note(find(el, '[data-answer-note]'), tr(`client.employment.duty.${duty.moment}`));
+  // A running contract with every point already in hand has nothing left to ask for.
+  const complete = missing === 0 && toReview === 0;
+  note(
+    find(el, '[data-answer-note]'),
+    complete && duty.moment === 'on_request' ? null : tr(`client.employment.duty.${duty.moment}`),
+  );
   renderRules(
     container,
     find(el, '[data-rules]'),
