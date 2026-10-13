@@ -33,12 +33,15 @@ export interface FeeFinding {
 
 // What an operation's cap depends on when the person or the law leaves it open: a mixed rate read
 // as fixed or as variable; the option of art. 23.5 the deed picks; for a deed before the LCCI,
-// whether its art. 23.6 and the window of 2022-2024 reach it (`lcci_reach`) or not; and, under
-// Ley 41/2007, whether a variable rate is revised at least once a year (art. 9).
+// whether its art. 23.6 and the window of 2022-2024 reach it (`lcci_reach`) or not; under
+// Ley 41/2007, whether a variable rate is revised at least once a year (art. 9); and, for the
+// fixed stretch of a mixed rate, whether the ten years of art. 23.7 run from the deed or from the
+// day the fixed rate applies.
 export type RateReading = 'fixed' | 'variable';
 export type OptionReading = 'option_a' | 'option_b';
 export type ReachReading = 'deed_regime' | 'lcci_reach';
 export type RevisionReading = 'revised_yearly' | 'revised_less_often';
+export type StretchReading = 'from_deed' | 'from_fixed_rate';
 
 export type FeeQuestion =
   | 'rate_type'
@@ -49,14 +52,17 @@ export type FeeQuestion =
   | 'rate_type_and_earlier_deed'
   | 'rate_type_and_rate_revision'
   | 'earlier_deed_and_rate_revision'
-  | 'rate_type_and_earlier_deed_and_rate_revision';
+  | 'rate_type_and_earlier_deed_and_rate_revision'
+  | 'rate_type_and_fixed_stretch'
+  | 'rate_type_and_prepayment_option_and_fixed_stretch';
 
 export type FeeReading =
   | RateReading
   | `${RateReading}.${OptionReading}`
   | `${RateReading}.${ReachReading}`
   | `${RateReading}.${RevisionReading}`
-  | `${RateReading}.${ReachReading}.${RevisionReading}`;
+  | `${RateReading}.${ReachReading}.${RevisionReading}`
+  | `${RateReading}.${StretchReading}`;
 
 export type FeeItem = Across<FeeQuestion, FeeReading, FeeFinding>;
 
@@ -73,6 +79,8 @@ interface World {
   readonly reach: ReachReading | null;
   // Null when the revision cannot change the cap, or when the person gave it.
   readonly revision: RevisionReading | null;
+  // Null unless the two counts of art. 23.7 can give different caps.
+  readonly stretch: StretchReading | null;
 }
 
 type Cap =
@@ -104,6 +112,9 @@ const PREPAYMENT: ReadonlySet<OperationKind> = new Set([
   'full_prepayment',
   'creditor_subrogation',
 ]);
+
+// Art. 23.7: 2 % in the first ten years, 1,5 % after.
+const FIXED_FIRST_YEARS = 10;
 
 // Whether the operation falls within the first `years` of the contract, counted from the deed.
 const withinYears = (deed: CivilDate, on: CivilDate, years: number): boolean =>
@@ -171,13 +182,20 @@ function prepaymentCap(
   if (lcci === 'doubt')
     return none('review_it', 'fees.doubtful_norm', ['prepayment_lcci_variable']);
   if (lcci === 'applies') {
-    // 23.7: 2 % of the capital repaid in the first ten years, 1,5 % after.
+    // 23.7: 2 % of the capital repaid in the first ten years, 1,5 % after. Counted from the day
+    // the fixed rate applies, a day not asked, they may run past the deed's tenth year.
     if (world.rate === 'fixed') {
-      const first = withinYears(deed, on, 10);
+      const first = withinYears(deed, on, FIXED_FIRST_YEARS);
+      if (!first && world.stretch === 'from_fixed_rate')
+        return none('not_checkable', 'fees.lcci_fixed_from_fixed_rate', ['prepayment_lcci_fixed']);
       return cap(
         first ? 2 : 1.5,
         ['prepayment_lcci_fixed'],
-        [p(first ? 'fees.lcci_fixed_first' : 'fees.lcci_fixed_after', { years: { integer: 10 } })],
+        [
+          p(first ? 'fees.lcci_fixed_first' : 'fees.lcci_fixed_after', {
+            years: { integer: FIXED_FIRST_YEARS },
+          }),
+        ],
         true,
       );
     }
@@ -313,17 +331,31 @@ function worlds(operation: Operation, input: MortgageInput, deps: MortgageDeps):
         ? (['revised_yearly', 'revised_less_often'] as const)
         : [null]
       : [null];
+  // Within the deed's first ten years both counts of art. 23.7 give 2 %.
+  const stretches: readonly (StretchReading | null)[] =
+    prepayment &&
+    input.rateType === 'mixed' &&
+    !withinYears(input.deedOn, operation.on, FIXED_FIRST_YEARS)
+      ? ['from_deed', 'from_fixed_rate']
+      : [null];
   return rates.flatMap((rate): World[] => {
     if (lcciDeed(input, deps.norms)) {
-      const options: readonly (OptionReading | null)[] =
-        !prepayment || rate === 'fixed'
-          ? [null]
-          : option === 'a_015_5y'
-            ? ['option_a']
-            : option === 'b_025_3y'
-              ? ['option_b']
-              : ['option_a', 'option_b'];
-      return options.map((o) => ({ rate, option: o, reach: null, revision: null }));
+      if (rate === 'fixed')
+        return stretches.map((stretch) => ({
+          rate,
+          option: null,
+          reach: null,
+          revision: null,
+          stretch,
+        }));
+      const options: readonly (OptionReading | null)[] = !prepayment
+        ? [null]
+        : option === 'a_015_5y'
+          ? ['option_a']
+          : option === 'b_025_3y'
+            ? ['option_b']
+            : ['option_a', 'option_b'];
+      return options.map((o) => ({ rate, option: o, reach: null, revision: null, stretch: null }));
     }
     const reaches =
       windowOn(operation, rate, deps.norms) !== undefined ||
@@ -332,19 +364,28 @@ function worlds(operation: Operation, input: MortgageInput, deps: MortgageDeps):
       ? ['deed_regime', 'lcci_reach']
       : [null];
     return reachReadings.flatMap((reach) =>
-      revisions(rate, reach).map((revision) => ({ rate, option: null, reach, revision })),
+      revisions(rate, reach).map((revision) => ({
+        rate,
+        option: null,
+        reach,
+        revision,
+        stretch: null,
+      })),
     );
   });
 }
 
 const readingOf = (w: World): FeeReading =>
-  [w.rate, w.option, w.reach, w.revision].filter((x) => x !== null).join('.') as FeeReading;
+  [w.rate, w.option, w.reach, w.revision, w.stretch]
+    .filter((x) => x !== null)
+    .join('.') as FeeReading;
 
 const QUESTION_PARTS = [
   ['rate', 'rate_type'],
   ['option', 'prepayment_option'],
   ['reach', 'earlier_deed'],
   ['revision', 'rate_revision'],
+  ['stretch', 'fixed_stretch'],
 ] as const;
 
 function questionOf(ws: readonly World[]): FeeQuestion {

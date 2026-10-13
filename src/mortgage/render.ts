@@ -17,6 +17,7 @@ import type {
   RateReading,
   ReachReading,
   RevisionReading,
+  StretchReading,
 } from '../engine/mortgage/fees';
 import type { ClauseFlag, FlagPart } from '../engine/mortgage/flags';
 import type { InformationBlock } from '../engine/mortgage/information';
@@ -309,7 +310,7 @@ export function feeStatusText(f: FeeFinding, tr: Translate): string {
     : tr(`client.mortgage.status.${f.status}`);
 }
 
-type ReadingPart = RateReading | OptionReading | ReachReading | RevisionReading;
+type ReadingPart = RateReading | OptionReading | ReachReading | RevisionReading | StretchReading;
 
 // The point each part of a reading answers; a reading names only the points its item is open on.
 const POINT_OF: Record<ReadingPart, string> = {
@@ -321,6 +322,8 @@ const POINT_OF: Record<ReadingPart, string> = {
   lcci_reach: 'earlier_deed',
   revised_yearly: 'rate_revision',
   revised_less_often: 'rate_revision',
+  from_deed: 'fixed_stretch',
+  from_fixed_rate: 'fixed_stretch',
 };
 
 // «Con la norma de la fecha de tu escritura · Si se revisa cada 12 meses o menos».

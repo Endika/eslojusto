@@ -53,6 +53,7 @@ export type MortgagePhraseKey =
   | 'fees.lcci_variable'
   | 'fees.lcci_fixed_first'
   | 'fees.lcci_fixed_after'
+  | 'fees.lcci_fixed_from_fixed_rate'
   | 'fees.law41_first'
   | 'fees.law41_after'
   | 'fees.law41_fixed'

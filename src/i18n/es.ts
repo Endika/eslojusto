@@ -5825,6 +5825,10 @@ export const es = {
     'Depende de si el tope de la ley de 2019 o la ventana de 2022 a 2024 llegan a tu escritura, algo que no está claro, y de cada cuánto se revisa tu tipo: el total cuenta la lectura más baja.',
   'client.mortgage.depends.rate_type_and_earlier_deed_and_rate_revision':
     'Depende de si se lee como de tipo fijo o variable, de si el tope de la ley de 2019 o la ventana de 2022 a 2024 llegan a tu escritura y de cada cuánto se revisa tu tipo: el total cuenta la lectura más baja.',
+  'client.mortgage.depends.rate_type_and_fixed_stretch':
+    'Tu hipoteca es mixta: el tope cambia si se lee como de tipo fijo o variable y, como fijo, según desde cuándo se cuenten los 10 años del art. 23.7 («los 10 primeros años de vigencia del contrato de préstamo o desde el día que resulta aplicable el tipo fijo»): el total cuenta la lectura más baja.',
+  'client.mortgage.depends.rate_type_and_prepayment_option_and_fixed_stretch':
+    'Depende de si se lee como de tipo fijo o variable, de la comisión que fija tu escritura, que no sabes, y, como fijo, de desde cuándo se cuenten los 10 años del art. 23.7 («los 10 primeros años de vigencia del contrato de préstamo o desde el día que resulta aplicable el tipo fijo»): el total cuenta la lectura más baja.',
   'client.mortgage.reading.fixed': 'Si se lee como fijo',
   'client.mortgage.reading.variable': 'Si se lee como variable',
   'client.mortgage.reading.option_a': 'Con el 0,15 % durante 5 años',
@@ -5833,6 +5837,9 @@ export const es = {
   'client.mortgage.reading.lcci_reach': 'Si la ley de 2019 llega a tu escritura',
   'client.mortgage.reading.revised_yearly': 'Si se revisa cada 12 meses o menos',
   'client.mortgage.reading.revised_less_often': 'Si se revisa con menos frecuencia',
+  'client.mortgage.reading.from_deed': 'Con los 10 años contados desde la escritura',
+  'client.mortgage.reading.from_fixed_rate':
+    'Con los 10 años contados desde que se aplica el tipo fijo',
 
   'client.mortgage.calculation.scope.company':
     'Esta revisión es para la hipoteca que pide una persona sobre su vivienda: un préstamo a una empresa tiene otras reglas, que aquí no se calculan.',
@@ -5926,6 +5933,8 @@ export const es = {
     'Con tipo fijo, la ley fija como tope el 2 % del capital amortizado en los {years} primeros años (art. 23.7).',
   'client.mortgage.calculation.fees.lcci_fixed_after':
     'Con tipo fijo, pasados los {years} primeros años, la ley fija como tope el 1,5 % del capital amortizado (art. 23.7).',
+  'client.mortgage.calculation.fees.lcci_fixed_from_fixed_rate':
+    'Contados desde el día en que empezó a aplicarse el tipo fijo, el tope es el 2 % del capital amortizado dentro de esos 10 años y el 1,5 % después (art. 23.7). Esta revisión no pregunta ese día: aquí no se puede comprobar el tope.',
   'client.mortgage.calculation.fees.law41_first':
     'Para tu escritura, la Ley 41/2007 fija como tope el 0,5 % del capital amortizado en los {years} primeros años (art. 8).',
   'client.mortgage.calculation.fees.law41_after':

@@ -242,6 +242,37 @@ describe('the mortgage result', () => {
     expect(root.querySelector('[data-total-more]')?.hasAttribute('hidden')).toBe(false);
   });
 
+  it('titles the two counts of the ten years of art. 23.7 for a mixed rate read as fixed', () => {
+    const repaid = {
+      on: d('2029-07-01'),
+      kind: 'full_prepayment' as const,
+      principal: 100_000,
+      feeCharged: 1_800,
+      hadInsurance: null,
+    };
+    const input = mortgage({
+      deedOn: d('2019-07-01'),
+      rateType: 'mixed',
+      prepaymentOption: 'a_015_5y',
+      operations: [repaid],
+    });
+    // Ten years after the deed, so a day still to come today.
+    const r = reviewMortgage(input, d('2029-07-02'), DEPS);
+    if (!r.ok) throw new Error(JSON.stringify(r.errors));
+    const root = rendered(r.review);
+    const fee = root.querySelector('[data-item="full_prepayment"]');
+    expect(
+      [...(fee?.querySelectorAll('[data-reading-title]') ?? [])].map((h) => h.textContent),
+    ).toEqual([
+      'Si se lee como fijo · Con los 10 años contados desde la escritura',
+      'Si se lee como fijo · Con los 10 años contados desde que se aplica el tipo fijo',
+      'Si se lee como variable',
+    ]);
+    expect(text(root, '[data-total="fees"] [data-total-amount]')).toBe(
+      'Nada en la lectura más baja',
+    );
+  });
+
   it('a total under a euro reads «menos de 1 €», never «unos 0 €»', () => {
     const root = rendered(
       review({
