@@ -169,7 +169,9 @@ export function averageRateIndicator(
       : creditPhrase('indicator.reference_2010', { rate: { percent: reference.value } });
   const fixation = variable ? [creditPhrase('indicator.variable_rate_series')] : [];
   const criterionRead = deps.sources[criterion].verified;
-  if (!criterionRead)
+  // STS 366/2026: the cards' 6 points are not directly applicable to a loan, though they may be
+  // taken into account; so a loan gets the distance and the ruling, never a band.
+  if (!revolving || !criterionRead)
     return result(
       'distance_only',
       [
@@ -177,7 +179,9 @@ export function averageRateIndicator(
         against,
         ...fixation,
         creditPhrase('indicator.distance', { points: { points } }),
-        creditPhrase('indicator.loan_criterion_unread'),
+        creditPhrase(
+          criterionRead ? 'indicator.loan_criterion' : 'indicator.loan_criterion_unread',
+        ),
       ],
       reference,
       points,

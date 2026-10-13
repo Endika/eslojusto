@@ -492,9 +492,7 @@ test('the page has its title, heading, canonical, JSON-LD, guide and questions',
   await expect(guide).toContainText(
     'STS 258/2023, de 15 de febrero (Pleno) · criterio del Tribunal Supremo',
   );
-  await expect(guide).toContainText(
-    'STS 366/2026, de 9 de marzo · criterio del Tribunal Supremo, sin comprobar en el texto de la sentencia',
-  );
+  await expect(guide).toContainText('STS 366/2026, de 9 de marzo · criterio del Tribunal Supremo');
   await expect(guide).toContainText('en tramitación: no se aplica');
   await expect(guide).toContainText('El Servicio de Reclamaciones del Banco de España.');
   await guide.getByText('¿Cuánto me pueden cobrar por devolver el préstamo antes?').click();

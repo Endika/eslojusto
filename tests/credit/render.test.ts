@@ -146,13 +146,13 @@ describe('the credit result', () => {
     const rules = [...(root.querySelectorAll('[data-item="indicator"] [data-rules] li') ?? [])];
     const sts366 = rules.find((li) => li.querySelector('a')?.textContent?.startsWith('STS 366'));
     expect(sts366?.querySelector('[data-rule-status]')?.textContent).toBe(
-      'criterio del Tribunal Supremo · estado a 07-10-2026 · sin comprobar en el texto de la sentencia',
+      'criterio del Tribunal Supremo · estado a 14-10-2026',
     );
     expect(lawSourceText(CREDIT_SOURCES.sts258_2023, tr)).toBe(
       'criterio del Tribunal Supremo · estado a 07-10-2026',
     );
-    expect(lawSourceText({ ...CREDIT_SOURCES.sts366_2026, verified: true }, tr)).toBe(
-      'criterio del Tribunal Supremo · estado a 07-10-2026',
+    expect(lawSourceText({ ...CREDIT_SOURCES.sts366_2026, verified: false }, tr)).toBe(
+      'criterio del Tribunal Supremo · estado a 14-10-2026 · sin comprobar en el texto de la sentencia',
     );
   });
 

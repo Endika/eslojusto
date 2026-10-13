@@ -4735,7 +4735,7 @@ export const es = {
   'credit.guide.indicator.p2':
     'La Ley de 23 de julio de 1908 sobre nulidad de los contratos de préstamos usurarios no fija ninguna cifra. Para las tarjetas revolving, el Tribunal Supremo toma como referencia una diferencia de más de 6 puntos porcentuales sobre el tipo medio y, para las anteriores a junio de 2010, el 19,32 % (STS 258/2023, de 15 de febrero, del Pleno). Es un criterio del tribunal, no una norma.',
   'credit.guide.indicator.p3':
-    'Entre 6 y 6,30 puntos el resultado queda en el borde: el tipo medio no incluye comisiones y la STS 258/2023 estima esa diferencia en 20-30 centésimas. Para los préstamos personales y de coche, el criterio del Tribunal Supremo aún no se ha comprobado en el texto de la sentencia, así que la revisión solo da la diferencia en puntos, sin compararla con ningún umbral.',
+    'Entre 6 y 6,30 puntos el resultado queda en el borde: el tipo medio no incluye comisiones y la STS 258/2023 estima esa diferencia en 20-30 centésimas. Para los préstamos personales y de coche, el Tribunal Supremo dice que ese umbral no se aplica directamente, pero puede tenerse en cuenta; en el caso que juzgó, con 8,51 puntos de diferencia, lo consideró notablemente superior al normal del dinero (STS 366/2026). Por eso la revisión da la diferencia en puntos sin compararla con ningún umbral.',
   'credit.guide.indicator.p4':
     'Es una referencia, no una conclusión: un juez valora además las circunstancias del caso. La revisión no calcula ningún importe por esta diferencia.',
   'credit.guide.revolving.title': 'Las tarjetas revolving',
@@ -5127,6 +5127,8 @@ export const es = {
     'La diferencia con el tipo medio es de {points} puntos: no pasa de 6 puntos.',
   'client.credit.calculation.indicator.distance':
     'La diferencia con el tipo medio es de {points} puntos.',
+  'client.credit.calculation.indicator.loan_criterion':
+    'En un préstamo, el Tribunal Supremo no aplica directamente el umbral de 6 puntos de las tarjetas revolving, pero dice que puede tenerse en cuenta. En el caso que juzgó, con 8,51 puntos de diferencia, lo consideró notablemente superior al normal del dinero (STS 366/2026). Aquí solo se da la diferencia.',
   'client.credit.calculation.indicator.loan_criterion_unread':
     'Para los préstamos, el criterio del Tribunal Supremo sobre esa diferencia aún no se ha comprobado en el texto de la sentencia, así que solo se da la diferencia, sin compararla con ningún umbral.',
   'client.credit.calculation.indicator.revolving_criterion':

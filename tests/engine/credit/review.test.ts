@@ -115,19 +115,9 @@ describe('reviewCredit', () => {
   it('never lets the indicator open the pass nor reach a total', () => {
     const r = review({ declaredApr: 16.6, confirmedApr: true });
     expect(r.indicator?.points).toBe(8.51);
-    const above = review(
-      { declaredApr: 16.6, confirmedApr: true },
-      {
-        ...DEPS,
-        sources: {
-          ...CREDIT_SOURCES,
-          sts366_2026: { ...CREDIT_SOURCES.sts366_2026, verified: true },
-        },
-      },
-    );
-    expect(above.indicator?.status).toBe('above');
-    expect(above.offerPass).toBe(false);
-    expect(above.totals.overCharged.counted).toBe(0);
+    expect(r.indicator?.status).toBe('distance_only');
+    expect(r.offerPass).toBe(false);
+    expect(r.totals.overCharged.counted).toBe(0);
   });
 
   it('adds the dealer discount to review when it was taken back', () => {
