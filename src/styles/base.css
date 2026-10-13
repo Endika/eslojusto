@@ -414,7 +414,8 @@ html:not(.js) .calculator {
   }
 }
 
-/* The article a reading sheet rests on, printed at its foot like a manual's running footer. */
+/* The article a reading sheet rests on, printed at its foot like a manual's running footer. It keeps
+   the citation's own case: an uppercase transform would turn «267.1.c» into «267.1.C». */
 .folio {
   display: flex;
   justify-content: flex-end;
@@ -424,7 +425,6 @@ html:not(.js) .calculator {
   border-top: 1px solid color-mix(in oklab, var(--sheet-ink) 24%, transparent);
   font: 500 var(--t-folio) / 1 var(--f-mono);
   letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--sheet-ink-soft);
 }
 .folio span {
