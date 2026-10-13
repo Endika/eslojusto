@@ -2,6 +2,7 @@ import type { DocumentFile } from './documents';
 import type { Readability } from './extraction-schema';
 import type { ResultCode } from './results';
 import type { CheckoutReview, ReviewKind } from './reviews';
+import type { ErrorName } from './error-name';
 
 export interface ModelRead {
   // The tool input exactly as the model produced it, or null if it produced none.
@@ -76,6 +77,8 @@ export interface LogEvent {
   readonly review?: ReviewKind;
   // A `pass` request that verified a pass rather than issued one.
   readonly verify?: boolean;
+  // The class of the last error a request recovered from or failed on.
+  readonly error?: ErrorName;
 }
 
 export interface Logger {

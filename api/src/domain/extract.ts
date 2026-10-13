@@ -64,6 +64,7 @@ import {
 import type { ReviewKind } from './reviews';
 import { telecomFailedChecks, telecomIncomplete, type TelecomCheck } from './telecom-checks';
 import { telecomMerge, type TelecomMerged } from './telecom-merge';
+import { errorName, type ErrorName } from './error-name';
 
 // Every model read, retries included, is abandoned this long after the request started, which
 // leaves the function's 180 s room to count a pass read and answer.
@@ -173,6 +174,8 @@ export interface ExtractMetrics {
   review?: ReviewKind;
   // A list came back at its maximum.
   truncated?: boolean;
+  // The class of the last model or Stripe error the read met.
+  error?: ErrorName;
   // Only on a mortgage read with a legible deed: whether the costs clause it needs was missing.
   missingKeyPage?: boolean;
 }
@@ -360,7 +363,8 @@ export async function extract<R extends ReviewKind = 'final_pay'>(
   if (allowance.type === 'pass') {
     try {
       passSession = await deps.payments.findSession(allowance.sessionId);
-    } catch {
+    } catch (error) {
+      metrics.error = errorName(error);
       return { code: 'payment_provider_unavailable' };
     }
     // Signed by this API and unexpired: a session Stripe can't find is its problem, not the pass's.
@@ -382,7 +386,8 @@ export async function extract<R extends ReviewKind = 'final_pay'>(
       metrics.inputTokens = (metrics.inputTokens ?? 0) + read.inputTokens;
       metrics.outputTokens = (metrics.outputTokens ?? 0) + read.outputTokens;
       return read;
-    } catch {
+    } catch (error) {
+      metrics.error = errorName(error);
       return null;
     }
   };
@@ -474,7 +479,8 @@ export async function extract<R extends ReviewKind = 'final_pay'>(
   const used = (passSession?.readsUsed ?? 0) + 1;
   try {
     await deps.payments.recordReads(allowance.sessionId, used);
-  } catch {
+  } catch (error) {
+    metrics.error = errorName(error);
     // The person got their read; a counter Stripe failed to store errs in their favour.
     metrics.countNotSaved = true;
   }

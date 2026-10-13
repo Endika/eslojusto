@@ -1,4 +1,5 @@
 import { LIMITS } from '../domain/documents';
+import { errorName, type ErrorName } from '../domain/error-name';
 import type { Clock, Logger, Operation } from '../domain/ports';
 import type { Readability } from '../domain/extraction-schema';
 import type { ResultCode } from '../domain/results';
@@ -60,6 +61,7 @@ export interface Metrics {
   readability?: Partial<Record<Readability, number>>;
   review?: ReviewKind;
   verify?: boolean;
+  error?: ErrorName;
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
@@ -92,7 +94,8 @@ export async function handle(
   try {
     const body = readJson(event);
     outcome = typeof body === 'string' ? { code: body } : await run(body, metrics);
-  } catch {
+  } catch (error) {
+    metrics.error = errorName(error);
     outcome = { code: 'service_unavailable' };
   }
   deps.logger.log({ op, code: outcome.code, latencyMs: deps.clock.now() - started, ...metrics });

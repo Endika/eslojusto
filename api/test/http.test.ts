@@ -158,12 +158,19 @@ describe('handleExtract', () => {
     expect(reader.calls).toEqual([]);
   });
 
-  it('turns an unexpected failure into a code', async () => {
-    const { deps } = extractDeps();
-    const broken = { ...deps, captcha: { verify: () => Promise.reject(new Error('boom')) } };
+  it('turns an unexpected failure into a code, logging only its class', async () => {
+    const { deps, logger } = extractDeps();
+    const broken = {
+      ...deps,
+      captcha: { verify: () => Promise.reject(new TypeError('boom: 12345678Z')) },
+    };
     const response = await handleExtract(post(extractBody()), broken);
     expect(response.statusCode).toBe(503);
     expect(json(response)).toEqual({ code: 'service_unavailable' });
+    expect(logger.events).toEqual([
+      expect.objectContaining({ op: 'extract', code: 'service_unavailable', error: 'TypeError' }),
+    ]);
+    expect(JSON.stringify(logger.events)).not.toContain('12345678Z');
   });
 
   it('logs one line per request with only codes and counts', async () => {
@@ -480,6 +487,7 @@ describe('flags in the log line', () => {
         retried: false,
         conflicts: 0,
         countNotSaved: true,
+        error: 'other',
       },
     ]);
   });
