@@ -19,6 +19,7 @@ import type {
   KeyValueStore,
   OfferedReview,
   PdfPages,
+  ReadPrefill,
   ReviewForm,
 } from '../documents/ports';
 import { setUpUpload } from '../documents/upload';
@@ -212,6 +213,16 @@ export const READS_UNMEASURED: Pick<
   qualityOverridden() {},
 };
 
+// For a page that measures nothing yet, not even the pass it shares with every other page.
+export const UNMEASURED: DocumentEvents = {
+  ...READS_UNMEASURED,
+  checkoutStarted() {},
+  passIssued() {},
+  passFailed() {},
+  passVerified() {},
+  downloaded() {},
+};
+
 export interface DocumentsWiring<R, F extends string, L extends string> {
   readonly form: ReviewForm;
   readonly hooks: ReviewHooks<R>;
@@ -365,6 +376,14 @@ const passStore = () =>
     browser.now,
   );
 
+// What a section's page can ask of the documents once they are wired.
+export interface DocumentsHandle {
+  // Fills the form with what a read gave, marked as read, as a read just made does.
+  fillRead(prefill: ReadPrefill): void;
+  // Opens the start sheet again, to read more documents or type.
+  showStart(): void;
+}
+
 export function wireDocuments<R, F extends string, L extends string>({
   form: calculator,
   hooks,
@@ -373,12 +392,12 @@ export function wireDocuments<R, F extends string, L extends string>({
   config,
   tr,
   events,
-}: DocumentsWiring<R, F, L>): void {
+}: DocumentsWiring<R, F, L>): DocumentsHandle | null {
   const start = document.querySelector<HTMLElement>('[data-documents-start]');
   const offer = document.querySelector<HTMLElement>('[data-pass-offer]');
   const captchaBox = start?.querySelector<HTMLElement>('[data-captcha]');
   const checkoutCaptchaBox = offer?.querySelector<HTMLElement>('[data-pass-captcha]');
-  if (!config || !start || !offer || !captchaBox || !checkoutCaptchaBox) return;
+  if (!config || !start || !offer || !captchaBox || !checkoutCaptchaBox) return null;
 
   const api = createApi(config.endpoints, (url, init) => fetch(url, init), section.extraction);
   const loadTurnstile = turnstileLoader();
@@ -430,4 +449,9 @@ export function wireDocuments<R, F extends string, L extends string>({
             : tr(`client.documents.error.${outcome}`),
         );
     });
+
+  return {
+    fillRead: (prefill) => upload.fillRead(prefill),
+    showStart: () => upload.showStart(true),
+  };
 }

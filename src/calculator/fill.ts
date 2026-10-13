@@ -4,10 +4,13 @@ export type FormEntries = readonly (readonly [string, string])[];
 
 const ROW_FIELD = /^otherContracts\.(\d+)\./;
 
+type Control = HTMLInputElement | HTMLSelectElement;
+const CONTROLS = 'input[name], select[name]';
+
 export function formEntries(form: HTMLFormElement): FormEntries {
   const entries: [string, string][] = [];
-  for (const el of form.querySelectorAll<HTMLInputElement>('input[name]')) {
-    if (el.type === 'radio' || el.type === 'checkbox') {
+  for (const el of form.querySelectorAll<Control>(CONTROLS)) {
+    if (el instanceof HTMLInputElement && (el.type === 'radio' || el.type === 'checkbox')) {
       if (el.checked) entries.push([el.name, el.value]);
     } else if (el.value !== '') entries.push([el.name, el.value]);
   }
@@ -23,13 +26,18 @@ export const rowsNeeded = (entries: FormEntries): number =>
 
 // Sets one control; returns false when the form has no such control or option.
 export function setEntry(form: HTMLFormElement, name: string, value: string): boolean {
-  const controls = [...form.querySelectorAll<HTMLInputElement>('input[name]')].filter(
-    (el) => el.name === name,
-  );
+  const controls = [...form.querySelectorAll<Control>(CONTROLS)].filter((el) => el.name === name);
   const first = controls[0];
   if (!first) return false;
+  if (first instanceof HTMLSelectElement) {
+    if (![...first.options].some((o) => o.value === value)) return false;
+    first.value = value;
+    return true;
+  }
   if (first.type === 'radio') {
-    const option = controls.find((el) => el.value === value);
+    const option = controls.find(
+      (el): el is HTMLInputElement => el instanceof HTMLInputElement && el.value === value,
+    );
     if (!option) return false;
     option.checked = true;
     return true;
