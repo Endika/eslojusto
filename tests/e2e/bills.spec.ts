@@ -347,3 +347,92 @@ test('the home page files the section as a live card', async ({ page }) => {
     '/facturas/',
   );
 });
+
+const PAGES = [
+  { path: 'facturas/', graph: ['BreadcrumbList'] },
+  { path: 'facturas/luz/', graph: ['WebApplication', 'BreadcrumbList', 'FAQPage'] },
+  { path: 'facturas/permanencia/', graph: ['WebApplication', 'BreadcrumbList', 'FAQPage'] },
+] as const;
+
+for (const { path, graph } of PAGES) {
+  test(`${path} has its title, description, canonical, JSON-LD and date`, async ({
+    page,
+    request,
+  }) => {
+    await page.goto(path);
+    await expect(page.locator('h1')).toHaveCount(1);
+    const title = (await page.title()).trim();
+    expect([...title].length).toBeGreaterThan(0);
+    expect([...title].length).toBeLessThanOrEqual(60);
+    const description = await page.locator('meta[name="description"]').getAttribute('content');
+    expect([...(description ?? '')].length).toBeGreaterThan(0);
+    expect([...(description ?? '')].length).toBeLessThanOrEqual(155);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      `https://eslojusto.es/${path}`,
+    );
+    const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
+    const nodes = (JSON.parse(jsonLd ?? '{}') as { '@graph': Record<string, unknown>[] })['@graph'];
+    expect(nodes.map((n) => n['@type'])).toEqual(graph);
+    expect(nodes.flatMap((n) => Object.keys(n))).not.toContain('aggregateRating');
+
+    // The sitemap dates the page by the day its content last changed; a review page shows the same
+    // day as when its rules were last checked.
+    const sitemap = await (await request.get('sitemap-0.xml')).text();
+    const lastmod = new RegExp(
+      `<loc>https://eslojusto.es/${path}</loc><lastmod>(\\d{4}-\\d{2}-\\d{2})`,
+    ).exec(sitemap)?.[1];
+    expect(lastmod).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    if (graph.length > 1) {
+      await expect(page.locator('.desk__reviewed time')).toHaveAttribute('datetime', lastmod ?? '');
+      await expect(page.locator('.guide__sources')).toContainText('Revisado el');
+      const faq = nodes.find((n) => n['@type'] === 'FAQPage') as {
+        mainEntity: { name: string; acceptedAnswer: { text: string } }[];
+      };
+      await expect(page.locator('.faq-item summary')).toHaveText(faq.mainEntity.map((q) => q.name));
+      for (const [i, q] of faq.mainEntity.entries())
+        await expect(page.locator('.faq-item p').nth(i)).toHaveText(q.acceptedAnswer.text);
+    }
+  });
+}
+
+test('the electricity guide gives the 2026 taxes, the quote and its sources', async ({ page }) => {
+  await open(page, 'facturas/luz/', SIZES[0].viewport);
+  const guide = page.locator('.guide');
+  await expect(guide.getByRole('heading', { name: 'Los impuestos de 2026' })).toBeVisible();
+  await expect(guide).toContainText('Real Decreto-ley 25/2026');
+  await expect(guide.locator('[data-legal-quote]')).toContainText(
+    'con al menos un mes de antelación, por escrito y de manera separada a su factura',
+  );
+  await expect(
+    guide.getByRole('link', { name: 'Real Decreto 88/2026, art. 6.1.m' }),
+  ).toHaveAttribute('href', 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-3212#a6');
+  await guide.getByText('¿Cuánto cuesta el alquiler del contador?').click();
+  await expect(page.locator('#faq-luz-contador')).toContainText('0,81 € al mes');
+  await noLiteralOutsideQuotes(page);
+});
+
+test('the telecom guide gives the proportional penalty and the official channel', async ({
+  page,
+}) => {
+  await open(page, 'facturas/permanencia/', SIZES[0].viewport);
+  const guide = page.locator('.guide');
+  await expect(guide).toContainText('180 × 184 / 549 = 60,33 €');
+  await expect(guide).toContainText('resuelve desacuerdos con operadores');
+  await expect(
+    guide.getByRole('link', { name: 'Oficina de Atención al Usuario de Telecomunicaciones' }),
+  ).toHaveAttribute('href', 'https://usuariosteleco.digital.gob.es/');
+  await expect(guide.locator('[data-legal-quote]')).toHaveCount(2);
+});
+
+for (const path of ['facturas/luz/', 'facturas/permanencia/'])
+  test(`the ${path} guide and its open questions fit a 360 px screen`, async ({ page }) => {
+    await open(page, path, SIZES[1].viewport);
+    const questions = page.locator('.faq-item');
+    await expect(questions.first()).toBeAttached();
+    for (const q of await questions.all()) {
+      await q.locator('summary').click();
+      await expect(q).toHaveAttribute('open', '');
+    }
+    await noSideScroll(page);
+  });

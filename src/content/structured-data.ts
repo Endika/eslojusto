@@ -121,6 +121,20 @@ export const mortgageApp = (home: URL, page: URL, lang: Lang) => ({
   publisher: organization(home),
 });
 
+// The two bills reviews, each its own application on its own page.
+export const billsApp = (home: URL, page: URL, lang: Lang, review: 'electricity' | 'telecom') => ({
+  '@type': 'WebApplication',
+  name: t(lang, `bills.${review}.app_name`),
+  url: page.href,
+  description: t(lang, `bills.${review}.description`),
+  applicationCategory: 'FinanceApplication',
+  operatingSystem: 'Any',
+  browserRequirements: 'Requires JavaScript',
+  isAccessibleForFree: true,
+  inLanguage: lang,
+  publisher: organization(home),
+});
+
 export interface Crumb {
   readonly name: string;
   // From the site root, with its trailing slash.

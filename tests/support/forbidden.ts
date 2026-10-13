@@ -118,6 +118,8 @@ export const SECTION_FORBIDDEN: Readonly<Record<string, readonly RegExp[]>> = {
   'dist/facturas': BILLS_FORBIDDEN,
   'bills.': BILLS_FORBIDDEN,
   'client.bills.': BILLS_FORBIDDEN,
+  'privacy.bills.': BILLS_FORBIDDEN,
+  'legal_notice.bills': BILLS_FORBIDDEN,
   'home.bills': BILLS_FORBIDDEN,
   'footer.note_bills': BILLS_FORBIDDEN,
 };

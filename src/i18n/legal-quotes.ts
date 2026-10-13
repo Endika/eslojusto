@@ -32,4 +32,16 @@ export const LEGAL_QUOTES: Readonly<Record<string, LegalQuoteText>> = {
     source: 'trlitpajd_29',
     text: 'Cuando se trate de escrituras de préstamo con garantía hipotecaria, se considerará sujeto pasivo al prestamista.',
   },
+  bills_change_notice: {
+    source: 'rd88_6',
+    text: 'Ser avisado de forma transparente y comprensible por su comercializador o agregador independiente, con al menos un mes de antelación, por escrito y de manera separada a su factura, de cualquier intención de modificar las condiciones del contrato e informado de su derecho a rescindir el contrato sin coste alguno cuando reciba el aviso.',
+  },
+  bills_commitment_proportional: {
+    source: 'trlgdcu_62',
+    text: 'En caso de que el usuario incumpla el compromiso de permanencia adquirido con la empresa, la penalización por baja o cese prematuro de la relación contractual, será proporcional al número de días no efectivos del compromiso de permanencia acordado.',
+  },
+  bills_after_exit: {
+    source: 'rd899_7',
+    text: 'El operador se abstendrá de facturar y cobrar cualquier cantidad que se haya podido devengar, por causa no imputable al usuario final, con posterioridad al plazo de dos días en que debió surtir efectos la baja.',
+  },
 };
