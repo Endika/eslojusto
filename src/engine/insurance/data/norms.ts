@@ -31,6 +31,6 @@ export const INSURANCE_NORMS: NormTable = {
 };
 
 export const NORM_REVIEW: NormReview = {
-  lcs: null,
-  law22_2007: null,
+  lcs: '2026-10-13',
+  law22_2007: '2026-10-13',
 };
