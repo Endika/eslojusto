@@ -6,6 +6,7 @@ import { pageTranslator } from '../i18n/client';
 import { setUpInsurance } from '../insurance/main';
 import type { CompletedInsuranceReview, InsuranceEvents } from '../insurance/ports';
 import { localToday } from './clock';
+import { withoutDocuments } from './without-documents';
 
 // The review's address as it arrived, before the form rewrites its fragment.
 const arrival = { hash: location.hash, search: location.search };
@@ -56,11 +57,5 @@ if (documentsBuild) {
         arrival,
       ),
     )
-    // Without the document module the page is still the review.
-    .catch(() => {
-      insurance.form.hidden = false;
-      const tabs = document.querySelector<HTMLElement>('.tabs');
-      if (tabs) tabs.hidden = false;
-      document.querySelector<HTMLElement>('[data-documents-start]')?.remove();
-    });
+    .catch((error: unknown) => withoutDocuments(insurance.form, error));
 }

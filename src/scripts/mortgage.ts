@@ -10,6 +10,7 @@ import type { CompletedMortgageReview, MortgageEvents } from '../mortgage/ports'
 import { DOCUMENTS_BUILD } from '../documents/config';
 import { pageTranslator } from '../i18n/client';
 import { localToday } from './clock';
+import { withoutDocuments } from './without-documents';
 
 // The review's address as it arrived, before the form rewrites its fragment.
 const arrival = { hash: location.hash, search: location.search };
@@ -74,11 +75,5 @@ if (documentsBuild) {
         LEGAL_INTEREST,
       ),
     )
-    // Without the document module the page is still the review.
-    .catch(() => {
-      mortgage.form.hidden = false;
-      const tabs = document.querySelector<HTMLElement>('.tabs');
-      if (tabs) tabs.hidden = false;
-      document.querySelector<HTMLElement>('[data-documents-start]')?.remove();
-    });
+    .catch((error: unknown) => withoutDocuments(mortgage.form, error));
 }
