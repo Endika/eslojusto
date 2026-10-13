@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { parseDate } from '../../src/engine/date';
 import { contract, repealedWindow, review, riseAboveIrav, unknownLargeLandlord } from './fixtures';
 import {
   headline,
@@ -60,6 +61,27 @@ describe('the free summary', () => {
   it('says when nothing was entered and when nothing came out', () => {
     expect(headline(review(contract({ deposit: null })))).toBe('nothing_entered');
     expect(headline(review(contract({ advanceMonths: 1 })))).toBe('nothing_found');
+  });
+
+  it('a point left to review is not «nothing over the law»', () => {
+    // Community bills of 600 € and 618 € in 2025 against 600 € agreed: left to review.
+    const charged = contract({
+      signedOn: parseDate('2025-09-15'),
+      startDate: parseDate('2025-09-20'),
+      updateClause: 'irav',
+      charges: [
+        {
+          kind: 'community',
+          inContract: true,
+          annualAgreed: 600,
+          charged: [
+            { year: 2025, amount: 600 },
+            { year: 2025, amount: 618 },
+          ],
+        },
+      ],
+    });
+    expect(headline(review(charged))).toBe('to_review');
   });
 });
 

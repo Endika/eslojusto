@@ -3421,6 +3421,8 @@ export const es = {
   'client.rental.headline.found': 'Hay partidas por encima de lo que permite la ley.',
   'client.rental.headline.only_doubtful':
     'Nada seguro por encima de la ley: lo que sale depende de dudas que esta revisión no puede resolver.',
+  'client.rental.headline.to_review':
+    'Con los datos que has metido no sale ninguna cifra por encima de la ley, pero hay partidas en «Revísalo».',
   'client.rental.headline.nothing_found':
     'Con los datos que has metido, nada sale por encima de lo que permite la ley.',
   'client.rental.headline.nothing_entered':
