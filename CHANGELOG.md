@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.56.3](https://github.com/Endika/eslojusto/compare/v1.56.2...v1.56.3) (2026-10-13)
+
+
+### Bug Fixes
+
+* **api:** chart each function's reserved concurrency and the errors by class on the dashboard ([0753aae](https://github.com/Endika/eslojusto/commit/0753aae87aa9ec6af7dde873e8f73c29af70dcda))
+
 ## [1.56.2](https://github.com/Endika/eslojusto/compare/v1.56.1...v1.56.2) (2026-10-13)
 
 
