@@ -146,9 +146,10 @@ export function assessTrialPeriod(input: EmploymentInput, norms: NormTable): Ass
   if (agreed !== null) {
     const over = exceeds(trial, agreed, input.startDate);
     const vars = { trial: trialPhrase(trial), months: agreed };
+    // The agreement's own limit, as the person gave it: nothing further to defer to.
     return single(
       findingOf('trial_limits', 'trial_period', norms, {
-        status: over ? 'depends_on_agreement' : 'within_limit',
+        status: over ? 'over_legal_limit' : 'within_limit',
         calculation: [
           phrase(over ? 'trial.over_your_agreement' : 'trial.within_your_agreement', vars),
         ],

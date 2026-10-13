@@ -177,7 +177,7 @@ describe('trial period against art. 14.1 ET', () => {
       basedOnYourAnswer: true,
     });
     expect(only(assess({ agreement, trial: months(6) }))).toMatchObject({
-      status: 'depends_on_agreement',
+      status: 'over_legal_limit',
       calculation: [phrase('trial.over_your_agreement', { trial: monthsPhrase(6), months: 4 })],
     });
   });
