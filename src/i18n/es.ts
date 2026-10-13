@@ -6578,7 +6578,7 @@ export const es = {
   'bills.pass.price':
     '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador: en ese tiempo puedes leer hasta 15 paquetes de documentos, en cualquier sección, y volver a descargar el informe sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
   'bills.basket.memory':
-    'No guardamos nada: tu año vive solo en esta pestaña. Si la cierras o la recargas, vuelve a subir tus facturas. Al volver del pago solo se recupera la última factura que revisaste.',
+    'No guardamos nada: tu año vive solo en esta pestaña. Si la cierras o la recargas, vuelve a subir tus facturas. Si pagas, las facturas que ya has revisado esperan en esta pestaña mientras estás en la página de pago y vuelven todas contigo; las leídas que aún no has revisado, no.',
   'bills.basket.year': 'Lo que suman tus facturas',
   'bills.basket.year_note': 'Por encima de la norma, con cada factura contada una sola vez.',
   'bills.basket.add': 'Añadir otra factura',

@@ -178,6 +178,18 @@ export interface PassSection<R> {
   decorateResult(result: ParentNode): void;
   // Answers kept by an earlier version of the page, as the form takes them now.
   restore(saved: FormEntries): FormEntries;
+  // A section whose pass covers several reviews kept in the page, such as a year of bills, takes
+  // them all on the trip to Stripe instead of the form on screen alone.
+  readonly basket?: KeptBasket;
+}
+
+// The reviews of a basket as the trip to Stripe keeps them: only the answers each was worked out
+// from, so the reviews are made again on return.
+export interface KeptBasket {
+  // The answers of every review kept, in order, the one on screen last.
+  answers(): readonly FormEntries[];
+  // Starts another review on an empty form, beside those already kept.
+  startNext(): void;
 }
 
 // What a section brings to reading documents, whether or not its page sells the pass.
@@ -286,7 +298,13 @@ function setUpPass<R>(
     browser,
     tr,
     pdf: () => import('../documents/pdf').then((m) => m.pdfMaker),
-    keepReview: () => session.set(section.keptReviewKey, JSON.stringify(calculator.entries())),
+    keepReview: () =>
+      session.set(
+        section.keptReviewKey,
+        JSON.stringify(
+          section.basket ? { reviews: section.basket.answers() } : calculator.entries(),
+        ),
+      ),
     today: localToday,
     // A pass verified or dropped shows the review again, with or without its detail.
     passChanged: () => {
@@ -303,9 +321,21 @@ function setUpPass<R>(
   return payment;
 }
 
+const isBasket = (v: unknown): v is { reviews: FormEntries[] } =>
+  typeof v === 'object' &&
+  v !== null &&
+  'reviews' in v &&
+  Array.isArray(v.reviews) &&
+  v.reviews.length > 0 &&
+  v.reviews.every(isEntries);
+
 // The answers kept for the trip to Stripe come back on any return, paid or not (cancelling or
-// the browser's back button arrive without a session id), and are deleted at once.
-function keptReview<R>(session: KeyValueStore, section: PassSection<R>): FormEntries | null {
+// the browser's back button arrive without a session id), and are deleted at once: those of the
+// form on screen, or of every review of a basket.
+function keptReviews<R>(
+  session: KeyValueStore,
+  section: PassSection<R>,
+): readonly FormEntries[] | null {
   let saved: unknown = null;
   try {
     saved = JSON.parse(session.get(section.keptReviewKey) ?? 'null');
@@ -313,7 +343,8 @@ function keptReview<R>(session: KeyValueStore, section: PassSection<R>): FormEnt
     // A damaged entry is dropped below like any other.
   }
   session.remove(section.keptReviewKey);
-  return isEntries(saved) ? section.restore(saved) : null;
+  if (section.basket && isBasket(saved)) return saved.reviews.map((r) => section.restore(r));
+  return isEntries(saved) ? [section.restore(saved)] : null;
 }
 
 // The payment's session id on the way back from Stripe, taken off the address at once.
@@ -428,13 +459,16 @@ export function wireDocuments<R, F extends string, L extends string>({
     events,
   });
 
-  const review = keptReview(session, section);
+  const reviews = keptReviews(session, section);
   const sessionId = returnedSession(arrival);
 
-  if (review) {
-    calculator.fill(review);
+  if (reviews) {
     upload.showCalculator(false);
-    calculator.review();
+    reviews.forEach((entries, i) => {
+      if (i > 0) section.basket?.startNext();
+      calculator.fill(entries);
+      calculator.review();
+    });
   } else if (sessionId === null && section.steps.includes(arrival.hash.slice(1)))
     upload.showCalculator(false);
   else upload.showStart();
@@ -442,7 +476,7 @@ export function wireDocuments<R, F extends string, L extends string>({
   // Back from Stripe with a session id: the pass is asked for, so the result shows the downloads.
   if (sessionId !== null)
     void payment.returned(sessionId).then((outcome) => {
-      if (!review)
+      if (!reviews)
         upload.notice(
           outcome === true
             ? tr('client.documents.pass.lost')
