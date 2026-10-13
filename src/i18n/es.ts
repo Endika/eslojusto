@@ -3728,6 +3728,8 @@ export const es = {
     'Cobras {monthly} al mes en dinero y {extras} al año en pagas extra: {annual} al año.',
   'client.household.calculation.minimum_wage.shortfall':
     'Podrían faltarte {annual} al año, unos {monthly} al mes.',
+  'client.household.calculation.minimum_wage.monthly_cash':
+    'Con alojamiento o manutención, lo que se paga en dinero cada mes tiene que llegar al salario mínimo en cómputo mensual (art. 8.2): {required} al mes, y te pagan {paid}.',
   'client.household.calculation.minimum_wage.shortfall_accrued':
     'En los {days} días de {year} que cuenta la revisión, unos {accrued}.',
   'client.household.calculation.minimum_wage.hourly':
