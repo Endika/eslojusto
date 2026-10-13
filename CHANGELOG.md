@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.60.0](https://github.com/Endika/eslojusto/compare/v1.59.0...v1.60.0) (2026-10-13)
+
+
+### Features
+
+* **analytics:** measure bill reviews with closed codes ([9109af3](https://github.com/Endika/eslojusto/commit/9109af33afef3e03224bdcac7f0b4089180c3a46))
+* **bills:** explain electricity bills and telecom commitments ([33bbb09](https://github.com/Endika/eslojusto/commit/33bbb09c8dd3d38711bb4316af67799ade79cfba))
+
+
+### Bug Fixes
+
+* **analytics:** never tell from a bill review that the household has the social bonus ([66c3c9b](https://github.com/Endika/eslojusto/commit/66c3c9b4c2c6edabb9a715ae80f01877e062052f))
+
 ## [1.59.0](https://github.com/Endika/eslojusto/compare/v1.58.0...v1.59.0) (2026-10-13)
 
 
