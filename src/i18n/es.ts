@@ -813,6 +813,8 @@ export const es = {
     'Al menos unos {dias} días ({meses} meses) solo por este trabajo. Si cotizaste en otros trabajos en los últimos 6 años y no los usaste para otro paro, puede ser más; lo ves en tu vida laboral.',
   'client.unemployment.duration.exact':
     'Unos {dias} días ({meses} meses), con las fechas que has puesto.',
+  'client.unemployment.duration.up_to_floor':
+    'Hasta unos {dias} días ({meses} meses). Si cobraste paro después de alguno de estos contratos, esos días ya se usaron y puede ser menos, pero no menos de unos {minimo} días ({meses_minimo} meses): los de este último contrato, que van después de ese paro (art. 269.2 LGSS).',
   'client.unemployment.duration.up_to':
     'Hasta unos {dias} días ({meses} meses); si cobraste paro después de alguno de estos contratos, esos días ya se usaron y puede ser menos (art. 269.2 LGSS).',
   'client.unemployment.duration.depends':

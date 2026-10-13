@@ -268,10 +268,23 @@ const MAX_DAYS = BENEFIT_2026.scale[0][1];
 // más»; «hasta» keeps its own caveat; 0 days never reads «hasta 0».
 export function durationKey(d: BenefitDuration): ClientKey {
   if (d.days === 0) return 'client.unemployment.duration.depends';
-  if (d.kind === 'up_to') return 'client.unemployment.duration.up_to';
+  if (d.kind === 'up_to')
+    return d.floor > 0 && d.floor < d.days
+      ? 'client.unemployment.duration.up_to_floor'
+      : 'client.unemployment.duration.up_to';
   if (d.days >= MAX_DAYS) return 'client.unemployment.duration.maximum';
   return `client.unemployment.duration.${d.kind}`;
 }
+
+// The duration sentence with its days and months, and the floor of an «hasta».
+export const durationText = (d: BenefitDuration, tr: Translate): string =>
+  tr(durationKey(d), {
+    dias: formatInteger(d.days),
+    meses: formatInteger(d.days / 30),
+    ...(d.kind === 'up_to'
+      ? { minimo: formatInteger(d.floor), meses_minimo: formatInteger(d.floor / 30) }
+      : {}),
+  });
 
 // Unpaid holidays add days, so «puede salir algo más» only fits where more is still possible.
 export const withHolidayNote = (d: BenefitDuration): boolean =>
@@ -350,13 +363,7 @@ export function renderBenefit(
   }
 
   const { duration } = p;
-  const days = formatInteger(duration.days);
-  const months = formatInteger(duration.days / 30);
-  setText(
-    sheet,
-    '[data-benefit-duration]',
-    tr(durationKey(duration), { dias: days, meses: months }),
-  );
+  setText(sheet, '[data-benefit-duration]', durationText(duration, tr));
   setText(
     sheet,
     '[data-benefit-duration-note]',
@@ -500,15 +507,7 @@ function summaryBenefit(
       ),
     ];
   if (cause === 'unknown') return [tr('client.summary.benefit_unknown')];
-  const duration = withDuration
-    ? [
-        ' ',
-        tr(durationKey(p.duration), {
-          dias: formatInteger(p.duration.days),
-          meses: formatInteger(p.duration.days / 30),
-        }),
-      ]
-    : [];
+  const duration = withDuration ? [' ', durationText(p.duration, tr)] : [];
   if (p.figures === null) return [tr('client.summary.benefit_yes_no_figures'), ...duration];
   const { min, max } = p.figures.firstStretch;
   return [

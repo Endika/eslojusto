@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   durationKey,
+  durationText,
   withHolidayNote,
   visibleStatus,
   renderBenefit,
@@ -363,10 +364,17 @@ describe('the duration sentence', () => {
     );
   });
   it('«hasta» keeps its caveat and carries no «algo más» note', () => {
-    const to = { kind: 'up_to', days: 720, reason: '' } as const;
+    const to = { kind: 'up_to', days: 720, floor: 0 } as const;
     expect(durationKey(to)).toBe('client.unemployment.duration.up_to');
     expect(withHolidayNote(to)).toBe(false);
     expect(trV('client.unemployment.duration.up_to')).not.toContain('algo más');
+  });
+  it('«hasta» gives the floor of the last contract, which no earlier benefit used up', () => {
+    const to = { kind: 'up_to', days: 660, floor: 240 } as const;
+    expect(durationKey(to)).toBe('client.unemployment.duration.up_to_floor');
+    expect(durationText(to, trV)).toBe(
+      'Hasta unos 660 días (22 meses). Si cobraste paro después de alguno de estos contratos, esos días ya se usaron y puede ser menos, pero no menos de unos 240 días (8 meses): los de este último contrato, que van después de ese paro (art. 269.2 LGSS).',
+    );
   });
   it('below the maximum, «al menos» and «unos» carry the note; 0 days, «depende»', () => {
     expect(durationKey({ kind: 'at_least', days: 540 })).toBe(

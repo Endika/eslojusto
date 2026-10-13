@@ -62,7 +62,8 @@ export interface BenefitFigures {
 export type BenefitDuration =
   | { readonly kind: 'at_least'; readonly days: number }
   | { readonly kind: 'exact'; readonly days: number }
-  | { readonly kind: 'up_to'; readonly days: number };
+  // `floor`: this contract's own days, after any benefit drawn before it, so never used up.
+  | { readonly kind: 'up_to'; readonly days: number; readonly floor: number };
 
 export type BenefitEstimate =
   | {
@@ -183,7 +184,7 @@ export function estimateBenefit(
       ? { kind: 'at_least', days: durationForDays(d) }
       : noBenefitSince
         ? { kind: 'exact', days: durationForDays(total) }
-        : { kind: 'up_to', days: durationForDays(total) };
+        : { kind: 'up_to', days: durationForDays(total), floor: durationForDays(d) };
   const noFigures: NoFiguresReason | null =
     d < P.baseDays
       ? 'short_contract'
