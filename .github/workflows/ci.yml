@@ -60,39 +60,41 @@ jobs:
             PUBLIC_MORTGAGE: '1',
           }
       - run: npm run test:run
+  # One job per Playwright project: each needs its own build, and a failure reruns alone.
+  e2e:
+    name: e2e (${{ matrix.project }})
+    needs: scope
+    if: needs.scope.outputs.release_only != 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { project: desktop, switch: '' }
+          - { project: mobile, switch: '' }
+          # The ar-test pseudo-locale.
+          - { project: rtl, switch: TEST_RTL }
+          # A test key, PostHog stubbed.
+          - { project: analytics, switch: TEST_ANALYTICS }
+          - { project: rental, switch: TEST_RENTAL }
+          - { project: employment, switch: TEST_EMPLOYMENT }
+          - { project: erte, switch: TEST_ERTE }
+          - { project: household, switch: TEST_HOUSEHOLD }
+          - { project: insurance, switch: TEST_INSURANCE }
+          - { project: credit, switch: TEST_CREDIT }
+          - { project: mortgage, switch: TEST_MORTGAGE }
+          # Fake API origins, routed by the page.
+          - { project: documents, switch: TEST_DOCUMENTS }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
-        env: { CI: 'true' }
-      - name: rtl layout (ar-test pseudo-locale)
-        run: TEST_RTL=1 npm run build && TEST_RTL=1 npm run test:e2e -- --project=rtl
-        env: { CI: 'true' }
-      - name: analytics (test key, PostHog stubbed)
-        run: npm run test:e2e -- --project=analytics
-        env: { CI: 'true', TEST_ANALYTICS: '1' }
-      - name: rental review (built with /alquiler/)
-        run: npm run test:e2e -- --project=rental
-        env: { CI: 'true', TEST_RENTAL: '1' }
-      - name: employment contract review (built with /contrato/)
-        run: npm run test:e2e -- --project=employment
-        env: { CI: 'true', TEST_EMPLOYMENT: '1' }
-      - name: benefit during an ERTE (built with /paro/erte/)
-        run: npm run test:e2e -- --project=erte
-        env: { CI: 'true', TEST_ERTE: '1' }
-      - name: household worker review (built with /empleada-de-hogar/)
-        run: npm run test:e2e -- --project=household
-        env: { CI: 'true', TEST_HOUSEHOLD: '1' }
-      - name: insurance dates review (built with /seguros/)
-        run: npm run test:e2e -- --project=insurance
-        env: { CI: 'true', TEST_INSURANCE: '1' }
-      - name: consumer credit review (built with /financiacion/)
-        run: npm run test:e2e -- --project=credit
-        env: { CI: 'true', TEST_CREDIT: '1' }
-      - name: mortgage review (built with /hipoteca/)
-        run: npm run test:e2e -- --project=mortgage
-        env: { CI: 'true', TEST_MORTGAGE: '1' }
-      - name: documents (fake API origins, routed by the page)
-        run: npm run test:e2e -- --project=documents
-        env: { CI: 'true', TEST_DOCUMENTS: '1' }
+      - run: |
+          if [ -n "$SWITCH" ]; then export "$SWITCH=1"; fi
+          npm run test:e2e -- --project="$PROJECT"
+        env: { CI: 'true', PROJECT: '${{ matrix.project }}', SWITCH: '${{ matrix.switch }}' }
   audit:
     name: audit
     needs: scope
@@ -127,7 +129,7 @@ jobs:
       - run: npm audit --omit=dev --audit-level=high
   all-green:
     name: all-green
-    needs: [scope, quality, audit, api]
+    needs: [scope, quality, e2e, audit, api]
     if: always()
     runs-on: ubuntu-latest
     steps:
