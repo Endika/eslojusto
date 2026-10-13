@@ -170,7 +170,7 @@ describe('renderReview', () => {
     const note = c.querySelector<HTMLElement>('[data-item="severance"] [data-reference]');
     expect(note?.hidden).toBe(false);
     expect(note?.textContent?.replace(/\s/g, ' ')).toBe(
-      'Referencia: si un juzgado declarase improcedente el despido, la indemnización sería de 8.136,99 € (33 días de salario por año trabajado, 45 por el tiempo anterior al 12 de febrero de 2012, con sus topes). Es la cifra con la que suelen compararse los acuerdos de mejora.',
+      'Referencia: si un juzgado declarase improcedente el despido, la indemnización sería de 8.136,99 € (33 días de salario por año trabajado, 45 por el tiempo anterior al 12 de febrero de 2012, con sus topes).',
     );
   });
 

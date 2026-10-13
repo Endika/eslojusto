@@ -12,7 +12,7 @@ const inForce = {
 export const EMPLOYMENT_NORMS: NormTable = {
   et: {
     id: 'et',
-    citation: 'Real Decreto Legislativo 2/2015, de 23 de octubre (Estatuto de los Trabajadores)',
+    citation: 'Real Decreto Legislativo 2/2015, de 23 de octubre',
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430',
     inForceSince: '2015-11-13',
     ...inForce,

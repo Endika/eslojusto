@@ -3,6 +3,8 @@ export interface Source {
   readonly citation: string;
   readonly url: string;
   readonly inForceSince: string;
+  // The date is when its figures take effect, not when the text came into force.
+  readonly effectiveFrom?: true;
 }
 
 export const ET = 'https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430';
@@ -178,11 +180,13 @@ export const SOURCES: Record<
     citation: 'Orden PJC/297/2026, normas de cotización a la Seguridad Social para 2026',
     url: 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-7296',
     inForceSince: '2026-01-01',
+    effectiveFrom: true,
   },
   sepeAmounts: {
     id: 'sepeAmounts',
     citation: 'SEPE, cuantías anuales de las prestaciones por desempleo',
     url: 'https://www.sepe.es/HomeSepe/prestaciones-desempleo/Cuantias-anuales.html',
     inForceSince: '2026-01-01',
+    effectiveFrom: true,
   },
 };

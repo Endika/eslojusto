@@ -93,7 +93,9 @@ test('objective dismissal with one dependent child: the estimate carries figures
   await expect(sheet).toContainText(
     'Estas cifras suponen jornada completa; con jornada parcial son menores.',
   );
-  await expect(sheet).toContainText('15 días hábiles');
+  await expect(sheet).toContainText(
+    '15 días siguientes al fin del contrato (hábiles, según el SEPE)',
+  );
   await expect(sheet.locator('[data-benefit-mark] use')).toHaveAttribute(
     'href',
     '#mark-benefit-yes',

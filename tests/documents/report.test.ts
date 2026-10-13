@@ -40,7 +40,7 @@ describe('the report', () => {
       ).blocks,
     );
     expect(working).toContain('22 días laborables (5 por semana) al año; 5 disfrutados');
-    expect(working).toContain('22 días laborables equivalen a 30 naturales');
+    expect(working).toContain('toma 22 días laborables como los 30 naturales');
   });
   it('cites every source with its link and the date it is in force from', () => {
     const sources = model.blocks.filter((b) => b.type === 'source');

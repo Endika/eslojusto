@@ -247,7 +247,7 @@ for (const { name, viewport } of SIZES) {
         /Dentro de lo que marca la norma/,
       );
       await expect(page.getByRole('region', { name: 'Resumen' })).toContainText(
-        'Hay puntos que quedan por debajo de lo que marca la norma.',
+        'Hay puntos que no cumplen lo que marca la norma.',
       );
       // The shortfall is per hour: nothing adds up to a total, and the summary says why.
       await expect(page.getByRole('region', { name: 'Resumen' })).toContainText(

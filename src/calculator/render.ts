@@ -237,9 +237,12 @@ function setSources(
       }
       const inForce = li.querySelector<HTMLElement>('[data-in-force]');
       if (inForce) {
-        inForce.textContent = tr('client.source.in_force', {
-          fecha: sourceDate(source.inForceSince),
-        });
+        inForce.textContent = tr(
+          source.effectiveFrom ? 'client.source.effective_from' : 'client.source.in_force',
+          {
+            fecha: sourceDate(source.inForceSince),
+          },
+        );
         inForce.hidden = false;
       }
       return li;

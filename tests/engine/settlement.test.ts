@@ -96,7 +96,7 @@ describe('holiday pay in working days', () => {
     const said = text(p.calculation);
     expect(said).toContain('22 días laborables (5 por semana) al año');
     expect(said).toContain('días laborables pendientes');
-    expect(said).toContain('22 días laborables equivalen a 30 naturales');
+    expect(said).toContain('toma 22 días laborables como los 30 naturales');
     expect(text(holidayPayItem(base).calculation)).toContain('30 días naturales al año');
   });
 
@@ -122,7 +122,7 @@ describe('holiday pay in working days', () => {
     // Read as a five-day week, the same answer would have looked short.
     const asFive = holidayPayItem(working({ annualHolidayDays: 26, holidayDaysTaken: 10 }));
     expect(compareItem(asFive, paid).status).toBe('below_minimum');
-    expect(text(asSix.calculation)).toContain('26 días laborables equivalen a 30 naturales');
+    expect(text(asSix.calculation)).toContain('toma 26 días laborables como los 30 naturales');
   });
 
   it('another week: 30 × days / 7, rounded', () => {

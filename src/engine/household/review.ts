@@ -13,7 +13,15 @@ import { validate, type ValidationError } from './validate';
 import { assessHolidays, assessWorkingTime } from './working-time';
 
 // What no review of the facts given can tell, always listed at the end.
-export type UncheckedCode = 'cause_truth' | 'in_kind_in_severance' | 'contributions' | 'net_pay';
+export type UncheckedCode =
+  | 'cause_truth'
+  | 'in_kind_in_severance'
+  | 'presence_time'
+  | 'live_in_meals'
+  | 'trial_period'
+  | 'prevention'
+  | 'contributions'
+  | 'net_pay';
 
 export type HouseholdDeps = MinimumWageDeps;
 
@@ -40,6 +48,10 @@ function uncheckedOf(input: HouseholdInput): readonly UncheckedCode[] {
     ...(input.termination?.route === 'desistimiento' && (input.inKindMonthly ?? 0) > 0
       ? (['in_kind_in_severance'] as const)
       : []),
+    'presence_time',
+    ...(input.liveIn ? (['live_in_meals'] as const) : []),
+    'trial_period',
+    'prevention',
     'contributions',
     'net_pay',
   ];

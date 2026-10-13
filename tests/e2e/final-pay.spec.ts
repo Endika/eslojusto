@@ -400,7 +400,7 @@ test('holidays count in working days by default; the yearly figure follows the u
   await expect(page.getByLabel('Vacaciones al año')).toHaveValue('22');
   await expect(
     page.getByText(
-      '22 laborables equivalen a los 30 naturales de la ley; 26 si trabajas de lunes a sábado.',
+      'La ley fija 30 naturales. La calculadora los toma como 22 laborables de lunes a viernes o 26 de lunes a sábado: es una equivalencia, no un texto de la ley.',
     ),
   ).toBeVisible();
   await page.getByLabel('6 (de lunes a sábado)').check();

@@ -129,7 +129,7 @@ for (const { name, viewport } of SIZES) {
         'tiene que llegar a la aseguradora como tarde el 01-02-2027',
       );
       await expect(card(page, 'Comunicar que no renuevas')).toContainText(
-        'Si tu póliza vence a las 00:00 h de ese día, el periodo acaba el día anterior: cuenta un día menos.',
+        'Si tu póliza vence a las 00:00 h de ese día, se puede leer que el periodo acaba el día anterior, y el plazo tendría un día menos.',
       );
       await expect(card(page, 'Aviso de cambios antes del vencimiento')).toContainText(
         'Llegó con 40 días de antelación: la ley pide al menos dos meses',
