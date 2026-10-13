@@ -131,7 +131,13 @@ export class ApiStack extends Stack {
       new CfnOutput(this, `${key}Url`, { value: url.url });
     }
 
-    addDashboard(this, { monthlyUsd: MONTHLY_BUDGET_USD, name: BUDGET_NAME });
+    addDashboard(this, {
+      budget: { monthlyUsd: MONTHLY_BUDGET_USD, name: BUDGET_NAME },
+      reserved:
+        props.reserveConcurrency === false
+          ? null
+          : { extract: EXTRACT_RESERVED_CONCURRENCY, payments: PAYMENT_RESERVED_CONCURRENCY },
+    });
   }
 }
 

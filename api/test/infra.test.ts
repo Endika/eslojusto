@@ -242,6 +242,23 @@ describe('dashboard', () => {
     expect(cost).toContain('as costePorLectura by revision');
   });
 
+  it('lists the requests that met an error by its class', () => {
+    const errors = byTitle('Errores por clase y función');
+    expect(errors).toContain('filter ispresent(error)');
+    expect(errors).toContain('by op, code, error');
+  });
+
+  it('marks each function’s reserved concurrency, not the account’s limit', () => {
+    const concurrency = widgets.find(
+      (w) =>
+        w.properties['title'] === 'Ejecuciones simultáneas frente a la reserva de cada función',
+    );
+    const annotations = (
+      concurrency?.properties['annotations'] as { horizontal: { value: number }[] } | undefined
+    )?.horizontal.map((a) => a.value);
+    expect(annotations).toEqual([5, 2]);
+  });
+
   it('stays within the free tier of 50 metrics per dashboard, with room for two models', () => {
     const rows = widgets.flatMap((w) => (w.properties['metrics'] ?? []) as unknown[]);
     const searches = body.match(/SEARCH\(/g) ?? [];
