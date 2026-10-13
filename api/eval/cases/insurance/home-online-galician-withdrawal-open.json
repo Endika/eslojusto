@@ -138,18 +138,6 @@
           "daysLeft": 327
         },
         {
-          "id": "change_notice",
-          "status": "not_entered",
-          "lastDay": null,
-          "daysLeft": null
-        },
-        {
-          "id": "premium",
-          "status": "not_entered",
-          "lastDay": null,
-          "daysLeft": null
-        },
-        {
           "id": "distance_withdrawal",
           "status": "open",
           "lastDay": "2026-10-16",

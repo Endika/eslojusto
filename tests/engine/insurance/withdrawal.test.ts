@@ -94,7 +94,7 @@ describe('withdrawal from a policy contracted at a distance (art. 10 Ley 22/2007
         null,
         null,
       ]);
-      expect(f?.calculation.map((p) => p.key)).toEqual(['withdrawal.mortgage_unverified']);
+      expect(f?.calculation.map((p) => p.key)).toEqual(['withdrawal.mortgage_duty']);
       expect(f?.sources.map((s) => s.id)).toEqual([
         'distance_withdrawal',
         'distance_withdrawal_excluded',

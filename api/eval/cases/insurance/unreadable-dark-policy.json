@@ -111,18 +111,6 @@
           "daysLeft": 98
         },
         {
-          "id": "change_notice",
-          "status": "not_entered",
-          "lastDay": null,
-          "daysLeft": null
-        },
-        {
-          "id": "premium",
-          "status": "not_entered",
-          "lastDay": null,
-          "daysLeft": null
-        },
-        {
           "id": "distance_withdrawal",
           "status": "not_applicable",
           "lastDay": null,

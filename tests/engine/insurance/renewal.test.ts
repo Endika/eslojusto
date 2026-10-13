@@ -14,6 +14,18 @@ import { notice, policy, TODAY } from './input';
 
 const keys = (f: { calculation: readonly { key: string }[] }) => f.calculation.map((p) => p.key);
 
+// With a notice there is always an item.
+function noticeOf(...args: Parameters<typeof changeNotice>) {
+  const f = changeNotice(...args);
+  if (f === null) throw new Error('expected a notice item');
+  return f;
+}
+function premiumOf(...args: Parameters<typeof premiumChange>) {
+  const f = premiumChange(...args);
+  if (f === null) throw new Error('expected a premium item');
+  return f;
+}
+
 describe('last day to give notice of not renewing (art. 22.2 LCS)', () => {
   it.each([
     ['2027-03-01', '2027-02-01', false],
@@ -105,7 +117,7 @@ describe('notice of changes (art. 22.3 LCS)', () => {
     ['2027-01-02', 'late', 58],
     ['2027-01-20', 'late', 40],
   ])('received on %s for a period ending on 01-03-2027', (received, status, days) => {
-    const f = changeNotice(
+    const f = noticeOf(
       policy({ notice: notice({ receivedOn: parseDate(received) }) }),
       TODAY,
       INSURANCE_NORMS,
@@ -124,7 +136,7 @@ describe('notice of changes (art. 22.3 LCS)', () => {
   ])(
     'with no equivalent day two months back, received on %s, late in every reading',
     (received, status) => {
-      const f = changeNotice(
+      const f = noticeOf(
         policy({
           expiresOn: parseDate('2027-04-30'),
           notice: notice({ receivedOn: parseDate(received) }),
@@ -140,7 +152,7 @@ describe('notice of changes (art. 22.3 LCS)', () => {
 
   it('in a leap year the last day is 29-02', () => {
     const f = (received: string) =>
-      changeNotice(
+      noticeOf(
         policy({
           expiresOn: parseDate('2028-04-30'),
           notice: notice({ receivedOn: parseDate(received) }),
@@ -153,7 +165,7 @@ describe('notice of changes (art. 22.3 LCS)', () => {
   });
 
   it('says nothing about what a late notice leads to', () => {
-    const f = changeNotice(
+    const f = noticeOf(
       policy({ notice: notice({ receivedOn: parseDate('2027-01-20') }) }),
       TODAY,
       INSURANCE_NORMS,
@@ -167,7 +179,7 @@ describe('notice of changes (art. 22.3 LCS)', () => {
   });
 
   it('a notice that changes covers or excesses needs no note on the premium', () => {
-    const f = changeNotice(
+    const f = noticeOf(
       policy({ notice: notice({ receivedOn: parseDate('2027-01-20'), changes: true }) }),
       TODAY,
       INSURANCE_NORMS,
@@ -176,13 +188,13 @@ describe('notice of changes (art. 22.3 LCS)', () => {
   });
 
   it('without a notice there is nothing to check', () => {
-    expect(changeNotice(policy(), TODAY, INSURANCE_NORMS).status).toBe('not_entered');
+    expect(changeNotice(policy(), TODAY, INSURANCE_NORMS)).toBeNull();
   });
 });
 
 describe('premium change', () => {
   it('a rise is given in euros and per cent, as a fact', () => {
-    const f = premiumChange(policy({ notice: notice() }), INSURANCE_NORMS);
+    const f = premiumOf(policy({ notice: notice() }), INSURANCE_NORMS);
     expect(f.status).toBe('up');
     expect(f.calculation[0]?.vars).toEqual({
       previous: { euros: 300 },
@@ -198,7 +210,7 @@ describe('premium change', () => {
     [300, 300, 'same', 0, 0],
     [412.37, 455.1, 'up', 42.73, 10.36],
   ])('%d € to %d €', (previous, next, status, difference, percent) => {
-    const f = premiumChange(
+    const f = premiumOf(
       policy({ notice: notice({ previousPremium: previous, newPremium: next }) }),
       INSURANCE_NORMS,
     );
@@ -209,8 +221,8 @@ describe('premium change', () => {
 
   it('without both premiums there is nothing to compare', () => {
     expect(
-      premiumChange(policy({ notice: notice({ previousPremium: null }) }), INSURANCE_NORMS).status,
+      premiumOf(policy({ notice: notice({ previousPremium: null }) }), INSURANCE_NORMS).status,
     ).toBe('not_entered');
-    expect(premiumChange(policy(), INSURANCE_NORMS).status).toBe('not_entered');
+    expect(premiumChange(policy(), INSURANCE_NORMS)).toBeNull();
   });
 });

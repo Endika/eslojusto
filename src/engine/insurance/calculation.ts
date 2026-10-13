@@ -34,7 +34,7 @@ export type InsurancePhraseKey =
   | 'withdrawal.not_started'
   | 'withdrawal.compulsory_excluded'
   | 'withdrawal.voluntary_unverified'
-  | 'withdrawal.mortgage_unverified'
+  | 'withdrawal.mortgage_duty'
   | 'information.policy_correction'
   | 'information.policy_correction.until'
   | 'information.policy_correction.no_policy'

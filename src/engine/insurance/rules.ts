@@ -54,10 +54,18 @@ const lcs = (id: InsuranceRuleId, article: string, anchor: string, output: RuleO
 export const RULES: Readonly<Record<InsuranceRuleId, Rule>> = {
   // 22.2: the policyholder who opposes the extension gives notice at least one month before the
   // current period ends.
-  non_renewal: { ...lcs('non_renewal', '22.2', 'aveintidos', 'date'), from: ART22_SINCE },
+  non_renewal: {
+    ...lcs('non_renewal', '22.2', 'aveintidos', 'date'),
+    from: ART22_SINCE,
+    wordingSince: ART22_SINCE,
+  },
   // 22.3: the insurer gives notice of any change to the contract at least two months before the
   // current period ends.
-  change_notice: { ...lcs('change_notice', '22.3', 'aveintidos', 'date'), from: ART22_SINCE },
+  change_notice: {
+    ...lcs('change_notice', '22.3', 'aveintidos', 'date'),
+    from: ART22_SINCE,
+    wordingSince: ART22_SINCE,
+  },
   // 8: one month from the delivery of the policy to ask the insurer to correct a divergence from
   // the proposal or the agreed clauses.
   policy_correction: lcs('policy_correction', '8', 'aoctavo', 'info'),
