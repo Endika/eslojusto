@@ -72,6 +72,7 @@ type TerminationPhraseKey =
   | 'termination.in_writing'
   | 'termination.writing_unknown'
   | 'dismissal.no_written_notice'
+  | 'dismissal.no_cause_in_writing'
   | 'dismissal.no_severance'
   | 'dismissal.unknown'
   | 'dismissal.none_of_the_two'
