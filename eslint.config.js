@@ -123,20 +123,21 @@ const mortgageReach = {
     'src/mortgage reaches the mortgage engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes, summary lines and letter details, and the translator type.',
 };
 // The bills reviews reach the bills engine through its modules, never its tables, which their
-// composition roots pass in; of the calculator, only what every section shares. Each review lives
-// in its own folder and shares the bills result and answers one level up. Allowlists of plain
-// segments, so no spelling of a path gets around them.
+// composition roots pass in; of the calculator, only what every section shares; of reading
+// documents, only the shared contract, ports, quotes, summary lines, letter details and basket.
+// Each review lives in its own folder and shares the bills result and answers one level up.
+// Allowlists of plain segments, so no spelling of a path gets around them.
 const billsShared =
-  'engine/(date|law/sources|bills/[\\w-]+)|calculator/(dom|fill|flow|navigation|number|review-form|review-result|section)|i18n/client';
+  'engine/(date|law/sources|bills/[\\w-]+)|calculator/(dom|fill|flow|navigation|number|review-form|review-result|section)|documents/(basket|contract|letter|ports|quote|summary)|i18n/client';
 const billsReach = {
   regex: `^(?!\\./[\\w-]+$|\\.\\./(${billsShared})$)`,
   message:
-    'src/bills reaches the bills engine (its tables come from the composition root), the shared sheets and the translator type.',
+    'src/bills reaches the bills engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes, summary lines, letter details and basket, and the translator type.',
 };
 const billsSectionReach = {
   regex: `^(?!\\./[\\w-]+$|\\.\\./[\\w-]+$|\\.\\./\\.\\./(${billsShared})$)`,
   message:
-    'A bills review reaches its own folder, the shared bills modules, the bills engine (its tables come from the composition root), the shared sheets and the translator type.',
+    'A bills review reaches its own folder, the shared bills modules, the bills engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes, summary lines, letter details and basket, and the translator type.',
 };
 const noBills = {
   regex: '(^|/)bills/',

@@ -18,7 +18,15 @@ interface PageGuide {
 }
 interface Props {
   lang: Lang;
-  review?: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance' | 'mortgage';
+  review?:
+    | 'final_pay'
+    | 'rental'
+    | 'employment'
+    | 'credit'
+    | 'insurance'
+    | 'mortgage'
+    | 'electricity'
+    | 'telecom';
   pageGuide?: PageGuide;
 }
 const { lang, review = 'final_pay', pageGuide } = Astro.props;
@@ -52,6 +60,18 @@ const MORTGAGE: Partial<Record<Key, Key>> = {
   'documents.upload.files_hint': 'mortgage.documents.files_hint',
   'documents.upload.consent': 'mortgage.documents.consent',
 };
+const ELECTRICITY: Partial<Record<Key, Key>> = {
+  'documents.start.help': 'bills.electricity.documents.start_help',
+  'documents.start.upload': 'bills.electricity.documents.upload',
+  'documents.upload.files_hint': 'bills.electricity.documents.files_hint',
+  'documents.upload.consent': 'bills.documents.consent',
+};
+const TELECOM: Partial<Record<Key, Key>> = {
+  'documents.start.help': 'bills.telecom.documents.start_help',
+  'documents.start.upload': 'bills.telecom.documents.upload',
+  'documents.upload.files_hint': 'bills.telecom.documents.files_hint',
+  'documents.upload.consent': 'bills.documents.consent',
+};
 const OWN: Partial<Record<Key, Key>> = {
   final_pay: {},
   rental: RENTAL,
@@ -59,6 +79,8 @@ const OWN: Partial<Record<Key, Key>> = {
   credit: CREDIT,
   insurance: INSURANCE,
   mortgage: MORTGAGE,
+  electricity: ELECTRICITY,
+  telecom: TELECOM,
 }[review];
 const tx = (key: Key) => t(lang, OWN[key] ?? key);
 const arrow = 'M4 12h15m-6-6 6 6-6 6';

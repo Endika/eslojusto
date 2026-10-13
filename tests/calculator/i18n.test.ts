@@ -3,6 +3,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { es, type Key } from '../../src/i18n/es';
 import {
+  BILLS_READING,
   CREDIT_READING,
   DICTIONARIES,
   INSURANCE_READING,
@@ -324,6 +325,32 @@ describe('client strings', () => {
     expect(clientStrings('es', { documents: true, credit: true })).toHaveProperty([
       'client.documents.field.principal',
     ]);
+  });
+
+  it('the bills pages read documents and tell how a pass stands, without the final pay’s report', () => {
+    const keys = Object.keys(clientStrings('es', { bills: true, documents: true }));
+    expect(keys).toContain('client.documents.kind.electricity_bill');
+    expect(keys).toContain('client.documents.skipped.not_telecom_document');
+    expect(keys).toContain('client.documents.verify.checking');
+    expect(keys).toContain('client.bills.basket.estimate');
+    expect(keys.filter((k) => /^client\.documents\.(report|letter|notice)\./.test(k))).toEqual([]);
+    expect(keys.filter((k) => CREDIT_READING.has(k) || MORTGAGE_READING.has(k))).toEqual([]);
+    // Without the documents API, the bills pages ship none of their words.
+    expect(
+      Object.keys(clientStrings('es', { bills: true })).filter((k) =>
+        k.startsWith('client.documents.'),
+      ),
+    ).toEqual([]);
+  });
+
+  it('ships the bills documents’ words only on their own pages', () => {
+    expect([...BILLS_READING].filter((k) => !(k in es))).toEqual([]);
+    for (const flags of [{}, { credit: true }, { insurance: true }, { mortgage: true }])
+      expect(
+        Object.keys(clientStrings('es', { documents: true, ...flags })).filter((k) =>
+          BILLS_READING.has(k),
+        ),
+      ).toEqual([]);
   });
 
   it('a build with it ships them', () => {

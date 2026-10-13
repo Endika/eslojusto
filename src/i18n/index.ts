@@ -25,7 +25,7 @@ export function t(lang: Lang, key: Key, vars?: Variables): string {
 const CREDIT_PAGE = ['client.credit.', 'client.theme.', 'client.other_language.'];
 // The mortgage page's likewise.
 const MORTGAGE_PAGE = ['client.mortgage.', 'client.theme.', 'client.other_language.'];
-// The bills reviews' pages likewise; they read no documents yet.
+// The bills reviews' pages likewise.
 const BILLS_PAGE = ['client.bills.', 'client.theme.', 'client.other_language.'];
 // What they take of document reading: none of the final pay's report, letter or pass notices. The
 // check of a pass already held is shared by every page that sells one.
@@ -98,7 +98,29 @@ export const MORTGAGE_READING = sectionReading(
     'client.documents.key_page_hint.expenses_clause',
   ],
 );
-const SECTION_READING = [CREDIT_READING, INSURANCE_READING, MORTGAGE_READING] as const;
+export const BILLS_READING = sectionReading(
+  [
+    'electricity_bill',
+    'electricity_contract',
+    'price_change_notice',
+    'telecom_bill',
+    'telecom_contract',
+  ],
+  [],
+  [
+    'client.documents.skipped.not_electricity_document',
+    'client.documents.skipped.not_telecom_document',
+  ],
+);
+// The bills pages also say how a pass this browser holds stands: they sell one with no letter.
+const billsReadingString = (key: string): boolean =>
+  readingString(key) || key.startsWith('client.documents.verify.');
+const SECTION_READING = [
+  CREDIT_READING,
+  INSURANCE_READING,
+  MORTGAGE_READING,
+  BILLS_READING,
+] as const;
 
 // The strings the browser scripts need, for the page to ship as JSON. Those of document reading
 // and the pass ship only in a build that has them, and each review section's only on its page.
@@ -128,7 +150,7 @@ export const clientStrings = (
   } = {},
 ): Partial<Record<Key, string>> => {
   // A word of some reviews' documents ships on any of their pages, and on no other.
-  const onPage = [credit, insurance, mortgage];
+  const onPage = [credit, insurance, mortgage, bills];
   const sectionWord = (key: string) => {
     const owners = SECTION_READING.flatMap((words, i) => (words.has(key) ? [onPage[i]] : []));
     return owners.length === 0 || owners.includes(true);
@@ -152,7 +174,8 @@ export const clientStrings = (
             (documents && readingString(key))
           : !key.startsWith('client.mortgage.')) &&
         (bills
-          ? BILLS_PAGE.some((prefix) => key.startsWith(prefix))
+          ? BILLS_PAGE.some((prefix) => key.startsWith(prefix)) ||
+            (documents && billsReadingString(key))
           : !key.startsWith('client.bills.')),
     ),
   );

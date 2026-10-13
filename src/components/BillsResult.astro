@@ -1,12 +1,16 @@
 ---
+import PassOffer from './PassOffer.astro';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
 
 interface Props {
   lang: Lang;
   review: 'electricity' | 'telecom';
+  // A build with the documents API reads bills and offers the pass; on the electricity review it
+  // keeps «tu año» too.
+  documents?: boolean;
 }
-const { lang, review } = Astro.props;
+const { lang, review, documents = false } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 
 const UP = 'M12 21V4m-5 5 5-5 5 5M3 14h18';
@@ -112,6 +116,41 @@ const CIRCLED = new Set([
 
     <div class="review__items" data-items></div>
 
+    {documents && review === 'electricity' && (
+      <section class="item basket" data-basket aria-labelledby="basket-title" hidden>
+        <div class="sheet">
+          <h3 class="item__title" id="basket-title" data-basket-title></h3>
+          <p class="help">{tx('bills.basket.memory')}</p>
+          <ul class="list" data-basket-bills></ul>
+          <div data-basket-year hidden>
+            <h4 class="rules__title">{tx('bills.basket.year')}</h4>
+            <p class="totals__amount" data-basket-counted></p>
+            <p class="item__note">{tx('bills.basket.year_note')}</p>
+            <p class="item__note" data-basket-up-to hidden></p>
+            <p class="item__note totals__under" data-basket-under hidden></p>
+            <p class="item__note" data-basket-recurring hidden></p>
+            <p class="item__note basket__estimate" data-basket-estimate hidden></p>
+          </div>
+          <div class="basket__actions">
+            <button class="button button--sheet" type="button" data-basket-next hidden></button>
+            <button class="button button--sheet" type="button" data-basket-add>
+              {tx('bills.basket.add')}
+            </button>
+          </div>
+        </div>
+      </section>
+    )}
+
+    {documents && (
+      <PassOffer
+        lang={lang}
+        review={review}
+        offer={
+          review === 'electricity' ? 'client.bills.pass.offer' : 'client.bills.telecom.pass.offer'
+        }
+      />
+    )}
+
     {review === 'electricity' ? (
       <section class="item" data-in-scope aria-labelledby="compare-title">
         <div class="sheet">
@@ -209,6 +248,16 @@ const CIRCLED = new Set([
     font: 620 1.375rem / 1.2 var(--f-mono);
     font-stretch: 87.5%;
     font-variant-numeric: tabular-nums;
+  }
+  .basket__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+  }
+  /* An estimate, never a figure of the bills: it reads as a note, apart from the total. */
+  .basket__estimate {
+    font-style: italic;
   }
   /* What is charged short reads as plainly as what is charged over, never smaller. */
   .totals__under {

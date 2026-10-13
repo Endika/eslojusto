@@ -4,7 +4,14 @@ import { MAX_IMAGE_LONG_SIDE } from '../../api/src/domain/image-limit';
 
 // Which review a request is for; a request without one is the final pay's.
 export type ReviewKind =
-  'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance' | 'mortgage';
+  | 'final_pay'
+  | 'rental'
+  | 'employment'
+  | 'credit'
+  | 'insurance'
+  | 'mortgage'
+  | 'electricity'
+  | 'telecom';
 
 // What the API says each page is; `other` is a page the review has no use for.
 export const PAGE_KINDS = [
@@ -40,6 +47,11 @@ export const PAGE_KINDS = [
   'fiae',
   'transparency_deed',
   'prepayment_statement',
+  'electricity_bill',
+  'electricity_contract',
+  'price_change_notice',
+  'telecom_bill',
+  'telecom_contract',
 ] as const;
 export type PageKind = (typeof PAGE_KINDS)[number];
 export type SourceKind = Exclude<PageKind, 'other'>;
@@ -58,6 +70,8 @@ export const READABILITY = [
   'not_credit_document',
   'not_insurance_document',
   'not_mortgage_document',
+  'not_electricity_document',
+  'not_telecom_document',
 ] as const;
 export type Readability = (typeof READABILITY)[number];
 
@@ -75,6 +89,8 @@ export const SKIP_REASONS = [
   'not_credit_document',
   'not_insurance_document',
   'not_mortgage_document',
+  'not_electricity_document',
+  'not_telecom_document',
   'no_data',
   'unread',
 ] as const satisfies readonly (Exclude<Readability, 'ok'> | 'no_data' | 'unread')[];
@@ -98,6 +114,8 @@ export const LIMITS = {
 
 export const PASS_READS = 15;
 export const PASS_DAYS = 7;
+// In euros, VAT included, as Stripe charges it.
+export const PASS_PRICE = 4.99;
 
 export const API_ERROR_CODES = [
   'method_not_allowed',
@@ -488,6 +506,70 @@ export const MORTGAGE_EXTRACTION: ExtractionShape<MortgageFieldName, MortgageLis
 
 export type MortgageExtraction = Extraction<MortgageFieldName, MortgageListName>;
 
+// The fields the API merges from household electricity documents
+// (api/src/domain/electricity-merge.ts): the contract's and a price change notice's. Each bill's
+// figures stay in its own row of `bills`, with its lines in the other lists by its document.
+export const ELECTRICITY_FIELDS = [
+  'signedOn',
+  'retailerName',
+  'priceType',
+  'durationMonths',
+  'renews',
+  'exitPenaltyText',
+  'noticeSentOn',
+  'noticeAppliesFrom',
+  'separateFromBill',
+] as const;
+export type ElectricityFieldName = (typeof ELECTRICITY_FIELDS)[number];
+
+// Their lists (api/src/domain/electricity-schema.ts). The bill's supply number arrives only as a
+// fingerprint, to tell two copies of one bill apart.
+export const ELECTRICITY_LISTS = [
+  'bills',
+  'powerLines',
+  'energyLines',
+  'otherLines',
+  'agreedPrices',
+  'services',
+  'priceChanges',
+] as const;
+export type ElectricityListName = (typeof ELECTRICITY_LISTS)[number];
+
+export const ELECTRICITY_EXTRACTION: ExtractionShape<ElectricityFieldName, ElectricityListName> = {
+  review: 'electricity',
+  fields: ELECTRICITY_FIELDS,
+  lists: ELECTRICITY_LISTS,
+};
+
+export type ElectricityExtraction = Extraction<ElectricityFieldName, ElectricityListName>;
+
+// The fields the API merges from phone and internet documents (api/src/domain/telecom-merge.ts):
+// the contract's. Each bill keeps its own row of `bills`, and its charges are rows of `lines`.
+export const TELECOM_FIELDS = [
+  'signedOn',
+  'operatorName',
+  'commitmentStartsOn',
+  'commitmentMonths',
+  'agreedPenalty',
+  'penaltyText',
+  'handsetSubsidised',
+  'handsetValue',
+  'priceReviewText',
+  'priceReviewIndex',
+] as const;
+export type TelecomFieldName = (typeof TELECOM_FIELDS)[number];
+
+export const TELECOM_LISTS = ['bills', 'lines'] as const;
+export type TelecomListName = (typeof TELECOM_LISTS)[number];
+
+export const TELECOM_EXTRACTION: ExtractionShape<TelecomFieldName, TelecomListName> = {
+  review: 'telecom',
+  fields: TELECOM_FIELDS,
+  lists: TELECOM_LISTS,
+};
+
+export type TelecomExtraction = Extraction<TelecomFieldName, TelecomListName>;
+
 export interface SourcedField extends ExtractedField {
   readonly source: SourceKind;
 }
@@ -583,9 +665,31 @@ export const MORTGAGE_CHECKS = [
 ] as const;
 export type MortgageCheck = (typeof MORTGAGE_CHECKS)[number];
 
+// What the API finds incoherent in electricity bills (api/src/domain/electricity-checks.ts).
+// `period_end_before_start` shares its name with the final pay's check, but the reading words it.
+export const ELECTRICITY_CHECKS = [
+  'period_end_before_start',
+  'days_mismatch',
+  'lines_do_not_sum',
+  'vat_base_mismatch',
+  'duplicate_bill',
+] as const;
+export type ElectricityCheck = (typeof ELECTRICITY_CHECKS)[number];
+
+// What the API finds incoherent in phone and internet documents (api/src/domain/telecom-checks.ts).
+export const TELECOM_CHECKS = ['period_end_before_start', 'lines_above_total'] as const;
+export type TelecomCheck = (typeof TELECOM_CHECKS)[number];
+
 // The final pay's checks are worded by the upload; any other review's, by its own reading.
 export type FailedCheck =
-  CoherenceCheck | RentalCheck | EmploymentCheck | CreditCheck | InsuranceCheck | MortgageCheck;
+  | CoherenceCheck
+  | RentalCheck
+  | EmploymentCheck
+  | CreditCheck
+  | InsuranceCheck
+  | MortgageCheck
+  | ElectricityCheck
+  | TelecomCheck;
 export const isCoherenceCheck = (c: FailedCheck): c is CoherenceCheck =>
   (COHERENCE_CHECKS as readonly string[]).includes(c);
 

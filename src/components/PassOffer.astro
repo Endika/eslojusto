@@ -10,12 +10,22 @@ import PassLetter from './PassLetter.astro';
 // information sit outside the paid part and download without a pass, under their own title when
 // there is nothing to sell; so does the mortgage review's request for its documents. The insurance
 // review never sells the pass: its one letter only tells the insurer, and a pass already held
-// downloads the report.
+// downloads the report. The bills reviews have no letter yet, and each says in its own words what
+// the pass is for: `offer` is the key of that pitch, which the others keep as it was.
 interface Props {
   lang: Lang;
-  review?: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance' | 'mortgage';
+  review?:
+    | 'final_pay'
+    | 'rental'
+    | 'employment'
+    | 'credit'
+    | 'insurance'
+    | 'mortgage'
+    | 'electricity'
+    | 'telecom';
+  offer?: Key;
 }
-const { lang, review = 'final_pay' } = Astro.props;
+const { lang, review = 'final_pay', offer } = Astro.props;
 const RENTAL: Partial<Record<Key, Key>> = {
   'documents.pass.title': 'rental.pass.title',
   'documents.pass.text': 'rental.pass.text',
@@ -69,6 +79,10 @@ const MORTGAGE: Partial<Record<Key, Key>> = {
   'documents.letter.company': 'mortgage.letter.company',
   'documents.letter.reference': 'mortgage.letter.reference',
 };
+const BILLS: Partial<Record<Key, Key>> = {
+  'documents.pass.title': 'bills.pass.title',
+  'documents.pass.price': 'bills.pass.price',
+};
 const OWN: Partial<Record<Key, Key>> = {
   final_pay: {},
   rental: RENTAL,
@@ -76,8 +90,11 @@ const OWN: Partial<Record<Key, Key>> = {
   credit: CREDIT,
   insurance: INSURANCE,
   mortgage: MORTGAGE,
+  electricity: BILLS,
+  telecom: BILLS,
 }[review];
-const tx = (key: Key) => t(lang, OWN[key] ?? key);
+const tx = (key: Key) =>
+  t(lang, key === 'documents.pass.text' && offer ? offer : (OWN[key] ?? key));
 // The title and lead shown when only the free letters are on offer.
 const FREE_ONLY = {
   employment: ['employment.letters.title', 'employment.letters.text'],
@@ -167,9 +184,13 @@ const pitch = freeOnly ? '' : undefined;
           {tx('documents.pass.download_report')}
         </button>
       </div>
-      {!freeOnly && <PassLetter review={review} tx={tx} />}
+      {review !== 'electricity' && review !== 'telecom' && !freeOnly && (
+        <PassLetter review={review} tx={tx} />
+      )}
     </div>
-    {freeOnly && <PassLetter review={review} tx={tx} />}
+    {review !== 'electricity' && review !== 'telecom' && freeOnly && (
+      <PassLetter review={review} tx={tx} />
+    )}
     <p class="pass__status" role="status" aria-live="polite" data-pass-status></p>
     <p class="errata" role="alert" data-pass-error hidden></p>
     <button class="button button--sheet" type="button" data-pass-verify-retry hidden>

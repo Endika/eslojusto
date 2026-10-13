@@ -1098,6 +1098,11 @@ export const es = {
   'client.documents.kind.fiae': 'Ficha de advertencias estandarizadas (FiAE)',
   'client.documents.kind.transparency_deed': 'Acta notarial previa',
   'client.documents.kind.prepayment_statement': 'Liquidación de una amortización o un cambio',
+  'client.documents.kind.electricity_bill': 'Factura de la luz',
+  'client.documents.kind.electricity_contract': 'Contrato de la luz',
+  'client.documents.kind.price_change_notice': 'Aviso de cambio de precios',
+  'client.documents.kind.telecom_bill': 'Factura de teléfono o internet',
+  'client.documents.kind.telecom_contract': 'Contrato de teléfono o internet',
   'client.documents.kind.lease': 'Contrato de alquiler',
   'client.documents.kind.rent_update_notice': 'Aviso de subida de la renta',
   'client.documents.kind.rent_receipt': 'Recibo del alquiler',
@@ -1127,6 +1132,11 @@ export const es = {
   'client.documents.source.fiae': 'la FiAE',
   'client.documents.source.transparency_deed': 'el acta notarial previa',
   'client.documents.source.prepayment_statement': 'la liquidación',
+  'client.documents.source.electricity_bill': 'la factura',
+  'client.documents.source.electricity_contract': 'el contrato',
+  'client.documents.source.price_change_notice': 'el aviso',
+  'client.documents.source.telecom_bill': 'la factura',
+  'client.documents.source.telecom_contract': 'el contrato',
   'client.documents.agreement_offer': 'El acuerdo que has subido ofrece {importe} en total.',
   'client.documents.conflict':
     '{dato}: los documentos no dicen lo mismo. Se ha usado lo que pone {fuente}; compáralo con los demás.',
@@ -1174,6 +1184,8 @@ export const es = {
   'client.documents.skipped.not_credit_document': 'no parece un documento del crédito.',
   'client.documents.skipped.not_insurance_document': 'no parece un documento del seguro.',
   'client.documents.skipped.not_mortgage_document': 'no parece un documento de la hipoteca.',
+  'client.documents.skipped.not_electricity_document': 'no parece un documento de la luz.',
+  'client.documents.skipped.not_telecom_document': 'no parece un documento de teléfono o internet.',
   'client.documents.missing_key_page':
     'No se ha encontrado {pagina}. Si tu escritura la tiene, puede que esa página no esté entre las que has subido: {pista}',
   'client.documents.key_page.expenses_clause': 'la cláusula de gastos de tu escritura',
@@ -6524,6 +6536,27 @@ export const es = {
   'bills.result.rows': 'Valores oficiales usados',
   'bills.result.restart': 'Empezar de nuevo',
 
+  'bills.documents.consent':
+    'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, direcciones o números de cuenta. Del código de suministro (CUPS) solo queda una huella para reconocer una factura repetida. Se leen en la Unión Europea y no se guardan.',
+  'bills.electricity.documents.start_help':
+    'Puedes subir tus facturas de la luz para rellenar los datos con lo que se lea en ellas, o escribirlos tú. Antes de revisar nada, confirmas cada dato, factura por factura.',
+  'bills.electricity.documents.upload': 'Sube una o varias facturas de la luz',
+  'bills.electricity.documents.files_hint':
+    'Todas las páginas de tus facturas de la luz y, si los tienes, el contrato o un aviso de cambio de precios, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+  'bills.telecom.documents.start_help':
+    'Puedes subir tu contrato y tus facturas de teléfono o internet para rellenar los datos con lo que se lea en ellos, o escribirlos tú. Antes de revisar nada, confirmas cada dato.',
+  'bills.telecom.documents.upload':
+    'Sube tu contrato y, si las tienes, tus facturas de teléfono o internet',
+  'bills.telecom.documents.files_hint':
+    'El contrato o sus condiciones de permanencia y, si las tienes, las facturas con la penalización o con cobros de después de la baja, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+  'bills.pass.title': 'El informe de tus facturas',
+  'bills.pass.price':
+    '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador: en ese tiempo puedes leer hasta 15 paquetes de documentos, en cualquier sección, y volver a descargar el informe sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
+  'bills.basket.memory':
+    'No guardamos nada: tu año vive solo en esta pestaña. Si la cierras o la recargas, vuelve a subir tus facturas. Al volver del pago solo se recupera la última factura que revisaste.',
+  'bills.basket.year': 'Lo que suman tus facturas',
+  'bills.basket.year_note': 'Por encima de la norma, con cada factura contada una sola vez.',
+  'bills.basket.add': 'Añadir otra factura',
   'client.bills.unit.day_one': '{n} día',
   'client.bills.unit.day_many': '{n} días',
   'client.bills.unit.month_one': '{n} mes',
@@ -6650,6 +6683,69 @@ export const es = {
   'client.bills.result.telecom_lead_nothing':
     'Con lo que has metido no hay penalización ni cobros de después de la baja que comprobar.',
   'client.bills.result.lead_out_of_scope': 'Esta revisión todavía no cubre lo que has metido.',
+  'client.bills.pass.issued': 'Pago recibido. Ya puedes descargar el informe.',
+  'client.bills.pass.offer':
+    'Revisa tu año entero: con un pase de 4,99 € revisas hasta ~15 lecturas durante 7 días, en cualquier sección.',
+  'client.bills.telecom.pass.offer':
+    'Con un pase de 4,99 € descargas el informe de tu baja y revisas hasta ~15 lecturas durante 7 días, en cualquier sección.',
+  'client.bills.basket.title_one': 'Tu año: 1 factura revisada',
+  'client.bills.basket.title_many': 'Tu año: {n} facturas revisadas',
+  'client.bills.basket.bill': 'Factura del {desde} al {hasta}',
+  'client.bills.basket.bill_counted': '{factura} · por encima de la norma: {importe}',
+  'client.bills.basket.bill_duplicate':
+    '{factura} · es la misma que otra de tu año (mismo suministro y periodo) y no cuenta dos veces.',
+  'client.bills.basket.duplicate':
+    'Es la misma que otra factura de tu año (mismo suministro y periodo) y no cuenta dos veces.',
+  'client.bills.basket.recurring': 'Se repite en más de una factura: {partidas}.',
+  'client.bills.basket.estimate':
+    'Estimación, no una cifra de tus facturas, y no se suma a ningún total: si lo que se repite ({partidas}) siguiera igual, en un año serían unos {importe}.',
+  'client.bills.basket.next_one': 'Revisar la siguiente factura leída (queda 1)',
+  'client.bills.basket.next_many': 'Revisar la siguiente factura leída (quedan {n})',
+  'client.bills.documents.several':
+    'Se han leído {n} facturas. Se revisan de una en una: ahora ves la más antigua y, en su resultado, puedes pasar a la siguiente.',
+  'client.bills.documents.more_services':
+    'Tu factura cobra {n} servicios aparte de la luz y esta revisión pregunta por dos: se han puesto los dos primeros.',
+  'client.bills.documents.both_regularizations':
+    'Tu factura regulariza facturas anteriores a tu cargo y a tu favor: el importe de la regularización queda para que lo metas tú.',
+  'client.bills.documents.truncated':
+    'Tus documentos traen más facturas o líneas de las que caben en una lectura, así que puede faltar alguna.',
+  'client.bills.documents.check.period_end_before_start':
+    'En alguna factura, la lectura actual leída no va después de la anterior: revisa las dos fechas.',
+  'client.bills.documents.check.days_mismatch':
+    'En alguna factura, los días facturados leídos no son los que van de una lectura a otra: revisa las fechas y los días.',
+  'client.bills.documents.check.lines_do_not_sum':
+    'En alguna factura, las líneas leídas no suman la base del IVA: revisa sus importes.',
+  'client.bills.documents.check.vat_base_mismatch':
+    'En alguna factura, la base y el IVA leídos suman más que el total: revisa esas cifras.',
+  'client.bills.documents.check.duplicate_bill':
+    'Has subido dos veces una factura del mismo suministro y periodo: en tu año cuenta una sola vez.',
+  'client.bills.documents.telecom.started_on':
+    'El inicio de la permanencia es la fecha del contrato. Si empezó otro día, como el de la instalación, pon ese día.',
+  'client.bills.documents.telecom.check.period_end_before_start':
+    'En alguna factura, el final del periodo leído va antes de su inicio: revisa las fechas.',
+  'client.bills.documents.telecom.check.lines_above_total':
+    'En alguna factura, los cobros leídos suman más que su total: revisa sus importes.',
+  'client.bills.documents.telecom.quote.agreedPenalty':
+    'Lo que dice tu contrato sobre la penalización',
+  'client.bills.documents.telecom.quote.priceIndex':
+    'Lo que dice tu contrato sobre los cambios de precio',
+  'client.bills.documents.telecom.quote_note':
+    'Copiado tal cual del documento: compáralo con lo que pones aquí.',
+  'client.bills.report.generated': 'eslojusto.es · {fecha}',
+  'client.bills.report.footer':
+    'eslojusto.es informa sobre tus derechos y no da asesoramiento. Normas y tablas según su estado el {fecha}.',
+  'client.bills.report.reviews': 'Línea por línea',
+  'client.bills.report.year': 'Lo que suman tus facturas',
+  'client.bills.report.counted': 'Por encima de la norma',
+  'client.bills.electricity.report.title': 'Revisión de tus facturas de la luz',
+  'client.bills.electricity.report.intro':
+    'Este informe compara cada factura de la luz que revisaste con tus propios precios y con lo que fija la norma, con los datos que confirmaste. Cada factura cuenta una sola vez, lo cobrado de menos va aparte y la estimación a un año no se suma a ningún total. Informa sobre la norma y no es asesoramiento jurídico.',
+  'client.bills.electricity.report.filename': 'eslojusto-informe-facturas-luz.pdf',
+  'client.bills.telecom.report.title': 'Revisión de tu baja de teléfono o internet',
+  'client.bills.telecom.report.intro':
+    'Este informe compara la penalización y los cobros de tu baja con lo que permite la norma, con los datos que confirmaste en la revisión. Informa sobre la norma y no es asesoramiento jurídico.',
+  'client.bills.telecom.report.exit': 'Tu baja',
+  'client.bills.telecom.report.filename': 'eslojusto-informe-baja-telefono.pdf',
   'client.bills.unchecked.electricity.agreed_price':
     'Si el precio que te cobran es el que pactaste: hace falta tu contrato.',
   'client.bills.unchecked.electricity.price_notice':
