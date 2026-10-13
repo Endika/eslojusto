@@ -141,7 +141,9 @@ function amountBlock(input: ErteInput, e: ErteEstimate): ErteBlock {
         ? ''
         : `Con el mínimo y el máximo según tus hijos o hijas a cargo (art. 270.3 LGSS): ${capCopy(input.children)} al mes con jornada completa.`;
   const proportion = reduction
-    ? ` Como el ERTE reduce tu jornada un ${percentText(reduction.percent)}, la prestación es proporcional a esa reducción (art. 270.5 LGSS); solo cuenta la reducción temporal del art. 47 ET.`
+    ? input.regime === 'red'
+      ? ` Como el ERTE reduce tu jornada un ${percentText(reduction.percent)}, la revisión toma la prestación en proporción a esa reducción, como en el paro por reducción de jornada (art. 270.5 LGSS). La disposición adicional 41.ª no dice cómo se calcula en el mecanismo RED: es un criterio de la revisión.`
+      : ` Como el ERTE reduce tu jornada un ${percentText(reduction.percent)}, la prestación es proporcional a esa reducción (art. 270.5 LGSS); solo cuenta la reducción temporal del art. 47 ET.`
     : '';
   return {
     title: 'Cuánto cobrarías',

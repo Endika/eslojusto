@@ -113,16 +113,17 @@ export const MORTGAGE_NORMS: NormTable = {
   },
 };
 
+// Read in the BOE on 13-10-2026, in the review of the published section.
 export const NORM_REVIEW: NormReview = {
-  lcci: null,
-  trlitpajd29: null,
-  law41_2007: null,
-  rdl19_2022: null,
-  rdl8_2023: null,
-  lh114: null,
-  law1_2013: null,
-  cc: null,
-  lo1_2025: null,
-  law44_2002: null,
-  lcci_25bis: null,
+  lcci: '2026-10-13',
+  trlitpajd29: '2026-10-13',
+  law41_2007: '2026-10-13',
+  rdl19_2022: '2026-10-13',
+  rdl8_2023: '2026-10-13',
+  lh114: '2026-10-13',
+  law1_2013: '2026-10-13',
+  cc: '2026-10-13',
+  lo1_2025: '2026-10-13',
+  law44_2002: '2026-10-13',
+  lcci_25bis: '2026-10-13',
 };

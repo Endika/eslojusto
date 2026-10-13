@@ -61,7 +61,7 @@ describe('mortgage norm table', () => {
     expect(n.inForceSince).toMatch(ISO);
     expect(n.inForceUntil).toBeNull();
     expect(n.status).toBe(id === 'lcci_25bis' ? 'pending_validation' : 'in_force');
-    expect(NORM_REVIEW[id as MortgageNormId]).toBeNull();
+    expect(NORM_REVIEW[id as MortgageNormId]).toMatch(ISO);
   });
 
   it('art. 25 bis rests on RDL 29/2026, pending validation, and is only explained', () => {
