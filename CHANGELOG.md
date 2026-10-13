@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.54.5](https://github.com/Endika/eslojusto/compare/v1.54.4...v1.54.5) (2026-10-13)
+
+
+### Bug Fixes
+
+* **employment:** a trial over the agreement limit the person gives is over the limit ([a528fc3](https://github.com/Endika/eslojusto/commit/a528fc328361a28ddb329c8b6bb59b3d30191354))
+* **employment:** carry a weekly hourly schedule over 365 days, not 52 weeks ([c87ad9f](https://github.com/Endika/eslojusto/commit/c87ad9f1fc46aa60a96cb42344a6fc16cfd511b5))
+* **employment:** no «puedes pedir» note when every point of the information is there ([ed16f11](https://github.com/Endika/eslojusto/commit/ed16f1124dd3a36c6b34f8bc5b1019f0c6c41006))
+* **employment:** no extra pays under the minimum is not a second shortfall ([397ecd1](https://github.com/Endika/eslojusto/commit/397ecd17ff48a1a3836d2bbb79e4185c4d7ea39d))
+* **employment:** say the occasional days may not be used continuously, unchecked ([6cdc508](https://github.com/Endika/eslojusto/commit/6cdc508eafac753466476816f85175dd25c17013))
+* **employment:** the harassment protocol of art. 3.2.l is always owed ([195d0e4](https://github.com/Endika/eslojusto/commit/195d0e49680072115e35471f95391bd3fa3686ce))
+
 ## [1.54.4](https://github.com/Endika/eslojusto/compare/v1.54.3...v1.54.4) (2026-10-13)
 
 
