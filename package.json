@@ -24,6 +24,7 @@
     "legal-interest:review": "vitest run tests/engine/law/interest.test.ts --reporter=verbose",
     "bills:due": "vitest run tests/engine/bills/due.test.ts tests/engine/law/conditional.test.ts --reporter=verbose",
     "indices:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indices.mjs --check",
+    "indices:due": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indices-due.mjs",
     "bde:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/bde-series.mjs --check",
     "bde:write": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/bde-series.mjs --write",
     "rental-bank": "node scripts/rental-bank/render.mjs",
