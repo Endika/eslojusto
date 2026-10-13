@@ -1,10 +1,17 @@
-import { addMonthsClamped, compareDates, type CivilDate } from '../date';
+import { addMonthsClamped, compareDates, toIso, type CivilDate } from '../date';
 import { assessAcross, type Across } from '../law/readings';
 import { round2 } from '../money';
 import { mortgagePhrase as p, type MortgageCalculation, type MortgagePhrase } from './calculation';
 import type { MortgageSource } from './expenses';
 import type { NormTable } from './norms';
-import { activeRules, ruleApplies, ruleSource, ruleStanding, type StatuteRuleId } from './rules';
+import {
+  activeRules,
+  ruleApplies,
+  ruleSource,
+  ruleStanding,
+  STATUTE_RULES,
+  type StatuteRuleId,
+} from './rules';
 import type { MortgageDeps, MortgageInput, Operation, OperationKind } from './types';
 
 // `above_cap` is the only status whose euros reach a total.
@@ -83,6 +90,10 @@ type Cap =
       readonly rules: readonly StatuteRuleId[];
       readonly phrases: readonly MortgagePhrase[];
     };
+
+// Art. 23.5 has the deed pick an option only from the LCCI on: an earlier deed has none to ask.
+export const deedPicksOption = (deed: CivilDate): boolean =>
+  toIso(deed) >= STATUTE_RULES.prepayment_lcci_variable.from;
 
 // Art. 9 Ley 41/2007: no compensation for the interest rate risk when the rate is revised at most
 // every twelve months.

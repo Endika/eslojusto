@@ -169,6 +169,22 @@ describe('the mortgage form', () => {
     });
   });
 
+  it('leaves out the deed’s option before 16-06-2019, where art. 23.5 sets none', () => {
+    const repaid = {
+      operation: 'partial_prepayment',
+      operationOn: '2023-03-01',
+      operationPrincipal: '20.000',
+      operationFee: '100',
+      prepaymentOption: '',
+    };
+    expect(read({ ...repaid, deedOn: '2019-06-15' })).toMatchObject({
+      input: { prepaymentOption: null, operations: [{ kind: 'partial_prepayment' }] },
+    });
+    expect(read({ ...repaid, deedOn: '2019-06-16' })).toEqual({
+      errors: [{ field: 'prepaymentOption', code: 'missing_choice' }],
+    });
+  });
+
   it('names a day still to come, an unreadable rate and a count that is not whole', () => {
     expect(read({ deedOn: '2026-12-01' })).toMatchObject({
       errors: expect.arrayContaining([{ field: 'deedOn', code: 'in_future' }]),
@@ -244,6 +260,12 @@ describe('the sheets asked', () => {
     expect(
       asked({ hasInvoices: 'no', rateType: 'fixed', operation: 'fixed_rate_novation' }),
     ).toEqual(['operacion']);
+  });
+
+  it('asks the deed’s option only of a deed from 16-06-2019', () => {
+    const repaid = { hasInvoices: 'no', operation: 'partial_prepayment' };
+    expect(asked({ ...repaid, deedOn: '2019-06-15' })).not.toContain('condiciones');
+    expect(asked({ ...repaid, deedOn: '2019-06-16' })).toContain('condiciones');
   });
 
   it('a mortgage out of the review asks nothing after its door', () => {

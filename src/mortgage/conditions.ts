@@ -1,4 +1,5 @@
-import { chosen } from '../calculator/review-form';
+import { chosen, tryDate } from '../calculator/review-form';
+import { deedPicksOption } from '../engine/mortgage/fees';
 import type { Scope } from '../engine/mortgage/types';
 import { formScope, type Sheet } from './form';
 
@@ -19,6 +20,9 @@ const INVOICE_SHEETS: readonly Sheet[] = [
 ];
 const PREPAYMENTS = ['partial_prepayment', 'full_prepayment', 'creditor_subrogation'];
 
+const deedOn = (form: HTMLFormElement) =>
+  tryDate(form.querySelector<HTMLInputElement>('[name="deedOn"]')?.value.trim() ?? '');
+
 // The loan sheet and the result always; the rest only for a mortgage within the review, each as
 // its answers ask for it.
 export function applies(form: HTMLFormElement, step: Sheet | 'resultado'): boolean {
@@ -29,7 +33,10 @@ export function applies(form: HTMLFormElement, step: Sheet | 'resultado'): boole
   if (step === 'suelo' || step === 'indice') return variable;
   if (INVOICE_SHEETS.includes(step)) return chosen(form, 'hasInvoices') === 'yes';
   if (step === 'operacion') return operation !== '' && operation !== 'none';
-  if (step === 'condiciones') return PREPAYMENTS.includes(operation) && variable;
+  if (step === 'condiciones') {
+    const deed = deedOn(form);
+    return PREPAYMENTS.includes(operation) && variable && deed !== null && deedPicksOption(deed);
+  }
   if (step === 'seguro') return operation === 'full_prepayment';
   return true;
 }
