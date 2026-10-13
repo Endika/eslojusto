@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.55.3](https://github.com/Endika/eslojusto/compare/v1.55.2...v1.55.3) (2026-10-13)
+
+
+### Bug Fixes
+
+* **credit:** give a personal loan what a credit linked to one purchase means (art. 29 LCC) ([b36b9a4](https://github.com/Endika/eslojusto/commit/b36b9a43143973327560a1aa05d77df2c4c267b7))
+* **credit:** keep the 6,00-6,30 edge band for the 2010 reference only ([4766ece](https://github.com/Endika/eslojusto/commit/4766ece07b27d04ad2c168918117dc4a0f86aa35))
+* **credit:** say a variable loan's initial fixed stretch is the exception of art. 30.3.c ([dbd1f8a](https://github.com/Endika/eslojusto/commit/dbd1f8afe364efb096783a24f468797748db5df0))
+* **insurance:** apply the 2016 wording of art. 22 by its earliest deadline, not the expiry ([f625149](https://github.com/Endika/eslojusto/commit/f625149fa246be29e43139984ad5420fc79ff77b))
+* **insurance:** give the arrival of the non-renewal notice as the review's reading ([a03e27b](https://github.com/Endika/eslojusto/commit/a03e27b77d0a203e8e2e9fd78d105226e0cb54bb))
+
 ## [1.55.2](https://github.com/Endika/eslojusto/compare/v1.55.1...v1.55.2) (2026-10-13)
 
 
