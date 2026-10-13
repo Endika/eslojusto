@@ -21,4 +21,6 @@ interface ImportMetaEnv {
   readonly PUBLIC_CREDIT?: string;
   // '1' builds the mortgage review at /hipoteca/; anything else leaves it out.
   readonly PUBLIC_MORTGAGE?: string;
+  // '1' builds the bills reviews at /facturas/; anything else leaves them out.
+  readonly PUBLIC_BILLS?: string;
 }

@@ -250,8 +250,7 @@ export const BILLS_NORMS: NormTable = {
   // Art. 62.5: a commitment penalty in proportion to the days left, for exits from 01-01-2022.
   trlgdcu: {
     id: 'trlgdcu',
-    citation:
-      'Texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios (Real Decreto Legislativo 1/2007, de 16 de noviembre)',
+    citation: 'Real Decreto Legislativo 1/2007, de 16 de noviembre',
     url: `${ACT}BOE-A-2007-20555`,
     inForceSince: '2007-12-01',
     ...inForce,

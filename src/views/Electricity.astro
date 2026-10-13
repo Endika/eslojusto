@@ -1,0 +1,100 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import ElectricityForm from '../components/ElectricityForm.astro';
+import BillsResult from '../components/BillsResult.astro';
+import { BILLS_BETA } from '../content/sections';
+import { formatLongDay } from '../content/rent-indices';
+import { breadcrumbList, trail } from '../content/structured-data';
+import { LAST_UPDATED } from '../content/updated';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+// Each tab's share of the rail follows how much its section asks, kept close so that every name
+// still fits on a phone. The second column is the section's first step, whose id is its URL
+// fragment.
+const sections = [
+  ['cause', 'suministro', '01', 3],
+  ['salary', 'potencia', '02', 3],
+  ['settlement', 'peajes', '03', 3],
+  ['dates', 'ajustes', '04', 3],
+  ['result', 'resultado', '05', 2],
+] as const;
+
+// The day the page's rules and tables were last checked; it exists only in a build with the page.
+const checkedOn = LAST_UPDATED['/facturas/luz/'];
+if (!checkedOn) throw new Error('/facturas/luz/ needs its date in LAST_UPDATED.');
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const crumbs = trail(
+  lang,
+  { name: tx('bills.crumb'), path: '/facturas/' },
+  { name: tx('bills.electricity.crumb'), path: '/facturas/luz/' },
+);
+---
+
+<Base
+  title={tx('bills.electricity.title')}
+  description={tx('bills.electricity.description')}
+  path="/facturas/luz/"
+  lang={lang}
+  section="cause"
+  structuredData={[breadcrumbList(home, lang, crumbs)]}
+>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')}>
+    <ol>
+      {/* Only a section already reached is a link; one still ahead is plain text until then. */}
+      {sections.map(([id, step, number, weight], i) => (
+        <li style={`--weight: ${weight}`} data-tone={id}>
+          {i === 0 ? (
+            <a class="tab" data-tab={id} data-state="current" href={`#${step}`} aria-current="step">
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`bills.electricity.tab.${step}`)}</span>
+            </a>
+          ) : (
+            <span class="tab" data-tab={id} data-state="pending" aria-disabled="true">
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`bills.electricity.tab.${step}`)}</span>
+            </span>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+  <main id="content">
+    <div class="desk">
+      <header class="desk__head">
+        <Breadcrumbs lang={lang} crumbs={crumbs} />
+        <h1 class="desk__title">{tx('bills.electricity.h1')}</h1>
+        <p class="desk__lead">{tx('bills.electricity.lead')}</p>
+        {BILLS_BETA && (
+          <p class="desk__beta">
+            <span class="beta">{tx('bills.beta')}</span>
+            {tx('bills.beta_note')}
+          </p>
+        )}
+        <p class="desk__reviewed">
+          <time datetime={checkedOn}>
+            {t(lang, 'bills.reviewed', { fecha: formatLongDay(checkedOn) })}
+          </time>
+        </p>
+      </header>
+      <noscript>
+        <div class="sheet sheet--notice">
+          <p class="help">{tx('bills.no_js')}</p>
+        </div>
+      </noscript>
+      <ElectricityForm lang={lang} />
+      <BillsResult lang={lang} review="electricity" />
+    </div>
+  </main>
+</Base>
+
+<script>
+  import '../scripts/electricity';
+</script>

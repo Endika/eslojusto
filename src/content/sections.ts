@@ -28,3 +28,8 @@ export const CREDIT_BETA = true;
 // opens as a beta.
 export const MORTGAGE_BUILD = import.meta.env.PUBLIC_MORTGAGE === '1';
 export const MORTGAGE_BETA = true;
+
+// /facturas/, a household electricity bill and the exit from a phone or internet contract, is
+// built only when PUBLIC_BILLS=1, on the same terms; it opens as a beta.
+export const BILLS_BUILD = import.meta.env.PUBLIC_BILLS === '1';
+export const BILLS_BETA = true;

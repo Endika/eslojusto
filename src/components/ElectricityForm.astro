@@ -1,0 +1,522 @@
+---
+import Field from './Field.astro';
+import Choice from './EmploymentChoice.astro';
+import SelectField from './SelectField.astro';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+import {
+  ACCESS_TARIFFS,
+  BONUS_CATEGORIES,
+  HOLDERS,
+  MARKETS,
+  PHASES,
+  POWER_UNITS,
+  PRICE_TYPES,
+  REGULARIZATIONS,
+  RETAILERS,
+  SELF_CONSUMPTION,
+  SERVICE_COUNTS,
+  SERVICE_LABELS,
+  type Sheet,
+} from '../bills/electricity/form';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+const answers = (values: readonly ('yes' | 'no' | 'unknown')[]) =>
+  values.map((value) => ({ value, label: tx(`bills.answer.${value}`) }));
+const yesNo = answers(['yes', 'no']);
+const yesNoUnknown = answers(['yes', 'no', 'unknown']);
+const options = <T extends string>(values: readonly T[], label: (value: T) => Key) =>
+  values.map((value) => ({ value, label: tx(label(value)) }));
+
+const question = (sheet: Sheet) => tx(`bills.electricity.question.${sheet}`);
+const sheetId = (sheet: Sheet) => ({
+  id: `sheet-${sheet}`,
+  'data-sheet': sheet,
+  'aria-labelledby': `question-${sheet}`,
+});
+
+const arrow = 'M4 12h15m-6-6 6 6-6 6';
+---
+
+<form class="calculator" id="electricity" novalidate aria-label={tx('bills.electricity.form_aria')}>
+  <div class="stack">
+    <fieldset class="sheet" {...sheetId('suministro')}>
+      <h2 class="question" id="question-suministro" tabindex="-1">
+        {question('suministro')}
+      </h2>
+      <Field
+        name="postcode"
+        label={tx('bills.electricity.postcode')}
+        hint={tx('bills.electricity.postcode_hint')}
+        kind="days"
+      />
+      <Choice
+        name="accessTariff"
+        legend={tx('bills.electricity.access_tariff')}
+        hint={tx('bills.electricity.access_tariff_hint')}
+        options={options(ACCESS_TARIFFS, (v) => `bills.electricity.access_tariff.${v}`)}
+        layout="pair"
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('autoconsumo')}>
+      <h2 class="question" id="question-autoconsumo" tabindex="-1">
+        {question('autoconsumo')}
+      </h2>
+      <Choice
+        name="selfConsumption"
+        legend={tx('bills.electricity.self_consumption')}
+        options={options(SELF_CONSUMPTION, (v) => `bills.electricity.self_consumption.${v}`)}
+        layout="list"
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('potencia-contratada')}>
+      <h2 class="question" id="question-potencia-contratada" tabindex="-1">
+        {question('potencia-contratada')}
+      </h2>
+      <p class="help help--short">{tx('bills.electricity.contracted_help')}</p>
+      <div class="pair">
+        <Field name="powerP1" label={tx('bills.electricity.power_p1')} kind="amount" />
+        <Field name="powerP2" label={tx('bills.electricity.power_p2')} kind="amount" />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('fechas')}>
+      <h2 class="question" id="question-fechas" tabindex="-1">
+        {question('fechas')}
+      </h2>
+      <Field name="issuedOn" label={tx('bills.electricity.issued_on')} kind="date" />
+      <Field
+        name="dueOn"
+        label={tx('bills.electricity.due_on')}
+        hint={tx('bills.electricity.due_on_hint')}
+        kind="date"
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('lecturas')}>
+      <h2 class="question" id="question-lecturas" tabindex="-1">
+        {question('lecturas')}
+      </h2>
+      <div class="pair">
+        <Field name="readingFrom" label={tx('bills.electricity.reading_from')} kind="date" />
+        <Field name="readingTo" label={tx('bills.electricity.reading_to')} kind="date" />
+      </div>
+      <Field
+        name="billedDays"
+        label={tx('bills.electricity.billed_days')}
+        hint={tx('bills.electricity.billed_days_hint')}
+        kind="days"
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('mercado')}>
+      <h2 class="question" id="question-mercado" tabindex="-1">
+        {question('mercado')}
+      </h2>
+      <Choice
+        name="market"
+        legend={tx('bills.electricity.market')}
+        hint={tx('bills.electricity.market_hint')}
+        options={options(MARKETS, (v) => `bills.electricity.market.${v}`)}
+        layout="pair"
+      />
+      <Choice
+        name="retailer"
+        legend={tx('bills.electricity.retailer')}
+        hint={tx('bills.electricity.retailer_hint')}
+        options={options(RETAILERS, (v) => `bills.electricity.retailer.${v}`)}
+        attributes={{ 'data-if': 'market:pvpc' }}
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('titular')}>
+      <h2 class="question" id="question-titular" tabindex="-1">
+        {question('titular')}
+      </h2>
+      <Choice
+        name="holder"
+        legend={tx('bills.electricity.holder')}
+        options={options(HOLDERS, (v) => `bills.electricity.holder.${v}`)}
+        layout="list"
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('potencia')}>
+      <h2 class="question" id="question-potencia" tabindex="-1">
+        {question('potencia')}
+      </h2>
+      <Choice
+        name="powerUnit"
+        legend={tx('bills.electricity.power_unit')}
+        hint={tx('bills.electricity.power_unit_hint')}
+        options={options(POWER_UNITS, (v) => `bills.electricity.power_unit.${v}`)}
+        layout="pair"
+      />
+      <Choice
+        name="priceChange"
+        legend={tx('bills.electricity.price_change')}
+        hint={tx('bills.electricity.price_change_hint')}
+        options={yesNo}
+        layout="pair"
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('potencia-punta')}>
+      <h2 class="question" id="question-potencia-punta" tabindex="-1">
+        {question('potencia-punta')}
+      </h2>
+      <div class="pair">
+        <Field name="powerPriceP1" label={tx('bills.electricity.power_price')} kind="amount" />
+        <Field name="powerAmountP1" label={tx('bills.electricity.line_amount')} kind="amount" />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('potencia-valle')}>
+      <h2 class="question" id="question-potencia-valle" tabindex="-1">
+        {question('potencia-valle')}
+      </h2>
+      <div class="pair">
+        <Field name="powerPriceP2" label={tx('bills.electricity.power_price')} kind="amount" />
+        <Field name="powerAmountP2" label={tx('bills.electricity.line_amount')} kind="amount" />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('potencia-maxima')}>
+      <h2 class="question" id="question-potencia-maxima" tabindex="-1">
+        {question('potencia-maxima')}
+      </h2>
+      <p class="help help--short">{tx('bills.electricity.max_used_help')}</p>
+      <div class="pair">
+        <Field name="maxUsedP1" label={tx('bills.electricity.max_used_p1')} kind="amount" />
+        <Field name="maxUsedP2" label={tx('bills.electricity.max_used_p2')} kind="amount" />
+      </div>
+    </fieldset>
+
+    {(['P1', 'P2', 'P3'] as const).map((p, i) => {
+      const sheet =
+        (['energia-punta', 'energia-llano', 'energia-valle'] as const)[i] ?? 'energia-punta';
+      return (
+        <fieldset class="sheet" {...sheetId(sheet)}>
+          <h2 class="question" id={`question-${sheet}`} tabindex="-1">
+            {question(sheet)}
+          </h2>
+          <Field name={`kwh${p}`} label={tx('bills.electricity.kwh')} kind="amount" />
+          <div class="pair">
+            <Field
+              name={`energyPrice${p}`}
+              label={tx('bills.electricity.energy_price')}
+              kind="amount"
+            />
+            <Field
+              name={`energyAmount${p}`}
+              label={tx('bills.electricity.line_amount')}
+              kind="amount"
+            />
+          </div>
+        </fieldset>
+      );
+    })}
+
+    <fieldset class="sheet" {...sheetId('peajes')}>
+      <h2 class="question" id="question-peajes" tabindex="-1">
+        {question('peajes')}
+      </h2>
+      <Choice
+        name="tollsShown"
+        legend={tx('bills.electricity.tolls_shown')}
+        hint={tx('bills.electricity.tolls_shown_hint')}
+        options={yesNo}
+        layout="pair"
+      />
+      <div class="pair" data-if="tollsShown:yes">
+        <Field name="tollsPower" label={tx('bills.electricity.tolls_power')} kind="amount" />
+        <Field name="tollsEnergy" label={tx('bills.electricity.tolls_energy')} kind="amount" />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('financiacion')}>
+      <h2 class="question" id="question-financiacion" tabindex="-1">
+        {question('financiacion')}
+      </h2>
+      <Choice
+        name="fundingShown"
+        legend={tx('bills.electricity.funding_shown')}
+        hint={tx('bills.electricity.funding_shown_hint')}
+        options={yesNo}
+        layout="pair"
+      />
+      <Field
+        name="funding"
+        label={tx('bills.electricity.line_amount')}
+        kind="amount"
+        attributes={{ 'data-if': 'fundingShown:yes' }}
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('bono-social')}>
+      <h2 class="question" id="question-bono-social" tabindex="-1">
+        {question('bono-social')}
+      </h2>
+      <Choice
+        name="hasBonus"
+        legend={tx('bills.electricity.has_bonus')}
+        options={yesNo}
+        layout="pair"
+      />
+      <div data-if="hasBonus:yes">
+        <Choice
+          name="bonusCategory"
+          legend={tx('bills.electricity.bonus_category')}
+          options={options(BONUS_CATEGORIES, (v) => `bills.electricity.bonus_category.${v}`)}
+        />
+        <Field name="bonusAmount" label={tx('bills.electricity.bonus_amount')} kind="amount" />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('bono-social-consumo')}>
+      <h2 class="question" id="question-bono-social-consumo" tabindex="-1">
+        {question('bono-social-consumo')}
+      </h2>
+      <div data-if="hasBonus:yes">
+        <Field
+          name="bonusKwhSoFar"
+          label={tx('bills.electricity.bonus_kwh_so_far')}
+          hint={tx('bills.electricity.bonus_kwh_so_far_hint')}
+          kind="amount"
+        />
+        <Field
+          name="bonusDiscountedKwh"
+          label={tx('bills.electricity.bonus_discounted_kwh')}
+          hint={tx('bills.electricity.optional_hint')}
+          kind="amount"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('contador')}>
+      <h2 class="question" id="question-contador" tabindex="-1">
+        {question('contador')}
+      </h2>
+      <Choice
+        name="meterCharged"
+        legend={tx('bills.electricity.meter_charged')}
+        options={yesNo}
+        layout="pair"
+      />
+      <Field
+        name="meterAmount"
+        label={tx('bills.electricity.line_amount')}
+        kind="amount"
+        attributes={{ 'data-if': 'meterCharged:yes' }}
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('contador-tipo')}>
+      <h2 class="question" id="question-contador-tipo" tabindex="-1">
+        {question('contador-tipo')}
+      </h2>
+      <div data-if="meterCharged:yes">
+        <Choice
+          name="meterPhase"
+          legend={tx('bills.electricity.meter_phase')}
+          hint={tx('bills.electricity.meter_phase_hint')}
+          options={options(PHASES, (v) => `bills.electricity.meter_phase.${v}`)}
+        />
+        <Choice
+          name="meterOwned"
+          legend={tx('bills.electricity.meter_owned')}
+          options={yesNoUnknown}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('servicios')}>
+      <h2 class="question" id="question-servicios" tabindex="-1">
+        {question('servicios')}
+      </h2>
+      <p class="help help--short">{tx('bills.electricity.services_help')}</p>
+      <Choice
+        name="serviceCount"
+        legend={tx('bills.electricity.service_count')}
+        options={options(SERVICE_COUNTS, (v) => `bills.electricity.service_count.${v}`)}
+      />
+    </fieldset>
+
+    {(['1', '2'] as const).map((n) => {
+      const sheet = n === '1' ? 'servicio-1' : 'servicio-2';
+      return (
+        <fieldset class="sheet" {...sheetId(sheet)}>
+          <h2 class="question" id={`question-${sheet}`} tabindex="-1">
+            {question(sheet)}
+          </h2>
+          <div data-if={`serviceCount:${n === '1' ? '1 2' : '2'}`}>
+            <SelectField
+              name={`serviceLabel${n}`}
+              label={tx('bills.electricity.service_label')}
+              options={options(SERVICE_LABELS, (v) => `client.bills.service.${v}`)}
+              choose={tx('bills.electricity.service_label_choose')}
+            />
+            <Field
+              name={`serviceAmount${n}`}
+              label={tx('bills.electricity.line_amount')}
+              kind="amount"
+            />
+            <Choice
+              name={`serviceRequested${n}`}
+              legend={tx('bills.electricity.service_requested')}
+              options={yesNoUnknown}
+            />
+          </div>
+        </fieldset>
+      );
+    })}
+
+    <fieldset class="sheet" {...sheetId('exceso')}>
+      <h2 class="question" id="question-exceso" tabindex="-1">
+        {question('exceso')}
+      </h2>
+      <Choice
+        name="hasExcess"
+        legend={tx('bills.electricity.has_excess')}
+        hint={tx('bills.electricity.has_excess_hint')}
+        options={yesNo}
+        layout="pair"
+      />
+      <div data-if="hasExcess:yes">
+        <Field name="excessAmount" label={tx('bills.electricity.line_amount')} kind="amount" />
+        <Choice
+          name="maximeter"
+          legend={tx('bills.electricity.maximeter')}
+          options={yesNoUnknown}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('penalizacion')}>
+      <h2 class="question" id="question-penalizacion" tabindex="-1">
+        {question('penalizacion')}
+      </h2>
+      <Choice
+        name="hasPenalty"
+        legend={tx('bills.electricity.has_penalty')}
+        options={yesNo}
+        layout="pair"
+      />
+      <Field
+        name="penaltyAmount"
+        label={tx('bills.electricity.line_amount')}
+        kind="amount"
+        attributes={{ 'data-if': 'hasPenalty:yes' }}
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('penalizacion-contrato')}>
+      <h2 class="question" id="question-penalizacion-contrato" tabindex="-1">
+        {question('penalizacion-contrato')}
+      </h2>
+      <div data-if="hasPenalty:yes">
+        <Choice
+          name="priceType"
+          legend={tx('bills.electricity.price_type')}
+          options={options(PRICE_TYPES, (v) => `bills.electricity.price_type.${v}`)}
+        />
+        <Choice
+          name="firstRenewalPassed"
+          legend={tx('bills.electricity.first_renewal')}
+          hint={tx('bills.electricity.first_renewal_hint')}
+          options={yesNoUnknown}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('ajustes')}>
+      <h2 class="question" id="question-ajustes" tabindex="-1">
+        {question('ajustes')}
+      </h2>
+      <Field
+        name="discount"
+        label={tx('bills.electricity.discount')}
+        hint={tx('bills.electricity.optional_hint')}
+        kind="amount"
+      />
+      <Choice
+        name="regularization"
+        legend={tx('bills.electricity.regularization')}
+        options={options(REGULARIZATIONS, (v) => `bills.electricity.regularization.${v}`)}
+      />
+      <Field
+        name="regularizationAmount"
+        label={tx('bills.electricity.regularization_amount')}
+        kind="amount"
+        attributes={{ 'data-if': 'regularization:charged returned' }}
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('impuesto-electrico')}>
+      <h2 class="question" id="question-impuesto-electrico" tabindex="-1">
+        {question('impuesto-electrico')}
+      </h2>
+      <div class="pair">
+        <Field name="taxAmount" label={tx('bills.electricity.tax_amount')} kind="amount" />
+        <Field
+          name="taxPercent"
+          label={tx('bills.electricity.tax_percent')}
+          hint={tx('bills.electricity.optional_hint')}
+          kind="amount"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('iva')}>
+      <h2 class="question" id="question-iva" tabindex="-1">
+        {question('iva')}
+      </h2>
+      <div class="pair">
+        <Field name="vatAmount" label={tx('bills.electricity.vat_amount')} kind="amount" />
+        <Field
+          name="vatPercent"
+          label={tx('bills.electricity.vat_percent')}
+          hint={tx('bills.electricity.optional_hint')}
+          kind="amount"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('total')}>
+      <h2 class="question" id="question-total" tabindex="-1">
+        {question('total')}
+      </h2>
+      <Field name="total" label={tx('bills.electricity.total')} kind="amount" />
+    </fieldset>
+  </div>
+
+  <div class="actions">
+    <div class="actions__inner">
+      <button class="button button--back" type="button" data-back hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow} transform="rotate(180 12 12)"></path>
+        </svg>
+        {tx('form.back')}
+      </button>
+      <button class="button button--forward" type="button" data-next>
+        {tx('form.next')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+      <button class="button button--forward" type="submit" data-submit hidden>
+        {tx('form.review')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</form>

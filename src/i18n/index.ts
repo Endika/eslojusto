@@ -25,6 +25,8 @@ export function t(lang: Lang, key: Key, vars?: Variables): string {
 const CREDIT_PAGE = ['client.credit.', 'client.theme.', 'client.other_language.'];
 // The mortgage page's likewise.
 const MORTGAGE_PAGE = ['client.mortgage.', 'client.theme.', 'client.other_language.'];
+// The bills reviews' pages likewise; they read no documents yet.
+const BILLS_PAGE = ['client.bills.', 'client.theme.', 'client.other_language.'];
 // What they take of document reading: none of the final pay's report, letter or pass notices.
 const NOT_READING = [
   'client.documents.report.',
@@ -113,6 +115,7 @@ export const clientStrings = (
     insurance = false,
     credit = false,
     mortgage = false,
+    bills = false,
   }: {
     documents?: boolean;
     rental?: boolean;
@@ -121,6 +124,7 @@ export const clientStrings = (
     insurance?: boolean;
     credit?: boolean;
     mortgage?: boolean;
+    bills?: boolean;
   } = {},
 ): Partial<Record<Key, string>> => {
   // A word of some reviews' documents ships on any of their pages, and on no other.
@@ -146,7 +150,10 @@ export const clientStrings = (
         (mortgage
           ? MORTGAGE_PAGE.some((prefix) => key.startsWith(prefix)) ||
             (documents && readingString(key))
-          : !key.startsWith('client.mortgage.')),
+          : !key.startsWith('client.mortgage.')) &&
+        (bills
+          ? BILLS_PAGE.some((prefix) => key.startsWith(prefix))
+          : !key.startsWith('client.bills.')),
     ),
   );
 };

@@ -1,0 +1,193 @@
+---
+import Field from './Field.astro';
+import Choice from './EmploymentChoice.astro';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+import { CHANGES, CHANGE_KINDS, PRICE_INDEXES, type Sheet } from '../bills/telecom/form';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+const yesNo = (['yes', 'no'] as const).map((value) => ({
+  value,
+  label: tx(`bills.answer.${value}`),
+}));
+const options = <T extends string>(values: readonly T[], label: (value: T) => Key) =>
+  values.map((value) => ({ value, label: tx(label(value)) }));
+
+const question = (sheet: Sheet) => tx(`bills.telecom.question.${sheet}`);
+const sheetId = (sheet: Sheet) => ({
+  id: `sheet-${sheet}`,
+  'data-sheet': sheet,
+  'aria-labelledby': `question-${sheet}`,
+});
+
+const arrow = 'M4 12h15m-6-6 6 6-6 6';
+---
+
+<form class="calculator" id="telecom" novalidate aria-label={tx('bills.telecom.form_aria')}>
+  <div class="stack">
+    <fieldset class="sheet" {...sheetId('permanencia')}>
+      <h2 class="question" id="question-permanencia" tabindex="-1">
+        {question('permanencia')}
+      </h2>
+      <Choice
+        name="hasCommitment"
+        legend={tx('bills.telecom.has_commitment')}
+        options={yesNo}
+        layout="pair"
+      />
+      <div class="pair" data-if="hasCommitment:yes">
+        <Field name="startedOn" label={tx('bills.telecom.started_on')} kind="date" />
+        <Field name="months" label={tx('bills.telecom.months')} kind="days" />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('penalizacion')}>
+      <h2 class="question" id="question-penalizacion" tabindex="-1">
+        {question('penalizacion')}
+      </h2>
+      <Field
+        name="agreedPenalty"
+        label={tx('bills.telecom.agreed_penalty')}
+        hint={tx('bills.telecom.agreed_penalty_hint')}
+        kind="amount"
+        attributes={{ 'data-if': 'hasCommitment:yes' }}
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('baja')}>
+      <h2 class="question" id="question-baja" tabindex="-1">
+        {question('baja')}
+      </h2>
+      <Field
+        name="exitRequestedOn"
+        label={tx('bills.telecom.exit_requested_on')}
+        hint={tx('bills.telecom.exit_requested_on_hint')}
+        kind="date"
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('aviso')}>
+      <h2 class="question" id="question-aviso" tabindex="-1">
+        {question('aviso')}
+      </h2>
+      <Choice
+        name="change"
+        legend={tx('bills.telecom.change')}
+        options={options(CHANGES, (v) => `bills.telecom.change.${v}`)}
+        layout="list"
+      />
+      <div class="pair" data-if="change:notice">
+        <Field name="sentOn" label={tx('bills.telecom.sent_on')} kind="date" />
+        <Field
+          name="appliesOn"
+          label={tx('bills.telecom.applies_on')}
+          hint={tx('bills.telecom.optional_hint')}
+          kind="date"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('cambio')}>
+      <h2 class="question" id="question-cambio" tabindex="-1">
+        {question('cambio')}
+      </h2>
+      <div data-if="change:notice no_notice">
+        <Choice
+          name="changeKind"
+          legend={tx('bills.telecom.change_kind')}
+          options={options(CHANGE_KINDS, (v) => `bills.telecom.change_kind.${v}`)}
+        />
+        <Choice
+          name="priceIndex"
+          legend={tx('bills.telecom.price_index')}
+          hint={tx('bills.telecom.price_index_hint')}
+          options={options(PRICE_INDEXES, (v) => `bills.telecom.price_index.${v}`)}
+          attributes={{ 'data-if': 'changeKind:price_up' }}
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('terminal')}>
+      <h2 class="question" id="question-terminal" tabindex="-1">
+        {question('terminal')}
+      </h2>
+      <div data-if="change:notice no_notice">
+        <Choice
+          name="hasHandset"
+          legend={tx('bills.telecom.has_handset')}
+          options={yesNo}
+          layout="pair"
+        />
+        <div data-if="hasHandset:yes">
+          <Field name="handsetValue" label={tx('bills.telecom.handset_value')} kind="amount" />
+          <Choice
+            name="handsetKept"
+            legend={tx('bills.telecom.handset_kept')}
+            options={yesNo}
+            layout="pair"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('cobros')}>
+      <h2 class="question" id="question-cobros" tabindex="-1">
+        {question('cobros')}
+      </h2>
+      <Field
+        name="penaltyCharged"
+        label={tx('bills.telecom.penalty_charged')}
+        hint={tx('bills.telecom.penalty_charged_hint')}
+        kind="amount"
+      />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('despues')}>
+      <h2 class="question" id="question-despues" tabindex="-1">
+        {question('despues')}
+      </h2>
+      <Choice
+        name="chargedAfter"
+        legend={tx('bills.telecom.charged_after')}
+        hint={tx('bills.telecom.charged_after_hint')}
+        options={yesNo}
+        layout="pair"
+      />
+      <div data-if="chargedAfter:yes">
+        <div class="pair">
+          <Field name="lineFrom" label={tx('bills.telecom.line_from')} kind="date" />
+          <Field name="lineTo" label={tx('bills.telecom.line_to')} kind="date" />
+        </div>
+        <Field name="lineAmount" label={tx('bills.telecom.line_amount')} kind="amount" />
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="actions">
+    <div class="actions__inner">
+      <button class="button button--back" type="button" data-back hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow} transform="rotate(180 12 12)"></path>
+        </svg>
+        {tx('form.back')}
+      </button>
+      <button class="button button--forward" type="button" data-next>
+        {tx('form.next')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+      <button class="button button--forward" type="submit" data-submit hidden>
+        {tx('form.review')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</form>

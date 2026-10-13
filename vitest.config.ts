@@ -27,6 +27,7 @@ export default defineConfig({
       'tests/insurance/**/*.test.ts',
       'tests/mortgage/**/*.test.ts',
       'tests/credit/**/*.test.ts',
+      'tests/bills/**/*.test.ts',
       'tests/content/**/*.test.ts',
       'tests/law/**/*.test.ts',
     ],

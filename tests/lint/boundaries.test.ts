@@ -550,3 +550,33 @@ describe('import boundaries', () => {
     ).toContain('no-restricted-syntax');
   });
 });
+
+describe('the bills reviews', () => {
+  it.each([
+    [
+      'src/bills/electricity/x.ts',
+      "import { BILLS_TABLES } from '../../engine/bills/data/tables';",
+    ],
+    ['src/bills/electricity/x.ts', "import { track } from '../../analytics/posthog';"],
+    ['src/bills/electricity/x.ts', "import { setUpCredit } from '../../credit/main';"],
+    ['src/bills/electricity/x.ts', "import { SHEETS } from '../telecom/form';"],
+    ['src/bills/electricity/x.ts', "import { x } from '../../engine/bills/./data/norms';"],
+    ['src/bills/electricity/x.ts', "import { localToday } from '../../scripts/clock';"],
+    ['src/bills/x.ts', "import { BILLS_NORMS } from '../engine/bills/data/norms';"],
+    ['src/bills/x.ts', "import { setUpMortgage } from '../mortgage/main';"],
+    ['src/calculator/x.ts', "import { setUpElectricity } from '../bills/electricity/main';"],
+  ])('%s cannot %s', async (filePath, code) => {
+    expect(await violations(filePath, code)).toContain('no-restricted-imports');
+  });
+
+  it.each([
+    ['src/bills/electricity/x.ts', "import { SHEETS } from './form';"],
+    ['src/bills/electricity/x.ts', "import { renderItems } from '../result';"],
+    ['src/bills/electricity/x.ts', "import { electricityScope } from '../../engine/bills/scope';"],
+    ['src/bills/electricity/x.ts', "import { setUpSection } from '../../calculator/section';"],
+    ['src/bills/x.ts', "import type { Translate } from '../i18n/client';"],
+    ['src/bills/x.ts', "import type { NormSource } from '../engine/law/sources';"],
+  ])('%s can %s', async (filePath, code) => {
+    expect(await violations(filePath, code)).not.toContain('no-restricted-imports');
+  });
+});

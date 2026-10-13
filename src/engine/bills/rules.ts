@@ -82,15 +82,18 @@ export const RULES: Readonly<Record<BillsRuleId, BillsRule>> = {
   // Arts. 43 to 45: reading and billing, and what was charged wrong is settled in the next bill.
   // In force with the decree on 12-02-2026, they take effect on 12-06-2026 (final provision
   // 9.ª.4). Bills issued before it are left out of the review.
-  billing: rule(
-    'billing',
-    'rd88_2026',
-    'Real Decreto 88/2026, arts. 43 a 45',
-    RD88_URL,
-    '2026-06-12',
-    null,
-    'info',
-  ),
+  billing: {
+    ...rule(
+      'billing',
+      'rd88_2026',
+      'Real Decreto 88/2026, arts. 43 a 45',
+      RD88_URL,
+      '2026-06-12',
+      null,
+      'info',
+    ),
+    wordingSince: '2026-06-12',
+  },
   // The 2026 tolls of the 2.0TD tariff.
   tolls: rule(
     'tolls',
@@ -113,15 +116,18 @@ export const RULES: Readonly<Record<BillsRuleId, BillsRule>> = {
   ),
   // Art. 5.3: the PVPC is for power up to 10 kW and holders who are natural persons or micro
   // enterprises, in the wording of BOE-A-2023-14048, in force from 15-06-2023.
-  pvpc_eligibility: rule(
-    'pvpc_eligibility',
-    'rd216_2014',
-    'Real Decreto 216/2014, art. 5.3',
-    RD216_URL,
-    '2023-06-15',
-    null,
-    'info',
-  ),
+  pvpc_eligibility: {
+    ...rule(
+      'pvpc_eligibility',
+      'rd216_2014',
+      'Real Decreto 216/2014, art. 5.3',
+      RD216_URL,
+      '2023-06-15',
+      null,
+      'info',
+    ),
+    wordingSince: '2023-06-15',
+  },
   // The fixed PVPC retail margin, a 2016 figure no 2026 norm confirms: never an amount.
   pvpc_margin: rule(
     'pvpc_margin',
@@ -237,15 +243,18 @@ export const RULES: Readonly<Record<BillsRuleId, BillsRule>> = {
   ),
   // Art. 28.3: a natural person on the 2.0TD tariff pays for leaving only on a fixed price before
   // the first renewal. Takes effect on 12-06-2026 (final provision 9.ª.4).
-  exit_penalty: rule(
-    'exit_penalty',
-    'rd88_2026',
-    'Real Decreto 88/2026, art. 28.3',
-    RD88_URL,
-    '2026-06-12',
-    null,
-    'amount',
-  ),
+  exit_penalty: {
+    ...rule(
+      'exit_penalty',
+      'rd88_2026',
+      'Real Decreto 88/2026, art. 28.3',
+      RD88_URL,
+      '2026-06-12',
+      null,
+      'amount',
+    ),
+    wordingSince: '2026-06-12',
+  },
   // Art. 38: the contracted power may change once every 12 months. In force with the decree.
   power_change: rule(
     'power_change',
@@ -257,15 +266,18 @@ export const RULES: Readonly<Record<BillsRuleId, BillsRule>> = {
     'info',
   ),
   // Art. 62.5: a penalty for leaving a commitment early, in proportion to the days left.
-  commitment_proportional: rule(
-    'commitment_proportional',
-    'trlgdcu',
-    'Texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios, art. 62.5',
-    TRLGDCU_URL,
-    '2022-01-01',
-    null,
-    'amount',
-  ),
+  commitment_proportional: {
+    ...rule(
+      'commitment_proportional',
+      'trlgdcu',
+      'Texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios, art. 62.5',
+      TRLGDCU_URL,
+      '2022-01-01',
+      null,
+      'amount',
+    ),
+    wordingSince: '2022-01-01',
+  },
   // Art. 67.7: a consumer's commitment lasts 24 months at most. Shown without a figure.
   commitment_maximum: rule(
     'commitment_maximum',

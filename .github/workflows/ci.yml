@@ -46,8 +46,8 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm run type:check
-      # With /alquiler/, /contrato/, /paro/erte/, /empleada-de-hogar/, /seguros/, /financiacion/ and
-      # /hipoteca/ in the build, so the copy test reads their pages too.
+      # With /alquiler/, /contrato/, /paro/erte/, /empleada-de-hogar/, /seguros/, /financiacion/,
+      # /hipoteca/ and /facturas/ in the build, so the copy test reads their pages too.
       - run: npm run build
         env:
           {
@@ -58,6 +58,7 @@ jobs:
             PUBLIC_INSURANCE: '1',
             PUBLIC_CREDIT: '1',
             PUBLIC_MORTGAGE: '1',
+            PUBLIC_BILLS: '1',
           }
       - run: npm run test:run
   # One job per Playwright project: each needs its own build, and a failure reruns alone.
@@ -83,6 +84,7 @@ jobs:
           - { project: insurance, switch: TEST_INSURANCE }
           - { project: credit, switch: TEST_CREDIT }
           - { project: mortgage, switch: TEST_MORTGAGE }
+          - { project: bills, switch: TEST_BILLS }
           # Fake API origins, routed by the page.
           - { project: documents, switch: TEST_DOCUMENTS }
     steps:
