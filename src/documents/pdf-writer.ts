@@ -42,6 +42,11 @@ const SUBSTITUTES: Readonly<Record<string, string>> = {
 };
 const INVISIBLE = /[\u200e\u200f\u2066-\u2069]/g;
 
+// The characters a text is drawn as, after dropping direction marks and substituting.
+export function drawnChars(text: string): string[] {
+  return [...text.replace(INVISIBLE, '')].map((c) => SUBSTITUTES[c] ?? c);
+}
+
 const fmt = (n: number) => (Math.round(n * 100) / 100).toString();
 const color = ([r, g, b]: Rgb) => `${fmt(r)} ${fmt(g)} ${fmt(b)}`;
 
@@ -130,13 +135,9 @@ export class PdfDocument {
     return { glyph: fallback, text: '?' };
   }
 
-  private chars(text: string): string[] {
-    return [...text.replace(INVISIBLE, '')].map((c) => SUBSTITUTES[c] ?? c);
-  }
-
   measure(text: string, style: TextStyle): number {
     const state = this.fonts[style.font];
-    const units = this.chars(text).reduce((sum, c) => sum + this.glyph(state, c).glyph[1], 0);
+    const units = drawnChars(text).reduce((sum, c) => sum + this.glyph(state, c).glyph[1], 0);
     return (units / state.font.unitsPerEm) * style.size;
   }
 
@@ -168,7 +169,7 @@ export class PdfDocument {
 
   private encode(state: FontState, text: string): string {
     let hex = '';
-    for (const c of this.chars(text)) {
+    for (const c of drawnChars(text)) {
       const { glyph, text: shown } = this.glyph(state, c);
       const [gid] = glyph;
       if (!state.used.has(gid)) state.used.set(gid, shown);

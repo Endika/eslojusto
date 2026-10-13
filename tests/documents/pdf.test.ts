@@ -100,6 +100,17 @@ describe('the PDF writer', () => {
     ).toEqual(['name', 'place']);
   });
 
+  it('a hard space, a hard hyphen or a direction mark is drawn, not flagged', () => {
+    expect(
+      unprintable({
+        name: 'Ana Pérez‑Gómez',
+        id: '12 345 678Z',
+        company: '‎Empresa‐SL⁦',
+        place: 'Vigo⁩',
+      }),
+    ).toEqual([]);
+  });
+
   it('a long value shrinks to its line instead of crossing the margin', async () => {
     const long = 'W'.repeat(80);
     const doc = new PdfDocument({ sans, serif }, 'x');

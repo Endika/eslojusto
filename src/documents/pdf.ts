@@ -1,6 +1,6 @@
 import { sans } from './fonts/sans';
 import { serif } from './fonts/serif';
-import { INK, PdfDocument, SOFT, type Rgb, type TextStyle } from './pdf-writer';
+import { drawnChars, INK, PdfDocument, SOFT, type Rgb, type TextStyle } from './pdf-writer';
 import { ALL_LETTER_FIELDS, type LetterField, type TypedDetails } from './letter';
 import type { DocumentModel, PdfMaker } from './ports';
 
@@ -85,7 +85,7 @@ export async function renderPdf(model: DocumentModel): Promise<Uint8Array> {
 // The letter's own fields whose text has a character neither font can draw; their lines stay blank.
 export function unprintable(details: TypedDetails): LetterField[] {
   const drawable = (text: string) =>
-    [...text.normalize('NFC')].every((c) => {
+    drawnChars(text.normalize('NFC')).every((c) => {
       const code = String(c.codePointAt(0));
       return code in sans.glyphs && code in serif.glyphs;
     });
