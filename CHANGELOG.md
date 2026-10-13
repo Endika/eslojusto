@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.54.3](https://github.com/Endika/eslojusto/compare/v1.54.2...v1.54.3) (2026-10-13)
+
+
+### Bug Fixes
+
+* **household:** a written notice with no cause brings the dismissal presumption ([8369d27](https://github.com/Endika/eslojusto/commit/8369d273742f4efa082b48b0b4d3157d54b21958))
+* **household:** base the severance and the notice on the minimum wage when pay falls below it ([0701610](https://github.com/Endika/eslojusto/commit/070161003a99cdf0f4a9a466a3da8ed581977d22))
+* **household:** check the money paid each month when there is pay in kind ([1684989](https://github.com/Endika/eslojusto/commit/168498955fed1b72ac1e842d24a5cb4d73531ee4))
+* **household:** working time and holidays below the norm are found, not warnings ([3845f43](https://github.com/Endika/eslojusto/commit/3845f430dfc1cd396f10bc6c6489ae17aebc33c9))
+
 ## [1.54.2](https://github.com/Endika/eslojusto/compare/v1.54.1...v1.54.2) (2026-10-13)
 
 
