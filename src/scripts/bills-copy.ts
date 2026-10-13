@@ -1,6 +1,7 @@
 import { pageTranslator, type ClientKey, type Translate } from '../i18n/client';
 
-// The shared messages the bills pages word their own way: their pass has no letter yet.
+// The shared messages the bills pages word their own way: their pass does not always come with a
+// letter.
 const BILLS_COPY: Partial<Record<ClientKey, ClientKey>> = {
   'client.documents.pass.issued': 'client.bills.pass.issued',
 };

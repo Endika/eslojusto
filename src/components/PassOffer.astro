@@ -10,8 +10,10 @@ import PassLetter from './PassLetter.astro';
 // information sit outside the paid part and download without a pass, under their own title when
 // there is nothing to sell; so does the mortgage review's request for its documents. The insurance
 // review never sells the pass: its one letter only tells the insurer, and a pass already held
-// downloads the report. The bills reviews have no letter yet, and each says in its own words what
-// the pass is for: `offer` is the key of that pitch, which the others keep as it was.
+// downloads the report. The bills reviews each say in their own words what the pass is for:
+// `offer` is the key of that pitch, which the others keep as it was. The electricity review's one
+// letter carries figures and sits among the paid downloads; the telecom review's letter about
+// leaving after a change of conditions carries none and downloads free, like the contract's.
 interface Props {
   lang: Lang;
   review?:
@@ -79,9 +81,25 @@ const MORTGAGE: Partial<Record<Key, Key>> = {
   'documents.letter.company': 'mortgage.letter.company',
   'documents.letter.reference': 'mortgage.letter.reference',
 };
-const BILLS: Partial<Record<Key, Key>> = {
+const ELECTRICITY: Partial<Record<Key, Key>> = {
   'documents.pass.title': 'bills.pass.title',
   'documents.pass.price': 'bills.pass.price',
+  'documents.pass.letter_note': 'bills.pass.letter_note',
+  'documents.letter.legend': 'bills.letter.legend',
+  'documents.letter.privacy': 'bills.letter.privacy',
+  'documents.letter.id': 'bills.letter.id',
+  'documents.letter.company': 'bills.letter.company',
+  'documents.letter.reference': 'bills.letter.reference',
+};
+const TELECOM: Partial<Record<Key, Key>> = {
+  'documents.pass.title': 'bills.telecom.pass.title',
+  'documents.pass.price': 'bills.pass.price',
+  'documents.pass.letter_note': 'bills.telecom.pass.letter_note',
+  'documents.letter.legend': 'bills.telecom.letter.legend',
+  'documents.letter.privacy': 'bills.telecom.letter.privacy',
+  'documents.letter.id': 'bills.letter.id',
+  'documents.letter.company': 'bills.telecom.letter.company',
+  'documents.letter.reference': 'bills.telecom.letter.reference',
 };
 const OWN: Partial<Record<Key, Key>> = {
   final_pay: {},
@@ -90,8 +108,8 @@ const OWN: Partial<Record<Key, Key>> = {
   credit: CREDIT,
   insurance: INSURANCE,
   mortgage: MORTGAGE,
-  electricity: BILLS,
-  telecom: BILLS,
+  electricity: ELECTRICITY,
+  telecom: TELECOM,
 }[review];
 const tx = (key: Key) =>
   t(lang, key === 'documents.pass.text' && offer ? offer : (OWN[key] ?? key));
@@ -101,6 +119,7 @@ const FREE_ONLY = {
   credit: ['credit.letters.title', 'credit.letters.text'],
   insurance: ['insurance.letters.title', 'insurance.letters.text'],
   mortgage: ['mortgage.letters.title', 'mortgage.letters.text'],
+  telecom: ['bills.telecom.letters.title', 'bills.telecom.letters.text'],
 } as const satisfies Record<string, readonly [Key, Key]>;
 const freeOnly = review in FREE_ONLY ? FREE_ONLY[review as keyof typeof FREE_ONLY] : null;
 // Marks what is about buying the pass, hidden when only the free letters are on offer.
@@ -184,13 +203,9 @@ const pitch = freeOnly ? '' : undefined;
           {tx('documents.pass.download_report')}
         </button>
       </div>
-      {review !== 'electricity' && review !== 'telecom' && !freeOnly && (
-        <PassLetter review={review} tx={tx} />
-      )}
+      {!freeOnly && <PassLetter review={review} tx={tx} />}
     </div>
-    {review !== 'electricity' && review !== 'telecom' && freeOnly && (
-      <PassLetter review={review} tx={tx} />
-    )}
+    {freeOnly && <PassLetter review={review} tx={tx} />}
     <p class="pass__status" role="status" aria-live="polite" data-pass-status></p>
     <p class="errata" role="alert" data-pass-error hidden></p>
     <button class="button button--sheet" type="button" data-pass-verify-retry hidden>

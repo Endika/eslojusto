@@ -5,16 +5,30 @@ import { STATUTE_RULES } from '../engine/mortgage/rules';
 
 // The letter's optional details and a button for each letter the review can give, worded in its
 // section's own copy. On the final pay's and the rental pages it sits among the paid downloads; on
-// the contract, credit, insurance and mortgage reviews', below them, because some of their letters
-// are free.
+// the contract, credit, insurance, mortgage and telecom reviews', below them, because some of their
+// letters are free.
 interface Props {
-  review: 'final_pay' | 'rental' | 'employment' | 'credit' | 'insurance' | 'mortgage';
+  review:
+    | 'final_pay'
+    | 'rental'
+    | 'employment'
+    | 'credit'
+    | 'insurance'
+    | 'mortgage'
+    | 'electricity'
+    | 'telecom';
   tx: (key: Key) => string;
 }
 const { review, tx } = Astro.props;
 const rental = review === 'rental';
 const employment = review === 'employment';
-const finance = review === 'credit' || review === 'insurance' || review === 'mortgage';
+// The bills letters ask for the same details: the company is the retailer or the operator.
+const finance =
+  review === 'credit' ||
+  review === 'insurance' ||
+  review === 'mortgage' ||
+  review === 'electricity' ||
+  review === 'telecom';
 type LetterField = readonly [
   id:
     | 'name'
@@ -91,6 +105,14 @@ const mortgageLetters = [
   ['mortgage_documents', 'mortgage.pass.download_documents_letter'],
   ['mortgage_amounts', 'mortgage.pass.download_amounts_letter'],
 ] as const;
+// The electricity review's one letter, which the pass pays for.
+const electricityLetters = [['bill_correction', 'bills.pass.download_correction_letter']] as const;
+// The telecom review's: the free one about leaving after a change first, then the one the pass
+// pays for.
+const telecomLetters = [
+  ['telecom_exit_without_penalty', 'bills.telecom.pass.download_exit_letter'],
+  ['telecom_penalty_review', 'bills.telecom.pass.download_penalty_letter'],
+] as const;
 const letterButtons = {
   final_pay: null,
   rental: rentalLetters,
@@ -98,6 +120,8 @@ const letterButtons = {
   credit: creditLetters,
   insurance: insuranceLetters,
   mortgage: mortgageLetters,
+  electricity: electricityLetters,
+  telecom: telecomLetters,
 }[review];
 // Beside the amounts letter, always: the step the law sets before going to court over a mortgage's
 // clauses is another thing, and its text is a link away.

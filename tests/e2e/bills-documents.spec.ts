@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import { syntheticPhoto } from '../support/synthetic-photo';
 import { fitsScreen, forwardButton, noSideScroll } from '../support/sheets';
 import { expectShownAndFocused } from '../support/reads';
@@ -6,6 +7,7 @@ import { expectShownAndFocused } from '../support/reads';
 // Runs only against a TEST_DOCUMENTS=1 build, which has /facturas/ too: every request to the fake
 // API and to Turnstile is answered here. Every bill and figure is synthetic.
 
+const ORIGIN = `http://localhost:${process.env['E2E_PORT'] ?? 4321}`;
 const API = { extract: 'https://extract.api.eslojusto.test/' };
 const TODAY = new Date('2026-10-13T12:00:00');
 
@@ -109,6 +111,16 @@ function pack(bills: readonly object[], failedChecks: readonly string[] = []) {
   };
 }
 
+async function downloadOf(page: Page, button: Locator): Promise<string> {
+  const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
+  expect(
+    readFileSync(await download.path())
+      .subarray(0, 5)
+      .toString(),
+  ).toBe('%PDF-');
+  return download.suggestedFilename();
+}
+
 async function fakeServices(page: Page, body: object): Promise<Request[]> {
   const sent: Request[] = [];
   await page.clock.setFixedTime(TODAY);
@@ -181,6 +193,8 @@ async function confirmBill(page: Page) {
 test('a pack of three bills is reviewed one by one into the year, offered with its estimate', async ({
   page,
 }) => {
+  // Three bills confirmed sheet by sheet take close to the default timeout on a busy machine.
+  test.slow();
   const sent = await fakeServices(page, pack([JULY, JUNE, AUGUST]));
   await upload(page, ['julio.png', 'junio.png', 'agosto.png']);
   await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }));
@@ -313,6 +327,69 @@ test('pages that are no electricity document are said, and the read counts for n
   await expect(page.locator('[data-doc-files] li')).toHaveCount(1);
   await expect(page.locator('#electricity')).toBeHidden();
   await expect(basket(page)).toBeHidden();
+});
+
+// A change of conditions notified on 01-02-2026 and an exit asked for on 20-02-2026, within the
+// month, keeping a handset worth 300 €, with 250 € charged: within its whole value, over its share
+// of the commitment left. The answers wait in the session as they do for the trip to Stripe.
+const EXIT_AFTER_CHANGE = [
+  ['hasCommitment', 'yes'],
+  ['startedOn', '2025-03-01'],
+  ['months', '18'],
+  ['agreedPenalty', '180'],
+  ['exitRequestedOn', '2026-02-20'],
+  ['change', 'notice'],
+  ['sentOn', '2026-02-01'],
+  ['appliesOn', '2026-03-10'],
+  ['changeKind', 'price_up'],
+  ['priceIndex', 'none'],
+  ['hasHandset', 'yes'],
+  ['handsetValue', '300'],
+  ['handsetKept', 'yes'],
+  ['penaltyCharged', '250'],
+  ['chargedAfter', 'no'],
+] as const;
+
+test('the letter about leaving after a change of conditions downloads free, with nothing sent', async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(TODAY);
+  const outside: string[] = [];
+  page.on('request', (r) => {
+    if (!r.url().startsWith(ORIGIN)) outside.push(r.url());
+  });
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.addInitScript(
+    ([key, value]) => {
+      if (sessionStorage.getItem('e2e-seeded') === null) {
+        sessionStorage.setItem(key, value);
+        sessionStorage.setItem('e2e-seeded', '1');
+      }
+    },
+    ['eslojusto-revision-permanencia-en-pago', JSON.stringify(EXIT_AFTER_CHANGE)] as const,
+  );
+  await page.goto('facturas/permanencia/');
+  await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeVisible();
+  await expect(
+    offer(page).getByRole('heading', { name: 'Carta que puedes descargar gratis' }),
+  ).toBeVisible();
+  await expect(offer(page).getByRole('button', { name: 'Pagar 4,99 €' })).toBeHidden();
+  await expect(
+    offer(page).getByRole('button', {
+      name: 'Descargar la carta que pide revisar la penalización (PDF)',
+    }),
+  ).toBeHidden();
+  await offer(page).getByLabel('Operador', { exact: true }).fill('Operador Ficticio, S.A.');
+  await noSideScroll(page);
+  expect(
+    await downloadOf(
+      page,
+      offer(page).getByRole('button', {
+        name: 'Descargar la carta sobre la baja tras un cambio de condiciones (PDF, gratis)',
+      }),
+    ),
+  ).toBe('eslojusto-carta-baja-cambio-condiciones.pdf');
+  expect(outside).toEqual([]);
 });
 
 test('the telecom page reads the contract into its sheets', async ({ page }) => {

@@ -5,15 +5,19 @@ import { STEPS } from '../bills/telecom/steps';
 import type { SectionForm } from '../calculator/section';
 import { DOCUMENTS } from '../documents/config';
 import { TELECOM_EXTRACTION } from '../documents/contract';
+import type { NormTable } from '../engine/bills/norms';
 import { billsTranslator } from './bills-copy';
 import { UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
 
-// Document reading and the pass on the telecom review's page: the contract and the bills fill its
-// sheets, and the pass unlocks the report.
+// Document reading, the pass and the letters on the telecom review's page: the contract and the
+// bills fill its sheets, the pass unlocks the report and the penalty letter, and the letter about
+// leaving after a change of conditions downloads without it. The norms are the ones the review
+// read.
 export function wireTelecomDocuments(
   telecom: SectionForm,
   hooks: ReviewHooks<CompletedTelecomReview>,
   arrival: { hash: string; search: string },
+  norms: NormTable,
 ): void {
   const tr = billsTranslator();
   wireDocuments({
@@ -29,7 +33,7 @@ export function wireTelecomDocuments(
       reading: telecomReading(telecom.form, tr),
       steps: STEPS,
       keptReviewKey: 'eslojusto-revision-permanencia-en-pago',
-      paidReview: telecomCase,
+      paidReview: (r) => telecomCase(r, norms),
       decorateResult: () => {},
       restore: (saved) => saved,
     },

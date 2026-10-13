@@ -61,6 +61,7 @@ if (documentsBuild) {
           detail: () => {},
         },
         arrival,
+        BILLS_NORMS,
       ),
     )
     .catch((error: unknown) => withoutDocuments(electricity.form, error));

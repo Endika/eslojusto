@@ -105,12 +105,14 @@ describe('a year of electricity bills as the pass sees it', () => {
   ];
 
   it('is not offered for one small difference, and is once it comes back bill after bill', () => {
-    expect(electricityCase([meterOver]).offer).toBe(false);
-    expect(electricityCase(year).offer).toBe(true);
+    expect(electricityCase([meterOver], BILLS_NORMS).offer).toBe(false);
+    expect(electricityCase(year, BILLS_NORMS).offer).toBe(true);
   });
 
   it('adds up every bill once, with the yearly estimate apart from the total', () => {
-    const lines = texts(electricityCase([...year, meterOver]).report(tr, today).blocks);
+    const lines = texts(
+      electricityCase([...year, meterOver], BILLS_NORMS).report(tr, today).blocks,
+    );
     expect(lines).toContain('Por encima de la norma: 0,60 €');
     expect(lines).not.toContain('Por encima de la norma: 0,80 €');
     expect(lines).toContain(
@@ -123,7 +125,7 @@ describe('a year of electricity bills as the pass sees it', () => {
   });
 
   it('lists a single bill without a year to add up', () => {
-    const lines = texts(electricityCase([meterOver]).report(tr, today).blocks);
+    const lines = texts(electricityCase([meterOver], BILLS_NORMS).report(tr, today).blocks);
     expect(lines).not.toContain('Lo que suman tus facturas');
     expect(lines.some((l) => l.startsWith('Alquiler del contador: Por encima'))).toBe(true);
   });
@@ -150,9 +152,9 @@ describe('an exit from a phone contract as the pass sees it', () => {
 
   it('is offered once what it counts reaches the price of the pass', () => {
     // 184 of 549 days left of 180,00 allow 60,33.
-    expect(telecomCase(exit(120)).offer).toBe(true);
-    expect(telecomCase(exit(64)).offer).toBe(false);
-    expect(telecomCase(exit(120)).report(tr, today).title).toBe(
+    expect(telecomCase(exit(120), BILLS_NORMS).offer).toBe(true);
+    expect(telecomCase(exit(64), BILLS_NORMS).offer).toBe(false);
+    expect(telecomCase(exit(120), BILLS_NORMS).report(tr, today).title).toBe(
       'Revisión de tu baja de teléfono o internet',
     );
   });
