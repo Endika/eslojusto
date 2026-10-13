@@ -182,9 +182,37 @@ describe('late interest', () => {
     ]);
   });
 
-  it('2010: before Ley 1/2013, only the courts; 4 % is within ordinary + 2', () => {
-    const flag = one('2010-06-01', late(4));
+  it('2010: before Ley 1/2013, its cap reaches what accrues from then on, without a figure', () => {
+    const flag = one('2010-06-01', late(20));
     expect(parts(flag)).toEqual([
+      [
+        'statute',
+        'default_interest_lh114_earlier',
+        ['flags.default_interest_lh114_earlier'],
+        ['default_interest_lh114_earlier'],
+        null,
+      ],
+      [
+        'case_law',
+        'default_interest_case_law',
+        ['flags.default_interest_case_law', 'flags.default_interest_case_law_above'],
+        ['tjue_c96_16', 'sts364_2016'],
+        '2026-10-07',
+      ],
+    ]);
+    expect(flag.parts[0]?.calculation[0]?.vars).toBeUndefined();
+  });
+
+  it('2013-05-14 is still before Ley 1/2013; 4 % is within ordinary + 2', () => {
+    const flag = one('2013-05-14', late(4));
+    expect(parts(flag)).toEqual([
+      [
+        'statute',
+        'default_interest_lh114_earlier',
+        ['flags.default_interest_lh114_earlier'],
+        ['default_interest_lh114_earlier'],
+        null,
+      ],
       [
         'case_law',
         'default_interest_case_law',

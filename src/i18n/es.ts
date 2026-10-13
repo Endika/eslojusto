@@ -5991,6 +5991,8 @@ export const es = {
     'Entre el 15-05-2013 y el 15-06-2019, en un préstamo para comprar tu vivienda habitual con hipoteca sobre ella, la ley limitaba el interés de demora a tres veces el interés legal del dinero (art. 114 de la Ley Hipotecaria).',
   'client.mortgage.calculation.flags.default_interest_lh114_above':
     'Tu escritura dice {default}: más que tres veces el interés legal más alto de esos años ({limit}).',
+  'client.mortgage.calculation.flags.default_interest_lh114_earlier':
+    'Tu escritura es anterior al 15-05-2013. La Ley 1/2013 aplica el límite del art. 114 de la Ley Hipotecaria, tres veces el interés legal del dinero, a los intereses de demora de los préstamos con hipoteca sobre vivienda habitual constituidos antes de esa fecha: a los que se devenguen desde entonces y a los ya devengados que no se hubieran pagado (disposición transitoria segunda). Aquí no se da cifra.',
   'client.mortgage.calculation.flags.default_interest_case_law':
     'Para las escrituras anteriores al 16-06-2019 con consumidores, el Tribunal de Justicia de la Unión Europea admite que un tribunal tome como referencia el interés ordinario más 2 puntos para valorar el de demora. Depende de un juez.',
   'client.mortgage.calculation.flags.default_interest_case_law_above':

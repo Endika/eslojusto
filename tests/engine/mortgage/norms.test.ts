@@ -232,6 +232,18 @@ describe('the regime follows the date', () => {
     expect(applies('default_interest_statute', day)).toBe(!expected && day >= '2019-06-16');
   });
 
+  it('the 2013 cap reaches earlier loans for the late interest accrued from 15-05-2013', () => {
+    expect(STATUTE_RULES.default_interest_lh114_earlier).toMatchObject({
+      norm: 'law1_2013',
+      url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2013-5073#dtsegunda',
+      from: '2013-05-15',
+      until: null,
+      output: 'info',
+    });
+    expect(applies('default_interest_lh114_earlier', '2013-05-14')).toBe(false);
+    expect(applies('default_interest_lh114_earlier', '2026-10-13')).toBe(true);
+  });
+
   it.each([
     ['2025-04-02', false],
     ['2025-04-03', true],
