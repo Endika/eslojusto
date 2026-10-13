@@ -228,9 +228,15 @@ function dutyBlocks(duty: InformationDuty, tr: Translate): Block[] {
       ...duty.sources.map((s) => sourceBlock(s, tr)),
     ];
   const checked = duty.elements.flatMap((e) => (e.applies ? [e.finding] : []));
+  // A running contract with every point already in hand has nothing left to ask for.
+  const complete = checked.every(
+    (f) => f.status !== 'missing_requirement' && f.status !== 'review_it',
+  );
   return [
     title,
-    { type: 'text', text: tr(`client.employment.duty.${duty.moment}`) },
+    ...(complete && duty.moment === 'on_request'
+      ? []
+      : [{ type: 'text' as const, text: tr(`client.employment.duty.${duty.moment}`) }]),
     ...duty.elements.flatMap((e): Block[] => [
       {
         type: 'subheading',
