@@ -1,13 +1,14 @@
 import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
-    // Unit tests see a build with the documents API and the credit, insurance and mortgage reviews,
-    // so their analytics events exist; the pages' gating is tested through documentsConfig with
-    // explicit values and through the built pages.
+    // Unit tests see a build with the documents API and the credit, insurance, mortgage and bills
+    // reviews, so their analytics events exist; the pages' gating is tested through documentsConfig
+    // with explicit values and through the built pages.
     env: {
       PUBLIC_CREDIT: '1',
       PUBLIC_INSURANCE: '1',
       PUBLIC_MORTGAGE: '1',
+      PUBLIC_BILLS: '1',
       PUBLIC_API_EXTRACT_URL: 'https://extract.api.test/',
       PUBLIC_API_CHECKOUT_URL: 'https://checkout.api.test/',
       PUBLIC_API_PASS_URL: 'https://pass.api.test/',

@@ -1,3 +1,6 @@
+import { electricityAnalytics } from '../analytics/bills';
+import { track } from '../analytics/posthog';
+import type { Detail } from '../calculator/ports';
 import { BILLS_NORMS } from '../engine/bills/data/norms';
 import { BILLS_TABLES } from '../engine/bills/data/tables';
 import { setUpElectricity } from '../bills/electricity/main';
@@ -20,21 +23,22 @@ const documentsBuild =
     import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
   ) && DOCUMENTS_BUILD;
 
+// Until the document module says whether a pass is there, the report counts as shown; without
+// the documents API there is no pass to lock it.
+let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedElectricityReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
-// Nothing on this page is measured yet: every event the review reports is heard by no one but the
-// documents, which follow each review shown and each one cleared.
-const ignore = () => undefined;
+const analytics = electricityAnalytics(
+  track,
+  () => performance.now(),
+  () => detail(),
+);
+// The measurement hears every event; the documents follow each review shown and each one cleared.
 const events: ElectricityEvents = {
-  stepShown: ignore,
-  wentBack: ignore,
-  stepCompleted: ignore,
-  fieldRejected: ignore,
-  helpOpened: ignore,
-  startedOver: ignore,
-  outOfScope: ignore,
+  ...analytics,
   reviewCompleted(r) {
+    analytics.reviewCompleted(r);
     for (const listener of reviewed) listener(r);
   },
   reviewCleared() {
@@ -57,11 +61,12 @@ if (documentsBuild) {
         {
           onReview: (listener) => reviewed.push(listener),
           onRestart: (listener) => cleared.push(listener),
-          // Nothing in the bills result is locked.
-          detail: () => {},
+          // Nothing in the result is locked; the pass unlocks the report and the letter.
+          detail: (state) => (detail = state),
         },
         arrival,
         BILLS_NORMS,
+        analytics,
       ),
     )
     .catch((error: unknown) => withoutDocuments(electricity.form, error));

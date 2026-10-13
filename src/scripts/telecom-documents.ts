@@ -1,3 +1,5 @@
+import { documentsAnalytics } from '../analytics/documents';
+import { track } from '../analytics/posthog';
 import { telecomCase } from '../bills/telecom/case';
 import type { CompletedTelecomReview } from '../bills/telecom/ports';
 import { telecomReading } from '../bills/telecom/reading';
@@ -7,7 +9,7 @@ import { DOCUMENTS } from '../documents/config';
 import { TELECOM_EXTRACTION } from '../documents/contract';
 import type { NormTable } from '../engine/bills/norms';
 import { billsTranslator } from './bills-copy';
-import { UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
+import { READS_UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
 
 // Document reading, the pass and the letters on the telecom review's page: the contract and the
 // bills fill its sheets, the pass unlocks the report and the penalty letter, and the letter about
@@ -26,8 +28,9 @@ export function wireTelecomDocuments(
     arrival,
     config: DOCUMENTS,
     tr,
-    // The review measures nothing yet, and neither does its pass.
-    events: UNMEASURED,
+    // Its reads send no event, as on the other finance pages; the pass is measured as on every
+    // page.
+    events: { ...documentsAnalytics(track), ...READS_UNMEASURED },
     section: {
       extraction: TELECOM_EXTRACTION,
       reading: telecomReading(telecom.form, tr),

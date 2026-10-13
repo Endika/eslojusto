@@ -204,8 +204,7 @@ export interface ReadingSection<F extends string, L extends string> {
 export interface DocumentsSection<R, F extends string, L extends string>
   extends PassSection<R>, ReadingSection<F, L> {}
 
-// For a page whose review measures nothing yet: its reads send no event either, while the pass
-// it shares with every page still does.
+// For a page whose reads send no event, while the pass it shares with every page still does.
 export const READS_UNMEASURED: Pick<
   DocumentEvents,
   | 'startChosen'
@@ -223,16 +222,6 @@ export const READS_UNMEASURED: Pick<
   nothingRead() {},
   qualityWarned() {},
   qualityOverridden() {},
-};
-
-// For a page that measures nothing yet, not even the pass it shares with every other page.
-export const UNMEASURED: DocumentEvents = {
-  ...READS_UNMEASURED,
-  checkoutStarted() {},
-  passIssued() {},
-  passFailed() {},
-  passVerified() {},
-  downloaded() {},
 };
 
 export interface DocumentsWiring<R, F extends string, L extends string> {

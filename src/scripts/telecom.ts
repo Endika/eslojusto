@@ -1,3 +1,5 @@
+import { telecomAnalytics } from '../analytics/bills';
+import { track } from '../analytics/posthog';
 import { BILLS_NORMS } from '../engine/bills/data/norms';
 import { BILLS_SOURCES } from '../engine/bills/data/sources';
 import { BILLS_TABLES } from '../engine/bills/data/tables';
@@ -24,18 +26,12 @@ const documentsBuild =
 const reviewed: ((r: CompletedTelecomReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
-// Nothing on this page is measured yet: every event the review reports is heard by no one but the
-// documents, which follow each review shown and each one cleared.
-const ignore = () => undefined;
+const analytics = telecomAnalytics(track, () => performance.now());
+// The measurement hears every event; the documents follow each review shown and each one cleared.
 const events: TelecomEvents = {
-  stepShown: ignore,
-  wentBack: ignore,
-  stepCompleted: ignore,
-  fieldRejected: ignore,
-  helpOpened: ignore,
-  startedOver: ignore,
-  outOfScope: ignore,
+  ...analytics,
   reviewCompleted(r) {
+    analytics.reviewCompleted(r);
     for (const listener of reviewed) listener(r);
   },
   reviewCleared() {

@@ -56,6 +56,18 @@ import {
   type OutOfScopeReason as MortgageOutOfScopeReason,
   type Step as MortgageStep,
 } from '../mortgage/ports';
+import { BILLS_FAQ_TOPICS } from '../content/bills-faq-topics';
+import type { BillsItemId, BillsStatus } from '../engine/bills/finding';
+import {
+  ELECTRICITY_FIELDS,
+  type ElectricityOutOfScope,
+  type Step as ElectricityStep,
+} from '../bills/electricity/ports';
+import {
+  TELECOM_FIELDS,
+  type TelecomOutOfScope,
+  type Step as TelecomStep,
+} from '../bills/telecom/ports';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import {
   DOWNLOADS,
@@ -204,12 +216,54 @@ const MORTGAGE_INSURANCE_SECTIONS = [
   'vencimiento',
   'condiciones',
 ] as const satisfies readonly MortgageStep[];
+// The bills reviews' sheets that no other review has; «fechas», «resultado» and «titular» are
+// already other reviews'. «penalizacion» appears in both of them, listed once.
+const BILLS_SECTIONS = [
+  'suministro',
+  'autoconsumo',
+  'potencia-contratada',
+  'lecturas',
+  'mercado',
+  'potencia',
+  'potencia-punta',
+  'potencia-valle',
+  'potencia-maxima',
+  'energia-punta',
+  'energia-llano',
+  'energia-valle',
+  'peajes',
+  'financiacion',
+  'bono-social',
+  'bono-social-consumo',
+  'contador',
+  'contador-tipo',
+  'servicios',
+  'servicio-1',
+  'servicio-2',
+  'exceso',
+  'penalizacion',
+  'penalizacion-contrato',
+  'ajustes',
+  'impuesto-electrico',
+  'iva',
+  'total',
+  'permanencia',
+  'baja',
+  'aviso',
+  'cambio',
+  'terminal',
+  'cobros',
+  'despues',
+] as const satisfies readonly (ElectricityStep | TelecomStep)[];
+// Its sheet that the mortgage review also has, listed once whichever is built.
+const BILLS_MORTGAGE_SECTIONS = ['titular'] as const satisfies readonly ElectricityStep[];
 // The credit, insurance and mortgage reviews exist only in a build with their switch; elsewhere their sheets,
 // questions and events are dropped from the bundle (the variables are read inline so the bundler can
 // fold them) and refused like any unknown event.
 const CREDIT_ON = import.meta.env.PUBLIC_CREDIT === '1';
 const INSURANCE_ON = import.meta.env.PUBLIC_INSURANCE === '1';
 const MORTGAGE_ON = import.meta.env.PUBLIC_MORTGAGE === '1';
+const BILLS_ON = import.meta.env.PUBLIC_BILLS === '1';
 export const SECTIONS = [
   'causa',
   'temporal',
@@ -234,6 +288,8 @@ export const SECTIONS = [
   ...(MORTGAGE_ON ? MORTGAGE_SECTIONS : []),
   ...(MORTGAGE_ON && !CREDIT_ON ? MORTGAGE_CREDIT_SECTIONS : []),
   ...(MORTGAGE_ON && !INSURANCE_ON ? MORTGAGE_INSURANCE_SECTIONS : []),
+  ...(BILLS_ON ? BILLS_SECTIONS : []),
+  ...(BILLS_ON && !MORTGAGE_ON ? BILLS_MORTGAGE_SECTIONS : []),
 ] as const;
 export type Section = (typeof SECTIONS)[number];
 
@@ -288,6 +344,10 @@ const _allInsuranceSteps: CoversAll<InsuranceStep, Section> = true;
 void _allInsuranceSteps;
 const _allMortgageSteps: CoversAll<MortgageStep, Section> = true;
 void _allMortgageSteps;
+const _allElectricitySteps: CoversAll<ElectricityStep, Section> = true;
+void _allElectricitySteps;
+const _allTelecomSteps: CoversAll<TelecomStep, Section> = true;
+void _allTelecomSteps;
 
 // The benefit answers, by name only: an error on one of them names the field, never the answer.
 // They are left out of `snapshot`, so `changed_fields` never lists them either.
@@ -317,6 +377,8 @@ export const CREDIT_TRACKABLE_FIELDS = CREDIT_FIELDS;
 export const INSURANCE_TRACKABLE_FIELDS = INSURANCE_FIELDS;
 // The mortgage questions by name; never what was answered.
 export const MORTGAGE_TRACKABLE_FIELDS = MORTGAGE_FIELDS;
+// The bills questions by name; never what was answered.
+export const BILLS_TRACKABLE_FIELDS = [...ELECTRICITY_FIELDS, ...TELECOM_FIELDS];
 
 export const HELP_TOPICS = [
   ...FAQ_TOPICS,
@@ -326,6 +388,7 @@ export const HELP_TOPICS = [
   ...(CREDIT_ON ? CREDIT_FAQ_TOPICS : []),
   ...(INSURANCE_ON ? INSURANCE_FAQ_TOPICS : []),
   ...(MORTGAGE_ON ? MORTGAGE_FAQ_TOPICS : []),
+  ...(BILLS_ON ? BILLS_FAQ_TOPICS : []),
 ].map(([, anchor]) => anchor);
 
 // What a rental result card is about. A card is a kind of item, never its concept as written.
@@ -634,6 +697,81 @@ export const MORTGAGE_FEE_STATUSES = [
 const _allFeeStatuses: CoversAll<FeeStatus, (typeof MORTGAGE_FEE_STATUSES)[number]> = true;
 void _allFeeStatuses;
 
+const BILLS_OUT_OF_SCOPE_REASONS = [
+  'canary_ceuta_melilla',
+  'over_15kw',
+  'not_2_0td',
+  'issued_before_2026_06_12',
+  'self_consumption_surplus',
+  'exit_before_2022',
+] as const satisfies readonly (ElectricityOutOfScope | TelecomOutOfScope)[];
+const _allBillsReasons: CoversAll<
+  ElectricityOutOfScope | TelecomOutOfScope,
+  (typeof BILLS_OUT_OF_SCOPE_REASONS)[number]
+> = true;
+void _allBillsReasons;
+
+// What a bills result line is about, by its kind; never its concept as written.
+export const BILLS_ITEM_IDS = [
+  'days',
+  'power',
+  'energy',
+  'total',
+  'tolls_and_charges_power',
+  'tolls_and_charges_energy',
+  'pvpc_eligibility',
+  'pvpc_power_p1',
+  'pvpc_power_p2',
+  'social_bonus_funding',
+  'meter',
+  'social_bonus',
+  'electricity_tax',
+  'vat',
+  'excess_power',
+  'service',
+  'exit_penalty',
+  'power_used',
+  'commitment_length',
+  'commitment_penalty',
+  'change_exit',
+  'charge_after_exit',
+] as const satisfies readonly BillsItemId[];
+const _allBillsItems: CoversAll<BillsItemId, (typeof BILLS_ITEM_IDS)[number]> = true;
+void _allBillsItems;
+
+// From the status of a bills line that weighs most to the one that weighs least; a line whose
+// readings disagree counts as `readings`, after the concrete findings.
+export const BILLS_STATUSES = [
+  'paid_over',
+  'charged_after_exit',
+  'above_legal_maximum',
+  'not_allowed',
+  'not_allowed_in_pvpc',
+  'tariff_not_allowed',
+  'above_regulated_price',
+  'wrong_rate_for_date',
+  'different_base',
+  'discount_lower',
+  'differs_from_official',
+  'does_not_add_up',
+  'readings',
+  'review_it',
+  'pending_official_data',
+  'not_checkable',
+  'not_on_bill',
+  'within_limit',
+  'matches',
+  'not_applicable',
+  'information',
+] as const satisfies readonly (BillsStatus | 'readings')[];
+const _allBillsStatuses: CoversAll<BillsStatus, (typeof BILLS_STATUSES)[number]> = true;
+void _allBillsStatuses;
+
+// How many bills a year of them counts.
+const BASKET_SIZES = ['1', '2-3', '4-6', '7-12', '13+'] as const;
+export const basketSizeBucket = (n: number): (typeof BASKET_SIZES)[number] =>
+  n <= 1 ? '1' : n <= 3 ? '2-3' : n <= 6 ? '4-6' : n <= 12 ? '7-12' : '13+';
+
 // By the days that change what the review reads in a deed.
 const DEED_PERIODS = ['before_2007', '2007_2013', '2013_2018', '2018_2019', '2019_plus'] as const;
 
@@ -762,6 +900,7 @@ const BASE_CATALOGUE = {
       ...(CREDIT_ON ? CREDIT_TRACKABLE_FIELDS : []),
       ...(INSURANCE_ON ? INSURANCE_TRACKABLE_FIELDS : []),
       ...(MORTGAGE_ON ? MORTGAGE_TRACKABLE_FIELDS : []),
+      ...(BILLS_ON ? BILLS_TRACKABLE_FIELDS : []),
     ]),
   },
   help_opened: { topic: oneOf(HELP_TOPICS) },
@@ -940,6 +1079,45 @@ const mortgageCatalogue = () => {
   } as const satisfies Record<string, Record<string, Rule>>;
 };
 
+const billsCatalogue = () => {
+  const BILLS_RESULT = oneOf([...BILLS_STATUSES, 'none']);
+  return {
+    // Why a bill or an exit stopped at a bills review's door; `$pathname` tells the two apart.
+    bills_out_of_scope: { reason: oneOf(BILLS_OUT_OF_SCOPE_REASONS) },
+    electricity_bill_reviewed: {
+      market: oneOf(['pvpc', 'free']),
+      retailer: oneOf(['reference', 'other', 'unknown']),
+      // The kinds of line that do not match, each once; never their concept or their figure.
+      findings: { list: BILLS_ITEM_IDS },
+      // Whether some line charges less than it should, whether a result waits on a norm not yet
+      // settled, and whether a difference comes back in every bill.
+      undercharged: { boolean: true },
+      conditional: { boolean: true },
+      recurring: { boolean: true },
+    },
+    telecom_review_completed: {
+      // Each point by the status that weighs most among its lines, or none.
+      commitment: BILLS_RESULT,
+      change_exit: BILLS_RESULT,
+      after_exit: BILLS_RESULT,
+    },
+  } as const satisfies Record<string, Record<string, Rule>>;
+};
+
+// «Tu año» exists only where documents are read: how many bills it counts and what it adds up to,
+// in buckets.
+const basketCatalogue = () =>
+  ({
+    basket_completed: {
+      size: oneOf(BASKET_SIZES),
+      difference: oneOf(DIFFERENCE_BUCKETS),
+      offered: { boolean: true },
+      detail: oneOf(['locked', 'unlocked']),
+      attempt: oneOf(ATTEMPT_BUCKETS),
+      seconds: oneOf(REVIEW_SECONDS),
+    },
+  }) as const satisfies Record<string, Record<string, Rule>>;
+
 // Reading documents and the pass: never a value read from a document, only the kinds found, how
 // many fields they filled and how sure the reading was.
 const DOCUMENT_CATALOGUE = {
@@ -987,24 +1165,29 @@ const DOCUMENT_CATALOGUE = {
 // The document events exist only in a build with the documents API; elsewhere they are dropped
 // from the bundle (the variables are read inline so the bundler can fold them) and refused like
 // any unknown event.
-export const CATALOGUE = {
-  ...BASE_CATALOGUE,
-  ...(!!(
+const DOCUMENTS_ON =
+  !!(
     import.meta.env.PUBLIC_API_EXTRACT_URL &&
     import.meta.env.PUBLIC_API_CHECKOUT_URL &&
     import.meta.env.PUBLIC_API_PASS_URL &&
     import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
-  ) && DOCUMENTS_BUILD
-    ? DOCUMENT_CATALOGUE
-    : {}),
+  ) && DOCUMENTS_BUILD;
+
+export const CATALOGUE = {
+  ...BASE_CATALOGUE,
+  ...(DOCUMENTS_ON ? DOCUMENT_CATALOGUE : {}),
   ...(CREDIT_ON ? creditCatalogue() : {}),
   ...(INSURANCE_ON ? insuranceCatalogue() : {}),
   ...(MORTGAGE_ON ? mortgageCatalogue() : {}),
+  ...(BILLS_ON ? billsCatalogue() : {}),
+  ...(BILLS_ON && DOCUMENTS_ON ? basketCatalogue() : {}),
 } as typeof BASE_CATALOGUE &
   typeof DOCUMENT_CATALOGUE &
   ReturnType<typeof creditCatalogue> &
   ReturnType<typeof insuranceCatalogue> &
-  ReturnType<typeof mortgageCatalogue>;
+  ReturnType<typeof mortgageCatalogue> &
+  ReturnType<typeof billsCatalogue> &
+  ReturnType<typeof basketCatalogue>;
 
 export type EventName = keyof typeof CATALOGUE;
 

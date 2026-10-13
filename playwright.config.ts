@@ -46,8 +46,8 @@ const port = Number(process.env['E2E_PORT'] ?? 4321);
 
 // The documents project reads documents on /alquiler/, /contrato/, /financiacion/, /seguros/,
 // /hipoteca/ and /facturas/ too, and offers the letters on /financiacion/, /seguros/ and
-// /hipoteca/, so its build has them; the analytics project measures the first two and /hipoteca/
-// too.
+// /hipoteca/, so its build has them; the analytics project measures the first two, /hipoteca/ and
+// /facturas/ too.
 const buildEnv = {
   ...(rental || documents || analytics ? { PUBLIC_RENTAL: '1' } : {}),
   ...(employment || documents || analytics ? { PUBLIC_EMPLOYMENT: '1' } : {}),
@@ -58,7 +58,7 @@ const buildEnv = {
   ...(insurance || documents ? { PUBLIC_INSURANCE: '1' } : {}),
   ...(credit || documents ? { PUBLIC_CREDIT: '1' } : {}),
   ...(mortgage || documents || analytics ? { PUBLIC_MORTGAGE: '1' } : {}),
-  ...(bills || documents ? { PUBLIC_BILLS: '1' } : {}),
+  ...(bills || documents || analytics ? { PUBLIC_BILLS: '1' } : {}),
   ...(analytics || household || insurance || credit ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
     ? {

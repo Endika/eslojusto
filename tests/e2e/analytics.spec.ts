@@ -1099,3 +1099,108 @@ test('the mortgage review sends sheets, field names and its outcome in codes, ne
   expect(spy.external).toEqual([]);
   expect(await context.cookies()).toEqual([]);
 });
+
+test('the bills reviews send sheets, field names and outcomes in codes, never a supply, an amount or a date', async ({
+  page,
+  context,
+}) => {
+  const spy = await spyOn(page);
+  await page.clock.setFixedTime(new Date('2026-10-13T12:00:00'));
+  const sheet = (name: string) => page.getByRole('group', { name, exact: true });
+  const choose = (scope: string, question: string, answer: string) =>
+    sheet(scope)
+      .getByRole('group', { name: question, exact: true })
+      .getByLabel(answer, { exact: true })
+      .check();
+  const type = (scope: string, label: string, value: string) =>
+    sheet(scope).getByLabel(label, { exact: true }).fill(value);
+  // The last sheet of a review shows «Revisar» instead of «Siguiente».
+  const next = async () => {
+    const review = page.getByRole('button', { name: 'Revisar' });
+    if (await review.isVisible()) {
+      await review.click();
+      await page.waitForFunction(() =>
+        document.getAnimations().every((a) => a.playState !== 'running'),
+      );
+    } else await nextSheet(page);
+  };
+
+  // The electricity review: a Canary Islands supply stops at its door.
+  await page.goto('facturas/luz/');
+  await type('Tu suministro', 'Código postal del suministro', '35001');
+  await choose('Tu suministro', 'Tarifa de acceso', '2.0TD');
+  await next();
+  await expect.poll(() => spy.named('bills_out_of_scope').length, { timeout: 15_000 }).toBe(1);
+  await page.getByText('¿Cuánto cuesta el alquiler del contador?').click();
+  await expect.poll(() => spy.named('help_opened').length, { timeout: 15_000 }).toBe(1);
+
+  // The telecom review: a penalty over its proportional share.
+  await page.goto('facturas/permanencia/');
+  await next(); // nothing answered: a validation error, by field name
+  await choose('Tu permanencia', '¿Tenías permanencia?', 'Sí');
+  await type('Tu permanencia', 'Inicio', '2025-03-01');
+  await type('Tu permanencia', 'Meses', '18');
+  await next();
+  await type('Penalización pactada', 'Penalización por irte el primer día', '187');
+  await next();
+  await type('Tu baja', 'Día en que pediste la baja', '2026-03-01');
+  await next();
+  await choose('Cambios antes de irte', '¿Te cambiaron las condiciones antes de irte?', 'No');
+  await next();
+  await type('Lo que te cobraron por irte', 'Penalización cobrada', '133');
+  await next();
+  await choose('Cobros después de la baja', '¿Te cobran días de después de pedir la baja?', 'No');
+  await next();
+  await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
+  await expect
+    .poll(() => spy.named('telecom_review_completed').length, { timeout: 15_000 })
+    .toBe(1);
+
+  const outOfScope = spy.named('bills_out_of_scope')[0];
+  expect(outOfScope?.properties['reason']).toBe('canary_ceuta_melilla');
+  expect(ownKeys(outOfScope)).toEqual(['reason']);
+  expect(spy.named('help_opened').map((e) => e.properties['topic'])).toEqual(['faq-luz-contador']);
+  expect(
+    spy.named('validation_error').map((e) => [e.properties['field'], e.properties['section']]),
+  ).toEqual([['hasCommitment', 'permanencia']]);
+  expect(spy.named('section_viewed').map((e) => e.properties['section'])).toEqual([
+    'suministro',
+    'resultado',
+    'permanencia',
+    'penalizacion',
+    'baja',
+    'aviso',
+    'cobros',
+    'despues',
+    'resultado',
+  ]);
+  const completed = spy.named('telecom_review_completed')[0];
+  expect(completed?.properties).toMatchObject({
+    commitment: 'paid_over',
+    change_exit: 'none',
+    after_exit: 'none',
+  });
+  expect(ownKeys(completed)).toEqual(['after_exit', 'change_exit', 'commitment']);
+
+  for (const e of spy.events()) {
+    const text = withoutRandom(e);
+    for (const forbidden of [
+      '35001',
+      '187',
+      '133',
+      '62,67',
+      '62.67',
+      '2025-03-01',
+      '01-03-2025',
+      '2026-03-01',
+      '01-03-2026',
+    ])
+      expect(text, `${e.event}: ${forbidden}`).not.toContain(forbidden);
+  }
+  for (const e of spy.events())
+    expect(String(e.properties['$current_url'])).toMatch(
+      new RegExp(`^${ORIGIN}/facturas/(luz|permanencia)/(#[a-z0-9-]+)?$`),
+    );
+  expect(spy.external).toEqual([]);
+  expect(await context.cookies()).toEqual([]);
+});
