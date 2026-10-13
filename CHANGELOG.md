@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.57.0](https://github.com/Endika/eslojusto/compare/v1.56.4...v1.57.0) (2026-10-13)
+
+
+### Features
+
+* **bills:** add the electricity bill and telecom exit reviews behind their switch ([e4e7c36](https://github.com/Endika/eslojusto/commit/e4e7c3607d9a13912db50b03ea31522a59719b5f))
+
 ## [1.56.4](https://github.com/Endika/eslojusto/compare/v1.56.3...v1.56.4) (2026-10-13)
 
 
