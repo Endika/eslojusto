@@ -230,7 +230,8 @@ for (const { name, viewport } of SIZES) {
       await expect(result(page)).not.toContainText('€ a ');
     });
 
-    test('a revolving card on the edge of the average-rate band', async ({ page }) => {
+    // Against the monthly series six points decide: the 6,00-6,30 band is for the 2010 reference.
+    test('a revolving card just over six points above the monthly series', async ({ page }) => {
       await open(page, viewport);
       await fill(page, {
         product: 'Tarjeta revolving',
@@ -243,9 +244,7 @@ for (const { name, viewport } of SIZES) {
       await reviewed(page);
       await expect(card(page, 'La TAE de tu contrato')).toContainText('Coincide');
       const indicator = card(page, 'Tu TAE frente al tipo medio del Banco de España');
-      await expect(indicator).toContainText(
-        'En el borde: depende de cómo se ajuste el tipo medio por comisiones',
-      );
+      await expect(indicator).toContainText('Más de 6 puntos por encima del tipo medio');
       await expect(indicator).toContainText('6,03 puntos');
       await expect(indicator).toContainText('STS 258/2023');
       await expect(card(page, 'Desistir del crédito')).toContainText(
