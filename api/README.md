@@ -770,33 +770,11 @@ day with how many pages had each readability, and «% lecturas sin datos (24 h)�
 answered reads (`ok` plus `nothing_read`) that found nothing. Log widgets follow the
 dashboard's range, 24 h by default, so that share covers whatever range is chosen. The AI cost is tokens × `MODEL_PRICES_USD_PER_MTOK` for the
 configured models; synth fails if a configured model has no price. It charts only AWS metrics
-and inline queries, with the alarms' state on top.
+and inline queries.
 
-**Alerts** (`infra/alarms.ts`): nine standard alarms email the `eslojusto-api-alerts` SNS topic
-on ALARM and again on OK, missing data counting as fine. Thresholds catch repeated failures,
-not a single one:
-
-| Alarm                                                             | Fires when                                                                                                            |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `eslojusto-api-payments-errors`                                   | `checkout` + `pass` Lambda errors and 5xx answers ≥ 2 in 15 min                                                       |
-| `eslojusto-api-extract-errors`                                    | `extract` Lambda errors (crash, timeout) ≥ 3 in 15 min                                                                |
-| `eslojusto-api-extract-5xx`                                       | `extract` 503s (`model_unavailable`, `service_unavailable`) ≥ 3 in 30 min                                             |
-| `eslojusto-api-extract-no-success`                                | ≥ 5 calls to the primary model in 1 h and not one `ok` read                                                           |
-| `eslojusto-api-throttles`                                         | ≥ 1 throttled invocation on any function in 5 min (account limit: 10)                                                 |
-| `eslojusto-api-rental-unread-share`, `-employment-`, `-mortgage-` | > 40 % of ≥ 5 answered reads of that beta in 6 h read nothing                                                         |
-| `eslojusto-api-mortgage-missing-key-page`                         | > 50 % of ≥ 5 legible deeds in 6 h lack the costs clause a deed before 16-06-2019 needs (`missingKeyPage` in the log) |
-
-Lambda counts a function URL's own 5xx answers in `Url5xxCount`, which is free, so no log
-filter is needed for `model_unavailable`. The metric filter `Eslojusto/Api ExtractOk` on the
-`extract` log group exists because no AWS metric counts successful reads. Bedrock's
-`Invocations` for the primary model count the attempts, so console playground calls count too.
-`countNotSaved` and `pass_revoked` have no alarm: each would need a filter of its own; the
-dashboard counts them. Each beta share feeds one custom metric from two filters, 1 for a read
-that counts against it and 0 for one that does not, so its Sum over its SampleCount is the share.
-Outside the betas `nothing_read` has no alarm: a run of reads where nothing is read already trips
-`extract-no-success`, which counts only `ok` reads as a success on purpose: that is what a broken
-prompt or model looks like. The address comes from the `alertEmail` context, which CI takes from the
-repository variable `ALERT_EMAIL`; without it the topic exists with no subscribers.
+**Alerts**: none in CloudWatch. The API had nine alarms until 13-10-2026; they were dropped
+because the dashboard shows the same and the budget below is the only alert kept. Watch the
+dashboard after each change.
 
 **Budget**: 10 USD a month on the whole account (Claude on Bedrock is billed through AWS
 Marketplace, so a Bedrock service filter would miss it; Budgets are in USD, and 10 USD stays
@@ -834,13 +812,11 @@ Nothing here has been run. Each step needs an account administrator.
    `npx cdk bootstrap aws://<account>/eu-south-2 --cloudformation-execution-policies <CfnExecutionPolicyArn>`.
 7. **GitHub:** create the `production` environment with yourself as required reviewer and
    deployments limited to `main`; set the variables `AWS_DEPLOY_ROLE_ARN` (step 5 output) and
-   `STRIPE_PRICE_ID`, and `ALERT_EMAIL` for the alarms. The deploy role trusts only
+   `STRIPE_PRICE_ID`, and `ALERT_EMAIL` for the budget. The deploy role trusts only
    `repo:Endika@568585/eslojusto@1407967362:environment:production`.
 8. **Approve** the `Deploy API` run, then give the three function URLs (stack outputs `extractUrl`, `checkoutUrl`,
    `passUrl`) and the
-   Turnstile site key to the site. Confirm the SNS subscription email ("AWS Notification -
-   Subscription Confirmation") that arrives after the first deploy with `ALERT_EMAIL` set: until
-   then the alarms change state but email nobody.
+   Turnstile site key to the site.
 9. **Before going live, in Stripe test mode with the restricted key:** create a session through
    `checkout`, pay it with `4242 4242 4242 4242`, redeem it through `pass`, and make one pass
    read. Then check in the Dashboard that the session's metadata reads `reads_used: 1`. That
@@ -850,10 +826,10 @@ Nothing here has been run. Each step needs an account administrator.
 
 **Changing what CI deploys.** The CloudFormation execution policy lists exactly what
 `EslojustoApi` may hold, so a new kind of resource there needs the global stack redeployed
-first (step 5, same command) by an administrator. The dashboard and the alerts are such a
-change: until `eslojusto-api-cfn-execution` allows the `dashboard/eslojusto-api` dashboard, the
-`eslojusto-api-alerts` topic and the `alarm:eslojusto-api-*` alarms (metric filters on the log
-groups were already covered by `logs:*`), the `Deploy API` run fails and rolls back.
+first (step 5, same command) by an administrator. Until `eslojusto-api-cfn-execution` allows a
+resource, the `Deploy API` run fails and rolls back. It still allows the `eslojusto-api-alerts`
+topic and the `alarm:eslojusto-api-*` alarms the API no longer has, so CloudFormation could
+delete them.
 
 ## Cost
 
@@ -862,11 +838,7 @@ two budgets with actions cost nothing; the bootstrap bucket holds about 1 MB; lo
 KB a day. The dashboard is within CloudWatch's free tier (3 dashboards of up to 50 metrics; a
 test keeps it under 50, and it is the account's only one) and reads only free AWS metrics; its
 Logs Insights widgets bill 0.0057 USD per GB scanned each time the page loads or refreshes, and
-14 days of these logs are well under 1 MB. The alarms use 17 alarm metrics, 7 past the free 10
-(0.70 USD a month; a test keeps them at 17); `ExtractOk` and the four beta shares are five custom
-metrics, within the free 10, and otherwise about 0.30 USD a month each at most, prorated by the
-hours they receive data; alert emails
-are free up to 1,000 a month.
+14 days of these logs are well under 1 MB. There are no alarms and no custom metrics.
 
 Per read, from the eu-south-2 Price List (07-10-2026): Sonnet 4.6 at 3.30 / 16.50 USD per
 million input / output tokens (EU profile); Haiku 4.5, if it reads first again, at 1.10 / 5.50

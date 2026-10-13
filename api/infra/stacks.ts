@@ -27,7 +27,6 @@ import {
   STRIPE_PRICE_ENV,
   foundationModelId,
 } from '../src/config';
-import { addAlarms, ALARM_PREFIX, ALERTS_TOPIC_NAME } from './alarms';
 import { addDashboard, DASHBOARD_NAME } from './dashboard';
 
 // CloudFormation in eu-south-2 has no AWS::Budgets::* types; this stack holds only global
@@ -75,9 +74,12 @@ export interface ApiStackProps extends StackProps {
   // Off only while the account's concurrency quota is too low to reserve anything; the
   // account-wide limit then caps every function instead.
   readonly reserveConcurrency?: boolean;
-  // Subscribed to the alerts topic; without it the topic has no subscribers.
-  readonly alertEmail?: string;
 }
+
+// The API had CloudWatch alarms and an alerts topic until 13-10-2026; CI's deployment keeps the
+// right to manage them so CloudFormation can delete what it created. The budget emails instead.
+const ALARM_PREFIX = 'eslojusto-api-';
+const ALERTS_TOPIC_NAME = 'eslojusto-api-alerts';
 
 // Everything regional, in eu-south-2. No IAM: the roles live in the global stack, so the CI
 // deployment can neither create roles nor widen their permissions.
@@ -85,7 +87,6 @@ export class ApiStack extends Stack {
   constructor(scope: Construct, id: string, props: ApiStackProps) {
     super(scope, id, { ...props, env: { ...props.env, region: REGION } });
 
-    const logGroups = {} as Record<FunctionKey, logs.LogGroup>;
     for (const key of Object.keys(FUNCTIONS) as FunctionKey[]) {
       const settings = FUNCTIONS[key];
       const functionName = FUNCTION_NAMES[key];
@@ -94,7 +95,6 @@ export class ApiStack extends Stack {
         retention: logs.RetentionDays.TWO_WEEKS,
         removalPolicy: RemovalPolicy.DESTROY,
       });
-      logGroups[key] = logGroup;
       const fn = new NodejsFunction(this, key, {
         functionName,
         entry: entry(key),
@@ -131,8 +131,7 @@ export class ApiStack extends Stack {
       new CfnOutput(this, `${key}Url`, { value: url.url });
     }
 
-    const alarms = addAlarms(this, logGroups.extract, props.alertEmail);
-    addDashboard(this, { monthlyUsd: MONTHLY_BUDGET_USD, name: BUDGET_NAME }, alarms);
+    addDashboard(this, { monthlyUsd: MONTHLY_BUDGET_USD, name: BUDGET_NAME });
   }
 }
 
@@ -398,7 +397,7 @@ export class GlobalStack extends Stack {
 
 export interface AppConfig {
   readonly stripePriceId: string;
-  // Budget and alarm emails; the hand-run deployment needs it to build the global stack.
+  // Budget emails; the hand-run deployment needs it to build the global stack.
   readonly alertEmail?: string;
   readonly reserveConcurrency?: boolean;
 }
@@ -407,7 +406,6 @@ export function buildApp(config: AppConfig, app = new App()) {
   const api = new ApiStack(app, 'EslojustoApi', {
     stripePriceId: config.stripePriceId,
     ...(config.reserveConcurrency === false && { reserveConcurrency: false }),
-    ...(config.alertEmail !== undefined && { alertEmail: config.alertEmail }),
     analyticsReporting: false,
   });
   const global =
