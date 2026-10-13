@@ -39,8 +39,8 @@ export type Fetch = (url: string, init: RequestInit) => Promise<Response>;
 // Longer than the extract function's 180 s by a minute for the upload, so the browser never
 // gives up on a read the API is still able to answer.
 export const API_TIMEOUT_MS = 240_000;
-// A verify only asks Stripe; past this the page offers to try again.
-const VERIFY_TIMEOUT_MS = 15_000;
+// Checkout and pass only ask Stripe and stop at 15 s; past this the page offers to try again.
+export const PAYMENT_TIMEOUT_MS = 20_000;
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -156,6 +156,7 @@ export function createApi<F extends string, L extends string>(
   timeoutMs = API_TIMEOUT_MS,
 ): Api<F, L> {
   const review = shape.review === 'final_pay' ? {} : { review: shape.review };
+  const payment = Math.min(timeoutMs, PAYMENT_TIMEOUT_MS);
   async function post(
     op: Operation,
     body: object,
@@ -228,18 +229,22 @@ export function createApi<F extends string, L extends string>(
       };
     },
     async checkout(nonce, captchaToken) {
-      const r = await post('checkout', {
-        nonce,
-        captchaToken,
-        ...(shape.review === 'final_pay' ? {} : { returnTo: shape.review }),
-      });
+      const r = await post(
+        'checkout',
+        {
+          nonce,
+          captchaToken,
+          ...(shape.review === 'final_pay' ? {} : { returnTo: shape.review }),
+        },
+        payment,
+      );
       if (failed(r)) return r;
       const { sessionId, url } = r;
       if (!isToken(sessionId) || !isToken(url)) return fail('unexpected_response');
       return { ok: true, sessionId, url };
     },
     async pass(sessionId, nonce) {
-      const r = await post('pass', { sessionId, nonce });
+      const r = await post('pass', { sessionId, nonce }, payment);
       if (failed(r)) return r;
       const { pass, expiresAt, readsLeft } = r;
       if (!isToken(pass) || !isCount(expiresAt) || !isCount(readsLeft))
@@ -247,7 +252,7 @@ export function createApi<F extends string, L extends string>(
       return { ok: true, pass, expiresAt, readsLeft };
     },
     async verify(pass) {
-      const r = await post('pass', { pass }, Math.min(timeoutMs, VERIFY_TIMEOUT_MS));
+      const r = await post('pass', { pass }, payment);
       if (failed(r)) return r;
       const { expiresAt, readsLeft } = r;
       if (!isCount(expiresAt) || !isCount(readsLeft)) return fail('unexpected_response');
