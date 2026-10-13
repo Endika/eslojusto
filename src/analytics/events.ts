@@ -377,8 +377,17 @@ export const CREDIT_TRACKABLE_FIELDS = CREDIT_FIELDS;
 export const INSURANCE_TRACKABLE_FIELDS = INSURANCE_FIELDS;
 // The mortgage questions by name; never what was answered.
 export const MORTGAGE_TRACKABLE_FIELDS = MORTGAGE_FIELDS;
-// The bills questions by name; never what was answered.
-export const BILLS_TRACKABLE_FIELDS = [...ELECTRICITY_FIELDS, ...TELECOM_FIELDS];
+// The bills questions by name; never what was answered, and never the social bonus's category,
+// amount or consumption, asked only of a household that has it.
+const BONUS_ONLY_FIELDS: readonly string[] = [
+  'bonusCategory',
+  'bonusAmount',
+  'bonusKwhSoFar',
+  'bonusDiscountedKwh',
+];
+export const BILLS_TRACKABLE_FIELDS = [...ELECTRICITY_FIELDS, ...TELECOM_FIELDS].filter(
+  (f) => !BONUS_ONLY_FIELDS.includes(f),
+);
 
 export const HELP_TOPICS = [
   ...FAQ_TOPICS,
@@ -738,6 +747,10 @@ export const BILLS_ITEM_IDS = [
 ] as const satisfies readonly BillsItemId[];
 const _allBillsItems: CoversAll<BillsItemId, (typeof BILLS_ITEM_IDS)[number]> = true;
 void _allBillsItems;
+export type BillsTrackedItemId = Exclude<BillsItemId, 'social_bonus'>;
+export const BILLS_TRACKED_ITEM_IDS = BILLS_ITEM_IDS.filter(
+  (id): id is BillsTrackedItemId => id !== 'social_bonus',
+);
 
 // From the status of a bills line that weighs most to the one that weighs least; a line whose
 // readings disagree counts as `readings`, after the concrete findings.
@@ -1087,8 +1100,9 @@ const billsCatalogue = () => {
     electricity_bill_reviewed: {
       market: oneOf(['pvpc', 'free']),
       retailer: oneOf(['reference', 'other', 'unknown']),
-      // The kinds of line that do not match, each once; never their concept or their figure.
-      findings: { list: BILLS_ITEM_IDS },
+      // The kinds of line that do not match, each once; never their concept or their figure. The
+      // social bonus is left out: that its line is there would tell that the household has it.
+      findings: { list: BILLS_TRACKED_ITEM_IDS },
       // Whether some line charges less than it should, whether a result waits on a norm not yet
       // settled, and whether a difference comes back in every bill.
       undercharged: { boolean: true },

@@ -6285,13 +6285,13 @@ export const es = {
     'Si revisas varias facturas de la luz, cada una con sus respuestas se queda en la memoria de la pestaña para sumarlas como «tu año». No se escribe en tu dispositivo ni sale de él, salvo durante el pago, como se explica más abajo; al cerrar o recargar la pestaña, desaparece.',
   'privacy.bills.tracked_sheets': 'En las revisiones de tus facturas',
   'privacy.bills.tracked_sheets_what':
-    'Lo mismo que en el finiquito con cada una de sus hojas, de tu suministro o tu permanencia al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha de cargo», nunca lo que escribiste. Qué pregunta frecuente abres.',
+    'Lo mismo que en el finiquito con cada una de sus hojas, de tu suministro o tu permanencia al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha de cargo», nunca lo que escribiste. Las preguntas del bono social que solo ve quien lo tiene no se miden: ni que las abres ni sus errores. Qué pregunta frecuente abres.',
   'privacy.bills.tracked_scope': 'Si tu factura o tu baja quedan fuera de la revisión',
   'privacy.bills.tracked_scope_what':
     'El motivo, de una lista cerrada: un suministro en Canarias, Ceuta o Melilla, de más de 15 kW, con otra tarifa de acceso que la 2.0TD o con placas solares que vierten a la red, o una factura emitida antes del 12-06-2026; o, en la permanencia, una baja pedida antes de 2022.',
   'privacy.bills.tracked_review': 'Al revisar tu factura de la luz',
   'privacy.bills.tracked_review_what':
-    'Si es PVPC o mercado libre y si la comercializadora es de referencia, otra o no lo sabes, nunca su nombre. Qué tipos de línea no cuadran, por ejemplo el alquiler del contador, el bono social o el IVA, cada uno una vez, nunca su concepto ni su importe; si alguna línea cobra de menos, si algún resultado espera un dato oficial y si una diferencia se repite en cada factura. Nunca el código de tu suministro ni su huella, un importe, una fecha ni el nombre de tu comercializadora.',
+    'Si es PVPC o mercado libre y si la comercializadora es de referencia, otra o no lo sabes, nunca su nombre. Qué tipos de línea no cuadran, por ejemplo el alquiler del contador o el IVA, cada uno una vez, nunca su concepto ni su importe, y nunca la del bono social, que diría que lo tienes; si alguna línea cobra de menos, si algún resultado espera un dato oficial y si una diferencia se repite en cada factura. Nunca el código de tu suministro ni su huella, un importe, una fecha ni el nombre de tu comercializadora.',
   'privacy.bills.tracked_telecom': 'Al revisar tu permanencia y tu baja',
   'privacy.bills.tracked_telecom_what':
     'De la permanencia, del cambio de condiciones y de los cobros después de la baja, su resultado en un código, por ejemplo «por encima de lo que permite la norma». Nunca un importe, una fecha ni el nombre del operador.',
