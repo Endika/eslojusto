@@ -75,7 +75,7 @@ describe('credit events', () => {
       product: 'personal_loan',
       period: '2016-2020',
       apr: 'contract_lower',
-      early_repayment: 'not_entered',
+      early_repayment: 'none',
       dealer_discount: 'none',
       withdrawal: 'ended',
       indicator: 'distance_only',

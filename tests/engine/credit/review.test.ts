@@ -29,11 +29,7 @@ describe('reviewCredit', () => {
   it('reviews the loan of STS 366/2026 end to end', () => {
     const r = review();
     expect(r.scope).toEqual({ inScope: true, indicatorOnly: false });
-    expect(statuses(r)).toEqual([
-      ['apr:contract_lower'],
-      ['early_repayment:not_entered'],
-      ['withdrawal:ended'],
-    ]);
+    expect(statuses(r)).toEqual([['apr:contract_lower'], ['withdrawal:ended']]);
     expect(r.indicator).toMatchObject({ status: 'distance_only', apr: 12, aprOrigin: 'declared' });
     expect(r.totals).toEqual({ overCharged: { counted: 0, upTo: 0 } });
     expect(r.offerPass).toBe(true);

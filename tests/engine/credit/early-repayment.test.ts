@@ -17,11 +17,14 @@ const only = (item: CreditItem): CreditFinding => {
 };
 
 // No interest settled that day, so a single reading on the capital.
-const check = (change: Partial<EarlyRepayment> = {}, input: Partial<CreditInput> = {}) =>
-  checkEarlyRepayment(
+const check = (change: Partial<EarlyRepayment> = {}, input: Partial<CreditInput> = {}) => {
+  const item = checkEarlyRepayment(
     loan({ earlyRepayment: repayment({ interestSettled: null, ...change }), ...input }),
     CREDIT_NORMS,
   );
+  if (item === null) throw new Error('expected an early repayment item');
+  return item;
+};
 
 const anchors = (f: CreditFinding) => f.sources.map((s) => s.id);
 
@@ -97,7 +100,7 @@ describe('item 3: compensation for an early repayment', () => {
   });
 
   it('says it was not entered without a repayment', () => {
-    expect(only(checkEarlyRepayment(loan(), CREDIT_NORMS)).status).toBe('not_entered');
+    expect(checkEarlyRepayment(loan(), CREDIT_NORMS)).toBeNull();
   });
 });
 

@@ -19,7 +19,7 @@ export const CREDIT_SOURCES: SourceTable = {
     court: `${SUPREME_CIVIL} (Pleno)`,
     number: '258/2023',
     decidedOn: '2023-02-15',
-    ecli: null,
+    ecli: 'ECLI:ES:TS:2023:442',
     lastVerified: '2026-10-07',
     verified: true,
     quotes: [],

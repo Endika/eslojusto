@@ -139,7 +139,7 @@ describe('average-rate criteria', () => {
       number: '258/2023',
       decidedOn: '2023-02-15',
       verified: true,
-      ecli: null,
+      ecli: 'ECLI:ES:TS:2023:442',
     });
     expect(criterionSource('usury_indicator_loan', CREDIT_SOURCES)).toMatchObject({
       number: '366/2026',

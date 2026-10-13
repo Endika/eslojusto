@@ -190,10 +190,6 @@
           "apr": 10.16
         },
         {
-          "id": "early_repayment",
-          "status": "not_entered"
-        },
-        {
           "id": "withdrawal",
           "status": "ended",
           "lastDay": "2024-03-18"
