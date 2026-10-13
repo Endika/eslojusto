@@ -67,10 +67,12 @@ const workHistoryUrl =
         <h3 class="item__title" id="summary-title">
           {tx('result.summary')}
         </h3>
+        {/* The benefit's pages lead with the benefit, what the person came for. */}
+        {benefitFirst && <p class="help" data-summary-benefit></p>}
         <p class="help" data-summary-headline></p>
         <ul class="list" data-summary-lines></ul>
         <p class="item__note" data-summary-counted hidden></p>
-        <p class="help" data-summary-benefit></p>
+        {!benefitFirst && <p class="help" data-summary-benefit></p>}
         <div data-summary-deadlines></div>
       </div>
     </section>
