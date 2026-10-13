@@ -94,7 +94,13 @@ export function sourceText(s: MortgageSource, tr: Translate): string {
       fecha: s.statusSince ? dayText(s.statusSince) : '',
     });
     if (s.status === 'draft') return status;
-    return `${tr('client.mortgage.source.since', { desde: dayText(s.inForceSince) })} · ${status}`;
+    const since = dayText(s.inForceSince);
+    const period =
+      s.inForceUntil === null
+        ? tr('client.mortgage.source.since', { desde: since })
+        : tr('client.mortgage.source.between', { desde: since, hasta: dayText(s.inForceUntil) });
+    // A wording with an end date says when it applied: «en vigor» would speak of the whole norm.
+    return s.inForceUntil !== null && s.status === 'in_force' ? period : `${period} · ${status}`;
   }
   if (s.basis !== 'case_law') return tr(`client.mortgage.source.${s.basis}`);
   const checked = tr('client.mortgage.source.checked', { fecha: dayText(s.lastVerified) });

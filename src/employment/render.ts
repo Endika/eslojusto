@@ -310,7 +310,10 @@ export function inForceText(s: NormSource, tr: Translate): string {
     s.inForceUntil === null
       ? tr('client.employment.source.since', { desde: since })
       : tr('client.employment.source.between', { desde: since, hasta: dayText(s.inForceUntil) });
-  return `${period} · ${normStatusText(s, tr)}`;
+  // A wording with an end date says when it applied: «en vigor» would speak of the whole norm.
+  return s.inForceUntil !== null && s.status === 'in_force'
+    ? period
+    : `${period} · ${normStatusText(s, tr)}`;
 }
 
 function renderSources(

@@ -39,14 +39,16 @@ export function ruleSource<RuleId extends string, NormId extends string, Status 
   id: RuleId,
   norms: NormTable<NormId, Status>,
 ): NormSource<Status> {
-  const { article, url, norm: normId, wordingSince } = rules[id];
+  const { article, url, norm: normId, wordingSince, until } = rules[id];
   const norm = norms[normId];
+  // The earlier end of the rule's wording and of its norm.
+  const ends = [until, norm.inForceUntil].filter((d): d is string => d !== null).sort();
   return {
     id,
     citation: `${article} (${norm.citation})`,
     url,
     inForceSince: wordingSince ?? norm.inForceSince,
-    inForceUntil: norm.inForceUntil,
+    inForceUntil: ends[0] ?? null,
     endUncertainUntil: norm.endUncertainUntil ?? null,
     status: norm.status,
     statusSince: norm.statusSince,

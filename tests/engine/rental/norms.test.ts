@@ -72,13 +72,13 @@ describe('rule table', () => {
 });
 
 describe('rule sources', () => {
-  it('carry the norm validity and status', () => {
+  it('carry the norm validity, the end of the rule and the status', () => {
     const s = ruleSource('cap_2_rdl29', NORMS);
     expect(s).toMatchObject({
       id: 'cap_2_rdl29',
       citation: 'disposición final 6.ª (Real Decreto-ley 29/2026, de 6 de octubre)',
       inForceSince: '2026-10-08',
-      inForceUntil: null,
+      inForceUntil: '2027-12-31',
       status: 'pending_validation',
       statusSince: null,
     });

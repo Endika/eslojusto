@@ -227,7 +227,10 @@ export function inForceText(s: RentalSource, tr: Translate): string {
     s.inForceUntil === null
       ? tr('client.rental.source.since', { desde: since })
       : tr('client.rental.source.between', { desde: since, hasta: dayText(s.inForceUntil) });
-  return `${period} · ${normStatusText(s, tr)}`;
+  // A wording with an end date says when it applied: «en vigor» would speak of the whole norm.
+  return s.inForceUntil !== null && s.status === 'in_force'
+    ? period
+    : `${period} · ${normStatusText(s, tr)}`;
 }
 
 // Each rule an item rests on: the norm and article, a link to it and how it stands today.
