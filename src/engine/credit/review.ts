@@ -162,9 +162,10 @@ export function reviewCredit(input: CreditInput, today: CivilDate, deps: CreditD
 
   const apr = checkApr(input, norms);
   const dealer = checkDealerDiscount(input, norms);
+  const repayment = checkEarlyRepayment(input, norms);
   const items = [
     apr,
-    checkEarlyRepayment(input, norms),
+    ...(repayment === null ? [] : [repayment]),
     ...(dealer === null ? [] : [dealer]),
     checkWithdrawal(input, today, norms),
   ];

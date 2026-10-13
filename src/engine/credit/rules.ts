@@ -128,14 +128,18 @@ export const STATUTE_RULES: Readonly<Record<StatuteRuleId, StatuteRule>> = {
   ),
   // 33 quinquies and 33 sexies: the statement a revolving card owes at least every quarter, and
   // the breakdown and repayment table on request within 5 working days.
-  revolving_info: rule(
-    'revolving_info',
-    'oeha',
-    'Orden de transparencia bancaria, arts. 33 quinquies y 33 sexies',
-    `${OEHA}#a3-17`,
-    '2021-01-27',
-    'info',
-  ),
+  // Orden ETD/699/2020 added both from 27-01-2021.
+  revolving_info: {
+    ...rule(
+      'revolving_info',
+      'oeha',
+      'Orden de transparencia bancaria, arts. 33 quinquies y 33 sexies',
+      `${OEHA}#a3-17`,
+      '2021-01-27',
+      'info',
+    ),
+    wordingSince: '2021-01-27',
+  },
   // 1: a loan at an interest notably higher than the normal one and manifestly disproportionate is
   // void. The average-rate criteria read it; the law itself fixes no threshold.
   usury_law: rule(

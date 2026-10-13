@@ -74,7 +74,7 @@ const cards = (root: HTMLElement) =>
   }));
 
 describe('the credit result', () => {
-  it('gives the APR first, then the indicator, the early repayment and the withdrawal', () => {
+  it('gives the APR first, then the indicator and the withdrawal: no early repayment, no item', () => {
     const root = result();
     renderCreditResult(root, review(loan({ confirmedApr: true })), tr);
     expect(cards(root)).toEqual([
@@ -84,7 +84,6 @@ describe('the credit result', () => {
           'La TAE de tu contrato es más baja que la que sale de sus cifras (12,00 % frente a 16,61 %)',
       },
       { item: 'indicator', status: 'Diferencia con el tipo medio: 8,51 puntos' },
-      { item: 'early_repayment', status: 'No lo has metido' },
       { item: 'withdrawal', status: 'El plazo terminó el 01-03-2019' },
     ]);
     const indicator = root.querySelectorAll('[data-item]')[1];

@@ -113,10 +113,6 @@
           "apr": 8.57
         },
         {
-          "id": "early_repayment",
-          "status": "not_entered"
-        },
-        {
           "id": "withdrawal",
           "status": "ended",
           "lastDay": "2024-11-04"

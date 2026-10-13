@@ -111,10 +111,6 @@
           "apr": 30.12
         },
         {
-          "id": "early_repayment",
-          "status": "not_entered"
-        },
-        {
           "id": "withdrawal",
           "status": "open",
           "lastDay": "2026-10-12",

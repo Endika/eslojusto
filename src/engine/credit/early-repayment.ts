@@ -116,19 +116,11 @@ function capReading(
   );
 }
 
-// Item 3: the compensation charged for an early repayment against the caps of art. 30.
-export function checkEarlyRepayment(input: CreditInput, norms: NormTable): CreditItem {
+// Item 3: the compensation charged for an early repayment against the caps of art. 30. Without
+// one (the person repaid nothing early, or a card, which the form does not ask) there is no item.
+export function checkEarlyRepayment(input: CreditInput, norms: NormTable): CreditItem | null {
   const repayment = input.earlyRepayment;
-  if (repayment === null)
-    return single(
-      creditFinding(
-        'early_repayment',
-        'not_entered',
-        [creditPhrase('item.not_entered')],
-        ['early_repayment_cap'],
-        norms,
-      ),
-    );
+  if (repayment === null) return null;
   const bases: readonly RepaymentBase[] =
     repayment.interestSettled !== null && repayment.interestSettled > 0
       ? ['principal_and_interest', 'principal_only']

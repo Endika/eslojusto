@@ -128,10 +128,6 @@
           "apr": 7.18
         },
         {
-          "id": "early_repayment",
-          "status": "not_entered"
-        },
-        {
           "id": "withdrawal",
           "status": "open",
           "lastDay": "2026-10-14",
