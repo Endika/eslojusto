@@ -737,6 +737,8 @@ export const es = {
     'El paro depende de la causa: un despido o el fin de un contrato temporal dan derecho si sumas al menos 360 días cotizados en los últimos 6 años; una baja voluntaria, no.',
   'client.summary.dismissal_deadline':
     'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
+  'client.summary.dismissal_deadline_if':
+    'Si fue un despido, el plazo para impugnarlo es de 20 días hábiles (art. 59.3 ET).',
   'client.summary.benefit_deadline':
     'Para cobrar el paro tienes que inscribirte como demandante de empleo y pedirlo en los 15 días siguientes al fin del contrato (hábiles, según el SEPE). Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (arts. 266 y 268 LGSS).',
 
