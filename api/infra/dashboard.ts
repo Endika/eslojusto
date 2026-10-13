@@ -9,8 +9,6 @@ import {
 } from '../src/config';
 
 export const DASHBOARD_NAME = 'eslojusto-api';
-// The account's concurrent-execution quota in eu-south-2 (`aws lambda get-account-settings`).
-const ACCOUNT_CONCURRENCY_LIMIT = 10;
 
 type FunctionKey = keyof typeof FUNCTION_NAMES;
 const KEYS = Object.keys(FUNCTION_NAMES) as FunctionKey[];
@@ -100,6 +98,8 @@ function header(monthlyBudgetUsd: number, budgetName: string): cw.TextWidget {
       '# eslojusto.es · API',
       `[Live Tail de las tres funciones](${liveTail()}) · Logs: ${logLinks} · Lambda: ${lambdaLinks} · [Presupuesto ${budgetName}](https://console.aws.amazon.com/billing/home#/budgets) · [Cost Explorer](https://console.aws.amazon.com/costmanagement/home#/cost-explorer)`,
       '',
+      `El coste IA cuenta todo Bedrock de la cuenta: también las evaluaciones, que comparten presupuesto.`,
+      '',
       `**Bien** es: 0 errores de Lambda, 0 limitaciones, 0 \`model_unavailable\`, duración p95 de extract por debajo de 60 s (la mitad de su tiempo límite) y coste IA por debajo de ${daily} USD al día (${monthlyBudgetUsd} USD al mes).`,
     ].join('\n'),
   });
@@ -154,7 +154,14 @@ function logTokenPrice(): { readonly input: number; readonly output: number } {
 
 export function addDashboard(
   stack: Stack,
-  budget: { readonly monthlyUsd: number; readonly name: string },
+  {
+    budget,
+    reserved,
+  }: {
+    readonly budget: { readonly monthlyUsd: number; readonly name: string };
+    // Each function's reserved concurrency; null while nothing is reserved.
+    readonly reserved: { readonly extract: number; readonly payments: number } | null;
+  },
 ): cw.Dashboard {
   const dashboard = new cw.Dashboard(stack, 'Dashboard', {
     dashboardName: DASHBOARD_NAME,
@@ -206,18 +213,21 @@ export function addDashboard(
       ]),
     }),
     new cw.GraphWidget({
-      title: 'Ejecuciones simultáneas frente al límite de la cuenta',
+      title: 'Ejecuciones simultáneas frente a la reserva de cada función',
       width: 6,
-      left: [
-        regional('ConcurrentExecutions', 'cuenta', 'Maximum').with({ period: Duration.minutes(5) }),
-        ...KEYS.map((k) =>
-          lambdaMetric(k, 'ConcurrentExecutions', 'Maximum').with({ period: Duration.minutes(5) }),
-        ),
-      ],
+      left: KEYS.map((k) =>
+        lambdaMetric(k, 'ConcurrentExecutions', 'Maximum').with({ period: Duration.minutes(5) }),
+      ),
       leftYAxis: { min: 0 },
-      leftAnnotations: [
-        { value: ACCOUNT_CONCURRENCY_LIMIT, label: `límite (${ACCOUNT_CONCURRENCY_LIMIT})` },
-      ],
+      leftAnnotations: reserved
+        ? [
+            { value: reserved.extract, label: `reserva de extract (${reserved.extract})` },
+            {
+              value: reserved.payments,
+              label: `reserva de checkout y pass (${reserved.payments} cada una)`,
+            },
+          ]
+        : [],
     }),
   );
 
@@ -283,6 +293,21 @@ export function addDashboard(
       ],
       cw.LogQueryVisualizationType.TABLE,
       6,
+    ),
+  );
+
+  // The class of the error a request failed on or recovered from, from a closed list.
+  dashboard.addWidgets(
+    logQuery(
+      'Errores por clase y función',
+      ['extract', 'checkout', 'pass'],
+      [
+        'filter ispresent(error)',
+        'stats count(*) as peticiones by op, code, error',
+        'sort peticiones desc',
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+      24,
     ),
   );
 
