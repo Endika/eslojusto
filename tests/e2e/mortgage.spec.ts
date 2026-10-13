@@ -1,5 +1,5 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import { fitsScreen, noSideScroll } from '../support/sheets';
+import { fitsScreen, forwardButton, noSideScroll } from '../support/sheets';
 
 // Runs only against a build with /hipoteca/ (TEST_MORTGAGE=1). The norms, rulings and legal
 // interest are read as loaded on this day, so the clock is fixed.
@@ -59,9 +59,7 @@ const card = (page: Page, title: string) =>
 // page turn: it moves in steps, so a click during it can land beside its target.
 async function next(page: Page) {
   await fitsScreen(page);
-  const review = page.getByRole('button', { name: 'Revisar' });
-  if (await review.isVisible()) await review.click();
-  else await page.getByRole('button', { name: 'Siguiente' }).click();
+  await (await forwardButton(page)).click();
   await page.waitForFunction(() =>
     document.getAnimations().every((a) => a.playState !== 'running'),
   );

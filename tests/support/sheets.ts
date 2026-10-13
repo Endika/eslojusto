@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 // Moves to the next sheet and waits out the page turn: it moves in steps, so a click during it can
 // land beside its target.
@@ -7,6 +7,24 @@ export async function nextSheet(page: Page): Promise<void> {
   await page.waitForFunction(() =>
     document.getAnimations().every((a) => a.playState !== 'running'),
   );
+}
+
+// Whether the sheet on screen is the last one, whose button reviews, decided once one of the two
+// buttons is on screen: deciding on what shows at that instant can catch a page turn.
+export async function atLastSheet(page: Page): Promise<boolean> {
+  const review = page.getByRole('button', { name: 'Revisar', exact: true });
+  await expect(
+    review.or(page.getByRole('button', { name: 'Siguiente', exact: true })),
+  ).toBeVisible();
+  return review.isVisible();
+}
+
+// The button the sheet on screen moves on with: «Revisar» on the last sheet, «Siguiente» before it.
+export async function forwardButton(page: Page): Promise<Locator> {
+  return page.getByRole('button', {
+    name: (await atLastSheet(page)) ? 'Revisar' : 'Siguiente',
+    exact: true,
+  });
 }
 
 // No page is ever wider than the screen.
