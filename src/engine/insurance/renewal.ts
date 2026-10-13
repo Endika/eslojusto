@@ -48,17 +48,15 @@ export function nonRenewal(input: InsuranceInput, today: CivilDate, norms: NormT
 
 // How far ahead of the end of the period the notice of changes arrived, against art. 22.3, as a
 // fact. What a late notice leads to is not said, and neither is whether a premium rise alone is a
-// change of the contract: no official source for either has been read.
-export function changeNotice(input: InsuranceInput, today: CivilDate, norms: NormTable): Finding {
+// change of the contract: no official source for either has been read. Without a notice (none
+// arrived, or a policy that does not renew) there is nothing to check.
+export function changeNotice(
+  input: InsuranceInput,
+  today: CivilDate,
+  norms: NormTable,
+): Finding | null {
   const { notice } = input;
-  if (notice === null)
-    return finding(
-      'change_notice',
-      'not_entered',
-      [insurancePhrase('item.not_entered')],
-      ['change_notice'],
-      norms,
-    );
+  if (notice === null) return null;
   const deadline = monthsBefore(input.expiresOn, CHANGE_NOTICE_MONTHS);
   const days = { days: daysBetween(notice.receivedOn, input.expiresOn) };
   const status = compareDates(notice.receivedOn, deadline.day) <= 0 ? 'on_time' : 'late';
@@ -82,9 +80,10 @@ export function changeNotice(input: InsuranceInput, today: CivilDate, norms: Nor
 }
 
 // The change in premium, as a fact: no verdict on whether it is high or low.
-export function premiumChange(input: InsuranceInput, norms: NormTable): Finding {
+export function premiumChange(input: InsuranceInput, norms: NormTable): Finding | null {
   const notice = input.notice;
-  if (notice === null || notice.previousPremium === null || notice.newPremium === null)
+  if (notice === null) return null;
+  if (notice.previousPremium === null || notice.newPremium === null)
     return finding('premium', 'not_entered', [insurancePhrase('item.not_entered')], [], norms);
   const difference = round2(notice.newPremium - notice.previousPremium);
   const percent = round2((difference / notice.previousPremium) * PERCENT);

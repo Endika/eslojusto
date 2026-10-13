@@ -53,13 +53,18 @@ function policyCorrection(input: InsuranceInput, norms: NormTable): InformationB
     'policy_correction',
     [
       insurancePhrase('information.policy_correction'),
-      input.policyReceived === false
-        ? insurancePhrase('information.policy_correction.no_policy')
-        : delivered === null
-          ? insurancePhrase('information.policy_correction.delivery_unknown')
-          : insurancePhrase('information.policy_correction.until', {
-              day: day(addMonthsClamped(delivered, CORRECTION_MONTHS)),
-            }),
+      // The delivery is asked only of a policy contracted at a distance.
+      ...(input.distance === false
+        ? []
+        : [
+            input.policyReceived === false
+              ? insurancePhrase('information.policy_correction.no_policy')
+              : delivered === null
+                ? insurancePhrase('information.policy_correction.delivery_unknown')
+                : insurancePhrase('information.policy_correction.until', {
+                    day: day(addMonthsClamped(delivered, CORRECTION_MONTHS)),
+                  }),
+          ]),
     ],
     ['policy_correction'],
     norms,

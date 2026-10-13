@@ -60,7 +60,7 @@ describe('the insurance result', () => {
     const input = policy({ notice: notice({ receivedOn: parseDate('2027-01-20') }) });
     renderInsuranceResult(root, review(input, parseDate('2027-01-25')), tr);
     expect(cards(root)).toEqual([
-      { item: 'non_renewal', status: 'Te quedan 7 días (hasta el 01-02-2027)' },
+      { item: 'non_renewal', status: 'Abierto hasta el 01-02-2027 (7 días desde hoy)' },
       {
         item: 'change_notice',
         status: 'Llegó con 40 días de antelación: la ley pide al menos dos meses',
@@ -72,7 +72,7 @@ describe('the insurance result', () => {
     expect(text).toContain('El aviso te llegó el 20-01-2027, 40 días antes del vencimiento');
     expect(text).toContain('como tarde el 01-02-2027');
     expect(text).toContain('Ley de Contrato de Seguro, art. 22.2');
-    expect(text).toContain('con efectos desde el 17-04-1981 · en vigor');
+    expect(text).toContain('con efectos desde el 01-01-2016 · en vigor');
   });
 
   it('says so on the last day, and when the period has ended', () => {
@@ -93,7 +93,7 @@ describe('the insurance result', () => {
     renderInsuranceResult(root, review(input), tr);
     expect(cards(root).at(-1)).toEqual({
       item: 'distance_withdrawal',
-      status: 'Te quedan 10 días (hasta el 19-10-2026)',
+      status: 'Abierto hasta el 19-10-2026 (10 días desde hoy)',
     });
     expect(root.textContent).toContain('desde que recibes las condiciones del contrato');
   });

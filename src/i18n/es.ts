@@ -4346,7 +4346,7 @@ export const es = {
   'insurance.guide.withdrawal.p1':
     'Si contrataste el seguro por internet o por teléfono sin ver a nadie, tienes 14 días naturales para desistir, desde que lo contrataste o, si recibiste las condiciones del contrato después, desde ese día (art. 10.1 de la Ley 22/2007).',
   'insurance.guide.withdrawal.p2':
-    'La ley deja fuera los seguros con los que cumples una obligación de asegurarte, como el seguro obligatorio del coche. No está comprobado en una fuente oficial si se puede desistir solo de las coberturas voluntarias del coche, ni si queda fuera un seguro de hogar que te pide tu hipoteca: en esos casos la revisión no da una fecha.',
+    'La ley deja fuera los seguros con los que cumples una obligación de asegurarte, como el seguro obligatorio del coche. Un seguro de hogar que te pide tu hipoteca también cumple una (art. 8 de la Ley 2/1981). La ley no aclara si se puede desistir solo de las coberturas voluntarias de esas pólizas: en esos casos la revisión no da una fecha.',
   'insurance.guide.proportional.title': 'Asegurar por menos o por más de lo que vale',
   'insurance.guide.proportional.p1':
     'Si la suma asegurada es menor que lo que vale lo asegurado, la aseguradora paga el daño en la misma proporción, salvo que la póliza lo excluya (art. 30). Por ejemplo, una vivienda que vale 200.000 € asegurada por 150.000 €: ante un daño de 20.000 €, la aseguradora paga 15.000 €.',
@@ -4368,7 +4368,7 @@ export const es = {
     'La aseguradora tiene que comunicarte cualquier modificación del contrato con al menos dos meses de antelación al final del periodo en curso (art. 22.3 de la Ley de Contrato de Seguro). Qué consecuencia tiene un aviso que llega tarde no se dice aquí: no se ha encontrado en una fuente oficial.',
   'insurance.faq.withdrawal': '¿Puedo desistir de un seguro contratado por internet?',
   'insurance.faq.withdrawal_answer':
-    'Si lo contrataste por internet o por teléfono sin ver a nadie, tienes 14 días naturales desde que lo contrataste o, si recibiste las condiciones del contrato después, desde ese día (art. 10.1 de la Ley 22/2007). No vale para los seguros con los que cumples una obligación de asegurarte, como el seguro obligatorio del coche.',
+    'Si lo contrataste por internet o por teléfono sin ver a nadie, tienes 14 días naturales desde que lo contrataste o, si recibiste las condiciones del contrato después, desde ese día; en los seguros de vida son 30 días (art. 10.1 de la Ley 22/2007). No vale para los seguros con los que cumples una obligación de asegurarte, como el seguro obligatorio del coche.',
   'insurance.faq.proportional_rule': '¿Qué pasa si aseguro mi casa por menos de lo que vale?',
   'insurance.faq.proportional_rule_answer':
     'La aseguradora paga el daño en la misma proporción que hay entre la suma asegurada y lo que vale lo asegurado, salvo que la póliza lo excluya (art. 30 de la Ley de Contrato de Seguro). Por ejemplo, una vivienda que vale 200.000 € asegurada por 150.000 €: ante un daño de 20.000 €, la aseguradora paga 15.000 €.',
@@ -4500,7 +4500,7 @@ export const es = {
   'client.insurance.item.distance_withdrawal_voluntary':
     'Desistir: coberturas voluntarias del coche',
 
-  'client.insurance.status.open': 'Te quedan {dias} (hasta el {fecha})',
+  'client.insurance.status.open': 'Abierto hasta el {fecha} ({dias} desde hoy)',
   'client.insurance.status.open_today': 'Hoy es el último día ({fecha})',
   'client.insurance.status.ended': 'El plazo terminó el {fecha}',
   'client.insurance.status.not_started': 'El plazo aún no ha empezado',
@@ -4518,7 +4518,7 @@ export const es = {
     'No has metido este dato, así que no se calcula.',
   'client.insurance.calculation.non_renewal.last_day':
     'Tu póliza vence el {expiry}. La ley pide comunicar por escrito que no la renuevas con al menos un mes de antelación: el último día es el {day}.',
-  'client.insurance.calculation.non_renewal.days_left': 'Desde hoy quedan {days}.',
+  'client.insurance.calculation.non_renewal.days_left': 'Es dentro de {days}.',
   'client.insurance.calculation.non_renewal.days_left_today': 'Hoy es ese último día.',
   'client.insurance.calculation.non_renewal.ended': 'Ese plazo terminó el {day}.',
   'client.insurance.calculation.non_renewal.arrive_by':
@@ -4561,7 +4561,7 @@ export const es = {
   'client.insurance.calculation.withdrawal.receipt_unknown':
     'No has metido el día en que recibiste las condiciones del contrato, así que se cuenta desde el día en que la contrataste; si las recibiste después, el plazo acaba más tarde.',
   'client.insurance.calculation.withdrawal.days_left':
-    'Desde hoy quedan {days}, hasta el {day} incluido.',
+    'El último día es el {day}, dentro de {days}.',
   'client.insurance.calculation.withdrawal.days_left_today': 'Hoy, {day}, es el último día.',
   'client.insurance.calculation.withdrawal.ended': 'El plazo terminó el {day}.',
   'client.insurance.calculation.withdrawal.not_started':
@@ -4570,8 +4570,8 @@ export const es = {
     'La ley deja fuera del desistimiento los seguros con los que cumples una obligación de asegurarte, como el seguro obligatorio del coche.',
   'client.insurance.calculation.withdrawal.voluntary_unverified':
     'Tu póliza incluye también coberturas voluntarias. No está comprobado en una fuente oficial si se puede desistir solo de ellas, así que no se da una fecha.',
-  'client.insurance.calculation.withdrawal.mortgage_unverified':
-    'Si tu hipoteca te pide asegurar la vivienda, este seguro podría cumplir una obligación de asegurarte, que la ley deja fuera del desistimiento. La norma de la hipoteca aún no se ha comprobado, así que no se da una fecha.',
+  'client.insurance.calculation.withdrawal.mortgage_duty':
+    'Si tu hipoteca te pide asegurar la vivienda, este seguro cumple una obligación de asegurarte: los bienes hipotecados tienen que estar asegurados contra daños (art. 8 de la Ley 2/1981). La ley deja fuera del desistimiento los seguros con los que cumples una obligación así, pero no dice si eso alcanza a toda la póliza o solo a esa cobertura, así que no se da una fecha.',
   'client.insurance.calculation.information.policy_correction':
     'Si la póliza no coincide con lo que pediste o con lo que acordaste, la ley da un mes desde que te la entregan para pedir a la aseguradora que lo corrija; pasado ese mes, vale lo que dice la póliza.',
   'client.insurance.calculation.information.policy_correction.until':
@@ -5008,7 +5008,7 @@ export const es = {
   'client.credit.status.within_cap': 'Dentro del tope',
   'client.credit.status.charged_without_basis': 'Cobro de más ({importe})',
   'client.credit.status.nothing_charged': 'No cabe compensación y no te la cobraron',
-  'client.credit.status.open': 'Te quedan {dias} (hasta el {fecha})',
+  'client.credit.status.open': 'Abierto hasta el {fecha} ({dias} desde hoy)',
   'client.credit.status.open_today': 'Hoy es el último día ({fecha})',
   'client.credit.status.ended': 'El plazo terminó el {fecha}',
   'client.credit.status.not_started': 'El plazo aún no ha empezado',
@@ -5168,8 +5168,7 @@ export const es = {
     'Son 14 días naturales desde el día en que lo contrataste, el {day}, sin contar ese día.',
   'client.credit.calculation.withdrawal.start_on_terms':
     'Son 14 días naturales desde que recibes el contrato y su información: como llegaron después, se cuentan desde el {day}, sin contar ese día.',
-  'client.credit.calculation.withdrawal.days_left':
-    'Desde hoy quedan {days}, hasta el {day} incluido.',
+  'client.credit.calculation.withdrawal.days_left': 'El último día es el {day}, dentro de {days}.',
   'client.credit.calculation.withdrawal.days_left_today': 'Hoy, {day}, es el último día.',
   'client.credit.calculation.withdrawal.ended': 'El plazo terminó el {day}.',
   'client.credit.calculation.withdrawal.not_started':

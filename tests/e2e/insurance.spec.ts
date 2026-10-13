@@ -123,7 +123,7 @@ for (const { name, viewport } of SIZES) {
         notice: { on: '2027-01-20', previous: '300,00', next: '345,00' },
       });
       await expect(card(page, 'Comunicar que no renuevas')).toContainText(
-        'Te quedan 7 días (hasta el 01-02-2027)',
+        'Abierto hasta el 01-02-2027 (7 días desde hoy)',
       );
       await expect(card(page, 'Comunicar que no renuevas')).toContainText(
         'tiene que llegar a la aseguradora como tarde el 01-02-2027',
@@ -149,9 +149,8 @@ for (const { name, viewport } of SIZES) {
       await expect(card(page, 'Comunicar que no renuevas')).toContainText(
         'El plazo terminó el 01-02-2027',
       );
-      await expect(card(page, 'Aviso de cambios antes del vencimiento')).toContainText(
-        'No lo has metido',
-      );
+      // No notice arrived, so there is no notice to check.
+      await expect(card(page, 'Aviso de cambios antes del vencimiento')).toHaveCount(0);
     });
 
     test('a motor policy bought online: compulsory cover out, voluntary covers to review', async ({
@@ -185,7 +184,7 @@ for (const { name, viewport } of SIZES) {
         receivedOn: '2026-10-05',
       });
       const withdrawal = card(page, 'Desistir de un seguro contratado a distancia');
-      await expect(withdrawal).toContainText('Te quedan 10 días (hasta el 19-10-2026)');
+      await expect(withdrawal).toContainText('Abierto hasta el 19-10-2026 (10 días desde hoy)');
       await expect(withdrawal).toContainText('desde que recibes las condiciones del contrato');
       await expect(result(page)).toContainText('Con tus fechas, ese mes llega hasta el 05-11-2026');
     });

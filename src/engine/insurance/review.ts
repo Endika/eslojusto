@@ -66,7 +66,7 @@ export function reviewInsurance(
         changeNotice(input, today, norms),
         premiumChange(input, norms),
         ...distanceWithdrawal(input, today, norms),
-      ],
+      ].filter((f): f is Finding => f !== null),
       information: informationBlocks(input, norms),
       unchecked: UNCHECKED,
       offerPass: false,

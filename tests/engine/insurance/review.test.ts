@@ -116,8 +116,6 @@ describe('insurance review', () => {
     );
     expect(r.findings.map((f) => [f.id, f.status])).toEqual([
       ['non_renewal', 'open'],
-      ['change_notice', 'not_entered'],
-      ['premium', 'not_entered'],
       ['distance_withdrawal_compulsory', 'not_applicable'],
       ['distance_withdrawal_voluntary', 'review_it'],
     ]);
@@ -156,7 +154,11 @@ describe('insurance review', () => {
 describe('information blocks', () => {
   it('gives the month to ask for a correction of the policy, from its delivery', () => {
     const block = review(
-      policy({ policyReceivedOn: parseDate('2024-01-31'), concludedOn: parseDate('2024-01-15') }),
+      policy({
+        distance: true,
+        policyReceivedOn: parseDate('2024-01-31'),
+        concludedOn: parseDate('2024-01-15'),
+      }),
     ).information[0];
     expect(block?.calculation[1]).toEqual({
       key: 'information.policy_correction.until',
@@ -165,19 +167,29 @@ describe('information blocks', () => {
   });
 
   it('has no date while the policy has not arrived', () => {
-    const block = review(policy({ policyReceived: false })).information[0];
+    const block = review(policy({ distance: true, policyReceived: false })).information[0];
     expect(block?.calculation[1]?.key).toBe('information.policy_correction.no_policy');
   });
 
-  it.each([
-    ['not known', { policyReceived: null }],
-    ['received on a day not given', { policyReceived: true, policyReceivedOn: null }],
-  ] as const)('gives no date when the delivery is %s', (_, delivery) => {
-    const block = review(policy({ concludedOn: parseDate('2024-01-15'), ...delivery }))
-      .information[0];
+  it('gives no date when the policy came on a day not given', () => {
+    const block = review(
+      policy({
+        distance: true,
+        concludedOn: parseDate('2024-01-15'),
+        policyReceived: true,
+        policyReceivedOn: null,
+      }),
+    ).information[0];
     expect(block?.calculation[1]).toEqual({
       key: 'information.policy_correction.delivery_unknown',
     });
+  });
+
+  it('says nothing of the delivery when it was not asked', () => {
+    const block = review(
+      policy({ concludedOn: parseDate('2024-01-15'), distance: false, policyReceived: null }),
+    ).information[0];
+    expect(block?.calculation.map((p) => p.key)).toEqual(['information.policy_correction']);
   });
 
   it('works the proportional rule through an example', () => {

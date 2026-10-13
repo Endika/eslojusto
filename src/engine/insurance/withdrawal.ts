@@ -102,15 +102,15 @@ export function distanceWithdrawal(
         norms,
       ),
     ];
-  // UNVERIFIED: a mortgage requires insuring the home against damage (art. 8 Ley 2/1981, not yet
-  // read), so such a policy may meet a duty to insure and be excluded (art. 10.2.b.4.º). Until that
-  // article is read it is left to review, with no date.
+  // A mortgage requires insuring the home against damage (art. 8 Ley 2/1981), so the policy meets a
+  // duty to insure and may be excluded (art. 10.2.b.4.º); whether the whole policy or only that cover
+  // is not settled, so it is left to review, with no date.
   if (input.line === 'home' && input.mortgageRequired !== false)
     return [
       finding(
         id,
         'review_it',
-        [insurancePhrase('withdrawal.mortgage_unverified')],
+        [insurancePhrase('withdrawal.mortgage_duty')],
         ['distance_withdrawal', 'distance_withdrawal_excluded'],
         norms,
       ),
