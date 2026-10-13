@@ -22,7 +22,7 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/': '2026-10-11',
   '/finiquito/': '2026-10-09',
   '/aviso-legal/': '2026-10-11',
-  '/privacidad/': '2026-10-11',
+  '/privacidad/': '2026-10-13',
   // Moves with the INE's newest figure on the page and with each check of its norms.
   [RENT_INDICES]: lastChanged(),
   '/finiquito/baja-voluntaria/': '2026-10-07',

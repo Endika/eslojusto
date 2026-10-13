@@ -794,7 +794,9 @@ Nothing here has been run. Each step needs an account administrator.
    retention to none (on 07-10-2026 it reads `inherit`), so a model that would retain data is
    blocked instead:
    `aws bedrock put-account-data-retention --mode none --region eu-south-2`, then check
-   `aws bedrock get-account-data-retention --region eu-south-2`. Model invocation logging must
+   `aws bedrock get-account-data-retention --region eu-south-2`. Do the same in every region
+   the EU profile routes to (eu-central-1, eu-north-1, eu-west-1, eu-west-3; eu-south-1 is not
+   enabled on the account): all five read `none` since 13-10-2026. Model invocation logging must
    stay off: `aws bedrock get-model-invocation-logging-configuration --region eu-south-2`
    prints nothing (true on 07-10-2026). Invoke Sonnet 4.6 (and Haiku 4.5 if it goes back to reading first) once from the console
    playground so the Marketplace subscription exists; the execution role has no Marketplace
@@ -1002,10 +1004,11 @@ the owner's written approval and that figure.
 ## Unverified
 
 - That a budget action resets by itself at the start of the next month; if not, detach
-  `eslojusto-api-deny-bedrock` from `eslojusto-api-extract` by hand.
+  `eslojusto-api-deny-bedrock` from `eslojusto-api-extract` by hand. Raising the budget's limit
+  above the spend did reset it on 13-10-2026 (back to STANDBY, the policy detached).
 - That `iam:AttachRolePolicy`/`DetachRolePolicy` on the one role is all the budget action needs.
-- That `data_retention_mode: none` set in eu-south-2 also governs requests the EU profile
-  routes to other EU regions.
+- Which region's `data_retention_mode` governs a request the EU profile routes elsewhere; every
+  region it can route to is set to `none`, so either reading holds.
 - That Stripe accepts a metadata update on a `complete` Checkout Session, and that the three
   restricted-key permissions are enough. The API reference lists `metadata` among the update
   parameters without the "while the session is active" restriction it puts on others; step 9

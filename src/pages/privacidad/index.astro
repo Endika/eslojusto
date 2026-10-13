@@ -155,7 +155,7 @@ const stored = [
           : []),
         {
           what: tx('privacy.data_pass'),
-          where: `En el almacenamiento local (localStorage) de tu navegador, y solo si los usas: un contador firmado de tus lecturas gratis del día («${STORAGE_KEYS.quota}»); si compras el pase, el pase y las lecturas que le quedan («${STORAGE_KEYS.pass}») y el código de cada pago que empiezas, con un número al azar que solo conoce tu navegador, para poder recuperar el pase («${STORAGE_KEYS.checkout}»; cada pago se quita a los 7 días si no se completó, o cuando caduca su pase). No llevan tu nombre ni nada de tus documentos, y solo salen de tu dispositivo con la siguiente lectura, para recuperar el pase o para comprobarlo antes de enseñarte el detalle de tu revisión, el informe o la carta. Se borran al borrar los datos de este sitio en tu navegador; por eso el pase solo vale en este navegador y se pierde en otro dispositivo, en una ventana privada o al borrarlos. Si la lectura no está disponible, la pestaña lo recuerda una hora en su almacenamiento de sesión («${OUTAGE_KEY}», solo con la hora) para no ofrecértela mientras tanto.`,
+          where: `En el almacenamiento local (localStorage) de tu navegador, y solo si los usas: un contador firmado de tus lecturas gratis del día («${STORAGE_KEYS.quota}»); si compras el pase, el pase y las lecturas que le quedan («${STORAGE_KEYS.pass}») y el código de cada pago que empiezas, con un número al azar que solo conoce tu navegador, para poder recuperar el pase («${STORAGE_KEYS.checkout}»; cada pago se quita a los 7 días si no se completó, o cuando caduca su pase). No llevan tu nombre ni nada de tus documentos, y solo salen de tu dispositivo con la siguiente lectura, para recuperar el pase o para comprobarlo antes de enseñarte el detalle de tu revisión, el informe o la carta. Los recibe el servidor de eslojusto.es en AWS, que pregunta a Stripe por el pago. El pase caducado y el contador de un día anterior se borran solos la siguiente vez que la página los consulta, y todo se borra al borrar los datos de este sitio en tu navegador; por eso el pase solo vale en este navegador y se pierde en otro dispositivo, en una ventana privada o al borrarlos. Si la lectura no está disponible, la pestaña lo recuerda una hora en su almacenamiento de sesión («${OUTAGE_KEY}», solo con la hora) para no ofrecértela mientras tanto.`,
         },
         {
           what: tx('privacy.data_checkout'),
@@ -181,7 +181,7 @@ const stored = [
 const tracked = [
   {
     when: 'Con cada aviso',
-    what: 'La fecha y hora de cada aviso y un número al azar que solo existe mientras la página está abierta. La dirección de la página sin parámetros: el dominio, la ruta y la hoja en la que estás. Tu navegador y su versión, y tu sistema (Windows, Android…). El tipo de dispositivo (ordenador, móvil o tableta) y el tamaño de la ventana. El dominio de la web de la que vienes (por ejemplo «www.google.com»), sin la dirección completa. Si llegas desde un enlace de campaña, su origen, su medio y su nombre (utm_source, utm_medium, utm_campaign). Y tres datos técnicos de PostHog: la clave del proyecto de eslojusto.es, la versión de su código y una marca que le pide no crear ningún perfil.',
+    what: 'La fecha y hora de cada aviso y un número al azar que solo existe mientras la página está abierta. La dirección de la página sin parámetros: el dominio, la ruta y la hoja en la que estás. Tu navegador y su versión, y tu sistema (Windows, Android…). El tipo de dispositivo (ordenador, móvil o tableta) y el tamaño de la ventana. El dominio de la web de la que vienes (por ejemplo «www.google.com»), sin la dirección completa. Si llegas desde un enlace de campaña, su origen, su medio y su nombre (utm_source, utm_medium, utm_campaign), solo cuando son un código corto de letras, números y guiones. Y tres datos técnicos de PostHog: la clave del proyecto de eslojusto.es, la versión de su código y una marca que le pide no crear ningún perfil.',
   },
   {
     when: 'Al abrir una página',
@@ -515,12 +515,17 @@ const tracked = [
             El pase del informe se paga en la página de Stripe Payments Europe, Ltd. (Irlanda).
             eslojusto.es no ve ni guarda los datos de tu tarjeta ni de Bizum: solo pregunta a Stripe
             si el pago se ha hecho y por qué importe, y anota junto al pago cuántas lecturas has
-            hecho con el pase, sin nada de lo que leyeron. La base jurídica es el contrato de compra
-            (art. 6.1.b) y las obligaciones contables y fiscales (art. 6.1.c). Stripe conserva los
-            datos del pago el tiempo que le exigen esas obligaciones y las normas contra el blanqueo
-            de capitales; lo explica en su{' '}
-            <a href="https://stripe.com/es/privacy">política de privacidad</a>. Las condiciones de
-            la compra están en el{' '}
+            hecho con el pase, sin nada de lo que leyeron. Stripe te pide tu correo y, según cómo
+            pagues, también tu nombre, tu país o tu teléfono. Esos datos quedan en la cuenta de
+            Stripe de eslojusto.es, que los puede ver en el panel de Stripe para atender un problema
+            con el pago o una devolución, y se conservan el tiempo que exigen las normas contables y
+            fiscales. La base jurídica es el contrato de compra (art. 6.1.b) y las obligaciones
+            contables y fiscales (art. 6.1.c). Stripe puede tratar los datos en Estados Unidos;
+            Stripe, Inc. está adherida al Marco de Privacidad de Datos UE-EE. UU. y su contrato
+            incluye las cláusulas contractuales tipo. Stripe conserva los datos del pago el tiempo
+            que le exigen esas obligaciones y las normas contra el blanqueo de capitales; lo explica
+            en su <a href="https://stripe.com/es/privacy">política de privacidad</a>. Las
+            condiciones de la compra están en el{' '}
             <a href={`${import.meta.env.BASE_URL}aviso-legal/#condiciones`}>aviso legal</a>.
           </p>
         </section>
@@ -567,7 +572,8 @@ const tracked = [
           eslojusto.es es un proyecto de Endika Iglesias, responsable de este tratamiento. Para
           cualquier pregunta sobre tus datos, escribe a <a href={`mailto:${email}`}>{email}</a>. Si
           has escrito a esa dirección, puedes pedir en ella que se consulten, corrijan o borren los
-          datos de tu correo.
+          datos de tu correo. Si has pagado el pase, también los datos de tu pago en Stripe, salvo
+          los que haya que conservar por las normas contables y fiscales.
         </p>
         <p>
           Lo que se mide no te identifica, así que no hay forma de encontrar tus avisos para

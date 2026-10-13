@@ -79,6 +79,16 @@ export function passClaims(token: string): PassClaims | null {
   return { sessionId: sid, expiresAt: exp as number };
 }
 
+// The UTC day a free-reads counter counts, as the API signs it.
+function quotaDay(token: string): string | null {
+  const [version, payload] = token.split('.');
+  if (version !== 'v1' || !payload) return null;
+  const c = base64UrlJson(payload);
+  if (typeof c !== 'object' || c === null) return null;
+  const { typ, day } = c as Record<string, unknown>;
+  return typ === 'quota' && typeof day === 'string' ? day : null;
+}
+
 export type PassState = 'none' | 'valid' | 'exhausted' | 'expired';
 
 export function passState(stored: StoredPass | null, nowMs: number): PassState {
@@ -111,17 +121,21 @@ export function createPassStore(store: KeyValueStore, now: () => number = () => 
       ? store.set(STORAGE_KEYS.checkout, JSON.stringify(list))
       : store.remove(STORAGE_KEYS.checkout);
   return {
+    // An expired pass is dropped as soon as it is read: it names a Stripe session and grants nothing.
     pass(): StoredPass | null {
       const v = readJson(store, STORAGE_KEYS.pass);
       if (!v || typeof v['token'] !== 'string' || typeof v['expiresAt'] !== 'number') return null;
       const left = v['readsLeft'];
-      return {
+      const stored: StoredPass = {
         token: v['token'],
         expiresAt: v['expiresAt'],
         readsLeft: Number.isInteger(left) ? Math.min(PASS_READS, left as number) : PASS_READS,
         ...(v['usable'] === false ? { usable: false as const } : {}),
         ...(v['renewed'] === true ? { renewed: true as const } : {}),
       };
+      if (passState(stored, now()) !== 'expired') return stored;
+      store.remove(STORAGE_KEYS.pass);
+      return null;
     },
     savePass(pass: StoredPass): void {
       store.set(STORAGE_KEYS.pass, JSON.stringify(pass));
@@ -142,8 +156,13 @@ export function createPassStore(store: KeyValueStore, now: () => number = () => 
     forgetQuota(): void {
       store.remove(STORAGE_KEYS.quota);
     },
+    // A counter from another day counts nothing any more, so it is dropped.
     quota(): string | null {
-      return store.get(STORAGE_KEYS.quota);
+      const token = store.get(STORAGE_KEYS.quota);
+      const day = token === null ? null : quotaDay(token);
+      if (day === null || day === new Date(now()).toISOString().slice(0, 10)) return token;
+      store.remove(STORAGE_KEYS.quota);
+      return null;
     },
     saveQuota(token: string): void {
       store.set(STORAGE_KEYS.quota, token);

@@ -4,6 +4,7 @@ import { everyAssessed, type EmploymentReview } from '../engine/employment/revie
 import type { Assessed, EmploymentInput, Finding } from '../engine/employment/types';
 import type { Detail, EmploymentEvents } from '../employment/ports';
 import {
+  EMPLOYMENT_TRACKABLE_FIELDS,
   POINT_STATUSES,
   attemptBucket,
   differenceBucket,
@@ -189,6 +190,7 @@ export function employmentAnalytics(track: Track, now: () => number): Employment
       track('went_back', { from, to });
     },
     fieldRejected(step, field) {
+      if (!(EMPLOYMENT_TRACKABLE_FIELDS as readonly string[]).includes(field)) return;
       track('validation_error', {
         section: step,
         field: field as Props<'validation_error'>['field'],

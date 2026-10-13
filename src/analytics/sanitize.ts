@@ -60,10 +60,17 @@ export function cleanUrl(url: string): string {
   }
 }
 
+// A campaign tag comes from the link as written, so only a short code passes: never a name or an
+// address someone put in it.
+const CAMPAIGN_KEYS: ReadonlySet<string> = new Set(['utm_source', 'utm_medium', 'utm_campaign']);
+const CAMPAIGN_CODE = /^[a-z0-9_-]{1,40}$/;
+
 export function cleanProperties(props: Properties): Properties {
   const clean: Properties = {};
   for (const [key, value] of Object.entries(props)) {
     if (!ALLOWED_KEYS.has(key) || value === null || value === undefined) continue;
+    if (CAMPAIGN_KEYS.has(key) && !(typeof value === 'string' && CAMPAIGN_CODE.test(value)))
+      continue;
     clean[key] = key === '$current_url' && typeof value === 'string' ? cleanUrl(value) : value;
   }
   return clean;

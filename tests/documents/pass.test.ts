@@ -43,7 +43,7 @@ describe('passState', () => {
   });
   it('records the reads the API reports, and reads an old entry as a full pass', () => {
     const store = memoryStore();
-    const passes = createPassStore(store);
+    const passes = createPassStore(store, () => NOW * 1000);
     passes.savePass(pass(15));
     passes.updateReads(4);
     expect(passes.pass()?.readsLeft).toBe(4);
@@ -63,7 +63,7 @@ describe('passState', () => {
 describe('createPassStore', () => {
   it('keeps the pass, the quota and the checkout under their own keys', () => {
     const store = memoryStore();
-    const passes = createPassStore(store);
+    const passes = createPassStore(store, () => NOW * 1000);
     passes.savePass(pass(1));
     passes.saveQuota('v1.q.s');
     passes.addCheckout({ nonce: 'n'.repeat(32), sessionId: 'cs_test_abc' });
@@ -72,8 +72,21 @@ describe('createPassStore', () => {
     expect(passes.quota()).toBe('v1.q.s');
     expect(passes.checkouts()).toMatchObject([{ nonce: 'n'.repeat(32), sessionId: 'cs_test_abc' }]);
   });
+  it('drops an expired pass and a free-reads counter from another day once read', () => {
+    const store = memoryStore();
+    const passes = createPassStore(store, () => (NOW + 7200) * 1000);
+    passes.savePass(pass(3));
+    const counter = (day: string) =>
+      `v1.${Buffer.from(JSON.stringify({ typ: 'quota', day, used: 1 })).toString('base64url')}.s`;
+    passes.saveQuota(counter('2026-10-06'));
+    expect(passes.pass()).toBeNull();
+    expect(passes.quota()).toBeNull();
+    expect([...store.data.keys()]).toEqual([]);
+    passes.saveQuota(counter('2026-10-07'));
+    expect(passes.quota()).toBe(counter('2026-10-07'));
+  });
   it('keeps every unredeemed payment, newest first, and drops one once redeemed', () => {
-    const passes = createPassStore(memoryStore());
+    const passes = createPassStore(memoryStore(), () => NOW * 1000);
     passes.addCheckout({ nonce: 'a'.repeat(32), sessionId: 'cs_test_a' });
     passes.addCheckout({ nonce: 'b'.repeat(32), sessionId: 'cs_test_b' });
     expect(passes.checkouts().map((c) => c.sessionId)).toEqual(['cs_test_b', 'cs_test_a']);
@@ -118,14 +131,14 @@ describe('createPassStore', () => {
     ]);
   });
   it('forgets the quota', () => {
-    const passes = createPassStore(memoryStore());
+    const passes = createPassStore(memoryStore(), () => NOW * 1000);
     passes.saveQuota('q');
     passes.forgetQuota();
     expect(passes.quota()).toBeNull();
   });
   it('reads damaged or foreign values as nothing', () => {
     const store = memoryStore();
-    const passes = createPassStore(store);
+    const passes = createPassStore(store, () => NOW * 1000);
     store.set(STORAGE_KEYS.pass, '{');
     store.set(STORAGE_KEYS.checkout, JSON.stringify({ nonce: 'short', sessionId: 'x' }));
     expect(passes.pass()).toBeNull();

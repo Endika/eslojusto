@@ -36,9 +36,11 @@ describe('the catalogue follows the contract form', () => {
     for (const step of STEPS) expect(SECTIONS).toContain(step);
     expect(new Set(SECTIONS).size).toBe(SECTIONS.length);
   });
-  it('every question is a trackable field', () => {
+  it('every question is a trackable field but whether the worker has a disability', () => {
     for (const sheet of SHEETS)
-      for (const field of SHEET_FIELDS[sheet]) expect(EMPLOYMENT_TRACKABLE_FIELDS).toContain(field);
+      for (const field of SHEET_FIELDS[sheet])
+        if (field === 'disability') expect(EMPLOYMENT_TRACKABLE_FIELDS).not.toContain(field);
+        else expect(EMPLOYMENT_TRACKABLE_FIELDS).toContain(field);
   });
   it('every question on the page is a help topic', () => {
     for (const [, anchor] of EMPLOYMENT_FAQ_TOPICS) expect(HELP_TOPICS).toContain(anchor);
@@ -57,6 +59,9 @@ describe('employment events', () => {
       true,
     );
     expect(isValidEvent('validation_error', { section: 'nominas', field: 'payslips' })).toBe(true);
+    expect(
+      isValidEvent('validation_error', { section: 'formacion-datos', field: 'disability' }),
+    ).toBe(false);
     expect(
       isValidEvent('validation_error', { section: 'nominas', field: 'payslips.0.salary' }),
     ).toBe(false);
