@@ -236,6 +236,7 @@ type InformationPhraseKey =
   | 'information.missing_before_start'
   | 'information.missing_on_request'
   | 'information.only_if_used'
+  | 'information.protocol_always'
   | 'information.unknown'
   | 'information.temporary_cause'
   | 'information.agreement.named'

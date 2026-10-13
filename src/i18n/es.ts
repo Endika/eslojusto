@@ -2660,6 +2660,8 @@ export const es = {
     'La empresa tenía que dártelo por escrito antes de que empezaras (art. 7.1).',
   'client.employment.calculation.information.missing_on_request':
     'Puedes pedirlo por escrito y la empresa tiene 30 días hábiles para dártelo.',
+  'client.employment.calculation.information.protocol_always':
+    'El plan de igualdad solo hace falta si la empresa tiene uno, pero el protocolo contra el acoso sexual y por razón de sexo hay que darlo siempre (art. 3.2.l).',
   'client.employment.calculation.information.only_if_used':
     'Solo hace falta si la empresa lo usa o lo tiene, y eso el contrato no lo dice.',
   'client.employment.calculation.information.unknown': 'No sabes si está.',
