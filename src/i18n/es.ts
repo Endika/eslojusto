@@ -877,6 +877,8 @@ export const es = {
     'Solo se calculan las dos pagas habituales (verano y Navidad); las demás dependen del convenio.',
   'client.calculation.employer_notice':
     '{preaviso} días de preaviso − {recibidos} recibidos = {faltan} días × entre {minimo} y {maximo} al día.',
+  'client.calculation.employer_notice_fixed_term_criterion':
+    'El art. 49.1.c obliga a avisar con 15 días cuando el contrato temporal duró más de un año, pero no dice qué pasa si no se avisa. La revisión cuenta los días que faltan como en el despido objetivo (art. 53.1.c): es un criterio, no una cifra que fije la ley.',
   'client.calculation.notice_deduction':
     '{convenio} días de preaviso del convenio − {dados} dados = {faltan} días × {diario} al día como máximo.',
   'client.calculation.notice_deduction.agreement_unknown':
