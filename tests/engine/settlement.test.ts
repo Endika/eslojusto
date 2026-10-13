@@ -338,6 +338,16 @@ describe('notice', () => {
       employerNoticeItem(withInput({ cause: 'fixed_term_end', startDate: f('2026-01-01') })),
     ).toBeNull();
   });
+  it('«más de un año» counts date to date: a year with 29 February is not more', () => {
+    const term = (start: string, end: string) =>
+      employerNoticeItem(
+        withInput({ cause: 'fixed_term_end', startDate: f(start), endDate: f(end) }),
+      );
+    expect(term('2023-03-01', '2024-02-29')).toBeNull();
+    const longer = term('2023-03-01', '2024-03-01');
+    expect(longer).not.toBeNull();
+    expect(longer?.calculation.map((p) => p.key)).toContain('employer_notice_fixed_term_criterion');
+  });
   it('resignation without the agreement figure → deduction not checkable', () => {
     const p = noticeDeductionItem(base);
     expect(p?.direction).toBe('deduction');

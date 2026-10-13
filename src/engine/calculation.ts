@@ -26,6 +26,7 @@ export type PhraseKey =
   | 'extra_pay.single'
   | 'extra_pay.over_two'
   | 'employer_notice'
+  | 'employer_notice_fixed_term_criterion'
   | 'notice_deduction'
   | 'notice_deduction.agreement_unknown'
   | 'severance.unfair'

@@ -2,6 +2,7 @@ import { SOURCES } from './sources';
 import { between } from './money';
 import { phrase, type Phrase, type PhraseKey } from './calculation';
 import {
+  addMonthsClamped,
   compareDates,
   daysInYear,
   daysInMonth,
@@ -14,6 +15,7 @@ import {
 import type { Accrual, FinalPayInput, HolidayUnit, Item } from './types';
 
 const NOTICE_DAYS = 15;
+const MONTHS_IN_YEAR = 12;
 
 export const CALENDAR_MINIMUM = 30;
 export const DEFAULT_WORK_WEEK = 5;
@@ -339,7 +341,10 @@ export function employerNoticeItem(e: FinalPayInput): Item | null {
   const objective = e.cause === 'objective_dismissal';
   // Art. 51.4 ET: a collective dismissal's notice is the objective one's, art. 53.1.c.
   const collective = e.cause === 'collective_dismissal';
-  const longFixedTerm = e.cause === 'fixed_term_end' && calendarDays(e.startDate, e.endDate) > 365;
+  // Art. 49.1.c: «superior a un año», counted date to date: it ends on or after the anniversary.
+  const longFixedTerm =
+    e.cause === 'fixed_term_end' &&
+    compareDates(e.endDate, addMonthsClamped(e.startDate, MONTHS_IN_YEAR)) >= 0;
   if (!objective && !collective && !longFixedTerm) return null;
   const received = e.noticeDaysReceived ?? 0;
   const missingDays = Math.max(0, NOTICE_DAYS - received);
@@ -357,6 +362,8 @@ export function employerNoticeItem(e: FinalPayInput): Item | null {
         minimo: { euros: dayMin },
         maximo: { euros: dayMax },
       }),
+      // Art. 49.1.c asks for the notice but says nothing of what a missing one costs.
+      ...(longFixedTerm ? [phrase('employer_notice_fixed_term_criterion')] : []),
     ],
     dependsOnAgreement: false,
     basedOnYourAnswer: false,
