@@ -64,7 +64,10 @@ export function startAnalytics(): Promise<Client> | undefined {
     .then(({ default: posthog }) => {
       posthog.init(POSTHOG_KEY, POSTHOG_OPTIONS);
       return posthog;
-    });
+    })
+    // A blocked or stale chunk must not reject: every track would raise an unhandled rejection,
+    // which watchErrors tracks as js_error, which rejects again, forever.
+    .catch(() => ({ capture: () => undefined }));
   return client;
 }
 
