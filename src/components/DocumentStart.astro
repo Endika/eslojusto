@@ -72,14 +72,15 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
     <p class="help">{tx('documents.start.help')}</p>
     <p class="start__status" role="status" aria-live="polite" data-start-status></p>
     <div class="start__choices" role="group" aria-label={tx('documents.start.choices')}>
-      <button class="start__choice" type="button" data-start-upload>
+      <!-- Disabled until the document module wires them: a click before then would do nothing. -->
+      <button class="start__choice" type="button" data-start-upload disabled>
         <span class="start__choice-title">{tx('documents.start.upload')}</span>
         <span class="hint">{tx('documents.start.upload_hint')}</span>
       </button>
       <p class="start__unavailable" data-start-unavailable hidden>
         {tx('documents.start.unavailable')}
       </p>
-      <button class="start__choice" type="button" data-start-manual>
+      <button class="start__choice" type="button" data-start-manual disabled>
         <span class="start__choice-title">{tx('documents.start.manual')}</span>
         <span class="hint">{tx('documents.start.manual_hint')}</span>
       </button>
@@ -306,6 +307,9 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
     font: inherit;
     text-align: start;
     cursor: pointer;
+  }
+  .start__choice:disabled {
+    cursor: progress;
   }
   .start__choice:hover {
     border-color: var(--sheet-ink);

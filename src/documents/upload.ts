@@ -755,6 +755,10 @@ export function setUpUpload<F extends string, L extends string>(
   start
     .querySelector('[data-start-continue]')
     ?.addEventListener('click', () => showCalculator(true));
+  for (const button of panels.choose.querySelectorAll<HTMLButtonElement>(
+    '[data-start-upload], [data-start-manual]',
+  ))
+    button.disabled = false;
 
   // A mark tells where a value came from; once the person changes the value, it no longer applies.
   // It sits in the element that holds the answer, the nearest one around the input that has one.

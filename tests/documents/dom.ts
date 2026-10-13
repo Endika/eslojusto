@@ -6,9 +6,9 @@ export const START = `
   <section data-start-panel="choose">
     <h2 class="question" tabindex="-1">Start</h2>
     <p data-start-status></p>
-    <button data-start-upload>Upload</button>
+    <button data-start-upload disabled>Upload</button>
     <p data-start-unavailable hidden>Unavailable</p>
-    <button data-start-manual>Manual</button>
+    <button data-start-manual disabled>Manual</button>
   </section>
   <form data-start-panel="upload" hidden>
     <h2 class="question" tabindex="-1">Upload</h2>

@@ -188,6 +188,17 @@ describe('the start sheet', () => {
     expect(document.querySelector<HTMLElement>('[data-start-panel="choose"]')?.hidden).toBe(false);
   });
 
+  it('enables the two choices only once they are wired', () => {
+    setUp(settlement);
+    const choices = [
+      ...document.querySelectorAll<HTMLButtonElement>(
+        '[data-start-panel="choose"] [data-start-upload], [data-start-panel="choose"] [data-start-manual]',
+      ),
+    ];
+    expect(choices).toHaveLength(2);
+    expect(choices.map((b) => b.disabled)).toEqual([false, false]);
+  });
+
   it('«Rellenar a mano» goes to the calculator’s first sheet, and calls nothing', () => {
     const { form, opened, requests, events } = setUp(settlement);
     click('[data-start-manual]');
