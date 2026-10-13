@@ -212,12 +212,15 @@ function occasionalDays(c: Context): Finding {
       calculation: [days(OCCASIONAL_DAYS), phrase('modality.occasional_agrifood')],
     });
   }
+  // The days «no podrán ser utilizados de manera continuada»: said, never checked, since one
+  // contract does not show how the company spreads its yearly days.
+  const continuous = phrase('modality.occasional_not_continuous');
   return modalityFinding(c, {
     id: 'production_occasional_90',
     status: known ? 'within_limit' : 'not_entered',
     calculation: known
-      ? [days(OCCASIONAL_DAYS)]
-      : [days(OCCASIONAL_DAYS), phrase('modality.no_end_date')],
+      ? [days(OCCASIONAL_DAYS), continuous]
+      : [days(OCCASIONAL_DAYS), phrase('modality.no_end_date'), continuous],
   });
 }
 
