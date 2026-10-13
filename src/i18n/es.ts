@@ -5175,7 +5175,7 @@ export const es = {
   'client.credit.calculation.early_repayment.paid_by_insurance':
     'Lo pagó un seguro: en ese caso la ley no permite cobrar compensación (art. 30.3).',
   'client.credit.calculation.early_repayment.variable_rate':
-    'Tu préstamo tiene interés variable: en un periodo sin tipo fijo la ley no permite cobrar compensación (art. 30.3).',
+    'Tu préstamo tiene interés variable: en un periodo sin tipo fijo la ley no permite cobrar compensación (art. 30.3.c). Si empezaba con un tramo a tipo fijo y lo devolviste dentro de ese tramo, no es así: entonces cuentan los topes del art. 30.2, y esta revisión no sabe en qué tramo estabas.',
   'client.credit.calculation.early_repayment.nothing_charged': 'No te cobraron nada por ello.',
   'client.credit.calculation.early_repayment.charged_without_basis':
     'Te cobraron {charged} de compensación, que en este caso la ley no permite.',
