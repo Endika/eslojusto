@@ -127,8 +127,9 @@ const LCCI_SHARES: Partial<Record<InvoiceKind, number>> = {
   transparency_deed: 100,
 };
 
-// The Supreme Court's split for consumers before the LCCI: the notary by halves, the lender's copy,
-// the registry, the agency and the valuation to the lender.
+// The Supreme Court's split for consumers before the LCCI: the notary by halves, the registry, the
+// agency and the valuation to the lender. Each copy is paid by whoever asks for it, by the notarial
+// fees (Real Decreto 1426/1989, annex II, general rule 6.ª), not by the split.
 const SPLIT_SHARES: Partial<Record<InvoiceKind, number>> = {
   notary_loan: 50,
   notary_copy_bank: 100,

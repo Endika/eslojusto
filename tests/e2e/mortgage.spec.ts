@@ -481,7 +481,10 @@ test('the page has its title, heading, canonical, JSON-LD, guide and questions',
   ).toBeVisible();
   await expect(guide.getByRole('table')).toContainText('Nadie: no se cobra');
   // Quotes of the law only inside <LegalQuote>, each with its source.
-  await expect(guide.locator('[data-legal-quote]')).toHaveCount(6);
+  await expect(guide.locator('[data-legal-quote]')).toHaveCount(7);
+  await expect(guide).toContainText(
+    'Fuente: Real Decreto 1426/1989, de 17 de noviembre, por el que se aprueba el Arancel de los Notarios, anexo II, norma general 6.ª',
+  );
   await expect(guide).toContainText(
     'Fuente: Ley del Impuesto sobre Transmisiones Patrimoniales y Actos Jurídicos Documentados, art. 29',
   );

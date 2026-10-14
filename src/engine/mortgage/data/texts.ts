@@ -66,4 +66,19 @@ export const MORTGAGE_TEXTS: TextTable = {
       'Cuando se trate de escrituras de préstamo con garantía hipotecaria, se considerará sujeto pasivo al prestamista.',
     ],
   },
+  // General rule 6.ª of the notarial fees: whoever requests a service, a copy among them, pays it.
+  arancel_6: {
+    id: 'arancel_6',
+    basis: 'statute',
+    citation:
+      'Real Decreto 1426/1989, de 17 de noviembre, por el que se aprueba el Arancel de los Notarios, anexo II, norma general 6.ª',
+    article: 'anexo II, norma general 6.ª',
+    url: 'https://www.boe.es/buscar/act.php?id=BOE-A-1989-28111#anii',
+    inForceSince: '1989-11-29',
+    lastVerified: '2026-10-15',
+    verified: true,
+    quotes: [
+      'La obligación de pago de los derechos corresponderá a los que hubieren requerido la prestación de funciones o los servicios del Notario y, en su caso, a los interesados según las normas sustantivas y fiscales, y si fueren varios, a todos ellos solidariamente.',
+    ],
+  },
 };

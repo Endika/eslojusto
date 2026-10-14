@@ -65,6 +65,17 @@ describe('floor clause', () => {
   });
 
   it.each([
+    ['2019-06-15', 'in_deed'],
+    ['2019-06-16', 'not_in_deed'],
+  ])('a floor at 0 %% in a deed of %s is %s: art. 21.4 binds from 16-06-2019', (deed, state) => {
+    const flag = one(deed, clause('floor_clause', { floorPercent: 0 }));
+    expect(flag.state).toBe(state);
+    expect(flag.calculation.some((c) => c.key === 'flags.floor_zero')).toBe(
+      state === 'not_in_deed',
+    );
+  });
+
+  it.each([
     ['2019-06-15', 'case_law'],
     ['2019-06-16', 'statute'],
   ])('a floor in a deed of %s rests on %s', (deed, basis) => {
