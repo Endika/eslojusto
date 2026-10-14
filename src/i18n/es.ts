@@ -581,7 +581,7 @@ export const es = {
   'faq.documents_answer':
     'Si subes tus documentos (la carta de despido, el finiquito, tus nóminas, el certificado de empresa o tu vida laboral), se envían cifrados a un servidor de Amazon Web Services en España, que se los pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo indica qué es cada página, copia solo los datos que necesita el formulario y no calcula nada. Ni el servidor ni el modelo guardan el documento: se procesa en memoria y se descarta. Antes de subirlo te pedimos tu consentimiento, porque una nómina puede mostrar datos sensibles. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
 
-  'legal.updated': 'Actualizado el 13 de octubre de 2026',
+  'legal.updated': 'Actualizado el 14 de octubre de 2026',
   'legal.owner_name_label': 'Titular',
   'legal.owner_name': 'Endika Iglesias',
   'legal.owner_id_label': 'NIF',

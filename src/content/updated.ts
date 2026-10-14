@@ -21,10 +21,10 @@ const mortgageBuild = process.env['PUBLIC_MORTGAGE'] === '1';
 const billsBuild = process.env['PUBLIC_BILLS'] === '1';
 
 export const LAST_UPDATED: Readonly<Record<string, string>> = {
-  '/': '2026-10-11',
+  '/': '2026-10-14',
   '/finiquito/': '2026-10-09',
   '/aviso-legal/': '2026-10-11',
-  '/privacidad/': '2026-10-13',
+  '/privacidad/': '2026-10-14',
   // Moves with the INE's newest figure on the page and with each check of its norms.
   [RENT_INDICES]: lastChanged(),
   '/finiquito/baja-voluntaria/': '2026-10-07',
@@ -55,9 +55,9 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   ...(mortgageBuild ? { '/hipoteca/': '2026-10-11' } : {}),
   ...(billsBuild
     ? {
-        '/facturas/': '2026-10-13',
-        '/facturas/luz/': '2026-10-13',
-        '/facturas/permanencia/': '2026-10-13',
+        '/facturas/': '2026-10-14',
+        '/facturas/luz/': '2026-10-14',
+        '/facturas/permanencia/': '2026-10-14',
       }
     : {}),
 };
