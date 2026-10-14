@@ -36,6 +36,7 @@ export type BillsPhraseKey =
   | 'tolls.energy'
   | 'tolls.not_on_bill'
   | 'tolls.energy_price_change'
+  | 'tolls.energy_one_price'
   | 'tolls.free_market_price'
   | 'pvpc.power_over_10kw'
   | 'pvpc.holder_not_allowed'

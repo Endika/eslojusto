@@ -128,6 +128,20 @@ function lines(a: Answers, power: readonly ExtractedRow[], energy: readonly Extr
     a.figure(`powerPrice${SUFFIX[p]}`, line.values['price'], line.confidence, decimalText);
     a.figure(`powerAmount${SUFFIX[p]}`, line.values['amount'], line.confidence);
   }
+  const single = energy.filter((r) => r.values['period'] === 'all');
+  const [whole] = single;
+  if (energy.length > 0)
+    a.read(
+      'energyPricing',
+      whole && single.length === energy.length ? 'single' : 'periods',
+      lowest(...energy.map((r) => r.confidence)),
+    );
+  if (whole && single.length === energy.length) {
+    a.figure('kwhAll', whole.values['kwh'], whole.confidence, decimalText);
+    a.figure('energyPriceAll', whole.values['price'], whole.confidence, decimalText);
+    a.figure('energyAmountAll', whole.values['amount'], whole.confidence);
+    return;
+  }
   for (const p of ENERGY_PERIODS) {
     const [line] = byEnergy(p);
     if (!line) continue;

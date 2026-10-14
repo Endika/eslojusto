@@ -40,6 +40,7 @@ const BILL: Values = {
   powerAmountP2: '0,27',
   maxUsedP1: '3,1',
   maxUsedP2: '1,2',
+  energyPricing: 'periods',
   kwhP1: '60',
   energyPriceP1: '0,20',
   energyAmountP1: '12,00',
@@ -92,6 +93,20 @@ describe('the electricity form', () => {
         meter: meter({ supplyPhase: null }),
       }),
     });
+  });
+
+  it('takes one line for all the energy when the bill charges it at one price', () => {
+    const r = readElectricityForm(
+      form(BILL, {
+        energyPricing: 'single',
+        kwhAll: '250',
+        energyPriceAll: '0,138',
+        energyAmountAll: '34,50',
+      }),
+      TODAY,
+    );
+    if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
+    expect(r.input.energy).toEqual([{ period: 'all', kwh: 250, price: 0.138, amount: 34.5 }]);
   });
 
   it('takes a free-market bill as from another retailer, with its services and a refund', () => {

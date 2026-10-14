@@ -7,6 +7,9 @@ export const gate = (form: HTMLFormElement): ElectricityScope => formScope(form)
 
 // Sheets asked only when an earlier answer asks for them.
 const ASKED_WHEN: Partial<Record<Sheet, readonly [string, readonly string[]]>> = {
+  'energia-punta': ['energyPricing', ['periods']],
+  'energia-llano': ['energyPricing', ['periods']],
+  'energia-valle': ['energyPricing', ['periods']],
   'bono-social-consumo': ['hasBonus', ['yes']],
   'contador-tipo': ['meterCharged', ['yes']],
   'servicio-1': ['serviceCount', ['1', '2']],

@@ -21,6 +21,7 @@ export const SECTION_OF_STEP: Record<Step, Tab> = {
   'potencia-punta': 'salary',
   'potencia-valle': 'salary',
   'potencia-maxima': 'salary',
+  energia: 'salary',
   'energia-punta': 'salary',
   'energia-llano': 'salary',
   'energia-valle': 'salary',

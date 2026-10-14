@@ -13,6 +13,7 @@ import {
 } from './finding';
 import type { BillsNormId, NormTable } from './norms';
 import {
+  billingPeriod,
   addOfficial,
   proratedOver,
   rowsCited,
@@ -33,10 +34,7 @@ export interface TollsDeps {
 
 const RULES: readonly BillsRuleId[] = ['tolls', 'charges'];
 
-export const periodOf = (input: ElectricityBillInput): BillingPeriod => ({
-  from: input.readingFrom,
-  to: input.readingTo,
-});
+export const periodOf = (input: ElectricityBillInput): BillingPeriod => billingPeriod(input);
 
 // The kWh of each energy period, adding up the bill's lines.
 export function kwhByPeriod(input: ElectricityBillInput): Readonly<Record<EnergyPeriod, number>> {
@@ -98,7 +96,9 @@ function againstOfficial(
 function accessEnergy(
   input: ElectricityBillInput,
   { norms, tables }: TollsDeps,
-): Official | 'price_change' {
+): Official | 'price_change' | 'one_price' {
+  // One price for all the energy leaves the kWh of each period unknown.
+  if (input.energy.some((l) => l.period === 'all')) return 'one_price';
   const kwh = kwhByPeriod(input);
   const perPeriod = (prices: PowerEnergyPrices) =>
     kwh.p1 * prices.energy.p1 + kwh.p2 * prices.energy.p2 + kwh.p3 * prices.energy.p3;
@@ -147,12 +147,18 @@ export function checkTollsAndCharges(
 
   const official = accessEnergy(input, deps);
   const energy =
-    official === 'price_change'
+    official === 'price_change' || official === 'one_price'
       ? single(
           billFinding(
             'tolls_and_charges_energy',
             'not_checkable',
-            [billsPhrase('tolls.energy_price_change')],
+            [
+              billsPhrase(
+                official === 'price_change'
+                  ? 'tolls.energy_price_change'
+                  : 'tolls.energy_one_price',
+              ),
+            ],
             RULES,
             norms,
           ),

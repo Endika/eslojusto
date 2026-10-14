@@ -951,7 +951,7 @@ Catalan and one in Galician, two of forty folios of which the useful pages were 
 registry, agency and valuation invoices, apart and mixed, modelo 600 returns of the loan and of the
 purchase, the notary's act of art. 15 LCCI and statements of early repayments, a switch to a fixed
 rate and a change of lender; `tests/engine/mortgage/bank.test.ts` runs `reviewMortgage` on each
-case's facts, at no cost. The electricity one has 37 packs (`eval/cases/electricity/*.json`, shape
+case's facts, at no cost. The electricity one has 38 packs (`eval/cases/electricity/*.json`, shape
 in `eval/electricity-schema.ts`) drawn from `eval/templates/electricity/`: PVPC bills re-laid out
 from the model bills of the DGPEM resolution of 28-04-2021 and free-market bills in three layouts,
 from June to December 2026, with the social bonus, single- and three-phase meters, packs of three
@@ -988,7 +988,7 @@ bank (`rental` by default, `employment`, `credit`, `insurance`, `mortgage`, `ele
 folder, by default that bank's. It reads, by default, the packs marked `eval: true` (bad photos,
 doubtful cases, long documents): 15 of the rental, of the employment and of the mortgage bank (four
 of them with more than nine photos: the two long deeds and two full deeds with their bills), and 15
-between the credit (10) and the insurance (5) banks, and 15 between the electricity (11) and the
+between the credit (10) and the insurance (5) banks, and 16 between the electricity (12) and the
 telecom (4) banks; `EVAL_CASES=all` or a
 comma-separated list of ids picks others, and so does `--only id1,id2`. Each pack goes through the Lambda's own domain (`extract`
 with that review) and the real `createBedrockReader`, with the models of `src/config.ts`. Before

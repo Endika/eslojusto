@@ -12,7 +12,7 @@ import {
   type BillsItemId,
 } from './finding';
 import type { NormTable } from './norms';
-import { periodDays } from './period';
+import { billingPeriod, periodDays } from './period';
 import type { ElectricityBillInput, EnergyLine, PowerLine } from './types';
 
 export const sum = (values: readonly number[]): number => values.reduce((a, b) => a + b, 0);
@@ -60,7 +60,7 @@ function powerLine(
   index: number,
   norms: NormTable,
 ): BillItem {
-  const days = line.days ?? periodDays({ from: input.readingFrom, to: input.readingTo });
+  const days = line.days ?? periodDays(billingPeriod(input));
   const billed = billsPhrase('arithmetic.billed', { euros: { euros: line.amount } });
   if (line.unit === 'per_kw_day') {
     const expected = line.kw * line.price * days;
@@ -147,7 +147,7 @@ export function checkArithmetic(
   norms: NormTable,
 ): readonly BillItem[] {
   const items: BillItem[] = [];
-  const days = periodDays({ from: input.readingFrom, to: input.readingTo });
+  const days = periodDays(billingPeriod(input));
   const daysPhrase = billsPhrase('arithmetic.days', {
     from: { date: toIso(input.readingFrom) },
     to: { date: toIso(input.readingTo) },

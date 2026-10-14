@@ -131,8 +131,8 @@ const matches = (r: ElectricityReview): boolean =>
   r.items.flatMap(findingsOf).every((x) => x.status === 'matches' || x.status === 'information');
 
 describe('the synthetic bank of electricity packs', () => {
-  it('holds 37 cases', () => {
-    expect(ELECTRICITY).toHaveLength(37);
+  it('holds 38 cases', () => {
+    expect(ELECTRICITY).toHaveLength(38);
   });
 
   it.each(ELECTRICITY.map((c) => [c.id, c] as const))('%s', (_, c) => {

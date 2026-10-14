@@ -138,6 +138,12 @@ async function fillElectricity(page: Page, b: Bill) {
   await type(used, 'Punta (P1), kW', '3,1');
   await type(used, 'Valle (P2), kW', '1,2');
   await next(page);
+  await choose(
+    sheet(page, 'Cómo cobra la energía'),
+    '¿Tu factura separa la energía por periodos?',
+    'Sí, por periodos',
+  );
+  await next(page);
   for (const [name, kwh, price, amount] of [
     ['Energía en punta (P1)', '60', '0,20', '12,00'],
     ['Energía en llano (P2)', '70', '0,15', '10,50'],

@@ -4,6 +4,7 @@ import type {
   ElectricityBillInput,
   ElectricityScope,
   EnergyLine,
+  EnergyLinePeriod,
   EnergyPeriod,
   PowerLine,
   PowerPeriod,
@@ -37,6 +38,7 @@ export const SHEETS = [
   'potencia-punta',
   'potencia-valle',
   'potencia-maxima',
+  'energia',
   'energia-punta',
   'energia-llano',
   'energia-valle',
@@ -78,6 +80,8 @@ export const SERVICE_LABELS: readonly ServiceLabel[] = [
   'pack',
   'other',
 ];
+// Whether the bill splits the energy by period or charges all of it at one price.
+export const ENERGY_PRICING = ['periods', 'single'] as const;
 export const PRICE_TYPES = ['fixed', 'variable', 'indexed', 'unknown'] as const;
 export const REGULARIZATIONS = ['none', 'charged', 'returned'] as const;
 const ANSWERS = ['yes', 'no', 'unknown'] as const;
@@ -100,6 +104,7 @@ export const SHEET_FIELDS: Readonly<Record<Sheet, readonly ElectricityFormField[
   'potencia-punta': ['powerPriceP1', 'powerAmountP1'],
   'potencia-valle': ['powerPriceP2', 'powerAmountP2'],
   'potencia-maxima': ['maxUsedP1', 'maxUsedP2'],
+  energia: ['energyPricing', 'kwhAll', 'energyPriceAll', 'energyAmountAll'],
   'energia-punta': ['kwhP1', 'energyPriceP1', 'energyAmountP1'],
   'energia-llano': ['kwhP2', 'energyPriceP2', 'energyAmountP2'],
   'energia-valle': ['kwhP3', 'energyPriceP3', 'energyAmountP3'],
@@ -229,13 +234,21 @@ function read(form: HTMLFormElement): Reading {
     return { period, kw, price, unit, days: null, amount };
   });
   const maxUsed = { p1: figure('maxUsedP1', false), p2: figure('maxUsedP2', false) };
-  const energyLines = ENERGY_PERIODS.map((period): EnergyLine | null => {
-    const kwh = figure(`kwh${SUFFIX[period]}`, true);
-    const price = figure(`energyPrice${SUFFIX[period]}`, true);
-    const amount = figure(`energyAmount${SUFFIX[period]}`, true);
+  const energyPricing = choice('energyPricing', ENERGY_PRICING);
+  const energyLine = (
+    period: EnergyLinePeriod,
+    suffix: 'All' | (typeof SUFFIX)[EnergyPeriod],
+  ): EnergyLine | null => {
+    const kwh = figure(`kwh${suffix}`, true);
+    const price = figure(`energyPrice${suffix}`, true);
+    const amount = figure(`energyAmount${suffix}`, true);
     if (kwh === null || price === null || amount === null) return null;
     return { period, kwh, price, amount };
-  });
+  };
+  const energyLines =
+    energyPricing === 'single'
+      ? [energyLine('all', 'All')]
+      : ENERGY_PERIODS.map((period) => energyLine(period, SUFFIX[period]));
 
   const tollsShown = choice('tollsShown', YES_NO);
   const tolls =
