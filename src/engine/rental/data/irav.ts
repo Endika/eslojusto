@@ -17,7 +17,7 @@ export const IRAV: IndexSeries = {
   url: 'https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/IRAV1',
   table: 72975,
   series: 'IRAV1',
-  coveredUntil: '2026-10-13',
+  coveredUntil: '2026-11-12',
   loadedFromStart: true,
   values: [
     month('2024-11', 2.2, '2025-01-02'),
@@ -42,6 +42,7 @@ export const IRAV: IndexSeries = {
     month('2026-06', 2.44, '2026-07-15'),
     month('2026-07', 2.49, '2026-08-13'),
     month('2026-08', 2.47, '2026-09-15'),
+    month('2026-09', 2.54, '2026-10-14'),
   ],
   pendingFlash: null,
 };

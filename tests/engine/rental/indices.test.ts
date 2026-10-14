@@ -75,12 +75,15 @@ describe('CPI flash estimates', () => {
     },
   );
 
-  it('include September 2026, whose definitive figure is not out yet', () => {
-    expect(IPC.pendingFlash).toEqual({
+  it('keep September 2026 with the definitive figure that followed it', () => {
+    expect(IPC.values.find((v) => v.month === '2026-09')).toEqual({
       month: '2026-09',
       rate: 4.9,
-      publishedOn: '2026-09-29',
-      url: 'https://www.ine.es/dyngs/Prensa/adIPC0926.htm',
+      publishedOn: '2026-10-14',
+      publishedUrl: 'https://servicios.ine.es/wstempus/js/ES/PUBLICACIONFECHA_PUBLICACION/8',
+      flashPublishedOn: '2026-09-29',
+      flashRate: 4.9,
+      flashUrl: 'https://www.ine.es/dyngs/Prensa/adIPC0926.htm',
     });
   });
 });
@@ -125,7 +128,7 @@ describe('reference month', () => {
   });
 
   it('is not loaded after the table coverage', () => {
-    expect(lookup(IRAV, '2026-10-14')).toEqual({ kind: 'not_loaded' });
+    expect(lookup(IRAV, '2030-10-14')).toEqual({ kind: 'not_loaded' });
     expect(lookup(IGC, '2018-12-31')).toEqual({ kind: 'not_loaded' });
   });
 
