@@ -163,7 +163,13 @@ describe('electricityFailedChecks', () => {
   });
 
   it('flags billed days that are not the days between the readings', () => {
-    expect(checks({ electricity_bill: bill({ billedDays: 32 }) })).toEqual(['days_mismatch']);
+    expect(checks({ electricity_bill: bill({ billedDays: 33 }) })).toEqual(['days_mismatch']);
+    expect(checks({ electricity_bill: bill({ billedDays: 30 }) })).toEqual(['days_mismatch']);
+  });
+
+  it('takes the days counted with or without the day of the first reading', () => {
+    expect(checks({ electricity_bill: bill({ billedDays: 31 }) })).toEqual([]);
+    expect(checks({ electricity_bill: bill({ billedDays: 32 }) })).toEqual([]);
   });
 
   it('flags a last reading on or before the first', () => {

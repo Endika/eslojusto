@@ -86,8 +86,11 @@ export function electricityFailedChecks(r: Reading): readonly ElectricityCheck[]
     // ISO dates compare correctly as strings.
     if (from !== null && to !== null && to <= from) failed.add('period_end_before_start');
     const days = num(bill, 'billedDays');
-    if (from !== null && to !== null && days !== null && daysBetween(from, to) !== days)
-      failed.add('days_mismatch');
+    // Some bills count the day of the first reading and some do not: either count agrees.
+    if (from !== null && to !== null && days !== null) {
+      const between = daysBetween(from, to);
+      if (days !== between && days !== between + 1) failed.add('days_mismatch');
+    }
     const document = bill.values['document'];
     if (
       linesDoNotSum(
