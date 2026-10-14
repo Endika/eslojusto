@@ -390,7 +390,7 @@ test('every sheet of the longest path fits in 360×640', async ({ page }) => {
   await choose(sheet(page, 'El seguro'), '¿Tenías un seguro ligado a la hipoteca?', 'Sí');
   await next(page);
   await reviewed(page);
-  await expect(card(page, 'Notaría del préstamo')).toContainText('Revísalo');
+  await expect(card(page, 'Notaría del préstamo')).toContainText('Para revisar');
   await expect(card(page, 'Gestoría')).toContainText('se cuentan una sola vez');
   await expect(card(page, 'Acta notarial previa')).toContainText('No debía cobrarse: 60,00 €');
   await expect(card(page, 'Cancelación antes de tiempo')).toContainText(

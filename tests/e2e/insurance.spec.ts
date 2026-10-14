@@ -171,7 +171,7 @@ for (const { name, viewport } of SIZES) {
       );
       await expect(result(page)).not.toContainText('Con tus fechas, ese mes llega hasta el');
       await expect(card(page, 'Desistir: coberturas voluntarias del coche')).toContainText(
-        'Revísalo',
+        'Para revisar',
       );
     });
 

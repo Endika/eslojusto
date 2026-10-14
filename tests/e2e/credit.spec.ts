@@ -368,7 +368,9 @@ test('every sheet of the longest path fits in 360×640', async ({ page }) => {
   await expect(card(page, 'Compensación por devolverlo antes')).toContainText(
     'Depende de un dato que no sabes',
   );
-  await expect(card(page, 'Descuento que pierdes al devolverlo antes')).toContainText('Revísalo');
+  await expect(card(page, 'Descuento que pierdes al devolverlo antes')).toContainText(
+    'Para revisar',
+  );
   await expect(card(page, 'Desistir del crédito')).toContainText('El plazo terminó el 19-03-2024');
 });
 

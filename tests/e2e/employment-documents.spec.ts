@@ -566,7 +566,7 @@ test('a work history cut to its most recent rows never reads as within the limit
   );
   await page.getByRole('button', { name: 'Revisar' }).click();
   const card = page.getByRole('region', { name: 'Contratos temporales encadenados', exact: true });
-  await expect(card.locator('.item__status')).toHaveText('Revísalo');
+  await expect(card.locator('.item__status')).toHaveText('Para revisar');
   await card.getByText('Cómo se calcula').click();
   await expect(card).toContainText('no se puede confirmar que estés dentro del límite');
 });

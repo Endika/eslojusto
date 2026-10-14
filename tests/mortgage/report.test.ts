@@ -125,11 +125,11 @@ describe('the mortgage report', () => {
     expect(summary.some(([label]) => label?.startsWith('Interés legal'))).toBe(false);
   });
 
-  it('with the agreement unknown, says the split is held in «Revísalo», not that nothing is owed', () => {
+  it('with the agreement unknown, says the split is held in «Para revisar», not that nothing is owed', () => {
     const summary = rows(between(report({ ...SPLIT, agreementOnExpenses: null }, DEPS), 'Resumen'));
     expect(summary).toContainEqual([
       'Según el reparto del Tribunal Supremo',
-      'Sin cifra: hay gastos en «Revísalo»',
+      'Sin cifra: hay gastos en «Para revisar»',
     ]);
   });
 
