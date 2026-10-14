@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.60.1](https://github.com/Endika/eslojusto/compare/v1.60.0...v1.60.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* **rental:** load the INE's September 2026 IRAV and CPI and cover up to the next release ([2bea1fe](https://github.com/Endika/eslojusto/commit/2bea1fe7db5d4c9329fb755a6afadbcc13a5a2ed))
+
 ## [1.60.0](https://github.com/Endika/eslojusto/compare/v1.59.0...v1.60.0) (2026-10-13)
 
 
