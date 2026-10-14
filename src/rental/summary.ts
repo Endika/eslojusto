@@ -9,7 +9,22 @@ import { rentUpdateAmount, type RentUpdateReading } from '../engine/rental/rent-
 import type { RentalItemResult, RentalReview, Total } from '../engine/rental/review';
 import type { ItemStatus } from '../engine/rental/types';
 
+import { shownPair, type Shown } from '../calculator/amounts';
+
 export { roundToTens, shownOne, shownPair, type Shown } from '../calculator/amounts';
+
+// The most something can be, said «hasta unos …»: rounded up to tens so the figure never falls
+// below the true maximum, and with its cents under 10 €, where rounding up would say too much.
+export const shownUpTo = (n: number): Shown =>
+  n > 0 && n < 10
+    ? { amount: n, cents: true }
+    : { amount: Math.ceil(Math.round(n * 100) / 1000) * 10, cents: false };
+
+// What is counted and the most it can be, with the maximum never rounded below its true value.
+export function shownBounds(counted: number, upTo: number): readonly [Shown, Shown] {
+  const [low, high] = shownPair(counted, upTo);
+  return high.cents ? [low, high] : [low, shownUpTo(upTo)];
+}
 
 // One reading of an item as the summary words it: its status and, when it carries one, the euros.
 export interface Verdict {

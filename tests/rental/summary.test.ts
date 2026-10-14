@@ -4,8 +4,10 @@ import { contract, repealedWindow, review, riseAboveIrav, unknownLargeLandlord }
 import {
   headline,
   roundToTens,
+  shownBounds,
   shownOne,
   shownPair,
+  shownUpTo,
   summarise,
   totalLines,
   totalShare,
@@ -108,6 +110,20 @@ describe('approximate amounts', () => {
     // Tens would put «al menos» at 20 €, above the 17,55 € the most it can be.
     expect(shownPair(16, 17.55).every((s) => s.cents)).toBe(true);
     expect(shownPair(4, 50).every((s) => s.cents)).toBe(true);
+  });
+
+  it('round a maximum up, never below its true value', () => {
+    expect(shownUpTo(64.8)).toEqual({ amount: 70, cents: false });
+    expect(shownUpTo(60)).toEqual({ amount: 60, cents: false });
+    expect(shownUpTo(4.1)).toEqual({ amount: 4.1, cents: true });
+    expect(shownUpTo(0)).toEqual({ amount: 0, cents: false });
+    expect(shownBounds(12, 64.8)).toEqual([
+      { amount: 10, cents: false },
+      { amount: 70, cents: false },
+    ]);
+    expect(shownBounds(17.27, 17.55).every((s) => s.cents)).toBe(true);
+    for (let high = 10; high < 300; high += 0.37)
+      expect(shownUpTo(high).amount).toBeGreaterThanOrEqual(high);
   });
 
   it('never let the lower figure pass the higher one', () => {

@@ -2994,7 +2994,7 @@ export const es = {
   'rental.guide.term.tacit':
     'Cumplido ese plazo, si nadie avisa (el casero con cuatro meses de antelación y tú con dos), el contrato sigue un año más cada vez, hasta tres años, y puedes dejarlo al acabar cualquiera de esos años avisando con un mes de antelación (art. 10.1 LAU).',
   'rental.guide.term.extension':
-    'Además, {decreto} prevé, con requisitos y excepciones, una prórroga extraordinaria por años, hasta dos más, si la pides. Los principales: el contrato tiene que estar en vigor el {desde}; su prórroga del art. 9.1 tiene que acabar antes del 31 de diciembre de 2028, o tiene que acabar su prórroga tácita o su tácita reconducción, y tienes que estar al corriente del pago de la renta y haberlo estado cada mes durante los ocho anteriores. No se aplica si pactáis otras condiciones, un contrato nuevo o una renovación con una renta al menos un 5 % más baja, ni si el casero comunica que necesita la vivienda para sí o su familia (art. 9.3 LAU). Si cabe la prórroga de las zonas tensionadas (art. 10.3 LAU), se aplica esa.',
+    'Además, {decreto} prevé, con requisitos y excepciones, una prórroga extraordinaria por años, hasta dos más, si la pides. Los principales: el contrato tiene que estar en vigor el {desde}; su prórroga obligatoria del art. 9.1, su prórroga tácita del art. 10 o su tácita reconducción tiene que acabar antes del 31 de diciembre de 2028, y tienes que estar al corriente del pago de la renta y haberlo estado cada mes durante los ocho anteriores. No se aplica si pactáis otras condiciones, un contrato nuevo o una renovación con una renta al menos un 5 % más baja, ni si el casero comunica que necesita la vivienda para sí o su familia (art. 9.3 LAU). Si cabe la prórroga de las zonas tensionadas (art. 10.3 LAU), se aplica esa.',
   'rental.guide.term.rdl28':
     'Por otro lado, {decreto} reescribe el art. 10 de la LAU, el de las prórrogas, y desde entonces deja fuera la prórroga extraordinaria del Real Decreto-ley 29/2026 cuando proceda la prórroga del nuevo art. 10.1.',
   'rental.guide.term.unchecked':
@@ -3563,7 +3563,7 @@ export const es = {
     'El Real Decreto-ley 28/2026, pendiente de convalidación, cambia las prórrogas desde el 15 de noviembre de 2026. Tu plazo mínimo acaba el {mandatoryEnd}.',
   'client.rental.info.extension_rdl29.title': 'Prórroga extraordinaria',
   'client.rental.info.extension_rdl29.text':
-    'El Real Decreto-ley 29/2026, pendiente de convalidación, prevé una prórroga extraordinaria para los contratos cuyo plazo acaba entre el {from} y el {until}.',
+    'El Real Decreto-ley 29/2026, pendiente de convalidación, prevé una prórroga extraordinaria para los contratos cuya prórroga obligatoria, prórroga tácita o tácita reconducción acaba entre el {from} y el {until}.',
   'client.rental.info.deposit_lodging.title': 'Depósito de la fianza',
   'client.rental.info.deposit_lodging.text':
     'El casero deposita la fianza en el organismo de la comunidad autónoma que lo prevea (disposición adicional 3.ª LAU).',
