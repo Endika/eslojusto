@@ -23,6 +23,9 @@
   premium and withdrawal. In beta.
 - **Credit (financiación)** — the APR, the average-rate indicator, early repayment and the dates
   of a consumer credit. In beta.
+- **Bills (facturas)** — each line of a household electricity bill against the regulated tolls,
+  charges, taxes and meter rental, a whole year of bills, and the penalty and exit of a mobile or
+  internet contract. In beta.
 
 The calculators run in your browser and nothing you type is sent anywhere. Reading your documents
 is optional: with your explicit consent, the pages go to the API in Spain, are read by a model in
