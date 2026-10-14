@@ -62,7 +62,7 @@ describe('VAT of a bill due in May 2026', () => {
     const f = only(check(mayBill()));
     expect(f.status).toBe('matches');
     expect(f.rows.map((r) => [r.norm, r.from, r.until, r.status])).toEqual([
-      ['rdl7_2026', '2026-04-30', '2026-05-31', 'in_force'],
+      ['rdl7_2026', '2026-03-22', '2026-05-31', 'in_force'],
     ]);
   });
 
@@ -139,12 +139,23 @@ describe('VAT of a bill due in May 2026', () => {
 });
 
 describe('VAT of a supply of exactly 10 kW in April 2026', () => {
-  it('gives two readings while RDL 7/2026 says «inferior a», and counts neither', () => {
+  it('is reduced: RDL 10/2026 clarified that «inferior o igual» held from the start', () => {
+    expect(only(check(spring('2026-04-20', 10, vat(4.47)))).status).toBe('matches');
+  });
+
+  it('gives two readings where a row leaves 10 kW out, and counts neither', () => {
+    const vatRows = BILLS_TABLES.vat.map((r) =>
+      r.from === '2026-03-22' && r.value.kind === 'reduced'
+        ? { ...r, value: { ...r.value, powerLimitIncluded: false } }
+        : r,
+    );
+    const atLimit = (input: ElectricityBillInput): BillItem =>
+      checkVat(input, { ...deps, tables: { ...BILLS_TABLES, vat: vatRows } });
     for (const [amount, expected] of [
       [4.47, ['matches:null', 'wrong_rate_for_date:4.92']],
       [9.39, ['wrong_rate_for_date:4.83', 'matches:null']],
     ] as const) {
-      const item = check(spring('2026-04-20', 10, vat(amount)));
+      const item = atLimit(spring('2026-04-20', 10, vat(amount)));
       expect(item.kind).toBe('readings');
       expect(statuses(item)).toEqual(expected);
       expect(countedAmount(item)).toBe(0);
@@ -155,7 +166,7 @@ describe('VAT of a supply of exactly 10 kW in April 2026', () => {
     }
   });
 
-  it('gives the reduced rate under 10 kW, and at 10 kW from 30-04-2026', () => {
+  it('gives the reduced rate under 10 kW too', () => {
     expect(only(check(spring('2026-04-20', 9.9, vat(4.47)))).status).toBe('matches');
     const f = only(check(spring('2026-04-30', 10, vat(4.47))));
     expect(f.status).toBe('matches');

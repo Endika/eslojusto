@@ -220,17 +220,17 @@ describe('the tax rates of 2026, by the day the bill falls due', () => {
     expect(valueOf(vat(day)).percent).toBe(value);
   });
 
-  it('from 22-03-2026 reduce VAT under 10 kW, and from 30-04-2026 at 10 kW too', () => {
-    expect(valueOf(vat('2026-04-29'))).toEqual({
-      kind: 'reduced',
-      percent: 10,
-      generalPercent: 21,
-      powerLimitKw: 10,
-      powerLimitIncluded: false,
-      severeVulnerable: true,
-    });
-    expect(valueOf(vat('2026-04-30'))).toMatchObject({ powerLimitIncluded: true });
-    expect(vat('2026-04-30')).toMatchObject({ row: { alsoRestsOn: ['rdl10_2026'] } });
+  it('from 22-03-2026 reduce VAT at 10 kW or less, as RDL 10/2026 clarified', () => {
+    for (const day of ['2026-03-22', '2026-04-29', '2026-05-31'])
+      expect(valueOf(vat(day))).toEqual({
+        kind: 'reduced',
+        percent: 10,
+        generalPercent: 21,
+        powerLimitKw: 10,
+        powerLimitIncluded: true,
+        severeVulnerable: true,
+      });
+    expect(vat('2026-04-20')).toMatchObject({ row: { norm: 'rdl7_2026', from: '2026-03-22' } });
   });
 
   it.each([
