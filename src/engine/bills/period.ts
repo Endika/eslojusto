@@ -10,6 +10,18 @@ export interface BillingPeriod {
 
 export const periodDays = ({ from, to }: BillingPeriod): number => ordinal(to) - ordinal(from);
 
+// Some bills give the day of the first reading as the first day billed, and count one day more
+// than the days between the two dates: their period starts on that day.
+export function billingPeriod(bill: {
+  readonly readingFrom: CivilDate;
+  readonly readingTo: CivilDate;
+  readonly billedDays: number | null;
+}): BillingPeriod {
+  const gap = periodDays({ from: bill.readingFrom, to: bill.readingTo });
+  const from = bill.billedDays === gap + 1 ? addDays(bill.readingFrom, -1) : bill.readingFrom;
+  return { from, to: bill.readingTo };
+}
+
 // Consecutive days of one year that the same rows cover. More than one row means the value
 // depends on a norm not yet settled on those days.
 export interface Stretch<V> {

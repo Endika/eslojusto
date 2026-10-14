@@ -175,6 +175,26 @@ describe('a read of electricity bills', () => {
     expect(bill?.entries.some(([name]) => name === 'energyAmountP1')).toBe(false);
   });
 
+  it('reads one line for all the energy as a single price, never as one period', () => {
+    const [bill] = electricityPrefill(
+      extraction({
+        bills: [row({ document: 1, ...JUNE })],
+        powerLines: linesOf(1).powerLines,
+        energyLines: [row({ document: 1, period: 'all', kwh: 250, price: 0.138, amount: 34.5 })],
+      }),
+      tr,
+    ).bills;
+    expect(bill?.entries).toEqual(
+      expect.arrayContaining([
+        ['energyPricing', 'single'],
+        ['kwhAll', '250'],
+        ['energyPriceAll', '0,138'],
+        ['energyAmountAll', '34,50'],
+      ]),
+    );
+    expect(bill?.entries.some(([name]) => name === 'kwhP1')).toBe(false);
+  });
+
   it('takes the first two services, discounts added up, and words a pack’s checks', () => {
     const service = (label: string, amount: number) =>
       row({ document: 1, kind: 'service', concept: 'Servicio', serviceLabel: label, amount });

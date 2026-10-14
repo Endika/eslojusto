@@ -26,8 +26,15 @@ describe('the bill against its own figures', () => {
     expect(findings.every((f) => f.amount === null)).toBe(true);
   });
 
+  it('takes a bill that counts the day of the first reading, starting its period on that day', () => {
+    expect(statusOf(juneBill({ billedDays: 31 }), 'days')?.status).toBe('matches');
+    const power = { period: 'p1', kw: 4.6, price: 0.1, unit: 'per_kw_day', days: null } as const;
+    const inclusive = juneBill({ billedDays: 31, power: [{ ...power, amount: 14.26 }] });
+    expect(statusOf(inclusive, 'power', 0)?.status).toBe('matches');
+  });
+
   it('counts the days from the day after the first reading to the last one', () => {
-    const days = statusOf(juneBill({ billedDays: 31 }), 'days');
+    const days = statusOf(juneBill({ billedDays: 32 }), 'days');
     expect(days).toMatchObject({ status: 'does_not_add_up', direction: 'over', amount: null });
     expect(days?.calculation[0]).toEqual({
       key: 'arithmetic.days',

@@ -28,6 +28,15 @@ describe('tolls and charges of the 2.0TD tariff', () => {
     });
   });
 
+  it('leave the energy unchecked when one price covers all of it, as no kWh go to a period', () => {
+    const { power, energy } = check(
+      juneBill({ energy: [{ period: 'all', kwh: 250, price: 0.138, amount: 34.5 }] }),
+    );
+    expect(only(power).status).toBe('matches');
+    expect(only(energy)).toMatchObject({ status: 'not_checkable' });
+    expect(only(energy).calculation).toEqual([{ key: 'tolls.energy_one_price' }]);
+  });
+
   it('cite the tolls and charges rows with their days and status', () => {
     const { power } = check(juneBill());
     expect(only(power).rows).toEqual([

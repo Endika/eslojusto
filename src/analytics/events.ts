@@ -228,6 +228,7 @@ const BILLS_SECTIONS = [
   'potencia-punta',
   'potencia-valle',
   'potencia-maxima',
+  'energia',
   'energia-punta',
   'energia-llano',
   'energia-valle',

@@ -10,6 +10,7 @@ import {
   HOLDERS,
   MARKETS,
   PHASES,
+  ENERGY_PRICING,
   POWER_UNITS,
   PRICE_TYPES,
   REGULARIZATIONS,
@@ -203,6 +204,26 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
       <div class="pair">
         <Field name="maxUsedP1" label={tx('bills.electricity.max_used_p1')} kind="amount" />
         <Field name="maxUsedP2" label={tx('bills.electricity.max_used_p2')} kind="amount" />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('energia')}>
+      <h2 class="question" id="question-energia" tabindex="-1">
+        {question('energia')}
+      </h2>
+      <Choice
+        name="energyPricing"
+        legend={tx('bills.electricity.energy_pricing')}
+        hint={tx('bills.electricity.energy_pricing_hint')}
+        options={options(ENERGY_PRICING, (v) => `bills.electricity.energy_pricing.${v}`)}
+        layout="pair"
+      />
+      <div data-if="energyPricing:single">
+        <Field name="kwhAll" label={tx('bills.electricity.kwh')} kind="amount" />
+        <div class="pair">
+          <Field name="energyPriceAll" label={tx('bills.electricity.energy_price')} kind="amount" />
+          <Field name="energyAmountAll" label={tx('bills.electricity.line_amount')} kind="amount" />
+        </div>
       </div>
     </fieldset>
 

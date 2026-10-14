@@ -4,6 +4,8 @@ import type { CivilDate } from '../date';
 // entered as what it takes off. Prices per unit with as many decimals as the bill gives.
 export type PowerPeriod = 'p1' | 'p2';
 export type EnergyPeriod = 'p1' | 'p2' | 'p3';
+// A line that prices all the energy at one price, without splitting it by period, is `all`.
+export type EnergyLinePeriod = EnergyPeriod | 'all';
 
 export type PowerPriceUnit = 'per_kw_day' | 'per_kw_year';
 
@@ -19,7 +21,7 @@ export interface PowerLine {
 }
 
 export interface EnergyLine {
-  readonly period: EnergyPeriod;
+  readonly period: EnergyLinePeriod;
   readonly kwh: number;
   readonly price: number;
   readonly amount: number;

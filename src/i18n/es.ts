@@ -6496,6 +6496,7 @@ export const es = {
   'bills.electricity.question.potencia-punta': 'Potencia en punta (P1)',
   'bills.electricity.question.potencia-valle': 'Potencia en valle (P2)',
   'bills.electricity.question.potencia-maxima': 'Potencia máxima que usaste',
+  'bills.electricity.question.energia': 'Cómo cobra la energía',
   'bills.electricity.question.energia-punta': 'Energía en punta (P1)',
   'bills.electricity.question.energia-llano': 'Energía en llano (P2)',
   'bills.electricity.question.energia-valle': 'Energía en valle (P3)',
@@ -6568,6 +6569,11 @@ export const es = {
   'bills.electricity.max_used_p1': 'Punta (P1), kW',
   'bills.electricity.max_used_p2': 'Valle (P2), kW',
   'bills.electricity.kwh': 'Consumo, kWh',
+  'bills.electricity.energy_pricing': '¿Tu factura separa la energía por periodos?',
+  'bills.electricity.energy_pricing_hint':
+    'Casi siempre trae tres líneas, punta, llano y valle. Algunas tarifas del mercado libre cobran toda la energía a un solo precio, en una sola línea.',
+  'bills.electricity.energy_pricing.periods': 'Sí, por periodos',
+  'bills.electricity.energy_pricing.single': 'No, un solo precio',
   'bills.electricity.energy_price': 'Precio, €/kWh',
   'bills.electricity.tolls_shown': '¿Tu factura los desglosa?',
   'bills.electricity.tolls_shown_hint':
@@ -6803,6 +6809,7 @@ export const es = {
   'client.bills.period.energy.p1': 'P1 (punta)',
   'client.bills.period.energy.p2': 'P2 (llano)',
   'client.bills.period.energy.p3': 'P3 (valle)',
+  'client.bills.period.energy.all': 'Toda la energía, a un solo precio',
   'client.bills.service.maintenance': 'Mantenimiento',
   'client.bills.service.insurance': 'Seguro',
   'client.bills.service.pack': 'Pack',
@@ -7056,6 +7063,8 @@ export const es = {
     'Tu factura no los desglosa. La Resolución de 28 de abril de 2021 de la Dirección General de Política Energética y Minas pide que la factura los muestre.',
   'client.bills.calculation.tolls.energy_price_change':
     'Los peajes y cargos de energía cambian dentro del periodo y no se sabe qué kWh van a cada precio: no se comprueban.',
+  'client.bills.calculation.tolls.energy_one_price':
+    'Tu factura cobra toda la energía a un solo precio, sin separarla por periodos, y no se sabe qué kWh van a cada uno: los peajes y cargos de energía no se comprueban.',
   'client.bills.calculation.tolls.free_market_price':
     'En el mercado libre, que tu precio quede por debajo de los peajes y cargos no va contra ninguna norma: no se marca.',
   'client.bills.calculation.pvpc.power_over_10kw':
