@@ -377,8 +377,8 @@
               },
               "period": {
                 "type": "string",
-                "enum": ["p1", "p2", "p3"],
-                "description": "p1 (punta), p2 (llano) or p3 (valle)."
+                "enum": ["p1", "p2", "p3", "all"],
+                "description": "p1 (punta), p2 (llano) or p3 (valle); all when one line prices all the energy at one price, without splitting it by period."
               },
               "kwh": {
                 "type": "number",

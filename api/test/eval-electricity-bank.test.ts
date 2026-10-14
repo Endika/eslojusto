@@ -34,10 +34,10 @@ describe('the bank of electricity packs', () => {
     }
   });
 
-  it('holds 37 packs and marks eleven hard ones for the AI pass, the unreadable and the long among them', () => {
-    expect(ELECTRICITY_BANK).toHaveLength(37);
+  it('holds 38 packs and marks twelve hard ones for the AI pass, the unreadable and the long among them', () => {
+    expect(ELECTRICITY_BANK).toHaveLength(38);
     const hard = ELECTRICITY_BANK.filter((c) => c.eval);
-    expect(hard).toHaveLength(11);
+    expect(hard).toHaveLength(12);
     for (const c of ELECTRICITY_BANK.filter(
       (x) => x.expected.extraction.outcome === 'nothing_read' || bills(x).length >= 12,
     ))

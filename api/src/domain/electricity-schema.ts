@@ -9,6 +9,8 @@ export const ACCESS_TARIFFS = ['2.0TD', '3.0TD', '6.1TD', 'other'] as const;
 export const SELF_CONSUMPTION = ['none', 'without_surplus', 'with_surplus'] as const;
 export const POWER_PERIODS = ['p1', 'p2'] as const;
 export const ENERGY_PERIODS = ['p1', 'p2', 'p3'] as const;
+// An energy line also takes `all`: one price for all the energy, not split by period.
+export const ENERGY_LINE_PERIODS = [...ENERGY_PERIODS, 'all'] as const;
 export const POWER_PRICE_UNITS = ['per_kw_day', 'per_kw_year'] as const;
 export const SOCIAL_BONUS_CATEGORIES = ['vulnerable', 'severe'] as const;
 export const METER_PHASES = ['single', 'three'] as const;
@@ -190,7 +192,10 @@ const energyLines = list(
   MAX_ENERGY_LINES,
   {
     document: billDocument,
-    period: oneOf(ENERGY_PERIODS, 'p1 (punta), p2 (llano) or p3 (valle).'),
+    period: oneOf(
+      ENERGY_LINE_PERIODS,
+      'p1 (punta), p2 (llano) or p3 (valle); all when one line prices all the energy at one price, without splitting it by period.',
+    ),
     kwh: decimal(100_000, 3, 'kWh billed.'),
     price: unitPrice('Price per kWh as printed, with every decimal.'),
     amount: money('Amount of the line.'),

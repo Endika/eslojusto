@@ -868,8 +868,8 @@ describe('an evaluation run over the bill banks', () => {
   const hardBills = ELECTRICITY_BANK.filter((c) => c.eval);
   const hardTelecom = TELECOM_BANK.filter((c) => c.eval);
 
-  it('reads the eleven hard electricity packs and the four hard telecom ones by default', () => {
-    expect(selectCases(ELECTRICITY_BANK, undefined)).toHaveLength(11);
+  it('reads the twelve hard electricity packs and the four hard telecom ones by default', () => {
+    expect(selectCases(ELECTRICITY_BANK, undefined)).toHaveLength(12);
     expect(selectCases(TELECOM_BANK, undefined)).toHaveLength(4);
   });
 

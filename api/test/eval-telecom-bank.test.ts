@@ -34,14 +34,14 @@ describe('the bank of telecom packs', () => {
     }
   });
 
-  it('holds 9 packs and marks four hard ones, which with the electricity bank make fifteen', () => {
+  it('holds 9 packs and marks four hard ones, which with the electricity bank make sixteen', () => {
     expect(TELECOM_BANK).toHaveLength(9);
     expect(TELECOM_BANK.filter((c) => c.eval)).toHaveLength(4);
     for (const c of TELECOM_BANK.filter((x) => x.expected.extraction.outcome === 'nothing_read'))
       expect(c.eval, c.id).toBe(true);
     expect(
       TELECOM_BANK.filter((c) => c.eval).length + ELECTRICITY_BANK.filter((c) => c.eval).length,
-    ).toBe(15);
+    ).toBe(16);
   });
 
   it('fits every pack in what the API accepts', () => {
