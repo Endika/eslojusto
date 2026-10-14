@@ -179,8 +179,8 @@ async function check(series, today) {
       if (day !== undefined && day <= series.coveredUntil)
         errors.push(`coveredUntil ${series.coveredUntil} reaches ${month}, released ${day}`);
   }
-  if (series.coveredUntil > today)
-    errors.push(`coveredUntil ${series.coveredUntil} is after today`);
+  if (series.coveredUntil > today && later.length === 0)
+    errors.push(`coveredUntil ${series.coveredUntil} is after today with no release scheduled`);
 
   const flashes = hasFlash ? await checkFlashes(series, releases, figures) : null;
   if (flashes) errors.push(...flashes.errors);
