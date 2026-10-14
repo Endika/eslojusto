@@ -116,6 +116,7 @@ function verdictOf(figures: HouseholdSeverance, p: SeverancePart, input: Househo
       ),
       basedOnYourAnswer: true,
     };
+  if (p.amount <= 0) return { status: 'within_limit', amount: null, calculation };
   return {
     status: 'review_it',
     calculation: [...calculation, phrase('severance.offered_unknown')],

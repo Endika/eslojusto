@@ -3,7 +3,8 @@ import { findingsFor, single, type Verdict } from './finding';
 import type { NormTable } from './norms';
 import type { Assessed, HouseholdInput } from './types';
 
-// Art. 9. These are warnings: they carry no amount and never add to what is owed.
+// Art. 9. A breach is flagged over or below the limit, but carries no amount and never adds to
+// what is owed.
 const WEEKLY_HOURS = 40;
 const REST_BETWEEN_SHIFTS = 12;
 // A live-in worker may rest ten hours, the difference made up within four weeks.

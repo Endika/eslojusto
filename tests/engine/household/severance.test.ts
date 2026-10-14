@@ -125,6 +125,16 @@ describe('the severance finding', () => {
     expect(highestAmount(a)).toBe(0);
   });
 
+  it('is within the limit with «No lo sé» when nothing is owed', () => {
+    const a = run('2020-03-20', { severanceAvailable: null, severanceOffered: null });
+    if (a?.kind !== 'readings') throw new Error('expected two readings');
+    // No complete year owes 0 days; the month started still owes one, so that one stays open.
+    expect(a.readings.map((r) => [r.when, r.finding.status])).toEqual([
+      ['complete_years_only', 'within_limit'],
+      ['prorated_by_months', 'review_it'],
+    ]);
+  });
+
   it('cannot be worked out without the salary', () => {
     const a = assessSeverance(
       household({ monthlyCash: null, termination: desistimiento() }),
