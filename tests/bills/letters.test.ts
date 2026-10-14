@@ -12,7 +12,6 @@ import type { CompletedTelecomReview } from '../../src/bills/telecom/ports';
 import { NO_DETAILS, type LetterDetails, type LetterKind } from '../../src/documents/letter';
 import { renderPdf } from '../../src/documents/pdf';
 import type { Block, DocumentModel } from '../../src/documents/ports';
-import { BILLS_NORMS } from '../../src/engine/bills/data/norms';
 import { BILLS_SOURCES } from '../../src/engine/bills/data/sources';
 import { BILLS_TABLES } from '../../src/engine/bills/data/tables';
 import { reviewElectricityBill } from '../../src/engine/bills/electricity-review';
@@ -24,18 +23,22 @@ import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { FORBIDDEN, forbiddenIn } from '../support/forbidden';
 import { freeBill, juneBill, meter, telecom, TODAY } from '../engine/bills/input';
+import { NORMS_BEFORE_FIGURE } from '../engine/bills/norms-before-figure';
 
 const tr: Translate = (key, vars) => t('es', key, vars);
 
 const electricity = (input: ElectricityBillInput): CompletedElectricityReview => {
-  const r = reviewElectricityBill(input, TODAY, { norms: BILLS_NORMS, tables: BILLS_TABLES });
+  const r = reviewElectricityBill(input, TODAY, {
+    norms: NORMS_BEFORE_FIGURE,
+    tables: BILLS_TABLES,
+  });
   if (!r.ok) throw new Error(JSON.stringify(r.errors));
   return { input, review: r.review };
 };
 
 const exit = (input: TelecomInput): CompletedTelecomReview => {
   const r = reviewTelecom(input, TODAY, {
-    norms: BILLS_NORMS,
+    norms: NORMS_BEFORE_FIGURE,
     sources: BILLS_SOURCES,
     tables: { holidays: BILLS_TABLES.holidays },
   });
@@ -102,7 +105,7 @@ describe('which electricity letters a year offers', () => {
     expect(electricityLetterKinds([meterOver()])).toEqual(['bill_correction']);
     expect(electricityLetterKinds([electricity(juneBill())])).toEqual([]);
     expect(electricityLetterKinds([vatUnsettled])).toEqual([]);
-    const c = electricityCase([meterOver()], BILLS_NORMS);
+    const c = electricityCase([meterOver()], NORMS_BEFORE_FIGURE);
     expect(c.letterKinds).toEqual(['bill_correction']);
     expect(c.freeLetterKinds).toEqual([]);
     expect(c.filename?.('letter', 'bill_correction')).toBe(
@@ -112,14 +115,14 @@ describe('which electricity letters a year offers', () => {
   });
 
   it('never builds a letter the year does not offer', () => {
-    const c = electricityCase([electricity(juneBill())], BILLS_NORMS);
+    const c = electricityCase([electricity(juneBill())], NORMS_BEFORE_FIGURE);
     expect(() => c.letter('bill_correction', NO_DETAILS, tr)).toThrow();
   });
 });
 
 describe('the correction letter', () => {
   it('gives each line with what was billed, what the norm sets and the difference', () => {
-    const all = text(correctionLetter([meterOver()], BILLS_NORMS, DETAILS, tr));
+    const all = text(correctionLetter([meterOver()], NORMS_BEFORE_FIGURE, DETAILS, tr));
     expect(all).toContain('Petición de factura rectificativa');
     expect(all).toContain('Factura del 31-05-2026 al 30-06-2026');
     expect(all).toContain(
@@ -131,7 +134,7 @@ describe('the correction letter', () => {
   });
 
   it('says what art. 45.2 says of amounts billed over, and links the decree', () => {
-    const model = correctionLetter([meterOver()], BILLS_NORMS, DETAILS, tr);
+    const model = correctionLetter([meterOver()], NORMS_BEFORE_FIGURE, DETAILS, tr);
     expect(text(model)).toContain(
       'El art. 45.2 del Reglamento que aprueba el Real Decreto 88/2026 dice que, si el comercializador ha facturado cantidades superiores a las debidas, en relación con la energía o con el acceso a las redes, deben devolverse todas las cantidades indebidamente facturadas en la primera facturación siguiente, sin fraccionarlas, con los intereses del tipo de interés legal del dinero más 150 puntos básicos.',
     );
@@ -148,7 +151,12 @@ describe('the correction letter', () => {
       readingFrom: parseDate('2026-06-30'),
       readingTo: parseDate('2026-07-30'),
     });
-    const model = correctionLetter([meterOver(), july, meterOver()], BILLS_NORMS, DETAILS, tr);
+    const model = correctionLetter(
+      [meterOver(), july, meterOver()],
+      NORMS_BEFORE_FIGURE,
+      DETAILS,
+      tr,
+    );
     const all = text(model);
     expect(model.title).toBe('Petición de facturas rectificativas');
     expect(all).toContain('Te escribo por 2 facturas de la luz');
@@ -175,7 +183,7 @@ describe('the correction letter', () => {
       expect(f.direction).toBe('over');
       expect(f.pendingOn).toEqual([]);
     }
-    const all = text(correctionLetter(year, BILLS_NORMS, DETAILS, tr));
+    const all = text(correctionLetter(year, NORMS_BEFORE_FIGURE, DETAILS, tr));
     expect(all).toContain('Servicio aparte de la luz · Seguro: facturado, 3,00 €');
     expect(all).not.toContain('Mantenimiento');
     expect(all).not.toContain('IVA');
@@ -293,7 +301,7 @@ describe('which telecom letters an exit offers', () => {
   });
 
   it('builds both through the pass, and names each file', () => {
-    const c = telecomCase(exit(telecom({ penaltyCharged: 120 })), BILLS_NORMS);
+    const c = telecomCase(exit(telecom({ penaltyCharged: 120 })), NORMS_BEFORE_FIGURE);
     expect(c.letter('telecom_penalty_review', NO_DETAILS, tr).title).toBe(
       'Revisión de la penalización por permanencia',
     );
@@ -301,7 +309,7 @@ describe('which telecom letters an exit offers', () => {
       'client.bills.telecom.letter.penalty.filename',
     );
     expect(() => c.letter('telecom_exit_without_penalty', NO_DETAILS, tr)).toThrow();
-    const free = telecomCase(exit(afterChange()), BILLS_NORMS);
+    const free = telecomCase(exit(afterChange()), NORMS_BEFORE_FIGURE);
     expect(free.freeLetterKinds).toEqual(['telecom_exit_without_penalty']);
     expect(free.filename?.('letter', 'telecom_exit_without_penalty')).toBe(
       'client.bills.telecom.letter.exit.filename',
@@ -333,11 +341,11 @@ describe('the bills letters', () => {
   ];
   const models = [
     ...electricityCases.flatMap((entries) => {
-      const c = electricityCase(entries, BILLS_NORMS);
+      const c = electricityCase(entries, NORMS_BEFORE_FIGURE);
       return [...c.letterKinds.map((k) => c.letter(k, DETAILS, tr)), c.report(tr, TODAY)];
     }),
     ...telecomCases.flatMap((r) => {
-      const c = telecomCase(r, BILLS_NORMS);
+      const c = telecomCase(r, NORMS_BEFORE_FIGURE);
       const kinds: LetterKind[] = [...c.letterKinds, ...(c.freeLetterKinds ?? [])];
       return [...kinds.map((k) => c.letter(k, DETAILS, tr)), c.report(tr, TODAY)];
     }),

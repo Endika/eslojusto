@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
+import { NORMS_BEFORE_FIGURE } from './norms-before-figure';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
 import {
   checkPvpc,
@@ -150,7 +151,7 @@ describe('the social bonus funding, by day', () => {
 
   it('while a norm is not settled, gives both readings and counts only the lower', () => {
     const conditional = {
-      ...BILLS_NORMS.rdl25_2026_november,
+      ...NORMS_BEFORE_FIGURE.rdl25_2026_november,
       inForceSince: '2026-06-01',
       inForceUntil: '2026-06-30',
     };

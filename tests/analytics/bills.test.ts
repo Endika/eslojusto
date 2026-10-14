@@ -25,7 +25,6 @@ import {
 import { STEPS as TELECOM_STEPS } from '../../src/bills/telecom/steps';
 import { BILLS_FAQ_TOPICS } from '../../src/content/bills-faq-topics';
 import { reviewBasket } from '../../src/engine/bills/basket';
-import { BILLS_NORMS } from '../../src/engine/bills/data/norms';
 import { BILLS_SOURCES } from '../../src/engine/bills/data/sources';
 import { BILLS_TABLES } from '../../src/engine/bills/data/tables';
 import { reviewElectricityBill } from '../../src/engine/bills/electricity-review';
@@ -33,16 +32,20 @@ import { reviewTelecom } from '../../src/engine/bills/telecom-review';
 import type { ElectricityBillInput, TelecomInput } from '../../src/engine/bills/types';
 import { parseDate } from '../../src/engine/date';
 import { TODAY, freeBill, juneBill, meter, telecom } from '../engine/bills/input';
+import { NORMS_BEFORE_FIGURE } from '../engine/bills/norms-before-figure';
 
 const electricity = (input: ElectricityBillInput) => {
-  const r = reviewElectricityBill(input, TODAY, { norms: BILLS_NORMS, tables: BILLS_TABLES });
+  const r = reviewElectricityBill(input, TODAY, {
+    norms: NORMS_BEFORE_FIGURE,
+    tables: BILLS_TABLES,
+  });
   if (!r.ok) throw new Error(JSON.stringify(r.errors));
   return { review: r.review, input };
 };
 
 const telecomReview = (input: TelecomInput) => {
   const r = reviewTelecom(input, TODAY, {
-    norms: BILLS_NORMS,
+    norms: NORMS_BEFORE_FIGURE,
     sources: BILLS_SOURCES,
     tables: { holidays: BILLS_TABLES.holidays },
   });
