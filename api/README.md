@@ -927,7 +927,7 @@ run at once, and the budget action caps the month.
 
 ## Evaluation
 
-`eval/` holds five synthetic banks. The rental one has 35 lease packs: each case
+`eval/` holds seven synthetic banks. The rental one has 35 lease packs: each case
 (`eval/cases/*.json`, shape in `eval/schema.ts`) lists its pages, drawn from the lease templates in
 `eval/templates/` or as notices, receipts, invoices and deposit returns, with how each photo is
 spoiled; what a read should find in them; and the facts and review the site's engine should give
@@ -951,9 +951,16 @@ Catalan and one in Galician, two of forty folios of which the useful pages were 
 registry, agency and valuation invoices, apart and mixed, modelo 600 returns of the loan and of the
 purchase, the notary's act of art. 15 LCCI and statements of early repayments, a switch to a fixed
 rate and a change of lender; `tests/engine/mortgage/bank.test.ts` runs `reviewMortgage` on each
-case's facts, at no cost. Every person, company and identifier in every bank is invented, and
+case's facts, at no cost. The electricity one has 37 packs (`eval/cases/electricity/*.json`, shape
+in `eval/electricity-schema.ts`) drawn from `eval/templates/electricity/`: PVPC bills re-laid out
+from the model bills of the DGPEM resolution of 28-04-2021 and free-market bills in three layouts,
+from June to December 2026, with the social bonus, single- and three-phase meters, packs of three
+and twelve bills and a contract; the telecom one has 9 (`eval/cases/telecom/*.json`, shape in
+`eval/telecom-schema.ts`): mobile and fibre contracts, price rise notices and the bills after an
+exit. `tests/engine/bills/bank.test.ts` checks every bill line against the engine, at no cost.
+Every person, company and identifier in every bank is invented, and
 `test/eval-synthetic.test.ts` proves that each DNI, NIE, IBAN, Social Security number, employer
-account code and CIF fails its check digits, and that each policy number starts with `PRUEBA-`.
+account code, CIF and supply point code (CUPS) fails its check digits, and that each policy number starts with `PRUEBA-`.
 
 ```bash
 npm run rental-bank                          # at the root: renders the lease photos to api/eval/out/
@@ -961,28 +968,34 @@ npm run employment-bank                      # at the root: the employment ones 
 npm run credit-bank                          # at the root: the credit ones to api/eval/out/credit/
 npm run insurance-bank                       # at the root: the insurance ones to api/eval/out/insurance/
 npm run mortgage-bank                        # at the root: the mortgage ones to api/eval/out/mortgage/
+npm run doc-bank -- --bank electricity       # at the root: the electricity ones to api/eval/out/electricity/
+npm run doc-bank -- --bank telecom           # at the root: the telecom ones to api/eval/out/telecom/
 EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval # here: reads the lease photos with Bedrock, never in CI
 EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval -- --review employment --cases eval/cases/employment
 EVAL_CONFIRM=yes EVAL_MAX_USD=2 npm run eval -- --review credit
 EVAL_CONFIRM=yes EVAL_MAX_USD=1 npm run eval -- --review insurance
 EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval -- --review mortgage
+EVAL_CONFIRM=yes EVAL_MAX_USD=3 npm run eval -- --review electricity
+EVAL_CONFIRM=yes EVAL_MAX_USD=1 npm run eval -- --review telecom
 ```
 
 The renderer is deterministic: the same seed (`--seed`, by default 20261008) gives the same
 bytes, and it prints the hash of what it wrote; `--cases` and `--out` point it at another bank.
 The run (`eval/run.ts`, with `tsx`, outside vitest) refuses to start without `EVAL_CONFIRM=yes`
 and a positive `EVAL_MAX_USD`, and exits before it loads any AWS adapter. `--review` picks the
-bank (`rental` by default, `employment`, `credit`, `insurance` or `mortgage`) and `--cases` its
+bank (`rental` by default, `employment`, `credit`, `insurance`, `mortgage`, `electricity` or
+`telecom`) and `--cases` its
 folder, by default that bank's. It reads, by default, the packs marked `eval: true` (bad photos,
 doubtful cases, long documents): 15 of the rental, of the employment and of the mortgage bank (four
 of them with more than nine photos: the two long deeds and two full deeds with their bills), and 15
-between the credit (10) and the insurance (5) banks; `EVAL_CASES=all` or a
+between the credit (10) and the insurance (5) banks, and 15 between the electricity (11) and the
+telecom (4) banks; `EVAL_CASES=all` or a
 comma-separated list of ids picks others, and so does `--only id1,id2`. Each pack goes through the Lambda's own domain (`extract`
 with that review) and the real `createBedrockReader`, with the models of `src/config.ts`. Before
 each pack it adds the cost measured so far (tokens × `MODEL_PRICES_USD_PER_MTOK`) to the worst
 case of one more pack and stops if that could pass `EVAL_MAX_USD`. It writes `report.json` next to
-the bank's photos (`eval/out/`, `eval/out/employment/`, `eval/out/credit/`, `eval/out/insurance/`
-or `eval/out/mortgage/`): accuracy by field and by page kind,
+the bank's photos (`eval/out/`, `eval/out/employment/`, `eval/out/credit/`, `eval/out/insurance/`,
+`eval/out/mortgage/`, `eval/out/electricity/` or `eval/out/telecom/`): accuracy by field and by page kind,
 `nothing_read` expected and got, conflicts, escalations, corrective retries, reads cut at `max_tokens`, values of a
 person found in what the model wrote (it must be 0; for employment the person replaced and a
 household employer count too, for a mortgage the notary) and the total cost. For a pack that missed any field it keeps, per
