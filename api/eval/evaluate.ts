@@ -30,6 +30,13 @@ import {
   type EmploymentBankCase,
   type EmploymentTemplateId,
 } from './employment-schema';
+import {
+  ELECTRICITY_PERSON_KEYS,
+  electricityPageKind,
+  isElectricityTemplatePage,
+  type ElectricityBankCase,
+  type ElectricityTemplateId,
+} from './electricity-schema';
 import type { EvalReview } from './env';
 import {
   INSURANCE_PERSON_KEYS,
@@ -45,6 +52,13 @@ import {
   type MortgageBankCase,
   type MortgageTemplateId,
 } from './mortgage-schema';
+import {
+  isTelecomTemplatePage,
+  TELECOM_PERSON_KEYS,
+  telecomPageKind,
+  type TelecomBankCase,
+  type TelecomTemplateId,
+} from './telecom-schema';
 import {
   isTemplatePage,
   pageKind,
@@ -237,6 +251,28 @@ export const expectedMortgagePages = (
     sheetsOf,
   );
 
+export const expectedElectricityPages = (
+  bankCase: ElectricityBankCase,
+  sheetsOf: (template: ElectricityTemplateId) => number,
+): readonly ExpectedPage[] =>
+  templatedPages(
+    bankCase.pages,
+    (p) => (isElectricityTemplatePage(p) ? p.template : null),
+    electricityPageKind,
+    sheetsOf,
+  );
+
+export const expectedTelecomPages = (
+  bankCase: TelecomBankCase,
+  sheetsOf: (template: TelecomTemplateId) => number,
+): readonly ExpectedPage[] =>
+  templatedPages(
+    bankCase.pages,
+    (p) => (isTelecomTemplatePage(p) ? p.template : null),
+    telecomPageKind,
+    sheetsOf,
+  );
+
 export const rentalBank = (sheetsOf: (template: TemplateId) => number): EvalBank<BankCase> => ({
   review: 'rental',
   pagesOf: (c) => expectedPages(c, sheetsOf),
@@ -273,6 +309,22 @@ export const mortgageBank = (
   review: 'mortgage',
   pagesOf: (c) => expectedMortgagePages(c, sheetsOf),
   personKeys: MORTGAGE_PERSON_KEYS,
+});
+
+export const electricityBank = (
+  sheetsOf: (template: ElectricityTemplateId) => number,
+): EvalBank<ElectricityBankCase> => ({
+  review: 'electricity',
+  pagesOf: (c) => expectedElectricityPages(c, sheetsOf),
+  personKeys: ELECTRICITY_PERSON_KEYS,
+});
+
+export const telecomBank = (
+  sheetsOf: (template: TelecomTemplateId) => number,
+): EvalBank<TelecomBankCase> => ({
+  review: 'telecom',
+  pagesOf: (c) => expectedTelecomPages(c, sheetsOf),
+  personKeys: TELECOM_PERSON_KEYS,
 });
 
 function diagnose(
@@ -331,7 +383,9 @@ type AnyResponse =
   | ExtractResponse<'employment'>
   | ExtractResponse<'credit'>
   | ExtractResponse<'insurance'>
-  | ExtractResponse<'mortgage'>;
+  | ExtractResponse<'mortgage'>
+  | ExtractResponse<'electricity'>
+  | ExtractResponse<'telecom'>;
 interface Scored {
   readonly fields: Readonly<Record<string, { readonly value: unknown } | undefined>>;
   readonly lists: Readonly<

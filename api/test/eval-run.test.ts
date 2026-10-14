@@ -11,6 +11,7 @@ import type { EmploymentBankCase } from '../eval/employment-schema';
 import { parseEvalArgs, parseEvalEnv, selectCases } from '../eval/env';
 import {
   creditBank,
+  electricityBank,
   employmentBank,
   evaluate,
   expectedCreditPages,
@@ -21,6 +22,7 @@ import {
   insuranceBank,
   mortgageBank,
   rentalBank,
+  telecomBank,
   type EvalBank,
   type EvalCase,
   type EvalDeps,
@@ -38,10 +40,12 @@ import {
   BANK,
   bankSheetsOf,
   CREDIT_BANK,
+  ELECTRICITY_BANK,
   EMPLOYMENT_BANK,
   employmentSheetsOf,
   INSURANCE_BANK,
   MORTGAGE_BANK,
+  TELECOM_BANK,
   sheetsOf,
 } from './support/bank';
 import { FakeClock } from './support/fakes';
@@ -118,6 +122,14 @@ describe('starting an evaluation run', () => {
       review: 'mortgage',
       cases: 'eval/cases/mortgage',
     });
+    expect(parseEvalArgs(['--review', 'electricity'])).toEqual({
+      review: 'electricity',
+      cases: 'eval/cases/electricity',
+    });
+    expect(parseEvalArgs(['--review', 'telecom'])).toEqual({
+      review: 'telecom',
+      cases: 'eval/cases/telecom',
+    });
     expect(
       parseEvalArgs(['--review', 'employment', '--only', 'replacement-named,household-gate']),
     ).toEqual({
@@ -128,7 +140,10 @@ describe('starting an evaluation run', () => {
   });
 
   it.each([
-    [['--review', 'final_pay'], 'rental, employment, credit, insurance or mortgage'],
+    [
+      ['--review', 'final_pay'],
+      'rental, employment, credit, insurance, mortgage, electricity or telecom',
+    ],
     [['--review'], '--review takes a value'],
     [['--review', 'employment', '--cases'], '--cases takes a value'],
     [['--cases', '--review', 'employment'], '--cases takes a value'],
@@ -844,5 +859,44 @@ describe('an evaluation run over the mortgage bank', () => {
       ),
     );
     expect(report.personsTranscribed).toBe(1);
+  });
+});
+
+describe('an evaluation run over the bill banks', () => {
+  const electricity = electricityBank(bankSheetsOf);
+  const telecom = telecomBank(bankSheetsOf);
+  const hardBills = ELECTRICITY_BANK.filter((c) => c.eval);
+  const hardTelecom = TELECOM_BANK.filter((c) => c.eval);
+
+  it('reads the eleven hard electricity packs and the four hard telecom ones by default', () => {
+    expect(selectCases(ELECTRICITY_BANK, undefined)).toHaveLength(11);
+    expect(selectCases(TELECOM_BANK, undefined)).toHaveLength(4);
+  });
+
+  it('stops before a pack whose worst case would cross the cap, and reads as its review', async () => {
+    // 60.000 in and 8.000 out is 0,33 USD a pack, against a worst case of 0,5148 USD.
+    const answer = () => ({ toolInput: null, inputTokens: 60_000, outputTokens: 8000 });
+    const bills = new FixedReader(answer);
+    const billsReport = await evaluate(
+      hardBills.map(packFor(electricity)),
+      electricity,
+      employmentDeps(bills, 3),
+    );
+    // After eight packs 2,64 USD is spent, and 2,64 + 0,5148 > 3.
+    expect(bills.calls).toHaveLength(8);
+    expect(billsReport.stoppedBefore).toBe(hardBills[8]?.id);
+    expect(billsReport.costUsd).toBeLessThanOrEqual(3);
+    for (const call of bills.calls) expect(call.review).toBe('electricity');
+
+    const lines = new FixedReader(answer);
+    const linesReport = await evaluate(
+      hardTelecom.map(packFor(telecom)),
+      telecom,
+      employmentDeps(lines, 1),
+    );
+    // After one pack 0,33 USD is spent, and 0,33 + 0,5148 ≤ 1 lets a second one in; not a third.
+    expect(lines.calls).toHaveLength(2);
+    expect(linesReport.stoppedBefore).toBe(hardTelecom[2]?.id);
+    for (const call of lines.calls) expect(call.review).toBe('telecom');
   });
 });
