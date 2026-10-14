@@ -593,9 +593,15 @@
       "flags": [
         {
           "label": "floor_clause",
-          "state": "not_in_deed",
-          "phrases": ["flags.floor_zero"],
-          "parts": []
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "case_law",
+              "rule": "floor_case_law",
+              "phrases": ["flags.floor_case_law"]
+            }
+          ]
         },
         {
           "label": "default_interest",

@@ -47,6 +47,6 @@ export type MortgageSourceId =
 export type SourceTable = LawSourceTable<MortgageSourceId>;
 
 // Passages of the norms read word for word in the BOE, which the page may quote.
-export type MortgageTextId = 'lcci_14' | 'lcci_15' | 'lcci_21' | 'trlitpajd_29';
+export type MortgageTextId = 'lcci_14' | 'lcci_15' | 'lcci_21' | 'trlitpajd_29' | 'arancel_6';
 
 export type TextTable = LawSourceTable<MortgageTextId>;

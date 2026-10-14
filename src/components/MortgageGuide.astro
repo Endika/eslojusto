@@ -206,6 +206,9 @@ const faq = mortgageFaqEntries(lang, { documents });
             />
           </>
         )}
+        {id === 'before_2019' && (
+          <LegalQuote lang={lang} source={MORTGAGE_TEXTS.arancel_6} quote="mortgage_copies" />
+        )}
         {id === 'tax' && (
           <LegalQuote lang={lang} source={MORTGAGE_TEXTS.trlitpajd_29} quote="mortgage_tax" />
         )}

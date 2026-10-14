@@ -20,6 +20,10 @@ export const LEGAL_QUOTES: Readonly<Record<string, LegalQuoteText>> = {
     source: 'lcci_14',
     text: 'Los gastos de inscripción de las garantías en el registro de la propiedad corresponderán al prestamista.',
   },
+  mortgage_copies: {
+    source: 'arancel_6',
+    text: 'La obligación de pago de los derechos corresponderá a los que hubieren requerido la prestación de funciones o los servicios del Notario y, en su caso, a los interesados según las normas sustantivas y fiscales, y si fueren varios, a todos ellos solidariamente.',
+  },
   mortgage_transparency_deed: {
     source: 'lcci_15',
     text: 'El acta donde conste la entrega y asesoramiento imparcial al prestatario no generará coste arancelario alguno.',

@@ -1,6 +1,6 @@
 {
   "id": "deed-2018-12-tax-paid-by-borrower",
-  "description": "Deed of 18-12-2018 where the borrower paid the stamp duty: from 10-11-2018 art. 29 TRLITPAJD makes the lender the taxpayer, so the law puts it on the lender, on its own line and without interest; the notary, registry, agency and valuation follow the Supreme Court split (STS 35/2021) with legal interest (STS 725/2018). A rate that may never be negative is no floor (art. 21.4 LCCI).",
+  "description": "Deed of 18-12-2018 where the borrower paid the stamp duty: from 10-11-2018 art. 29 TRLITPAJD makes the lender the taxpayer, so the law puts it on the lender, on its own line and without interest; the notary, registry, agency and valuation follow the Supreme Court split (STS 35/2021) with legal interest (STS 725/2018). Its 0 % floor is read as any other floor: art. 21.4 LCCI only binds deeds from 16-06-2019.",
   "eval": true,
   "today": "2026-10-09",
   "pages": [
@@ -563,9 +563,15 @@
       "flags": [
         {
           "label": "floor_clause",
-          "state": "not_in_deed",
-          "phrases": ["flags.floor_zero"],
-          "parts": []
+          "state": "in_deed",
+          "phrases": [],
+          "parts": [
+            {
+              "basis": "case_law",
+              "rule": "floor_case_law",
+              "phrases": ["flags.floor_case_law"]
+            }
+          ]
         },
         {
           "label": "default_interest",

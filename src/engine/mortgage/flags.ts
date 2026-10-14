@@ -308,9 +308,12 @@ function readClause(
 const isFlagLabel = (label: ClauseLabel): label is FlagLabel =>
   (FLAG_LABELS as readonly ClauseLabel[]).includes(label);
 
-// A floor of 0 % only keeps the rate from going below zero, as art. 21.4 LCCI allows: no floor.
-const zeroFloor = (clause: Clause): boolean =>
-  clause.label === 'floor_clause' && clause.floorPercent === 0;
+// A floor of 0 % only keeps the rate from going below zero, as art. 21.4 LCCI requires of deeds
+// from 16-06-2019: no floor there. In an earlier deed it is read as any other floor.
+const zeroFloor = (clause: Clause, input: MortgageInput, deps: MortgageDeps): boolean =>
+  clause.label === 'floor_clause' &&
+  clause.floorPercent === 0 &&
+  applies('floor_statute', input.deedOn, deps);
 
 // One flag per clause the person confirmed or the reading found, in the order they came. What the
 // law or a court says is given beside it, with its source, and never as a verdict on the clause.
@@ -329,7 +332,7 @@ export function reviewFlags(
       flags.push({ label, state: 'unreadable', calculation: [], parts: [] });
     } else if (!clause.present) {
       flags.push({ label, state: 'not_in_deed', calculation: [], parts: [] });
-    } else if (zeroFloor(clause)) {
+    } else if (zeroFloor(clause, input, deps)) {
       flags.push({ label, state: 'not_in_deed', calculation: [p('flags.floor_zero')], parts: [] });
     } else {
       flags.push({ label, state: 'in_deed', ...readClause(label, clause, input, today, deps) });
