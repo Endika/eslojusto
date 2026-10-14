@@ -6396,7 +6396,7 @@ export const es = {
   'bills.guide.social_bonus.p1':
     'El bono social es un descuento sobre el PVPC que aplica la comercializadora de referencia (Real Decreto 897/2017, art. 6). En 2026 es del 42,5 % para el consumidor vulnerable y del 57,5 % para el vulnerable severo (Real Decreto-ley 7/2026, art. 1); sin esa norma serían el 35 % y el 50 % (art. 6.3). En la energía, el descuento llega hasta un límite de kWh por factura que fija el anexo I según tu unidad familiar; lo que pasa de ese límite se paga a PVPC.',
   'bills.guide.social_bonus.p2':
-    'La financiación del bono social es otra línea: un término del PVPC que se cobra en proporción a los días de la factura (Real Decreto 216/2014, art. 8.4) con el valor que fija una orden del Ministerio. En 2026, 6,979247 € por suministro y año hasta el 25-06-2026 (Orden TED/1524/2025) y 9,011295 € desde el 26-06-2026 (Orden TED/634/2026).',
+    'La financiación del bono social es otra línea: un término del PVPC que se cobra en proporción a los días de la factura (Real Decreto 216/2014, art. 8.4) con el valor que fija una orden del Ministerio. En 2026, las órdenes fijan 6,979247 euros por suministro («euros/CUPS») hasta el 25-06-2026 (Orden TED/1524/2025) y 9,011295 euros desde el 26-06-2026 (Orden TED/634/2026). No dicen que sea al año: la revisión lo toma como un importe anual y lo reparte por días, y eso es una interpretación.',
   'bills.guide.power.title': 'La potencia',
   'bills.guide.power.p1':
     'La potencia contratada se paga aunque no se use entera. Si tu factura trae la potencia máxima que usaste en los últimos 12 meses en cada periodo, la revisión te la enseña tal cual, sin decirte qué potencia contratar.',
