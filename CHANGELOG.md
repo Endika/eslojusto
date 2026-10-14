@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.60.2](https://github.com/Endika/eslojusto/compare/v1.60.1...v1.60.2) (2026-10-14)
+
+
+### Bug Fixes
+
+* **api:** tell the electricity read to copy the tolls and charges a bill states ([1a57863](https://github.com/Endika/eslojusto/commit/1a57863405bd3c3f71ce7744a64d920afc466002))
+
 ## [1.60.1](https://github.com/Endika/eslojusto/compare/v1.60.0...v1.60.1) (2026-10-14)
 
 
