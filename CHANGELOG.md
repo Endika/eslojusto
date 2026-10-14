@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.61.0](https://github.com/Endika/eslojusto/compare/v1.60.4...v1.61.0) (2026-10-14)
+
+
+### Features
+
+* **bills:** publish the bill review as a beta ([6742463](https://github.com/Endika/eslojusto/commit/67424633cd88414068d7172024125fe0a83c662b))
+
 ## [1.60.4](https://github.com/Endika/eslojusto/compare/v1.60.3...v1.60.4) (2026-10-14)
 
 
