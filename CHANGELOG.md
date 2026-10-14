@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.61.1](https://github.com/Endika/eslojusto/compare/v1.61.0...v1.61.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* **api:** read one energy price for a whole bill, and take either count of its days ([b5f8da1](https://github.com/Endika/eslojusto/commit/b5f8da1de9456016d1e143fa8ce20ea5fa534349))
+* **bills:** review a bill that prices all its energy at one price or counts the first reading day ([b76de7c](https://github.com/Endika/eslojusto/commit/b76de7c82fce5e6e3aaebdb5190b5a0163c3b6c5))
+
 ## [1.61.0](https://github.com/Endika/eslojusto/compare/v1.60.4...v1.61.0) (2026-10-14)
 
 
