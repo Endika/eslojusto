@@ -1,7 +1,8 @@
 // Renders a synthetic bank of packs (by default the lease packs of api/eval/cases) to the JPEG
 // photos a person would upload: each page as HTML, then a PNG, then spoiled in a <canvas> from a
 // seeded PRNG. The same seed gives the same bytes, and the manifest's hash says so.
-//   node scripts/rental-bank/render.mjs [--seed N] [--cases DIR --out DIR]
+//   node scripts/rental-bank/render.mjs [--seed N] [--bank NAME | --cases DIR --out DIR]
+// `--bank NAME` reads api/eval/cases/NAME/ and writes to api/eval/out/NAME/.
 import { chromium } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -28,8 +29,12 @@ const dirArg = (name, fallback) => {
 const seedArg = argOf('--seed');
 const SEED = seedArg === undefined ? 20261008 : Number(seedArg);
 if (!Number.isInteger(SEED)) throw new Error('--seed takes an integer');
-const CASES = dirArg('--cases', new URL('cases/', ROOT));
-const OUT = dirArg('--out', new URL('out/', ROOT));
+const bank = argOf('--bank');
+if (bank !== undefined && !/^[a-z]+$/.test(bank)) throw new Error('--bank takes a bank name');
+if (bank !== undefined && (argOf('--cases') !== undefined || argOf('--out') !== undefined))
+  throw new Error('--bank sets --cases and --out');
+const CASES = dirArg('--cases', new URL(bank === undefined ? 'cases/' : `cases/${bank}/`, ROOT));
+const OUT = dirArg('--out', new URL(bank === undefined ? 'out/' : `out/${bank}/`, ROOT));
 
 const escape = (v) =>
   String(v).replace(

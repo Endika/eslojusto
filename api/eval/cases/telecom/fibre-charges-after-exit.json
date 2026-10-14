@@ -1,0 +1,130 @@
+{
+  "id": "fibre-charges-after-exit",
+  "description": "Fibre without commitment left on 14-09-2026 and billed the whole of September: art. 7 RD 899/2009 has the exit take effect within two working days, so what accrues after it is charged after the exit.",
+  "eval": false,
+  "today": "2026-10-13",
+  "pages": [
+    {
+      "template": "telecom/contract-es",
+      "data": {
+        "operatorBlock": "Ficticia Fibra y Hogar, S. L.",
+        "operatorLine": "CIF B98002177 · Calle de la Prueba Ficticia, 4, 08002 Barcelona",
+        "signedOnText": "10 de abril de 2024",
+        "customerRef": "CL-721095",
+        "holderName": "Persona Abonada Ficticia E",
+        "holderDni": "63728355Y",
+        "serviceText": "Fibra de 1 Gb por 39,90 € al mes, IVA no incluido.",
+        "commitmentClause": "Este contrato no tiene compromiso de permanencia.",
+        "handsetClause": "No se entrega ningún terminal subvencionado.",
+        "priceReviewClause": "Los precios de este contrato no se modifican durante la permanencia.",
+        "iban": "ES07 8888 0005 0200 0003 0035"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "telecom/fibre-bill-es",
+      "data": {
+        "operatorBlock": "Ficticia Fibra y Hogar, S. L.",
+        "operatorLine": "CIF B98002177 · Calle de la Prueba Ficticia, 4, 08002 Barcelona",
+        "invoiceNumber": "FF-26-1001033",
+        "issuedOnText": "1 de octubre de 2026",
+        "periodText": "01/09/2026 – 30/09/2026",
+        "holderName": "Persona Abonada Ficticia E",
+        "holderDni": "63728355Y",
+        "customerRef": "CL-721095",
+        "lineText": "Servicio de fibra en Calle de la Prueba Ficticia, 15, 46002 Valencia",
+        "lineRows": [
+          {
+            "concept": "Cuota fibra 1 Gb",
+            "dates": "01/09/2026 – 30/09/2026",
+            "amount": "39,90 €"
+          }
+        ],
+        "base": "39,90 €",
+        "vatText": "IVA 21 %",
+        "vatAmount": "8,38 €",
+        "total": "48,28 €",
+        "noticeText": "Gracias por confiar en nosotros. Consulta tus consumos en tu área de cliente.",
+        "paymentText": "Cargo en la cuenta ES07 8888 0005 0200 0003 0035."
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2024-04-10",
+        "handsetSubsidised": false,
+        "priceReviewIndex": "none"
+      },
+      "lists": {
+        "bills": [
+          {
+            "issuedOn": "2026-10-01",
+            "periodFrom": "2026-09-01",
+            "periodTo": "2026-09-30",
+            "vatAmount": 8.38,
+            "total": 48.28
+          }
+        ],
+        "lines": [
+          {
+            "kind": "fixed_fee",
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "amount": 39.9
+          }
+        ]
+      }
+    },
+    "input": {
+      "commitment": null,
+      "exitRequestedOn": "2026-09-14",
+      "penaltyCharged": null,
+      "handset": null,
+      "changeNotice": null,
+      "lines": [
+        {
+          "from": "2026-09-01",
+          "to": "2026-09-30",
+          "amount": 39.9
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "charge_after_exit",
+          "line": 0,
+          "status": "charged_after_exit",
+          "amount": 17.29,
+          "direction": "over",
+          "recurring": false
+        }
+      ],
+      "totals": {
+        "counted": 17.29,
+        "upTo": 17.29,
+        "under": 0
+      }
+    }
+  }
+}

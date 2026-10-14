@@ -1,0 +1,89 @@
+<!--
+  Telecom template «contract-es»: the summary of a phone or internet contract on one sheet: the
+  service and its price, the commitment and its penalty, a subsidised handset and the clause on
+  price changes.
+  Source: written for this bank, with invented wording, layout and figures, after the items a
+  contract summary lists; it copies no operator's contract.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1d1d1d;
+        font:
+          15px/1.5 'DejaVu Sans',
+          sans-serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 60px 80px 90px;
+        position: relative;
+        overflow: hidden;
+        background: #fdfdfb;
+      }
+      h1 {
+        font-size: 21px;
+        margin: 0 0 6px;
+      }
+      h2 {
+        font-size: 15px;
+        margin: 18px 0 6px;
+        text-transform: uppercase;
+      }
+      p {
+        margin: 0 0 6px;
+      }
+      .clause {
+        border-left: 3px solid #555;
+        padding-left: 12px;
+      }
+      .muted {
+        color: #555;
+        font-size: 13px;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <h1>Resumen del contrato</h1>
+      <p class="muted">{{operatorBlock}} · {{operatorLine}}</p>
+      <p>Fecha del contrato: {{signedOnText}} · Cliente n.º {{customerRef}}</p>
+      <h2>Titular</h2>
+      <p>{{holderName}} · NIF {{holderDni}}</p>
+      <h2>Servicios y precio</h2>
+      <p>{{serviceText}}</p>
+      <h2>Permanencia</h2>
+      <p class="clause">{{commitmentClause}}</p>
+      <h2>Terminal</h2>
+      <p class="clause">{{handsetClause}}</p>
+      <h2>Revisión de precios</h2>
+      <p class="clause">{{priceReviewClause}}</p>
+      <h2>Baja</h2>
+      <p class="muted">
+        Puedes solicitar la baja en cualquier momento por los mismos medios por los que contrataste.
+        Para cualquier desacuerdo puedes dirigirte a la Oficina de Atención al Usuario de
+        Telecomunicaciones.
+      </p>
+      <p>Domiciliación: {{iban}}</p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,470 @@
+{
+  "id": "free-august-discount-matches",
+  "description": "Free-market bill for August 2026 with a 10 % discount on the energy: the electricity tax (art. 97 Ley 38/1992) and VAT (art. 78 Ley 37/1992) match with the discount out of their base.",
+  "eval": false,
+  "today": "2026-10-13",
+  "pages": [
+    {
+      "template": "electricity/free-modern-es",
+      "data": {
+        "retailerBlock": "Ficticia Energía Verde Libre, S. A.",
+        "retailerLine": "CIF A99004156 · Calle de la Prueba Ficticia, 1, 50001 Zaragoza",
+        "invoiceNumber": "VL-0262466",
+        "issuedOnText": "02-09-2026",
+        "periodText": "31-07-2026 a 31-08-2026",
+        "dueText": "Fecha de cargo: 08-09-2026",
+        "billedDaysText": "31 días",
+        "total": "75,15 €",
+        "holderName": "Persona Titular Ficticia R",
+        "holderDni": "52222206K",
+        "supplyAddress": "Calle de la Prueba Ficticia, 26, 08001 Barcelona",
+        "cups": "ES0999 0018 0016 4278 CM",
+        "contractTypeText": "Precio fijo de energía y potencia",
+        "accessTariff": "2.0TD",
+        "powerP1Text": "4,4 kW",
+        "powerP2Text": "4,4 kW",
+        "contractRef": "CS-262466",
+        "accessRef": "AC-62466",
+        "endDateText": "31-01-2027",
+        "meterNumber": "CT0262466",
+        "consumptionText": "350 kWh",
+        "maxPowerText": "3,6 kW en P1 (punta) y 1,9 kW en P2 (valle)",
+        "readingKindText": "real",
+        "readingDateText": "31-08-2026",
+        "readingRows": [
+          {
+            "periodLabel": "P1 (punta)",
+            "reading": "42087 kWh",
+            "kwh": "88 kWh"
+          },
+          {
+            "periodLabel": "P2 (llano)",
+            "reading": "23208 kWh",
+            "kwh": "97 kWh"
+          },
+          {
+            "periodLabel": "P3 (valle)",
+            "reading": "52499 kWh",
+            "kwh": "165 kWh"
+          }
+        ],
+        "summaryRows": [
+          {
+            "label": "Por potencia contratada",
+            "amount": "17,94 €"
+          },
+          {
+            "label": "Por energía consumida",
+            "amount": "43,99 €"
+          },
+          {
+            "label": "Otros conceptos",
+            "amount": "-3,63 €"
+          },
+          {
+            "label": "Impuesto electricidad",
+            "amount": "2,98 €"
+          },
+          {
+            "label": "Alquiler del contador",
+            "amount": "0,83 €"
+          },
+          {
+            "label": "Impuesto aplicado (IVA 21 %)",
+            "amount": "13,04 €"
+          }
+        ],
+        "powerTotal": "17,94 €",
+        "powerRows": [
+          {
+            "label": "Potencia P1",
+            "detail": "4,4 kW × 0,104110 €/kW día × 31 días",
+            "amount": "14,20 €"
+          },
+          {
+            "label": "Potencia P2",
+            "detail": "4,4 kW × 0,027397 €/kW día × 31 días",
+            "amount": "3,74 €"
+          }
+        ],
+        "powerNote": "Peajes de transporte y distribución y cargos incluidos en la potencia: 10,62 €.",
+        "energyTotal": "43,99 €",
+        "energyRows": [
+          {
+            "label": "Energía P1",
+            "detail": "88 kWh × 0,178421 €/kWh",
+            "amount": "15,70 €"
+          },
+          {
+            "label": "Energía P2",
+            "detail": "97 kWh × 0,131207 €/kWh",
+            "amount": "12,73 €"
+          },
+          {
+            "label": "Energía P3",
+            "detail": "165 kWh × 0,094315 €/kWh",
+            "amount": "15,56 €"
+          }
+        ],
+        "energyNote": "Peajes de transporte y distribución y cargos incluidos en la energía: 11,97 €.",
+        "chargeRows": [
+          {
+            "label": "Financiación del bono social",
+            "detail": "31 días × 0,024688 €/día",
+            "amount": "0,77 €"
+          },
+          {
+            "label": "Descuento de bienvenida",
+            "detail": "10 % sobre 43,99 €",
+            "amount": "-4,40 €"
+          },
+          {
+            "label": "Impuesto de electricidad",
+            "detail": "5,11269632 % s/ 58,30 €",
+            "amount": "2,98 €"
+          },
+          {
+            "label": "Alquiler del contador (monofásico)",
+            "detail": "31 días × 0,026630 €/día",
+            "amount": "0,83 €"
+          },
+          {
+            "label": "IVA",
+            "detail": "21 % s/ 62,11 €",
+            "amount": "13,04 €"
+          }
+        ],
+        "paymentText": "Domiciliación bancaria en la cuenta ES06 9999 0018 0100 0014 2542.",
+        "penaltyText": "Su contrato no prevé penalización por resolución anticipada.",
+        "bonusInfoText": ""
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {},
+      "lists": {
+        "bills": [
+          {
+            "market": "free",
+            "issuedOn": "2026-09-02",
+            "dueOn": "2026-09-08",
+            "readingFrom": "2026-07-31",
+            "readingTo": "2026-08-31",
+            "billedDays": 31,
+            "readingKind": "real",
+            "postcode": "08001",
+            "accessTariff": "2.0TD",
+            "selfConsumption": "none",
+            "contractedPowerP1": 4.4,
+            "contractedPowerP2": 4.4,
+            "maxPowerUsedP1": 3.6,
+            "maxPowerUsedP2": 1.9,
+            "tollsAndChargesPower": 10.62,
+            "tollsAndChargesEnergy": 11.97,
+            "socialBonusFunding": 0.77,
+            "electricityTaxBase": 58.3,
+            "electricityTaxPercent": 5.11269632,
+            "electricityTaxAmount": 2.98,
+            "meterAmount": 0.83,
+            "meterPhase": "single",
+            "vatBase": 62.11,
+            "vatPercent": 21,
+            "vatAmount": 13.04,
+            "total": 75.15
+          }
+        ],
+        "powerLines": [
+          {
+            "period": "p1",
+            "kw": 4.4,
+            "price": 0.10411,
+            "unit": "per_kw_day",
+            "days": 31,
+            "amount": 14.2
+          },
+          {
+            "period": "p2",
+            "kw": 4.4,
+            "price": 0.027397,
+            "unit": "per_kw_day",
+            "days": 31,
+            "amount": 3.74
+          }
+        ],
+        "energyLines": [
+          {
+            "period": "p1",
+            "kwh": 88,
+            "price": 0.178421,
+            "amount": 15.7
+          },
+          {
+            "period": "p2",
+            "kwh": 97,
+            "price": 0.131207,
+            "amount": 12.73
+          },
+          {
+            "period": "p3",
+            "kwh": 165,
+            "price": 0.094315,
+            "amount": 15.56
+          }
+        ],
+        "otherLines": [
+          {
+            "kind": "discount",
+            "amount": 4.4
+          }
+        ]
+      }
+    },
+    "input": {
+      "bills": [
+        {
+          "issuedOn": "2026-09-02",
+          "dueOn": "2026-09-08",
+          "readingFrom": "2026-07-31",
+          "readingTo": "2026-08-31",
+          "readingKind": "real",
+          "billedDays": 31,
+          "postcode": "08001",
+          "accessTariff": "2.0TD",
+          "selfConsumption": "none",
+          "market": "free",
+          "retailer": "other",
+          "holder": "person",
+          "contractedPower": {
+            "p1": 4.4,
+            "p2": 4.4
+          },
+          "maxPowerUsed": {
+            "p1": 3.6,
+            "p2": 1.9
+          },
+          "priceChange": "none",
+          "power": [
+            {
+              "period": "p1",
+              "kw": 4.4,
+              "price": 0.10411,
+              "unit": "per_kw_day",
+              "days": null,
+              "amount": 14.2
+            },
+            {
+              "period": "p2",
+              "kw": 4.4,
+              "price": 0.027397,
+              "unit": "per_kw_day",
+              "days": null,
+              "amount": 3.74
+            }
+          ],
+          "energy": [
+            {
+              "period": "p1",
+              "kwh": 88,
+              "price": 0.178421,
+              "amount": 15.7
+            },
+            {
+              "period": "p2",
+              "kwh": 97,
+              "price": 0.131207,
+              "amount": 12.73
+            },
+            {
+              "period": "p3",
+              "kwh": 165,
+              "price": 0.094315,
+              "amount": 15.56
+            }
+          ],
+          "discounts": [4.4],
+          "tollsAndCharges": {
+            "power": 10.62,
+            "energy": 11.97
+          },
+          "socialBonusFunding": 0.77,
+          "socialBonus": null,
+          "excessPower": null,
+          "electricityTax": {
+            "base": 58.3,
+            "percent": 5.11269632,
+            "amount": 2.98
+          },
+          "meter": {
+            "amount": 0.83,
+            "days": null,
+            "phase": "single",
+            "supplyPhase": "single",
+            "owned": false
+          },
+          "services": [],
+          "exitPenalty": null,
+          "regularizations": [],
+          "vat": {
+            "base": 62.11,
+            "percent": 21,
+            "amount": 13.04
+          },
+          "total": 75.15,
+          "supplyFingerprint": "ES0999001800164278CM"
+        }
+      ]
+    },
+    "review": {
+      "bills": [
+        {
+          "scope": {
+            "inScope": true
+          },
+          "items": [
+            {
+              "id": "days",
+              "line": null,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "power",
+              "line": 0,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "power",
+              "line": 1,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "energy",
+              "line": 0,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "energy",
+              "line": 1,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "energy",
+              "line": 2,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "total",
+              "line": null,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "tolls_and_charges_power",
+              "line": null,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "tolls_and_charges_energy",
+              "line": null,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "social_bonus_funding",
+              "line": null,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "meter",
+              "line": null,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "electricity_tax",
+              "line": null,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "vat",
+              "line": null,
+              "status": "matches",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "id": "power_used",
+              "line": null,
+              "status": "information",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            }
+          ],
+          "totals": {
+            "counted": 0,
+            "upTo": 0,
+            "under": 0
+          },
+          "recurring": false
+        }
+      ],
+      "basket": {
+        "bills": [0],
+        "skipped": [],
+        "totals": {
+          "counted": 0,
+          "upTo": 0,
+          "under": 0
+        },
+        "days": 31,
+        "recurring": [],
+        "yearlyEstimate": null,
+        "offerPass": false
+      }
+    }
+  }
+}

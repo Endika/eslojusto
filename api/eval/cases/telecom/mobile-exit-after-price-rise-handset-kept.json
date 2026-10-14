@@ -1,0 +1,223 @@
+{
+  "id": "mobile-exit-after-price-rise-handset-kept",
+  "description": "Mobile line with a subsidised handset of 240 € left within the month after a price rise: art. 67.10 Ley 11/2022 still owes the handset, its whole value or the share of the commitment left, which is not settled: two readings, the lowest counts.",
+  "eval": true,
+  "today": "2026-10-13",
+  "pages": [
+    {
+      "template": "telecom/contract-es",
+      "data": {
+        "operatorBlock": "Ficticia Móvil, S. A.",
+        "operatorLine": "CIF A98001161 · Calle de la Prueba Ficticia, 2, 28002 Madrid",
+        "signedOnText": "1 de diciembre de 2025",
+        "customerRef": "CL-716876",
+        "holderName": "Persona Abonada Ficticia D",
+        "holderDni": "61382684J",
+        "serviceText": "Tarifa móvil con 80 GB por 22,00 € al mes, IVA no incluido, y terminal subvencionado.",
+        "commitmentClause": "Compromiso de permanencia de 24 meses desde el 1 de diciembre de 2025. Si causas baja antes de que termine, abonarás una penalización máxima de 200,00 €, en proporción al tiempo que falte por cumplir.",
+        "handsetClause": "Se entrega un terminal subvencionado con un valor de 240,00 €, vinculado al compromiso de permanencia.",
+        "priceReviewClause": "Los precios de este contrato no se modifican durante la permanencia.",
+        "iban": "ES04 8888 0004 0200 0002 4028"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "telecom/mobile-bill-es",
+      "data": {
+        "operatorBlock": "Ficticia Móvil, S. A.",
+        "operatorLine": "CIF A98001161 · Calle de la Prueba Ficticia, 2, 28002 Madrid",
+        "invoiceNumber": "FM-2026-0905120",
+        "issuedOnText": "4 de septiembre de 2026",
+        "periodText": "01/08/2026 – 31/08/2026",
+        "holderName": "Persona Abonada Ficticia D",
+        "holderDni": "61382684J",
+        "customerRef": "CL-716876",
+        "lineText": "Línea móvil 6** *** *05",
+        "lineRows": [
+          {
+            "concept": "Cuota tarifa móvil",
+            "dates": "01/08/2026 – 31/08/2026",
+            "amount": "22,00 €"
+          }
+        ],
+        "base": "22,00 €",
+        "vatText": "IVA 21 %",
+        "vatAmount": "4,62 €",
+        "total": "26,62 €",
+        "noticeText": "A partir del 5 de octubre de 2026 tu tarifa pasa a costar 25,00 € al mes, IVA no incluido. Si no aceptas el cambio, puedes resolver el contrato sin penalización en el plazo de un mes.",
+        "paymentText": "Cargo en la cuenta ES04 8888 0004 0200 0002 4028."
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "telecom/mobile-bill-es",
+      "data": {
+        "operatorBlock": "Ficticia Móvil, S. A.",
+        "operatorLine": "CIF A98001161 · Calle de la Prueba Ficticia, 2, 28002 Madrid",
+        "invoiceNumber": "FM-2026-1002877",
+        "issuedOnText": "2 de octubre de 2026",
+        "periodText": "01/09/2026 – 16/09/2026",
+        "holderName": "Persona Abonada Ficticia D",
+        "holderDni": "61382684J",
+        "customerRef": "CL-716876",
+        "lineText": "Línea móvil 6** *** *05",
+        "lineRows": [
+          {
+            "concept": "Cuota tarifa móvil (hasta la baja)",
+            "dates": "01/09/2026 – 16/09/2026",
+            "amount": "11,73 €"
+          },
+          {
+            "concept": "Penalización por baja con terminal",
+            "dates": "—",
+            "amount": "200,00 €"
+          }
+        ],
+        "base": "211,73 €",
+        "vatText": "IVA 21 %",
+        "vatAmount": "44,46 €",
+        "total": "256,19 €",
+        "noticeText": "Gracias por confiar en nosotros. Consulta tus consumos en tu área de cliente.",
+        "paymentText": "Cargo en la cuenta ES04 8888 0004 0200 0002 4028."
+      },
+      "degrade": {
+        "rotate": -2.4,
+        "shadow": 0.42,
+        "blur": 1.3,
+        "dark": 0.16,
+        "crop": 0.03,
+        "jpegQuality": 0.6
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2025-12-01",
+        "commitmentStartsOn": "2025-12-01",
+        "commitmentMonths": 24,
+        "agreedPenalty": 200,
+        "handsetSubsidised": true,
+        "handsetValue": 240,
+        "priceReviewIndex": "none"
+      },
+      "lists": {
+        "bills": [
+          {
+            "issuedOn": "2026-09-04",
+            "periodFrom": "2026-08-01",
+            "periodTo": "2026-08-31",
+            "vatAmount": 4.62,
+            "total": 26.62
+          },
+          {
+            "issuedOn": "2026-10-02",
+            "periodFrom": "2026-09-01",
+            "periodTo": "2026-09-16",
+            "vatAmount": 44.46,
+            "total": 256.19
+          }
+        ],
+        "lines": [
+          {
+            "kind": "fixed_fee",
+            "from": "2026-08-01",
+            "to": "2026-08-31",
+            "amount": 22
+          },
+          {
+            "kind": "fixed_fee",
+            "from": "2026-09-01",
+            "to": "2026-09-16",
+            "amount": 11.73
+          },
+          {
+            "kind": "penalty",
+            "amount": 200
+          }
+        ]
+      }
+    },
+    "input": {
+      "commitment": {
+        "startedOn": "2025-12-01",
+        "months": 24,
+        "agreedPenalty": 200
+      },
+      "exitRequestedOn": "2026-09-14",
+      "penaltyCharged": 200,
+      "handset": {
+        "value": 240,
+        "kept": true
+      },
+      "changeNotice": {
+        "sentOn": "2026-09-04",
+        "appliesOn": "2026-10-05",
+        "change": "price_up",
+        "index": "none"
+      },
+      "lines": [
+        {
+          "from": "2026-08-01",
+          "to": "2026-08-31",
+          "amount": 22
+        },
+        {
+          "from": "2026-09-01",
+          "to": "2026-09-16",
+          "amount": 11.73
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "question": "handset_share",
+          "readings": [
+            {
+              "when": "whole_value",
+              "id": "change_exit",
+              "line": null,
+              "status": "within_limit",
+              "amount": null,
+              "direction": null,
+              "recurring": false
+            },
+            {
+              "when": "prorated_value",
+              "id": "change_exit",
+              "line": null,
+              "status": "paid_over",
+              "amount": 54.36,
+              "direction": "over",
+              "recurring": false
+            }
+          ]
+        }
+      ],
+      "totals": {
+        "counted": 0,
+        "upTo": 54.36,
+        "under": 0
+      }
+    }
+  }
+}

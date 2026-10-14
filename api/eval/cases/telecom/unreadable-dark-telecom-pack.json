@@ -1,0 +1,119 @@
+{
+  "id": "unreadable-dark-telecom-pack",
+  "description": "A mobile contract and its last bill photographed in the dark: a read must give nothing_read. The facts behind them: a penalty of 120 € charged whole on an exit with half of a 12-month commitment left (art. 62.5 TRLGDCU).",
+  "eval": true,
+  "today": "2026-10-13",
+  "pages": [
+    {
+      "template": "telecom/contract-es",
+      "data": {
+        "operatorBlock": "Ficticia Móvil, S. A.",
+        "operatorLine": "CIF A98001161 · Calle de la Prueba Ficticia, 2, 28002 Madrid",
+        "signedOnText": "2 de enero de 2026",
+        "customerRef": "CL-733752",
+        "holderName": "Persona Abonada Ficticia H",
+        "holderDni": "70765368P",
+        "serviceText": "Tarifa móvil con 40 GB por 14,90 € al mes, IVA no incluido.",
+        "commitmentClause": "Compromiso de permanencia de 12 meses desde el 2 de enero de 2026. Si causas baja antes de que termine, abonarás una penalización máxima de 120,00 €, en proporción al tiempo que falte por cumplir.",
+        "handsetClause": "No se entrega ningún terminal subvencionado.",
+        "priceReviewClause": "Los precios de este contrato no se modifican durante la permanencia.",
+        "iban": "ES16 8888 0008 0200 0004 8056"
+      },
+      "degrade": {
+        "rotate": 4.5,
+        "shadow": 0.7,
+        "blur": 2.5,
+        "dark": 0.82,
+        "crop": 0.1,
+        "jpegQuality": 0.35
+      },
+      "readability": "dark"
+    },
+    {
+      "template": "telecom/mobile-bill-es",
+      "data": {
+        "operatorBlock": "Ficticia Móvil, S. A.",
+        "operatorLine": "CIF A98001161 · Calle de la Prueba Ficticia, 2, 28002 Madrid",
+        "invoiceNumber": "FM-2026-0706513",
+        "issuedOnText": "6 de julio de 2026",
+        "periodText": "01/07/2026 – 03/07/2026",
+        "holderName": "Persona Abonada Ficticia H",
+        "holderDni": "70765368P",
+        "customerRef": "CL-733752",
+        "lineText": "Línea móvil 6** *** *19",
+        "lineRows": [
+          {
+            "concept": "Cuota tarifa móvil (hasta la baja)",
+            "dates": "01/07/2026 – 03/07/2026",
+            "amount": "1,49 €"
+          },
+          {
+            "concept": "Penalización por baja anticipada",
+            "dates": "—",
+            "amount": "120,00 €"
+          }
+        ],
+        "base": "121,49 €",
+        "vatText": "IVA 21 %",
+        "vatAmount": "25,51 €",
+        "total": "147,00 €",
+        "noticeText": "Gracias por confiar en nosotros. Consulta tus consumos en tu área de cliente.",
+        "paymentText": "Cargo en la cuenta ES16 8888 0008 0200 0004 8056."
+      },
+      "degrade": {
+        "rotate": 4.5,
+        "shadow": 0.7,
+        "blur": 2.5,
+        "dark": 0.82,
+        "crop": 0.1,
+        "jpegQuality": 0.35
+      },
+      "readability": "dark"
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "nothing_read",
+      "fields": {},
+      "lists": {}
+    },
+    "input": {
+      "commitment": {
+        "startedOn": "2026-01-02",
+        "months": 12,
+        "agreedPenalty": 120
+      },
+      "exitRequestedOn": "2026-07-01",
+      "penaltyCharged": 120,
+      "handset": null,
+      "changeNotice": null,
+      "lines": [
+        {
+          "from": "2026-07-01",
+          "to": "2026-07-03",
+          "amount": 1.49
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "commitment_penalty",
+          "line": null,
+          "status": "paid_over",
+          "amount": 59.18,
+          "direction": "over",
+          "recurring": false
+        }
+      ],
+      "totals": {
+        "counted": 59.18,
+        "upTo": 59.18,
+        "under": 0
+      }
+    }
+  }
+}

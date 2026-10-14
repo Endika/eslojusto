@@ -1,0 +1,138 @@
+{
+  "id": "mobile-exit-2021-gate",
+  "description": "Mobile line left on 15-11-2021, before the proportional penalty of art. 62.5 TRLGDCU applied (01-01-2022): the review stops at the door.",
+  "eval": false,
+  "today": "2026-10-13",
+  "pages": [
+    {
+      "template": "telecom/contract-es",
+      "data": {
+        "operatorBlock": "Ficticia Móvil, S. A.",
+        "operatorLine": "CIF A98001161 · Calle de la Prueba Ficticia, 2, 28002 Madrid",
+        "signedOnText": "16 de noviembre de 2020",
+        "customerRef": "CL-737971",
+        "holderName": "Persona Abonada Ficticia I",
+        "holderDni": "73111039R",
+        "serviceText": "Tarifa móvil con 20 GB por 12,00 € al mes, IVA no incluido.",
+        "commitmentClause": "Compromiso de permanencia de 12 meses desde el 16 de noviembre de 2020. Si causas baja antes de que termine, abonarás una penalización máxima de 90,00 €, en proporción al tiempo que falte por cumplir.",
+        "handsetClause": "No se entrega ningún terminal subvencionado.",
+        "priceReviewClause": "Los precios de este contrato no se modifican durante la permanencia.",
+        "iban": "ES19 8888 0009 0200 0005 4063"
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "telecom/mobile-bill-es",
+      "data": {
+        "operatorBlock": "Ficticia Móvil, S. A.",
+        "operatorLine": "CIF A98001161 · Calle de la Prueba Ficticia, 2, 28002 Madrid",
+        "invoiceNumber": "FM-2021-1201188",
+        "issuedOnText": "1 de diciembre de 2021",
+        "periodText": "01/11/2021 – 17/11/2021",
+        "holderName": "Persona Abonada Ficticia I",
+        "holderDni": "73111039R",
+        "customerRef": "CL-737971",
+        "lineText": "Línea móvil 6** *** *33",
+        "lineRows": [
+          {
+            "concept": "Cuota tarifa móvil (hasta la baja)",
+            "dates": "01/11/2021 – 17/11/2021",
+            "amount": "6,80 €"
+          },
+          {
+            "concept": "Penalización por baja anticipada",
+            "dates": "—",
+            "amount": "90,00 €"
+          }
+        ],
+        "base": "96,80 €",
+        "vatText": "IVA 21 %",
+        "vatAmount": "20,33 €",
+        "total": "117,13 €",
+        "noticeText": "Gracias por confiar en nosotros. Consulta tus consumos en tu área de cliente.",
+        "paymentText": "Cargo en la cuenta ES19 8888 0009 0200 0005 4063."
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2020-11-16",
+        "commitmentStartsOn": "2020-11-16",
+        "commitmentMonths": 12,
+        "agreedPenalty": 90,
+        "handsetSubsidised": false,
+        "priceReviewIndex": "none"
+      },
+      "lists": {
+        "bills": [
+          {
+            "issuedOn": "2021-12-01",
+            "periodFrom": "2021-11-01",
+            "periodTo": "2021-11-17",
+            "vatAmount": 20.33,
+            "total": 117.13
+          }
+        ],
+        "lines": [
+          {
+            "kind": "fixed_fee",
+            "from": "2021-11-01",
+            "to": "2021-11-17",
+            "amount": 6.8
+          },
+          {
+            "kind": "penalty",
+            "amount": 90
+          }
+        ]
+      }
+    },
+    "input": {
+      "commitment": {
+        "startedOn": "2020-11-16",
+        "months": 12,
+        "agreedPenalty": 90
+      },
+      "exitRequestedOn": "2021-11-15",
+      "penaltyCharged": 90,
+      "handset": null,
+      "changeNotice": null,
+      "lines": [
+        {
+          "from": "2021-11-01",
+          "to": "2021-11-17",
+          "amount": 6.8
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": false,
+        "reason": "exit_before_2022"
+      },
+      "items": [],
+      "totals": {
+        "counted": 0,
+        "upTo": 0,
+        "under": 0
+      }
+    }
+  }
+}

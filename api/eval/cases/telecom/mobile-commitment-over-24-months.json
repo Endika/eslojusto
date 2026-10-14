@@ -1,0 +1,154 @@
+{
+  "id": "mobile-commitment-over-24-months",
+  "description": "Mobile contract with a commitment of 30 months, over the 24 that art. 67.7 Ley 11/2022 allows a consumer: the length is above the maximum, and the penalty charged, under the cap worked out on 30 months, is sent to review.",
+  "eval": true,
+  "today": "2026-10-13",
+  "pages": [
+    {
+      "template": "telecom/contract-es",
+      "data": {
+        "operatorBlock": "Ficticia Móvil, S. A.",
+        "operatorLine": "CIF A98001161 · Calle de la Prueba Ficticia, 2, 28002 Madrid",
+        "signedOnText": "1 de abril de 2025",
+        "customerRef": "CL-725314",
+        "holderName": "Persona Abonada Ficticia F",
+        "holderDni": "66074026E",
+        "serviceText": "Tarifa móvil y fibra por 49,00 € al mes, IVA no incluido.",
+        "commitmentClause": "Compromiso de permanencia de 30 meses desde el 1 de abril de 2025. Si causas baja antes de que termine, abonarás una penalización máxima de 300,00 €, en proporción al tiempo que falte por cumplir.",
+        "handsetClause": "No se entrega ningún terminal subvencionado.",
+        "priceReviewClause": "Los precios de este contrato no se modifican durante la permanencia.",
+        "iban": "ES10 8888 0006 0200 0003 6042"
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    },
+    {
+      "template": "telecom/mobile-bill-es",
+      "data": {
+        "operatorBlock": "Ficticia Móvil, S. A.",
+        "operatorLine": "CIF A98001161 · Calle de la Prueba Ficticia, 2, 28002 Madrid",
+        "invoiceNumber": "FM-2026-0807730",
+        "issuedOnText": "6 de agosto de 2026",
+        "periodText": "01/08/2026 – 05/08/2026",
+        "holderName": "Persona Abonada Ficticia F",
+        "holderDni": "66074026E",
+        "customerRef": "CL-725314",
+        "lineText": "Línea móvil 6** *** *62",
+        "lineRows": [
+          {
+            "concept": "Cuota tarifa (hasta la baja)",
+            "dates": "01/08/2026 – 05/08/2026",
+            "amount": "7,90 €"
+          },
+          {
+            "concept": "Penalización por baja anticipada",
+            "dates": "—",
+            "amount": "130,00 €"
+          }
+        ],
+        "base": "137,90 €",
+        "vatText": "IVA 21 %",
+        "vatAmount": "28,96 €",
+        "total": "166,86 €",
+        "noticeText": "Gracias por confiar en nosotros. Consulta tus consumos en tu área de cliente.",
+        "paymentText": "Cargo en la cuenta ES10 8888 0006 0200 0003 6042."
+      },
+      "degrade": {
+        "rotate": 1.6,
+        "shadow": 0.3,
+        "blur": 0.8,
+        "dark": 0.1,
+        "crop": 0.02,
+        "jpegQuality": 0.68
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2025-04-01",
+        "commitmentStartsOn": "2025-04-01",
+        "commitmentMonths": 30,
+        "agreedPenalty": 300,
+        "handsetSubsidised": false,
+        "priceReviewIndex": "none"
+      },
+      "lists": {
+        "bills": [
+          {
+            "issuedOn": "2026-08-06",
+            "periodFrom": "2026-08-01",
+            "periodTo": "2026-08-05",
+            "vatAmount": 28.96,
+            "total": 166.86
+          }
+        ],
+        "lines": [
+          {
+            "kind": "fixed_fee",
+            "from": "2026-08-01",
+            "to": "2026-08-05",
+            "amount": 7.9
+          },
+          {
+            "kind": "penalty",
+            "amount": 130
+          }
+        ]
+      }
+    },
+    "input": {
+      "commitment": {
+        "startedOn": "2025-04-01",
+        "months": 30,
+        "agreedPenalty": 300
+      },
+      "exitRequestedOn": "2026-08-03",
+      "penaltyCharged": 130,
+      "handset": null,
+      "changeNotice": null,
+      "lines": [
+        {
+          "from": "2026-08-01",
+          "to": "2026-08-05",
+          "amount": 7.9
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "commitment_length",
+          "line": null,
+          "status": "above_legal_maximum",
+          "amount": null,
+          "direction": null,
+          "recurring": false
+        },
+        {
+          "id": "commitment_penalty",
+          "line": null,
+          "status": "review_it",
+          "amount": null,
+          "direction": null,
+          "recurring": false
+        }
+      ],
+      "totals": {
+        "counted": 0,
+        "upTo": 0,
+        "under": 0
+      }
+    }
+  }
+}
