@@ -1,0 +1,156 @@
+<!--
+  Telecom template «mobile-bill-es»: a mobile line's monthly bill on one sheet: the operator, the
+  line, every charge with the days it is for, VAT and the total.
+  Source: written for this bank, with invented layout, wording and figures, after what a phone
+  bill usually prints; it copies no operator's bill.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1a1a1a;
+        font:
+          15px/1.45 'DejaVu Sans',
+          sans-serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 0 0 90px;
+        position: relative;
+        overflow: hidden;
+        background: #fcfcfc;
+      }
+      .band {
+        background: #a8380a;
+        color: #fff;
+        padding: 30px 60px 20px;
+      }
+      .band .name {
+        font-size: 26px;
+        font-weight: bold;
+      }
+      .band .small {
+        font-size: 13px;
+      }
+      .content {
+        padding: 24px 60px;
+      }
+      .cols {
+        display: flex;
+        justify-content: space-between;
+        gap: 30px;
+      }
+      .total {
+        font-size: 32px;
+        font-weight: bold;
+        color: #a8380a;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 22px 0 8px;
+      }
+      p {
+        margin: 0 0 5px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      td,
+      th {
+        padding: 6px 8px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+      }
+      .n {
+        text-align: right;
+        white-space: nowrap;
+      }
+      tr.sum td {
+        font-weight: bold;
+        border-top: 2px solid #333;
+      }
+      .muted {
+        color: #555;
+        font-size: 13px;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <div class="band">
+        <div class="name">{{operatorBlock}}</div>
+        <div class="small">{{operatorLine}}</div>
+      </div>
+      <div class="content">
+        <div class="cols">
+          <div>
+            <p>{{holderName}}</p>
+            <p class="muted">NIF {{holderDni}}</p>
+            <p class="muted">Cliente n.º {{customerRef}}</p>
+            <p class="muted">{{lineText}}</p>
+          </div>
+          <div>
+            <p>Factura {{invoiceNumber}}</p>
+            <p>Fecha de factura: {{issuedOnText}}</p>
+            <p>Periodo facturado: {{periodText}}</p>
+            <p class="total">{{total}}</p>
+          </div>
+        </div>
+        <h2>Detalle de tus cargos</h2>
+        <table>
+          <tr>
+            <th>Concepto</th>
+            <th>Periodo</th>
+            <th class="n">Importe</th>
+          </tr>
+          {{#lineRows}}
+          <tr>
+            <td>{{concept}}</td>
+            <td>{{dates}}</td>
+            <td class="n">{{amount}}</td>
+          </tr>
+          {{/lineRows}}
+          <tr class="sum">
+            <td colspan="2">Base imponible</td>
+            <td class="n">{{base}}</td>
+          </tr>
+          <tr>
+            <td colspan="2">{{vatText}}</td>
+            <td class="n">{{vatAmount}}</td>
+          </tr>
+          <tr class="sum">
+            <td colspan="2">Total factura</td>
+            <td class="n">{{total}}</td>
+          </tr>
+        </table>
+        <h2>Información</h2>
+        <p>{{noticeText}}</p>
+        <p class="muted">{{paymentText}}</p>
+        <p class="muted">
+          Atención al cliente: 1000 (gratuito). Si no estás conforme, puedes dirigirte a la Oficina
+          de Atención al Usuario de Telecomunicaciones.
+        </p>
+      </div>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

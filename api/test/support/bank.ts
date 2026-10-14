@@ -1,9 +1,11 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { expect } from 'vitest';
 import type { CreditBankCase, CreditTemplateId } from '../../eval/credit-schema';
+import type { ElectricityBankCase, ElectricityTemplateId } from '../../eval/electricity-schema';
 import type { EmploymentBankCase, EmploymentTemplateId } from '../../eval/employment-schema';
 import type { InsuranceBankCase, InsuranceTemplateId } from '../../eval/insurance-schema';
 import type { MortgageBankCase, MortgageTemplateId } from '../../eval/mortgage-schema';
+import type { TelecomBankCase, TelecomTemplateId } from '../../eval/telecom-schema';
 import {
   PLACEHOLDER,
   SECTION,
@@ -42,10 +44,17 @@ export const employmentSheetsOf = (id: EmploymentTemplateId): number =>
 export const CREDIT_BANK: readonly CreditBankCase[] = casesIn('cases/credit/');
 export const INSURANCE_BANK: readonly InsuranceBankCase[] = casesIn('cases/insurance/');
 export const MORTGAGE_BANK: readonly MortgageBankCase[] = casesIn('cases/mortgage/');
+export const ELECTRICITY_BANK: readonly ElectricityBankCase[] = casesIn('cases/electricity/');
+export const TELECOM_BANK: readonly TelecomBankCase[] = casesIn('cases/telecom/');
 
-type BankTemplateId = CreditTemplateId | InsuranceTemplateId | MortgageTemplateId;
+type BankTemplateId =
+  | CreditTemplateId
+  | InsuranceTemplateId
+  | MortgageTemplateId
+  | ElectricityTemplateId
+  | TelecomTemplateId;
 
-// A template of the credit, the insurance or the mortgage bank, named with its folder.
+// A template of the credit, the insurance, the mortgage or a bills bank, named with its folder.
 export const bankTemplate = (id: BankTemplateId): string =>
   readFileSync(new URL(`templates/${id}.html`, EVAL_DIR), 'utf8');
 

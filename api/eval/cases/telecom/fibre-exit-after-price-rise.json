@@ -1,0 +1,204 @@
+{
+  "id": "fibre-exit-after-price-rise",
+  "description": "Fibre with 12 months of commitment whose price rises on 01-07-2026, notified on 01-06-2026 under a contract that says prices do not change: leaving within the month costs nothing (art. 67.8 Ley 11/2022), so the penalty charged is paid over.",
+  "eval": false,
+  "today": "2026-10-13",
+  "pages": [
+    {
+      "template": "telecom/contract-es",
+      "data": {
+        "operatorBlock": "Ficticia Fibra y Hogar, S. L.",
+        "operatorLine": "CIF B98002177 · Calle de la Prueba Ficticia, 4, 08002 Barcelona",
+        "signedOnText": "15 de enero de 2026",
+        "customerRef": "CL-712657",
+        "holderName": "Persona Abonada Ficticia C",
+        "holderDni": "59037013C",
+        "serviceText": "Fibra de 600 Mb y línea fija por 30,00 € al mes, IVA no incluido.",
+        "commitmentClause": "Compromiso de permanencia de 12 meses desde el 15 de enero de 2026. Si causas baja antes de que termine, abonarás una penalización máxima de 120,00 €, en proporción al tiempo que falte por cumplir.",
+        "handsetClause": "No se entrega ningún terminal subvencionado.",
+        "priceReviewClause": "Los precios de este contrato no se modifican durante la permanencia.",
+        "iban": "ES01 8888 0003 0200 0001 8021"
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    },
+    {
+      "template": "telecom/fibre-bill-es",
+      "data": {
+        "operatorBlock": "Ficticia Fibra y Hogar, S. L.",
+        "operatorLine": "CIF B98002177 · Calle de la Prueba Ficticia, 4, 08002 Barcelona",
+        "invoiceNumber": "FF-26-0601877",
+        "issuedOnText": "1 de junio de 2026",
+        "periodText": "01/05/2026 – 31/05/2026",
+        "holderName": "Persona Abonada Ficticia C",
+        "holderDni": "59037013C",
+        "customerRef": "CL-712657",
+        "lineText": "Servicio de fibra en Calle de la Prueba Ficticia, 9, 08002 Barcelona",
+        "lineRows": [
+          {
+            "concept": "Cuota fibra 600 Mb y fijo",
+            "dates": "01/05/2026 – 31/05/2026",
+            "amount": "30,00 €"
+          }
+        ],
+        "base": "30,00 €",
+        "vatText": "IVA 21 %",
+        "vatAmount": "6,30 €",
+        "total": "36,30 €",
+        "noticeText": "Te informamos de que a partir del 1 de julio de 2026 la cuota de tu fibra pasa de 30,00 € a 34,00 € al mes, IVA no incluido. Si no estás de acuerdo, puedes darte de baja sin penalización antes de esa fecha.",
+        "paymentText": "Cargo en la cuenta ES01 8888 0003 0200 0001 8021."
+      },
+      "degrade": {
+        "rotate": -0.8,
+        "shadow": 0.12,
+        "blur": 0.4,
+        "dark": 0.05,
+        "crop": 0,
+        "jpegQuality": 0.78
+      }
+    },
+    {
+      "template": "telecom/fibre-bill-es",
+      "data": {
+        "operatorBlock": "Ficticia Fibra y Hogar, S. L.",
+        "operatorLine": "CIF B98002177 · Calle de la Prueba Ficticia, 4, 08002 Barcelona",
+        "invoiceNumber": "FF-26-0701245",
+        "issuedOnText": "1 de julio de 2026",
+        "periodText": "01/06/2026 – 22/06/2026",
+        "holderName": "Persona Abonada Ficticia C",
+        "holderDni": "59037013C",
+        "customerRef": "CL-712657",
+        "lineText": "Servicio de fibra en Calle de la Prueba Ficticia, 9, 08002 Barcelona",
+        "lineRows": [
+          {
+            "concept": "Cuota fibra 600 Mb y fijo (hasta la baja)",
+            "dates": "01/06/2026 – 22/06/2026",
+            "amount": "22,00 €"
+          },
+          {
+            "concept": "Penalización por incumplimiento de permanencia",
+            "dates": "—",
+            "amount": "54,25 €"
+          }
+        ],
+        "base": "76,25 €",
+        "vatText": "IVA 21 %",
+        "vatAmount": "16,01 €",
+        "total": "92,26 €",
+        "noticeText": "Gracias por confiar en nosotros. Consulta tus consumos en tu área de cliente.",
+        "paymentText": "Cargo en la cuenta ES01 8888 0003 0200 0001 8021."
+      },
+      "degrade": {
+        "rotate": 0.3,
+        "shadow": 0.04,
+        "blur": 0.2,
+        "dark": 0.02,
+        "crop": 0,
+        "jpegQuality": 0.82
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "signedOn": "2026-01-15",
+        "commitmentStartsOn": "2026-01-15",
+        "commitmentMonths": 12,
+        "agreedPenalty": 120,
+        "handsetSubsidised": false,
+        "priceReviewIndex": "none"
+      },
+      "lists": {
+        "bills": [
+          {
+            "issuedOn": "2026-06-01",
+            "periodFrom": "2026-05-01",
+            "periodTo": "2026-05-31",
+            "vatAmount": 6.3,
+            "total": 36.3
+          },
+          {
+            "issuedOn": "2026-07-01",
+            "periodFrom": "2026-06-01",
+            "periodTo": "2026-06-22",
+            "vatAmount": 16.01,
+            "total": 92.26
+          }
+        ],
+        "lines": [
+          {
+            "kind": "fixed_fee",
+            "from": "2026-05-01",
+            "to": "2026-05-31",
+            "amount": 30
+          },
+          {
+            "kind": "fixed_fee",
+            "from": "2026-06-01",
+            "to": "2026-06-22",
+            "amount": 22
+          },
+          {
+            "kind": "penalty",
+            "amount": 54.25
+          }
+        ]
+      }
+    },
+    "input": {
+      "commitment": {
+        "startedOn": "2026-01-15",
+        "months": 12,
+        "agreedPenalty": 120
+      },
+      "exitRequestedOn": "2026-06-18",
+      "penaltyCharged": 54.25,
+      "handset": null,
+      "changeNotice": {
+        "sentOn": "2026-06-01",
+        "appliesOn": "2026-07-01",
+        "change": "price_up",
+        "index": "none"
+      },
+      "lines": [
+        {
+          "from": "2026-05-01",
+          "to": "2026-05-31",
+          "amount": 30
+        },
+        {
+          "from": "2026-06-01",
+          "to": "2026-06-22",
+          "amount": 22
+        }
+      ]
+    },
+    "review": {
+      "scope": {
+        "inScope": true
+      },
+      "items": [
+        {
+          "id": "change_exit",
+          "line": null,
+          "status": "paid_over",
+          "amount": 54.25,
+          "direction": "over",
+          "recurring": false
+        }
+      ],
+      "totals": {
+        "counted": 54.25,
+        "upTo": 54.25,
+        "under": 0
+      }
+    }
+  }
+}

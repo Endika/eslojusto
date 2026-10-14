@@ -1,0 +1,168 @@
+<!--
+  Electricity template «free-compact-es»: a household bill of a free-market retailer on one dense
+  sheet, every figure in a single table, as an online account prints it.
+  Source: written for this bank, with invented layout, wording and figures, after the minimum
+  content a free-market bill up to 15 kW must carry by apartado cuarto of the Resolución de 28 de
+  abril de 2021 de la Dirección General de Política Energética y Minas (BOE-A-2021-7120). It copies
+  no retailer's bill.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #111;
+        font:
+          14px/1.35 'DejaVu Sans Mono',
+          monospace;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 46px 56px 90px;
+        position: relative;
+        overflow: hidden;
+        background: #fff;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 4px;
+      }
+      p {
+        margin: 0 0 3px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+      }
+      td,
+      th {
+        border: 1px solid #999;
+        padding: 4px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: #eee;
+      }
+      .n {
+        text-align: right;
+        white-space: nowrap;
+      }
+      tr.total td {
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .muted {
+        color: #555;
+        font-size: 12px;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+        font-family: 'DejaVu Sans', sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <h1>{{retailerBlock}}</h1>
+      <p class="muted">{{retailerLine}}</p>
+      <table>
+        <tr>
+          <th>Factura</th>
+          <td>{{invoiceNumber}}</td>
+          <th>Emisión</th>
+          <td>{{issuedOnText}}</td>
+        </tr>
+        <tr>
+          <th>Periodo</th>
+          <td>{{periodText}}</td>
+          <th>Días</th>
+          <td>{{billedDaysText}}</td>
+        </tr>
+        <tr>
+          <th>Titular</th>
+          <td>{{holderName}} ({{holderDni}})</td>
+          <th>Cobro</th>
+          <td>{{dueText}}</td>
+        </tr>
+        <tr>
+          <th>Suministro</th>
+          <td>{{supplyAddress}}</td>
+          <th>CUPS</th>
+          <td>{{cups}}</td>
+        </tr>
+        <tr>
+          <th>Peaje</th>
+          <td>{{accessTariff}} · mercado libre · {{contractTypeText}}</td>
+          <th>Potencias</th>
+          <td>P1 {{powerP1Text}} · P2 {{powerP2Text}}</td>
+        </tr>
+        <tr>
+          <th>Máx. demandada</th>
+          <td>{{maxPowerText}}</td>
+          <th>Contador</th>
+          <td>{{meterNumber}} · fin {{endDateText}}</td>
+        </tr>
+        <tr>
+          <th>Lectura</th>
+          <td colspan="3">
+            {{readingKindText}}, {{readingDateText}} · consumo {{consumptionText}}
+          </td>
+        </tr>
+      </table>
+      <table>
+        <tr>
+          <th>Concepto</th>
+          <th>Cálculo</th>
+          <th class="n">Importe</th>
+        </tr>
+        {{#powerRows}}
+        <tr>
+          <td>{{label}}</td>
+          <td>{{detail}}</td>
+          <td class="n">{{amount}}</td>
+        </tr>
+        {{/powerRows}} {{#energyRows}}
+        <tr>
+          <td>{{label}}</td>
+          <td>{{detail}}</td>
+          <td class="n">{{amount}}</td>
+        </tr>
+        {{/energyRows}} {{#chargeRows}}
+        <tr>
+          <td>{{label}}</td>
+          <td>{{detail}}</td>
+          <td class="n">{{amount}}</td>
+        </tr>
+        {{/chargeRows}}
+        <tr class="total">
+          <td colspan="2">TOTAL</td>
+          <td class="n">{{total}}</td>
+        </tr>
+      </table>
+      <p class="muted">{{powerNote}} {{energyNote}}</p>
+      <p class="muted">{{penaltyText}}</p>
+      <p class="muted">{{paymentText}}</p>
+      <p class="muted">
+        Suministro en mercado libre. Ofertas comparables en comparador.cnmc.gob.es. Reclamaciones:
+        900 000 030 (gratuito).
+      </p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

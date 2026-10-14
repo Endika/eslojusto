@@ -1,0 +1,232 @@
+<!--
+  Electricity template «free-classic-es»: a household bill of a free-market retailer, two sheets:
+  the bill's data and the supply on the first, the priced breakdown, what the tolls and charges come
+  to and the consumer's rights on the second.
+  Source: written for this bank, with invented layout, wording and figures, after the minimum
+  content a free-market bill up to 15 kW must carry by apartado cuarto of the Resolución de 28 de
+  abril de 2021 de la Dirección General de Política Energética y Minas (BOE-A-2021-7120): that it
+  is a supply in the free market, the contract's end date, the tolls and charges, any penalty for
+  leaving early and the CNMC's comparator. It copies no retailer's bill.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #202020;
+        font:
+          15px/1.45 'DejaVu Serif',
+          serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 56px 70px 90px;
+        position: relative;
+        overflow: hidden;
+        background: #fffef9;
+      }
+      header {
+        border-bottom: 4px solid #2e7d4f;
+        padding-bottom: 10px;
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+      }
+      header .name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2e7d4f;
+      }
+      h2 {
+        font-size: 16px;
+        color: #2e7d4f;
+        border-bottom: 1px solid #2e7d4f;
+        margin: 18px 0 8px;
+      }
+      p {
+        margin: 0 0 5px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      td,
+      th {
+        padding: 5px 6px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+        vertical-align: top;
+      }
+      .n {
+        text-align: right;
+        white-space: nowrap;
+      }
+      tr.total td {
+        font-weight: bold;
+        font-size: 18px;
+        border-top: 2px solid #2e7d4f;
+      }
+      .cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px 30px;
+      }
+      .muted {
+        color: #555;
+        font-size: 13px;
+      }
+      .amount {
+        font-size: 30px;
+        font-weight: bold;
+        text-align: right;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+        font-family: 'DejaVu Sans', sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <header>
+        <div>
+          <div class="name">{{retailerBlock}}</div>
+          <div class="muted">{{retailerLine}}</div>
+        </div>
+        <div>
+          <p>Factura {{invoiceNumber}}</p>
+          <p>Fecha de emisión: {{issuedOnText}}</p>
+          <div class="amount">{{total}}</div>
+        </div>
+      </header>
+      <p><b>Suministro de electricidad en mercado libre.</b> {{contractTypeText}}</p>
+      <p>Periodo de facturación: {{periodText}} ({{billedDaysText}})</p>
+      <p>{{dueText}}</p>
+      <h2>Datos del suministro</h2>
+      <div class="cols">
+        <p>Titular: {{holderName}}</p>
+        <p>NIF: {{holderDni}}</p>
+        <p>Dirección de suministro: {{supplyAddress}}</p>
+        <p>CUPS: {{cups}}</p>
+        <p>Peaje de acceso: {{accessTariff}}</p>
+        <p>Segmento de cargos: 1</p>
+        <p>Potencia P1: {{powerP1Text}}</p>
+        <p>Potencia P2: {{powerP2Text}}</p>
+        <p>Potencia máxima demandada: {{maxPowerText}}</p>
+        <p>N.º de contador: {{meterNumber}}</p>
+        <p>Contrato: {{contractRef}}</p>
+        <p>Fin del contrato: {{endDateText}}</p>
+      </div>
+      <h2>Su consumo</h2>
+      <p>
+        Lectura {{readingKindText}} del {{readingDateText}}. Consumo del periodo:
+        {{consumptionText}}.
+      </p>
+      <table>
+        <tr>
+          <th>Periodo</th>
+          <th class="n">Lectura</th>
+          <th class="n">Consumo</th>
+        </tr>
+        {{#readingRows}}
+        <tr>
+          <td>{{periodLabel}}</td>
+          <td class="n">{{reading}}</td>
+          <td class="n">{{kwh}}</td>
+        </tr>
+        {{/readingRows}}
+      </table>
+      <h2>Resumen</h2>
+      <table>
+        {{#summaryRows}}
+        <tr>
+          <td>{{label}}</td>
+          <td class="n">{{amount}}</td>
+        </tr>
+        {{/summaryRows}}
+        <tr class="total">
+          <td>Total factura</td>
+          <td class="n">{{total}}</td>
+        </tr>
+      </table>
+      <h2>Forma de pago</h2>
+      <p>{{paymentText}}</p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+    <section class="page">
+      <h2>Detalle de la factura</h2>
+      <table>
+        <tr>
+          <th colspan="2">Término de potencia</th>
+          <th class="n">{{powerTotal}}</th>
+        </tr>
+        {{#powerRows}}
+        <tr>
+          <td>{{label}}</td>
+          <td>{{detail}}</td>
+          <td class="n">{{amount}}</td>
+        </tr>
+        {{/powerRows}}
+        <tr>
+          <th colspan="2">Término de energía</th>
+          <th class="n">{{energyTotal}}</th>
+        </tr>
+        {{#energyRows}}
+        <tr>
+          <td>{{label}}</td>
+          <td>{{detail}}</td>
+          <td class="n">{{amount}}</td>
+        </tr>
+        {{/energyRows}}
+        <tr>
+          <th colspan="3">Otros conceptos e impuestos</th>
+        </tr>
+        {{#chargeRows}}
+        <tr>
+          <td>{{label}}</td>
+          <td>{{detail}}</td>
+          <td class="n">{{amount}}</td>
+        </tr>
+        {{/chargeRows}}
+        <tr class="total">
+          <td colspan="2">Total factura</td>
+          <td class="n">{{total}}</td>
+        </tr>
+      </table>
+      <h2>Peajes y cargos</h2>
+      <p>{{powerNote}}</p>
+      <p>{{energyNote}}</p>
+      <p class="muted">
+        Los peajes retribuyen las redes de transporte y distribución; los cargos, entre otros, las
+        renovables, la cogeneración y los residuos, las anualidades del déficit y el sobrecoste de
+        generación en los territorios no peninsulares.
+      </p>
+      <h2>Información para el consumidor</h2>
+      <p>{{penaltyText}}</p>
+      <p>
+        En el código QR o en el enlace comparador.cnmc.gob.es puede consultar y comparar las ofertas
+        vigentes de las comercializadoras de energía eléctrica.
+      </p>
+      <p class="muted">
+        Atención al cliente y reclamaciones: 900 000 010 (gratuito). Averías de la distribuidora:
+        900 000 011 (gratuito). La comercializadora está adherida a una entidad de resolución
+        alternativa de litigios de consumo.
+      </p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

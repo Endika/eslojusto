@@ -1,16 +1,26 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { CREDIT_PERSON_KEYS } from '../eval/credit-schema';
+import { ELECTRICITY_PERSON_KEYS } from '../eval/electricity-schema';
 import { EMPLOYMENT_PERSON_KEYS } from '../eval/employment-schema';
 import { INSURANCE_PERSON_KEYS } from '../eval/insurance-schema';
 import { MORTGAGE_PERSON_KEYS } from '../eval/mortgage-schema';
 import { PERSON_KEYS } from '../eval/schema';
-import { BANK, CREDIT_BANK, EMPLOYMENT_BANK, INSURANCE_BANK, MORTGAGE_BANK } from './support/bank';
+import { TELECOM_PERSON_KEYS } from '../eval/telecom-schema';
+import {
+  BANK,
+  CREDIT_BANK,
+  ELECTRICITY_BANK,
+  EMPLOYMENT_BANK,
+  INSURANCE_BANK,
+  MORTGAGE_BANK,
+  TELECOM_BANK,
+} from './support/bank';
 
 // Every person and company in the banks is invented, and so are their identifiers: each DNI or NIE
 // carries a wrong check letter, and each IBAN, Social Security number (NAF), employer account code
-// (CCC) and CIF wrong check digits, so none can belong to anyone. Policy numbers have no check
-// digit, so they say they are test numbers.
+// (CCC) and CIF wrong check digits, and each supply point code (CUPS) wrong check letters, so none
+// can belong to anyone. Policy numbers have no check digit, so they say they are test numbers.
 
 const DNI_LETTERS = 'TRWAGMYFPDXBNJZSQVHLCKE';
 
@@ -61,6 +71,15 @@ function validCif(id: string): boolean {
   return m[3] === String(control) || m[3] === CIF_LETTERS[control];
 }
 
+// A CUPS: ES, the distributor's four digits, twelve more and two check letters, the remainder of
+// those sixteen digits by 529 read as two letters of the DNI's alphabet.
+function validCups(id: string): boolean {
+  const m = /^ES(\d{16})([A-Z]{2})/.exec(id.replace(/\s/g, '').toUpperCase());
+  if (!m) return false;
+  const r = Number(BigInt(m[1] ?? '0') % 529n);
+  return m[2] === `${DNI_LETTERS[Math.floor(r / 23)]}${DNI_LETTERS[r % 23]}`;
+}
+
 const ROOTS = ['../eval/cases/', '../eval/templates/', '../../scripts/rental-bank/'];
 
 function filesUnder(root: string, dir: URL): { name: string; text: string }[] {
@@ -74,6 +93,7 @@ const FILES = ROOTS.flatMap((root) => filesUnder(root, new URL(root, import.meta
 const EMPLOYMENT_FILES = FILES.filter((f) => f.name.includes('/employment/'));
 const FINANCE_FILES = FILES.filter((f) => /\/(credit|insurance)\//.test(f.name));
 const MORTGAGE_FILES = FILES.filter((f) => f.name.includes('/mortgage/'));
+const BILLS_FILES = FILES.filter((f) => /\/(electricity|telecom)\//.test(f.name));
 // The household cases are golden inputs of the engine, kept beside its tests, not eval packs.
 const HOUSEHOLD_ROOT = '../../tests/engine/household/cases/';
 const HOUSEHOLD_FILES = filesUnder(HOUSEHOLD_ROOT, new URL(HOUSEHOLD_ROOT, import.meta.url));
@@ -83,6 +103,7 @@ const IBAN_LIKE = /\bES\d{2}(?: ?\d{4}){5}\b/g;
 const NAF_LIKE = /\b\d{2}[ /-]?\d{8}[ /-]?\d{2}\b/g;
 const CCC_LIKE = /\b\d{2}[ /-]\d{7}[ /-]\d{2}\b/g;
 const CIF_LIKE = /\b[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]\b/g;
+const CUPS_LIKE = /\bES ?\d{4} ?\d{4} ?\d{4} ?\d{4} ?[A-Z]{2}\b/g;
 
 const found = (files: readonly { name: string; text: string }[], pattern: RegExp) =>
   files.flatMap((f) => [...f.text.matchAll(pattern)].map((m) => ({ file: f.name, id: m[0] })));
@@ -151,6 +172,16 @@ describe('the checks of employment identifiers', () => {
   });
 });
 
+describe('the checks of supply numbers', () => {
+  // 0999 0000 0000 0002: 999000000000002 % 529 = 385 = 16 × 23 + 17, so Q and V.
+  it('accept a CUPS with its check letters and refuse it with others', () => {
+    expect(validCups('ES0999000000000002QV')).toBe(true);
+    expect(validCups('ES 0999 0000 0000 0002 QV 0F')).toBe(true);
+    expect(validCups('ES0999000000000002QW')).toBe(false);
+    expect(validCups('ES0999000000000002VQ')).toBe(false);
+  });
+});
+
 describe('the synthetic bank', () => {
   it('holds DNIs and IBANs to check, and every one of them is invalid', () => {
     const dnis = FILES.flatMap((f) =>
@@ -196,6 +227,44 @@ describe('the synthetic bank', () => {
     for (const { file, id } of dnis) expect(validDni(id), `${file}: ${id}`).toBe(false);
     for (const { file, id } of ibans) expect(validIban(id), `${file}: ${id}`).toBe(false);
     for (const { file, id } of cifs) expect(validCif(id), `${file}: ${id}`).toBe(false);
+  });
+
+  it('holds bills DNIs, IBANs, CIFs and CUPS to check, and every one of them is invalid', () => {
+    const packs = ELECTRICITY_BANK.length + TELECOM_BANK.length;
+    const dnis = found(BILLS_FILES, DNI_LIKE);
+    const ibans = found(BILLS_FILES, IBAN_LIKE);
+    const cifs = found(BILLS_FILES, CIF_LIKE);
+    for (const list of [dnis, ibans, cifs]) expect(list.length).toBeGreaterThanOrEqual(packs);
+    expect(found(BILLS_FILES, CUPS_LIKE).length).toBeGreaterThanOrEqual(ELECTRICITY_BANK.length);
+    for (const { file, id } of dnis) expect(validDni(id), `${file}: ${id}`).toBe(false);
+    for (const { file, id } of ibans) expect(validIban(id), `${file}: ${id}`).toBe(false);
+    for (const { file, id } of cifs) expect(validCif(id), `${file}: ${id}`).toBe(false);
+  });
+
+  it('holds no CUPS anywhere with its right check letters', () => {
+    for (const { file, id } of found(FILES, CUPS_LIKE))
+      expect(validCups(id), `${file}: ${id}`).toBe(false);
+  });
+
+  it('names only invented holders of supplies and lines, retailers and operators', () => {
+    const pages = [...ELECTRICITY_BANK, ...TELECOM_BANK].flatMap((c) =>
+      c.pages.map((p) => ({ id: c.id, data: p.data })),
+    );
+    for (const { id, data } of pages) {
+      const name = data['holderName'];
+      if (name !== undefined) expect(name, id).toMatch(/^Persona \w+ Ficticia [A-Z]$/);
+      for (const key of ['retailerBlock', 'operatorBlock'] as const) {
+        const company = data[key];
+        if (company !== undefined) expect(company, `${id}: ${key}`).toMatch(/^Ficticia /);
+      }
+    }
+  });
+
+  it('keeps the electricity and telecom person keys it scans for in the AI pass', () => {
+    const keys = (bank: readonly { pages: readonly { data: object }[] }[]) =>
+      new Set(bank.flatMap((c) => c.pages.flatMap((p) => Object.keys(p.data))));
+    for (const key of ELECTRICITY_PERSON_KEYS) expect(keys(ELECTRICITY_BANK)).toContain(key);
+    for (const key of TELECOM_PERSON_KEYS) expect(keys(TELECOM_BANK)).toContain(key);
   });
 
   it('holds household cases with no identifier of any kind, valid or not', () => {
