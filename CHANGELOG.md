@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.60.4](https://github.com/Endika/eslojusto/compare/v1.60.3...v1.60.4) (2026-10-14)
+
+
+### Bug Fixes
+
+* **bills:** reduce VAT at 10 kW or less from 22-03-2026, as RDL 10/2026 clarified ([3e867fc](https://github.com/Endika/eslojusto/commit/3e867fc69667a6ca53a2c7dd0225d19107e5717c))
+
 ## [1.60.3](https://github.com/Endika/eslojusto/compare/v1.60.2...v1.60.3) (2026-10-14)
 
 
