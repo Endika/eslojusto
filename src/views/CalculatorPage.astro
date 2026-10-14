@@ -70,7 +70,13 @@ const documents = DOCUMENTS !== null;
       {sections.map(([id, step, number, weight], i) => (
         <li style={`--weight: ${weight}`} data-tone={id}>
           {i === 0 ? (
-            <a class="tab" data-tab={id} data-state="current" href={`#${step}`} aria-current="step">
+            <a
+              class="tab"
+              data-tab={id}
+              data-state="current"
+              href={`#sheet-${step}`}
+              aria-current="step"
+            >
               <span class="tab__number">{number}</span>
               <span class="tab__name">{tx(`section.${id}`)}</span>
             </a>

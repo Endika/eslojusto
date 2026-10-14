@@ -26,8 +26,13 @@ export const lastSheet = <S extends string>(flow: Flow<S>): number => flow.steps
 export const stepAt = <S extends string>(flow: Flow<S>, i: number): S =>
   flow.steps[i] ?? flow.steps[0];
 
+// A tab links to its sheet's element, `sheet-` and the step; the address carries the bare step, and
+// either form names it.
+export const sheetAnchor = (step: string): string => `#sheet-${step}`;
+export const stepOfHash = (hash: string): string => hash.replace(/^#(sheet-)?/, '');
+
 export function indexOfHash<S extends string>(flow: Flow<S>, hash: string): number {
-  const i = flow.steps.indexOf(hash.replace(/^#/, '') as S);
+  const i = flow.steps.indexOf(stepOfHash(hash) as S);
   return i < 0 ? 0 : i;
 }
 

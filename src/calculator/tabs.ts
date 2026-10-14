@@ -1,4 +1,4 @@
-import { stepAt, type Flow } from './flow';
+import { sheetAnchor, stepAt, type Flow } from './flow';
 
 function asTab(el: HTMLElement, link: boolean): HTMLElement {
   if (el instanceof HTMLAnchorElement === link) return el;
@@ -26,7 +26,7 @@ export function setUpTabs<S extends string>(
       const p = asTab(el, available);
       tabs[i] = p;
       if (available) {
-        p.setAttribute('href', `#${steps[first]}`);
+        p.setAttribute('href', sheetAnchor(stepAt(flow, first)));
         p.removeAttribute('aria-disabled');
       } else {
         p.removeAttribute('href');

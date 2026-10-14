@@ -68,6 +68,7 @@ describe('a flow', () => {
     expect(indexOfHash(demo, '#b')).toBe(2);
     expect(indexOfHash(demo, 'end')).toBe(3);
     expect(indexOfHash(demo, '#nowhere')).toBe(0);
+    expect(indexOfHash(demo, '#sheet-b')).toBe(2);
   });
 
   it('skips the sheets that are not asked, both ways', () => {
@@ -130,7 +131,7 @@ describe('a flow', () => {
     expect(back).toEqual([['b', 'a']]);
     const tabs = all<HTMLElement>('[data-tab]');
     expect(tabs.map((t) => t.dataset['state'])).toEqual(['current', 'done', 'pending']);
-    expect(tabs.map((t) => t.getAttribute('href'))).toEqual(['#a', '#b', null]);
+    expect(tabs.map((t) => t.getAttribute('href'))).toEqual(['#sheet-a', '#sheet-b', null]);
   });
 
   it('follows the browser history and rewrites an address it cannot show', () => {
