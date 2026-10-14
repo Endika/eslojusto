@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { formatRate } from '../../src/content/rent-indices';
+import { IRAV } from '../../src/engine/rental/data/irav';
 
 const PAGES = [
   {
@@ -92,7 +94,8 @@ test('the rise page lists the caps and the pending decree twice over', async ({ 
   await expect(caps.locator('[data-cap="two"]')).toContainText('08-10-2026');
   await expect(page.locator('.status')).toContainText('pendiente de convalidación');
   await expect(page.locator('.example').first()).toContainText('918,00');
-  await expect(page.locator('.example').first()).toContainText('no el 2,47');
+  const latest = IRAV.values.at(-1)?.rate ?? Number.NaN;
+  await expect(page.locator('.example').first()).toContainText(`no el ${formatRate(latest)}`);
 });
 
 test('the decree page links to the guides in this build', async ({ page }) => {

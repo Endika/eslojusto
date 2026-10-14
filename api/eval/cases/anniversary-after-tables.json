@@ -1,8 +1,8 @@
 {
   "id": "anniversary-after-tables",
-  "description": "LAU art. 18.1: the reference index is the last one published on the anniversary; on 20-10-2026, past the loaded tables, the review never falls back to an older month and says the update is not checkable.",
+  "description": "LAU art. 18.1: the reference index is the last one published on the anniversary; on 20-10-2029, the fourth anniversary, past the loaded tables, the review never falls back to an older month and says the update is not checkable.",
   "eval": false,
-  "today": "2026-11-03",
+  "today": "2029-11-03",
   "pages": [
     {
       "template": "general-es",
@@ -41,12 +41,12 @@
       "kind": "rent_update_notice",
       "data": {
         "city": "Santiago de Compostela",
-        "noticeOnText": "1 de octubre de 2026",
+        "noticeOnText": "1 de octubre de 2029",
         "medium": "letter",
         "previousRent": "1.100,00 €",
         "newRent": "1.127,17 €",
         "percent": "2,47 %",
-        "appliesFromText": "1 de octubre de 2026",
+        "appliesFromText": "1 de octubre de 2029",
         "tenantName": "Persona Arrendataria Ficticia J",
         "landlordName": "Persona Arrendadora Ficticia J"
       },
@@ -77,7 +77,7 @@
       "lists": {
         "notices": [
           {
-            "noticeOn": "2026-10-01",
+            "noticeOn": "2029-10-01",
             "previousRent": 1100,
             "newRent": 1127.17
           }
@@ -96,13 +96,13 @@
       "advanceMonths": 1,
       "updates": [
         {
-          "anniversary": "2026-10-20",
-          "effectiveOn": "2026-10-20",
+          "anniversary": "2029-10-20",
+          "effectiveOn": "2029-10-20",
           "previousRent": 1100,
           "newRent": 1127.17,
-          "chargedFrom": "2026-10-01",
+          "chargedFrom": "2029-10-01",
           "notice": "letter",
-          "noticeOn": "2026-10-01",
+          "noticeOn": "2029-10-01",
           "agreedInWriting": false
         }
       ],
