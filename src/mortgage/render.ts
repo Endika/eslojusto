@@ -151,7 +151,7 @@ function renderRules(container: ParentNode, card: HTMLElement, lines: readonly R
 // ---------- Totals ----------
 
 // The words of a line that counts nothing: a split without its figure yet, a cost held in
-// «Revísalo», costs without their invoices, or nothing among what was entered.
+// «Para revisar», costs without their invoices, or nothing among what was entered.
 export function emptyTotalKey(items: readonly ExpenseItem[], basis: Basis): ClientKey {
   const own = items.filter((i) => i.basis === basis);
   if (own.some((i) => i.status === 'split_explained')) return 'client.mortgage.total.no_figure_yet';

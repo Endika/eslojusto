@@ -220,7 +220,7 @@ describe('client strings', () => {
       false,
     );
     expect(clientStrings('es', { insurance: true })['client.insurance.status.review_it']).toBe(
-      'Revísalo',
+      'Para revisar',
     );
   });
 
@@ -285,7 +285,7 @@ describe('client strings', () => {
       false,
     );
     expect(clientStrings('es', { mortgage: true })['client.mortgage.status.review_it']).toBe(
-      'Revísalo',
+      'Para revisar',
     );
   });
 

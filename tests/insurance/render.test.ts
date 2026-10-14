@@ -110,7 +110,7 @@ describe('the insurance result', () => {
     renderInsuranceResult(root, review(input), tr);
     expect(cards(root).slice(-2)).toEqual([
       { item: 'distance_withdrawal_compulsory', status: 'No aplica' },
-      { item: 'distance_withdrawal_voluntary', status: 'Revísalo' },
+      { item: 'distance_withdrawal_voluntary', status: 'Para revisar' },
     ]);
   });
 
@@ -118,7 +118,7 @@ describe('the insurance result', () => {
     const root = result();
     const input = policy({ distance: true, mortgageRequired: null });
     renderInsuranceResult(root, review(input), tr);
-    expect(cards(root).at(-1)).toEqual({ item: 'distance_withdrawal', status: 'Revísalo' });
+    expect(cards(root).at(-1)).toEqual({ item: 'distance_withdrawal', status: 'Para revisar' });
   });
 
   it('folds the information blocks and lists what it does not look at', () => {

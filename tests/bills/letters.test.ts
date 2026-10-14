@@ -187,7 +187,7 @@ describe('the correction letter', () => {
     expect(all).toContain('Servicio aparte de la luz · Seguro: facturado, 3,00 €');
     expect(all).not.toContain('Mantenimiento');
     expect(all).not.toContain('IVA');
-    expect(all).not.toMatch(/Revísalo|de menos|sin sumar/);
+    expect(all).not.toMatch(/Para revisar|de menos|sin sumar/);
   });
 });
 

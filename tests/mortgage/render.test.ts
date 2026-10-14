@@ -150,12 +150,15 @@ describe('the mortgage result', () => {
       }),
     );
     expect(text(root, '[data-total="case_law"] [data-total-amount]')).toBe(
-      'Sin cifra: hay gastos en «Revísalo»',
+      'Sin cifra: hay gastos en «Para revisar»',
     );
     expect(text(root, '[data-total="statute"] [data-total-amount]')).toBe(
       'Nada con lo que has metido',
     );
-    expect(cards(root, '[data-expenses]').map((c) => c.status)).toEqual(['Revísalo', 'Revísalo']);
+    expect(cards(root, '[data-expenses]').map((c) => c.status)).toEqual([
+      'Para revisar',
+      'Para revisar',
+    ]);
   });
 
   it('names a cost without its invoice and the tax the lender paid apart from one left out', () => {
