@@ -73,10 +73,12 @@ function show(view: ErteView) {
   title.focus();
 }
 
-form.addEventListener('change', () => {
-  applyConditions();
-  result.hidden = true;
-});
+// A figure being typed already makes the shown result stale, before the field loses focus.
+for (const type of ['input', 'change'] as const)
+  form.addEventListener(type, () => {
+    applyConditions();
+    result.hidden = true;
+  });
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();

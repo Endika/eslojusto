@@ -145,6 +145,21 @@ test('changing an answer hides a stale result, and starting over clears the form
   await expect(page.getByLabel('No lo sé', { exact: true })).not.toBeChecked();
 });
 
+test('typing a new figure hides the result before the field loses focus', async ({ page }) => {
+  await answer(page, '¿Qué tipo de ERTE tienes?', 'Por fuerza mayor');
+  await answer(page, '¿Tu ERTE suspende el contrato o reduce la jornada?', 'Suspende el contrato');
+  const base = page.getByLabel('Base reguladora al mes', { exact: true });
+  await base.fill('3000');
+  await answer(page, '¿Cuántos hijos o hijas tienes a tu cargo?', '1');
+  await calculate(page);
+  await expect(page.locator('#erte-result')).toBeVisible();
+  await base.focus();
+  await page.keyboard.press('End');
+  await page.keyboard.type('0');
+  await expect(base).toBeFocused();
+  await expect(page.locator('#erte-result')).toBeHidden();
+});
+
 test('fits a phone without scrolling sideways', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto('paro/erte/');

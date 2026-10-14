@@ -26,7 +26,9 @@ const base: ErteInput = {
 describe('ERTE result copy', () => {
   it('ETOP shows both stretches, the consumption and the 360 days', () => {
     const t = text(base);
-    expect(t).toContain('1.050 € al mes los primeros 180 días y unos 900 € desde el día 181');
+    expect(t).toContain(
+      '1.050 € al mes los primeros 180 días de prestación y unos 900 € desde el día 181',
+    );
     expect(t).toContain('Sí. Cada día de ERTE');
     expect(t).toContain(
       '360 días cotizados en los últimos 6 años que no hayas usado para otro paro',
