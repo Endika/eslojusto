@@ -1,5 +1,5 @@
 import type { FormEntries } from '../calculator/fill';
-import type { Detail } from '../calculator/flow';
+import { stepOfHash, type Detail } from '../calculator/flow';
 import { createApi } from '../documents/api';
 import { TURNSTILE_SCRIPT, type DocumentsConfig } from '../documents/config';
 import type { Api, ExtractionShape, PassApi } from '../documents/contract';
@@ -458,7 +458,7 @@ export function wireDocuments<R, F extends string, L extends string>({
       calculator.fill(entries);
       calculator.review();
     });
-  } else if (sessionId === null && section.steps.includes(arrival.hash.slice(1)))
+  } else if (sessionId === null && section.steps.includes(stepOfHash(arrival.hash)))
     upload.showCalculator(false);
   else upload.showStart();
 

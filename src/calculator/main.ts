@@ -12,6 +12,7 @@ import {
   startStep,
   stepAt,
   stepFrom,
+  stepOfHash,
 } from './flow';
 import {
   SHEETS,
@@ -200,7 +201,7 @@ export function setUpCalculator(
   const otherContracts = setUpOtherContracts(form, tr, conditions);
   conditions();
   nav.reached = firstIncomplete(flow, form, today());
-  const arrival = (flow.steps as readonly string[]).includes(location.hash.slice(1))
+  const arrival = (flow.steps as readonly string[]).includes(stepOfHash(location.hash))
     ? indexOfHash(flow, location.hash)
     : startStep(flow, form);
   nav.show(Math.min(arrival, nav.reached), { history: 'replace' });
