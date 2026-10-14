@@ -174,7 +174,7 @@ export const BILLS_NORMS: NormTable = {
     statusUrl: null,
   },
   // «De acuerdo con la información que publique en octubre el Instituto Nacional de Estadística»:
-  // the September CPI comes out on 14-10-2026 in the INE calendar.
+  // on 14-10-2026 the INE gave the electricity CPI of September 2026 at 11,4 % over a year earlier.
   rdl25_2026_november: {
     id: 'rdl25_2026_november',
     citation: 'Real Decreto-ley 25/2026, arts. 18 y 20 (rebaja de noviembre de 2026)',
@@ -182,13 +182,13 @@ export const BILLS_NORMS: NormTable = {
     inForceSince: '2026-11-01',
     inForceUntil: '2026-11-30',
     status: 'conditional',
-    statusSince: null,
-    statusUrl: null,
+    statusSince: '2026-10-14',
+    statusUrl: 'https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/IPC291482',
     condition: {
       text: 'Que el IPC de la electricidad de septiembre de 2026 suba más del 15 % interanual',
       decidesOn: '2026-10-14',
       source: 'ine_cpi_electricity',
-      met: null,
+      met: false,
     },
   },
   // The October CPI comes out on 13-11-2026.

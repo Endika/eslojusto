@@ -46,10 +46,13 @@ describe('the electricity answers', () => {
     expect(answer).toContain('Orden IET/1491/2013');
   });
 
-  it('dates VAT by the day the bill falls due and leaves November and December open', () => {
+  it('dates VAT by the day the bill falls due, settles November and leaves December open', () => {
     const answer = answerOf(entries, 'faq-luz-iva');
     expect(answer).toContain('arts. 75 y 90.Dos');
-    expect(answer).toContain('Real Decreto-ley 25/2026, arts. 18 y 19');
+    expect(answer).toContain(
+      '11,4 %, por debajo del 15 % que pide el Real Decreto-ley 25/2026 (art. 18)',
+    );
+    expect(answer).toContain('(art. 19)');
     expect(answer).toContain('no suma ninguna diferencia que dependa de ello');
   });
 
