@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.60.3](https://github.com/Endika/eslojusto/compare/v1.60.2...v1.60.3) (2026-10-14)
+
+
+### Bug Fixes
+
+* **bills:** apply the general rates in November 2026, as the September electricity CPI rose 11.4 % ([e674774](https://github.com/Endika/eslojusto/commit/e67477468509870ad74905b841dd60474b5967dc))
+
 ## [1.60.2](https://github.com/Endika/eslojusto/compare/v1.60.1...v1.60.2) (2026-10-14)
 
 
