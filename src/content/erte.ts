@@ -133,7 +133,7 @@ function amountBlock(input: ErteInput, e: ErteEstimate): ErteBlock {
       ? `${capitalise(first)} al mes.`
       : second === first
         ? `${capitalise(first)} al mes, antes y después del día 181.`
-        : `${capitalise(first)} al mes los primeros 180 días y ${second} desde el día 181.`;
+        : `${capitalise(first)} al mes los primeros 180 días de prestación y ${second} desde el día 181.`;
   const limit =
     input.regime === 'red'
       ? `Con un tope de ${capText(RED_MONTHLY_CAP)} al mes, el 225\u00a0% del IPREM más un sexto, y sin mínimo propio (DA 41.ª.4 LGSS).`
@@ -241,7 +241,7 @@ export const erteUnknownView = (): ErteView => ({
   blocks: [
     {
       title: 'Causas económicas, técnicas, organizativas o de producción',
-      text: 'El 70\u00a0% de tu base los primeros 180 días y el 60\u00a0% después, dentro de los mínimos y máximos por hijos o hijas. Gasta tu paro futuro y hacen falta 360 días cotizados en los últimos 6 años que no hayas usado para otro paro.',
+      text: 'El 70\u00a0% de tu base los primeros 180 días de prestación y el 60\u00a0% después, dentro de los mínimos y máximos por hijos o hijas. Gasta tu paro futuro y hacen falta 360 días cotizados en los últimos 6 años que no hayas usado para otro paro.',
       source: 'Arts. 266.b, 269 y 270 LGSS',
     },
     {
