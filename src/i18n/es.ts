@@ -2590,13 +2590,13 @@ export const es = {
   'client.employment.calculation.holidays.working_days_equivalent':
     '{days} laborables con {week} de trabajo a la semana equivalen a unos {calendar} naturales.',
   'client.employment.calculation.holidays.counted_in_calendar_days':
-    'El mínimo legal se cuenta en días naturales: {minimum}.',
+    'El art. 38.1 del Estatuto de los Trabajadores fija el mínimo en días naturales, {minimum}, y la ley no dice a cuántos días laborables equivalen: por eso no se puede comprobar si los de tu contrato llegan al mínimo.',
   'client.employment.calculation.holidays.under_your_agreement':
     'Según tu dato, tu convenio da {agreed}.',
   'client.employment.calculation.holidays.span_unknown':
     'Sin fecha de fin no se sabe si te corresponden los 30 días enteros o la parte proporcional.',
   'client.employment.calculation.holidays.prorated_entitlement':
-    'Para un contrato de {span}, la parte proporcional de 30 días es de {entitled}.',
+    'Para un contrato de {span}, la parte proporcional de 30 días es de {entitled}, aunque el art. 38.1 no lo dice expresamente.',
   'client.employment.calculation.holidays.may_be_annual':
     'La cifra del contrato puede ser al año y no solo para este contrato.',
   'client.employment.calculation.holidays.prorated_if_temporary':
