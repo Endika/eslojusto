@@ -19,8 +19,10 @@ import type { FieldError } from './form';
 import {
   headline,
   roundToTens,
+  shownBounds,
   shownOne,
   shownPair,
+  shownUpTo,
   summarise,
   totalLines,
   totalShare,
@@ -384,11 +386,11 @@ function renderTotals(container: ParentNode, review: RentalReview, tr: Translate
   find(container, '[data-totals]').replaceChildren(
     ...totalLines(review).map(({ kind, total }) => {
       const li = document.createElement('li');
-      const [counted, upTo] = shownPair(total.counted, total.upTo).map((x) => approx(x, tr));
+      const [counted, upTo] = shownBounds(total.counted, total.upTo).map((x) => approx(x, tr));
       const line =
         total.counted === 0
           ? pieces(tr(`client.rental.total.${kind}_doubtful`), {
-              maximo: approx(shownOne(total.upTo), tr),
+              maximo: approx(shownUpTo(total.upTo), tr),
             })
           : total.upTo > total.counted
             ? pieces(tr(`client.rental.total.${kind}_up_to`), {
