@@ -8,17 +8,17 @@ const GENERAL_URL = `${BILLS_NORMS.law37_1992.url}#a90`;
 const GENERAL: VatRate = { kind: 'general', percent: 21 };
 // Every reduction also reaches holders of the social bonus as severely vulnerable, or severely
 // vulnerable at risk of social exclusion, whatever their power.
-const REDUCED_UNDER_10: VatRate = {
+// «Inferior o igual a 10 kW»: art. 42.a RDL 7/2026 as RDL 10/2026 rewrote it «para evitar
+// cualquier género de dudas… sin que ello signifique una modificación de su contenido», so from
+// 22-03-2026; arts. 10 and 11 RDL 18/2026 and arts. 18.1 and 19.1 RDL 25/2026.
+const REDUCED_UP_TO_10: VatRate = {
   kind: 'reduced',
   percent: 10,
   generalPercent: 21,
   powerLimitKw: 10,
-  powerLimitIncluded: false,
+  powerLimitIncluded: true,
   severeVulnerable: true,
 };
-// «Inferior o igual a 10 kW»: art. 42.a RDL 7/2026 as rewritten by RDL 10/2026 from 30-04-2026,
-// arts. 10 and 11 RDL 18/2026 and arts. 18.1 and 19.1 RDL 25/2026.
-const REDUCED_UP_TO_10: VatRate = { ...REDUCED_UNDER_10, powerLimitIncluded: true };
 
 const general = (from: string, until: string): TableRow<VatRate> => ({
   from,
@@ -47,20 +47,11 @@ const RDL25 = BILLS_NORMS.rdl25_2026.url;
 
 export const VAT: Table<VatRate> = [
   general('2026-01-01', '2026-03-21'),
-  // Art. 42.a RDL 7/2026: «inferior a» 10 kW.
   {
     from: '2026-03-22',
-    until: '2026-04-29',
-    value: REDUCED_UNDER_10,
-    norm: 'rdl7_2026',
-    url: `${RDL7}#a4-4`,
-  },
-  {
-    from: '2026-04-30',
     until: '2026-05-31',
     value: REDUCED_UP_TO_10,
     norm: 'rdl7_2026',
-    alsoRestsOn: ['rdl10_2026'],
     url: `${RDL7}#a4-4`,
   },
   ...conditionalMonth(
