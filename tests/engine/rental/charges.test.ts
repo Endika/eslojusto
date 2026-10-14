@@ -153,9 +153,9 @@ describe('a charge agreed with its yearly amount', () => {
 
   it('a year whose index is not out yet is not checkable', () => {
     const [r] = checkCharges(
-      input([community({ charged: [{ year: 2026, amount: 640 }] })], {
-        signedOn: f('2025-10-15'),
-        startDate: f('2025-10-20'),
+      input([community({ charged: [{ year: 2030, amount: 640 }] })], {
+        signedOn: f('2029-10-15'),
+        startDate: f('2029-10-20'),
       }),
       DEPS,
     );
