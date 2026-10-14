@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
+import { NORMS_BEFORE_FIGURE } from './norms-before-figure';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
 import { RULES } from '../../../src/engine/bills/rules';
 import type { BillsNormId, Norm, NormTable } from '../../../src/engine/bills/norms';
@@ -70,11 +71,11 @@ describe('looking a value up by day', () => {
     ...change,
   });
   const reduction: Norm = {
-    ...BILLS_NORMS.rdl25_2026_november,
+    ...NORMS_BEFORE_FIGURE.rdl25_2026_november,
     inForceSince: '2030-02-01',
     inForceUntil: '2030-02-28',
   };
-  const norms: NormTable = { ...BILLS_NORMS, rdl25_2026_november: reduction };
+  const norms: NormTable = { ...NORMS_BEFORE_FIGURE, rdl25_2026_november: reduction };
   const table: Table<number> = [
     row({}),
     row({ from: '2030-02-01', until: '2030-02-28', value: 2, norm: 'rdl25_2026_november' }),
@@ -245,6 +246,15 @@ describe('the tax rates of 2026, by the day the bill falls due', () => {
     expect(valueOf(vat(day, met))).toMatchObject({ percent: 10, severeVulnerable: true });
   });
 
+  it('on 2026-11-05 apply the general rates: the September figure missed the 15 %', () => {
+    expect(BILLS_NORMS.rdl25_2026_november.condition?.met).toBe(false);
+    expect(valueOf(tax('2026-11-05')).percent).toBe(5.11269632);
+    expect(valueOf(vat('2026-11-05')).percent).toBe(21);
+    const met = validated(withSettled({ rdl25_2026_november: true }));
+    expect(valueOf(tax('2026-11-05', met)).percent).toBe(0.5);
+    expect(valueOf(vat('2026-11-05', met))).toMatchObject({ percent: 10, severeVulnerable: true });
+  });
+
   it.each([
     ['2026-11-05', 'rdl25_2026_november'],
     ['2026-12-20', 'rdl25_2026_december'],
@@ -253,12 +263,15 @@ describe('the tax rates of 2026, by the day the bill falls due', () => {
       lookup.kind === 'conditional'
         ? { percents: lookup.rows.map((r) => r.value.percent), norms: lookup.norms }
         : lookup.kind;
-    expect(percents(tax(day))).toEqual({
+    expect(percents(tax(day, NORMS_BEFORE_FIGURE))).toEqual({
       percents: [0.5, 5.11269632],
       norms: [norm, 'rdl25_2026'],
     });
-    expect(percents(vat(day))).toEqual({ percents: [10, 21], norms: [norm, 'rdl25_2026'] });
-    expect(vat(day)).toMatchObject({
+    expect(percents(vat(day, NORMS_BEFORE_FIGURE))).toEqual({
+      percents: [10, 21],
+      norms: [norm, 'rdl25_2026'],
+    });
+    expect(vat(day, NORMS_BEFORE_FIGURE)).toMatchObject({
       rows: [{ value: { powerLimitIncluded: true, severeVulnerable: true } }, {}],
     });
   });
@@ -364,7 +377,7 @@ describe('the bills norm table', () => {
 
   it('RDL 25/2026 awaits validation, and its two reductions their CPI figure', () => {
     expect(BILLS_NORMS.rdl25_2026.status).toBe('pending_validation');
-    const open = Object.values(BILLS_NORMS).filter(
+    const open = Object.values(NORMS_BEFORE_FIGURE).filter(
       (n) => n.status === 'conditional' && n.condition?.met === null,
     );
     expect(open.map((n) => [n.id, n.inForceSince, n.inForceUntil, n.condition?.decidesOn])).toEqual(
@@ -383,10 +396,13 @@ describe('the bills norm table', () => {
       ['rdl7_2026_june', '2026-05-14', '2026-05-19'],
       ['rdl18_2026_august', '2026-07-15', '2026-09-01'],
       ['rdl18_2026_september', '2026-08-13', '2026-09-01'],
+      ['rdl25_2026_november', '2026-10-14', '2026-10-14'],
     ]);
     for (const n of settledOnes) {
       expect(n.inForceUntil !== null && n.inForceUntil >= n.inForceSince).toBe(true);
-      expect(n.statusUrl).toMatch(/^https:\/\/sede\.agenciatributaria\.gob\.es\//);
+      expect(n.statusUrl).toMatch(
+        /^https:\/\/(sede\.agenciatributaria\.gob\.es|servicios\.ine\.es)\//,
+      );
     }
   });
 });

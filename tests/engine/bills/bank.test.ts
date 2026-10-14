@@ -20,6 +20,7 @@ import { ELECTRICITY_TAX } from '../../../src/engine/bills/data/electricity-tax'
 import { SOCIAL_BONUS_FUNDING } from '../../../src/engine/bills/data/fbs';
 import { METER_RENT } from '../../../src/engine/bills/data/meter';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
+import { NORMS_BEFORE_FIGURE } from './norms-before-figure';
 import { PVPC_MARGIN } from '../../../src/engine/bills/data/pvpc';
 import { BILLS_SOURCES } from '../../../src/engine/bills/data/sources';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
@@ -48,7 +49,8 @@ function casesIn<C>(folder: string): readonly C[] {
 const ELECTRICITY: readonly ElectricityBankCase[] = casesIn('electricity');
 const TELECOM: readonly TelecomBankCase[] = casesIn('telecom');
 
-const ELECTRICITY_DEPS = { norms: BILLS_NORMS, tables: BILLS_TABLES };
+// The bank reviews each case as the norms stood when it was written, open conditions included.
+const ELECTRICITY_DEPS = { norms: NORMS_BEFORE_FIGURE, tables: BILLS_TABLES };
 const TELECOM_DEPS = { norms: BILLS_NORMS, tables: BILLS_TABLES, sources: BILLS_SOURCES };
 
 const toBill = (b: ElectricityCaseBill): ElectricityBillInput => ({

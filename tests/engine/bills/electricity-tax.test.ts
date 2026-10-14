@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
+import { NORMS_BEFORE_FIGURE } from './norms-before-figure';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
 import {
   checkElectricityTax,
@@ -164,8 +165,12 @@ describe('the electricity tax of a bill due in May 2026', () => {
 });
 
 describe('the electricity tax of a bill due in November 2026', () => {
+  it('applies the general rate: the September figure missed the 15 %', () => {
+    expect(only(check(november(2.4, 5.11269632))).status).toBe('matches');
+  });
+
   it('gives two readings while the CPI figure and the validation are pending', () => {
-    const item = check(november(2.4, 5.11269632));
+    const item = check(november(2.4, 5.11269632), NORMS_BEFORE_FIGURE);
     expect(item.kind).toBe('readings');
     const [low, high] = findingsOf(item);
     expect(low).toMatchObject({ status: 'wrong_rate_for_date', amount: 2.15, direction: 'over' });
@@ -191,7 +196,7 @@ describe('the electricity tax of a bill due in November 2026', () => {
   it('counts only the lowest reading when both are over', () => {
     // 6 % on its base is over both rates: 2,82 − 0,25 = 2,57 and, to the base with the meter
     // rental in, 2,82 − 2,44 = 0,38.
-    const item = check(november(2.82, 6));
+    const item = check(november(2.82, 6), NORMS_BEFORE_FIGURE);
     expect(findingsOf(item).map((f) => f.amount)).toEqual([2.57, 0.38]);
     expect(countedAmount(item)).toBe(0.38);
   });

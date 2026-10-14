@@ -3,7 +3,6 @@ import { electricityCase } from '../../src/bills/electricity/case';
 import type { CompletedElectricityReview } from '../../src/bills/electricity/ports';
 import { telecomCase } from '../../src/bills/telecom/case';
 import type { Block } from '../../src/documents/ports';
-import { BILLS_NORMS } from '../../src/engine/bills/data/norms';
 import { BILLS_SOURCES } from '../../src/engine/bills/data/sources';
 import { BILLS_TABLES } from '../../src/engine/bills/data/tables';
 import { reviewElectricityBill } from '../../src/engine/bills/electricity-review';
@@ -13,11 +12,15 @@ import { parseDate } from '../../src/engine/date';
 import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { juneBill, meter, telecom, TODAY } from '../engine/bills/input';
+import { NORMS_BEFORE_FIGURE } from '../engine/bills/norms-before-figure';
 
 const tr: Translate = (key, vars) => t('es', key, vars);
 
 const electricity = (input: ElectricityBillInput): CompletedElectricityReview => {
-  const r = reviewElectricityBill(input, TODAY, { norms: BILLS_NORMS, tables: BILLS_TABLES });
+  const r = reviewElectricityBill(input, TODAY, {
+    norms: NORMS_BEFORE_FIGURE,
+    tables: BILLS_TABLES,
+  });
   if (!r.ok) throw new Error(JSON.stringify(r.errors));
   return { input, review: r.review };
 };
@@ -49,7 +52,7 @@ const july = meterOver({
 });
 
 describe('the report of a year of bills', () => {
-  const report = electricityCase([meterOver(), july], BILLS_NORMS).report(tr, TODAY);
+  const report = electricityCase([meterOver(), july], NORMS_BEFORE_FIGURE).report(tr, TODAY);
   const all = lines(report.blocks);
 
   it('lists every bill with its lines, their calculation and the rules with how each norm stands', () => {
@@ -100,7 +103,7 @@ describe('the report of a year of bills', () => {
 describe('the report of a phone exit', () => {
   it('gives the penalty with its calculation and its rule', () => {
     const r = reviewTelecom(telecom({ penaltyCharged: 120 }), TODAY, {
-      norms: BILLS_NORMS,
+      norms: NORMS_BEFORE_FIGURE,
       sources: BILLS_SOURCES,
       tables: { holidays: BILLS_TABLES.holidays },
     });
@@ -108,7 +111,7 @@ describe('the report of a phone exit', () => {
     const all = lines(
       telecomCase(
         { input: telecom({ penaltyCharged: 120 }), review: r.review },
-        BILLS_NORMS,
+        NORMS_BEFORE_FIGURE,
       ).report(tr, TODAY).blocks,
     );
     expect(all).toContain(

@@ -3,6 +3,7 @@ import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
 import { billsDue, uncoveredOn, type DueDeps, type DueItem } from '../../../src/engine/bills/due';
 import { parseDate, toIso, type CivilDate } from '../../../src/engine/date';
+import { NORMS_BEFORE_FIGURE } from './norms-before-figure';
 
 // CI runs the checks on injected days. The monthly review runs `BILLS_REVIEW=1 npm run bills:due`,
 // which prints the list for today and checks that today is covered: it reads the real clock,
@@ -10,6 +11,8 @@ import { parseDate, toIso, type CivilDate } from '../../../src/engine/date';
 const REVIEW = process.env['BILLS_REVIEW'] === '1';
 
 const deps: DueDeps = { norms: BILLS_NORMS, tables: BILLS_TABLES };
+
+const beforeFigure: DueDeps = { ...deps, norms: NORMS_BEFORE_FIGURE };
 
 const describeItem = (item: DueItem): string => {
   switch (item.kind) {
@@ -35,7 +38,7 @@ const realToday = (): CivilDate => {
 
 describe('the bills due list', () => {
   it('names the open conditions and when each figure is due', () => {
-    const items = billsDue(parseDate('2026-10-09'), deps);
+    const items = billsDue(parseDate('2026-10-09'), beforeFigure);
     expect(items.filter((i) => i.kind === 'condition_open')).toEqual([
       {
         kind: 'condition_open',
@@ -56,7 +59,7 @@ describe('the bills due list', () => {
 
   it('flags a condition still open a week after its figure is due', () => {
     const open = (day: string) =>
-      billsDue(parseDate(day), deps)
+      billsDue(parseDate(day), beforeFigure)
         .filter((i) => i.kind === 'condition_open' && i.overdue)
         .map((i) => i.kind === 'condition_open' && i.norm);
     expect(open('2026-10-21')).toEqual([]);
@@ -64,7 +67,7 @@ describe('the bills due list', () => {
   });
 
   it('lists by month which tax rate depends on a condition, from this month on', () => {
-    const months = billsDue(parseDate('2026-10-09'), deps)
+    const months = billsDue(parseDate('2026-10-09'), beforeFigure)
       .filter((i) => i.kind === 'month_conditional')
       .map((i) => i.kind === 'month_conditional' && `${i.month} ${i.table} ${i.norms.join()}`);
     expect(months).toEqual([
@@ -73,9 +76,9 @@ describe('the bills due list', () => {
       '2026-12 electricityTax rdl25_2026_december,rdl25_2026',
       '2026-12 vat rdl25_2026_december,rdl25_2026',
     ]);
-    expect(billsDue(parseDate('2026-10-09'), deps).some((i) => i.kind === 'month_missing')).toBe(
-      false,
-    );
+    expect(
+      billsDue(parseDate('2026-10-09'), beforeFigure).some((i) => i.kind === 'month_missing'),
+    ).toBe(false);
   });
 
   it('lists the tables by the day they run out, soonest first', () => {
@@ -97,12 +100,22 @@ describe('the bills due list', () => {
   });
 
   it('leaves a settled condition out of the open ones', () => {
-    const items = billsDue(parseDate('2026-05-20'), deps);
+    const items = billsDue(parseDate('2026-05-20'), beforeFigure);
     expect(
       items
         .filter((i) => i.kind === 'condition_open')
         .map((i) => i.kind === 'condition_open' && i.norm),
     ).toEqual(['rdl25_2026_november', 'rdl25_2026_december']);
+  });
+
+  it('leaves November out once the INE gave its figure', () => {
+    const items = billsDue(parseDate('2026-10-14'), deps);
+    expect(
+      items
+        .filter((i) => i.kind === 'condition_open')
+        .map((i) => i.kind === 'condition_open' && i.norm),
+    ).toEqual(['rdl25_2026_december']);
+    expect(items.some((i) => i.kind === 'month_conditional' && i.month === '2026-11')).toBe(false);
   });
 
   it('a month without its rate is listed as missing', () => {

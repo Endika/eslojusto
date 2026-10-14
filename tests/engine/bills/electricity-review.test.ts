@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
+import { NORMS_BEFORE_FIGURE } from './norms-before-figure';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
 import {
   reviewElectricityBill,
@@ -13,8 +14,8 @@ import { freeBill, juneBill, mayBill, meter, TODAY } from './input';
 
 const deps = { norms: BILLS_NORMS, tables: BILLS_TABLES };
 
-const review = (input: ElectricityBillInput): ElectricityReview => {
-  const result = reviewElectricityBill(input, TODAY, deps);
+const review = (input: ElectricityBillInput, norms = BILLS_NORMS): ElectricityReview => {
+  const result = reviewElectricityBill(input, TODAY, { ...deps, norms });
   if (!result.ok) throw new Error(`invalid: ${JSON.stringify(result.errors)}`);
   return result.review;
 };
@@ -86,7 +87,7 @@ describe('a bill due in November 2026', () => {
   // Until the September CPI and the validation of RDL 25/2026 are in: the electricity tax 0,25 or
   // 2,40, VAT 5,02 (5,11 with the meter at 21 %) or 10,55; the bill charged the general rates.
   it('shows both readings and counts only the lowest', () => {
-    const r = review(juneBill({ dueOn: parseDate('2026-11-10') }));
+    const r = review(juneBill({ dueOn: parseDate('2026-11-10') }), NORMS_BEFORE_FIGURE);
     const taxes = r.items.filter((i) => i.kind === 'readings');
     expect(taxes.flatMap(findingsOf).map((f) => `${f.id}:${f.status}:${f.amount}`)).toEqual([
       'electricity_tax:wrong_rate_for_date:2.15',

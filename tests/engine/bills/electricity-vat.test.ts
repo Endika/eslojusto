@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
+import { NORMS_BEFORE_FIGURE } from './norms-before-figure';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
 import { checkVat, type VatDeps } from '../../../src/engine/bills/electricity-vat';
 import { countedAmount, findingsOf, type BillItem } from '../../../src/engine/bills/finding';
@@ -9,7 +10,8 @@ import { juneBill, mayBill, only } from './input';
 
 const deps: VatDeps = { norms: BILLS_NORMS, tables: BILLS_TABLES };
 
-const check = (input: ElectricityBillInput): BillItem => checkVat(input, deps);
+const check = (input: ElectricityBillInput, norms = BILLS_NORMS): BillItem =>
+  checkVat(input, { ...deps, norms });
 
 const vat = (amount: number, percent: number | null = null): VatLine => ({
   base: null,
@@ -162,9 +164,13 @@ describe('VAT of a supply of exactly 10 kW in April 2026', () => {
 });
 
 describe('VAT of a bill due in November 2026', () => {
+  it('is the general rate: the September figure missed the 15 %', () => {
+    expect(only(check(juneBill({ dueOn: parseDate('2026-11-10') }))).status).toBe('matches');
+  });
+
   // 50,22 × 10 % = 5,02 or × 21 % = 10,55, until the CPI figure and the validation are in.
   it('gives two readings, the lowest counted', () => {
-    const item = check(juneBill({ dueOn: parseDate('2026-11-10') }));
+    const item = check(juneBill({ dueOn: parseDate('2026-11-10') }), NORMS_BEFORE_FIGURE);
     expect(statuses(item)).toEqual(['wrong_rate_for_date:5.44', 'matches:null']);
     expect(countedAmount(item)).toBe(0);
     for (const f of findingsOf(item))

@@ -9,7 +9,6 @@ import {
   summaryKind,
 } from '../../src/bills/result';
 import { renderTelecomResult } from '../../src/bills/telecom/render';
-import { BILLS_NORMS } from '../../src/engine/bills/data/norms';
 import { BILLS_SOURCES } from '../../src/engine/bills/data/sources';
 import { BILLS_TABLES } from '../../src/engine/bills/data/tables';
 import {
@@ -24,17 +23,21 @@ import { parseDate } from '../../src/engine/date';
 import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { freeBill, juneBill, meter, telecom, TODAY } from '../engine/bills/input';
+import { NORMS_BEFORE_FIGURE } from '../engine/bills/norms-before-figure';
 
 const tr: Translate = (key, vars) => t('es', key, vars);
 
 const electricity = (input: ElectricityBillInput): ElectricityReview => {
-  const r = reviewElectricityBill(input, TODAY, { norms: BILLS_NORMS, tables: BILLS_TABLES });
+  const r = reviewElectricityBill(input, TODAY, {
+    norms: NORMS_BEFORE_FIGURE,
+    tables: BILLS_TABLES,
+  });
   if (!r.ok) throw new Error(JSON.stringify(r.errors));
   return r.review;
 };
 const exit = (input: TelecomInput): TelecomReview => {
   const r = reviewTelecom(input, TODAY, {
-    norms: BILLS_NORMS,
+    norms: NORMS_BEFORE_FIGURE,
     sources: BILLS_SOURCES,
     tables: { holidays: BILLS_TABLES.holidays },
   });
@@ -91,7 +94,7 @@ describe('the electricity result', () => {
     const root = result();
     const input = juneBill();
     const review = electricity(input);
-    renderElectricityResult(root, review, input, BILLS_NORMS, tr);
+    renderElectricityResult(root, review, input, NORMS_BEFORE_FIGURE, tr);
     expect(text(root, '[data-lead]')).toBe(
       'Con lo que has metido, cada línea cuadra con tus propios precios y con lo que fija la norma.',
     );
@@ -111,7 +114,7 @@ describe('the electricity result', () => {
   it('gives the power used as a figure, never as advice', () => {
     const root = result();
     const input = juneBill();
-    renderElectricityResult(root, electricity(input), input, BILLS_NORMS, tr);
+    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, tr);
     const power = cardText(root, 'Potencia que usaste');
     expect(power).toContain(
       'La potencia máxima que usaste en los últimos 12 meses, según tu factura: 3,1 kW en punta y 1,2 kW en valle.',
@@ -127,7 +130,7 @@ describe('the electricity result', () => {
       vat: { base: null, percent: 21, amount: 10.69 },
       total: 61.61,
     });
-    renderElectricityResult(root, electricity(input), input, BILLS_NORMS, tr);
+    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, tr);
     expect(text(root, '[data-total-counted]')).toBe('0,70 €');
     expect(root.querySelector<HTMLElement>('[data-recurring]')?.hidden).toBe(false);
     expect(cards(root).find((c) => c.title === 'Alquiler del contador')).toEqual({
@@ -148,7 +151,7 @@ describe('the electricity result', () => {
       vat: { base: null, percent: 21, amount: 12.32 },
       total: 70.97,
     });
-    renderElectricityResult(root, electricity(input), input, BILLS_NORMS, tr);
+    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, tr);
     expect(cards(root).find((c) => c.title.startsWith('Servicio'))).toEqual({
       title: 'Servicio aparte de la luz · Mantenimiento',
       state: 'paid_over',
@@ -161,7 +164,7 @@ describe('the electricity result', () => {
     const root = result();
     const input = juneBill({ total: 60.5 });
     const review = electricity(input);
-    renderElectricityResult(root, review, input, BILLS_NORMS, tr);
+    renderElectricityResult(root, review, input, NORMS_BEFORE_FIGURE, tr);
     expect(cards(root).find((c) => c.title === 'Total de la factura')?.status).toBe(
       'No cuadra: 0,27 € de menos',
     );
@@ -184,7 +187,7 @@ describe('the electricity result', () => {
       readingFrom: parseDate('2026-08-31'),
       readingTo: parseDate('2026-09-30'),
     });
-    renderElectricityResult(root, electricity(input), input, BILLS_NORMS, tr);
+    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, tr);
     const tax = root.querySelector<HTMLElement>('[data-item="vat"]');
     expect(tax?.dataset['state']).toBe('depends');
     expect(tax?.querySelector('[data-depends]')?.textContent).toContain(
@@ -197,7 +200,7 @@ describe('the electricity result', () => {
 describe('the telecom result', () => {
   it('counts a commitment penalty over its proportional share', () => {
     const root = result();
-    renderTelecomResult(root, exit(telecom({ penaltyCharged: 120 })), BILLS_NORMS, tr);
+    renderTelecomResult(root, exit(telecom({ penaltyCharged: 120 })), NORMS_BEFORE_FIGURE, tr);
     expect(cards(root)).toEqual([
       {
         title: 'Penalización por permanencia',
@@ -216,7 +219,7 @@ describe('the telecom result', () => {
     renderTelecomResult(
       root,
       exit(telecom({ commitment: null, penaltyCharged: 0, lines: [] })),
-      BILLS_NORMS,
+      NORMS_BEFORE_FIGURE,
       tr,
     );
     expect(text(root, '[data-lead]')).toBe(
@@ -280,7 +283,7 @@ describe('the words of a result', () => {
       status: 'in_force',
       doubt: 'ccf_not_updated_since_2016',
     } as const;
-    expect(rowText(row, BILLS_NORMS, tr)).toBe(
+    expect(rowText(row, NORMS_BEFORE_FIGURE, tr)).toBe(
       'con efectos del 01-01-2026 al 31-12-2026 · valor de 2016 sin actualizar',
     );
   });
