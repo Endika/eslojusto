@@ -30,7 +30,7 @@ export interface HouseholdReview {
   // Why the review stopped at the door, when it did.
   readonly scopeSource: NormSource | null;
   // Pay, working time and holidays, then how the relationship ended: its form, severance, notice
-  // and unemployment. Working time and holidays are warnings and carry no amount.
+  // and unemployment. Working time and holidays flag a breach but carry no amount.
   readonly items: readonly Assessed[];
   readonly finalPay: HouseholdFinalPay | null;
   readonly unchecked: readonly UncheckedCode[];
