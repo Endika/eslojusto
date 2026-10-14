@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.61.2](https://github.com/Endika/eslojusto/compare/v1.61.1...v1.61.2) (2026-10-14)
+
+
+### Bug Fixes
+
+* **bills:** date the BOE review of the norms and word the social bonus funding as the orders do ([8fd5665](https://github.com/Endika/eslojusto/commit/8fd5665fcef452bfe64c35198f74c6665028e771))
+* **employment:** explain why working-day holidays and prorated ones cannot be read from art. 38.1 ([d3f00b4](https://github.com/Endika/eslojusto/commit/d3f00b4126a9dc0f85bd1da10063c562f0c3ce88))
+* **erte:** hide a stale result while typing and name the 180 days of benefit ([89c6094](https://github.com/Endika/eslojusto/commit/89c6094c3e30794bc63cc69f9c39354d3d5a0bc1))
+* **household:** settle a zero severance and describe working-time breaches as flagged ([1b017a6](https://github.com/Endika/eslojusto/commit/1b017a6899713c2c607efbdb8ed779445bd3bcba))
+* label the status to review as «Para revisar» ([be5f9d3](https://github.com/Endika/eslojusto/commit/be5f9d34438b7c253e09c951581da0e22bde188e))
+* **mortgage:** cite the notarial fees for copies, halve the fixed stamp duty, date the zero floor ([ba9b3a1](https://github.com/Endika/eslojusto/commit/ba9b3a1a8ec59fcabe074842a55712e0ec14ded2))
+* point the tab links at their sheets ([1d21457](https://github.com/Endika/eslojusto/commit/1d2145718e29e72902758d167ba4d77903c5e6ce))
+* **rental:** apply the 2028 deadline to every extension and never round a maximum down ([260f601](https://github.com/Endika/eslojusto/commit/260f6013c1f99673e964e810e508e630e020d86a))
+
 ## [1.61.1](https://github.com/Endika/eslojusto/compare/v1.61.0...v1.61.1) (2026-10-14)
 
 
