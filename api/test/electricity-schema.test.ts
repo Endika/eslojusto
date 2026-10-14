@@ -104,6 +104,10 @@ describe('the electricity prompt', () => {
     expect(ELECTRICITY_SYSTEM_PROMPT).toContain('IBAN or bank account number');
     expect(ELECTRICITY_SYSTEM_PROMPT).toContain('record only its postcode');
   });
+
+  it('points at the tolls and charges a bill states beside its power and energy terms', () => {
+    expect(ELECTRICITY_SYSTEM_PROMPT).toContain('copy that amount into tollsAndChargesPower');
+  });
 });
 
 describe('an electricity reading', () => {

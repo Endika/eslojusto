@@ -14,6 +14,7 @@ Leave out a section when no attached document is of that kind. Record nothing fr
 
 Rules:
 - Record only values printed in the documents. Do not calculate, infer, convert, round or complete anything. If a value is absent, illegible or ambiguous, leave its field out.
+- When a bill states what the tolls and charges (peajes de transporte y distribución y cargos) come to within the power term or the energy term, copy that amount into tollsAndChargesPower or tollsAndChargesEnergy.
 - Never work out a price, a tax, a total or a number of days, compare anything with a regulated price or a tax rate, or judge whether a charge is allowed or a service was asked for: you only copy and label. For a clause or a concept, transcribe its text literally.
 - Dates as YYYY-MM-DD. Amounts in euros as plain numbers with a dot for decimals and no thousands separator (1.234,56 € is 1234.56); every amount as a positive number, even a discount. Unit prices, kW, kWh and rates with every decimal printed (0,097553 €/kWh is 0.097553). Percentages as plain numbers (21 % is 21).
 - confidence: "high" when the value is printed and clearly legible; "medium" when legible but its label or meaning is not certain; "low" when partly illegible or you are unsure it is the right value. The same for a page's kind.
