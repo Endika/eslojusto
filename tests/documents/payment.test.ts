@@ -319,7 +319,6 @@ describe('the pass offer', () => {
     expect(await payment.returned('cs_test_1')).toBe(true);
     passes.forgetPass();
     payment.show(asPaid(completed()));
-    $<HTMLInputElement>('#pass-session').value = 'cs_test_1';
     await click('[data-pass-recover-button]');
     expect(calls).toEqual(['pass cs_test_1 n', 'pass cs_test_1 n']);
     expect(passes.pass()?.readsLeft).toBe(14);
@@ -397,7 +396,6 @@ describe('the pass offer', () => {
   it('«¿Ya has pagado?» without a payment from this browser says so', async () => {
     const { payment, calls, events } = setUp();
     payment.show(asPaid(completed()));
-    $<HTMLInputElement>('#pass-session').value = 'cs_test_9';
     await click('[data-pass-recover-button]');
     expect(calls).toEqual([]);
     expect($('[data-pass-error]').textContent).toContain(

@@ -33,8 +33,8 @@ const DEAD_CHECKOUT: ReadonlySet<ErrorCode> = new Set([
   'pass_revoked',
 ]);
 
-// Which payments to ask about, a few calls at most: the one whose session came back from Stripe
-// or was typed, the newest redeemed one (its pass can be fetched again), and the two newest not
+// Which payments to ask about, a few calls at most: the one whose session came back from Stripe,
+// the newest redeemed one (its pass can be fetched again), and the two newest not
 // yet redeemed.
 function passCandidates(
   checkouts: readonly PendingCheckout[],
@@ -48,7 +48,7 @@ function passCandidates(
   return chosen.filter((c, i) => chosen.findIndex((d) => d.nonce === c.nonce) === i);
 }
 
-// The answer worth showing: the one about the session the person came back with or typed;
+// The answer worth showing: the one about the session the person came back with;
 // otherwise a payment still settling says more than one made from another browser.
 const RANK: Partial<Record<ErrorCode, number>> = { payment_not_complete: 2, session_mismatch: 0 };
 function reportedFailure(failures: readonly { code: ErrorCode; matches: boolean }[]) {
@@ -134,7 +134,6 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     section.querySelector<HTMLElement>('[data-pass-waiver-error]'),
     'waiver error',
   );
-  const session = required(section.querySelector<HTMLInputElement>('#pass-session'), 'session');
   const status = required(section.querySelector<HTMLElement>('[data-pass-status]'), 'status');
   const errorSlip = required(section.querySelector<HTMLElement>('[data-pass-error]'), 'error');
   // A section whose pass unlocks only its detail has no letter.
@@ -280,7 +279,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   }
 
   // Asks for a pass with each payment this browser started that could match, newest first: the
-  // session is known on the way back from Stripe, typed by hand, or any pending one.
+  // session is known on the way back from Stripe, or any pending one.
   async function fetchPass(
     sessionId: string | null,
     via: 'return' | 'recovery',
@@ -501,14 +500,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   section.querySelector('[data-pass-pay]')?.addEventListener('click', guard(pay));
   section.querySelector('[data-pass-recover-button]')?.addEventListener(
     'click',
-    guard(async () => {
-      const typed = session.value.trim();
-      if (typed && !SESSION_ID.test(typed)) {
-        setError('session_not_found');
-        return;
-      }
-      await fetchPass(typed || null, 'recovery');
-    }),
+    guard(() => fetchPass(null, 'recovery')),
   );
   for (const button of [
     ...section.querySelectorAll<HTMLButtonElement>('[data-download]'),

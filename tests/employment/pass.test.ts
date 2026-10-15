@@ -25,7 +25,6 @@ const EMPLOYMENT_OFFER = `
     <input type="checkbox" id="pass-waiver" />
     <p data-pass-waiver-error hidden></p>
     <button data-pass-pay>Pay</button>
-    <input id="pass-session" />
     <button data-pass-recover-button>Recover</button>
   </div>
   <div data-pass-downloads hidden>
