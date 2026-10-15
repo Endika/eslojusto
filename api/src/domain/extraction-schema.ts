@@ -8,6 +8,7 @@ import {
 import {
   EMPLOYMENT_PAGE_KIND_DESCRIPTION,
   EMPLOYMENT_SECTIONS,
+  PAYSLIP_LINE_AMOUNT,
   type EmploymentSectionKind,
 } from './employment-schema';
 import {
@@ -159,7 +160,10 @@ const payslipLines: ListSpec = {
       type: { type: 'text', maxLength: MAX_CONCEPT_LENGTH },
       description: 'The concept exactly as printed, for example «PLUS TRANSPORTE».',
     },
-    amount: money('Amount of the line, in euros.'),
+    amount: {
+      type: { type: 'decimal', min: -MAX_MONEY, max: MAX_MONEY },
+      description: PAYSLIP_LINE_AMOUNT,
+    },
     category: {
       type: { type: 'enum', values: LINE_CATEGORIES },
       description:

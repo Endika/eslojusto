@@ -2047,7 +2047,7 @@ export const es = {
   'client.employment.headline.nothing_entered':
     'No has metido datos que se puedan comparar con la ley.',
   'client.employment.warning.breakdown_short_of_total':
-    'El desglose suma menos que el salario: la parte que falta se cuenta como un complemento de tipo desconocido.',
+    'El desglose suma menos que el salario: como el contrato lo fija en una cantidad, la parte que falta se cuenta como un complemento fijo.',
 
   'client.employment.status.below_minimum': 'Por debajo del mínimo legal',
   'client.employment.status.below_minimum_year': 'Por debajo del SMI: {importe} al año',
@@ -2316,7 +2316,7 @@ export const es = {
   'client.employment.calculation.minimum_wage.pay.extra_pays_unknown':
     'El contrato tiene {count} sin prorratear y no se sabe su importe: no se suman al año.',
   'client.employment.calculation.minimum_wage.breakdown_gap':
-    'El desglose deja sin explicar {gap}: se cuenta como un complemento de tipo desconocido.',
+    'El desglose deja sin explicar {gap}: como el contrato fija el salario en una cantidad, se cuenta como un complemento fijo.',
   'client.employment.calculation.minimum_wage.excluded':
     'No se cuentan {excluded} de complementos variables o de tipo desconocido.',
   'client.employment.calculation.minimum_wage.in_kind_not_counted':
@@ -2591,6 +2591,8 @@ export const es = {
     '{days} laborables con {week} de trabajo a la semana equivalen a unos {calendar} naturales.',
   'client.employment.calculation.holidays.counted_in_calendar_days':
     'El art. 38.1 del Estatuto de los Trabajadores fija el mínimo en días naturales, {minimum}, y la ley no dice a cuántos días laborables equivalen: por eso no se puede comprobar si los de tu contrato llegan al mínimo.',
+  'client.employment.calculation.holidays.usual_equivalence':
+    'La ley fija 30 días naturales y no dice a cuántos laborables equivalen. Con tu semana de trabajo, la equivalencia habitual es de {minimum} laborables, la misma que usa la revisión del finiquito.',
   'client.employment.calculation.holidays.under_your_agreement':
     'Según tu dato, tu convenio da {agreed}.',
   'client.employment.calculation.holidays.span_unknown':

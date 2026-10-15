@@ -187,6 +187,7 @@ type HolidaysPayPhraseKey =
   | 'holidays.working_days'
   | 'holidays.working_days_equivalent'
   | 'holidays.counted_in_calendar_days'
+  | 'holidays.usual_equivalence'
   | 'holidays.under_your_agreement'
   | 'holidays.span_unknown'
   | 'holidays.prorated_entitlement'

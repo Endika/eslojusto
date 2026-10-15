@@ -167,6 +167,16 @@ describe('the contract', () => {
     expect(extraPays({ count: 2, prorated: true })).not.toContain('extra_pays.none_below_minimum');
   });
 
+  it('a lone part of unknown kind that is the whole salary is no breakdown', () => {
+    const whole = [
+      row({ concept: 'S/Convenio y mejora voluntaria', amount: 1400, kind: 'unknown' }),
+    ];
+    const q = prefill({ fields: contract, salaryParts: whole });
+    expect(entry(q, 'hasBreakdown')).toBeUndefined();
+    const part = [row({ concept: 'Plus', amount: 200, kind: 'unknown' })];
+    expect(entry(prefill({ fields: contract, salaryParts: part }), 'hasBreakdown')).toBe('yes');
+  });
+
   it('enters the salary period once when only the annual salary comes', () => {
     const q = prefill({
       fields: { ...without(contract, 'salaryAmount'), annualSalaryAmount: f(19600) },
@@ -178,6 +188,13 @@ describe('the contract', () => {
     const q = prefill({ fields: { ...without(contract, 'endDate'), durationMonths: f(6) } });
     expect(entry(q, 'endDate')).toBe('2025-09-30');
     expect(mark(q, 'endDate')).toMatchObject({ confidence: 'medium', derived: true });
+  });
+
+  it('takes the working week for working holiday days from a schedule «de lunes a viernes»', () => {
+    const q = prefill({ fields: { ...contract, holidayDays: f(22), holidayUnit: f('working') } });
+    expect(entry(q, 'workDaysPerWeek')).toBe('5');
+    expect(mark(q, 'workDaysPerWeek')).toMatchObject({ derived: true, confidence: 'medium' });
+    expect(entry(p, 'workDaysPerWeek')).toBeUndefined();
   });
 
   it('says when the holidays come without their unit', () => {
@@ -302,6 +319,17 @@ describe('the payslips', () => {
         'extraProrated',
       ),
     ).toBeUndefined();
+  });
+
+  it('nets a negative line against the one it offsets, such as meal vouchers', () => {
+    const vouchers = [
+      row({ month: '2025-05', concept: 'Salario base', amount: 1400, category: 'salary' }),
+      row({ month: '2025-05', concept: 'Ticket Restaurant', amount: 216.32, category: 'in_kind' }),
+      row({ month: '2025-05', concept: 'Pago Ticket', amount: -216.32, category: 'in_kind' }),
+    ];
+    const q = prefill({ payslips: slips.slice(0, 1), lines: vouchers });
+    expect(entry(q, 'payslips.0.salary')).toBe('1.400,00');
+    expect(entry(q, 'payslips.0.inKind')).toBeUndefined();
   });
 
   it('says which lines it left out', () => {

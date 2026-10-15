@@ -26,14 +26,28 @@ const holidays = (change: Partial<Holidays>): Partial<EmploymentInput> => ({
 });
 
 describe('holidays (art. 38.1 ET)', () => {
-  it('22 working days in a five-day week are to review, with their equivalence', () => {
+  it('22 working days in a five-day week reach the minimum by the usual equivalence', () => {
     expect(findingFor(holidays({ days: 22, unit: 'working' }), 'holidays_30')).toMatchObject({
-      status: 'review_it',
+      status: 'within_limit',
       calculation: [
         phrase('holidays.working_days_equivalent', {
           days: { days: 22 },
           week: { integer: 5 },
           calendar: { days: 30 },
+        }),
+        phrase('holidays.usual_equivalence', { minimum: { days: 22 } }),
+      ],
+    });
+  });
+
+  it('21 working days in a five-day week are to review, with their equivalence', () => {
+    expect(findingFor(holidays({ days: 21, unit: 'working' }), 'holidays_30')).toMatchObject({
+      status: 'review_it',
+      calculation: [
+        phrase('holidays.working_days_equivalent', {
+          days: { days: 21 },
+          week: { integer: 5 },
+          calendar: { days: 28.64 },
         }),
         phrase('holidays.counted_in_calendar_days', { minimum: { days: 30 } }),
       ],

@@ -237,11 +237,11 @@ function salary(a: Answers, fields: Fields, parts: readonly ExtractedRow[]): boo
   );
   if (agreement) a.read('agreementNamed', 'yes', agreement.confidence);
 
-  salaryParts(a, parts);
+  salaryParts(a, parts, amountOf(fields.salaryAmount?.value ?? fields.annualSalaryAmount?.value));
   return inTwelve;
 }
 
-function salaryParts(a: Answers, parts: readonly ExtractedRow[]) {
+function salaryParts(a: Answers, parts: readonly ExtractedRow[], total: number | null) {
   const rows = a.rows(
     'parts',
     parts.filter(
@@ -249,6 +249,15 @@ function salaryParts(a: Answers, parts: readonly ExtractedRow[]) {
     ),
   );
   if (rows.length === 0) return;
+  // One part of unknown kind that is the whole salary («según convenio y mejora voluntaria»)
+  // breaks nothing down: the salary stays the amount the contract fixes.
+  const [only] = rows;
+  if (
+    rows.length === 1 &&
+    only?.values['kind'] === 'unknown' &&
+    amountOf(only.values['amount']) === total
+  )
+    return;
   a.open('hasBreakdown', 'yes');
   rows.forEach((row, i) => {
     a.read(rowField('parts', i, 'kind'), String(row.values['kind']), row.confidence);
@@ -287,7 +296,9 @@ function sumLines(lines: readonly ExtractedRow[]) {
   const leftOut = new Set<LeftOutLine>();
   for (const row of lines) {
     const month = monthOf(row.values['month']);
-    const amount = amountOf(row.values['amount']);
+    // A line may be negative: the worker's own share that offsets another line.
+    const raw = row.values['amount'];
+    const amount = isNumber(raw) ? raw : null;
     const category = row.values['category'];
     if (!month || amount === null || typeof category !== 'string') continue;
     const sums = months.get(month) ?? {
@@ -434,7 +445,13 @@ function trialAndHolidays(a: Answers, fields: Fields): boolean {
   if (!holidays || amountOf(holidays.value) === null) return false;
   a.read('hasHolidays', 'yes', holidays.confidence);
   read.figure('holidayDays', 'holidayDays');
-  return read.choice('holidayUnit', 'holidayUnit', ['calendar', 'working'] as const) === null;
+  const holidayUnit = read.choice('holidayUnit', 'holidayUnit', ['calendar', 'working'] as const);
+  // Working days need the working week; a schedule «de lunes a viernes» or «a sábado» gives it.
+  const schedule = textOf(fields.scheduleText?.value)?.toLowerCase() ?? '';
+  const week = /lunes a viernes/.test(schedule) ? 5 : /lunes a s[aá]bado/.test(schedule) ? 6 : null;
+  if (holidayUnit === 'working' && week !== null && fields.scheduleText)
+    a.read('workDaysPerWeek', String(week), lowest(fields.scheduleText.confidence, 'medium'), true);
+  return holidayUnit === null;
 }
 
 function clauses(a: Answers, rows: readonly ExtractedRow[]) {
