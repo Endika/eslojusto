@@ -27,6 +27,8 @@
     "indices:due": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indices-due.mjs",
     "bde:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/bde-series.mjs --check",
     "bde:write": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/bde-series.mjs --write",
+    "pvpc:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/pvpc.mjs --check",
+    "pvpc:write": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/pvpc.mjs --write",
     "rental-bank": "node scripts/rental-bank/render.mjs",
     "employment-bank": "node scripts/rental-bank/render.mjs --cases api/eval/cases/employment --out api/eval/out/employment",
     "credit-bank": "node scripts/rental-bank/render.mjs --cases api/eval/cases/credit --out api/eval/out/credit",
