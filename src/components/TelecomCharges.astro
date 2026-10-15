@@ -1,0 +1,137 @@
+---
+import LegalQuote from './LegalQuote.astro';
+import { BILLS_TEXTS } from '../engine/bills/data/texts';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+
+// Every line read on the phone or internet bills, shown once they are read and whatever the exit:
+// the reading fills it, and the norms it may need wait here, hidden until a line calls for them.
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+---
+
+<section class="charges" data-charges aria-labelledby="charges-title" hidden>
+  <h3 class="charges__title" id="charges-title">
+    {tx('bills.telecom.charges.title')}
+  </h3>
+  <p class="help">{tx('bills.telecom.charges.lead')}</p>
+  <p class="help" data-charges-extras hidden>
+    {tx('bills.telecom.charges.extras')}
+  </p>
+  <p class="help" data-charges-fees hidden>
+    {tx('bills.telecom.charges.fees')}
+  </p>
+  <div data-charges-bills></div>
+  <div data-charges-promotions hidden>
+    <h4 class="rules__title">{tx('bills.telecom.charges.promotions')}</h4>
+    <ul class="list" data-charges-promotion-list></ul>
+  </div>
+  <div data-charges-rights hidden>
+    <h4 class="rules__title">{tx('bills.telecom.charges.rights')}</h4>
+    <div data-charges-right="disconnect" hidden>
+      <p class="item__note">{tx('bills.telecom.charges.disconnect')}</p>
+      <LegalQuote lang={lang} source={BILLS_TEXTS.rd899_24} quote="bills_disconnect" />
+    </div>
+    <div data-charges-right="unrequested" hidden>
+      <p class="item__note">{tx('bills.telecom.charges.unrequested')}</p>
+      <LegalQuote lang={lang} source={BILLS_TEXTS.trlgdcu_66quater} quote="bills_unrequested" />
+    </div>
+  </div>
+
+  <template data-template="charges-bill">
+    <section class="charges__bill">
+      <h4 class="charges__bill-title" data-bill-title></h4>
+      <div data-bill-groups></div>
+    </section>
+  </template>
+  <template data-template="charges-group">
+    <div class="charges__group">
+      <p class="charges__kind" data-group-title></p>
+      <ul class="charges__lines" data-group-lines></ul>
+    </div>
+  </template>
+  <template data-template="charges-line">
+    <li class="charges__line">
+      <span class="charges__concept">
+        <span data-line-concept></span>
+        <span class="charges__extra" data-line-extra hidden></span>
+        <span class="charges__period" data-line-period hidden></span>
+      </span>
+      <bdi class="charges__amount" data-line-amount></bdi>
+    </li>
+  </template>
+</section>
+
+<style>
+  .charges {
+    margin-block: 1.25rem 1rem;
+    padding-block-start: 1rem;
+    border-block-start: 1.5px solid color-mix(in oklab, var(--sheet-ink) 30%, transparent);
+  }
+  .charges__title {
+    margin: 0 0 0.5rem;
+    font: 620 1.125rem / 1.3 var(--f-grotesque);
+  }
+  .charges__bill + .charges__bill {
+    margin-top: 1rem;
+  }
+  .charges__bill-title {
+    margin: 0 0 0.5rem;
+    font: 620 0.9375rem / 1.4 var(--f-grotesque);
+    overflow-wrap: anywhere;
+  }
+  .charges__group {
+    margin-bottom: 0.75rem;
+  }
+  .charges__kind {
+    margin: 0 0 0.25rem;
+    font: 500 0.8125rem / 1.5 var(--f-mono);
+    font-stretch: 87.5%;
+    color: var(--sheet-ink-soft);
+  }
+  .charges__lines {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font: 400 var(--t-help) / var(--l-help) var(--f-serif);
+  }
+  /* The amount keeps to the right of its concept, which wraps on a narrow screen. */
+  .charges__line {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-block: 0.25rem;
+    border-block-end: 1px solid color-mix(in oklab, var(--sheet-ink) 15%, transparent);
+  }
+  .charges__concept {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .charges__period {
+    display: block;
+    font: 500 0.8125rem / 1.5 var(--f-mono);
+    font-stretch: 87.5%;
+    color: var(--sheet-ink-soft);
+  }
+  /* Marked with a word, never by colour alone. */
+  .charges__extra {
+    display: inline-block;
+    margin-inline-start: 0.375rem;
+    padding: 0 0.3125rem;
+    border: 1.5px solid currentColor;
+    border-radius: 0.25rem;
+    font: 700 0.75rem / 1.4 var(--f-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .charges__amount {
+    flex: none;
+    font: 500 0.9375rem / 1.45 var(--f-mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+</style>

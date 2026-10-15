@@ -5,7 +5,8 @@ import { link, type Lang } from '../i18n/languages';
 // Rendered only in a build with the documents API: the first sheet offers reading a document or
 // filling the form by hand. Its styles live here, inline, so a build without the API ships none.
 // Each review names the documents it reads in its own words. A review whose main document runs
-// past what one read takes shows a guide to the pages worth sending, each with how to tell it.
+// past what one read takes shows a guide to the pages worth sending, each with how to tell it. A
+// review may add to what a read shows, in the `done` slot.
 interface GuidePage {
   name: string;
   signs: string;
@@ -294,6 +295,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
     <p class="help start__recognised" data-done-documents hidden></p>
     <p class="help" data-done-summary></p>
     <ul class="list start__notes" data-done-notes hidden></ul>
+    <slot name="done" />
     <div class="start__actions">
       <button class="button start__secondary" type="button" data-start-upload>
         {tx('documents.done.another')}

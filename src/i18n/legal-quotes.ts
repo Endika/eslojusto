@@ -48,4 +48,12 @@ export const LEGAL_QUOTES: Readonly<Record<string, LegalQuoteText>> = {
     source: 'rd899_7',
     text: 'El operador se abstendrá de facturar y cobrar cualquier cantidad que se haya podido devengar, por causa no imputable al usuario final, con posterioridad al plazo de dos días en que debió surtir efectos la baja.',
   },
+  bills_disconnect: {
+    source: 'rd899_24',
+    text: 'Los operadores que presten el servicio telefónico disponible al público deberán garantizar a sus abonados el derecho a la desconexión de determinados servicios, entre los que se incluirá, al menos, el de llamadas internacionales y a servicios de tarificación adicional.',
+  },
+  bills_unrequested: {
+    source: 'trlgdcu_66quater',
+    text: 'Queda prohibido el envío y el suministro al consumidor y usuario de bienes, de agua, gas o electricidad, de calefacción mediante sistemas urbanos, de contenido digital o de prestación de servicios no solicitados por él, cuando dichos envíos y suministros incluyan una pretensión de pago de cualquier naturaleza.',
+  },
 };
