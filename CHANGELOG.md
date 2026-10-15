@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.63.0](https://github.com/Endika/eslojusto/compare/v1.62.0...v1.63.0) (2026-10-15)
+
+
+### Features
+
+* **bills:** list every charge read on telecom bills, marking extras and discounts that end ([019749d](https://github.com/Endika/eslojusto/commit/019749ddfcc765fa3bbee526a5983c5334834623))
+
+
+### Bug Fixes
+
+* **api:** ask a telecom read for every line of a bill, the plan's own fee included ([e24bb5c](https://github.com/Endika/eslojusto/commit/e24bb5c6c1012190cbe24c8339a806eb73497223))
+* **bills:** read a fee printed with four decimals, skip the VAT line, note fees only when several ([bf0dc0c](https://github.com/Endika/eslojusto/commit/bf0dc0c502b88af423ab87e6c5bcb504a0589842))
+
 ## [1.62.0](https://github.com/Endika/eslojusto/compare/v1.61.4...v1.62.0) (2026-10-15)
 
 
