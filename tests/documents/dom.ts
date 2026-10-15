@@ -78,7 +78,6 @@ export const OFFER = `
     <p data-pass-waiver-error hidden></p>
     <button data-pass-pay>Pay</button>
     <details data-pass-recover>
-      <input id="pass-session" />
       <button data-pass-recover-button>Recover</button>
     </details>
   </div>

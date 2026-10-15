@@ -524,9 +524,6 @@ export const es = {
   'documents.pass.paid_question': '¿Ya has pagado?',
   'documents.pass.paid_help':
     'Si pagaste desde este navegador y no ves la descarga, recupera aquí tu pase. Solo funciona en el navegador con el que pagaste.',
-  'documents.pass.session': 'Código del pago',
-  'documents.pass.session_hint':
-    'Empieza por «cs_» y está en la dirección a la que volviste tras pagar. En blanco, se usa el último pago de este navegador.',
   'documents.pass.recover': 'Recuperar el pase',
   'documents.pass.download_report': 'Descargar el informe (PDF)',
   'documents.pass.download_letter': 'Descargar la carta (PDF)',
@@ -1244,7 +1241,7 @@ export const es = {
     'No se han podido leer los documentos. Prueba con fotos más nítidas o rellena a mano.',
   'client.documents.error.model_unavailable':
     'La lectura no está disponible ahora mismo. Prueba más tarde o rellena a mano.',
-  'client.documents.error.session_not_found': 'No encontramos ese pago. Revisa el código.',
+  'client.documents.error.session_not_found': 'No encontramos ese pago.',
   'client.documents.error.session_mismatch':
     'Ese pago no se hizo desde este navegador, y el pase solo se recupera en el navegador con el que se pagó. Para devoluciones o quejas, escribe a hola@eslojusto.es.',
   'client.documents.error.payment_not_complete':
