@@ -362,4 +362,4 @@ export const EMPLOYMENT_SECTIONS = {
 export type EmploymentSectionKind = keyof typeof EMPLOYMENT_SECTIONS;
 
 export const EMPLOYMENT_PAGE_KIND_DESCRIPTION =
-  'employment_contract: a contract, its annex, extension or training plan. job_offer: a job offer. payslip: a nómina. work_history: the vida laboral. settlement_proposal, dismissal_letter, company_certificate, settlement_agreement: a finiquito, despido, certificado de empresa or conciliation. other: anything else.';
+  'employment_contract: a contract, its annex, extension or training plan. job_offer: a job offer. payslip: a nómina. work_history: the vida laboral. settlement_proposal, dismissal_letter, company_certificate, settlement_agreement: a finiquito, despido, certificado de empresa for the public employment service or conciliation. other: anything else, such as a tax withholding certificate (certificado de retenciones).';

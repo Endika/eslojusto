@@ -27,7 +27,7 @@
               "settlement_agreement",
               "other"
             ],
-            "description": "employment_contract: a contract, its annex, extension or training plan. job_offer: a job offer. payslip: a nómina. work_history: the vida laboral. settlement_proposal, dismissal_letter, company_certificate, settlement_agreement: a finiquito, despido, certificado de empresa or conciliation. other: anything else."
+            "description": "employment_contract: a contract, its annex, extension or training plan. job_offer: a job offer. payslip: a nómina. work_history: the vida laboral. settlement_proposal, dismissal_letter, company_certificate, settlement_agreement: a finiquito, despido, certificado de empresa for the public employment service or conciliation. other: anything else, such as a tax withholding certificate (certificado de retenciones)."
           },
           "document": {
             "type": "integer",

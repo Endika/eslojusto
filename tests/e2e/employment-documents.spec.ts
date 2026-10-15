@@ -383,7 +383,11 @@ async function confirmRest(page: Page) {
   await choose(length, '¿Tu empresa tiene menos de 25 personas en plantilla?', 'No');
   await next(page);
   const before = sheet(page, 'Más sobre la prueba');
-  await choose(before, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
+  await choose(
+    before,
+    '¿Antes de este contrato ya habías hecho las mismas funciones en la misma empresa?',
+    'No',
+  );
   await choose(before, '¿Vienes de un contrato formativo en esta empresa?', 'No');
   await next(page);
 
@@ -688,7 +692,11 @@ async function fillByHand(page: Page, c: ByHand) {
   await choose(length, '¿Tu empresa tiene menos de 25 personas en plantilla?', 'No');
   await next(page);
   const before = sheet(page, 'Más sobre la prueba');
-  await choose(before, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
+  await choose(
+    before,
+    '¿Antes de este contrato ya habías hecho las mismas funciones en la misma empresa?',
+    'No',
+  );
   await choose(before, '¿Vienes de un contrato formativo en esta empresa?', 'No');
   await next(page);
   const holidays = sheet(page, 'Tus vacaciones');

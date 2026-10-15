@@ -352,9 +352,10 @@ function payslips(
     if (month && !byMonth.has(month)) byMonth.set(month, row);
   }
   const months = a.rows('payslips', [...new Set([...byMonth.keys(), ...sums.keys()])].sort());
-  if (months.length === 0) return { leftOut, unsummed: false, partial: false };
+  if (months.length === 0) return { leftOut, unsummed: false, partial: false, prorated: null };
   a.open('hasPayslips', 'yes');
   let unsummed = false;
+  let prorated: Confidence | null = null;
   months.forEach((month, i) => {
     const field = (key: string) => rowField('payslips', i, key);
     const slip = byMonth.get(month);
@@ -367,8 +368,10 @@ function payslips(
       // Lines that do not add up to the payslip's total leave every sum in doubt.
       const confidence = doubts.mismatch ? 'low' : base;
       a.read(field('salary'), amountText(sum.salary / 100), confidence, true);
-      if (sum.prorated > 0)
+      if (sum.prorated > 0) {
         a.read(field('prorated'), amountText(sum.prorated / 100), confidence, true);
+        prorated = lowest(prorated ?? 'high', confidence);
+      }
       if (sum.inKind > 0) a.read(field('inKind'), amountText(sum.inKind / 100), confidence, true);
     } else unsummed = true;
     if (!slip) return;
@@ -377,7 +380,12 @@ function payslips(
     const incidents = yesNo(slip.values['incidents']);
     if (incidents) a.read(field('incidents'), incidents, slip.confidence);
   });
-  return { leftOut, unsummed, partial: partial !== undefined && months.includes(partial) };
+  return {
+    leftOut,
+    unsummed,
+    partial: partial !== undefined && months.includes(partial),
+    prorated,
+  };
 }
 
 function time(a: Answers, fields: Fields) {
@@ -622,6 +630,10 @@ export function employmentPrefill(
     mismatch: checks.includes('payslip_lines_do_not_sum'),
     cut: cut.lists.includes('lines') || cut.unknown,
   });
+  // Payslips that pay a share of the extra pays each month say they are prorated, when the
+  // contract does not.
+  if (slips.prorated && !e.fields.prorated && !extrasInTwelve)
+    a.read('extraProrated', 'yes', slips.prorated, true);
   time(a, e.fields);
   const holidayUnitMissing = trialAndHolidays(a, e.fields);
   clauses(a, e.clauses);

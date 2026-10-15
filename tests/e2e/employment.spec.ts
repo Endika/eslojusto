@@ -193,7 +193,11 @@ async function fillRest(page: Page, c: Contract, fit = false) {
   );
   await next(page, fit);
   const before = sheet(page, 'Más sobre la prueba');
-  await choose(before, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
+  await choose(
+    before,
+    '¿Antes de este contrato ya habías hecho las mismas funciones en la misma empresa?',
+    'No',
+  );
   await choose(before, '¿Vienes de un contrato formativo en esta empresa?', 'No');
   await next(page, fit);
   const holidays = sheet(page, 'Tus vacaciones');
