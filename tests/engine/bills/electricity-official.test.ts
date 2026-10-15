@@ -81,6 +81,22 @@ describe('the official figures of the paid report', () => {
     });
   });
 
+  it('gives no figure when a period has kWh but no hour in the billed days', () => {
+    // Saturday 17 and Sunday 18 October have no P1 hour, yet the bill puts 60 kWh there.
+    const weekend = {
+      days: Object.fromEntries(['2026-10-17', '2026-10-18'].map((d) => [d, day])),
+      coveredUntil: '2026-10-18',
+    };
+    const bill = freeBill({
+      ...twoDays,
+      readingFrom: parseDate('2026-10-16'),
+      readingTo: parseDate('2026-10-18'),
+    });
+    expect(officialFigures(bill, { pvpc: weekend, tollHolidays: TOLL_HOLIDAYS }).energy).toEqual({
+      kind: 'pending',
+    });
+  });
+
   it('sets the contracted power beside the highest used and what each kW costs a year', () => {
     // 0,10 €/kW a day is 36,50 a year; 1,5 kW above the 3,1 used cost 54,75.
     expect(officialFigures(freeBill(twoDays), deps).power).toEqual([

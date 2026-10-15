@@ -43,11 +43,12 @@ jobs:
           git switch -c "$BRANCH"
           git commit -am "chore(bills): update PVPC prices to $UNTIL"
           git push --force origin "$BRANCH"
+          title="chore(bills): update PVPC prices to $UNTIL"
+          body="Hourly PVPC prices from REE's REData, added by \`npm run pvpc:write\` up to $UNTIL. Merge it to have the paid electricity report compare bills of those days."
           open="$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')"
           if [ -z "$open" ]; then
-            gh pr create --head "$BRANCH" --title "chore(bills): update PVPC prices to $UNTIL" \
-              --body "Hourly PVPC prices from REE's REData, added by \`npm run pvpc:write\` up to $UNTIL. Merge it to have the paid electricity report compare bills of those days."
+            gh pr create --head "$BRANCH" --title "$title" --body "$body"
           else
             # gh pr edit fails on repositories without classic projects; the API does not.
-            gh api -X PATCH "repos/$GITHUB_REPOSITORY/pulls/$open" -f title="chore(bills): update PVPC prices to $UNTIL"
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/pulls/$open" -f title="$title" -f body="$body"
           fi

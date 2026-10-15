@@ -15,9 +15,11 @@ const isHour = (h: unknown): h is readonly [number, number] =>
   h[0] >= 0 &&
   h[0] <= 23 &&
   typeof h[1] === 'number' &&
-  Number.isFinite(h[1]);
+  h[1] >= -500 &&
+  h[1] <= 5000;
 
-// pvpc-hourly.json checked as it arrives: each day 23 to 25 hours, `coveredUntil` a day. Null when
+// pvpc-hourly.json checked as it arrives: each day 23 to 25 hours of -500 to 5.000 €/MWh, and
+// `coveredUntil` its last day. Null when
 // anything is off, so the report leaves the section out rather than use a wrong price.
 export function pvpcTable(raw: unknown): PvpcTable | null {
   if (typeof raw !== 'object' || raw === null) return null;
@@ -25,9 +27,15 @@ export function pvpcTable(raw: unknown): PvpcTable | null {
   if (typeof source !== 'string' || typeof url !== 'string') return null;
   if (typeof coveredUntil !== 'string' || !DAY.test(coveredUntil)) return null;
   if (typeof days !== 'object' || days === null) return null;
-  for (const [day, hours] of Object.entries(days)) {
+  const entries = Object.entries(days);
+  for (const [day, hours] of entries) {
     if (!DAY.test(day) || !Array.isArray(hours)) return null;
     if (hours.length < 23 || hours.length > 25 || !hours.every(isHour)) return null;
   }
+  const last = entries
+    .map(([day]) => day)
+    .sort()
+    .at(-1);
+  if (last !== undefined && last !== coveredUntil) return null;
   return { source, url, coveredUntil, days: days as PvpcHourly['days'] };
 }

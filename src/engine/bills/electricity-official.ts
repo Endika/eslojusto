@@ -66,7 +66,7 @@ const round6 = (n: number): number => Math.round(n * 1e6) / 1e6;
 function pvpcMeans(
   input: ElectricityBillInput,
   { pvpc, tollHolidays }: OfficialDeps,
-): Readonly<Record<EnergyLinePeriod, number>> | null {
+): Readonly<Record<EnergyLinePeriod, number | null>> | null {
   const { from, to } = billingPeriod(input);
   const sums: Record<EnergyLinePeriod, { total: number; hours: number }> = {
     p1: { total: 0, hours: 0 },
@@ -87,8 +87,9 @@ function pvpcMeans(
       }
     }
   }
+  // No hour of a period in the billed days, as in a bill of a weekend: no mean to compare with.
   const mean = ({ total, hours }: { total: number; hours: number }) =>
-    hours === 0 ? 0 : round6(total / hours / 1000);
+    hours === 0 ? null : round6(total / hours / 1000);
   return { p1: mean(sums.p1), p2: mean(sums.p2), p3: mean(sums.p3), all: mean(sums.all) };
 }
 
@@ -99,22 +100,24 @@ function energyFigures(input: ElectricityBillInput, deps: OfficialDeps): EnergyF
   if (means === null) return { kind: 'pending' };
   const singlePrice = input.energy.some((l) => l.period === 'all');
   const order: readonly EnergyLinePeriod[] = singlePrice ? ['all'] : ['p1', 'p2', 'p3'];
-  const periods = order.flatMap((period) => {
+  const periods: EnergyAgainstPvpc[] = [];
+  for (const period of order) {
     const lines = input.energy.filter((l) => (singlePrice ? true : l.period === period));
     const kwh = lines.reduce((s, l) => s + l.kwh, 0);
-    if (kwh <= 0) return [];
+    if (kwh <= 0) continue;
+    const pvpcPrice = means[period];
+    // kWh in a period none of the billed hours fall in: the bill's dates and lines disagree.
+    if (pvpcPrice === null) return { kind: 'pending' };
     const yourCost = round2(lines.reduce((s, l) => s + l.kwh * l.price, 0));
-    return [
-      {
-        period,
-        kwh,
-        yourPrice: round6(yourCost / kwh),
-        pvpcPrice: means[period],
-        yourCost,
-        pvpcCost: round2(kwh * means[period]),
-      },
-    ];
-  });
+    periods.push({
+      period,
+      kwh,
+      yourPrice: round6(yourCost / kwh),
+      pvpcPrice,
+      yourCost,
+      pvpcCost: round2(kwh * pvpcPrice),
+    });
+  }
   return {
     kind: 'compared',
     periods,
