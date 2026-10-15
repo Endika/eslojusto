@@ -30,6 +30,8 @@ export type DueItem =
   // The last day each table covers, soonest first.
   | { readonly kind: 'table_ends'; readonly table: TableName; readonly lastDay: string }
   | { readonly kind: 'holidays_missing'; readonly year: number }
+  // The 2.0TD toll holidays of this year, which the paid report's PVPC comparison needs.
+  | { readonly kind: 'toll_holidays_missing'; readonly year: number }
   // A decree the Congress has not validated yet, and the day it came into force.
   | { readonly kind: 'validation_pending'; readonly norm: BillsNormId; readonly since: string };
 
@@ -89,6 +91,8 @@ export function billsDue(today: CivilDate, deps: DueDeps): readonly DueItem[] {
 
   if (!tables.holidays.some((h) => h.year === today.y))
     items.push({ kind: 'holidays_missing', year: today.y });
+  if (!tables.tollHolidays.some((h) => h.year === today.y))
+    items.push({ kind: 'toll_holidays_missing', year: today.y });
 
   for (const norm of Object.values(norms))
     if (norm.status === 'pending_validation')

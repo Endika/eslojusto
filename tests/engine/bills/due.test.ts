@@ -26,6 +26,8 @@ const describeItem = (item: DueItem): string => {
       return `ENDS ${item.table} on ${item.lastDay}`;
     case 'holidays_missing':
       return `MISSING the ${item.year} national holidays: load the resolution from the BOE`;
+    case 'toll_holidays_missing':
+      return `MISSING the ${item.year} 2.0TD toll holidays: the fixed, non-replaceable national ones and 6 January`;
     case 'validation_pending':
       return `VALIDATION ${item.norm}: in force since ${item.since}, still to be validated`;
   }
@@ -37,6 +39,16 @@ const realToday = (): CivilDate => {
 };
 
 describe('the bills due list', () => {
+  it('asks for the next year of 2.0TD toll holidays', () => {
+    expect(billsDue(parseDate('2027-01-04'), deps)).toContainEqual({
+      kind: 'toll_holidays_missing',
+      year: 2027,
+    });
+    expect(billsDue(parseDate('2026-10-09'), deps).map((i) => i.kind)).not.toContain(
+      'toll_holidays_missing',
+    );
+  });
+
   it('names the open conditions and when each figure is due', () => {
     const items = billsDue(parseDate('2026-10-09'), beforeFigure);
     expect(items.filter((i) => i.kind === 'condition_open')).toEqual([

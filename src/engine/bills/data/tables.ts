@@ -3,6 +3,7 @@ import { CHARGES } from './charges';
 import { ELECTRICITY_TAX } from './electricity-tax';
 import { SOCIAL_BONUS_FUNDING } from './fbs';
 import { NATIONAL_HOLIDAYS } from './holidays';
+import { TOLL_HOLIDAYS } from './holidays-20td';
 import { METER_RENT } from './meter';
 import { PVPC_MARGIN } from './pvpc';
 import { SOCIAL_BONUS_CAPS, SOCIAL_BONUS_DISCOUNT } from './social-bonus';
@@ -21,4 +22,5 @@ export const BILLS_TABLES: BillsTables = {
   socialBonusDiscount: SOCIAL_BONUS_DISCOUNT,
   socialBonusCaps: SOCIAL_BONUS_CAPS,
   holidays: NATIONAL_HOLIDAYS,
+  tollHolidays: TOLL_HOLIDAYS,
 };

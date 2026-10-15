@@ -151,10 +151,12 @@ export interface BillsTables {
   // household each one belongs to is set by the rule that reads them.
   readonly socialBonusCaps: Table<readonly number[]>;
   readonly holidays: HolidayCalendar;
+  // The weekdays that are P3 all day under the 2.0TD toll, which are not all the national holidays.
+  readonly tollHolidays: HolidayCalendar;
 }
 
 // The tables a month of bills needs, with the names the maintenance lists use.
-export type TableName = Exclude<keyof BillsTables, 'holidays'>;
+export type TableName = Exclude<keyof BillsTables, 'holidays' | 'tollHolidays'>;
 
 export const TABLE_NAMES: readonly TableName[] = [
   'tolls',
