@@ -123,3 +123,16 @@ describe('the official figures of the paid report', () => {
     ).toBeNull();
   });
 });
+
+describe('the PVPC table as the report loads it', () => {
+  it('takes the table in the repo and refuses one that is off', async () => {
+    const { pvpcTable } = await import('../../../src/engine/bills/data/pvpc-hourly');
+    const { default: raw } = await import('../../../src/engine/bills/data/pvpc-hourly.json');
+    expect(pvpcTable(raw)?.days['2026-03-29']).toHaveLength(23);
+    const ok = { source: 's', url: 'u', coveredUntil: '2026-10-13', days: { '2026-10-13': day } };
+    expect(pvpcTable(ok)).not.toBeNull();
+    expect(pvpcTable({ ...ok, days: { '2026-10-13': day.slice(0, 20) } })).toBeNull();
+    expect(pvpcTable({ ...ok, coveredUntil: 'ayer' })).toBeNull();
+    expect(pvpcTable(null)).toBeNull();
+  });
+});
