@@ -386,6 +386,22 @@
       "type": "object",
       "description": "Notice of the policy’s renewal or of changes to it (aviso de renovación, comunicación de modificación de la prima o de las condiciones). Leave the section out when no attached document is one.",
       "properties": {
+        "line": {
+          "type": "object",
+          "description": "The line of insurance, only if it names it (seguro de salud).",
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["home", "car", "life", "health", "funeral", "other"]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": ["high", "medium", "low"]
+            }
+          },
+          "required": ["value", "confidence"],
+          "additionalProperties": false
+        },
         "noticeOn": {
           "type": "object",
           "description": "Date of the notice.",

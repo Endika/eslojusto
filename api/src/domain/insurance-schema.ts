@@ -120,6 +120,7 @@ const renewalNotice = {
     'Notice of the policy’s renewal or of changes to it (aviso de renovación, comunicación de modificación de la prima o de las condiciones).',
   source: 'insurance_renewal_notice',
   fields: {
+    line: oneOf(INSURANCE_LINES, 'The line of insurance, only if it names it (seguro de salud).'),
     noticeOn: date('Date of the notice.'),
     noticeMedium: oneOf(RENEWAL_NOTICE_MEDIA, 'How it was sent: letter, email, sms, app or other.'),
     expiresOn: date('Date the current period ends, from which the renewal applies (vencimiento).'),

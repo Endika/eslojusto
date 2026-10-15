@@ -131,7 +131,8 @@ export function insurancePrefill(
   const changed = textOf(fields.changesText?.value);
   if (changed) quotes.changes = changed;
 
-  const low = a.marks.some((m) => m.confidence === 'low');
+  // The notice's date is marked low on purpose and has its own note.
+  const low = a.marks.some((m) => m.confidence === 'low' && m.id !== 'noticeReceivedOn');
   return {
     entries: a.entries,
     marks: a.marks,

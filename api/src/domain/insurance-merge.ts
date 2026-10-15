@@ -22,7 +22,7 @@ const fromNotice = own('insurance_renewal_notice');
 // For each field the response carries, where it may come from, preferred first. A renewal notice
 // is about the period that ends next, so its end date comes before the one an older policy prints.
 export const INSURANCE_MERGE_RULES = {
-  line: fromPolicy,
+  line: own('insurance_policy', 'insurance_renewal_notice'),
   carCover: fromPolicy,
   insurerName: fromPolicy,
   intermediaryType: fromPolicy,

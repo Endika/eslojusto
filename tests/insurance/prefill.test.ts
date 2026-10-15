@@ -113,6 +113,9 @@ describe('a renewal notice', () => {
     expect(entry(p, 'noticeReceivedOn')).toBe('2026-09-20');
     expect(mark(p, 'noticeReceivedOn')).toMatchObject({ confidence: 'low', derived: true });
     expect(p.notes).toContain(t('es', 'client.insurance.documents.notice_date'));
+    // That date is low on purpose and has its own note: alone it does not call the read doubtful.
+    expect(p.lowConfidence).toBe(false);
+    expect(p.notes).not.toContain(t('es', 'client.documents.done_low'));
   });
 
   it('gives answers the form reads into the engine’s input once the person adds the rest', () => {
