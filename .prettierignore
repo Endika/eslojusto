@@ -5,3 +5,4 @@ CHANGELOG.md
 package-lock.json
 playwright-report
 test-results
+src/engine/bills/data/pvpc-hourly.json
