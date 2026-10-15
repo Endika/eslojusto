@@ -5,9 +5,10 @@ import type { FieldSpec, ListSpec, ReviewSchema, SectionSchema } from './extract
 // test/telecom-contract.test.ts keeps it equal.
 export const PRICE_INDEXES = ['ipc', 'ipc_plus', 'fixed_amount', 'none', 'other'] as const;
 
-// What a line of a phone or internet bill is: the monthly fee of a service, premium-rate calls or
-// messages (tarificación adicional), a third party's charge, a penalty, a handset instalment, a
-// discount or anything else.
+// Mirror of src/engine/bills/telecom-charges.ts, kept equal by the same test. What a line of a
+// phone or internet bill is: the monthly fee of a service, premium-rate calls or messages
+// (tarificación adicional), a third party's charge, a penalty, a handset instalment, a discount
+// or anything else.
 export const TELECOM_LINE_KINDS = [
   'fixed_fee',
   'premium_rate',
@@ -89,7 +90,7 @@ const telecomBill = {
       'periodTo',
     ),
     lines: list(
-      'Every charge or discount of the bills, one entry per line, with its own dates when it prints them.',
+      'Every charge or discount of the bills, one entry per line, the monthly fee of the plan included, with its own dates when it prints them.',
       MAX_TELECOM_LINES,
       {
         document: billDocument,

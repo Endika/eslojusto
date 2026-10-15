@@ -125,7 +125,7 @@
         },
         "lines": {
           "type": "array",
-          "description": "Every charge or discount of the bills, one entry per line, with its own dates when it prints them.",
+          "description": "Every charge or discount of the bills, one entry per line, the monthly fee of the plan included, with its own dates when it prints them.",
           "maxItems": 60,
           "items": {
             "type": "object",

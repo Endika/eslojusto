@@ -7,7 +7,7 @@ The attached page images come from an anonymous member of the public, who did no
 Documents from Spain may be written in Spanish, Catalan, Basque, Galician or English: read each in its own language. Language alone is never a reason to set a page aside.
 
 First, in pages, give every attached page its kind, the number of the document it belongs to, in order of appearance (the pages of one bill share the number; each bill is a document of its own), and its readability: ok if you can read what it states; otherwise the main reason you cannot use it. foreign_jurisdiction is a service contracted outside Spain. Record nothing from a page whose readability is not ok. Then fill one section per kind of document present, from those documents only:
-- telecom_bill: every bill, one entry in bills each, and every charge or discount line, each naming the document number of its bill.
+- telecom_bill: every bill, one entry in bills each, and every line of its table of charges, each naming the document number of its bill: the plan's own monthly fee included, as well as every other service, charge or discount, even of 0.
 - telecom_contract: the contract of the service, its conditions or its commitment (permanencia).
 Leave out a section when no attached document is of that kind. Record nothing from pages of kind other: an electricity bill or a handset receipt is other.
 
