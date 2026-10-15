@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.64.1](https://github.com/Endika/eslojusto/compare/v1.64.0...v1.64.1) (2026-10-15)
+
+
+### Bug Fixes
+
+* **insurance:** read the line from a renewal notice, no doubt note for its own date ([d633563](https://github.com/Endika/eslojusto/commit/d6335634ff1b128cb3daf65b5bac6eb84e0d38d1))
+
 ## [1.64.0](https://github.com/Endika/eslojusto/compare/v1.63.3...v1.64.0) (2026-10-15)
 
 
