@@ -1,9 +1,11 @@
 import { basketCase } from '../../documents/basket';
 import type { PaidReview } from '../../documents/ports';
 import type { Basket } from '../../engine/bills/basket';
+import type { OfficialDeps } from '../../engine/bills/electricity-official';
 import type { NormTable } from '../../engine/bills/norms';
 import type { Translate } from '../../i18n/client';
 import { billsReport, type ReportedReview } from '../report';
+import { officialBlocks, type PvpcSource } from './official';
 import { correctionLetter, electricityLetterKinds } from './letters';
 import type { CompletedElectricityReview } from './ports';
 import { electricityLabels } from './render';
@@ -33,6 +35,9 @@ function reported(
 export const electricityCase = (
   entries: readonly CompletedElectricityReview[],
   norms: NormTable,
+  // The PVPC prices for «Tus cifras frente a las oficiales», once loaded; null until then or if
+  // they could not be.
+  official: () => { readonly deps: OfficialDeps; readonly pvpc: PvpcSource } | null = () => null,
 ): PaidReview =>
   basketCase(entries, {
     offer: (kept) => electricityBasket(kept).offerPass,
@@ -52,6 +57,12 @@ export const electricityCase = (
                   yearlyEstimate: basket.yearlyEstimate,
                 },
           norms,
+          extra: officialBlocks(
+            kept.filter((_, i) => !basket.skipped.some((s) => s.bill === i)),
+            official(),
+            norms,
+            tr,
+          ),
         },
         tr,
         today,

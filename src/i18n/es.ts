@@ -6963,6 +6963,47 @@ export const es = {
   'client.bills.electricity.report.intro':
     'Este informe compara cada factura de la luz que revisaste con tus propios precios y con lo que fija la norma, con los datos que confirmaste. Cada factura cuenta una sola vez, lo cobrado de menos va aparte y la estimación a un año no se suma a ningún total. Informa sobre la norma y no es asesoramiento jurídico.',
   'client.bills.electricity.report.filename': 'eslojusto-informe-facturas-luz.pdf',
+  'client.bills.electricity.report.official.heading': 'Tus cifras frente a las oficiales',
+  'client.bills.electricity.report.official.intro':
+    'Tu energía junto al precio del PVPC de los mismos días y tu potencia junto a la que usaste, solo con datos oficiales. Son cifras para que las conozcas: no dicen qué tarifa ni qué potencia contratar.',
+  'client.bills.electricity.report.official.unavailable':
+    'No se han podido cargar los precios oficiales del PVPC: este apartado no está en el informe. Vuelve a descargarlo en un momento.',
+  'client.bills.electricity.report.official.energy': 'Tu energía y el PVPC de esos días',
+  'client.bills.electricity.report.official.energy_period':
+    '{periodo}: {kwh} a {tuPrecio}, {tuCoste}. Al precio medio del PVPC de esas horas, {pvpcPrecio}: {pvpcCoste}.',
+  'client.bills.electricity.report.official.energy_single':
+    'Toda tu energía, {kwh} a {tuPrecio}, {tuCoste}. Al precio medio del PVPC de todas las horas de esos días, {pvpcPrecio}: {pvpcCoste}.',
+  'client.bills.electricity.report.official.energy_total':
+    'En total, tu energía cuesta {tuCoste} y, al precio medio del PVPC de esos días, costaría unos {pvpcCoste}.',
+  'client.bills.electricity.report.official.single_note':
+    'Tu factura cobra toda la energía a un solo precio, sin separarla por periodos: se compara con la media de todas las horas.',
+  'client.bills.electricity.report.official.estimate':
+    'Es una estimación: el PVPC cambia cada hora y la cifra real depende de a qué horas gastaste. Los dos precios llevan dentro los peajes y cargos; las cifras van sin descuentos ni impuestos.',
+  'client.bills.electricity.report.official.who':
+    'El PVPC solo lo ofrecen las comercializadoras de referencia, a personas físicas y microempresas con hasta 10 kW en cada periodo.',
+  'client.bills.electricity.report.official.pvpc_bill':
+    'Esta factura ya es del PVPC: su energía es la que publica Red Eléctrica hora a hora.',
+  'client.bills.electricity.report.official.pending':
+    'Pendiente de un dato oficial: aún no están cargados los precios del PVPC de todos los días de esta factura.',
+  'client.bills.electricity.report.official.power': 'Tu potencia y la que usaste',
+  'client.bills.electricity.report.official.power_period':
+    '{periodo}: {contratada} contratados; la potencia máxima que usaste en el último año, {maxima}. Cada kW contratado cuesta {porKw} al año con tus precios; los {sobrantes} por encima de la máxima que usaste, {coste} al año.',
+  'client.bills.electricity.report.official.power_period_no_price':
+    '{periodo}: {contratada} contratados; la potencia máxima que usaste en el último año, {maxima}.',
+  'client.bills.electricity.report.official.power_unknown':
+    '{periodo}: {contratada} contratados; tu factura no dice la potencia máxima que usaste.',
+  'client.bills.electricity.report.official.power_above':
+    'En {periodo}, la potencia máxima que usaste ({maxima}) pasa de la contratada ({contratada}).',
+  'client.bills.electricity.report.official.power_change':
+    'La potencia contratada solo se puede cambiar una vez cada 12 meses.',
+  'client.bills.electricity.report.official.source_pvpc': 'Precios del PVPC: {fuente}',
+  'client.bills.electricity.report.official.period.p1': 'Punta (P1)',
+  'client.bills.electricity.report.official.period.p2': 'Llano (P2)',
+  'client.bills.electricity.report.official.period.p3': 'Valle (P3)',
+  'client.bills.electricity.report.official.power_period.p1': 'Punta',
+  'client.bills.electricity.report.official.power_period.p2': 'Valle',
+  'client.bills.electricity.report.official.power_in.p1': 'punta',
+  'client.bills.electricity.report.official.power_in.p2': 'valle',
   'client.bills.telecom.charges.bill': 'Factura',
   'client.bills.telecom.charges.bill_issued': 'Factura del {fecha}',
   'client.bills.telecom.charges.bill_period': 'Factura del {desde} al {hasta}',

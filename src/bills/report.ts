@@ -46,6 +46,8 @@ export interface BillsReport {
   readonly year: ReportedYear | null;
   // The norms the reviews read, for the table rows their figures rest on.
   readonly norms: NormTable;
+  // What a section adds after the reviews, such as the electricity bills' official figures.
+  readonly extra?: readonly Block[];
 }
 
 const row = (label: string, value: string): Block => ({ type: 'row', label, value });
@@ -168,6 +170,7 @@ export function billsReport(report: BillsReport, tr: Translate, today: CivilDate
       ...(report.year === null ? [] : yearBlocks(report.year, tr)),
       { type: 'heading', text: tr('client.bills.report.reviews') },
       ...report.reviews.flatMap((r) => reviewBlocks(r, report.norms, tr)),
+      ...(report.extra ?? []),
     ],
   };
 }

@@ -2,6 +2,7 @@ import { documentsAnalytics } from '../analytics/documents';
 import { track } from '../analytics/posthog';
 import { renderBasket } from '../bills/electricity/basket';
 import { electricityCase } from '../bills/electricity/case';
+import type { PvpcSource } from '../bills/electricity/official';
 import type { CompletedElectricityReview, YearEvents } from '../bills/electricity/ports';
 import { electricityReading } from '../bills/electricity/reading';
 import { STEPS } from '../bills/electricity/steps';
@@ -11,6 +12,9 @@ import type { SectionForm } from '../calculator/section';
 import { createBasket } from '../documents/basket';
 import { DOCUMENTS } from '../documents/config';
 import { ELECTRICITY_EXTRACTION } from '../documents/contract';
+import { TOLL_HOLIDAYS } from '../engine/bills/data/holidays-20td';
+import { pvpcTable } from '../engine/bills/data/pvpc-hourly';
+import type { OfficialDeps } from '../engine/bills/electricity-official';
 import type { NormTable } from '../engine/bills/norms';
 import { billsTranslator } from './bills-copy';
 import { READS_UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
@@ -35,6 +39,23 @@ export function wireElectricityDocuments(
 ): void {
   const tr = billsTranslator();
   const { form } = electricity;
+  // The PVPC prices only the paid report reads, fetched apart and early: by the time a pass is
+  // paid they are here. If they never arrive the report says so and goes without them.
+  let official: { readonly deps: OfficialDeps; readonly pvpc: PvpcSource } | null = null;
+  import('../engine/bills/data/pvpc-hourly.json')
+    .then(({ default: raw }: { default: unknown }) => {
+      const table = pvpcTable(raw);
+      official =
+        table === null
+          ? null
+          : {
+              deps: { pvpc: table, tollHolidays: TOLL_HOLIDAYS },
+              pvpc: { source: table.source, url: table.url },
+            };
+    })
+    .catch(() => {
+      official = null;
+    });
   const reading = electricityReading(form, tr);
   const year = createBasket<KeptBill>();
   const show = () => renderBasket(document, year.entries(), reading.pending(), tr);
@@ -75,7 +96,7 @@ export function wireElectricityDocuments(
       reading,
       steps: STEPS,
       keptReviewKey: 'eslojusto-revision-luz-en-pago',
-      paidReview: () => electricityCase(year.entries(), norms),
+      paidReview: () => electricityCase(year.entries(), norms, () => official),
       decorateResult: show,
       restore: (saved) => saved,
       // The whole year goes on the trip to Stripe, each bill as its answers and nothing else, and
