@@ -241,7 +241,7 @@ describe('the invoices', () => {
     const p = prefill({
       notaryInvoices: [notary({ concept: 'loan', mixed: false, total: 720.5 })],
       registryInvoices: [registry({ concept: 'mortgage', mixed: false, total: 410 })],
-      agencyInvoices: [row({ total: 1_850 }, 'agency_invoice_mortgage')],
+      agencyInvoices: [row({ concept: 'loan', total: 1_850 }, 'agency_invoice_mortgage')],
       agencySupplied: [
         row({ concept: 'ajd', amount: 1_125 }, 'agency_invoice_mortgage'),
         row({ concept: 'registry', amount: 410 }, 'agency_invoice_mortgage'),
@@ -313,6 +313,107 @@ describe('the invoices', () => {
     });
     expect(entry(p, 'ajdLoan')).toBeUndefined();
     expect(p.notes).toContain(tr('client.mortgage.documents.ajd_lender_paid'));
+  });
+});
+
+// An agency that handled the purchase and the loan as two files: an invoice for each, and a
+// statement of funds listing what it paid for each deed apart from both invoices. Made-up figures.
+describe('an agency that handled the purchase and the loan', () => {
+  const agency = (values: Record<string, ExtractedValue>) => row(values, 'agency_invoice_mortgage');
+  const LOAN = agency({ concept: 'loan', base: 310, vat: 65.1, total: 375.1 });
+  const PURCHASE = agency({ concept: 'purchase', base: 180, vat: 37.8, total: 217.8 });
+  const INVOICES = [LOAN, PURCHASE];
+  const STATEMENT = [
+    agency({ concept: 'ajd', deed: 'loan', amount: 1_640 }),
+    agency({ concept: 'ajd', deed: 'purchase', amount: 410 }),
+    agency({ concept: 'notary', deed: 'purchase', amount: 702.4 }),
+    agency({ concept: 'notary', deed: 'loan', amount: 815.3 }),
+    agency({ concept: 'registry', deed: 'purchase', amount: 150.2 }),
+    agency({ concept: 'registry', deed: 'loan', amount: 176.9 }),
+  ];
+  const BILLS: Partial<MortgageExtraction> = {
+    notaryInvoices: [
+      row({ concept: 'purchase', mixed: false, total: 702.4 }, 'notary_invoice'),
+      row({ concept: 'loan', mixed: false, total: 815.3 }, 'notary_invoice'),
+    ],
+    registryInvoices: [
+      row({ concept: 'purchase', mixed: false, total: 150.2 }, 'registry_invoice'),
+      row({ concept: 'mortgage', mixed: false, total: 176.9 }, 'registry_invoice'),
+    ],
+    ajdForms: [
+      row({ concept: 'purchase', amountPaid: 410, paidByLender: false }, 'ajd_form'),
+      row({ concept: 'loan', amountPaid: 1_640, paidByLender: false }, 'ajd_form'),
+    ],
+  };
+
+  it('passes the loan’s invoice alone, and no outlay listed apart from it', () => {
+    const p = prefill({
+      fields: DEED,
+      ...BILLS,
+      agencyInvoices: INVOICES,
+      agencySupplied: STATEMENT,
+    });
+    expect(entry(p, 'agency')).toBe('375,10');
+    expect(entry(p, 'agencyTax')).toBeUndefined();
+    expect(entry(p, 'agencyRegistry')).toBeUndefined();
+    expect(entry(p, 'notaryLoan')).toBe('815,30');
+    expect(entry(p, 'registryMortgage')).toBe('176,90');
+    expect(entry(p, 'ajdLoan')).toBe('1.640,00');
+    expect(p.notes).toContain(tr('client.mortgage.documents.invoices_left_out'));
+    expect(p.notes).not.toContain(tr('client.mortgage.documents.agency_supplied_apart'));
+  });
+
+  it('gives the review answers it takes without a complaint', () => {
+    const p = prefill({
+      fields: DEED,
+      clauses: CLAUSES,
+      ...BILLS,
+      agencyInvoices: INVOICES,
+      agencySupplied: STATEMENT,
+    });
+    const read = readAnswers(p, {
+      consumer: 'yes',
+      roundingUp: 'no',
+      insuranceRequired: 'no',
+      valuation: '',
+      paidOn: '2014-03-20',
+      agreement: 'no',
+      returned: '',
+      operation: 'none',
+    });
+    expect(read).not.toHaveProperty('errors');
+    expect(read).toMatchObject({
+      input: {
+        invoices: expect.arrayContaining([
+          expect.objectContaining({ kind: 'agency', total: 375.1, supplied: [] }),
+        ]),
+      },
+    });
+  });
+
+  it('says where an outlay paid apart goes when its own document was not read', () => {
+    const p = prefill({ agencyInvoices: INVOICES, agencySupplied: STATEMENT });
+    expect(entry(p, 'agency')).toBe('375,10');
+    expect(entry(p, 'agencyTax')).toBeUndefined();
+    expect(p.notes).toContain(tr('client.mortgage.documents.agency_supplied_apart'));
+  });
+
+  it('passes the outlays inside the loan’s invoice, those of the purchase left out', () => {
+    const p = prefill({
+      agencyInvoices: [agency({ concept: 'loan', base: 310, vat: 65.1, total: 2_192 }), PURCHASE],
+      agencySupplied: STATEMENT,
+    });
+    expect(entry(p, 'agency')).toBe('2.192,00');
+    expect(entry(p, 'agencyTax')).toBe('1.640,00');
+    expect(entry(p, 'agencyRegistry')).toBe('176,90');
+  });
+
+  it('leaves out an invoice that names no deed, rather than adding it to the loan’s', () => {
+    const p = prefill({
+      agencyInvoices: [LOAN, agency({ base: 180, vat: 37.8, total: 217.8 })],
+    });
+    expect(entry(p, 'agency')).toBe('375,10');
+    expect(p.notes).toContain(tr('client.mortgage.documents.invoices_left_out'));
   });
 });
 

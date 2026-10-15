@@ -5928,6 +5928,8 @@ export const es = {
     'La gestoría incluyó {euros} que ya están en su propia línea, la del impuesto o la del registro: se cuentan una sola vez.',
   'client.mortgage.calculation.expenses.supplied_left_out':
     'La gestoría incluyó otros {euros} de pagos hechos por ti que no se identifican: se dejan fuera.',
+  'client.mortgage.calculation.expenses.supplied_apart':
+    'Los pagos que indicas como hechos por la gestoría, {euros}, superan el total de su factura, así que no van dentro de ella y no se le restan. El impuesto y el registro se cuentan en su propia línea, si los has escrito.',
   'client.mortgage.calculation.expenses.agreement_statute':
     'Has indicado un acuerdo con el banco sobre los gastos: lo que la ley pone a cargo del banco no cambia por un acuerdo (art. 3).',
   'client.mortgage.calculation.expenses.agreement_case_law':
@@ -6219,7 +6221,6 @@ export const es = {
   'client.mortgage.error.percent_range': 'Escribe un porcentaje entre 0 y 30',
   'client.mortgage.error.count_range': 'Escribe un número entre 1 y 600',
   'client.mortgage.error.not_agency': 'Solo la factura de la gestoría lleva pagos hechos por ti',
-  'client.mortgage.error.above_total': 'Suman más que el total de su factura',
   'client.mortgage.documents.mark_derived':
     'Sale de lo leído en tus documentos · confianza {nivel}',
   'client.mortgage.documents.quote.expensesClause': 'Lo que dice tu escritura sobre los gastos',
@@ -6261,6 +6262,8 @@ export const es = {
     'Había varias facturas del mismo concepto y se han sumado en su hoja: compruébalo.',
   'client.mortgage.documents.invoices_left_out':
     'Alguna factura cobra algo que esta revisión no cuenta (la compraventa, una copia o una cancelación) o no dice qué cobra, así que no se ha pasado: si es de la hipoteca, escribe su importe a mano.',
+  'client.mortgage.documents.agency_supplied_apart':
+    'La gestoría pagó por ti el impuesto o el registro aparte de su factura, en su liquidación de gastos, así que no se le han restado: si no has subido el modelo 600 o la factura del registro, escribe ese importe en su hoja.',
   'client.mortgage.documents.ajd_lender_paid':
     'Según el modelo 600, el impuesto del préstamo lo pagó el banco, así que no se ha pasado como gasto tuyo.',
   'client.mortgage.documents.operations_many':

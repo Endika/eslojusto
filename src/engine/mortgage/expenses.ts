@@ -244,18 +244,22 @@ const DUPLICABLE: ReadonlySet<InvoiceKind> = new Set(['ajd_loan', 'registry_mort
 
 // An agency's own fee: its total less the outlays it passed on. An outlay that matches the tax or
 // the registry entered on their own goes on that invoice's line, whatever that line counts; any
-// other is left out, never guessed.
+// other is left out, never guessed. Outlays above the total cannot be inside it: the agency listed
+// them apart, as on a statement of funds, so nothing is taken out of its invoice.
 function agencyFee(
   invoice: Invoice,
   total: number,
   invoices: readonly Invoice[],
 ): { readonly fee: number; readonly phrases: readonly MortgagePhrase[] } {
   if (invoice.supplied.length === 0) return { fee: total, phrases: [] };
+  const sum = (xs: readonly number[]) => round2(xs.reduce((s, x) => s + x, 0));
+  const all = sum(invoice.supplied);
+  if (all > total)
+    return { fee: total, phrases: [p('expenses.supplied_apart', { euros: { euros: all } })] };
   const entered = invoices.flatMap((i) =>
     DUPLICABLE.has(i.kind) && i.total !== null ? [i.total] : [],
   );
   const matches = (x: number) => entered.some((t) => Math.abs(t - x) <= SAME_PAYMENT);
-  const sum = (xs: readonly number[]) => round2(xs.reduce((s, x) => s + x, 0));
   const apart = sum(invoice.supplied.filter(matches));
   const left = sum(invoice.supplied.filter((x) => !matches(x)));
   return {

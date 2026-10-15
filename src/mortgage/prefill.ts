@@ -254,6 +254,48 @@ interface Pot {
   readonly confidences: Confidence[];
 }
 
+interface Outlay {
+  readonly field: 'agencyTax' | 'agencyRegistry';
+  readonly amount: number;
+  readonly row: ExtractedRow;
+}
+
+// The agency's invoices for the loan and its outlays for the loan's tax and registry. An agency
+// that handled the purchase too bills it apart, and that is not counted here; one invoice for both
+// names no deed and is left out too, never added whole. An outlay names its deed, or is the loan's
+// when every invoice is. The review takes the outlays out of the agency's total, so they are
+// passed only when they fit in what its invoices bill beyond their base and VAT: listed apart, on
+// a statement of funds, they are not inside any invoice.
+function loanAgency(e: MortgageExtraction): {
+  readonly invoices: readonly ExtractedRow[];
+  readonly leftOut: boolean;
+  readonly outlays: readonly Outlay[];
+  readonly inside: boolean;
+} {
+  const priced = e.agencyInvoices.filter((row) => positiveOf(row.values['total']) !== null);
+  const invoices = priced.filter((row) => row.values['concept'] === 'loan');
+  const onlyLoan = invoices.length > 0 && invoices.length === priced.length;
+  const outlays = e.agencySupplied.flatMap((row): Outlay[] => {
+    const deed = row.values['deed'];
+    if (deed !== 'loan' && !(deed === undefined && onlyLoan)) return [];
+    const concept = row.values['concept'];
+    const field =
+      concept === 'ajd' ? 'agencyTax' : concept === 'registry' ? 'agencyRegistry' : null;
+    const amount = positiveOf(row.values['amount']);
+    return field && amount !== null ? [{ field, amount, row }] : [];
+  });
+  const room = invoices.reduce(
+    (sum, row) =>
+      sum +
+      cents(amountOf(row.values['total']) ?? 0) -
+      cents(amountOf(row.values['base']) ?? 0) -
+      cents(amountOf(row.values['vat']) ?? 0),
+    0,
+  );
+  const inside = cents(sum(outlays.map((o) => o.amount))) <= room;
+  return { invoices, leftOut: invoices.length < priced.length, outlays, inside };
+}
+
 // Each invoice goes to the question of its concept: the notary's and the registry's for the loan,
 // the agency's with the outlays it paid, the valuation's, the tax return for the loan and what the
 // notarial act billed. What the purchase cost, a copy or a cancellation, this review does not
@@ -291,14 +333,9 @@ function invoices(a: Answers, e: MortgageExtraction, tr: Translate) {
   };
   both(e.notaryInvoices, 'loan', 'notaryLoan', 'notaryMixed');
   both(e.registryInvoices, 'mortgage', 'registryMortgage', 'registryMixed');
-  for (const row of e.agencyInvoices)
-    put('agency', positiveOf(row.values['total']), row.confidence);
-  for (const row of e.agencySupplied) {
-    const concept = row.values['concept'];
-    const field =
-      concept === 'ajd' ? 'agencyTax' : concept === 'registry' ? 'agencyRegistry' : null;
-    if (field) put(field, positiveOf(row.values['amount']), row.confidence);
-  }
+  const agency = loanAgency(e);
+  leftOut ||= agency.leftOut;
+  for (const row of agency.invoices) put('agency', positiveOf(row.values['total']), row.confidence);
   for (const row of e.valuationInvoices)
     put('valuation', positiveOf(row.values['total']), row.confidence);
   let lenderPaid = false;
@@ -309,10 +346,18 @@ function invoices(a: Answers, e: MortgageExtraction, tr: Translate) {
   }
   const act = e.fields.transparencyActCharged;
   if (act) put('transparencyDeed', positiveOf(act.value), act.confidence);
+  if (agency.inside) for (const o of agency.outlays) put(o.field, o.amount, o.row.confidence);
+  // Outside the invoice, each outlay belongs on the line of what it paid; said only when that line
+  // was not read.
+  const unread = agency.outlays.some(
+    (o) => !pots.has(o.field === 'agencyTax' ? 'ajdLoan' : 'registryMortgage'),
+  );
+  const apart = !agency.inside && unread;
 
   if (pots.size === 0) {
     if (leftOut) a.notes.push(tr('client.mortgage.documents.invoices_left_out'));
     if (lenderPaid) a.notes.push(tr('client.mortgage.documents.ajd_lender_paid'));
+    if (apart) a.notes.push(tr('client.mortgage.documents.agency_supplied_apart'));
     return;
   }
   a.open('hasInvoices', 'yes');
@@ -331,6 +376,7 @@ function invoices(a: Answers, e: MortgageExtraction, tr: Translate) {
   if (added) a.notes.push(tr('client.mortgage.documents.invoices_added'));
   if (leftOut) a.notes.push(tr('client.mortgage.documents.invoices_left_out'));
   if (lenderPaid) a.notes.push(tr('client.mortgage.documents.ajd_lender_paid'));
+  if (apart) a.notes.push(tr('client.mortgage.documents.agency_supplied_apart'));
 }
 
 // The form asks for one operation: the latest a statement shows.

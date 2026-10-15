@@ -1,5 +1,4 @@
 import { addDays, compareDates, daysInMonth, parseDate, type CivilDate } from '../date';
-import { round2 } from '../money';
 import type { Clause, MortgageInput } from './types';
 
 export type MortgageField =
@@ -30,8 +29,7 @@ export type ValidationCode =
   | 'amount_range'
   | 'percent_range'
   | 'count_range'
-  | 'not_agency'
-  | 'above_total';
+  | 'not_agency';
 
 export interface ValidationError {
   readonly field: MortgageField;
@@ -100,11 +98,6 @@ export function validate(input: MortgageInput, today: CivilDate): readonly Valid
     if (invoice.supplied.length === 0) return;
     if (invoice.kind !== 'agency') fail('invoices.supplied', 'not_agency', i);
     else if (!invoice.supplied.every(isAmount)) fail('invoices.supplied', 'amount_range', i);
-    else if (
-      invoice.total !== null &&
-      round2(invoice.supplied.reduce((s, x) => s + x, 0)) > invoice.total
-    )
-      fail('invoices.supplied', 'above_total', i);
   });
   if (input.alreadyReturned !== null && !isAmountOrZero(input.alreadyReturned))
     fail('alreadyReturned', 'amount_range');
