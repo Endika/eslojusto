@@ -416,10 +416,12 @@ function linesOf(s: Section | undefined, category: LineCategory): readonly Extra
   return (s?.lists['lines'] ?? []).filter((r) => r.values['category'] === category);
 }
 
-// The sum of a category's lines, as the field it fills; none when the payslip has no such line.
+// The sum of a category's lines, as the field it fills; none when the payslip has no such line,
+// nor when its negative lines outweigh the rest: that is left to the person.
 function sumOf(rows: readonly ExtractedRow[]): ExtractedField | null {
-  if (rows.length === 0) return null;
-  return { value: listSum(rows, 'amount') / 100, confidence: lowest(rows) };
+  const sum = listSum(rows, 'amount');
+  if (rows.length === 0 || sum < 0) return null;
+  return { value: sum / 100, confidence: lowest(rows) };
 }
 
 // The liquidation items of the final payslip, by the category of the lines that make them up.

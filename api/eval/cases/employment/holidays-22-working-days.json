@@ -1,6 +1,6 @@
 {
   "id": "holidays-22-working-days",
-  "description": "ET art. 38.1: thirty calendar days of paid holidays; 22 working days of a five-day week usually amount to them, but the statute gives no equivalence, so it is to review.",
+  "description": "ET art. 38.1: thirty calendar days of paid holidays; the statute gives no equivalence, but with a five-day week the usual one, 22 working days, decides, as in the final pay review.",
   "eval": false,
   "today": "2026-10-08",
   "pages": [
@@ -276,7 +276,7 @@
         },
         {
           "id": "holidays_30",
-          "status": "review_it"
+          "status": "within_limit"
         },
         {
           "id": "extra_pays",

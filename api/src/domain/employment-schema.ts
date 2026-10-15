@@ -151,6 +151,11 @@ const list = (
   keepLatestBy?: string,
 ): ListSpec => ({ description, maxItems, item, required, ...(keepLatestBy && { keepLatestBy }) });
 
+// A payslip line, here and in the final pay review's payslips, may be printed negative.
+export const PAYSLIP_LINE_AMOUNT =
+  'Amount; negative if printed so (Ticket Restaurant: aportación del empleado), with the category of the line so offset.';
+const MAX_LINE_AMOUNT = 1_000_000;
+
 // Literal texts are copied so the person can check the label against them; the prompt says how
 // (persons' names become «[nombre]») and that the model never judges them.
 const LITERAL = ' Word for word.';
@@ -178,7 +183,11 @@ const employmentContract = {
     endDate: date('End date of a temporary contract.'),
     durationMonths: whole(1, 120, 'Duration in months, if stated so.'),
     modalityText: text(MAX_MODALITY_TEXT, 'The modality as printed (modalidad).' + LITERAL),
-    modality: oneOf(MODALITIES, 'Its label: ' + MODALITY_LABELS),
+    modality: oneOf(
+      MODALITIES,
+      'From the box ticked or the contract code (1xx, 2xx indefinido; 3xx fijo discontinuo); a blank clause states nothing. ' +
+        MODALITY_LABELS,
+    ),
     partTime: flag('true for part time (tiempo parcial), false for full time.'),
     causeText: text(
       MAX_CAUSE_TEXT,
@@ -227,12 +236,15 @@ const employmentContract = {
       {
         concept: text(MAX_SHORT_TEXT, 'The concept as printed.'),
         amount: money('Amount, for the period of salaryAmount.'),
-        kind: oneOf(SALARY_PART_KINDS, 'base, fixed_complement (monthly), variable, unknown.'),
+        kind: oneOf(
+          SALARY_PART_KINDS,
+          'base (de convenio), fixed_complement (monthly plus, mejora voluntaria), variable, unknown.',
+        ),
       },
       ['amount', 'kind'],
     ),
     clauses: list(
-      'Every clause of one of these kinds.',
+      'Every clause of one of these kinds, annexes included.',
       EMPLOYMENT_LIST_MAXIMA.clauses,
       {
         label: oneOf(CLAUSE_LABELS, 'retention is permanencia; overtime_included, in the salary.'),
@@ -313,7 +325,7 @@ const employmentPayslips = {
       {
         month: field({ type: 'month' }, 'Month of its payslip.'),
         concept: text(MAX_SHORT_TEXT, 'The concept as printed.'),
-        amount: money('Amount.'),
+        amount: decimal(-MAX_LINE_AMOUNT, MAX_LINE_AMOUNT, PAYSLIP_LINE_AMOUNT),
         category: oneOf(
           EMPLOYMENT_LINE_CATEGORIES,
           'salary (base), fixed_complement (monthly plus: antigüedad, convenio), variable (incentivos), overtime, complementary_hours, in_kind, extra_pay (a full one), prorated_extra_pay, expenses (dietas), one_off (atrasos, bonus), other.',

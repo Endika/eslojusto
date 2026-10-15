@@ -99,12 +99,13 @@ const breakdownGap = (salary: Salary): number =>
     : Math.max(0, round2(salary.amount - salary.breakdown.reduce((t, c) => t + c.amount, 0)));
 
 // Money per salary period that counts in one world. A breakdown, when given, replaces the total,
-// and the part of the total it leaves unexplained is a complement of unknown kind.
+// and the part of the total it leaves unexplained is still pay the contract fixes as an amount:
+// a fixed complement, never a variable one.
 function periodPay(salary: Salary, world: ComplementWorld): { counted: number; excluded: number } {
   if (salary.breakdown.length === 0) return { counted: salary.amount, excluded: 0 };
   const components = [
     ...salary.breakdown,
-    { kind: 'unknown' as const, amount: breakdownGap(salary) },
+    { kind: 'fixed_complement' as const, amount: breakdownGap(salary) },
   ];
   const sum = (counted: boolean) =>
     components
@@ -114,7 +115,6 @@ function periodPay(salary: Salary, world: ComplementWorld): { counted: number; e
 }
 
 const complementInDoubt = (salary: Salary): boolean =>
-  breakdownGap(salary) > 0 ||
   salary.breakdown.some((c) => !COUNTED.complement_variable.has(c.kind));
 
 // An hour rate with only yearly hours: those may be effective hours, without the paid rest.

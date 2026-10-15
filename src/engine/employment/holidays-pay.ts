@@ -1,5 +1,5 @@
 import { round2 } from '../money';
-import { CALENDAR_MINIMUM, calendarDaysPer } from '../settlement';
+import { CALENDAR_MINIMUM, calendarDaysPer, minimumHolidays } from '../settlement';
 import { phrase, type EmploymentPhrase } from './calculation';
 import { findingsFor, single } from './finding';
 import { contractAgainstMinimum, isShortTemporary, type MinimumWageTable } from './minimum-wage';
@@ -135,8 +135,10 @@ function belowThirty(
   return finding('holidays_30', { status: 'within_limit', calculation: [says, prorated] }, norms);
 }
 
-// Art. 38.1 ET counts thirty calendar days. Working days have no equivalence in the statute: the
-// usual one is shown and the point is to review, unless they cover thirty calendar days anyway.
+// Art. 38.1 ET counts thirty calendar days. Working days have no equivalence in the statute: with
+// the working week known, the usual one decides, the one the final pay review uses too (22 days of
+// a Monday-to-Friday week, 26 of a Monday-to-Saturday one); without it the point is to review,
+// unless they cover thirty calendar days anyway.
 function holidayDays(input: EmploymentInput, holidays: Holidays, norms: NormTable): Finding {
   const { days, unit, workDaysPerWeek } = holidays;
   // No holidays at all count as zero calendar days in any unit; on a span of a few days even zero
@@ -149,6 +151,24 @@ function holidayDays(input: EmploymentInput, holidays: Holidays, norms: NormTabl
         {
           status: 'within_limit',
           calculation: [phrase('holidays.working_days', { days: { days } })],
+        },
+        norms,
+      );
+    if (workDaysPerWeek !== null && days >= minimumHolidays('working', workDaysPerWeek))
+      return finding(
+        'holidays_30',
+        {
+          status: 'within_limit',
+          calculation: [
+            phrase('holidays.working_days_equivalent', {
+              days: { days },
+              week: { integer: workDaysPerWeek },
+              calendar: { days: round2(days * calendarDaysPer('working', workDaysPerWeek)) },
+            }),
+            phrase('holidays.usual_equivalence', {
+              minimum: { days: minimumHolidays('working', workDaysPerWeek) },
+            }),
+          ],
         },
         norms,
       );

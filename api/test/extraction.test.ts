@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { failedChecks, hasLowConfidence, parseReading } from '../src/domain/extraction';
+import {
+  failedChecks,
+  hasLowConfidence,
+  parseReading,
+  withLineTotals,
+} from '../src/domain/extraction';
 import { LIMITS } from '../src/domain/documents';
 import { coherentSettlement, f, page, proposal } from './support/fields';
 
@@ -183,6 +188,48 @@ describe('the monthly payslip', () => {
       values: { concept: 'PAGA EXTRA', amount: 1500, category: 'extra_pay' },
       confidence: 'high',
     });
+  });
+
+  it('keeps a negative line, which offsets another, and adds it up', () => {
+    // A real liquidation payslip: 1.450 € gross with meal vouchers paid and taken back.
+    const line = (concept: string, amount: number, category: string) => ({
+      concept,
+      amount,
+      category,
+      confidence: 'high',
+    });
+    const r = parseReading(
+      {
+        pages: [page(1, 'payslip', 1, 'high', '2024-09')],
+        final_payslip: {
+          totalAccrued: f(1450),
+          lines: [
+            line('Salario convenio', 1449.99, 'salary'),
+            line('Ticket restaurant: importe total', 217.06, 'salary'),
+            line('Ticket restaurant: aportación del empleado', -217.06, 'salary'),
+          ],
+        },
+      },
+      1,
+    );
+    expect(r.dropped).toBe(0);
+    expect(failedChecks(r)).toEqual([]);
+    expect(withLineTotals(r).sections.final_payslip?.fields['pending_salary']).toEqual(f(1449.99));
+  });
+
+  it('leaves the item out when its negative lines outweigh the rest', () => {
+    const r = parseReading(
+      {
+        pages: [page(1, 'payslip')],
+        final_payslip: {
+          lines: [
+            { concept: 'Descuento', amount: -10, category: 'holiday_pay', confidence: 'high' },
+          ],
+        },
+      },
+      1,
+    );
+    expect(withLineTotals(r).sections.final_payslip?.fields['holiday_pay']).toBeUndefined();
   });
 
   it.each([

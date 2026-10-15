@@ -695,24 +695,20 @@ describe('complements of doubtful kind', () => {
     expect(offerPass([assessed])).toBe(false);
   });
 
-  it('reads a breakdown short of the total as a complement of unknown kind', () => {
-    // 1.300 € a month with only 1.100 € of base listed: 18.200 € or 15.400 € a year.
+  it('counts a breakdown short of the total as a fixed complement: the contract fixes it', () => {
+    // 1.300 € a month with only 1.100 € of base listed: 18.200 € a year either way.
     const input = contract({
       ...start,
       salary: salary({ amount: 1300, breakdown: [{ kind: 'base', amount: 1100 }] }),
     });
     const [assessed] = review(input, '2026-12-31');
-    expect(assessed?.kind).toBe('readings');
-    if (assessed?.kind !== 'readings') return;
-    expect(assessed.readings.map((r) => r.finding.status)).toEqual([
-      'within_limit',
-      'below_minimum',
-    ]);
-    expect(assessed.readings[0]?.finding.calculation).toContainEqual({
+    expect(assessed?.kind).toBe('single');
+    if (assessed?.kind !== 'single') return;
+    expect(assessed.finding.status).toBe('within_limit');
+    expect(assessed.finding.calculation).toContainEqual({
       key: 'minimum_wage.breakdown_gap',
       vars: { gap: { euros: 200 } },
     });
-    expect(offerPass([assessed])).toBe(false);
   });
 
   it('opens them for a complement of unknown kind too', () => {

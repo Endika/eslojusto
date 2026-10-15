@@ -249,7 +249,7 @@
         },
         "modality": {
           "type": "object",
-          "description": "Its label: permanent (indefinido), discontinuous (fijo-discontinuo), production (circunstancias de la producción), production_occasional (at most 90 days a year), replacement (sustitución), replacement_selection (cover during a selection), training_alternance, training_practice, work_or_service (obra o servicio), eventual, interim (interinidad), unknown.",
+          "description": "From the box ticked or the contract code (1xx, 2xx indefinido; 3xx fijo discontinuo); a blank clause states nothing. permanent (indefinido), discontinuous (fijo-discontinuo), production (circunstancias de la producción), production_occasional (at most 90 days a year), replacement (sustitución), replacement_selection (cover during a selection), training_alternance, training_practice, work_or_service (obra o servicio), eventual, interim (interinidad), unknown.",
           "properties": {
             "value": {
               "type": "string",
@@ -810,7 +810,7 @@
               "kind": {
                 "type": "string",
                 "enum": ["base", "fixed_complement", "variable", "unknown"],
-                "description": "base, fixed_complement (monthly), variable, unknown."
+                "description": "base (de convenio), fixed_complement (monthly plus, mejora voluntaria), variable, unknown."
               }
             },
             "required": ["amount", "kind", "confidence"],
@@ -819,7 +819,7 @@
         },
         "clauses": {
           "type": "array",
-          "description": "Every clause of one of these kinds.",
+          "description": "Every clause of one of these kinds, annexes included.",
           "maxItems": 10,
           "items": {
             "type": "object",
@@ -1213,9 +1213,9 @@
               },
               "amount": {
                 "type": "number",
-                "minimum": 0,
+                "minimum": -1000000,
                 "maximum": 1000000,
-                "description": "Amount."
+                "description": "Amount; negative if printed so (Ticket Restaurant: aportación del empleado), with the category of the line so offset."
               },
               "category": {
                 "type": "string",
