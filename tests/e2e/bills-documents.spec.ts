@@ -521,3 +521,88 @@ test('the telecom page reads the contract into its sheets', async ({ page }) => 
   await expect(commitment.getByLabel('Inicio')).toHaveValue('2025-03-01');
   await expect(commitment.getByLabel('Meses')).toHaveValue('18');
 });
+
+test('the telecom page lists every charge of the bills read, before any question on the exit', async ({
+  page,
+}) => {
+  const bill = (values: Record<string, Value>) => ({
+    values,
+    confidence: 'high',
+    source: 'telecom_bill',
+  });
+  await fakeServices(page, {
+    code: 'ok',
+    extraction: {
+      pages: [{ ...readPage(1), kind: 'telecom_bill' }],
+      documents: [{ kind: 'telecom_bill', pages: [1] }],
+      fields: {},
+      lists: {
+        bills: [
+          bill({
+            document: 1,
+            operatorName: 'Operador Ficticio',
+            issuedOn: '2026-09-22',
+            periodFrom: '2026-09-01',
+            periodTo: '2026-09-30',
+            total: 25.45,
+          }),
+        ],
+        lines: [
+          bill({ document: 1, concept: 'Tarifa Ficticia 50', kind: 'fixed_fee', amount: 23.14 }),
+          bill({ document: 1, concept: 'Mensajes a 79xx', kind: 'premium_rate', amount: 1.45 }),
+          bill({ document: 1, concept: 'Club de juegos', kind: 'third_party', amount: 3.99 }),
+          bill({
+            document: 1,
+            concept: 'Descuento de bienvenida',
+            kind: 'discount',
+            from: '2025-09-30',
+            to: '2026-09-30',
+            amount: 4.13,
+          }),
+        ],
+      },
+      conflicts: [],
+    },
+    failedChecks: [],
+    allowance: 'v1.quota.e2e',
+  });
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.goto('facturas/permanencia/');
+  await page.getByRole('button', { name: /^Sube tu contrato y, si las tienes/ }).click();
+  await page.getByLabel('Elegir fotos o PDF').setInputFiles([photo('factura.png')]);
+  await page.getByLabel(/Doy mi consentimiento explícito/).check();
+  await page.getByRole('button', { name: 'Leer los documentos' }).click();
+  await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }));
+
+  const charges = page.getByRole('region', { name: 'Lo que te cobran' });
+  await expect(charges).toBeVisible();
+  await expect(
+    charges.getByRole('heading', { name: 'Factura del 22-09-2026 · Operador Ficticio' }),
+  ).toBeVisible();
+  const lines = charges.locator('[data-bill-groups] li');
+  await expect(lines).toHaveText([
+    /^Tarifa Ficticia 50\s*23,14 €$/,
+    /^Mensajes a 79xx\s*Extra\s*1,45 €$/,
+    /^Club de juegos\s*Extra\s*3,99 €$/,
+    /^Descuento de bienvenida\s*Del 30-09-2025 al 30-09-2026\s*−4,13 €$/,
+  ]);
+  await expect(charges).toContainText('comprueba que reconoces cada cuota');
+  await expect(charges).toContainText('Si no lo contrataste tú, pregunta a tu compañía.');
+  await expect(charges.getByRole('listitem').filter({ hasText: 'terminó' })).toHaveText(
+    'Descuento de bienvenida: terminó el 30-09-2026. Desde el día siguiente, tu factura es 4,13 € más alta, sin contar el IVA.',
+  );
+  await expect(charges.getByRole('heading', { name: 'Lo que dice la norma' })).toBeVisible();
+  await expect(charges).toContainText('desconecte los servicios de tarificación adicional');
+  await expect(
+    charges.getByRole('link', { name: /Real Decreto 899\/2009, art\. 24/ }),
+  ).toHaveAttribute('href', 'https://www.boe.es/buscar/act.php?id=BOE-A-2009-8961#a24');
+  await expect(charges).toContainText('Si no pediste un servicio, la ley no permite cobrártelo');
+  await expect(charges.getByRole('link', { name: /art\. 66 quáter\.1/ })).toHaveAttribute(
+    'href',
+    'https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555#a66quater',
+  );
+  await noSideScroll(page);
+
+  await page.getByRole('button', { name: 'Revisar los datos' }).click();
+  await expect(charges).toBeHidden();
+});

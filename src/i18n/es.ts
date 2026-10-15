@@ -6727,7 +6727,7 @@ export const es = {
   'bills.telecom.documents.upload':
     'Sube tu contrato y, si las tienes, tus facturas de teléfono o internet',
   'bills.telecom.documents.files_hint':
-    'El contrato o sus condiciones de permanencia y, si las tienes, las facturas con la penalización o con cobros de después de la baja, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+    'El contrato o sus condiciones de permanencia y, si las tienes, tus facturas: las de la penalización o de después de la baja, y cualquier otra cuyos cobros quieras repasar, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
   'bills.pass.title': 'El informe de tus facturas y la carta',
   'bills.pass.letter_note':
     'La carta es una plantilla. Se descarga en tu dispositivo y no se envía desde aquí: usarla o no, y cómo, es decisión tuya.',
@@ -6739,6 +6739,19 @@ export const es = {
   'bills.letter.reference': 'Número de contrato',
   'bills.letter.privacy':
     'Estos datos solo se usan para rellenar la carta en tu dispositivo; no se envían ni se guardan.',
+  'bills.telecom.charges.title': 'Lo que te cobran',
+  'bills.telecom.charges.lead':
+    'Cada línea leída en tus facturas, para que reconozcas todo lo que te cobran. Si ves algo que no contrataste tú, pregunta a tu compañía.',
+  'bills.telecom.charges.extras':
+    'Las líneas marcadas «Extra» son de tarificación adicional o de servicios de terceros: se cobran aparte de tu tarifa. Si no lo contrataste tú, pregunta a tu compañía.',
+  'bills.telecom.charges.fees':
+    'La factura no dice cuál de las cuotas es la de tu tarifa: comprueba que reconoces cada cuota.',
+  'bills.telecom.charges.promotions': 'Descuentos que terminan',
+  'bills.telecom.charges.rights': 'Lo que dice la norma',
+  'bills.telecom.charges.disconnect':
+    'Puedes pedir a tu compañía que desconecte los servicios de tarificación adicional y las llamadas internacionales. Tiene que aceptar la petición por escrito, por teléfono o por internet, y desconectarlos en 10 días como mucho; si no lo hace en ese plazo por una causa que no es tuya, lo que cuesten esos servicios corre de su cuenta. El operador que la presta como servicio universal la ofrece gratis.',
+  'bills.telecom.charges.unrequested':
+    'Si no pediste un servicio, la ley no permite cobrártelo, y no responder a quien te lo presta no cuenta como aceptarlo. Si no lo contrataste tú, pregunta a tu compañía.',
   'bills.telecom.pass.title': 'El informe y las cartas',
   'bills.telecom.pass.letter_note':
     'Las cartas son plantillas. Se descargan en tu dispositivo y no se envían desde aquí: usarlas o no, y cómo, es decisión tuya.',
@@ -6948,6 +6961,28 @@ export const es = {
   'client.bills.electricity.report.intro':
     'Este informe compara cada factura de la luz que revisaste con tus propios precios y con lo que fija la norma, con los datos que confirmaste. Cada factura cuenta una sola vez, lo cobrado de menos va aparte y la estimación a un año no se suma a ningún total. Informa sobre la norma y no es asesoramiento jurídico.',
   'client.bills.electricity.report.filename': 'eslojusto-informe-facturas-luz.pdf',
+  'client.bills.telecom.charges.bill': 'Factura',
+  'client.bills.telecom.charges.bill_issued': 'Factura del {fecha}',
+  'client.bills.telecom.charges.bill_period': 'Factura del {desde} al {hasta}',
+  'client.bills.telecom.charges.bill_operator': '{factura} · {operador}',
+  'client.bills.telecom.charges.kind.fixed_fee': 'Cuotas de tus servicios',
+  'client.bills.telecom.charges.kind.premium_rate':
+    'Tarificación adicional: números 80x y 90x, SMS premium',
+  'client.bills.telecom.charges.kind.third_party':
+    'Servicios de terceros y compras cargadas a la factura',
+  'client.bills.telecom.charges.kind.handset': 'Plazos de un terminal',
+  'client.bills.telecom.charges.kind.penalty': 'Penalizaciones',
+  'client.bills.telecom.charges.kind.other': 'Otros cobros',
+  'client.bills.telecom.charges.kind.discount': 'Descuentos',
+  'client.bills.telecom.charges.extra': 'Extra',
+  'client.bills.telecom.charges.no_concept': 'Concepto sin leer',
+  'client.bills.telecom.charges.period': 'Del {desde} al {hasta}',
+  'client.bills.telecom.charges.period_from': 'Desde el {desde}',
+  'client.bills.telecom.charges.period_to': 'Hasta el {hasta}',
+  'client.bills.telecom.charges.promotion_ends':
+    '{concepto}: termina el {fecha}. Desde el día siguiente, tu factura será {importe} más alta, sin contar el IVA.',
+  'client.bills.telecom.charges.promotion_ended':
+    '{concepto}: terminó el {fecha}. Desde el día siguiente, tu factura es {importe} más alta, sin contar el IVA.',
   'client.bills.telecom.report.title': 'Revisión de tu baja de teléfono o internet',
   'client.bills.telecom.report.intro':
     'Este informe compara la penalización y los cobros de tu baja con lo que permite la norma, con los datos que confirmaste en la revisión. Informa sobre la norma y no es asesoramiento jurídico.',
@@ -7019,8 +7054,9 @@ export const es = {
   'client.bills.unchecked.telecom.agreed_price': 'Si el precio que te cobran es el que pactaste.',
   'client.bills.unchecked.telecom.service_cuts': 'Las compensaciones por cortes del servicio.',
   'client.bills.unchecked.telecom.premium_rate_services':
-    'Los cobros de servicios de tarificación adicional.',
-  'client.bills.unchecked.telecom.unrequested_services': 'Los servicios que no pediste.',
+    'Si pediste tú los servicios de tarificación adicional o de terceros que te cobran: solo lo sabes tú.',
+  'client.bills.unchecked.telecom.unrequested_services':
+    'Si contrataste cada cuota que te cobran: solo lo sabes tú.',
   'client.bills.calculation.scope.canary_ceuta_melilla':
     'Esta revisión todavía no cubre tu territorio: en Canarias, Ceuta y Melilla la luz lleva otros impuestos y otros horarios.',
   'client.bills.calculation.scope.over_15kw':

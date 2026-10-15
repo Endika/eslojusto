@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import DocumentStart from '../components/DocumentStart.astro';
+import TelecomCharges from '../components/TelecomCharges.astro';
 import TelecomForm from '../components/TelecomForm.astro';
 import BillsResult from '../components/BillsResult.astro';
 import BillsGuide from '../components/BillsGuide.astro';
@@ -109,7 +110,11 @@ const structuredData = [
           <p class="help">{tx('bills.no_js')}</p>
         </div>
       </noscript>
-      {documents && <DocumentStart lang={lang} review="telecom" />}
+      {documents && (
+        <DocumentStart lang={lang} review="telecom">
+          <TelecomCharges slot="done" lang={lang} />
+        </DocumentStart>
+      )}
       <TelecomForm lang={lang} hidden={documents} />
       <BillsResult lang={lang} review="telecom" documents={documents} />
     </div>
