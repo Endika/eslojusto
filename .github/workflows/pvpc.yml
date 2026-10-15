@@ -1,0 +1,53 @@
+name: PVPC prices
+
+# Every Monday, the hourly PVPC prices REE has published since the table's last day go into one
+# pull request for the owner to merge: one branch, refreshed while its pull request stays open. The
+# token is the PAT, so the pull request runs CI. A failed run, such as REData being down, emails the
+# repository owner.
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pvpc
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BRANCH: chore/pvpc-prices
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+      - uses: actions/setup-node@v7
+        with: { node-version: 22 }
+      - run: npm run pvpc:write
+      - id: diff
+        run: |
+          if git diff --quiet; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+          echo "until=$(jq -r .coveredUntil src/engine/bills/data/pvpc-hourly.json)" >> "$GITHUB_OUTPUT"
+      - if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          UNTIL: ${{ steps.diff.outputs.until }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$BRANCH"
+          git commit -am "chore(bills): update PVPC prices to $UNTIL"
+          git push --force origin "$BRANCH"
+          open="$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')"
+          if [ -z "$open" ]; then
+            gh pr create --head "$BRANCH" --title "chore(bills): update PVPC prices to $UNTIL" \
+              --body "Hourly PVPC prices from REE's REData, added by \`npm run pvpc:write\` up to $UNTIL. Merge it to have the paid electricity report compare bills of those days."
+          else
+            # gh pr edit fails on repositories without classic projects; the API does not.
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/pulls/$open" -f title="chore(bills): update PVPC prices to $UNTIL"
+          fi
