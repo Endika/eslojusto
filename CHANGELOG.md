@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.61.3](https://github.com/Endika/eslojusto/compare/v1.61.2...v1.61.3) (2026-10-15)
+
+
+### Bug Fixes
+
+* **household:** describe a holidays breach as flagged without an amount ([ebb7622](https://github.com/Endika/eslojusto/commit/ebb7622d04a93f203eaf35a54d44b0fee1b7521d))
+
 ## [1.61.2](https://github.com/Endika/eslojusto/compare/v1.61.1...v1.61.2) (2026-10-14)
 
 
