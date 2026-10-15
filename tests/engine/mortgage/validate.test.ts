@@ -66,13 +66,12 @@ describe('mortgage validation', () => {
     expect(errors({ invoices: [invoice('registry_mortgage', total)] })).toEqual(expected);
   });
 
-  it('takes outlays only on an agency invoice, never above its total', () => {
+  it('takes outlays only on an agency invoice, even above its total', () => {
     expect(errors({ invoices: [invoice('notary_loan', 600, { supplied: [10] })] })).toEqual([
       'invoices.supplied[0]:not_agency',
     ]);
-    expect(errors({ invoices: [invoice('agency', 300, { supplied: [200, 100.01] })] })).toEqual([
-      'invoices.supplied[0]:above_total',
-    ]);
+    // Listed apart, on its statement of funds: the review leaves them out of the invoice.
+    expect(errors({ invoices: [invoice('agency', 300, { supplied: [200, 100.01] })] })).toEqual([]);
     expect(errors({ invoices: [invoice('agency', 300, { supplied: [0] })] })).toEqual([
       'invoices.supplied[0]:amount_range',
     ]);

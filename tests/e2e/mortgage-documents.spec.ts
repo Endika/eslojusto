@@ -100,6 +100,19 @@ function reading(
   };
 }
 
+const CLAUSES = [
+  clause('floor_clause', FLOOR, 2),
+  clause('euribor', INDEX, 2),
+  clause('default_interest', 'El interés de demora será del 18 % nominal anual.', 2),
+  clause(
+    'early_termination',
+    'El banco podrá dar por vencido el préstamo si se impagan 3 cuotas.',
+    2,
+  ),
+  clause('opening_fee', 'Comisión de apertura: 1.500 euros, de una sola vez.', 2),
+  clause('expenses_clause', EXPENSES, 2),
+];
+
 // The first page, the financial clauses and every invoice of the deed's day.
 const PACK = reading(
   [
@@ -113,18 +126,7 @@ const PACK = reading(
   ],
   DEED_FIELDS,
   {
-    clauses: [
-      clause('floor_clause', FLOOR, 2),
-      clause('euribor', INDEX, 2),
-      clause('default_interest', 'El interés de demora será del 18 % nominal anual.', 2),
-      clause(
-        'early_termination',
-        'El banco podrá dar por vencido el préstamo si se impagan 3 cuotas.',
-        2,
-      ),
-      clause('opening_fee', 'Comisión de apertura: 1.500 euros, de una sola vez.', 2),
-      clause('expenses_clause', EXPENSES, 2),
-    ],
+    clauses: CLAUSES,
     notaryInvoices: [
       row('notary_invoice', {
         concept: 'loan',
@@ -143,10 +145,48 @@ const PACK = reading(
         total: 410,
       }),
     ],
-    agencyInvoices: [row('agency_invoice_mortgage', { fee: 300, vat: 63, total: 363 })],
+    agencyInvoices: [
+      row('agency_invoice_mortgage', { concept: 'loan', base: 300, vat: 63, total: 363 }),
+    ],
     valuationInvoices: [row('valuation_invoice', { base: 250, vat: 52.5, total: 302.5 })],
     ajdForms: [row('ajd_form', { concept: 'loan', amountPaid: 1_125, paidByLender: false })],
   },
+);
+
+// An agency that handled the purchase and the loan as two files: its statement of funds, with what
+// it paid for each deed, and an invoice for each; the notary, the registry and the tax of each deed.
+const AGENCY = 'agency_invoice_mortgage';
+const TWO_FILES = reading(
+  [DEED, DEED, AGENCY, AGENCY, AGENCY, 'notary_invoice', 'registry_invoice', 'ajd_form'],
+  DEED_FIELDS,
+  {
+    clauses: CLAUSES,
+    agencyInvoices: [
+      row(AGENCY, { concept: 'loan', base: 310, vat: 65.1, total: 375.1 }),
+      row(AGENCY, { concept: 'purchase', base: 180, vat: 37.8, total: 217.8 }),
+    ],
+    agencySupplied: [
+      row(AGENCY, { concept: 'ajd', deed: 'loan', amount: 1_640 }),
+      row(AGENCY, { concept: 'ajd', deed: 'purchase', amount: 410 }),
+      row(AGENCY, { concept: 'notary', deed: 'purchase', amount: 702.4 }),
+      row(AGENCY, { concept: 'notary', deed: 'loan', amount: 815.3 }),
+      row(AGENCY, { concept: 'registry', deed: 'purchase', amount: 150.2 }),
+      row(AGENCY, { concept: 'registry', deed: 'loan', amount: 176.9 }),
+    ],
+    notaryInvoices: [
+      row('notary_invoice', { concept: 'purchase', mixed: false, total: 702.4 }),
+      row('notary_invoice', { concept: 'loan', mixed: false, total: 815.3 }),
+    ],
+    registryInvoices: [
+      row('registry_invoice', { concept: 'purchase', mixed: false, total: 150.2 }),
+      row('registry_invoice', { concept: 'mortgage', mixed: false, total: 176.9 }),
+    ],
+    ajdForms: [
+      row('ajd_form', { concept: 'purchase', amountPaid: 410, paidByLender: false }),
+      row('ajd_form', { concept: 'loan', amountPaid: 1_640, paidByLender: false }),
+    ],
+  },
+  ['ajd_purchase_not_loan'],
 );
 
 // Only the first page and the floor's: the page of the expenses clause was never sent.
@@ -388,6 +428,54 @@ test('a full pack fills every sheet, each clause shown word for word to be confi
   await next(page);
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
   await expect(page.locator('#resultado [data-item]').first()).toBeVisible();
+});
+
+test('an agency’s purchase file is left out, and its statement of funds blocks nothing', async ({
+  page,
+}) => {
+  await fakeServices(page, TWO_FILES);
+  await upload(page, [
+    'escritura-p1.png',
+    'escritura-p12.png',
+    'gestoria-liquidacion.png',
+    'gestoria-prestamo.png',
+    'gestoria-compraventa.png',
+    'notaria.png',
+    'registro.png',
+    'modelo-600.png',
+  ]);
+  await expectShownAndFocused(page.getByRole('heading', { name: 'Datos leídos' }));
+  await expect(notes(page).filter({ hasText: /^Alguna factura cobra algo/ })).toHaveCount(1);
+  await page.getByRole('button', { name: 'Revisar los datos' }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Tu hipoteca', level: 2, exact: true }),
+  ).toBeFocused();
+  for (let i = 0; i < 14; i += 1) {
+    if (i === 2)
+      await choose(
+        sheet(page, 'La escritura'),
+        '¿Pediste la hipoteca como particular, para tu casa?',
+        'Sí',
+      );
+    if (i === 6)
+      await choose(sheet(page, 'El índice'), '¿El tipo variable se calcula con el IRPH?', 'No');
+    if (i === 10) {
+      const other = sheet(page, 'Otras cláusulas');
+      await choose(other, '¿El tipo se redondea al alza, por ejemplo al cuarto de punto?', 'No');
+      await choose(
+        other,
+        '¿La escritura te pide contratar un seguro u otro producto con el banco?',
+        'No',
+      );
+    }
+    await next(page);
+  }
+  const agency = sheet(page, 'La gestoría');
+  await expect(agency.getByLabel('Gestoría', { exact: true })).toHaveValue('375,10');
+  await expect(agency.getByLabel('Impuesto pagado por la gestoría')).toHaveValue('');
+  await expect(agency.getByLabel('Registro pagado por la gestoría')).toHaveValue('');
+  await next(page);
+  await expect(sheet(page, 'La tasación y el acta')).toBeVisible();
 });
 
 test('a deed without the expenses page names the page missing and how to tell it', async ({

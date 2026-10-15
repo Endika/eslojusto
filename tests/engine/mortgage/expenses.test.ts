@@ -214,6 +214,26 @@ describe('a 2021 deed', () => {
     expect(r.totals.statute.principal).toBe(2_000.03);
   });
 
+  it('takes nothing out of an agency invoice for outlays above its total, listed apart', () => {
+    const r = run({
+      deedOn,
+      invoices: [
+        invoice('agency', 396.7, { supplied: [1_860, 185.06] }),
+        invoice('ajd_loan', 1_860),
+        invoice('registry_mortgage', 185.06),
+      ],
+    });
+    expect(statuses(r.items)).toEqual([
+      ['agency', 'statute', 'lender_bears', 100, 396.7],
+      ['ajd_loan', 'statute', 'lender_bears', 100, 1_860],
+      ['registry_mortgage', 'statute', 'lender_bears', 100, 185.06],
+    ]);
+    expect(r.items[0]?.calculation.slice(1, 2)).toEqual([
+      { key: 'expenses.supplied_apart', vars: { euros: { euros: 2_045.06 } } },
+    ]);
+    expect(r.totals.statute.principal).toBe(2_441.76);
+  });
+
   it('takes out an outlay matching a tax that counts nothing here, saying only where it goes', () => {
     const r = run(
       {

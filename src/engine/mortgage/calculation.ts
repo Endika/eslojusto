@@ -39,6 +39,7 @@ export type MortgagePhraseKey =
   | 'expenses.payer_unknown'
   | 'expenses.supplied_own_line'
   | 'expenses.supplied_left_out'
+  | 'expenses.supplied_apart'
   | 'expenses.agreement_statute'
   | 'expenses.agreement_case_law'
   | 'expenses.agreement_ajd'

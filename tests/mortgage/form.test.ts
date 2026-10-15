@@ -228,8 +228,8 @@ describe('the mortgage form', () => {
     const f = form({ ...DEED, paidOn: '2020-01-01' });
     expect(sheetErrors(f, 'pago', TODAY)).toEqual([{ field: 'paidOn', code: 'before_deed' }]);
     expect(
-      sheetErrors(form({ ...DEED, agencyTax: '300', agencyRegistry: '100' }), 'gestoria', TODAY),
-    ).toEqual([{ field: 'agencyTax', code: 'above_total' }]);
+      sheetErrors(form({ ...DEED, agency: '300', agencyTax: '0' }), 'gestoria', TODAY),
+    ).toEqual([{ field: 'agencyTax', code: 'amount_range' }]);
     expect(readMortgageForm(form({ ...DEED, deedOn: '1994-12-31' }), TODAY)).toEqual({
       errors: [{ field: 'deedOn', code: 'before_table' }],
     });
