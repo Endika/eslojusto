@@ -67,13 +67,25 @@ export function parseRedata(json: {
   return days;
 }
 
-// A day has 23 hours when clocks go forward, 25 when they go back, 24 otherwise.
+// The last Sunday of `month` (1-12) in `year`, when Spanish clocks change.
+const lastSunday = (year: number, month: number): string => {
+  const d = new Date(Date.UTC(year, month, 0));
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay());
+  return d.toISOString().slice(0, 10);
+};
+
+// 23 hours, without 2 o'clock, on the last Sunday of March; 25, with 2 o'clock twice, on the last
+// Sunday of October; 24, each once, any other day. In order.
 export function checkDay(day: string, hours: Hours): void {
-  if (hours.length < 23 || hours.length > 25)
-    throw new Error(`${day}: ${hours.length} hours from REData, expected 23 to 25`);
-  for (let i = 1; i < hours.length; i++)
-    if ((hours[i]?.[0] ?? 0) < (hours[i - 1]?.[0] ?? 0))
-      throw new Error(`${day}: hours out of order at ${hours[i]?.[0]}`);
+  const year = Number(day.slice(0, 4));
+  const expected = day === lastSunday(year, 3) ? 23 : day === lastSunday(year, 10) ? 25 : 24;
+  if (hours.length !== expected)
+    throw new Error(`${day}: ${hours.length} hours from REData, expected ${expected}`);
+  for (let i = 1; i < hours.length; i++) {
+    const [before, now] = [hours[i - 1]?.[0] ?? 0, hours[i]?.[0] ?? 0];
+    if (now < before || (now === before && !(expected === 25 && now === 2)))
+      throw new Error(`${day}: hours out of order at ${now}`);
+  }
 }
 
 // The table with the days from `from` to `to` added; every one of them must be there.

@@ -39,23 +39,28 @@ export function wireElectricityDocuments(
 ): void {
   const tr = billsTranslator();
   const { form } = electricity;
-  // The PVPC prices only the paid report reads, fetched apart and early: by the time a pass is
-  // paid they are here. If they never arrive the report says so and goes without them.
+  // The PVPC prices only the paid report reads: fetched once a bill is reviewed, which a pass
+  // needs, so they are here by the time one is paid. A failed fetch is tried again with the next
+  // review or download; until then the report says it goes without them.
   let official: { readonly deps: OfficialDeps; readonly pvpc: PvpcSource } | null = null;
-  import('../engine/bills/data/pvpc-hourly.json')
-    .then(({ default: raw }: { default: unknown }) => {
-      const table = pvpcTable(raw);
-      official =
-        table === null
-          ? null
-          : {
-              deps: { pvpc: table, tollHolidays: TOLL_HOLIDAYS },
-              pvpc: { source: table.source, url: table.url },
-            };
-    })
-    .catch(() => {
-      official = null;
-    });
+  let loading = false;
+  const loadOfficial = () => {
+    if (official !== null || loading) return;
+    loading = true;
+    import('../engine/bills/data/pvpc-hourly.json')
+      .then(({ default: raw }: { default: unknown }) => {
+        const table = pvpcTable(raw);
+        if (table !== null)
+          official = {
+            deps: { pvpc: table, tollHolidays: TOLL_HOLIDAYS },
+            pvpc: { source: table.source, url: table.url },
+          };
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        loading = false;
+      });
+  };
   const reading = electricityReading(form, tr);
   const year = createBasket<KeptBill>();
   const show = () => renderBasket(document, year.entries(), reading.pending(), tr);
@@ -69,6 +74,7 @@ export function wireElectricityDocuments(
 
   // Heard before the pass, so its offer counts the bill just reviewed.
   hooks.onReview((r) => {
+    loadOfficial();
     year.put({
       ...r,
       input: { ...r.input, supplyFingerprint: reading.fingerprint() },
@@ -96,7 +102,11 @@ export function wireElectricityDocuments(
       reading,
       steps: STEPS,
       keptReviewKey: 'eslojusto-revision-luz-en-pago',
-      paidReview: () => electricityCase(year.entries(), norms, () => official),
+      paidReview: () =>
+        electricityCase(year.entries(), norms, () => {
+          loadOfficial();
+          return official;
+        }),
       decorateResult: show,
       restore: (saved) => saved,
       // The whole year goes on the trip to Stripe, each bill as its answers and nothing else, and

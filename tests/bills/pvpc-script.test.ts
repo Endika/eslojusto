@@ -72,11 +72,17 @@ describe('the PVPC update script', () => {
     ).toThrow(/Bad PVPC value/);
   });
 
-  it('accepts 23 to 25 hours a day, in order, and nothing else', () => {
-    expect(() => checkDay('d', day(23))).not.toThrow();
-    expect(() => checkDay('d', day(25))).not.toThrow();
-    expect(() => checkDay('d', day(22))).toThrow(/22 hours/);
-    expect(() => checkDay('d', [[1, 1], [0, 1], ...day(22)])).toThrow(/out of order/);
+  it('takes 23 hours only when clocks go forward, 25 only when they go back, 24 otherwise', () => {
+    const forward = day(24).filter(([h]) => h !== 2);
+    const back: Hours = [...day(3), [2, 1], ...day(24).slice(3)];
+    expect(() => checkDay('2026-03-29', forward)).not.toThrow();
+    expect(() => checkDay('2026-10-25', back)).not.toThrow();
+    expect(() => checkDay('2026-10-13', day(24))).not.toThrow();
+    expect(() => checkDay('2026-10-13', forward)).toThrow(/23 hours from REData, expected 24/);
+    expect(() => checkDay('2026-03-29', day(24))).toThrow(/expected 23/);
+    // Two 5 o'clocks on an ordinary day.
+    const twice: Hours = [...day(6), [5, 1], ...day(24).slice(6, 23)];
+    expect(() => checkDay('2026-10-13', twice)).toThrow(/out of order at 5/);
   });
 
   it('adds every day asked for and moves coveredUntil, or adds none', () => {

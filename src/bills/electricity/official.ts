@@ -37,6 +37,7 @@ const bullet = (t: string): Block => ({ type: 'bullet', text: t });
 const note = (t: string): Block => ({ type: 'note', text: t });
 
 function energyBlocks(
+  year: number,
   energy: EnergyFigures,
   pvpc: PvpcSource,
   deps: OfficialDeps,
@@ -48,7 +49,7 @@ function energyBlocks(
     return [heading, note(tr('client.bills.electricity.report.official.pvpc_bill'))];
   if (energy.kind === 'pending')
     return [heading, note(tr('client.bills.electricity.report.official.pending'))];
-  const [hours] = deps.tollHolidays;
+  const hours = deps.tollHolidays.find((h) => h.year === year);
   const eligibility = ruleSource('pvpc_eligibility', norms);
   return [
     heading,
@@ -167,7 +168,14 @@ export function officialBlocks(
     const blocks = [
       ...(figures.energy === null
         ? []
-        : energyBlocks(figures.energy, official.pvpc, official.deps, norms, tr)),
+        : energyBlocks(
+            entry.input.readingTo.y,
+            figures.energy,
+            official.pvpc,
+            official.deps,
+            norms,
+            tr,
+          )),
       ...(figures.power === null ? [] : powerBlocks(figures.power, norms, tr)),
     ];
     return blocks.length === 0
