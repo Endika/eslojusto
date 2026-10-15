@@ -144,17 +144,17 @@ const mortgageDeed = {
       'Default interest when printed as points over the ordinary rate (interés remuneratorio más 2 puntos is 2).',
     ),
     earlyTerminationInstalments: months(
-      'Monthly instalments left unpaid after which the lender may call in the whole loan (vencimiento anticipado); one instalment is 1.',
+      'Monthly instalments left unpaid after which the lender may call in the whole loan (vencimiento anticipado); «una cualquiera» is 1.',
     ),
     prepaymentOption: oneOf(
       PREPAYMENT_OPTIONS,
       'For a variable rate, the compensation for repaying early the deed picks (art. 23.5 Ley 5/2019): a_015_5y (0,15 % in the first five years) or b_025_3y (0,25 % in the first three years).',
     ),
     variablePrepaymentFeePercent: rate(
-      'Compensation for repaying early in a variable stretch, as a percentage of the capital repaid.',
+      'Fee for repaying early a variable rate, as a % of the capital repaid; one fixed only for a first year is variable.',
     ),
     fixedPrepaymentFeePercent: rate(
-      'Compensation for repaying early in a fixed stretch, as a percentage of the capital repaid; the first one printed when it has two periods.',
+      'Fee for repaying early in a fixed stretch, as a % of the capital repaid; the first one printed when it has two periods.',
     ),
     openingFee: money('Opening fee (comisión de apertura), in euros.'),
     openingFeePercent: rate('Opening fee as a percentage of the capital.'),

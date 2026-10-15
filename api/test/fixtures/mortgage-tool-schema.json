@@ -347,7 +347,7 @@
         },
         "earlyTerminationInstalments": {
           "type": "object",
-          "description": "Monthly instalments left unpaid after which the lender may call in the whole loan (vencimiento anticipado); one instalment is 1.",
+          "description": "Monthly instalments left unpaid after which the lender may call in the whole loan (vencimiento anticipado); «una cualquiera» is 1.",
           "properties": {
             "value": {
               "type": "integer",
@@ -380,7 +380,7 @@
         },
         "variablePrepaymentFeePercent": {
           "type": "object",
-          "description": "Compensation for repaying early in a variable stretch, as a percentage of the capital repaid.",
+          "description": "Fee for repaying early a variable rate, as a % of the capital repaid; one fixed only for a first year is variable.",
           "properties": {
             "value": {
               "type": "number",
@@ -397,7 +397,7 @@
         },
         "fixedPrepaymentFeePercent": {
           "type": "object",
-          "description": "Compensation for repaying early in a fixed stretch, as a percentage of the capital repaid; the first one printed when it has two periods.",
+          "description": "Fee for repaying early in a fixed stretch, as a % of the capital repaid; the first one printed when it has two periods.",
           "properties": {
             "value": {
               "type": "number",
