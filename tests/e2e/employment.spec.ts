@@ -359,12 +359,12 @@ test('the sheets each modality opens fit in 360×640', async ({ page }) => {
   }
 });
 
-test('the home page labels the contract review as a beta', async ({ page }) => {
+test('the home page lists the contract review, out of beta', async ({ page }) => {
   await page.goto('');
   const work = page.getByRole('region', { name: 'Trabajo' });
   const card = work.getByRole('article', { name: 'Contrato de trabajo' });
   await expect(card.getByRole('link', { name: 'Contrato de trabajo' })).toBeVisible();
-  await expect(card.getByText('Beta')).toBeVisible();
+  await expect(card.getByText('Beta')).toHaveCount(0);
   await expect(work.getByText(/^Próximamente/)).toHaveCount(0);
 });
 
