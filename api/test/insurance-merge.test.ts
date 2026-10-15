@@ -32,6 +32,12 @@ describe('insuranceMerge', () => {
     ]);
   });
 
+  it('takes the line from a renewal notice that names it when no policy is read', () => {
+    const notices = [page(1, 'insurance_renewal_notice')];
+    const m = pack({ insurance_renewal_notice: { line: f('health') } }, notices);
+    expect(m.fields['line']).toEqual({ ...f('health'), source: 'insurance_renewal_notice' });
+  });
+
   it('keeps an intermediary’s name for a company only', () => {
     const named = (type: string) =>
       pack({
