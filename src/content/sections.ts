@@ -2,9 +2,10 @@
 // home page and no sitemap entry, so main can take the section piece by piece.
 export const RENTAL_BUILD = import.meta.env.PUBLIC_RENTAL === '1';
 
-// /contrato/ is built only when PUBLIC_EMPLOYMENT=1, on the same terms; it opens as a beta.
+// /contrato/ is built only when PUBLIC_EMPLOYMENT=1, on the same terms; it left the beta after
+// three real contracts read and reviewed right.
 export const EMPLOYMENT_BUILD = import.meta.env.PUBLIC_EMPLOYMENT === '1';
-export const EMPLOYMENT_BETA = true;
+export const EMPLOYMENT_BETA = false;
 
 // /paro/erte/, the benefit during an ERTE, is built only when PUBLIC_ERTE=1, on the same terms.
 export const ERTE_BUILD = import.meta.env.PUBLIC_ERTE === '1';
