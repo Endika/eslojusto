@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.62.0](https://github.com/Endika/eslojusto/compare/v1.61.4...v1.62.0) (2026-10-15)
+
+
+### Features
+
+* **credit:** take /financiacion/ out of beta ([c5a1600](https://github.com/Endika/eslojusto/commit/c5a160008294ccb6e8e34372738bad81d26dc20d))
+
 ## [1.61.4](https://github.com/Endika/eslojusto/compare/v1.61.3...v1.61.4) (2026-10-15)
 
 
