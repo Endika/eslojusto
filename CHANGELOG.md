@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.63.3](https://github.com/Endika/eslojusto/compare/v1.63.2...v1.63.3) (2026-10-15)
+
+
+### Bug Fixes
+
+* **employment:** read model codes and negative lines, fixed salary, usual holiday days ([217bec9](https://github.com/Endika/eslojusto/commit/217bec94a62e99f8caf73479857f9804c7037842))
+
 ## [1.63.2](https://github.com/Endika/eslojusto/compare/v1.63.1...v1.63.2) (2026-10-15)
 
 
