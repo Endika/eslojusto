@@ -4023,7 +4023,7 @@ export const es = {
   'household.guide.time.p1':
     'La jornada ordinaria es de 40 horas de trabajo efectivo a la semana, y el tiempo de presencia se cuenta aparte (art. 9.1); lo que pase de ahí serían horas extraordinarias (art. 9.3). Entre una jornada y la siguiente hay 12 horas de descanso, que a quien vive en la casa pueden quedar en 10 si la diferencia se compensa en cuatro semanas. El descanso semanal es de 36 horas seguidas.',
   'household.guide.time.p2':
-    'Las vacaciones son de 30 días naturales al año, y al menos un periodo ha de ser de 15 días seguidos (art. 9). Si no se cumple, la revisión lo señala como aviso: un aviso no suma importes.',
+    'Las vacaciones son de 30 días naturales al año, y al menos un periodo ha de ser de 15 días seguidos (art. 9). Si no se cumple, la revisión lo marca como «Por debajo de lo que marca la norma». Estas partidas no llevan importe: la revisión no calcula lo que valen esos días ni los suma a lo que podría faltarte.',
   'household.guide.desistimiento.title': 'El desistimiento de la familia',
   'household.guide.desistimiento.p1':
     'La familia puede terminar la relación por desistimiento solo por una de tres causas, y siempre que estén justificadas: menos ingresos o más gastos de la familia por una circunstancia sobrevenida, un cambio sustancial de sus necesidades o una pérdida de confianza razonable y proporcionada. Se comunica por escrito, con la causa (art. 11.2).',
