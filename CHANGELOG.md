@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.65.0](https://github.com/Endika/eslojusto/compare/v1.64.2...v1.65.0) (2026-10-15)
+
+
+### Features
+
+* **bills:** add «Tus cifras frente a las oficiales» to the paid electricity report ([41f17d9](https://github.com/Endika/eslojusto/commit/41f17d9141b701f96458344b162c9a437f72c824))
+* **bills:** add the hourly PVPC table and its REData update script ([7e35a71](https://github.com/Endika/eslojusto/commit/7e35a71aef7d1c4824fefbbac3afaf28bf15c391))
+* **bills:** set a bill's energy beside the PVPC and its power beside the power used ([c1c2d09](https://github.com/Endika/eslojusto/commit/c1c2d091f9133c41185c1e457cb3793b94a4ef8d))
+* **bills:** tell the 2.0TD energy period of each hour, with the toll holidays ([eea6249](https://github.com/Endika/eslojusto/commit/eea6249fc4b5df3c796991f10eb7edfec7d0e01f))
+
+
+### Bug Fixes
+
+* **bills:** load the PVPC prices on review, no PVPC figure for an empty period, stricter day checks ([e8fdfb7](https://github.com/Endika/eslojusto/commit/e8fdfb753444ea9d76eae950b661405e5c0e2ab8))
+
 ## [1.64.2](https://github.com/Endika/eslojusto/compare/v1.64.1...v1.64.2) (2026-10-15)
 
 
