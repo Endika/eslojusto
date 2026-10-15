@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.64.2](https://github.com/Endika/eslojusto/compare/v1.64.1...v1.64.2) (2026-10-15)
+
+
+### Bug Fixes
+
+* **mortgage:** put a variable loan's prepayment fee in its own field, read any one instalment as 1 ([871cad7](https://github.com/Endika/eslojusto/commit/871cad72cd9e05a295c639d980caaab5d6566e97))
+
 ## [1.64.1](https://github.com/Endika/eslojusto/compare/v1.64.0...v1.64.1) (2026-10-15)
 
 
