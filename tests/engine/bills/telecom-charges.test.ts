@@ -58,12 +58,20 @@ describe('the charges of telecom bills', () => {
     expect(c.bills.map((b) => b.extras)).toEqual([[2], [0]]);
     expect(c.extras).toBe(2);
     expect(c.premiumRate).toBe(true);
-    expect(c.fixedFees).toBe(true);
+    expect(c.severalFees).toBe(true);
   });
 
   it('has no extras, premium rate or fees when the bills have none', () => {
     const c = telecomCharges([bill(line('handset', 10), line('discount', 2))], TODAY);
-    expect(c).toMatchObject({ extras: 0, premiumRate: false, fixedFees: false });
+    expect(c).toMatchObject({ extras: 0, premiumRate: false, severalFees: false });
+  });
+
+  it('asks to recognise each fee only when a bill has more than one', () => {
+    const one = telecomCharges(
+      [bill(line('fixed_fee', 23.14)), bill(line('fixed_fee', 23.14))],
+      TODAY,
+    );
+    expect(one.severalFees).toBe(false);
   });
 
   it('tells when a discount with an end day ends, or ended, and by how much', () => {

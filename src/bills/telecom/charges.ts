@@ -186,7 +186,7 @@ export function renderCharges(
   const c = telecomCharges(bills, today);
   root.hidden = bills.length === 0;
   find(root, '[data-charges-extras]').hidden = c.extras === 0;
-  find(root, '[data-charges-fees]').hidden = !c.fixedFees;
+  find(root, '[data-charges-fees]').hidden = !c.severalFees;
   find(root, '[data-charges-bills]').replaceChildren(
     ...bills.map((bill, b) => {
       const frag = template(root, 'charges-bill');

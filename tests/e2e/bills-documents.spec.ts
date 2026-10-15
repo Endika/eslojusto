@@ -544,11 +544,12 @@ test('the telecom page lists every charge of the bills read, before any question
             issuedOn: '2026-09-22',
             periodFrom: '2026-09-01',
             periodTo: '2026-09-30',
-            total: 25.45,
+            total: 28.44,
           }),
         ],
         lines: [
           bill({ document: 1, concept: 'Tarifa Ficticia 50', kind: 'fixed_fee', amount: 23.14 }),
+          bill({ document: 1, concept: 'Servicio Ficticio Plus', kind: 'fixed_fee', amount: 2.99 }),
           bill({ document: 1, concept: 'Mensajes a 79xx', kind: 'premium_rate', amount: 1.45 }),
           bill({ document: 1, concept: 'Club de juegos', kind: 'third_party', amount: 3.99 }),
           bill({
@@ -582,6 +583,7 @@ test('the telecom page lists every charge of the bills read, before any question
   const lines = charges.locator('[data-bill-groups] li');
   await expect(lines).toHaveText([
     /^Tarifa Ficticia 50\s*23,14 €$/,
+    /^Servicio Ficticio Plus\s*2,99 €$/,
     /^Mensajes a 79xx\s*Extra\s*1,45 €$/,
     /^Club de juegos\s*Extra\s*3,99 €$/,
     /^Descuento de bienvenida\s*Del 30-09-2025 al 30-09-2026\s*−4,13 €$/,
