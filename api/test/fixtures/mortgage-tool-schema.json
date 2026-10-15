@@ -622,7 +622,7 @@
               "concept": {
                 "type": "string",
                 "enum": ["mortgage", "purchase", "cancellation"],
-                "description": "What it registers: mortgage (the mortgage, inscripción de la hipoteca), purchase (the purchase, inscripción de la compraventa), cancellation (the cancellation of a mortgage)."
+                "description": "What it registers: mortgage (inscripción or aceptación de la hipoteca), purchase (the purchase, inscripción de la compraventa), cancellation (the cancellation of a mortgage)."
               },
               "mixed": {
                 "type": "boolean",

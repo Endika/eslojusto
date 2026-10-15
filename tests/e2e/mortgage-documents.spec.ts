@@ -186,7 +186,6 @@ const TWO_FILES = reading(
       row('ajd_form', { concept: 'loan', amountPaid: 1_640, paidByLender: false }),
     ],
   },
-  ['ajd_purchase_not_loan'],
 );
 
 // Only the first page and the floor's: the page of the expenses clause was never sent.

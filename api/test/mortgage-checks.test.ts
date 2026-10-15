@@ -114,7 +114,7 @@ describe('mortgage coherence checks', () => {
         },
         registry_invoice: { registryInvoices: [row({ concept: 'mortgage', total: 176.9 })] },
       }),
-    ).toEqual(['ajd_purchase_not_loan']);
+    ).toEqual([]);
   });
 
   it('flags a return that taxes the purchase rather than the loan', () => {

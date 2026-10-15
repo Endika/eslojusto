@@ -123,8 +123,8 @@ export function mortgageFailedChecks(r: Reading): readonly MortgageCheck[] {
   if (invoices.some((row) => row.values['mixed'] === true))
     failed.push('invoice_mixes_purchase_and_loan');
   if (suppliedTwice(r)) failed.push('duplicate_supplied_amount');
-  if (rows(r, 'ajd_form', 'ajdForms').some((row) => row.values['concept'] === 'purchase'))
-    failed.push('ajd_purchase_not_loan');
+  const ajd = rows(r, 'ajd_form', 'ajdForms').map((row) => row.values['concept']);
+  if (ajd.includes('purchase') && !ajd.includes('loan')) failed.push('ajd_purchase_not_loan');
   const deedRead = r.pages.some((p) => p.kind === 'mortgage_deed' && isReadable(p));
   const expenses = rows(r, 'mortgage_deed', 'clauses').some(
     (row) => row.values['label'] === 'expenses_clause',
