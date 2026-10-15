@@ -67,7 +67,8 @@ export interface TelecomCharges {
   readonly bills: readonly BillCharges[];
   readonly extras: number;
   readonly premiumRate: boolean;
-  readonly fixedFees: boolean;
+  // A bill with more than one monthly fee: which is the plan's own, the bill does not say.
+  readonly severalFees: boolean;
   readonly promotions: readonly PromotionEnd[];
 }
 
@@ -106,7 +107,7 @@ export function telecomCharges(bills: readonly ChargedBill[], today: CivilDate):
     bills: bills.map(billCharges),
     extras: lines.filter((l) => isExtra(l.kind)).length,
     premiumRate: lines.some((l) => l.kind === 'premium_rate'),
-    fixedFees: lines.some((l) => l.kind === 'fixed_fee'),
+    severalFees: bills.some((b) => b.lines.filter((l) => l.kind === 'fixed_fee').length > 1),
     promotions,
   };
 }

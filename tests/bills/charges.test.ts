@@ -176,11 +176,11 @@ describe('«Lo que te cobran»', () => {
     ]);
   });
 
-  it('shows the norms the extras call for, and the fees note beside monthly fees', () => {
+  it('shows the norms the extras call for, and no fees note beside a single monthly fee', () => {
     const root = block();
     renderCharges(root, readBills(READ), TODAY, tr);
     expect(hidden(root, '[data-charges-extras]')).toBe(false);
-    expect(hidden(root, '[data-charges-fees]')).toBe(false);
+    expect(hidden(root, '[data-charges-fees]')).toBe(true);
     expect(hidden(root, '[data-charges-rights]')).toBe(false);
     expect(hidden(root, '[data-charges-right="disconnect"]')).toBe(false);
     expect(hidden(root, '[data-charges-right="unrequested"]')).toBe(false);
@@ -200,6 +200,15 @@ describe('«Lo que te cobran»', () => {
     });
     renderCharges(root, readBills(plain), TODAY, tr);
     expect(hidden(root, '[data-charges-rights]')).toBe(true);
+    const two = telecom({
+      lines: [
+        row({ document: 1, concept: 'Tarifa', kind: 'fixed_fee', amount: 20 }),
+        row({ document: 1, concept: 'Televisión', kind: 'fixed_fee', amount: 9 }),
+      ],
+    });
+    renderCharges(root, readBills(two), TODAY, tr);
+    expect(hidden(root, '[data-charges-fees]')).toBe(false);
+    renderCharges(root, readBills(plain), TODAY, tr);
     expect(hidden(root, '[data-charges-extras]')).toBe(true);
     expect(hidden(root, '[data-charges-promotions]')).toBe(true);
   });

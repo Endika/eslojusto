@@ -6749,7 +6749,7 @@ export const es = {
   'bills.telecom.charges.promotions': 'Descuentos que terminan',
   'bills.telecom.charges.rights': 'Lo que dice la norma',
   'bills.telecom.charges.disconnect':
-    'Puedes pedir a tu compañía que desconecte los servicios de tarificación adicional y las llamadas internacionales. Tiene que aceptar la petición por escrito, por teléfono o por internet, y desconectarlos en 10 días como mucho; si no lo hace en ese plazo por una causa que no es tuya, lo que cuesten esos servicios corre de su cuenta. El operador que la presta como servicio universal la ofrece gratis.',
+    'Puedes pedir a tu compañía que desconecte los servicios de tarificación adicional y las llamadas internacionales. Tiene que aceptar la petición por escrito, por teléfono o por internet, y desconectarlos en 10 días como mucho; si no lo hace en ese plazo por una causa que no es tuya, lo que cuesten esos servicios corre de su cuenta.',
   'bills.telecom.charges.unrequested':
     'Si no pediste un servicio, la ley no permite cobrártelo, y no responder a quien te lo presta no cuenta como aceptarlo. Si no lo contrataste tú, pregunta a tu compañía.',
   'bills.telecom.pass.title': 'El informe y las cartas',
