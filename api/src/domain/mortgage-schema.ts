@@ -225,7 +225,7 @@ const registryInvoice = {
         invoiceOn,
         concept: oneOf(
           REGISTRY_CONCEPTS,
-          'What it registers: mortgage (the mortgage, inscripción de la hipoteca), purchase (the purchase, inscripción de la compraventa), cancellation (the cancellation of a mortgage).',
+          'What it registers: mortgage (inscripción or aceptación de la hipoteca), purchase (the purchase, inscripción de la compraventa), cancellation (the cancellation of a mortgage).',
         ),
         mixed,
         base,

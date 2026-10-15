@@ -109,7 +109,7 @@ describe('a mortgage read', () => {
     });
   });
 
-  it('flags a mixed notary bill, an agency outlay paid twice and the purchase’s tax', async () => {
+  it('flags a mixed notary bill and an agency outlay paid twice, and not the purchase’s tax beside the loan’s', async () => {
     const { extraction, failedChecks, metrics } = await ok('mortgage-mixed-agency', 4);
     expect(extraction.lists.agencySupplied?.map((r) => r.values)).toEqual([
       { concept: 'ajd', deed: 'loan', amount: 1800 },
@@ -119,11 +119,7 @@ describe('a mortgage read', () => {
       'loan',
       'purchase',
     ]);
-    expect(failedChecks).toEqual([
-      'invoice_mixes_purchase_and_loan',
-      'duplicate_supplied_amount',
-      'ajd_purchase_not_loan',
-    ]);
+    expect(failedChecks).toEqual(['invoice_mixes_purchase_and_loan', 'duplicate_supplied_amount']);
     // No deed among the invoices: the read says nothing on its key page.
     expect(metrics.missingKeyPage).toBeUndefined();
   });
