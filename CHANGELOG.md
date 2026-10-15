@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.64.0](https://github.com/Endika/eslojusto/compare/v1.63.3...v1.64.0) (2026-10-15)
+
+
+### Features
+
+* **employment:** take /contrato/ out of beta ([ef50f8e](https://github.com/Endika/eslojusto/commit/ef50f8e7adea6bfea49ef03b5d3c8b89a9d08b29))
+
+
+### Bug Fixes
+
+* **employment:** copy the start of a long clause instead of skipping it ([a869308](https://github.com/Endika/eslojusto/commit/a86930833ff018abefc079e1338a09bba1d45df3))
+* **legal:** drop the beta note of /contrato/ from the legal notice ([140017f](https://github.com/Endika/eslojusto/commit/140017f2772ec85035c43d1d2c2c69c58a4e4ea2))
+
 ## [1.63.3](https://github.com/Endika/eslojusto/compare/v1.63.2...v1.63.3) (2026-10-15)
 
 
