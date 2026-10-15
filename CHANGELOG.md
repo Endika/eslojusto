@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.63.1](https://github.com/Endika/eslojusto/compare/v1.63.0...v1.63.1) (2026-10-15)
+
+
+### Bug Fixes
+
+* **employment:** prefill prorated extra pays from payslips, word the same-duties question clearly ([226ce49](https://github.com/Endika/eslojusto/commit/226ce496469c262136c89164465116aab7da0c93))
+
 ## [1.63.0](https://github.com/Endika/eslojusto/compare/v1.62.0...v1.63.0) (2026-10-15)
 
 
