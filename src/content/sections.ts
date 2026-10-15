@@ -19,9 +19,9 @@ export const INSURANCE_BUILD = import.meta.env.PUBLIC_INSURANCE === '1';
 export const INSURANCE_BETA = true;
 
 // /financiacion/, a consumer credit's APR, average-rate indicator and dates, is built only when
-// PUBLIC_CREDIT=1, on the same terms; it opens as a beta.
+// PUBLIC_CREDIT=1, on the same terms; it left the beta after a real contract read and reviewed right.
 export const CREDIT_BUILD = import.meta.env.PUBLIC_CREDIT === '1';
-export const CREDIT_BETA = true;
+export const CREDIT_BETA = false;
 
 // /hipoteca/, a home mortgage's set-up costs by law and by the Supreme Court's split, its fee caps
 // and its clauses with dated sources, is built only when PUBLIC_MORTGAGE=1, on the same terms; it
