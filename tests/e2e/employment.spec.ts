@@ -447,7 +447,10 @@ test('the privacy page and the legal notice describe the contract review in this
   const notice = page.locator('main');
   await expect(
     notice.getByRole('heading', { name: /La revisión del contrato de trabajo/ }),
-  ).toContainText('Beta');
+  ).not.toContainText('Beta');
+  await expect(notice).not.toContainText(
+    'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves un punto',
+  );
   await expect(notice).toContainText('No lee convenios colectivos ni sus tablas');
   await expect(notice).toContainText('No calcula el salario neto, el IRPF ni las cotizaciones');
 });
