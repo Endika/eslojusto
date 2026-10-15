@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.63.2](https://github.com/Endika/eslojusto/compare/v1.63.1...v1.63.2) (2026-10-15)
+
+
+### Bug Fixes
+
+* **pass:** recover the pass with a button alone, drop the payment code field ([3198c06](https://github.com/Endika/eslojusto/commit/3198c06b225f626ca41d07cb1074cd5734a9d8b3))
+
 ## [1.63.1](https://github.com/Endika/eslojusto/compare/v1.63.0...v1.63.1) (2026-10-15)
 
 
