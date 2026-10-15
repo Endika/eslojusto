@@ -10,6 +10,7 @@ import {
   BILLS_BUILD,
   CREDIT_BETA,
   CREDIT_BUILD,
+  EMPLOYMENT_BETA,
   EMPLOYMENT_BUILD,
   ERTE_BUILD,
   HOUSEHOLD_BUILD,
@@ -157,13 +158,16 @@ const bills = BILLS_BUILD;
       {employment && (
         <section class="sheet sheet--text">
           <h2 id="al-contrato">
-            {tx('legal_notice.employment')} <span class="beta">{tx('employment.beta')}</span>
+            {tx('legal_notice.employment')}
+            {EMPLOYMENT_BETA && <span class="beta">{tx('employment.beta')}</span>}
           </h2>
           <p>{tx('legal_notice.employment.does')}</p>
           <p>{tx('legal_notice.employment.does_not')}</p>
-          <p>
-            {tx('legal_notice.employment.beta')} <a href={`mailto:${email}`}>{email}</a>.
-          </p>
+          {EMPLOYMENT_BETA && (
+            <p>
+              {tx('legal_notice.employment.beta')} <a href={`mailto:${email}`}>{email}</a>.
+            </p>
+          )}
         </section>
       )}
 
