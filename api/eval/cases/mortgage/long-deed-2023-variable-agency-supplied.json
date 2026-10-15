@@ -561,7 +561,8 @@
         "agencyInvoices": [
           {
             "invoiceOn": "2023-05-09",
-            "fee": 280.99,
+            "concept": "loan",
+            "base": 280.99,
             "vat": 59.01,
             "total": 790
           }
@@ -569,6 +570,7 @@
         "agencySupplied": [
           {
             "concept": "registry",
+            "deed": "loan",
             "amount": 450
           }
         ],

@@ -41,6 +41,8 @@ export const NOTARY_CONCEPTS = [
 ] as const;
 export const REGISTRY_CONCEPTS = ['mortgage', 'purchase', 'cancellation'] as const;
 export const AJD_CONCEPTS = ['loan', 'purchase'] as const;
+// What an agency handled: the engine has one kind for the agency, and counts only the loan's.
+export const AGENCY_CONCEPTS = ['loan', 'purchase'] as const;
 
 export const MORTGAGE_INDICES = ['euribor', 'irph', 'other'] as const;
 export const SUPPLIED_CONCEPTS = ['ajd', 'registry', 'notary', 'valuation', 'other'] as const;
@@ -60,7 +62,8 @@ const MAX_NAME = 80;
 export const MAX_MORTGAGE_CLAUSE_TEXT = 1500;
 export const MAX_CLAUSES = 12;
 export const MAX_INVOICES = 6;
-export const MAX_SUPPLIED = 6;
+// A statement of the funds lists the tax, the notary and the registry of each deed, and more.
+export const MAX_SUPPLIED = 12;
 export const MAX_OPERATIONS = 6;
 // Fifty years of monthly instalments, the site's own limit for a loan.
 const MAX_MONTHS = 600;
@@ -93,11 +96,8 @@ const base = money('Taxable base (base imponible, honorarios, derechos de arance
 const vat = money('VAT (IVA) of the invoice.');
 const total = money('Total of the invoice (total factura), outlays included.');
 // Notaries and registries bill the purchase and the loan of one day apart or together.
-const SPLIT =
-  ' When one invoice prints separate amounts for the purchase and for the loan, one entry for each part; when it bills both in one amount, one entry with mixed true.';
-const mixed = flag(
-  'true when the invoice bills the purchase (compraventa) and the mortgage loan together without splitting their amounts; false when it bills only one of them.',
-);
+const SPLIT = ' One entry for each part an invoice prints apart.';
+const mixed = flag('true when it bills the purchase (compraventa) and the loan in one amount.');
 
 const mortgageDeed = {
   description:
@@ -244,24 +244,29 @@ const agencyInvoice = {
   fields: {},
   lists: {
     agencyInvoices: list(
-      'Every agency invoice, one entry each.',
+      'Every agency invoice, one entry each; a statement of funds (liquidación de gastos) is none.',
       3,
       {
         invoiceOn,
-        fee: money('The agency’s own fee (honorarios), before VAT.'),
+        concept: oneOf(
+          AGENCY_CONCEPTS,
+          'Which deed it handled, by its type of document: loan (préstamo hipotecario), purchase (compraventa); none when it bills both.',
+        ),
+        base: money('Base imponible, before VAT.'),
         vat,
         total,
       },
       ['total'],
     ),
     agencySupplied: list(
-      'Every outlay the agency paid and passed on (suplidos, provisión de fondos aplicada), one entry each.',
+      'Every outlay the agency paid (suplidos), on an invoice or a statement of funds, one entry each.',
       MAX_SUPPLIED,
       {
         concept: oneOf(
           SUPPLIED_CONCEPTS,
           'ajd (the stamp duty, Actos Jurídicos Documentados, modelo 600), registry (the land registry), notary, valuation (tasación), other.',
         ),
+        deed: oneOf(AGENCY_CONCEPTS, 'Which deed it was paid for, as its invoice or heading says.'),
         amount: money('Its amount, in euros.'),
       },
       ['concept', 'amount'],
@@ -390,7 +395,7 @@ export type MortgageSectionKind = keyof typeof MORTGAGE_SECTIONS;
 export const MORTGAGE_READABILITY_DESCRIPTION =
   'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand; a handwritten statement beside a printed deed is no reason), blurry, dark, cropped (the part with the values is cut off), not_mortgage_document (not about a mortgage loan), foreign_jurisdiction (a mortgage under the law of another country; never because of its language), unknown_format (about a mortgage loan, but no kind of document you know).';
 export const MORTGAGE_PAGE_KIND_DESCRIPTION =
-  'mortgage_deed: a page of the mortgage loan deed (escritura de préstamo hipotecario), the purchase and the loan in one deed included. notary_invoice: a notary invoice. registry_invoice: a land registry invoice. agency_invoice_mortgage: an agency invoice (gestoría) for the deed. valuation_invoice: a valuation invoice (tasación). ajd_form: a stamp duty or transfer tax return (modelo 600). fein: the FEIN. fiae: the FiAE. transparency_deed: the notarial act on the information given before the loan (acta de transparencia). prepayment_statement: a statement of an early repayment, a change to a fixed rate or a move to another lender. other: anything else, such as an ID card, a purchase deed without a loan, a property tax receipt or a payslip.';
+  'mortgage_deed: a page of the mortgage loan deed (escritura de préstamo hipotecario), the purchase and the loan in one deed included. notary_invoice: a notary invoice. registry_invoice: a land registry invoice. agency_invoice_mortgage: an agency invoice (gestoría) for the deed, or its liquidación de gastos. valuation_invoice: a valuation invoice (tasación). ajd_form: a stamp duty or transfer tax return (modelo 600). fein: the FEIN. fiae: the FiAE. transparency_deed: the notarial act on the information given before the loan (acta de transparencia). prepayment_statement: a statement of an early repayment, a change to a fixed rate or a move to another lender. other: anything else, such as an ID card, a purchase deed without a loan, a property tax receipt or a payslip.';
 
 export const MORTGAGE_SCHEMA: ReviewSchema = {
   pageKinds: MORTGAGE_PAGE_KINDS,

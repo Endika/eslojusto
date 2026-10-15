@@ -342,7 +342,8 @@
         "agencyInvoices": [
           {
             "invoiceOn": "2021-07-20",
-            "fee": 289.26,
+            "concept": "loan",
+            "base": 289.26,
             "vat": 60.74,
             "total": 350
           }

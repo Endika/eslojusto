@@ -33,19 +33,27 @@ describe('mortgage coherence checks', () => {
     expect(checks(notary({ concept: 'loan', base: 500, vat: 105, total: 605.04 }))).toEqual([]);
   });
 
-  it('adds an agency’s outlays to its only invoice, and leaves two invoices unchecked', () => {
+  it('adds up an agency invoice with the outlays of its deed or without them', () => {
     const agency = (invoices: readonly Record<string, unknown>[]) => ({
       pages: [page(1, 'agency_invoice_mortgage')],
       agency_invoice_mortgage: {
         agencyInvoices: invoices.map(row),
-        agencySupplied: [row({ concept: 'registry', amount: 300 })],
+        agencySupplied: [row({ concept: 'registry', deed: 'loan', amount: 300 })],
       },
     });
-    expect(checks(agency([{ fee: 200, vat: 42, total: 542 }]))).toEqual([]);
-    expect(checks(agency([{ fee: 200, vat: 42, total: 242 }]))).toEqual([
+    expect(checks(agency([{ concept: 'loan', base: 200, vat: 42, total: 542 }]))).toEqual([]);
+    expect(checks(agency([{ concept: 'loan', base: 200, vat: 42, total: 242 }]))).toEqual([]);
+    expect(checks(agency([{ concept: 'loan', base: 200, vat: 42, total: 442 }]))).toEqual([
       'invoice_parts_do_not_sum',
     ]);
-    expect(checks(agency([{ fee: 200, vat: 42, total: 242 }, { total: 90 }]))).toEqual([]);
+    expect(
+      checks(
+        agency([
+          { concept: 'loan', base: 200, vat: 42, total: 242 },
+          { concept: 'purchase', base: 150, vat: 31.5, total: 481.5 },
+        ]),
+      ),
+    ).toEqual(['invoice_parts_do_not_sum']);
   });
 
   it('flags a notary or registry invoice that bills the purchase and the loan as one', () => {
@@ -54,17 +62,59 @@ describe('mortgage coherence checks', () => {
     ]);
   });
 
-  it('flags an agency outlay that repeats a tax return or a registry invoice in the pack', () => {
-    const pack = (supplied: number) => ({
+  it('flags a loan outlay inside an agency invoice that repeats a tax return or a registry invoice', () => {
+    const pack = (supplied: number, deed = 'loan', total = 1800) => ({
       pages: [page(1, 'agency_invoice_mortgage'), page(2, 'ajd_form'), page(3, 'registry_invoice')],
       agency_invoice_mortgage: {
-        agencySupplied: [row({ concept: 'ajd', amount: supplied })],
+        agencyInvoices: [row({ concept: 'loan', base: 250, vat: 52.5, total })],
+        agencySupplied: [row({ concept: 'ajd', deed, amount: supplied })],
       },
       ajd_form: { ajdForms: [row({ concept: 'loan', amountPaid: 1500 })] },
       registry_invoice: { registryInvoices: [row({ concept: 'mortgage', total: 410.2 })] },
     });
-    expect(checks(pack(1500.04))).toEqual(['duplicate_supplied_amount']);
-    expect(checks(pack(1499))).toEqual([]);
+    expect(checks(pack(1500.04, 'loan', 1802.54))).toEqual(['duplicate_supplied_amount']);
+    expect(checks(pack(1499, 'loan', 1801.5))).toEqual([]);
+    expect(checks(pack(1500, 'purchase', 1802.5))).toEqual(['invoice_parts_do_not_sum']);
+    // On a statement of funds apart, the invoice's total holds no outlay to count twice.
+    expect(checks(pack(1500, 'loan', 302.5))).toEqual([]);
+  });
+
+  // An agency that handled the purchase and the loan as two files: an invoice for each and a
+  // statement of funds listing what it paid for each deed.
+  it('finds nothing wrong with an agency’s two invoices and its statement of funds', () => {
+    expect(
+      checks({
+        pages: [
+          page(1, 'agency_invoice_mortgage', 1),
+          page(2, 'agency_invoice_mortgage', 2),
+          page(3, 'agency_invoice_mortgage', 3),
+          page(4, 'ajd_form', 4),
+          page(5, 'ajd_form', 5),
+          page(6, 'registry_invoice', 6),
+        ],
+        agency_invoice_mortgage: {
+          agencyInvoices: [
+            row({ concept: 'loan', base: 310, vat: 65.1, total: 375.1 }),
+            row({ concept: 'purchase', base: 180, vat: 37.8, total: 217.8 }),
+          ],
+          agencySupplied: [
+            row({ concept: 'ajd', deed: 'loan', amount: 1640 }),
+            row({ concept: 'ajd', deed: 'purchase', amount: 410 }),
+            row({ concept: 'notary', deed: 'purchase', amount: 702.4 }),
+            row({ concept: 'notary', deed: 'loan', amount: 815.3 }),
+            row({ concept: 'registry', deed: 'purchase', amount: 150.2 }),
+            row({ concept: 'registry', deed: 'loan', amount: 176.9 }),
+          ],
+        },
+        ajd_form: {
+          ajdForms: [
+            row({ concept: 'purchase', amountPaid: 410 }),
+            row({ concept: 'loan', amountPaid: 1640 }),
+          ],
+        },
+        registry_invoice: { registryInvoices: [row({ concept: 'mortgage', total: 176.9 })] },
+      }),
+    ).toEqual(['ajd_purchase_not_loan']);
   });
 
   it('flags a return that taxes the purchase rather than the loan', () => {

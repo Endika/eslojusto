@@ -40,24 +40,60 @@ function partsDoNotSum(row: ExtractedRow, baseName: string, extra = 0): boolean 
   return Math.abs(parts - cents(total)) > TOLERANCE_CENTS;
 }
 
+const sumOf = (list: readonly ExtractedRow[]): number =>
+  list.reduce((sum, row) => sum + (num(row, 'amount') ?? 0), 0);
+
+// The agency's outlays of the deed an invoice handled; one naming no deed, when it is the only
+// invoice.
+const outlaysOf = (
+  invoice: ExtractedRow,
+  invoices: readonly ExtractedRow[],
+  supplied: readonly ExtractedRow[],
+): readonly ExtractedRow[] =>
+  supplied.filter((row) =>
+    row.values['deed'] === undefined
+      ? invoices.length === 1
+      : row.values['deed'] === invoice.values['concept'],
+  );
+
+// An agency lists its outlays inside an invoice, adding them to its total, or on a statement of
+// the funds apart: its invoice adds up either with them or without them.
+function agencyDoesNotSum(r: Reading): boolean {
+  const invoices = rows(r, 'agency_invoice_mortgage', 'agencyInvoices');
+  const supplied = rows(r, 'agency_invoice_mortgage', 'agencySupplied');
+  return invoices.some(
+    (row) =>
+      partsDoNotSum(row, 'base') &&
+      partsDoNotSum(row, 'base', sumOf(outlaysOf(row, invoices, supplied))),
+  );
+}
+
 function anyInvoiceDoesNotSum(r: Reading): boolean {
   const notary = rows(r, 'notary_invoice', 'notaryInvoices');
   const registry = rows(r, 'registry_invoice', 'registryInvoices');
   const valuation = rows(r, 'valuation_invoice', 'valuationInvoices');
-  if ([...notary, ...registry, ...valuation].some((row) => partsDoNotSum(row, 'base'))) return true;
-  // The outlays are listed apart from the agency's invoices: they add up only against one.
-  const agency = rows(r, 'agency_invoice_mortgage', 'agencyInvoices');
-  const [only] = agency;
-  if (agency.length !== 1 || only === undefined) return false;
-  const supplied = rows(r, 'agency_invoice_mortgage', 'agencySupplied').reduce(
-    (sum, row) => sum + (num(row, 'amount') ?? 0),
-    0,
+  return (
+    [...notary, ...registry, ...valuation].some((row) => partsDoNotSum(row, 'base')) ||
+    agencyDoesNotSum(r)
   );
-  return partsDoNotSum(only, 'fee', supplied);
 }
 
-// An agency outlay for the tax or the registry that equals a return or a registry invoice in the
-// pack: the same payment twice, once as itself and once inside the agency's total.
+// Whether an outlay fits in what an agency invoice of its deed bills beyond its base and VAT, so
+// the invoice's total holds it; one on a statement of the funds apart fits in none.
+function insideAnInvoice(r: Reading, outlay: ExtractedRow, amount: number): boolean {
+  const invoices = rows(r, 'agency_invoice_mortgage', 'agencyInvoices');
+  const deed = outlay.values['deed'];
+  return invoices.some((row) => {
+    const total = num(row, 'total');
+    if (total === null || (deed !== undefined && row.values['concept'] !== deed)) return false;
+    const room = cents(total) - cents(num(row, 'base') ?? 0) - cents(num(row, 'vat') ?? 0);
+    return cents(amount) <= room + TOLERANCE_CENTS;
+  });
+}
+
+// An agency outlay for the loan's tax or registry, inside its invoice, that equals a return or a
+// registry invoice in the pack: the same payment twice, once as itself and once inside the
+// agency's total.
 function suppliedTwice(r: Reading): boolean {
   const paid = [
     ...rows(r, 'ajd_form', 'ajdForms').map((row) => num(row, 'amountPaid')),
@@ -66,10 +102,13 @@ function suppliedTwice(r: Reading): boolean {
   return rows(r, 'agency_invoice_mortgage', 'agencySupplied').some((row) => {
     const amount = num(row, 'amount');
     const concept = row.values['concept'];
+    const deed = row.values['deed'];
     return (
       amount !== null &&
       (concept === 'ajd' || concept === 'registry') &&
-      paid.some((p) => near(p, amount))
+      (deed === undefined || deed === 'loan') &&
+      paid.some((p) => near(p, amount)) &&
+      insideAnInvoice(r, row, amount)
     );
   });
 }

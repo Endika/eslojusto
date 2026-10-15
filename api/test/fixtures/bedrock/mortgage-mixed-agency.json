@@ -68,7 +68,8 @@
           "agencyInvoices": [
             {
               "invoiceOn": "2015-09-20",
-              "fee": 250,
+              "concept": "loan",
+              "base": 250,
               "vat": 52.5,
               "total": 2302.5,
               "confidence": "high"
@@ -77,11 +78,13 @@
           "agencySupplied": [
             {
               "concept": "ajd",
+              "deed": "loan",
               "amount": 1800,
               "confidence": "high"
             },
             {
               "concept": "other",
+              "deed": "loan",
               "amount": 200,
               "confidence": "high"
             }

@@ -404,7 +404,8 @@
         "agencyInvoices": [
           {
             "invoiceOn": "2024-02-05",
-            "fee": 322.31,
+            "concept": "loan",
+            "base": 322.31,
             "vat": 67.69,
             "total": 390
           }

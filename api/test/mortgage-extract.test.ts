@@ -112,8 +112,8 @@ describe('a mortgage read', () => {
   it('flags a mixed notary bill, an agency outlay paid twice and the purchase’s tax', async () => {
     const { extraction, failedChecks, metrics } = await ok('mortgage-mixed-agency', 4);
     expect(extraction.lists.agencySupplied?.map((r) => r.values)).toEqual([
-      { concept: 'ajd', amount: 1800 },
-      { concept: 'other', amount: 200 },
+      { concept: 'ajd', deed: 'loan', amount: 1800 },
+      { concept: 'other', deed: 'loan', amount: 200 },
     ]);
     expect(extraction.lists.ajdForms?.map((r) => r.values['concept'])).toEqual([
       'loan',
