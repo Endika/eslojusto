@@ -248,7 +248,7 @@ const employmentContract = {
       EMPLOYMENT_LIST_MAXIMA.clauses,
       {
         label: oneOf(CLAUSE_LABELS, 'retention is permanencia; overtime_included, in the salary.'),
-        literal: text(MAX_CLAUSE_LITERAL, 'The clause.' + LITERAL),
+        literal: text(MAX_CLAUSE_LITERAL, 'The clause, or its start if long.' + LITERAL),
         months: whole(0, 120, 'Months it lasts.'),
         compensationStated: flag('Whether it states a payment in return.'),
         trainingDescribed: flag(

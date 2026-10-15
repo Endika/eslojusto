@@ -846,7 +846,7 @@
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 600,
-                "description": "The clause. Word for word."
+                "description": "The clause, or its start if long. Word for word."
               },
               "months": {
                 "type": "integer",
