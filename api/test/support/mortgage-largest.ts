@@ -99,13 +99,15 @@ export function mortgageRecord(texts: 'largest' | 'typical'): Record<string, unk
     agency_invoice_mortgage: {
       agencyInvoices: rows(maxOf('agency_invoice_mortgage', 'agencyInvoices'), () => ({
         invoiceOn: '2019-07-20',
-        fee: 250,
+        concept: 'loan',
+        base: 250,
         vat: 52.5,
         total: 2302.5,
         confidence: 'high',
       })),
       agencySupplied: rows(MAX_SUPPLIED, () => ({
         concept: 'registry',
+        deed: 'loan',
         amount: 410.2,
         confidence: 'high',
       })),

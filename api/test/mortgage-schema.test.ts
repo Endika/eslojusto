@@ -71,8 +71,22 @@ describe('the mortgage tool schema', () => {
     );
     expect(listItem('ajd_form', 'ajdForms')['concept']?.['enum']).toEqual(['loan', 'purchase']);
     const notary = JSON.stringify(properties(schema)['notary_invoice']);
-    expect(notary).toContain('one entry for each part');
-    expect(notary).toContain('mixed true');
+    expect(notary).toContain('One entry for each part');
+    expect(notary).toContain('in one amount');
+  });
+
+  it('tells which deed each agency invoice and outlay was for', () => {
+    expect(listItem('agency_invoice_mortgage', 'agencyInvoices')['concept']?.['enum']).toEqual([
+      'loan',
+      'purchase',
+    ]);
+    expect(listItem('agency_invoice_mortgage', 'agencySupplied')['deed']?.['enum']).toEqual([
+      'loan',
+      'purchase',
+    ]);
+    expect(JSON.stringify(properties(schema)['agency_invoice_mortgage'])).toContain(
+      'liquidación de gastos',
+    );
   });
 
   it('never asks for a verdict on a clause, a cost or a fee', () => {

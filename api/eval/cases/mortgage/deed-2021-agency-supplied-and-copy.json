@@ -355,7 +355,8 @@
         "agencyInvoices": [
           {
             "invoiceOn": "2021-11-12",
-            "fee": 300,
+            "concept": "loan",
+            "base": 300,
             "vat": 63,
             "total": 803
           }
@@ -363,6 +364,7 @@
         "agencySupplied": [
           {
             "concept": "registry",
+            "deed": "loan",
             "amount": 440
           }
         ]

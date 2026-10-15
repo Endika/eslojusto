@@ -182,12 +182,12 @@ describe('what a mortgage read records', () => {
 
   it('fits every list at its maximum, with clauses of the usual length, a tenth under max_tokens', () => {
     const full = recordTokens(mortgageRecord('typical'));
-    expect(full).toBe(9_622);
+    expect(full).toBe(9_907);
     expect(full).toBeLessThanOrEqual(0.91 * room);
   });
 
   it('does not fit every list and every copied text at its limit', () => {
-    expect(recordTokens(mortgageRecord('largest'))).toBe(14_001);
+    expect(recordTokens(mortgageRecord('largest'))).toBe(14_286);
   });
 });
 

@@ -456,7 +456,8 @@
         "agencyInvoices": [
           {
             "invoiceOn": "2005-04-15",
-            "fee": 290,
+            "concept": "loan",
+            "base": 290,
             "vat": 46.4,
             "total": 2928.08
           }
@@ -464,10 +465,12 @@
         "agencySupplied": [
           {
             "concept": "ajd",
+            "deed": "loan",
             "amount": 2250
           },
           {
             "concept": "registry",
+            "deed": "loan",
             "amount": 341.68
           }
         ],

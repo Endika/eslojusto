@@ -361,7 +361,8 @@
         "agencyInvoices": [
           {
             "invoiceOn": "2015-11-10",
-            "fee": 250,
+            "concept": "loan",
+            "base": 250,
             "vat": 52.5,
             "total": 302.5
           }
