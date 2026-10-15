@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.61.4](https://github.com/Endika/eslojusto/compare/v1.61.3...v1.61.4) (2026-10-15)
+
+
+### Bug Fixes
+
+* **mortgage:** prefill only the loan's agency invoice and never block outlays paid apart ([7aa2d11](https://github.com/Endika/eslojusto/commit/7aa2d11004b60516510316c74fab97775b9d0ed8))
+* **mortgage:** read a mortgage acceptance as its registry; flag a purchase tax only alone ([ede82f9](https://github.com/Endika/eslojusto/commit/ede82f9ed3b01f4920394d027a8fc5704f2169e9))
+* **mortgage:** read which deed each agency invoice and outlay is for ([6d84a35](https://github.com/Endika/eslojusto/commit/6d84a35227cfca4b8fc9b97fa14ec5bdb950eace))
+
 ## [1.61.3](https://github.com/Endika/eslojusto/compare/v1.61.2...v1.61.3) (2026-10-15)
 
 
