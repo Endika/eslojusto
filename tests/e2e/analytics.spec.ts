@@ -735,7 +735,11 @@ test('the contract review sends sheets, field names and its outcome in codes, ne
   await choose(length, '¿Tu empresa tiene menos de 25 personas en plantilla?', 'No lo sé');
   await next();
   const before = sheet('Más sobre la prueba');
-  await choose(before, '¿Ya habías hecho este mismo trabajo en esta empresa?', 'No');
+  await choose(
+    before,
+    '¿Antes de este contrato ya habías hecho las mismas funciones en la misma empresa?',
+    'No',
+  );
   await choose(before, '¿Vienes de un contrato formativo en esta empresa?', 'No');
   await next();
   const holidays = sheet('Tus vacaciones');

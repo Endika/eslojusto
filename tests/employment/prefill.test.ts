@@ -289,6 +289,21 @@ describe('the payslips', () => {
     expect(mark(p, 'payslips.1.salary')?.confidence).toBe('medium');
   });
 
+  it('a prorated share of the extra pays answers that they are prorated, as worked out', () => {
+    expect(entry(p, 'extraProrated')).toBe('yes');
+    expect(mark(p, 'extraProrated')).toMatchObject({ derived: true, confidence: 'medium' });
+    const prorated = lines.filter((l) => l.values['category'] === 'prorated_extra_pay');
+    expect(entry(prefill({ fields: contract, payslips: slips, lines }), 'extraProrated')).toBe(
+      'no',
+    );
+    expect(
+      entry(
+        prefill({ payslips: slips, lines: lines.filter((l) => !prorated.includes(l)) }),
+        'extraProrated',
+      ),
+    ).toBeUndefined();
+  });
+
   it('says which lines it left out', () => {
     expect(p.notes).toContain(
       tr('client.employment.documents.lines_left_out', {

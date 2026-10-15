@@ -1847,7 +1847,10 @@ export const es = {
   'employment.trial.technical_hint':
     'Con un título universitario o de formación profesional superior, y trabajas en funciones de ese título.',
   'employment.trial.small_company': '¿Tu empresa tiene menos de 25 personas en plantilla?',
-  'employment.trial.same_duties': '¿Ya habías hecho este mismo trabajo en esta empresa?',
+  'employment.trial.same_duties':
+    '¿Antes de este contrato ya habías hecho las mismas funciones en la misma empresa?',
+  'employment.trial.same_duties_hint':
+    'Con cualquier contrato anterior, también uno temporal. Si es así, este contrato no puede tener periodo de prueba (art. 14.1).',
   'employment.trial.after_training': '¿Vienes de un contrato formativo en esta empresa?',
   'employment.trial.agreement': 'Periodo de prueba máximo de tu convenio, en meses',
 
