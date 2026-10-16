@@ -3,9 +3,6 @@ import type { Translation } from './translation';
 export const en: Translation = {
   'meta.og_image_alt': 'eslojusto.es logo: a sheet of paper with an orange tab.',
   'header.language': 'Language',
-  'review.label': 'Translation under review',
-  'review.text': 'This translation is under review and may contain errors.',
-  'review.spanish': 'Read the Spanish version, which is the one that counts.',
   'breadcrumb.label': 'You are here',
   'breadcrumb.home': 'Home',
   'home.title':
