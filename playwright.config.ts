@@ -2,6 +2,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 // The RTL project needs a TEST_RTL=1 build, so it only exists when that build is asked for.
 const rtl = process.env['TEST_RTL'] === '1';
+// The review project needs a build that serves an unpublished language to its reviewer.
+const review = process.env['TEST_REVIEW'] === '1';
 // The analytics project needs a build with an analytics key; every other build has none.
 const analytics = process.env['TEST_ANALYTICS'] === '1';
 // The documents project needs a build with a (fake) documents API; the page routes it.
@@ -32,7 +34,7 @@ const mortgageSpecs = /[\\/]mortgage[^\\/]*\.spec\.ts$/;
 const bills = process.env['TEST_BILLS'] === '1';
 const billsSpecs = /[\\/]bills\.spec\.ts$/;
 const optInSpecs = [
-  /(rtl|analytics|documents)\.spec\.ts/,
+  /(rtl|review|analytics|documents)\.spec\.ts/,
   rentalSpecs,
   employmentSpecs,
   erteSpecs,
@@ -54,7 +56,8 @@ const buildEnv = {
   ...(erte ? { PUBLIC_ERTE: '1' } : {}),
   // The household, insurance and credit projects also measure their own events, so their builds
   // have a test analytics key.
-  ...(household ? { PUBLIC_HOUSEHOLD: '1' } : {}),
+  ...(household || review ? { PUBLIC_HOUSEHOLD: '1' } : {}),
+  ...(review ? { REVIEW_LANGS: 'eu' } : {}),
   ...(insurance || documents ? { PUBLIC_INSURANCE: '1' } : {}),
   ...(credit || documents ? { PUBLIC_CREDIT: '1' } : {}),
   ...(mortgage || documents || analytics ? { PUBLIC_MORTGAGE: '1' } : {}),
@@ -84,6 +87,9 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] }, testIgnore: optInSpecs },
     ...(rtl
       ? [{ name: 'rtl', use: { ...devices['Desktop Chrome'] }, testMatch: /rtl\.spec\.ts/ }]
+      : []),
+    ...(review
+      ? [{ name: 'review', use: { ...devices['Desktop Chrome'] }, testMatch: /review\.spec\.ts/ }]
       : []),
     ...(analytics
       ? [

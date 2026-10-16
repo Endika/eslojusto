@@ -14,7 +14,7 @@ import '../styles/pages.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { t, clientStrings } from '../i18n';
-import { LANGS, link, publishedLangs, type Lang } from '../i18n/languages';
+import { LANGS, link, publishedLangs, reviewLangs, type Lang } from '../i18n/languages';
 import { contentSecurityPolicy } from './csp';
 import { DOCUMENTS } from '../documents/config';
 
@@ -49,6 +49,8 @@ const root = base.replace(/\/$/, '');
 const url = (i: Lang) => new URL(link(i, path.replace(/^\//, '')), Astro.site);
 const canonical = url(lang);
 const { dir, published } = LANGS[lang];
+// A language served only to its reviewer says so on every page, with the Spanish one a click away.
+const underReview = reviewLangs().includes(lang);
 // An unpublished language (only ar-test, under TEST_RTL=1) and a noindex page (the 404) are
 // never indexed nor announced; the 404 is served at any address, so it names no canonical.
 const indexable = published && !noindex;
@@ -139,6 +141,16 @@ const otherLangsJson = JSON.stringify(otherLangs).replace(/</g, '\\u003c');
   <body data-section={section}>
     <slot name="tabs" />
     <div class="ground">
+      {underReview && (
+        <aside class="review-banner" aria-label={t(lang, 'review.label')}>
+          <p>
+            {t(lang, 'review.text')}{' '}
+            <a href={url('es').pathname} hreflang="es">
+              {t(lang, 'review.spanish')}
+            </a>
+          </p>
+        </aside>
+      )}
       <Header lang={lang} />
       <slot />
     </div>
