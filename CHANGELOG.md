@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.79.0](https://github.com/Endika/eslojusto/compare/v1.78.0...v1.79.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** drop the banner on pages under review ([3a1a031](https://github.com/Endika/eslojusto/commit/3a1a031fd08899c396026fb9a05401bee86f2f36))
+
 ## [1.78.0](https://github.com/Endika/eslojusto/compare/v1.77.0...v1.78.0) (2026-10-16)
 
 
