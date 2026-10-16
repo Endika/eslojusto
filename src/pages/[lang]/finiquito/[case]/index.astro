@@ -1,0 +1,17 @@
+---
+import type { GetStaticPaths } from 'astro';
+import CasePage from '../../../../views/CasePage.astro';
+import { casePaths } from '../../../../content/landings';
+import { prose } from '../../../../prose';
+import type { Lang } from '../../../../i18n/languages';
+
+export const getStaticPaths = (() => casePaths('finiquito')) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+const { id } = Astro.props;
+const Prose = prose(lang, id);
+---
+
+<CasePage id={id} lang={lang}>
+  <Prose lang={lang} />
+</CasePage>

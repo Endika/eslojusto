@@ -1,12 +1,13 @@
 ---
-import { LANDINGS, type LandingId } from '../content/landings';
-import { link } from '../i18n/languages';
+import { LANDINGS, landingCopy, type LandingId } from '../content/landings';
+import { link, type Lang } from '../i18n/languages';
 
 // A link to a case page, always with that page's own name as its text.
 interface Props {
+  lang: Lang;
   id: LandingId;
 }
-const { path, name } = LANDINGS[Astro.props.id];
+const { lang, id } = Astro.props;
 ---
 
-<a href={link('es', path.replace(/^\//, ''))}>{name}</a>
+<a href={link(lang, LANDINGS[id].path.replace(/^\//, ''))}>{landingCopy(lang, id).name}</a>

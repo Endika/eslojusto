@@ -1,0 +1,15 @@
+---
+import type { GetStaticPaths } from 'astro';
+import CasePage from '../../../views/CasePage.astro';
+import { langPaths, type Lang } from '../../../i18n/languages';
+import { prose } from '../../../prose';
+
+export const getStaticPaths = langPaths satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+const Prose = prose(lang, 'benefit');
+---
+
+<CasePage id="benefit" lang={lang}>
+  <Prose lang={lang} />
+</CasePage>

@@ -40,6 +40,20 @@ test('its language menu switches to the same page in Spanish, and closes on Esca
   await expect(page.locator('html')).toHaveAttribute('lang', 'es');
 });
 
+test('the case pages are under review too, and link within the language', async ({ page }) => {
+  for (const path of [
+    'eu/paro/',
+    'eu/finiquito/baja-voluntaria/',
+    'eu/paro/despido-disciplinario/',
+  ]) {
+    const response = await page.goto(path);
+    expect(response?.status(), path).toBe(200);
+    await expect(page.locator('.review-banner')).toBeVisible();
+  }
+  await page.goto('eu/finiquito/baja-voluntaria/');
+  await expect(page.locator('.next-pages a').first()).toHaveAttribute('href', '/eu/finiquito/');
+});
+
 test('the Spanish pages neither link nor offer it', async ({ page }) => {
   await page.goto('');
   await expect(page.locator('.review-banner')).toHaveCount(0);
