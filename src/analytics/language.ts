@@ -47,6 +47,10 @@ export interface OtherLanguage {
   readonly code: string;
   readonly name: string;
   readonly url: string;
+  // The bar's words in the language it offers, when the page ships them.
+  readonly text?: string;
+  readonly aria?: string;
+  readonly close?: string;
 }
 
 // Another published language of this page that matches the browser's, for a visitor on Spanish.
@@ -78,21 +82,28 @@ export function offerOtherLanguage(
   const target = new URL(suggested.url, doc.location.href);
   if (target.origin !== doc.location.origin) return;
 
+  // In the language it offers, which the visitor reads; the page's own if it ships none.
+  const words = {
+    text: suggested.text ?? tr('client.other_language.text'),
+    aria: suggested.aria ?? tr('client.other_language.aria'),
+    close: suggested.close ?? tr('client.other_language.close'),
+  };
   const bar = doc.createElement('aside');
   bar.className = 'other-language';
-  bar.setAttribute('aria-label', tr('client.other_language.aria'));
+  if (suggested.text) bar.lang = suggested.code;
+  bar.setAttribute('aria-label', words.aria);
   const text = doc.createElement('p');
   const link = doc.createElement('a');
   link.href = target.pathname;
   link.hreflang = suggested.code;
   link.lang = suggested.code;
   link.textContent = suggested.name;
-  const [before = '', after = ''] = tr('client.other_language.text').split('{idioma}');
+  const [before = '', after = ''] = words.text.split('{idioma}');
   text.append(before, link, after);
   const close = doc.createElement('button');
   close.type = 'button';
   close.className = 'other-language__close';
-  close.setAttribute('aria-label', tr('client.other_language.close'));
+  close.setAttribute('aria-label', words.close);
   close.append(closeIcon(doc));
   close.addEventListener('click', () => bar.remove());
   bar.append(text, close);

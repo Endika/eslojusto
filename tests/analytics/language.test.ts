@@ -104,6 +104,25 @@ describe('the «Esta página también está en …» bar', () => {
       es['client.other_language.close'],
     );
   });
+  it('speaks the language it offers when the page ships its words', () => {
+    document.body.innerHTML = `<div class="ground"></div><script id="other-languages" type="application/json">${JSON.stringify(
+      others.map((o) => ({
+        ...o,
+        text: 'This page is also in {idioma}.',
+        aria: 'Another language',
+        close: 'Close the language notice',
+      })),
+    )}</script>`;
+    document.documentElement.lang = 'es';
+    offerOtherLanguage(document, ['ar'], tr);
+    const bar = document.querySelector<HTMLElement>('.other-language');
+    expect(bar?.textContent).toBe('This page is also in Pseudo RTL.');
+    expect(bar?.lang).toBe('ar-test');
+    expect(bar?.getAttribute('aria-label')).toBe('Another language');
+    expect(bar?.querySelector('button')?.getAttribute('aria-label')).toBe(
+      'Close the language notice',
+    );
+  });
   it('the close button carries a drawn icon, no glyph', () => {
     setUp();
     offerOtherLanguage(document, ['ar'], tr);

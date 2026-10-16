@@ -1,3 +1,4 @@
+import { LANGS } from '../i18n/languages';
 import { PATH as RENT_INDICES, lastChanged } from './rent-indices';
 
 // The day each page's content last changed, for the sitemap's lastmod. Update a page's date only
@@ -61,3 +62,8 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
       }
     : {}),
 };
+
+// A page in another language changes when its Spanish one does: `/eu/paro/` reads `/paro/`.
+const LANG_PREFIX = new RegExp(`^/(${Object.keys(LANGS).join('|')})(?=/)`);
+export const lastUpdated = (path: string): string | undefined =>
+  LAST_UPDATED[path.replace(LANG_PREFIX, '')];

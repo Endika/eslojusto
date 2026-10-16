@@ -26,3 +26,13 @@ describe('what each language writes on its own', () => {
     },
   );
 });
+
+describe('the sitemap date of a page in another language', () => {
+  it('is its Spanish page’s', async () => {
+    const { LAST_UPDATED, lastUpdated } = await import('../../src/content/updated');
+    expect(lastUpdated('/eu/finiquito/')).toBe(LAST_UPDATED['/finiquito/']);
+    expect(lastUpdated('/zh/')).toBe(LAST_UPDATED['/']);
+    expect(lastUpdated('/finiquito/')).toBe(LAST_UPDATED['/finiquito/']);
+    expect(lastUpdated('/xx/finiquito/')).toBeUndefined();
+  });
+});

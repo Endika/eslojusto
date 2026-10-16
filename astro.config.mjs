@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { DEFAULT_LANG, LANGS, builtLangs } from './src/i18n/languages.ts';
-import { LAST_UPDATED } from './src/content/updated.ts';
+import { lastUpdated } from './src/content/updated.ts';
 
 const base = process.env.BASE ?? '/';
 const root = base.replace(/\/?$/, '/');
@@ -25,7 +25,8 @@ export default defineConfig({
         !unpublished.some((lang) => new URL(page).pathname.startsWith(`${root}${lang}/`)),
       serialize: (item) => {
         const path = `/${new URL(item.url).pathname.slice(root.length)}`;
-        return LAST_UPDATED[path] ? { ...item, lastmod: LAST_UPDATED[path] } : item;
+        const lastmod = lastUpdated(path);
+        return lastmod ? { ...item, lastmod } : item;
       },
     }),
   ],
