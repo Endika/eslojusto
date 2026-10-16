@@ -1,13 +1,15 @@
 ---
 import CalculatorPage from './CalculatorPage.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
-import FinalPayGuide from '../components/FinalPayGuide.astro';
+import FinalPayGuide from '../prose/es/final-pay-guide.astro';
 import { DOCUMENTS } from '../documents/config';
 import { faqPage } from '../content/faq';
 import { breadcrumbList, calculatorApp, trail } from '../content/structured-data';
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
 
+// The calculator of /finiquito/ and its guide: the Spanish one, or another language's from
+// src/prose/ in the slot.
 interface Props {
   lang: Lang;
 }
@@ -34,7 +36,9 @@ const crumbs = trail(lang, { name: tx('home.final_pay'), path: '/finiquito/' });
   lead={tx(documents ? 'final_pay.lead_documents' : 'final_pay.lead')}
 >
   <Breadcrumbs slot="head" lang={lang} crumbs={crumbs} />
-  <FinalPayGuide lang={lang} documents={documents} />
+  <slot>
+    <FinalPayGuide lang={lang} />
+  </slot>
 </CalculatorPage>
 
 <script>

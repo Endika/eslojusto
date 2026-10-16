@@ -1,23 +1,26 @@
 ---
-import FigureTable from './FigureTable.astro';
-import CaseLink from './CaseLink.astro';
-import { faqEntries } from '../content/faq';
-import { bySeniority } from '../content/examples';
-import { wholeEuroRange, wholeEuros } from '../content/format';
-import { LANDINGS, type LandingId } from '../content/landings';
-import { ET, SOURCES, LGSS } from '../engine/sources';
-import { t, type Key } from '../i18n';
-import { link, type Lang } from '../i18n/languages';
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { faqEntries } from '../../content/faq';
+import { bySeniority } from '../../content/examples';
+import { wholeEuroRange, wholeEuros } from '../../content/format';
+import { LANDINGS, type LandingId } from '../../content/landings';
+import { ET, SOURCES, LGSS } from '../../engine/sources';
+import { DOCUMENTS } from '../../documents/config';
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
 
 interface Props {
   lang: Lang;
-  documents?: boolean;
 }
-const { lang, documents = false } = Astro.props;
+const { lang } = Astro.props;
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
 const tx = (key: Key) => t(lang, key);
 
-// Headings and labels come from the dictionary. The explanatory prose, the rules and the worked
-// examples are Spanish legal text: a language gets its own localized guide once it is reviewed.
+// The guide under the calculator of /finiquito/, in Spanish: headings and labels from the
+// dictionary, the prose, the rules and the worked examples here. Another language's guide is a
+// translated copy of this file in src/prose/<lang>/.
 const causes: { title: string; rule: string; citation: string; page?: LandingId }[] = [
   {
     title: tx('guide.unfair_dismissal'),
