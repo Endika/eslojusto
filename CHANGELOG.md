@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.66.0](https://github.com/Endika/eslojusto/compare/v1.65.1...v1.66.0) (2026-10-16)
+
+
+### Features
+
+* **insurance:** take /seguros/ out of beta ([8c43958](https://github.com/Endika/eslojusto/commit/8c439580b50cd79b05f8efbb3b601b9e823e1ed3))
+
 ## [1.65.1](https://github.com/Endika/eslojusto/compare/v1.65.0...v1.65.1) (2026-10-16)
 
 
