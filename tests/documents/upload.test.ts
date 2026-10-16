@@ -804,6 +804,20 @@ describe('the start sheet', () => {
       );
     });
 
+    it('drops a pass the locate step finds spent, as a refused read does', async () => {
+      const token = passToken({ typ: 'pass', sid: 'cs_test_1', exp: NOW / 1000 + 3600 });
+      const used = setUp(settlement, { locate: { ok: false, code: 'pass_exhausted' } });
+      used.passes.savePass({ token, expiresAt: NOW / 1000 + 3600, readsLeft: 5 });
+      choose([deed(57)]);
+      await flush();
+      await submit();
+      await flush();
+      expect(used.locateRequests[0]).toHaveProperty('pass', token);
+      expect(used.passes.pass()?.readsLeft).toBe(0);
+      expect(used.requests).toEqual([]);
+      expect(listed()).toHaveLength(1);
+    });
+
     it('reads a PDF whole, without locating, once removing files has made room for it', async () => {
       const { requests, locateRequests } = setUp(settlement, { locate: located });
       choose(
