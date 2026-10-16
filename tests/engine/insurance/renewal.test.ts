@@ -220,8 +220,14 @@ describe('premium change', () => {
   });
 
   it('without both premiums there is nothing to compare', () => {
+    const nextOnly = premiumOf(
+      policy({ notice: notice({ previousPremium: null }) }),
+      INSURANCE_NORMS,
+    );
+    expect(nextOnly.status).toBe('next_only');
+    expect(nextOnly.calculation[0]?.vars?.next).toEqual({ euros: notice().newPremium });
     expect(
-      premiumOf(policy({ notice: notice({ previousPremium: null }) }), INSURANCE_NORMS).status,
+      premiumOf(policy({ notice: notice({ newPremium: null }) }), INSURANCE_NORMS).status,
     ).toBe('not_entered');
     expect(premiumChange(policy(), INSURANCE_NORMS)).toBeNull();
   });

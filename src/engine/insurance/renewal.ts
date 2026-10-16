@@ -83,6 +83,14 @@ export function changeNotice(
 export function premiumChange(input: InsuranceInput, norms: NormTable): Finding | null {
   const notice = input.notice;
   if (notice === null) return null;
+  if (notice.previousPremium === null && notice.newPremium !== null)
+    return finding(
+      'premium',
+      'next_only',
+      [insurancePhrase('premium.next_only', { next: { euros: notice.newPremium } })],
+      [],
+      norms,
+    );
   if (notice.previousPremium === null || notice.newPremium === null)
     return finding('premium', 'not_entered', [insurancePhrase('item.not_entered')], [], norms);
   const difference = round2(notice.newPremium - notice.previousPremium);

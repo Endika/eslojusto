@@ -655,6 +655,7 @@ const INSURANCE_STATUSES = [
   'not_entered',
   'on_time',
   'late',
+  'next_only',
   'up',
   'same',
   'down',

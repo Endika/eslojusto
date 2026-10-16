@@ -20,6 +20,7 @@ export type InsurancePhraseKey =
   | 'change_notice.month_end'
   | 'change_notice.any_change'
   | 'change_notice.premium_only'
+  | 'premium.next_only'
   | 'premium.up'
   | 'premium.same'
   | 'premium.down'
