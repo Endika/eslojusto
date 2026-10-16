@@ -23,6 +23,7 @@
     "case-law:review": "vitest run tests/engine/law/last-verified.test.ts --reporter=verbose",
     "legal-interest:review": "vitest run tests/engine/law/interest.test.ts --reporter=verbose",
     "bills:due": "vitest run tests/engine/bills/due.test.ts tests/engine/law/conditional.test.ts --reporter=verbose",
+    "i18n:stamp": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/i18n-stamp.mjs",
     "indices:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indices.mjs --check",
     "indices:due": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indices-due.mjs",
     "bde:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/bde-series.mjs --check",
