@@ -1,0 +1,616 @@
+---
+// source: 09f730db2222
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+import { DOCUMENTS } from '../../documents/config';
+import { OUTAGE_KEY } from '../../documents/outage';
+import { STORAGE_KEYS } from '../../documents/pass';
+import {
+  BILLS_BUILD,
+  CREDIT_BUILD,
+  EMPLOYMENT_BUILD,
+  HOUSEHOLD_BUILD,
+  INSURANCE_BUILD,
+  MORTGAGE_BUILD,
+  RENTAL_BUILD,
+} from '../../content/sections';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const tx = (key: Key) => t(lang, key);
+
+const email = 'hola@eslojusto.es';
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+// The rental review exists only in a PUBLIC_RENTAL=1 build; so do the paragraphs about it.
+const rental = RENTAL_BUILD;
+// The contract review exists only in a PUBLIC_EMPLOYMENT=1 build; so do the paragraphs about it.
+const employment = EMPLOYMENT_BUILD;
+// The household review exists only in a PUBLIC_HOUSEHOLD=1 build; so do the paragraphs about it.
+const household = HOUSEHOLD_BUILD;
+// The credit and insurance reviews exist only in a PUBLIC_CREDIT=1 or PUBLIC_INSURANCE=1 build; so
+// do the paragraphs about each.
+const credit = CREDIT_BUILD;
+const insurance = INSURANCE_BUILD;
+// The mortgage review exists only in a PUBLIC_MORTGAGE=1 build; so do the paragraphs about it.
+const mortgage = MORTGAGE_BUILD;
+// The bills reviews exist only in a PUBLIC_BILLS=1 build; so do the paragraphs about them.
+const bills = BILLS_BUILD;
+
+// One entry per thing that is stored or processed; a new tool adds a row here.
+const stored = [
+  {
+    what: tx('privacy.data_review'),
+    where:
+      'في متصفحك فقط، ما دامت الصفحة مفتوحة. يُجرى الحساب على جهازك: تواريخك، وراتبك، وأرقام تسويتك النهائية ⁨(finiquito)⁩، وأبناؤك أو بناتك الذين تعيلهم، وعقودك الأخرى لا تُرسَل إلى أي خادم ولا تُحفَظ. عند إغلاق الصفحة أو إعادة تحميلها، تختفي.',
+  },
+  ...(rental
+    ? [{ what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') }]
+    : []),
+  ...(employment
+    ? [
+        {
+          what: tx('privacy.employment.data_review'),
+          where: tx('privacy.employment.data_review_where'),
+        },
+      ]
+    : []),
+  ...(household
+    ? [
+        {
+          what: tx('privacy.household.data_review'),
+          where: tx('privacy.household.data_review_where'),
+        },
+      ]
+    : []),
+  ...(credit
+    ? [{ what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') }]
+    : []),
+  ...(insurance
+    ? [
+        {
+          what: tx('privacy.insurance.data_review'),
+          where: tx('privacy.insurance.data_review_where'),
+        },
+      ]
+    : []),
+  ...(mortgage
+    ? [
+        {
+          what: tx('privacy.mortgage.data_review'),
+          where: tx('privacy.mortgage.data_review_where'),
+        },
+      ]
+    : []),
+  ...(bills
+    ? [
+        { what: tx('privacy.bills.data_review'), where: tx('privacy.bills.data_review_where') },
+        ...(documents
+          ? [{ what: tx('privacy.bills.data_year'), where: tx('privacy.bills.data_year_where') }]
+          : []),
+      ]
+    : []),
+  {
+    what: tx('privacy.data_analytics'),
+    where:
+      'إشعارات قصيرة برموز وفئات، تُرسَل إلى PostHog أثناء استخدامك الصفحة (التفاصيل أدناه). يعيش معرّف الصفحة المعروضة في ذاكرتها فقط: لا يُكتَب على جهازك ويضيع عند إغلاقها أو إعادة تحميلها.',
+  },
+  ...(documents
+    ? [
+        {
+          what: tx('privacy.data_documents'),
+          where:
+            'فقط إذا اخترت رفع مستنداتك (رسالة الفصل، والتسوية النهائية ⁨(finiquito)⁩، وقسائم راتبك، وشهادة الشركة ⁨(certificado de empresa)⁩، واتفاق مصالحة أو محضر مصالحة ⁨(acta de conciliación)⁩، أو سجلك المهني ⁨(vida laboral)⁩) وأعطيت موافقتك. تتحوّل ملفات PDF إلى صور لصفحاتها داخل متصفحك، دون أن تغادره، وقبل إرسال أي شيء تفحص الصفحة، في متصفحك أيضًا، ما إذا كانت أي صورة تبدو داكنة أو ضبابية أو صغيرة. تنتقل تلك الصور والصور الملتقطة مشفّرةً إلى خادم تابع لـ eslojusto.es لدى Amazon Web Services، في إسبانيا (المنطقة eu-south-2)، يمرّرها إلى نموذج ذكاء اصطناعي ⁨(Claude)⁩ من Anthropic عبر Amazon Bedrock، داخل الاتحاد الأوروبي. يحدّد نموذج الذكاء الاصطناعي نوع المستند في كل صفحة، وينسخ البيانات التي يطلبها النموذج، ويعود ما قُرئ إلى متصفحك. لا يُحفَظ شيء: لا توجد المستندات إلا في ذاكرة الخادم أثناء قراءتها، وسجلاتها، التي تُحفَظ 14 يومًا، لا تتضمّن إلا بيانات تقنية: النتيجة، وعدد الصفحات، والمدة التي استغرقتها، وكمية النص التي عالجها نموذج الذكاء الاصطناعي، وبعض علامات التشغيل، مثل ما إذا لزمت قراءة ثانية، وعدد البيانات التي لم تتطابق بين المستندات (دون ذكر أيّها ولا قيمها)، أو عدد الصفحات التي تعذّرت قراءتها وسبب ذلك (مثلًا، ضبابية أو من بلد آخر). ولا تتضمّن أبدًا المحتوى ولا أي شيء يحدّد هويتك.',
+        },
+        ...(rental
+          ? [
+              {
+                what: tx('privacy.rental.data_documents'),
+                where: tx('privacy.rental.data_documents_where'),
+              },
+              {
+                what: tx('privacy.rental.data_letters'),
+                where: tx('privacy.rental.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(employment
+          ? [
+              {
+                what: tx('privacy.employment.data_documents'),
+                where: tx('privacy.employment.data_documents_where'),
+              },
+              {
+                what: tx('privacy.employment.data_letters'),
+                where: tx('privacy.employment.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(credit
+          ? [
+              {
+                what: tx('privacy.credit.data_documents'),
+                where: tx('privacy.credit.data_documents_where'),
+              },
+              {
+                what: tx('privacy.credit.data_letters'),
+                where: tx('privacy.credit.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(insurance
+          ? [
+              {
+                what: tx('privacy.insurance.data_documents'),
+                where: tx('privacy.insurance.data_documents_where'),
+              },
+              {
+                what: tx('privacy.insurance.data_letters'),
+                where: tx('privacy.insurance.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(mortgage
+          ? [
+              {
+                what: tx('privacy.mortgage.data_documents'),
+                where: tx('privacy.mortgage.data_documents_where'),
+              },
+              {
+                what: tx('privacy.mortgage.data_letters'),
+                where: tx('privacy.mortgage.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(bills
+          ? [
+              {
+                what: tx('privacy.bills.data_documents'),
+                where: tx('privacy.bills.data_documents_where'),
+              },
+              {
+                what: tx('privacy.bills.data_letters'),
+                where: tx('privacy.bills.data_letters_where'),
+              },
+            ]
+          : []),
+        {
+          what: tx('privacy.data_pass'),
+          where: `في التخزين المحلي ⁨(localStorage)⁩ لمتصفحك، وفقط إذا استخدمتها: عدّاد موقَّع لقراءاتك المجانية في اليوم («${STORAGE_KEYS.quota}»)؛ وإذا اشتريت التصريح، التصريح والقراءات المتبقية فيه («${STORAGE_KEYS.pass}») ورمز كل عملية دفع تبدؤها، مع رقم عشوائي لا يعرفه إلا متصفحك، ليمكن استرجاع التصريح («${STORAGE_KEYS.checkout}»؛ تُزال كل عملية دفع بعد 7 أيام إذا لم تكتمل، أو عندما ينتهي تصريحها). لا تحمل اسمك ولا أي شيء من مستنداتك، ولا تغادر جهازك إلا مع القراءة التالية، أو لاسترجاع التصريح، أو للتحقق منه قبل أن يُعرَض عليك تفصيل مراجعتك أو التقرير أو الرسالة. يتلقّاها خادم eslojusto.es لدى AWS، الذي يسأل Stripe عن الدفع. يُحذَف التصريح المنتهي والعدّاد الخاص بيوم سابق تلقائيًا في المرة التالية التي تطّلع عليهما فيها الصفحة، ويُحذَف كل شيء عند حذف بيانات هذا الموقع في متصفحك؛ ولهذا لا يصلح التصريح إلا في هذا المتصفح ويضيع على جهاز آخر، أو في نافذة خاصة، أو عند حذف تلك البيانات. إذا لم تكن القراءة متاحة، تتذكّر علامة التبويب ذلك لمدة ساعة في تخزين الجلسة الخاص بها («${OUTAGE_KEY}»، مع الوقت فقط) كي لا تعرضها عليك في الأثناء.`,
+        },
+        {
+          what: tx('privacy.data_checkout'),
+          where: `إذا دفعت، تُحفَظ أجوبة مراجعتك في تخزين الجلسة ⁨(sessionStorage)⁩ لعلامة التبويب تلك ما دمت في صفحة الدفع، لعرض النتيجة عليك عند عودتك.${bills ? ' وفي فواتير الكهرباء تُحفَظ بالطريقة نفسها أجوبة كل فاتورة من سنتك سبق أن راجعتها، دون البصمة الرقمية لرمز نقطة التزويد.' : ''} لا تغادر جهازك وتُحذَف عند عودتك أو عند إغلاق علامة التبويب.`,
+        },
+      ]
+    : []),
+  {
+    what: tx('privacy.data_theme'),
+    where:
+      'في التخزين المحلي ⁨(localStorage)⁩ لمتصفحك، وفقط إذا ضغطت زر المظهر. لا يغادر جهازك أبدًا. ويُحذَف عند حذف بيانات هذا الموقع في متصفحك.',
+  },
+  {
+    what: tx('privacy.data_server'),
+    where:
+      'الموقع مستضاف على GitHub Pages. يسجّل GitHub عنوان IP والبيانات التقنية لكل زيارة، مثل أي خادم ويب.',
+  },
+];
+
+// The allowlist (src/analytics/sanitize.ts) and the event catalogue (src/analytics/events.ts), in
+// plain words. Keep all three in step: the analytics e2e asserts the exact keys.
+const tracked = [
+  {
+    when: 'مع كل إشعار',
+    what: 'تاريخ كل إشعار ووقته، ورقم عشوائي لا يوجد إلا ما دامت الصفحة مفتوحة. عنوان الصفحة دون معاملات: النطاق، والمسار، وصفحة المراجعة التي أنت فيها. متصفحك وإصداره، ونظامك ⁨(Windows, Android…)⁩. نوع الجهاز (حاسوب، أو هاتف محمول، أو جهاز لوحي) وحجم النافذة. نطاق الموقع الذي أتيت منه (مثلًا «www.google.com»)، دون العنوان الكامل. إذا وصلت من رابط حملة، مصدرها ووسيطها واسمها ⁨(utm_source, utm_medium, utm_campaign)⁩، فقط عندما تكون رمزًا قصيرًا من حروف وأرقام وشرطات. وثلاثة بيانات تقنية من PostHog: مفتاح مشروع eslojusto.es، وإصدار شيفرته، وعلامة تطلب منه عدم إنشاء أي ملف تعريفي.',
+  },
+  {
+    when: 'عند فتح صفحة',
+    what: 'أنك فتحتها، واللغة الرئيسية لمتصفحك، الجزء العام منها فقط: «ja»، وليس «ja-JP».',
+  },
+  {
+    when: 'عند مغادرة صفحة',
+    what: 'المدة التي بقيتها في الصفحة وإلى أين نزلت فيها.',
+  },
+  {
+    when: 'إذا استخدمت مترجم المتصفح',
+    what: 'اللغة التي تترجم إليها الصفحة، مثلًا «ar».',
+  },
+  {
+    when: 'في كل صفحة من صفحات المراجعة',
+    what: 'أنك تفتحها، وعند إنهائها، المدة التي استغرقتها ضمن فئة واسعة: أقل من 10 ثوانٍ، أو من 10 إلى 30، أو من 30 إلى 60، أو من 60 إلى 180، أو أكثر من 180. وإذا عدت إلى الخلف، من أي صفحة إلى أيّها.',
+  },
+  {
+    when: 'إذا لم تُقبَل معلومة',
+    what: 'اسم الحقل، مثلًا «تاريخ انتهاء العمل». وليس أبدًا ما كتبته فيه.',
+  },
+  {
+    when: 'إذا فتحت مساعدة',
+    what: 'أي سؤال شائع تفتحه، أو لأي بند تطّلع على «طريقة الحساب».',
+  },
+  {
+    when: 'عند المراجعة',
+    what: 'سبب انتهاء العقد، ونوع العقد المؤقت، وطريقة قبضك للدفعات الإضافية ⁨(pagas extra)⁩، وما إذا كنت تحسب الإجازات بأيام العمل ⁨(laborables)⁩ أو بالأيام التقويمية ⁨(naturales)⁩، وإذا كانت بأيام العمل، ما إذا كنت تعمل 5 أو 6 أيام في الأسبوع أو عددًا آخر، كما تختارها في الخيارات. وعدد البنود التي تحمل رقمًا من تسويتك النهائية، وعدد ما يأتي منها أقل، أو مطابقًا، أو أعلى، أو دون إمكانية التحقق منه. وما إذا كان يُخصَم منك من مهلة الإشعار المسبق أكثر من الحد الأقصى. وما إذا عُرض ما كان سيُدفَع في حالة الفصل غير المبرَّر ⁨(despido improcedente)⁩، دون الرقم. وما إذا ظهرت النتيجة ملخّصة أو بتفاصيل التصريح. وما إذا كان الفرق صفرًا، أو أقل من 100 €، أو من 100 إلى 500 €، أو من 500 إلى 2.000 €، أو أكثر. وعدد المرات التي راجعت فيها في هذه الصفحة، والمدة التي استغرقتها ضمن فئات، وإذا راجعت مرة أخرى، أسماء الحقول التي غيّرتها. ومن إعانة البطالة ⁨(paro)⁩، فقط ما إذا كان التقدير لا ينطبق على سببك، أو يتضمّن أرقامًا، أو يظهر دونها، وعدد العقود الأخرى التي أضفتها، ضمن فئة: 0، أو 1، أو 2، أو 3 أو أكثر. ولا يُرسَل أبدًا عدد الأبناء أو البنات الذين تعيلهم ولا أي تاريخ من تلك العقود. ومن إجراء ERTE ومن سؤال ما إذا دُفع لك، فقط اسم السؤال إذا غيّرته، وليس الجواب أبدًا. وما تؤشّر عليه بشأن فصل باطل محتمل (الحمل، والإجازات الخاصة ⁨(permisos)⁩، والإجازة المرضية…) لا يُرسَل أبدًا، حتى لو أشّرت على شيء.',
+  },
+  {
+    when: 'عند الضغط على «البدء من جديد»',
+    what: 'أنك ضغطته.',
+  },
+  ...(rental
+    ? [
+        {
+          when: tx('privacy.rental.tracked_sheets'),
+          what: tx('privacy.rental.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.rental.tracked_scope'),
+          what: tx('privacy.rental.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.rental.tracked_review'),
+          what: tx('privacy.rental.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(employment
+    ? [
+        {
+          when: tx('privacy.employment.tracked_sheets'),
+          what: tx('privacy.employment.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_scope'),
+          what: tx('privacy.employment.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_review'),
+          what: tx('privacy.employment.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(household
+    ? [
+        {
+          when: tx('privacy.household.tracked_sheets'),
+          what: tx('privacy.household.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.household.tracked_scope'),
+          what: tx('privacy.household.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.household.tracked_review'),
+          what: tx('privacy.household.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(credit
+    ? [
+        {
+          when: tx('privacy.credit.tracked_sheets'),
+          what: tx('privacy.credit.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_scope'),
+          what: tx('privacy.credit.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_review'),
+          what: tx('privacy.credit.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(insurance
+    ? [
+        {
+          when: tx('privacy.insurance.tracked_sheets'),
+          what: tx('privacy.insurance.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_scope'),
+          what: tx('privacy.insurance.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_review'),
+          what: tx('privacy.insurance.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(mortgage
+    ? [
+        {
+          when: tx('privacy.mortgage.tracked_sheets'),
+          what: tx('privacy.mortgage.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_scope'),
+          what: tx('privacy.mortgage.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_review'),
+          what: tx('privacy.mortgage.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(bills
+    ? [
+        {
+          when: tx('privacy.bills.tracked_sheets'),
+          what: tx('privacy.bills.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_scope'),
+          what: tx('privacy.bills.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_review'),
+          what: tx('privacy.bills.tracked_review_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_telecom'),
+          what: tx('privacy.bills.tracked_telecom_what'),
+        },
+      ]
+    : []),
+  ...(documents
+    ? [
+        {
+          when: 'عند اختيار طريقة البدء',
+          what: 'ما إذا اخترت رفع مستند أو الملء يدويًا.',
+        },
+        {
+          when: 'عند قراءة المستندات',
+          what: 'عدد الصور أو الصفحات التي ترفعها، ضمن فئة (1، أو من 2 إلى 4، أو من 5 إلى 9، أو من 10 إلى 15، أو من 16 إلى 25)، وعدد ملفات PDF التي اخترتها. وعند الانتهاء، أنواع المستندات التي تم التعرّف عليها (مثلًا، رسالة الفصل أو قسيمة الراتب)، وعدد البيانات التي مُلئت، ضمن فئة (0، أو من 1 إلى 3، أو من 4 إلى 8، أو 9 أو أكثر)، وما إذا ظهر أيٌّ منها بثقة منخفضة، وما إذا كانت الأرقام لا تتطابق، وما إذا لم يتطابق مستندان، وما إذا لزمت قراءتها مرة أخرى بنموذج ذكاء اصطناعي أدق، وإذا تعذّرت قراءة صفحة ما، السبب (ضبابية، أو داكنة، أو مقطوعة، أو مكتوبة بخط اليد، أو لا تتعلق بالعمل، أو من بلد آخر، أو من نوع لا يُتعرَّف عليه، أو بلا بيانات مفيدة، أو لم تُقرأ)، دون ذكر أيّها؛ أو، إذا فشلت القراءة، رمز الخطأ. وإذا بدت صورة، قبل إرسالها، داكنة أو ضبابية أو صغيرة، أيّ الأمور الثلاثة، وما إذا أرسلتها رغم ذلك. ولا شيء أبدًا مما تتضمّنه المستندات.',
+        },
+        {
+          when: 'مع التصريح',
+          what: 'أنك تبدأ الدفع، وأن التصريح يصدر عند العودة من الدفع أو عند استرجاعه، أو رمز الخطأ، وما إذا كان عند التحقق منه صالحًا، أو غير صالح، أو منتهيًا، أو ملغى، أو بلا جواب، وما إذا نزّلت التقرير أو الرسالة. ومن الرسالة، فقط ما إذا ملأت لا شيء من البيانات الاختيارية أو بعضها أو كلها (الاسم، ورقم DNI أو NIE، والشركة، والبلدة)، ولا تُذكَر أيّها أبدًا ولا ما تتضمّنه: هذه البيانات لا تملأ الرسالة إلا في متصفحك ولا تُرسَل ولا تُحفَظ. ولا يُرسَل أبدًا رمز الدفع ولا التصريح.',
+        },
+        ...(rental
+          ? [
+              {
+                when: tx('privacy.rental.tracked_documents'),
+                what: tx('privacy.rental.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(employment
+          ? [
+              {
+                when: tx('privacy.employment.tracked_documents'),
+                what: tx('privacy.employment.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(credit
+          ? [
+              {
+                when: tx('privacy.credit.tracked_documents'),
+                what: tx('privacy.credit.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(insurance
+          ? [
+              {
+                when: tx('privacy.insurance.tracked_documents'),
+                what: tx('privacy.insurance.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(mortgage
+          ? [
+              {
+                when: tx('privacy.mortgage.tracked_documents'),
+                what: tx('privacy.mortgage.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(bills
+          ? [
+              {
+                when: tx('privacy.bills.tracked_documents'),
+                what: tx('privacy.bills.tracked_documents_what'),
+              },
+            ]
+          : []),
+      ]
+    : []),
+  {
+    when: 'إذا تعطّلت الصفحة',
+    what: 'نوع الخطأ، وفي أي ملف وأي سطر من الشيفرة حدث. وليس أبدًا رسالة الخطأ، لأنها قد تقتبس شيئًا كتبته.',
+  },
+];
+---
+
+<div class="document__sheets">
+  <section class="sheet sheet--text">
+    <h2 id="pr-resumen">{tx('privacy.summary')}</h2>
+    <p>
+      ما تكتبه في المراجعة لا يغادر جهازك. تُحسَب تسويتك النهائية بالكامل في متصفحك ولا تُحفَظ.
+      ولمعرفة ما إذا كانت الأداة مفيدة وفي أي خطوة يتعثّر الناس، يُقاس، دون تحديد هويتك، أيّ الخطوات
+      تستخدم. لا تُرسَل إلا رموز وفئات، ولا يُرسَل أبدًا أي مبلغ ولا أي تاريخ. لا توجد ملفات تعريف
+      ارتباط <bdi>(cookies)</bdi> ولا إعلانات.
+    </p>
+    {rental && <p>{tx('privacy.rental.summary')}</p>}
+    {employment && <p>{tx('privacy.employment.summary')}</p>}
+    {household && <p>{tx('privacy.household.summary')}</p>}
+    {credit && <p>{tx('privacy.credit.summary')}</p>}
+    {insurance && <p>{tx('privacy.insurance.summary')}</p>}
+    {mortgage && <p>{tx('privacy.mortgage.summary')}</p>}
+    {bills && <p>{tx('privacy.bills.summary')}</p>}
+    {documents && (
+      <p>
+        إذا قرّرت رفع مستند لملء البيانات، يُقرأ بالذكاء الاصطناعي داخل الاتحاد الأوروبي بموافقتك
+        ولا يُحفَظ. وإذا اشتريت تصريح التقرير، تتولّى Stripe عملية الدفع.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-datos">{tx('privacy.data')}</h2>
+    <dl class="data-list">
+      {stored.map(({ what, where }) => (
+        <div>
+          <dt>{what}</dt>
+          <dd>{where}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      بشأن سجلات GitHub، راجع{' '}
+      <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">
+        بيان الخصوصية العام لـ GitHub
+      </a>
+      .
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-medicion">{tx('privacy.analytics')}</h2>
+    <p>
+      هذا كل ما يُرسَل. كل قيمة تأتي من قائمة مغلقة من الرموز أو الفئات، وتتحقّق الصفحة من كل إشعار
+      قبل إرساله: الإشعار الذي يتضمّن أي شيء آخر لا يُرسَل، ومما يضيفه PostHog من تلقاء نفسه لا يمرّ
+      إلا ما هو مدرج في هذه القائمة.
+    </p>
+    <dl class="data-list">
+      {tracked.map(({ when, what }) => (
+        <div>
+          <dt>{when}</dt>
+          <dd>{what}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      لا يُنشأ ملف تعريفي عنك ولا تُربَط زيارة بأخرى: في كل مرة تفتح فيها صفحة أو تعيد تحميلها، يبدأ
+      القياس من الصفر. ولا يُرسَل أبدًا إصدار نظامك، ولا منطقتك الزمنية، ولا حجم شاشتك، ولا لغتك
+      الكاملة، ولا السلسلة الكاملة لوكيل المستخدم، ولا عنوان الصفحة، ولا ما بحثت عنه للوصول، ولا
+      معرّفات النقر <bdi>(gclid, fbclid)</bdi> وما شابهها التي يضيفها المعلنون إلى الروابط.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-quien">{tx('privacy.who')}</h2>
+    <p>
+      يتلقّاه PostHog Inc.، أداة القياس، في{' '}
+      <a href="https://posthog.com/blog/posthog-cloud-eu">سحابته في الاتحاد الأوروبي</a>، المستضافة
+      في فرانكفورت (ألمانيا). ويعالج البيانات نيابةً عن eslojusto.es ولا يستخدمها لأي غرض آخر.
+      PostHog Inc. شركة من الولايات المتحدة: المعالجة مشمولة بعقد المعالِج الخاص بها، الذي يتضمّن
+      البنود التعاقدية النموذجية للمفوضية الأوروبية.
+    </p>
+    <p>
+      عند تلقّي كل إشعار، يرى PostHog عنوان IP لاتصالك ووكيل المستخدم لمتصفحك، مثل أي خادم. ولا يحفظ
+      أيًّا منهما: المشروع مُعَدّ لتجاهل عنوان IP، دون استخدامه لتحديد موقعك، ووكيل المستخدم الكامل
+      لا يُرسَل بوصفه بيانًا؛ بل فقط المتصفح وإصداره والنظام الذي يسرده قسم «ما الذي يُقاس».
+    </p>
+    <p>
+      تُحفَظ الإشعارات سنة واحدة، وهي المدة في الخطة المجانية لـ PostHog (راجع{' '}
+      <a href="https://posthog.com/docs/privacy">صفحة الخصوصية</a> لديه).
+    </p>
+  </section>
+
+  {documents && (
+    <section class="sheet sheet--text">
+      <h2 id="pr-documentos">{tx('privacy.documents')}</h2>
+      <p>
+        قراءة مستند أمر اختياري: تعمل المراجعة بالطريقة نفسها إذا كتبت البيانات. قبل رفعه نطلب منك
+        موافقتك الصريحة، لأن قسيمة الراتب أو السجل المهني <bdi>(vida laboral)</bdi> قد يُظهران
+        بيانات محمية بشكل خاص، مثل الانتساب إلى نقابة (من خلال اشتراكها) أو إجازة مرضية. الأساس
+        القانوني هو تلك الموافقة، بموجب اللائحة العامة لحماية البيانات
+        <bdi>(arts. 6.1.a y 9.2.a del Reglamento General de Protección de Datos)</bdi>. يمكنك سحبها
+        متى شئت بعدم رفع مزيد من المستندات: وبما أنه لا يُحفَظ شيء، لا يبقى شيء لحذفه.
+      </p>
+      {rental && <p>{tx('privacy.rental.consent')}</p>}
+      {employment && <p>{tx('privacy.employment.consent')}</p>}
+      {credit && <p>{tx('privacy.credit.consent')}</p>}
+      {insurance && <p>{tx('privacy.insurance.consent')}</p>}
+      {mortgage && <p>{tx('privacy.mortgage.consent')}</p>}
+      {bills && <p>{tx('privacy.bills.consent')}</p>}
+      <p>
+        تعالج المستندات Amazon Web Services EMEA SARL (لوكسمبورغ)، بصفتها معالِجًا: الخادم
+        <bdi>(AWS Lambda)</bdi> في إسبانيا، ويُستخدَم نموذج الذكاء الاصطناعي عبر Amazon Bedrock بملف
+        تعريف لا يعمل إلا في مناطق الاتحاد الأوروبي. لا يحفظ Amazon Bedrock المستندات ولا ما يجيب به
+        نموذج الذكاء الاصطناعي، ولا يستخدمها لتدريب نماذج ذكاء اصطناعي، ولا يشاركها مع Anthropic.
+        ويتضمّن عقد المعالِج الخاص بـ AWS البنود التعاقدية النموذجية للمفوضية الأوروبية.
+      </p>
+      <p>
+        لكي يقوم بالقراءات وعمليات الدفع بشر، تحمّل الصفحة، قبل كل قراءة وكل عملية دفع، Cloudflare
+        Turnstile، الذي يتحقّق من أنك لست روبوتًا دون استخدام ملفات تعريف الارتباط. تتلقّى
+        Cloudflare, Inc. عنوان IP وبيانات تقنية عن متصفحك لأجل هذا التحقق، وفقط عندما تختار رفع
+        مستند أو دفع ثمن التصريح. الأساس القانوني هو المصلحة المشروعة في تجنّب إساءة استخدام الخدمة
+        <bdi>(art. 6.1.f del Reglamento)</bdi>؛ وCloudflare منضمّة إلى إطار خصوصية البيانات بين
+        الاتحاد الأوروبي والولايات المتحدة <bdi>(Marco de Privacidad de Datos UE-EE. UU.)</bdi>.
+      </p>
+      <p>
+        يُدفَع ثمن تصريح التقرير في صفحة Stripe Payments Europe, Ltd. (أيرلندا). لا يرى eslojusto.es
+        بيانات بطاقتك ولا بيانات Bizum ولا يحفظها: يسأل Stripe فقط ما إذا تمّ الدفع وبأي مبلغ،
+        ويدوّن إلى جانب الدفع عدد القراءات التي أجريتها بالتصريح، دون أي شيء مما قُرئ فيها. يطلب منك
+        Stripe بريدك الإلكتروني، وبحسب طريقة دفعك، اسمك أو بلدك أو هاتفك أيضًا. تبقى هذه البيانات في
+        حساب Stripe الخاص بـ eslojusto.es، الذي يمكنه الاطلاع عليها في لوحة تحكم Stripe لمعالجة
+        مشكلة في الدفع أو عملية استرداد، وتُحفَظ المدة التي تفرضها القواعد المحاسبية والضريبية.
+        الأساس القانوني هو عقد الشراء <bdi>(art. 6.1.b)</bdi> والالتزامات المحاسبية والضريبية
+        <bdi>(art. 6.1.c)</bdi>. قد يعالج Stripe البيانات في الولايات المتحدة؛ وStripe, Inc. منضمّة
+        إلى إطار خصوصية البيانات بين الاتحاد الأوروبي والولايات المتحدة، ويتضمّن عقدها البنود
+        التعاقدية النموذجية. يحتفظ Stripe ببيانات الدفع المدة التي تفرضها عليه تلك الالتزامات وقواعد
+        مكافحة غسل الأموال؛ ويشرح ذلك في <a href="https://stripe.com/es/privacy">سياسة الخصوصية</a>{' '}
+        الخاصة به. شروط الشراء موجودة في{' '}
+        <a href={`${link(lang, 'aviso-legal/')}#condiciones`}>الإشعار القانوني</a>.
+      </p>
+    </section>
+  )}
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-cookies">{tx('privacy.cookies')}</h2>
+    {documents ? (
+      <p>
+        لا يستخدم هذا الموقع ملفات تعريف الارتباط <bdi>(cookies)</bdi>، ولا يكتب القياس أي شيء على
+        جهازك، ولا في أي مساحة تخزين أخرى في المتصفح، لأن كل شيء يعيش في ذاكرة الصفحة. لا يُحفَظ إلا
+        ما تطلبه أنت: اختيارك للمظهر، إذا ضغطت زره، وإذا قرأت مستندات أو اشتريت التصريح، ما يشرحه
+        قسم «ما الذي يُحفَظ وأين». لهذا لا ترى أي إشعار بشأن ملفات تعريف الارتباط.
+      </p>
+    ) : (
+      <p>
+        لا يستخدم هذا الموقع ملفات تعريف الارتباط <bdi>(cookies)</bdi>، ولا يكتب القياس أي شيء على
+        جهازك، ولا في أي مساحة تخزين أخرى في المتصفح، لأن كل شيء يعيش في ذاكرة الصفحة. الشيء الوحيد
+        الذي يُحفَظ هو اختيارك للمظهر، وفقط إذا ضغطت زره. لهذا لا ترى أي إشعار بشأن ملفات تعريف
+        الارتباط.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-base">{tx('privacy.legal_basis')}</h2>
+    <p>
+      الأساس القانوني هو المصلحة المشروعة، بموجب اللائحة العامة لحماية البيانات
+      <bdi>(art. 6.1.f del Reglamento General de Protección de Datos)</bdi>، وهي هنا معرفة ما إذا
+      كانت الأداة تُستخدَم، وفي أي خطوة يتعثّر الناس، وما الذي يتعطّل، من أجل تحسينها. يُقاس الحد
+      الأدنى اللازم لذلك، دون تحديد هويتك ودون إعلانات.
+    </p>
+    <p>
+      إذا أرسل متصفحك إشارة عدم التتبّع <bdi>(Global Privacy Control o Do Not Track)</bdi>، لا يُقاس
+      أي شيء من زيارتك. ويمكنك الاعتراض على هذا القياس <bdi>(art. 21 del Reglamento)</bdi> أيضًا
+      بحظر العنوان eu.i.posthog.com بأداة لحظر المحتوى. وتعمل المراجعة بالطريقة نفسها.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-responsable">{tx('privacy.controller')}</h2>
+    <p>
+      eslojusto.es مشروع يعود إلى Endika Iglesias، المسؤول عن هذه المعالجة. لأي سؤال بشأن بياناتك،
+      اكتب إلى <a href={`mailto:${email}`}>{email}</a>. إذا كنت قد كتبت إلى ذلك العنوان، يمكنك أن
+      تطلب عبره الاطلاع على بيانات بريدك أو تصحيحها أو حذفها. وإذا كنت قد دفعت ثمن التصريح، فكذلك
+      بيانات دفعك في Stripe، باستثناء ما يلزم الاحتفاظ به بموجب القواعد المحاسبية والضريبية.
+    </p>
+    <p>
+      ما يُقاس لا يحدّد هويتك، لذا لا توجد طريقة للعثور على إشعاراتك لعرضها عليك أو حذفها
+      <bdi>(art. 11 del Reglamento)</bdi>. إذا كنت ترى أن أمرًا ما لا يُنجَز كما ينبغي، يمكنك تقديم
+      شكوى إلى{' '}
+      <a href="https://www.aepd.es/">
+        الوكالة الإسبانية لحماية البيانات <bdi>(Agencia Española de Protección de Datos)</bdi>
+      </a>
+      .
+    </p>
+  </section>
+</div>
