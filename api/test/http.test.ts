@@ -645,6 +645,10 @@ describe('payment handlers', () => {
     { nonce: 'n0nce-generated-by-the-browser', captchaToken: 't', returnTo: '/alquiler/' },
     { nonce: 'n0nce-generated-by-the-browser', captchaToken: 't', returnTo: '/contrato/' },
     { nonce: 'n0nce-generated-by-the-browser', captchaToken: 't', returnTo: null },
+    { nonce: 'n0nce-generated-by-the-browser', captchaToken: 't', lang: 'es' },
+    { nonce: 'n0nce-generated-by-the-browser', captchaToken: 't', lang: 'ar-test' },
+    { nonce: 'n0nce-generated-by-the-browser', captchaToken: 't', lang: 'eu/../evil' },
+    { nonce: 'n0nce-generated-by-the-browser', captchaToken: 't', lang: 'EN' },
   ])('refuses a malformed request %j', async (body) => {
     expect(json(await handleCheckout(post(body), deps()))).toEqual({ code: 'invalid_request' });
   });
@@ -656,6 +660,19 @@ describe('payment handlers', () => {
     await handleCheckout(post({ ...body, returnTo: 'rental' }), { ...deps(), checkout });
     await handleCheckout(post({ ...body, returnTo: 'employment' }), { ...deps(), checkout });
     expect(checkout.returns).toEqual(['final_pay', 'rental', 'employment']);
+  });
+
+  it('sends a checkout back in the language it came from, Spanish when it names none', async () => {
+    const checkout = new FakeCheckout();
+    const body = { nonce: 'n0nce-generated-by-the-browser', captchaToken: 'turnstile-token' };
+    await handleCheckout(post(body), { ...deps(), checkout });
+    await handleCheckout(post({ ...body, lang: 'eu' }), { ...deps(), checkout });
+    await handleCheckout(post({ ...body, returnTo: 'rental', lang: 'zh' }), {
+      ...deps(),
+      checkout,
+    });
+    expect(checkout.langs).toEqual(['es', 'eu', 'zh']);
+    expect(checkout.returns).toEqual(['final_pay', 'final_pay', 'rental']);
   });
 
   it('sends a credit or a mortgage checkout back to its page and starts none from the insurance review', async () => {

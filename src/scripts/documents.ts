@@ -82,6 +82,22 @@ function turnstileLoader(): () => Promise<Turnstile> {
     }));
 }
 
+// The challenge in the page's language where Turnstile has it; the co-official languages read
+// Spanish, and any other the browser's own.
+const TURNSTILE_LANGUAGE: Readonly<Record<string, string>> = {
+  es: 'es',
+  ca: 'es',
+  eu: 'es',
+  gl: 'es',
+  en: 'en',
+  fr: 'fr',
+  ro: 'ro',
+  ar: 'ar',
+  uk: 'uk',
+  zh: 'zh-cn',
+};
+const turnstileLanguage = (lang: string): string => TURNSTILE_LANGUAGE[lang] ?? 'auto';
+
 function turnstileCaptcha(
   loadTurnstile: () => Promise<Turnstile>,
   siteKey: string,
@@ -103,7 +119,7 @@ function turnstileCaptcha(
           sitekey: siteKey,
           action,
           appearance: 'interaction-only',
-          language: document.documentElement.lang === 'es' ? 'es' : 'auto',
+          language: turnstileLanguage(document.documentElement.lang),
           callback: (token: string) => done(() => resolve(token))(),
           'error-callback': done(() => reject(new Error('Turnstile error'))),
           'expired-callback': done(() => reject(new Error('Turnstile expired'))),
@@ -419,7 +435,12 @@ export function wireDocuments<R, F extends string, L extends string>({
   const checkoutCaptchaBox = offer?.querySelector<HTMLElement>('[data-pass-captcha]');
   if (!config || !start || !offer || !captchaBox || !checkoutCaptchaBox) return null;
 
-  const api = createApi(config.endpoints, (url, init) => fetch(url, init), section.extraction);
+  const api = createApi(
+    config.endpoints,
+    (url, init) => fetch(url, init),
+    section.extraction,
+    document.documentElement.lang,
+  );
   const loadTurnstile = turnstileLoader();
   const passes = passStore();
   const session = storage(() => sessionStorage);

@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import { CHECKOUT_PATHS, SITE_ORIGIN } from '../config';
 import { PASS_READS } from '../domain/allowance';
 import type { CheckoutCreator, PaymentVerifier, SessionSnapshot } from '../domain/ports';
-import type { CheckoutReview } from '../domain/reviews';
+import type { CheckoutLang, CheckoutReview } from '../domain/reviews';
 
 export const READS_METADATA_KEY = 'reads_used';
 
@@ -44,12 +44,28 @@ export function toSessionSnapshot(session: Stripe.Checkout.Session): SessionSnap
   };
 }
 
+// Checkout in the page's language where Stripe has it; the co-official languages read Spanish,
+// the others it lacks, English.
+const STRIPE_LOCALE: Record<CheckoutLang, Stripe.Checkout.SessionCreateParams.Locale> = {
+  es: 'es',
+  en: 'en-GB',
+  ar: 'en-GB',
+  ro: 'ro',
+  fr: 'fr',
+  uk: 'en-GB',
+  zh: 'zh',
+  ca: 'es',
+  eu: 'es',
+  gl: 'es',
+};
+
 export function checkoutParams(
   nonce: string,
   priceId: string,
   returnTo: CheckoutReview = 'final_pay',
+  lang: CheckoutLang = 'es',
 ): [Stripe.Checkout.SessionCreateParams, Stripe.RequestOptions] {
-  const path = CHECKOUT_PATHS[returnTo];
+  const path = `${lang === 'es' ? '' : `/${lang}`}${CHECKOUT_PATHS[returnTo]}`;
   return [
     {
       mode: 'payment',
@@ -58,7 +74,7 @@ export function checkoutParams(
       allowed_payment_method_types: ['card', 'bizum'],
       allow_promotion_codes: true,
       client_reference_id: nonce,
-      locale: 'es',
+      locale: STRIPE_LOCALE[lang],
       success_url: `${SITE_ORIGIN}${path}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${SITE_ORIGIN}${path}`,
     },
@@ -66,8 +82,12 @@ export function checkoutParams(
     // refuses a key reused with other parameters, so a nonce first used for another page gets
     // a key of its own there.
     {
-      idempotencyKey:
-        returnTo === 'final_pay' ? `checkout-${nonce}` : `checkout-${returnTo}-${nonce}`,
+      idempotencyKey: [
+        'checkout',
+        ...(returnTo === 'final_pay' ? [] : [returnTo]),
+        ...(lang === 'es' ? [] : [lang]),
+        nonce,
+      ].join('-'),
     },
   ];
 }
@@ -85,9 +105,9 @@ const client = (restrictedKey: string): Stripe => {
 export function createStripeCheckout(restrictedKey: string, priceId: string): CheckoutCreator {
   const stripe = client(restrictedKey);
   return {
-    async create(nonce, returnTo) {
+    async create(nonce, returnTo, lang) {
       const session = await stripe.checkout.sessions.create(
-        ...checkoutParams(nonce, priceId, returnTo),
+        ...checkoutParams(nonce, priceId, returnTo, lang),
       );
       if (!session.url) throw new Error('Checkout Session without a URL');
       return { sessionId: session.id, url: session.url };
