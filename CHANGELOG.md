@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.0](https://github.com/Endika/eslojusto/compare/v1.74.0...v1.75.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** keep the report and the letters in Spanish on a page in another language ([12ec363](https://github.com/Endika/eslojusto/commit/12ec363b44f5471ff068fb71444af7df08a1d615))
+
 ## [1.74.0](https://github.com/Endika/eslojusto/compare/v1.73.0...v1.74.0) (2026-10-16)
 
 
