@@ -1,10 +1,14 @@
 const WITH_COMMA = /^(\d{1,3}(\.\d{3})+|\d+)(,\d+)?$/;
 const DOT_THOUSANDS = /^\d{1,3}(\.\d{3})+$/;
 const DOT_DECIMAL = /^\d+(\.\d+)?$/;
+// «1,500»: a thousands comma to an English or Chinese reader, a decimal one to a Spanish reader.
+// No field takes three decimals after a whole part, so it is refused rather than guessed.
+const AMBIGUOUS = /^[1-9]\d{0,2},\d{3}$/;
 
 export function parseAmount(text: string): number | null {
   const t = text.replace(/[\s\u00a0\u202f€]/g, '');
   if (t === '') return null;
+  if (AMBIGUOUS.test(t)) return NaN;
   if (t.includes(',')) {
     return WITH_COMMA.test(t) ? Number(t.replace(/\./g, '').replace(',', '.')) : NaN;
   }

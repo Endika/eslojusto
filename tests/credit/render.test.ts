@@ -196,7 +196,7 @@ describe('the credit result', () => {
 
 describe('the credit phrases', () => {
   it('write a month in words and a deadline open today as such', () => {
-    expect(monthText('2019-02')).toBe('febrero de 2019');
+    expect(monthText('2019-02', tr)).toBe('febrero de 2019');
     expect(
       phraseText(
         { key: 'withdrawal.days_left', vars: { days: { days: 0 }, day: { date: '2026-10-09' } } },

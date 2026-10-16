@@ -86,7 +86,7 @@ const faq = householdFaqEntries(lang, { checkedOn, minimumWage: MINIMUM_WAGE });
     </h2>
     <p class="guide__lead">{tx('household.guide.lead')}</p>
     <p class="guide__sources">
-      <span>{t(lang, 'household.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>{t(lang, 'household.reviewed', { fecha: formatLongDay(checkedOn, lang) })}</span>
       <span>
         {tx('household.guide.sources')}:{' '}
         <a href={HOUSEHOLD_NORMS.rd1620_2011.url}>Real Decreto 1620/2011</a> ·{' '}

@@ -84,7 +84,7 @@ const faq = insuranceFaqEntries(lang);
     </h2>
     <p class="guide__lead">{tx('insurance.guide.lead')}</p>
     <p class="guide__sources">
-      <span>{t(lang, 'insurance.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>{t(lang, 'insurance.reviewed', { fecha: formatLongDay(checkedOn, lang) })}</span>
       <span>
         {tx('insurance.guide.sources')}:{' '}
         <a href={INSURANCE_NORMS.lcs.url}>{tx('insurance.guide.source_lcs')}</a> ·{' '}

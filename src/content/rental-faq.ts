@@ -34,7 +34,7 @@ export function rentalFaqEntries(
         checkedOn < norms[id].inForceSince
           ? 'rental.faq.pending_norms_item_upcoming'
           : 'rental.faq.pending_norms_item_live',
-        { norma: NAME[id], desde: formatLongDay(norms[id].inForceSince) },
+        { norma: NAME[id], desde: formatLongDay(norms[id].inForceSince, lang) },
       ),
   );
   const repealedIds = REPEALED_CANDIDATES.filter((id) => norms[id].status === 'repealed');
@@ -43,7 +43,7 @@ export function rentalFaqEntries(
     .filter((id) => !neverInForce(norms[id]))
     .map((id) => `${NAME[id]}, ${period(lang, norms[id])}`);
   const never = repealedIds.filter((id) => neverInForce(norms[id])).map((id) => NAME[id]);
-  const fecha = formatLongDay(checkedOn);
+  const fecha = formatLongDay(checkedOn, lang);
 
   const answers: Record<RentalFaqId, string> = {
     agency_fees: tx('rental.faq.agency_fees_answer', {

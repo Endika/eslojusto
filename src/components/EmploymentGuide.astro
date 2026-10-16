@@ -32,7 +32,7 @@ const faq = employmentFaqEntries(lang, EMPLOYMENT_NORMS, { ...tables, documents 
     </h2>
     <p class="guide__lead">{tx('employment.guide.lead')}</p>
     <p class="guide__sources">
-      <span>{t(lang, 'employment.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>{t(lang, 'employment.reviewed', { fecha: formatLongDay(checkedOn, lang) })}</span>
       <span>
         {tx('employment.guide.sources')}:{' '}
         <a href={EMPLOYMENT_NORMS.et.url}>{tx('employment.guide.source_et')}</a> ·{' '}

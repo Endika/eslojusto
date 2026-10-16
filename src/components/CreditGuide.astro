@@ -124,7 +124,7 @@ const faq = creditFaqEntries(lang);
     </h2>
     <p class="guide__lead">{tx('credit.guide.lead')}</p>
     <p class="guide__sources">
-      <span>{t(lang, 'credit.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>{t(lang, 'credit.reviewed', { fecha: formatLongDay(checkedOn, lang) })}</span>
       <span>
         {tx('credit.guide.sources')}:{' '}
         <a href={CREDIT_NORMS.lcc.url}>{tx('credit.guide.source_lcc')}</a> ·{' '}

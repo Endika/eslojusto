@@ -155,10 +155,10 @@ export function normSentence(
     code === 'upcoming' || code === 'pending_validation'
       ? t(lang, `employment.guide.norm_clause_${code}`, {
           norma: withArticle(name),
-          desde: formatLongDay(norm.inForceSince),
+          desde: formatLongDay(norm.inForceSince, lang),
         })
       : withArticle(name);
-  return t(lang, key, { ...vars, norma: clause, desde: formatLongDay(norm.inForceSince) });
+  return t(lang, key, { ...vars, norma: clause, desde: formatLongDay(norm.inForceSince, lang) });
 }
 
 // Whether a sentence resting on the norm still describes the law.
@@ -239,8 +239,8 @@ function currentYearSentence(
     anual: euros(row.annual),
     doce: euros(twelvePayments(row)),
     norma: withArticle(shortName(norms[row.norm])),
-    publicado: formatLongDay(row.publishedOn),
-    efectos: formatLongDay(row.effectsFrom),
+    publicado: formatLongDay(row.publishedOn, lang),
+    efectos: formatLongDay(row.effectsFrom, lang),
   });
 }
 
@@ -268,7 +268,7 @@ export function employmentGuide(
       url: s.url,
     };
   };
-  const reform = formatLongDay(RULES.fixed_term_presumption.from);
+  const reform = formatLongDay(RULES.fixed_term_presumption.from, lang);
   const rd723Stands = normStands(norms.rd723_2026);
   const latest = [...minimumWage].sort((a, b) => b.year - a.year)[0];
   if (latest === undefined) throw new Error('The employment guide needs the minimum wage table.');

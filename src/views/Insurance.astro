@@ -96,7 +96,7 @@ const structuredData = [
         )}
         <p class="desk__reviewed">
           <time datetime={checkedOn}>
-            {t(lang, 'insurance.reviewed', { fecha: formatLongDay(checkedOn) })}
+            {t(lang, 'insurance.reviewed', { fecha: formatLongDay(checkedOn, lang) })}
           </time>
         </p>
       </header>

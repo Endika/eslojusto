@@ -158,7 +158,7 @@ const faq = mortgageFaqEntries(lang, { documents });
     </h2>
     <p class="guide__lead">{tx('mortgage.guide.lead')}</p>
     <p class="guide__sources">
-      <span>{t(lang, 'mortgage.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>{t(lang, 'mortgage.reviewed', { fecha: formatLongDay(checkedOn, lang) })}</span>
       <span>
         {tx('mortgage.guide.sources')}:{' '}
         <a href={MORTGAGE_NORMS.lcci.url}>{tx('mortgage.guide.source_lcci')}</a>

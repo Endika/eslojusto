@@ -62,7 +62,7 @@ describe('the monthly rent indices', () => {
     expect(formatRate(2.2, 'irav')).toBe('2,20\u00a0%');
     expect(formatRate(4.3, 'ipc')).toBe('4,3\u00a0%');
     expect(formatRate(-0.33, 'igc')).toBe('-0,33\u00a0%');
-    expect(formatMonth('2026-08')).toBe('agosto de 2026');
+    expect(formatMonth('2026-08', 'es')).toBe('agosto de 2026');
   });
 
   it('works the example out from the IRAV published on the anniversary', () => {

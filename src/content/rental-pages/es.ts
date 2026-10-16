@@ -200,7 +200,7 @@ const staticPages = (
         },
         {
           question: '¿Puede cobrarme el IBI?',
-          answer: `Depende de cuándo firmaste. ${decreed('rental.page.decree.taxes')} ${t('es', 'rental.guide.charges.taxes_before', { desde: formatLongDay(norms.rdl29_2026.inForceSince) })}`,
+          answer: `Depende de cuándo firmaste. ${decreed('rental.page.decree.taxes')} ${t('es', 'rental.guide.charges.taxes_before', { desde: formatLongDay(norms.rdl29_2026.inForceSince, 'es') })}`,
         },
       ],
     },
@@ -314,8 +314,8 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
   const { norms, checkedOn } = ctx;
   const tx = (key: Key, vars?: Record<string, string>) => t('es', key, vars);
   const decree = norms.rdl29_2026;
-  const decreeEve = formatLongDay(toIso(addDays(parseDate(decree.inForceSince), -1)));
-  const since = formatLongDay(decree.inForceSince);
+  const decreeEve = formatLongDay(toIso(addDays(parseDate(decree.inForceSince), -1)), 'es');
+  const since = formatLongDay(decree.inForceSince, 'es');
   const caps = capsCopy('es', norms, {
     checkedOn,
     iravRate: ctx.irav,
@@ -330,16 +330,16 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const raise = (rate: number) => round2((rent * (100 + rate)) / 100);
     const capped = ctx.irav > DECREE_CAP;
     const exampleDecree = capped
-      ? `Pagas ${formatEuros(rent)} al mes y tu contrato cumple un año más el ${formatLongDay(anniversary)}. ` +
+      ? `Pagas ${formatEuros(rent)} al mes y tu contrato cumple un año más el ${formatLongDay(anniversary, 'es')}. ` +
         `Con el último IRAV publicado (${formatRate(ctx.irav)}), si rige el Real Decreto-ley 29/2026, el tope sin nuevo pacto ` +
         `es el ${pct(DECREE_CAP)}, no el ${formatRate(ctx.irav)}: tu renta puede pasar a ${formatEuros(raise(DECREE_CAP))} como mucho.`
-      : `Pagas ${formatEuros(rent)} al mes y tu contrato cumple un año más el ${formatLongDay(anniversary)}. ` +
+      : `Pagas ${formatEuros(rent)} al mes y tu contrato cumple un año más el ${formatLongDay(anniversary, 'es')}. ` +
         `Si rige el Real Decreto-ley 29/2026, el tope sin nuevo pacto es el ${pct(DECREE_CAP)} o el IRAV, el más bajo: ` +
         `con el último IRAV publicado (${formatRate(ctx.irav)}), tu renta puede pasar a ${formatEuros(raise(ctx.irav))} como mucho.`;
     const exampleNoDecree =
       `Si el Congreso derogara el decreto, el tope en un contrato firmado desde el 26 de mayo de 2023 volvería a ser el IRAV o el IPC, el más bajo. ` +
       `Con el último IRAV publicado (${formatRate(ctx.irav)}), serían ${formatEuros(raise(ctx.irav))} como mucho, ` +
-      `siempre que el IPC no fuera más bajo. El IRAV que cuenta es el último publicado el ${formatLongDay(anniversary)}, que aún no existe.`;
+      `siempre que el IPC no fuera más bajo. El IRAV que cuenta es el último publicado el ${formatLongDay(anniversary, 'es')}, que aún no existe.`;
     return {
       lead: 'La subida depende de tres cosas: que el contrato la pacte, el día en que se cumple cada año de contrato y el tope legal de ese día. Aquí están los topes, uno por uno y con su artículo.',
       sections: [

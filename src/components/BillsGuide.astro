@@ -188,7 +188,7 @@ const faq = billsFaqEntries(lang, review, { documents });
     </h2>
     <p class="guide__lead">{tx(`bills.guide.${review}.lead`)}</p>
     <p class="guide__sources">
-      <span>{t(lang, 'bills.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>{t(lang, 'bills.reviewed', { fecha: formatLongDay(checkedOn, lang) })}</span>
       <span>
         {tx('bills.guide.sources')}:{' '}
         {sources.map(([label, norm], i) => (

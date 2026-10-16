@@ -24,6 +24,7 @@ import type {
   PassVerifyResult,
   PdfMaker,
 } from './ports';
+import { longDay } from '../i18n/dates';
 
 // Answers after which a payment can never give a pass, so it is no longer kept.
 const DEAD_CHECKOUT: ReadonlySet<ErrorCode> = new Set([
@@ -269,11 +270,8 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     buy.hidden = held || !current.offer;
     downloads.hidden = !paid;
     if (paid && stored) {
-      const until = new Date(stored.expiresAt * 1000).toLocaleDateString('es-ES', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
+      const end = new Date(stored.expiresAt * 1000);
+      const until = longDay(`${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`, tr);
       validity.textContent = tr('client.documents.pass.valid_until', { fecha: until });
     }
   }

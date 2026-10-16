@@ -17,6 +17,7 @@ import type { Scope } from '../engine/credit/types';
 import type { LawSource, NormSource } from '../engine/law/sources';
 import type { ClientKey, Translate } from '../i18n/client';
 import type { FieldError } from './form';
+import { monthYear } from '../i18n/dates';
 
 export const civilDayText = (d: CivilDate): string => dayText(toIso(d));
 
@@ -36,20 +37,12 @@ const POINTS = new Intl.NumberFormat('es-ES', {
   maximumFractionDigits: 2,
   useGrouping: 'always',
 });
-const MONTH = new Intl.DateTimeFormat('es-ES', {
-  month: 'long',
-  year: 'numeric',
-  timeZone: 'UTC',
-});
 
 export const percentText = (n: number): string => `${PERCENT.format(n)} %`;
 const pointsText = (n: number): string => POINTS.format(n);
 
-// «2019-02» → «febrero de 2019».
-export function monthText(month: string): string {
-  const [y = 0, m = 1] = month.split('-').map(Number);
-  return MONTH.format(new Date(Date.UTC(y, m - 1, 1)));
-}
+// «2019-02» → «febrero de 2019», in the words of the translator.
+export const monthText = monthYear;
 
 const daysText = (n: number, tr: Translate): string =>
   tr(n === 1 ? 'client.credit.unit.day_one' : 'client.credit.unit.day_many', {
@@ -77,7 +70,7 @@ function figureText(key: CreditPhraseKey, name: string, f: CreditFigure, tr: Tra
       : percentText(f.percent);
   if ('points' in f) return pointsText(f.points);
   if ('date' in f) return dayText(f.date);
-  if ('month' in f) return monthText(f.month);
+  if ('month' in f) return monthText(f.month, tr);
   if ('days' in f) return daysText(f.days, tr);
   if ('euros' in f) return formatCalculationEuros(f.euros);
   return MONTH_VARS.has(name) ? monthsText(f.integer, tr) : formatInteger(f.integer);

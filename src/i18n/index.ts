@@ -57,13 +57,31 @@ export function t(lang: Lang, key: Key, vars?: Variables): string {
   return interpolate(DICTIONARIES[lang][key], vars);
 }
 
-// The credit page's strings: its own, and the theme switch and other-language notice every page
-// reads.
-const CREDIT_PAGE = ['client.credit.', 'client.theme.', 'client.other_language.'];
+// The credit page's strings: its own, and the theme switch, the other-language notice and the
+// month and date words every page reads.
+const CREDIT_PAGE = [
+  'client.credit.',
+  'client.theme.',
+  'client.other_language.',
+  'client.month.',
+  'client.date.',
+];
 // The mortgage page's likewise.
-const MORTGAGE_PAGE = ['client.mortgage.', 'client.theme.', 'client.other_language.'];
+const MORTGAGE_PAGE = [
+  'client.mortgage.',
+  'client.theme.',
+  'client.other_language.',
+  'client.month.',
+  'client.date.',
+];
 // The bills reviews' pages likewise.
-const BILLS_PAGE = ['client.bills.', 'client.theme.', 'client.other_language.'];
+const BILLS_PAGE = [
+  'client.bills.',
+  'client.theme.',
+  'client.other_language.',
+  'client.month.',
+  'client.date.',
+];
 // What they take of document reading: none of the final pay's own report, letter or pass notices. The
 // check of a pass already held is shared by every page that sells one.
 const NOT_READING = [

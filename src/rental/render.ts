@@ -31,14 +31,13 @@ import {
   type Verdict,
 } from './summary';
 import { TAB_NUMBER } from './steps';
+import { monthYear } from '../i18n/dates';
 
 // «2025-03-14» → «14-03-2025».
 export const dayText = (iso: string): string => iso.split('-').reverse().join('-');
 
-const MONTH = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-
-// «2025-02» → «febrero de 2025».
-export const monthText = (month: string): string => MONTH.format(new Date(`${month}-01T00:00:00Z`));
+// «2025-02» → «febrero de 2025», in the words of the translator.
+export const monthText = monthYear;
 
 const PERCENT = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2, useGrouping: 'always' });
 
@@ -51,7 +50,7 @@ function figureText(f: RentalFigure, tr: Translate, name: string): string {
   if (typeof f === 'number') return String(f);
   if (YEAR_VARS.has(name) && 'integer' in f) return String(f.integer);
   if ('percent' in f) return percentText(f.percent);
-  if ('month' in f) return monthText(f.month);
+  if ('month' in f) return monthText(f.month, tr);
   if ('date' in f) return dayText(f.date);
   if ('index' in f) return tr(`client.rental.index.${f.index}`);
   if ('days' in f) return formatDays(f.days);
@@ -412,7 +411,7 @@ export function rateText(rate: RateFigure, tr: Translate): string {
   const f = rate.figure;
   return tr(f.flash ? 'client.rental.detail.index_flash' : 'client.rental.detail.index', {
     indice: tr(`client.rental.index.${f.index}`),
-    mes: monthText(f.month),
+    mes: monthText(f.month, tr),
     tasa: percentText(f.rate),
     fecha: dayText(f.publishedOn),
   });
