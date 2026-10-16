@@ -5,8 +5,10 @@ import { link, type Lang } from '../i18n/languages';
 
 interface Props {
   lang: Lang;
+  // This page in each language a visitor can switch to, this one included; one alone shows no menu.
+  languages?: readonly { code: Lang; name: string; href: string }[];
 }
-const { lang } = Astro.props;
+const { lang, languages = [] } = Astro.props;
 ---
 
 <header class="header">
@@ -14,22 +16,49 @@ const { lang } = Astro.props;
     <Logo class="logo--compact" />
     <Logo variant="full" class="logo--full" />
   </a>
-  <button
-    class="theme-toggle"
-    type="button"
-    data-theme-toggle
-    aria-label={t(lang, 'client.theme.to_dark')}
-  >
-    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
-      <circle
-        cx="12"
-        cy="12"
-        r="8.25"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.75"
-      ></circle>
-      <path d="M12 3.75a8.25 8.25 0 0 1 0 16.5Z" fill="currentColor"></path>
-    </svg>
-  </button>
+  <div class="header__tools">
+    {languages.length > 1 && (
+      <details class="language-menu" data-language-menu>
+        <summary aria-label={t(lang, 'header.language')}>
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="8.25" />
+            <path d="M3.75 12h16.5M12 3.75c-2.75 2.5-2.75 14 0 16.5M12 3.75c2.75 2.5 2.75 14 0 16.5" />
+          </svg>
+          <span class="language-menu__code">{lang.toUpperCase()}</span>
+        </summary>
+        <ul class="language-menu__list">
+          {languages.map((l) => (
+            <li>
+              <a
+                href={l.href}
+                hreflang={l.code}
+                lang={l.code}
+                aria-current={l.code === lang ? 'page' : undefined}
+              >
+                {l.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </details>
+    )}
+    <button
+      class="theme-toggle"
+      type="button"
+      data-theme-toggle
+      aria-label={t(lang, 'client.theme.to_dark')}
+    >
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+        <circle
+          cx="12"
+          cy="12"
+          r="8.25"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+        ></circle>
+        <path d="M12 3.75a8.25 8.25 0 0 1 0 16.5Z" fill="currentColor"></path>
+      </svg>
+    </button>
+  </div>
 </header>

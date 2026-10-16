@@ -28,6 +28,8 @@ export const es = {
   'footer.legal_notice': 'Aviso legal',
   'footer.privacy': 'Privacidad',
 
+  'header.language': 'Idioma',
+
   'review.label': 'Traducción en revisión',
   'review.text': 'Esta traducción está en revisión y puede tener errores.',
   'review.spanish': 'Lee la versión en castellano, que es la que vale.',
