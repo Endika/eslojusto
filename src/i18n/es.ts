@@ -30,10 +30,6 @@ export const es = {
 
   'header.language': 'Idioma',
 
-  'review.label': 'Traducción en revisión',
-  'review.text': 'Esta traducción está en revisión y puede tener errores.',
-  'review.spanish': 'Lee la versión en castellano, que es la que vale.',
-
   'breadcrumb.label': 'Estás en',
   'breadcrumb.home': 'Inicio',
 
