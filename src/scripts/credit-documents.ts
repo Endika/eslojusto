@@ -8,7 +8,7 @@ import { STEPS } from '../credit/steps';
 import { DOCUMENTS } from '../documents/config';
 import { CREDIT_EXTRACTION } from '../documents/contract';
 import type { NormTable } from '../engine/credit/norms';
-import { pageTranslator, type ClientKey, type Translate } from '../i18n/client';
+import { pageTranslator, papersTranslator, type ClientKey, type Translate } from '../i18n/client';
 import { READS_UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
 
 // The shared message the credit page words its own way: what a value worked out from the
@@ -32,12 +32,14 @@ export function wireCreditDocuments(
   norms: NormTable,
 ): void {
   const tr = creditCopy(pageTranslator());
+  const paperTr = creditCopy(papersTranslator());
   wireDocuments({
     form: credit,
     hooks,
     arrival,
     config: DOCUMENTS,
     tr,
+    paperTr,
     // The review measures nothing yet, so neither do its reads: no event of it is in the
     // analytics catalogue. The pass is measured as on every page.
     events: { ...documentsAnalytics(track), ...READS_UNMEASURED },

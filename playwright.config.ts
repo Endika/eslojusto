@@ -69,6 +69,8 @@ const buildEnv = {
         PUBLIC_API_CHECKOUT_URL: 'https://checkout.api.eslojusto.test/',
         PUBLIC_API_PASS_URL: 'https://pass.api.eslojusto.test/',
         PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
+        // A language under review, for the papers a translated page keeps in Spanish.
+        REVIEW_LANGS: 'eu',
       }
     : {}),
 };

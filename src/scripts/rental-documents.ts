@@ -2,7 +2,7 @@ import { documentsAnalytics } from '../analytics/documents';
 import { track } from '../analytics/posthog';
 import { DOCUMENTS } from '../documents/config';
 import { RENTAL_EXTRACTION } from '../documents/contract';
-import { pageTranslator, type ClientKey, type Translate } from '../i18n/client';
+import { pageTranslator, papersTranslator, type ClientKey, type Translate } from '../i18n/client';
 import { rentalCase } from '../rental/case';
 import type { RentalCalculator } from '../rental/main';
 import type { CompletedRentalReview } from '../rental/ports';
@@ -34,12 +34,14 @@ export function wireRentalDocuments(
   arrival: { hash: string; search: string },
 ): void {
   const tr = rentalCopy(pageTranslator());
+  const paperTr = rentalCopy(papersTranslator());
   wireDocuments({
     form: rental,
     hooks,
     arrival,
     config: DOCUMENTS,
     tr,
+    paperTr,
     events: documentsAnalytics(track),
     section: {
       extraction: RENTAL_EXTRACTION,

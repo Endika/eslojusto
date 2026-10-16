@@ -3,7 +3,7 @@ import { track } from '../analytics/posthog';
 import type { SectionForm } from '../calculator/section';
 import { DOCUMENTS } from '../documents/config';
 import { INSURANCE_EXTRACTION } from '../documents/contract';
-import { pageTranslator, type ClientKey, type Translate } from '../i18n/client';
+import { pageTranslator, papersTranslator, type ClientKey, type Translate } from '../i18n/client';
 import { insuranceCase } from '../insurance/case';
 import type { CompletedInsuranceReview } from '../insurance/ports';
 import { insuranceReading } from '../insurance/reading';
@@ -30,12 +30,14 @@ export function wireInsuranceDocuments(
   arrival: { hash: string; search: string },
 ): void {
   const tr = insuranceCopy(pageTranslator());
+  const paperTr = insuranceCopy(papersTranslator());
   wireDocuments({
     form: insurance,
     hooks,
     arrival,
     config: DOCUMENTS,
     tr,
+    paperTr,
     // The review measures nothing yet, so neither do its reads: no event of it is in the
     // analytics catalogue. The pass is measured as on every page.
     events: { ...documentsAnalytics(track), ...READS_UNMEASURED },
