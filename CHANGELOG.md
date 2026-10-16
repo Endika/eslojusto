@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.67.0](https://github.com/Endika/eslojusto/compare/v1.66.0...v1.67.0) (2026-10-16)
+
+
+### Features
+
+* **documents:** locate the useful pages of a long PDF before reading it ([d5b6c33](https://github.com/Endika/eslojusto/commit/d5b6c3342ebce2b21352e902e3da9f6a1dbef876))
+
+
+### Bug Fixes
+
+* **documents:** give the read after locate its own captcha and keep refused PDFs whole ([f8dd291](https://github.com/Endika/eslojusto/commit/f8dd291bd22000f6ded43e7d2a7916ebbeb4a312))
+
 ## [1.66.0](https://github.com/Endika/eslojusto/compare/v1.65.1...v1.66.0) (2026-10-16)
 
 
