@@ -1,0 +1,580 @@
+---
+// source: 169eec130c4d
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { faqEntries } from '../../content/faq';
+import { bySeniority, spanLabel } from '../../content/examples';
+import { wholeEuroRange, wholeEuros } from '../../content/format';
+import { LANDINGS, type LandingId } from '../../content/landings';
+import { ET, SOURCES, LGSS } from '../../engine/sources';
+import { DOCUMENTS } from '../../documents/config';
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+const tx = (key: Key) => t(lang, key);
+
+// The guide under the calculator of /finiquito/, in Spanish: headings and labels from the
+// dictionary, the prose, the rules and the worked examples here. Another language's guide is a
+// translated copy of this file in src/prose/<lang>/.
+const causes: { title: string; rule: string; citation: string; page?: LandingId }[] = [
+  {
+    title: tx('guide.unfair_dismissal'),
+    rule: '33 يومًا عن كل سنة عمل، بحدّ أقصى 24 راتبًا شهريًا (720 يومًا).',
+    citation: 'Art. 56 ET',
+    page: 'unfair_dismissal',
+  },
+  {
+    title: tx('guide.objective_dismissal'),
+    rule: '20 يومًا عن كل سنة، بحدّ أقصى 12 راتبًا شهريًا (360 يومًا، ⁨STS 651/2026⁩). إضافةً إلى ذلك، 15 يومًا من مهلة الإشعار المسبق ⁨(preaviso)⁩، والأيام التي لا تمنحها الشركة منها تُدفع.',
+    citation: 'Art. 53 ET',
+    page: 'objective_dismissal',
+  },
+  {
+    title: tx('guide.collective_dismissal'),
+    rule: 'على الأقل، ما يعادل الفصل لأسباب موضوعية: 20 يومًا عن كل سنة، بحدّ أقصى 12 راتبًا شهريًا، و15 يومًا من مهلة الإشعار المسبق. يمكن أن يحسّن اتفاقُ ERE ذلك؛ والمراجعة لا تعرف هذا الاتفاق فتعطي الحد الأدنى.',
+    citation: 'Art. 51.2, 51.4 y 53.1 ET',
+  },
+  {
+    title: tx('guide.fixed_term_end'),
+    rule: '12 يومًا عن كل سنة، بنسبة الأيام التي عملتها. إذا بدأ العقد في 2011 أو قبلها، 8 أيام؛ في 2012، 9؛ في 2013، 10؛ في 2014، 11. لا تعويض لعقود الاستبدال ⁨(sustitución)⁩ ولا للعقود التكوينية، ولا للعقود الموقّعة قبل 4 مارس 2001. إذا تجاوزت مدة العقد سنة، 15 يومًا من مهلة الإشعار المسبق.',
+    citation: 'Art. 49.1.c ET y DT 8.ª',
+    page: 'fixed_term_end',
+  },
+  {
+    title: tx('guide.resignation'),
+    rule: 'لا تعويض. إذا حدّدت اتفاقيتك الجماعية مهلة إشعار مسبق ولم تلتزم بها، يمكن للشركة أن تخصم الأيام الناقصة.',
+    citation: 'Art. 49.1.d ET',
+    page: 'resignation',
+  },
+  {
+    title: tx('guide.disciplinary_dismissal'),
+    rule: 'لا تعويض إذا أُعلن الفصل مبرَّرًا ⁨(procedente)⁩. وإذا أُعلن غير مبرَّر ⁨(improcedente)⁩، يُحسب كما يُحسب الفصل غير المبرَّر.',
+    citation: 'Art. 55.7 y 56 ET',
+  },
+];
+
+const unchecked = [
+  'المبلغ الصافي: اقتطاعات ضريبة الدخل ⁨(IRPF)⁩ والاشتراكات.',
+  'العلاوات والمكمّلات والساعات الإضافية والعمولات الواردة في اتفاقيتك الجماعية أو في عقدك.',
+  'الدفعات الإضافية فوق الدفعتين العاديتين.',
+  'ما إذا كان سبب الفصل مبرَّرًا، وهو أمر تقرّره المحكمة.',
+  'أجور فترة الإجراءات ⁨(salarios de tramitación)⁩.',
+  'ما يضيفه اتفاق ERE فوق الحد الأدنى القانوني.',
+];
+
+// The case pages, in the order of the map: the finiquito ones, then the pages on the benefit.
+const caseLinks: readonly LandingId[] = [
+  'resignation',
+  'unfair_dismissal',
+  'objective_dismissal',
+  'fixed_term_end',
+  'not_agreed',
+];
+
+// The same report the result links to.
+const workHistoryUrl =
+  'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
+const benefitSources = [
+  SOURCES.lgss267,
+  SOURCES.lgss268,
+  SOURCES.lgss269,
+  SOURCES.lgss270,
+  SOURCES.sepeAmounts,
+].map(({ citation, url, inForceSince, effectiveFrom }) => ({
+  citation,
+  url,
+  inForce: t(lang, effectiveFrom ? 'client.source.effective_from' : 'client.source.in_force', {
+    fecha: inForceSince.split('-').reverse().join('-'),
+  }),
+}));
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('guide.title')}
+    </h2>
+    <p class="guide__lead">
+      ما تتضمنه التسوية النهائية <bdi>(finiquito)</bdi> ومن أين يأتي كل رقم، مع مادته القانونية.
+      تستخدم الأمثلة راتبًا إجماليًا قدره 1.500&nbsp;€ في الشهر ودفعتين إضافيتين قيمة كل منهما
+      1.500&nbsp;€، أي ما مجموعه 21.000&nbsp;€ في السنة.
+    </p>
+    <p class="guide__sources">
+      <span>{tx('guide.updated')}</span>
+      <span>
+        {tx('guide.sources')}: <a href={ET}>{tx('guide.source_et')}</a> ·{' '}
+        <a href={SOURCES.cgpjGuide.url}>{tx('guide.source_cgpj')}</a> ·{' '}
+        <a href={LGSS}>{tx('guide.source_lgss')}</a> ·{' '}
+        <a href={SOURCES.sepeAmounts.url}>{tx('guide.source_sepe')}</a>
+      </span>
+      <a href={link(lang, 'aviso-legal/')}>{tx('guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    <section class="sheet sheet--text">
+      <h3 id="g-que-lleva">{tx('guide.what_it_includes')}</h3>
+      <p>
+        عند انتهاء عقدك، تسلّمك الشركة عرضًا لوثيقة التسوية <bdi>(documento de liquidación)</bdi>
+        بالمبالغ التي تعود لك <bdi>(art. 49.2 ET)</bdi>. هذه هي التسوية النهائية، وهي تشمل ما كسبته
+        بالفعل ولم تتقاضَه بعد:
+      </p>
+      <ul>
+        <li>
+          راتب أيام العمل في الشهر الأخير <bdi>(art. 26 ET)</bdi>.
+        </li>
+        <li>
+          أيام الإجازة المتراكمة وغير المستفاد منها <bdi>(art. 38 ET)</bdi>.
+        </li>
+        <li>
+          الجزء المتراكم من الدفعات الإضافية <bdi>(pagas extra)</bdi>، إذا لم تكن موزّعة على قسائم
+          الراتب الشهرية <bdi>(art. 31 ET)</bdi>.
+        </li>
+        <li>
+          أيام مهلة الإشعار المسبق <bdi>(preaviso)</bdi> التي لم تمنحها الشركة، حين يشترطها القانون.
+        </li>
+      </ul>
+      <p>
+        إذا انتهى العقد مع حق في التعويض <bdi>(indemnización)</bdi>، يمكن أن تتضمنه وثيقة التسوية
+        أيضًا، لكنه من الناحية القانونية مبلغ مختلف عن التسوية النهائية، له قواعده ومُهَله الخاصة.
+        جميع الأرقام إجمالية، قبل الاقتطاعات الضريبية والاشتراكات.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-diferencia">{tx('guide.difference')}</h3>
+      <p>
+        تعود لك التسوية النهائية كلما انتهى العقد، حتى لو كنت أنت من يغادر، لأنها مال كسبته بالفعل.
+        أما التعويض فيقابل انتهاء العقد ويتوقف على سببه.
+      </p>
+      <p>
+        الاستقالة لا يترتب عليها تعويض <bdi>(art. 49.1.d ET)</bdi>. ولا الفصل التأديبي الذي يُعلَن
+        مبرَّرًا <bdi>(art. 55.7 ET)</bdi>؛ وإذا أُعلن غير مبرَّر، يُحسب كما يُحسب الفصل غير
+        المبرَّر.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 55.7</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-casos">{tx('guide.cases')}</h3>
+      <p>لكل سبب قواعده الخاصة. نشرحها بمثال محلول:</p>
+      <ul>
+        {caseLinks.map((id) => (
+          <li>
+            <CaseLink lang={lang} id={id} />
+          </li>
+        ))}
+      </ul>
+      <p>
+        ولإعانة البطالة <bdi>(paro)</bdi> صفحتها الخاصة: <CaseLink lang={lang} id="benefit" />.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-salario">{tx('guide.salary')}</h3>
+      <p>
+        تدخل أيام العمل من الشهر الذي ينتهي فيه العقد. قيمة اليوم يمكن أن تكون راتبك الشهري مقسومًا
+        على 30 (الشهر التجاري) أو على عدد أيام ذلك الشهر (الشهر التقويمي). تعطي المراجعة الهامش بين
+        الحسابين.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> انتهاء العمل في 15 أكتوبر:
+        1.500&nbsp;€ × 15/30 = 750,00&nbsp;€، أو 1.500&nbsp;€ × 15/31 = 725,81&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>26</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-vacaciones">{tx('guide.holidays')}</h3>
+      <p>
+        هي على الأقل ثلاثون يومًا تقويميًا في السنة <bdi>(art. 38.1 ET)</bdi>. تعتبرها المراجعة 22
+        يوم عمل من الاثنين إلى الجمعة، و26 من الاثنين إلى السبت، و30 × الأيام / 7 مع أسبوع عمل
+        مختلف: هذه معادلات، وليست نصًّا من القانون. يمكن أن تمنحك اتفاقيتك الجماعية
+        <bdi>(convenio colectivo)</bdi> أو عقدك أكثر. تتراكم مع كل يوم عمل، وتدخل في التسوية
+        النهائية أيام هذه السنة التي لم تستفد منها. كثير من الشركات تحسبها بالأشهر (2,5 يوم عن كل
+        شهر مع 30 في السنة) بدلًا من الأيام، وتعطي المراجعة الهامش بين الحسابين. يُدفع كل يوم بقيمة
+        تتراوح بين راتبك الشهري / 30 وراتبك السنوي / 365.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> انتهاء العمل في 15 أكتوبر 2026:
+        288 يومًا من العمل في السنة. 30 × 288/365 = 23,67 يوم متراكم. إذا استفدت من 15، يتبقى نحو
+        8,67 يوم: بين (30 × 288/365 − 15) × 1.500&nbsp;€/30 = 433,56&nbsp;€ و(30 × 288/365 − 15) ×
+        21.000&nbsp;€/365 = 498,89&nbsp;€.
+      </p>
+      <p>
+        إذا استفدت من أيام أكثر من الأيام المتراكمة، فإن جواز الخصم من عدمه يتوقف على الاتفاقية
+        الجماعية.
+      </p>
+      <p class="folio">
+        Art. <span>38</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-pagas">{tx('guide.extra_pay')}</h3>
+      <p>
+        يحدّد القانون دفعتين إضافيتين في السنة، وتحدّد الاتفاقية الجماعية قيمتهما وكيفية تراكمهما.
+        إذا كانتا موزّعتين على قسائم راتبك الشهرية <bdi>(prorrateadas)</bdi>، فقد تقاضيتهما بالفعل
+        شهرًا بشهر. وإلا، يدخل الجزء المتراكم منذ بدء فترة كل منهما: نصف سنوية (من يناير إلى يونيو
+        ومن يوليو إلى ديسمبر) أو سنوية (من يوليو إلى يونيو لدفعة الصيف، ومن يناير إلى ديسمبر لدفعة
+        عيد الميلاد). يمكن الحساب بالأيام أو بالأشهر، وتعطي المراجعة الهامش بين الحسابين. إذا غادرت
+        في الشهر الذي تُدفع فيه إحدى الدفعتين (يونيو أو يوليو لدفعة الصيف، وديسمبر لدفعة عيد
+        الميلاد)، فقد تكون مدرجة بالفعل في قسيمة راتب ذلك الشهر.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> دفعة عيد الميلاد بقيمة
+        1.500&nbsp;€ بفترة نصف سنوية، وانتهاء العمل في 15 أكتوبر: من 1 يوليو إلى 15 أكتوبر تمرّ 107
+        أيام من أصل 184 يومًا. 1.500&nbsp;€ × 107/184 = 872,28&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>31</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-indemnizacion">{tx('guide.severance')}</h3>
+      <p>
+        يُحسب التعويض بأيام الراتب. الراتب اليومي هو راتبك السنوي، مع الدفعات الإضافية، مقسومًا على
+        365، كما يفعل دليل CGPJ. في المثال، 21.000&nbsp;€ / 365 ≈ 57,53&nbsp;€. تضرب الأمثلة في
+        الرقم الدقيق، دون تقريب. في حالات الفصل، تُحسب مدة العمل بالأشهر، وجزء الشهر يُحتسب شهرًا
+        كاملًا. إذا وقع الفصل خلال إجراء ERTE، يُحسب التعويض بالراتب الكامل السابق لإجراء ERTE.
+      </p>
+      <div class="causes">
+        {causes.map(({ title, rule, citation, page }) => (
+          <div>
+            <h4>{page ? <a href={link(lang, LANDINGS[page].path.slice(1))}>{title}</a> : title}</h4>
+            <p>{rule}</p>
+            <p class="causes__citation">{citation}</p>
+          </div>
+        ))}
+      </div>
+      <p class="example">
+        <span class="example__label">فصل غير مبرَّر</span> من 3 مايو 2018 إلى 20 يوليو 2026: 98
+        شهرًا كاملًا وبضعة أيام، تُحتسب 99. 33 يومًا عن كل سنة تساوي 2,75 عن كل شهر: 99 × 2,75 =
+        272,25 يوم. 21.000&nbsp;€ × 272,25 / 365 = 15.663,70&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">فصل لأسباب موضوعية</span> بالتواريخ نفسها: 99 × 20/12 = 165
+        يومًا. 21.000&nbsp;€ × 165 / 365 = 9.493,15&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">انتهاء عقد مؤقت</span> مدته سنة، من 1 أكتوبر 2025 إلى 30 سبتمبر
+        2026: 365 يومًا × 12/365 = 12 يومًا. 21.000&nbsp;€ × 12 / 365 = 690,41&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 51 · 53 · 56</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-2012">{tx('guide.before_2012')}</h3>
+      <p>في الفصل غير المبرَّر لعقد سابق لـ 12 فبراير 2012، يُحسب التعويض على جزأين:</p>
+      <ul>
+        <li>حتى 11 فبراير 2012: 45 يومًا عن كل سنة (3,75 عن كل شهر).</li>
+        <li>ابتداءً من 12 فبراير 2012: 33 يومًا عن كل سنة (2,75 عن كل شهر).</li>
+      </ul>
+      <p>
+        للمجموع حدّ أقصى قدره 720 يومًا، إلا إذا تجاوزه الجزء الأول بالفعل. في هذه الحالة يُحتسب
+        الجزء الأول وحده، بحدّ أقصى 42 راتبًا شهريًا (1.260 يومًا).
+      </p>
+      <p>
+        عقود تشجيع التوظيف غير محدد المدة <bdi>(fomento de la contratación indefinida)</bdi>{' '}
+        الموقّعة قبل 12 فبراير 2012 تتبع، في التعويض عن الفصل لأسباب موضوعية، القاعدة التي وُقّعت
+        بموجبها؛ وفي الفصل التأديبي، يُحسب التعويض بهذين الجزأين (الفقرة 3). لا تميّز المراجعة هذا
+        النوع من العقود.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> من 1 مارس 2010 إلى 15 سبتمبر 2026.
+        الجزء الأول: 24 شهرًا × 3,75 = 90 يومًا. الجزء الثاني: 176 شهرًا × 2,75 = 484 يومًا.
+        المجموع: 574 يومًا. 21.000&nbsp;€ × 574 / 365 = 33.024,66&nbsp;€.
+      </p>
+      <p class="folio">
+        Disposición transitoria <span>11.ª</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-antiguedad">{tx('guide.by_seniority')}</h3>
+      <p>
+        التسوية النهائية هي ما تراكم خلال السنة وفي الشهر الأخير، لذا تتوقف عن الزيادة بعد سنة من
+        العقد. أما التعويض فيزداد مع كل شهر عمل ويتوقف على السبب.
+      </p>
+      <FigureTable id="g-antiguedad-tabla" label={tx('guide.by_seniority')}>
+        <Fragment slot="caption">
+          عقود تنتهي في 30 سبتمبر 2026، براتب إجمالي قدره 1.500&nbsp;€ في الشهر، ودفعتين إضافيتين
+          قيمة كل منهما 1.500&nbsp;€ بفترات نصف سنوية (دفعة الصيف مدفوعة بالفعل)، و22 يوم عمل من
+          الإجازة في السنة دون الاستفادة من أي منها. مقرّبة إلى أقرب يورو.
+        </Fragment>
+        <thead>
+          <tr>
+            <th scope="col">مدة العمل</th>
+            <th scope="col">التسوية النهائية</th>
+            <th scope="col">
+              عقد مؤقت
+              <span class="figures-note">12 يومًا</span>
+            </th>
+            <th scope="col">
+              فصل لأسباب موضوعية
+              <span class="figures-note">20 يومًا</span>
+            </th>
+            <th scope="col">
+              فصل غير مبرَّر
+              <span class="figures-note">33 يومًا</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {bySeniority.map(({ months, finalPay, fixedTermLimit, fixedTerm, objective, unfair }) => (
+            <tr>
+              <th scope="row">{spanLabel(months, lang)}</th>
+              <td>{wholeEuroRange(finalPay)}</td>
+              <td>
+                {fixedTerm === null ? '—' : wholeEuros(fixedTerm)}
+                {fixedTermLimit === 'sector_agreement' && <sup>1</sup>}
+                {fixedTermLimit === 'over' && <sup>2</sup>}
+              </td>
+              <td>{wholeEuros(objective)}</td>
+              <td>{wholeEuros(unfair)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </FigureTable>
+      <p>
+        تجمع التسوية النهائية راتب سبتمبر، وأيام الإجازة، والجزء المتراكم من دفعة عيد الميلاد، مع
+        الهامش بين الحساب بالأيام والحساب بالأشهر. الأعمدة الثلاثة الأخرى هي تعويض كل سبب، وهو
+        منفصل: عند انتهاء العقد المؤقت <bdi>(art. 49.1.c ET)</bdi>، وفي الفصل لأسباب موضوعية
+        <bdi>(arts. 52 y 53.1.b ET)</bdi>، وفي الفصل غير المبرَّر <bdi>(art. 56 ET)</bdi>. إذا أردت
+        المجموع، أضِفه إلى التسوية النهائية.
+      </p>
+      <p class="table-notes">
+        <sup>1</sup> مدة العقد لظروف الإنتاج <bdi>(por circunstancias de la producción)</bdi> 6 أشهر
+        على الأكثر. ولا تصل إلى سنة إلا إذا مدّدتها اتفاقيتك الجماعية القطاعية
+        <bdi>(art. 15.2 ET)</bdi>، أو في عقد العمل أو الخدمة المحددة <bdi>(obra o servicio)</bdi>
+        الموقّع قبل 31 ديسمبر 2021
+        <bdi>(disposición transitoria 3.ª del Real Decreto-ley 32/2021)</bdi>.
+      </p>
+      <p class="table-notes">
+        <sup>2</sup> العقد لظروف الإنتاج لا يدوم كل هذه المدة. وعقد العمل أو الخدمة المحددة الموقّع
+        قبل 31 ديسمبر 2021 كان يدوم 3 سنوات على الأكثر، أو 4 إذا مدّدته الاتفاقية الجماعية القطاعية
+        <bdi>(art. 15.1.a ET)</bdi> بصيغتها السابقة و
+        <bdi>(disposición transitoria 3.ª del Real Decreto-ley 32/2021)</bdi>، لذا لا ينتهي أيٌّ
+        منها في سبتمبر 2026 بهذه الأقدمية. والعقد المؤقت الذي يتجاوز مدته القصوى قد يصبح عقدًا غير
+        محدد المدة <bdi>(art. 15.4 ET)</bdi>، وعندها يكون إنهاؤه فصلًا.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-propuesta">{tx('guide.proposal')}</h3>
+      <p>
+        تسلّم الشركة عرضًا لوثيقة التسوية. وينصّ القانون على أن للعامل أو العاملة أن يوقّعه بحضور
+        أحد الممثلين القانونيين للعمال.
+      </p>
+      <p>
+        يوقّع بعض الأشخاص مع كتابة «recibí no conforme» (استلمت، دون موافقة) عندما لا يوافقون على
+        أحد المبالغ. نذكر ذلك على سبيل المعلومات فقط. ما يمكن فعله في كل حالة يمكن أن يقيّمه مكتب
+        محاماة متخصص في قانون العمل، أو مكتب مستشار في شؤون العمل <bdi>(graduado social)</bdi>، أو
+        نقابة.
+      </p>
+      <p>
+        ما الذي يتغيّر وما الذي لا يتغيّر: صفحة <CaseLink lang={lang} id="not_agreed" />.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-plazos">{tx('guide.deadlines')}</h3>
+      <p>
+        بالنسبة إلى مبالغ مثل الراتب المتبقي، وأيام الإجازة، والدفعات الإضافية، أو التعويض عن انتهاء
+        عقد مؤقت، المهلة سنة واحدة <bdi>(art. 59.1 ET)</bdi>. إذا لم تدفع لك الشركة بعد، فما هو راتب
+        تترتب عليه فائدة تأخير بنسبة 10&nbsp;% سنويًا <bdi>(art. 29.3 ET)</bdi>؛ أما التعويض فلا.
+      </p>
+      <p>
+        في حالة الفصل (لأسباب موضوعية، أو جماعي، أو غير مبرَّر، أو تأديبي)، مهلة الطعن فيه 20 يوم
+        عمل رسمي <bdi>(art. 59.3 ET)</bdi>. ومن لا يوافق على تعويض الفصل يطرح ذلك عادةً عبر الطريق
+        نفسه، خلال هذه المهلة البالغة 20 يومًا.
+      </p>
+      <p>
+        المهلة قصيرة، ويمكن لمكتب محاماة متخصص في قانون العمل، أو مكتب مستشار في شؤون العمل، أو
+        نقابة أن يخبرك بالمهلة التي تنطبق على حالتك.
+      </p>
+      <p class="folio">
+        Art. <span>29.3 · 59</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-no-revisa">{tx('guide.unchecked')}</h3>
+      <ul>
+        {unchecked.map((text) => (
+          <li>{text}</li>
+        ))}
+      </ul>
+      <p>
+        تُقارن أيام الإجازة والدفعات الإضافية بالحد الأدنى القانوني، مع الهامش بين الحساب بالأيام
+        والحساب بالأشهر؛ ويمكن لاتفاقيتك الجماعية أن تحسّن هذه الأرقام. لا تظهر عبارة «لا يمكن
+        التحقق منه» إلا عندما تنقص معلومة لا يوجد بدونها رقم قانوني، مثل مهلة الإشعار المسبق في
+        الاستقالة أو أيام الإجازة التي استفدت منها.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-paro">{tx('guide.benefit')}</h2>
+      <p>
+        عند انتهاء العقد، قد تكون هناك، إلى جانب التسوية النهائية، إعانة البطالة <bdi>(paro)</bdi>،
+        أي الإعانة القائمة على الاشتراكات <bdi>(prestación contributiva)</bdi>. وللحصول عليها،
+        يُشترط أن ينتهي العقد في وضع قانوني للبطالة <bdi>(situación legal de desempleo)</bdi>، وهذا
+        يتوقف على السبب:
+      </p>
+      <ul>
+        <li>
+          الفصل لأسباب موضوعية أو الجماعي أو غير المبرَّر أو التأديبي يُعدّ كذلك
+          <bdi>(art. 267.1.a LGSS)</bdi>. والفصل التأديبي يُحتسب أيضًا حتى لو أُعلن مبرَّرًا أو لم
+          يُطعن فيه <bdi>(art. 268.4 LGSS)</bdi>.
+        </li>
+        <li>
+          انتهاء العقد المؤقت يُعدّ كذلك، إلا إذا كنت أنت من أنهاه{' '}
+          <bdi>(art. 267.1.a.6.º LGSS)</bdi>.
+        </li>
+        <li>
+          الاستقالة <bdi>(baja voluntaria)</bdi> لا تُعدّ كذلك <bdi>(art. 267.2.a LGSS)</bdi>، إلا
+          إذا غادرت بسبب النقل إلى مكان عمل آخر <bdi>(traslado)</bdi>، أو تعديل جوهري لشروط عملك
+          يضرّ بك <bdi>(art. 41.3 ET)</bdi>، أو إخلال جسيم من الشركة، مثل عدم دفع راتبك أو دفعه
+          متأخرًا مرة بعد مرة، أو بسبب العنف القائم على النوع الاجتماعي أو العنف الجنسي
+          <bdi>(art. 267.1.a.5.º LGSS)</bdi>.
+        </li>
+      </ul>
+      <p>
+        ويلزم أيضًا 360 يومًا على الأقل من الاشتراك عن البطالة في السنوات الـ6 السابقة لم تُستخدم
+        بعدُ لإعانة بطالة أخرى، ويمكن جمع عدة أعمال <bdi>(arts. 266.b y 269 LGSS)</bdi>. ويُشترط
+        كذلك أن تكون مسجّلًا في الضمان الاجتماعي <bdi>(de alta)</bdi> أو في وضع مماثل، وأن تسجّل
+        نفسك طالبَ عمل <bdi>(demandante de empleo)</bdi>، وأن توقّع اتفاق النشاط{' '}
+        <bdi>(acuerdo de actividad)</bdi>، وألّا تكون قد بلغت سن التقاعد <bdi>(art. 266 LGSS)</bdi>.
+      </p>
+      <p>
+        لحسابها ببياناتك ورؤية السلّم الكامل، انظر صفحة <CaseLink lang={lang} id="benefit" />.
+      </p>
+      <p class="folio">
+        Arts. <span>266 · 267 · 268.4</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-cuanto">{tx('guide.benefit_amount')}</h3>
+      <p>
+        القاعدة هي متوسط ما اشتركت به عن البطالة في آخر 180 يومًا، دون الساعات الإضافية
+        <bdi>(art. 270.1 LGSS)</bdi>. يُتقاضى 70&nbsp;% من القاعدة في أول 180 يومًا، و60&nbsp;%
+        ابتداءً من اليوم 181 <bdi>(art. 270.2 LGSS)</bdi>.
+      </p>
+      <p>
+        لكل شهر حد أدنى وحد أقصى بحسب أبنائك أو بناتك المُعالين <bdi>(art. 270.3 LGSS)</bdi>. في
+        2026، ومع مؤشر IPREM عند 600&nbsp;€، هي كالتالي:
+      </p>
+      <ul>
+        <li>دون أبناء أو بنات مُعالين، بين 560&nbsp;€ و1.225&nbsp;€ شهريًا.</li>
+        <li>مع واحد، بين 749&nbsp;€ و1.400&nbsp;€.</li>
+        <li>مع اثنين أو أكثر، بين 749&nbsp;€ و1.575&nbsp;€.</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> مع 21.000&nbsp;€ في السنة، تكون
+        القاعدة 21.000&nbsp;€ / 12 = 1.750&nbsp;€ شهريًا. ونسبة 70&nbsp;% منها 1.225&nbsp;€، وهو
+        الحد الأقصى تمامًا دون أبناء أو بنات مُعالين، ونسبة 60&nbsp;% منها 1.050&nbsp;€.
+      </p>
+      <p>
+        هذه أرقام إجمالية. يُقتطع منها 4,85&nbsp;% من القاعدة للضمان الاجتماعي
+        <bdi>(Seguridad Social)</bdi> وضريبة الدخل <bdi>(IRPF)</bdi> المطبّقة. تفترض أرقام هذا
+        الدليل والمراجعة دوامًا كاملًا؛ ومع الدوام الجزئي تكون أقل.
+      </p>
+      <p class="folio">
+        Art. <span>270</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-duracion">{tx('guide.benefit_duration')}</h3>
+      <p>
+        تتوقف على أيام الاشتراك في السنوات الـ6 الأخيرة التي لم تُستخدم لإعانة بطالة أخرى
+        <bdi>(art. 269 LGSS)</bdi>:
+      </p>
+      <ul>
+        <li>من 360 إلى 539 يومًا من الاشتراك، 120 يومًا من إعانة البطالة (4 أشهر).</li>
+        <li>
+          كل 180 يومًا إضافية من الاشتراك تضيف 60 يومًا من إعانة البطالة (2 أشهر). من 540 إلى 719
+          تكون 180 يومًا؛ ومن 720 إلى 899، 240؛ وهكذا.
+        </li>
+        <li>ابتداءً من 2.160 يومًا من الاشتراك، الحد الأقصى، أي 720 يومًا (24 شهرًا).</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> مع ثلاث سنوات من الاشتراك، أي
+        1.095 يومًا، تكون المدة 360 يومًا من إعانة البطالة (12 شهرًا).
+      </p>
+      <p>
+        وتُحتسب أيضًا أيامَ اشتراك <bdi>(art. 269.4 LGSS)</bdi> أيامُ الإجازة المدفوعة وغير المستفاد
+        منها. ويظهر كل بدء عمل وكل انتهاء عمل وأيام الاشتراك في{' '}
+        <a href={workHistoryUrl} rel="noopener">
+          {tx('result.benefit_work_history_link')}
+        </a>
+        .
+      </p>
+      <p class="folio">
+        Art. <span>269</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-plazo">{tx('guide.benefit_deadline')}</h3>
+      <p>
+        دون التسجيل طالبَ عمل <bdi>(demandante de empleo)</bdi> لا توجد إعانة بطالة
+        <bdi>(art. 266 LGSS)</bdi>: تسجّل في خدمة التوظيف في منطقتك ذات الحكم الذاتي
+        <bdi>(comunidad autónoma)</bdi> وتطلب الإعانة من SEPE. يُقدَّم الطلب خلال الـ15 يومًا
+        التالية لانتهاء العقد، وهي أيام عمل رسمية بحسب SEPE. إذا كانت تسويتك النهائية تدفع أيام
+        إجازة غير مستفاد منها، تُحتسب المهلة من انتهاء تلك الأيام{' '}
+        <bdi>(art. 268.1 y 268.3 LGSS)</bdi>. وتقديم الطلب متأخرًا يُنقص من إعانة البطالة أيام
+        التأخير <bdi>(art. 268.2 LGSS)</bdi>.
+      </p>
+      <ul class="sources">
+        {benefitSources.map(({ citation, url, inForce }) => (
+          <li>
+            <a href={url}>{citation}</a>
+            <span class="sources__in-force">{inForce}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="folio">
+        Art. <span>268</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('guide.faq')}</h2>
+      <div class="faq-list">
+        {faqEntries(lang, { documents }).map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>
+
+<style>
+  .sheet--text .table-notes {
+    font-size: 0.875rem;
+  }
+</style>
