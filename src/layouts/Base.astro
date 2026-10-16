@@ -14,7 +14,7 @@ import '../styles/pages.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { t, clientStrings } from '../i18n';
-import { LANGS, link, publishedLangs, reviewLangs, type Lang } from '../i18n/languages';
+import { LANGS, builtLangs, link, reviewLangs, type Lang } from '../i18n/languages';
 import { contentSecurityPolicy } from './csp';
 import { DOCUMENTS } from '../documents/config';
 
@@ -38,7 +38,7 @@ const {
   description,
   path,
   lang = 'es',
-  langs = publishedLangs(),
+  langs = builtLangs(),
   section = 'cause',
   structuredData,
   noindex = false,
@@ -51,6 +51,11 @@ const canonical = url(lang);
 const { dir, published } = LANGS[lang];
 // A language served only to its reviewer says so on every page, with the Spanish one a click away.
 const underReview = reviewLangs().includes(lang);
+// The header's language menu: this page in each published language it is built in, plus the one
+// shown when it is under review. A page never offers an unreviewed language, nor the pseudo-locale.
+const languages = langs
+  .filter((i) => builtLangs().includes(i) && (LANGS[i].published || (i === lang && underReview)))
+  .map((i) => ({ code: i, name: LANGS[i].name, href: url(i).pathname }));
 // An unpublished language (only ar-test, under TEST_RTL=1) and a noindex page (the 404) are
 // never indexed nor announced; the 404 is served at any address, so it names no canonical.
 const indexable = published && !noindex;
@@ -151,12 +156,13 @@ const otherLangsJson = JSON.stringify(otherLangs).replace(/</g, '\\u003c');
           </p>
         </aside>
       )}
-      <Header lang={lang} />
+      <Header lang={lang} languages={languages} />
       <slot />
     </div>
     <Footer lang={lang} />
     <script>
       import '../scripts/theme';
+      import '../scripts/language-menu';
       import '../scripts/analytics';
     </script>
   </body>

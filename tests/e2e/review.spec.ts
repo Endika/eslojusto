@@ -18,9 +18,31 @@ test('every section the build has is under review too', async ({ page }) => {
   await expect(page.locator('.review-banner a')).toHaveAttribute('href', '/empleada-de-hogar/');
 });
 
+test('its language menu switches to the same page in Spanish, and closes on Escape', async ({
+  page,
+}) => {
+  await page.goto('eu/empleada-de-hogar/');
+  const menu = page.locator('.language-menu');
+  await menu.locator('summary').click();
+  const links = menu.locator('.language-menu__list a');
+  await expect(links).toHaveText(['Español', 'Euskara']);
+  await expect(links.nth(1)).toHaveAttribute('aria-current', 'page');
+  await expect(links.nth(0)).toHaveAttribute('hreflang', 'es');
+  await page.keyboard.press('Escape');
+  await expect(links.nth(0)).toBeHidden();
+  await menu.locator('summary').click();
+  await page.locator('h1').click();
+  await expect(links.nth(0)).toBeHidden();
+  await menu.locator('summary').click();
+  await links.nth(0).click();
+  await expect(page).toHaveURL(/\/empleada-de-hogar\/$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+});
+
 test('the Spanish pages neither link nor offer it', async ({ page }) => {
   await page.goto('');
   await expect(page.locator('.review-banner')).toHaveCount(0);
+  await expect(page.locator('.language-menu')).toHaveCount(0);
   await expect(page.locator('link[hreflang="eu"]')).toHaveCount(0);
   await expect(page.locator('#other-languages')).toHaveCount(0);
 });
