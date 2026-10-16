@@ -1,0 +1,88 @@
+---
+// source: a172b338d8e2
+import CaseLink from '../../components/CaseLink.astro';
+import { disciplinary, entitledByCause } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import { t } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+if (disciplinary.entitled !== 'yes' || disciplinary.figures === null)
+  throw new Error('Incomplete example');
+const { figures } = disciplinary;
+// The reasons are the calculator's own: the same sentence and article it shows in the result.
+const causes = entitledByCause.map(({ cause, entitled }) => ({
+  name: t(lang, `cause.${cause}`),
+  entitled,
+  reason: t(lang, `client.unemployment.reason.${cause}`),
+}));
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-si">يمنح الحق في إعانة البطالة، حتى لو كان الفصل مبرَّرًا</h3>
+  <p>
+    هذا سؤال شائع، والجواب في القانون: الفصل يُعدّ وضعًا قانونيًا للبطالة
+    <bdi>(situación legal de desempleo)</bdi> <bdi>(art. 267.1.a.3.º LGSS)</bdi>، ولتقاضي إعانة
+    البطالة <bdi>(paro)</bdi> لا يُشترط الطعن فيه <bdi>(art. 268.4 LGSS)</bdi>. ولا فرق في أن يكون
+    الفصل تأديبيًا <bdi>(disciplinario)</bdi> أو أن يُعلَن أنه مبرَّر
+    <bdi>(procedente)</bdi>.
+  </p>
+  <p>
+    ما يُشترط هو الشروط المعتادة: 360 يومًا من الاشتراك <bdi>(días cotizados)</bdi> في السنوات الـ6
+    الأخيرة، والتسجيل طالبَ عمل <bdi>(demandante de empleo)</bdi>، وتوقيع اتفاق النشاط
+    <bdi>(acuerdo de actividad)</bdi>، من بين شروط أخرى <bdi>(art. 266 LGSS)</bdi>.
+  </p>
+  <p class="folio">
+    Arts. <span>267 · 268.4</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ceses">أيّ حالات انتهاء العمل تمنح الحق في إعانة البطالة</h3>
+  <div class="causes">
+    {causes.map(({ name, entitled, reason }) => (
+      <div>
+        <h4>{name}</h4>
+        <p>
+          <strong>
+            {entitled === 'yes'
+              ? 'يمنح الحق في إعانة البطالة.'
+              : 'لا يمنح الحق في إعانة البطالة، إلا في استثناءات.'}
+          </strong>{' '}
+          {reason}
+        </p>
+      </div>
+    ))}
+  </div>
+  <p>
+    استثناءات الاستقالة <bdi>(baja voluntaria)</bdi>، مثل النقل إلى مكان عمل آخر أو عدم دفع الأجور
+    بشكل جسيم، تجدها في صفحة <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ejemplo">مثال محلول</h3>
+  <p>
+    شخص يتقاضى 1.500&nbsp;€ إجمالًا في الشهر، مع دفعتين إضافيتين قيمة كل منهما 1.500&nbsp;€، يعمل من
+    1 يونيو 2022 إلى 30 سبتمبر 2026، دون أبناء أو بنات مُعالين، وتفصله الشركة لأسباب تأديبية.
+  </p>
+  <p class="example">
+    <span class="example__label">إعانة البطالة التي تعود له</span> مع
+    {integer(disciplinary.contractDays)} يومًا من الاشتراك يعود له على الأقل
+    {integer(disciplinary.duration.days)} يومًا من إعانة البطالة (
+    {integer(disciplinary.duration.days / 30)} شهرًا): نحو {wholeEuros(figures.firstStretch.min)} في
+    الشهر خلال أول 6 أشهر ونحو {wholeEuros(figures.secondStretch.min)} بعدها، إجمالًا. «على الأقل»،
+    لأن أعمالًا أخرى خلال السنوات الـ6 الأخيرة يمكن أن تضيف أيامًا.
+  </p>
+  <p>
+    إذا أُعلن أن الفصل غير مبرَّر <bdi>(improcedente)</bdi>، فسيكون هناك أيضًا تعويض: تجد ذلك في
+    صفحة <CaseLink lang={lang} id="unfair_dismissal" />.
+  </p>
+</section>

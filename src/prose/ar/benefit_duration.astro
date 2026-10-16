@@ -1,0 +1,101 @@
+---
+// source: e288ce65363a
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { BENEFIT_SCALE, durationByTime, spanLabel } from '../../content/examples';
+import { integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+// Each row runs from its own threshold to the day before the next one; the last has no end.
+const rows = BENEFIT_SCALE.map(([from, days], i) => ({
+  from,
+  to: BENEFIT_SCALE[i + 1]?.[0],
+  days,
+}));
+const months = (days: number) => integer(days / 30);
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pt-escala">الجدول الكامل</h3>
+  <p>
+    تتوقف مدة إعانة البطالة <bdi>(paro)</bdi> على أيام الاشتراك عن البطالة
+    <bdi>(días cotizados)</bdi> في السنوات الـ6 السابقة التي لم تستخدمها بالفعل لإعانة بطالة أخرى
+    <bdi>(art. 269.1 LGSS)</bdi>. تُحتسب جميع أعمالك خلال تلك المدة، لا العمل الأخير وحده.
+  </p>
+  <FigureTable id="pt-tabla">
+    <Fragment slot="caption">أيام الاشتراك في السنوات الـ6 الأخيرة وأيام إعانة البطالة.</Fragment>
+    <thead>
+      <tr>
+        <th scope="col">أيام الاشتراك</th>
+        <th scope="col">أيام إعانة البطالة</th>
+        <th scope="col">الأشهر</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(({ from, to, days }) => (
+        <tr>
+          <th scope="row">
+            {to === undefined
+              ? `${integer(from)} أو أكثر`
+              : `من ${integer(from)} إلى ${integer(to - 1)}`}
+          </th>
+          <td>{integer(days)}</td>
+          <td>{months(days)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    مع أقل من 360 يومًا من الاشتراك لا توجد إعانة قائمة على الاشتراكات
+    <bdi>(prestación contributiva)</bdi>. وتُحتسب أيضًا أيامَ اشتراك
+    <bdi>(art. 269.4 LGSS)</bdi> أيامُ الإجازة المدفوعة في التسوية النهائية <bdi>(finiquito)</bdi>
+    وغير المستفاد منها.
+  </p>
+  <p class="folio">
+    Art. <span>269</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pt-ejemplos">أمثلة: من 6 أشهر إلى 6 سنوات</h3>
+  <p>
+    عقد واحد ينتهي في 31 أغسطس 2026، دون أعمال أخرى في السنوات الـ6 السابقة ولا إعانة بطالة أخرى سبق
+    تقاضيها:
+  </p>
+  <FigureTable id="pt-ejemplos-tabla">
+    <Fragment slot="caption">مدة العمل وأيام الاشتراك وإعانة البطالة.</Fragment>
+    <thead>
+      <tr>
+        <th scope="col">مدة العمل</th>
+        <th scope="col">أيام الاشتراك</th>
+        <th scope="col">أيام إعانة البطالة</th>
+      </tr>
+    </thead>
+    <tbody>
+      {durationByTime.map(({ months: span, days, benefitDays }) => (
+        <tr>
+          <th scope="row">{spanLabel(span, lang)}</th>
+          <td>{integer(days)}</td>
+          <td>
+            {benefitDays === 0
+              ? 'لا يبلغ 360'
+              : `${integer(benefitDays)} (${months(benefitDays)} شهر)`}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    مع 6 أشهر لا تصل الأيام إلى 360 يومًا، لكن إذا عملت في أماكن أخرى خلال السنوات الـ6 السابقة،
+    فتلك الأيام تُضاف. لهذا تسألك الحاسبة عن أعمال أخرى وتحيلك إلى سجلك المهني
+    <bdi>(vida laboral)</bdi>، حيث تظهر جميع أيام الاشتراك.
+  </p>
+  <p>
+    مقدار كل شهر تجده في صفحة <CaseLink lang={lang} id="benefit" />.
+  </p>
+</section>

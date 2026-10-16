@@ -1,0 +1,101 @@
+---
+// source: af62c96628b9
+import CaseLink from '../../components/CaseLink.astro';
+import { itemRange, resignation } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const salary = itemRange(resignation, 'pending_salary');
+const holidays = itemRange(resignation, 'holiday_pay');
+const extraPay = itemRange(resignation, 'extra_pay');
+const deduction = itemRange(resignation, 'notice_deduction');
+if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="bv-que-lleva">
+    ما تتضمّنه التسوية النهائية <bdi>(finiquito)</bdi> عند الاستقالة
+  </h3>
+  <p>
+    طلب الاستقالة <bdi>(baja voluntaria)</bdi> يعني ترك العمل بقرار منك: ينتهي العقد بقرارك
+    <bdi>(art. 49.1.d ET)</bdi>. وحتى إن كنت أنت من يغادر، فما كسبته بالفعل ولم تتقاضه بعد يعود لك
+    من الشركة:
+  </p>
+  <ul>
+    <li>
+      راتب الأيام التي عملتها في الشهر الأخير <bdi>(art. 26 ET)</bdi>.
+    </li>
+    <li>
+      أيام الإجازة المتراكمة هذا العام وغير المستفاد منها <bdi>(art. 38 ET)</bdi>.
+    </li>
+    <li>
+      الجزء المتراكم من الدفعات الإضافية <bdi>(pagas extra)</bdi>، إذا لم تكن موزّعة على قسائم
+      الراتب الشهرية <bdi>(prorrateadas)</bdi> <bdi>(art. 31 ET)</bdi>.
+    </li>
+  </ul>
+  <p>
+    أما التعويض <bdi>(indemnización)</bdi> فلا يوجد: الاستقالة لا يترتب عليها تعويض
+    <bdi>(art. 49.1.d ET)</bdi>. جميع الأرقام إجمالية <bdi>(brutas)</bdi>، أي قبل الاقتطاعات
+    الضريبية واشتراكات الضمان الاجتماعي.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d · 26 · 31 · 38</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-preaviso">مهلة الإشعار المسبق في اتفاقيتك الجماعية</h3>
+  <p>
+    عند الاستقالة، يلزم الإشعار بالمهلة التي تحدّدها اتفاقيتك الجماعية
+    <bdi>(convenio colectivo)</bdi> أو العُرف المحلي <bdi>(art. 49.1.d ET)</bdi>. إذا نصّت اتفاقيتك
+    على ذلك ولم تقدّم الإشعار، يمكن للشركة أن تخصم من التسوية النهائية الأيام الناقصة، بحسب راتبك
+    اليومي.
+  </p>
+  <p>
+    تسألك الحاسبة عن عدد الأيام التي تحدّدها اتفاقيتك وعن عدد الأيام التي قدّمتها، وتعطي الحد الأقصى
+    للخصم. إذا كنت لا تعرف عدد أيام الاتفاقية، يظهر ذلك الخصم بعلامة «لا يمكن التحقق منه».
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-ejemplo">مثال محلول</h3>
+  <p>
+    شخص يتقاضى 1.500&nbsp;€ إجمالًا في الشهر، مع دفعتين إضافيتين قيمة كل منهما 1.500&nbsp;€ تتراكمان
+    كل نصف سنة، يعمل من 1 مارس 2023 إلى 15 أكتوبر 2026. استفاد هذا العام من 10 أيام من أصل 22 يوم
+    عمل من الإجازة. تحدّد اتفاقيته 15 يومًا من الإشعار المسبق، ويغادر دون أن يقدّمها. هذه أرقام
+    الحاسبة:
+  </p>
+  <ul>
+    <li>راتب أكتوبر: {euroRange(salary)}، بحسب احتساب الشهر 30 يومًا أو 31.</li>
+    <li>أيام الإجازة غير المستفاد منها: {euroRange(holidays)}.</li>
+    <li>الدفعة الإضافية لعيد الميلاد المتراكمة منذ يوليو: {euroRange(extraPay)}.</li>
+    <li>التعويض: {euros(0)}.</li>
+    <li>الخصم بسبب الإشعار المسبق غير المقدَّم: {euros(deduction.max)} كحد أقصى.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">الحساب</span> ينتج هامش كل بند من الحساب بالأيام أو بالأشهر، كما
+    تفعل الشركات. الخصم هو 15 يومًا بمعدل {euros(deduction.max / 15)}
+    لليوم، وهو الأعلى بين الراتبين اليوميين: الراتب الشهري مقسومًا على 30، والسنوي مقسومًا على 365.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-paro">وإعانة البطالة</h3>
+  <p>
+    الاستقالة لا تُعدّ وضعًا قانونيًا للبطالة <bdi>(situación legal de desempleo)</bdi>، ولذلك فهي
+    كقاعدة عامة لا تمنح الحق في إعانة البطالة <bdi>(paro)</bdi> <bdi>(art. 267.2.a LGSS)</bdi>. هناك
+    استثناءات، مثل المغادرة بسبب النقل إلى مكان عمل آخر أو بسبب عدم دفع الأجور بشكل جسيم. تجدها في
+    صفحة <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

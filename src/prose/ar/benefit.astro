@@ -1,0 +1,143 @@
+---
+// source: 5665f4065cc1
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitBySalary } from '../../content/examples';
+import { euros, wholeEuros } from '../../content/format';
+import { BENEFIT_2026 } from '../../engine/unemployment';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const { minCap, maxCap } = BENEFIT_2026;
+const [, mid, high] = benefitBySalary;
+if (!mid || !high) throw new Error('Incomplete example');
+type Row = (typeof benefitBySalary)[number];
+const stretch = (b: Row, n: 0 | 1 | 2) => b.children[n] ?? { c1: 0, c2: 0 };
+// One row per figure, one column per salary, so the table fits a phone.
+const rows: readonly (readonly [string, (b: Row) => number])[] = [
+  ['القاعدة المرجعية', (b) => b.base],
+  ['أول 180 يومًا، دون أبناء أو بنات', (b) => stretch(b, 0).c1],
+  ['أول 180 يومًا، مع واحد', (b) => stretch(b, 1).c1],
+  ['أول 180 يومًا، مع اثنين أو أكثر', (b) => stretch(b, 2).c1],
+  ['ابتداءً من اليوم 181، دون أبناء أو بنات', (b) => stretch(b, 0).c2],
+];
+---
+
+<section class="sheet sheet--text">
+  <h3 id="p-cuanto">70&nbsp;% ثم 60&nbsp;%</h3>
+  <p>
+    تُحسب إعانة البطالة <bdi>(paro)</bdi>، أي الإعانة القائمة على الاشتراكات
+    <bdi>(prestación contributiva)</bdi>، على أساس قاعدتك المرجعية <bdi>(base reguladora)</bdi>:
+    متوسط ما اشتُرك به عن البطالة خلال آخر 180 يومًا، دون الساعات الإضافية
+    <bdi>(art. 270.1 LGSS)</bdi>. يُتقاضى 70&nbsp;% من تلك القاعدة خلال أول 180 يومًا و60&nbsp;%
+    ابتداءً من اليوم 181 <bdi>(art. 270.2 LGSS)</bdi>.
+  </p>
+  <p>
+    لكل شهر حدّ أدنى وحدّ أقصى بحسب أبنائك أو بناتك المُعالين <bdi>(art. 270.3 LGSS)</bdi>. في 2026،
+    مع مؤشر IPREM عند {wholeEuros(BENEFIT_2026.monthlyIprem)}، هي كالتالي:
+  </p>
+  <ul>
+    <li>
+      دون أبناء أو بنات مُعالين، بين {wholeEuros(minCap[0])} و{wholeEuros(maxCap[0])} في الشهر.
+    </li>
+    <li>
+      مع واحد، بين {wholeEuros(minCap[1])} و{wholeEuros(maxCap[1])}.
+    </li>
+    <li>
+      مع اثنين أو أكثر، بين {wholeEuros(minCap[1])} و{wholeEuros(maxCap[2])}.
+    </li>
+  </ul>
+  <p class="folio">
+    Art. <span>270</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-tabla">كم تبلغ إعانة البطالة مع راتب قدره 1.300 أو 1.500 أو 1.800&nbsp;€</h3>
+  <FigureTable id="p-tabla-titulo">
+    <Fragment slot="caption">
+      إعانة البطالة الإجمالية في الشهر مع راتب موزّع على 14 دفعة متساوية ودوام كامل، في 2026، مقرّبة
+      إلى اليورو كما في الحاسبة.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">الراتب الإجمالي في الشهر</th>
+        {benefitBySalary.map(({ salary }) => (
+          <th scope="col">{wholeEuros(salary)}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(([label, value]) => (
+        <tr>
+          <th scope="row">{label}</th>
+          {benefitBySalary.map((b) => (
+            <td>{wholeEuros(value(b))}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    تُستخرج القاعدة من الراتب السنوي، مع الدفعات الإضافية <bdi>(pagas extra)</bdi>، مقسومًا على 12:
+    مع 1.500&nbsp;€ على 14 دفعة، 21.000&nbsp;€ / 12 = {euros(mid.base)}، و70&nbsp;% منها يساوي
+    تمامًا الحد الأقصى دون أبناء أو بنات مُعالين. مع 1.800&nbsp;€ تكون القاعدة {euros(high.base)}،
+    و70&nbsp;% منها يتجاوز الحدّين الأقصيين دون أبناء أو بنات ومع واحد، ولذلك يُتقاضى في هاتين
+    الحالتين الحد الأقصى.
+  </p>
+  <p>
+    هذه أرقام إجمالية <bdi>(brutas)</bdi>. يُقتطع منها 4,85&nbsp;% من القاعدة للضمان الاجتماعي
+    <bdi>(Seguridad Social)</bdi> وضريبة الدخل <bdi>(IRPF)</bdi> المطبّقة. مع الدوام الجزئي تكون
+    الأرقام أقل، والحاسبة لا تعطيها.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-requisitos">من يمكنه تقاضيها</h3>
+  <p>
+    يلزم أن ينتهي العقد في وضع قانوني للبطالة <bdi>(situación legal de desempleo)</bdi>: فصل، أو
+    انتهاء عقد مؤقت لم تكن أنت من أنهاه، على سبيل المثال <bdi>(art. 267 LGSS)</bdi>. ويُشترط أيضًا
+    360 يومًا على الأقل من الاشتراك <bdi>(días cotizados)</bdi> في السنوات الـ6 الأخيرة، والتسجيل
+    طالبَ عمل <bdi>(demandante de empleo)</bdi>، وتوقيع اتفاق النشاط
+    <bdi>(acuerdo de actividad)</bdi>، من بين شروط أخرى <bdi>(art. 266 LGSS)</bdi>.
+  </p>
+  <ul>
+    <li>
+      مدتها بحسب أيام الاشتراك: <CaseLink lang={lang} id="benefit_duration" />.
+    </li>
+    <li>
+      إذا تركت العمل بقرار منك: <CaseLink lang={lang} id="benefit_resignation" />
+    </li>
+    <li>
+      إذا فُصلت بسبب خطأ منسوب إليك: <CaseLink lang={lang} id="benefit_disciplinary" />.
+    </li>
+  </ul>
+  <p>
+    دون التسجيل طالبَ عمل لا توجد إعانة بطالة: يكون التسجيل في خدمة التوظيف في منطقتك ذات الحكم
+    الذاتي <bdi>(comunidad autónoma)</bdi>، ويُقدَّم الطلب إلى SEPE خلال الـ15 يومًا التالية لانتهاء
+    العقد، أو لانتهاء أيام الإجازة غير المستفاد منها التي تدفعها لك التسوية النهائية
+    <bdi>(finiquito)</bdi> <bdi>(arts. 266 y 268 LGSS)</bdi>. أما كونها أيام عمل رسمية، فتذكره SEPE.
+  </p>
+  <p class="folio">
+    Arts. <span>266 · 267 · 268</span> LGSS
+  </p>
+</section>
+
+{/* The literal switch, as in the ERTE page's route: a build without it renders nothing here. */}
+{import.meta.env.PUBLIC_ERTE === '1' && (
+  <section class="sheet sheet--text">
+    <h3 id="p-erte">إذا كنت مشمولًا بإجراء ERTE</h3>
+    <p>
+      يمكن لإجراء ERTE أيضًا أن يمنح الحق في إعانة البطالة طوال مدته. مقدار ما يُتقاضى، وما إذا كان
+      يستهلك من إعانة البطالة المستقبلية، يتوقفان على نوع إجراء ERTE:{' '}
+      <a href={link(lang, 'paro/erte/')}>احسب إعانة البطالة خلال إجراء ERTE</a>.
+    </p>
+    <p class="folio">
+      Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+    </p>
+  </section>
+)}

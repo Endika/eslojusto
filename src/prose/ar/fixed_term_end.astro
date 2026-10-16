@@ -1,0 +1,115 @@
+---
+// source: fb74508032fd
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { fixedTerms, spanLabel } from '../../content/examples';
+import { euroRange } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<section class="sheet sheet--text">
+  <h3 id="fc-indemnizacion">12 يومًا عن كل سنة، إلا في عقود الاستبدال والتكوين</h3>
+  <p>
+    عند انتهاء عقد مؤقت لظروف الإنتاج <bdi>(por circunstancias de la producción)</bdi>، يعود لك
+    تعويض <bdi>(indemnización)</bdi> قدره 12 يومًا من الراتب عن كل سنة، بالتناسب مع الأيام التي
+    عملتها <bdi>(art. 49.1.c ET)</bdi>. إذا بدأ العقد قبل 2015، فالأيام أقل: 8 إذا بدأ في 2011 أو
+    قبلها، و9 في 2012، و10 في 2013، و11 في 2014 <bdi>(disposición transitoria 8.ª ET)</bdi>. العقود
+    الموقّعة قبل 4 مارس 2001 لا يترتب عليها هذا التعويض
+    <bdi>(disposición transitoria 8.ª.2 ET)</bdi>.
+  </p>
+  <p>
+    عقود استبدال شخص آخر <bdi>(sustitución)</bdi> والعقود التكوينية <bdi>(formativos)</bdi> لا يترتب
+    عليها تعويض <bdi>(art. 49.1.c ET)</bdi>. لهذا تسألك الحاسبة عن نوع العقد مباشرةً بعد سبب
+    انتهائه.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET · DT <span>8.ª</span>
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-preaviso">الإشعار المسبق في العقود التي تتجاوز سنة</h3>
+  <p>
+    إذا دام العقد أكثر من سنة، كما قد يحدث في عقد الاستبدال، تلتزم الشركة بإشعارك بانتهائه قبل 15
+    يومًا على الأقل <bdi>(art. 49.1.c ET)</bdi>. تحتسب المراجعة أيام ذلك الإشعار المسبق التي لم
+    تُمنح لك على أنها مبالغ لم تُدفع بعد. قيمة كل يوم بين راتبك الشهري / 30 وراتبك السنوي / 365،
+    بحسب طريقة احتساب الشركة.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-ejemplos">أمثلة: 3 و6 و12 شهرًا</h3>
+  <p>
+    يدوم العقد لظروف الإنتاج 6 أشهر كحد أقصى، أو حتى سنة إذا مدّدت اتفاقيتك الجماعية القطاعية
+    <bdi>(convenio sectorial)</bdi> هذه المدة <bdi>(art. 15.2 ET)</bdi>.
+  </p>
+  <FigureTable id="fc-tabla">
+    <Fragment slot="caption">
+      عقود لظروف الإنتاج تنتهي في 30 سبتمبر 2026، براتب 1.500&nbsp;€ إجمالًا في الشهر ودفعتين
+      إضافيتين قيمة كل منهما 1.500&nbsp;€.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">المدة</th>
+        <th scope="col">التعويض</th>
+      </tr>
+    </thead>
+    <tbody>
+      {fixedTerms.map(({ months, limit, severance }) => (
+        <tr>
+          <th scope="row">
+            {spanLabel(months, lang, 'months')}
+            {limit === 'sector_agreement' && (
+              <span class="figures-note">فقط إذا مدّدت اتفاقيتك الجماعية القطاعية المدة</span>
+            )}
+          </th>
+          <td>{severance ? euroRange(severance) : '—'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    كل تعويض يساوي أيام العقد × 12 / 365 يومًا من الراتب، بمعدل 21.000&nbsp;€ / 365 لكل يوم. وتجمع
+    التسوية النهائية <bdi>(finiquito)</bdi> أيضًا راتب الشهر الأخير وأيام الإجازة والدفعات الإضافية،
+    وتراجعها الحاسبة ببياناتك.
+  </p>
+  <p>
+    العقد المؤقت الذي يتجاوز مدته القصوى يمكن أن يكون في الواقع عقدًا غير محدد المدة
+    <bdi>(indefinido)</bdi> <bdi>(art. 15.4 ET)</bdi>، وعندئذ يكون انتهاؤه فصلًا. وحدها عقود العمل
+    أو الخدمة المحددة <bdi>(obra o servicio)</bdi> الموقّعة قبل 31 ديسمبر 2021 كان يمكن أن تدوم أكثر{' '}
+    <bdi>(disposición transitoria 3.ª del Real Decreto-ley 32/2021)</bdi>.
+  </p>
+  <p class="folio">
+    Art. <span>15</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-baja">إذا انتهى العقد وأنت في إجازة مرضية</h3>
+  <p>
+    تحسب المراجعة التسوية النهائية بالتواريخ والراتب وأيام الإجازة التي تكتبها. ولا تأخذ في الحسبان
+    الإجازة المرضية <bdi>(baja médica)</bdi> ولا ما يحدث لإعانتها عند انتهاء العقد: هذا لا نتحقق
+    منه.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-paro">وإعانة البطالة</h3>
+  <p>
+    انتهاء العقد المؤقت يُعدّ وضعًا قانونيًا للبطالة <bdi>(situación legal de desempleo)</bdi>، إلا
+    إذا كنت أنت من أنهاه <bdi>(art. 267.1.a.6.º LGSS)</bdi>. تتوقف مدة إعانة البطالة
+    <bdi>(paro)</bdi> على أيام الاشتراك <bdi>(días cotizados)</bdi> في السنوات الـ6 الأخيرة: تجد ذلك
+    في صفحة <CaseLink lang={lang} id="benefit_duration" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

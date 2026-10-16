@@ -1,0 +1,97 @@
+---
+// source: 47084c570826
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitAfterDismissal, benefitAfterResignation } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const dismissal = benefitAfterDismissal;
+if (dismissal.entitled !== 'yes' || dismissal.figures === null)
+  throw new Error('Incomplete example');
+const resignationGivesBenefit = benefitAfterResignation.entitled === 'yes';
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-regla">القاعدة: ترك العمل بقرار منك لا يمنح الحق في إعانة البطالة</h3>
+  <p>
+    لتقاضي إعانة البطالة <bdi>(paro)</bdi>، يلزم أن ينتهي العقد في وضع قانوني للبطالة
+    <bdi>(situación legal de desempleo)</bdi>. وترك العمل طوعًا لا يُعدّ كذلك
+    <bdi>(art. 267.2.a LGSS)</bdi>، ولذلك فالاستقالة <bdi>(baja voluntaria)</bdi> لا تمنح كقاعدة
+    عامة الحق في إعانة البطالة، حتى إن كانت لديك أيام الاشتراك <bdi>(días cotizados)</bdi>.
+  </p>
+  <p class="folio">
+    Art. <span>267.2.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-excepciones">متى يمنح ترك العمل الحق في إعانة البطالة</h3>
+  <p>
+    يعامل القانون ترك العمل بقرار منك معاملة الوضع القانوني للبطالة في هذه الحالات
+    <bdi>(art. 267.1.a.5.º LGSS)</bdi>:
+  </p>
+  <ul>
+    <li>
+      النقل إلى مكان عمل آخر يقتضي تغيير محل الإقامة <bdi>(art. 40 ET)</bdi>.
+    </li>
+    <li>
+      تعديل جوهري لشروط عملك يضرّ بك <bdi>(art. 41.3 ET)</bdi>.
+    </li>
+    <li>
+      إخلال جسيم من الشركة، مثل عدم دفع راتبك أو دفعه متأخرًا مرارًا <bdi>(art. 50 ET)</bdi>. وهذا
+      الخروج تعلنه عادةً محكمة.
+    </li>
+    <li>
+      العنف القائم على النوع الاجتماعي أو العنف الجنسي <bdi>(art. 49.1.m ET)</bdi>.
+    </li>
+  </ul>
+  <p class="folio">
+    Art. <span>267.1.a.5.º</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-nuevo">إذا بدأت بعد ذلك عملًا آخر</h3>
+  <p>
+    ما يُنظر إليه هو كيف ينتهي عقدك الأخير. إذا انتهى العمل الجديد بالفصل أو بانتهاء عقد مؤقت، فذلك
+    الخروج يُعدّ وضعًا قانونيًا للبطالة <bdi>(art. 267.1.a LGSS)</bdi>.
+  </p>
+  <p>
+    ينظّم القانون حالة واحدة على حدة: إذا أنهت الشركة الجديدة العقد خلال فترة التجربة، فلا يُعدّ ذلك
+    وضعًا قانونيًا للبطالة إلا إذا مرّت ثلاثة أشهر على استقالتك
+    <bdi>(art. 267.1.a.7.º LGSS)</bdi>.
+  </p>
+  <p class="folio">
+    Art. <span>267.1.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-ejemplo">مثال: العقد نفسه بنهايتين مختلفتين</h3>
+  <p>
+    شخص يتقاضى 1.500&nbsp;€ إجمالًا في الشهر، مع دفعتين إضافيتين قيمة كل منهما 1.500&nbsp;€، يعمل من
+    1 سبتمبر 2023 إلى 31 أغسطس 2026، دون أبناء أو بنات مُعالين.
+  </p>
+  <p class="example">
+    <span class="example__label">إذا ترك العمل بالاستقالة</span>{' '}
+    {resignationGivesBenefit
+      ? 'تقدّر الحاسبة إعانة بطالة.'
+      : 'تجيب الحاسبة بأن ذلك لا يمنح الحق في إعانة البطالة ⁨(art. 267.2.a LGSS)⁩.'}{' '}
+    وتعود له التسوية النهائية مع ذلك: الراتب المتبقّي وأيام الإجازة والدفعات الإضافية.
+  </p>
+  <p class="example">
+    <span class="example__label">إذا فُصل</span> مع {integer(dismissal.contractDays)} يومًا من
+    الاشتراك يعود له على الأقل {integer(dismissal.duration.days)} يومًا من إعانة البطالة، أي نحو{' '}
+    {wholeEuros(dismissal.figures.firstStretch.min)} في الشهر خلال أول 6 أشهر ونحو{' '}
+    {wholeEuros(dismissal.figures.secondStretch.min)} بعدها، إجمالًا.
+  </p>
+  <p>
+    تأتي حاسبة هذه الصفحة وقد اختير فيها سبب الاستقالة. إذا كانت حالتك مختلفة، غيّر السبب في الورقة
+    الأولى. المزيد عن التسوية النهائية في صفحة <CaseLink lang={lang} id="resignation" />.
+  </p>
+</section>
