@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.71.0](https://github.com/Endika/eslojusto/compare/v1.70.0...v1.71.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** give the rental topics a route and their words per language ([d000406](https://github.com/Endika/eslojusto/commit/d00040643804911eeae1e339e76c7413a756e3f3))
+
 ## [1.70.0](https://github.com/Endika/eslojusto/compare/v1.69.0...v1.70.0) (2026-10-16)
 
 
