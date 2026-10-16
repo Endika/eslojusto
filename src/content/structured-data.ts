@@ -32,7 +32,7 @@ export const homeGraph = (home: URL, lang: Lang) => [
 
 export const calculatorApp = (home: URL, page: URL, lang: Lang) => ({
   '@type': 'WebApplication',
-  name: 'Calculadora de finiquito',
+  name: t(lang, 'final_pay.app_name'),
   url: page.href,
   description: t(lang, 'final_pay.description'),
   applicationCategory: 'FinanceApplication',
