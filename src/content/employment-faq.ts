@@ -46,7 +46,7 @@ export function employmentFaqEntries(
             doce: euros(twelvePayments(row)),
             diario: euros(row.daily),
             norma: shortName(norms[row.norm]),
-            efectos: formatLongDay(row.effectsFrom),
+            efectos: formatLongDay(row.effectsFrom, lang),
           })
         : tx('employment.faq.minimum_wage_not_published', {
             anio,
@@ -71,8 +71,8 @@ export function employmentFaqEntries(
     ),
     january: tx('employment.faq.january_answer', {
       anio: String(row.year),
-      publicado: formatLongDay(row.publishedOn),
-      efectos: formatLongDay(row.effectsFrom),
+      publicado: formatLongDay(row.publishedOn, lang),
+      efectos: formatLongDay(row.effectsFrom, lang),
     }),
     documents: tx('employment.faq.documents_answer'),
     pass: tx('employment.faq.pass_answer'),

@@ -616,9 +616,9 @@ export function rentalPrefill(
     .filter((c) => c.unclear)
     .map((c) =>
       tr('client.rental.documents.gap_unclear', {
-        desde: monthText(c.gapAfter ?? c.month),
+        desde: monthText(c.gapAfter ?? c.month, tr),
         antes: formatEuros(c.previous),
-        hasta: monthText(c.month),
+        hasta: monthText(c.month, tr),
         despues: formatEuros(c.next),
       }),
     );

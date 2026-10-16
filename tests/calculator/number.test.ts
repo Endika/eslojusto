@@ -13,6 +13,16 @@ describe('parseAmount', () => {
     ['  ', null],
   ])('%s → %s', (t, n) => expect(parseAmount(t)).toBe(n));
   it('garbage → NaN', () => expect(parseAmount('abc')).toBeNaN());
+  // «1,500» reads as 1500 in English and as 1,5 in Spanish: neither is guessed.
+  it.each(['1,500', '12,000', '999,999', '1,500 €'])('%s, ambiguous → NaN', (t) =>
+    expect(parseAmount(t)).toBeNaN(),
+  );
+  it.each([
+    ['0,125', 0.125],
+    ['1,25', 1.25],
+    ['1.500,000', 1500],
+    ['1234,500', 1234.5],
+  ])('%s is not ambiguous → %s', (t, n) => expect(parseAmount(t)).toBe(n));
 });
 describe('formatEuros', () => {
   it('es-ES', () => expect(formatEuros(1234.5).replace(/\s/g, ' ')).toBe('1.234,50 €'));

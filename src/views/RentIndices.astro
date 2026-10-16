@@ -62,9 +62,9 @@ const faq = (
     [
       'which_month',
       {
-        dia: formatLongDay(ex.anniversary),
-        mes: formatMonth(ex.month),
-        publicado: formatLongDay(ex.figure.publishedOn),
+        dia: formatLongDay(ex.anniversary, lang),
+        mes: formatMonth(ex.month, lang),
+        publicado: formatLongDay(ex.figure.publishedOn, lang),
       },
     ],
     ['irav_or_ipc', { decreto: caps.faqIravOrIpc }],
@@ -131,9 +131,9 @@ const structuredData = [
 ---
 
 <Base
-  title={tx('rent_indices.title', { mes: formatMonth(irav.month).replace(' de ', ' ') })}
+  title={tx('rent_indices.title', { mes: formatMonth(irav.month, lang).replace(' de ', ' ') })}
   description={tx('rent_indices.description', {
-    mes: formatMonth(irav.month),
+    mes: formatMonth(irav.month, lang),
     irav: formatRate(irav.figure.rate, 'irav'),
     ipc: formatRate(ipc.figure.rate, 'ipc'),
   })}
@@ -161,13 +161,13 @@ const structuredData = [
 
     <div class="document__sheets">
       <section class="sheet sheet--text" aria-labelledby="ultimo">
-        <h2 id="ultimo">{tx('rent_indices.latest', { mes: formatMonth(irav.month) })}</h2>
+        <h2 id="ultimo">{tx('rent_indices.latest', { mes: formatMonth(irav.month, lang) })}</h2>
         <dl class="data-list latest">
           {latestItems.map(
             ([key, item, column]) =>
               item && (
                 <div>
-                  <dt>{tx(`rent_indices.${key}`, { mes: formatMonth(item.month) })}</dt>
+                  <dt>{tx(`rent_indices.${key}`, { mes: formatMonth(item.month, lang) })}</dt>
                   <dd>
                     <span class="latest__rate">{formatRate(item.figure.rate, column)}</span>
                     <a class="latest__date" href={item.figure.url}>
@@ -180,7 +180,9 @@ const structuredData = [
               ),
           )}
         </dl>
-        {nextIravMonth && <p>{tx('rent_indices.next', { mes: formatMonth(nextIravMonth) })}</p>}
+        {nextIravMonth && (
+          <p>{tx('rent_indices.next', { mes: formatMonth(nextIravMonth, lang) })}</p>
+        )}
       </section>
 
       <section class="sheet sheet--text" aria-labelledby="cada-mes">
@@ -205,7 +207,7 @@ const structuredData = [
               {rows.map((row) => (
                 <tr data-month={row.month}>
                   <th scope="row">
-                    <time datetime={row.month}>{formatMonth(row.month)}</time>
+                    <time datetime={row.month}>{formatMonth(row.month, lang)}</time>
                   </th>
                   {COLUMNS.map((c) => {
                     const f = row[c];
@@ -273,8 +275,8 @@ const structuredData = [
           <span class="example__label">{tx('rent_indices.example_label')}</span>{' '}
           {tx('rent_indices.example', {
             renta: formatEuros(ex.rent),
-            dia: formatLongDay(ex.anniversary),
-            mes: formatMonth(ex.month),
+            dia: formatLongDay(ex.anniversary, lang),
+            mes: formatMonth(ex.month, lang),
             irav: formatRate(ex.figure.rate, 'irav'),
             publicado: formatDay(ex.figure.publishedOn),
             maximo: formatEuros(ex.maxRent),

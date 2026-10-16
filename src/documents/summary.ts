@@ -1,7 +1,6 @@
 import type { ClientKey, Translate } from '../i18n/client';
 import type { Conflict, RecognisedDocument } from './contract';
-
-const MONTH = new Intl.DateTimeFormat('es-ES', { month: 'long', timeZone: 'UTC' });
+import { monthName } from '../i18n/dates';
 
 // The kinds of document named with their month: a payslip, a rent receipt, a card statement.
 const MONTHLY: Partial<Record<RecognisedDocument['kind'], ClientKey>> = {
@@ -13,7 +12,7 @@ const MONTHLY: Partial<Record<RecognisedDocument['kind'], ClientKey>> = {
 function documentName(d: RecognisedDocument, tr: Translate): string {
   const monthly = d.month ? MONTHLY[d.kind] : undefined;
   const name = monthly
-    ? tr(monthly, { mes: MONTH.format(new Date(`${d.month}-01T00:00:00Z`)) })
+    ? tr(monthly, { mes: monthName(Number(d.month?.slice(5, 7)), tr) })
     : tr(`client.documents.kind.${d.kind}` as ClientKey);
   return d.pages > 1 ? tr('client.documents.kind.pages', { nombre: name, n: d.pages }) : name;
 }

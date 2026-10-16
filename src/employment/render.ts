@@ -43,16 +43,13 @@ import {
   type Euros,
   type EurosRange,
 } from './summary';
+import { monthName } from '../i18n/dates';
 
 // «2025-03-14» → «14-03-2025».
 export const dayText = (iso: string): string => iso.split('-').reverse().join('-');
 
 export const civilText = ({ y, m, d }: { y: number; m: number; d: number }): string =>
   `${String(d).padStart(2, '0')}-${String(m).padStart(2, '0')}-${y}`;
-
-const MONTH_NAME = new Intl.DateTimeFormat('es-ES', { month: 'long', timeZone: 'UTC' });
-const monthName = (m: number): string =>
-  MONTH_NAME.format(new Date(Date.UTC(2000, Math.max(0, m - 1), 1)));
 
 // Hours, percentages and coefficients: Spanish decimals, up to four of them.
 const NUMBER = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 4 });
@@ -116,7 +113,8 @@ const counted = (n: number, unit: Unit, tr: Translate, text: string): string =>
 function figureText(key: EmploymentPhraseKey, name: string, f: Figure, tr: Translate): string {
   const n = valueOf(f);
   if (YEAR_VARS.has(name)) return String(n);
-  if (name === 'month' && key.startsWith('minimum_wage.payslip.')) return monthName(n);
+  if (name === 'month' && key.startsWith('minimum_wage.payslip.'))
+    return monthName(Math.max(1, n), tr);
   if (name === 'day' && key === 'working_time.longest_day')
     return tr(`client.employment.weekday.${n}` as ClientKey);
   const text =

@@ -4,6 +4,11 @@ import { referenceMonth, type IndexSeries } from '../engine/rental/indices';
 import { IGC } from '../engine/rental/data/igc';
 import { IPC } from '../engine/rental/data/ipc';
 import { IRAV } from '../engine/rental/data/irav';
+import { t } from '../i18n';
+import type { ClientKey } from '../i18n/client';
+import { longDay, monthYear } from '../i18n/dates';
+import type { Variables } from '../i18n/interpolate';
+import type { Lang } from '../i18n/languages';
 
 // The monthly page of the rent indices, read from the engine's tables at build time.
 
@@ -143,7 +148,7 @@ export const example = (): Example => {
   };
 };
 
-// Spanish formats for the page: «2,47 %», «15-09-2026», «agosto de 2026».
+// Spanish figures on every page: «2,47 %», «15-09-2026»; the month in the page's language.
 const DECIMALS: Record<Column, number> = { irav: 2, ipc: 1, ipcFlash: 1, igc: 2 };
 
 export const formatRate = (rate: number, column: Column = 'irav'): string =>
@@ -154,18 +159,12 @@ export const formatRate = (rate: number, column: Column = 'irav'): string =>
 
 export const formatDay = (iso: string): string => iso.split('-').reverse().join('-');
 
-const MONTH = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+// Month and day names in the page's language.
+const words = (lang: Lang) => (key: ClientKey, vars?: Variables) => t(lang, key, vars);
 
-export const formatMonth = (month: string): string =>
-  MONTH.format(new Date(`${month}-01T00:00:00Z`));
+export const formatMonth = (month: string, lang: Lang): string => monthYear(month, words(lang));
 
-export const formatLongDay = (iso: string): string =>
-  new Intl.DateTimeFormat('es-ES', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(`${iso}T00:00:00Z`));
+export const formatLongDay = (iso: string, lang: Lang): string => longDay(iso, words(lang));
 
 export const formatEuros = (n: number): string =>
   `${new Intl.NumberFormat('es-ES', {

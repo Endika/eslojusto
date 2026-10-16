@@ -189,7 +189,7 @@ function rateWords(rate: RateFigure, cap: string | null, tr: Translate): string 
   const f = rate.figure;
   const vars = {
     indice: tr(`client.rental.index.${f.index}`),
-    mes: monthText(f.month),
+    mes: monthText(f.month, tr),
     tasa: percentText(f.rate),
   };
   const words = tr(

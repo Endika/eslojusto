@@ -56,7 +56,7 @@ const faq = rentalFaqEntries(lang, NORMS, { documents, checkedOn });
     </h2>
     <p class="guide__lead">{tx('rental.guide.lead')}</p>
     <p class="guide__sources">
-      <span>{t(lang, 'rental.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+      <span>{t(lang, 'rental.reviewed', { fecha: formatLongDay(checkedOn, lang) })}</span>
       <span>
         {tx('rental.guide.sources')}: <a href={NORMS.lau.url}>{tx('rental.guide.source_lau')}</a> ·{' '}
         <a href={inePage(SERIES.irav)}>{tx('rental.guide.source_irav')}</a> ·{' '}

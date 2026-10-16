@@ -146,9 +146,9 @@ export function capsCopy(
   ];
 
   const status = tx(`rent_indices.status.${decree.status}`, {
-    fecha: formatLongDay(checkedOn),
+    fecha: formatLongDay(checkedOn, lang),
     norma: name,
-    desde: formatLongDay(decree.inForceSince),
+    desde: formatLongDay(decree.inForceSince, lang),
     estado: decree.statusSince ? formatDay(decree.statusSince) : '',
   });
 
@@ -188,7 +188,7 @@ export function capsCopy(
       : null,
     exampleLater: live
       ? tx('rent_indices.example_later', {
-          dia: formatLongDay(example.later),
+          dia: formatLongDay(example.later, lang),
           norma: name,
           renta: formatEuros(example.rent),
           maximo: formatEuros(example.maxRentLater),
@@ -199,7 +199,7 @@ export function capsCopy(
     faqIravOrIpc: live
       ? tx('rent_indices.faq.decree_live', {
           norma: name,
-          desde: formatLongDay(decree.inForceSince),
+          desde: formatLongDay(decree.inForceSince, lang),
           estado: statusShort(decree),
         })
       : tx('rent_indices.faq.decree_repealed', { norma: name, periodo: period(lang, decree) }),

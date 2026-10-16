@@ -73,8 +73,8 @@ export function rentalGuide(
   // wording runs on with no end.
   const rdl29 = norms.rdl29_2026;
   const rdl29Stands = rdl29.status !== 'repealed';
-  const rdl29Since = formatLongDay(rdl29.inForceSince);
-  const rdl29Eve = formatLongDay(toIso(addDays(parseDate(rdl29.inForceSince), -1)));
+  const rdl29Since = formatLongDay(rdl29.inForceSince, lang);
+  const rdl29Eve = formatLongDay(toIso(addDays(parseDate(rdl29.inForceSince), -1)), lang);
 
   const block = (
     id: GuideBlockId,
@@ -185,7 +185,7 @@ export function decreeClause(lang: Lang, norms: NormTable, id: Decree, checkedOn
     checkedOn < norm.inForceSince ? 'rental.guide.decree_upcoming' : 'rental.guide.decree_live',
     {
       norma: DECREE_NAME[id],
-      desde: formatLongDay(norm.inForceSince),
+      desde: formatLongDay(norm.inForceSince, lang),
       estado: t(lang, `rent_indices.status_short.${norm.status}`),
     },
   );

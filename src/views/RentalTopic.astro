@@ -55,7 +55,7 @@ const crumbs = trail(
       <h1 class="document__title">{page.h1}</h1>
       <p class="guide__lead">{page.lead}</p>
       <p class="guide__sources">
-        <span>{t(lang, 'rental.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+        <span>{t(lang, 'rental.reviewed', { fecha: formatLongDay(checkedOn, lang) })}</span>
         <span>
           {tx('guide.sources')}: <a href={NORMS.lau.url}>Ley de Arrendamientos Urbanos</a> ·{' '}
           <a href={NORMS.rdl29_2026.url}>Real Decreto-ley 29/2026</a>
