@@ -174,19 +174,6 @@ html:not(.js) .calculator {
   background: color-mix(in oklab, var(--on-ground) 12%, transparent);
 }
 
-.review-banner {
-  padding: 0.5rem var(--margin);
-  background: var(--ink);
-  color: var(--white);
-  font-size: var(--t-small);
-}
-.review-banner p {
-  margin: 0;
-}
-.review-banner a {
-  color: inherit;
-}
-
 .other-language {
   display: flex;
   align-items: center;

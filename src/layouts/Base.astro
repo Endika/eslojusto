@@ -49,7 +49,7 @@ const root = base.replace(/\/$/, '');
 const url = (i: Lang) => new URL(link(i, path.replace(/^\//, '')), Astro.site);
 const canonical = url(lang);
 const { dir, published } = LANGS[lang];
-// A language served only to its reviewer says so on every page, with the Spanish one a click away.
+// A language served only to its reviewer, which its language menu offers beside Spanish.
 const underReview = reviewLangs().includes(lang);
 // The header's language menu: this page in each published language it is built in, plus the one
 // shown when it is under review. A page never offers an unreviewed language, nor the pseudo-locale.
@@ -173,16 +173,6 @@ const otherLangsJson = JSON.stringify(otherLangs).replace(/</g, '\\u003c');
   <body data-section={section}>
     <slot name="tabs" />
     <div class="ground">
-      {underReview && (
-        <aside class="review-banner" aria-label={t(lang, 'review.label')}>
-          <p>
-            {t(lang, 'review.text')}{' '}
-            <a href={url('es').pathname} hreflang="es">
-              {t(lang, 'review.spanish')}
-            </a>
-          </p>
-        </aside>
-      )}
       <Header lang={lang} languages={languages} />
       <slot />
     </div>

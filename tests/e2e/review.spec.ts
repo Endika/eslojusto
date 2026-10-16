@@ -2,20 +2,18 @@ import { test, expect } from '@playwright/test';
 
 // Runs only against a REVIEW_LANGS=eu build: Basque is served to its reviewer, never announced.
 
-test('a page under review is served noindexed, behind the banner', async ({ page }) => {
+test('a page under review is served noindexed, with no banner', async ({ page }) => {
   await page.goto('eu/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'eu');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
   await expect(page.locator('link[hreflang]')).toHaveCount(0);
-  const banner = page.locator('.review-banner');
-  await expect(banner).toBeVisible();
-  await expect(banner.locator('a')).toHaveAttribute('href', '/');
+  await expect(page.locator('.review-banner')).toHaveCount(0);
 });
 
 test('every section the build has is under review too', async ({ page }) => {
   const response = await page.goto('eu/empleada-de-hogar/');
   expect(response?.status()).toBe(200);
-  await expect(page.locator('.review-banner a')).toHaveAttribute('href', '/empleada-de-hogar/');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
 });
 
 test('its language menu switches to the same page in Spanish, and closes on Escape', async ({
@@ -48,7 +46,7 @@ test('the case pages are under review too, and link within the language', async 
   ]) {
     const response = await page.goto(path);
     expect(response?.status(), path).toBe(200);
-    await expect(page.locator('.review-banner')).toBeVisible();
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
   }
   await page.goto('eu/finiquito/baja-voluntaria/');
   await expect(page.locator('.next-pages a').first()).toHaveAttribute('href', '/eu/finiquito/');
@@ -60,7 +58,7 @@ test('the ERTE page works under review too, with its script and the hub in the l
   await page.goto('eu/paro/');
   await page.locator('a[href="/eu/paro/erte/"]').first().click();
   await expect(page).toHaveURL(/\/eu\/paro\/erte\/$/);
-  await expect(page.locator('.review-banner')).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
   await page.locator('#regime-force_majeure').check();
   await page.locator('#measure-suspension').check();
   await page.locator('#base').fill('1.500,00');
@@ -75,7 +73,7 @@ test('the rental topics are under review too, with their own sections', async ({
   await page.locator('a[href="/eu/alquiler/fianza/"]').first().click();
   await expect(page).toHaveURL(/\/eu\/alquiler\/fianza\/$/);
   await expect(page.locator('#fianza-legal')).toBeVisible();
-  await expect(page.locator('.review-banner')).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
   for (const path of [
     'eu/alquiler/subida/',
     'eu/alquiler/devolucion-fianza/',

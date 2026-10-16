@@ -4,7 +4,7 @@ export const DEFAULT_LANG: Lang = 'es';
 
 // A language is published (`published: true`) only after a native speaker has reviewed every
 // string in its dictionary. Until then it builds no route and appears in no hreflang, except in a
-// review build (REVIEW_LANGS), which serves it noindexed behind a banner for its reviewer.
+// review build (REVIEW_LANGS), which serves it noindexed for its reviewer.
 // `ar-test` is a pseudo-locale that only exists to prove the RTL layout; it is never published.
 export const LANGS: Record<Lang, { name: string; dir: 'ltr' | 'rtl'; published: boolean }> = {
   es: { name: 'Español', dir: 'ltr', published: true },
