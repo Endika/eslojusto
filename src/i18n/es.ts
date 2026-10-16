@@ -7331,6 +7331,9 @@ export const es = {
   'case.next': 'Sigue leyendo',
   'rental.topic.example': 'Ejemplo.',
   'rental.topic.norms': 'Normas',
+  'legal.translation':
+    'Esta página es una traducción: si algo no coincide, vale la versión en castellano.',
+  'legal.translation_link': 'Leer en castellano',
   'landing.hub.finiquito.anchor': 'Calcula tu finiquito',
   'landing.hub.paro.anchor': 'Calcula cuánto paro vas a cobrar',
 

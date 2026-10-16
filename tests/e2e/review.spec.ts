@@ -86,6 +86,23 @@ test('the rental topics are under review too, with their own sections', async ({
   }
 });
 
+test('the legal pages are under review too, and say the Spanish text binds', async ({ page }) => {
+  await page.goto('eu/');
+  await page.locator('footer a[href="/eu/aviso-legal/"]').click();
+  await expect(page).toHaveURL(/\/eu\/aviso-legal\/$/);
+  await expect(page.locator('.document__head a[hreflang="es"]')).toHaveAttribute(
+    'href',
+    '/aviso-legal/',
+  );
+  await page.goto('eu/privacidad/');
+  await expect(page.locator('.document__head a[hreflang="es"]')).toHaveAttribute(
+    'href',
+    '/privacidad/',
+  );
+  await page.goto('privacidad/');
+  await expect(page.locator('.document__head a[hreflang="es"]')).toHaveCount(0);
+});
+
 test('the Spanish pages neither link nor offer it', async ({ page }) => {
   await page.goto('');
   await expect(page.locator('.review-banner')).toHaveCount(0);
