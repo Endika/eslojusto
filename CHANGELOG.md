@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.68.0](https://github.com/Endika/eslojusto/compare/v1.67.1...v1.68.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** add a language menu to the header ([c0c9bb1](https://github.com/Endika/eslojusto/commit/c0c9bb14e3915190f8ece6ef2a14d2ee589c424b))
+* **i18n:** add nine unpublished languages and a review build that serves them noindexed ([a014e2a](https://github.com/Endika/eslojusto/commit/a014e2ac22c2f0b95ed22ca12a941d4cd5dbbd43))
+
 ## [1.67.1](https://github.com/Endika/eslojusto/compare/v1.67.0...v1.67.1) (2026-10-16)
 
 
