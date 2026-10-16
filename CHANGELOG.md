@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.1](https://github.com/Endika/eslojusto/compare/v1.67.0...v1.67.1) (2026-10-16)
+
+
+### Bug Fixes
+
+* **documents:** ship the shared letter and report strings on the credit, mortgage and bills pages ([ef99579](https://github.com/Endika/eslojusto/commit/ef9957916c0951930dc4563d4634b3e161284632))
+
 ## [1.67.0](https://github.com/Endika/eslojusto/compare/v1.66.0...v1.67.0) (2026-10-16)
 
 
