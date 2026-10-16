@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.81.0](https://github.com/Endika/eslojusto/compare/v1.80.0...v1.81.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** translate the case pages' prose into Arabic ([c85a44d](https://github.com/Endika/eslojusto/commit/c85a44deb4b7819fac73aac1f45ecdd113d36e48))
+* **i18n:** translate the dictionary into Arabic, unpublished ([ac9bd2c](https://github.com/Endika/eslojusto/commit/ac9bd2cc78ae7726ee5754cd26e2ac64682f3215))
+* **i18n:** translate the final pay guide into Arabic ([e23f994](https://github.com/Endika/eslojusto/commit/e23f9946793b21b68e323d32461cb8523785f811))
+* **i18n:** translate the legal notice and the privacy page into Arabic ([62f6cea](https://github.com/Endika/eslojusto/commit/62f6cea56876ec39eb2c4db23bbe7a917e77c277))
+* **i18n:** translate the rental sections and the ERTE page into Arabic ([ed2afbe](https://github.com/Endika/eslojusto/commit/ed2afbe954cf57dc491174a1cdd959db2e6842d5))
+* **i18n:** translate the rental topics into Arabic ([e5b7179](https://github.com/Endika/eslojusto/commit/e5b71792afc3780fa4b363842586456ed4a9dcb9))
+
 ## [1.80.0](https://github.com/Endika/eslojusto/compare/v1.79.0...v1.80.0) (2026-10-16)
 
 
