@@ -14,11 +14,11 @@ import type {
   TelecomExtraction,
 } from '../../src/documents/contract';
 import { parseDate } from '../../src/engine/date';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { juneBill, meter } from '../engine/bills/input';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('bills');
 const TODAY = parseDate('2026-10-13');
 
 const row = (

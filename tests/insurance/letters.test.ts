@@ -6,15 +6,15 @@ import type { InsuranceInput } from '../../src/engine/insurance/types';
 import { NO_DETAILS, type LetterDetails } from '../../src/documents/letter';
 import { renderPdf } from '../../src/documents/pdf';
 import type { Block, DocumentModel } from '../../src/documents/ports';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { insuranceCase } from '../../src/insurance/case';
 import { insuranceLetterKinds, nonRenewalLetter } from '../../src/insurance/letters';
 import type { CompletedInsuranceReview } from '../../src/insurance/ports';
 import { FORBIDDEN, forbiddenIn } from '../support/forbidden';
 import { notice, policy, TODAY } from '../engine/insurance/input';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('insurance');
 
 const completed = (input: InsuranceInput, today = TODAY): CompletedInsuranceReview => {
   const r = reviewInsurance(input, today, { norms: INSURANCE_NORMS });

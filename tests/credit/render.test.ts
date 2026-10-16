@@ -6,7 +6,6 @@ import { CREDIT_SOURCES } from '../../src/engine/credit/data/sources';
 import { reviewCredit, type CreditReview } from '../../src/engine/credit/review';
 import type { CreditInput } from '../../src/engine/credit/types';
 import { parseDate } from '../../src/engine/date';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import {
   lawSourceText,
@@ -17,8 +16,9 @@ import {
   renderOutOfScope,
 } from '../../src/credit/render';
 import { loan, repayment, TODAY } from '../engine/credit/input';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('credit');
 
 const DEPS = {
   norms: CREDIT_NORMS,

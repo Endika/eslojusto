@@ -12,7 +12,10 @@ import { reviewTelecom } from '../../src/engine/bills/telecom-review';
 import type { ElectricityBillInput, TelecomInput } from '../../src/engine/bills/types';
 import { parseDate } from '../../src/engine/date';
 import { juneBill, meter, TODAY } from '../engine/bills/input';
+import { pageTranslator } from '../support/page-strings';
 import { today, tr } from './fixtures';
+
+const billsTr = pageTranslator('bills');
 
 describe('a basket kept in memory', () => {
   it('replaces the review being worked on, and keeps it once the next one starts', () => {
@@ -111,7 +114,7 @@ describe('a year of electricity bills as the pass sees it', () => {
 
   it('adds up every bill once, with the yearly estimate apart from the total', () => {
     const lines = texts(
-      electricityCase([...year, meterOver], BILLS_NORMS).report(tr, today).blocks,
+      electricityCase([...year, meterOver], BILLS_NORMS).report(billsTr, today).blocks,
     );
     expect(lines).toContain('Por encima de la norma: 0,60 €');
     expect(lines).not.toContain('Por encima de la norma: 0,80 €');
@@ -125,7 +128,7 @@ describe('a year of electricity bills as the pass sees it', () => {
   });
 
   it('lists a single bill without a year to add up', () => {
-    const lines = texts(electricityCase([meterOver], BILLS_NORMS).report(tr, today).blocks);
+    const lines = texts(electricityCase([meterOver], BILLS_NORMS).report(billsTr, today).blocks);
     expect(lines).not.toContain('Lo que suman tus facturas');
     expect(lines.some((l) => l.startsWith('Alquiler del contador: Por encima'))).toBe(true);
   });
@@ -154,7 +157,7 @@ describe('an exit from a phone contract as the pass sees it', () => {
     // 184 of 549 days left of 180,00 allow 60,33.
     expect(telecomCase(exit(120), BILLS_NORMS).offer).toBe(true);
     expect(telecomCase(exit(64), BILLS_NORMS).offer).toBe(false);
-    expect(telecomCase(exit(120), BILLS_NORMS).report(tr, today).title).toBe(
+    expect(telecomCase(exit(120), BILLS_NORMS).report(billsTr, today).title).toBe(
       'Revisión de tu baja de teléfono o internet',
     );
   });

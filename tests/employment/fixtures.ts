@@ -3,14 +3,14 @@ import { EMPLOYMENT_NORMS } from '../../src/engine/employment/data/norms';
 import { MINIMUM_WAGE } from '../../src/engine/employment/data/minimum-wage';
 import { reviewEmployment, type EmploymentReview } from '../../src/engine/employment/review';
 import type { EmploymentInput } from '../../src/engine/employment/types';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { contract } from '../engine/employment/input';
+import { pageTranslator } from '../support/page-strings';
 
 export { contract };
 
 export const TODAY = f('2026-10-08');
-export const tr: Translate = (key, vars) => t('es', key, vars);
+export const tr: Translate = pageTranslator('employment');
 export const TABLES = { norms: EMPLOYMENT_NORMS, minimumWage: MINIMUM_WAGE };
 
 export const review = (input: EmploymentInput, today: CivilDate = TODAY): EmploymentReview => {

@@ -11,8 +11,9 @@ import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { readInsuranceForm } from '../../src/insurance/form';
 import { insurancePrefill } from '../../src/insurance/prefill';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('insurance');
 const TODAY = parseDate('2026-10-09');
 
 const f = (

@@ -8,12 +8,12 @@ import type {
   SourceKind,
 } from '../../src/documents/contract';
 import { parseDate } from '../../src/engine/date';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { readMortgageForm } from '../../src/mortgage/form';
 import { mortgagePrefill } from '../../src/mortgage/prefill';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('mortgage');
 const TODAY = parseDate('2026-10-10');
 
 const f = (
