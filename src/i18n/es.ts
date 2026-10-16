@@ -4558,6 +4558,7 @@ export const es = {
   'client.insurance.status.not_entered': 'No lo has metido',
   'client.insurance.status.on_time': 'Llegó con al menos dos meses de antelación',
   'client.insurance.status.late': 'Llegó con {days} de antelación: la ley pide al menos dos meses',
+  'client.insurance.status.next_only': 'Falta la prima del periodo que acaba para comparar',
   'client.insurance.status.up': 'Tu prima sube un {percent} ({difference})',
   'client.insurance.status.same': 'Tu prima no cambia',
   'client.insurance.status.down': 'Tu prima baja un {percent} ({difference})',
@@ -4592,6 +4593,8 @@ export const es = {
     'La ley habla de cualquier modificación del contrato. Qué consecuencia tiene un aviso que llega tarde no se dice aquí: no se ha encontrado en una fuente oficial.',
   'client.insurance.calculation.change_notice.premium_only':
     'Si lo único que cambia es la prima, aquí no se afirma si eso cuenta como modificación del contrato a estos efectos.',
+  'client.insurance.calculation.premium.next_only':
+    'La prima del periodo siguiente es {next}. Para ver cuánto cambia hace falta la del periodo que acaba, que está en tu último recibo.',
   'client.insurance.calculation.premium.up':
     'Pasas de {previous} a {next}: {difference} más, un {percent} más. Es un dato: no dice si el precio es alto o bajo.',
   'client.insurance.calculation.premium.same': 'La prima sigue en {previous}.',

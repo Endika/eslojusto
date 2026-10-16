@@ -50,7 +50,7 @@ export type FindingId =
   | 'distance_withdrawal_compulsory'
   | 'distance_withdrawal_voluntary';
 
-// `open` and `ended` for a deadline; `on_time` and `late` for the notice of changes; `up`, `same` and `down` for the premium, as a fact with no verdict.
+// `open` and `ended` for a deadline; `on_time` and `late` for the notice of changes; `up`, `same` and `down` for the premium, as a fact with no verdict, and `next_only` when only the new one is known.
 export type FindingStatus =
   | 'open'
   | 'ended'
@@ -60,6 +60,7 @@ export type FindingStatus =
   | 'not_entered'
   | 'on_time'
   | 'late'
+  | 'next_only'
   | 'up'
   | 'same'
   | 'down';
