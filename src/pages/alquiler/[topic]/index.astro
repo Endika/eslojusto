@@ -1,9 +1,9 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import RentalTopic from '../../../views/RentalTopic.astro';
-import DepositSections from '../../../views/rental/DepositSections.astro';
-import DepositReturnSections from '../../../views/rental/DepositReturnSections.astro';
-import ChargesSections from '../../../views/rental/ChargesSections.astro';
+import DepositProse from '../../../prose/es/rental-deposit.astro';
+import DepositReturnProse from '../../../prose/es/rental-deposit_return.astro';
+import ChargesProse from '../../../prose/es/rental-charges.astro';
 import { RENTAL_BUILD } from '../../../content/sections';
 import { RENTAL_PAGES, RENTAL_PAGE_IDS, type RentalPageId } from '../../../content/rental-pages';
 
@@ -16,8 +16,8 @@ export const getStaticPaths = (() =>
 const { id } = Astro.props as { id: RentalPageId };
 ---
 
-<RentalTopic id={id}>
-  {id === 'deposit' && <DepositSections />}
-  {id === 'deposit_return' && <DepositReturnSections />}
-  {id === 'charges' && <ChargesSections />}
+<RentalTopic id={id} lang="es">
+  {id === 'deposit' && <DepositProse lang="es" />}
+  {id === 'deposit_return' && <DepositReturnProse lang="es" />}
+  {id === 'charges' && <ChargesProse lang="es" />}
 </RentalTopic>

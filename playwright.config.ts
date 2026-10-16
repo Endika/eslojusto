@@ -51,7 +51,7 @@ const port = Number(process.env['E2E_PORT'] ?? 4321);
 // /hipoteca/, so its build has them; the analytics project measures the first two, /hipoteca/ and
 // /facturas/ too.
 const buildEnv = {
-  ...(rental || documents || analytics ? { PUBLIC_RENTAL: '1' } : {}),
+  ...(rental || documents || analytics || review ? { PUBLIC_RENTAL: '1' } : {}),
   ...(employment || documents || analytics ? { PUBLIC_EMPLOYMENT: '1' } : {}),
   ...(erte || review ? { PUBLIC_ERTE: '1' } : {}),
   // The household, insurance and credit projects also measure their own events, so their builds

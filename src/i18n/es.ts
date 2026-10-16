@@ -7329,6 +7329,8 @@ export const es = {
     'El {day} es el día justo después: un festivo de tu comunidad podría mover un día la baja, así que se muestra sin sumar.',
 
   'case.next': 'Sigue leyendo',
+  'rental.topic.example': 'Ejemplo.',
+  'rental.topic.norms': 'Normas',
   'landing.hub.finiquito.anchor': 'Calcula tu finiquito',
   'landing.hub.paro.anchor': 'Calcula cuánto paro vas a cobrar',
 
