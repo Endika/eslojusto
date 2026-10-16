@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.65.1](https://github.com/Endika/eslojusto/compare/v1.65.0...v1.65.1) (2026-10-16)
+
+
+### Bug Fixes
+
+* **insurance:** show the new premium when the previous one is missing ([f32fd94](https://github.com/Endika/eslojusto/commit/f32fd94e7171adc7577146b435ac1e9df64e9217))
+
 ## [1.65.0](https://github.com/Endika/eslojusto/compare/v1.64.2...v1.65.0) (2026-10-15)
 
 
