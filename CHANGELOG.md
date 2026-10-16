@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.76.0](https://github.com/Endika/eslojusto/compare/v1.75.0...v1.76.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** send a checkout back to the page's language and show it in that language ([eefd0f9](https://github.com/Endika/eslojusto/commit/eefd0f9f190d4305271e82eea723356024c279f5))
+
 ## [1.75.0](https://github.com/Endika/eslojusto/compare/v1.74.0...v1.75.0) (2026-10-16)
 
 
