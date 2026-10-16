@@ -1,7 +1,5 @@
 import { parseAmount } from '../calculator/number';
 import {
-  MAX_REDUCTION_PERCENT,
-  MIN_REDUCTION_PERCENT,
   isReductionPercent,
   type ErteInput,
   type ErteMeasure,
@@ -12,14 +10,6 @@ import type { Children } from '../engine/unemployment';
 export const ERTE_FIELDS = ['regime', 'measure', 'percent', 'base', 'children'] as const;
 export type ErteField = (typeof ERTE_FIELDS)[number];
 export type ErteAnswers = Readonly<Record<ErteField, string>>;
-
-export const ERTE_ERRORS: Readonly<Record<ErteField, string>> = {
-  regime: 'Elige una opción; «No lo sé» también vale',
-  measure: 'Elige una opción',
-  percent: `Escribe un porcentaje entre ${MIN_REDUCTION_PERCENT} y ${MAX_REDUCTION_PERCENT}`,
-  base: 'Escribe la base en euros al mes, por ejemplo 1.500,00',
-  children: 'Elige una opción; «Prefiero no decirlo» también vale',
-};
 
 export type ErteParse =
   | { readonly kind: 'unknown_regime' }

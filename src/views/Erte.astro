@@ -2,32 +2,32 @@
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Field from '../components/Field.astro';
-import {
-  ERTE_FAQ,
-  ERTE_GUIDE,
-  ERTE_PAGE,
-  ERTE_QUESTIONS as Q,
-  erteUnknownView,
-} from '../content/erte';
+import { erteCopy } from '../content/erte';
 import { faqNode } from '../content/faq';
 import { HUBS, hubCopy } from '../content/landings';
 import { breadcrumbList, trail } from '../content/structured-data';
 import { LAST_UPDATED } from '../content/updated';
 import { ET, LGSS } from '../engine/sources';
 import { t } from '../i18n';
-import { link } from '../i18n/languages';
+import { link, type Lang } from '../i18n/languages';
 
-// The benefit during an ERTE: one short form and its result, Spanish only. It exists only in a
-// PUBLIC_ERTE=1 build and has no document reading, no pass and no analytics events of its own.
+// The benefit during an ERTE: one short form and its result. It exists only in a PUBLIC_ERTE=1
+// build and has no document reading, no pass and no analytics events of its own.
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const copy = erteCopy(lang);
+const { page: ERTE_PAGE, questions: Q, guide: ERTE_GUIDE, faq: ERTE_FAQ } = copy;
 const checkedOn = LAST_UPDATED['/paro/erte/'];
 if (!checkedOn) throw new Error('/paro/erte/ needs its date in LAST_UPDATED.');
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
 const crumbs = trail(
-  'es',
-  { name: hubCopy('es', 'paro').name, path: HUBS.paro.path },
-  { name: 'Paro durante un ERTE', path: '/paro/erte/' },
+  lang,
+  { name: hubCopy(lang, 'paro').name, path: HUBS.paro.path },
+  { name: copy.crumb, path: '/paro/erte/' },
 );
-const regimes = erteUnknownView().blocks;
+const regimes = copy.unknownView().blocks;
 const arrow = 'M4 12h15m-6-6 6 6-6 6';
 ---
 
@@ -35,15 +35,14 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
   title={ERTE_PAGE.title}
   description={ERTE_PAGE.description}
   path="/paro/erte/"
-  lang="es"
-  langs={['es']}
+  lang={lang}
   section="cause"
-  structuredData={[breadcrumbList(home, 'es', crumbs), faqNode(ERTE_FAQ)]}
+  structuredData={[breadcrumbList(home, lang, crumbs), faqNode(ERTE_FAQ)]}
 >
   <main id="content">
     <div class="desk">
       <header class="desk__head">
-        <Breadcrumbs lang="es" crumbs={crumbs} />
+        <Breadcrumbs lang={lang} crumbs={crumbs} />
         <h1 class="desk__title">{ERTE_PAGE.h1}</h1>
         <p class="desk__lead">{ERTE_PAGE.lead}</p>
         <p class="desk__beta">
@@ -184,12 +183,12 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           {ERTE_GUIDE.title}
         </h2>
         <p class="guide__sources">
-          <span>{t('es', 'guide.updated')}</span>
+          <span>{t(lang, 'guide.updated')}</span>
           <span>
-            {t('es', 'guide.sources')}: <a href={ET}>{t('es', 'guide.source_et')}</a> ·{' '}
-            <a href={LGSS}>{t('es', 'guide.source_lgss')}</a>
+            {t(lang, 'guide.sources')}: <a href={ET}>{t(lang, 'guide.source_et')}</a> ·{' '}
+            <a href={LGSS}>{t(lang, 'guide.source_lgss')}</a>
           </span>
-          <a href={link('es', 'aviso-legal/')}>{t('es', 'guide.who')}</a>
+          <a href={link('es', 'aviso-legal/')}>{t(lang, 'guide.who')}</a>
         </p>
       </header>
 
@@ -211,7 +210,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         </section>
 
         <section class="sheet sheet--text" aria-labelledby="erte-faq">
-          <h2 id="erte-faq">{t('es', 'guide.faq')}</h2>
+          <h2 id="erte-faq">{t(lang, 'guide.faq')}</h2>
           <div class="faq-list">
             {ERTE_FAQ.map(({ question, answer }) => (
               <details class="faq-item">
@@ -226,7 +225,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           <h2 id="erte-next">{ERTE_GUIDE.nextTitle}</h2>
           <ul class="next-pages">
             <li>
-              <a href={link('es', ERTE_GUIDE.hubPath)}>{ERTE_GUIDE.nextHub}</a>
+              <a href={link(lang, ERTE_GUIDE.hubPath)}>{ERTE_GUIDE.nextHub}</a>
             </li>
           </ul>
         </nav>

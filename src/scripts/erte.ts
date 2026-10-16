@@ -1,13 +1,10 @@
 import { required } from '../calculator/dom';
-import { erteUnknownView, ertePositiveView, type ErteView } from '../content/erte';
+import type { ErteView } from '../content/erte/copy';
+import { loadErteCopy } from '../content/erte/load';
 import { estimateErte } from '../engine/erte';
-import {
-  ERTE_ERRORS,
-  ERTE_FIELDS,
-  parseErte,
-  type ErteAnswers,
-  type ErteField,
-} from '../erte/form';
+import { ERTE_FIELDS, parseErte, type ErteAnswers, type ErteField } from '../erte/form';
+
+const copy = await loadErteCopy(document.documentElement.lang);
 
 const form = required(document.querySelector<HTMLFormElement>('#erte-form'), 'erte form');
 const result = required(document.querySelector<HTMLElement>('#erte-result'), 'erte result');
@@ -49,7 +46,7 @@ function showErrors(fields: readonly ErteField[]) {
     if (!slot) continue;
     const failed = fields.includes(name);
     slot.hidden = !failed;
-    slot.textContent = failed ? ERTE_ERRORS[name] : '';
+    slot.textContent = failed ? copy.errors[name] : '';
     form.querySelector(`[name="${name}"]`)?.setAttribute('aria-invalid', String(failed));
   }
 }
@@ -92,8 +89,8 @@ form.addEventListener('submit', (event) => {
   showErrors([]);
   show(
     parsed.kind === 'unknown_regime'
-      ? erteUnknownView()
-      : ertePositiveView(parsed.input, estimateErte(parsed.input)),
+      ? copy.unknownView()
+      : copy.positiveView(parsed.input, estimateErte(parsed.input)),
   );
 });
 

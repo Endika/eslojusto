@@ -1,28 +1,20 @@
-import type { Range } from '../engine/money';
+import type { Range } from '../../engine/money';
 import {
   belowFullTimeMinimum,
   RED_MONTHLY_CAP,
   type ErteEstimate,
   type ErteInput,
   type ErteRegime,
-} from '../engine/erte';
-import { BENEFIT_2026 } from '../engine/unemployment';
-import { euros, wholeEuros } from './format';
+} from '../../engine/erte';
+import { BENEFIT_2026 } from '../../engine/unemployment';
+import { euros, wholeEuros } from '../format';
 
-// The ERTE benefit page is Spanish only, like the landing pages, and its words live here rather
-// than in the dictionary so that a build without the page ships none of them.
-export interface ErteBlock {
-  readonly title: string;
-  readonly text: string;
-  // The article that backs the block.
-  readonly source: string;
-}
+import type { ErteBlock, ErteCopy, ErteView } from './copy';
+import { MAX_REDUCTION_PERCENT, MIN_REDUCTION_PERCENT } from '../../engine/erte';
 
-export interface ErteView {
-  readonly title: string;
-  readonly lead: string;
-  readonly blocks: readonly ErteBlock[];
-}
+// The ERTE benefit page in Spanish. Its words live here rather than in the dictionary so that a
+// build without the page ships none of them; another language is a sibling file with the same
+// shape (./copy.ts).
 
 export const ERTE_PAGE = {
   title: 'Paro durante un ERTE: cuánto cobrarías al mes',
@@ -289,3 +281,23 @@ export const ERTE_FAQ: readonly { question: string; answer: string }[] = [
       'La comunicación que te mandó la empresa dice de qué tipo es. Mientras tanto, elige «No lo sé» en el formulario y verás cómo cambian las reglas en cada tipo, sin una sola cifra.',
   },
 ];
+
+export const ERTE_ERRORS = {
+  regime: 'Elige una opción; «No lo sé» también vale',
+  measure: 'Elige una opción',
+  percent: `Escribe un porcentaje entre ${MIN_REDUCTION_PERCENT} y ${MAX_REDUCTION_PERCENT}`,
+  base: 'Escribe la base en euros al mes, por ejemplo 1.500,00',
+  children: 'Elige una opción; «Prefiero no decirlo» también vale',
+} as const;
+
+export const ERTE: ErteCopy = {
+  page: ERTE_PAGE,
+  crumb: 'Paro durante un ERTE',
+  legal: ERTE_LEGAL,
+  questions: ERTE_QUESTIONS,
+  errors: ERTE_ERRORS,
+  guide: ERTE_GUIDE,
+  faq: ERTE_FAQ,
+  positiveView: ertePositiveView,
+  unknownView: erteUnknownView,
+};

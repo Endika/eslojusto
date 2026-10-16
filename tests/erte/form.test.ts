@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { ERTE_ERRORS, parseErte, type ErteAnswers } from '../../src/erte/form';
+import { ERTE_ERRORS } from '../../src/content/erte';
+import { parseErte, type ErteAnswers } from '../../src/erte/form';
 
 const answers = (over: Partial<ErteAnswers> = {}): ErteAnswers => ({
   regime: 'etop',
