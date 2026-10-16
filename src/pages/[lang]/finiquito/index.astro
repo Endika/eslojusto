@@ -2,10 +2,14 @@
 import type { GetStaticPaths } from 'astro';
 import FinalPay from '../../../views/FinalPay.astro';
 import { langPaths, type Lang } from '../../../i18n/languages';
+import { prose } from '../../../prose';
 
 export const getStaticPaths = langPaths satisfies GetStaticPaths;
 
 const lang = Astro.params.lang as Lang;
+const Guide = prose(lang, 'final-pay-guide');
 ---
 
-<FinalPay lang={lang} />
+<FinalPay lang={lang}>
+  <Guide lang={lang} />
+</FinalPay>

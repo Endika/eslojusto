@@ -103,6 +103,16 @@ test('the legal pages are under review too, and say the Spanish text binds', asy
   await expect(page.locator('.document__head a[hreflang="es"]')).toHaveCount(0);
 });
 
+test('the final pay page under review carries its guide, linking cases within the language', async ({
+  page,
+}) => {
+  await page.goto('eu/finiquito/');
+  await expect(page.locator('#guide-title')).toBeVisible();
+  await expect(
+    page.locator('.guide a[href="/eu/finiquito/baja-voluntaria/"]').first(),
+  ).toBeAttached();
+});
+
 test('the Spanish pages neither link nor offer it', async ({ page }) => {
   await page.goto('');
   await expect(page.locator('.review-banner')).toHaveCount(0);
