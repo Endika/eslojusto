@@ -35,7 +35,8 @@ test('its language menu switches to the same page in Spanish, and closes on Esca
   await expect(links.nth(0)).toBeHidden();
   await menu.locator('summary').click();
   await links.nth(0).click();
-  await expect(page).toHaveURL(/\/empleada-de-hogar\/$/);
+  // The page then marks its first tab in the hash.
+  await expect(page).toHaveURL(/\/empleada-de-hogar\/(#[a-z-]+)?$/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'es');
 });
 
