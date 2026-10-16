@@ -10,10 +10,12 @@ const files = (dir: string): string[] =>
   });
 
 describe("the owner's details", () => {
-  it('live only in the dictionary', () => {
+  // The dictionaries: the Spanish one and each language's, which carries the details unchanged.
+  const dictionary = /^src[\\/]i18n[\\/][a-z]{2}\.ts$/;
+  it('live only in the dictionaries', () => {
     const id = es['legal.owner_id'];
     expect(id).toMatch(/^\w{9}$/);
-    for (const file of files('src').filter((f) => f !== join('src', 'i18n', 'es.ts')))
+    for (const file of files('src').filter((f) => !dictionary.test(f)))
       expect(readFileSync(file, 'utf8'), file).not.toContain(id);
   });
 });
