@@ -70,6 +70,22 @@ test('the ERTE page works under review too, with its script and the hub in the l
   await expect(page.locator('#erte-result')).toContainText('1.050');
 });
 
+test('the rental topics are under review too, with their own sections', async ({ page }) => {
+  await page.goto('eu/alquiler/');
+  await page.locator('a[href="/eu/alquiler/fianza/"]').first().click();
+  await expect(page).toHaveURL(/\/eu\/alquiler\/fianza\/$/);
+  await expect(page.locator('#fianza-legal')).toBeVisible();
+  await expect(page.locator('.review-banner')).toBeVisible();
+  for (const path of [
+    'eu/alquiler/subida/',
+    'eu/alquiler/devolucion-fianza/',
+    'eu/alquiler/gastos/',
+  ]) {
+    const response = await page.goto(path);
+    expect(response?.status(), path).toBe(200);
+  }
+});
+
 test('the Spanish pages neither link nor offer it', async ({ page }) => {
   await page.goto('');
   await expect(page.locator('.review-banner')).toHaveCount(0);

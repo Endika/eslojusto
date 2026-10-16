@@ -5,24 +5,20 @@ import { NORMS } from '../engine/rental/data/norms';
 import { LAST_UPDATED } from '../content/updated';
 import { breadcrumbList, trail } from '../content/structured-data';
 import { faqNode } from '../content/faq';
-import {
-  RENTAL_PAGES,
-  REVIEW,
-  nextPages,
-  rentalPage,
-  type RentalPageId,
-} from '../content/rental-pages';
+import { rentalPagesCopy, type RentalPageId } from '../content/rental-pages';
 import { example, formatLongDay, latest, monthRows } from '../content/rent-indices';
 import { t, type Key } from '../i18n';
-import { link } from '../i18n/languages';
+import { link, type Lang } from '../i18n/languages';
 
 // A page on one question about a rental: what it says, its questions and the pages next to it.
-// Spanish only, like its prose; it exists only in a PUBLIC_RENTAL=1 build, so its date is in
-// LAST_UPDATED only then. A page with sections of its own puts them in the slot.
+// It exists only in a PUBLIC_RENTAL=1 build, so its date is in LAST_UPDATED only then. A page with
+// sections of its own puts them, from src/prose/, in the slot.
 interface Props {
   id: RentalPageId;
+  lang: Lang;
 }
-const { id } = Astro.props;
+const { id, lang } = Astro.props;
+const { pages: RENTAL_PAGES, review: REVIEW, rentalPage, nextPages } = rentalPagesCopy(lang);
 const irav = latest('irav', monthRows());
 if (!irav) throw new Error('The rental pages need a published IRAV.');
 const { path } = RENTAL_PAGES[id];
@@ -34,12 +30,12 @@ const page = rentalPage(id, {
   irav: irav.figure.rate,
   example: example(),
 });
-const tx = (key: Key) => t('es', key);
-const href = (to: string) => link('es', to.replace(/^\//, ''));
+const tx = (key: Key) => t(lang, key);
+const href = (to: string) => link(lang, to.replace(/^\//, ''));
 
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
 const crumbs = trail(
-  'es',
+  lang,
   { name: tx('home.rent'), path: REVIEW.path },
   { name: page.crumb, path },
 );
@@ -49,23 +45,22 @@ const crumbs = trail(
   title={page.title}
   description={page.description}
   path={path}
-  lang="es"
-  langs={['es']}
+  lang={lang}
   section="settlement"
-  structuredData={[breadcrumbList(home, 'es', crumbs), faqNode(page.faq)]}
+  structuredData={[breadcrumbList(home, lang, crumbs), faqNode(page.faq)]}
 >
   <main class="document rent" id="content">
-    <Breadcrumbs lang="es" crumbs={crumbs} />
+    <Breadcrumbs lang={lang} crumbs={crumbs} />
     <header class="document__head">
       <h1 class="document__title">{page.h1}</h1>
       <p class="guide__lead">{page.lead}</p>
       <p class="guide__sources">
-        <span>{t('es', 'rental.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
+        <span>{t(lang, 'rental.reviewed', { fecha: formatLongDay(checkedOn) })}</span>
         <span>
           {tx('guide.sources')}: <a href={NORMS.lau.url}>Ley de Arrendamientos Urbanos</a> ·{' '}
           <a href={NORMS.rdl29_2026.url}>Real Decreto-ley 29/2026</a>
         </span>
-        <a href={href('/aviso-legal/')}>{tx('guide.who')}</a>
+        <a href={link('es', 'aviso-legal/')}>{tx('guide.who')}</a>
       </p>
     </header>
 
@@ -109,7 +104,7 @@ const crumbs = trail(
           )}
           {section.example?.map((text, i) => (
             <p class="example">
-              {i === 0 && <span class="example__label">Ejemplo.</span>} {text}
+              {i === 0 && <span class="example__label">{tx('rental.topic.example')}</span>} {text}
             </p>
           ))}
           {section.after?.map((text) => (
@@ -141,7 +136,7 @@ const crumbs = trail(
 
       {page.sources.length > 0 && (
         <section class="sheet sheet--text" aria-labelledby="normas">
-          <h2 id="normas">Normas</h2>
+          <h2 id="normas">{tx('rental.topic.norms')}</h2>
           <ul class="sources sources--wrap">
             {page.sources.map((s) => (
               <li>
@@ -168,7 +163,7 @@ const crumbs = trail(
       </section>
 
       <nav class="sheet sheet--text" aria-labelledby="sigue">
-        <h2 id="sigue">Sigue leyendo</h2>
+        <h2 id="sigue">{tx('case.next')}</h2>
         <ul class="next-pages">
           {nextPages(id).map(({ name, path: to }) => (
             <li>

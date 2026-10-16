@@ -1,0 +1,29 @@
+---
+import type { GetStaticPaths } from 'astro';
+import RentalTopic from '../../../../views/RentalTopic.astro';
+import { RENTAL_BUILD } from '../../../../content/sections';
+import { RENTAL_PAGES, RENTAL_PAGE_IDS, type RentalPageId } from '../../../../content/rental-pages';
+import { langPaths, type Lang } from '../../../../i18n/languages';
+import { prose } from '../../../../prose';
+
+export const getStaticPaths = (() =>
+  RENTAL_BUILD
+    ? langPaths().flatMap(({ params }) =>
+        RENTAL_PAGE_IDS.map((id) => ({
+          params: { ...params, topic: RENTAL_PAGES[id].slug },
+          props: { id },
+        })),
+      )
+    : []) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+const { id } = Astro.props as { id: RentalPageId };
+// Three of the pages have sections of their own, in src/prose/.
+const Prose = ['deposit', 'deposit_return', 'charges'].includes(id)
+  ? prose(lang, `rental-${id}`)
+  : null;
+---
+
+<RentalTopic id={id} lang={lang}>
+  {Prose && <Prose lang={lang} />}
+</RentalTopic>

@@ -3,10 +3,15 @@ import { NORMS } from '../../engine/rental/data/norms';
 import { REVIEW, chargesExample, pageDecree } from '../../content/rental-pages';
 import { formatEuros, formatLongDay } from '../../content/rent-indices';
 import { t } from '../../i18n';
-import { link } from '../../i18n/languages';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
 
 const ex = chargesExample();
-const href = (path: string) => link('es', path.replace(/^\//, ''));
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
 ---
 
 <section class="sheet sheet--text" aria-labelledby="pacto">

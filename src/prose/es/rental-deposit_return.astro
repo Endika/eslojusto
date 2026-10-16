@@ -3,10 +3,15 @@ import { LEGAL_INTEREST } from '../../engine/law/data/legal-interest';
 import { NORMS } from '../../engine/rental/data/norms';
 import { REVIEW, RENTAL_PAGES, depositReturnExample, pageDecree } from '../../content/rental-pages';
 import { formatDay, formatEuros, formatRate } from '../../content/rent-indices';
-import { link } from '../../i18n/languages';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
 
 const ex = depositReturnExample();
-const href = (path: string) => link('es', path.replace(/^\//, ''));
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
 const [first, second] = ex.stretches;
 if (!first || !second) throw new Error('The example spans a year change.');
 const table = LEGAL_INTEREST[0]?.url;

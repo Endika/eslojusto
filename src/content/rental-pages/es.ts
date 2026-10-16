@@ -1,24 +1,25 @@
-import { addDays, parseDate, toIso } from '../engine/date';
-import { round2 } from '../engine/money';
-import { checkDepositReturn } from '../engine/rental/deposit-return';
-import { checkCharges } from '../engine/rental/charges';
-import { checkGuarantees } from '../engine/rental/guarantees';
-import type { ItemReading, ItemResult } from '../engine/rental/item';
-import type { NormTable } from '../engine/rental/norms';
-import { ruleSource, type RuleId } from '../engine/rental/rules';
-import { RENTAL_TABLES } from '../engine/rental/data/tables';
-import { NORMS } from '../engine/rental/data/norms';
-import type { RentalFigure, RentalPhrase } from '../engine/rental/calculation';
-import type { RentalInput } from '../engine/rental/types';
-import { t, type Key } from '../i18n';
-import { capsCopy, type CapRow, type Source } from './rent-caps';
-import { decreeClause, decreeSentence } from './rental-guide';
-import { DECREE_CAP, formatDay, formatEuros, formatLongDay, formatRate } from './rent-indices';
-import type { Example } from './rent-indices';
-import { LAST_UPDATED } from './updated';
+import { addDays, parseDate, toIso } from '../../engine/date';
+import { round2 } from '../../engine/money';
+import { checkDepositReturn } from '../../engine/rental/deposit-return';
+import { checkCharges } from '../../engine/rental/charges';
+import { checkGuarantees } from '../../engine/rental/guarantees';
+import type { ItemReading, ItemResult } from '../../engine/rental/item';
+import type { NormTable } from '../../engine/rental/norms';
+import { ruleSource, type RuleId } from '../../engine/rental/rules';
+import { RENTAL_TABLES } from '../../engine/rental/data/tables';
+import { NORMS } from '../../engine/rental/data/norms';
+import type { RentalFigure, RentalPhrase } from '../../engine/rental/calculation';
+import type { RentalInput } from '../../engine/rental/types';
+import { t, type Key } from '../../i18n';
+import { capsCopy, type CapRow, type Source } from '../rent-caps';
+import { decreeClause, decreeSentence } from '../rental-guide';
+import { DECREE_CAP, formatDay, formatEuros, formatLongDay, formatRate } from '../rent-indices';
+import type { Example } from '../rent-indices';
+import { LAST_UPDATED } from '../updated';
 
 // The six pages on a rental that sit under /alquiler/: the rise, the 2026 decree and the agency
-// fees, and the deposit, its return and the charges. Spanish only, like the case pages, and they
+// fees, and the deposit, its return and the charges, in Spanish; another language's words are a
+// sibling file with the shape of RentalPagesCopy, on the paths and examples of this one. They
 // exist only in a PUBLIC_RENTAL=1 build. The deposit pages keep their prose in a section component
 // each and the others are built here from the engine's norm table and rule list, so a validation
 // or a repeal changes them without touching the copy. Every figure of a worked example comes out
@@ -739,3 +740,20 @@ export function chargesExample(): ChargesExample {
     throw new Error('The example needs a charge over the agreed amount.');
   return { agreed, charged, over: reading.amount };
 }
+
+// The words of the rental pages in a language: another language's file exports its own.
+export interface RentalPagesCopy {
+  readonly pages: Record<RentalPageId, PageMeta>;
+  readonly review: { readonly path: string; readonly name: string };
+  readonly nextPages: (id: RentalPageId) => readonly { name: string; path: string }[];
+  readonly rentalPage: (id: RentalPageId, ctx: PageContext) => RentalPage;
+  readonly pageDecree: (page: RentalPageId, key: Key) => string;
+}
+
+export const RENTAL_COPY: RentalPagesCopy = {
+  pages: RENTAL_PAGES,
+  review: REVIEW,
+  nextPages,
+  rentalPage,
+  pageDecree,
+};

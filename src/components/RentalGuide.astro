@@ -11,7 +11,7 @@ import {
   monthRows,
 } from '../content/rent-indices';
 import { legalInterestSummary, rentalGuide } from '../content/rental-guide';
-import { RENTAL_PAGES, RENTAL_PAGE_IDS, type RentalPageId } from '../content/rental-pages';
+import { RENTAL_PAGE_IDS, rentalPagesCopy, type RentalPageId } from '../content/rental-pages';
 import { rentalFaqEntries } from '../content/rental-faq';
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
@@ -24,6 +24,7 @@ interface Props {
 }
 const { lang, checkedOn, documents = false } = Astro.props;
 const tx = (key: Key) => t(lang, key);
+const RENTAL_PAGES = rentalPagesCopy(lang).pages;
 
 const blocks = rentalGuide(lang, NORMS, {
   checkedOn,
@@ -108,7 +109,7 @@ const faq = rentalFaqEntries(lang, NORMS, { documents, checkedOn });
         )}
         {deeper[id] && (
           <p>
-            <a href={link('es', RENTAL_PAGES[deeper[id]].path.slice(1))}>
+            <a href={link(lang, RENTAL_PAGES[deeper[id]].path.slice(1))}>
               {RENTAL_PAGES[deeper[id]].h1}
             </a>
           </p>
@@ -137,7 +138,7 @@ const faq = rentalFaqEntries(lang, NORMS, { documents, checkedOn });
       <ul class="next-pages">
         {RENTAL_PAGE_IDS.map((id) => (
           <li>
-            <a href={link('es', RENTAL_PAGES[id].path.slice(1))}>{RENTAL_PAGES[id].h1}</a>
+            <a href={link(lang, RENTAL_PAGES[id].path.slice(1))}>{RENTAL_PAGES[id].h1}</a>
           </li>
         ))}
       </ul>

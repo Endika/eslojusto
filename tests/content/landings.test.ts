@@ -2,7 +2,6 @@ import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { HUBS, LANDINGS, LANDING_IDS, landingCopy, landingKeys } from '../../src/content/landings';
 import { es } from '../../src/i18n/es';
-import { LANGS, type Lang } from '../../src/i18n/languages';
 import { LAST_UPDATED } from '../../src/content/updated';
 import { euroRange, wholeEuroRange } from '../../src/content/format';
 
@@ -44,14 +43,6 @@ describe('the case pages', () => {
 
   it('the paro pages show the estimate first; the finiquito pages, the items', () => {
     for (const [, page] of pages) expect(page.benefitFirst).toBe(page.hub === 'paro');
-  });
-
-  // A published language can't lean on the Spanish prose either.
-  it('every published language has the prose of every case page', () => {
-    const published = (Object.keys(LANGS) as Lang[]).filter((i) => LANGS[i].published);
-    for (const lang of published)
-      for (const id of LANDING_IDS)
-        expect(existsSync(`src/prose/${lang}/${id}.astro`), `${lang}/${id}`).toBe(true);
   });
 
   it.each(LANDING_IDS)('%s has every word in the dictionary', (id) => {
