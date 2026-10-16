@@ -1,0 +1,113 @@
+---
+// source: 497baf7f9449
+import { LEGAL_INTEREST } from '../../engine/law/data/legal-interest';
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositReturnExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatDay, formatEuros, formatRate } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositReturnExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+const [first, second] = ex.stretches;
+if (!first || !second) throw new Error('The example spans a year change.');
+const table = LEGAL_INTEREST[0]?.url;
+---
+
+<section class="sheet sheet--text" aria-labelledby="plazo">
+  <h2 id="plazo">The time limit: one month from when you hand over the keys</h2>
+  <p>
+    When the agreement ends and you hand over the keys, the landlord has one month to return the
+    deposit to you. After that month, whatever remains to be returned accrues statutory interest
+    (interés legal del dinero) (art. 36.4 LAU).
+  </p>
+  <p>
+    The month is counted from date to date: if you hand over the keys on 15 November, the time limit
+    ends on 15 December and interest runs from the 16th. It runs until the day the money is returned
+    to you, which no longer counts.
+  </p>
+  <p>
+    How much deposit you can be asked for at the start:{' '}
+    <a href={href(RENTAL_PAGES.deposit.path)}>{RENTAL_PAGES.deposit.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="interes">
+  <h2 id="interes">Which interest applies</h2>
+  <p>
+    Statutory interest (interés legal del dinero). It is set each year by the Ley de Presupuestos
+    Generales del Estado (State Budget Act), and the calculation uses the rate of the calendar year
+    of each day. The rates for each year are in the <a href={table}>Banco de España's table</a>.
+  </p>
+  <p>
+    The year can be counted by its calendar days (365, or 366 in a leap year) or as 360 days: we
+    give both calculations.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Worked example</h2>
+  <p>
+    A person with a deposit of {formatEuros(ex.deposit)} hands over the keys on{' '}
+    {formatDay(ex.keysReturnedOn)}. The landlord accepts them and returns the whole deposit on{' '}
+    {formatDay(ex.returnedOn)}. The month ended on 15-12-2022, so interest runs from{' '}
+    {formatDay(ex.interestFrom)} and crosses the change of year, with each year's rate:
+  </p>
+  <ul>
+    <li>
+      From {formatDay(first.from)} to {formatDay(first.to)} ({first.days} days) at{' '}
+      {formatRate(first.rate)}: {formatEuros(first.interest)}.
+    </li>
+    <li>
+      From {formatDay(second.from)} to {formatDay(second.to)} ({second.days} days) at{' '}
+      {formatRate(second.rate)}: {formatEuros(second.interest)}.
+    </li>
+  </ul>
+  <p class="example">
+    <span class="example__label">The figures</span> Each stretch is the deposit times the rate and
+    times the days, divided by 100 and by the {first.yearDays} days of the year:{' '}
+    {formatEuros(ex.deposit)} × {formatRate(first.rate)} × {first.days} ÷ {first.yearDays} and{' '}
+    {formatEuros(ex.deposit)} × {formatRate(second.rate)} × {second.days} ÷ {second.yearDays}. In
+    total, {formatEuros(ex.total)} of interest; if the year is counted as 360 days,{' '}
+    {formatEuros(ex.totalCommercial)}.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="no-valoramos">
+  <h2 id="no-valoramos">What we do not assess</h2>
+  <p>
+    If the landlord keeps part of the deposit for damage, cleaning or other items, the review notes
+    each deduction as it was given to you and subtracts it from what remains to be returned. It does
+    not assess whether it is justified or how much a repair costs.
+  </p>
+  <p>{pageDecree('deposit_return', 'rental.guide.return.closing')}</p>
+  <p class="folio">
+    Art. <span>36.7</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Calculate what remains to be returned</h2>
+  <p>
+    In the <a href={href(REVIEW.path)}>rental review</a> you enter when you handed over the keys,
+    how much has been returned to you and when. It gives you what remains of the deposit and the
+    interest, with both ways of counting the year, and can prepare a letter to request it.
+  </p>
+  <p>
+    {NORMS.lau.citation}: <a href={NORMS.lau.url}>consolidated text in the BOE</a>.
+  </p>
+</section>
