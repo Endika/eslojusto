@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.73.0](https://github.com/Endika/eslojusto/compare/v1.72.0...v1.73.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** give the final pay guide its prose per language ([5cc971c](https://github.com/Endika/eslojusto/commit/5cc971c18113869b876d8169939f3b8ddf4e7c76))
+
 ## [1.72.0](https://github.com/Endika/eslojusto/compare/v1.71.0...v1.72.0) (2026-10-16)
 
 
