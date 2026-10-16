@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.74.0](https://github.com/Endika/eslojusto/compare/v1.73.0...v1.74.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** write dates in the page's words and refuse an ambiguous amount ([1cff1b9](https://github.com/Endika/eslojusto/commit/1cff1b996d1bc18d18dcbde49a78ef2af8669579))
+
 ## [1.73.0](https://github.com/Endika/eslojusto/compare/v1.72.0...v1.73.0) (2026-10-16)
 
 
