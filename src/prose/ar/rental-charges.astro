@@ -1,0 +1,81 @@
+---
+// source: 8e819e81fa1a
+import { NORMS } from '../../engine/rental/data/norms';
+import { chargesExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros, formatLongDay } from '../../content/rent-indices';
+import { t } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pageDecree } = rentalPagesCopy(lang);
+
+const ex = chargesExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="pacto">
+  <h2 id="pacto">فقط باتفاق مكتوب مع مبلغها السنوي</h2>
+  <p>
+    لا يمكن للمؤجِّر أن يحصّل منك المصاريف العامة للمبنى أو الخدمات التي ليس لها عدّاد إلا إذا
+    اتفقتما على ذلك كتابةً مع ذكر مبلغها السنوي في تاريخ العقد <bdi>(art. 20.1 LAU)</bdi>. للضرائب،
+    مثل ضريبة العقارات <bdi>(IBI)</bdi>، قاعدتها الخاصة: انظر «ضريبة IBI والرسوم» أدناه.
+  </p>
+  <p>إذا لم يذكرها العقد أو لم يحدّد لها مبلغًا سنويًا، تشير المراجعة إلى ذلك لتطّلع عليه.</p>
+  <p>{pageDecree('charges', 'rental.page.charges.community')}</p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="subida">
+  <h2 id="subida">كم يمكن أن تزيد: حتى ضعف زيادة الإيجار</h2>
+  <p>
+    في السنوات الخمس الأولى من العقد، أو السبع إذا كان المؤجِّر شركة، لا يمكن أن تزيد هذه المصاريف،
+    باستثناء الضرائب، إلا مرة واحدة في السنة، بالاتفاق، ولا بأكثر من ضعف ما يمكن أن يزيد به الإيجار
+    (<bdi>art. 20.3 LAU</bdi>، أو <bdi>art. 20.2</bdi> في العقود السابقة للمرسوم بقانون
+    <bdi>Real Decreto-ley 29/2026</bdi>). تقارن المراجعة كل مصروف في كل سنة بذلك الحد الأقصى.
+  </p>
+  <p class="folio">
+    Art. <span>20.3</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ibi">
+  <h2 id="ibi">ضريبة IBI والرسوم</h2>
+  <p>{pageDecree('charges', 'rental.page.decree.taxes')}</p>
+  <p>
+    {t(lang, 'rental.guide.charges.taxes_before', {
+      desde: formatLongDay(NORMS.rdl29_2026.inForceSince, lang),
+    })}
+  </p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">مثال تطبيقي</h2>
+  <p>
+    يحدّد عقد {formatEuros(ex.agreed)} سنويًا لرسوم اتحاد الملاك <bdi>(comunidad)</bdi>. في السنة
+    الأولى، يحصّل المؤجِّر {formatEuros(ex.charged)}.
+  </p>
+  <p class="example">
+    <span class="example__label">الحساب</span> لم يكن من الممكن أن تحدث أي زيادة بعد، لذا فالحد
+    الأقصى هو المبلغ المتفق عليه، {formatEuros(ex.agreed)}. {formatEuros(ex.charged)} −{' '}
+    {formatEuros(ex.agreed)} = {formatEuros(ex.over)} زيادةً.
+  </p>
+  <p class="folio">
+    Art. <span>20</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">تحقّق مما يُحصَّل منك</h2>
+  <p>
+    تقارن <a href={href(REVIEW.path)}>مراجعة الإيجار</a> كل مصروف في كل سنة بالمبلغ المتفق عليه
+    وبالحد الأقصى للزيادة، وتبيّن لك كم دفعت زيادةً على ذلك.
+  </p>
+</section>

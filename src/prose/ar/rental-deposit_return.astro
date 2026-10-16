@@ -1,0 +1,119 @@
+---
+// source: 497baf7f9449
+import { LEGAL_INTEREST } from '../../engine/law/data/legal-interest';
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositReturnExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatDay, formatEuros, formatRate } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositReturnExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+const [first, second] = ex.stretches;
+if (!first || !second) throw new Error('The example spans a year change.');
+const table = LEGAL_INTEREST[0]?.url;
+---
+
+<section class="sheet sheet--text" aria-labelledby="plazo">
+  <h2 id="plazo">المهلة: شهر واحد من تسليم المفاتيح</h2>
+  <p>
+    عند انتهاء العقد وتسليم المفاتيح، أمام المؤجِّر شهر واحد لإعادة التأمين <bdi>(fianza)</bdi>
+    إليك. بعد مرور ذلك الشهر، يترتّب على ما تبقّى دون إعادة الفائدة القانونية للمال
+    <bdi>(interés legal del dinero)</bdi> <bdi>(art. 36.4 LAU)</bdi>.
+  </p>
+  <p>
+    يُحسب الشهر من تاريخ إلى التاريخ المقابل له: إذا سلّمت المفاتيح في 15 نوفمبر، تنتهي المهلة في 15
+    ديسمبر وتسري الفائدة اعتبارًا من يوم 16. وتستمر حتى اليوم الذي يُعاد فيه المال إليك، وهذا اليوم
+    لا يُحتسب.
+  </p>
+  <p>
+    كم يمكن أن يُطلب منك تأمينًا منذ البداية:{' '}
+    <a href={href(RENTAL_PAGES.deposit.path)}>{RENTAL_PAGES.deposit.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="interes">
+  <h2 id="interes">أي فائدة تُطبَّق</h2>
+  <p>
+    الفائدة القانونية للمال. يحدّدها كل سنة قانون الموازنة العامة للدولة
+    <bdi>(Ley de Presupuestos Generales del Estado)</bdi>، وتستخدم الحسابات سعر السنة التقويمية التي
+    يقع فيها كل يوم. أسعار كل سنة موجودة في{' '}
+    <a href={table}>
+      جدول البنك المركزي الإسباني <bdi>(Banco de España)</bdi>
+    </a>
+    .
+  </p>
+  <p>
+    يمكن احتساب السنة بأيامها التقويمية (365، أو 366 في السنة الكبيسة) أو على أساس 360 يومًا: نقدّم
+    الحسابين كليهما.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">مثال تطبيقي</h2>
+  <p>
+    شخص لديه تأمين قدره {formatEuros(ex.deposit)} يسلّم المفاتيح في {formatDay(ex.keysReturnedOn)}.
+    يقبلها المؤجِّر ويعيد إليه التأمين كاملًا في {formatDay(ex.returnedOn)}. انتهى الشهر في
+    15-12-2022، لذا تسري الفائدة اعتبارًا من {formatDay(ex.interestFrom)} وتمتد عبر تغيّر السنة،
+    بسعر كل سنة:
+  </p>
+  <ul>
+    <li>
+      من {formatDay(first.from)} إلى {formatDay(first.to)} ({first.days} يومًا) بسعر{' '}
+      {formatRate(first.rate)}: {formatEuros(first.interest)}.
+    </li>
+    <li>
+      من {formatDay(second.from)} إلى {formatDay(second.to)} ({second.days} يومًا) بسعر{' '}
+      {formatRate(second.rate)}: {formatEuros(second.interest)}.
+    </li>
+  </ul>
+  <p class="example">
+    <span class="example__label">الحساب</span> كل مرحلة هي التأمين مضروبًا في السعر وفي عدد الأيام،
+    مقسومًا على 100 وعلى عدد أيام السنة {first.yearDays}: {formatEuros(ex.deposit)} ×{' '}
+    {formatRate(first.rate)} × {first.days} ÷ {first.yearDays} و{formatEuros(ex.deposit)} ×{' '}
+    {formatRate(second.rate)} × {second.days} ÷ {second.yearDays}. المجموع {formatEuros(ex.total)}{' '}
+    من الفوائد؛ وإذا احتُسبت السنة على أساس 360 يومًا، {formatEuros(ex.totalCommercial)}.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="no-valoramos">
+  <h2 id="no-valoramos">ما لا نقيّمه</h2>
+  <p>
+    إذا احتفظ المؤجِّر بجزء من التأمين بسبب أضرار أو تنظيف أو بنود أخرى، تسجّل المراجعة كل خصم كما
+    أُبلغت به وتطرحه مما تبقّى دون إعادة. ولا تقيّم ما إذا كان الخصم مبرَّرًا ولا كم تكلّف
+    الإصلاحات.
+  </p>
+  <p>{pageDecree('deposit_return', 'rental.guide.return.closing')}</p>
+  <p class="folio">
+    Art. <span>36.7</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">احسب ما يتبقّى لك</h2>
+  <p>
+    في <a href={href(REVIEW.path)}>مراجعة الإيجار</a> تكتب متى سلّمت المفاتيح، وكم أُعيد إليك ومتى.
+    وتعطيك ما يتبقّى من التأمين والفائدة، بحسابَي السنة كليهما، ويمكنها إعداد رسالة لطلبه.
+  </p>
+  <p>
+    {NORMS.lau.citation}:{' '}
+    <a href={NORMS.lau.url}>
+      النص الموحَّد في الجريدة الرسمية <bdi>(BOE)</bdi>
+    </a>
+    .
+  </p>
+</section>

@@ -1,0 +1,100 @@
+---
+// source: f63abb595478
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositExample();
+// Until the Congress votes the decree down, the insurance ban stands as pending.
+const banStands = NORMS.rdl29_2026.status !== 'repealed';
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="fianza-legal">
+  <h2 id="fianza-legal">التأمين: إيجار شهر واحد</h2>
+  <p>
+    التأمين <bdi>(fianza)</bdi> إلزامي، وفي إيجار المسكن يساوي إيجار شهر واحد يُدفع نقدًا
+    <bdi>(art. 36.1 LAU)</bdi>.
+  </p>
+  <p>
+    عند انتهاء العقد وتسليم المفاتيح، يُلزَم المؤجِّر بإعادته إليك خلال شهر:{' '}
+    <a href={href(RENTAL_PAGES.deposit_return.path)}>{RENTAL_PAGES.deposit_return.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.1</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="garantia-adicional">
+  <h2 id="garantia-adicional">ضمانات أخرى: حتى إيجار شهرين إضافيين</h2>
+  <p>
+    إلى جانب التأمين، يمكن أن يشترط العقد ضمانًا آخر: مبلغًا إضافيًا من المال أو كفالة
+    <bdi>(aval)</bdi>. في العقود الموقَّعة منذ 6 مارس 2019 لمدة تصل إلى خمس سنوات، أو حتى سبع سنوات
+    إذا كان المؤجِّر شركة، لا يمكن أن يتجاوز هذا الضمان الإضافي إيجار شهرين
+    <bdi>(art. 36.5 LAU)</bdi>.
+  </p>
+  <p>تقارن المراجعة المال الذي دفعته بالحد الأقصى.</p>
+  {banStands && (
+    <p>
+      بحسب المرسوم، لم يعد بإمكان المؤجِّر أن يشترط عليك وثيقة تأمين ضد عدم دفع الإيجار
+      <bdi>(seguro de impago)</bdi>: يشرح ذلك <a href="#seguro">قسم وثيقة التأمين</a> أدناه.
+    </p>
+  )}
+  <p class="folio">
+    Art. <span>36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="adelantado">
+  <h2 id="adelantado">الدفع المسبق: إيجار شهر واحد</h2>
+  <p>
+    لا يمكن للمؤجِّر أن يشترط دفع أكثر من إيجار شهر واحد مسبقًا <bdi>(art. 17 LAU)</bdi>.
+  </p>
+  <p class="folio">
+    Art. <span>17</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="seguro">
+  <h2 id="seguro">
+    {banStands
+      ? 'وثيقة التأمين ضد عدم دفع الإيجار: المرسوم يحظر اشتراطها عليك'
+      : 'وثيقة التأمين ضد عدم دفع الإيجار'}
+  </h2>
+  <p>{pageDecree('deposit', 'rental.page.decree.insurance')}</p>
+  <p class="folio">
+    Art. <span>36.5</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">مثال تطبيقي</h2>
+  <p>
+    مع إيجار قدره {formatEuros(ex.rent)}، يطلب مؤجِّر {formatEuros(ex.asked)} نقدًا قبل الدخول إلى
+    المسكن: التأمين وضمانات إضافية.
+  </p>
+  <p class="example">
+    <span class="example__label">الحساب</span> التأمين إيجار شهر واحد، {formatEuros(ex.rent)}،
+    والضمان الإضافي يمكن أن يصل إلى إيجار شهرين، {formatEuros(2 * ex.rent)}. الحد الأقصى هو{' '}
+    {formatEuros(ex.allowed)}. يُطلب منك {formatEuros(ex.asked)}: أي {formatEuros(ex.over)} فوق الحد
+    الأقصى.
+  </p>
+  <p class="folio">
+    Art. <span>36.1 · 36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">تحقّق مما طُلب منك</h2>
+  <p>
+    تقارن <a href={href(REVIEW.path)}>مراجعة الإيجار</a> التأمين والضمانات والدفع المسبق في عقدك
+    بهذه الحدود القصوى، وتبيّن لك بكم يتجاوز كلَّ حدّ منها.
+  </p>
+</section>
