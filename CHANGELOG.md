@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.78.0](https://github.com/Endika/eslojusto/compare/v1.77.0...v1.78.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** fail on a translation that drops a figure or a variable, or outlives its Spanish ([a24d6fc](https://github.com/Endika/eslojusto/commit/a24d6fc897f2d331a79ba7b7c677d20b24b8695d))
+
 ## [1.77.0](https://github.com/Endika/eslojusto/compare/v1.76.0...v1.77.0) (2026-10-16)
 
 
