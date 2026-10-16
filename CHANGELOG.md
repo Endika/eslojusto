@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.70.0](https://github.com/Endika/eslojusto/compare/v1.69.0...v1.70.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** give the ERTE page a route and a copy per language ([0990ae3](https://github.com/Endika/eslojusto/commit/0990ae3e7ed5b1b198534fa06255384a20a82417))
+
 ## [1.69.0](https://github.com/Endika/eslojusto/compare/v1.68.0...v1.69.0) (2026-10-16)
 
 
