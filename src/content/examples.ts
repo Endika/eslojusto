@@ -1,3 +1,5 @@
+import { t } from '../i18n';
+import type { Lang } from '../i18n/languages';
 import { parseDate } from '../engine/date';
 import type { Range } from '../engine/money';
 import { reviewFinalPay, type EmployerFigures, type Review } from '../engine/review';
@@ -123,7 +125,7 @@ export const fixedTerms = FIXED_TERMS.map(([label, start, months]) => {
       noticeDaysReceived: 0,
     }),
   );
-  return { label, limit: fixedTermLimit(months), severance: itemRange(r, 'severance') };
+  return { label, months, limit: fixedTermLimit(months), severance: itemRange(r, 'severance') };
 });
 
 // /finiquito/: what changes with seniority for a contract that ends on 30 September 2026. The
@@ -148,6 +150,7 @@ export const bySeniority = SENIORITY.map(([label, start, months]) => {
     }).amount;
   return {
     label,
+    months,
     finalPay,
     fixedTermLimit: fixedTermLimit(months),
     // No figure where a contract for production circumstances could not have lasted that long.
@@ -185,15 +188,15 @@ export const benefitBySalary = BENEFIT_SALARIES.map((salary) => {
 
 // /paro/por-tiempo-trabajado/: one contract alone, ending on 31 August 2026.
 export const WORKED = [
-  ['6 meses', '2026-03-01'],
-  ['1 año', '2025-09-01'],
-  ['2 años', '2024-09-01'],
-  ['3 años', '2023-09-01'],
-  ['6 años', '2020-09-01'],
+  ['6 meses', '2026-03-01', 6],
+  ['1 año', '2025-09-01', 12],
+  ['2 años', '2024-09-01', 24],
+  ['3 años', '2023-09-01', 36],
+  ['6 años', '2020-09-01', 72],
 ] as const;
-export const durationByTime = WORKED.map(([label, start]) => {
+export const durationByTime = WORKED.map(([label, start, months]) => {
   const days = contractContributedDays(date(start), date('2026-08-31'));
-  return { label, days, benefitDays: durationForDays(days) };
+  return { label, months, days, benefitDays: durationForDays(days) };
 });
 export const BENEFIT_SCALE = [...BENEFIT_2026.scale].reverse();
 
@@ -219,3 +222,9 @@ export const entitledByCause = CAUSES.map((cause) => ({
   cause,
   entitled: estimateBenefit(threeYears(cause), 0).entitled,
 }));
+
+// A table's span in the page's words: «6 meses», «1 año», «2 años»; in months only when asked.
+export const spanLabel = (months: number, lang: Lang, unit: 'months' | 'span' = 'span'): string =>
+  unit === 'months' || months % 12 !== 0
+    ? t(lang, 'span.months', { n: months })
+    : t(lang, months === 12 ? 'span.year' : 'span.years', { n: months / 12 });

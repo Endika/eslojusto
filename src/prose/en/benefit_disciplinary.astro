@@ -1,0 +1,89 @@
+---
+// source: a172b338d8e2
+import CaseLink from '../../components/CaseLink.astro';
+import { disciplinary, entitledByCause } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import { t } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+if (disciplinary.entitled !== 'yes' || disciplinary.figures === null)
+  throw new Error('Incomplete example');
+const { figures } = disciplinary;
+// The reasons are the calculator's own: the same sentence and article it shows in the result.
+const causes = entitledByCause.map(({ cause, entitled }) => ({
+  name: t(lang, `cause.${cause}`),
+  entitled,
+  reason: t(lang, `client.unemployment.reason.${cause}`),
+}));
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-si">It does give unemployment benefit, even if the dismissal is fair</h3>
+  <p>
+    It is a common question, and the answer is in the law: dismissal is a legal situation of
+    unemployment (art. 267.1.a.3.º LGSS), and to receive unemployment benefit (paro) there is no
+    need to challenge it (art. 268.4 LGSS). It makes no difference that the dismissal is
+    disciplinary or that it is declared fair (procedente).
+  </p>
+  <p>
+    What you do need is the usual: 360 days of contributions in the last 6 years, to register as a
+    jobseeker and to sign the activity agreement (acuerdo de actividad), among other requirements
+    (art. 266 LGSS).
+  </p>
+  <p class="folio">
+    Arts. <span>267 · 268.4</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ceses">Which ways of leaving a job give unemployment benefit</h3>
+  <div class="causes">
+    {causes.map(({ name, entitled, reason }) => (
+      <div>
+        <h4>{name}</h4>
+        <p>
+          <strong>
+            {entitled === 'yes'
+              ? 'It gives unemployment benefit.'
+              : 'It does not give unemployment benefit, with some exceptions.'}
+          </strong>{' '}
+          {reason}
+        </p>
+      </div>
+    ))}
+  </div>
+  <p>
+    The exceptions for resignation, such as a relocation or serious non-payment, are in{' '}
+    <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ejemplo">Worked example</h3>
+  <p>
+    A person earning 1.500&nbsp;€ gross a month with two extra payments of 1.500&nbsp;€ works from 1
+    June 2022 to 30 September 2026, with no dependent children, and the employer dismisses them on
+    disciplinary grounds.
+  </p>
+  <p class="example">
+    <span class="example__label">Their unemployment benefit</span> With{' '}
+    {integer(disciplinary.contractDays)} days of contributions, they are entitled to at least{' '}
+    {integer(disciplinary.duration.days)}
+    days of unemployment benefit ({integer(disciplinary.duration.days / 30)} months): about{' '}
+    {wholeEuros(figures.firstStretch.min)} a month for the first 6 months and about{' '}
+    {wholeEuros(figures.secondStretch.min)} after that, gross. “At least”, because other jobs in the
+    last 6 years can add days.
+  </p>
+  <p>
+    If the dismissal were declared unfair, there would also be severance pay: you will find it in{' '}
+    <CaseLink lang={lang} id="unfair_dismissal" />.
+  </p>
+</section>

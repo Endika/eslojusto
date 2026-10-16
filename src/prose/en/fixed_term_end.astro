@@ -1,0 +1,116 @@
+---
+// source: fb74508032fd
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { fixedTerms, spanLabel } from '../../content/examples';
+import { euroRange } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<section class="sheet sheet--text">
+  <h3 id="fc-indemnizacion">12 days per year, except for replacement and training contracts</h3>
+  <p>
+    When a fixed-term contract for production circumstances (circunstancias de la producción) ends,
+    you are entitled to severance pay of 12 days’ pay per year, in proportion to the days worked
+    (art. 49.1.c ET). If the contract started before 2015, it is fewer days: 8 if it started in 2011
+    or earlier, 9 in 2012, 10 in 2013 and 11 in 2014 (transitional provision 8.ª ET). Contracts
+    signed before 4 March 2001 carry no such severance pay (transitional provision 8.ª.2 ET).
+  </p>
+  <p>
+    Contracts to replace another person (sustitución) and training contracts (formativos) carry no
+    severance pay (art. 49.1.c ET). That is why the calculator asks you the type of contract right
+    after the reason.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET · DT <span>8.ª</span>
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-preaviso">Notice for contracts of more than a year</h3>
+  <p>
+    If the contract lasted more than a year, as can happen with a replacement contract, the employer
+    has to give you at least 15 days’ notice of its end (art. 49.1.c ET). The review counts the days
+    of that notice you were not given as still to be paid. Each day is worth between your monthly
+    pay / 30 and your annual pay / 365, depending on how the employer counts it.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-ejemplos">Examples: 3, 6 and 12 months</h3>
+  <p>
+    A contract for production circumstances lasts at most 6 months, or up to a year if your sector’s
+    collective agreement extends it (art. 15.2 ET).
+  </p>
+  <FigureTable id="fc-tabla">
+    <Fragment slot="caption">
+      Contracts for production circumstances ending on 30 September 2026, with 1.500&nbsp;€ gross a
+      month and two extra payments of 1.500&nbsp;€.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Length</th>
+        <th scope="col">Severance pay</th>
+      </tr>
+    </thead>
+    <tbody>
+      {fixedTerms.map(({ months, limit, severance }) => (
+        <tr>
+          <th scope="row">
+            {spanLabel(months, lang, 'months')}
+            {limit === 'sector_agreement' && (
+              <span class="figures-note">
+                only if your sector’s collective agreement extends it
+              </span>
+            )}
+          </th>
+          <td>{severance ? euroRange(severance) : '—'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    Each severance payment is the days of the contract × 12 / 365 days’ pay, at 21.000&nbsp;€ / 365
+    each. The final settlement also adds the last month’s pay, holiday and extra payments, which the
+    calculator reviews with your details.
+  </p>
+  <p>
+    A fixed-term contract that goes beyond its maximum length may in fact be a permanent one (art.
+    15.4 ET), and its end would then be a dismissal. Only contracts for a specific project or
+    service (obra o servicio) signed before 31 December 2021 could last longer (transitional
+    provision 3.ª of Real Decreto-ley 32/2021).
+  </p>
+  <p class="folio">
+    Art. <span>15</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-baja">If the contract ends while you are on sick leave</h3>
+  <p>
+    The review calculates the final settlement with the dates, pay and holiday days you enter. It
+    does not take into account the sick leave or what happens to its benefit when the contract ends:
+    we do not check that.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-paro">And unemployment benefit</h3>
+  <p>
+    The end of a fixed-term contract is a legal situation of unemployment, unless you were the one
+    who ended it (art. 267.1.a.6.º LGSS). How long the benefit lasts depends on the days of
+    contributions in the last 6 years: you will find it in{' '}
+    <CaseLink lang={lang} id="benefit_duration" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

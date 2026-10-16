@@ -1,0 +1,87 @@
+---
+// source: 176e7bb53168
+import CaseLink from '../../components/CaseLink.astro';
+import { itemRange, objective, severanceMonths } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const severance = itemRange(objective, 'severance');
+const notice = itemRange(objective, 'employer_notice');
+const salary = itemRange(objective, 'pending_salary');
+const holidays = itemRange(objective, 'holiday_pay');
+const extraPay = itemRange(objective, 'extra_pay');
+const unfair = objective.unfairReference;
+const months =
+  severanceMonths(
+    objective.items.find((p) => p.item.id === 'severance')?.item.calculation ?? [],
+  )[0] ?? 0;
+if (!severance || !notice || !salary || !holidays || !extraPay || unfair === null)
+  throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="do-20-dias">20 days per year, with a cap of 12 monthly payments</h3>
+  <p>
+    In a dismissal on objective grounds (despido objetivo), the employer has to make available to
+    you, together with the letter, severance pay of 20 days’ pay per year worked, up to a maximum of
+    12 monthly payments (art. 53.1.b ET). The CGPJ guide, following STS 651/2026, counts that cap as
+    360 days. Time is counted in months, and part of a month counts as a whole month.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.b</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-preaviso">15 days’ notice, or payment in lieu</h3>
+  <p>
+    Between the letter and the dismissal there have to be 15 days’ notice (art. 53.1.c ET). The days
+    the employer does not give are paid. The calculator asks you how many you were given and
+    calculates the ones missing.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-ejemplo">Worked example</h3>
+  <p>
+    A person earning 1.500&nbsp;€ gross a month with two extra payments of 1.500&nbsp;€ works from 3
+    May 2018 to 20 July 2026. They have taken 10 days of holiday this year and the employer gives
+    them no notice. These are the calculator’s figures:
+  </p>
+  <ul>
+    <li>
+      Severance pay: {euroRange(severance)} ({months} months × 20 / 12 ={' '}
+      {String((months * 20) / 12).replace('.', ',')} days).
+    </li>
+    <li>Notice not given: {euroRange(notice)}.</li>
+    <li>July pay: {euroRange(salary)}.</li>
+    <li>Untaken holiday: {euroRange(holidays)}.</li>
+    <li>Christmas extra payment accrued since 1 July: {euroRange(extraPay)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">If it were declared unfair</span> With the same dates, the
+    severance pay would be {euros(unfair)}, at 33 days per year. The review shows you that figure
+    beside the one for the objective-grounds dismissal.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-diferencia">Objective-grounds or unfair dismissal</h3>
+  <p>
+    An objective-grounds dismissal can be challenged in the same way as a disciplinary one (art.
+    53.3 ET). If it is declared unfair, the severance pay is calculated at 33 days per year, with a
+    cap of 720 days: you will find it in <CaseLink lang={lang} id="unfair_dismissal" />. The time
+    limit to challenge it is 20 business days (días hábiles) (art. 59.3 ET).
+  </p>
+  <p class="folio">
+    Art. <span>53 · 56 · 59</span> ET
+  </p>
+</section>

@@ -1,0 +1,148 @@
+---
+// source: 5665f4065cc1
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitBySalary } from '../../content/examples';
+import { euros, wholeEuros } from '../../content/format';
+import { BENEFIT_2026 } from '../../engine/unemployment';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const { minCap, maxCap } = BENEFIT_2026;
+const [, mid, high] = benefitBySalary;
+if (!mid || !high) throw new Error('Incomplete example');
+type Row = (typeof benefitBySalary)[number];
+const stretch = (b: Row, n: 0 | 1 | 2) => b.children[n] ?? { c1: 0, c2: 0 };
+// One row per figure, one column per salary, so the table fits a phone.
+const rows: readonly (readonly [string, (b: Row) => number])[] = [
+  ['Benefit base (base reguladora)', (b) => b.base],
+  ['First 180 days, no children', (b) => stretch(b, 0).c1],
+  ['First 180 days, with one', (b) => stretch(b, 1).c1],
+  ['First 180 days, with two or more', (b) => stretch(b, 2).c1],
+  ['From day 181, no children', (b) => stretch(b, 0).c2],
+];
+---
+
+<section class="sheet sheet--text">
+  <h3 id="p-cuanto">70&nbsp;% and then 60&nbsp;%</h3>
+  <p>
+    Unemployment benefit (paro), the contributory unemployment benefit (prestación contributiva por
+    desempleo), is calculated on your benefit base (base reguladora): the average of the
+    unemployment contributions paid in the last 180 days, without overtime (art. 270.1 LGSS). You
+    receive 70&nbsp;% of that base for the first 180 days and 60&nbsp;% from day 181 (art. 270.2
+    LGSS).
+  </p>
+  <p>
+    Each month has a minimum and a maximum depending on your dependent children (art. 270.3 LGSS).
+    In 2026, with the IPREM (the public income reference index) at
+    {wholeEuros(BENEFIT_2026.monthlyIprem)}, they are these:
+  </p>
+  <ul>
+    <li>
+      With no dependent children, between {wholeEuros(minCap[0])} and {wholeEuros(maxCap[0])} a
+      month.
+    </li>
+    <li>
+      With one, between {wholeEuros(minCap[1])} and {wholeEuros(maxCap[1])}.
+    </li>
+    <li>
+      With two or more, between {wholeEuros(minCap[1])} and {wholeEuros(maxCap[2])}.
+    </li>
+  </ul>
+  <p class="folio">
+    Art. <span>270</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-tabla">
+    How much unemployment benefit you receive on a payslip of 1.300, 1.500 or 1.800&nbsp;€
+  </h3>
+  <FigureTable id="p-tabla-titulo">
+    <Fragment slot="caption">
+      Gross unemployment benefit a month with pay in 14 equal payments and full-time hours, in 2026,
+      rounded to the euro as in the calculator.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Gross pay a month</th>
+        {benefitBySalary.map(({ salary }) => (
+          <th scope="col">{wholeEuros(salary)}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(([label, value]) => (
+        <tr>
+          <th scope="row">{label}</th>
+          {benefitBySalary.map((b) => (
+            <td>{wholeEuros(value(b))}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    The base comes from the annual pay, including the extra payments, divided by 12: with
+    1.500&nbsp;€ in 14 payments, 21.000&nbsp;€ / 12 = {euros(mid.base)}, and 70&nbsp;% of it is
+    exactly the maximum with no dependent children. With 1.800&nbsp;€ the base is {euros(high.base)}
+    and 70&nbsp;% of it goes above the maximums with no children and with one, so in those cases you
+    receive the maximum.
+  </p>
+  <p>
+    These are gross figures. From them, 4,85&nbsp;% of the base is deducted for the Seguridad
+    Social, plus whatever IRPF (income tax) applies. With part-time hours the figures are lower, and
+    the calculator does not give them.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-requisitos">Who can receive it</h3>
+  <p>
+    The contract has to end in a legal situation of unemployment: for example, a dismissal or the
+    end of a fixed-term contract that you did not end yourself (art. 267 LGSS). You also need at
+    least 360 days of contributions in the last 6 years, to register as a jobseeker and to sign the
+    activity agreement (acuerdo de actividad), among other requirements (art. 266 LGSS).
+  </p>
+  <ul>
+    <li>
+      How long it lasts depending on your contributions:{' '}
+      <CaseLink lang={lang} id="benefit_duration" />.
+    </li>
+    <li>
+      If you are the one leaving: <CaseLink lang={lang} id="benefit_resignation" />
+    </li>
+    <li>
+      If you are dismissed for misconduct: <CaseLink lang={lang} id="benefit_disciplinary" />.
+    </li>
+  </ul>
+  <p>
+    Without registering as a jobseeker there is no unemployment benefit: you register with your
+    region’s employment service and apply to SEPE within the 15 days after the contract ends, or
+    after the end of the untaken holiday paid in your final settlement (arts. 266 and 268 LGSS).
+    SEPE states that these are business days.
+  </p>
+  <p class="folio">
+    Arts. <span>266 · 267 · 268</span> LGSS
+  </p>
+</section>
+
+{/* The literal switch, as in the ERTE page's route: a build without it renders nothing here. */}
+{import.meta.env.PUBLIC_ERTE === '1' && (
+  <section class="sheet sheet--text">
+    <h3 id="p-erte">If you are in an ERTE</h3>
+    <p>
+      An ERTE (temporary lay-off scheme) can also give entitlement to unemployment benefit while it
+      lasts. How much you receive and whether it uses up your future unemployment benefit depend on
+      the type of ERTE:{' '}
+      <a href={link(lang, 'paro/erte/')}>calculate your unemployment benefit during an ERTE</a>.
+    </p>
+    <p class="folio">
+      Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+    </p>
+  </section>
+)}

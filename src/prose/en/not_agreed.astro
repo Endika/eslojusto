@@ -1,0 +1,76 @@
+---
+// source: c72414824687
+import { OFFERED_HOLIDAYS, itemRange, notAgreed } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+
+const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
+const range = itemRange(notAgreed, 'holiday_pay');
+if (!holidays || !range || holidays.difference === null) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="nc-que-es">What it means</h3>
+  <p>
+    When the contract ends, the employer gives you a proposed settlement statement (documento de
+    liquidación) with the amounts due to you (art. 49.2 ET). Some people, when they do not agree
+    with an amount, sign it adding «recibí no conforme» (received, not agreed) or «no conforme» (not
+    agreed).
+  </p>
+  <p>
+    That note does not change what the employer pays you: it puts in writing that you do not agree
+    with some figure. We give this only as information. What to do in your case can be assessed by
+    an employment law firm, a graduado social (labour relations adviser) office or a trade union.
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-representante">With someone from the workforce present</h3>
+  <p>
+    You can ask for a workers’ legal representative to be present when you go to sign the final
+    settlement (finiquito). The document records whether you sign it in their presence or have not
+    used that option (art. 49.2 ET).
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-ejemplo">Example: comparing before signing</h3>
+  <p>
+    A person earning 1.500&nbsp;€ gross a month with two extra payments of 1.500&nbsp;€ resigns on
+    15 October 2026, having worked since 1 March 2023. They have taken 10 of their 22 working days
+    of holiday and have given the 15 days’ notice set by their collective agreement. The proposal
+    pays them {euros(OFFERED_HOLIDAYS)} for holiday.
+  </p>
+  <p class="example">
+    <span class="example__label">Holiday</span> The legal minimum comes to {euroRange(range)},
+    depending on whether it is counted by days or by months. At least {euros(holidays.difference)}{' '}
+    is missing compared with {euros(OFFERED_HOLIDAYS)}.
+  </p>
+  <p>
+    The calculator does the same with each item: enter what the proposal says on the “Your final
+    settlement” sheet and you will see what matches the legal minimum and what does not.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-plazos">The time limits keep running</h3>
+  <p>
+    For outstanding pay, holiday, extra payments or severance pay at the end of a fixed-term
+    contract, the time limit is one year (art. 59.1 ET).
+  </p>
+  <p>
+    In a dismissal, the time limit to challenge it is 20 business days (días hábiles) (art. 59.3
+    ET). That time limit is interrupted when you file the request for conciliation with the relevant
+    public mediation, arbitration and conciliation service. It is short, and an employment law firm,
+    a graduado social (labour relations adviser) office or a trade union can tell you which one
+    applies to your case.
+  </p>
+  <p class="folio">
+    Art. <span>59</span> ET
+  </p>
+</section>
