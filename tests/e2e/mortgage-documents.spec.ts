@@ -2,6 +2,7 @@ import { test, expect, type Locator, type Page, type Request } from '@playwright
 import { syntheticPhoto } from '../support/synthetic-photo';
 import { fitsScreen, forwardButton } from '../support/sheets';
 import { expectShownAndFocused } from '../support/reads';
+import { syntheticPdf } from '../support/synthetic-pdf';
 
 // Runs only against a TEST_DOCUMENTS=1 build, which has /hipoteca/ too: every request to the fake
 // API and to Turnstile is answered here. The deed, the invoices and every figure are synthetic.
@@ -237,7 +238,7 @@ async function fakeServices(page: Page, body: object): Promise<Request[]> {
 
 const openUpload = async (page: Page) => {
   await page.goto('hipoteca/');
-  await page.getByRole('button', { name: /^Sube las páginas útiles de tu escritura/ }).click();
+  await page.getByRole('button', { name: /^Sube tu escritura y, si las tienes/ }).click();
   await expect(page.getByRole('heading', { name: 'Sube tus documentos' })).toBeFocused();
 };
 
@@ -281,7 +282,7 @@ test('the upload says which pages of a long deed to send and how to tell them', 
   await expect(page.locator('#mortgage')).toBeHidden();
   await openUpload(page);
   const guide = page.getByRole('figure', {
-    name: 'Tu escritura puede tener 25-60 páginas. Sube la primera, las de cláusulas financieras (intereses, comisiones, gastos, demora, vencimiento) y tus facturas.',
+    name: 'Tu escritura puede tener 25-60 páginas. Si la tienes en PDF, súbela entera: se buscan sus páginas útiles. Si le haces fotos, haz la primera, las de cláusulas financieras (intereses, comisiones, gastos, demora, vencimiento) y tus facturas.',
   });
   await expect(guide).toBeVisible();
   await expect(guide.locator('li')).toHaveText([
@@ -550,4 +551,48 @@ test('a read with nothing for the review keeps the files to change them', async 
   ).toBeVisible({ timeout: 30_000 });
   await expect(page.locator('[data-doc-files] li')).toHaveCount(1);
   await expect(page.locator('#mortgage')).toBeHidden();
+});
+
+test('a whole deed in PDF, longer than a read takes, is read from the pages located in it', async ({
+  page,
+}) => {
+  // No fixed clock here: pdf.js does not draw pages under one.
+  const sent: { step?: string; files: unknown[]; maxPages?: number; handoff?: string }[] = [];
+  await page.route('https://challenges.cloudflare.com/**', (route) =>
+    route.fulfill({
+      contentType: 'text/javascript',
+      body: `window.turnstile = { render(el, o) { setTimeout(() => o.callback(o.action + '-token')); return 'w'; }, remove() {} };`,
+    }),
+  );
+  await page.route(API.extract, (route) => {
+    const body = route.request().postDataJSON() as (typeof sent)[number];
+    sent.push(body);
+    return route.fulfill({
+      json:
+        body.step === 'locate'
+          ? { code: 'ok', pages: [2, 5, 31], handoff: 'v1.handoff.e2e' }
+          : reading([DEED, DEED, DEED], DEED_FIELDS, { clauses: CLAUSES }),
+    });
+  });
+  await openUpload(page);
+  await page.getByLabel('Elegir fotos o PDF').setInputFiles({
+    name: 'escritura.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from(syntheticPdf(40)),
+  });
+  await expect(
+    page.getByText(
+      'Añadido: escritura.pdf. Tiene 40 páginas, más de las que caben: al leer se buscarán sus páginas útiles. Llevas 1 de 25.',
+    ),
+  ).toBeVisible();
+  await expect(page.locator('[data-doc-files] li')).toHaveCount(1);
+  await page.getByLabel(/Doy mi consentimiento explícito/).check();
+  await page.getByRole('button', { name: 'Leer los documentos' }).click();
+  await expect(page.locator('[data-start-panel="done"]')).toBeVisible({ timeout: 60_000 });
+  expect(sent.map((b) => b.step ?? 'read')).toEqual(['locate', 'read']);
+  expect(sent[0]?.files).toHaveLength(40);
+  expect(sent[0]?.maxPages).toBe(25);
+  expect(sent[1]?.handoff).toBe('v1.handoff.e2e');
+  expect(sent[1]).not.toHaveProperty('captchaToken');
+  expect(sent[1]?.files).toHaveLength(3);
 });

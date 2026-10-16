@@ -62,6 +62,7 @@ export interface Metrics {
   review?: ReviewKind;
   verify?: boolean;
   error?: ErrorName;
+  step?: 'locate';
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>

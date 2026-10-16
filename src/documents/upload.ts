@@ -3,6 +3,7 @@ import { formatInteger } from '../calculator/number';
 import type { Translate } from '../i18n/client';
 import {
   LIMITS,
+  LOCATE_LIMITS,
   type Api,
   isCoherenceCheck,
   type FailedCheck,
@@ -134,7 +135,10 @@ export function setUpUpload<F extends string, L extends string>(
     readonly name: string;
     readonly thumbnail: string | null;
     readonly pdf?: { readonly opened: OpenedPdf; readonly page: number };
+    // A whole PDF longer than the places left: its useful pages are located before the read.
+    readonly long?: { readonly opened: OpenedPdf };
   }
+  const openedOf = (p: Picked): OpenedPdf | undefined => p.pdf?.opened ?? p.long?.opened;
   let picked: Picked[] = [];
   const encodedPages = new Map<Picked, EncodedFile>();
   let photos = 0;
@@ -228,7 +232,7 @@ export function setUpUpload<F extends string, L extends string>(
       // A photo the browser can't show (HEIC in most) keeps an empty square.
       img.addEventListener('error', () => img.replaceWith(placeholder()), { once: true });
       li.append(img);
-    } else li.append(placeholder(p.pdf ? 'PDF' : ''));
+    } else li.append(placeholder(openedOf(p) ? 'PDF' : ''));
     const text = document.createElement('span');
     const name = document.createElement('span');
     name.className = 'start__file-name';
@@ -237,7 +241,9 @@ export function setUpUpload<F extends string, L extends string>(
     size.className = 'start__file-size';
     size.textContent = p.pdf
       ? tr('client.documents.pdf_page_detail', { n: p.pdf.page, total: p.pdf.opened.pages })
-      : sizeText(p.file.size);
+      : p.long
+        ? tr('client.documents.pdf_long_detail', { total: p.long.opened.pages })
+        : sizeText(p.file.size);
     text.append(name, size);
     const remove = document.createElement('button');
     remove.type = 'button';
@@ -264,6 +270,22 @@ export function setUpUpload<F extends string, L extends string>(
 
   const count = () => ({ n: picked.length });
 
+  const pdfPage = (file: File, opened: OpenedPdf, page: number): Picked => ({
+    file,
+    name: tr('client.documents.pdf_page', { nombre: file.name, n: page }),
+    thumbnail: null,
+    pdf: { opened, page },
+  });
+
+  // Whether a PDF that does not fit can still go whole, its useful pages located when it is read:
+  // one such PDF at a time, of at most LOCATE_LIMITS.maxPages, with a place left for it.
+  const canLocate = (pages: number, free: number) =>
+    api.locate !== undefined &&
+    free > 0 &&
+    pages > free &&
+    pages <= LOCATE_LIMITS.maxPages &&
+    !picked.some((p) => p.long);
+
   // Opens each PDF and adds its pages while places are left, saying which pages fit.
   async function addPdfs(
     files: readonly File[],
@@ -288,15 +310,14 @@ export function setUpUpload<F extends string, L extends string>(
         problem ??= opened;
         continue;
       }
+      if (canLocate(opened.pages, free)) {
+        picked.push({ file, name: file.name, thumbnail: null, long: { opened } });
+        said.push(tr('client.documents.pdf_long', { nombre: file.name, total: opened.pages }));
+        continue;
+      }
       const fit = Math.min(opened.pages, free);
       if (fit === 0) opened.close();
-      for (let page = 1; page <= fit; page += 1)
-        picked.push({
-          file,
-          name: tr('client.documents.pdf_page', { nombre: file.name, n: page }),
-          thumbnail: null,
-          pdf: { opened, page },
-        });
+      for (let page = 1; page <= fit; page += 1) picked.push(pdfPage(file, opened, page));
       said.push(
         fit < opened.pages
           ? tr('client.documents.pdf_pages_fit', { nombre: file.name, k: fit, total: opened.pages })
@@ -356,7 +377,7 @@ export function setUpUpload<F extends string, L extends string>(
   // Closes the PDFs no entry draws from any more.
   function closeUnused(candidates: Iterable<OpenedPdf>) {
     for (const opened of new Set(candidates))
-      if (!picked.some((p) => p.pdf?.opened === opened)) opened.close();
+      if (!picked.some((p) => openedOf(p) === opened)) opened.close();
   }
 
   function removeFile(index: number) {
@@ -364,7 +385,8 @@ export function setUpUpload<F extends string, L extends string>(
     if (!gone) return;
     if (gone.thumbnail) URL.revokeObjectURL(gone.thumbnail);
     encodedPages.delete(gone);
-    if (gone.pdf) closeUnused([gone.pdf.opened]);
+    const goneOpened = openedOf(gone);
+    if (goneOpened) closeUnused([goneOpened]);
     renderFiles();
     fileStatus.textContent = tr('client.documents.removed', { nombre: gone.name, ...count() });
     fieldError('files', null);
@@ -377,7 +399,7 @@ export function setUpUpload<F extends string, L extends string>(
 
   function clearFiles() {
     for (const p of picked) if (p.thumbnail) URL.revokeObjectURL(p.thumbnail);
-    const opened = picked.flatMap((p) => (p.pdf ? [p.pdf.opened] : []));
+    const opened = picked.flatMap((p) => openedOf(p) ?? []);
     picked = [];
     encodedPages.clear();
     closeUnused(opened);
@@ -558,8 +580,95 @@ export function setUpUpload<F extends string, L extends string>(
     );
   }
 
-  async function read(pages: readonly Picked[], qualityChecked = false) {
+  // The allowance a request carries: a valid pass, or the free quota.
+  function allowance() {
+    const stored = passes.pass();
+    return stored !== null && passState(stored, deps.now()) === 'valid'
+      ? { stored, fields: { pass: stored.token } }
+      : { stored: null, fields: { quota: passes.quota() } };
+  }
+
+  // Every page of the long PDF, at low resolution, within the request's budget; null when one
+  // can't be drawn in time or the whole doesn't fit.
+  async function lowResolution(opened: OpenedPdf, started: number) {
+    const encoded: EncodedFile[] = [];
+    let said = -Infinity;
+    for (let page = 1; page <= opened.pages; page += 1) {
+      if (deps.now() - said >= PROGRESS_MS) {
+        said = deps.now();
+        status.textContent = tr('client.documents.status.locating_n', {
+          k: page,
+          total: opened.pages,
+        });
+      }
+      const share = photoShare(requestBytes(encoded), opened.pages - page + 1);
+      let image: EncodedFile | 'pdf_too_slow';
+      try {
+        image = await opened.render(page, share, LOCATE_LIMITS.imageLongSide);
+      } catch {
+        return null;
+      }
+      if (started !== generation || image === 'pdf_too_slow') return null;
+      encoded.push(image);
+    }
+    return requestBytes(encoded) > LIMITS.requestBudgetBytes ? null : encoded;
+  }
+
+  // Swaps the long PDF for the pages the locate step chose, or, if it could not run, for its first
+  // pages as before; says which. `stopped` when the person left for the form meanwhile.
+  async function locateLong(
+    pages: readonly Picked[],
+    started: number,
+  ): Promise<{ readonly pages: readonly Picked[]; readonly handoff: string | null } | 'stopped'> {
+    const long = pages.find((p) => p.long);
+    if (!long?.long || !api.locate) return { pages, handoff: null };
+    const { opened } = long.long;
+    const maxPages = LIMITS.maxImages - (pages.length - 1);
+    setBusy(true, tr('client.documents.status.locating', { nombre: long.file.name }), true);
+    const files = await lowResolution(opened, started);
+    if (started !== generation) return 'stopped';
+    let chosen: readonly number[] | null = null;
+    let handoff: string | null = null;
+    if (files !== null) {
+      let captchaToken: string | null;
+      try {
+        captchaToken = await captcha.token();
+      } catch {
+        captchaToken = null;
+      }
+      if (started !== generation) return 'stopped';
+      if (captchaToken !== null) {
+        setBusy(true, tr('client.documents.status.locating', { nombre: long.file.name }));
+        const result = await api.locate({
+          files: files.map(({ mediaType, data }) => ({ mediaType, data })),
+          captchaToken,
+          maxPages,
+          ...allowance().fields,
+        });
+        if (started !== generation) return 'stopped';
+        if (result.ok) ({ pages: chosen, handoff } = result);
+      }
+    }
+    const numbers = chosen ?? Array.from({ length: maxPages }, (_, i) => i + 1);
+    const entries = numbers.map((n) => pdfPage(long.file, opened, n));
+    const swap = (list: readonly Picked[]) => list.flatMap((p) => (p === long ? entries : [p]));
+    picked = swap(picked);
+    renderFiles();
+    fileStatus.textContent =
+      chosen === null
+        ? tr('client.documents.locate_failed', { nombre: long.file.name, k: maxPages })
+        : tr('client.documents.located', {
+            nombre: long.file.name,
+            paginas: numbers.join(', '),
+          });
+    return { pages: swap(pages), handoff };
+  }
+
+  async function read(all: readonly Picked[], qualityChecked = false) {
     const started = generation;
+    const located = await locateLong(all, started);
+    if (located === 'stopped') return;
+    const { pages, handoff } = located;
     setBusy(true, tr('client.documents.status.preparing'), true);
     const fail = (code: ErrorCode) => {
       events.extractionFailed(code);
@@ -592,24 +701,24 @@ export function setUpUpload<F extends string, L extends string>(
     }
 
     setBusy(true, tr('client.documents.status.captcha'), true);
-    let captchaToken: string;
+    let proof: { readonly captchaToken: string } | { readonly handoff: string };
     try {
-      captchaToken = await captcha.token();
+      proof = handoff === null ? { captchaToken: await captcha.token() } : { handoff };
     } catch {
       if (started !== generation) return;
       return fail('captcha_unavailable');
     }
     if (started !== generation) return;
 
-    const stored = passes.pass();
-    const usePass = stored !== null && passState(stored, deps.now()) === 'valid';
+    const { stored } = allowance();
+    const usePass = stored !== null;
     const pdfsPicked = new Set(pages.filter((p) => p.pdf).map((p) => p.file)).size;
     const files = filesBucket(pages.length);
     events.uploadStarted(files, pdfsPicked);
     setBusy(true, tr('client.documents.status.reading'));
     const result = await api.extract({
       files: encoded.map(({ mediaType, data }) => ({ mediaType, data })),
-      captchaToken,
+      ...proof,
       ...(usePass ? { pass: stored.token } : { quota: passes.quota() }),
     });
     const nameOf = (page: number) => pages[page - 1]?.name ?? '';

@@ -1,12 +1,6 @@
 import { Aws, Duration, type Stack } from 'aws-cdk-lib';
 import * as cw from 'aws-cdk-lib/aws-cloudwatch';
-import {
-  ESCALATION_MODEL,
-  FUNCTION_NAMES,
-  MODEL_PRICES_USD_PER_MTOK,
-  PRIMARY_MODEL,
-  REGION,
-} from '../src/config';
+import { FUNCTION_NAMES, INVOKED_MODELS, MODEL_PRICES_USD_PER_MTOK, REGION } from '../src/config';
 
 export const DASHBOARD_NAME = 'eslojusto-api';
 
@@ -43,7 +37,7 @@ const bedrockSearch = (metric: string, statistic: string) =>
 
 // Tokens × list price of the configured models.
 function aiCost(label: string): cw.MathExpression {
-  const models = [...new Set([PRIMARY_MODEL, ESCALATION_MODEL])];
+  const models = INVOKED_MODELS;
   const usingMetrics: Record<string, cw.IMetric> = {};
   const terms = models.flatMap((model, i) => {
     const price = MODEL_PRICES_USD_PER_MTOK[model];
@@ -138,10 +132,10 @@ const REVIEW_LABELS: Readonly<Record<string, string>> = {
 };
 const byReview = 'fields coalesce(review, "final_pay") as revision';
 
-// The log sums the tokens of a read and its escalation without naming the model; with two prices,
-// the dearer one bounds the cost from above.
+// The log sums the tokens of a read and its escalation, or of a locate step, without naming the
+// model; with several prices, the dearest bounds the cost from above.
 function logTokenPrice(): { readonly input: number; readonly output: number } {
-  const prices = [...new Set([PRIMARY_MODEL, ESCALATION_MODEL])].map((model) => {
+  const prices = INVOKED_MODELS.map((model) => {
     const price = MODEL_PRICES_USD_PER_MTOK[model];
     if (!price) throw new Error(`No price for ${model} in MODEL_PRICES_USD_PER_MTOK`);
     return price;

@@ -2,7 +2,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createHmacSigner } from '../src/adapters/hmac-signer';
 import { passClaims } from '../src/domain/allowance';
 import { consoleLogger } from '../src/adapters/runtime';
-import type { ExtractDeps } from '../src/domain/extract';
 import type { HttpEvent } from '../src/http/common';
 import { handleExtract } from '../src/http/extract';
 import { tokenHash } from '../src/adapters/token-hash';
@@ -14,8 +13,10 @@ import {
   FakeCaptcha,
   FakeCheckout,
   FakeClock,
+  FakeLocator,
   FakePayments,
   FakeReader,
+  LOCATE,
   MemoryLogger,
   paidSession,
   PRIMARY,
@@ -41,13 +42,14 @@ const extractBody = (overrides: Record<string, unknown> = {}) => ({
 function extractDeps(toolInput: unknown = coherentSettlement()) {
   const logger = new MemoryLogger();
   const reader = new FakeReader({ [PRIMARY]: read(toolInput), [ESCALATION]: read(toolInput) });
-  const deps: ExtractDeps & { logger: MemoryLogger } = {
+  const deps: Parameters<typeof handleExtract>[1] & { logger: MemoryLogger } = {
     reader,
     captcha: new FakeCaptcha(),
     signer,
     payments: new FakePayments({}),
     clock: new FakeClock(),
     models: { primary: PRIMARY, escalation: ESCALATION },
+    locate: { locator: new FakeLocator(), model: LOCATE },
     logger,
   };
   return { deps, logger, reader };

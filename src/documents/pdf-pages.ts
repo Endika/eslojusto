@@ -94,10 +94,10 @@ export function createPdfPages<C>(
       }
       return {
         pages: opened.numPages,
-        async render(number, maxBytes) {
+        async render(number, maxBytes, longSide) {
           const page = await opened.getPage(number);
           const base = page.getViewport({ scale: 1 });
-          const { width, height, scale } = fitExactly(base.width, base.height);
+          const { width, height, scale } = fitExactly(base.width, base.height, longSide);
           const { canvas, context } = raster.create(width, height);
           const task = page.render({
             canvas,

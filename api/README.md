@@ -929,6 +929,18 @@ two reads take at most 96,000 input tokens and one `max_tokens` of output betwee
 the read is logged with `underestimated`. A free read needs a fresh captcha, at most 5 reads
 run at once, and the budget action caps the month.
 
+### Locating the pages of a long PDF
+
+A mortgage deed runs to 25–80 pages and a read takes 25. When a PDF does not fit, the browser
+first sends every page at 768 px a side with `step: 'locate'`; Haiku 4.5 (`LOCATE_MODEL`) lists
+the useful ones and the API answers them, cut to the places the read has left, with a `handoff`
+token that stands in for the read's captcha for ten minutes. The step spends no read, but answers
+`daily_limit_reached` or `pass_exhausted` as the read would. Only reviews in `LOCATE_REVIEWS`
+take it (the mortgage review). A 57-page deed at 543 × 768 is about 31,700 tokens in and a few
+hundred out: **about 0.04 USD**. The API takes at most 80 images of 1024 px and refuses above
+60,000 estimated tokens (`MAX_LOCATE_INPUT_TOKENS`), with `max_tokens` at 2,000: **at most 0.077
+USD** (60,000 × 1.10 + 2,000 × 5.50 USD/M), on top of the read's own bound.
+
 ## Evaluation
 
 `eval/` holds seven synthetic banks. The rental one has 35 lease packs: each case

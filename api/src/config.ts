@@ -23,6 +23,10 @@ export const SONNET_5_5 = 'eu.anthropic.claude-sonnet-5-5';
 export const PRIMARY_MODEL = SONNET_4_6;
 // SONNET_5_5 once the account can invoke it.
 export const ESCALATION_MODEL = SONNET_4_6;
+// Picks the pages of a long upload for the read: it only labels low-resolution pages.
+export const LOCATE_MODEL = HAIKU_4_5;
+// Every model the extract function calls: IAM, the dashboard and its prices follow this list.
+export const INVOKED_MODELS = [...new Set([PRIMARY_MODEL, ESCALATION_MODEL, LOCATE_MODEL])];
 
 export interface ModelSettings {
   // Sonnet 5.5 rejects tool_choice "tool" with a 400; it gets "auto" and the prompt names the tool.

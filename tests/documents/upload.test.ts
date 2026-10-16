@@ -6,6 +6,8 @@ import type {
   ExtractedFieldName,
   ExtractRequest,
   ExtractResult,
+  LocateRequest,
+  LocateResult,
   PassResult,
 } from '../../src/documents/contract';
 import { finalPayReading } from '../../src/documents/final-pay-reading';
@@ -38,8 +40,12 @@ function setUp(
     slowPages?: boolean;
     // Another section's way of taking what was read; the final pay's otherwise.
     reading?: DocumentReading<ExtractedFieldName, 'contracts'>;
+    // Gives the API a locate step, as the mortgage review's has, answering this.
+    locate?: LocateResult;
   } = {},
 ) {
+  const locateRequests: LocateRequest[] = [];
+  const sides: (number | undefined)[] = [];
   document.body.innerHTML = START;
   const store = memoryStore();
   const passes = createPassStore(store, () => NOW);
@@ -65,6 +71,12 @@ function setUp(
       return options.passAgain ?? { ok: false, code: 'service_unavailable' };
     },
     verify: async () => ({ ok: false, code: 'service_unavailable' }),
+    ...(options.locate && {
+      locate: async (r: LocateRequest) => {
+        locateRequests.push(r);
+        return options.locate as LocateResult;
+      },
+    }),
   };
   const reading = finalPayReading(form, tr);
   const upload = setUpUpload(document.querySelector('[data-documents-start]') as HTMLElement, {
@@ -88,9 +100,10 @@ function setUp(
         await options.pdfGate;
         return {
           pages,
-          render: async (n, maxBytes) => {
+          render: async (n, maxBytes, longSide) => {
             if (options.slowPages) return 'pdf_too_slow';
             shares.push(maxBytes);
+            sides.push(longSide);
             return { mediaType: 'image/jpeg', data: btoa(`${f.name}#${n}`), bytes: 1 };
           },
           close: () => void closed.push(f.name),
@@ -125,6 +138,8 @@ function setUp(
     opened,
     form,
     passCalls,
+    locateRequests,
+    sides,
   };
 }
 
@@ -704,6 +719,100 @@ describe('the start sheet', () => {
     expect(text('[data-doc-files-status]')).toBe(
       'De vida-laboral.pdf caben las páginas 1 a 2 de 20: como mucho 25 fotos o páginas en total. Llevas 25 de 25.',
     );
+  });
+
+  describe('a PDF longer than the places left, in a review that locates its pages', () => {
+    const deed = (pages: number, name = 'escritura.pdf') =>
+      new File([String(pages)], name, { type: 'application/pdf' });
+    const located: LocateResult = { ok: true, pages: [3, 4, 40], handoff: 'v1.handoff' };
+
+    it('goes in whole, as one entry, and says its pages will be located', async () => {
+      setUp(settlement, { locate: located });
+      choose([deed(57)]);
+      await flush();
+      expect(listed()).toHaveLength(1);
+      expect(text('.start__file-size')).toBe('57 páginas: al leer se buscan las útiles');
+      expect(text('[data-doc-files-status]')).toBe(
+        'Añadido: escritura.pdf. Tiene 57 páginas, más de las que caben: al leer se buscarán sus páginas útiles. Llevas 1 de 25.',
+      );
+    });
+
+    it('sends every page at 768 px to locate, then reads the chosen ones with the handoff', async () => {
+      const { requests, locateRequests, sides, closed } = setUp(settlement, { locate: located });
+      choose([photo]);
+      pick([deed(57)]);
+      await flush();
+      await submit();
+      await flush();
+      expect(locateRequests).toHaveLength(1);
+      expect(locateRequests[0]?.files).toHaveLength(57);
+      expect(locateRequests[0]).toMatchObject({ captchaToken: 'captcha', maxPages: 24 });
+      expect(sides.slice(0, 57).every((s) => s === 768)).toBe(true);
+      expect(requests).toHaveLength(1);
+      const request = requests[0] as ExtractRequest & { handoff?: string; captchaToken?: string };
+      expect(request.handoff).toBe('v1.handoff');
+      expect(request.captchaToken).toBeUndefined();
+      expect(request.files.map((f) => f.data)).toEqual([
+        btoa('finiquito.jpg'),
+        ...[3, 4, 40].map((n) => btoa(`escritura.pdf#${n}`)),
+      ]);
+      expect(sides.slice(57)).toEqual([undefined, undefined, undefined]);
+      expect(closed).toContain('escritura.pdf');
+    });
+
+    it('says which pages it took, numbered as in the PDF, while the read is on its way', async () => {
+      pending.next = new Promise(() => {});
+      setUp(settlement, { locate: located });
+      choose([deed(57)]);
+      await flush();
+      await submit();
+      await flush();
+      expect(text('[data-doc-files-status]')).toBe(
+        'De escritura.pdf se leen las páginas 3, 4, 40.',
+      );
+      expect([...document.querySelectorAll('.start__file-name')].map((n) => n.textContent)).toEqual(
+        ['escritura.pdf, página 3', 'escritura.pdf, página 4', 'escritura.pdf, página 40'],
+      );
+    });
+
+    it('falls back to the first pages that fit, with a fresh captcha, when locating fails', async () => {
+      pending.next = new Promise(() => {});
+      const { requests } = setUp(settlement, {
+        locate: { ok: false, code: 'model_unavailable' },
+      });
+      choose([deed(30)]);
+      await flush();
+      await submit();
+      await flush();
+      expect(text('[data-doc-files-status]')).toBe(
+        'No se han podido buscar las páginas útiles de escritura.pdf: se leen sus páginas 1 a 25.',
+      );
+      const request = requests[0] as ExtractRequest & { captchaToken?: string };
+      expect(request.captchaToken).toBe('captcha');
+      expect(request.files).toHaveLength(25);
+    });
+
+    it('cuts a PDF of more than 80 pages, or a second long one, as before', async () => {
+      setUp(settlement, { locate: located });
+      choose([deed(81, 'enorme.pdf')]);
+      await flush();
+      expect(listed()).toHaveLength(25);
+
+      setUp(settlement, { locate: located });
+      choose([deed(40, 'una.pdf')]);
+      await flush();
+      pick([deed(40, 'otra.pdf')]);
+      await flush();
+      expect(listed()).toHaveLength(25);
+      expect(text('[data-doc-files-status]')).toContain('De otra.pdf caben las páginas 1 a 24');
+    });
+
+    it('cuts it as before in a review without a locate step', async () => {
+      setUp(settlement);
+      choose([deed(57)]);
+      await flush();
+      expect(listed()).toHaveLength(25);
+    });
   });
 
   it('words a PDF it cannot open', async () => {

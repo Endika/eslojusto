@@ -1,5 +1,9 @@
-import { ESCALATION_MODEL, PARAMETER_NAMES, PRIMARY_MODEL } from '../config';
-import { bedrockInvoke, createBedrockReader } from '../adapters/bedrock-reader';
+import { ESCALATION_MODEL, LOCATE_MODEL, PARAMETER_NAMES, PRIMARY_MODEL } from '../config';
+import {
+  bedrockInvoke,
+  createBedrockLocator,
+  createBedrockReader,
+} from '../adapters/bedrock-reader';
 import { createHmacSigner } from '../adapters/hmac-signer';
 import { consoleLogger, systemClock } from '../adapters/runtime';
 import { loadParameters } from '../adapters/ssm-parameters';
@@ -9,7 +13,9 @@ import { handleExtract } from '../http/extract';
 import { unavailable } from './unavailable';
 import type { HttpEvent, HttpResponse } from '../http/common';
 
-const reader = createBedrockReader(bedrockInvoke());
+const invoke = bedrockInvoke();
+const reader = createBedrockReader(invoke);
+const locator = createBedrockLocator(invoke);
 
 let deps: ReturnType<typeof load> | undefined;
 const load = async () => {
@@ -39,5 +45,6 @@ export async function handler(event: HttpEvent): Promise<HttpResponse> {
     clock: systemClock,
     logger: consoleLogger,
     models: { primary: PRIMARY_MODEL, escalation: ESCALATION_MODEL },
+    locate: { locator, model: LOCATE_MODEL },
   });
 }

@@ -2,14 +2,17 @@ import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { describe, expect, it } from 'vitest';
 import {
-  ESCALATION_MODEL,
   EU_PROFILE_DESTINATIONS,
   EXTRACT_TIMEOUT_SECONDS,
   FUNCTION_NAMES,
+  HAIKU_4_5,
+  INVOKED_MODELS,
+  LOCATE_MODEL,
   MODEL_PRICES_USD_PER_MTOK,
   PARAMETER_NAMES,
   PRIMARY_MODEL,
   REGION,
+  SONNET_4_6,
 } from '../src/config';
 import { buildApp, GLOBAL_STACK_REGION } from '../infra/stacks';
 import { NO_ESCALATION_AFTER_MS, READ_DEADLINE_MS } from '../src/domain/extract';
@@ -143,7 +146,7 @@ describe('dashboard', () => {
   });
 
   it('prices the configured models from the config', () => {
-    for (const model of [PRIMARY_MODEL, ESCALATION_MODEL]) {
+    for (const model of INVOKED_MODELS) {
       const price = MODEL_PRICES_USD_PER_MTOK[model];
       expect(price).toBeDefined();
       expect(body).toContain(model);
@@ -232,7 +235,7 @@ describe('dashboard', () => {
     expect(tokens).toContain('pct(inputTokens, 95)');
     expect(tokens).toContain('pct(outputTokens, 95)');
     const cost = byTitle('Coste IA por lectura y revisión (USD)');
-    const prices = [PRIMARY_MODEL, ESCALATION_MODEL].map((m) => MODEL_PRICES_USD_PER_MTOK[m]);
+    const prices = INVOKED_MODELS.map((m) => MODEL_PRICES_USD_PER_MTOK[m]);
     expect(cost).toContain(
       `sum(inputTokens) * ${Math.max(...prices.map((p) => p?.input ?? 0))} / 1000000 / count(*)`,
     );
@@ -305,14 +308,17 @@ describe('global stack', () => {
     );
     expect(bedrock.map((s) => s['Action'])).toEqual(['bedrock:InvokeModel', 'bedrock:InvokeModel']);
     const json = JSON.stringify(bedrock);
-    for (const model of [PRIMARY_MODEL, ESCALATION_MODEL]) {
+    for (const model of INVOKED_MODELS) {
       expect(json).toContain(`inference-profile/${model}`);
       for (const region of EU_PROFILE_DESTINATIONS)
         expect(json).toContain(`arn:aws:bedrock:${region}::foundation-model/${model.slice(3)}`);
     }
     expect(json).not.toMatch(/"\*"|global\.|us\.|apac\./);
-    // Sonnet reads alone, so the role reaches no other model.
-    expect(json).not.toContain('haiku');
+    // Sonnet reads and Haiku only locates pages, so the role reaches no other model.
+    expect(PRIMARY_MODEL).toBe(SONNET_4_6);
+    expect(LOCATE_MODEL).toBe(HAIKU_4_5);
+    expect(INVOKED_MODELS).toEqual([SONNET_4_6, HAIKU_4_5]);
+    expect(json).not.toMatch(/opus|sonnet-5/);
     expect(bedrock[1]?.['Condition']).toHaveProperty([
       'StringEquals',
       'bedrock:InferenceProfileArn',

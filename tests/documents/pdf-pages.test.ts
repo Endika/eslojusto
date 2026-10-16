@@ -88,6 +88,14 @@ describe('the PDF-to-pages adapter, drawing', () => {
     expect(budgets).toEqual([300_000]);
   });
 
+  it('draws a page smaller when the locate step asks for it', async () => {
+    const { raster, made } = recordingRaster();
+    const opened = await createPdfPages(fakePdfjs(), raster).open(pdfFile(syntheticPdf(1)));
+    if (typeof opened === 'string') throw new Error(opened);
+    await opened.render(1, 100_000, 768);
+    expect(made).toEqual([{ width: 543, height: 768 }]);
+  });
+
   it('tells a password-protected PDF from a broken one', async () => {
     const password = Object.assign(new Error('No password given'), { name: 'PasswordException' });
     const { raster } = recordingRaster();

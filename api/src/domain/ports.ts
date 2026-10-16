@@ -35,6 +35,18 @@ export interface DocumentReader {
   }): Promise<ModelRead>;
 }
 
+// Picks, from low-resolution images of a long upload, the pages worth a full read. Throws whenever
+// the model provider does not answer, like DocumentReader.
+export interface PageLocator {
+  locate(request: {
+    readonly model: string;
+    readonly review: ReviewKind;
+    readonly files: readonly DocumentFile[];
+    // Epoch milliseconds by which the call must be over, or abandoned.
+    readonly deadline: number;
+  }): Promise<ModelRead>;
+}
+
 export interface CaptchaVerifier {
   verify(token: string): Promise<boolean>;
 }
@@ -79,6 +91,8 @@ export interface LogEvent {
   readonly verify?: boolean;
   // The class of the last error a request recovered from or failed on.
   readonly error?: ErrorName;
+  // An `extract` request that only located the useful pages of a long upload.
+  readonly step?: 'locate';
 }
 
 export interface Logger {

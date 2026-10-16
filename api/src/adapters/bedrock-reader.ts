@@ -2,10 +2,12 @@ import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedroc
 import { MODEL_SETTINGS, REGION } from '../config';
 import type { DocumentFile } from '../domain/documents';
 import { TOOL_NAME, toolInputSchema } from '../domain/extraction-schema';
-import type { Correction, DocumentReader, ModelRead } from '../domain/ports';
+import { isLocateReview, LOCATE_MAX_TOKENS, type LocateReview } from '../domain/locate';
+import type { Correction, DocumentReader, ModelRead, PageLocator } from '../domain/ports';
 import type { ReviewKind } from '../domain/reviews';
 import { EXTRA_OUTPUT_TOKENS_BY_REVIEW } from '../domain/tokens';
 import { SYSTEM_PROMPTS } from './prompts';
+import { LOCATE_PROMPTS, LOCATE_TOOL_NAME, locateToolSchema } from './prompts/locate';
 
 export { CREDIT_SYSTEM_PROMPT } from './prompts/credit';
 export { ELECTRICITY_SYSTEM_PROMPT } from './prompts/electricity';
@@ -107,13 +109,47 @@ export function buildRequestBody(
   };
 }
 
+// The same fixed request shape for the cheap call that picks the pages of a long upload.
+export function buildLocateBody(
+  model: string,
+  files: readonly DocumentFile[],
+  review: LocateReview,
+): Record<string, unknown> {
+  const settings = MODEL_SETTINGS[model];
+  if (!settings) throw new Error(`No settings for model ${model}`);
+  const content: Record<string, unknown>[] = files.flatMap((file, i) => [
+    { type: 'text', text: `Page ${i + 1}:` },
+    imageBlock(file),
+  ]);
+  content.push({
+    type: 'text',
+    text: `That is all ${files.length} pages. Call ${LOCATE_TOOL_NAME} with the useful ones.`,
+  });
+  return {
+    anthropic_version: 'bedrock-2023-05-31',
+    max_tokens: LOCATE_MAX_TOKENS,
+    system: LOCATE_PROMPTS[review],
+    tools: [
+      {
+        name: LOCATE_TOOL_NAME,
+        description: 'Report the pages a careful read must see, the most important first.',
+        input_schema: locateToolSchema(review),
+      },
+    ],
+    tool_choice: settings.forcedToolChoice
+      ? { type: 'tool', name: LOCATE_TOOL_NAME }
+      : { type: 'auto' },
+    messages: [{ role: 'user', content }],
+  };
+}
+
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
 
 const count = (v: unknown): number =>
   Number.isInteger(v) && (v as number) >= 0 ? (v as number) : 0;
 
-export function parseResponseBody(body: unknown): ModelRead {
+export function parseResponseBody(body: unknown, toolName: string = TOOL_NAME): ModelRead {
   const response = isRecord(body) ? body : {};
   const usage = isRecord(response['usage']) ? response['usage'] : {};
   const content = Array.isArray(response['content']) ? response['content'] : [];
@@ -121,7 +157,7 @@ export function parseResponseBody(body: unknown): ModelRead {
   const complete = response['stop_reason'] === 'tool_use' || response['stop_reason'] === 'end_turn';
   const toolUse = content.find(
     (block: unknown) =>
-      isRecord(block) && block['type'] === 'tool_use' && block['name'] === TOOL_NAME,
+      isRecord(block) && block['type'] === 'tool_use' && block['name'] === toolName,
   ) as Record<string, unknown> | undefined;
   const id = complete && toolUse ? toolUse['id'] : undefined;
   return {
@@ -162,6 +198,18 @@ export function createBedrockReader(invoke: Invoke): DocumentReader {
       const signal = AbortSignal.timeout(Math.max(1, deadline - Date.now()));
       const raw = await invoke(model, body, signal);
       return { ...parseResponseBody(JSON.parse(raw)), maxTokens: request['max_tokens'] as number };
+    },
+  };
+}
+
+export function createBedrockLocator(invoke: Invoke): PageLocator {
+  return {
+    async locate({ model, review, files, deadline }) {
+      if (!isLocateReview(review)) throw new Error(`No locate prompt for ${review}`);
+      const body = JSON.stringify(buildLocateBody(model, files, review));
+      const signal = AbortSignal.timeout(Math.max(1, deadline - Date.now()));
+      const raw = await invoke(model, body, signal);
+      return parseResponseBody(JSON.parse(raw), LOCATE_TOOL_NAME);
     },
   };
 }

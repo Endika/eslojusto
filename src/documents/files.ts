@@ -129,7 +129,7 @@ export function encodingSteps(width: number, height: number): EncodingStep[] {
 
 // The size that brings the long side to exactly `max`: a PDF page is drawn, not resampled, so
 // it is rendered at the size a photo is sent at.
-export function fitExactly(width: number, height: number, max = LIMITS.maxImageLongSide) {
+export function fitExactly(width: number, height: number, max: number = LIMITS.maxImageLongSide) {
   const scale = max / Math.max(width, height);
   return {
     width: Math.max(1, Math.min(max, Math.round(width * scale))),
