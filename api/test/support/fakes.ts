@@ -78,10 +78,12 @@ export class MemoryLogger implements Logger {
 export class FakeCheckout implements CheckoutCreator {
   readonly nonces: string[] = [];
   readonly returns: ReviewKind[] = [];
+  readonly langs: string[] = [];
   constructor(private readonly fail = false) {}
-  async create(nonce: string, returnTo: ReviewKind) {
+  async create(nonce: string, returnTo: ReviewKind, lang: string) {
     this.nonces.push(nonce);
     this.returns.push(returnTo);
+    this.langs.push(lang);
     if (this.fail) throw new Error('Stripe is down');
     return {
       sessionId: `cs_test_${nonce.replace(/[^A-Za-z0-9]/g, '')}`,

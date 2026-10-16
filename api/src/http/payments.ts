@@ -8,7 +8,7 @@ import {
   type VerifyMemo,
 } from '../domain/payments';
 import type { CaptchaVerifier, CheckoutCreator, Clock, Logger } from '../domain/ports';
-import { isReturnTo, type CheckoutReview } from '../domain/reviews';
+import { isCheckoutLang, isReturnTo, type CheckoutReview } from '../domain/reviews';
 import { handle, type HttpEvent, type HttpResponse } from './common';
 
 const MAX_TOKEN_LENGTH = 2048;
@@ -23,17 +23,19 @@ export function handleCheckout(
   },
 ): Promise<HttpResponse> {
   return handle('checkout', event, deps, async (body) => {
-    const { nonce, captchaToken, returnTo } = body;
+    const { nonce, captchaToken, returnTo, lang } = body;
     if (
       !isNonce(nonce) ||
       typeof captchaToken !== 'string' ||
       captchaToken.length === 0 ||
       captchaToken.length > MAX_TOKEN_LENGTH ||
-      (returnTo !== undefined && !isReturnTo(returnTo))
+      (returnTo !== undefined && !isReturnTo(returnTo)) ||
+      // Spanish is the default, never named.
+      (lang !== undefined && (lang === 'es' || !isCheckoutLang(lang)))
     )
       return { code: 'invalid_request' };
     const review: CheckoutReview = returnTo ?? 'final_pay';
-    return startCheckout(nonce, captchaToken, deps, review);
+    return startCheckout(nonce, captchaToken, deps, review, lang ?? 'es');
   });
 }
 

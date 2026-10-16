@@ -1,7 +1,7 @@
 import type { DocumentFile } from './documents';
 import type { Readability } from './extraction-schema';
 import type { ResultCode } from './results';
-import type { CheckoutReview, ReviewKind } from './reviews';
+import type { CheckoutLang, CheckoutReview, ReviewKind } from './reviews';
 import type { ErrorName } from './error-name';
 
 export interface ModelRead {
@@ -101,10 +101,11 @@ export interface Logger {
 
 export interface CheckoutCreator {
   // Throws when the payment provider is unavailable. Stripe returns the person to the page of
-  // the review they paid from.
+  // the review they paid from, in the language they read it in.
   create(
     nonce: string,
     returnTo: CheckoutReview,
+    lang: CheckoutLang,
   ): Promise<{ readonly sessionId: string; readonly url: string }>;
 }
 

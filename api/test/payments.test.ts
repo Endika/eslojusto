@@ -171,6 +171,23 @@ describe('Stripe adapter', () => {
     expect(checkoutParams(NONCE, PRICE, 'final_pay')).toEqual([params, options]);
   });
 
+  it('returns a payment from a page in another language to that page, in its language', () => {
+    const [params, options] = checkoutParams(NONCE, PRICE, 'rental', 'eu');
+    expect(params.success_url).toBe(
+      'https://eslojusto.es/eu/alquiler/?session_id={CHECKOUT_SESSION_ID}',
+    );
+    expect(params.cancel_url).toBe('https://eslojusto.es/eu/alquiler/');
+    expect(params.locale).toBe('es');
+    expect(options).toEqual({ idempotencyKey: `checkout-rental-eu-${NONCE}` });
+    const [english, key] = checkoutParams(NONCE, PRICE, 'final_pay', 'en');
+    expect(english.success_url).toBe(
+      'https://eslojusto.es/en/finiquito/?session_id={CHECKOUT_SESSION_ID}',
+    );
+    expect(english.locale).toBe('en-GB');
+    expect(key).toEqual({ idempotencyKey: `checkout-en-${NONCE}` });
+    expect(checkoutParams(NONCE, PRICE, 'final_pay', 'es')).toEqual(checkoutParams(NONCE, PRICE));
+  });
+
   it('returns a rental payment to /alquiler/, under a key of its own', () => {
     const [params, options] = checkoutParams(NONCE, PRICE, 'rental');
     expect(params.success_url).toBe(

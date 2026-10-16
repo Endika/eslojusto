@@ -158,6 +158,8 @@ export function createApi<F extends string, L extends string>(
   endpoints: Readonly<Record<Operation, string>>,
   fetchFn: Fetch,
   shape: ExtractionShape<F, L>,
+  // The page's language: Stripe sends the person back to the page in it.
+  lang = 'es',
   timeoutMs = API_TIMEOUT_MS,
 ): Api<F, L> {
   const review = shape.review === 'final_pay' ? {} : { review: shape.review };
@@ -261,6 +263,7 @@ export function createApi<F extends string, L extends string>(
           nonce,
           captchaToken,
           ...(shape.review === 'final_pay' ? {} : { returnTo: shape.review }),
+          ...(lang === 'es' ? {} : { lang }),
         },
         payment,
       );

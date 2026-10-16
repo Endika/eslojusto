@@ -391,6 +391,13 @@ describe('the review a page reads for', () => {
     expect(fetch.calls[0]?.body).not.toHaveProperty('review');
     expect(fetch.calls[1]?.body).not.toHaveProperty('returnTo');
   });
+  it('a page in another language names it in the checkout, Spanish never', async () => {
+    const fetch = ok(sent);
+    await createApi(ENDPOINTS, fetch, FINAL_PAY_EXTRACTION, 'eu').checkout('n'.repeat(32), 't');
+    await createApi(ENDPOINTS, fetch, FINAL_PAY_EXTRACTION, 'es').checkout('n'.repeat(32), 't');
+    expect(fetch.calls[0]?.body).toEqual({ nonce: 'n'.repeat(32), captchaToken: 't', lang: 'eu' });
+    expect(fetch.calls[1]?.body).not.toHaveProperty('lang');
+  });
   it('another review names itself in both, and reads only its own fields and lists', async () => {
     const shape = { review: 'rental', fields: ['deposit'], lists: ['receipts'] } as const;
     const fetch = ok({
