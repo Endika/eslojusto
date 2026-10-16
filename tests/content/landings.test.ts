@@ -1,10 +1,12 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { HUBS, LANDINGS, LANDING_IDS } from '../../src/content/landings';
+import { HUBS, LANDINGS, LANDING_IDS, landingCopy, landingKeys } from '../../src/content/landings';
+import { es } from '../../src/i18n/es';
+import { LANGS, type Lang } from '../../src/i18n/languages';
 import { LAST_UPDATED } from '../../src/content/updated';
 import { euroRange, wholeEuroRange } from '../../src/content/format';
 
-const pages = LANDING_IDS.map((id) => [id, LANDINGS[id]] as const);
+const pages = LANDING_IDS.map((id) => [id, { ...LANDINGS[id], ...landingCopy('es', id) }] as const);
 const unique = (values: readonly string[]) => new Set(values).size === values.length;
 
 describe('the case pages', () => {
@@ -44,8 +46,22 @@ describe('the case pages', () => {
     for (const [, page] of pages) expect(page.benefitFirst).toBe(page.hub === 'paro');
   });
 
-  it('the content module gives no advice', () => {
-    const text = readFileSync('src/content/landings.ts', 'utf8').toLowerCase();
+  // A published language can't lean on the Spanish prose either.
+  it('every published language has the prose of every case page', () => {
+    const published = (Object.keys(LANGS) as Lang[]).filter((i) => LANGS[i].published);
+    for (const lang of published)
+      for (const id of LANDING_IDS)
+        expect(existsSync(`src/prose/${lang}/${id}.astro`), `${lang}/${id}`).toBe(true);
+  });
+
+  it.each(LANDING_IDS)('%s has every word in the dictionary', (id) => {
+    expect(landingKeys(id).filter((key) => !(key in es))).toEqual([]);
+  });
+
+  it('the case pages’ words give no advice', () => {
+    const text = LANDING_IDS.flatMap((id) => landingKeys(id).map((key) => es[key]))
+      .join('\n')
+      .toLowerCase();
     for (const forbidden of [/\bfirma(lo)?\b/, /\breclama(lo)?\b/, /\bdemanda\b/, /\bno firmes\b/])
       expect(text).not.toMatch(forbidden);
   });

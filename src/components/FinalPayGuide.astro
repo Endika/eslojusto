@@ -162,12 +162,12 @@ const benefitSources = [
       <ul>
         {caseLinks.map((id) => (
           <li>
-            <CaseLink id={id} />
+            <CaseLink lang={lang} id={id} />
           </li>
         ))}
       </ul>
       <p>
-        Y para el paro, con su propia página: <CaseLink id="benefit" />.
+        Y para el paro, con su propia página: <CaseLink lang={lang} id="benefit" />.
       </p>
     </section>
 
@@ -246,7 +246,7 @@ const benefitSources = [
       <div class="causes">
         {causes.map(({ title, rule, citation, page }) => (
           <div>
-            <h4>{page ? <a href={link('es', LANDINGS[page].path.slice(1))}>{title}</a> : title}</h4>
+            <h4>{page ? <a href={link(lang, LANDINGS[page].path.slice(1))}>{title}</a> : title}</h4>
             <p>{rule}</p>
             <p class="causes__citation">{citation}</p>
           </div>
@@ -384,7 +384,7 @@ const benefitSources = [
         despacho laboralista, un despacho de graduado social o un sindicato.
       </p>
       <p>
-        Lo que cambia y lo que no: <CaseLink id="not_agreed" />.
+        Lo que cambia y lo que no: <CaseLink lang={lang} id="not_agreed" />.
       </p>
       <p class="folio">
         Art. <span>49.2</span> ET
@@ -458,7 +458,8 @@ const benefitSources = [
         empleo, suscribir el acuerdo de actividad y no tener la edad de jubilación (art. 266 LGSS).
       </p>
       <p>
-        Para calcularlo con tus datos y ver la escala completa: <CaseLink id="benefit" />.
+        Para calcularlo con tus datos y ver la escala completa:{' '}
+        <CaseLink lang={lang} id="benefit" />.
       </p>
       <p class="folio">
         Arts. <span>266 · 267 · 268.4</span> LGSS

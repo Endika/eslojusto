@@ -106,7 +106,7 @@ const faq = householdFaqEntries(lang, { checkedOn, minimumWage: MINIMUM_WAGE });
         ))}
         {paro && (
           <p>
-            <a href={link('es', 'paro/')}>{tx('household.guide.unemployment.link')}</a>
+            <a href={link(lang, 'paro/')}>{tx('household.guide.unemployment.link')}</a>
           </p>
         )}
         {norms.length > 0 && (
