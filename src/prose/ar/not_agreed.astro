@@ -1,0 +1,74 @@
+---
+// source: c72414824687
+import { OFFERED_HOLIDAYS, itemRange, notAgreed } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+
+const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
+const range = itemRange(notAgreed, 'holiday_pay');
+if (!holidays || !range || holidays.difference === null) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="nc-que-es">ماذا يعني</h3>
+  <p>
+    عند انتهاء العقد، تسلّمك الشركة عرضًا لوثيقة التسوية <bdi>(documento de liquidación)</bdi>
+    بالمبالغ التي تعود لك <bdi>(art. 49.2 ET)</bdi>. بعض الأشخاص، عندما لا يوافقون على أحد المبالغ،
+    يوقّعونها مع إضافة عبارة «recibí no conforme» (استلمت، دون موافقة) أو «no conforme» (غير موافق).
+  </p>
+  <p>
+    هذه الملاحظة لا تغيّر ما تدفعه لك الشركة: بل تُثبت كتابةً أنك لا توافق على أحد الأرقام. نذكر ذلك
+    على سبيل المعلومات فقط. ما يمكن فعله في حالتك يمكن أن يقيّمه مكتب محاماة متخصص في قانون العمل،
+    أو مكتب مستشار في شؤون العمل <bdi>(graduado social)</bdi>، أو نقابة.
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-representante">بحضور أحد ممثلي العمال</h3>
+  <p>
+    يمكنك أن تطلب حضور أحد الممثلين القانونيين للعمال عندما توقّع على التسوية النهائية
+    <bdi>(finiquito)</bdi>. وتُثبت الوثيقة ما إذا وقّعتها بحضوره أو لم تستخدم هذه الإمكانية
+    <bdi>(art. 49.2 ET)</bdi>.
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-ejemplo">مثال: المقارنة قبل التوقيع</h3>
+  <p>
+    شخص يتقاضى 1.500&nbsp;€ إجمالًا في الشهر، مع دفعتين إضافيتين قيمة كل منهما 1.500&nbsp;€، يترك
+    العمل بالاستقالة <bdi>(baja voluntaria)</bdi> في 15 أكتوبر 2026، بعد أن عمل منذ 1 مارس 2023.
+    استفاد من 10 أيام من أصل 22 يوم عمل من الإجازة، وقدّم الإشعار المسبق البالغ 15 يومًا الذي تحدّده
+    اتفاقيته الجماعية. يدفع له العرض {euros(OFFERED_HOLIDAYS)} عن الإجازة.
+  </p>
+  <p class="example">
+    <span class="example__label">الإجازة</span> يبلغ الحد الأدنى القانوني {euroRange(range)}، بحسب
+    الحساب بالأيام أو بالأشهر. مقارنةً بـ{euros(OFFERED_HOLIDAYS)}، ينقص{' '}
+    {euros(holidays.difference)} على الأقل.
+  </p>
+  <p>
+    تفعل الحاسبة الشيء نفسه مع كل بند: اكتب ما يرد في العرض في ورقة «تسويتك النهائية» وسترى ما
+    يتطابق مع الحد الأدنى القانوني وما لا يتطابق.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-plazos">المُهَل تستمر في السريان</h3>
+  <p>
+    بالنسبة للراتب المتبقّي أو الإجازة أو الدفعات الإضافية أو التعويض عند انتهاء عقد مؤقت، المهلة
+    سنة واحدة <bdi>(art. 59.1 ET)</bdi>.
+  </p>
+  <p>
+    في حالة الفصل، مهلة الطعن فيه 20 يوم عمل رسمي <bdi>(art. 59.3 ET)</bdi>. تنقطع هذه المهلة عند
+    تقديم طلب المصالحة <bdi>(conciliación)</bdi> أمام الجهة العامة المختصة بالوساطة والتحكيم
+    والمصالحة. المهلة قصيرة، ويمكن لمكتب محاماة متخصص في قانون العمل، أو مكتب مستشار في شؤون العمل
+    <bdi>(graduado social)</bdi>، أو نقابة، أن يوضّحوا لك أيّها ينطبق على حالتك.
+  </p>
+  <p class="folio">
+    Art. <span>59</span> ET
+  </p>
+</section>

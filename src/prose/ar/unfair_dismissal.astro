@@ -1,0 +1,106 @@
+---
+// source: 6ba110cf70a7
+import CaseLink from '../../components/CaseLink.astro';
+import { severanceMonths, unfairAfter2012, unfairBefore2012 } from '../../content/examples';
+import { euros, integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const [months = 0] = severanceMonths(unfairAfter2012.calculation);
+const [first = 0, second = 0] = severanceMonths(unfairBefore2012.calculation);
+const decimal = (n: number) => String(n).replace('.', ',');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="di-tramos">33 يومًا عن كل سنة، بحدّ أقصى 720</h3>
+  <p>
+    إذا اعتُرف بأن الفصل غير مبرَّر <bdi>(despido improcedente)</bdi> أو أُعلن ذلك، يكون التعويض
+    <bdi>(indemnización)</bdi> 33 يومًا من الراتب عن كل سنة عمل، بحدّ أقصى 24 راتبًا شهريًا، أي 720
+    يومًا <bdi>(art. 56.1 ET)</bdi>. تُحسب المدة بالأشهر، وجزء الشهر يُحتسب شهرًا كاملًا: 33 يومًا
+    في السنة تساوي 2,75 يوم عن كل شهر.
+  </p>
+  <p>
+    راتب كل يوم هو راتبك السنوي، مع الدفعات الإضافية <bdi>(pagas extra)</bdi>، مقسومًا على 365، كما
+    يفعل دليل CGPJ. تعطي الحاسبة الرقم حتى السنتيم وتقارنه برقم شركتك.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-2012">إذا بدأت العمل قبل 12 فبراير 2012</h3>
+  <p>
+    يُحسب التعويض على جزأين <bdi>(disposición transitoria 11.ª ET)</bdi>:
+  </p>
+  <ul>
+    <li>حتى 11 فبراير 2012، 45 يومًا عن كل سنة (3,75 عن كل شهر).</li>
+    <li>ابتداءً من 12 فبراير 2012، 33 يومًا عن كل سنة (2,75 عن كل شهر).</li>
+  </ul>
+  <p>
+    للمجموع حدّ أقصى قدره 720 يومًا، إلا إذا تجاوزه الجزء الأول بالفعل. في هذه الحالة يُحتسب الجزء
+    الأول وحده، بحدّ أقصى 42 راتبًا شهريًا (1.260 يومًا).
+  </p>
+  <p class="folio">
+    Disposición transitoria <span>11.ª</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-ejemplo">أمثلة محلولة</h3>
+  <p>
+    شخص يتقاضى 1.500&nbsp;€ إجمالًا في الشهر، مع دفعتين إضافيتين قيمة كل منهما 1.500&nbsp;€، أي
+    21.000&nbsp;€ في السنة. راتبه اليومي هو 21.000&nbsp;€ / 365 ={' '}
+    {euros(unfairAfter2012.dailySalary)}.
+  </p>
+  <p class="example">
+    <span class="example__label">عقد من 2018</span> من 3 مايو 2018 إلى 20 يوليو 2026 تُحتسب
+    {integer(months)} شهرًا. {integer(months)} × 2,75 = {decimal(unfairAfter2012.salaryDays)} يوم.
+    21.000&nbsp;€ × {decimal(unfairAfter2012.salaryDays)} / 365 = {euros(unfairAfter2012.amount)}.
+  </p>
+  <p class="example">
+    <span class="example__label">عقد من 2010</span> من 1 مارس 2010 إلى 15 سبتمبر 2026. الجزء الأول:{' '}
+    {integer(first)} شهرًا × 3,75 = {decimal(first * 3.75)} يوم. الجزء الثاني:
+    {integer(second)} شهرًا × 2,75 = {decimal(second * 2.75)} يوم. المجموع:{' '}
+    {integer(unfairBefore2012.salaryDays)} يومًا، أقل من الحد الأقصى. 21.000&nbsp;€ ×{' '}
+    {integer(unfairBefore2012.salaryDays)} / 365 = {euros(unfairBefore2012.amount)}.
+  </p>
+  <p>
+    التعويض منفصل عن التسوية النهائية <bdi>(finiquito)</bdi>، التي تجمع راتب الشهر الأخير وأيام
+    الإجازة غير المستفاد منها والجزء المتراكم من الدفعات الإضافية. تراجع الحاسبة كل ذلك معًا.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-readmision">الإعادة إلى العمل أو التعويض</h3>
+  <p>
+    عندما يُعلَن أن الفصل غير مبرَّر، تختار الشركة خلال خمسة أيام بين إعادتك إلى العمل
+    <bdi>(readmisión)</bdi> أو دفع التعويض لك <bdi>(art. 56.1 ET)</bdi>. إذا أعادتك إلى العمل، تعود
+    لك أيضًا أجور فترة الإجراءات <bdi>(salarios de tramitación)</bdi>، وهي الأجور التي لم تتقاضها
+    منذ الفصل <bdi>(art. 56.2 ET)</bdi>. إذا كنت من الممثلين القانونيين للعمال أو مندوبًا نقابيًا،
+    فالاختيار لك <bdi>(art. 56.4 ET)</bdi>.
+  </p>
+  <p>
+    هذه المراجعة لا تحسب أجور فترة الإجراءات ولا تقرّر ما إذا كان الفصل غير مبرَّر: فذلك تعلنه محكمة
+    أو تعترف به الشركة.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-otros">أنواع أخرى من الفصل</h3>
+  <p>
+    الفصل لأسباب موضوعية <bdi>(despido objetivo)</bdi> يُدفع بمعدل 20 يومًا عن كل سنة، مع 15 يومًا
+    من الإشعار المسبق: تجده في صفحة <CaseLink lang={lang} id="objective_dismissal" />. أي فصل، بما
+    في ذلك الفصل التأديبي
+    <bdi>(despido disciplinario)</bdi>، يُعدّ وضعًا قانونيًا للبطالة: تشرح صفحة
+    <CaseLink lang={lang} id="benefit_disciplinary" /> أيّ حالات انتهاء العمل تمنح الحق في إعانة
+    البطالة <bdi>(paro)</bdi>.
+  </p>
+</section>
