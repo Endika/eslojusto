@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.69.0](https://github.com/Endika/eslojusto/compare/v1.68.0...v1.69.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** translate-ready case pages with a route per language ([0e921ab](https://github.com/Endika/eslojusto/commit/0e921abb91799cba8aef4132b625a3cde9d6544d))
+
 ## [1.68.0](https://github.com/Endika/eslojusto/compare/v1.67.1...v1.68.0) (2026-10-16)
 
 
