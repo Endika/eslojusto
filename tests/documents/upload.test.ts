@@ -724,7 +724,7 @@ describe('the start sheet', () => {
   describe('a PDF longer than the places left, in a review that locates its pages', () => {
     const deed = (pages: number, name = 'escritura.pdf') =>
       new File([String(pages)], name, { type: 'application/pdf' });
-    const located: LocateResult = { ok: true, pages: [3, 4, 40], handoff: 'v1.handoff' };
+    const located: LocateResult = { ok: true, pages: [3, 4, 40] };
 
     it('goes in whole, as one entry, and says its pages will be located', async () => {
       setUp(settlement, { locate: located });
@@ -737,7 +737,7 @@ describe('the start sheet', () => {
       );
     });
 
-    it('sends every page at 768 px to locate, then reads the chosen ones with the handoff', async () => {
+    it('sends every page at 768 px to locate, then reads the chosen ones with a captcha of its own', async () => {
       const { requests, locateRequests, sides, closed } = setUp(settlement, { locate: located });
       choose([photo]);
       pick([deed(57)]);
@@ -749,10 +749,8 @@ describe('the start sheet', () => {
       expect(locateRequests[0]).toMatchObject({ captchaToken: 'captcha', maxPages: 24 });
       expect(sides.slice(0, 57).every((s) => s === 768)).toBe(true);
       expect(requests).toHaveLength(1);
-      const request = requests[0] as ExtractRequest & { handoff?: string; captchaToken?: string };
-      expect(request.handoff).toBe('v1.handoff');
-      expect(request.captchaToken).toBeUndefined();
-      expect(request.files.map((f) => f.data)).toEqual([
+      expect(requests[0]?.captchaToken).toBe('captcha');
+      expect(requests[0]?.files.map((f) => f.data)).toEqual([
         btoa('finiquito.jpg'),
         ...[3, 4, 40].map((n) => btoa(`escritura.pdf#${n}`)),
       ]);
@@ -787,9 +785,61 @@ describe('the start sheet', () => {
       expect(text('[data-doc-files-status]')).toBe(
         'No se han podido buscar las páginas útiles de escritura.pdf: se leen sus páginas 1 a 25.',
       );
-      const request = requests[0] as ExtractRequest & { captchaToken?: string };
-      expect(request.captchaToken).toBe('captcha');
-      expect(request.files).toHaveLength(25);
+      expect(requests[0]?.captchaToken).toBe('captcha');
+      expect(requests[0]?.files).toHaveLength(25);
+    });
+
+    it('keeps the PDF whole and says why when locate is refused as the read would be', async () => {
+      const { requests } = setUp(settlement, {
+        locate: { ok: false, code: 'daily_limit_reached' },
+      });
+      choose([deed(57)]);
+      await flush();
+      await submit();
+      await flush();
+      expect(requests).toEqual([]);
+      expect(listed()).toHaveLength(1);
+      expect(text('[data-doc-error]')).toBe(
+        'Ya has usado las 2 lecturas gratis de hoy en este navegador. Puedes rellenar a mano o volver mañana.',
+      );
+    });
+
+    it('reads a PDF whole, without locating, once removing files has made room for it', async () => {
+      const { requests, locateRequests } = setUp(settlement, { locate: located });
+      choose(
+        Array.from({ length: 20 }, (_, i) => new File(['x'], `f${i}.jpg`, { type: 'image/jpeg' })),
+      );
+      pick([deed(10)]);
+      await flush();
+      expect(listed()).toHaveLength(21);
+      for (let i = 0; i < 20; i += 1)
+        document
+          .querySelector<HTMLElement>('[data-doc-remove="0"]')
+          ?.dispatchEvent(new Event('click', { bubbles: true }));
+      expect(listed()).toHaveLength(1);
+      await submit();
+      await flush();
+      expect(locateRequests).toEqual([]);
+      expect(requests[0]?.files).toHaveLength(10);
+    });
+
+    it('opens a PDF of up to 64 MB here, and of up to 20 MB elsewhere', async () => {
+      const heavy = (mb: number) => {
+        const file = deed(57);
+        Object.defineProperty(file, 'size', { value: mb * 1024 * 1024 });
+        return file;
+      };
+      setUp(settlement, { locate: located });
+      choose([heavy(45)]);
+      await flush();
+      expect(listed()).toHaveLength(1);
+      setUp(settlement);
+      choose([heavy(45)]);
+      await flush();
+      expect(listed()).toEqual([]);
+      expect(text('[data-doc-error-for="files"]')).toBe(
+        'Un PDF pesa demasiado para abrirlo aquí. Sube fotos de las páginas con datos.',
+      );
     });
 
     it('cuts a PDF of more than 80 pages, or a second long one, as before', async () => {

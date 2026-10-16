@@ -1,6 +1,14 @@
 import { Aws, Duration, type Stack } from 'aws-cdk-lib';
 import * as cw from 'aws-cdk-lib/aws-cloudwatch';
-import { FUNCTION_NAMES, INVOKED_MODELS, MODEL_PRICES_USD_PER_MTOK, REGION } from '../src/config';
+import {
+  ESCALATION_MODEL,
+  FUNCTION_NAMES,
+  INVOKED_MODELS,
+  LOCATE_MODEL,
+  MODEL_PRICES_USD_PER_MTOK,
+  PRIMARY_MODEL,
+  REGION,
+} from '../src/config';
 
 export const DASHBOARD_NAME = 'eslojusto-api';
 
@@ -132,10 +140,10 @@ const REVIEW_LABELS: Readonly<Record<string, string>> = {
 };
 const byReview = 'fields coalesce(review, "final_pay") as revision';
 
-// The log sums the tokens of a read and its escalation, or of a locate step, without naming the
-// model; with several prices, the dearest bounds the cost from above.
+// The log sums the tokens of a read and its escalation without naming the model; with two prices,
+// the dearer one bounds the cost from above. Locate steps have their own panel.
 function logTokenPrice(): { readonly input: number; readonly output: number } {
-  const prices = INVOKED_MODELS.map((model) => {
+  const prices = [...new Set([PRIMARY_MODEL, ESCALATION_MODEL])].map((model) => {
     const price = MODEL_PRICES_USD_PER_MTOK[model];
     if (!price) throw new Error(`No price for ${model} in MODEL_PRICES_USD_PER_MTOK`);
     return price;
@@ -255,7 +263,24 @@ export function addDashboard(
     }),
   );
 
-  const extract = 'filter op = "extract"';
+  // Reads only: a locate step, which picks the pages of a long PDF, logs `step` and has its panel.
+  const extract = 'filter op = "extract" and not ispresent(step)';
+  const locatePrice = MODEL_PRICES_USD_PER_MTOK[LOCATE_MODEL];
+  if (!locatePrice) throw new Error(`No price for ${LOCATE_MODEL} in MODEL_PRICES_USD_PER_MTOK`);
+  dashboard.addWidgets(
+    logQuery(
+      'Páginas localizadas en PDF largos',
+      ['extract'],
+      [
+        'filter op = "extract" and step = "locate"',
+        'stats count(*) as pasos, sum(code = "ok") as ok, avg(pages) as paginas, ' +
+          `sum(inputTokens) * ${locatePrice.input} / 1000000 + ` +
+          `sum(outputTokens) * ${locatePrice.output} / 1000000 as usd by bin(1d)`,
+      ],
+      cw.LogQueryVisualizationType.TABLE,
+      24,
+    ),
+  );
   dashboard.addWidgets(
     logQuery(
       'Lecturas por resultado',

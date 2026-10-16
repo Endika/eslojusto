@@ -203,13 +203,10 @@ export function createApi<F extends string, L extends string>(
   const failed = (r: Record<string, unknown> | Failure): r is Failure => r['ok'] === false;
 
   return {
-    async extract(request) {
-      const { files, pass, quota } = request;
+    async extract({ files, captchaToken, pass, quota }) {
       const r = await post('extract', {
         files,
-        ...('handoff' in request
-          ? { handoff: request.handoff }
-          : { captchaToken: request.captchaToken }),
+        captchaToken,
         ...review,
         ...(pass === undefined ? { quota: quota ?? null } : { pass }),
       });
@@ -247,14 +244,14 @@ export function createApi<F extends string, L extends string>(
           ...(pass === undefined ? { quota: quota ?? null } : { pass }),
         });
         if (failed(r)) return r;
-        const { pages, handoff } = r;
+        const { pages } = r;
         const valid =
           Array.isArray(pages) &&
           pages.length > 0 &&
           pages.length <= maxPages &&
           pages.every((p) => Number.isInteger(p) && p >= 1 && p <= files.length);
-        if (!valid || !isToken(handoff)) return fail('unexpected_response');
-        return { ok: true, pages: [...new Set(pages as number[])].sort((a, b) => a - b), handoff };
+        if (!valid) return fail('unexpected_response');
+        return { ok: true, pages: [...new Set(pages as number[])].sort((a, b) => a - b) };
       },
     }),
     async checkout(nonce, captchaToken) {

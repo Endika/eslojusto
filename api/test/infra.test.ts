@@ -230,12 +230,19 @@ describe('dashboard', () => {
     expect(missing).toContain('sum(@message like /"missingKeyPage":true/) as sinPaginaDeGastos');
   });
 
+  it('keeps locate steps out of the reads, in a panel of their own at Haiku’s price', () => {
+    expect(byTitle('Lecturas por resultado')).toContain('not ispresent(step)');
+    const locate = byTitle('Páginas localizadas en PDF largos');
+    expect(locate).toContain('step = "locate"');
+    expect(locate).toContain(`* ${MODEL_PRICES_USD_PER_MTOK[LOCATE_MODEL]?.input} / 1000000`);
+  });
+
   it('charts p95 tokens and prices each review’s reads from the config', () => {
     const tokens = byTitle('Tokens p95 por revisión');
     expect(tokens).toContain('pct(inputTokens, 95)');
     expect(tokens).toContain('pct(outputTokens, 95)');
     const cost = byTitle('Coste IA por lectura y revisión (USD)');
-    const prices = INVOKED_MODELS.map((m) => MODEL_PRICES_USD_PER_MTOK[m]);
+    const prices = [PRIMARY_MODEL, SONNET_4_6].map((m) => MODEL_PRICES_USD_PER_MTOK[m]);
     expect(cost).toContain(
       `sum(inputTokens) * ${Math.max(...prices.map((p) => p?.input ?? 0))} / 1000000 / count(*)`,
     );

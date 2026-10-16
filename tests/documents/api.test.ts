@@ -507,8 +507,8 @@ describe('the locate step of a long PDF', () => {
   });
 
   it('posts to extract with its step, review and places, and returns the pages in order', async () => {
-    const fetchFn = fakeFetch(200, { code: 'ok', pages: [20, 3, 4], handoff: 'v1.h' });
-    expect(await ask(fetchFn)).toEqual({ ok: true, pages: [3, 4, 20], handoff: 'v1.h' });
+    const fetchFn = fakeFetch(200, { code: 'ok', pages: [20, 3, 4] });
+    expect(await ask(fetchFn)).toEqual({ ok: true, pages: [3, 4, 20] });
     expect(fetchFn.calls[0]?.url).toBe(ENDPOINTS.extract);
     expect(fetchFn.calls[0]?.body).toEqual({
       step: 'locate',
@@ -520,30 +520,19 @@ describe('the locate step of a long PDF', () => {
     });
   });
 
-  it('an answer without pages, with too many or out of range, or without a handoff is unexpected', async () => {
+  it('an answer without pages, with too many or out of range is unexpected', async () => {
     for (const body of [
-      { code: 'ok', pages: [], handoff: 'h' },
-      { code: 'ok', pages: Array.from({ length: 25 }, (_, i) => i + 1), handoff: 'h' },
-      { code: 'ok', pages: [31], handoff: 'h' },
-      { code: 'ok', pages: [1.5], handoff: 'h' },
-      { code: 'ok', pages: [1] },
+      { code: 'ok', pages: [] },
+      { code: 'ok', pages: Array.from({ length: 25 }, (_, i) => i + 1) },
+      { code: 'ok', pages: [31] },
+      { code: 'ok', pages: [1.5] },
+      { code: 'ok' },
     ])
       expect(await ask(fakeFetch(200, body))).toEqual({ ok: false, code: 'unexpected_response' });
     expect(await ask(fakeFetch(503, { code: 'model_unavailable' }))).toEqual({
       ok: false,
       code: 'model_unavailable',
     });
-  });
-
-  it('a read after it sends the handoff in place of the captcha', async () => {
-    const fetchFn = fakeFetch(503, { code: 'model_unavailable' });
-    await createApi(ENDPOINTS, fetchFn, MORTGAGE_EXTRACTION).extract({
-      files,
-      handoff: 'v1.h',
-      quota: null,
-    });
-    expect(fetchFn.calls[0]?.body).toMatchObject({ handoff: 'v1.h', review: 'mortgage' });
-    expect(fetchFn.calls[0]?.body).not.toHaveProperty('captchaToken');
   });
 });
 

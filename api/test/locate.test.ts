@@ -4,13 +4,7 @@ import { createHmacSigner } from '../src/adapters/hmac-signer';
 import { LOCATE_PROMPTS, LOCATE_TOOL_NAME, locateToolSchema } from '../src/adapters/prompts/locate';
 import { HAIKU_4_5 } from '../src/config';
 import { passClaims } from '../src/domain/allowance';
-import {
-  chosenPages,
-  HANDOFF_SECONDS,
-  handoffClaims,
-  LOCATE_PROMPT_TOKENS,
-  validHandoff,
-} from '../src/domain/locate';
+import { chosenPages, LOCATE_PROMPT_TOKENS } from '../src/domain/locate';
 import type { HttpEvent } from '../src/http/common';
 import { handleExtract } from '../src/http/extract';
 import {
@@ -96,38 +90,13 @@ describe('which pages a locate answer picks', () => {
   });
 });
 
-describe('the handoff that stands in for the captcha of the read after locate', () => {
-  const now = Date.UTC(2026, 9, 16, 10);
-  const token = signer.sign(handoffClaims('mortgage', now));
-
-  it('holds for the same review until it expires', () => {
-    expect(validHandoff(token, 'mortgage', signer, now)).toBe(true);
-    expect(validHandoff(token, 'mortgage', signer, now + HANDOFF_SECONDS * 1000)).toBe(false);
-    expect(validHandoff(token, 'rental', signer, now)).toBe(false);
-  });
-
-  it('is no pass, quota or forged token', () => {
-    expect(
-      validHandoff(signer.sign(passClaims('cs', now / 1000 + 60)), 'mortgage', signer, now),
-    ).toBe(false);
-    const other = createHmacSigner('another-key-that-is-long-enough-for-hmac-sha256');
-    expect(validHandoff(other.sign(handoffClaims('mortgage', now)), 'mortgage', signer, now)).toBe(
-      false,
-    );
-  });
-});
-
 describe('the locate step', () => {
-  it('answers the chosen pages and a handoff, and spends no read', async () => {
+  it('answers the chosen pages, and spends no read', async () => {
     const { deps, locator, logger } = setup({ answer: listed(40, 3, 4) });
     const response = await handleExtract(post(locateBody()), deps);
     expect(response.statusCode).toBe(200);
     const body = json(response);
-    expect(body).toMatchObject({ code: 'ok', pages: [3, 4, 40] });
-    expect(body).not.toHaveProperty('allowance');
-    expect(validHandoff(body['handoff'] as string, 'mortgage', signer, deps.clock.now())).toBe(
-      true,
-    );
+    expect(body).toEqual({ code: 'ok', pages: [3, 4, 40] });
     expect(locator.calls).toHaveLength(1);
     expect(locator.calls[0]).toMatchObject({ model: LOCATE, review: 'mortgage' });
     expect(locator.calls[0]?.files).toHaveLength(57);
@@ -145,6 +114,18 @@ describe('the locate step', () => {
     const { deps } = setup({ answer: listed(9, 8, 7, 6, 5) });
     expect(json(await handleExtract(post(locateBody({ maxPages: 3 })), deps))).toMatchObject({
       pages: [7, 8, 9],
+    });
+  });
+
+  it('takes 80 square pages at 768 px within its token cap', async () => {
+    const { deps } = setup({ answer: listed(1) });
+    const square = Array.from({ length: 80 }, () => ({
+      mediaType: 'image/jpeg',
+      data: b64(jpeg(768, 768)),
+    }));
+    expect(json(await handleExtract(post(locateBody({ files: square })), deps))).toEqual({
+      code: 'ok',
+      pages: [1],
     });
   });
 
@@ -170,7 +151,7 @@ describe('the locate step', () => {
       { maxPages: 0 },
       { maxPages: 26 },
       { maxPages: 2.5 },
-      { captchaToken: undefined, handoff: signer.sign(handoffClaims('mortgage', Date.now())) },
+      { captchaToken: undefined },
     ])
       expect(json(await handleExtract(post(locateBody(overrides)), deps))).toEqual({
         code: 'invalid_request',
@@ -218,43 +199,13 @@ describe('the locate step', () => {
 });
 
 describe('the read after locate', () => {
-  const readBody = (overrides: Record<string, unknown> = {}) => ({
-    review: 'mortgage',
-    files: [{ mediaType: 'image/jpeg', data: b64(jpeg(1000, 1400)) }],
-    ...overrides,
-  });
-
-  it('takes the handoff in place of the captcha, for the review it was signed for', async () => {
-    const { deps, captcha, reader } = setup({ captcha: new FakeCaptcha(false) });
-    const handoff = signer.sign(handoffClaims('mortgage', deps.clock.now()));
-    const response = json(await handleExtract(post(readBody({ handoff })), deps));
-    expect(response['code']).not.toBe('captcha_failed');
-    expect(reader.calls.length).toBeGreaterThan(0);
-    expect(captcha.tokens).toHaveLength(0);
-
-    expect(json(await handleExtract(post(readBody({ handoff, review: 'credit' })), deps))).toEqual({
-      code: 'captcha_failed',
-    });
-  });
-
-  it('refuses an expired handoff, and a captcha and handoff together', async () => {
-    const { deps, clock } = setup();
-    const handoff = signer.sign(handoffClaims('mortgage', clock.now()));
-    clock.ms += HANDOFF_SECONDS * 1000;
-    expect(json(await handleExtract(post(readBody({ handoff })), deps))).toEqual({
-      code: 'captcha_failed',
-    });
+  it('needs its own captcha: nothing from the locate step stands in for it', async () => {
+    const { deps, reader } = setup();
+    const files = [{ mediaType: 'image/jpeg', data: b64(jpeg(1000, 1400)) }];
     expect(
-      json(await handleExtract(post(readBody({ handoff, captchaToken: 'turnstile-token' })), deps)),
+      json(await handleExtract(post({ review: 'mortgage', files, handoff: 'v1.x' }), deps)),
     ).toEqual({ code: 'invalid_request' });
-  });
-
-  it('still takes at most 25 pages', async () => {
-    const { deps } = setup();
-    const handoff = signer.sign(handoffClaims('mortgage', deps.clock.now()));
-    expect(json(await handleExtract(post(readBody({ handoff, files: lowRes(26) })), deps))).toEqual(
-      { code: 'too_many_files' },
-    );
+    expect(reader.calls).toHaveLength(0);
   });
 });
 

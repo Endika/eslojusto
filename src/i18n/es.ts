@@ -1229,7 +1229,7 @@ export const es = {
   'client.documents.error.pdf_too_slow':
     'Este PDF tarda demasiado en abrirse aquí. Sube fotos de sus páginas.',
   'client.documents.error.pdf_too_large':
-    'Un PDF pesa más de 20 MB y no se puede abrir aquí. Sube fotos de las páginas con datos.',
+    'Un PDF pesa demasiado para abrirlo aquí. Sube fotos de las páginas con datos.',
   'client.documents.error.document_too_dense':
     'Los documentos tienen demasiado texto para leerlos de una vez. Sube solo las páginas con los datos.',
   'client.documents.error.captcha_failed':

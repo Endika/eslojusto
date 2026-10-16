@@ -5,7 +5,6 @@ import {
   isLocateReview,
   LOCATE_LIMITS,
   locate,
-  validHandoff,
   type LocateDeps,
   type LocateRequest,
 } from '../domain/locate';
@@ -26,11 +25,8 @@ function toRequest(
   body: Record<string, unknown>,
   maxImages: number,
 ): ExtractRequest<ReviewKind> | ErrorCode {
-  const { files, pass, quota, review } = body;
-  // A read that follows a locate step proves itself with the handoff that step signed.
-  const captchaToken = body['captchaToken'] ?? body['handoff'];
+  const { files, captchaToken, pass, quota, review } = body;
   if (!Array.isArray(files) || !isToken(captchaToken)) return 'invalid_request';
-  if (body['captchaToken'] !== undefined && body['handoff'] !== undefined) return 'invalid_request';
   if (review !== undefined && !isReview(review)) return 'invalid_request';
   if (files.length > maxImages) return 'too_many_files';
 
@@ -57,7 +53,7 @@ function toRequest(
 
 function toLocateRequest(body: Record<string, unknown>): LocateRequest | ErrorCode {
   const { review, maxPages } = body;
-  if (!isLocateReview(review) || body['handoff'] !== undefined) return 'invalid_request';
+  if (!isLocateReview(review)) return 'invalid_request';
   if (!Number.isInteger(maxPages) || (maxPages as number) < 1) return 'invalid_request';
   if ((maxPages as number) > LIMITS.maxImages) return 'invalid_request';
   const request = toRequest(body, LOCATE_LIMITS.maxImages);
@@ -84,14 +80,7 @@ export function handleExtract(
     if (body['step'] !== undefined) return { code: 'invalid_request' };
     const request = toRequest(body, LIMITS.maxImages);
     if (typeof request === 'string') return { code: request };
-    const handoff = body['handoff'] !== undefined;
-    const captcha = handoff
-      ? {
-          verify: async (token: string) =>
-            validHandoff(token, request.review, deps.signer, deps.clock.now()),
-        }
-      : deps.captcha;
-    const response = await extract(request, { ...deps, captcha }, metrics);
+    const response = await extract(request, deps, metrics);
     if (response.code !== 'ok') return response;
     return {
       code: 'ok',

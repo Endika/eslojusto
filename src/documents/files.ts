@@ -38,6 +38,7 @@ export function admit<T extends Selected>(
   current: readonly Selected[],
   free: number,
   incoming: readonly T[],
+  maxPdfBytes: number = MAX_PDF_BYTES,
 ): Admission<T> {
   const photos: T[] = [];
   const pdfs: T[] = [];
@@ -52,7 +53,7 @@ export function admit<T extends Selected>(
     const why: ErrorCode | null =
       !isPdf(file) && !isImage(file)
         ? 'file_type'
-        : isPdf(file) && file.size > MAX_PDF_BYTES
+        : isPdf(file) && file.size > maxPdfBytes
           ? 'pdf_too_large'
           : places <= 0
             ? 'too_many_files'
