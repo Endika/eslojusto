@@ -1,4 +1,14 @@
 import { es, type Key } from './es';
+import { en } from './en';
+import { ar } from './ar';
+import { ro } from './ro';
+import { fr } from './fr';
+import { uk } from './uk';
+import { zh } from './zh';
+import { ca } from './ca';
+import { eu } from './eu';
+import { gl } from './gl';
+import type { Translation } from './translation';
 import type { Lang } from './languages';
 import { interpolate, type Variables } from './interpolate';
 
@@ -9,8 +19,35 @@ export type { Lang } from './languages';
 // untranslated one (a literal left in a component) stands out at a glance.
 const pseudoRtl = (text: string): string => `ع\u200f ${text} \u200fع`;
 
+// A language's keys over the Spanish ones, so a key not yet translated reads in Spanish.
+const over = (translation: Translation): Readonly<Record<Key, string>> => ({
+  ...es,
+  ...translation,
+});
+
+export const TRANSLATIONS: Readonly<Record<Exclude<Lang, 'es' | 'ar-test'>, Translation>> = {
+  en,
+  ar,
+  ro,
+  fr,
+  uk,
+  zh,
+  ca,
+  eu,
+  gl,
+};
+
 export const DICTIONARIES: Record<Lang, Readonly<Record<Key, string>>> = {
   es,
+  en: over(en),
+  ar: over(ar),
+  ro: over(ro),
+  fr: over(fr),
+  uk: over(uk),
+  zh: over(zh),
+  ca: over(ca),
+  eu: over(eu),
+  gl: over(gl),
   'ar-test': Object.fromEntries(
     Object.entries(es).map(([key, text]) => [key, pseudoRtl(text)]),
   ) as Record<Key, string>,

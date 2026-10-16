@@ -6,12 +6,13 @@ import {
   BILLS_READING,
   CREDIT_READING,
   DICTIONARIES,
+  TRANSLATIONS,
   INSURANCE_READING,
   MORTGAGE_READING,
   clientStrings,
   t,
 } from '../../src/i18n';
-import { LANGS, builtLangs, type Lang } from '../../src/i18n/languages';
+import { LANGS, builtLangs, reviewLangs, type Lang } from '../../src/i18n/languages';
 import { translator } from '../../src/i18n/client';
 import { statusText } from '../../src/calculator/render';
 import { reviewFinalPay } from '../../src/engine/review';
@@ -32,9 +33,24 @@ describe('published languages', () => {
     for (const key of keys) expect(DICTIONARIES[lang][key], key).toBeTruthy();
   });
 
+  // A published translation can't lean on the Spanish fallback: every key is its own.
+  it.each(Object.keys(TRANSLATIONS) as (keyof typeof TRANSLATIONS)[])(
+    '%s, once published, has translated every key',
+    (lang) => {
+      if (!LANGS[lang].published) return;
+      expect(keys.filter((key) => !TRANSLATIONS[lang][key])).toEqual([]);
+    },
+  );
+
   it('a normal build builds only the published languages', () => {
     expect(builtLangs({})).toEqual(['es']);
     expect(builtLangs({ TEST_RTL: '1' })).toEqual(['es', 'ar-test']);
+  });
+
+  it('a review build adds the unpublished languages it names, and only those', () => {
+    expect(builtLangs({ REVIEW_LANGS: 'eu, ca' })).toEqual(['es', 'ca', 'eu']);
+    expect(reviewLangs({ REVIEW_LANGS: 'es,ar-test,xx,gl' })).toEqual(['gl']);
+    expect(reviewLangs({})).toEqual([]);
   });
 });
 

@@ -1,12 +1,22 @@
-export type Lang = 'es' | 'ar-test';
+export type Lang = 'es' | 'en' | 'ar' | 'ro' | 'fr' | 'uk' | 'zh' | 'ca' | 'eu' | 'gl' | 'ar-test';
 
 export const DEFAULT_LANG: Lang = 'es';
 
 // A language is published (`published: true`) only after a native speaker has reviewed every
-// string in its dictionary. Until then it builds no route and appears in no hreflang.
+// string in its dictionary. Until then it builds no route and appears in no hreflang, except in a
+// review build (REVIEW_LANGS), which serves it noindexed behind a banner for its reviewer.
 // `ar-test` is a pseudo-locale that only exists to prove the RTL layout; it is never published.
 export const LANGS: Record<Lang, { name: string; dir: 'ltr' | 'rtl'; published: boolean }> = {
   es: { name: 'Español', dir: 'ltr', published: true },
+  en: { name: 'English', dir: 'ltr', published: false },
+  ar: { name: 'العربية', dir: 'rtl', published: false },
+  ro: { name: 'Română', dir: 'ltr', published: false },
+  fr: { name: 'Français', dir: 'ltr', published: false },
+  uk: { name: 'Українська', dir: 'ltr', published: false },
+  zh: { name: '中文', dir: 'ltr', published: false },
+  ca: { name: 'Català', dir: 'ltr', published: false },
+  eu: { name: 'Euskara', dir: 'ltr', published: false },
+  gl: { name: 'Galego', dir: 'ltr', published: false },
   'ar-test': { name: 'Pseudo RTL (solo pruebas)', dir: 'rtl', published: false },
 };
 
@@ -14,9 +24,18 @@ const all = Object.keys(LANGS) as Lang[];
 
 export const publishedLangs = (): Lang[] => all.filter((i) => LANGS[i].published);
 
-// The languages a build emits routes for: the published ones, plus ar-test under TEST_RTL=1.
+// The unpublished real languages a review build serves: REVIEW_LANGS=eu,ca. Anything else in the
+// list is ignored, so the pseudo-locale can't sneak in this way.
+export const reviewLangs = (env: Record<string, string | undefined> = process.env): Lang[] => {
+  const asked = (env['REVIEW_LANGS'] ?? '').split(',').map((i) => i.trim());
+  return all.filter((i) => i !== 'ar-test' && !LANGS[i].published && asked.includes(i));
+};
+
+// The languages a build emits routes for: the published ones, those under review, plus ar-test
+// under TEST_RTL=1.
 export const builtLangs = (env: Record<string, string | undefined> = process.env): Lang[] => [
   ...publishedLangs(),
+  ...reviewLangs(env),
   ...(env['TEST_RTL'] === '1' ? (['ar-test'] as const) : []),
 ];
 

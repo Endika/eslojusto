@@ -75,6 +75,8 @@ jobs:
           - { project: mobile, switch: '' }
           # The ar-test pseudo-locale.
           - { project: rtl, switch: TEST_RTL }
+          # A language served unpublished to its reviewer.
+          - { project: review, switch: TEST_REVIEW }
           # A test key, PostHog stubbed.
           - { project: analytics, switch: TEST_ANALYTICS }
           - { project: rental, switch: TEST_RENTAL }
