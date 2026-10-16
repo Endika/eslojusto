@@ -8,7 +8,11 @@ import { setUpPayment } from '../../src/documents/payment';
 import type { LetterDetails } from '../../src/documents/letter';
 import type { Browser, PaidReview } from '../../src/documents/ports';
 import { NOTICE, OFFER, flush, recordingEvents } from './dom';
+import type { Translate } from '../../src/i18n/client';
 import { completed, memoryStore, passToken, tr, unfairDismissal } from './fixtures';
+
+// A page in another language, as the pseudo-locale writes it: every word marked.
+const pseudo: Translate = (key, vars) => `ع ${tr(key, vars)}`;
 
 const NOW = Date.UTC(2026, 9, 7);
 const EXPIRES = NOW / 1000 + 7 * 86400;
@@ -31,6 +35,7 @@ function setUp(
   passResults: PassResult[] = [],
   checkoutUrl = 'https://checkout.stripe.com/c/pay/1',
   verifyResults: VerifyResult[] = [],
+  paperTr?: Translate,
 ) {
   document.body.innerHTML = NOTICE + OFFER;
   const passes = createPassStore(memoryStore(), () => NOW);
@@ -72,7 +77,8 @@ function setUp(
     passes,
     events,
     browser,
-    tr,
+    tr: paperTr ? pseudo : tr,
+    ...(paperTr ? { paperTr } : {}),
     pdf: async () => ({
       render: async () => new Blob(['%PDF']),
       // Stands in for the fonts: «€» is the one character they lack here.
@@ -428,6 +434,28 @@ describe('the pass offer', () => {
       ['downloaded', 'report'],
       ['downloaded', 'letter', 'none', 'items'],
     ]);
+  });
+
+  // A page in another language: its own words on screen, the papers' in Spanish.
+  it('builds the report and the letter, and names their files, with the Spanish words', async () => {
+    const { payment, passes, saved } = setUp([], undefined, [], tr);
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
+    const c = finalPayCase(completed());
+    const words: string[] = [];
+    const paid: PaidReview = {
+      ...c,
+      report: (t, today) => (words.push(t('client.documents.report.title')), c.report(t, today)),
+      letter: (kind, details, t) => (
+        words.push(t('client.documents.letter.title')),
+        c.letter(kind, details, t)
+      ),
+    };
+    payment.show(paid);
+    await click('[data-download="report"]');
+    await click('[data-download="letter"]');
+    expect(words).toEqual(['Revisión de tu finiquito', 'Recibí no conforme']);
+    expect(saved).toEqual(['eslojusto-informe-finiquito.pdf', 'eslojusto-recibi-no-conforme.pdf']);
+    expect($('[data-pass-validity]').textContent).toMatch(/^ع/);
   });
 
   it('the letter takes what the person adds, dated today unless changed', async () => {

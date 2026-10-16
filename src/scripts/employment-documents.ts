@@ -7,7 +7,7 @@ import type { EmploymentCalculator } from '../employment/main';
 import type { CompletedEmploymentReview } from '../employment/ports';
 import { employmentReading } from '../employment/reading';
 import { STEPS } from '../employment/steps';
-import { pageTranslator, type ClientKey, type Translate } from '../i18n/client';
+import { pageTranslator, papersTranslator, type ClientKey, type Translate } from '../i18n/client';
 import type { EmploymentDeps } from '../engine/employment/review';
 import { localToday } from './clock';
 import { wireDocuments, type ReviewHooks } from './documents';
@@ -37,12 +37,14 @@ export function wireEmploymentDocuments(
   tables: EmploymentDeps,
 ): void {
   const tr = employmentCopy(pageTranslator());
+  const paperTr = employmentCopy(papersTranslator());
   wireDocuments({
     form: employment,
     hooks,
     arrival,
     config: DOCUMENTS,
     tr,
+    paperTr,
     events: documentsAnalytics(track),
     section: {
       extraction: EMPLOYMENT_EXTRACTION,

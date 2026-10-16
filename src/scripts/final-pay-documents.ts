@@ -8,7 +8,7 @@ import { finalPayCase } from '../documents/case';
 import { DOCUMENTS } from '../documents/config';
 import { FINAL_PAY_EXTRACTION } from '../documents/contract';
 import { finalPayReading } from '../documents/final-pay-reading';
-import { pageTranslator } from '../i18n/client';
+import { pageTranslator, papersTranslator } from '../i18n/client';
 import { wireDocuments, type ReviewHooks } from './documents';
 
 // Answers kept before the holiday unit was asked were in calendar days.
@@ -22,6 +22,7 @@ export function wireFinalPayDocuments(
   arrival: { hash: string; search: string },
 ): void {
   const tr = pageTranslator();
+  const paperTr = papersTranslator();
   const reading = finalPayReading(calculator.form, tr);
   wireDocuments({
     form: calculator,
@@ -29,6 +30,7 @@ export function wireFinalPayDocuments(
     arrival,
     config: DOCUMENTS,
     tr,
+    paperTr,
     events: documentsAnalytics(track),
     section: {
       extraction: FINAL_PAY_EXTRACTION,

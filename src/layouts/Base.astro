@@ -63,18 +63,23 @@ const alternates = indexable ? langs.filter((i) => LANGS[i].published) : [];
 const OG_LOCALE: Partial<Record<Lang, string>> = { es: 'es_ES' };
 const ogLocale = OG_LOCALE[lang];
 // The browser scripts' strings, as data: the CSP does not apply to a JSON block.
-const clientStringsJson = JSON.stringify(
-  clientStrings(lang, {
-    documents: DOCUMENTS !== null,
-    rental: path === '/alquiler/',
-    employment: path === '/contrato/',
-    household: path === '/empleada-de-hogar/',
-    insurance: path === '/seguros/',
-    credit: path === '/financiacion/',
-    mortgage: path === '/hipoteca/',
-    bills: path === '/facturas/luz/' || path === '/facturas/permanencia/',
-  }),
-).replace(/</g, '\\u003c');
+const pageStrings = {
+  documents: DOCUMENTS !== null,
+  rental: path === '/alquiler/',
+  employment: path === '/contrato/',
+  household: path === '/empleada-de-hogar/',
+  insurance: path === '/seguros/',
+  credit: path === '/financiacion/',
+  mortgage: path === '/hipoteca/',
+  bills: path === '/facturas/luz/' || path === '/facturas/permanencia/',
+};
+const clientStringsJson = JSON.stringify(clientStrings(lang, pageStrings)).replace(/</g, '\\u003c');
+// The report and the letters stay in Spanish on every page: they go to a Spanish employer,
+// landlord, bank or supplier, so a page in another language that offers them ships their words.
+const papersJson =
+  lang !== 'es' && calculator && DOCUMENTS !== null
+    ? JSON.stringify(clientStrings('es', pageStrings)).replace(/</g, '\\u003c')
+    : null;
 const socialImage = new URL(`${root}/og.png`, Astro.site);
 // A JSON-LD block is data, not script, so the CSP does not apply; `<` is escaped so it can't close the tag.
 const graph = Array.isArray(structuredData)
@@ -139,6 +144,9 @@ const otherLangsJson = JSON.stringify(otherLangs).replace(/</g, '\\u003c');
     <link rel="sitemap" href={`${base}sitemap-index.xml`} />
     {jsonLd && <script is:inline type="application/ld+json" set:html={jsonLd} />}
     <script is:inline id="client-strings" type="application/json" set:html={clientStringsJson} />
+    {papersJson && (
+      <script is:inline id="client-strings-papers" type="application/json" set:html={papersJson} />
+    )}
     {otherLangs.length > 0 && (
       <script is:inline id="other-languages" type="application/json" set:html={otherLangsJson} />
     )}

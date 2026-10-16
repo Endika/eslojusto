@@ -16,7 +16,7 @@ import { TOLL_HOLIDAYS } from '../engine/bills/data/holidays-20td';
 import { pvpcTable } from '../engine/bills/data/pvpc-hourly';
 import type { OfficialDeps } from '../engine/bills/electricity-official';
 import type { NormTable } from '../engine/bills/norms';
-import { billsTranslator } from './bills-copy';
+import { billsPapersTranslator, billsTranslator } from './bills-copy';
 import { READS_UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
 
 // A bill of the year with the answers it was reviewed from, which are all the trip to Stripe keeps
@@ -38,6 +38,7 @@ export function wireElectricityDocuments(
   yearEvents: YearEvents,
 ): void {
   const tr = billsTranslator();
+  const paperTr = billsPapersTranslator();
   const { form } = electricity;
   // The PVPC prices only the paid report reads: fetched once a bill is reviewed, which a pass
   // needs, so they are here by the time one is paid. A failed fetch is tried again with the next
@@ -94,6 +95,7 @@ export function wireElectricityDocuments(
     arrival,
     config: DOCUMENTS,
     tr,
+    paperTr,
     // Its reads send no event, as on the other finance pages; the pass is measured as on every
     // page.
     events: { ...documentsAnalytics(track), ...READS_UNMEASURED },

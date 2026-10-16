@@ -4,7 +4,7 @@ import type { SectionForm } from '../calculator/section';
 import { DOCUMENTS } from '../documents/config';
 import { MORTGAGE_EXTRACTION } from '../documents/contract';
 import type { LegalInterestTable } from '../engine/law/interest';
-import { pageTranslator, type ClientKey, type Translate } from '../i18n/client';
+import { pageTranslator, papersTranslator, type ClientKey, type Translate } from '../i18n/client';
 import { mortgageCase } from '../mortgage/case';
 import type { CompletedMortgageReview } from '../mortgage/ports';
 import { mortgageReading } from '../mortgage/reading';
@@ -33,12 +33,14 @@ export function wireMortgageDocuments(
   legalInterest: LegalInterestTable,
 ): void {
   const tr = mortgageCopy(pageTranslator());
+  const paperTr = mortgageCopy(papersTranslator());
   wireDocuments({
     form: mortgage,
     hooks,
     arrival,
     config: DOCUMENTS,
     tr,
+    paperTr,
     // The review measures nothing yet, so neither do its reads: no event of it is in the
     // analytics catalogue. The pass is measured as on every page.
     events: { ...documentsAnalytics(track), ...READS_UNMEASURED },

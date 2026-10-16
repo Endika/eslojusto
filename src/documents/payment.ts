@@ -69,6 +69,8 @@ export interface PaymentDeps {
   readonly events: DocumentEvents;
   readonly browser: Browser;
   readonly tr: Translate;
+  // The report's and the letters' words, Spanish on every page; the page's own when not given.
+  readonly paperTr?: Translate;
   readonly pdf: () => Promise<PdfMaker>;
   // Keeps the review's answers for the trip to the payment page and back.
   readonly keepReview: () => void;
@@ -126,6 +128,7 @@ function letterParts(letter: HTMLElement) {
 
 export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
   const { api, passes, events, browser, tr } = deps;
+  const paperTr = deps.paperTr ?? tr;
   const wait = deps.wait ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
   const buy = required(section.querySelector<HTMLElement>('[data-pass-buy]'), 'buy');
   const downloads = required(section.querySelector<HTMLElement>('[data-pass-downloads]'), 'dl');
@@ -435,11 +438,13 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
         details = { ...details, ...Object.fromEntries(blanked.map((f) => [f, ''])) };
       }
       const blob = await maker.render(
-        kind === undefined ? current.report(tr, deps.today()) : current.letter(kind, details, tr),
+        kind === undefined
+          ? current.report(paperTr, deps.today())
+          : current.letter(kind, details, paperTr),
       );
       browser.save(
         blob,
-        tr(current.filename?.(which, kind) ?? `client.documents.${FILENAMES[which]}.filename`),
+        paperTr(current.filename?.(which, kind) ?? `client.documents.${FILENAMES[which]}.filename`),
       );
       if (which === 'letter')
         events.downloaded(

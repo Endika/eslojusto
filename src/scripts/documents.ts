@@ -233,6 +233,8 @@ export interface DocumentsWiring<R, F extends string, L extends string> {
   readonly config: DocumentsConfig | null;
   // The section's copy: its root may word some messages its own way.
   readonly tr: Translate;
+  // The same copy in Spanish, for the report and the letters.
+  readonly paperTr: Translate;
   readonly events: DocumentEvents;
 }
 
@@ -253,6 +255,7 @@ interface PassContext<R> {
   readonly passes: ReturnType<typeof createPassStore>;
   readonly session: KeyValueStore;
   readonly tr: Translate;
+  readonly paperTr: Translate;
   readonly events: DocumentEvents;
 }
 
@@ -270,6 +273,7 @@ function setUpPass<R>(
     passes,
     session,
     tr,
+    paperTr,
     events,
   }: PassContext<R>,
 ) {
@@ -286,6 +290,7 @@ function setUpPass<R>(
     events,
     browser,
     tr,
+    paperTr,
     pdf: () => import('../documents/pdf').then((m) => m.pdfMaker),
     keepReview: () =>
       session.set(
@@ -411,6 +416,7 @@ export function wireDocuments<R, F extends string, L extends string>({
   section,
   config,
   tr,
+  paperTr,
   events,
 }: DocumentsWiring<R, F, L>): DocumentsHandle | null {
   const start = document.querySelector<HTMLElement>('[data-documents-start]');
@@ -445,6 +451,7 @@ export function wireDocuments<R, F extends string, L extends string>({
     passes,
     session,
     tr,
+    paperTr,
     events,
   });
 

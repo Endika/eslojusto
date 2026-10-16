@@ -8,7 +8,7 @@ import type { SectionForm } from '../calculator/section';
 import { DOCUMENTS } from '../documents/config';
 import { TELECOM_EXTRACTION } from '../documents/contract';
 import type { NormTable } from '../engine/bills/norms';
-import { billsTranslator } from './bills-copy';
+import { billsPapersTranslator, billsTranslator } from './bills-copy';
 import { localToday } from './clock';
 import { READS_UNMEASURED, wireDocuments, type ReviewHooks } from './documents';
 
@@ -23,12 +23,14 @@ export function wireTelecomDocuments(
   norms: NormTable,
 ): void {
   const tr = billsTranslator();
+  const paperTr = billsPapersTranslator();
   wireDocuments({
     form: telecom,
     hooks,
     arrival,
     config: DOCUMENTS,
     tr,
+    paperTr,
     // Its reads send no event, as on the other finance pages; the pass is measured as on every
     // page.
     events: { ...documentsAnalytics(track), ...READS_UNMEASURED },
