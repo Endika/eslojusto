@@ -1,0 +1,98 @@
+---
+// source: f63abb595478
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositExample();
+// Until the Congress votes the decree down, the insurance ban stands as pending.
+const banStands = NORMS.rdl29_2026.status !== 'repealed';
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="fianza-legal">
+  <h2 id="fianza-legal">The deposit: one month's rent</h2>
+  <p>
+    The deposit (fianza) is compulsory and, in a housing rental, is one month's rent in cash (art.
+    36.1 LAU).
+  </p>
+  <p>
+    When the agreement ends and you hand over the keys, the deposit has to be returned to you within
+    a month: <a href={href(RENTAL_PAGES.deposit_return.path)}>{RENTAL_PAGES.deposit_return.name}</a>
+    .
+  </p>
+  <p class="folio">
+    Art. <span>36.1</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="garantia-adicional">
+  <h2 id="garantia-adicional">Other guarantees: up to two more months' rent</h2>
+  <p>
+    In addition to the deposit, the agreement can require another guarantee: more money or a bank
+    guarantee (aval). In agreements signed on or after 6 March 2019 for up to five years, or up to
+    seven if the landlord is a company, that additional guarantee cannot exceed two months' rent
+    (art. 36.5 LAU).
+  </p>
+  <p>The review compares the money you paid with the cap.</p>
+  {banStands && (
+    <p>
+      According to the decree, the landlord can no longer require you to take out rent default
+      insurance: this is explained in the <a href="#seguro">insurance section</a>, further down.
+    </p>
+  )}
+  <p class="folio">
+    Art. <span>36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="adelantado">
+  <h2 id="adelantado">In advance: one month's rent</h2>
+  <p>The landlord cannot require more than one month's rent in advance (art. 17 LAU).</p>
+  <p class="folio">
+    Art. <span>17</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="seguro">
+  <h2 id="seguro">
+    {banStands ? 'Rent default insurance: the decree bans requiring it' : 'Rent default insurance'}
+  </h2>
+  <p>{pageDecree('deposit', 'rental.page.decree.insurance')}</p>
+  <p class="folio">
+    Art. <span>36.5</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Worked example</h2>
+  <p>
+    With a rent of {formatEuros(ex.rent)}, a landlord asks for {formatEuros(ex.asked)} in money
+    before moving in: the deposit and additional guarantees.
+  </p>
+  <p class="example">
+    <span class="example__label">The figures</span> The deposit is one month's rent,{' '}
+    {formatEuros(ex.rent)}, and the additional guarantee can be two, {formatEuros(2 * ex.rent)}. The
+    maximum is {formatEuros(ex.allowed)}. You are asked for {formatEuros(ex.asked)}:{' '}
+    {formatEuros(ex.over)} above the cap.
+  </p>
+  <p class="folio">
+    Art. <span>36.1 · 36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Check what you have been asked for</h2>
+  <p>
+    The <a href={href(REVIEW.path)}>rental review</a> compares the deposit, the guarantees and the
+    advance payment in your agreement with these caps, and tells you by how much each cap is
+    exceeded.
+  </p>
+</section>

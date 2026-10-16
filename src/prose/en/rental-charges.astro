@@ -1,0 +1,85 @@
+---
+// source: 8e819e81fa1a
+import { NORMS } from '../../engine/rental/data/norms';
+import { chargesExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros, formatLongDay } from '../../content/rent-indices';
+import { t } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pageDecree } = rentalPagesCopy(lang);
+
+const ex = chargesExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="pacto">
+  <h2 id="pacto">Only with a written agreement and their annual amount</h2>
+  <p>
+    The landlord can only charge you the general costs of the building or services without a meter
+    if you agreed it in writing, with their annual amount as at the date of the agreement (art. 20.1
+    LAU). Taxes, such as the IBI (property tax), have their own rule: see “IBI and local fees”
+    further down.
+  </p>
+  <p>
+    If the agreement does not mention them or does not give an amount per year, the review flags it
+    for you to look at.
+  </p>
+  <p>{pageDecree('charges', 'rental.page.charges.community')}</p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="subida">
+  <h2 id="subida">How much they can go up: up to double the rent</h2>
+  <p>
+    In the first five years of the agreement, or seven if the landlord is a company, those charges,
+    except taxes, can only go up once a year, by agreement, and never by more than double what the
+    rent can go up by (art. 20.3 LAU, or art. 20.2 in agreements prior to Real Decreto-ley 29/2026).
+    The review compares each charge for each year with that cap.
+  </p>
+  <p class="folio">
+    Art. <span>20.3</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ibi">
+  <h2 id="ibi">IBI and local fees</h2>
+  <p>{pageDecree('charges', 'rental.page.decree.taxes')}</p>
+  <p>
+    {t(lang, 'rental.guide.charges.taxes_before', {
+      desde: formatLongDay(NORMS.rdl29_2026.inForceSince, lang),
+    })}
+  </p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Worked example</h2>
+  <p>
+    An agreement sets {formatEuros(ex.agreed)} a year in community fees. In the first year, the
+    landlord charges {formatEuros(ex.charged)}.
+  </p>
+  <p class="example">
+    <span class="example__label">The figures</span> There cannot have been any increase yet, so the
+    maximum is the agreed amount, {formatEuros(ex.agreed)}. {formatEuros(ex.charged)} −{' '}
+    {formatEuros(ex.agreed)} = {formatEuros(ex.over)} over.
+  </p>
+  <p class="folio">
+    Art. <span>20</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Check what you are charged</h2>
+  <p>
+    The <a href={href(REVIEW.path)}>rental review</a> compares each charge for each year with the
+    agreed amount and with the cap on increases, and tells you how much you have paid over.
+  </p>
+</section>
