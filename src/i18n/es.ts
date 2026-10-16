@@ -1019,11 +1019,20 @@ export const es = {
   'client.documents.status.preparing': 'Preparando los archivos…',
   'client.documents.status.preparing_n': 'Preparando {k} de {total}…',
   'client.documents.status.captcha': 'Comprobando que no eres un robot…',
+  'client.documents.status.locating': 'Buscando las páginas útiles de {nombre}…',
+  'client.documents.status.locating_n':
+    'Preparando la página {k} de {total} para buscar las útiles…',
   'client.documents.status.reading':
     'Leyendo los documentos. Puede tardar hasta dos minutos si son muchas páginas.',
   'client.documents.photo': 'Foto {n}',
   'client.documents.pdf_page': '{nombre}, página {n}',
   'client.documents.pdf_page_detail': 'Página {n} de {total}',
+  'client.documents.pdf_long_detail': '{total} páginas: al leer se buscan las útiles',
+  'client.documents.pdf_long':
+    'Añadido: {nombre}. Tiene {total} páginas, más de las que caben: al leer se buscarán sus páginas útiles.',
+  'client.documents.located': 'De {nombre} se leen las páginas {paginas}.',
+  'client.documents.locate_failed':
+    'No se han podido buscar las páginas útiles de {nombre}: se leen sus páginas 1 a {k}.',
   'client.documents.pdf_added': 'Añadido: {nombre}. Páginas: {total}.',
   'client.documents.pdf_pages_fit':
     'De {nombre} caben las páginas 1 a {k} de {total}: como mucho 25 fotos o páginas en total.',
@@ -5545,14 +5554,13 @@ export const es = {
     'El pase vale para cualquier revisión de la web durante 7 días, solo en el navegador con el que pagas. Aquí se ofrece solo si algún gasto o comisión de tu revisión tiene cifra: las cláusulas solas no lo abren. Te deja descargar el informe en PDF, con cada gasto y comisión, su cuenta y cada norma y sentencia con su estado, y, si tu revisión tiene importes que fija la ley, la carta que pide al banco que los revise. La carta que pide la documentación de tu hipoteca es gratis. En otro dispositivo, en una ventana privada o si borras los datos de navegación, el pase se pierde.',
   'mortgage.documents.start_help':
     'Puedes subir tu escritura y tus facturas para rellenar los datos con lo que se lea en ellas, o escribirlos tú. Antes de revisar nada, confirmas cada dato y lees cada cláusula tal como está escrita.',
-  'mortgage.documents.upload':
-    'Sube las páginas útiles de tu escritura y, si las tienes, tus facturas',
+  'mortgage.documents.upload': 'Sube tu escritura y, si las tienes, tus facturas',
   'mortgage.documents.files_hint':
-    'Las páginas de la escritura que dice la guía y, si los tienes, las facturas de notaría, registro, gestoría y tasación, el modelo 600, la FEIN o la liquidación de una amortización, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+    'Tu escritura en PDF, entera, o fotos de las páginas que dice la guía y, si los tienes, las facturas de notaría, registro, gestoría y tasación, el modelo 600, la FEIN o la liquidación de una amortización, en el orden que sea. Se leen hasta 25 fotos o páginas en total: de una escritura en PDF más larga, de hasta 80 páginas, se buscan primero las útiles. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
   'mortgage.documents.consent':
     'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, DNI o domicilios, también de avalistas, y, si hay un seguro de vida vinculado, datos de salud. Se leen en la Unión Europea y no se guardan.',
   'mortgage.documents.guide.lead':
-    'Tu escritura puede tener 25-60 páginas. Sube la primera, las de cláusulas financieras (intereses, comisiones, gastos, demora, vencimiento) y tus facturas.',
+    'Tu escritura puede tener 25-60 páginas. Si la tienes en PDF, súbela entera: se buscan sus páginas útiles. Si le haces fotos, haz la primera, las de cláusulas financieras (intereses, comisiones, gastos, demora, vencimiento) y tus facturas.',
   'mortgage.documents.guide.first': 'La primera página',
   'mortgage.documents.guide.first_signs':
     'Empieza con el número de la escritura, el lugar, la fecha y el nombre del notario.',

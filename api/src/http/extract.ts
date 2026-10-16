@@ -1,7 +1,15 @@
 import type { Allowance } from '../domain/allowance';
 import { LIMITS, MEDIA_TYPES, type DocumentFile, type MediaType } from '../domain/documents';
 import { extract, type ExtractDeps, type ExtractRequest } from '../domain/extract';
-import type { Clock, Logger } from '../domain/ports';
+import {
+  isLocateReview,
+  LOCATE_LIMITS,
+  locate,
+  validHandoff,
+  type LocateDeps,
+  type LocateRequest,
+} from '../domain/locate';
+import type { Clock, Logger, PageLocator } from '../domain/ports';
 import type { ErrorCode } from '../domain/results';
 import { isReview, type ReviewKind } from '../domain/reviews';
 import { handle, type HttpEvent, type HttpResponse } from './common';
@@ -14,11 +22,17 @@ const isMediaType = (v: unknown): v is MediaType =>
 const isToken = (v: unknown): v is string =>
   typeof v === 'string' && v.length > 0 && v.length <= MAX_TOKEN_LENGTH;
 
-function toRequest(body: Record<string, unknown>): ExtractRequest<ReviewKind> | ErrorCode {
-  const { files, captchaToken, pass, quota, review } = body;
+function toRequest(
+  body: Record<string, unknown>,
+  maxImages: number,
+): ExtractRequest<ReviewKind> | ErrorCode {
+  const { files, pass, quota, review } = body;
+  // A read that follows a locate step proves itself with the handoff that step signed.
+  const captchaToken = body['captchaToken'] ?? body['handoff'];
   if (!Array.isArray(files) || !isToken(captchaToken)) return 'invalid_request';
+  if (body['captchaToken'] !== undefined && body['handoff'] !== undefined) return 'invalid_request';
   if (review !== undefined && !isReview(review)) return 'invalid_request';
-  if (files.length > LIMITS.maxImages) return 'too_many_files';
+  if (files.length > maxImages) return 'too_many_files';
 
   let allowance: Allowance;
   if (pass !== undefined) {
@@ -41,14 +55,43 @@ function toRequest(body: Record<string, unknown>): ExtractRequest<ReviewKind> | 
   return { files: decoded, captchaToken, allowance, ...(review !== undefined && { review }) };
 }
 
+function toLocateRequest(body: Record<string, unknown>): LocateRequest | ErrorCode {
+  const { review, maxPages } = body;
+  if (!isLocateReview(review) || body['handoff'] !== undefined) return 'invalid_request';
+  if (!Number.isInteger(maxPages) || (maxPages as number) < 1) return 'invalid_request';
+  if ((maxPages as number) > LIMITS.maxImages) return 'invalid_request';
+  const request = toRequest(body, LOCATE_LIMITS.maxImages);
+  if (typeof request === 'string') return request;
+  return { ...request, review, maxPages: maxPages as number };
+}
+
 export function handleExtract(
   event: HttpEvent,
-  deps: ExtractDeps & { readonly logger: Logger; readonly clock: Clock },
+  deps: ExtractDeps & {
+    readonly logger: Logger;
+    readonly clock: Clock;
+    readonly locate: { readonly locator: PageLocator; readonly model: string };
+  },
 ): Promise<HttpResponse> {
   return handle('extract', event, deps, async (body, metrics) => {
-    const request = toRequest(body);
+    if (body['step'] === 'locate') {
+      metrics.step = 'locate';
+      const request = toLocateRequest(body);
+      if (typeof request === 'string') return { code: request };
+      const locateDeps: LocateDeps = { ...deps, ...deps.locate };
+      return locate(request, locateDeps, metrics);
+    }
+    if (body['step'] !== undefined) return { code: 'invalid_request' };
+    const request = toRequest(body, LIMITS.maxImages);
     if (typeof request === 'string') return { code: request };
-    const response = await extract(request, deps, metrics);
+    const handoff = body['handoff'] !== undefined;
+    const captcha = handoff
+      ? {
+          verify: async (token: string) =>
+            validHandoff(token, request.review, deps.signer, deps.clock.now()),
+        }
+      : deps.captcha;
+    const response = await extract(request, { ...deps, captcha }, metrics);
     if (response.code !== 'ok') return response;
     return {
       code: 'ok',

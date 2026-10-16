@@ -107,7 +107,8 @@ export interface OpenedPdf {
   readonly pages: number;
   // `page` counts from 1. Rejects when the page can't be drawn; gives up on one that takes too
   // long, as a heavy scan or a crafted file can.
-  render(page: number, maxBytes: number): Promise<EncodedFile | 'pdf_too_slow'>;
+  // `longSide` is the photo size unless a locate step asks for less.
+  render(page: number, maxBytes: number, longSide?: number): Promise<EncodedFile | 'pdf_too_slow'>;
   // Frees what the reader holds for the document; its pages can't be drawn afterwards.
   close(): void;
 }

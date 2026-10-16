@@ -175,19 +175,25 @@ function hasMagic(file: DocumentFile): boolean {
 }
 
 // Counts and magic bytes only: cheap enough to run before the captcha.
-export function checkFileShapes(files: readonly DocumentFile[]): ErrorCode | null {
+export function checkFileShapes(
+  files: readonly DocumentFile[],
+  maxImages: number = LIMITS.maxImages,
+): ErrorCode | null {
   if (files.length === 0) return 'no_files';
-  if (files.length > LIMITS.maxImages) return 'too_many_files';
+  if (files.length > maxImages) return 'too_many_files';
   return files.every(hasMagic) ? null : 'image_unreadable';
 }
 
 // Parses image headers; runs only after the captcha.
-export function imageSizes(files: readonly DocumentFile[]): readonly ImageSize[] | ErrorCode {
+export function imageSizes(
+  files: readonly DocumentFile[],
+  maxLongSide: number = LIMITS.maxImageLongSide,
+): readonly ImageSize[] | ErrorCode {
   const sizes: ImageSize[] = [];
   for (const file of files) {
     const size = imageDimensions(file.bytes);
     if (size === null || size.format !== file.mediaType) return 'image_unreadable';
-    if (Math.max(size.width, size.height) > LIMITS.maxImageLongSide) return 'image_too_large';
+    if (Math.max(size.width, size.height) > maxLongSide) return 'image_too_large';
     sizes.push(size);
   }
   return sizes;

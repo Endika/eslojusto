@@ -12,6 +12,7 @@ import {
   LIMITS,
   PAGE_KINDS,
   READABILITY,
+  LOCATE_REVIEWS,
   type Api,
   type FailedCheck,
   type Conflict,
@@ -202,10 +203,13 @@ export function createApi<F extends string, L extends string>(
   const failed = (r: Record<string, unknown> | Failure): r is Failure => r['ok'] === false;
 
   return {
-    async extract({ files, captchaToken, pass, quota }) {
+    async extract(request) {
+      const { files, pass, quota } = request;
       const r = await post('extract', {
         files,
-        captchaToken,
+        ...('handoff' in request
+          ? { handoff: request.handoff }
+          : { captchaToken: request.captchaToken }),
         ...review,
         ...(pass === undefined ? { quota: quota ?? null } : { pass }),
       });
@@ -232,6 +236,27 @@ export function createApi<F extends string, L extends string>(
         escalated: typeof r['escalated'] === 'boolean' ? r['escalated'] : null,
       };
     },
+    ...(LOCATE_REVIEWS.includes(shape.review) && {
+      async locate({ files, captchaToken, maxPages, pass, quota }) {
+        const r = await post('extract', {
+          step: 'locate',
+          files,
+          captchaToken,
+          maxPages,
+          ...review,
+          ...(pass === undefined ? { quota: quota ?? null } : { pass }),
+        });
+        if (failed(r)) return r;
+        const { pages, handoff } = r;
+        const valid =
+          Array.isArray(pages) &&
+          pages.length > 0 &&
+          pages.length <= maxPages &&
+          pages.every((p) => Number.isInteger(p) && p >= 1 && p <= files.length);
+        if (!valid || !isToken(handoff)) return fail('unexpected_response');
+        return { ok: true, pages: [...new Set(pages as number[])].sort((a, b) => a - b), handoff };
+      },
+    }),
     async checkout(nonce, captchaToken) {
       const r = await post(
         'checkout',

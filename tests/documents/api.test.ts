@@ -13,6 +13,10 @@ import {
   LIMITS as API_LIMITS,
   ALL_PAGE_KINDS as API_PAGE_KINDS,
 } from '../../api/src/domain/documents';
+import {
+  LOCATE_LIMITS as API_LOCATE_LIMITS,
+  LOCATE_REVIEWS as API_LOCATE_REVIEWS,
+} from '../../api/src/domain/locate';
 import { ALL_READABILITY as API_READABILITY } from '../../api/src/domain/extraction-schema';
 import type { ElectricityCheck as ApiElectricityCheck } from '../../api/src/domain/electricity-checks';
 import { ELECTRICITY_MERGE_RULES } from '../../api/src/domain/electricity-merge';
@@ -40,6 +44,8 @@ import {
   INSURANCE_CHECKS,
   INSURANCE_EXTRACTION,
   LIMITS,
+  LOCATE_LIMITS,
+  LOCATE_REVIEWS,
   MORTGAGE_CHECKS,
   MORTGAGE_EXTRACTION,
   PAGE_KINDS,
@@ -476,6 +482,68 @@ describe('an employment read', () => {
     });
     const result = await createApi(ENDPOINTS, fetch, EMPLOYMENT_EXTRACTION).extract(request);
     expect(result.ok && 'truncated' in result.extraction).toBe(false);
+  });
+});
+
+describe('the locate step of a long PDF', () => {
+  const files = Array.from({ length: 30 }, () => ({
+    mediaType: 'image/jpeg' as const,
+    data: 'AA==',
+  }));
+  const ask = (fetchFn: Fetch) =>
+    createApi(ENDPOINTS, fetchFn, MORTGAGE_EXTRACTION).locate?.({
+      files,
+      captchaToken: 'captcha',
+      maxPages: 24,
+      quota: null,
+    });
+
+  it('exists for the reviews the API locates for, with the API’s limits', () => {
+    expect(LOCATE_REVIEWS).toEqual(API_LOCATE_REVIEWS);
+    expect(LOCATE_LIMITS.maxPages).toBe(API_LOCATE_LIMITS.maxImages);
+    expect(LOCATE_LIMITS.imageLongSide).toBeLessThanOrEqual(API_LOCATE_LIMITS.maxImageLongSide);
+    expect(createApi(ENDPOINTS, fakeFetch(200, {}), MORTGAGE_EXTRACTION).locate).toBeDefined();
+    expect(createApi(ENDPOINTS, fakeFetch(200, {}), RENTAL_EXTRACTION).locate).toBeUndefined();
+  });
+
+  it('posts to extract with its step, review and places, and returns the pages in order', async () => {
+    const fetchFn = fakeFetch(200, { code: 'ok', pages: [20, 3, 4], handoff: 'v1.h' });
+    expect(await ask(fetchFn)).toEqual({ ok: true, pages: [3, 4, 20], handoff: 'v1.h' });
+    expect(fetchFn.calls[0]?.url).toBe(ENDPOINTS.extract);
+    expect(fetchFn.calls[0]?.body).toEqual({
+      step: 'locate',
+      files,
+      captchaToken: 'captcha',
+      maxPages: 24,
+      review: 'mortgage',
+      quota: null,
+    });
+  });
+
+  it('an answer without pages, with too many or out of range, or without a handoff is unexpected', async () => {
+    for (const body of [
+      { code: 'ok', pages: [], handoff: 'h' },
+      { code: 'ok', pages: Array.from({ length: 25 }, (_, i) => i + 1), handoff: 'h' },
+      { code: 'ok', pages: [31], handoff: 'h' },
+      { code: 'ok', pages: [1.5], handoff: 'h' },
+      { code: 'ok', pages: [1] },
+    ])
+      expect(await ask(fakeFetch(200, body))).toEqual({ ok: false, code: 'unexpected_response' });
+    expect(await ask(fakeFetch(503, { code: 'model_unavailable' }))).toEqual({
+      ok: false,
+      code: 'model_unavailable',
+    });
+  });
+
+  it('a read after it sends the handoff in place of the captcha', async () => {
+    const fetchFn = fakeFetch(503, { code: 'model_unavailable' });
+    await createApi(ENDPOINTS, fetchFn, MORTGAGE_EXTRACTION).extract({
+      files,
+      handoff: 'v1.h',
+      quota: null,
+    });
+    expect(fetchFn.calls[0]?.body).toMatchObject({ handoff: 'v1.h', review: 'mortgage' });
+    expect(fetchFn.calls[0]?.body).not.toHaveProperty('captchaToken');
   });
 });
 

@@ -15,12 +15,11 @@ import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import type { Construct } from 'constructs';
 import {
-  ESCALATION_MODEL,
   EXTRACT_TIMEOUT_SECONDS,
   EU_PROFILE_DESTINATIONS,
   FUNCTION_NAMES,
+  INVOKED_MODELS,
   PARAMETER_NAMES,
-  PRIMARY_MODEL,
   REGION,
   ROLE_NAMES,
   SITE_ORIGIN,
@@ -178,7 +177,7 @@ export class GlobalStack extends Stack {
         },
       });
 
-    const models = [...new Set([PRIMARY_MODEL, ESCALATION_MODEL])];
+    const models = INVOKED_MODELS;
     const profileArns = models.map((m) => regional('bedrock', `inference-profile/${m}`));
     const extractRole = lambdaRole('extract', [
       new iam.PolicyStatement({ actions: ['bedrock:InvokeModel'], resources: profileArns }),

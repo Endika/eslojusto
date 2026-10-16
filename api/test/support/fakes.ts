@@ -6,6 +6,7 @@ import type {
   LogEvent,
   Logger,
   ModelRead,
+  PageLocator,
   PaymentVerifier,
   SessionSnapshot,
 } from '../../src/domain/ports';
@@ -30,6 +31,18 @@ export class FakeReader implements DocumentReader {
     if (answer === undefined) throw new Error(`No answer for ${request.model}`);
     if (answer instanceof Error) throw answer;
     return answer;
+  }
+}
+
+export const LOCATE = 'locate-model';
+
+export class FakeLocator implements PageLocator {
+  readonly calls: Parameters<PageLocator['locate']>[0][] = [];
+  constructor(private readonly answer: Answer = read({ pages: [] })) {}
+  async locate(request: Parameters<PageLocator['locate']>[0]) {
+    this.calls.push(request);
+    if (this.answer instanceof Error) throw this.answer;
+    return this.answer;
   }
 }
 
