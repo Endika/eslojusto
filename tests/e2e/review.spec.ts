@@ -54,6 +54,22 @@ test('the case pages are under review too, and link within the language', async 
   await expect(page.locator('.next-pages a').first()).toHaveAttribute('href', '/eu/finiquito/');
 });
 
+test('the ERTE page works under review too, with its script and the hub in the language', async ({
+  page,
+}) => {
+  await page.goto('eu/paro/');
+  await page.locator('a[href="/eu/paro/erte/"]').first().click();
+  await expect(page).toHaveURL(/\/eu\/paro\/erte\/$/);
+  await expect(page.locator('.review-banner')).toBeVisible();
+  await page.locator('#regime-force_majeure').check();
+  await page.locator('#measure-suspension').check();
+  await page.locator('#base').fill('1.500,00');
+  await page.locator('#children-0').check();
+  await page.locator('#erte-form button[type="submit"]').click();
+  await expect(page.locator('#erte-result [data-result-blocks] h3').first()).toBeVisible();
+  await expect(page.locator('#erte-result')).toContainText('1.050');
+});
+
 test('the Spanish pages neither link nor offer it', async ({ page }) => {
   await page.goto('');
   await expect(page.locator('.review-banner')).toHaveCount(0);

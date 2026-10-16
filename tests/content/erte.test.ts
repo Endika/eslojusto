@@ -9,6 +9,8 @@ import {
 } from '../../src/content/erte';
 import { estimateErte, type ErteInput } from '../../src/engine/erte';
 import { FORBIDDEN } from '../support/forbidden';
+import { existsSync } from 'node:fs';
+import { LANGS, type Lang } from '../../src/i18n/languages';
 
 const view = (input: ErteInput) => ertePositiveView(input, estimateErte(input));
 const text = (input: ErteInput) =>
@@ -134,5 +136,14 @@ describe('ERTE copy gives no advice', () => {
       view({ ...base, regime: 'red' }),
     ]).toLowerCase();
     for (const forbidden of FORBIDDEN) expect(all).not.toMatch(forbidden);
+  });
+});
+
+describe('the ERTE page in other languages', () => {
+  // A published language can't lean on the Spanish copy.
+  it('every published language has its own copy', () => {
+    const published = (Object.keys(LANGS) as Lang[]).filter((i) => LANGS[i].published);
+    for (const lang of published)
+      expect(existsSync(`src/content/erte/${lang}.ts`), lang).toBe(true);
   });
 });

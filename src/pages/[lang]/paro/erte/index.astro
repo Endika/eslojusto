@@ -1,0 +1,18 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { ERTE_BUILD } from '../../../../content/sections';
+import { langPaths, type Lang } from '../../../../i18n/languages';
+
+export const getStaticPaths = (() => (ERTE_BUILD ? langPaths() : [])) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+// As on the Spanish route, the literal switch keeps the page out of a build without it.
+/* eslint-disable no-restricted-syntax -- a fixed path into src/views, not a boundary escape */
+const Erte =
+  import.meta.env.PUBLIC_ERTE === '1'
+    ? (await import('../../../../views/Erte.astro')).default
+    : null;
+/* eslint-enable no-restricted-syntax */
+---
+
+{Erte && <Erte lang={lang} />}

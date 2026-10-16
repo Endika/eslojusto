@@ -53,7 +53,7 @@ const port = Number(process.env['E2E_PORT'] ?? 4321);
 const buildEnv = {
   ...(rental || documents || analytics ? { PUBLIC_RENTAL: '1' } : {}),
   ...(employment || documents || analytics ? { PUBLIC_EMPLOYMENT: '1' } : {}),
-  ...(erte ? { PUBLIC_ERTE: '1' } : {}),
+  ...(erte || review ? { PUBLIC_ERTE: '1' } : {}),
   // The household, insurance and credit projects also measure their own events, so their builds
   // have a test analytics key.
   ...(household || review ? { PUBLIC_HOUSEHOLD: '1' } : {}),
