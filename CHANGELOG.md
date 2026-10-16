@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.72.0](https://github.com/Endika/eslojusto/compare/v1.71.0...v1.72.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** give the legal notice and the privacy page a route and their prose per language ([b5419ae](https://github.com/Endika/eslojusto/commit/b5419aeb54cbc7970b5b799f4419152d2b09e300))
+
 ## [1.71.0](https://github.com/Endika/eslojusto/compare/v1.70.0...v1.71.0) (2026-10-16)
 
 
