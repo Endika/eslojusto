@@ -15,9 +15,10 @@ export const HOUSEHOLD_BUILD = import.meta.env.PUBLIC_HOUSEHOLD === '1';
 export const HOUSEHOLD_BETA = true;
 
 // /seguros/, the dates of a home or motor policy, is built only when PUBLIC_INSURANCE=1, on the
-// same terms; it opens as a beta.
+// same terms; it left the beta after a real home policy and its renewal notice read and reviewed
+// right.
 export const INSURANCE_BUILD = import.meta.env.PUBLIC_INSURANCE === '1';
-export const INSURANCE_BETA = true;
+export const INSURANCE_BETA = false;
 
 // /financiacion/, a consumer credit's APR, average-rate indicator and dates, is built only when
 // PUBLIC_CREDIT=1, on the same terms; it left the beta after a real contract read and reviewed right.

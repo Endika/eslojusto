@@ -307,3 +307,18 @@ test('analytics carry codes and buckets, never a typed value', async ({ page }) 
   for (const typed of ['300,00', '345,00', '2027-03-01', '01-03-2027', '2026-10-01'])
     expect(everything, typed).not.toContain(typed);
 });
+
+test('the home page and the legal notice show the insurance review out of beta', async ({
+  page,
+}) => {
+  await page.goto('');
+  const card = page.getByRole('article', { name: 'Seguros' });
+  await expect(card.getByRole('link', { name: 'Seguros' })).toBeVisible();
+  await expect(card.getByText('Beta')).toHaveCount(0);
+  await page.goto('seguros/');
+  await expect(page.locator('main')).not.toContainText('Sección en pruebas');
+  await page.goto('aviso-legal/');
+  await expect(
+    page.getByRole('heading', { name: /La revisión de las fechas de tu seguro/ }),
+  ).not.toContainText('Beta');
+});
