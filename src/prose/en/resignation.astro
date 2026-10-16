@@ -1,0 +1,97 @@
+---
+// source: af62c96628b9
+import CaseLink from '../../components/CaseLink.astro';
+import { itemRange, resignation } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const salary = itemRange(resignation, 'pending_salary');
+const holidays = itemRange(resignation, 'holiday_pay');
+const extraPay = itemRange(resignation, 'extra_pay');
+const deduction = itemRange(resignation, 'notice_deduction');
+if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="bv-que-lleva">What the final settlement after resignation includes</h3>
+  <p>
+    Handing in your resignation (baja voluntaria) means the contract ends by your decision (art.
+    49.1.d ET). Even though you are the one leaving, what you have already earned and not yet been
+    paid is due to you from the employer:
+  </p>
+  <ul>
+    <li>Pay for the days worked in the last month (art. 26 ET).</li>
+    <li>Holiday accrued this year and not taken (art. 38 ET).</li>
+    <li>
+      The accrued part of the extra payments (pagas extra), if they are not spread over your monthly
+      payslips (art. 31 ET).
+    </li>
+  </ul>
+  <p>
+    What there is not is severance pay: resignation does not give rise to it (art. 49.1.d ET). All
+    the figures are gross, before tax withholding and contributions.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d · 26 · 31 · 38</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-preaviso">The notice period in your collective agreement</h3>
+  <p>
+    When you resign, you have to give the notice period set by your collective agreement (convenio)
+    or by local custom (art. 49.1.d ET). If your collective agreement provides for it and you do not
+    give it, the employer can deduct the missing days from the final settlement, at your daily pay
+    rate.
+  </p>
+  <p>
+    The calculator asks you how many days your collective agreement sets and how many you gave, and
+    gives the maximum deduction. If you do not know your collective agreement’s figure, that
+    deduction comes out as “cannot be checked”.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-ejemplo">Worked example</h3>
+  <p>
+    A person earning 1.500&nbsp;€ gross a month, with two extra payments of 1.500&nbsp;€ that accrue
+    by half-year, works from 1 March 2023 to 15 October 2026. This year they have taken 10 of their
+    22 working days of holiday. Their collective agreement sets 15 days’ notice and they leave
+    without giving it. These are the calculator’s figures:
+  </p>
+  <ul>
+    <li>
+      October pay: {euroRange(salary)}, depending on whether the month is counted as 30 days or 31.
+    </li>
+    <li>Untaken holiday: {euroRange(holidays)}.</li>
+    <li>Christmas extra payment accrued since July: {euroRange(extraPay)}.</li>
+    <li>Severance pay: {euros(0)}.</li>
+    <li>Deduction for the notice not given: at most {euros(deduction.max)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">The sums</span> The range for each item comes from counting by days
+    or by months, as employers do. The deduction is 15 days at {euros(deduction.max / 15)} a day,
+    the higher of the two daily pay rates: monthly pay divided by 30 or annual pay divided by 365.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-paro">And unemployment benefit</h3>
+  <p>
+    A resignation is not a legal situation of unemployment, so, as a general rule, it does not give
+    you unemployment benefit (paro) (art. 267.2.a LGSS). There are exceptions, such as leaving
+    because of a relocation or serious non-payment. You will find them in{' '}
+    <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

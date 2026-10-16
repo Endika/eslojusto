@@ -117,3 +117,14 @@ describe('a translation stays on today’s Spanish', () => {
     },
   );
 });
+
+describe('the spans of the example tables', () => {
+  it('read in Spanish as the labels they replace', async () => {
+    const { bySeniority, durationByTime, fixedTerms, spanLabel } =
+      await import('../../src/content/examples');
+    for (const row of [...bySeniority, ...durationByTime])
+      expect(spanLabel(row.months, 'es')).toBe(row.label);
+    for (const row of fixedTerms) expect(spanLabel(row.months, 'es', 'months')).toBe(row.label);
+    expect(spanLabel(24, 'en')).toBe('2 years');
+  });
+});

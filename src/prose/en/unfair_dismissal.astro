@@ -1,0 +1,105 @@
+---
+// source: 6ba110cf70a7
+import CaseLink from '../../components/CaseLink.astro';
+import { severanceMonths, unfairAfter2012, unfairBefore2012 } from '../../content/examples';
+import { euros, integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const [months = 0] = severanceMonths(unfairAfter2012.calculation);
+const [first = 0, second = 0] = severanceMonths(unfairBefore2012.calculation);
+const decimal = (n: number) => String(n).replace('.', ',');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="di-tramos">33 days per year, with a cap of 720</h3>
+  <p>
+    If the dismissal is acknowledged or declared unfair (improcedente), the severance pay is 33
+    days’ pay per year worked, up to a maximum of 24 monthly payments, which is 720 days (art. 56.1
+    ET). Time is counted in months, and part of a month counts as a whole month: 33 days a year is
+    2,75 days per month.
+  </p>
+  <p>
+    Your pay for each day is your annual pay, including the extra payments, divided by 365, as the
+    CGPJ guide does. The calculator gives the figure to the cent and compares it with your
+    employer’s.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-2012">If you started before 12 February 2012</h3>
+  <p>The severance pay is calculated in two periods (transitional provision 11.ª ET):</p>
+  <ul>
+    <li>Up to 11 February 2012, 45 days per year (3,75 per month).</li>
+    <li>From 12 February 2012, 33 days per year (2,75 per month).</li>
+  </ul>
+  <p>
+    The total is capped at 720 days, unless the first period already goes beyond that. In that case
+    only the first period counts, up to a maximum of 42 monthly payments (1.260 days).
+  </p>
+  <p class="folio">
+    Transitional provision <span>11.ª</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-ejemplo">Worked examples</h3>
+  <p>
+    A person earning 1.500&nbsp;€ gross a month with two extra payments of 1.500&nbsp;€,
+    21.000&nbsp;€ a year. Their daily pay is 21.000&nbsp;€ / 365 ={' '}
+    {euros(unfairAfter2012.dailySalary)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Contract from 2018</span> From 3 May 2018 to 20 July 2026,
+    {integer(months)} months count. {integer(months)} × 2,75 = {decimal(unfairAfter2012.salaryDays)}{' '}
+    days. 21.000&nbsp;€ × {decimal(unfairAfter2012.salaryDays)} / 365 ={' '}
+    {euros(unfairAfter2012.amount)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Contract from 2010</span> From 1 March 2010 to 15 September 2026.
+    First period: {integer(first)} months × 3,75 = {decimal(first * 3.75)} days. Second period:
+    {integer(second)} months × 2,75 = {decimal(second * 2.75)} days. Total:{' '}
+    {integer(unfairBefore2012.salaryDays)} days, below the cap. 21.000&nbsp;€ ×{' '}
+    {integer(unfairBefore2012.salaryDays)} / 365 = {euros(unfairBefore2012.amount)}.
+  </p>
+  <p>
+    The severance pay is separate from the final settlement (finiquito), which adds up the last
+    month’s pay, untaken holiday and the accrued extra payments. The calculator reviews it all
+    together.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-readmision">Reinstatement or severance pay</h3>
+  <p>
+    When a dismissal is declared unfair, the employer chooses within five days between reinstating
+    you or paying you the severance pay (art. 56.1 ET). If it reinstates you, it also has to pay you
+    back pay for the duration of proceedings (salarios de tramitación): the pay you did not receive
+    from the dismissal onwards (art. 56.2 ET). If you are one of the workers’ legal representatives
+    or a trade union delegate, the choice is yours (art. 56.4 ET).
+  </p>
+  <p>
+    This review does not calculate back pay for the duration of proceedings, nor does it decide
+    whether a dismissal is unfair: that is declared by a court or acknowledged by the employer.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-otros">Other dismissals</h3>
+  <p>
+    An objective-grounds dismissal is paid at 20 days per year, with 15 days’ notice: you will find
+    it in <CaseLink lang={lang} id="objective_dismissal" />. Any dismissal, including a disciplinary
+    one, is a legal situation of unemployment: <CaseLink lang={lang} id="benefit_disciplinary" />{' '}
+    explains which ways of leaving a job give you unemployment benefit.
+  </p>
+</section>

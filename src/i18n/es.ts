@@ -7339,6 +7339,9 @@ export const es = {
     'El {day} es el día justo después: un festivo de tu comunidad podría mover un día la baja, así que se muestra sin sumar.',
 
   'case.next': 'Sigue leyendo',
+  'span.months': '{n} meses',
+  'span.year': '{n} año',
+  'span.years': '{n} años',
   'final_pay.app_name': 'Calculadora de finiquito',
   'rental.topic.example': 'Ejemplo.',
   'rental.topic.norms': 'Normas',

@@ -1,0 +1,92 @@
+---
+// source: 47084c570826
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitAfterDismissal, benefitAfterResignation } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const dismissal = benefitAfterDismissal;
+if (dismissal.entitled !== 'yes' || dismissal.figures === null)
+  throw new Error('Incomplete example');
+const resignationGivesBenefit = benefitAfterResignation.entitled === 'yes';
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-regla">The rule: leaving by your own decision does not give unemployment benefit</h3>
+  <p>
+    To receive unemployment benefit (paro), the contract has to end in a legal situation of
+    unemployment. Leaving your job voluntarily is not one (art. 267.2.a LGSS), so a resignation
+    (baja voluntaria), as a general rule, does not give unemployment benefit, even if you have the
+    days of contributions.
+  </p>
+  <p class="folio">
+    Art. <span>267.2.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-excepciones">When leaving does give unemployment benefit</h3>
+  <p>
+    The law treats leaving by your own decision as a legal situation of unemployment in these cases
+    (art. 267.1.a.5.º LGSS):
+  </p>
+  <ul>
+    <li>A relocation to another workplace that requires you to move home (art. 40 ET).</li>
+    <li>A substantial change to your conditions that harms you (art. 41.3 ET).</li>
+    <li>
+      A serious breach by the employer, such as not paying you or paying you late again and again
+      (art. 50 ET). This departure is usually declared by a court.
+    </li>
+    <li>Gender-based violence or sexual violence (art. 49.1.m ET).</li>
+  </ul>
+  <p class="folio">
+    Art. <span>267.1.a.5.º</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-nuevo">If you then start another job</h3>
+  <p>
+    What counts is how your last contract ends. If the new job ends with a dismissal or with the end
+    of a fixed-term contract, that ending is a legal situation of unemployment (art. 267.1.a LGSS).
+  </p>
+  <p>
+    The law sets out one case separately: if the new employer ends the contract during the trial
+    period, that is a legal situation of unemployment only if three months have passed since your
+    resignation (art. 267.1.a.7.º LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>267.1.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-ejemplo">Example: the same contract, two endings</h3>
+  <p>
+    A person earning 1.500&nbsp;€ gross a month with two extra payments of 1.500&nbsp;€ works from 1
+    September 2023 to 31 August 2026, with no dependent children.
+  </p>
+  <p class="example">
+    <span class="example__label">If they resign</span>{' '}
+    {resignationGivesBenefit
+      ? 'The calculator estimates unemployment benefit.'
+      : 'The calculator answers that it gives no entitlement to unemployment benefit (art. 267.2.a LGSS).'}{' '}
+    They still have a final settlement: outstanding pay, holiday and extra payments.
+  </p>
+  <p class="example">
+    <span class="example__label">If they are dismissed</span> With {integer(dismissal.contractDays)}
+    days of contributions, they are entitled to at least {integer(dismissal.duration.days)} days of
+    unemployment benefit, about {wholeEuros(dismissal.figures.firstStretch.min)} a month for the
+    first 6 months and about {wholeEuros(dismissal.figures.secondStretch.min)} after that, gross.
+  </p>
+  <p>
+    The calculator on this page comes with resignation selected. If your case is different, change
+    the reason on the first sheet. More on the final settlement in{' '}
+    <CaseLink lang={lang} id="resignation" />.
+  </p>
+</section>

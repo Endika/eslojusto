@@ -1,0 +1,101 @@
+---
+// source: e288ce65363a
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { BENEFIT_SCALE, durationByTime, spanLabel } from '../../content/examples';
+import { integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+// Each row runs from its own threshold to the day before the next one; the last has no end.
+const rows = BENEFIT_SCALE.map(([from, days], i) => ({
+  from,
+  to: BENEFIT_SCALE[i + 1]?.[0],
+  days,
+}));
+const months = (days: number) => integer(days / 30);
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pt-escala">The full scale</h3>
+  <p>
+    How long unemployment benefit (paro) lasts depends on the days of unemployment contributions in
+    the previous 6 years that you have not already used for another period of benefit (art. 269.1
+    LGSS). All your jobs in that time count, not just the last one.
+  </p>
+  <FigureTable id="pt-tabla">
+    <Fragment slot="caption">
+      Days of contributions in the last 6 years and days of benefit.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Days of contributions</th>
+        <th scope="col">Days of benefit</th>
+        <th scope="col">Months</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(({ from, to, days }) => (
+        <tr>
+          <th scope="row">
+            {to === undefined
+              ? `${integer(from)} or more`
+              : `From ${integer(from)} to ${integer(to - 1)}`}
+          </th>
+          <td>{integer(days)}</td>
+          <td>{months(days)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    With fewer than 360 days of contributions there is no contributory benefit. Untaken holiday paid
+    in the final settlement also counts as days of contributions (art. 269.4 LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>269</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pt-ejemplos">Examples: from 6 months to 6 years</h3>
+  <p>
+    A single contract ending on 31 August 2026, with no other jobs in the previous 6 years and no
+    other unemployment benefit received:
+  </p>
+  <FigureTable id="pt-ejemplos-tabla">
+    <Fragment slot="caption">Time worked, days of contributions and unemployment benefit.</Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Time worked</th>
+        <th scope="col">Days of contributions</th>
+        <th scope="col">Days of benefit</th>
+      </tr>
+    </thead>
+    <tbody>
+      {durationByTime.map(({ months: span, days, benefitDays }) => (
+        <tr>
+          <th scope="row">{spanLabel(span, lang)}</th>
+          <td>{integer(days)}</td>
+          <td>
+            {benefitDays === 0
+              ? 'Does not reach 360'
+              : `${integer(benefitDays)} (${months(benefitDays)} months)`}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    With 6 months you do not reach the 360 days, but if you worked elsewhere in the previous 6
+    years, those days add up. That is why the calculator asks you about other jobs and links you to
+    your employment history (vida laboral), which shows all your days of contributions.
+  </p>
+  <p>
+    The amount for each month is in <CaseLink lang={lang} id="benefit" />.
+  </p>
+</section>
