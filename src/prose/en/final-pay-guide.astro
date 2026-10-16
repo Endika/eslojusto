@@ -1,0 +1,585 @@
+---
+// source: 169eec130c4d
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { faqEntries } from '../../content/faq';
+import { bySeniority, spanLabel } from '../../content/examples';
+import { wholeEuroRange, wholeEuros } from '../../content/format';
+import { LANDINGS, type LandingId } from '../../content/landings';
+import { ET, SOURCES, LGSS } from '../../engine/sources';
+import { DOCUMENTS } from '../../documents/config';
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+const tx = (key: Key) => t(lang, key);
+
+// The guide under the calculator of /finiquito/, in Spanish: headings and labels from the
+// dictionary, the prose, the rules and the worked examples here. Another language's guide is a
+// translated copy of this file in src/prose/<lang>/.
+const causes: { title: string; rule: string; citation: string; page?: LandingId }[] = [
+  {
+    title: tx('guide.unfair_dismissal'),
+    rule: '33 days per year worked, with a cap of 24 monthly payments (720 days).',
+    citation: 'Art. 56 ET',
+    page: 'unfair_dismissal',
+  },
+  {
+    title: tx('guide.objective_dismissal'),
+    rule: '20 days per year, with a cap of 12 monthly payments (360 days, STS 651/2026). On top of that, 15 days’ notice, and any of those days the employer does not give are paid.',
+    citation: 'Art. 53 ET',
+    page: 'objective_dismissal',
+  },
+  {
+    title: tx('guide.collective_dismissal'),
+    rule: 'At least the same as an objective-grounds dismissal: 20 days per year, with a cap of 12 monthly payments, and 15 days’ notice. The ERE agreement can improve on it; the review does not know it and gives the minimum.',
+    citation: 'Arts. 51.2, 51.4 and 53.1 ET',
+  },
+  {
+    title: tx('guide.fixed_term_end'),
+    rule: '12 days per year, in proportion to the days worked. If it started in 2011 or earlier, 8 days; in 2012, 9; in 2013, 10; in 2014, 11. Replacement contracts (sustitución) and training contracts carry no severance pay, nor do those signed before 4 March 2001. If it lasted more than a year, 15 days’ notice.',
+    citation: 'Art. 49.1.c ET and transitional provision 8.ª',
+    page: 'fixed_term_end',
+  },
+  {
+    title: tx('guide.resignation'),
+    rule: 'No severance pay. If your collective agreement sets a notice period and you do not give it, the employer can deduct the missing days.',
+    citation: 'Art. 49.1.d ET',
+    page: 'resignation',
+  },
+  {
+    title: tx('guide.disciplinary_dismissal'),
+    rule: 'No severance pay if it is declared fair (procedente). If it is declared unfair (improcedente), it is calculated as an unfair dismissal.',
+    citation: 'Arts. 55.7 and 56 ET',
+  },
+];
+
+const unchecked = [
+  'Net pay: IRPF (income tax) withholdings and Social Security contributions.',
+  'Bonuses, supplements, overtime and commissions under your collective agreement or your contract.',
+  'Extra payments beyond the two ordinary ones.',
+  'Whether the reason for the dismissal is justified, which is for a court to decide.',
+  'Back pay for the dismissal proceedings (salarios de tramitación).',
+  'Anything an ERE agreement adds on top of the legal minimum.',
+];
+
+// The case pages, in the order of the map: the finiquito ones, then the pages on the benefit.
+const caseLinks: readonly LandingId[] = [
+  'resignation',
+  'unfair_dismissal',
+  'objective_dismissal',
+  'fixed_term_end',
+  'not_agreed',
+];
+
+// The same report the result links to.
+const workHistoryUrl =
+  'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
+const benefitSources = [
+  SOURCES.lgss267,
+  SOURCES.lgss268,
+  SOURCES.lgss269,
+  SOURCES.lgss270,
+  SOURCES.sepeAmounts,
+].map(({ citation, url, inForceSince, effectiveFrom }) => ({
+  citation,
+  url,
+  inForce: t(lang, effectiveFrom ? 'client.source.effective_from' : 'client.source.in_force', {
+    fecha: inForceSince.split('-').reverse().join('-'),
+  }),
+}));
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('guide.title')}
+    </h2>
+    <p class="guide__lead">
+      What a final settlement (finiquito) includes and where each figure comes from, with its
+      article. The examples use a pay of 1.500&nbsp;€ gross a month and two extra payments of
+      1.500&nbsp;€, which add up to 21.000&nbsp;€ a year.
+    </p>
+    <p class="guide__sources">
+      <span>{tx('guide.updated')}</span>
+      <span>
+        {tx('guide.sources')}: <a href={ET}>{tx('guide.source_et')}</a> ·{' '}
+        <a href={SOURCES.cgpjGuide.url}>{tx('guide.source_cgpj')}</a> ·{' '}
+        <a href={LGSS}>{tx('guide.source_lgss')}</a> ·{' '}
+        <a href={SOURCES.sepeAmounts.url}>{tx('guide.source_sepe')}</a>
+      </span>
+      <a href={link(lang, 'aviso-legal/')}>{tx('guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    <section class="sheet sheet--text">
+      <h3 id="g-que-lleva">{tx('guide.what_it_includes')}</h3>
+      <p>
+        When your contract ends, the employer gives you a proposed settlement statement (documento
+        de liquidación) with the amounts due to you (art. 49.2 ET). That is the final settlement,
+        and it covers what you have already earned and not yet been paid:
+      </p>
+      <ul>
+        <li>Your pay for the days worked in the last month (art. 26 ET).</li>
+        <li>The holiday you have accrued and not taken (art. 38 ET).</li>
+        <li>
+          The accrued share of the extra payments (pagas extra), if they are not spread over your
+          monthly payslips (art. 31 ET).
+        </li>
+        <li>Any days of notice the employer has not given, when the law requires notice.</li>
+      </ul>
+      <p>
+        If the contract ends with a right to severance pay, the settlement statement can include it
+        too, but legally it is a separate amount from the final settlement, with its own rules and
+        time limits. All the figures are gross, before withholdings and contributions.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-diferencia">{tx('guide.difference')}</h3>
+      <p>
+        You are entitled to the final settlement whenever the contract ends, including when you are
+        the one leaving, because it is money you have already earned. Severance pay compensates for
+        the end of the contract and depends on the reason.
+      </p>
+      <p>
+        A resignation does not give rise to severance pay (art. 49.1.d ET). Nor does a disciplinary
+        dismissal declared fair (procedente) (art. 55.7 ET); if it is declared unfair
+        (improcedente), it is calculated as an unfair dismissal.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 55.7</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-casos">{tx('guide.cases')}</h3>
+      <p>Each reason has its own rules. We explain them with a worked example:</p>
+      <ul>
+        {caseLinks.map((id) => (
+          <li>
+            <CaseLink lang={lang} id={id} />
+          </li>
+        ))}
+      </ul>
+      <p>
+        And unemployment benefit, with its own page: <CaseLink lang={lang} id="benefit" />.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-salario">{tx('guide.salary')}</h3>
+      <p>
+        This covers the days worked in the month the contract ends. A day can be worth your monthly
+        pay divided by 30 (a commercial month) or by the number of days in that month (a calendar
+        month). The review gives the range between the two calculations.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Leaving on 15 October:
+        1.500&nbsp;€ × 15/30 = 750,00&nbsp;€, or 1.500&nbsp;€ × 15/31 = 725,81&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>26</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-vacaciones">{tx('guide.holidays')}</h3>
+      <p>
+        The minimum is thirty calendar days a year (art. 38.1 ET). The review takes them as 22
+        working days with a Monday-to-Friday week, 26 with a Monday-to-Saturday week and 30 × days /
+        7 with any other week: these are equivalences, not the text of the law. Your collective
+        agreement or your contract can give more. Holiday accrues with each day worked, and the
+        final settlement includes this year’s holiday that you have not taken. Many employers count
+        it by months (2,5 days per month with 30 a year) rather than by days, and the review gives
+        the range between the two calculations. Each day is paid at between your monthly pay / 30
+        and your annual pay / 365.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Leaving on 15 October 2026: 288
+        days worked in the year. 30 × 288/365 = 23,67 days accrued. If you have taken 15, about 8,67
+        days remain: between (30 × 288/365 − 15) × 1.500&nbsp;€/30 = 433,56&nbsp;€ and (30 × 288/365
+        − 15) × 21.000&nbsp;€/365 = 498,89&nbsp;€.
+      </p>
+      <p>
+        If you have taken more days than you have accrued, whether a deduction applies depends on
+        the collective agreement.
+      </p>
+      <p class="folio">
+        Art. <span>38</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-pagas">{tx('guide.extra_pay')}</h3>
+      <p>
+        The law sets two extra payments (pagas extra) a year, and the collective agreement sets
+        their amount and how they accrue. If they are spread over your monthly payslips, you have
+        already been paid them month by month. If not, the final settlement includes the share
+        accrued since their period began: half-yearly (January to June and July to December) or
+        yearly (July to June for the summer one, January to December for the Christmas one). It can
+        be counted by days or by months, and the review gives the range between the two
+        calculations. If you leave in the month a payment is made (June or July for the summer one,
+        December for the Christmas one), it may already be in that payslip.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> A Christmas extra payment of
+        1.500&nbsp;€ with a half-yearly period, leaving on 15 October: from 1 July to 15 October is
+        107 of 184 days. 1.500&nbsp;€ × 107/184 = 872,28&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>31</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-indemnizacion">{tx('guide.severance')}</h3>
+      <p>
+        It is counted in days’ pay. The daily pay is your annual pay, including the extra payments,
+        divided by 365, as the CGPJ guide does. In the example, 21.000&nbsp;€ / 365 ≈ 57,53&nbsp;€.
+        The examples multiply by the exact figure, without rounding. In dismissals, the time worked
+        is counted in months, and part of a month counts as a whole month. If you are dismissed
+        during an ERTE (temporary lay-off scheme), it is calculated on your full pay from before the
+        ERTE.
+      </p>
+      <div class="causes">
+        {causes.map(({ title, rule, citation, page }) => (
+          <div>
+            <h4>{page ? <a href={link(lang, LANDINGS[page].path.slice(1))}>{title}</a> : title}</h4>
+            <p>{rule}</p>
+            <p class="causes__citation">{citation}</p>
+          </div>
+        ))}
+      </div>
+      <p class="example">
+        <span class="example__label">Unfair dismissal</span> from 3 May 2018 to 20 July 2026: 98
+        whole months and a few days, which count as 99. 33 days per year is 2,75 per month: 99 ×
+        2,75 = 272,25 days. 21.000&nbsp;€ × 272,25 / 365 = 15.663,70&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">Objective-grounds dismissal</span> with the same dates: 99 ×
+        20/12 = 165 days. 21.000&nbsp;€ × 165 / 365 = 9.493,15&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">End of a fixed-term contract</span> lasting one year, from 1
+        October 2025 to 30 September 2026: 365 days × 12/365 = 12 days. 21.000&nbsp;€ × 12 / 365 =
+        690,41&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 51 · 53 · 56</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-2012">{tx('guide.before_2012')}</h3>
+      <p>
+        In an unfair dismissal from a contract that began before 12 February 2012, the severance pay
+        is calculated in two periods:
+      </p>
+      <ul>
+        <li>Up to 11 February 2012: 45 days per year (3,75 per month).</li>
+        <li>From 12 February 2012: 33 days per year (2,75 per month).</li>
+      </ul>
+      <p>
+        The total is capped at 720 days, unless the first period already goes beyond that. In that
+        case only the first period counts, up to a maximum of 42 monthly payments (1.260 days).
+      </p>
+      <p>
+        Contracts to promote permanent employment (contratos de fomento de la contratación
+        indefinida) signed before 12 February 2012 follow the rules they were signed under for
+        objective-grounds severance pay; in a disciplinary dismissal, it is calculated with these
+        two periods (section 3). The review does not tell that type of contract apart.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> From 1 March 2010 to 15 September
+        2026. First period: 24 months × 3,75 = 90 days. Second period: 176 months × 2,75 = 484 days.
+        Total: 574 days. 21.000&nbsp;€ × 574 / 365 = 33.024,66&nbsp;€.
+      </p>
+      <p class="folio">
+        Transitional provision <span>11.ª</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-antiguedad">{tx('guide.by_seniority')}</h3>
+      <p>
+        The final settlement is what has accrued in the year and in the last month, so once a
+        contract has lasted a year it stops growing. Severance pay, on the other hand, grows with
+        each month worked and depends on the reason.
+      </p>
+      <FigureTable id="g-antiguedad-tabla" label={tx('guide.by_seniority')}>
+        <Fragment slot="caption">
+          Contracts ending on 30 September 2026, with 1.500&nbsp;€ gross a month, two extra payments
+          of 1.500&nbsp;€ accruing half-yearly (the summer one already paid) and 22 working days of
+          holiday a year, none of them taken. Rounded to the euro.
+        </Fragment>
+        <thead>
+          <tr>
+            <th scope="col">Time worked</th>
+            <th scope="col">Final settlement</th>
+            <th scope="col">
+              Fixed-term
+              <span class="figures-note">12 days</span>
+            </th>
+            <th scope="col">
+              Objective grounds
+              <span class="figures-note">20 days</span>
+            </th>
+            <th scope="col">
+              Unfair
+              <span class="figures-note">33 days</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {bySeniority.map(({ months, finalPay, fixedTermLimit, fixedTerm, objective, unfair }) => (
+            <tr>
+              <th scope="row">{spanLabel(months, lang)}</th>
+              <td>{wholeEuroRange(finalPay)}</td>
+              <td>
+                {fixedTerm === null ? '—' : wholeEuros(fixedTerm)}
+                {fixedTermLimit === 'sector_agreement' && <sup>1</sup>}
+                {fixedTermLimit === 'over' && <sup>2</sup>}
+              </td>
+              <td>{wholeEuros(objective)}</td>
+              <td>{wholeEuros(unfair)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </FigureTable>
+      <p>
+        The final settlement adds up September’s pay, the holiday and the accrued Christmas extra
+        payment, with the range between counting by days or by months. The other three columns are
+        the severance pay for each reason, which is separate: art. 49.1.c ET at the end of a
+        fixed-term contract, arts. 52 and 53.1.b ET in an objective-grounds dismissal and art. 56 ET
+        in an unfair one. For the total, add it to the final settlement.
+      </p>
+      <p class="table-notes">
+        <sup>1</sup> A contract for production circumstances (circunstancias de la producción) lasts
+        6 months at most. It reaches a year only if your sector-level collective agreement extends
+        it (art. 15.2 ET), or in a contract for a specific project or service (obra o servicio)
+        signed before 31 December 2021 (transitional provision 3.ª of Real Decreto-ley 32/2021).
+      </p>
+      <p class="table-notes">
+        <sup>2</sup> A contract for production circumstances does not last that long. One for a
+        specific project or service signed before 31 December 2021 lasted 3 years at most, or 4 if
+        the sector-level collective agreement extended it (art. 15.1.a ET in its previous wording
+        and transitional provision 3.ª of Real Decreto-ley 32/2021), so none ends in September 2026
+        with this length of service. A fixed-term contract that goes beyond its maximum length can
+        become permanent (art. 15.4 ET), and then its end would be a dismissal.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-propuesta">{tx('guide.proposal')}</h3>
+      <p>
+        The employer gives you a proposed settlement statement. The law provides that the worker can
+        sign it in the presence of someone from the workers’ legal representatives.
+      </p>
+      <p>
+        Some people sign it with the words «recibí no conforme» (“received, not agreed”) when they
+        do not agree with an amount. We mention it only as information. What to do in each case can
+        be assessed by an employment law firm, a graduado social (a labour relations adviser) or a
+        trade union.
+      </p>
+      <p>
+        What changes and what does not: <CaseLink lang={lang} id="not_agreed" />.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-plazos">{tx('guide.deadlines')}</h3>
+      <p>
+        For amounts such as outstanding pay, holiday, extra payments or severance pay at the end of
+        a fixed-term contract, the time limit is one year (art. 59.1 ET). If the employer has not
+        paid you yet, whatever is pay carries late-payment interest of 10&nbsp;% a year (art. 29.3
+        ET); severance pay does not.
+      </p>
+      <p>
+        In a dismissal (objective-grounds, collective, unfair or disciplinary), the time limit to
+        challenge it is 20 business days (art. 59.3 ET). People who disagree with the severance pay
+        for a dismissal usually raise it through that same route, within those 20 days.
+      </p>
+      <p>
+        The time limit is short, and an employment law firm, a graduado social or a trade union can
+        tell you which one applies to your case.
+      </p>
+      <p class="folio">
+        Art. <span>29.3 · 59</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-no-revisa">{tx('guide.unchecked')}</h3>
+      <ul>
+        {unchecked.map((text) => (
+          <li>{text}</li>
+        ))}
+      </ul>
+      <p>
+        Holiday and extra payments are compared with the legal minimum, with the range between
+        counting by days and counting by months; your collective agreement can improve on those
+        figures. An item shows as “can't be checked” only when a detail is missing without which
+        there is no legal figure, such as the notice period for a resignation or the holiday days
+        you have taken.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-paro">{tx('guide.benefit')}</h2>
+      <p>
+        When a contract ends, as well as the final settlement there may be unemployment benefit
+        (paro), the contributory unemployment benefit. To receive it, the contract has to end in a
+        legal situation of unemployment, and that depends on the reason:
+      </p>
+      <ul>
+        <li>
+          An objective-grounds, collective, unfair or disciplinary dismissal is one (art. 267.1.a
+          LGSS). A disciplinary dismissal also counts even if it is declared fair or is not
+          challenged (art. 268.4 LGSS).
+        </li>
+        <li>
+          The end of a fixed-term contract is too, unless you were the one who ended it (art.
+          267.1.a.6.º LGSS).
+        </li>
+        <li>
+          A resignation is not (art. 267.2.a LGSS), unless you leave because of a relocation, a
+          substantial change to your conditions that harms you (art. 41.3 ET), a serious breach by
+          the employer, such as not paying you or paying you late again and again, or gender-based
+          or sexual violence (art. 267.1.a.5.º LGSS).
+        </li>
+      </ul>
+      <p>
+        You also need at least 360 days of unemployment contributions in the previous 6 years that
+        you have not already used for another unemployment benefit, and several jobs can add up
+        (arts. 266.b and 269 LGSS). You also need to be registered with the Seguridad Social or in
+        an equivalent situation (situación asimilada), to register as a jobseeker, to sign the
+        activity agreement (acuerdo de actividad) and not to have reached retirement age (art. 266
+        LGSS).
+      </p>
+      <p>
+        To calculate it with your details and see the full scale:{' '}
+        <CaseLink lang={lang} id="benefit" />.
+      </p>
+      <p class="folio">
+        Arts. <span>266 · 267 · 268.4</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-cuanto">{tx('guide.benefit_amount')}</h3>
+      <p>
+        The base is the average of your unemployment contributions over the last 180 days, without
+        overtime (art. 270.1 LGSS). You receive 70&nbsp;% of the base for the first 180 days and
+        60&nbsp;% from day 181 (art. 270.2 LGSS).
+      </p>
+      <p>
+        Each month has a minimum and a maximum depending on your dependent sons or daughters (art.
+        270.3 LGSS). In 2026, with the IPREM (the public income reference index) at 600&nbsp;€, they
+        are:
+      </p>
+      <ul>
+        <li>With no dependent sons or daughters, between 560&nbsp;€ and 1.225&nbsp;€ a month.</li>
+        <li>With one, between 749&nbsp;€ and 1.400&nbsp;€.</li>
+        <li>With two or more, between 749&nbsp;€ and 1.575&nbsp;€.</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> With 21.000&nbsp;€ a year, the
+        base is 21.000&nbsp;€ / 12 = 1.750&nbsp;€ a month. 70&nbsp;% of that is 1.225&nbsp;€,
+        exactly the maximum with no dependent sons or daughters, and 60&nbsp;% is 1.050&nbsp;€.
+      </p>
+      <p>
+        These are gross figures. From them, 4,85&nbsp;% of the base is deducted for the Seguridad
+        Social, plus whatever IRPF (income tax) applies. The figures in this guide and in the review
+        assume full-time work; with part-time hours they are lower.
+      </p>
+      <p class="folio">
+        Art. <span>270</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-duracion">{tx('guide.benefit_duration')}</h3>
+      <p>
+        It depends on the days of contributions in the last 6 years that have not been used for
+        another unemployment benefit (art. 269 LGSS):
+      </p>
+      <ul>
+        <li>From 360 to 539 days of contributions, 120 days of benefit (4 months).</li>
+        <li>
+          Each further 180 days of contributions adds 60 days of benefit (2 months). From 540 to 719
+          it is 180 days; from 720 to 899, 240; and so on.
+        </li>
+        <li>From 2.160 days of contributions, the maximum, 720 days (24 months).</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> With three years of contributions,
+        1.095 days, it is 360 days of benefit (12 months).
+      </p>
+      <p>
+        Untaken holiday that has been paid also counts as days of contributions (art. 269.4 LGSS).
+        Each start date, each leaving date and the days of contributions appear in{' '}
+        <a href={workHistoryUrl} rel="noopener">
+          {tx('result.benefit_work_history_link')}
+        </a>
+        .
+      </p>
+      <p class="folio">
+        Art. <span>269</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-plazo">{tx('guide.benefit_deadline')}</h3>
+      <p>
+        Without registering as a jobseeker there is no unemployment benefit (art. 266 LGSS): you
+        register with your region’s employment service and apply to SEPE for the benefit. The
+        application is made within the 15 days after the contract ends, business days according to
+        SEPE. If your final settlement pays untaken holiday, the time limit runs from when those
+        days end (art. 268.1 and 268.3 LGSS). Applying later takes the days of delay off the benefit
+        (art. 268.2 LGSS).
+      </p>
+      <ul class="sources">
+        {benefitSources.map(({ citation, url, inForce }) => (
+          <li>
+            <a href={url}>{citation}</a>
+            <span class="sources__in-force">{inForce}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="folio">
+        Art. <span>268</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('guide.faq')}</h2>
+      <div class="faq-list">
+        {faqEntries(lang, { documents }).map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>
+
+<style>
+  .sheet--text .table-notes {
+    font-size: 0.875rem;
+  }
+</style>
