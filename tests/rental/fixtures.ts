@@ -2,14 +2,14 @@ import { parseDate as f } from '../../src/engine/date';
 import { RENTAL_TABLES } from '../../src/engine/rental/data/tables';
 import { reviewRental, type RentalReview } from '../../src/engine/rental/review';
 import type { RentalInput } from '../../src/engine/rental/types';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { contract, update } from '../engine/rental/fixtures';
+import { pageTranslator } from '../support/page-strings';
 
 export { contract, update };
 
 export const TODAY = f('2026-10-08');
-export const tr: Translate = (key, vars) => t('es', key, vars);
+export const tr: Translate = pageTranslator('rental');
 
 export const review = (input: RentalInput): RentalReview => {
   const r = reviewRental(input, TODAY, RENTAL_TABLES);

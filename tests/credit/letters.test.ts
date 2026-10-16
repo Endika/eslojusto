@@ -17,12 +17,12 @@ import { creditReport } from '../../src/credit/report';
 import { NO_DETAILS, type LetterDetails, type LetterKind } from '../../src/documents/letter';
 import { renderPdf } from '../../src/documents/pdf';
 import type { Block, DocumentModel } from '../../src/documents/ports';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { FORBIDDEN, forbiddenIn } from '../support/forbidden';
 import { loan, repayment, TODAY } from '../engine/credit/input';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('credit');
 
 const DEPS = {
   norms: CREDIT_NORMS,

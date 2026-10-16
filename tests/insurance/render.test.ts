@@ -4,7 +4,6 @@ import { parseDate } from '../../src/engine/date';
 import { INSURANCE_NORMS } from '../../src/engine/insurance/data/norms';
 import { reviewInsurance, type InsuranceReview } from '../../src/engine/insurance/review';
 import type { InsuranceInput } from '../../src/engine/insurance/types';
-import { t } from '../../src/i18n';
 import { es } from '../../src/i18n/es';
 import type { Translate } from '../../src/i18n/client';
 import {
@@ -14,8 +13,9 @@ import {
   statusText,
 } from '../../src/insurance/render';
 import { notice, policy, TODAY } from '../engine/insurance/input';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('insurance');
 
 const review = (input: InsuranceInput, today = TODAY): InsuranceReview => {
   const r = reviewInsurance(input, today, { norms: INSURANCE_NORMS });

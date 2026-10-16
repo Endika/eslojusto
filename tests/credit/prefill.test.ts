@@ -12,8 +12,9 @@ import { readCreditForm } from '../../src/credit/form';
 import { parseDate } from '../../src/engine/date';
 import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('credit');
 const TODAY = parseDate('2026-10-09');
 
 const f = (

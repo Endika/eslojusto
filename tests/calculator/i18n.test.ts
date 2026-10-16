@@ -67,6 +67,19 @@ describe('ar-test pseudo-locale', () => {
   });
 });
 
+// The final pay's letter and report words every review's papers use too.
+const SHARED_PAPERWORK = [
+  'client.documents.letter.company',
+  'client.documents.letter.date_blank',
+  'client.documents.letter.glyph_warning',
+  'client.documents.letter.id',
+  'client.documents.letter.id_warning',
+  'client.documents.letter.name',
+  'client.documents.letter.place_blank',
+  'client.documents.letter.place_date',
+  'client.documents.report.generated',
+];
+
 describe('client strings', () => {
   it('the browser translator reads the strings the page writes', () => {
     const tr = translator({ 'client.status.matches': 'Coincide con el mínimo legal' });
@@ -238,12 +251,14 @@ describe('client strings', () => {
     expect(keys.filter((k) => k.startsWith('client.warning.'))).toEqual([]);
   });
 
-  it('the credit page reads documents in words its own copy allows, without the report', () => {
+  it('the credit page reads documents in words its own copy allows, without the final pay’s own report', () => {
     const strings = clientStrings('es', { credit: true, documents: true });
     const keys = Object.keys(strings);
     expect(keys).toContain('client.documents.kind.credit_agreement');
     expect(keys).toContain('client.documents.error.daily_limit_reached');
-    expect(keys.filter((k) => /^client\.documents\.(report|letter|notice)\./.test(k))).toEqual([]);
+    expect(
+      keys.filter((k) => /^client\.documents\.(report|letter|notice)\./.test(k)).sort(),
+    ).toEqual(SHARED_PAPERWORK);
     expect(keys).toContain('client.documents.verify.checking');
     expect(
       Object.values(strings).flatMap((text) =>
@@ -297,13 +312,15 @@ describe('client strings', () => {
     expect(keys.filter((k) => k.startsWith('client.credit.'))).toEqual([]);
   });
 
-  it('the mortgage page reads documents in words its own copy allows, without the report', () => {
+  it('the mortgage page reads documents in words its own copy allows, without the final pay’s own report', () => {
     const strings = clientStrings('es', { mortgage: true, documents: true });
     const keys = Object.keys(strings);
     expect(keys).toContain('client.documents.kind.mortgage_deed');
     expect(keys).toContain('client.documents.missing_key_page');
     expect(keys).toContain('client.mortgage.documents.quote_note');
-    expect(keys.filter((k) => /^client\.documents\.(report|letter|notice)\./.test(k))).toEqual([]);
+    expect(
+      keys.filter((k) => /^client\.documents\.(report|letter|notice)\./.test(k)).sort(),
+    ).toEqual(SHARED_PAPERWORK);
     expect(keys).toContain('client.documents.verify.checking');
     expect(keys.filter((k) => CREDIT_READING.has(k) && !MORTGAGE_READING.has(k))).toEqual([]);
     expect(
@@ -333,7 +350,9 @@ describe('client strings', () => {
     expect(keys).toContain('client.documents.skipped.not_telecom_document');
     expect(keys).toContain('client.documents.verify.checking');
     expect(keys).toContain('client.bills.basket.estimate');
-    expect(keys.filter((k) => /^client\.documents\.(report|letter|notice)\./.test(k))).toEqual([]);
+    expect(
+      keys.filter((k) => /^client\.documents\.(report|letter|notice)\./.test(k)).sort(),
+    ).toEqual(SHARED_PAPERWORK);
     expect(keys.filter((k) => CREDIT_READING.has(k) || MORTGAGE_READING.has(k))).toEqual([]);
     // Without the documents API, the bills pages ship none of their words.
     expect(

@@ -9,14 +9,14 @@ import { reviewElectricityBill } from '../../src/engine/bills/electricity-review
 import { reviewTelecom } from '../../src/engine/bills/telecom-review';
 import type { ElectricityBillInput } from '../../src/engine/bills/types';
 import { parseDate } from '../../src/engine/date';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { TOLL_HOLIDAYS } from '../../src/engine/bills/data/holidays-20td';
 import { pvpcTable } from '../../src/engine/bills/data/pvpc-hourly';
 import { freeBill, juneBill, meter, telecom, TODAY } from '../engine/bills/input';
 import { NORMS_BEFORE_FIGURE } from '../engine/bills/norms-before-figure';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('bills');
 
 const electricity = (input: ElectricityBillInput): CompletedElectricityReview => {
   const r = reviewElectricityBill(input, TODAY, {

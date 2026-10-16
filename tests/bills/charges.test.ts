@@ -9,10 +9,10 @@ import {
 import { telecomReading } from '../../src/bills/telecom/reading';
 import type { ExtractedValue, TelecomExtraction } from '../../src/documents/contract';
 import { parseDate } from '../../src/engine/date';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('bills');
 const TODAY = parseDate('2026-10-15');
 
 const row = (values: Record<string, ExtractedValue>) => ({

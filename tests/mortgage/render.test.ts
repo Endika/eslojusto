@@ -6,7 +6,6 @@ import { MORTGAGE_NORMS } from '../../src/engine/mortgage/data/norms';
 import { reviewMortgage, type MortgageReview } from '../../src/engine/mortgage/review';
 import { ruleSource } from '../../src/engine/mortgage/rules';
 import type { MortgageDeps, MortgageInput } from '../../src/engine/mortgage/types';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import {
   phraseText,
@@ -15,8 +14,9 @@ import {
   sourceText,
 } from '../../src/mortgage/render';
 import { DEPS, invoice, mortgage, TODAY, UNREAD_DEPS } from '../engine/mortgage/input';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('mortgage');
 const d = parseDate;
 
 const review = (change: Partial<MortgageInput>, deps: MortgageDeps = DEPS): MortgageReview => {

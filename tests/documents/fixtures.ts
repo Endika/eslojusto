@@ -2,12 +2,12 @@ import type { CompletedReview } from '../../src/calculator/ports';
 import { reviewFinalPay, type EmployerFigures } from '../../src/engine/review';
 import type { FinalPayInput } from '../../src/engine/types';
 import { estimateBenefit } from '../../src/engine/unemployment';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import type { KeyValueStore } from '../../src/documents/ports';
+import { pageTranslator } from '../support/page-strings';
 
 export const today = { y: 2026, m: 10, d: 7 };
-export const tr: Translate = (key, vars) => t('es', key, vars);
+export const tr: Translate = pageTranslator('final-pay');
 
 export const unfairDismissal: FinalPayInput = {
   cause: 'unfair_dismissal',

@@ -19,13 +19,13 @@ import { findingsOf } from '../../src/engine/bills/finding';
 import { reviewTelecom } from '../../src/engine/bills/telecom-review';
 import type { ElectricityBillInput, TelecomInput } from '../../src/engine/bills/types';
 import { parseDate } from '../../src/engine/date';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { FORBIDDEN, forbiddenIn } from '../support/forbidden';
 import { freeBill, juneBill, meter, telecom, TODAY } from '../engine/bills/input';
 import { NORMS_BEFORE_FIGURE } from '../engine/bills/norms-before-figure';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('bills');
 
 const electricity = (input: ElectricityBillInput): CompletedElectricityReview => {
   const r = reviewElectricityBill(input, TODAY, {

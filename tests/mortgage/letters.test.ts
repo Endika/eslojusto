@@ -6,7 +6,6 @@ import type { MortgageDeps, MortgageInput, Operation } from '../../src/engine/mo
 import { NO_DETAILS, type LetterDetails, type LetterKind } from '../../src/documents/letter';
 import { renderPdf } from '../../src/documents/pdf';
 import type { Block, DocumentModel } from '../../src/documents/ports';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { mortgageCase } from '../../src/mortgage/case';
 import {
@@ -19,8 +18,9 @@ import type { CompletedMortgageReview } from '../../src/mortgage/ports';
 import { mortgageReport } from '../../src/mortgage/report';
 import { FORBIDDEN, forbiddenIn } from '../support/forbidden';
 import { DEPS, invoice, mortgage, TODAY } from '../engine/mortgage/input';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('mortgage');
 const d = parseDate;
 
 const completed = (

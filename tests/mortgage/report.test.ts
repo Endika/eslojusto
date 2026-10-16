@@ -4,12 +4,12 @@ import { LEGAL_INTEREST } from '../../src/engine/law/data/legal-interest';
 import { reviewMortgage } from '../../src/engine/mortgage/review';
 import type { MortgageDeps, MortgageInput } from '../../src/engine/mortgage/types';
 import type { Block, DocumentModel } from '../../src/documents/ports';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { mortgageReport } from '../../src/mortgage/report';
 import { DEPS, invoice, mortgage, TODAY, UNREAD_DEPS } from '../engine/mortgage/input';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('mortgage');
 const d = parseDate;
 
 const report = (change: Partial<MortgageInput>, deps: MortgageDeps = DEPS): DocumentModel => {

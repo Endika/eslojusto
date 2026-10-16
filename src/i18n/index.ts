@@ -27,15 +27,29 @@ const CREDIT_PAGE = ['client.credit.', 'client.theme.', 'client.other_language.'
 const MORTGAGE_PAGE = ['client.mortgage.', 'client.theme.', 'client.other_language.'];
 // The bills reviews' pages likewise.
 const BILLS_PAGE = ['client.bills.', 'client.theme.', 'client.other_language.'];
-// What they take of document reading: none of the final pay's report, letter or pass notices. The
+// What they take of document reading: none of the final pay's own report, letter or pass notices. The
 // check of a pass already held is shared by every page that sells one.
 const NOT_READING = [
   'client.documents.report.',
   'client.documents.letter.',
   'client.documents.notice.',
 ];
+// What every review's letter and report share with the final pay's: the sender's lines, the place
+// and date, the warnings on those fields and the report's dateline.
+const SHARED_PAPERWORK: ReadonlySet<string> = new Set([
+  'client.documents.letter.name',
+  'client.documents.letter.id',
+  'client.documents.letter.company',
+  'client.documents.letter.place_date',
+  'client.documents.letter.place_blank',
+  'client.documents.letter.date_blank',
+  'client.documents.letter.id_warning',
+  'client.documents.letter.glyph_warning',
+  'client.documents.report.generated',
+]);
 const readingString = (key: string): boolean =>
-  key.startsWith('client.documents.') && !NOT_READING.some((prefix) => key.startsWith(prefix));
+  key.startsWith('client.documents.') &&
+  (SHARED_PAPERWORK.has(key) || !NOT_READING.some((prefix) => key.startsWith(prefix)));
 
 // The words document reading has only for the credit, the insurance or the mortgage review's
 // documents: what each kind is called, the figures their summary names, why a page was set aside

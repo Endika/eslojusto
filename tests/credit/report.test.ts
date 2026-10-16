@@ -7,11 +7,11 @@ import type { CreditInput } from '../../src/engine/credit/types';
 import type { CompletedCreditReview } from '../../src/credit/ports';
 import { creditReport } from '../../src/credit/report';
 import type { Block, DocumentModel } from '../../src/documents/ports';
-import { t } from '../../src/i18n';
 import type { Translate } from '../../src/i18n/client';
 import { loan, repayment, TODAY } from '../engine/credit/input';
+import { pageTranslator } from '../support/page-strings';
 
-const tr: Translate = (key, vars) => t('es', key, vars);
+const tr: Translate = pageTranslator('credit');
 
 const DEPS = {
   norms: CREDIT_NORMS,
