@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { breadcrumbList, trail } from '../content/structured-data';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+// The legal notice and the privacy page: their headings and metadata from the dictionary, their
+// prose from src/prose/, in the slot. A translation says the Spanish text is the one that binds.
+interface Props {
+  page: 'legal_notice' | 'privacy';
+  lang: Lang;
+}
+const { page, lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+const PAGES = {
+  legal_notice: {
+    path: '/aviso-legal/',
+    crumb: 'footer.legal_notice',
+    updated: 'legal_notice.updated',
+  },
+  privacy: { path: '/privacidad/', crumb: 'footer.privacy', updated: 'legal.updated' },
+} as const satisfies Record<string, { path: string; crumb: Key; updated: Key }>;
+const { path, crumb, updated } = PAGES[page];
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const crumbs = trail(lang, { name: tx(crumb), path });
+---
+
+<Base
+  title={tx(`${page}.title`)}
+  description={tx(`${page}.description`)}
+  lang={lang}
+  path={path}
+  section="legal"
+  structuredData={[breadcrumbList(home, lang, crumbs)]}
+>
+  <main class="document" id="content">
+    <Breadcrumbs lang={lang} crumbs={crumbs} />
+    <header class="document__head">
+      <h1 class="document__title">{tx(`${page}.h1`)}</h1>
+      <p class="document__date">{tx(updated)}</p>
+      {lang !== 'es' && (
+        <p class="document__date">
+          {tx('legal.translation')}{' '}
+          <a href={link('es', path.slice(1))} hreflang="es">
+            {tx('legal.translation_link')}
+          </a>
+        </p>
+      )}
+    </header>
+
+    <slot />
+  </main>
+</Base>

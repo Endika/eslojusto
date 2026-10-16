@@ -15,10 +15,9 @@ interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
-// The legal pages are long legal prose, published only in Spanish for now.
 const links = [
-  [link('es', 'aviso-legal/'), t(lang, 'footer.legal_notice')],
-  [link('es', 'privacidad/'), t(lang, 'footer.privacy')],
+  [link(lang, 'aviso-legal/'), t(lang, 'footer.legal_notice')],
+  [link(lang, 'privacidad/'), t(lang, 'footer.privacy')],
 ] as const;
 const current = Astro.url.pathname;
 // Each section names the norms its figures follow; the legal pages and a home page with more than

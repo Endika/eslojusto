@@ -93,7 +93,7 @@ const faq = householdFaqEntries(lang, { checkedOn, minimumWage: MINIMUM_WAGE });
         <a href={HOUSEHOLD_NORMS.rdl16_2022.url}>Real Decreto-ley 16/2022</a> ·{' '}
         <a href={wageNorm.url}>{wageNorm.citation.split(', de ')[0]}</a>
       </span>
-      <a href={link('es', 'aviso-legal/')}>{tx('household.guide.who')}</a>
+      <a href={link(lang, 'aviso-legal/')}>{tx('household.guide.who')}</a>
     </p>
   </header>
 

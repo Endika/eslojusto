@@ -62,7 +62,7 @@ const faq = rentalFaqEntries(lang, NORMS, { documents, checkedOn });
         <a href={inePage(SERIES.irav)}>{tx('rental.guide.source_irav')}</a> ·{' '}
         <a href={LEGAL_INTEREST.at(-1)?.url}>{tx('rental.guide.source_bde')}</a>
       </span>
-      <a href={link('es', 'aviso-legal/')}>{tx('rental.guide.who')}</a>
+      <a href={link(lang, 'aviso-legal/')}>{tx('rental.guide.who')}</a>
     </p>
   </header>
 
