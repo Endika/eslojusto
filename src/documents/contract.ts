@@ -103,9 +103,8 @@ export type MediaType = (typeof MEDIA_TYPES)[number];
 export const LIMITS = {
   // Photos and PDF pages together: each becomes one image.
   maxImages: 25,
-  // What the browser opens to render; past it, a PDF is too heavy to render on a phone. A scanned
-  // deed of 60 pages weighs about 45 MB.
-  maxPdfBytes: 64 * 1024 * 1024,
+  // What the browser opens to render; past it, a PDF is too heavy to render on a phone.
+  maxPdfBytes: 20 * 1024 * 1024,
   maxImageLongSide: MAX_IMAGE_LONG_SIDE,
   maxPayloadBytes: 6 * 1024 * 1024,
   // What the browser lets a request weigh: under the API's limit, with room for Lambda's event
@@ -116,7 +115,12 @@ export const LIMITS = {
 // The reviews whose long PDFs are located first (api/README.md, «Locating the pages of a long
 // PDF»): every page at 768 px, at most 80 of them.
 export const LOCATE_REVIEWS: readonly ReviewKind[] = ['mortgage'];
-export const LOCATE_LIMITS = { maxPages: 80, imageLongSide: 768 } as const;
+// A scanned deed of 60 pages weighs about 45 MB.
+export const LOCATE_LIMITS = {
+  maxPages: 80,
+  imageLongSide: 768,
+  maxPdfBytes: 64 * 1024 * 1024,
+} as const;
 
 export const PASS_READS = 15;
 export const PASS_DAYS = 7;
@@ -711,10 +715,10 @@ interface Allowed {
   readonly quota?: string | null;
 }
 
-// A read proves itself with a captcha token, or with the handoff of the locate step before it.
-export type ExtractRequest = Allowed & { readonly files: readonly DocumentFile[] } & (
-    { readonly captchaToken: string } | { readonly handoff: string }
-  );
+export interface ExtractRequest extends Allowed {
+  readonly files: readonly DocumentFile[];
+  readonly captchaToken: string;
+}
 
 // Every page of one long PDF at low resolution, to learn which ones the read should take.
 export interface LocateRequest extends Allowed {
@@ -724,10 +728,9 @@ export interface LocateRequest extends Allowed {
   readonly maxPages: number;
 }
 
-// The pages chosen, numbered as sent and ascending, and the token that stands in for the read's
-// captcha. It spends no read.
-export type LocateResult =
-  { readonly ok: true; readonly pages: readonly number[]; readonly handoff: string } | Failure;
+// The pages chosen, numbered as sent and ascending. It spends no read; the read that follows needs
+// a captcha of its own.
+export type LocateResult = { readonly ok: true; readonly pages: readonly number[] } | Failure;
 
 export type Failure = { readonly ok: false; readonly code: ErrorCode };
 

@@ -933,13 +933,14 @@ run at once, and the budget action caps the month.
 
 A mortgage deed runs to 25–80 pages and a read takes 25. When a PDF does not fit, the browser
 first sends every page at 768 px a side with `step: 'locate'`; Haiku 4.5 (`LOCATE_MODEL`) lists
-the useful ones and the API answers them, cut to the places the read has left, with a `handoff`
-token that stands in for the read's captcha for ten minutes. The step spends no read, but answers
-`daily_limit_reached` or `pass_exhausted` as the read would. Only reviews in `LOCATE_REVIEWS`
-take it (the mortgage review). A 57-page deed at 543 × 768 is about 31,700 tokens in and a few
-hundred out: **about 0.04 USD**. The API takes at most 80 images of 1024 px and refuses above
-60,000 estimated tokens (`MAX_LOCATE_INPUT_TOKENS`), with `max_tokens` at 2,000: **at most 0.077
-USD** (60,000 × 1.10 + 2,000 × 5.50 USD/M), on top of the read's own bound.
+the useful ones and the API answers them, cut to the places the read has left. The read of those
+pages that follows needs a captcha of its own, so each call still costs a fresh challenge. The
+step spends no read, but answers `daily_limit_reached` or `pass_exhausted` as the read would.
+Only reviews in `LOCATE_REVIEWS` take it (the mortgage review). A 57-page deed at 543 × 768 was
+33,550 tokens in and 273 out: **about 0.04 USD**. The API takes at most 80 images of 1024 px and
+refuses above 66,000 estimated tokens (`MAX_LOCATE_INPUT_TOKENS`; 80 square pages at 768 px are
+62,960), with `max_tokens` at 2,000: **at most 0.084 USD** (66,000 × 1.10 + 2,000 × 5.50 USD/M),
+on top of the read's own bound.
 
 ## Evaluation
 

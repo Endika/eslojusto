@@ -338,7 +338,12 @@ export function setUpUpload<F extends string, L extends string>(
       refused,
       problem,
       duplicates,
-    } = admit([...new Set(picked.map((p) => p.file))], LIMITS.maxImages - picked.length, files);
+    } = admit(
+      [...new Set(picked.map((p) => p.file))],
+      LIMITS.maxImages - picked.length,
+      files,
+      api.locate ? LOCATE_LIMITS.maxPdfBytes : LIMITS.maxPdfBytes,
+    );
     const names = new Map<File, string>();
     for (const file of images) {
       const name = fromCamera ? tr('client.documents.photo', { n: (photos += 1) }) : file.name;
@@ -614,68 +619,110 @@ export function setUpUpload<F extends string, L extends string>(
     return requestBytes(encoded) > LIMITS.requestBudgetBytes ? null : encoded;
   }
 
-  // Swaps the long PDF for the pages the locate step chose, or, if it could not run, for its first
-  // pages as before; says which. `stopped` when the person left for the form meanwhile.
+  function failRead(code: ErrorCode) {
+    events.extractionFailed(code);
+    if (code === 'model_unavailable') outage.remember();
+    setBusy(false, '');
+    setError(code);
+  }
+
+  // The server has the last word on what was sent: a pass it no longer honours is dropped, so the
+  // next read is a free one, and so is a quota token it refuses.
+  async function refused(code: ErrorCode, stored: StoredPass | null) {
+    if (stored !== null && code === 'pass_exhausted') passes.updateReads(0);
+    if (stored !== null && code === 'pass_invalid') {
+      if (await fetchPassAgain(stored)) {
+        events.extractionFailed(code);
+        setBusy(false, tr('client.documents.pass.renewed'));
+        return;
+      }
+      passes.retirePass();
+    }
+    if (stored !== null && ['pass_revoked', 'pass_expired'].includes(code)) passes.forgetPass();
+    if (stored === null && code === 'invalid_request' && passes.quota() !== null)
+      passes.forgetQuota();
+    failRead(code);
+  }
+
+  // What the locate step answers as the read would: the read is refused too, so nothing is cut.
+  const REFUSALS: ReadonlySet<ErrorCode> = new Set<ErrorCode>([
+    'invalid_request',
+    'captcha_failed',
+    'daily_limit_reached',
+    'pass_invalid',
+    'pass_expired',
+    'pass_exhausted',
+    'pass_revoked',
+    'pass_unconfirmed',
+    'payment_not_complete',
+    'payment_provider_unavailable',
+  ]);
+
+  // Swaps the long PDF for the pages the locate step chose or, if it could not choose, for its
+  // first pages as before, and says which. One that fits by now goes whole. `stopped` when the
+  // read is refused or the person left for the form meanwhile.
   async function locateLong(
     pages: readonly Picked[],
     started: number,
-  ): Promise<{ readonly pages: readonly Picked[]; readonly handoff: string | null } | 'stopped'> {
+  ): Promise<readonly Picked[] | 'stopped'> {
     const long = pages.find((p) => p.long);
-    if (!long?.long || !api.locate) return { pages, handoff: null };
+    if (!long?.long || !api.locate) return pages;
     const { opened } = long.long;
-    const maxPages = LIMITS.maxImages - (pages.length - 1);
+    const room = LIMITS.maxImages - (pages.length - 1);
+    const swapFor = (numbers: readonly number[]) => {
+      const entries = numbers.map((n) => pdfPage(long.file, opened, n));
+      const swap = (list: readonly Picked[]) => list.flatMap((p) => (p === long ? entries : [p]));
+      picked = swap(picked);
+      renderFiles();
+      return swap(pages);
+    };
+    const first = (k: number) => Array.from({ length: k }, (_, i) => i + 1);
+    if (opened.pages <= room) return swapFor(first(opened.pages));
+
     setBusy(true, tr('client.documents.status.locating', { nombre: long.file.name }), true);
     const files = await lowResolution(opened, started);
     if (started !== generation) return 'stopped';
     let chosen: readonly number[] | null = null;
-    let handoff: string | null = null;
     if (files !== null) {
-      let captchaToken: string | null;
+      let captchaToken: string;
       try {
         captchaToken = await captcha.token();
       } catch {
-        captchaToken = null;
+        if (started !== generation) return 'stopped';
+        failRead('captcha_unavailable');
+        return 'stopped';
       }
       if (started !== generation) return 'stopped';
-      if (captchaToken !== null) {
-        setBusy(true, tr('client.documents.status.locating', { nombre: long.file.name }));
-        const result = await api.locate({
-          files: files.map(({ mediaType, data }) => ({ mediaType, data })),
-          captchaToken,
-          maxPages,
-          ...allowance().fields,
-        });
-        if (started !== generation) return 'stopped';
-        if (result.ok) ({ pages: chosen, handoff } = result);
+      setBusy(true, tr('client.documents.status.locating', { nombre: long.file.name }));
+      const { stored, fields } = allowance();
+      const result = await api.locate({
+        files: files.map(({ mediaType, data }) => ({ mediaType, data })),
+        captchaToken,
+        maxPages: room,
+        ...fields,
+      });
+      if (started !== generation) return 'stopped';
+      if (!result.ok && REFUSALS.has(result.code)) {
+        await refused(result.code, stored);
+        return 'stopped';
       }
+      if (result.ok) chosen = result.pages;
     }
-    const numbers = chosen ?? Array.from({ length: maxPages }, (_, i) => i + 1);
-    const entries = numbers.map((n) => pdfPage(long.file, opened, n));
-    const swap = (list: readonly Picked[]) => list.flatMap((p) => (p === long ? entries : [p]));
-    picked = swap(picked);
-    renderFiles();
+    const numbers = chosen ?? first(room);
+    const swapped = swapFor(numbers);
     fileStatus.textContent =
       chosen === null
-        ? tr('client.documents.locate_failed', { nombre: long.file.name, k: maxPages })
-        : tr('client.documents.located', {
-            nombre: long.file.name,
-            paginas: numbers.join(', '),
-          });
-    return { pages: swap(pages), handoff };
+        ? tr('client.documents.locate_failed', { nombre: long.file.name, k: room })
+        : tr('client.documents.located', { nombre: long.file.name, paginas: numbers.join(', ') });
+    return swapped;
   }
 
   async function read(all: readonly Picked[], qualityChecked = false) {
     const started = generation;
-    const located = await locateLong(all, started);
-    if (located === 'stopped') return;
-    const { pages, handoff } = located;
+    const pages = await locateLong(all, started);
+    if (pages === 'stopped') return;
     setBusy(true, tr('client.documents.status.preparing'), true);
-    const fail = (code: ErrorCode) => {
-      events.extractionFailed(code);
-      if (code === 'model_unavailable') outage.remember();
-      setBusy(false, '');
-      setError(code);
-    };
+    const fail = failRead;
     let encoded: Awaited<ReturnType<typeof encodeAll>>;
     try {
       encoded = await encodeAll(pages, started);
@@ -701,16 +748,16 @@ export function setUpUpload<F extends string, L extends string>(
     }
 
     setBusy(true, tr('client.documents.status.captcha'), true);
-    let proof: { readonly captchaToken: string } | { readonly handoff: string };
+    let captchaToken: string;
     try {
-      proof = handoff === null ? { captchaToken: await captcha.token() } : { handoff };
+      captchaToken = await captcha.token();
     } catch {
       if (started !== generation) return;
       return fail('captcha_unavailable');
     }
     if (started !== generation) return;
 
-    const { stored } = allowance();
+    const { stored, fields } = allowance();
     const usePass = stored !== null;
     const pdfsPicked = new Set(pages.filter((p) => p.pdf).map((p) => p.file)).size;
     const files = filesBucket(pages.length);
@@ -718,8 +765,8 @@ export function setUpUpload<F extends string, L extends string>(
     setBusy(true, tr('client.documents.status.reading'));
     const result = await api.extract({
       files: encoded.map(({ mediaType, data }) => ({ mediaType, data })),
-      ...proof,
-      ...(usePass ? { pass: stored.token } : { quota: passes.quota() }),
+      captchaToken,
+      ...fields,
     });
     const nameOf = (page: number) => pages[page - 1]?.name ?? '';
     if (!result.ok && result.code === 'nothing_read') {
@@ -729,23 +776,7 @@ export function setUpUpload<F extends string, L extends string>(
       setBusy(false, '');
       return showReview(tr('client.documents.nothing_read'), skippedLines(skipped, nameOf, tr), '');
     }
-    if (!result.ok) {
-      // The server has the last word on what was sent: a pass it no longer honours is dropped, so
-      // the next read is a free one, and so is a quota token it refuses.
-      if (usePass && result.code === 'pass_exhausted') passes.updateReads(0);
-      if (usePass && result.code === 'pass_invalid') {
-        if (await fetchPassAgain(stored)) {
-          events.extractionFailed(result.code);
-          setBusy(false, tr('client.documents.pass.renewed'));
-          return;
-        }
-        passes.retirePass();
-      }
-      if (usePass && ['pass_revoked', 'pass_expired'].includes(result.code)) passes.forgetPass();
-      if (!usePass && result.code === 'invalid_request' && passes.quota() !== null)
-        passes.forgetQuota();
-      return fail(result.code);
-    }
+    if (!result.ok) return refused(result.code, stored);
     if (usePass && result.readsLeft !== null) passes.updateReads(result.readsLeft);
     if (!usePass && result.allowance !== null) passes.saveQuota(result.allowance);
 

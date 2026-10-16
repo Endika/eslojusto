@@ -557,7 +557,7 @@ test('a whole deed in PDF, longer than a read takes, is read from the pages loca
   page,
 }) => {
   // No fixed clock here: pdf.js does not draw pages under one.
-  const sent: { step?: string; files: unknown[]; maxPages?: number; handoff?: string }[] = [];
+  const sent: { step?: string; files: unknown[]; maxPages?: number; captchaToken?: string }[] = [];
   await page.route('https://challenges.cloudflare.com/**', (route) =>
     route.fulfill({
       contentType: 'text/javascript',
@@ -570,7 +570,7 @@ test('a whole deed in PDF, longer than a read takes, is read from the pages loca
     return route.fulfill({
       json:
         body.step === 'locate'
-          ? { code: 'ok', pages: [2, 5, 31], handoff: 'v1.handoff.e2e' }
+          ? { code: 'ok', pages: [2, 5, 31] }
           : reading([DEED, DEED, DEED], DEED_FIELDS, { clauses: CLAUSES }),
     });
   });
@@ -592,7 +592,6 @@ test('a whole deed in PDF, longer than a read takes, is read from the pages loca
   expect(sent.map((b) => b.step ?? 'read')).toEqual(['locate', 'read']);
   expect(sent[0]?.files).toHaveLength(40);
   expect(sent[0]?.maxPages).toBe(25);
-  expect(sent[1]?.handoff).toBe('v1.handoff.e2e');
-  expect(sent[1]).not.toHaveProperty('captchaToken');
+  expect(sent.map((b) => b.captchaToken)).toEqual(['extract-token', 'extract-token']);
   expect(sent[1]?.files).toHaveLength(3);
 });

@@ -19,14 +19,11 @@ export const LOCATE_LIMITS = { maxImages: 80, maxImageLongSide: 1024 } as const;
 // The locate prompt and tool, priced at two characters per token (test/locate.test.ts keeps it
 // honest).
 export const LOCATE_PROMPT_TOKENS = 1_500;
-// 80 pages at 768 px a side come to about 45,000; at this cap a Haiku call costs 60,000 × 1.10 +
-// 2,000 × 5.50 USD per million = 0.077 USD (api/README.md, «Cost»).
-export const MAX_LOCATE_INPUT_TOKENS = 60_000;
+// 80 square pages at 768 px come to 62,960 (A4 ones, 44,800); at this cap a Haiku call costs
+// 66,000 × 1.10 + 2,000 × 5.50 USD per million = 0.084 USD (api/README.md, «Cost»).
+export const MAX_LOCATE_INPUT_TOKENS = 66_000;
 export const LOCATE_MAX_TOKENS = 2_000;
 export const LOCATE_DEADLINE_MS = 90_000;
-// How long the read that follows may skip the captcha: the browser encodes the chosen pages first.
-export const HANDOFF_SECONDS = 600;
-
 export interface LocateDeps {
   readonly locator: PageLocator;
   readonly captcha: CaptchaVerifier;
@@ -50,7 +47,6 @@ export type LocateResponse =
       readonly code: 'ok';
       // Page numbers in what was sent, ascending: the most useful, up to maxPages.
       readonly pages: readonly number[];
-      readonly handoff: string;
     }
   | { readonly code: ErrorCode };
 
@@ -82,31 +78,9 @@ export function chosenPages(toolInput: unknown, pageCount: number, maxPages: num
   return [...seen].sort((a, b) => a - b);
 }
 
-export const handoffClaims = (review: LocateReview, nowMs: number) => ({
-  typ: 'handoff',
-  review,
-  exp: Math.floor(nowMs / 1000) + HANDOFF_SECONDS,
-});
-
-// Whether a handoff token stands in for the captcha of a read of `review`.
-export function validHandoff(
-  token: string,
-  review: ReviewKind | undefined,
-  signer: TokenSigner,
-  nowMs: number,
-): boolean {
-  const c = signer.verify(token);
-  return (
-    isRecord(c) &&
-    c['typ'] === 'handoff' &&
-    c['review'] === review &&
-    typeof c['exp'] === 'number' &&
-    nowMs < c['exp'] * 1000
-  );
-}
-
 // One cheap call over every page of a long upload: which pages the read should take. It spends no
-// read, but answers as the read would if none is left, so it is never free work.
+// read, but answers as the read would if none is left, and needs its own captcha, as the read that
+// follows does: each costs a fresh challenge.
 export async function locate(
   request: LocateRequest,
   deps: LocateDeps,
@@ -159,9 +133,5 @@ export async function locate(
   metrics.outputTokens = read.outputTokens;
   const pages = chosenPages(read.toolInput, request.files.length, request.maxPages);
   if (pages.length === 0) return { code: 'document_unreadable' };
-  return {
-    code: 'ok',
-    pages,
-    handoff: deps.signer.sign(handoffClaims(request.review, deps.clock.now())),
-  };
+  return { code: 'ok', pages };
 }
