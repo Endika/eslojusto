@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.80.0](https://github.com/Endika/eslojusto/compare/v1.79.0...v1.80.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** translate the case pages' prose into English ([4f750e7](https://github.com/Endika/eslojusto/commit/4f750e7b1379156b9c6abc02bad99bbdee9301fa))
+* **i18n:** translate the dictionary into English, unpublished ([c2b6326](https://github.com/Endika/eslojusto/commit/c2b632636051e387c38fe8acc5e7cd87606e046b))
+* **i18n:** translate the final pay guide into English ([cded28c](https://github.com/Endika/eslojusto/commit/cded28c8c5fb9b9c02de7e9966badc3317ea1240))
+* **i18n:** translate the legal notice and the privacy page into English ([e00e802](https://github.com/Endika/eslojusto/commit/e00e8027bf498b26c69266b5fe8d55f9b2afecba))
+* **i18n:** translate the rental sections and the ERTE page into English ([11c80ec](https://github.com/Endika/eslojusto/commit/11c80ecee64c2127a2a6e371165aa351601e9755))
+* **i18n:** translate the rental topics into English ([c26f01c](https://github.com/Endika/eslojusto/commit/c26f01ccd0e72b73ef48d488be69fa58b1edd980))
+
 ## [1.79.0](https://github.com/Endika/eslojusto/compare/v1.78.0...v1.79.0) (2026-10-16)
 
 
