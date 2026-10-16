@@ -77,6 +77,15 @@
   --step: 90ms;
 }
 
+/* Chinese: none of the faces has its glyphs, so the system's own come right after the Latin. */
+:root:lang(zh) {
+  --f-grotesque:
+    'Golos Text Variable', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC',
+    system-ui, sans-serif;
+  --f-serif:
+    'Source Serif 4 Variable', 'Songti SC', 'SimSun', 'Noto Serif SC', ui-serif, Georgia, serif;
+}
+
 :root[data-theme='dark'] {
   color-scheme: dark;
   --cause: #c24919;

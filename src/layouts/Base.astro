@@ -60,7 +60,18 @@ const languages = langs
 // never indexed nor announced; the 404 is served at any address, so it names no canonical.
 const indexable = published && !noindex;
 const alternates = indexable ? langs.filter((i) => LANGS[i].published) : [];
-const OG_LOCALE: Partial<Record<Lang, string>> = { es: 'es_ES' };
+const OG_LOCALE: Partial<Record<Lang, string>> = {
+  es: 'es_ES',
+  en: 'en_GB',
+  ar: 'ar_AR',
+  ro: 'ro_RO',
+  fr: 'fr_FR',
+  uk: 'uk_UA',
+  zh: 'zh_CN',
+  ca: 'ca_ES',
+  eu: 'eu_ES',
+  gl: 'gl_ES',
+};
 const ogLocale = OG_LOCALE[lang];
 // The browser scripts' strings, as data: the CSP does not apply to a JSON block.
 const pageStrings = {
@@ -102,7 +113,15 @@ const otherLangs =
   lang === 'es'
     ? alternates
         .filter((i) => i !== lang)
-        .map((i) => ({ code: i, name: LANGS[i].name, url: url(i).pathname }))
+        .map((i) => ({
+          code: i,
+          name: LANGS[i].name,
+          url: url(i).pathname,
+          // The bar speaks the language it offers.
+          text: t(i, 'client.other_language.text'),
+          aria: t(i, 'client.other_language.aria'),
+          close: t(i, 'client.other_language.close'),
+        }))
     : [];
 const otherLangsJson = JSON.stringify(otherLangs).replace(/</g, '\\u003c');
 ---
