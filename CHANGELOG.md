@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.77.0](https://github.com/Endika/eslojusto/compare/v1.76.0...v1.77.0) (2026-10-16)
+
+
+### Features
+
+* **i18n:** give each language its og:locale, sitemap date, bar words and Chinese faces ([e24cbfd](https://github.com/Endika/eslojusto/commit/e24cbfd29395708faa2d49e9c35ff656a9002d4f))
+
 ## [1.76.0](https://github.com/Endika/eslojusto/compare/v1.75.0...v1.76.0) (2026-10-16)
 
 
