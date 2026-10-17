@@ -58,7 +58,7 @@ const decimal = (n: number) => String(n).replace('.', ',');
     {euros(unfairAfter2012.dailySalary)}.
   </p>
   <p class="example">
-    <span class="example__label">عقد من 2018</span> من 3 مايو 2018 إلى 20 يوليو 2026 تُحتسب
+    <span class="example__label">عقد من 2018</span> من 3 مايو 2018 إلى 20 يوليو 2026 تُحتسب{' '}
     {integer(months)} شهرًا. {integer(months)} × 2,75 = {decimal(unfairAfter2012.salaryDays)} يوم.
     21.000&nbsp;€ × {decimal(unfairAfter2012.salaryDays)} / 365 = {euros(unfairAfter2012.amount)}.
   </p>

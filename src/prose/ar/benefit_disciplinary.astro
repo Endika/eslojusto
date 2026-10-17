@@ -1,5 +1,5 @@
 ---
-// source: a172b338d8e2
+// source: 5b2dfc6de32e
 import CaseLink from '../../components/CaseLink.astro';
 import { disciplinary, entitledByCause } from '../../content/examples';
 import { integer, wholeEuros } from '../../content/format';
@@ -74,8 +74,8 @@ const causes = entitledByCause.map(({ cause, entitled }) => ({
     1 يونيو 2022 إلى 30 سبتمبر 2026، دون أبناء أو بنات مُعالين، وتفصله الشركة لأسباب تأديبية.
   </p>
   <p class="example">
-    <span class="example__label">إعانة البطالة التي تعود له</span> مع
-    {integer(disciplinary.contractDays)} يومًا من الاشتراك يعود له على الأقل
+    <span class="example__label">إعانة البطالة التي تعود له</span> مع{' '}
+    {integer(disciplinary.contractDays)} يومًا من الاشتراك يعود له على الأقل{' '}
     {integer(disciplinary.duration.days)} يومًا من إعانة البطالة (
     {integer(disciplinary.duration.days / 30)} شهرًا): نحو {wholeEuros(figures.firstStretch.min)} في
     الشهر خلال أول 6 أشهر ونحو {wholeEuros(figures.secondStretch.min)} بعدها، إجمالًا. «على الأقل»،
