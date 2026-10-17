@@ -1,0 +1,88 @@
+---
+// source: 176e7bb53168
+import CaseLink from '../../components/CaseLink.astro';
+import { itemRange, objective, severanceMonths } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const severance = itemRange(objective, 'severance');
+const notice = itemRange(objective, 'employer_notice');
+const salary = itemRange(objective, 'pending_salary');
+const holidays = itemRange(objective, 'holiday_pay');
+const extraPay = itemRange(objective, 'extra_pay');
+const unfair = objective.unfairReference;
+const months =
+  severanceMonths(
+    objective.items.find((p) => p.item.id === 'severance')?.item.calculation ?? [],
+  )[0] ?? 0;
+if (!severance || !notice || !salary || !holidays || !extraPay || unfair === null)
+  throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="do-20-dias">20 днів за рік, не більше 12 місячних зарплат</h3>
+  <p>
+    При звільненні з об’єктивних причин (objetivo) роботодавець має разом із листом надати у ваше
+    розпорядження вихідну допомогу (indemnización) у розмірі 20 днів зарплати за кожен
+    відпрацьований рік, не більше 12 місячних зарплат (art. 53.1.b ET). Посібник CGPJ після рішення
+    STS 651/2026 рахує цю межу як 360 днів. Час рахується в місяцях, і неповний місяць зараховується
+    як повний.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.b</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-preaviso">15 днів попередження або їх оплата</h3>
+  <p>
+    Між листом і звільненням мають минути 15 днів попередження (art. 53.1.c ET). Дні, яких
+    роботодавець не надає, оплачуються. Калькулятор запитує, скільки днів вам надали, і розраховує
+    ті, яких бракує.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-ejemplo">Розібраний приклад</h3>
+  <p>
+    Особа із зарплатою 1.500&nbsp;€ брутто на місяць і двома додатковими виплатами по 1.500&nbsp;€
+    працює з 3 травня 2018 р. до 20 липня 2026 р. Цього року вона використала 10 днів відпустки, і
+    роботодавець не надає їй попередження. Ось суми з калькулятора:
+  </p>
+  <ul>
+    <li>
+      Вихідна допомога: {euroRange(severance)} ({months} міс. × 20 / 12 ={' '}
+      {String((months * 20) / 12).replace('.', ',')} дн.).
+    </li>
+    <li>Ненадане попередження: {euroRange(notice)}.</li>
+    <li>Зарплата за липень: {euroRange(salary)}.</li>
+    <li>Невикористана відпустка: {euroRange(holidays)}.</li>
+    <li>Різдвяна додаткова виплата, нарахована з 1 липня: {euroRange(extraPay)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Якби звільнення визнали необґрунтованим</span> За тих самих дат
+    вихідна допомога становила б {euros(unfair)}, з розрахунку 33 дні за рік. Перевірка показує цю
+    суму поруч із сумою за звільнення з об’єктивних причин.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-diferencia">Звільнення з об’єктивних причин чи необґрунтоване</h3>
+  <p>
+    Звільнення з об’єктивних причин можна оскаржити так само, як дисциплінарне (art. 53.3 ET). Якщо
+    його визнають необґрунтованим (improcedente), вихідна допомога розраховується з розрахунку 33
+    дні за рік, не більше 720 днів: про це тут — <CaseLink lang={lang} id="unfair_dismissal" />.
+    Строк для оскарження — 20 робочих днів (art. 59.3 ET).
+  </p>
+  <p class="folio">
+    Art. <span>53 · 56 · 59</span> ET
+  </p>
+</section>
