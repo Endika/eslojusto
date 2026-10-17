@@ -25,7 +25,6 @@ export const ro: Translation = {
   'home.contract_situation': 'Ai un contract sau o ofertă: fiecare condiție față de lege',
   'home.rent_situation': 'Locuiești cu chirie: ce ți se încasează față de ce permite legea',
   'home.mortgage': 'Credit ipotecar',
-  'home.finance': 'Finanțare și asigurări',
   'home.credit': 'Finanțare',
   'home.insurance': 'Asigurări',
   'home.insurance_situation':
@@ -3225,9 +3224,6 @@ export const ro: Translation = {
   'rent_indices.check':
     'Verifică dacă proprietarul ți-a majorat chiria mai mult decât permite legea, cu data contractului tău și indicele din fiecare lună.',
   'rent_indices.check_link': 'Verifică-mi închirierea',
-  'rent_indices.soon_title': 'În curând: verifică-ți majorarea',
-  'rent_indices.soon':
-    'Pregătim un calculator care să verifice majorarea ta cu data contractului și indicele din fiecare lună. Încă nu este disponibil.',
   'rent_indices.faq': 'Întrebări frecvente',
   'rent_indices.faq.what_is_irav': 'Ce este IRAV?',
   'rent_indices.faq.what_is_irav_answer':

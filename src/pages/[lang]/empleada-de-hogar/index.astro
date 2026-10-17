@@ -1,10 +1,9 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import Household from '../../../views/Household.astro';
-import { HOUSEHOLD_BUILD } from '../../../content/sections';
 import { langPaths, type Lang } from '../../../i18n/languages';
 
-export const getStaticPaths = (() => (HOUSEHOLD_BUILD ? langPaths() : [])) satisfies GetStaticPaths;
+export const getStaticPaths = langPaths satisfies GetStaticPaths;
 
 const lang = Astro.params.lang as Lang;
 ---

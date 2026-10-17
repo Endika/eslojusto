@@ -206,16 +206,6 @@ const MORTGAGE_SECTIONS = [
   'acuerdo',
   'operacion',
 ] as const satisfies readonly MortgageStep[];
-// Its sheets that the credit and the insurance reviews also have, listed once whichever is built.
-const MORTGAGE_CREDIT_SECTIONS = [
-  'apertura',
-  'amortizacion',
-  'seguro',
-] as const satisfies readonly MortgageStep[];
-const MORTGAGE_INSURANCE_SECTIONS = [
-  'vencimiento',
-  'condiciones',
-] as const satisfies readonly MortgageStep[];
 // The bills reviews' sheets that no other review has; «fechas», «resultado» and «titular» are
 // already other reviews'. «penalizacion» appears in both of them, listed once.
 const BILLS_SECTIONS = [
@@ -256,15 +246,6 @@ const BILLS_SECTIONS = [
   'cobros',
   'despues',
 ] as const satisfies readonly (ElectricityStep | TelecomStep)[];
-// Its sheet that the mortgage review also has, listed once whichever is built.
-const BILLS_MORTGAGE_SECTIONS = ['titular'] as const satisfies readonly ElectricityStep[];
-// The credit, insurance and mortgage reviews exist only in a build with their switch; elsewhere their sheets,
-// questions and events are dropped from the bundle (the variables are read inline so the bundler can
-// fold them) and refused like any unknown event.
-const CREDIT_ON = import.meta.env.PUBLIC_CREDIT === '1';
-const INSURANCE_ON = import.meta.env.PUBLIC_INSURANCE === '1';
-const MORTGAGE_ON = import.meta.env.PUBLIC_MORTGAGE === '1';
-const BILLS_ON = import.meta.env.PUBLIC_BILLS === '1';
 export const SECTIONS = [
   'causa',
   'temporal',
@@ -284,13 +265,10 @@ export const SECTIONS = [
   ...RENTAL_SECTIONS,
   ...EMPLOYMENT_SECTIONS,
   ...HOUSEHOLD_SECTIONS,
-  ...(CREDIT_ON ? CREDIT_SECTIONS : []),
-  ...(INSURANCE_ON ? INSURANCE_SECTIONS : []),
-  ...(MORTGAGE_ON ? MORTGAGE_SECTIONS : []),
-  ...(MORTGAGE_ON && !CREDIT_ON ? MORTGAGE_CREDIT_SECTIONS : []),
-  ...(MORTGAGE_ON && !INSURANCE_ON ? MORTGAGE_INSURANCE_SECTIONS : []),
-  ...(BILLS_ON ? BILLS_SECTIONS : []),
-  ...(BILLS_ON && !MORTGAGE_ON ? BILLS_MORTGAGE_SECTIONS : []),
+  ...CREDIT_SECTIONS,
+  ...INSURANCE_SECTIONS,
+  ...MORTGAGE_SECTIONS,
+  ...BILLS_SECTIONS,
 ] as const;
 export type Section = (typeof SECTIONS)[number];
 
@@ -395,10 +373,10 @@ export const HELP_TOPICS = [
   ...RENTAL_FAQ_TOPICS,
   ...EMPLOYMENT_FAQ_TOPICS,
   ...HOUSEHOLD_FAQ_TOPICS,
-  ...(CREDIT_ON ? CREDIT_FAQ_TOPICS : []),
-  ...(INSURANCE_ON ? INSURANCE_FAQ_TOPICS : []),
-  ...(MORTGAGE_ON ? MORTGAGE_FAQ_TOPICS : []),
-  ...(BILLS_ON ? BILLS_FAQ_TOPICS : []),
+  ...CREDIT_FAQ_TOPICS,
+  ...INSURANCE_FAQ_TOPICS,
+  ...MORTGAGE_FAQ_TOPICS,
+  ...BILLS_FAQ_TOPICS,
 ].map(([, anchor]) => anchor);
 
 // What a rental result card is about. A card is a kind of item, never its concept as written.
@@ -912,10 +890,10 @@ const BASE_CATALOGUE = {
       ...RENTAL_TRACKABLE_FIELDS,
       ...EMPLOYMENT_TRACKABLE_FIELDS,
       ...HOUSEHOLD_TRACKABLE_FIELDS,
-      ...(CREDIT_ON ? CREDIT_TRACKABLE_FIELDS : []),
-      ...(INSURANCE_ON ? INSURANCE_TRACKABLE_FIELDS : []),
-      ...(MORTGAGE_ON ? MORTGAGE_TRACKABLE_FIELDS : []),
-      ...(BILLS_ON ? BILLS_TRACKABLE_FIELDS : []),
+      ...CREDIT_TRACKABLE_FIELDS,
+      ...INSURANCE_TRACKABLE_FIELDS,
+      ...MORTGAGE_TRACKABLE_FIELDS,
+      ...BILLS_TRACKABLE_FIELDS,
     ]),
   },
   help_opened: { topic: oneOf(HELP_TOPICS) },
@@ -1028,7 +1006,6 @@ const BASE_CATALOGUE = {
   js_error: { kind: oneOf(ERROR_TYPES), source: SOURCE_RULE },
 } as const satisfies Record<string, Record<string, Rule>>;
 
-// Built only in a build with the review, so one without it carries none of its codes.
 const creditCatalogue = () => {
   const CREDIT_RESULT = oneOf([...CREDIT_STATUSES, 'none']);
   return {
@@ -1192,11 +1169,11 @@ const DOCUMENTS_ON =
 export const CATALOGUE = {
   ...BASE_CATALOGUE,
   ...(DOCUMENTS_ON ? DOCUMENT_CATALOGUE : {}),
-  ...(CREDIT_ON ? creditCatalogue() : {}),
-  ...(INSURANCE_ON ? insuranceCatalogue() : {}),
-  ...(MORTGAGE_ON ? mortgageCatalogue() : {}),
-  ...(BILLS_ON ? billsCatalogue() : {}),
-  ...(BILLS_ON && DOCUMENTS_ON ? basketCatalogue() : {}),
+  ...creditCatalogue(),
+  ...insuranceCatalogue(),
+  ...mortgageCatalogue(),
+  ...billsCatalogue(),
+  ...(DOCUMENTS_ON ? basketCatalogue() : {}),
 } as typeof BASE_CATALOGUE &
   typeof DOCUMENT_CATALOGUE &
   ReturnType<typeof creditCatalogue> &

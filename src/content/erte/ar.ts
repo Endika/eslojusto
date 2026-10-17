@@ -1,4 +1,4 @@
-// source: f89d3a3982c4
+// source: cbf3c50ce7b9
 import type { Range } from '../../engine/money';
 import {
   belowFullTimeMinimum,
@@ -28,7 +28,7 @@ export const ERTE_PAGE = {
   restart: 'ابدأ من جديد',
 } as const;
 
-// The paragraphs of the legal notice about the page, only in a build that has it.
+// The paragraphs of the legal notice about the page.
 export const ERTE_LEGAL = {
   title: 'تقدير إعانة البطالة خلال إجراء ERTE',
   does: 'يقدّر إعانة البطالة الإجمالية شهريًا خلال إجراء ERTE لأسباب اقتصادية أو تقنية أو تنظيمية أو إنتاجية، أو للقوة القاهرة ⁨(fuerza mayor)⁩، أو في إطار آلية RED ⁨(mecanismo RED)⁩، بالقاعدة المرجعية ⁨(base reguladora)⁩ وبالبيانات التي تكتبها أنت: المبلغ مع حدوده، وما إذا كانت البطالة كلية أو جزئية، وما إذا كان يستهلك إعانة البطالة المتبقية لك لاحقًا، والاشتراك اللازم. تذكر كل فقرة المادة التي تستند إليها من القانون العام للضمان الاجتماعي ⁨(Ley General de la Seguridad Social)⁩، بما في ذلك حكماه الإضافيان ⁨(disposiciones adicionales 41.ª y 46.ª)⁩.',

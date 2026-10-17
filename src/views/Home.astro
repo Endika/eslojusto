@@ -6,18 +6,11 @@ import { homeGraph } from '../content/structured-data';
 import { DOCUMENTS } from '../documents/config';
 import {
   BILLS_BETA,
-  BILLS_BUILD,
   CREDIT_BETA,
-  CREDIT_BUILD,
   EMPLOYMENT_BETA,
-  EMPLOYMENT_BUILD,
   HOUSEHOLD_BETA,
-  HOUSEHOLD_BUILD,
   INSURANCE_BETA,
-  INSURANCE_BUILD,
   MORTGAGE_BETA,
-  MORTGAGE_BUILD,
-  RENTAL_BUILD,
 } from '../content/sections';
 
 interface Props {
@@ -66,29 +59,22 @@ const groups: Group[] = [
         citation: 'home.benefit_citation',
         beta: false,
       },
-      EMPLOYMENT_BUILD
-        ? {
-            id: 'employment',
-            name: 'home.contract',
-            href: link(lang, 'contrato/'),
-            situation: 'home.contract_situation',
-            citation: 'home.contract_citation',
-            beta: EMPLOYMENT_BETA,
-          }
-        : 'home.contract',
-      // Unlike the others it is not even a name on the «próximamente» line until its switch is on.
-      ...(HOUSEHOLD_BUILD
-        ? [
-            {
-              id: 'household',
-              name: 'home.household' as const,
-              href: link(lang, 'empleada-de-hogar/'),
-              situation: 'home.household_situation' as const,
-              citation: 'home.household_citation' as const,
-              beta: HOUSEHOLD_BETA,
-            },
-          ]
-        : []),
+      {
+        id: 'employment',
+        name: 'home.contract',
+        href: link(lang, 'contrato/'),
+        situation: 'home.contract_situation',
+        citation: 'home.contract_citation',
+        beta: EMPLOYMENT_BETA,
+      },
+      {
+        id: 'household',
+        name: 'home.household',
+        href: link(lang, 'empleada-de-hogar/'),
+        situation: 'home.household_situation',
+        citation: 'home.household_citation',
+        beta: HOUSEHOLD_BETA,
+      },
     ],
   },
   {
@@ -96,26 +82,22 @@ const groups: Group[] = [
     tone: 'settlement',
     label: 'home.group_housing',
     sections: [
-      RENTAL_BUILD
-        ? {
-            id: 'rental',
-            name: 'home.rent',
-            href: link(lang, 'alquiler/'),
-            situation: 'home.rent_situation',
-            citation: 'home.rent_citation',
-            beta: true,
-          }
-        : 'home.rent',
-      MORTGAGE_BUILD
-        ? {
-            id: 'mortgage',
-            name: 'home.mortgage',
-            href: link(lang, 'hipoteca/'),
-            situation: 'home.mortgage_situation',
-            citation: 'home.mortgage_citation',
-            beta: MORTGAGE_BETA,
-          }
-        : 'home.mortgage',
+      {
+        id: 'rental',
+        name: 'home.rent',
+        href: link(lang, 'alquiler/'),
+        situation: 'home.rent_situation',
+        citation: 'home.rent_citation',
+        beta: true,
+      },
+      {
+        id: 'mortgage',
+        name: 'home.mortgage',
+        href: link(lang, 'hipoteca/'),
+        situation: 'home.mortgage_situation',
+        citation: 'home.mortgage_citation',
+        beta: MORTGAGE_BETA,
+      },
     ],
     more: { href: link(lang, 'alquiler/irav-ipc/'), label: 'home.rent_indices' },
   },
@@ -123,50 +105,31 @@ const groups: Group[] = [
     id: 'money',
     tone: 'salary',
     label: 'home.group_money',
-    // Credit and insurance share one name on the «próximamente» line until either is live; then
-    // the other one is still to come under its own name.
     sections: [
-      ...(INSURANCE_BUILD
-        ? [
-            {
-              id: 'insurance',
-              name: 'home.insurance',
-              href: link(lang, 'seguros/'),
-              situation: 'home.insurance_situation',
-              citation: 'home.insurance_citation',
-              beta: INSURANCE_BETA,
-            } satisfies Review,
-          ]
-        : []),
-      ...(CREDIT_BUILD
-        ? [
-            {
-              id: 'credit',
-              name: 'home.credit',
-              href: link(lang, 'financiacion/'),
-              situation: 'home.credit_situation',
-              citation: 'home.credit_citation',
-              beta: CREDIT_BETA,
-            } satisfies Review,
-          ]
-        : []),
-      ...(INSURANCE_BUILD && CREDIT_BUILD
-        ? []
-        : INSURANCE_BUILD
-          ? ['home.credit' as const]
-          : CREDIT_BUILD
-            ? ['home.insurance' as const]
-            : ['home.finance' as const]),
-      BILLS_BUILD
-        ? {
-            id: 'bills',
-            name: 'home.bills',
-            href: link(lang, 'facturas/'),
-            situation: 'home.bills_situation',
-            citation: 'home.bills_citation',
-            beta: BILLS_BETA,
-          }
-        : 'home.bills',
+      {
+        id: 'insurance',
+        name: 'home.insurance',
+        href: link(lang, 'seguros/'),
+        situation: 'home.insurance_situation',
+        citation: 'home.insurance_citation',
+        beta: INSURANCE_BETA,
+      },
+      {
+        id: 'credit',
+        name: 'home.credit',
+        href: link(lang, 'financiacion/'),
+        situation: 'home.credit_situation',
+        citation: 'home.credit_citation',
+        beta: CREDIT_BETA,
+      },
+      {
+        id: 'bills',
+        name: 'home.bills',
+        href: link(lang, 'facturas/'),
+        situation: 'home.bills_situation',
+        citation: 'home.bills_citation',
+        beta: BILLS_BETA,
+      },
     ],
   },
 ];

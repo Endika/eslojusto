@@ -12,9 +12,8 @@ import { euros, wholeEuros } from '../format';
 import type { ErteBlock, ErteCopy, ErteView } from './copy';
 import { MAX_REDUCTION_PERCENT, MIN_REDUCTION_PERCENT } from '../../engine/erte';
 
-// The ERTE benefit page in Spanish. Its words live here rather than in the dictionary so that a
-// build without the page ships none of them; another language is a sibling file with the same
-// shape (./copy.ts).
+// The ERTE benefit page in Spanish; another language is a sibling file with the same shape
+// (./copy.ts).
 
 export const ERTE_PAGE = {
   title: 'Paro durante un ERTE: cuánto cobrarías al mes',
@@ -30,7 +29,7 @@ export const ERTE_PAGE = {
   restart: 'Empezar de nuevo',
 } as const;
 
-// The paragraphs of the legal notice about the page, only in a build that has it.
+// The paragraphs of the legal notice about the page.
 export const ERTE_LEGAL = {
   title: 'La estimación del paro durante un ERTE',
   does: 'Estima el paro bruto al mes durante un ERTE por causas económicas, técnicas, organizativas o de producción, por fuerza mayor o del mecanismo RED, con la base reguladora y los datos que escribes tú: la cuantía con sus límites, si es desempleo total o parcial, si gasta el paro que te quede para más adelante y la cotización que hace falta. Cada bloque lleva el artículo de la Ley General de la Seguridad Social del que sale, también de sus disposiciones adicionales 41.ª y 46.ª.',

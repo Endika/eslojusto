@@ -1,19 +1,16 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { BILLS_BUILD } from '../../../content/sections';
 import { langPaths, type Lang } from '../../../i18n/languages';
 
-export const getStaticPaths = (() => (BILLS_BUILD ? langPaths() : [])) satisfies GetStaticPaths;
+export const getStaticPaths = langPaths satisfies GetStaticPaths;
 
 const lang = Astro.params.lang as Lang;
 
-// The literal switch, as on /facturas/: a build without it carries none of the page's code.
+// Imported dynamically: a static import lets the bundler merge this view's scripts into the
+// chunks other pages share, which then download them too.
 /* eslint-disable no-restricted-syntax -- a fixed path into src/views, not a boundary escape */
-const Bills =
-  import.meta.env.PUBLIC_BILLS === '1'
-    ? (await import('../../../views/Bills.astro')).default
-    : null;
+const Bills = (await import('../../../views/Bills.astro')).default;
 /* eslint-enable no-restricted-syntax */
 ---
 
-{Bills && <Bills lang={lang} />}
+<Bills lang={lang} />

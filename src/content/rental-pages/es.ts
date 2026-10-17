@@ -19,11 +19,10 @@ import { LAST_UPDATED } from '../updated';
 
 // The six pages on a rental that sit under /alquiler/: the rise, the 2026 decree and the agency
 // fees, and the deposit, its return and the charges, in Spanish; another language's words are a
-// sibling file with the shape of RentalPagesCopy, on the paths and examples of this one. They
-// exist only in a PUBLIC_RENTAL=1 build. The deposit pages keep their prose in a section component
-// each and the others are built here from the engine's norm table and rule list, so a validation
-// or a repeal changes them without touching the copy. Every figure of a worked example comes out
-// of the rental engine or the norm table.
+// sibling file with the shape of RentalPagesCopy, on the paths and examples of this one. The
+// deposit pages keep their prose in a section component each and the others are built here from
+// the engine's norm table and rule list, so a validation or a repeal changes them without touching
+// the copy. Every figure of a worked example comes out of the rental engine or the norm table.
 
 export type RentalPageId = 'rise' | 'decree' | 'fees' | 'deposit' | 'deposit_return' | 'charges';
 

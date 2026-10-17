@@ -1,4 +1,4 @@
-// source: f89d3a3982c4
+// source: cbf3c50ce7b9
 import type { Range } from '../../engine/money';
 import {
   belowFullTimeMinimum,
@@ -29,7 +29,7 @@ export const ERTE_PAGE = {
   restart: 'Start again',
 } as const;
 
-// The paragraphs of the legal notice about the page, only in a build that has it.
+// The paragraphs of the legal notice about the page.
 export const ERTE_LEGAL = {
   title: 'The estimate of unemployment benefit during an ERTE',
   does: 'It estimates gross monthly unemployment benefit during an ERTE (temporary lay-off scheme) for economic, technical, organisational or production reasons, for force majeure or under the mecanismo RED, with the benefit base (base reguladora) and the figures you enter yourself: the amount with its limits, whether it is total or partial unemployment, whether it uses up the benefit you have left for later and the contributions required. Each block carries the article of the Ley General de la Seguridad Social it comes from, including its additional provisions 41.ª and 46.ª.',

@@ -1,4 +1,4 @@
-// source: f89d3a3982c4
+// source: cbf3c50ce7b9
 import type { Range } from '../../engine/money';
 import {
   belowFullTimeMinimum,
@@ -29,7 +29,7 @@ export const ERTE_PAGE = {
   restart: 'Ia-o de la capăt',
 } as const;
 
-// The paragraphs of the legal notice about the page, only in a build that has it.
+// The paragraphs of the legal notice about the page.
 export const ERTE_LEGAL = {
   title: 'Estimarea indemnizației de șomaj în timpul unui ERTE',
   does: 'Estimează indemnizația de șomaj (paro) brută pe lună în timpul unui ERTE (șomaj tehnic temporar) din motive economice, tehnice, organizatorice sau de producție, din cauză de forță majoră sau din mecanismul RED (mecanismo RED), cu baza de calcul (base reguladora) și datele pe care le scrii tu: suma cu limitele ei, dacă este șomaj total sau parțial, dacă îți consumă indemnizația de șomaj rămasă pentru mai târziu și contribuțiile necesare. Fiecare bloc indică articolul din Ley General de la Seguridad Social din care provine, inclusiv din dispozițiile ei adiționale 41.ª și 46.ª.',

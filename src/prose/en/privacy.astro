@@ -1,19 +1,10 @@
 ---
-// source: 09f730db2222
+// source: 625095d4cc94
 import { t, type Key } from '../../i18n';
 import { link, type Lang } from '../../i18n/languages';
 import { DOCUMENTS } from '../../documents/config';
 import { OUTAGE_KEY } from '../../documents/outage';
 import { STORAGE_KEYS } from '../../documents/pass';
-import {
-  BILLS_BUILD,
-  CREDIT_BUILD,
-  EMPLOYMENT_BUILD,
-  HOUSEHOLD_BUILD,
-  INSURANCE_BUILD,
-  MORTGAGE_BUILD,
-  RENTAL_BUILD,
-} from '../../content/sections';
 
 interface Props {
   lang: Lang;
@@ -25,20 +16,6 @@ const tx = (key: Key) => t(lang, key);
 const email = 'hola@eslojusto.es';
 // Reading documents and the pass exist only in a build with their API; so do their paragraphs.
 const documents = DOCUMENTS !== null;
-// The rental review exists only in a PUBLIC_RENTAL=1 build; so do the paragraphs about it.
-const rental = RENTAL_BUILD;
-// The contract review exists only in a PUBLIC_EMPLOYMENT=1 build; so do the paragraphs about it.
-const employment = EMPLOYMENT_BUILD;
-// The household review exists only in a PUBLIC_HOUSEHOLD=1 build; so do the paragraphs about it.
-const household = HOUSEHOLD_BUILD;
-// The credit and insurance reviews exist only in a PUBLIC_CREDIT=1 or PUBLIC_INSURANCE=1 build; so
-// do the paragraphs about each.
-const credit = CREDIT_BUILD;
-const insurance = INSURANCE_BUILD;
-// The mortgage review exists only in a PUBLIC_MORTGAGE=1 build; so do the paragraphs about it.
-const mortgage = MORTGAGE_BUILD;
-// The bills reviews exist only in a PUBLIC_BILLS=1 build; so do the paragraphs about them.
-const bills = BILLS_BUILD;
 
 // One entry per thing that is stored or processed; a new tool adds a row here.
 const stored = [
@@ -47,51 +24,27 @@ const stored = [
     where:
       'Only in your browser, while the page is open. The calculation is done on your device: your dates, your pay, the figures in your final settlement, your dependent children and your other contracts are not sent to any server or stored. When you close or reload the page, they disappear.',
   },
-  ...(rental
-    ? [{ what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') }]
-    : []),
-  ...(employment
-    ? [
-        {
-          what: tx('privacy.employment.data_review'),
-          where: tx('privacy.employment.data_review_where'),
-        },
-      ]
-    : []),
-  ...(household
-    ? [
-        {
-          what: tx('privacy.household.data_review'),
-          where: tx('privacy.household.data_review_where'),
-        },
-      ]
-    : []),
-  ...(credit
-    ? [{ what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') }]
-    : []),
-  ...(insurance
-    ? [
-        {
-          what: tx('privacy.insurance.data_review'),
-          where: tx('privacy.insurance.data_review_where'),
-        },
-      ]
-    : []),
-  ...(mortgage
-    ? [
-        {
-          what: tx('privacy.mortgage.data_review'),
-          where: tx('privacy.mortgage.data_review_where'),
-        },
-      ]
-    : []),
-  ...(bills
-    ? [
-        { what: tx('privacy.bills.data_review'), where: tx('privacy.bills.data_review_where') },
-        ...(documents
-          ? [{ what: tx('privacy.bills.data_year'), where: tx('privacy.bills.data_year_where') }]
-          : []),
-      ]
+  { what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') },
+  {
+    what: tx('privacy.employment.data_review'),
+    where: tx('privacy.employment.data_review_where'),
+  },
+  {
+    what: tx('privacy.household.data_review'),
+    where: tx('privacy.household.data_review_where'),
+  },
+  { what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') },
+  {
+    what: tx('privacy.insurance.data_review'),
+    where: tx('privacy.insurance.data_review_where'),
+  },
+  {
+    what: tx('privacy.mortgage.data_review'),
+    where: tx('privacy.mortgage.data_review_where'),
+  },
+  { what: tx('privacy.bills.data_review'), where: tx('privacy.bills.data_review_where') },
+  ...(documents
+    ? [{ what: tx('privacy.bills.data_year'), where: tx('privacy.bills.data_year_where') }]
     : []),
   {
     what: tx('privacy.data_analytics'),
@@ -105,85 +58,61 @@ const stored = [
           where:
             "Only if you choose to upload your documents (the dismissal letter, the final settlement, your payslips, the employer certificate (certificado de empresa), a conciliation agreement or record, or your employment history (vida laboral)) and give your consent. PDFs are turned into images of their pages in your browser, without leaving it, and before sending anything the page checks, also in your browser, whether any photo looks dark, blurry or small. Those images and the photos travel encrypted to an eslojusto.es server at Amazon Web Services, in Spain (region eu-south-2), which passes them to an AI model (Claude, by Anthropic) through Amazon Bedrock, within the European Union. The model indicates what type of document each page is, copies the details the form asks for, and what was read goes back to your browser. Nothing is stored: the documents only exist in the server's memory while they are read, and its logs, which are kept for 14 days, contain only technical data: the result, the number of pages, how long it took, how much text the model processed and some operational flags, such as whether a second reading was needed, how many details did not match between documents (without saying which ones or their values) or how many pages could not be read and why (for example, blurry or from another country). Never the content or anything that identifies you.",
         },
-        ...(rental
-          ? [
-              {
-                what: tx('privacy.rental.data_documents'),
-                where: tx('privacy.rental.data_documents_where'),
-              },
-              {
-                what: tx('privacy.rental.data_letters'),
-                where: tx('privacy.rental.data_letters_where'),
-              },
-            ]
-          : []),
-        ...(employment
-          ? [
-              {
-                what: tx('privacy.employment.data_documents'),
-                where: tx('privacy.employment.data_documents_where'),
-              },
-              {
-                what: tx('privacy.employment.data_letters'),
-                where: tx('privacy.employment.data_letters_where'),
-              },
-            ]
-          : []),
-        ...(credit
-          ? [
-              {
-                what: tx('privacy.credit.data_documents'),
-                where: tx('privacy.credit.data_documents_where'),
-              },
-              {
-                what: tx('privacy.credit.data_letters'),
-                where: tx('privacy.credit.data_letters_where'),
-              },
-            ]
-          : []),
-        ...(insurance
-          ? [
-              {
-                what: tx('privacy.insurance.data_documents'),
-                where: tx('privacy.insurance.data_documents_where'),
-              },
-              {
-                what: tx('privacy.insurance.data_letters'),
-                where: tx('privacy.insurance.data_letters_where'),
-              },
-            ]
-          : []),
-        ...(mortgage
-          ? [
-              {
-                what: tx('privacy.mortgage.data_documents'),
-                where: tx('privacy.mortgage.data_documents_where'),
-              },
-              {
-                what: tx('privacy.mortgage.data_letters'),
-                where: tx('privacy.mortgage.data_letters_where'),
-              },
-            ]
-          : []),
-        ...(bills
-          ? [
-              {
-                what: tx('privacy.bills.data_documents'),
-                where: tx('privacy.bills.data_documents_where'),
-              },
-              {
-                what: tx('privacy.bills.data_letters'),
-                where: tx('privacy.bills.data_letters_where'),
-              },
-            ]
-          : []),
+        {
+          what: tx('privacy.rental.data_documents'),
+          where: tx('privacy.rental.data_documents_where'),
+        },
+        {
+          what: tx('privacy.rental.data_letters'),
+          where: tx('privacy.rental.data_letters_where'),
+        },
+        {
+          what: tx('privacy.employment.data_documents'),
+          where: tx('privacy.employment.data_documents_where'),
+        },
+        {
+          what: tx('privacy.employment.data_letters'),
+          where: tx('privacy.employment.data_letters_where'),
+        },
+        {
+          what: tx('privacy.credit.data_documents'),
+          where: tx('privacy.credit.data_documents_where'),
+        },
+        {
+          what: tx('privacy.credit.data_letters'),
+          where: tx('privacy.credit.data_letters_where'),
+        },
+        {
+          what: tx('privacy.insurance.data_documents'),
+          where: tx('privacy.insurance.data_documents_where'),
+        },
+        {
+          what: tx('privacy.insurance.data_letters'),
+          where: tx('privacy.insurance.data_letters_where'),
+        },
+        {
+          what: tx('privacy.mortgage.data_documents'),
+          where: tx('privacy.mortgage.data_documents_where'),
+        },
+        {
+          what: tx('privacy.mortgage.data_letters'),
+          where: tx('privacy.mortgage.data_letters_where'),
+        },
+        {
+          what: tx('privacy.bills.data_documents'),
+          where: tx('privacy.bills.data_documents_where'),
+        },
+        {
+          what: tx('privacy.bills.data_letters'),
+          where: tx('privacy.bills.data_letters_where'),
+        },
         {
           what: tx('privacy.data_pass'),
           where: `In your browser's local storage (localStorage), and only if you use them: a signed counter of your free readings for the day (“${STORAGE_KEYS.quota}”); if you buy the pass, the pass and the readings it has left (“${STORAGE_KEYS.pass}”) and the code of each payment you start, with a random number that only your browser knows, so that the pass can be recovered (“${STORAGE_KEYS.checkout}”; each payment is removed after 7 days if it was not completed, or when its pass expires). They do not carry your name or anything from your documents, and they only leave your device with the next reading, to recover the pass or to check it before showing you the detail of your review, the report or the letter. They are received by the eslojusto.es server at AWS, which asks Stripe about the payment. An expired pass and a counter from a previous day are deleted automatically the next time the page looks them up, and everything is deleted when you clear this site's data in your browser; that is why the pass is only valid in this browser and is lost on another device, in a private window or when you clear that data. If reading is not available, the tab remembers this for one hour in its session storage (“${OUTAGE_KEY}”, only with the time) so as not to offer it to you in the meantime.`,
         },
         {
           what: tx('privacy.data_checkout'),
-          where: `If you pay, the answers of your review are stored in that tab's session storage (sessionStorage) while you are on the payment page, to show you the result when you return.${bills ? ' For electricity bills, the answers for each bill of your year that you have already reviewed are stored the same way, without the fingerprint of the supply point code.' : ''} They do not leave your device and are deleted when you return or close the tab.`,
+          where: `If you pay, the answers of your review are stored in that tab's session storage (sessionStorage) while you are on the payment page, to show you the result when you return. For electricity bills, the answers for each bill of your year that you have already reviewed are stored the same way, without the fingerprint of the supply point code. They do not leave your device and are deleted when you return or close the tab.`,
         },
       ]
     : []),
@@ -238,122 +167,94 @@ const tracked = [
     when: 'When you press “Start again”',
     what: 'That you have pressed it.',
   },
-  ...(rental
-    ? [
-        {
-          when: tx('privacy.rental.tracked_sheets'),
-          what: tx('privacy.rental.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.rental.tracked_scope'),
-          what: tx('privacy.rental.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.rental.tracked_review'),
-          what: tx('privacy.rental.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(employment
-    ? [
-        {
-          when: tx('privacy.employment.tracked_sheets'),
-          what: tx('privacy.employment.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.employment.tracked_scope'),
-          what: tx('privacy.employment.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.employment.tracked_review'),
-          what: tx('privacy.employment.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(household
-    ? [
-        {
-          when: tx('privacy.household.tracked_sheets'),
-          what: tx('privacy.household.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.household.tracked_scope'),
-          what: tx('privacy.household.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.household.tracked_review'),
-          what: tx('privacy.household.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(credit
-    ? [
-        {
-          when: tx('privacy.credit.tracked_sheets'),
-          what: tx('privacy.credit.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.credit.tracked_scope'),
-          what: tx('privacy.credit.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.credit.tracked_review'),
-          what: tx('privacy.credit.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(insurance
-    ? [
-        {
-          when: tx('privacy.insurance.tracked_sheets'),
-          what: tx('privacy.insurance.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.insurance.tracked_scope'),
-          what: tx('privacy.insurance.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.insurance.tracked_review'),
-          what: tx('privacy.insurance.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(mortgage
-    ? [
-        {
-          when: tx('privacy.mortgage.tracked_sheets'),
-          what: tx('privacy.mortgage.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.mortgage.tracked_scope'),
-          what: tx('privacy.mortgage.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.mortgage.tracked_review'),
-          what: tx('privacy.mortgage.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(bills
-    ? [
-        {
-          when: tx('privacy.bills.tracked_sheets'),
-          what: tx('privacy.bills.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.bills.tracked_scope'),
-          what: tx('privacy.bills.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.bills.tracked_review'),
-          what: tx('privacy.bills.tracked_review_what'),
-        },
-        {
-          when: tx('privacy.bills.tracked_telecom'),
-          what: tx('privacy.bills.tracked_telecom_what'),
-        },
-      ]
-    : []),
+  {
+    when: tx('privacy.rental.tracked_sheets'),
+    what: tx('privacy.rental.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.rental.tracked_scope'),
+    what: tx('privacy.rental.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.rental.tracked_review'),
+    what: tx('privacy.rental.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_sheets'),
+    what: tx('privacy.employment.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_scope'),
+    what: tx('privacy.employment.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_review'),
+    what: tx('privacy.employment.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_sheets'),
+    what: tx('privacy.household.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_scope'),
+    what: tx('privacy.household.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_review'),
+    what: tx('privacy.household.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_sheets'),
+    what: tx('privacy.credit.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_scope'),
+    what: tx('privacy.credit.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_review'),
+    what: tx('privacy.credit.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_sheets'),
+    what: tx('privacy.insurance.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_scope'),
+    what: tx('privacy.insurance.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_review'),
+    what: tx('privacy.insurance.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_sheets'),
+    what: tx('privacy.mortgage.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_scope'),
+    what: tx('privacy.mortgage.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_review'),
+    what: tx('privacy.mortgage.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_sheets'),
+    what: tx('privacy.bills.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_scope'),
+    what: tx('privacy.bills.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_review'),
+    what: tx('privacy.bills.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_telecom'),
+    what: tx('privacy.bills.tracked_telecom_what'),
+  },
   ...(documents
     ? [
         {
@@ -368,54 +269,30 @@ const tracked = [
           when: 'With the pass',
           what: 'That you start the payment, that the pass is issued when you return from the payment or when you recover it, or the error code, whether on checking it comes out valid, not valid, expired, cancelled or with no response, and whether you download the report or the letter. About the letter, only whether you filled in none, some or all of the optional details (name, DNI or NIE, employer and town), never which ones or what they say: those details only fill in the letter in your browser and are neither sent nor stored. Never the payment code or the pass.',
         },
-        ...(rental
-          ? [
-              {
-                when: tx('privacy.rental.tracked_documents'),
-                what: tx('privacy.rental.tracked_documents_what'),
-              },
-            ]
-          : []),
-        ...(employment
-          ? [
-              {
-                when: tx('privacy.employment.tracked_documents'),
-                what: tx('privacy.employment.tracked_documents_what'),
-              },
-            ]
-          : []),
-        ...(credit
-          ? [
-              {
-                when: tx('privacy.credit.tracked_documents'),
-                what: tx('privacy.credit.tracked_documents_what'),
-              },
-            ]
-          : []),
-        ...(insurance
-          ? [
-              {
-                when: tx('privacy.insurance.tracked_documents'),
-                what: tx('privacy.insurance.tracked_documents_what'),
-              },
-            ]
-          : []),
-        ...(mortgage
-          ? [
-              {
-                when: tx('privacy.mortgage.tracked_documents'),
-                what: tx('privacy.mortgage.tracked_documents_what'),
-              },
-            ]
-          : []),
-        ...(bills
-          ? [
-              {
-                when: tx('privacy.bills.tracked_documents'),
-                what: tx('privacy.bills.tracked_documents_what'),
-              },
-            ]
-          : []),
+        {
+          when: tx('privacy.rental.tracked_documents'),
+          what: tx('privacy.rental.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_documents'),
+          what: tx('privacy.employment.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_documents'),
+          what: tx('privacy.credit.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_documents'),
+          what: tx('privacy.insurance.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_documents'),
+          what: tx('privacy.mortgage.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_documents'),
+          what: tx('privacy.bills.tracked_documents_what'),
+        },
       ]
     : []),
   {
@@ -434,13 +311,13 @@ const tracked = [
       step people get stuck, which steps you use is measured without identifying you. Only codes and
       bands are sent, never an amount or a date. There are no cookies and no advertising.
     </p>
-    {rental && <p>{tx('privacy.rental.summary')}</p>}
-    {employment && <p>{tx('privacy.employment.summary')}</p>}
-    {household && <p>{tx('privacy.household.summary')}</p>}
-    {credit && <p>{tx('privacy.credit.summary')}</p>}
-    {insurance && <p>{tx('privacy.insurance.summary')}</p>}
-    {mortgage && <p>{tx('privacy.mortgage.summary')}</p>}
-    {bills && <p>{tx('privacy.bills.summary')}</p>}
+    <p>{tx('privacy.rental.summary')}</p>
+    <p>{tx('privacy.employment.summary')}</p>
+    <p>{tx('privacy.household.summary')}</p>
+    <p>{tx('privacy.credit.summary')}</p>
+    <p>{tx('privacy.insurance.summary')}</p>
+    <p>{tx('privacy.mortgage.summary')}</p>
+    <p>{tx('privacy.bills.summary')}</p>
     {documents && (
       <p>
         If you decide to upload a document to fill in the details, it is read with AI in the
@@ -526,12 +403,12 @@ const tracked = [
         like by not uploading any more documents: as nothing is stored, there is nothing left to
         erase.
       </p>
-      {rental && <p>{tx('privacy.rental.consent')}</p>}
-      {employment && <p>{tx('privacy.employment.consent')}</p>}
-      {credit && <p>{tx('privacy.credit.consent')}</p>}
-      {insurance && <p>{tx('privacy.insurance.consent')}</p>}
-      {mortgage && <p>{tx('privacy.mortgage.consent')}</p>}
-      {bills && <p>{tx('privacy.bills.consent')}</p>}
+      <p>{tx('privacy.rental.consent')}</p>
+      <p>{tx('privacy.employment.consent')}</p>
+      <p>{tx('privacy.credit.consent')}</p>
+      <p>{tx('privacy.insurance.consent')}</p>
+      <p>{tx('privacy.mortgage.consent')}</p>
+      <p>{tx('privacy.bills.consent')}</p>
       <p>
         The documents are processed by Amazon Web Services EMEA SARL (Luxembourg), as processor: the
         server (AWS Lambda) is in Spain and the AI model is used through Amazon Bedrock with a

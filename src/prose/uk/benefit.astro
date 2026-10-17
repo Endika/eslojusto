@@ -1,5 +1,5 @@
 ---
-// source: 5665f4065cc1
+// source: 854c3338933e
 import FigureTable from '../../components/FigureTable.astro';
 import CaseLink from '../../components/CaseLink.astro';
 import { benefitBySalary } from '../../content/examples';
@@ -128,18 +128,15 @@ const rows: readonly (readonly [string, (b: Row) => number])[] = [
   </p>
 </section>
 
-{/* The literal switch, as in the ERTE page's route: a build without it renders nothing here. */}
-{import.meta.env.PUBLIC_ERTE === '1' && (
-  <section class="sheet sheet--text">
-    <h3 id="p-erte">Якщо ви в ERTE</h3>
-    <p>
-      ERTE (тимчасове призупинення або скорочення роботи) теж може давати право на допомогу по
-      безробіттю, поки він триває. Її розмір і те, чи витрачає вона вашу майбутню допомогу, залежать
-      від виду ERTE:{' '}
-      <a href={link(lang, 'paro/erte/')}>розрахуйте свою допомогу по безробіттю під час ERTE</a>.
-    </p>
-    <p class="folio">
-      Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
-    </p>
-  </section>
-)}
+<section class="sheet sheet--text">
+  <h3 id="p-erte">Якщо ви в ERTE</h3>
+  <p>
+    ERTE (тимчасове призупинення або скорочення роботи) теж може давати право на допомогу по
+    безробіттю, поки він триває. Її розмір і те, чи витрачає вона вашу майбутню допомогу, залежать
+    від виду ERTE:{' '}
+    <a href={link(lang, 'paro/erte/')}>розрахуйте свою допомогу по безробіттю під час ERTE</a>.
+  </p>
+  <p class="folio">
+    Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+  </p>
+</section>

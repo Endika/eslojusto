@@ -21,7 +21,7 @@ interface Props {
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
 
-// The day the page's rules and norms were last checked; it exists only in a build with the page.
+// The day the page's rules and norms were last checked.
 const checkedOn = LAST_UPDATED['/empleada-de-hogar/'];
 if (!checkedOn) throw new Error('/empleada-de-hogar/ needs its date in LAST_UPDATED.');
 const home = new URL(import.meta.env.BASE_URL, Astro.site);

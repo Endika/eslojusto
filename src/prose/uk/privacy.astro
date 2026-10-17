@@ -1,19 +1,10 @@
 ---
-// source: 09f730db2222
+// source: 625095d4cc94
 import { t, type Key } from '../../i18n';
 import { link, type Lang } from '../../i18n/languages';
 import { DOCUMENTS } from '../../documents/config';
 import { OUTAGE_KEY } from '../../documents/outage';
 import { STORAGE_KEYS } from '../../documents/pass';
-import {
-  BILLS_BUILD,
-  CREDIT_BUILD,
-  EMPLOYMENT_BUILD,
-  HOUSEHOLD_BUILD,
-  INSURANCE_BUILD,
-  MORTGAGE_BUILD,
-  RENTAL_BUILD,
-} from '../../content/sections';
 
 interface Props {
   lang: Lang;
@@ -25,20 +16,6 @@ const tx = (key: Key) => t(lang, key);
 const email = 'hola@eslojusto.es';
 // Reading documents and the pass exist only in a build with their API; so do their paragraphs.
 const documents = DOCUMENTS !== null;
-// The rental review exists only in a PUBLIC_RENTAL=1 build; so do the paragraphs about it.
-const rental = RENTAL_BUILD;
-// The contract review exists only in a PUBLIC_EMPLOYMENT=1 build; so do the paragraphs about it.
-const employment = EMPLOYMENT_BUILD;
-// The household review exists only in a PUBLIC_HOUSEHOLD=1 build; so do the paragraphs about it.
-const household = HOUSEHOLD_BUILD;
-// The credit and insurance reviews exist only in a PUBLIC_CREDIT=1 or PUBLIC_INSURANCE=1 build; so
-// do the paragraphs about each.
-const credit = CREDIT_BUILD;
-const insurance = INSURANCE_BUILD;
-// The mortgage review exists only in a PUBLIC_MORTGAGE=1 build; so do the paragraphs about it.
-const mortgage = MORTGAGE_BUILD;
-// The bills reviews exist only in a PUBLIC_BILLS=1 build; so do the paragraphs about them.
-const bills = BILLS_BUILD;
 
 // One entry per thing that is stored or processed; a new tool adds a row here.
 const stored = [
@@ -47,51 +24,27 @@ const stored = [
     where:
       'Лише у вашому браузері, поки сторінка відкрита. Розрахунок виконується на вашому пристрої: ваші дати, ваша зарплата, суми вашого остаточного розрахунку, ваші діти на утриманні та ваші інші договори не надсилаються на жоден сервер і не зберігаються. Коли ви закриваєте або перезавантажуєте сторінку, вони зникають.',
   },
-  ...(rental
-    ? [{ what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') }]
-    : []),
-  ...(employment
-    ? [
-        {
-          what: tx('privacy.employment.data_review'),
-          where: tx('privacy.employment.data_review_where'),
-        },
-      ]
-    : []),
-  ...(household
-    ? [
-        {
-          what: tx('privacy.household.data_review'),
-          where: tx('privacy.household.data_review_where'),
-        },
-      ]
-    : []),
-  ...(credit
-    ? [{ what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') }]
-    : []),
-  ...(insurance
-    ? [
-        {
-          what: tx('privacy.insurance.data_review'),
-          where: tx('privacy.insurance.data_review_where'),
-        },
-      ]
-    : []),
-  ...(mortgage
-    ? [
-        {
-          what: tx('privacy.mortgage.data_review'),
-          where: tx('privacy.mortgage.data_review_where'),
-        },
-      ]
-    : []),
-  ...(bills
-    ? [
-        { what: tx('privacy.bills.data_review'), where: tx('privacy.bills.data_review_where') },
-        ...(documents
-          ? [{ what: tx('privacy.bills.data_year'), where: tx('privacy.bills.data_year_where') }]
-          : []),
-      ]
+  { what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') },
+  {
+    what: tx('privacy.employment.data_review'),
+    where: tx('privacy.employment.data_review_where'),
+  },
+  {
+    what: tx('privacy.household.data_review'),
+    where: tx('privacy.household.data_review_where'),
+  },
+  { what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') },
+  {
+    what: tx('privacy.insurance.data_review'),
+    where: tx('privacy.insurance.data_review_where'),
+  },
+  {
+    what: tx('privacy.mortgage.data_review'),
+    where: tx('privacy.mortgage.data_review_where'),
+  },
+  { what: tx('privacy.bills.data_review'), where: tx('privacy.bills.data_review_where') },
+  ...(documents
+    ? [{ what: tx('privacy.bills.data_year'), where: tx('privacy.bills.data_year_where') }]
     : []),
   {
     what: tx('privacy.data_analytics'),
@@ -105,85 +58,61 @@ const stored = [
           where:
             'Лише якщо ви вирішите завантажити свої документи (лист про звільнення, остаточний розрахунок, ваші розрахункові листи, довідку від роботодавця (certificado de empresa), угоду чи протокол примирення або виписку про трудовий стаж (vida laboral)) і дасте згоду. PDF перетворюються на зображення своїх сторінок у вашому браузері, не залишаючи його, і перш ніж щось надіслати, сторінка перевіряє, також у вашому браузері, чи не виглядає якесь фото темним, розмитим або замалим. Ці зображення і фото передаються в зашифрованому вигляді на сервер eslojusto.es в Amazon Web Services, в Іспанії (регіон eu-south-2), який передає їх моделі ШІ (Claude від Anthropic) через Amazon Bedrock, у межах Європейського Союзу. Модель визначає, який документ на кожній сторінці, копіює дані, яких потребує форма, і зчитане повертається у ваш браузер. Нічого не зберігається: документи існують лише в пам’яті сервера під час зчитування, а його журнали, які зберігаються 14 днів, містять лише технічні дані: результат, кількість сторінок, скільки часу це зайняло, скільки тексту обробила модель і кілька службових позначок, як-от чи знадобилося повторне зчитування, скільки значень не збігалися між документами (без зазначення, яких саме, і їхніх значень) або скільки сторінок не вдалося зчитати і чому (наприклад, розмита або з іншої країни). Ніколи не вміст і нічого, що вас ідентифікує.',
         },
-        ...(rental
-          ? [
-              {
-                what: tx('privacy.rental.data_documents'),
-                where: tx('privacy.rental.data_documents_where'),
-              },
-              {
-                what: tx('privacy.rental.data_letters'),
-                where: tx('privacy.rental.data_letters_where'),
-              },
-            ]
-          : []),
-        ...(employment
-          ? [
-              {
-                what: tx('privacy.employment.data_documents'),
-                where: tx('privacy.employment.data_documents_where'),
-              },
-              {
-                what: tx('privacy.employment.data_letters'),
-                where: tx('privacy.employment.data_letters_where'),
-              },
-            ]
-          : []),
-        ...(credit
-          ? [
-              {
-                what: tx('privacy.credit.data_documents'),
-                where: tx('privacy.credit.data_documents_where'),
-              },
-              {
-                what: tx('privacy.credit.data_letters'),
-                where: tx('privacy.credit.data_letters_where'),
-              },
-            ]
-          : []),
-        ...(insurance
-          ? [
-              {
-                what: tx('privacy.insurance.data_documents'),
-                where: tx('privacy.insurance.data_documents_where'),
-              },
-              {
-                what: tx('privacy.insurance.data_letters'),
-                where: tx('privacy.insurance.data_letters_where'),
-              },
-            ]
-          : []),
-        ...(mortgage
-          ? [
-              {
-                what: tx('privacy.mortgage.data_documents'),
-                where: tx('privacy.mortgage.data_documents_where'),
-              },
-              {
-                what: tx('privacy.mortgage.data_letters'),
-                where: tx('privacy.mortgage.data_letters_where'),
-              },
-            ]
-          : []),
-        ...(bills
-          ? [
-              {
-                what: tx('privacy.bills.data_documents'),
-                where: tx('privacy.bills.data_documents_where'),
-              },
-              {
-                what: tx('privacy.bills.data_letters'),
-                where: tx('privacy.bills.data_letters_where'),
-              },
-            ]
-          : []),
+        {
+          what: tx('privacy.rental.data_documents'),
+          where: tx('privacy.rental.data_documents_where'),
+        },
+        {
+          what: tx('privacy.rental.data_letters'),
+          where: tx('privacy.rental.data_letters_where'),
+        },
+        {
+          what: tx('privacy.employment.data_documents'),
+          where: tx('privacy.employment.data_documents_where'),
+        },
+        {
+          what: tx('privacy.employment.data_letters'),
+          where: tx('privacy.employment.data_letters_where'),
+        },
+        {
+          what: tx('privacy.credit.data_documents'),
+          where: tx('privacy.credit.data_documents_where'),
+        },
+        {
+          what: tx('privacy.credit.data_letters'),
+          where: tx('privacy.credit.data_letters_where'),
+        },
+        {
+          what: tx('privacy.insurance.data_documents'),
+          where: tx('privacy.insurance.data_documents_where'),
+        },
+        {
+          what: tx('privacy.insurance.data_letters'),
+          where: tx('privacy.insurance.data_letters_where'),
+        },
+        {
+          what: tx('privacy.mortgage.data_documents'),
+          where: tx('privacy.mortgage.data_documents_where'),
+        },
+        {
+          what: tx('privacy.mortgage.data_letters'),
+          where: tx('privacy.mortgage.data_letters_where'),
+        },
+        {
+          what: tx('privacy.bills.data_documents'),
+          where: tx('privacy.bills.data_documents_where'),
+        },
+        {
+          what: tx('privacy.bills.data_letters'),
+          where: tx('privacy.bills.data_letters_where'),
+        },
         {
           what: tx('privacy.data_pass'),
           where: `У локальному сховищі (localStorage) вашого браузера, і лише якщо ви ними користуєтеся: підписаний лічильник ваших безкоштовних зчитувань за день («${STORAGE_KEYS.quota}»); якщо ви купуєте абонемент, — абонемент і зчитування, що в ньому залишилися («${STORAGE_KEYS.pass}»), і код кожної оплати, яку ви розпочинаєте, з випадковим числом, яке знає лише ваш браузер, щоб можна було відновити абонемент («${STORAGE_KEYS.checkout}»; кожна оплата видаляється через 7 днів, якщо її не завершено, або коли спливає строк її абонемента). Вони не містять ні вашого імені, ні нічого з ваших документів і залишають ваш пристрій лише з наступним зчитуванням, щоб відновити абонемент або перевірити його, перш ніж показати вам деталі вашої перевірки, звіт або лист. Їх отримує сервер eslojusto.es в AWS, який запитує в Stripe про оплату. Абонемент, строк якого сплив, і лічильник попереднього дня видаляються самі наступного разу, коли сторінка до них звертається, а все видаляється, коли ви видаляєте дані цього сайту у своєму браузері; тому абонемент діє лише в цьому браузері і втрачається на іншому пристрої, у приватному вікні або коли ви їх видаляєте. Якщо зчитування недоступне, вкладка пам’ятає це протягом години у своєму сховищі сеансу («${OUTAGE_KEY}», лише з часом), щоб тим часом не пропонувати його вам.`,
         },
         {
           what: tx('privacy.data_checkout'),
-          where: `Якщо ви платите, відповіді вашої перевірки зберігаються у сховищі сеансу (sessionStorage) цієї вкладки, поки ви на сторінці оплати, щоб показати вам результат, коли ви повернетеся.${bills ? ' Для рахунків за електроенергію так само зберігаються відповіді щодо кожного рахунку вашого року, який ви вже перевірили, без відбитка коду точки постачання.' : ''} Вони не залишають вашого пристрою і видаляються, коли ви повертаєтеся або закриваєте вкладку.`,
+          where: `Якщо ви платите, відповіді вашої перевірки зберігаються у сховищі сеансу (sessionStorage) цієї вкладки, поки ви на сторінці оплати, щоб показати вам результат, коли ви повернетеся. Для рахунків за електроенергію так само зберігаються відповіді щодо кожного рахунку вашого року, який ви вже перевірили, без відбитка коду точки постачання. Вони не залишають вашого пристрою і видаляються, коли ви повертаєтеся або закриваєте вкладку.`,
         },
       ]
     : []),
@@ -238,122 +167,94 @@ const tracked = [
     when: 'Коли ви натискаєте «Почати спочатку»',
     what: 'Те, що ви натиснули цю кнопку.',
   },
-  ...(rental
-    ? [
-        {
-          when: tx('privacy.rental.tracked_sheets'),
-          what: tx('privacy.rental.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.rental.tracked_scope'),
-          what: tx('privacy.rental.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.rental.tracked_review'),
-          what: tx('privacy.rental.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(employment
-    ? [
-        {
-          when: tx('privacy.employment.tracked_sheets'),
-          what: tx('privacy.employment.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.employment.tracked_scope'),
-          what: tx('privacy.employment.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.employment.tracked_review'),
-          what: tx('privacy.employment.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(household
-    ? [
-        {
-          when: tx('privacy.household.tracked_sheets'),
-          what: tx('privacy.household.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.household.tracked_scope'),
-          what: tx('privacy.household.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.household.tracked_review'),
-          what: tx('privacy.household.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(credit
-    ? [
-        {
-          when: tx('privacy.credit.tracked_sheets'),
-          what: tx('privacy.credit.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.credit.tracked_scope'),
-          what: tx('privacy.credit.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.credit.tracked_review'),
-          what: tx('privacy.credit.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(insurance
-    ? [
-        {
-          when: tx('privacy.insurance.tracked_sheets'),
-          what: tx('privacy.insurance.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.insurance.tracked_scope'),
-          what: tx('privacy.insurance.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.insurance.tracked_review'),
-          what: tx('privacy.insurance.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(mortgage
-    ? [
-        {
-          when: tx('privacy.mortgage.tracked_sheets'),
-          what: tx('privacy.mortgage.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.mortgage.tracked_scope'),
-          what: tx('privacy.mortgage.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.mortgage.tracked_review'),
-          what: tx('privacy.mortgage.tracked_review_what'),
-        },
-      ]
-    : []),
-  ...(bills
-    ? [
-        {
-          when: tx('privacy.bills.tracked_sheets'),
-          what: tx('privacy.bills.tracked_sheets_what'),
-        },
-        {
-          when: tx('privacy.bills.tracked_scope'),
-          what: tx('privacy.bills.tracked_scope_what'),
-        },
-        {
-          when: tx('privacy.bills.tracked_review'),
-          what: tx('privacy.bills.tracked_review_what'),
-        },
-        {
-          when: tx('privacy.bills.tracked_telecom'),
-          what: tx('privacy.bills.tracked_telecom_what'),
-        },
-      ]
-    : []),
+  {
+    when: tx('privacy.rental.tracked_sheets'),
+    what: tx('privacy.rental.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.rental.tracked_scope'),
+    what: tx('privacy.rental.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.rental.tracked_review'),
+    what: tx('privacy.rental.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_sheets'),
+    what: tx('privacy.employment.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_scope'),
+    what: tx('privacy.employment.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_review'),
+    what: tx('privacy.employment.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_sheets'),
+    what: tx('privacy.household.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_scope'),
+    what: tx('privacy.household.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_review'),
+    what: tx('privacy.household.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_sheets'),
+    what: tx('privacy.credit.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_scope'),
+    what: tx('privacy.credit.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_review'),
+    what: tx('privacy.credit.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_sheets'),
+    what: tx('privacy.insurance.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_scope'),
+    what: tx('privacy.insurance.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_review'),
+    what: tx('privacy.insurance.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_sheets'),
+    what: tx('privacy.mortgage.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_scope'),
+    what: tx('privacy.mortgage.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_review'),
+    what: tx('privacy.mortgage.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_sheets'),
+    what: tx('privacy.bills.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_scope'),
+    what: tx('privacy.bills.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_review'),
+    what: tx('privacy.bills.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_telecom'),
+    what: tx('privacy.bills.tracked_telecom_what'),
+  },
   ...(documents
     ? [
         {
@@ -368,54 +269,30 @@ const tracked = [
           when: 'З абонементом',
           what: 'Те, що ви починаєте оплату, що абонемент видано після повернення з оплати або під час його відновлення, або код помилки; чи під час перевірки він виявляється дійсним, недійсним, простроченим, анульованим або без відповіді; і чи завантажуєте ви звіт або лист. Щодо листа — лише те, скільки необов’язкових даних (ім’я, DNI або NIE, компанія і населений пункт) ви заповнили: жодного, деякі чи всі; ніколи — які саме чи що в них написано: ці дані лише заповнюють лист у вашому браузері і не надсилаються і не зберігаються. Ніколи — код оплати чи абонемент.',
         },
-        ...(rental
-          ? [
-              {
-                when: tx('privacy.rental.tracked_documents'),
-                what: tx('privacy.rental.tracked_documents_what'),
-              },
-            ]
-          : []),
-        ...(employment
-          ? [
-              {
-                when: tx('privacy.employment.tracked_documents'),
-                what: tx('privacy.employment.tracked_documents_what'),
-              },
-            ]
-          : []),
-        ...(credit
-          ? [
-              {
-                when: tx('privacy.credit.tracked_documents'),
-                what: tx('privacy.credit.tracked_documents_what'),
-              },
-            ]
-          : []),
-        ...(insurance
-          ? [
-              {
-                when: tx('privacy.insurance.tracked_documents'),
-                what: tx('privacy.insurance.tracked_documents_what'),
-              },
-            ]
-          : []),
-        ...(mortgage
-          ? [
-              {
-                when: tx('privacy.mortgage.tracked_documents'),
-                what: tx('privacy.mortgage.tracked_documents_what'),
-              },
-            ]
-          : []),
-        ...(bills
-          ? [
-              {
-                when: tx('privacy.bills.tracked_documents'),
-                what: tx('privacy.bills.tracked_documents_what'),
-              },
-            ]
-          : []),
+        {
+          when: tx('privacy.rental.tracked_documents'),
+          what: tx('privacy.rental.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_documents'),
+          what: tx('privacy.employment.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_documents'),
+          what: tx('privacy.credit.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_documents'),
+          what: tx('privacy.insurance.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_documents'),
+          what: tx('privacy.mortgage.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_documents'),
+          what: tx('privacy.bills.tracked_documents_what'),
+        },
       ]
     : []),
   {
@@ -435,13 +312,13 @@ const tracked = [
       користуєтеся. Надсилаються лише коди і діапазони, ніколи не сума чи дата. Cookie і реклами
       немає.
     </p>
-    {rental && <p>{tx('privacy.rental.summary')}</p>}
-    {employment && <p>{tx('privacy.employment.summary')}</p>}
-    {household && <p>{tx('privacy.household.summary')}</p>}
-    {credit && <p>{tx('privacy.credit.summary')}</p>}
-    {insurance && <p>{tx('privacy.insurance.summary')}</p>}
-    {mortgage && <p>{tx('privacy.mortgage.summary')}</p>}
-    {bills && <p>{tx('privacy.bills.summary')}</p>}
+    <p>{tx('privacy.rental.summary')}</p>
+    <p>{tx('privacy.employment.summary')}</p>
+    <p>{tx('privacy.household.summary')}</p>
+    <p>{tx('privacy.credit.summary')}</p>
+    <p>{tx('privacy.insurance.summary')}</p>
+    <p>{tx('privacy.mortgage.summary')}</p>
+    <p>{tx('privacy.bills.summary')}</p>
     {documents && (
       <p>
         Якщо ви вирішите завантажити документ, щоб заповнити дані, він зчитується за допомогою ШІ в
@@ -529,12 +406,12 @@ const tracked = [
         регламенту захисту даних (GDPR)). Ви можете відкликати її будь-коли, просто не завантажуючи
         більше документів: оскільки нічого не зберігається, видаляти нічого.
       </p>
-      {rental && <p>{tx('privacy.rental.consent')}</p>}
-      {employment && <p>{tx('privacy.employment.consent')}</p>}
-      {credit && <p>{tx('privacy.credit.consent')}</p>}
-      {insurance && <p>{tx('privacy.insurance.consent')}</p>}
-      {mortgage && <p>{tx('privacy.mortgage.consent')}</p>}
-      {bills && <p>{tx('privacy.bills.consent')}</p>}
+      <p>{tx('privacy.rental.consent')}</p>
+      <p>{tx('privacy.employment.consent')}</p>
+      <p>{tx('privacy.credit.consent')}</p>
+      <p>{tx('privacy.insurance.consent')}</p>
+      <p>{tx('privacy.mortgage.consent')}</p>
+      <p>{tx('privacy.bills.consent')}</p>
       <p>
         Документи обробляє Amazon Web Services EMEA SARL (Люксембург) як обробник даних: сервер (AWS
         Lambda) розташований в Іспанії, а модель ШІ використовується через Amazon Bedrock із
