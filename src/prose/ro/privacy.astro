@@ -1,0 +1,629 @@
+---
+// source: 09f730db2222
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+import { DOCUMENTS } from '../../documents/config';
+import { OUTAGE_KEY } from '../../documents/outage';
+import { STORAGE_KEYS } from '../../documents/pass';
+import {
+  BILLS_BUILD,
+  CREDIT_BUILD,
+  EMPLOYMENT_BUILD,
+  HOUSEHOLD_BUILD,
+  INSURANCE_BUILD,
+  MORTGAGE_BUILD,
+  RENTAL_BUILD,
+} from '../../content/sections';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const tx = (key: Key) => t(lang, key);
+
+const email = 'hola@eslojusto.es';
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+// The rental review exists only in a PUBLIC_RENTAL=1 build; so do the paragraphs about it.
+const rental = RENTAL_BUILD;
+// The contract review exists only in a PUBLIC_EMPLOYMENT=1 build; so do the paragraphs about it.
+const employment = EMPLOYMENT_BUILD;
+// The household review exists only in a PUBLIC_HOUSEHOLD=1 build; so do the paragraphs about it.
+const household = HOUSEHOLD_BUILD;
+// The credit and insurance reviews exist only in a PUBLIC_CREDIT=1 or PUBLIC_INSURANCE=1 build; so
+// do the paragraphs about each.
+const credit = CREDIT_BUILD;
+const insurance = INSURANCE_BUILD;
+// The mortgage review exists only in a PUBLIC_MORTGAGE=1 build; so do the paragraphs about it.
+const mortgage = MORTGAGE_BUILD;
+// The bills reviews exist only in a PUBLIC_BILLS=1 build; so do the paragraphs about them.
+const bills = BILLS_BUILD;
+
+// One entry per thing that is stored or processed; a new tool adds a row here.
+const stored = [
+  {
+    what: tx('privacy.data_review'),
+    where:
+      'Doar în browserul tău, cât timp pagina este deschisă. Calculul se face pe dispozitivul tău: datele calendaristice, salariul tău, cifrele lichidării tale finale (finiquito), copiii aflați în întreținerea ta și celelalte contracte ale tale nu se trimit la niciun server și nici nu se păstrează. Când închizi sau reîncarci pagina, dispar.',
+  },
+  ...(rental
+    ? [{ what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') }]
+    : []),
+  ...(employment
+    ? [
+        {
+          what: tx('privacy.employment.data_review'),
+          where: tx('privacy.employment.data_review_where'),
+        },
+      ]
+    : []),
+  ...(household
+    ? [
+        {
+          what: tx('privacy.household.data_review'),
+          where: tx('privacy.household.data_review_where'),
+        },
+      ]
+    : []),
+  ...(credit
+    ? [{ what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') }]
+    : []),
+  ...(insurance
+    ? [
+        {
+          what: tx('privacy.insurance.data_review'),
+          where: tx('privacy.insurance.data_review_where'),
+        },
+      ]
+    : []),
+  ...(mortgage
+    ? [
+        {
+          what: tx('privacy.mortgage.data_review'),
+          where: tx('privacy.mortgage.data_review_where'),
+        },
+      ]
+    : []),
+  ...(bills
+    ? [
+        { what: tx('privacy.bills.data_review'), where: tx('privacy.bills.data_review_where') },
+        ...(documents
+          ? [{ what: tx('privacy.bills.data_year'), where: tx('privacy.bills.data_year_where') }]
+          : []),
+      ]
+    : []),
+  {
+    what: tx('privacy.data_analytics'),
+    where:
+      'Câteva evenimente scurte cu coduri și intervale, care se trimit la PostHog cât timp folosești pagina (detaliile, mai jos). Identificatorul vizualizării paginii există doar în memoria ei: nu se scrie pe dispozitivul tău și se pierde când o închizi sau o reîncarci.',
+  },
+  ...(documents
+    ? [
+        {
+          what: tx('privacy.data_documents'),
+          where:
+            'Doar dacă alegi să îți încarci documentele (scrisoarea de concediere, lichidarea finală, fluturașii de salariu, adeverința de la firmă (certificado de empresa), un acord sau un proces-verbal de conciliere (acta de conciliación) ori istoricul de muncă (vida laboral)) și îți dai consimțământul. Fișierele PDF se transformă în imagini ale paginilor lor în browserul tău, fără să iasă din el, iar înainte să trimită ceva, pagina verifică, tot în browserul tău, dacă vreo fotografie pare întunecată, neclară sau mică. Aceste imagini și fotografiile ajung criptate la un server al eslojusto.es din Amazon Web Services, în Spania (regiunea eu-south-2), care le transmite unui model de IA (Claude, de la Anthropic) prin Amazon Bedrock, în interiorul Uniunii Europene. Modelul de IA indică ce tip de document este fiecare pagină, copiază datele cerute de formular, iar ce s-a citit se întoarce în browserul tău. Nu se păstrează nimic: documentele există doar în memoria serverului cât timp sunt citite, iar jurnalele lor, care se păstrează 14 zile, conțin doar date tehnice: rezultatul, numărul de pagini, cât a durat, cât text a procesat modelul de IA și câțiva indicatori de funcționare, cum ar fi dacă a fost nevoie de o a doua citire, câte informații nu coincideau între documente (fără să spună care sau valorile lor) ori câte pagini nu au putut fi citite și de ce (de exemplu, neclare sau din altă țară). Niciodată conținutul sau ceva care te identifică.',
+        },
+        ...(rental
+          ? [
+              {
+                what: tx('privacy.rental.data_documents'),
+                where: tx('privacy.rental.data_documents_where'),
+              },
+              {
+                what: tx('privacy.rental.data_letters'),
+                where: tx('privacy.rental.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(employment
+          ? [
+              {
+                what: tx('privacy.employment.data_documents'),
+                where: tx('privacy.employment.data_documents_where'),
+              },
+              {
+                what: tx('privacy.employment.data_letters'),
+                where: tx('privacy.employment.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(credit
+          ? [
+              {
+                what: tx('privacy.credit.data_documents'),
+                where: tx('privacy.credit.data_documents_where'),
+              },
+              {
+                what: tx('privacy.credit.data_letters'),
+                where: tx('privacy.credit.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(insurance
+          ? [
+              {
+                what: tx('privacy.insurance.data_documents'),
+                where: tx('privacy.insurance.data_documents_where'),
+              },
+              {
+                what: tx('privacy.insurance.data_letters'),
+                where: tx('privacy.insurance.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(mortgage
+          ? [
+              {
+                what: tx('privacy.mortgage.data_documents'),
+                where: tx('privacy.mortgage.data_documents_where'),
+              },
+              {
+                what: tx('privacy.mortgage.data_letters'),
+                where: tx('privacy.mortgage.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(bills
+          ? [
+              {
+                what: tx('privacy.bills.data_documents'),
+                where: tx('privacy.bills.data_documents_where'),
+              },
+              {
+                what: tx('privacy.bills.data_letters'),
+                where: tx('privacy.bills.data_letters_where'),
+              },
+            ]
+          : []),
+        {
+          what: tx('privacy.data_pass'),
+          where: `În spațiul de stocare local (localStorage) al browserului tău, și doar dacă le folosești: un contor semnat al citirilor tale gratuite din ziua respectivă („${STORAGE_KEYS.quota}”); dacă cumperi permisul (pase), permisul și citirile care îi mai rămân („${STORAGE_KEYS.pass}”) și codul fiecărei plăți pe care o începi, cu un număr aleatoriu pe care îl cunoaște doar browserul tău, ca să poți recupera permisul („${STORAGE_KEYS.checkout}”; fiecare plată se elimină după 7 zile dacă nu a fost finalizată sau când îi expiră permisul). Nu conțin numele tău și nimic din documentele tale și ies de pe dispozitivul tău doar la următoarea citire, pentru a recupera permisul sau pentru a-l verifica înainte să îți arate calculul detaliat al verificării tale, raportul sau scrisoarea. Le primește serverul eslojusto.es din AWS, care întreabă Stripe despre plată. Permisul expirat și contorul dintr-o zi anterioară se șterg singure data următoare când pagina le consultă, iar totul se șterge când ștergi datele acestui site din browserul tău; de aceea permisul este valabil doar în acest browser și se pierde pe alt dispozitiv, într-o fereastră privată sau când le ștergi. Dacă citirea nu este disponibilă, fila reține acest lucru timp de o oră în spațiul ei de stocare a sesiunii („${OUTAGE_KEY}”, doar cu ora), ca să nu ți-o ofere între timp.`,
+        },
+        {
+          what: tx('privacy.data_checkout'),
+          where: `Dacă plătești, răspunsurile din verificarea ta se păstrează în spațiul de stocare a sesiunii (sessionStorage) al acelei file cât timp ești pe pagina de plată, ca să îți fie arătat rezultatul când te întorci.${bills ? ' La facturile la electricitate se păstrează astfel răspunsurile pentru fiecare factură din anul tău pe care ai verificat-o deja, fără amprenta codului punctului de consum.' : ''} Nu ies de pe dispozitivul tău și se șterg când te întorci sau când închizi fila.`,
+        },
+      ]
+    : []),
+  {
+    what: tx('privacy.data_theme'),
+    where:
+      'În spațiul de stocare local (localStorage) al browserului tău, și doar dacă apeși butonul temei. Nu iese niciodată de pe dispozitivul tău. Se șterge când ștergi datele acestui site din browserul tău.',
+  },
+  {
+    what: tx('privacy.data_server'),
+    where:
+      'Site-ul este găzduit pe GitHub Pages. GitHub înregistrează adresa IP și datele tehnice ale fiecărei vizite, ca orice server web.',
+  },
+];
+
+// The allowlist (src/analytics/sanitize.ts) and the event catalogue (src/analytics/events.ts), in
+// plain words. Keep all three in step: the analytics e2e asserts the exact keys.
+const tracked = [
+  {
+    when: 'La fiecare eveniment',
+    what: 'Data și ora fiecărui eveniment și un număr aleatoriu care există doar cât timp pagina este deschisă. Adresa paginii fără parametri: domeniul, calea și pasul la care te afli. Browserul tău și versiunea lui, și sistemul tău (Windows, Android…). Tipul de dispozitiv (computer, telefon mobil sau tabletă) și dimensiunea ferestrei. Domeniul site-ului de pe care vii (de exemplu „www.google.com”), fără adresa completă. Dacă ajungi de pe un link de campanie, sursa, mediul și numele ei (utm_source, utm_medium, utm_campaign), doar când sunt un cod scurt din litere, cifre și cratime. Și trei date tehnice ale PostHog: cheia proiectului eslojusto.es, versiunea codului său și un indicator care îi cere să nu creeze niciun profil.',
+  },
+  {
+    when: 'Când deschizi o pagină',
+    what: 'Faptul că ai deschis-o și limba principală a browserului tău, doar partea generală: „ja”, nu „ja-JP”.',
+  },
+  {
+    when: 'Când părăsești o pagină',
+    what: 'Cât timp ai stat pe pagină și până unde ai derulat.',
+  },
+  {
+    when: 'Dacă folosești traducătorul browserului',
+    what: 'Limba în care traduci pagina, de exemplu „ar”.',
+  },
+  {
+    when: 'La fiecare pas al verificării',
+    what: 'Faptul că îl deschizi și, când îl termini, cât timp ți-a luat, pe un interval larg: sub 10 secunde, de la 10 la 30, de la 30 la 60, de la 60 la 180 sau peste 180. Dacă te întorci înapoi, de la ce pas la care.',
+  },
+  {
+    when: 'Dacă o informație nu este acceptată',
+    what: 'Numele câmpului, de exemplu „data plecării”. Niciodată ce ai scris în el.',
+  },
+  {
+    when: 'Dacă deschizi un ajutor',
+    what: 'Ce întrebare frecventă deschizi sau la ce componentă te uiți la „Cum se calculează”.',
+  },
+  {
+    when: 'Când verifici',
+    what: 'Motivul încetării contractului, tipul contractului pe durată determinată, cum primești plățile suplimentare (pagas extra) și dacă îți socotești concediul în zile lucrătoare sau calendaristice și, dacă sunt lucrătoare, dacă lucrezi 5, 6 sau alt număr de zile pe săptămână, așa cum le alegi în opțiuni. Câte componente au cifra din lichidarea ta finală și câte ies sub minimul legal, coincid cu el, îl depășesc sau nu pot fi verificate. Dacă ți se reține pentru preaviz mai mult decât maximul. Dacă se arată cât s-ar plăti la o concediere nejustificată (improcedente), fără cifră. Dacă rezultatul apare ca rezumat sau cu calculul detaliat al permisului. Dacă diferența este zero, sub 100 €, între 100 și 500 €, între 500 și 2.000 € sau mai mare. De câte ori ai făcut verificarea pe această pagină, cât timp ți-a luat, pe intervale, și, dacă verifici din nou, numele câmpurilor pe care le-ai schimbat. Despre șomaj, doar dacă estimarea nu se aplică motivului tău, dacă are cifre sau apare fără ele și câte alte contracte ai adăugat, pe un interval: 0, 1, 2 sau 3 ori mai multe. Niciodată câți copii ai în întreținere și nicio dată a acelor contracte. Despre ERTE (șomaj tehnic temporar) și despre dacă ți s-a plătit, doar numele întrebării dacă o schimbi, niciodată răspunsul. Ce bifezi despre o posibilă concediere nulă (sarcină, concedii speciale (permisos), concediu medical…) nu se trimite niciodată, nici chiar dacă ai bifat ceva.',
+  },
+  {
+    when: 'Când apeși „Ia-o de la capăt”',
+    what: 'Faptul că l-ai apăsat.',
+  },
+  ...(rental
+    ? [
+        {
+          when: tx('privacy.rental.tracked_sheets'),
+          what: tx('privacy.rental.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.rental.tracked_scope'),
+          what: tx('privacy.rental.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.rental.tracked_review'),
+          what: tx('privacy.rental.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(employment
+    ? [
+        {
+          when: tx('privacy.employment.tracked_sheets'),
+          what: tx('privacy.employment.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_scope'),
+          what: tx('privacy.employment.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_review'),
+          what: tx('privacy.employment.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(household
+    ? [
+        {
+          when: tx('privacy.household.tracked_sheets'),
+          what: tx('privacy.household.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.household.tracked_scope'),
+          what: tx('privacy.household.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.household.tracked_review'),
+          what: tx('privacy.household.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(credit
+    ? [
+        {
+          when: tx('privacy.credit.tracked_sheets'),
+          what: tx('privacy.credit.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_scope'),
+          what: tx('privacy.credit.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_review'),
+          what: tx('privacy.credit.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(insurance
+    ? [
+        {
+          when: tx('privacy.insurance.tracked_sheets'),
+          what: tx('privacy.insurance.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_scope'),
+          what: tx('privacy.insurance.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_review'),
+          what: tx('privacy.insurance.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(mortgage
+    ? [
+        {
+          when: tx('privacy.mortgage.tracked_sheets'),
+          what: tx('privacy.mortgage.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_scope'),
+          what: tx('privacy.mortgage.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_review'),
+          what: tx('privacy.mortgage.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(bills
+    ? [
+        {
+          when: tx('privacy.bills.tracked_sheets'),
+          what: tx('privacy.bills.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_scope'),
+          what: tx('privacy.bills.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_review'),
+          what: tx('privacy.bills.tracked_review_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_telecom'),
+          what: tx('privacy.bills.tracked_telecom_what'),
+        },
+      ]
+    : []),
+  ...(documents
+    ? [
+        {
+          when: 'Când alegi cum să începi',
+          what: 'Dacă alegi să încarci un document sau să completezi manual.',
+        },
+        {
+          when: 'Când se citesc documentele',
+          what: 'Câte fotografii sau pagini încarci, pe un interval (1, de la 2 la 4, de la 5 la 9, de la 10 la 15 sau de la 16 la 25), și câte fișiere PDF ai ales. La final, ce tipuri de documente au fost recunoscute (de exemplu, scrisoare de concediere sau fluturaș de salariu), câte informații au fost completate, pe un interval (0, de la 1 la 3, de la 4 la 8 sau 9 ori mai multe), dacă vreuna a ieșit cu încredere scăzută, dacă cifrele nu se potriveau, dacă două documente nu coincideau, dacă a fost nevoie să fie citite din nou cu un model de IA mai precis și, dacă vreo pagină nu a putut fi citită, de ce (neclară, întunecată, tăiată, scrisă de mână, fără legătură cu munca, din altă țară, de un tip care nu este recunoscut, fără date utile sau necitită), fără să spună care; ori, dacă citirea eșuează, codul erorii. Dacă înainte de trimitere o fotografie pare întunecată, neclară sau mică, care dintre cele trei probleme și dacă ai trimis-o oricum. Niciodată nimic din ce scrie în documente.',
+        },
+        {
+          when: 'Cu permisul',
+          what: 'Faptul că începi plata, că permisul este emis la întoarcerea de la plată sau când îl recuperezi, ori codul erorii, dacă la verificare iese valabil, nevalabil, expirat, anulat sau fără răspuns și dacă descarci raportul sau scrisoarea. Despre scrisoare, doar dacă ai completat niciuna, unele sau toate datele opționale (nume, DNI sau NIE, firmă și localitate), niciodată care anume sau ce scrie: aceste date doar completează scrisoarea în browserul tău și nu se trimit și nici nu se păstrează. Niciodată codul plății sau permisul.',
+        },
+        ...(rental
+          ? [
+              {
+                when: tx('privacy.rental.tracked_documents'),
+                what: tx('privacy.rental.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(employment
+          ? [
+              {
+                when: tx('privacy.employment.tracked_documents'),
+                what: tx('privacy.employment.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(credit
+          ? [
+              {
+                when: tx('privacy.credit.tracked_documents'),
+                what: tx('privacy.credit.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(insurance
+          ? [
+              {
+                when: tx('privacy.insurance.tracked_documents'),
+                what: tx('privacy.insurance.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(mortgage
+          ? [
+              {
+                when: tx('privacy.mortgage.tracked_documents'),
+                what: tx('privacy.mortgage.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(bills
+          ? [
+              {
+                when: tx('privacy.bills.tracked_documents'),
+                what: tx('privacy.bills.tracked_documents_what'),
+              },
+            ]
+          : []),
+      ]
+    : []),
+  {
+    when: 'Dacă pagina are o eroare',
+    what: 'Tipul erorii și în ce fișier și pe ce linie din cod a apărut. Niciodată mesajul erorii, pentru că ar putea cita ceva ce ai scris.',
+  },
+];
+---
+
+<div class="document__sheets">
+  <section class="sheet sheet--text">
+    <h2 id="pr-resumen">{tx('privacy.summary')}</h2>
+    <p>
+      Ce scrii în verificare nu iese de pe dispozitivul tău. Lichidarea ta finală (finiquito) se
+      calculează în întregime în browserul tău și nu se păstrează. Pentru a ști dacă instrumentul
+      este util și la ce pas se blochează oamenii, se măsoară, fără să te identifice, ce pași
+      folosești. Se trimit doar coduri și intervale, niciodată o sumă sau o dată. Nu există
+      cookie-uri și nici publicitate.
+    </p>
+    {rental && <p>{tx('privacy.rental.summary')}</p>}
+    {employment && <p>{tx('privacy.employment.summary')}</p>}
+    {household && <p>{tx('privacy.household.summary')}</p>}
+    {credit && <p>{tx('privacy.credit.summary')}</p>}
+    {insurance && <p>{tx('privacy.insurance.summary')}</p>}
+    {mortgage && <p>{tx('privacy.mortgage.summary')}</p>}
+    {bills && <p>{tx('privacy.bills.summary')}</p>}
+    {documents && (
+      <p>
+        Dacă decizi să încarci un document pentru a completa datele, acesta este citit cu un model
+        de IA în Uniunea Europeană, cu consimțământul tău, și nu se păstrează. Dacă cumperi permisul
+        (pase) pentru raport, plata este gestionată de Stripe.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-datos">{tx('privacy.data')}</h2>
+    <dl class="data-list">
+      {stored.map(({ what, where }) => (
+        <div>
+          <dt>{what}</dt>
+          <dd>{where}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      Despre jurnalele GitHub, consultă{' '}
+      <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">
+        declarația de confidențialitate a GitHub
+      </a>
+      .
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-medicion">{tx('privacy.analytics')}</h2>
+    <p>
+      Acesta este tot ce se trimite. Fiecare valoare provine dintr-o listă închisă de coduri sau de
+      intervale, iar pagina verifică fiecare eveniment înainte să îl trimită: un eveniment care
+      conține orice altceva nu pleacă, iar din ce adaugă PostHog de la sine trece doar ce se află pe
+      această listă.
+    </p>
+    <dl class="data-list">
+      {tracked.map(({ when, what }) => (
+        <div>
+          <dt>{when}</dt>
+          <dd>{what}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      Nu se creează un profil al tău și nici nu se leagă o vizită de alta: de fiecare dată când
+      deschizi sau reîncarci o pagină, măsurarea începe de la zero. Nu ies niciodată versiunea
+      sistemului tău, fusul tău orar, dimensiunea ecranului tău, limba ta completă, șirul complet al
+      agentului utilizator (user agent), titlul paginii, ce ai căutat ca să ajungi aici și nici
+      identificatorii de clic pe care advertiserii îi adaugă la linkuri (gclid, fbclid și altele
+      asemănătoare).
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-quien">{tx('privacy.who')}</h2>
+    <p>
+      Le primește PostHog Inc., instrumentul de măsurare, în{' '}
+      <a href="https://posthog.com/blog/posthog-cloud-eu">cloudul său din Uniunea Europeană</a>,
+      găzduit la Frankfurt (Germania). Prelucrează datele în numele eslojusto.es și nu le folosește
+      în niciun alt scop. PostHog Inc. este o companie din Statele Unite: prelucrarea este acoperită
+      de contractul său de persoană împuternicită de operator, care include clauzele contractuale
+      standard ale Comisiei Europene.
+    </p>
+    <p>
+      Când primește fiecare eveniment, PostHog vede adresa IP a conexiunii tale și agentul
+      utilizator al browserului tău, ca orice server. Nu păstrează niciuna dintre ele: proiectul
+      este configurat să elimine adresa IP, fără să o folosească pentru a te localiza, iar agentul
+      utilizator complet nu se trimite ca dată; doar browserul, versiunea lui și sistemul, așa cum
+      apar la „Ce se măsoară”.
+    </p>
+    <p>
+      Evenimentele se păstrează un an, termenul planului gratuit PostHog (consultă{' '}
+      <a href="https://posthog.com/docs/privacy">pagina sa de confidențialitate</a>).
+    </p>
+  </section>
+
+  {documents && (
+    <section class="sheet sheet--text">
+      <h2 id="pr-documentos">{tx('privacy.documents')}</h2>
+      <p>
+        Citirea unui document este opțională: verificarea funcționează la fel dacă scrii datele.
+        Înainte să îl încarci îți cerem consimțământul explicit, pentru că un fluturaș de salariu
+        (nómina) sau un istoric de muncă (vida laboral) pot arăta date cu protecție specială, cum ar
+        fi apartenența la un sindicat (prin cotizație) sau un concediu medical. Temeiul juridic este
+        acest consimțământ (art. 6.1.a și 9.2.a din Regulamentul general privind protecția datelor,
+        RGPD). Îl poți retrage oricând, nemaiîncărcând alte documente: deoarece nu se păstrează
+        nimic, nu rămâne nimic de șters.
+      </p>
+      {rental && <p>{tx('privacy.rental.consent')}</p>}
+      {employment && <p>{tx('privacy.employment.consent')}</p>}
+      {credit && <p>{tx('privacy.credit.consent')}</p>}
+      {insurance && <p>{tx('privacy.insurance.consent')}</p>}
+      {mortgage && <p>{tx('privacy.mortgage.consent')}</p>}
+      {bills && <p>{tx('privacy.bills.consent')}</p>}
+      <p>
+        Documentele sunt prelucrate de Amazon Web Services EMEA SARL (Luxemburg), persoană
+        împuternicită de operator: serverul (AWS Lambda) se află în Spania, iar modelul de IA este
+        folosit prin Amazon Bedrock cu un profil care funcționează doar în regiuni din Uniunea
+        Europeană. Amazon Bedrock nu păstrează documentele și nici ce răspunde modelul de IA, nu le
+        folosește pentru a antrena modele și nu le împărtășește cu Anthropic. Contractul AWS de
+        persoană împuternicită include clauzele contractuale standard ale Comisiei Europene.
+      </p>
+      <p>
+        Pentru ca citirile și plățile să fie făcute de persoane, înainte de fiecare citire și de
+        fiecare plată pagina încarcă Cloudflare Turnstile, care verifică, fără să folosească
+        cookie-uri, că nu ești un robot. Cloudflare, Inc. primește adresa IP și date tehnice ale
+        browserului tău pentru această verificare, și doar când alegi să încarci un document sau să
+        plătești permisul. Temeiul juridic este interesul legitim de a preveni abuzul de serviciu
+        (art. 6.1.f din RGPD); Cloudflare aderă la Cadrul UE-SUA privind confidențialitatea datelor
+        (EU-U.S. Data Privacy Framework).
+      </p>
+      <p>
+        Permisul pentru raport se plătește pe pagina Stripe Payments Europe, Ltd. (Irlanda).
+        eslojusto.es nu vede și nu păstrează datele cardului tău sau ale Bizum: doar întreabă Stripe
+        dacă plata a fost efectuată și pentru ce sumă și notează, alături de plată, câte citiri ai
+        făcut cu permisul, fără nimic din ce s-a citit. Stripe îți cere adresa de e-mail și, în
+        funcție de cum plătești, și numele, țara sau telefonul. Aceste date rămân în contul Stripe
+        al eslojusto.es, care le poate vedea în panoul Stripe pentru a rezolva o problemă cu plata
+        sau o rambursare, și se păstrează cât timp cer normele contabile și fiscale. Temeiul juridic
+        este contractul de cumpărare (art. 6.1.b) și obligațiile contabile și fiscale (art. 6.1.c).
+        Stripe poate prelucra datele în Statele Unite; Stripe, Inc. aderă la Cadrul UE-SUA privind
+        confidențialitatea datelor, iar contractul său include clauzele contractuale standard.
+        Stripe păstrează datele plății cât timp îi cer aceste obligații și normele privind
+        combaterea spălării banilor; explică acest lucru în{' '}
+        <a href="https://stripe.com/es/privacy">politica sa de confidențialitate</a>. Condițiile
+        cumpărării se află în <a href={`${link(lang, 'aviso-legal/')}#condiciones`}>nota legală</a>.
+      </p>
+    </section>
+  )}
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-cookies">{tx('privacy.cookies')}</h2>
+    {documents ? (
+      <p>
+        Acest site nu folosește cookie-uri, iar măsurarea nu scrie nimic pe dispozitivul tău și nici
+        în alt spațiu de stocare al browserului, pentru că totul există în memoria paginii. Se
+        păstrează doar ce ceri tu: tema aleasă, dacă apeși butonul ei, și, dacă citești documente
+        sau cumperi permisul, ce explică secțiunea „Ce se păstrează și unde”. De aceea nu vezi
+        niciun anunț despre cookie-uri.
+      </p>
+    ) : (
+      <p>
+        Acest site nu folosește cookie-uri, iar măsurarea nu scrie nimic pe dispozitivul tău și nici
+        în alt spațiu de stocare al browserului, pentru că totul există în memoria paginii. Singurul
+        lucru care se păstrează este tema aleasă, și doar dacă apeși butonul ei. De aceea nu vezi
+        niciun anunț despre cookie-uri.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-base">{tx('privacy.legal_basis')}</h2>
+    <p>
+      Temeiul juridic este interesul legitim (art. 6.1.f din Regulamentul general privind protecția
+      datelor, RGPD), care aici înseamnă a ști dacă instrumentul este folosit, la ce pas se
+      blochează oamenii și ce nu funcționează, pentru a-l îmbunătăți. Se măsoară minimul necesar
+      pentru asta, fără să te identifice și fără publicitate.
+    </p>
+    <p>
+      Dacă browserul tău trimite semnalul de a nu fi urmărit (Global Privacy Control sau Do Not
+      Track), nu se măsoară nimic din vizita ta. Te poți opune acestei măsurări (art. 21 din RGPD)
+      și blocând adresa eu.i.posthog.com cu un program de blocare a conținutului. Verificarea
+      funcționează la fel.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-responsable">{tx('privacy.controller')}</h2>
+    <p>
+      eslojusto.es este un proiect al lui Endika Iglesias, operatorul acestei prelucrări. Pentru
+      orice întrebare despre datele tale, scrie la <a href={`mailto:${email}`}>{email}</a>. Dacă ai
+      scris la această adresă, poți cere tot acolo consultarea, corectarea sau ștergerea datelor din
+      e-mailul tău. Dacă ai plătit permisul, și a datelor plății tale din Stripe, cu excepția celor
+      care trebuie păstrate conform normelor contabile și fiscale.
+    </p>
+    <p>
+      Ce se măsoară nu te identifică, așa că nu există nicio modalitate de a-ți găsi evenimentele
+      pentru a ți le arăta sau a le șterge (art. 11 din RGPD). Dacă ești de părere că ceva nu se
+      face corect, poți depune o plângere la{' '}
+      <a href="https://www.aepd.es/">Agencia Española de Protección de Datos</a> (AEPD, autoritatea
+      spaniolă pentru protecția datelor).
+    </p>
+  </section>
+</div>
