@@ -1,0 +1,86 @@
+---
+// source: 8e819e81fa1a
+import { NORMS } from '../../engine/rental/data/norms';
+import { chargesExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros, formatLongDay } from '../../content/rent-indices';
+import { t } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pageDecree } = rentalPagesCopy(lang);
+
+const ex = chargesExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="pacto">
+  <h2 id="pacto">Doar cu acord scris și cu suma lor anuală</h2>
+  <p>
+    Proprietarul îți poate cere cheltuielile generale ale clădirii sau serviciile fără contor doar
+    dacă ați convenit acest lucru în scris, cu suma lor anuală la data contractului (art. 20.1 LAU).
+    Impozitele și taxele (tributos), cum ar fi IBI, au o regulă separată: vezi „IBI și taxele” mai
+    jos.
+  </p>
+  <p>
+    Dacă contractul nu le menționează sau nu dă o sumă pe an, verificarea semnalează acest lucru ca
+    să te uiți la el.
+  </p>
+  <p>{pageDecree('charges', 'rental.page.charges.community')}</p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="subida">
+  <h2 id="subida">Cât pot crește: până la dublul chiriei</h2>
+  <p>
+    În primii cinci ani de contract, sau șapte dacă proprietarul este o firmă, aceste cheltuieli, cu
+    excepția impozitelor și taxelor, pot crește doar o dată pe an, prin acord, și niciodată mai mult
+    decât dublul a cât poate crește chiria (art. 20.3 LAU, sau art. 20.2 în contractele anterioare
+    Real Decreto-ley 29/2026). Verificarea compară fiecare cheltuială din fiecare an cu acest
+    plafon.
+  </p>
+  <p class="folio">
+    Art. <span>20.3</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ibi">
+  <h2 id="ibi">IBI și taxele</h2>
+  <p>{pageDecree('charges', 'rental.page.decree.taxes')}</p>
+  <p>
+    {t(lang, 'rental.guide.charges.taxes_before', {
+      desde: formatLongDay(NORMS.rdl29_2026.inForceSince, lang),
+    })}
+  </p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Exemplu rezolvat</h2>
+  <p>
+    Un contract stabilește {formatEuros(ex.agreed)} pe an pentru cheltuielile asociației de
+    proprietari. În primul an, proprietarul încasează {formatEuros(ex.charged)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Calculul</span> Încă nu a putut exista nicio majorare, așa că
+    maximul este suma convenită, {formatEuros(ex.agreed)}. {formatEuros(ex.charged)} −{' '}
+    {formatEuros(ex.agreed)} = {formatEuros(ex.over)} în plus.
+  </p>
+  <p class="folio">
+    Art. <span>20</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Verifică ce ți se încasează</h2>
+  <p>
+    <a href={href(REVIEW.path)}>Verificarea închirierii</a> compară fiecare cheltuială din fiecare
+    an cu suma convenită și cu plafonul de majorare și îți spune cât ai plătit în plus.
+  </p>
+</section>
