@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.84.1](https://github.com/Endika/eslojusto/compare/v1.84.0...v1.84.1) (2026-10-17)
+
+
+### Bug Fixes
+
+* **analytics:** report a sheet once when Next goes straight to the review ([6a88066](https://github.com/Endika/eslojusto/commit/6a88066bcbcc739ba72e4bdfcbc9fa787f8b0c0a))
+* review when the last sheets are skipped, reopen tabs and focus errors alike ([8ba3b2d](https://github.com/Endika/eslojusto/commit/8ba3b2d93fffb46c632a8eb38efefe117d43c86c))
+
 ## [1.84.0](https://github.com/Endika/eslojusto/compare/v1.83.1...v1.84.0) (2026-10-17)
 
 
