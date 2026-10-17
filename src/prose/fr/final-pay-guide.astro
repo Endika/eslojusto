@@ -1,0 +1,596 @@
+---
+// source: 169eec130c4d
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { faqEntries } from '../../content/faq';
+import { bySeniority, spanLabel } from '../../content/examples';
+import { wholeEuroRange, wholeEuros } from '../../content/format';
+import { LANDINGS, type LandingId } from '../../content/landings';
+import { ET, SOURCES, LGSS } from '../../engine/sources';
+import { DOCUMENTS } from '../../documents/config';
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+const tx = (key: Key) => t(lang, key);
+
+// The guide under the calculator of /finiquito/, in Spanish: headings and labels from the
+// dictionary, the prose, the rules and the worked examples here. Another language's guide is a
+// translated copy of this file in src/prose/<lang>/.
+const causes: { title: string; rule: string; citation: string; page?: LandingId }[] = [
+  {
+    title: tx('guide.unfair_dismissal'),
+    rule: '33 jours par année travaillée, avec un plafond de 24 mensualités (720 jours).',
+    citation: 'Art. 56 ET',
+    page: 'unfair_dismissal',
+  },
+  {
+    title: tx('guide.objective_dismissal'),
+    rule: "20 jours par an, avec un plafond de 12 mensualités (360 jours, STS 651/2026, un arrêt de la Cour suprême). En outre, 15 jours de préavis, et ceux que l'entreprise ne donne pas sont payés.",
+    citation: 'Art. 53 ET',
+    page: 'objective_dismissal',
+  },
+  {
+    title: tx('guide.collective_dismissal'),
+    rule: "Au minimum, la même chose qu'un licenciement pour motif objectif : 20 jours par an, avec un plafond de 12 mensualités, et 15 jours de préavis. L'accord de l'ERE peut l'améliorer ; la vérification ne le connaît pas et donne le minimum.",
+    citation: 'Art. 51.2, 51.4 et 53.1 ET',
+  },
+  {
+    title: tx('guide.fixed_term_end'),
+    rule: "12 jours par an, au prorata des jours travaillés. S'il a commencé en 2011 ou avant, 8 jours ; en 2012, 9 ; en 2013, 10 ; en 2014, 11. Les contrats de remplacement (sustitución) et de formation (formativos) ne donnent pas droit à une indemnité, pas plus que ceux signés avant le 4 mars 2001. S'il a duré plus d'un an, 15 jours de préavis.",
+    citation: 'Art. 49.1.c ET et DT 8.ª',
+    page: 'fixed_term_end',
+  },
+  {
+    title: tx('guide.resignation'),
+    rule: "Pas d'indemnité. Si votre convention collective fixe un préavis et que vous ne le respectez pas, l'entreprise peut retenir les jours manquants.",
+    citation: 'Art. 49.1.d ET',
+    page: 'resignation',
+  },
+  {
+    title: tx('guide.disciplinary_dismissal'),
+    rule: "Pas d'indemnité s'il est déclaré justifié (procedente). S'il est déclaré injustifié (improcedente), elle se calcule comme pour un licenciement injustifié.",
+    citation: 'Art. 55.7 et 56 ET',
+  },
+];
+
+const unchecked = [
+  "Le net : les retenues d'IRPF (impôt sur le revenu) et les cotisations.",
+  'Les primes, compléments, heures supplémentaires et commissions prévus par votre convention collective ou votre contrat.',
+  'Les primes extraordinaires au-delà des deux habituelles.',
+  "Si le motif du licenciement est fondé, ce qui relève d'un tribunal.",
+  'Les salaires de procédure (salarios de tramitación).',
+  "Ce que l'accord d'un ERE ajoute au minimum légal.",
+];
+
+// The case pages, in the order of the map: the finiquito ones, then the pages on the benefit.
+const caseLinks: readonly LandingId[] = [
+  'resignation',
+  'unfair_dismissal',
+  'objective_dismissal',
+  'fixed_term_end',
+  'not_agreed',
+];
+
+// The same report the result links to.
+const workHistoryUrl =
+  'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
+const benefitSources = [
+  SOURCES.lgss267,
+  SOURCES.lgss268,
+  SOURCES.lgss269,
+  SOURCES.lgss270,
+  SOURCES.sepeAmounts,
+].map(({ citation, url, inForceSince, effectiveFrom }) => ({
+  citation,
+  url,
+  inForce: t(lang, effectiveFrom ? 'client.source.effective_from' : 'client.source.in_force', {
+    fecha: inForceSince.split('-').reverse().join('-'),
+  }),
+}));
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('guide.title')}
+    </h2>
+    <p class="guide__lead">
+      Ce que comprend un solde de tout compte (finiquito) et d'où vient chaque chiffre, avec
+      l'article correspondant. Les exemples prennent un salaire de 1.500&nbsp;€ bruts par mois et
+      deux primes extraordinaires (pagas extra) de 1.500&nbsp;€, soit 21.000&nbsp;€ par an.
+    </p>
+    <p class="guide__sources">
+      <span>{tx('guide.updated')}</span>
+      <span>
+        {tx('guide.sources')}&nbsp;: <a href={ET}>{tx('guide.source_et')}</a> ·{' '}
+        <a href={SOURCES.cgpjGuide.url}>{tx('guide.source_cgpj')}</a> ·{' '}
+        <a href={LGSS}>{tx('guide.source_lgss')}</a> ·{' '}
+        <a href={SOURCES.sepeAmounts.url}>{tx('guide.source_sepe')}</a>
+      </span>
+      <a href={link(lang, 'aviso-legal/')}>{tx('guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    <section class="sheet sheet--text">
+      <h3 id="g-que-lleva">{tx('guide.what_it_includes')}</h3>
+      <p>
+        À la fin de votre contrat, l'entreprise vous remet une proposition de décompte de solde avec
+        les montants qui vous reviennent (art. 49.2 ET). C'est le solde de tout compte, qui reprend
+        ce que vous avez déjà gagné et pas encore perçu&nbsp;:
+      </p>
+      <ul>
+        <li>Le salaire des jours travaillés du dernier mois (art. 26 ET).</li>
+        <li>Les congés acquis et non pris (art. 38 ET).</li>
+        <li>
+          La part acquise des primes extraordinaires, si elles ne sont pas réparties sur les
+          bulletins de paie mensuels (art. 31 ET).
+        </li>
+        <li>Les jours de préavis que l'entreprise n'a pas donnés, lorsque la loi l'exige.</li>
+      </ul>
+      <p>
+        Si le contrat prend fin avec droit à une indemnité, le décompte de solde peut aussi
+        l'inclure, mais juridiquement c'est un montant distinct du solde de tout compte, avec ses
+        propres règles et délais. Tous les chiffres sont bruts, avant retenues et cotisations.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-diferencia">{tx('guide.difference')}</h3>
+      <p>
+        Le solde de tout compte vous revient chaque fois que le contrat prend fin, y compris si
+        c'est vous qui partez, car c'est de l'argent que vous avez déjà gagné. L'indemnité compense
+        la fin du contrat et dépend du motif.
+      </p>
+      <p>
+        Une démission (baja voluntaria) ne donne pas droit à une indemnité (art. 49.1.d ET). Un
+        licenciement disciplinaire déclaré justifié (procedente) non plus (art. 55.7 ET)&nbsp;; s'il
+        est déclaré injustifié (improcedente), l'indemnité se calcule comme pour un licenciement
+        injustifié.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 55.7</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-casos">{tx('guide.cases')}</h3>
+      <p>Chaque motif a ses propres règles. Nous les expliquons avec un exemple détaillé&nbsp;:</p>
+      <ul>
+        {caseLinks.map((id) => (
+          <li>
+            <CaseLink lang={lang} id={id} />
+          </li>
+        ))}
+      </ul>
+      <p>
+        Et pour l'allocation chômage (paro), sur sa propre page&nbsp;:{' '}
+        <CaseLink lang={lang} id="benefit" />.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-salario">{tx('guide.salary')}</h3>
+      <p>
+        Sont comptés les jours travaillés du mois où le contrat prend fin. Le jour peut valoir votre
+        salaire mensuel divisé par 30 (mois commercial) ou par le nombre de jours de ce mois (mois
+        calendaire). La vérification donne la fourchette entre les deux calculs.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Sortie le 15 octobre&nbsp;:
+        1.500&nbsp;€ × 15/30 = 750,00&nbsp;€, ou 1.500&nbsp;€ × 15/31 = 725,81&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>26</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-vacaciones">{tx('guide.holidays')}</h3>
+      <p>
+        Ce sont au minimum trente jours calendaires (naturales) par an (art. 38.1 ET). La
+        vérification les compte comme 22 jours ouvrés (laborables) du lundi au vendredi, 26 du lundi
+        au samedi et 30 × jours / 7 avec une autre semaine&nbsp;: ce sont des équivalences, pas le
+        texte de la loi. Votre convention collective (convenio colectivo) ou votre contrat peuvent
+        en prévoir davantage. Ils s'acquièrent avec chaque jour travaillé, et le solde de tout
+        compte inclut ceux de l'année en cours que vous n'avez pas pris. Beaucoup d'entreprises les
+        comptent par mois (2,5 jours par mois avec 30 par an) plutôt que par jours, et la
+        vérification donne la fourchette entre les deux calculs. Chaque jour est payé entre votre
+        salaire mensuel / 30 et votre salaire annuel / 365.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Sortie le 15 octobre 2026&nbsp;:
+        288 jours travaillés dans l'année. 30 × 288/365 = 23,67 jours acquis. Si vous en avez pris
+        15, il en reste environ 8,67&nbsp;: entre (30 × 288/365 − 15) × 1.500&nbsp;€/30 =
+        433,56&nbsp;€ et (30 × 288/365 − 15) × 21.000&nbsp;€/365 = 498,89&nbsp;€.
+      </p>
+      <p>
+        Si vous avez pris plus de jours que vous n'en avez acquis, la possibilité d'une retenue
+        dépend de la convention collective.
+      </p>
+      <p class="folio">
+        Art. <span>38</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-pagas">{tx('guide.extra_pay')}</h3>
+      <p>
+        La loi prévoit deux primes extraordinaires par an, et la convention collective fixe leur
+        montant et leur mode d'acquisition. Si elles sont réparties sur vos bulletins de paie
+        mensuels, vous les avez déjà perçues mois par mois. Sinon, le solde inclut la part acquise
+        depuis le début de leur période&nbsp;: semestrielle (de janvier à juin et de juillet à
+        décembre) ou annuelle (de juillet à juin pour la prime d'été, de janvier à décembre pour la
+        prime de Noël). Le calcul peut se faire par jours ou par mois, et la vérification donne la
+        fourchette entre les deux calculs. Si vous partez le mois où une prime est versée (juin ou
+        juillet pour celle d'été, décembre pour celle de Noël), elle peut déjà figurer sur ce
+        bulletin de paie.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Prime de Noël de 1.500&nbsp;€ avec
+        une période semestrielle et sortie le 15 octobre&nbsp;: du 1 juillet au 15 octobre, cela
+        fait 107 jours sur 184. 1.500&nbsp;€ × 107/184 = 872,28&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>31</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-indemnizacion">{tx('guide.severance')}</h3>
+      <p>
+        Elle se compte en jours de salaire. Le salaire journalier est votre salaire annuel, primes
+        extraordinaires comprises, divisé par 365, comme le fait le guide du CGPJ. Dans l'exemple,
+        21.000&nbsp;€ / 365 ≈ 57,53&nbsp;€. Les exemples multiplient par le chiffre exact, sans
+        arrondir. En cas de licenciement, le temps travaillé se compte en mois, et une fraction de
+        mois compte comme un mois entier. En cas de licenciement pendant un ERTE (chômage partiel
+        temporaire), le calcul se fait avec le salaire complet d'avant l'ERTE.
+      </p>
+      <div class="causes">
+        {causes.map(({ title, rule, citation, page }) => (
+          <div>
+            <h4>{page ? <a href={link(lang, LANDINGS[page].path.slice(1))}>{title}</a> : title}</h4>
+            <p>{rule}</p>
+            <p class="causes__citation">{citation}</p>
+          </div>
+        ))}
+      </div>
+      <p class="example">
+        <span class="example__label">Licenciement injustifié</span> du 3 mai 2018 au 20 juillet
+        2026&nbsp;: 98 mois complets et quelques jours, qui comptent pour 99. 33 jours par an font
+        2,75 par mois&nbsp;: 99 × 2,75 = 272,25 jours. 21.000&nbsp;€ × 272,25 / 365 =
+        15.663,70&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">Licenciement pour motif objectif</span> avec les mêmes
+        dates&nbsp;: 99 × 20/12 = 165 jours. 21.000&nbsp;€ × 165 / 365 = 9.493,15&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">Fin d'un contrat à durée déterminée</span> d'un an, du 1
+        octobre 2025 au 30 septembre 2026&nbsp;: 365 jours × 12/365 = 12 jours. 21.000&nbsp;€ × 12 /
+        365 = 690,41&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 51 · 53 · 56</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-2012">{tx('guide.before_2012')}</h3>
+      <p>
+        En cas de licenciement injustifié d'un contrat antérieur au 12 février 2012, l'indemnité se
+        calcule en deux tranches&nbsp;:
+      </p>
+      <ul>
+        <li>Jusqu'au 11 février 2012&nbsp;: 45 jours par an (3,75 par mois).</li>
+        <li>À partir du 12 février 2012&nbsp;: 33 jours par an (2,75 par mois).</li>
+      </ul>
+      <p>
+        Le total est plafonné à 720 jours, sauf si la première tranche le dépasse déjà. Dans ce cas,
+        seule la première tranche compte, avec un maximum de 42 mensualités (1.260 jours).
+      </p>
+      <p>
+        Les contrats de promotion de l'embauche à durée indéterminée (fomento de la contratación
+        indefinida) signés avant le 12 février 2012 suivent, pour l'indemnité pour motif objectif,
+        la règle en vigueur lors de leur signature&nbsp;; en cas de licenciement disciplinaire, elle
+        se calcule avec ces deux tranches (paragraphe 3). La vérification ne distingue pas ce type
+        de contrat.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Du 1 mars 2010 au 15 septembre
+        2026. Première tranche&nbsp;: 24 mois × 3,75 = 90 jours. Deuxième tranche&nbsp;: 176 mois ×
+        2,75 = 484 jours. Total&nbsp;: 574 jours. 21.000&nbsp;€ × 574 / 365 = 33.024,66&nbsp;€.
+      </p>
+      <p class="folio">
+        Disposition transitoire <span>11.ª</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-antiguedad">{tx('guide.by_seniority')}</h3>
+      <p>
+        Le solde de tout compte correspond à ce qui a été acquis dans l'année et le dernier mois, si
+        bien qu'à partir d'un an de contrat il cesse d'augmenter. L'indemnité, en revanche, augmente
+        avec chaque mois travaillé et dépend du motif.
+      </p>
+      <FigureTable id="g-antiguedad-tabla" label={tx('guide.by_seniority')}>
+        <Fragment slot="caption">
+          Contrats qui prennent fin le 30 septembre 2026, avec 1.500&nbsp;€ bruts par mois, deux
+          primes extraordinaires de 1.500&nbsp;€ par semestre (celle d'été déjà perçue) et 22 jours
+          ouvrés de congés par an, dont aucun n'a été pris. Arrondi à l'euro.
+        </Fragment>
+        <thead>
+          <tr>
+            <th scope="col">Temps travaillé</th>
+            <th scope="col">Solde de tout compte</th>
+            <th scope="col">
+              Durée déterminée
+              <span class="figures-note">12 jours</span>
+            </th>
+            <th scope="col">
+              Motif objectif
+              <span class="figures-note">20 jours</span>
+            </th>
+            <th scope="col">
+              Injustifié
+              <span class="figures-note">33 jours</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {bySeniority.map(({ months, finalPay, fixedTermLimit, fixedTerm, objective, unfair }) => (
+            <tr>
+              <th scope="row">{spanLabel(months, lang)}</th>
+              <td>{wholeEuroRange(finalPay)}</td>
+              <td>
+                {fixedTerm === null ? '—' : wholeEuros(fixedTerm)}
+                {fixedTermLimit === 'sector_agreement' && <sup>1</sup>}
+                {fixedTermLimit === 'over' && <sup>2</sup>}
+              </td>
+              <td>{wholeEuros(objective)}</td>
+              <td>{wholeEuros(unfair)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </FigureTable>
+      <p>
+        Le solde de tout compte additionne le salaire de septembre, les congés et la part acquise de
+        la prime de Noël, avec la fourchette entre le calcul par jours et le calcul par mois. Les
+        trois autres colonnes donnent l'indemnité de chaque motif, qui s'ajoute à part&nbsp;: art.
+        49.1.c ET pour la fin d'un contrat à durée déterminée, art. 52 et 53.1.b ET pour le
+        licenciement pour motif objectif et art. 56 ET pour le licenciement injustifié. Pour obtenir
+        le total, ajoutez-la au solde de tout compte.
+      </p>
+      <p class="table-notes">
+        <sup>1</sup> Un contrat (à durée déterminée) lié aux circonstances de la production dure au
+        maximum 6 mois. Il n'atteint un an que si votre convention collective de branche (convenio
+        sectorial) le prolonge (art. 15.2 ET), ou dans le cas d'un contrat pour un ouvrage ou un
+        service déterminé (obra o servicio) signé avant le 31 décembre 2021 (disposition transitoire
+        3.ª du Real Decreto-ley 32/2021).
+      </p>
+      <p class="table-notes">
+        <sup>2</sup> Un contrat lié aux circonstances de la production ne dure pas aussi longtemps.
+        Un contrat pour un ouvrage ou un service déterminé signé avant le 31 décembre 2021 durait au
+        maximum 3 ans, ou 4 si la convention collective de branche le prolongeait (art. 15.1.a ET
+        dans sa rédaction antérieure et disposition transitoire 3.ª du Real Decreto-ley 32/2021), si
+        bien qu'aucun ne prend fin en septembre 2026 avec cette ancienneté. Un contrat à durée
+        déterminée qui dépasse sa durée maximale peut devenir à durée indéterminée (art. 15.4 ET),
+        et sa fin serait alors un licenciement.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-propuesta">{tx('guide.proposal')}</h3>
+      <p>
+        L'entreprise remet une proposition de décompte de solde. La loi prévoit que la personne
+        salariée peut la signer en présence d'une personne de la représentation du personnel.
+      </p>
+      <p>
+        Certaines personnes signent en indiquant «&nbsp;reçu, non conforme&nbsp;» (recibí no
+        conforme) lorsqu'elles ne sont pas d'accord avec un montant. Nous le présentons à titre
+        d'information uniquement. Ce qu'il convient de faire dans chaque cas peut être évalué par un
+        cabinet d'avocats en droit du travail, un cabinet de graduado social ou un syndicat.
+      </p>
+      <p>
+        Ce qui change et ce qui ne change pas&nbsp;: <CaseLink lang={lang} id="not_agreed" />.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-plazos">{tx('guide.deadlines')}</h3>
+      <p>
+        Pour des montants comme le salaire restant dû, les congés, les primes extraordinaires ou
+        l'indemnité de fin de contrat à durée déterminée, le délai est d'un an (art. 59.1 ET). Si
+        l'entreprise ne vous a pas encore payé, ce qui relève du salaire porte des intérêts de
+        retard de 10&nbsp;% par an (art. 29.3 ET)&nbsp;; l'indemnité, non.
+      </p>
+      <p>
+        En cas de licenciement (pour motif objectif, collectif, injustifié ou disciplinaire), le
+        délai pour le contester est de 20 jours ouvrables (hábiles) (art. 59.3 ET). Les personnes
+        qui ne sont pas d'accord avec l'indemnité d'un licenciement le font généralement valoir par
+        cette même voie, dans ces 20 jours.
+      </p>
+      <p>
+        Le délai est court, et un cabinet d'avocats en droit du travail, un cabinet de graduado
+        social ou un syndicat peuvent vous dire lequel s'applique à votre cas.
+      </p>
+      <p class="folio">
+        Art. <span>29.3 · 59</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-no-revisa">{tx('guide.unchecked')}</h3>
+      <ul>
+        {unchecked.map((text) => (
+          <li>{text}</li>
+        ))}
+      </ul>
+      <p>
+        Les congés et les primes extraordinaires sont comparés au minimum légal, avec la fourchette
+        entre le calcul par jours et le calcul par mois&nbsp;; votre convention collective peut
+        améliorer ces chiffres. «&nbsp;Impossible à vérifier&nbsp;» n'apparaît que lorsqu'il manque
+        une donnée sans laquelle il n'y a pas de chiffre légal, comme le préavis d'une démission ou
+        les jours de congé que vous avez pris.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-paro">{tx('guide.benefit')}</h2>
+      <p>
+        À la fin d'un contrat, en plus du solde de tout compte, il peut y avoir l'allocation chômage
+        (paro), la prestation contributive de chômage. Pour la percevoir, le contrat doit prendre
+        fin dans une situation légale de chômage (situación legal de desempleo), et cela dépend du
+        motif&nbsp;:
+      </p>
+      <ul>
+        <li>
+          Un licenciement pour motif objectif, collectif, injustifié ou disciplinaire l'est (art.
+          267.1.a LGSS). Le licenciement disciplinaire compte aussi s'il est déclaré justifié ou
+          s'il n'est pas contesté (art. 268.4 LGSS).
+        </li>
+        <li>
+          La fin d'un contrat à durée déterminée aussi, sauf si c'est vous qui y avez mis fin (art.
+          267.1.a.6.º LGSS).
+        </li>
+        <li>
+          Une démission non (art. 267.2.a LGSS), sauf si vous partez à la suite d'une mutation,
+          d'une modification substantielle de vos conditions de travail qui vous porte préjudice
+          (art. 41.3 ET), d'un manquement grave de l'entreprise, comme ne pas vous payer ou vous
+          payer en retard de façon répétée, ou de violence de genre (violencia de género) ou de
+          violence sexuelle (art. 267.1.a.5.º LGSS).
+        </li>
+      </ul>
+      <p>
+        Il faut en outre au moins 360 jours cotisés au chômage au cours des 6 années précédentes,
+        non utilisés pour une autre allocation, et plusieurs emplois peuvent s'additionner (art.
+        266.b et 269 LGSS). Il faut aussi être affilié en activité (estar de alta) ou dans une
+        situation assimilée, vous inscrire comme demandeur d'emploi (demandante de empleo), signer
+        l'accord d'activité (acuerdo de actividad) et ne pas avoir atteint l'âge de la retraite
+        (art. 266 LGSS).
+      </p>
+      <p>
+        Pour la calculer avec vos données et voir le barème complet&nbsp;:{' '}
+        <CaseLink lang={lang} id="benefit" />.
+      </p>
+      <p class="folio">
+        Art. <span>266 · 267 · 268.4</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-cuanto">{tx('guide.benefit_amount')}</h3>
+      <p>
+        La base de calcul (base reguladora) est la moyenne des cotisations chômage des 180 derniers
+        jours, sans les heures supplémentaires (art. 270.1 LGSS). Vous percevez 70&nbsp;% de la base
+        pendant les 180 premiers jours et 60&nbsp;% à partir du jour 181 (art. 270.2 LGSS).
+      </p>
+      <p>
+        Chaque mois a un minimum et un maximum selon vos enfants à charge (art. 270.3 LGSS). En
+        2026, avec l'IPREM à 600&nbsp;€, ce sont les suivants&nbsp;:
+      </p>
+      <ul>
+        <li>Sans enfant à charge, entre 560&nbsp;€ et 1.225&nbsp;€ par mois.</li>
+        <li>Avec un enfant, entre 749&nbsp;€ et 1.400&nbsp;€.</li>
+        <li>Avec deux enfants ou plus, entre 749&nbsp;€ et 1.575&nbsp;€.</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Avec 21.000&nbsp;€ par an, la base
+        est de 21.000&nbsp;€ / 12 = 1.750&nbsp;€ par mois. 70&nbsp;% font 1.225&nbsp;€, soit
+        exactement le maximum sans enfant à charge, et 60&nbsp;%, 1.050&nbsp;€.
+      </p>
+      <p>
+        Ce sont des chiffres bruts. On en déduit 4,85&nbsp;% de la base pour la Seguridad Social et
+        l'IRPF applicable. Les chiffres de ce guide et de la vérification supposent un temps
+        plein&nbsp;; à temps partiel, ils sont inférieurs.
+      </p>
+      <p class="folio">
+        Art. <span>270</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-duracion">{tx('guide.benefit_duration')}</h3>
+      <p>
+        Elle dépend des jours cotisés au cours des 6 dernières années qui n'ont pas été utilisés
+        pour une autre allocation (art. 269 LGSS)&nbsp;:
+      </p>
+      <ul>
+        <li>De 360 à 539 jours cotisés, 120 jours de chômage (4 mois).</li>
+        <li>
+          Chaque tranche de 180 jours cotisés supplémentaires ajoute 60 jours de chômage (2 mois).
+          De 540 à 719, ce sont 180 jours&nbsp;; de 720 à 899, 240&nbsp;; et ainsi de suite.
+        </li>
+        <li>À partir de 2.160 jours cotisés, le maximum, 720 jours (24 mois).</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Avec trois ans cotisés, 1.095
+        jours, cela fait 360 jours de chômage (12 mois).
+      </p>
+      <p>
+        Les congés payés et non pris comptent aussi comme cotisés (art. 269.4 LGSS). Chaque entrée,
+        chaque sortie et les jours cotisés figurent dans le{' '}
+        <a href={workHistoryUrl} rel="noopener">
+          {tx('result.benefit_work_history_link')}
+        </a>
+        .
+      </p>
+      <p class="folio">
+        Art. <span>269</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-plazo">{tx('guide.benefit_deadline')}</h3>
+      <p>
+        Sans inscription comme demandeur d'emploi, pas d'allocation chômage (art. 266 LGSS)&nbsp;:
+        vous vous inscrivez auprès du service de l'emploi de votre communauté autonome et vous
+        demandez la prestation au SEPE. La demande se fait dans les 15 jours qui suivent la fin du
+        contrat, ouvrables (hábiles) selon le SEPE. Si votre solde de tout compte paie des congés
+        non pris, le délai court à partir de la fin de ces jours (art. 268.1 et 268.3 LGSS). Une
+        demande plus tardive retire de l'allocation les jours de retard (art. 268.2 LGSS).
+      </p>
+      <ul class="sources">
+        {benefitSources.map(({ citation, url, inForce }) => (
+          <li>
+            <a href={url}>{citation}</a>
+            <span class="sources__in-force">{inForce}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="folio">
+        Art. <span>268</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('guide.faq')}</h2>
+      <div class="faq-list">
+        {faqEntries(lang, { documents }).map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>
+
+<style>
+  .sheet--text .table-notes {
+    font-size: 0.875rem;
+  }
+</style>
