@@ -107,6 +107,8 @@ describe.skipIf(!built)('the final pay on the shared walk', () => {
     for (let i = 0; i < 12 && location.hash !== '#resultado'; i++) clickNext();
     expect(location.hash).toBe('#resultado');
     expect(named('reviewCompleted')).toHaveLength(1);
+    const completed = named('stepCompleted').map(([step]) => step);
+    expect(new Set(completed).size).toBe(completed.length);
     expect(document.querySelector('#resultado [data-items]')?.children.length).toBeGreaterThan(0);
   });
 

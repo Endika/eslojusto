@@ -164,14 +164,15 @@ export function setUpSection<
     const next = stepFrom(flow, form, nav.current, 1);
     // The last sheet that applies closes the walk with the review.
     if (next === RESULT_STEP) {
-      submitReview();
+      submitReview(false);
       return;
     }
     nav.reached = Math.max(nav.reached, next);
     nav.show(next, { history: 'push', focus: true });
   }
 
-  function submitReview(): boolean {
+  // `complete` is false when Next has already reported this sheet as completed.
+  function submitReview(complete = true): boolean {
     if (stopAtGate()) return true;
     const errors = section.review(form, result, today());
     if (errors.length > 0) {
@@ -179,7 +180,7 @@ export function setUpSection<
       return false;
     }
     section.renderErrors(form, []);
-    events.stepCompleted(stepAt(flow, nav.current));
+    if (complete) events.stepCompleted(stepAt(flow, nav.current));
     section.reviewed?.();
     showResult();
     return true;
