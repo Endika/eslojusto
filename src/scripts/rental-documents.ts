@@ -4,7 +4,7 @@ import { DOCUMENTS } from '../documents/config';
 import { RENTAL_EXTRACTION } from '../documents/contract';
 import { pageTranslator, papersTranslator, type ClientKey, type Translate } from '../i18n/client';
 import { rentalCase } from '../rental/case';
-import type { RentalCalculator } from '../rental/main';
+import type { SectionForm } from '../calculator/section';
 import type { CompletedRentalReview } from '../rental/ports';
 import { rentalReading } from '../rental/reading';
 import { STEPS } from '../rental/steps';
@@ -29,7 +29,7 @@ const rentalCopy =
 // Document reading and the pass on the rental review's page. The pass unlocks the detail of each
 // item, the report and the letters the review has figures for.
 export function wireRentalDocuments(
-  rental: RentalCalculator,
+  rental: SectionForm,
   hooks: ReviewHooks<CompletedRentalReview>,
   arrival: { hash: string; search: string },
 ): void {

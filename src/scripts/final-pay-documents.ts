@@ -1,7 +1,7 @@
 import { documentsAnalytics } from '../analytics/documents';
 import { track } from '../analytics/posthog';
 import type { FormEntries } from '../calculator/fill';
-import type { Calculator } from '../calculator/main';
+import type { SectionForm } from '../calculator/section';
 import type { CompletedReview } from '../calculator/ports';
 import { STEPS } from '../calculator/steps';
 import { finalPayCase } from '../documents/case';
@@ -17,7 +17,7 @@ const withHolidayUnit = (saved: FormEntries): FormEntries =>
 
 // Document reading and the pass on the final pay's page.
 export function wireFinalPayDocuments(
-  calculator: Calculator,
+  calculator: SectionForm,
   hooks: ReviewHooks<CompletedReview>,
   arrival: { hash: string; search: string },
 ): void {

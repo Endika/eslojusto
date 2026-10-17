@@ -1,19 +1,8 @@
 import { estimateBenefit } from '../engine/unemployment';
 import { reviewFinalPay } from '../engine/review';
 import { applyConditions, followHolidayDefault } from './conditions';
-import { watchDisclosures } from './disclosures';
 import { required } from './dom';
-import { formEntries, rowsNeeded, setEntry, type FormEntries } from './fill';
-import {
-  firstIncomplete,
-  indexOfHash,
-  lastSheet,
-  resultStep,
-  startStep,
-  stepAt,
-  stepFrom,
-  stepOfHash,
-} from './flow';
+import { rowsNeeded } from './fill';
 import {
   SHEETS,
   baseField,
@@ -22,221 +11,90 @@ import {
   readBenefitSheets,
   readForm,
   readSituations,
-  type FieldError,
 } from './form';
-import { createNavigation } from './navigation';
 import { setUpOtherContracts } from './other-contracts';
-import type { CalculatorDeps } from './ports';
+import type { ItemId } from '../engine/types';
+import type { CalculatorDeps, CompletedReview } from './ports';
 import { renderErrors, renderResult, type ResultData } from './render';
+import { setUpSection, type SectionForm } from './section';
 import { FINAL_PAY_FLOW } from './steps';
 
-// What the page's other parts can do with the calculator: set or read its answers, and open it.
-export interface Calculator {
-  readonly form: HTMLFormElement;
-  // Sets the answers and returns the names it could not set.
-  fill(entries: FormEntries): string[];
-  entries(): FormEntries;
-  // Shows the sheet a visit opens on, as if it started there.
-  open(): void;
-  // Reviews the answers as the «Revisar» button does; false when a sheet still needs an answer.
-  review(): boolean;
-  // Shows the last review again, locked or with its detail as `detail` now says.
-  refreshResult(): void;
-}
-
+// The final pay's review: its sheets and the result, shown again when its detail is locked or
+// unlocked. A page about one cause opens on the sheet after it.
 export function setUpCalculator(
   root: HTMLElement,
   { events, today, tr, detail = () => 'unlocked', flow = FINAL_PAY_FLOW }: CalculatorDeps,
-): Calculator {
-  const LAST_SHEET = lastSheet(flow);
-  const RESULT_STEP = resultStep(flow);
+): SectionForm {
   const form = required(root.querySelector<HTMLFormElement>('#calculator'), 'the form');
-  const result = required(root.querySelector<HTMLElement>('#resultado'), 'the result');
+  const otherContracts = setUpOtherContracts(form, tr, () => applyConditions(form));
   // The last review shown, to show it again when its detail is unlocked or locked.
   let shown: ResultData | null = null;
-  const backButton = required(form.querySelector<HTMLButtonElement>('[data-back]'), 'Back');
-  const nextButton = required(form.querySelector<HTMLButtonElement>('[data-next]'), 'Next');
-  const nav = createNavigation(
-    {
-      root,
-      form,
-      result,
-      resultTitle: required(root.querySelector<HTMLElement>('#result-title'), 'the result title'),
-      sheets: SHEETS.map((h) =>
-        required(form.querySelector<HTMLElement>(`[data-sheet="${h}"]`), h),
-      ),
-      actions: required(form.querySelector<HTMLElement>('.actions'), 'the actions'),
-      backButton,
-      nextButton,
-      reviewButton: required(form.querySelector<HTMLButtonElement>('[data-submit]'), 'Review'),
-    },
+  let completed: CompletedReview | null = null;
+
+  return setUpSection(root, {
+    formId: 'calculator',
+    flow,
+    sheets: SHEETS,
     events,
     today,
-    flow,
-  );
-  const conditions = () => applyConditions(form);
-
-  function trackErrors(errors: readonly FieldError[]) {
-    for (const { field } of errors) events.fieldRejected(sheetOfField(field), baseField(field));
-  }
-
-  function focusError(errors: readonly FieldError[]) {
-    const first = errors[0];
-    if (!first) return;
-    form
-      .querySelector<HTMLElement>(`[name="${first.field}"]:not([disabled])`)
-      ?.focus({ preventScroll: true });
-    // Inside the scrolling list of other contracts, the slip sits below its input.
-    form.querySelector(`[data-error-for="${first.field}"]`)?.scrollIntoView({ block: 'nearest' });
-  }
-
-  function advance() {
-    const sheet = SHEETS[nav.current];
-    if (!sheet) return;
-    const errors = sheetErrors(form, sheet, today());
-    renderErrors(form, errors, tr);
-    if (errors.length > 0) {
-      trackErrors(errors);
-      focusError(errors);
-      return;
-    }
-    events.stepCompleted(sheet);
-    const next = stepFrom(flow, form, nav.current, 1);
-    // The last sheet that applies closes the walk with the review.
-    if (next === RESULT_STEP) {
-      void submitReview();
-      return;
-    }
-    nav.reached = Math.max(nav.reached, next);
-    nav.show(next, { history: 'push', focus: true });
-  }
-
-  function goToError(errors: readonly FieldError[]): false {
-    trackErrors(errors);
-    renderErrors(form, errors, tr);
-    const first = errors[0];
-    if (!first) return false;
-    nav.show(SHEETS.indexOf(sheetOfField(first.field)), { history: 'push' });
-    focusError(errors);
-    return false;
-  }
-
-  function submitReview(): boolean {
-    const parsed = readForm(form);
-    if ('errors' in parsed) return goToError(parsed.errors);
-    const r = reviewFinalPay(parsed.input, parsed.figures, today());
-    if (!r.ok) return goToError(r.errors);
-    const benefit = readBenefitSheets(form);
-    if ('errors' in benefit) return goToError(benefit.errors);
-    const estimate = estimateBenefit(
-      parsed.input,
-      benefit.data?.children ?? null,
-      benefit.data?.others,
-    );
-    renderErrors(form, [], tr);
-    shown = {
-      review: r.review,
-      benefit: estimate,
-      cause: parsed.input.cause,
-      children: benefit.data?.children ?? null,
-      erte: parsed.input.erte,
-      // Kept to the result: the events below never get them.
-      situations: readSituations(form),
-    };
-    const state = detail();
-    renderResult(result, shown, state === 'locked', tr);
-    events.stepCompleted(stepAt(flow, nav.current));
-    events.reviewCompleted({
-      review: r.review,
-      input: parsed.input,
-      figures: parsed.figures,
-      benefit: estimate,
-      otherContracts: benefit.data?.others.contracts.length ?? 0,
-      detail: state,
-    });
-    nav.reached = RESULT_STEP;
-    nav.show(RESULT_STEP, { history: 'push', focus: true });
-    return true;
-  }
-
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (nav.current < LAST_SHEET) advance();
-    else void submitReview();
-  });
-  nextButton.addEventListener('click', advance);
-  backButton.addEventListener('click', () =>
-    nav.goBack(stepFrom(flow, form, nav.current, -1), { history: 'push', focus: true }),
-  );
-
-  form.addEventListener('change', () => {
-    conditions();
-    followHolidayDefault(form);
-  });
-  // A changed answer reopens the sheets: the furthest one reachable is the first that still needs
-  // an answer.
-  form.addEventListener('input', () => {
-    if (nav.reached === RESULT_STEP) {
-      nav.reached = Math.min(LAST_SHEET, firstIncomplete(flow, form, today()));
-      nav.renderTabs();
-    }
-  });
-
-  root.querySelector('.tabs')?.addEventListener('click', (e) => {
-    const a = e.target instanceof Element && e.target.closest('a[data-tab]');
-    if (!(a instanceof HTMLAnchorElement)) return;
-    e.preventDefault();
-    nav.goBack(indexOfHash(flow, a.hash), { history: 'push', focus: true });
-  });
-
-  window.addEventListener('popstate', () => nav.followHistory());
-
-  watchDisclosures(root, events);
-
-  required(result.querySelector('[data-restart]'), 'the restart button').addEventListener(
-    'click',
-    () => {
-      events.startedOver();
-      shown = null;
-      form.reset();
-      otherContracts.reset();
-      renderErrors(form, [], tr);
-      conditions();
-      nav.reached = startStep(flow, form);
-      nav.show(nav.reached, { history: 'push', focus: true });
+    applyConditions,
+    changed: followHolidayDefault,
+    sheetOfField,
+    fieldName: baseField,
+    sheetErrors,
+    renderErrors: (f, errors) => renderErrors(f, errors, tr),
+    stopsAtGate: () => false,
+    review(f, result, day) {
+      const parsed = readForm(f);
+      if ('errors' in parsed) return parsed.errors;
+      const r = reviewFinalPay(parsed.input, parsed.figures, day);
+      if (!r.ok) return r.errors;
+      const benefit = readBenefitSheets(f);
+      if ('errors' in benefit) return benefit.errors;
+      const estimate = estimateBenefit(
+        parsed.input,
+        benefit.data?.children ?? null,
+        benefit.data?.others,
+      );
+      shown = {
+        review: r.review,
+        benefit: estimate,
+        cause: parsed.input.cause,
+        children: benefit.data?.children ?? null,
+        erte: parsed.input.erte,
+        // Kept to the result: the events below never get them.
+        situations: readSituations(f),
+      };
+      const state = detail();
+      renderResult(result, shown, state === 'locked', tr);
+      completed = {
+        review: r.review,
+        input: parsed.input,
+        figures: parsed.figures,
+        benefit: estimate,
+        otherContracts: benefit.data?.others.contracts.length ?? 0,
+        detail: state,
+      };
+      return [];
     },
-  );
-
-  const otherContracts = setUpOtherContracts(form, tr, conditions);
-  conditions();
-  nav.reached = firstIncomplete(flow, form, today());
-  const arrival = (flow.steps as readonly string[]).includes(stepOfHash(location.hash))
-    ? indexOfHash(flow, location.hash)
-    : startStep(flow, form);
-  nav.show(Math.min(arrival, nav.reached), { history: 'replace' });
-
-  return {
-    form,
-    fill(entries) {
+    reviewed() {
+      if (completed) events.reviewCompleted(completed);
+    },
+    opened(d) {
+      const item = d.closest<HTMLElement>('[data-item]')?.dataset['item'];
+      if (d.hasAttribute('data-detail') && item) events.detailOpened(item as ItemId);
+    },
+    restarted() {
+      shown = null;
+      otherContracts.reset();
+    },
+    beforeFill(entries) {
       const rows = rowsNeeded(entries);
       if (rows > 0) otherContracts.setRows(rows);
-      // A sheet's conditions decide which controls are enabled, so they follow every answer.
-      const missed = entries.filter(([name, value]) => !setEntry(form, name, value));
-      conditions();
-      renderErrors(form, [], tr);
-      return missed.map(([name]) => name);
     },
-    entries: () => formEntries(form),
-    open() {
-      nav.reached = startStep(flow, form);
-      nav.show(nav.reached, { history: 'replace', focus: true });
-    },
-    review: () => {
-      nav.reached = LAST_SHEET;
-      return submitReview();
-    },
-    refreshResult() {
+    filled: (f) => renderErrors(f, [], tr),
+    refreshResult(result) {
       if (shown) renderResult(result, shown, detail() === 'locked', tr);
     },
-  };
+  });
 }

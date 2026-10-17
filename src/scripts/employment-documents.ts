@@ -3,7 +3,7 @@ import { track } from '../analytics/posthog';
 import { DOCUMENTS } from '../documents/config';
 import { EMPLOYMENT_EXTRACTION } from '../documents/contract';
 import { employmentCase } from '../employment/case';
-import type { EmploymentCalculator } from '../employment/main';
+import type { SectionForm } from '../calculator/section';
 import type { CompletedEmploymentReview } from '../employment/ports';
 import { employmentReading } from '../employment/reading';
 import { STEPS } from '../employment/steps';
@@ -31,7 +31,7 @@ const employmentCopy =
 // each point, the report and the letter to the company; the letters that only ask for information
 // download without it. The tables are the ones the review read.
 export function wireEmploymentDocuments(
-  employment: EmploymentCalculator,
+  employment: SectionForm,
   hooks: ReviewHooks<CompletedEmploymentReview>,
   arrival: { hash: string; search: string },
   tables: EmploymentDeps,

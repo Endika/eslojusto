@@ -371,7 +371,7 @@ function renderUnemployment(root: HTMLElement, review: HouseholdReview, tr: Tran
 
 // ---------- Result ----------
 
-export interface HouseholdResultData {
+interface HouseholdResultData {
   readonly review: HouseholdReview;
   readonly input: HouseholdInput;
   // «No lo sé» to how it ended: the end of the relationship is not reviewed.

@@ -81,7 +81,7 @@ const flowOnly = {
 // documents, only the shared contract, ports, letter details and summary lines, never the final
 // pay's pieces.
 const rentalReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|rental/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|dom|fill|flow|navigation|number)$|\\.\\./documents/(contract|letter|ports|quote|summary)$|\\.\\./i18n/(client|dates)$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|rental/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|dom|fill|flow|navigation|number|section)$|\\.\\./documents/(contract|letter|ports|quote|summary)$|\\.\\./i18n/(client|dates)$)|${notCanonical}`,
   message:
     'src/rental reaches the rental engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes and letter details, and the translator type.',
 };
@@ -94,7 +94,7 @@ const noRental = {
 // of reading documents, only the shared contract, ports, letter details and summary lines, never
 // the final pay's pieces.
 const employmentReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|calculation|sources|law/sources|employment/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|dom|fill|flow|navigation|number)$|\\.\\./documents/(contract|letter|ports|quote|summary)$|\\.\\./i18n/(client|dates)$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|calculation|sources|law/sources|employment/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|dom|fill|flow|navigation|number|section)$|\\.\\./documents/(contract|letter|ports|quote|summary)$|\\.\\./i18n/(client|dates)$)|${notCanonical}`,
   message:
     'src/employment reaches the employment engine (its tables come from the composition root), the shared sheets, the documents contract, ports, quotes and letter details, and the translator type.',
 };
@@ -163,7 +163,7 @@ const noEmployment = {
 // which its composition root passes in; of the calculator, only what every section shares. It
 // reads no documents.
 const householdReach = {
-  regex: `^(?!\\./|\\.\\./engine/(date|money|types|calculation|sources|law/sources|household/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|calculation|dom|flow|navigation|number)$|\\.\\./i18n/(client|dates)$)|${notCanonical}`,
+  regex: `^(?!\\./|\\.\\./engine/(date|money|types|calculation|sources|law/sources|household/(?!data$)[\\w-]+)$|\\.\\./calculator/(amounts|calculation|dom|flow|navigation|number|section)$|\\.\\./i18n/(client|dates)$)|${notCanonical}`,
   message:
     'src/household reaches the household engine (its tables come from the composition root), the shared sheets and the translator type.',
 };
