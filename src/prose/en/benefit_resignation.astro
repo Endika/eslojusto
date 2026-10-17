@@ -79,7 +79,7 @@ const resignationGivesBenefit = benefitAfterResignation.entitled === 'yes';
     They still have a final settlement: outstanding pay, holiday and extra payments.
   </p>
   <p class="example">
-    <span class="example__label">If they are dismissed</span> With {integer(dismissal.contractDays)}
+    <span class="example__label">If they are dismissed</span> With {integer(dismissal.contractDays)}{' '}
     days of contributions, they are entitled to at least {integer(dismissal.duration.days)} days of
     unemployment benefit, about {wholeEuros(dismissal.figures.firstStretch.min)} a month for the
     first 6 months and about {wholeEuros(dismissal.figures.secondStretch.min)} after that, gross.

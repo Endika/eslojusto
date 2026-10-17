@@ -88,7 +88,7 @@ const resignationGivesBenefit = benefitAfterResignation.entitled === 'yes';
     extraordinaires.
   </p>
   <p class="example">
-    <span class="example__label">Si elle est licenciée</span> Avec {integer(dismissal.contractDays)}
+    <span class="example__label">Si elle est licenciée</span> Avec {integer(dismissal.contractDays)}{' '}
     jours cotisés, elle a droit à au moins {integer(dismissal.duration.days)} jours de chômage,
     environ {wholeEuros(dismissal.figures.firstStretch.min)} par mois les 6 premiers mois et environ{' '}
     {wholeEuros(dismissal.figures.secondStretch.min)} ensuite, en brut.

@@ -1,5 +1,5 @@
 ---
-// source: a172b338d8e2
+// source: 5b2dfc6de32e
 import CaseLink from '../../components/CaseLink.astro';
 import { disciplinary, entitledByCause } from '../../content/examples';
 import { integer, wholeEuros } from '../../content/format';
@@ -76,11 +76,10 @@ const causes = entitledByCause.map(({ cause, entitled }) => ({
   <p class="example">
     <span class="example__label">Their unemployment benefit</span> With{' '}
     {integer(disciplinary.contractDays)} days of contributions, they are entitled to at least{' '}
-    {integer(disciplinary.duration.days)}
-    days of unemployment benefit ({integer(disciplinary.duration.days / 30)} months): about{' '}
-    {wholeEuros(figures.firstStretch.min)} a month for the first 6 months and about{' '}
-    {wholeEuros(figures.secondStretch.min)} after that, gross. “At least”, because other jobs in the
-    last 6 years can add days.
+    {integer(disciplinary.duration.days)} days of unemployment benefit (
+    {integer(disciplinary.duration.days / 30)} months): about {wholeEuros(figures.firstStretch.min)}{' '}
+    a month for the first 6 months and about {wholeEuros(figures.secondStretch.min)} after that,
+    gross. “At least”, because other jobs in the last 6 years can add days.
   </p>
   <p>
     If the dismissal were declared unfair, there would also be severance pay: you will find it in{' '}

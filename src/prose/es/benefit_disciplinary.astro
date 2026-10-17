@@ -69,10 +69,11 @@ const causes = entitledByCause.map(({ cause, entitled }) => ({
   </p>
   <p class="example">
     <span class="example__label">Su paro</span> Con {integer(disciplinary.contractDays)} días
-    cotizados le corresponden al menos {integer(disciplinary.duration.days)} días de paro (
-    {integer(disciplinary.duration.days / 30)} meses): unos {wholeEuros(figures.firstStretch.min)}{' '}
-    al mes los primeros 6 meses y unos {wholeEuros(figures.secondStretch.min)} después, en bruto.
-    «Al menos», porque otros trabajos de los últimos 6 años pueden sumar días.
+    cotizados le corresponden al menos {integer(disciplinary.duration.days)} días de paro
+    {` (${integer(disciplinary.duration.days / 30)} meses)`}: unos{' '}
+    {wholeEuros(figures.firstStretch.min)} al mes los primeros 6 meses y unos{' '}
+    {wholeEuros(figures.secondStretch.min)} después, en bruto. «Al menos», porque otros trabajos de
+    los últimos 6 años pueden sumar días.
   </p>
   <p>
     Si el despido se declarara improcedente, además habría indemnización: lo tienes en{' '}
