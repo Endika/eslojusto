@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.83.0](https://github.com/Endika/eslojusto/compare/v1.82.0...v1.83.0) (2026-10-17)
+
+
+### Features
+
+* **i18n:** translate the case pages' prose into French ([5c8712a](https://github.com/Endika/eslojusto/commit/5c8712a7a74fee0819129697410a16a511cb7780))
+* **i18n:** translate the dictionary into French, unpublished ([b114839](https://github.com/Endika/eslojusto/commit/b11483945fd81f329d453d9bceabfd1e57a3aec3))
+* **i18n:** translate the final pay guide into French ([b2417b7](https://github.com/Endika/eslojusto/commit/b2417b70e081e2eab5537925ce88d885b3582f58))
+* **i18n:** translate the legal notice and the privacy page into French ([2161102](https://github.com/Endika/eslojusto/commit/2161102125e6c12f905e0b246133b08bd14c701f))
+* **i18n:** translate the rental sections and the ERTE page into French ([673d923](https://github.com/Endika/eslojusto/commit/673d923fb288abf28cd8c8aef97f4d3f904b99fb))
+* **i18n:** translate the rental topics into French ([1e1a0e7](https://github.com/Endika/eslojusto/commit/1e1a0e755253fc91b7b052bb2f66995e8320c113))
+
+
+### Bug Fixes
+
+* **i18n:** say which French severance reading gives the maximum, and call each reading a calculation ([58d68c9](https://github.com/Endika/eslojusto/commit/58d68c95486d25dee35c1315c01752f4d927f9a0))
+
 ## [1.82.0](https://github.com/Endika/eslojusto/compare/v1.81.0...v1.82.0) (2026-10-17)
 
 
