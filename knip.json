@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["scripts/**/*.{mjs,ts}"]
+    },
+    "api": {
+      "entry": ["src/handlers/*.ts", "infra/app.ts"],
+      "ignoreDependencies": ["esbuild"]
+    }
+  },
+  "rules": {
+    "duplicates": "off"
+  }
+}

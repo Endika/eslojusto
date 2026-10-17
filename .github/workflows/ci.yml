@@ -45,6 +45,10 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run lint
+      # knip follows the imports into api/, so it needs that package's dependencies too.
+      - run: npm ci --ignore-scripts
+        working-directory: api
+      - run: npm run knip
       - run: npm run type:check
       # With /alquiler/, /contrato/, /paro/erte/, /empleada-de-hogar/, /seguros/, /financiacion/,
       # /hipoteca/ and /facturas/ in the build, so the copy test reads their pages too.
