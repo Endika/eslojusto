@@ -1,0 +1,114 @@
+---
+// source: 497baf7f9449
+import { LEGAL_INTEREST } from '../../engine/law/data/legal-interest';
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositReturnExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatDay, formatEuros, formatRate } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositReturnExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+const [first, second] = ex.stretches;
+if (!first || !second) throw new Error('The example spans a year change.');
+const table = LEGAL_INTEREST[0]?.url;
+---
+
+<section class="sheet sheet--text" aria-labelledby="plazo">
+  <h2 id="plazo">Строк: місяць від дня, коли ви повертаєте ключі</h2>
+  <p>
+    Коли договір закінчується і ви повертаєте ключі, орендодавець має місяць, щоб повернути вам
+    заставний депозит (fianza). Після цього місяця на неповернену суму нараховуються відсотки за
+    законною ставкою (interés legal del dinero) (art. 36.4 LAU).
+  </p>
+  <p>
+    Місяць рахується від дати до дати: якщо ви повертаєте ключі 15 листопада, строк закінчується 15
+    грудня, а відсотки нараховуються з 16-го. Вони нараховуються до дня, коли вам повертають гроші;
+    цей день уже не враховується.
+  </p>
+  <p>
+    Який заставний депозит можуть вимагати від вас на початку:{' '}
+    <a href={href(RENTAL_PAGES.deposit.path)}>{RENTAL_PAGES.deposit.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="interes">
+  <h2 id="interes">Яка ставка застосовується</h2>
+  <p>
+    Законна ставка (interés legal del dinero). Її щороку встановлює Ley de Presupuestos Generales
+    del Estado (закон про державний бюджет), і в розрахунках для кожного дня застосовується ставка
+    його календарного року. Ставки за кожен рік наведено в{' '}
+    <a href={table}>таблиці Banco de España</a>.
+  </p>
+  <p>
+    Рік можна рахувати за календарними днями (365, або 366 у високосному році) або як 360 днів: ми
+    наводимо обидва розрахунки.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Розібраний приклад</h2>
+  <p>
+    Особа із заставним депозитом {formatEuros(ex.deposit)} повертає ключі{' '}
+    {formatDay(ex.keysReturnedOn)}. Орендодавець їх приймає і повертає їй увесь заставний депозит{' '}
+    {formatDay(ex.returnedOn)}. Місяць закінчився 15-12-2022, тож відсотки нараховуються з{' '}
+    {formatDay(ex.interestFrom)} і охоплюють зміну року, зі ставкою кожного з них:
+  </p>
+  <ul>
+    <li>
+      {formatDay(first.from)} – {formatDay(first.to)} ({first.days} дн.) за ставкою{' '}
+      {formatRate(first.rate)}: {formatEuros(first.interest)}.
+    </li>
+    <li>
+      {formatDay(second.from)} – {formatDay(second.to)} ({second.days} дн.) за ставкою{' '}
+      {formatRate(second.rate)}: {formatEuros(second.interest)}.
+    </li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Розрахунки</span> Кожен проміжок — це заставний депозит, помножений
+    на ставку і на дні та поділений на 100 і на кількість днів у році ({first.yearDays}):{' '}
+    {formatEuros(ex.deposit)} × {formatRate(first.rate)} × {first.days} ÷ {first.yearDays} і{' '}
+    {formatEuros(ex.deposit)} × {formatRate(second.rate)} × {second.days} ÷ {second.yearDays}.
+    Загалом {formatEuros(ex.total)} відсотків; якщо рахувати рік як 360 днів,{' '}
+    {formatEuros(ex.totalCommercial)}.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="no-valoramos">
+  <h2 id="no-valoramos">Чого ми не оцінюємо</h2>
+  <p>
+    Якщо орендодавець залишає собі частину заставного депозиту за пошкодження, прибирання чи з інших
+    причин, перевірка записує кожне утримання так, як вам його вказали, і віднімає його від суми,
+    яку ще мають повернути. Вона не оцінює, чи воно обґрунтоване, ані скільки коштує ремонт.
+  </p>
+  <p>{pageDecree('deposit_return', 'rental.guide.return.closing')}</p>
+  <p class="folio">
+    Art. <span>36.7</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Розрахуйте, що вам належить</h2>
+  <p>
+    У <a href={href(REVIEW.path)}>перевірці оренди</a> ви вводите, коли повернули ключі, скільки вам
+    повернули і коли. Вона показує, скільки ще не повернуто із заставного депозиту, і відсотки, з
+    обома розрахунками року, а також може підготувати лист, щоб попросити про це.
+  </p>
+  <p>
+    {NORMS.lau.citation}: <a href={NORMS.lau.url}>консолідований текст у BOE</a>.
+  </p>
+</section>
