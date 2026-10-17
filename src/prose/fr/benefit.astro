@@ -1,5 +1,5 @@
 ---
-// source: 5665f4065cc1
+// source: 854c3338933e
 import FigureTable from '../../components/FigureTable.astro';
 import CaseLink from '../../components/CaseLink.astro';
 import { benefitBySalary } from '../../content/examples';
@@ -129,18 +129,15 @@ const rows: readonly (readonly [string, (b: Row) => number])[] = [
   </p>
 </section>
 
-{/* The literal switch, as in the ERTE page's route: a build without it renders nothing here. */}
-{import.meta.env.PUBLIC_ERTE === '1' && (
-  <section class="sheet sheet--text">
-    <h3 id="p-erte">Si vous êtes en ERTE</h3>
-    <p>
-      Un ERTE (chômage partiel temporaire) peut aussi ouvrir droit au chômage pendant sa durée. Le
-      montant perçu et le fait qu'il consomme ou non vos droits au chômage futurs dépendent du type
-      d'ERTE&nbsp;:{' '}
-      <a href={link(lang, 'paro/erte/')}>calculez votre allocation chômage pendant un ERTE</a>.
-    </p>
-    <p class="folio">
-      Art. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
-    </p>
-  </section>
-)}
+<section class="sheet sheet--text">
+  <h3 id="p-erte">Si vous êtes en ERTE</h3>
+  <p>
+    Un ERTE (chômage partiel temporaire) peut aussi ouvrir droit au chômage pendant sa durée. Le
+    montant perçu et le fait qu'il consomme ou non vos droits au chômage futurs dépendent du type
+    d'ERTE&nbsp;:{' '}
+    <a href={link(lang, 'paro/erte/')}>calculez votre allocation chômage pendant un ERTE</a>.
+  </p>
+  <p class="folio">
+    Art. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+  </p>
+</section>

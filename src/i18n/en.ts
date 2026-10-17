@@ -25,7 +25,6 @@ export const en: Translation = {
   'home.contract_situation': 'You have a contract or a job offer: each condition against the law',
   'home.rent_situation': 'You rent your home: what you are charged against what the law allows',
   'home.mortgage': 'Mortgage',
-  'home.finance': 'Credit and insurance',
   'home.credit': 'Credit',
   'home.insurance': 'Insurance',
   'home.insurance_situation':
@@ -3198,9 +3197,6 @@ export const en: Translation = {
   'rent_indices.check':
     'Check whether your landlord has raised your rent by more than the law allows, using the date of your agreement and the index for each month.',
   'rent_indices.check_link': 'Review my rental',
-  'rent_indices.soon_title': 'Coming soon: check your increase',
-  'rent_indices.soon':
-    'We are preparing a calculator that checks your increase using the date of your agreement and the index for each month. It is not available yet.',
   'rent_indices.faq': 'Frequently asked questions',
   'rent_indices.faq.what_is_irav': 'What is the IRAV?',
   'rent_indices.faq.what_is_irav_answer':

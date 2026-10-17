@@ -107,8 +107,7 @@ const readingString = (key: string): boolean =>
 
 // The words document reading has only for the credit, the insurance or the mortgage review's
 // documents: what each kind is called, the figures their summary names, why a page was set aside
-// and which page a read missed. Each ships only on its reviews' pages, so no other page changes
-// while those reviews wait behind a switch.
+// and which page a read missed. Each ships only on its reviews' pages.
 const sectionReading = (
   kinds: readonly string[],
   fields: readonly string[],

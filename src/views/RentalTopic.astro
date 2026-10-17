@@ -10,9 +10,8 @@ import { example, formatLongDay, latest, monthRows } from '../content/rent-indic
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
 
-// A page on one question about a rental: what it says, its questions and the pages next to it.
-// It exists only in a PUBLIC_RENTAL=1 build, so its date is in LAST_UPDATED only then. A page with
-// sections of its own puts them, from src/prose/, in the slot.
+// A page on one question about a rental: what it says, its questions and the pages next to it. A
+// page with sections of its own puts them, from src/prose/, in the slot.
 interface Props {
   id: RentalPageId;
   lang: Lang;

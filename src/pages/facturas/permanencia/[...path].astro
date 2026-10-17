@@ -1,19 +1,13 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { BILLS_BUILD } from '../../../content/sections';
 
-// Without PUBLIC_BILLS=1 the build has no /facturas/permanencia/ at all, and the page's code stays out of it.
-export const getStaticPaths = (() =>
-  BILLS_BUILD ? [{ params: { path: undefined } }] : []) satisfies GetStaticPaths;
+export const getStaticPaths = (() => [{ params: { path: undefined } }]) satisfies GetStaticPaths;
 
-// The literal switch, not BILLS_BUILD: the bundler drops the page and its script from a build
-// without it, which keeps that build identical to one without this page.
+// Imported dynamically: a static import lets the bundler merge this view's scripts into the
+// chunks other pages share, which then download them too.
 /* eslint-disable no-restricted-syntax -- a fixed path into src/views, not a boundary escape */
-const Telecom =
-  import.meta.env.PUBLIC_BILLS === '1'
-    ? (await import('../../../views/Telecom.astro')).default
-    : null;
+const Telecom = (await import('../../../views/Telecom.astro')).default;
 /* eslint-enable no-restricted-syntax */
 ---
 
-{Telecom && <Telecom lang="es" />}
+<Telecom lang="es" />

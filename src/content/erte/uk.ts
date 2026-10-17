@@ -1,4 +1,4 @@
-// source: f89d3a3982c4
+// source: cbf3c50ce7b9
 import type { Range } from '../../engine/money';
 import {
   belowFullTimeMinimum,
@@ -28,7 +28,7 @@ export const ERTE_PAGE = {
   restart: 'Почати спочатку',
 } as const;
 
-// The paragraphs of the legal notice about the page, only in a build that has it.
+// The paragraphs of the legal notice about the page.
 export const ERTE_LEGAL = {
   title: 'Оцінка допомоги по безробіттю під час ERTE',
   does: 'Оцінює допомогу по безробіттю брутто на місяць під час ERTE з економічних, технічних, організаційних або виробничих причин, через непереборну силу (fuerza mayor) або в межах механізму RED, за базою розрахунку (base reguladora) і даними, які вводите ви: суму з її межами, чи це повне, чи часткове безробіття, чи витрачається допомога, що залишиться вам на майбутнє, і які потрібні внески. Для кожного блоку вказано статтю Ley General de la Seguridad Social, з якої він випливає, зокрема з її додаткових положень 41.ª і 46.ª.',

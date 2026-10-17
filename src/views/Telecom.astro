@@ -35,7 +35,7 @@ const sections = [
   ['result', 'resultado', '04', 2],
 ] as const;
 
-// The day the page's rules were last checked; it exists only in a build with the page.
+// The day the page's rules were last checked.
 const checkedOn = LAST_UPDATED['/facturas/permanencia/'];
 if (!checkedOn) throw new Error('/facturas/permanencia/ needs its date in LAST_UPDATED.');
 const home = new URL(import.meta.env.BASE_URL, Astro.site);

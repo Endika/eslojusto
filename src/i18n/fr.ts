@@ -28,7 +28,6 @@ export const fr: Translation = {
   'home.rent_situation':
     "Vous êtes locataire\u00a0: ce que l'on vous facture face à ce que permet la loi",
   'home.mortgage': 'Prêt immobilier',
-  'home.finance': 'Financement et assurances',
   'home.credit': 'Financement',
   'home.insurance': 'Assurances',
   'home.insurance_situation':
@@ -3295,9 +3294,6 @@ export const fr: Translation = {
   'rent_indices.check':
     "Vérifiez si votre propriétaire a augmenté le loyer au-delà de ce que permet la loi, avec la date de votre bail et l'indice de chaque mois.",
   'rent_indices.check_link': 'Vérifier ma location',
-  'rent_indices.soon_title': 'Bientôt\u00a0: vérifiez votre augmentation',
-  'rent_indices.soon':
-    "Nous préparons un calculateur qui vérifiera votre augmentation avec la date de votre bail et l'indice de chaque mois. Il n'est pas encore disponible.",
   'rent_indices.faq': 'Questions fréquentes',
   'rent_indices.faq.what_is_irav': "Qu'est-ce que l'IRAV\u00a0?",
   'rent_indices.faq.what_is_irav_answer':

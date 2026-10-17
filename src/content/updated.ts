@@ -3,24 +3,6 @@ import { PATH as RENT_INDICES, lastChanged } from './rent-indices';
 
 // The day each page's content last changed, for the sitemap's lastmod. Update a page's date only
 // when its content changes: a date that moves on every build teaches Google to ignore it.
-// /alquiler/ exists only in a PUBLIC_RENTAL=1 build. The Astro config reads this file in Node,
-// before any import.meta.env, so the switch is read from the process as the build sets it.
-const rentalBuild = process.env['PUBLIC_RENTAL'] === '1';
-// /contrato/ likewise exists only in a PUBLIC_EMPLOYMENT=1 build.
-const employmentBuild = process.env['PUBLIC_EMPLOYMENT'] === '1';
-// /paro/erte/ likewise exists only in a PUBLIC_ERTE=1 build.
-const erteBuild = process.env['PUBLIC_ERTE'] === '1';
-// /empleada-de-hogar/ likewise exists only in a PUBLIC_HOUSEHOLD=1 build.
-const householdBuild = process.env['PUBLIC_HOUSEHOLD'] === '1';
-// /seguros/ likewise exists only in a PUBLIC_INSURANCE=1 build.
-const insuranceBuild = process.env['PUBLIC_INSURANCE'] === '1';
-// /financiacion/ likewise exists only in a PUBLIC_CREDIT=1 build.
-const creditBuild = process.env['PUBLIC_CREDIT'] === '1';
-// /hipoteca/ likewise exists only in a PUBLIC_MORTGAGE=1 build.
-const mortgageBuild = process.env['PUBLIC_MORTGAGE'] === '1';
-// /facturas/ and its two reviews likewise exist only in a PUBLIC_BILLS=1 build.
-const billsBuild = process.env['PUBLIC_BILLS'] === '1';
-
 export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/': '2026-10-14',
   '/finiquito/': '2026-10-09',
@@ -37,30 +19,22 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/paro/por-tiempo-trabajado/': '2026-10-07',
   '/paro/baja-voluntaria/': '2026-10-07',
   '/paro/despido-disciplinario/': '2026-10-07',
-  ...(rentalBuild
-    ? {
-        '/alquiler/': '2026-10-09',
-        '/alquiler/subida/': '2026-10-09',
-        '/alquiler/decreto-2026/': '2026-10-09',
-        '/alquiler/honorarios-inmobiliaria/': '2026-10-09',
-        '/alquiler/fianza/': '2026-10-09',
-        '/alquiler/devolucion-fianza/': '2026-10-09',
-        '/alquiler/gastos/': '2026-10-09',
-      }
-    : {}),
-  ...(employmentBuild ? { '/contrato/': '2026-10-09' } : {}),
-  ...(erteBuild ? { '/paro/erte/': '2026-10-09' } : {}),
-  ...(householdBuild ? { '/empleada-de-hogar/': '2026-10-09' } : {}),
-  ...(insuranceBuild ? { '/seguros/': '2026-10-11' } : {}),
-  ...(creditBuild ? { '/financiacion/': '2026-10-11' } : {}),
-  ...(mortgageBuild ? { '/hipoteca/': '2026-10-11' } : {}),
-  ...(billsBuild
-    ? {
-        '/facturas/': '2026-10-14',
-        '/facturas/luz/': '2026-10-14',
-        '/facturas/permanencia/': '2026-10-14',
-      }
-    : {}),
+  '/alquiler/': '2026-10-09',
+  '/alquiler/subida/': '2026-10-09',
+  '/alquiler/decreto-2026/': '2026-10-09',
+  '/alquiler/honorarios-inmobiliaria/': '2026-10-09',
+  '/alquiler/fianza/': '2026-10-09',
+  '/alquiler/devolucion-fianza/': '2026-10-09',
+  '/alquiler/gastos/': '2026-10-09',
+  '/contrato/': '2026-10-09',
+  '/paro/erte/': '2026-10-09',
+  '/empleada-de-hogar/': '2026-10-09',
+  '/seguros/': '2026-10-11',
+  '/financiacion/': '2026-10-11',
+  '/hipoteca/': '2026-10-11',
+  '/facturas/': '2026-10-14',
+  '/facturas/luz/': '2026-10-14',
+  '/facturas/permanencia/': '2026-10-14',
 };
 
 // A page in another language changes when its Spanish one does: `/eu/paro/` reads `/paro/`.

@@ -26,7 +26,6 @@ export const uk: Translation = {
     'У вас є трудовий договір або пропозиція роботи: кожна умова порівняно із законом',
   'home.rent_situation': 'Ви орендуєте житло: що з вас стягують порівняно з тим, що дозволяє закон',
   'home.mortgage': 'Іпотека',
-  'home.finance': 'Фінансування і страхування',
   'home.credit': 'Фінансування',
   'home.insurance': 'Страхування',
   'home.insurance_situation':
@@ -3234,9 +3233,6 @@ export const uk: Translation = {
   'rent_indices.check':
     'Перевірте, чи орендодавець підвищив вам орендну плату більше, ніж дозволяє закон, за датою вашого договору та індексом кожного місяця.',
   'rent_indices.check_link': 'Перевірити мою оренду',
-  'rent_indices.soon_title': 'Незабаром: перевірте своє підвищення',
-  'rent_indices.soon':
-    'Ми готуємо калькулятор, який перевірятиме ваше підвищення за датою вашого договору та індексом кожного місяця. Він ще недоступний.',
   'rent_indices.faq': 'Поширені запитання',
   'rent_indices.faq.what_is_irav': 'Що таке IRAV?',
   'rent_indices.faq.what_is_irav_answer':

@@ -1,5 +1,5 @@
 ---
-// source: 5665f4065cc1
+// source: 854c3338933e
 import FigureTable from '../../components/FigureTable.astro';
 import CaseLink from '../../components/CaseLink.astro';
 import { benefitBySalary } from '../../content/examples';
@@ -127,17 +127,14 @@ const rows: readonly (readonly [string, (b: Row) => number])[] = [
   </p>
 </section>
 
-{/* The literal switch, as in the ERTE page's route: a build without it renders nothing here. */}
-{import.meta.env.PUBLIC_ERTE === '1' && (
-  <section class="sheet sheet--text">
-    <h3 id="p-erte">إذا كنت مشمولًا بإجراء ERTE</h3>
-    <p>
-      يمكن لإجراء ERTE أيضًا أن يمنح الحق في إعانة البطالة طوال مدته. مقدار ما يُتقاضى، وما إذا كان
-      يستهلك من إعانة البطالة المستقبلية، يتوقفان على نوع إجراء ERTE:{' '}
-      <a href={link(lang, 'paro/erte/')}>احسب إعانة البطالة خلال إجراء ERTE</a>.
-    </p>
-    <p class="folio">
-      Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
-    </p>
-  </section>
-)}
+<section class="sheet sheet--text">
+  <h3 id="p-erte">إذا كنت مشمولًا بإجراء ERTE</h3>
+  <p>
+    يمكن لإجراء ERTE أيضًا أن يمنح الحق في إعانة البطالة طوال مدته. مقدار ما يُتقاضى، وما إذا كان
+    يستهلك من إعانة البطالة المستقبلية، يتوقفان على نوع إجراء ERTE:{' '}
+    <a href={link(lang, 'paro/erte/')}>احسب إعانة البطالة خلال إجراء ERTE</a>.
+  </p>
+  <p class="folio">
+    Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+  </p>
+</section>

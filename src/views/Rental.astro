@@ -26,7 +26,7 @@ const tx = (key: Key) => t(lang, key);
 // the form wait until it is made.
 const documents = DOCUMENTS !== null;
 
-// The day the page's rules and norms were last checked; it exists only in a build with the page.
+// The day the page's rules and norms were last checked.
 const checkedOn = LAST_UPDATED['/alquiler/'];
 if (!checkedOn) throw new Error('/alquiler/ needs its date in LAST_UPDATED.');
 const home = new URL(import.meta.env.BASE_URL, Astro.site);

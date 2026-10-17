@@ -127,9 +127,6 @@ export const es = {
   'rent_indices.check':
     'Revisa si tu casero te ha subido la renta más de lo que permite la ley, con la fecha de tu contrato y el índice de cada mes.',
   'rent_indices.check_link': 'Revisar mi alquiler',
-  'rent_indices.soon_title': 'Próximamente: comprueba tu subida',
-  'rent_indices.soon':
-    'Estamos preparando una calculadora que compruebe tu subida con la fecha de tu contrato y el índice de cada mes. Aún no está disponible.',
 
   'rent_indices.faq': 'Preguntas frecuentes',
   'rent_indices.faq.what_is_irav': '¿Qué es el IRAV?',
@@ -179,7 +176,6 @@ export const es = {
   'home.contract_situation': 'Tienes un contrato o una oferta: cada condición frente a la ley',
   'home.rent_situation': 'Vives de alquiler: lo que te cobran frente a lo que permite la ley',
   'home.mortgage': 'Hipoteca',
-  'home.finance': 'Financiación y seguros',
   'home.credit': 'Financiación',
   'home.insurance': 'Seguros',
   'home.insurance_situation': 'Renuevas tu seguro de hogar o de coche: sus plazos frente a la ley',
@@ -3782,7 +3778,7 @@ export const es = {
   'client.rental.calculation.deposit.interest_total': 'Intereses: {total}.',
   'client.rental.calculation.deposit.interest_rate_not_loaded':
     'El interés legal de {year} aún no está en esta revisión: desde ese año no se cuenta.',
-  // The household domestic worker review's engine phrases, shown only with PUBLIC_HOUSEHOLD=1.
+  // The household domestic worker review's engine phrases.
   'client.household.calculation.minimum_wage.not_published':
     'El SMI de {year} aún no se ha publicado en el BOE. Como referencia, el de {referenceYear}: {reference}. Para {year} no se calcula ninguna diferencia.',
   'client.household.calculation.minimum_wage.not_loaded':
@@ -3927,7 +3923,7 @@ export const es = {
   'client.household.calculation.unemployment.general_rules':
     'Desde el 1 de octubre de 2022 el desempleo se cotiza y se aplican las reglas generales: 360 días cotizados en los últimos seis años (art. 266.b LGSS) que no hayas usado ya para otra prestación (art. 269.2 LGSS), y una prestación del 70 % y después del 60 %. Esta revisión no calcula la prestación.',
 
-  // The household domestic worker review, built only with PUBLIC_HOUSEHOLD=1.
+  // The household domestic worker review.
   'household.title': 'Empleada de hogar: revisa tu sueldo y el desistimiento frente a la ley',
   'household.description':
     'Comprueba el sueldo, la jornada, las vacaciones, el finiquito y el desistimiento de tu trabajo en una casa frente a la ley, cifra a cifra y con su artículo.',

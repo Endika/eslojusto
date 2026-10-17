@@ -1,4 +1,4 @@
-// source: 2c557a5eacec
+// source: 3c9f4c62bcf0
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -22,7 +22,7 @@ const NBSP = ' ';
 
 // The six pages on a rental that sit under /alquiler/: the rise, the 2026 decree and the agency
 // fees, and the deposit, its return and the charges, in French, with the shape, paths and
-// examples of es.ts. They exist only in a PUBLIC_RENTAL=1 build. Only the loader imports this file.
+// examples of es.ts. Only the loader imports this file.
 
 export type RentalPageId = 'rise' | 'decree' | 'fees' | 'deposit' | 'deposit_return' | 'charges';
 

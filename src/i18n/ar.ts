@@ -24,7 +24,6 @@ export const ar: Translation = {
   'home.contract_situation': 'لديك عقد عمل أو عرض عمل: كل شرط مقارنةً بالقانون',
   'home.rent_situation': 'تسكن بالإيجار: ما يُطلب منك دفعه مقارنةً بما يسمح به القانون',
   'home.mortgage': 'القرض العقاري \u2068(hipoteca)\u2069',
-  'home.finance': 'التمويل والتأمين',
   'home.credit': 'التمويل',
   'home.insurance': 'التأمين',
   'home.insurance_situation': 'تجدّد تأمين منزلك أو سيارتك: مُهَله مقارنةً بالقانون',
@@ -3152,8 +3151,6 @@ export const ar: Translation = {
   'rent_indices.check':
     'راجِع ما إذا كان المؤجِّر قد رفع إيجارك أكثر مما يسمح به القانون، بتاريخ عقدك ومؤشر كل شهر.',
   'rent_indices.check_link': 'مراجعة إيجاري',
-  'rent_indices.soon_title': 'قريبًا: تحقّق من الزيادة',
-  'rent_indices.soon': 'نُعِدّ حاسبة تتحقّق من الزيادة بتاريخ عقدك ومؤشر كل شهر. لم تتوفر بعد.',
   'rent_indices.faq': 'أسئلة شائعة',
   'rent_indices.faq.what_is_irav': 'ما هو IRAV؟',
   'rent_indices.faq.what_is_irav_answer':

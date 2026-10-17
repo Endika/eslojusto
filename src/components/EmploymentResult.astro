@@ -1,6 +1,5 @@
 ---
 import PassOffer from './PassOffer.astro';
-import { HOUSEHOLD_BUILD } from '../content/sections';
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
 
@@ -81,11 +80,9 @@ const CIRCLED = new Set([
           <span data-out-of-scope-status></span>
         </p>
         <p class="help" data-out-of-scope-reason></p>
-        {HOUSEHOLD_BUILD && (
-          <p class="help" data-out-of-scope-household hidden>
-            <a href={link(lang, 'empleada-de-hogar/')}>{tx('employment.result.household_link')}</a>
-          </p>
-        )}
+        <p class="help" data-out-of-scope-household hidden>
+          <a href={link(lang, 'empleada-de-hogar/')}>{tx('employment.result.household_link')}</a>
+        </p>
       </div>
     </section>
 

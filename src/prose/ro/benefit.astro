@@ -1,5 +1,5 @@
 ---
-// source: 5665f4065cc1
+// source: 854c3338933e
 import FigureTable from '../../components/FigureTable.astro';
 import CaseLink from '../../components/CaseLink.astro';
 import { benefitBySalary } from '../../content/examples';
@@ -128,19 +128,15 @@ const rows: readonly (readonly [string, (b: Row) => number])[] = [
   </p>
 </section>
 
-{/* The literal switch, as in the ERTE page's route: a build without it renders nothing here. */}
-{import.meta.env.PUBLIC_ERTE === '1' && (
-  <section class="sheet sheet--text">
-    <h3 id="p-erte">Dacă ești într-un ERTE</h3>
-    <p>
-      Un ERTE (șomaj tehnic temporar) poate da și el dreptul la indemnizație de șomaj cât timp
-      durează. Cât se primește și dacă îți consumă indemnizația de șomaj viitoare depind de tipul de
-      ERTE:{' '}
-      <a href={link(lang, 'paro/erte/')}>calculează-ți indemnizația de șomaj în timpul unui ERTE</a>
-      .
-    </p>
-    <p class="folio">
-      Art. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
-    </p>
-  </section>
-)}
+<section class="sheet sheet--text">
+  <h3 id="p-erte">Dacă ești într-un ERTE</h3>
+  <p>
+    Un ERTE (șomaj tehnic temporar) poate da și el dreptul la indemnizație de șomaj cât timp
+    durează. Cât se primește și dacă îți consumă indemnizația de șomaj viitoare depind de tipul de
+    ERTE:{' '}
+    <a href={link(lang, 'paro/erte/')}>calculează-ți indemnizația de șomaj în timpul unui ERTE</a>.
+  </p>
+  <p class="folio">
+    Art. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+  </p>
+</section>

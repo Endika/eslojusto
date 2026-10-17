@@ -1,4 +1,4 @@
-// source: f89d3a3982c4
+// source: cbf3c50ce7b9
 import type { Range } from '../../engine/money';
 import {
   belowFullTimeMinimum,
@@ -31,7 +31,7 @@ export const ERTE_PAGE = {
   restart: 'Recommencer',
 } as const;
 
-// The paragraphs of the legal notice about the page, only in a build that has it.
+// The paragraphs of the legal notice about the page.
 export const ERTE_LEGAL = {
   title: "L'estimation de l'allocation chômage pendant un ERTE",
   does: "Elle estime l'allocation chômage brute mensuelle pendant un ERTE pour causes économiques, techniques, organisationnelles ou de production, pour force majeure ou dans le cadre du mécanisme RED, à partir de la base de calcul (base reguladora) et des données que vous saisissez : le montant avec ses limites, s'il s'agit de chômage total ou partiel, s'il consomme le chômage qui vous resterait pour plus tard et la cotisation requise. Chaque bloc indique l'article de la Ley General de la Seguridad Social dont il provient, y compris de ses dispositions additionnelles 41.ª et 46.ª.",
