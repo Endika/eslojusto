@@ -1,0 +1,116 @@
+---
+// source: 497baf7f9449
+import { LEGAL_INTEREST } from '../../engine/law/data/legal-interest';
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositReturnExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatDay, formatEuros, formatRate } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositReturnExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+const [first, second] = ex.stretches;
+if (!first || !second) throw new Error('The example spans a year change.');
+const table = LEGAL_INTEREST[0]?.url;
+---
+
+<section class="sheet sheet--text" aria-labelledby="plazo">
+  <h2 id="plazo">Le délai&nbsp;: un mois à compter de la remise des clés</h2>
+  <p>
+    Quand le bail prend fin et que vous rendez les clés, le propriétaire dispose d'un mois pour vous
+    restituer le dépôt de garantie. Passé ce mois, ce qui reste à restituer produit des intérêts au
+    taux d'intérêt légal (interés legal del dinero) (art. 36.4 LAU).
+  </p>
+  <p>
+    Le mois se compte de date à date&nbsp;: si vous rendez les clés le 15 novembre, le délai prend
+    fin le 15 décembre et les intérêts courent à partir du 16. Ils courent jusqu'au jour où l'argent
+    vous est restitué, qui n'est plus compté.
+  </p>
+  <p>
+    Le montant du dépôt de garantie qui peut vous être demandé au départ&nbsp;:{' '}
+    <a href={href(RENTAL_PAGES.deposit.path)}>{RENTAL_PAGES.deposit.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="interes">
+  <h2 id="interes">Quel taux s'applique</h2>
+  <p>
+    Le taux d'intérêt légal. Il est fixé chaque année par la Ley de Presupuestos Generales del
+    Estado (loi de finances), et le calcul applique le taux de l'année civile de chaque jour. Les
+    taux de chaque année figurent dans le <a href={table}>tableau du Banco de España</a>.
+  </p>
+  <p>
+    L'année peut se compter en jours calendaires (365, ou 366 pour une année bissextile) ou sur 360
+    jours&nbsp;: nous donnons les deux calculs.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Exemple détaillé</h2>
+  <p>
+    Une personne dont le dépôt de garantie est de {formatEuros(ex.deposit)} rend les clés le{' '}
+    {formatDay(ex.keysReturnedOn)}. Le propriétaire les accepte et lui restitue la totalité du dépôt
+    de garantie le {formatDay(ex.returnedOn)}. Le mois a pris fin le 15-12-2022, donc les intérêts
+    courent à partir du {formatDay(ex.interestFrom)} et chevauchent le changement d'année, avec le
+    taux de chacune&nbsp;:
+  </p>
+  <ul>
+    <li>
+      Du {formatDay(first.from)} au {formatDay(first.to)} ({first.days} jours) à{' '}
+      {formatRate(first.rate)}&nbsp;: {formatEuros(first.interest)}.
+    </li>
+    <li>
+      Du {formatDay(second.from)} au {formatDay(second.to)} ({second.days} jours) à{' '}
+      {formatRate(second.rate)}&nbsp;: {formatEuros(second.interest)}.
+    </li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Le calcul</span> Chaque tranche correspond au dépôt de garantie
+    multiplié par le taux et par les jours, divisé par 100 et par les {first.yearDays} jours de
+    l'année&nbsp;: {formatEuros(ex.deposit)} × {formatRate(first.rate)} × {first.days} ÷{' '}
+    {first.yearDays} et {formatEuros(ex.deposit)} × {formatRate(second.rate)} × {second.days} ÷{' '}
+    {second.yearDays}. Au total, {formatEuros(ex.total)} d'intérêts&nbsp;; si l'année compte 360
+    jours, {formatEuros(ex.totalCommercial)}.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="no-valoramos">
+  <h2 id="no-valoramos">Ce que nous n'évaluons pas</h2>
+  <p>
+    Si le propriétaire garde une partie du dépôt de garantie pour des dégradations, le nettoyage ou
+    d'autres motifs, la vérification note chaque retenue telle qu'elle vous a été indiquée et la
+    déduit de ce qui reste à restituer. Elle n'évalue ni si elle est fondée ni le coût d'une
+    réparation.
+  </p>
+  <p>{pageDecree('deposit_return', 'rental.guide.return.closing')}</p>
+  <p class="folio">
+    Art. <span>36.7</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Calculez ce qui vous revient</h2>
+  <p>
+    Dans la <a href={href(REVIEW.path)}>vérification de la location</a>, vous saisissez quand vous
+    avez rendu les clés, combien vous a été restitué et quand. Elle vous donne ce qui manque du
+    dépôt de garantie et les intérêts, avec les deux calculs de l'année, et peut préparer une lettre
+    pour les demander.
+  </p>
+  <p>
+    {NORMS.lau.citation}&nbsp;: <a href={NORMS.lau.url}>texte consolidé au BOE</a>.
+  </p>
+</section>

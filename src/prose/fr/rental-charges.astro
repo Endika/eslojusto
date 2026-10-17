@@ -1,0 +1,87 @@
+---
+// source: 8e819e81fa1a
+import { NORMS } from '../../engine/rental/data/norms';
+import { chargesExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros, formatLongDay } from '../../content/rent-indices';
+import { t } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pageDecree } = rentalPagesCopy(lang);
+
+const ex = chargesExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="pacto">
+  <h2 id="pacto">Seulement avec un accord écrit et leur montant annuel</h2>
+  <p>
+    Le propriétaire ne peut vous facturer les charges générales de l'immeuble ou les services sans
+    compteur que si cela a été convenu par écrit, avec leur montant annuel à la date du bail (art.
+    20.1 LAU). Les impôts et taxes (tributos), comme l'IBI, suivent une règle à part&nbsp;: voir
+    «&nbsp;L'IBI et les taxes&nbsp;» plus bas.
+  </p>
+  <p>
+    Si le bail ne les mentionne pas ou n'indique pas de montant annuel, la vérification le signale
+    pour que vous y regardiez de plus près.
+  </p>
+  <p>{pageDecree('charges', 'rental.page.charges.community')}</p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="subida">
+  <h2 id="subida">De combien elles peuvent augmenter&nbsp;: jusqu'au double du loyer</h2>
+  <p>
+    Pendant les cinq premières années du bail, ou sept si le propriétaire est une entreprise, ces
+    charges, hors impôts et taxes, ne peuvent augmenter qu'une fois par an, d'un commun accord, et
+    jamais de plus du double de ce dont le loyer peut augmenter (art. 20.3 LAU, ou art. 20.2 pour
+    les baux antérieurs au Real Decreto-ley 29/2026). La vérification compare chaque charge de
+    chaque année à ce plafond.
+  </p>
+  <p class="folio">
+    Art. <span>20.3</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ibi">
+  <h2 id="ibi">L'IBI et les taxes</h2>
+  <p>{pageDecree('charges', 'rental.page.decree.taxes')}</p>
+  <p>
+    {t(lang, 'rental.guide.charges.taxes_before', {
+      desde: formatLongDay(NORMS.rdl29_2026.inForceSince, lang),
+    })}
+  </p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Exemple détaillé</h2>
+  <p>
+    Un bail fixe {formatEuros(ex.agreed)} par an de charges de copropriété. La première année, le
+    propriétaire facture {formatEuros(ex.charged)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Le calcul</span> Aucune augmentation n'a encore pu avoir lieu, donc
+    le maximum est le montant convenu, {formatEuros(ex.agreed)}. {formatEuros(ex.charged)} −{' '}
+    {formatEuros(ex.agreed)} = {formatEuros(ex.over)} en trop.
+  </p>
+  <p class="folio">
+    Art. <span>20</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Vérifiez ce qui vous est facturé</h2>
+  <p>
+    La <a href={href(REVIEW.path)}>vérification de la location</a> compare chaque charge de chaque
+    année au montant convenu et au plafond d'augmentation, et vous indique combien vous avez payé en
+    trop.
+  </p>
+</section>
