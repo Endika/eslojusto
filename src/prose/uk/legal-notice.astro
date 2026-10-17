@@ -1,0 +1,316 @@
+---
+// source: c76c3a602e8c
+import { t, type Key } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+import { DOCUMENTS } from '../../documents/config';
+import { PASS_DAYS, PASS_READS } from '../../documents/contract';
+import {
+  BILLS_BETA,
+  BILLS_BUILD,
+  CREDIT_BETA,
+  CREDIT_BUILD,
+  EMPLOYMENT_BETA,
+  EMPLOYMENT_BUILD,
+  ERTE_BUILD,
+  HOUSEHOLD_BUILD,
+  INSURANCE_BETA,
+  INSURANCE_BUILD,
+  MORTGAGE_BETA,
+  MORTGAGE_BUILD,
+  RENTAL_BUILD,
+} from '../../content/sections';
+import { erteCopy } from '../../content/erte';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const tx = (key: Key, vars?: Record<string, string>) => t(lang, key, vars);
+
+const email = 'hola@eslojusto.es';
+// The owner's details (art. 10 LSSI), on every build: the duty covers the whole site.
+const owner = {
+  titular: tx('legal.owner_name'),
+  nif: tx('legal.owner_id'),
+  domicilio: tx('legal.owner_address'),
+};
+// The pass and its conditions exist only in a build with the documents API.
+const documents = DOCUMENTS !== null;
+// The rental review and its paragraphs exist only in a PUBLIC_RENTAL=1 build.
+const rental = RENTAL_BUILD;
+// The contract review exists only in a PUBLIC_EMPLOYMENT=1 build; so do the paragraphs about it.
+const employment = EMPLOYMENT_BUILD;
+// The household review exists only in a PUBLIC_HOUSEHOLD=1 build; so do the paragraphs about it.
+const household = HOUSEHOLD_BUILD;
+// The ERTE page exists only in a PUBLIC_ERTE=1 build; so do the paragraphs about it.
+const erte = ERTE_BUILD;
+const erteText = erteCopy(lang);
+// The credit and insurance reviews exist only in a PUBLIC_CREDIT=1 or PUBLIC_INSURANCE=1 build; so
+// do the paragraphs about each.
+const credit = CREDIT_BUILD;
+const insurance = INSURANCE_BUILD;
+// The mortgage review exists only in a PUBLIC_MORTGAGE=1 build; so do the paragraphs about it.
+const mortgage = MORTGAGE_BUILD;
+// The bills reviews exist only in a PUBLIC_BILLS=1 build; so do the paragraphs about them.
+const bills = BILLS_BUILD;
+---
+
+<div class="document__sheets">
+  <section class="sheet sheet--text">
+    <h2 id="al-quien">{tx('legal_notice.who')}</h2>
+    <p>
+      eslojusto.es — проєкт Endika Iglesias. З будь-яких питань щодо сайту пишіть на{' '}
+      <a href={`mailto:${email}`}>{email}</a>.
+    </p>
+    <p>{tx('legal_notice.owner')}</p>
+    <dl class="data-list" data-owner>
+      <div>
+        <dt>{tx('legal.owner_name_label')}</dt>
+        <dd>{owner.titular}</dd>
+      </div>
+      <div>
+        <dt>{tx('legal.owner_id_label')}</dt>
+        <dd>{owner.nif}</dd>
+      </div>
+      {owner.domicilio && (
+        <div>
+          <dt>{tx('legal.owner_address_label')}</dt>
+          <dd>{owner.domicilio}</dd>
+        </div>
+      )}
+      <div>
+        <dt>{tx('legal.owner_contact_label')}</dt>
+        <dd>
+          <a href={`mailto:${email}`}>{email}</a>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-que-hace">{tx('legal_notice.what_it_does')}</h2>
+    <p>
+      Інструмент порівнює суми вашого остаточного розрахунку (finiquito) з мінімумом, який
+      встановлює закон, позиція за позицією. Формули відповідають Estatuto de los Trabajadores
+      (Статут працівників) і практичному посібнику CGPJ з розрахунку вихідної допомоги (v0.6, липень
+      2026 р.), і для кожної суми вказано статтю, з якої вона випливає.
+    </p>
+    <p>
+      Коли правило допускає два розрахунки, він показує діапазон між ними. Те, що ваш колективний
+      договір (convenio colectivo) може поліпшити, як-от більше днів відпустки чи інший порядок
+      нарахування додаткових виплат (pagas extra), порівнюється із законним мінімумом, і інструмент
+      про це повідомляє. Коли бракує даних, без яких законної суми немає, як-от строку попередження
+      при звільненні за власним бажанням, він позначає це як «неможливо перевірити», замість того
+      щоб наводити суму, якої не може знати.
+    </p>
+    {documents && (
+      <p>
+        Якщо ви завантажуєте документ, модель ШІ копіює його дані у форму. Вона нічого не
+        розраховує: ви підтверджуєте кожне значення перед перевіркою, а суми розраховує той самий
+        інструмент, що й тоді, коли ви вводите їх самі.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-no-hace">{tx('legal_notice.what_it_does_not')}</h2>
+    <ul>
+      <li>Він не є юридичною консультацією. Він дає загальну інформацію про те, що каже закон.</li>
+      <li>
+        Він не знає вашого колективного договору і не перевіряє зарплату нетто, надбавки (pluses),
+        понаднормові години чи комісійні.
+      </li>
+      <li>Він не вирішує, чи обґрунтована підстава звільнення. Це вирішує суд.</li>
+      <li>Він не каже вам, що робити з вашим остаточним розрахунком.</li>
+    </ul>
+    <p>
+      Він не замінює юриста з трудового права, graduado social (консультанта з трудового права) чи
+      профспілку, які можуть розглянути вашу ситуацію з вашими документами і вашим колективним
+      договором.
+    </p>
+  </section>
+
+  {rental && (
+    <section class="sheet sheet--text">
+      <h2 id="al-alquiler">
+        {tx('legal_notice.rental')} <span class="beta">{tx('rental.beta')}</span>
+      </h2>
+      <p>{tx('legal_notice.rental.does')}</p>
+      <p>{tx('legal_notice.rental.pending')}</p>
+      <p>{tx('legal_notice.rental.does_not')}</p>
+      <p>
+        {tx('legal_notice.rental.beta')} <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+    </section>
+  )}
+
+  {employment && (
+    <section class="sheet sheet--text">
+      <h2 id="al-contrato">
+        {tx('legal_notice.employment')}
+        {EMPLOYMENT_BETA && <span class="beta">{tx('employment.beta')}</span>}
+      </h2>
+      <p>{tx('legal_notice.employment.does')}</p>
+      <p>{tx('legal_notice.employment.does_not')}</p>
+      {EMPLOYMENT_BETA && (
+        <p>
+          {tx('legal_notice.employment.beta')} <a href={`mailto:${email}`}>{email}</a>.
+        </p>
+      )}
+    </section>
+  )}
+
+  {household && (
+    <section class="sheet sheet--text">
+      <h2 id="al-hogar">
+        {tx('legal_notice.household')} <span class="beta">{tx('household.beta')}</span>
+      </h2>
+      <p>{tx('legal_notice.household.does')}</p>
+      <p>{tx('legal_notice.household.does_not')}</p>
+      <p>
+        {tx('legal_notice.household.beta')} <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+    </section>
+  )}
+
+  {credit && (
+    <section class="sheet sheet--text">
+      <h2 id="al-financiacion">
+        {tx('legal_notice.credit')}
+        {CREDIT_BETA && <span class="beta">{tx('credit.beta')}</span>}
+      </h2>
+      <p>{tx('legal_notice.credit.does')}</p>
+      <p>{tx('legal_notice.credit.does_not')}</p>
+      {CREDIT_BETA && (
+        <p>
+          {tx('legal_notice.credit.beta')} <a href={`mailto:${email}`}>{email}</a>.
+        </p>
+      )}
+    </section>
+  )}
+
+  {insurance && (
+    <section class="sheet sheet--text">
+      <h2 id="al-seguros">
+        {tx('legal_notice.insurance')}
+        {INSURANCE_BETA && <span class="beta">{tx('insurance.beta')}</span>}
+      </h2>
+      <p>{tx('legal_notice.insurance.does')}</p>
+      <p>{tx('legal_notice.insurance.does_not')}</p>
+      {INSURANCE_BETA && (
+        <p>
+          {tx('legal_notice.insurance.beta')} <a href={`mailto:${email}`}>{email}</a>.
+        </p>
+      )}
+    </section>
+  )}
+
+  {mortgage && (
+    <section class="sheet sheet--text">
+      <h2 id="al-hipoteca">
+        {tx('legal_notice.mortgage')}
+        {MORTGAGE_BETA && <span class="beta">{tx('mortgage.beta')}</span>}
+      </h2>
+      <p>{tx('legal_notice.mortgage.does')}</p>
+      <p>{tx('legal_notice.mortgage.does_not')}</p>
+      {MORTGAGE_BETA && (
+        <p>
+          {tx('legal_notice.mortgage.beta')} <a href={`mailto:${email}`}>{email}</a>.
+        </p>
+      )}
+    </section>
+  )}
+
+  {bills && (
+    <section class="sheet sheet--text">
+      <h2 id="al-facturas">
+        {tx('legal_notice.bills')}
+        {BILLS_BETA && <span class="beta">{tx('bills.beta')}</span>}
+      </h2>
+      <p>{tx('legal_notice.bills.does')}</p>
+      <p>{tx('legal_notice.bills.does_not')}</p>
+      {BILLS_BETA && (
+        <p>
+          {tx('legal_notice.bills.beta')} <a href={`mailto:${email}`}>{email}</a>.
+        </p>
+      )}
+    </section>
+  )}
+
+  {erte && (
+    <section class="sheet sheet--text">
+      <h2 id="al-erte">
+        {erteText.legal.title} <span class="beta">{erteText.page.beta}</span>
+      </h2>
+      <p>{erteText.legal.does}</p>
+      <p>{erteText.legal.doesNot}</p>
+      <p>
+        {erteText.legal.beta} <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+    </section>
+  )}
+
+  {documents && (
+    <section class="sheet sheet--text">
+      <h2 id="condiciones">{tx('legal_notice.conditions')}</h2>
+      <p>
+        {tx('legal_notice.seller', owner)}{' '}
+        {owner.domicilio && <>{tx('legal_notice.seller_address', owner)} </>}З будь-яких питань щодо
+        покупки пишіть на <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+      <ul>
+        <li>
+          Що ви купуєте: цифровий абонемент, який діє {PASS_DAYS} дн. від оплати і лише в тому
+          браузері, у якому ви платите. Протягом цього часу ви можете повторити або виправити свою
+          перевірку, зчитати до {PASS_READS} пакетів документів і завантажити, скільки завгодно
+          разів і без повторної оплати, звіт у PDF з перевіркою вашого остаточного розрахунку і
+          шаблон листа «отримав(-ла), не погоджуюся» (recibí no conforme) з вашими сумами, якщо
+          чогось бракує. Звіт і лист створюються на вашому пристрої з даних вашої перевірки, які ми
+          ніде не зберігаємо.
+        </li>
+        {rental && <li>{tx('legal_notice.rental.pass', { dias: String(PASS_DAYS) })}</li>}
+        {employment && <li>{tx('legal_notice.employment.pass', { dias: String(PASS_DAYS) })}</li>}
+        {mortgage && <li>{tx('legal_notice.mortgage.pass', { dias: String(PASS_DAYS) })}</li>}
+        {bills && <li>{tx('legal_notice.bills.pass', { dias: String(PASS_DAYS) })}</li>}
+        <li>
+          Де він діє: абонемент зберігається лише в цьому браузері. На іншому пристрої, у приватному
+          вікні або якщо ви видалите дані браузера, він втрачається.
+        </li>
+        <li>
+          Ціна: 4,99 € з ПДВ (IVA). Один платіж карткою або через Bizum на сторінці Stripe, без
+          передплати і без подальших списань.
+        </li>
+        <li>
+          Отримання: одразу після повернення з оплати; тоді ж ви завантажуєте звіт і лист. Якщо ви
+          не бачите завантажень, кнопка «Ви вже оплатили?» в результаті відновлює абонемент, але
+          лише в тому браузері, у якому ви платили.
+        </li>
+        <li>
+          Право на відмову (desistimiento): це цифровий контент, який надається одразу. Перед
+          оплатою ми просимо вас позначити, що ви хочете отримати його вже зараз і знаєте, що таким
+          чином втрачаєте право на відмову від договору протягом 14 днів (art. 103.m зведеного
+          тексту (texto refundido) Ley General para la Defensa de los Consumidores y Usuarios).
+        </li>
+        <li>
+          Якщо щось не працює, наприклад ви не можете завантажити звіт або з вас списали кошти
+          двічі, напишіть на <a href={`mailto:${email}`}>{email}</a>, і відповідну суму буде
+          повернено.
+        </li>
+        <li>
+          Звіт дає загальну інформацію про закон і не є юридичною консультацією. Лист — це шаблон:
+          використовувати його чи ні, вирішуєте ви.
+        </li>
+      </ul>
+    </section>
+  )}
+
+  <section class="sheet sheet--text">
+    <h2 id="al-errores">{tx('legal_notice.errors')}</h2>
+    <p>
+      Суми вихідної допомоги звіряються з випадками, розрахованими калькулятором CGPJ. Якщо ви
+      бачите суму, яка не збігається із законом, можете написати на{' '}
+      <a href={`mailto:${email}`}>{email}</a>.
+    </p>
+  </section>
+</div>

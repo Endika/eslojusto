@@ -1,0 +1,627 @@
+---
+// source: 09f730db2222
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+import { DOCUMENTS } from '../../documents/config';
+import { OUTAGE_KEY } from '../../documents/outage';
+import { STORAGE_KEYS } from '../../documents/pass';
+import {
+  BILLS_BUILD,
+  CREDIT_BUILD,
+  EMPLOYMENT_BUILD,
+  HOUSEHOLD_BUILD,
+  INSURANCE_BUILD,
+  MORTGAGE_BUILD,
+  RENTAL_BUILD,
+} from '../../content/sections';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const tx = (key: Key) => t(lang, key);
+
+const email = 'hola@eslojusto.es';
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+// The rental review exists only in a PUBLIC_RENTAL=1 build; so do the paragraphs about it.
+const rental = RENTAL_BUILD;
+// The contract review exists only in a PUBLIC_EMPLOYMENT=1 build; so do the paragraphs about it.
+const employment = EMPLOYMENT_BUILD;
+// The household review exists only in a PUBLIC_HOUSEHOLD=1 build; so do the paragraphs about it.
+const household = HOUSEHOLD_BUILD;
+// The credit and insurance reviews exist only in a PUBLIC_CREDIT=1 or PUBLIC_INSURANCE=1 build; so
+// do the paragraphs about each.
+const credit = CREDIT_BUILD;
+const insurance = INSURANCE_BUILD;
+// The mortgage review exists only in a PUBLIC_MORTGAGE=1 build; so do the paragraphs about it.
+const mortgage = MORTGAGE_BUILD;
+// The bills reviews exist only in a PUBLIC_BILLS=1 build; so do the paragraphs about them.
+const bills = BILLS_BUILD;
+
+// One entry per thing that is stored or processed; a new tool adds a row here.
+const stored = [
+  {
+    what: tx('privacy.data_review'),
+    where:
+      'Лише у вашому браузері, поки сторінка відкрита. Розрахунок виконується на вашому пристрої: ваші дати, ваша зарплата, суми вашого остаточного розрахунку, ваші діти на утриманні та ваші інші договори не надсилаються на жоден сервер і не зберігаються. Коли ви закриваєте або перезавантажуєте сторінку, вони зникають.',
+  },
+  ...(rental
+    ? [{ what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') }]
+    : []),
+  ...(employment
+    ? [
+        {
+          what: tx('privacy.employment.data_review'),
+          where: tx('privacy.employment.data_review_where'),
+        },
+      ]
+    : []),
+  ...(household
+    ? [
+        {
+          what: tx('privacy.household.data_review'),
+          where: tx('privacy.household.data_review_where'),
+        },
+      ]
+    : []),
+  ...(credit
+    ? [{ what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') }]
+    : []),
+  ...(insurance
+    ? [
+        {
+          what: tx('privacy.insurance.data_review'),
+          where: tx('privacy.insurance.data_review_where'),
+        },
+      ]
+    : []),
+  ...(mortgage
+    ? [
+        {
+          what: tx('privacy.mortgage.data_review'),
+          where: tx('privacy.mortgage.data_review_where'),
+        },
+      ]
+    : []),
+  ...(bills
+    ? [
+        { what: tx('privacy.bills.data_review'), where: tx('privacy.bills.data_review_where') },
+        ...(documents
+          ? [{ what: tx('privacy.bills.data_year'), where: tx('privacy.bills.data_year_where') }]
+          : []),
+      ]
+    : []),
+  {
+    what: tx('privacy.data_analytics'),
+    where:
+      'Кілька коротких сигналів із кодами і діапазонами, які надсилаються до PostHog, поки ви користуєтеся сторінкою (подробиці нижче). Ідентифікатор переглянутої сторінки існує лише в її пам’яті: він не записується на ваш пристрій і втрачається, коли ви її закриваєте або перезавантажуєте.',
+  },
+  ...(documents
+    ? [
+        {
+          what: tx('privacy.data_documents'),
+          where:
+            'Лише якщо ви вирішите завантажити свої документи (лист про звільнення, остаточний розрахунок, ваші розрахункові листи, довідку від роботодавця (certificado de empresa), угоду чи протокол примирення або виписку про трудовий стаж (vida laboral)) і дасте згоду. PDF перетворюються на зображення своїх сторінок у вашому браузері, не залишаючи його, і перш ніж щось надіслати, сторінка перевіряє, також у вашому браузері, чи не виглядає якесь фото темним, розмитим або замалим. Ці зображення і фото передаються в зашифрованому вигляді на сервер eslojusto.es в Amazon Web Services, в Іспанії (регіон eu-south-2), який передає їх моделі ШІ (Claude від Anthropic) через Amazon Bedrock, у межах Європейського Союзу. Модель визначає, який документ на кожній сторінці, копіює дані, яких потребує форма, і зчитане повертається у ваш браузер. Нічого не зберігається: документи існують лише в пам’яті сервера під час зчитування, а його журнали, які зберігаються 14 днів, містять лише технічні дані: результат, кількість сторінок, скільки часу це зайняло, скільки тексту обробила модель і кілька службових позначок, як-от чи знадобилося повторне зчитування, скільки значень не збігалися між документами (без зазначення, яких саме, і їхніх значень) або скільки сторінок не вдалося зчитати і чому (наприклад, розмита або з іншої країни). Ніколи не вміст і нічого, що вас ідентифікує.',
+        },
+        ...(rental
+          ? [
+              {
+                what: tx('privacy.rental.data_documents'),
+                where: tx('privacy.rental.data_documents_where'),
+              },
+              {
+                what: tx('privacy.rental.data_letters'),
+                where: tx('privacy.rental.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(employment
+          ? [
+              {
+                what: tx('privacy.employment.data_documents'),
+                where: tx('privacy.employment.data_documents_where'),
+              },
+              {
+                what: tx('privacy.employment.data_letters'),
+                where: tx('privacy.employment.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(credit
+          ? [
+              {
+                what: tx('privacy.credit.data_documents'),
+                where: tx('privacy.credit.data_documents_where'),
+              },
+              {
+                what: tx('privacy.credit.data_letters'),
+                where: tx('privacy.credit.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(insurance
+          ? [
+              {
+                what: tx('privacy.insurance.data_documents'),
+                where: tx('privacy.insurance.data_documents_where'),
+              },
+              {
+                what: tx('privacy.insurance.data_letters'),
+                where: tx('privacy.insurance.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(mortgage
+          ? [
+              {
+                what: tx('privacy.mortgage.data_documents'),
+                where: tx('privacy.mortgage.data_documents_where'),
+              },
+              {
+                what: tx('privacy.mortgage.data_letters'),
+                where: tx('privacy.mortgage.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(bills
+          ? [
+              {
+                what: tx('privacy.bills.data_documents'),
+                where: tx('privacy.bills.data_documents_where'),
+              },
+              {
+                what: tx('privacy.bills.data_letters'),
+                where: tx('privacy.bills.data_letters_where'),
+              },
+            ]
+          : []),
+        {
+          what: tx('privacy.data_pass'),
+          where: `У локальному сховищі (localStorage) вашого браузера, і лише якщо ви ними користуєтеся: підписаний лічильник ваших безкоштовних зчитувань за день («${STORAGE_KEYS.quota}»); якщо ви купуєте абонемент, — абонемент і зчитування, що в ньому залишилися («${STORAGE_KEYS.pass}»), і код кожної оплати, яку ви розпочинаєте, з випадковим числом, яке знає лише ваш браузер, щоб можна було відновити абонемент («${STORAGE_KEYS.checkout}»; кожна оплата видаляється через 7 днів, якщо її не завершено, або коли спливає строк її абонемента). Вони не містять ні вашого імені, ні нічого з ваших документів і залишають ваш пристрій лише з наступним зчитуванням, щоб відновити абонемент або перевірити його, перш ніж показати вам деталі вашої перевірки, звіт або лист. Їх отримує сервер eslojusto.es в AWS, який запитує в Stripe про оплату. Абонемент, строк якого сплив, і лічильник попереднього дня видаляються самі наступного разу, коли сторінка до них звертається, а все видаляється, коли ви видаляєте дані цього сайту у своєму браузері; тому абонемент діє лише в цьому браузері і втрачається на іншому пристрої, у приватному вікні або коли ви їх видаляєте. Якщо зчитування недоступне, вкладка пам’ятає це протягом години у своєму сховищі сеансу («${OUTAGE_KEY}», лише з часом), щоб тим часом не пропонувати його вам.`,
+        },
+        {
+          what: tx('privacy.data_checkout'),
+          where: `Якщо ви платите, відповіді вашої перевірки зберігаються у сховищі сеансу (sessionStorage) цієї вкладки, поки ви на сторінці оплати, щоб показати вам результат, коли ви повернетеся.${bills ? ' Для рахунків за електроенергію так само зберігаються відповіді щодо кожного рахунку вашого року, який ви вже перевірили, без відбитка коду точки постачання.' : ''} Вони не залишають вашого пристрою і видаляються, коли ви повертаєтеся або закриваєте вкладку.`,
+        },
+      ]
+    : []),
+  {
+    what: tx('privacy.data_theme'),
+    where:
+      'У локальному сховищі (localStorage) вашого браузера, і лише якщо ви натискаєте кнопку теми. Він ніколи не залишає вашого пристрою. Він видаляється, коли ви видаляєте дані цього сайту у своєму браузері.',
+  },
+  {
+    what: tx('privacy.data_server'),
+    where:
+      'Сайт розміщено на GitHub Pages. GitHub записує IP-адресу і технічні дані кожного відвідування, як будь-який вебсервер.',
+  },
+];
+
+// The allowlist (src/analytics/sanitize.ts) and the event catalogue (src/analytics/events.ts), in
+// plain words. Keep all three in step: the analytics e2e asserts the exact keys.
+const tracked = [
+  {
+    when: 'З кожним сигналом',
+    what: 'Дата і час кожного сигналу і випадкове число, яке існує лише поки сторінка відкрита. Адреса сторінки без параметрів: домен, шлях і картка, на якій ви перебуваєте. Ваш браузер і його версія, і ваша система (Windows, Android…). Тип пристрою (комп’ютер, мобільний телефон чи планшет) і розмір вікна. Домен сайту, з якого ви прийшли (наприклад, «www.google.com»), без повної адреси. Якщо ви прийшли за посиланням рекламної кампанії, — її джерело, канал і назва (utm_source, utm_medium, utm_campaign), лише коли це короткий код із літер, цифр і дефісів. І три технічні дані PostHog: ключ проєкту eslojusto.es, версія його коду і позначка, яка просить його не створювати жодного профілю.',
+  },
+  {
+    when: 'Коли ви відкриваєте сторінку',
+    what: 'Те, що ви її відкрили, і основна мова вашого браузера, лише загальна частина: «ja», а не «ja-JP».',
+  },
+  {
+    when: 'Коли ви залишаєте сторінку',
+    what: 'Скільки часу ви провели на сторінці і докуди її прокрутили.',
+  },
+  {
+    when: 'Якщо ви користуєтеся перекладачем браузера',
+    what: 'Мова, на яку ви перекладаєте сторінку, наприклад «ar».',
+  },
+  {
+    when: 'На кожній картці перевірки',
+    what: 'Те, що ви її відкриваєте, і, коли ви її завершуєте, скільки часу це зайняло, у широкому діапазоні: менше 10 секунд, від 10 до 30, від 30 до 60, від 60 до 180 або понад 180. Якщо ви повертаєтеся назад, — з якої картки на яку.',
+  },
+  {
+    when: 'Якщо значення не приймається',
+    what: 'Назва поля, наприклад «дата звільнення». Ніколи не те, що ви в ньому ввели.',
+  },
+  {
+    when: 'Якщо ви відкриваєте довідку',
+    what: 'Яке поширене запитання ви відкриваєте або для якої позиції дивитеся «Як розраховується».',
+  },
+  {
+    when: 'Під час перевірки',
+    what: 'Підстава припинення договору, тип строкового договору, як ви отримуєте додаткові виплати (pagas extra) і чи рахуєте ви відпустку в робочих днях за графіком (laborables) чи в календарних днях (naturales), а якщо в робочих — чи працюєте ви 5, 6 чи іншу кількість днів на тиждень, так, як ви обираєте це у варіантах. Скільки позицій містять суму з вашого остаточного розрахунку і скільки з них виходять нижчими, збігаються, вищими або не піддаються перевірці. Чи утримують з вас за попередження більше за максимум. Чи показано, скільки коштувало б необґрунтоване звільнення, без суми. Чи результат показано коротко чи з деталями абонемента. Чи різниця дорівнює нулю, менша за 100 €, від 100 до 500 €, від 500 до 2.000 € чи більша. Скільки разів ви виконали перевірку на цій сторінці, скільки часу це зайняло, у діапазонах, і, якщо ви перевіряєте ще раз, назви полів, які ви змінили. Щодо допомоги по безробіттю — лише те, чи оцінка не застосовується до вашої підстави, чи вона містить суми або виходить без них, і скільки інших договорів ви додали, у діапазоні: 0, 1, 2 або 3 і більше. Ніколи — скільки у вас дітей на утриманні, і жодної дати цих договорів. Щодо ERTE і того, чи вам заплатили, — лише назва запитання, якщо ви змінюєте відповідь, ніколи сама відповідь. Те, що ви позначаєте щодо можливого недійсного звільнення (nulo) (вагітність, відпустки, лікарняний…), не надсилається ніколи, навіть якщо ви щось позначили.',
+  },
+  {
+    when: 'Коли ви натискаєте «Почати спочатку»',
+    what: 'Те, що ви натиснули цю кнопку.',
+  },
+  ...(rental
+    ? [
+        {
+          when: tx('privacy.rental.tracked_sheets'),
+          what: tx('privacy.rental.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.rental.tracked_scope'),
+          what: tx('privacy.rental.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.rental.tracked_review'),
+          what: tx('privacy.rental.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(employment
+    ? [
+        {
+          when: tx('privacy.employment.tracked_sheets'),
+          what: tx('privacy.employment.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_scope'),
+          what: tx('privacy.employment.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_review'),
+          what: tx('privacy.employment.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(household
+    ? [
+        {
+          when: tx('privacy.household.tracked_sheets'),
+          what: tx('privacy.household.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.household.tracked_scope'),
+          what: tx('privacy.household.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.household.tracked_review'),
+          what: tx('privacy.household.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(credit
+    ? [
+        {
+          when: tx('privacy.credit.tracked_sheets'),
+          what: tx('privacy.credit.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_scope'),
+          what: tx('privacy.credit.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_review'),
+          what: tx('privacy.credit.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(insurance
+    ? [
+        {
+          when: tx('privacy.insurance.tracked_sheets'),
+          what: tx('privacy.insurance.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_scope'),
+          what: tx('privacy.insurance.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_review'),
+          what: tx('privacy.insurance.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(mortgage
+    ? [
+        {
+          when: tx('privacy.mortgage.tracked_sheets'),
+          what: tx('privacy.mortgage.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_scope'),
+          what: tx('privacy.mortgage.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_review'),
+          what: tx('privacy.mortgage.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(bills
+    ? [
+        {
+          when: tx('privacy.bills.tracked_sheets'),
+          what: tx('privacy.bills.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_scope'),
+          what: tx('privacy.bills.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_review'),
+          what: tx('privacy.bills.tracked_review_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_telecom'),
+          what: tx('privacy.bills.tracked_telecom_what'),
+        },
+      ]
+    : []),
+  ...(documents
+    ? [
+        {
+          when: 'Коли ви обираєте, з чого почати',
+          what: 'Чи ви вирішили завантажити документ чи заповнити форму вручну.',
+        },
+        {
+          when: 'Під час зчитування документів',
+          what: 'Скільки фото чи сторінок ви завантажуєте, у діапазоні (1, від 2 до 4, від 5 до 9, від 10 до 15 або від 16 до 25), і скільки PDF ви обрали. Після завершення — які типи документів розпізнано (наприклад, лист про звільнення чи розрахунковий лист), скільки значень заповнено, у діапазоні (0, від 1 до 3, від 4 до 8 або 9 і більше), чи якесь значення має низьку впевненість, чи суми не збігалися, чи два документи не збігалися між собою, чи знадобилося зчитати їх повторно точнішою моделлю і, якщо якусь сторінку не вдалося зчитати, чому (розмита, темна, обрізана, написана від руки, не стосується роботи, з іншої країни, невідомого типу, без корисних даних або не зчитана), не вказуючи, яка саме; або, якщо сталася помилка, код помилки. Якщо перед надсиланням фото виглядає темним, розмитим або замалим, — яка з цих трьох ознак і чи ви все одно його надіслали. Ніколи нічого з того, що написано в документах.',
+        },
+        {
+          when: 'З абонементом',
+          what: 'Те, що ви починаєте оплату, що абонемент видано після повернення з оплати або під час його відновлення, або код помилки; чи під час перевірки він виявляється дійсним, недійсним, простроченим, анульованим або без відповіді; і чи завантажуєте ви звіт або лист. Щодо листа — лише те, скільки необов’язкових даних (ім’я, DNI або NIE, компанія і населений пункт) ви заповнили: жодного, деякі чи всі; ніколи — які саме чи що в них написано: ці дані лише заповнюють лист у вашому браузері і не надсилаються і не зберігаються. Ніколи — код оплати чи абонемент.',
+        },
+        ...(rental
+          ? [
+              {
+                when: tx('privacy.rental.tracked_documents'),
+                what: tx('privacy.rental.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(employment
+          ? [
+              {
+                when: tx('privacy.employment.tracked_documents'),
+                what: tx('privacy.employment.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(credit
+          ? [
+              {
+                when: tx('privacy.credit.tracked_documents'),
+                what: tx('privacy.credit.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(insurance
+          ? [
+              {
+                when: tx('privacy.insurance.tracked_documents'),
+                what: tx('privacy.insurance.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(mortgage
+          ? [
+              {
+                when: tx('privacy.mortgage.tracked_documents'),
+                what: tx('privacy.mortgage.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(bills
+          ? [
+              {
+                when: tx('privacy.bills.tracked_documents'),
+                what: tx('privacy.bills.tracked_documents_what'),
+              },
+            ]
+          : []),
+      ]
+    : []),
+  {
+    when: 'Якщо на сторінці стається помилка',
+    what: 'Тип помилки і в якому файлі та рядку коду вона сталася. Ніколи не текст помилки, бо він міг би цитувати щось, що ви ввели.',
+  },
+];
+---
+
+<div class="document__sheets">
+  <section class="sheet sheet--text">
+    <h2 id="pr-resumen">{tx('privacy.summary')}</h2>
+    <p>
+      Те, що ви вводите під час перевірки, не залишає вашого пристрою. Ваш остаточний розрахунок
+      повністю розраховується у вашому браузері і не зберігається. Щоб знати, чи інструмент корисний
+      і на якому кроці люди зупиняються, без вашої ідентифікації вимірюється, якими кроками ви
+      користуєтеся. Надсилаються лише коди і діапазони, ніколи не сума чи дата. Cookie і реклами
+      немає.
+    </p>
+    {rental && <p>{tx('privacy.rental.summary')}</p>}
+    {employment && <p>{tx('privacy.employment.summary')}</p>}
+    {household && <p>{tx('privacy.household.summary')}</p>}
+    {credit && <p>{tx('privacy.credit.summary')}</p>}
+    {insurance && <p>{tx('privacy.insurance.summary')}</p>}
+    {mortgage && <p>{tx('privacy.mortgage.summary')}</p>}
+    {bills && <p>{tx('privacy.bills.summary')}</p>}
+    {documents && (
+      <p>
+        Якщо ви вирішите завантажити документ, щоб заповнити дані, він зчитується за допомогою ШІ в
+        Європейському Союзі з вашої згоди і не зберігається. Якщо ви купуєте абонемент на звіт,
+        оплату обробляє Stripe.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-datos">{tx('privacy.data')}</h2>
+    <dl class="data-list">
+      {stored.map(({ what, where }) => (
+        <div>
+          <dt>{what}</dt>
+          <dd>{where}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      Про журнали GitHub див.{' '}
+      <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">
+        заяву про конфіденційність GitHub
+      </a>
+      .
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-medicion">{tx('privacy.analytics')}</h2>
+    <p>
+      Це все, що надсилається. Кожне значення береться із закритого списку кодів або діапазонів, і
+      сторінка перевіряє кожен сигнал перед надсиланням: сигнал із будь-чим іншим не надсилається, а
+      з того, що PostHog додає від себе, проходить лише те, що є в цьому списку.
+    </p>
+    <dl class="data-list">
+      {tracked.map(({ when, what }) => (
+        <div>
+          <dt>{when}</dt>
+          <dd>{what}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      Ваш профіль не створюється, і одне відвідування не пов’язується з іншим: щоразу, коли ви
+      відкриваєте або перезавантажуєте сторінку, вимірювання починається з нуля. Ніколи не
+      надсилаються версія вашої системи, ваш часовий пояс, розмір вашого екрана, повний код вашої
+      мови, повний рядок агента користувача (user agent), заголовок сторінки, те, що ви шукали, щоб
+      сюди потрапити, і ідентифікатори кліків, які рекламодавці додають до посилань (gclid, fbclid і
+      подібні).
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-quien">{tx('privacy.who')}</h2>
+    <p>
+      Сигнали отримує PostHog Inc., інструмент вимірювання, у своїй{' '}
+      <a href="https://posthog.com/blog/posthog-cloud-eu">хмарі в Європейському Союзі</a>,
+      розміщеній у Франкфурті (Німеччина). Він обробляє дані за дорученням eslojusto.es і не
+      використовує їх ні для чого іншого. PostHog Inc. — компанія зі Сполучених Штатів: обробку
+      охоплює її договір обробника даних, який містить стандартні договірні умови Європейської
+      комісії.
+    </p>
+    <p>
+      Отримуючи кожен сигнал, PostHog бачить IP-адресу вашого з’єднання і агент користувача вашого
+      браузера, як будь-який сервер. Він не зберігає жодного з них: проєкт налаштовано відкидати
+      IP-адресу, не використовуючи її для визначення вашого місцезнаходження, а повний агент
+      користувача не надсилається як дані; лише браузер, його версія і система, які перелічено в
+      розділі «Що вимірюється».
+    </p>
+    <p>
+      Сигнали зберігаються один рік — це строк безкоштовного плану PostHog (див. його{' '}
+      <a href="https://posthog.com/docs/privacy">сторінку про конфіденційність</a>).
+    </p>
+  </section>
+
+  {documents && (
+    <section class="sheet sheet--text">
+      <h2 id="pr-documentos">{tx('privacy.documents')}</h2>
+      <p>
+        Зчитування документа необов’язкове: перевірка працює так само, якщо ви вводите дані самі.
+        Перед завантаженням ми просимо вашої явної згоди, бо розрахунковий лист чи виписка про
+        трудовий стаж можуть показувати дані особливої категорії, як-от членство у профспілці (через
+        членський внесок) чи лікарняний. Правова підстава — ця згода (arts. 6.1.a і 9.2.a Загального
+        регламенту захисту даних (GDPR)). Ви можете відкликати її будь-коли, просто не завантажуючи
+        більше документів: оскільки нічого не зберігається, видаляти нічого.
+      </p>
+      {rental && <p>{tx('privacy.rental.consent')}</p>}
+      {employment && <p>{tx('privacy.employment.consent')}</p>}
+      {credit && <p>{tx('privacy.credit.consent')}</p>}
+      {insurance && <p>{tx('privacy.insurance.consent')}</p>}
+      {mortgage && <p>{tx('privacy.mortgage.consent')}</p>}
+      {bills && <p>{tx('privacy.bills.consent')}</p>}
+      <p>
+        Документи обробляє Amazon Web Services EMEA SARL (Люксембург) як обробник даних: сервер (AWS
+        Lambda) розташований в Іспанії, а модель ШІ використовується через Amazon Bedrock із
+        профілем, який працює лише в регіонах Європейського Союзу. Amazon Bedrock не зберігає ні
+        документів, ні того, що відповідає модель, не використовує їх для навчання моделей і не
+        передає їх Anthropic. Договір обробника даних AWS містить стандартні договірні умови
+        Європейської комісії.
+      </p>
+      <p>
+        Щоб зчитування й оплати здійснювали люди, перед кожним зчитуванням і кожною оплатою сторінка
+        завантажує Cloudflare Turnstile, який перевіряє, що ви не робот, не використовуючи cookie.
+        Cloudflare, Inc. отримує IP-адресу і технічні дані вашого браузера для цієї перевірки, і
+        лише тоді, коли ви вирішуєте завантажити документ або оплатити абонемент. Правова підстава —
+        законний інтерес у запобіганні неправомірному використанню сервісу (art. 6.1.f GDPR);
+        Cloudflare приєдналася до Рамкової програми захисту даних ЄС–США (EU-U.S. Data Privacy
+        Framework).
+      </p>
+      <p>
+        Абонемент на звіт оплачується на сторінці Stripe Payments Europe, Ltd. (Ірландія).
+        eslojusto.es не бачить і не зберігає даних вашої картки чи Bizum: він лише запитує в Stripe,
+        чи оплату здійснено і на яку суму, і записує біля оплати, скільки зчитувань ви зробили з
+        абонементом, без нічого з того, що було зчитано. Stripe запитує вашу електронну адресу і,
+        залежно від способу оплати, також ваше ім’я, вашу країну чи ваш телефон. Ці дані залишаються
+        в обліковому записі Stripe сайту eslojusto.es, який може бачити їх на панелі Stripe, щоб
+        розв’язати проблему з оплатою чи поверненням коштів, і зберігаються стільки, скільки
+        вимагають норми бухгалтерського обліку й оподаткування. Правова підстава — договір купівлі
+        (art. 6.1.b) і обов’язки з бухгалтерського обліку й оподаткування (art. 6.1.c). Stripe може
+        обробляти дані у Сполучених Штатах; Stripe, Inc. приєдналася до Рамкової програми захисту
+        даних ЄС–США, а її договір містить стандартні договірні умови. Stripe зберігає дані оплати
+        стільки, скільки вимагають ці обов’язки і норми щодо протидії відмиванню коштів; компанія
+        пояснює це у своїй <a href="https://stripe.com/es/privacy">політиці конфіденційності</a>.
+        Умови покупки наведено в розділі{' '}
+        <a href={`${link(lang, 'aviso-legal/')}#condiciones`}>«Правова інформація»</a>.
+      </p>
+    </section>
+  )}
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-cookies">{tx('privacy.cookies')}</h2>
+    {documents ? (
+      <p>
+        Цей сайт не використовує cookie, а вимірювання нічого не записує ні на ваш пристрій, ні в
+        будь-яке інше сховище браузера, бо все існує в пам’яті сторінки. Зберігається лише те, про
+        що ви просите: ваш вибір теми, якщо ви натискаєте її кнопку, і, якщо ви зчитуєте документи
+        чи купуєте абонемент, те, що пояснено в розділі «Що зберігається і де». Тому ви не бачите
+        жодного банера cookie.
+      </p>
+    ) : (
+      <p>
+        Цей сайт не використовує cookie, а вимірювання нічого не записує ні на ваш пристрій, ні в
+        будь-яке інше сховище браузера, бо все існує в пам’яті сторінки. Єдине, що зберігається, —
+        ваш вибір теми, і лише якщо ви натискаєте її кнопку. Тому ви не бачите жодного банера
+        cookie.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-base">{tx('privacy.legal_basis')}</h2>
+    <p>
+      Правова підстава — законний інтерес (art. 6.1.f Загального регламенту захисту даних (GDPR)),
+      який тут полягає в тому, щоб знати, чи інструментом користуються, на якому кроці люди
+      зупиняються і що не працює, щоб його поліпшити. Для цього вимірюється мінімум, без вашої
+      ідентифікації і без реклами.
+    </p>
+    <p>
+      Якщо ваш браузер передає налаштування «не відстежувати» (Global Privacy Control або Do Not
+      Track), нічого з вашого відвідування не вимірюється. Ви також можете заперечити проти цього
+      вимірювання (art. 21 GDPR), заблокувавши адресу eu.i.posthog.com блокувальником контенту.
+      Перевірка працює так само.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-responsable">{tx('privacy.controller')}</h2>
+    <p>
+      eslojusto.es — проєкт Endika Iglesias, який відповідає за цю обробку даних. З будь-яких питань
+      щодо ваших даних пишіть на <a href={`mailto:${email}`}>{email}</a>. Якщо ви писали на цю
+      адресу, ви можете попросити там переглянути, виправити або видалити дані вашого листування.
+      Якщо ви оплатили абонемент, — також дані вашої оплати в Stripe, крім тих, які потрібно
+      зберігати згідно з нормами бухгалтерського обліку й оподаткування.
+    </p>
+    <p>
+      Те, що вимірюється, не ідентифікує вас, тому немає способу знайти ваші сигнали, щоб показати
+      їх вам або видалити (art. 11 GDPR). Якщо ви вважаєте, що щось робиться неналежним чином, ви
+      можете подати скаргу до іспанського органу із захисту даних —{' '}
+      <a href="https://www.aepd.es/">Agencia Española de Protección de Datos</a>.
+    </p>
+  </section>
+</div>
