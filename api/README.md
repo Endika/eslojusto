@@ -833,9 +833,7 @@ Nothing here has been run. Each step needs an account administrator.
 **Changing what CI deploys.** The CloudFormation execution policy lists exactly what
 `EslojustoApi` may hold, so a new kind of resource there needs the global stack redeployed
 first (step 5, same command) by an administrator. Until `eslojusto-api-cfn-execution` allows a
-resource, the `Deploy API` run fails and rolls back. It still allows the `eslojusto-api-alerts`
-topic and the `alarm:eslojusto-api-*` alarms the API no longer has, so CloudFormation could
-delete them.
+resource, the `Deploy API` run fails and rolls back.
 
 ## Cost
 
