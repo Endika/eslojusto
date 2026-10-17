@@ -1754,7 +1754,7 @@ export const fr: Translation = {
   'employment.guide.permanent.certificate':
     "Vous pouvez demander par écrit au service public de l'emploi un certificat des contrats à durée déterminée que vous avez eus (art. 15.9). Avec votre relevé de carrière (vida laboral), la vérification additionne vos contrats pour la limite de 18 mois sur 24.",
   'employment.guide.permanent.review':
-    "Quand le calcul dépend d'un élément inconnu, comme le fait de savoir quel contrat antérieur à la réforme compte, la vérification donne les deux lectures et ne cite le passage à durée indéterminée que lorsqu'elles concordent.",
+    "Quand le calcul dépend d'un élément inconnu, comme le fait de savoir quel contrat antérieur à la réforme compte, la vérification donne les deux calculs et ne cite le passage à durée indéterminée que lorsqu'ils concordent.",
   'employment.guide.trial.title': "La période d'essai",
   'employment.guide.trial.lead':
     "La période d'essai n'est possible que si elle est convenue par écrit, dans les limites fixées par votre convention collective. Si la convention ne dit rien, voici les maximums (art. 14.1)\u00a0:",
@@ -3128,7 +3128,7 @@ export const fr: Translation = {
     "Nous sommes revenus du paiement, mais la vérification n'a pas pu être récupérée. Refaites-la et vous verrez le détail et les téléchargements.",
   'client.employment.report.title': 'Vérification de votre contrat de travail',
   'client.employment.report.intro':
-    "Ce rapport compare votre contrat à ce que fixe la loi, point par point, avec les données que vous avez confirmées lors de la vérification. Lorsque le résultat dépend d'une réponse «\u00a0Je ne sais pas\u00a0», il donne chaque lecture. Il informe sur la loi et ne constitue pas un conseil juridique.",
+    "Ce rapport compare votre contrat à ce que fixe la loi, point par point, avec les données que vous avez confirmées lors de la vérification. Lorsque le résultat dépend d'une réponse «\u00a0Je ne sais pas\u00a0», il donne chaque calcul. Il informe sur la loi et ne constitue pas un conseil juridique.",
   'client.employment.report.footer':
     'eslojusto.es informe sur vos droits et ne fournit pas de conseil. Textes de loi et SMI selon leur état au {fecha}.',
   'client.employment.report.filename': 'eslojusto-informe-contrato.pdf',
@@ -6879,7 +6879,7 @@ export const fr: Translation = {
   'client.household.calculation.severance.salary_unknown':
     "Sans votre salaire en argent, l'indemnité ne peut pas être calculée.",
   'client.household.calculation.severance.prorated_note':
-    'Ce calcul compte un jour par mois commencé. La réglementation ne dit pas comment compter une année incomplète\u00a0: seul le calcul fondé sur les années complètes est retenu, et celui-ci donne le maximum possible.',
+    'Ce calcul compte un jour par mois commencé. La réglementation ne dit pas comment compter une année incomplète\u00a0: seul compte le calcul fondé sur les années complètes, et ce calcul par mois commencé est le maximum auquel on pourrait arriver.',
   'client.household.calculation.notice.days':
     'Préavis\u00a0: {required} jours calendaires, comptés à partir du lendemain de la notification. Il en a été donné {given} et il en manque {missing}.',
   'client.household.calculation.notice.salary_unknown':
