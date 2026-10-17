@@ -1,0 +1,595 @@
+---
+// source: 169eec130c4d
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { faqEntries } from '../../content/faq';
+import { bySeniority, spanLabel } from '../../content/examples';
+import { wholeEuroRange, wholeEuros } from '../../content/format';
+import { LANDINGS, type LandingId } from '../../content/landings';
+import { ET, SOURCES, LGSS } from '../../engine/sources';
+import { DOCUMENTS } from '../../documents/config';
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+const tx = (key: Key) => t(lang, key);
+
+// The guide under the calculator of /finiquito/, in Spanish: headings and labels from the
+// dictionary, the prose, the rules and the worked examples here. Another language's guide is a
+// translated copy of this file in src/prose/<lang>/.
+const causes: { title: string; rule: string; citation: string; page?: LandingId }[] = [
+  {
+    title: tx('guide.unfair_dismissal'),
+    rule: '33 de zile pe an lucrat, cu un plafon de 24 de salarii lunare (720 de zile).',
+    citation: 'Art. 56 ET',
+    page: 'unfair_dismissal',
+  },
+  {
+    title: tx('guide.objective_dismissal'),
+    rule: '20 de zile pe an, cu un plafon de 12 salarii lunare (360 de zile, STS 651/2026, o hotărâre a Curții Supreme). În plus, 15 zile de preaviz, iar cele pe care firma nu le dă se plătesc.',
+    citation: 'Art. 53 ET',
+    page: 'objective_dismissal',
+  },
+  {
+    title: tx('guide.collective_dismissal'),
+    rule: 'Cel puțin cât la o concediere din motive obiective: 20 de zile pe an, cu un plafon de 12 salarii lunare, și 15 zile de preaviz. Acordul din ERE poate îmbunătăți aceste sume; verificarea nu îl cunoaște și dă minimul.',
+    citation: 'Art. 51.2, 51.4 și 53.1 ET',
+  },
+  {
+    title: tx('guide.fixed_term_end'),
+    rule: '12 zile pe an, proporțional cu zilele lucrate. Dacă a început în 2011 sau înainte, 8 zile; în 2012, 9; în 2013, 10; în 2014, 11. Contractele de înlocuire (sustitución) și cele de formare (formativos) nu au indemnizație, nici cele semnate înainte de 4 martie 2001. Dacă a durat mai mult de un an, 15 zile de preaviz.',
+    citation: 'Art. 49.1.c ET și DT 8.ª',
+    page: 'fixed_term_end',
+  },
+  {
+    title: tx('guide.resignation'),
+    rule: 'Fără indemnizație. Dacă contractul tău colectiv de muncă stabilește un preaviz și nu îl dai, firma poate reține zilele care lipsesc.',
+    citation: 'Art. 49.1.d ET',
+    page: 'resignation',
+  },
+  {
+    title: tx('guide.disciplinary_dismissal'),
+    rule: 'Fără indemnizație dacă este declarată justificată (procedente). Dacă este declarată nejustificată (improcedente), se calculează ca o concediere nejustificată.',
+    citation: 'Art. 55.7 și 56 ET',
+  },
+];
+
+const unchecked = [
+  'Salariul net: reținerile de impozit pe venit (IRPF) și contribuțiile.',
+  'Sporurile, adaosurile, orele suplimentare și comisioanele prevăzute de contractul tău colectiv de muncă sau de contractul tău.',
+  'Plățile suplimentare în afara celor două obișnuite.',
+  'Dacă motivul concedierii este întemeiat, lucru pe care îl decide o instanță.',
+  'Salariile pe durata procedurii (salarios de tramitación).',
+  'Ce adaugă acordul dintr-un ERE peste minimul legal.',
+];
+
+// The case pages, in the order of the map: the finiquito ones, then the pages on the benefit.
+const caseLinks: readonly LandingId[] = [
+  'resignation',
+  'unfair_dismissal',
+  'objective_dismissal',
+  'fixed_term_end',
+  'not_agreed',
+];
+
+// The same report the result links to.
+const workHistoryUrl =
+  'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
+const benefitSources = [
+  SOURCES.lgss267,
+  SOURCES.lgss268,
+  SOURCES.lgss269,
+  SOURCES.lgss270,
+  SOURCES.sepeAmounts,
+].map(({ citation, url, inForceSince, effectiveFrom }) => ({
+  citation,
+  url,
+  inForce: t(lang, effectiveFrom ? 'client.source.effective_from' : 'client.source.in_force', {
+    fecha: inForceSince.split('-').reverse().join('-'),
+  }),
+}));
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('guide.title')}
+    </h2>
+    <p class="guide__lead">
+      Ce include o lichidare finală (finiquito) și de unde vine fiecare cifră, cu articolul ei.
+      Exemplele folosesc un salariu de 1.500&nbsp;€ brut pe lună și două plăți suplimentare de
+      1.500&nbsp;€, care însumează 21.000&nbsp;€ pe an.
+    </p>
+    <p class="guide__sources">
+      <span>{tx('guide.updated')}</span>
+      <span>
+        {tx('guide.sources')}: <a href={ET}>{tx('guide.source_et')}</a> ·{' '}
+        <a href={SOURCES.cgpjGuide.url}>{tx('guide.source_cgpj')}</a> ·{' '}
+        <a href={LGSS}>{tx('guide.source_lgss')}</a> ·{' '}
+        <a href={SOURCES.sepeAmounts.url}>{tx('guide.source_sepe')}</a>
+      </span>
+      <a href={link(lang, 'aviso-legal/')}>{tx('guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    <section class="sheet sheet--text">
+      <h3 id="g-que-lleva">{tx('guide.what_it_includes')}</h3>
+      <p>
+        La încetarea contractului, firma îți predă o propunere a documentului de lichidare cu sumele
+        care ți se cuvin (art. 49.2 ET). Aceasta este lichidarea finală (finiquito) și cuprinde ce
+        ai câștigat deja și nu ai primit încă:
+      </p>
+      <ul>
+        <li>Salariul pentru zilele lucrate în ultima lună (art. 26 ET).</li>
+        <li>Zilele de concediu acumulate și neefectuate (art. 38 ET).</li>
+        <li>
+          Partea acumulată din plățile suplimentare (pagas extra), dacă nu sunt repartizate în
+          fluturașul de salariu (art. 31 ET).
+        </li>
+        <li>Zilele de preaviz pe care firma nu le-a dat, când legea îl cere.</li>
+      </ul>
+      <p>
+        Dacă încetarea contractului dă dreptul la indemnizație (indemnización), documentul de
+        lichidare o poate include și pe ea, dar din punct de vedere legal este o sumă diferită de
+        lichidarea finală, cu propriile reguli și termene. Toate cifrele sunt brute, înainte de
+        rețineri și contribuții.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-diferencia">{tx('guide.difference')}</h3>
+      <p>
+        Lichidarea finală ți se cuvine de fiecare dată când se încheie contractul, chiar și dacă
+        pleci tu, pentru că sunt bani pe care i-ai câștigat deja. Indemnizația compensează încetarea
+        contractului și depinde de motiv.
+      </p>
+      <p>
+        O demisie nu dă dreptul la indemnizație (art. 49.1.d ET). Nici o concediere disciplinară
+        declarată justificată (procedente) (art. 55.7 ET); dacă este declarată nejustificată
+        (improcedente), se calculează ca o concediere nejustificată.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 55.7</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-casos">{tx('guide.cases')}</h3>
+      <p>Fiecare motiv are propriile reguli. Le explicăm cu un exemplu rezolvat:</p>
+      <ul>
+        {caseLinks.map((id) => (
+          <li>
+            <CaseLink lang={lang} id={id} />
+          </li>
+        ))}
+      </ul>
+      <p>
+        Iar pentru indemnizația de șomaj, cu pagina ei: <CaseLink lang={lang} id="benefit" />.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-salario">{tx('guide.salary')}</h3>
+      <p>
+        Intră zilele lucrate din luna în care se încheie contractul. Ziua poate valora salariul tău
+        lunar împărțit la 30 (luna comercială) sau la numărul de zile al acelei luni (luna
+        calendaristică). Verificarea dă intervalul dintre cele două calcule.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Plecare la 15 octombrie:
+        1.500&nbsp;€ × 15/30 = 750,00&nbsp;€, sau 1.500&nbsp;€ × 15/31 = 725,81&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>26</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-vacaciones">{tx('guide.holidays')}</h3>
+      <p>
+        Sunt cel puțin treizeci de zile calendaristice pe an (art. 38.1 ET). Verificarea le
+        socotește drept 22 de zile lucrătoare de luni până vineri, 26 de luni până sâmbătă și 30 ×
+        zile / 7 cu altă săptămână de lucru: sunt echivalențe, nu text de lege. Contractul tău
+        colectiv de muncă sau contractul tău pot acorda mai multe. Se acumulează cu fiecare zi
+        lucrată, iar în lichidarea finală intră cele din acest an pe care nu le-ai efectuat. Multe
+        firme le socotesc pe luni (2,5 zile pe lună, la 30 pe an) în loc de pe zile, iar verificarea
+        dă intervalul dintre cele două calcule. Fiecare zi se plătește între salariul tău lunar / 30
+        și salariul tău anual / 365.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Plecare la 15 octombrie 2026: 288
+        de zile lucrate în an. 30 × 288/365 = 23,67 zile acumulate. Dacă ai efectuat 15, rămân
+        aproximativ 8,67 zile: între (30 × 288/365 − 15) × 1.500&nbsp;€/30 = 433,56&nbsp;€ și (30 ×
+        288/365 − 15) × 21.000&nbsp;€/365 = 498,89&nbsp;€.
+      </p>
+      <p>
+        Dacă ai efectuat mai multe zile decât ai acumulat, dacă se poate face o reținere sau nu
+        depinde de contractul colectiv de muncă.
+      </p>
+      <p class="folio">
+        Art. <span>38</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-pagas">{tx('guide.extra_pay')}</h3>
+      <p>
+        Legea stabilește două plăți suplimentare pe an, iar contractul colectiv de muncă, valoarea
+        lor și modul în care se acumulează. Dacă sunt repartizate în fluturașul tău de salariu
+        (prorrateadas), le-ai primit deja lună de lună. Dacă nu, intră partea acumulată de la
+        începutul perioadei lor: semestrială (din ianuarie până în iunie și din iulie până în
+        decembrie) sau anuală (din iulie până în iunie cea de vară, din ianuarie până în decembrie
+        cea de Crăciun). Se poate socoti pe zile sau pe luni, iar verificarea dă intervalul dintre
+        cele două calcule. Dacă pleci în luna în care se plătește o plată suplimentară (iunie sau
+        iulie cea de vară, decembrie cea de Crăciun), poate fi inclusă deja în acel fluturaș de
+        salariu.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Plata de Crăciun de 1.500&nbsp;€,
+        cu perioadă semestrială, și plecare la 15 octombrie: de la 1 iulie până la 15 octombrie sunt
+        107 din 184 de zile. 1.500&nbsp;€ × 107/184 = 872,28&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>31</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-indemnizacion">{tx('guide.severance')}</h3>
+      <p>
+        Se socotește în zile de salariu. Salariul zilnic este salariul tău anual, cu plățile
+        suplimentare, împărțit la 365, așa cum face ghidul CGPJ. În exemplu, 21.000&nbsp;€ / 365 ≈
+        57,53&nbsp;€. Exemplele înmulțesc cu cifra exactă, fără rotunjire. La concedieri, timpul
+        lucrat se socotește în luni, iar o fracțiune de lună contează ca o lună întreagă. Dacă te
+        concediază în timpul unui ERTE (șomaj tehnic temporar), se socotește cu salariul întreg de
+        dinainte de ERTE.
+      </p>
+      <div class="causes">
+        {causes.map(({ title, rule, citation, page }) => (
+          <div>
+            <h4>{page ? <a href={link(lang, LANDINGS[page].path.slice(1))}>{title}</a> : title}</h4>
+            <p>{rule}</p>
+            <p class="causes__citation">{citation}</p>
+          </div>
+        ))}
+      </div>
+      <p class="example">
+        <span class="example__label">Concediere nejustificată</span> de la 3 mai 2018 până la 20
+        iulie 2026: 98 de luni complete și câteva zile, care contează ca 99. 33 de zile pe an
+        înseamnă 2,75 pe lună: 99 × 2,75 = 272,25 zile. 21.000&nbsp;€ × 272,25 / 365 =
+        15.663,70&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">Concediere din motive obiective</span> cu aceleași date: 99 ×
+        20/12 = 165 de zile. 21.000&nbsp;€ × 165 / 365 = 9.493,15&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">Încetarea unui contract pe durată determinată</span> de un an,
+        de la 1 octombrie 2025 până la 30 septembrie 2026: 365 de zile × 12/365 = 12 zile.
+        21.000&nbsp;€ × 12 / 365 = 690,41&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 51 · 53 · 56</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-2012">{tx('guide.before_2012')}</h3>
+      <p>
+        La o concediere nejustificată dintr-un contract anterior datei de 12 februarie 2012,
+        indemnizația se calculează pe două perioade:
+      </p>
+      <ul>
+        <li>Până la 11 februarie 2012: 45 de zile pe an (3,75 pe lună).</li>
+        <li>De la 12 februarie 2012: 33 de zile pe an (2,75 pe lună).</li>
+      </ul>
+      <p>
+        Totalul are un plafon de 720 de zile, cu excepția cazului în care prima perioadă îl
+        depășește deja. În acest caz contează doar prima perioadă, cu un maxim de 42 de salarii
+        lunare (1.260 de zile).
+      </p>
+      <p>
+        Contractele pentru promovarea angajării pe durată nedeterminată (contratos de fomento de la
+        contratación indefinida) semnate înainte de 12 februarie 2012 urmează, pentru indemnizația
+        pentru motive obiective, norma după care au fost semnate; la o concediere disciplinară, se
+        calculează cu aceste două perioade (alineatul 3). Verificarea nu deosebește acest tip de
+        contract.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> De la 1 martie 2010 până la 15
+        septembrie 2026. Prima perioadă: 24 de luni × 3,75 = 90 de zile. A doua perioadă: 176 de
+        luni × 2,75 = 484 de zile. Total: 574 de zile. 21.000&nbsp;€ × 574 / 365 = 33.024,66&nbsp;€.
+      </p>
+      <p class="folio">
+        Disposición transitoria <span>11.ª</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-antiguedad">{tx('guide.by_seniority')}</h3>
+      <p>
+        Lichidarea finală este ceea ce s-a acumulat în cursul anului și în ultima lună, așa că după
+        un an de contract nu mai crește. Indemnizația, în schimb, crește cu fiecare lună lucrată și
+        depinde de motiv.
+      </p>
+      <FigureTable id="g-antiguedad-tabla" label={tx('guide.by_seniority')}>
+        <Fragment slot="caption">
+          Contracte care se încheie la 30 septembrie 2026, cu 1.500&nbsp;€ brut pe lună, două plăți
+          suplimentare de 1.500&nbsp;€ pe semestre (cea de vară deja primită) și 22 de zile
+          lucrătoare de concediu pe an, fără niciuna efectuată. Rotunjit la euro.
+        </Fragment>
+        <thead>
+          <tr>
+            <th scope="col">Timp lucrat</th>
+            <th scope="col">Lichidare finală</th>
+            <th scope="col">
+              Durată determinată
+              <span class="figures-note">12 zile</span>
+            </th>
+            <th scope="col">
+              Motive obiective
+              <span class="figures-note">20 de zile</span>
+            </th>
+            <th scope="col">
+              Nejustificată
+              <span class="figures-note">33 de zile</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {bySeniority.map(({ months, finalPay, fixedTermLimit, fixedTerm, objective, unfair }) => (
+            <tr>
+              <th scope="row">{spanLabel(months, lang)}</th>
+              <td>{wholeEuroRange(finalPay)}</td>
+              <td>
+                {fixedTerm === null ? '—' : wholeEuros(fixedTerm)}
+                {fixedTermLimit === 'sector_agreement' && <sup>1</sup>}
+                {fixedTermLimit === 'over' && <sup>2</sup>}
+              </td>
+              <td>{wholeEuros(objective)}</td>
+              <td>{wholeEuros(unfair)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </FigureTable>
+      <p>
+        Lichidarea finală adună salariul din septembrie, concediul și plata de Crăciun acumulată, cu
+        intervalul dintre socotirea pe zile sau pe luni. Celelalte trei coloane sunt indemnizația
+        pentru fiecare motiv, care se plătește separat: art. 49.1.c ET la încetarea contractului pe
+        durată determinată, art. 52 și 53.1.b ET la concedierea din motive obiective și art. 56 ET
+        la cea nejustificată. Dacă vrei totalul, adun-o la lichidarea finală.
+      </p>
+      <p class="table-notes">
+        <sup>1</sup> Un contract pentru circumstanțe de producție (eventual) durează cel mult 6
+        luni. Ajunge la un an doar dacă îl prelungește contractul colectiv de muncă din sectorul tău
+        (convenio sectorial) (art. 15.2 ET) sau la un contract pentru o lucrare sau un serviciu
+        (obra o servicio) semnat înainte de 31 decembrie 2021 (disposición transitoria 3.ª del Real
+        Decreto-ley 32/2021).
+      </p>
+      <p class="table-notes">
+        <sup>2</sup> Un contract pentru circumstanțe de producție nu durează atât. Unul pentru o
+        lucrare sau un serviciu semnat înainte de 31 decembrie 2021 dura cel mult 3 ani, sau 4 dacă
+        îl prelungea contractul colectiv de muncă din sector (art. 15.1.a ET în redactarea sa
+        anterioară și disposición transitoria 3.ª del Real Decreto-ley 32/2021), așa că niciunul nu
+        se încheie în septembrie 2026 cu această vechime. Un contract pe durată determinată care își
+        depășește durata maximă poate deveni pe durată nedeterminată (art. 15.4 ET), iar atunci
+        încetarea lui ar fi o concediere.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-propuesta">{tx('guide.proposal')}</h3>
+      <p>
+        Firma predă o propunere a documentului de lichidare. Legea prevede că persoana angajată o
+        poate semna în prezența unei persoane din reprezentanța legală a angajaților.
+      </p>
+      <p>
+        Unele persoane semnează adăugând «recibí no conforme» („primit, fără acord”) când nu sunt de
+        acord cu o anumită sumă. Îți spunem asta doar ca informație. Ce e de făcut în fiecare caz
+        poate evalua un cabinet de avocatură specializat în dreptul muncii, un consilier în dreptul
+        muncii (graduado social) sau un sindicat.
+      </p>
+      <p>
+        Ce se schimbă și ce nu: <CaseLink lang={lang} id="not_agreed" />.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-plazos">{tx('guide.deadlines')}</h3>
+      <p>
+        Pentru sume precum salariul rămas de plătit, concediul, plățile suplimentare sau
+        indemnizația la încetarea contractului pe durată determinată, termenul este de un an (art.
+        59.1 ET). Dacă firma nu ți-a plătit încă, ceea ce este salariu produce o dobândă pentru
+        întârziere de 10&nbsp;% pe an (art. 29.3 ET); indemnizația, nu.
+      </p>
+      <p>
+        La o concediere (din motive obiective, colectivă, nejustificată sau disciplinară), termenul
+        pentru a o contesta este de 20 de zile lucrătoare (días hábiles) (art. 59.3 ET). Cine nu
+        este de acord cu indemnizația unei concedieri o contestă de obicei pe aceeași cale, în
+        aceleași 20 de zile.
+      </p>
+      <p>
+        Termenul este scurt, iar un cabinet de avocatură specializat în dreptul muncii, un consilier
+        în dreptul muncii (graduado social) sau un sindicat îți pot spune care se aplică în cazul
+        tău.
+      </p>
+      <p class="folio">
+        Art. <span>29.3 · 59</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-no-revisa">{tx('guide.unchecked')}</h3>
+      <ul>
+        {unchecked.map((text) => (
+          <li>{text}</li>
+        ))}
+      </ul>
+      <p>
+        Concediul și plățile suplimentare se compară cu minimul legal, cu intervalul dintre calculul
+        pe zile și cel pe luni; contractul tău colectiv de muncă poate îmbunătăți aceste cifre. „Nu
+        se poate verifica” apare doar când lipsește o informație fără de care nu există o cifră
+        legală, cum ar fi preavizul unei demisii sau zilele de concediu pe care le-ai efectuat.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-paro">{tx('guide.benefit')}</h2>
+      <p>
+        La încetarea unui contract, pe lângă lichidarea finală poate exista indemnizația de șomaj
+        (paro), prestația contributivă pentru șomaj. Pentru a o primi, contractul trebuie să se
+        încheie într-o situație legală de șomaj (situación legal de desempleo), iar asta depinde de
+        motiv:
+      </p>
+      <ul>
+        <li>
+          O concediere din motive obiective, colectivă, nejustificată sau disciplinară este (art.
+          267.1.a LGSS). Cea disciplinară contează și dacă este declarată justificată sau nu este
+          contestată (art. 268.4 LGSS).
+        </li>
+        <li>
+          Încetarea unui contract pe durată determinată este, dacă nu tu l-ai încheiat (art.
+          267.1.a.6.º LGSS).
+        </li>
+        <li>
+          O demisie (baja voluntaria) nu este (art. 267.2.a LGSS), cu excepția cazului în care pleci
+          din cauza unui transfer, a unei modificări substanțiale a condițiilor tale care te
+          dezavantajează (art. 41.3 ET), a unei încălcări grave din partea firmei, cum ar fi să nu
+          te plătească sau să te plătească cu întârziere în mod repetat, ori a violenței de gen sau
+          sexuale (art. 267.1.a.5.º LGSS).
+        </li>
+      </ul>
+      <p>
+        În plus, ai nevoie de cel puțin 360 de zile de contribuție pentru șomaj (días cotizados) în
+        ultimii 6 ani, pe care să nu le fi folosit deja pentru o altă indemnizație de șomaj, iar ele
+        pot proveni de la mai multe locuri de muncă (art. 266.b și 269 LGSS). Trebuie, de asemenea,
+        să ai înregistrarea activă la Seguridad Social (estar de alta) sau să fii într-o situație
+        asimilată (situación asimilada), să te înscrii ca persoană în căutarea unui loc de muncă
+        (demandante de empleo), să semnezi acordul de activitate (acuerdo de actividad) și să nu ai
+        vârsta de pensionare (art. 266 LGSS).
+      </p>
+      <p>
+        Pentru a o calcula cu datele tale și a vedea scala completă:{' '}
+        <CaseLink lang={lang} id="benefit" />.
+      </p>
+      <p class="folio">
+        Art. <span>266 · 267 · 268.4</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-cuanto">{tx('guide.benefit_amount')}</h3>
+      <p>
+        Baza de calcul (base reguladora) este media contribuțiilor pentru șomaj din ultimele 180 de
+        zile, fără orele suplimentare (art. 270.1 LGSS). Se primește 70&nbsp;% din bază în primele
+        180 de zile și 60&nbsp;% începând cu ziua 181 (art. 270.2 LGSS).
+      </p>
+      <p>
+        Fiecare lună are un minim și un maxim în funcție de copiii aflați în întreținerea ta (art.
+        270.3 LGSS). În 2026, cu IPREM la 600&nbsp;€, acestea sunt:
+      </p>
+      <ul>
+        <li>Fără copii în întreținere, între 560&nbsp;€ și 1.225&nbsp;€ pe lună.</li>
+        <li>Cu unul, între 749&nbsp;€ și 1.400&nbsp;€.</li>
+        <li>Cu doi sau mai mulți, între 749&nbsp;€ și 1.575&nbsp;€.</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Cu 21.000&nbsp;€ pe an, baza este
+        21.000&nbsp;€ / 12 = 1.750&nbsp;€ pe lună. 70&nbsp;% înseamnă 1.225&nbsp;€, exact maximul
+        fără copii în întreținere, iar 60&nbsp;%, 1.050&nbsp;€.
+      </p>
+      <p>
+        Sunt cifre brute. Din ele se scad 4,85&nbsp;% din bază pentru Seguridad Social și impozitul
+        pe venit (IRPF) corespunzător. Cifrele din acest ghid și din verificare presupun normă
+        întreagă; cu normă parțială sunt mai mici.
+      </p>
+      <p class="folio">
+        Art. <span>270</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-duracion">{tx('guide.benefit_duration')}</h3>
+      <p>
+        Depinde de zilele de contribuție din ultimii 6 ani care nu au fost folosite pentru o altă
+        indemnizație de șomaj (art. 269 LGSS):
+      </p>
+      <ul>
+        <li>De la 360 la 539 de zile de contribuție, 120 de zile de șomaj (4 luni).</li>
+        <li>
+          La fiecare 180 de zile de contribuție în plus se adaugă 60 de zile de șomaj (2 luni). De
+          la 540 la 719 sunt 180 de zile; de la 720 la 899, 240; și tot așa.
+        </li>
+        <li>De la 2.160 de zile de contribuție, maximul, 720 de zile (24 de luni).</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Cu trei ani de contribuție, 1.095
+        de zile, sunt 360 de zile de șomaj (12 luni).
+      </p>
+      <p>
+        Zilele de concediu plătite și neefectuate contează și ele drept zile de contribuție (art.
+        269.4 LGSS). Fiecare angajare, fiecare plecare și zilele de contribuție apar în{' '}
+        <a href={workHistoryUrl} rel="noopener">
+          {tx('result.benefit_work_history_link')}
+        </a>
+        .
+      </p>
+      <p class="folio">
+        Art. <span>269</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-plazo">{tx('guide.benefit_deadline')}</h3>
+      <p>
+        Fără înscrierea ca persoană în căutarea unui loc de muncă nu există indemnizație de șomaj
+        (art. 266 LGSS): te înscrii la serviciul de ocupare al comunității tale autonome și ceri
+        prestația la SEPE. Se cere în cele 15 zile de după încetarea contractului, zile lucrătoare
+        potrivit SEPE. Dacă lichidarea ta finală plătește zile de concediu neefectuat, termenul
+        curge de la sfârșitul acelor zile (art. 268.1 și 268.3 LGSS). Dacă o ceri mai târziu, zilele
+        de întârziere se scad din indemnizația de șomaj (art. 268.2 LGSS).
+      </p>
+      <ul class="sources">
+        {benefitSources.map(({ citation, url, inForce }) => (
+          <li>
+            <a href={url}>{citation}</a>
+            <span class="sources__in-force">{inForce}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="folio">
+        Art. <span>268</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('guide.faq')}</h2>
+      <div class="faq-list">
+        {faqEntries(lang, { documents }).map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>
+
+<style>
+  .sheet--text .table-notes {
+    font-size: 0.875rem;
+  }
+</style>
