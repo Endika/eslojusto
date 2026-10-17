@@ -1,0 +1,89 @@
+---
+// source: 176e7bb53168
+import CaseLink from '../../components/CaseLink.astro';
+import { itemRange, objective, severanceMonths } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const severance = itemRange(objective, 'severance');
+const notice = itemRange(objective, 'employer_notice');
+const salary = itemRange(objective, 'pending_salary');
+const holidays = itemRange(objective, 'holiday_pay');
+const extraPay = itemRange(objective, 'extra_pay');
+const unfair = objective.unfairReference;
+const months =
+  severanceMonths(
+    objective.items.find((p) => p.item.id === 'severance')?.item.calculation ?? [],
+  )[0] ?? 0;
+if (!severance || !notice || !salary || !holidays || !extraPay || unfair === null)
+  throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="do-20-dias">20 jours par an, plafonnés à 12 mensualités</h3>
+  <p>
+    En cas de licenciement pour motif objectif (objetivo), l'entreprise doit mettre à votre
+    disposition, en même temps que la lettre, une indemnité de licenciement (indemnización) de 20
+    jours de salaire par année travaillée, avec un maximum de 12 mensualités (art. 53.1.b ET). Le
+    guide du CGPJ, à la suite de l'arrêt STS 651/2026, compte ce plafond comme 360 jours. La durée
+    se compte en mois, et une fraction de mois compte comme un mois entier.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.b</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-preaviso">15 jours de préavis, ou leur paiement</h3>
+  <p>
+    Entre la lettre et le licenciement, il doit s'écouler 15 jours de préavis (art. 53.1.c ET). Les
+    jours que l'entreprise n'accorde pas sont payés. Le calculateur vous demande combien de jours
+    vous ont été accordés et calcule ceux qui manquent.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-ejemplo">Exemple détaillé</h3>
+  <p>
+    Une personne qui gagne 1.500&nbsp;€ bruts par mois, avec deux primes extraordinaires de
+    1.500&nbsp;€, travaille du 3 mai 2018 au 20 juillet 2026. Elle a pris 10 jours de congé cette
+    année et l'entreprise ne lui accorde pas de préavis. Voici les chiffres du calculateur&nbsp;:
+  </p>
+  <ul>
+    <li>
+      Indemnité&nbsp;: {euroRange(severance)} ({months} mois × 20 / 12 ={' '}
+      {String((months * 20) / 12).replace('.', ',')} jours).
+    </li>
+    <li>Préavis non accordé&nbsp;: {euroRange(notice)}.</li>
+    <li>Salaire de juillet&nbsp;: {euroRange(salary)}.</li>
+    <li>Congés non pris&nbsp;: {euroRange(holidays)}.</li>
+    <li>Prime de Noël acquise depuis le 1er juillet&nbsp;: {euroRange(extraPay)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">S'il était déclaré injustifié</span> Avec les mêmes dates,
+    l'indemnité serait de {euros(unfair)}, à 33 jours par an. La vérification vous montre ce chiffre
+    à côté de celui du licenciement pour motif objectif.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-diferencia">Licenciement pour motif objectif ou injustifié</h3>
+  <p>
+    Un licenciement pour motif objectif peut être contesté comme un licenciement disciplinaire (art.
+    53.3 ET). S'il est déclaré injustifié (improcedente), l'indemnité est calculée à 33 jours par
+    an, plafonnée à 720 jours&nbsp;: vous la trouverez dans{' '}
+    <CaseLink lang={lang} id="unfair_dismissal" />. Le délai pour le contester est de 20 jours
+    ouvrables (art. 59.3 ET).
+  </p>
+  <p class="folio">
+    Art. <span>53 · 56 · 59</span> ET
+  </p>
+</section>

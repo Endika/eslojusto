@@ -1,0 +1,101 @@
+---
+// source: 47084c570826
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitAfterDismissal, benefitAfterResignation } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const dismissal = benefitAfterDismissal;
+if (dismissal.entitled !== 'yes' || dismissal.figures === null)
+  throw new Error('Incomplete example');
+const resignationGivesBenefit = benefitAfterResignation.entitled === 'yes';
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-regla">
+    La règle&nbsp;: partir de votre propre initiative n'ouvre pas droit au chômage
+  </h3>
+  <p>
+    Pour percevoir l'allocation chômage (paro), le contrat doit prendre fin dans une situation
+    légale de chômage (situación legal de desempleo). Quitter volontairement son emploi n'en est pas
+    une (art. 267.2.a LGSS)&nbsp;: une démission (baja voluntaria), en règle générale, n'ouvre donc
+    pas droit au chômage, même si vous avez les jours cotisés.
+  </p>
+  <p class="folio">
+    Art. <span>267.2.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-excepciones">Quand partir ouvre droit au chômage</h3>
+  <p>
+    La loi traite comme une situation légale de chômage le départ de votre propre initiative dans
+    les cas suivants (art. 267.1.a.5.º LGSS)&nbsp;:
+  </p>
+  <ul>
+    <li>
+      Une mutation dans un autre établissement qui oblige à changer de résidence (art. 40 ET).
+    </li>
+    <li>
+      Une modification substantielle de vos conditions de travail qui vous porte préjudice (art.
+      41.3 ET).
+    </li>
+    <li>
+      Un manquement grave de l'entreprise, comme ne pas vous payer ou vous payer en retard à
+      répétition (art. 50 ET). Ce départ est en général prononcé par un tribunal.
+    </li>
+    <li>La violence de genre (violencia de género) ou la violence sexuelle (art. 49.1.m ET).</li>
+  </ul>
+  <p class="folio">
+    Art. <span>267.1.a.5.º</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-nuevo">Si vous commencez ensuite un autre emploi</h3>
+  <p>
+    Ce qui compte, c'est la façon dont votre dernier contrat prend fin. Si le nouvel emploi se
+    termine par un licenciement ou par la fin d'un contrat à durée déterminée, cette fin de contrat
+    est bien une situation légale de chômage (art. 267.1.a LGSS).
+  </p>
+  <p>
+    La loi règle à part un cas&nbsp;: si la nouvelle entreprise met fin au contrat pendant la
+    période d'essai, c'est une situation légale de chômage seulement si trois mois se sont écoulés
+    depuis votre démission (art. 267.1.a.7.º LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>267.1.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-ejemplo">Exemple&nbsp;: le même contrat, deux fins</h3>
+  <p>
+    Une personne qui gagne 1.500&nbsp;€ bruts par mois, avec deux primes extraordinaires de
+    1.500&nbsp;€, travaille du 1er septembre 2023 au 31 août 2026, sans enfant à charge.
+  </p>
+  <p class="example">
+    <span class="example__label">Si elle démissionne</span>{' '}
+    {resignationGivesBenefit
+      ? 'Le calculateur estime une allocation chômage.'
+      : "Le calculateur répond qu'elle n'ouvre pas droit au chômage (art. 267.2.a LGSS)."}{' '}
+    Elle a droit à son solde de tout compte malgré tout&nbsp;: salaire restant dû, congés et primes
+    extraordinaires.
+  </p>
+  <p class="example">
+    <span class="example__label">Si elle est licenciée</span> Avec {integer(dismissal.contractDays)}
+    jours cotisés, elle a droit à au moins {integer(dismissal.duration.days)} jours de chômage,
+    environ {wholeEuros(dismissal.figures.firstStretch.min)} par mois les 6 premiers mois et environ{' '}
+    {wholeEuros(dismissal.figures.secondStretch.min)} ensuite, en brut.
+  </p>
+  <p>
+    Le calculateur de cette page s'ouvre avec la démission cochée. Si votre cas est différent,
+    modifiez le motif dans la première fiche. Plus d'informations sur le solde de tout compte dans{' '}
+    <CaseLink lang={lang} id="resignation" />.
+  </p>
+</section>
