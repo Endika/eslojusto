@@ -1,0 +1,105 @@
+---
+// source: 6ba110cf70a7
+import CaseLink from '../../components/CaseLink.astro';
+import { severanceMonths, unfairAfter2012, unfairBefore2012 } from '../../content/examples';
+import { euros, integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const [months = 0] = severanceMonths(unfairAfter2012.calculation);
+const [first = 0, second = 0] = severanceMonths(unfairBefore2012.calculation);
+const decimal = (n: number) => String(n).replace('.', ',');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="di-tramos">33 de zile pe an, cu un plafon de 720</h3>
+  <p>
+    Dacă concedierea este recunoscută sau declarată nejustificată (improcedente), indemnizația
+    (indemnización) este de 33 de zile de salariu pe an lucrat, cu un maxim de 24 de salarii lunare,
+    adică 720 de zile (art. 56.1 ET). Timpul se socotește în luni, iar o fracțiune de lună contează
+    ca o lună întreagă: 33 de zile pe an înseamnă 2,75 zile pe lună.
+  </p>
+  <p>
+    Salariul pentru fiecare zi este salariul tău anual, cu plățile suplimentare, împărțit la 365,
+    cum face ghidul CGPJ. Calculatorul dă cifra la cent și o compară cu cea a firmei tale.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-2012">Dacă ai început înainte de 12 februarie 2012</h3>
+  <p>Indemnizația se calculează pe două perioade (disposición transitoria 11.ª ET):</p>
+  <ul>
+    <li>Până la 11 februarie 2012, 45 de zile pe an (3,75 pe lună).</li>
+    <li>De la 12 februarie 2012, 33 de zile pe an (2,75 pe lună).</li>
+  </ul>
+  <p>
+    Totalul are un plafon de 720 de zile, cu excepția cazului în care prima perioadă îl depășește
+    deja. În acest caz contează doar prima perioadă, cu un maxim de 42 de salarii lunare (1.260 de
+    zile).
+  </p>
+  <p class="folio">
+    Disposición transitoria <span>11.ª</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-ejemplo">Exemple rezolvate</h3>
+  <p>
+    O persoană cu 1.500&nbsp;€ brut pe lună și două plăți suplimentare de 1.500&nbsp;€, adică
+    21.000&nbsp;€ pe an. Salariul său zilnic este 21.000&nbsp;€ / 365 ={' '}
+    {euros(unfairAfter2012.dailySalary)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Contract din 2018</span> De la 3 mai 2018 până la 20 iulie 2026 se
+    socotesc {integer(months)} luni. {integer(months)} × 2,75 ={' '}
+    {decimal(unfairAfter2012.salaryDays)} zile. 21.000&nbsp;€ ×{' '}
+    {decimal(unfairAfter2012.salaryDays)} / 365 = {euros(unfairAfter2012.amount)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Contract din 2010</span> De la 1 martie 2010 până la 15 septembrie
+    2026. Prima perioadă: {integer(first)} luni × 3,75 = {decimal(first * 3.75)} zile. A doua
+    perioadă: {integer(second)} luni × 2,75 = {decimal(second * 2.75)} zile. Total:{' '}
+    {integer(unfairBefore2012.salaryDays)} zile, sub plafon. 21.000&nbsp;€ ×{' '}
+    {integer(unfairBefore2012.salaryDays)} / 365 = {euros(unfairBefore2012.amount)}.
+  </p>
+  <p>
+    Indemnizația este separată de lichidarea finală (finiquito), care adună salariul din ultima
+    lună, zilele de concediu neefectuat și plățile suplimentare acumulate. Calculatorul le verifică
+    pe toate împreună.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-readmision">Reintegrare sau indemnizație</h3>
+  <p>
+    Când o concediere este declarată nejustificată, firma alege în cinci zile între a te reintegra
+    (readmisión) și a-ți plăti indemnizația (art. 56.1 ET). Dacă te reintegrează, ți se cuvin și
+    salariile pe durata procedurii (salarios de tramitación), cele pe care nu le-ai primit de la
+    concediere (art. 56.2 ET). Dacă ești reprezentant legal al angajaților sau delegat sindical,
+    alegerea îți aparține (art. 56.4 ET).
+  </p>
+  <p>
+    Această verificare nu calculează salariile pe durata procedurii și nici nu decide dacă o
+    concediere este nejustificată: acest lucru îl declară o instanță sau îl recunoaște firma.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-otros">Alte concedieri</h3>
+  <p>
+    O concediere din motive obiective se plătește cu 20 de zile pe an, cu 15 zile de preaviz: o
+    găsești în <CaseLink lang={lang} id="objective_dismissal" />. Orice concediere, inclusiv cea
+    disciplinară, este situație legală de șomaj: <CaseLink lang={lang} id="benefit_disciplinary" />{' '}
+    explică ce încetări ale contractului dau dreptul la indemnizație de șomaj.
+  </p>
+</section>

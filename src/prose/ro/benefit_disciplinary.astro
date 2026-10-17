@@ -1,0 +1,88 @@
+---
+// source: a172b338d8e2
+import CaseLink from '../../components/CaseLink.astro';
+import { disciplinary, entitledByCause } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import { t } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+if (disciplinary.entitled !== 'yes' || disciplinary.figures === null)
+  throw new Error('Incomplete example');
+const { figures } = disciplinary;
+// The reasons are the calculator's own: the same sentence and article it shows in the result.
+const causes = entitledByCause.map(({ cause, entitled }) => ({
+  name: t(lang, `cause.${cause}`),
+  entitled,
+  reason: t(lang, `client.unemployment.reason.${cause}`),
+}));
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-si">Da, dă dreptul la indemnizație de șomaj, chiar dacă este justificată</h3>
+  <p>
+    Este o întrebare frecventă, iar răspunsul se află în lege: concedierea este situație legală de
+    șomaj (situación legal de desempleo) (art. 267.1.a.3.º LGSS), iar pentru a primi indemnizația de
+    șomaj nu este nevoie să o contești (art. 268.4 LGSS). Nu contează dacă concedierea este
+    disciplinară și nici dacă este declarată justificată (procedente).
+  </p>
+  <p>
+    Ce este necesar sunt condițiile obișnuite: 360 de zile de contribuție în ultimii 6 ani,
+    înscrierea ca persoană în căutarea unui loc de muncă (demandante de empleo) și semnarea
+    acordului de activitate (acuerdo de actividad), printre alte condiții (art. 266 LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>267 · 268.4</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ceses">Ce încetări ale contractului dau dreptul la indemnizație de șomaj</h3>
+  <div class="causes">
+    {causes.map(({ name, entitled, reason }) => (
+      <div>
+        <h4>{name}</h4>
+        <p>
+          <strong>
+            {entitled === 'yes'
+              ? 'Dă dreptul la indemnizație de șomaj.'
+              : 'Nu dă dreptul la indemnizație de șomaj, cu unele excepții.'}
+          </strong>{' '}
+          {reason}
+        </p>
+      </div>
+    ))}
+  </div>
+  <p>
+    Excepțiile de la demisie, cum ar fi un transfer sau neplata gravă a salariului, se găsesc în{' '}
+    <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ejemplo">Exemplu rezolvat</h3>
+  <p>
+    O persoană cu 1.500&nbsp;€ brut pe lună și două plăți suplimentare de 1.500&nbsp;€ lucrează de
+    la 1 iunie 2022 până la 30 septembrie 2026, fără copii în întreținere, iar firma o concediază
+    din motive disciplinare.
+  </p>
+  <p class="example">
+    <span class="example__label">Indemnizația sa de șomaj</span> Cu{' '}
+    {integer(disciplinary.contractDays)} zile de contribuție i se cuvin cel puțin{' '}
+    {integer(disciplinary.duration.days)} zile de șomaj ({integer(disciplinary.duration.days / 30)}{' '}
+    luni): aproximativ {wholeEuros(figures.firstStretch.min)} pe lună în primele 6 luni și
+    aproximativ {wholeEuros(figures.secondStretch.min)} după aceea, brut. „Cel puțin”, pentru că
+    alte locuri de muncă din ultimii 6 ani pot adăuga zile.
+  </p>
+  <p>
+    Dacă concedierea ar fi declarată nejustificată, ar exista și o indemnizație: o găsești în{' '}
+    <CaseLink lang={lang} id="unfair_dismissal" />.
+  </p>
+</section>

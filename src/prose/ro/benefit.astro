@@ -1,0 +1,146 @@
+---
+// source: 5665f4065cc1
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitBySalary } from '../../content/examples';
+import { euros, wholeEuros } from '../../content/format';
+import { BENEFIT_2026 } from '../../engine/unemployment';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const { minCap, maxCap } = BENEFIT_2026;
+const [, mid, high] = benefitBySalary;
+if (!mid || !high) throw new Error('Incomplete example');
+type Row = (typeof benefitBySalary)[number];
+const stretch = (b: Row, n: 0 | 1 | 2) => b.children[n] ?? { c1: 0, c2: 0 };
+// One row per figure, one column per salary, so the table fits a phone.
+const rows: readonly (readonly [string, (b: Row) => number])[] = [
+  ['Baza de calcul (base reguladora)', (b) => b.base],
+  ['Primele 180 de zile, fără copii', (b) => stretch(b, 0).c1],
+  ['Primele 180 de zile, cu unul', (b) => stretch(b, 1).c1],
+  ['Primele 180 de zile, cu doi sau mai mulți', (b) => stretch(b, 2).c1],
+  ['De la ziua 181, fără copii', (b) => stretch(b, 0).c2],
+];
+---
+
+<section class="sheet sheet--text">
+  <h3 id="p-cuanto">70&nbsp;% și apoi 60&nbsp;%</h3>
+  <p>
+    Indemnizația de șomaj (paro), adică prestația contributivă pentru șomaj, se calculează pe baza
+    ta de calcul (base reguladora): media contribuțiilor pentru șomaj din ultimele 180 de zile, fără
+    orele suplimentare (art. 270.1 LGSS). Se primește 70&nbsp;% din această bază în primele 180 de
+    zile și 60&nbsp;% de la ziua 181 (art. 270.2 LGSS).
+  </p>
+  <p>
+    Fiecare lună are un minim și un maxim, în funcție de copiii pe care îi ai în întreținere (art.
+    270.3 LGSS). În 2026, cu IPREM la {wholeEuros(BENEFIT_2026.monthlyIprem)}, acestea sunt:
+  </p>
+  <ul>
+    <li>
+      Fără copii în întreținere, între {wholeEuros(minCap[0])} și {wholeEuros(maxCap[0])} pe lună.
+    </li>
+    <li>
+      Cu unul, între {wholeEuros(minCap[1])} și {wholeEuros(maxCap[1])}.
+    </li>
+    <li>
+      Cu doi sau mai mulți, între {wholeEuros(minCap[1])} și {wholeEuros(maxCap[2])}.
+    </li>
+  </ul>
+  <p class="folio">
+    Art. <span>270</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-tabla">
+    Câtă indemnizație de șomaj se primește cu un salariu de 1.300, 1.500 sau 1.800&nbsp;€
+  </h3>
+  <FigureTable id="p-tabla-titulo">
+    <Fragment slot="caption">
+      Indemnizația de șomaj brută pe lună, cu un salariu în 14 plăți egale și normă întreagă, în
+      2026, rotunjită la euro, ca în calculator.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Salariul brut pe lună</th>
+        {benefitBySalary.map(({ salary }) => (
+          <th scope="col">{wholeEuros(salary)}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(([label, value]) => (
+        <tr>
+          <th scope="row">{label}</th>
+          {benefitBySalary.map((b) => (
+            <td>{wholeEuros(value(b))}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    Baza rezultă din salariul anual, cu plățile suplimentare, împărțit la 12: cu 1.500&nbsp;€ în 14
+    plăți, 21.000&nbsp;€ / 12 = {euros(mid.base)}, iar 70&nbsp;% din ea este exact maximul fără
+    copii în întreținere. Cu 1.800&nbsp;€, baza este {euros(high.base)}, iar 70&nbsp;% din ea
+    depășește maximele fără copii și cu unul, așa că în aceste cazuri se primește maximul.
+  </p>
+  <p>
+    Sunt cifre brute. Din ele se reține 4,85&nbsp;% din bază pentru Seguridad Social și impozitul pe
+    venit (IRPF) care se aplică. Cu normă parțială cifrele sunt mai mici, iar calculatorul nu le dă.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-requisitos">Cine o poate primi</h3>
+  <p>
+    Contractul trebuie să se încheie într-o situație legală de șomaj (situación legal de desempleo):
+    de exemplu, o concediere sau încetarea unui contract pe durată determinată pe care nu l-ai
+    încheiat tu (art. 267 LGSS). În plus, sunt necesare cel puțin 360 de zile de contribuție (días
+    cotizados) în ultimii 6 ani, înscrierea ca persoană în căutarea unui loc de muncă (demandante de
+    empleo) și semnarea acordului de activitate (acuerdo de actividad), printre alte condiții (art.
+    266 LGSS).
+  </p>
+  <ul>
+    <li>
+      Cât durează în funcție de contribuții: <CaseLink lang={lang} id="benefit_duration" />.
+    </li>
+    <li>
+      Dacă pleci tu: <CaseLink lang={lang} id="benefit_resignation" />
+    </li>
+    <li>
+      Dacă te concediază pentru o abatere: <CaseLink lang={lang} id="benefit_disciplinary" />.
+    </li>
+  </ul>
+  <p>
+    Fără înscrierea ca persoană în căutarea unui loc de muncă nu există indemnizație de șomaj: te
+    înscrii la serviciul de ocupare din comunitatea ta autonomă și o ceri la SEPE în cele 15 zile de
+    după încetarea contractului sau de după sfârșitul zilelor de concediu neefectuat pe care ți le
+    plătește lichidarea finală (finiquito) (art. 266 și 268 LGSS). Că sunt zile lucrătoare o indică
+    SEPE.
+  </p>
+  <p class="folio">
+    Art. <span>266 · 267 · 268</span> LGSS
+  </p>
+</section>
+
+{/* The literal switch, as in the ERTE page's route: a build without it renders nothing here. */}
+{import.meta.env.PUBLIC_ERTE === '1' && (
+  <section class="sheet sheet--text">
+    <h3 id="p-erte">Dacă ești într-un ERTE</h3>
+    <p>
+      Un ERTE (șomaj tehnic temporar) poate da și el dreptul la indemnizație de șomaj cât timp
+      durează. Cât se primește și dacă îți consumă indemnizația de șomaj viitoare depind de tipul de
+      ERTE:{' '}
+      <a href={link(lang, 'paro/erte/')}>calculează-ți indemnizația de șomaj în timpul unui ERTE</a>
+      .
+    </p>
+    <p class="folio">
+      Art. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+    </p>
+  </section>
+)}

@@ -1,0 +1,99 @@
+---
+// source: af62c96628b9
+import CaseLink from '../../components/CaseLink.astro';
+import { itemRange, resignation } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const salary = itemRange(resignation, 'pending_salary');
+const holidays = itemRange(resignation, 'holiday_pay');
+const extraPay = itemRange(resignation, 'extra_pay');
+const deduction = itemRange(resignation, 'notice_deduction');
+if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="bv-que-lleva">Ce cuprinde lichidarea finală la demisie</h3>
+  <p>
+    Încetarea voluntară a contractului (baja voluntaria) este o demisie (dimisión): contractul se
+    încheie prin decizia ta (art. 49.1.d ET). Chiar dacă pleci tu, ți se cuvine ce ai câștigat deja
+    și încă nu ți s-a plătit:
+  </p>
+  <ul>
+    <li>Salariul pentru zilele lucrate din ultima lună (art. 26 ET).</li>
+    <li>Zilele de concediu acumulate anul acesta și neefectuate (art. 38 ET).</li>
+    <li>
+      Partea acumulată din plățile suplimentare (pagas extra), dacă nu sunt repartizate în
+      fluturașii lunari (art. 31 ET).
+    </li>
+  </ul>
+  <p>
+    Ce nu există este indemnizația: demisia nu dă dreptul la ea (art. 49.1.d ET). Toate cifrele sunt
+    brute, înainte de rețineri și contribuții.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d · 26 · 31 · 38</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-preaviso">Preavizul din contractul tău colectiv de muncă</h3>
+  <p>
+    La demisie, legea cere preavizul stabilit de contractul tău colectiv de muncă (convenio
+    colectivo) sau de obiceiul locului (art. 49.1.d ET). Dacă contractul tău colectiv îl prevede și
+    nu îl dai, firma poate reține din lichidarea finală zilele care lipsesc, la nivelul salariului
+    tău zilnic.
+  </p>
+  <p>
+    Calculatorul te întreabă câte zile stabilește contractul tău colectiv și câte ai dat, și îți
+    arată reținerea maximă. Dacă nu știi câte zile stabilește contractul tău colectiv, această
+    reținere apare ca „nu se poate verifica”.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-ejemplo">Exemplu rezolvat</h3>
+  <p>
+    O persoană cu 1.500&nbsp;€ brut pe lună și două plăți suplimentare de 1.500&nbsp;€, cu acumulare
+    semestrială, lucrează de la 1 martie 2023 până la 15 octombrie 2026. Anul acesta a efectuat 10
+    din cele 22 de zile lucrătoare de concediu. Contractul său colectiv stabilește 15 zile de
+    preaviz, iar persoana pleacă fără să le dea. Acestea sunt cifrele calculatorului:
+  </p>
+  <ul>
+    <li>
+      Salariul din octombrie: {euroRange(salary)}, în funcție de cum se socotește luna, cu 30 sau cu
+      31 de zile.
+    </li>
+    <li>Zilele de concediu neefectuat: {euroRange(holidays)}.</li>
+    <li>Plata de Crăciun acumulată din iulie: {euroRange(extraPay)}.</li>
+    <li>Indemnizația: {euros(0)}.</li>
+    <li>Reținerea pentru lipsa preavizului: cel mult {euros(deduction.max)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Calculele</span> Marja fiecărei componente rezultă din socotirea pe
+    zile sau pe luni, cum fac firmele. Reținerea înseamnă 15 zile a câte {euros(deduction.max / 15)}
+    pe zi, cel mai mare dintre cele două salarii zilnice: cel lunar împărțit la 30 și cel anual
+    împărțit la 365.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-paro">Și indemnizația de șomaj</h3>
+  <p>
+    Demisia nu este situație legală de șomaj (situación legal de desempleo), așa că, ca regulă
+    generală, nu dă dreptul la indemnizație de șomaj (art. 267.2.a LGSS). Există excepții, cum ar fi
+    plecarea din cauza unui transfer sau a neplății grave a salariului. Le găsești în{' '}
+    <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>
