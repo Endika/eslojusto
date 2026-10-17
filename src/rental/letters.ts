@@ -37,7 +37,7 @@ const interestOwed = (review: RentalReview): number | null => {
 
 // A rise the rent letter asks to look at again: what holds in every reading and is above zero,
 // never one inside a repealed norm's window, with the lowest reading to word it.
-export interface RiseLine {
+interface RiseLine {
   readonly item: RentUpdateItem;
   readonly reading: RentUpdateReading;
   readonly pending: boolean;

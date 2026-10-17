@@ -36,7 +36,7 @@ export interface HouseholdReview {
   readonly unchecked: readonly UncheckedCode[];
 }
 
-export type HouseholdResult =
+type HouseholdResult =
   | { readonly ok: false; readonly errors: readonly ValidationError[] }
   | { readonly ok: true; readonly review: HouseholdReview };
 

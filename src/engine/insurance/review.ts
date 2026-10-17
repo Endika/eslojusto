@@ -31,7 +31,7 @@ export interface InsuranceReview {
   readonly offerPass: false;
 }
 
-export type InsuranceResult =
+type InsuranceResult =
   | { readonly ok: false; readonly errors: readonly ValidationError[] }
   | { readonly ok: true; readonly review: InsuranceReview };
 

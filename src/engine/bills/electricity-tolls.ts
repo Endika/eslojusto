@@ -37,14 +37,14 @@ const RULES: readonly BillsRuleId[] = ['tolls', 'charges'];
 export const periodOf = (input: ElectricityBillInput): BillingPeriod => billingPeriod(input);
 
 // The kWh of each energy period, adding up the bill's lines.
-export function kwhByPeriod(input: ElectricityBillInput): Readonly<Record<EnergyPeriod, number>> {
+function kwhByPeriod(input: ElectricityBillInput): Readonly<Record<EnergyPeriod, number>> {
   const of = (period: EnergyPeriod) =>
     input.energy.filter((l) => l.period === period).reduce((s, l) => s + l.kwh, 0);
   return { p1: of('p1'), p2: of('p2'), p3: of('p3') };
 }
 
 // € a year for the contracted power of the given periods at these prices.
-export const powerPerYear =
+const powerPerYear =
   (input: ElectricityBillInput, periods: readonly PowerPeriod[]) =>
   (prices: PowerEnergyPrices): number =>
     periods.reduce((s, p) => s + input.contractedPower[p] * prices.power[p], 0);

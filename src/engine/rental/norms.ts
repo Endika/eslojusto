@@ -1,6 +1,6 @@
 import type { EnactedStatus, Norm as LawNorm, NormTable as LawNormTable } from '../law/norms';
 
-export { normStanding, type NormStanding, type EnactedStatus as NormStatus } from '../law/norms';
+export { normStanding } from '../law/norms';
 
 export type NormId =
   | 'lau'

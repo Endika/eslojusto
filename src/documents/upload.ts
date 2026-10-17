@@ -32,7 +32,7 @@ import type {
 } from './ports';
 import { recognisedLine } from './summary';
 
-export interface UploadDeps<F extends string, L extends string> {
+interface UploadDeps<F extends string, L extends string> {
   readonly api: Api<F, L>;
   // How the section's form takes what was read.
   readonly reading: DocumentReading<F, L>;

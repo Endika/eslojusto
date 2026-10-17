@@ -3,7 +3,7 @@ import type { Norm } from './norms';
 import type { RuleBase } from './rules';
 import type { LawSource } from './sources';
 
-export type AmountRuleBreach =
+type AmountRuleBreach =
   | { readonly rule: string; readonly reason: 'unverified_source'; readonly source: string }
   | { readonly rule: string; readonly reason: 'unknown_source'; readonly source: string }
   | { readonly rule: string; readonly reason: 'draft_norm'; readonly norm: string }
@@ -55,7 +55,7 @@ export function staleCaseLaw(
 // A condition is settled within this many days of the day its figure is due.
 export const CONDITION_GRACE_DAYS = 7;
 
-export type ConditionBreach =
+type ConditionBreach =
   | { readonly norm: string; readonly reason: 'no_condition' }
   | { readonly norm: string; readonly reason: 'unknown_source'; readonly source: string }
   | { readonly norm: string; readonly reason: 'overdue'; readonly decidesOn: string };

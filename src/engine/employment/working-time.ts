@@ -281,7 +281,7 @@ export function assessWorkingTime(input: EmploymentInput, norms: NormTable): rea
 }
 
 // Shown with the working time, with no verdict.
-export interface WorkingTimeNote {
+interface WorkingTimeNote {
   readonly key: EmploymentPhraseKey;
   readonly sources: readonly NormSource[];
 }

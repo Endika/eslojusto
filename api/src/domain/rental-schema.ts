@@ -40,18 +40,11 @@ export const DEDUCTION_KINDS = [
   'other',
 ] as const;
 
-export const UTILITY_KINDS = ['electricity', 'water', 'gas', 'internet', 'other'] as const;
-export const UTILITY_PAYERS = ['tenant', 'landlord'] as const;
-export const NOTICE_MEDIA = [
-  'letter',
-  'burofax',
-  'email',
-  'messaging',
-  'receipt_note',
-  'other',
-] as const;
-export const NAMED_INDEXES = ['ipc', 'irav', 'igc', 'other'] as const;
-export const INVOICE_ISSUERS = ['agency', 'landlord', 'other'] as const;
+const UTILITY_KINDS = ['electricity', 'water', 'gas', 'internet', 'other'] as const;
+const UTILITY_PAYERS = ['tenant', 'landlord'] as const;
+const NOTICE_MEDIA = ['letter', 'burofax', 'email', 'messaging', 'receipt_note', 'other'] as const;
+const NAMED_INDEXES = ['ipc', 'irav', 'igc', 'other'] as const;
+const INVOICE_ISSUERS = ['agency', 'landlord', 'other'] as const;
 
 export const RENTAL_READABILITY = [
   'ok',
@@ -65,10 +58,10 @@ export const RENTAL_READABILITY = [
 ] as const;
 
 const MAX_CONCEPT = 80;
-export const MAX_CLAUSE_TEXT = 600;
-export const MAX_FEES_TEXT = 300;
+const MAX_CLAUSE_TEXT = 600;
+const MAX_FEES_TEXT = 300;
 // Fifty years, the longest a lease is likely to run.
-export const MAX_AGREED_MONTHS = 600;
+const MAX_AGREED_MONTHS = 600;
 
 const field = (type: FieldSpec['type'], description: string): FieldSpec => ({ type, description });
 const date = (description: string) => field({ type: 'date' }, description);
@@ -316,9 +309,9 @@ export const RENTAL_SECTIONS = {
 
 export type RentalSectionKind = keyof typeof RENTAL_SECTIONS;
 
-export const RENTAL_READABILITY_DESCRIPTION =
+const RENTAL_READABILITY_DESCRIPTION =
   'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_rental_document (not about renting a home), foreign_jurisdiction (a tenancy document for a home outside Spain; never because of its language), unknown_format (about renting a home, but no kind of document you know).';
-export const RENTAL_PAGE_KIND_DESCRIPTION =
+const RENTAL_PAGE_KIND_DESCRIPTION =
   'lease: a residential lease contract (contrato de arrendamiento) or its annex. rent_update_notice: a notice that the rent goes up or down (actualización de renta), as a letter, burofax, email, message or a note on a receipt. rent_receipt: a rent receipt (recibo) or a bank statement showing the rent paid. agency_invoice: an invoice or receipt for a fee charged when renting (honorarios, gestión, reserva, estudio de solvencia). deposit_return: a deposit return, end-of-lease settlement or key handover record (devolución de la fianza, entrega de llaves). other: anything else, such as an ID card or a payslip.';
 
 export const RENTAL_SCHEMA: ReviewSchema = {

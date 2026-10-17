@@ -20,10 +20,10 @@ import { formatDay, formatLongDay } from './rent-indices';
 // the norm and minimum wage tables so a new decree, a repeal or a new year changes the page
 // without touching it.
 
-export type NormStatusCode =
+type NormStatusCode =
   'in_force' | 'upcoming' | 'ended' | 'pending_validation' | 'repealed' | 'never_applied';
 
-export interface GuideSource {
+interface GuideSource {
   readonly citation: string;
   readonly url: string;
   readonly status: string;
@@ -31,7 +31,7 @@ export interface GuideSource {
 }
 
 // The words of the law, quoted after the sentence that names the article.
-export interface GuideQuote {
+interface GuideQuote {
   // What the case is, before the sentence that names the article.
   readonly lead: string | null;
   readonly intro: string;
@@ -40,12 +40,12 @@ export interface GuideQuote {
   readonly url: string;
 }
 
-export interface GuideLink {
+interface GuideLink {
   readonly label: string;
   readonly url: string;
 }
 
-export type GuideBlockId =
+type GuideBlockId =
   | 'minimum_wage'
   | 'what_counts'
   | 'modalities'
@@ -58,7 +58,7 @@ export type GuideBlockId =
   | 'information'
   | 'agreement';
 
-export interface GuideBlock {
+interface GuideBlock {
   readonly id: GuideBlockId;
   // The block's id on the page, a URL fragment that keeps its Spanish name.
   readonly anchor: string;
@@ -166,7 +166,7 @@ const normStands = (norm: Norm): boolean => norm.status !== 'repealed';
 
 // One year of the minimum wage as the guide's table shows it. The twelve-payment figure is the
 // yearly one divided by twelve: the decrees give the fourteen-payment one only.
-export interface MinimumWageLine {
+interface MinimumWageLine {
   readonly year: number;
   readonly monthly: string;
   readonly twelve: string;
@@ -183,7 +183,7 @@ const MONTHS_IN_YEAR = 12;
 export const twelvePayments = (row: Pick<MinimumWageRow, 'annual'>): number =>
   round2(row.annual / MONTHS_IN_YEAR);
 
-export interface MinimumWageSummary {
+interface MinimumWageSummary {
   readonly lines: readonly MinimumWageLine[];
   // The year the page was checked in, and whether its decree is out.
   readonly current: string;

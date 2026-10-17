@@ -24,7 +24,7 @@ export type TemplateId = (typeof TEMPLATE_IDS)[number];
 
 // Documents other than the lease, drawn by the renderer itself; `other` is a page nothing in the
 // review uses, such as a supermarket receipt.
-export type DocumentKind = (typeof RENTAL_PAGE_KINDS)[number];
+type DocumentKind = (typeof RENTAL_PAGE_KINDS)[number];
 type Readability = (typeof RENTAL_READABILITY)[number];
 
 // How the photo of a page is spoiled, applied in a canvas from a seeded PRNG.

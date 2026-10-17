@@ -5,7 +5,7 @@ import type { DocumentModel, Download, PaidReview } from './ports';
 
 // Several reviews of one section under one pass, such as a year of bills, each confirmed on its
 // own. It lives in the page's memory only and is never stored: closing the tab empties it.
-export interface ReviewBasket<T> {
+interface ReviewBasket<T> {
   // Keeps the review being worked on: reviewing it again replaces it rather than adding it twice.
   put(entry: T): void;
   // Takes the review being worked on out, as when it falls outside the review or starts over.
@@ -39,7 +39,7 @@ export function createBasket<T>(): ReviewBasket<T> {
 
 // The letters a basket can give, over every review kept: those the pass pays for and those that
 // carry no figure and download free.
-export interface BasketLetters<T> {
+interface BasketLetters<T> {
   paid(entries: readonly T[]): readonly LetterKind[];
   free?(entries: readonly T[]): readonly LetterKind[];
   letter(
@@ -53,7 +53,7 @@ export interface BasketLetters<T> {
 
 // What a section brings to sell one pass for its whole basket: the rule that offers it, over every
 // review kept, the report that adds them up and the letters, if it has any.
-export interface BasketSection<T> {
+interface BasketSection<T> {
   offer(entries: readonly T[]): boolean;
   report(entries: readonly T[], tr: Translate, today: CivilDate): DocumentModel;
   readonly reportFilename: ClientKey;

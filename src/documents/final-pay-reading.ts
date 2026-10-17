@@ -42,7 +42,7 @@ const marksOf = (p: Prefill): ReadMark[] => [
   })),
 ];
 
-export interface FinalPayReading extends DocumentReading<ExtractedFieldName, 'contracts'> {
+interface FinalPayReading extends DocumentReading<ExtractedFieldName, 'contracts'> {
   // Beside the severance of a result: what the uploaded agreement offers, as a figure only.
   showAgreementOffer(result: ParentNode): void;
 }

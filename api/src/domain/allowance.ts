@@ -3,14 +3,14 @@ import type { ErrorCode } from './results';
 
 export const FREE_READS_PER_DAY = 2;
 export const PASS_READS = 15;
-export const PASS_DAYS = 7;
+const PASS_DAYS = 7;
 const DAY_SECONDS = 86_400;
 
 export type Allowance =
   | { readonly type: 'free'; readonly token: string | null }
   | { readonly type: 'pass'; readonly token: string };
 
-export type AllowanceCheck =
+type AllowanceCheck =
   | { readonly ok: false; readonly code: ErrorCode }
   // Free reads: `next` is the quota token to hand back after a successful read.
   | { readonly ok: true; readonly type: 'free'; readonly next: () => string }
@@ -22,7 +22,7 @@ const isRecord = (v: unknown): v is Record<string, unknown> =>
 
 const isCount = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0;
 
-export const utcDay = (epochMs: number): string => new Date(epochMs).toISOString().slice(0, 10);
+const utcDay = (epochMs: number): string => new Date(epochMs).toISOString().slice(0, 10);
 
 export function passClaims(sessionId: string, expiresAt: number): Claims {
   return { typ: 'pass', sid: sessionId, exp: expiresAt };

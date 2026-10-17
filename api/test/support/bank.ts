@@ -15,7 +15,7 @@ import {
   type TemplateId,
 } from '../../eval/schema';
 
-export const EVAL_DIR = new URL('../../eval/', import.meta.url);
+const EVAL_DIR = new URL('../../eval/', import.meta.url);
 
 // The cases of a bank's folder, in file name order.
 function casesIn<C>(folder: string): readonly C[] {

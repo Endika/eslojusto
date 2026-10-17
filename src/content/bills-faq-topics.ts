@@ -17,7 +17,7 @@ export const BILLS_FAQ_TOPICS = [
   ['pass', 'faq-permanencia-pase', 'telecom'],
 ] as const;
 
-export type BillsFaqId = (typeof BILLS_FAQ_TOPICS)[number][0];
+type BillsFaqId = (typeof BILLS_FAQ_TOPICS)[number][0];
 export type BillsFaqReview = (typeof BILLS_FAQ_TOPICS)[number][2];
 
 export const BILLS_DOCUMENT_TOPICS: readonly BillsFaqId[] = ['documents', 'pass'];

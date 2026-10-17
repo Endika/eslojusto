@@ -7,9 +7,9 @@ import { INTERMEDIARY_TYPES } from './credit-schema';
 export const INSURANCE_LINES = ['home', 'car', 'life', 'health', 'funeral', 'other'] as const;
 export const CAR_COVERS = ['compulsory_only', 'with_voluntary'] as const;
 
-export const POLICY_CHANNELS = ['online', 'phone', 'in_person', 'other'] as const;
-export const RENEWAL_NOTICE_MEDIA = ['letter', 'email', 'sms', 'app', 'other'] as const;
-export const SUM_INSURED_KINDS = ['building', 'contents', 'liability', 'vehicle', 'other'] as const;
+const POLICY_CHANNELS = ['online', 'phone', 'in_person', 'other'] as const;
+const RENEWAL_NOTICE_MEDIA = ['letter', 'email', 'sms', 'app', 'other'] as const;
+const SUM_INSURED_KINDS = ['building', 'contents', 'liability', 'vehicle', 'other'] as const;
 
 export const INSURANCE_READABILITY = [
   'ok',
@@ -23,7 +23,7 @@ export const INSURANCE_READABILITY = [
 ] as const;
 
 const MAX_NAME = 80;
-export const MAX_INSURANCE_CLAUSE_TEXT = 600;
+const MAX_INSURANCE_CLAUSE_TEXT = 600;
 
 const field = (type: FieldSpec['type'], description: string): FieldSpec => ({ type, description });
 const date = (description: string) => field({ type: 'date' }, description);
@@ -147,9 +147,9 @@ export const INSURANCE_SECTIONS = {
 
 export type InsuranceSectionKind = keyof typeof INSURANCE_SECTIONS;
 
-export const INSURANCE_READABILITY_DESCRIPTION =
+const INSURANCE_READABILITY_DESCRIPTION =
   'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_insurance_document (not about an insurance policy), foreign_jurisdiction (a policy under the law of another country; never because of its language), unknown_format (about an insurance policy, but no kind of document you know).';
-export const INSURANCE_PAGE_KIND_DESCRIPTION =
+const INSURANCE_PAGE_KIND_DESCRIPTION =
   'insurance_policy: an insurance policy (póliza), its particular, general or special conditions, certificate or premium receipt. insurance_renewal_notice: a notice that the policy renews or changes (aviso de renovación, de modificación de la prima o de las condiciones). other: anything else, such as an ID card, a claim report or a payslip.';
 
 export const INSURANCE_SCHEMA: ReviewSchema = {

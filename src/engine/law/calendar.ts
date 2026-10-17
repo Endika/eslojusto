@@ -11,7 +11,7 @@ export interface HolidayYear {
 
 export type HolidayCalendar = readonly HolidayYear[];
 
-export type BusinessDay =
+type BusinessDay =
   | { readonly kind: 'ok'; readonly date: CivilDate }
   // A year the calendar has not loaded: no working day is counted across it.
   | { readonly kind: 'missing'; readonly year: number };

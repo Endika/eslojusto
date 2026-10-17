@@ -51,7 +51,7 @@ export interface TaxReading {
   readonly calculation: BillsCalculation;
 }
 
-export interface TaxLine {
+interface TaxLine {
   readonly id: 'electricity_tax' | 'vat';
   readonly billed: number;
   // The rate the bill prints; null when it does not.

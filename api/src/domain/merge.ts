@@ -29,7 +29,7 @@ export const own = (...sections: readonly SectionKind[]) => sections.map((s): Fr
 // name means the field's own name. The settlement proposal is the employer's own account of the
 // final pay, so it comes first for its figures; an agreement that settles the dispute comes first
 // for the cause, since it can acknowledge a dismissal as unfair.
-export const MERGE_RULES = {
+const MERGE_RULES = {
   startDate: own('settlement_proposal', 'final_payslip', 'monthly_payslip', 'company_certificate'),
   endDate: own(
     'settlement_proposal',

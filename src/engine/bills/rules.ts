@@ -35,7 +35,7 @@ export type BillsRuleId =
   | 'indexed_price_rise'
   | 'exit_effective';
 
-export type BillsRule = LawRule<BillsRuleId, BillsNormId> & RuleBase<BillsSourceId>;
+type BillsRule = LawRule<BillsRuleId, BillsNormId> & RuleBase<BillsSourceId>;
 
 const rule = (
   id: BillsRuleId,
@@ -340,7 +340,7 @@ export function ruleSource(id: BillsRuleId, norms: NormTable): NormSource<NormSt
   return lawRuleSource(RULES, id, norms);
 }
 
-export type ActiveRule = LawActiveRule<BillsRuleId, BillsNormId, NormStatus>;
+type ActiveRule = LawActiveRule<BillsRuleId, BillsNormId, NormStatus>;
 
 // The rules that govern a bill on `date`.
 export function activeRules(date: CivilDate, norms: NormTable): readonly ActiveRule[] {

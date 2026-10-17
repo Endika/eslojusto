@@ -11,7 +11,7 @@ export const ERTE_FIELDS = ['regime', 'measure', 'percent', 'base', 'children'] 
 export type ErteField = (typeof ERTE_FIELDS)[number];
 export type ErteAnswers = Readonly<Record<ErteField, string>>;
 
-export type ErteParse =
+type ErteParse =
   | { readonly kind: 'unknown_regime' }
   | { readonly kind: 'input'; readonly input: ErteInput }
   | { readonly kind: 'errors'; readonly fields: readonly ErteField[] };

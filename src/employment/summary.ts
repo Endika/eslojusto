@@ -2,7 +2,7 @@ import type { EmploymentPhrase } from '../engine/employment/calculation';
 import { everyAssessed, type EmploymentReview } from '../engine/employment/review';
 import type { Assessed, Finding, FindingStatus } from '../engine/employment/types';
 
-export { roundToTens, shownOne, shownPair, type Shown } from '../calculator/amounts';
+export { shownOne, shownPair } from '../calculator/amounts';
 
 // Only a shortfall against the minimum wage carries euros; every other finding is worded by its
 // status, never as «0 €».
@@ -11,7 +11,7 @@ export const amountOf = (f: Finding): number | null =>
 
 // What the free summary says of a shortfall against the minimum wage: per year (or per working
 // day in a short fixed-term contract) in the last year below it, and since the contract started.
-export interface Shortfall {
+interface Shortfall {
   readonly per: 'year' | 'day';
   readonly year: number;
   readonly amount: number;
@@ -118,7 +118,7 @@ const TO_REVIEW: ReadonlySet<FindingStatus> = new Set([
   'depends_on_agreement',
 ]);
 
-export type Headline = 'found' | 'to_review' | 'nothing_found' | 'nothing_entered';
+type Headline = 'found' | 'to_review' | 'nothing_found' | 'nothing_entered';
 
 // The summary's first line follows the engine: what opens the pass (a shortfall, a limit passed,
 // a void clause or a contract the law makes permanent, in every reading) is «found»; anything

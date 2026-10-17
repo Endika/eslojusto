@@ -22,7 +22,7 @@ export type InsuranceRuleId =
 
 // No insurance rule yields euros: the review gives dates and information, resting on its norms
 // alone.
-export type Rule = LawRule<InsuranceRuleId, InsuranceNormId> & RuleBase;
+type Rule = LawRule<InsuranceRuleId, InsuranceNormId> & RuleBase;
 
 const LCS = 'https://www.boe.es/buscar/act.php?id=BOE-A-1980-22501';
 const LAW22_2007 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-13411';
@@ -100,7 +100,7 @@ export function ruleSource(id: InsuranceRuleId, norms: NormTable): NormSource {
   return lawRuleSource(RULES, id, norms);
 }
 
-export type ActiveRule = LawActiveRule<InsuranceRuleId, InsuranceNormId>;
+type ActiveRule = LawActiveRule<InsuranceRuleId, InsuranceNormId>;
 
 export function activeRules(date: CivilDate, norms: NormTable): readonly ActiveRule[] {
   return lawActiveRules(RULES, date, norms);

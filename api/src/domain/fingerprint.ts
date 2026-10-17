@@ -8,7 +8,7 @@
 // verified: an illegible one should not lose the bill.
 const SUPPLY_NUMBER = /^(ES\d{16}[A-Z]{2})(?:\d[A-Z])?$/;
 
-export const FINGERPRINT_LENGTH = 16;
+const FINGERPRINT_LENGTH = 16;
 
 // Upper case, without the spaces, dots or dashes a bill groups it with; null when it is no CUPS.
 export function supplyNumber(raw: string): string | null {

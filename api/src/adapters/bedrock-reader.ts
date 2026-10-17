@@ -28,7 +28,7 @@ const imageBlock = (file: DocumentFile): Record<string, unknown> => ({
 
 // What the model is told when parts of its tool input had the wrong JSON type. Schema names
 // only, so nothing a document said comes back into the request.
-export const correctionMessage = (malformed: readonly string[]): string =>
+const correctionMessage = (malformed: readonly string[]): string =>
   `The tool input was rejected: ${malformed
     .map((part) => `${part} must be ${part === 'pages' ? 'an array' : 'a JSON object'}`)
     .join('; ')}, never a string. Call ${TOOL_NAME} again with the whole record.`;
@@ -168,7 +168,7 @@ export function parseResponseBody(body: unknown, toolName: string = TOOL_NAME): 
   };
 }
 
-export type Invoke = (modelId: string, body: string, signal: AbortSignal) => Promise<string>;
+type Invoke = (modelId: string, body: string, signal: AbortSignal) => Promise<string>;
 
 // One retry at most; the abort signal ends the call and any retry at the read's deadline.
 export function bedrockInvoke(

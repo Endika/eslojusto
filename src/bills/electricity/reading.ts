@@ -3,10 +3,7 @@ import type { DocumentReading } from '../../documents/ports';
 import type { Translate } from '../../i18n/client';
 import { electricityPrefill, type BillRead } from './prefill';
 
-export interface ElectricityReading extends DocumentReading<
-  ElectricityFieldName,
-  ElectricityListName
-> {
+interface ElectricityReading extends DocumentReading<ElectricityFieldName, ElectricityListName> {
   // The next bill read and not yet in the form, which it now is; null when none is left.
   next(): BillRead | null;
   // How many bills read wait for their turn.

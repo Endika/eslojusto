@@ -7,9 +7,9 @@ import type { NormTable } from './norms';
 import type { TelecomInput, TelecomLine } from './types';
 
 // Art. 7 RD 899/2009: an exit takes effect within two working days of the request.
-export const EXIT_WORKING_DAYS = 2;
+const EXIT_WORKING_DAYS = 2;
 
-export interface AfterExitDeps {
+interface AfterExitDeps {
   readonly norms: NormTable;
   readonly holidays: HolidayCalendar;
 }

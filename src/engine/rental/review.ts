@@ -56,7 +56,7 @@ export interface RentalReview {
   readonly unchecked: readonly UncheckedCode[];
 }
 
-export type RentalReviewResult =
+type RentalReviewResult =
   | { readonly ok: true; readonly review: RentalReview }
   | { readonly ok: false; readonly errors: readonly RentalInputError[] };
 

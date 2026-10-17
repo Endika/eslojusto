@@ -13,9 +13,9 @@ export type EmploymentCheck =
 const cents = (n: number): number => Math.round(n * 100);
 const LINES_TOLERANCE_CENTS = 100;
 // Weekly hours above this are taken for a misreading, not a long week.
-export const MAX_PLAUSIBLE_WEEKLY_HOURS = 80;
+const MAX_PLAUSIBLE_WEEKLY_HOURS = 80;
 // Monthly pay times the payments a year against the annual figure the contract prints.
-export const SALARY_PERIOD_TOLERANCE = 0.05;
+const SALARY_PERIOD_TOLERANCE = 0.05;
 
 function num(values: Readonly<Record<string, unknown>>, name: string): number | null {
   const v = values[name];

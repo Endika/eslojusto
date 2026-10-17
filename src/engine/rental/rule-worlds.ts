@@ -32,7 +32,7 @@ export function ruleHolds(
   return norm === a.rule.norm ? doubtful : !doubtful;
 }
 
-export interface RuleFrame {
+interface RuleFrame {
   readonly day: string;
   readonly active: ReadonlyMap<RuleId, ActiveRule>;
   // The norm doubts the rules open on that day.

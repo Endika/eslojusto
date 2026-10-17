@@ -37,9 +37,9 @@ export const QUOTED = [
   'insuranceRequired',
   'operation',
 ] as const;
-export type Quoted = (typeof QUOTED)[number];
+type Quoted = (typeof QUOTED)[number];
 
-export interface MortgagePrefill extends ReadPrefill {
+interface MortgagePrefill extends ReadPrefill {
   readonly quotes: Readonly<Partial<Record<Quoted, string>>>;
 }
 

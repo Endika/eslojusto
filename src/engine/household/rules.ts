@@ -8,8 +8,6 @@ import {
 import type { NormSource } from '../law/sources';
 import type { HouseholdNormId, NormTable } from './norms';
 
-export type { RuleDoubt } from '../law/rules';
-
 export type HouseholdRuleId =
   | 'transitional_application'
   | 'smi_monthly'
@@ -35,7 +33,7 @@ export type HouseholdRuleId =
   | 'unemployment_contribution'
   | 'unemployment_general';
 
-export type Rule = LawRule<HouseholdRuleId, HouseholdNormId>;
+type Rule = LawRule<HouseholdRuleId, HouseholdNormId>;
 
 const RD1620 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2011-17975';
 const RDL16 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2022-14680';
@@ -171,7 +169,7 @@ export function ruleSource(id: HouseholdRuleId, norms: NormTable): NormSource {
   return lawRuleSource(RULES, id, norms);
 }
 
-export type ActiveRule = LawActiveRule<HouseholdRuleId, HouseholdNormId>;
+type ActiveRule = LawActiveRule<HouseholdRuleId, HouseholdNormId>;
 
 export function activeRules(date: CivilDate, norms: NormTable): readonly ActiveRule[] {
   return lawActiveRules(RULES, date, norms);

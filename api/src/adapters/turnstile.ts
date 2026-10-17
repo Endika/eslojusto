@@ -4,9 +4,9 @@ import type { CaptchaVerifier } from '../domain/ports';
 const SITEVERIFY = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
 // The widget's `action`, so a token solved for one endpoint can't be spent on another.
-export type TurnstileAction = 'extract' | 'checkout';
+type TurnstileAction = 'extract' | 'checkout';
 
-export function isAcceptedVerdict(verdict: unknown, action: TurnstileAction): boolean {
+function isAcceptedVerdict(verdict: unknown, action: TurnstileAction): boolean {
   if (typeof verdict !== 'object' || verdict === null) return false;
   const v = verdict as Record<string, unknown>;
   return v['success'] === true && v['hostname'] === SITE_HOSTNAME && v['action'] === action;

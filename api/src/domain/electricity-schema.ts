@@ -10,7 +10,7 @@ export const SELF_CONSUMPTION = ['none', 'without_surplus', 'with_surplus'] as c
 export const POWER_PERIODS = ['p1', 'p2'] as const;
 export const ENERGY_PERIODS = ['p1', 'p2', 'p3'] as const;
 // An energy line also takes `all`: one price for all the energy, not split by period.
-export const ENERGY_LINE_PERIODS = [...ENERGY_PERIODS, 'all'] as const;
+const ENERGY_LINE_PERIODS = [...ENERGY_PERIODS, 'all'] as const;
 export const POWER_PRICE_UNITS = ['per_kw_day', 'per_kw_year'] as const;
 export const SOCIAL_BONUS_CATEGORIES = ['vulnerable', 'severe'] as const;
 export const METER_PHASES = ['single', 'three'] as const;
@@ -19,15 +19,15 @@ export const PRICE_TYPES = ['fixed', 'variable', 'indexed'] as const;
 
 // What a line of a bill beyond power, energy and taxes is. A service keeps its closed label too;
 // a regularisation of earlier bills is charged or given back.
-export const OTHER_LINE_KINDS = [
+const OTHER_LINE_KINDS = [
   'service',
   'discount',
   'regularization_charge',
   'regularization_refund',
   'other',
 ] as const;
-export const AGREED_PRICE_TERMS = ['power', 'energy'] as const;
-export const AGREED_PRICE_UNITS = ['per_kw_day', 'per_kw_year', 'per_kwh'] as const;
+const AGREED_PRICE_TERMS = ['power', 'energy'] as const;
+const AGREED_PRICE_UNITS = ['per_kw_day', 'per_kw_year', 'per_kwh'] as const;
 
 export const ELECTRICITY_READABILITY = [
   'ok',
@@ -41,8 +41,8 @@ export const ELECTRICITY_READABILITY = [
 ] as const;
 
 const MAX_NAME = 80;
-export const MAX_INVOICE_NUMBER = 40;
-export const MAX_ELECTRICITY_CLAUSE_TEXT = 600;
+const MAX_INVOICE_NUMBER = 40;
+const MAX_ELECTRICITY_CLAUSE_TEXT = 600;
 // A year of monthly bills, which a pack of 25 pages holds at two pages each. Past it, the most
 // recent by their last reading.
 export const MAX_BILLS = 12;
@@ -312,9 +312,9 @@ export const ELECTRICITY_SECTIONS = {
 
 export type ElectricitySectionKind = keyof typeof ELECTRICITY_SECTIONS;
 
-export const ELECTRICITY_READABILITY_DESCRIPTION =
+const ELECTRICITY_READABILITY_DESCRIPTION =
   'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_electricity_document (not about a household electricity supply), foreign_jurisdiction (a supply outside Spain; never because of its language), unknown_format (about an electricity supply, but no kind of document you know).';
-export const ELECTRICITY_PAGE_KIND_DESCRIPTION =
+const ELECTRICITY_PAGE_KIND_DESCRIPTION =
   'electricity_bill: a household electricity bill (factura de la luz), any of its pages. electricity_contract: the supply contract or its particular or general conditions. price_change_notice: a notice that the prices or conditions change. other: anything else, such as a gas bill, a phone bill or an ID card.';
 
 export const ELECTRICITY_SCHEMA: ReviewSchema = {

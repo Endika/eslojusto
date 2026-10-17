@@ -251,7 +251,7 @@ export const expectedMortgagePages = (
     sheetsOf,
   );
 
-export const expectedElectricityPages = (
+const expectedElectricityPages = (
   bankCase: ElectricityBankCase,
   sheetsOf: (template: ElectricityTemplateId) => number,
 ): readonly ExpectedPage[] =>
@@ -262,7 +262,7 @@ export const expectedElectricityPages = (
     sheetsOf,
   );
 
-export const expectedTelecomPages = (
+const expectedTelecomPages = (
   bankCase: TelecomBankCase,
   sheetsOf: (template: TelecomTemplateId) => number,
 ): readonly ExpectedPage[] =>

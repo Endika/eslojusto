@@ -19,7 +19,7 @@ export interface TemporalityDeps {
   readonly norms: NormTable;
 }
 
-export type RuleStanding = 'not_in_force' | 'in_force' | 'doubtful';
+type RuleStanding = 'not_in_force' | 'in_force' | 'doubtful';
 
 // Whether a rule covers `day`, following the validity and status of its norm.
 export function ruleStanding(id: EmploymentRuleId, day: CivilDate, norms: NormTable): RuleStanding {

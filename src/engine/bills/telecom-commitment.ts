@@ -6,9 +6,9 @@ import type { NormTable } from './norms';
 import type { Commitment, TelecomInput } from './types';
 
 // Art. 67.7 LGTel: the longest commitment a consumer may be held to.
-export const MAX_COMMITMENT_MONTHS = 24;
+const MAX_COMMITMENT_MONTHS = 24;
 
-export interface CommitmentDays {
+interface CommitmentDays {
   readonly endsOn: CivilDate;
   readonly total: number;
   // Days from the exit request to the end, none once the commitment is over.

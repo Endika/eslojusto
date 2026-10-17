@@ -32,7 +32,7 @@ export interface Figure {
   readonly url: string;
 }
 
-export interface MonthRow {
+interface MonthRow {
   readonly month: string;
   readonly irav: Figure | null;
   readonly ipc: Figure | null;
@@ -40,7 +40,7 @@ export interface MonthRow {
   readonly igc: Figure | null;
 }
 
-export type Column = Exclude<keyof MonthRow, 'month'>;
+type Column = Exclude<keyof MonthRow, 'month'>;
 
 export const COLUMNS: readonly Column[] = ['irav', 'ipcFlash', 'ipc', 'igc'];
 
@@ -102,7 +102,7 @@ export const lastChanged = (rows: readonly MonthRow[] = monthRows()): string => 
 export const checkedOn = (): string =>
   [IRAV, IPC, IGC].map((s) => s.coveredUntil).reduce((a, b) => (a < b ? a : b));
 
-export interface Latest {
+interface Latest {
   readonly month: string;
   readonly figure: Figure;
 }

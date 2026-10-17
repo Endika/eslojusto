@@ -4,7 +4,7 @@ import type { NormTable } from './norms';
 import { ruleSource, type EmploymentRuleId } from './rules';
 import type { Assessed, Finding, FindingStatus, ItemId, LiteralQuote } from './types';
 
-export interface Verdict {
+interface Verdict {
   readonly status: FindingStatus;
   readonly calculation?: EmploymentCalculation;
   readonly amount?: Range | null;
@@ -43,7 +43,7 @@ export function findingOf(
 
 export const single = (finding: Finding): Assessed => ({ kind: 'single', finding });
 
-export type FindingMaker = (id: EmploymentRuleId, verdict: Verdict, norms: NormTable) => Finding;
+type FindingMaker = (id: EmploymentRuleId, verdict: Verdict, norms: NormTable) => Finding;
 
 // The finding builder of one checked item.
 export const findingsFor =

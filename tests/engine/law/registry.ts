@@ -35,7 +35,7 @@ import { NORMS as RENTAL_NORMS } from '../../../src/engine/rental/data/norms';
 
 // Every section's law tables, for the checks that span them all and the monthly review list.
 // A section whose rules state their output and sources lists them under `rules` and `sources`.
-export interface LawSection {
+interface LawSection {
   readonly name: string;
   readonly norms: Readonly<Record<string, Norm<string>>>;
   // Day each norm was last read in the BOE, where the section keeps it; null before its first reading.

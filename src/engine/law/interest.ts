@@ -14,9 +14,9 @@ export interface LegalInterestPeriod {
 export type LegalInterestTable = readonly LegalInterestPeriod[];
 
 // 365 or 360 days a year whatever the year, or the real length of each year (366 in a leap year).
-export type InterestYearBase = 365 | 360 | 'actual';
+type InterestYearBase = 365 | 360 | 'actual';
 
-export interface InterestSegment {
+interface InterestSegment {
   // First day that accrues and the day after the last one.
   readonly from: CivilDate;
   readonly to: CivilDate;
@@ -27,7 +27,7 @@ export interface InterestSegment {
   readonly interest: number;
 }
 
-export type LegalInterest =
+type LegalInterest =
   | {
       readonly kind: 'complete';
       readonly segments: readonly InterestSegment[];

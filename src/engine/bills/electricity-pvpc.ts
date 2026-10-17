@@ -26,7 +26,7 @@ export interface PvpcDeps {
 
 // Art. 5.3 RD 216/2014, in its wording in force from 15-06-2023: the PVPC takes up to 10 kW in
 // each period.
-export const PVPC_MAX_KW = 10;
+const PVPC_MAX_KW = 10;
 
 const FUNDING_RULES: readonly BillsRuleId[] = [
   'social_bonus_funding_until_june',

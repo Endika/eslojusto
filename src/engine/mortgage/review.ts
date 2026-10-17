@@ -44,7 +44,7 @@ export interface MortgageReview {
   readonly unchecked: readonly UncheckedCode[];
 }
 
-export type MortgageResult =
+type MortgageResult =
   | { readonly ok: false; readonly errors: readonly ValidationError[] }
   | { readonly ok: true; readonly review: MortgageReview };
 

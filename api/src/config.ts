@@ -28,7 +28,7 @@ export const LOCATE_MODEL = HAIKU_4_5;
 // Every model the extract function calls: IAM, the dashboard and its prices follow this list.
 export const INVOKED_MODELS = [...new Set([PRIMARY_MODEL, ESCALATION_MODEL, LOCATE_MODEL])];
 
-export interface ModelSettings {
+interface ModelSettings {
   // Sonnet 5.5 rejects tool_choice "tool" with a 400; it gets "auto" and the prompt names the tool.
   readonly forcedToolChoice: boolean;
   readonly maxTokens: number;

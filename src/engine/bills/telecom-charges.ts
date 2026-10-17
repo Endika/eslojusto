@@ -14,7 +14,7 @@ export type TelecomLineKind = (typeof TELECOM_LINE_KINDS)[number];
 
 // The order the kinds are shown in: the fees first, what may not have been asked for right after
 // them, the discounts last.
-export const CHARGE_GROUP_ORDER: readonly TelecomLineKind[] = [
+const CHARGE_GROUP_ORDER: readonly TelecomLineKind[] = [
   'fixed_fee',
   'premium_rate',
   'third_party',
@@ -38,11 +38,11 @@ export interface ChargeLine {
   readonly amount: number;
 }
 
-export interface ChargedBill {
+interface ChargedBill {
   readonly lines: readonly ChargeLine[];
 }
 
-export interface ChargeGroup {
+interface ChargeGroup {
   readonly kind: TelecomLineKind;
   // Positions in the bill's lines, in their order.
   readonly lines: readonly number[];

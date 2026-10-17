@@ -47,7 +47,7 @@ export interface PowerAgainstUse {
   readonly aboveContracted: boolean;
 }
 
-export interface OfficialFigures {
+interface OfficialFigures {
   // Null when the bill has no energy lines.
   readonly energy: EnergyFigures | null;
   // Null when the bill prints no highest power used.

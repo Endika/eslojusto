@@ -90,7 +90,7 @@ export type BenefitEstimate =
 
 export type NoFiguresReason = 'short_contract' | 'base_below_minimum';
 
-export { BENEFIT_STATES, benefitState, type BenefitState } from './benefit-state';
+export { benefitState } from './benefit-state';
 
 // Truncates to cents like the SEPE simulator; the epsilon absorbs float noise such as 1750 × 0.7.
 export const trunc2 = (x: number): number => Math.floor(x * 100 + 1e-6) / 100;

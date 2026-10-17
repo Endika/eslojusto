@@ -9,7 +9,7 @@ export interface NoticeState {
   readonly downloaded: ReadonlySet<Download>;
 }
 
-export type NoticeView = 'hidden' | 'full' | 'done';
+type NoticeView = 'hidden' | 'full' | 'done';
 
 export function noticeView(s: NoticeState): NoticeView {
   if (!s.fresh || !s.showing) return 'hidden';

@@ -50,7 +50,7 @@ export interface ElectricityReview {
   readonly unchecked: readonly UncheckedCode[];
 }
 
-export type ElectricityResult =
+type ElectricityResult =
   | { readonly ok: false; readonly errors: readonly ValidationError<ElectricityField>[] }
   | { readonly ok: true; readonly review: ElectricityReview };
 

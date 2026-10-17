@@ -723,7 +723,7 @@ const _allBillsReasons: CoversAll<
 void _allBillsReasons;
 
 // What a bills result line is about, by its kind; never its concept as written.
-export const BILLS_ITEM_IDS = [
+const BILLS_ITEM_IDS = [
   'days',
   'power',
   'energy',
@@ -750,7 +750,7 @@ export const BILLS_ITEM_IDS = [
 const _allBillsItems: CoversAll<BillsItemId, (typeof BILLS_ITEM_IDS)[number]> = true;
 void _allBillsItems;
 export type BillsTrackedItemId = Exclude<BillsItemId, 'social_bonus'>;
-export const BILLS_TRACKED_ITEM_IDS = BILLS_ITEM_IDS.filter(
+const BILLS_TRACKED_ITEM_IDS = BILLS_ITEM_IDS.filter(
   (id): id is BillsTrackedItemId => id !== 'social_bonus',
 );
 
@@ -834,7 +834,7 @@ const HOLIDAY_UNITS = ['working', 'calendar'] as const satisfies readonly Holida
 const EXTRA_PAY = ['prorated', 'annual', 'semiannual', 'unknown', 'no_extra_pay'] as const;
 const OUTCOMES = ['shortfall', 'all_match', 'only_not_checkable', 'no_figures'] as const;
 const OTHER_CONTRACT_BUCKETS = ['0', '1', '2', '3+'] as const;
-export type Outcome = (typeof OUTCOMES)[number];
+type Outcome = (typeof OUTCOMES)[number];
 
 export const ERROR_TYPES = [
   'Error',

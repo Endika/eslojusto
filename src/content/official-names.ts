@@ -5,5 +5,3 @@ export const OFFICIAL_NAMES = [
   'Servicio de Reclamaciones de la Dirección General de Seguros y Fondos de Pensiones',
   'Ley de 23 de julio de 1908 sobre nulidad de los contratos de préstamos usurarios',
 ] as const;
-
-export type OfficialName = (typeof OFFICIAL_NAMES)[number];

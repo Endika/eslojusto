@@ -50,7 +50,7 @@ export interface EmploymentReview {
   readonly offerPass: boolean;
 }
 
-export type EmploymentResult =
+type EmploymentResult =
   | { readonly ok: false; readonly errors: readonly ValidationError[] }
   | { readonly ok: true; readonly review: EmploymentReview };
 

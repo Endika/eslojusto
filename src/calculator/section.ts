@@ -23,7 +23,7 @@ export interface SectionEvents<S extends string> extends NavigationEvents<S> {
 
 // What a review section brings to the shared walk through its sheets: its form, how it checks a
 // sheet, how it stops at its gate and how it reviews the answers.
-export interface Section<S extends string, Sheet extends S, E extends { readonly field: string }> {
+interface Section<S extends string, Sheet extends S, E extends { readonly field: string }> {
   // The form's id.
   readonly formId: string;
   readonly flow: Flow<S>;

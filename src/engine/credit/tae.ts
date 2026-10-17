@@ -245,7 +245,7 @@ export function aprFlows(input: CreditInput, options: FlowOptions): AprFlows | n
   return withTotals(plan.basis, flows);
 }
 
-export type AprSolution =
+type AprSolution =
   { readonly kind: 'solved'; readonly rate: number } | { readonly kind: 'unsolvable' };
 
 // The search runs over this interval of the yearly rate, as a fraction, first on a grid to count

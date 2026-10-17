@@ -42,7 +42,7 @@ export interface CapRow {
   readonly sources: readonly Source[];
 }
 
-export interface CapsCopy {
+interface CapsCopy {
   readonly rows: readonly CapRow[];
   readonly status: string;
   // Only while RDL 29/2026 has not been repealed.

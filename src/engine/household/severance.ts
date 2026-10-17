@@ -18,13 +18,13 @@ const CAP_MONTHS = 6;
 const DAYS_IN_MONTHLY_SALARY = 30;
 const CAP_DAYS = CAP_MONTHS * DAYS_IN_MONTHLY_SALARY;
 
-export interface SeverancePart {
+interface SeverancePart {
   readonly days: number;
   readonly amount: number;
   readonly capped: boolean;
 }
 
-export interface HouseholdSeverance {
+interface HouseholdSeverance {
   readonly annualPay: number;
   readonly dailySalary: number;
   readonly completeYears: number;

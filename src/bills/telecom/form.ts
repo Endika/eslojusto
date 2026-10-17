@@ -56,7 +56,7 @@ export const SHEET_FIELDS: Readonly<Record<Sheet, readonly TelecomFormField[]>> 
 export const sheetOfField = (field: TelecomFormField): Sheet =>
   SHEETS.find((s) => SHEET_FIELDS[s].includes(field)) ?? 'permanencia';
 
-export type TelecomFieldError = FieldError<TelecomFormField>;
+type TelecomFieldError = FieldError<TelecomFormField>;
 
 // Where each of the engine's fields is asked.
 const FIELD_OF: Readonly<Record<TelecomField, TelecomFormField>> = {

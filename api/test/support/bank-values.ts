@@ -3,7 +3,7 @@ import type { FieldSpec, SectionSchema } from '../../src/domain/extraction-schem
 import type { From } from '../../src/domain/merge';
 import type { ExpectedValue } from '../../eval/schema';
 
-export interface Specs {
+interface Specs {
   // Each field of the response, read where its first source keeps it.
   readonly fields: Readonly<Record<string, FieldSpec | undefined>>;
   readonly lists: Readonly<Record<string, Readonly<Record<string, FieldSpec>> | undefined>>;

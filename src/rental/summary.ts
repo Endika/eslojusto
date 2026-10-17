@@ -78,7 +78,7 @@ export function summarise(item: RentalItemResult): ItemSummary {
 }
 
 // How a doubtful item stands against the totals: wholly out, only its lowest reading in, or in.
-export type TotalShare = 'in' | 'lowest' | 'out';
+type TotalShare = 'in' | 'lowest' | 'out';
 
 export function totalShare(s: ItemSummary): TotalShare {
   if (s.kind === 'single' || s.upTo === 0) return 'in';
@@ -86,8 +86,7 @@ export function totalShare(s: ItemSummary): TotalShare {
   return s.counted < s.upTo ? 'lowest' : 'in';
 }
 
-export type Headline =
-  'found' | 'only_doubtful' | 'to_review' | 'nothing_found' | 'nothing_entered';
+type Headline = 'found' | 'only_doubtful' | 'to_review' | 'nothing_found' | 'nothing_entered';
 
 // The summary's first line: something counted, something only in some readings, or nothing.
 export function headline(review: RentalReview): Headline {
@@ -105,7 +104,7 @@ export function headline(review: RentalReview): Headline {
 }
 
 // The total lines, in the order the summary shows them: only those with something in them.
-export type TotalKind = 'paidOver' | 'owed' | 'overCap';
+type TotalKind = 'paidOver' | 'owed' | 'overCap';
 
 export const totalLines = (review: RentalReview): readonly { kind: TotalKind; total: Total }[] =>
   (['paidOver', 'owed', 'overCap'] as const)

@@ -1,7 +1,7 @@
 import type { ClientKey, Translate } from '../i18n/client';
 import { SKIP_REASONS, type FailedCheck, type ReadPage, type SkipReason } from './contract';
 
-export interface SkippedPage {
+interface SkippedPage {
   // 1-based, in the order sent.
   readonly page: number;
   readonly reason: SkipReason;

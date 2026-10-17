@@ -316,7 +316,7 @@ const completeInput = (partial: Partial<EmploymentInput>): EmploymentInput => ({
 
 // Where each item of a list in the input sits on screen, so an engine error lands on its row. The
 // schedule groups its rows by day: one day of the input holds every row of that day.
-export type RowsOnScreen = Readonly<Record<RowList, readonly (readonly number[])[]>>;
+type RowsOnScreen = Readonly<Record<RowList, readonly (readonly number[])[]>>;
 
 interface Reading {
   readonly partial: Partial<Mutable<EmploymentInput>>;

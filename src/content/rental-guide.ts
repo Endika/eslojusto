@@ -11,22 +11,22 @@ import { formatDay, formatLongDay } from './rent-indices';
 // The guide on /alquiler/: each block's text, the norms it rests on and how each stands, read from
 // the norm table so a validation or a repeal changes the page without touching it.
 
-export interface GuideSource {
+interface GuideSource {
   readonly citation: string;
   readonly url: string;
   readonly status: string;
   readonly statusCode: string;
 }
 
-export interface GuideLink {
+interface GuideLink {
   readonly label: string;
   readonly url: string;
 }
 
-export type GuideBlockId =
+type GuideBlockId =
   'fees' | 'guarantees' | 'update' | 'charges' | 'return' | 'zones' | 'term' | 'regional';
 
-export interface GuideBlock {
+interface GuideBlock {
   readonly id: GuideBlockId;
   // The block's id on the page, a URL fragment that keeps its Spanish name.
   readonly anchor: string;
@@ -219,7 +219,7 @@ export const neverInForce = (norm: Norm): boolean => {
 };
 
 // The legal interest the guide names: the latest year's rate and the first year it has held.
-export interface LegalInterestSummary {
+interface LegalInterestSummary {
   readonly rate: number;
   readonly since: number;
   readonly url: string;

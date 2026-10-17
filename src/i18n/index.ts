@@ -13,7 +13,6 @@ import type { Lang } from './languages';
 import { interpolate, type Variables } from './interpolate';
 
 export type { Key } from './es';
-export type { Lang } from './languages';
 
 // Arabic-script markers around the Spanish text: every string reads right to left, and an
 // untranslated one (a literal left in a component) stands out at a glance.

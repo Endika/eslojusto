@@ -11,7 +11,7 @@ import type { NormTable } from './norms';
 import { ruleSource, type InsuranceRuleId } from './rules';
 import type { Finding, FindingId, FindingStatus } from './types';
 
-export interface MonthsBefore {
+interface MonthsBefore {
   // The day the months run back to; when that month has no equivalent day, its last day.
   readonly day: CivilDate;
   readonly monthEnd: boolean;

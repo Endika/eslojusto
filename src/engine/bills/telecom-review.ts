@@ -33,7 +33,7 @@ export interface TelecomReview {
   readonly unchecked: readonly TelecomUncheckedCode[];
 }
 
-export type TelecomResult =
+type TelecomResult =
   | { readonly ok: false; readonly errors: readonly ValidationError<TelecomField>[] }
   | { readonly ok: true; readonly review: TelecomReview };
 

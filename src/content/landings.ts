@@ -5,14 +5,14 @@ import { langPaths, type Lang } from '../i18n/languages';
 // The case pages: one search intent each, the same calculator with the case already marked. Their
 // words live in the dictionary under `landing.<id>.`; their prose, in src/prose/.
 
-export type Hub = 'finiquito' | 'paro';
+type Hub = 'finiquito' | 'paro';
 
-export interface Question {
+interface Question {
   readonly question: string;
   readonly answer: string;
 }
 
-export interface Landing {
+interface Landing {
   // From the site root, with its trailing slash.
   readonly path: string;
   readonly hub: Hub;
@@ -25,7 +25,7 @@ export interface Landing {
 }
 
 // A case page's words in a language.
-export interface LandingCopy {
+interface LandingCopy {
   // The page's name in the breadcrumb and in links from other pages.
   readonly name: string;
   readonly title: string;

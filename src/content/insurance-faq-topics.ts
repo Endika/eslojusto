@@ -9,5 +9,3 @@ export const INSURANCE_FAQ_TOPICS = [
   ['questionnaire', 'faq-seguro-cuestionario'],
   ['data', 'faq-seguro-datos'],
 ] as const;
-
-export type InsuranceFaqId = (typeof INSURANCE_FAQ_TOPICS)[number][0];

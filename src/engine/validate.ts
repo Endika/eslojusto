@@ -111,7 +111,7 @@ export type OtherContractErrorCode =
   | 'other_contract_end_before_start'
   | 'other_contract_ends_after_this_one';
 
-export type OtherContractError = {
+type OtherContractError = {
   readonly field: `otherContracts.${number}.${keyof ContributionPeriod}`;
   readonly row: number;
   readonly code: OtherContractErrorCode;

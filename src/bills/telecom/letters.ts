@@ -28,7 +28,7 @@ const itemOf = (review: TelecomReview, id: BillFinding['id']): BillItem | undefi
 // Leaving within the month after a change of conditions, in every reading, with something charged
 // over what 67.8 and 67.10 leave in one of them at least. A change the review sends to look at, or
 // one it does not reach, gives no letter.
-export function exitUnderChange(review: TelecomReview): BillItem | null {
+function exitUnderChange(review: TelecomReview): BillItem | null {
   const item = itemOf(review, 'change_exit');
   if (item === undefined) return null;
   const findings = findingsOf(item);
@@ -39,13 +39,13 @@ export function exitUnderChange(review: TelecomReview): BillItem | null {
 }
 
 // A commitment penalty over its proportional cap: a single reading, always.
-export function penaltyOver(review: TelecomReview): BillFinding | null {
+function penaltyOver(review: TelecomReview): BillFinding | null {
   const item = itemOf(review, 'commitment_penalty');
   if (item === undefined || item.kind !== 'single' || countedAmount(item) <= 0) return null;
   return item.finding;
 }
 
-export interface TelecomLetterKinds {
+interface TelecomLetterKinds {
   // The penalty letter, with figures, which the pass pays for.
   readonly paid: readonly LetterKind[];
   // The exit letter carries no figure: it states the dates and the rule, and downloads free.

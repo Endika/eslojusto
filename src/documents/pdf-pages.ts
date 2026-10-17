@@ -2,7 +2,7 @@ import { fitExactly } from './files';
 import type { EncodedFile, OpenedPdf, PdfPages, PdfProblem } from './ports';
 
 // The slice of pdf.js this adapter uses; the library itself loads only when a PDF is picked.
-export interface PdfJsPage {
+interface PdfJsPage {
   getViewport(params: { scale: number }): { readonly width: number; readonly height: number };
   render(params: { canvas: unknown; canvasContext: unknown; viewport: unknown }): {
     readonly promise: Promise<void>;

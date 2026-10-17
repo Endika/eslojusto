@@ -22,7 +22,7 @@ export const LANGS: Record<Lang, { name: string; dir: 'ltr' | 'rtl'; published: 
 
 const all = Object.keys(LANGS) as Lang[];
 
-export const publishedLangs = (): Lang[] => all.filter((i) => LANGS[i].published);
+const publishedLangs = (): Lang[] => all.filter((i) => LANGS[i].published);
 
 // The unpublished real languages a review build serves: REVIEW_LANGS=eu,ca. Anything else in the
 // list is ignored, so the pseudo-locale can't sneak in this way.

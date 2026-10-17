@@ -6,7 +6,7 @@ import { EMPLOYMENT_LIST_MAXIMA, INFO_ELEMENTS } from '../../src/domain/employme
 // fills every list and every copied text to its limit; `typical` copies texts of the length
 // real documents print. Made-up values only.
 
-export interface RecordShape {
+interface RecordShape {
   readonly payslips: number;
   readonly lines: number;
   readonly contracts: number;

@@ -16,9 +16,9 @@ import { CAR_COVERS, LINES, type InsuranceFormField } from './form';
 // The questions beside which the documents' own words are shown, so the person can check the
 // answer against them.
 export const QUOTED = ['renews', 'changes'] as const;
-export type Quoted = (typeof QUOTED)[number];
+type Quoted = (typeof QUOTED)[number];
 
-export interface InsurancePrefill extends ReadPrefill {
+interface InsurancePrefill extends ReadPrefill {
   readonly quotes: Readonly<Partial<Record<Quoted, string>>>;
 }
 
