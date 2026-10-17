@@ -75,11 +75,6 @@ export interface ApiStackProps extends StackProps {
   readonly reserveConcurrency?: boolean;
 }
 
-// The API had CloudWatch alarms and an alerts topic until 13-10-2026; CI's deployment keeps the
-// right to manage them so CloudFormation can delete what it created. The budget emails instead.
-const ALARM_PREFIX = 'eslojusto-api-';
-const ALERTS_TOPIC_NAME = 'eslojusto-api-alerts';
-
 // Everything regional, in eu-south-2. No IAM: the roles live in the global stack, so the CI
 // deployment can neither create roles nor widen their permissions.
 export class ApiStack extends Stack {
@@ -318,7 +313,6 @@ export class GlobalStack extends Stack {
     const functionArns = Object.values(FUNCTION_NAMES).map((n) =>
       regional('lambda', `function:${n}`),
     );
-    const alertsTopic = regional('sns', ALERTS_TOPIC_NAME);
     const cfnExecution = new iam.ManagedPolicy(this, 'CfnExecutionPolicy', {
       managedPolicyName: CFN_EXECUTION_POLICY_NAME,
       statements: [
@@ -352,41 +346,6 @@ export class GlobalStack extends Stack {
           actions: ['iam:PassRole'],
           resources: [extractRole.roleArn, checkoutRole.roleArn, passRole.roleArn],
           conditions: { StringEquals: { 'iam:PassedToService': 'lambda.amazonaws.com' } },
-        }),
-        new iam.PolicyStatement({
-          actions: [
-            'sns:CreateTopic',
-            'sns:DeleteTopic',
-            'sns:GetTopicAttributes',
-            'sns:SetTopicAttributes',
-            'sns:ListSubscriptionsByTopic',
-            'sns:Subscribe',
-            'sns:GetDataProtectionPolicy',
-            'sns:PutDataProtectionPolicy',
-            'sns:TagResource',
-            'sns:UntagResource',
-            'sns:ListTagsForResource',
-          ],
-          resources: [alertsTopic],
-        }),
-        new iam.PolicyStatement({
-          actions: [
-            'sns:Unsubscribe',
-            'sns:GetSubscriptionAttributes',
-            'sns:SetSubscriptionAttributes',
-          ],
-          resources: [`${alertsTopic}:*`],
-        }),
-        new iam.PolicyStatement({
-          actions: [
-            'cloudwatch:PutMetricAlarm',
-            'cloudwatch:DeleteAlarms',
-            'cloudwatch:DescribeAlarms',
-            'cloudwatch:TagResource',
-            'cloudwatch:UntagResource',
-            'cloudwatch:ListTagsForResource',
-          ],
-          resources: [regional('cloudwatch', `alarm:${ALARM_PREFIX}*`)],
         }),
         new iam.PolicyStatement({
           actions: ['s3:GetObject'],

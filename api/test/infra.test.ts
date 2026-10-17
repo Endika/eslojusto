@@ -452,20 +452,13 @@ describe('global stack', () => {
     );
   });
 
-  it('lets CloudFormation manage only the alerts topic and the API alarms', () => {
+  it('gives CloudFormation no say over topics or alarms', () => {
     const json = JSON.stringify(
       globalTemplate.findResources('AWS::IAM::ManagedPolicy', {
         Properties: { ManagedPolicyName: 'eslojusto-api-cfn-execution' },
       }),
     );
-    expect(json).toContain(':eslojusto-api-alerts"');
-    expect(json).toContain(':eslojusto-api-alerts:*"');
-    expect(json).toContain(':alarm:eslojusto-api-*"');
-    expect(json).toContain('cloudwatch:PutMetricAlarm');
-    expect(json).toContain('sns:Subscribe');
-    expect(json).not.toMatch(/sns:\*|cloudwatch:\*|sns:Publish|iam:PassRole[^}]*sns/);
-    expect(json.match(/arn:aws:sns:/g)).toHaveLength(2);
-    expect(json.match(/:alarm:/g)).toHaveLength(1);
+    expect(json).not.toMatch(/sns:|arn:aws:sns:|:alarm:|MetricAlarm|DeleteAlarms|DescribeAlarms/);
   });
 
   it('lets CloudFormation manage the API dashboard and no other', () => {
