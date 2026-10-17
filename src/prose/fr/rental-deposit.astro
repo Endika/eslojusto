@@ -1,0 +1,101 @@
+---
+// source: f63abb595478
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositExample();
+// Until the Congress votes the decree down, the insurance ban stands as pending.
+const banStands = NORMS.rdl29_2026.status !== 'repealed';
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="fianza-legal">
+  <h2 id="fianza-legal">Le dépôt de garantie&nbsp;: un mois de loyer</h2>
+  <p>
+    Le dépôt de garantie (fianza) est obligatoire et, pour la location d'un logement, il correspond
+    à un mois de loyer en espèces (art. 36.1 LAU).
+  </p>
+  <p>
+    Quand le bail prend fin et que vous rendez les clés, il doit vous être restitué dans un délai
+    d'un mois&nbsp;:{' '}
+    <a href={href(RENTAL_PAGES.deposit_return.path)}>{RENTAL_PAGES.deposit_return.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.1</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="garantia-adicional">
+  <h2 id="garantia-adicional">Autres garanties&nbsp;: jusqu'à deux mois de loyer de plus</h2>
+  <p>
+    En plus du dépôt de garantie, le bail peut prévoir une autre garantie&nbsp;: davantage d'argent
+    ou une caution bancaire (aval). Dans les baux signés depuis le 6 mars 2019 pour cinq ans au
+    plus, ou sept au plus si le propriétaire est une entreprise, cette garantie supplémentaire ne
+    peut pas dépasser deux mois de loyer (art. 36.5 LAU).
+  </p>
+  <p>La vérification compare au plafond l'argent que vous avez versé.</p>
+  {banStands && (
+    <p>
+      Selon le décret, le propriétaire ne peut plus vous imposer une assurance loyers impayés&nbsp;:
+      la <a href="#seguro">section sur l'assurance</a>, plus bas, l'explique.
+    </p>
+  )}
+  <p class="folio">
+    Art. <span>36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="adelantado">
+  <h2 id="adelantado">D'avance&nbsp;: un mois de loyer</h2>
+  <p>D'avance, le propriétaire ne peut pas exiger plus d'un mois de loyer (art. 17 LAU).</p>
+  <p class="folio">
+    Art. <span>17</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="seguro">
+  <h2 id="seguro">
+    {banStands
+      ? "Assurance loyers impayés : le décret interdit de vous l'imposer"
+      : 'Assurance loyers impayés'}
+  </h2>
+  <p>{pageDecree('deposit', 'rental.page.decree.insurance')}</p>
+  <p class="folio">
+    Art. <span>36.5</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Exemple détaillé</h2>
+  <p>
+    Pour un loyer de {formatEuros(ex.rent)}, un propriétaire demande {formatEuros(ex.asked)} en
+    argent avant l'entrée dans les lieux&nbsp;: le dépôt de garantie et des garanties
+    supplémentaires.
+  </p>
+  <p class="example">
+    <span class="example__label">Le calcul</span> Le dépôt de garantie correspond à un mois de
+    loyer, {formatEuros(ex.rent)}, et la garantie supplémentaire peut aller jusqu'à deux,{' '}
+    {formatEuros(2 * ex.rent)}. Le maximum est de {formatEuros(ex.allowed)}. On vous demande{' '}
+    {formatEuros(ex.asked)}&nbsp;: {formatEuros(ex.over)} au-dessus du plafond.
+  </p>
+  <p class="folio">
+    Art. <span>36.1 · 36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Vérifiez ce qui vous a été demandé</h2>
+  <p>
+    La <a href={href(REVIEW.path)}>vérification de la location</a> compare à ces plafonds le dépôt
+    de garantie, les garanties et le paiement d'avance de votre bail, et vous indique de combien
+    chaque plafond est dépassé.
+  </p>
+</section>
