@@ -64,16 +64,18 @@ interface Section<S extends string, Sheet extends S, E extends { readonly field:
   refreshResult?(result: HTMLElement): void;
 }
 
-// The section's form as reading documents and the pass drive it. These sections lock nothing in
-// their result, so a pass verified or dropped leaves it as it is.
+// The section's form as reading documents and the pass drive it.
 export interface SectionForm {
   readonly form: HTMLFormElement;
   // Sets the answers and returns the names it could not set.
   fill(entries: FormEntries): string[];
   entries(): FormEntries;
+  // Shows the sheet a visit opens on, as if it started there.
   open(): void;
   // Reviews the answers as the «Revisar» button does; false when a sheet still needs an answer.
   review(): boolean;
+  // Shows the last review again, locked or with its detail as the pass now says; a section that
+  // locks nothing leaves its result as it is.
   refreshResult(): void;
 }
 
