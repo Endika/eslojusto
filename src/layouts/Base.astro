@@ -99,7 +99,9 @@ const graph = Array.isArray(structuredData)
 const jsonLd = graph && JSON.stringify(graph).replace(/</g, '\\u003c');
 
 // Runs before first paint so the stored or system theme never flashes; the CSP allows it by hash.
-const initialTheme = `(()=>{const d=document.documentElement;d.classList.add('js');let t=null;try{t=localStorage.getItem('tema')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.dataset.theme=t})()`;
+// A page inside another site's frame stays blank: GitHub Pages can't send frame-ancestors and a
+// <meta> CSP ignores it, so this is the only guard against clickjacking the upload or the payment.
+const initialTheme = `(()=>{const d=document.documentElement;if(self!==top){d.style.display='none';return}d.classList.add('js');let t=null;try{t=localStorage.getItem('tema')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.dataset.theme=t})()`;
 const themeHash = `'sha256-${createHash('sha256').update(initialTheme).digest('base64')}'`;
 const csp = contentSecurityPolicy({
   themeHash,
