@@ -1,0 +1,113 @@
+---
+// source: 497baf7f9449
+import { LEGAL_INTEREST } from '../../engine/law/data/legal-interest';
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositReturnExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatDay, formatEuros, formatRate } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositReturnExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+const [first, second] = ex.stretches;
+if (!first || !second) throw new Error('The example spans a year change.');
+const table = LEGAL_INTEREST[0]?.url;
+---
+
+<section class="sheet sheet--text" aria-labelledby="plazo">
+  <h2 id="plazo">Termenul: o lună de la predarea cheilor</h2>
+  <p>
+    Când se termină contractul și predai cheile, proprietarul are o lună ca să îți restituie
+    garanția. După acea lună, ce a rămas de restituit produce dobânda legală (interés legal del
+    dinero) (art. 36.4 LAU).
+  </p>
+  <p>
+    Luna se socotește de la o dată la aceeași dată: dacă predai cheile pe 15 noiembrie, termenul se
+    încheie pe 15 decembrie, iar dobânda curge din 16. Curge până în ziua în care ți se restituie
+    banii, zi care nu se mai socotește.
+  </p>
+  <p>
+    Ce garanție ți se poate cere de la început:{' '}
+    <a href={href(RENTAL_PAGES.deposit.path)}>{RENTAL_PAGES.deposit.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="interes">
+  <h2 id="interes">Ce dobândă se aplică</h2>
+  <p>
+    Dobânda legală. O stabilește în fiecare an Ley de Presupuestos Generales del Estado (legea
+    bugetului de stat), iar calculul folosește rata anului calendaristic al fiecărei zile. Ratele
+    fiecărui an se găsesc în <a href={table}>tabelul Banco de España</a>.
+  </p>
+  <p>
+    Anul se poate socoti după zilele lui calendaristice (365, sau 366 într-un an bisect) sau la 360
+    de zile: dăm ambele calcule.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Exemplu rezolvat</h2>
+  <p>
+    O persoană cu o garanție de {formatEuros(ex.deposit)} predă cheile pe{' '}
+    {formatDay(ex.keysReturnedOn)}. Proprietarul le acceptă și îi restituie toată garanția pe{' '}
+    {formatDay(ex.returnedOn)}. Luna s-a încheiat pe 15-12-2022, așa că dobânda curge din{' '}
+    {formatDay(ex.interestFrom)} și trece de schimbarea anului, cu rata fiecăruia:
+  </p>
+  <ul>
+    <li>
+      De la {formatDay(first.from)} până la {formatDay(first.to)} ({first.days} zile), la{' '}
+      {formatRate(first.rate)}: {formatEuros(first.interest)}.
+    </li>
+    <li>
+      De la {formatDay(second.from)} până la {formatDay(second.to)} ({second.days} zile), la{' '}
+      {formatRate(second.rate)}: {formatEuros(second.interest)}.
+    </li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Calculul</span> Fiecare interval este garanția înmulțită cu rata și
+    cu zilele, împărțită la 100 și la cele {first.yearDays} zile ale anului:{' '}
+    {formatEuros(ex.deposit)} × {formatRate(first.rate)} × {first.days} ÷ {first.yearDays} și{' '}
+    {formatEuros(ex.deposit)} × {formatRate(second.rate)} × {second.days} ÷ {second.yearDays}. În
+    total, {formatEuros(ex.total)} dobândă; dacă anul se socotește la 360 de zile,{' '}
+    {formatEuros(ex.totalCommercial)}.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="no-valoramos">
+  <h2 id="no-valoramos">Ce nu evaluăm</h2>
+  <p>
+    Dacă proprietarul păstrează o parte din garanție pentru deteriorări, curățenie sau alte motive,
+    verificarea notează fiecare reținere așa cum ți-a fost comunicată și o scade din ce a rămas de
+    restituit. Nu evaluează dacă este întemeiată și nici cât costă o reparație.
+  </p>
+  <p>{pageDecree('deposit_return', 'rental.guide.return.closing')}</p>
+  <p class="folio">
+    Art. <span>36.7</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Calculează ce ți se cuvine</h2>
+  <p>
+    În <a href={href(REVIEW.path)}>verificarea închirierii</a> scrii când ai predat cheile, cât ți
+    s-a restituit și când. Îți dă ce lipsește din garanție și dobânda, cu ambele calcule ale anului,
+    și poate pregăti o scrisoare prin care să le ceri.
+  </p>
+  <p>
+    {NORMS.lau.citation}: <a href={NORMS.lau.url}>textul consolidat în BOE</a>.
+  </p>
+</section>
