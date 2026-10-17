@@ -19,11 +19,10 @@ const today = () => ({ y: 2026, m: 10, d: 17 });
 
 function mount(page: string): void {
   const html = readFileSync(`dist/${page}/index.html`, 'utf8');
-  const body = /<body[^>]*>([\s\S]*)<\/body>/.exec(html)?.[1] ?? '';
-  document.body.innerHTML = body.replace(
-    /<script\b(?![^>]*application\/json)[^>]*>[\s\S]*?<\/script>/g,
-    '',
-  );
+  const parsed = new DOMParser().parseFromString(html, 'text/html');
+  for (const script of parsed.body.querySelectorAll('script:not([type="application/json"])'))
+    script.remove();
+  document.body.innerHTML = parsed.body.innerHTML;
 }
 
 // Every event the section reports, in order, by name and arguments.
