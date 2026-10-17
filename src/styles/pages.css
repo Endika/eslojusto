@@ -403,10 +403,6 @@
 [dir='rtl'] .group__cards {
   padding: 0 0 0 1rem;
 }
-.group__soon {
-  margin: 0;
-  font: 550 0.9375rem / 1.45 var(--f-grotesque);
-}
 .group__more {
   margin: -0.5rem 0 0;
   font: 620 var(--t-help) / 1.4 var(--f-grotesque);

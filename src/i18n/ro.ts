@@ -35,7 +35,6 @@ export const ro: Translation = {
   'home.bills_situation':
     'Factura la electricitate sau renunțarea la abonamentul de mobil: ce ți s-a încasat față de normă',
   'home.bills_citation': 'Real Decreto 88/2026 · Ley 11/2022',
-  'home.coming_soon': 'În curând: {secciones}',
   'home.final_pay': 'Lichidarea finală',
   'home.final_pay_citation': 'Estatuto de los Trabajadores · ghidul CGPJ v0.6',
   'home.benefit': 'Șomaj',

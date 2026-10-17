@@ -36,7 +36,6 @@ export const en: Translation = {
   'home.bills_situation':
     'Your electricity bill or cancelling your mobile contract: what was charged against the rules',
   'home.bills_citation': 'Real Decreto 88/2026 · Ley 11/2022',
-  'home.coming_soon': 'Coming soon: {secciones}',
   'home.final_pay': 'Final settlement',
   'home.final_pay_citation': 'Estatuto de los Trabajadores · CGPJ guide v0.6',
   'home.benefit': 'Unemployment benefit',
