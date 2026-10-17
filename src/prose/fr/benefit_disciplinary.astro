@@ -1,0 +1,89 @@
+---
+// source: a172b338d8e2
+import CaseLink from '../../components/CaseLink.astro';
+import { disciplinary, entitledByCause } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import { t } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+if (disciplinary.entitled !== 'yes' || disciplinary.figures === null)
+  throw new Error('Incomplete example');
+const { figures } = disciplinary;
+// The reasons are the calculator's own: the same sentence and article it shows in the result.
+const causes = entitledByCause.map(({ cause, entitled }) => ({
+  name: t(lang, `cause.${cause}`),
+  entitled,
+  reason: t(lang, `client.unemployment.reason.${cause}`),
+}));
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-si">Il ouvre droit au chômage, même s'il est justifié</h3>
+  <p>
+    C'est une question fréquente, et la réponse se trouve dans la loi&nbsp;: le licenciement est une
+    situation légale de chômage (situación legal de desempleo) (art. 267.1.a.3.º LGSS), et il n'est
+    pas nécessaire de le contester pour percevoir l'allocation chômage (paro) (art. 268.4 LGSS). Peu
+    importe que le licenciement soit disciplinaire et qu'il soit déclaré justifié (procedente).
+  </p>
+  <p>
+    Ce qu'il faut, ce sont les conditions habituelles&nbsp;: 360 jours cotisés au cours des 6
+    dernières années, être inscrit comme demandeur d'emploi (demandante de empleo) et signer
+    l'accord d'activité (acuerdo de actividad), entre autres conditions (art. 266 LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>267 · 268.4</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ceses">Quelles fins de contrat ouvrent droit au chômage</h3>
+  <div class="causes">
+    {causes.map(({ name, entitled, reason }) => (
+      <div>
+        <h4>{name}</h4>
+        <p>
+          <strong>
+            {entitled === 'yes'
+              ? 'Ouvre droit au chômage.'
+              : "N'ouvre pas droit au chômage, sauf exceptions."}
+          </strong>{' '}
+          {reason}
+        </p>
+      </div>
+    ))}
+  </div>
+  <p>
+    Les exceptions de la démission, comme une mutation ou des impayés graves, figurent dans{' '}
+    <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ejemplo">Exemple détaillé</h3>
+  <p>
+    Une personne qui gagne 1.500&nbsp;€ bruts par mois, avec deux primes extraordinaires de
+    1.500&nbsp;€, travaille du 1er juin 2022 au 30 septembre 2026, sans enfant à charge, et
+    l'entreprise la licencie pour motif disciplinaire.
+  </p>
+  <p class="example">
+    <span class="example__label">Son allocation chômage</span> Avec{' '}
+    {integer(disciplinary.contractDays)} jours cotisés, elle a droit à au moins{' '}
+    {integer(disciplinary.duration.days)} jours de chômage, soit{' '}
+    {integer(disciplinary.duration.days / 30)} mois&nbsp;: environ{' '}
+    {wholeEuros(figures.firstStretch.min)} par mois les 6 premiers mois et environ{' '}
+    {wholeEuros(figures.secondStretch.min)} ensuite, en brut. «&nbsp;Au moins&nbsp;», car d'autres
+    emplois des 6 dernières années peuvent ajouter des jours.
+  </p>
+  <p>
+    Si le licenciement était déclaré injustifié (improcedente), il y aurait en plus une
+    indemnité&nbsp;: vous la trouverez dans <CaseLink lang={lang} id="unfair_dismissal" />.
+  </p>
+</section>

@@ -1,0 +1,98 @@
+---
+// source: af62c96628b9
+import CaseLink from '../../components/CaseLink.astro';
+import { itemRange, resignation } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const salary = itemRange(resignation, 'pending_salary');
+const holidays = itemRange(resignation, 'holiday_pay');
+const extraPay = itemRange(resignation, 'extra_pay');
+const deduction = itemRange(resignation, 'notice_deduction');
+if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="bv-que-lleva">Ce que comprend le solde de tout compte en cas de démission</h3>
+  <p>
+    Présenter sa démission (baja voluntaria), c'est démissionner&nbsp;: le contrat prend fin par
+    votre décision (art. 49.1.d ET). Même si c'est vous qui partez, ce que vous avez déjà gagné et
+    pas encore perçu vous revient&nbsp;:
+  </p>
+  <ul>
+    <li>Le salaire des jours travaillés du dernier mois (art. 26 ET).</li>
+    <li>Les congés acquis cette année et non pris (art. 38 ET).</li>
+    <li>
+      La part acquise des primes extraordinaires (pagas extra), si elles ne sont pas réparties sur
+      vos bulletins de paie mensuels (art. 31 ET).
+    </li>
+  </ul>
+  <p>
+    Il n'y a en revanche pas d'indemnité&nbsp;: la démission n'y ouvre pas droit (art. 49.1.d ET).
+    Tous les montants sont bruts, avant retenues fiscales et cotisations.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d · 26 · 31 · 38</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-preaviso">Le préavis de votre convention collective</h3>
+  <p>
+    En cas de démission, il faut prévenir en respectant le préavis fixé par votre convention
+    collective (convenio colectivo) ou par l'usage local (art. 49.1.d ET). Si votre convention le
+    prévoit et que vous ne le respectez pas, l'entreprise peut retenir sur le solde de tout compte
+    les jours manquants, sur la base de votre salaire journalier.
+  </p>
+  <p>
+    Le calculateur vous demande combien de jours fixe votre convention collective et combien vous en
+    avez respecté, et donne la retenue maximale. Si vous ne connaissez pas ceux de la convention,
+    cette retenue apparaît comme «&nbsp;impossible à vérifier&nbsp;».
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-ejemplo">Exemple détaillé</h3>
+  <p>
+    Une personne qui gagne 1.500&nbsp;€ bruts par mois, avec deux primes extraordinaires de
+    1.500&nbsp;€ acquises par semestre, travaille du 1er mars 2023 au 15 octobre 2026. Cette année,
+    elle a pris 10 de ses 22 jours ouvrés de congé. Sa convention collective fixe 15 jours de
+    préavis et elle part sans les respecter. Voici les chiffres du calculateur&nbsp;:
+  </p>
+  <ul>
+    <li>
+      Salaire d'octobre&nbsp;: {euroRange(salary)}, selon que le mois est compté sur 30 ou 31 jours.
+    </li>
+    <li>Congés non pris&nbsp;: {euroRange(holidays)}.</li>
+    <li>Prime de Noël acquise depuis juillet&nbsp;: {euroRange(extraPay)}.</li>
+    <li>Indemnité&nbsp;: {euros(0)}.</li>
+    <li>Retenue pour le préavis non respecté&nbsp;: au maximum {euros(deduction.max)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Les calculs</span> La fourchette de chaque poste vient du calcul
+    par jours ou par mois, comme le font les entreprises. La retenue correspond à 15 jours à{' '}
+    {euros(deduction.max / 15)} par jour, le plus élevé des deux salaires journaliers&nbsp;: le
+    mensuel divisé par 30 et l'annuel divisé par 365.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-paro">Et le chômage</h3>
+  <p>
+    Une démission n'est pas une situation légale de chômage (situación legal de desempleo)&nbsp;: en
+    règle générale, elle n'ouvre donc pas droit à l'allocation chômage (paro) (art. 267.2.a LGSS).
+    Il existe des exceptions, comme partir à la suite d'une mutation ou d'impayés graves. Vous les
+    trouverez dans <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

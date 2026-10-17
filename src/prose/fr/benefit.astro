@@ -1,0 +1,146 @@
+---
+// source: 5665f4065cc1
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitBySalary } from '../../content/examples';
+import { euros, wholeEuros } from '../../content/format';
+import { BENEFIT_2026 } from '../../engine/unemployment';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const { minCap, maxCap } = BENEFIT_2026;
+const [, mid, high] = benefitBySalary;
+if (!mid || !high) throw new Error('Incomplete example');
+type Row = (typeof benefitBySalary)[number];
+const stretch = (b: Row, n: 0 | 1 | 2) => b.children[n] ?? { c1: 0, c2: 0 };
+// One row per figure, one column per salary, so the table fits a phone.
+const rows: readonly (readonly [string, (b: Row) => number])[] = [
+  ['Base de calcul (base reguladora)', (b) => b.base],
+  ['180 premiers jours, sans enfant', (b) => stretch(b, 0).c1],
+  ['180 premiers jours, avec un enfant', (b) => stretch(b, 1).c1],
+  ['180 premiers jours, avec deux enfants ou plus', (b) => stretch(b, 2).c1],
+  ['À partir du jour 181, sans enfant', (b) => stretch(b, 0).c2],
+];
+---
+
+<section class="sheet sheet--text">
+  <h3 id="p-cuanto">70&nbsp;%, puis 60&nbsp;%</h3>
+  <p>
+    L'allocation chômage (paro), la prestation contributive de chômage, est calculée sur votre base
+    de calcul (base reguladora)&nbsp;: la moyenne de ce qui a été cotisé au titre du chômage au
+    cours des 180 derniers jours, sans les heures supplémentaires (art. 270.1 LGSS). Vous percevez
+    70&nbsp;% de cette base les 180 premiers jours et 60&nbsp;% à partir du jour 181 (art. 270.2
+    LGSS).
+  </p>
+  <p>
+    Chaque mois a un minimum et un maximum selon vos enfants à charge (art. 270.3 LGSS). En 2026,
+    avec l'IPREM à {wholeEuros(BENEFIT_2026.monthlyIprem)}, ce sont les suivants&nbsp;:
+  </p>
+  <ul>
+    <li>
+      Sans enfant à charge, entre {wholeEuros(minCap[0])} et {wholeEuros(maxCap[0])} par mois.
+    </li>
+    <li>
+      Avec un enfant, entre {wholeEuros(minCap[1])} et {wholeEuros(maxCap[1])}.
+    </li>
+    <li>
+      Avec deux enfants ou plus, entre {wholeEuros(minCap[1])} et {wholeEuros(maxCap[2])}.
+    </li>
+  </ul>
+  <p class="folio">
+    Art. <span>270</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-tabla">Montant du chômage avec un salaire de 1.300, 1.500 ou 1.800&nbsp;€</h3>
+  <FigureTable id="p-tabla-titulo">
+    <Fragment slot="caption">
+      Allocation chômage brute par mois avec un salaire sur 14 versements égaux et à temps plein, en
+      2026, arrondie à l'euro comme dans le calculateur.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Salaire brut par mois</th>
+        {benefitBySalary.map(({ salary }) => (
+          <th scope="col">{wholeEuros(salary)}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(([label, value]) => (
+        <tr>
+          <th scope="row">{label}</th>
+          {benefitBySalary.map((b) => (
+            <td>{wholeEuros(value(b))}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    La base correspond au salaire annuel, primes extraordinaires comprises, divisé par 12&nbsp;:
+    avec 1.500&nbsp;€ sur 14 versements, 21.000&nbsp;€ / 12 = {euros(mid.base)}, et ses 70&nbsp;%
+    tombent exactement sur le maximum sans enfant à charge. Avec 1.800&nbsp;€, la base est de{' '}
+    {euros(high.base)} et ses 70&nbsp;% dépassent les maximums sans enfant et avec un enfant&nbsp;:
+    dans ces cas, c'est le maximum qui est versé.
+  </p>
+  <p>
+    Ce sont des montants bruts. On en retient 4,85&nbsp;% de la base pour la Seguridad Social, ainsi
+    que l'IRPF (impôt sur le revenu) applicable. À temps partiel, les montants sont plus faibles, et
+    le calculateur ne les donne pas.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-requisitos">Qui peut la percevoir</h3>
+  <p>
+    Le contrat doit prendre fin dans une situation légale de chômage (situación legal de
+    desempleo)&nbsp;: un licenciement ou la fin d'un contrat à durée déterminée à laquelle vous
+    n'avez pas mis fin vous-même, par exemple (art. 267 LGSS). Il faut en outre au moins 360 jours
+    cotisés au cours des 6 dernières années, être inscrit comme demandeur d'emploi (demandante de
+    empleo) et signer l'accord d'activité (acuerdo de actividad), entre autres conditions (art. 266
+    LGSS).
+  </p>
+  <ul>
+    <li>
+      Sa durée selon les jours cotisés&nbsp;: <CaseLink lang={lang} id="benefit_duration" />.
+    </li>
+    <li>
+      Si vous partez de vous-même&nbsp;: <CaseLink lang={lang} id="benefit_resignation" />
+    </li>
+    <li>
+      En cas de licenciement pour faute&nbsp;: <CaseLink lang={lang} id="benefit_disciplinary" />.
+    </li>
+  </ul>
+  <p>
+    Sans inscription comme demandeur d'emploi, pas d'allocation chômage&nbsp;: vous vous inscrivez
+    auprès du service de l'emploi de votre communauté autonome et vous en faites la demande au SEPE
+    dans les 15 jours qui suivent la fin du contrat, ou la fin des congés non pris payés dans le
+    solde de tout compte (finiquito) (arts. 266 et 268 LGSS). C'est le SEPE qui précise qu'il s'agit
+    de jours ouvrables.
+  </p>
+  <p class="folio">
+    Art. <span>266 · 267 · 268</span> LGSS
+  </p>
+</section>
+
+{/* The literal switch, as in the ERTE page's route: a build without it renders nothing here. */}
+{import.meta.env.PUBLIC_ERTE === '1' && (
+  <section class="sheet sheet--text">
+    <h3 id="p-erte">Si vous êtes en ERTE</h3>
+    <p>
+      Un ERTE (chômage partiel temporaire) peut aussi ouvrir droit au chômage pendant sa durée. Le
+      montant perçu et le fait qu'il consomme ou non vos droits au chômage futurs dépendent du type
+      d'ERTE&nbsp;:{' '}
+      <a href={link(lang, 'paro/erte/')}>calculez votre allocation chômage pendant un ERTE</a>.
+    </p>
+    <p class="folio">
+      Art. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+    </p>
+  </section>
+)}

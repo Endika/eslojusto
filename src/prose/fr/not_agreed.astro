@@ -1,0 +1,78 @@
+---
+// source: c72414824687
+import { OFFERED_HOLIDAYS, itemRange, notAgreed } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+
+const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
+const range = itemRange(notAgreed, 'holiday_pay');
+if (!holidays || !range || holidays.difference === null) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="nc-que-es">Ce que cela signifie</h3>
+  <p>
+    À la fin du contrat, l'entreprise vous remet une proposition de décompte de solde (finiquito)
+    avec les montants qui vous reviennent (art. 49.2 ET). Certaines personnes, lorsqu'elles ne sont
+    pas d'accord avec un montant, la signent en ajoutant «&nbsp;reçu, non conforme&nbsp;» (recibí no
+    conforme) ou «&nbsp;non conforme&nbsp;» (no conforme).
+  </p>
+  <p>
+    Cette mention ne change pas ce que l'entreprise vous verse&nbsp;: elle laisse par écrit que vous
+    n'êtes pas d'accord avec un chiffre. Nous le présentons à titre d'information uniquement. Ce
+    qu'il convient de faire dans votre cas peut être évalué par un cabinet d'avocats en droit du
+    travail, un cabinet de graduado social ou un syndicat.
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-representante">En présence d'une personne de la représentation du personnel</h3>
+  <p>
+    Vous pouvez demander qu'une personne de la représentation du personnel soit présente au moment
+    de signer le solde de tout compte. Le document indique si vous le signez en sa présence ou si
+    vous n'avez pas fait usage de cette possibilité (art. 49.2 ET).
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-ejemplo">Exemple&nbsp;: comparer avant de signer</h3>
+  <p>
+    Une personne qui gagne 1.500&nbsp;€ bruts par mois, avec deux primes extraordinaires de
+    1.500&nbsp;€, démissionne le 15 octobre 2026, après avoir travaillé depuis le 1er mars 2023.
+    Elle a pris 10 de ses 22 jours ouvrés de congé et a respecté les 15 jours de préavis de sa
+    convention collective. La proposition lui verse {euros(OFFERED_HOLIDAYS)} au titre des congés.
+  </p>
+  <p class="example">
+    <span class="example__label">Congés</span> Le minimum légal est de {euroRange(range)}, selon que
+    le calcul se fait par jours ou par mois. Face à {euros(OFFERED_HOLIDAYS)}, il manque au moins{' '}
+    {euros(holidays.difference)}.
+  </p>
+  <p>
+    Le calculateur fait de même pour chaque poste&nbsp;: saisissez ce qu'indique la proposition dans
+    la fiche «&nbsp;Votre solde de tout compte&nbsp;» et vous verrez ce qui concorde avec le minimum
+    légal et ce qui ne concorde pas.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-plazos">Les délais continuent de courir</h3>
+  <p>
+    Pour le salaire restant dû, les congés, les primes extraordinaires ou l'indemnité de fin de
+    contrat à durée déterminée, le délai est d'un an (art. 59.1 ET).
+  </p>
+  <p>
+    En cas de licenciement, le délai pour le contester est de 20 jours ouvrables (art. 59.3 ET). Ce
+    délai est interrompu par le dépôt de la demande de conciliation (papeleta de conciliación)
+    auprès du service public de médiation, d'arbitrage et de conciliation compétent. Le délai est
+    court, et un cabinet d'avocats en droit du travail, un cabinet de graduado social ou un syndicat
+    peuvent vous dire quel service correspond à votre cas.
+  </p>
+  <p class="folio">
+    Art. <span>59</span> ET
+  </p>
+</section>

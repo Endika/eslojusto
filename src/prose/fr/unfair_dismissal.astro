@@ -1,0 +1,106 @@
+---
+// source: 6ba110cf70a7
+import CaseLink from '../../components/CaseLink.astro';
+import { severanceMonths, unfairAfter2012, unfairBefore2012 } from '../../content/examples';
+import { euros, integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const [months = 0] = severanceMonths(unfairAfter2012.calculation);
+const [first = 0, second = 0] = severanceMonths(unfairBefore2012.calculation);
+const decimal = (n: number) => String(n).replace('.', ',');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="di-tramos">33 jours par an, plafonnés à 720</h3>
+  <p>
+    Si le licenciement est reconnu ou déclaré injustifié (improcedente), l'indemnité de licenciement
+    (indemnización) est de 33 jours de salaire par année travaillée, avec un maximum de 24
+    mensualités, soit 720 jours (art. 56.1 ET). La durée se compte en mois, et une fraction de mois
+    compte comme un mois entier&nbsp;: 33 jours par an font 2,75 jours par mois.
+  </p>
+  <p>
+    Le salaire de chaque jour est votre salaire annuel, primes extraordinaires comprises, divisé par
+    365, comme le fait le guide du CGPJ. Le calculateur donne le chiffre au centime près et le
+    compare à celui de votre entreprise.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-2012">Si vous avez commencé avant le 12 février 2012</h3>
+  <p>L'indemnité est calculée en deux tranches (disposition transitoire 11.ª ET)&nbsp;:</p>
+  <ul>
+    <li>Jusqu'au 11 février 2012, 45 jours par an (3,75 par mois).</li>
+    <li>À partir du 12 février 2012, 33 jours par an (2,75 par mois).</li>
+  </ul>
+  <p>
+    Le total est plafonné à 720 jours, sauf si la première tranche dépasse déjà ce plafond. Dans ce
+    cas, seule la première tranche compte, avec un maximum de 42 mensualités (1.260 jours).
+  </p>
+  <p class="folio">
+    Disposition transitoire <span>11.ª</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-ejemplo">Exemples détaillés</h3>
+  <p>
+    Une personne qui gagne 1.500&nbsp;€ bruts par mois, avec deux primes extraordinaires de
+    1.500&nbsp;€, soit 21.000&nbsp;€ par an. Son salaire journalier est de 21.000&nbsp;€ / 365 ={' '}
+    {euros(unfairAfter2012.dailySalary)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Contrat de 2018</span> Du 3 mai 2018 au 20 juillet 2026, on compte{' '}
+    {integer(months)} mois. {integer(months)} × 2,75 = {decimal(unfairAfter2012.salaryDays)}
+    jours. 21.000&nbsp;€ × {decimal(unfairAfter2012.salaryDays)} / 365 ={' '}
+    {euros(unfairAfter2012.amount)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Contrat de 2010</span> Du 1er mars 2010 au 15 septembre 2026.
+    Première tranche&nbsp;: {integer(first)} mois × 3,75 = {decimal(first * 3.75)} jours. Deuxième
+    tranche&nbsp;: {integer(second)} mois × 2,75 = {decimal(second * 2.75)} jours. Total&nbsp;:{' '}
+    {integer(unfairBefore2012.salaryDays)} jours, en dessous du plafond. 21.000&nbsp;€ ×{' '}
+    {integer(unfairBefore2012.salaryDays)} / 365 = {euros(unfairBefore2012.amount)}.
+  </p>
+  <p>
+    L'indemnité s'ajoute au solde de tout compte (finiquito), qui comprend le salaire du dernier
+    mois, les congés non pris et les primes extraordinaires acquises. Le calculateur vérifie
+    l'ensemble.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-readmision">Réintégration ou indemnité</h3>
+  <p>
+    Lorsqu'un licenciement est déclaré injustifié, l'entreprise choisit dans un délai de cinq jours
+    entre vous réintégrer et vous verser l'indemnité (art. 56.1 ET). Si elle vous réintègre, elle
+    vous verse en outre les salaires de procédure (salarios de tramitación), ceux que vous n'avez
+    pas perçus depuis le licenciement (art. 56.2 ET). Si vous faites partie de la représentation du
+    personnel ou êtes délégué syndical, le choix vous appartient (art. 56.4 ET).
+  </p>
+  <p>
+    Cette vérification ne calcule pas les salaires de procédure et ne décide pas si un licenciement
+    est injustifié&nbsp;: c'est un tribunal qui le déclare ou l'entreprise qui le reconnaît.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-otros">Autres licenciements</h3>
+  <p>
+    Un licenciement pour motif objectif est indemnisé à 20 jours par an, avec 15 jours de
+    préavis&nbsp;: vous le trouverez dans <CaseLink lang={lang} id="objective_dismissal" />. Tout
+    licenciement, y compris disciplinaire, est une situation légale de chômage&nbsp;:{' '}
+    <CaseLink lang={lang} id="benefit_disciplinary" /> explique quelles fins de contrat ouvrent
+    droit au chômage.
+  </p>
+</section>

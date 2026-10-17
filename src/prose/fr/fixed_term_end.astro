@@ -1,0 +1,118 @@
+---
+// source: fb74508032fd
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { fixedTerms, spanLabel } from '../../content/examples';
+import { euroRange } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<section class="sheet sheet--text">
+  <h3 id="fc-indemnizacion">12 jours par an, sauf remplacement et formation</h3>
+  <p>
+    À la fin d'un contrat à durée déterminée lié aux circonstances de la production, vous avez droit
+    à une indemnité de 12 jours de salaire par an, au prorata des jours travaillés (art. 49.1.c ET).
+    Si le contrat a commencé avant 2015, le nombre de jours est plus faible&nbsp;: 8 s'il a commencé
+    en 2011 ou avant, 9 en 2012, 10 en 2013 et 11 en 2014 (disposition transitoire 8.ª ET). Les
+    contrats signés avant le 4 mars 2001 n'ouvrent pas droit à cette indemnité (disposition
+    transitoire 8.ª.2 ET).
+  </p>
+  <p>
+    Les contrats de remplacement (sustitución) d'une autre personne et les contrats de formation
+    (formativos) n'ouvrent pas droit à une indemnité (art. 49.1.c ET). C'est pourquoi le calculateur
+    vous demande le type de contrat juste après le motif.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET · DT <span>8.ª</span>
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-preaviso">Le préavis au-delà d'un an</h3>
+  <p>
+    Si le contrat a duré plus d'un an, comme cela peut arriver avec un contrat de remplacement,
+    l'entreprise doit vous prévenir de sa fin au moins 15 jours à l'avance (art. 49.1.c ET). La
+    vérification compte comme restant à payer les jours de ce préavis qui ne vous ont pas été
+    accordés. Chaque jour vaut entre votre salaire mensuel / 30 et votre salaire annuel / 365, selon
+    la façon dont l'entreprise le calcule.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-ejemplos">Exemples&nbsp;: 3, 6 et 12 mois</h3>
+  <p>
+    Un contrat lié aux circonstances de la production dure au maximum 6 mois, ou jusqu'à un an si
+    votre convention collective de branche (convenio sectorial) le prolonge (art. 15.2 ET).
+  </p>
+  <FigureTable id="fc-tabla">
+    <Fragment slot="caption">
+      Contrats liés aux circonstances de la production qui prennent fin le 30 septembre 2026, avec
+      1.500&nbsp;€ bruts par mois et deux primes extraordinaires de 1.500&nbsp;€.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Durée</th>
+        <th scope="col">Indemnité</th>
+      </tr>
+    </thead>
+    <tbody>
+      {fixedTerms.map(({ months, limit, severance }) => (
+        <tr>
+          <th scope="row">
+            {spanLabel(months, lang, 'months')}
+            {limit === 'sector_agreement' && (
+              <span class="figures-note">
+                seulement si votre convention collective de branche le prolonge
+              </span>
+            )}
+          </th>
+          <td>{severance ? euroRange(severance) : '—'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    Chaque indemnité correspond aux jours du contrat × 12 / 365 jours de salaire, à 21.000&nbsp;€ /
+    365 chacun. Le solde de tout compte (finiquito) comprend en outre le salaire du dernier mois,
+    les congés et les primes extraordinaires, que le calculateur vérifie avec vos données.
+  </p>
+  <p>
+    Un contrat à durée déterminée qui dépasse sa durée maximale peut être en réalité à durée
+    indéterminée (art. 15.4 ET), et sa fin serait alors un licenciement. Seuls les contrats pour un
+    ouvrage ou un service déterminé (obra o servicio) signés avant le 31 décembre 2021 pouvaient
+    durer plus longtemps (disposition transitoire 3.ª du Real Decreto-ley 32/2021).
+  </p>
+  <p class="folio">
+    Art. <span>15</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-baja">Si le contrat prend fin pendant un arrêt maladie</h3>
+  <p>
+    La vérification calcule le solde de tout compte avec les dates, le salaire et les jours de congé
+    que vous saisissez. Elle ne tient pas compte de l'arrêt maladie ni de ce qu'il advient de son
+    indemnisation à la fin du contrat&nbsp;: ce point n'est pas vérifié.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-paro">Et le chômage</h3>
+  <p>
+    La fin d'un contrat à durée déterminée est une situation légale de chômage (situación legal de
+    desempleo), sauf si c'est vous qui y avez mis fin (art. 267.1.a.6.º LGSS). Sa durée dépend des
+    jours cotisés au cours des 6 dernières années&nbsp;: vous la trouverez dans{' '}
+    <CaseLink lang={lang} id="benefit_duration" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

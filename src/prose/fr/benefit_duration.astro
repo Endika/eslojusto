@@ -1,0 +1,102 @@
+---
+// source: e288ce65363a
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { BENEFIT_SCALE, durationByTime, spanLabel } from '../../content/examples';
+import { integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+// Each row runs from its own threshold to the day before the next one; the last has no end.
+const rows = BENEFIT_SCALE.map(([from, days], i) => ({
+  from,
+  to: BENEFIT_SCALE[i + 1]?.[0],
+  days,
+}));
+const months = (days: number) => integer(days / 30);
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pt-escala">Le barème complet</h3>
+  <p>
+    La durée de l'allocation chômage (paro) dépend des jours cotisés au titre du chômage au cours
+    des 6 années précédentes que vous n'avez pas déjà utilisés pour une autre allocation (art. 269.1
+    LGSS). Tous vos emplois de cette période comptent, pas seulement le dernier.
+  </p>
+  <FigureTable id="pt-tabla">
+    <Fragment slot="caption">
+      Jours cotisés au cours des 6 dernières années et jours de chômage.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Jours cotisés</th>
+        <th scope="col">Jours de chômage</th>
+        <th scope="col">Mois</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(({ from, to, days }) => (
+        <tr>
+          <th scope="row">
+            {to === undefined
+              ? `${integer(from)} ou plus`
+              : `De ${integer(from)} à ${integer(to - 1)}`}
+          </th>
+          <td>{integer(days)}</td>
+          <td>{months(days)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    Avec moins de 360 jours cotisés, il n'y a pas de prestation contributive. Les congés non pris
+    payés dans le solde de tout compte (finiquito) comptent aussi comme cotisés (art. 269.4 LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>269</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pt-ejemplos">Exemples&nbsp;: de 6 mois à 6 ans</h3>
+  <p>
+    Un seul contrat qui prend fin le 31 août 2026, sans autre emploi au cours des 6 années
+    précédentes ni autre allocation chômage perçue&nbsp;:
+  </p>
+  <FigureTable id="pt-ejemplos-tabla">
+    <Fragment slot="caption">Durée travaillée, jours cotisés et chômage.</Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Durée travaillée</th>
+        <th scope="col">Jours cotisés</th>
+        <th scope="col">Jours de chômage</th>
+      </tr>
+    </thead>
+    <tbody>
+      {durationByTime.map(({ months: span, days, benefitDays }) => (
+        <tr>
+          <th scope="row">{spanLabel(span, lang)}</th>
+          <td>{integer(days)}</td>
+          <td>
+            {benefitDays === 0
+              ? "N'atteint pas 360"
+              : `${integer(benefitDays)} (${months(benefitDays)} mois)`}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    Avec 6 mois, on n'atteint pas les 360 jours, mais si vous avez travaillé ailleurs au cours des 6
+    années précédentes, ces jours s'ajoutent. C'est pourquoi le calculateur vous interroge sur vos
+    autres emplois et vous renvoie vers votre relevé de carrière (vida laboral), où figurent tous
+    les jours cotisés.
+  </p>
+  <p>
+    Le montant de chaque mois figure dans <CaseLink lang={lang} id="benefit" />.
+  </p>
+</section>
