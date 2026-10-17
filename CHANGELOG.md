@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.84.2](https://github.com/Endika/eslojusto/compare/v1.84.1...v1.84.2) (2026-10-17)
+
+
+### Bug Fixes
+
+* keep a page blank inside another site's frame ([1418b5d](https://github.com/Endika/eslojusto/commit/1418b5d39cc50772f640ab2d9409b3a2169b71e3))
+
 ## [1.84.1](https://github.com/Endika/eslojusto/compare/v1.84.0...v1.84.1) (2026-10-17)
 
 
