@@ -18,9 +18,9 @@ import { CHARGE_PAYMENTS, RATE_TYPES, type CreditFormField } from './form';
 // The questions beside which the contract's own words are shown, so the person can check the
 // answer against them.
 export const QUOTED = ['compensation', 'infoReceived'] as const;
-export type Quoted = (typeof QUOTED)[number];
+type Quoted = (typeof QUOTED)[number];
 
-export interface CreditPrefill extends ReadPrefill {
+interface CreditPrefill extends ReadPrefill {
   readonly quotes: Readonly<Partial<Record<Quoted, string>>>;
 }
 

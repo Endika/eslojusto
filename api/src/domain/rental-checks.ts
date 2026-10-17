@@ -15,7 +15,7 @@ const RECEIPT_TOLERANCE_CENTS = 100;
 const INVOICE_TOLERANCE_CENTS = 5;
 const NOTICE_TOLERANCE_CENTS = 100;
 // A lease can start before it is put in writing, but not by more than a month.
-export const START_BEFORE_SIGNING_DAYS = 31;
+const START_BEFORE_SIGNING_DAYS = 31;
 
 const RECEIPT_PARTS = ['rent', 'community', 'propertyTax', 'waste', 'utilities', 'other'];
 

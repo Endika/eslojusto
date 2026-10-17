@@ -185,7 +185,7 @@ export interface ReviewHooks<R> {
 }
 
 // What a section brings to the pass; the rest is the same for all.
-export interface PassSection<R> {
+interface PassSection<R> {
   // Where the review's answers wait while the person is on Stripe's page; read back and deleted
   // on return.
   readonly keptReviewKey: string;
@@ -201,7 +201,7 @@ export interface PassSection<R> {
 
 // The reviews of a basket as the trip to Stripe keeps them: only the answers each was worked out
 // from, so the reviews are made again on return.
-export interface KeptBasket {
+interface KeptBasket {
   // The answers of every review kept, in order, the one on screen last.
   answers(): readonly FormEntries[];
   // Starts another review on an empty form, beside those already kept.
@@ -209,7 +209,7 @@ export interface KeptBasket {
 }
 
 // What a section brings to reading documents, whether or not its page sells the pass.
-export interface ReadingSection<F extends string, L extends string> {
+interface ReadingSection<F extends string, L extends string> {
   readonly extraction: ExtractionShape<F, L>;
   readonly reading: DocumentReading<F, L>;
   // The fragments that open the form itself rather than the start sheet.
@@ -217,7 +217,7 @@ export interface ReadingSection<F extends string, L extends string> {
 }
 
 // What a section brings to reading documents and to the pass.
-export interface DocumentsSection<R, F extends string, L extends string>
+interface DocumentsSection<R, F extends string, L extends string>
   extends PassSection<R>, ReadingSection<F, L> {}
 
 // For a page whose reads send no event, while the pass it shares with every page still does.
@@ -240,7 +240,7 @@ export const READS_UNMEASURED: Pick<
   qualityOverridden() {},
 };
 
-export interface DocumentsWiring<R, F extends string, L extends string> {
+interface DocumentsWiring<R, F extends string, L extends string> {
   readonly form: ReviewForm;
   readonly hooks: ReviewHooks<R>;
   // The address the visit arrived at, before the form rewrote its fragment.
@@ -418,7 +418,7 @@ const passStore = () =>
   );
 
 // What a section's page can ask of the documents once they are wired.
-export interface DocumentsHandle {
+interface DocumentsHandle {
   // Fills the form with what a read gave, marked as read, as a read just made does.
   fillRead(prefill: ReadPrefill): void;
   // Opens the start sheet again, to read more documents or type.

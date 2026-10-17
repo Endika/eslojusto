@@ -1,7 +1,7 @@
 import type { PvpcHourly } from '../electricity-official';
 
 // The table as the paid report reads it, with where its prices come from.
-export interface PvpcTable extends PvpcHourly {
+interface PvpcTable extends PvpcHourly {
   readonly source: string;
   readonly url: string;
 }

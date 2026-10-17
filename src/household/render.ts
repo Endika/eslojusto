@@ -390,7 +390,7 @@ const FOUND: ReadonlySet<FindingStatus> = new Set([
   'dismissal_regime_presumed',
 ]);
 
-export type Headline = 'found' | 'to_review' | 'nothing_found' | 'nothing_entered';
+type Headline = 'found' | 'to_review' | 'nothing_found' | 'nothing_entered';
 
 // The summary's first line follows the engine: a point that falls short of the norm is «found»;
 // a warning or a doubt is only to review.
@@ -405,7 +405,7 @@ function headline(review: HouseholdReview): Headline {
 
 // The warnings of the summary, each once: working time, holidays, the dismissal presumption and
 // the night notice.
-export type WarningCode = 'working_time' | 'holidays' | 'presumed' | 'night_notice';
+type WarningCode = 'working_time' | 'holidays' | 'presumed' | 'night_notice';
 
 function warningCodes(review: HouseholdReview): readonly WarningCode[] {
   const findings = review.items.flatMap(findingsOf);

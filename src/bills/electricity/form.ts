@@ -129,7 +129,7 @@ export const SHEET_FIELDS: Readonly<Record<Sheet, readonly ElectricityFormField[
 export const sheetOfField = (field: ElectricityFormField): Sheet =>
   SHEETS.find((s) => SHEET_FIELDS[s].includes(field)) ?? 'suministro';
 
-export type ElectricityFieldError = FieldError<ElectricityFormField>;
+type ElectricityFieldError = FieldError<ElectricityFormField>;
 
 // Where each of the engine's fields is asked; a list of lines is asked from its first question.
 const FIELD_OF: Readonly<Record<ElectricityField, ElectricityFormField>> = {
@@ -176,7 +176,7 @@ interface GateAnswers {
 // A day after every billing rule's start, for a bill whose issue date does not read yet.
 const ANY_ISSUE_DAY: CivilDate = { y: 9999, m: 12, d: 31 };
 
-export function gateOf(a: GateAnswers): ElectricityScope {
+function gateOf(a: GateAnswers): ElectricityScope {
   return electricityScope({
     postcode: a.postcode ?? '',
     accessTariff: a.accessTariff === 'other' ? 'other' : '2.0TD',

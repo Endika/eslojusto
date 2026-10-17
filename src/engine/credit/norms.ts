@@ -1,7 +1,7 @@
 import type { Norm as LawNorm, NormTable as LawNormTable } from '../law/norms';
 import type { SourceTable as LawSourceTable } from '../law/sources';
 
-export { normStanding, type NormStanding, type NormStatus } from '../law/norms';
+export { type NormStatus } from '../law/norms';
 
 // `dcc_2023` is a directive not yet transposed and `consumer_credit_bill` the bill that would
 // transpose it: drafts the engine never applies.

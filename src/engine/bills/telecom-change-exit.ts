@@ -16,7 +16,7 @@ import { RULES, type BillsRuleId } from './rules';
 import { commitmentDays } from './telecom-commitment';
 import type { TelecomInput } from './types';
 
-export interface ChangeExitDeps {
+interface ChangeExitDeps {
   readonly norms: NormTable;
   readonly sources: SourceTable;
 }

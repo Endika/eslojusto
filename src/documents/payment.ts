@@ -61,7 +61,7 @@ function reportedFailure(failures: readonly { code: ErrorCode; matches: boolean 
   );
 }
 
-export interface PaymentDeps {
+interface PaymentDeps {
   readonly api: PassApi;
   // A Turnstile widget with the action «checkout».
   readonly captcha: Captcha;

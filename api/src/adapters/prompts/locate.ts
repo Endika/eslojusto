@@ -3,7 +3,7 @@ import type { LocateReview } from '../../domain/locate';
 export const LOCATE_TOOL_NAME = 'report_useful_pages';
 
 // What each page can hold that the read needs, as the tool's labels.
-export const LOCATE_CONTENTS: Readonly<Record<LocateReview, readonly string[]>> = {
+const LOCATE_CONTENTS: Readonly<Record<LocateReview, readonly string[]>> = {
   mortgage: [
     'loan_terms',
     'interest',

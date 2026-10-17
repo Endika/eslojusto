@@ -26,7 +26,7 @@ import { electricityLabels } from './render';
 // the lowest of their figures. Nothing to look at, nothing charged short and nothing that rests on
 // a norm not yet settled ever reaches it.
 
-export interface CorrectionLine {
+interface CorrectionLine {
   readonly finding: BillFinding;
   // What the bill charges for the line, or the discount it gives; null when the answers do not
   // say it apart.
@@ -70,7 +70,7 @@ function billedOf(input: ElectricityBillInput, f: BillFinding): number | null {
   }
 }
 
-export function correctionLines({ input, review }: CompletedElectricityReview): CorrectionLine[] {
+function correctionLines({ input, review }: CompletedElectricityReview): CorrectionLine[] {
   return review.items.flatMap((item) => {
     const least = countedAmount(item);
     if (least <= 0) return [];

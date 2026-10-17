@@ -35,14 +35,14 @@ export type StatuteRuleId =
   | 'tae_caps';
 
 // Rules that rest on a court's criterion rather than on a norm.
-export type CriterionRuleId = 'usury_indicator_revolving' | 'usury_indicator_loan';
+type CriterionRuleId = 'usury_indicator_revolving' | 'usury_indicator_loan';
 
-export type CreditRuleId = StatuteRuleId | CriterionRuleId;
+type CreditRuleId = StatuteRuleId | CriterionRuleId;
 
-export type StatuteRule = LawRule<StatuteRuleId, CreditNormId> & RuleBase<CreditSourceId>;
+type StatuteRule = LawRule<StatuteRuleId, CreditNormId> & RuleBase<CreditSourceId>;
 
 // A criterion reaches contracts of any date; its source carries the day it was decided.
-export interface CriterionRule extends RuleBase<CreditSourceId> {
+interface CriterionRule extends RuleBase<CreditSourceId> {
   readonly id: CriterionRuleId;
   readonly norm: null;
   readonly source: CreditSourceId;
@@ -222,7 +222,7 @@ export function ruleSource(id: StatuteRuleId, norms: NormTable): NormSource<Norm
 export const criterionSource = (id: CriterionRuleId, sources: SourceTable): LawSource =>
   sources[CRITERION_RULES[id].source];
 
-export type ActiveRule = LawActiveRule<StatuteRuleId, CreditNormId, NormStatus>;
+type ActiveRule = LawActiveRule<StatuteRuleId, CreditNormId, NormStatus>;
 
 // The statute rules that govern a contract concluded on `date`.
 export function activeRules(date: CivilDate, norms: NormTable): readonly ActiveRule[] {

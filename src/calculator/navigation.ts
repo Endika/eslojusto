@@ -2,7 +2,7 @@ import type { CivilDate } from '../engine/date';
 import { indexOfHash, lastSheet, resultStep, stepAt, stepFrom, type Flow } from './flow';
 import { setUpTabs } from './tabs';
 
-export interface Screen {
+interface Screen {
   readonly root: HTMLElement;
   readonly form: HTMLFormElement;
   readonly result: HTMLElement;
@@ -14,12 +14,12 @@ export interface Screen {
   readonly reviewButton: HTMLButtonElement;
 }
 
-export interface ShowOptions {
+interface ShowOptions {
   readonly history?: 'push' | 'replace';
   readonly focus?: boolean;
 }
 
-export interface Navigation {
+interface Navigation {
   readonly current: number;
   // The furthest step the visitor may open.
   reached: number;

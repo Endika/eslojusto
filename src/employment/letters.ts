@@ -40,7 +40,7 @@ const CONTRACT_PAY: ReadonlySet<FindingId> = new Set([
 
 // The elements of art. 3.2 RD 723/2026 the contract lacks and the law requires, the agreement and
 // the category first, as the engine lists them.
-export interface MissingInformation {
+interface MissingInformation {
   readonly moment: InformationMoment;
   readonly elements: readonly InfoElement[];
 }
@@ -56,7 +56,7 @@ export function missingInformation(review: EmploymentReview): MissingInformation
 
 // The years the contract's pay is below the minimum wage in every reading, with the figures most
 // favourable to the pay, and only in a year whose minimum is published.
-export interface PayShortfall {
+interface PayShortfall {
   readonly finding: Finding;
   readonly years: readonly Extract<YearComparison, { kind: 'compared' }>[];
   // A «No lo sé» gives other readings with more: these figures are the lowest of them.
@@ -129,7 +129,7 @@ export const hasTemporalityFinding = ({ review, input }: CompletedEmploymentRevi
     return findings.length > 0 && findings.every((f) => isTemporality(f, input));
   });
 
-export interface EmploymentLetterKinds {
+interface EmploymentLetterKinds {
   // The letter to the company with figures or points to review, which the pass pays for.
   readonly paid: readonly LetterKind[];
   // The letters that only ask for information.

@@ -18,7 +18,7 @@ export interface Applied {
   readonly derived: boolean;
 }
 
-export interface Merged {
+interface Merged {
   // What to set: every row already in a list the read touches, so none is lost, and the new
   // values.
   readonly entries: FormEntries;

@@ -165,7 +165,7 @@ const DEFAULTS: RentalInput = {
 };
 
 // Where each item of a list in the input sits on screen, so an engine error lands on its row.
-export type RowsOnScreen = Readonly<Record<RowList, readonly (readonly number[])[]>>;
+type RowsOnScreen = Readonly<Record<RowList, readonly (readonly number[])[]>>;
 
 interface Reading {
   readonly partial: Partial<Mutable<RentalInput>>;

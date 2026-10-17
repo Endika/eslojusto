@@ -1,6 +1,6 @@
 import { LIMITS, type ErrorCode } from './contract';
 
-export interface Selected {
+interface Selected {
   readonly type: string;
   readonly size: number;
   readonly name?: string;
@@ -20,7 +20,7 @@ const isImage = (f: Selected) => f.type.startsWith('image/');
 
 export const MAX_PDF_BYTES = LIMITS.maxPdfBytes;
 
-export interface Admission<T> {
+interface Admission<T> {
   // Photos to add, and PDFs to open; a PDF then takes as many of the free places as its pages.
   readonly photos: readonly T[];
   readonly pdfs: readonly T[];
@@ -105,7 +105,7 @@ const ENCODING_LADDER = [
   { side: 1100, qualities: [0.65, 0.5, 0.4, 0.3] },
 ] as const;
 
-export interface EncodingStep {
+interface EncodingStep {
   readonly width: number;
   readonly height: number;
   readonly quality: number;

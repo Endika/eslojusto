@@ -1,7 +1,7 @@
 import type { HolidayCalendar } from '../law/calendar';
 import { normStanding, type BillsNormId, type NormStanding, type NormTable } from './norms';
 
-export type { HolidayCalendar, HolidayYear } from '../law/calendar';
+export type { HolidayCalendar } from '../law/calendar';
 
 // What the sources leave open about a row: an amount resting on it is never shown as certain.
 export type RowDoubt =

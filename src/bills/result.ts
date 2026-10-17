@@ -349,7 +349,7 @@ const OPEN: ReadonlySet<BillsStatus> = new Set([
   'pending_official_data',
 ]);
 
-export type SummaryKind = 'over' | 'open' | 'clear';
+type SummaryKind = 'over' | 'open' | 'clear';
 
 // What the lead says: euros over the norm, lines still to look at, or every line matching.
 export function summaryKind(items: readonly BillItem[], totals: BillTotals): SummaryKind {

@@ -28,9 +28,9 @@ import { ROW_MAX, rowField, type RowList } from './rows';
 // The questions beside which the contract's own words are shown, so the person can check the
 // answer against them.
 export const QUOTED = ['updateClause', 'hasFees', 'hasCharges'] as const;
-export type Quoted = (typeof QUOTED)[number];
+type Quoted = (typeof QUOTED)[number];
 
-export interface RentalPrefill extends ReadPrefill {
+interface RentalPrefill extends ReadPrefill {
   readonly quotes: Readonly<Partial<Record<Quoted, string>>>;
 }
 

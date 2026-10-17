@@ -56,8 +56,6 @@ export function ruleSource<RuleId extends string, NormId extends string, Status 
   };
 }
 
-export type RuleDoubt = 'pending_validation' | 'repealed_window' | 'conditional';
-
 // The doubts a table of norms with these statuses can open.
 export type RuleDoubtOf<Status extends NormStatus> =
   | (Status extends 'pending_validation' ? 'pending_validation' : never)

@@ -29,7 +29,7 @@ const TONE: Record<ItemId, string> = {
 
 const TAB_NUMBER: Record<string, string> = { cause: '01', salary: '03', holidays: '04' };
 
-export type VisibleStatus = Status | 'no_severance';
+type VisibleStatus = Status | 'no_severance';
 
 // A severance the law sets at zero, with no employer figure to compare, is not a finding.
 export function visibleStatus(r: ItemResult): VisibleStatus {
@@ -451,7 +451,7 @@ const COMPARED: ReadonlySet<VisibleStatus> = new Set([
   'deduction_within_max',
 ]);
 
-export type SummaryHeadline = 'shortfall' | 'all_match' | 'nothing_short' | 'no_figures';
+type SummaryHeadline = 'shortfall' | 'all_match' | 'nothing_short' | 'no_figures';
 
 export function summaryHeadline(r: Review): SummaryHeadline {
   const statuses = r.items.map(visibleStatus);
@@ -600,7 +600,7 @@ export interface Warning {
 const challengeable = (cause: Cause) => DISMISSALS.includes(cause) || cause === 'unknown';
 
 // One sentence of the late-payment warning: its key and the figure it carries, if any.
-export interface InterestLine {
+interface InterestLine {
   readonly key: ClientKey;
   readonly importe?: number;
   readonly dias?: number;

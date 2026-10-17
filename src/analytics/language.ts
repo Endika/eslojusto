@@ -43,7 +43,7 @@ function closeIcon(doc: Document): SVGSVGElement {
   return svg;
 }
 
-export interface OtherLanguage {
+interface OtherLanguage {
   readonly code: string;
   readonly name: string;
   readonly url: string;

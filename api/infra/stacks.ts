@@ -31,16 +31,16 @@ import { addDashboard, DASHBOARD_NAME } from './dashboard';
 // CloudFormation in eu-south-2 has no AWS::Budgets::* types; this stack holds only global
 // resources (IAM, Budgets), so the region it is deployed through stores nothing.
 export const GLOBAL_STACK_REGION = 'eu-west-1';
-export const MONTHLY_BUDGET_USD = 10;
-export const BUDGET_ALERT_PERCENTAGES = [50, 80, 100] as const;
+const MONTHLY_BUDGET_USD = 10;
+const BUDGET_ALERT_PERCENTAGES = [50, 80, 100] as const;
 // The repository signs its OIDC subject with immutable owner and repository ids (GitHub's
 // `use_immutable_subject`), so a renamed or recreated repository can never match.
-export const GITHUB_SUBJECT_PREFIX = 'repo:Endika@568585/eslojusto@1407967362';
-export const GITHUB_ENVIRONMENT = 'production';
-export const DEPLOY_ROLE_NAME = 'eslojusto-github-deploy';
-export const CFN_EXECUTION_POLICY_NAME = 'eslojusto-api-cfn-execution';
-export const DENY_BEDROCK_POLICY_NAME = 'eslojusto-api-deny-bedrock';
-export const BUDGET_NAME = 'eslojusto-api-monthly';
+const GITHUB_SUBJECT_PREFIX = 'repo:Endika@568585/eslojusto@1407967362';
+const GITHUB_ENVIRONMENT = 'production';
+const DEPLOY_ROLE_NAME = 'eslojusto-github-deploy';
+const CFN_EXECUTION_POLICY_NAME = 'eslojusto-api-cfn-execution';
+const DENY_BEDROCK_POLICY_NAME = 'eslojusto-api-deny-bedrock';
+const BUDGET_NAME = 'eslojusto-api-monthly';
 const CDK_QUALIFIER = 'hnb659fds';
 const EXTRACT_RESERVED_CONCURRENCY = 5;
 // Caps how hard checkout and pass can be hammered; each holds a Stripe call, never Bedrock.
@@ -68,7 +68,7 @@ const entry = (key: FunctionKey): string =>
   fileURLToPath(new URL(`../src/handlers/${key}.ts`, import.meta.url));
 const TSCONFIG = fileURLToPath(new URL('../tsconfig.json', import.meta.url));
 
-export interface ApiStackProps extends StackProps {
+interface ApiStackProps extends StackProps {
   readonly stripePriceId: string;
   // Off only while the account's concurrency quota is too low to reserve anything; the
   // account-wide limit then caps every function instead.
@@ -77,7 +77,7 @@ export interface ApiStackProps extends StackProps {
 
 // Everything regional, in eu-south-2. No IAM: the roles live in the global stack, so the CI
 // deployment can neither create roles nor widen their permissions.
-export class ApiStack extends Stack {
+class ApiStack extends Stack {
   constructor(scope: Construct, id: string, props: ApiStackProps) {
     super(scope, id, { ...props, env: { ...props.env, region: REGION } });
 
@@ -135,12 +135,12 @@ export class ApiStack extends Stack {
   }
 }
 
-export interface GlobalStackProps extends StackProps {
+interface GlobalStackProps extends StackProps {
   readonly alertEmail: string;
 }
 
 // IAM and Budgets: global services, deployed once by hand and reviewed, never by CI.
-export class GlobalStack extends Stack {
+class GlobalStack extends Stack {
   constructor(scope: Construct, id: string, props: GlobalStackProps) {
     super(scope, id, {
       ...props,
@@ -359,7 +359,7 @@ export class GlobalStack extends Stack {
   }
 }
 
-export interface AppConfig {
+interface AppConfig {
   readonly stripePriceId: string;
   // Budget emails; the hand-run deployment needs it to build the global stack.
   readonly alertEmail?: string;

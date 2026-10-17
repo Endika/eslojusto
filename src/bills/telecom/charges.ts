@@ -136,7 +136,7 @@ function periodText(l: ReadLine, tr: Translate): string | null {
   return null;
 }
 
-export const amountText = (l: Pick<ReadLine, 'kind' | 'amount'>): string =>
+const amountText = (l: Pick<ReadLine, 'kind' | 'amount'>): string =>
   l.kind === 'discount' && l.amount > 0
     ? `−${formatCalculationEuros(l.amount)}`
     : formatCalculationEuros(l.amount);

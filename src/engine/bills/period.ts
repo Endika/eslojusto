@@ -24,7 +24,7 @@ export function billingPeriod(bill: {
 
 // Consecutive days of one year that the same rows cover. More than one row means the value
 // depends on a norm not yet settled on those days.
-export interface Stretch<V> {
+interface Stretch<V> {
   readonly first: string;
   readonly last: string;
   readonly days: number;
@@ -32,7 +32,7 @@ export interface Stretch<V> {
   readonly rows: readonly TableRow<V>[];
 }
 
-export type Span<V> =
+type Span<V> =
   | {
       readonly kind: 'covered';
       readonly stretches: readonly Stretch<V>[];
@@ -75,13 +75,13 @@ export interface Range {
   readonly high: number;
 }
 
-export const addRanges = (a: Range, b: Range): Range => ({
+const addRanges = (a: Range, b: Range): Range => ({
   low: a.low + b.low,
   high: a.high + b.high,
 });
 
 // No norm says whether a leap year divides by 365 or 366: both are taken.
-export type YearBase = 365 | 'actual';
+type YearBase = 365 | 'actual';
 
 export function prorated<V>(
   stretches: readonly Stretch<V>[],
@@ -146,7 +146,7 @@ export function citeRows<V>(
 
 // Every row of `table` that may hold on one day, as a tax read on the day the bill falls due, and
 // the norms not yet settled that choose between them.
-export type DayRows<V> =
+type DayRows<V> =
   | {
       readonly kind: 'covered';
       readonly rows: readonly TableRow<V>[];
@@ -208,7 +208,7 @@ export function addOfficial(a: Official, b: Official): Official {
 }
 
 // The lowest and highest values the norms leave open, each with every year base it may use.
-export interface OfficialValues {
+interface OfficialValues {
   readonly low: readonly number[];
   readonly high: readonly number[];
 }

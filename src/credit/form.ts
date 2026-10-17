@@ -51,7 +51,7 @@ export type Sheet = (typeof SHEETS)[number];
 
 // What the first sheet offers: the three credits the review covers and two that stop at the door.
 export const PRODUCTS = ['personal_loan', 'car_loan', 'revolving', 'mortgage', 'lease'] as const;
-export type ProductAnswer = (typeof PRODUCTS)[number];
+type ProductAnswer = (typeof PRODUCTS)[number];
 export const PURPOSES = ['personal', 'business'] as const;
 export const RATE_TYPES = ['fixed', 'variable'] as const;
 export const CHARGE_PAYMENTS: readonly ChargePayment[] = ['deducted', 'financed', 'paid'];

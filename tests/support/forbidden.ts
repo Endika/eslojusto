@@ -81,7 +81,7 @@ const BILLS_FORBIDDEN = [
 
 // What each section adds, by where its copy lives: a source folder, a built page or a prefix of
 // its translation keys. What is forbidden in one section may be the law's own words in another.
-export const SECTION_FORBIDDEN: Readonly<Record<string, readonly RegExp[]>> = {
+const SECTION_FORBIDDEN: Readonly<Record<string, readonly RegExp[]>> = {
   'src/employment': EMPLOYMENT_FORBIDDEN,
   'dist/contrato/index.html': EMPLOYMENT_FORBIDDEN,
   'employment.': EMPLOYMENT_FORBIDDEN,
@@ -130,7 +130,7 @@ const sectionsOf = (where: string) =>
 // Whether any section adds its own words for the copy at `where`.
 export const hasSectionWords = (where: string): boolean => sectionsOf(where).length > 0;
 
-export const forbiddenFor = (where: string): readonly RegExp[] => [
+const forbiddenFor = (where: string): readonly RegExp[] => [
   ...FORBIDDEN,
   ...sectionsOf(where).flatMap((prefix) => SECTION_FORBIDDEN[prefix] ?? []),
 ];
@@ -145,7 +145,7 @@ const officialNames = OFFICIAL_NAMES.map((name) => name.toLowerCase());
 
 // The text the patterns read at `where`: lower case, one space between words, official names and
 // the page's own legal phrases taken out.
-export const plainCopy = (where: string, text: string): string =>
+const plainCopy = (where: string, text: string): string =>
   [
     ...officialNames,
     ...Object.entries(PAGE_PHRASES).flatMap(([prefix, phrases]) =>

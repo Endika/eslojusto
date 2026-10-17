@@ -14,9 +14,9 @@ import { PRICE_INDEXES, type TelecomFormField } from './form';
 
 // The questions beside which the contract's own words are shown, to check the answer against them.
 export const QUOTED = ['agreedPenalty', 'priceIndex'] as const;
-export type Quoted = (typeof QUOTED)[number];
+type Quoted = (typeof QUOTED)[number];
 
-export interface TelecomPrefill extends ReadPrefill {
+interface TelecomPrefill extends ReadPrefill {
   readonly quotes: Readonly<Partial<Record<Quoted, string>>>;
 }
 

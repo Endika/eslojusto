@@ -107,7 +107,7 @@ export const objective = review(
 
 // A contract for production circumstances lasts at most 6 months, or a year where a sectoral
 // agreement extends it (art. 15.2 ET); past that, the person may be permanent (art. 15.4 ET).
-export type FixedTermLimit = 'legal' | 'sector_agreement' | 'over';
+type FixedTermLimit = 'legal' | 'sector_agreement' | 'over';
 const fixedTermLimit = (months: number): FixedTermLimit =>
   months <= 6 ? 'legal' : months <= 12 ? 'sector_agreement' : 'over';
 
@@ -211,7 +211,7 @@ export const disciplinary = estimateBenefit(
 );
 
 // Which causes the engine treats as a legal unemployment situation.
-export const CAUSES: readonly Cause[] = [
+const CAUSES: readonly Cause[] = [
   'disciplinary_dismissal',
   'unfair_dismissal',
   'objective_dismissal',

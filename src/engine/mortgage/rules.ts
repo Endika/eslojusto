@@ -55,7 +55,7 @@ export type CaseLawRuleId =
 
 export type MortgageRuleId = StatuteRuleId | CaseLawRuleId;
 
-export type StatuteRule = LawRule<StatuteRuleId, MortgageNormId> &
+type StatuteRule = LawRule<StatuteRuleId, MortgageNormId> &
   RuleBase<MortgageSourceId> & { readonly basis: 'statute' };
 
 // A court's criterion: no norm of its own, the rulings it rests on, and the deeds it reaches by
@@ -68,7 +68,7 @@ export interface CaseLawRule extends RuleBase<MortgageSourceId> {
   readonly until: string | null;
 }
 
-export type MortgageRule = StatuteRule | CaseLawRule;
+type MortgageRule = StatuteRule | CaseLawRule;
 
 const LCCI = 'https://www.boe.es/buscar/act.php?id=BOE-A-2019-3814';
 const LCCI_SINCE = '2019-06-16';
@@ -374,7 +374,7 @@ export const criterionCounts = (rule: CaseLawRule, sources: SourceTable): boolea
 export const caseLawSources = (id: CaseLawRuleId, sources: SourceTable): readonly LawSource[] =>
   CASE_LAW_RULES[id].sources.map((s) => sources[s]);
 
-export interface ReadRulings {
+interface ReadRulings {
   readonly sources: readonly CaseLawSource[];
   // The oldest day any of them was last read: the state of the case law is given as of it.
   readonly asOf: string;
@@ -392,7 +392,7 @@ export function readRulings(id: CaseLawRuleId, sources: SourceTable): ReadRuling
   };
 }
 
-export type ActiveRule = LawActiveRule<StatuteRuleId, MortgageNormId>;
+type ActiveRule = LawActiveRule<StatuteRuleId, MortgageNormId>;
 
 // The statute rules that govern `date` (the deed's, or the operation's for the fee caps).
 export function activeRules(date: CivilDate, norms: NormTable): readonly ActiveRule[] {

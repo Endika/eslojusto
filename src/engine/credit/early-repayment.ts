@@ -14,7 +14,7 @@ const UP_TO_A_YEAR = 0.005;
 const A_YEAR = 12;
 const PERCENT = 100;
 
-export type RepaymentBase = 'principal_and_interest' | 'principal_only';
+type RepaymentBase = 'principal_and_interest' | 'principal_only';
 
 // Whether more than a year is left from the repayment to the agreed end. Exactly a year, date to
 // date, is not more than a year.

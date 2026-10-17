@@ -44,9 +44,9 @@ export const QUOTED = [
   'categorySalary',
   'hasSchedule',
 ] as const;
-export type Quoted = (typeof QUOTED)[number];
+type Quoted = (typeof QUOTED)[number];
 
-export interface EmploymentPrefill extends ReadPrefill {
+interface EmploymentPrefill extends ReadPrefill {
   readonly quotes: Readonly<Partial<Record<Quoted, string>>>;
 }
 

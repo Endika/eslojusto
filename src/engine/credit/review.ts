@@ -30,7 +30,7 @@ export const UNCHECKED: readonly UncheckedCode[] = [
   'new_law',
 ];
 
-export interface Total {
+interface Total {
   // What holds in every reading: the lowest one.
   readonly counted: number;
   // The most any reading gives, for «y hasta … si …».
@@ -61,7 +61,7 @@ export interface CreditReview {
   readonly unchecked: readonly UncheckedCode[];
 }
 
-export type CreditResult =
+type CreditResult =
   | { readonly ok: false; readonly errors: readonly ValidationError[] }
   | { readonly ok: true; readonly review: CreditReview };
 

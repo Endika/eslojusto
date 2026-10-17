@@ -47,9 +47,9 @@ const STATUS: Readonly<Record<ResultCode, number>> = {
   service_unavailable: 503,
 };
 
-export type Outcome = { readonly code: ResultCode } & Readonly<Record<string, unknown>>;
+type Outcome = { readonly code: ResultCode } & Readonly<Record<string, unknown>>;
 
-export interface Metrics {
+interface Metrics {
   pages?: number;
   inputTokens?: number;
   outputTokens?: number;

@@ -4,7 +4,7 @@ import { PASS_READS } from '../domain/allowance';
 import type { CheckoutCreator, PaymentVerifier, SessionSnapshot } from '../domain/ports';
 import type { CheckoutLang, CheckoutReview } from '../domain/reviews';
 
-export const READS_METADATA_KEY = 'reads_used';
+const READS_METADATA_KEY = 'reads_used';
 
 // Only this code writes the counter; anything else in it counts as a spent pass.
 export function readsUsed(metadata: Stripe.Metadata | null): number {

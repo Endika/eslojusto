@@ -16,20 +16,20 @@ import type { CompletedMortgageReview } from './ports';
 const day = (d: CivilDate): string => dayText(toIso(d));
 
 // A cost the law puts on the lender, or says is charged to nobody, that the person paid.
-export interface ExpenseLine {
+interface ExpenseLine {
   readonly item: ExpenseItem;
   readonly amount: number;
 }
 
 // A fee over its cap: the reading with the least over it, which every reading reaches, and whether
 // another reading gives more.
-export interface FeeLine {
+interface FeeLine {
   readonly finding: FeeFinding;
   readonly amount: number;
   readonly lowest: boolean;
 }
 
-export interface AmountLines {
+interface AmountLines {
   readonly expenses: readonly ExpenseLine[];
   readonly fees: readonly FeeLine[];
   // What the lender already gave back of the set-up costs, which of them unknown, and what is left
@@ -75,7 +75,7 @@ export function amountLines(r: CompletedMortgageReview): AmountLines {
 const hasAmounts = (lines: AmountLines): boolean =>
   lines.expenses.length > 0 || lines.fees.length > 0;
 
-export interface MortgageLetterKinds {
+interface MortgageLetterKinds {
   // The amounts letter, with figures, which the pass pays for.
   readonly paid: readonly LetterKind[];
   // The request for the mortgage's documents, which only asks for them.

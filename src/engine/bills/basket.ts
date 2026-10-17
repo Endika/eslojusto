@@ -34,7 +34,7 @@ export interface Basket {
   readonly offerPass: boolean;
 }
 
-export interface BasketDeps {
+interface BasketDeps {
   readonly passPrice: number;
 }
 

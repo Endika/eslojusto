@@ -13,6 +13,6 @@ export const MORTGAGE_FAQ_TOPICS = [
   ['pass', 'faq-hipoteca-pase'],
 ] as const;
 
-export type MortgageFaqId = (typeof MORTGAGE_FAQ_TOPICS)[number][0];
+type MortgageFaqId = (typeof MORTGAGE_FAQ_TOPICS)[number][0];
 
 export const MORTGAGE_DOCUMENT_TOPICS: readonly MortgageFaqId[] = ['documents', 'pass'];

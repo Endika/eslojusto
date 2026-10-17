@@ -8,8 +8,6 @@ import {
 import type { NormSource } from '../law/sources';
 import type { NormId, NormTable } from './norms';
 
-export type { RuleDoubt } from '../law/rules';
-
 export type RuleId =
   | 'fees_2019'
   | 'fees_2023'
@@ -48,7 +46,7 @@ export type RuleId =
   | 'deposit_lodging'
   | 'closing_document';
 
-export type Rule = LawRule<RuleId, NormId>;
+type Rule = LawRule<RuleId, NormId>;
 
 const LAU = 'https://www.boe.es/buscar/act.php?id=BOE-A-1994-26003';
 const LAU_2019 = `${LAU}&tn=1&p=20190305`;

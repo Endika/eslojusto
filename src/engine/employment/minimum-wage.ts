@@ -11,7 +11,6 @@ import {
 import type { Figure } from '../calculation';
 import {
   minimumWageFor,
-  type MinimumWageLookup as LawMinimumWageLookup,
   type MinimumWageRow as LawMinimumWageRow,
   type MinimumWageTable as LawMinimumWageTable,
 } from '../law/minimum-wage';
@@ -35,7 +34,6 @@ import {
 
 export type MinimumWageRow = LawMinimumWageRow<EmploymentNormId>;
 export type MinimumWageTable = LawMinimumWageTable<EmploymentNormId>;
-export type MinimumWageLookup = LawMinimumWageLookup<EmploymentNormId>;
 
 export { minimumWageFor };
 
@@ -74,7 +72,7 @@ type ComplementWorld = ReadingCode<'complement_kind'>;
 type HoursWorld = ReadingCode<'paid_hours'>;
 
 // One answer to each doubt about the pay.
-export interface PayWorld {
+interface PayWorld {
   readonly complement: ComplementWorld;
   readonly hours: HoursWorld;
 }
@@ -405,7 +403,7 @@ export function compareByYear(
   return years;
 }
 
-export type PayslipVerdict =
+type PayslipVerdict =
   | Exclude<ComparisonVerdict, 'salary_may_have_risen'>
   // Extra payments paid apart: arts. 3.1 and 3.2 of each decree compare the year, so the month is
   // only a guide.
@@ -421,7 +419,7 @@ export type PayslipVerdict =
   | 'not_published'
   | 'not_loaded';
 
-export interface PayslipComparison {
+interface PayslipComparison {
   // 'YYYY-MM'
   readonly month: string;
   readonly verdict: PayslipVerdict;

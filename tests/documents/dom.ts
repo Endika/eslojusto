@@ -101,7 +101,7 @@ export const OFFER = `
   <button data-pass-verify-retry hidden>Retry</button>
 </section>`;
 
-export type Recorded = [keyof DocumentEvents, ...unknown[]];
+type Recorded = [keyof DocumentEvents, ...unknown[]];
 
 export function recordingEvents(): DocumentEvents & { log: Recorded[] } {
   const log: Recorded[] = [];

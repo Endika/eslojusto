@@ -15,7 +15,7 @@ import { civilDayText as day } from './render';
 
 // The early repayment the letter asks to look at again: the reading with the least over a cap,
 // which every reading reaches, and whether there were others with more.
-export interface RepaymentLine {
+interface RepaymentLine {
   readonly finding: CreditFinding;
   readonly lowest: boolean;
 }
@@ -31,7 +31,7 @@ export function repaymentLine(review: CreditReview): RepaymentLine | null {
   return { finding, lowest: findings.length > 1 };
 }
 
-export interface CreditLetterKinds {
+interface CreditLetterKinds {
   // The early repayment letter, with figures, which the pass pays for.
   readonly paid: readonly LetterKind[];
   // The request for the credit's information, which only asks for it.

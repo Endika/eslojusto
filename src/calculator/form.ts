@@ -268,7 +268,7 @@ export function readSituations(form: HTMLFormElement): ProtectedSituation[] {
   return PROTECTED_SITUATIONS.filter((s) => data.get(situationField(s)) === 'yes');
 }
 
-export interface BenefitAnswers {
+interface BenefitAnswers {
   readonly children: Children;
   readonly others: OtherContracts;
 }

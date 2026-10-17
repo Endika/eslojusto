@@ -42,7 +42,7 @@ export type ChecklistItem<NormId extends string, MatterId extends string> =
   | ({ readonly kind: 'matter' } & WatchedMatter<MatterId>);
 
 // A monthly review, with a few days of slack so a review late in the month is not flagged early.
-export const REVIEW_INTERVAL_DAYS = 35;
+const REVIEW_INTERVAL_DAYS = 35;
 
 export function monthlyChecklist<NormId extends string, MatterId extends string>(
   today: CivilDate,

@@ -28,7 +28,7 @@ const PROSE =
 const prose = (length: number) => PROSE.repeat(Math.ceil(length / PROSE.length)).slice(0, length);
 const month = (i: number) => String((i % 12) + 1).padStart(2, '0');
 
-export const SYNTHETIC_SUPPLY_NUMBER = 'ES0000000000000000AA';
+const SYNTHETIC_SUPPLY_NUMBER = 'ES0000000000000000AA';
 
 const RARE = [
   'socialBonusCategory',

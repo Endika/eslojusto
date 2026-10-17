@@ -203,7 +203,7 @@ export function averageRateIndicator(
   );
 }
 
-export type CardPayoff =
+type CardPayoff =
   | { readonly kind: 'never'; readonly monthlyInterest: number }
   | {
       readonly kind: 'pays_off';

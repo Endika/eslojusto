@@ -3,7 +3,7 @@ import type { Page, Request } from '@playwright/test';
 
 const POSTHOG = 'https://eu.i.posthog.com';
 
-export interface Captured {
+interface Captured {
   event: string;
   properties: Record<string, unknown>;
 }

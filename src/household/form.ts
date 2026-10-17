@@ -29,14 +29,12 @@ export const SHEETS = [
 export type Sheet = (typeof SHEETS)[number];
 
 export const WORKS = ['hourly_external', 'monthly', 'live_in'] as const;
-export type Work = (typeof WORKS)[number];
 export const ENDINGS = [
   'working',
   'desistimiento',
   'et_cause',
   'unknown',
 ] as const satisfies readonly HouseholdEnding[];
-export type Ending = (typeof ENDINGS)[number];
 export const CAUSES: readonly DesistimientoCause[] = [
   'income_drop_or_expense_rise',
   'family_needs_change',

@@ -98,7 +98,7 @@ export const TOTAL_TOLERANCE = 0.02;
 
 const EPSILON = 1e-9;
 
-export interface Comparison {
+interface Comparison {
   readonly matches: boolean;
   // Billed less the nearest figure it is checked against, rounded to the cent.
   readonly difference: number;
@@ -207,7 +207,7 @@ export function acrossOfficial(
 }
 
 // The statuses whose euros reach what the person pays over.
-export const COUNTED: ReadonlySet<BillsStatus> = new Set([
+const COUNTED: ReadonlySet<BillsStatus> = new Set([
   'above_regulated_price',
   'wrong_rate_for_date',
   'different_base',

@@ -1,7 +1,7 @@
-import type { Norm as LawNorm, NormTable as LawNormTable } from '../law/norms';
+import type { NormTable as LawNormTable } from '../law/norms';
 import type { SourceTable as LawSourceTable } from '../law/sources';
 
-export { normStanding, type NormStanding, type NormStatus } from '../law/norms';
+export { type NormStatus } from '../law/norms';
 
 export type MortgageNormId =
   | 'lcci'
@@ -15,8 +15,6 @@ export type MortgageNormId =
   | 'lo1_2025'
   | 'law44_2002'
   | 'lcci_25bis';
-
-export type Norm = LawNorm<MortgageNormId>;
 
 export type NormTable = LawNormTable<MortgageNormId>;
 

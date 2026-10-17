@@ -70,10 +70,10 @@ export const RELATIONSHIP_HINTS = [
   'relief',
 ] as const;
 
-export const OVERTIME_AGREEMENTS = ['none', 'hours', 'as_needed', 'included'] as const;
-export const EMPLOYER_TYPES = ['person', 'company'] as const;
+const OVERTIME_AGREEMENTS = ['none', 'hours', 'as_needed', 'included'] as const;
+const EMPLOYER_TYPES = ['person', 'company'] as const;
 // ISO 3166-2:ES codes of the autonomous communities and cities.
-export const REGIONS = [
+const REGIONS = [
   'AN',
   'AR',
   'AS',
@@ -96,7 +96,7 @@ export const REGIONS = [
 ] as const;
 
 // What each earnings line of a payslip pays for; the sums by month are done in code.
-export const EMPLOYMENT_LINE_CATEGORIES = [
+const EMPLOYMENT_LINE_CATEGORIES = [
   'salary',
   'fixed_complement',
   'variable',
@@ -110,11 +110,11 @@ export const EMPLOYMENT_LINE_CATEGORIES = [
   'other',
 ] as const;
 
-export const MAX_CLAUSE_LITERAL = 600;
-export const MAX_CAUSE_TEXT = 600;
-export const MAX_SCHEDULE_TEXT = 400;
-export const MAX_MODALITY_TEXT = 120;
-export const MAX_AGREEMENT_NAME = 160;
+const MAX_CLAUSE_LITERAL = 600;
+const MAX_CAUSE_TEXT = 600;
+const MAX_SCHEDULE_TEXT = 400;
+const MAX_MODALITY_TEXT = 120;
+const MAX_AGREEMENT_NAME = 160;
 const MAX_SHORT_TEXT = 80;
 // A week has 168 hours; anything the contract prints up to that is kept for the checks to see.
 const MAX_WEEKLY_HOURS = 168;

@@ -1,5 +1,5 @@
 // An evaluation run spends real money on Bedrock: it starts only when told to, with a cap.
-export type EvalEnv =
+type EvalEnv =
   { readonly ok: true; readonly maxUsd: number } | { readonly ok: false; readonly message: string };
 
 export function parseEvalEnv(env: Readonly<Record<string, string | undefined>>): EvalEnv {

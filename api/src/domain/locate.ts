@@ -21,9 +21,9 @@ export const LOCATE_LIMITS = { maxImages: 80, maxImageLongSide: 1024 } as const;
 export const LOCATE_PROMPT_TOKENS = 1_500;
 // 80 square pages at 768 px come to 62,960 (A4 ones, 44,800); at this cap a Haiku call costs
 // 66,000 × 1.10 + 2,000 × 5.50 USD per million = 0.084 USD (api/README.md, «Cost»).
-export const MAX_LOCATE_INPUT_TOKENS = 66_000;
+const MAX_LOCATE_INPUT_TOKENS = 66_000;
 export const LOCATE_MAX_TOKENS = 2_000;
-export const LOCATE_DEADLINE_MS = 90_000;
+const LOCATE_DEADLINE_MS = 90_000;
 export interface LocateDeps {
   readonly locator: PageLocator;
   readonly captcha: CaptchaVerifier;
@@ -42,7 +42,7 @@ export interface LocateRequest {
   readonly maxPages: number;
 }
 
-export type LocateResponse =
+type LocateResponse =
   | {
       readonly code: 'ok';
       // Page numbers in what was sent, ascending: the most useful, up to maxPages.
@@ -50,7 +50,7 @@ export type LocateResponse =
     }
   | { readonly code: ErrorCode };
 
-export interface LocateMetrics {
+interface LocateMetrics {
   pages?: number;
   inputTokens?: number;
   outputTokens?: number;

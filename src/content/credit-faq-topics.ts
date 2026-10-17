@@ -11,5 +11,3 @@ export const CREDIT_FAQ_TOPICS = [
   ['new_law', 'faq-credito-ley-nueva'],
   ['data', 'faq-credito-datos'],
 ] as const;
-
-export type CreditFaqId = (typeof CREDIT_FAQ_TOPICS)[number][0];

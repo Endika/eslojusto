@@ -31,7 +31,7 @@ export const TELECOM_READABILITY = [
 ] as const;
 
 const MAX_NAME = 80;
-export const MAX_TELECOM_CLAUSE_TEXT = 600;
+const MAX_TELECOM_CLAUSE_TEXT = 600;
 export const MAX_TELECOM_BILLS = 12;
 export const MAX_TELECOM_LINES = 60;
 // Five years: well past the 24 months the law allows, so a longer term is still read.
@@ -154,9 +154,9 @@ export const TELECOM_SECTIONS = {
 
 export type TelecomSectionKind = keyof typeof TELECOM_SECTIONS;
 
-export const TELECOM_READABILITY_DESCRIPTION =
+const TELECOM_READABILITY_DESCRIPTION =
   'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_telecom_document (not about a phone, mobile or internet service), foreign_jurisdiction (a service contracted outside Spain; never because of its language), unknown_format (about such a service, but no kind of document you know).';
-export const TELECOM_PAGE_KIND_DESCRIPTION =
+const TELECOM_PAGE_KIND_DESCRIPTION =
   'telecom_bill: a phone, mobile or internet bill, any of its pages. telecom_contract: the contract of such a service, its conditions or its commitment. other: anything else, such as an electricity bill, a handset receipt or an ID card.';
 
 export const TELECOM_SCHEMA: ReviewSchema = {

@@ -33,7 +33,7 @@ export interface BillRead extends ReadPrefill {
   readonly to: string | null;
 }
 
-export interface ElectricityRead {
+interface ElectricityRead {
   // Oldest first, by their last reading.
   readonly bills: readonly BillRead[];
   // What the summary says about the whole read.

@@ -23,7 +23,7 @@ import {
 } from '../engine/mortgage/validate';
 import type { MortgageFormField } from './ports';
 
-export { MORTGAGE_FIELDS, type MortgageFormField } from './ports';
+export { type MortgageFormField } from './ports';
 
 // The sheets in order. Step ids are also the URL fragments, so they keep their Spanish names.
 export const SHEETS = [
@@ -431,7 +431,7 @@ export function sheetErrors(form: HTMLFormElement, sheet: Sheet, today: CivilDat
   return [...own, ...fromEngine];
 }
 
-export interface MortgageForm {
+interface MortgageForm {
   readonly input: MortgageInput;
   readonly invoiceFields: readonly MortgageFormField[];
 }

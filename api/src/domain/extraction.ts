@@ -425,7 +425,7 @@ function sumOf(rows: readonly ExtractedRow[]): ExtractedField | null {
 }
 
 // The liquidation items of the final payslip, by the category of the lines that make them up.
-export const FINAL_PAYSLIP_ITEMS: Readonly<Partial<Record<LineCategory, string>>> = {
+const FINAL_PAYSLIP_ITEMS: Readonly<Partial<Record<LineCategory, string>>> = {
   salary: 'pending_salary',
   notice_compensation: 'employer_notice',
   severance: 'severance',

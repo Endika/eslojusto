@@ -9,12 +9,7 @@ export const LOAN_CHARGE_KINDS = ['opening', 'study', 'management', 'other'] as 
 export const LOAN_CHARGE_PAYMENTS = ['deducted', 'financed', 'paid'] as const;
 export const LOAN_RATE_TYPES = ['fixed', 'variable'] as const;
 export const INTERMEDIARY_TYPES = ['person', 'company'] as const;
-export const CARD_PAYMENT_MODES = [
-  'fixed_amount',
-  'percent_of_balance',
-  'full_balance',
-  'other',
-] as const;
+const CARD_PAYMENT_MODES = ['fixed_amount', 'percent_of_balance', 'full_balance', 'other'] as const;
 
 export const CREDIT_READABILITY = [
   'ok',
@@ -28,9 +23,9 @@ export const CREDIT_READABILITY = [
 ] as const;
 
 const MAX_NAME = 80;
-export const MAX_CREDIT_CLAUSE_TEXT = 600;
+const MAX_CREDIT_CLAUSE_TEXT = 600;
 // Fifty years of monthly instalments, the site's own limit.
-export const MAX_INSTALMENTS = 600;
+const MAX_INSTALMENTS = 600;
 // Eight years of monthly rows, which a schedule fits in two to four pages; a longer one keeps its
 // first rows and the read says it was cut. More would not fit in max_tokens beside the other lists.
 export const MAX_SCHEDULE_ROWS = 96;
@@ -285,9 +280,9 @@ export const CREDIT_SECTIONS = {
 
 export type CreditSectionKind = keyof typeof CREDIT_SECTIONS;
 
-export const CREDIT_READABILITY_DESCRIPTION =
+const CREDIT_READABILITY_DESCRIPTION =
   'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_credit_document (not about a consumer credit), foreign_jurisdiction (a credit under the law of another country; never because of its language), unknown_format (about a consumer credit, but no kind of document you know).';
-export const CREDIT_PAGE_KIND_DESCRIPTION =
+const CREDIT_PAGE_KIND_DESCRIPTION =
   'credit_agreement: a consumer credit contract (préstamo personal, financiación de un coche, compra a plazos) or its conditions. credit_precontract_info: the Información Normalizada Europea (INE, SECCI) given before it. amortization_schedule: a repayment schedule (cuadro de amortización). early_repayment_statement: a statement of an early repayment (liquidación de amortización o cancelación anticipada). revolving_agreement: the contract of a revolving card or credit line. card_statement: a monthly statement (extracto) of such a card. other: anything else, such as an ID card, a mortgage or a payslip.';
 
 export const CREDIT_SCHEMA: ReviewSchema = {

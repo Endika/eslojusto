@@ -23,7 +23,7 @@ export interface DataSeries {
   readonly values: readonly SeriesValue[];
 }
 
-export type SeriesRate =
+type SeriesRate =
   | { readonly kind: 'ok'; readonly month: string; readonly value: number }
   // After the last month the file held.
   | { readonly kind: 'not_published' }

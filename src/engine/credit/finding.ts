@@ -55,7 +55,7 @@ export type DoubtReading =
 
 export type CreditItem = Across<DoubtQuestion, DoubtReading, CreditFinding>;
 
-export interface FindingExtras {
+interface FindingExtras {
   readonly amount?: number | null;
   readonly detail?: AprDetail | null;
   readonly deadline?: { readonly lastDay: CivilDate; readonly today: CivilDate } | null;

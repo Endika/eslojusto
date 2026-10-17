@@ -32,14 +32,14 @@ export interface ReportedReview {
 }
 
 // What a year of bills adds up to, and the estimate that stands apart from it.
-export interface ReportedYear {
+interface ReportedYear {
   readonly totals: BillTotals;
   // The items that come back bill after bill, by name.
   readonly recurring: readonly string[];
   readonly yearlyEstimate: number | null;
 }
 
-export interface BillsReport {
+interface BillsReport {
   readonly title: ClientKey;
   readonly intro: ClientKey;
   readonly reviews: readonly ReportedReview[];

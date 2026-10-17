@@ -5,8 +5,6 @@ import type {
   NormTable as LawNormTable,
 } from '../law/norms';
 
-export { normStanding, type NormStanding, type EnactedStatus as NormStatus } from '../law/norms';
-
 export type HouseholdNormId =
   | 'rd1620_2011'
   | 'rdl16_2022'

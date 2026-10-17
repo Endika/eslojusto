@@ -40,7 +40,7 @@ export function parseRowField(
     : null;
 }
 
-export interface Rows {
+interface Rows {
   // Back to the list's first rows, as on arrival.
   reset(): void;
   // Exactly `n` rows (never fewer than the list's minimum), so values can be set by their names.

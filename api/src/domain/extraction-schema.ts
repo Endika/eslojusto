@@ -133,7 +133,7 @@ const flag = (description: string): FieldSpec => ({ type: { type: 'boolean' }, d
 
 export const MAX_MONEY = 1_000_000;
 // A CUPS is 20 to 22 characters; a bill may print it in groups.
-export const MAX_SUPPLY_NUMBER_LENGTH = 32;
+const MAX_SUPPLY_NUMBER_LENGTH = 32;
 export const MAX_DAYS = 366;
 
 // What each earnings line of a payslip pays for. Only `salary` lines make up the salary of the
@@ -149,7 +149,7 @@ export const LINE_CATEGORIES = [
 ] as const;
 export type LineCategory = (typeof LINE_CATEGORIES)[number];
 
-export const MAX_CONCEPT_LENGTH = 80;
+const MAX_CONCEPT_LENGTH = 80;
 
 const payslipLines: ListSpec = {
   description:
@@ -343,7 +343,7 @@ export type SectionKind =
   | TelecomSectionKind;
 export const SECTION_KINDS = Object.keys(SECTIONS) as readonly FinalPaySectionKind[];
 
-export const PAGES_DESCRIPTION =
+const PAGES_DESCRIPTION =
   'One entry per attached page, in order: its kind, the number of its document and its readability.';
 
 // Why a page can't be used, or `ok`. Its language is never a reason.
@@ -373,7 +373,7 @@ export const READABILITY = [
 )[];
 // Every reason the reviews before the bills can give: the credit, the insurance and the mortgage
 // review's too.
-export const SITE_READABILITY = [
+const SITE_READABILITY = [
   ...READABILITY,
   'not_credit_document',
   'not_insurance_document',
@@ -399,7 +399,7 @@ export type Readability = (typeof ALL_READABILITY)[number];
 
 export const READABILITY_DESCRIPTION =
   'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_labour_document (not about a job), foreign_jurisdiction (an employment document from another country, where Spanish law does not apply; never because of its language), unknown_format (about a job, but no kind of document you know).';
-export const PAGE_KIND_DESCRIPTION =
+const PAGE_KIND_DESCRIPTION =
   'settlement_proposal: a settlement proposal or notification (propuesta o notificación de finiquito, «liquidación, saldo y finiquito»), listing the liquidation concepts (salario del mes, vacaciones, partes proporcionales, indemnización, preaviso), with or without amounts, and a total, often net. payslip: a nómina with the earnings and deductions of a pay period, the final liquidation payslip included. dismissal_letter: a dismissal letter or termination notice (carta de despido). company_certificate: the company certificate for the public employment service (certificado de empresa): a Ministerio de Trabajo or SEPE header and a table of «bases de cotización de los últimos 180 días»; never a payslip, despite its monthly amounts. settlement_agreement: an agreement or conciliation record (acuerdo, acta de conciliación). work_history: the Social Security work history (vida laboral). other: anything else, such as a tax withholding certificate (certificado de retenciones del IRPF).';
 
 const FINAL_PAY_MONTH_DESCRIPTION =

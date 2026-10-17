@@ -50,7 +50,7 @@ function isPendingCheckout(v: unknown): v is PendingCheckout {
   );
 }
 
-export interface PassClaims {
+interface PassClaims {
   readonly sessionId: string;
   readonly expiresAt: number;
 }
@@ -89,7 +89,7 @@ function quotaDay(token: string): string | null {
   return typ === 'quota' && typeof day === 'string' ? day : null;
 }
 
-export type PassState = 'none' | 'valid' | 'exhausted' | 'expired';
+type PassState = 'none' | 'valid' | 'exhausted' | 'expired';
 
 export function passState(stored: StoredPass | null, nowMs: number): PassState {
   if (!stored) return 'none';

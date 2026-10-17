@@ -9,8 +9,6 @@ import type { NormSource } from '../law/sources';
 import { ET } from '../sources';
 import type { EmploymentNormId, NormTable } from './norms';
 
-export type { RuleDoubt } from '../law/rules';
-
 export type EmploymentRuleId =
   | 'smi_annual'
   | 'smi_prorata'
@@ -83,7 +81,7 @@ export type EmploymentRuleId =
   | 'late_payment_interest'
   | 'limitation';
 
-export type Rule = LawRule<EmploymentRuleId, EmploymentNormId>;
+type Rule = LawRule<EmploymentRuleId, EmploymentNormId>;
 
 const ET_SINCE = '2015-11-13';
 const REFORM_SINCE = '2022-03-30';
@@ -125,7 +123,7 @@ const ET_WORDING = {
   a59: ET_SINCE,
   a82: ET_SINCE,
 } as const;
-export type EtArticle = keyof typeof ET_WORDING;
+type EtArticle = keyof typeof ET_WORDING;
 
 const etRule = (id: EmploymentRuleId, article: string, anchor: EtArticle, from: string): Rule => ({
   ...rule(id, 'et', `Estatuto de los Trabajadores, art. ${article}`, `${ET}#${anchor}`, from),
@@ -319,7 +317,7 @@ export function ruleSource(id: EmploymentRuleId, norms: NormTable): NormSource {
   return lawRuleSource(RULES, id, norms);
 }
 
-export type ActiveRule = LawActiveRule<EmploymentRuleId, EmploymentNormId>;
+type ActiveRule = LawActiveRule<EmploymentRuleId, EmploymentNormId>;
 
 export function activeRules(date: CivilDate, norms: NormTable): readonly ActiveRule[] {
   return lawActiveRules(RULES, date, norms);

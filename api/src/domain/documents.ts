@@ -77,7 +77,7 @@ export const ELECTRICITY_PAGE_KINDS = [
 // A phone or internet review's documents; an electricity bill is `other`.
 export const TELECOM_PAGE_KINDS = ['telecom_bill', 'telecom_contract', 'other'] as const;
 // Every kind the final pay, the rental and the employment review can give a page.
-export const PAGE_KINDS = [
+const PAGE_KINDS = [
   'settlement_proposal',
   'payslip',
   'dismissal_letter',
@@ -99,7 +99,7 @@ export const PAGE_KINDS = [
 )[];
 // Every kind the reviews before the bills can give a page: the credit, the insurance and the
 // mortgage review's too.
-export const SITE_PAGE_KINDS = [
+const SITE_PAGE_KINDS = [
   ...PAGE_KINDS,
   'credit_agreement',
   'credit_precontract_info',
