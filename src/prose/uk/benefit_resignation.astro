@@ -1,0 +1,96 @@
+---
+// source: 47084c570826
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitAfterDismissal, benefitAfterResignation } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const dismissal = benefitAfterDismissal;
+if (dismissal.entitled !== 'yes' || dismissal.figures === null)
+  throw new Error('Incomplete example');
+const resignationGivesBenefit = benefitAfterResignation.entitled === 'yes';
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-regla">
+    Правило: звільнення з власного рішення не дає права на допомогу по безробіттю
+  </h3>
+  <p>
+    Щоб отримувати допомогу по безробіттю (paro), договір має завершитися так, щоб ви набули
+    законного статусу безробітного (situación legal de desempleo). Добровільне припинення роботи
+    таким не є (art. 267.2.a LGSS), тож звільнення за власним бажанням (baja voluntaria), як
+    правило, не дає права на допомогу по безробіттю, навіть якщо у вас є потрібні дні сплачених
+    внесків.
+  </p>
+  <p class="folio">
+    Art. <span>267.2.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-excepciones">Коли звільнення з власного рішення все ж дає право на допомогу</h3>
+  <p>
+    Закон вважає законним статусом безробітного звільнення з вашого рішення в таких випадках (art.
+    267.1.a.5.º LGSS):
+  </p>
+  <ul>
+    <li>Переведення на інше робоче місце, яке вимагає зміни місця проживання (art. 40 ET).</li>
+    <li>Істотна зміна ваших умов праці, яка вам шкодить (art. 41.3 ET).</li>
+    <li>
+      Серйозне порушення з боку роботодавця, як-от коли вам знову й знову не платять або платять
+      невчасно (art. 50 ET). Таке звільнення зазвичай визнає суд.
+    </li>
+    <li>Гендерне насильство (violencia de género) або сексуальне насильство (art. 49.1.m ET).</li>
+  </ul>
+  <p class="folio">
+    Art. <span>267.1.a.5.º</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-nuevo">Якщо потім ви почнете іншу роботу</h3>
+  <p>
+    Враховується те, як закінчується ваш останній договір. Якщо нова робота закінчується звільненням
+    або закінченням строкового договору, таке припинення роботи є законним статусом безробітного
+    (art. 267.1.a LGSS).
+  </p>
+  <p>
+    Один випадок закон регулює окремо: якщо нова компанія припиняє договір під час випробувального
+    строку, це є законним статусом безробітного, лише якщо від вашого звільнення за власним бажанням
+    минуло три місяці (art. 267.1.a.7.º LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>267.1.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-ejemplo">Приклад: той самий договір, два варіанти завершення</h3>
+  <p>
+    Особа із зарплатою 1.500&nbsp;€ брутто на місяць і двома додатковими виплатами по 1.500&nbsp;€
+    працює з 1 вересня 2023 р. до 31 серпня 2026 р., без дітей на утриманні.
+  </p>
+  <p class="example">
+    <span class="example__label">Якщо вона звільняється за власним бажанням</span>{' '}
+    {resignationGivesBenefit
+      ? 'Калькулятор оцінює допомогу по безробіттю.'
+      : 'Калькулятор відповідає, що це не дає права на допомогу по безробіттю (art. 267.2.a LGSS).'}{' '}
+    Остаточний розрахунок їй однаково належить: невиплачена зарплата, відпустка і додаткові виплати.
+  </p>
+  <p class="example">
+    <span class="example__label">Якщо її звільняють</span> За {integer(dismissal.contractDays)} дн.
+    сплачених внесків їй належить щонайменше {integer(dismissal.duration.days)} дн. допомоги,
+    близько {wholeEuros(dismissal.figures.firstStretch.min)} на місяць перші 6 місяців і близько{' '}
+    {wholeEuros(dismissal.figures.secondStretch.min)} далі, брутто.
+  </p>
+  <p>
+    Калькулятор на цій сторінці відкривається з уже позначеним звільненням за власним бажанням. Якщо
+    ваша ситуація інша, змініть підставу на першій картці. Більше про остаточний розрахунок:{' '}
+    <CaseLink lang={lang} id="resignation" />.
+  </p>
+</section>

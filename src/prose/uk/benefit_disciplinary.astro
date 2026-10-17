@@ -1,0 +1,89 @@
+---
+// source: 5b2dfc6de32e
+import CaseLink from '../../components/CaseLink.astro';
+import { disciplinary, entitledByCause } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import { t } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+if (disciplinary.entitled !== 'yes' || disciplinary.figures === null)
+  throw new Error('Incomplete example');
+const { figures } = disciplinary;
+// The reasons are the calculator's own: the same sentence and article it shows in the result.
+const causes = entitledByCause.map(({ cause, entitled }) => ({
+  name: t(lang, `cause.${cause}`),
+  entitled,
+  reason: t(lang, `client.unemployment.reason.${cause}`),
+}));
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-si">Так, дає право на допомогу по безробіттю, навіть якщо воно обґрунтоване</h3>
+  <p>
+    Це поширене запитання, і відповідь є в законі: звільнення є законним статусом безробітного
+    (situación legal de desempleo) (art. 267.1.a.3.º LGSS), а щоб отримувати допомогу по безробіттю
+    (paro), оскаржувати його не потрібно (art. 268.4 LGSS). Не має значення, що звільнення
+    дисциплінарне і що його визнано обґрунтованим (procedente).
+  </p>
+  <p>
+    Потрібне те саме, що й завжди: 360 днів сплачених внесків за останні 6 років, реєстрація як
+    шукача роботи (demandante de empleo) і підписання угоди про активність (acuerdo de actividad),
+    серед інших вимог (art. 266 LGSS).
+  </p>
+  <p class="folio">
+    Arts. <span>267 · 268.4</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ceses">Яке припинення роботи дає право на допомогу по безробіттю</h3>
+  <div class="causes">
+    {causes.map(({ name, entitled, reason }) => (
+      <div>
+        <h4>{name}</h4>
+        <p>
+          <strong>
+            {entitled === 'yes'
+              ? 'Дає право на допомогу по безробіттю.'
+              : 'Не дає права на допомогу по безробіттю, крім винятків.'}
+          </strong>{' '}
+          {reason}
+        </p>
+      </div>
+    ))}
+  </div>
+  <p>
+    Винятки для звільнення за власним бажанням, як-от переведення в інше місце чи серйозні невиплати
+    зарплати, описано тут: <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ejemplo">Розібраний приклад</h3>
+  <p>
+    Особа із зарплатою 1.500&nbsp;€ брутто на місяць і двома додатковими виплатами по 1.500&nbsp;€
+    працює з 1 червня 2022 р. до 30 вересня 2026 р., без дітей на утриманні, і роботодавець звільняє
+    її з дисциплінарних причин.
+  </p>
+  <p class="example">
+    <span class="example__label">Її допомога по безробіттю</span> За{' '}
+    {integer(disciplinary.contractDays)} дн. сплачених внесків їй належить щонайменше{' '}
+    {integer(disciplinary.duration.days)} дн. допомоги
+    {` (${integer(disciplinary.duration.days / 30)} міс.)`}: близько{' '}
+    {wholeEuros(figures.firstStretch.min)} на місяць перші 6 місяців і близько{' '}
+    {wholeEuros(figures.secondStretch.min)} далі, брутто. «Щонайменше», бо інша робота за останні 6
+    років може додати дні.
+  </p>
+  <p>
+    Якби звільнення визнали необґрунтованим (improcedente), була б ще й вихідна допомога
+    (indemnización): про це тут — <CaseLink lang={lang} id="unfair_dismissal" />.
+  </p>
+</section>

@@ -1,0 +1,106 @@
+---
+// source: 6ba110cf70a7
+import CaseLink from '../../components/CaseLink.astro';
+import { severanceMonths, unfairAfter2012, unfairBefore2012 } from '../../content/examples';
+import { euros, integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const [months = 0] = severanceMonths(unfairAfter2012.calculation);
+const [first = 0, second = 0] = severanceMonths(unfairBefore2012.calculation);
+const decimal = (n: number) => String(n).replace('.', ',');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="di-tramos">33 дні за рік, не більше 720</h3>
+  <p>
+    Якщо звільнення визнано роботодавцем або судом необґрунтованим (improcedente), вихідна допомога
+    (indemnización) становить 33 дні зарплати за кожен відпрацьований рік, не більше 24 місячних
+    зарплат, тобто 720 днів (art. 56.1 ET). Час рахується в місяцях, і неповний місяць зараховується
+    як повний: 33 дні за рік — це 2,75 дня за місяць.
+  </p>
+  <p>
+    Зарплата за день — це ваша річна зарплата разом із додатковими виплатами (pagas extra), поділена
+    на 365, як у посібнику CGPJ. Калькулятор показує суму з точністю до цента і порівнює її з сумою
+    вашого роботодавця.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-2012">Якщо ви почали працювати до 12 лютого 2012 р.</h3>
+  <p>Вихідна допомога розраховується за двома періодами (перехідне положення 11.ª ET):</p>
+  <ul>
+    <li>До 11 лютого 2012 р. — 45 днів за рік (3,75 за місяць).</li>
+    <li>З 12 лютого 2012 р. — 33 дні за рік (2,75 за місяць).</li>
+  </ul>
+  <p>
+    Загальна сума обмежена 720 днями, якщо тільки перший період уже не перевищує цієї межі. У такому
+    разі враховується лише перший період, не більше 42 місячних зарплат (1.260 днів).
+  </p>
+  <p class="folio">
+    Перехідне положення <span>11.ª</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-ejemplo">Розібрані приклади</h3>
+  <p>
+    Особа із зарплатою 1.500&nbsp;€ брутто на місяць і двома додатковими виплатами по 1.500&nbsp;€,
+    тобто 21.000&nbsp;€ на рік. Її денна зарплата: 21.000&nbsp;€ / 365 ={' '}
+    {euros(unfairAfter2012.dailySalary)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Договір 2018 року</span> З 3 травня 2018 р. до 20 липня 2026 р.
+    враховується місяців: {integer(months)}. {integer(months)} × 2,75 ={' '}
+    {decimal(unfairAfter2012.salaryDays)} дн. 21.000&nbsp;€ × {decimal(unfairAfter2012.salaryDays)}{' '}
+    / 365 = {euros(unfairAfter2012.amount)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Договір 2010 року</span> З 1 березня 2010 р. до 15 вересня 2026 р.
+    Перший період: {integer(first)} міс. × 3,75 = {decimal(first * 3.75)} дн. Другий період:{' '}
+    {integer(second)} міс. × 2,75 = {decimal(second * 2.75)} дн. Разом:{' '}
+    {integer(unfairBefore2012.salaryDays)} дн., у межах ліміту. 21.000&nbsp;€ ×{' '}
+    {integer(unfairBefore2012.salaryDays)} / 365 = {euros(unfairBefore2012.amount)}.
+  </p>
+  <p>
+    Вихідна допомога виплачується окремо від остаточного розрахунку (finiquito), який включає
+    зарплату за останній місяць, невикористану відпустку і нараховані додаткові виплати. Калькулятор
+    перевіряє все разом.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-readmision">Поновлення на роботі або вихідна допомога</h3>
+  <p>
+    Коли звільнення визнано необґрунтованим, роботодавець протягом п’яти днів обирає між тим, щоб
+    поновити вас на роботі, і тим, щоб виплатити вам вихідну допомогу (art. 56.1 ET). Якщо вас
+    поновлюють, вам також належить зарплата за час розгляду справи (salarios de tramitación), тобто
+    те, чого ви не отримали від дня звільнення (art. 56.2 ET). Якщо ви є представником працівників
+    або профспілковим делегатом, вибір за вами (art. 56.4 ET).
+  </p>
+  <p>
+    Ця перевірка не розраховує зарплату за час розгляду справи і не вирішує, чи є звільнення
+    необґрунтованим: це визнає суд або сам роботодавець.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-otros">Інші види звільнення</h3>
+  <p>
+    При звільненні з об’єктивних причин виплачують 20 днів за рік і надають 15 днів попередження:
+    про це тут — <CaseLink lang={lang} id="objective_dismissal" />. Будь-яке звільнення, зокрема
+    дисциплінарне, є законним статусом безробітного: на сторінці{' '}
+    <CaseLink lang={lang} id="benefit_disciplinary" /> пояснено, яке припинення роботи дає право на
+    допомогу по безробіттю.
+  </p>
+</section>

@@ -1,0 +1,145 @@
+---
+// source: 5665f4065cc1
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitBySalary } from '../../content/examples';
+import { euros, wholeEuros } from '../../content/format';
+import { BENEFIT_2026 } from '../../engine/unemployment';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const { minCap, maxCap } = BENEFIT_2026;
+const [, mid, high] = benefitBySalary;
+if (!mid || !high) throw new Error('Incomplete example');
+type Row = (typeof benefitBySalary)[number];
+const stretch = (b: Row, n: 0 | 1 | 2) => b.children[n] ?? { c1: 0, c2: 0 };
+// One row per figure, one column per salary, so the table fits a phone.
+const rows: readonly (readonly [string, (b: Row) => number])[] = [
+  ['База розрахунку (base reguladora)', (b) => b.base],
+  ['Перші 180 днів, без дітей', (b) => stretch(b, 0).c1],
+  ['Перші 180 днів, з однією дитиною', (b) => stretch(b, 1).c1],
+  ['Перші 180 днів, з двома чи більше', (b) => stretch(b, 2).c1],
+  ['З 181-го дня, без дітей', (b) => stretch(b, 0).c2],
+];
+---
+
+<section class="sheet sheet--text">
+  <h3 id="p-cuanto">70&nbsp;%, а потім 60&nbsp;%</h3>
+  <p>
+    Допомога по безробіттю (paro), тобто страхова допомога (prestación contributiva) у разі
+    безробіття, розраховується від вашої бази розрахунку (base reguladora): середнього значення
+    внесків на випадок безробіття за останні 180 днів, без понаднормових годин (art. 270.1 LGSS).
+    Перші 180 днів виплачується 70&nbsp;% цієї бази, а з 181-го дня — 60&nbsp;% (art. 270.2 LGSS).
+  </p>
+  <p>
+    Для кожного місяця є мінімум і максимум залежно від того, скільки дітей у вас на утриманні (art.
+    270.3 LGSS). У 2026 році, при IPREM {wholeEuros(BENEFIT_2026.monthlyIprem)}, вони такі:
+  </p>
+  <ul>
+    <li>
+      Без дітей на утриманні — від {wholeEuros(minCap[0])} до {wholeEuros(maxCap[0])} на місяць.
+    </li>
+    <li>
+      З однією дитиною — від {wholeEuros(minCap[1])} до {wholeEuros(maxCap[1])}.
+    </li>
+    <li>
+      З двома чи більше — від {wholeEuros(minCap[1])} до {wholeEuros(maxCap[2])}.
+    </li>
+  </ul>
+  <p class="folio">
+    Art. <span>270</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-tabla">
+    Яка допомога по безробіттю при розрахунковому листі на 1.300, 1.500 або 1.800&nbsp;€
+  </h3>
+  <FigureTable id="p-tabla-titulo">
+    <Fragment slot="caption">
+      Допомога по безробіттю брутто на місяць при зарплаті у 14 рівних виплатах і повному робочому
+      часі, у 2026 році, з округленням до євро, як у калькуляторі.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Зарплата брутто на місяць</th>
+        {benefitBySalary.map(({ salary }) => (
+          <th scope="col">{wholeEuros(salary)}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(([label, value]) => (
+        <tr>
+          <th scope="row">{label}</th>
+          {benefitBySalary.map((b) => (
+            <td>{wholeEuros(value(b))}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    База — це річна зарплата разом із додатковими виплатами (pagas extra), поділена на 12: при
+    1.500&nbsp;€ у 14 виплатах — 21.000&nbsp;€ / 12 = {euros(mid.base)}, і 70&nbsp;% від неї якраз
+    дорівнює максимуму без дітей на утриманні. При 1.800&nbsp;€ база становить {euros(high.base)}, і
+    її 70&nbsp;% перевищує максимуми без дітей і з однією дитиною, тож у цих випадках виплачується
+    максимум.
+  </p>
+  <p>
+    Це суми брутто. З них утримують 4,85&nbsp;% бази на внески до Seguridad Social і відповідний
+    IRPF. При неповному робочому часі суми менші, і калькулятор їх не показує.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-requisitos">Хто може її отримувати</h3>
+  <p>
+    Договір має завершитися так, щоб ви набули законного статусу безробітного (situación legal de
+    desempleo): наприклад, через звільнення або закінчення строкового договору, якщо його припинили
+    не ви (art. 267 LGSS). Крім того, потрібно щонайменше 360 днів сплачених внесків за останні 6
+    років, реєстрація як шукача роботи (demandante de empleo) і підписання угоди про активність
+    (acuerdo de actividad), серед інших вимог (art. 266 LGSS).
+  </p>
+  <ul>
+    <li>
+      Скільки вона триває залежно від сплачених внесків:{' '}
+      <CaseLink lang={lang} id="benefit_duration" />.
+    </li>
+    <li>
+      Якщо ви йдете самі: <CaseLink lang={lang} id="benefit_resignation" />
+    </li>
+    <li>
+      Якщо вас звільняють за порушення: <CaseLink lang={lang} id="benefit_disciplinary" />.
+    </li>
+  </ul>
+  <p>
+    Без реєстрації як шукача роботи допомоги по безробіттю немає: ви реєструєтеся в службі
+    зайнятості свого автономного співтовариства і подаєте заяву до SEPE протягом 15 днів після
+    закінчення договору або після закінчення невикористаної відпустки, яку оплачує остаточний
+    розрахунок (finiquito) (arts. 266 і 268 LGSS). Що це робочі дні, зазначає SEPE.
+  </p>
+  <p class="folio">
+    Arts. <span>266 · 267 · 268</span> LGSS
+  </p>
+</section>
+
+{/* The literal switch, as in the ERTE page's route: a build without it renders nothing here. */}
+{import.meta.env.PUBLIC_ERTE === '1' && (
+  <section class="sheet sheet--text">
+    <h3 id="p-erte">Якщо ви в ERTE</h3>
+    <p>
+      ERTE (тимчасове призупинення або скорочення роботи) теж може давати право на допомогу по
+      безробіттю, поки він триває. Її розмір і те, чи витрачає вона вашу майбутню допомогу, залежать
+      від виду ERTE:{' '}
+      <a href={link(lang, 'paro/erte/')}>розрахуйте свою допомогу по безробіттю під час ERTE</a>.
+    </p>
+    <p class="folio">
+      Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+    </p>
+  </section>
+)}
