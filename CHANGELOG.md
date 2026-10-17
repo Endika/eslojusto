@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.83.1](https://github.com/Endika/eslojusto/compare/v1.83.0...v1.83.1) (2026-10-17)
+
+
+### Bug Fixes
+
+* **prose:** keep the spaces lost at line breaks around figures ([e877d83](https://github.com/Endika/eslojusto/commit/e877d8364969899a2b27bee415e501a271ef90e7))
+
 ## [1.83.0](https://github.com/Endika/eslojusto/compare/v1.82.0...v1.83.0) (2026-10-17)
 
 
