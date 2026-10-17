@@ -307,7 +307,7 @@ export const ro: Translation = {
   'faq.benefit':
     'Am dreptul la indemnizație de șomaj dacă mă concediază sau dacă mi se termină contractul?',
   'faq.benefit_answer':
-    'Orice concediere este situație legală de șomaj (situación legal de desempleo), inclusiv cea disciplinară, chiar dacă este justificată, iar încetarea unui contract pe durată determinată este și ea, dacă nu tu l-ai încheiat (art. 267.1.a și 268.4 LGSS). Plecarea din proprie decizie nu este, cu excepții precum un transfer sau neplata gravă a salariului de către firmă (art. 267 LGSS). În plus, ai nevoie de 360 de zile de contribuție în ultimii 6 ani, care pot proveni de la mai multe locuri de muncă, și să te înscrii ca persoană în căutarea unui loc de muncă (demandante de empleo), printre alte condiții (art. 266 și 269.1 LGSS).',
+    'Orice concediere este situație legală de șomaj (situación legal de desempleo), inclusiv cea disciplinară, chiar dacă este justificată, iar încetarea unui contract pe durată determinată este și ea, dacă nu tu i-ai pus capăt (art. 267.1.a și 268.4 LGSS). Plecarea din proprie decizie nu este, cu excepții precum un transfer sau neplata gravă a salariului de către firmă (art. 267 LGSS). În plus, ai nevoie de 360 de zile de contribuție în ultimii 6 ani, care pot proveni de la mai multe locuri de muncă, și să te înscrii ca persoană în căutarea unui loc de muncă (demandante de empleo), printre alte condiții (art. 266 și 269.1 LGSS).',
   'faq.benefit_amount': 'Cât voi primi ca indemnizație de șomaj?',
   'faq.benefit_amount_answer':
     'Depinde de contribuțiile pentru șomaj din ultimele 180 de zile. Se primește 70 % din această bază în primele 180 de zile și 60 % după aceea (art. 270 LGSS), iar în 2026 fiecare lună se situează între 560 € și 1.575 € brut, în funcție de copiii pe care îi ai în întreținere (SEPE). Durează între 120 și 720 de zile, în funcție de contribuțiile din ultimii 6 ani (art. 269.1 LGSS). Verificarea lichidării finale o estimează cu datele tale, pentru normă întreagă.',
@@ -432,7 +432,7 @@ export const ro: Translation = {
   'client.unemployment.reason.resignation':
     'Plecarea din proprie decizie nu este situație legală de șomaj (art. 267.2.a LGSS).',
   'client.unemployment.reason.fixed_term_end':
-    'Încetarea unui contract pe durată determinată este situație legală de șomaj, cu excepția cazului în care tu l-ai încheiat (art. 267.1.a.6.º LGSS).',
+    'Încetarea unui contract pe durată determinată este situație legală de șomaj, cu excepția cazului în care tu i-ai pus capăt (art. 267.1.a.6.º LGSS).',
   'client.unemployment.reason.objective_dismissal':
     'Concedierea din motive obiective este situație legală de șomaj (art. 267.1.a.4.º LGSS).',
   'client.unemployment.reason.collective_dismissal':
@@ -573,7 +573,7 @@ export const ro: Translation = {
     'Fără motiv se verifică doar componentele care nu depind de el: salariul din luna plecării, concediul și plățile suplimentare. Indemnizația nu se calculează. Motivul apare în scrisoarea de concediere și în adeverința de la firmă (certificado de empresa), în căsuța «causa de la situación legal de desempleo» (motivul situației legale de șomaj).',
   'client.warning.null_dismissal.title': 'Această concediere ar putea fi nulă',
   'client.warning.null_dismissal.protected':
-    'După ce ai bifat, concedierea ar putea fi nulă (nulo) (art. 55.5 ET), cu excepția cazului în care motivul nu are nicio legătură cu acea situație.',
+    'Din ce ai bifat, concedierea ar putea fi nulă (nulo) (art. 55.5 ET), cu excepția cazului în care motivul nu are nicio legătură cu acea situație.',
   'client.warning.null_dismissal.sick_leave':
     'Concedierea cuiva aflat în concediu medical (baja médica) ar putea fi nulă dacă motivul este boala: Ley 15/2022 interzice discriminarea pe motiv de boală sau de stare de sănătate și declară nule astfel de acte (art. 2.1 și 26). Instanțele încă nu aplică acest lucru în mod unitar.',
   'client.warning.null_dismissal.effects':
@@ -1171,7 +1171,7 @@ export const ro: Translation = {
   'landing.fixed_term_end.faq.5.question':
     'Încetarea contractului dă dreptul la indemnizație de șomaj?',
   'landing.fixed_term_end.faq.5.answer':
-    'Da, cu excepția cazului în care tu ai încheiat contractul (art. 267.1.a.6.º LGSS). În plus, ai nevoie de 360 de zile de contribuție în ultimii 6 ani, care pot proveni de la mai multe contracte.',
+    'Da, cu excepția cazului în care tu ai pus capăt contractului (art. 267.1.a.6.º LGSS). În plus, ai nevoie de 360 de zile de contribuție în ultimii 6 ani, care pot proveni de la mai multe contracte.',
   'landing.not_agreed.name': 'Semnarea lichidării finale ca «no conforme»',
   'landing.not_agreed.title':
     'Semnarea lichidării finale ca «no conforme» (fără acord): ce înseamnă',
@@ -1214,7 +1214,7 @@ export const ro: Translation = {
   'landing.benefit.faq.4.question':
     'Ce încetări ale contractului dau dreptul la indemnizație de șomaj?',
   'landing.benefit.faq.4.answer':
-    'Orice concediere și încetarea unui contract pe durată determinată pe care nu l-ai încheiat tu sunt situație legală de șomaj (situación legal de desempleo); demisia nu, cu unele excepții (art. 267 LGSS).',
+    'Orice concediere și încetarea unui contract pe durată determinată dacă nu tu i-ai pus capăt, sunt situație legală de șomaj (situación legal de desempleo); demisia nu, cu unele excepții (art. 267 LGSS).',
   'landing.benefit.faq.5.question': 'În ce termen se cere indemnizația de șomaj?',
   'landing.benefit.faq.5.answer':
     'În cele 15 zile de după încetarea contractului sau de după sfârșitul zilelor de concediu neefectuat pe care ți le plătește lichidarea finală, iar înainte trebuie să te înscrii ca persoană în căutarea unui loc de muncă (demandante de empleo). Dacă o ceri mai târziu, pierzi zile de șomaj (art. 266 și 268 LGSS). Că sunt zile lucrătoare o indică SEPE.',
@@ -1312,7 +1312,7 @@ export const ro: Translation = {
   'landing.benefit_disciplinary.faq.3.question':
     'Ce încetări ale contractului nu dau dreptul la indemnizație de șomaj?',
   'landing.benefit_disciplinary.faq.3.answer':
-    'Plecarea din proprie decizie, cu excepții precum un transfer sau neplata gravă a salariului de către firmă (art. 267.2.a și 267.1.a.5.º LGSS), și încetarea unui contract pe durată determinată pe care l-ai încheiat tu (art. 267.1.a.6.º LGSS).',
+    'Plecarea din proprie decizie, cu excepții precum un transfer sau neplata gravă a salariului de către firmă (art. 267.2.a și 267.1.a.5.º LGSS), și încetarea unui contract pe durată determinată căruia i-ai pus capăt tu (art. 267.1.a.6.º LGSS).',
   'landing.benefit_disciplinary.faq.4.question':
     'Există indemnizație la o concediere disciplinară?',
   'landing.benefit_disciplinary.faq.4.answer':
@@ -1421,7 +1421,7 @@ export const ro: Translation = {
     'La contractul de muncă, contractul, fluturașii de salariu și istoricul de muncă pot arăta date cu protecție specială, cum ar fi o dizabilitate, un concediu medical (baja) sau apartenența la un sindicat prin cotizație. De aceea îți cerem și consimțământul explicit înainte să le încarci, cu același temei juridic. Modelul de IA are instrucțiuni să nu copieze aceste date, iar serverul elimină textele care le mai conțin; nimic nu se păstrează.',
   'privacy.employment.tracked_sheets': 'În verificarea contractului',
   'privacy.employment.tracked_sheets_what':
-    'Același lucru ca la lichidarea finală, pentru pașii acestei verificări (relația de muncă, tipul de contract, contractele anterioare, salariul, fluturașii, programul, perioada de probă, concediul, clauzele, informarea, oferta și rezultatul): că deschizi fiecare pas, cât timp îți ia, pe intervale, și dacă te întorci înapoi. Dacă o informație nu este acceptată, numele câmpului, de exemplu „data de începere”, niciodată ce ai scris. Ce întrebare frecventă deschizi sau la ce punct te uiți la „Cum se calculează”, după tipul lui (salariu, tip de contract, contracte succesive, perioadă de probă, program, normă parțială, concediu și plăți, clauze, informare, ofertă sau referință), niciodată textul lui. Și dacă apeși „Ia-o de la capăt”.',
+    'Același lucru ca la lichidarea finală, pentru pașii acestei verificări (relația de muncă, tipul de contract, contractele anterioare, salariul, fluturașii, programul, perioada de probă, concediul, clauzele, informarea, oferta și rezultatul): că deschizi fiecare pas, cât timp îți ia, pe intervale, și dacă te întorci înapoi. Dacă o informație nu este acceptată, numele câmpului, de exemplu „data de început”, niciodată ce ai scris. Ce întrebare frecventă deschizi sau la ce punct te uiți la „Cum se calculează”, după tipul lui (salariu, tip de contract, contracte succesive, perioadă de probă, program, normă parțială, concediu și plăți, clauze, informare, ofertă sau referință), niciodată textul lui. Și dacă apeși „Ia-o de la capăt”.',
   'privacy.employment.tracked_scope': 'Dacă contractul tău nu intră în verificarea contractului',
   'privacy.employment.tracked_scope_what':
     'Motivul, dintr-o listă închisă: o relație de muncă specială, personal funcționar public, un contract printr-un agent de muncă temporară (ETT), un contract de ștafetă (contrato de relevo) sau vârsta sub 18 ani.',
@@ -1458,7 +1458,7 @@ export const ro: Translation = {
     'Doar în browserul tău, cât timp pagina este deschisă. Datele tale, salariul, programul, concediul și răspunsurile despre cum s-a încheiat relația de muncă se calculează pe dispozitivul tău și nu se trimit la niciun server și nici nu se păstrează. Când închizi sau reîncarci pagina, dispar.',
   'privacy.household.tracked_sheets': 'În verificarea pentru lucrătoarea casnică',
   'privacy.household.tracked_sheets_what':
-    'Același lucru ca la lichidarea finală, pentru fiecare dintre pașii acestei verificări, de la muncă la rezultat: că deschizi fiecare pas, cât timp îți ia, pe intervale, și dacă te întorci înapoi. Dacă o informație nu este acceptată, numele câmpului, de exemplu „data de începere”, niciodată ce ai scris. Ce întrebare frecventă deschizi și la ce punct din rezultat deschizi calculul, după tipul lui.',
+    'Același lucru ca la lichidarea finală, pentru fiecare dintre pașii acestei verificări, de la muncă la rezultat: că deschizi fiecare pas, cât timp îți ia, pe intervale, și dacă te întorci înapoi. Dacă o informație nu este acceptată, numele câmpului, de exemplu „data de început”, niciodată ce ai scris. Ce întrebare frecventă deschizi și la ce punct din rezultat deschizi calculul, după tipul lui.',
   'privacy.household.tracked_scope':
     'Dacă situația ta nu intră în verificarea pentru lucrătoarea casnică',
   'privacy.household.tracked_scope_what':
@@ -2002,7 +2002,7 @@ export const ro: Translation = {
   'employment.salary.annual_hours_hint': 'Dacă contractul le indică pe an, nu pe săptămână.',
   'employment.agreement.title': 'Contractul tău colectiv',
   'employment.agreement.help':
-    'Această verificare nu are grilele contractelor colective. Dacă știi aceste informații, se compară „potrivit informației tale”.',
+    'Această verificare nu are grilele contractelor colective. Dacă știi aceste informații, se compară „pe baza datelor tale”.',
   'employment.agreement.figures': 'Cifrele din contractul tău colectiv',
   'employment.agreement.terms': 'Perioada de probă și concediul din contractul tău colectiv',
   'employment.agreement.named':
@@ -3369,7 +3369,7 @@ export const ro: Translation = {
   'rental.guide.term.minimum':
     'Dacă în contract s-au convenit mai puțin de cinci ani, sau șapte dacă proprietarul este o firmă, contractul se prelungește în fiecare an până se ajunge la ei, cu excepția cazului în care anunți cu 30 de zile înainte că nu vrei să continui (art. 9.1 LAU).',
   'rental.guide.term.tacit':
-    'După acest termen, dacă nimeni nu anunță (proprietarul cu patru luni înainte, iar tu cu două), contractul continuă de fiecare dată încă un an, până la trei ani, iar tu îl poți încheia la sfârșitul oricăruia dintre acești ani, anunțând cu o lună înainte (art. 10.1 LAU).',
+    'După acest termen, dacă nimeni nu anunță (proprietarul cu patru luni înainte, iar tu cu două), contractul continuă de fiecare dată încă un an, până la trei ani, iar tu îi poți pune capăt la sfârșitul oricăruia dintre acești ani, anunțând cu o lună înainte (art. 10.1 LAU).',
   'rental.guide.term.extension':
     'În plus, {decreto} prevede, cu condiții și excepții, o prelungire extraordinară cu câte un an, până la încă doi, dacă o ceri. Principalele: contractul trebuie să fie în vigoare pe {desde}; prelungirea lui obligatorie din art. 9.1, prelungirea lui tacită din art. 10 sau reînnoirea lui tacită (tácita reconducción) trebuie să se încheie înainte de 31 decembrie 2028, iar tu trebuie să ai chiria plătită la zi și să o fi avut așa în fiecare lună din ultimele opt. Nu se aplică dacă conveniți alte condiții, un contract nou sau o reînnoire cu o chirie mai mică cu cel puțin 5 %, nici dacă proprietarul comunică faptul că are nevoie de locuință pentru el sau pentru familia lui (art. 9.3 LAU). Dacă este posibilă prelungirea pentru zonele cu piață locativă tensionată (art. 10.3 LAU), se aplică aceea.',
   'rental.guide.term.rdl28':
@@ -4236,7 +4236,7 @@ export const ro: Translation = {
   'bills.guide.exit.p2':
     'Acest decret regal rămâne în vigoare în măsura în care nu contravine Ley 11/2022, până la aprobarea normelor de aplicare (disposición transitoria primera). Norma nu spune care zile sunt lucrătoare (hábiles): verificarea nu numără sâmbetele, duminicile și sărbătorile legale naționale, ceea ce dă ziua cea mai târzie; ce ți se percepe pentru ziua următoare îl semnalează ca fiind de verificat, fără să-l adune, pentru că o sărbătoare legală din comunitatea ta autonomă ar putea-o muta, iar ce urmează după aceea îl numără.',
   'bills.guide.exit.p3':
-    'Poți încheia contractul în același mod în care l-ai încheiat (texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios, art. 62.3), iar procedura de reziliere trebuie să-ți lase o dovadă a conținutului cererii tale (Real Decreto 899/2009, art. 7).',
+    'Poți pune capăt contractului în același mod în care l-ai încheiat (texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios, art. 62.3), iar procedura de reziliere trebuie să-ți lase o dovadă a conținutului cererii tale (Real Decreto 899/2009, art. 7).',
   'bills.guide.channels.title': 'Unde te poți informa gratuit',
   'bills.faq.electricity.meter': 'Cât costă chiria contorului?',
   'bills.faq.electricity.meter_answer':
@@ -6901,7 +6901,7 @@ export const ro: Translation = {
   'household.guide.desistimiento.title':
     'Încetarea contractului prin voința familiei (desistimiento)',
   'household.guide.desistimiento.p1':
-    'Familia poate încheia relația de muncă prin încetarea contractului prin voința angajatorului (desistimiento) doar pentru unul dintre cele trei motive și numai dacă sunt justificate: venituri mai mici sau cheltuieli mai mari ale familiei din cauza unei împrejurări intervenite ulterior, o schimbare substanțială a nevoilor ei sau o pierdere a încrederii, rezonabilă și proporțională. Se comunică în scris, cu motivul (art. 11.2).',
+    'Familia poate pune capăt relației de muncă prin încetarea contractului prin voința angajatorului (desistimiento) doar pentru unul dintre cele trei motive și numai dacă sunt justificate: venituri mai mici sau cheltuieli mai mari ale familiei din cauza unei împrejurări intervenite ulterior, o schimbare substanțială a nevoilor ei sau o pierdere a încrederii, rezonabilă și proporțională. Se comunică în scris, cu motivul (art. 11.2).',
   'household.guide.desistimiento.p2':
     'Indemnizația (indemnización) este de 12 zile de salariu pentru fiecare an de vechime, cu un plafon de șase salarii lunare, și se pune la dispoziție în același timp cu comunicarea încetării (art. 11.2). Preavizul este de 20 de zile dacă lucrezi acolo de mai mult de un an și de 7 dacă nu, socotite de când ți se comunică decizia, și poate fi înlocuit cu salariul acelor zile. Sunt zile calendaristice: în termenele civile nu se exclud zilele nelucrătoare (art. 5 din Código Civil, Codul civil spaniol). Cine lucrează cu normă întreagă are șase ore plătite pe săptămână pentru a-și căuta de lucru în timpul preavizului.',
   'household.guide.desistimiento.p3':
