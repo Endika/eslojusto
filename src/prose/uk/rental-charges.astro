@@ -1,0 +1,86 @@
+---
+// source: 8e819e81fa1a
+import { NORMS } from '../../engine/rental/data/norms';
+import { chargesExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros, formatLongDay } from '../../content/rent-indices';
+import { t } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pageDecree } = rentalPagesCopy(lang);
+
+const ex = chargesExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="pacto">
+  <h2 id="pacto">Лише за письмовою домовленістю і з річною сумою</h2>
+  <p>
+    Орендодавець може стягувати з вас загальні витрати будинку або плату за послуги без лічильника,
+    лише якщо ви домовилися про це письмово, із зазначенням їхньої річної суми на дату договору
+    (art. 20.1 LAU). Для податків і зборів (tributos), як-от IBI, діє окреме правило: див. розділ
+    «IBI і збори» нижче.
+  </p>
+  <p>
+    Якщо в договорі їх не згадано або не вказано річної суми, перевірка це позначає, щоб ви це
+    переглянули.
+  </p>
+  <p>{pageDecree('charges', 'rental.page.charges.community')}</p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="subida">
+  <h2 id="subida">Наскільки вони можуть зрости: до подвійного зростання орендної плати</h2>
+  <p>
+    Протягом перших п’яти років договору, або семи, якщо орендодавець — компанія, ці витрати, крім
+    податків і зборів, можуть зростати лише раз на рік, за домовленістю, і ніколи не більше ніж
+    удвічі від того, на скільки може зрости орендна плата (art. 20.3 LAU, або art. 20.2 у договорах,
+    укладених до Real Decreto-ley 29/2026). Перевірка порівнює кожну статтю витрат за кожен рік із
+    цим граничним рівнем.
+  </p>
+  <p class="folio">
+    Art. <span>20.3</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ibi">
+  <h2 id="ibi">IBI і збори</h2>
+  <p>{pageDecree('charges', 'rental.page.decree.taxes')}</p>
+  <p>
+    {t(lang, 'rental.guide.charges.taxes_before', {
+      desde: formatLongDay(NORMS.rdl29_2026.inForceSince, lang),
+    })}
+  </p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Розібраний приклад</h2>
+  <p>
+    У договорі встановлено {formatEuros(ex.agreed)} на рік внесків до ОСББ (comunidad). У перший рік
+    орендодавець стягує {formatEuros(ex.charged)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Розрахунки</span> Жодного підвищення ще не могло бути, тож максимум
+    — погоджена сума, {formatEuros(ex.agreed)}. {formatEuros(ex.charged)} − {formatEuros(ex.agreed)}{' '}
+    = {formatEuros(ex.over)} понад належне.
+  </p>
+  <p class="folio">
+    Art. <span>20</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Перевірте, що з вас стягують</h2>
+  <p>
+    <a href={href(REVIEW.path)}>Перевірка оренди</a> порівнює кожну статтю витрат за кожен рік із
+    погодженою сумою і з граничним рівнем підвищення та показує, скільки ви переплатили.
+  </p>
+</section>

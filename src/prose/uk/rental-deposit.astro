@@ -1,0 +1,99 @@
+---
+// source: f63abb595478
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositExample();
+// Until the Congress votes the decree down, the insurance ban stands as pending.
+const banStands = NORMS.rdl29_2026.status !== 'repealed';
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="fianza-legal">
+  <h2 id="fianza-legal">Заставний депозит: місячна орендна плата</h2>
+  <p>
+    Заставний депозит (fianza) обов’язковий і для оренди житла дорівнює місячній орендній платі
+    готівкою (art. 36.1 LAU).
+  </p>
+  <p>
+    Коли договір закінчиться і ви повернете ключі, його мають повернути вам протягом місяця:{' '}
+    <a href={href(RENTAL_PAGES.deposit_return.path)}>{RENTAL_PAGES.deposit_return.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.1</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="garantia-adicional">
+  <h2 id="garantia-adicional">Інші гарантії: ще до двомісячної орендної плати</h2>
+  <p>
+    Крім заставного депозиту, договір може вимагати іншу гарантію: додаткові гроші або банківську
+    гарантію (aval). У договорах, підписаних з 6 березня 2019 р., строком до п’яти років, або до
+    семи, якщо орендодавець — компанія, ця додаткова гарантія не може перевищувати двомісячної
+    орендної плати (art. 36.5 LAU).
+  </p>
+  <p>Перевірка порівнює з граничним рівнем гроші, які ви передали.</p>
+  {banStands && (
+    <p>
+      Згідно з декретом, орендодавець більше не може вимагати від вас страхування від несплати
+      орендної плати: про це йдеться в <a href="#seguro">розділі про страхування</a> нижче.
+    </p>
+  )}
+  <p class="folio">
+    Art. <span>36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="adelantado">
+  <h2 id="adelantado">Наперед: місячна орендна плата</h2>
+  <p>Наперед орендодавець не може вимагати більше, ніж місячну орендну плату (art. 17 LAU).</p>
+  <p class="folio">
+    Art. <span>17</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="seguro">
+  <h2 id="seguro">
+    {banStands
+      ? 'Страхування від несплати орендної плати: декрет забороняє вимагати його від вас'
+      : 'Страхування від несплати орендної плати'}
+  </h2>
+  <p>{pageDecree('deposit', 'rental.page.decree.insurance')}</p>
+  <p class="folio">
+    Art. <span>36.5</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Розібраний приклад</h2>
+  <p>
+    За орендної плати {formatEuros(ex.rent)} орендодавець просить {formatEuros(ex.asked)} грошима до
+    заселення: заставний депозит і додаткові гарантії.
+  </p>
+  <p class="example">
+    <span class="example__label">Розрахунки</span> Заставний депозит — це місячна орендна плата,{' '}
+    {formatEuros(ex.rent)}, а додаткова гарантія може дорівнювати двомісячній,{' '}
+    {formatEuros(2 * ex.rent)}. Максимум становить {formatEuros(ex.allowed)}. З вас просять{' '}
+    {formatEuros(ex.asked)}: {formatEuros(ex.over)} понад граничний рівень.
+  </p>
+  <p class="folio">
+    Art. <span>36.1 · 36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Перевірте, що з вас попросили</h2>
+  <p>
+    <a href={href(REVIEW.path)}>Перевірка оренди</a> порівнює з цими граничними рівнями заставний
+    депозит, гарантії і передоплату за вашим договором та показує, на скільки перевищено кожен
+    граничний рівень.
+  </p>
+</section>
