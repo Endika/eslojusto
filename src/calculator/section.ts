@@ -6,8 +6,10 @@ import {
   indexOfHash,
   lastSheet,
   resultStep,
+  startStep,
   stepAt,
   stepFrom,
+  stepOfHash,
   type Flow,
 } from './flow';
 import { createNavigation, type NavigationEvents } from './navigation';
@@ -22,7 +24,8 @@ export interface SectionEvents<S extends string> extends NavigationEvents<S> {
 }
 
 // What a review section brings to the shared walk through its sheets: its form, how it checks a
-// sheet, how it stops at its gate and how it reviews the answers.
+// sheet, how it stops at its gate and how it reviews the answers. The optional parts are for the
+// sections whose form does more, such as lists of rows.
 interface Section<S extends string, Sheet extends S, E extends { readonly field: string }> {
   // The form's id.
   readonly formId: string;
@@ -38,8 +41,27 @@ interface Section<S extends string, Sheet extends S, E extends { readonly field:
   stopsAtGate(form: HTMLFormElement, result: HTMLElement): boolean;
   // Reviews the answers into the result, or returns the errors that keep it from doing so.
   review(form: HTMLFormElement, result: HTMLElement, today: CivilDate): readonly E[];
+  // Told once a review is on screen and its last sheet completed.
+  reviewed?(): void;
   // Told when the person starts over from the result.
   restarted?(): void;
+  // The name a rejected field is reported by; the field's own unless told otherwise.
+  fieldName?(field: E['field']): string;
+  // Told on every change, once the conditions follow it.
+  changed?(form: HTMLFormElement): void;
+  // Whether a typed answer can open or close a question too, not only a changed one.
+  readonly conditionsOnInput?: boolean;
+  // Told of every <details> opened, after a help topic is reported.
+  opened?(details: HTMLDetailsElement): void;
+  // Readies the form for the answers a fill brings, such as the rows they name.
+  beforeFill?(entries: FormEntries): void;
+  // Sets one answer; `setEntry` unless the form has controls of its own.
+  setEntry?(form: HTMLFormElement, name: string, value: string): boolean;
+  // Told after a fill, once the conditions follow its answers.
+  filled?(form: HTMLFormElement): void;
+  entries?(form: HTMLFormElement): FormEntries;
+  // Shows the last review again into the result, as its detail now stands.
+  refreshResult?(result: HTMLElement): void;
 }
 
 // The section's form as reading documents and the pass drive it. These sections lock nothing in
@@ -90,7 +112,8 @@ export function setUpSection<
   const conditions = () => section.applyConditions(form);
 
   function trackErrors(errors: readonly E[]) {
-    for (const { field } of errors) events.fieldRejected(section.sheetOfField(field), field);
+    for (const { field } of errors)
+      events.fieldRejected(section.sheetOfField(field), section.fieldName?.(field) ?? field);
   }
 
   function focusError(errors: readonly E[]) {
@@ -155,6 +178,7 @@ export function setUpSection<
     }
     section.renderErrors(form, []);
     events.stepCompleted(stepAt(flow, nav.current));
+    section.reviewed?.();
     showResult();
     return true;
   }
@@ -169,7 +193,11 @@ export function setUpSection<
     nav.goBack(stepFrom(flow, form, nav.current, -1), { history: 'push', focus: true }),
   );
 
-  form.addEventListener('change', conditions);
+  form.addEventListener('change', () => {
+    conditions();
+    section.changed?.(form);
+  });
+  if (section.conditionsOnInput) form.addEventListener('input', conditions);
   // A changed answer reopens the sheets: the furthest one reachable is the first that still needs
   // an answer, so a stop at the gate never opens the sheets it skipped.
   form.addEventListener('input', () => {
@@ -193,8 +221,9 @@ export function setUpSection<
     'toggle',
     (e) => {
       const d = e.target;
-      if (d instanceof HTMLDetailsElement && d.open && d.hasAttribute('data-help'))
-        events.helpOpened(d.id);
+      if (!(d instanceof HTMLDetailsElement) || !d.open) return;
+      if (d.hasAttribute('data-help')) events.helpOpened(d.id);
+      section.opened?.(d);
     },
     true,
   );
@@ -207,30 +236,37 @@ export function setUpSection<
       form.reset();
       section.renderErrors(form, []);
       conditions();
-      nav.reached = 0;
-      nav.show(0, { history: 'push', focus: true });
+      nav.reached = startStep(flow, form);
+      nav.show(nav.reached, { history: 'push', focus: true });
     },
   );
 
   conditions();
   nav.reached = firstIncomplete(flow, form, today());
-  nav.show(Math.min(indexOfHash(flow, location.hash), nav.reached), { history: 'replace' });
+  // An address that names no step opens where the flow says a visit starts.
+  const arrival = (flow.steps as readonly string[]).includes(stepOfHash(location.hash))
+    ? indexOfHash(flow, location.hash)
+    : startStep(flow, form);
+  nav.show(Math.min(arrival, nav.reached), { history: 'replace' });
+  const set = section.setEntry ?? setEntry;
   return {
     form,
     fill(entries) {
-      const missed = entries.filter(([name, value]) => !setEntry(form, name, value));
+      section.beforeFill?.(entries);
+      const missed = entries.filter(([name, value]) => !set(form, name, value));
       conditions();
+      section.filled?.(form);
       return missed.map(([name]) => name);
     },
-    entries: () => formEntries(form),
+    entries: () => (section.entries ?? formEntries)(form),
     open() {
-      nav.reached = 0;
-      nav.show(0, { history: 'replace', focus: true });
+      nav.reached = startStep(flow, form);
+      nav.show(nav.reached, { history: 'replace', focus: true });
     },
     review() {
       nav.reached = LAST_SHEET;
       return submitReview();
     },
-    refreshResult() {},
+    refreshResult: () => section.refreshResult?.(result),
   };
 }
