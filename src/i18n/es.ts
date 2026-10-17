@@ -184,7 +184,6 @@ export const es = {
   'home.bills': 'Facturas',
   'home.bills_situation': 'Tu factura de la luz o tu baja del móvil: lo cobrado frente a la norma',
   'home.bills_citation': 'Real Decreto 88/2026 · Ley 11/2022',
-  'home.coming_soon': 'Próximamente: {secciones}',
   'home.final_pay': 'Finiquito',
   'home.final_pay_citation': 'Estatuto de los Trabajadores · guía del CGPJ v0.6',
   'home.benefit': 'Paro',

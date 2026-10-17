@@ -31,8 +31,7 @@ interface Group {
   id: string;
   tone: string;
   label: Key;
-  // A section is live with its review in hand; until then it is a name on the «próximamente» line.
-  sections: (Review | Key)[];
+  sections: Review[];
   more?: { href: string; label: Key };
 }
 
@@ -134,10 +133,6 @@ const groups: Group[] = [
   },
 ];
 
-const live = (group: Group) => group.sections.filter((s): s is Review => typeof s !== 'string');
-const soon = (group: Group) =>
-  group.sections.filter((s): s is Key => typeof s === 'string').map(tx);
-
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
 const documents = DOCUMENTS !== null;
 ---
@@ -162,41 +157,34 @@ const documents = DOCUMENTS !== null;
           <h2 class="group__label" id={`group-${group.id}`}>
             {tx(group.label)}
           </h2>
-          {live(group).length > 0 && (
-            <ul class="group__cards">
-              {live(group).map((review) => (
-                <li class="card">
-                  <article class="sheet" data-tone="dates" aria-labelledby={`card-${review.id}`}>
-                    <h3 class="card__name" id={`card-${review.id}`}>
-                      <a href={review.href}>{tx(review.name)}</a>
-                    </h3>
-                    <p class="card__situation">{tx(review.situation)}</p>
-                    <p class="card__meta">
-                      <span class="card__citation">{tx(review.citation)}</span>
-                      <span class="card__go">
-                        {review.beta && <span class="beta">{tx('home.beta')}</span>}
-                        <span class="card__review" aria-hidden="true">
-                          {tx('home.review')}
-                          <svg viewBox="0 0 24 24" focusable="false">
-                            <path d="M4 12h15m-6-6 6 6-6 6" />
-                          </svg>
-                        </span>
+          <ul class="group__cards">
+            {group.sections.map((review) => (
+              <li class="card">
+                <article class="sheet" data-tone="dates" aria-labelledby={`card-${review.id}`}>
+                  <h3 class="card__name" id={`card-${review.id}`}>
+                    <a href={review.href}>{tx(review.name)}</a>
+                  </h3>
+                  <p class="card__situation">{tx(review.situation)}</p>
+                  <p class="card__meta">
+                    <span class="card__citation">{tx(review.citation)}</span>
+                    <span class="card__go">
+                      {review.beta && <span class="beta">{tx('home.beta')}</span>}
+                      <span class="card__review" aria-hidden="true">
+                        {tx('home.review')}
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M4 12h15m-6-6 6 6-6 6" />
+                        </svg>
                       </span>
-                    </p>
-                  </article>
-                  <span class="card__tab" aria-hidden="true" />
-                </li>
-              ))}
-            </ul>
-          )}
+                    </span>
+                  </p>
+                </article>
+                <span class="card__tab" aria-hidden="true" />
+              </li>
+            ))}
+          </ul>
           {group.more && (
             <p class="group__more">
               <a href={group.more.href}>{tx(group.more.label)}</a>
-            </p>
-          )}
-          {soon(group).length > 0 && (
-            <p class="group__soon">
-              {t(lang, 'home.coming_soon', { secciones: soon(group).join(', ') })}
             </p>
           )}
         </section>

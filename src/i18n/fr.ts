@@ -40,7 +40,6 @@ export const fr: Translation = {
   'home.bills_situation':
     "Votre facture d'électricité ou la résiliation de votre forfait mobile\u00a0: ce qui est facturé face à la réglementation",
   'home.bills_citation': 'Real Decreto 88/2026 · Ley 11/2022',
-  'home.coming_soon': 'Bientôt\u00a0: {secciones}',
   'home.final_pay': 'Solde de tout compte',
   'home.final_pay_citation': 'Estatuto de los Trabajadores · guide du CGPJ v0.6',
   'home.benefit': 'Chômage',

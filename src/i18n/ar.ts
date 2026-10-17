@@ -33,7 +33,6 @@ export const ar: Translation = {
   'home.bills': 'الفواتير',
   'home.bills_situation': 'فاتورة الكهرباء أو إلغاء خط الهاتف المحمول: ما دُفع مقارنةً بالقواعد',
   'home.bills_citation': 'Real Decreto 88/2026 · Ley 11/2022',
-  'home.coming_soon': 'قريبًا: {secciones}',
   'home.final_pay': 'التسوية النهائية \u2068(finiquito)\u2069',
   'home.final_pay_citation': 'Estatuto de los Trabajadores · دليل CGPJ v0.6',
   'home.benefit': 'إعانة البطالة \u2068(paro)\u2069',

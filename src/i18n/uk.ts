@@ -36,7 +36,6 @@ export const uk: Translation = {
   'home.bills_situation':
     'Ваш рахунок за електроенергію або розірвання договору мобільного зв’язку: стягнуте порівняно з нормою',
   'home.bills_citation': 'Real Decreto 88/2026 · Ley 11/2022',
-  'home.coming_soon': 'Незабаром: {secciones}',
   'home.final_pay': 'Остаточний розрахунок',
   'home.final_pay_citation': 'Estatuto de los Trabajadores · посібник CGPJ v0.6',
   'home.benefit': 'Допомога по безробіттю',
