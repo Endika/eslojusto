@@ -9,13 +9,21 @@ import {
   type FailedCheck,
   type Confidence,
   type ErrorCode,
-  type Extraction,
+  type RecognisedDocument,
 } from './contract';
-import { heldEntries, mergeRead, type Applied } from './merge';
-import { admit, cannotFit, checkSelection, filesBucket, photoShare, requestBytes } from './files';
+import { heldEntries, mergeRead, type Applied, type ListSpecs } from './merge';
+import { admit, checkSelection, filesBucket } from './files';
 import type { OutageMemory } from './outage';
-import { passClaims, passState, type PassStore, type StoredPass } from './pass';
-import { qualityProblem, type QualityProblem } from './quality';
+import type { PassStore } from './pass';
+import type { QualityProblem } from './quality';
+import {
+  canLocate,
+  encodeAll,
+  locatePages,
+  qualityWarnings,
+  sendRead,
+  type ReadingDeps,
+} from './reading';
 import { missingPageLines, reasonsOf, skippedLines, skippedPages } from './skipped';
 import type {
   Captcha,
@@ -52,8 +60,6 @@ interface UploadDeps<F extends string, L extends string> {
 }
 
 type Panel = 'choose' | 'upload' | 'done';
-// How often, at most, preparing the files says how far it got.
-const PROGRESS_MS = 500;
 type LocalError = 'consent_missing';
 
 const KIB = 1024;
@@ -89,6 +95,243 @@ function removeMark(mark: Element) {
   mark.remove();
 }
 
+// What the reads leave on the form: their values, marked as read, on top of what earlier reads or
+// the person put there. Returns how to apply a read.
+function readMarks<F extends string, L extends string>(
+  calculator: UploadDeps<F, L>['calculator'],
+  lists: ListSpecs,
+  tr: Translate,
+) {
+  const { form } = calculator;
+  // What the reads since the form last started over put in it, by name.
+  const applied = new Map<string, Applied>();
+
+  function markForm(marks: readonly ReadMark[]) {
+    const label = (m: ReadMark) =>
+      m.conflict
+        ? tr('client.documents.mark_conflict')
+        : tr(m.derived ? 'client.documents.mark_derived' : 'client.documents.mark', {
+            nivel: tr(`client.documents.confidence.${m.confidence}`),
+          }) + (m.confidence === 'low' ? tr('client.documents.mark_low') : '');
+    for (const m of marks) {
+      const container = form.querySelector<HTMLElement>(m.container);
+      if (container) addMark(container, m.id, label(m), m.confidence);
+    }
+  }
+
+  // Whether a control still holds what the page gave it, so the answer is nobody's yet.
+  function atDefault(name: string, value: string): boolean {
+    const controls = [
+      ...form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+        'input[name], select[name], textarea[name]',
+      ),
+    ].filter((el) => el.name === name);
+    return controls.every((el) => {
+      if (el instanceof HTMLSelectElement) {
+        const options = [...el.options];
+        return (options.find((o) => o.defaultSelected) ?? options[0])?.value === value;
+      }
+      if (el instanceof HTMLInputElement && (el.type === 'radio' || el.type === 'checkbox'))
+        return el.checked === el.defaultChecked;
+      return el.value === el.defaultValue;
+    });
+  }
+
+  // A mark tells where a value came from; once the person changes the value, it no longer applies.
+  // It sits in the element that holds the answer, the nearest one around the input that has one.
+  const unmark = (e: Event) => {
+    const input =
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLSelectElement ||
+      e.target instanceof HTMLTextAreaElement
+        ? e.target
+        : null;
+    let container = input?.parentElement ?? null;
+    while (container && container !== form && !container.querySelector(':scope > [data-read-mark]'))
+      container = container.parentElement;
+    if (!container || container === form) return;
+    for (const mark of container.querySelectorAll(':scope > [data-read-mark]')) removeMark(mark);
+  };
+  form.addEventListener('input', unmark);
+  form.addEventListener('change', unmark);
+  form.addEventListener('reset', () => {
+    for (const mark of form.querySelectorAll('[data-read-mark]')) removeMark(mark);
+    applied.clear();
+  });
+
+  // The notes say what the read could not set as it came.
+  return function apply(prefill: ReadPrefill): string[] {
+    const held = heldEntries(calculator.entries(), applied, atDefault, lists);
+    const merged = mergeRead(prefill, held, applied, lists);
+    calculator.fill(merged.entries);
+    markForm(merged.marks);
+    for (const [name, value] of merged.applied) applied.set(name, value);
+    return [
+      ...(merged.differ ? [tr('client.documents.reads_differ')] : []),
+      ...(merged.typedDiffers ? [tr('client.documents.typed_differs')] : []),
+      ...(merged.recalculated ? [tr('client.documents.recalculated')] : []),
+      ...(merged.full ? [tr('client.documents.rows_full')] : []),
+    ];
+  };
+}
+
+// The pages chosen so far, in the order they were added: each pick, drop or photo adds to them,
+// and a PDF adds one entry per page.
+interface Picked {
+  readonly file: File;
+  readonly name: string;
+  readonly thumbnail: string | null;
+  readonly pdf?: { readonly opened: OpenedPdf; readonly page: number };
+  // A whole PDF longer than the places left: its useful pages are located before the read.
+  readonly long?: { readonly opened: OpenedPdf };
+}
+const openedOf = (p: Picked): OpenedPdf | undefined => p.pdf?.opened ?? p.long?.opened;
+
+const pdfPage = (file: File, opened: OpenedPdf, page: number, tr: Translate): Picked => ({
+  file,
+  name: tr('client.documents.pdf_page', { nombre: file.name, n: page }),
+  thumbnail: null,
+  pdf: { opened, page },
+});
+
+function fileItem(p: Picked, index: number, tr: Translate): HTMLLIElement {
+  const li = document.createElement('li');
+  li.className = 'start__file';
+  if (p.thumbnail) {
+    const img = document.createElement('img');
+    img.className = 'start__thumb';
+    img.alt = '';
+    img.src = p.thumbnail;
+    // A photo the browser can't show (HEIC in most) keeps an empty square.
+    img.addEventListener('error', () => img.replaceWith(placeholder()), { once: true });
+    li.append(img);
+  } else li.append(placeholder(openedOf(p) ? 'PDF' : ''));
+  const text = document.createElement('span');
+  const name = document.createElement('span');
+  name.className = 'start__file-name';
+  name.textContent = p.name;
+  const size = document.createElement('span');
+  size.className = 'start__file-size';
+  size.textContent = p.pdf
+    ? tr('client.documents.pdf_page_detail', { n: p.pdf.page, total: p.pdf.opened.pages })
+    : p.long
+      ? tr('client.documents.pdf_long_detail', { total: p.long.opened.pages })
+      : sizeText(p.file.size);
+  text.append(name, size);
+  const remove = document.createElement('button');
+  remove.type = 'button';
+  remove.className = 'button start__remove';
+  remove.dataset['docRemove'] = String(index);
+  remove.textContent = tr('client.documents.remove');
+  remove.setAttribute('aria-label', tr('client.documents.remove_label', { nombre: p.name }));
+  li.append(text, remove);
+  return li;
+}
+
+function placeholder(label = ''): HTMLElement {
+  const span = document.createElement('span');
+  span.className = 'start__thumb';
+  span.setAttribute('aria-hidden', 'true');
+  span.textContent = label;
+  return span;
+}
+
+const listItems = (lines: readonly string[]) =>
+  lines.map((text) => {
+    const li = document.createElement('li');
+    li.textContent = text;
+    return li;
+  });
+
+interface DonePanel {
+  readonly recognised: HTMLElement | null;
+  readonly summary: HTMLElement;
+  readonly notes: HTMLElement;
+}
+
+// Says what a read recognised, how many answers it gave, and what else there is to know of it.
+function fillDone(
+  { recognised, summary, notes }: DonePanel,
+  tr: Translate,
+  read: {
+    readonly prefill: ReadPrefill;
+    readonly checks: readonly FailedCheck[];
+    readonly documents: readonly RecognisedDocument[];
+    readonly skipped: readonly string[];
+    readonly wordsEveryCheck: boolean;
+  },
+) {
+  const line = recognisedLine(read.documents, tr);
+  if (recognised) {
+    recognised.hidden = line === '';
+    recognised.textContent = line;
+  }
+  const n = read.prefill.count;
+  summary.textContent =
+    n === 0
+      ? tr('client.documents.done_none')
+      : n === 1
+        ? tr('client.documents.done_one')
+        : tr('client.documents.done', { n });
+  const lines = [
+    ...read.skipped,
+    ...missingPageLines(read.checks, tr),
+    ...read.prefill.notes,
+    ...(read.wordsEveryCheck ? [] : read.checks.filter(isCoherenceCheck)).map((c) =>
+      tr(`client.documents.check.${c}`),
+    ),
+  ];
+  notes.hidden = lines.length === 0;
+  notes.replaceChildren(...listItems(lines));
+}
+
+// Says what is wrong with the files or the consent, or that nothing is any more.
+function showFieldError(
+  upload: HTMLElement,
+  tr: Translate,
+  field: 'files' | 'consent',
+  code: ErrorCode | LocalError | null,
+) {
+  const slip = upload.querySelector<HTMLElement>(`[data-doc-error-for="${field}"]`);
+  if (!slip) return;
+  slip.hidden = code === null;
+  slip.textContent = code === null ? '' : tr(`client.documents.error.${code}`);
+  const inputs = upload.querySelectorAll(`[data-doc-field="${field}"] input`);
+  for (const input of inputs)
+    if (code === null) input.removeAttribute('aria-invalid');
+    else input.setAttribute('aria-invalid', 'true');
+}
+
+// Files dropped on the zone are added, unless `busy`.
+function acceptDrops(
+  upload: HTMLElement,
+  busy: () => boolean,
+  add: (files: File[]) => Promise<void>,
+) {
+  const drop = required(upload.querySelector<HTMLElement>('[data-doc-drop]'), 'drop zone');
+  const carriesFiles = (e: DragEvent) => e.dataTransfer?.types.includes('Files') ?? false;
+  // A file dropped beside the zone would make the browser open it and leave the page.
+  for (const type of ['dragover', 'drop'] as const)
+    upload.addEventListener(type, (e) => {
+      if (carriesFiles(e)) e.preventDefault();
+    });
+  drop.addEventListener('dragover', (e) => {
+    if (!carriesFiles(e) || busy()) return;
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    drop.dataset['over'] = '';
+  });
+  drop.addEventListener('dragleave', (e) => {
+    if (!(e.relatedTarget instanceof Node && drop.contains(e.relatedTarget)))
+      delete drop.dataset['over'];
+  });
+  drop.addEventListener('drop', (e) => {
+    delete drop.dataset['over'];
+    const dropped = e.dataTransfer?.files;
+    if (busy() || !dropped || dropped.length === 0) return;
+    void add([...dropped]);
+  });
+}
+
 export function setUpUpload<F extends string, L extends string>(
   start: HTMLElement,
   deps: UploadDeps<F, L>,
@@ -117,9 +360,11 @@ export function setUpUpload<F extends string, L extends string>(
   const [reviewLead, reviewList, reviewAsk, reviewActions] = ['lead', 'list', 'ask', 'actions'].map(
     reviewPart,
   ) as [HTMLElement, HTMLElement, HTMLElement, HTMLElement];
-  const recognised = panels.done.querySelector<HTMLElement>('[data-done-documents]');
-  const summary = required(panels.done.querySelector<HTMLElement>('[data-done-summary]'), 'sum');
-  const notes = required(panels.done.querySelector<HTMLElement>('[data-done-notes]'), 'notes');
+  const done: DonePanel = {
+    recognised: panels.done.querySelector<HTMLElement>('[data-done-documents]'),
+    summary: required(panels.done.querySelector<HTMLElement>('[data-done-summary]'), 'sum'),
+    notes: required(panels.done.querySelector<HTMLElement>('[data-done-notes]'), 'notes'),
+  };
   const uploadChoice = panels.choose.querySelector<HTMLElement>('[data-start-upload]');
   const unavailableNote = panels.choose.querySelector<HTMLElement>('[data-start-unavailable]');
   let busy = false;
@@ -127,25 +372,13 @@ export function setUpUpload<F extends string, L extends string>(
   // stays usable and abandons the work, whose late results are then dropped.
   let preparing = false;
   let generation = 0;
+  const apply = readMarks(calculator, deps.reading.lists ?? {}, tr);
 
-  // The pages chosen so far, in the order they were added: each pick, drop or photo adds to them,
-  // and a PDF adds one entry per page.
-  interface Picked {
-    readonly file: File;
-    readonly name: string;
-    readonly thumbnail: string | null;
-    readonly pdf?: { readonly opened: OpenedPdf; readonly page: number };
-    // A whole PDF longer than the places left: its useful pages are located before the read.
-    readonly long?: { readonly opened: OpenedPdf };
-  }
-  const openedOf = (p: Picked): OpenedPdf | undefined => p.pdf?.opened ?? p.long?.opened;
   let picked: Picked[] = [];
   const encodedPages = new Map<Picked, EncodedFile>();
   let photos = 0;
   // The photos the last quality warning was about, for «Repetir».
   let flagged: Picked[] = [];
-  // What the reads since the form last started over put in it, by name.
-  const applied = new Map<string, Applied>();
 
   function show(panel: Panel, focus = true) {
     for (const [name, el] of Object.entries(panels)) el.hidden = name !== panel;
@@ -167,16 +400,8 @@ export function setUpUpload<F extends string, L extends string>(
     if (open) calculator.open();
   }
 
-  function fieldError(field: 'files' | 'consent', code: ErrorCode | LocalError | null) {
-    const slip = upload.querySelector<HTMLElement>(`[data-doc-error-for="${field}"]`);
-    if (!slip) return;
-    slip.hidden = code === null;
-    slip.textContent = code === null ? '' : tr(`client.documents.error.${code}`);
-    const inputs = upload.querySelectorAll(`[data-doc-field="${field}"] input`);
-    for (const input of inputs)
-      if (code === null) input.removeAttribute('aria-invalid');
-      else input.setAttribute('aria-invalid', 'true');
-  }
+  const fieldError = (field: 'files' | 'consent', code: ErrorCode | LocalError | null) =>
+    showFieldError(upload, tr, field, code);
 
   function setError(code: ErrorCode | null) {
     errorSlip.hidden = code === null;
@@ -188,13 +413,7 @@ export function setUpUpload<F extends string, L extends string>(
   function showReview(lead: string, lines: readonly string[], ask: string) {
     reviewLead.textContent = lead;
     reviewAsk.textContent = ask;
-    reviewList.replaceChildren(
-      ...lines.map((text) => {
-        const li = document.createElement('li');
-        li.textContent = text;
-        return li;
-      }),
-    );
+    reviewList.replaceChildren(...listItems(lines));
     reviewActions.hidden = ask === '';
     review.hidden = false;
     (lead ? reviewLead : reviewAsk).focus();
@@ -221,70 +440,12 @@ export function setUpUpload<F extends string, L extends string>(
     upload.setAttribute('aria-busy', String(on));
   }
 
-  function fileItem(p: Picked, index: number): HTMLLIElement {
-    const li = document.createElement('li');
-    li.className = 'start__file';
-    if (p.thumbnail) {
-      const img = document.createElement('img');
-      img.className = 'start__thumb';
-      img.alt = '';
-      img.src = p.thumbnail;
-      // A photo the browser can't show (HEIC in most) keeps an empty square.
-      img.addEventListener('error', () => img.replaceWith(placeholder()), { once: true });
-      li.append(img);
-    } else li.append(placeholder(openedOf(p) ? 'PDF' : ''));
-    const text = document.createElement('span');
-    const name = document.createElement('span');
-    name.className = 'start__file-name';
-    name.textContent = p.name;
-    const size = document.createElement('span');
-    size.className = 'start__file-size';
-    size.textContent = p.pdf
-      ? tr('client.documents.pdf_page_detail', { n: p.pdf.page, total: p.pdf.opened.pages })
-      : p.long
-        ? tr('client.documents.pdf_long_detail', { total: p.long.opened.pages })
-        : sizeText(p.file.size);
-    text.append(name, size);
-    const remove = document.createElement('button');
-    remove.type = 'button';
-    remove.className = 'button start__remove';
-    remove.dataset['docRemove'] = String(index);
-    remove.textContent = tr('client.documents.remove');
-    remove.setAttribute('aria-label', tr('client.documents.remove_label', { nombre: p.name }));
-    li.append(text, remove);
-    return li;
-  }
-
-  function placeholder(label = ''): HTMLElement {
-    const span = document.createElement('span');
-    span.className = 'start__thumb';
-    span.setAttribute('aria-hidden', 'true');
-    span.textContent = label;
-    return span;
-  }
-
   function renderFiles() {
     fileList.hidden = picked.length === 0;
-    fileList.replaceChildren(...picked.map(fileItem));
+    fileList.replaceChildren(...picked.map((p, i) => fileItem(p, i, tr)));
   }
 
   const count = () => ({ n: picked.length });
-
-  const pdfPage = (file: File, opened: OpenedPdf, page: number): Picked => ({
-    file,
-    name: tr('client.documents.pdf_page', { nombre: file.name, n: page }),
-    thumbnail: null,
-    pdf: { opened, page },
-  });
-
-  // Whether a PDF that does not fit can still go whole, its useful pages located when it is read:
-  // one such PDF at a time, of at most LOCATE_LIMITS.maxPages, with a place left for it.
-  const canLocate = (pages: number, free: number) =>
-    api.locate !== undefined &&
-    free > 0 &&
-    pages > free &&
-    pages <= LOCATE_LIMITS.maxPages &&
-    !picked.some((p) => p.long);
 
   // Opens each PDF and adds its pages while places are left, saying which pages fit.
   async function addPdfs(
@@ -310,14 +471,14 @@ export function setUpUpload<F extends string, L extends string>(
         problem ??= opened;
         continue;
       }
-      if (canLocate(opened.pages, free)) {
+      if (canLocate(api, opened.pages, free, picked)) {
         picked.push({ file, name: file.name, thumbnail: null, long: { opened } });
         said.push(tr('client.documents.pdf_long', { nombre: file.name, total: opened.pages }));
         continue;
       }
       const fit = Math.min(opened.pages, free);
       if (fit === 0) opened.close();
-      for (let page = 1; page <= fit; page += 1) picked.push(pdfPage(file, opened, page));
+      for (let page = 1; page <= fit; page += 1) picked.push(pdfPage(file, opened, page, tr));
       said.push(
         fit < opened.pages
           ? tr('client.documents.pdf_pages_fit', { nombre: file.name, k: fit, total: opened.pages })
@@ -412,91 +573,6 @@ export function setUpUpload<F extends string, L extends string>(
     fileStatus.textContent = '';
   }
 
-  function markForm(marks: readonly ReadMark[]) {
-    const label = (m: ReadMark) =>
-      m.conflict
-        ? tr('client.documents.mark_conflict')
-        : tr(m.derived ? 'client.documents.mark_derived' : 'client.documents.mark', {
-            nivel: tr(`client.documents.confidence.${m.confidence}`),
-          }) + (m.confidence === 'low' ? tr('client.documents.mark_low') : '');
-    for (const m of marks) {
-      const container = form.querySelector<HTMLElement>(m.container);
-      if (container) addMark(container, m.id, label(m), m.confidence);
-    }
-  }
-
-  // Whether a control still holds what the page gave it, so the answer is nobody's yet.
-  function atDefault(name: string, value: string): boolean {
-    const controls = [
-      ...form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
-        'input[name], select[name], textarea[name]',
-      ),
-    ].filter((el) => el.name === name);
-    return controls.every((el) => {
-      if (el instanceof HTMLSelectElement) {
-        const options = [...el.options];
-        return (options.find((o) => o.defaultSelected) ?? options[0])?.value === value;
-      }
-      if (el instanceof HTMLInputElement && (el.type === 'radio' || el.type === 'checkbox'))
-        return el.checked === el.defaultChecked;
-      return el.value === el.defaultValue;
-    });
-  }
-
-  // Fills the form with a read on top of what earlier reads or the person put there; the notes
-  // say what the read could not set as it came.
-  function apply(prefill: ReadPrefill): string[] {
-    const lists = deps.reading.lists ?? {};
-    const held = heldEntries(calculator.entries(), applied, atDefault, lists);
-    const merged = mergeRead(prefill, held, applied, lists);
-    calculator.fill(merged.entries);
-    markForm(merged.marks);
-    for (const [name, value] of merged.applied) applied.set(name, value);
-    return [
-      ...(merged.differ ? [tr('client.documents.reads_differ')] : []),
-      ...(merged.typedDiffers ? [tr('client.documents.typed_differs')] : []),
-      ...(merged.recalculated ? [tr('client.documents.recalculated')] : []),
-      ...(merged.full ? [tr('client.documents.rows_full')] : []),
-    ];
-  }
-
-  function showDone(
-    p: ReadPrefill,
-    checks: readonly FailedCheck[],
-    e: Extraction<F, L>,
-    skipped: readonly string[],
-  ) {
-    const line = recognisedLine(e.documents, tr);
-    if (recognised) {
-      recognised.hidden = line === '';
-      recognised.textContent = line;
-    }
-    const n = p.count;
-    summary.textContent =
-      n === 0
-        ? tr('client.documents.done_none')
-        : n === 1
-          ? tr('client.documents.done_one')
-          : tr('client.documents.done', { n });
-    const lines = [
-      ...skipped,
-      ...missingPageLines(checks, tr),
-      ...p.notes,
-      ...(deps.reading.wordsEveryCheck ? [] : checks.filter(isCoherenceCheck)).map((c) =>
-        tr(`client.documents.check.${c}`),
-      ),
-    ];
-    notes.hidden = lines.length === 0;
-    notes.replaceChildren(
-      ...lines.map((text) => {
-        const li = document.createElement('li');
-        li.textContent = text;
-        return li;
-      }),
-    );
-    show('done');
-  }
-
   function validate(): readonly Picked[] | null {
     const fileProblem = checkSelection(picked.length);
     fieldError('files', fileProblem);
@@ -506,117 +582,31 @@ export function setUpUpload<F extends string, L extends string>(
     return fileProblem === null && consent.checked ? [...picked] : null;
   }
 
-  // A paid pass the API refuses (its signing key may have changed) is asked for once more with
-  // the payment it came from; true when that gave a different one. Only once per pass.
-  async function fetchPassAgain(refused: StoredPass): Promise<boolean> {
-    if (refused.renewed) return false;
-    const claims = passClaims(refused.token);
-    const checkout = passes
-      .checkouts()
-      .find((c) => c.redeemed && c.sessionId === claims?.sessionId);
-    if (!checkout) return false;
-    const again = await api.pass(checkout.sessionId, checkout.nonce);
-    // The same token back would only be refused again.
-    if (!again.ok || again.pass === refused.token) return false;
-    passes.savePass({
-      token: again.pass,
-      expiresAt: again.expiresAt,
-      readsLeft: again.readsLeft,
-      renewed: true,
-    });
-    passes.markRedeemed(checkout.sessionId, again.expiresAt);
-    return true;
-  }
+  // The flow of one read, let go once the person leaves for the form.
+  const flowOf = (started: number): ReadingDeps<F, L> => ({
+    api,
+    captcha,
+    encoder,
+    passes,
+    now: deps.now,
+    current: () => started === generation,
+    progress: (kind, k, total) => {
+      status.textContent = tr(`client.documents.status.${kind}_n`, { k, total });
+    },
+  });
 
-  // Encodes the pages in their order, sharing what the request may weigh among them, and says how
-  // far it got at most every PROGRESS_MS. A PDF's pages are kept once drawn, and the document
-  // closed, so a second try needs no reader. Gives up as soon as the rest can't fit.
-  async function encodeAll(
-    pages: readonly Picked[],
-    started: number,
-  ): Promise<EncodedFile[] | { readonly tooSlow: OpenedPdf } | 'payload_too_large' | null> {
-    const encoded: EncodedFile[] = [];
-    let said = -Infinity;
-    for (const [i, p] of pages.entries()) {
-      if (deps.now() - said >= PROGRESS_MS) {
-        said = deps.now();
-        status.textContent = tr('client.documents.status.preparing_n', {
-          k: i + 1,
-          total: pages.length,
-        });
-      }
-      const share = photoShare(requestBytes(encoded), pages.length - i);
-      const kept = encodedPages.get(p);
-      const image =
-        kept ??
-        (await (p.pdf ? p.pdf.opened.render(p.pdf.page, share) : encoder.encode(p.file, share)));
-      if (started !== generation) return null;
-      if (image === 'pdf_too_slow') return p.pdf ? { tooSlow: p.pdf.opened } : null;
-      if (p.pdf) encodedPages.set(p, image);
-      encoded.push(image);
-      if (cannotFit(requestBytes(encoded), pages.length - i - 1, image.bytes))
-        return 'payload_too_large';
-    }
-    for (const opened of new Set(pages.flatMap((p) => (p.pdf ? [p.pdf.opened] : []))))
-      opened.close();
-    return encoded;
-  }
-
-  // The photos that look like they will read badly, each with the one thing to say about it.
-  function qualityWarnings(pages: readonly Picked[], encoded: readonly EncodedFile[]) {
-    return pages.flatMap((picked, i) => {
-      const quality = encoded[i]?.quality;
-      const problem = quality ? qualityProblem(quality) : null;
-      return problem ? [{ picked, problem }] : [];
-    });
-  }
-
-  function warnQuality(warnings: readonly { picked: Picked; problem: QualityProblem }[]) {
+  function warnQuality(warnings: readonly { page: Picked; problem: QualityProblem }[]) {
     for (const problem of new Set(warnings.map((w) => w.problem))) events.qualityWarned(problem);
-    flagged = warnings.map((w) => w.picked);
+    flagged = warnings.map((w) => w.page);
     showReview(
       '',
-      warnings.map((w) => tr(`client.documents.quality.${w.problem}`, { nombre: w.picked.name })),
+      warnings.map((w) => tr(`client.documents.quality.${w.problem}`, { nombre: w.page.name })),
       tr(
         warnings.length === 1
           ? 'client.documents.quality.ask_one'
           : 'client.documents.quality.ask_many',
       ),
     );
-  }
-
-  // The allowance a request carries: a valid pass, or the free quota.
-  function allowance() {
-    const stored = passes.pass();
-    return stored !== null && passState(stored, deps.now()) === 'valid'
-      ? { stored, fields: { pass: stored.token } }
-      : { stored: null, fields: { quota: passes.quota() } };
-  }
-
-  // Every page of the long PDF, at low resolution, within the request's budget; null when one
-  // can't be drawn in time or the whole doesn't fit.
-  async function lowResolution(opened: OpenedPdf, started: number) {
-    const encoded: EncodedFile[] = [];
-    let said = -Infinity;
-    for (let page = 1; page <= opened.pages; page += 1) {
-      if (deps.now() - said >= PROGRESS_MS) {
-        said = deps.now();
-        status.textContent = tr('client.documents.status.locating_n', {
-          k: page,
-          total: opened.pages,
-        });
-      }
-      const share = photoShare(requestBytes(encoded), opened.pages - page + 1);
-      let image: EncodedFile | 'pdf_too_slow';
-      try {
-        image = await opened.render(page, share, LOCATE_LIMITS.imageLongSide);
-      } catch {
-        return null;
-      }
-      if (started !== generation || image === 'pdf_too_slow') return null;
-      encoded.push(image);
-    }
-    return requestBytes(encoded) > LIMITS.requestBudgetBytes ? null : encoded;
   }
 
   function failRead(code: ErrorCode) {
@@ -626,159 +616,89 @@ export function setUpUpload<F extends string, L extends string>(
     setError(code);
   }
 
-  // The server has the last word on what was sent: a pass it no longer honours is dropped, so the
-  // next read is a free one, and so is a quota token it refuses.
-  async function refused(code: ErrorCode, stored: StoredPass | null) {
-    if (stored !== null && code === 'pass_exhausted') passes.updateReads(0);
-    if (stored !== null && code === 'pass_invalid') {
-      if (await fetchPassAgain(stored)) {
-        events.extractionFailed(code);
-        setBusy(false, tr('client.documents.pass.renewed'));
-        return;
-      }
-      passes.retirePass();
-    }
-    if (stored !== null && ['pass_revoked', 'pass_expired'].includes(code)) passes.forgetPass();
-    if (stored === null && code === 'invalid_request' && passes.quota() !== null)
-      passes.forgetQuota();
-    failRead(code);
+  function refused({ code, renewed }: { code: ErrorCode; renewed: boolean }) {
+    if (!renewed) return failRead(code);
+    events.extractionFailed(code);
+    setBusy(false, tr('client.documents.pass.renewed'));
   }
-
-  // What the locate step answers as the read would: the read is refused too, so nothing is cut.
-  const REFUSALS: ReadonlySet<ErrorCode> = new Set<ErrorCode>([
-    'invalid_request',
-    'captcha_failed',
-    'daily_limit_reached',
-    'pass_invalid',
-    'pass_expired',
-    'pass_exhausted',
-    'pass_revoked',
-    'pass_unconfirmed',
-    'payment_not_complete',
-    'payment_provider_unavailable',
-  ]);
 
   // Swaps the long PDF for the pages the locate step chose or, if it could not choose, for its
   // first pages as before, and says which. One that fits by now goes whole. `stopped` when the
   // read is refused or the person left for the form meanwhile.
   async function locateLong(
     pages: readonly Picked[],
-    started: number,
+    flow: ReadingDeps<F, L>,
   ): Promise<readonly Picked[] | 'stopped'> {
     const long = pages.find((p) => p.long);
     if (!long?.long || !api.locate) return pages;
     const { opened } = long.long;
     const room = LIMITS.maxImages - (pages.length - 1);
     const swapFor = (numbers: readonly number[]) => {
-      const entries = numbers.map((n) => pdfPage(long.file, opened, n));
+      const entries = numbers.map((n) => pdfPage(long.file, opened, n, tr));
       const swap = (list: readonly Picked[]) => list.flatMap((p) => (p === long ? entries : [p]));
       picked = swap(picked);
       renderFiles();
       return swap(pages);
     };
-    const first = (k: number) => Array.from({ length: k }, (_, i) => i + 1);
-    if (opened.pages <= room) return swapFor(first(opened.pages));
+    if (opened.pages <= room) return swapFor(Array.from({ length: opened.pages }, (_, i) => i + 1));
 
-    setBusy(true, tr('client.documents.status.locating', { nombre: long.file.name }), true);
-    const files = await lowResolution(opened, started);
-    if (started !== generation) return 'stopped';
-    let chosen: readonly number[] | null = null;
-    if (files !== null) {
-      let captchaToken: string;
-      try {
-        captchaToken = await captcha.token();
-      } catch {
-        if (started !== generation) return 'stopped';
-        failRead('captcha_unavailable');
-        return 'stopped';
-      }
-      if (started !== generation) return 'stopped';
-      setBusy(true, tr('client.documents.status.locating', { nombre: long.file.name }));
-      const { stored, fields } = allowance();
-      const result = await api.locate({
-        files: files.map(({ mediaType, data }) => ({ mediaType, data })),
-        captchaToken,
-        maxPages: room,
-        ...fields,
-      });
-      if (started !== generation) return 'stopped';
-      if (!result.ok && REFUSALS.has(result.code)) {
-        await refused(result.code, stored);
-        return 'stopped';
-      }
-      if (result.ok) chosen = result.pages;
-    }
-    const numbers = chosen ?? first(room);
-    const swapped = swapFor(numbers);
+    const locating = tr('client.documents.status.locating', { nombre: long.file.name });
+    setBusy(true, locating, true);
+    const located = await locatePages(opened, room, flow, () => setBusy(true, locating));
+    if (located.kind === 'captcha_unavailable') failRead(located.kind);
+    if (located.kind === 'refused') refused(located);
+    if (located.kind !== 'chosen' && located.kind !== 'first') return 'stopped';
+    const swapped = swapFor(located.pages);
     fileStatus.textContent =
-      chosen === null
+      located.kind === 'first'
         ? tr('client.documents.locate_failed', { nombre: long.file.name, k: room })
-        : tr('client.documents.located', { nombre: long.file.name, paginas: numbers.join(', ') });
+        : tr('client.documents.located', {
+            nombre: long.file.name,
+            paginas: located.pages.join(', '),
+          });
     return swapped;
   }
 
   async function read(all: readonly Picked[], qualityChecked = false) {
-    const started = generation;
-    const pages = await locateLong(all, started);
+    const flow = flowOf(generation);
+    const pages = await locateLong(all, flow);
     if (pages === 'stopped') return;
     setBusy(true, tr('client.documents.status.preparing'), true);
-    const fail = failRead;
-    let encoded: Awaited<ReturnType<typeof encodeAll>>;
-    try {
-      encoded = await encodeAll(pages, started);
-    } catch {
-      if (started !== generation) return;
-      return fail('image_unreadable');
-    }
-    if (encoded === null) return;
-    if (encoded === 'payload_too_large') return fail(encoded);
-    if (!Array.isArray(encoded)) {
+    const encoded = await encodeAll(pages, encodedPages, flow);
+    if (encoded.kind === 'stopped') return;
+    if (encoded.kind === 'failed') return failRead(encoded.code);
+    if (encoded.kind === 'too_slow') {
       // A PDF that won't draw in time leaves the list, so the next try is not stuck on it too.
-      const slow = encoded.tooSlow;
-      picked = picked.filter((p) => p.pdf?.opened !== slow);
-      slow.close();
+      picked = picked.filter((p) => p.pdf?.opened !== encoded.pdf);
+      encoded.pdf.close();
       renderFiles();
-      return fail('pdf_too_slow');
+      return failRead('pdf_too_slow');
     }
-    if (requestBytes(encoded) > LIMITS.requestBudgetBytes) return fail('payload_too_large');
-    const warnings = qualityChecked ? [] : qualityWarnings(pages, encoded);
+    const warnings = qualityChecked ? [] : qualityWarnings(pages, encoded.files);
     if (warnings.length > 0) {
       setBusy(false, '');
       return warnQuality(warnings);
     }
 
     setBusy(true, tr('client.documents.status.captcha'), true);
-    let captchaToken: string;
-    try {
-      captchaToken = await captcha.token();
-    } catch {
-      if (started !== generation) return;
-      return fail('captcha_unavailable');
-    }
-    if (started !== generation) return;
-
-    const { stored, fields } = allowance();
-    const usePass = stored !== null;
     const pdfsPicked = new Set(pages.filter((p) => p.pdf).map((p) => p.file)).size;
     const files = filesBucket(pages.length);
-    events.uploadStarted(files, pdfsPicked);
-    setBusy(true, tr('client.documents.status.reading'));
-    const result = await api.extract({
-      files: encoded.map(({ mediaType, data }) => ({ mediaType, data })),
-      captchaToken,
-      ...fields,
+    const outcome = await sendRead(encoded.files, flow, () => {
+      events.uploadStarted(files, pdfsPicked);
+      setBusy(true, tr('client.documents.status.reading'));
     });
+    if (outcome.kind === 'stopped') return;
+    if (outcome.kind === 'captcha_unavailable') return failRead(outcome.kind);
+    if (outcome.kind === 'refused') return refused(outcome);
     const nameOf = (page: number) => pages[page - 1]?.name ?? '';
-    if (!result.ok && result.code === 'nothing_read') {
+    if (outcome.kind === 'nothing_read') {
       // Spent no read: the files stay, so the ones that failed can be changed.
-      const skipped = skippedPages(result.pages, pages.length, true);
+      const skipped = skippedPages(outcome.pages, pages.length, true);
       events.nothingRead(reasonsOf(skipped), files, pdfsPicked);
       setBusy(false, '');
       return showReview(tr('client.documents.nothing_read'), skippedLines(skipped, nameOf, tr), '');
     }
-    if (!result.ok) return refused(result.code, stored);
-    if (usePass && result.readsLeft !== null) passes.updateReads(result.readsLeft);
-    if (!usePass && result.allowance !== null) passes.saveQuota(result.allowance);
+    const { result } = outcome;
 
     const prefill = deps.reading.prefill(
       result.extraction,
@@ -800,12 +720,14 @@ export function setUpUpload<F extends string, L extends string>(
     upload.reset();
     clearFiles();
     fieldError('files', null);
-    showDone(
-      { ...prefill, notes: [...prefill.notes, ...merged] },
-      result.failedChecks,
-      result.extraction,
-      skippedLines(skipped, nameOf, tr, 'client.documents.skipped.done'),
-    );
+    fillDone(done, tr, {
+      prefill: { ...prefill, notes: [...prefill.notes, ...merged] },
+      checks: result.failedChecks,
+      documents: result.extraction.documents,
+      skipped: skippedLines(skipped, nameOf, tr, 'client.documents.skipped.done'),
+      wordsEveryCheck: deps.reading.wordsEveryCheck === true,
+    });
+    show('done');
   }
 
   upload.addEventListener('submit', (e) => {
@@ -848,28 +770,7 @@ export function setUpUpload<F extends string, L extends string>(
     if (!(button instanceof HTMLElement) || busy) return;
     removeFile(Number(button.dataset['docRemove']));
   });
-  const drop = required(upload.querySelector<HTMLElement>('[data-doc-drop]'), 'drop zone');
-  const carriesFiles = (e: DragEvent) => e.dataTransfer?.types.includes('Files') ?? false;
-  // A file dropped beside the zone would make the browser open it and leave the page.
-  for (const type of ['dragover', 'drop'] as const)
-    upload.addEventListener(type, (e) => {
-      if (carriesFiles(e)) e.preventDefault();
-    });
-  drop.addEventListener('dragover', (e) => {
-    if (!carriesFiles(e) || busy) return;
-    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
-    drop.dataset['over'] = '';
-  });
-  drop.addEventListener('dragleave', (e) => {
-    if (!(e.relatedTarget instanceof Node && drop.contains(e.relatedTarget)))
-      delete drop.dataset['over'];
-  });
-  drop.addEventListener('drop', (e) => {
-    delete drop.dataset['over'];
-    const dropped = e.dataTransfer?.files;
-    if (busy || !dropped || dropped.length === 0) return;
-    void addFiles([...dropped]);
-  });
+  acceptDrops(upload, () => busy, addFiles);
   consent.addEventListener('change', () => fieldError('consent', null));
 
   for (const button of start.querySelectorAll('[data-start-upload]'))
@@ -899,28 +800,6 @@ export function setUpUpload<F extends string, L extends string>(
     '[data-start-upload], [data-start-manual]',
   ))
     button.disabled = false;
-
-  // A mark tells where a value came from; once the person changes the value, it no longer applies.
-  // It sits in the element that holds the answer, the nearest one around the input that has one.
-  const unmark = (e: Event) => {
-    const input =
-      e.target instanceof HTMLInputElement ||
-      e.target instanceof HTMLSelectElement ||
-      e.target instanceof HTMLTextAreaElement
-        ? e.target
-        : null;
-    let container = input?.parentElement ?? null;
-    while (container && container !== form && !container.querySelector(':scope > [data-read-mark]'))
-      container = container.parentElement;
-    if (!container || container === form) return;
-    for (const mark of container.querySelectorAll(':scope > [data-read-mark]')) removeMark(mark);
-  };
-  form.addEventListener('input', unmark);
-  form.addEventListener('change', unmark);
-  form.addEventListener('reset', () => {
-    for (const mark of form.querySelectorAll('[data-read-mark]')) removeMark(mark);
-    applied.clear();
-  });
 
   const startStatus = panels.choose.querySelector<HTMLElement>('[data-start-status]');
 
