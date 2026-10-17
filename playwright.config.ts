@@ -8,29 +8,22 @@ const review = process.env['TEST_REVIEW'] === '1';
 const analytics = process.env['TEST_ANALYTICS'] === '1';
 // The documents project needs a build with a (fake) documents API; the page routes it.
 const documents = process.env['TEST_DOCUMENTS'] === '1';
-// The rental project needs a build with /alquiler/, which a normal build leaves out.
-const rental = process.env['TEST_RENTAL'] === '1';
+// Each section's specs run in that section's project, apart from the desktop and mobile ones.
 // Matched on the file name alone, so a folder named after a section never opts every spec in.
+const rental = process.env['TEST_RENTAL'] === '1';
 const rentalSpecs = /[\\/]rental[^\\/]*\.spec\.ts$/;
-// The employment project needs a build with /contrato/, which a normal build leaves out.
 const employment = process.env['TEST_EMPLOYMENT'] === '1';
 const employmentSpecs = /[\\/]employment[^\\/]*\.spec\.ts$/;
-// The ERTE project needs a build with /paro/erte/, which a normal build leaves out.
 const erte = process.env['TEST_ERTE'] === '1';
 const erteSpecs = /[\\/]erte[^\\/]*\.spec\.ts$/;
-// The household project needs a build with /empleada-de-hogar/, which a normal build leaves out.
 const household = process.env['TEST_HOUSEHOLD'] === '1';
 const householdSpecs = /[\\/]household[^\\/]*\.spec\.ts$/;
-// The insurance project needs a build with /seguros/, which a normal build leaves out.
 const insurance = process.env['TEST_INSURANCE'] === '1';
 const insuranceSpecs = /[\\/]insurance[^\\/]*\.spec\.ts$/;
-// The credit project needs a build with /financiacion/, which a normal build leaves out.
 const credit = process.env['TEST_CREDIT'] === '1';
 const creditSpecs = /[\\/]credit[^\\/]*\.spec\.ts$/;
-// The mortgage project needs a build with /hipoteca/, which a normal build leaves out.
 const mortgage = process.env['TEST_MORTGAGE'] === '1';
 const mortgageSpecs = /[\\/]mortgage[^\\/]*\.spec\.ts$/;
-// The bills project needs a build with /facturas/, which a normal build leaves out.
 const bills = process.env['TEST_BILLS'] === '1';
 const billsSpecs = /[\\/]bills\.spec\.ts$/;
 const optInSpecs = [
@@ -46,22 +39,10 @@ const optInSpecs = [
 ];
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
-// The documents project reads documents on /alquiler/, /contrato/, /financiacion/, /seguros/,
-// /hipoteca/ and /facturas/ too, and offers the letters on /financiacion/, /seguros/ and
-// /hipoteca/, so its build has them; the analytics project measures the first two, /hipoteca/ and
-// /facturas/ too.
 const buildEnv = {
-  ...(rental || documents || analytics || review ? { PUBLIC_RENTAL: '1' } : {}),
-  ...(employment || documents || analytics ? { PUBLIC_EMPLOYMENT: '1' } : {}),
-  ...(erte || review ? { PUBLIC_ERTE: '1' } : {}),
+  ...(review ? { REVIEW_LANGS: 'eu' } : {}),
   // The household, insurance and credit projects also measure their own events, so their builds
   // have a test analytics key.
-  ...(household || review ? { PUBLIC_HOUSEHOLD: '1' } : {}),
-  ...(review ? { REVIEW_LANGS: 'eu' } : {}),
-  ...(insurance || documents ? { PUBLIC_INSURANCE: '1' } : {}),
-  ...(credit || documents ? { PUBLIC_CREDIT: '1' } : {}),
-  ...(mortgage || documents || analytics ? { PUBLIC_MORTGAGE: '1' } : {}),
-  ...(bills || documents || analytics ? { PUBLIC_BILLS: '1' } : {}),
   ...(analytics || household || insurance || credit ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
   ...(documents
     ? {

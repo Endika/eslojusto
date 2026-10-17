@@ -50,20 +50,8 @@ jobs:
         working-directory: api
       - run: npm run knip
       - run: npm run type:check
-      # With /alquiler/, /contrato/, /paro/erte/, /empleada-de-hogar/, /seguros/, /financiacion/,
-      # /hipoteca/ and /facturas/ in the build, so the copy test reads their pages too.
+      # The copy tests read the built pages.
       - run: npm run build
-        env:
-          {
-            PUBLIC_RENTAL: '1',
-            PUBLIC_EMPLOYMENT: '1',
-            PUBLIC_ERTE: '1',
-            PUBLIC_HOUSEHOLD: '1',
-            PUBLIC_INSURANCE: '1',
-            PUBLIC_CREDIT: '1',
-            PUBLIC_MORTGAGE: '1',
-            PUBLIC_BILLS: '1',
-          }
       - run: npm run test:run
   # One job per Playwright project: each needs its own build, and a failure reruns alone.
   e2e:
