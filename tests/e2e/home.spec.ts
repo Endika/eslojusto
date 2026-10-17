@@ -1,28 +1,47 @@
 import { test, expect } from '@playwright/test';
 
-// A plain build: Alquiler and Contrato wait behind their build switches.
 test('the home page files each review under its theme', async ({ page }) => {
   await page.goto('./');
   const groups = page.locator('main').getByRole('heading', { level: 2 });
   await expect(groups).toHaveText(['Trabajo', 'Vivienda', 'Dinero']);
 
-  const work = page.getByRole('region', { name: 'Trabajo' });
-  await expect(work.getByRole('article')).toHaveCount(2);
-  await expect(work.getByRole('link', { name: 'Finiquito' })).toHaveAttribute(
-    'href',
-    '/finiquito/',
-  );
-  await expect(work.getByRole('link', { name: 'Paro' })).toHaveAttribute('href', '/paro/');
-  await expect(work.getByText('Próximamente: Contrato de trabajo')).toBeVisible();
-
-  const housing = page.getByRole('region', { name: 'Vivienda' });
-  await expect(housing.getByRole('article')).toHaveCount(0);
-  await expect(housing.getByText('Próximamente: Alquiler, Hipoteca')).toBeVisible();
-  await expect(housing.getByRole('link', { name: 'IRAV e IPC de cada mes' })).toBeVisible();
-
-  const money = page.getByRole('region', { name: 'Dinero' });
-  await expect(money.getByRole('article')).toHaveCount(0);
-  await expect(money.getByText('Próximamente: Financiación y seguros, Facturas')).toBeVisible();
+  for (const [group, reviews] of [
+    [
+      'Trabajo',
+      [
+        ['Finiquito', '/finiquito/'],
+        ['Paro', '/paro/'],
+        ['Contrato de trabajo', '/contrato/'],
+        ['Empleada de hogar', '/empleada-de-hogar/'],
+      ],
+    ],
+    [
+      'Vivienda',
+      [
+        ['Alquiler', '/alquiler/'],
+        ['Hipoteca', '/hipoteca/'],
+      ],
+    ],
+    [
+      'Dinero',
+      [
+        ['Seguros', '/seguros/'],
+        ['Financiación', '/financiacion/'],
+        ['Facturas', '/facturas/'],
+      ],
+    ],
+  ] as const) {
+    const region = page.getByRole('region', { name: group });
+    await expect(region.getByRole('article')).toHaveCount(reviews.length);
+    for (const [name, href] of reviews)
+      await expect(region.getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
+  }
+  await expect(page.getByText(/^Próximamente/)).toHaveCount(0);
+  await expect(
+    page
+      .getByRole('region', { name: 'Vivienda' })
+      .getByRole('link', { name: 'IRAV e IPC de cada mes' }),
+  ).toBeVisible();
 });
 
 test('a card is one link, and the whole card answers to it', async ({ page }) => {

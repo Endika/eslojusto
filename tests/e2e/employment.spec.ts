@@ -444,13 +444,11 @@ test('the privacy page and the legal notice describe the contract review in this
   await expect(privacy).toContainText('La respuesta sobre si tienes una discapacidad reconocida');
   await expect(privacy).toContainText('Al revisar el contrato');
   await page.goto('aviso-legal/');
-  const notice = page.locator('main');
+  const notice = page.locator('main section').filter({ has: page.locator('#al-contrato') });
   await expect(
     notice.getByRole('heading', { name: /La revisión del contrato de trabajo/ }),
   ).not.toContainText('Beta');
-  await expect(notice).not.toContainText(
-    'Es una sección en pruebas: puede tener errores mientras se revisa con casos reales. Si ves un punto',
-  );
+  await expect(notice).not.toContainText('Es una sección en pruebas');
   await expect(notice).toContainText('No lee convenios colectivos ni sus tablas');
   await expect(notice).toContainText('No calcula el salario neto, el IRPF ni las cotizaciones');
 });

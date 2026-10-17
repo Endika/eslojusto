@@ -21,9 +21,11 @@ test('the rent indices page shows one row per month with its sources', async ({ 
     august.getByRole('link', { name: 'publicado el 15-09-2026' }).first(),
   ).toHaveAttribute('href', /^https:\/\/www\.ine\.es\//);
   await expect(page.getByText('pendiente de convalidación')).toBeVisible();
-  await expect(
-    page.getByRole('heading', { name: 'Próximamente: comprueba tu subida' }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Comprueba tu subida' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Revisar mi alquiler' })).toHaveAttribute(
+    'href',
+    '/alquiler/',
+  );
 });
 
 test('the rent indices page never scrolls sideways', async ({ page }) => {
