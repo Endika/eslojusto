@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.82.0](https://github.com/Endika/eslojusto/compare/v1.81.0...v1.82.0) (2026-10-17)
+
+
+### Features
+
+* **i18n:** translate the case pages' prose into Romanian ([1575962](https://github.com/Endika/eslojusto/commit/1575962b562ba6c2256f59a836ffa05885620eec))
+* **i18n:** translate the dictionary into Romanian, unpublished ([e121a52](https://github.com/Endika/eslojusto/commit/e121a522f3d7020f61c705440246fdfb489c5cb0))
+* **i18n:** translate the final pay guide into Romanian ([9792a19](https://github.com/Endika/eslojusto/commit/9792a195fc964faf63d07d5217820454817e025f))
+* **i18n:** translate the legal notice and the privacy page into Romanian ([bf00dfe](https://github.com/Endika/eslojusto/commit/bf00dfe866b8d5f0645c5272d5287be2883b6754))
+* **i18n:** translate the rental sections and the ERTE page into Romanian ([a873676](https://github.com/Endika/eslojusto/commit/a873676cde55341afaf4843214e916ed835a7303))
+* **i18n:** translate the rental topics into Romanian ([f4fb645](https://github.com/Endika/eslojusto/commit/f4fb645be5f90eadae31d3f813ce48d394b26366))
+
+
+### Bug Fixes
+
+* **i18n:** say who ends the contract in the Romanian texts, and match three quoted labels ([60985b7](https://github.com/Endika/eslojusto/commit/60985b798121b2a531eac3553adb25d415be99fa))
+
 ## [1.81.0](https://github.com/Endika/eslojusto/compare/v1.80.0...v1.81.0) (2026-10-16)
 
 
