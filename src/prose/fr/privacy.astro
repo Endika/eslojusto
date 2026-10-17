@@ -1,0 +1,634 @@
+---
+// source: 09f730db2222
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+import { DOCUMENTS } from '../../documents/config';
+import { OUTAGE_KEY } from '../../documents/outage';
+import { STORAGE_KEYS } from '../../documents/pass';
+import {
+  BILLS_BUILD,
+  CREDIT_BUILD,
+  EMPLOYMENT_BUILD,
+  HOUSEHOLD_BUILD,
+  INSURANCE_BUILD,
+  MORTGAGE_BUILD,
+  RENTAL_BUILD,
+} from '../../content/sections';
+const NBSP = ' ';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const tx = (key: Key) => t(lang, key);
+
+const email = 'hola@eslojusto.es';
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+// The rental review exists only in a PUBLIC_RENTAL=1 build; so do the paragraphs about it.
+const rental = RENTAL_BUILD;
+// The contract review exists only in a PUBLIC_EMPLOYMENT=1 build; so do the paragraphs about it.
+const employment = EMPLOYMENT_BUILD;
+// The household review exists only in a PUBLIC_HOUSEHOLD=1 build; so do the paragraphs about it.
+const household = HOUSEHOLD_BUILD;
+// The credit and insurance reviews exist only in a PUBLIC_CREDIT=1 or PUBLIC_INSURANCE=1 build; so
+// do the paragraphs about each.
+const credit = CREDIT_BUILD;
+const insurance = INSURANCE_BUILD;
+// The mortgage review exists only in a PUBLIC_MORTGAGE=1 build; so do the paragraphs about it.
+const mortgage = MORTGAGE_BUILD;
+// The bills reviews exist only in a PUBLIC_BILLS=1 build; so do the paragraphs about them.
+const bills = BILLS_BUILD;
+
+// One entry per thing that is stored or processed; a new tool adds a row here.
+const stored = [
+  {
+    what: tx('privacy.data_review'),
+    where:
+      'Uniquement dans votre navigateur, tant que la page est ouverte. Le calcul se fait sur votre appareil : vos dates, votre salaire, les chiffres de votre solde de tout compte, vos enfants à charge et vos autres contrats ne sont envoyés à aucun serveur et ne sont pas conservés. Quand vous fermez ou rechargez la page, ils disparaissent.',
+  },
+  ...(rental
+    ? [{ what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') }]
+    : []),
+  ...(employment
+    ? [
+        {
+          what: tx('privacy.employment.data_review'),
+          where: tx('privacy.employment.data_review_where'),
+        },
+      ]
+    : []),
+  ...(household
+    ? [
+        {
+          what: tx('privacy.household.data_review'),
+          where: tx('privacy.household.data_review_where'),
+        },
+      ]
+    : []),
+  ...(credit
+    ? [{ what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') }]
+    : []),
+  ...(insurance
+    ? [
+        {
+          what: tx('privacy.insurance.data_review'),
+          where: tx('privacy.insurance.data_review_where'),
+        },
+      ]
+    : []),
+  ...(mortgage
+    ? [
+        {
+          what: tx('privacy.mortgage.data_review'),
+          where: tx('privacy.mortgage.data_review_where'),
+        },
+      ]
+    : []),
+  ...(bills
+    ? [
+        { what: tx('privacy.bills.data_review'), where: tx('privacy.bills.data_review_where') },
+        ...(documents
+          ? [{ what: tx('privacy.bills.data_year'), where: tx('privacy.bills.data_year_where') }]
+          : []),
+      ]
+    : []),
+  {
+    what: tx('privacy.data_analytics'),
+    where:
+      "Quelques signaux courts, avec des codes et des tranches, envoyés à PostHog pendant que vous utilisez la page (le détail, plus bas). L'identifiant de la page consultée ne vit que dans sa mémoire : il n'est pas écrit sur votre appareil et il est perdu quand vous la fermez ou la rechargez.",
+  },
+  ...(documents
+    ? [
+        {
+          what: tx('privacy.data_documents'),
+          where:
+            "Uniquement si vous choisissez d'envoyer vos documents (la lettre de licenciement, le solde de tout compte, vos bulletins de paie, l'attestation employeur, un accord ou un procès-verbal de conciliation ou votre relevé de carrière) et que vous donnez votre consentement. Les PDF sont convertis en images de leurs pages dans votre navigateur, sans en sortir, et avant tout envoi la page vérifie, également dans votre navigateur, si une photo paraît sombre, floue ou petite. Ces images et les photos sont transmises chiffrées à un serveur d'eslojusto.es chez Amazon Web Services, en Espagne (région eu-south-2), qui les transmet à un modèle d'IA (Claude, d'Anthropic) via Amazon Bedrock, dans l'Union européenne. Le modèle indique le type de document de chaque page, recopie les données que demande le formulaire, et ce qui a été lu revient dans votre navigateur. Rien n'est conservé : les documents n'existent que dans la mémoire du serveur pendant la lecture, et ses journaux, conservés 14 jours, ne contiennent que des données techniques : le résultat, le nombre de pages, la durée, la quantité de texte traitée par le modèle et quelques indicateurs de fonctionnement, comme le besoin d'une deuxième lecture, le nombre de données qui ne concordaient pas d'un document à l'autre (sans dire lesquelles ni leurs valeurs) ou le nombre de pages qui n'ont pas pu être lues et pourquoi (par exemple, floue ou d'un autre pays). Jamais le contenu ni rien qui vous identifie.",
+        },
+        ...(rental
+          ? [
+              {
+                what: tx('privacy.rental.data_documents'),
+                where: tx('privacy.rental.data_documents_where'),
+              },
+              {
+                what: tx('privacy.rental.data_letters'),
+                where: tx('privacy.rental.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(employment
+          ? [
+              {
+                what: tx('privacy.employment.data_documents'),
+                where: tx('privacy.employment.data_documents_where'),
+              },
+              {
+                what: tx('privacy.employment.data_letters'),
+                where: tx('privacy.employment.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(credit
+          ? [
+              {
+                what: tx('privacy.credit.data_documents'),
+                where: tx('privacy.credit.data_documents_where'),
+              },
+              {
+                what: tx('privacy.credit.data_letters'),
+                where: tx('privacy.credit.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(insurance
+          ? [
+              {
+                what: tx('privacy.insurance.data_documents'),
+                where: tx('privacy.insurance.data_documents_where'),
+              },
+              {
+                what: tx('privacy.insurance.data_letters'),
+                where: tx('privacy.insurance.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(mortgage
+          ? [
+              {
+                what: tx('privacy.mortgage.data_documents'),
+                where: tx('privacy.mortgage.data_documents_where'),
+              },
+              {
+                what: tx('privacy.mortgage.data_letters'),
+                where: tx('privacy.mortgage.data_letters_where'),
+              },
+            ]
+          : []),
+        ...(bills
+          ? [
+              {
+                what: tx('privacy.bills.data_documents'),
+                where: tx('privacy.bills.data_documents_where'),
+              },
+              {
+                what: tx('privacy.bills.data_letters'),
+                where: tx('privacy.bills.data_letters_where'),
+              },
+            ]
+          : []),
+        {
+          what: tx('privacy.data_pass'),
+          where: `Dans le stockage local (localStorage) de votre navigateur, et uniquement si vous les utilisez${NBSP}: un compteur signé de vos lectures gratuites du jour («${NBSP}${STORAGE_KEYS.quota}${NBSP}»)${NBSP}; si vous achetez le pass, le pass et les lectures qui lui restent («${NBSP}${STORAGE_KEYS.pass}${NBSP}») et le code de chaque paiement que vous commencez, avec un nombre aléatoire que seul votre navigateur connaît, pour pouvoir récupérer le pass («${NBSP}${STORAGE_KEYS.checkout}${NBSP}»${NBSP}; chaque paiement est retiré au bout de 7 jours s'il n'a pas été finalisé, ou quand son pass expire). Ils ne contiennent ni votre nom ni rien de vos documents, et ne quittent votre appareil qu'avec la lecture suivante, pour récupérer le pass ou pour le vérifier avant de vous montrer le détail de votre vérification, le rapport ou la lettre. Ils sont reçus par le serveur d'eslojusto.es chez AWS, qui interroge Stripe sur le paiement. Le pass expiré et le compteur d'un jour précédent s'effacent d'eux-mêmes la prochaine fois que la page les consulte, et tout est effacé quand vous effacez les données de ce site dans votre navigateur${NBSP}; c'est pourquoi le pass n'est valable que dans ce navigateur et se perd sur un autre appareil, dans une fenêtre de navigation privée ou quand vous les effacez. Si la lecture n'est pas disponible, l'onglet le garde en mémoire une heure dans son stockage de session («${NBSP}${OUTAGE_KEY}${NBSP}», avec l'heure seulement) pour ne pas vous la proposer entre-temps.`,
+        },
+        {
+          what: tx('privacy.data_checkout'),
+          where: `Si vous payez, les réponses de votre vérification sont conservées dans le stockage de session (sessionStorage) de cet onglet pendant que vous êtes sur la page de paiement, pour vous montrer le résultat à votre retour.${bills ? " Pour les factures d'électricité, les réponses de chaque facture de votre année que vous avez déjà vérifiée sont conservées de la même façon, sans l'empreinte du code du point de livraison." : ''} Elles ne quittent pas votre appareil et sont effacées à votre retour ou quand vous fermez l'onglet.`,
+        },
+      ]
+    : []),
+  {
+    what: tx('privacy.data_theme'),
+    where:
+      'Dans le stockage local (localStorage) de votre navigateur, et uniquement si vous appuyez sur le bouton du thème. Il ne quitte jamais votre appareil. Il est effacé quand vous effacez les données de ce site dans votre navigateur.',
+  },
+  {
+    what: tx('privacy.data_server'),
+    where:
+      "Le site est hébergé sur GitHub Pages. GitHub enregistre l'adresse IP et les données techniques de chaque visite, comme n'importe quel serveur web.",
+  },
+];
+
+// The allowlist (src/analytics/sanitize.ts) and the event catalogue (src/analytics/events.ts), in
+// plain words. Keep all three in step: the analytics e2e asserts the exact keys.
+const tracked = [
+  {
+    when: 'Avec chaque signal',
+    what: "La date et l'heure de chaque signal et un nombre aléatoire qui n'existe que tant que la page est ouverte. L'adresse de la page sans paramètres : le domaine, le chemin et la fiche sur laquelle vous êtes. Votre navigateur et sa version, et votre système (Windows, Android…). Le type d'appareil (ordinateur, mobile ou tablette) et la taille de la fenêtre. Le domaine du site d'où vous venez (par exemple « www.google.com »), sans l'adresse complète. Si vous arrivez par un lien de campagne, sa source, son support et son nom (utm_source, utm_medium, utm_campaign), uniquement s'il s'agit d'un code court composé de lettres, de chiffres et de tirets. Et trois données techniques de PostHog : la clé du projet d'eslojusto.es, la version de son code et un indicateur qui lui demande de ne créer aucun profil.",
+  },
+  {
+    when: "À l'ouverture d'une page",
+    what: "Que vous l'avez ouverte et la langue principale de votre navigateur, uniquement la partie générale : « ja », pas « ja-JP ».",
+  },
+  {
+    when: 'En quittant une page',
+    what: "Le temps passé sur la page et jusqu'où vous avez fait défiler.",
+  },
+  {
+    when: 'Si vous utilisez le traducteur du navigateur',
+    what: 'La langue vers laquelle vous traduisez la page, par exemple « ar ».',
+  },
+  {
+    when: 'Sur chaque fiche de la vérification',
+    what: "Que vous l'ouvrez et, quand vous la terminez, le temps que vous y avez passé, dans une tranche large : moins de 10 secondes, de 10 à 30, de 30 à 60, de 60 à 180 ou plus de 180. Si vous revenez en arrière, de quelle fiche vers laquelle.",
+  },
+  {
+    when: "Si une donnée n'est pas acceptée",
+    what: 'Le nom du champ, par exemple « date de sortie ». Jamais ce que vous y avez saisi.',
+  },
+  {
+    when: 'Si vous ouvrez une aide',
+    what: "Quelle question fréquente vous ouvrez, ou pour quel poste vous consultez « Comment c'est calculé ».",
+  },
+  {
+    when: 'Lors de la vérification',
+    what: "Le motif de la fin du contrat, le type de contrat à durée déterminée, la façon dont vous percevez les primes extraordinaires et si vous comptez les congés en jours ouvrés ou en jours calendaires et, s'ils sont ouvrés, si vous travaillez 5, 6 ou un autre nombre de jours par semaine, tels que vous les choisissez dans les options. Combien de postes comportent le chiffre de votre solde de tout compte et combien ressortent en dessous, concordent, au-dessus ou sans pouvoir être vérifiés. Si l'on vous retient plus de préavis que le maximum. Si ce que coûterait un licenciement injustifié est affiché, sans le chiffre. Si le résultat s'affiche en résumé ou avec le détail du pass. Si l'écart est nul, inférieur à 100 €, de 100 à 500 €, de 500 à 2.000 € ou supérieur. Combien de fois vous avez fait la vérification sur cette page, le temps passé, par tranches, et, si vous la refaites, le nom des champs que vous avez modifiés. Pour le chômage, uniquement si l'estimation ne s'applique pas à votre motif, si elle comporte des chiffres ou si elle s'affiche sans, et combien d'autres contrats vous avez ajoutés, par tranche : 0, 1, 2, ou 3 et plus. Jamais le nombre d'enfants à votre charge ni aucune date de ces contrats. Pour l'ERTE et pour la question de savoir si vous avez été payé, uniquement le nom de la question si vous la modifiez, jamais la réponse. Ce que vous cochez sur un éventuel licenciement nul (grossesse, congés, arrêt maladie…) n'est jamais envoyé, même si vous avez coché quelque chose.",
+  },
+  {
+    when: 'En appuyant sur « Recommencer »',
+    what: 'Que vous avez appuyé dessus.',
+  },
+  ...(rental
+    ? [
+        {
+          when: tx('privacy.rental.tracked_sheets'),
+          what: tx('privacy.rental.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.rental.tracked_scope'),
+          what: tx('privacy.rental.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.rental.tracked_review'),
+          what: tx('privacy.rental.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(employment
+    ? [
+        {
+          when: tx('privacy.employment.tracked_sheets'),
+          what: tx('privacy.employment.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_scope'),
+          what: tx('privacy.employment.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_review'),
+          what: tx('privacy.employment.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(household
+    ? [
+        {
+          when: tx('privacy.household.tracked_sheets'),
+          what: tx('privacy.household.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.household.tracked_scope'),
+          what: tx('privacy.household.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.household.tracked_review'),
+          what: tx('privacy.household.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(credit
+    ? [
+        {
+          when: tx('privacy.credit.tracked_sheets'),
+          what: tx('privacy.credit.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_scope'),
+          what: tx('privacy.credit.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_review'),
+          what: tx('privacy.credit.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(insurance
+    ? [
+        {
+          when: tx('privacy.insurance.tracked_sheets'),
+          what: tx('privacy.insurance.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_scope'),
+          what: tx('privacy.insurance.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_review'),
+          what: tx('privacy.insurance.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(mortgage
+    ? [
+        {
+          when: tx('privacy.mortgage.tracked_sheets'),
+          what: tx('privacy.mortgage.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_scope'),
+          what: tx('privacy.mortgage.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_review'),
+          what: tx('privacy.mortgage.tracked_review_what'),
+        },
+      ]
+    : []),
+  ...(bills
+    ? [
+        {
+          when: tx('privacy.bills.tracked_sheets'),
+          what: tx('privacy.bills.tracked_sheets_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_scope'),
+          what: tx('privacy.bills.tracked_scope_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_review'),
+          what: tx('privacy.bills.tracked_review_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_telecom'),
+          what: tx('privacy.bills.tracked_telecom_what'),
+        },
+      ]
+    : []),
+  ...(documents
+    ? [
+        {
+          when: 'En choisissant comment commencer',
+          what: "Si vous choisissez d'envoyer un document ou de remplir à la main.",
+        },
+        {
+          when: 'Lors de la lecture des documents',
+          what: "Combien de photos ou de pages vous envoyez, par tranche (1, de 2 à 4, de 5 à 9, de 10 à 15 ou de 16 à 25), et combien de PDF vous avez choisis. À la fin, quels types de document ont été reconnus (par exemple, lettre de licenciement ou bulletin de paie), combien de données ont été remplies, par tranche (0, de 1 à 3, de 4 à 8, ou 9 et plus), si l'une d'elles est ressortie avec une confiance faible, si les chiffres ne concordaient pas, si deux documents ne concordaient pas entre eux, s'il a fallu les relire avec un modèle plus précis et, si une page n'a pas pu être lue, pourquoi (floue, sombre, coupée, manuscrite, sans rapport avec le travail, d'un autre pays, d'un type non reconnu, sans données utiles ou non lue), sans dire laquelle ; ou, en cas d'échec, le code de l'erreur. Si, avant l'envoi, une photo paraît sombre, floue ou petite, lequel des trois problèmes et si vous l'avez envoyée quand même. Jamais rien de ce que contiennent les documents.",
+        },
+        {
+          when: 'Avec le pass',
+          what: "Que vous commencez le paiement, que le pass est émis au retour du paiement ou lors de sa récupération, ou le code de l'erreur, si, lors de sa vérification, il ressort valable, non valable, expiré, annulé ou sans réponse, et si vous téléchargez le rapport ou la lettre. Pour la lettre, uniquement combien des données facultatives vous avez remplies : aucune, certaines ou toutes (nom, DNI ou NIE, entreprise et localité), jamais lesquelles ni ce qu'elles contiennent : ces données ne font que remplir la lettre dans votre navigateur et ne sont ni envoyées ni conservées. Jamais le code du paiement ni le pass.",
+        },
+        ...(rental
+          ? [
+              {
+                when: tx('privacy.rental.tracked_documents'),
+                what: tx('privacy.rental.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(employment
+          ? [
+              {
+                when: tx('privacy.employment.tracked_documents'),
+                what: tx('privacy.employment.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(credit
+          ? [
+              {
+                when: tx('privacy.credit.tracked_documents'),
+                what: tx('privacy.credit.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(insurance
+          ? [
+              {
+                when: tx('privacy.insurance.tracked_documents'),
+                what: tx('privacy.insurance.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(mortgage
+          ? [
+              {
+                when: tx('privacy.mortgage.tracked_documents'),
+                what: tx('privacy.mortgage.tracked_documents_what'),
+              },
+            ]
+          : []),
+        ...(bills
+          ? [
+              {
+                when: tx('privacy.bills.tracked_documents'),
+                what: tx('privacy.bills.tracked_documents_what'),
+              },
+            ]
+          : []),
+      ]
+    : []),
+  {
+    when: 'Si la page rencontre une erreur',
+    what: "Le type d'erreur et le fichier et la ligne du code où elle s'est produite. Jamais le message d'erreur, car il pourrait citer quelque chose que vous avez saisi.",
+  },
+];
+---
+
+<div class="document__sheets">
+  <section class="sheet sheet--text">
+    <h2 id="pr-resumen">{tx('privacy.summary')}</h2>
+    <p>
+      Ce que vous saisissez dans la vérification ne quitte pas votre appareil. Votre solde de tout
+      compte est calculé entièrement dans votre navigateur et n'est pas conservé. Pour savoir si
+      l'outil est utile et à quelle étape les gens bloquent, les étapes que vous utilisez sont
+      mesurées sans vous identifier. Seuls des codes et des tranches sont envoyés, jamais un montant
+      ni une date. Il n'y a ni cookies ni publicité.
+    </p>
+    {rental && <p>{tx('privacy.rental.summary')}</p>}
+    {employment && <p>{tx('privacy.employment.summary')}</p>}
+    {household && <p>{tx('privacy.household.summary')}</p>}
+    {credit && <p>{tx('privacy.credit.summary')}</p>}
+    {insurance && <p>{tx('privacy.insurance.summary')}</p>}
+    {mortgage && <p>{tx('privacy.mortgage.summary')}</p>}
+    {bills && <p>{tx('privacy.bills.summary')}</p>}
+    {documents && (
+      <p>
+        Si vous décidez d'envoyer un document pour remplir les données, il est lu par IA dans
+        l'Union européenne avec votre consentement et n'est pas conservé. Si vous achetez le pass du
+        rapport, le paiement est géré par Stripe.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-datos">{tx('privacy.data')}</h2>
+    <dl class="data-list">
+      {stored.map(({ what, where }) => (
+        <div>
+          <dt>{what}</dt>
+          <dd>{where}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      Sur les journaux de GitHub, consultez la{' '}
+      <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">
+        déclaration de confidentialité de GitHub
+      </a>
+      .
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-medicion">{tx('privacy.analytics')}</h2>
+    <p>
+      Voici tout ce qui est envoyé. Chaque valeur provient d'une liste fermée de codes ou de
+      tranches, et la page vérifie chaque signal avant de l'envoyer&nbsp;: un signal contenant autre
+      chose ne part pas, et de ce que PostHog ajoute de lui-même, seul passe ce qui figure dans
+      cette liste.
+    </p>
+    <dl class="data-list">
+      {tracked.map(({ when, what }) => (
+        <div>
+          <dt>{when}</dt>
+          <dd>{what}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      Aucun profil n'est créé à votre sujet et aucune visite n'est reliée à une autre&nbsp;: chaque
+      fois que vous ouvrez ou rechargez une page, la mesure repart de zéro. Ne sont jamais envoyés
+      la version de votre système, votre fuseau horaire, la taille de votre écran, votre langue
+      complète, la chaîne complète de l'agent utilisateur, le titre de la page, ce que vous avez
+      recherché pour arriver ici ni les identifiants de clic que les annonceurs ajoutent aux liens
+      (gclid, fbclid et similaires).
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-quien">{tx('privacy.who')}</h2>
+    <p>
+      Les signaux sont reçus par PostHog Inc., l'outil de mesure, dans son{' '}
+      <a href="https://posthog.com/blog/posthog-cloud-eu">cloud de l'Union européenne</a>, hébergé à
+      Francfort (Allemagne). PostHog traite les données pour le compte d'eslojusto.es et ne les
+      utilise à aucune autre fin. PostHog Inc. est une entreprise des États-Unis&nbsp;: le
+      traitement est couvert par son contrat de sous-traitance, qui inclut les clauses
+      contractuelles types de la Commission européenne.
+    </p>
+    <p>
+      À la réception de chaque signal, PostHog voit l'adresse IP de votre connexion et l'agent
+      utilisateur de votre navigateur, comme n'importe quel serveur. Il ne conserve ni l'un ni
+      l'autre&nbsp;: le projet est configuré pour écarter l'adresse IP, sans l'utiliser pour vous
+      localiser, et l'agent utilisateur complet n'est pas envoyé comme donnée&nbsp;; seulement le
+      navigateur, sa version et le système qu'énumère «&nbsp;Ce qui est mesuré&nbsp;».
+    </p>
+    <p>
+      Les signaux sont conservés un an, la durée du plan gratuit de PostHog (consultez sa{' '}
+      <a href="https://posthog.com/docs/privacy">page de confidentialité</a>).
+    </p>
+  </section>
+
+  {documents && (
+    <section class="sheet sheet--text">
+      <h2 id="pr-documentos">{tx('privacy.documents')}</h2>
+      <p>
+        La lecture d'un document est facultative&nbsp;: la vérification fonctionne de la même façon
+        si vous saisissez les données. Avant l'envoi, nous vous demandons votre consentement
+        explicite, car un bulletin de paie ou un relevé de carrière peuvent faire apparaître des
+        données particulièrement protégées, comme l'adhésion à un syndicat (par sa cotisation) ou un
+        arrêt maladie. La base juridique est ce consentement (art. 6.1.a et 9.2.a du Règlement
+        général sur la protection des données, RGPD). Vous pouvez le retirer quand vous le souhaitez
+        en n'envoyant plus de documents&nbsp;: comme rien n'est conservé, il n'y a rien à effacer.
+      </p>
+      {rental && <p>{tx('privacy.rental.consent')}</p>}
+      {employment && <p>{tx('privacy.employment.consent')}</p>}
+      {credit && <p>{tx('privacy.credit.consent')}</p>}
+      {insurance && <p>{tx('privacy.insurance.consent')}</p>}
+      {mortgage && <p>{tx('privacy.mortgage.consent')}</p>}
+      {bills && <p>{tx('privacy.bills.consent')}</p>}
+      <p>
+        Les documents sont traités par Amazon Web Services EMEA SARL (Luxembourg), en tant que
+        sous-traitant&nbsp;: le serveur (AWS Lambda) se trouve en Espagne et le modèle d'IA est
+        utilisé via Amazon Bedrock avec un profil qui ne fonctionne que dans des régions de l'Union
+        européenne. Amazon Bedrock ne conserve ni les documents ni ce que répond le modèle, ne les
+        utilise pas pour entraîner des modèles et ne les partage pas avec Anthropic. Le contrat de
+        sous-traitance d'AWS inclut les clauses contractuelles types de la Commission européenne.
+      </p>
+      <p>
+        Pour que les lectures et les paiements soient faits par des personnes, avant chaque lecture
+        et chaque paiement, la page charge Cloudflare Turnstile, qui vérifie que vous n'êtes pas un
+        robot sans utiliser de cookies. Cloudflare, Inc. reçoit l'adresse IP et des données
+        techniques de votre navigateur pour cette vérification, et uniquement quand vous choisissez
+        d'envoyer un document ou de payer le pass. La base juridique est l'intérêt légitime à éviter
+        les abus du service (art. 6.1.f du RGPD)&nbsp;; Cloudflare adhère au cadre de protection des
+        données UE-États-Unis (Data Privacy Framework).
+      </p>
+      <p>
+        Le pass du rapport se paie sur la page de Stripe Payments Europe, Ltd. (Irlande).
+        eslojusto.es ne voit ni ne conserve les données de votre carte ni de Bizum&nbsp;: il demande
+        seulement à Stripe si le paiement a été effectué et pour quel montant, et note à côté du
+        paiement combien de lectures vous avez faites avec le pass, sans rien de ce qu'elles ont lu.
+        Stripe vous demande votre adresse e-mail et, selon votre mode de paiement, aussi votre nom,
+        votre pays ou votre téléphone. Ces données restent dans le compte Stripe d'eslojusto.es, qui
+        peut les consulter dans le tableau de bord de Stripe pour traiter un problème de paiement ou
+        un remboursement, et elles sont conservées pendant la durée qu'exigent les règles comptables
+        et fiscales. La base juridique est le contrat d'achat (art. 6.1.b) et les obligations
+        comptables et fiscales (art. 6.1.c). Stripe peut traiter les données aux États-Unis&nbsp;;
+        Stripe, Inc. adhère au cadre de protection des données UE-États-Unis et son contrat inclut
+        les clauses contractuelles types. Stripe conserve les données du paiement pendant la durée
+        que lui imposent ces obligations et les règles de lutte contre le blanchiment de
+        capitaux&nbsp;; elle l'explique dans sa{' '}
+        <a href="https://stripe.com/es/privacy">politique de confidentialité</a>. Les conditions de
+        l'achat figurent dans les{' '}
+        <a href={`${link(lang, 'aviso-legal/')}#condiciones`}>mentions légales</a>.
+      </p>
+    </section>
+  )}
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-cookies">{tx('privacy.cookies')}</h2>
+    {documents ? (
+      <p>
+        Ce site n'utilise pas de cookies, et la mesure n'écrit rien sur votre appareil, ni dans
+        aucun autre stockage du navigateur, car tout vit dans la mémoire de la page. Seul est
+        conservé ce que vous demandez&nbsp;: votre choix de thème, si vous appuyez sur son bouton,
+        et, si vous lisez des documents ou achetez le pass, ce qu'explique «&nbsp;Ce qui est
+        conservé, et où&nbsp;». C'est pourquoi vous ne voyez aucun bandeau de cookies.
+      </p>
+    ) : (
+      <p>
+        Ce site n'utilise pas de cookies, et la mesure n'écrit rien sur votre appareil, ni dans
+        aucun autre stockage du navigateur, car tout vit dans la mémoire de la page. La seule chose
+        conservée est votre choix de thème, et uniquement si vous appuyez sur son bouton. C'est
+        pourquoi vous ne voyez aucun bandeau de cookies.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-base">{tx('privacy.legal_basis')}</h2>
+    <p>
+      La base juridique est l'intérêt légitime (art. 6.1.f du Règlement général sur la protection
+      des données, RGPD), qui consiste ici à savoir si l'outil est utilisé, à quelle étape les gens
+      bloquent et ce qui ne fonctionne pas, afin de l'améliorer. Seul le minimum nécessaire est
+      mesuré, sans vous identifier et sans publicité.
+    </p>
+    <p>
+      Si votre navigateur envoie le signal de refus du suivi (Global Privacy Control ou Do Not
+      Track), rien n'est mesuré de votre visite. Vous pouvez aussi vous opposer à cette mesure (art.
+      21 du RGPD) en bloquant l'adresse eu.i.posthog.com avec un bloqueur de contenu. La
+      vérification fonctionne de la même façon.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-responsable">{tx('privacy.controller')}</h2>
+    <p>
+      eslojusto.es est un projet d'Endika Iglesias, responsable de ce traitement. Pour toute
+      question sur vos données, écrivez à <a href={`mailto:${email}`}>{email}</a>. Si vous avez
+      écrit à cette adresse, vous pouvez y demander la consultation, la rectification ou
+      l'effacement des données de votre e-mail. Si vous avez payé le pass, également des données de
+      votre paiement chez Stripe, sauf celles qui doivent être conservées en vertu des règles
+      comptables et fiscales.
+    </p>
+    <p>
+      Ce qui est mesuré ne vous identifie pas&nbsp;: il n'y a donc aucun moyen de retrouver vos
+      signaux pour vous les montrer ou les effacer (art. 11 du RGPD). Si vous estimez que quelque
+      chose n'est pas fait correctement, vous pouvez introduire une réclamation auprès de{' '}
+      <a href="https://www.aepd.es/">l'Agencia Española de Protección de Datos</a> (AEPD, l'autorité
+      espagnole de protection des données).
+    </p>
+  </section>
+</div>
