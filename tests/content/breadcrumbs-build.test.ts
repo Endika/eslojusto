@@ -5,8 +5,8 @@ import { LANGS } from '../../src/i18n/languages';
 
 const built = existsSync('dist/index.html');
 
-// Every page of the build by its path from the site root: whatever the switches put in it, a new
-// page joins the check without touching this test.
+// Every page of the build by its path from the site root: a new page joins the check without
+// touching this test.
 const pages = (dir = 'dist', path = '/'): string[] =>
   readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     if (entry.isDirectory()) return pages(`${dir}/${entry.name}`, `${path}${entry.name}/`);
