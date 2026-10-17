@@ -1,0 +1,119 @@
+---
+// source: fb74508032fd
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { fixedTerms, spanLabel } from '../../content/examples';
+import { euroRange } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<section class="sheet sheet--text">
+  <h3 id="fc-indemnizacion">12 zile pe an, cu excepția contractelor de înlocuire și de formare</h3>
+  <p>
+    La încetarea unui contract pe durată determinată pentru circumstanțe de producție, ți se cuvine
+    o indemnizație (indemnización) de 12 zile de salariu pe an, proporțional cu zilele lucrate (art.
+    49.1.c ET). Dacă contractul a început înainte de 2015, sunt mai puține zile: 8 dacă a început în
+    2011 sau mai devreme, 9 în 2012, 10 în 2013 și 11 în 2014 (disposición transitoria 8.ª ET).
+    Contractele semnate înainte de 4 martie 2001 nu au această indemnizație (disposición transitoria
+    8.ª.2 ET).
+  </p>
+  <p>
+    Contractele de înlocuire a unei alte persoane (sustitución) și contractele de formare
+    (formativo) nu au indemnizație (art. 49.1.c ET). De aceea calculatorul te întreabă tipul de
+    contract imediat după cauză.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET · DT <span>8.ª</span>
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-preaviso">Preavizul pentru contractele de peste un an</h3>
+  <p>
+    Dacă contractul a durat mai mult de un an, cum se poate întâmpla cu unul de înlocuire, firma
+    trebuie să te anunțe de încetare cu cel puțin 15 zile înainte (art. 49.1.c ET). Verificarea
+    socotește ca rămase de plătit zilele din acest preaviz care nu ți-au fost date. Fiecare zi
+    valorează între salariul tău lunar / 30 și salariul tău anual / 365, în funcție de cum o
+    socotește firma.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-ejemplos">Exemple: 3, 6 și 12 luni</h3>
+  <p>
+    Un contract pentru circumstanțe de producție durează cel mult 6 luni sau până la un an, dacă
+    contractul colectiv de muncă din sectorul tău (convenio sectorial) prelungește această durată
+    (art. 15.2 ET).
+  </p>
+  <FigureTable id="fc-tabla">
+    <Fragment slot="caption">
+      Contracte pentru circumstanțe de producție care se încheie la 30 septembrie 2026, cu
+      1.500&nbsp;€ brut pe lună și două plăți suplimentare de 1.500&nbsp;€.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Durata</th>
+        <th scope="col">Indemnizația</th>
+      </tr>
+    </thead>
+    <tbody>
+      {fixedTerms.map(({ months, limit, severance }) => (
+        <tr>
+          <th scope="row">
+            {spanLabel(months, lang, 'months')}
+            {limit === 'sector_agreement' && (
+              <span class="figures-note">
+                doar dacă contractul colectiv din sectorul tău prelungește durata
+              </span>
+            )}
+          </th>
+          <td>{severance ? euroRange(severance) : '—'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    Fiecare indemnizație înseamnă zilele contractului × 12 / 365 zile de salariu, fiecare la
+    21.000&nbsp;€ / 365. Lichidarea finală (finiquito) adaugă salariul din ultima lună, concediul și
+    plățile suplimentare, pe care calculatorul le verifică cu datele tale.
+  </p>
+  <p>
+    Un contract pe durată determinată care își depășește durata maximă poate fi, în realitate, pe
+    durată nedeterminată (indefinido) (art. 15.4 ET), iar atunci încetarea lui ar fi o concediere.
+    Doar contractele pentru o lucrare sau un serviciu (obra o servicio) semnate înainte de 31
+    decembrie 2021 puteau dura mai mult (disposición transitoria 3.ª del Real Decreto-ley 32/2021).
+  </p>
+  <p class="folio">
+    Art. <span>15</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-baja">Dacă contractul se încheie în timp ce ești în concediu medical</h3>
+  <p>
+    Verificarea calculează lichidarea finală cu datele, salariul și zilele de concediu pe care le
+    scrii. Nu ține cont de concediul medical (baja médica) și nici de ce se întâmplă cu prestația
+    aferentă la încetarea contractului: asta nu verificăm.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-paro">Și indemnizația de șomaj</h3>
+  <p>
+    Încetarea unui contract pe durată determinată este situație legală de șomaj (situación legal de
+    desempleo), cu excepția cazului în care l-ai încheiat tu (art. 267.1.a.6.º LGSS). Cât durează
+    depinde de zilele de contribuție din ultimii 6 ani: o găsești în{' '}
+    <CaseLink lang={lang} id="benefit_duration" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

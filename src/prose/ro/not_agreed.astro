@@ -1,0 +1,77 @@
+---
+// source: c72414824687
+import { OFFERED_HOLIDAYS, itemRange, notAgreed } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+
+const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
+const range = itemRange(notAgreed, 'holiday_pay');
+if (!holidays || !range || holidays.difference === null) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="nc-que-es">Ce înseamnă</h3>
+  <p>
+    La încetarea contractului, firma îți predă o propunere a documentului de lichidare cu sumele
+    care ți se cuvin (art. 49.2 ET). Unele persoane, când nu sunt de acord cu o anumită sumă, o
+    semnează adăugând «recibí no conforme» („primit, fără acord”) sau «no conforme» („fără acord”).
+  </p>
+  <p>
+    Această mențiune nu schimbă ce îți plătește firma: rămâne scris că nu ești de acord cu o anumită
+    cifră. Îți spunem asta doar ca informație. Ce e de făcut în cazul tău poate evalua un cabinet de
+    avocatură specializat în dreptul muncii, un consilier în dreptul muncii (graduado social) sau un
+    sindicat.
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-representante">Cu cineva din partea angajaților de față</h3>
+  <p>
+    Poți cere să fie de față un reprezentant legal al angajaților când mergi să semnezi lichidarea
+    finală (finiquito). Documentul menționează dacă o semnezi în prezența lui sau dacă nu ai folosit
+    această posibilitate (art. 49.2 ET).
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-ejemplo">Exemplu: compararea înainte de semnare</h3>
+  <p>
+    O persoană cu 1.500&nbsp;€ brut pe lună și două plăți suplimentare de 1.500&nbsp;€ pleacă prin
+    demisie la 15 octombrie 2026, după ce a lucrat de la 1 martie 2023. A efectuat 10 din cele 22 de
+    zile lucrătoare de concediu și a dat cele 15 zile de preaviz prevăzute de contractul său
+    colectiv de muncă (convenio colectivo). Propunerea îi plătește {euros(OFFERED_HOLIDAYS)} pentru
+    concediu.
+  </p>
+  <p class="example">
+    <span class="example__label">Concediul</span> Minimul legal este de {euroRange(range)}, în
+    funcție de cum se socotește, pe zile sau pe luni. Comparat cu {euros(OFFERED_HOLIDAYS)}, lipsesc
+    cel puțin {euros(holidays.difference)}.
+  </p>
+  <p>
+    Calculatorul face același lucru cu fiecare componentă: scrie ce apare în propunere la pasul
+    „Lichidarea ta finală” și vei vedea ce se potrivește cu minimul legal și ce nu.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-plazos">Termenele continuă să curgă</h3>
+  <p>
+    Pentru salariul rămas de plătit, concediu, plățile suplimentare sau indemnizația la încetarea
+    contractului pe durată determinată, termenul este de un an (art. 59.1 ET).
+  </p>
+  <p>
+    La o concediere, termenul pentru a o contesta este de 20 de zile lucrătoare (días hábiles) (art.
+    59.3 ET). Acest termen se întrerupe la depunerea cererii de conciliere la serviciul public de
+    mediere, arbitraj și conciliere competent. Este scurt, iar un cabinet de avocatură specializat
+    în dreptul muncii, un consilier în dreptul muncii (graduado social) sau un sindicat îți pot
+    spune care se aplică în cazul tău.
+  </p>
+  <p class="folio">
+    Art. <span>59</span> ET
+  </p>
+</section>

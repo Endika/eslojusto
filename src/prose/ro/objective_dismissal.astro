@@ -1,0 +1,88 @@
+---
+// source: 176e7bb53168
+import CaseLink from '../../components/CaseLink.astro';
+import { itemRange, objective, severanceMonths } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const severance = itemRange(objective, 'severance');
+const notice = itemRange(objective, 'employer_notice');
+const salary = itemRange(objective, 'pending_salary');
+const holidays = itemRange(objective, 'holiday_pay');
+const extraPay = itemRange(objective, 'extra_pay');
+const unfair = objective.unfairReference;
+const months =
+  severanceMonths(
+    objective.items.find((p) => p.item.id === 'severance')?.item.calculation ?? [],
+  )[0] ?? 0;
+if (!severance || !notice || !salary || !holidays || !extraPay || unfair === null)
+  throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="do-20-dias">20 de zile pe an, cu un plafon de 12 salarii lunare</h3>
+  <p>
+    La o concediere din motive obiective (despido objetivo), firma trebuie să pună la dispoziția ta,
+    odată cu scrisoarea, o indemnizație (indemnización) de 20 de zile de salariu pe an lucrat, cu un
+    maxim de 12 salarii lunare (art. 53.1.b ET). Ghidul CGPJ, după STS 651/2026 (o hotărâre a Curții
+    Supreme), socotește acest plafon ca 360 de zile. Timpul se socotește în luni, iar o fracțiune de
+    lună contează ca o lună întreagă.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.b</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-preaviso">15 zile de preaviz sau plata lor</h3>
+  <p>
+    Între scrisoare și concediere trebuie să treacă 15 zile de preaviz (art. 53.1.c ET). Zilele pe
+    care firma nu le dă se plătesc. Calculatorul te întreabă câte ți-au fost date și calculează
+    zilele care lipsesc.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-ejemplo">Exemplu rezolvat</h3>
+  <p>
+    O persoană cu 1.500&nbsp;€ brut pe lună și două plăți suplimentare de 1.500&nbsp;€ lucrează de
+    la 3 mai 2018 până la 20 iulie 2026. A efectuat 10 zile de concediu anul acesta, iar firma nu îi
+    dă preaviz. Acestea sunt cifrele calculatorului:
+  </p>
+  <ul>
+    <li>
+      Indemnizația: {euroRange(severance)} ({months} luni × 20 / 12 ={' '}
+      {String((months * 20) / 12).replace('.', ',')} zile).
+    </li>
+    <li>Preavizul nedat: {euroRange(notice)}.</li>
+    <li>Salariul din iulie: {euroRange(salary)}.</li>
+    <li>Zilele de concediu neefectuat: {euroRange(holidays)}.</li>
+    <li>Plata de Crăciun acumulată de la 1 iulie: {euroRange(extraPay)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Dacă ar fi declarată nejustificată</span> Cu aceleași date,
+    indemnizația ar fi de {euros(unfair)}, la 33 de zile pe an. Verificarea îți arată această cifră
+    alături de cea a concedierii din motive obiective.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-diferencia">Concediere din motive obiective sau nejustificată</h3>
+  <p>
+    O concediere din motive obiective se poate contesta la fel ca una disciplinară (art. 53.3 ET).
+    Dacă este declarată nejustificată (improcedente), indemnizația se calculează la 33 de zile pe
+    an, cu un plafon de 720 de zile: o găsești în <CaseLink lang={lang} id="unfair_dismissal" />.
+    Termenul pentru a o contesta este de 20 de zile lucrătoare (art. 59.3 ET).
+  </p>
+  <p class="folio">
+    Art. <span>53 · 56 · 59</span> ET
+  </p>
+</section>

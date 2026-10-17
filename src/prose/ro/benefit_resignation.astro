@@ -1,0 +1,97 @@
+---
+// source: 47084c570826
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitAfterDismissal, benefitAfterResignation } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const dismissal = benefitAfterDismissal;
+if (dismissal.entitled !== 'yes' || dismissal.figures === null)
+  throw new Error('Incomplete example');
+const resignationGivesBenefit = benefitAfterResignation.entitled === 'yes';
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-regla">
+    Regula: plecarea din proprie decizie nu dă dreptul la indemnizație de șomaj
+  </h3>
+  <p>
+    Pentru a primi indemnizația de șomaj, contractul trebuie să se încheie într-o situație legală de
+    șomaj (situación legal de desempleo). Încetarea voluntară a contractului nu este una (art.
+    267.2.a LGSS), așa că demisia (baja voluntaria), ca regulă generală, nu dă dreptul la
+    indemnizație de șomaj, chiar dacă ai zilele de contribuție.
+  </p>
+  <p class="folio">
+    Art. <span>267.2.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-excepciones">Când plecarea dă totuși dreptul la indemnizație de șomaj</h3>
+  <p>
+    Legea tratează ca situație legală de șomaj plecarea din decizia ta în aceste cazuri (art.
+    267.1.a.5.º LGSS):
+  </p>
+  <ul>
+    <li>Un transfer la un alt centru de lucru care impune schimbarea domiciliului (art. 40 ET).</li>
+    <li>O modificare substanțială a condițiilor tale care te dezavantajează (art. 41.3 ET).</li>
+    <li>
+      O încălcare gravă din partea firmei, cum ar fi să nu te plătească sau să te plătească cu
+      întârziere în mod repetat (art. 50 ET). Această plecare este de obicei declarată de o
+      instanță.
+    </li>
+    <li>Violența de gen sau violența sexuală (art. 49.1.m ET).</li>
+  </ul>
+  <p class="folio">
+    Art. <span>267.1.a.5.º</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-nuevo">Dacă după aceea începi un alt loc de muncă</h3>
+  <p>
+    Contează cum se încheie ultimul tău contract. Dacă noul loc de muncă se încheie printr-o
+    concediere sau prin încetarea unui contract pe durată determinată, această încetare este
+    situație legală de șomaj (art. 267.1.a LGSS).
+  </p>
+  <p>
+    Legea reglementează separat un caz: dacă noua firmă încheie contractul în perioada de probă,
+    aceasta este situație legală de șomaj doar dacă au trecut trei luni de la demisia ta (art.
+    267.1.a.7.º LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>267.1.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-ejemplo">Exemplu: același contract, două finaluri</h3>
+  <p>
+    O persoană cu 1.500&nbsp;€ brut pe lună și două plăți suplimentare de 1.500&nbsp;€ lucrează de
+    la 1 septembrie 2023 până la 31 august 2026, fără copii în întreținere.
+  </p>
+  <p class="example">
+    <span class="example__label">Dacă pleacă prin demisie</span>{' '}
+    {resignationGivesBenefit
+      ? 'Calculatorul estimează o indemnizație de șomaj.'
+      : 'Calculatorul răspunde că nu are dreptul la indemnizație de șomaj (art. 267.2.a LGSS).'}{' '}
+    Are totuși dreptul la lichidarea finală (finiquito): salariul rămas de plătit, concediul și
+    plățile suplimentare.
+  </p>
+  <p class="example">
+    <span class="example__label">Dacă este concediată</span> Cu {integer(dismissal.contractDays)}{' '}
+    zile de contribuție i se cuvin cel puțin {integer(dismissal.duration.days)} zile de șomaj,
+    aproximativ {wholeEuros(dismissal.figures.firstStretch.min)} pe lună în primele 6 luni și
+    aproximativ {wholeEuros(dismissal.figures.secondStretch.min)} după aceea, brut.
+  </p>
+  <p>
+    Calculatorul de pe această pagină vine cu demisia deja aleasă. Dacă situația ta este alta,
+    schimbă cauza la primul pas. Mai multe despre lichidarea finală în{' '}
+    <CaseLink lang={lang} id="resignation" />.
+  </p>
+</section>
