@@ -127,6 +127,11 @@ export function setUpRental(
     events.stepCompleted(sheet);
     if (stopAtGate()) return;
     const next = stepFrom(flow, form, nav.current, 1);
+    // The last sheet that applies closes the walk with the review.
+    if (next === RESULT_STEP) {
+      void submitReview();
+      return;
+    }
     nav.reached = Math.max(nav.reached, next);
     nav.show(next, { history: 'push', focus: true });
   }

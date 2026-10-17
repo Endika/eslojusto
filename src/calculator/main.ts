@@ -83,7 +83,9 @@ export function setUpCalculator(
   function focusError(errors: readonly FieldError[]) {
     const first = errors[0];
     if (!first) return;
-    form.querySelector<HTMLInputElement>(`[name="${first.field}"]:not([disabled])`)?.focus();
+    form
+      .querySelector<HTMLElement>(`[name="${first.field}"]:not([disabled])`)
+      ?.focus({ preventScroll: true });
     // Inside the scrolling list of other contracts, the slip sits below its input.
     form.querySelector(`[data-error-for="${first.field}"]`)?.scrollIntoView({ block: 'nearest' });
   }
@@ -98,8 +100,13 @@ export function setUpCalculator(
       focusError(errors);
       return;
     }
-    const next = stepFrom(flow, form, nav.current, 1);
     events.stepCompleted(sheet);
+    const next = stepFrom(flow, form, nav.current, 1);
+    // The last sheet that applies closes the walk with the review.
+    if (next === RESULT_STEP) {
+      void submitReview();
+      return;
+    }
     nav.reached = Math.max(nav.reached, next);
     nav.show(next, { history: 'push', focus: true });
   }
@@ -166,9 +173,11 @@ export function setUpCalculator(
     conditions();
     followHolidayDefault(form);
   });
+  // A changed answer reopens the sheets: the furthest one reachable is the first that still needs
+  // an answer.
   form.addEventListener('input', () => {
     if (nav.reached === RESULT_STEP) {
-      nav.reached = LAST_SHEET;
+      nav.reached = Math.min(LAST_SHEET, firstIncomplete(flow, form, today()));
       nav.renderTabs();
     }
   });

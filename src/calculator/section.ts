@@ -99,6 +99,8 @@ export function setUpSection<
     form
       .querySelector<HTMLElement>(`[name="${first.field}"]:not([disabled])`)
       ?.focus({ preventScroll: true });
+    // Inside a scrolling list of rows, the slip sits below its control.
+    form.querySelector(`[data-error-for="${first.field}"]`)?.scrollIntoView({ block: 'nearest' });
   }
 
   function goToError(errors: readonly E[]) {
