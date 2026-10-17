@@ -3382,9 +3382,9 @@ export const fr: Translation = {
   'rental.guide.fees.2026':
     "Baux signés depuis le {desde}\u00a0: {decreto} prévoit qu'ils ne peuvent être facturés au locataire ni directement ni indirectement, sous aucun intitulé ni aucun nom. Cela couvre tout service visant à préparer, formaliser, gérer, renouveler ou modifier le bail\u00a0; un autre service non nécessaire au bail ne peut être facturé que si vous l'avez demandé par écrit en sachant qu'il était facultatif et quel était son prix.",
   'rental.guide.fees.other_names':
-    "Un frais portant un autre nom, comme «\u00a0étude de solvabilité\u00a0» (estudio de solvencia), «\u00a0réservation\u00a0» (reserva) ou «\u00a0frais de gestion\u00a0» (gestión), peut être un honoraire. Dans un bail antérieur au {desde}, la vérification le signale pour que vous l'examiniez, sans chiffre\u00a0; à partir de cette date, elle le compte comme payé en trop, sauf s'il s'agissait d'un service facultatif que vous avez demandé par écrit.",
+    "Une somme facturée sous un autre nom, comme «\u00a0étude de solvabilité\u00a0» (estudio de solvencia), «\u00a0réservation\u00a0» (reserva) ou «\u00a0frais de gestion\u00a0» (gestión), peut être un honoraire. Dans un bail antérieur au {desde}, la vérification le signale pour que vous l'examiniez, sans chiffre\u00a0; à partir de cette date, elle le compte comme payé en trop, sauf s'il s'agissait d'un service facultatif que vous avez demandé par écrit.",
   'rental.guide.fees.other_names_open':
-    "Un frais portant un autre nom, comme «\u00a0étude de solvabilité\u00a0» (estudio de solvencia), «\u00a0réservation\u00a0» (reserva) ou «\u00a0frais de gestion\u00a0» (gestión), peut être un honoraire. La vérification le signale pour que vous l'examiniez, sans chiffre.",
+    "Une somme facturée sous un autre nom, comme «\u00a0étude de solvabilité\u00a0» (estudio de solvencia), «\u00a0réservation\u00a0» (reserva) ou «\u00a0frais de gestion\u00a0» (gestión), peut être un honoraire. La vérification le signale pour que vous l'examiniez, sans chiffre.",
   'rental.guide.guarantees.title': "Dépôt de garantie, garanties et paiement d'avance",
   'rental.guide.guarantees.deposit':
     "Le dépôt de garantie (fianza) est obligatoire et, pour la location d'un logement, il équivaut à un mois de loyer en espèces (art. 36.1 LAU).",
