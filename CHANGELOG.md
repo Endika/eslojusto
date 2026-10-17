@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.84.0](https://github.com/Endika/eslojusto/compare/v1.83.1...v1.84.0) (2026-10-17)
+
+
+### Features
+
+* **i18n:** give the month its own words in a date with a day ([6fb02b2](https://github.com/Endika/eslojusto/commit/6fb02b2c4d73658316dbdef9568d49b84d552c3f))
+* **i18n:** translate the case pages' prose into Ukrainian ([0795edb](https://github.com/Endika/eslojusto/commit/0795edbcbf0bbc0f775d3eca18fc51c066becba2))
+* **i18n:** translate the dictionary into Ukrainian, unpublished ([a6e5508](https://github.com/Endika/eslojusto/commit/a6e55086531f9c2a7f861cc7c9a9bd00f5a3e01a))
+* **i18n:** translate the final pay guide into Ukrainian ([d1526d6](https://github.com/Endika/eslojusto/commit/d1526d65149fbd878d1e7c54c93ea2e7191db065))
+* **i18n:** translate the legal notice and the privacy page into Ukrainian ([e5779ab](https://github.com/Endika/eslojusto/commit/e5779ab60ae1e345b35271e8e9ab9b98a3af2a9a))
+* **i18n:** translate the rental sections and the ERTE page into Ukrainian ([3ea1843](https://github.com/Endika/eslojusto/commit/3ea1843a894f94e7c82a35d51d2cfbca4c49d441))
+* **i18n:** translate the rental topics into Ukrainian ([ede82c9](https://github.com/Endika/eslojusto/commit/ede82c9033001dcbd088fceabe887f58d6767531))
+
+
+### Bug Fixes
+
+* **i18n:** say a company with few flats is not a large landlord, in Ukrainian ([5aaf6b5](https://github.com/Endika/eslojusto/commit/5aaf6b55660242fe5efe6a4060867f708da566a3))
+
 ## [1.83.1](https://github.com/Endika/eslojusto/compare/v1.83.0...v1.83.1) (2026-10-17)
 
 
