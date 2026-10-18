@@ -3045,8 +3045,8 @@ export const zh: Translation = {
   'rental.guide.source_bde': '法定利率（西班牙银行，Banco de España）',
   'rental.guide.who': '网站背后是谁',
   'rental.guide.norms': '法规',
-  'rental.guide.decree_live': '{norma}（自{desde}起生效，{estado}），',
-  'rental.guide.decree_upcoming': '{norma}（将于{desde}生效，目前{estado}），',
+  'rental.guide.decree_live': '{norma}（自{desde}起生效，{estado}）',
+  'rental.guide.decree_upcoming': '{norma}（将于{desde}生效，目前{estado}）',
   'rental.guide.decree_never': '{norma}从未适用：众议院在其生效之前就将其废止。',
   'rental.guide.decree_repealed':
     '{norma}曾改变这一规则（{periodo}），但已被众议院废止：仍适用此前的规则。',
