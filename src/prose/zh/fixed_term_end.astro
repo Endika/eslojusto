@@ -1,0 +1,108 @@
+---
+// source: fb74508032fd
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { fixedTerms, spanLabel } from '../../content/examples';
+import { euroRange } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<section class="sheet sheet--text">
+  <h3 id="fc-indemnizacion">每年12天，替岗合同和培训类合同除外</h3>
+  <p>
+    因生产情况签订的定期合同（por circunstancias de la
+    producción）结束时，您有权获得每年12天工资的补偿金（indemnización），按实际工作天数折算（art.
+    49.1.c
+    ET）。如果合同在2015年之前开始，天数更少：2011年或之前开始的为8天，2012年为9天，2013年为10天，2014年为11天（disposición
+    transitoria 8.ª ET）。2001年三月4日之前签订的合同没有这笔补偿金（disposición transitoria 8.ª.2
+    ET）。
+  </p>
+  <p>
+    替岗合同和培训类合同没有补偿金（art. 49.1.c
+    ET）。所以计算器在问完离职原因后，紧接着就会问合同类型。
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET · DT <span>8.ª</span>
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-preaviso">合同超过一年时的提前通知期</h3>
+  <p>
+    如果合同持续超过一年（替岗合同就可能如此），公司必须至少提前15天通知您合同结束（art. 49.1.c
+    ET）。本核查把没有给足的提前通知天数算作待支付款项。每天的金额在月工资 / 30与年工资 /
+    365之间，取决于公司的计算方式。
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-ejemplos">示例：3、6和12个月</h3>
+  <p>
+    因生产情况签订的合同最长6个月；如果您的行业集体协议（convenio
+    sectorial）予以延长，最长可到一年（art. 15.2 ET）。
+  </p>
+  <FigureTable id="fc-tabla">
+    <Fragment slot="caption">
+      于2026年九月30日结束的因生产情况签订的合同，每月税前工资1.500&nbsp;€，另有两笔各1.500&nbsp;€的额外工资。
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">期限</th>
+        <th scope="col">补偿金</th>
+      </tr>
+    </thead>
+    <tbody>
+      {fixedTerms.map(({ months, limit, severance }) => (
+        <tr>
+          <th scope="row">
+            {spanLabel(months, lang, 'months')}
+            {limit === 'sector_agreement' && (
+              <span class="figures-note">仅限您的行业集体协议延长期限时</span>
+            )}
+          </th>
+          <td>{severance ? euroRange(severance) : '—'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    每笔补偿金 = 合同天数 × 12 / 365天的工资，每天按21.000&nbsp;€ /
+    365计算。离职结算（finiquito）还包括最后一个月的工资、年假和额外工资，计算器会根据您的数据进行核查。
+  </p>
+  <p>
+    超过最长期限的定期合同，实际上可能是无固定期限合同（art. 15.4
+    ET），这样它的结束就属于解雇。只有2021年十二月31日之前签订的工程或服务合同（obra o
+    servicio）才可以持续更久（disposición transitoria 3.ª del Real Decreto-ley 32/2021）。
+  </p>
+  <p class="folio">
+    Art. <span>15</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-baja">如果合同结束时您在休病假</h3>
+  <p>
+    本核查根据您填写的日期、工资和年假天数计算离职结算。它不考虑病假（baja
+    médica），也不考虑合同结束后病假补贴会怎样：这些我们不作核查。
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-paro">失业金</h3>
+  <p>
+    定期合同到期属于法定失业状态，除非是您自己终止的（art. 267.1.a.6.º
+    LGSS）。失业金（paro）能领多久，取决于最近6年的缴费天数：详见
+    <CaseLink lang={lang} id="benefit_duration" />。
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

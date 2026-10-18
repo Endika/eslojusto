@@ -1,0 +1,134 @@
+---
+// source: 854c3338933e
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitBySalary } from '../../content/examples';
+import { euros, wholeEuros } from '../../content/format';
+import { BENEFIT_2026 } from '../../engine/unemployment';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const { minCap, maxCap } = BENEFIT_2026;
+const [, mid, high] = benefitBySalary;
+if (!mid || !high) throw new Error('Incomplete example');
+type Row = (typeof benefitBySalary)[number];
+const stretch = (b: Row, n: 0 | 1 | 2) => b.children[n] ?? { c1: 0, c2: 0 };
+// One row per figure, one column per salary, so the table fits a phone.
+const rows: readonly (readonly [string, (b: Row) => number])[] = [
+  ['计算基数（base reguladora）', (b) => b.base],
+  ['前180天，没有子女', (b) => stretch(b, 0).c1],
+  ['前180天，一个子女', (b) => stretch(b, 1).c1],
+  ['前180天，两个或以上子女', (b) => stretch(b, 2).c1],
+  ['从第181天起，没有子女', (b) => stretch(b, 0).c2],
+];
+---
+
+<section class="sheet sheet--text">
+  <h3 id="p-cuanto">先领70&nbsp;%，之后领60&nbsp;%</h3>
+  <p>
+    失业金（paro），即缴费型失业金（prestación contributiva por desempleo），按您的计算基数（base
+    reguladora）计算：也就是最近180天失业保险缴费的平均值，不含加班（art. 270.1
+    LGSS）。前180天领取该基数的70&nbsp;%，从第181天起领取60&nbsp;%（art. 270.2 LGSS）。
+  </p>
+  <p>
+    每个月都有最低和最高金额，取决于您需要抚养的子女人数（art. 270.3 LGSS）。2026年，IPREM 为
+    {wholeEuros(BENEFIT_2026.monthlyIprem)}，具体如下：
+  </p>
+  <ul>
+    <li>
+      没有需要抚养的子女：每月{wholeEuros(minCap[0])}至{wholeEuros(maxCap[0])}。
+    </li>
+    <li>
+      一个子女：{wholeEuros(minCap[1])}至{wholeEuros(maxCap[1])}。
+    </li>
+    <li>
+      两个或以上子女：{wholeEuros(minCap[1])}至{wholeEuros(maxCap[2])}。
+    </li>
+  </ul>
+  <p class="folio">
+    Art. <span>270</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-tabla">工资单（nómina）为1.300、1.500或1.800&nbsp;€时，能领多少失业金</h3>
+  <FigureTable id="p-tabla-titulo">
+    <Fragment slot="caption">
+      每月税前失业金，按2026年、工资分14次等额发放、全日制计算，与计算器一样四舍五入到欧元。
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">每月税前工资</th>
+        {benefitBySalary.map(({ salary }) => (
+          <th scope="col">{wholeEuros(salary)}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(([label, value]) => (
+        <tr>
+          <th scope="row">{label}</th>
+          {benefitBySalary.map((b) => (
+            <td>{wholeEuros(value(b))}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    基数等于年工资（含额外工资）除以12：工资1.500&nbsp;€、分14次发放时，21.000&nbsp;€ / 12 ={' '}
+    {euros(mid.base)}，其70&nbsp;%恰好等于没有需要抚养子女时的最高金额。工资1.800&nbsp;€时，基数为
+    {euros(high.base)}
+    ，其70&nbsp;%超过了没有子女和有一个子女时的最高金额，所以这两种情况下领取的是最高金额。
+  </p>
+  <p>
+    这些都是税前数字。其中要扣除基数的4,85&nbsp;%作为社会保障（Seguridad
+    Social）缴费，以及相应的个人所得税（IRPF）。非全日制的数字更低，计算器不提供。
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-requisitos">谁可以领取</h3>
+  <p>
+    合同必须在法定失业状态（situación legal de
+    desempleo）下结束：例如被解雇，或定期合同到期且不是由您自己终止的（art. 267
+    LGSS）。此外，还需要在最近6年内至少缴费360天、登记为求职者（demandante de
+    empleo）并签署活动协议（acuerdo de actividad）等条件（art. 266 LGSS）。
+  </p>
+  <ul>
+    <li>
+      按缴费天数能领多久：
+      <CaseLink lang={lang} id="benefit_duration" />。
+    </li>
+    <li>
+      如果是您自己离职：
+      <CaseLink lang={lang} id="benefit_resignation" />
+    </li>
+    <li>
+      如果您因过错被解雇：
+      <CaseLink lang={lang} id="benefit_disciplinary" />。
+    </li>
+  </ul>
+  <p>
+    不登记为求职者就没有失业金：您需要在所在自治区的就业服务机构登记，并在合同结束后（或离职结算（finiquito）中支付的未休年假结束后）的15天内向
+    SEPE 申请（arts. 266 y 268 LGSS）。据 SEPE 的说法，这些天数按工作日计算。
+  </p>
+  <p class="folio">
+    Arts. <span>266 · 267 · 268</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-erte">如果您处于 ERTE 期间</h3>
+  <p>
+    ERTE（临时停工或减时）期间也可能有权领取失业金。能领多少、是否会消耗您今后的失业金，取决于 ERTE
+    的类型：<a href={link(lang, 'paro/erte/')}>计算您在 ERTE 期间的失业金</a>。
+  </p>
+  <p class="folio">
+    Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+  </p>
+</section>

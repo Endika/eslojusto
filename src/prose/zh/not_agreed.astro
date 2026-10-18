@@ -1,0 +1,65 @@
+---
+// source: c72414824687
+import { OFFERED_HOLIDAYS, itemRange, notAgreed } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+
+const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
+const range = itemRange(notAgreed, 'holiday_pay');
+if (!holidays || !range || holidays.difference === null) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="nc-que-es">这是什么意思</h3>
+  <p>
+    合同结束时，公司会交给您一份结算单草案，列出需支付给您的各项金额（art. 49.2
+    ET）。有些人不同意其中某项金额时，会在签字时加上«recibí no conforme»（“已收到，但不同意”）或«no
+    conforme»（“不同意”）。
+  </p>
+  <p>
+    这一备注不会改变公司支付给您的金额，只是书面记下您不同意其中某个数字。我们介绍这些仅供参考。您的情况该如何处理，可以由劳动法律师事务所、社会事务师（graduado
+    social）事务所或工会来评估。
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-representante">有员工代表在场</h3>
+  <p>
+    签署离职结算（finiquito）时，您可以要求员工法定代表在场。文件上会注明您是在其在场时签署的，还是没有使用这一选择（art.
+    49.2 ET）。
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-ejemplo">示例：签字前先对比</h3>
+  <p>
+    某人每月税前工资1.500&nbsp;€，另有两笔各1.500&nbsp;€的额外工资，从2023年三月1日开始工作，2026年十月15日主动辞职（baja
+    voluntaria）。在22个排班工作日的年假中，已休10天，并按其集体协议（convenio
+    colectivo）提前15天通知。草案中支付的年假为{euros(OFFERED_HOLIDAYS)}。
+  </p>
+  <p class="example">
+    <span class="example__label">年假</span> 法定最低金额为{euroRange(range)}
+    ，取决于按天计算还是按月计算。与{euros(OFFERED_HOLIDAYS)}相比，至少少了
+    {euros(holidays.difference)}。
+  </p>
+  <p>
+    计算器对每一项都做同样的对比：在“您的离职结算”表格中填写草案上的金额，就能看到哪些与法定最低金额一致、哪些不一致。
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-plazos">期限照常计算</h3>
+  <p>未付工资、年假、额外工资或定期合同到期的补偿金，主张的期限为一年（art. 59.1 ET）。</p>
+  <p>
+    如果是解雇，对解雇提出异议的期限为20个工作日（art. 59.3
+    ET）。向相应的公共调解、仲裁和和解服务机构提交调解申请后，该期限中断。期限很短，劳动法律师事务所、社会事务师事务所或工会可以告诉您，您的情况适用哪个机构。
+  </p>
+  <p class="folio">
+    Art. <span>59</span> ET
+  </p>
+</section>

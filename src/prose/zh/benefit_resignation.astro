@@ -1,0 +1,82 @@
+---
+// source: 47084c570826
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitAfterDismissal, benefitAfterResignation } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const dismissal = benefitAfterDismissal;
+if (dismissal.entitled !== 'yes' || dismissal.figures === null)
+  throw new Error('Incomplete example');
+const resignationGivesBenefit = benefitAfterResignation.entitled === 'yes';
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-regla">规则：自己决定离职不能领取失业金</h3>
+  <p>
+    要领取失业金（paro），合同必须在法定失业状态（situación legal de
+    desempleo）下结束。自愿离职不属于这种情况（art. 267.2.a LGSS），所以主动辞职（baja
+    voluntaria）一般不能领取失业金，即使您的缴费天数已经足够。
+  </p>
+  <p class="folio">
+    Art. <span>267.2.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-excepciones">什么情况下离职也能领取失业金</h3>
+  <p>在以下情况下，法律把您自己决定的离职视为法定失业状态（art. 267.1.a.5.º LGSS）：</p>
+  <ul>
+    <li>调到另一个工作场所，需要变更居住地（art. 40 ET）。</li>
+    <li>对您不利的工作条件重大变更（art. 41.3 ET）。</li>
+    <li>公司严重违约，例如反复不付或迟付您的工资（art. 50 ET）。这种离职通常由法院判定。</li>
+    <li>性别暴力或性暴力（art. 49.1.m ET）。</li>
+  </ul>
+  <p class="folio">
+    Art. <span>267.1.a.5.º</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-nuevo">如果之后开始了新工作</h3>
+  <p>
+    要看的是您最后一份合同是如何结束的。如果新工作因解雇或定期合同到期而结束，这种离职属于法定失业状态（art.
+    267.1.a LGSS）。
+  </p>
+  <p>
+    法律对一种情况另有规定：如果新公司在试用期内终止合同，只有在您主动辞职已满三个月时，才属于法定失业状态（art.
+    267.1.a.7.º LGSS）。
+  </p>
+  <p class="folio">
+    Art. <span>267.1.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-ejemplo">示例：同一份合同，两种结局</h3>
+  <p>
+    某人每月税前工资1.500&nbsp;€，另有两笔各1.500&nbsp;€的额外工资，从2023年九月1日工作到2026年八月31日，没有需要抚养的子女。
+  </p>
+  <p class="example">
+    <span class="example__label">如果主动辞职</span>{' '}
+    {resignationGivesBenefit
+      ? '计算器会估算失业金。'
+      : '计算器的答复是无权领取失业金（art. 267.2.a LGSS）。'}
+    照样有离职结算（finiquito）：未付工资、年假和额外工资。
+  </p>
+  <p class="example">
+    <span class="example__label">如果被解雇</span> 缴费{integer(dismissal.contractDays)}
+    天，至少可领取{integer(dismissal.duration.days)}天失业金，前6个月每月约
+    {wholeEuros(dismissal.figures.firstStretch.min)}，之后约
+    {wholeEuros(dismissal.figures.secondStretch.min)}，均为税前。
+  </p>
+  <p>
+    本页的计算器默认选中主动辞职。如果您的情况不同，请在第一张表格中更改离职原因。关于离职结算的更多内容，见
+    <CaseLink lang={lang} id="resignation" />。
+  </p>
+</section>
