@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.85.2](https://github.com/Endika/eslojusto/compare/v1.85.1...v1.85.2) (2026-10-18)
+
+
+### Bug Fixes
+
+* **prose:** keep the space Astro drops at a line break beside a figure ([11833cb](https://github.com/Endika/eslojusto/commit/11833cb75559cf1f5170a7fc0e21218a6625476b))
+
 ## [1.85.1](https://github.com/Endika/eslojusto/compare/v1.85.0...v1.85.1) (2026-10-18)
 
 
