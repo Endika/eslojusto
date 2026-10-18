@@ -1,0 +1,475 @@
+---
+// source: 625095d4cc94
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+import { DOCUMENTS } from '../../documents/config';
+import { OUTAGE_KEY } from '../../documents/outage';
+import { STORAGE_KEYS } from '../../documents/pass';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const tx = (key: Key) => t(lang, key);
+
+const email = 'hola@eslojusto.es';
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+
+// One entry per thing that is stored or processed; a new tool adds a row here.
+const stored = [
+  {
+    what: tx('privacy.data_review'),
+    where:
+      '只保存在您的浏览器中，且仅在页面打开期间。计算在您的设备上进行：您的日期、工资、离职结算（finiquito）中的数字、您需要抚养的子女以及您的其他合同都不会发送到任何服务器，也不会保存。关闭或刷新页面后，这些内容就会消失。',
+  },
+  { what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') },
+  {
+    what: tx('privacy.employment.data_review'),
+    where: tx('privacy.employment.data_review_where'),
+  },
+  {
+    what: tx('privacy.household.data_review'),
+    where: tx('privacy.household.data_review_where'),
+  },
+  { what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') },
+  {
+    what: tx('privacy.insurance.data_review'),
+    where: tx('privacy.insurance.data_review_where'),
+  },
+  {
+    what: tx('privacy.mortgage.data_review'),
+    where: tx('privacy.mortgage.data_review_where'),
+  },
+  { what: tx('privacy.bills.data_review'), where: tx('privacy.bills.data_review_where') },
+  ...(documents
+    ? [{ what: tx('privacy.bills.data_year'), where: tx('privacy.bills.data_year_where') }]
+    : []),
+  {
+    what: tx('privacy.data_analytics'),
+    where:
+      '一些包含代码和区间的简短统计事件，在您使用页面期间发送给 PostHog（详情见下文）。所浏览页面的标识符只存在于页面的内存中：不会写入您的设备，关闭或刷新页面后即丢失。',
+  },
+  ...(documents
+    ? [
+        {
+          what: tx('privacy.data_documents'),
+          where:
+            '仅在您选择上传文件（解雇信、离职结算、工资单（nómina）、公司离职证明（certificado de empresa）、调解协议或调解记录，或工作履历报告（vida laboral））并表示同意时。PDF 文件在您的浏览器中转换为各页的图片，不会离开浏览器；在发送任何内容之前，页面也会在您的浏览器中检查是否有照片看起来过暗、模糊或过小。这些图片和照片以加密方式传送到 eslojusto.es 位于 Amazon Web Services 的服务器，该服务器在西班牙（eu-south-2 区域），再由它通过 Amazon Bedrock 交给一个 AI 模型（Anthropic 的 Claude）处理，全程在欧盟境内。模型判断每一页是什么类型的文件，抄录表格所需的数据，识别结果返回您的浏览器。任何内容都不会保存：文件只在识别期间存在于服务器内存中；服务器日志保存14天，只包含技术数据：结果、页数、用时、模型处理的文本量，以及一些运行标记，例如是否需要第二次识别、文件之间有多少数据不一致（不说明是哪些数据，也不包括其数值），或有多少页无法识别以及原因（例如模糊或来自其他国家）。绝不包括文件内容，也不包括任何能识别您身份的信息。',
+        },
+        {
+          what: tx('privacy.rental.data_documents'),
+          where: tx('privacy.rental.data_documents_where'),
+        },
+        {
+          what: tx('privacy.rental.data_letters'),
+          where: tx('privacy.rental.data_letters_where'),
+        },
+        {
+          what: tx('privacy.employment.data_documents'),
+          where: tx('privacy.employment.data_documents_where'),
+        },
+        {
+          what: tx('privacy.employment.data_letters'),
+          where: tx('privacy.employment.data_letters_where'),
+        },
+        {
+          what: tx('privacy.credit.data_documents'),
+          where: tx('privacy.credit.data_documents_where'),
+        },
+        {
+          what: tx('privacy.credit.data_letters'),
+          where: tx('privacy.credit.data_letters_where'),
+        },
+        {
+          what: tx('privacy.insurance.data_documents'),
+          where: tx('privacy.insurance.data_documents_where'),
+        },
+        {
+          what: tx('privacy.insurance.data_letters'),
+          where: tx('privacy.insurance.data_letters_where'),
+        },
+        {
+          what: tx('privacy.mortgage.data_documents'),
+          where: tx('privacy.mortgage.data_documents_where'),
+        },
+        {
+          what: tx('privacy.mortgage.data_letters'),
+          where: tx('privacy.mortgage.data_letters_where'),
+        },
+        {
+          what: tx('privacy.bills.data_documents'),
+          where: tx('privacy.bills.data_documents_where'),
+        },
+        {
+          what: tx('privacy.bills.data_letters'),
+          where: tx('privacy.bills.data_letters_where'),
+        },
+        {
+          what: tx('privacy.data_pass'),
+          where: `保存在您浏览器的本地存储（localStorage）中，且仅在您使用时：一个带签名的当日免费识别次数计数器（«${STORAGE_KEYS.quota}»）；如果您购买了通行证，还有通行证及其剩余的识别次数（«${STORAGE_KEYS.pass}»），以及您发起的每笔付款的代码，附带一个只有您的浏览器知道的随机数，以便找回通行证（«${STORAGE_KEYS.checkout}»；每笔付款如未完成，7天后删除，或在其通行证过期时删除）。这些内容不包含您的姓名，也不包含您文件中的任何内容，只有在下一次识别、找回通行证，或在向您显示核查的详细内容、报告或信函之前核验通行证时，才会离开您的设备。接收它们的是 eslojusto.es 位于 AWS 的服务器，由它向 Stripe 查询付款情况。过期的通行证和前一天的计数器会在页面下一次读取它们时自动删除；当您在浏览器中清除本网站的数据时，所有内容都会删除。因此，通行证只在此浏览器中有效，在其他设备上、在无痕窗口中或清除数据后就会丢失。如果识别功能暂不可用，该标签页会在其会话存储中记住这一点一个小时（«${OUTAGE_KEY}»，只记录时间），以免在此期间向您提供该功能。`,
+        },
+        {
+          what: tx('privacy.data_checkout'),
+          where: `如果您付款，在您停留在付款页面期间，您的核查答案会保存在该标签页的会话存储（sessionStorage）中，以便您返回时向您显示结果。对于电费账单，您这一年中已经核查过的每张账单的答案也以这种方式保存，但不包括供电点代码的指纹码。这些内容不会离开您的设备，在您返回或关闭标签页时删除。`,
+        },
+      ]
+    : []),
+  {
+    what: tx('privacy.data_theme'),
+    where:
+      '保存在您浏览器的本地存储（localStorage）中，且仅在您点击主题按钮时。它绝不会离开您的设备。当您在浏览器中清除本网站的数据时，它会被删除。',
+  },
+  {
+    what: tx('privacy.data_server'),
+    where:
+      '本网站托管在 GitHub Pages 上。和任何网络服务器一样，GitHub 会记录每次访问的 IP 地址和技术数据。',
+  },
+];
+
+// The allowlist (src/analytics/sanitize.ts) and the event catalogue (src/analytics/events.ts), in
+// plain words. Keep all three in step: the analytics e2e asserts the exact keys.
+const tracked = [
+  {
+    when: '每个统计事件',
+    what: '每个统计事件的日期和时间，以及一个只在页面打开期间存在的随机数。不带参数的页面地址：域名、路径和您所在的页。您的浏览器及其版本，以及您的系统（Windows、Android…）。设备类型（电脑、手机或平板）和窗口大小。您来自的网站的域名（例如«www.google.com»），不含完整地址。如果您通过推广链接进入，统计其来源、媒介和名称（utm_source、utm_medium、utm_campaign），仅当它们是由字母、数字和连字符组成的简短代码时。还有 PostHog 的三项技术数据：eslojusto.es 项目的密钥、其代码的版本，以及一个要求它不创建任何用户档案的标记。',
+  },
+  {
+    when: '打开页面时',
+    what: '您打开了该页面，以及您浏览器的主要语言，只统计其通用部分：«ja»，而不是«ja-JP»。',
+  },
+  {
+    when: '离开页面时',
+    what: '您在页面上停留了多长时间，以及您向下滚动到了哪里。',
+  },
+  {
+    when: '如果您使用浏览器的翻译功能',
+    what: '您将页面翻译成的语言，例如«ar»。',
+  },
+  {
+    when: '核查的每一页',
+    what: '您打开了该页；完成该页时，统计您用了多长时间，按较宽的区间：少于10秒、10至30秒、30至60秒、60至180秒，或超过180秒。如果您返回上一步，统计是从哪一页回到哪一页。',
+  },
+  {
+    when: '如果某个数据未被接受',
+    what: '字段的名称，例如“离职日期”。绝不包括您在其中填写的内容。',
+  },
+  {
+    when: '如果您打开帮助',
+    what: '您打开了哪个常见问题，或者您查看了哪一项的“计算方法”。',
+  },
+  {
+    when: '核查时',
+    what: '合同终止的原因、定期合同的类型、您领取额外工资（pagas extra）的方式、您的年假按排班工作日（laborables）还是自然日（naturales）计算，如果按排班工作日计算，您每周工作5天、6天还是其他天数，均按您在选项中的选择统计。有多少项填入了您离职结算中的数字，以及有多少项低于、等于、高于法定标准或无法核查。扣除的提前通知期是否超过上限。是否显示了不当解雇（improcedente）需支付的金额（不含数字）。结果显示为概要还是通行证的详细内容。差额是零、低于100 €、100至500 €、500至2.000 €，还是更高。您在本页面核查了几次、按区间计的用时，以及如果您再次核查，您修改过的字段名称。关于失业金（paro），只统计该估算是否不适用于您的原因、是否给出了数字，以及您添加了多少份其他合同，按区间统计：0、1、2，或3及以上。绝不包括您需要抚养的子女人数，也不包括这些合同的任何日期。关于 ERTE 以及是否已向您付款，如果您修改了答案，只统计问题的名称，绝不统计答案。您就可能的无效解雇（nulo）所勾选的内容（怀孕、各类假期、病假…）绝不会发送，即使您勾选了某一项也不会。',
+  },
+  {
+    when: '点击“重新开始”时',
+    what: '您点击了该按钮。',
+  },
+  {
+    when: tx('privacy.rental.tracked_sheets'),
+    what: tx('privacy.rental.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.rental.tracked_scope'),
+    what: tx('privacy.rental.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.rental.tracked_review'),
+    what: tx('privacy.rental.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_sheets'),
+    what: tx('privacy.employment.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_scope'),
+    what: tx('privacy.employment.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_review'),
+    what: tx('privacy.employment.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_sheets'),
+    what: tx('privacy.household.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_scope'),
+    what: tx('privacy.household.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_review'),
+    what: tx('privacy.household.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_sheets'),
+    what: tx('privacy.credit.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_scope'),
+    what: tx('privacy.credit.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_review'),
+    what: tx('privacy.credit.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_sheets'),
+    what: tx('privacy.insurance.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_scope'),
+    what: tx('privacy.insurance.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_review'),
+    what: tx('privacy.insurance.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_sheets'),
+    what: tx('privacy.mortgage.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_scope'),
+    what: tx('privacy.mortgage.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_review'),
+    what: tx('privacy.mortgage.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_sheets'),
+    what: tx('privacy.bills.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_scope'),
+    what: tx('privacy.bills.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_review'),
+    what: tx('privacy.bills.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_telecom'),
+    what: tx('privacy.bills.tracked_telecom_what'),
+  },
+  ...(documents
+    ? [
+        {
+          when: '选择开始方式时',
+          what: '您选择的是上传文件还是手动填写。',
+        },
+        {
+          when: '识别文件时',
+          what: '您上传了多少张照片或多少页，按区间统计（1、2至4、5至9、10至15或16至25），以及您选择了多少个 PDF。完成时，统计识别出了哪些类型的文件（例如解雇信或工资单）、填入了多少个数据，按区间统计（0、1至3、4至8，或9及以上），是否有数据的置信度低，数字是否不一致，是否有两份文件不一致，是否需要用更精确的模型再次识别；如果有页面无法识别，统计原因（模糊、过暗、被裁切、手写、与劳动无关、来自其他国家、无法辨认的类型、没有有用数据或未识别），但不说明是哪一页；如果出错，则统计错误代码。如果在发送之前某张照片看起来过暗、模糊或过小，统计是这三种情况中的哪一种，以及您是否仍然发送了它。绝不包括文件上写的任何内容。',
+        },
+        {
+          when: '使用通行证时',
+          what: '您开始付款；通行证在付款返回时或找回时签发，或者错误代码；核验时通行证是有效、无效、已过期、已作废还是没有响应；以及您是否下载了报告或信函。对于信函，只统计您填写了可选数据（姓名、DNI 或 NIE、公司和所在地）中的全部、部分还是没有填写，绝不统计是哪些，也不统计填写的内容：这些数据只用于在您的浏览器中填写信函，不会发送，也不会保存。绝不包括付款代码或通行证本身。',
+        },
+        {
+          when: tx('privacy.rental.tracked_documents'),
+          what: tx('privacy.rental.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_documents'),
+          what: tx('privacy.employment.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_documents'),
+          what: tx('privacy.credit.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_documents'),
+          what: tx('privacy.insurance.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_documents'),
+          what: tx('privacy.mortgage.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_documents'),
+          what: tx('privacy.bills.tracked_documents_what'),
+        },
+      ]
+    : []),
+  {
+    when: '如果页面出错',
+    what: '错误的类型，以及错误发生在代码的哪个文件和哪一行。绝不包括错误信息，因为其中可能引用您填写的内容。',
+  },
+];
+---
+
+<div class="document__sheets">
+  <section class="sheet sheet--text">
+    <h2 id="pr-resumen">{tx('privacy.summary')}</h2>
+    <p>
+      您在核查中填写的内容不会离开您的设备。您的离职结算（finiquito）完全在您的浏览器中计算，不会保存。为了了解这个工具是否有用、大家在哪一步卡住，我们会在不确认您身份的情况下统计您使用了哪些步骤。发送的只有代码和区间，绝不包括金额或日期。不使用
+      cookie，也没有广告。
+    </p>
+    <p>{tx('privacy.rental.summary')}</p>
+    <p>{tx('privacy.employment.summary')}</p>
+    <p>{tx('privacy.household.summary')}</p>
+    <p>{tx('privacy.credit.summary')}</p>
+    <p>{tx('privacy.insurance.summary')}</p>
+    <p>{tx('privacy.mortgage.summary')}</p>
+    <p>{tx('privacy.bills.summary')}</p>
+    {documents && (
+      <p>
+        如果您决定上传文件来填写数据，文件会在征得您同意后在欧盟境内由 AI
+        识别，且不会保存。如果您购买报告通行证，付款由 Stripe 处理。
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-datos">{tx('privacy.data')}</h2>
+    <dl class="data-list">
+      {stored.map(({ what, where }) => (
+        <div>
+          <dt>{what}</dt>
+          <dd>{where}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      关于 GitHub 的日志，请参阅
+      <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">
+        GitHub 隐私声明
+      </a>
+      。
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-medicion">{tx('privacy.analytics')}</h2>
+    <p>
+      以下就是发送的全部内容。每个值都来自一份封闭的代码或区间列表，页面在发送每个统计事件之前都会进行检查：含有任何其他内容的统计事件不会发出；PostHog
+      自行添加的内容中，只有列在此处的才会通过。
+    </p>
+    <dl class="data-list">
+      {tracked.map(({ when, what }) => (
+        <div>
+          <dt>{when}</dt>
+          <dd>{what}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      不会为您创建用户档案，也不会把一次访问与另一次访问关联起来：每次您打开或刷新页面，统计都从零开始。绝不会发送您的系统版本、时区、屏幕尺寸、完整的语言设置、完整的用户代理字符串、页面标题、您为进入本网站搜索的内容，以及广告商添加到链接中的点击标识符（gclid、fbclid
+      等）。
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-quien">{tx('privacy.who')}</h2>
+    <p>
+      接收方是统计工具 PostHog Inc.，数据存放在其位于德国法兰克福的
+      <a href="https://posthog.com/blog/posthog-cloud-eu">欧盟云</a>中。它受 eslojusto.es
+      委托处理这些数据，不将其用于任何其他目的。PostHog Inc.
+      是一家美国公司：该处理受其数据处理者合同约束，该合同包含欧盟委员会的标准合同条款。
+    </p>
+    <p>
+      在接收每个统计事件时，PostHog 和任何服务器一样，会看到您网络连接的 IP
+      地址和您浏览器的用户代理。这两者它都不保存：项目已设置为丢弃 IP
+      地址，不用它来确定您的位置；完整的用户代理也不会作为数据发送，只发送“统计哪些内容”中列出的浏览器、其版本和系统。
+    </p>
+    <p>
+      统计事件保存一年，这是 PostHog 免费套餐的保存期限（请参阅其
+      <a href="https://posthog.com/docs/privacy">隐私页面</a>）。
+    </p>
+  </section>
+
+  {documents && (
+    <section class="sheet sheet--text">
+      <h2 id="pr-documentos">{tx('privacy.documents')}</h2>
+      <p>
+        识别文件是可选的：如果您自己填写数据，核查同样可以进行。上传之前，我们会征求您的明确同意，因为工资单或工作履历报告可能显示受特别保护的数据，例如工会会员身份（通过会费体现）或病假。法律依据就是这一同意（《通用数据保护条例》（Reglamento
+        General de Protección de Datos）arts. 6.1.a y
+        9.2.a）。您可以随时撤回同意，只要不再上传文件即可：由于不保存任何内容，也就没有需要删除的内容。
+      </p>
+      <p>{tx('privacy.rental.consent')}</p>
+      <p>{tx('privacy.employment.consent')}</p>
+      <p>{tx('privacy.credit.consent')}</p>
+      <p>{tx('privacy.insurance.consent')}</p>
+      <p>{tx('privacy.mortgage.consent')}</p>
+      <p>{tx('privacy.bills.consent')}</p>
+      <p>
+        文件由数据处理者 Amazon Web Services EMEA SARL（卢森堡）处理：服务器（AWS
+        Lambda）位于西班牙，AI 模型通过 Amazon Bedrock 使用，所用的配置只在欧盟区域内运行。Amazon
+        Bedrock 不保存文件，也不保存模型的回复，不用它们训练模型，也不与 Anthropic 共享。AWS
+        的数据处理者合同包含欧盟委员会的标准合同条款。
+      </p>
+      <p>
+        为了确保识别和付款是由真人发起的，在每次识别和每次付款之前，页面会加载 Cloudflare
+        Turnstile，它在不使用 cookie 的情况下检查您不是机器人。为进行这项检查，Cloudflare, Inc.
+        会收到 IP
+        地址和您浏览器的技术数据，且仅在您选择上传文件或购买通行证时。法律依据是防止滥用本服务的合法利益（该条例
+        art. 6.1.f）；Cloudflare 已加入欧盟-美国数据隐私框架（Marco de Privacidad de Datos UE-EE.
+        UU.）。
+      </p>
+      <p>
+        报告通行证在 Stripe Payments Europe, Ltd.（爱尔兰）的页面上付款。eslojusto.es
+        看不到也不保存您的银行卡或 Bizum 数据：它只向 Stripe
+        查询付款是否完成以及金额多少，并在付款记录旁记下您用该通行证进行了多少次识别，不包含识别的任何内容。Stripe
+        会要求您提供电子邮箱，并根据您的付款方式，可能还会要求您的姓名、国家或电话。这些数据保存在
+        eslojusto.es 的 Stripe 账户中，eslojusto.es 可以在 Stripe
+        后台查看，以处理付款问题或退款，并按照会计和税务法规要求的期限保存。法律依据是购买合同（art.
+        6.1.b）以及会计和税务义务（art. 6.1.c）。Stripe 可能在美国处理这些数据；Stripe, Inc.
+        已加入欧盟-美国数据隐私框架，其合同包含标准合同条款。Stripe
+        按照这些义务和反洗钱法规要求的期限保存付款数据，详见其
+        <a href="https://stripe.com/es/privacy">隐私政策</a>。购买条件见
+        <a href={`${link(lang, 'aviso-legal/')}#condiciones`}>法律声明</a>。
+      </p>
+    </section>
+  )}
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-cookies">{tx('privacy.cookies')}</h2>
+    {documents ? (
+      <p>
+        本网站不使用
+        cookie，统计也不会在您的设备上写入任何内容，也不写入浏览器的任何其他存储，因为一切都存在于页面的内存中。只保存您要求保存的内容：如果您点击主题按钮，保存您选择的主题；如果您识别文件或购买通行证，保存“保存什么、保存在哪里”中说明的内容。因此，您不会看到任何
+        cookie 提示。
+      </p>
+    ) : (
+      <p>
+        本网站不使用
+        cookie，统计也不会在您的设备上写入任何内容，也不写入浏览器的任何其他存储，因为一切都存在于页面的内存中。唯一保存的是您选择的主题，且仅在您点击主题按钮时。因此，您不会看到任何
+        cookie 提示。
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-base">{tx('privacy.legal_basis')}</h2>
+    <p>
+      法律依据是合法利益（《通用数据保护条例》（Reglamento General de Protección de Datos）art.
+      6.1.f），在这里是指了解这个工具是否被使用、大家在哪一步卡住以及哪里出错，以便改进它。为此只统计最少的内容，不确认您的身份，也没有广告。
+    </p>
+    <p>
+      如果您的浏览器发送拒绝跟踪信号（Global Privacy Control 或 Do Not
+      Track），您的访问不会被统计任何内容。您也可以使用内容拦截工具屏蔽 eu.i.posthog.com
+      这个地址，以反对这项统计（该条例 art. 21）。核查功能照常可用。
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-responsable">{tx('privacy.controller')}</h2>
+    <p>
+      eslojusto.es 是 Endika Iglesias
+      的项目，他是这项数据处理的控制者。如对您的数据有任何问题，请写信至{' '}
+      <a href={`mailto:${email}`}>{email}</a>
+      。如果您曾写信到该地址，可以通过该地址要求查阅、更正或删除您邮件中的数据。如果您购买了通行证，也可以要求查阅、更正或删除您在
+      Stripe 的付款数据，但会计和税务法规要求保存的数据除外。
+    </p>
+    <p>
+      统计的内容无法识别您的身份，因此无法找到您的统计事件来向您展示或删除（该条例 art.
+      11）。如果您认为某些做法不当，可以向
+      <a href="https://www.aepd.es/">西班牙数据保护局（Agencia Española de Protección de Datos）</a>
+      提出投诉。
+    </p>
+  </section>
+</div>

@@ -1,0 +1,256 @@
+---
+// source: b643a207932c
+import { t, type Key } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+import { DOCUMENTS } from '../../documents/config';
+import { PASS_DAYS, PASS_READS } from '../../documents/contract';
+import {
+  BILLS_BETA,
+  CREDIT_BETA,
+  EMPLOYMENT_BETA,
+  INSURANCE_BETA,
+  MORTGAGE_BETA,
+} from '../../content/sections';
+import { erteCopy } from '../../content/erte';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const tx = (key: Key, vars?: Record<string, string>) => t(lang, key, vars);
+
+const email = 'hola@eslojusto.es';
+// The owner's details (art. 10 LSSI), on every build: the duty covers the whole site.
+const owner = {
+  titular: tx('legal.owner_name'),
+  nif: tx('legal.owner_id'),
+  domicilio: tx('legal.owner_address'),
+};
+// The pass and its conditions exist only in a build with the documents API.
+const documents = DOCUMENTS !== null;
+const erteText = erteCopy(lang);
+---
+
+<div class="document__sheets">
+  <section class="sheet sheet--text">
+    <h2 id="al-quien">{tx('legal_notice.who')}</h2>
+    <p>
+      eslojusto.es 是 Endika Iglesias 的项目。如对本网站有任何疑问，请写信至{' '}
+      <a href={`mailto:${email}`}>{email}</a>。
+    </p>
+    <p>{tx('legal_notice.owner')}</p>
+    <dl class="data-list" data-owner>
+      <div>
+        <dt>{tx('legal.owner_name_label')}</dt>
+        <dd>{owner.titular}</dd>
+      </div>
+      <div>
+        <dt>{tx('legal.owner_id_label')}</dt>
+        <dd>{owner.nif}</dd>
+      </div>
+      {owner.domicilio && (
+        <div>
+          <dt>{tx('legal.owner_address_label')}</dt>
+          <dd>{owner.domicilio}</dd>
+        </div>
+      )}
+      <div>
+        <dt>{tx('legal.owner_contact_label')}</dt>
+        <dd>
+          <a href={`mailto:${email}`}>{email}</a>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-que-hace">{tx('legal_notice.what_it_does')}</h2>
+    <p>
+      本工具逐项将您离职结算（finiquito）中的数字与法律规定的最低标准进行比较。计算公式依据《劳动者法》（Estatuto
+      de los Trabajadores）和
+      CGPJ（西班牙司法总委员会）关于补偿金计算的实用指南（v0.6，2026年七月），每个数字都注明其所依据的条款。
+    </p>
+    <p>
+      当一条规则允许两种计算方式时，本工具给出两者之间的范围。您的集体协议（convenio
+      colectivo）可以改善的内容，例如更多的年假天数或不同的额外工资（pagas
+      extra）累计方式，会与法定最低标准进行比较，并加以提示。当缺少某个数据、没有它就得不出法定数字时，例如主动辞职的提前通知期，本工具会将其标记为“无法核查”，而不是给出一个它无从得知的数字。
+    </p>
+    {documents && (
+      <p>
+        如果您上传文件，AI
+        模型会将其中的数据抄录到表格中。它不做任何计算：在核查之前，每个数据都由您确认，而数字由同一个工具计算，与您手动填写时相同。
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-no-hace">{tx('legal_notice.what_it_does_not')}</h2>
+    <ul>
+      <li>本工具不提供法律咨询，只提供关于法律规定的一般信息。</li>
+      <li>本工具不了解您的集体协议，也不核查税后工资、各项津贴（pluses）、加班或提成。</li>
+      <li>本工具不判断解雇理由是否成立，这由法院判定。</li>
+      <li>本工具不会告诉您如何处理您的离职结算。</li>
+    </ul>
+    <p>
+      本工具不能代替劳动法律师事务所、社会事务师（graduado
+      social）事务所或工会，它们可以结合您的文件和您的集体协议审查您的情况。
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-alquiler">
+      {tx('legal_notice.rental')} <span class="beta">{tx('rental.beta')}</span>
+    </h2>
+    <p>{tx('legal_notice.rental.does')}</p>
+    <p>{tx('legal_notice.rental.pending')}</p>
+    <p>{tx('legal_notice.rental.does_not')}</p>
+    <p>
+      {tx('legal_notice.rental.beta')} <a href={`mailto:${email}`}>{email}</a>。
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-contrato">
+      {tx('legal_notice.employment')}
+      {EMPLOYMENT_BETA && <span class="beta">{tx('employment.beta')}</span>}
+    </h2>
+    <p>{tx('legal_notice.employment.does')}</p>
+    <p>{tx('legal_notice.employment.does_not')}</p>
+    {EMPLOYMENT_BETA && (
+      <p>
+        {tx('legal_notice.employment.beta')} <a href={`mailto:${email}`}>{email}</a>。
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-hogar">
+      {tx('legal_notice.household')} <span class="beta">{tx('household.beta')}</span>
+    </h2>
+    <p>{tx('legal_notice.household.does')}</p>
+    <p>{tx('legal_notice.household.does_not')}</p>
+    <p>
+      {tx('legal_notice.household.beta')} <a href={`mailto:${email}`}>{email}</a>。
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-financiacion">
+      {tx('legal_notice.credit')}
+      {CREDIT_BETA && <span class="beta">{tx('credit.beta')}</span>}
+    </h2>
+    <p>{tx('legal_notice.credit.does')}</p>
+    <p>{tx('legal_notice.credit.does_not')}</p>
+    {CREDIT_BETA && (
+      <p>
+        {tx('legal_notice.credit.beta')} <a href={`mailto:${email}`}>{email}</a>。
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-seguros">
+      {tx('legal_notice.insurance')}
+      {INSURANCE_BETA && <span class="beta">{tx('insurance.beta')}</span>}
+    </h2>
+    <p>{tx('legal_notice.insurance.does')}</p>
+    <p>{tx('legal_notice.insurance.does_not')}</p>
+    {INSURANCE_BETA && (
+      <p>
+        {tx('legal_notice.insurance.beta')} <a href={`mailto:${email}`}>{email}</a>。
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-hipoteca">
+      {tx('legal_notice.mortgage')}
+      {MORTGAGE_BETA && <span class="beta">{tx('mortgage.beta')}</span>}
+    </h2>
+    <p>{tx('legal_notice.mortgage.does')}</p>
+    <p>{tx('legal_notice.mortgage.does_not')}</p>
+    {MORTGAGE_BETA && (
+      <p>
+        {tx('legal_notice.mortgage.beta')} <a href={`mailto:${email}`}>{email}</a>。
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-facturas">
+      {tx('legal_notice.bills')}
+      {BILLS_BETA && <span class="beta">{tx('bills.beta')}</span>}
+    </h2>
+    <p>{tx('legal_notice.bills.does')}</p>
+    <p>{tx('legal_notice.bills.does_not')}</p>
+    {BILLS_BETA && (
+      <p>
+        {tx('legal_notice.bills.beta')} <a href={`mailto:${email}`}>{email}</a>。
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-erte">
+      {erteText.legal.title} <span class="beta">{erteText.page.beta}</span>
+    </h2>
+    <p>{erteText.legal.does}</p>
+    <p>{erteText.legal.doesNot}</p>
+    <p>
+      {erteText.legal.beta} <a href={`mailto:${email}`}>{email}</a>。
+    </p>
+  </section>
+
+  {documents && (
+    <section class="sheet sheet--text">
+      <h2 id="condiciones">{tx('legal_notice.conditions')}</h2>
+      <p>
+        {tx('legal_notice.seller', owner)}
+        {owner.domicilio && <>{tx('legal_notice.seller_address', owner)} </>}
+        如对购买有任何疑问，请写信至 <a href={`mailto:${email}`}>{email}</a>。
+      </p>
+      <ul>
+        <li>
+          您购买的是：一张数字通行证，自付款起{PASS_DAYS}
+          天内有效，且仅在您付款时使用的浏览器中有效。在此期间，您可以重做或修改您的核查，识别最多
+          {PASS_READS}组文件，并可不限次数、无需再次付款地下载一份包含您离职结算核查结果的 PDF
+          报告，以及一份“已收到，但不同意”（recibí no
+          conforme）信函模板；如有缺少的款项，模板中会填入您的数字。报告和信函在您的设备上根据您的核查数据生成，我们不会在任何地方保存这些数据。
+        </li>
+        <li>{tx('legal_notice.rental.pass', { dias: String(PASS_DAYS) })}</li>
+        <li>{tx('legal_notice.employment.pass', { dias: String(PASS_DAYS) })}</li>
+        <li>{tx('legal_notice.mortgage.pass', { dias: String(PASS_DAYS) })}</li>
+        <li>{tx('legal_notice.bills.pass', { dias: String(PASS_DAYS) })}</li>
+        <li>
+          适用范围：通行证只保存在该浏览器中。在其他设备上、在无痕窗口中，或者您清除了浏览数据，通行证就会丢失。
+        </li>
+        <li>
+          价格：4,99 €，含增值税（IVA）。在 Stripe 页面通过银行卡或 Bizum
+          一次性付款，不是订阅，之后也不会再扣费。
+        </li>
+        <li>
+          交付：付款返回后立即交付；届时请下载报告和信函。如果您看不到下载项，可以在结果中点击“已经付过款了？”找回通行证，但仅限于您付款时使用的浏览器。
+        </li>
+        <li>
+          撤回权（derecho de
+          desistimiento）：这是即时交付的数字内容。付款前，我们会请您勾选确认您希望立即获得该内容，并知道这样您将失去14天的撤回权（《保护消费者和用户总法》合并文本（texto
+          refundido de la Ley General para la Defensa de los Consumidores y Usuarios）art. 103.m）。
+        </li>
+        <li>
+          如果出现问题，例如您无法下载报告或被扣款两次，请写信至{' '}
+          <a href={`mailto:${email}`}>{email}</a>，相应的金额将会退还。
+        </li>
+        <li>报告提供关于法律的一般信息，不构成法律咨询。信函只是一份模板：是否使用由您决定。</li>
+      </ul>
+    </section>
+  )}
+
+  <section class="sheet sheet--text">
+    <h2 id="al-errores">{tx('legal_notice.errors')}</h2>
+    <p>
+      补偿金的计算结果会与 CGPJ 计算器算出的案例进行对照。如果您发现某个数字与法律不一致，可以写信至{' '}
+      <a href={`mailto:${email}`}>{email}</a>。
+    </p>
+  </section>
+</div>
