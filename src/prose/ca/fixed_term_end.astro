@@ -1,0 +1,112 @@
+---
+// source: df0ae511359a
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { euroRange, fixedTerms, spanLabel } from '../../content/examples';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<section class="sheet sheet--text">
+  <h3 id="fc-indemnizacion">12 dies per any, llevat de substitució i formació</h3>
+  <p>
+    En acabar un contracte temporal per circumstàncies de la producció, et correspon una
+    indemnització de 12 dies de salari per any, en proporció als dies treballats (art. 49.1.c ET).
+    Si el contracte va començar abans del 2015, són menys dies: 8 si va començar el 2011 o abans, 9
+    el 2012, 10 el 2013 i 11 el 2014 (disposició transitòria 8.ª ET). Els contractes signats abans
+    del 4 de març de 2001 no tenen aquesta indemnització (disposició transitòria 8.ª.2 ET).
+  </p>
+  <p>
+    Els contractes de substitució d’una altra persona i els contractes formatius no tenen
+    indemnització (art. 49.1.c ET). Per això la calculadora et pregunta el tipus de contracte just
+    després de la causa.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET · DT <span>8.ª</span>
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-preaviso">El preavís en contractes de més d’un any</h3>
+  <p>
+    Si el contracte ha durat més d’un any, com pot passar amb un de substitució, l’empresa t’ha
+    d’avisar del final amb almenys 15 dies d’antelació (art. 49.1.c ET). La revisió compta com a
+    pendents de pagament els dies d’aquest preavís que no et van donar. Cada dia val entre el teu
+    salari mensual / 30 i el teu salari anual / 365, segons com ho compti l’empresa.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-ejemplos">Exemples: 3, 6 i 12 mesos</h3>
+  <p>
+    Un contracte per circumstàncies de la producció dura com a màxim 6 mesos, o fins a un any si el
+    teu conveni sectorial l’amplia (art. 15.2 ET).
+  </p>
+  <FigureTable id="fc-tabla">
+    <Fragment slot="caption">
+      Contractes per circumstàncies de la producció que acaben el 30 de setembre de 2026, amb
+      1.500&nbsp;€ bruts al mes i dues pagues extraordinàries de 1.500&nbsp;€.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Durada</th>
+        <th scope="col">Indemnització</th>
+      </tr>
+    </thead>
+    <tbody>
+      {fixedTerms.map(({ months, limit, severance }) => (
+        <tr>
+          <th scope="row">
+            {spanLabel(months, lang, 'months')}
+            {limit === 'sector_agreement' && (
+              <span class="figures-note">només si el teu conveni sectorial l’amplia</span>
+            )}
+          </th>
+          <td>{severance ? euroRange(severance, lang) : '—'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    Cada indemnització són els dies del contracte × 12 / 365 dies de salari, a 21.000&nbsp;€ / 365
+    cadascun. La quitança suma, a més, el salari de l’últim mes, les vacances i les pagues
+    extraordinàries, que la calculadora revisa amb les teves dades.
+  </p>
+  <p>
+    Un contracte temporal que supera la seva durada màxima pot ser en realitat indefinit (art. 15.4
+    ET), i aleshores el seu final seria un acomiadament. Només els contractes d’obra o servei
+    signats abans del 31 de desembre de 2021 podien durar més (disposició transitòria 3.ª del Real
+    Decreto-ley 32/2021).
+  </p>
+  <p class="folio">
+    Art. <span>15</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-baja">Si el contracte acaba mentre estàs de baixa</h3>
+  <p>
+    La revisió calcula la quitança amb les dates, el salari i els dies de vacances que indiquis. No
+    té en compte la baixa mèdica ni què passa amb la seva prestació en acabar el contracte: això no
+    ho comprovem.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-paro">I l’atur</h3>
+  <p>
+    El final d’un contracte temporal és situació legal de desocupació, tret que l’acabessis tu (art.
+    267.1.a.6.º LGSS). Quant dura depèn dels dies cotitzats en els últims 6 anys: ho tens a{' '}
+    <CaseLink lang={lang} id="benefit_duration" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

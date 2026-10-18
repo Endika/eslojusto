@@ -1,0 +1,93 @@
+---
+// source: c5540529f7c2
+import CaseLink from '../../components/CaseLink.astro';
+import { euroRange, itemRange, resignation } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const salary = itemRange(resignation, 'pending_salary');
+const holidays = itemRange(resignation, 'holiday_pay');
+const extraPay = itemRange(resignation, 'extra_pay');
+const deduction = itemRange(resignation, 'notice_deduction');
+if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="bv-que-lleva">Què inclou la quitança per baixa voluntària</h3>
+  <p>
+    Demanar la baixa voluntària és dimitir: el contracte s’acaba per decisió teva (art. 49.1.d ET).
+    Encara que te’n vagis tu, l’empresa t’ha de pagar el que ja has guanyat i no has cobrat:
+  </p>
+  <ul>
+    <li>El salari dels dies treballats de l’últim mes (art. 26 ET).</li>
+    <li>Les vacances meritades aquest any i no gaudides (art. 38 ET).</li>
+    <li>
+      La part meritada de les pagues extraordinàries, si no van prorratejades a la teva nòmina (art.
+      31 ET).
+    </li>
+  </ul>
+  <p>
+    El que no hi ha és indemnització: la dimissió no en genera (art. 49.1.d ET). Totes les xifres
+    són brutes, abans de retencions i cotitzacions.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d · 26 · 31 · 38</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-preaviso">El preavís del teu conveni</h3>
+  <p>
+    En dimitir cal avisar amb el preavís que fixi el teu conveni o el costum del lloc (art. 49.1.d
+    ET). Si el teu conveni ho preveu i no el dones, l’empresa pot descomptar de la quitança els dies
+    que faltin, a raó del teu salari diari.
+  </p>
+  <p>
+    La calculadora et pregunta quants dies fixa el teu conveni i quants en vas donar, i dona el
+    descompte màxim. Si no saps els del conveni, aquest descompte surt com a «no es pot comprovar».
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-ejemplo">Exemple resolt</h3>
+  <p>
+    Una persona amb 1.500&nbsp;€ bruts al mes i dues pagues extraordinàries de 1.500&nbsp;€ que es
+    meriten per semestres treballa de l’1 de març de 2023 al 15 d’octubre de 2026. Aquest any ha
+    gaudit 10 dels seus 22 dies feiners de vacances. El seu conveni fixa 15 dies de preavís i se’n
+    va sense donar-los. Aquestes són les xifres de la calculadora:
+  </p>
+  <ul>
+    <li>
+      Salari d’octubre: {euroRange(salary, lang)}, segons es compti el mes amb 30 dies o amb 31.
+    </li>
+    <li>Vacances no gaudides: {euroRange(holidays, lang)}.</li>
+    <li>Paga de Nadal meritada des de juliol: {euroRange(extraPay, lang)}.</li>
+    <li>Indemnització: {euros(0)}.</li>
+    <li>Descompte pel preavís no donat: com a màxim {euros(deduction.max)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Els càlculs</span> El marge de cada partida surt de comptar per
+    dies o per mesos, com fan les empreses. El descompte són 15 dies a {euros(deduction.max / 15)}{' '}
+    al dia, el més alt dels dos salaris diaris: el mensual entre 30 i l’anual entre 365.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-paro">I l’atur</h3>
+  <p>
+    Una baixa voluntària no és situació legal de desocupació, així que, per regla general, no dona
+    atur (art. 267.2.a LGSS). Hi ha excepcions, com marxar per un trasllat o per impagaments greus.
+    Les tens a <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

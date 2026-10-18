@@ -1,0 +1,80 @@
+---
+// source: 3387bbf43a04
+import { euroRange, itemRange, notAgreed, OFFERED_HOLIDAYS } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
+const range = itemRange(notAgreed, 'holiday_pay');
+if (!holidays || !range || holidays.difference === null) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="nc-que-es">Què significa</h3>
+  <p>
+    En acabar el contracte, l’empresa et lliura una proposta del document de liquidació amb les
+    quantitats que t’ha de pagar (art. 49.2 ET). Algunes persones, quan no estan d’acord amb alguna
+    quantitat, la signen afegint-hi «rebut, no conforme» (recibí no conforme) o «no conforme».
+  </p>
+  <p>
+    Aquesta nota no canvia el que et paga l’empresa: deixa per escrit que no estàs d’acord amb
+    alguna xifra. Ho expliquem només com a informació. Què fer en el teu cas ho pot valorar un
+    despatx laboralista, un despatx de graduat social o un sindicat.
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-representante">Amb algú de la plantilla present</h3>
+  <p>
+    Pots demanar que hi sigui present un representant legal de la plantilla quan vagis a signar la
+    quitança. El document fa constar si la signes en la seva presència o si no has fet servir
+    aquesta possibilitat (art. 49.2 ET).
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-ejemplo">Exemple: comparar abans de signar</h3>
+  <p>
+    Una persona amb 1.500&nbsp;€ bruts al mes i dues pagues extraordinàries de 1.500&nbsp;€ se’n va
+    per baixa voluntària el 15 d’octubre de 2026, després de treballar des de l’1 de març de 2023.
+    Ha gaudit 10 dels seus 22 dies feiners de vacances i ha donat els 15 dies de preavís del seu
+    conveni. La proposta li paga {euros(OFFERED_HOLIDAYS)} de vacances.
+  </p>
+  <p class="example">
+    <span class="example__label">Vacances</span> El mínim legal surt {euroRange(range, lang)},
+    segons es compti per dies o per mesos. Comparat amb {euros(OFFERED_HOLIDAYS)}, en falten almenys{' '}
+    {euros(holidays.difference)}.
+  </p>
+  <p>
+    La calculadora fa el mateix amb cada partida: escriu el que diu la proposta al full «La teva
+    quitança» i veuràs què quadra amb el mínim legal i què no.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-plazos">Els terminis continuen corrent</h3>
+  <p>
+    Per al salari pendent, les vacances, les pagues extraordinàries o la indemnització per final de
+    contracte temporal, el termini és d’un any (art. 59.1 ET).
+  </p>
+  <p>
+    En un acomiadament, el termini per impugnar-lo és de 20 dies hàbils (art. 59.3 ET). Aquest
+    termini s’interromp en presentar la sol·licitud de conciliació davant del servei públic de
+    mediació, arbitratge i conciliació que correspongui. És curt, i un despatx laboralista, un
+    despatx de graduat social o un sindicat et poden dir quin s’aplica al teu cas.
+  </p>
+  <p class="folio">
+    Art. <span>59</span> ET
+  </p>
+</section>

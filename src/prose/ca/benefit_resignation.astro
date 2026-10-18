@@ -1,0 +1,92 @@
+---
+// source: 47084c570826
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitAfterDismissal, benefitAfterResignation } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const dismissal = benefitAfterDismissal;
+if (dismissal.entitled !== 'yes' || dismissal.figures === null)
+  throw new Error('Incomplete example');
+const resignationGivesBenefit = benefitAfterResignation.entitled === 'yes';
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-regla">La regla: marxar per decisió pròpia no dona atur</h3>
+  <p>
+    Per cobrar l’atur, el contracte ha d’acabar en una situació legal de desocupació. Cessar
+    voluntàriament a la feina no ho és (art. 267.2.a LGSS), així que una baixa voluntària, per regla
+    general, no dona atur, encara que tinguis els dies cotitzats.
+  </p>
+  <p class="folio">
+    Art. <span>267.2.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-excepciones">Quan marxar sí que dona atur</h3>
+  <p>
+    La llei tracta com a situació legal de desocupació la sortida per decisió teva en aquests casos
+    (art. 267.1.a.5.º LGSS):
+  </p>
+  <ul>
+    <li>Un trasllat a un altre centre que obliga a canviar de residència (art. 40 ET).</li>
+    <li>Una modificació substancial de les teves condicions que et perjudiqui (art. 41.3 ET).</li>
+    <li>
+      Un incompliment greu de l’empresa, com no pagar-te o pagar-te tard una vegada i una altra
+      (art. 50 ET). Aquesta sortida la sol declarar un jutjat.
+    </li>
+    <li>La violència de gènere o la violència sexual (art. 49.1.m ET).</li>
+  </ul>
+  <p class="folio">
+    Art. <span>267.1.a.5.º</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-nuevo">Si després comences una altra feina</h3>
+  <p>
+    El que es mira és com acaba el teu últim contracte. Si la feina nova acaba per un acomiadament o
+    pel final d’un contracte temporal, aquest final sí que és situació legal de desocupació (art.
+    267.1.a LGSS).
+  </p>
+  <p>
+    La llei regula a part un cas: si l’empresa nova acaba el contracte durant el període de prova,
+    això és situació legal de desocupació només si han passat tres mesos des de la teva baixa
+    voluntària (art. 267.1.a.7.º LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>267.1.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-ejemplo">Exemple: el mateix contracte, dos finals</h3>
+  <p>
+    Una persona amb 1.500&nbsp;€ bruts al mes i dues pagues extraordinàries de 1.500&nbsp;€ treballa
+    de l’1 de setembre de 2023 al 31 d’agost de 2026, sense fills o filles a càrrec.
+  </p>
+  <p class="example">
+    <span class="example__label">Si se’n va per baixa voluntària</span>{' '}
+    {resignationGivesBenefit
+      ? 'La calculadora estima atur.'
+      : 'La calculadora respon que no dona dret a atur (art. 267.2.a LGSS).'}{' '}
+    Té quitança igualment: salari pendent, vacances i pagues extraordinàries.
+  </p>
+  <p class="example">
+    <span class="example__label">Si l’acomiaden</span> Amb {integer(dismissal.contractDays)} dies
+    cotitzats li corresponen almenys {integer(dismissal.duration.days)} dies d’atur, uns{' '}
+    {wholeEuros(dismissal.figures.firstStretch.min)} al mes els primers 6 mesos i uns{' '}
+    {wholeEuros(dismissal.figures.secondStretch.min)} després, en brut.
+  </p>
+  <p>
+    La calculadora d’aquesta pàgina ve amb la baixa voluntària marcada. Si el teu cas és un altre,
+    canvia la causa al primer full. Més sobre la quitança a{' '}
+    <CaseLink lang={lang} id="resignation" />.
+  </p>
+</section>
