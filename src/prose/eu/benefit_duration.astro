@@ -1,0 +1,100 @@
+---
+// source: e288ce65363a
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { BENEFIT_SCALE, durationByTime, spanLabel } from '../../content/examples';
+import { integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+// Each row runs from its own threshold to the day before the next one; the last has no end.
+const rows = BENEFIT_SCALE.map(([from, days], i) => ({
+  from,
+  to: BENEFIT_SCALE[i + 1]?.[0],
+  days,
+}));
+const months = (days: number) => integer(days / 30);
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pt-escala">Eskala osoa</h3>
+  <p>
+    Langabezia-prestazioaren iraupena aurreko 6 urteetan langabeziagatik kotizatutako egunen
+    araberakoa da, beste prestazio baterako erabili ez badituzu (art. 269.1 LGSS). Garai horretako
+    zure lan guztiak zenbatzen dira, ez azkena bakarrik.
+  </p>
+  <FigureTable id="pt-tabla">
+    <Fragment slot="caption">Azken 6 urteetan kotizatutako egunak eta prestazio-egunak.</Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Kotizatutako egunak</th>
+        <th scope="col">Prestazio-egunak</th>
+        <th scope="col">Hilabeteak</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(({ from, to, days }) => (
+        <tr>
+          <th scope="row">
+            {to === undefined
+              ? `${integer(from)} edo gehiago`
+              : `${integer(from)} eta ${integer(to - 1)} artean`}
+          </th>
+          <td>{integer(days)}</td>
+          <td>{months(days)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    360 egun kotizatu baino gutxiagorekin ez dago prestazio kontributiborik. Kitapenean ordaindutako
+    eta hartu gabeko oporrak ere kotizatutzat zenbatzen dira (art. 269.4 LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>269</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pt-ejemplos">Adibideak: 6 hilabetetik 6 urtera</h3>
+  <p>
+    Kontratu bakarra, 2026ko abuztuaren 31n amaitzen dena, aurreko 6 urteetan beste lanik izan gabe
+    eta beste prestaziorik kobratu gabe:
+  </p>
+  <FigureTable id="pt-ejemplos-tabla">
+    <Fragment slot="caption">Lan egindako denbora, kotizatutako egunak eta prestazioa.</Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Lan egindako denbora</th>
+        <th scope="col">Kotizatutako egunak</th>
+        <th scope="col">Prestazio-egunak</th>
+      </tr>
+    </thead>
+    <tbody>
+      {durationByTime.map(({ months: span, days, benefitDays }) => (
+        <tr>
+          <th scope="row">{spanLabel(span, lang)}</th>
+          <td>{integer(days)}</td>
+          <td>
+            {benefitDays === 0
+              ? 'Ez da 360ra iristen'
+              : `${integer(benefitDays)} (${months(benefitDays)} hilabete)`}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    6 hilabeterekin ez da 360 egunetara iristen, baina aurreko 6 urteetan beste leku batzuetan lan
+    egin bazenuen, egun horiek gehitzen dira. Horregatik, kalkulagailuak beste lanei buruz galdetzen
+    dizu eta zure lan-bizitzaren txostenera bidaltzen zaitu; han agertzen dira kotizatutako egun
+    guztiak.
+  </p>
+  <p>
+    Hilabete bakoitzeko zenbatekoa hemen duzu: <CaseLink lang={lang} id="benefit" />.
+  </p>
+</section>

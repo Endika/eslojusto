@@ -1,0 +1,88 @@
+---
+// source: 5b2dfc6de32e
+import CaseLink from '../../components/CaseLink.astro';
+import { disciplinary, entitledByCause } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import { t } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+if (disciplinary.entitled !== 'yes' || disciplinary.figures === null)
+  throw new Error('Incomplete example');
+const { figures } = disciplinary;
+// The reasons are the calculator's own: the same sentence and article it shows in the result.
+const causes = entitledByCause.map(({ cause, entitled }) => ({
+  name: t(lang, `cause.${cause}`),
+  entitled,
+  reason: t(lang, `client.unemployment.reason.${cause}`),
+}));
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-si">Langabezia-prestazioa ematen du, bidezkoa izan arren</h3>
+  <p>
+    Ohiko zalantza da, eta erantzuna legean dago: kaleratzea legezko langabezia-egoera da (art.
+    267.1.a.3.º LGSS), eta langabezia-prestazioa kobratzeko ez da beharrezkoa hura aurkaratzea (art.
+    268.4 LGSS). Berdin dio kaleratzea diziplina-kaleratzea izatea eta bidezkotzat deklaratzea.
+  </p>
+  <p>
+    Beharrezkoa dena betikoa da: beste baldintza batzuen artean, azken 6 urteetan 360 egun
+    kotizatuta izatea, enplegu-eskatzaile gisa izena ematea eta jarduera-akordioa (acuerdo de
+    actividad) sinatzea (art. 266 LGSS).
+  </p>
+  <p class="folio">
+    Arts. <span>267 · 268.4</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ceses">Zer lan-amaierak ematen dute langabezia-prestaziorako eskubidea</h3>
+  <div class="causes">
+    {causes.map(({ name, entitled, reason }) => (
+      <div>
+        <h4>{name}</h4>
+        <p>
+          <strong>
+            {entitled === 'yes'
+              ? 'Langabezia-prestazioa ematen du.'
+              : 'Ez du langabezia-prestaziorik ematen, salbuespenak salbu.'}
+          </strong>{' '}
+          {reason}
+        </p>
+      </div>
+    ))}
+  </div>
+  <p>
+    Borondatezko bajaren salbuespenak, hala nola lekualdatze bat edo ordainketa-falta larriak, hemen
+    daude: <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ejemplo">Adibide ebatzia</h3>
+  <p>
+    Pertsona batek hilean 1.500&nbsp;€ gordin eta 1.500&nbsp;€-ko bi aparteko ordainsari ditu,
+    2022ko ekainaren 1etik 2026ko irailaren 30era lan egiten du, kargurako seme-alabarik gabe, eta
+    enpresak diziplina-arrazoiengatik kaleratzen du.
+  </p>
+  <p class="example">
+    <span class="example__label">Bere langabezia-prestazioa</span>{' '}
+    {integer(disciplinary.contractDays)} egun kotizatuta, gutxienez{' '}
+    {integer(disciplinary.duration.days)} eguneko langabezia-prestazioa dagokio
+    {` (${integer(disciplinary.duration.days / 30)} hilabete)`}:{' '}
+    {wholeEuros(figures.firstStretch.min)} inguru hilean lehen 6 hilabeteetan, eta{' '}
+    {wholeEuros(figures.secondStretch.min)} inguru gero, gordinean. «Gutxienez», azken 6 urteetako
+    beste lan batzuek egunak gehi ditzaketelako.
+  </p>
+  <p>
+    Kaleratzea bidegabetzat deklaratuko balitz, kalte-ordaina ere egongo litzateke: hemen duzu{' '}
+    <CaseLink lang={lang} id="unfair_dismissal" />.
+  </p>
+</section>

@@ -1,0 +1,95 @@
+---
+// source: c5540529f7c2
+import CaseLink from '../../components/CaseLink.astro';
+import { euroRange, itemRange, resignation } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const salary = itemRange(resignation, 'pending_salary');
+const holidays = itemRange(resignation, 'holiday_pay');
+const extraPay = itemRange(resignation, 'extra_pay');
+const deduction = itemRange(resignation, 'notice_deduction');
+if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="bv-que-lleva">Zer dakar borondatezko bajagatiko kitapenak</h3>
+  <p>
+    Borondatezko baja eskatzea dimititzea da: kontratua zure erabakiz amaitzen da (art. 49.1.d ET).
+    Zu zeu joan arren, enpresak ordaindu behar dizu dagoeneko irabazi duzun eta kobratu ez duzuna:
+  </p>
+  <ul>
+    <li>Azken hilabetean lan egindako egunen soldata (art. 26 ET).</li>
+    <li>Aurten sortutako eta hartu gabeko oporrak (art. 38 ET).</li>
+    <li>
+      Aparteko ordainsarietatik sortutako zatia, zure nominan hainbanatuta ez badaude (art. 31 ET).
+    </li>
+  </ul>
+  <p>
+    Ez dagoena kalte-ordaina da: dimisioak ez du sortzen (art. 49.1.d ET). Zifra guztiak gordinak
+    dira, atxikipenen eta kotizazioen aurretik.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d · 26 · 31 · 38</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-preaviso">Zure hitzarmeneko aurreabisua</h3>
+  <p>
+    Dimititzean, zure hitzarmenak edo tokiko ohiturak finkatzen duen aurreabisua eman behar da (art.
+    49.1.d ET). Zure hitzarmenak aurreikusten badu eta ematen ez baduzu, enpresak falta diren egunak
+    kitapenetik deskonta ditzake, zure eguneko soldataren arabera.
+  </p>
+  <p>
+    Kalkulagailuak galdetzen dizu zenbat egun finkatzen dituen zure hitzarmenak eta zenbat eman
+    zenituen, eta gehieneko deskontua ematen du. Hitzarmenekoak ez badakizkizu, deskontu hori «ezin
+    da egiaztatu» gisa ateratzen da.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-ejemplo">Adibide ebatzia</h3>
+  <p>
+    Pertsona batek hilean 1.500&nbsp;€ gordin eta seihilekoka sortzen diren 1.500&nbsp;€-ko bi
+    aparteko ordainsari ditu, eta 2023ko martxoaren 1etik 2026ko urriaren 15era lan egiten du.
+    Aurten bere 22 opor-lanegunetatik 10 hartu ditu. Bere hitzarmenak 15 eguneko aurreabisua
+    finkatzen du, eta eman gabe joaten da. Hauek dira kalkulagailuaren zifrak:
+  </p>
+  <ul>
+    <li>
+      Urriko soldata: {euroRange(salary, lang)}, hilabetea 30 edo 31 egunekin zenbatzearen arabera.
+    </li>
+    <li>Hartu gabeko oporrak: {euroRange(holidays, lang)}.</li>
+    <li>Uztailetik sortutako Gabonetako ordainsaria: {euroRange(extraPay, lang)}.</li>
+    <li>Kalte-ordaina: {euros(0)}.</li>
+    <li>Eman gabeko aurreabisuagatiko deskontua: gehienez {euros(deduction.max)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Kontuak</span> Kontzeptu bakoitzaren tartea egunka edo hilabeteka
+    zenbatzetik dator, enpresek egiten duten bezala. Deskontua 15 egun dira, egunean{' '}
+    {euros(deduction.max / 15)}, bi eguneko soldatetatik handiena: hilekoa 30ez zatituta eta urtekoa
+    365ez zatituta.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-paro">Eta langabezia-prestazioa</h3>
+  <p>
+    Borondatezko baja ez da legezko langabezia-egoera; beraz, oro har, ez du langabezia-prestaziorik
+    ematen (art. 267.2.a LGSS). Salbuespenak badaude, hala nola lekualdatze batengatik edo
+    ordainketa-falta larriengatik joatea. Hemen dituzu:{' '}
+    <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

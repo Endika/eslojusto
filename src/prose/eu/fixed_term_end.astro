@@ -1,0 +1,113 @@
+---
+// source: df0ae511359a
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { euroRange, fixedTerms, spanLabel } from '../../content/examples';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<section class="sheet sheet--text">
+  <h3 id="fc-indemnizacion">12 egun urteko, ordezkapen- eta prestakuntza-kontratuetan izan ezik</h3>
+  <p>
+    Ekoizpen-zirkunstantziengatiko aldi baterako kontratu bat amaitzean, urteko 12 eguneko soldatako
+    kalte-ordaina dagokizu, lan egindako egunen proportzioan (art. 49.1.c ET). Kontratua 2015 baino
+    lehen hasi bazen, egun gutxiago dira: 8, 2011n edo lehenago hasi bazen; 9, 2012an; 10, 2013an;
+    eta 11, 2014an (disposición transitoria 8.ª ET). 2001eko martxoaren 4a baino lehen sinatutako
+    kontratuek ez dute kalte-ordain hori (disposición transitoria 8.ª.2 ET).
+  </p>
+  <p>
+    Beste pertsona baten ordezkapen-kontratuek eta prestakuntza-kontratuek ez dute kalte-ordainik
+    (art. 49.1.c ET). Horregatik, kalkulagailuak kontratu mota galdetzen dizu, kausaren ondoren
+    berehala.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET · DT <span>8.ª</span>
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-preaviso">Urtebete baino gehiagoko kontratuen aurreabisua</h3>
+  <p>
+    Kontratuak urtebete baino gehiago iraun badu, ordezkapen-kontratu batekin gerta daitekeen
+    bezala, enpresak gutxienez 15 egun lehenago jakinarazi behar dizu amaiera (art. 49.1.c ET).
+    Berrikuspenak ordaintzeke daudentzat hartzen ditu eman ez zizuten aurreabisu-egunak. Egun
+    bakoitzak zure hileko soldata / 30 eta zure urteko soldata / 365 arteko balioa du, enpresak nola
+    zenbatzen duenaren arabera.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-ejemplos">Adibideak: 3, 6 eta 12 hilabete</h3>
+  <p>
+    Ekoizpen-zirkunstantziengatiko kontratu batek gehienez 6 hilabete irauten du, edo urtebete arte,
+    zure sektoreko hitzarmenak luzatzen badu (art. 15.2 ET).
+  </p>
+  <FigureTable id="fc-tabla">
+    <Fragment slot="caption">
+      Ekoizpen-zirkunstantziengatiko kontratuak, 2026ko irailaren 30ean amaitzen direnak, hilean
+      1.500&nbsp;€ gordinekin eta 1.500&nbsp;€-ko bi aparteko ordainsarirekin.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Iraupena</th>
+        <th scope="col">Kalte-ordaina</th>
+      </tr>
+    </thead>
+    <tbody>
+      {fixedTerms.map(({ months, limit, severance }) => (
+        <tr>
+          <th scope="row">
+            {spanLabel(months, lang, 'months')}
+            {limit === 'sector_agreement' && (
+              <span class="figures-note">zure sektoreko hitzarmenak luzatzen badu soilik</span>
+            )}
+          </th>
+          <td>{severance ? euroRange(severance, lang) : '—'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    Kalte-ordain bakoitza kontratuaren egunak × 12 / 365 eguneko soldata da, egun bakoitza
+    21.000&nbsp;€ / 365 izanik. Kitapenak, gainera, azken hilabeteko soldata, oporrak eta aparteko
+    ordainsariak batzen ditu, eta kalkulagailuak zure datuekin berrikusten ditu.
+  </p>
+  <p>
+    Gehieneko iraupena gainditzen duen aldi baterako kontratu bat, egiaz, mugagabea izan daiteke
+    (art. 15.4 ET), eta orduan haren amaiera kaleratze bat izango litzateke. 2021eko abenduaren 31
+    baino lehen sinatutako obra edo zerbitzuko kontratuek bakarrik iraun zezaketen gehiago (Real
+    Decreto-ley 32/2021 arauaren disposición transitoria 3.ª).
+  </p>
+  <p class="folio">
+    Art. <span>15</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-baja">Kontratua baja medikoan zaudela amaitzen bada</h3>
+  <p>
+    Berrikuspenak idazten dituzun datekin, soldatarekin eta opor-egunekin kalkulatzen du kitapena.
+    Ez ditu kontuan hartzen baja medikoa, ezta kontratua amaitzean haren prestazioarekin gertatzen
+    dena ere: hori ez dugu egiaztatzen.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="fc-paro">Eta langabezia-prestazioa</h3>
+  <p>
+    Aldi baterako kontratu baten amaiera legezko langabezia-egoera da, zuk amaitu ez bazenuen
+    behintzat (art. 267.1.a.6.º LGSS). Zenbat irauten duen azken 6 urteetan kotizatutako egunen
+    araberakoa da: hemen duzu <CaseLink lang={lang} id="benefit_duration" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

@@ -1,0 +1,88 @@
+---
+// source: b433a07857b6
+import CaseLink from '../../components/CaseLink.astro';
+import { euroRange, itemRange, objective, severanceMonths } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const severance = itemRange(objective, 'severance');
+const notice = itemRange(objective, 'employer_notice');
+const salary = itemRange(objective, 'pending_salary');
+const holidays = itemRange(objective, 'holiday_pay');
+const extraPay = itemRange(objective, 'extra_pay');
+const unfair = objective.unfairReference;
+const months =
+  severanceMonths(
+    objective.items.find((p) => p.item.id === 'severance')?.item.calculation ?? [],
+  )[0] ?? 0;
+if (!severance || !notice || !salary || !holidays || !extraPay || unfair === null)
+  throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="do-20-dias">20 egun urteko, gehienez 12 hileko soldata</h3>
+  <p>
+    Kausa objektiboengatiko kaleratze batean, enpresak zure eskura jarri behar du, gutunarekin
+    batera, lan egindako urte bakoitzeko 20 eguneko soldatako kalte-ordaina, gehienez 12 hileko
+    soldata (art. 53.1.b ET). CGPJren gidak, STS 651/2026 epaiaren ondoren, muga hori 360 egun gisa
+    zenbatzen du. Denbora hilabeteka zenbatzen da, eta hilabete-zati bat hilabete osotzat hartzen
+    da.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.b</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-preaviso">15 eguneko aurreabisua, edo haren ordainketa</h3>
+  <p>
+    Gutunaren eta kaleratzearen artean 15 eguneko aurreabisua igaro behar da (art. 53.1.c ET).
+    Enpresak ematen ez dituen egunak ordaindu egiten dira. Kalkulagailuak zenbat eman zizkizuten
+    galdetzen dizu, eta falta direnak kalkulatzen ditu.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-ejemplo">Adibide ebatzia</h3>
+  <p>
+    Pertsona batek hilean 1.500&nbsp;€ gordin eta 1.500&nbsp;€-ko bi aparteko ordainsari ditu, eta
+    2018ko maiatzaren 3tik 2026ko uztailaren 20ra lan egiten du. Aurten 10 opor-egun hartu ditu, eta
+    enpresak ez dio aurreabisurik ematen. Hauek dira kalkulagailuaren zifrak:
+  </p>
+  <ul>
+    <li>
+      Kalte-ordaina: {euroRange(severance, lang)} ({months} hilabete × 20 / 12 ={' '}
+      {String((months * 20) / 12).replace('.', ',')} egun).
+    </li>
+    <li>Eman gabeko aurreabisua: {euroRange(notice, lang)}.</li>
+    <li>Uztaileko soldata: {euroRange(salary, lang)}.</li>
+    <li>Hartu gabeko oporrak: {euroRange(holidays, lang)}.</li>
+    <li>Uztailaren 1etik sortutako Gabonetako ordainsaria: {euroRange(extraPay, lang)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Bidegabetzat deklaratuko balitz</span> Data berekin, kalte-ordaina{' '}
+    {euros(unfair)} izango litzateke, urteko 33 egun. Berrikuspenak zifra hori kaleratze
+    objektiboarenaren ondoan erakusten dizu.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-diferencia">Kaleratze objektiboa edo bidegabea</h3>
+  <p>
+    Kaleratze objektibo bat diziplina-kaleratze bat bezala aurkara daiteke (art. 53.3 ET).
+    Bidegabetzat deklaratzen bada, kalte-ordaina urteko 33 egunean kalkulatzen da, gehienez 720
+    egun: hemen duzu <CaseLink lang={lang} id="unfair_dismissal" />. Hura aurkaratzeko epea 20 egun
+    baliodunekoa da (art. 59.3 ET).
+  </p>
+  <p class="folio">
+    Art. <span>53 · 56 · 59</span> ET
+  </p>
+</section>

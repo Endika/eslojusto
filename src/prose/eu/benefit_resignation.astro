@@ -1,0 +1,92 @@
+---
+// source: 47084c570826
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitAfterDismissal, benefitAfterResignation } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const dismissal = benefitAfterDismissal;
+if (dismissal.entitled !== 'yes' || dismissal.figures === null)
+  throw new Error('Incomplete example');
+const resignationGivesBenefit = benefitAfterResignation.entitled === 'yes';
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-regla">Araua: norberaren erabakiz joateak ez du langabezia-prestaziorik ematen</h3>
+  <p>
+    Langabezia-prestazioa kobratzeko, kontratua legezko langabezia-egoeran amaitu behar da. Lana
+    borondatez uztea ez da halakoa (art. 267.2.a LGSS); beraz, borondatezko baja batek, oro har, ez
+    du langabezia-prestaziorik ematen, kotizatutako egunak izan arren.
+  </p>
+  <p class="folio">
+    Art. <span>267.2.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-excepciones">Noiz ematen duen langabezia-prestazioa zu joateak</h3>
+  <p>
+    Legeak legezko langabezia-egoeratzat hartzen du zure erabakiz joatea kasu hauetan (art.
+    267.1.a.5.º LGSS):
+  </p>
+  <ul>
+    <li>Bizilekua aldatzea eskatzen duen beste lantoki baterako lekualdatzea (art. 40 ET).</li>
+    <li>Zure baldintzen funtsezko aldaketa bat, kalte egiten dizuna (art. 41.3 ET).</li>
+    <li>
+      Enpresaren ez-betetze larri bat, hala nola behin eta berriz ez ordaintzea edo berandu
+      ordaintzea (art. 50 ET). Irteera hori epaitegi batek deklaratu ohi du.
+    </li>
+    <li>Genero-indarkeria edo indarkeria sexuala (art. 49.1.m ET).</li>
+  </ul>
+  <p class="folio">
+    Art. <span>267.1.a.5.º</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-nuevo">Gero beste lan bat hasten baduzu</h3>
+  <p>
+    Zure azken kontratua nola amaitzen den begiratzen da. Lan berria kaleratze batengatik edo aldi
+    baterako kontratu baten amaieragatik bukatzen bada, lan-amaiera hori legezko langabezia-egoera
+    da (art. 267.1.a LGSS).
+  </p>
+  <p>
+    Legeak kasu bat bereizita arautzen du: enpresa berriak proba-aldian amaitzen badu kontratua,
+    hori legezko langabezia-egoera da soilik zure borondatezko bajatik hiru hilabete igaro badira
+    (art. 267.1.a.7.º LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>267.1.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-ejemplo">Adibidea: kontratu bera, bi amaiera</h3>
+  <p>
+    Pertsona batek hilean 1.500&nbsp;€ gordin eta 1.500&nbsp;€-ko bi aparteko ordainsari ditu, eta
+    2023ko irailaren 1etik 2026ko abuztuaren 31ra lan egiten du, kargurako seme-alabarik gabe.
+  </p>
+  <p class="example">
+    <span class="example__label">Borondatezko baja hartzen badu</span>{' '}
+    {resignationGivesBenefit
+      ? 'Kalkulagailuak langabezia-prestazioa estimatzen du.'
+      : 'Kalkulagailuaren erantzuna da ez duela langabezia-prestaziorako eskubiderik ematen (art. 267.2.a LGSS).'}{' '}
+    Kitapena berdin dagokio: ordaintzeke dagoen soldata, oporrak eta aparteko ordainsariak.
+  </p>
+  <p class="example">
+    <span class="example__label">Kaleratzen badute</span> {integer(dismissal.contractDays)} egun
+    kotizatuta, gutxienez {integer(dismissal.duration.days)} eguneko langabezia-prestazioa dagokio:{' '}
+    {wholeEuros(dismissal.figures.firstStretch.min)} inguru hilean lehen 6 hilabeteetan, eta{' '}
+    {wholeEuros(dismissal.figures.secondStretch.min)} inguru gero, gordinean.
+  </p>
+  <p>
+    Orri honetako kalkulagailuak borondatezko baja markatuta dakar. Zure kasua bestelakoa bada,
+    aldatu kausa lehen urratsean. Kitapenari buruz gehiago:{' '}
+    <CaseLink lang={lang} id="resignation" />.
+  </p>
+</section>
