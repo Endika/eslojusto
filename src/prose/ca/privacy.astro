@@ -1,0 +1,497 @@
+---
+// source: 625095d4cc94
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+import { DOCUMENTS } from '../../documents/config';
+import { OUTAGE_KEY } from '../../documents/outage';
+import { STORAGE_KEYS } from '../../documents/pass';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const tx = (key: Key) => t(lang, key);
+
+const email = 'hola@eslojusto.es';
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+
+// One entry per thing that is stored or processed; a new tool adds a row here.
+const stored = [
+  {
+    what: tx('privacy.data_review'),
+    where:
+      'Només al teu navegador, mentre la pàgina és oberta. El càlcul es fa al teu dispositiu: les teves dates, el teu salari, les xifres de la teva quitança, els teus fills o filles a càrrec i els teus altres contractes no s’envien a cap servidor ni es desen. En tancar o recarregar la pàgina, desapareixen.',
+  },
+  { what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') },
+  {
+    what: tx('privacy.employment.data_review'),
+    where: tx('privacy.employment.data_review_where'),
+  },
+  {
+    what: tx('privacy.household.data_review'),
+    where: tx('privacy.household.data_review_where'),
+  },
+  { what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') },
+  {
+    what: tx('privacy.insurance.data_review'),
+    where: tx('privacy.insurance.data_review_where'),
+  },
+  {
+    what: tx('privacy.mortgage.data_review'),
+    where: tx('privacy.mortgage.data_review_where'),
+  },
+  { what: tx('privacy.bills.data_review'), where: tx('privacy.bills.data_review_where') },
+  ...(documents
+    ? [{ what: tx('privacy.bills.data_year'), where: tx('privacy.bills.data_year_where') }]
+    : []),
+  {
+    what: tx('privacy.data_analytics'),
+    where:
+      'Uns avisos curts amb codis i trams, que s’envien a PostHog mentre fas servir la pàgina (el detall, més avall). L’identificador de la pàgina vista només viu a la seva memòria: no s’escriu al teu dispositiu i es perd en tancar-la o recarregar-la.',
+  },
+  ...(documents
+    ? [
+        {
+          what: tx('privacy.data_documents'),
+          where:
+            'Només si tries pujar els teus documents (la carta d’acomiadament, la quitança, les teves nòmines, el certificat d’empresa, un acord o acta de conciliació o la teva vida laboral) i dones el teu consentiment. Els PDF es converteixen en imatges de les seves pàgines al teu navegador, sense sortir-ne, i abans d’enviar res la pàgina mira, també al teu navegador, si alguna foto es veu fosca, borrosa o petita. Aquestes imatges i les fotos viatgen xifrades a un servidor d’eslojusto.es a Amazon Web Services, a Espanya (regió eu-south-2), que les passa a un model d’IA (Claude, d’Anthropic) a través d’Amazon Bedrock, dins de la Unió Europea. El model indica quin tipus de document és cada pàgina, copia les dades que demana el formulari i el que ha llegit torna al teu navegador. No es desa res: els documents només existeixen a la memòria del servidor mentre es llegeixen, i els seus registres, que es conserven 14 dies, porten només dades tècniques: el resultat, el nombre de pàgines, quant va trigar, quant text va processar el model i unes marques de funcionament, com ara si va caldre una segona lectura, quantes dades no coincidien entre documents (sense dir quines ni els seus valors) o quantes pàgines no es van poder llegir i per què (per exemple, borrosa o d’un altre país). Mai el contingut ni res que t’identifiqui.',
+        },
+        {
+          what: tx('privacy.rental.data_documents'),
+          where: tx('privacy.rental.data_documents_where'),
+        },
+        {
+          what: tx('privacy.rental.data_letters'),
+          where: tx('privacy.rental.data_letters_where'),
+        },
+        {
+          what: tx('privacy.employment.data_documents'),
+          where: tx('privacy.employment.data_documents_where'),
+        },
+        {
+          what: tx('privacy.employment.data_letters'),
+          where: tx('privacy.employment.data_letters_where'),
+        },
+        {
+          what: tx('privacy.credit.data_documents'),
+          where: tx('privacy.credit.data_documents_where'),
+        },
+        {
+          what: tx('privacy.credit.data_letters'),
+          where: tx('privacy.credit.data_letters_where'),
+        },
+        {
+          what: tx('privacy.insurance.data_documents'),
+          where: tx('privacy.insurance.data_documents_where'),
+        },
+        {
+          what: tx('privacy.insurance.data_letters'),
+          where: tx('privacy.insurance.data_letters_where'),
+        },
+        {
+          what: tx('privacy.mortgage.data_documents'),
+          where: tx('privacy.mortgage.data_documents_where'),
+        },
+        {
+          what: tx('privacy.mortgage.data_letters'),
+          where: tx('privacy.mortgage.data_letters_where'),
+        },
+        {
+          what: tx('privacy.bills.data_documents'),
+          where: tx('privacy.bills.data_documents_where'),
+        },
+        {
+          what: tx('privacy.bills.data_letters'),
+          where: tx('privacy.bills.data_letters_where'),
+        },
+        {
+          what: tx('privacy.data_pass'),
+          where: `A l’emmagatzematge local (localStorage) del teu navegador, i només si els fas servir: un comptador signat de les teves lectures gratuïtes del dia («${STORAGE_KEYS.quota}»); si compres el passi, el passi i les lectures que li queden («${STORAGE_KEYS.pass}») i el codi de cada pagament que comences, amb un número a l’atzar que només coneix el teu navegador, per poder recuperar el passi («${STORAGE_KEYS.checkout}»; cada pagament es treu al cap de 7 dies si no es va completar, o quan caduca el seu passi). No porten el teu nom ni res dels teus documents, i només surten del teu dispositiu amb la lectura següent, per recuperar el passi o per comprovar-lo abans de mostrar-te el detall de la teva revisió, l’informe o la carta. Els rep el servidor d’eslojusto.es a AWS, que pregunta a Stripe pel pagament. El passi caducat i el comptador d’un dia anterior s’esborren sols la vegada següent que la pàgina els consulta, i tot s’esborra en esborrar les dades d’aquest lloc al teu navegador; per això el passi només val en aquest navegador i es perd en un altre dispositiu, en una finestra privada o en esborrar-les. Si la lectura no està disponible, la pestanya ho recorda una hora al seu emmagatzematge de sessió («${OUTAGE_KEY}», només amb l’hora) per no oferir-te-la mentrestant.`,
+        },
+        {
+          what: tx('privacy.data_checkout'),
+          where: `Si pagues, les respostes de la teva revisió es desen a l’emmagatzematge de sessió (sessionStorage) d’aquella pestanya mentre ets a la pàgina de pagament, per mostrar-te el resultat en tornar. A les factures de la llum s’hi desen així les respostes de cada factura del teu any que ja has revisat, sense l’empremta del codi de subministrament. No surten del teu dispositiu i s’esborren en tornar o en tancar la pestanya.`,
+        },
+      ]
+    : []),
+  {
+    what: tx('privacy.data_theme'),
+    where:
+      'A l’emmagatzematge local (localStorage) del teu navegador, i només si prems el botó del tema. Mai no surt del teu dispositiu. S’esborra en esborrar les dades d’aquest lloc al teu navegador.',
+  },
+  {
+    what: tx('privacy.data_server'),
+    where:
+      'El web està allotjat a GitHub Pages. GitHub registra l’adreça IP i les dades tècniques de cada visita, com qualsevol servidor web.',
+  },
+];
+
+// The allowlist (src/analytics/sanitize.ts) and the event catalogue (src/analytics/events.ts), in
+// plain words. Keep all three in step: the analytics e2e asserts the exact keys.
+const tracked = [
+  {
+    when: 'Amb cada avís',
+    what: 'La data i l’hora de cada avís i un número a l’atzar que només existeix mentre la pàgina és oberta. L’adreça de la pàgina sense paràmetres: el domini, la ruta i el full on ets. El teu navegador i la seva versió, i el teu sistema (Windows, Android…). El tipus de dispositiu (ordinador, mòbil o tauleta) i la mida de la finestra. El domini del web d’on vens (per exemple «www.google.com»), sense l’adreça completa. Si arribes des d’un enllaç de campanya, el seu origen, el seu mitjà i el seu nom (utm_source, utm_medium, utm_campaign), només quan són un codi curt de lletres, números i guions. I tres dades tècniques de PostHog: la clau del projecte d’eslojusto.es, la versió del seu codi i una marca que li demana que no creï cap perfil.',
+  },
+  {
+    when: 'En obrir una pàgina',
+    what: 'Que l’has oberta i l’idioma principal del teu navegador, només la part general: «ja», no «ja-JP».',
+  },
+  {
+    when: 'En deixar una pàgina',
+    what: 'Quant de temps vas ser a la pàgina i fins on vas baixar.',
+  },
+  {
+    when: 'Si fas servir el traductor del navegador',
+    what: 'L’idioma al qual tradueixes la pàgina, per exemple «ar».',
+  },
+  {
+    when: 'A cada full de la revisió',
+    what: 'Que l’obres i, en acabar-lo, quant vas trigar en un tram ampli: menys de 10 segons, de 10 a 30, de 30 a 60, de 60 a 180 o més de 180. Si tornes enrere, de quin full a quin.',
+  },
+  {
+    when: 'Si una dada no s’accepta',
+    what: 'El nom del camp, per exemple «data de baixa». Mai el que hi vas escriure.',
+  },
+  {
+    when: 'Si obres una ajuda',
+    what: 'Quina pregunta freqüent obres, o de quina partida mires «Com es calcula».',
+  },
+  {
+    when: 'En revisar',
+    what: 'La causa del final del contracte, el tipus de contracte temporal, com cobres les pagues extraordinàries i si comptes les vacances en dies feiners o naturals i, si són feiners, si treballes 5, 6 o un altre nombre de dies a la setmana, tal com els tries a les opcions. Quantes partides porten la xifra de la teva quitança i quantes surten per sota, coincideixen, per sobre o sense poder-se comprovar. Si et descompten més preavís del màxim. Si es mostra el que pagaria un acomiadament improcedent, sense la xifra. Si el resultat surt en resum o amb el detall del passi. Si la diferència és zero, menor de 100 €, de 100 a 500 €, de 500 a 2.000 € o més gran. Quantes vegades has revisat en aquesta pàgina, quant vas trigar en trams i, si revises una altra vegada, el nom dels camps que vas canviar. De l’atur, només si l’estimació no s’aplica a la teva causa, si porta xifres o si surt sense, i quants altres contractes hi vas afegir, en un tram: 0, 1, 2 o 3 o més. Mai quants fills o filles tens a càrrec ni cap data d’aquests contractes. De l’ERTE i de si t’han pagat, només el nom de la pregunta si la canvies, mai la resposta. El que marquis sobre un possible acomiadament nul (embaràs, permisos, baixa mèdica…) no s’envia mai, ni tan sols si has marcat alguna cosa.',
+  },
+  {
+    when: 'En prémer «Tornar a començar»',
+    what: 'Que l’has premut.',
+  },
+  {
+    when: tx('privacy.rental.tracked_sheets'),
+    what: tx('privacy.rental.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.rental.tracked_scope'),
+    what: tx('privacy.rental.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.rental.tracked_review'),
+    what: tx('privacy.rental.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_sheets'),
+    what: tx('privacy.employment.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_scope'),
+    what: tx('privacy.employment.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_review'),
+    what: tx('privacy.employment.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_sheets'),
+    what: tx('privacy.household.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_scope'),
+    what: tx('privacy.household.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_review'),
+    what: tx('privacy.household.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_sheets'),
+    what: tx('privacy.credit.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_scope'),
+    what: tx('privacy.credit.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_review'),
+    what: tx('privacy.credit.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_sheets'),
+    what: tx('privacy.insurance.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_scope'),
+    what: tx('privacy.insurance.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_review'),
+    what: tx('privacy.insurance.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_sheets'),
+    what: tx('privacy.mortgage.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_scope'),
+    what: tx('privacy.mortgage.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_review'),
+    what: tx('privacy.mortgage.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_sheets'),
+    what: tx('privacy.bills.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_scope'),
+    what: tx('privacy.bills.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_review'),
+    what: tx('privacy.bills.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_telecom'),
+    what: tx('privacy.bills.tracked_telecom_what'),
+  },
+  ...(documents
+    ? [
+        {
+          when: 'En triar com començar',
+          what: 'Si tries pujar un document o escriure les dades a mà.',
+        },
+        {
+          when: 'En llegir documents',
+          what: 'Quantes fotos o pàgines puges, en un tram (1, de 2 a 4, de 5 a 9, de 10 a 15 o de 16 a 25), i quants PDF vas triar. En acabar, quins tipus de document es van reconèixer (per exemple, carta d’acomiadament o nòmina), quantes dades es van omplir, en un tram (0, d’1 a 3, de 4 a 8, o 9 o més), si alguna va sortir amb confiança baixa, si les xifres no quadraven, si dos documents no coincidien, si va caldre tornar-los a llegir amb un model més precís i, si alguna pàgina no es va poder llegir, per què (borrosa, fosca, tallada, escrita a mà, no laboral, d’un altre país, d’un tipus que no es reconeix, sense dades útils o sense llegir), sense dir quina; o, si falla, el codi de l’error. Si abans d’enviar una foto es veu fosca, borrosa o petita, quina de les tres coses i si la vas enviar igualment. Mai res del que diuen els documents.',
+        },
+        {
+          when: 'Amb el passi',
+          what: 'Que comences el pagament, que el passi s’emet en tornar del pagament o en recuperar-lo, o el codi de l’error, si en comprovar-lo surt vàlid, no vàlid, caducat, anul·lat o sense resposta, i si descarregues l’informe o la carta. De la carta, només si n’has omplert cap, algunes o totes les dades opcionals (nom, DNI o NIE, empresa i localitat), mai quines ni el que hi diu: aquestes dades només omplen la carta al teu navegador i no s’envien ni es desen. Mai el codi del pagament ni el passi.',
+        },
+        {
+          when: tx('privacy.rental.tracked_documents'),
+          what: tx('privacy.rental.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_documents'),
+          what: tx('privacy.employment.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_documents'),
+          what: tx('privacy.credit.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_documents'),
+          what: tx('privacy.insurance.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_documents'),
+          what: tx('privacy.mortgage.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_documents'),
+          what: tx('privacy.bills.tracked_documents_what'),
+        },
+      ]
+    : []),
+  {
+    when: 'Si la pàgina falla',
+    what: 'El tipus d’error i en quin fitxer i línia del codi es va produir. Mai el missatge de l’error, perquè podria citar alguna cosa que vas escriure.',
+  },
+];
+---
+
+<div class="document__sheets">
+  <section class="sheet sheet--text">
+    <h2 id="pr-resumen">{tx('privacy.summary')}</h2>
+    <p>
+      El que escrius a la revisió no surt del teu dispositiu. La teva quitança es calcula sencera al
+      teu navegador i no es desa. Per saber si l’eina serveix i en quin pas s’encalla la gent, es
+      mesura sense identificar-te quins passos fas servir. Només s’envien codis i trams, mai un
+      import ni una data. No hi ha galetes ni publicitat.
+    </p>
+    <p>{tx('privacy.rental.summary')}</p>
+    <p>{tx('privacy.employment.summary')}</p>
+    <p>{tx('privacy.household.summary')}</p>
+    <p>{tx('privacy.credit.summary')}</p>
+    <p>{tx('privacy.insurance.summary')}</p>
+    <p>{tx('privacy.mortgage.summary')}</p>
+    <p>{tx('privacy.bills.summary')}</p>
+    {documents && (
+      <p>
+        Si decideixes pujar un document per omplir les dades, es llegeix amb IA a la Unió Europea
+        amb el teu consentiment i no es desa. Si compres el passi de l’informe, el pagament el
+        gestiona Stripe.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-datos">{tx('privacy.data')}</h2>
+    <dl class="data-list">
+      {stored.map(({ what, where }) => (
+        <div>
+          <dt>{what}</dt>
+          <dd>{where}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      Sobre els registres de GitHub, consulta la{' '}
+      <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">
+        declaració de privacitat de GitHub
+      </a>
+      .
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-medicion">{tx('privacy.analytics')}</h2>
+    <p>
+      Això és tot el que s’envia. Cada valor surt d’una llista tancada de codis o de trams, i la
+      pàgina comprova cada avís abans d’enviar-lo: un avís amb qualsevol altra cosa no surt, i del
+      que PostHog afegeix pel seu compte només passa el que és en aquesta llista.
+    </p>
+    <dl class="data-list">
+      {tracked.map(({ when, what }) => (
+        <div>
+          <dt>{when}</dt>
+          <dd>{what}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      No es crea cap perfil teu ni s’uneix una visita amb una altra: cada vegada que obres o
+      recarregues una pàgina, la mesura comença de zero. Mai no surten la versió del teu sistema, la
+      teva zona horària, la mida de la teva pantalla, el teu idioma complet, la cadena completa de
+      l’agent d’usuari, el títol de la pàgina, el que vas cercar per arribar-hi ni els
+      identificadors de clic que els anunciants afegeixen als enllaços (gclid, fbclid i semblants).
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-quien">{tx('privacy.who')}</h2>
+    <p>
+      Ho rep PostHog Inc., l’eina de mesura, al seu{' '}
+      <a href="https://posthog.com/blog/posthog-cloud-eu">núvol de la Unió Europea</a>, allotjat a
+      Frankfurt (Alemanya). Tracta les dades per encàrrec d’eslojusto.es i no les fa servir per a
+      res més. PostHog Inc. és una empresa dels Estats Units: el tractament està cobert pel seu
+      contracte d’encarregat del tractament, que inclou les clàusules contractuals tipus de la
+      Comissió Europea.
+    </p>
+    <p>
+      En rebre cada avís, PostHog veu l’adreça IP de la teva connexió i l’agent d’usuari del teu
+      navegador, com qualsevol servidor. No en desa cap dels dos: el projecte està configurat per
+      descartar la IP, sense fer-la servir per situar-te, i l’agent d’usuari complet no s’envia com
+      a dada; només el navegador, la seva versió i el sistema que llista «Què es mesura».
+    </p>
+    <p>
+      Els avisos es conserven un any, el termini del pla gratuït de PostHog (consulta’n la{' '}
+      <a href="https://posthog.com/docs/privacy">pàgina de privacitat</a>).
+    </p>
+  </section>
+
+  {documents && (
+    <section class="sheet sheet--text">
+      <h2 id="pr-documentos">{tx('privacy.documents')}</h2>
+      <p>
+        Llegir un document és opcional: la revisió funciona igual si escrius les dades. Abans de
+        pujar-lo et demanem el teu consentiment explícit, perquè una nòmina o una vida laboral poden
+        mostrar dades especialment protegides, com l’afiliació a un sindicat (per la seva quota) o
+        una baixa per malaltia. La base jurídica és aquest consentiment (arts. 6.1.a i 9.2.a del
+        Reglament general de protecció de dades). Pots retirar-lo quan vulguis deixant de pujar
+        documents: com que no es desa res, no queda res per esborrar.
+      </p>
+      <p>{tx('privacy.rental.consent')}</p>
+      <p>{tx('privacy.employment.consent')}</p>
+      <p>{tx('privacy.credit.consent')}</p>
+      <p>{tx('privacy.insurance.consent')}</p>
+      <p>{tx('privacy.mortgage.consent')}</p>
+      <p>{tx('privacy.bills.consent')}</p>
+      <p>
+        Els documents els processa Amazon Web Services EMEA SARL (Luxemburg), encarregada del
+        tractament: el servidor (AWS Lambda) és a Espanya i el model d’IA es fa servir a través
+        d’Amazon Bedrock amb un perfil que només funciona en regions de la Unió Europea. Amazon
+        Bedrock no desa els documents ni el que el model respon, no els fa servir per entrenar
+        models i no els comparteix amb Anthropic. El contracte d’encarregat d’AWS inclou les
+        clàusules contractuals tipus de la Comissió Europea.
+      </p>
+      <p>
+        Perquè les lectures i els pagaments els facin persones, abans de cada lectura i de cada
+        pagament la pàgina carrega Cloudflare Turnstile, que comprova que no ets un robot sense fer
+        servir galetes. Cloudflare, Inc. rep l’adreça IP i dades tècniques del teu navegador per a
+        aquesta comprovació, i només quan tries pujar un document o pagar el passi. La base jurídica
+        és l’interès legítim a evitar l’abús del servei (art. 6.1.f del Reglament); Cloudflare està
+        adherida al Marc de privacitat de dades UE-EUA.
+      </p>
+      <p>
+        El passi de l’informe es paga a la pàgina de Stripe Payments Europe, Ltd. (Irlanda).
+        eslojusto.es no veu ni desa les dades de la teva targeta ni de Bizum: només pregunta a
+        Stripe si el pagament s’ha fet i per quin import, i anota al costat del pagament quantes
+        lectures has fet amb el passi, sense res del que van llegir. Stripe et demana el teu correu
+        i, segons com paguis, també el teu nom, el teu país o el teu telèfon. Aquestes dades queden
+        al compte de Stripe d’eslojusto.es, que les pot veure al tauler de Stripe per atendre un
+        problema amb el pagament o una devolució, i es conserven el temps que exigeixen les normes
+        comptables i fiscals. La base jurídica és el contracte de compra (art. 6.1.b) i les
+        obligacions comptables i fiscals (art. 6.1.c). Stripe pot tractar les dades als Estats
+        Units; Stripe, Inc. està adherida al Marc de privacitat de dades UE-EUA i el seu contracte
+        inclou les clàusules contractuals tipus. Stripe conserva les dades del pagament el temps que
+        li exigeixen aquestes obligacions i les normes contra el blanqueig de capitals; ho explica a
+        la seva <a href="https://stripe.com/es/privacy">política de privacitat</a>. Les condicions
+        de la compra són a <a href={`${link(lang, 'aviso-legal/')}#condiciones`}>l’avís legal</a>.
+      </p>
+    </section>
+  )}
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-cookies">{tx('privacy.cookies')}</h2>
+    {documents ? (
+      <p>
+        Aquest web no fa servir galetes, i la mesura no escriu res al teu dispositiu, ni en cap
+        altre emmagatzematge del navegador, perquè tot viu a la memòria de la pàgina. Només es desa
+        el que tu demanes: la teva elecció de tema, si prems el seu botó, i, si llegeixes documents
+        o compres el passi, el que explica «Què es desa i on». Per això no veus cap avís de galetes.
+      </p>
+    ) : (
+      <p>
+        Aquest web no fa servir galetes, i la mesura no escriu res al teu dispositiu, ni en cap
+        altre emmagatzematge del navegador, perquè tot viu a la memòria de la pàgina. L’única cosa
+        que es desa és la teva elecció de tema, i només si prems el seu botó. Per això no veus cap
+        avís de galetes.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-base">{tx('privacy.legal_basis')}</h2>
+    <p>
+      La base jurídica és l’interès legítim (art. 6.1.f del Reglament general de protecció de
+      dades), que aquí és saber si l’eina es fa servir, en quin pas s’encalla la gent i què falla,
+      per millorar-la. Es mesura el mínim per a això, sense identificar-te i sense publicitat.
+    </p>
+    <p>
+      Si el teu navegador envia el senyal de no rastrejar (Global Privacy Control o Do Not Track),
+      no es mesura res de la teva visita. També et pots oposar a aquesta mesura (art. 21 del
+      Reglament) bloquejant l’adreça eu.i.posthog.com amb un bloquejador de contingut. La revisió
+      funciona igual.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-responsable">{tx('privacy.controller')}</h2>
+    <p>
+      eslojusto.es és un projecte d’Endika Iglesias, responsable d’aquest tractament. Per a
+      qualsevol pregunta sobre les teves dades, escriu a <a href={`mailto:${email}`}>{email}</a>. Si
+      has escrit a aquesta adreça, hi pots demanar que es consultin, es corregeixin o s’esborrin les
+      dades del teu correu. Si has pagat el passi, també les dades del teu pagament a Stripe,
+      excepte les que s’hagin de conservar per les normes comptables i fiscals.
+    </p>
+    <p>
+      El que es mesura no t’identifica, així que no hi ha manera de trobar els teus avisos per
+      mostrar-te’ls o esborrar-los (art. 11 del Reglament). Si creus que alguna cosa no es fa bé,
+      pots presentar una reclamació davant{' '}
+      <a href="https://www.aepd.es/">l’Agencia Española de Protección de Datos</a>.
+    </p>
+  </section>
+</div>
