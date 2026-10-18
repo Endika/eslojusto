@@ -3438,6 +3438,8 @@ export const uk: Translation = {
   'rental.faq.pending_norms_none': 'Станом на {fecha} жодна норма не очікує затвердження.',
   'rental.faq.pending_norms_item_live': '{norma}, що діє з {desde}',
   'rental.faq.pending_norms_item_upcoming': '{norma}, що набирає чинності {desde}',
+  'rental.faq.pending_norms_and': '{a}, і {b}',
+  'rental.faq.pending_norms_never_and': '{a} і {b}',
   'rental.faq.pending_norms_never':
     'Конгрес скасував {lista} до набрання чинності, тож його так і не почали застосовувати.',
   'rental.faq.pending_norms_repealed':

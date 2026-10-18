@@ -3401,6 +3401,8 @@ export const en: Translation = {
   'rental.faq.pending_norms_none': 'As at {fecha}, none is awaiting validation.',
   'rental.faq.pending_norms_item_live': '{norma}, in force since {desde}',
   'rental.faq.pending_norms_item_upcoming': '{norma}, which comes into force on {desde}',
+  'rental.faq.pending_norms_and': '{a}, and {b}',
+  'rental.faq.pending_norms_never_and': '{a} and {b}',
   'rental.faq.pending_norms_never':
     'Congress repealed {lista} before it came into force, so it never came to apply.',
   'rental.faq.pending_norms_repealed':

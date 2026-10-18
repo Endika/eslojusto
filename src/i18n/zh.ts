@@ -3167,6 +3167,8 @@ export const zh: Translation = {
   'rental.faq.pending_norms_none': '截至{fecha}，没有待确认的法规。',
   'rental.faq.pending_norms_item_live': '{norma}（自{desde}起生效）',
   'rental.faq.pending_norms_item_upcoming': '{norma}（将于{desde}生效）',
+  'rental.faq.pending_norms_and': '{a}和{b}',
+  'rental.faq.pending_norms_never_and': '{a}和{b}',
   'rental.faq.pending_norms_never': '众议院在{lista}生效之前就将其废止，因此它从未适用。',
   'rental.faq.pending_norms_repealed':
     '如果某次涨租落在一项已被众议院废止的法令的有效期内，本核查会给出两种计算方式，但不计入总额。已废止的法令：{lista}。',

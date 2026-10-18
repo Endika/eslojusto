@@ -42,7 +42,7 @@ export function rentalFaqEntries(
   const repealed = repealedIds
     .filter((id) => !neverInForce(norms[id]))
     .map((id) => `${NAME[id]}, ${period(lang, norms[id])}`);
-  const never = repealedIds.filter((id) => neverInForce(norms[id])).map((id) => NAME[id]);
+  const never: string[] = repealedIds.filter((id) => neverInForce(norms[id])).map((id) => NAME[id]);
   const fecha = formatLongDay(checkedOn, lang);
 
   const answers: Record<RentalFaqId, string> = {
@@ -58,14 +58,19 @@ export function rentalFaqEntries(
     pending_norms: tx('rental.faq.pending_norms_answer', {
       pendientes:
         pending.length > 0
-          ? tx('rental.faq.pending_norms_list', { fecha, lista: pending.join(', y ') })
+          ? tx('rental.faq.pending_norms_list', {
+              fecha,
+              lista: pending.reduce((a, b) => tx('rental.faq.pending_norms_and', { a, b })),
+            })
           : tx('rental.faq.pending_norms_none', { fecha }),
       derogados: [
         repealed.length > 0
           ? tx('rental.faq.pending_norms_repealed', { lista: repealed.join('; ') })
           : '',
         never.length > 0
-          ? tx('rental.faq.pending_norms_never', { lista: never.join(' y el ') })
+          ? tx('rental.faq.pending_norms_never', {
+              lista: never.reduce((a, b) => tx('rental.faq.pending_norms_never_and', { a, b })),
+            })
           : '',
       ]
         .filter(Boolean)

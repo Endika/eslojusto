@@ -3360,6 +3360,8 @@ export const ca: Translation = {
   'rental.faq.pending_norms_none': 'En data {fecha} no n’hi ha cap de pendent.',
   'rental.faq.pending_norms_item_live': '{norma}, en vigor des de {desde}',
   'rental.faq.pending_norms_item_upcoming': '{norma}, que entra en vigor en data {desde}',
+  'rental.faq.pending_norms_and': '{a}, i {b}',
+  'rental.faq.pending_norms_never_and': '{a} i {b}',
   'rental.faq.pending_norms_never':
     'El Congrés va derogar {lista} abans que entrés en vigor, de manera que no es va arribar a aplicar.',
   'rental.faq.pending_norms_repealed':

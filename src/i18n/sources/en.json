@@ -2406,6 +2406,8 @@
   "rental.faq.pending_norms_none": "1d84516739b2",
   "rental.faq.pending_norms_item_live": "fa621041665a",
   "rental.faq.pending_norms_item_upcoming": "90478c48ae4b",
+  "rental.faq.pending_norms_and": "ddefcdf23399",
+  "rental.faq.pending_norms_never_and": "9ec2efcc8013",
   "rental.faq.pending_norms_never": "ae42f20140d8",
   "rental.faq.pending_norms_repealed": "df464559f76c",
   "rental.faq.documents": "39c00aaaf276",

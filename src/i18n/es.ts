@@ -3080,6 +3080,8 @@ export const es = {
   'rental.faq.pending_norms_none': 'A {fecha} no hay ninguna pendiente.',
   'rental.faq.pending_norms_item_live': 'el {norma}, en vigor desde el {desde}',
   'rental.faq.pending_norms_item_upcoming': 'el {norma}, que entra en vigor el {desde}',
+  'rental.faq.pending_norms_and': '{a}, y {b}',
+  'rental.faq.pending_norms_never_and': '{a} y el {b}',
   'rental.faq.pending_norms_never':
     'El Congreso derogó el {lista} antes de que entrara en vigor, así que no llegó a aplicarse.',
   'rental.faq.pending_norms_repealed':

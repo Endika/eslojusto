@@ -3354,6 +3354,8 @@ export const ar: Translation = {
   'rental.faq.pending_norms_none': 'في {fecha}، لا يوجد أي نص بانتظار المصادقة.',
   'rental.faq.pending_norms_item_live': '{norma}، الساري منذ {desde}',
   'rental.faq.pending_norms_item_upcoming': '{norma}، الذي يدخل حيّز التنفيذ في {desde}',
+  'rental.faq.pending_norms_and': '{a}، و{b}',
+  'rental.faq.pending_norms_never_and': '{a} و{b}',
   'rental.faq.pending_norms_never':
     'ألغى البرلمان \u2068(Congreso)\u2069 {lista} قبل دخوله حيّز التنفيذ، فلم يُطبَّق قط.',
   'rental.faq.pending_norms_repealed':
