@@ -1,0 +1,102 @@
+---
+// source: 497baf7f9449
+import { LEGAL_INTEREST } from '../../engine/law/data/legal-interest';
+import { NORMS } from '../../engine/rental/data/norms';
+import { REVIEW, RENTAL_PAGES, depositReturnExample, pageDecree } from '../../content/rental-pages';
+import { formatDay, formatEuros, formatRate } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const ex = depositReturnExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+const [first, second] = ex.stretches;
+if (!first || !second) throw new Error('The example spans a year change.');
+const table = LEGAL_INTEREST[0]?.url;
+---
+
+<section class="sheet sheet--text" aria-labelledby="plazo">
+  <h2 id="plazo">期限：自您交还钥匙起一个月</h2>
+  <p>
+    合同结束、您交还钥匙后，房东有一个月的时间退还押金。过了这一个月，尚未退还的部分按法定利率（interés
+    legal del dinero）产生利息（art. 36.4 LAU）。
+  </p>
+  <p>
+    这一个月按日期对日期计算：如果您在十一月15日交还钥匙，期限在十二月15日届满，利息从16日起计算，一直计算到退还款项的那一天，但这一天本身不计入。
+  </p>
+  <p>
+    从一开始可以向您收取多少押金：
+    <a href={href(RENTAL_PAGES.deposit.path)}>{RENTAL_PAGES.deposit.name}</a>。
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="interes">
+  <h2 id="interes">适用什么利率</h2>
+  <p>
+    法定利率。它每年由《国家总预算法》（Ley de Presupuestos Generales del
+    Estado）确定，计算时每一天都使用该天所在自然年的利率。各年的利率见
+    <a href={table}>西班牙银行（Banco de España）的表格</a>。
+  </p>
+  <p>一年可以按其自然日（365天，闰年为366天）计算，也可以按360天计算：我们两种算法都给出。</p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">计算示例</h2>
+  <p>
+    某人的押金为{formatEuros(ex.deposit)}，于{formatDay(ex.keysReturnedOn)}
+    交还钥匙。房东接受了钥匙，并于{formatDay(ex.returnedOn)}
+    退还了全部押金。一个月的期限在15-12-2022届满，因此利息从{formatDay(ex.interestFrom)}
+    起计算，并跨越年份更替，每年使用各自的利率：
+  </p>
+  <ul>
+    <li>
+      {formatDay(first.from)}至{formatDay(first.to)}（{first.days}天），利率{formatRate(first.rate)}
+      ：{formatEuros(first.interest)}。
+    </li>
+    <li>
+      {formatDay(second.from)}至{formatDay(second.to)}（{second.days}天），利率
+      {formatRate(second.rate)}：{formatEuros(second.interest)}。
+    </li>
+  </ul>
+  <p class="example">
+    <span class="example__label">计算过程</span>{' '}
+    每一段的利息为押金乘以利率和天数，再除以100和一年的天数{first.yearDays}：
+    {formatEuros(ex.deposit)} × {formatRate(first.rate)} × {first.days} ÷ {first.yearDays}，以及
+    {formatEuros(ex.deposit)} × {formatRate(second.rate)} × {second.days} ÷ {second.yearDays}
+    。利息合计{formatEuros(ex.total)}；如果一年按360天计算，则为{formatEuros(ex.totalCommercial)}。
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="no-valoramos">
+  <h2 id="no-valoramos">我们不评估的内容</h2>
+  <p>
+    如果房东因房屋损坏、清洁或其他名目扣留部分押金，本核查会按房东给出的金额记录每一项扣款，并从尚未退还的金额中减去。本核查不评估扣款是否合理，也不评估维修费用是多少。
+  </p>
+  <p>{pageDecree('deposit_return', 'rental.guide.return.closing')}</p>
+  <p class="folio">
+    Art. <span>36.7</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">计算需退还给您的金额</h2>
+  <p>
+    在<a href={href(REVIEW.path)}>租房核查</a>
+    中，请填写您交还钥匙的日期、已退还给您的金额及退还日期。核查会给出尚未退还的押金和利息（按两种一年天数的算法），并可以准备一封相关信函。
+  </p>
+  <p>
+    {NORMS.lau.citation}：<a href={NORMS.lau.url}>BOE 上的合并文本</a>。
+  </p>
+</section>

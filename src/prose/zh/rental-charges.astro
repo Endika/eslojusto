@@ -1,0 +1,77 @@
+---
+// source: 8e819e81fa1a
+import { NORMS } from '../../engine/rental/data/norms';
+import { REVIEW, chargesExample, pageDecree } from '../../content/rental-pages';
+import { formatEuros, formatLongDay } from '../../content/rent-indices';
+import { t } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const ex = chargesExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="pacto">
+  <h2 id="pacto">只有书面约定并写明年度金额才能收取</h2>
+  <p>
+    只有在双方以书面形式约定、并写明合同签订时的年度金额的情况下，房东才能向您收取楼宇的一般费用或没有计量表的服务费用（art.
+    20.1 LAU）。税费（例如 IBI）另有规定：见下文“IBI 和其他税费”。
+  </p>
+  <p>如果合同没有提到这些费用，或没有写明每年的金额，本核查会标出来，供您查看。</p>
+  <p>{pageDecree('charges', 'rental.page.charges.community')}</p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="subida">
+  <h2 id="subida">能涨多少：最多为租金涨幅的两倍</h2>
+  <p>
+    在合同的前五年（房东是公司时为前七年）内，这些费用（税费除外）每年只能经双方同意上涨一次，且涨幅任何时候都不得超过租金可上涨幅度的两倍（art.
+    20.3 LAU；在 Real Decreto-ley 29/2026 之前签订的合同为 art.
+    20.2）。本核查将每年的每一项费用与该上限进行比较。
+  </p>
+  <p class="folio">
+    Art. <span>20.3</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ibi">
+  <h2 id="ibi">IBI 和其他税费</h2>
+  <p>{pageDecree('charges', 'rental.page.decree.taxes')}</p>
+  <p>
+    {t(lang, 'rental.guide.charges.taxes_before', {
+      desde: formatLongDay(NORMS.rdl29_2026.inForceSince, lang),
+    })}
+  </p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">计算示例</h2>
+  <p>
+    某合同约定物业费为每年{formatEuros(ex.agreed)}。第一年，房东收取了{formatEuros(ex.charged)}。
+  </p>
+  <p class="example">
+    <span class="example__label">计算过程</span> 此时还不可能有任何上涨，因此上限就是约定的金额
+    {formatEuros(ex.agreed)}。{formatEuros(ex.charged)} − {formatEuros(ex.agreed)} = 多付
+    {formatEuros(ex.over)}。
+  </p>
+  <p class="folio">
+    Art. <span>20</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">核查向您收取的费用</h2>
+  <p>
+    <a href={href(REVIEW.path)}>租房核查</a>
+    会将每年的每一项费用与约定金额和涨幅上限进行比较，并告诉您多付了多少。
+  </p>
+</section>

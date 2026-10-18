@@ -1,0 +1,86 @@
+---
+// source: f63abb595478
+import { NORMS } from '../../engine/rental/data/norms';
+import { REVIEW, RENTAL_PAGES, depositExample, pageDecree } from '../../content/rental-pages';
+import { formatEuros } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const ex = depositExample();
+// Until the Congress votes the decree down, the insurance ban stands as pending.
+const banStands = NORMS.rdl29_2026.status !== 'repealed';
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="fianza-legal">
+  <h2 id="fianza-legal">押金：一个月的租金</h2>
+  <p>押金（fianza）是强制性的；住房租赁的押金为一个月的租金，以现金支付（art. 36.1 LAU）。</p>
+  <p>
+    合同结束、您交还钥匙后，押金需在一个月内退还给您：
+    <a href={href(RENTAL_PAGES.deposit_return.path)}>{RENTAL_PAGES.deposit_return.name}</a>。
+  </p>
+  <p class="folio">
+    Art. <span>36.1</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="garantia-adicional">
+  <h2 id="garantia-adicional">其他担保：最多再加两个月的租金</h2>
+  <p>
+    除押金外，合同还可以要求另一项担保：更多的钱或一份保函。在2019年三月6日起签订、期限不超过五年（房东是公司时不超过七年）的合同中，这项额外担保不得超过两个月的租金（art.
+    36.5 LAU）。
+  </p>
+  <p>本核查将您支付的金额与该上限进行比较。</p>
+  {banStands && (
+    <p>
+      根据该法令，房东已不能要求您购买欠租险：详见下文<a href="#seguro">保险部分</a>。
+    </p>
+  )}
+  <p class="folio">
+    Art. <span>36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="adelantado">
+  <h2 id="adelantado">预付：一个月的租金</h2>
+  <p>房东要求预付的租金不得超过一个月（art. 17 LAU）。</p>
+  <p class="folio">
+    Art. <span>17</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="seguro">
+  <h2 id="seguro">{banStands ? '欠租险：该法令禁止要求您购买' : '欠租险'}</h2>
+  <p>{pageDecree('deposit', 'rental.page.decree.insurance')}</p>
+  <p class="folio">
+    Art. <span>36.5</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">计算示例</h2>
+  <p>
+    租金为{formatEuros(ex.rent)}时，某房东要求在入住前支付{formatEuros(ex.asked)}
+    现金：包括押金和额外担保。
+  </p>
+  <p class="example">
+    <span class="example__label">计算过程</span> 押金为一个月的租金，即{formatEuros(ex.rent)}
+    ；额外担保最多为两个月，即{formatEuros(2 * ex.rent)}。最多为{formatEuros(ex.allowed)}。房东要求
+    {formatEuros(ex.asked)}：超出上限{formatEuros(ex.over)}。
+  </p>
+  <p class="folio">
+    Art. <span>36.1 · 36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">核查房东向您要求的金额</h2>
+  <p>
+    <a href={href(REVIEW.path)}>租房核查</a>
+    会将您合同中的押金、担保和预付款与这些上限进行比较，并告诉您每一项超出上限多少。
+  </p>
+</section>
