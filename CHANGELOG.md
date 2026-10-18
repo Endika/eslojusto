@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.85.0](https://github.com/Endika/eslojusto/compare/v1.84.2...v1.85.0) (2026-10-18)
+
+
+### Features
+
+* **i18n:** translate the case pages' prose into Chinese ([bd0f2db](https://github.com/Endika/eslojusto/commit/bd0f2db3cf9dbd923ea3cf213f988e8940952d53))
+* **i18n:** translate the dictionary into Chinese, unpublished ([fa7b1ab](https://github.com/Endika/eslojusto/commit/fa7b1abacb1dc0cff28af081d61a428e48e16016))
+* **i18n:** translate the final pay guide into Chinese ([72be30c](https://github.com/Endika/eslojusto/commit/72be30c4dd2c8de08e6289048339cc6fb9928d95))
+* **i18n:** translate the legal notice and the privacy page into Chinese ([5b8dd85](https://github.com/Endika/eslojusto/commit/5b8dd8545ed827a8f2be0bebcff15d33fed2d719))
+* **i18n:** translate the rental sections and the ERTE page into Chinese ([1e4cc6c](https://github.com/Endika/eslojusto/commit/1e4cc6c611f26be58b0a104e5fea642fdc5d3ffd))
+* **i18n:** translate the rental topics into Chinese ([15c922c](https://github.com/Endika/eslojusto/commit/15c922c4ca83aabbb8a38565a620a03dabed8a4f))
+
+
+### Bug Fixes
+
+* **i18n:** drop the decree clause's Spanish comma in Chinese ([983103e](https://github.com/Endika/eslojusto/commit/983103ec02727b278c2e48d7bf8634c37442898c))
+* **i18n:** give a range of euros and a decree's name in the page's language ([fa31cbd](https://github.com/Endika/eslojusto/commit/fa31cbde46bb37fa64ce4fa196d3cd2a9c83d345))
+* **i18n:** say which Chinese severance reading gives the maximum, and two nuances ([58b0171](https://github.com/Endika/eslojusto/commit/58b0171acb9e3105701352cf7b5df7e391c146bd))
+* **i18n:** title the worked example in Ukrainian on the rental topics ([667632a](https://github.com/Endika/eslojusto/commit/667632a3ec74eee74aecae66025cd61ad7b9540d))
+* **i18n:** write the seniority table's spans in Ukrainian ([6450763](https://github.com/Endika/eslojusto/commit/6450763fe009eff67b17fb808eb29d1178ff785c))
+
 ## [1.84.2](https://github.com/Endika/eslojusto/compare/v1.84.1...v1.84.2) (2026-10-17)
 
 
