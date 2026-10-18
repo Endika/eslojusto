@@ -6253,7 +6253,7 @@ export const zh: Translation = {
   'client.household.calculation.severance.offered_unknown': '不清楚备好供您领取的金额是多少。',
   'client.household.calculation.severance.salary_unknown': '没有您的货币工资，无法计算补偿金。',
   'client.household.calculation.severance.prorated_note':
-    '这种计算方式把每个开始的月份算作一天。法规没有说明不满一年如何计算：只计入按完整年份的计算方式，而按开始的月份计算得出的是可能的最高金额。',
+    '这种计算方式把每个开始的月份算作一天，得出的是可能的最高金额。法规没有说明不满一年如何计算，因此总额只计入按完整年份的计算方式。',
   'client.household.calculation.notice.days':
     '提前通知期：{required}个自然日，自通知次日起算。已提前{given}天，还差{missing}天。',
   'client.household.calculation.notice.salary_unknown':

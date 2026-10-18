@@ -6703,7 +6703,7 @@ export const en: Translation = {
   'client.household.calculation.severance.salary_unknown':
     'Without your pay in money the severance pay cannot be calculated.',
   'client.household.calculation.severance.prorated_note':
-    'This reading counts one day for each month started. The regulation does not say how to count an incomplete year: only the reading that uses complete years counts, and this one is the most it could come to.',
+    'This reading counts one day for each month started and is the most it could come to. The regulation does not say how to count an incomplete year, so the total only counts the reading that uses complete years.',
   'client.household.calculation.notice.days':
     'Notice period: {required} calendar days, counted from the day after the notice. {given} were given and {missing} are missing.',
   'client.household.calculation.notice.salary_unknown':

@@ -6759,7 +6759,7 @@ export const ro: Translation = {
   'client.household.calculation.severance.salary_unknown':
     'Fără salariul tău în bani nu se poate calcula indemnizația.',
   'client.household.calculation.severance.prorated_note':
-    'Această interpretare socotește câte o zi pentru fiecare lună începută. Norma nu spune cum se socotește un an incomplet: în total intră doar interpretarea care folosește anii întregi, iar aceasta este suma maximă care ar putea rezulta.',
+    'Această interpretare socotește câte o zi pentru fiecare lună începută și dă suma maximă care ar putea rezulta. Norma nu spune cum se socotește un an incomplet, așa că în total intră doar interpretarea care folosește anii întregi.',
   'client.household.calculation.notice.days':
     'Preavizul: {required} zile calendaristice, socotite din ziua următoare comunicării. S-au dat {given} și lipsesc {missing}.',
   'client.household.calculation.notice.salary_unknown':

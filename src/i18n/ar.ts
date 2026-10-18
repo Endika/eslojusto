@@ -6596,7 +6596,7 @@ export const ar: Translation = {
   'client.household.calculation.severance.offered_unknown': 'لا يُعرَف أي مبلغ وُضع تحت تصرفك.',
   'client.household.calculation.severance.salary_unknown': 'دون أجرك النقدي لا يمكن حساب التعويض.',
   'client.household.calculation.severance.prorated_note':
-    'تحتسب هذه القراءة يومًا واحدًا عن كل شهر بدأ. لا يقول النص القانوني كيف تُحتسَب السنة غير المكتملة: لا تُحتسَب إلا القراءة التي تعتمد السنوات الكاملة، وهذه هي أقصى ما يمكن أن ينتج.',
+    'تحتسب هذه القراءة يومًا واحدًا عن كل شهر بدأ، وهي أقصى ما يمكن أن ينتج. لا يقول النص القانوني كيف تُحتسَب السنة غير المكتملة، لذلك لا يُحتسَب في المجموع إلا القراءة التي تعتمد السنوات الكاملة.',
   'client.household.calculation.notice.days':
     'مهلة الإشعار المسبق \u2068(preaviso)\u2069: {required} يومًا تقويميًا، تُحتسَب من اليوم التالي للإشعار. أُعطيت {given} وينقص {missing}.',
   'client.household.calculation.notice.salary_unknown':

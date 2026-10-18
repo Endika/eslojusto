@@ -6664,7 +6664,7 @@ export const ca: Translation = {
   'client.household.calculation.severance.salary_unknown':
     'Sense el teu salari en diners no es pot calcular la indemnització.',
   'client.household.calculation.severance.prorated_note':
-    'Aquest càlcul compta cada mes començat com un dia. La norma no diu com s’ha de comptar un any incomplet: només compta el càlcul que fa servir els anys complets, i aquest càlcul dona el màxim que podria sortir.',
+    'Aquest càlcul compta cada mes començat com un dia i dona el màxim que podria sortir. La norma no diu com s’ha de comptar un any incomplet, així que el total només compta el càlcul que fa servir els anys complets.',
   'client.household.calculation.notice.days':
     'Preavís: {required} dies naturals, comptats des de l’endemà de l’avís. Se’n van donar {given} i en falten {missing}.',
   'client.household.calculation.notice.salary_unknown':

@@ -6886,7 +6886,7 @@ export const fr: Translation = {
   'client.household.calculation.severance.salary_unknown':
     "Sans votre salaire en argent, l'indemnité ne peut pas être calculée.",
   'client.household.calculation.severance.prorated_note':
-    'Ce calcul compte un jour par mois commencé. La réglementation ne dit pas comment compter une année incomplète\u00a0: seul compte le calcul fondé sur les années complètes, et ce calcul par mois commencé est le maximum auquel on pourrait arriver.',
+    'Ce calcul compte un jour par mois commencé et donne le maximum auquel on pourrait arriver. La réglementation ne dit pas comment compter une année incomplète\u00a0: le total ne retient donc que le calcul fondé sur les années complètes.',
   'client.household.calculation.notice.days':
     'Préavis\u00a0: {required} jours calendaires, comptés à partir du lendemain de la notification. Il en a été donné {given} et il en manque {missing}.',
   'client.household.calculation.notice.salary_unknown':
