@@ -3428,6 +3428,8 @@ export const ro: Translation = {
   'rental.faq.pending_norms_none': 'La {fecha} nu există niciuna în așteptare.',
   'rental.faq.pending_norms_item_live': '{norma}, în vigoare din {desde}',
   'rental.faq.pending_norms_item_upcoming': '{norma}, care intră în vigoare pe {desde}',
+  'rental.faq.pending_norms_and': '{a}, și {b}',
+  'rental.faq.pending_norms_never_and': '{a} și {b}',
   'rental.faq.pending_norms_never':
     'Congresul a abrogat {lista} înainte să intre în vigoare, așa că nu a ajuns să se aplice.',
   'rental.faq.pending_norms_repealed':

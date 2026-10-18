@@ -3499,6 +3499,8 @@ export const fr: Translation = {
   'rental.faq.pending_norms_none': "Au {fecha}, aucun texte n'est en attente.",
   'rental.faq.pending_norms_item_live': 'le {norma}, en vigueur depuis le {desde}',
   'rental.faq.pending_norms_item_upcoming': 'le {norma}, qui entre en vigueur le {desde}',
+  'rental.faq.pending_norms_and': '{a}, et {b}',
+  'rental.faq.pending_norms_never_and': '{a} et le {b}',
   'rental.faq.pending_norms_never':
     "Le Congrès a abrogé le {lista} avant son entrée en vigueur\u00a0: il n'a donc jamais été appliqué.",
   'rental.faq.pending_norms_repealed':
