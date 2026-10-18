@@ -3905,7 +3905,7 @@ export const es = {
   'client.household.calculation.severance.salary_unknown':
     'Sin tu salario en dinero no se puede calcular la indemnización.',
   'client.household.calculation.severance.prorated_note':
-    'Esta lectura cuenta como un día cada mes empezado. La norma no dice cómo contar un año incompleto: solo cuenta la lectura que usa los años completos, y esta es lo más que podría salir.',
+    'Esta lectura cuenta como un día cada mes empezado y es lo más que podría salir. La norma no dice cómo contar un año incompleto, así que el total solo cuenta la lectura que usa los años completos.',
   'client.household.calculation.notice.days':
     'Preaviso: {required} días naturales, contados desde el día siguiente al aviso. Se dieron {given} y faltan {missing}.',
   'client.household.calculation.notice.salary_unknown':
