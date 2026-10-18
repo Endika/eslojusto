@@ -1,0 +1,102 @@
+---
+// source: c891fa20c5a1
+import CaseLink from '../../components/CaseLink.astro';
+import { severanceMonths, unfairAfter2012, unfairBefore2012 } from '../../content/examples';
+import { euros, integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const [months = 0] = severanceMonths(unfairAfter2012.calculation);
+const [first = 0, second = 0] = severanceMonths(unfairBefore2012.calculation);
+const decimal = (n: number) => String(n).replace('.', ',');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="di-tramos">33 días por ano, cun límite de 720</h3>
+  <p>
+    Se o despedimento se recoñece ou se declara improcedente, a indemnización é de 33 días de
+    salario por ano traballado, cun máximo de 24 mensualidades, que son 720 días (art. 56.1 ET). O
+    tempo cóntase en meses, e unha fracción de mes conta como un mes enteiro: 33 días ao ano son
+    2,75 días por mes.
+  </p>
+  <p>
+    O salario de cada día é o teu salario anual, coas pagas extraordinarias, entre 365, como fai a
+    guía do CGPJ. A calculadora dá a cifra ao céntimo e compáraa coa da túa empresa.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-2012">Se empezaches antes do 12 de febreiro de 2012</h3>
+  <p>A indemnización calcúlase en dous tramos (disposición transitoria 11.ª ET):</p>
+  <ul>
+    <li>Ata o 11 de febreiro de 2012, 45 días por ano (3,75 por mes).</li>
+    <li>Desde o 12 de febreiro de 2012, 33 días por ano (2,75 por mes).</li>
+  </ul>
+  <p>
+    O total ten un límite de 720 días, agás que o primeiro tramo xa o supere. Nese caso conta só o
+    primeiro tramo, cun máximo de 42 mensualidades (1.260 días).
+  </p>
+  <p class="folio">
+    Disposición transitoria <span>11.ª</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-ejemplo">Exemplos resoltos</h3>
+  <p>
+    Unha persoa con 1.500&nbsp;€ brutos ao mes e dúas pagas extraordinarias de 1.500&nbsp;€,
+    21.000&nbsp;€ ao ano. O seu salario diario é 21.000&nbsp;€ / 365 ={' '}
+    {euros(unfairAfter2012.dailySalary)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Contrato de 2018</span> Do 3 de maio de 2018 ao 20 de xullo de 2026
+    contan {integer(months)} meses. {integer(months)} × 2,75 = {decimal(unfairAfter2012.salaryDays)}{' '}
+    días. 21.000&nbsp;€ × {decimal(unfairAfter2012.salaryDays)} / 365 ={' '}
+    {euros(unfairAfter2012.amount)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Contrato de 2010</span> Do 1 de marzo de 2010 ao 15 de setembro de
+    2026. Primeiro tramo: {integer(first)} meses × 3,75 = {decimal(first * 3.75)} días. Segundo
+    tramo: {integer(second)} meses × 2,75 = {decimal(second * 2.75)} días. Total:{' '}
+    {integer(unfairBefore2012.salaryDays)} días, por debaixo do límite. 21.000&nbsp;€ ×{' '}
+    {integer(unfairBefore2012.salaryDays)} / 365 = {euros(unfairBefore2012.amount)}.
+  </p>
+  <p>
+    A indemnización vai á parte do finiquito, que suma o salario do último mes, as vacacións non
+    gozadas e as pagas extraordinarias xeradas. A calculadora revisa todo xunto.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-readmision">Readmisión ou indemnización</h3>
+  <p>
+    Cando un despedimento se declara improcedente, a empresa escolle en cinco días entre readmitirte
+    ou pagarche a indemnización (art. 56.1 ET). Se te readmite, ten que pagarche ademais os salarios
+    de tramitación, os que deixaches de cobrar desde o despedimento (art. 56.2 ET). Se es
+    representante legal do persoal ou delegado sindical, a elección é túa (art. 56.4 ET).
+  </p>
+  <p>
+    Esta revisión non calcula os salarios de tramitación nin decide se un despedimento é
+    improcedente: iso declárao un xulgado ou recoñéceo a empresa.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-otros">Outros despedimentos</h3>
+  <p>
+    Un despedimento obxectivo págase a 20 días por ano, con 15 días de preaviso: explícase en{' '}
+    <CaseLink lang={lang} id="objective_dismissal" />. Calquera despedimento, tamén o disciplinario,
+    é situación legal de desemprego: <CaseLink lang={lang} id="benefit_disciplinary" /> explica que
+    ceses dan paro.
+  </p>
+</section>

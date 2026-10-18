@@ -1,0 +1,91 @@
+---
+// source: 47084c570826
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitAfterDismissal, benefitAfterResignation } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const dismissal = benefitAfterDismissal;
+if (dismissal.entitled !== 'yes' || dismissal.figures === null)
+  throw new Error('Incomplete example');
+const resignationGivesBenefit = benefitAfterResignation.entitled === 'yes';
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-regla">A regra: marchar por decisión propia non dá paro</h3>
+  <p>
+    Para cobrar o paro, o contrato ten que rematar nunha situación legal de desemprego. Cesar
+    voluntariamente no traballo non o é (art. 267.2.a LGSS), así que unha baixa voluntaria, por
+    regra xeral, non dá paro, aínda que teñas os días cotizados.
+  </p>
+  <p class="folio">
+    Art. <span>267.2.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-excepciones">Cando marchar si dá paro</h3>
+  <p>
+    A lei trata como situación legal de desemprego a saída por decisión túa nestes casos (art.
+    267.1.a.5.º LGSS):
+  </p>
+  <ul>
+    <li>Un traslado a outro centro que esixe cambiar de residencia (art. 40 ET).</li>
+    <li>Unha modificación substancial das túas condicións que te prexudique (art. 41.3 ET).</li>
+    <li>
+      Un incumprimento grave da empresa, como non pagarche ou pagarche tarde unha e outra vez (art.
+      50 ET). Esta saída adoita declarala un xulgado.
+    </li>
+    <li>A violencia de xénero ou a violencia sexual (art. 49.1.m ET).</li>
+  </ul>
+  <p class="folio">
+    Art. <span>267.1.a.5.º</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-nuevo">Se despois comezas outro traballo</h3>
+  <p>
+    O que se mira é como remata o teu último contrato. Se o traballo novo acaba por un despedimento
+    ou polo fin dun contrato temporal, ese cese si é situación legal de desemprego (art. 267.1.a
+    LGSS).
+  </p>
+  <p>
+    A lei regula á parte un caso: se a empresa nova remata o contrato durante o período de proba,
+    iso é situación legal de desemprego só se pasaron tres meses desde a túa baixa voluntaria (art.
+    267.1.a.7.º LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>267.1.a</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pbv-ejemplo">Exemplo: o mesmo contrato, dous finais</h3>
+  <p>
+    Unha persoa con 1.500&nbsp;€ brutos ao mes e dúas pagas extraordinarias de 1.500&nbsp;€ traballa
+    do 1 de setembro de 2023 ao 31 de agosto de 2026, sen fillos ou fillas ao cargo.
+  </p>
+  <p class="example">
+    <span class="example__label">Se marcha por baixa voluntaria</span>{' '}
+    {resignationGivesBenefit
+      ? 'A calculadora estima paro.'
+      : 'A calculadora responde que non dá dereito a paro (art. 267.2.a LGSS).'}{' '}
+    Ten finiquito igualmente: salario pendente, vacacións e pagas extraordinarias.
+  </p>
+  <p class="example">
+    <span class="example__label">Se a despiden</span> Con {integer(dismissal.contractDays)} días
+    cotizados correspóndenlle polo menos {integer(dismissal.duration.days)} días de paro, uns{' '}
+    {wholeEuros(dismissal.figures.firstStretch.min)} ao mes os primeiros 6 meses e uns{' '}
+    {wholeEuros(dismissal.figures.secondStretch.min)} despois, en bruto.
+  </p>
+  <p>
+    A calculadora desta páxina vén coa baixa voluntaria marcada. Se o teu caso é outro, cambia a
+    causa no primeiro paso. Máis sobre o finiquito en <CaseLink lang={lang} id="resignation" />.
+  </p>
+</section>

@@ -1,0 +1,83 @@
+---
+// source: 8e819e81fa1a
+import { NORMS } from '../../engine/rental/data/norms';
+import { chargesExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros, formatLongDay } from '../../content/rent-indices';
+import { t } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pageDecree } = rentalPagesCopy(lang);
+
+const ex = chargesExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="pacto">
+  <h2 id="pacto">Só cun pacto por escrito e o seu importe anual</h2>
+  <p>
+    O propietario só pode cobrarche os gastos xerais do edificio ou os servizos sen contador se o
+    pactastes por escrito e co seu importe anual á data do contrato (art. 20.1 LAU). Os tributos,
+    como o IBI, teñen a súa regra á parte: mira «O IBI e as taxas» máis abaixo.
+  </p>
+  <p>
+    Se o contrato non os menciona ou non dá un importe ao ano, a revisión sinálao para que o mires.
+  </p>
+  <p>{pageDecree('charges', 'rental.page.charges.community')}</p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="subida">
+  <h2 id="subida">Canto poden subir: ata o dobre que a renda</h2>
+  <p>
+    Nos cinco primeiros anos de contrato, ou sete se o propietario é unha empresa, eses gastos, agás
+    os tributos, só poden subir unha vez ao ano, por acordo, e nunca máis do dobre do que pode subir
+    a renda (art. 20.3 LAU, ou art. 20.2 nos contratos anteriores ao Real Decreto-ley 29/2026). A
+    revisión compara cada gasto de cada ano con ese límite.
+  </p>
+  <p class="folio">
+    Art. <span>20.3</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ibi">
+  <h2 id="ibi">O IBI e as taxas</h2>
+  <p>{pageDecree('charges', 'rental.page.decree.taxes')}</p>
+  <p>
+    {t(lang, 'rental.guide.charges.taxes_before', {
+      desde: formatLongDay(NORMS.rdl29_2026.inForceSince, lang),
+    })}
+  </p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Exemplo resolto</h2>
+  <p>
+    Un contrato fixa {formatEuros(ex.agreed)} ao ano de comunidade. O primeiro ano, o propietario
+    cobra {formatEuros(ex.charged)}.
+  </p>
+  <p class="example">
+    <span class="example__label">As contas</span> Aínda non puido haber ningunha suba, así que o
+    máximo é o pactado, {formatEuros(ex.agreed)}. {formatEuros(ex.charged)} −{' '}
+    {formatEuros(ex.agreed)} = {formatEuros(ex.over)} de máis.
+  </p>
+  <p class="folio">
+    Art. <span>20</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Comproba o que che cobran</h2>
+  <p>
+    A <a href={href(REVIEW.path)}>revisión do aluguer</a> compara cada gasto de cada ano co pactado
+    e co límite de suba, e diche canto pagaches de máis.
+  </p>
+</section>

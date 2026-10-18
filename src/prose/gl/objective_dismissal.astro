@@ -1,0 +1,86 @@
+---
+// source: b433a07857b6
+import CaseLink from '../../components/CaseLink.astro';
+import { euroRange, itemRange, objective, severanceMonths } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const severance = itemRange(objective, 'severance');
+const notice = itemRange(objective, 'employer_notice');
+const salary = itemRange(objective, 'pending_salary');
+const holidays = itemRange(objective, 'holiday_pay');
+const extraPay = itemRange(objective, 'extra_pay');
+const unfair = objective.unfairReference;
+const months =
+  severanceMonths(
+    objective.items.find((p) => p.item.id === 'severance')?.item.calculation ?? [],
+  )[0] ?? 0;
+if (!severance || !notice || !salary || !holidays || !extraPay || unfair === null)
+  throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="do-20-dias">20 días por ano, cun límite de 12 mensualidades</h3>
+  <p>
+    Nun despedimento por causas obxectivas, a empresa ten que poñer á túa disposición, xunto coa
+    carta, unha indemnización de 20 días de salario por ano traballado, cun máximo de 12
+    mensualidades (art. 53.1.b ET). A guía do CGPJ, tras a STS 651/2026, conta ese límite como 360
+    días. O tempo cóntase en meses, e unha fracción de mes conta como un mes enteiro.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.b</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-preaviso">15 días de preaviso, ou o seu pagamento</h3>
+  <p>
+    Entre a carta e o despedimento teñen que pasar 15 días de preaviso (art. 53.1.c ET). Os días que
+    a empresa non dea páganse. A calculadora pregúntache cantos che deron e calcula os que faltan.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-ejemplo">Exemplo resolto</h3>
+  <p>
+    Unha persoa con 1.500&nbsp;€ brutos ao mes e dúas pagas extraordinarias de 1.500&nbsp;€ traballa
+    do 3 de maio de 2018 ao 20 de xullo de 2026. Gozou 10 días de vacacións este ano e a empresa non
+    lle dá preaviso. Estas son as cifras da calculadora:
+  </p>
+  <ul>
+    <li>
+      Indemnización: {euroRange(severance, lang)} ({months} meses × 20 / 12 ={' '}
+      {String((months * 20) / 12).replace('.', ',')} días).
+    </li>
+    <li>Preaviso non dado: {euroRange(notice, lang)}.</li>
+    <li>Salario de xullo: {euroRange(salary, lang)}.</li>
+    <li>Vacacións non gozadas: {euroRange(holidays, lang)}.</li>
+    <li>Paga de Nadal xerada desde o 1 de xullo: {euroRange(extraPay, lang)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Se se declarase improcedente</span> Coas mesmas datas, a
+    indemnización sería de {euros(unfair)}, a 33 días por ano. A revisión amósache esa cifra ao lado
+    da do despedimento obxectivo.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-diferencia">Despedimento obxectivo ou improcedente</h3>
+  <p>
+    Un despedimento obxectivo pódese impugnar como un disciplinario (art. 53.3 ET). Se se declara
+    improcedente, a indemnización calcúlase a 33 días por ano, cun límite de 720 días: explícase en{' '}
+    <CaseLink lang={lang} id="unfair_dismissal" />. O prazo para impugnalo é de 20 días hábiles
+    (art. 59.3 ET).
+  </p>
+  <p class="folio">
+    Art. <span>53 · 56 · 59</span> ET
+  </p>
+</section>
