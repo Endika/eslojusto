@@ -3,7 +3,7 @@
 import FigureTable from '../../components/FigureTable.astro';
 import CaseLink from '../../components/CaseLink.astro';
 import { faqEntries } from '../../content/faq';
-import { bySeniority } from '../../content/examples';
+import { bySeniority, spanLabel } from '../../content/examples';
 import { wholeEuroRange, wholeEuros } from '../../content/format';
 import { LANDINGS, type LandingId } from '../../content/landings';
 import { ET, SOURCES, LGSS } from '../../engine/sources';
@@ -343,9 +343,9 @@ const benefitSources = [
           </tr>
         </thead>
         <tbody>
-          {bySeniority.map(({ label, finalPay, fixedTermLimit, fixedTerm, objective, unfair }) => (
+          {bySeniority.map(({ months, finalPay, fixedTermLimit, fixedTerm, objective, unfair }) => (
             <tr>
-              <th scope="row">{label}</th>
+              <th scope="row">{spanLabel(months, lang)}</th>
               <td>{wholeEuroRange(finalPay)}</td>
               <td>
                 {fixedTerm === null ? '—' : wholeEuros(fixedTerm)}
