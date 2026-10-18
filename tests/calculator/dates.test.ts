@@ -27,4 +27,24 @@ describe('dates in words, from the dictionary', () => {
     );
     expect(months.map((_, i) => monthName(i + 1, tr))).toEqual(months.map(intl({ month: 'long' })));
   });
+
+  it('give a Basque year the ending its figure takes', () => {
+    const eu: Translate = (key, vars) => t('eu', key, vars);
+    const years = {
+      2000: 'ko',
+      2010: 'eko',
+      2011: 'ko',
+      2020: 'ko',
+      2021: 'eko',
+      2025: 'eko',
+      2026: 'ko',
+      2030: 'eko',
+      2031: 'ko',
+      2100: 'eko',
+    };
+    for (const [year, ending] of Object.entries(years)) {
+      expect(monthYear(`${year}-10`, eu)).toBe(`${year}${ending} urria`);
+    }
+    expect(longDay('2026-10-08', eu)).toBe('2026ko urriaren 8a');
+  });
 });
