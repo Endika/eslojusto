@@ -1,0 +1,104 @@
+---
+// source: c891fa20c5a1
+import CaseLink from '../../components/CaseLink.astro';
+import { severanceMonths, unfairAfter2012, unfairBefore2012 } from '../../content/examples';
+import { euros, integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const [months = 0] = severanceMonths(unfairAfter2012.calculation);
+const [first = 0, second = 0] = severanceMonths(unfairBefore2012.calculation);
+const decimal = (n: number) => String(n).replace('.', ',');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="di-tramos">33 egun urteko, gehienez 720</h3>
+  <p>
+    Kaleratzea bidegabetzat onartzen edo deklaratzen bada, kalte-ordaina lan egindako urte
+    bakoitzeko 33 eguneko soldata da, gehienez 24 hileko soldata, hau da, 720 egun (art. 56.1 ET).
+    Denbora hilabeteka zenbatzen da, eta hilabete-zati bat hilabete osotzat hartzen da: urteko 33
+    egun hilabeteko 2,75 egun dira.
+  </p>
+  <p>
+    Egun bakoitzeko soldata zure urteko soldata da, aparteko ordainsariak barne, 365ez zatituta,
+    CGPJren gidak egiten duen bezala. Kalkulagailuak zifra zentimoraino ematen du, eta zure
+    enpresarenarekin alderatzen du.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-2012">2012ko otsailaren 12a baino lehen hasi bazinen</h3>
+  <p>Kalte-ordaina bi tartetan kalkulatzen da (disposición transitoria 11.ª ET):</p>
+  <ul>
+    <li>2012ko otsailaren 11ra arte, 45 egun urteko (3,75 hilabeteko).</li>
+    <li>2012ko otsailaren 12tik aurrera, 33 egun urteko (2,75 hilabeteko).</li>
+  </ul>
+  <p>
+    Guztizkoak 720 eguneko muga du, lehen tarteak dagoeneko gainditzen ez badu behintzat. Kasu
+    horretan lehen tartea bakarrik zenbatzen da, gehienez 42 hileko soldata (1.260 egun).
+  </p>
+  <p class="folio">
+    Disposición transitoria <span>11.ª</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-ejemplo">Adibide ebatziak</h3>
+  <p>
+    Pertsona batek hilean 1.500&nbsp;€ gordin eta 1.500&nbsp;€-ko bi aparteko ordainsari ditu,
+    urtean 21.000&nbsp;€. Bere eguneko soldata 21.000&nbsp;€ / 365 ={' '}
+    {euros(unfairAfter2012.dailySalary)} da.
+  </p>
+  <p class="example">
+    <span class="example__label">2018ko kontratua</span> 2018ko maiatzaren 3tik 2026ko uztailaren
+    20ra {integer(months)} hilabete zenbatzen dira. {integer(months)} × 2,75 ={' '}
+    {decimal(unfairAfter2012.salaryDays)} egun. 21.000&nbsp;€ ×{' '}
+    {decimal(unfairAfter2012.salaryDays)} / 365 = {euros(unfairAfter2012.amount)}.
+  </p>
+  <p class="example">
+    <span class="example__label">2010eko kontratua</span> 2010eko martxoaren 1etik 2026ko irailaren
+    15era. Lehen tartea: {integer(first)} hilabete × 3,75 = {decimal(first * 3.75)} egun. Bigarren
+    tartea: {integer(second)} hilabete × 2,75 = {decimal(second * 2.75)} egun. Guztira:{' '}
+    {integer(unfairBefore2012.salaryDays)} egun, mugaren azpitik. 21.000&nbsp;€ ×{' '}
+    {integer(unfairBefore2012.salaryDays)} / 365 = {euros(unfairBefore2012.amount)}.
+  </p>
+  <p>
+    Kalte-ordaina kitapenaz aparte doa; kitapenak azken hilabeteko soldata, hartu gabeko oporrak eta
+    sortutako aparteko ordainsariak batzen ditu. Kalkulagailuak dena batera berrikusten du.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-readmision">Berronartzea edo kalte-ordaina</h3>
+  <p>
+    Kaleratze bat bidegabetzat deklaratzen denean, enpresak bost egunean aukeratzen du zu berronartu
+    edo kalte-ordaina ordaindu (art. 56.1 ET). Berronartzen bazaitu, izapidetze-soldatak ere
+    ordaindu behar dizkizu, hau da, kaleratzetik aurrera kobratu gabe utzi zenituenak (art. 56.2
+    ET). Langileen legezko ordezkaria edo ordezkari sindikala bazara, aukera zurea da (art. 56.4
+    ET).
+  </p>
+  <p>
+    Berrikuspen honek ez ditu izapidetze-soldatak kalkulatzen, eta ez du erabakitzen kaleratze bat
+    bidegabea den ala ez: hori epaitegi batek deklaratzen du edo enpresak onartzen du.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-otros">Beste kaleratze batzuk</h3>
+  <p>
+    Kaleratze objektibo bat urteko 20 egunean ordaintzen da, 15 eguneko aurreabisuarekin: hemen duzu{' '}
+    <CaseLink lang={lang} id="objective_dismissal" />. Edozein kaleratze, diziplina-kaleratzea ere,
+    legezko langabezia-egoera da: <CaseLink lang={lang} id="benefit_disciplinary" /> orrian azaltzen
+    da zer lan-amaierak ematen duten langabezia-prestaziorako eskubidea.
+  </p>
+</section>

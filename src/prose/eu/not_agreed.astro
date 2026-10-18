@@ -1,0 +1,82 @@
+---
+// source: 3387bbf43a04
+import { euroRange, itemRange, notAgreed, OFFERED_HOLIDAYS } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
+const range = itemRange(notAgreed, 'holiday_pay');
+if (!holidays || !range || holidays.difference === null) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="nc-que-es">Zer esan nahi du</h3>
+  <p>
+    Kontratua amaitzean, enpresak likidazio-agiriaren proposamen bat ematen dizu, ordaindu behar
+    dizkizun kopuruekin (art. 49.2 ET). Pertsona batzuek, kopururen batekin ados ez daudenean,
+    «recibí no conforme» (jasoa, ados ez) edo «no conforme» (ados ez) gehituta sinatzen dute.
+  </p>
+  <p>
+    Ohar horrek ez du aldatzen enpresak ordaintzen dizuna: zifraren batekin ados ez zaudela idatziz
+    uzten du. Informazio gisa bakarrik kontatzen dugu. Zure kasuan zer egin lan-zuzenbideko bulego
+    batek, graduatu sozialaren bulego batek edo sindikatu batek balora dezake.
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-representante">Langileen ordezkari bat aurrean dela</h3>
+  <p>
+    Kitapena sinatzera zoazenean langileen legezko ordezkari bat bertan egotea eska dezakezu.
+    Agirian jasotzen da haren aurrean sinatzen duzun edo aukera hori erabili ez duzun (art. 49.2
+    ET).
+  </p>
+  <p class="folio">
+    Art. <span>49.2</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-ejemplo">Adibidea: sinatu aurretik alderatu</h3>
+  <p>
+    Pertsona batek hilean 1.500&nbsp;€ gordin eta 1.500&nbsp;€-ko bi aparteko ordainsari ditu, eta
+    borondatezko baja hartzen du 2026ko urriaren 15ean, 2023ko martxoaren 1etik lanean egon ondoren.
+    Bere 22 opor-lanegunetatik 10 hartu ditu, eta bere hitzarmeneko 15 eguneko aurreabisua eman du.
+    Proposamenak {euros(OFFERED_HOLIDAYS)} ordaintzen dizkio oporrengatik.
+  </p>
+  <p class="example">
+    <span class="example__label">Oporrak</span> Legezko gutxienekoa {euroRange(range, lang)} da,
+    egunka edo hilabeteka zenbatzearen arabera. Proposamenaren {euros(OFFERED_HOLIDAYS)} kopuruaren
+    aldean, gutxienez {euros(holidays.difference)} falta dira.
+  </p>
+  <p>
+    Kalkulagailuak gauza bera egiten du kontzeptu bakoitzarekin: idatzi proposamenean jartzen duena
+    «Zure kitapena» urratsean, eta ikusiko duzu zer datorren bat legezko gutxienekoarekin eta zer
+    ez.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="nc-plazos">Epeek aurrera jarraitzen dute</h3>
+  <p>
+    Ordaintzeke dagoen soldatarako, oporretarako, aparteko ordainsarietarako edo aldi baterako
+    kontratuaren amaierako kalte-ordainerako, epea urtebetekoa da (art. 59.1 ET).
+  </p>
+  <p>
+    Kaleratze batean, hura aurkaratzeko epea 20 egun baliodunekoa da (art. 59.3 ET). Epe hori eten
+    egiten da dagokion bitartekaritza, arbitraje eta adiskidetze zerbitzu publikoaren aurrean
+    adiskidetze-eskaera aurkeztean. Laburra da, eta lan-zuzenbideko bulego batek, graduatu
+    sozialaren bulego batek edo sindikatu batek esan diezazukete zein den zure kasuari aplikatzen
+    zaiona.
+  </p>
+  <p class="folio">
+    Art. <span>59</span> ET
+  </p>
+</section>

@@ -1,0 +1,140 @@
+---
+// source: 854c3338933e
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitBySalary } from '../../content/examples';
+import { euros, wholeEuros } from '../../content/format';
+import { BENEFIT_2026 } from '../../engine/unemployment';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const { minCap, maxCap } = BENEFIT_2026;
+const [, mid, high] = benefitBySalary;
+if (!mid || !high) throw new Error('Incomplete example');
+type Row = (typeof benefitBySalary)[number];
+const stretch = (b: Row, n: 0 | 1 | 2) => b.children[n] ?? { c1: 0, c2: 0 };
+// One row per figure, one column per salary, so the table fits a phone.
+const rows: readonly (readonly [string, (b: Row) => number])[] = [
+  ['Oinarri arautzailea', (b) => b.base],
+  ['Lehen 180 egunak, seme-alabarik gabe', (b) => stretch(b, 0).c1],
+  ['Lehen 180 egunak, seme-alaba batekin', (b) => stretch(b, 1).c1],
+  ['Lehen 180 egunak, bi edo gehiagorekin', (b) => stretch(b, 2).c1],
+  ['181. egunetik aurrera, seme-alabarik gabe', (b) => stretch(b, 0).c2],
+];
+---
+
+<section class="sheet sheet--text">
+  <h3 id="p-cuanto">70&nbsp;% eta gero 60&nbsp;%</h3>
+  <p>
+    Langabezia-prestazio kontributiboa (prestación contributiva por desempleo) zure oinarri
+    arautzailearen gainean kalkulatzen da: azken 180 egunetan langabeziagatik kotizatutakoaren batez
+    bestekoa, aparteko orduak kontuan hartu gabe (art. 270.1 LGSS). Oinarri horren 70&nbsp;%
+    kobratzen da lehen 180 egunetan, eta 60&nbsp;% 181. egunetik aurrera (art. 270.2 LGSS).
+  </p>
+  <p>
+    Hilabete bakoitzak gutxieneko bat eta gehieneko bat ditu, zure kargurako seme-alaben arabera
+    (art. 270.3 LGSS). 2026an, IPREM {wholeEuros(BENEFIT_2026.monthlyIprem)} izanik, hauek dira:
+  </p>
+  <ul>
+    <li>
+      Kargurako seme-alabarik gabe, hilean {wholeEuros(minCap[0])} eta {wholeEuros(maxCap[0])}{' '}
+      artean.
+    </li>
+    <li>
+      Seme-alaba batekin, {wholeEuros(minCap[1])} eta {wholeEuros(maxCap[1])} artean.
+    </li>
+    <li>
+      Bi edo gehiagorekin, {wholeEuros(minCap[1])} eta {wholeEuros(maxCap[2])} artean.
+    </li>
+  </ul>
+  <p class="folio">
+    Art. <span>270</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-tabla">Zenbat kobratzen den langabezian, nomina 1.300, 1.500 edo 1.800&nbsp;€ bada</h3>
+  <FigureTable id="p-tabla-titulo">
+    <Fragment slot="caption">
+      Langabezia-prestazio gordina hilean, 14 ordainsari berdinetan kobratutako soldatarekin eta
+      lanaldi osoarekin, 2026an, eurora biribilduta, kalkulagailuan bezala.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Soldata gordina hilean</th>
+        {benefitBySalary.map(({ salary }) => (
+          <th scope="col">{wholeEuros(salary)}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(([label, value]) => (
+        <tr>
+          <th scope="row">{label}</th>
+          {benefitBySalary.map((b) => (
+            <td>{wholeEuros(value(b))}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    Oinarria urteko soldatatik ateratzen da, aparteko ordainsariak barne, 12z zatituta: 1.500&nbsp;€
+    14 ordainsaritan, 21.000&nbsp;€ / 12 = {euros(mid.base)}, eta horren 70&nbsp;% seme-alabarik
+    gabeko gehienekoa da, hain zuzen. 1.800&nbsp;€-rekin oinarria {euros(high.base)} da, eta horren
+    70&nbsp;% seme-alabarik gabeko eta seme-alaba bateko gehienekoen gainetik dago; beraz, kasu
+    horretan gehienekoa kobratzen da.
+  </p>
+  <p>
+    Zifra gordinak dira. Hortik oinarriaren 4,85&nbsp;% kentzen da Seguridad Social
+    erakundearentzat, eta dagokion IRPFa ere bai. Lanaldi partzialarekin zifrak txikiagoak dira, eta
+    kalkulagailuak ez ditu ematen.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-requisitos">Nork kobra dezakeen</h3>
+  <p>
+    Kontratua legezko langabezia-egoeran amaitu behar da: adibidez, kaleratze bat edo zuk amaitu ez
+    zenuen aldi baterako kontratu baten amaiera (art. 267 LGSS). Gainera, beste baldintza batzuen
+    artean, azken 6 urteetan gutxienez 360 egun kotizatuta izan behar dira, enplegu-eskatzaile gisa
+    izena eman behar da eta jarduera-akordioa (acuerdo de actividad) sinatu behar da (art. 266
+    LGSS).
+  </p>
+  <ul>
+    <li>
+      Zenbat irauten duen, kotizatutakoaren arabera: <CaseLink lang={lang} id="benefit_duration" />.
+    </li>
+    <li>
+      Zu zeu joaten bazara: <CaseLink lang={lang} id="benefit_resignation" />
+    </li>
+    <li>
+      Falta batengatik kaleratzen bazaituzte: <CaseLink lang={lang} id="benefit_disciplinary" />.
+    </li>
+  </ul>
+  <p>
+    Enplegu-eskatzaile gisa izena eman gabe ez dago langabezia-prestaziorik: zure erkidegoko
+    enplegu-zerbitzuan ematen duzu alta, eta SEPEri eskatzen diozu, kontratuaren amaieraren edo
+    kitapenak ordaintzen dizkizun hartu gabeko oporren amaieraren hurrengo 15 egunetan (arts. 266
+    eta 268 LGSS). Egun baliodunak direla SEPEk adierazten du.
+  </p>
+  <p class="folio">
+    Arts. <span>266 · 267 · 268</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-erte">ERTE batean bazaude</h3>
+  <p>
+    ERTE batek ere langabezia-prestaziorako eskubidea eman dezake, irauten duen bitartean. Zenbat
+    kobratzen den eta etorkizuneko prestazioa kontsumitzen duen ala ez ERTE motaren araberakoa da:{' '}
+    <a href={link(lang, 'paro/erte/')}>kalkulatu zure langabezia-prestazioa ERTE batean</a>.
+  </p>
+  <p class="folio">
+    Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+  </p>
+</section>
