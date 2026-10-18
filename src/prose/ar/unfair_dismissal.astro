@@ -1,5 +1,5 @@
 ---
-// source: 6ba110cf70a7
+// source: c891fa20c5a1
 import CaseLink from '../../components/CaseLink.astro';
 import { severanceMonths, unfairAfter2012, unfairBefore2012 } from '../../content/examples';
 import { euros, integer } from '../../content/format';
@@ -64,10 +64,10 @@ const decimal = (n: number) => String(n).replace('.', ',');
   </p>
   <p class="example">
     <span class="example__label">عقد من 2010</span> من 1 مارس 2010 إلى 15 سبتمبر 2026. الجزء الأول:{' '}
-    {integer(first)} شهرًا × 3,75 = {decimal(first * 3.75)} يوم. الجزء الثاني:
-    {integer(second)} شهرًا × 2,75 = {decimal(second * 2.75)} يوم. المجموع:{' '}
-    {integer(unfairBefore2012.salaryDays)} يومًا، أقل من الحد الأقصى. 21.000&nbsp;€ ×{' '}
-    {integer(unfairBefore2012.salaryDays)} / 365 = {euros(unfairBefore2012.amount)}.
+    {integer(first)} شهرًا × 3,75 = {decimal(first * 3.75)} يوم. الجزء الثاني: {integer(second)}{' '}
+    شهرًا × 2,75 = {decimal(second * 2.75)} يوم. المجموع: {integer(unfairBefore2012.salaryDays)}{' '}
+    يومًا، أقل من الحد الأقصى. 21.000&nbsp;€ × {integer(unfairBefore2012.salaryDays)} / 365 ={' '}
+    {euros(unfairBefore2012.amount)}.
   </p>
   <p>
     التعويض منفصل عن التسوية النهائية <bdi>(finiquito)</bdi>، التي تجمع راتب الشهر الأخير وأيام

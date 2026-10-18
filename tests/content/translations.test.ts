@@ -128,3 +128,33 @@ describe('the spans of the example tables', () => {
     expect(spanLabel(24, 'en')).toBe('2 years');
   });
 });
+
+// Astro drops a line break that touches an {expression}, so «{euros(x)}⏎al día» reads «57,53 €al
+// día». A word that must follow or precede one across a break needs an explicit {' '}. Chinese
+// writes no space there, so it is left out.
+const PROSE_FILES = readdirSync('src/prose', { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && entry.name !== 'zh')
+  .flatMap((entry) =>
+    readdirSync(`src/prose/${entry.name}`).map((file) => `src/prose/${entry.name}/${file}`),
+  );
+
+const gluedBreaks = (path: string): string[] => {
+  const text = readFileSync(path, 'utf8');
+  const lines = text.slice(text.indexOf('---', 3) + 3).split('\n');
+  return lines.slice(0, -1).flatMap((line, i) => {
+    const end = line.trimEnd();
+    const next = (lines[i + 1] ?? '').trimStart();
+    const exprThenWord =
+      /[^'>]\}$/.test(end) && !end.trimStart().startsWith('<') && /^[\p{L}\d]/u.test(next);
+    const wordThenExpr = /[\p{L}\d:;,]$/u.test(end) && /^\{(?![/#:]|' '|` )/.test(next);
+    return exprThenWord || wordThenExpr
+      ? [`${path}:${i + 1}: «${end.slice(-30)}⏎${next.slice(0, 20)}»`]
+      : [];
+  });
+};
+
+describe('a line break beside an expression', () => {
+  it.each(PROSE_FILES)('%s keeps the space Astro would drop', (path) => {
+    expect(gluedBreaks(path)).toEqual([]);
+  });
+});
