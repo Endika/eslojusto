@@ -1,0 +1,582 @@
+---
+// source: 169eec130c4d
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { faqEntries } from '../../content/faq';
+import { bySeniority, spanLabel } from '../../content/examples';
+import { wholeEuroRange, wholeEuros } from '../../content/format';
+import { LANDINGS, type LandingId } from '../../content/landings';
+import { ET, SOURCES, LGSS } from '../../engine/sources';
+import { DOCUMENTS } from '../../documents/config';
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+const tx = (key: Key) => t(lang, key);
+
+// The guide under the calculator of /finiquito/, in Spanish: headings and labels from the
+// dictionary, the prose, the rules and the worked examples here. Another language's guide is a
+// translated copy of this file in src/prose/<lang>/.
+const causes: { title: string; rule: string; citation: string; page?: LandingId }[] = [
+  {
+    title: tx('guide.unfair_dismissal'),
+    rule: '33 egun lan egindako urte bakoitzeko, gehienez 24 hileko soldata (720 egun).',
+    citation: 'Art. 56 ET',
+    page: 'unfair_dismissal',
+  },
+  {
+    title: tx('guide.objective_dismissal'),
+    rule: '20 egun urteko, gehienez 12 hileko soldata (360 egun, STS 651/2026). Gainera, 15 eguneko aurreabisua, eta enpresak ematen ez dituen egunak ordaindu egiten dira.',
+    citation: 'Art. 53 ET',
+    page: 'objective_dismissal',
+  },
+  {
+    title: tx('guide.collective_dismissal'),
+    rule: 'Gutxienez, kaleratze objektibo batean bezala: 20 egun urteko, gehienez 12 hileko soldata, eta 15 eguneko aurreabisua. EREaren akordioak hobe dezake; berrikuspenak ez du ezagutzen, eta gutxienekoa ematen du.',
+    citation: 'Art. 51.2, 51.4 eta 53.1 ET',
+  },
+  {
+    title: tx('guide.fixed_term_end'),
+    rule: '12 egun urteko, lan egindako egunen proportzioan. 2011n edo lehenago hasi bazen, 8 egun; 2012an, 9; 2013an, 10; 2014an, 11. Ordezkapen-kontratuek eta prestakuntza-kontratuek ez dute kalte-ordainik, ezta 2001eko martxoaren 4a baino lehen sinatutakoek ere. Urtebete baino gehiago iraun bazuen, 15 eguneko aurreabisua.',
+    citation: 'Art. 49.1.c ET eta DT 8.ª',
+    page: 'fixed_term_end',
+  },
+  {
+    title: tx('guide.resignation'),
+    rule: 'Kalte-ordainik gabe. Zure hitzarmenak aurreabisu bat ezartzen badu eta ez baduzu ematen, enpresak falta diren egunak deskonta ditzake.',
+    citation: 'Art. 49.1.d ET',
+    page: 'resignation',
+  },
+  {
+    title: tx('guide.disciplinary_dismissal'),
+    rule: 'Kalte-ordainik gabe, bidezkotzat deklaratzen bada. Bidegabetzat deklaratzen bada, bidegabeko kaleratze bat bezala kalkulatzen da.',
+    citation: 'Art. 55.7 eta 56 ET',
+  },
+];
+
+const unchecked = [
+  'Zenbateko garbia: IRPFaren atxikipenak eta kotizazioak.',
+  'Zure hitzarmeneko edo kontratuko plusak, osagarriak, aparteko orduak eta komisioak.',
+  'Ohiko biez gain dauden beste aparteko ordainsariak.',
+  'Kaleratzearen kausa justifikatuta dagoen ala ez; hori epaitegi batek erabakitzen du.',
+  'Izapidetze-soldatak.',
+  'ERE baten akordioak legezko gutxienekoaren gainetik hobetzen duena.',
+];
+
+// The case pages, in the order of the map: the finiquito ones, then the pages on the benefit.
+const caseLinks: readonly LandingId[] = [
+  'resignation',
+  'unfair_dismissal',
+  'objective_dismissal',
+  'fixed_term_end',
+  'not_agreed',
+];
+
+// The same report the result links to.
+const workHistoryUrl =
+  'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
+const benefitSources = [
+  SOURCES.lgss267,
+  SOURCES.lgss268,
+  SOURCES.lgss269,
+  SOURCES.lgss270,
+  SOURCES.sepeAmounts,
+].map(({ citation, url, inForceSince, effectiveFrom }) => ({
+  citation,
+  url,
+  inForce: t(lang, effectiveFrom ? 'client.source.effective_from' : 'client.source.in_force', {
+    fecha: inForceSince.split('-').reverse().join('-'),
+  }),
+}));
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('guide.title')}
+    </h2>
+    <p class="guide__lead">
+      Zer jasotzen duen kitapen batek eta zifra bakoitza nondik ateratzen den, bere artikuluarekin.
+      Adibideek hilean 1.500&nbsp;€ gordineko soldata eta 1.500&nbsp;€-ko bi aparteko ordainsari
+      erabiltzen dituzte; urtean, 21.000&nbsp;€ guztira.
+    </p>
+    <p class="guide__sources">
+      <span>{tx('guide.updated')}</span>
+      <span>
+        {tx('guide.sources')}: <a href={ET}>{tx('guide.source_et')}</a> ·{' '}
+        <a href={SOURCES.cgpjGuide.url}>{tx('guide.source_cgpj')}</a> ·{' '}
+        <a href={LGSS}>{tx('guide.source_lgss')}</a> ·{' '}
+        <a href={SOURCES.sepeAmounts.url}>{tx('guide.source_sepe')}</a>
+      </span>
+      <a href={link(lang, 'aviso-legal/')}>{tx('guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    <section class="sheet sheet--text">
+      <h3 id="g-que-lleva">{tx('guide.what_it_includes')}</h3>
+      <p>
+        Zure kontratua amaitzean, enpresak likidazio-agiriaren proposamen bat ematen dizu, ordaindu
+        behar dizkizun kopuruekin (art. 49.2 ET). Hori da kitapena (finiquito), eta dagoeneko
+        irabazi duzuna eta oraindik kobratu ez duzuna jasotzen du:
+      </p>
+      <ul>
+        <li>Azken hilabetean lan egindako egunen soldata (art. 26 ET).</li>
+        <li>Sortutako eta hartu gabeko oporrak (art. 38 ET).</li>
+        <li>
+          Aparteko ordainsarien sortutako zatia, nominan hainbanatuta ez badaude (art. 31 ET).
+        </li>
+        <li>Enpresak eman ez dituen aurreabisu-egunak, legeak eskatzen duenean.</li>
+      </ul>
+      <p>
+        Kontratua kalte-ordainerako eskubidearekin amaitzen bada, likidazio-agiriak hori ere jaso
+        dezake, baina legez kitapenaz bestelako kopurua da, bere arau eta epeekin. Zifra guztiak
+        gordinak dira, atxikipenen eta kotizazioen aurretik.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-diferencia">{tx('guide.difference')}</h3>
+      <p>
+        Kitapena kontratua amaitzen den guztietan dagokizu, zu zeu joaten bazara ere, dagoeneko
+        irabazi duzun dirua delako. Kalte-ordainak kontratuaren amaiera konpentsatzen du, eta
+        kausaren araberakoa da.
+      </p>
+      <p>
+        Dimisio batek ez du kalte-ordainik sortzen (art. 49.1.d ET). Bidezkotzat deklaratutako
+        diziplina-kaleratze batek ere ez (art. 55.7 ET); bidegabetzat deklaratzen bada, bidegabeko
+        kaleratze bat bezala kalkulatzen da.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 55.7</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-casos">{tx('guide.cases')}</h3>
+      <p>Kausa bakoitzak bere arauak ditu. Adibide ebatzi batekin azaltzen ditugu:</p>
+      <ul>
+        {caseLinks.map((id) => (
+          <li>
+            <CaseLink lang={lang} id={id} />
+          </li>
+        ))}
+      </ul>
+      <p>
+        Eta langabezia-prestazioa, bere orrian: <CaseLink lang={lang} id="benefit" />.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-salario">{tx('guide.salary')}</h3>
+      <p>
+        Kontratua amaitzen den hilabetean lan egindako egunak sartzen dira. Egun batek zure hileko
+        soldata 30ez zatituta (merkataritza-hilabetea) edo hilabete horrek dituen egunez zatituta
+        (hilabete naturala) balio dezake. Berrikuspenak bi kalkuluen arteko tartea ematen du.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Baja urriaren 15ean: 1.500&nbsp;€
+        × 15/30 = 750,00&nbsp;€, edo 1.500&nbsp;€ × 15/31 = 725,81&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>26</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-vacaciones">{tx('guide.holidays')}</h3>
+      <p>
+        Gutxienez hogeita hamar egun natural dira urtean (art. 38.1 ET). Berrikuspenak 22 lanegun
+        gisa hartzen ditu astelehenetik ostiralera, 26 astelehenetik larunbatera, eta 30 × egunak /
+        7 beste aste batekin: baliokidetasunak dira, ez legearen testua. Zure hitzarmenak edo
+        kontratuak gehiago eman ditzakete. Lan egindako egun bakoitzarekin sortzen dira, eta
+        kitapenean aurten hartu ez dituzunak sartzen dira. Enpresa askok hilabeteka zenbatzen
+        dituzte (2,5 egun hilabeteko, urtean 30 izanik) egunka beharrean, eta berrikuspenak bi
+        kalkuluen arteko tartea ematen du. Egun bakoitza zure hileko soldata / 30 eta zure urteko
+        soldata / 365 artean ordaintzen da.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Baja 2026ko urriaren 15ean: urtean
+        288 egun lan eginda. 30 × 288/365 = 23,67 egun sortuta. 15 hartu badituzu, 8,67 egun inguru
+        geratzen dira: (30 × 288/365 − 15) × 1.500&nbsp;€/30 = 433,56&nbsp;€ eta (30 × 288/365 − 15)
+        × 21.000&nbsp;€/365 = 498,89&nbsp;€ artean.
+      </p>
+      <p>
+        Sortutakoak baino egun gehiago hartu badituzu, deskontua bidezkoa den ala ez hitzarmenaren
+        araberakoa da.
+      </p>
+      <p class="folio">
+        Art. <span>38</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-pagas">{tx('guide.extra_pay')}</h3>
+      <p>
+        Legeak urtean bi aparteko ordainsari ezartzen ditu, eta hitzarmenak haien zenbatekoa eta
+        nola sortzen diren. Zure nominan hainbanatuta badaude, hilez hile kobratu dituzu jada.
+        Bestela, haien aldia hasi zenetik sortutako zatia sartzen da: seihilekoa (urtarriletik
+        ekainera eta uztailetik abendura) edo urtekoa (uztailetik ekainera udakoa, urtarriletik
+        abendura Gabonetakoa). Egunka edo hilabeteka zenba daiteke, eta berrikuspenak bi kalkuluen
+        arteko tartea ematen du. Ordainsari bat kobratzen den hilabetean joaten bazara (ekainean edo
+        uztailean udakoa, abenduan Gabonetakoa), nomina horretan bertan etor daiteke.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> 1.500&nbsp;€-ko Gabonetako
+        ordainsaria, seihileko aldiarekin, eta baja urriaren 15ean: uztailaren 1etik urriaren 15era
+        184 egunetatik 107 igaro dira. 1.500&nbsp;€ × 107/184 = 872,28&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>31</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-indemnizacion">{tx('guide.severance')}</h3>
+      <p>
+        Soldata-egunetan zenbatzen da. Eguneko soldata zure urteko soldata da, aparteko ordainsariak
+        barne, 365ez zatituta, CGPJren gidak egiten duen bezala. Adibidean, 21.000&nbsp;€ / 365 ≈
+        57,53&nbsp;€. Adibideek zifra zehatzarekin biderkatzen dute, biribildu gabe. Kaleratzeetan,
+        lan egindako denbora hilabeteka zenbatzen da, eta hilabete-zati bat hilabete osotzat hartzen
+        da. ERTE batean kaleratzen bazaituzte, ERTEaren aurreko soldata osoarekin kalkulatzen da.
+      </p>
+      <div class="causes">
+        {causes.map(({ title, rule, citation, page }) => (
+          <div>
+            <h4>{page ? <a href={link(lang, LANDINGS[page].path.slice(1))}>{title}</a> : title}</h4>
+            <p>{rule}</p>
+            <p class="causes__citation">{citation}</p>
+          </div>
+        ))}
+      </div>
+      <p class="example">
+        <span class="example__label">Bidegabeko kaleratzea</span> 2018ko maiatzaren 3tik 2026ko
+        uztailaren 20ra: 98 hilabete oso eta egun batzuk, 99 gisa zenbatzen direnak. Urteko 33 egun
+        hilabeteko 2,75 dira: 99 × 2,75 = 272,25 egun. 21.000&nbsp;€ × 272,25 / 365 =
+        15.663,70&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">Kaleratze objektiboa</span> data berberekin: 99 × 20/12 = 165
+        egun. 21.000&nbsp;€ × 165 / 365 = 9.493,15&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">Aldi baterako kontratuaren amaiera</span> urtebeteko kontratu
+        batean, 2025eko urriaren 1etik 2026ko irailaren 30era: 365 egun × 12/365 = 12 egun.
+        21.000&nbsp;€ × 12 / 365 = 690,41&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 51 · 53 · 56</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-2012">{tx('guide.before_2012')}</h3>
+      <p>
+        2012ko otsailaren 12a baino lehenagoko kontratu baten bidegabeko kaleratzean, kalte-ordaina
+        bi tartetan kalkulatzen da:
+      </p>
+      <ul>
+        <li>2012ko otsailaren 11ra arte: 45 egun urteko (3,75 hilabeteko).</li>
+        <li>2012ko otsailaren 12tik aurrera: 33 egun urteko (2,75 hilabeteko).</li>
+      </ul>
+      <p>
+        Guztizkoak 720 eguneko muga du, lehen tarteak dagoeneko gainditzen ez badu behintzat. Kasu
+        horretan lehen tartea bakarrik zenbatzen da, gehienez 42 hileko soldata (1.260 egun).
+      </p>
+      <p>
+        2012ko otsailaren 12a baino lehen sinatutako kontratazio mugagabea sustatzeko kontratuek
+        sinatu ziren arauari jarraitzen diote kausa objektiboengatiko kalte-ordainean;
+        diziplina-kaleratze batean, bi tarte hauekin kalkulatzen da (3. apartatua). Berrikuspenak ez
+        du kontratu mota hori bereizten.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> 2010eko martxoaren 1etik 2026ko
+        irailaren 15era. Lehen tartea: 24 hilabete × 3,75 = 90 egun. Bigarren tartea: 176 hilabete ×
+        2,75 = 484 egun. Guztira: 574 egun. 21.000&nbsp;€ × 574 / 365 = 33.024,66&nbsp;€.
+      </p>
+      <p class="folio">
+        Disposición transitoria <span>11.ª</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-antiguedad">{tx('guide.by_seniority')}</h3>
+      <p>
+        Kitapena urtean eta azken hilabetean sortutakoa da; beraz, urtebeteko kontratutik aurrera ez
+        da hazten. Kalte-ordaina, aldiz, lan egindako hilabete bakoitzarekin hazten da, eta kausaren
+        araberakoa da.
+      </p>
+      <FigureTable id="g-antiguedad-tabla" label={tx('guide.by_seniority')}>
+        <Fragment slot="caption">
+          2026ko irailaren 30ean amaitzen diren kontratuak, hilean 1.500&nbsp;€ gordinekin,
+          seihilekoka sortzen diren 1.500&nbsp;€-ko bi aparteko ordainsarirekin (udakoa kobratuta
+          jada) eta urtean 22 opor-lanegunekin, bat ere hartu gabe. Eurora biribilduta.
+        </Fragment>
+        <thead>
+          <tr>
+            <th scope="col">Lan egindako denbora</th>
+            <th scope="col">Kitapena</th>
+            <th scope="col">
+              Aldi baterakoa
+              <span class="figures-note">12 egun</span>
+            </th>
+            <th scope="col">
+              Objektiboa
+              <span class="figures-note">20 egun</span>
+            </th>
+            <th scope="col">
+              Bidegabea
+              <span class="figures-note">33 egun</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {bySeniority.map(({ months, finalPay, fixedTermLimit, fixedTerm, objective, unfair }) => (
+            <tr>
+              <th scope="row">{spanLabel(months, lang)}</th>
+              <td>{wholeEuroRange(finalPay)}</td>
+              <td>
+                {fixedTerm === null ? '—' : wholeEuros(fixedTerm)}
+                {fixedTermLimit === 'sector_agreement' && <sup>1</sup>}
+                {fixedTermLimit === 'over' && <sup>2</sup>}
+              </td>
+              <td>{wholeEuros(objective)}</td>
+              <td>{wholeEuros(unfair)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </FigureTable>
+      <p>
+        Kitapenak iraileko soldata, oporrak eta sortutako Gabonetako ordainsaria batzen ditu, egunka
+        edo hilabeteka zenbatzearen arteko tartearekin. Beste hiru zutabeak kausa bakoitzaren
+        kalte-ordaina dira, eta aparte doaz: art. 49.1.c ET aldi baterako kontratuaren amaieran,
+        arts. 52 eta 53.1.b ET kaleratze objektiboan eta art. 56 ET bidegabean. Guztizkoa jakiteko,
+        kitapenari gehitzen zaio.
+      </p>
+      <p class="table-notes">
+        <sup>1</sup> Ekoizpen-zirkunstantziengatiko kontratu batek gehienez 6 hilabete irauten du.
+        Urtebetera iristen da zure sektoreko hitzarmenak luzatzen badu soilik (art. 15.2 ET), edo
+        2021eko abenduaren 31 baino lehen sinatutako obra edo zerbitzu jakin baterako kontratu
+        batean (Real Decreto-ley 32/2021 arauaren disposición transitoria 3.ª).
+      </p>
+      <p class="table-notes">
+        <sup>2</sup> Ekoizpen-zirkunstantziengatiko kontratu batek ez du hainbeste irauten. 2021eko
+        abenduaren 31 baino lehen sinatutako obra edo zerbitzu jakin baterako kontratu batek
+        gehienez 3 urte irauten zuen, edo 4 sektoreko hitzarmenak luzatzen bazuen (art. 15.1.a ET
+        aurreko idazketan eta Real Decreto-ley 32/2021 arauaren disposición transitoria 3.ª); beraz,
+        horietako bat ere ez da 2026ko irailean amaitzen antzinatasun honekin. Bere gehieneko
+        iraupena gainditzen duen aldi baterako kontratu bat mugagabea izan daiteke (art. 15.4 ET),
+        eta orduan haren amaiera kaleratze bat litzateke.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-propuesta">{tx('guide.proposal')}</h3>
+      <p>
+        Enpresak likidazio-agiriaren proposamen bat ematen du. Legeak aurreikusten du langileak hura
+        sinatu ahal izatea langileen legezko ordezkaritzako norbait aurrean dela.
+      </p>
+      <p>
+        Pertsona batzuek «recibí no conforme» (jasoa, ados ez) adierazita sinatzen dute, kopururen
+        batekin ados ez daudenean. Informazio gisa bakarrik kontatzen dugu. Kasu bakoitzean zer egin
+        lan-zuzenbideko bulego batek, graduatu sozialaren bulego batek edo sindikatu batek balora
+        dezake.
+      </p>
+      <p>
+        Zer aldatzen den eta zer ez: <CaseLink lang={lang} id="not_agreed" />.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-plazos">{tx('guide.deadlines')}</h3>
+      <p>
+        Ordaintzeke dagoen soldata, oporrak, aparteko ordainsariak edo aldi baterako kontratua
+        amaitzeagatiko kalte-ordaina bezalako kopuruetarako, epea urtebetekoa da (art. 59.1 ET).
+        Enpresak oraindik ordaindu ez badizu, soldata denak berandutze-interesa du, urtean 10&nbsp;%
+        (art. 29.3 ET); kalte-ordainak, ez.
+      </p>
+      <p>
+        Kaleratze batean (objektiboa, kolektiboa, bidegabea edo diziplinazkoa), hura aurkaratzeko
+        epea 20 egun baliodunekoa da (art. 59.3 ET). Kaleratze baten kalte-ordainarekin ados ez
+        dagoenak bide beretik planteatu ohi du, 20 egun horien barruan.
+      </p>
+      <p>
+        Epea laburra da, eta lan-zuzenbideko bulego batek, graduatu sozialaren bulego batek edo
+        sindikatu batek esan diezazukete zein den zure kasuari aplikatzen zaiona.
+      </p>
+      <p class="folio">
+        Art. <span>29.3 · 59</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-no-revisa">{tx('guide.unchecked')}</h3>
+      <ul>
+        {unchecked.map((text) => (
+          <li>{text}</li>
+        ))}
+      </ul>
+      <p>
+        Oporrak eta aparteko ordainsariak legearen gutxienekoarekin alderatzen dira, egunkako eta
+        hilabetekako kalkuluen arteko tartearekin; zure hitzarmenak zifra horiek hobe ditzake. «Ezin
+        da egiaztatu» datu bat falta denean bakarrik agertzen da, hura gabe legezko zifrarik ez
+        dagoenean, hala nola dimisio baten aurreabisua edo hartu dituzun opor-egunak.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-paro">{tx('guide.benefit')}</h2>
+      <p>
+        Kontratu bat amaitzen denean, kitapenaz gain langabezia-prestazioa egon daiteke, hau da,
+        langabeziagatiko prestazio kontributiboa (prestación contributiva por desempleo). Hura
+        kobratzeko, kontratuak legezko langabezia-egoeran amaitu behar du, eta hori kausaren
+        araberakoa da:
+      </p>
+      <ul>
+        <li>
+          Kaleratze objektiboa, kolektiboa, bidegabea edo diziplinazkoa bada, bai (art. 267.1.a
+          LGSS). Diziplinazkoak ere balio du, bidezkotzat deklaratzen bada edo aurkaratzen ez bada
+          ere (art. 268.4 LGSS).
+        </li>
+        <li>
+          Aldi baterako kontratuaren amaiera ere bai, zuk amaitu ez bazenuen (art. 267.1.a.6.º
+          LGSS).
+        </li>
+        <li>
+          Borondatezko baja ez (art. 267.2.a LGSS), kasu hauetan izan ezik: lekualdatze batengatik
+          joaten bazara, kalte egiten dizun baldintzen funtsezko aldaketa batengatik (art. 41.3 ET),
+          enpresaren ez-betetze larri batengatik (adibidez, behin eta berriz ez ordaintzea edo
+          berandu ordaintzea), edo genero-indarkeriagatik edo indarkeria sexualagatik (art.
+          267.1.a.5.º LGSS).
+        </li>
+      </ul>
+      <p>
+        Gainera, aurreko 6 urteetan langabeziagatik gutxienez 360 egun kotizatuta izan behar dira,
+        beste langabezia-prestazio baterako erabili gabeak, eta hainbat lanetakoak batu daitezke
+        (arts. 266.b eta 269 LGSS). Halaber, alta emanda edo egoera parekatuan egon behar da,
+        enplegu-eskatzaile gisa izena eman, jarduera-akordioa (acuerdo de actividad) sinatu eta
+        erretiro-adinik ez izan (art. 266 LGSS).
+      </p>
+      <p>
+        Zure datuekin kalkulatzeko eta eskala osoa ikusteko: <CaseLink lang={lang} id="benefit" />.
+      </p>
+      <p class="folio">
+        Arts. <span>266 · 267 · 268.4</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-cuanto">{tx('guide.benefit_amount')}</h3>
+      <p>
+        Oinarria azken 180 egunetan langabeziagatik kotizatutakoaren batez bestekoa da, aparteko
+        orduak kontuan hartu gabe (art. 270.1 LGSS). Oinarriaren 70&nbsp;% kobratzen da lehen 180
+        egunetan, eta 60&nbsp;% 181. egunetik aurrera (art. 270.2 LGSS).
+      </p>
+      <p>
+        Hilabete bakoitzak gutxieneko bat eta gehieneko bat ditu, zure kargurako seme-alaben arabera
+        (art. 270.3 LGSS). 2026an, IPREM 600&nbsp;€ izanik, hauek dira:
+      </p>
+      <ul>
+        <li>Kargurako seme-alabarik gabe, hilean 560&nbsp;€ eta 1.225&nbsp;€ artean.</li>
+        <li>Seme-alaba batekin, 749&nbsp;€ eta 1.400&nbsp;€ artean.</li>
+        <li>Bi edo gehiagorekin, 749&nbsp;€ eta 1.575&nbsp;€ artean.</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Urtean 21.000&nbsp;€ izanik,
+        oinarria 21.000&nbsp;€ / 12 = 1.750&nbsp;€ da hilean. Horren 70&nbsp;% 1.225&nbsp;€ da, hain
+        zuzen kargurako seme-alabarik gabeko gehienekoa, eta 60&nbsp;%, 1.050&nbsp;€.
+      </p>
+      <p>
+        Zifra gordinak dira. Hortik oinarriaren 4,85&nbsp;% kentzen da Seguridad Social
+        erakundearentzat, eta dagokion IRPFa ere bai. Gida honetako eta berrikuspeneko zifrek
+        lanaldi osoa hartzen dute oinarri; lanaldi partzialarekin txikiagoak dira.
+      </p>
+      <p class="folio">
+        Art. <span>270</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-duracion">{tx('guide.benefit_duration')}</h3>
+      <p>
+        Azken 6 urteetan kotizatutako eta beste langabezia-prestazio baterako erabili ez diren
+        egunen araberakoa da (art. 269 LGSS):
+      </p>
+      <ul>
+        <li>360 eta 539 egun artean kotizatuta, 120 prestazio-egun (4 hilabete).</li>
+        <li>
+          Kotizatutako beste 180 egun bakoitzak 60 prestazio-egun gehitzen ditu (2 hilabete). 540
+          eta 719 artean, 180 egun; 720 eta 899 artean, 240; eta horrela hurrenez hurren.
+        </li>
+        <li>2.160 egun kotizatutik aurrera, gehienekoa: 720 egun (24 hilabete).</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Hiru urte kotizatuta, hau da,
+        1.095 egun, 360 prestazio-egun dira (12 hilabete).
+      </p>
+      <p>
+        Ordaindutako eta hartu gabeko oporrak ere kotizatutzat hartzen dira (art. 269.4 LGSS). Alta
+        bakoitza, baja bakoitza eta kotizatutako egunak hemen agertzen dira:{' '}
+        <a href={workHistoryUrl} rel="noopener">
+          {tx('result.benefit_work_history_link')}
+        </a>
+        .
+      </p>
+      <p class="folio">
+        Art. <span>269</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-plazo">{tx('guide.benefit_deadline')}</h3>
+      <p>
+        Enplegu-eskatzaile gisa izena eman gabe ez dago langabezia-prestaziorik (art. 266 LGSS):
+        zure erkidegoko enplegu-zerbitzuan ematen duzu alta, eta SEPEri eskatzen diozu prestazioa.
+        Kontratua amaitu eta hurrengo 15 egunetan eskatzen da; SEPEren arabera, egun baliodunak
+        dira. Zure kitapenak hartu gabeko oporrak ordaintzen baditu, epea egun horiek amaitzen
+        direnetik zenbatzen da (art. 268.1 eta 268.3 LGSS). Beranduago eskatuz gero, atzeratutako
+        egunak prestaziotik kentzen dira (art. 268.2 LGSS).
+      </p>
+      <ul class="sources">
+        {benefitSources.map(({ citation, url, inForce }) => (
+          <li>
+            <a href={url}>{citation}</a>
+            <span class="sources__in-force">{inForce}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="folio">
+        Art. <span>268</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('guide.faq')}</h2>
+      <div class="faq-list">
+        {faqEntries(lang, { documents }).map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>
+
+<style>
+  .sheet--text .table-notes {
+    font-size: 0.875rem;
+  }
+</style>
