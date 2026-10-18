@@ -1,0 +1,87 @@
+---
+// source: af62c96628b9
+import CaseLink from '../../components/CaseLink.astro';
+import { itemRange, resignation } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const salary = itemRange(resignation, 'pending_salary');
+const holidays = itemRange(resignation, 'holiday_pay');
+const extraPay = itemRange(resignation, 'extra_pay');
+const deduction = itemRange(resignation, 'notice_deduction');
+if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="bv-que-lleva">主动辞职的离职结算包括什么</h3>
+  <p>
+    主动辞职（baja voluntaria）就是辞职：合同因您的决定而终止（art. 49.1.d
+    ET）。即使是您自己离开，公司仍需支付您已经挣得但尚未领取的款项：
+  </p>
+  <ul>
+    <li>最后一个月已工作天数的工资（art. 26 ET）。</li>
+    <li>今年已累计但未休的年假（art. 38 ET）。</li>
+    <li>
+      额外工资（pagas extra）中已累计的部分，如果没有分摊到您每月的工资单（nómina）中（art. 31
+      ET）。
+    </li>
+  </ul>
+  <p>
+    没有的是解雇补偿金：辞职不产生补偿金（art. 49.1.d
+    ET）。所有数字都是税前的，即扣除预扣税和社保缴费之前的金额。
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d · 26 · 31 · 38</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-preaviso">您的集体协议规定的提前通知期</h3>
+  <p>
+    辞职时，需要按照您的集体协议（convenio colectivo）或当地惯例规定的提前通知期提前告知（art.
+    49.1.d
+    ET）。如果您的集体协议有此规定而您没有提前通知，公司可以按您的日工资，从离职结算中扣除缺少的天数。
+  </p>
+  <p>
+    计算器会问您集体协议规定了多少天、您实际提前了多少天，并给出最高扣款额。如果您不知道集体协议规定的天数，这笔扣款会显示为“无法核查”。
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-ejemplo">计算示例</h3>
+  <p>
+    某人每月税前工资1.500&nbsp;€，另有两笔各1.500&nbsp;€、按半年累计的额外工资，从2023年三月1日工作到2026年十月15日。今年在22个排班工作日的年假中已休10天。其集体协议规定提前15天通知，而其离职时没有提前通知。计算器得出的数字如下：
+  </p>
+  <ul>
+    <li>十月工资：{euroRange(salary)}，取决于这个月按30天还是31天计算。</li>
+    <li>未休年假：{euroRange(holidays)}。</li>
+    <li>自七月起累计的圣诞额外工资：{euroRange(extraPay)}。</li>
+    <li>解雇补偿金：{euros(0)}。</li>
+    <li>未提前通知的扣款：最多{euros(deduction.max)}。</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">计算方法</span>{' '}
+    每一项的范围来自按天计算还是按月计算，各公司两种做法都有。扣款为15天，每天
+    {euros(deduction.max / 15)}，按两种日工资中较高的一种计算：月工资除以30，或年工资除以365。
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-paro">失业金</h3>
+  <p>
+    主动辞职不属于法定失业状态，因此一般不能领取失业金（art. 267.2.a
+    LGSS）。也有例外，例如因调岗异地或严重拖欠工资而离职。详见
+    <CaseLink lang={lang} id="benefit_resignation" />。
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

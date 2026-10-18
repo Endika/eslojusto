@@ -1,0 +1,95 @@
+---
+// source: 6ba110cf70a7
+import CaseLink from '../../components/CaseLink.astro';
+import { severanceMonths, unfairAfter2012, unfairBefore2012 } from '../../content/examples';
+import { euros, integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const [months = 0] = severanceMonths(unfairAfter2012.calculation);
+const [first = 0, second = 0] = severanceMonths(unfairBefore2012.calculation);
+const decimal = (n: number) => String(n).replace('.', ',');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="di-tramos">每年33天，上限720天</h3>
+  <p>
+    如果解雇被承认或被判定为不当解雇（improcedente），解雇补偿金（indemnización）为每工作一年33天工资，最多24个月工资，即720天（art.
+    56.1 ET）。工龄按月计算，不足一个月的按一个月计：每年33天，即每月2,75天。
+  </p>
+  <p>
+    每天的工资为年工资（含额外工资）除以365，与 CGPJ
+    指南的做法相同。计算器把数字精确到分，并与您公司给出的数字对比。
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-2012">如果您在2012年二月12日之前入职</h3>
+  <p>补偿金分两段计算（disposición transitoria 11.ª ET）：</p>
+  <ul>
+    <li>截至2012年二月11日：每年45天（每月3,75天）。</li>
+    <li>自2012年二月12日起：每年33天（每月2,75天）。</li>
+  </ul>
+  <p>
+    总数上限为720天，除非第一段已经超过这个数。这种情况下只计第一段，最多42个月工资（1.260天）。
+  </p>
+  <p class="folio">
+    Disposición transitoria <span>11.ª</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-ejemplo">计算示例</h3>
+  <p>
+    某人每月税前工资1.500&nbsp;€，另有两笔各1.500&nbsp;€的额外工资，每年共21.000&nbsp;€。其日工资为21.000&nbsp;€
+    / 365 = {euros(unfairAfter2012.dailySalary)}。
+  </p>
+  <p class="example">
+    <span class="example__label">2018年的合同</span> 从2018年五月3日到2026年七月20日，计
+    {integer(months)}个月。{integer(months)} × 2,75 = {decimal(unfairAfter2012.salaryDays)}
+    天。21.000&nbsp;€ × {decimal(unfairAfter2012.salaryDays)} / 365 ={' '}
+    {euros(unfairAfter2012.amount)}。
+  </p>
+  <p class="example">
+    <span class="example__label">2010年的合同</span> 从2010年三月1日到2026年九月15日。第一段：
+    {integer(first)}个月 × 3,75 = {decimal(first * 3.75)}天。第二段：{integer(second)}个月 × 2,75 ={' '}
+    {decimal(second * 2.75)}天。合计：{integer(unfairBefore2012.salaryDays)}
+    天，低于上限。21.000&nbsp;€ × {integer(unfairBefore2012.salaryDays)} / 365 ={' '}
+    {euros(unfairBefore2012.amount)}。
+  </p>
+  <p>
+    补偿金与离职结算（finiquito）分开计算；离职结算包括最后一个月的工资、未休年假和已累计的额外工资。计算器会把这些一起核查。
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-readmision">复职或补偿金</h3>
+  <p>
+    解雇被判定为不当解雇时，公司需在五天内选择让您复职或向您支付补偿金（art. 56.1
+    ET）。如果让您复职，公司还需支付诉讼期间工资（salarios de
+    tramitación），即您自解雇起未能领取的工资（art. 56.2
+    ET）。如果您是员工法定代表或工会代表（delegado sindical），则由您来选择（art. 56.4 ET）。
+  </p>
+  <p>本核查不计算诉讼期间工资，也不判断解雇是否不当：这由法院判定，或由公司承认。</p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-otros">其他解雇</h3>
+  <p>
+    客观原因解雇按每年20天计算，另有15天提前通知期：详见
+    <CaseLink lang={lang} id="objective_dismissal" />
+    。任何解雇，包括纪律解雇，都属于法定失业状态：
+    <CaseLink lang={lang} id="benefit_disciplinary" />
+    说明了哪些离职情形可以领取失业金。
+  </p>
+</section>

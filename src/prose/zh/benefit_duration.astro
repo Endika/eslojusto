@@ -1,0 +1,93 @@
+---
+// source: e288ce65363a
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { BENEFIT_SCALE, durationByTime, spanLabel } from '../../content/examples';
+import { integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+// Each row runs from its own threshold to the day before the next one; the last has no end.
+const rows = BENEFIT_SCALE.map(([from, days], i) => ({
+  from,
+  to: BENEFIT_SCALE[i + 1]?.[0],
+  days,
+}));
+const months = (days: number) => integer(days / 30);
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pt-escala">完整对照表</h3>
+  <p>
+    失业金（paro）的领取期限，取决于前6年内尚未用于其他失业金的失业保险缴费天数（art. 269.1
+    LGSS）。这期间的所有工作都算，不只是最后一份。
+  </p>
+  <FigureTable id="pt-tabla">
+    <Fragment slot="caption">最近6年的缴费天数与失业金天数。</Fragment>
+    <thead>
+      <tr>
+        <th scope="col">缴费天数</th>
+        <th scope="col">失业金天数</th>
+        <th scope="col">月数</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(({ from, to, days }) => (
+        <tr>
+          <th scope="row">
+            {to === undefined ? `${integer(from)}或以上` : `${integer(from)}至${integer(to - 1)}`}
+          </th>
+          <td>{integer(days)}</td>
+          <td>{months(days)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    缴费不足360天，就没有缴费型失业金。离职结算（finiquito）中支付的未休年假也算作缴费天数（art.
+    269.4 LGSS）。
+  </p>
+  <p class="folio">
+    Art. <span>269</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pt-ejemplos">示例：从6个月到6年</h3>
+  <p>只有一份合同，于2026年八月31日结束，前6年内没有其他工作，也没有领取过其他失业金：</p>
+  <FigureTable id="pt-ejemplos-tabla">
+    <Fragment slot="caption">工作时长、缴费天数和失业金。</Fragment>
+    <thead>
+      <tr>
+        <th scope="col">工作时长</th>
+        <th scope="col">缴费天数</th>
+        <th scope="col">失业金天数</th>
+      </tr>
+    </thead>
+    <tbody>
+      {durationByTime.map(({ months: span, days, benefitDays }) => (
+        <tr>
+          <th scope="row">{spanLabel(span, lang)}</th>
+          <td>{integer(days)}</td>
+          <td>
+            {benefitDays === 0
+              ? '不足360'
+              : `${integer(benefitDays)}（${months(benefitDays)}个月）`}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    工作6个月达不到360天，但如果前6年内您在其他地方工作过，那些天数也会累加。所以计算器会问您其他工作的情况，并提供您的工作履历报告（vida
+    laboral）的链接，上面列有所有缴费天数。
+  </p>
+  <p>
+    每月的金额见
+    <CaseLink lang={lang} id="benefit" />。
+  </p>
+</section>

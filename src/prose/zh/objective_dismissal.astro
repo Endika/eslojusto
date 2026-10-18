@@ -1,0 +1,83 @@
+---
+// source: 176e7bb53168
+import CaseLink from '../../components/CaseLink.astro';
+import { itemRange, objective, severanceMonths } from '../../content/examples';
+import { euroRange, euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const severance = itemRange(objective, 'severance');
+const notice = itemRange(objective, 'employer_notice');
+const salary = itemRange(objective, 'pending_salary');
+const holidays = itemRange(objective, 'holiday_pay');
+const extraPay = itemRange(objective, 'extra_pay');
+const unfair = objective.unfairReference;
+const months =
+  severanceMonths(
+    objective.items.find((p) => p.item.id === 'severance')?.item.calculation ?? [],
+  )[0] ?? 0;
+if (!severance || !notice || !salary || !holidays || !extraPay || unfair === null)
+  throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="do-20-dias">每年20天，上限为12个月工资</h3>
+  <p>
+    因客观原因解雇（despido
+    objetivo）时，公司必须在递交解雇信的同时，将解雇补偿金（indemnización）备好供您领取：每工作一年20天工资，最多12个月工资（art.
+    53.1.b ET）。CGPJ 指南在 STS 651/2026
+    之后，将这一上限计为360天。工龄按月计算，不足一个月的按一个月计。
+  </p>
+  <p class="folio">
+    Art. <span>53.1.b</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-preaviso">15天提前通知期，或支付相应工资</h3>
+  <p>
+    从递交解雇信到解雇生效，必须有15天的提前通知期（art. 53.1.c
+    ET）。公司没有给足的天数要支付工资。计算器会问您实际给了几天，并计算缺少的天数。
+  </p>
+  <p class="folio">
+    Art. <span>53.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-ejemplo">计算示例</h3>
+  <p>
+    某人每月税前工资1.500&nbsp;€，另有两笔各1.500&nbsp;€的额外工资，从2018年五月3日工作到2026年七月20日。今年已休10天年假，公司没有给提前通知期。计算器得出的数字如下：
+  </p>
+  <ul>
+    <li>
+      解雇补偿金：{euroRange(severance)}（{months}个月 × 20 / 12 ={' '}
+      {String((months * 20) / 12).replace('.', ',')}天）。
+    </li>
+    <li>未给的提前通知期：{euroRange(notice)}。</li>
+    <li>七月工资：{euroRange(salary)}。</li>
+    <li>未休年假：{euroRange(holidays)}。</li>
+    <li>自七月1日起累计的圣诞额外工资：{euroRange(extraPay)}。</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">如果被判定为不当解雇</span> 按相同日期，解雇补偿金将为
+    {euros(unfair)}，按每年33天计算。核查会把这个数字显示在客观原因解雇的数字旁边。
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-diferencia">客观原因解雇还是不当解雇</h3>
+  <p>
+    对客观原因解雇可以像对纪律解雇一样提出异议（art. 53.3
+    ET）。如果被判定为不当解雇（improcedente），补偿金按每年33天计算，上限为720天：详见
+    <CaseLink lang={lang} id="unfair_dismissal" />
+    。提出异议的期限为20个工作日（art. 59.3 ET）。
+  </p>
+  <p class="folio">
+    Art. <span>53 · 56 · 59</span> ET
+  </p>
+</section>

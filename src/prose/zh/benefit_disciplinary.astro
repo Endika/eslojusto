@@ -1,0 +1,81 @@
+---
+// source: 5b2dfc6de32e
+import CaseLink from '../../components/CaseLink.astro';
+import { disciplinary, entitledByCause } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import { t } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+if (disciplinary.entitled !== 'yes' || disciplinary.figures === null)
+  throw new Error('Incomplete example');
+const { figures } = disciplinary;
+// The reasons are the calculator's own: the same sentence and article it shows in the result.
+const causes = entitledByCause.map(({ cause, entitled }) => ({
+  name: t(lang, `cause.${cause}`),
+  entitled,
+  reason: t(lang, `client.unemployment.reason.${cause}`),
+}));
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-si">即使被判定为正当解雇，也能领取失业金</h3>
+  <p>
+    这是一个常见的疑问，法律给出了答案：解雇属于法定失业状态（art. 267.1.a.3.º
+    LGSS），而且领取失业金（paro）不需要对解雇提出异议（art. 268.4
+    LGSS）。无论是纪律解雇，还是被判定为正当解雇（procedente），都是如此。
+  </p>
+  <p>
+    需要满足的仍是通常的条件：最近6年内缴费360天、登记为求职者（demandante de
+    empleo）并签署活动协议（acuerdo de actividad）等（art. 266 LGSS）。
+  </p>
+  <p class="folio">
+    Arts. <span>267 · 268.4</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ceses">哪些离职情形可以领取失业金</h3>
+  <div class="causes">
+    {causes.map(({ name, entitled, reason }) => (
+      <div>
+        <h4>{name}</h4>
+        <p>
+          <strong>
+            {entitled === 'yes' ? '可以领取失业金。' : '不能领取失业金，例外情况除外。'}
+          </strong>
+          {reason}
+        </p>
+      </div>
+    ))}
+  </div>
+  <p>
+    主动辞职的例外情况，例如调岗异地或严重拖欠工资，见
+    <CaseLink lang={lang} id="benefit_resignation" />。
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ejemplo">计算示例</h3>
+  <p>
+    某人每月税前工资1.500&nbsp;€，另有两笔各1.500&nbsp;€的额外工资，从2022年六月1日工作到2026年九月30日，没有需要抚养的子女，公司以纪律原因将其解雇。
+  </p>
+  <p class="example">
+    <span class="example__label">其失业金</span> 缴费{integer(disciplinary.contractDays)}
+    天，至少可领取{integer(disciplinary.duration.days)}天失业金
+    {`（${integer(disciplinary.duration.days / 30)}个月）`}：前6个月每月约
+    {wholeEuros(figures.firstStretch.min)}，之后约{wholeEuros(figures.secondStretch.min)}
+    ，均为税前。之所以说“至少”，是因为最近6年内的其他工作也可能增加天数。
+  </p>
+  <p>
+    如果解雇被判定为不当解雇（improcedente），还会有解雇补偿金（indemnización）：详见
+    <CaseLink lang={lang} id="unfair_dismissal" />。
+  </p>
+</section>
