@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.88.0](https://github.com/Endika/eslojusto/compare/v1.87.0...v1.88.0) (2026-10-18)
+
+
+### Features
+
+* **i18n:** translate the dictionary into Galician ([b5b9d0f](https://github.com/Endika/eslojusto/commit/b5b9d0f66a4cde2839355801323c4eb1e2d1aaa3))
+* **i18n:** translate the prose pages into Galician ([8d336e9](https://github.com/Endika/eslojusto/commit/8d336e94f186b5b18e218c3f00eb257e6447be57))
+
 ## [1.87.0](https://github.com/Endika/eslojusto/compare/v1.86.0...v1.87.0) (2026-10-18)
 
 
