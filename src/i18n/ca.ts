@@ -3232,8 +3232,8 @@ export const ca: Translation = {
   'rental.guide.source_bde': 'Interès legal (Banco de España)',
   'rental.guide.who': 'Qui hi ha al darrere',
   'rental.guide.norms': 'Normes',
-  'rental.guide.decree_live': '{norma}, en vigor des de {desde} i {estado},',
-  'rental.guide.decree_upcoming': '{norma}, que entra en vigor en data {desde} i està {estado},',
+  'rental.guide.decree_live': 'el {norma}, en vigor des de {desde} i {estado},',
+  'rental.guide.decree_upcoming': 'el {norma}, que entra en vigor en data {desde} i està {estado},',
   'rental.guide.decree_never':
     'La norma {norma} no es va arribar a aplicar: el Congrés la va derogar abans que entrés en vigor.',
   'rental.guide.decree_repealed':
