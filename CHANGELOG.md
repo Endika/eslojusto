@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.87.0](https://github.com/Endika/eslojusto/compare/v1.86.0...v1.87.0) (2026-10-18)
+
+
+### Features
+
+* **i18n:** give a Basque year the ending its figure takes ([e4a9c5a](https://github.com/Endika/eslojusto/commit/e4a9c5a6de85a164c02bd2e2a3be929bd611d986))
+* **i18n:** translate the case pages' prose into Basque ([0012619](https://github.com/Endika/eslojusto/commit/001261914ccb9732110bd87f53389069c9e4e6c0))
+* **i18n:** translate the dictionary into Basque, unpublished ([0d91a19](https://github.com/Endika/eslojusto/commit/0d91a19da8cf350b1dace2cdde3cdcf78e57633a))
+* **i18n:** translate the final pay guide into Basque ([c774822](https://github.com/Endika/eslojusto/commit/c774822d8b5a788b545feca5325b53187ffaa5e6))
+* **i18n:** translate the legal notice and the privacy page into Basque ([6fbe964](https://github.com/Endika/eslojusto/commit/6fbe964b8ba3f6757bcbd027305aa504aefa2678))
+* **i18n:** translate the rental sections and the ERTE page into Basque ([fe30bfb](https://github.com/Endika/eslojusto/commit/fe30bfb923d90b4faef7850bcaba3af929597b5d))
+* **i18n:** translate the rental topics into Basque ([b0eba34](https://github.com/Endika/eslojusto/commit/b0eba34b44f40119b9d2378882d6e780e77fe372))
+
+
+### Bug Fixes
+
+* **i18n:** join the pending decrees with the page's own conjunction ([5f49889](https://github.com/Endika/eslojusto/commit/5f4988973b55d51b5bf1ff8212eb5bfc0e57a184))
+* **i18n:** keep the Basque indirect questions and the only-if clear ([ac6f72a](https://github.com/Endika/eslojusto/commit/ac6f72a8760b5a71ba9aaf2c713f5534dffc333f))
+
 ## [1.86.0](https://github.com/Endika/eslojusto/compare/v1.85.2...v1.86.0) (2026-10-18)
 
 
