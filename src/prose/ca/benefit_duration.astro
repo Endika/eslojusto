@@ -1,0 +1,99 @@
+---
+// source: e288ce65363a
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { BENEFIT_SCALE, durationByTime, spanLabel } from '../../content/examples';
+import { integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+// Each row runs from its own threshold to the day before the next one; the last has no end.
+const rows = BENEFIT_SCALE.map(([from, days], i) => ({
+  from,
+  to: BENEFIT_SCALE[i + 1]?.[0],
+  days,
+}));
+const months = (days: number) => integer(days / 30);
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pt-escala">L’escala completa</h3>
+  <p>
+    La durada de l’atur depèn dels dies cotitzats per desocupació en els 6 anys anteriors que no
+    hagis fet servir ja per a un altre atur (art. 269.1 LGSS). Compten totes les teves feines
+    d’aquest període, no només l’última.
+  </p>
+  <FigureTable id="pt-tabla">
+    <Fragment slot="caption">Dies cotitzats en els últims 6 anys i dies d’atur.</Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Dies cotitzats</th>
+        <th scope="col">Dies d’atur</th>
+        <th scope="col">Mesos</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(({ from, to, days }) => (
+        <tr>
+          <th scope="row">
+            {to === undefined
+              ? `${integer(from)} o més`
+              : `De ${integer(from)} a ${integer(to - 1)}`}
+          </th>
+          <td>{integer(days)}</td>
+          <td>{months(days)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    Amb menys de 360 dies cotitzats no hi ha prestació contributiva. Les vacances pagades a la
+    quitança i no gaudides també compten com a cotitzades (art. 269.4 LGSS).
+  </p>
+  <p class="folio">
+    Art. <span>269</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pt-ejemplos">Exemples: de 6 mesos a 6 anys</h3>
+  <p>
+    Un sol contracte que acaba el 31 d’agost de 2026, sense altres feines en els 6 anys anteriors ni
+    cap altre atur cobrat:
+  </p>
+  <FigureTable id="pt-ejemplos-tabla">
+    <Fragment slot="caption">Temps treballat, dies cotitzats i atur.</Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Temps treballat</th>
+        <th scope="col">Dies cotitzats</th>
+        <th scope="col">Dies d’atur</th>
+      </tr>
+    </thead>
+    <tbody>
+      {durationByTime.map(({ months: span, days, benefitDays }) => (
+        <tr>
+          <th scope="row">{spanLabel(span, lang)}</th>
+          <td>{integer(days)}</td>
+          <td>
+            {benefitDays === 0
+              ? 'No arriba a 360'
+              : `${integer(benefitDays)} (${months(benefitDays)} mesos)`}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    Amb 6 mesos no s’arriba als 360 dies, però si en els 6 anys anteriors vas treballar en altres
+    llocs, aquests dies sumen. Per això la calculadora et pregunta per altres feines i t’enllaça al
+    teu informe de vida laboral, on surten tots els dies cotitzats.
+  </p>
+  <p>
+    La quantia de cada mes la tens a <CaseLink lang={lang} id="benefit" />.
+  </p>
+</section>

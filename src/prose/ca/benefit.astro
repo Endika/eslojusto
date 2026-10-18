@@ -1,0 +1,138 @@
+---
+// source: 854c3338933e
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitBySalary } from '../../content/examples';
+import { euros, wholeEuros } from '../../content/format';
+import { BENEFIT_2026 } from '../../engine/unemployment';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const { minCap, maxCap } = BENEFIT_2026;
+const [, mid, high] = benefitBySalary;
+if (!mid || !high) throw new Error('Incomplete example');
+type Row = (typeof benefitBySalary)[number];
+const stretch = (b: Row, n: 0 | 1 | 2) => b.children[n] ?? { c1: 0, c2: 0 };
+// One row per figure, one column per salary, so the table fits a phone.
+const rows: readonly (readonly [string, (b: Row) => number])[] = [
+  ['Base reguladora', (b) => b.base],
+  ['Primers 180 dies, sense fills o filles', (b) => stretch(b, 0).c1],
+  ['Primers 180 dies, amb un fill o filla', (b) => stretch(b, 1).c1],
+  ['Primers 180 dies, amb dos o més', (b) => stretch(b, 2).c1],
+  ['Des del dia 181, sense fills o filles', (b) => stretch(b, 0).c2],
+];
+---
+
+<section class="sheet sheet--text">
+  <h3 id="p-cuanto">El 70&nbsp;% i després el 60&nbsp;%</h3>
+  <p>
+    L’atur, la prestació contributiva per desocupació, es calcula sobre la teva base reguladora: la
+    mitjana del que s’ha cotitzat per desocupació en els últims 180 dies, sense les hores
+    extraordinàries (art. 270.1 LGSS). Es cobra el 70&nbsp;% d’aquesta base els primers 180 dies i
+    el 60&nbsp;% des del dia 181 (art. 270.2 LGSS).
+  </p>
+  <p>
+    Cada mes té un mínim i un màxim segons els fills o filles que tinguis a càrrec (art. 270.3
+    LGSS). El 2026, amb l’IPREM en {wholeEuros(BENEFIT_2026.monthlyIprem)}, són aquests:
+  </p>
+  <ul>
+    <li>
+      Sense fills o filles a càrrec, entre {wholeEuros(minCap[0])} i {wholeEuros(maxCap[0])} al mes.
+    </li>
+    <li>
+      Amb un, entre {wholeEuros(minCap[1])} i {wholeEuros(maxCap[1])}.
+    </li>
+    <li>
+      Amb dos o més, entre {wholeEuros(minCap[1])} i {wholeEuros(maxCap[2])}.
+    </li>
+  </ul>
+  <p class="folio">
+    Art. <span>270</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-tabla">Quant es cobra d’atur amb una nòmina de 1.300, 1.500 o 1.800&nbsp;€</h3>
+  <FigureTable id="p-tabla-titulo">
+    <Fragment slot="caption">
+      Atur brut al mes amb un salari en 14 pagues iguals i jornada completa, el 2026, arrodonit a
+      l’euro com a la calculadora.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Salari brut al mes</th>
+        {benefitBySalary.map(({ salary }) => (
+          <th scope="col">{wholeEuros(salary)}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(([label, value]) => (
+        <tr>
+          <th scope="row">{label}</th>
+          {benefitBySalary.map((b) => (
+            <td>{wholeEuros(value(b))}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    La base surt del salari anual, amb les pagues extraordinàries, dividit entre 12: amb
+    1.500&nbsp;€ en 14 pagues, 21.000&nbsp;€ / 12 = {euros(mid.base)}, i el seu 70&nbsp;% és just el
+    màxim sense fills o filles a càrrec. Amb 1.800&nbsp;€ la base és {euros(high.base)} i el seu
+    70&nbsp;% supera els màxims sense fills o filles i amb un, així que en aquests casos es cobra el
+    màxim.
+  </p>
+  <p>
+    Són xifres brutes. D’aquí es descompta un 4,85&nbsp;% de la base per a la Seguridad Social i
+    l’IRPF que correspongui. Amb jornada parcial les xifres són més baixes, i la calculadora no les
+    dona.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-requisitos">Qui el pot cobrar</h3>
+  <p>
+    El contracte ha d’acabar en una situació legal de desocupació: un acomiadament o el final d’un
+    contracte temporal que no vas acabar tu, per exemple (art. 267 LGSS). A més, calen almenys 360
+    dies cotitzats en els últims 6 anys, inscriure’t com a demandant d’ocupació i subscriure l’acord
+    d’activitat, entre altres requisits (art. 266 LGSS).
+  </p>
+  <ul>
+    <li>
+      Quant dura segons el que has cotitzat: <CaseLink lang={lang} id="benefit_duration" />.
+    </li>
+    <li>
+      Si te’n vas tu: <CaseLink lang={lang} id="benefit_resignation" />
+    </li>
+    <li>
+      Si t’acomiaden per una falta: <CaseLink lang={lang} id="benefit_disciplinary" />.
+    </li>
+  </ul>
+  <p>
+    Sense inscriure’t com a demandant d’ocupació no hi ha atur: et dones d’alta al servei d’ocupació
+    de la teva comunitat i el demanes al SEPE en els 15 dies següents al final del contracte, o al
+    final de les vacances no gaudides que et pagui la quitança (arts. 266 i 268 LGSS). Que siguin
+    dies hàbils ho indica el SEPE.
+  </p>
+  <p class="folio">
+    Arts. <span>266 · 267 · 268</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-erte">Si estàs en un ERTE</h3>
+  <p>
+    Un ERTE també pot donar dret a atur mentre dura. Quant es cobra i si consumeix el teu atur futur
+    depèn del tipus d’ERTE:{' '}
+    <a href={link(lang, 'paro/erte/')}>calcula el teu atur durant un ERTE</a>.
+  </p>
+  <p class="folio">
+    Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+  </p>
+</section>

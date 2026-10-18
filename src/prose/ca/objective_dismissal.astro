@@ -1,0 +1,87 @@
+---
+// source: b433a07857b6
+import CaseLink from '../../components/CaseLink.astro';
+import { euroRange, itemRange, objective, severanceMonths } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const severance = itemRange(objective, 'severance');
+const notice = itemRange(objective, 'employer_notice');
+const salary = itemRange(objective, 'pending_salary');
+const holidays = itemRange(objective, 'holiday_pay');
+const extraPay = itemRange(objective, 'extra_pay');
+const unfair = objective.unfairReference;
+const months =
+  severanceMonths(
+    objective.items.find((p) => p.item.id === 'severance')?.item.calculation ?? [],
+  )[0] ?? 0;
+if (!severance || !notice || !salary || !holidays || !extraPay || unfair === null)
+  throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="do-20-dias">20 dies per any, amb un límit de 12 mensualitats</h3>
+  <p>
+    En un acomiadament per causes objectives, l’empresa ha de posar a la teva disposició, juntament
+    amb la carta, una indemnització de 20 dies de salari per any treballat, amb un màxim de 12
+    mensualitats (art. 53.1.b ET). La guia del CGPJ, després de la STS 651/2026, compta aquest límit
+    com a 360 dies. El temps es compta en mesos, i una fracció de mes compta com un mes sencer.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.b</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-preaviso">15 dies de preavís, o el seu pagament</h3>
+  <p>
+    Entre la carta i l’acomiadament han de passar 15 dies de preavís (art. 53.1.c ET). Els dies que
+    l’empresa no doni es paguen. La calculadora et pregunta quants te’n van donar i calcula els que
+    falten.
+  </p>
+  <p class="folio">
+    Art. <span>53.1.c</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-ejemplo">Exemple resolt</h3>
+  <p>
+    Una persona amb 1.500&nbsp;€ bruts al mes i dues pagues extraordinàries de 1.500&nbsp;€ treballa
+    del 3 de maig de 2018 al 20 de juliol de 2026. Ha gaudit 10 dies de vacances aquest any i
+    l’empresa no li dona preavís. Aquestes són les xifres de la calculadora:
+  </p>
+  <ul>
+    <li>
+      Indemnització: {euroRange(severance, lang)} ({months} mesos × 20 / 12 ={' '}
+      {String((months * 20) / 12).replace('.', ',')} dies).
+    </li>
+    <li>Preavís no donat: {euroRange(notice, lang)}.</li>
+    <li>Salari de juliol: {euroRange(salary, lang)}.</li>
+    <li>Vacances no gaudides: {euroRange(holidays, lang)}.</li>
+    <li>Paga de Nadal meritada des de l’1 de juliol: {euroRange(extraPay, lang)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Si es declarés improcedent</span> Amb les mateixes dates, la
+    indemnització pujaria a {euros(unfair)}, a 33 dies per any. La revisió et mostra aquesta xifra
+    al costat de la de l’acomiadament objectiu.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="do-diferencia">Acomiadament objectiu o improcedent</h3>
+  <p>
+    Un acomiadament objectiu es pot impugnar com un de disciplinari (art. 53.3 ET). Si es declara
+    improcedent, la indemnització es calcula a 33 dies per any, amb un límit de 720 dies: ho tens a{' '}
+    <CaseLink lang={lang} id="unfair_dismissal" />. El termini per impugnar-lo és de 20 dies hàbils
+    (art. 59.3 ET).
+  </p>
+  <p class="folio">
+    Art. <span>53 · 56 · 59</span> ET
+  </p>
+</section>

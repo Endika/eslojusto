@@ -1,0 +1,104 @@
+---
+// source: c891fa20c5a1
+import CaseLink from '../../components/CaseLink.astro';
+import { severanceMonths, unfairAfter2012, unfairBefore2012 } from '../../content/examples';
+import { euros, integer } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const [months = 0] = severanceMonths(unfairAfter2012.calculation);
+const [first = 0, second = 0] = severanceMonths(unfairBefore2012.calculation);
+const decimal = (n: number) => String(n).replace('.', ',');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="di-tramos">33 dies per any, amb un límit de 720</h3>
+  <p>
+    Si l’acomiadament es reconeix o es declara improcedent, la indemnització és de 33 dies de salari
+    per any treballat, amb un màxim de 24 mensualitats, que són 720 dies (art. 56.1 ET). El temps es
+    compta en mesos, i una fracció de mes compta com un mes sencer: 33 dies l’any són 2,75 dies per
+    mes.
+  </p>
+  <p>
+    El salari de cada dia és el teu salari anual, amb les pagues extraordinàries, dividit entre 365,
+    com fa la guia del CGPJ. La calculadora dona la xifra al cèntim i la compara amb la de la teva
+    empresa.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-2012">Si vas començar abans del 12 de febrer de 2012</h3>
+  <p>La indemnització es calcula en dos trams (disposició transitòria 11.ª ET):</p>
+  <ul>
+    <li>Fins a l’11 de febrer de 2012, 45 dies per any (3,75 per mes).</li>
+    <li>Des del 12 de febrer de 2012, 33 dies per any (2,75 per mes).</li>
+  </ul>
+  <p>
+    El total té un límit de 720 dies, tret que el primer tram ja el superi. En aquest cas compta
+    només el primer tram, amb un màxim de 42 mensualitats (1.260 dies).
+  </p>
+  <p class="folio">
+    Disposició transitòria <span>11.ª</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-ejemplo">Exemples resolts</h3>
+  <p>
+    Una persona amb 1.500&nbsp;€ bruts al mes i dues pagues extraordinàries de 1.500&nbsp;€,
+    21.000&nbsp;€ l’any. El seu salari diari és 21.000&nbsp;€ / 365 ={' '}
+    {euros(unfairAfter2012.dailySalary)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Contracte del 2018</span> Del 3 de maig de 2018 al 20 de juliol de
+    2026 compten {integer(months)} mesos. {integer(months)} × 2,75 ={' '}
+    {decimal(unfairAfter2012.salaryDays)} dies. 21.000&nbsp;€ ×{' '}
+    {decimal(unfairAfter2012.salaryDays)} / 365 = {euros(unfairAfter2012.amount)}.
+  </p>
+  <p class="example">
+    <span class="example__label">Contracte del 2010</span> De l’1 de març de 2010 al 15 de setembre
+    de 2026. Primer tram: {integer(first)} mesos × 3,75 = {decimal(first * 3.75)} dies. Segon tram:{' '}
+    {integer(second)} mesos × 2,75 = {decimal(second * 2.75)} dies. Total:{' '}
+    {integer(unfairBefore2012.salaryDays)} dies, per sota del límit. 21.000&nbsp;€ ×{' '}
+    {integer(unfairBefore2012.salaryDays)} / 365 = {euros(unfairBefore2012.amount)}.
+  </p>
+  <p>
+    La indemnització va a part de la quitança, que suma el salari de l’últim mes, les vacances no
+    gaudides i les pagues extraordinàries meritades. La calculadora ho revisa tot junt.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-readmision">Readmissió o indemnització</h3>
+  <p>
+    Quan un acomiadament es declara improcedent, l’empresa tria en cinc dies entre readmetre’t o
+    pagar-te la indemnització (art. 56.1 ET). Si et readmet, també t’ha de pagar els salaris de
+    tramitació, els que vas deixar de cobrar des de l’acomiadament (art. 56.2 ET). Si ets
+    representant legal de la plantilla o delegat sindical, l’elecció és teva (art. 56.4 ET).
+  </p>
+  <p>
+    Aquesta revisió no calcula els salaris de tramitació ni decideix si un acomiadament és
+    improcedent: això ho declara un jutjat o ho reconeix l’empresa.
+  </p>
+  <p class="folio">
+    Art. <span>56</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="di-otros">Altres acomiadaments</h3>
+  <p>
+    Un acomiadament objectiu es paga a 20 dies per any, amb 15 dies de preavís: ho tens a{' '}
+    <CaseLink lang={lang} id="objective_dismissal" />. Qualsevol acomiadament, també el
+    disciplinari, és situació legal de desocupació:{' '}
+    <CaseLink lang={lang} id="benefit_disciplinary" />
+    explica quins finals de contracte donen atur.
+  </p>
+</section>

@@ -1,0 +1,86 @@
+---
+// source: 5b2dfc6de32e
+import CaseLink from '../../components/CaseLink.astro';
+import { disciplinary, entitledByCause } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import { t } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+if (disciplinary.entitled !== 'yes' || disciplinary.figures === null)
+  throw new Error('Incomplete example');
+const { figures } = disciplinary;
+// The reasons are the calculator's own: the same sentence and article it shows in the result.
+const causes = entitledByCause.map(({ cause, entitled }) => ({
+  name: t(lang, `cause.${cause}`),
+  entitled,
+  reason: t(lang, `client.unemployment.reason.${cause}`),
+}));
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-si">Sí que dona atur, encara que sigui procedent</h3>
+  <p>
+    És un dubte freqüent, i la resposta és a la llei: l’acomiadament és situació legal de
+    desocupació (art. 267.1.a.3.º LGSS), i per cobrar l’atur no cal impugnar-lo (art. 268.4 LGSS).
+    Tant és que l’acomiadament sigui disciplinari i que es declari procedent.
+  </p>
+  <p>
+    El que sí que cal és el de sempre: 360 dies cotitzats en els últims 6 anys, inscriure’t com a
+    demandant d’ocupació i subscriure l’acord d’activitat, entre altres requisits (art. 266 LGSS).
+  </p>
+  <p class="folio">
+    Arts. <span>267 · 268.4</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ceses">Quins finals de contracte donen atur</h3>
+  <div class="causes">
+    {causes.map(({ name, entitled, reason }) => (
+      <div>
+        <h4>{name}</h4>
+        <p>
+          <strong>
+            {entitled === 'yes'
+              ? 'Sí que dona atur.'
+              : 'No dona atur, llevat d’algunes excepcions.'}
+          </strong>{' '}
+          {reason}
+        </p>
+      </div>
+    ))}
+  </div>
+  <p>
+    Les excepcions de la baixa voluntària, com un trasllat o els impagaments greus, les tens a{' '}
+    <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ejemplo">Exemple resolt</h3>
+  <p>
+    Una persona amb 1.500&nbsp;€ bruts al mes i dues pagues extraordinàries de 1.500&nbsp;€ treballa
+    de l’1 de juny de 2022 al 30 de setembre de 2026, sense fills o filles a càrrec, i l’empresa
+    l’acomiada per motius disciplinaris.
+  </p>
+  <p class="example">
+    <span class="example__label">El seu atur</span> Amb {integer(disciplinary.contractDays)} dies
+    cotitzats li corresponen almenys {integer(disciplinary.duration.days)} dies d’atur
+    {` (${integer(disciplinary.duration.days / 30)} mesos)`}: uns{' '}
+    {wholeEuros(figures.firstStretch.min)} al mes els primers 6 mesos i uns{' '}
+    {wholeEuros(figures.secondStretch.min)} després, en brut. «Almenys», perquè altres feines dels
+    últims 6 anys poden sumar dies.
+  </p>
+  <p>
+    Si l’acomiadament es declarés improcedent, a més hi hauria indemnització: la tens a{' '}
+    <CaseLink lang={lang} id="unfair_dismissal" />.
+  </p>
+</section>
