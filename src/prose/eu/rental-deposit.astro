@@ -1,0 +1,101 @@
+---
+// source: f63abb595478
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositExample();
+// Until the Congress votes the decree down, the insurance ban stands as pending.
+const banStands = NORMS.rdl29_2026.status !== 'repealed';
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="fianza-legal">
+  <h2 id="fianza-legal">Fidantza: errenta-hileko bat</h2>
+  <p>
+    Fidantza derrigorrezkoa da, eta, etxebizitza-alokairu batean, eskudiruzko errenta-hileko batekoa
+    da (art. 36.1 LAU).
+  </p>
+  <p>
+    Kontratua amaitu eta giltzak ematen dituzunean, hilabeteko epean itzuli behar dizute:{' '}
+    <a href={href(RENTAL_PAGES.deposit_return.path)}>{RENTAL_PAGES.deposit_return.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.1</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="garantia-adicional">
+  <h2 id="garantia-adicional">Beste berme batzuk: beste bi errenta-hileko, gehienez</h2>
+  <p>
+    Fidantzaz gain, kontratuak beste berme bat eska dezake: diru gehiago edo abal bat. 2019ko
+    martxoaren 6tik aurrera sinatutako bost urtera arteko kontratuetan, edo zazpi urtera artekoetan
+    jabea enpresa bat bada, berme osagarri horrek ezin ditu bi errenta-hileko gainditu (art. 36.5
+    LAU).
+  </p>
+  <p>Berrikuspenak mugarekin alderatzen du ordaindu zenuen dirua.</p>
+  {banStands && (
+    <p>
+      Dekretuaren arabera, jabeak ezin dizu jada errenta ez ordaintzearen aurkako asegururik eskatu:
+      beherago azaltzen da, <a href="#seguro">aseguruaren atalean</a>.
+    </p>
+  )}
+  <p class="folio">
+    Art. <span>36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="adelantado">
+  <h2 id="adelantado">Aurretiko ordainketa: errenta-hileko bat</h2>
+  <p>
+    Aurretiko ordainketa gisa, jabeak ezin du errenta-hileko bat baino gehiago eskatu (art. 17 LAU).
+  </p>
+  <p class="folio">
+    Art. <span>17</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="seguro">
+  <h2 id="seguro">
+    {banStands
+      ? 'Errenta ez ordaintzearen aurkako asegurua: dekretuak debekatu egiten du zuri eskatzea'
+      : 'Errenta ez ordaintzearen aurkako asegurua'}
+  </h2>
+  <p>{pageDecree('deposit', 'rental.page.decree.insurance')}</p>
+  <p class="folio">
+    Art. <span>36.5</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Adibide ebatzia</h2>
+  <p>
+    Errenta {formatEuros(ex.rent)} izanik, jabe batek {formatEuros(ex.asked)} eskatzen ditu dirutan,
+    etxera sartu aurretik: fidantza eta berme osagarriak.
+  </p>
+  <p class="example">
+    <span class="example__label">Kalkulua</span> Fidantza errenta-hileko bat da,{' '}
+    {formatEuros(ex.rent)}, eta berme osagarria bi errenta-hilekokoa izan daiteke,{' '}
+    {formatEuros(2 * ex.rent)}. Gehienekoa {formatEuros(ex.allowed)} da. {formatEuros(ex.asked)}{' '}
+    eskatzen dizkizute: {formatEuros(ex.over)} mugaren gainetik.
+  </p>
+  <p class="folio">
+    Art. <span>36.1 · 36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Egiaztatu eskatu dizutena</h2>
+  <p>
+    <a href={href(REVIEW.path)}>Alokairuaren berrikuspenak</a> zure kontratuko fidantza, bermeak eta
+    aurretiko ordainketa muga horiekin alderatzen ditu, eta muga bakoitza zenbat gainditzen den
+    esaten dizu.
+  </p>
+</section>

@@ -1,0 +1,85 @@
+---
+// source: 8e819e81fa1a
+import { NORMS } from '../../engine/rental/data/norms';
+import { chargesExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros, formatLongDay } from '../../content/rent-indices';
+import { t } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pageDecree } = rentalPagesCopy(lang);
+
+const ex = chargesExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="pacto">
+  <h2 id="pacto">Idatzizko itunarekin eta urteko zenbatekoarekin bakarrik</h2>
+  <p>
+    Jabeak eraikinaren gastu orokorrak edo kontagailurik gabeko zerbitzuak kobra diezazkizun,
+    idatziz itundu behar zenuten, kontratuaren datako urteko zenbatekoarekin (art. 20.1 LAU).
+    Zergek, hala nola IBIk, beren arau berezia dute: ikusi «IBIa eta tasak», beherago.
+  </p>
+  <p>
+    Kontratuak gastu horiek aipatzen ez baditu edo urteko zenbatekorik ematen ez badu, berrikuspenak
+    adierazi egiten du, begira dezazun.
+  </p>
+  <p>{pageDecree('charges', 'rental.page.charges.community')}</p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="subida">
+  <h2 id="subida">Zenbat igo daitezkeen: errentaren bikoitza, gehienez</h2>
+  <p>
+    Kontratuaren lehen bost urteetan, edo zazpietan jabea enpresa bat bada, gastu horiek, zergak
+    izan ezik, urtean behin bakarrik igo daitezke, akordioz, eta inoiz ez errenta igo daitekeenaren
+    bikoitza baino gehiago (art. 20.3 LAU, edo art. 20.2 Real Decreto-ley 29/2026 arauaren aurreko
+    kontratuetan). Berrikuspenak urte bakoitzeko gastu bakoitza muga horrekin alderatzen du.
+  </p>
+  <p class="folio">
+    Art. <span>20.3</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ibi">
+  <h2 id="ibi">IBIa eta tasak</h2>
+  <p>{pageDecree('charges', 'rental.page.decree.taxes')}</p>
+  <p>
+    {t(lang, 'rental.guide.charges.taxes_before', {
+      desde: formatLongDay(NORMS.rdl29_2026.inForceSince, lang),
+    })}
+  </p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Adibide ebatzia</h2>
+  <p>
+    Kontratu batek urtean {formatEuros(ex.agreed)} finkatzen ditu komunitatearen gastuetarako. Lehen
+    urtean, jabeak {formatEuros(ex.charged)} kobratzen ditu.
+  </p>
+  <p class="example">
+    <span class="example__label">Kalkulua</span> Oraindik ezin izan da igoerarik egon; beraz,
+    gehienekoa itundutakoa da: {formatEuros(ex.agreed)}. {formatEuros(ex.charged)} −{' '}
+    {formatEuros(ex.agreed)} = {formatEuros(ex.over)} gehiegi.
+  </p>
+  <p class="folio">
+    Art. <span>20</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Egiaztatu kobratzen dizutena</h2>
+  <p>
+    <a href={href(REVIEW.path)}>Alokairuaren berrikuspenak</a> urte bakoitzeko gastu bakoitza
+    itundutakoarekin eta igoera-mugarekin alderatzen du, eta zenbat gehiegi ordaindu duzun esaten
+    dizu.
+  </p>
+</section>
