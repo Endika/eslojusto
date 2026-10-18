@@ -1,0 +1,518 @@
+---
+// source: 169eec130c4d
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { faqEntries } from '../../content/faq';
+import { bySeniority, spanLabel } from '../../content/examples';
+import { wholeEuroRange, wholeEuros } from '../../content/format';
+import { LANDINGS, type LandingId } from '../../content/landings';
+import { ET, SOURCES, LGSS } from '../../engine/sources';
+import { DOCUMENTS } from '../../documents/config';
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+const tx = (key: Key) => t(lang, key);
+
+// The guide under the calculator of /finiquito/, in Spanish: headings and labels from the
+// dictionary, the prose, the rules and the worked examples here. Another language's guide is a
+// translated copy of this file in src/prose/<lang>/.
+const causes: { title: string; rule: string; citation: string; page?: LandingId }[] = [
+  {
+    title: tx('guide.unfair_dismissal'),
+    rule: '每工作一年33天工资，上限为24个月工资（720天）。',
+    citation: 'Art. 56 ET',
+    page: 'unfair_dismissal',
+  },
+  {
+    title: tx('guide.objective_dismissal'),
+    rule: '每年20天工资，上限为12个月工资（360天，STS 651/2026，西班牙最高法院判决）。另有15天提前通知期，公司未给出的天数需支付工资。',
+    citation: 'Art. 53 ET',
+    page: 'objective_dismissal',
+  },
+  {
+    title: tx('guide.collective_dismissal'),
+    rule: '至少与客观原因解雇相同：每年20天工资，上限为12个月工资，另有15天提前通知期。ERE 协议可以给出更高的标准；本核查不了解该协议，只给出最低标准。',
+    citation: 'Art. 51.2, 51.4 y 53.1 ET',
+  },
+  {
+    title: tx('guide.fixed_term_end'),
+    rule: '每年12天工资，按实际工作天数折算。合同在2011年或更早开始的，为8天；2012年开始的，9天；2013年，10天；2014年，11天。替岗合同（sustitución）和培训类合同（formativos）没有补偿金，2001年三月4日之前签订的合同也没有。合同持续超过一年的，有15天提前通知期。',
+    citation: 'Art. 49.1.c ET y DT 8.ª',
+    page: 'fixed_term_end',
+  },
+  {
+    title: tx('guide.resignation'),
+    rule: '没有补偿金。如果您的集体协议规定了提前通知期而您没有提前通知，公司可以扣除不足的天数。',
+    citation: 'Art. 49.1.d ET',
+    page: 'resignation',
+  },
+  {
+    title: tx('guide.disciplinary_dismissal'),
+    rule: '如果被判定为正当解雇（procedente），没有补偿金。如果被判定为不当解雇（improcedente），按不当解雇计算。',
+    citation: 'Art. 55.7 y 56 ET',
+  },
+];
+
+const unchecked = [
+  '税后金额：个人所得税（IRPF）预扣和社保缴费。',
+  '您的集体协议或合同中的津贴、补贴、加班费和提成。',
+  '两笔常规额外工资以外的其他额外工资。',
+  '解雇原因是否成立，这由法院判定。',
+  '诉讼期间工资（salarios de tramitación）。',
+  'ERE 协议在法定最低金额之上增加的部分。',
+];
+
+// The case pages, in the order of the map: the finiquito ones, then the pages on the benefit.
+const caseLinks: readonly LandingId[] = [
+  'resignation',
+  'unfair_dismissal',
+  'objective_dismissal',
+  'fixed_term_end',
+  'not_agreed',
+];
+
+// The same report the result links to.
+const workHistoryUrl =
+  'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
+const benefitSources = [
+  SOURCES.lgss267,
+  SOURCES.lgss268,
+  SOURCES.lgss269,
+  SOURCES.lgss270,
+  SOURCES.sepeAmounts,
+].map(({ citation, url, inForceSince, effectiveFrom }) => ({
+  citation,
+  url,
+  inForce: t(lang, effectiveFrom ? 'client.source.effective_from' : 'client.source.in_force', {
+    fecha: inForceSince.split('-').reverse().join('-'),
+  }),
+}));
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('guide.title')}
+    </h2>
+    <p class="guide__lead">
+      离职结算包括哪些项目，每个数字从何而来，以及所依据的法律条文。示例使用的工资为每月税前1.500&nbsp;€，另有两笔各1.500&nbsp;€的额外工资，每年共21.000&nbsp;€。
+    </p>
+    <p class="guide__sources">
+      <span>{tx('guide.updated')}</span>
+      <span>
+        {tx('guide.sources')}: <a href={ET}>{tx('guide.source_et')}</a> ·{' '}
+        <a href={SOURCES.cgpjGuide.url}>{tx('guide.source_cgpj')}</a> ·{' '}
+        <a href={LGSS}>{tx('guide.source_lgss')}</a> ·{' '}
+        <a href={SOURCES.sepeAmounts.url}>{tx('guide.source_sepe')}</a>
+      </span>
+      <a href={link(lang, 'aviso-legal/')}>{tx('guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    <section class="sheet sheet--text">
+      <h3 id="g-que-lleva">{tx('guide.what_it_includes')}</h3>
+      <p>
+        合同结束时，公司会交给您一份结算单（documento de
+        liquidación）草案，列出需支付给您的款项（art. 49.2
+        ET）。这就是离职结算（finiquito），包括您已经挣得但尚未领取的部分：
+      </p>
+      <ul>
+        <li>最后一个月已工作天数的工资（art. 26 ET）。</li>
+        <li>已累计但未休的年假（art. 38 ET）。</li>
+        <li>额外工资（pagas extra）中已累计的部分，前提是没有分摊到每月工资单（art. 31 ET）。</li>
+        <li>法律要求提前通知而公司未给出的提前通知期天数。</li>
+      </ul>
+      <p>
+        如果合同结束时有权获得解雇补偿金（indemnización），结算单也可以包括这笔钱，但在法律上它是与离职结算不同的一笔款项，有自己的规则和期限。所有数字都是税前金额，即扣除预扣税和社保缴费之前的金额。
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-diferencia">{tx('guide.difference')}</h3>
+      <p>
+        只要合同结束，您就有权获得离职结算，即使是您自己离开，因为这是您已经挣得的钱。补偿金则是对合同终止的补偿，取决于终止的原因。
+      </p>
+      <p>
+        主动辞职（dimisión）没有补偿金（art. 49.1.d
+        ET）。被判定为正当解雇（procedente）的纪律解雇也没有（art. 55.7
+        ET）；如果被判定为不当解雇（improcedente），按不当解雇计算。
+      </p>
+      <p class="folio">
+        Art. <span>49 · 55.7</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-casos">{tx('guide.cases')}</h3>
+      <p>每种原因都有自己的规则。我们用计算示例逐一说明：</p>
+      <ul>
+        {caseLinks.map((id) => (
+          <li>
+            <CaseLink lang={lang} id={id} />
+          </li>
+        ))}
+      </ul>
+      <p>
+        失业金另有专页：
+        <CaseLink lang={lang} id="benefit" />。
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-salario">{tx('guide.salary')}</h3>
+      <p>
+        计入合同结束当月已工作的天数。每天的工资可以按月工资除以30（商业月），也可以按月工资除以当月的天数（自然月）。本核查给出两种算法之间的范围。
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> 十月15日离职：1.500&nbsp;€ × 15/30
+        = 750,00&nbsp;€，或1.500&nbsp;€ × 15/31 = 725,81&nbsp;€。
+      </p>
+      <p class="folio">
+        Art. <span>26</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-vacaciones">{tx('guide.holidays')}</h3>
+      <p>
+        年假每年至少三十个自然日（art. 38.1
+        ET）。本核查将其折算为：周一至周五上班的，22个排班工作日；周一至周六上班的，26天；其他排班方式，按30
+        × 每周工作天数 /
+        7计算。这只是一种折算，不是法律条文。您的集体协议或合同可以规定更多天数。年假随每个工作日累计，离职结算中计入本年度尚未休的年假。很多公司按月计算（每年30天即每月2,5天），而不是按天计算，本核查给出两种算法之间的范围。每天的年假工资介于月工资
+        / 30和年工资 / 365之间。
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span>{' '}
+        2026年十月15日离职：当年已工作288天。30 × 288/365 =
+        23,67天已累计。如果已休15天，还剩约8,67天：介于(30 × 288/365 − 15) × 1.500&nbsp;€/30 =
+        433,56&nbsp;€和(30 × 288/365 − 15) × 21.000&nbsp;€/365 = 498,89&nbsp;€之间。
+      </p>
+      <p>如果已休天数超过已累计天数，是否扣款取决于集体协议。</p>
+      <p class="folio">
+        Art. <span>38</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-pagas">{tx('guide.extra_pay')}</h3>
+      <p>
+        法律规定每年两笔额外工资，金额和累计方式由集体协议规定。如果额外工资已分摊到您的每月工资单，您已经按月领取了。如果没有，计入从其累计期开始起已累计的部分：按半年累计（一月至六月、七月至十二月），或按年累计（夏季额外工资为七月至次年六月，圣诞额外工资为一月至十二月）。可以按天或按月计算，本核查给出两种算法之间的范围。如果您在发放某笔额外工资的月份离职（夏季额外工资在六月或七月，圣诞额外工资在十二月），这笔钱可能已包含在当月工资单中。
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span>{' '}
+        圣诞额外工资1.500&nbsp;€，按半年累计，十月15日离职：七月1日至十月15日，184天中已过107天。1.500&nbsp;€
+        × 107/184 = 872,28&nbsp;€。
+      </p>
+      <p class="folio">
+        Art. <span>31</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-indemnizacion">{tx('guide.severance')}</h3>
+      <p>
+        补偿金按工资天数计算。日工资为年工资（含额外工资）除以365，与 CGPJ
+        指南的做法相同。在示例中，21.000&nbsp;€ / 365 ≈
+        57,53&nbsp;€。示例用精确数字相乘，不做四舍五入。解雇时，工龄按月计算，不足一个月的按一个完整的月计算。如果在
+        ERTE（临时停工或减时）期间被解雇，按 ERTE 之前的全额工资计算。
+      </p>
+      <div class="causes">
+        {causes.map(({ title, rule, citation, page }) => (
+          <div>
+            <h4>{page ? <a href={link(lang, LANDINGS[page].path.slice(1))}>{title}</a> : title}</h4>
+            <p>{rule}</p>
+            <p class="causes__citation">{citation}</p>
+          </div>
+        ))}
+      </div>
+      <p class="example">
+        <span class="example__label">不当解雇</span>{' '}
+        从2018年五月3日到2026年七月20日：98个完整月零几天，按99个月计。每年33天即每月2,75天：99 ×
+        2,75 = 272,25天。21.000&nbsp;€ × 272,25 / 365 = 15.663,70&nbsp;€。
+      </p>
+      <p class="example">
+        <span class="example__label">客观原因解雇</span> 日期相同：99 × 20/12 = 165天。21.000&nbsp;€
+        × 165 / 365 = 9.493,15&nbsp;€。
+      </p>
+      <p class="example">
+        <span class="example__label">定期合同到期</span>{' '}
+        合同为期一年，从2025年十月1日到2026年九月30日：365天 × 12/365 = 12天。21.000&nbsp;€ × 12 /
+        365 = 690,41&nbsp;€。
+      </p>
+      <p class="folio">
+        Art. <span>49 · 51 · 53 · 56</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-2012">{tx('guide.before_2012')}</h3>
+      <p>如果被不当解雇的合同签订于2012年二月12日之前，补偿金分两段计算：</p>
+      <ul>
+        <li>截至2012年二月11日：每年45天（每月3,75天）。</li>
+        <li>自2012年二月12日起：每年33天（每月2,75天）。</li>
+      </ul>
+      <p>
+        总数上限为720天，除非第一段已经超过这个数。这种情况下只计第一段，最多42个月工资（1.260天）。
+      </p>
+      <p>
+        2012年二月12日之前签订的促进无固定期限雇用合同（contratos de fomento de la contratación
+        indefinida），在客观原因解雇时，补偿金按签订时适用的法规计算；在纪律解雇时，按上述两段计算（apartado
+        3）。本核查不区分这类合同。
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span>{' '}
+        从2010年三月1日到2026年九月15日。第一段：24个月 × 3,75 = 90天。第二段：176个月 × 2,75 =
+        484天。合计：574天。21.000&nbsp;€ × 574 / 365 = 33.024,66&nbsp;€。
+      </p>
+      <p class="folio">
+        Disposición transitoria <span>11.ª</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-antiguedad">{tx('guide.by_seniority')}</h3>
+      <p>
+        离职结算是当年和最后一个月累计的金额，所以合同满一年后就不再增长。而补偿金随每个工作月增长，并取决于原因。
+      </p>
+      <FigureTable id="g-antiguedad-tabla" label={tx('guide.by_seniority')}>
+        <Fragment slot="caption">
+          合同于2026年九月30日结束，每月税前1.500&nbsp;€，两笔各1.500&nbsp;€的额外工资按半年累计（夏季额外工资已领取），每年22个排班工作日的年假，一天都没有休。按欧元取整。
+        </Fragment>
+        <thead>
+          <tr>
+            <th scope="col">工作时长</th>
+            <th scope="col">离职结算</th>
+            <th scope="col">
+              定期合同
+              <span class="figures-note">12天</span>
+            </th>
+            <th scope="col">
+              客观原因
+              <span class="figures-note">20天</span>
+            </th>
+            <th scope="col">
+              不当解雇
+              <span class="figures-note">33天</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {bySeniority.map(({ months, finalPay, fixedTermLimit, fixedTerm, objective, unfair }) => (
+            <tr>
+              <th scope="row">{spanLabel(months, lang)}</th>
+              <td>{wholeEuroRange(finalPay)}</td>
+              <td>
+                {fixedTerm === null ? '—' : wholeEuros(fixedTerm)}
+                {fixedTermLimit === 'sector_agreement' && <sup>1</sup>}
+                {fixedTermLimit === 'over' && <sup>2</sup>}
+              </td>
+              <td>{wholeEuros(objective)}</td>
+              <td>{wholeEuros(unfair)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </FigureTable>
+      <p>
+        离职结算包括九月的工资、年假和已累计的圣诞额外工资，并给出按天和按月两种算法之间的范围。其他三列是每种原因的补偿金，与离职结算分开计算：定期合同到期依据
+        art. 49.1.c ET，客观原因解雇依据 arts. 52 y 53.1.b ET，不当解雇依据 art. 56
+        ET。总额为补偿金与离职结算之和。
+      </p>
+      <p class="table-notes">
+        <sup>1</sup> 因生产情况签订的合同（por circunstancias de la
+        producción）最长6个月。只有在您的行业集体协议（convenio sectorial）延长期限时（art. 15.2
+        ET），或者是2021年十二月31日之前签订的工程或服务合同（obra o servicio）时（王室法令 Real
+        Decreto-ley 32/2021的 disposición transitoria 3.ª），才能达到一年。
+      </p>
+      <p class="table-notes">
+        <sup>2</sup>{' '}
+        因生产情况签订的合同不会持续这么久。2021年十二月31日之前签订的工程或服务合同最长3年，行业集体协议延长的最长4年（art.
+        15.1.a ET 原条文及 Real Decreto-ley 32/2021的 disposición transitoria
+        3.ª），所以这样工龄的合同都不会在2026年九月结束。超过最长期限的定期合同可能成为无固定期限合同（art.
+        15.4 ET），这时合同终止就属于解雇。
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-propuesta">{tx('guide.proposal')}</h3>
+      <p>公司交给员工一份结算单草案。法律规定，员工可以在员工法定代表中的一人在场的情况下签署。</p>
+      <p>
+        有些人在不同意其中某项金额时，会注明“已收到，但不同意”（recibí no
+        conforme）后再签署。我们只是介绍这一做法。每种情况下怎么做，可以由劳动法律师事务所、社会事务师（graduado
+        social）事务所或工会来评估。
+      </p>
+      <p>
+        哪些会改变，哪些不会：
+        <CaseLink lang={lang} id="not_agreed" />。
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-plazos">{tx('guide.deadlines')}</h3>
+      <p>
+        对于未付工资、年假、额外工资或定期合同到期补偿金等款项，主张期限为一年（art. 59.1
+        ET）。如果公司尚未支付，属于工资的部分按每年10&nbsp;%计算延迟利息（art. 29.3
+        ET）；补偿金则不计。
+      </p>
+      <p>
+        遇到解雇（客观原因解雇、集体裁员、不当解雇或纪律解雇）时，对解雇提出异议的期限为20个工作日（art.
+        59.3 ET）。不同意解雇补偿金的人，通常也通过同一途径、在这20天内提出。
+      </p>
+      <p>期限很短，劳动法律师事务所、社会事务师事务所或工会可以告诉您哪个期限适用于您的情况。</p>
+      <p class="folio">
+        Art. <span>29.3 · 59</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-no-revisa">{tx('guide.unchecked')}</h3>
+      <ul>
+        {unchecked.map((text) => (
+          <li>{text}</li>
+        ))}
+      </ul>
+      <p>
+        年假和额外工资与法定最低标准对比，并给出按天和按月两种算法之间的范围；您的集体协议可以提高这些数字。只有在缺少某项数据就无法得出法定金额时，才会显示“无法核查”，例如主动辞职的提前通知期，或您已休的年假天数。
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-paro">{tx('guide.benefit')}</h2>
+      <p>
+        合同结束时，除了离职结算，还可能有失业金（paro），即缴费型失业金。要领取失业金，合同必须在法定失业状态（situación
+        legal de desempleo）下结束，这取决于原因：
+      </p>
+      <ul>
+        <li>
+          客观原因解雇、集体裁员、不当解雇或纪律解雇属于法定失业状态（art. 267.1.a
+          LGSS）。纪律解雇即使被判定为正当解雇或没有提出异议，也同样属于（art. 268.4 LGSS）。
+        </li>
+        <li>定期合同到期也属于，除非是您自己终止的（art. 267.1.a.6.º LGSS）。</li>
+        <li>
+          主动辞职不属于（art. 267.2.a
+          LGSS），除非您是因为以下原因离职：调岗异地、对您不利的工作条件重大变更（art. 41.3
+          ET）、公司严重违约（例如不付工资或反复拖欠工资），或性别暴力或性暴力（art. 267.1.a.5.º
+          LGSS）。
+        </li>
+      </ul>
+      <p>
+        此外，还需要在之前6年内有至少360天尚未用于其他失业金的失业保险缴费天数，可以累加多份工作（arts.
+        266.b y 269 LGSS）。还需要处于在保或视同在保状态，登记为求职者（demandante de
+        empleo），签署活动协议（acuerdo de actividad），并且未达到退休年龄（art. 266 LGSS）。
+      </p>
+      <p>
+        用您的数据计算并查看完整的标准表：
+        <CaseLink lang={lang} id="benefit" />。
+      </p>
+      <p class="folio">
+        Arts. <span>266 · 267 · 268.4</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-cuanto">{tx('guide.benefit_amount')}</h3>
+      <p>
+        计算基数（base reguladora）为最近180天失业保险缴费的平均值，不含加班（art. 270.1
+        LGSS）。前180天领取基数的70&nbsp;%，从第181天起领取60&nbsp;%（art. 270.2 LGSS）。
+      </p>
+      <p>
+        每月金额有最低和最高标准，取决于您需抚养的子女人数（art. 270.3
+        LGSS）。2026年，IPREM（公共收入多效指标）为600&nbsp;€，标准如下：
+      </p>
+      <ul>
+        <li>没有需抚养的子女：每月560&nbsp;€至1.225&nbsp;€。</li>
+        <li>一个：749&nbsp;€至1.400&nbsp;€。</li>
+        <li>两个或以上：749&nbsp;€至1.575&nbsp;€。</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span>{' '}
+        年收入21.000&nbsp;€时，基数为21.000&nbsp;€ / 12 =
+        1.750&nbsp;€每月。其70&nbsp;%为1.225&nbsp;€，正好是没有需抚养子女时的最高标准；60&nbsp;%为1.050&nbsp;€。
+      </p>
+      <p>
+        这些都是税前金额。其中要扣除基数的4,85&nbsp;%作为社会保障（Seguridad
+        Social）缴费，以及适用的 IRPF。本指南和本核查的数字以全日制为前提；非全日制的金额更低。
+      </p>
+      <p class="folio">
+        Art. <span>270</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-duracion">{tx('guide.benefit_duration')}</h3>
+      <p>取决于最近6年内尚未用于其他失业金的缴费天数（art. 269 LGSS）：</p>
+      <ul>
+        <li>缴费360至539天，失业金120天（4个月）。</li>
+        <li>
+          缴费每多180天，失业金增加60天（2个月）。540至719天为180天；720至899天为240天；以此类推。
+        </li>
+        <li>缴费2.160天起，达到最高的720天（24个月）。</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span>{' '}
+        缴费三年，即1.095天，失业金为360天（12个月）。
+      </p>
+      <p>
+        已支付但未休的年假也算作缴费天数（art. 269.4 LGSS）。每次入职、每次离职以及缴费天数都列在
+        <a href={workHistoryUrl} rel="noopener">
+          {tx('result.benefit_work_history_link')}
+        </a>
+        中。
+      </p>
+      <p class="folio">
+        Art. <span>269</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-plazo">{tx('guide.benefit_deadline')}</h3>
+      <p>
+        不登记为求职者就没有失业金（art. 266 LGSS）：您需要在所在自治区的就业服务机构登记，并向 SEPE
+        申请失业金。申请期限为合同结束后的15天内，按 SEPE
+        的标准为工作日（hábiles）。如果您的离职结算支付了未休年假，期限从这些年假天数结束时起算（art.
+        268.1 y 268.3 LGSS）。逾期申请的，失业金会扣除延迟的天数（art. 268.2 LGSS）。
+      </p>
+      <ul class="sources">
+        {benefitSources.map(({ citation, url, inForce }) => (
+          <li>
+            <a href={url}>{citation}</a>
+            <span class="sources__in-force">{inForce}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="folio">
+        Art. <span>268</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('guide.faq')}</h2>
+      <div class="faq-list">
+        {faqEntries(lang, { documents }).map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>
+
+<style>
+  .sheet--text .table-notes {
+    font-size: 0.875rem;
+  }
+</style>
