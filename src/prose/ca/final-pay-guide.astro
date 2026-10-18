@@ -1,0 +1,575 @@
+---
+// source: 169eec130c4d
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { faqEntries } from '../../content/faq';
+import { bySeniority, spanLabel } from '../../content/examples';
+import { wholeEuroRange, wholeEuros } from '../../content/format';
+import { LANDINGS, type LandingId } from '../../content/landings';
+import { ET, SOURCES, LGSS } from '../../engine/sources';
+import { DOCUMENTS } from '../../documents/config';
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+const tx = (key: Key) => t(lang, key);
+
+// The guide under the calculator of /finiquito/, in Spanish: headings and labels from the
+// dictionary, the prose, the rules and the worked examples here. Another language's guide is a
+// translated copy of this file in src/prose/<lang>/.
+const causes: { title: string; rule: string; citation: string; page?: LandingId }[] = [
+  {
+    title: tx('guide.unfair_dismissal'),
+    rule: '33 dies per any treballat, amb un límit de 24 mensualitats (720 dies).',
+    citation: 'Art. 56 ET',
+    page: 'unfair_dismissal',
+  },
+  {
+    title: tx('guide.objective_dismissal'),
+    rule: '20 dies per any, amb un límit de 12 mensualitats (360 dies, STS 651/2026). A més, 15 dies de preavís, i els que l’empresa no doni es paguen.',
+    citation: 'Art. 53 ET',
+    page: 'objective_dismissal',
+  },
+  {
+    title: tx('guide.collective_dismissal'),
+    rule: 'Com a mínim, el mateix que un acomiadament objectiu: 20 dies per any, amb un límit de 12 mensualitats, i 15 dies de preavís. L’acord de l’ERE el pot millorar; la revisió no el coneix i dona el mínim.',
+    citation: 'Art. 51.2, 51.4 i 53.1 ET',
+  },
+  {
+    title: tx('guide.fixed_term_end'),
+    rule: '12 dies per any, en proporció als dies treballats. Si va començar el 2011 o abans, 8 dies; el 2012, 9; el 2013, 10; el 2014, 11. Els contractes de substitució i els formatius no tenen indemnització, ni els signats abans del 4 de març de 2001. Si va durar més d’un any, 15 dies de preavís.',
+    citation: 'Art. 49.1.c ET i DT 8.ª',
+    page: 'fixed_term_end',
+  },
+  {
+    title: tx('guide.resignation'),
+    rule: 'Sense indemnització. Si el teu conveni fixa un preavís i no el dones, l’empresa pot descomptar els dies que faltin.',
+    citation: 'Art. 49.1.d ET',
+    page: 'resignation',
+  },
+  {
+    title: tx('guide.disciplinary_dismissal'),
+    rule: 'Sense indemnització si es declara procedent. Si es declara improcedent, es calcula com un acomiadament improcedent.',
+    citation: 'Art. 55.7 i 56 ET',
+  },
+];
+
+const unchecked = [
+  'El net: les retencions d’IRPF i les cotitzacions.',
+  'Plusos, complements, hores extraordinàries i comissions del teu conveni o del teu contracte.',
+  'Pagues extraordinàries a més de les dues ordinàries.',
+  'Si la causa de l’acomiadament està justificada, cosa que decideix un jutjat.',
+  'Els salaris de tramitació.',
+  'El que l’acord d’un ERE millori sobre el mínim legal.',
+];
+
+// The case pages, in the order of the map: the finiquito ones, then the pages on the benefit.
+const caseLinks: readonly LandingId[] = [
+  'resignation',
+  'unfair_dismissal',
+  'objective_dismissal',
+  'fixed_term_end',
+  'not_agreed',
+];
+
+// The same report the result links to.
+const workHistoryUrl =
+  'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
+const benefitSources = [
+  SOURCES.lgss267,
+  SOURCES.lgss268,
+  SOURCES.lgss269,
+  SOURCES.lgss270,
+  SOURCES.sepeAmounts,
+].map(({ citation, url, inForceSince, effectiveFrom }) => ({
+  citation,
+  url,
+  inForce: t(lang, effectiveFrom ? 'client.source.effective_from' : 'client.source.in_force', {
+    fecha: inForceSince.split('-').reverse().join('-'),
+  }),
+}));
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('guide.title')}
+    </h2>
+    <p class="guide__lead">
+      El que inclou una quitança i d’on surt cada xifra, amb el seu article. Els exemples fan servir
+      un salari de 1.500&nbsp;€ bruts al mes i dues pagues extraordinàries de 1.500&nbsp;€, que
+      sumen 21.000&nbsp;€ l’any.
+    </p>
+    <p class="guide__sources">
+      <span>{tx('guide.updated')}</span>
+      <span>
+        {tx('guide.sources')}: <a href={ET}>{tx('guide.source_et')}</a> ·{' '}
+        <a href={SOURCES.cgpjGuide.url}>{tx('guide.source_cgpj')}</a> ·{' '}
+        <a href={LGSS}>{tx('guide.source_lgss')}</a> ·{' '}
+        <a href={SOURCES.sepeAmounts.url}>{tx('guide.source_sepe')}</a>
+      </span>
+      <a href={link(lang, 'aviso-legal/')}>{tx('guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    <section class="sheet sheet--text">
+      <h3 id="g-que-lleva">{tx('guide.what_it_includes')}</h3>
+      <p>
+        Quan acaba el teu contracte, l’empresa et lliura una proposta del document de liquidació amb
+        les quantitats que t’ha de pagar (art. 49.2 ET). Aquesta és la quitança, i recull el que ja
+        has guanyat i encara no has cobrat:
+      </p>
+      <ul>
+        <li>El salari dels dies treballats de l’últim mes (art. 26 ET).</li>
+        <li>Les vacances meritades i no gaudides (art. 38 ET).</li>
+        <li>
+          La part meritada de les pagues extraordinàries, si no van prorratejades a la nòmina (art.
+          31 ET).
+        </li>
+        <li>Els dies de preavís que l’empresa no hagi donat, quan la llei ho exigeix.</li>
+      </ul>
+      <p>
+        Si el contracte acaba amb dret a indemnització, el document de liquidació també la pot
+        incloure, però legalment és una quantitat diferent de la quitança, amb les seves pròpies
+        regles i terminis. Totes les xifres són brutes, abans de retencions i cotitzacions.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-diferencia">{tx('guide.difference')}</h3>
+      <p>
+        La quitança et correspon sempre que s’acaba el contracte, també si te’n vas tu, perquè són
+        diners que ja has guanyat. La indemnització compensa el final del contracte i depèn de la
+        causa.
+      </p>
+      <p>
+        Una dimissió no genera indemnització (art. 49.1.d ET). Un acomiadament disciplinari declarat
+        procedent, tampoc (art. 55.7 ET); si es declara improcedent, es calcula com un acomiadament
+        improcedent.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 55.7</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-casos">{tx('guide.cases')}</h3>
+      <p>Cada causa té les seves pròpies regles. Les expliquem amb un exemple resolt:</p>
+      <ul>
+        {caseLinks.map((id) => (
+          <li>
+            <CaseLink lang={lang} id={id} />
+          </li>
+        ))}
+      </ul>
+      <p>
+        I per a l’atur, amb la seva pròpia pàgina: <CaseLink lang={lang} id="benefit" />.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-salario">{tx('guide.salary')}</h3>
+      <p>
+        Hi entren els dies treballats del mes en què acaba el contracte. El dia pot valer el teu
+        salari mensual dividit entre 30 (mes comercial) o entre els dies que té aquell mes (mes
+        natural). La revisió dona el marge entre els dos càlculs.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Baixa el 15 d’octubre:
+        1.500&nbsp;€ × 15/30 = 750,00&nbsp;€, o 1.500&nbsp;€ × 15/31 = 725,81&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>26</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-vacaciones">{tx('guide.holidays')}</h3>
+      <p>
+        Són com a mínim trenta dies naturals l’any (art. 38.1 ET). La revisió els pren com a 22
+        feiners de dilluns a divendres, 26 de dilluns a dissabte i 30 × dies / 7 amb una altra
+        setmana: són equivalències, no text de la llei. El teu conveni o el teu contracte en poden
+        donar més. Es meriten amb cada dia treballat, i a la quitança hi entren les d’aquest any que
+        no has gaudit. Moltes empreses les compten per mesos (2,5 dies per mes amb 30 l’any) en lloc
+        de per dies, i la revisió dona el marge entre els dos càlculs. Cada dia es paga entre el teu
+        salari mensual / 30 i el teu salari anual / 365.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Baixa el 15 d’octubre de 2026: 288
+        dies treballats en l’any. 30 × 288/365 = 23,67 dies meritats. Si n’has gaudit 15, en queden
+        uns 8,67: entre (30 × 288/365 − 15) × 1.500&nbsp;€/30 = 433,56&nbsp;€ i (30 × 288/365 − 15)
+        × 21.000&nbsp;€/365 = 498,89&nbsp;€.
+      </p>
+      <p>
+        Si has gaudit més dies dels meritats, que es pugui fer un descompte o no depèn del conveni.
+      </p>
+      <p class="folio">
+        Art. <span>38</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-pagas">{tx('guide.extra_pay')}</h3>
+      <p>
+        La llei fixa dues pagues extraordinàries l’any, i el conveni en fixa la quantia i com es
+        meriten. Si van prorratejades a la teva nòmina, ja les has cobrades mes a mes. Si no, hi
+        entra la part meritada des que va començar el seu període: semestral (de gener a juny i de
+        juliol a desembre) o anual (de juliol a juny la d’estiu, de gener a desembre la de Nadal).
+        Es pot comptar per dies o per mesos, i la revisió dona el marge entre els dos càlculs. Si
+        te’n vas el mes en què es cobra una paga (juny o juliol la d’estiu, desembre la de Nadal),
+        pot anar ja en aquella nòmina.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Paga de Nadal de 1.500&nbsp;€ amb
+        període semestral i baixa el 15 d’octubre: de l’1 de juliol al 15 d’octubre hi ha 107 de 184
+        dies. 1.500&nbsp;€ × 107/184 = 872,28&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>31</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-indemnizacion">{tx('guide.severance')}</h3>
+      <p>
+        Es compta en dies de salari. El salari diari és el teu salari anual, amb les pagues
+        extraordinàries, dividit entre 365, com fa la guia del CGPJ. En l’exemple, 21.000&nbsp;€ /
+        365 ≈ 57,53&nbsp;€. Els exemples multipliquen per la xifra exacta, sense arrodonir. En els
+        acomiadaments, el temps treballat es compta en mesos, i una fracció de mes compta com un mes
+        sencer. Si t’acomiaden durant un ERTE, es compta amb el salari complet d’abans de l’ERTE.
+      </p>
+      <div class="causes">
+        {causes.map(({ title, rule, citation, page }) => (
+          <div>
+            <h4>{page ? <a href={link(lang, LANDINGS[page].path.slice(1))}>{title}</a> : title}</h4>
+            <p>{rule}</p>
+            <p class="causes__citation">{citation}</p>
+          </div>
+        ))}
+      </div>
+      <p class="example">
+        <span class="example__label">Acomiadament improcedent</span> del 3 de maig de 2018 al 20 de
+        juliol de 2026: 98 mesos complets i uns dies, que compten com a 99. 33 dies per any són 2,75
+        per mes: 99 × 2,75 = 272,25 dies. 21.000&nbsp;€ × 272,25 / 365 = 15.663,70&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">Acomiadament objectiu</span> amb les mateixes dates: 99 × 20/12
+        = 165 dies. 21.000&nbsp;€ × 165 / 365 = 9.493,15&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">Final d’un contracte temporal</span> d’un any, de l’1 d’octubre
+        de 2025 al 30 de setembre de 2026: 365 dies × 12/365 = 12 dies. 21.000&nbsp;€ × 12 / 365 =
+        690,41&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 51 · 53 · 56</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-2012">{tx('guide.before_2012')}</h3>
+      <p>
+        En un acomiadament improcedent d’un contracte anterior al 12 de febrer de 2012, la
+        indemnització es calcula en dos trams:
+      </p>
+      <ul>
+        <li>Fins a l’11 de febrer de 2012: 45 dies per any (3,75 per mes).</li>
+        <li>Des del 12 de febrer de 2012: 33 dies per any (2,75 per mes).</li>
+      </ul>
+      <p>
+        El total té un límit de 720 dies, tret que el primer tram ja el superi. En aquest cas compta
+        només el primer tram, amb un màxim de 42 mensualitats (1.260 dies).
+      </p>
+      <p>
+        Els contractes de foment de la contractació indefinida signats abans del 12 de febrer de
+        2012 segueixen la norma amb què es van signar per a la indemnització per causes objectives;
+        en un acomiadament disciplinari, es calcula amb aquests dos trams (apartat 3). La revisió no
+        distingeix aquest tipus de contracte.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> De l’1 de març de 2010 al 15 de
+        setembre de 2026. Primer tram: 24 mesos × 3,75 = 90 dies. Segon tram: 176 mesos × 2,75 = 484
+        dies. Total: 574 dies. 21.000&nbsp;€ × 574 / 365 = 33.024,66&nbsp;€.
+      </p>
+      <p class="folio">
+        Disposició transitòria <span>11.ª</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-antiguedad">{tx('guide.by_seniority')}</h3>
+      <p>
+        La quitança és el que s’ha meritat en l’any i en l’últim mes, així que a partir d’un any de
+        contracte deixa de créixer. La indemnització, en canvi, creix amb cada mes treballat i depèn
+        de la causa.
+      </p>
+      <FigureTable id="g-antiguedad-tabla" label={tx('guide.by_seniority')}>
+        <Fragment slot="caption">
+          Contractes que acaben el 30 de setembre de 2026, amb 1.500&nbsp;€ bruts al mes, dues
+          pagues extraordinàries de 1.500&nbsp;€ per semestres (la d’estiu ja cobrada) i 22 dies
+          feiners de vacances l’any sense haver-ne gaudit cap. Arrodonit a l’euro.
+        </Fragment>
+        <thead>
+          <tr>
+            <th scope="col">Temps treballat</th>
+            <th scope="col">Quitança</th>
+            <th scope="col">
+              Temporal
+              <span class="figures-note">12 dies</span>
+            </th>
+            <th scope="col">
+              Objectiu
+              <span class="figures-note">20 dies</span>
+            </th>
+            <th scope="col">
+              Improcedent
+              <span class="figures-note">33 dies</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {bySeniority.map(({ months, finalPay, fixedTermLimit, fixedTerm, objective, unfair }) => (
+            <tr>
+              <th scope="row">{spanLabel(months, lang)}</th>
+              <td>{wholeEuroRange(finalPay)}</td>
+              <td>
+                {fixedTerm === null ? '—' : wholeEuros(fixedTerm)}
+                {fixedTermLimit === 'sector_agreement' && <sup>1</sup>}
+                {fixedTermLimit === 'over' && <sup>2</sup>}
+              </td>
+              <td>{wholeEuros(objective)}</td>
+              <td>{wholeEuros(unfair)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </FigureTable>
+      <p>
+        La quitança suma el salari de setembre, les vacances i la part meritada de la paga de Nadal,
+        amb el marge entre comptar per dies o per mesos. Les altres tres columnes són la
+        indemnització de cada causa, que va a part: art. 49.1.c ET en el final d’un contracte
+        temporal, arts. 52 i 53.1.b ET en l’acomiadament objectiu i art. 56 ET en l’improcedent. Si
+        vols el total, suma-la a la quitança.
+      </p>
+      <p class="table-notes">
+        <sup>1</sup> Un contracte per circumstàncies de la producció dura com a màxim 6 mesos.
+        Arriba a un any només si el teu conveni sectorial l’amplia (art. 15.2 ET), o en un contracte
+        d’obra o servei signat abans del 31 de desembre de 2021 (disposició transitòria 3.ª del Real
+        Decreto-ley 32/2021).
+      </p>
+      <p class="table-notes">
+        <sup>2</sup> Un contracte per circumstàncies de la producció no dura tant. Un d’obra o
+        servei signat abans del 31 de desembre de 2021 durava com a màxim 3 anys, o 4 si l’ampliava
+        el conveni sectorial (art. 15.1.a ET en la seva redacció anterior i disposició transitòria
+        3.ª del Real Decreto-ley 32/2021), així que cap no acaba el setembre de 2026 amb aquesta
+        antiguitat. Un contracte temporal que passa de la seva durada màxima pot ser indefinit (art.
+        15.4 ET), i llavors el seu final seria un acomiadament.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-propuesta">{tx('guide.proposal')}</h3>
+      <p>
+        L’empresa lliura una proposta del document de liquidació. La llei preveu que la persona
+        treballadora la pugui signar en presència d’algú de la representació legal de la plantilla.
+      </p>
+      <p>
+        Algunes persones signen indicant «rebut, no conforme» (recibí no conforme) quan no estan
+        d’acord amb alguna quantitat. Ho expliquem només com a informació. Què fer en cada cas ho
+        pot valorar un despatx laboralista, un despatx de graduat social o un sindicat.
+      </p>
+      <p>
+        El que canvia i el que no: <CaseLink lang={lang} id="not_agreed" />.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-plazos">{tx('guide.deadlines')}</h3>
+      <p>
+        Per a quantitats com el salari pendent, les vacances, les pagues extraordinàries o la
+        indemnització per final d’un contracte temporal, el termini és d’un any (art. 59.1 ET). Si
+        l’empresa encara no t’ha pagat, el que és salari porta un interès per demora del 10&nbsp;%
+        l’any (art. 29.3 ET); la indemnització, no.
+      </p>
+      <p>
+        En un acomiadament (objectiu, col·lectiu, improcedent o disciplinari), el termini per
+        impugnar-lo és de 20 dies hàbils (art. 59.3 ET). Qui no està d’acord amb la indemnització
+        d’un acomiadament sol plantejar-ho per aquesta mateixa via, dins d’aquests 20 dies.
+      </p>
+      <p>
+        El termini és curt, i un despatx laboralista, un despatx de graduat social o un sindicat et
+        poden dir quin s’aplica al teu cas.
+      </p>
+      <p class="folio">
+        Art. <span>29.3 · 59</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-no-revisa">{tx('guide.unchecked')}</h3>
+      <ul>
+        {unchecked.map((text) => (
+          <li>{text}</li>
+        ))}
+      </ul>
+      <p>
+        Les vacances i les pagues extraordinàries es comparen amb el mínim de la llei, amb el marge
+        entre el càlcul per dies i el càlcul per mesos; el teu conveni pot millorar aquestes xifres.
+        Només surt «no es pot comprovar» quan falta una dada sense la qual no hi ha xifra legal, com
+        el preavís d’una dimissió o els dies de vacances que has gaudit.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-paro">{tx('guide.benefit')}</h2>
+      <p>
+        Quan acaba un contracte, a més de la quitança hi pot haver atur, la prestació contributiva
+        per desocupació. Per cobrar-lo, el contracte ha d’acabar en una situació legal de
+        desocupació, i això depèn de la causa:
+      </p>
+      <ul>
+        <li>
+          Un acomiadament objectiu, col·lectiu, improcedent o disciplinari sí que ho és (art.
+          267.1.a LGSS). El disciplinari també compta encara que es declari procedent o no s’impugni
+          (art. 268.4 LGSS).
+        </li>
+        <li>
+          El final d’un contracte temporal sí, tret que l’haguessis acabat tu (art. 267.1.a.6.º
+          LGSS).
+        </li>
+        <li>
+          Una baixa voluntària no (art. 267.2.a LGSS), tret que te’n vagis per un trasllat, per una
+          modificació substancial de les teves condicions que et perjudiqui (art. 41.3 ET), per un
+          incompliment greu de l’empresa, com no pagar-te o pagar-te tard una vegada i una altra, o
+          per violència de gènere o sexual (art. 267.1.a.5.º LGSS).
+        </li>
+      </ul>
+      <p>
+        A més, calen almenys 360 dies cotitzats per desocupació en els 6 anys anteriors que no hagis
+        fet servir ja per a un altre atur, i hi poden sumar diverses feines (arts. 266.b i 269
+        LGSS). També cal estar d’alta o en situació assimilada, inscriure’t com a demandant
+        d’ocupació, subscriure l’acord d’activitat i no tenir l’edat de jubilació (art. 266 LGSS).
+      </p>
+      <p>
+        Per calcular-lo amb les teves dades i veure l’escala completa:{' '}
+        <CaseLink lang={lang} id="benefit" />.
+      </p>
+      <p class="folio">
+        Arts. <span>266 · 267 · 268.4</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-cuanto">{tx('guide.benefit_amount')}</h3>
+      <p>
+        La base és la mitjana del que s’ha cotitzat per desocupació en els últims 180 dies, sense
+        les hores extraordinàries (art. 270.1 LGSS). Es cobra el 70&nbsp;% de la base els primers
+        180 dies i el 60&nbsp;% des del dia 181 (art. 270.2 LGSS).
+      </p>
+      <p>
+        Cada mes té un mínim i un màxim segons els teus fills o filles a càrrec (art. 270.3 LGSS).
+        El 2026, amb l’IPREM a 600&nbsp;€, són aquests:
+      </p>
+      <ul>
+        <li>Sense fills o filles a càrrec, entre 560&nbsp;€ i 1.225&nbsp;€ al mes.</li>
+        <li>Amb un, entre 749&nbsp;€ i 1.400&nbsp;€.</li>
+        <li>Amb dos o més, entre 749&nbsp;€ i 1.575&nbsp;€.</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Amb 21.000&nbsp;€ l’any, la base
+        és 21.000&nbsp;€ / 12 = 1.750&nbsp;€ al mes. El 70&nbsp;% són 1.225&nbsp;€, just el màxim
+        sense fills o filles a càrrec, i el 60&nbsp;%, 1.050&nbsp;€.
+      </p>
+      <p>
+        Són xifres brutes. D’aquí es descompta un 4,85&nbsp;% de la base per a la Seguridad Social i
+        l’IRPF que correspongui. Les xifres d’aquesta guia i de la revisió suposen jornada completa;
+        amb jornada parcial són més baixes.
+      </p>
+      <p class="folio">
+        Art. <span>270</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-duracion">{tx('guide.benefit_duration')}</h3>
+      <p>
+        Depèn dels dies cotitzats en els últims 6 anys que no s’hagin fet servir per a un altre atur
+        (art. 269 LGSS):
+      </p>
+      <ul>
+        <li>De 360 a 539 dies cotitzats, 120 dies d’atur (4 mesos).</li>
+        <li>
+          Cada 180 dies cotitzats més sumen 60 dies d’atur (2 mesos). De 540 a 719 són 180 dies; de
+          720 a 899, 240; i així successivament.
+        </li>
+        <li>Des de 2.160 dies cotitzats, el màxim, 720 dies (24 mesos).</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Amb tres anys cotitzats, 1.095
+        dies, són 360 dies d’atur (12 mesos).
+      </p>
+      <p>
+        Les vacances pagades i no gaudides també compten com a cotitzades (art. 269.4 LGSS). Cada
+        alta, cada baixa i els dies cotitzats surten en un{' '}
+        <a href={workHistoryUrl} rel="noopener">
+          {tx('result.benefit_work_history_link')}
+        </a>
+        .
+      </p>
+      <p class="folio">
+        Art. <span>269</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-plazo">{tx('guide.benefit_deadline')}</h3>
+      <p>
+        Sense inscriure’t com a demandant d’ocupació no hi ha atur (art. 266 LGSS): et dones d’alta
+        al servei d’ocupació de la teva comunitat i demanes la prestació al SEPE. Es demana en els
+        15 dies següents al final del contracte, hàbils segons el SEPE. Si la teva quitança paga
+        vacances no gaudides, el termini compta des que acaben aquests dies (art. 268.1 i 268.3
+        LGSS). Demanar-la més tard resta de l’atur els dies de retard (art. 268.2 LGSS).
+      </p>
+      <ul class="sources">
+        {benefitSources.map(({ citation, url, inForce }) => (
+          <li>
+            <a href={url}>{citation}</a>
+            <span class="sources__in-force">{inForce}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="folio">
+        Art. <span>268</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('guide.faq')}</h2>
+      <div class="faq-list">
+        {faqEntries(lang, { documents }).map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>
+
+<style>
+  .sheet--text .table-notes {
+    font-size: 0.875rem;
+  }
+</style>
