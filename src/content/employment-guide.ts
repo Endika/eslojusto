@@ -75,8 +75,10 @@ interface GuideBlock {
 export const shortName = (norm: Pick<Norm, 'citation'>): string =>
   norm.citation.split(', de ')[0] ?? norm.citation;
 
-// «el Real Decreto 723/2026», «la Ley 1/2025».
-const withArticle = (name: string): string => `${name.startsWith('Ley') ? 'la' : 'el'} ${name}`;
+// «el Real Decreto 723/2026», «la Ley 1/2025» in Spanish; the name alone in another language, whose
+// sentence brings its own words around it.
+const withArticle = (name: string, lang: Lang): string =>
+  lang === 'es' ? `${name.startsWith('Ley') ? 'la' : 'el'} ${name}` : name;
 
 const lastDayOf = (norm: Norm): string | null =>
   norm.status === 'repealed' ? (norm.endUncertainUntil ?? norm.inForceUntil) : norm.inForceUntil;
@@ -154,10 +156,10 @@ export function normSentence(
   const clause =
     code === 'upcoming' || code === 'pending_validation'
       ? t(lang, `employment.guide.norm_clause_${code}`, {
-          norma: withArticle(name),
+          norma: withArticle(name, lang),
           desde: formatLongDay(norm.inForceSince, lang),
         })
-      : withArticle(name);
+      : withArticle(name, lang);
   return t(lang, key, { ...vars, norma: clause, desde: formatLongDay(norm.inForceSince, lang) });
 }
 
@@ -238,7 +240,7 @@ function currentYearSentence(
     mensual: euros(row.monthly),
     anual: euros(row.annual),
     doce: euros(twelvePayments(row)),
-    norma: withArticle(shortName(norms[row.norm])),
+    norma: withArticle(shortName(norms[row.norm]), lang),
     publicado: formatLongDay(row.publishedOn, lang),
     efectos: formatLongDay(row.effectsFrom, lang),
   });

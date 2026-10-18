@@ -1,8 +1,8 @@
 ---
-// source: 176e7bb53168
+// source: b433a07857b6
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, objective, severanceMonths } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, objective, severanceMonths } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -55,13 +55,13 @@ if (!severance || !notice || !salary || !holidays || !extraPay || unfair === nul
   </p>
   <ul>
     <li>
-      解雇补偿金：{euroRange(severance)}（{months}个月 × 20 / 12 ={' '}
+      解雇补偿金：{euroRange(severance, lang)}（{months}个月 × 20 / 12 ={' '}
       {String((months * 20) / 12).replace('.', ',')}天）。
     </li>
-    <li>未给的提前通知期：{euroRange(notice)}。</li>
-    <li>七月工资：{euroRange(salary)}。</li>
-    <li>未休年假：{euroRange(holidays)}。</li>
-    <li>自七月1日起累计的圣诞额外工资：{euroRange(extraPay)}。</li>
+    <li>未给的提前通知期：{euroRange(notice, lang)}。</li>
+    <li>七月工资：{euroRange(salary, lang)}。</li>
+    <li>未休年假：{euroRange(holidays, lang)}。</li>
+    <li>自七月1日起累计的圣诞额外工资：{euroRange(extraPay, lang)}。</li>
   </ul>
   <p class="example">
     <span class="example__label">如果被判定为不当解雇</span> 按相同日期，解雇补偿金将为

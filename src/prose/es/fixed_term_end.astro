@@ -1,8 +1,7 @@
 ---
 import FigureTable from '../../components/FigureTable.astro';
 import CaseLink from '../../components/CaseLink.astro';
-import { fixedTerms } from '../../content/examples';
-import { euroRange } from '../../content/format';
+import { euroRange, fixedTerms } from '../../content/examples';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -69,7 +68,7 @@ const { lang } = Astro.props;
               <span class="figures-note">solo si tu convenio sectorial lo amplía</span>
             )}
           </th>
-          <td>{severance ? euroRange(severance) : '—'}</td>
+          <td>{severance ? euroRange(severance, lang) : '—'}</td>
         </tr>
       ))}
     </tbody>

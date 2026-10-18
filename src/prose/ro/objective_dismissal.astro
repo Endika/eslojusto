@@ -1,8 +1,8 @@
 ---
-// source: 176e7bb53168
+// source: b433a07857b6
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, objective, severanceMonths } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, objective, severanceMonths } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -59,13 +59,13 @@ if (!severance || !notice || !salary || !holidays || !extraPay || unfair === nul
   </p>
   <ul>
     <li>
-      Indemnizația: {euroRange(severance)} ({months} luni × 20 / 12 ={' '}
+      Indemnizația: {euroRange(severance, lang)} ({months} luni × 20 / 12 ={' '}
       {String((months * 20) / 12).replace('.', ',')} zile).
     </li>
-    <li>Preavizul nedat: {euroRange(notice)}.</li>
-    <li>Salariul din iulie: {euroRange(salary)}.</li>
-    <li>Zilele de concediu neefectuat: {euroRange(holidays)}.</li>
-    <li>Plata de Crăciun acumulată de la 1 iulie: {euroRange(extraPay)}.</li>
+    <li>Preavizul nedat: {euroRange(notice, lang)}.</li>
+    <li>Salariul din iulie: {euroRange(salary, lang)}.</li>
+    <li>Zilele de concediu neefectuat: {euroRange(holidays, lang)}.</li>
+    <li>Plata de Crăciun acumulată de la 1 iulie: {euroRange(extraPay, lang)}.</li>
   </ul>
   <p class="example">
     <span class="example__label">Dacă ar fi declarată nejustificată</span> Cu aceleași date,

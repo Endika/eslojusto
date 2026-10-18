@@ -1,8 +1,8 @@
 ---
-// source: 176e7bb53168
+// source: b433a07857b6
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, objective, severanceMonths } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, objective, severanceMonths } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -58,13 +58,13 @@ if (!severance || !notice || !salary || !holidays || !extraPay || unfair === nul
   </p>
   <ul>
     <li>
-      التعويض: {euroRange(severance)} ({months} شهرًا × 20 / 12 ={' '}
+      التعويض: {euroRange(severance, lang)} ({months} شهرًا × 20 / 12 ={' '}
       {String((months * 20) / 12).replace('.', ',')} يوم).
     </li>
-    <li>الإشعار المسبق غير الممنوح: {euroRange(notice)}.</li>
-    <li>راتب يوليو: {euroRange(salary)}.</li>
-    <li>أيام الإجازة غير المستفاد منها: {euroRange(holidays)}.</li>
-    <li>الدفعة الإضافية لعيد الميلاد المتراكمة منذ 1 يوليو: {euroRange(extraPay)}.</li>
+    <li>الإشعار المسبق غير الممنوح: {euroRange(notice, lang)}.</li>
+    <li>راتب يوليو: {euroRange(salary, lang)}.</li>
+    <li>أيام الإجازة غير المستفاد منها: {euroRange(holidays, lang)}.</li>
+    <li>الدفعة الإضافية لعيد الميلاد المتراكمة منذ 1 يوليو: {euroRange(extraPay, lang)}.</li>
   </ul>
   <p class="example">
     <span class="example__label">إذا أُعلن أن الفصل غير مبرَّر</span> بالتواريخ نفسها، يكون التعويض{' '}

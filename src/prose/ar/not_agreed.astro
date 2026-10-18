@@ -1,7 +1,13 @@
 ---
-// source: c72414824687
-import { OFFERED_HOLIDAYS, itemRange, notAgreed } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+// source: 3387bbf43a04
+import { euroRange, itemRange, notAgreed, OFFERED_HOLIDAYS } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
 
 const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
 const range = itemRange(notAgreed, 'holiday_pay');
@@ -46,8 +52,8 @@ if (!holidays || !range || holidays.difference === null) throw new Error('Incomp
     اتفاقيته الجماعية. يدفع له العرض {euros(OFFERED_HOLIDAYS)} عن الإجازة.
   </p>
   <p class="example">
-    <span class="example__label">الإجازة</span> يبلغ الحد الأدنى القانوني {euroRange(range)}، بحسب
-    الحساب بالأيام أو بالأشهر. مقارنةً بـ{euros(OFFERED_HOLIDAYS)}، ينقص{' '}
+    <span class="example__label">الإجازة</span> يبلغ الحد الأدنى القانوني {euroRange(range, lang)}،
+    بحسب الحساب بالأيام أو بالأشهر. مقارنةً بـ{euros(OFFERED_HOLIDAYS)}، ينقص{' '}
     {euros(holidays.difference)} على الأقل.
   </p>
   <p>

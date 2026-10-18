@@ -1,9 +1,8 @@
 ---
-// source: fb74508032fd
+// source: df0ae511359a
 import FigureTable from '../../components/FigureTable.astro';
 import CaseLink from '../../components/CaseLink.astro';
-import { fixedTerms, spanLabel } from '../../content/examples';
-import { euroRange } from '../../content/format';
+import { euroRange, fixedTerms, spanLabel } from '../../content/examples';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -71,7 +70,7 @@ const { lang } = Astro.props;
               <span class="figures-note">فقط إذا مدّدت اتفاقيتك الجماعية القطاعية المدة</span>
             )}
           </th>
-          <td>{severance ? euroRange(severance) : '—'}</td>
+          <td>{severance ? euroRange(severance, lang) : '—'}</td>
         </tr>
       ))}
     </tbody>

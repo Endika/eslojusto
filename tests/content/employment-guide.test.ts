@@ -134,6 +134,15 @@ describe('the minimum wage in the guide', () => {
     expect(lines[1]?.status.status).toBe('con efectos hasta el 31-12-2025');
   });
 
+  it('names the decree with the Spanish article only in Spanish', () => {
+    expect(minimumWageSummary('es', MINIMUM_WAGE, EMPLOYMENT_NORMS, CHECKED).current).toContain(
+      'el Real Decreto 126/2026',
+    );
+    const { current } = minimumWageSummary('en', MINIMUM_WAGE, EMPLOYMENT_NORMS, CHECKED);
+    expect(current).toContain('Real Decreto 126/2026');
+    expect(current).not.toMatch(/\bel Real Decreto/);
+  });
+
   it('reads every figure from the table it is given', () => {
     const raised: MinimumWageTable = MINIMUM_WAGE.map((r) =>
       r.year === 2026 ? { ...r, monthly: 1300, annual: 18200, temporaryPerDay: 61.5 } : r,

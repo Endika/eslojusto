@@ -1,8 +1,8 @@
 ---
-// source: af62c96628b9
+// source: 506fdf4350ed
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, resignation } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, resignation } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -69,11 +69,11 @@ if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete
   </p>
   <ul>
     <li>
-      Salariul din octombrie: {euroRange(salary)}, în funcție de cum se socotește luna, cu 30 sau cu
-      31 de zile.
+      Salariul din octombrie: {euroRange(salary, lang)}, în funcție de cum se socotește luna, cu 30
+      sau cu 31 de zile.
     </li>
-    <li>Zilele de concediu neefectuat: {euroRange(holidays)}.</li>
-    <li>Plata de Crăciun acumulată din iulie: {euroRange(extraPay)}.</li>
+    <li>Zilele de concediu neefectuat: {euroRange(holidays, lang)}.</li>
+    <li>Plata de Crăciun acumulată din iulie: {euroRange(extraPay, lang)}.</li>
     <li>Indemnizația: {euros(0)}.</li>
     <li>Reținerea pentru lipsa preavizului: cel mult {euros(deduction.max)}.</li>
   </ul>

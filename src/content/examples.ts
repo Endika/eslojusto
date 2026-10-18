@@ -1,5 +1,6 @@
 import { t } from '../i18n';
 import type { Lang } from '../i18n/languages';
+import { formatEuros } from '../calculator/number';
 import { parseDate } from '../engine/date';
 import type { Range } from '../engine/money';
 import { reviewFinalPay, type EmployerFigures, type Review } from '../engine/review';
@@ -222,6 +223,12 @@ export const entitledByCause = CAUSES.map((cause) => ({
   cause,
   entitled: estimateBenefit(threeYears(cause), 0).entitled,
 }));
+
+// «750,00 €», or «entre 725,81 € y 750,00 €» in the page's words when the two counts differ.
+export const euroRange = (r: Range, lang: Lang): string =>
+  r.min === r.max
+    ? formatEuros(r.min)
+    : t(lang, 'client.range.between', { minimo: formatEuros(r.min), maximo: formatEuros(r.max) });
 
 // A table's span in the page's words: «6 meses», «1 año», «2 años»; in months only when asked.
 export const spanLabel = (months: number, lang: Lang, unit: 'months' | 'span' = 'span'): string =>

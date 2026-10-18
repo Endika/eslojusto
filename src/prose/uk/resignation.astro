@@ -1,8 +1,8 @@
 ---
-// source: af62c96628b9
+// source: 506fdf4350ed
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, resignation } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, resignation } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -69,11 +69,11 @@ if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete
   </p>
   <ul>
     <li>
-      Зарплата за жовтень: {euroRange(salary)}, залежно від того, чи рахувати місяць як 30 днів, чи
-      як 31.
+      Зарплата за жовтень: {euroRange(salary, lang)}, залежно від того, чи рахувати місяць як 30
+      днів, чи як 31.
     </li>
-    <li>Невикористана відпустка: {euroRange(holidays)}.</li>
-    <li>Різдвяна додаткова виплата, нарахована з липня: {euroRange(extraPay)}.</li>
+    <li>Невикористана відпустка: {euroRange(holidays, lang)}.</li>
+    <li>Різдвяна додаткова виплата, нарахована з липня: {euroRange(extraPay, lang)}.</li>
     <li>Вихідна допомога: {euros(0)}.</li>
     <li>Утримання за недотримання строку попередження: щонайбільше {euros(deduction.max)}.</li>
   </ul>

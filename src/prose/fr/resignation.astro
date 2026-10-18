@@ -1,8 +1,8 @@
 ---
-// source: af62c96628b9
+// source: 506fdf4350ed
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, resignation } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, resignation } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -69,10 +69,11 @@ if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete
   </p>
   <ul>
     <li>
-      Salaire d'octobre&nbsp;: {euroRange(salary)}, selon que le mois est compté sur 30 ou 31 jours.
+      Salaire d'octobre&nbsp;: {euroRange(salary, lang)}, selon que le mois est compté sur 30 ou 31
+      jours.
     </li>
-    <li>Congés non pris&nbsp;: {euroRange(holidays)}.</li>
-    <li>Prime de Noël acquise depuis juillet&nbsp;: {euroRange(extraPay)}.</li>
+    <li>Congés non pris&nbsp;: {euroRange(holidays, lang)}.</li>
+    <li>Prime de Noël acquise depuis juillet&nbsp;: {euroRange(extraPay, lang)}.</li>
     <li>Indemnité&nbsp;: {euros(0)}.</li>
     <li>Retenue pour le préavis non respecté&nbsp;: au maximum {euros(deduction.max)}.</li>
   </ul>

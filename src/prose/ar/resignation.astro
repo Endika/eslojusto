@@ -1,8 +1,8 @@
 ---
-// source: af62c96628b9
+// source: 506fdf4350ed
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, resignation } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, resignation } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -74,9 +74,9 @@ if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete
     الحاسبة:
   </p>
   <ul>
-    <li>راتب أكتوبر: {euroRange(salary)}، بحسب احتساب الشهر 30 يومًا أو 31.</li>
-    <li>أيام الإجازة غير المستفاد منها: {euroRange(holidays)}.</li>
-    <li>الدفعة الإضافية لعيد الميلاد المتراكمة منذ يوليو: {euroRange(extraPay)}.</li>
+    <li>راتب أكتوبر: {euroRange(salary, lang)}، بحسب احتساب الشهر 30 يومًا أو 31.</li>
+    <li>أيام الإجازة غير المستفاد منها: {euroRange(holidays, lang)}.</li>
+    <li>الدفعة الإضافية لعيد الميلاد المتراكمة منذ يوليو: {euroRange(extraPay, lang)}.</li>
     <li>التعويض: {euros(0)}.</li>
     <li>الخصم بسبب الإشعار المسبق غير المقدَّم: {euros(deduction.max)} كحد أقصى.</li>
   </ul>

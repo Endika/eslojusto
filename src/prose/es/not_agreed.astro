@@ -1,6 +1,12 @@
 ---
-import { OFFERED_HOLIDAYS, itemRange, notAgreed } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, notAgreed, OFFERED_HOLIDAYS } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
 
 const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
 const range = itemRange(notAgreed, 'holiday_pay');
@@ -45,8 +51,8 @@ if (!holidays || !range || holidays.difference === null) throw new Error('Incomp
     propuesta le paga {euros(OFFERED_HOLIDAYS)} de vacaciones.
   </p>
   <p class="example">
-    <span class="example__label">Vacaciones</span> El mínimo legal sale {euroRange(range)}, según se
-    cuente por días o por meses. Frente a {euros(OFFERED_HOLIDAYS)}, faltan al menos{' '}
+    <span class="example__label">Vacaciones</span> El mínimo legal sale {euroRange(range, lang)},
+    según se cuente por días o por meses. Frente a {euros(OFFERED_HOLIDAYS)}, faltan al menos{' '}
     {euros(holidays.difference)}.
   </p>
   <p>
