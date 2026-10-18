@@ -3041,7 +3041,7 @@ export const eu: Translation = {
   'client.employment.documents.check.end_before_start':
     'Irakurritako amaiera-dataren bat hasierakoa baino lehenagokoa da, kontratuan, nomina batean edo zure lan-bizitzan: berrikusi data horiek.',
   'client.employment.documents.check.payslip_not_whole_month':
-    'Nominaren batek ez du hilabete osoa hartzen: berrikusi nominen urratsean hilabete osoa lan egin zenuen.',
+    'Nominaren batek ez du hilabete osoa hartzen: berrikusi nominen urratsean hilabete osoa lan egin zenuen ala ez.',
   'client.employment.documents.check.payslip_lines_do_not_sum':
     'Nominaren batetik irakurritako sortzapenek ez dute haren sortutakoa guztira ematen: berrikusi nominen urratseko zifrak.',
   'client.employment.documents.check.hours_over_week':
@@ -3334,7 +3334,7 @@ export const eu: Translation = {
     'Igoera bat Kongresuak indargabetutako dekretu baten egunetan badago, berrikuspenak bi kalkuluak ematen ditu, eta ez du guztizkoari batzen. Baliozkotzeko zain dagoen arau baten araberakoa bada, biak ematen ditu, eta guztizkoak txikiena bakarrik batzen du.',
   'rental.guide.charges.title': 'Gastuak: komunitatea, IBI eta zaborrak',
   'rental.guide.charges.pact':
-    'Jabeak eraikinaren gastu orokorrak edo kontagailurik gabeko zerbitzuak kobra diezazkizuke, baldin eta idatziz itundu bazenuten eta kontratuaren datako urteko zenbatekoa jaso bazenuten (art. 20.1 LAU). Zergek, hala nola IBIk, beren arau berezia dute, beherago.',
+    'Jabeak eraikinaren gastu orokorrak edo kontagailurik gabeko zerbitzuak soilik kobra diezazkizuke, baldin eta idatziz itundu bazenuten eta kontratuaren datako urteko zenbatekoa jaso bazenuten (art. 20.1 LAU). Zergek, hala nola IBIk, beren arau berezia dute, beherago.',
   'rental.guide.charges.increase':
     'Kontratuaren lehen bost urteetan, edo zazpietan jabea enpresa bat bada, gastu horiek, zergak izan ezik, urtean behin bakarrik igo daitezke, akordioz, eta inoiz ez errenta igo daitekeenaren bikoitza baino gehiago (art. 20.2 LAU; Real Decreto-ley 29/2026 arauak 20.3 zenbakia ematen dio).',
   'rental.guide.charges.meters':
@@ -5043,7 +5043,7 @@ export const eu: Translation = {
   'client.bills.calculation.exit.not_person':
     'Real Decreto 88/2026 arauaren araua pertsona baten izenean dauden kontratuetarako da.',
   'client.bills.calculation.exit.terms_unknown':
-    'Zure prezioa finkoa zen eta kontratua jada luzatu zen jakin gabe, ez da egiaztatzen.',
+    'Ez dakigunez zure prezioa finkoa zen ala ez, ezta kontratua jada luzatu zen ala ez ere, ez da egiaztatzen.',
   'client.bills.calculation.exit.not_fixed':
     'Prezio aldakorrarekin edo indexatuarekin, 2.0TD tarifa duen pertsona batek ez du penalizaziorik ordaintzen joateagatik.',
   'client.bills.calculation.exit.renewed':
