@@ -5700,7 +5700,7 @@ export const es = {
   'mortgage.agency.tax': 'Impuesto pagado por la gestoría',
   'mortgage.agency.registry': 'Registro pagado por la gestoría',
   'mortgage.agency.supplied_hint':
-    'Si su factura incluye esos pagos hechos por ti, sus importes. Si no, en blanco.',
+    'Si su factura incluye esos pagos hechos en tu nombre, sus importes. Si no, en blanco.',
   'mortgage.valuation.question': 'La tasación y el acta',
   'mortgage.valuation.total': 'Tasación',
   'mortgage.valuation.act': 'Acta notarial previa',

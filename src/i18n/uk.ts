@@ -5361,7 +5361,7 @@ export const uk: Translation = {
   'mortgage.agency.tax': 'Податок, сплачений агентством',
   'mortgage.agency.registry': 'Реєстрація, сплачена агентством',
   'mortgage.agency.supplied_hint':
-    'Якщо його рахунок містить ці платежі, здійснені за ваш рахунок, — їхні суми. Якщо ні, залиште порожнім.',
+    'Якщо його рахунок містить ці платежі, здійснені від вашого імені, — їхні суми. Якщо ні, залиште порожнім.',
   'mortgage.valuation.question': 'Оцінка і протокол',
   'mortgage.valuation.total': 'Оцінка',
   'mortgage.valuation.act': 'Попередній нотаріальний протокол',
