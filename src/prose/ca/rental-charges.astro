@@ -1,0 +1,85 @@
+---
+// source: 8e819e81fa1a
+import { NORMS } from '../../engine/rental/data/norms';
+import { chargesExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros, formatLongDay } from '../../content/rent-indices';
+import { t } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pageDecree } = rentalPagesCopy(lang);
+
+const ex = chargesExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="pacto">
+  <h2 id="pacto">Només amb un pacte per escrit i el seu import anual</h2>
+  <p>
+    El propietari només et pot cobrar les despeses generals de l’edifici o els serveis sense
+    comptador si ho vau pactar per escrit i amb el seu import anual a la data del contracte (art.
+    20.1 LAU). Els tributs, com l’IBI, tenen la seva regla a part: mira «L’IBI i les taxes» més
+    avall.
+  </p>
+  <p>
+    Si el contracte no les esmenta o no dona un import anual, la revisió ho assenyala perquè ho
+    miris.
+  </p>
+  <p>{pageDecree('charges', 'rental.page.charges.community')}</p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="subida">
+  <h2 id="subida">Quant poden pujar: fins al doble que la renda</h2>
+  <p>
+    En els cinc primers anys de contracte, o set si el propietari és una empresa, aquestes despeses,
+    excepte els tributs, només poden pujar una vegada l’any, per acord, i mai més del doble del que
+    pot pujar la renda (art. 20.3 LAU, o art. 20.2 en els contractes anteriors al Real Decreto-ley
+    29/2026). La revisió compara cada despesa de cada any amb aquest límit.
+  </p>
+  <p class="folio">
+    Art. <span>20.3</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ibi">
+  <h2 id="ibi">L’IBI i les taxes</h2>
+  <p>{pageDecree('charges', 'rental.page.decree.taxes')}</p>
+  <p>
+    {t(lang, 'rental.guide.charges.taxes_before', {
+      desde: formatLongDay(NORMS.rdl29_2026.inForceSince, lang),
+    })}
+  </p>
+  <p class="folio">
+    Art. <span>20.1</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Exemple resolt</h2>
+  <p>
+    Un contracte fixa {formatEuros(ex.agreed)} l’any de comunitat. El primer any, el propietari
+    cobra {formatEuros(ex.charged)}.
+  </p>
+  <p class="example">
+    <span class="example__label">El càlcul</span> Encara no hi ha pogut haver cap pujada, així que
+    el màxim és el que es va pactar, {formatEuros(ex.agreed)}. {formatEuros(ex.charged)} −{' '}
+    {formatEuros(ex.agreed)} = {formatEuros(ex.over)} de més.
+  </p>
+  <p class="folio">
+    Art. <span>20</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Comprova el que et cobren</h2>
+  <p>
+    La <a href={href(REVIEW.path)}>revisió del lloguer</a> compara cada despesa de cada any amb el
+    que es va pactar i amb el límit de pujada, i et diu quant has pagat de més.
+  </p>
+</section>

@@ -1,0 +1,112 @@
+---
+// source: 497baf7f9449
+import { LEGAL_INTEREST } from '../../engine/law/data/legal-interest';
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositReturnExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatDay, formatEuros, formatRate } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositReturnExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+const [first, second] = ex.stretches;
+if (!first || !second) throw new Error('The example spans a year change.');
+const table = LEGAL_INTEREST[0]?.url;
+---
+
+<section class="sheet sheet--text" aria-labelledby="plazo">
+  <h2 id="plazo">El termini: un mes des que lliures les claus</h2>
+  <p>
+    Quan s’acaba el contracte i lliures les claus, el propietari té un mes per retornar-te la
+    fiança. Passat aquest mes, el que falti per retornar genera l’interès legal del diner (art. 36.4
+    LAU).
+  </p>
+  <p>
+    El mes es compta de data a data: si lliures les claus el 15 de novembre, el termini s’acaba el
+    15 de desembre i l’interès corre des del dia 16. Corre fins al dia en què et retornen els
+    diners, que ja no compta.
+  </p>
+  <p>
+    Quanta fiança et poden demanar des del principi:{' '}
+    <a href={href(RENTAL_PAGES.deposit.path)}>{RENTAL_PAGES.deposit.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="interes">
+  <h2 id="interes">Quin interès s’aplica</h2>
+  <p>
+    L’interès legal del diner. Cada any el fixa la Ley de Presupuestos Generales del Estado, i els
+    càlculs fan servir el tipus de l’any natural de cada dia. Els tipus de cada any són a la{' '}
+    <a href={table}>taula del Banco de España</a>.
+  </p>
+  <p>
+    L’any es pot comptar pels seus dies naturals (365, o 366 en un any de traspàs) o a 360 dies:
+    donem els dos càlculs.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Exemple resolt</h2>
+  <p>
+    Una persona amb {formatEuros(ex.deposit)} de fiança lliura les claus el dia{' '}
+    {formatDay(ex.keysReturnedOn)}. El propietari les accepta i li retorna la fiança sencera el dia{' '}
+    {formatDay(ex.returnedOn)}. El mes es va acabar el 15-12-2022, així que l’interès corre des del
+    dia {formatDay(ex.interestFrom)} i travessa el canvi d’any, amb el tipus de cadascun:
+  </p>
+  <ul>
+    <li>
+      Des de {formatDay(first.from)} fins a {formatDay(first.to)} ({first.days} dies) a un{' '}
+      {formatRate(first.rate)}: {formatEuros(first.interest)}.
+    </li>
+    <li>
+      Des de {formatDay(second.from)} fins a {formatDay(second.to)} ({second.days} dies) a un{' '}
+      {formatRate(second.rate)}: {formatEuros(second.interest)}.
+    </li>
+  </ul>
+  <p class="example">
+    <span class="example__label">El càlcul</span> Cada tram és la fiança pel tipus i pels dies,
+    entre 100 i entre {first.yearDays} dies de l’any: {formatEuros(ex.deposit)} ×{' '}
+    {formatRate(first.rate)} × {first.days} ÷ {first.yearDays} i {formatEuros(ex.deposit)} ×{' '}
+    {formatRate(second.rate)} × {second.days} ÷ {second.yearDays}. En total, {formatEuros(ex.total)}{' '}
+    d’interessos; si l’any es compta a 360 dies, {formatEuros(ex.totalCommercial)}.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="no-valoramos">
+  <h2 id="no-valoramos">El que no valorem</h2>
+  <p>
+    Si el propietari es queda una part de la fiança per desperfectes, neteja o altres conceptes, la
+    revisió anota cada descompte tal com te l’han donat i el resta del que falta per retornar. No
+    valora si està justificat ni quant costa una reparació.
+  </p>
+  <p>{pageDecree('deposit_return', 'rental.guide.return.closing')}</p>
+  <p class="folio">
+    Art. <span>36.7</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Calcula el que t’han de retornar</h2>
+  <p>
+    A la <a href={href(REVIEW.path)}>revisió del lloguer</a> escrius quan vas lliurar les claus,
+    quant t’han retornat i quan. Et dona el que falta de la fiança i l’interès, amb els dos càlculs
+    de l’any, i pot preparar una carta per demanar-ho.
+  </p>
+  <p>
+    {NORMS.lau.citation}: <a href={NORMS.lau.url}>text consolidat al BOE</a>.
+  </p>
+</section>

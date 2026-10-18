@@ -1,0 +1,98 @@
+---
+// source: f63abb595478
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatEuros } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositExample();
+// Until the Congress votes the decree down, the insurance ban stands as pending.
+const banStands = NORMS.rdl29_2026.status !== 'repealed';
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+---
+
+<section class="sheet sheet--text" aria-labelledby="fianza-legal">
+  <h2 id="fianza-legal">La fiança: una mensualitat</h2>
+  <p>
+    La fiança és obligatòria i, en un lloguer d’habitatge, és d’una mensualitat de renda en
+    metàl·lic (art. 36.1 LAU).
+  </p>
+  <p>
+    Quan s’acabi el contracte i lliuris les claus, te l’han de retornar en un mes:{' '}
+    <a href={href(RENTAL_PAGES.deposit_return.path)}>{RENTAL_PAGES.deposit_return.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.1</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="garantia-adicional">
+  <h2 id="garantia-adicional">Altres garanties: fins a dues mensualitats més</h2>
+  <p>
+    A més de la fiança, el contracte pot demanar una altra garantia: més diners o un aval. En els
+    contractes signats des del 6 de març de 2019 de fins a cinc anys, o fins a set si el propietari
+    és una empresa, aquesta garantia addicional no pot passar de dues mensualitats de renda (art.
+    36.5 LAU).
+  </p>
+  <p>La revisió compara amb el límit els diners que vas pagar.</p>
+  {banStands && (
+    <p>
+      Segons el decret, el propietari ja no et pot exigir una assegurança d’impagament: ho explica
+      la <a href="#seguro">secció de l’assegurança</a>, més avall.
+    </p>
+  )}
+  <p class="folio">
+    Art. <span>36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="adelantado">
+  <h2 id="adelantado">Per avançat: una mensualitat</h2>
+  <p>Per avançat, el propietari no pot exigir més d’una mensualitat de renda (art. 17 LAU).</p>
+  <p class="folio">
+    Art. <span>17</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="seguro">
+  <h2 id="seguro">
+    {banStands
+      ? 'Assegurança d’impagament: el decret prohibeix exigir-te-la'
+      : 'Assegurança d’impagament'}
+  </h2>
+  <p>{pageDecree('deposit', 'rental.page.decree.insurance')}</p>
+  <p class="folio">
+    Art. <span>36.5</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Exemple resolt</h2>
+  <p>
+    Amb una renda fixada en {formatEuros(ex.rent)}, un propietari demana {formatEuros(ex.asked)} en
+    diners abans d’entrar: la fiança i garanties addicionals.
+  </p>
+  <p class="example">
+    <span class="example__label">El càlcul</span> La fiança és una mensualitat,{' '}
+    {formatEuros(ex.rent)}, i la garantia addicional pot ser de dues, {formatEuros(2 * ex.rent)}. El
+    màxim és {formatEuros(ex.allowed)}. Et demanen {formatEuros(ex.asked)}: {formatEuros(ex.over)}{' '}
+    per sobre del límit.
+  </p>
+  <p class="folio">
+    Art. <span>36.1 · 36.5</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Comprova el que t’han demanat</h2>
+  <p>
+    La <a href={href(REVIEW.path)}>revisió del lloguer</a> compara amb aquests límits la fiança, les
+    garanties i el pagament per avançat del teu contracte, i et diu quant passa de cada límit.
+  </p>
+</section>
