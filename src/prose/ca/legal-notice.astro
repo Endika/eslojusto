@@ -1,0 +1,274 @@
+---
+// source: b643a207932c
+import { t, type Key } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+import { DOCUMENTS } from '../../documents/config';
+import { PASS_DAYS, PASS_READS } from '../../documents/contract';
+import {
+  BILLS_BETA,
+  CREDIT_BETA,
+  EMPLOYMENT_BETA,
+  INSURANCE_BETA,
+  MORTGAGE_BETA,
+} from '../../content/sections';
+import { erteCopy } from '../../content/erte';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const tx = (key: Key, vars?: Record<string, string>) => t(lang, key, vars);
+
+const email = 'hola@eslojusto.es';
+// The owner's details (art. 10 LSSI), on every build: the duty covers the whole site.
+const owner = {
+  titular: tx('legal.owner_name'),
+  nif: tx('legal.owner_id'),
+  domicilio: tx('legal.owner_address'),
+};
+// The pass and its conditions exist only in a build with the documents API.
+const documents = DOCUMENTS !== null;
+const erteText = erteCopy(lang);
+---
+
+<div class="document__sheets">
+  <section class="sheet sheet--text">
+    <h2 id="al-quien">{tx('legal_notice.who')}</h2>
+    <p>
+      eslojusto.es és un projecte d’Endika Iglesias. Per a qualsevol consulta sobre el web, escriu a{' '}
+      <a href={`mailto:${email}`}>{email}</a>.
+    </p>
+    <p>{tx('legal_notice.owner')}</p>
+    <dl class="data-list" data-owner>
+      <div>
+        <dt>{tx('legal.owner_name_label')}</dt>
+        <dd>{owner.titular}</dd>
+      </div>
+      <div>
+        <dt>{tx('legal.owner_id_label')}</dt>
+        <dd>{owner.nif}</dd>
+      </div>
+      {owner.domicilio && (
+        <div>
+          <dt>{tx('legal.owner_address_label')}</dt>
+          <dd>{owner.domicilio}</dd>
+        </div>
+      )}
+      <div>
+        <dt>{tx('legal.owner_contact_label')}</dt>
+        <dd>
+          <a href={`mailto:${email}`}>{email}</a>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-que-hace">{tx('legal_notice.what_it_does')}</h2>
+    <p>
+      Compara les xifres de la teva quitança (finiquito) amb el mínim que fixa la llei, partida per
+      partida. Les fórmules segueixen l’Estatuto de los Trabajadores i la guia pràctica del CGPJ per
+      al càlcul d’indemnitzacions (v0.6, juliol de 2026), i cada xifra porta l’article d’on surt.
+    </p>
+    <p>
+      Quan una regla admet dos càlculs, dona el marge entre tots dos. El que el teu conveni
+      col·lectiu pot millorar, com més dies de vacances o una altra meritació de les pagues
+      extraordinàries, es compara amb el mínim de la llei i ho avisa. Quan falta una dada sense la
+      qual no hi ha xifra legal, com el preavís d’una dimissió, ho marca com a «no es pot comprovar»
+      en lloc de donar una xifra que no pot saber.
+    </p>
+    {documents && (
+      <p>
+        Si puges un document, un model d’IA en copia les dades al formulari. No calcula res: tu
+        confirmes cada dada abans de revisar, i les xifres les calcula la mateixa eina que quan les
+        escrius.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-no-hace">{tx('legal_notice.what_it_does_not')}</h2>
+    <ul>
+      <li>No és assessorament jurídic. Dona informació general sobre el que diu la llei.</li>
+      <li>
+        No coneix el teu conveni, ni revisa el net, els plusos, les hores extraordinàries o les
+        comissions.
+      </li>
+      <li>
+        No decideix si la causa d’un acomiadament està justificada. Això ho decideix un jutjat.
+      </li>
+      <li>No et diu què has de fer amb la teva quitança.</li>
+    </ul>
+    <p>
+      No substitueix un despatx laboralista, un despatx de graduat social o un sindicat, que poden
+      revisar el teu cas amb els teus documents i el teu conveni.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-alquiler">
+      {tx('legal_notice.rental')} <span class="beta">{tx('rental.beta')}</span>
+    </h2>
+    <p>{tx('legal_notice.rental.does')}</p>
+    <p>{tx('legal_notice.rental.pending')}</p>
+    <p>{tx('legal_notice.rental.does_not')}</p>
+    <p>
+      {tx('legal_notice.rental.beta')} <a href={`mailto:${email}`}>{email}</a>.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-contrato">
+      {tx('legal_notice.employment')}
+      {EMPLOYMENT_BETA && <span class="beta">{tx('employment.beta')}</span>}
+    </h2>
+    <p>{tx('legal_notice.employment.does')}</p>
+    <p>{tx('legal_notice.employment.does_not')}</p>
+    {EMPLOYMENT_BETA && (
+      <p>
+        {tx('legal_notice.employment.beta')} <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-hogar">
+      {tx('legal_notice.household')} <span class="beta">{tx('household.beta')}</span>
+    </h2>
+    <p>{tx('legal_notice.household.does')}</p>
+    <p>{tx('legal_notice.household.does_not')}</p>
+    <p>
+      {tx('legal_notice.household.beta')} <a href={`mailto:${email}`}>{email}</a>.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-financiacion">
+      {tx('legal_notice.credit')}
+      {CREDIT_BETA && <span class="beta">{tx('credit.beta')}</span>}
+    </h2>
+    <p>{tx('legal_notice.credit.does')}</p>
+    <p>{tx('legal_notice.credit.does_not')}</p>
+    {CREDIT_BETA && (
+      <p>
+        {tx('legal_notice.credit.beta')} <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-seguros">
+      {tx('legal_notice.insurance')}
+      {INSURANCE_BETA && <span class="beta">{tx('insurance.beta')}</span>}
+    </h2>
+    <p>{tx('legal_notice.insurance.does')}</p>
+    <p>{tx('legal_notice.insurance.does_not')}</p>
+    {INSURANCE_BETA && (
+      <p>
+        {tx('legal_notice.insurance.beta')} <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-hipoteca">
+      {tx('legal_notice.mortgage')}
+      {MORTGAGE_BETA && <span class="beta">{tx('mortgage.beta')}</span>}
+    </h2>
+    <p>{tx('legal_notice.mortgage.does')}</p>
+    <p>{tx('legal_notice.mortgage.does_not')}</p>
+    {MORTGAGE_BETA && (
+      <p>
+        {tx('legal_notice.mortgage.beta')} <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-facturas">
+      {tx('legal_notice.bills')}
+      {BILLS_BETA && <span class="beta">{tx('bills.beta')}</span>}
+    </h2>
+    <p>{tx('legal_notice.bills.does')}</p>
+    <p>{tx('legal_notice.bills.does_not')}</p>
+    {BILLS_BETA && (
+      <p>
+        {tx('legal_notice.bills.beta')} <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="al-erte">
+      {erteText.legal.title} <span class="beta">{erteText.page.beta}</span>
+    </h2>
+    <p>{erteText.legal.does}</p>
+    <p>{erteText.legal.doesNot}</p>
+    <p>
+      {erteText.legal.beta} <a href={`mailto:${email}`}>{email}</a>.
+    </p>
+  </section>
+
+  {documents && (
+    <section class="sheet sheet--text">
+      <h2 id="condiciones">{tx('legal_notice.conditions')}</h2>
+      <p>
+        {tx('legal_notice.seller', owner)}{' '}
+        {owner.domicilio && <>{tx('legal_notice.seller_address', owner)} </>} Per a qualsevol dubte
+        sobre una compra, escriu a <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+      <ul>
+        <li>
+          Què compres: un passi digital que dura {PASS_DAYS} dies des del pagament i només val al
+          navegador amb què pagues. En aquest temps pots refer o corregir la teva revisió, llegir
+          fins a {PASS_READS} paquets de documents i descarregar, tantes vegades com vulguis i sense
+          tornar a pagar, un informe en PDF amb la revisió de la teva quitança i una plantilla de
+          carta «rebut, no conforme» (recibí no conforme), amb les teves xifres si falta alguna
+          cosa. L’informe i la carta es generen al teu dispositiu amb les dades de la teva revisió,
+          que no desem enlloc.
+        </li>
+        <li>{tx('legal_notice.rental.pass', { dias: String(PASS_DAYS) })}</li>
+        <li>{tx('legal_notice.employment.pass', { dias: String(PASS_DAYS) })}</li>
+        <li>{tx('legal_notice.mortgage.pass', { dias: String(PASS_DAYS) })}</li>
+        <li>{tx('legal_notice.bills.pass', { dias: String(PASS_DAYS) })}</li>
+        <li>
+          On val: el passi només es desa en aquest navegador. En un altre dispositiu, en una
+          finestra privada o si esborres les dades de navegació, es perd.
+        </li>
+        <li>
+          Preu: 4,99 € amb l’IVA inclòs. Un sol pagament amb targeta o Bizum a la pàgina de Stripe,
+          sense subscripció ni cobraments posteriors.
+        </li>
+        <li>
+          Lliurament: immediat, en tornar del pagament; llavors es descarreguen l’informe i la
+          carta. Si no veus les descàrregues, «Ja has pagat?» al resultat recupera el passi, però
+          només al navegador amb què vas pagar.
+        </li>
+        <li>
+          Desistiment: és contingut digital que es lliura a l’instant. Abans de pagar et demanem que
+          marquis que el vols rebre ja i que saps que així perds el dret de desistiment de 14 dies
+          (art. 103.m del text refós (texto refundido) de la Ley General para la Defensa de los
+          Consumidores y Usuarios).
+        </li>
+        <li>
+          Si alguna cosa falla, per exemple si no pots descarregar l’informe o se’t cobra dues
+          vegades, escriu a <a href={`mailto:${email}`}>{email}</a> i es retorna l’import que
+          correspongui.
+        </li>
+        <li>
+          L’informe dona informació general sobre la llei i no és assessorament jurídic. La carta és
+          una plantilla: fer-la servir o no és decisió teva.
+        </li>
+      </ul>
+    </section>
+  )}
+
+  <section class="sheet sheet--text">
+    <h2 id="al-errores">{tx('legal_notice.errors')}</h2>
+    <p>
+      Les indemnitzacions es contrasten amb casos calculats per la calculadora del CGPJ. Si veus una
+      xifra que no quadra amb la llei, pots escriure a <a href={`mailto:${email}`}>{email}</a>.
+    </p>
+  </section>
+</div>
