@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.86.0](https://github.com/Endika/eslojusto/compare/v1.85.2...v1.86.0) (2026-10-18)
+
+
+### Features
+
+* **i18n:** translate the case pages' prose into Catalan ([eb50baf](https://github.com/Endika/eslojusto/commit/eb50baf13049e6a346f0acaedcfb7037819227a4))
+* **i18n:** translate the dictionary into Catalan, unpublished ([c0b3872](https://github.com/Endika/eslojusto/commit/c0b38725680faa1bfee72e95970c06c2214eb576))
+* **i18n:** translate the final pay guide into Catalan ([5b80350](https://github.com/Endika/eslojusto/commit/5b803500054d3e6fafb0ba889227d8a34d85f273))
+* **i18n:** translate the legal notice and the privacy page into Catalan ([153c8ed](https://github.com/Endika/eslojusto/commit/153c8ed2465a2bfbd233fa2c52a61c4fe9858c45))
+* **i18n:** translate the rental sections and the ERTE page into Catalan ([8390d7c](https://github.com/Endika/eslojusto/commit/8390d7c6997529d68dbd03274b6b706bca419b45))
+* **i18n:** translate the rental topics into Catalan ([0faaa89](https://github.com/Endika/eslojusto/commit/0faaa8999d26ed4b4f3e4ede666cd2fb108dad1d))
+
+
+### Bug Fixes
+
+* **i18n:** give the decree its article in Catalan ([80d5efa](https://github.com/Endika/eslojusto/commit/80d5efa71a168df484f7c261bd90be47002786f0))
+* **i18n:** say plainly which household severance reading gives the most ([e0c99fc](https://github.com/Endika/eslojusto/commit/e0c99fc27226dcce6e30b3195b92e25ae6ccf222))
+
 ## [1.85.2](https://github.com/Endika/eslojusto/compare/v1.85.1...v1.85.2) (2026-10-18)
 
 
