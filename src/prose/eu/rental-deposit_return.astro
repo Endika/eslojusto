@@ -1,0 +1,113 @@
+---
+// source: 497baf7f9449
+import { LEGAL_INTEREST } from '../../engine/law/data/legal-interest';
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositReturnExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatDay, formatEuros, formatRate } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositReturnExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+const [first, second] = ex.stretches;
+if (!first || !second) throw new Error('The example spans a year change.');
+const table = LEGAL_INTEREST[0]?.url;
+---
+
+<section class="sheet sheet--text" aria-labelledby="plazo">
+  <h2 id="plazo">Epea: hilabete bat, giltzak ematen dituzunetik</h2>
+  <p>
+    Kontratua amaitu eta giltzak ematen dituzunean, jabeak hilabete du fidantza itzultzeko. Hilabete
+    hori igarota, itzultzeko falta denak diruaren legezko interesa sortzen du (art. 36.4 LAU).
+  </p>
+  <p>
+    Hilabetea datatik datara zenbatzen da: giltzak azaroaren 15ean ematen badituzu, epea abenduaren
+    15ean amaitzen da, eta interesa 16tik aurrera sortzen da. Dirua itzultzen dizuten egunera arte
+    sortzen da, eta egun hori ez da zenbatzen.
+  </p>
+  <p>
+    Hasieratik zenbat fidantza eska diezazuketen:{' '}
+    <a href={href(RENTAL_PAGES.deposit.path)}>{RENTAL_PAGES.deposit.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="interes">
+  <h2 id="interes">Zer interes aplikatzen den</h2>
+  <p>
+    Diruaren legezko interesa. Urtero Ley de Presupuestos Generales del Estado legeak finkatzen du,
+    eta kalkuluek egun bakoitzari dagokion urte naturaleko tasa erabiltzen dute. Urte bakoitzeko
+    tasak <a href={table}>Banco de España erakundearen taulan</a> daude.
+  </p>
+  <p>
+    Urtea bere egun naturalen arabera zenbat daiteke (365, edo 366 bisurte batean) edo 360 egunekin:
+    bi kalkuluak ematen ditugu.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Adibide ebatzia</h2>
+  <p>
+    Pertsona batek, {formatEuros(ex.deposit)} fidantza duela, {formatDay(ex.keysReturnedOn)} datan
+    ematen ditu giltzak. Jabeak onartu egiten ditu, eta fidantza osoa itzultzen dio{' '}
+    {formatDay(ex.returnedOn)} datan. Hilabetea 15-12-2022an amaitu zen; beraz, interesa{' '}
+    {formatDay(ex.interestFrom)} datatik aurrera sortzen da, eta urte-aldaketa zeharkatzen du, urte
+    bakoitzaren tasarekin:
+  </p>
+  <ul>
+    <li>
+      {formatDay(first.from)} datatik {formatDay(first.to)} datara ({first.days} egun),{' '}
+      {formatRate(first.rate)} tasan: {formatEuros(first.interest)}.
+    </li>
+    <li>
+      {formatDay(second.from)} datatik {formatDay(second.to)} datara ({second.days} egun),{' '}
+      {formatRate(second.rate)} tasan: {formatEuros(second.interest)}.
+    </li>
+  </ul>
+  <p class="example">
+    <span class="example__label">Kalkulua</span> Tarte bakoitza fidantza bider tasa bider egunak da,
+    zati 100 eta zati urteko {first.yearDays} egun: {formatEuros(ex.deposit)} ×{' '}
+    {formatRate(first.rate)} × {first.days} ÷ {first.yearDays} eta {formatEuros(ex.deposit)} ×{' '}
+    {formatRate(second.rate)} × {second.days} ÷ {second.yearDays}. Guztira, interesak:{' '}
+    {formatEuros(ex.total)}; urtea 360 egunekin zenbatzen bada, {formatEuros(ex.totalCommercial)}.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="no-valoramos">
+  <h2 id="no-valoramos">Baloratzen ez duguna</h2>
+  <p>
+    Jabeak fidantzaren zati bat gordetzen badu kalteengatik, garbiketagatik edo beste kontzeptu
+    batzuengatik, berrikuspenak deskontu bakoitza eman dizuten bezala jasotzen du, eta itzultzeko
+    falta denari kentzen dio. Ez du baloratzen deskontua justifikatuta dagoen, ez eta konponketa
+    batek zenbat balio duen ere.
+  </p>
+  <p>{pageDecree('deposit_return', 'rental.guide.return.closing')}</p>
+  <p class="folio">
+    Art. <span>36.7</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Kalkulatu dagokizuna</h2>
+  <p>
+    <a href={href(REVIEW.path)}>Alokairuaren berrikuspenean</a>, giltzak noiz eman zenituen, zenbat
+    itzuli dizuten eta noiz idazten duzu. Fidantzatik falta dena eta interesa ematen dizkizu,
+    urtearen bi kalkuluekin, eta hori eskatzeko gutun bat presta dezake.
+  </p>
+  <p>
+    {NORMS.lau.citation}: <a href={NORMS.lau.url}>BOEko testu bateratua</a>.
+  </p>
+</section>
