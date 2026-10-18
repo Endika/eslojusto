@@ -1,0 +1,83 @@
+---
+// source: 5b2dfc6de32e
+import CaseLink from '../../components/CaseLink.astro';
+import { disciplinary, entitledByCause } from '../../content/examples';
+import { integer, wholeEuros } from '../../content/format';
+import { t } from '../../i18n';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+if (disciplinary.entitled !== 'yes' || disciplinary.figures === null)
+  throw new Error('Incomplete example');
+const { figures } = disciplinary;
+// The reasons are the calculator's own: the same sentence and article it shows in the result.
+const causes = entitledByCause.map(({ cause, entitled }) => ({
+  name: t(lang, `cause.${cause}`),
+  entitled,
+  reason: t(lang, `client.unemployment.reason.${cause}`),
+}));
+---
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-si">Si dá paro, aínda que sexa procedente</h3>
+  <p>
+    É unha dúbida frecuente, e a resposta está na lei: o despedimento é situación legal de
+    desemprego (art. 267.1.a.3.º LGSS), e para cobrar o paro non fai falta impugnalo (art. 268.4
+    LGSS). Dá igual que o despedimento sexa disciplinario e que se declare procedente.
+  </p>
+  <p>
+    O que si fai falta é o de sempre: 360 días cotizados nos últimos 6 anos, inscribirte como
+    demandante de emprego e subscribir o acordo de actividade, entre outros requisitos (art. 266
+    LGSS).
+  </p>
+  <p class="folio">
+    Arts. <span>267 · 268.4</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ceses">Que ceses dan paro</h3>
+  <div class="causes">
+    {causes.map(({ name, entitled, reason }) => (
+      <div>
+        <h4>{name}</h4>
+        <p>
+          <strong>{entitled === 'yes' ? 'Si dá paro.' : 'Non dá paro, agás excepcións.'}</strong>{' '}
+          {reason}
+        </p>
+      </div>
+    ))}
+  </div>
+  <p>
+    As excepcións da baixa voluntaria, como un traslado ou os impagamentos graves, están en{' '}
+    <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="pdd-ejemplo">Exemplo resolto</h3>
+  <p>
+    Unha persoa con 1.500&nbsp;€ brutos ao mes e dúas pagas extraordinarias de 1.500&nbsp;€ traballa
+    do 1 de xuño de 2022 ao 30 de setembro de 2026, sen fillos ou fillas ao cargo, e a empresa
+    despídea por motivos disciplinarios.
+  </p>
+  <p class="example">
+    <span class="example__label">O seu paro</span> Con {integer(disciplinary.contractDays)} días
+    cotizados correspóndenlle polo menos {integer(disciplinary.duration.days)} días de paro
+    {` (${integer(disciplinary.duration.days / 30)} meses)`}: uns{' '}
+    {wholeEuros(figures.firstStretch.min)} ao mes os primeiros 6 meses e uns{' '}
+    {wholeEuros(figures.secondStretch.min)} despois, en bruto. «Polo menos», porque outros traballos
+    dos últimos 6 anos poden sumar días.
+  </p>
+  <p>
+    Se o despedimento se declarase improcedente, ademais habería indemnización: explícase en{' '}
+    <CaseLink lang={lang} id="unfair_dismissal" />.
+  </p>
+</section>

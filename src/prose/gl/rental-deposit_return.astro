@@ -1,0 +1,111 @@
+---
+// source: 497baf7f9449
+import { LEGAL_INTEREST } from '../../engine/law/data/legal-interest';
+import { NORMS } from '../../engine/rental/data/norms';
+import { depositReturnExample, rentalPagesCopy } from '../../content/rental-pages';
+import { formatDay, formatEuros, formatRate } from '../../content/rent-indices';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { review: REVIEW, pages: RENTAL_PAGES, pageDecree } = rentalPagesCopy(lang);
+
+const ex = depositReturnExample();
+const href = (path: string) => link(lang, path.replace(/^\//, ''));
+const [first, second] = ex.stretches;
+if (!first || !second) throw new Error('The example spans a year change.');
+const table = LEGAL_INTEREST[0]?.url;
+---
+
+<section class="sheet sheet--text" aria-labelledby="plazo">
+  <h2 id="plazo">O prazo: un mes desde que entregas as chaves</h2>
+  <p>
+    Cando remata o contrato e entregas as chaves, o propietario ten un mes para devolverche a
+    fianza. Pasado ese mes, o que falte por devolver xera o xuro legal do diñeiro (art. 36.4 LAU).
+  </p>
+  <p>
+    O mes cóntase de data a data: se entregas as chaves o 15 de novembro, o prazo remata o 15 de
+    decembro e o xuro corre desde o 16. Corre ata o día en que che devolven o diñeiro, que xa non
+    conta.
+  </p>
+  <p>
+    Canta fianza che poden pedir desde o principio:{' '}
+    <a href={href(RENTAL_PAGES.deposit.path)}>{RENTAL_PAGES.deposit.name}</a>.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="interes">
+  <h2 id="interes">Que xuro se aplica</h2>
+  <p>
+    O xuro legal do diñeiro. Cada ano fíxao a Ley de Presupuestos Generales del Estado, e os
+    cálculos usan o tipo do ano natural de cada día. Os tipos de cada ano están na{' '}
+    <a href={table}>táboa do Banco de España</a>.
+  </p>
+  <p>
+    O ano pode contarse polos seus días naturais (365, ou 366 nun ano bisesto) ou a 360 días: damos
+    os dous cálculos.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="ejemplo">
+  <h2 id="ejemplo">Exemplo resolto</h2>
+  <p>
+    Unha persoa cunha fianza de {formatEuros(ex.deposit)} entrega as chaves o{' '}
+    {formatDay(ex.keysReturnedOn)}. O propietario acéptallas e devólvelle a fianza enteira o{' '}
+    {formatDay(ex.returnedOn)}. O mes rematou o 15-12-2022, así que o xuro corre desde o{' '}
+    {formatDay(ex.interestFrom)} e atravesa o cambio de ano, co tipo de cada un:
+  </p>
+  <ul>
+    <li>
+      Do {formatDay(first.from)} ao {formatDay(first.to)} ({first.days} días) ao{' '}
+      {formatRate(first.rate)}: {formatEuros(first.interest)}.
+    </li>
+    <li>
+      Do {formatDay(second.from)} ao {formatDay(second.to)} ({second.days} días) ao{' '}
+      {formatRate(second.rate)}: {formatEuros(second.interest)}.
+    </li>
+  </ul>
+  <p class="example">
+    <span class="example__label">As contas</span> Cada tramo é a fianza polo tipo e polos días,
+    entre 100 e entre {first.yearDays} días do ano: {formatEuros(ex.deposit)} ×{' '}
+    {formatRate(first.rate)} × {first.days} ÷ {first.yearDays} e {formatEuros(ex.deposit)} ×{' '}
+    {formatRate(second.rate)} × {second.days} ÷ {second.yearDays}. En total, {formatEuros(ex.total)}{' '}
+    de xuros; se o ano se conta a 360 días, {formatEuros(ex.totalCommercial)}.
+  </p>
+  <p class="folio">
+    Art. <span>36.4</span> LAU
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="no-valoramos">
+  <h2 id="no-valoramos">O que non valoramos</h2>
+  <p>
+    Se o propietario se queda con parte da fianza por desperfectos, limpeza ou outros conceptos, a
+    revisión anota cada desconto como cho deron e réstao do que falta por devolver. Non valora se
+    está xustificado nin canto custa un arranxo.
+  </p>
+  <p>{pageDecree('deposit_return', 'rental.guide.return.closing')}</p>
+  <p class="folio">
+    Art. <span>36.7</span> LAU · RDL 29/2026
+  </p>
+</section>
+
+<section class="sheet sheet--text" aria-labelledby="revision">
+  <h2 id="revision">Calcula o que che teñen que devolver</h2>
+  <p>
+    Na <a href={href(REVIEW.path)}>revisión do aluguer</a> escribes cando entregaches as chaves,
+    canto che devolveron e cando. Dáche o que falta da fianza e o xuro, cos dous cálculos do ano, e
+    pode preparar unha carta para pedilo.
+  </p>
+  <p>
+    {NORMS.lau.citation}: <a href={NORMS.lau.url}>texto consolidado no BOE</a>.
+  </p>
+</section>

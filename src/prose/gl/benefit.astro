@@ -1,0 +1,136 @@
+---
+// source: 854c3338933e
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { benefitBySalary } from '../../content/examples';
+import { euros, wholeEuros } from '../../content/format';
+import { BENEFIT_2026 } from '../../engine/unemployment';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const { minCap, maxCap } = BENEFIT_2026;
+const [, mid, high] = benefitBySalary;
+if (!mid || !high) throw new Error('Incomplete example');
+type Row = (typeof benefitBySalary)[number];
+const stretch = (b: Row, n: 0 | 1 | 2) => b.children[n] ?? { c1: 0, c2: 0 };
+// One row per figure, one column per salary, so the table fits a phone.
+const rows: readonly (readonly [string, (b: Row) => number])[] = [
+  ['Base reguladora', (b) => b.base],
+  ['Primeiros 180 días, sen fillos ou fillas', (b) => stretch(b, 0).c1],
+  ['Primeiros 180 días, cun fillo ou filla', (b) => stretch(b, 1).c1],
+  ['Primeiros 180 días, con dous ou máis', (b) => stretch(b, 2).c1],
+  ['Desde o día 181, sen fillos ou fillas', (b) => stretch(b, 0).c2],
+];
+---
+
+<section class="sheet sheet--text">
+  <h3 id="p-cuanto">O 70&nbsp;% e despois o 60&nbsp;%</h3>
+  <p>
+    O paro, a prestación contributiva por desemprego, calcúlase sobre a túa base reguladora: a media
+    do cotizado por desemprego nos últimos 180 días, sen as horas extraordinarias (art. 270.1 LGSS).
+    Cóbrase o 70&nbsp;% desa base os primeiros 180 días e o 60&nbsp;% desde o día 181 (art. 270.2
+    LGSS).
+  </p>
+  <p>
+    Cada mes ten un mínimo e un máximo segundo os teus fillos ou fillas ao cargo (art. 270.3 LGSS).
+    En 2026, co IPREM en {wholeEuros(BENEFIT_2026.monthlyIprem)}, son estes:
+  </p>
+  <ul>
+    <li>
+      Sen fillos ou fillas ao cargo, entre {wholeEuros(minCap[0])} e {wholeEuros(maxCap[0])} ao mes.
+    </li>
+    <li>
+      Cun, entre {wholeEuros(minCap[1])} e {wholeEuros(maxCap[1])}.
+    </li>
+    <li>
+      Con dous ou máis, entre {wholeEuros(minCap[1])} e {wholeEuros(maxCap[2])}.
+    </li>
+  </ul>
+  <p class="folio">
+    Art. <span>270</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-tabla">Canto se cobra de paro cunha nómina de 1.300, 1.500 ou 1.800&nbsp;€</h3>
+  <FigureTable id="p-tabla-titulo">
+    <Fragment slot="caption">
+      Paro bruto ao mes cun salario en 14 pagas iguais e xornada completa, en 2026, arredondado ao
+      euro como na calculadora.
+    </Fragment>
+    <thead>
+      <tr>
+        <th scope="col">Salario bruto ao mes</th>
+        {benefitBySalary.map(({ salary }) => (
+          <th scope="col">{wholeEuros(salary)}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(([label, value]) => (
+        <tr>
+          <th scope="row">{label}</th>
+          {benefitBySalary.map((b) => (
+            <td>{wholeEuros(value(b))}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </FigureTable>
+  <p>
+    A base sae do salario anual, coas pagas extraordinarias, entre 12: con 1.500&nbsp;€ en 14 pagas,
+    21.000&nbsp;€ / 12 = {euros(mid.base)}, e o seu 70&nbsp;% é xusto o máximo sen fillos ou fillas
+    ao cargo. Con 1.800&nbsp;€ a base é {euros(high.base)} e o seu 70&nbsp;% supera os máximos sen
+    fillos ou fillas e cun, polo que nestes casos se cobra o máximo.
+  </p>
+  <p>
+    Son cifras brutas. Delas descóntase un 4,85&nbsp;% da base para a Seguridad Social e o IRPF que
+    corresponda. Con xornada parcial as cifras son menores, e a calculadora non as dá.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-requisitos">Quen pode cobralo</h3>
+  <p>
+    O contrato ten que rematar nunha situación legal de desemprego: un despedimento ou o fin dun
+    contrato temporal que non remataches ti, por exemplo (art. 267 LGSS). Ademais cómpren polo menos
+    360 días cotizados nos últimos 6 anos, inscribirte como demandante de emprego e subscribir o
+    acordo de actividade, entre outros requisitos (art. 266 LGSS).
+  </p>
+  <ul>
+    <li>
+      Canto dura segundo o cotizado: <CaseLink lang={lang} id="benefit_duration" />.
+    </li>
+    <li>
+      Se marchas ti: <CaseLink lang={lang} id="benefit_resignation" />
+    </li>
+    <li>
+      Se te despiden por unha falta: <CaseLink lang={lang} id="benefit_disciplinary" />.
+    </li>
+  </ul>
+  <p>
+    Sen inscribirte como demandante de emprego non hai paro: dáste de alta no servizo de emprego da
+    túa comunidade e pídelo ao SEPE nos 15 días seguintes ao fin do contrato, ou ao fin das
+    vacacións non gozadas que che pague o finiquito (arts. 266 e 268 LGSS). Que sexan días hábiles
+    indícao o SEPE.
+  </p>
+  <p class="folio">
+    Arts. <span>266 · 267 · 268</span> LGSS
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="p-erte">Se estás nun ERTE</h3>
+  <p>
+    Un ERTE tamén pode dar dereito a paro mentres dura. Canto se cobra e se gasta o teu paro futuro
+    depende do tipo de ERTE:{' '}
+    <a href={link(lang, 'paro/erte/')}>calcula o teu paro durante un ERTE</a>.
+  </p>
+  <p class="folio">
+    Arts. <span>262 · 267</span> LGSS, DA <span>41.ª · 46.ª</span>
+  </p>
+</section>

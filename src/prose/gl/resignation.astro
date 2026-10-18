@@ -1,0 +1,92 @@
+---
+// source: c5540529f7c2
+import CaseLink from '../../components/CaseLink.astro';
+import { euroRange, itemRange, resignation } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const salary = itemRange(resignation, 'pending_salary');
+const holidays = itemRange(resignation, 'holiday_pay');
+const extraPay = itemRange(resignation, 'extra_pay');
+const deduction = itemRange(resignation, 'notice_deduction');
+if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete example');
+---
+
+<section class="sheet sheet--text">
+  <h3 id="bv-que-lleva">Que inclúe o finiquito por baixa voluntaria</h3>
+  <p>
+    Pedir a baixa voluntaria é dimitir: o contrato remata por decisión túa (art. 49.1.d ET). Aínda
+    que marches ti, a empresa ten que pagarche o que xa gañaches e non cobraches:
+  </p>
+  <ul>
+    <li>O salario dos días traballados do último mes (art. 26 ET).</li>
+    <li>As vacacións xeradas este ano e non gozadas (art. 38 ET).</li>
+    <li>
+      A parte xerada das pagas extraordinarias, se non van rateadas na túa nómina (art. 31 ET).
+    </li>
+  </ul>
+  <p>
+    O que non hai é indemnización: a dimisión non a xera (art. 49.1.d ET). Todas as cifras son
+    brutas, antes de retencións e cotizacións.
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d · 26 · 31 · 38</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-preaviso">O preaviso do teu convenio</h3>
+  <p>
+    Ao dimitir hai que avisar co preaviso que fixe o teu convenio ou o costume do lugar (art. 49.1.d
+    ET). Se o teu convenio o prevé e non o dás, a empresa pode descontar do finiquito os días que
+    falten, a razón do teu salario diario.
+  </p>
+  <p>
+    A calculadora pregúntache cantos días fixa o teu convenio e cantos deches, e dá o desconto
+    máximo. Se non sabes os do convenio, ese desconto sae como «non se pode comprobar».
+  </p>
+  <p class="folio">
+    Art. <span>49.1.d</span> ET
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-ejemplo">Exemplo resolto</h3>
+  <p>
+    Unha persoa con 1.500&nbsp;€ brutos ao mes e dúas pagas extraordinarias de 1.500&nbsp;€ que se
+    xeran por semestres traballa do 1 de marzo de 2023 ao 15 de outubro de 2026. Este ano gozou 10
+    dos seus 22 días laborables de vacacións. O seu convenio fixa 15 días de preaviso e marcha sen
+    dalos. Estas son as cifras da calculadora:
+  </p>
+  <ul>
+    <li>
+      Salario de outubro: {euroRange(salary, lang)}, segundo se conte o mes con 30 días ou con 31.
+    </li>
+    <li>Vacacións non gozadas: {euroRange(holidays, lang)}.</li>
+    <li>Paga de Nadal xerada desde xullo: {euroRange(extraPay, lang)}.</li>
+    <li>Indemnización: {euros(0)}.</li>
+    <li>Desconto polo preaviso non dado: como moito {euros(deduction.max)}.</li>
+  </ul>
+  <p class="example">
+    <span class="example__label">As contas</span> A marxe de cada partida sae de contar por días ou
+    por meses, como fan as empresas. O desconto son 15 días a {euros(deduction.max / 15)} ao día, o
+    maior dos dous salarios diarios: o mensual entre 30 e o anual entre 365.
+  </p>
+</section>
+
+<section class="sheet sheet--text">
+  <h3 id="bv-paro">E o paro</h3>
+  <p>
+    Unha baixa voluntaria non é situación legal de desemprego, así que, por regra xeral, non dá paro
+    (art. 267.2.a LGSS). Hai excepcións, como marchar por un traslado ou por impagamentos graves.
+    Explícanse en <CaseLink lang={lang} id="benefit_resignation" />.
+  </p>
+  <p class="folio">
+    Art. <span>267</span> LGSS
+  </p>
+</section>

@@ -1076,7 +1076,7 @@ export const gl: Translation = {
     'Na baixa voluntaria non hai indemnización, pero si vacacións, pagas e salario pendente. Calcula o teu finiquito e compárao co que che ofrecen.',
   'landing.resignation.h1': 'Finiquito por baixa voluntaria: canto che corresponde',
   'landing.resignation.lead':
-    'Se marchas por decisión propia, correspóndeche o que xa gañaches. Calcula o mínimo legal do teu finiquito por baixa voluntaria e compárao co que che ofrecen.',
+    'Se marchas por decisión propia, a empresa ten que pagarche o que xa gañaches. Calcula o mínimo legal do teu finiquito por baixa voluntaria e compárao co que che ofrecen.',
   'landing.resignation.guide_title': 'Que inclúe o finiquito por baixa voluntaria',
   'landing.resignation.faq.1.question': 'Teño dereito a finiquito se marcho da empresa?',
   'landing.resignation.faq.1.answer':

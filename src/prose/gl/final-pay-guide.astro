@@ -1,0 +1,566 @@
+---
+// source: 169eec130c4d
+import FigureTable from '../../components/FigureTable.astro';
+import CaseLink from '../../components/CaseLink.astro';
+import { faqEntries } from '../../content/faq';
+import { bySeniority, spanLabel } from '../../content/examples';
+import { wholeEuroRange, wholeEuros } from '../../content/format';
+import { LANDINGS, type LandingId } from '../../content/landings';
+import { ET, SOURCES, LGSS } from '../../engine/sources';
+import { DOCUMENTS } from '../../documents/config';
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+const tx = (key: Key) => t(lang, key);
+
+// The guide under the calculator of /finiquito/, in Spanish: headings and labels from the
+// dictionary, the prose, the rules and the worked examples here. Another language's guide is a
+// translated copy of this file in src/prose/<lang>/.
+const causes: { title: string; rule: string; citation: string; page?: LandingId }[] = [
+  {
+    title: tx('guide.unfair_dismissal'),
+    rule: '33 días por ano traballado, cun límite de 24 mensualidades (720 días).',
+    citation: 'Art. 56 ET',
+    page: 'unfair_dismissal',
+  },
+  {
+    title: tx('guide.objective_dismissal'),
+    rule: '20 días por ano, cun límite de 12 mensualidades (360 días, STS 651/2026). Ademais, 15 días de preaviso, e os que a empresa non dea páganse.',
+    citation: 'Art. 53 ET',
+    page: 'objective_dismissal',
+  },
+  {
+    title: tx('guide.collective_dismissal'),
+    rule: 'Como mínimo, o mesmo que un despedimento obxectivo: 20 días por ano, cun límite de 12 mensualidades, e 15 días de preaviso. O acordo do ERE pode melloralo; a revisión non o coñece e dá o mínimo.',
+    citation: 'Art. 51.2, 51.4 e 53.1 ET',
+  },
+  {
+    title: tx('guide.fixed_term_end'),
+    rule: '12 días por ano, en proporción aos días traballados. Se empezou en 2011 ou antes, 8 días; en 2012, 9; en 2013, 10; en 2014, 11. Os contratos de substitución e os formativos non teñen indemnización, nin os asinados antes do 4 de marzo de 2001. Se durou máis dun ano, 15 días de preaviso.',
+    citation: 'Art. 49.1.c ET e DT 8.ª',
+    page: 'fixed_term_end',
+  },
+  {
+    title: tx('guide.resignation'),
+    rule: 'Sen indemnización. Se o teu convenio fixa un preaviso e non o dás, a empresa pode descontar os días que falten.',
+    citation: 'Art. 49.1.d ET',
+    page: 'resignation',
+  },
+  {
+    title: tx('guide.disciplinary_dismissal'),
+    rule: 'Sen indemnización se se declara procedente. Se se declara improcedente, calcúlase como un despedimento improcedente.',
+    citation: 'Art. 55.7 e 56 ET',
+  },
+];
+
+const unchecked = [
+  'O neto: as retencións de IRPF e as cotizacións.',
+  'Pluses, complementos, horas extraordinarias e comisións do teu convenio ou do teu contrato.',
+  'Pagas extraordinarias ademais das dúas ordinarias.',
+  'Se a causa do despedimento está xustificada, algo que decide un xulgado.',
+  'Os salarios de tramitación.',
+  'O que o acordo dun ERE mellore sobre o mínimo legal.',
+];
+
+// The case pages, in the order of the map: the finiquito ones, then the pages on the benefit.
+const caseLinks: readonly LandingId[] = [
+  'resignation',
+  'unfair_dismissal',
+  'objective_dismissal',
+  'fixed_term_end',
+  'not_agreed',
+];
+
+// The same report the result links to.
+const workHistoryUrl =
+  'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/Informes+y+Certificados/201864';
+const benefitSources = [
+  SOURCES.lgss267,
+  SOURCES.lgss268,
+  SOURCES.lgss269,
+  SOURCES.lgss270,
+  SOURCES.sepeAmounts,
+].map(({ citation, url, inForceSince, effectiveFrom }) => ({
+  citation,
+  url,
+  inForce: t(lang, effectiveFrom ? 'client.source.effective_from' : 'client.source.in_force', {
+    fecha: inForceSince.split('-').reverse().join('-'),
+  }),
+}));
+---
+
+<article class="guide" data-tone="legal" aria-labelledby="guide-title">
+  <header class="guide__head">
+    <h2 class="guide__title" id="guide-title">
+      {tx('guide.title')}
+    </h2>
+    <p class="guide__lead">
+      O que leva un finiquito e de onde sae cada cifra, co seu artigo. Os exemplos usan un salario
+      de 1.500&nbsp;€ brutos ao mes e dúas pagas extraordinarias de 1.500&nbsp;€, que suman
+      21.000&nbsp;€ ao ano.
+    </p>
+    <p class="guide__sources">
+      <span>{tx('guide.updated')}</span>
+      <span>
+        {tx('guide.sources')}: <a href={ET}>{tx('guide.source_et')}</a> ·{' '}
+        <a href={SOURCES.cgpjGuide.url}>{tx('guide.source_cgpj')}</a> ·{' '}
+        <a href={LGSS}>{tx('guide.source_lgss')}</a> ·{' '}
+        <a href={SOURCES.sepeAmounts.url}>{tx('guide.source_sepe')}</a>
+      </span>
+      <a href={link(lang, 'aviso-legal/')}>{tx('guide.who')}</a>
+    </p>
+  </header>
+
+  <div class="guide__sheets">
+    <section class="sheet sheet--text">
+      <h3 id="g-que-lleva">{tx('guide.what_it_includes')}</h3>
+      <p>
+        Cando remata o teu contrato, a empresa entrégache unha proposta do documento de liquidación
+        coas cantidades que che ten que pagar (art. 49.2 ET). Ese é o finiquito, e recolle o que xa
+        gañaches e aínda non cobraches:
+      </p>
+      <ul>
+        <li>O salario dos días traballados do último mes (art. 26 ET).</li>
+        <li>As vacacións xeradas e non gozadas (art. 38 ET).</li>
+        <li>
+          A parte xerada das pagas extraordinarias, se non van rateadas na nómina (art. 31 ET).
+        </li>
+        <li>Os días de preaviso que a empresa non dese, cando a lei o esixe.</li>
+      </ul>
+      <p>
+        Se o contrato remata con dereito a indemnización, o documento de liquidación pode incluíla
+        tamén, pero legalmente é unha cantidade distinta do finiquito, coas súas propias regras e
+        prazos. Todas as cifras son brutas, antes de retencións e cotizacións.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-diferencia">{tx('guide.difference')}</h3>
+      <p>
+        O finiquito correspóndeche sempre que remata o contrato, tamén se marchas ti, porque é
+        diñeiro que xa gañaches. A indemnización compensa o fin do contrato e depende da causa.
+      </p>
+      <p>
+        Unha dimisión non xera indemnización (art. 49.1.d ET). Un despedimento disciplinario
+        declarado procedente, tampouco (art. 55.7 ET); se se declara improcedente, calcúlase como un
+        despedimento improcedente.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 55.7</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-casos">{tx('guide.cases')}</h3>
+      <p>Cada causa ten as súas propias regras. Explicámolas cun exemplo resolto:</p>
+      <ul>
+        {caseLinks.map((id) => (
+          <li>
+            <CaseLink lang={lang} id={id} />
+          </li>
+        ))}
+      </ul>
+      <p>
+        E para o paro, coa súa propia páxina: <CaseLink lang={lang} id="benefit" />.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-salario">{tx('guide.salary')}</h3>
+      <p>
+        Entran os días traballados do mes en que remata o contrato. O día pode valer o teu salario
+        mensual entre 30 (mes comercial) ou entre os días que ten ese mes (mes natural). A revisión
+        dá a marxe entre os dous cálculos.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Baixa o 15 de outubro:
+        1.500&nbsp;€ × 15/30 = 750,00&nbsp;€, ou 1.500&nbsp;€ × 15/31 = 725,81&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>26</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-vacaciones">{tx('guide.holidays')}</h3>
+      <p>
+        Son como mínimo trinta días naturais ao ano (art. 38.1 ET). A revisión tómaos como 22
+        laborables de luns a venres, 26 de luns a sábado e 30 × días / 7 con outra semana: son
+        equivalencias, non texto da lei. O teu convenio ou o teu contrato poden dar máis. Xéranse
+        con cada día traballado, e no finiquito entran as deste ano que non gozaches. Moitas
+        empresas cóntanas por meses (2,5 días por mes con 30 ao ano) en vez de por días, e a
+        revisión dá a marxe entre os dous cálculos. Cada día págase entre o teu salario mensual / 30
+        e o teu salario anual / 365.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Baixa o 15 de outubro de 2026: 288
+        días traballados no ano. 30 × 288/365 = 23,67 días xerados. Se gozaches 15, quedan uns 8,67
+        días: entre (30 × 288/365 − 15) × 1.500&nbsp;€/30 = 433,56&nbsp;€ e (30 × 288/365 − 15) ×
+        21.000&nbsp;€/365 = 498,89&nbsp;€.
+      </p>
+      <p>Se gozaches máis días dos xerados, que proceda ou non un desconto depende do convenio.</p>
+      <p class="folio">
+        Art. <span>38</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-pagas">{tx('guide.extra_pay')}</h3>
+      <p>
+        A lei fixa dúas pagas extraordinarias ao ano, e o convenio a súa contía e como se xeran. Se
+        van rateadas na túa nómina, xa as cobraches mes a mes. Se non, entra a parte xerada desde
+        que empezou o seu período: semestral (de xaneiro a xuño e de xullo a decembro) ou anual (de
+        xullo a xuño a de verán, de xaneiro a decembro a de Nadal). Pódese contar por días ou por
+        meses, e a revisión dá a marxe entre os dous cálculos. Se marchas no mes en que se cobra
+        unha paga (xuño ou xullo a de verán, decembro a de Nadal), pode ir xa nesa nómina.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Paga de Nadal de 1.500&nbsp;€ con
+        período semestral e baixa o 15 de outubro: do 1 de xullo ao 15 de outubro van 107 de 184
+        días. 1.500&nbsp;€ × 107/184 = 872,28&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>31</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-indemnizacion">{tx('guide.severance')}</h3>
+      <p>
+        Cóntase en días de salario. O salario diario é o teu salario anual, coas pagas
+        extraordinarias, entre 365, como fai a guía do CGPJ. No exemplo, 21.000&nbsp;€ / 365 ≈
+        57,53&nbsp;€. Os exemplos multiplican pola cifra exacta, sen arredondar. Nos despedimentos,
+        o tempo traballado cóntase en meses, e unha fracción de mes conta como un mes enteiro. Se te
+        despiden durante un ERTE, cóntase co salario completo de antes do ERTE.
+      </p>
+      <div class="causes">
+        {causes.map(({ title, rule, citation, page }) => (
+          <div>
+            <h4>{page ? <a href={link(lang, LANDINGS[page].path.slice(1))}>{title}</a> : title}</h4>
+            <p>{rule}</p>
+            <p class="causes__citation">{citation}</p>
+          </div>
+        ))}
+      </div>
+      <p class="example">
+        <span class="example__label">Despedimento improcedente</span> do 3 de maio de 2018 ao 20 de
+        xullo de 2026: 98 meses completos e uns días, que contan como 99. 33 días por ano son 2,75
+        por mes: 99 × 2,75 = 272,25 días. 21.000&nbsp;€ × 272,25 / 365 = 15.663,70&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">Despedimento obxectivo</span> coas mesmas datas: 99 × 20/12 =
+        165 días. 21.000&nbsp;€ × 165 / 365 = 9.493,15&nbsp;€.
+      </p>
+      <p class="example">
+        <span class="example__label">Fin dun contrato temporal</span> dun ano, do 1 de outubro de
+        2025 ao 30 de setembro de 2026: 365 días × 12/365 = 12 días. 21.000&nbsp;€ × 12 / 365 =
+        690,41&nbsp;€.
+      </p>
+      <p class="folio">
+        Art. <span>49 · 51 · 53 · 56</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-2012">{tx('guide.before_2012')}</h3>
+      <p>
+        Nun despedimento improcedente dun contrato anterior ao 12 de febreiro de 2012, a
+        indemnización calcúlase en dous tramos:
+      </p>
+      <ul>
+        <li>Ata o 11 de febreiro de 2012: 45 días por ano (3,75 por mes).</li>
+        <li>Desde o 12 de febreiro de 2012: 33 días por ano (2,75 por mes).</li>
+      </ul>
+      <p>
+        O total ten un límite de 720 días, agás que o primeiro tramo xa o supere. Nese caso conta só
+        o primeiro tramo, cun máximo de 42 mensualidades (1.260 días).
+      </p>
+      <p>
+        Os contratos de fomento da contratación indefinida asinados antes do 12 de febreiro de 2012
+        seguen a norma coa que se asinaron para a indemnización por causas obxectivas; nun
+        despedimento disciplinario, calcúlase con estes dous tramos (apartado 3). A revisión non
+        distingue ese tipo de contrato.
+      </p>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Do 1 de marzo de 2010 ao 15 de
+        setembro de 2026. Primeiro tramo: 24 meses × 3,75 = 90 días. Segundo tramo: 176 meses × 2,75
+        = 484 días. Total: 574 días. 21.000&nbsp;€ × 574 / 365 = 33.024,66&nbsp;€.
+      </p>
+      <p class="folio">
+        Disposición transitoria <span>11.ª</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-antiguedad">{tx('guide.by_seniority')}</h3>
+      <p>
+        O finiquito é o xerado no ano e no último mes, así que a partir dun ano de contrato deixa de
+        medrar. A indemnización, en cambio, medra con cada mes traballado e depende da causa.
+      </p>
+      <FigureTable id="g-antiguedad-tabla" label={tx('guide.by_seniority')}>
+        <Fragment slot="caption">
+          Contratos que rematan o 30 de setembro de 2026, con 1.500&nbsp;€ brutos ao mes, dúas pagas
+          extraordinarias de 1.500&nbsp;€ por semestres (a de verán xa cobrada) e 22 días laborables
+          de vacacións ao ano sen gozar ningún. Arredondado ao euro.
+        </Fragment>
+        <thead>
+          <tr>
+            <th scope="col">Tempo traballado</th>
+            <th scope="col">Finiquito</th>
+            <th scope="col">
+              Temporal
+              <span class="figures-note">12 días</span>
+            </th>
+            <th scope="col">
+              Obxectivo
+              <span class="figures-note">20 días</span>
+            </th>
+            <th scope="col">
+              Improcedente
+              <span class="figures-note">33 días</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {bySeniority.map(({ months, finalPay, fixedTermLimit, fixedTerm, objective, unfair }) => (
+            <tr>
+              <th scope="row">{spanLabel(months, lang)}</th>
+              <td>{wholeEuroRange(finalPay)}</td>
+              <td>
+                {fixedTerm === null ? '—' : wholeEuros(fixedTerm)}
+                {fixedTermLimit === 'sector_agreement' && <sup>1</sup>}
+                {fixedTermLimit === 'over' && <sup>2</sup>}
+              </td>
+              <td>{wholeEuros(objective)}</td>
+              <td>{wholeEuros(unfair)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </FigureTable>
+      <p>
+        O finiquito suma o salario de setembro, as vacacións e a parte xerada da paga de Nadal, coa
+        marxe entre contar por días ou por meses. As outras tres columnas son a indemnización de
+        cada causa, que vai á parte: art. 49.1.c ET no fin dun contrato temporal, arts. 52 e 53.1.b
+        ET no despedimento obxectivo e art. 56 ET no improcedente. Se queres o total, súmaa ao
+        finiquito.
+      </p>
+      <p class="table-notes">
+        <sup>1</sup> Un contrato por circunstancias da produción dura como moito 6 meses. Chega a un
+        ano só se o teu convenio sectorial o amplía (art. 15.2 ET), ou nun contrato de obra ou
+        servizo asinado antes do 31 de decembro de 2021 (disposición transitoria 3.ª do Real
+        Decreto-ley 32/2021).
+      </p>
+      <p class="table-notes">
+        <sup>2</sup> Un contrato por circunstancias da produción non dura tanto. Un de obra ou
+        servizo asinado antes do 31 de decembro de 2021 duraba como moito 3 anos, ou 4 se o ampliaba
+        o convenio sectorial (art. 15.1.a ET na súa redacción anterior e disposición transitoria 3.ª
+        do Real Decreto-ley 32/2021), así que ningún remata en setembro de 2026 con esta
+        antigüidade. Un contrato temporal que supera a súa duración máxima pode ser indefinido (art.
+        15.4 ET), e entón o seu fin sería un despedimento.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-propuesta">{tx('guide.proposal')}</h3>
+      <p>
+        A empresa entrega unha proposta do documento de liquidación. A lei prevé que a persoa
+        traballadora poida asinala en presenza de alguén da representación legal do persoal.
+      </p>
+      <p>
+        Algunhas persoas asinan indicando «recibín, non conforme» (recibí no conforme) cando non
+        están de acordo con algunha cantidade. Contámolo só como información. Que facer en cada caso
+        pode valoralo un despacho laboralista, un despacho de graduado social ou un sindicato.
+      </p>
+      <p>
+        O que cambia e o que non: <CaseLink lang={lang} id="not_agreed" />.
+      </p>
+      <p class="folio">
+        Art. <span>49.2</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-plazos">{tx('guide.deadlines')}</h3>
+      <p>
+        Para cantidades como o salario pendente, as vacacións, as pagas extraordinarias ou a
+        indemnización por fin dun contrato temporal, o prazo é dun ano (art. 59.1 ET). Se a empresa
+        aínda non che pagou, o que é salario leva un xuro polo atraso do 10&nbsp;% ao ano (art. 29.3
+        ET); a indemnización, non.
+      </p>
+      <p>
+        Nun despedimento (obxectivo, colectivo, improcedente ou disciplinario), o prazo para
+        impugnalo é de 20 días hábiles (art. 59.3 ET). Quen non estea de acordo coa indemnización
+        dun despedimento adoita formulalo por esa mesma vía, dentro deses 20 días.
+      </p>
+      <p>
+        O prazo é curto, e un despacho laboralista, un despacho de graduado social ou un sindicato
+        poden dicirche cal se aplica ao teu caso.
+      </p>
+      <p class="folio">
+        Art. <span>29.3 · 59</span> ET
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-no-revisa">{tx('guide.unchecked')}</h3>
+      <ul>
+        {unchecked.map((text) => (
+          <li>{text}</li>
+        ))}
+      </ul>
+      <p>
+        As vacacións e as pagas extraordinarias compáranse co mínimo da lei, coa marxe entre o
+        cálculo por días e o cálculo por meses; o teu convenio pode mellorar esas cifras. Só aparece
+        «non se pode comprobar» cando falta un dato sen o que non hai cifra legal, como o preaviso
+        dunha dimisión ou os días de vacacións que gozaches.
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-paro">{tx('guide.benefit')}</h2>
+      <p>
+        Cando remata un contrato, ademais do finiquito pode haber paro, a prestación contributiva
+        por desemprego. Para cobralo, o contrato ten que rematar nunha situación legal de
+        desemprego, e iso depende da causa:
+      </p>
+      <ul>
+        <li>
+          Un despedimento obxectivo, colectivo, improcedente ou disciplinario si o é (art. 267.1.a
+          LGSS). O disciplinario tamén conta aínda que se declare procedente ou non se impugne (art.
+          268.4 LGSS).
+        </li>
+        <li>O fin dun contrato temporal si, agás que o rematases ti (art. 267.1.a.6.º LGSS).</li>
+        <li>
+          Unha baixa voluntaria non (art. 267.2.a LGSS), agás que marches por un traslado, por unha
+          modificación substancial das túas condicións que te prexudique (art. 41.3 ET), por un
+          incumprimento grave da empresa, como non pagarche ou pagarche tarde unha e outra vez, ou
+          por violencia de xénero ou sexual (art. 267.1.a.5.º LGSS).
+        </li>
+      </ul>
+      <p>
+        Ademais cómpren polo menos 360 días cotizados por desemprego nos 6 anos anteriores que non
+        usases xa para outro paro, e poden sumar varios traballos (arts. 266.b e 269 LGSS). Tamén
+        cómpre estar de alta ou en situación asimilada, inscribirte como demandante de emprego,
+        subscribir o acordo de actividade e non ter a idade de xubilación (art. 266 LGSS).
+      </p>
+      <p>
+        Para calculalo cos teus datos e ver a escala completa: <CaseLink lang={lang} id="benefit" />
+        .
+      </p>
+      <p class="folio">
+        Arts. <span>266 · 267 · 268.4</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-cuanto">{tx('guide.benefit_amount')}</h3>
+      <p>
+        A base é a media do cotizado por desemprego nos últimos 180 días, sen as horas
+        extraordinarias (art. 270.1 LGSS). Cóbrase o 70&nbsp;% da base os primeiros 180 días e o
+        60&nbsp;% desde o día 181 (art. 270.2 LGSS).
+      </p>
+      <p>
+        Cada mes ten un mínimo e un máximo segundo os teus fillos ou fillas a cargo (art. 270.3
+        LGSS). En 2026, co IPREM en 600&nbsp;€, son estes:
+      </p>
+      <ul>
+        <li>Sen fillos ou fillas a cargo, entre 560&nbsp;€ e 1.225&nbsp;€ ao mes.</li>
+        <li>Cun, entre 749&nbsp;€ e 1.400&nbsp;€.</li>
+        <li>Con dous ou máis, entre 749&nbsp;€ e 1.575&nbsp;€.</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Con 21.000&nbsp;€ ao ano, a base é
+        21.000&nbsp;€ / 12 = 1.750&nbsp;€ ao mes. O 70&nbsp;% son 1.225&nbsp;€, xusto o máximo sen
+        fillos ou fillas a cargo, e o 60&nbsp;%, 1.050&nbsp;€.
+      </p>
+      <p>
+        Son cifras brutas. Diso descóntase un 4,85&nbsp;% da base para a Seguridad Social e o IRPF
+        que corresponda. As cifras desta guía e da revisión supoñen xornada completa; con xornada
+        parcial son menores.
+      </p>
+      <p class="folio">
+        Art. <span>270</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-duracion">{tx('guide.benefit_duration')}</h3>
+      <p>
+        Depende dos días cotizados nos últimos 6 anos que non se usasen para outro paro (art. 269
+        LGSS):
+      </p>
+      <ul>
+        <li>De 360 a 539 días cotizados, 120 días de paro (4 meses).</li>
+        <li>
+          Cada 180 días cotizados máis suman 60 días de paro (2 meses). De 540 a 719 son 180 días;
+          de 720 a 899, 240; e así sucesivamente.
+        </li>
+        <li>Desde 2.160 días cotizados, o máximo, 720 días (24 meses).</li>
+      </ul>
+      <p class="example">
+        <span class="example__label">{tx('guide.example')}</span> Con tres anos cotizados, 1.095
+        días, son 360 días de paro (12 meses).
+      </p>
+      <p>
+        As vacacións pagadas e non gozadas tamén contan como cotizadas (art. 269.4 LGSS). Cada alta,
+        cada baixa e os días cotizados aparecen no{' '}
+        <a href={workHistoryUrl} rel="noopener">
+          {tx('result.benefit_work_history_link')}
+        </a>
+        .
+      </p>
+      <p class="folio">
+        Art. <span>269</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h3 id="g-paro-plazo">{tx('guide.benefit_deadline')}</h3>
+      <p>
+        Sen inscribirte como demandante de emprego non hai paro (art. 266 LGSS): dáste de alta no
+        servizo de emprego da túa comunidade e pídeslle a prestación ao SEPE. Pídese nos 15 días
+        seguintes ao fin do contrato, hábiles segundo o SEPE. Se o teu finiquito paga vacacións non
+        gozadas, o prazo conta desde que rematan eses días (art. 268.1 e 268.3 LGSS). Pedilo máis
+        tarde réstalle ao paro os días de atraso (art. 268.2 LGSS).
+      </p>
+      <ul class="sources">
+        {benefitSources.map(({ citation, url, inForce }) => (
+          <li>
+            <a href={url}>{citation}</a>
+            <span class="sources__in-force">{inForce}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="folio">
+        Art. <span>268</span> LGSS
+      </p>
+    </section>
+
+    <section class="sheet sheet--text">
+      <h2 id="g-preguntas">{tx('guide.faq')}</h2>
+      <div class="faq-list">
+        {faqEntries(lang, { documents }).map(({ anchor, question, answer }) => (
+          <details class="faq-item" id={anchor} data-help>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</article>
+
+<style>
+  .sheet--text .table-notes {
+    font-size: 0.875rem;
+  }
+</style>
