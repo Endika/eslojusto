@@ -1,0 +1,510 @@
+---
+// source: 625095d4cc94
+import { t, type Key } from '../../i18n';
+import { link, type Lang } from '../../i18n/languages';
+import { DOCUMENTS } from '../../documents/config';
+import { OUTAGE_KEY } from '../../documents/outage';
+import { STORAGE_KEYS } from '../../documents/pass';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const tx = (key: Key) => t(lang, key);
+
+const email = 'hola@eslojusto.es';
+// Reading documents and the pass exist only in a build with their API; so do their paragraphs.
+const documents = DOCUMENTS !== null;
+
+// One entry per thing that is stored or processed; a new tool adds a row here.
+const stored = [
+  {
+    what: tx('privacy.data_review'),
+    where:
+      'Zure nabigatzailean bakarrik, orria irekita dagoen bitartean. Kalkulua zure gailuan egiten da: zure datak, zure soldata, zure kitapenaren zifrak, zure kargurako seme-alabak eta zure beste kontratuak ez dira inongo zerbitzarira bidaltzen, ezta gordetzen ere. Orria ixtean edo berriro kargatzean, desagertu egiten dira.',
+  },
+  { what: tx('privacy.rental.data_review'), where: tx('privacy.rental.data_review_where') },
+  {
+    what: tx('privacy.employment.data_review'),
+    where: tx('privacy.employment.data_review_where'),
+  },
+  {
+    what: tx('privacy.household.data_review'),
+    where: tx('privacy.household.data_review_where'),
+  },
+  { what: tx('privacy.credit.data_review'), where: tx('privacy.credit.data_review_where') },
+  {
+    what: tx('privacy.insurance.data_review'),
+    where: tx('privacy.insurance.data_review_where'),
+  },
+  {
+    what: tx('privacy.mortgage.data_review'),
+    where: tx('privacy.mortgage.data_review_where'),
+  },
+  { what: tx('privacy.bills.data_review'), where: tx('privacy.bills.data_review_where') },
+  ...(documents
+    ? [{ what: tx('privacy.bills.data_year'), where: tx('privacy.bills.data_year_where') }]
+    : []),
+  {
+    what: tx('privacy.data_analytics'),
+    where:
+      'Kodez eta tartez osatutako abisu labur batzuk, orria erabiltzen duzun bitartean PostHog zerbitzura bidaltzen direnak (xehetasuna, behean). Ikusitako orriaren identifikatzailea orriaren memorian bakarrik bizi da: ez da zure gailuan idazten, eta orria ixtean edo berriro kargatzean galtzen da.',
+  },
+  ...(documents
+    ? [
+        {
+          what: tx('privacy.data_documents'),
+          where:
+            'Zure dokumentuak igotzea aukeratzen baduzu (kaleratze-gutuna, kitapena, zure nominak, enpresa-ziurtagiria, adiskidetze-akordio edo -akta bat edo zure lan-bizitza) eta baimena ematen baduzu bakarrik. PDFak haien orrialdeen irudi bihurtzen dira zure nabigatzailean, handik atera gabe, eta ezer bidali aurretik orriak begiratzen du, hori ere zure nabigatzailean, argazkiren bat ilun, lauso edo txiki ikusten den. Irudi horiek eta argazkiak zifratuta bidaltzen dira Amazon Web Services-en Espainiako eslojusto.es-en zerbitzari batera (eu-south-2 eskualdea), eta zerbitzari horrek AA eredu bati pasatzen dizkio (Claude, Anthropic-ena, Amazon Bedrock bidez), Europar Batasunaren barruan. AA ereduak orrialde bakoitza zer dokumentu mota den adierazten du, formularioak eskatzen dituen datuak kopiatzen ditu, eta irakurritakoa zure nabigatzailera itzultzen da. Ez da ezer gordetzen: dokumentuak zerbitzariaren memorian bakarrik daude irakurtzen diren bitartean, eta haien erregistroek, 14 egunez gordetzen direnek, datu teknikoak bakarrik dituzte: emaitza, orrialde kopurua, zenbat denbora behar izan zen, AA ereduak zenbat testu prozesatu zuen eta funtzionamendu-marka batzuk, hala nola bigarren irakurketa bat behar izan zen, dokumentuen artean zenbat datu ez zetozen bat (zein ziren edo haien balioak esan gabe) edo zenbat orrialde ezin izan ziren irakurri eta zergatik (adibidez, lausoa edo beste herrialde batekoa). Inoiz ez edukia, ezta zu identifikatzen zaituen ezer ere.',
+        },
+        {
+          what: tx('privacy.rental.data_documents'),
+          where: tx('privacy.rental.data_documents_where'),
+        },
+        {
+          what: tx('privacy.rental.data_letters'),
+          where: tx('privacy.rental.data_letters_where'),
+        },
+        {
+          what: tx('privacy.employment.data_documents'),
+          where: tx('privacy.employment.data_documents_where'),
+        },
+        {
+          what: tx('privacy.employment.data_letters'),
+          where: tx('privacy.employment.data_letters_where'),
+        },
+        {
+          what: tx('privacy.credit.data_documents'),
+          where: tx('privacy.credit.data_documents_where'),
+        },
+        {
+          what: tx('privacy.credit.data_letters'),
+          where: tx('privacy.credit.data_letters_where'),
+        },
+        {
+          what: tx('privacy.insurance.data_documents'),
+          where: tx('privacy.insurance.data_documents_where'),
+        },
+        {
+          what: tx('privacy.insurance.data_letters'),
+          where: tx('privacy.insurance.data_letters_where'),
+        },
+        {
+          what: tx('privacy.mortgage.data_documents'),
+          where: tx('privacy.mortgage.data_documents_where'),
+        },
+        {
+          what: tx('privacy.mortgage.data_letters'),
+          where: tx('privacy.mortgage.data_letters_where'),
+        },
+        {
+          what: tx('privacy.bills.data_documents'),
+          where: tx('privacy.bills.data_documents_where'),
+        },
+        {
+          what: tx('privacy.bills.data_letters'),
+          where: tx('privacy.bills.data_letters_where'),
+        },
+        {
+          what: tx('privacy.data_pass'),
+          where: `Zure nabigatzailearen tokiko biltegian (localStorage), eta erabiltzen badituzu bakarrik: eguneko doako irakurketen kontagailu sinatu bat («${STORAGE_KEYS.quota}»); pasea erosten baduzu, pasea eta geratzen zaizkion irakurketak («${STORAGE_KEYS.pass}»), eta hasten duzun ordainketa bakoitzaren kodea, zure nabigatzaileak bakarrik ezagutzen duen ausazko zenbaki batekin, pasea berreskuratu ahal izateko («${STORAGE_KEYS.checkout}»; ordainketa bakoitza 7 egunen buruan kentzen da osatu ez bada, edo haren pasea iraungitzen denean). Ez daramate zure izenik, ezta zure dokumentuetako ezer ere, eta hurrengo irakurketarekin bakarrik ateratzen dira zure gailutik, pasea berreskuratzeko edo hura egiaztatzeko zure berrikuspenaren xehetasuna, txostena edo gutuna erakutsi aurretik. AWSko eslojusto.es-en zerbitzariak jasotzen ditu, eta zerbitzari horrek Stripe-ri galdetzen dio ordainketaz. Iraungitako pasea eta aurreko egun bateko kontagailua bere kabuz ezabatzen dira orriak hurrengo aldiz kontsultatzen dituenean, eta dena ezabatzen da zure nabigatzailean gune honetako datuak ezabatzean; horregatik, paseak nabigatzaile honetan bakarrik balio du, eta beste gailu batean, leiho pribatu batean edo datu horiek ezabatzean galtzen da. Irakurketa erabilgarri ez badago, nabigatzailearen fitxak ordubetez gogoratzen du bere saio-biltegian («${OUTAGE_KEY}», orduarekin bakarrik), bitartean ez eskaintzeko.`,
+        },
+        {
+          what: tx('privacy.data_checkout'),
+          where: `Ordaintzen baduzu, zure berrikuspeneko erantzunak fitxa horren saio-biltegian (sessionStorage) gordetzen dira ordainketa-orrian zauden bitartean, itzultzean emaitza erakusteko. Argiaren fakturetan, dagoeneko berrikusi duzun zure urteko faktura bakoitzaren erantzunak gordetzen dira horrela, hornidura-kodearen aztarnarik gabe. Ez dira zure gailutik ateratzen, eta itzultzean edo fitxa ixtean ezabatzen dira.`,
+        },
+      ]
+    : []),
+  {
+    what: tx('privacy.data_theme'),
+    where:
+      'Zure nabigatzailearen tokiko biltegian (localStorage), eta gaiaren botoia sakatzen baduzu bakarrik. Ez da inoiz zure gailutik ateratzen. Zure nabigatzailean gune honetako datuak ezabatzean ezabatzen da.',
+  },
+  {
+    what: tx('privacy.data_server'),
+    where:
+      'Webgunea GitHub Pages zerbitzuan dago ostatatuta. GitHub-ek bisita bakoitzaren IP helbidea eta datu teknikoak erregistratzen ditu, edozein web-zerbitzarik bezala.',
+  },
+];
+
+// The allowlist (src/analytics/sanitize.ts) and the event catalogue (src/analytics/events.ts), in
+// plain words. Keep all three in step: the analytics e2e asserts the exact keys.
+const tracked = [
+  {
+    when: 'Abisu bakoitzarekin',
+    what: 'Abisu bakoitzaren data eta ordua, eta orria irekita dagoen bitartean bakarrik existitzen den ausazko zenbaki bat. Orriaren helbidea, parametrorik gabe: domeinua, bidea eta zauden urratsa. Zure nabigatzailea eta haren bertsioa, eta zure sistema (Windows, Android…). Gailu mota (ordenagailua, mugikorra edo tableta) eta leihoaren tamaina. Zatozen webgunearen domeinua (adibidez, «www.google.com»), helbide osoa gabe. Kanpaina-esteka batetik iristen bazara, haren jatorria, bitartekoa eta izena (utm_source, utm_medium, utm_campaign), letrez, zenbakiz eta marratxoz osatutako kode labur bat direnean bakarrik. Eta PostHog zerbitzuaren hiru datu tekniko: eslojusto.es-en proiektuaren gakoa, haren kodearen bertsioa eta profilik ez sortzeko eskatzen dion marka bat.',
+  },
+  {
+    when: 'Orri bat irekitzean',
+    what: 'Ireki duzula, eta zure nabigatzailearen hizkuntza nagusia, zati orokorra bakarrik: «ja», ez «ja-JP».',
+  },
+  {
+    when: 'Orri bat uztean',
+    what: 'Zenbat denbora egon zinen orrian eta noraino jaitsi zinen.',
+  },
+  {
+    when: 'Nabigatzailearen itzultzailea erabiltzen baduzu',
+    what: 'Orria zer hizkuntzatara itzultzen duzun, adibidez «ar».',
+  },
+  {
+    when: 'Berrikuspenaren urrats bakoitzean',
+    what: 'Irekitzen duzula eta, amaitzean, zenbat denbora behar izan duzun, tarte zabal batean: 10 segundo baino gutxiago, 10etik 30era, 30etik 60ra, 60tik 180ra edo 180 baino gehiago. Atzera itzultzen bazara, zer urratsetatik zeinetara.',
+  },
+  {
+    when: 'Datu bat onartzen ez bada',
+    what: 'Eremuaren izena, adibidez «baja-data». Inoiz ez hor idatzi duzuna.',
+  },
+  {
+    when: 'Laguntza bat irekitzen baduzu',
+    what: 'Zer ohiko galdera irekitzen duzun, edo zer kontzepturen «Nola kalkulatzen den» begiratzen duzun.',
+  },
+  {
+    when: 'Berrikustean',
+    what: 'Kontratuaren amaieraren kausa, aldi baterako kontratuaren mota, aparteko ordainsariak nola kobratzen dituzun, oporrak lanegunetan edo egun naturaletan zenbatzen dituzun eta, lanegunak badira, astean 5, 6 edo beste egun kopuru bat lan egiten duzun, aukeretan hautatzen dituzun bezala. Zenbat kontzeptuk duten zure kitapeneko zifra, eta horietatik zenbat geratzen diren gutxienekoaren azpitik, zenbat datozen bat, zenbat geratzen diren gainetik eta zenbat ezin diren egiaztatu. Gehienezkoa baino aurreabis gehiago kentzen dizuten. Bidegabeko kaleratze batek zer ordainduko lukeen erakusten den, zifrarik gabe. Emaitza laburpenean ateratzen den edo pasearen xehetasunarekin. Aldea zero den, 100 € baino txikiagoa, 100 eta 500 € artekoa, 500 eta 2.000 € artekoa edo handiagoa. Orri honetan zenbat aldiz berrikusi duzun, zenbat denbora behar izan duzun, tartetan, eta, berriro berrikusten baduzu, aldatu dituzun eremuen izena. Langabeziari dagokionez, estimazioa zure kausari aplikatzen ez zaion, zifrak dituen edo zifrarik gabe ateratzen den bakarrik, eta beste zenbat kontratu gehitu dituzun, tarte batean: 0, 1, 2 edo 3 edo gehiago. Inoiz ez zenbat seme-alaba dituzun zure kargura, ezta kontratu horien datarik ere. ERTEari eta ordaindu dizuten ala ez galderari dagokienez, galderaren izena bakarrik, aldatzen baduzu, inoiz ez erantzuna. Kaleratze deusez posible bati buruz markatzen duzuna (haurdunaldia, baimenak, baja medikoa…) ez da inoiz bidaltzen, ezta zerbait markatu baduzu ere.',
+  },
+  {
+    when: '«Hasi berriro» sakatzean',
+    what: 'Sakatu duzula.',
+  },
+  {
+    when: tx('privacy.rental.tracked_sheets'),
+    what: tx('privacy.rental.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.rental.tracked_scope'),
+    what: tx('privacy.rental.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.rental.tracked_review'),
+    what: tx('privacy.rental.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_sheets'),
+    what: tx('privacy.employment.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_scope'),
+    what: tx('privacy.employment.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.employment.tracked_review'),
+    what: tx('privacy.employment.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_sheets'),
+    what: tx('privacy.household.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_scope'),
+    what: tx('privacy.household.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.household.tracked_review'),
+    what: tx('privacy.household.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_sheets'),
+    what: tx('privacy.credit.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_scope'),
+    what: tx('privacy.credit.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.credit.tracked_review'),
+    what: tx('privacy.credit.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_sheets'),
+    what: tx('privacy.insurance.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_scope'),
+    what: tx('privacy.insurance.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.insurance.tracked_review'),
+    what: tx('privacy.insurance.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_sheets'),
+    what: tx('privacy.mortgage.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_scope'),
+    what: tx('privacy.mortgage.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.mortgage.tracked_review'),
+    what: tx('privacy.mortgage.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_sheets'),
+    what: tx('privacy.bills.tracked_sheets_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_scope'),
+    what: tx('privacy.bills.tracked_scope_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_review'),
+    what: tx('privacy.bills.tracked_review_what'),
+  },
+  {
+    when: tx('privacy.bills.tracked_telecom'),
+    what: tx('privacy.bills.tracked_telecom_what'),
+  },
+  ...(documents
+    ? [
+        {
+          when: 'Nola hasi aukeratzean',
+          what: 'Dokumentu bat igotzea edo eskuz betetzea aukeratzen duzun.',
+        },
+        {
+          when: 'Dokumentuak irakurtzean',
+          what: 'Zenbat argazki edo orrialde igotzen dituzun, tarte batean (1, 2tik 4ra, 5etik 9ra, 10etik 15era edo 16tik 25era), eta zenbat PDF aukeratu dituzun. Amaitzean, zer dokumentu mota ezagutu diren (adibidez, kaleratze-gutuna edo nomina), zenbat datu bete diren, tarte batean (0, 1etik 3ra, 4tik 8ra, edo 9 edo gehiago), baten bat konfiantza baxuarekin atera den, zifrak bat ez zetozen, bi dokumentu bat ez zetozen, eredu zehatzago batekin berriro irakurri behar izan ziren eta, orrialderen bat ezin izan bada irakurri, zergatik (lausoa, iluna, moztua, eskuz idatzia, lanekoa ez dena, beste herrialde batekoa, ezagutzen ez den mota batekoa, datu erabilgarririk gabea edo irakurri gabea), zein den esan gabe; edo, huts egiten badu, errorearen kodea. Argazki bat bidali aurretik ilun, lauso edo txiki ikusten bada, hiru horietatik zein den eta hala ere bidali zenuen. Inoiz ez dokumentuek dioten ezer.',
+        },
+        {
+          when: 'Pasearekin',
+          what: 'Ordainketa hasten duzula; pasea ordainketatik itzultzean edo berreskuratzean jaulkitzen dela, edo errorearen kodea; egiaztatzean baliozkoa, ez baliozkoa, iraungia, baliogabetua edo erantzunik gabe ateratzen den; eta txostena edo gutuna deskargatzen duzun. Gutunari dagokionez, aukerako datuetatik (izena, DNI edo NIE, enpresa eta herria) bat ere ez, batzuk edo guztiak bete dituzun bakarrik, inoiz ez zein, ezta zer dioten ere: datu horiek zure nabigatzailean gutuna betetzeko baino ez dira, eta ez dira bidaltzen, ezta gordetzen ere. Inoiz ez ordainketaren kodea, ezta pasea ere.',
+        },
+        {
+          when: tx('privacy.rental.tracked_documents'),
+          what: tx('privacy.rental.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.employment.tracked_documents'),
+          what: tx('privacy.employment.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.credit.tracked_documents'),
+          what: tx('privacy.credit.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.insurance.tracked_documents'),
+          what: tx('privacy.insurance.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.mortgage.tracked_documents'),
+          what: tx('privacy.mortgage.tracked_documents_what'),
+        },
+        {
+          when: tx('privacy.bills.tracked_documents'),
+          what: tx('privacy.bills.tracked_documents_what'),
+        },
+      ]
+    : []),
+  {
+    when: 'Orriak huts egiten badu',
+    what: 'Errore mota, eta kodearen zer fitxategi eta lerrotan gertatu zen. Inoiz ez errorearen mezua, idatzi duzun zerbait aipa dezakeelako.',
+  },
+];
+---
+
+<div class="document__sheets">
+  <section class="sheet sheet--text">
+    <h2 id="pr-resumen">{tx('privacy.summary')}</h2>
+    <p>
+      Berrikuspenean idazten duzuna ez da zure gailutik ateratzen. Zure kitapena osorik kalkulatzen
+      da zure nabigatzailean, eta ez da gordetzen. Tresnak balio duen eta jendea zer urratsetan
+      trabatzen den jakiteko, zer urrats erabiltzen dituzun neurtzen da, zu identifikatu gabe.
+      Kodeak eta tarteak bakarrik bidaltzen dira, inoiz ez zenbateko bat, ezta data bat ere. Ez dago
+      cookierik, ezta publizitaterik ere.
+    </p>
+    <p>{tx('privacy.rental.summary')}</p>
+    <p>{tx('privacy.employment.summary')}</p>
+    <p>{tx('privacy.household.summary')}</p>
+    <p>{tx('privacy.credit.summary')}</p>
+    <p>{tx('privacy.insurance.summary')}</p>
+    <p>{tx('privacy.mortgage.summary')}</p>
+    <p>{tx('privacy.bills.summary')}</p>
+    {documents && (
+      <p>
+        Datuak betetzeko dokumentu bat igotzea erabakitzen baduzu, AA bidez irakurtzen da Europar
+        Batasunean, zure baimenarekin, eta ez da gordetzen. Txostenaren pasea erosten baduzu,
+        Stripe-k kudeatzen du ordainketa.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-datos">{tx('privacy.data')}</h2>
+    <dl class="data-list">
+      {stored.map(({ what, where }) => (
+        <div>
+          <dt>{what}</dt>
+          <dd>{where}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      GitHub-en erregistroei buruz, ikusi{' '}
+      <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">
+        GitHub-en pribatutasun-adierazpena
+      </a>
+      .
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-medicion">{tx('privacy.analytics')}</h2>
+    <p>
+      Hau da bidaltzen den guztia. Balio bakoitza kodeen edo tarteen zerrenda itxi batetik ateratzen
+      da, eta orriak abisu bakoitza egiaztatzen du bidali aurretik: beste edozer duen abisu bat ez
+      da ateratzen, eta PostHog zerbitzuak bere kabuz gehitzen duenetik, zerrenda honetan dagoena
+      bakarrik pasatzen da.
+    </p>
+    <dl class="data-list">
+      {tracked.map(({ when, what }) => (
+        <div>
+          <dt>{when}</dt>
+          <dd>{what}</dd>
+        </div>
+      ))}
+    </dl>
+    <p>
+      Ez da zure profilik sortzen, eta ez da bisita bat beste batekin lotzen: orri bat ireki edo
+      berriro kargatzen duzun bakoitzean, neurketa zerotik hasten da. Inoiz ez dira ateratzen zure
+      sistemaren bertsioa, zure ordu-eremua, zure pantailaren tamaina, zure hizkuntza osoa,
+      erabiltzaile-agentearen kate osoa, orriaren izenburua, iristeko bilatu zenuena, ezta
+      iragarleek estekei gehitzen dizkieten klik-identifikatzaileak ere (gclid, fbclid eta
+      antzekoak).
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-quien">{tx('privacy.who')}</h2>
+    <p>
+      Datu horiek PostHog Inc. neurketa-tresnak jasotzen ditu, bere{' '}
+      <a href="https://posthog.com/blog/posthog-cloud-eu">Europar Batasuneko hodeian</a>,
+      Frankfurten (Alemania). Datuak eslojusto.es-en enkarguz tratatzen ditu, eta ez ditu beste
+      ezertarako erabiltzen. PostHog Inc. Estatu Batuetako enpresa bat da: tratamendua haren
+      tratamendu-eragile kontratuak babesten du, eta kontratu horrek Europako Batzordearen
+      kontratu-klausula estandarrak ditu.
+    </p>
+    <p>
+      Abisu bakoitza jasotzean, PostHog zerbitzuak zure konexioaren IP helbidea eta zure
+      nabigatzailearen erabiltzaile-agentea ikusten ditu, edozein zerbitzarik bezala. Ez du bietako
+      bat ere gordetzen: proiektua IPa baztertzeko konfiguratuta dago, zu kokatzeko erabili gabe,
+      eta erabiltzaile-agente osoa ez da datu gisa bidaltzen; «Zer neurtzen den» atalak zerrendatzen
+      dituen nabigatzailea, haren bertsioa eta sistema bakarrik.
+    </p>
+    <p>
+      Abisuak urtebetez gordetzen dira, PostHog zerbitzuaren doako planaren epea (ikusi haren{' '}
+      <a href="https://posthog.com/docs/privacy">pribatutasun-orria</a>).
+    </p>
+  </section>
+
+  {documents && (
+    <section class="sheet sheet--text">
+      <h2 id="pr-documentos">{tx('privacy.documents')}</h2>
+      <p>
+        Dokumentu bat irakurtzea aukerakoa da: berrikuspenak berdin funtzionatzen du datuak idazten
+        badituzu. Igo aurretik, zure baimen esplizitua eskatzen dizugu, nomina batek edo lan-bizitza
+        batek bereziki babestutako datuak erakuts ditzaketelako, hala nola sindikatu bateko
+        afiliazioa (haren kuotagatik) edo gaixotasunagatiko baja bat. Oinarri juridikoa baimen hori
+        da (Reglamento General de Protección de Datos, arts. 6.1.a eta 9.2.a). Nahi duzunean ken
+        dezakezu baimena, dokumentu gehiago igo gabe: ez denez ezer gordetzen, ez dago ezabatzeko
+        ezer.
+      </p>
+      <p>{tx('privacy.rental.consent')}</p>
+      <p>{tx('privacy.employment.consent')}</p>
+      <p>{tx('privacy.credit.consent')}</p>
+      <p>{tx('privacy.insurance.consent')}</p>
+      <p>{tx('privacy.mortgage.consent')}</p>
+      <p>{tx('privacy.bills.consent')}</p>
+      <p>
+        Dokumentuak Amazon Web Services EMEA SARL enpresak (Luxemburgo) prozesatzen ditu,
+        tratamendu-eragile gisa: zerbitzaria (AWS Lambda) Espainian dago, eta AA eredua Amazon
+        Bedrock bidez erabiltzen da, Europar Batasuneko eskualdeetan bakarrik funtzionatzen duen
+        profil batekin. Amazon Bedrock zerbitzuak ez ditu gordetzen dokumentuak, ezta AA ereduak
+        erantzuten duena ere, ez ditu ereduak entrenatzeko erabiltzen, eta ez ditu Anthropic-ekin
+        partekatzen. AWSren tratamendu-eragile kontratuak Europako Batzordearen kontratu-klausula
+        estandarrak ditu.
+      </p>
+      <p>
+        Irakurketak eta ordainketak pertsonek egin ditzaten, irakurketa eta ordainketa bakoitzaren
+        aurretik orriak Cloudflare Turnstile kargatzen du, robot bat ez zarela egiaztatzen duena,
+        cookierik erabili gabe. Cloudflare, Inc. enpresak zure IP helbidea eta zure nabigatzailearen
+        datu teknikoak jasotzen ditu egiaztapen horretarako, eta dokumentu bat igotzea edo pasea
+        ordaintzea aukeratzen duzunean bakarrik. Oinarri juridikoa zerbitzuaren gehiegikeria
+        saihesteko interes legitimoa da (art. 6.1.f RGPD); Cloudflare EB eta AEBen arteko Datuen
+        Pribatutasun Esparruari atxikita dago.
+      </p>
+      <p>
+        Txostenaren pasea Stripe Payments Europe, Ltd. (Irlanda) enpresaren orrian ordaintzen da.
+        eslojusto.es-ek ez ditu ikusten, ezta gordetzen ere, zure txartelaren edo Bizumen datuak:
+        Stripe-ri galdetzen dio ordainketa egin den eta zer zenbatekotan bakarrik, eta ordainketaren
+        ondoan idazten du zenbat irakurketa egin dituzun pasearekin, irakurritakoaren ezer gabe.
+        Stripe-k zure helbide elektronikoa eskatzen dizu eta, nola ordaintzen duzun, zure izena,
+        zure herrialdea edo zure telefonoa ere bai. Datu horiek eslojusto.es-en Stripe kontuan
+        geratzen dira; eslojusto.es-ek Stripe-ren panelean ikus ditzake, ordainketarekin edo
+        itzulketa batekin lotutako arazo bati erantzuteko, eta kontabilitate- eta zerga-arauek
+        eskatzen duten denboran gordetzen dira. Oinarri juridikoa erosketa-kontratua (art. 6.1.b)
+        eta kontabilitate- eta zerga-betebeharrak (art. 6.1.c) dira. Stripe-k Estatu Batuetan trata
+        ditzake datuak; Stripe, Inc. EB eta AEBen arteko Datuen Pribatutasun Esparruari atxikita
+        dago, eta haren kontratuak kontratu-klausula estandarrak ditu. Stripe-k ordainketaren datuak
+        betebehar horiek eta kapital-zuritzearen aurkako arauek eskatzen dioten denboran gordetzen
+        ditu; hala azaltzen du bere{' '}
+        <a href="https://stripe.com/es/privacy">pribatutasun-politikan</a>. Erosketaren baldintzak{' '}
+        <a href={`${link(lang, 'aviso-legal/')}#condiciones`}>lege-oharrean</a> daude.
+      </p>
+    </section>
+  )}
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-cookies">{tx('privacy.cookies')}</h2>
+    {documents ? (
+      <p>
+        Webgune honek ez du cookierik erabiltzen, eta neurketak ez du ezer idazten zure gailuan,
+        ezta nabigatzailearen beste biltegiren batean ere, dena orriaren memorian bizi delako. Zuk
+        eskatzen duzuna bakarrik gordetzen da: aukeratzen duzun gaia, haren botoia sakatzen baduzu,
+        eta, dokumentuak irakurtzen badituzu edo pasea erosten baduzu, «Zer gordetzen den eta non»
+        atalak azaltzen duena. Horregatik ez duzu cookieen inolako abisurik ikusten.
+      </p>
+    ) : (
+      <p>
+        Webgune honek ez du cookierik erabiltzen, eta neurketak ez du ezer idazten zure gailuan,
+        ezta nabigatzailearen beste biltegiren batean ere, dena orriaren memorian bizi delako.
+        Gordetzen den gauza bakarra aukeratzen duzun gaia da, eta haren botoia sakatzen baduzu
+        bakarrik. Horregatik ez duzu cookieen inolako abisurik ikusten.
+      </p>
+    )}
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-base">{tx('privacy.legal_basis')}</h2>
+    <p>
+      Oinarri juridikoa interes legitimoa da (Reglamento General de Protección de Datos, art.
+      6.1.f), eta hemen interes hori da jakitea tresna erabiltzen den, jendea zer urratsetan
+      trabatzen den eta zerk huts egiten duen, tresna hobetzeko. Horretarako behar den gutxiena
+      neurtzen da, zu identifikatu gabe eta publizitaterik gabe.
+    </p>
+    <p>
+      Zure nabigatzaileak jarraipenik ez egiteko seinalea bidaltzen badu (Global Privacy Control edo
+      Do Not Track), ez da zure bisitatik ezer neurtzen. Neurketa honen aurka egin dezakezu (art. 21
+      RGPD), baita eu.i.posthog.com helbidea eduki-blokeatzaile batekin blokeatuz ere. Berrikuspenak
+      berdin funtzionatzen du.
+    </p>
+  </section>
+
+  <section class="sheet sheet--text">
+    <h2 id="pr-responsable">{tx('privacy.controller')}</h2>
+    <p>
+      eslojusto.es Endika Iglesiasen proiektu bat da, eta bera da tratamendu honen arduraduna. Zure
+      datuei buruzko edozein galderatarako, idatzi helbide honetara:{' '}
+      <a href={`mailto:${email}`}>{email}</a>. Helbide horretara idatzi baduzu, bertan eska dezakezu
+      zure mezuetako datuak kontsultatzea, zuzentzea edo ezabatzea. Pasea ordaindu baduzu, baita
+      Stripe-n dauden zure ordainketaren datuak ere, kontabilitate- eta zerga-arauengatik gorde
+      behar direnak izan ezik.
+    </p>
+    <p>
+      Neurtzen denak ez zaitu identifikatzen; beraz, ez dago zure abisuak aurkitzeko modurik, zuri
+      erakusteko edo ezabatzeko (art. 11 RGPD). Zerbait ondo egiten ez dela uste baduzu,
+      erreklamazio bat aurkez dezakezu{' '}
+      <a href="https://www.aepd.es/">Agencia Española de Protección de Datos</a> erakundearen
+      aurrean.
+    </p>
+  </section>
+</div>
