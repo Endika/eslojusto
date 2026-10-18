@@ -986,7 +986,7 @@ export const zh: Translation = {
   'client.documents.letter.body_general':
     '本人已收到因合同结束而出具的离职结算（finiquito）草案，离职日期为{fecha}，特此声明本人收到该草案并不表示同意其内容。',
   'client.documents.letter.credit':
-    '{partida}：草案列明{empresa}，法定最低金额为{minimo}；相差{diferencia}。',
+    '{partida}：草案列明{empresa}，法定最低金额为{minimo}；草案少{diferencia}。',
   'client.documents.letter.deduction':
     '{partida}：草案扣除{empresa}，法定上限为{maximo}；多扣{diferencia}。',
   'client.documents.letter.closing': '本收据仅证明本人已收到该文件，不代表本人同意其中的金额。',
@@ -5326,7 +5326,7 @@ export const zh: Translation = {
   'client.mortgage.calculation.information.loan_assignment':
     '自08-10-2026起，Real Decreto-ley 29/2026 在该法中增加了 art. 25 bis：如果银行将您的贷款转让给他人，您对原银行可以提出的主张，对新的债权人同样可以提出；而且须将转让情况告知您，除非银行经与新债权人约定，继续提供该贷款的相关服务（art. 25 bis.3）。该法令尚待众议院确认（convalidación）。',
   'client.mortgage.calculation.information.complaints_service':
-    '西班牙银行（Banco de España）的投诉服务处（Servicio de Reclamaciones）受理有关银行的咨询和投诉（Ley 44/2002 的 art. 30），公共消费者服务机构也提供免费咨询。',
+    '西班牙银行（Banco de España）的投诉服务处（Servicio de Reclamaciones）受理有关银行的咨询和投诉（Ley 44/2002 的 art. 30），公共消费者服务机构也免费提供信息。',
   'client.mortgage.info.fein_timing': '签订公证契约之前的信息',
   'client.mortgage.info.handwritten_statement': '手写声明',
   'client.mortgage.info.limitation_rule': '期限从何时起算',
@@ -6253,7 +6253,7 @@ export const zh: Translation = {
   'client.household.calculation.severance.offered_unknown': '不清楚备好供您领取的金额是多少。',
   'client.household.calculation.severance.salary_unknown': '没有您的货币工资，无法计算补偿金。',
   'client.household.calculation.severance.prorated_note':
-    '这种计算方式把每个开始的月份算作一天。法规没有说明不满一年如何计算：只计入按完整年份的计算方式，而这种计算方式得出的是可能的最高金额。',
+    '这种计算方式把每个开始的月份算作一天。法规没有说明不满一年如何计算：只计入按完整年份的计算方式，而按开始的月份计算得出的是可能的最高金额。',
   'client.household.calculation.notice.days':
     '提前通知期：{required}个自然日，自通知次日起算。已提前{given}天，还差{missing}天。',
   'client.household.calculation.notice.salary_unknown':
