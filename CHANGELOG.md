@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.85.1](https://github.com/Endika/eslojusto/compare/v1.85.0...v1.85.1) (2026-10-18)
+
+
+### Bug Fixes
+
+* **i18n:** say the agency's outlays are made in your name, not by you ([411239c](https://github.com/Endika/eslojusto/commit/411239c8b525500514d9e662e45f65a382b2f471))
+
 ## [1.85.0](https://github.com/Endika/eslojusto/compare/v1.84.2...v1.85.0) (2026-10-18)
 
 
