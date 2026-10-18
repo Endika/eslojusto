@@ -364,7 +364,7 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
         },
         {
           id: 'ejemplo',
-          heading: 'Ejemplo resuelto',
+          heading: 'Приклад розрахунку',
           paragraphs: [],
           example: [exampleDecree, exampleNoDecree],
           after: [
@@ -518,7 +518,7 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
       },
       {
         id: 'ejemplo',
-        heading: 'Ejemplo resuelto',
+        heading: 'Приклад розрахунку',
         paragraphs: [],
         example: [
           `Агентство нерухомості стягує з вас суму місячної орендної плати ${formatEuros(rent)} плюс ${pct(vat)} IVA (ПДВ): ${formatEuros(rent)} + ${formatEuros(round2(charge - rent))} = ${formatEuros(charge)}.`,
