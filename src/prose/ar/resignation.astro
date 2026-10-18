@@ -1,5 +1,5 @@
 ---
-// source: 506fdf4350ed
+// source: c5540529f7c2
 import CaseLink from '../../components/CaseLink.astro';
 import { euroRange, itemRange, resignation } from '../../content/examples';
 import { euros } from '../../content/format';
@@ -82,8 +82,8 @@ if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete
   </ul>
   <p class="example">
     <span class="example__label">الحساب</span> ينتج هامش كل بند من الحساب بالأيام أو بالأشهر، كما
-    تفعل الشركات. الخصم هو 15 يومًا بمعدل {euros(deduction.max / 15)}
-    لليوم، وهو الأعلى بين الراتبين اليوميين: الراتب الشهري مقسومًا على 30، والسنوي مقسومًا على 365.
+    تفعل الشركات. الخصم هو 15 يومًا بمعدل {euros(deduction.max / 15)} لليوم، وهو الأعلى بين الراتبين
+    اليوميين: الراتب الشهري مقسومًا على 30، والسنوي مقسومًا على 365.
   </p>
 </section>
 

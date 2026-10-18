@@ -1,5 +1,5 @@
 ---
-// source: 506fdf4350ed
+// source: c5540529f7c2
 import CaseLink from '../../components/CaseLink.astro';
 import { euroRange, itemRange, resignation } from '../../content/examples';
 import { euros } from '../../content/format';
@@ -79,7 +79,7 @@ if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete
   </ul>
   <p class="example">
     <span class="example__label">Calculele</span> Marja fiecărei componente rezultă din socotirea pe
-    zile sau pe luni, cum fac firmele. Reținerea înseamnă 15 zile a câte {euros(deduction.max / 15)}
+    zile sau pe luni, cum fac firmele. Reținerea înseamnă 15 zile a câte {euros(deduction.max / 15)}{' '}
     pe zi, cel mai mare dintre cele două salarii zilnice: cel lunar împărțit la 30 și cel anual
     împărțit la 365.
   </p>
