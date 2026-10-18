@@ -1,7 +1,7 @@
 ---
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, objective, severanceMonths } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, objective, severanceMonths } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -57,13 +57,13 @@ if (!severance || !notice || !salary || !holidays || !extraPay || unfair === nul
   </p>
   <ul>
     <li>
-      Indemnización: {euroRange(severance)} ({months} meses × 20 / 12 ={' '}
+      Indemnización: {euroRange(severance, lang)} ({months} meses × 20 / 12 ={' '}
       {String((months * 20) / 12).replace('.', ',')} días).
     </li>
-    <li>Preaviso no dado: {euroRange(notice)}.</li>
-    <li>Salario de julio: {euroRange(salary)}.</li>
-    <li>Vacaciones no disfrutadas: {euroRange(holidays)}.</li>
-    <li>Paga de Navidad generada desde el 1 de julio: {euroRange(extraPay)}.</li>
+    <li>Preaviso no dado: {euroRange(notice, lang)}.</li>
+    <li>Salario de julio: {euroRange(salary, lang)}.</li>
+    <li>Vacaciones no disfrutadas: {euroRange(holidays, lang)}.</li>
+    <li>Paga de Navidad generada desde el 1 de julio: {euroRange(extraPay, lang)}.</li>
   </ul>
   <p class="example">
     <span class="example__label">Si se declarara improcedente</span> Con las mismas fechas, la

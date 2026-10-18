@@ -1,7 +1,7 @@
 ---
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, resignation } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, resignation } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -61,9 +61,11 @@ if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete
     Estas son las cifras de la calculadora:
   </p>
   <ul>
-    <li>Salario de octubre: {euroRange(salary)}, según se cuente el mes con 30 días o con 31.</li>
-    <li>Vacaciones no disfrutadas: {euroRange(holidays)}.</li>
-    <li>Paga de Navidad generada desde julio: {euroRange(extraPay)}.</li>
+    <li>
+      Salario de octubre: {euroRange(salary, lang)}, según se cuente el mes con 30 días o con 31.
+    </li>
+    <li>Vacaciones no disfrutadas: {euroRange(holidays, lang)}.</li>
+    <li>Paga de Navidad generada desde julio: {euroRange(extraPay, lang)}.</li>
     <li>Indemnización: {euros(0)}.</li>
     <li>Descuento por el preaviso no dado: como mucho {euros(deduction.max)}.</li>
   </ul>

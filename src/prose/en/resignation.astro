@@ -1,8 +1,8 @@
 ---
-// source: af62c96628b9
+// source: 506fdf4350ed
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, resignation } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, resignation } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -69,10 +69,11 @@ if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete
   </p>
   <ul>
     <li>
-      October pay: {euroRange(salary)}, depending on whether the month is counted as 30 days or 31.
+      October pay: {euroRange(salary, lang)}, depending on whether the month is counted as 30 days
+      or 31.
     </li>
-    <li>Untaken holiday: {euroRange(holidays)}.</li>
-    <li>Christmas extra payment accrued since July: {euroRange(extraPay)}.</li>
+    <li>Untaken holiday: {euroRange(holidays, lang)}.</li>
+    <li>Christmas extra payment accrued since July: {euroRange(extraPay, lang)}.</li>
     <li>Severance pay: {euros(0)}.</li>
     <li>Deduction for the notice not given: at most {euros(deduction.max)}.</li>
   </ul>

@@ -1,7 +1,13 @@
 ---
-// source: c72414824687
-import { OFFERED_HOLIDAYS, itemRange, notAgreed } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+// source: 3387bbf43a04
+import { euroRange, itemRange, notAgreed, OFFERED_HOLIDAYS } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
 
 const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
 const range = itemRange(notAgreed, 'holiday_pay');
@@ -47,9 +53,9 @@ if (!holidays || !range || holidays.difference === null) throw new Error('Incomp
     за своїм колективним договором. Проєкт передбачає їй {euros(OFFERED_HOLIDAYS)} за відпустку.
   </p>
   <p class="example">
-    <span class="example__label">Відпустка</span> Законний мінімум становить {euroRange(range)},
-    залежно від того, чи рахувати за днями, чи за місяцями. Порівняно з {euros(OFFERED_HOLIDAYS)},
-    бракує щонайменше {euros(holidays.difference)}.
+    <span class="example__label">Відпустка</span> Законний мінімум становить{' '}
+    {euroRange(range, lang)}, залежно від того, чи рахувати за днями, чи за місяцями. Порівняно з{' '}
+    {euros(OFFERED_HOLIDAYS)}, бракує щонайменше {euros(holidays.difference)}.
   </p>
   <p>
     Калькулятор робить те саме з кожною позицією: введіть те, що зазначено в проєкті, на картці «Ваш

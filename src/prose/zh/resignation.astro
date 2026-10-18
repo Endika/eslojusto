@@ -1,8 +1,8 @@
 ---
-// source: af62c96628b9
+// source: 506fdf4350ed
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, resignation } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, resignation } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -61,9 +61,9 @@ if (!salary || !holidays || !extraPay || !deduction) throw new Error('Incomplete
     某人每月税前工资1.500&nbsp;€，另有两笔各1.500&nbsp;€、按半年累计的额外工资，从2023年三月1日工作到2026年十月15日。今年在22个排班工作日的年假中已休10天。其集体协议规定提前15天通知，而其离职时没有提前通知。计算器得出的数字如下：
   </p>
   <ul>
-    <li>十月工资：{euroRange(salary)}，取决于这个月按30天还是31天计算。</li>
-    <li>未休年假：{euroRange(holidays)}。</li>
-    <li>自七月起累计的圣诞额外工资：{euroRange(extraPay)}。</li>
+    <li>十月工资：{euroRange(salary, lang)}，取决于这个月按30天还是31天计算。</li>
+    <li>未休年假：{euroRange(holidays, lang)}。</li>
+    <li>自七月起累计的圣诞额外工资：{euroRange(extraPay, lang)}。</li>
     <li>解雇补偿金：{euros(0)}。</li>
     <li>未提前通知的扣款：最多{euros(deduction.max)}。</li>
   </ul>

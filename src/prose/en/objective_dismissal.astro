@@ -1,8 +1,8 @@
 ---
-// source: 176e7bb53168
+// source: b433a07857b6
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, objective, severanceMonths } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, objective, severanceMonths } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -58,13 +58,13 @@ if (!severance || !notice || !salary || !holidays || !extraPay || unfair === nul
   </p>
   <ul>
     <li>
-      Severance pay: {euroRange(severance)} ({months} months × 20 / 12 ={' '}
+      Severance pay: {euroRange(severance, lang)} ({months} months × 20 / 12 ={' '}
       {String((months * 20) / 12).replace('.', ',')} days).
     </li>
-    <li>Notice not given: {euroRange(notice)}.</li>
-    <li>July pay: {euroRange(salary)}.</li>
-    <li>Untaken holiday: {euroRange(holidays)}.</li>
-    <li>Christmas extra payment accrued since 1 July: {euroRange(extraPay)}.</li>
+    <li>Notice not given: {euroRange(notice, lang)}.</li>
+    <li>July pay: {euroRange(salary, lang)}.</li>
+    <li>Untaken holiday: {euroRange(holidays, lang)}.</li>
+    <li>Christmas extra payment accrued since 1 July: {euroRange(extraPay, lang)}.</li>
   </ul>
   <p class="example">
     <span class="example__label">If it were declared unfair</span> With the same dates, the

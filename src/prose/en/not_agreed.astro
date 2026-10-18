@@ -1,7 +1,13 @@
 ---
-// source: c72414824687
-import { OFFERED_HOLIDAYS, itemRange, notAgreed } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+// source: 3387bbf43a04
+import { euroRange, itemRange, notAgreed, OFFERED_HOLIDAYS } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
 
 const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
 const range = itemRange(notAgreed, 'holiday_pay');
@@ -47,7 +53,7 @@ if (!holidays || !range || holidays.difference === null) throw new Error('Incomp
     pays them {euros(OFFERED_HOLIDAYS)} for holiday.
   </p>
   <p class="example">
-    <span class="example__label">Holiday</span> The legal minimum comes to {euroRange(range)},
+    <span class="example__label">Holiday</span> The legal minimum comes to {euroRange(range, lang)},
     depending on whether it is counted by days or by months. At least {euros(holidays.difference)}{' '}
     is missing compared with {euros(OFFERED_HOLIDAYS)}.
   </p>

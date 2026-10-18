@@ -1,7 +1,13 @@
 ---
-// source: c72414824687
-import { OFFERED_HOLIDAYS, itemRange, notAgreed } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+// source: 3387bbf43a04
+import { euroRange, itemRange, notAgreed, OFFERED_HOLIDAYS } from '../../content/examples';
+import { euros } from '../../content/format';
+import type { Lang } from '../../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
 
 const holidays = notAgreed.items.find((p) => p.item.id === 'holiday_pay');
 const range = itemRange(notAgreed, 'holiday_pay');
@@ -48,9 +54,9 @@ if (!holidays || !range || holidays.difference === null) throw new Error('Incomp
     convention collective. La proposition lui verse {euros(OFFERED_HOLIDAYS)} au titre des congés.
   </p>
   <p class="example">
-    <span class="example__label">Congés</span> Le minimum légal est de {euroRange(range)}, selon que
-    le calcul se fait par jours ou par mois. Face à {euros(OFFERED_HOLIDAYS)}, il manque au moins{' '}
-    {euros(holidays.difference)}.
+    <span class="example__label">Congés</span> Le minimum légal est de {euroRange(range, lang)},
+    selon que le calcul se fait par jours ou par mois. Face à {euros(OFFERED_HOLIDAYS)}, il manque
+    au moins {euros(holidays.difference)}.
   </p>
   <p>
     Le calculateur fait de même pour chaque poste&nbsp;: saisissez ce qu'indique la proposition dans

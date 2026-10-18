@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { HUBS, LANDINGS, LANDING_IDS, landingCopy, landingKeys } from '../../src/content/landings';
 import { es } from '../../src/i18n/es';
 import { LAST_UPDATED } from '../../src/content/updated';
-import { euroRange, wholeEuroRange } from '../../src/content/format';
+import { wholeEuroRange } from '../../src/content/format';
+import { euroRange } from '../../src/content/examples';
 
 const pages = LANDING_IDS.map((id) => [id, { ...LANDINGS[id], ...landingCopy('es', id) }] as const);
 const unique = (values: readonly string[]) => new Set(values).size === values.length;
@@ -59,9 +60,10 @@ describe('the case pages', () => {
 });
 
 describe('figures in words', () => {
-  it('a range reads «entre … y …», a single figure alone', () => {
-    expect(euroRange({ min: 750, max: 750 })).toMatch(/^750,00\s€$/);
-    expect(euroRange({ min: 725.81, max: 750 })).toMatch(/^entre 725,81\s€ y 750,00\s€$/);
+  it('a range reads «entre … y …» in the page’s language, a single figure alone', () => {
+    expect(euroRange({ min: 750, max: 750 }, 'es')).toMatch(/^750,00\s€$/);
+    expect(euroRange({ min: 725.81, max: 750 }, 'es')).toMatch(/^entre 725,81\s€ y 750,00\s€$/);
+    expect(euroRange({ min: 725.81, max: 750 }, 'en')).toMatch(/^between 725,81\s€ and 750,00\s€$/);
     expect(wholeEuroRange({ min: 2625, max: 2685.05 })).toMatch(/^2\.625–2\.685\s€$/);
   });
 });

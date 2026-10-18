@@ -1,8 +1,8 @@
 ---
-// source: 176e7bb53168
+// source: b433a07857b6
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, objective, severanceMonths } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, objective, severanceMonths } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -59,13 +59,13 @@ if (!severance || !notice || !salary || !holidays || !extraPay || unfair === nul
   </p>
   <ul>
     <li>
-      Indemnité&nbsp;: {euroRange(severance)} ({months} mois × 20 / 12 ={' '}
+      Indemnité&nbsp;: {euroRange(severance, lang)} ({months} mois × 20 / 12 ={' '}
       {String((months * 20) / 12).replace('.', ',')} jours).
     </li>
-    <li>Préavis non accordé&nbsp;: {euroRange(notice)}.</li>
-    <li>Salaire de juillet&nbsp;: {euroRange(salary)}.</li>
-    <li>Congés non pris&nbsp;: {euroRange(holidays)}.</li>
-    <li>Prime de Noël acquise depuis le 1er juillet&nbsp;: {euroRange(extraPay)}.</li>
+    <li>Préavis non accordé&nbsp;: {euroRange(notice, lang)}.</li>
+    <li>Salaire de juillet&nbsp;: {euroRange(salary, lang)}.</li>
+    <li>Congés non pris&nbsp;: {euroRange(holidays, lang)}.</li>
+    <li>Prime de Noël acquise depuis le 1er juillet&nbsp;: {euroRange(extraPay, lang)}.</li>
   </ul>
   <p class="example">
     <span class="example__label">S'il était déclaré injustifié</span> Avec les mêmes dates,

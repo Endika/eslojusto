@@ -1,8 +1,8 @@
 ---
-// source: 176e7bb53168
+// source: b433a07857b6
 import CaseLink from '../../components/CaseLink.astro';
-import { itemRange, objective, severanceMonths } from '../../content/examples';
-import { euroRange, euros } from '../../content/format';
+import { euroRange, itemRange, objective, severanceMonths } from '../../content/examples';
+import { euros } from '../../content/format';
 import type { Lang } from '../../i18n/languages';
 
 interface Props {
@@ -59,13 +59,13 @@ if (!severance || !notice || !salary || !holidays || !extraPay || unfair === nul
   </p>
   <ul>
     <li>
-      Вихідна допомога: {euroRange(severance)} ({months} міс. × 20 / 12 ={' '}
+      Вихідна допомога: {euroRange(severance, lang)} ({months} міс. × 20 / 12 ={' '}
       {String((months * 20) / 12).replace('.', ',')} дн.).
     </li>
-    <li>Ненадане попередження: {euroRange(notice)}.</li>
-    <li>Зарплата за липень: {euroRange(salary)}.</li>
-    <li>Невикористана відпустка: {euroRange(holidays)}.</li>
-    <li>Різдвяна додаткова виплата, нарахована з 1 липня: {euroRange(extraPay)}.</li>
+    <li>Ненадане попередження: {euroRange(notice, lang)}.</li>
+    <li>Зарплата за липень: {euroRange(salary, lang)}.</li>
+    <li>Невикористана відпустка: {euroRange(holidays, lang)}.</li>
+    <li>Різдвяна додаткова виплата, нарахована з 1 липня: {euroRange(extraPay, lang)}.</li>
   </ul>
   <p class="example">
     <span class="example__label">Якби звільнення визнали необґрунтованим</span> За тих самих дат
