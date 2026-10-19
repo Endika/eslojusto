@@ -71,11 +71,32 @@ describe('repaying capital today', () => {
     expect(keys(c)).toEqual(['fees.lcci_fixed_first', 'fees.financial_loss']);
   });
 
-  it('a lower percentage in the deed is the most that can be charged', () => {
+  it('a lower percentage in the deed is the most that can be charged, and 1,5 % changes nothing', () => {
     const c = only({ deedOn: d('2023-02-01'), rateType: 'fixed', deedPercents: { fixed: 1 } });
-    expect(brief(c)).toEqual(['cap', 2, 1, 100, ['2033-02-01', 1.5]]);
+    expect(brief(c)).toEqual(['cap', 2, 1, 100, null]);
     expect(keys(c)).toEqual(['fees.lcci_fixed_first', 'fees.deed_lower', 'fees.financial_loss']);
     expect(c.calculation[1]?.vars).toEqual({ percent: { percent: 1 } });
+  });
+
+  it('a deed percentage between both caps still gives the day the law goes below it', () => {
+    const c = only({ deedOn: d('2023-02-01'), rateType: 'fixed', deedPercents: { fixed: 1.8 } });
+    expect(brief(c)).toEqual(['cap', 2, 1.8, 180, ['2033-02-01', 1.5]]);
+  });
+
+  it('within its first five years, a variable rate saw the window open and close', () => {
+    const input = mortgage({
+      deedOn: d('2021-03-01'),
+      rateType: 'variable',
+      prepaymentOption: 'a_015_5y',
+    });
+    const on = (day: string) => {
+      const item = prepaymentToday(input, d(day), DEPS);
+      if (item.kind !== 'single') throw new Error('expected a single finding');
+      return brief(item.finding);
+    };
+    expect(on('2022-06-01')).toEqual(['cap', 0.15, null, 15, ['2022-11-24', 0]]);
+    expect(on('2023-06-01')).toEqual(['cap', 0, null, 0, ['2025-01-01', 0.15]]);
+    expect(on('2025-06-01')).toEqual(['cap', 0.15, null, 15, ['2026-03-01', 0]]);
   });
 
   it('a higher percentage in the deed changes nothing: the law caps it', () => {
@@ -106,7 +127,8 @@ describe('repaying capital today', () => {
     expect(
       item.kind === 'readings' && item.readings.map((r) => [r.when, ...brief(r.finding)]),
     ).toEqual([
-      ['fixed', 'cap', 2, null, 200, ['2033-02-01', 1.5]],
+      // Past its tenth year the law leaves open from which day they count: no day is given.
+      ['fixed', 'cap', 2, null, 200, null],
       ['variable.option_a', 'cap', 0.15, null, 15, ['2028-02-01', 0]],
     ]);
   });

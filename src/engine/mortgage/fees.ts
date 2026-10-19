@@ -1,4 +1,4 @@
-import { addMonthsClamped, compareDates, toIso, type CivilDate } from '../date';
+import { addDays, addMonthsClamped, compareDates, parseDate, toIso, type CivilDate } from '../date';
 import { assessAcross, type Across } from '../law/readings';
 import { round2 } from '../money';
 import { mortgagePhrase as p, type MortgageCalculation, type MortgagePhrase } from './calculation';
@@ -441,10 +441,24 @@ export interface TodayCap {
 
 export type TodayItem = Across<FeeQuestion, FeeReading, TodayCap>;
 
-// The anniversaries on which a cap can change: the end of the first 3 or 5 years of a variable
-// rate and of the first 10 of a fixed one.
+// The days on which a cap can change: the end of the first 3 or 5 years of a variable rate and of
+// the first 10 of a fixed one, and both ends of the window without compensation.
 const CHANGE_YEARS = [3, 5, FIXED_FIRST_YEARS] as const;
+const WINDOW = STATUTE_RULES.fee_free_window;
+const WINDOW_DAYS: readonly CivilDate[] = [
+  parseDate(WINDOW.from),
+  ...(WINDOW.until === null ? [] : [addDays(parseDate(WINDOW.until), 1)]),
+];
 
+// Whether a reading of a later day is the same as today's on every point today's leaves fixed.
+const sameReading = (today: World, later: World): boolean =>
+  later.rate === today.rate &&
+  (today.option === null || later.option === today.option) &&
+  (today.reach === null || later.reach === today.reach) &&
+  (today.revision === null || later.revision === today.revision);
+
+// The next day the law's cap changes, only when every reading of that day agrees on it: a mixed
+// rate past its tenth year may count them from the day the fixed rate applies, a day not asked.
 function nextChange(
   operation: Operation,
   input: MortgageInput,
@@ -452,16 +466,28 @@ function nextChange(
   deps: MortgageDeps,
   percent: number,
 ): TodayCap['next'] {
-  const days = CHANGE_YEARS.map((years) => addMonthsClamped(input.deedOn, years * 12))
+  const days = [
+    ...CHANGE_YEARS.map((years) => addMonthsClamped(input.deedOn, years * 12)),
+    ...WINDOW_DAYS,
+  ]
     .filter((on) => compareDates(on, operation.on) > 0)
     .sort(compareDates);
   for (const on of days) {
-    const later = capFor({ ...operation, on }, input, world, deps);
-    if (later.kind === 'none') return null;
-    if (later.percent !== percent) return { on, percent: later.percent };
+    const later = { ...operation, on };
+    const caps = worlds(later, input, deps)
+      .filter((w) => sameReading(world, w))
+      .map((w) => capFor(later, input, w, deps));
+    const percents = new Set(caps.map((c) => (c.kind === 'cap' ? c.percent : null)));
+    if (percents.has(null) || percents.size !== 1) return null;
+    const [next] = percents;
+    if (next !== undefined && next !== null && next !== percent) return { on, percent: next };
   }
   return null;
 }
+
+// With a lower percentage in the deed, a change of the law's cap matters only if it goes below it.
+const deedOnly = (next: TodayCap['next'], deedPercent: number | null): TodayCap['next'] =>
+  next === null || deedPercent === null || next.percent < deedPercent ? next : null;
 
 function todayCap(
   operation: Operation,
@@ -490,7 +516,7 @@ function todayCap(
     capPercent: c.percent,
     deedPercent,
     cap: round2((TODAY_EXAMPLE * percent) / 100),
-    next: nextChange(operation, input, world, deps, c.percent),
+    next: deedOnly(nextChange(operation, input, world, deps, c.percent), deedPercent),
     calculation: [
       ...c.phrases,
       ...(deedPercent === null
