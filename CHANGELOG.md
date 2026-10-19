@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.101.0](https://github.com/Endika/eslojusto/compare/v1.100.0...v1.101.0) (2026-10-19)
+
+
+### Features
+
+* **electricity:** free result hides which lines they are when there is something to claim ([efcbad9](https://github.com/Endika/eslojusto/commit/efcbad9b5099bab17b55e0358c720bedeb47ba10))
+
 ## [1.100.0](https://github.com/Endika/eslojusto/compare/v1.99.0...v1.100.0) (2026-10-19)
 
 
