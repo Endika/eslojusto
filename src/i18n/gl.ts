@@ -368,10 +368,11 @@ export const gl: Translation = {
     'Ningunha das cifras que introduciches está por debaixo do mínimo legal.',
   'client.summary.no_figures':
     'Sen as cifras do teu finiquito non hai nada que comparar; podes introducilas no paso «O teu finiquito».',
-  'client.summary.missing': '{partida}: poderíanche faltar uns {importe}.',
-  'client.summary.missing_little': '{partida}: poderíanche faltar menos de 10 €.',
-  'client.summary.deduction': '{partida}: o desconto podería pasarse nuns {importe}.',
-  'client.summary.deduction_little': '{partida}: o desconto podería pasarse en menos de 10 €.',
+  'client.summary.short_one': 'Unha partida podería quedar curta: uns {importe}.',
+  'client.summary.short_many': '{n} partidas poderían quedar curtas: uns {importe} en total.',
+  'client.summary.short_one_little': 'Unha partida podería quedar curta, en menos de 10 €.',
+  'client.summary.short_many_little':
+    '{n} partidas poderían quedar curtas, en menos de 10 € en total.',
   'client.summary.benefit_yes':
     'Esta causa dá dereito a paro: {cuantia} ao mes en bruto os primeiros 6 meses, se sumas polo menos 360 días cotizados nos últimos 6 anos.',
   'client.summary.benefit_yes_whole':
@@ -690,8 +691,12 @@ export const gl: Translation = {
   'documents.done.continue': 'Revisar os datos',
   'documents.done.another': 'Subir máis documentos',
   'documents.pass.title': 'Informe en PDF e carta «recibín, non conforme» (recibí no conforme)',
+  'documents.pass.claim_title': 'Que partidas son e canto falta en cada unha',
   'documents.pass.text':
-    'Descarga o informe completo co cálculo paso a paso, as fontes legais e a carta «recibín, non conforme» por 4,99 €. Xéranse no teu dispositivo.',
+    'Co pase de 4,99 € ves cada partida coa súa cifra, o cálculo paso a paso e a norma na que se apoia, e descargas o informe en PDF e a carta «recibín, non conforme». Xéranse no teu dispositivo.',
+  'documents.pass.quiet_title': 'Non fai falta que pagues',
+  'documents.pass.quiet_text':
+    'Coas cifras que introduciches, nada queda por debaixo do mínimo legal. Se aínda así queres telo por escrito, o informe en PDF con cada partida e a carta «recibín, non conforme» custan 4,99 €.',
   'documents.pass.price':
     '4,99 € con IVA incluído. Un só pagamento, sen conta nin subscrición. O pase dura 7 días e só vale neste navegador: nese tempo podes refacer ou corrixir a túa revisión, ler ata 15 paquetes de documentos e volver descargar o informe e a carta sen pagar outra vez. Noutro dispositivo, nunha xanela privada ou se borras os datos de navegación, pérdese.',
   'documents.pass.waiver':

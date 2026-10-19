@@ -227,10 +227,10 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   );
   await page.getByRole('button', { name: 'Revisar' }).click();
 
-  // Before the pass, the summary: what falls short and roughly how much. The detail is not in
-  // the page at all, not even hidden.
+  // Before the pass, the summary: how many items fall short and roughly how much, never which.
+  // The detail is not in the page at all, not even hidden.
   const summary = page.getByRole('region', { name: 'En resumen' });
-  await expect(summary).toContainText('Indemnización: podrían faltarte unos 440 €.');
+  await expect(summary).toContainText('Una partida podría quedarse corta: unos 440 €.');
   await expect(summary).toContainText(
     'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
   );
@@ -241,8 +241,12 @@ test('upload → prefill → confirm → result → pass → PDF report and lett
   await expectNoDetail(result);
 
   // The pass: the waiver first, then Stripe, then back with the session id.
-  const offer = page.getByRole('region', { name: /Informe en PDF/ });
+  const offer = page.getByRole('region', { name: /Qué partidas son|Informe en PDF/ });
   await expect(offer).toContainText('4,99 € con IVA incluido');
+  await expect(summary).not.toContainText('Indemnización');
+  await expect(
+    page.getByRole('region', { name: 'Qué partidas son y cuánto falta en cada una' }),
+  ).toBeVisible();
   await expect(offer).toContainText(
     'El pase dura 7 días y solo vale en este navegador: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a descargar el informe y la carta sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
   );
@@ -374,7 +378,7 @@ async function confirmToResult(page: Page) {
   await next();
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('region', { name: 'En resumen' })).toContainText(
-    'Indemnización: podrían faltarte unos 440 €.',
+    'Una partida podría quedarse corta: unos 440 €.',
   );
 }
 
@@ -405,7 +409,7 @@ test('the situations of a possibly null dismissal reach no request, and come bac
   const warning = page.getByRole('region', { name: 'Este despido podría ser nulo' });
   // Never behind the pass.
   await expect(warning).toBeVisible();
-  const offer = page.getByRole('region', { name: /Informe en PDF/ });
+  const offer = page.getByRole('region', { name: /Qué partidas son|Informe en PDF/ });
   await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
   await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
   await page.waitForURL(/\/finiquito\/(#.*)?$/);
@@ -418,11 +422,8 @@ test('the situations of a possibly null dismissal reach no request, and come bac
   for (const r of requests) expect(r.postData() ?? '').not.toMatch(/situation|embaraz|pregnan/i);
 });
 
-test('a pass holder with nothing short gets the general letter, and no offer to pay', async ({
-  page,
-}) => {
-  const fake = await fakeServices(page);
-  await page.goto('finiquito/');
+// Read, confirmed and filled with the severance the review asks for: nothing falls short.
+async function nothingShort(page: Page) {
   await uploadSettlement(page);
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
   const next = () => nextSheet(page);
@@ -439,8 +440,29 @@ test('a pass holder with nothing short gets the general letter, and no offer to 
   await next();
   await next();
   await next();
-  // The severance the review asks for: nothing falls short.
   await page.getByLabel('Indemnización').fill('40.438,41');
+}
+
+test('with nothing short and no pass: no need to pay, and the pass still on sale, quietly', async ({
+  page,
+}) => {
+  await fakeServices(page);
+  await page.goto('finiquito/');
+  await nothingShort(page);
+  await page.getByRole('button', { name: 'Revisar' }).click();
+  await expect(page.getByRole('region', { name: 'En resumen' })).toContainText('mínimo legal');
+  const quiet = page.getByRole('region', { name: 'No hace falta que pagues' });
+  await expect(quiet).toContainText('nada queda por debajo del mínimo legal');
+  await expect(quiet.getByRole('button', { name: 'Pagar 4,99 €' })).toBeVisible();
+  await expect(quiet).not.toHaveAttribute('data-tone');
+});
+
+test('a pass holder with nothing short gets the general letter, and no offer to pay', async ({
+  page,
+}) => {
+  const fake = await fakeServices(page);
+  await page.goto('finiquito/');
+  await nothingShort(page);
   await page.evaluate(
     (pass) => localStorage.setItem('eslojusto-pase', pass),
     JSON.stringify({ token: PASS, expiresAt, readsLeft: 15 }),
@@ -449,7 +471,7 @@ test('a pass holder with nothing short gets the general letter, and no offer to 
   await expect(page.getByRole('region', { name: 'Indemnización' })).toContainText(
     'Coincide con el mínimo legal',
   );
-  const offer = page.getByRole('region', { name: /Informe en PDF/ });
+  const offer = page.getByRole('region', { name: /Qué partidas son|Informe en PDF/ });
   await expect(offer.getByRole('button', { name: 'Pagar 4,99 €' })).toBeHidden();
   const download = page.waitForEvent('download');
   await offer.getByRole('button', { name: 'Descargar la carta (PDF)' }).click();
@@ -470,13 +492,13 @@ test('cancelling at Stripe brings the review back and keeps nothing in the tab',
   await page.goto('finiquito/');
   await uploadSettlement(page);
   await confirmToResult(page);
-  const offer = page.getByRole('region', { name: /Informe en PDF/ });
+  const offer = page.getByRole('region', { name: /Qué partidas son|Informe en PDF/ });
   await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
   await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
   await page.waitForURL(`${ORIGIN}/finiquito/#resultado`);
   await expect(page.getByRole('heading', { name: /Resultado/ })).toBeFocused();
   await expect(page.getByRole('region', { name: 'En resumen' })).toContainText(
-    'Indemnización: podrían faltarte unos 440 €.',
+    'Una partida podría quedarse corta: unos 440 €.',
   );
   await expect(offer.getByRole('button', { name: 'Pagar 4,99 €' })).toBeVisible();
   expect(await page.evaluate(() => sessionStorage.length)).toBe(0);
@@ -495,7 +517,7 @@ test('a forged pass in localStorage never unlocks the detail', async ({ page }) 
     JSON.stringify({ token: forgedPass, expiresAt, readsLeft: 15 }),
   );
   await confirmToResult(page);
-  const offer = page.getByRole('region', { name: /Informe en PDF/ });
+  const offer = page.getByRole('region', { name: /Qué partidas son|Informe en PDF/ });
   await expect(offer.getByRole('alert')).toContainText('Este pase no es válido');
   expect(fake.verify).toHaveLength(1);
   expect(fake.verify[0]?.postDataJSON()).toEqual({ pass: forgedPass });
@@ -517,7 +539,7 @@ test('with the API out of reach the pass stays locked until a retry gets through
     JSON.stringify({ token: PASS, expiresAt, readsLeft: 15 }),
   );
   await confirmToResult(page);
-  const offer = page.getByRole('region', { name: /Informe en PDF/ });
+  const offer = page.getByRole('region', { name: /Qué partidas son|Informe en PDF/ });
   await expect(offer.getByRole('alert')).toHaveText(
     'No hemos podido comprobar tu pase ahora mismo. Prueba otra vez en un momento.',
   );

@@ -388,12 +388,12 @@ export const fr: Translation = {
     "Aucun des chiffres que vous avez saisis n'est inférieur au minimum légal.",
   'client.summary.no_figures':
     "Sans les chiffres de votre solde de tout compte, il n'y a rien à comparer\u00a0; vous pouvez les saisir dans la fiche «\u00a0Votre solde de tout compte\u00a0».",
-  'client.summary.missing': '{partida}\u00a0: il pourrait vous manquer environ {importe}.',
-  'client.summary.missing_little': '{partida}\u00a0: il pourrait vous manquer moins de 10 €.',
-  'client.summary.deduction':
-    "{partida}\u00a0: la retenue pourrait dépasser le maximum d'environ {importe}.",
-  'client.summary.deduction_little':
-    '{partida}\u00a0: la retenue pourrait dépasser le maximum de moins de 10 €.',
+  'client.summary.short_one': 'Un poste pourrait être insuffisant\u00a0: environ {importe}.',
+  'client.summary.short_many':
+    '{n} postes pourraient être insuffisants\u00a0: environ {importe} au total.',
+  'client.summary.short_one_little': 'Un poste pourrait être insuffisant, de moins de 10 €.',
+  'client.summary.short_many_little':
+    '{n} postes pourraient être insuffisants, de moins de 10 € au total.',
   'client.summary.benefit_yes':
     'Ce motif ouvre droit au chômage\u00a0: {cuantia} brut par mois les 6 premiers mois, si vous totalisez au moins 360 jours cotisés au cours des 6 dernières années.',
   'client.summary.benefit_yes_whole':
@@ -728,8 +728,12 @@ export const fr: Translation = {
   'documents.done.another': "Envoyer d'autres documents",
   'documents.pass.title':
     'Rapport PDF et lettre «\u00a0reçu, non conforme\u00a0» (recibí no conforme)',
+  'documents.pass.claim_title': 'Quels postes sont concernés et combien il manque sur chacun',
   'documents.pass.text':
-    'Téléchargez le rapport complet avec le calcul étape par étape, les sources juridiques et la lettre «\u00a0reçu, non conforme\u00a0» pour 4,99 €. Ils sont générés sur votre appareil.',
+    'Avec le pass à 4,99 €, vous voyez chaque poste avec son montant, le calcul étape par étape et la règle sur laquelle il s’appuie, et vous téléchargez le rapport PDF et la lettre «\u00a0reçu, non conforme\u00a0». Ils sont générés sur votre appareil.',
+  'documents.pass.quiet_title': 'Inutile de payer',
+  'documents.pass.quiet_text':
+    'Avec les chiffres que vous avez saisis, rien n’est inférieur au minimum légal. Si vous voulez tout de même l’avoir par écrit, le rapport PDF avec chaque poste et la lettre «\u00a0reçu, non conforme\u00a0» coûtent 4,99 €.',
   'documents.pass.price':
     "4,99 €, TVA (IVA) comprise. Un seul paiement, sans compte ni abonnement. Le pass dure 7 jours et n'est valable que dans ce navigateur\u00a0: pendant ce temps, vous pouvez refaire ou corriger votre vérification, lire jusqu'à 15 lots de documents et télécharger de nouveau le rapport et la lettre sans payer une nouvelle fois. Sur un autre appareil, dans une fenêtre de navigation privée ou si vous effacez les données de navigation, il est perdu.",
   'documents.pass.waiver':

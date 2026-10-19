@@ -49,17 +49,33 @@ describe('the amount in the summary', () => {
 });
 
 describe('the summary before the pass', () => {
-  it('with a shortfall: only the item and roughly how much, never a range or a method', () => {
+  it('with a shortfall: how many items and roughly how much, never which, a range or a method', () => {
     const s = summaryOf(completed());
     expect(summaryHeadline(completed().review)).toBe('shortfall');
     expect(s.headline).toBe(
       'Con las cifras que has metido, a tu finiquito le podría faltar dinero:',
     );
-    expect(s.lines).toContain('Indemnización: podrían faltarte unos 440 €.');
+    expect(s.lines).toEqual(['Una partida podría quedarse corta: unos 440 €.']);
     const all = s.div.querySelector('[data-summary]')?.textContent ?? '';
+    for (const p of completed().review.items)
+      expect(all).not.toContain(tr(`client.item.${p.item.id}`));
     expect(all).not.toMatch(/entre .* y /);
     expect(all).not.toContain('en vigor desde');
     expect(all).not.toContain('Cómo se calcula');
+  });
+
+  it('two items short: one line with how many and their sum, rounded once', () => {
+    const one = completed(unfairDismissal, { severance: 100, holiday_pay: 1500 }).review;
+    const two = completed(unfairDismissal, { severance: 100, holiday_pay: 1 }).review;
+    const sum = two.items.reduce(
+      (total, p) => total + (p.status === 'below_minimum' ? (p.difference ?? 0) : 0),
+      0,
+    );
+    expect(two.items.filter((p) => p.status === 'below_minimum').length).toBe(2);
+    expect(sum).toBeGreaterThan(one.items.reduce((t, p) => t + (p.difference ?? 0), 0));
+    const s = summaryOf(completed(unfairDismissal, { severance: 100, holiday_pay: 1 }));
+    expect(roundToTens(sum)).toBe(41_830);
+    expect(s.lines).toEqual(['2 partidas podrían quedarse cortas: unos 41.830 € en total.']);
   });
 
   it('under 10 € still says something is missing', () => {
@@ -67,7 +83,7 @@ describe('the summary before the pass', () => {
     const severance = r.review.items.find((p) => p.item.id === 'severance');
     const min = severance?.item.range?.min ?? 0;
     const s = summaryOf(completed(unfairDismissal, { severance: min - 3 }));
-    expect(s.lines).toEqual(['Indemnización: podrían faltarte menos de 10 €.']);
+    expect(s.lines).toEqual(['Una partida podría quedarse corta, en menos de 10 €.']);
   });
 
   it('5 € short is «menos de 10 €», never rounded up to «unos 10 €»', () => {
@@ -75,10 +91,10 @@ describe('the summary before the pass', () => {
     const severance = r.review.items.find((p) => p.item.id === 'severance');
     const min = severance?.item.range?.min ?? 0;
     const s = summaryOf(completed(unfairDismissal, { severance: min - 5 }));
-    expect(s.lines).toEqual(['Indemnización: podrían faltarte menos de 10 €.']);
+    expect(s.lines).toEqual(['Una partida podría quedarse corta, en menos de 10 €.']);
   });
 
-  it('a deduction above its maximum reads as such', () => {
+  it('a deduction above its maximum counts as short, unnamed', () => {
     const s = summaryOf(
       completed(
         { ...unfairDismissal, cause: 'resignation', agreementNoticeDays: 15, noticeDaysGiven: 0 },
@@ -87,7 +103,7 @@ describe('the summary before the pass', () => {
     );
     expect(
       s.lines.some((l) =>
-        /^Descuento por preaviso no cumplido: el descuento podría pasarse en unos [\d.]+0 €\.$/.test(
+        /^(Una partida podría quedarse corta: unos|\d+ partidas podrían quedarse cortas: unos) [\d.]+0 €( en total)?\.$/.test(
           l,
         ),
       ),
@@ -240,7 +256,8 @@ describe('locked and unlocked result', () => {
     const r = completed({ ...unfairDismissal, cause: 'objective_dismissal' }, { severance: 100 });
     renderResult(root, data(r), true, tr);
     const text = root.textContent ?? '';
-    expect(text).toContain('Indemnización: podrían faltarte');
+    expect(text).toContain('Una partida podría quedarse corta');
+    expect(text).not.toContain('Indemnización');
     for (const detail of [
       'Cómo se calcula',
       'días devengados',

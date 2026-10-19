@@ -29,4 +29,10 @@ describe('the final pay as a paid review', () => {
     expect(finalPayCase(completed()).offer).toBe(true);
     expect(finalPayCase(completed(unfairDismissal, { severance: 41000 })).offer).toBe(false);
   });
+
+  it('with figures and nothing short, still sells it quietly, with the plain letter', () => {
+    const clear = finalPayCase(completed(unfairDismissal, { severance: 41000, holiday_pay: 1500 }));
+    expect([clear.offer, clear.quiet, clear.letterKinds]).toEqual([false, true, ['general']]);
+    expect(finalPayCase(completed(unfairDismissal, {})).quiet).toBe(false);
+  });
 });

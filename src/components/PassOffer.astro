@@ -3,7 +3,9 @@ import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
 import PassLetter from './PassLetter.astro';
 
-// The pass for the PDF report and the letter, offered in the result when an item falls short.
+// The pass for the PDF report and the letter, offered in the result when an item falls short, then
+// standing out from the result around it. The final pay's is also sold quietly when nothing falls
+// short, under words that say there is no need to pay.
 // Rendered only in a build with the documents API, with its own styles. On the rental review the
 // same pass unlocks each item's detail too, and its letters are two, each shown only when the
 // review has figures for it. On the contract and credit reviews the letters that only ask for
@@ -122,25 +124,43 @@ const FREE_ONLY = {
   telecom: ['bills.telecom.letters.title', 'bills.telecom.letters.text'],
 } as const satisfies Record<string, readonly [Key, Key]>;
 const freeOnly = review in FREE_ONLY ? FREE_ONLY[review as keyof typeof FREE_ONLY] : null;
-// Marks what is about buying the pass, hidden when only the free letters are on offer.
-const pitch = freeOnly ? '' : undefined;
+// The title and lead when nothing is to claim and the pass is still sold, quietly.
+const QUIET = {
+  final_pay: ['documents.pass.quiet_title', 'documents.pass.quiet_text'],
+} as const satisfies Partial<Record<string, readonly [Key, Key]>>;
+const quiet = review in QUIET ? QUIET[review as keyof typeof QUIET] : null;
+// The title that says what the pass shows, while it is still to buy with something to claim.
+const claim = review === 'final_pay' ? 'documents.pass.claim_title' : null;
 ---
 
 <section class="item pass" data-pass-offer aria-labelledby="pass-title" hidden>
+  <span class="item__tab pass__tab" aria-hidden="true">
+    €
+  </span>
   <div class="sheet">
     <h3 class="item__title" id="pass-title">
-      {freeOnly ? (
+      {claim ? (
         <>
-          <span data-pass-pitch>{tx('documents.pass.title')}</span>
-          <span data-pass-free-only hidden>
-            {tx(freeOnly[0])}
+          <span data-pass-unheld>{tx(claim)}</span>
+          <span data-pass-held hidden>
+            {tx('documents.pass.title')}
           </span>
         </>
       ) : (
-        tx('documents.pass.title')
+        <span data-pass-pitch>{tx('documents.pass.title')}</span>
+      )}
+      {freeOnly && (
+        <span data-pass-free-only hidden>
+          {tx(freeOnly[0])}
+        </span>
+      )}
+      {quiet && (
+        <span data-pass-quiet hidden>
+          {tx(quiet[0])}
+        </span>
       )}
     </h3>
-    <p class="help" data-pass-pitch={pitch}>
+    <p class="help" data-pass-pitch>
       {tx('documents.pass.text')}
     </p>
     {freeOnly && (
@@ -148,8 +168,13 @@ const pitch = freeOnly ? '' : undefined;
         {tx(freeOnly[1])}
       </p>
     )}
+    {quiet && (
+      <p class="help" data-pass-quiet hidden>
+        {tx(quiet[1])}
+      </p>
+    )}
     <div data-pass-buy>
-      <p class="help">{tx('documents.pass.price')}</p>
+      <p class="item__note">{tx('documents.pass.price')}</p>
       <div class="checkbox">
         <input
           type="checkbox"
@@ -197,6 +222,27 @@ const pitch = freeOnly ? '' : undefined;
 </section>
 
 <style is:inline>
+  .pass:not([data-pass-mode='claim']) .pass__tab {
+    display: none;
+  }
+  .pass__tab {
+    font-size: 0.8125rem;
+  }
+  .pass[data-pass-mode='claim'] > .sheet {
+    outline: 2px solid var(--ground);
+    outline-offset: -2px;
+  }
+  .pass[data-pass-mode='claim'] [data-pass-pay] {
+    min-block-size: 3.25rem;
+    padding-inline: 1.25rem;
+    border-color: var(--sheet-ink);
+    background: var(--sheet-ink);
+    color: var(--field-fill);
+    font-size: 1.0625rem;
+  }
+  .pass[data-pass-mode='claim'] [data-pass-pay]:hover {
+    background: color-mix(in oklab, var(--sheet-ink) 86%, var(--ground));
+  }
   .pass__captcha:empty {
     display: none;
   }

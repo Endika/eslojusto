@@ -510,8 +510,12 @@ export const es = {
   'documents.done.another': 'Subir más documentos',
 
   'documents.pass.title': 'Informe en PDF y carta «recibí no conforme»',
+  'documents.pass.claim_title': 'Qué partidas son y cuánto falta en cada una',
   'documents.pass.text':
-    'Descarga el informe completo con el cálculo paso a paso, las fuentes legales y la carta «recibí no conforme» por 4,99 €. Se generan en tu dispositivo.',
+    'Con el pase de 4,99 € ves cada partida con su cifra, el cálculo paso a paso y la norma en que se apoya, y descargas el informe en PDF y la carta «recibí no conforme». Se generan en tu dispositivo.',
+  'documents.pass.quiet_title': 'No hace falta que pagues',
+  'documents.pass.quiet_text':
+    'Con las cifras que has metido, nada queda por debajo del mínimo legal. Si aun así quieres tenerlo por escrito, el informe en PDF con cada partida y la carta «recibí no conforme» cuestan 4,99 €.',
   'documents.pass.price':
     '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a descargar el informe y la carta sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
   'documents.pass.waiver':
@@ -742,10 +746,11 @@ export const es = {
     'Ninguna de las cifras que has metido está por debajo del mínimo legal.',
   'client.summary.no_figures':
     'Sin las cifras de tu finiquito no hay nada que comparar; puedes meterlas en la hoja «Tu finiquito».',
-  'client.summary.missing': '{partida}: podrían faltarte unos {importe}.',
-  'client.summary.missing_little': '{partida}: podrían faltarte menos de 10 €.',
-  'client.summary.deduction': '{partida}: el descuento podría pasarse en unos {importe}.',
-  'client.summary.deduction_little': '{partida}: el descuento podría pasarse en menos de 10 €.',
+  'client.summary.short_one': 'Una partida podría quedarse corta: unos {importe}.',
+  'client.summary.short_many': '{n} partidas podrían quedarse cortas: unos {importe} en total.',
+  'client.summary.short_one_little': 'Una partida podría quedarse corta, en menos de 10 €.',
+  'client.summary.short_many_little':
+    '{n} partidas podrían quedarse cortas, en menos de 10 € en total.',
   'client.summary.benefit_yes':
     'Esta causa da derecho a paro: {cuantia} al mes en bruto los primeros 6 meses, si sumas al menos 360 días cotizados en los últimos 6 años.',
   'client.summary.benefit_yes_whole':

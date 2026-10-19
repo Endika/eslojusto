@@ -11,6 +11,6 @@ describe('a build without the documents API', () => {
     const { CATALOGUE, isValidEvent } = await import('../../src/analytics/events');
     expect(Object.keys(CATALOGUE)).not.toContain('extraction_completed');
     expect(Object.keys(CATALOGUE)).toContain('review_completed');
-    expect(isValidEvent('checkout_started', {})).toBe(false);
+    expect(isValidEvent('checkout_started', { offer: 'claim' })).toBe(false);
   });
 });

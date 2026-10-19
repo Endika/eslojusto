@@ -41,8 +41,8 @@ export function documentsAnalytics(track: Track): DocumentEvents {
     qualityOverridden() {
       track('quality_overridden', {});
     },
-    checkoutStarted() {
-      track('checkout_started', {});
+    checkoutStarted(offer) {
+      track('checkout_started', { offer });
     },
     passIssued(via) {
       track('pass_issued', { via });

@@ -117,16 +117,35 @@ describe('the pass offer', () => {
     document.body.innerHTML = '';
   });
 
-  it('shows only when an item falls short', () => {
+  it('with an item short it is pitched and stands out; with nothing short, sold quietly', () => {
     const { payment, section } = setUp();
+    const shown = (s: string) =>
+      [...section.querySelectorAll<HTMLElement>(s)].map((el) => !el.hidden);
     payment.show(asPaid(completed()));
     expect(section.hidden).toBe(false);
+    expect(section.dataset['passMode']).toBe('claim');
+    expect(section.dataset['tone']).toBe('dates');
+    expect(shown('[data-pass-pitch]')).toEqual([true, true]);
+    expect(shown('[data-pass-quiet]')).toEqual([false, false]);
     expect($('[data-pass-buy]').hidden).toBe(false);
     expect($('[data-pass-downloads]').hidden).toBe(true);
-    payment.show(asPaid(completed(unfairDismissal, { severance: 41000 })));
-    expect(section.hidden).toBe(true);
+    payment.show(asPaid(completed(unfairDismissal, { severance: 41000, holiday_pay: 1500 })));
+    expect(section.hidden).toBe(false);
+    expect(section.dataset['passMode']).toBe('quiet');
+    expect(section.dataset['tone']).toBeUndefined();
+    expect(shown('[data-pass-pitch]')).toEqual([false, false]);
+    expect(shown('[data-pass-quiet]')).toEqual([true, true]);
+    expect($('[data-pass-buy]').hidden).toBe(false);
     payment.hide();
     expect(section.hidden).toBe(true);
+  });
+
+  it('bought with nothing short, the checkout says it was quiet', async () => {
+    const { payment, events } = setUp();
+    payment.show(asPaid(completed(unfairDismissal, { severance: 41000, holiday_pay: 1500 })));
+    $<HTMLInputElement>('#pass-waiver').checked = true;
+    await click('[data-pass-pay]');
+    expect(events.log).toEqual([['checkoutStarted', 'quiet']]);
   });
 
   it('a held pass unlocks only once the API verifies it, and only once per page', async () => {
@@ -251,7 +270,7 @@ describe('the pass offer', () => {
     ]);
     expect(kept()).toBe(1);
     expect(redirects).toEqual(['https://checkout.stripe.com/c/pay/1']);
-    expect(events.log).toEqual([['checkoutStarted']]);
+    expect(events.log).toEqual([['checkoutStarted', 'claim']]);
   });
 
   it('a checkout that fails keeps no nonce', async () => {
@@ -536,9 +555,9 @@ describe('the pass offer', () => {
     expect(events.log.at(-1)).toEqual(['downloaded', 'letter', 'none', 'general']);
   });
 
-  it('without a pass and nothing short, nothing is offered', () => {
+  it('without a pass and no figure to compare, nothing is offered', () => {
     const { payment, section } = setUp();
-    payment.show(asPaid(completed(unfairDismissal, { severance: 41000 })));
+    payment.show(asPaid(completed(unfairDismissal, {})));
     expect(section.hidden).toBe(true);
   });
 

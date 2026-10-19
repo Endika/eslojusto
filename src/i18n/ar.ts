@@ -370,10 +370,10 @@ export const ar: Translation = {
     'لا يوجد أي رقم من الأرقام التي أدخلتها دون الحد الأدنى القانوني.',
   'client.summary.no_figures':
     'دون أرقام تسويتك النهائية لا يوجد ما يُقارَن؛ يمكنك إدخالها في ورقة «تسويتك النهائية».',
-  'client.summary.missing': '{partida}: قد ينقصك نحو {importe}.',
-  'client.summary.missing_little': '{partida}: قد ينقصك أقل من 10 €.',
-  'client.summary.deduction': '{partida}: قد يزيد الاقتطاع بنحو {importe}.',
-  'client.summary.deduction_little': '{partida}: قد يزيد الاقتطاع بأقل من 10 €.',
+  'client.summary.short_one': 'قد ينقص بند واحد: نحو {importe}.',
+  'client.summary.short_many': 'قد تنقص بنود عددها {n}: نحو {importe} إجمالًا.',
+  'client.summary.short_one_little': 'قد ينقص بند واحد، بأقل من 10 €.',
+  'client.summary.short_many_little': 'قد تنقص بنود عددها {n}، بأقل من 10 € إجمالًا.',
   'client.summary.benefit_yes':
     'هذا السبب يمنح الحق في إعانة البطالة: {cuantia} شهريًا إجمالًا خلال الأشهر الـ6 الأولى، إذا كان لديك ما لا يقل عن 360 يومَ اشتراك في السنوات الـ6 الأخيرة.',
   'client.summary.benefit_yes_whole':
@@ -692,8 +692,12 @@ export const ar: Translation = {
   'documents.done.continue': 'مراجعة البيانات',
   'documents.done.another': 'رفع مستندات أخرى',
   'documents.pass.title': 'تقرير PDF ورسالة «recibí no conforme» (استلمت، دون موافقة)',
+  'documents.pass.claim_title': 'ما هي البنود وكم ينقص في كل منها',
   'documents.pass.text':
-    'نزّل التقرير الكامل مع الحساب خطوةً بخطوة، والمصادر القانونية، ورسالة «recibí no conforme» (استلمت، دون موافقة) مقابل 4,99 €. يُنشآن على جهازك.',
+    'مع التصريح بسعر 4,99 € ترى كل بند مع مبلغه، والحساب خطوةً بخطوة، والقاعدة التي يستند إليها، وتنزّل تقرير PDF ورسالة «recibí no conforme» (استلمت، دون موافقة). يُنشآن على جهازك.',
+  'documents.pass.quiet_title': 'لا داعي للدفع',
+  'documents.pass.quiet_text':
+    'بحسب الأرقام التي أدخلتها، لا شيء دون الحد الأدنى القانوني. وإن أردت مع ذلك أن يكون ذلك مكتوبًا، فإن تقرير PDF مع كل بند ورسالة «recibí no conforme» (استلمت، دون موافقة) يكلّفان 4,99 €.',
   'documents.pass.price':
     '4,99 € شاملًا ضريبة القيمة المضافة \u2068(IVA)\u2069. دفعة واحدة، دون حساب ولا اشتراك. يدوم التصريح 7 أيام ولا يصلح إلا في هذا المتصفح: خلال تلك المدة يمكنك إعادة مراجعتك أو تصحيحها، وقراءة ما يصل إلى 15 حزمة من المستندات، وتنزيل التقرير والرسالة مجددًا دون الدفع مرة أخرى. ويضيع إذا استخدمت جهازًا آخر أو نافذة خاصة، أو إذا حذفت بيانات التصفح.',
   'documents.pass.waiver':
