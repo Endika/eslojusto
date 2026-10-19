@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { addDays, parseDate, toIso } from '../../../src/engine/date';
-import { NORMS } from '../../../src/engine/rental/data/norms';
+import { NORMS, NORM_REVIEW } from '../../../src/engine/rental/data/norms';
 import {
   normStanding,
   type Norm,
@@ -205,5 +205,12 @@ describe('rules active on a day', () => {
       const day = toIso(addDays(parseDate('2019-01-01'), i));
       expect(untouched(rdl29Repealed, day)).toEqual(untouched(NORMS, day));
     }
+  });
+});
+
+describe('rental norm review', () => {
+  it('dates the last reading of every norm', () => {
+    expect(Object.keys(NORM_REVIEW).sort()).toEqual(Object.keys(NORMS).sort());
+    for (const day of Object.values(NORM_REVIEW)) expect(day).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });

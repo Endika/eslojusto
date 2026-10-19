@@ -20,3 +20,6 @@ export type NormId =
 export type Norm = LawNorm<NormId, EnactedStatus>;
 
 export type NormTable = LawNormTable<NormId, EnactedStatus>;
+
+// Day each norm was last read in the BOE: its text, its status and any later reference.
+export type NormReview = Readonly<Record<NormId, string>>;

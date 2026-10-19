@@ -31,7 +31,10 @@ import {
 import { MORTGAGE_SOURCES } from '../../../src/engine/mortgage/data/sources';
 import { MORTGAGE_TEXTS } from '../../../src/engine/mortgage/data/texts';
 import { RULES as MORTGAGE_RULES } from '../../../src/engine/mortgage/rules';
-import { NORMS as RENTAL_NORMS } from '../../../src/engine/rental/data/norms';
+import {
+  NORMS as RENTAL_NORMS,
+  NORM_REVIEW as RENTAL_NORM_REVIEW,
+} from '../../../src/engine/rental/data/norms';
 
 // Every section's law tables, for the checks that span them all and the monthly review list.
 // A section whose rules state their output and sources lists them under `rules` and `sources`.
@@ -45,7 +48,7 @@ interface LawSection {
 }
 
 export const LAW_SECTIONS: readonly LawSection[] = [
-  { name: 'rental', norms: RENTAL_NORMS, normReview: null, sources: {}, rules: {} },
+  { name: 'rental', norms: RENTAL_NORMS, normReview: RENTAL_NORM_REVIEW, sources: {}, rules: {} },
   {
     name: 'employment',
     norms: EMPLOYMENT_NORMS,
