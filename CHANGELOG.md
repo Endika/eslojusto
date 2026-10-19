@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.98.0](https://github.com/Endika/eslojusto/compare/v1.97.0...v1.98.0) (2026-10-19)
+
+
+### Features
+
+* **mortgage:** free result hides which costs and fees they are when there is something to claim ([7ba5b4a](https://github.com/Endika/eslojusto/commit/7ba5b4a50418cd6c0bd77f834948da2aec99ca6b))
+
 ## [1.97.0](https://github.com/Endika/eslojusto/compare/v1.96.0...v1.97.0) (2026-10-19)
 
 
