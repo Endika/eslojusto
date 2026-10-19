@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.92.2](https://github.com/Endika/eslojusto/compare/v1.92.1...v1.92.2) (2026-10-19)
+
+
+### Bug Fixes
+
+* **credit:** link each Supreme Court ruling to its own PDF in CENDOJ ([3df520e](https://github.com/Endika/eslojusto/commit/3df520ef2b2257bb2b0404e7ddae5fd9ab34a1e0))
+
 ## [1.92.1](https://github.com/Endika/eslojusto/compare/v1.92.0...v1.92.1) (2026-10-19)
 
 
