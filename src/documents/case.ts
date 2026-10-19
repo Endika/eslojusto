@@ -4,7 +4,7 @@ import type { LetterKind } from './letter';
 import type { PaidReview } from './ports';
 import { letterModel, reportModel } from './report';
 
-// The pass is offered only when the review finds money missing: an item below its minimum or a
+// The pass is offered when the review finds money missing: an item below its minimum or a
 // deduction above its maximum.
 export const hasShortfall = (r: Review): boolean =>
   r.items.some((i) => i.status === 'below_minimum' || i.status === 'deduction_too_high');
@@ -24,6 +24,8 @@ export const letterKind = (r: Review): LetterKind =>
 export function finalPayCase(r: CompletedReview): PaidReview {
   return {
     offer: hasShortfall(r.review),
+    // With figures to compare and none short, it is still sold, without a pitch.
+    quiet: r.review.items.some((i) => i.employerFigure !== null),
     letterKinds: [letterKind(r.review)],
     report: (tr, today) => reportModel(r, tr, today),
     letter: (_kind, details, tr) => letterModel(r, tr, details),

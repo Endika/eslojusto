@@ -375,10 +375,10 @@ export const en: Translation = {
     'None of the figures you have entered is below the legal minimum.',
   'client.summary.no_figures':
     'Without the figures from your final settlement there is nothing to compare; you can enter them on the “Your final settlement” sheet.',
-  'client.summary.missing': '{partida}: about {importe} could be missing.',
-  'client.summary.missing_little': '{partida}: less than 10 € could be missing.',
-  'client.summary.deduction': '{partida}: the deduction could be about {importe} too high.',
-  'client.summary.deduction_little': '{partida}: the deduction could be less than 10 € too high.',
+  'client.summary.short_one': 'One item could be short: about {importe}.',
+  'client.summary.short_many': '{n} items could be short: about {importe} in all.',
+  'client.summary.short_one_little': 'One item could be short, by less than 10 €.',
+  'client.summary.short_many_little': '{n} items could be short, by less than 10 € in all.',
   'client.summary.benefit_yes':
     'This reason gives entitlement to unemployment benefit: {cuantia} a month gross for the first 6 months, if you have at least 360 days of contributions in the last 6 years.',
   'client.summary.benefit_yes_whole':
@@ -698,8 +698,12 @@ export const en: Translation = {
   'documents.done.continue': 'Review the details',
   'documents.done.another': 'Upload more documents',
   'documents.pass.title': 'PDF report and «recibí no conforme» (received, not agreed) letter',
+  'documents.pass.claim_title': 'Which items they are and how much each is short',
   'documents.pass.text':
-    'Download the full report with the step-by-step calculation, the legal sources and the «recibí no conforme» (received, not agreed) letter for 4,99 €. They are generated on your device.',
+    'With the 4,99 € pass you see each item with its figure, the step-by-step calculation and the rule behind it, and you download the PDF report and the «recibí no conforme» (received, not agreed) letter. They are generated on your device.',
+  'documents.pass.quiet_title': 'There is no need to pay',
+  'documents.pass.quiet_text':
+    'With the figures you have entered, nothing falls below the legal minimum. If you still want it in writing, the PDF report with each item and the «recibí no conforme» (received, not agreed) letter cost 4,99 €.',
   'documents.pass.price':
     '4,99 €, VAT (IVA) included. A single payment, with no account or subscription. The pass lasts 7 days and only works in this browser: during that time you can redo or correct your review, read up to 15 document packs and download the report and the letter again without paying again. On another device, in a private window or if you clear your browsing data, it is lost.',
   'documents.pass.waiver':

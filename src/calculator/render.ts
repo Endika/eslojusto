@@ -461,22 +461,27 @@ export function summaryHeadline(r: Review): SummaryHeadline {
   return r.items.every((p) => p.employerFigure === null) ? 'no_figures' : 'nothing_short';
 }
 
-// One line per item that falls short: its name and roughly how much, never the range or the method.
-function shortfallLine(r: ItemResult, tr: Translate): Piece[] | null {
-  const deduction = r.status === 'deduction_too_high';
-  if (r.status !== 'below_minimum' && !deduction) return null;
-  const difference = r.difference ?? 0;
-  const amount = roundToTens(difference);
-  const partida = [tr(`client.item.${r.item.id}`)];
+const SHORT: ReadonlySet<VisibleStatus> = new Set(['below_minimum', 'deduction_too_high']);
+
+// How many items fall short and roughly how much in all, never which ones: naming them, with the
+// range and the method, is the pass's.
+function shortfallLine(items: readonly ItemResult[], tr: Translate): Piece[] | null {
+  const short = items.filter((p) => SHORT.has(p.status));
+  if (short.length === 0) return null;
+  const difference = short.reduce((sum, p) => sum + (p.difference ?? 0), 0);
+  const one = short.length === 1;
   // Under 10 € before rounding, so 5 € never reads «unos 10 €».
   if (difference < 10)
-    return piecesWithAmounts(
-      tr(deduction ? 'client.summary.deduction_little' : 'client.summary.missing_little'),
-      { partida },
-    );
+    return [
+      tr(one ? 'client.summary.short_one_little' : 'client.summary.short_many_little', {
+        n: formatInteger(short.length),
+      }),
+    ];
   return piecesWithAmounts(
-    tr(deduction ? 'client.summary.deduction' : 'client.summary.missing'),
-    { partida, importe: amount },
+    tr(one ? 'client.summary.short_one' : 'client.summary.short_many', {
+      n: formatInteger(short.length),
+    }),
+    { importe: roundToTens(difference) },
     formatWholeEuros,
   );
 }
@@ -550,15 +555,10 @@ export function renderSummary(
   if (!summary) return;
   setText(summary, '[data-summary-headline]', tr(`client.summary.${summaryHeadline(r)}`));
   const lines = summary.querySelector('[data-summary-lines]');
-  lines?.replaceChildren(
-    ...r.items.flatMap((p) => {
-      const line = shortfallLine(p, tr);
-      if (!line) return [];
-      const li = document.createElement('li');
-      li.replaceChildren(...line);
-      return [li];
-    }),
-  );
+  const line = shortfallLine(r.items, tr);
+  const li = document.createElement('li');
+  if (line) li.replaceChildren(...line);
+  lines?.replaceChildren(...(line ? [li] : []));
   const counted = r.items.find((p) => p.item.counted)?.item.counted;
   const note = setText(summary, '[data-summary-counted]', counted ? phraseText(counted, tr) : '');
   note.hidden = !counted;

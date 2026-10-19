@@ -375,11 +375,12 @@ export const ro: Translation = {
     'Niciuna dintre sumele pe care le-ai introdus nu este sub minimul legal.',
   'client.summary.no_figures':
     'Fără sumele din lichidarea ta finală nu există nimic de comparat; le poți introduce în fișa „Lichidarea ta finală”.',
-  'client.summary.missing': '{partida}: ar putea lipsi aproximativ {importe}.',
-  'client.summary.missing_little': '{partida}: ar putea lipsi mai puțin de 10 €.',
-  'client.summary.deduction': '{partida}: reținerea ar putea fi mai mare cu aproximativ {importe}.',
-  'client.summary.deduction_little':
-    '{partida}: reținerea ar putea fi mai mare cu mai puțin de 10 €.',
+  'client.summary.short_one': 'O componentă ar putea fi mai mică: aproximativ {importe}.',
+  'client.summary.short_many':
+    '{n} componente ar putea fi mai mici: aproximativ {importe} în total.',
+  'client.summary.short_one_little': 'O componentă ar putea fi mai mică, cu mai puțin de 10 €.',
+  'client.summary.short_many_little':
+    '{n} componente ar putea fi mai mici, cu mai puțin de 10 € în total.',
   'client.summary.benefit_yes':
     'Acest motiv dă dreptul la indemnizație de șomaj: {cuantia} brut pe lună în primele 6 luni, dacă ai cel puțin 360 de zile de contribuție în ultimii 6 ani.',
   'client.summary.benefit_yes_whole':
@@ -707,8 +708,12 @@ export const ro: Translation = {
   'documents.done.continue': 'Verifică datele',
   'documents.done.another': 'Încarcă mai multe documente',
   'documents.pass.title': 'Raport PDF și scrisoarea „primit, fără acord” (recibí no conforme)',
+  'documents.pass.claim_title': 'Ce componente sunt și cât lipsește la fiecare',
   'documents.pass.text':
-    'Descarcă raportul complet, cu calculul pas cu pas și sursele legale, și scrisoarea „primit, fără acord” (recibí no conforme) pentru 4,99 €. Sunt generate pe dispozitivul tău.',
+    'Cu permisul de 4,99 € vezi fiecare componentă cu suma ei, calculul pas cu pas și norma pe care se sprijină, și descarci raportul PDF și scrisoarea „primit, fără acord” (recibí no conforme). Sunt generate pe dispozitivul tău.',
+  'documents.pass.quiet_title': 'Nu e nevoie să plătești',
+  'documents.pass.quiet_text':
+    'Cu sumele pe care le-ai introdus, nimic nu este sub minimul legal. Dacă vrei totuși să le ai în scris, raportul PDF cu fiecare componentă și scrisoarea „primit, fără acord” (recibí no conforme) costă 4,99 €.',
   'documents.pass.price':
     '4,99 €, cu TVA (IVA) inclus. O singură plată, fără cont și fără abonament. Permisul (pase) durează 7 zile și funcționează doar în acest browser: în acest timp poți reface sau corecta verificarea, poți citi până la 15 seturi de documente și poți descărca din nou raportul și scrisoarea fără să plătești încă o dată. Pe alt dispozitiv, într-o fereastră privată sau dacă ștergi datele de navigare, se pierde.',
   'documents.pass.waiver':

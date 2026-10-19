@@ -377,11 +377,11 @@ export const eu: Translation = {
     'Sartu dituzun zifretako bat ere ez dago legezko gutxienekoaren azpitik.',
   'client.summary.no_figures':
     'Zure kitapenaren zifrarik gabe ez dago ezer alderatzeko; «Zure kitapena» urratsean sar ditzakezu.',
-  'client.summary.missing': '{partida}: baliteke {importe} inguru falta izatea.',
-  'client.summary.missing_little': '{partida}: baliteke 10 € baino gutxiago falta izatea.',
-  'client.summary.deduction': '{partida}: baliteke deskontua {importe} inguru gehiegizkoa izatea.',
-  'client.summary.deduction_little':
-    '{partida}: baliteke deskontua gehiegizkoa izatea, 10 € baino gutxiago.',
+  'client.summary.short_one': 'Baliteke kontzeptu bat motz geratzea: {importe} inguru.',
+  'client.summary.short_many': 'Baliteke {n} kontzeptu motz geratzea: {importe} inguru guztira.',
+  'client.summary.short_one_little': 'Baliteke kontzeptu bat motz geratzea, 10 € baino gutxiagoan.',
+  'client.summary.short_many_little':
+    'Baliteke {n} kontzeptu motz geratzea, guztira 10 € baino gutxiagoan.',
   'client.summary.benefit_yes':
     'Kausa honek langabezia-prestaziorako eskubidea ematen du: {cuantia} hilean, gordinik, lehen 6 hilabeteetan, azken 6 urteetan gutxienez 360 egun kotizatuta badituzu.',
   'client.summary.benefit_yes_whole':
@@ -709,8 +709,12 @@ export const eu: Translation = {
   'documents.done.continue': 'Berrikusi datuak',
   'documents.done.another': 'Igo dokumentu gehiago',
   'documents.pass.title': 'PDF txostena eta «recibí no conforme» (jasoa, ados ez) gutuna',
+  'documents.pass.claim_title': 'Zein kontzeptu diren eta bakoitzean zenbat falta den',
   'documents.pass.text':
-    'Deskargatu txosten osoa 4,99 €-tan: kalkulua urratsez urrats, lege-iturriak eta «recibí no conforme» gutuna. Zure gailuan sortzen dira.',
+    '4,99 €-ko pasearekin kontzeptu bakoitza bere zifrarekin ikusten duzu, kalkulua urratsez urrats eta oinarri duen araua, eta PDF txostena eta «recibí no conforme» gutuna deskargatzen dituzu. Zure gailuan sortzen dira.',
+  'documents.pass.quiet_title': 'Ez duzu ordaindu beharrik',
+  'documents.pass.quiet_text':
+    'Sartu dituzun zifrekin, ezer ez dago legezko gutxienekoaren azpitik. Hala ere idatziz izan nahi baduzu, kontzeptu bakoitza duen PDF txostenak eta «recibí no conforme» gutunak 4,99 € balio dute.',
   'documents.pass.price':
     '4,99 €, IVA barne. Ordainketa bakarra, konturik eta harpidetzarik gabe. Paseak 7 egun irauten du, eta nabigatzaile honetan bakarrik balio du: denbora horretan zure berrikuspena berregin edo zuzen dezakezu, gehienez 15 dokumentu-sorta irakurri, eta txostena eta gutuna berriro deskargatu, berriz ordaindu gabe. Beste gailu batean, leiho pribatu batean edo nabigazio-datuak ezabatzen badituzu, galdu egiten da.',
   'documents.pass.waiver':

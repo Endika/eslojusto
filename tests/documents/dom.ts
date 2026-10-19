@@ -73,6 +73,9 @@ export const NOTICE = `
 
 export const OFFER = `
 <section data-pass-offer hidden>
+  <h3><span data-pass-pitch>Pitch</span><span data-pass-quiet hidden>No need to pay</span></h3>
+  <p data-pass-pitch>Pitch text</p>
+  <p data-pass-quiet hidden>Quiet text</p>
   <div data-pass-buy>
     <input type="checkbox" id="pass-waiver" />
     <p data-pass-waiver-error hidden></p>

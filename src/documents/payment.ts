@@ -263,14 +263,25 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     const held = heldPass() !== null;
     const paid = verified();
     renderLetters(current, paid);
-    // With nothing to sell and no pass, only the free letters show, under their own title.
-    const freeOnly = !held && !current.offer;
+    // With nothing to sell and no pass, only the free letters show, under their own title. With
+    // nothing to claim but a pass still on sale, it is offered quietly, under its own words.
+    const quiet = !held && !current.offer && current.quiet === true;
+    const freeOnly = !held && !current.offer && !quiet;
+    const mode = freeOnly ? 'free' : quiet ? 'quiet' : 'claim';
+    section.dataset['passMode'] = mode;
+    // Something to claim stands out from the result around it; the other two do not.
+    if (mode === 'claim') section.dataset['tone'] = 'dates';
+    else delete section.dataset['tone'];
     section.hidden = freeOnly && freeKinds(current).length === 0;
     for (const el of section.querySelectorAll<HTMLElement>('[data-pass-pitch]'))
-      el.hidden = freeOnly;
+      el.hidden = freeOnly || quiet;
     for (const el of section.querySelectorAll<HTMLElement>('[data-pass-free-only]'))
       el.hidden = !freeOnly;
-    buy.hidden = held || !current.offer;
+    for (const el of section.querySelectorAll<HTMLElement>('[data-pass-quiet]')) el.hidden = !quiet;
+    for (const el of section.querySelectorAll<HTMLElement>('[data-pass-unheld]'))
+      el.hidden = held || freeOnly || quiet;
+    for (const el of section.querySelectorAll<HTMLElement>('[data-pass-held]')) el.hidden = !held;
+    buy.hidden = held || freeOnly;
     downloads.hidden = !paid;
     if (paid && stored) {
       const end = new Date(stored.expiresAt * 1000);
@@ -353,7 +364,7 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
       (await fetchPass(null, 'recovery', { quiet: true })) === true
     )
       return;
-    events.checkoutStarted();
+    events.checkoutStarted(current?.offer === false ? 'quiet' : 'claim');
     status.textContent = tr('client.documents.status.captcha');
     let captchaToken: string;
     try {

@@ -76,6 +76,7 @@ import {
   LETTER_KINDS,
   LETTER_PREFILLED,
   PAGE_KINDS,
+  PASS_OFFERED,
   PASS_VERIFY_RESULTS,
   PASS_VIA,
   QUALITY_PROBLEMS,
@@ -1142,7 +1143,7 @@ const DOCUMENT_CATALOGUE = {
   // Measured in the browser before sending: a photo looked dark, blurry or small.
   quality_warned: { kind: oneOf(QUALITY_PROBLEMS) },
   quality_overridden: {},
-  checkout_started: {},
+  checkout_started: { offer: oneOf(PASS_OFFERED) },
   pass_issued: { via: oneOf(PASS_VIA) },
   pass_failed: { code: oneOf(ERROR_CODES) },
   pass_verified: { result: oneOf(PASS_VERIFY_RESULTS) },

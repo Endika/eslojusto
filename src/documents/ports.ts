@@ -38,6 +38,9 @@ export const FILES_BUCKETS = [
 
 export const PASS_VIA = ['return', 'recovery'] as const;
 export type PassVia = (typeof PASS_VIA)[number];
+// Whether the pass was bought with something to claim or quietly, with nothing short.
+export const PASS_OFFERED = ['claim', 'quiet'] as const;
+export type PassOffered = (typeof PASS_OFFERED)[number];
 export const DOWNLOADS = ['report', 'letter'] as const;
 // What the API said of the pass this browser holds; `unavailable` when it could not say.
 export const PASS_VERIFY_RESULTS = ['ok', 'invalid', 'expired', 'revoked', 'unavailable'] as const;
@@ -65,7 +68,7 @@ export interface DocumentEvents {
   // Before sending, a photo looked dark, blurry or small; then whether it was sent all the same.
   qualityWarned(problem: QualityProblem): void;
   qualityOverridden(): void;
-  checkoutStarted(): void;
+  checkoutStarted(offer: PassOffered): void;
   passIssued(via: PassVia): void;
   passFailed(code: ErrorCode): void;
   passVerified(result: PassVerifyResult): void;
@@ -158,6 +161,8 @@ export interface PdfMaker {
 // A review whose pass unlocks only its detail has nothing more.
 export interface OfferedReview {
   readonly offer: boolean;
+  // With nothing to claim, the pass is still sold, quietly, to whoever wants the report anyway.
+  readonly quiet?: boolean;
 }
 
 // One whose pass unlocks downloads too: the report and the letters.

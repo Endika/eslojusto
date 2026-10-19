@@ -247,7 +247,9 @@ describe('document and pass events', () => {
       expect(isValidEvent('quality_warned', { kind })).toBe(true);
     expect(isValidEvent('quality_overridden', {})).toBe(true);
     expect(isValidEvent('extraction_failed', { code: 'network_error' })).toBe(true);
-    expect(isValidEvent('checkout_started', {})).toBe(true);
+    expect(isValidEvent('checkout_started', { offer: 'claim' })).toBe(true);
+    expect(isValidEvent('checkout_started', { offer: 'quiet' })).toBe(true);
+    expect(isValidEvent('checkout_started', {})).toBe(false);
     expect(isValidEvent('pass_issued', { via: 'recovery' })).toBe(true);
     expect(isValidEvent('pass_failed', { code: 'session_mismatch' })).toBe(true);
     for (const result of ['ok', 'invalid', 'expired', 'revoked', 'unavailable'])
@@ -347,7 +349,7 @@ describe('document and pass events', () => {
     events.nothingRead(['dark', 'no_data'], '1', 0);
     events.qualityWarned('blurry');
     events.qualityOverridden();
-    events.checkoutStarted();
+    events.checkoutStarted('quiet');
     events.passIssued('return');
     events.passFailed('price_mismatch');
     events.downloaded('report');

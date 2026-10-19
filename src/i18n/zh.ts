@@ -353,10 +353,10 @@ export const zh: Translation = {
   'client.summary.nothing_short': '您填写的数字没有一项低于法定最低金额。',
   'client.summary.no_figures':
     '没有您离职结算单上的数字，就无法对比；您可以在“您的离职结算”一页填写。',
-  'client.summary.missing': '{partida}：可能少付了约{importe}。',
-  'client.summary.missing_little': '{partida}：可能少付了不到10 €。',
-  'client.summary.deduction': '{partida}：扣款可能多扣了约{importe}。',
-  'client.summary.deduction_little': '{partida}：扣款可能多扣了不到10 €。',
+  'client.summary.short_one': '有一个项目可能少付：约{importe}。',
+  'client.summary.short_many': '有{n}个项目可能少付：合计约{importe}。',
+  'client.summary.short_one_little': '有一个项目可能少付，不到10 €。',
+  'client.summary.short_many_little': '有{n}个项目可能少付，合计不到10 €。',
   'client.summary.benefit_yes':
     '这一原因可以领取失业金：前6个月每月税前{cuantia}，前提是您在过去6年中累计缴费至少360天。',
   'client.summary.benefit_yes_whole':
@@ -656,8 +656,12 @@ export const zh: Translation = {
   'documents.done.continue': '核对数据',
   'documents.done.another': '上传更多文件',
   'documents.pass.title': 'PDF 报告和“已收到，但不同意”（recibí no conforme）信函',
+  'documents.pass.claim_title': '是哪些项目，每项少了多少',
   'documents.pass.text':
-    '支付4,99 €即可下载完整报告，其中包含逐步计算过程、法律出处和“已收到，但不同意”信函。报告和信函在您的设备上生成。',
+    '购买4,99 €的通行证后，您可以看到每个项目及其金额、逐步计算过程和所依据的规定，并下载 PDF 报告和“已收到，但不同意”信函。报告和信函在您的设备上生成。',
+  'documents.pass.quiet_title': '无需付费',
+  'documents.pass.quiet_text':
+    '按您填写的数字，没有任何一项低于法定最低金额。如果您仍想留下书面记录，包含每个项目的 PDF 报告和“已收到，但不同意”信函的价格为4,99 €。',
   'documents.pass.price':
     '4,99 €，含增值税（IVA）。一次性付款，无需注册账户，也不是订阅。通行证有效期7天，且只在本浏览器中有效：在此期间，您可以重做或修改核查，识别最多15份文件包，并重新下载报告和信函，无需再次付款。换一台设备、使用无痕窗口或清除浏览数据后，通行证就会丢失。',
   'documents.pass.waiver':

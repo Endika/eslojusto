@@ -373,10 +373,11 @@ export const ca: Translation = {
     'Cap de les xifres que has introduït no és per sota del mínim legal.',
   'client.summary.no_figures':
     'Sense les xifres de la teva quitança no hi ha res per comparar; les pots introduir al full «La teva quitança».',
-  'client.summary.missing': '{partida}: et podrien faltar uns {importe}.',
-  'client.summary.missing_little': '{partida}: et podrien faltar menys de 10 €.',
-  'client.summary.deduction': '{partida}: el descompte es podria passar en uns {importe}.',
-  'client.summary.deduction_little': '{partida}: el descompte es podria passar en menys de 10 €.',
+  'client.summary.short_one': 'Una partida podria quedar curta: uns {importe}.',
+  'client.summary.short_many': '{n} partides podrien quedar curtes: uns {importe} en total.',
+  'client.summary.short_one_little': 'Una partida podria quedar curta, en menys de 10 €.',
+  'client.summary.short_many_little':
+    '{n} partides podrien quedar curtes, en menys de 10 € en total.',
   'client.summary.benefit_yes':
     'Aquesta causa dona dret a atur: {cuantia} al mes en brut els primers 6 mesos, si sumes almenys 360 dies cotitzats en els últims 6 anys.',
   'client.summary.benefit_yes_whole':
@@ -699,8 +700,12 @@ export const ca: Translation = {
   'documents.done.continue': 'Revisar les dades',
   'documents.done.another': 'Pujar més documents',
   'documents.pass.title': 'Informe en PDF i carta «rebut, no conforme» (recibí no conforme)',
+  'documents.pass.claim_title': 'Quines partides són i quant hi falta en cadascuna',
   'documents.pass.text':
-    'Descarrega l’informe complet amb el càlcul pas a pas, les fonts legals i la carta «rebut, no conforme» per 4,99 €. Es generen al teu dispositiu.',
+    'Amb el passi de 4,99 € veus cada partida amb la seva xifra, el càlcul pas a pas i la norma en què es basa, i descarregues l’informe en PDF i la carta «rebut, no conforme». Es generen al teu dispositiu.',
+  'documents.pass.quiet_title': 'No cal que paguis',
+  'documents.pass.quiet_text':
+    'Amb les xifres que has introduït, res no queda per sota del mínim legal. Si tot i així ho vols tenir per escrit, l’informe en PDF amb cada partida i la carta «rebut, no conforme» costen 4,99 €.',
   'documents.pass.price':
     '4,99 € amb IVA inclòs. Un sol pagament, sense compte ni subscripció. El passi dura 7 dies i només val en aquest navegador: en aquest temps pots refer o corregir la teva revisió, llegir fins a 15 paquets de documents i tornar a descarregar l’informe i la carta sense pagar una altra vegada. En un altre dispositiu, en una finestra privada o si esborres les dades de navegació, es perd.',
   'documents.pass.waiver':

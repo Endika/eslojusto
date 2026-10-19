@@ -76,11 +76,12 @@ const workHistoryUrl =
         <div data-summary-deadlines></div>
       </div>
     </section>
+    {/* Right under the verdict, so it is not lost among the items. */}
+    {documents && <PassOffer lang={lang} />}
     {/* Warnings with no figure behind the pass: shown with the summary and with the detail. */}
     <div class="review__items" data-warnings hidden></div>
     {benefitFirst && <div class="review__slot" data-slot="benefit" />}
     <div class="review__items" data-items></div>
-    {documents && <PassOffer lang={lang} />}
 
     {!benefitFirst && <div class="review__slot" data-slot="benefit" />}
 
