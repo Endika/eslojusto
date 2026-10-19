@@ -5787,7 +5787,8 @@ export const zh: Translation = {
   'credit.result.restart': '重新开始',
   'credit.pass.title': '报告和信函',
   'credit.pass.text':
-    '支付4,99 €，即可下载 PDF 报告，其中包括计算 TAE 所用的付款表、每项费用使 TAE 增加的幅度以及提前还款的上限；如果您的核查中有相应数字，还可以下载关于提前还款补偿费的信函。这些文件在您的设备上生成。',
+    '支付4,99 €，即可看到是哪些项目及其计算过程和所依据的法规，并下载 PDF 报告，其中包括计算 TAE 所用的付款表、每项费用使 TAE 增加的幅度以及提前还款的上限；如果您的核查中有相应数字，还可以下载关于提前还款补偿费的信函。这些文件在您的设备上生成。',
+  'credit.pass.claim_title': '是哪些项目，法律对每一项怎么规定',
   'credit.pass.price':
     '4,99 €，含增值税（IVA）。一次性付款，无需注册账户，也不是订阅。通行证有效期7天，且只在本浏览器中有效，也可用于本网站的其他核查：在此期间，您可以重做或修改核查，并重新下载报告和信函，无需再次付款。换一台设备、使用无痕窗口或清除浏览数据后，通行证就会丢失。',
   'credit.pass.download_information_letter': '下载索取您贷款信息的信函（PDF，免费）',
@@ -5805,6 +5806,17 @@ export const zh: Translation = {
   'client.credit.result.lead':
     '每一项都附有得出结果的计算过程，以及所依据的法规或司法判例。剩余天数从今天起算。',
   'client.credit.result.lead_out_of_scope': '这笔贷款不在本页面的核查范围内。',
+  'client.credit.result.lead_unnamed':
+    '有多少项可能对不上；如涉及欧元，合计多少（四舍五入）。具体是哪些，以及计算过程和所依据的法规，购买通行证后可见。',
+  'client.credit.about': '约{importe}',
+  'client.credit.about_under_one': '不到1 €',
+  'client.credit.count_one': '共一项。',
+  'client.credit.count_many': '共{n}项。',
+  'client.credit.count_amount': '超出法律允许范围收取的金额合计{importe}。',
+  'client.credit.count_amount_up_to':
+    '超出法律允许范围收取的金额合计{importe}；视一个您不知道的数据而定，最多可达{hasta}。',
+  'client.credit.count_amount_only_up_to':
+    '视一个您不知道的数据而定，超出法律允许范围收取的金额最多可达{hasta}。',
   'client.credit.unit.day_one': '{n}天',
   'client.credit.unit.day_many': '{n}天',
   'client.credit.unit.month_one': '{n}个月',

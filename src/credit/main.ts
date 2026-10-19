@@ -1,18 +1,20 @@
 import { applyConditions } from '../calculator/review-form';
 import { setUpSection, type SectionForm } from '../calculator/section';
-import { reviewCredit } from '../engine/credit/review';
+import { reviewCredit, type CreditReview } from '../engine/credit/review';
 import { gate } from './conditions';
 import { SHEETS, onQuestions, readCreditForm, sheetErrors, sheetOfField } from './form';
 import type { CreditSetup } from './ports';
 import { renderCreditResult, renderErrors, renderOutOfScope } from './render';
 import { CREDIT_FLOW as flow } from './steps';
 
-// The consumer credit review: its sheets, the gate after the first ones and the result.
-export const setUpCredit = (
+// The consumer credit review: its sheets, the gate after the first ones and the result, shown
+// again when the pass is verified or dropped.
+export function setUpCredit(
   root: HTMLElement,
-  { events, today, tr, tables }: CreditSetup,
-): SectionForm =>
-  setUpSection(root, {
+  { events, today, tr, tables, detail = () => 'unlocked' }: CreditSetup,
+): SectionForm {
+  let shown: CreditReview | null = null;
+  return setUpSection(root, {
     formId: 'credit',
     flow,
     sheets: SHEETS,
@@ -25,6 +27,7 @@ export const setUpCredit = (
     stopsAtGate(form, result) {
       const g = gate(form);
       if (g.inScope) return false;
+      shown = null;
       renderOutOfScope(result, g, tr);
       events.reviewCleared();
       events.outOfScope(g.reason);
@@ -38,14 +41,23 @@ export const setUpCredit = (
       if (!r.ok) return onQuestions(r.errors, parsed.input);
       const reach = r.review.scope;
       if (reach.inScope) {
-        renderCreditResult(result, r.review, tr);
+        shown = r.review;
+        renderCreditResult(result, r.review, detail() === 'locked', tr);
         events.reviewCompleted({ review: r.review, input: parsed.input });
       } else {
+        shown = null;
         renderOutOfScope(result, reach, tr);
         events.reviewCleared();
         events.outOfScope(reach.reason);
       }
       return [];
     },
-    restarted: () => events.reviewCleared(),
+    restarted() {
+      shown = null;
+      events.reviewCleared();
+    },
+    refreshResult(result) {
+      if (shown) renderCreditResult(result, shown, detail() === 'locked', tr);
+    },
   });
+}

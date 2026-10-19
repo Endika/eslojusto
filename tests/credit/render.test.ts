@@ -42,6 +42,7 @@ function result(): HTMLElement {
   const root = document.createElement('section');
   root.innerHTML = `
     <p data-lead></p>
+    <p data-count hidden></p>
     <section data-out-of-scope hidden>
       <span data-out-of-scope-status></span><p data-out-of-scope-reason></p>
     </section>
@@ -76,7 +77,7 @@ const cards = (root: HTMLElement) =>
 describe('the credit result', () => {
   it('gives the APR first, then the indicator and the withdrawal: no early repayment, no item', () => {
     const root = result();
-    renderCreditResult(root, review(loan({ confirmedApr: true })), tr);
+    renderCreditResult(root, review(loan({ confirmedApr: true })), false, tr);
     expect(cards(root)).toEqual([
       {
         item: 'apr',
@@ -100,6 +101,7 @@ describe('the credit result', () => {
       review(
         loan({ earlyRepayment: repayment({ interestSettled: null, compensationCharged: 80 }) }),
       ),
+      false,
       tr,
     );
     const card = root.querySelectorAll('[data-item]')[2];
@@ -118,6 +120,7 @@ describe('the credit result', () => {
           insurance: { premium: 600, single: true, financed: false, required: null },
         }),
       ),
+      false,
       tr,
     );
     const apr = root.querySelector('[data-item="apr"]');
@@ -142,7 +145,7 @@ describe('the credit result', () => {
 
   it('dates a court criterion and says when it was not read in the ruling', () => {
     const root = result();
-    renderCreditResult(root, review(loan()), tr);
+    renderCreditResult(root, review(loan()), false, tr);
     const rules = [...(root.querySelectorAll('[data-item="indicator"] [data-rules] li') ?? [])];
     const sts366 = rules.find((li) => li.querySelector('a')?.textContent?.startsWith('STS 366'));
     expect(sts366?.querySelector('[data-rule-status]')?.textContent).toBe(
@@ -154,6 +157,56 @@ describe('the credit result', () => {
     expect(lawSourceText({ ...CREDIT_SOURCES.sts366_2026, verified: false }, tr)).toBe(
       'criterio del Tribunal Supremo · estado a 19-10-2026 · sin comprobar en el texto de la sentencia',
     );
+  });
+
+  it('locked with something to claim, counts the points and their euros without naming them', () => {
+    const r = review(
+      loan({ earlyRepayment: repayment({ interestSettled: null, compensationCharged: 80 }) }),
+    );
+    expect(r.offerPass).toBe(true);
+    const root = result();
+    renderCreditResult(root, r, true, tr);
+    expect(cards(root).map((c) => c.item)).toEqual(['indicator', 'withdrawal']);
+    expect(root.querySelectorAll('[data-item="apr"], [data-item="early_repayment"]')).toHaveLength(
+      0,
+    );
+    expect(root.textContent).not.toContain('art. 30');
+    const count = root.querySelector('[data-count]');
+    expect(count?.hasAttribute('hidden')).toBe(false);
+    // Whole euros carry a non-breaking space before the sign.
+    expect(count?.textContent?.replace(/\s/g, ' ')).toBe(
+      'Son 2 puntos. Lo cobrado por encima de lo que permite la ley suma unos 30 €.',
+    );
+    expect(root.querySelector('[data-lead]')?.textContent).toBe(
+      'Cuántos puntos podrían no cuadrar y, si hay euros, cuánto suman, redondeado. Cuáles son, con su cuenta y la norma en que se apoyan, va con el pase.',
+    );
+    expect(root.querySelector('[data-unchecked]')?.children.length).toBeGreaterThan(0);
+
+    renderCreditResult(root, r, false, tr);
+    expect(cards(root).map((c) => c.item)).toEqual([
+      'apr',
+      'indicator',
+      'early_repayment',
+      'withdrawal',
+    ]);
+    expect(root.querySelector('[data-count]')?.hasAttribute('hidden')).toBe(true);
+  });
+
+  it('locked with only the APR to claim, says it is one point and no euros', () => {
+    const root = result();
+    renderCreditResult(root, review(loan()), true, tr);
+    expect(root.querySelector('[data-count]')?.textContent).toBe('Es un punto.');
+    expect(cards(root).map((c) => c.item)).toEqual(['indicator', 'withdrawal']);
+  });
+
+  it('locked with nothing to claim, shows every point as before', () => {
+    const r = review(loan({ declaredApr: 16.61 }));
+    expect(r.offerPass).toBe(false);
+    const root = result();
+    renderCreditResult(root, r, true, tr);
+    expect(cards(root).map((c) => c.item)).toEqual(['apr', 'indicator', 'withdrawal']);
+    expect(root.querySelector('[data-count]')?.hasAttribute('hidden')).toBe(true);
+    expect(root.querySelector('[data-lead]')?.textContent).toBe(tr('client.credit.result.lead'));
   });
 
   it('a credit outside the review says why and works nothing out', () => {
@@ -183,6 +236,7 @@ describe('the credit result', () => {
           card: { limit: 1_500, nominalRate: 22, annualFee: 0, minimumPayment: 60, balance: 0 },
         }),
       ),
+      false,
       tr,
     );
     expect(root.querySelector('[data-lead]')?.textContent).toContain(

@@ -1,5 +1,10 @@
 import { toIso, type CivilDate } from '../engine/date';
-import { formatCalculationEuros, formatDays, formatInteger } from '../calculator/number';
+import {
+  formatCalculationEuros,
+  formatDays,
+  formatInteger,
+  formatWholeEuros,
+} from '../calculator/number';
 import { dayText, find, listOf, template, renderFieldErrors } from '../calculator/review-result';
 import type {
   CreditCalculation,
@@ -7,11 +12,17 @@ import type {
   CreditPhrase,
   CreditPhraseKey,
 } from '../engine/credit/calculation';
-import type { CreditFinding, CreditItem, DoubtReading, FindingId } from '../engine/credit/finding';
+import {
+  findingsOf,
+  type CreditFinding,
+  type CreditItem,
+  type DoubtReading,
+  type FindingId,
+} from '../engine/credit/finding';
 import type { Indicator } from '../engine/credit/indicator';
 import type { InformationBlock } from '../engine/credit/information';
 import type { NormStatus } from '../engine/credit/norms';
-import type { CreditReview } from '../engine/credit/review';
+import { overChargedOf, type CreditReview } from '../engine/credit/review';
 import { scopePhrases } from '../engine/credit/scope';
 import type { Scope } from '../engine/credit/types';
 import type { LawSource, NormSource } from '../engine/law/sources';
@@ -367,18 +378,71 @@ const inScopeParts = (root: ParentNode) => [
   ...root.querySelectorAll<HTMLElement>('[data-in-scope]'),
 ];
 
+// What the free result shows of a total: whole euros, never cents, and never «unos 0 €».
+const about = (euros: number, tr: Translate): string =>
+  euros < 0.5
+    ? tr('client.credit.about_under_one')
+    : tr('client.credit.about', { importe: formatWholeEuros(euros) });
+
+// A point that opens the pass: the contract states a lower APR in every reading, or something was
+// charged over what the law allows in every reading.
+const claimable = (item: CreditItem): boolean => {
+  const findings = findingsOf(item);
+  return findings[0]?.id === 'apr'
+    ? findings.every((f) => f.status === 'contract_lower')
+    : findings.every((f) => overChargedOf(f) > 0);
+};
+
+// How many points may not add up and, if they come to euros, about how much, without naming them.
+function countText(review: CreditReview, tr: Translate): string {
+  const n = review.items.filter(claimable).length;
+  const points =
+    n === 1
+      ? tr('client.credit.count_one')
+      : tr('client.credit.count_many', { n: formatInteger(n) });
+  const { counted, upTo } = review.totals.overCharged;
+  if (upTo <= 0) return points;
+  const amount =
+    counted <= 0
+      ? tr('client.credit.count_amount_only_up_to', { hasta: about(upTo, tr) })
+      : upTo > counted
+        ? tr('client.credit.count_amount_up_to', {
+            importe: about(counted, tr),
+            hasta: about(upTo, tr),
+          })
+        : tr('client.credit.count_amount', { importe: about(counted, tr) });
+  return `${points} ${amount}`;
+}
+
+// Free whatever the pass says: where the APR stands against the average rate and the withdrawal
+// period, whose deadline is never behind a payment.
+const ALWAYS_SHOWN: ReadonlySet<Card['id']> = new Set(['indicator', 'withdrawal']);
+
 // The APR first, then where it stands against the average rate, the early repayment and the
-// withdrawal period; each with its calculation and its rules. The indicator is free and whole, and
-// nothing here is locked.
-export function renderCreditResult(root: HTMLElement, review: CreditReview, tr: Translate): void {
+// withdrawal period; each with its calculation and its rules. Locked with something to claim, the
+// APR, the early repayment and the dealer's discount are the pass's: their cards are not in the
+// page at all, only how many points may not add up and what they come to.
+export function renderCreditResult(
+  root: HTMLElement,
+  review: CreditReview,
+  locked: boolean,
+  tr: Translate,
+): void {
   find(root, '[data-out-of-scope]').hidden = true;
   for (const el of inScopeParts(root)) el.hidden = false;
+  const unnamed = locked && review.offerPass;
   const scopeNote = scopePhrases(review.scope).map((p) => phraseText(p, tr));
+  const lead = unnamed ? [...scopeNote, tr('client.credit.result.lead_unnamed')] : scopeNote;
   find(root, '[data-lead]').textContent =
-    scopeNote.length > 0 ? scopeNote.join(' ') : tr('client.credit.result.lead');
+    lead.length > 0 ? lead.join(' ') : tr('client.credit.result.lead');
+  const count = find(root, '[data-count]');
+  count.hidden = !unnamed;
+  count.textContent = unnamed ? countText(review, tr) : '';
   const [first, ...rest] = review.items.map((item) => itemCard(item, tr));
   const indicator = review.indicator === null ? [] : [indicatorCard(review.indicator, tr)];
-  const cards = [...(first ? [first] : []), ...indicator, ...rest];
+  const cards = [...(first ? [first] : []), ...indicator, ...rest].filter(
+    (c) => !unnamed || ALWAYS_SHOWN.has(c.id),
+  );
   find(root, '[data-items]').replaceChildren(...cards.map((c, i) => renderCard(root, c, i, tr)));
   renderInformation(root, review.information, tr);
   renderUnchecked(root, review, tr);
@@ -389,6 +453,9 @@ export function renderOutOfScope(root: HTMLElement, reach: Scope, tr: Translate)
   for (const el of inScopeParts(root)) el.hidden = true;
   find(root, '[data-items]').replaceChildren();
   find(root, '[data-information]').replaceChildren();
+  const count = find(root, '[data-count]');
+  count.hidden = true;
+  count.textContent = '';
   find(root, '[data-lead]').textContent = tr('client.credit.result.lead_out_of_scope');
   const box = find(root, '[data-out-of-scope]');
   box.hidden = false;

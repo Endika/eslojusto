@@ -6249,7 +6249,8 @@ export const ro: Translation = {
   'credit.result.restart': 'Ia-o de la capăt',
   'credit.pass.title': 'Raportul și scrisoarea',
   'credit.pass.text':
-    'Pentru 4,99 € descarci raportul în PDF, cu tabelul plăților pe baza căruia se calculează DAE (TAE), cât adaugă fiecare cost și plafonul pentru rambursarea anticipată, și, dacă verificarea ta are cifre pentru ea, scrisoarea despre compensația pentru rambursarea anticipată. Sunt generate pe dispozitivul tău.',
+    'Pentru 4,99 € vezi care sunt punctele, cu calculul lor și norma pe care se sprijină, și descarci raportul în PDF, cu tabelul plăților pe baza căruia se calculează DAE (TAE), cât adaugă fiecare cost și plafonul pentru rambursarea anticipată, și, dacă verificarea ta are cifre pentru ea, scrisoarea despre compensația pentru rambursarea anticipată. Sunt generate pe dispozitivul tău.',
+  'credit.pass.claim_title': 'Care sunt punctele și ce spune legea despre fiecare',
   'credit.pass.price':
     '4,99 €, cu TVA (IVA) inclus. O singură plată, fără cont și fără abonament. Permisul (pase) durează 7 zile și funcționează doar în acest browser, inclusiv pentru celelalte verificări de pe site: în acest timp poți reface sau corecta verificarea și poți descărca din nou raportul și scrisoarea fără să plătești încă o dată. Pe alt dispozitiv, într-o fereastră privată sau dacă ștergi datele de navigare, se pierde.',
   'credit.pass.download_information_letter':
@@ -6270,6 +6271,17 @@ export const ro: Translation = {
   'client.credit.result.lead':
     'Fiecare componentă, cu calculul care duce la ea și norma sau criteriul pe care se sprijină. Zilele rămase se socotesc de azi.',
   'client.credit.result.lead_out_of_scope': 'Acest credit nu intră în ce verifică această pagină.',
+  'client.credit.result.lead_unnamed':
+    'Câte puncte s-ar putea să nu se potrivească și, dacă sunt euro la mijloc, cât fac, rotunjit. Care sunt, cu calculul lor și norma pe care se sprijină, vin cu permisul.',
+  'client.credit.about': 'aproximativ {importe}',
+  'client.credit.about_under_one': 'mai puțin de 1 €',
+  'client.credit.count_one': 'Este un punct.',
+  'client.credit.count_many': 'Sunt {n} puncte.',
+  'client.credit.count_amount': 'Ce s-a perceput peste cât permite legea se ridică la {importe}.',
+  'client.credit.count_amount_up_to':
+    'Ce s-a perceput peste cât permite legea se ridică la {importe} și până la {hasta}, în funcție de o informație pe care nu o știi.',
+  'client.credit.count_amount_only_up_to':
+    'În funcție de o informație pe care nu o știi, ce s-a perceput peste cât permite legea poate ajunge la {hasta}.',
   'client.credit.unit.day_one': '{n} zi',
   'client.credit.unit.day_many': '{n} zile',
   'client.credit.unit.month_one': '{n} lună',

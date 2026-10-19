@@ -68,13 +68,15 @@ type CreditResult =
 // The statuses whose euros reach a total.
 const FIGURED: ReadonlySet<FindingStatus> = new Set(['above_general_cap', 'charged_without_basis']);
 
-const amountOf = (f: CreditFinding): number => (FIGURED.has(f.status) ? (f.amount ?? 0) : 0);
+// The euros a finding puts in a total: what was charged over a cap or without a basis.
+export const overChargedOf = (f: CreditFinding): number =>
+  FIGURED.has(f.status) ? (f.amount ?? 0) : 0;
 
 function totalOf(items: readonly CreditItem[]): Total {
   let counted = 0;
   let upTo = 0;
   for (const item of items) {
-    const amounts = findingsOf(item).map(amountOf);
+    const amounts = findingsOf(item).map(overChargedOf);
     counted += Math.min(...amounts);
     upTo += Math.max(...amounts);
   }

@@ -1,3 +1,4 @@
+import type { Detail } from '../calculator/flow';
 import type { SectionEvents } from '../calculator/section';
 import type { CivilDate } from '../engine/date';
 import type { CreditDeps, CreditReview } from '../engine/credit/review';
@@ -75,4 +76,6 @@ export interface CreditSetup {
   // The norms, sources and Bank of Spain series the review reads, as the composition root loads
   // them.
   readonly tables: CreditDeps;
+  // How the result is shown when a review completes; unlocked unless told otherwise.
+  readonly detail?: () => Detail;
 }
