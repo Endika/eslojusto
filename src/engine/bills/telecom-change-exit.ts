@@ -1,4 +1,4 @@
-import { addMonthsClamped, compareDates, toIso } from '../date';
+import { addMonthsClamped, compareDates, toIso, type CivilDate } from '../date';
 import { assessAcross } from '../law/readings';
 import { round2 } from '../money';
 import { billsPhrase, type BillsCalculation, type BillsPhraseKey } from './calculation';
@@ -19,6 +19,20 @@ import type { TelecomInput } from './types';
 interface ChangeExitDeps {
   readonly norms: NormTable;
   readonly sources: SourceTable;
+}
+
+// The last day of the month after a notice of changed conditions, when the review settles it: an
+// exit under the current law, a notice with its date given at least a month ahead, of a change that
+// may give the right to leave. It reads only the answers, never whether the penalty is right.
+export function changeExitDeadline(input: TelecomInput): CivilDate | null {
+  const notice = input.changeNotice;
+  if (notice === null || notice.sentOn === null) return null;
+  if (toIso(input.exitRequestedOn) < RULES.change_exit.from) return null;
+  if (notice.change === 'other' || (notice.change === 'price_up' && notice.index !== 'none'))
+    return null;
+  const lastDay = addMonthsClamped(notice.sentOn, 1);
+  if (notice.appliesOn !== null && compareDates(notice.appliesOn, lastDay) < 0) return null;
+  return lastDay;
 }
 
 // Art. 67.8 and 67.10 LGTel: leaving within the month after a change of conditions is notified

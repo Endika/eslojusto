@@ -1,5 +1,6 @@
 import { telecomAnalytics } from '../analytics/bills';
 import { track } from '../analytics/posthog';
+import type { Detail } from '../calculator/flow';
 import { BILLS_NORMS } from '../engine/bills/data/norms';
 import { BILLS_SOURCES } from '../engine/bills/data/sources';
 import { BILLS_TABLES } from '../engine/bills/data/tables';
@@ -23,6 +24,9 @@ const documentsBuild =
     import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
   ) && DOCUMENTS_BUILD;
 
+// Until the document module says whether a pass is there, the result shows which items they are;
+// without the documents API there is no pass to lock them.
+let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedTelecomReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
@@ -48,6 +52,7 @@ const telecom = setUpTelecom(document.body, {
     sources: BILLS_SOURCES,
     tables: { holidays: BILLS_TABLES.holidays },
   },
+  detail: () => detail(),
 });
 
 if (documentsBuild) {
@@ -58,8 +63,8 @@ if (documentsBuild) {
         {
           onReview: (listener) => reviewed.push(listener),
           onRestart: (listener) => cleared.push(listener),
-          // Nothing in the bills result is locked.
-          detail: () => {},
+          // The pass shows which items they are and unlocks the report and the penalty letter.
+          detail: (state) => (detail = state),
         },
         arrival,
         BILLS_NORMS,

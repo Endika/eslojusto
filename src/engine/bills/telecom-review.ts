@@ -4,7 +4,7 @@ import type { NormTable, SourceTable } from './norms';
 import { telecomScope } from './scope';
 import type { BillsTables } from './tables';
 import { checkChargesAfterExit } from './telecom-after-exit';
-import { checkChangeExit } from './telecom-change-exit';
+import { changeExitDeadline, checkChangeExit } from './telecom-change-exit';
 import { checkCommitment } from './telecom-commitment';
 import type { TelecomInput, TelecomScope } from './types';
 import { validateTelecom, type TelecomField, type ValidationError } from './validate';
@@ -31,6 +31,9 @@ export interface TelecomReview {
   readonly items: readonly BillItem[];
   readonly totals: BillTotals;
   readonly unchecked: readonly TelecomUncheckedCode[];
+  // The last day to leave without the commitment penalty after a notice of changed conditions;
+  // null when there is none or the review does not settle it.
+  readonly changeDeadline: CivilDate | null;
 }
 
 type TelecomResult =
@@ -59,6 +62,7 @@ export function reviewTelecom(
         items: [],
         totals: { counted: 0, upTo: 0, under: 0 },
         unchecked: TELECOM_UNCHECKED,
+        changeDeadline: null,
       },
     };
   const errors = validateTelecom(input, today);
@@ -74,6 +78,12 @@ export function reviewTelecom(
   ];
   return {
     ok: true,
-    review: { scope: reach, items, totals: totalsOf(items), unchecked: TELECOM_UNCHECKED },
+    review: {
+      scope: reach,
+      items,
+      totals: totalsOf(items),
+      unchecked: TELECOM_UNCHECKED,
+      changeDeadline: changeExitDeadline(input),
+    },
   };
 }

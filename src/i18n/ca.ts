@@ -4500,6 +4500,7 @@ export const ca: Translation = {
   'bills.telecom.charges.unrequested':
     'Si no has demanat un servei, la llei no permet cobrar-te’l, i no respondre a qui te’l presta no compta com a acceptar-lo. Si no l’has contractat tu, pregunta-ho a la teva companyia.',
   'bills.telecom.pass.title': 'L’informe i les cartes',
+  'bills.telecom.pass.claim_title': 'Quins punts són i quant surt en cadascun',
   'bills.telecom.pass.letter_note':
     'Les cartes són plantilles. Es descarreguen al teu dispositiu i no s’envien des d’aquí: fer-les servir o no, i com, és decisió teva.',
   'bills.telecom.pass.download_exit_letter':
@@ -4648,6 +4649,11 @@ export const ca: Translation = {
     'Amb el que has introduït, el que et cobren queda dins del que permet la norma.',
   'client.bills.result.telecom_lead_nothing':
     'Amb el que has introduït no hi ha penalització ni cobraments de després de la baixa per comprovar.',
+  'client.bills.result.telecom_lead_unnamed':
+    'Amb el que has introduït, et cobren més del que permet la norma. Quins punts són, amb el seu càlcul i la seva font, va amb el passi.',
+  'client.bills.telecom.deadline.rule':
+    'Si la teva companyia t’avisa d’un canvi en les condicions del contracte, la llei et permet donar-te de baixa en el mes següent a l’avís sense pagar la penalització per permanència; només et pot continuar cobrant el terminal subvencionat que et quedis.',
+  'client.bills.telecom.deadline.ends': 'El mes següent a l’avís acaba el {fecha}.',
   'client.bills.result.lead_out_of_scope':
     'Aquesta revisió encara no cobreix el que has introduït.',
   'client.bills.pass.issued':
@@ -4655,7 +4661,7 @@ export const ca: Translation = {
   'client.bills.pass.offer':
     'Revisa el teu any sencer: amb un passi de 4,99 € revises fins a ~15 lectures durant 7 dies, en qualsevol secció. Descarregues l’informe de les teves factures i, si alguna línia passa de la norma, la carta que demana la factura rectificativa.',
   'client.bills.telecom.pass.offer':
-    'Amb un passi de 4,99 € descarregues l’informe de la teva baixa i, si la penalització passa del que permet la norma, la carta que demana revisar-la, i revises fins a ~15 lectures durant 7 dies, en qualsevol secció.',
+    'Amb un passi de 4,99 € veus quins punts són, amb el seu càlcul i la seva font, descarregues l’informe de la teva baixa i, si la penalització passa del que permet la norma, la carta que demana revisar-la, i revises fins a ~15 lectures durant 7 dies, en qualsevol secció.',
   'client.bills.basket.title_one': 'El teu any: 1 factura revisada',
   'client.bills.basket.title_many': 'El teu any: {n} factures revisades',
   'client.bills.basket.bill': 'Factura des de {desde} fins a {hasta}',

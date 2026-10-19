@@ -4235,6 +4235,7 @@ export const zh: Translation = {
   'bills.telecom.charges.unrequested':
     '如果您没有申请某项服务，法律不允许向您收费，而且不回复服务提供方也不视为接受。如果不是您自己签约的，请向您的运营商询问。',
   'bills.telecom.pass.title': '报告和信函',
+  'bills.telecom.pass.claim_title': '是哪几点，每点各是多少',
   'bills.telecom.pass.letter_note':
     '这些信函是模板。它们下载到您的设备上，不会从这里发送：是否使用以及如何使用，由您自己决定。',
   'bills.telecom.pass.download_exit_letter': '下载条件变更后退订的信函（PDF，免费）',
@@ -4374,13 +4375,18 @@ export const zh: Translation = {
     '根据您填写的内容，向您收取的费用在法规允许的范围之内。',
   'client.bills.result.telecom_lead_nothing':
     '根据您填写的内容，没有需要核查的违约金或退订后的收费。',
+  'client.bills.result.telecom_lead_unnamed':
+    '根据您填写的内容，向您收取的费用超出了法规允许的范围。具体是哪几点，以及计算过程和来源，购买通行证后可见。',
+  'client.bills.telecom.deadline.rule':
+    '如果运营商通知您合同条件有变更，法律允许您在通知后的一个月内退订，无需支付最低合约期违约金；只有您保留的补贴终端仍可收费。',
+  'client.bills.telecom.deadline.ends': '通知后的一个月于{fecha}结束。',
   'client.bills.result.lead_out_of_scope': '本核查暂不涵盖您填写的内容。',
   'client.bills.pass.issued':
     '已收到付款。您现在可以下载报告；如果您的核查有相应的数字，还可以下载信函。',
   'client.bills.pass.offer':
     '核查您的一整年：凭4,99 €的通行证，您可以在7天内于任何栏目中进行最多~15次文件识别。您可以下载账单报告；如果某一项超出法规，还可以下载要求开具更正发票（factura rectificativa）的信函。',
   'client.bills.telecom.pass.offer':
-    '凭4,99 €的通行证，您可以下载退订报告；如果违约金超出法规允许的范围，还可以下载要求重新核算违约金的信函；并且可以在7天内于任何栏目中进行最多~15次文件识别。',
+    '凭4,99 €的通行证，您可以看到具体是哪几点及其计算过程和来源，下载退订报告；如果违约金超出法规允许的范围，还可以下载要求重新核算违约金的信函；并且可以在7天内于任何栏目中进行最多~15次文件识别。',
   'client.bills.basket.title_one': '您的一年：已核查1张账单',
   'client.bills.basket.title_many': '您的一年：已核查{n}张账单',
   'client.bills.basket.bill': '{desde}至{hasta}的账单',

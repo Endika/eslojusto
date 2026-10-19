@@ -4670,6 +4670,7 @@ export const fr: Translation = {
   'bills.telecom.charges.unrequested':
     "Si vous n'avez pas demandé un service, la loi ne permet pas de vous le facturer, et ne pas répondre à celui qui le fournit ne vaut pas acceptation. Si vous ne l'avez pas souscrit vous-même, posez la question à votre opérateur.",
   'bills.telecom.pass.title': 'Le rapport et les lettres',
+  'bills.telecom.pass.claim_title': 'Quels points sont concernés et combien chacun représente',
   'bills.telecom.pass.letter_note':
     "Les lettres sont des modèles. Elles se téléchargent sur votre appareil et ne sont pas envoyées d'ici\u00a0: les utiliser ou non, et comment, relève de votre décision.",
   'bills.telecom.pass.download_exit_letter':
@@ -4824,6 +4825,11 @@ export const fr: Translation = {
     "D'après ce que vous avez saisi, ce que l'on vous facture reste dans les limites de ce que permet la réglementation.",
   'client.bills.result.telecom_lead_nothing':
     "D'après ce que vous avez saisi, il n'y a ni pénalité ni montant facturé après la résiliation à vérifier.",
+  'client.bills.result.telecom_lead_unnamed':
+    "D'après ce que vous avez saisi, on vous facture plus que ce que permet la réglementation. Quels points sont concernés, avec leur calcul et leur source, vient avec le pass.",
+  'client.bills.telecom.deadline.rule':
+    "Si votre opérateur vous informe d'une modification des conditions du contrat, la loi vous permet de résilier dans le mois qui suit l'avis sans payer la pénalité liée à la durée d'engagement ; seul le terminal subventionné que vous gardez peut encore vous être facturé.",
+  'client.bills.telecom.deadline.ends': "Le mois qui suit l'avis se termine le {fecha}.",
   'client.bills.result.lead_out_of_scope':
     'Cette vérification ne couvre pas encore ce que vous avez saisi.',
   'client.bills.pass.issued':
@@ -4831,7 +4837,7 @@ export const fr: Translation = {
   'client.bills.pass.offer':
     "Vérifiez votre année entière\u00a0: avec un pass à 4,99 €, vous vérifiez jusqu'à ~15 lectures pendant 7 jours, dans n'importe quelle section. Vous téléchargez le rapport de vos factures et, si une ligne dépasse la réglementation, la lettre qui demande la facture rectificative.",
   'client.bills.telecom.pass.offer':
-    "Avec un pass à 4,99 €, vous téléchargez le rapport de votre résiliation et, si la pénalité dépasse ce que permet la réglementation, la lettre qui demande de la revoir, et vous vérifiez jusqu'à ~15 lectures pendant 7 jours, dans n'importe quelle section.",
+    "Avec un pass à 4,99 €, vous voyez quels points sont concernés, avec leur calcul et leur source, vous téléchargez le rapport de votre résiliation et, si la pénalité dépasse ce que permet la réglementation, la lettre qui demande de la revoir, et vous vérifiez jusqu'à ~15 lectures pendant 7 jours, dans n'importe quelle section.",
   'client.bills.basket.title_one': 'Votre année\u00a0: 1 facture vérifiée',
   'client.bills.basket.title_many': 'Votre année\u00a0: {n} factures vérifiées',
   'client.bills.basket.bill': 'Facture du {desde} au {hasta}',

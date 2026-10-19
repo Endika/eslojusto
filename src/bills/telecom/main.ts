@@ -1,6 +1,6 @@
 import { applyConditions } from '../../calculator/review-form';
 import { setUpSection, type SectionForm } from '../../calculator/section';
-import { reviewTelecom } from '../../engine/bills/telecom-review';
+import { reviewTelecom, type TelecomReview } from '../../engine/bills/telecom-review';
 import { renderErrors, renderOutOfScope } from '../result';
 import { gate } from './conditions';
 import { SHEETS, onQuestions, readTelecomForm, sheetErrors, sheetOfField } from './form';
@@ -9,12 +9,13 @@ import { renderTelecomResult } from './render';
 import { TELECOM_FLOW as flow } from './steps';
 
 // The review of leaving a phone or internet contract: its sheets, the gate after the exit date and
-// the result.
-export const setUpTelecom = (
+// the result, shown again when the pass is verified or dropped.
+export function setUpTelecom(
   root: HTMLElement,
-  { events, today, tr, tables }: TelecomSetup,
-): SectionForm =>
-  setUpSection(root, {
+  { events, today, tr, tables, detail = () => 'unlocked' }: TelecomSetup,
+): SectionForm {
+  let shown: TelecomReview | null = null;
+  return setUpSection(root, {
     formId: 'telecom',
     flow,
     sheets: SHEETS,
@@ -27,6 +28,7 @@ export const setUpTelecom = (
     stopsAtGate(form, result) {
       const g = gate(form);
       if (g.inScope) return false;
+      shown = null;
       renderOutOfScope(result, g, tr);
       events.reviewCleared();
       events.outOfScope(g.reason);
@@ -40,14 +42,23 @@ export const setUpTelecom = (
       if (!r.ok) return onQuestions(r.errors);
       const reach = r.review.scope;
       if (reach.inScope) {
-        renderTelecomResult(result, r.review, tables.norms, tr);
+        shown = r.review;
+        renderTelecomResult(result, r.review, tables.norms, detail() === 'locked', tr);
         events.reviewCompleted({ review: r.review, input: parsed.input });
       } else {
+        shown = null;
         renderOutOfScope(result, reach, tr);
         events.reviewCleared();
         events.outOfScope(reach.reason);
       }
       return [];
     },
-    restarted: () => events.reviewCleared(),
+    restarted() {
+      shown = null;
+      events.reviewCleared();
+    },
+    refreshResult(result) {
+      if (shown) renderTelecomResult(result, shown, tables.norms, detail() === 'locked', tr);
+    },
   });
+}

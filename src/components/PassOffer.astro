@@ -142,6 +142,7 @@ const CLAIM = {
   employment: 'employment.pass.claim_title',
   mortgage: 'mortgage.pass.claim_title',
   credit: 'credit.pass.claim_title',
+  telecom: 'bills.telecom.pass.claim_title',
 } as const satisfies Partial<Record<string, Key>>;
 const claim = review in CLAIM ? CLAIM[review as keyof typeof CLAIM] : null;
 ---

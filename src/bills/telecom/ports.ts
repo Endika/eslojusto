@@ -1,3 +1,4 @@
+import type { Detail } from '../../calculator/flow';
 import type { SectionEvents } from '../../calculator/section';
 import type { CivilDate } from '../../engine/date';
 import type { TelecomDeps, TelecomReview } from '../../engine/bills/telecom-review';
@@ -51,4 +52,6 @@ export interface TelecomSetup {
   readonly tr: Translate;
   // The norms, sources and holidays the review reads, as the composition root loads them.
   readonly tables: TelecomDeps;
+  // How the result is shown when a review completes; unlocked unless told otherwise.
+  readonly detail?: () => Detail;
 }

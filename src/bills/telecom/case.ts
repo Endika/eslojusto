@@ -1,10 +1,10 @@
 import { basketCase } from '../../documents/basket';
 import type { PaidReview } from '../../documents/ports';
-import { PASS_PRICE } from '../../documents/contract';
 import type { NormTable } from '../../engine/bills/norms';
 import { billsReport } from '../report';
 import { allClear } from '../result';
 import { exitLetter, penaltyLetter, telecomLetterKinds } from './letters';
+import { offersPass } from './offer';
 import type { CompletedTelecomReview } from './ports';
 import { telecomLabels } from './render';
 
@@ -14,7 +14,7 @@ import { telecomLabels } from './render';
 // pass. The norms are the ones the review read.
 export const telecomCase = (r: CompletedTelecomReview, norms: NormTable): PaidReview =>
   basketCase([r], {
-    offer: (kept) => kept.reduce((sum, k) => sum + k.review.totals.counted, 0) >= PASS_PRICE,
+    offer: (kept) => offersPass(kept.map((k) => k.review)),
     quiet: (kept) => kept.every(({ review }) => allClear(review.items, review.totals)),
     report: (kept, tr, today) =>
       billsReport(
