@@ -1,6 +1,8 @@
 import type { SourceTable } from '../norms';
 
-const CENDOJ = 'https://www.poderjudicial.es/search/indexAN.jsp';
+// A ruling's own PDF in CENDOJ, by the reference and date its search result links to.
+const cendojPdf = (reference: string, optimize: string): string =>
+  `https://www.poderjudicial.es/search/contenidos.action?action=contentpdf&databasematch=TS&reference=${reference}&optimize=${optimize}&publicinterface=true`;
 const SUPREME_CIVIL = 'Tribunal Supremo, Sala de lo Civil';
 
 // Court criteria are shown as such, never as law. A criterion read in its own text is verified for
@@ -14,7 +16,7 @@ export const CREDIT_SOURCES: SourceTable = {
     basis: 'case_law',
     citation: 'STS 258/2023, de 15 de febrero (Pleno)',
     article: 'criterio sobre tarjetas revolving',
-    url: CENDOJ,
+    url: cendojPdf('10303585', '20230224'),
     inForceSince: '2023-02-15',
     court: `${SUPREME_CIVIL} (Pleno)`,
     number: '258/2023',
@@ -34,7 +36,7 @@ export const CREDIT_SOURCES: SourceTable = {
     basis: 'case_law',
     citation: 'STS 366/2026, de 9 de marzo',
     article: 'criterio sobre préstamos al consumo',
-    url: CENDOJ,
+    url: cendojPdf('11659366', '20260318'),
     inForceSince: '2026-03-09',
     court: SUPREME_CIVIL,
     number: '366/2026',
