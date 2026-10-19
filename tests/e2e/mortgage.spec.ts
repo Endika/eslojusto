@@ -410,7 +410,7 @@ test('flags alone give no figure', async ({ page }) => {
   await expect(total(page, 'case_law')).toContainText('Sin cifra: no tienes las facturas');
   const floor = card(page, 'Cláusula suelo');
   await expect(floor).toContainText('Aparece en tu escritura');
-  await expect(floor).toContainText('Lo que dicen los tribunales · estado a 07-10-2026');
+  await expect(floor).toContainText('Lo que dicen los tribunales · estado a 10-10-2026');
   await expect(floor).toContainText('C-154/15');
 });
 
@@ -490,7 +490,7 @@ test('the page has its title, heading, canonical, JSON-LD, guide and questions',
   );
   // What the courts have said is dated and never shown as law.
   await expect(guide.locator('[data-guide="before_2019"]')).toContainText(
-    'Lo que han dicho los tribunales, estado a 07-10-2026.',
+    'Lo que han dicho los tribunales, estado a 10-10-2026.',
   );
   await expect(guide).toContainText(
     'STS 35/2021, de 27 de enero (Pleno) · criterio del Tribunal Supremo, Sala de lo Civil (Pleno)',
