@@ -3,6 +3,7 @@ import { CREDIT_SOURCES } from '../engine/credit/data/sources';
 import { BE1904 } from '../engine/credit/data/be1904';
 import { creditAnalytics } from '../analytics/credit';
 import { track } from '../analytics/posthog';
+import type { Detail } from '../calculator/flow';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import { setUpCredit } from '../credit/main';
 import type { CompletedCreditReview, CreditEvents } from '../credit/ports';
@@ -22,6 +23,9 @@ const documentsBuild =
     import.meta.env.PUBLIC_API_PASS_URL &&
     import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
   ) && DOCUMENTS_BUILD;
+// Until the document module says whether a pass is there, the result shows every point; without
+// the documents API there is no pass to lock them.
+let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedCreditReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
@@ -53,6 +57,7 @@ const credit = setUpCredit(document.body, {
   today: localToday,
   tr: pageTranslator(),
   tables,
+  detail: () => detail(),
 });
 
 if (documentsBuild) {
@@ -63,8 +68,8 @@ if (documentsBuild) {
         {
           onReview: (listener) => reviewed.push(listener),
           onRestart: (listener) => cleared.push(listener),
-          // Nothing in the credit result is locked.
-          detail: () => {},
+          // The pass shows which points they are and unlocks the report and the repayment letter.
+          detail: (state) => (detail = state),
         },
         arrival,
         tables.norms,

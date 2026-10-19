@@ -196,7 +196,10 @@ test('the credit information letter is free; the pass unlocks the report and the
   await page.setViewportSize({ width: 360, height: 640 });
   await arriveWith(page, 'financiacion/', 'eslojusto-revision-financiacion-en-pago', LOAN);
   const offer = page.locator('[data-pass-offer]');
-  await expect(offer.getByRole('heading', { name: 'El informe y la carta' })).toBeVisible();
+  await expect(
+    offer.getByRole('heading', { name: 'Qué puntos son y qué dice la ley de cada uno' }),
+  ).toBeVisible();
+  await expect(page.locator('#resultado [data-item="early_repayment"]')).toHaveCount(0);
   const free = offer.getByRole('button', {
     name: 'Descargar la carta que pide la información de tu crédito (PDF, gratis)',
   });
@@ -216,6 +219,9 @@ test('the credit information letter is free; the pass unlocks the report and the
   await offer.getByLabel(/Quiero el informe ahora/).check();
   await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
   await expect(paid).toBeVisible();
+  // Once the pass is verified, the result shows again with each point.
+  await expect(page.locator('#resultado [data-item="early_repayment"]')).toBeVisible();
+  await expect(offer.getByRole('heading', { name: 'El informe y la carta' })).toBeVisible();
   await expect(page).toHaveURL(`${ORIGIN}/financiacion/#resultado`);
   expect(fake.checkout).toHaveLength(1);
   expect(fake.checkout[0]?.postDataJSON()).toMatchObject({ returnTo: 'credit' });

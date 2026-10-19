@@ -6187,7 +6187,8 @@ export const en: Translation = {
   'credit.result.restart': 'Start again',
   'credit.pass.title': 'The report and the letter',
   'credit.pass.text':
-    'For 4,99 € you download the PDF report, with the table of payments the APR (TAE) is calculated from, what each cost adds and the cap for repaying early, and, if your review has figures for it, the letter about the compensation for repaying early. They are generated on your device.',
+    'For 4,99 € you see which points they are, with their calculation and the law they rest on, and you download the PDF report, with the table of payments the APR (TAE) is calculated from, what each cost adds and the cap for repaying early, and, if your review has figures for it, the letter about the compensation for repaying early. They are generated on your device.',
+  'credit.pass.claim_title': 'Which points they are and what the law says of each',
   'credit.pass.price':
     '4,99 € including VAT (IVA). A single payment, with no account or subscription. The pass lasts 7 days and is only valid in this browser, also for the other reviews on the website: during that time you can redo or correct your review and download the report and the letter again without paying again. On another device, in a private window or if you clear your browsing data, it is lost.',
   'credit.pass.download_information_letter':
@@ -6208,6 +6209,17 @@ export const en: Translation = {
   'client.credit.result.lead':
     'Each item, with the calculation that leads to it and the law or interpretation it relies on. The days remaining are counted from today.',
   'client.credit.result.lead_out_of_scope': 'This credit falls outside what this page reviews.',
+  'client.credit.result.lead_unnamed':
+    'How many points may not add up and, if they come to euros, how much, rounded. Which ones, with their calculation and the law they rest on, comes with the pass.',
+  'client.credit.about': 'about {importe}',
+  'client.credit.about_under_one': 'less than 1 €',
+  'client.credit.count_one': 'It is one point.',
+  'client.credit.count_many': 'There are {n} points.',
+  'client.credit.count_amount': 'What was charged above what the law allows comes to {importe}.',
+  'client.credit.count_amount_up_to':
+    'What was charged above what the law allows comes to {importe}, and up to {hasta} depending on a detail you do not know.',
+  'client.credit.count_amount_only_up_to':
+    'Depending on a detail you do not know, what was charged above what the law allows may come to {hasta}.',
   'client.credit.unit.day_one': '{n} day',
   'client.credit.unit.day_many': '{n} days',
   'client.credit.unit.month_one': '{n} month',

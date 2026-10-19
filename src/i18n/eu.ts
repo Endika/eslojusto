@@ -6225,7 +6225,8 @@ export const eu: Translation = {
   'credit.result.restart': 'Hasi berriro',
   'credit.pass.title': 'Txostena eta gutuna',
   'credit.pass.text':
-    '4,99 €-tan, PDF txostena deskargatzen duzu, TAEa kalkulatzeko erabiltzen den ordainketen taularekin, gastu bakoitzak gehitzen duenarekin eta aurretik itzultzeagatiko mugarekin, eta, zure berrikuspenak horretarako zifrak baditu, aurretik itzultzeagatiko konpentsazioari buruzko gutuna. Zure gailuan sortzen dira.',
+    '4,99 €-tan, zein puntu diren ikusten duzu, beren kalkuluarekin eta oinarri duten arauarekin, eta PDF txostena deskargatzen duzu, TAEa kalkulatzeko erabiltzen den ordainketen taularekin, gastu bakoitzak gehitzen duenarekin eta aurretik itzultzeagatiko mugarekin, eta, zure berrikuspenak horretarako zifrak baditu, aurretik itzultzeagatiko konpentsazioari buruzko gutuna. Zure gailuan sortzen dira.',
+  'credit.pass.claim_title': 'Zein puntu diren eta legeak bakoitzaz zer dioen',
   'credit.pass.price':
     '4,99 €, IVA barne. Ordainketa bakarra, konturik eta harpidetzarik gabe. Paseak 7 egun irauten du, eta nabigatzaile honetan bakarrik balio du, baita webguneko gainerako berrikuspenetarako ere: denbora horretan zure berrikuspena berregin edo zuzen dezakezu, eta txostena eta gutuna berriro deskargatu, berriz ordaindu gabe. Beste gailu batean, leiho pribatu batean edo nabigazio-datuak ezabatzen badituzu, galdu egiten da.',
   'credit.pass.download_information_letter':
@@ -6247,6 +6248,17 @@ export const eu: Translation = {
     'Kontzeptu bakoitza, hartara daraman kalkuluarekin eta oinarritzat duen arau edo irizpidearekin. Geratzen diren egunak gaurtik aurrera zenbatzen dira.',
   'client.credit.result.lead_out_of_scope':
     'Kreditu hau orri honek berrikusten duenetik kanpo geratzen da.',
+  'client.credit.result.lead_unnamed':
+    'Zenbat puntuk ez duten bat etorriko, eta, euroak badaude, zenbat egiten duten, biribilduta. Zein diren, beren kalkuluarekin eta oinarri duten arauarekin, pasearekin dator.',
+  'client.credit.about': '{importe} inguru',
+  'client.credit.about_under_one': '1 € baino gutxiago',
+  'client.credit.count_one': 'Puntu bat da.',
+  'client.credit.count_many': '{n} puntu dira.',
+  'client.credit.count_amount': 'Legeak uzten duenaren gainetik kobratutakoa {importe} da.',
+  'client.credit.count_amount_up_to':
+    'Legeak uzten duenaren gainetik kobratutakoa {importe} da, eta {hasta} arte, ez dakizun datu baten arabera.',
+  'client.credit.count_amount_only_up_to':
+    'Ez dakizun datu baten arabera, legeak uzten duenaren gainetik kobratutakoa {hasta} izan daiteke.',
   'client.credit.unit.day_one': '{n} egun',
   'client.credit.unit.day_many': '{n} egun',
   'client.credit.unit.month_one': '{n} hilabete',

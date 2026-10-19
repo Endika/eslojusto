@@ -6154,7 +6154,8 @@ export const ca: Translation = {
   'credit.result.restart': 'Tornar a començar',
   'credit.pass.title': 'L’informe i la carta',
   'credit.pass.text':
-    'Per 4,99 € descarregues l’informe en PDF, amb la taula de pagaments amb què es calcula la TAE, el que hi afegeix cada despesa i el límit per retornar-lo abans, i, si la teva revisió té xifres per a ella, la carta sobre la compensació per retornar-lo abans. Es generen al teu dispositiu.',
+    'Per 4,99 € veus quins punts són, amb el seu càlcul i la norma en què es basen, i descarregues l’informe en PDF, amb la taula de pagaments amb què es calcula la TAE, el que hi afegeix cada despesa i el límit per retornar-lo abans, i, si la teva revisió té xifres per a ella, la carta sobre la compensació per retornar-lo abans. Es generen al teu dispositiu.',
+  'credit.pass.claim_title': 'Quins punts són i què diu la llei de cadascun',
   'credit.pass.price':
     '4,99 € amb IVA inclòs. Un sol pagament, sense compte ni subscripció. El passi dura 7 dies i només val en aquest navegador, també per a les altres revisions del web: en aquest temps pots refer o corregir la teva revisió i tornar a descarregar l’informe i la carta sense pagar una altra vegada. En un altre dispositiu, en una finestra privada o si esborres les dades de navegació, es perd.',
   'credit.pass.download_information_letter':
@@ -6176,6 +6177,18 @@ export const ca: Translation = {
     'Cada partida, amb el càlcul que hi porta i la norma o el criteri en què es basa. Els dies que queden es compten a partir d’avui.',
   'client.credit.result.lead_out_of_scope':
     'Aquest crèdit queda fora del que revisa aquesta pàgina.',
+  'client.credit.result.lead_unnamed':
+    'Quants punts podrien no quadrar i, si hi ha euros, quant sumen, arrodonit. Quins són, amb el seu càlcul i la norma en què es basen, va amb el passi.',
+  'client.credit.about': 'uns {importe}',
+  'client.credit.about_under_one': 'menys d’1 €',
+  'client.credit.count_one': 'És un punt.',
+  'client.credit.count_many': 'Són {n} punts.',
+  'client.credit.count_amount':
+    'El que s’ha cobrat per sobre del que permet la llei suma {importe}.',
+  'client.credit.count_amount_up_to':
+    'El que s’ha cobrat per sobre del que permet la llei suma {importe}, i fins a {hasta} segons una dada que no saps.',
+  'client.credit.count_amount_only_up_to':
+    'Segons una dada que no saps, el que s’ha cobrat per sobre del que permet la llei pot arribar a {hasta}.',
   'client.credit.unit.day_one': '{n} dia',
   'client.credit.unit.day_many': '{n} dies',
   'client.credit.unit.month_one': '{n} mes',

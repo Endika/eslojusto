@@ -74,6 +74,7 @@ const channels: readonly Key[] = [
       {tx('credit.result.title')}
     </h2>
     <p class="result__lead" data-lead></p>
+    <p class="help" data-count hidden></p>
   </header>
 
   <div class="review" data-review>
@@ -98,9 +99,10 @@ const channels: readonly Key[] = [
       </div>
     </section>
 
-    <div class="review__items" data-items></div>
-
+    {/* Right under the count, so it is not lost among the items. */}
     {documents && <PassOffer lang={lang} review="credit" />}
+
+    <div class="review__items" data-items></div>
 
     <section class="item" data-in-scope aria-labelledby="information-title">
       <div class="sheet">

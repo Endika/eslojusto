@@ -6369,7 +6369,8 @@ export const fr: Translation = {
   'credit.result.restart': 'Recommencer',
   'credit.pass.title': 'Le rapport et la lettre',
   'credit.pass.text':
-    "Pour 4,99 €, vous téléchargez le rapport en PDF, avec le tableau des paiements qui sert à calculer le TAEG, ce qu'ajoute chaque poste de frais et le plafond en cas de remboursement anticipé, et, si votre vérification contient des chiffres pour elle, la lettre sur l'indemnité de remboursement anticipé. Ils sont générés sur votre appareil.",
+    "Pour 4,99 €, vous voyez quels points sont concernés, avec leur calcul et la règle sur laquelle ils s’appuient, et vous téléchargez le rapport en PDF, avec le tableau des paiements qui sert à calculer le TAEG, ce qu'ajoute chaque poste de frais et le plafond en cas de remboursement anticipé, et, si votre vérification contient des chiffres pour elle, la lettre sur l'indemnité de remboursement anticipé. Ils sont générés sur votre appareil.",
+  'credit.pass.claim_title': 'Quels points sont concernés et ce que dit la loi de chacun',
   'credit.pass.price':
     "4,99 €, TVA (IVA) comprise. Un seul paiement, sans compte ni abonnement. Le pass dure 7 jours et n'est valable que dans ce navigateur, y compris pour les autres vérifications du site\u00a0: pendant ce temps, vous pouvez refaire ou corriger votre vérification et télécharger de nouveau le rapport et la lettre sans payer une nouvelle fois. Sur un autre appareil, dans une fenêtre de navigation privée ou si vous effacez les données de navigation, il est perdu.",
   'credit.pass.download_information_letter':
@@ -6390,6 +6391,18 @@ export const fr: Translation = {
   'client.credit.result.lead':
     "Chaque poste, avec le calcul qui y mène et le texte de loi ou la jurisprudence sur lesquels il s'appuie. Les jours restants se comptent à partir d'aujourd'hui.",
   'client.credit.result.lead_out_of_scope': 'Ce crédit sort du champ de ce que vérifie cette page.',
+  'client.credit.result.lead_unnamed':
+    'Combien de points pourraient ne pas correspondre et, s’il y a des euros, combien ils font, arrondi. Lesquels, avec leur calcul et la règle sur laquelle ils s’appuient, vient avec le pass.',
+  'client.credit.about': 'environ {importe}',
+  'client.credit.about_under_one': 'moins de 1 €',
+  'client.credit.count_one': 'C’est un point.',
+  'client.credit.count_many': 'Il y en a {n}.',
+  'client.credit.count_amount':
+    'Ce qui a été facturé au-delà de ce que permet la loi s’élève à {importe}.',
+  'client.credit.count_amount_up_to':
+    'Ce qui a été facturé au-delà de ce que permet la loi s’élève à {importe}, et jusqu’à {hasta} selon une donnée que vous ne connaissez pas.',
+  'client.credit.count_amount_only_up_to':
+    'Selon une donnée que vous ne connaissez pas, ce qui a été facturé au-delà de ce que permet la loi peut atteindre {hasta}.',
   'client.credit.unit.day_one': '{n} jour',
   'client.credit.unit.day_many': '{n} jours',
   'client.credit.unit.month_one': '{n} mois',

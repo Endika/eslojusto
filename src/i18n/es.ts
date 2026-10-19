@@ -5034,7 +5034,8 @@ export const es = {
   'credit.result.restart': 'Empezar de nuevo',
   'credit.pass.title': 'El informe y la carta',
   'credit.pass.text':
-    'Por 4,99 € descargas el informe en PDF, con la tabla de pagos con que se calcula la TAE, lo que añade cada gasto y el tope por devolverlo antes, y, si tu revisión tiene cifras para ella, la carta sobre la compensación por devolverlo antes. Se generan en tu dispositivo.',
+    'Por 4,99 € ves qué puntos son, con su cuenta y la norma en que se apoyan, y descargas el informe en PDF, con la tabla de pagos con que se calcula la TAE, lo que añade cada gasto y el tope por devolverlo antes, y, si tu revisión tiene cifras para ella, la carta sobre la compensación por devolverlo antes. Se generan en tu dispositivo.',
+  'credit.pass.claim_title': 'Qué puntos son y qué dice la ley de cada uno',
   'credit.pass.price':
     '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para las demás revisiones de la web: en ese tiempo puedes rehacer o corregir tu revisión y volver a descargar el informe y la carta sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
   'credit.pass.download_information_letter':
@@ -5057,6 +5058,17 @@ export const es = {
     'Cada partida, con la cuenta que lleva a ella y la norma o el criterio en que se apoya. Los días que quedan se cuentan desde hoy.',
   'client.credit.result.lead_out_of_scope':
     'Este crédito queda fuera de lo que revisa esta página.',
+  'client.credit.result.lead_unnamed':
+    'Cuántos puntos podrían no cuadrar y, si hay euros, cuánto suman, redondeado. Cuáles son, con su cuenta y la norma en que se apoyan, va con el pase.',
+  'client.credit.about': 'unos {importe}',
+  'client.credit.about_under_one': 'menos de 1 €',
+  'client.credit.count_one': 'Es un punto.',
+  'client.credit.count_many': 'Son {n} puntos.',
+  'client.credit.count_amount': 'Lo cobrado por encima de lo que permite la ley suma {importe}.',
+  'client.credit.count_amount_up_to':
+    'Lo cobrado por encima de lo que permite la ley suma {importe}, y hasta {hasta} según un dato que no sabes.',
+  'client.credit.count_amount_only_up_to':
+    'Según un dato que no sabes, lo cobrado por encima de lo que permite la ley puede llegar a {hasta}.',
   'client.credit.unit.day_one': '{n} día',
   'client.credit.unit.day_many': '{n} días',
   'client.credit.unit.month_one': '{n} mes',
