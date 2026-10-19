@@ -4563,6 +4563,7 @@ export const eu: Translation = {
   'bills.telecom.charges.unrequested':
     'Zerbitzu bat eskatu ez baduzu, legeak ez du onartzen hura kobratzea, eta zerbitzua ematen dizunari ez erantzutea ez da onartzetzat hartzen. Zuk kontratatu ez baduzu, galdetu zure konpainiari.',
   'bills.telecom.pass.title': 'Txostena eta gutunak',
+  'bills.telecom.pass.claim_title': 'Zein puntu diren eta bakoitzean zenbat ateratzen den',
   'bills.telecom.pass.letter_note':
     'Gutunak txantiloiak dira. Zure gailuan deskargatzen dira, eta ez dira hemendik bidaltzen: erabili ala ez, eta nola, zure erabakia da.',
   'bills.telecom.pass.download_exit_letter':
@@ -4710,13 +4711,19 @@ export const eu: Translation = {
     'Sartu duzunarekin, kobratzen dizutena arauak onartzen duenaren barruan dago.',
   'client.bills.result.telecom_lead_nothing':
     'Sartu duzunarekin, ez dago egiaztatzeko penalizaziorik, ezta bajaren ondorengo kobrantzarik ere.',
+  'client.bills.result.telecom_lead_unnamed':
+    'Sartu duzunarekin, arauak onartzen duena baino gehiago kobratzen dizute. Zein puntu diren, beren kalkuluarekin eta iturriarekin, pasearekin dator.',
+  'client.bills.telecom.deadline.rule':
+    'Konpainiak kontratuaren baldintzetan aldaketa bat jakinarazten badizu, legeak aukera ematen dizu jakinarazpenaren hurrengo hilabetean baja emateko, iraupen-konpromisoagatiko penalizaziorik ordaindu gabe; gordetzen duzun terminal diruz lagundua bakarrik kobra diezazukete oraindik.',
+  'client.bills.telecom.deadline.ends':
+    'Jakinarazpenaren hurrengo hilabetea egun honetan amaitzen da: {fecha}.',
   'client.bills.result.lead_out_of_scope': 'Berrikuspen honek oraindik ez du hartzen sartu duzuna.',
   'client.bills.pass.issued':
     'Ordainketa jaso da. Orain txostena deskarga dezakezu eta, zure berrikuspenak horretarako zifrak baditu, gutuna.',
   'client.bills.pass.offer':
     'Berrikusi zure urte osoa: 4,99 €-ko pase batekin, gehienez ~15 irakurketa berrikusten dituzu 7 egunez, edozein ataletan. Zure fakturen txostena deskargatzen duzu eta, lerroren batek araua gainditzen badu, faktura zuzentzailea eskatzen duen gutuna.',
   'client.bills.telecom.pass.offer':
-    '4,99 €-ko pase batekin, zure bajaren txostena deskargatzen duzu eta, penalizazioak arauak onartzen duena gainditzen badu, hura berrikusteko eskatzen duen gutuna; gainera, gehienez ~15 irakurketa berrikusten dituzu 7 egunez, edozein ataletan.',
+    '4,99 €-ko pase batekin, zein puntu diren ikusten duzu, beren kalkuluarekin eta iturriarekin, zure bajaren txostena deskargatzen duzu eta, penalizazioak arauak onartzen duena gainditzen badu, hura berrikusteko eskatzen duen gutuna; gainera, gehienez ~15 irakurketa berrikusten dituzu 7 egunez, edozein ataletan.',
   'client.bills.basket.title_one': 'Zure urtea: 1 faktura berrikusita',
   'client.bills.basket.title_many': 'Zure urtea: {n} faktura berrikusita',
   'client.bills.basket.bill': 'Faktura, {desde} datatik {hasta} datara',

@@ -4580,6 +4580,7 @@ export const ro: Translation = {
   'bills.telecom.charges.unrequested':
     'Dacă nu ai cerut un serviciu, legea nu permite să ți se perceapă, iar faptul că nu răspunzi celui care ți-l prestează nu înseamnă că l-ai acceptat. Dacă nu l-ai contractat tu, întreabă compania ta.',
   'bills.telecom.pass.title': 'Raportul și scrisorile',
+  'bills.telecom.pass.claim_title': 'Care sunt punctele și cât iese la fiecare',
   'bills.telecom.pass.letter_note':
     'Scrisorile sunt modele. Se descarcă pe dispozitivul tău și nu se trimit de aici: dacă le folosești și cum, este decizia ta.',
   'bills.telecom.pass.download_exit_letter':
@@ -4731,13 +4732,18 @@ export const ro: Translation = {
     'Cu ce ai introdus, ce ți se percepe se încadrează în ce permite norma.',
   'client.bills.result.telecom_lead_nothing':
     'Cu ce ai introdus, nu există nicio penalitate și nicio sumă percepută după reziliere de verificat.',
+  'client.bills.result.telecom_lead_unnamed':
+    'Cu ce ai introdus, ți se percepe mai mult decât permite norma. Care sunt punctele, cu calculul și sursa lor, vin cu permisul.',
+  'client.bills.telecom.deadline.rule':
+    'Dacă operatorul te anunță despre o modificare a condițiilor contractului, legea îți permite să reziliezi în luna de după anunț fără să plătești penalitatea pentru perioada minimă de contract; ți se mai poate percepe doar terminalul subvenționat pe care îl păstrezi.',
+  'client.bills.telecom.deadline.ends': 'Luna de după anunț se încheie pe {fecha}.',
   'client.bills.result.lead_out_of_scope': 'Această verificare nu acoperă încă ce ai introdus.',
   'client.bills.pass.issued':
     'Plata a fost primită. Acum poți descărca raportul și, dacă verificarea ta are cifre pentru ea, scrisoarea.',
   'client.bills.pass.offer':
     'Verifică-ți întregul an: cu un permis de 4,99 € verifici până la ~15 citiri timp de 7 zile, în orice secțiune. Descarci raportul facturilor tale și, dacă vreo linie depășește norma, scrisoarea prin care ceri factura de corecție (factura rectificativa).',
   'client.bills.telecom.pass.offer':
-    'Cu un permis de 4,99 € descarci raportul despre rezilierea ta și, dacă penalitatea depășește ce permite norma, scrisoarea prin care ceri verificarea ei, iar în plus verifici până la ~15 citiri timp de 7 zile, în orice secțiune.',
+    'Cu un permis de 4,99 € vezi care sunt punctele, cu calculul și sursa lor, descarci raportul despre rezilierea ta și, dacă penalitatea depășește ce permite norma, scrisoarea prin care ceri verificarea ei, iar în plus verifici până la ~15 citiri timp de 7 zile, în orice secțiune.',
   'client.bills.basket.title_one': 'Anul tău: 1 factură verificată',
   'client.bills.basket.title_many': 'Anul tău: {n} facturi verificate',
   'client.bills.basket.bill': 'Factura de la {desde} până la {hasta}',

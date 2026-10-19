@@ -4542,6 +4542,7 @@ export const en: Translation = {
   'bills.telecom.charges.unrequested':
     'If you did not ask for a service, the law does not allow you to be charged for it, and not replying to whoever provides it does not count as accepting it. If you did not sign up for it yourself, ask your company.',
   'bills.telecom.pass.title': 'The report and the letters',
+  'bills.telecom.pass.claim_title': 'Which points they are and how much each comes to',
   'bills.telecom.pass.letter_note':
     'The letters are templates. They are downloaded to your device and are not sent from here: whether and how you use them is your decision.',
   'bills.telecom.pass.download_exit_letter':
@@ -4689,13 +4690,18 @@ export const en: Translation = {
     'With what you entered, what you are charged is within what the regulations allow.',
   'client.bills.result.telecom_lead_nothing':
     'With what you entered, there is no penalty and no charges after the cancellation to check.',
+  'client.bills.result.telecom_lead_unnamed':
+    'With what you entered, you are charged more than the regulations allow. Which points they are, with their calculation and their source, comes with the pass.',
+  'client.bills.telecom.deadline.rule':
+    'If your provider notifies you of a change in the conditions of the contract, the law lets you cancel within the month after the notice without paying the minimum-term commitment penalty; only a subsidised handset you keep can still be charged.',
+  'client.bills.telecom.deadline.ends': 'The month after the notice ends on {fecha}.',
   'client.bills.result.lead_out_of_scope': 'This review does not cover what you entered yet.',
   'client.bills.pass.issued':
     'Payment received. You can now download the report and, if your review has figures for it, the letter.',
   'client.bills.pass.offer':
     'Review your whole year: with a 4,99 € pass you review up to ~15 readings over 7 days, in any section. You download the report on your bills and, if any line goes beyond the regulations, the letter asking for a corrected invoice (factura rectificativa).',
   'client.bills.telecom.pass.offer':
-    'With a 4,99 € pass you download the report on your cancellation and, if the penalty goes beyond what the regulations allow, the letter asking for it to be reviewed, and you review up to ~15 readings over 7 days, in any section.',
+    'With a 4,99 € pass you see which points they are, with their calculation and their source, you download the report on your cancellation and, if the penalty goes beyond what the regulations allow, the letter asking for it to be reviewed, and you review up to ~15 readings over 7 days, in any section.',
   'client.bills.basket.title_one': 'Your year: 1 bill reviewed',
   'client.bills.basket.title_many': 'Your year: {n} bills reviewed',
   'client.bills.basket.bill': 'Bill from {desde} to {hasta}',

@@ -490,6 +490,65 @@ test('the letter about leaving after a change of conditions downloads free, with
   expect(outside).toEqual([]);
 });
 
+// The same change, with no handset, all 250 € of the penalty charged and a month billed after the
+// exit: over the pass's price, so before it the result does not say which items they are.
+const EXIT_TO_CLAIM = [
+  ...EXIT_AFTER_CHANGE.filter(([field]) => !/^(hasHandset|handset|chargedAfter)/.test(field)),
+  ['hasHandset', 'no'],
+  ['chargedAfter', 'yes'],
+  ['lineFrom', '2026-03-01'],
+  ['lineTo', '2026-03-31'],
+  ['lineAmount', '30'],
+] as const;
+
+test('before the pass, the telecom result keeps its totals and its deadline, not which items they are', async ({
+  page,
+}) => {
+  await fakeServices(page, {});
+  const payment = await fakePayment(page, 'facturas/permanencia/');
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.addInitScript(
+    ([key, value]) => {
+      if (sessionStorage.getItem('e2e-seeded') === null) {
+        sessionStorage.setItem(key, value);
+        sessionStorage.setItem('e2e-seeded', '1');
+      }
+    },
+    ['eslojusto-revision-permanencia-en-pago', JSON.stringify(EXIT_TO_CLAIM)] as const,
+  );
+  await page.goto('facturas/permanencia/');
+  await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeVisible();
+  await expect(
+    offer(page).getByRole('heading', { name: 'Qué puntos son y cuánto sale en cada uno' }),
+  ).toBeVisible();
+  const counted = await page.locator('#resultado [data-total-counted]').textContent();
+  expect(counted).toMatch(/^\d+,\d\d €$/);
+  const items = page.locator('#resultado [data-items] [data-item]');
+  await expect(items).toHaveCount(1);
+  await expect(items.first()).toHaveAttribute('data-item', 'change_exit');
+  // The deadline alone: the day the month after the notice ends, no verdict and no euros.
+  await expect(items.first()).toContainText('El mes siguiente al aviso acaba el 01-03-2026.');
+  await expect(items.first().locator('[data-verdict]')).toBeHidden();
+  await expect(items.first()).not.toContainText('€');
+  await expect(page.locator('#resultado [data-lead]')).toContainText('va con el pase');
+  await noSideScroll(page);
+
+  await offer(page)
+    .getByLabel(/Quiero el informe ahora/)
+    .check();
+  await offer(page).getByRole('button', { name: 'Pagar 4,99 €' }).click();
+  // Once the pass is verified, the result shows again with each item.
+  await expect(page.locator('#resultado [data-item="charge_after_exit"]')).toBeVisible();
+  await expect(page.locator('#resultado [data-item="change_exit"] [data-verdict]')).toContainText(
+    '€',
+  );
+  await expect(offer(page).getByRole('heading', { name: 'El informe y las cartas' })).toBeVisible();
+  await expect(page.locator('#resultado [data-total-counted]')).toHaveText(counted ?? '');
+  await expect(page.locator('#resultado [data-lead]')).not.toContainText('pase');
+  expect(payment.checkout).toHaveLength(1);
+  expect(payment.checkout[0]?.postDataJSON()).toMatchObject({ returnTo: 'telecom' });
+});
+
 test('the telecom page reads the contract into its sheets', async ({ page }) => {
   const contract = (value: Value) => ({ value, confidence: 'high', source: 'telecom_contract' });
   const sent = await fakeServices(page, {

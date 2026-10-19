@@ -1,14 +1,15 @@
 import { formatCalculationEuros, formatDays, formatInteger } from '../calculator/number';
 import { dayText, find, listOf, template, renderFieldErrors } from '../calculator/review-result';
 import type { BillsFigure, BillsPhrase } from '../engine/bills/calculation';
-import type {
-  BillFinding,
-  BillItem,
-  BillTotals,
-  BillsItemId,
-  BillsStatus,
-  HandsetReading,
-  OfficialReading,
+import {
+  findingsOf,
+  type BillFinding,
+  type BillItem,
+  type BillTotals,
+  type BillsItemId,
+  type BillsStatus,
+  type HandsetReading,
+  type OfficialReading,
 } from '../engine/bills/finding';
 import type { NormStatus, NormTable } from '../engine/bills/norms';
 import type { RowCitation } from '../engine/bills/period';
@@ -236,7 +237,8 @@ export interface ItemLabels {
 interface Card {
   readonly finding: BillFinding;
   readonly state: string;
-  readonly status: string;
+  // Null on a card that gives only its rule, with no verdict.
+  readonly status: string | null;
   readonly calculation: readonly string[];
   readonly depends: string | null;
   readonly readings: readonly {
@@ -302,7 +304,8 @@ function renderCard(
   title.id = titleId;
   title.textContent = labels.title(c.finding);
   find(card, '[data-mark] use').setAttributeNS(null, 'href', markId(c.state));
-  find(card, '[data-status-text]').textContent = c.status;
+  find(card, '[data-verdict]').hidden = c.status === null;
+  find(card, '[data-status-text]').textContent = c.status ?? '';
   const depends = find(card, '[data-depends]');
   depends.hidden = c.depends === null;
   depends.textContent = c.depends ?? '';
@@ -323,15 +326,38 @@ function renderCard(
   return frag;
 }
 
+// A card with its title, the lines given and its rules alone: no status, no figure, no reading.
+function ruleCard(item: BillItem, lines: readonly string[], tr: Translate): Card {
+  const findings = findingsOf(item);
+  const [first] = findings;
+  if (first === undefined) throw new RangeError('A reading item with no reading');
+  return {
+    finding: first,
+    state: 'information',
+    status: null,
+    calculation: lines,
+    depends: null,
+    readings: [],
+    rules: findings.flatMap((f) => f.sources.map((s) => ruleLine(s, tr))),
+    rows: [],
+  };
+}
+
+// Each item's card; one that `ruleOnly` gives lines for shows those lines and its rules alone.
 export function renderItems(
   root: HTMLElement,
   items: readonly BillItem[],
   norms: NormTable,
   labels: ItemLabels,
   tr: Translate,
+  ruleOnly: (item: BillItem) => readonly string[] | null = () => null,
 ): void {
   find(root, '[data-items]').replaceChildren(
-    ...items.map((item, i) => renderCard(root, itemCard(item, norms, tr), i, labels)),
+    ...items.map((item, i) => {
+      const lines = ruleOnly(item);
+      const card = lines === null ? itemCard(item, norms, tr) : ruleCard(item, lines, tr);
+      return renderCard(root, card, i, labels);
+    }),
   );
 }
 

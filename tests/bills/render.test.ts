@@ -62,7 +62,7 @@ function result(): HTMLElement {
     <template data-template="item">
       <section data-item>
         <span data-tab-number></span><h3 data-title></h3>
-        <p><svg data-mark><use href="#x"></use></svg><span data-status-text></span></p>
+        <p data-verdict><svg data-mark><use href="#x"></use></svg><span data-status-text></span></p>
         <p data-depends hidden></p>
         <ol data-calculation></ol><div data-readings></div>
         <h4 data-rules-title></h4><ul data-rules></ul>
@@ -200,7 +200,13 @@ describe('the electricity result', () => {
 describe('the telecom result', () => {
   it('counts a commitment penalty over its proportional share', () => {
     const root = result();
-    renderTelecomResult(root, exit(telecom({ penaltyCharged: 120 })), NORMS_BEFORE_FIGURE, tr);
+    renderTelecomResult(
+      root,
+      exit(telecom({ penaltyCharged: 120 })),
+      NORMS_BEFORE_FIGURE,
+      false,
+      tr,
+    );
     expect(cards(root)).toEqual([
       {
         title: 'Penalización por permanencia',
@@ -220,11 +226,74 @@ describe('the telecom result', () => {
       root,
       exit(telecom({ commitment: null, penaltyCharged: 0, lines: [] })),
       NORMS_BEFORE_FIGURE,
+      false,
       tr,
     );
     expect(text(root, '[data-lead]')).toBe(
       'Con lo que has metido no hay penalización ni cobros de después de la baja que comprobar.',
     );
+  });
+});
+
+describe('the telecom result before the pass', () => {
+  const afterChange = telecom({
+    penaltyCharged: 120,
+    changeNotice: {
+      sentOn: parseDate('2026-02-10'),
+      appliesOn: parseDate('2026-03-15'),
+      change: 'price_up',
+      index: 'none',
+    },
+    lines: [{ from: parseDate('2026-03-01'), to: parseDate('2026-03-31'), amount: 30 }],
+  });
+
+  it('with something to claim, keeps the exact totals and only the exit after a change', () => {
+    const unlocked = result();
+    renderTelecomResult(unlocked, exit(afterChange), NORMS_BEFORE_FIGURE, false, tr);
+    expect(cards(unlocked).map((c) => c.title)).toContain('Cobros después de la baja');
+    const root = result();
+    renderTelecomResult(root, exit(afterChange), NORMS_BEFORE_FIGURE, true, tr);
+    expect(text(root, '[data-lead]')).toBe(
+      'Con lo que has metido, te cobran más de lo que permite la norma. Qué puntos son, con su cálculo y su fuente, va con el pase.',
+    );
+    expect(text(root, '[data-total-counted]')).toBe('146,13 €');
+    const shown = [...root.querySelectorAll<HTMLElement>('[data-item]')];
+    expect(shown.map((c) => c.dataset['item'])).toEqual(['change_exit']);
+    // The deadline alone: the rule, the day its month ends and the norm, with no verdict.
+    const card = shown[0];
+    expect(card?.querySelector<HTMLElement>('[data-verdict]')?.hidden).toBe(true);
+    expect(text(card ?? root, '[data-status-text]')).toBe('');
+    expect(text(card ?? root, '[data-calculation]')).toBe(
+      'Si tu compañía te avisa de un cambio en las condiciones del contrato, la ley te deja darte de baja en el mes siguiente al aviso sin pagar la penalización por la permanencia; solo puede seguir cobrándote el terminal subvencionado que te quedes.' +
+        'El mes siguiente al aviso acaba el 10-03-2026.',
+    );
+    expect(card?.textContent).not.toContain('€');
+    expect(card?.querySelector('[data-readings]')?.children).toHaveLength(0);
+    expect(text(card ?? root, '[data-rules]')).toContain('art. 67.8');
+  });
+
+  it('with something to claim and no date for the notice, shows no card', () => {
+    const root = result();
+    const noDate = telecom({
+      ...afterChange,
+      changeNotice: { sentOn: null, appliesOn: null, change: 'price_up', index: 'none' },
+    });
+    renderTelecomResult(root, exit(noDate), NORMS_BEFORE_FIGURE, true, tr);
+    expect(text(root, '[data-total-counted]')).not.toBe('0,00 €');
+    expect(root.querySelectorAll('[data-item]')).toHaveLength(0);
+  });
+
+  it('with nothing to claim, names every item as before', () => {
+    const root = result();
+    renderTelecomResult(root, exit(telecom({ penaltyCharged: 63 })), NORMS_BEFORE_FIGURE, true, tr);
+    expect(cards(root)).toEqual([
+      {
+        title: 'Penalización por permanencia',
+        state: 'paid_over',
+        status: 'Por encima de lo que permite la norma: 2,67 € de más',
+      },
+    ]);
+    expect(text(root, '[data-lead]')).not.toContain('pase');
   });
 });
 

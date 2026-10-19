@@ -4460,6 +4460,7 @@ export const gl: Translation = {
   'bills.telecom.charges.unrequested':
     'Se non pediches un servizo, a lei non permite cobrarcho, e non responder a quen cho presta non conta como aceptalo. Se non o contrataches ti, pregunta á túa compañía.',
   'bills.telecom.pass.title': 'O informe e as cartas',
+  'bills.telecom.pass.claim_title': 'Que puntos son e canto sae en cada un',
   'bills.telecom.pass.letter_note':
     'As cartas son modelos. Descárganse no teu dispositivo e non se envían desde aquí: usalas ou non, e como, é decisión túa.',
   'bills.telecom.pass.download_exit_letter':
@@ -4607,13 +4608,18 @@ export const gl: Translation = {
     'Co que introduciches, o que che cobran queda dentro do que permite a norma.',
   'client.bills.result.telecom_lead_nothing':
     'Co que introduciches non hai penalización nin cobramentos de despois da baixa que comprobar.',
+  'client.bills.result.telecom_lead_unnamed':
+    'Co que introduciches, cóbranche máis do que permite a norma. Que puntos son, co seu cálculo e a súa fonte, vai co pase.',
+  'client.bills.telecom.deadline.rule':
+    'Se a túa compañía che avisa dun cambio nas condicións do contrato, a lei permíteche darte de baixa no mes seguinte ao aviso sen pagar a penalización pola permanencia; só pode seguir cobrándoche o terminal subvencionado que te quedes.',
+  'client.bills.telecom.deadline.ends': 'O mes seguinte ao aviso remata o {fecha}.',
   'client.bills.result.lead_out_of_scope': 'Esta revisión aínda non cobre o que introduciches.',
   'client.bills.pass.issued':
     'Pagamento recibido. Xa podes descargar o informe e, se a túa revisión ten cifras para ela, a carta.',
   'client.bills.pass.offer':
     'Revisa o teu ano enteiro: cun pase de 4,99 € revisas ata ~15 lecturas durante 7 días, en calquera sección. Descargas o informe das túas facturas e, se algunha liña pasa da norma, a carta que pide a factura rectificativa.',
   'client.bills.telecom.pass.offer':
-    'Cun pase de 4,99 € descargas o informe da túa baixa e, se a penalización pasa do que permite a norma, a carta que pide revisala, e revisas ata ~15 lecturas durante 7 días, en calquera sección.',
+    'Cun pase de 4,99 € ves que puntos son, co seu cálculo e a súa fonte, descargas o informe da túa baixa e, se a penalización pasa do que permite a norma, a carta que pide revisala, e revisas ata ~15 lecturas durante 7 días, en calquera sección.',
   'client.bills.basket.title_one': 'O teu ano: 1 factura revisada',
   'client.bills.basket.title_many': 'O teu ano: {n} facturas revisadas',
   'client.bills.basket.bill': 'Factura do {desde} ao {hasta}',
