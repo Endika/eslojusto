@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.88.1](https://github.com/Endika/eslojusto/compare/v1.88.0...v1.88.1) (2026-10-19)
+
+
+### Bug Fixes
+
+* **rental:** add the August 2026 IGC and cover until the next release ([0fee1a4](https://github.com/Endika/eslojusto/commit/0fee1a4708587cc6e77755cdb2948615828f604d))
+
 ## [1.88.0](https://github.com/Endika/eslojusto/compare/v1.87.0...v1.88.0) (2026-10-18)
 
 
