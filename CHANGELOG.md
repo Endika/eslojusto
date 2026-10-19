@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.92.0](https://github.com/Endika/eslojusto/compare/v1.91.0...v1.92.0) (2026-10-19)
+
+
+### Features
+
+* **rental:** date the reading of every rental norm, like the other sections ([445b078](https://github.com/Endika/eslojusto/commit/445b0788612254c05dae043e4c6c0cb8a4613f84))
+
 ## [1.91.0](https://github.com/Endika/eslojusto/compare/v1.90.1...v1.91.0) (2026-10-19)
 
 
