@@ -24,7 +24,7 @@ const completed = (input: InsuranceInput) => {
 };
 
 const props = (input: InsuranceInput = policy()) =>
-  insuranceReviewProps({ ...completed(input), attempt: 1, seconds: 45 });
+  insuranceReviewProps({ ...completed(input), attempt: 1, seconds: 45, pass: 'none' });
 
 // A synthetic motor policy bought online, with voluntary covers and a renewal notice.
 const carOnline = policy({
@@ -75,6 +75,7 @@ describe('insurance events', () => {
       notice: 'none',
       premium: 'none',
       withdrawal: 'not_applicable',
+      pass: 'none',
       attempt: '1',
       seconds: '<60',
     });
@@ -109,6 +110,8 @@ describe('insurance events', () => {
         sent.push([name, p]);
       }) as Track,
       () => clock,
+      // A policy never offers the pass; one already held downloads its report.
+      () => 'held',
     );
     const done = completed(carOnline);
     events.stepShown('poliza');
@@ -134,6 +137,11 @@ describe('insurance events', () => {
       'started_over',
     ]);
     expect(sent[2]?.[1]).toEqual({ section: 'poliza', seconds: '<10' });
-    expect(sent[7]?.[1]).toMatchObject({ line: 'car', attempt: '1', seconds: '60-180' });
+    expect(sent[7]?.[1]).toMatchObject({
+      line: 'car',
+      pass: 'held',
+      attempt: '1',
+      seconds: '60-180',
+    });
   });
 });

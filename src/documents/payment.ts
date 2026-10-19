@@ -21,6 +21,7 @@ import type {
   Download,
   OfferedReview,
   PaidReview,
+  PassMode,
   PassVerifyResult,
   PdfMaker,
 } from './ports';
@@ -124,6 +125,14 @@ function letterParts(letter: HTMLElement) {
       'id warning',
     ),
   };
+}
+
+// With nothing to sell and no pass, only the free letters show, under their own title. With
+// nothing to claim but a pass still on sale, it is offered quietly, under its own words.
+export function passMode(review: OfferedReview, held: boolean): PassMode {
+  if (held) return 'held';
+  if (review.offer) return 'claim';
+  return review.quiet === true ? 'quiet' : 'none';
 }
 
 export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
@@ -263,10 +272,9 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     const held = heldPass() !== null;
     const paid = verified();
     renderLetters(current, paid);
-    // With nothing to sell and no pass, only the free letters show, under their own title. With
-    // nothing to claim but a pass still on sale, it is offered quietly, under its own words.
-    const quiet = !held && !current.offer && current.quiet === true;
-    const freeOnly = !held && !current.offer && !quiet;
+    const shown = passMode(current, held);
+    const quiet = shown === 'quiet';
+    const freeOnly = shown === 'none';
     const mode = freeOnly ? 'free' : quiet ? 'quiet' : 'claim';
     section.dataset['passMode'] = mode;
     // Something to claim stands out from the result around it; the other two do not.
@@ -537,6 +545,8 @@ export function setUpPayment(section: HTMLElement, deps: PaymentDeps) {
     },
     // Whether the pass in this browser was confirmed by the API during this page's life.
     verified,
+    // How the pass would show under this review, were it shown now.
+    mode: (review: OfferedReview): PassMode => passMode(review, heldPass() !== null),
     hide() {
       current = null;
       // The notice belongs to the review that was paid for; starting over ends it.

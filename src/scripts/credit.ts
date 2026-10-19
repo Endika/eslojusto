@@ -5,6 +5,7 @@ import { creditAnalytics } from '../analytics/credit';
 import { track } from '../analytics/posthog';
 import type { Detail } from '../calculator/flow';
 import { DOCUMENTS_BUILD } from '../documents/config';
+import type { PassMode } from '../documents/ports';
 import { setUpCredit } from '../credit/main';
 import type { CompletedCreditReview, CreditEvents } from '../credit/ports';
 import { pageTranslator } from '../i18n/client';
@@ -29,7 +30,15 @@ let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedCreditReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
-const analytics = creditAnalytics(track, () => performance.now());
+// Until the document module says how the pass shows under a review, it shows none; without the
+// documents API there is no pass.
+let pass: (r: CompletedCreditReview) => PassMode = () => 'none';
+const analytics = creditAnalytics(
+  track,
+  () => performance.now(),
+  () => detail(),
+  (r) => pass(r),
+);
 // The measurement hears every event; the pass listens to each review shown and each one cleared.
 const events: CreditEvents = {
   ...analytics,
@@ -70,6 +79,7 @@ if (documentsBuild) {
           onRestart: (listener) => cleared.push(listener),
           // The pass shows which points they are and unlocks the report and the repayment letter.
           detail: (state) => (detail = state),
+          pass: (state) => (pass = state),
         },
         arrival,
         tables.norms,

@@ -1,6 +1,7 @@
 import type { InsuranceReview } from '../engine/insurance/review';
 import type { Finding, FindingId, InsuranceInput } from '../engine/insurance/types';
-import type { InsuranceEvents, Step } from '../insurance/ports';
+import type { PassMode } from '../documents/ports';
+import type { CompletedInsuranceReview, InsuranceEvents, Step } from '../insurance/ports';
 import { attemptBucket, reviewSecondsBucket, type Props, type Track } from './events';
 import { sectionAnalytics } from './section';
 
@@ -25,6 +26,7 @@ export function insuranceReviewProps(data: {
   input: InsuranceInput;
   attempt: number;
   seconds: number;
+  pass: PassMode;
 }): Completed {
   const { findings } = data.review;
   const { line } = data.input;
@@ -36,17 +38,19 @@ export function insuranceReviewProps(data: {
     notice: statusOf(findings, ['change_notice']),
     premium: statusOf(findings, ['premium']),
     withdrawal: statusOf(findings, WITHDRAWAL),
+    pass: data.pass,
     attempt: attemptBucket(data.attempt),
     seconds: reviewSecondsBucket(data.seconds),
   };
 }
 
 // The insurance review's events as catalogue events: steps, field names, codes and buckets only;
-// never a date, a premium or an insurer.
+// never a date, a premium or an insurer. `pass` tells how the pass shows under a review.
 // The letter, not the measurement, hears when a review is cleared.
 export function insuranceAnalytics(
   track: Track,
   now: () => number,
+  pass: (r: CompletedInsuranceReview) => PassMode,
 ): Omit<InsuranceEvents, 'reviewCleared'> {
   const { events, reviewed } = sectionAnalytics<Step>(track, now);
   return {
@@ -54,8 +58,12 @@ export function insuranceAnalytics(
     outOfScope(reason) {
       track('insurance_out_of_scope', { reason });
     },
-    reviewCompleted({ review, input }) {
-      track('insurance_review_completed', insuranceReviewProps({ review, input, ...reviewed() }));
+    reviewCompleted(completed) {
+      const { review, input } = completed;
+      track(
+        'insurance_review_completed',
+        insuranceReviewProps({ review, input, ...reviewed(), pass: pass(completed) }),
+      );
     },
   };
 }

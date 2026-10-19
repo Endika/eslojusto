@@ -18,6 +18,7 @@ import type {
   FileEncoder,
   KeyValueStore,
   OfferedReview,
+  PassMode,
   PdfPages,
   ReadPrefill,
   ReviewForm,
@@ -182,6 +183,8 @@ export interface ReviewHooks<R> {
   onRestart(listener: () => void): void;
   // Tells the form how a review's result will be shown.
   detail(state: () => Detail): void;
+  // Tells the measurement how the pass will show under a review, asked as the review completes.
+  pass(state: (r: R) => PassMode): void;
 }
 
 // What a section brings to the pass; the rest is the same for all.
@@ -190,6 +193,9 @@ interface PassSection<R> {
   // on return.
   readonly keptReviewKey: string;
   paidReview(r: R): OfferedReview;
+  // The review as the pass will see it, asked as the review completes, before this section keeps
+  // it; the paid review itself when the two are the same.
+  offeredOnCompletion?(r: R): OfferedReview;
   // Adds to a result just shown what only the documents read can say.
   decorateResult(result: ParentNode): void;
   // Answers kept by an earlier version of the page, as the form takes them now.
@@ -323,6 +329,7 @@ function setUpPass<R>(
     },
   });
   hooks.detail(() => (payment.verified() ? 'unlocked' : 'locked'));
+  hooks.pass((r) => payment.mode(section.offeredOnCompletion?.(r) ?? section.paidReview(r)));
   hooks.onReview((r) => {
     payment.show(section.paidReview(r));
     section.decorateResult(document);

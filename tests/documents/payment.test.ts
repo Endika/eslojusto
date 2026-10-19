@@ -4,7 +4,7 @@ import type { CompletedReview } from '../../src/calculator/ports';
 import { finalPayCase } from '../../src/documents/case';
 import type { Api, PassResult, VerifyResult } from '../../src/documents/contract';
 import { createPassStore } from '../../src/documents/pass';
-import { setUpPayment } from '../../src/documents/payment';
+import { passMode, setUpPayment } from '../../src/documents/payment';
 import type { LetterDetails } from '../../src/documents/letter';
 import type { Browser, PaidReview } from '../../src/documents/ports';
 import { NOTICE, OFFER, flush, recordingEvents } from './dom';
@@ -138,6 +138,30 @@ describe('the pass offer', () => {
     expect($('[data-pass-buy]').hidden).toBe(false);
     payment.hide();
     expect(section.hidden).toBe(true);
+  });
+
+  it('tells the measurement how it will show a review, as it then shows it', () => {
+    const { payment, passes, section } = setUp();
+    const claim = asPaid(completed());
+    const quiet = asPaid(completed(unfairDismissal, { severance: 41000, holiday_pay: 1500 }));
+    const none = { offer: false };
+    expect([claim, quiet, none].map((r) => payment.mode(r))).toEqual(['claim', 'quiet', 'none']);
+    payment.show(none);
+    expect(section.dataset['passMode']).toBe('free');
+    // Held by its own dates is enough, as for what the offer shows: the API is asked after.
+    passes.savePass({ token: validPass, expiresAt: EXPIRES, readsLeft: 15 });
+    expect([claim, quiet, none].map((r) => payment.mode(r))).toEqual(['held', 'held', 'held']);
+    payment.show(quiet);
+    expect($('[data-pass-buy]').hidden).toBe(true);
+  });
+
+  it('a pass held outranks the offer; with none, something to claim outranks a quiet sale', () => {
+    expect(passMode({ offer: true, quiet: true }, true)).toBe('held');
+    expect(passMode({ offer: false }, true)).toBe('held');
+    expect(passMode({ offer: true, quiet: true }, false)).toBe('claim');
+    expect(passMode({ offer: false, quiet: true }, false)).toBe('quiet');
+    expect(passMode({ offer: false, quiet: false }, false)).toBe('none');
+    expect(passMode({ offer: false }, false)).toBe('none');
   });
 
   it('bought with nothing short, the checkout says it was quiet', async () => {

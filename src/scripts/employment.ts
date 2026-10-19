@@ -3,6 +3,7 @@ import { track } from '../analytics/posthog';
 import { EMPLOYMENT_NORMS } from '../engine/employment/data/norms';
 import { MINIMUM_WAGE } from '../engine/employment/data/minimum-wage';
 import { DOCUMENTS_BUILD } from '../documents/config';
+import type { PassMode } from '../documents/ports';
 import { pageTranslator } from '../i18n/client';
 import { setUpEmployment } from '../employment/main';
 import type { CompletedEmploymentReview, Detail, EmploymentEvents } from '../employment/ports';
@@ -26,7 +27,14 @@ let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedEmploymentReview) => void)[] = [];
 const restarted: (() => void)[] = [];
 
-const analytics = employmentAnalytics(track, () => performance.now());
+// Until the document module says how the pass shows under a review, it shows none; without the
+// documents API there is no pass.
+let pass: (r: CompletedEmploymentReview) => PassMode = () => 'none';
+const analytics = employmentAnalytics(
+  track,
+  () => performance.now(),
+  (r) => pass(r),
+);
 // Reading documents and the pass listen to the same completed review and restart as analytics.
 const events: EmploymentEvents = {
   ...analytics,
@@ -58,6 +66,7 @@ if (documentsBuild) {
           onReview: (listener) => reviewed.push(listener),
           onRestart: (listener) => restarted.push(listener),
           detail: (state) => (detail = state),
+          pass: (state) => (pass = state),
         },
         arrival,
         tables,

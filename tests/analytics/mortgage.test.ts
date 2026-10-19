@@ -8,6 +8,7 @@ import {
   type Track,
 } from '../../src/analytics/events';
 import { mortgageAnalytics, mortgageReviewProps } from '../../src/analytics/mortgage';
+import type { PassMode } from '../../src/documents/ports';
 import { MORTGAGE_FAQ_TOPICS } from '../../src/content/mortgage-faq-topics';
 import { parseDate } from '../../src/engine/date';
 import { reviewMortgage } from '../../src/engine/mortgage/review';
@@ -23,7 +24,13 @@ const completed = (input: MortgageInput) => {
 };
 
 const props = (input: MortgageInput = mortgage()) =>
-  mortgageReviewProps({ ...completed(input), attempt: 1, seconds: 95, detail: 'locked' });
+  mortgageReviewProps({
+    ...completed(input),
+    attempt: 1,
+    seconds: 95,
+    detail: 'locked',
+    pass: 'claim',
+  });
 
 const repayment = (change: Partial<Operation> = {}): Operation => ({
   on: parseDate('2021-03-01'),
@@ -87,6 +94,7 @@ describe('mortgage events', () => {
       difference: '500-2000',
       offered: true,
       detail: 'locked',
+      pass: 'claim',
       attempt: '1',
       seconds: '60-180',
     });
@@ -150,6 +158,7 @@ describe('mortgage events', () => {
     const sent: [string, Record<string, unknown>][] = [];
     let clock = 0;
     let detail: 'locked' | 'unlocked' = 'locked';
+    let pass: PassMode = 'claim';
     const events = mortgageAnalytics(
       ((name: string, p: Record<string, unknown>) => {
         expect(isValidEvent(name, p), name).toBe(true);
@@ -157,6 +166,7 @@ describe('mortgage events', () => {
       }) as Track,
       () => clock,
       () => detail,
+      () => pass,
     );
     const done = completed(deed2021);
     events.stepShown('hipoteca');
@@ -171,6 +181,7 @@ describe('mortgage events', () => {
     clock = 100_000;
     events.reviewCompleted(done);
     detail = 'unlocked';
+    pass = 'held';
     events.reviewCompleted(done);
     events.startedOver();
     expect(sent.map(([n]) => n)).toEqual([
@@ -187,7 +198,12 @@ describe('mortgage events', () => {
     ]);
     expect(sent[2]?.[1]).toEqual({ section: 'hipoteca', seconds: '10-30' });
     expect(sent[5]?.[1]).toEqual({ reason: 'company' });
-    expect(sent[7]?.[1]).toMatchObject({ attempt: '1', seconds: '60-180', detail: 'locked' });
-    expect(sent[8]?.[1]).toMatchObject({ attempt: '2', detail: 'unlocked' });
+    expect(sent[7]?.[1]).toMatchObject({
+      attempt: '1',
+      seconds: '60-180',
+      detail: 'locked',
+      pass: 'claim',
+    });
+    expect(sent[8]?.[1]).toMatchObject({ attempt: '2', detail: 'unlocked', pass: 'held' });
   });
 });

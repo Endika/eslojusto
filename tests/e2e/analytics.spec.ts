@@ -225,6 +225,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
     other_contracts: '1',
     unfair_reference: 'none',
     detail: 'unlocked',
+    pass: 'none',
   });
   expect(keys(spy.named('review_completed')[0])).toEqual(
     [
@@ -252,6 +253,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
       'other_contracts',
       'unfair_reference',
       'detail',
+      'pass',
     ].toSorted(),
   );
 
@@ -618,6 +620,7 @@ test('the rental review sends sheets, field names and its outcome in codes, neve
     deposit_return: 'none',
     offered: true,
     detail: 'unlocked',
+    pass: 'none',
     attempt: '1',
   });
   expect(ownKeys(completed)).toEqual(
@@ -636,6 +639,7 @@ test('the rental review sends sheets, field names and its outcome in codes, neve
       'difference',
       'offered',
       'detail',
+      'pass',
       'attempt',
       'seconds',
     ].toSorted(),
@@ -841,6 +845,7 @@ test('the contract review sends sheets, field names and its outcome in codes, ne
     difference: '500-2000',
     offered: true,
     detail: 'unlocked',
+    pass: 'none',
     attempt: '1',
   });
   expect(ownKeys(completed)).toEqual(
@@ -870,6 +875,7 @@ test('the contract review sends sheets, field names and its outcome in codes, ne
       'difference',
       'offered',
       'detail',
+      'pass',
       'attempt',
       'seconds',
     ].toSorted(),
@@ -1058,6 +1064,7 @@ test('the mortgage review sends sheets, field names and its outcome in codes, ne
     difference: '500-2000',
     offered: true,
     detail: 'unlocked',
+    pass: 'none',
     attempt: '1',
   });
   expect(ownKeys(completed)).toEqual(
@@ -1072,6 +1079,7 @@ test('the mortgage review sends sheets, field names and its outcome in codes, ne
       'difference',
       'offered',
       'detail',
+      'pass',
       'attempt',
       'seconds',
     ].toSorted(),
@@ -1185,8 +1193,9 @@ test('the bills reviews send sheets, field names and outcomes in codes, never a 
     commitment: 'paid_over',
     change_exit: 'none',
     after_exit: 'none',
+    pass: 'none',
   });
-  expect(ownKeys(completed)).toEqual(['after_exit', 'change_exit', 'commitment']);
+  expect(ownKeys(completed)).toEqual(['after_exit', 'change_exit', 'commitment', 'pass']);
 
   for (const e of spy.events()) {
     const text = withoutRandom(e);

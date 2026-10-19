@@ -19,6 +19,7 @@ import {
   type Track,
 } from '../../src/analytics/events';
 import { documentsAnalytics } from '../../src/analytics/documents';
+import { PASS_MODES } from '../../src/documents/ports';
 import { cleanEvent } from '../../src/analytics/sanitize';
 import { POSTHOG_OPTIONS } from '../../src/analytics/posthog';
 import type { Status, ItemResult } from '../../src/engine/compare';
@@ -138,6 +139,7 @@ describe('the catalogue guard', () => {
       benefit,
       otherContracts: 0,
       detail: 'unlocked',
+      pass: 'none',
     });
     expect(isValidEvent('review_completed', props)).toBe(true);
     expect(isValidEvent('review_completed', { ...props, difference: 412.5 })).toBe(false);
@@ -221,6 +223,23 @@ describe('the catalogue guard', () => {
 });
 
 describe('document and pass events', () => {
+  it('every review that shows the pass says how, from a closed list', () => {
+    const reviews = [
+      'review_completed',
+      'rental_review_completed',
+      'employment_review_completed',
+      'credit_review_completed',
+      'insurance_review_completed',
+      'mortgage_review_completed',
+      'electricity_bill_reviewed',
+      'telecom_review_completed',
+      'basket_completed',
+    ] as const;
+    for (const name of reviews) expect(CATALOGUE[name].pass, name).toEqual({ values: PASS_MODES });
+    expect(PASS_MODES).toEqual(['held', 'claim', 'quiet', 'none']);
+    expect(Object.keys(CATALOGUE.household_review_completed)).not.toContain('pass');
+  });
+
   it('accept kinds, codes and buckets', () => {
     expect(isValidEvent('start_chosen', { path: 'upload' })).toBe(true);
     expect(isValidEvent('upload_started', { files_bucket: '10-15', pdfs: 2 })).toBe(true);
@@ -456,6 +475,7 @@ describe('review_completed', () => {
         benefit,
         otherContracts: 0,
         detail: 'unlocked',
+        pass: 'none',
       });
     expect(props(8136.99).unfair_reference).toBe('shown');
     expect(props(null).unfair_reference).toBe('none');
@@ -479,6 +499,7 @@ describe('review_completed', () => {
       benefit,
       otherContracts: 0,
       detail: 'locked',
+      pass: 'claim',
     });
     expect(props).toEqual({
       cause: 'fixed_term_end',
@@ -501,6 +522,7 @@ describe('review_completed', () => {
       other_contracts: '0',
       unfair_reference: 'none',
       detail: 'locked',
+      pass: 'claim',
     });
     expect(isValidEvent('review_completed', props)).toBe(true);
   });
@@ -514,6 +536,7 @@ describe('review_completed', () => {
       benefit,
       otherContracts: 0,
       detail: 'unlocked',
+      pass: 'none',
     } as const;
     const withInput = (e: Partial<FinalPayInput>) =>
       reviewProps({ ...base, input: { ...input, ...e } });
@@ -546,6 +569,7 @@ describe('review_completed', () => {
       benefit,
       otherContracts: 0,
       detail: 'unlocked',
+      pass: 'none',
     });
     expect(isValidEvent('review_completed', props)).toBe(true);
     expect(JSON.stringify(props)).not.toMatch(/1500|40000|2010|2026/);
@@ -555,7 +579,7 @@ describe('review_completed', () => {
 describe('review_completed: the benefit', () => {
   const base = { review: review(), input, attempt: 1, changedFields: [], seconds: 1 } as const;
   const props = (p: ReturnType<typeof estimateBenefit>, otherContracts = 0) =>
-    reviewProps({ ...base, benefit: p, otherContracts, detail: 'unlocked' });
+    reviewProps({ ...base, benefit: p, otherContracts, detail: 'unlocked', pass: 'none' });
 
   it('says whether there were figures, none, or it does not apply, and nothing else', () => {
     expect(props(benefit).benefit).toBe('with_figures');

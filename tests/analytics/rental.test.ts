@@ -24,7 +24,14 @@ import {
 } from '../rental/fixtures';
 
 const props = (input = riseAboveIrav, detail: 'locked' | 'unlocked' = 'unlocked') =>
-  rentalReviewProps({ review: review(input), input, attempt: 1, seconds: 95, detail });
+  rentalReviewProps({
+    review: review(input),
+    input,
+    attempt: 1,
+    seconds: 95,
+    detail,
+    pass: 'claim',
+  });
 
 describe('the catalogue follows the rental form', () => {
   it('every sheet, and the result, is a trackable section', () => {
@@ -74,6 +81,7 @@ describe('rental events', () => {
       difference: '100-500',
       offered: true,
       detail: 'unlocked',
+      pass: 'claim',
       attempt: '1',
       seconds: '60-180',
     });
@@ -139,6 +147,8 @@ describe('rental events', () => {
         sent.push([name, p]);
       }) as Track,
       () => clock,
+      // The pass held once the first review was paid for.
+      (r) => (r.detail === 'locked' ? 'claim' : 'held'),
     );
     events.stepShown('contrato');
     events.stepShown('contrato');
@@ -159,7 +169,7 @@ describe('rental events', () => {
     events.reviewCompleted({
       review: review(riseAboveIrav),
       input: riseAboveIrav,
-      detail: 'locked',
+      detail: 'unlocked',
     });
     events.startedOver();
     expect(sent.map(([n]) => n)).toEqual([
@@ -177,8 +187,13 @@ describe('rental events', () => {
     ]);
     expect(sent[2]?.[1]).toEqual({ section: 'contrato', seconds: '10-30' });
     expect(sent[5]?.[1]).toEqual({ reason: 'seasonal' });
-    expect(sent[8]?.[1]).toMatchObject({ attempt: '1', seconds: '60-180', detail: 'locked' });
-    expect(sent[9]?.[1]).toMatchObject({ attempt: '2' });
+    expect(sent[8]?.[1]).toMatchObject({
+      attempt: '1',
+      seconds: '60-180',
+      detail: 'locked',
+      pass: 'claim',
+    });
+    expect(sent[9]?.[1]).toMatchObject({ attempt: '2', detail: 'unlocked', pass: 'held' });
   });
 
   it('a download names the rental letter by its kind', () => {

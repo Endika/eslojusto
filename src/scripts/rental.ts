@@ -2,6 +2,7 @@ import { rentalAnalytics } from '../analytics/rental';
 import { track } from '../analytics/posthog';
 import { RENTAL_TABLES } from '../engine/rental/data/tables';
 import { DOCUMENTS_BUILD } from '../documents/config';
+import type { PassMode } from '../documents/ports';
 import { pageTranslator } from '../i18n/client';
 import { setUpRental } from '../rental/main';
 import type { CompletedRentalReview, Detail, RentalEvents } from '../rental/ports';
@@ -25,7 +26,14 @@ let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedRentalReview) => void)[] = [];
 const restarted: (() => void)[] = [];
 
-const analytics = rentalAnalytics(track, () => performance.now());
+// Until the document module says how the pass shows under a review, it shows none; without the
+// documents API there is no pass.
+let pass: (r: CompletedRentalReview) => PassMode = () => 'none';
+const analytics = rentalAnalytics(
+  track,
+  () => performance.now(),
+  (r) => pass(r),
+);
 // Reading documents and the pass listen to the same completed review and restart as analytics.
 const events: RentalEvents = {
   ...analytics,
@@ -56,6 +64,7 @@ if (documentsBuild) {
           onReview: (listener) => reviewed.push(listener),
           onRestart: (listener) => restarted.push(listener),
           detail: (state) => (detail = state),
+          pass: (state) => (pass = state),
         },
         arrival,
       ),

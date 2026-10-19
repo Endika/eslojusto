@@ -1,7 +1,9 @@
 import { findingsOf, type CreditItem, type FindingId } from '../engine/credit/finding';
 import type { CreditReview } from '../engine/credit/review';
 import type { CreditInput } from '../engine/credit/types';
-import type { CreditEvents, Step } from '../credit/ports';
+import type { Detail } from '../calculator/ports';
+import type { CompletedCreditReview, CreditEvents, Step } from '../credit/ports';
+import type { PassMode } from '../documents/ports';
 import { attemptBucket, reviewSecondsBucket, type Props, type Track } from './events';
 import { sectionAnalytics } from './section';
 
@@ -29,6 +31,8 @@ export function creditReviewProps(data: {
   input: CreditInput;
   attempt: number;
   seconds: number;
+  detail: Detail;
+  pass: PassMode;
 }): Completed {
   const { review, input } = data;
   const { items, indicator } = review;
@@ -41,17 +45,23 @@ export function creditReviewProps(data: {
     withdrawal: pointStatus(items, 'withdrawal'),
     indicator: indicator?.status ?? 'none',
     compared_apr: indicator?.aprOrigin ?? 'none',
+    offered: review.offerPass,
+    detail: data.detail,
+    pass: data.pass,
     attempt: attemptBucket(data.attempt),
     seconds: reviewSecondsBucket(data.seconds),
   };
 }
 
 // The credit review's events as catalogue events: steps, field names, codes and buckets only;
-// never an amount, a rate, a date or a lender.
+// never an amount, a rate, a date or a lender. `detail` tells whether a pass shows which points
+// they are, `pass` how the pass shows under a review.
 // The pass, not the measurement, hears when a review is cleared.
 export function creditAnalytics(
   track: Track,
   now: () => number,
+  detail: () => Detail,
+  pass: (r: CompletedCreditReview) => PassMode,
 ): Omit<CreditEvents, 'reviewCleared'> {
   const { events, reviewed } = sectionAnalytics<Step>(track, now);
   return {
@@ -59,8 +69,18 @@ export function creditAnalytics(
     outOfScope(reason) {
       track('credit_out_of_scope', { reason });
     },
-    reviewCompleted({ review, input }) {
-      track('credit_review_completed', creditReviewProps({ review, input, ...reviewed() }));
+    reviewCompleted(completed) {
+      const { review, input } = completed;
+      track(
+        'credit_review_completed',
+        creditReviewProps({
+          review,
+          input,
+          ...reviewed(),
+          detail: detail(),
+          pass: pass(completed),
+        }),
+      );
     },
   };
 }

@@ -114,7 +114,7 @@ describe('bills events', () => {
   });
 
   it('a bill that matches leaves its market and no finding', () => {
-    const p = electricityBillProps(electricity(juneBill()));
+    const p = electricityBillProps(electricity(juneBill()), 'quiet');
     expect(isValidEvent('electricity_bill_reviewed', p)).toBe(true);
     expect(p).toEqual({
       market: 'pvpc',
@@ -123,11 +123,12 @@ describe('bills events', () => {
       undercharged: false,
       conditional: false,
       recurring: false,
+      pass: 'quiet',
     });
   });
 
   it('names the kinds of line that do not match, and a recurring one', () => {
-    const p = electricityBillProps(meterOver());
+    const p = electricityBillProps(meterOver(), 'claim');
     expect(p.findings).toEqual(['meter']);
     expect(p.recurring).toBe(true);
     expect(p.undercharged).toBe(false);
@@ -135,45 +136,60 @@ describe('bills events', () => {
 
   it('says when something is charged short, without the figure', () => {
     // The meter at 1,00 with VAT left at 10,55: 0,04 short of (47,02 + 2,40 + 1,00) × 21 %.
-    const p = electricityBillProps(electricity(juneBill({ meter: meter({ amount: 1 }) })));
+    const p = electricityBillProps(electricity(juneBill({ meter: meter({ amount: 1 }) })), 'claim');
     expect(p.undercharged).toBe(true);
     expect(p.findings).toEqual(expect.arrayContaining(['meter', 'vat', 'total']));
   });
 
   it('says when a result waits on November’s condition', () => {
-    const p = electricityBillProps(electricity(juneBill({ dueOn: parseDate('2026-11-10') })));
+    const p = electricityBillProps(
+      electricity(juneBill({ dueOn: parseDate('2026-11-10') })),
+      'claim',
+    );
     expect(p.conditional).toBe(true);
     expect(p.findings).toEqual(['electricity_tax', 'vat']);
   });
 
   it('a free-market bill carries its market and retailer as codes', () => {
-    expect(electricityBillProps(electricity(freeBill()))).toMatchObject({
+    expect(electricityBillProps(electricity(freeBill()), 'claim')).toMatchObject({
       market: 'free',
       retailer: 'other',
     });
   });
 
   it('a telecom exit leaves each point by its status', () => {
-    const over = telecomReviewProps(telecomReview(telecom({ penaltyCharged: 90 })));
+    const over = telecomReviewProps(telecomReview(telecom({ penaltyCharged: 90 })), 'claim');
     expect(isValidEvent('telecom_review_completed', over)).toBe(true);
-    expect(over).toEqual({ commitment: 'paid_over', change_exit: 'none', after_exit: 'none' });
+    expect(over).toEqual({
+      commitment: 'paid_over',
+      change_exit: 'none',
+      after_exit: 'none',
+      pass: 'claim',
+    });
     const none = telecomReviewProps(
       telecomReview(telecom({ commitment: null, penaltyCharged: null, lines: [] })),
+      'quiet',
     );
-    expect(none).toEqual({ commitment: 'none', change_exit: 'none', after_exit: 'none' });
+    expect(none).toEqual({
+      commitment: 'none',
+      change_exit: 'none',
+      after_exit: 'none',
+      pass: 'quiet',
+    });
   });
 
   it('a year leaves its size, its difference and the offer in buckets', () => {
     const basket = reviewBasket([meterOver(), meterOver('2026-06-30', '2026-07-31')], {
       passPrice: 4.99,
     });
-    const p = basketProps({ basket, attempt: 1, seconds: 400, detail: 'locked' });
+    const p = basketProps({ basket, attempt: 1, seconds: 400, detail: 'locked', pass: 'claim' });
     expect(isValidEvent('basket_completed', p)).toBe(true);
     expect(p).toEqual({
       size: '2-3',
       difference: '<100',
       offered: true,
       detail: 'locked',
+      pass: 'claim',
       attempt: '1',
       seconds: '180-600',
     });
@@ -181,8 +197,8 @@ describe('bills events', () => {
 
   it('refuse a supply code, its fingerprint, a number or a date in any key', () => {
     const cases = [
-      ['electricity_bill_reviewed', electricityBillProps(meterOver())],
-      ['telecom_review_completed', telecomReviewProps(telecomReview(telecom()))],
+      ['electricity_bill_reviewed', electricityBillProps(meterOver(), 'claim')],
+      ['telecom_review_completed', telecomReviewProps(telecomReview(telecom()), 'held')],
       [
         'basket_completed',
         basketProps({
@@ -190,6 +206,7 @@ describe('bills events', () => {
           attempt: 1,
           seconds: 30,
           detail: 'unlocked',
+          pass: 'held',
         }),
       ],
       ['bills_out_of_scope', { reason: 'over_15kw' }],
@@ -204,7 +221,7 @@ describe('bills events', () => {
     }
     expect(
       isValidEvent('electricity_bill_reviewed', {
-        ...electricityBillProps(meterOver()),
+        ...electricityBillProps(meterOver(), 'claim'),
         findings: ['meter', FINGERPRINT],
       }),
     ).toBe(false);
@@ -217,6 +234,7 @@ describe('bills events', () => {
         void sent.push(JSON.stringify([name, p]))) as Track,
       () => 0,
       () => 'locked',
+      () => 'none',
     );
     events.stepShown('bono-social');
     events.fieldRejected('bono-social', 'bonusCategory');
@@ -233,6 +251,7 @@ describe('bills events', () => {
     const sent: [string, Record<string, unknown>][] = [];
     let clock = 0;
     let detail: 'locked' | 'unlocked' = 'locked';
+    const bill = meterOver();
     const events = electricityAnalytics(
       ((name: string, p: Record<string, unknown>) => {
         expect(isValidEvent(name, p), name).toBe(true);
@@ -240,6 +259,8 @@ describe('bills events', () => {
       }) as Track,
       () => clock,
       () => detail,
+      // The first bill offers the pass quietly, the second with something to claim.
+      (r) => (r === bill ? 'quiet' : 'claim'),
     );
     events.stepShown('suministro');
     clock = 12_000;
@@ -247,16 +268,13 @@ describe('bills events', () => {
     events.stepCompleted('suministro');
     events.outOfScope('canary_ceuta_melilla');
     events.helpOpened('faq-luz-contador');
-    const bill = meterOver();
     events.reviewCompleted(bill);
     clock = 100_000;
     events.basketCompleted(reviewBasket([bill], { passPrice: 4.99 }));
     detail = 'unlocked';
-    events.basketCompleted(
-      reviewBasket([bill, meterOver('2026-06-30', '2026-07-31')], {
-        passPrice: 4.99,
-      }),
-    );
+    const july = meterOver('2026-06-30', '2026-07-31');
+    events.reviewCompleted(july);
+    events.basketCompleted(reviewBasket([bill, july], { passPrice: 4.99 }));
     events.startedOver();
     expect(sent.map(([n]) => n)).toEqual([
       'section_viewed',
@@ -266,38 +284,49 @@ describe('bills events', () => {
       'help_opened',
       'electricity_bill_reviewed',
       'basket_completed',
+      'electricity_bill_reviewed',
       'basket_completed',
       'started_over',
     ]);
     expect(sent[3]?.[1]).toEqual({ reason: 'canary_ceuta_melilla' });
+    expect(sent[5]?.[1]).toMatchObject({ pass: 'quiet' });
     expect(sent[6]?.[1]).toEqual({
       size: '1',
       difference: '<100',
       offered: false,
       detail: 'locked',
+      pass: 'quiet',
       attempt: '1',
       seconds: '60-180',
     });
-    expect(sent[7]?.[1]).toMatchObject({
+    expect(sent[7]?.[1]).toMatchObject({ pass: 'claim' });
+    expect(sent[8]?.[1]).toMatchObject({
       size: '2-3',
       offered: true,
       detail: 'unlocked',
+      pass: 'claim',
       attempt: '2',
     });
   });
 
   it('telecomAnalytics names each event as the catalogue does', () => {
-    const sent: string[] = [];
+    const sent: [string, Record<string, unknown>][] = [];
     const events = telecomAnalytics(
       ((name: string, p: Record<string, unknown>) => {
         expect(isValidEvent(name, p), name).toBe(true);
-        sent.push(name);
+        sent.push([name, p]);
       }) as Track,
       () => 0,
+      () => 'claim',
     );
     events.stepShown('permanencia');
     events.outOfScope('exit_before_2022');
     events.reviewCompleted(telecomReview(telecom()));
-    expect(sent).toEqual(['section_viewed', 'bills_out_of_scope', 'telecom_review_completed']);
+    expect(sent.map(([n]) => n)).toEqual([
+      'section_viewed',
+      'bills_out_of_scope',
+      'telecom_review_completed',
+    ]);
+    expect(sent[2]?.[1]).toMatchObject({ pass: 'claim' });
   });
 });

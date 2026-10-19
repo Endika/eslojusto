@@ -5,7 +5,8 @@ import type { MortgageReview } from '../engine/mortgage/review';
 import type { Basis } from '../engine/mortgage/rules';
 import type { MortgageInput } from '../engine/mortgage/types';
 import type { Detail } from '../calculator/ports';
-import type { MortgageEvents, Step } from '../mortgage/ports';
+import type { PassMode } from '../documents/ports';
+import type { CompletedMortgageReview, MortgageEvents, Step } from '../mortgage/ports';
 import {
   MORTGAGE_EXPENSE_STATUSES,
   MORTGAGE_FEE_STATUSES,
@@ -53,6 +54,7 @@ export function mortgageReviewProps(data: {
   attempt: number;
   seconds: number;
   detail: Detail;
+  pass: PassMode;
 }): Completed {
   const { review, input } = data;
   const { statute, caseLaw, fees } = review.totals;
@@ -69,18 +71,21 @@ export function mortgageReviewProps(data: {
     difference: differenceBucket(Math.max(statute.principal, caseLaw.principal, fees.counted)),
     offered: review.offerPass,
     detail: data.detail,
+    pass: data.pass,
     attempt: attemptBucket(data.attempt),
     seconds: reviewSecondsBucket(data.seconds),
   };
 }
 
 // The mortgage review's events as catalogue events: steps, field names, codes and buckets only;
-// never an amount, a rate, a date or a bank. `detail` tells whether a pass shows the report.
+// never an amount, a rate, a date or a bank. `detail` tells whether a pass shows the report, `pass`
+// how the pass shows under a review.
 // The pass, not the measurement, hears when a review is cleared.
 export function mortgageAnalytics(
   track: Track,
   now: () => number,
   detail: () => Detail,
+  pass: (r: CompletedMortgageReview) => PassMode,
 ): Omit<MortgageEvents, 'reviewCleared'> {
   const { events, reviewed } = sectionAnalytics<Step>(track, now);
   return {
@@ -88,10 +93,17 @@ export function mortgageAnalytics(
     outOfScope(reason) {
       track('mortgage_out_of_scope', { reason });
     },
-    reviewCompleted({ review, input }) {
+    reviewCompleted(completed) {
+      const { review, input } = completed;
       track(
         'mortgage_review_completed',
-        mortgageReviewProps({ review, input, ...reviewed(), detail: detail() }),
+        mortgageReviewProps({
+          review,
+          input,
+          ...reviewed(),
+          detail: detail(),
+          pass: pass(completed),
+        }),
       );
     },
   };
