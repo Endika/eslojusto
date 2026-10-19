@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.91.0](https://github.com/Endika/eslojusto/compare/v1.90.1...v1.91.0) (2026-10-19)
+
+
+### Features
+
+* **mortgage:** give what repaying capital today may cost at most in the report ([83e7a1c](https://github.com/Endika/eslojusto/commit/83e7a1cde97be51c61b9f44558c72d4d6bf693e0))
+
+
+### Bug Fixes
+
+* **mortgage:** give the next cap change only when every reading agrees on it ([4f19531](https://github.com/Endika/eslojusto/commit/4f195318f339ff31836e886d0615f88e9ec9cc22))
+
 ## [1.90.1](https://github.com/Endika/eslojusto/compare/v1.90.0...v1.90.1) (2026-10-19)
 
 
