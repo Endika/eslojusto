@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.93.0](https://github.com/Endika/eslojusto/compare/v1.92.2...v1.93.0) (2026-10-19)
+
+
+### Features
+
+* **mortgage:** ask the early repayment fee the deed sets, optionally ([17e50d9](https://github.com/Endika/eslojusto/commit/17e50d90c384ac1dd1e52eae0a6ffce07b12ddcb))
+
 ## [1.92.2](https://github.com/Endika/eslojusto/compare/v1.92.1...v1.92.2) (2026-10-19)
 
 
