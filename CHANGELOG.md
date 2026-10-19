@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.89.1](https://github.com/Endika/eslojusto/compare/v1.89.0...v1.89.1) (2026-10-19)
+
+
+### Bug Fixes
+
+* **household:** label findings «Para revisar» like every other section ([78dc988](https://github.com/Endika/eslojusto/commit/78dc98890ab8554f6342a5892f5f1f73d8de5fdd))
+
 ## [1.89.0](https://github.com/Endika/eslojusto/compare/v1.88.1...v1.89.0) (2026-10-19)
 
 
