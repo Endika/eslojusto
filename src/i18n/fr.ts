@@ -5279,7 +5279,7 @@ export const fr: Translation = {
   'mortgage.guide.floor.p1':
     "Une clause plancher fixe un taux minimum\u00a0: même si l'indice baisse, le taux d'intérêt ne descend pas en dessous. Depuis le 16-06-2019, la loi interdit cette limite dans les prêts immobiliers à taux variable (art. 21.3) et exige que l'intérêt ne soit pas négatif (art. 21.4).",
   'mortgage.guide.floor.p2':
-    "Pour les actes antérieurs, ce qui existe, c'est la jurisprudence. La Cour de justice de l'Union européenne a dit en 2016 que, lorsqu'un juge annule une clause plancher, ce qui est restitué ne peut pas se limiter à ce qui a été payé après son arrêt (C-154/15), et en 2020, qu'une clause plancher peut être modifiée par un accord ultérieur s'il est accepté de manière libre et éclairée (C-452/18).",
+    "Pour les actes antérieurs, ce qui existe, c'est la jurisprudence. La Cour de justice de l'Union européenne a dit en 2016 que, lorsqu'un juge annule une clause plancher, ce qui est restitué ne peut pas se limiter à ce qui a été payé après son arrêt (C-154/15), et en 2020, qu'une clause plancher peut être modifiée par un accord ultérieur s'il est accepté de manière libre et éclairée, ce que vérifie le juge (C-452/18).",
   'mortgage.guide.floor.p3':
     "C'est un juge qui examine au cas par cas si votre clause a été expliquée clairement\u00a0: cette vérification vous indique si elle figure dans votre acte, mais ne l'apprécie pas et ne calcule pas ce qu'elle a représenté dans vos échéances.",
   'mortgage.guide.irph.title': "L'IRPH",
@@ -5303,7 +5303,7 @@ export const fr: Translation = {
   'mortgage.guide.limits.p1':
     "Selon la Cour de justice de l'Union européenne, le délai pour demander ce qui a été payé en vertu d'une clause de frais peut commencer à courir lorsque devient définitif le jugement qui l'annule, sauf si la banque prouve que l'on pouvait déjà savoir auparavant que la clause n'était pas valable (C-561/21). La Cour suprême l'applique aux frais du prêt immobilier (STS 857/2024).",
   'mortgage.guide.limits.p2':
-    "C'est la règle, pas un calcul de votre cas\u00a0: cette vérification ne dit pas si, dans votre cas, un délai est écoulé.",
+    "C'est le critère de la Cour, pas un calcul de votre cas\u00a0: cette vérification ne dit pas si, dans votre cas, un délai est écoulé.",
   'mortgage.guide.prior_step.title': "L'étape préalable de l'art. 439 bis",
   'mortgage.guide.prior_step.p1':
     "Depuis le 03-04-2025, avant de saisir un tribunal au sujet des clauses d'un prêt immobilier, la loi encadre une étape préalable du consommateur auprès de la banque (art. 439 bis de la Ley de Enjuiciamiento Civil)\u00a0: la banque fait un calcul détaillé, avec les intérêts, le délai pour parvenir à un accord est d'un mois au maximum et cette étape n'est pas facturée.",
@@ -5821,7 +5821,7 @@ export const fr: Translation = {
   'client.mortgage.calculation.flags.default_interest_lh114_earlier':
     "Votre acte est antérieur au 15-05-2013. La Ley 1/2013 applique la limite de l'art. 114 de la Ley Hipotecaria, trois fois le taux d'intérêt légal, aux intérêts de retard des prêts garantis par une hypothèque sur la résidence principale consentis avant cette date\u00a0: à ceux acquis depuis lors et à ceux déjà acquis qui n'avaient pas été payés (disposition transitoire deuxième). Aucun chiffre n'est donné ici.",
   'client.mortgage.calculation.flags.default_interest_case_law':
-    "Pour les actes antérieurs au 16-06-2019 conclus avec des consommateurs, la Cour de justice de l'Union européenne admet qu'un tribunal prenne comme référence l'intérêt ordinaire plus 2 points pour apprécier le taux de retard. Cela dépend d'un juge.",
+    "Pour les actes antérieurs au 16-06-2019 conclus avec des consommateurs, la Cour suprême prend comme référence l'intérêt ordinaire plus 2 points pour apprécier le taux de retard, et la Cour de justice de l'Union européenne dit que ce critère n'est pas contraire au droit de l'Union. Cela dépend d'un juge.",
   'client.mortgage.calculation.flags.default_interest_case_law_above':
     'Votre acte indique {default} avec un taux ordinaire de {ordinary}\u00a0: plus que cette référence ({reference}).',
   'client.mortgage.calculation.flags.early_termination':
@@ -5853,7 +5853,7 @@ export const fr: Translation = {
   'client.mortgage.calculation.information.handwritten_statement':
     "Entre le 15-05-2013 et le 15-06-2019, si vous avez souscrit le prêt immobilier en tant que particulier (persona física), sur un logement ou pour acheter ou conserver un terrain ou un bâtiment, et qu'il comportait des limites à la variation du taux, comme un plancher et un plafond, «en los cuales el límite de variabilidad a la baja sea inferior al límite de variabilidad al alza» (dans lesquelles la limite de variation à la baisse est inférieure à la limite de variation à la hausse), un instrument de couverture du risque de taux d'intérêt, ou qu'il était accordé en devises, l'acte devait comporter une mention manuscrite indiquant que ses risques vous avaient été signalés (art. 6 de la Ley 1/2013).",
   'client.mortgage.calculation.information.limitation_rule':
-    "Selon la Cour de justice de l'Union européenne, le délai pour demander ce qui a été payé en vertu d'une clause de frais ne peut pas commencer à courir le jour du paiement, mais lorsqu'il a été possible de savoir que la clause n'était pas valable. C'est la règle, pas un calcul de votre cas.",
+    "Selon la Cour de justice de l'Union européenne, le délai pour demander ce qui a été payé en vertu d'une clause de frais peut commencer à courir lorsque devient définitif le jugement qui l'annule, sauf si la banque prouve que l'on pouvait déjà savoir auparavant que la clause n'était pas valable (C-561/21). C'est le critère de la Cour, pas un calcul de votre cas.",
   'client.mortgage.calculation.information.prior_step_439bis':
     "Depuis le 03-04-2025, la loi encadre une étape préalable précise avant de saisir un tribunal au sujet des clauses d'un prêt immobilier (art. 439 bis de la Ley de Enjuiciamiento Civil). Le lien mène au texte de la loi.",
   'client.mortgage.calculation.information.loan_assignment':

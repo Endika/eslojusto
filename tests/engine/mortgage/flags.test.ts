@@ -41,7 +41,7 @@ describe('floor clause', () => {
         'floor_case_law',
         ['flags.floor_case_law'],
         ['tjue_c154_15', 'tjue_c452_18', 'sts241_2013'],
-        '2026-10-07',
+        '2026-10-10',
       ],
     ]);
     expect(flag.parts[0]?.calculation[0]?.vars).toEqual({ floor: { percent: 3 } });
@@ -98,7 +98,7 @@ describe('floor clause', () => {
 describe('IRPH', () => {
   it('is shown with the Court of Justice rulings and the day they were read', () => {
     expect(parts(one('2005-03-01', clause('irph')))).toEqual([
-      ['case_law', 'irph', ['flags.irph'], ['tjue_c125_18', 'tjue_c265_22'], '2026-10-07'],
+      ['case_law', 'irph', ['flags.irph'], ['tjue_c125_18', 'tjue_c265_22'], '2026-10-19'],
     ]);
   });
 
@@ -171,7 +171,7 @@ describe('late interest', () => {
         'default_interest_case_law',
         ['flags.default_interest_case_law', 'flags.default_interest_case_law_above'],
         ['tjue_c96_16', 'sts364_2016'],
-        '2026-10-07',
+        '2026-10-10',
       ],
     ]);
     expect(flag.parts[0]?.calculation[1]?.vars).toEqual({
@@ -208,7 +208,7 @@ describe('late interest', () => {
         'default_interest_case_law',
         ['flags.default_interest_case_law', 'flags.default_interest_case_law_above'],
         ['tjue_c96_16', 'sts364_2016'],
-        '2026-10-07',
+        '2026-10-10',
       ],
     ]);
     expect(flag.parts[0]?.calculation[0]?.vars).toBeUndefined();
@@ -229,7 +229,7 @@ describe('late interest', () => {
         'default_interest_case_law',
         ['flags.default_interest_case_law'],
         ['tjue_c96_16', 'sts364_2016'],
-        '2026-10-07',
+        '2026-10-10',
       ],
     ]);
   });
@@ -261,7 +261,7 @@ describe('early termination', () => {
         'early_termination_case_law',
         ['flags.early_termination_case_law'],
         ['tjue_c70_17', 'sts463_2019'],
-        '2026-10-07',
+        '2026-10-10',
       ],
     ]);
     expect(flag.parts[0]?.calculation[2]?.vars).toEqual({ instalments: { integer: 1 } });
@@ -300,7 +300,7 @@ describe('other clauses', () => {
         'opening_fee_case_law',
         ['flags.opening_fee_case_law'],
         ['tjue_c565_21', 'sts816_2023'],
-        '2026-10-07',
+        '2026-10-10',
       ],
     ]);
   });

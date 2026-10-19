@@ -52,11 +52,17 @@ describe('mortgage case-law sources', () => {
     }
   });
 
-  it('quotes only the Supreme Court passages the costs, their interest and their time limit rest on', () => {
+  it('quotes the Supreme Court passages the costs, their interest and their time limit rest on, and each judgment of the Court of Justice', () => {
     const quoting = Object.values(MORTGAGE_SOURCES)
       .filter((s) => s.quotes.length > 0)
       .map((s) => s.id);
-    expect(quoting).toEqual(['sts725_2018', 'sts35_2021', 'sts816_2023', 'sts857_2024']);
+    expect(quoting).toEqual([
+      'sts725_2018',
+      'sts35_2021',
+      'sts816_2023',
+      'sts857_2024',
+      ...Object.keys(MORTGAGE_SOURCES).filter((id) => id.startsWith('tjue_')),
+    ]);
   });
 });
 

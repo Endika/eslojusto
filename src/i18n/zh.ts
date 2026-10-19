@@ -4793,7 +4793,7 @@ export const zh: Translation = {
   'mortgage.guide.floor.p1':
     '利率下限条款（cláusula suelo）规定一个最低利率：即使指数下降，利率也不会低于这个数。自16-06-2019起，法律禁止浮动利率房贷设置这种下限（art. 21.3），并要求利率不得为负（art. 21.4）。',
   'mortgage.guide.floor.p2':
-    '对于此前的公证契约，依据的是司法判例。欧盟法院在2016年表示，当法官宣告利率下限条款无效时，退还的款项不能只限于其判决之后支付的部分（C-154/15）；并在2020年表示，如果在自由且知情的情况下接受，利率下限条款可以通过事后协议加以变更（C-452/18）。',
+    '对于此前的公证契约，依据的是司法判例。欧盟法院在2016年表示，当法官宣告利率下限条款无效时，退还的款项不能只限于其判决之后支付的部分（C-154/15）；并在2020年表示，如果在自由且知情的情况下接受，利率下限条款可以通过事后协议加以变更，这一点由法官核实（C-452/18）。',
   'mortgage.guide.floor.p3':
     '您的条款是否解释清楚，由法官逐案审查：本核查会告诉您该条款是否出现在您的公证契约中，但不对其作出评估，也不计算它对您每期还款额的影响。',
   'mortgage.guide.irph.title': 'IRPH',
@@ -4817,7 +4817,7 @@ export const zh: Translation = {
   'mortgage.guide.limits.p1':
     '根据欧盟法院的判例，主张返还依据费用条款所付款项的期限，可以从宣告该条款无效的判决生效之日起算，除非银行能证明此前就已经可以知道该条款无效（C-561/21）。西班牙最高法院将这一规则适用于房贷费用（STS 857/2024）。',
   'mortgage.guide.limits.p2':
-    '这是一般规则，不是对您个人情况的计算：本核查不会判断您的情况是否已过某个期限。',
+    '这是法院的判例标准，不是对您个人情况的计算：本核查不会判断您的情况是否已过某个期限。',
   'mortgage.guide.prior_step.title': 'art. 439 bis 规定的前置程序',
   'mortgage.guide.prior_step.p1':
     '自03-04-2025起，在因房贷条款诉诸法院之前，法律规定了消费者向银行提出的一个前置程序（《民事诉讼法》（Ley de Enjuiciamiento Civil）art. 439 bis）：银行须作出含利息的分项计算，达成协议的期限最长为一个月，且不收费。',
@@ -5292,7 +5292,7 @@ export const zh: Translation = {
   'client.mortgage.calculation.flags.default_interest_lh114_earlier':
     '您的公证契约早于15-05-2013。Ley 1/2013 将《抵押法》（Ley Hipotecaria）art. 114 规定的上限（法定利率的三倍），适用于在该日期之前设立的以自住房屋作抵押的贷款的逾期利息：既适用于此后产生的利息，也适用于已经产生但尚未支付的利息（disposición transitoria segunda）。这里不给出金额。',
   'client.mortgage.calculation.flags.default_interest_case_law':
-    '对于16-06-2019之前与消费者签订的公证契约，欧盟法院允许法院以普通利率加2个百分点作为参考来评估逾期利率。这取决于法官的判断。',
+    '对于16-06-2019之前与消费者签订的公证契约，西班牙最高法院以普通利率加2个百分点作为参考来评估逾期利率，欧盟法院则表示这一标准不违反欧盟法。这取决于法官的判断。',
   'client.mortgage.calculation.flags.default_interest_case_law_above':
     '您的公证契约写的是{default}，普通利率为{ordinary}：高于这一参考（{reference}）。',
   'client.mortgage.calculation.flags.early_termination':
@@ -5322,7 +5322,7 @@ export const zh: Translation = {
   'client.mortgage.calculation.information.handwritten_statement':
     '在15-05-2013至15-06-2019期间，如果您以自然人身份申请房贷，以住房作抵押或用于购买或保有土地或建筑物，且房贷对利率变动设有限制，例如下限和上限（«en los cuales el límite de variabilidad a la baja sea inferior al límite de variabilidad al alza»），或附有利率风险对冲工具，或以外币发放，那么公证契约中须有一段手写声明，写明银行已向您提示其风险（Ley 1/2013 的 art. 6）。',
   'client.mortgage.calculation.information.limitation_rule':
-    '根据欧盟法院的判例，主张返还依据费用条款所付款项的期限，不能从付款之日起算，而是从能够知道该条款无效之时起算。这是一般规则，不是对您个人情况的计算。',
+    '根据欧盟法院的判例，主张返还依据费用条款所付款项的期限，可以从宣告该条款无效的判决生效之日起算，除非银行能证明此前就已经可以知道该条款无效（C-561/21）。这是法院的判例标准，不是对您个人情况的计算。',
   'client.mortgage.calculation.information.prior_step_439bis':
     '自03-04-2025起，在因房贷条款诉诸法院之前，法律规定了一个具体的前置程序（《民事诉讼法》（Ley de Enjuiciamiento Civil）art. 439 bis）。链接中是该法律的原文。',
   'client.mortgage.calculation.information.loan_assignment':

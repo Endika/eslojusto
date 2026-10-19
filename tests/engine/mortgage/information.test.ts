@@ -58,7 +58,7 @@ describe('information blocks', () => {
       'case_law',
       ['information.limitation_rule'],
       ['tjue_c561_21', 'sts857_2024'],
-      '2026-10-07',
+      '2026-10-10',
     ]);
   });
 
