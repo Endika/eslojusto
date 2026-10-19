@@ -5180,7 +5180,7 @@ export const ro: Translation = {
   'mortgage.guide.floor.p1':
     'O clauză de dobândă minimă (cláusula suelo) stabilește o dobândă minimă: chiar dacă indicele scade, dobânda nu coboară sub acel nivel. Din 16-06-2019, legea interzice această limită la creditele ipotecare cu dobândă variabilă (art. 21.3) și cere ca dobânda să nu fie negativă (art. 21.4).',
   'mortgage.guide.floor.p2':
-    'Pentru actele notariale anterioare, există criteriul instanțelor. Curtea de Justiție a Uniunii Europene a spus în 2016 că, atunci când un judecător anulează o clauză de dobândă minimă, ce se restituie nu poate fi limitat la ce s-a plătit după hotărârea sa (C-154/15), iar în 2020, că o clauză de dobândă minimă poate fi înlocuită printr-un acord ulterior, dacă este acceptat în mod liber și informat (C-452/18).',
+    'Pentru actele notariale anterioare, există criteriul instanțelor. Curtea de Justiție a Uniunii Europene a spus în 2016 că, atunci când un judecător anulează o clauză de dobândă minimă, ce se restituie nu poate fi limitat la ce s-a plătit după hotărârea sa (C-154/15), iar în 2020, că o clauză de dobândă minimă poate fi înlocuită printr-un acord ulterior, dacă este acceptat în mod liber și informat, lucru pe care îl verifică judecătorul (C-452/18).',
   'mortgage.guide.floor.p3':
     'Dacă clauza ta a fost explicată clar examinează un judecător, de la caz la caz: această verificare îți spune dacă apare în actul tău notarial, dar nu o evaluează și nici nu calculează ce a însemnat în ratele tale.',
   'mortgage.guide.irph.title': 'IRPH',
@@ -5204,7 +5204,7 @@ export const ro: Translation = {
   'mortgage.guide.limits.p1':
     'Potrivit Curții de Justiție a Uniunii Europene, termenul pentru a cere ce s-a plătit în baza unei clauze privind cheltuielile poate începe să curgă când devine definitivă hotărârea care o anulează, cu excepția cazului în care banca dovedește că se putea ști mai devreme că clauza nu era valabilă (C-561/21). Curtea Supremă (Tribunal Supremo) aplică acest criteriu costurilor creditului ipotecar (STS 857/2024).',
   'mortgage.guide.limits.p2':
-    'Este regula, nu un calcul pentru cazul tău: această verificare nu spune dacă în cazul tău a trecut vreun termen.',
+    'Este criteriul instanței, nu un calcul pentru cazul tău: această verificare nu spune dacă în cazul tău a trecut vreun termen.',
   'mortgage.guide.prior_step.title': 'Pasul prealabil din art. 439 bis',
   'mortgage.guide.prior_step.p1':
     'Din 03-04-2025, înainte de a te adresa instanței pentru clauze ale unui credit ipotecar, legea reglementează un pas prealabil al consumatorului în fața băncii (art. 439 bis din Ley de Enjuiciamiento Civil, codul de procedură civilă): banca face un calcul detaliat, cu dobânzile, termenul pentru a ajunge la un acord este de cel mult o lună și nu se percepe nimic.',
@@ -5712,7 +5712,7 @@ export const ro: Translation = {
   'client.mortgage.calculation.flags.default_interest_lh114_earlier':
     'Actul tău notarial este anterior datei de 15-05-2013. Ley 1/2013 aplică limita din art. 114 din Ley Hipotecaria, de trei ori dobânda legală, dobânzilor penalizatoare ale împrumuturilor cu ipotecă pe locuința principală constituite înainte de acea dată: celor care se acumulează de atunci și celor deja acumulate care nu fuseseră plătite (disposición transitoria segunda). Aici nu se dă cifră.',
   'client.mortgage.calculation.flags.default_interest_case_law':
-    'Pentru actele notariale cu consumatori anterioare datei de 16-06-2019, Curtea de Justiție a Uniunii Europene admite ca o instanță să ia ca reper dobânda obișnuită plus 2 puncte procentuale pentru a evalua dobânda penalizatoare. Depinde de un judecător.',
+    'Pentru actele notariale cu consumatori anterioare datei de 16-06-2019, Curtea Supremă (Tribunal Supremo) ia ca reper dobânda obișnuită plus 2 puncte procentuale pentru a evalua dobânda penalizatoare, iar Curtea de Justiție a Uniunii Europene spune că acest criteriu nu este contrar dreptului Uniunii. Depinde de un judecător.',
   'client.mortgage.calculation.flags.default_interest_case_law_above':
     'Actul tău notarial prevede {default}, cu o dobândă obișnuită de {ordinary}: mai mult decât acest reper ({reference}).',
   'client.mortgage.calculation.flags.early_termination':
@@ -5744,7 +5744,7 @@ export const ro: Translation = {
   'client.mortgage.calculation.information.handwritten_statement':
     'Între 15-05-2013 și 15-06-2019, dacă ai luat creditul ipotecar ca persoană fizică, pe o locuință sau pentru a cumpăra ori a păstra un teren sau o clădire, și avea limite ale variației dobânzii, cum ar fi o dobândă minimă și una maximă, «en los cuales el límite de variabilidad a la baja sea inferior al límite de variabilidad al alza», un instrument de acoperire a riscului de rată a dobânzii sau era acordat în valută, actul notarial trebuia să conțină o mențiune scrisă de mână în care se consemna că ai fost avertizat cu privire la riscurile lui (art. 6 din Ley 1/2013).',
   'client.mortgage.calculation.information.limitation_rule':
-    'Potrivit Curții de Justiție a Uniunii Europene, termenul pentru a cere ce s-a plătit în baza unei clauze privind cheltuielile nu poate începe să curgă din ziua plății, ci de când s-a putut ști că clauza nu era valabilă. Este regula, nu un calcul pentru cazul tău.',
+    'Potrivit Curții de Justiție a Uniunii Europene, termenul pentru a cere ce s-a plătit în baza unei clauze privind cheltuielile poate începe să curgă când devine definitivă hotărârea care o anulează, cu excepția cazului în care banca dovedește că se putea ști mai devreme că clauza nu era valabilă (C-561/21). Este criteriul instanței, nu un calcul pentru cazul tău.',
   'client.mortgage.calculation.information.prior_step_439bis':
     'Din 03-04-2025, legea reglementează un pas prealabil concret înainte de a te adresa instanței pentru clauze ale unui credit ipotecar (art. 439 bis din Ley de Enjuiciamiento Civil, codul de procedură civilă). În link găsești textul legii.',
   'client.mortgage.calculation.information.loan_assignment':

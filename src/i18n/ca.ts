@@ -5098,7 +5098,7 @@ export const ca: Translation = {
   'mortgage.guide.floor.p1':
     'Una clàusula sòl fixa un tipus mínim: encara que l’índex baixi, l’interès no baixa d’aquí. Des del 16-06-2019, la llei prohibeix aquest límit en les hipoteques de tipus variable (art. 21.3) i exigeix que l’interès no sigui negatiu (art. 21.4).',
   'mortgage.guide.floor.p2':
-    'Per a les escriptures anteriors, el que hi ha és criteri dels tribunals. El Tribunal de Justicia de la Unión Europea va dir el 2016 que, quan un jutge anul·la una clàusula sòl, el que es retorna no es pot limitar al que s’ha pagat després de la seva sentència (C-154/15), i el 2020, que una clàusula sòl es pot canviar per un acord posterior si s’accepta de manera lliure i informada (C-452/18).',
+    'Per a les escriptures anteriors, el que hi ha és criteri dels tribunals. El Tribunal de Justicia de la Unión Europea va dir el 2016 que, quan un jutge anul·la una clàusula sòl, el que es retorna no es pot limitar al que s’ha pagat després de la seva sentència (C-154/15), i el 2020, que una clàusula sòl es pot canviar per un acord posterior si s’accepta de manera lliure i informada, cosa que comprova el jutge (C-452/18).',
   'mortgage.guide.floor.p3':
     'Si la teva clàusula es va explicar amb claredat ho examina un jutge en cada cas: aquesta revisió et diu si apareix a la teva escriptura, però no la valora ni calcula el que va suposar en les teves quotes.',
   'mortgage.guide.irph.title': 'L’IRPH',
@@ -5122,7 +5122,7 @@ export const ca: Translation = {
   'mortgage.guide.limits.p1':
     'Segons el Tribunal de Justicia de la Unión Europea, el termini per demanar el que s’ha pagat per una clàusula de despeses pot començar a comptar quan és ferma la sentència que l’anul·la, llevat que el banc provi que ja es podia saber abans que la clàusula no era vàlida (C-561/21). El Tribunal Supremo ho aplica a les despeses de la hipoteca (STS 857/2024).',
   'mortgage.guide.limits.p2':
-    'És la regla, no un càlcul del teu cas: aquesta revisió no diu si en el teu cas ha passat algun termini.',
+    'És el criteri, no un càlcul del teu cas: aquesta revisió no diu si en el teu cas ha passat algun termini.',
   'mortgage.guide.prior_step.title': 'El pas previ de l’art. 439 bis',
   'mortgage.guide.prior_step.p1':
     'Des del 03-04-2025, abans d’anar a un jutjat per clàusules d’una hipoteca, la llei regula un pas previ del consumidor davant del banc (art. 439 bis de la Ley de Enjuiciamiento Civil): el banc fa un càlcul desglossat, amb els interessos, el termini per arribar a un acord és d’un mes com a màxim i no es cobra.',
@@ -5622,7 +5622,7 @@ export const ca: Translation = {
   'client.mortgage.calculation.flags.default_interest_lh114_earlier':
     'La teva escriptura és anterior al 15-05-2013. La Ley 1/2013 aplica el límit de l’art. 114 de la Ley Hipotecaria, tres vegades l’interès legal del diner, als interessos de demora dels préstecs amb hipoteca sobre habitatge habitual constituïts abans d’aquesta data: als que es meritin des d’aleshores i als ja meritats que no s’haguessin pagat (disposició transitòria segona). Aquí no es dona xifra.',
   'client.mortgage.calculation.flags.default_interest_case_law':
-    'Per a les escriptures anteriors al 16-06-2019 amb consumidors, el Tribunal de Justicia de la Unión Europea admet que un tribunal prengui com a referència l’interès ordinari més 2 punts per valorar el de demora. Depèn d’un jutge.',
+    'Per a les escriptures anteriors al 16-06-2019 amb consumidors, el Tribunal Supremo pren com a referència l’interès ordinari més 2 punts per valorar el de demora, i el Tribunal de Justicia de la Unión Europea diu que aquest criteri no és contrari al dret europeu. Depèn d’un jutge.',
   'client.mortgage.calculation.flags.default_interest_case_law_above':
     'La teva escriptura diu {default} amb un interès ordinari d’un {ordinary}: més que aquesta referència ({reference}).',
   'client.mortgage.calculation.flags.early_termination':
@@ -5653,7 +5653,7 @@ export const ca: Translation = {
   'client.mortgage.calculation.information.handwritten_statement':
     'Entre el 15-05-2013 i el 15-06-2019, si vas demanar la hipoteca com a persona física, sobre un habitatge o per comprar o conservar un terreny o un edifici, i tenia límits a la variació del tipus, com un sòl i un sostre, «en los cuales el límite de variabilidad a la baja sea inferior al límite de variabilidad al alza», un instrument de cobertura del risc de tipus d’interès o es concedia en divises, l’escriptura havia de portar una expressió escrita a mà en què constava que t’havien advertit dels seus riscos (art. 6 de la Ley 1/2013).',
   'client.mortgage.calculation.information.limitation_rule':
-    'Segons el Tribunal de Justicia de la Unión Europea, el termini per demanar el que s’ha pagat per una clàusula de despeses no pot començar a comptar el dia del pagament, sinó quan es va poder saber que la clàusula no era vàlida. És la regla, no un càlcul del teu cas.',
+    'Segons el Tribunal de Justicia de la Unión Europea, el termini per demanar el que s’ha pagat per una clàusula de despeses pot començar a comptar quan és ferma la sentència que l’anul·la, llevat que el banc provi que ja es podia saber abans que la clàusula no era vàlida (C-561/21). És el criteri, no un càlcul del teu cas.',
   'client.mortgage.calculation.information.prior_step_439bis':
     'Des del 03-04-2025, la llei regula un pas previ concret abans d’anar a un jutjat per clàusules d’una hipoteca (art. 439 bis de la Ley de Enjuiciamiento Civil). A l’enllaç tens el text de la llei.',
   'client.mortgage.calculation.information.loan_assignment':

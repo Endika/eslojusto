@@ -5519,7 +5519,7 @@ export const es = {
   'mortgage.guide.floor.p1':
     'Una cláusula suelo fija un tipo mínimo: aunque el índice baje, el interés no baja de ahí. Desde el 16-06-2019, la ley prohíbe ese límite en las hipotecas de tipo variable (art. 21.3) y exige que el interés no sea negativo (art. 21.4).',
   'mortgage.guide.floor.p2':
-    'Para las escrituras anteriores, lo que hay es criterio de los tribunales. El Tribunal de Justicia de la Unión Europea dijo en 2016 que, cuando un juez anula una cláusula suelo, lo que se devuelve no puede limitarse a lo pagado después de su sentencia (C-154/15), y en 2020, que una cláusula suelo puede cambiarse por un acuerdo posterior si se acepta de forma libre e informada (C-452/18).',
+    'Para las escrituras anteriores, lo que hay es criterio de los tribunales. El Tribunal de Justicia de la Unión Europea dijo en 2016 que, cuando un juez anula una cláusula suelo, lo que se devuelve no puede limitarse a lo pagado después de su sentencia (C-154/15), y en 2020, que una cláusula suelo puede cambiarse por un acuerdo posterior si se acepta de forma libre e informada, lo que comprueba el juez (C-452/18).',
   'mortgage.guide.floor.p3':
     'Si tu cláusula se explicó con claridad lo examina un juez en cada caso: esta revisión te dice si aparece en tu escritura, pero no la valora ni calcula lo que supuso en tus cuotas.',
   'mortgage.guide.irph.title': 'El IRPH',
@@ -5543,7 +5543,7 @@ export const es = {
   'mortgage.guide.limits.p1':
     'Según el Tribunal de Justicia de la Unión Europea, el plazo para pedir lo pagado por una cláusula de gastos puede empezar a contar cuando es firme la sentencia que la anula, salvo que el banco pruebe que ya se podía conocer antes que la cláusula no era válida (C-561/21). El Tribunal Supremo lo aplica a los gastos de la hipoteca (STS 857/2024).',
   'mortgage.guide.limits.p2':
-    'Es la regla, no un cálculo de tu caso: esta revisión no dice si en tu caso ha pasado algún plazo.',
+    'Es el criterio, no un cálculo de tu caso: esta revisión no dice si en tu caso ha pasado algún plazo.',
   'mortgage.guide.prior_step.title': 'El paso previo del art. 439 bis',
   'mortgage.guide.prior_step.p1':
     'Desde el 03-04-2025, antes de acudir a un juzgado por cláusulas de una hipoteca, la ley regula un paso previo del consumidor ante el banco (art. 439 bis de la Ley de Enjuiciamiento Civil): el banco hace un cálculo desglosado, con los intereses, el plazo para llegar a un acuerdo es de un mes como máximo y no se cobra.',
@@ -6068,7 +6068,7 @@ export const es = {
   'client.mortgage.calculation.flags.default_interest_lh114_earlier':
     'Tu escritura es anterior al 15-05-2013. La Ley 1/2013 aplica el límite del art. 114 de la Ley Hipotecaria, tres veces el interés legal del dinero, a los intereses de demora de los préstamos con hipoteca sobre vivienda habitual constituidos antes de esa fecha: a los que se devenguen desde entonces y a los ya devengados que no se hubieran pagado (disposición transitoria segunda). Aquí no se da cifra.',
   'client.mortgage.calculation.flags.default_interest_case_law':
-    'Para las escrituras anteriores al 16-06-2019 con consumidores, el Tribunal de Justicia de la Unión Europea admite que un tribunal tome como referencia el interés ordinario más 2 puntos para valorar el de demora. Depende de un juez.',
+    'Para las escrituras anteriores al 16-06-2019 con consumidores, el Tribunal Supremo toma como referencia el interés ordinario más 2 puntos para valorar el de demora, y el Tribunal de Justicia de la Unión Europea dice que ese criterio no es contrario al Derecho europeo. Depende de un juez.',
   'client.mortgage.calculation.flags.default_interest_case_law_above':
     'Tu escritura dice {default} con un ordinario del {ordinary}: más que esa referencia ({reference}).',
   'client.mortgage.calculation.flags.early_termination':
@@ -6100,7 +6100,7 @@ export const es = {
   'client.mortgage.calculation.information.handwritten_statement':
     'Entre el 15-05-2013 y el 15-06-2019, si pediste la hipoteca como persona física, sobre una vivienda o para comprar o conservar un terreno o un edificio, y tenía límites a la variación del tipo, como un suelo y un techo, «en los cuales el límite de variabilidad a la baja sea inferior al límite de variabilidad al alza», un instrumento de cobertura del riesgo de tipo de interés o se concedía en divisas, la escritura debía llevar una expresión escrita a mano en la que constaba que te habían advertido de sus riesgos (art. 6 de la Ley 1/2013).',
   'client.mortgage.calculation.information.limitation_rule':
-    'Según el Tribunal de Justicia de la Unión Europea, el plazo para pedir lo pagado por una cláusula de gastos no puede empezar a contar el día del pago, sino cuando se pudo conocer que la cláusula no era válida. Es la regla, no un cálculo de tu caso.',
+    'Según el Tribunal de Justicia de la Unión Europea, el plazo para pedir lo pagado por una cláusula de gastos puede empezar a contar cuando es firme la sentencia que la anula, salvo que el banco pruebe que ya se podía conocer antes que la cláusula no era válida (C-561/21). Es el criterio, no un cálculo de tu caso.',
   'client.mortgage.calculation.information.prior_step_439bis':
     'Desde el 03-04-2025, la ley regula un paso previo concreto antes de acudir a un juzgado por cláusulas de una hipoteca (art. 439 bis de la Ley de Enjuiciamiento Civil). En el enlace tienes el texto de la ley.',
   'client.mortgage.calculation.information.loan_assignment':

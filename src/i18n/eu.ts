@@ -5164,7 +5164,7 @@ export const eu: Translation = {
   'mortgage.guide.floor.p1':
     'Zoru-klausula batek gutxieneko tasa bat finkatzen du: indizea jaitsi arren, interesa ez da hortik behera jaisten. 16-06-2019tik aurrera, legeak debekatu egiten du muga hori tasa aldakorreko hipoteketan (art. 21.3), eta interesa negatiboa ez izatea eskatzen du (art. 21.4).',
   'mortgage.guide.floor.p2':
-    'Aurreko eskrituretan, auzitegien irizpidea dago. Tribunal de Justicia de la Unión Europea auzitegiak 2016an esan zuen epaile batek zoru-klausula bat deuseztatzen duenean itzultzen dena ezin dela mugatu haren epaiaren ondoren ordaindutakora (C-154/15), eta 2020an, zoru-klausula bat ondorengo akordio baten bidez alda daitekeela, askatasunez eta informazio osoz onartzen bada (C-452/18).',
+    'Aurreko eskrituretan, auzitegien irizpidea dago. Tribunal de Justicia de la Unión Europea auzitegiak 2016an esan zuen epaile batek zoru-klausula bat deuseztatzen duenean itzultzen dena ezin dela mugatu haren epaiaren ondoren ordaindutakora (C-154/15), eta 2020an, zoru-klausula bat ondorengo akordio baten bidez alda daitekeela, askatasunez eta informazio osoz onartzen bada, eta hori epaileak egiaztatzen du (C-452/18).',
   'mortgage.guide.floor.p3':
     'Zure klausula argi azaldu zen ala ez epaile batek aztertzen du kasu bakoitzean: berrikuspen honek zure eskrituran agertzen den esaten dizu, baina ez du baloratzen, ezta zure kuotetan zer ekarri zuen kalkulatzen ere.',
   'mortgage.guide.irph.title': 'IRPH indizea',
@@ -5188,7 +5188,7 @@ export const eu: Translation = {
   'mortgage.guide.limits.p1':
     'Tribunal de Justicia de la Unión Europea auzitegiaren arabera, gastuen klausula baten ondorioz ordaindutakoa eskatzeko epea klausula deuseztatzen duen epaia irmo bihurtzen denean has daiteke zenbatzen, salbu eta bankuak frogatzen badu klausula baliozkoa ez zela lehenago ere jakin zitekeela (C-561/21). Tribunal Supremoak hipotekaren gastuei aplikatzen die (STS 857/2024).',
   'mortgage.guide.limits.p2':
-    'Araua da, ez zure kasuaren kalkulu bat: berrikuspen honek ez du esaten zure kasuan eperen bat igaro den.',
+    'Auzitegiaren irizpidea da, ez zure kasuaren kalkulu bat: berrikuspen honek ez du esaten zure kasuan eperen bat igaro den.',
   'mortgage.guide.prior_step.title': 'Aurretiazko pausoa (art. 439 bis)',
   'mortgage.guide.prior_step.p1':
     '03-04-2025etik aurrera, hipoteka baten klausulengatik epaitegi batera jo aurretik, legeak kontsumitzailearen aurretiazko pauso bat arautzen du, bankuaren aurrean (Ley de Enjuiciamiento Civil, art. 439 bis): bankuak kalkulu banakatua egiten du, interesekin; akordio batera iristeko epea gehienez hilabetekoa da, eta ez da kobratzen.',
@@ -5689,7 +5689,7 @@ export const eu: Translation = {
   'client.mortgage.calculation.flags.default_interest_lh114_earlier':
     'Zure eskritura 15-05-2013 baino lehenagokoa da. Ley 1/2013 arauak Ley Hipotecaria legearen art. 114ko muga, diruaren legezko interesaren hirukoitza, aplikatzen die data hori baino lehen eratutako ohiko etxebizitzaren gaineko hipotekadun maileguen berandutze-interesei: ordutik aurrera sortzen direnei eta jada sortuta egon arren ordaindu gabe zeudenei (disposición transitoria segunda). Hemen ez da zifrarik ematen.',
   'client.mortgage.calculation.flags.default_interest_case_law':
-    'Kontsumitzaileekin egindako 16-06-2019 baino lehenagoko eskrituretan, Tribunal de Justicia de la Unión Europea auzitegiak onartzen du auzitegi batek interes arrunta gehi 2 puntu erreferentziatzat hartzea berandutze-interesa baloratzeko. Epaile baten araberakoa da.',
+    'Kontsumitzaileekin egindako 16-06-2019 baino lehenagoko eskrituretan, Tribunal Supremoak interes arrunta gehi 2 puntu hartzen ditu erreferentziatzat berandutze-interesa baloratzeko, eta Tribunal de Justicia de la Unión Europea auzitegiak dio irizpide hori ez dela Europako zuzenbidearen aurkakoa. Epaile baten araberakoa da.',
   'client.mortgage.calculation.flags.default_interest_case_law_above':
     'Zure eskriturak {default} dio, {ordinary} interes arruntarekin: erreferentzia hori baino gehiago ({reference}).',
   'client.mortgage.calculation.flags.early_termination':
@@ -5720,7 +5720,7 @@ export const eu: Translation = {
   'client.mortgage.calculation.information.handwritten_statement':
     '15-05-2013tik 15-06-2019ra bitartean, hipoteka pertsona fisiko gisa eskatu bazenuen, etxebizitza baten gainean edo lur bat edo eraikin bat erosteko edo kontserbatzeko, eta tasaren aldakuntzarako mugak bazituen, zorua eta sabaia adibidez, «en los cuales el límite de variabilidad a la baja sea inferior al límite de variabilidad al alza», interes-tasaren arriskua estaltzeko tresna bat bazuen edo dibisetan ematen bazen, eskriturak eskuz idatzitako adierazpen bat eraman behar zuen, haren arriskuez ohartarazi zintuztela jasotzen zuena (Ley 1/2013, art. 6).',
   'client.mortgage.calculation.information.limitation_rule':
-    'Tribunal de Justicia de la Unión Europea auzitegiaren arabera, gastuen klausula baten ondorioz ordaindutakoa eskatzeko epea ezin da hasi ordainketaren egunean zenbatzen, baizik eta klausula baliozkoa ez zela jakin zitekeenean. Araua da, ez zure kasuaren kalkulu bat.',
+    'Tribunal de Justicia de la Unión Europea auzitegiaren arabera, gastuen klausula baten ondorioz ordaindutakoa eskatzeko epea klausula deuseztatzen duen epaia irmo bihurtzen denean has daiteke zenbatzen, salbu eta bankuak frogatzen badu klausula baliozkoa ez zela lehenago ere jakin zitekeela (C-561/21). Auzitegiaren irizpidea da, ez zure kasuaren kalkulu bat.',
   'client.mortgage.calculation.information.prior_step_439bis':
     '03-04-2025etik aurrera, legeak aurretiazko pauso zehatz bat arautzen du hipoteka baten klausulengatik epaitegi batera jo aurretik (Ley de Enjuiciamiento Civil, art. 439 bis). Estekan duzu legearen testua.',
   'client.mortgage.calculation.information.loan_assignment':

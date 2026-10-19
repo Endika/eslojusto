@@ -6,7 +6,7 @@ const SUPREME_CIVIL = 'Tribunal Supremo, Sala de lo Civil';
 const COURT_OF_JUSTICE = 'Tribunal de Justicia de la Unión Europea';
 const EUR_LEX = 'https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:';
 // The days these criteria were last read at their source.
-const READ_ON = '2026-10-07';
+const READ_ON = '2026-10-19';
 const SUPREME_READ_ON = '2026-10-10';
 
 // A Supreme Court ruling read in CENDOJ, at the PDF of its own text.
@@ -36,7 +36,8 @@ const supreme = (
   quotes,
 });
 
-// A judgment of the Court of Justice, read in EUR-Lex; `celex` is its document number there.
+// A judgment of the Court of Justice, linked in EUR-Lex; `celex` is its document number there. Its
+// Spanish text was read at the EU Publications Office (Cellar), which serves the same document.
 const courtOfJustice = (
   id: MortgageSourceId,
   number: string,
@@ -45,6 +46,7 @@ const courtOfJustice = (
   citation: string,
   article: string,
   ecli: string,
+  quotes: readonly string[],
 ): SourceTable[MortgageSourceId] => ({
   id,
   basis: 'case_law',
@@ -58,7 +60,7 @@ const courtOfJustice = (
   ecli,
   lastVerified: READ_ON,
   verified: true,
-  quotes: [],
+  quotes,
 });
 
 // Court criteria are shown as such, never as law, each with the day it was last read.
@@ -174,6 +176,7 @@ export const MORTGAGE_SOURCES: SourceTable = {
     'Sentencia del TJUE de 21 de diciembre de 2016, asuntos acumulados C-154/15, C-307/15 y C-308/15',
     'efectos en el tiempo de las cláusulas suelo',
     'ECLI:EU:C:2016:980',
+    ['se opone a una jurisprudencia nacional que limita en el tiempo los efectos restitutorios'],
   ),
   tjue_c96_16: courtOfJustice(
     'tjue_c96_16',
@@ -183,6 +186,9 @@ export const MORTGAGE_SOURCES: SourceTable = {
     'Sentencia del TJUE de 7 de agosto de 2018, asuntos acumulados C-96/16 y C-94/17',
     'intereses de demora',
     'ECLI:EU:C:2018:643',
+    [
+      'cuando tal cuantía suponga un incremento de más de dos puntos porcentuales respecto del interés remuneratorio',
+    ],
   ),
   tjue_c70_17: courtOfJustice(
     'tjue_c70_17',
@@ -192,6 +198,7 @@ export const MORTGAGE_SOURCES: SourceTable = {
     'Sentencia del TJUE de 26 de marzo de 2019, asuntos acumulados C-70/17 y C-179/17',
     'vencimiento anticipado',
     'ECLI:EU:C:2019:250',
+    ['sustituyéndola por la nueva redacción de la disposición legal que inspiró dicha cláusula'],
   ),
   tjue_c125_18: courtOfJustice(
     'tjue_c125_18',
@@ -201,6 +208,9 @@ export const MORTGAGE_SOURCES: SourceTable = {
     'Sentencia del TJUE de 3 de marzo de 2020, asunto C-125/18',
     'IRPH',
     'ECLI:EU:C:2020:138',
+    [
+      'el suministro de información sobre la evolución en el pasado del índice en que se basa el cálculo de ese mismo tipo de interés',
+    ],
   ),
   tjue_c452_18: courtOfJustice(
     'tjue_c452_18',
@@ -210,6 +220,9 @@ export const MORTGAGE_SOURCES: SourceTable = {
     'Sentencia del TJUE de 9 de julio de 2020, asunto C-452/18',
     'novación de cláusulas suelo',
     'ECLI:EU:C:2020:536',
+    [
+      'siempre que la renuncia proceda de un consentimiento libre e informado por parte del consumidor, extremo este que corresponde comprobar al juez nacional',
+    ],
   ),
   // What is given back of the set-up costs, unless national law puts them on the consumer.
   tjue_c224_19: courtOfJustice(
@@ -220,6 +233,9 @@ export const MORTGAGE_SOURCES: SourceTable = {
     'Sentencia del TJUE de 16 de julio de 2020, asuntos acumulados C-224/19 y C-259/19',
     'gastos de constitución y comisión de apertura',
     'ECLI:EU:C:2020:578',
+    [
+      'salvo que las disposiciones de Derecho nacional aplicables en defecto de tal cláusula impongan al consumidor el pago de la totalidad o de una parte de esos gastos',
+    ],
   ),
   tjue_c565_21: courtOfJustice(
     'tjue_c565_21',
@@ -229,6 +245,9 @@ export const MORTGAGE_SOURCES: SourceTable = {
     'Sentencia del TJUE de 16 de marzo de 2023, asunto C-565/21',
     'comisión de apertura',
     'ECLI:EU:C:2023:212',
+    [
+      'el juez competente deberá comprobar, a la vista de todos los elementos de hecho pertinentes, que el prestatario está en condiciones de evaluar las consecuencias económicas que se derivan para él de dicha cláusula',
+    ],
   ),
   tjue_c265_22: courtOfJustice(
     'tjue_c265_22',
@@ -238,6 +257,9 @@ export const MORTGAGE_SOURCES: SourceTable = {
     'Sentencia del TJUE de 13 de julio de 2023, asunto C-265/22',
     'IRPH',
     'ECLI:EU:C:2023:578',
+    [
+      'También es pertinente determinar si esa información es suficientemente accesible para un consumidor medio.',
+    ],
   ),
   tjue_c561_21: courtOfJustice(
     'tjue_c561_21',
@@ -247,5 +269,8 @@ export const MORTGAGE_SOURCES: SourceTable = {
     'Sentencia del TJUE de 25 de abril de 2024, asunto C-561/21',
     'inicio del plazo de la acción de restitución',
     'ECLI:EU:C:2024:362',
+    [
+      'comience a correr en la fecha en que esa resolución haya adquirido firmeza, sin perjuicio de la facultad del profesional de probar que ese consumidor tenía o podía razonablemente tener conocimiento',
+    ],
   ),
 };

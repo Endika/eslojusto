@@ -5136,7 +5136,7 @@ export const en: Translation = {
   'mortgage.guide.floor.p1':
     'A floor clause (cláusula suelo) sets a minimum rate: even if the index falls, the interest does not go below it. From 16-06-2019, the law prohibits that limit in variable-rate mortgages (art. 21.3) and requires that the interest is not negative (art. 21.4).',
   'mortgage.guide.floor.p2':
-    "For earlier deeds, what exists is the courts' interpretation. In 2016 the Court of Justice of the European Union (CJEU) said that, when a judge annuls a floor clause, what is returned cannot be limited to what was paid after their ruling (C-154/15), and in 2020, that a floor clause can be changed by a later agreement if it is accepted freely and on an informed basis (C-452/18).",
+    "For earlier deeds, what exists is the courts' interpretation. In 2016 the Court of Justice of the European Union (CJEU) said that, when a judge annuls a floor clause, what is returned cannot be limited to what was paid after their ruling (C-154/15), and in 2020, that a floor clause can be changed by a later agreement if it is accepted freely and on an informed basis, which the judge checks (C-452/18).",
   'mortgage.guide.floor.p3':
     'Whether your clause was explained clearly is examined by a judge in each case: this review tells you whether it appears in your deed, but does not assess it or calculate what it meant for your instalments.',
   'mortgage.guide.irph.title': 'The IRPH',
@@ -5160,7 +5160,7 @@ export const en: Translation = {
   'mortgage.guide.limits.p1':
     'According to the Court of Justice of the European Union (CJEU), the time limit for requesting what was paid under an expenses clause may start to run when the ruling annulling it becomes final, unless the bank proves that it could already be known earlier that the clause was not valid (C-561/21). The Tribunal Supremo (Supreme Court) applies this to mortgage costs (STS 857/2024).',
   'mortgage.guide.limits.p2':
-    'This is the rule, not a calculation for your case: this review does not say whether any time limit has passed in your case.',
+    "This is the court's criterion, not a calculation for your case: this review does not say whether any time limit has passed in your case.",
   'mortgage.guide.prior_step.title': 'The prior step of art. 439 bis',
   'mortgage.guide.prior_step.p1':
     'Since 03-04-2025, before going to court over mortgage clauses, the law regulates a prior step by the consumer with the bank (art. 439 bis of the Ley de Enjuiciamiento Civil, the Civil Procedure Act): the bank makes an itemised calculation, including interest, the period for reaching an agreement is one month at most, and it is free of charge.',
@@ -5662,7 +5662,7 @@ export const en: Translation = {
   'client.mortgage.calculation.flags.default_interest_lh114_earlier':
     'Your deed is from before 15-05-2013. Ley 1/2013 applies the limit in art. 114 of the Ley Hipotecaria (Mortgage Act), three times the statutory interest rate, to the default interest on loans secured by a mortgage on a main home set up before that date: to the interest accruing from then on and to interest already accrued that had not been paid (second transitional provision). No figure is given here.',
   'client.mortgage.calculation.flags.default_interest_case_law':
-    'For deeds with consumers from before 16-06-2019, the Court of Justice of the European Union (CJEU) accepts that a court may take the ordinary rate plus 2 points as a reference for assessing the default interest. It depends on a judge.',
+    'For deeds with consumers from before 16-06-2019, the Tribunal Supremo (Supreme Court) takes the ordinary rate plus 2 points as a reference for assessing the default interest, and the Court of Justice of the European Union (CJEU) says that this criterion is not contrary to EU law. It depends on a judge.',
   'client.mortgage.calculation.flags.default_interest_case_law_above':
     'Your deed says {default} with an ordinary rate of {ordinary}: more than that reference ({reference}).',
   'client.mortgage.calculation.flags.early_termination':
@@ -5692,7 +5692,7 @@ export const en: Translation = {
   'client.mortgage.calculation.information.handwritten_statement':
     'Between 15-05-2013 and 15-06-2019, if you took out the mortgage as a natural person, on a home or to buy or keep land or a building, and it had limits on rate changes, such as a floor and a ceiling, «en los cuales el límite de variabilidad a la baja sea inferior al límite de variabilidad al alza» (“in which the lower limit of variability is below the upper limit of variability”), an interest-rate risk hedging instrument, or it was granted in a foreign currency, the deed had to include a handwritten statement recording that you had been warned of its risks (art. 6 of Ley 1/2013).',
   'client.mortgage.calculation.information.limitation_rule':
-    'According to the Court of Justice of the European Union (CJEU), the time limit for requesting what was paid under an expenses clause cannot start to run on the day of payment, but when it could be known that the clause was not valid. This is the rule, not a calculation for your case.',
+    "According to the Court of Justice of the European Union (CJEU), the time limit for requesting what was paid under an expenses clause may start to run when the ruling annulling it becomes final, unless the bank proves that it could already be known earlier that the clause was not valid (C-561/21). This is the court's criterion, not a calculation for your case.",
   'client.mortgage.calculation.information.prior_step_439bis':
     'Since 03-04-2025, the law regulates a specific prior step before going to court over mortgage clauses (art. 439 bis of the Ley de Enjuiciamiento Civil, the Civil Procedure Act). The link takes you to the text of the law.',
   'client.mortgage.calculation.information.loan_assignment':

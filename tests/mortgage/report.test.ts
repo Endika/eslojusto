@@ -102,7 +102,7 @@ describe('the mortgage report', () => {
 
   it('dates the state of the case law in the flags and gives every source with its state', () => {
     expect(texts(between(model, 'Cláusulas de tu escritura'))).toContain(
-      'Lo que dicen los tribunales · estado a 07-10-2026',
+      'Lo que dicen los tribunales · estado a 19-10-2026',
     );
     const sources = between(model, 'Las normas y criterios, y su estado').blocks.filter(
       (b) => b.type === 'source',

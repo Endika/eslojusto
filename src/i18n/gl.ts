@@ -5054,7 +5054,7 @@ export const gl: Translation = {
   'mortgage.guide.floor.p1':
     'Unha cláusula chan (cláusula suelo) fixa un tipo mínimo: aínda que o índice baixe, o xuro non baixa de aí. Desde o 16-06-2019, a lei prohíbe ese límite nas hipotecas de tipo variable (art. 21.3) e esixe que o xuro non sexa negativo (art. 21.4).',
   'mortgage.guide.floor.p2':
-    'Para as escrituras anteriores, o que hai é criterio dos tribunais. O Tribunal de Justicia de la Unión Europea dixo en 2016 que, cando un xuíz anula unha cláusula chan, o que se devolve non pode limitarse ao pagado despois da súa sentenza (C-154/15), e en 2020, que unha cláusula chan pode cambiarse por un acordo posterior se se acepta de forma libre e informada (C-452/18).',
+    'Para as escrituras anteriores, o que hai é criterio dos tribunais. O Tribunal de Justicia de la Unión Europea dixo en 2016 que, cando un xuíz anula unha cláusula chan, o que se devolve non pode limitarse ao pagado despois da súa sentenza (C-154/15), e en 2020, que unha cláusula chan pode cambiarse por un acordo posterior se se acepta de forma libre e informada, o que comproba o xuíz (C-452/18).',
   'mortgage.guide.floor.p3':
     'Se a túa cláusula se explicou con claridade examínao un xuíz en cada caso: esta revisión diche se aparece na túa escritura, pero non a valora nin calcula o que supuxo nas túas cotas.',
   'mortgage.guide.irph.title': 'O IRPH',
@@ -5078,7 +5078,7 @@ export const gl: Translation = {
   'mortgage.guide.limits.p1':
     'Segundo o Tribunal de Justicia de la Unión Europea, o prazo para pedir o pagado por unha cláusula de gastos pode empezar a contar cando é firme a sentenza que a anula, agás que o banco probe que xa se podía coñecer antes que a cláusula non era válida (C-561/21). O Tribunal Supremo aplícao aos gastos da hipoteca (STS 857/2024).',
   'mortgage.guide.limits.p2':
-    'É a regra, non un cálculo do teu caso: esta revisión non di se no teu caso pasou algún prazo.',
+    'É o criterio, non un cálculo do teu caso: esta revisión non di se no teu caso pasou algún prazo.',
   'mortgage.guide.prior_step.title': 'O paso previo do art. 439 bis',
   'mortgage.guide.prior_step.p1':
     'Desde o 03-04-2025, antes de acudir a un xulgado por cláusulas dunha hipoteca, a lei regula un paso previo do consumidor ante o banco (art. 439 bis da Ley de Enjuiciamiento Civil): o banco fai un cálculo detallado, cos xuros, o prazo para chegar a un acordo é dun mes como máximo e non se cobra.',
@@ -5574,7 +5574,7 @@ export const gl: Translation = {
   'client.mortgage.calculation.flags.default_interest_lh114_earlier':
     'A túa escritura é anterior ao 15-05-2013. A Ley 1/2013 aplica o límite do art. 114 da Ley Hipotecaria, tres veces o xuro legal do diñeiro, aos xuros de mora dos préstamos con hipoteca sobre vivenda habitual constituídos antes desa data: aos que se devindiquen desde entón e aos xa devindicados que non se pagasen (disposición transitoria segunda). Aquí non se dá cifra.',
   'client.mortgage.calculation.flags.default_interest_case_law':
-    'Para as escrituras anteriores ao 16-06-2019 con consumidores, o Tribunal de Justicia de la Unión Europea admite que un tribunal tome como referencia o xuro ordinario máis 2 puntos para valorar o de mora. Depende dun xuíz.',
+    'Para as escrituras anteriores ao 16-06-2019 con consumidores, o Tribunal Supremo toma como referencia o xuro ordinario máis 2 puntos para valorar o de mora, e o Tribunal de Justicia de la Unión Europea di que ese criterio non é contrario ao dereito europeo. Depende dun xuíz.',
   'client.mortgage.calculation.flags.default_interest_case_law_above':
     'A túa escritura di {default} cun ordinario do {ordinary}: máis que esa referencia ({reference}).',
   'client.mortgage.calculation.flags.early_termination':
@@ -5605,7 +5605,7 @@ export const gl: Translation = {
   'client.mortgage.calculation.information.handwritten_statement':
     'Entre o 15-05-2013 e o 15-06-2019, se pediches a hipoteca como persoa física, sobre unha vivenda ou para comprar ou conservar un terreo ou un edificio, e tiña límites á variación do tipo, como un chan e un teito, «en los cuales el límite de variabilidad a la baja sea inferior al límite de variabilidad al alza», un instrumento de cobertura do risco de tipo de xuro ou se concedía en divisas, a escritura debía levar unha expresión escrita a man na que constaba que te advertiran dos seus riscos (art. 6 da Ley 1/2013).',
   'client.mortgage.calculation.information.limitation_rule':
-    'Segundo o Tribunal de Justicia de la Unión Europea, o prazo para pedir o pagado por unha cláusula de gastos non pode empezar a contar o día do pagamento, senón cando se puido coñecer que a cláusula non era válida. É a regra, non un cálculo do teu caso.',
+    'Segundo o Tribunal de Justicia de la Unión Europea, o prazo para pedir o pagado por unha cláusula de gastos pode empezar a contar cando é firme a sentenza que a anula, agás que o banco probe que xa se podía coñecer antes que a cláusula non era válida (C-561/21). É o criterio, non un cálculo do teu caso.',
   'client.mortgage.calculation.information.prior_step_439bis':
     'Desde o 03-04-2025, a lei regula un paso previo concreto antes de acudir a un xulgado por cláusulas dunha hipoteca (art. 439 bis da Ley de Enjuiciamiento Civil). Na ligazón tes o texto da lei.',
   'client.mortgage.calculation.information.loan_assignment':

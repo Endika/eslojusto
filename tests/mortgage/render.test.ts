@@ -309,7 +309,7 @@ describe('the mortgage result', () => {
     const floor = root.querySelector('[data-item="floor_clause"]');
     expect(text(floor ?? root, '[data-status-text]')).toBe('Aparece en tu escritura');
     expect(text(floor ?? root, '[data-reading-title]')).toBe(
-      'Lo que dicen los tribunales · estado a 07-10-2026',
+      'Lo que dicen los tribunales · estado a 10-10-2026',
     );
     expect(floor?.textContent).toContain('Tu escritura fija un tipo mínimo del 3 %.');
     expect(floor?.textContent).toContain('STS 241/2013, de 9 de mayo (Pleno)');
@@ -369,7 +369,7 @@ describe('the mortgage sources', () => {
       'con efectos desde el 16-08-1889 · en vigor',
       'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026',
       'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026',
-      'Tribunal de Justicia de la Unión Europea · estado a 07-10-2026',
+      'Tribunal de Justicia de la Unión Europea · estado a 19-10-2026',
       'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026',
     ]);
     const unread = review(deed2018(), UNREAD_DEPS).expenses.items.find(
@@ -378,7 +378,7 @@ describe('the mortgage sources', () => {
     expect((unread?.sources ?? []).map((s) => sourceText(s, tr))).toEqual([
       'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026 · sin comprobar en el texto de la sentencia',
       'Tribunal Supremo, Sala de lo Civil · estado a 10-10-2026 · sin comprobar en el texto de la sentencia',
-      'Tribunal de Justicia de la Unión Europea · estado a 07-10-2026',
+      'Tribunal de Justicia de la Unión Europea · estado a 19-10-2026',
     ]);
   });
 });
