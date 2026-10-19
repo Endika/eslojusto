@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.100.0](https://github.com/Endika/eslojusto/compare/v1.99.0...v1.100.0) (2026-10-19)
+
+
+### Features
+
+* **telecom:** free result hides which items they are when there is something to claim ([bee5a93](https://github.com/Endika/eslojusto/commit/bee5a938e4900fb510943278c271e63a49182e9d))
+
 ## [1.99.0](https://github.com/Endika/eslojusto/compare/v1.98.0...v1.99.0) (2026-10-19)
 
 
