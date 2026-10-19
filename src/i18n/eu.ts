@@ -2264,6 +2264,8 @@ export const eu: Translation = {
     'Puntu bakoitza, legeak dioenarekin eta oinarri duen arauarekin.',
   'client.employment.result.lead_locked':
     'Puntu bakoitza, bere emaitzarekin eta oinarri duen arauarekin.',
+  'client.employment.result.lead_unnamed':
+    'Zenbat puntuk ez duten betetzen. Zein diren, beren kalkuluarekin eta oinarri duten arauarekin, pasearekin dator.',
   'client.employment.result.lead_out_of_scope':
     'Erantzun duzunarekin, berrikuspen honek ez du ezer kalkulatzen.',
   'client.employment.partial.notice':
@@ -2280,6 +2282,8 @@ export const eu: Translation = {
   'client.employment.out_of_scope.minor':
     '18 urte baino gutxiagorekin, lanaldiari eta atsedenari buruzko arau bereziak daude. Bertsio honek ez ditu kalkulatzen: behean dituzu, informazio gisa.',
   'client.employment.headline.found': 'Puntu batzuek ez dute betetzen legeak ezartzen duena.',
+  'client.employment.count_one': 'Puntu bat da.',
+  'client.employment.count_many': '{n} puntu dira.',
   'client.employment.headline.to_review':
     'Puntu batzuk berrikusi behar dira, edo zure hitzarmenaren edo zure erantzunen araberakoak dira.',
   'client.employment.headline.nothing_found':
@@ -2969,7 +2973,10 @@ export const eu: Translation = {
     'Nire baimen esplizitua ematen dut AA eredu batek dokumentu hauek irakur ditzan eta formularioa bete dezan. Badakit datu sentikorrak izan ditzaketela, hala nola sindikatu bateko afiliazioa, baja medikoa edo desgaitasun bat. Europar Batasunean irakurtzen dira, eta ez dira gordetzen.',
   'employment.pass.title': 'Xehetasuna, txostena eta gutuna',
   'employment.pass.text':
-    '4,99 €-tan, zure kontratuaren puntu bakoitzaren kalkulua urratsez urrats ikusten duzu (urtez urte eta nominaz nomina, aplikatzen den arauarekin eta haren iturriarekin), eta PDF txostena deskargatzen duzu eta, zure berrikuspenak horretarako punturik badu, enpresarentzako gutuna. Zure gailuan sortzen dira.',
+    '4,99 €-tan, zure kontratuaren zein puntu diren eta bakoitzaren kalkulua urratsez urrats ikusten duzu (urtez urte eta nominaz nomina, aplikatzen den arauarekin eta haren iturriarekin), eta PDF txostena deskargatzen duzu eta, zure berrikuspenak horretarako punturik badu, enpresarentzako gutuna. Zure gailuan sortzen dira.',
+  'employment.pass.claim_title': 'Zein puntu diren eta legeak bakoitzaz zer dioen',
+  'employment.pass.quiet_text':
+    'Sartu dituzun datuekin, ezer ez da geratzen legeak bermatzen duenaren azpitik, ezta haren mugen gainetik ere. Hala ere idatziz izan nahi baduzu, puntu bakoitza duen PDF txostenak 4,99 € balio du.',
   'employment.pass.price':
     '4,99 €, IVA barne. Ordainketa bakarra, konturik eta harpidetzarik gabe. Paseak 7 egun irauten du, eta nabigatzaile honetan bakarrik balio du, baita kitapenaren eta alokairuaren berrikuspenetarako ere: denbora horretan zure berrikuspena berregin edo zuzen dezakezu, gehienez 15 dokumentu-sorta irakurri, eta xehetasuna berriro ikusi eta txostena eta gutuna deskargatu, berriz ordaindu gabe. Beste gailu batean, leiho pribatu batean edo nabigazio-datuak ezabatzen badituzu, galdu egiten da.',
   'employment.pass.paid_help':

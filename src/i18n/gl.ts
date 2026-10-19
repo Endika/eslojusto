@@ -2198,6 +2198,8 @@ export const gl: Translation = {
   'client.employment.error.empty_slot': 'O tramo comeza e remata á mesma hora',
   'client.employment.result.lead': 'Cada punto, co que di a lei e a norma en que se apoia.',
   'client.employment.result.lead_locked': 'Cada punto co seu resultado e a norma en que se apoia.',
+  'client.employment.result.lead_unnamed':
+    'Cantos puntos non cumpren. Cales son, co seu cálculo e a norma en que se apoia, vai co pase.',
   'client.employment.result.lead_out_of_scope':
     'Co que contestaches, esta revisión non calcula nada.',
   'client.employment.partial.notice':
@@ -2214,6 +2216,8 @@ export const gl: Translation = {
   'client.employment.out_of_scope.minor':
     'Con menos de 18 anos hai regras propias de xornada e descanso. Esta versión non as calcula: abaixo tes esas regras como información.',
   'client.employment.headline.found': 'Hai puntos que non cumpren o que marca a lei.',
+  'client.employment.count_one': 'É un punto.',
+  'client.employment.count_many': 'Son {n} puntos.',
   'client.employment.headline.to_review':
     'Hai puntos que revisar ou que dependen do teu convenio ou das túas respostas.',
   'client.employment.headline.nothing_found':
@@ -2893,7 +2897,10 @@ export const gl: Translation = {
     'Dou o meu consentimento explícito para que unha IA lea estes documentos e cubra o formulario. Sei que poden incluír datos sensibles, como a afiliación a un sindicato, unha baixa médica ou unha discapacidade. Lense na Unión Europea e non se gardan.',
   'employment.pass.title': 'O detalle, o informe e a carta',
   'employment.pass.text':
-    'Por 4,99 € ves o cálculo paso a paso de cada punto do teu contrato (ano a ano e nómina a nómina, coa norma que se aplica e a súa fonte) e descargas o informe en PDF e, se a túa revisión ten puntos para ela, a carta á empresa. Xéranse no teu dispositivo.',
+    'Por 4,99 € ves que puntos do teu contrato son e o cálculo paso a paso de cada un (ano a ano e nómina a nómina, coa norma que se aplica e a súa fonte) e descargas o informe en PDF e, se a túa revisión ten puntos para ela, a carta á empresa. Xéranse no teu dispositivo.',
+  'employment.pass.claim_title': 'Que puntos son e que di a lei de cada un',
+  'employment.pass.quiet_text':
+    'Cos datos que introduciches, nada queda por debaixo do que garante a lei nin por riba dos seus límites. Se aínda así queres telo por escrito, o informe en PDF con cada punto custa 4,99 €.',
   'employment.pass.price':
     '4,99 € con IVA incluído. Un só pagamento, sen conta nin subscrición. O pase dura 7 días e só vale neste navegador, tamén para as revisións do finiquito e do aluguer: nese tempo podes refacer ou corrixir a túa revisión, ler ata 15 paquetes de documentos e volver ver o detalle e descargar o informe e a carta sen pagar outra vez. Noutro dispositivo, nunha xanela privada ou se borras os datos de navegación, pérdese.',
   'employment.pass.paid_help':

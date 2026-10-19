@@ -2222,6 +2222,8 @@ export const ca: Translation = {
   'client.employment.result.lead': 'Cada punt, amb el que diu la llei i la norma en què es basa.',
   'client.employment.result.lead_locked':
     'Cada punt amb el seu resultat i la norma en què es basa.',
+  'client.employment.result.lead_unnamed':
+    'Quants punts no compleixen. Quins són, amb el seu càlcul i la norma en què es basa, va amb el passi.',
   'client.employment.result.lead_out_of_scope':
     'Amb el que has respost, aquesta revisió no calcula res.',
   'client.employment.partial.notice':
@@ -2238,6 +2240,8 @@ export const ca: Translation = {
   'client.employment.out_of_scope.minor':
     'Amb menys de 18 anys hi ha regles pròpies de jornada i descans. Aquesta versió no les calcula: a continuació les tens com a informació.',
   'client.employment.headline.found': 'Hi ha punts que no compleixen el que marca la llei.',
+  'client.employment.count_one': 'És un punt.',
+  'client.employment.count_many': 'Són {n} punts.',
   'client.employment.headline.to_review':
     'Hi ha punts per revisar o que depenen del teu conveni o de les teves respostes.',
   'client.employment.headline.nothing_found':
@@ -2915,7 +2919,10 @@ export const ca: Translation = {
     'Dono el meu consentiment explícit perquè una IA llegeixi aquests documents i ompli el formulari. Sé que poden incloure dades sensibles, com ara l’afiliació a un sindicat, una baixa mèdica o una discapacitat. Es llegeixen a la Unió Europea i no es desen.',
   'employment.pass.title': 'El detall, l’informe i la carta',
   'employment.pass.text':
-    'Per 4,99 € veus el càlcul pas a pas de cada punt del teu contracte (any per any i nòmina per nòmina, amb la norma que s’aplica i la seva font) i descarregues l’informe en PDF i, si la teva revisió té punts per a ella, la carta a l’empresa. Es generen al teu dispositiu.',
+    'Per 4,99 € veus quins punts del teu contracte són i el càlcul pas a pas de cadascun (any per any i nòmina per nòmina, amb la norma que s’aplica i la seva font) i descarregues l’informe en PDF i, si la teva revisió té punts per a ella, la carta a l’empresa. Es generen al teu dispositiu.',
+  'employment.pass.claim_title': 'Quins punts són i què diu la llei de cadascun',
+  'employment.pass.quiet_text':
+    'Amb les dades que has introduït, res no queda per sota del que garanteix la llei ni per sobre dels seus límits. Si tot i així ho vols tenir per escrit, l’informe en PDF amb cada punt costa 4,99 €.',
   'employment.pass.price':
     '4,99 € amb IVA inclòs. Un sol pagament, sense compte ni subscripció. El passi dura 7 dies i només val en aquest navegador, també per a les revisions de la quitança i del lloguer: en aquest temps pots refer o corregir la teva revisió, llegir fins a 15 paquets de documents i tornar a veure el detall i descarregar l’informe i la carta sense pagar una altra vegada. En un altre dispositiu, en una finestra privada o si esborres les dades de navegació, es perd.',
   'employment.pass.paid_help':

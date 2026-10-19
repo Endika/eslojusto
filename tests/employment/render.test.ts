@@ -27,7 +27,7 @@ function result(): HTMLElement {
       <p data-out-of-scope-household hidden><a></a></p>
     </section>
     <section data-in-scope data-summary>
-      <p data-partial hidden></p><p data-headline></p><ul data-warnings></ul>
+      <p data-partial hidden></p><p data-headline></p><p data-count hidden></p><ul data-warnings></ul>
     </section>
     <div data-items></div>
     <section data-information-section><div data-information></div></section>
@@ -159,7 +159,7 @@ describe('the employment result', () => {
   });
 
   it('counts the lower shortfall when both readings fall short, the higher only as «y hasta»', () => {
-    const root = render(shortDayRateDoubt, true);
+    const root = render(shortDayRateDoubt, false);
     const status = text(
       card(root, 'Salario por jornada frente al SMI')?.querySelector('[data-status-text]'),
     );
@@ -175,7 +175,7 @@ describe('the employment result', () => {
   });
 
   it('quotes art. 15.4 for a work-or-service contract, with the law’s words', () => {
-    const root = render(workOrService, true);
+    const root = render(workOrService, false);
     const modality = card(root, 'Modalidad de contrato');
     expect(text(modality?.querySelector('[data-literal-intro]'))).toContain(
       'El artículo 15.4 del Estatuto de los Trabajadores dice que',
@@ -228,6 +228,22 @@ describe('the employment result', () => {
     const open = render(workOrService, false);
     expect(open.querySelector('[data-detail]')).not.toBeNull();
     expect(text(open.querySelector('[data-reference]'))).toMatch(/Despido improcedente/);
+  });
+
+  it('locked with something to claim: how many points, never which', () => {
+    const root = render(belowMinimum, true);
+    expect(root.querySelectorAll('[data-items] > *')).toHaveLength(0);
+    expect(text(root.querySelector('[data-count]'))).toBe('Es un punto.');
+    expect(text(root.querySelector('[data-lead]'))).toBe(
+      'Cuántos puntos no cumplen. Cuáles son, con su cálculo y la norma en que se apoya, va con el pase.',
+    );
+    expect(root.textContent).not.toContain('SMI');
+  });
+
+  it('locked with nothing to claim, each point still shows its verdict', () => {
+    const root = render(contract(), true);
+    expect(root.querySelectorAll('[data-items] > *').length).toBeGreaterThan(0);
+    expect(root.querySelector<HTMLElement>('[data-count]')?.hidden).toBe(true);
   });
 
   it('marks a partial review of a contract from before the reform', () => {

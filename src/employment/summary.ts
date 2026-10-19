@@ -1,4 +1,5 @@
 import type { EmploymentPhrase } from '../engine/employment/calculation';
+import { concreteCount } from '../engine/employment/readings';
 import { everyAssessed, type EmploymentReview } from '../engine/employment/review';
 import type { Assessed, Finding, FindingStatus } from '../engine/employment/types';
 
@@ -123,6 +124,10 @@ type Headline = 'found' | 'to_review' | 'nothing_found' | 'nothing_entered';
 // The summary's first line follows the engine: what opens the pass (a shortfall, a limit passed,
 // a void clause or a contract the law makes permanent, in every reading) is «found»; anything
 // else to look at, such as information missing, is only to review.
+// How many points carry a concrete finding in every reading: those the pass is offered for.
+export const shortCount = (review: EmploymentReview): number =>
+  concreteCount(everyAssessed(review));
+
 export function headline(review: EmploymentReview): Headline {
   if (review.offerPass) return 'found';
   const findings = everyAssessed(review).flatMap(findingsOf);

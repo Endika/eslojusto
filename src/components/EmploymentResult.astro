@@ -95,13 +95,15 @@ const CIRCLED = new Set([
           {tx('client.employment.partial.notice')}
         </p>
         <p class="help" data-headline></p>
+        <p class="help" data-count hidden></p>
         <ul class="list" data-warnings></ul>
       </div>
     </section>
 
-    <div class="review__items" data-items></div>
-
+    {/* Right under the verdict, so it is not lost among the items. */}
     {documents && <PassOffer lang={lang} review="employment" />}
+
+    <div class="review__items" data-items></div>
 
     <section class="item" data-information-section aria-labelledby="information-title">
       <div class="sheet">

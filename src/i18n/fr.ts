@@ -2334,6 +2334,8 @@ export const fr: Translation = {
     "Chaque point, avec ce que dit la loi et le texte sur lequel il s'appuie.",
   'client.employment.result.lead_locked':
     "Chaque point avec son résultat et le texte sur lequel il s'appuie.",
+  'client.employment.result.lead_unnamed':
+    'Combien de points ne sont pas respectés. Lesquels, avec leur calcul et la règle sur laquelle ils s’appuient, vient avec le pass.',
   'client.employment.result.lead_out_of_scope':
     'Avec vos réponses, cette vérification ne calcule rien.',
   'client.employment.partial.notice':
@@ -2350,6 +2352,8 @@ export const fr: Translation = {
   'client.employment.out_of_scope.minor':
     "Avant 18 ans, des règles propres s'appliquent au temps de travail et au repos. Cette version ne les calcule pas\u00a0: vous les trouverez ci-dessous à titre d'information.",
   'client.employment.headline.found': 'Certains points ne respectent pas ce que prévoit la loi.',
+  'client.employment.count_one': 'C’est un point.',
+  'client.employment.count_many': 'Il y en a {n}.',
   'client.employment.headline.to_review':
     'Certains points sont à vérifier ou dépendent de votre convention collective ou de vos réponses.',
   'client.employment.headline.nothing_found':
@@ -3050,7 +3054,10 @@ export const fr: Translation = {
     "Je donne mon consentement explicite pour qu'une IA lise ces documents et remplisse le formulaire. Je sais qu'ils peuvent contenir des données sensibles, comme l'affiliation à un syndicat, un arrêt maladie ou un handicap. Ils sont lus dans l'Union européenne et ne sont pas conservés.",
   'employment.pass.title': 'Le détail, le rapport et la lettre',
   'employment.pass.text':
-    "Pour 4,99 €, vous voyez le calcul pas à pas de chaque point de votre contrat (année par année et bulletin par bulletin, avec la règle applicable et sa source) et vous téléchargez le rapport en PDF et, si votre vérification comporte des points qui s'y prêtent, la lettre à l'entreprise. Ils sont générés sur votre appareil.",
+    "Pour 4,99 €, vous voyez quels points de votre contrat sont concernés et le calcul pas à pas de chacun (année par année et bulletin par bulletin, avec la règle applicable et sa source) et vous téléchargez le rapport en PDF et, si votre vérification comporte des points qui s'y prêtent, la lettre à l'entreprise. Ils sont générés sur votre appareil.",
+  'employment.pass.claim_title': 'Quels points sont concernés et ce que dit la loi de chacun',
+  'employment.pass.quiet_text':
+    'Avec les données que vous avez saisies, rien ne reste en dessous de ce que garantit la loi ni au-delà de ses limites. Si vous voulez tout de même l’avoir par écrit, le rapport PDF avec chaque point coûte 4,99 €.',
   'employment.pass.price':
     "4,99 €, TVA (IVA) comprise. Un seul paiement, sans compte ni abonnement. Le pass dure 7 jours et n'est valable que dans ce navigateur, y compris pour les vérifications du solde de tout compte et de la location\u00a0: pendant ce temps, vous pouvez refaire ou corriger votre vérification, lire jusqu'à 15 lots de documents, revoir le détail et télécharger de nouveau le rapport et la lettre sans payer une nouvelle fois. Sur un autre appareil, dans une fenêtre de navigation privée ou si vous effacez les données de navigation, il est perdu.",
   'employment.pass.paid_help':

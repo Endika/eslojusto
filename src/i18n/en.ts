@@ -2250,6 +2250,8 @@ export const en: Translation = {
   'client.employment.error.empty_slot': 'The time slot starts and ends at the same time',
   'client.employment.result.lead': 'Each point, with what the law says and the law it is based on.',
   'client.employment.result.lead_locked': 'Each point with its result and the law it is based on.',
+  'client.employment.result.lead_unnamed':
+    'How many points fall short. Which ones, with their calculation and the law they rest on, comes with the pass.',
   'client.employment.result.lead_out_of_scope':
     'With your answers, this review does not calculate anything.',
   'client.employment.partial.notice':
@@ -2266,6 +2268,8 @@ export const en: Translation = {
   'client.employment.out_of_scope.minor':
     'Under 18, there are specific rules on working hours and rest. This version does not calculate them: you have them below for information.',
   'client.employment.headline.found': 'Some points do not meet what the law sets.',
+  'client.employment.count_one': 'It is one point.',
+  'client.employment.count_many': 'There are {n} points.',
   'client.employment.headline.to_review':
     'Some points need checking or depend on your collective agreement or your answers.',
   'client.employment.headline.nothing_found':
@@ -2955,7 +2959,10 @@ export const en: Translation = {
     'I give my explicit consent for an AI to read these documents and fill in the form. I know they may include sensitive data, such as trade union membership, sick leave or a disability. They are read in the European Union and not stored.',
   'employment.pass.title': 'The detail, the report and the letter',
   'employment.pass.text':
-    'For 4,99 € you see the step-by-step calculation of each point of your contract (year by year and payslip by payslip, with the law that applies and its source) and you download the PDF report and, if your review has points for it, the letter to the company. They are generated on your device.',
+    'For 4,99 € you see which points of your contract they are and the step-by-step calculation of each (year by year and payslip by payslip, with the law that applies and its source) and you download the PDF report and, if your review has points for it, the letter to the company. They are generated on your device.',
+  'employment.pass.claim_title': 'Which points they are and what the law says of each',
+  'employment.pass.quiet_text':
+    'With the data you entered, nothing falls below what the law guarantees or above its limits. If you still want it in writing, the PDF report with each point costs 4,99 €.',
   'employment.pass.price':
     '4,99 €, VAT (IVA) included. A single payment, with no account or subscription. The pass lasts 7 days and only works in this browser, also for the final settlement and rent reviews: during that time you can redo or correct your review, read up to 15 document packs and see the detail again and download the report and the letter without paying again. On another device, in a private window or if you clear your browsing data, it is lost.',
   'employment.pass.paid_help':

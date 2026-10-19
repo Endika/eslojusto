@@ -6,6 +6,7 @@ import type { ClientKey } from '../i18n/client';
 import { certificateRequest, companyLetter, employmentLetterKinds } from './letters';
 import type { CompletedEmploymentReview } from './ports';
 import { employmentReport } from './report';
+import { headline } from './summary';
 
 const FILENAMES: Partial<Record<LetterKind, ClientKey>> = {
   information_request: 'client.employment.letter.information.filename',
@@ -26,6 +27,8 @@ export function employmentCase(
   const kinds = employmentLetterKinds(r, today, tables);
   return {
     offer: r.review.offerPass,
+    // With figures and nothing against the law, it is still sold, without a pitch.
+    quiet: headline(r.review) === 'nothing_found',
     letterKinds: kinds.paid,
     freeLetterKinds: kinds.free,
     report: (tr, day) => employmentReport(r, tr, day),

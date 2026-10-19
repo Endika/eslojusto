@@ -494,13 +494,17 @@ test('a whole pack fills every sheet; the detail waits for the pass, which unloc
   await confirmClausesAndOffer(page);
 
   const result = page.locator('#resultado');
+  // Before the pass, with something to claim: how many points, never which.
+  await expect(result.locator('[data-count]')).toBeVisible();
   await expect(
     result.getByRole('region', { name: 'Contratos temporales encadenados', exact: true }),
-  ).toContainText('Dentro del límite');
+  ).toHaveCount(0);
   await expectNoDetail(result);
 
   // The same pass as the other reviews', returning to this page.
-  const offer = page.getByRole('region', { name: 'El detalle, el informe y la carta' });
+  const offer = page.getByRole('region', {
+    name: /Qué puntos son|El detalle, el informe y la carta/,
+  });
   await expect(offer).toContainText('4,99 € con IVA incluido');
   await expect(offer.getByRole('button', { name: /Descargar/ })).toHaveCount(0);
   await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
@@ -760,7 +764,9 @@ test('the pass unlocks the report and the letter to the company, filled in and d
     missing: [AGREEMENT, CATEGORY],
   });
 
-  const offer = page.getByRole('region', { name: 'El detalle, el informe y la carta' });
+  const offer = page.getByRole('region', {
+    name: /Qué puntos son|El detalle, el informe y la carta/,
+  });
   const letter = offer.getByRole('group', { name: 'Tus datos para las cartas (opcional)' });
   // Before paying, only the letter that asks for the information.
   await expect(
@@ -843,7 +849,9 @@ test('a fixed-term finding gives the certificate request free, beside the pass',
   await page.setViewportSize({ width: 360, height: 640 });
   await fillByHand(page, { start: '2023-05-02', modality: 'De obra o servicio' });
 
-  const offer = page.getByRole('region', { name: 'El detalle, el informe y la carta' });
+  const offer = page.getByRole('region', {
+    name: /Qué puntos son|El detalle, el informe y la carta/,
+  });
   await expect(offer.getByRole('button', { name: 'Pagar 4,99 €' })).toBeVisible();
   await expect(offer.getByRole('button', { name: /carta que pide la información/ })).toBeHidden();
   expect(
