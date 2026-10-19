@@ -1,4 +1,4 @@
-import type { NormTable } from '../norms';
+import type { NormReview, NormTable } from '../norms';
 
 // Status as published in the BOE. A validation or repeal vote changes `status`, `statusSince`,
 // `statusUrl` and, on repeal, `inForceUntil` here; no rule needs to change.
@@ -148,4 +148,22 @@ export const NORMS: NormTable = {
     statusSince: null,
     statusUrl: null,
   },
+};
+
+// Read on 19-10-2026 in the BOE open data API: none repealed since, and no validation agreement
+// published yet for RDL 28/2026 and 29/2026.
+export const NORM_REVIEW: NormReview = {
+  lau: '2026-10-19',
+  law2_2015: '2026-10-19',
+  rdl7_2019: '2026-10-19',
+  rdl6_2022: '2026-10-19',
+  rdl11_2022: '2026-10-19',
+  rdl20_2022: '2026-10-19',
+  law12_2023: '2026-10-19',
+  ineIravResolution: '2026-10-19',
+  pge2023: '2026-10-19',
+  rdl8_2026: '2026-10-19',
+  rdl26_2026: '2026-10-19',
+  rdl29_2026: '2026-10-19',
+  rdl28_2026: '2026-10-19',
 };
