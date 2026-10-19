@@ -4214,6 +4214,7 @@ export const zh: Translation = {
   'bills.telecom.documents.files_hint':
     '合同或其中的最低合约期条款，以及（如果有的话）您的账单：收取违约金的账单、退订之后的账单，以及您想核对其收费的任何其他账单，顺序不限。总共最多25张照片或 PDF 页面。照片和 PDF 页面会在您的设备上转换为图片后再发送。',
   'bills.pass.title': '您的账单报告和信函',
+  'bills.pass.claim_title': '是哪些项目，每项各是多少',
   'bills.pass.letter_note':
     '这封信函是模板。它下载到您的设备上，不会从这里发送：是否使用以及如何使用，由您自己决定。',
   'bills.pass.download_correction_letter': '下载要求开具更正发票的信函（PDF）',
@@ -4367,6 +4368,8 @@ export const zh: Translation = {
   'client.bills.result.lead_open':
     '根据您填写的内容，有些项目不一致，或无法完全核查。下面列出每一项及其计算和来源。',
   'client.bills.result.lead_clear': '根据您填写的内容，每一项都与您自己的价格以及法规的规定一致。',
+  'client.bills.result.lead_unnamed':
+    '根据您填写的内容，您的账单中有某些项目的收费高于法规的规定。具体是哪些项目，以及计算过程和来源，购买通行证后可见。',
   'client.bills.result.telecom_lead_over':
     '根据您填写的内容，向您收取的费用超出了法规允许的范围。下面列出每一点及其计算和来源。',
   'client.bills.result.telecom_lead_open':
@@ -4384,7 +4387,7 @@ export const zh: Translation = {
   'client.bills.pass.issued':
     '已收到付款。您现在可以下载报告；如果您的核查有相应的数字，还可以下载信函。',
   'client.bills.pass.offer':
-    '核查您的一整年：凭4,99 €的通行证，您可以在7天内于任何栏目中进行最多~15次文件识别。您可以下载账单报告；如果某一项超出法规，还可以下载要求开具更正发票（factura rectificativa）的信函。',
+    '核查您的一整年：凭4,99 €的通行证，您可以看到具体是哪些项目以及计算过程和来源，并可以在7天内于任何栏目中进行最多~15次文件识别。您可以下载账单报告；如果某一项超出法规，还可以下载要求开具更正发票（factura rectificativa）的信函。',
   'client.bills.telecom.pass.offer':
     '凭4,99 €的通行证，您可以看到具体是哪几点及其计算过程和来源，下载退订报告；如果违约金超出法规允许的范围，还可以下载要求重新核算违约金的信函；并且可以在7天内于任何栏目中进行最多~15次文件识别。',
   'client.bills.basket.title_one': '您的一年：已核查1张账单',
@@ -4396,8 +4399,12 @@ export const zh: Translation = {
   'client.bills.basket.duplicate':
     '与您这一年中的另一张账单相同（同一供电点、同一期间），不重复计算。',
   'client.bills.basket.recurring': '在多张账单中重复出现：{partidas}。',
+  'client.bills.basket.recurring_unnamed':
+    '至少有一个项目在多张账单中超出法规。具体是哪些，以及计算过程和来源，购买通行证后可见。',
   'client.bills.basket.estimate':
     '这是估算，不是您账单上的数字，也不计入任何合计：如果重复出现的项目（{partidas}）保持不变，一年约为{importe}。',
+  'client.bills.basket.estimate_unnamed':
+    '这是估算，不是您账单上的数字，也不计入任何合计：如果重复出现的项目保持不变，一年约为{importe}。',
   'client.bills.basket.next_one': '核查下一张已识别的账单（还剩1张）',
   'client.bills.basket.next_many': '核查下一张已识别的账单（还剩{n}张）',
   'client.bills.documents.several':

@@ -4646,6 +4646,7 @@ export const fr: Translation = {
   'bills.telecom.documents.files_hint':
     "Le contrat ou ses conditions d'engagement et, si vous les avez, vos factures\u00a0: celles de la pénalité ou postérieures à la résiliation, et toute autre dont vous voulez revoir les montants, dans n'importe quel ordre. Jusqu'à 25 photos ou pages de PDF au total. Les photos et les pages des PDF sont converties en images sur votre appareil avant l'envoi.",
   'bills.pass.title': 'Le rapport de vos factures et la lettre',
+  'bills.pass.claim_title': 'Quels postes sont concernés et combien chacun représente',
   'bills.pass.letter_note':
     "La lettre est un modèle. Elle se télécharge sur votre appareil et n'est pas envoyée d'ici\u00a0: l'utiliser ou non, et comment, relève de votre décision.",
   'bills.pass.download_correction_letter':
@@ -4817,6 +4818,8 @@ export const fr: Translation = {
     "D'après ce que vous avez saisi, certaines lignes ne concordent pas ou ne peuvent pas être entièrement vérifiées. Vous trouverez ci-dessous chaque ligne avec son calcul et sa source.",
   'client.bills.result.lead_clear':
     "D'après ce que vous avez saisi, chaque ligne concorde avec vos propres prix et avec ce que fixe la réglementation.",
+  'client.bills.result.lead_unnamed':
+    "D'après ce que vous avez saisi, votre facture comporte au moins une ligne supérieure à ce que fixe la réglementation. Quels postes sont concernés, avec leur calcul et leur source, vient avec le pass.",
   'client.bills.result.telecom_lead_over':
     "D'après ce que vous avez saisi, on vous facture plus que ce que permet la réglementation. Vous trouverez ci-dessous chaque point avec son calcul et sa source.",
   'client.bills.result.telecom_lead_open':
@@ -4835,7 +4838,7 @@ export const fr: Translation = {
   'client.bills.pass.issued':
     'Paiement reçu. Vous pouvez maintenant télécharger le rapport et, si votre vérification comporte des chiffres pour elle, la lettre.',
   'client.bills.pass.offer':
-    "Vérifiez votre année entière\u00a0: avec un pass à 4,99 €, vous vérifiez jusqu'à ~15 lectures pendant 7 jours, dans n'importe quelle section. Vous téléchargez le rapport de vos factures et, si une ligne dépasse la réglementation, la lettre qui demande la facture rectificative.",
+    "Vérifiez votre année entière\u00a0: avec un pass à 4,99 €, vous voyez quels postes sont concernés, avec leur calcul et leur source, et vous vérifiez jusqu'à ~15 lectures pendant 7 jours, dans n'importe quelle section. Vous téléchargez le rapport de vos factures et, si une ligne dépasse la réglementation, la lettre qui demande la facture rectificative.",
   'client.bills.telecom.pass.offer':
     "Avec un pass à 4,99 €, vous voyez quels points sont concernés, avec leur calcul et leur source, vous téléchargez le rapport de votre résiliation et, si la pénalité dépasse ce que permet la réglementation, la lettre qui demande de la revoir, et vous vérifiez jusqu'à ~15 lectures pendant 7 jours, dans n'importe quelle section.",
   'client.bills.basket.title_one': 'Votre année\u00a0: 1 facture vérifiée',
@@ -4847,8 +4850,12 @@ export const fr: Translation = {
   'client.bills.basket.duplicate':
     "C'est la même qu'une autre facture de votre année (même point de livraison et même période) et elle n'est pas comptée deux fois.",
   'client.bills.basket.recurring': 'Revient sur plusieurs factures\u00a0: {partidas}.',
+  'client.bills.basket.recurring_unnamed':
+    'Au moins un poste dépasse la réglementation sur plusieurs factures. Lesquels, avec leur calcul et leur source, vient avec le pass.',
   'client.bills.basket.estimate':
     "Estimation, et non un chiffre tiré de vos factures, qui ne s'ajoute à aucun total\u00a0: si ce qui se répète ({partidas}) restait identique, cela ferait environ {importe} sur un an.",
+  'client.bills.basket.estimate_unnamed':
+    "Estimation, et non un chiffre tiré de vos factures, qui ne s'ajoute à aucun total\u00a0: si ce qui se répète restait identique, cela ferait environ {importe} sur un an.",
   'client.bills.basket.next_one': 'Vérifier la facture lue suivante (il en reste 1)',
   'client.bills.basket.next_many': 'Vérifier la facture lue suivante (il en reste {n})',
   'client.bills.documents.several':

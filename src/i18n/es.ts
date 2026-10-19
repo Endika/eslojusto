@@ -6822,6 +6822,7 @@ export const es = {
   'bills.telecom.documents.files_hint':
     'El contrato o sus condiciones de permanencia y, si las tienes, tus facturas: las de la penalización o de después de la baja, y cualquier otra cuyos cobros quieras repasar, en el orden que sea. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
   'bills.pass.title': 'El informe de tus facturas y la carta',
+  'bills.pass.claim_title': 'Qué partidas son y cuánto sale en cada una',
   'bills.pass.letter_note':
     'La carta es una plantilla. Se descarga en tu dispositivo y no se envía desde aquí: usarla o no, y cómo, es decisión tuya.',
   'bills.pass.download_correction_letter':
@@ -6986,6 +6987,8 @@ export const es = {
     'Con lo que has metido, hay líneas que no cuadran o que no se pueden comprobar del todo. Abajo está cada línea con su cálculo y su fuente.',
   'client.bills.result.lead_clear':
     'Con lo que has metido, cada línea cuadra con tus propios precios y con lo que fija la norma.',
+  'client.bills.result.lead_unnamed':
+    'Con lo que has metido, tu factura cobra en alguna línea más de lo que fija la norma. Qué partidas son, con su cálculo y su fuente, va con el pase.',
   'client.bills.result.telecom_lead_over':
     'Con lo que has metido, te cobran más de lo que permite la norma. Abajo está cada punto con su cálculo y su fuente.',
   'client.bills.result.telecom_lead_open':
@@ -7003,7 +7006,7 @@ export const es = {
   'client.bills.pass.issued':
     'Pago recibido. Ya puedes descargar el informe y, si tu revisión tiene cifras para ella, la carta.',
   'client.bills.pass.offer':
-    'Revisa tu año entero: con un pase de 4,99 € revisas hasta ~15 lecturas durante 7 días, en cualquier sección. Descargas el informe de tus facturas y, si alguna línea pasa de la norma, la carta que pide la factura rectificativa.',
+    'Revisa tu año entero: con un pase de 4,99 € ves qué partidas son, con su cálculo y su fuente, y revisas hasta ~15 lecturas durante 7 días, en cualquier sección. Descargas el informe de tus facturas y, si alguna línea pasa de la norma, la carta que pide la factura rectificativa.',
   'client.bills.telecom.pass.offer':
     'Con un pase de 4,99 € ves qué puntos son, con su cálculo y su fuente, descargas el informe de tu baja y, si la penalización pasa de lo que permite la norma, la carta que pide revisarla, y revisas hasta ~15 lecturas durante 7 días, en cualquier sección.',
   'client.bills.basket.title_one': 'Tu año: 1 factura revisada',
@@ -7015,8 +7018,12 @@ export const es = {
   'client.bills.basket.duplicate':
     'Es la misma que otra factura de tu año (mismo suministro y periodo) y no cuenta dos veces.',
   'client.bills.basket.recurring': 'Se repite en más de una factura: {partidas}.',
+  'client.bills.basket.recurring_unnamed':
+    'Al menos una partida pasa de la norma en más de una factura. Cuáles son, con su cálculo y su fuente, va con el pase.',
   'client.bills.basket.estimate':
     'Estimación, no una cifra de tus facturas, y no se suma a ningún total: si lo que se repite ({partidas}) siguiera igual, en un año serían unos {importe}.',
+  'client.bills.basket.estimate_unnamed':
+    'Estimación, no una cifra de tus facturas, y no se suma a ningún total: si lo que se repite siguiera igual, en un año serían unos {importe}.',
   'client.bills.basket.next_one': 'Revisar la siguiente factura leída (queda 1)',
   'client.bills.basket.next_many': 'Revisar la siguiente factura leída (quedan {n})',
   'client.bills.documents.several':

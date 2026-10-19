@@ -4556,6 +4556,7 @@ export const ro: Translation = {
   'bills.telecom.documents.files_hint':
     'Contractul sau condițiile lui privind perioada minimă de contract și, dacă le ai, facturile tale: cele cu penalitatea sau de după reziliere și oricare alta ale cărei sume vrei să le verifici, în orice ordine. Până la 25 de fotografii sau pagini PDF în total. Fotografiile și paginile din PDF-uri sunt transformate în imagini pe dispozitivul tău înainte de a fi trimise.',
   'bills.pass.title': 'Raportul facturilor tale și scrisoarea',
+  'bills.pass.claim_title': 'Care sunt componentele și cât iese la fiecare',
   'bills.pass.letter_note':
     'Scrisoarea este un model. Se descarcă pe dispozitivul tău și nu se trimite de aici: dacă o folosești și cum, este decizia ta.',
   'bills.pass.download_correction_letter':
@@ -4724,6 +4725,8 @@ export const ro: Translation = {
     'Cu ce ai introdus, există linii care nu se potrivesc sau care nu pot fi verificate complet. Mai jos este fiecare linie cu calculul și sursa ei.',
   'client.bills.result.lead_clear':
     'Cu ce ai introdus, fiecare linie se potrivește cu propriile tale prețuri și cu ce stabilește norma.',
+  'client.bills.result.lead_unnamed':
+    'Cu ce ai introdus, factura ta percepe pe vreo linie mai mult decât stabilește norma. Care sunt componentele, cu calculul și sursa lor, vin cu permisul.',
   'client.bills.result.telecom_lead_over':
     'Cu ce ai introdus, ți se percepe mai mult decât permite norma. Mai jos este fiecare punct cu calculul și sursa lui.',
   'client.bills.result.telecom_lead_open':
@@ -4741,7 +4744,7 @@ export const ro: Translation = {
   'client.bills.pass.issued':
     'Plata a fost primită. Acum poți descărca raportul și, dacă verificarea ta are cifre pentru ea, scrisoarea.',
   'client.bills.pass.offer':
-    'Verifică-ți întregul an: cu un permis de 4,99 € verifici până la ~15 citiri timp de 7 zile, în orice secțiune. Descarci raportul facturilor tale și, dacă vreo linie depășește norma, scrisoarea prin care ceri factura de corecție (factura rectificativa).',
+    'Verifică-ți întregul an: cu un permis de 4,99 € vezi care sunt componentele, cu calculul și sursa lor, și verifici până la ~15 citiri timp de 7 zile, în orice secțiune. Descarci raportul facturilor tale și, dacă vreo linie depășește norma, scrisoarea prin care ceri factura de corecție (factura rectificativa).',
   'client.bills.telecom.pass.offer':
     'Cu un permis de 4,99 € vezi care sunt punctele, cu calculul și sursa lor, descarci raportul despre rezilierea ta și, dacă penalitatea depășește ce permite norma, scrisoarea prin care ceri verificarea ei, iar în plus verifici până la ~15 citiri timp de 7 zile, în orice secțiune.',
   'client.bills.basket.title_one': 'Anul tău: 1 factură verificată',
@@ -4753,8 +4756,12 @@ export const ro: Translation = {
   'client.bills.basket.duplicate':
     'Este aceeași cu o altă factură din anul tău (același punct de consum și aceeași perioadă) și nu se socotește de două ori.',
   'client.bills.basket.recurring': 'Se repetă pe mai multe facturi: {partidas}.',
+  'client.bills.basket.recurring_unnamed':
+    'Cel puțin o componentă depășește norma pe mai multe facturi. Care sunt, cu calculul și sursa lor, vin cu permisul.',
   'client.bills.basket.estimate':
     'Estimare, nu o cifră din facturile tale, și nu se adună la niciun total: dacă ce se repetă ({partidas}) ar rămâne la fel, într-un an ar fi aproximativ {importe}.',
+  'client.bills.basket.estimate_unnamed':
+    'Estimare, nu o cifră din facturile tale, și nu se adună la niciun total: dacă ce se repetă ar rămâne la fel, într-un an ar fi aproximativ {importe}.',
   'client.bills.basket.next_one': 'Verifică următoarea factură citită (a mai rămas 1)',
   'client.bills.basket.next_many': 'Verifică următoarea factură citită (au mai rămas {n})',
   'client.bills.documents.several':

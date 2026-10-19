@@ -1,6 +1,10 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest';
+import { renderBasket } from '../../src/bills/electricity/basket';
+import type { CompletedElectricityReview } from '../../src/bills/electricity/ports';
 import { renderElectricityResult } from '../../src/bills/electricity/render';
+import { offeredWith } from '../../src/bills/electricity/year';
+import { createBasket } from '../../src/documents/basket';
 import {
   phraseText,
   renderOutOfScope,
@@ -94,7 +98,7 @@ describe('the electricity result', () => {
     const root = result();
     const input = juneBill();
     const review = electricity(input);
-    renderElectricityResult(root, review, input, NORMS_BEFORE_FIGURE, tr);
+    renderElectricityResult(root, review, input, NORMS_BEFORE_FIGURE, false, tr);
     expect(text(root, '[data-lead]')).toBe(
       'Con lo que has metido, cada línea cuadra con tus propios precios y con lo que fija la norma.',
     );
@@ -114,7 +118,7 @@ describe('the electricity result', () => {
   it('gives the power used as a figure, never as advice', () => {
     const root = result();
     const input = juneBill();
-    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, tr);
+    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, false, tr);
     const power = cardText(root, 'Potencia que usaste');
     expect(power).toContain(
       'La potencia máxima que usaste en los últimos 12 meses, según tu factura: 3,1 kW en punta y 1,2 kW en valle.',
@@ -130,7 +134,7 @@ describe('the electricity result', () => {
       vat: { base: null, percent: 21, amount: 10.69 },
       total: 61.61,
     });
-    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, tr);
+    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, false, tr);
     expect(text(root, '[data-total-counted]')).toBe('0,70 €');
     expect(root.querySelector<HTMLElement>('[data-recurring]')?.hidden).toBe(false);
     expect(cards(root).find((c) => c.title === 'Alquiler del contador')).toEqual({
@@ -151,7 +155,7 @@ describe('the electricity result', () => {
       vat: { base: null, percent: 21, amount: 12.32 },
       total: 70.97,
     });
-    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, tr);
+    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, false, tr);
     expect(cards(root).find((c) => c.title.startsWith('Servicio'))).toEqual({
       title: 'Servicio aparte de la luz · Mantenimiento',
       state: 'paid_over',
@@ -164,7 +168,7 @@ describe('the electricity result', () => {
     const root = result();
     const input = juneBill({ total: 60.5 });
     const review = electricity(input);
-    renderElectricityResult(root, review, input, NORMS_BEFORE_FIGURE, tr);
+    renderElectricityResult(root, review, input, NORMS_BEFORE_FIGURE, false, tr);
     expect(cards(root).find((c) => c.title === 'Total de la factura')?.status).toBe(
       'No cuadra: 0,27 € de menos',
     );
@@ -187,13 +191,114 @@ describe('the electricity result', () => {
       readingFrom: parseDate('2026-08-31'),
       readingTo: parseDate('2026-09-30'),
     });
-    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, tr);
+    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, false, tr);
     const tax = root.querySelector<HTMLElement>('[data-item="vat"]');
     expect(tax?.dataset['state']).toBe('depends');
     expect(tax?.querySelector('[data-depends]')?.textContent).toContain(
       'el total cuenta la lectura más baja',
     );
     expect(tax?.textContent).toContain('pendiente: Que el IPC de la electricidad de septiembre');
+  });
+});
+
+describe('the electricity result before the pass', () => {
+  // A maintenance service nobody asked for, of the given amount, on the June bill or on July's.
+  const withService = (amount: number, month: 'june' | 'july' = 'june'): ElectricityBillInput =>
+    freeBill({
+      services: [{ label: 'maintenance', amount, requested: 'no' }],
+      ...(month === 'july' && {
+        issuedOn: parseDate('2026-08-01'),
+        dueOn: parseDate('2026-08-06'),
+        readingFrom: parseDate('2026-06-30'),
+        readingTo: parseDate('2026-07-30'),
+      }),
+    });
+  const completed = (input: ElectricityBillInput): CompletedElectricityReview => ({
+    review: electricity(input),
+    input,
+  });
+  const LEAD =
+    'Con lo que has metido, tu factura cobra en alguna línea más de lo que fija la norma. Qué partidas son, con su cálculo y su fuente, va con el pase.';
+
+  it('with something to claim, keeps the exact totals and names no line', () => {
+    const input = withService(5);
+    const unlocked = result();
+    renderElectricityResult(unlocked, electricity(input), input, NORMS_BEFORE_FIGURE, false, tr);
+    expect(cards(unlocked).map((c) => c.title)).toContain(
+      'Servicio aparte de la luz · Mantenimiento',
+    );
+    const root = result();
+    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, true, tr);
+    expect(text(root, '[data-lead]')).toBe(LEAD);
+    expect(text(root, '[data-total-counted]')).toBe(text(unlocked, '[data-total-counted]'));
+    expect(text(root, '[data-total-counted]')).toMatch(/^\d+,\d\d €$/);
+    expect(root.querySelectorAll('[data-item]')).toHaveLength(0);
+  });
+
+  it('with nothing over the norm on this bill, names every line as before', () => {
+    const root = result();
+    const input = juneBill();
+    renderElectricityResult(root, electricity(input), input, NORMS_BEFORE_FIGURE, true, tr);
+    expect(cards(root).length).toBeGreaterThan(0);
+    expect(text(root, '[data-lead]')).not.toContain('pase');
+  });
+
+  it('counts the bill being shown in the year, so a small one the year carries is unnamed', () => {
+    const july = completed(withService(3, 'july'));
+    const june = completed(withService(3));
+    expect(june.review.totals.counted).toBeLessThan(4.99);
+    const year = createBasket<CompletedElectricityReview>();
+    year.put(july);
+    year.next();
+    expect(offeredWith(year, july)).toBe(false);
+    // The year does not hold June yet when its result is first shown.
+    expect(year.entries()).toHaveLength(1);
+    const offered = offeredWith(year, june);
+    expect(offered).toBe(true);
+    const root = result();
+    renderElectricityResult(root, june.review, june.input, NORMS_BEFORE_FIGURE, offered, tr);
+    expect(text(root, '[data-lead]')).toBe(LEAD);
+    expect(text(root, '[data-total-counted]')).toBe('3,00 €');
+    expect(root.querySelectorAll('[data-item]')).toHaveLength(0);
+  });
+
+  // «Tu año», as BillsResult.astro has it.
+  function basketBox(): HTMLElement {
+    const root = document.createElement('section');
+    root.innerHTML = `
+      <section data-basket hidden>
+        <h3 data-basket-title></h3><ul data-basket-bills></ul>
+        <div data-basket-year hidden>
+          <p data-basket-counted></p><p data-basket-up-to hidden></p>
+          <p data-basket-under hidden></p><p data-basket-recurring hidden></p>
+          <p data-basket-estimate hidden></p>
+        </div>
+        <button data-basket-next hidden></button>
+      </section>`;
+    return root;
+  }
+
+  it('in «tu año», says something repeats without naming it, and names it once unlocked', () => {
+    const bills = [completed(withService(3)), completed(withService(3, 'july'))];
+    const locked = basketBox();
+    renderBasket(locked, bills, 0, true, tr);
+    const recurring = locked.querySelector<HTMLElement>('[data-basket-recurring]');
+    const estimate = locked.querySelector<HTMLElement>('[data-basket-estimate]');
+    expect(recurring?.hidden).toBe(false);
+    expect(recurring?.textContent).toBe(
+      'Al menos una partida pasa de la norma en más de una factura. Cuáles son, con su cálculo y su fuente, va con el pase.',
+    );
+    expect(estimate?.hidden).toBe(false);
+    expect(estimate?.textContent).toMatch(
+      /^Estimación, no una cifra de tus facturas, y no se suma a ningún total: si lo que se repite siguiera igual, en un año serían unos 37\s€\.$/,
+    );
+    expect(locked.textContent).not.toContain('Servicio');
+    expect(text(locked, '[data-basket-counted]')).toBe('6,00 €');
+
+    const unlocked = basketBox();
+    renderBasket(unlocked, bills, 0, false, tr);
+    expect(text(unlocked, '[data-basket-recurring]')).toContain('Servicio aparte de la luz');
+    expect(text(unlocked, '[data-basket-estimate]')).toContain('Servicio aparte de la luz');
   });
 });
 

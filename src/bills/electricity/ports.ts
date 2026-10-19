@@ -1,3 +1,4 @@
+import type { Detail } from '../../calculator/flow';
 import type { SectionEvents } from '../../calculator/section';
 import type { CivilDate } from '../../engine/date';
 import type { Basket } from '../../engine/bills/basket';
@@ -109,4 +110,8 @@ export interface ElectricitySetup {
   readonly tr: Translate;
   // The norms and the tables the review reads, as the composition root loads them.
   readonly tables: ElectricityDeps;
+  // How the result is shown when a review completes; unlocked unless told otherwise.
+  readonly detail?: () => Detail;
+  // Whether the pass is offered for the year once this review joins it; never unless told.
+  readonly offered?: (r: CompletedElectricityReview) => boolean;
 }

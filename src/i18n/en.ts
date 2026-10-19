@@ -4518,6 +4518,7 @@ export const en: Translation = {
   'bills.telecom.documents.files_hint':
     'The contract or its minimum-term conditions and, if you have them, your bills: those with the penalty or from after the cancellation, and any other whose charges you want to go over, in any order. Up to 25 photos or PDF pages in total. The photos and PDF pages are turned into images on your device before they are sent.',
   'bills.pass.title': 'The report on your bills and the letter',
+  'bills.pass.claim_title': 'Which items they are and how much each comes to',
   'bills.pass.letter_note':
     'The letter is a template. It is downloaded to your device and is not sent from here: whether and how you use it is your decision.',
   'bills.pass.download_correction_letter':
@@ -4682,6 +4683,8 @@ export const en: Translation = {
     'With what you entered, some lines do not add up or cannot be fully checked. Below is each line with its calculation and its source.',
   'client.bills.result.lead_clear':
     'With what you entered, each line adds up with your own prices and with what the regulations set.',
+  'client.bills.result.lead_unnamed':
+    'With what you entered, your bill charges more than the regulations set on some line. Which items they are, with their calculation and their source, comes with the pass.',
   'client.bills.result.telecom_lead_over':
     'With what you entered, you are charged more than the regulations allow. Below is each point with its calculation and its source.',
   'client.bills.result.telecom_lead_open':
@@ -4699,7 +4702,7 @@ export const en: Translation = {
   'client.bills.pass.issued':
     'Payment received. You can now download the report and, if your review has figures for it, the letter.',
   'client.bills.pass.offer':
-    'Review your whole year: with a 4,99 € pass you review up to ~15 readings over 7 days, in any section. You download the report on your bills and, if any line goes beyond the regulations, the letter asking for a corrected invoice (factura rectificativa).',
+    'Review your whole year: with a 4,99 € pass you see which items they are, with their calculation and their source, and you review up to ~15 readings over 7 days, in any section. You download the report on your bills and, if any line goes beyond the regulations, the letter asking for a corrected invoice (factura rectificativa).',
   'client.bills.telecom.pass.offer':
     'With a 4,99 € pass you see which points they are, with their calculation and their source, you download the report on your cancellation and, if the penalty goes beyond what the regulations allow, the letter asking for it to be reviewed, and you review up to ~15 readings over 7 days, in any section.',
   'client.bills.basket.title_one': 'Your year: 1 bill reviewed',
@@ -4711,8 +4714,12 @@ export const en: Translation = {
   'client.bills.basket.duplicate':
     'It is the same as another bill in your year (same supply and period) and does not count twice.',
   'client.bills.basket.recurring': 'It repeats on more than one bill: {partidas}.',
+  'client.bills.basket.recurring_unnamed':
+    'At least one item goes beyond the regulations on more than one bill. Which ones, with their calculation and their source, comes with the pass.',
   'client.bills.basket.estimate':
     'An estimate, not a figure from your bills, and it is not added to any total: if what repeats ({partidas}) stayed the same, over a year it would come to about {importe}.',
+  'client.bills.basket.estimate_unnamed':
+    'An estimate, not a figure from your bills, and it is not added to any total: if what repeats stayed the same, over a year it would come to about {importe}.',
   'client.bills.basket.next_one': 'Review the next bill read (1 left)',
   'client.bills.basket.next_many': 'Review the next bill read ({n} left)',
   'client.bills.documents.several':
