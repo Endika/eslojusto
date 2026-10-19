@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.99.0](https://github.com/Endika/eslojusto/compare/v1.98.0...v1.99.0) (2026-10-19)
+
+
+### Features
+
+* **credit:** free result counts the points and their euros when there is something to claim ([8b70e0d](https://github.com/Endika/eslojusto/commit/8b70e0db49faa93edff7ba525648962ca6b9eea0))
+
 ## [1.98.0](https://github.com/Endika/eslojusto/compare/v1.97.0...v1.98.0) (2026-10-19)
 
 
