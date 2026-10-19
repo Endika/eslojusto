@@ -17,7 +17,7 @@ export const IGC: IndexSeries = {
   url: 'https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/IGC1',
   table: 10802,
   series: 'IGC1',
-  coveredUntil: '2026-10-18',
+  coveredUntil: '2026-11-18',
   loadedFromStart: false,
   values: [
     month('2018-12', -1.21, '2019-02-25'),
@@ -112,6 +112,7 @@ export const IGC: IndexSeries = {
     month('2026-05', -0.02, '2026-07-20'),
     month('2026-06', -0.76, '2026-08-20'),
     month('2026-07', -0.33, '2026-09-18'),
+    month('2026-08', 0.03, '2026-10-19'),
   ],
   pendingFlash: null,
 };
