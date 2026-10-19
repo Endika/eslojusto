@@ -714,6 +714,8 @@ export const ro: Translation = {
   'documents.pass.quiet_title': 'Nu e nevoie să plătești',
   'documents.pass.quiet_text':
     'Cu sumele pe care le-ai introdus, nimic nu este sub minimul legal. Dacă vrei totuși să le ai în scris, raportul PDF cu fiecare componentă și scrisoarea „primit, fără acord” (recibí no conforme) costă 4,99 €.',
+  'documents.pass.quiet_report_text':
+    'Cu ce ai introdus, nimic nu depășește ce permite norma. Dacă vrei totuși să le ai în scris, raportul PDF costă 4,99 €.',
   'documents.pass.price':
     '4,99 €, cu TVA (IVA) inclus. O singură plată, fără cont și fără abonament. Permisul (pase) durează 7 zile și funcționează doar în acest browser: în acest timp poți reface sau corecta verificarea, poți citi până la 15 seturi de documente și poți descărca din nou raportul și scrisoarea fără să plătești încă o dată. Pe alt dispozitiv, într-o fereastră privată sau dacă ștergi datele de navigare, se pierde.',
   'documents.pass.waiver':

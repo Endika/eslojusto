@@ -734,6 +734,8 @@ export const fr: Translation = {
   'documents.pass.quiet_title': 'Inutile de payer',
   'documents.pass.quiet_text':
     'Avec les chiffres que vous avez saisis, rien n’est inférieur au minimum légal. Si vous voulez tout de même l’avoir par écrit, le rapport PDF avec chaque poste et la lettre «\u00a0reçu, non conforme\u00a0» coûtent 4,99 €.',
+  'documents.pass.quiet_report_text':
+    'Avec ce que vous avez saisi, rien ne dépasse ce que permet la règle. Si vous voulez tout de même l’avoir par écrit, le rapport PDF coûte 4,99 €.',
   'documents.pass.price':
     "4,99 €, TVA (IVA) comprise. Un seul paiement, sans compte ni abonnement. Le pass dure 7 jours et n'est valable que dans ce navigateur\u00a0: pendant ce temps, vous pouvez refaire ou corriger votre vérification, lire jusqu'à 15 lots de documents et télécharger de nouveau le rapport et la lettre sans payer une nouvelle fois. Sur un autre appareil, dans une fenêtre de navigation privée ou si vous effacez les données de navigation, il est perdu.",
   'documents.pass.waiver':

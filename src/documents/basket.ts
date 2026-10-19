@@ -55,6 +55,8 @@ interface BasketLetters<T> {
 // review kept, the report that adds them up and the letters, if it has any.
 interface BasketSection<T> {
   offer(entries: readonly T[]): boolean;
+  // With nothing to claim, whether the pass is still sold, quietly.
+  quiet?(entries: readonly T[]): boolean;
   report(entries: readonly T[], tr: Translate, today: CivilDate): DocumentModel;
   readonly reportFilename: ClientKey;
   readonly letters?: BasketLetters<T>;
@@ -68,6 +70,7 @@ export function basketCase<T>(entries: readonly T[], section: BasketSection<T>):
   const freeLetterKinds = letters?.free?.(kept) ?? [];
   return {
     offer: kept.length > 0 && section.offer(kept),
+    quiet: kept.length > 0 && (section.quiet?.(kept) ?? false),
     letterKinds,
     freeLetterKinds,
     report: (tr, today) => section.report(kept, tr, today),

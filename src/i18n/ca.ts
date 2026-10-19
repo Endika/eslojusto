@@ -706,6 +706,8 @@ export const ca: Translation = {
   'documents.pass.quiet_title': 'No cal que paguis',
   'documents.pass.quiet_text':
     'Amb les xifres que has introduït, res no queda per sota del mínim legal. Si tot i així ho vols tenir per escrit, l’informe en PDF amb cada partida i la carta «rebut, no conforme» costen 4,99 €.',
+  'documents.pass.quiet_report_text':
+    'Amb el que has introduït, res no surt per sobre del que permet la norma. Si tot i així ho vols tenir per escrit, l’informe en PDF costa 4,99 €.',
   'documents.pass.price':
     '4,99 € amb IVA inclòs. Un sol pagament, sense compte ni subscripció. El passi dura 7 dies i només val en aquest navegador: en aquest temps pots refer o corregir la teva revisió, llegir fins a 15 paquets de documents i tornar a descarregar l’informe i la carta sense pagar una altra vegada. En un altre dispositiu, en una finestra privada o si esborres les dades de navegació, es perd.',
   'documents.pass.waiver':

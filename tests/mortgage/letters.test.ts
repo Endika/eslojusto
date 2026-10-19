@@ -325,6 +325,21 @@ describe('the mortgage review as the pass sees it', () => {
     expect(c.report(tr, TODAY)).toEqual(mortgageReport(r, LEGAL_INTEREST, tr, TODAY));
   });
 
+  it('sells it quietly only with nothing on the lender, no fee over its cap and no clause flagged', () => {
+    const valuation = { deedOn: TODAY, invoices: [invoice('valuation', 300)] };
+    expect(mortgageCase(completed(valuation), LEGAL_INTEREST)).toMatchObject({
+      offer: false,
+      quiet: true,
+    });
+    expect(
+      mortgageCase(
+        completed({ ...valuation, clauses: [{ label: 'irph', present: true }] }),
+        LEGAL_INTEREST,
+      ).quiet,
+    ).toBe(false);
+    expect(mortgageCase(completed({}), LEGAL_INTEREST).quiet).toBe(false);
+  });
+
   it('does not offer the pass for clauses alone, and keeps the free letter', () => {
     const c = mortgageCase(
       completed({ deedOn: d('2005-03-01'), clauses: [{ label: 'irph', present: true }] }),

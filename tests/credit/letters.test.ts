@@ -285,6 +285,16 @@ describe('the credit review as the pass sees it', () => {
     expect(c.report(tr, TODAY)).toEqual(creditReport(r, tr, TODAY));
   });
 
+  it('sells it quietly only when every figure compared is within the law and the indicator calm', () => {
+    expect(creditCase(completed(card()), CREDIT_NORMS)).toMatchObject({
+      offer: false,
+      quiet: true,
+    });
+    // A loan's distance to the average rate comes with no criterion read.
+    expect(creditCase(completed(loan({ declaredApr: 17 })), CREDIT_NORMS).quiet).toBe(false);
+    expect(creditCase(completed(loan({ declaredApr: 12 })), CREDIT_NORMS).quiet).toBe(false);
+  });
+
   it('does not offer the pass for the indicator alone, and keeps the free letter', () => {
     const c = creditCase(completed(card({ declaredApr: 30 })), CREDIT_NORMS);
     expect(c).toMatchObject({

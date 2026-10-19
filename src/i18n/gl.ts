@@ -697,6 +697,8 @@ export const gl: Translation = {
   'documents.pass.quiet_title': 'Non fai falta que pagues',
   'documents.pass.quiet_text':
     'Coas cifras que introduciches, nada queda por debaixo do mínimo legal. Se aínda así queres telo por escrito, o informe en PDF con cada partida e a carta «recibín, non conforme» custan 4,99 €.',
+  'documents.pass.quiet_report_text':
+    'Co que introduciches, nada sae por riba do que permite a norma. Se aínda así queres telo por escrito, o informe en PDF custa 4,99 €.',
   'documents.pass.price':
     '4,99 € con IVA incluído. Un só pagamento, sen conta nin subscrición. O pase dura 7 días e só vale neste navegador: nese tempo podes refacer ou corrixir a túa revisión, ler ata 15 paquetes de documentos e volver descargar o informe e a carta sen pagar outra vez. Noutro dispositivo, nunha xanela privada ou se borras os datos de navegación, pérdese.',
   'documents.pass.waiver':

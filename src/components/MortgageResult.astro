@@ -135,6 +135,9 @@ const channels: readonly Key[] = [
       </div>
     </section>
 
+    {/* Right under the totals, so it is not lost among the items. */}
+    {documents && <PassOffer lang={lang} review="mortgage" />}
+
     <section class="results-group" data-in-scope aria-labelledby="expenses-title">
       <h3 class="results-group__title" id="expenses-title">
         {tx('mortgage.result.expenses')}
@@ -157,8 +160,6 @@ const channels: readonly Key[] = [
       <p class="results-group__note">{tx('mortgage.result.flags_note')}</p>
       <div class="review__items" data-flags></div>
     </section>
-
-    {documents && <PassOffer lang={lang} review="mortgage" />}
 
     <section class="item" data-in-scope aria-labelledby="information-title">
       <div class="sheet">

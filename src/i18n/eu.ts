@@ -715,6 +715,8 @@ export const eu: Translation = {
   'documents.pass.quiet_title': 'Ez duzu ordaindu beharrik',
   'documents.pass.quiet_text':
     'Sartu dituzun zifrekin, ezer ez dago legezko gutxienekoaren azpitik. Hala ere idatziz izan nahi baduzu, kontzeptu bakoitza duen PDF txostenak eta «recibí no conforme» gutunak 4,99 € balio dute.',
+  'documents.pass.quiet_report_text':
+    'Sartu duzunarekin, ezer ez da ateratzen arauak onartzen duenaren gainetik. Hala ere idatziz izan nahi baduzu, PDF txostenak 4,99 € balio du.',
   'documents.pass.price':
     '4,99 €, IVA barne. Ordainketa bakarra, konturik eta harpidetzarik gabe. Paseak 7 egun irauten du, eta nabigatzaile honetan bakarrik balio du: denbora horretan zure berrikuspena berregin edo zuzen dezakezu, gehienez 15 dokumentu-sorta irakurri, eta txostena eta gutuna berriro deskargatu, berriz ordaindu gabe. Beste gailu batean, leiho pribatu batean edo nabigazio-datuak ezabatzen badituzu, galdu egiten da.',
   'documents.pass.waiver':

@@ -704,6 +704,8 @@ export const en: Translation = {
   'documents.pass.quiet_title': 'There is no need to pay',
   'documents.pass.quiet_text':
     'With the figures you have entered, nothing falls below the legal minimum. If you still want it in writing, the PDF report with each item and the «recibí no conforme» (received, not agreed) letter cost 4,99 €.',
+  'documents.pass.quiet_report_text':
+    'With what you entered, nothing comes out above what the rules allow. If you still want it in writing, the PDF report costs 4,99 €.',
   'documents.pass.price':
     '4,99 €, VAT (IVA) included. A single payment, with no account or subscription. The pass lasts 7 days and only works in this browser: during that time you can redo or correct your review, read up to 15 document packs and download the report and the letter again without paying again. On another device, in a private window or if you clear your browsing data, it is lost.',
   'documents.pass.waiver':

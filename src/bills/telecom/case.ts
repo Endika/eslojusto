@@ -3,6 +3,7 @@ import type { PaidReview } from '../../documents/ports';
 import { PASS_PRICE } from '../../documents/contract';
 import type { NormTable } from '../../engine/bills/norms';
 import { billsReport } from '../report';
+import { allClear } from '../result';
 import { exitLetter, penaltyLetter, telecomLetterKinds } from './letters';
 import type { CompletedTelecomReview } from './ports';
 import { telecomLabels } from './render';
@@ -14,6 +15,7 @@ import { telecomLabels } from './render';
 export const telecomCase = (r: CompletedTelecomReview, norms: NormTable): PaidReview =>
   basketCase([r], {
     offer: (kept) => kept.reduce((sum, k) => sum + k.review.totals.counted, 0) >= PASS_PRICE,
+    quiet: (kept) => kept.every(({ review }) => allClear(review.items, review.totals)),
     report: (kept, tr, today) =>
       billsReport(
         {
