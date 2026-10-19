@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.95.0](https://github.com/Endika/eslojusto/compare/v1.94.0...v1.95.0) (2026-10-19)
+
+
+### Features
+
+* **rental:** free result hides the items when there is something to claim; quiet pass otherwise ([d782f6c](https://github.com/Endika/eslojusto/commit/d782f6ca3ece3bc978e40bd2f3ea6b19bade211c))
+
 ## [1.94.0](https://github.com/Endika/eslojusto/compare/v1.93.0...v1.94.0) (2026-10-19)
 
 
