@@ -20,11 +20,11 @@ const reviewedAll = (day: string): NormReview =>
   Object.fromEntries(Object.keys(NORM_REVIEW).map((id) => [id, day])) as NormReview;
 
 describe('household monthlyChecklist', () => {
-  it('lists the three watched articles and the next minimum wage', () => {
+  it('lists the watched articles and the next minimum wage', () => {
     const items = monthlyChecklist(parseDate('2026-10-09'), deps);
     expect(
       items.filter((i) => i.kind === 'article').map((i) => i.kind === 'article' && i.block),
-    ).toEqual(['a8', 'a9', 'a11']);
+    ).toEqual(['a8', 'a9', 'a11', 'a49', 'a267', 'a269', 'art5']);
     expect(
       items.filter((i) => i.kind === 'matter').map((i) => i.kind === 'matter' && i.id),
     ).toEqual(['next_minimum_wage']);

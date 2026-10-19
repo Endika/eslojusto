@@ -17,6 +17,23 @@ const rd1620 = (
   lastAmendedBy,
 });
 
+const article = (
+  norm: 'et' | 'lgss' | 'cc',
+  id: string,
+  block: string,
+  versionInForceSince: string,
+  lastAmendedBy: string,
+): ArticleWatch['articles'][number] => ({
+  norm,
+  block,
+  apiUrl: `${API}/${id}/texto/bloque/${block}`,
+  versionInForceSince,
+  lastAmendedBy,
+});
+const ET_ID = 'BOE-A-2015-11430';
+const LGSS_ID = 'BOE-A-2015-11724';
+const CC_ID = 'BOE-A-1889-4763';
+
 export const ARTICLE_WATCH: ArticleWatch = {
   articles: [
     // Never amended since the decree itself.
@@ -24,6 +41,11 @@ export const ARTICLE_WATCH: ArticleWatch = {
     // Last amended by the final provision 5.ª of RDL 16/2013, which added art. 9.3 bis.
     rd1620('a9', '2013-12-22', 'BOE-A-2013-13426'),
     rd1620('a11', '2022-09-09', 'BOE-A-2022-14680'),
+    // Added on 19-10-2026, as the API returned them: the other articles the rules cite.
+    article('et', ET_ID, 'a49', '2025-05-01', 'BOE-A-2025-8567'),
+    article('lgss', LGSS_ID, 'a267', '2023-03-02', 'BOE-A-2023-5365'),
+    article('lgss', LGSS_ID, 'a269', '2024-05-23', 'BOE-A-2024-10235'),
+    article('cc', CC_ID, 'art5', '1974-07-29', 'BOE-A-1974-1083'),
   ],
   matters: [{ id: 'next_minimum_wage', url: 'https://www.boe.es/buscar/boe.php' }],
 };
