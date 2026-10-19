@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.89.2](https://github.com/Endika/eslojusto/compare/v1.89.1...v1.89.2) (2026-10-19)
+
+
+### Bug Fixes
+
+* **bills:** say the social bonus cut-off on 26-06 is a reading of «liquidación 7» ([70e7b49](https://github.com/Endika/eslojusto/commit/70e7b493ff7ec5c1fb05e7b043823364d49f2eb4))
+
 ## [1.89.1](https://github.com/Endika/eslojusto/compare/v1.89.0...v1.89.1) (2026-10-19)
 
 
