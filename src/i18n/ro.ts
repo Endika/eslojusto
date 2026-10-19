@@ -5675,6 +5675,8 @@ export const ro: Translation = {
     'La {principal} rambursați, plafonul este {cap}. Ți s-au perceput {charged}: {over} peste plafon.',
   'client.mortgage.calculation.fees.within_cap':
     'La {principal} rambursați, plafonul este {cap}. Ți s-au perceput {charged}: nu depășește plafonul.',
+  'client.mortgage.calculation.fees.deed_lower':
+    'Actul tău notarial stabilește o compensație de {percent}, sub plafonul legal: este maximul care se poate percepe.',
   'client.mortgage.calculation.fees.financial_loss':
     'Legea limitează compensația și la pierderea pe care o suferă banca (art. 23.8), care aici nu se poate calcula.',
   'client.mortgage.calculation.fees.subrogation':
@@ -5876,6 +5878,14 @@ export const ro: Translation = {
   'client.mortgage.report.interest_by_year': 'Dobânda legală pentru partea băncii, an cu an:',
   'client.mortgage.report.interest_year': '{anio}: {dias} zile la {tipo}',
   'client.mortgage.report.fees': 'Comisioane',
+  'client.mortgage.report.today': 'Dacă ai rambursa capital astăzi',
+  'client.mortgage.report.today_intro':
+    'Maximul pe care banca ți-l poate percepe astăzi drept compensație pentru rambursarea de capital, după actul tău notarial și lege. Calculul folosește un exemplu de {ejemplo} rambursați: suma crește proporțional cu ce rambursezi.',
+  'client.mortgage.report.today_cap':
+    'Plafonul de astăzi: {porcentaje} din capitalul rambursat, adică {importe} pentru fiecare {ejemplo}.',
+  'client.mortgage.report.today_nothing':
+    'Plafonul de astăzi: 0 €. Nu se poate percepe nicio compensație.',
+  'client.mortgage.report.today_next': 'De la {fecha}, plafonul legal devine {porcentaje}.',
   'client.mortgage.report.flags': 'Clauzele din actul tău notarial',
   'client.mortgage.report.flags_note':
     'Ce spun legea sau instanțele despre fiecare clauză, cu sursa și, dacă este un criteriu al instanțelor, data situației lui. Aici clauza ta nu este evaluată.',

@@ -5652,6 +5652,8 @@ export const eu: Translation = {
     'Amortizatutako {principal} zenbatekoaren gainean, muga {cap} da. {charged} kobratu zizuten: {over} mugaren gainetik.',
   'client.mortgage.calculation.fees.within_cap':
     'Amortizatutako {principal} zenbatekoaren gainean, muga {cap} da. {charged} kobratu zizuten: ez du muga gainditzen.',
+  'client.mortgage.calculation.fees.deed_lower':
+    'Zure eskriturak konpentsazio hau finkatzen du: {percent}, legearen mugaren azpitik. Hori da kobra daitekeen gehiena.',
   'client.mortgage.calculation.fees.financial_loss':
     'Legeak konpentsazioa bankuak jasaten duen galerara ere mugatzen du (art. 23.8), eta hori ezin da hemen kalkulatu.',
   'client.mortgage.calculation.fees.subrogation':
@@ -5852,6 +5854,14 @@ export const eu: Translation = {
     'Bankuaren zatiaren gaineko legezko interesa, urtez urte:',
   'client.mortgage.report.interest_year': '{anio}: {dias} egun, {tipo} tasan',
   'client.mortgage.report.fees': 'Komisioak',
+  'client.mortgage.report.today': 'Gaur kapitala itzuliko bazenu',
+  'client.mortgage.report.today_intro':
+    'Kapitala amortizatzeagatik zure bankuak gaur konpentsazio gisa kobra diezazukeen gehiena, zure eskriturak eta legeak diotenaren arabera. Adibide gisa, {ejemplo} amortizatzen direla hartzen da: zifra itzultzen duzunaren proportzioan handitzen da.',
+  'client.mortgage.report.today_cap':
+    'Gaurko muga: amortizatutako kapitalaren {porcentaje}; hau da, {importe} {ejemplo} bakoitzeko.',
+  'client.mortgage.report.today_nothing': 'Gaurko muga: 0 €. Ezin da konpentsaziorik kobratu.',
+  'client.mortgage.report.today_next':
+    '{fecha} datatik aurrera, legearen muga {porcentaje} izango da.',
   'client.mortgage.report.flags': 'Zure eskriturako klausulak',
   'client.mortgage.report.flags_note':
     'Legeak edo auzitegiek zer dioten klausula bakoitzaz, haren iturriarekin eta, auzitegien irizpidea bada, haren egoeraren datarekin. Hemen ez da zure klausula baloratzen.',

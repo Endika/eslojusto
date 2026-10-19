@@ -5682,6 +5682,8 @@ export const uk: Translation = {
     'Для погашених {principal} граничний рівень становить {cap}. З вас стягнули {charged}: на {over} понад граничний рівень.',
   'client.mortgage.calculation.fees.within_cap':
     'Для погашених {principal} граничний рівень становить {cap}. З вас стягнули {charged}: це не перевищує граничного рівня.',
+  'client.mortgage.calculation.fees.deed_lower':
+    'Ваш нотаріальний акт встановлює компенсацію {percent}, нижчу за граничний рівень закону: це найбільше, що можуть стягнути.',
   'client.mortgage.calculation.fees.financial_loss':
     'Закон також обмежує компенсацію втратами, яких зазнає банк (art. 23.8), а їх тут неможливо розрахувати.',
   'client.mortgage.calculation.fees.subrogation':
@@ -5880,6 +5882,15 @@ export const uk: Translation = {
     'Відсотки за законною ставкою на частку банку, рік за роком:',
   'client.mortgage.report.interest_year': '{anio}: {dias} дн. за ставкою {tipo}',
   'client.mortgage.report.fees': 'Комісії',
+  'client.mortgage.report.today': 'Якби ви погасили частину основного боргу сьогодні',
+  'client.mortgage.report.today_intro':
+    'Найбільша компенсація, яку банк може стягнути з вас сьогодні за дострокове погашення основного боргу, згідно з вашим нотаріальним актом і законом. Розрахунок на прикладі погашення {ejemplo}: сума зростає пропорційно до того, що ви погашаєте.',
+  'client.mortgage.report.today_cap':
+    'Граничний рівень сьогодні: {porcentaje} погашеного основного боргу, тобто {importe} за кожні {ejemplo}.',
+  'client.mortgage.report.today_nothing':
+    'Граничний рівень сьогодні: 0 €. Компенсацію стягувати не можна.',
+  'client.mortgage.report.today_next':
+    'З {fecha} граничний рівень за законом становитиме {porcentaje}.',
   'client.mortgage.report.flags': 'Умови вашого нотаріального акта',
   'client.mortgage.report.flags_note':
     'Що кажуть закон чи суди про кожну умову, із джерелом, а якщо це судова практика, — із датою, станом на яку її наведено. Тут вашу умову не оцінюють.',

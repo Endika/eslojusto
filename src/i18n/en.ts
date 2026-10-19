@@ -5625,6 +5625,8 @@ export const en: Translation = {
     'On {principal} repaid, the cap is {cap}. You were charged {charged}: {over} above the cap.',
   'client.mortgage.calculation.fees.within_cap':
     'On {principal} repaid, the cap is {cap}. You were charged {charged}: it does not exceed the cap.',
+  'client.mortgage.calculation.fees.deed_lower':
+    'Your deed sets a compensation of {percent}, below the legal cap: that is the most that can be charged.',
   'client.mortgage.calculation.fees.financial_loss':
     'The law also limits the compensation to the loss the bank suffers (art. 23.8), which cannot be calculated here.',
   'client.mortgage.calculation.fees.subrogation':
@@ -5821,6 +5823,13 @@ export const en: Translation = {
     "Statutory interest on the bank's share, year by year:",
   'client.mortgage.report.interest_year': '{anio}: {dias} days at {tipo}',
   'client.mortgage.report.fees': 'Fees',
+  'client.mortgage.report.today': 'If you repaid capital today',
+  'client.mortgage.report.today_intro':
+    'The most your bank can charge you today as compensation for repaying capital, according to your deed and the law. It uses an example of {ejemplo} repaid: the figure grows in proportion to what you repay.',
+  'client.mortgage.report.today_cap':
+    "Today's cap: {porcentaje} of the capital repaid, {importe} for every {ejemplo}.",
+  'client.mortgage.report.today_nothing': "Today's cap: 0 €. No compensation can be charged.",
+  'client.mortgage.report.today_next': 'From {fecha}, the legal cap becomes {porcentaje}.',
   'client.mortgage.report.flags': 'Clauses in your deed',
   'client.mortgage.report.flags_note':
     "What the law or the courts say about each clause, with its source and, if it is a courts' interpretation, the date of its status. Your clause is not assessed here.",

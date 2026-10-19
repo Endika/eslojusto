@@ -71,6 +71,7 @@ export type MortgagePhraseKey =
   | 'fees.above_cap'
   | 'fees.within_cap'
   | 'fees.financial_loss'
+  | 'fees.deed_lower'
   | 'fees.subrogation'
   | 'fees.unused_premium'
   | 'flags.floor_statute'

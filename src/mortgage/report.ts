@@ -1,9 +1,21 @@
-import { formatCalculationEuros, formatEuros, formatInteger } from '../calculator/number';
+import {
+  formatCalculationEuros,
+  formatEuros,
+  formatInteger,
+  formatWholeEuros,
+} from '../calculator/number';
 import { dayText } from '../calculator/review-result';
 import { addDays, parseDate, toIso, type CivilDate } from '../engine/date';
 import { interestByYear, type LegalInterestTable } from '../engine/law/interest';
 import type { ExpenseItem, MortgageSource } from '../engine/mortgage/expenses';
-import { feeFindings, type FeeFinding, type FeeItem } from '../engine/mortgage/fees';
+import {
+  feeFindings,
+  TODAY_EXAMPLE,
+  type FeeFinding,
+  type FeeItem,
+  type TodayCap,
+  type TodayItem,
+} from '../engine/mortgage/fees';
 import type { ClauseFlag } from '../engine/mortgage/flags';
 import type { InformationBlock } from '../engine/mortgage/information';
 import type { MortgageInput } from '../engine/mortgage/types';
@@ -257,6 +269,58 @@ function feeBlocks(item: FeeItem, tr: Translate): Block[] {
   ];
 }
 
+const todayCapBlocks = (c: TodayCap, title: string | null, tr: Translate): Block[] => [
+  ...(title === null ? [] : [{ type: 'text', text: title } as const]),
+  ...(c.status !== 'cap' || c.cap === null
+    ? []
+    : [
+        {
+          type: 'text',
+          text:
+            c.cap === 0
+              ? tr('client.mortgage.report.today_nothing')
+              : tr('client.mortgage.report.today_cap', {
+                  porcentaje: percentText(c.deedPercent ?? c.capPercent ?? 0),
+                  importe: formatCalculationEuros(c.cap),
+                  ejemplo: formatWholeEuros(TODAY_EXAMPLE),
+                }),
+        } as const,
+      ]),
+  ...bullets(calculationLines(c.calculation, tr)),
+  ...(c.next === null
+    ? []
+    : [
+        {
+          type: 'text',
+          text: tr('client.mortgage.report.today_next', {
+            fecha: day(c.next.on),
+            porcentaje: percentText(c.next.percent),
+          }),
+        } as const,
+      ]),
+];
+
+// What repaying capital today may cost at most: the deed's and the law's figures, every reading
+// the deed or the law leaves open, never whether it is worth it.
+function todayBlocks(item: TodayItem, tr: Translate): Block[] {
+  const caps = item.kind === 'single' ? [item.finding] : item.readings.map((r) => r.finding);
+  return [
+    {
+      type: 'text',
+      text: tr('client.mortgage.report.today_intro', { ejemplo: formatWholeEuros(TODAY_EXAMPLE) }),
+    },
+    ...(item.kind === 'single'
+      ? todayCapBlocks(item.finding, null, tr)
+      : [
+          { type: 'text', text: tr(`client.mortgage.depends.${item.question}`) } as const,
+          ...item.readings.flatMap((r) =>
+            todayCapBlocks(r.finding, readingTitle(r.when, item.question, tr), tr),
+          ),
+        ]),
+    ...uniqueSources(caps.flatMap((c) => c.sources)).map((s) => sourceBlock(s, tr)),
+  ];
+}
+
 // A clause with what the law or the courts say of it, a court's criterion with the day its state
 // is given as of; never a verdict on the clause.
 const flagBlocks = (flag: ClauseFlag, tr: Translate): Block[] => [
@@ -290,6 +354,11 @@ function allSources({ review }: CompletedMortgageReview): MortgageSource[] {
   return uniqueSources([
     ...review.expenses.items.flatMap((i) => i.sources),
     ...review.fees.flatMap((item) => feeFindings(item).flatMap((f) => f.sources)),
+    ...(review.prepaymentToday === null
+      ? []
+      : review.prepaymentToday.kind === 'single'
+        ? review.prepaymentToday.finding.sources
+        : review.prepaymentToday.readings.flatMap((r) => r.finding.sources)),
     ...review.flags.flatMap((f) => f.parts.flatMap((p) => p.sources)),
     ...review.information.flatMap((b) => b.sources),
   ]);
@@ -328,6 +397,10 @@ export function mortgageReport(
       ...section(
         tr('client.mortgage.report.fees'),
         review.fees.flatMap((item) => feeBlocks(item, tr)),
+      ),
+      ...section(
+        tr('client.mortgage.report.today'),
+        review.prepaymentToday === null ? [] : todayBlocks(review.prepaymentToday, tr),
       ),
       ...section(tr('client.mortgage.report.flags'), [
         ...(review.flags.length === 0

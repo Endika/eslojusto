@@ -5585,6 +5585,8 @@ export const ca: Translation = {
     'Sobre {principal} amortitzats, el límit és {cap}. Et van cobrar {charged}: {over} per sobre del límit.',
   'client.mortgage.calculation.fees.within_cap':
     'Sobre {principal} amortitzats, el límit és {cap}. Et van cobrar {charged}: no passa del límit.',
+  'client.mortgage.calculation.fees.deed_lower':
+    'La teva escriptura fixa una compensació del {percent}, per sota del límit de la llei: és el màxim que es pot cobrar.',
   'client.mortgage.calculation.fees.financial_loss':
     'La llei també limita la compensació a la pèrdua que pateix el banc (art. 23.8), que aquí no es pot calcular.',
   'client.mortgage.calculation.fees.subrogation':
@@ -5784,6 +5786,14 @@ export const ca: Translation = {
   'client.mortgage.report.interest_by_year': 'Interès legal sobre la part del banc, any per any:',
   'client.mortgage.report.interest_year': '{anio}: {dias} dies a un {tipo}',
   'client.mortgage.report.fees': 'Comissions',
+  'client.mortgage.report.today': 'Si tornessis capital avui',
+  'client.mortgage.report.today_intro':
+    'El màxim que el teu banc et pot cobrar avui com a compensació per amortitzar capital, amb el que diuen la teva escriptura i la llei. Va amb un exemple de {ejemplo} amortitzats: la xifra creix en proporció al que tornis.',
+  'client.mortgage.report.today_cap':
+    'Límit d’avui: el {porcentaje} del capital amortitzat, {importe} per cada {ejemplo}.',
+  'client.mortgage.report.today_nothing': 'Límit d’avui: 0 €. No es pot cobrar compensació.',
+  'client.mortgage.report.today_next':
+    'Des del {fecha}, el límit de la llei passa al {porcentaje}.',
   'client.mortgage.report.flags': 'Clàusules de la teva escriptura',
   'client.mortgage.report.flags_note':
     'Què diuen la llei o els tribunals de cada clàusula, amb la seva font i, si és un criteri dels tribunals, la data del seu estat. Aquí no es valora la teva clàusula.',
