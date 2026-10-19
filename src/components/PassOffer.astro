@@ -127,10 +127,15 @@ const freeOnly = review in FREE_ONLY ? FREE_ONLY[review as keyof typeof FREE_ONL
 // The title and lead when nothing is to claim and the pass is still sold, quietly.
 const QUIET = {
   final_pay: ['documents.pass.quiet_title', 'documents.pass.quiet_text'],
+  rental: ['documents.pass.quiet_title', 'rental.pass.quiet_text'],
 } as const satisfies Partial<Record<string, readonly [Key, Key]>>;
 const quiet = review in QUIET ? QUIET[review as keyof typeof QUIET] : null;
 // The title that says what the pass shows, while it is still to buy with something to claim.
-const claim = review === 'final_pay' ? 'documents.pass.claim_title' : null;
+const CLAIM = {
+  final_pay: 'documents.pass.claim_title',
+  rental: 'rental.pass.claim_title',
+} as const satisfies Partial<Record<string, Key>>;
+const claim = review in CLAIM ? CLAIM[review as keyof typeof CLAIM] : null;
 ---
 
 <section class="item pass" data-pass-offer aria-labelledby="pass-title" hidden>

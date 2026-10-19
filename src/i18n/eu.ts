@@ -3252,7 +3252,10 @@ export const eu: Translation = {
     'Nire baimen esplizitua ematen dut AA eredu batek dokumentu hauek irakur ditzan eta formularioa bete dezan. Badakit datu pertsonalak izan ditzaketela, hala nola izenak, DNIak, helbideak edo kontu-zenbakiak. Europar Batasunean irakurtzen dira, eta ez dira gordetzen.',
   'rental.pass.title': 'Xehetasuna, txostena eta gutunak',
   'rental.pass.text':
-    '4,99 €-tan, kontzeptu bakoitzaren kalkulua urratsez urrats ikusten duzu (hilez hil eta urtez urte, indizearekin, aplikatzen den mugarekin eta lege-iturriekin), eta PDF txostena deskargatzen duzu eta, zure berrikuspenak horietarako zifrak baditu, fidantzari eta igoerei buruzko gutunak. Zure gailuan sortzen dira.',
+    '4,99 €-tan, zein kontzeptu diren eta bakoitzaren kalkulua urratsez urrats ikusten duzu (hilez hil eta urtez urte, indizearekin, aplikatzen den mugarekin eta lege-iturriekin), eta PDF txostena deskargatzen duzu eta, zure berrikuspenak horietarako zifrak baditu, fidantzari eta igoerei buruzko gutunak. Zure gailuan sortzen dira.',
+  'rental.pass.claim_title': 'Zein kontzeptu diren eta bakoitzean zenbat ateratzen den',
+  'rental.pass.quiet_text':
+    'Sartu dituzun datuekin, ezer ez da ateratzen legeak onartzen duenaren gainetik. Hala ere idatziz izan nahi baduzu, kontzeptu bakoitza duen PDF txostenak 4,99 € balio du.',
   'rental.pass.price':
     '4,99 €, IVA barne. Ordainketa bakarra, konturik eta harpidetzarik gabe. Paseak 7 egun irauten du, eta nabigatzaile honetan bakarrik balio du, baita kitapenaren berrikuspenerako ere: denbora horretan zure berrikuspena berregin edo zuzen dezakezu, gehienez 15 dokumentu-sorta irakurri, eta xehetasuna berriro ikusi eta txostena eta gutunak deskargatu, berriz ordaindu gabe. Beste gailu batean, leiho pribatu batean edo nabigazio-datuak ezabatzen badituzu, galdu egiten da.',
   'rental.pass.paid_help':
@@ -3789,6 +3792,8 @@ export const eu: Translation = {
   'client.rental.letter.rent.filename': 'eslojusto-carta-renta.pdf',
   'client.rental.result.lead_locked':
     'Kontzeptu bakoitza, bere emaitza biribilduarekin eta oinarri duen arauarekin.',
+  'client.rental.result.lead_unnamed':
+    'Guztira ateratzen dena, biribilduta. Zein kontzeptu diren, beren kalkuluarekin eta oinarri duten arauarekin, pasearekin dator.',
   'client.rental.result.lead_out_of_scope':
     'Eman dituzun erantzunekin, berrikuspen honek ez du ezer kalkulatzen.',
   'client.rental.out_of_scope.status': 'Berrikuspen honek ez du zure kontratu mota hartzen',

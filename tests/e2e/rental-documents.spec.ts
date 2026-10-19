@@ -354,13 +354,20 @@ test('a whole pack fills every sheet; the detail waits for the pass, which unloc
 
   await confirmPack(page);
   const result = page.locator('#resultado');
-  await expect(result.getByRole('region', { name: 'Subida del 20-03-2025' })).toContainText(
-    'Pagas de más',
+  // Before the pass, with something to claim: the totals, never which items they are.
+  await expect(result.getByRole('region', { name: 'Resumen', exact: true })).toContainText(
+    'Pagas o has pagado de más',
   );
+  await expect(result.getByRole('region', { name: 'Subida del 20-03-2025' })).toHaveCount(0);
+  await expect(
+    page.getByRole('region', { name: 'Qué partidas son y cuánto sale en cada una' }),
+  ).toBeVisible();
   await expectNoDetail(result);
 
   // The same pass as the final pay's, returning to this page.
-  const offer = page.getByRole('region', { name: 'El detalle, el informe y las cartas' });
+  const offer = page.getByRole('region', {
+    name: /Qué partidas son|El detalle, el informe y las cartas/,
+  });
   await expect(offer).toContainText('4,99 € con IVA incluido');
   await expect(offer.getByRole('button', { name: /Descargar/ })).toHaveCount(0);
   await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
@@ -523,11 +530,13 @@ test('the pass unlocks the report and both letters, filled in and downloaded', a
   page.on('request', (r) => sent.push(`${r.url()} ${r.postData() ?? ''}`));
   await fillByHand(page);
   const result = page.locator('#resultado');
-  await expect(result.getByRole('region', { name: 'Devolución de la fianza' })).toContainText(
+  await expect(result.getByRole('region', { name: 'Resumen', exact: true })).toContainText(
     'Te deben',
   );
 
-  const offer = page.getByRole('region', { name: 'El detalle, el informe y las cartas' });
+  const offer = page.getByRole('region', {
+    name: /Qué partidas son|El detalle, el informe y las cartas/,
+  });
   await expect(offer.getByRole('button', { name: /Descargar/ })).toHaveCount(0);
   await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
   await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
@@ -584,7 +593,9 @@ test('without a deposit owed, only the rent letter and no account to ask for', a
   await page.getByRole('button', { name: 'Revisar' }).click();
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
 
-  const offer = page.getByRole('region', { name: 'El detalle, el informe y las cartas' });
+  const offer = page.getByRole('region', {
+    name: /Qué partidas son|El detalle, el informe y las cartas/,
+  });
   await offer.getByLabel(/pierdo el derecho de desistimiento/).check();
   await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
   await expect(offer).toContainText(/Tu pase vale hasta el/);

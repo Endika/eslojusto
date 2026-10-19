@@ -3236,7 +3236,10 @@ export const en: Translation = {
     'I give my explicit consent for an AI to read these documents and fill in the form. I know they may include personal data, such as names, DNI numbers, addresses or account numbers. They are read in the European Union and not stored.',
   'rental.pass.title': 'The detail, the report and the letters',
   'rental.pass.text':
-    'For 4,99 € you see the step-by-step calculation of each item (month by month and year by year, with the index, the cap that applies and the legal sources) and you download the PDF report and, if your review has figures for them, the letters about the deposit and the increases. They are generated on your device.',
+    'For 4,99 € you see which items they are and the step-by-step calculation of each (month by month and year by year, with the index, the cap that applies and the legal sources) and you download the PDF report and, if your review has figures for them, the letters about the deposit and the increases. They are generated on your device.',
+  'rental.pass.claim_title': 'Which items they are and how much each comes to',
+  'rental.pass.quiet_text':
+    'With the details you entered, nothing comes out above what the law allows. If you still want it in writing, the PDF report with each item costs 4,99 €.',
   'rental.pass.price':
     '4,99 €, VAT (IVA) included. A single payment, with no account or subscription. The pass lasts 7 days and only works in this browser, also for the final settlement review: during that time you can redo or correct your review, read up to 15 document packs and see the detail again and download the report and the letters without paying again. On another device, in a private window or if you clear your browsing data, it is lost.',
   'rental.pass.paid_help':
@@ -3770,6 +3773,8 @@ export const en: Translation = {
   'client.rental.letter.rent.filename': 'eslojusto-carta-renta.pdf',
   'client.rental.result.lead_locked':
     'Each item with its rounded result and the law it is based on.',
+  'client.rental.result.lead_unnamed':
+    'What comes out in total, rounded. Which items they are, with their calculation and the law they rest on, comes with the pass.',
   'client.rental.result.lead_out_of_scope':
     'With your answers, this review does not calculate anything.',
   'client.rental.out_of_scope.status': 'This review does not cover your type of agreement',

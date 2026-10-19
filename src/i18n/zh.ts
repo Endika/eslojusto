@@ -3011,7 +3011,10 @@ export const zh: Translation = {
     '我明确同意由 AI 识别这些文件并填写表单。我知道其中可能包含个人数据，例如姓名、DNI、地址或银行账号。文件在欧盟境内识别，且不会保存。',
   'rental.pass.title': '详细内容、报告和信函',
   'rental.pass.text':
-    '支付4,99 €，即可查看每一项的逐步计算过程（逐月、逐年，附指数、适用的上限和法律来源），并下载 PDF 报告；如果您的核查中有相关数字，还可以下载关于押金和涨租的信函。这些文件在您的设备上生成。',
+    '支付4,99 €，即可查看是哪些项目以及每一项的逐步计算过程（逐月、逐年，附指数、适用的上限和法律来源），并下载 PDF 报告；如果您的核查中有相关数字，还可以下载关于押金和涨租的信函。这些文件在您的设备上生成。',
+  'rental.pass.claim_title': '是哪些项目，每项各是多少',
+  'rental.pass.quiet_text':
+    '根据您填写的数据，没有任何项目超出法律允许的范围。如果您仍想留下书面记录，包含每个项目的 PDF 报告价格为4,99 €。',
   'rental.pass.price':
     '4,99 €，含增值税（IVA）。一次性付款，无需注册账户，也不是订阅。通行证有效期7天，且只在本浏览器中有效，也可用于离职结算核查：在此期间，您可以重做或修改核查，识别最多15份文件包，并重新查看详细内容、下载报告和信函，无需再次付款。换一台设备、使用无痕窗口或清除浏览数据后，通行证就会丢失。',
   'rental.pass.paid_help':
@@ -3513,6 +3516,8 @@ export const zh: Translation = {
   'client.rental.letter.rent.ask': '因此，请您复核该金额。',
   'client.rental.letter.rent.filename': 'eslojusto-carta-renta.pdf',
   'client.rental.result.lead_locked': '每一项，附四舍五入后的结果及其所依据的法规。',
+  'client.rental.result.lead_unnamed':
+    '四舍五入后的合计金额。具体是哪些项目，以及计算过程和所依据的法规，购买通行证后可见。',
   'client.rental.result.lead_out_of_scope': '根据您的回答，本核查不进行任何计算。',
   'client.rental.out_of_scope.status': '本核查不涵盖您的合同类型',
   'client.rental.out_of_scope.before_2019_status': '本核查不涵盖您的合同',

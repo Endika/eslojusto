@@ -3334,7 +3334,10 @@ export const fr: Translation = {
     "Je donne mon consentement explicite pour qu'une IA lise ces documents et remplisse le formulaire. Je sais qu'ils peuvent contenir des données personnelles, comme des noms, des DNI, des adresses ou des numéros de compte. Ils sont lus dans l'Union européenne et ne sont pas conservés.",
   'rental.pass.title': 'Le détail, le rapport et les lettres',
   'rental.pass.text':
-    "Pour 4,99 €, vous voyez le calcul étape par étape de chaque poste (mois par mois et année par année, avec l'indice, le plafond applicable et les sources juridiques) et vous téléchargez le rapport en PDF et, si votre vérification contient des chiffres pour elles, les lettres sur le dépôt de garantie et les augmentations. Ils sont générés sur votre appareil.",
+    "Pour 4,99 €, vous voyez quels postes sont concernés et le calcul étape par étape de chacun (mois par mois et année par année, avec l'indice, le plafond applicable et les sources juridiques) et vous téléchargez le rapport en PDF et, si votre vérification contient des chiffres pour elles, les lettres sur le dépôt de garantie et les augmentations. Ils sont générés sur votre appareil.",
+  'rental.pass.claim_title': 'Quels postes sont concernés et combien chacun représente',
+  'rental.pass.quiet_text':
+    'Avec les données que vous avez saisies, rien ne dépasse ce que permet la loi. Si vous voulez tout de même l’avoir par écrit, le rapport PDF avec chaque poste coûte 4,99 €.',
   'rental.pass.price':
     "4,99 €, TVA (IVA) comprise. Un seul paiement, sans compte ni abonnement. Le pass dure 7 jours et n'est valable que dans ce navigateur, y compris pour la vérification du solde de tout compte\u00a0: pendant ce temps, vous pouvez refaire ou corriger votre vérification, lire jusqu'à 15 lots de documents, revoir le détail et télécharger le rapport et les lettres sans payer une nouvelle fois. Sur un autre appareil, dans une fenêtre de navigation privée ou si vous effacez les données de navigation, il est perdu.",
   'rental.pass.paid_help':
@@ -3878,6 +3881,8 @@ export const fr: Translation = {
   'client.rental.letter.rent.filename': 'eslojusto-carta-renta.pdf',
   'client.rental.result.lead_locked':
     "Chaque poste avec son résultat arrondi et le texte sur lequel il s'appuie.",
+  'client.rental.result.lead_unnamed':
+    'Ce qui ressort au total, arrondi. Quels postes sont concernés, avec leur calcul et le texte sur lequel ils s’appuient, vient avec le pass.',
   'client.rental.result.lead_out_of_scope':
     'Avec vos réponses, cette vérification ne calcule rien.',
   'client.rental.out_of_scope.status': 'Cette vérification ne couvre pas votre type de bail',
