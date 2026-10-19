@@ -5,6 +5,7 @@ import type { OfficialDeps } from '../../engine/bills/electricity-official';
 import type { NormTable } from '../../engine/bills/norms';
 import type { Translate } from '../../i18n/client';
 import { billsReport, type ReportedReview } from '../report';
+import { allClear } from '../result';
 import { officialBlocks, type PvpcSource } from './official';
 import { correctionLetter, electricityLetterKinds } from './letters';
 import type { CompletedElectricityReview } from './ports';
@@ -41,6 +42,7 @@ export const electricityCase = (
 ): PaidReview =>
   basketCase(entries, {
     offer: (kept) => electricityBasket(kept).offerPass,
+    quiet: (kept) => kept.every(({ review }) => allClear(review.items, review.totals)),
     report(kept, tr, today) {
       const basket = electricityBasket(kept);
       return billsReport(

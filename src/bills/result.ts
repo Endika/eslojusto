@@ -363,6 +363,10 @@ export function summaryKind(items: readonly BillItem[], totals: BillTotals): Sum
   return open || totals.under > 0 || totals.upTo > 0 ? 'open' : 'clear';
 }
 
+// Every line matching, with at least one: the pass is then sold only quietly.
+export const allClear = (items: readonly BillItem[], totals: BillTotals): boolean =>
+  items.length > 0 && summaryKind(items, totals) === 'clear';
+
 // The totals: what is over the norm in every reading, the most any reading gives, and what is
 // charged short, apart and never set against the rest.
 export function renderTotals(root: HTMLElement, totals: BillTotals, tr: Translate): void {

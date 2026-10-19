@@ -69,6 +69,13 @@ describe('a paid review built from a basket', () => {
     expect(basketCase([], { ...section, offer: () => true }).offer).toBe(false);
   });
 
+  it('is sold quietly only by the section’s own rule, never for an empty basket', () => {
+    expect(basketCase([2], section).quiet).toBe(false);
+    const quiet = { ...section, quiet: (entries: readonly number[]) => entries.length > 0 };
+    expect(basketCase([2], quiet).quiet).toBe(true);
+    expect(basketCase([], { ...quiet, quiet: () => true }).quiet).toBe(false);
+  });
+
   it('reports the reviews it was built from, even once the basket changes', () => {
     const entries = [2, 3];
     const paid = basketCase(entries, section);
@@ -109,6 +116,7 @@ describe('a year of electricity bills as the pass sees it', () => {
 
   it('is not offered for one small difference, and is once it comes back bill after bill', () => {
     expect(electricityCase([meterOver], BILLS_NORMS).offer).toBe(false);
+    expect(electricityCase([meterOver], BILLS_NORMS).quiet).toBe(false);
     expect(electricityCase(year, BILLS_NORMS).offer).toBe(true);
   });
 
@@ -157,6 +165,9 @@ describe('an exit from a phone contract as the pass sees it', () => {
     // 184 of 549 days left of 180,00 allow 60,33.
     expect(telecomCase(exit(120), BILLS_NORMS).offer).toBe(true);
     expect(telecomCase(exit(64), BILLS_NORMS).offer).toBe(false);
+    // Over what the law allows, though under the price: not «no need to pay».
+    expect(telecomCase(exit(64), BILLS_NORMS).quiet).toBe(false);
+    expect(telecomCase(exit(60), BILLS_NORMS)).toMatchObject({ offer: false, quiet: true });
     expect(telecomCase(exit(120), BILLS_NORMS).report(billsTr, today).title).toBe(
       'Revisión de tu baja de teléfono o internet',
     );

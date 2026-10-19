@@ -516,6 +516,8 @@ export const es = {
   'documents.pass.quiet_title': 'No hace falta que pagues',
   'documents.pass.quiet_text':
     'Con las cifras que has metido, nada queda por debajo del mínimo legal. Si aun así quieres tenerlo por escrito, el informe en PDF con cada partida y la carta «recibí no conforme» cuestan 4,99 €.',
+  'documents.pass.quiet_report_text':
+    'Con lo que has metido, nada sale por encima de lo que permite la norma. Si aun así quieres tenerlo por escrito, el informe en PDF cuesta 4,99 €.',
   'documents.pass.price':
     '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a descargar el informe y la carta sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
   'documents.pass.waiver':

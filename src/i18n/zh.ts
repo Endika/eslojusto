@@ -662,6 +662,8 @@ export const zh: Translation = {
   'documents.pass.quiet_title': '无需付费',
   'documents.pass.quiet_text':
     '按您填写的数字，没有任何一项低于法定最低金额。如果您仍想留下书面记录，包含每个项目的 PDF 报告和“已收到，但不同意”信函的价格为4,99 €。',
+  'documents.pass.quiet_report_text':
+    '根据您填写的内容，没有任何项目超出规定允许的范围。如果您仍想留下书面记录，PDF 报告的价格为4,99 €。',
   'documents.pass.price':
     '4,99 €，含增值税（IVA）。一次性付款，无需注册账户，也不是订阅。通行证有效期7天，且只在本浏览器中有效：在此期间，您可以重做或修改核查，识别最多15份文件包，并重新下载报告和信函，无需再次付款。换一台设备、使用无痕窗口或清除浏览数据后，通行证就会丢失。',
   'documents.pass.waiver':
