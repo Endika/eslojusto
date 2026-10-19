@@ -6,6 +6,7 @@ import { BILLS_TABLES } from '../engine/bills/data/tables';
 import { setUpElectricity } from '../bills/electricity/main';
 import type { CompletedElectricityReview, ElectricityEvents } from '../bills/electricity/ports';
 import { DOCUMENTS_BUILD } from '../documents/config';
+import type { PassMode } from '../documents/ports';
 import { pageTranslator } from '../i18n/client';
 import { localToday } from './clock';
 import { withoutDocuments } from './without-documents';
@@ -31,10 +32,14 @@ let yearOffer: (r: CompletedElectricityReview) => boolean = () => false;
 const reviewed: ((r: CompletedElectricityReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
+// Until the document module says how the pass shows under a review, it shows none; without the
+// documents API there is no pass.
+let pass: (r: CompletedElectricityReview) => PassMode = () => 'none';
 const analytics = electricityAnalytics(
   track,
   () => performance.now(),
   () => detail(),
+  (r) => pass(r),
 );
 // The measurement hears every event; the documents follow each review shown and each one cleared.
 const events: ElectricityEvents = {
@@ -67,6 +72,7 @@ if (documentsBuild) {
           onRestart: (listener) => cleared.push(listener),
           // The pass shows which lines they are and unlocks the report and the letter.
           detail: (state) => (detail = state),
+          pass: (state) => (pass = state),
         },
         arrival,
         BILLS_NORMS,

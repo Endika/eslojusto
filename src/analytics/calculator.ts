@@ -1,4 +1,5 @@
-import type { CalculatorEvents } from '../calculator/ports';
+import type { CalculatorEvents, CompletedReview } from '../calculator/ports';
+import type { PassMode } from '../documents/ports';
 import {
   changedFields,
   reviewProps,
@@ -13,8 +14,12 @@ import {
 
 // The calculator's events as catalogue events. The catalogue's «section» is the step. Kept for this
 // page view only: when each step and the whole run started, how many reviews were made, and the
-// previous answers, only to name what changed.
-export function calculatorAnalytics(track: Track, now: () => number): CalculatorEvents {
+// previous answers, only to name what changed. `pass` tells how the pass shows under a review.
+export function calculatorAnalytics(
+  track: Track,
+  now: () => number,
+  pass: (r: CompletedReview) => PassMode,
+): CalculatorEvents {
   let viewedSection: Section | null = null;
   let sectionEnteredAt = 0;
   let start: number | null = null;
@@ -42,7 +47,8 @@ export function calculatorAnalytics(track: Track, now: () => number): Calculator
     fieldRejected(step, field) {
       track('validation_error', { section: step, field: field as TrackableField });
     },
-    reviewCompleted({ review, input, figures, benefit, otherContracts, detail }) {
+    reviewCompleted(completed) {
+      const { review, input, figures, benefit, otherContracts, detail } = completed;
       attempts += 1;
       const answers = snapshot(input, figures);
       track(
@@ -56,6 +62,7 @@ export function calculatorAnalytics(track: Track, now: () => number): Calculator
           benefit,
           otherContracts,
           detail,
+          pass: pass(completed),
         }),
       );
       previous = answers;

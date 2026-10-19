@@ -103,7 +103,11 @@ describe('the situations of a possibly null dismissal never leave the page', () 
     if (!r.ok) throw new Error('invalid input');
     const sent: unknown[] = [];
     const track: Track = (event, props) => void sent.push({ event, props });
-    const events = calculatorAnalytics(track, () => 0);
+    const events = calculatorAnalytics(
+      track,
+      () => 0,
+      () => 'none',
+    );
     for (let attempt = 0; attempt < 2; attempt++) {
       if (attempt === 1)
         f.querySelector<HTMLInputElement>('[name="situation_sick_leave"]')?.click();

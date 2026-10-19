@@ -1,6 +1,7 @@
 import type { Basket } from '../engine/bills/basket';
 import { findingsOf, type BillItem, type BillsItemId } from '../engine/bills/finding';
 import type { Detail } from '../calculator/ports';
+import type { PassMode } from '../documents/ports';
 import type {
   CompletedElectricityReview,
   ElectricityEvents,
@@ -49,10 +50,10 @@ const findingIds = (items: readonly BillItem[]): BillsTrackedItemId[] => [
   ),
 ];
 
-export function electricityBillProps({
-  review,
-  input,
-}: CompletedElectricityReview): Props<'electricity_bill_reviewed'> {
+export function electricityBillProps(
+  { review, input }: CompletedElectricityReview,
+  pass: PassMode,
+): Props<'electricity_bill_reviewed'> {
   const findings = review.items.flatMap(findingsOf);
   return {
     market: input.market,
@@ -61,6 +62,7 @@ export function electricityBillProps({
     undercharged: review.totals.under > 0,
     conditional: findings.some((f) => f.pendingOn.length > 0 || f.dependsOn.length > 0),
     recurring: review.recurring,
+    pass,
   };
 }
 
@@ -77,10 +79,14 @@ function pointStatus(items: readonly BillItem[], ids: readonly BillsItemId[]): P
   return BILLS_STATUSES.find((s) => statuses.includes(s)) ?? 'none';
 }
 
-export const telecomReviewProps = ({ review }: CompletedTelecomReview): TelecomCompleted => ({
+export const telecomReviewProps = (
+  { review }: CompletedTelecomReview,
+  pass: PassMode,
+): TelecomCompleted => ({
   commitment: pointStatus(review.items, ['commitment_length', 'commitment_penalty']),
   change_exit: pointStatus(review.items, ['change_exit']),
   after_exit: pointStatus(review.items, ['charge_after_exit']),
+  pass,
 });
 
 export const basketProps = (data: {
@@ -88,11 +94,13 @@ export const basketProps = (data: {
   attempt: number;
   seconds: number;
   detail: Detail;
+  pass: PassMode;
 }): Props<'basket_completed'> => ({
   size: basketSizeBucket(data.basket.bills.length),
   difference: differenceBucket(data.basket.totals.counted),
   offered: data.basket.offerPass,
   detail: data.detail,
+  pass: data.pass,
   attempt: attemptBucket(data.attempt),
   seconds: reviewSecondsBucket(data.seconds),
 });
@@ -109,16 +117,19 @@ const BONUS_ONLY_FIELDS: ReadonlySet<string> = new Set([
 
 // The electricity review's events as catalogue events: steps, field names, codes and buckets
 // only; never a supply code or its fingerprint, an amount, a date, a retailer or a concept as
-// written. `detail` tells whether a pass shows the report. The pass, not the measurement, hears
-// when a review is cleared.
+// written. `detail` tells whether a pass shows the report, `pass` how the pass shows under a bill
+// once it joins the year. The pass, not the measurement, hears when a review is cleared.
 export function electricityAnalytics(
   track: Track,
   now: () => number,
   detail: () => Detail,
+  pass: (r: CompletedElectricityReview) => PassMode,
 ): Omit<ElectricityEvents, 'reviewCleared'> & YearEvents {
   const { events } = sectionAnalytics<ElectricityStep>(track, now);
   let start: number | null = null;
   let years = 0;
+  // The year is completed by the bill just reviewed, so it shows the pass that bill did.
+  let shown: PassMode = 'none';
   return {
     ...events,
     stepShown(step) {
@@ -139,12 +150,16 @@ export function electricityAnalytics(
       track('bills_out_of_scope', { reason });
     },
     reviewCompleted(r) {
-      track('electricity_bill_reviewed', electricityBillProps(r));
+      shown = pass(r);
+      track('electricity_bill_reviewed', electricityBillProps(r, shown));
     },
     basketCompleted(basket) {
       years += 1;
       const seconds = start === null ? 0 : (now() - start) / 1000;
-      track('basket_completed', basketProps({ basket, attempt: years, seconds, detail: detail() }));
+      track(
+        'basket_completed',
+        basketProps({ basket, attempt: years, seconds, detail: detail(), pass: shown }),
+      );
     },
   };
 }
@@ -153,6 +168,7 @@ export function electricityAnalytics(
 export function telecomAnalytics(
   track: Track,
   now: () => number,
+  pass: (r: CompletedTelecomReview) => PassMode,
 ): Omit<TelecomEvents, 'reviewCleared'> {
   const { events } = sectionAnalytics<TelecomStep>(track, now);
   return {
@@ -161,7 +177,7 @@ export function telecomAnalytics(
       track('bills_out_of_scope', { reason });
     },
     reviewCompleted(r) {
-      track('telecom_review_completed', telecomReviewProps(r));
+      track('telecom_review_completed', telecomReviewProps(r, pass(r)));
     },
   };
 }

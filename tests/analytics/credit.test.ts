@@ -8,6 +8,7 @@ import {
   type Track,
 } from '../../src/analytics/events';
 import { creditAnalytics, creditReviewProps } from '../../src/analytics/credit';
+import type { PassMode } from '../../src/documents/ports';
 import { CREDIT_FAQ_TOPICS } from '../../src/content/credit-faq-topics';
 import { BE1904 } from '../../src/engine/credit/data/be1904';
 import { CREDIT_NORMS } from '../../src/engine/credit/data/norms';
@@ -28,7 +29,13 @@ const completed = (input: CreditInput) => {
 };
 
 const props = (input: CreditInput = loan()) =>
-  creditReviewProps({ ...completed(input), attempt: 1, seconds: 95 });
+  creditReviewProps({
+    ...completed(input),
+    attempt: 1,
+    seconds: 95,
+    detail: 'locked',
+    pass: 'claim',
+  });
 
 // A synthetic revolving card concluded before the 2011 law: it gets only the indicator.
 const oldCard = loan({
@@ -80,6 +87,9 @@ describe('credit events', () => {
       withdrawal: 'ended',
       indicator: 'distance_only',
       compared_apr: 'declared',
+      offered: true,
+      detail: 'locked',
+      pass: 'claim',
       attempt: '1',
       seconds: '60-180',
     });
@@ -146,12 +156,16 @@ describe('credit events', () => {
   it('creditAnalytics names each event as the catalogue does', () => {
     const sent: [string, Record<string, unknown>][] = [];
     let clock = 0;
+    let detail: 'locked' | 'unlocked' = 'locked';
+    let pass: PassMode = 'claim';
     const events = creditAnalytics(
       ((name: string, p: Record<string, unknown>) => {
         expect(isValidEvent(name, p), name).toBe(true);
         sent.push([name, p]);
       }) as Track,
       () => clock,
+      () => detail,
+      () => pass,
     );
     const done = completed(loan());
     events.stepShown('producto');
@@ -165,6 +179,8 @@ describe('credit events', () => {
     events.helpOpened('faq-credito-tae');
     clock = 100_000;
     events.reviewCompleted(done);
+    detail = 'unlocked';
+    pass = 'held';
     events.reviewCompleted(done);
     events.startedOver();
     expect(sent.map(([n]) => n)).toEqual([
@@ -181,7 +197,12 @@ describe('credit events', () => {
     ]);
     expect(sent[2]?.[1]).toEqual({ section: 'producto', seconds: '10-30' });
     expect(sent[5]?.[1]).toEqual({ reason: 'mortgage' });
-    expect(sent[7]?.[1]).toMatchObject({ attempt: '1', seconds: '60-180' });
-    expect(sent[8]?.[1]).toMatchObject({ attempt: '2' });
+    expect(sent[7]?.[1]).toMatchObject({
+      attempt: '1',
+      seconds: '60-180',
+      detail: 'locked',
+      pass: 'claim',
+    });
+    expect(sent[8]?.[1]).toMatchObject({ attempt: '2', detail: 'unlocked', pass: 'held' });
   });
 });

@@ -299,6 +299,7 @@ test('analytics carry codes and buckets, never a typed value', async ({ page }) 
     notice: 'on_time',
     premium: 'up',
     withdrawal: 'not_applicable',
+    pass: 'none',
   });
   expect(named('help_opened')[0]?.properties['topic']).toBe('faq-seguro-aviso');
 

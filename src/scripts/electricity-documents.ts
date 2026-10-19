@@ -121,6 +121,8 @@ export function wireElectricityDocuments(
           loadOfficial();
           return official;
         }),
+      // Measured as the bill is reviewed, before the year keeps it, so the year counts it already.
+      offeredOnCompletion: (r) => electricityCase(year.entriesWith(kept(r)), norms),
       decorateResult: show,
       restore: (saved) => saved,
       // The whole year goes on the trip to Stripe, each bill as its answers and nothing else, and

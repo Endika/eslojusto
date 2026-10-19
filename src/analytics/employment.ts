@@ -2,7 +2,8 @@ import { toIso } from '../engine/date';
 import type { EmploymentPhrase } from '../engine/employment/calculation';
 import { everyAssessed, type EmploymentReview } from '../engine/employment/review';
 import type { Assessed, EmploymentInput, Finding } from '../engine/employment/types';
-import type { Detail, EmploymentEvents } from '../employment/ports';
+import type { PassMode } from '../documents/ports';
+import type { CompletedEmploymentReview, Detail, EmploymentEvents } from '../employment/ports';
 import {
   EMPLOYMENT_TRACKABLE_FIELDS,
   POINT_STATUSES,
@@ -120,6 +121,7 @@ export function employmentReviewProps(data: {
   attempt: number;
   seconds: number;
   detail: Detail;
+  pass: PassMode;
 }): Completed {
   const { review, input } = data;
   const points = everyAssessed(review);
@@ -158,14 +160,20 @@ export function employmentReviewProps(data: {
     difference: differenceBucket(difference),
     offered: review.offerPass,
     detail: data.detail,
+    pass: data.pass,
     attempt: attemptBucket(data.attempt),
     seconds: reviewSecondsBucket(data.seconds),
   };
 }
 
 // The contract review's events as catalogue events: steps, field names, codes and buckets only.
-// Kept for this page view: when each step and the whole run started, and how many reviews.
-export function employmentAnalytics(track: Track, now: () => number): EmploymentEvents {
+// Kept for this page view: when each step and the whole run started, and how many reviews. `pass`
+// tells how the pass shows under a review.
+export function employmentAnalytics(
+  track: Track,
+  now: () => number,
+  pass: (r: CompletedEmploymentReview) => PassMode,
+): EmploymentEvents {
   let viewedSection: Section | null = null;
   let sectionEnteredAt = 0;
   let start: number | null = null;
@@ -199,7 +207,8 @@ export function employmentAnalytics(track: Track, now: () => number): Employment
     outOfScope(reason) {
       track('employment_out_of_scope', { reason });
     },
-    reviewCompleted({ review, input, detail }) {
+    reviewCompleted(completed) {
+      const { review, input, detail } = completed;
       attempts += 1;
       track(
         'employment_review_completed',
@@ -209,6 +218,7 @@ export function employmentAnalytics(track: Track, now: () => number): Employment
           attempt: attempts,
           seconds: secondsSince(start ?? sectionEnteredAt),
           detail,
+          pass: pass(completed),
         }),
       );
     },

@@ -1,7 +1,8 @@
 import { toIso } from '../engine/date';
 import type { RentalItemResult, RentalReview } from '../engine/rental/review';
 import type { ItemStatus, RentalInput } from '../engine/rental/types';
-import type { Detail, RentalEvents } from '../rental/ports';
+import type { PassMode } from '../documents/ports';
+import type { CompletedRentalReview, Detail, RentalEvents } from '../rental/ports';
 import {
   DOUBT_REASONS,
   ITEM_STATUSES,
@@ -52,6 +53,7 @@ export function rentalReviewProps(data: {
   attempt: number;
   seconds: number;
   detail: Detail;
+  pass: PassMode;
 }): Props<'rental_review_completed'> {
   const { review, input } = data;
   const reasons = new Set(
@@ -73,14 +75,20 @@ export function rentalReviewProps(data: {
     difference: differenceBucket(review.totals.paidOver.counted + review.totals.owed.counted),
     offered: review.offerPass,
     detail: data.detail,
+    pass: data.pass,
     attempt: attemptBucket(data.attempt),
     seconds: reviewSecondsBucket(data.seconds),
   };
 }
 
 // The rental review's events as catalogue events: steps, field names, codes and buckets only.
-// Kept for this page view: when each step and the whole run started, and how many reviews.
-export function rentalAnalytics(track: Track, now: () => number): RentalEvents {
+// Kept for this page view: when each step and the whole run started, and how many reviews. `pass`
+// tells how the pass shows under a review.
+export function rentalAnalytics(
+  track: Track,
+  now: () => number,
+  pass: (r: CompletedRentalReview) => PassMode,
+): RentalEvents {
   let viewedSection: Section | null = null;
   let sectionEnteredAt = 0;
   let start: number | null = null;
@@ -113,7 +121,8 @@ export function rentalAnalytics(track: Track, now: () => number): RentalEvents {
     outOfScope(reason) {
       track('rental_out_of_scope', { reason });
     },
-    reviewCompleted({ review, input, detail }) {
+    reviewCompleted(completed) {
+      const { review, input, detail } = completed;
       attempts += 1;
       track(
         'rental_review_completed',
@@ -123,6 +132,7 @@ export function rentalAnalytics(track: Track, now: () => number): RentalEvents {
           attempt: attempts,
           seconds: secondsSince(start ?? sectionEnteredAt),
           detail,
+          pass: pass(completed),
         }),
       );
     },

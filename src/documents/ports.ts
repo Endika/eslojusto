@@ -41,6 +41,10 @@ export type PassVia = (typeof PASS_VIA)[number];
 // Whether the pass was bought with something to claim or quietly, with nothing short.
 export const PASS_OFFERED = ['claim', 'quiet'] as const;
 export type PassOffered = (typeof PASS_OFFERED)[number];
+// How the pass shows under a review: already held, offered with something to claim, offered
+// quietly, or not at all.
+export const PASS_MODES = ['held', 'claim', 'quiet', 'none'] as const;
+export type PassMode = (typeof PASS_MODES)[number];
 export const DOWNLOADS = ['report', 'letter'] as const;
 // What the API said of the pass this browser holds; `unavailable` when it could not say.
 export const PASS_VERIFY_RESULTS = ['ok', 'invalid', 'expired', 'revoked', 'unavailable'] as const;

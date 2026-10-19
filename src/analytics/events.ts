@@ -76,9 +76,11 @@ import {
   LETTER_KINDS,
   LETTER_PREFILLED,
   PAGE_KINDS,
+  PASS_MODES,
   PASS_OFFERED,
   PASS_VERIFY_RESULTS,
   PASS_VIA,
+  type PassMode,
   QUALITY_PROBLEMS,
   SKIP_REASONS,
 } from '../documents/ports';
@@ -923,6 +925,9 @@ const BASE_CATALOGUE = {
     unfair_reference: oneOf(['shown', 'none']),
     // Whether the result showed only its summary or the detail a pass unlocks.
     detail: oneOf(['locked', 'unlocked']),
+    // How the pass showed under the result: already held, offered with something to claim,
+    // offered quietly or not at all.
+    pass: oneOf(PASS_MODES),
   },
   detail_opened: {
     item: oneOf([...ITEM_IDS, ...RENTAL_ITEMS, ...EMPLOYMENT_ITEMS, ...HOUSEHOLD_ITEMS]),
@@ -946,6 +951,7 @@ const BASE_CATALOGUE = {
     difference: oneOf(DIFFERENCE_BUCKETS),
     offered: { boolean: true },
     detail: oneOf(['locked', 'unlocked']),
+    pass: oneOf(PASS_MODES),
     attempt: oneOf(ATTEMPT_BUCKETS),
     seconds: oneOf(REVIEW_SECONDS),
   },
@@ -980,6 +986,7 @@ const BASE_CATALOGUE = {
     difference: oneOf(DIFFERENCE_BUCKETS),
     offered: { boolean: true },
     detail: oneOf(['locked', 'unlocked']),
+    pass: oneOf(PASS_MODES),
     attempt: oneOf(ATTEMPT_BUCKETS),
     seconds: oneOf(REVIEW_SECONDS),
   },
@@ -1024,6 +1031,9 @@ const creditCatalogue = () => {
       indicator: oneOf([...INDICATOR_STATUSES, 'none']),
       // Which APR the indicator compared: the one worked out from the figures or the stated one.
       compared_apr: oneOf(['recalculated', 'declared', 'none']),
+      offered: { boolean: true },
+      detail: oneOf(['locked', 'unlocked']),
+      pass: oneOf(PASS_MODES),
       attempt: oneOf(ATTEMPT_BUCKETS),
       seconds: oneOf(REVIEW_SECONDS),
     },
@@ -1043,6 +1053,7 @@ const insuranceCatalogue = () => {
       notice: INSURANCE_RESULT,
       premium: INSURANCE_RESULT,
       withdrawal: INSURANCE_RESULT,
+      pass: oneOf(PASS_MODES),
       attempt: oneOf(ATTEMPT_BUCKETS),
       seconds: oneOf(REVIEW_SECONDS),
     },
@@ -1067,6 +1078,7 @@ const mortgageCatalogue = () => {
       difference: oneOf(DIFFERENCE_BUCKETS),
       offered: { boolean: true },
       detail: oneOf(['locked', 'unlocked']),
+      pass: oneOf(PASS_MODES),
       attempt: oneOf(ATTEMPT_BUCKETS),
       seconds: oneOf(REVIEW_SECONDS),
     },
@@ -1089,12 +1101,14 @@ const billsCatalogue = () => {
       undercharged: { boolean: true },
       conditional: { boolean: true },
       recurring: { boolean: true },
+      pass: oneOf(PASS_MODES),
     },
     telecom_review_completed: {
       // Each point by the status that weighs most among its lines, or none.
       commitment: BILLS_RESULT,
       change_exit: BILLS_RESULT,
       after_exit: BILLS_RESULT,
+      pass: oneOf(PASS_MODES),
     },
   } as const satisfies Record<string, Record<string, Rule>>;
 };
@@ -1108,6 +1122,7 @@ const basketCatalogue = () =>
       difference: oneOf(DIFFERENCE_BUCKETS),
       offered: { boolean: true },
       detail: oneOf(['locked', 'unlocked']),
+      pass: oneOf(PASS_MODES),
       attempt: oneOf(ATTEMPT_BUCKETS),
       seconds: oneOf(REVIEW_SECONDS),
     },
@@ -1269,6 +1284,7 @@ export function reviewProps(data: {
   benefit: BenefitEstimate;
   otherContracts: number;
   detail: Detail;
+  pass: PassMode;
 }): Props<'review_completed'> {
   const { review, input: e } = data;
   const countOf = (status: string) => review.items.filter((p) => p.status === status).length;
@@ -1308,5 +1324,6 @@ export function reviewProps(data: {
     other_contracts: otherContractsBucket(data.otherContracts),
     unfair_reference: review.unfairReference === null ? 'none' : 'shown',
     detail: data.detail,
+    pass: data.pass,
   };
 }

@@ -5,10 +5,18 @@ import type { CalculatorEvents, CompletedReview, Detail } from '../calculator/po
 import { FINAL_PAY_FLOW, presetCauseFlow } from '../calculator/steps';
 import { pageTranslator } from '../i18n/client';
 import { DOCUMENTS_BUILD } from '../documents/config';
+import type { PassMode } from '../documents/ports';
 import { localToday } from './clock';
 import { withoutDocuments } from './without-documents';
 
-const analytics = calculatorAnalytics(track, () => performance.now());
+// Until the document module says how the pass shows under a review, it shows none; without the
+// documents API there is no pass.
+let pass: (r: CompletedReview) => PassMode = () => 'none';
+const analytics = calculatorAnalytics(
+  track,
+  () => performance.now(),
+  (r) => pass(r),
+);
 // The calculator rewrites the fragment as it opens, so the address it arrived at is kept first.
 const arrival = { hash: location.hash, search: location.search };
 
@@ -61,6 +69,7 @@ if (documentsBuild) {
           onReview: (listener) => reviewed.push(listener),
           onRestart: (listener) => restarted.push(listener),
           detail: (state) => (detail = state),
+          pass: (state) => (pass = state),
         },
         arrival,
       ),

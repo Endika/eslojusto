@@ -7,6 +7,7 @@ import { BILLS_TABLES } from '../engine/bills/data/tables';
 import { setUpTelecom } from '../bills/telecom/main';
 import type { CompletedTelecomReview, TelecomEvents } from '../bills/telecom/ports';
 import { DOCUMENTS_BUILD } from '../documents/config';
+import type { PassMode } from '../documents/ports';
 import { pageTranslator } from '../i18n/client';
 import { localToday } from './clock';
 import { withoutDocuments } from './without-documents';
@@ -30,7 +31,14 @@ let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedTelecomReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
-const analytics = telecomAnalytics(track, () => performance.now());
+// Until the document module says how the pass shows under a review, it shows none; without the
+// documents API there is no pass.
+let pass: (r: CompletedTelecomReview) => PassMode = () => 'none';
+const analytics = telecomAnalytics(
+  track,
+  () => performance.now(),
+  (r) => pass(r),
+);
 // The measurement hears every event; the documents follow each review shown and each one cleared.
 const events: TelecomEvents = {
   ...analytics,
@@ -65,6 +73,7 @@ if (documentsBuild) {
           onRestart: (listener) => cleared.push(listener),
           // The pass shows which items they are and unlocks the report and the penalty letter.
           detail: (state) => (detail = state),
+          pass: (state) => (pass = state),
         },
         arrival,
         BILLS_NORMS,

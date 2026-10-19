@@ -532,6 +532,8 @@ test('analytics carry codes and buckets, never a typed value', async ({ page }) 
     withdrawal: 'ended',
     indicator: 'distance_only',
     compared_apr: 'recalculated',
+    detail: 'unlocked',
+    pass: 'none',
   });
   expect(named('help_opened')[0]?.properties['topic']).toBe('faq-credito-tipo-medio');
 

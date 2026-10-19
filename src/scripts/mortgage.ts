@@ -8,6 +8,7 @@ import type { Detail } from '../calculator/ports';
 import { setUpMortgage } from '../mortgage/main';
 import type { CompletedMortgageReview, MortgageEvents } from '../mortgage/ports';
 import { DOCUMENTS_BUILD } from '../documents/config';
+import type { PassMode } from '../documents/ports';
 import { pageTranslator } from '../i18n/client';
 import { localToday } from './clock';
 import { withoutDocuments } from './without-documents';
@@ -31,10 +32,14 @@ let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedMortgageReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
+// Until the document module says how the pass shows under a review, it shows none; without the
+// documents API there is no pass.
+let pass: (r: CompletedMortgageReview) => PassMode = () => 'none';
 const analytics = mortgageAnalytics(
   track,
   () => performance.now(),
   () => detail(),
+  (r) => pass(r),
 );
 // The measurement hears every event; the pass listens to each review shown and each one cleared.
 const events: MortgageEvents = {
@@ -72,6 +77,7 @@ if (documentsBuild) {
           // The pass shows which costs and fees they are and unlocks the report and the amounts
           // letter.
           detail: (state) => (detail = state),
+          pass: (state) => (pass = state),
         },
         arrival,
         LEGAL_INTEREST,
