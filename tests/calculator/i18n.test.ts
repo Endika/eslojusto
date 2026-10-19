@@ -12,7 +12,7 @@ import {
   clientStrings,
   t,
 } from '../../src/i18n';
-import { LANGS, builtLangs, reviewLangs, type Lang } from '../../src/i18n/languages';
+import { LANGS, builtLangs, type Lang } from '../../src/i18n/languages';
 import { translator } from '../../src/i18n/client';
 import { statusText } from '../../src/calculator/render';
 import { reviewFinalPay } from '../../src/engine/review';
@@ -24,9 +24,8 @@ const langs = Object.keys(LANGS) as Lang[];
 const keys = Object.keys(es) as Key[];
 
 describe('published languages', () => {
-  it('Spanish is the only published language', () => {
-    expect(LANGS.es.published).toBe(true);
-    expect(langs.filter((i) => LANGS[i].published)).toEqual(['es']);
+  it('every real language is published; only the pseudo-locale is not', () => {
+    expect(langs.filter((i) => !LANGS[i].published)).toEqual(['ar-test']);
   });
 
   it.each(langs.filter((i) => LANGS[i].published))('%s has every key', (lang) => {
@@ -42,15 +41,10 @@ describe('published languages', () => {
     },
   );
 
-  it('a normal build builds only the published languages', () => {
-    expect(builtLangs({})).toEqual(['es']);
-    expect(builtLangs({ TEST_RTL: '1' })).toEqual(['es', 'ar-test']);
-  });
-
-  it('a review build adds the unpublished languages it names, and only those', () => {
-    expect(builtLangs({ REVIEW_LANGS: 'eu, ca' })).toEqual(['es', 'ca', 'eu']);
-    expect(reviewLangs({ REVIEW_LANGS: 'es,ar-test,xx,gl' })).toEqual(['gl']);
-    expect(reviewLangs({})).toEqual([]);
+  it('a normal build builds the published languages, and ar-test only under TEST_RTL', () => {
+    const published = langs.filter((i) => LANGS[i].published);
+    expect(builtLangs({})).toEqual(published);
+    expect(builtLangs({ TEST_RTL: '1' })).toEqual([...published, 'ar-test']);
   });
 });
 
@@ -198,16 +192,23 @@ describe.skipIf(!normalBuild)('a normal build does not publish ar-test', () => {
     );
     expect(noindexed.map((p) => p.split(/[\\/]/).pop())).toEqual(['404.html']);
   });
-  it('every page links its Spanish version with hreflang and no other', () => {
+  it('every page links each language it is built in with hreflang, and Spanish as x-default', () => {
+    const published = langs.filter((i) => LANGS[i].published);
     const html = all.filter((p) => p.endsWith('.html'));
     for (const p of html) {
       const text = readFileSync(p, 'utf8');
       const links = [...text.matchAll(/<link[^>]*hreflang="([^"]+)"/g)].map((m) => m[1]);
       // The 404 answers at any address: it is never indexed and announces no alternates.
-      const expected = text.includes('<meta name="robots" content="noindex">')
-        ? []
-        : ['es', 'x-default'];
-      expect(links.toSorted(), p).toEqual(expected);
+      if (text.includes('<meta name="robots" content="noindex">')) {
+        expect(links, p).toEqual([]);
+        continue;
+      }
+      const parts = p.split(/[\\/]/).slice(1);
+      const page = published.includes(parts[0] as Lang) ? parts.slice(1) : parts;
+      const builtIn = published.filter((lang) =>
+        existsSync(join('dist', ...(lang === 'es' ? [] : [lang]), ...page)),
+      );
+      expect(links.toSorted(), p).toEqual([...builtIn, 'x-default'].toSorted());
     }
   });
 });

@@ -234,6 +234,7 @@
 
 .guide {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   gap: 2rem;
   padding: 3.5rem var(--margin) 4rem;
@@ -300,6 +301,7 @@
 
 .document {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   gap: 1.5rem;
   padding: 1.5rem var(--margin) 4rem;

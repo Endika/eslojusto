@@ -130,10 +130,118 @@ const sectionsOf = (where: string) =>
 // Whether any section adds its own words for the copy at `where`.
 export const hasSectionWords = (where: string): boolean => sectionsOf(where).length > 0;
 
-const forbiddenFor = (where: string): readonly RegExp[] => [
-  ...FORBIDDEN,
-  ...sectionsOf(where).flatMap((prefix) => SECTION_FORBIDDEN[prefix] ?? []),
-];
+// The same advice in each translation, read on its built pages (dist/<lang>/), where the Spanish
+// lists would only catch other words: «firma» is the company in Romanian. Bounds are letters, since
+// \b does not see accented ones.
+const word = (source: string) => new RegExp(`(?<!\\p{L})(?:${source})(?!\\p{L})`, 'u');
+const TRANSLATED_FORBIDDEN: Readonly<Record<string, readonly RegExp[]>> = {
+  en: [
+    word('you should'),
+    word('we recommend'),
+    word('claim it'),
+    word('sue'),
+    word('illegal'),
+    word('abusive'),
+    word('usury|usurious'),
+    word('they owe you'),
+    word("you('ll| will) get (it|your money) back"),
+  ],
+  ar: [/يجب عليك/, /ننصح/, /نوصي/, /طالِ?ب ب/, /ارفع دعوى/, /غير قانوني/, /تعسف/, /مستحقة? لك/],
+  ro: [
+    word('ar trebui s[ăa]'),
+    word('recomand(ăm|am)'),
+    word('reclam[ăa]'),
+    /în judecată/,
+    word('ilegal\\p{L}*'),
+    word('abuziv\\p{L}*'),
+    word('c[aă]m[aă]t\\p{L}*'),
+    /îți datorează/,
+    /îți vei recupera/,
+  ],
+  fr: [
+    word('vous devriez'),
+    word('(nous )?(vous )?(recommandons|conseillons)'),
+    word('réclamez'),
+    word('portez plainte'),
+    word('(poursuivre|attaquer) en justice'),
+    word('illégal\\p{L}*'),
+    word('abusi(f|ve)s?'),
+    word('usur(e|aire)s?'),
+    word('vous doi(t|vent)'),
+    word('vous récupérerez'),
+  ],
+  uk: [
+    /вам (слід|варто)/,
+    /радимо|рекомендуємо/,
+    /вимагайте/,
+    /подайте (до суду|позов)/,
+    /незаконн/,
+    /зловжив/,
+    /кабальн/,
+    /лихвар/,
+    /(вам|вас) (винні|заборгува)/,
+    /ви повернете (собі )?(гроші|кошти)/,
+  ],
+  zh: [
+    /(您|你)(应该|应当)/,
+    /(建议|推荐)(您|你)/,
+    /我们(建议|推荐)/,
+    /索赔/,
+    /起诉/,
+    /提起诉讼/,
+    /违法/,
+    /非法/,
+    /滥用/,
+    /霸王条款/,
+    /高利贷/,
+    /欠(您|你)/,
+    /(您|你)(能|将|会)拿回/,
+  ],
+  ca: [
+    word('hauries de'),
+    word('(et |us )?(recomanem|aconsellem)'),
+    word('reclama(-ho|-la|-lo)?'),
+    /(?<!\p{L})demanda(-la|-lo)?(?!\p{L})(?! de)/u,
+    word('il·legal\\p{L}*'),
+    word('abusi(u|va|us|ves)'),
+    word('usura(ri|ria)?'),
+    word('et deuen'),
+    word('recuperaràs'),
+  ],
+  eu: [
+    word('beharko zenuke'),
+    word('gomendatzen (dizugu|dizuegu|dugu)'),
+    word('erreklama(tu)? ezazu'),
+    word('salatu'),
+    word('auzitara eraman'),
+    word('legez kanpo'),
+    word('abusibo(a|ak)?'),
+    word('usura\\p{L}*'),
+    word('zor dizute'),
+    word('berreskuratuko duzu'),
+  ],
+  gl: [
+    word('deberías'),
+    word('terías que'),
+    word('recomendámosche|aconsellámosche|recomendamos|aconsellamos'),
+    word('reclám?a(o|a|lle)?'),
+    /(?<!\p{L})demanda(o|a)?(?!\p{L})(?! de)/u,
+    word('ilegal\\p{L}*'),
+    word('abusiv[oa]s?'),
+    word('usura(rio|ria)?'),
+    word('débenche'),
+    word('recuperarás'),
+  ],
+};
+
+const langOf = (where: string): string | undefined =>
+  Object.keys(TRANSLATED_FORBIDDEN).find((lang) => where.startsWith(`dist/${lang}/`));
+
+const forbiddenFor = (where: string): readonly RegExp[] => {
+  const lang = langOf(where);
+  if (lang) return TRANSLATED_FORBIDDEN[lang] ?? [];
+  return [...FORBIDDEN, ...sectionsOf(where).flatMap((prefix) => SECTION_FORBIDDEN[prefix] ?? [])];
+};
 
 // Phrases a page must carry in the law's terms, allowed only where they live: the privacy notice
 // states the right to lodge a complaint with the supervisory authority (GDPR arts. 13.2.d and 77).

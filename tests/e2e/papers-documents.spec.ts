@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
-// Runs against the documents build, which serves Basque under review: a page in another language
-// keeps the report's and the letters' words in Spanish.
+// Runs against the documents build, where a page in another language,
+// such as Basque, keeps the report's and the letters' words in Spanish.
 
 const block = (page: Page, id: string) =>
   page.evaluate((i) => {

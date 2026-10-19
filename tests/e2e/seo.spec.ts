@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { LAST_UPDATED } from '../../src/content/updated';
+import { DEFAULT_LANG, LANGS, type Lang } from '../../src/i18n/languages';
 
 const PATHS = ['./', 'finiquito/', 'aviso-legal/', 'privacidad/', 'alquiler/irav-ipc/'];
 
@@ -158,10 +159,16 @@ test('robots.txt points to the sitemap', async ({ request }) => {
   expect(text).toContain('Sitemap:');
 });
 
-// Every indexable page has its date of last change, so the dates' list is the sitemap's list:
-// a new page joins both at once and this test needs no count.
-const SITEMAP_URLS = Object.keys(LAST_UPDATED)
-  .map((path) => `https://eslojusto.es${path}`)
+// Every indexable page has its date of last change, and each is built in every published language,
+// so the dates' list is the sitemap's list: a new page joins both at once and this test needs no
+// count.
+const SITEMAP_URLS = (Object.keys(LANGS) as Lang[])
+  .filter((lang) => LANGS[lang].published)
+  .flatMap((lang) =>
+    Object.keys(LAST_UPDATED).map(
+      (path) => `https://eslojusto.es${lang === DEFAULT_LANG ? '' : `/${lang}`}${path}`,
+    ),
+  )
   .toSorted();
 
 test('the sitemap lists every page', async ({ request }) => {
