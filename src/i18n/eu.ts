@@ -4539,6 +4539,7 @@ export const eu: Translation = {
   'bills.telecom.documents.files_hint':
     'Kontratua edo haren iraupen-konpromisoaren baldintzak eta, badituzu, zure fakturak: penalizaziokoak edo bajaren ondorengoak, eta kobrantzak aztertu nahi dituzun beste edozein faktura, edozein ordenatan. Gehienez 25 argazki edo PDF orrialde, guztira. Argazkiak eta PDFen orrialdeak irudi bihurtzen dira zure gailuan, bidali aurretik.',
   'bills.pass.title': 'Zure fakturen txostena eta gutuna',
+  'bills.pass.claim_title': 'Zein kontzeptu diren eta bakoitzean zenbat ateratzen den',
   'bills.pass.letter_note':
     'Gutuna txantiloi bat da. Zure gailuan deskargatzen da, eta ez da hemendik bidaltzen: erabili ala ez, eta nola, zure erabakia da.',
   'bills.pass.download_correction_letter':
@@ -4703,6 +4704,8 @@ export const eu: Translation = {
     'Sartu duzunarekin, lerro batzuk ez datoz bat edo ezin dira osorik egiaztatu. Behean dago lerro bakoitza, bere kalkuluarekin eta iturriarekin.',
   'client.bills.result.lead_clear':
     'Sartu duzunarekin, lerro bakoitza bat dator zure prezioekin eta arauak finkatzen duenarekin.',
+  'client.bills.result.lead_unnamed':
+    'Sartu duzunarekin, zure fakturak lerroren batean arauak finkatzen duena baino gehiago kobratzen du. Zein kontzeptu diren, beren kalkuluarekin eta iturriarekin, pasearekin dator.',
   'client.bills.result.telecom_lead_over':
     'Sartu duzunarekin, arauak onartzen duena baino gehiago kobratzen dizute. Behean dago puntu bakoitza, bere kalkuluarekin eta iturriarekin.',
   'client.bills.result.telecom_lead_open':
@@ -4721,7 +4724,7 @@ export const eu: Translation = {
   'client.bills.pass.issued':
     'Ordainketa jaso da. Orain txostena deskarga dezakezu eta, zure berrikuspenak horretarako zifrak baditu, gutuna.',
   'client.bills.pass.offer':
-    'Berrikusi zure urte osoa: 4,99 €-ko pase batekin, gehienez ~15 irakurketa berrikusten dituzu 7 egunez, edozein ataletan. Zure fakturen txostena deskargatzen duzu eta, lerroren batek araua gainditzen badu, faktura zuzentzailea eskatzen duen gutuna.',
+    'Berrikusi zure urte osoa: 4,99 €-ko pase batekin, zein kontzeptu diren ikusten duzu, beren kalkuluarekin eta iturriarekin, eta gehienez ~15 irakurketa berrikusten dituzu 7 egunez, edozein ataletan. Zure fakturen txostena deskargatzen duzu eta, lerroren batek araua gainditzen badu, faktura zuzentzailea eskatzen duen gutuna.',
   'client.bills.telecom.pass.offer':
     '4,99 €-ko pase batekin, zein puntu diren ikusten duzu, beren kalkuluarekin eta iturriarekin, zure bajaren txostena deskargatzen duzu eta, penalizazioak arauak onartzen duena gainditzen badu, hura berrikusteko eskatzen duen gutuna; gainera, gehienez ~15 irakurketa berrikusten dituzu 7 egunez, edozein ataletan.',
   'client.bills.basket.title_one': 'Zure urtea: 1 faktura berrikusita',
@@ -4733,8 +4736,12 @@ export const eu: Translation = {
   'client.bills.basket.duplicate':
     'Zure urteko beste faktura baten berdina da (hornidura eta aldi bera), eta ez da bi aldiz zenbatzen.',
   'client.bills.basket.recurring': 'Faktura batean baino gehiagotan errepikatzen da: {partidas}.',
+  'client.bills.basket.recurring_unnamed':
+    'Kontzeptu batek gutxienez araua gainditzen du faktura batean baino gehiagotan. Zein diren, beren kalkuluarekin eta iturriarekin, pasearekin dator.',
   'client.bills.basket.estimate':
     'Estimazio bat da, ez zure fakturetako zifra bat, eta ez zaio inolako guztizkori batzen: errepikatzen dena ({partidas}) berdin jarraituko balu, urtebetean {importe} inguru izango lirateke.',
+  'client.bills.basket.estimate_unnamed':
+    'Estimazio bat da, ez zure fakturetako zifra bat, eta ez zaio inolako guztizkori batzen: errepikatzen dena berdin jarraituko balu, urtebetean {importe} inguru izango lirateke.',
   'client.bills.basket.next_one': 'Berrikusi irakurritako hurrengo faktura (1 geratzen da)',
   'client.bills.basket.next_many': 'Berrikusi irakurritako hurrengo faktura ({n} geratzen dira)',
   'client.bills.documents.several':

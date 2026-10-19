@@ -5,7 +5,7 @@ import type { DocumentModel, Download, PaidReview } from './ports';
 
 // Several reviews of one section under one pass, such as a year of bills, each confirmed on its
 // own. It lives in the page's memory only and is never stored: closing the tab empties it.
-interface ReviewBasket<T> {
+export interface ReviewBasket<T> {
   // Keeps the review being worked on: reviewing it again replaces it rather than adding it twice.
   put(entry: T): void;
   // Takes the review being worked on out, as when it falls outside the review or starts over.
@@ -13,6 +13,8 @@ interface ReviewBasket<T> {
   // The next review put is another one, beside those kept.
   next(): void;
   entries(): readonly T[];
+  // What the basket would hold once this review is put, keeping nothing.
+  entriesWith(entry: T): readonly T[];
 }
 
 export function createBasket<T>(): ReviewBasket<T> {
@@ -34,6 +36,8 @@ export function createBasket<T>(): ReviewBasket<T> {
       current = null;
     },
     entries: () => [...kept],
+    entriesWith: (entry) =>
+      current === null ? [...kept, entry] : kept.map((e, i) => (i === current ? entry : e)),
   };
 }
 

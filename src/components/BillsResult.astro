@@ -114,9 +114,15 @@ const CIRCLED = new Set([
       </div>
     </section>
 
-    {/* Right under the totals on the telecom review, so it is not lost among the items. */}
-    {documents && review === 'telecom' && (
-      <PassOffer lang={lang} review="telecom" offer="client.bills.telecom.pass.offer" />
+    {/* Right under the totals, so it is not lost among the items. */}
+    {documents && (
+      <PassOffer
+        lang={lang}
+        review={review}
+        offer={
+          review === 'electricity' ? 'client.bills.pass.offer' : 'client.bills.telecom.pass.offer'
+        }
+      />
     )}
 
     <div class="review__items" data-items></div>
@@ -144,10 +150,6 @@ const CIRCLED = new Set([
           </div>
         </div>
       </section>
-    )}
-
-    {documents && review === 'electricity' && (
-      <PassOffer lang={lang} review="electricity" offer="client.bills.pass.offer" />
     )}
 
     {review === 'electricity' ? (

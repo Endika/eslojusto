@@ -4476,6 +4476,7 @@ export const ca: Translation = {
   'bills.telecom.documents.files_hint':
     'El contracte o les seves condicions de permanència i, si en tens, les teves factures: les de la penalització o de després de la baixa, i qualsevol altra els cobraments de la qual vulguis repassar, en l’ordre que sigui. Fins a 25 fotos o pàgines de PDF en total. Les fotos i les pàgines dels PDF es converteixen en imatges al teu dispositiu abans d’enviar-se.',
   'bills.pass.title': 'L’informe de les teves factures i la carta',
+  'bills.pass.claim_title': 'Quines partides són i quant surt en cadascuna',
   'bills.pass.letter_note':
     'La carta és una plantilla. Es descarrega al teu dispositiu i no s’envia des d’aquí: fer-la servir o no, i com, és decisió teva.',
   'bills.pass.download_correction_letter':
@@ -4641,6 +4642,8 @@ export const ca: Translation = {
     'Amb el que has introduït, hi ha línies que no quadren o que no es poden comprovar del tot. A sota hi ha cada línia amb el seu càlcul i la seva font.',
   'client.bills.result.lead_clear':
     'Amb el que has introduït, cada línia quadra amb els teus propis preus i amb el que fixa la norma.',
+  'client.bills.result.lead_unnamed':
+    'Amb el que has introduït, la teva factura cobra en alguna línia més del que fixa la norma. Quines partides són, amb el seu càlcul i la seva font, va amb el passi.',
   'client.bills.result.telecom_lead_over':
     'Amb el que has introduït, et cobren més del que permet la norma. A sota hi ha cada punt amb el seu càlcul i la seva font.',
   'client.bills.result.telecom_lead_open':
@@ -4659,7 +4662,7 @@ export const ca: Translation = {
   'client.bills.pass.issued':
     'Pagament rebut. Ja pots descarregar l’informe i, si la teva revisió té xifres per fer-la, la carta.',
   'client.bills.pass.offer':
-    'Revisa el teu any sencer: amb un passi de 4,99 € revises fins a ~15 lectures durant 7 dies, en qualsevol secció. Descarregues l’informe de les teves factures i, si alguna línia passa de la norma, la carta que demana la factura rectificativa.',
+    'Revisa el teu any sencer: amb un passi de 4,99 € veus quines partides són, amb el seu càlcul i la seva font, i revises fins a ~15 lectures durant 7 dies, en qualsevol secció. Descarregues l’informe de les teves factures i, si alguna línia passa de la norma, la carta que demana la factura rectificativa.',
   'client.bills.telecom.pass.offer':
     'Amb un passi de 4,99 € veus quins punts són, amb el seu càlcul i la seva font, descarregues l’informe de la teva baixa i, si la penalització passa del que permet la norma, la carta que demana revisar-la, i revises fins a ~15 lectures durant 7 dies, en qualsevol secció.',
   'client.bills.basket.title_one': 'El teu any: 1 factura revisada',
@@ -4671,8 +4674,12 @@ export const ca: Translation = {
   'client.bills.basket.duplicate':
     'És la mateixa que una altra factura del teu any (mateix subministrament i període) i no compta dues vegades.',
   'client.bills.basket.recurring': 'Es repeteix en més d’una factura: {partidas}.',
+  'client.bills.basket.recurring_unnamed':
+    'Almenys una partida passa de la norma en més d’una factura. Quines són, amb el seu càlcul i la seva font, va amb el passi.',
   'client.bills.basket.estimate':
     'Estimació, no una xifra de les teves factures, i no se suma a cap total: si el que es repeteix ({partidas}) continués igual, en un any serien uns {importe}.',
+  'client.bills.basket.estimate_unnamed':
+    'Estimació, no una xifra de les teves factures, i no se suma a cap total: si el que es repeteix continués igual, en un any serien uns {importe}.',
   'client.bills.basket.next_one': 'Revisar la factura llegida següent (en queda 1)',
   'client.bills.basket.next_many': 'Revisar la factura llegida següent (en queden {n})',
   'client.bills.documents.several':

@@ -23,9 +23,11 @@ const documentsBuild =
     import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
   ) && DOCUMENTS_BUILD;
 
-// Until the document module says whether a pass is there, the report counts as shown; without
-// the documents API there is no pass to lock it.
+// Until the document module says whether a pass is there and whether the year offers it, the
+// result shows which lines they are and the report counts as shown; without the documents API there
+// is no pass to lock them.
 let detail: () => Detail = () => 'unlocked';
+let yearOffer: (r: CompletedElectricityReview) => boolean = () => false;
 const reviewed: ((r: CompletedElectricityReview) => void)[] = [];
 const cleared: (() => void)[] = [];
 
@@ -51,6 +53,8 @@ const electricity = setUpElectricity(document.body, {
   today: localToday,
   tr: pageTranslator(),
   tables: { norms: BILLS_NORMS, tables: BILLS_TABLES },
+  detail: () => detail(),
+  offered: (r) => yearOffer(r),
 });
 
 if (documentsBuild) {
@@ -61,12 +65,13 @@ if (documentsBuild) {
         {
           onReview: (listener) => reviewed.push(listener),
           onRestart: (listener) => cleared.push(listener),
-          // Nothing in the result is locked; the pass unlocks the report and the letter.
+          // The pass shows which lines they are and unlocks the report and the letter.
           detail: (state) => (detail = state),
         },
         arrival,
         BILLS_NORMS,
         analytics,
+        (offered) => (yearOffer = offered),
       ),
     )
     .catch((error: unknown) => withoutDocuments(electricity.form, error));

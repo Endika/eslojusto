@@ -42,6 +42,16 @@ describe('a basket kept in memory', () => {
     expect(basket.entries()).toEqual(['june', 'july']);
   });
 
+  it('tells what it would hold with a review put, keeping nothing', () => {
+    const basket = createBasket<string>();
+    expect(basket.entriesWith('june')).toEqual(['june']);
+    basket.put('june');
+    expect(basket.entriesWith('june, corrected')).toEqual(['june, corrected']);
+    basket.next();
+    expect(basket.entriesWith('july')).toEqual(['june', 'july']);
+    expect(basket.entries()).toEqual(['june']);
+  });
+
   it('gives a copy of what it keeps', () => {
     const basket = createBasket<string>();
     basket.put('june');

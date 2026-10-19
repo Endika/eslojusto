@@ -79,21 +79,26 @@ export function electricityLabels(input: ElectricityBillInput, tr: Translate): I
 }
 
 // The totals first, then every line with its verdict, calculation, rules and table rows, and what
-// the review does not look at. Nothing here is locked.
+// the review does not look at. With the pass offered for the year and not held, a bill that counts
+// something over the norm does not say which lines: their cards are not in the page at all, and the
+// totals, exact, name none.
 export function renderElectricityResult(
   root: HTMLElement,
   review: ElectricityReview,
   input: ElectricityBillInput,
   norms: NormTable,
+  passToBuy: boolean,
   tr: Translate,
 ): void {
   showInScope(root);
+  const kind = summaryKind(review.items, review.totals);
+  const unnamed = passToBuy && kind === 'over';
   find(root, '[data-lead]').textContent = tr(
-    `client.bills.result.lead_${summaryKind(review.items, review.totals)}`,
+    unnamed ? 'client.bills.result.lead_unnamed' : `client.bills.result.lead_${kind}`,
   );
   renderTotals(root, review.totals, tr);
   find(root, '[data-recurring]').hidden = !review.recurring;
-  renderItems(root, review.items, norms, electricityLabels(input, tr), tr);
+  renderItems(root, unnamed ? [] : review.items, norms, electricityLabels(input, tr), tr);
   renderUnchecked(
     root,
     review.unchecked.map((code) => tr(`client.bills.unchecked.electricity.${code}`)),

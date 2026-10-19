@@ -6,7 +6,7 @@ import type { PvpcSource } from '../bills/electricity/official';
 import type { CompletedElectricityReview, YearEvents } from '../bills/electricity/ports';
 import { electricityReading } from '../bills/electricity/reading';
 import { STEPS } from '../bills/electricity/steps';
-import { electricityBasket } from '../bills/electricity/year';
+import { electricityBasket, offeredWith } from '../bills/electricity/year';
 import type { FormEntries } from '../calculator/fill';
 import type { SectionForm } from '../calculator/section';
 import { createBasket } from '../documents/basket';
@@ -36,6 +36,8 @@ export function wireElectricityDocuments(
   arrival: { hash: string; search: string },
   norms: NormTable,
   yearEvents: YearEvents,
+  // Hands the page whether the pass is offered for the year once a review joins it.
+  yearOffer: (offered: (r: CompletedElectricityReview) => boolean) => void,
 ): void {
   const tr = billsTranslator();
   const paperTr = billsPapersTranslator();
@@ -64,7 +66,15 @@ export function wireElectricityDocuments(
   };
   const reading = electricityReading(form, tr);
   const year = createBasket<KeptBill>();
-  const show = () => renderBasket(document, year.entries(), reading.pending(), tr);
+  let locked = () => false;
+  const show = () => renderBasket(document, year.entries(), reading.pending(), locked(), tr);
+  const kept = (r: CompletedElectricityReview): KeptBill => ({
+    ...r,
+    input: { ...r.input, supplyFingerprint: reading.fingerprint() },
+    answers: electricity.entries(),
+  });
+  // Asked while the review is shown, before the year keeps it, so its offer counts it already.
+  yearOffer((r) => offeredWith(year, kept(r)));
 
   // A new bill starts on an empty form; the year keeps every bill already reviewed.
   function startBill() {
@@ -76,11 +86,7 @@ export function wireElectricityDocuments(
   // Heard before the pass, so its offer counts the bill just reviewed.
   hooks.onReview((r) => {
     loadOfficial();
-    year.put({
-      ...r,
-      input: { ...r.input, supplyFingerprint: reading.fingerprint() },
-      answers: electricity.entries(),
-    });
+    year.put(kept(r));
     reading.reviewed();
     if (reading.pending() === 0) yearEvents.basketCompleted(electricityBasket(year.entries()));
   });
@@ -91,7 +97,13 @@ export function wireElectricityDocuments(
 
   const documents = wireDocuments({
     form: electricity,
-    hooks,
+    hooks: {
+      ...hooks,
+      detail(state) {
+        hooks.detail(state);
+        locked = () => state() === 'locked';
+      },
+    },
     arrival,
     config: DOCUMENTS,
     tr,

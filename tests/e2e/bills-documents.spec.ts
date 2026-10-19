@@ -252,6 +252,8 @@ test('a pack of three bills is reviewed one by one into the year, offered with i
   );
   await confirmBill(page);
   await expect(page.locator('#resultado [data-total-counted]')).toHaveText('0,20 €');
+  // With no pass offered yet, the result names its lines.
+  await expect(page.locator('#resultado [data-item="meter"]')).toBeVisible();
   await expect(basket(page).locator('[data-basket-title]')).toHaveText(
     'Tu año: 1 factura revisada',
   );
@@ -278,9 +280,11 @@ test('a pack of three bills is reviewed one by one into the year, offered with i
     await expect(basket(page).locator('[data-basket-title]')).toHaveText(title);
   }
 
-  // The bill on screen counts its own 0,20 €; the year adds the three up, and the estimate stands
-  // apart from that total.
+  // The bill on screen counts its own 0,20 €, exact, without saying which line; the year adds the
+  // three up, and the estimate stands apart from that total, naming nothing either.
   await expect(page.locator('#resultado [data-total-counted]')).toHaveText('0,20 €');
+  await expect(page.locator('#resultado [data-items] [data-item]')).toHaveCount(0);
+  await expect(page.locator('#resultado [data-lead]')).toContainText('va con el pase');
   await expect(basket(page).locator('[data-basket-bills] li')).toHaveText([
     'Factura del 31\u201105\u20112026 al 30\u201106\u20112026 · por encima de la norma: 0,20 €',
     'Factura del 30\u201106\u20112026 al 30\u201107\u20112026 · por encima de la norma: 0,20 €',
@@ -288,16 +292,20 @@ test('a pack of three bills is reviewed one by one into the year, offered with i
   ]);
   await expect(basket(page).locator('[data-basket-counted]')).toHaveText('0,60 €');
   await expect(basket(page).locator('[data-basket-recurring]')).toHaveText(
-    'Se repite en más de una factura: Alquiler del contador.',
+    'Al menos una partida pasa de la norma en más de una factura. Cuáles son, con su cálculo y su fuente, va con el pase.',
   );
   await expect(basket(page).locator('[data-basket-estimate]')).toHaveText(
-    /^Estimación, no una cifra de tus facturas, y no se suma a ningún total: si lo que se repite \(Alquiler del contador\) siguiera igual, en un año serían unos 2\s€\.$/,
+    /^Estimación, no una cifra de tus facturas, y no se suma a ningún total: si lo que se repite siguiera igual, en un año serían unos 2\s€\.$/,
   );
+  await expect(basket(page)).not.toContainText('Alquiler del contador');
   await expect(basket(page).getByRole('button', { name: /^Revisar la siguiente/ })).toBeHidden();
 
   await expect(offer(page)).toBeVisible();
+  await expect(
+    offer(page).getByRole('heading', { name: 'Qué partidas son y cuánto sale en cada una' }),
+  ).toBeVisible();
   await expect(offer(page)).toContainText(
-    'Revisa tu año entero: con un pase de 4,99 € revisas hasta ~15 lecturas durante 7 días, en cualquier sección.',
+    'Revisa tu año entero: con un pase de 4,99 € ves qué partidas son, con su cálculo y su fuente, y revisas hasta ~15 lecturas durante 7 días, en cualquier sección.',
   );
   await expect(offer(page)).not.toContainText(/suscripción mensual|te avisaremos|recordatorio/i);
   await noSideScroll(page);
@@ -395,12 +403,29 @@ test('a year of three bills goes to the payment and comes back whole, with its r
     name: 'Descargar la carta que pide la factura rectificativa (PDF)',
   });
   await expect(letter).toBeHidden();
+  // Before the pass, neither the result nor the year says which line it is.
+  await expect(
+    offer(page).getByRole('heading', { name: 'Qué partidas son y cuánto sale en cada una' }),
+  ).toBeVisible();
+  await expect(page.locator('#resultado [data-items] [data-item]')).toHaveCount(0);
+  await expect(basket(page).locator('[data-basket-recurring]')).toHaveText(
+    'Al menos una partida pasa de la norma en más de una factura. Cuáles son, con su cálculo y su fuente, va con el pase.',
+  );
 
   await offer(page)
     .getByLabel(/Quiero el informe ahora/)
     .check();
   await offer(page).getByRole('button', { name: 'Pagar 4,99 €' }).click();
   await expect(letter).toBeVisible();
+  // Once the pass is verified, the result names each line again, and the year what repeats.
+  await expect(page.locator('#resultado [data-item="meter"]')).toBeVisible();
+  await expect(
+    offer(page).getByRole('heading', { name: 'El informe de tus facturas y la carta' }),
+  ).toBeVisible();
+  await expect(page.locator('#resultado [data-lead]')).not.toContainText('pase');
+  await expect(basket(page).locator('[data-basket-recurring]')).toHaveText(
+    'Se repite en más de una factura: Alquiler del contador.',
+  );
   expect(payment.checkout).toHaveLength(1);
   expect(payment.checkout[0]?.postDataJSON()).toMatchObject({ returnTo: 'electricity' });
   expect(payment.pass).toHaveLength(1);

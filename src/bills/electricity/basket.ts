@@ -5,11 +5,13 @@ import { billHeading, electricityBasket } from './year';
 import type { CompletedElectricityReview } from './ports';
 
 // «Tu año»: every bill reviewed in this tab, what those that count add up to, and the yearly
-// estimate apart, never in a total. `pending` is how many bills read still wait their turn.
+// estimate apart, never in a total. `pending` is how many bills read still wait their turn. Locked
+// with the pass offered, what repeats is not named: which lines they are is the pass's.
 export function renderBasket(
   root: ParentNode,
   entries: readonly CompletedElectricityReview[],
   pending: number,
+  locked: boolean,
   tr: Translate,
 ): void {
   const box = find(root, '[data-basket]');
@@ -49,19 +51,22 @@ export function renderBasket(
   under.textContent = tr('client.bills.total.under', {
     importe: formatCalculationEuros(totals.under),
   });
+  const unnamed = locked && basket.offerPass;
   const partidas = basket.recurring.map((id) => tr(`client.bills.item.${id}`)).join(', ');
   const recurring = find(year, '[data-basket-recurring]');
   recurring.hidden = basket.recurring.length === 0;
-  recurring.textContent = tr('client.bills.basket.recurring', { partidas });
+  recurring.textContent = unnamed
+    ? tr('client.bills.basket.recurring_unnamed')
+    : tr('client.bills.basket.recurring', { partidas });
   const estimate = find(year, '[data-basket-estimate]');
   estimate.hidden = basket.yearlyEstimate === null;
+  const importe = formatWholeEuros(basket.yearlyEstimate ?? 0);
   estimate.textContent =
     basket.yearlyEstimate === null
       ? ''
-      : tr('client.bills.basket.estimate', {
-          partidas,
-          importe: formatWholeEuros(basket.yearlyEstimate),
-        });
+      : unnamed
+        ? tr('client.bills.basket.estimate_unnamed', { importe })
+        : tr('client.bills.basket.estimate', { partidas, importe });
 
   const next = find(box, '[data-basket-next]');
   next.hidden = pending === 0;
