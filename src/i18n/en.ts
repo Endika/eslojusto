@@ -5381,12 +5381,8 @@ export const en: Translation = {
   'mortgage.result.total_case_law': "According to the Tribunal Supremo's allocation",
   'mortgage.result.total_case_law_note':
     "For a consumer's deeds before 16-06-2019. For it to be returned, the bank has to accept it or a judge has to annul the expenses clause.",
-  'mortgage.result.total_case_law_explained':
-    "The rulings this allocation relies on have not yet been checked against their text: each invoice explains what share was the bank's, without a figure.",
   'mortgage.result.total_fees': 'Fees above the legal cap',
   'mortgage.result.total_fees_note': 'What you were charged above the cap set by the law.',
-  'mortgage.result.total_fees_more':
-    "If a fee depends on a detail you don't know, the lowest reading counts here; you can see the others under that fee.",
   'mortgage.result.totals_apart':
     "These figures are not added together: what the law says does not depend on a judge, and the Tribunal Supremo's allocation does.",
   'mortgage.result.expenses': 'Set-up costs',
@@ -5408,7 +5404,8 @@ export const en: Translation = {
   'mortgage.result.restart': 'Start again',
   'mortgage.pass.title': 'The report and the letter',
   'mortgage.pass.text':
-    'For 4,99 € you download the PDF report, with each cost and fee, its calculation and each law and ruling with its status, and, if your review has amounts set by the law, the letter asking the bank to review them. They are generated on your device.',
+    'For 4,99 € you see which costs and fees they are and how much each comes to, and you download the PDF report, with each cost and fee, its calculation and each law and ruling with its status, and, if your review has amounts set by the law, the letter asking the bank to review them. They are generated on your device.',
+  'mortgage.pass.claim_title': 'Which costs and fees they are and how much each comes to',
   'mortgage.pass.price':
     '4,99 € including VAT (IVA). A single payment, with no account or subscription. The pass lasts 7 days and is only valid in this browser, also for the other reviews on the website: during that time you can redo or correct your review and download the report and the letter again without paying again. On another device, in a private window or if you clear your browsing data, it is lost.',
   'mortgage.pass.download_documents_letter':
@@ -5430,6 +5427,8 @@ export const en: Translation = {
     'These details are only used to fill in the letters on your device; they are not sent or stored.',
   'client.mortgage.result.lead':
     'Each cost, fee and clause, with the calculation behind it and the law or interpretation it rests on. What the law says and what depends on a judge are always kept separate.',
+  'client.mortgage.result.lead_unnamed':
+    'What comes out in total, rounded. Which costs and fees they are, with their calculation and the law or interpretation they rest on, comes with the pass.',
   'client.mortgage.result.lead_out_of_scope': 'This mortgage falls outside what this page reviews.',
   'client.mortgage.about': 'about {importe}',
   'client.mortgage.about_under_one': 'less than 1 €',
@@ -5437,9 +5436,21 @@ export const en: Translation = {
   'client.mortgage.total.nothing_lowest': 'Nothing on the lowest reading',
   'client.mortgage.total.no_figure_yet': 'No figure for now',
   'client.mortgage.total.review_it': 'No figure: there are costs under “To review”',
+  'client.mortgage.total.review_it_unnamed':
+    'Some costs have no settled figure; which ones comes with the pass',
+  'client.mortgage.total.case_law_explained':
+    "The rulings this allocation relies on have not yet been checked against their text: each invoice explains what share was the bank's, without a figure.",
+  'client.mortgage.total.case_law_explained_unnamed':
+    "The rulings this allocation relies on have not yet been checked against their text, so there is no figure here. What share of each cost was the bank's comes with the pass.",
+  'client.mortgage.total.fees_more':
+    "If a fee depends on a detail you don't know, the lowest reading counts here; you can see the others under that fee.",
+  'client.mortgage.total.fees_more_unnamed':
+    "If a fee depends on a detail you don't know, the lowest reading counts here.",
   'client.mortgage.total.no_invoice': "No figure: you don't have the invoices",
   'client.mortgage.total.transparency_free':
     'Separately, the prior notarial record, which should not have been charged: about {importe}.',
+  'client.mortgage.total.not_chargeable_free':
+    'Separately, what should not have been charged: about {importe}.',
   'client.mortgage.total.interest':
     'Statutory interest up to {fecha}: about {importe}. The “By law” total is given without interest.',
   'client.mortgage.total.interest_estimated':

@@ -268,7 +268,9 @@ test('the mortgage documents letter is free; the pass unlocks the report and the
   await page.setViewportSize({ width: 360, height: 640 });
   await arriveWith(page, 'hipoteca/', 'eslojusto-revision-hipoteca-en-pago', MORTGAGE);
   const offer = page.locator('[data-pass-offer]');
-  await expect(offer.getByRole('heading', { name: 'El informe y la carta' })).toBeVisible();
+  await expect(
+    offer.getByRole('heading', { name: 'Qué gastos y comisiones son y cuánto sale en cada uno' }),
+  ).toBeVisible();
   const free = offer.getByRole('button', {
     name: 'Descargar la carta que pide la documentación de tu hipoteca (PDF, gratis)',
   });
@@ -289,6 +291,9 @@ test('the mortgage documents letter is free; the pass unlocks the report and the
   await offer.getByLabel(/Quiero el informe ahora/).check();
   await offer.getByRole('button', { name: 'Pagar 4,99 €' }).click();
   await expect(paid).toBeVisible();
+  // Once the pass is verified, the result shows again with each cost and fee.
+  await expect(page.locator('#resultado [data-expenses] [data-item]').first()).toBeVisible();
+  await expect(offer.getByRole('heading', { name: 'El informe y la carta' })).toBeVisible();
   await expect(page).toHaveURL(`${ORIGIN}/hipoteca/#resultado`);
   expect(fake.checkout).toHaveLength(1);
   expect(fake.checkout[0]?.postDataJSON()).toMatchObject({ returnTo: 'mortgage' });

@@ -5430,12 +5430,8 @@ export const ro: Translation = {
   'mortgage.result.total_case_law': 'Potrivit repartizării făcute de Curtea Supremă',
   'mortgage.result.total_case_law_note':
     'Pentru actele notariale ale unui consumator anterioare datei de 16-06-2019. Pentru ca suma să se restituie, este nevoie ca banca să accepte sau ca un judecător să anuleze clauza privind cheltuielile.',
-  'mortgage.result.total_case_law_explained':
-    'Hotărârile pe care se sprijină această repartizare nu au fost încă verificate în textul lor: fiecare factură explică ce parte îi revenea băncii, fără cifră.',
   'mortgage.result.total_fees': 'Comisioane peste plafonul legal',
   'mortgage.result.total_fees_note': 'Ce ți s-a perceput peste plafonul stabilit de lege.',
-  'mortgage.result.total_fees_more':
-    'Dacă un comision depinde de o informație pe care nu o știi, aici contează varianta cea mai mică; pe celelalte le vezi la comisionul respectiv.',
   'mortgage.result.totals_apart':
     'Aceste cifre nu se adună: ce spune legea nu depinde de un judecător, iar repartizarea făcută de Curtea Supremă depinde.',
   'mortgage.result.expenses': 'Costurile de constituire',
@@ -5457,7 +5453,8 @@ export const ro: Translation = {
   'mortgage.result.restart': 'Ia-o de la capăt',
   'mortgage.pass.title': 'Raportul și scrisoarea',
   'mortgage.pass.text':
-    'Pentru 4,99 € descarci raportul în PDF, cu fiecare cost și comision, calculul lui și fiecare normă și hotărâre cu situația ei, și, dacă verificarea ta are sume stabilite prin lege, scrisoarea prin care ceri băncii să le verifice. Sunt generate pe dispozitivul tău.',
+    'Pentru 4,99 € vezi care sunt costurile și comisioanele și cât iese la fiecare, și descarci raportul în PDF, cu fiecare cost și comision, calculul lui și fiecare normă și hotărâre cu situația ei, și, dacă verificarea ta are sume stabilite prin lege, scrisoarea prin care ceri băncii să le verifice. Sunt generate pe dispozitivul tău.',
+  'mortgage.pass.claim_title': 'Care sunt costurile și comisioanele și cât iese la fiecare',
   'mortgage.pass.price':
     '4,99 €, cu TVA (IVA) inclus. O singură plată, fără cont și fără abonament. Permisul (pase) durează 7 zile și funcționează doar în acest browser, inclusiv pentru celelalte verificări de pe site: în acest timp poți reface sau corecta verificarea și poți descărca din nou raportul și scrisoarea fără să plătești încă o dată. Pe alt dispozitiv, într-o fereastră privată sau dacă ștergi datele de navigare, se pierde.',
   'mortgage.pass.download_documents_letter':
@@ -5479,6 +5476,8 @@ export const ro: Translation = {
     'Aceste date sunt folosite doar pentru a completa scrisorile pe dispozitivul tău; nu sunt trimise și nu sunt păstrate.',
   'client.mortgage.result.lead':
     'Fiecare cost, comision și clauză, cu calculul care duce la rezultat și norma sau criteriul pe care se sprijină. Ce spune legea și ce depinde de un judecător apar mereu separat.',
+  'client.mortgage.result.lead_unnamed':
+    'Ce iese în total, rotunjit. Care sunt costurile și comisioanele, cu calculul lor și norma sau criteriul pe care se sprijină, vin cu permisul.',
   'client.mortgage.result.lead_out_of_scope':
     'Acest credit ipotecar nu intră în ce verifică această pagină.',
   'client.mortgage.about': 'aproximativ {importe}',
@@ -5487,9 +5486,21 @@ export const ro: Translation = {
   'client.mortgage.total.nothing_lowest': 'Nimic în varianta cea mai mică',
   'client.mortgage.total.no_figure_yet': 'Fără cifră deocamdată',
   'client.mortgage.total.review_it': 'Fără cifră: există costuri la „De verificat”',
+  'client.mortgage.total.review_it_unnamed':
+    'Există costuri fără o cifră stabilită; care sunt vin cu permisul',
+  'client.mortgage.total.case_law_explained':
+    'Hotărârile pe care se sprijină această repartizare nu au fost încă verificate în textul lor: fiecare factură explică ce parte îi revenea băncii, fără cifră.',
+  'client.mortgage.total.case_law_explained_unnamed':
+    'Hotărârile pe care se sprijină această repartizare nu au fost încă verificate în textul lor, așa că aici nu există cifră. Ce parte din fiecare cost îi revenea băncii vine cu permisul.',
+  'client.mortgage.total.fees_more':
+    'Dacă un comision depinde de o informație pe care nu o știi, aici contează varianta cea mai mică; pe celelalte le vezi la comisionul respectiv.',
+  'client.mortgage.total.fees_more_unnamed':
+    'Dacă un comision depinde de o informație pe care nu o știi, aici contează varianta cea mai mică.',
   'client.mortgage.total.no_invoice': 'Fără cifră: nu ai facturile',
   'client.mortgage.total.transparency_free':
     'Separat, procesul-verbal notarial prealabil, care nu trebuia perceput: aproximativ {importe}.',
+  'client.mortgage.total.not_chargeable_free':
+    'Separat, ce nu trebuia perceput: aproximativ {importe}.',
   'client.mortgage.total.interest':
     'Dobânda legală până la {fecha}: aproximativ {importe}. Totalul „Conform legii” se dă fără dobândă.',
   'client.mortgage.total.interest_estimated':

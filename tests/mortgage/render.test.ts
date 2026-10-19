@@ -69,9 +69,9 @@ function result(): HTMLElement {
   return root;
 }
 
-const rendered = (r: MortgageReview): HTMLElement => {
+const rendered = (r: MortgageReview, locked: boolean): HTMLElement => {
   const root = result();
-  renderMortgageResult(root, r, tr);
+  renderMortgageResult(root, r, locked, tr);
   return root;
 };
 
@@ -102,7 +102,7 @@ const deed2018 = (): Partial<MortgageInput> => ({
 describe('the mortgage result', () => {
   it('gives what the law says and what the split gives on lines that are never added', () => {
     const r = review(deed2018(), DEPS);
-    const root = rendered(r);
+    const root = rendered(r, false);
     const statute = r.totals.statute.principal;
     const caseLaw = r.totals.caseLaw.principal;
     expect([statute, caseLaw]).toEqual([1_100, 700]);
@@ -115,7 +115,7 @@ describe('the mortgage result', () => {
   });
 
   it('explains the split without a figure if its rulings were unread', () => {
-    const root = rendered(review(deed2018(), UNREAD_DEPS));
+    const root = rendered(review(deed2018(), UNREAD_DEPS), false);
     expect(text(root, '[data-total="statute"] [data-total-amount]')).toBe(about(1_100));
     expect(text(root, '[data-total="case_law"] [data-total-amount]')).toBe('Sin cifra por ahora');
     expect(root.querySelector('[data-total-explained]')?.hasAttribute('hidden')).toBe(false);
@@ -148,6 +148,7 @@ describe('the mortgage result', () => {
           invoice('registry_mortgage', 300, paid('2015-03-02')),
         ],
       }),
+      false,
     );
     expect(text(root, '[data-total="case_law"] [data-total-amount]')).toBe(
       'Sin cifra: hay gastos en «Para revisar»',
@@ -167,6 +168,7 @@ describe('the mortgage result', () => {
         deedOn: d('2021-05-10'),
         invoices: [invoice('notary_loan', null), invoice('ajd_loan', null, { paidBy: 'bank' })],
       }),
+      false,
     );
     expect(cards(atHand, '[data-expenses]').map((c) => c.status)).toEqual([
       'No lo has metido',
@@ -181,6 +183,7 @@ describe('the mortgage result', () => {
         invoicesAtHand: false,
         invoices: [invoice('agency', null)],
       }),
+      false,
     );
     expect(cards(none, '[data-expenses]').map((c) => c.status)).toEqual(['Sin factura ni importe']);
     expect(text(none, '[data-total="statute"] [data-total-amount]')).toBe(
@@ -201,6 +204,7 @@ describe('the mortgage result', () => {
           invoice('transparency_deed', 60, paid('2021-05-09')),
         ],
       }),
+      false,
     );
     expect(text(root, '[data-total="statute"] [data-total-amount]')).toBe(about(700));
     expect(text(root, '[data-total-free]')).toBe(
@@ -228,6 +232,7 @@ describe('the mortgage result', () => {
           },
         ],
       }),
+      false,
     );
     const fee = root.querySelector('[data-item="partial_prepayment"]');
     expect(fee?.querySelector('[data-status-text]')?.textContent).toBe(
@@ -243,6 +248,9 @@ describe('the mortgage result', () => {
       'Nada en la lectura más baja',
     );
     expect(root.querySelector('[data-total-more]')?.hasAttribute('hidden')).toBe(false);
+    expect(text(root, '[data-total-more]')).toBe(
+      'Si una comisión depende de un dato que no sabes, aquí cuenta la lectura más baja; las demás las ves en esa comisión.',
+    );
   });
 
   it('titles the two counts of the ten years of art. 23.7 for a mixed rate read as fixed', () => {
@@ -262,7 +270,7 @@ describe('the mortgage result', () => {
     // Ten years after the deed, so a day still to come today.
     const r = reviewMortgage(input, d('2029-07-02'), DEPS);
     if (!r.ok) throw new Error(JSON.stringify(r.errors));
-    const root = rendered(r.review);
+    const root = rendered(r.review, false);
     const fee = root.querySelector('[data-item="full_prepayment"]');
     expect(
       [...(fee?.querySelectorAll('[data-reading-title]') ?? [])].map((h) => h.textContent),
@@ -292,6 +300,7 @@ describe('the mortgage result', () => {
           },
         ],
       }),
+      false,
     );
     expect(text(root, '[data-total="fees"] [data-total-amount]')).toBe('menos de 1 €');
   });
@@ -305,6 +314,7 @@ describe('the mortgage result', () => {
           { label: 'irph', present: null },
         ],
       }),
+      false,
     );
     const floor = root.querySelector('[data-item="floor_clause"]');
     expect(text(floor ?? root, '[data-status-text]')).toBe('Aparece en tu escritura');
@@ -319,6 +329,7 @@ describe('the mortgage result', () => {
   it('says the law forbids a floor in a variable rate from 2019, with no figure left open', () => {
     const root = rendered(
       review({ deedOn: d('2020-03-02'), clauses: [{ label: 'floor_clause', present: true }] }),
+      false,
     );
     const floor = root.querySelector('[data-item="floor_clause"]');
     expect(text(floor ?? root, '[data-reading-title]')).toBe('Lo que dice la ley');
@@ -327,12 +338,94 @@ describe('the mortgage result', () => {
   });
 
   it('hides what holds nothing and lists what it never looks at', () => {
-    const root = rendered(review({}));
+    const root = rendered(review({}), false);
     const fees = root.querySelector('[data-fees]')?.closest('[data-in-scope]');
     expect(fees?.hasAttribute('hidden')).toBe(true);
     expect(root.querySelector('[data-total="fees"]')?.hasAttribute('hidden')).toBe(true);
     expect(root.querySelectorAll('[data-unchecked] li')).toHaveLength(7);
     expect(root.textContent).toContain('El paso previo del art. 439 bis');
+  });
+
+  it('locked with something to claim, which costs and fees they are is not in the page at all', () => {
+    const r = review({
+      deedOn: d('2021-05-10'),
+      invoices: [
+        invoice('notary_loan', 700, paid('2021-05-10')),
+        invoice('transparency_deed', 60, paid('2021-05-09')),
+      ],
+      clauses: [{ label: 'floor_clause', present: true }],
+    });
+    expect(r.offerPass).toBe(true);
+    const root = rendered(r, true);
+    expect(
+      root.querySelectorAll('[data-expenses] [data-item], [data-fees] [data-item]'),
+    ).toHaveLength(0);
+    expect(
+      root.querySelector('[data-expenses]')?.closest('[data-in-scope]')?.hasAttribute('hidden'),
+    ).toBe(true);
+    expect(root.querySelectorAll('[data-expenses-note] li')).toHaveLength(0);
+    expect(text(root, '[data-lead]')).toBe(
+      'Lo que sale en total, redondeado. Qué gastos y comisiones son, con su cuenta y la norma o el criterio en que se apoyan, va con el pase.',
+    );
+    expect(text(root, '[data-totals]')).toContain('unos');
+    expect(text(root, '[data-total="statute"] [data-total-amount]')).toBe(about(700));
+    expect(text(root, '[data-total-free]')).toBe(`Aparte, lo que no debía cobrarse: ${about(60)}.`);
+    expect(root.textContent).not.toContain('acta notarial');
+    expect(root.querySelector('[data-flags] [data-item="floor_clause"]')).not.toBeNull();
+    expect(root.querySelectorAll('[data-unchecked] li')).toHaveLength(7);
+  });
+
+  it('locked with something to claim, no total points at a card that is not there', () => {
+    const split = rendered(review(deed2018(), UNREAD_DEPS), true);
+    expect(split.querySelector('[data-total-explained]')?.hasAttribute('hidden')).toBe(false);
+    expect(text(split, '[data-total-explained]')).toBe(
+      'Las sentencias en que se apoya este reparto aún no se han comprobado en su texto, así que aquí no hay cifra. Qué parte de cada gasto le correspondía al banco va con el pase.',
+    );
+    const held = rendered(
+      {
+        ...review({
+          deedOn: d('2015-03-02'),
+          agreementOnExpenses: null,
+          invoices: [invoice('notary_loan', 600, paid('2015-03-02'))],
+        }),
+        offerPass: true,
+      },
+      true,
+    );
+    expect(text(held, '[data-total="case_law"] [data-total-amount]')).toBe(
+      'Hay gastos sin cifra cerrada; cuáles son va con el pase',
+    );
+    expect(held.textContent).not.toContain('«Para revisar»');
+    const fees = rendered(
+      {
+        ...review({
+          deedOn: d('2015-03-02'),
+          rateRevisionMonths: 12,
+          operations: [
+            {
+              on: d('2023-05-02'),
+              kind: 'partial_prepayment',
+              principal: 20_000,
+              feeCharged: 40,
+              hadInsurance: null,
+            },
+          ],
+        }),
+        offerPass: true,
+      },
+      true,
+    );
+    expect(text(fees, '[data-total-more]')).toBe(
+      'Si una comisión depende de un dato que no sabes, aquí cuenta la lectura más baja.',
+    );
+  });
+
+  it('locked with nothing to claim, each cost still shows its card', () => {
+    const r = review({ deedOn: d('2021-05-10'), invoices: [invoice('notary_loan', null)] });
+    expect(r.offerPass).toBe(false);
+    const root = rendered(r, true);
+    expect(cards(root, '[data-expenses]').length).toBeGreaterThan(0);
+    expect(text(root, '[data-lead]')).toBe(plain(tr('client.mortgage.result.lead')));
   });
 
   it('a mortgage outside the review says why and works nothing out', () => {
