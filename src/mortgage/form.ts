@@ -38,6 +38,7 @@ export const SHEETS = [
   'vencimiento',
   'apertura',
   'otras',
+  'comision',
   'facturas',
   'notaria',
   'registro',
@@ -86,6 +87,7 @@ export const SHEET_FIELDS: Readonly<Record<Sheet, readonly MortgageFormField[]>>
   vencimiento: ['earlyTermination', 'missedInstalments'],
   apertura: ['openingFee', 'openingFeeAmount', 'duplicateFee'],
   otras: ['roundingUp', 'insuranceRequired'],
+  comision: ['deedPercentFixed', 'deedPercentVariable'],
   facturas: ['hasInvoices'],
   notaria: ['notaryLoan', 'notaryMixed'],
   registro: ['registryMortgage', 'registryMixed'],
@@ -263,6 +265,11 @@ function read(form: HTMLFormElement, today: CivilDate): Reading {
   const consumer = answer('consumer');
   const rateType = choice('rateType', RATE_TYPES);
   const rateRevisionMonths = count('revisionMonths');
+  // The compensation for early repayment the deed itself sets, by rate; optional, so the caps of
+  // the law stand when it is left blank.
+  const deedFixed = rateType === 'fixed' || rateType === 'mixed' ? rate('deedPercentFixed') : null;
+  const deedVariable =
+    rateType === 'variable' || rateType === 'mixed' ? rate('deedPercentVariable') : null;
   const expensesClause = choice('expensesClause', EXPENSES_CLAUSE);
 
   // A clause not asked (a floor on a fixed rate) is left out; one asked carries its answer.
@@ -370,8 +377,10 @@ function read(form: HTMLFormElement, today: CivilDate): Reading {
       // Not asked without invoices, when it changes nothing.
       agreementOnExpenses: agreement ?? null,
       prepaymentOption,
-      // The deed's own percentages are not asked: the caps come from the law.
-      deedPercents: {},
+      deedPercents: {
+        ...(deedFixed === null ? {} : { fixed: deedFixed }),
+        ...(deedVariable === null ? {} : { variable: deedVariable }),
+      },
       operations,
       clauses,
     },
@@ -387,8 +396,8 @@ const FIELD_OF: Readonly<Record<Exclude<MortgageField, 'invoices.total'>, Mortga
   'invoices.paidOn': 'paidOn',
   'invoices.supplied': 'agencyTax',
   alreadyReturned: 'returned',
-  'deedPercents.variable': 'prepaymentOption',
-  'deedPercents.fixed': 'prepaymentOption',
+  'deedPercents.variable': 'deedPercentVariable',
+  'deedPercents.fixed': 'deedPercentFixed',
   'operations.on': 'operationOn',
   'operations.principal': 'operationPrincipal',
   'operations.feeCharged': 'operationFee',

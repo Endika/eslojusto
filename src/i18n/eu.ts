@@ -5282,6 +5282,11 @@ export const eu: Translation = {
   'mortgage.rate.type.mixed': 'Mistoa',
   'mortgage.rate.revision': 'Zenbat hilabetean behin berrikusten den tasa',
   'mortgage.rate.revision_hint': '6 edo 12 izan ohi da. Ez badakizu, hutsik.',
+  'mortgage.rate.deed_percent_question': 'Amortizatzeagatiko komisioa',
+  'mortgage.rate.deed_percent_fixed': 'Tasa finkoarekin (%)',
+  'mortgage.rate.deed_percent_variable': 'Tasa aldakorrarekin (%)',
+  'mortgage.rate.deed_percent_hint':
+    'Aukerakoa. Eskrituran «compensación por desistimiento» deitzen zaio normalean. Ez badakizu, utzi hutsik: legearen muga erabiltzen da.',
   'mortgage.expenses_clause.question': 'Gastuen klausula',
   'mortgage.expenses_clause.present':
     'Zure eskriturak gastuak mailegua eskatzen duenaren kontura jartzen dituen klausula bat du?',

@@ -197,6 +197,7 @@ const MORTGAGE_SECTIONS = [
   'indice',
   'demora',
   'otras',
+  'comision',
   'facturas',
   'notaria',
   'registro',

@@ -5171,6 +5171,11 @@ export const gl: Translation = {
   'mortgage.rate.type.mixed': 'Mixto',
   'mortgage.rate.revision': 'Cada cantos meses se revisa o tipo',
   'mortgage.rate.revision_hint': 'Adoita ser 6 ou 12. Se non o sabes, en branco.',
+  'mortgage.rate.deed_percent_question': 'A comisión por amortizar',
+  'mortgage.rate.deed_percent_fixed': 'Con tipo fixo (%)',
+  'mortgage.rate.deed_percent_variable': 'Con tipo variable (%)',
+  'mortgage.rate.deed_percent_hint':
+    'Opcional. Na escritura adoita chamarse «compensación por desistimiento». Se non a sabes, en branco: úsase o límite da lei.',
   'mortgage.expenses_clause.question': 'A cláusula de gastos',
   'mortgage.expenses_clause.present':
     'A túa escritura ten unha cláusula que pon os gastos a cargo de quen pide o préstamo?',

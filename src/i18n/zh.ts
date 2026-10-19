@@ -4907,6 +4907,11 @@ export const zh: Translation = {
   'mortgage.rate.type.mixed': '混合',
   'mortgage.rate.revision': '利率每隔几个月调整一次',
   'mortgage.rate.revision_hint': '通常是6或12。如果不知道，请留空。',
+  'mortgage.rate.deed_percent_question': '提前还款手续费',
+  'mortgage.rate.deed_percent_fixed': '固定利率（%）',
+  'mortgage.rate.deed_percent_variable': '浮动利率（%）',
+  'mortgage.rate.deed_percent_hint':
+    '选填。公证契约中通常称为«compensación por desistimiento»。如果不知道，请留空：将使用法律上限。',
   'mortgage.expenses_clause.question': '费用条款',
   'mortgage.expenses_clause.present': '您的公证契约中是否有一项条款，规定费用由借款人承担？',
   'mortgage.expenses_clause.present_hint':

@@ -236,6 +236,38 @@ describe('the mortgage form', () => {
   });
 });
 
+describe('the compensation the deed sets', () => {
+  const percents = (change: Values) => {
+    const r = read(change);
+    return 'input' in r ? r.input?.deedPercents : undefined;
+  };
+
+  it('reads the one for the rate the deed has, and both for a mixed one', () => {
+    expect(percents({ deedPercentVariable: '0,15', deedPercentFixed: '1' })).toEqual({
+      variable: 0.15,
+    });
+    expect(percents({ rateType: 'fixed', revisionMonths: null, deedPercentFixed: '1,5' })).toEqual({
+      fixed: 1.5,
+    });
+    expect(
+      percents({ rateType: 'mixed', deedPercentFixed: '2', deedPercentVariable: '0,25' }),
+    ).toEqual({ fixed: 2, variable: 0.25 });
+  });
+
+  it('leaves it out when blank: the caps of the law stand', () => {
+    expect(percents({ deedPercentVariable: '' })).toEqual({});
+  });
+
+  it('puts a percentage the engine refuses on its own field', () => {
+    expect(read({ deedPercentVariable: '45' })).toMatchObject({
+      errors: [{ field: 'deedPercentVariable', code: 'percent_range' }],
+    });
+    expect(read({ deedPercentVariable: 'medio' })).toMatchObject({
+      errors: [{ field: 'deedPercentVariable', code: 'invalid_rate' }],
+    });
+  });
+});
+
 describe('the door', () => {
   const scopeOf = (change: Values) => gate(form({ ...DEED, ...change }));
 

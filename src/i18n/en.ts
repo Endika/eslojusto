@@ -5254,6 +5254,11 @@ export const en: Translation = {
   'mortgage.rate.type.mixed': 'Mixed',
   'mortgage.rate.revision': 'How often the rate is revised, in months',
   'mortgage.rate.revision_hint': "Usually 6 or 12. If you don't know, leave it blank.",
+  'mortgage.rate.deed_percent_question': 'The early repayment fee',
+  'mortgage.rate.deed_percent_fixed': 'With a fixed rate (%)',
+  'mortgage.rate.deed_percent_variable': 'With a variable rate (%)',
+  'mortgage.rate.deed_percent_hint':
+    'Optional. In the deed it is usually called «compensación por desistimiento». If you do not know it, leave it blank: the legal cap is used.',
   'mortgage.expenses_clause.question': 'The expenses clause',
   'mortgage.expenses_clause.present':
     'Does your deed have a clause placing the costs on whoever takes out the loan?',

@@ -5402,6 +5402,11 @@ export const fr: Translation = {
   'mortgage.rate.type.mixed': 'Mixte',
   'mortgage.rate.revision': 'Tous les combien de mois le taux est révisé',
   'mortgage.rate.revision_hint': 'Généralement 6 ou 12. Si vous ne le savez pas, laissez vide.',
+  'mortgage.rate.deed_percent_question': "L'indemnité de remboursement anticipé",
+  'mortgage.rate.deed_percent_fixed': 'À taux fixe (%)',
+  'mortgage.rate.deed_percent_variable': 'À taux variable (%)',
+  'mortgage.rate.deed_percent_hint':
+    "Facultatif. Dans l'acte, elle s'appelle souvent «compensación por desistimiento». Si vous ne la connaissez pas, laissez vide\u00a0: le plafond légal s'applique.",
   'mortgage.expenses_clause.question': 'La clause de frais',
   'mortgage.expenses_clause.present':
     'Votre acte contient-il une clause qui met les frais à la charge de la personne qui demande le prêt\u00a0?',

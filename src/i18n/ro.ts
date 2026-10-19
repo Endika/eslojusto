@@ -5299,6 +5299,11 @@ export const ro: Translation = {
   'mortgage.rate.type.mixed': 'Mixtă',
   'mortgage.rate.revision': 'La câte luni se revizuiește dobânda',
   'mortgage.rate.revision_hint': 'De obicei 6 sau 12. Dacă nu știi, lasă câmpul gol.',
+  'mortgage.rate.deed_percent_question': 'Comisionul de rambursare anticipată',
+  'mortgage.rate.deed_percent_fixed': 'Cu dobândă fixă (%)',
+  'mortgage.rate.deed_percent_variable': 'Cu dobândă variabilă (%)',
+  'mortgage.rate.deed_percent_hint':
+    'Opțional. În actul notarial se numește de obicei «compensación por desistimiento». Dacă nu o știi, lasă câmpul gol: se folosește plafonul legal.',
   'mortgage.expenses_clause.question': 'Clauza privind cheltuielile',
   'mortgage.expenses_clause.present':
     'Actul tău notarial are o clauză care pune costurile în sarcina celui care ia împrumutul?',
