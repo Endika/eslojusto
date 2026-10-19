@@ -3265,7 +3265,10 @@ export const ro: Translation = {
     'Îmi dau consimțământul explicit ca un model de IA să citească aceste documente și să completeze formularul. Știu că pot conține date personale, cum ar fi nume, DNI, adrese sau numere de cont. Sunt citite în Uniunea Europeană și nu sunt păstrate.',
   'rental.pass.title': 'Calculul detaliat, raportul și scrisorile',
   'rental.pass.text':
-    'Pentru 4,99 € vezi calculul pas cu pas pentru fiecare componentă (lună cu lună și an cu an, cu indicele, plafonul care se aplică și sursele legale) și descarci raportul în PDF și, dacă verificarea ta are cifre pentru ele, scrisorile despre garanție și despre majorări. Sunt generate pe dispozitivul tău.',
+    'Pentru 4,99 € vezi care sunt componentele și calculul pas cu pas pentru fiecare (lună cu lună și an cu an, cu indicele, plafonul care se aplică și sursele legale) și descarci raportul în PDF și, dacă verificarea ta are cifre pentru ele, scrisorile despre garanție și despre majorări. Sunt generate pe dispozitivul tău.',
+  'rental.pass.claim_title': 'Care sunt componentele și cât iese la fiecare',
+  'rental.pass.quiet_text':
+    'Cu datele pe care le-ai introdus, nimic nu depășește ce permite legea. Dacă vrei totuși să le ai în scris, raportul PDF cu fiecare componentă costă 4,99 €.',
   'rental.pass.price':
     '4,99 €, cu TVA (IVA) inclus. O singură plată, fără cont și fără abonament. Permisul (pase) durează 7 zile și funcționează doar în acest browser, inclusiv pentru verificarea lichidării finale: în acest timp poți reface sau corecta verificarea, poți citi până la 15 seturi de documente și poți vedea din nou calculul detaliat și descărca raportul și scrisorile fără să plătești încă o dată. Pe alt dispozitiv, într-o fereastră privată sau dacă ștergi datele de navigare, se pierde.',
   'rental.pass.paid_help':
@@ -3800,6 +3803,8 @@ export const ro: Translation = {
   'client.rental.letter.rent.filename': 'eslojusto-carta-renta.pdf',
   'client.rental.result.lead_locked':
     'Fiecare componentă, cu rezultatul ei rotunjit și norma pe care se sprijină.',
+  'client.rental.result.lead_unnamed':
+    'Ce iese în total, rotunjit. Care sunt componentele, cu calculul lor și norma pe care se sprijină, vin cu permisul.',
   'client.rental.result.lead_out_of_scope':
     'Cu ce ai răspuns, această verificare nu calculează nimic.',
   'client.rental.out_of_scope.status': 'Această verificare nu acoperă tipul tău de contract',

@@ -554,7 +554,10 @@ export const es = {
     'Doy mi consentimiento explícito para que una IA lea estos documentos y rellene el formulario. Sé que pueden incluir datos personales, como nombres, DNI, direcciones o números de cuenta. Se leen en la Unión Europea y no se guardan.',
   'rental.pass.title': 'El detalle, el informe y las cartas',
   'rental.pass.text':
-    'Por 4,99 € ves el cálculo paso a paso de cada partida (mes a mes y año a año, con el índice, el tope que aplica y las fuentes legales) y descargas el informe en PDF y, si tu revisión tiene cifras para ellas, las cartas sobre la fianza y las subidas. Se generan en tu dispositivo.',
+    'Por 4,99 € ves qué partidas son y el cálculo paso a paso de cada una (mes a mes y año a año, con el índice, el tope que aplica y las fuentes legales) y descargas el informe en PDF y, si tu revisión tiene cifras para ellas, las cartas sobre la fianza y las subidas. Se generan en tu dispositivo.',
+  'rental.pass.claim_title': 'Qué partidas son y cuánto sale en cada una',
+  'rental.pass.quiet_text':
+    'Con los datos que has metido, nada sale por encima de lo que permite la ley. Si aun así quieres tenerlo por escrito, el informe en PDF con cada partida cuesta 4,99 €.',
   'rental.pass.price':
     '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para la revisión del finiquito: en ese tiempo puedes rehacer o corregir tu revisión, leer hasta 15 paquetes de documentos y volver a ver el detalle y descargar el informe y las cartas sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
   'rental.pass.paid_help':
@@ -3459,6 +3462,8 @@ export const es = {
   'client.rental.letter.rent.filename': 'eslojusto-carta-renta.pdf',
   'client.rental.result.lead_locked':
     'Cada partida con su resultado redondeado y la norma en que se apoya.',
+  'client.rental.result.lead_unnamed':
+    'Lo que sale en total, redondeado. Qué partidas son, con su cálculo y la norma en que se apoya, va con el pase.',
   'client.rental.result.lead_out_of_scope':
     'Con lo que has contestado, esta revisión no calcula nada.',
   'client.rental.out_of_scope.status': 'Esta revisión no cubre tu tipo de contrato',

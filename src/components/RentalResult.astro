@@ -95,9 +95,10 @@ const tx = (key: Key) => t(lang, key);
       </div>
     </section>
 
-    <div class="review__items" data-items></div>
-
+    {/* Right under the verdict, so it is not lost among the items. */}
     {documents && <PassOffer lang={lang} review="rental" />}
+
+    <div class="review__items" data-items></div>
 
     <section class="item" data-in-scope aria-labelledby="information-title">
       <div class="sheet">

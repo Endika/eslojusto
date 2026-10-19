@@ -554,10 +554,11 @@ const inScopeParts = (root: ParentNode) => [
   ...root.querySelectorAll<HTMLElement>('[data-in-scope]'),
 ];
 
-// The free summary always: the verdict of each item, rounded, the doubts and the totals, the
-// information blocks folded and what was not looked at. The detail (each reading's figures, the
-// calculation and the sources) is cloned in only when it may be shown, so a locked result never
-// carries it, not even hidden.
+// The free summary always: the headline and the totals, the information blocks folded and what was
+// not looked at. Each item's verdict, rounded, shows too unless there is something to claim: then
+// which items they are is the pass's. The detail (each reading's figures, the calculation and the
+// sources) is cloned in only when it may be shown, so a locked result never carries it, not even
+// hidden.
 export function renderRentalResult(
   root: HTMLElement,
   { review, input }: RentalResultData,
@@ -566,12 +567,19 @@ export function renderRentalResult(
 ): void {
   find(root, '[data-out-of-scope]').hidden = true;
   for (const el of inScopeParts(root)) el.hidden = false;
+  const unnamed = locked && review.offerPass;
   find(root, '[data-lead]').textContent = tr(
-    locked ? 'client.rental.result.lead_locked' : 'client.rental.result.lead',
+    unnamed
+      ? 'client.rental.result.lead_unnamed'
+      : locked
+        ? 'client.rental.result.lead_locked'
+        : 'client.rental.result.lead',
   );
   renderTotals(root, review, tr);
   const items = find(root, '[data-items]');
-  items.replaceChildren(...review.items.map((item, i) => renderItem(root, item, input, i, tr)));
+  items.replaceChildren(
+    ...(unnamed ? [] : review.items.map((item, i) => renderItem(root, item, input, i, tr))),
+  );
   if (!locked)
     [...items.querySelectorAll<HTMLElement>('[data-item]')].forEach((card, i) => {
       const item = review.items[i];

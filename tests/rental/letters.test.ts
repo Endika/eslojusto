@@ -314,6 +314,12 @@ describe('the rental case', () => {
     expect(rentalCase(completed(contract()), TODAY).offer).toBe(false);
   });
 
+  it('with nothing over the law, still sells it quietly; with something, or nothing entered, not', () => {
+    expect(rentalCase(completed(contract({ advanceMonths: 1 })), TODAY).quiet).toBe(true);
+    expect(rentalCase(completed(riseAboveIrav), TODAY).quiet).toBe(false);
+    expect(rentalCase(completed(contract({ deposit: null })), TODAY).quiet).toBe(false);
+  });
+
   it('builds each letter by its kind', () => {
     const both = completed({ ...riseAboveIrav, moveOut: depositOut.moveOut });
     const paid = rentalCase(both, TODAY);

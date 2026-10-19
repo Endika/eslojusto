@@ -3,6 +3,7 @@ import type { PaidReview } from '../documents/ports';
 import { depositLetter, rentalLetterKinds, rentLetter } from './letters';
 import type { CompletedRentalReview } from './ports';
 import { rentalReport } from './report';
+import { headline } from './summary';
 
 // A rental review as the pass sees it: offered when something is paid over or owed in every
 // reading; it unlocks the detail, the report and the letters the review has figures for. `today`
@@ -10,6 +11,8 @@ import { rentalReport } from './report';
 export function rentalCase(r: CompletedRentalReview, today: CivilDate): PaidReview {
   return {
     offer: r.review.offerPass,
+    // With figures and nothing over the law, it is still sold, without a pitch.
+    quiet: headline(r.review) === 'nothing_found',
     letterKinds: rentalLetterKinds(r.review),
     report: (tr, day) => rentalReport(r, tr, day),
     letter: (kind, details, tr) =>

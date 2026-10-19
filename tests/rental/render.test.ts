@@ -131,7 +131,7 @@ describe('the summary of an item', () => {
         deductions: [],
       },
     });
-    const root = render(input, true);
+    const root = render(input, false);
     const card = root.querySelector('[data-item="deposit_interest"]');
     const depends = text(card?.querySelector('[data-depends]'));
     const range = /entre ([\d.,]+ €) y ([\d.,]+ €)/.exec(depends);
@@ -206,11 +206,25 @@ describe('the result', () => {
     );
   });
 
-  it('locked, the detail is not in the page at all', () => {
+  it('locked with something to claim, which items they are is not in the page at all', () => {
     const root = render(riseAboveIrav, true);
+    expect(root.querySelectorAll('[data-item]')).toHaveLength(0);
+    expect(text(root.querySelector('[data-lead]'))).toBe(
+      'Lo que sale en total, redondeado. Qué partidas son, con su cálculo y la norma en que se apoya, va con el pase.',
+    );
+    expect(text(root.querySelector('[data-totals]'))).toContain('unos 180 €');
     expect(root.querySelector('[data-detail]')).toBeNull();
     expect(root.querySelector('[data-information] details')).not.toBeNull();
     expect(root.querySelectorAll('[data-unchecked] li')).toHaveLength(5);
+  });
+
+  it('locked with nothing to claim, each item still shows its verdict, without its detail', () => {
+    const root = render(contract({ advanceMonths: 1 }), true);
+    expect(root.querySelectorAll('[data-item]').length).toBeGreaterThan(0);
+    expect(root.querySelector('[data-detail]')).toBeNull();
+    expect(text(root.querySelector('[data-lead]'))).toBe(
+      'Cada partida con su resultado redondeado y la norma en que se apoya.',
+    );
   });
 
   it('unlocked, each rise shows its index, month, publication day and cap', () => {

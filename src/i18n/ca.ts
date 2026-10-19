@@ -3197,7 +3197,10 @@ export const ca: Translation = {
     'Dono el meu consentiment explícit perquè una IA llegeixi aquests documents i ompli el formulari. Sé que poden incloure dades personals, com ara noms, DNI, adreces o números de compte. Es llegeixen a la Unió Europea i no es desen.',
   'rental.pass.title': 'El detall, l’informe i les cartes',
   'rental.pass.text':
-    'Per 4,99 € veus el càlcul pas a pas de cada partida (mes a mes i any a any, amb l’índex, el límit que s’aplica i les fonts legals) i descarregues l’informe en PDF i, si la teva revisió té xifres per a elles, les cartes sobre la fiança i les pujades. Es generen al teu dispositiu.',
+    'Per 4,99 € veus quines partides són i el càlcul pas a pas de cadascuna (mes a mes i any a any, amb l’índex, el límit que s’aplica i les fonts legals) i descarregues l’informe en PDF i, si la teva revisió té xifres per a elles, les cartes sobre la fiança i les pujades. Es generen al teu dispositiu.',
+  'rental.pass.claim_title': 'Quines partides són i quant surt en cadascuna',
+  'rental.pass.quiet_text':
+    'Amb les dades que has introduït, res no surt per sobre del que permet la llei. Si tot i així ho vols tenir per escrit, l’informe en PDF amb cada partida costa 4,99 €.',
   'rental.pass.price':
     '4,99 € amb IVA inclòs. Un sol pagament, sense compte ni subscripció. El passi dura 7 dies i només val en aquest navegador, també per a la revisió de la quitança: en aquest temps pots refer o corregir la teva revisió, llegir fins a 15 paquets de documents i tornar a veure el detall i descarregar l’informe i les cartes sense pagar una altra vegada. En un altre dispositiu, en una finestra privada o si esborres les dades de navegació, es perd.',
   'rental.pass.paid_help':
@@ -3730,6 +3733,8 @@ export const ca: Translation = {
   'client.rental.letter.rent.filename': 'eslojusto-carta-renta.pdf',
   'client.rental.result.lead_locked':
     'Cada partida amb el seu resultat arrodonit i la norma en què es basa.',
+  'client.rental.result.lead_unnamed':
+    'El que surt en total, arrodonit. Quines partides són, amb el seu càlcul i la norma en què es basa, va amb el passi.',
   'client.rental.result.lead_out_of_scope':
     'Amb el que has respost, aquesta revisió no calcula res.',
   'client.rental.out_of_scope.status': 'Aquesta revisió no cobreix el teu tipus de contracte',
