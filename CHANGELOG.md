@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.94.0](https://github.com/Endika/eslojusto/compare/v1.93.0...v1.94.0) (2026-10-19)
+
+
+### Features
+
+* **final-pay:** free summary gives only the total, and the pass stands out or is sold quietly ([e384c98](https://github.com/Endika/eslojusto/commit/e384c98126e3d8bf5662378a368aa2253c9d2fa2))
+
 ## [1.93.0](https://github.com/Endika/eslojusto/compare/v1.92.2...v1.93.0) (2026-10-19)
 
 
