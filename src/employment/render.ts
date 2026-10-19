@@ -36,6 +36,7 @@ import {
   figureOf,
   headline,
   rangeOf,
+  shortCount,
   shownOne,
   shownPair,
   sinceOf,
@@ -860,9 +861,10 @@ const inScopeParts = (root: ParentNode) => [
   ...root.querySelectorAll<HTMLElement>('[data-in-scope]'),
 ];
 
-// The free summary always: each point's verdict, the shortfall against the minimum wage rounded,
-// the «No lo sé» readings, the law's words on fixed-term contracts, the information blocks folded
-// and what was not looked at. The detail (each calculation, the full information list, the offer
+// The free summary always: the headline, the «No lo sé» readings, the information blocks folded and
+// what was not looked at. Each point's verdict, with the shortfall against the minimum wage rounded
+// and the law's words on fixed-term contracts, shows too unless there is something to claim: then
+// only how many points fall short, and which ones is the pass's. The detail (each calculation, the full information list, the offer
 // side by side and the reference figures) is cloned in only when it may be shown, so a locked
 // result never carries it, not even hidden.
 export function renderEmploymentResult(
@@ -874,8 +876,13 @@ export function renderEmploymentResult(
   find(root, '[data-out-of-scope]').hidden = true;
   for (const el of inScopeParts(root)) el.hidden = false;
   find(root, '[data-information-section]').hidden = false;
+  const unnamed = locked && review.offerPass;
   find(root, '[data-lead]').textContent = tr(
-    locked ? 'client.employment.result.lead_locked' : 'client.employment.result.lead',
+    unnamed
+      ? 'client.employment.result.lead_unnamed'
+      : locked
+        ? 'client.employment.result.lead_locked'
+        : 'client.employment.result.lead',
   );
   const partial = find(root, '[data-partial]');
   partial.hidden = !(review.scope.inScope && review.scope.partial);
@@ -883,6 +890,22 @@ export function renderEmploymentResult(
   find(root, '[data-warnings]').replaceChildren(
     ...listItems(review.warnings.map((w) => tr(`client.employment.warning.${w.code}`))),
   );
+  const count = shortCount(review);
+  const counted = find(root, '[data-count]');
+  counted.hidden = !unnamed;
+  counted.textContent = unnamed
+    ? count === 1
+      ? tr('client.employment.count_one')
+      : tr('client.employment.count_many', { n: formatInteger(count) })
+    : '';
+  if (unnamed) {
+    find(root, '[data-items]').replaceChildren();
+    renderInformation(root, review.information, tr);
+    find(root, '[data-unchecked]').replaceChildren(
+      ...listItems(review.unchecked.map((code) => tr(`client.employment.unchecked.${code}`))),
+    );
+    return;
+  }
   find(root, '[data-items]').replaceChildren(
     ...review.items.map((a, i) => itemCard(root, a, i, locked, tr)),
     ...review.clauses.map((c) => clauseCard(root, c, input, locked, tr)),

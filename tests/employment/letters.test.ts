@@ -9,6 +9,7 @@ import { formatEuros } from '../../src/calculator/number';
 import { NO_DETAILS, type LetterDetails, type LetterKind } from '../../src/documents/letter';
 import type { Block, DocumentModel } from '../../src/documents/ports';
 import { employmentCase } from '../../src/employment/case';
+import { headline } from '../../src/employment/summary';
 import {
   certificateRequest,
   companyLetter,
@@ -530,5 +531,17 @@ describe('the contract review as the pass sees it', () => {
   it('gives a review without findings neither the pass nor a letter', () => {
     const c = employmentCase(completed(contract()), TODAY, TABLES);
     expect(c).toMatchObject({ offer: false, letterKinds: [], freeLetterKinds: [] });
+  });
+
+  it('sells it quietly only when nothing is against the law', () => {
+    const clear = contract({
+      startDate: f('2026-01-01'),
+      signedOn: null,
+      schedule: null,
+      info: Object.fromEntries('abcdefghijklmnopq'.split('').map((e) => [e, 'present'])) as never,
+    });
+    expect(headline(completed(clear).review)).toBe('nothing_found');
+    expect(employmentCase(completed(clear), TODAY, TABLES).quiet).toBe(true);
+    expect(employmentCase(completed(belowMinimum), TODAY, TABLES).quiet).toBe(false);
   });
 });

@@ -2272,6 +2272,8 @@ export const ro: Translation = {
   'client.employment.result.lead': 'Fiecare punct, cu ce spune legea și norma pe care se sprijină.',
   'client.employment.result.lead_locked':
     'Fiecare punct cu rezultatul lui și norma pe care se sprijină.',
+  'client.employment.result.lead_unnamed':
+    'Câte puncte nu respectă legea. Care sunt, cu calculul lor și norma pe care se sprijină, vin cu permisul.',
   'client.employment.result.lead_out_of_scope':
     'Cu ce ai răspuns, această verificare nu calculează nimic.',
   'client.employment.partial.notice':
@@ -2288,6 +2290,8 @@ export const ro: Translation = {
   'client.employment.out_of_scope.minor':
     'Sub 18 ani există reguli proprii privind timpul de lucru și repausul. Această versiune nu le calculează: le găsești mai jos, ca informație.',
   'client.employment.headline.found': 'Există puncte care nu respectă ce prevede legea.',
+  'client.employment.count_one': 'Este un punct.',
+  'client.employment.count_many': 'Sunt {n} puncte.',
   'client.employment.headline.to_review':
     'Există puncte de verificat sau care depind de contractul tău colectiv ori de răspunsurile tale.',
   'client.employment.headline.nothing_found':
@@ -2981,7 +2985,10 @@ export const ro: Translation = {
     'Îmi dau consimțământul explicit ca un model de IA să citească aceste documente și să completeze formularul. Știu că pot conține date sensibile, cum ar fi apartenența la un sindicat, un concediu medical (baja médica) sau o dizabilitate. Sunt citite în Uniunea Europeană și nu sunt păstrate.',
   'employment.pass.title': 'Calculul detaliat, raportul și scrisoarea',
   'employment.pass.text':
-    'Pentru 4,99 € vezi calculul pas cu pas pentru fiecare punct din contractul tău (an cu an și fluturaș cu fluturaș, cu norma care se aplică și sursa ei) și descarci raportul în PDF și, dacă verificarea ta are puncte pentru ea, scrisoarea către firmă. Sunt generate pe dispozitivul tău.',
+    'Pentru 4,99 € vezi care sunt punctele din contractul tău și calculul pas cu pas pentru fiecare (an cu an și fluturaș cu fluturaș, cu norma care se aplică și sursa ei) și descarci raportul în PDF și, dacă verificarea ta are puncte pentru ea, scrisoarea către firmă. Sunt generate pe dispozitivul tău.',
+  'employment.pass.claim_title': 'Care sunt punctele și ce spune legea despre fiecare',
+  'employment.pass.quiet_text':
+    'Cu datele pe care le-ai introdus, nimic nu rămâne sub ce garantează legea și nici peste limitele ei. Dacă vrei totuși să le ai în scris, raportul PDF cu fiecare punct costă 4,99 €.',
   'employment.pass.price':
     '4,99 €, cu TVA (IVA) inclus. O singură plată, fără cont și fără abonament. Permisul (pase) durează 7 zile și funcționează doar în acest browser, inclusiv pentru verificările lichidării finale și ale închirierii: în acest timp poți reface sau corecta verificarea, poți citi până la 15 seturi de documente și poți vedea din nou calculul detaliat și descărca raportul și scrisoarea fără să plătești încă o dată. Pe alt dispozitiv, într-o fereastră privată sau dacă ștergi datele de navigare, se pierde.',
   'employment.pass.paid_help':

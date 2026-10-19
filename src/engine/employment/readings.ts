@@ -33,9 +33,12 @@ const CONCRETE: ReadonlySet<FindingStatus> = new Set([
 // A limit the collective agreement can move is only «depends on your agreement».
 const isConcrete = (f: Finding): boolean => CONCRETE.has(f.status) && !f.agreementMaySetOther;
 
+const holds = (a: Assessed): boolean =>
+  a.kind === 'single' ? isConcrete(a.finding) : a.readings.every((r) => isConcrete(r.finding));
+
 // The pass is offered only for a concrete finding that holds in every reading.
-export function offerPass(assessed: readonly Assessed[]): boolean {
-  return assessed.some((a) =>
-    a.kind === 'single' ? isConcrete(a.finding) : a.readings.every((r) => isConcrete(r.finding)),
-  );
-}
+export const offerPass = (assessed: readonly Assessed[]): boolean => assessed.some(holds);
+
+// How many points carry such a finding.
+export const concreteCount = (assessed: readonly Assessed[]): number =>
+  assessed.filter(holds).length;

@@ -2089,6 +2089,8 @@ export const zh: Translation = {
   'client.employment.error.empty_slot': '该时段的开始和结束时间相同',
   'client.employment.result.lead': '每一项都附有法律规定及其所依据的法规。',
   'client.employment.result.lead_locked': '每一项都附有结果及其所依据的法规。',
+  'client.employment.result.lead_unnamed':
+    '有多少项目不符合规定。具体是哪些，以及计算过程和所依据的法规，购买通行证后可见。',
   'client.employment.result.lead_out_of_scope': '根据您的回答，本核查不进行任何计算。',
   'client.employment.partial.notice':
     '部分核查：您的合同在2022年三月30日之前开始或签订。本核查核对工资、试用期、工时、年假和条款；临时性适用此前的规定，此版本不予核查。',
@@ -2104,6 +2106,8 @@ export const zh: Translation = {
   'client.employment.out_of_scope.minor':
     '未满18岁者在工时和休息方面有专门规定。此版本不计算这些内容：下方列出供您参考。',
   'client.employment.headline.found': '有些项目不符合法律规定的标准。',
+  'client.employment.count_one': '共一项。',
+  'client.employment.count_many': '共{n}项。',
   'client.employment.headline.to_review': '有些项目需要核查，或取决于您的集体协议或您的回答。',
   'client.employment.headline.nothing_found':
     '根据您填写的数据，没有任何项目低于法律保障的标准或超出法律规定的上限。',
@@ -2745,7 +2749,10 @@ export const zh: Translation = {
     '我明确同意由 AI 识别这些文件并填写表单。我知道其中可能包含敏感数据，例如工会会员身份、病假（baja médica）或残疾。文件在欧盟境内识别，且不会保存。',
   'employment.pass.title': '详细内容、报告和信函',
   'employment.pass.text':
-    '支付4,99 €，即可查看合同每一项的逐步计算过程（逐年、逐张工资单，附适用的法规及其来源），并下载 PDF 报告；如果您的核查中有可以写入信函的项目，还可以下载致公司的信函。报告和信函在您的设备上生成。',
+    '支付4,99 €，即可查看是合同的哪些项目以及每一项的逐步计算过程（逐年、逐张工资单，附适用的法规及其来源），并下载 PDF 报告；如果您的核查中有可以写入信函的项目，还可以下载致公司的信函。报告和信函在您的设备上生成。',
+  'employment.pass.claim_title': '是哪些项目，法律对每一项怎么规定',
+  'employment.pass.quiet_text':
+    '根据您填写的数据，没有任何项目低于法律保障的标准或超出法律规定的上限。如果您仍想留下书面记录，包含每个项目的 PDF 报告价格为4,99 €。',
   'employment.pass.price':
     '4,99 €，含增值税（IVA）。一次性付款，无需注册账户，也不是订阅。通行证有效期7天，且只在本浏览器中有效，也可用于离职结算和租房核查：在此期间，您可以重做或修改核查，识别最多15份文件包，并重新查看详细内容、下载报告和信函，无需再次付款。换一台设备、使用无痕窗口或清除浏览数据后，通行证就会丢失。',
   'employment.pass.paid_help':
