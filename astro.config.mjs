@@ -11,14 +11,13 @@ export default defineConfig({
   site: process.env.SITE ?? 'https://eslojusto.es',
   base,
   trailingSlash: 'always',
-  // Published languages, those under review (REVIEW_LANGS), and ar-test under TEST_RTL=1 to prove
-  // the RTL layout.
+  // Published languages, and ar-test under TEST_RTL=1 to prove the RTL layout.
   i18n: {
     locales: builtLangs(),
     defaultLocale: DEFAULT_LANG,
     routing: { prefixDefaultLocale: false },
   },
-  // An unpublished language is never indexed: not ar-test under TEST_RTL=1, nor one under review.
+  // An unpublished language is never indexed: ar-test under TEST_RTL=1.
   integrations: [
     sitemap({
       filter: (page) =>

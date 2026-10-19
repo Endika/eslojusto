@@ -2,8 +2,6 @@ import { defineConfig, devices } from '@playwright/test';
 
 // The RTL project needs a TEST_RTL=1 build, so it only exists when that build is asked for.
 const rtl = process.env['TEST_RTL'] === '1';
-// The review project needs a build that serves an unpublished language to its reviewer.
-const review = process.env['TEST_REVIEW'] === '1';
 // The analytics project needs a build with an analytics key; every other build has none.
 const analytics = process.env['TEST_ANALYTICS'] === '1';
 // The documents project needs a build with a (fake) documents API; the page routes it.
@@ -27,7 +25,7 @@ const mortgageSpecs = /[\\/]mortgage[^\\/]*\.spec\.ts$/;
 const bills = process.env['TEST_BILLS'] === '1';
 const billsSpecs = /[\\/]bills\.spec\.ts$/;
 const optInSpecs = [
-  /(rtl|review|analytics|documents)\.spec\.ts/,
+  /(rtl|analytics|documents)\.spec\.ts/,
   rentalSpecs,
   employmentSpecs,
   erteSpecs,
@@ -40,7 +38,6 @@ const optInSpecs = [
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
 const buildEnv = {
-  ...(review ? { REVIEW_LANGS: 'eu' } : {}),
   // The household, insurance and credit projects also measure their own events, so their builds
   // have a test analytics key.
   ...(analytics || household || insurance || credit ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
@@ -50,15 +47,15 @@ const buildEnv = {
         PUBLIC_API_CHECKOUT_URL: 'https://checkout.api.eslojusto.test/',
         PUBLIC_API_PASS_URL: 'https://pass.api.eslojusto.test/',
         PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
-        // A language under review, for the papers a translated page keeps in Spanish.
-        REVIEW_LANGS: 'eu',
       }
     : {}),
 };
 
 export default defineConfig({
   testDir: 'tests/e2e',
-  use: { baseURL: `http://localhost:${port}/` },
+  // A Spanish browser, as most visitors have: any other published language gets the page's offer
+  // to switch, which languages.spec.ts covers.
+  use: { baseURL: `http://localhost:${port}/`, locale: 'es-ES' },
   webServer: {
     command: `npm run build && npm run preview -- --port ${port}`,
     url: `http://localhost:${port}/`,
@@ -70,9 +67,6 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] }, testIgnore: optInSpecs },
     ...(rtl
       ? [{ name: 'rtl', use: { ...devices['Desktop Chrome'] }, testMatch: /rtl\.spec\.ts/ }]
-      : []),
-    ...(review
-      ? [{ name: 'review', use: { ...devices['Desktop Chrome'] }, testMatch: /review\.spec\.ts/ }]
       : []),
     ...(analytics
       ? [

@@ -59,28 +59,29 @@ describe.skipIf(!built)('the breadcrumbs of the build', () => {
     }
   });
 
-  it('show the trail on every page below the home and declare the same one', () => {
+  it('cover pages below the home', () => {
     expect(below.length).toBeGreaterThan(0);
-    for (const path of below) {
-      const doc = parse(path);
-      expect(doc.querySelectorAll('main nav.crumbs'), `${path}: one visible trail`).toHaveLength(1);
-      const shown = visibleTrail(doc, path);
-      expect(shown.length, `${path}: home and the page at least`).toBeGreaterThanOrEqual(2);
-      expect(homes.has(shown[0]?.path ?? ''), `${path}: starts at the home`).toBe(true);
-      expect(shown.at(-1)?.path, `${path}: ends on the page itself`).toBe(path);
+  });
 
-      const lists = breadcrumbLists(doc);
-      expect(lists, `${path}: one BreadcrumbList`).toHaveLength(1);
-      const declared = (lists[0]?.itemListElement ?? []).map(({ position, name, item }) => ({
-        position,
-        name,
-        path: new URL(item).pathname,
-      }));
-      expect(declared, `${path}: the JSON-LD matches the visible trail`).toEqual(
-        shown.map((crumb, i) => ({ position: i + 1, ...crumb })),
-      );
-      const canonical = doc.querySelector('link[rel="canonical"]')?.getAttribute('href');
-      if (canonical) expect(lists[0]?.itemListElement.at(-1)?.item).toBe(canonical);
-    }
+  it.each(below)('%s shows its trail and declares the same one', (path) => {
+    const doc = parse(path);
+    expect(doc.querySelectorAll('main nav.crumbs'), `${path}: one visible trail`).toHaveLength(1);
+    const shown = visibleTrail(doc, path);
+    expect(shown.length, `${path}: home and the page at least`).toBeGreaterThanOrEqual(2);
+    expect(homes.has(shown[0]?.path ?? ''), `${path}: starts at the home`).toBe(true);
+    expect(shown.at(-1)?.path, `${path}: ends on the page itself`).toBe(path);
+
+    const lists = breadcrumbLists(doc);
+    expect(lists, `${path}: one BreadcrumbList`).toHaveLength(1);
+    const declared = (lists[0]?.itemListElement ?? []).map(({ position, name, item }) => ({
+      position,
+      name,
+      path: new URL(item).pathname,
+    }));
+    expect(declared, `${path}: the JSON-LD matches the visible trail`).toEqual(
+      shown.map((crumb, i) => ({ position: i + 1, ...crumb })),
+    );
+    const canonical = doc.querySelector('link[rel="canonical"]')?.getAttribute('href');
+    if (canonical) expect(lists[0]?.itemListElement.at(-1)?.item).toBe(canonical);
   });
 });
