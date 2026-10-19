@@ -260,6 +260,29 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
       />
     </fieldset>
 
+    <fieldset {...sheet('comision')}>
+      <h2 class="question" id="question-comision" tabindex="-1">
+        {tx('mortgage.rate.deed_percent_question')}
+      </h2>
+      <Field
+        name="deedPercentFixed"
+        label={tx('mortgage.rate.deed_percent_fixed')}
+        kind="amount"
+        attributes={when('rateType:fixed mixed')}
+        extraHints={['hint-deed-percent']}
+      />
+      <Field
+        name="deedPercentVariable"
+        label={tx('mortgage.rate.deed_percent_variable')}
+        kind="amount"
+        attributes={when('rateType:variable mixed')}
+        extraHints={['hint-deed-percent']}
+      />
+      <p class="hint" id="hint-deed-percent">
+        {tx('mortgage.rate.deed_percent_hint')}
+      </p>
+    </fieldset>
+
     <fieldset {...sheet('facturas')}>
       <h2 class="question" id="question-facturas" tabindex="-1">
         {tx('mortgage.invoices.question')}

@@ -5215,6 +5215,11 @@ export const ca: Translation = {
   'mortgage.rate.type.mixed': 'Mixt',
   'mortgage.rate.revision': 'Cada quants mesos es revisa el tipus',
   'mortgage.rate.revision_hint': 'Sol ser 6 o 12. Si no ho saps, en blanc.',
+  'mortgage.rate.deed_percent_question': 'La comissió per amortitzar',
+  'mortgage.rate.deed_percent_fixed': 'Amb tipus fix (%)',
+  'mortgage.rate.deed_percent_variable': 'Amb tipus variable (%)',
+  'mortgage.rate.deed_percent_hint':
+    'Opcional. A l’escriptura sol dir-se «compensación por desistimiento». Si no la saps, en blanc: s’aplica el límit de la llei.',
   'mortgage.expenses_clause.question': 'La clàusula de despeses',
   'mortgage.expenses_clause.present':
     'La teva escriptura té una clàusula que posa les despeses a càrrec de qui demana el préstec?',

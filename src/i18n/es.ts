@@ -5640,6 +5640,11 @@ export const es = {
   'mortgage.rate.type.mixed': 'Mixto',
   'mortgage.rate.revision': 'Cada cuántos meses se revisa el tipo',
   'mortgage.rate.revision_hint': 'Suele ser 6 o 12. Si no lo sabes, en blanco.',
+  'mortgage.rate.deed_percent_question': 'La comisión por amortizar',
+  'mortgage.rate.deed_percent_fixed': 'Con tipo fijo (%)',
+  'mortgage.rate.deed_percent_variable': 'Con tipo variable (%)',
+  'mortgage.rate.deed_percent_hint':
+    'Opcional. En la escritura suele llamarse «compensación por desistimiento». Si no la sabes, en blanco: se usa el tope de la ley.',
 
   'mortgage.expenses_clause.question': 'La cláusula de gastos',
   'mortgage.expenses_clause.present':

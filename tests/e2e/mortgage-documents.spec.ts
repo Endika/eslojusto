@@ -387,6 +387,9 @@ test('a full pack fills every sheet, each clause shown word for word to be confi
     'No',
   );
   await next(page);
+  // Optional: left blank, the caps of the law stand.
+  await expect(sheet(page, 'La comisión por amortizar')).toBeVisible();
+  await next(page);
 
   await expect(
     group(
@@ -450,7 +453,7 @@ test('an agency’s purchase file is left out, and its statement of funds blocks
   await expect(
     page.getByRole('heading', { name: 'Tu hipoteca', level: 2, exact: true }),
   ).toBeFocused();
-  for (let i = 0; i < 14; i += 1) {
+  for (let i = 0; i < 15; i += 1) {
     if (i === 2)
       await choose(
         sheet(page, 'La escritura'),

@@ -135,6 +135,9 @@ async function fill(page: Page, d: Deed) {
     'No',
   );
   await next(page);
+  // Optional: left blank, the caps of the law stand.
+  await expect(sheet(page, 'La comisión por amortizar')).toBeVisible();
+  await next(page);
 
   const i = d.invoices;
   await choose(
@@ -337,6 +340,9 @@ test('every sheet of the longest path fits in 360×640', async ({ page }) => {
     '¿La escritura te pide contratar un seguro u otro producto con el banco?',
     'Sí',
   );
+  await next(page);
+  // Optional: left blank, the caps of the law stand.
+  await expect(sheet(page, 'La comisión por amortizar')).toBeVisible();
   await next(page);
   await choose(
     sheet(page, 'Tus facturas'),

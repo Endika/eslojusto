@@ -19,6 +19,7 @@ const SECTION_OF_STEP: Record<Step, string> = {
   vencimiento: 'salary',
   apertura: 'salary',
   otras: 'salary',
+  comision: 'salary',
   facturas: 'settlement',
   notaria: 'settlement',
   registro: 'settlement',

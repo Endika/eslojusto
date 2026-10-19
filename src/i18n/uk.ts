@@ -5305,6 +5305,11 @@ export const uk: Translation = {
   'mortgage.rate.type.mixed': 'Змішана',
   'mortgage.rate.revision': 'Як часто (у місяцях) переглядається ставка',
   'mortgage.rate.revision_hint': 'Зазвичай 6 або 12. Якщо ви не знаєте, залиште порожнім.',
+  'mortgage.rate.deed_percent_question': 'Комісія за дострокове погашення',
+  'mortgage.rate.deed_percent_fixed': 'При фіксованій ставці (%)',
+  'mortgage.rate.deed_percent_variable': 'При змінній ставці (%)',
+  'mortgage.rate.deed_percent_hint':
+    'Необов’язково. У нотаріальному акті вона зазвичай називається «compensación por desistimiento». Якщо ви її не знаєте, залиште порожнім: застосовується граничний рівень закону.',
   'mortgage.expenses_clause.question': 'Умова про витрати',
   'mortgage.expenses_clause.present':
     'Чи є у вашому нотаріальному акті умова, яка покладає витрати на позичальника?',

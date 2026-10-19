@@ -5169,6 +5169,11 @@ export const ar: Translation = {
   'mortgage.rate.type.mixed': 'مختلط',
   'mortgage.rate.revision': 'كل كم شهرًا يُراجَع السعر',
   'mortgage.rate.revision_hint': 'عادةً 6 أو 12. إذا كنت لا تعرف، فاتركه فارغًا.',
+  'mortgage.rate.deed_percent_question': 'عمولة السداد المبكر',
+  'mortgage.rate.deed_percent_fixed': 'مع السعر الثابت (%)',
+  'mortgage.rate.deed_percent_variable': 'مع السعر المتغير (%)',
+  'mortgage.rate.deed_percent_hint':
+    'اختياري. تُسمّى في الصك عادةً \u2068«compensación por desistimiento»\u2069. إذا لم تكن تعرفها فاتركها فارغة: يُستخدم الحد الأقصى القانوني.',
   'mortgage.expenses_clause.question': 'بند المصاريف',
   'mortgage.expenses_clause.present': 'هل يتضمّن صكّك بندًا يحمّل المصاريف لمن يطلب القرض؟',
   'mortgage.expenses_clause.present_hint':

@@ -18,6 +18,8 @@ export const MORTGAGE_FIELDS = [
   'consumer',
   'rateType',
   'revisionMonths',
+  'deedPercentFixed',
+  'deedPercentVariable',
   'expensesClause',
   'floor',
   'floorPercent',

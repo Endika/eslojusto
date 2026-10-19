@@ -967,6 +967,7 @@ test('the mortgage review sends sheets, field names and its outcome in codes, ne
     'No',
   );
   await next();
+  await next();
   await choose(
     'Tus facturas',
     '¿Tienes las facturas o los importes de los gastos de la hipoteca?',
@@ -1025,6 +1026,7 @@ test('the mortgage review sends sheets, field names and its outcome in codes, ne
     'vencimiento',
     'apertura',
     'otras',
+    'comision',
     'facturas',
     'notaria',
     'registro',
