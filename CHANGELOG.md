@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.96.0](https://github.com/Endika/eslojusto/compare/v1.95.0...v1.96.0) (2026-10-19)
+
+
+### Features
+
+* **employment:** free result counts the points when something is claimable; quiet pass otherwise ([2a6abd9](https://github.com/Endika/eslojusto/commit/2a6abd98004c0a3ddbb9dd95c3fbb1a38a93ac8c))
+
 ## [1.95.0](https://github.com/Endika/eslojusto/compare/v1.94.0...v1.95.0) (2026-10-19)
 
 
