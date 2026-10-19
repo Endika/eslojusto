@@ -378,6 +378,10 @@ describe('a deposit taken as at least what came back and was kept', () => {
   });
 });
 
+// Seeded, so each run is the same; it takes about 3.5 s alone, which a full parallel run can push
+// past the default 5 s.
+const SLOW = { timeout: 30_000 };
+
 describe('the part of the deposit above one month', () => {
   // mulberry32: small, seeded and deterministic.
   function prng(seed: number) {
@@ -407,7 +411,7 @@ describe('the part of the deposit above one month', () => {
     return total;
   };
 
-  it('is never put where another split would give less interest', () => {
+  it('is never put where another split would give less interest', SLOW, () => {
     const g = prng(36042026);
     const rent = 1000;
     let checked = 0;

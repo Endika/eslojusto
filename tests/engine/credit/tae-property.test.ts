@@ -59,6 +59,10 @@ function randomLoan(g: ReturnType<typeof prng>): CreditInput {
   });
 }
 
+// Seeded, so each run is the same; it takes about 3.5 s alone, which a full parallel run can push
+// past the default 5 s.
+const SLOW = { timeout: 30_000 };
+
 describe('APR properties', () => {
   it('without charges and with a level instalment, is the nominal rate compounded monthly', () => {
     const g = prng(20_261_009);
@@ -69,7 +73,7 @@ describe('APR properties', () => {
     }
   });
 
-  it('never goes down when a charge is added, however it is paid', () => {
+  it('never goes down when a charge is added, however it is paid', SLOW, () => {
     const g = prng(7);
     const ways: readonly ChargePayment[] = ['deducted', 'financed', 'paid'];
     for (let n = 0; n < CASES; n++) {
