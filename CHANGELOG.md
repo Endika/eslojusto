@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.90.1](https://github.com/Endika/eslojusto/compare/v1.90.0...v1.90.1) (2026-10-19)
+
+
+### Bug Fixes
+
+* **mortgage:** say what the Court of Justice held, read at its source ([4293874](https://github.com/Endika/eslojusto/commit/4293874cd6db51546757d8cb00c52d1c02ef6a8f))
+
 ## [1.90.0](https://github.com/Endika/eslojusto/compare/v1.89.2...v1.90.0) (2026-10-19)
 
 
