@@ -58,11 +58,15 @@ describe('household rule table', () => {
     expect(r.supersededBy).toBeNull();
   });
 
-  it('watches the three articles the rules rest on, in RD 1620/2011', () => {
+  it('watches every article the rules rest on', () => {
     expect(ARTICLE_WATCH.articles.map((a) => [a.norm, a.block])).toEqual([
       ['rd1620_2011', 'a8'],
       ['rd1620_2011', 'a9'],
       ['rd1620_2011', 'a11'],
+      ['et', 'a49'],
+      ['lgss', 'a267'],
+      ['lgss', 'a269'],
+      ['cc', 'art5'],
     ]);
     // The versions in force the BOE API lists for each block.
     expect(
@@ -71,13 +75,21 @@ describe('household rule table', () => {
       ['a8', '2011-11-18', 'BOE-A-2011-17975'],
       ['a9', '2013-12-22', 'BOE-A-2013-13426'],
       ['a11', '2022-09-09', 'BOE-A-2022-14680'],
+      ['a49', '2025-05-01', 'BOE-A-2025-8567'],
+      ['a267', '2023-03-02', 'BOE-A-2023-5365'],
+      ['a269', '2024-05-23', 'BOE-A-2024-10235'],
+      ['art5', '1974-07-29', 'BOE-A-1974-1083'],
     ]);
-    const anchors = new Set(
+    // Each article a rule links to, by its BOE id and anchor, is one of them.
+    const cited = new Set(
       Object.values(RULES)
-        .filter((r) => r.url.includes('BOE-A-2011-17975#'))
-        .map((r) => r.url.split('#')[1]),
+        .filter((r) => r.url.includes('#'))
+        .map((r) => `${r.url.replace(/^.*id=/, '').split('#')[0]}#${r.url.split('#')[1]}`),
     );
-    expect(anchors).toEqual(new Set(['a8', 'a9', 'a11']));
+    const watched = new Set(
+      ARTICLE_WATCH.articles.map((a) => `${a.apiUrl.split('/id/')[1]?.split('/')[0]}#${a.block}`),
+    );
+    expect(watched).toEqual(cited);
   });
 
   it('every rule starts with the reform, except the unemployment contribution and benefit rules that start on 01-10-2022', () => {
