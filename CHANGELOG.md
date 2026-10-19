@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.97.0](https://github.com/Endika/eslojusto/compare/v1.96.0...v1.97.0) (2026-10-19)
+
+
+### Features
+
+* **pass:** with nothing to claim, credit, mortgage and bills sell the pass quietly ([1316089](https://github.com/Endika/eslojusto/commit/131608910e657d653b808cb6954b7c4d4cd60e81))
+
 ## [1.96.0](https://github.com/Endika/eslojusto/compare/v1.95.0...v1.96.0) (2026-10-19)
 
 
