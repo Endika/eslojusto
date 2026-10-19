@@ -20,9 +20,12 @@ export const CREDIT_SOURCES: SourceTable = {
     number: '258/2023',
     decidedOn: '2023-02-15',
     ecli: 'ECLI:ES:TS:2023:442',
-    lastVerified: '2026-10-07',
+    lastVerified: '2026-10-19',
     verified: true,
-    quotes: [],
+    quotes: [
+      'consideramos más adecuado seguir el criterio de que la diferencia entre el tipo medio de mercado y el convenido sea superior a 6 puntos porcentuales.',
+      'Según el boletín estadístico el tipo medio TEDR ese año estaba en el 19,32.',
+    ],
   },
   // Consumer loans: the revolving threshold is not directly applicable but may be taken into
   // account, so the loan indicator gives the distance in points and the ruling, never a band.
@@ -37,7 +40,7 @@ export const CREDIT_SOURCES: SourceTable = {
     number: '366/2026',
     decidedOn: '2026-03-09',
     ecli: 'ECLI:ES:TS:2026:1013',
-    lastVerified: '2026-10-14',
+    lastVerified: '2026-10-19',
     verified: true,
     quotes: [
       'no resulta directamente aplicable a un supuesto como el presente de préstamo personal, en el que el tipo medio de mercado es inferior al 15%.',
