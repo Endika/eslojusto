@@ -42,8 +42,7 @@ export const HOUSEHOLD_NORMS: NormTable = {
   },
   lgss: {
     id: 'lgss',
-    citation:
-      'Real Decreto Legislativo 8/2015, de 30 de octubre (Ley General de la Seguridad Social)',
+    citation: 'Real Decreto Legislativo 8/2015, de 30 de octubre',
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2015-11724',
     inForceSince: '2016-01-02',
     ...inForce,
