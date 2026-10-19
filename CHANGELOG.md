@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.90.0](https://github.com/Endika/eslojusto/compare/v1.89.2...v1.90.0) (2026-10-19)
+
+
+### Features
+
+* **household:** watch every article the rules cite ([53e4369](https://github.com/Endika/eslojusto/commit/53e4369c44967a08cb67a6807d1a74147b9f90e5))
+
+
+### Bug Fixes
+
+* **household:** cite the LGSS without a nested parenthesis ([d54848f](https://github.com/Endika/eslojusto/commit/d54848faeea9e9ab4b3b46782ec46582cd2edf5a))
+
 ## [1.89.2](https://github.com/Endika/eslojusto/compare/v1.89.1...v1.89.2) (2026-10-19)
 
 
