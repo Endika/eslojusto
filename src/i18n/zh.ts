@@ -5026,12 +5026,8 @@ export const zh: Translation = {
   'mortgage.result.total_case_law': '按西班牙最高法院的分摊方式',
   'mortgage.result.total_case_law_note':
     '适用于消费者在16-06-2019之前签订的公证契约。要退还这笔钱，需要银行同意，或由法官宣告费用条款无效。',
-  'mortgage.result.total_case_law_explained':
-    '这一分摊方式所依据的判决尚未对照原文核查：每张发票都会说明由银行承担的部分，但不给出金额。',
   'mortgage.result.total_fees': '超出法定上限的手续费',
   'mortgage.result.total_fees_note': '向您收取的超出法律规定上限的部分。',
-  'mortgage.result.total_fees_more':
-    '如果某项手续费取决于一个您不知道的数据，这里按较低的计算方式；其他计算方式请在该手续费中查看。',
   'mortgage.result.totals_apart':
     '这些数字不相加：法律规定的内容不取决于法官判断，而西班牙最高法院的分摊方式则取决于法官判断。',
   'mortgage.result.expenses': '房贷设立费用',
@@ -5052,7 +5048,8 @@ export const zh: Translation = {
   'mortgage.result.restart': '重新开始',
   'mortgage.pass.title': '报告和信函',
   'mortgage.pass.text':
-    '支付4,99 €，即可下载 PDF 报告，其中列出每项费用和手续费、其计算过程，以及每项法规和判决及其状态；如果您的核查中有法律规定的金额，还可以下载要求银行核查这些金额的信函。这些文件在您的设备上生成。',
+    '支付4,99 €，即可查看是哪些费用和手续费、每项各是多少，并下载 PDF 报告，其中列出每项费用和手续费、其计算过程，以及每项法规和判决及其状态；如果您的核查中有法律规定的金额，还可以下载要求银行核查这些金额的信函。这些文件在您的设备上生成。',
+  'mortgage.pass.claim_title': '是哪些费用和手续费，每项各是多少',
   'mortgage.pass.price':
     '4,99 €，含增值税（IVA）。一次性付款，无需注册账户，也不是订阅。通行证有效期7天，且只在本浏览器中有效，也可用于本网站的其他核查：在此期间，您可以重做或修改核查，并重新下载报告和信函，无需再次付款。换一台设备、使用无痕窗口或清除浏览数据后，通行证就会丢失。',
   'mortgage.pass.download_documents_letter': '下载索取房贷文件的信函（PDF，免费）',
@@ -5071,6 +5068,8 @@ export const zh: Translation = {
   'mortgage.letter.privacy': '这些信息只用于在您的设备上填写信函，不会发送，也不会保存。',
   'client.mortgage.result.lead':
     '每项费用、手续费和条款，都附有得出结果的计算过程，以及所依据的法规或司法判例。法律规定的内容和取决于法官判断的内容始终分开列出。',
+  'client.mortgage.result.lead_unnamed':
+    '四舍五入后的合计金额。具体是哪些费用和手续费，以及计算过程和所依据的法规或司法判例，购买通行证后可见。',
   'client.mortgage.result.lead_out_of_scope': '这笔房贷不在本页面的核查范围内。',
   'client.mortgage.about': '约{importe}',
   'client.mortgage.about_under_one': '不到1 €',
@@ -5078,8 +5077,18 @@ export const zh: Translation = {
   'client.mortgage.total.nothing_lowest': '按较低的计算方式，没有金额',
   'client.mortgage.total.no_figure_yet': '暂无金额',
   'client.mortgage.total.review_it': '无金额：有费用标为“需要核查”',
+  'client.mortgage.total.review_it_unnamed': '有费用尚无确定金额；具体是哪些，购买通行证后可见',
+  'client.mortgage.total.case_law_explained':
+    '这一分摊方式所依据的判决尚未对照原文核查：每张发票都会说明由银行承担的部分，但不给出金额。',
+  'client.mortgage.total.case_law_explained_unnamed':
+    '这一分摊方式所依据的判决尚未对照原文核查，因此这里不给出金额。每项费用中由银行承担的部分，购买通行证后可见。',
+  'client.mortgage.total.fees_more':
+    '如果某项手续费取决于一个您不知道的数据，这里按较低的计算方式；其他计算方式请在该手续费中查看。',
+  'client.mortgage.total.fees_more_unnamed':
+    '如果某项手续费取决于一个您不知道的数据，这里按较低的计算方式。',
   'client.mortgage.total.no_invoice': '无金额：您没有发票',
   'client.mortgage.total.transparency_free': '另外，签约前公证记录本不该收费：约{importe}。',
+  'client.mortgage.total.not_chargeable_free': '另外，本不该收取的费用：约{importe}。',
   'client.mortgage.total.interest':
     '截至{fecha}的法定利息：约{importe}。“依法律规定”的总额不含利息。',
   'client.mortgage.total.interest_estimated':

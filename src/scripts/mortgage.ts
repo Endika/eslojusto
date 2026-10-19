@@ -25,8 +25,8 @@ const documentsBuild =
     import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
   ) && DOCUMENTS_BUILD;
 
-// Until the document module says whether a pass is there, the report counts as shown; without
-// the documents API there is no pass to lock it.
+// Until the document module says whether a pass is there, the result shows which costs and fees
+// they are; without the documents API there is no pass to lock them.
 let detail: () => Detail = () => 'unlocked';
 const reviewed: ((r: CompletedMortgageReview) => void)[] = [];
 const cleared: (() => void)[] = [];
@@ -58,6 +58,7 @@ const mortgage = setUpMortgage(document.body, {
     criteria: CASE_LAW_RULES,
     legalInterest: LEGAL_INTEREST,
   },
+  detail: () => detail(),
 });
 
 if (documentsBuild) {
@@ -68,7 +69,8 @@ if (documentsBuild) {
         {
           onReview: (listener) => reviewed.push(listener),
           onRestart: (listener) => cleared.push(listener),
-          // Nothing in the result is locked; the pass unlocks the report and the amounts letter.
+          // The pass shows which costs and fees they are and unlocks the report and the amounts
+          // letter.
           detail: (state) => (detail = state),
         },
         arrival,

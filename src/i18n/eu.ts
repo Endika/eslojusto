@@ -5407,12 +5407,8 @@ export const eu: Translation = {
   'mortgage.result.total_case_law': 'Tribunal Supremoaren banaketaren arabera',
   'mortgage.result.total_case_law_note':
     'Kontsumitzaile baten 16-06-2019 baino lehenagoko eskrituretarako. Itzul dadin, bankuak onartu behar du edo epaile batek gastuen klausula deuseztatu behar du.',
-  'mortgage.result.total_case_law_explained':
-    'Banaketa honek oinarritzat dituen epaiak ez dira oraindik haien testuan egiaztatu: faktura bakoitzak azaltzen du zer zati zegokion bankuari, zifrarik gabe.',
   'mortgage.result.total_fees': 'Legezko mugaren gaineko komisioak',
   'mortgage.result.total_fees_note': 'Legeak finkatzen duen mugaren gainetik kobratu zizutena.',
-  'mortgage.result.total_fees_more':
-    'Komisio bat ez dakizun datu baten araberakoa bada, hemen kalkulu txikiena hartzen da; besteak komisio horretan ikusten dituzu.',
   'mortgage.result.totals_apart':
     'Zifra hauek ez dira batzen: legeak dioena ez dago epaile baten esku, eta Tribunal Supremoaren banaketa, berriz, bai.',
   'mortgage.result.expenses': 'Eraketa-gastuak',
@@ -5434,7 +5430,8 @@ export const eu: Translation = {
   'mortgage.result.restart': 'Hasi berriro',
   'mortgage.pass.title': 'Txostena eta gutuna',
   'mortgage.pass.text':
-    '4,99 €-tan, PDF txostena deskargatzen duzu, gastu eta komisio bakoitzarekin, haren kalkuluarekin eta arau eta epai bakoitzarekin eta haren egoerarekin, eta, zure berrikuspenak legeak finkatzen dituen zenbatekoak baditu, bankuari horiek berrikusteko eskatzen dion gutuna. Zure gailuan sortzen dira.',
+    '4,99 €-tan, zein gastu eta komisio diren eta bakoitzean zenbat ateratzen den ikusten duzu, eta PDF txostena deskargatzen duzu, gastu eta komisio bakoitzarekin, haren kalkuluarekin eta arau eta epai bakoitzarekin eta haren egoerarekin, eta, zure berrikuspenak legeak finkatzen dituen zenbatekoak baditu, bankuari horiek berrikusteko eskatzen dion gutuna. Zure gailuan sortzen dira.',
+  'mortgage.pass.claim_title': 'Zein gastu eta komisio diren eta bakoitzean zenbat ateratzen den',
   'mortgage.pass.price':
     '4,99 €, IVA barne. Ordainketa bakarra, konturik eta harpidetzarik gabe. Paseak 7 egun irauten du, eta nabigatzaile honetan bakarrik balio du, baita webguneko gainerako berrikuspenetarako ere: denbora horretan zure berrikuspena berregin edo zuzen dezakezu, eta txostena eta gutuna berriro deskargatu, berriz ordaindu gabe. Beste gailu batean, leiho pribatu batean edo nabigazio-datuak ezabatzen badituzu, galdu egiten da.',
   'mortgage.pass.download_documents_letter':
@@ -5456,6 +5453,8 @@ export const eu: Translation = {
     'Datu hauek gutunak zure gailuan betetzeko bakarrik erabiltzen dira; ez dira bidaltzen, ezta gordetzen ere.',
   'client.mortgage.result.lead':
     'Gastu, komisio eta klausula bakoitza, hartara daraman kalkuluarekin eta oinarritzat duen arau edo irizpidearekin. Legeak dioena eta epaile baten araberakoa dena beti bereizita doaz.',
+  'client.mortgage.result.lead_unnamed':
+    'Guztira ateratzen dena, biribilduta. Zein gastu eta komisio diren, beren kalkuluarekin eta oinarri duten arau edo irizpidearekin, pasearekin dator.',
   'client.mortgage.result.lead_out_of_scope':
     'Hipoteka hau orri honek berrikusten duenetik kanpo geratzen da.',
   'client.mortgage.about': '{importe} inguru',
@@ -5464,9 +5463,20 @@ export const eu: Translation = {
   'client.mortgage.total.nothing_lowest': 'Ezer ez, kalkulu txikienean',
   'client.mortgage.total.no_figure_yet': 'Zifrarik gabe oraingoz',
   'client.mortgage.total.review_it': 'Zifrarik gabe: gastu batzuk «Berrikusteko» daude',
+  'client.mortgage.total.review_it_unnamed':
+    'Zifra itxirik gabeko gastuak daude; zein diren pasearekin dator',
+  'client.mortgage.total.case_law_explained':
+    'Banaketa honek oinarritzat dituen epaiak ez dira oraindik haien testuan egiaztatu: faktura bakoitzak azaltzen du zer zati zegokion bankuari, zifrarik gabe.',
+  'client.mortgage.total.case_law_explained_unnamed':
+    'Banaketa honek oinarritzat dituen epaiak ez dira oraindik haien testuan egiaztatu, beraz hemen ez dago zifrarik. Gastu bakoitzetik zer zati zegokion bankuari pasearekin dator.',
+  'client.mortgage.total.fees_more':
+    'Komisio bat ez dakizun datu baten araberakoa bada, hemen kalkulu txikiena hartzen da; besteak komisio horretan ikusten dituzu.',
+  'client.mortgage.total.fees_more_unnamed':
+    'Komisio bat ez dakizun datu baten araberakoa bada, hemen kalkulu txikiena hartzen da.',
   'client.mortgage.total.no_invoice': 'Zifrarik gabe: ez dituzu fakturak',
   'client.mortgage.total.transparency_free':
     'Aparte, aurretiazko akta notariala, kobratu behar ez zena: {importe} inguru.',
+  'client.mortgage.total.not_chargeable_free': 'Aparte, kobratu behar ez zena: {importe} inguru.',
   'client.mortgage.total.interest':
     'Legezko interesa {fecha} arte: {importe} inguru. «Legez» guztizkoa interesik gabe ematen da.',
   'client.mortgage.total.interest_estimated':

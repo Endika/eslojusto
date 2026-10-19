@@ -5342,12 +5342,8 @@ export const ca: Translation = {
   'mortgage.result.total_case_law': 'Segons el repartiment del Tribunal Supremo',
   'mortgage.result.total_case_law_note':
     'Per a escriptures anteriors al 16-06-2019 d’un consumidor. Perquè es retorni cal que el banc ho accepti o que un jutge anul·li la clàusula de despeses.',
-  'mortgage.result.total_case_law_explained':
-    'Les sentències en què es basa aquest repartiment encara no s’han comprovat en el seu text: cada factura explica quina part li corresponia al banc, sense xifra.',
   'mortgage.result.total_fees': 'Comissions per sobre del límit legal',
   'mortgage.result.total_fees_note': 'El que et van cobrar per sobre del límit que fixa la llei.',
-  'mortgage.result.total_fees_more':
-    'Si una comissió depèn d’una dada que no saps, aquí compta el càlcul més baix; els altres els veus en aquesta comissió.',
   'mortgage.result.totals_apart':
     'Aquestes xifres no se sumen: el que diu la llei no depèn d’un jutge, i el repartiment del Tribunal Supremo sí.',
   'mortgage.result.expenses': 'Despeses de la constitució',
@@ -5368,7 +5364,8 @@ export const ca: Translation = {
   'mortgage.result.restart': 'Tornar a començar',
   'mortgage.pass.title': 'L’informe i la carta',
   'mortgage.pass.text':
-    'Per 4,99 € descarregues l’informe en PDF, amb cada despesa i comissió, el seu càlcul i cada norma i sentència amb el seu estat, i, si la teva revisió té imports que fixa la llei, la carta que demana al banc que els revisi. Es generen al teu dispositiu.',
+    'Per 4,99 € veus quines despeses i comissions són i quant surt en cadascuna, i descarregues l’informe en PDF, amb cada despesa i comissió, el seu càlcul i cada norma i sentència amb el seu estat, i, si la teva revisió té imports que fixa la llei, la carta que demana al banc que els revisi. Es generen al teu dispositiu.',
+  'mortgage.pass.claim_title': 'Quines despeses i comissions són i quant surt en cadascuna',
   'mortgage.pass.price':
     '4,99 € amb IVA inclòs. Un sol pagament, sense compte ni subscripció. El passi dura 7 dies i només val en aquest navegador, també per a les altres revisions del web: en aquest temps pots refer o corregir la teva revisió i tornar a descarregar l’informe i la carta sense pagar una altra vegada. En un altre dispositiu, en una finestra privada o si esborres les dades de navegació, es perd.',
   'mortgage.pass.download_documents_letter':
@@ -5390,6 +5387,8 @@ export const ca: Translation = {
     'Aquestes dades només s’utilitzen per omplir les cartes al teu dispositiu; no s’envien ni es desen.',
   'client.mortgage.result.lead':
     'Cada despesa, comissió i clàusula, amb el càlcul que hi porta i la norma o el criteri en què es basa. El que diu la llei i el que depèn d’un jutge van sempre per separat.',
+  'client.mortgage.result.lead_unnamed':
+    'El que surt en total, arrodonit. Quines despeses i comissions són, amb el seu càlcul i la norma o el criteri en què es basen, va amb el passi.',
   'client.mortgage.result.lead_out_of_scope':
     'Aquesta hipoteca queda fora del que revisa aquesta pàgina.',
   'client.mortgage.about': 'uns {importe}',
@@ -5398,9 +5397,21 @@ export const ca: Translation = {
   'client.mortgage.total.nothing_lowest': 'Res en el càlcul més baix',
   'client.mortgage.total.no_figure_yet': 'Sense xifra de moment',
   'client.mortgage.total.review_it': 'Sense xifra: hi ha despeses a «Per revisar»',
+  'client.mortgage.total.review_it_unnamed':
+    'Hi ha despeses sense xifra tancada; quines són va amb el passi',
+  'client.mortgage.total.case_law_explained':
+    'Les sentències en què es basa aquest repartiment encara no s’han comprovat en el seu text: cada factura explica quina part li corresponia al banc, sense xifra.',
+  'client.mortgage.total.case_law_explained_unnamed':
+    'Les sentències en què es basa aquest repartiment encara no s’han comprovat en el seu text, així que aquí no hi ha xifra. Quina part de cada despesa li corresponia al banc va amb el passi.',
+  'client.mortgage.total.fees_more':
+    'Si una comissió depèn d’una dada que no saps, aquí compta el càlcul més baix; els altres els veus en aquesta comissió.',
+  'client.mortgage.total.fees_more_unnamed':
+    'Si una comissió depèn d’una dada que no saps, aquí compta el càlcul més baix.',
   'client.mortgage.total.no_invoice': 'Sense xifra: no tens les factures',
   'client.mortgage.total.transparency_free':
     'A part, l’acta notarial prèvia, que no s’havia de cobrar: uns {importe}.',
+  'client.mortgage.total.not_chargeable_free':
+    'A part, el que no s’havia de cobrar: uns {importe}.',
   'client.mortgage.total.interest':
     'Interès legal fins a {fecha}: uns {importe}. El total «Per llei» es dona sense interès.',
   'client.mortgage.total.interest_estimated':

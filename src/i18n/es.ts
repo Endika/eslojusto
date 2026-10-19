@@ -5777,12 +5777,8 @@ export const es = {
   'mortgage.result.total_case_law': 'Según el reparto del Tribunal Supremo',
   'mortgage.result.total_case_law_note':
     'Para escrituras anteriores al 16-06-2019 de un consumidor. Para que se devuelva hace falta que el banco lo acepte o que un juez anule la cláusula de gastos.',
-  'mortgage.result.total_case_law_explained':
-    'Las sentencias en que se apoya este reparto aún no se han comprobado en su texto: cada factura explica qué parte le correspondía al banco, sin cifra.',
   'mortgage.result.total_fees': 'Comisiones por encima del tope legal',
   'mortgage.result.total_fees_note': 'Lo que te cobraron por encima del tope que fija la ley.',
-  'mortgage.result.total_fees_more':
-    'Si una comisión depende de un dato que no sabes, aquí cuenta la lectura más baja; las demás las ves en esa comisión.',
   'mortgage.result.totals_apart':
     'Estas cifras no se suman: lo que dice la ley no depende de un juez, y el reparto del Tribunal Supremo sí.',
   'mortgage.result.expenses': 'Gastos de la constitución',
@@ -5803,7 +5799,8 @@ export const es = {
   'mortgage.result.restart': 'Empezar de nuevo',
   'mortgage.pass.title': 'El informe y la carta',
   'mortgage.pass.text':
-    'Por 4,99 € descargas el informe en PDF, con cada gasto y comisión, su cuenta y cada norma y sentencia con su estado, y, si tu revisión tiene importes que fija la ley, la carta que pide al banco que los revise. Se generan en tu dispositivo.',
+    'Por 4,99 € ves qué gastos y comisiones son y cuánto sale en cada uno, y descargas el informe en PDF, con cada gasto y comisión, su cuenta y cada norma y sentencia con su estado, y, si tu revisión tiene importes que fija la ley, la carta que pide al banco que los revise. Se generan en tu dispositivo.',
+  'mortgage.pass.claim_title': 'Qué gastos y comisiones son y cuánto sale en cada uno',
   'mortgage.pass.price':
     '4,99 € con IVA incluido. Un solo pago, sin cuenta ni suscripción. El pase dura 7 días y solo vale en este navegador, también para las demás revisiones de la web: en ese tiempo puedes rehacer o corregir tu revisión y volver a descargar el informe y la carta sin pagar otra vez. En otro dispositivo, en una ventana privada o si borras los datos de navegación, se pierde.',
   'mortgage.pass.download_documents_letter':
@@ -5826,6 +5823,8 @@ export const es = {
 
   'client.mortgage.result.lead':
     'Cada gasto, comisión y cláusula, con la cuenta que lleva a ella y la norma o el criterio en que se apoya. Lo que dice la ley y lo que depende de un juez van siempre por separado.',
+  'client.mortgage.result.lead_unnamed':
+    'Lo que sale en total, redondeado. Qué gastos y comisiones son, con su cuenta y la norma o el criterio en que se apoyan, va con el pase.',
   'client.mortgage.result.lead_out_of_scope':
     'Esta hipoteca queda fuera de lo que revisa esta página.',
   'client.mortgage.about': 'unos {importe}',
@@ -5834,9 +5833,20 @@ export const es = {
   'client.mortgage.total.nothing_lowest': 'Nada en la lectura más baja',
   'client.mortgage.total.no_figure_yet': 'Sin cifra por ahora',
   'client.mortgage.total.review_it': 'Sin cifra: hay gastos en «Para revisar»',
+  'client.mortgage.total.review_it_unnamed':
+    'Hay gastos sin cifra cerrada; cuáles son va con el pase',
+  'client.mortgage.total.case_law_explained':
+    'Las sentencias en que se apoya este reparto aún no se han comprobado en su texto: cada factura explica qué parte le correspondía al banco, sin cifra.',
+  'client.mortgage.total.case_law_explained_unnamed':
+    'Las sentencias en que se apoya este reparto aún no se han comprobado en su texto, así que aquí no hay cifra. Qué parte de cada gasto le correspondía al banco va con el pase.',
+  'client.mortgage.total.fees_more':
+    'Si una comisión depende de un dato que no sabes, aquí cuenta la lectura más baja; las demás las ves en esa comisión.',
+  'client.mortgage.total.fees_more_unnamed':
+    'Si una comisión depende de un dato que no sabes, aquí cuenta la lectura más baja.',
   'client.mortgage.total.no_invoice': 'Sin cifra: no tienes las facturas',
   'client.mortgage.total.transparency_free':
     'Aparte, el acta notarial previa, que no debía cobrarse: unos {importe}.',
+  'client.mortgage.total.not_chargeable_free': 'Aparte, lo que no debía cobrarse: unos {importe}.',
   'client.mortgage.total.interest':
     'Interés legal hasta el {fecha}: unos {importe}. El total «Por ley» se da sin interés.',
   'client.mortgage.total.interest_estimated':

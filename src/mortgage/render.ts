@@ -151,41 +151,56 @@ function renderRules(container: ParentNode, card: HTMLElement, lines: readonly R
 // ---------- Totals ----------
 
 // The words of a line that counts nothing: a split without its figure yet, a cost held in
-// «Para revisar», costs without their invoices, or nothing among what was entered.
-export function emptyTotalKey(items: readonly ExpenseItem[], basis: Basis): ClientKey {
+// «Para revisar», costs without their invoices, or nothing among what was entered. Unnamed, no
+// card is there to point at.
+export function emptyTotalKey(
+  items: readonly ExpenseItem[],
+  basis: Basis,
+  unnamed = false,
+): ClientKey {
   const own = items.filter((i) => i.basis === basis);
   if (own.some((i) => i.status === 'split_explained')) return 'client.mortgage.total.no_figure_yet';
-  if (own.some((i) => i.status === 'review_it')) return 'client.mortgage.total.review_it';
+  if (own.some((i) => i.status === 'review_it'))
+    return unnamed ? 'client.mortgage.total.review_it_unnamed' : 'client.mortgage.total.review_it';
   if (own.some((i) => i.status === 'no_invoice')) return 'client.mortgage.total.no_invoice';
   return 'client.mortgage.total.nothing';
 }
 
 // What the law puts on the lender and what the Supreme Court's split gives, each on its own, and
 // the fees over their caps: three figures that are never added together.
-function renderTotals(root: ParentNode, review: MortgageReview, tr: Translate) {
+function renderTotals(root: ParentNode, review: MortgageReview, unnamed: boolean, tr: Translate) {
   const { totals } = review;
   const items = review.expenses.items;
   const statute = find(root, '[data-total="statute"]');
   find(statute, '[data-total-amount]').textContent =
     totals.statute.principal > 0
       ? about(totals.statute.principal, tr)
-      : tr(emptyTotalKey(items, 'statute'));
+      : tr(emptyTotalKey(items, 'statute', unnamed));
   const notChargeable = items
     .filter((i) => i.status === 'not_chargeable')
     .reduce((s, i) => s + (i.amount ?? 0), 0);
   const free = find(statute, '[data-total-free]');
   free.hidden = notChargeable === 0;
-  free.textContent = tr('client.mortgage.total.transparency_free', {
-    importe: formatWholeEuros(notChargeable),
-  });
+  free.textContent = tr(
+    unnamed
+      ? 'client.mortgage.total.not_chargeable_free'
+      : 'client.mortgage.total.transparency_free',
+    { importe: formatWholeEuros(notChargeable) },
+  );
 
   const caseLaw = find(root, '[data-total="case_law"]');
   const explained = items.some((i) => i.status === 'split_explained');
   find(caseLaw, '[data-total-amount]').textContent =
     totals.caseLaw.principal > 0
       ? about(totals.caseLaw.principal, tr)
-      : tr(emptyTotalKey(items, 'case_law'));
-  find(caseLaw, '[data-total-explained]').hidden = !explained || totals.caseLaw.principal > 0;
+      : tr(emptyTotalKey(items, 'case_law', unnamed));
+  const explainedNote = find(caseLaw, '[data-total-explained]');
+  explainedNote.hidden = !explained || totals.caseLaw.principal > 0;
+  explainedNote.textContent = tr(
+    unnamed
+      ? 'client.mortgage.total.case_law_explained_unnamed'
+      : 'client.mortgage.total.case_law_explained',
+  );
   const interest = find(caseLaw, '[data-total-interest]');
   const i = totals.caseLaw.interest;
   interest.hidden = i === null || totals.caseLaw.principal === 0;
@@ -210,7 +225,11 @@ function renderTotals(root: ParentNode, review: MortgageReview, tr: Translate) {
       : totals.fees.upTo > 0
         ? tr('client.mortgage.total.nothing_lowest')
         : tr('client.mortgage.total.nothing');
-  find(fees, '[data-total-more]').hidden = totals.fees.upTo <= totals.fees.counted;
+  const more = find(fees, '[data-total-more]');
+  more.hidden = totals.fees.upTo <= totals.fees.counted;
+  more.textContent = tr(
+    unnamed ? 'client.mortgage.total.fees_more_unnamed' : 'client.mortgage.total.fees_more',
+  );
 }
 
 // ---------- Cards ----------
@@ -440,21 +459,27 @@ function renderList(root: ParentNode, selector: string, cards: readonly Card[], 
 }
 
 // The totals by basis first, then each cost, each fee and each clause with its calculation and
-// its rules, what the review explains without applying, and what it never looks at.
+// its rules, what the review explains without applying, and what it never looks at. Locked with
+// something to claim, which costs and fees they are is the pass's: their cards are not in the page
+// at all, and the totals do not name them either.
 export function renderMortgageResult(
   root: HTMLElement,
   review: MortgageReview,
+  locked: boolean,
   tr: Translate,
 ): void {
   find(root, '[data-out-of-scope]').hidden = true;
   for (const el of inScopeParts(root)) el.hidden = false;
-  find(root, '[data-lead]').textContent = tr('client.mortgage.result.lead');
-  renderTotals(root, review, tr);
-  const expenses = review.expenses.items.map((item) => expenseCard(item, tr));
-  const fees = review.fees.map((item) => feeCard(item, tr));
+  const unnamed = locked && review.offerPass;
+  find(root, '[data-lead]').textContent = tr(
+    unnamed ? 'client.mortgage.result.lead_unnamed' : 'client.mortgage.result.lead',
+  );
+  renderTotals(root, review, unnamed, tr);
+  const expenses = unnamed ? [] : review.expenses.items.map((item) => expenseCard(item, tr));
+  const fees = unnamed ? [] : review.fees.map((item) => feeCard(item, tr));
   const flags = review.flags.map((flag) => flagCard(flag, tr));
   find(root, '[data-expenses-note]').replaceChildren(
-    ...listOf(calculationLines(review.expenses.calculation, tr)),
+    ...(unnamed ? [] : listOf(calculationLines(review.expenses.calculation, tr))),
   );
   renderList(root, '[data-expenses]', expenses, 0);
   renderList(root, '[data-fees]', fees, expenses.length);

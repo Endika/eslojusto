@@ -1,3 +1,4 @@
+import type { Detail } from '../calculator/flow';
 import type { SectionEvents } from '../calculator/section';
 import type { CivilDate } from '../engine/date';
 import type { MortgageReview } from '../engine/mortgage/review';
@@ -78,4 +79,6 @@ export interface MortgageSetup {
   // The norms, rulings, court criteria and legal interest table the review reads, as the
   // composition root loads them.
   readonly tables: MortgageDeps;
+  // How the result is shown when a review completes; unlocked unless told otherwise.
+  readonly detail?: () => Detail;
 }

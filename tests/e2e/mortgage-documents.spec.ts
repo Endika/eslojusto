@@ -430,7 +430,14 @@ test('a full pack fills every sheet, each clause shown word for word to be confi
   await expect(page.locator('#resultado [data-item]')).toHaveCount(0);
   await next(page);
   await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
-  await expect(page.locator('#resultado [data-item]').first()).toBeVisible();
+  // Before the pass, with something to claim: the totals, never which costs and fees they are.
+  await expect(page.locator('#resultado [data-totals]')).toContainText('unos');
+  await expect(
+    page.locator('#resultado :is([data-expenses], [data-fees]) [data-item]'),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('region', { name: 'Qué gastos y comisiones son y cuánto sale en cada uno' }),
+  ).toBeVisible();
 });
 
 test('an agency’s purchase file is left out, and its statement of funds blocks nothing', async ({

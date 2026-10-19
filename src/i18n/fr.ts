@@ -5536,13 +5536,9 @@ export const fr: Translation = {
   'mortgage.result.total_case_law': 'Selon la répartition de la Cour suprême',
   'mortgage.result.total_case_law_note':
     "Pour les actes d'un consommateur antérieurs au 16-06-2019. Pour que ce soit restitué, il faut que la banque l'accepte ou qu'un juge annule la clause de frais.",
-  'mortgage.result.total_case_law_explained':
-    "Les arrêts sur lesquels s'appuie cette répartition n'ont pas encore été vérifiés dans leur texte\u00a0: chaque facture explique quelle part revenait à la banque, sans chiffre.",
   'mortgage.result.total_fees': 'Commissions au-dessus du plafond légal',
   'mortgage.result.total_fees_note':
     'Ce qui vous a été facturé au-delà du plafond fixé par la loi.',
-  'mortgage.result.total_fees_more':
-    "Si une commission dépend d'une donnée que vous ne connaissez pas, c'est le calcul le plus bas qui compte ici\u00a0; vous voyez les autres dans cette commission.",
   'mortgage.result.totals_apart':
     "Ces chiffres ne s'additionnent pas\u00a0: ce que dit la loi ne dépend pas d'un juge, alors que la répartition de la Cour suprême, si.",
   'mortgage.result.expenses': 'Frais de constitution',
@@ -5563,7 +5559,9 @@ export const fr: Translation = {
   'mortgage.result.restart': 'Recommencer',
   'mortgage.pass.title': 'Le rapport et la lettre',
   'mortgage.pass.text':
-    'Pour 4,99 €, vous téléchargez le rapport en PDF, avec chaque poste de frais et chaque commission, son calcul et chaque texte de loi et arrêt avec son état, et, si votre vérification contient des montants fixés par la loi, la lettre qui demande à la banque de les revoir. Ils sont générés sur votre appareil.',
+    'Pour 4,99 €, vous voyez quels frais et quelles commissions sont concernés et combien chacun représente, et vous téléchargez le rapport en PDF, avec chaque poste de frais et chaque commission, son calcul et chaque texte de loi et arrêt avec son état, et, si votre vérification contient des montants fixés par la loi, la lettre qui demande à la banque de les revoir. Ils sont générés sur votre appareil.',
+  'mortgage.pass.claim_title':
+    'Quels frais et quelles commissions sont concernés et combien chacun représente',
   'mortgage.pass.price':
     "4,99 €, TVA (IVA) comprise. Un seul paiement, sans compte ni abonnement. Le pass dure 7 jours et n'est valable que dans ce navigateur, y compris pour les autres vérifications du site\u00a0: pendant ce temps, vous pouvez refaire ou corriger votre vérification et télécharger de nouveau le rapport et la lettre sans payer une nouvelle fois. Sur un autre appareil, dans une fenêtre de navigation privée ou si vous effacez les données de navigation, il est perdu.",
   'mortgage.pass.download_documents_letter':
@@ -5585,6 +5583,8 @@ export const fr: Translation = {
     'Ces données servent uniquement à remplir les lettres sur votre appareil\u00a0; elles ne sont ni envoyées ni conservées.',
   'client.mortgage.result.lead':
     "Chaque poste de frais, chaque commission et chaque clause, avec le calcul qui y mène et le texte de loi ou la jurisprudence sur lesquels il s'appuie. Ce que dit la loi et ce qui dépend d'un juge sont toujours présentés séparément.",
+  'client.mortgage.result.lead_unnamed':
+    "Ce qui ressort au total, arrondi. Quels frais et quelles commissions sont concernés, avec leur calcul et le texte de loi ou la jurisprudence sur lesquels ils s'appuient, vient avec le pass.",
   'client.mortgage.result.lead_out_of_scope':
     'Ce prêt immobilier sort du champ de ce que vérifie cette page.',
   'client.mortgage.about': 'environ {importe}',
@@ -5594,9 +5594,21 @@ export const fr: Translation = {
   'client.mortgage.total.no_figure_yet': "Pas de chiffre pour l'instant",
   'client.mortgage.total.review_it':
     'Pas de chiffre\u00a0: certains frais sont «\u00a0À vérifier\u00a0»',
+  'client.mortgage.total.review_it_unnamed':
+    "Certains frais n'ont pas de chiffre arrêté\u00a0; lesquels, cela vient avec le pass",
+  'client.mortgage.total.case_law_explained':
+    "Les arrêts sur lesquels s'appuie cette répartition n'ont pas encore été vérifiés dans leur texte\u00a0: chaque facture explique quelle part revenait à la banque, sans chiffre.",
+  'client.mortgage.total.case_law_explained_unnamed':
+    "Les arrêts sur lesquels s'appuie cette répartition n'ont pas encore été vérifiés dans leur texte, il n'y a donc pas de chiffre ici. Quelle part de chaque poste de frais revenait à la banque vient avec le pass.",
+  'client.mortgage.total.fees_more':
+    "Si une commission dépend d'une donnée que vous ne connaissez pas, c'est le calcul le plus bas qui compte ici\u00a0; vous voyez les autres dans cette commission.",
+  'client.mortgage.total.fees_more_unnamed':
+    "Si une commission dépend d'une donnée que vous ne connaissez pas, c'est le calcul le plus bas qui compte ici.",
   'client.mortgage.total.no_invoice': "Pas de chiffre\u00a0: vous n'avez pas les factures",
   'client.mortgage.total.transparency_free':
     "À part, l'acte notarié préalable, qui n'aurait pas dû être facturé\u00a0: environ {importe}.",
+  'client.mortgage.total.not_chargeable_free':
+    "À part, ce qui n'aurait pas dû être facturé\u00a0: environ {importe}.",
   'client.mortgage.total.interest':
     "Intérêts au taux légal jusqu'au {fecha}\u00a0: environ {importe}. Le total «\u00a0Selon la loi\u00a0» est donné sans intérêts.",
   'client.mortgage.total.interest_estimated':
