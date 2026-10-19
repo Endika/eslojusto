@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.102.0](https://github.com/Endika/eslojusto/compare/v1.101.0...v1.102.0) (2026-10-19)
+
+
+### Features
+
+* **analytics:** say how the pass showed under each review ([ccffd2f](https://github.com/Endika/eslojusto/commit/ccffd2f54313f2d6b7f32d5fdb433840c3a9bebc))
+
 ## [1.101.0](https://github.com/Endika/eslojusto/compare/v1.100.0...v1.101.0) (2026-10-19)
 
 
