@@ -5784,6 +5784,8 @@ export const fr: Translation = {
     'Sur {principal} remboursés, le plafond est de {cap}. On vous a facturé {charged}\u00a0: {over} au-dessus du plafond.',
   'client.mortgage.calculation.fees.within_cap':
     'Sur {principal} remboursés, le plafond est de {cap}. On vous a facturé {charged}\u00a0: cela ne dépasse pas le plafond.',
+  'client.mortgage.calculation.fees.deed_lower':
+    "Votre acte fixe une indemnité de {percent}, inférieure au plafond légal\u00a0: c'est le maximum qui peut être facturé.",
   'client.mortgage.calculation.fees.financial_loss':
     "La loi limite aussi l'indemnité à la perte subie par la banque (art. 23.8), qui ne peut pas être calculée ici.",
   'client.mortgage.calculation.fees.subrogation':
@@ -5987,6 +5989,15 @@ export const fr: Translation = {
     'Intérêts au taux légal sur la part de la banque, année par année\u00a0:',
   'client.mortgage.report.interest_year': '{anio}\u00a0: {dias} jours à {tipo}',
   'client.mortgage.report.fees': 'Commissions',
+  'client.mortgage.report.today': "Si vous remboursiez du capital aujourd'hui",
+  'client.mortgage.report.today_intro':
+    "Le maximum que votre banque peut vous facturer aujourd'hui comme indemnité pour un remboursement de capital, selon votre acte et la loi. Le calcul prend l'exemple de {ejemplo} remboursés\u00a0: le montant augmente en proportion de ce que vous remboursez.",
+  'client.mortgage.report.today_cap':
+    "Plafond d'aujourd'hui\u00a0: {porcentaje} du capital remboursé, soit {importe} pour {ejemplo}.",
+  'client.mortgage.report.today_nothing':
+    "Plafond d'aujourd'hui\u00a0: 0 €. Aucune indemnité ne peut être facturée.",
+  'client.mortgage.report.today_next':
+    'À partir du {fecha}, le plafond légal passe à {porcentaje}.',
   'client.mortgage.report.flags': 'Clauses de votre acte',
   'client.mortgage.report.flags_note':
     "Ce que disent la loi ou les tribunaux de chaque clause, avec leur source et, s'il s'agit de jurisprudence, la date de son état. Votre clause n'est pas appréciée ici.",

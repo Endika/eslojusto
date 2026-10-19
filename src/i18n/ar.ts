@@ -5534,6 +5534,8 @@ export const ar: Translation = {
     'على {principal} مسدَّدة، الحد الأقصى {cap}. حُصِّل منك {charged}: أي {over} زيادةً على الحد الأقصى.',
   'client.mortgage.calculation.fees.within_cap':
     'على {principal} مسدَّدة، الحد الأقصى {cap}. حُصِّل منك {charged}: لا يتجاوز الحد الأقصى.',
+  'client.mortgage.calculation.fees.deed_lower':
+    'تحدّد صكّك مقابلًا تعويضيًا قدره {percent}، وهو أقل من الحد الأقصى القانوني: وهذا أقصى ما يمكن تحصيله.',
   'client.mortgage.calculation.fees.financial_loss':
     'يحدّ القانون أيضًا من المقابل التعويضي بالخسارة التي يتكبّدها البنك \u2068(art. 23.8)\u2069، وهي لا يمكن حسابها هنا.',
   'client.mortgage.calculation.fees.subrogation':
@@ -5729,6 +5731,14 @@ export const ar: Translation = {
   'client.mortgage.report.interest_by_year': 'الفائدة القانونية على حصة البنك، سنةً سنة:',
   'client.mortgage.report.interest_year': '{anio}: {dias} يوم بنسبة {tipo}',
   'client.mortgage.report.fees': 'العمولات',
+  'client.mortgage.report.today': 'إذا سدّدت جزءًا من رأس المال اليوم',
+  'client.mortgage.report.today_intro':
+    'أقصى ما يمكن أن يتقاضاه منك بنكك اليوم مقابلًا تعويضيًا عن سداد رأس المال، وفق ما يقوله صكّك والقانون. والمثال مبني على سداد {ejemplo}: يزداد المبلغ بنسبة ما تسدّده.',
+  'client.mortgage.report.today_cap':
+    'الحد الأقصى اليوم: {porcentaje} من رأس المال المسدَّد، أي {importe} عن كل {ejemplo}.',
+  'client.mortgage.report.today_nothing': 'الحد الأقصى اليوم: 0 €. لا يمكن تحصيل مقابل تعويضي.',
+  'client.mortgage.report.today_next':
+    'ابتداءً من {fecha}، يصبح الحد الأقصى القانوني {porcentaje}.',
   'client.mortgage.report.flags': 'بنود صكّك',
   'client.mortgage.report.flags_note':
     'ماذا يقول القانون أو المحاكم عن كل بند، مع مصدره، وإذا كان معيارًا للمحاكم، تاريخ وضعه. لا يُقيَّم بندك هنا.',

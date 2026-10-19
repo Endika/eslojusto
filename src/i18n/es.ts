@@ -6030,6 +6030,8 @@ export const es = {
     'Sobre {principal} amortizados, el tope es {cap}. Te cobraron {charged}: {over} por encima del tope.',
   'client.mortgage.calculation.fees.within_cap':
     'Sobre {principal} amortizados, el tope es {cap}. Te cobraron {charged}: no pasa del tope.',
+  'client.mortgage.calculation.fees.deed_lower':
+    'Tu escritura fija una compensación del {percent}, por debajo del tope de la ley: es lo más que se puede cobrar.',
   'client.mortgage.calculation.fees.financial_loss':
     'La ley también limita la compensación a la pérdida que sufre el banco (art. 23.8), que aquí no se puede calcular.',
   'client.mortgage.calculation.fees.subrogation':
@@ -6236,6 +6238,13 @@ export const es = {
   'client.mortgage.report.interest_by_year': 'Interés legal sobre la parte del banco, año por año:',
   'client.mortgage.report.interest_year': '{anio}: {dias} días al {tipo}',
   'client.mortgage.report.fees': 'Comisiones',
+  'client.mortgage.report.today': 'Si devolvieras capital hoy',
+  'client.mortgage.report.today_intro':
+    'Lo más que tu banco puede cobrarte hoy como compensación por amortizar capital, con lo que dicen tu escritura y la ley. Va con un ejemplo de {ejemplo} amortizados: la cifra crece en proporción a lo que devuelvas.',
+  'client.mortgage.report.today_cap':
+    'Tope de hoy: el {porcentaje} del capital amortizado, {importe} por cada {ejemplo}.',
+  'client.mortgage.report.today_nothing': 'Tope de hoy: 0 €. No se puede cobrar compensación.',
+  'client.mortgage.report.today_next': 'Desde el {fecha}, el tope de la ley pasa al {porcentaje}.',
   'client.mortgage.report.flags': 'Cláusulas de tu escritura',
   'client.mortgage.report.flags_note':
     'Qué dicen la ley o los tribunales de cada cláusula, con su fuente y, si es un criterio de los tribunales, la fecha de su estado. Aquí no se valora tu cláusula.',

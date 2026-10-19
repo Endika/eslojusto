@@ -422,3 +422,106 @@ export function feeTotal(items: readonly FeeItem[]): FeeTotal {
   }
   return { counted: round2(counted), upTo: round2(upTo) };
 }
+
+// The capital the example of repaying today is worked out on.
+export const TODAY_EXAMPLE = 10_000;
+
+export interface TodayCap {
+  readonly status: 'cap' | 'not_checkable' | 'review_it';
+  // The law's cap, and the lower one the deed sets, if it sets one.
+  readonly capPercent: number | null;
+  readonly deedPercent: number | null;
+  // The most the lender may charge for repaying TODAY_EXAMPLE euros today.
+  readonly cap: number | null;
+  // The next day the law's cap changes, and to what; null when it changes no more.
+  readonly next: { readonly on: CivilDate; readonly percent: number } | null;
+  readonly calculation: MortgageCalculation;
+  readonly sources: readonly MortgageSource[];
+}
+
+export type TodayItem = Across<FeeQuestion, FeeReading, TodayCap>;
+
+// The anniversaries on which a cap can change: the end of the first 3 or 5 years of a variable
+// rate and of the first 10 of a fixed one.
+const CHANGE_YEARS = [3, 5, FIXED_FIRST_YEARS] as const;
+
+function nextChange(
+  operation: Operation,
+  input: MortgageInput,
+  world: World,
+  deps: MortgageDeps,
+  percent: number,
+): TodayCap['next'] {
+  const days = CHANGE_YEARS.map((years) => addMonthsClamped(input.deedOn, years * 12))
+    .filter((on) => compareDates(on, operation.on) > 0)
+    .sort(compareDates);
+  for (const on of days) {
+    const later = capFor({ ...operation, on }, input, world, deps);
+    if (later.kind === 'none') return null;
+    if (later.percent !== percent) return { on, percent: later.percent };
+  }
+  return null;
+}
+
+function todayCap(
+  operation: Operation,
+  input: MortgageInput,
+  world: World,
+  deps: MortgageDeps,
+): TodayCap {
+  const c = capFor(operation, input, world, deps);
+  if (c.kind === 'none')
+    return {
+      status: c.status,
+      capPercent: null,
+      deedPercent: null,
+      cap: null,
+      next: null,
+      calculation: c.phrases,
+      sources: sourcesOf(c.rules, deps.norms),
+    };
+  const own = world.rate === 'fixed' ? input.deedPercents.fixed : input.deedPercents.variable;
+  const deedPercent = own !== undefined && own < c.percent ? own : null;
+  const percent = deedPercent ?? c.percent;
+  // 23.8: within the cap, the compensation may still exceed the lender's loss, unknown here.
+  const loss = c.lossBound && percent > 0;
+  return {
+    status: 'cap',
+    capPercent: c.percent,
+    deedPercent,
+    cap: round2((TODAY_EXAMPLE * percent) / 100),
+    next: nextChange(operation, input, world, deps, c.percent),
+    calculation: [
+      ...c.phrases,
+      ...(deedPercent === null
+        ? []
+        : [p('fees.deed_lower', { percent: { percent: deedPercent } })]),
+      ...(loss ? [p('fees.financial_loss')] : []),
+    ],
+    sources: sourcesOf(
+      [...c.rules, ...(loss ? (['financial_loss_cap'] as const) : [])],
+      deps.norms,
+    ),
+  };
+}
+
+// What the law lets the lender charge for repaying capital today, in every reading the deed or
+// the law leaves open: the figures of the deed and the law, never a recommendation.
+export function prepaymentToday(
+  input: MortgageInput,
+  today: CivilDate,
+  deps: MortgageDeps,
+): TodayItem {
+  const operation: Operation = {
+    on: today,
+    kind: 'partial_prepayment',
+    principal: TODAY_EXAMPLE,
+    feeCharged: 0,
+    hadInsurance: null,
+  };
+  const ws = worlds(operation, input, deps);
+  const byReading = new Map(ws.map((w) => [readingOf(w), w]));
+  return assessAcross(questionOf(ws), [...byReading.keys()], (reading) =>
+    todayCap(operation, input, byReading.get(reading) as World, deps),
+  );
+}

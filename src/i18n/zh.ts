@@ -5256,6 +5256,8 @@ export const zh: Translation = {
     '提前偿还{principal}，上限为{cap}。向您收取了{charged}：超出上限{over}。',
   'client.mortgage.calculation.fees.within_cap':
     '提前偿还{principal}，上限为{cap}。向您收取了{charged}：没有超出上限。',
+  'client.mortgage.calculation.fees.deed_lower':
+    '您的公证契约规定的补偿费为{percent}，低于法律上限：这就是可以收取的最高金额。',
   'client.mortgage.calculation.fees.financial_loss':
     '法律还规定补偿费不得超过银行遭受的损失（art. 23.8），而这一损失在这里无法计算。',
   'client.mortgage.calculation.fees.subrogation':
@@ -5442,6 +5444,13 @@ export const zh: Translation = {
   'client.mortgage.report.interest_by_year': '银行承担部分的法定利息，逐年列出：',
   'client.mortgage.report.interest_year': '{anio}年：{dias}天，利率{tipo}',
   'client.mortgage.report.fees': '手续费',
+  'client.mortgage.report.today': '如果您今天提前偿还本金',
+  'client.mortgage.report.today_intro':
+    '根据您的公证契约和法律，您的银行今天因您提前偿还本金而可以向您收取的最高补偿费。这里以提前偿还{ejemplo}为例：金额按您偿还的数额成比例增加。',
+  'client.mortgage.report.today_cap':
+    '今天的上限：提前偿还本金的{porcentaje}，即每{ejemplo}收取{importe}。',
+  'client.mortgage.report.today_nothing': '今天的上限：0 €。不得收取补偿费。',
+  'client.mortgage.report.today_next': '自{fecha}起，法律上限变为{porcentaje}。',
   'client.mortgage.report.flags': '您公证契约中的条款',
   'client.mortgage.report.flags_note':
     '法律或法院对每项条款的认定，注明来源；如果是司法判例，还注明其状态的日期。这里不对您的条款作出评估。',

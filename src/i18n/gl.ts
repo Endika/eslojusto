@@ -5537,6 +5537,8 @@ export const gl: Translation = {
     'Sobre {principal} amortizados, o límite é {cap}. Cobráronche {charged}: {over} por riba do límite.',
   'client.mortgage.calculation.fees.within_cap':
     'Sobre {principal} amortizados, o límite é {cap}. Cobráronche {charged}: non pasa do límite.',
+  'client.mortgage.calculation.fees.deed_lower':
+    'A túa escritura fixa unha compensación do {percent}, por debaixo do límite da lei: é o máximo que se pode cobrar.',
   'client.mortgage.calculation.fees.financial_loss':
     'A lei tamén limita a compensación á perda que sofre o banco (art. 23.8), que aquí non se pode calcular.',
   'client.mortgage.calculation.fees.subrogation':
@@ -5734,6 +5736,13 @@ export const gl: Translation = {
   'client.mortgage.report.interest_by_year': 'Xuro legal sobre a parte do banco, ano por ano:',
   'client.mortgage.report.interest_year': '{anio}: {dias} días ao {tipo}',
   'client.mortgage.report.fees': 'Comisións',
+  'client.mortgage.report.today': 'Se devolveses capital hoxe',
+  'client.mortgage.report.today_intro':
+    'O máximo que o teu banco che pode cobrar hoxe como compensación por amortizar capital, co que din a túa escritura e a lei. Vai cun exemplo de {ejemplo} amortizados: a cifra crece en proporción ao que devolvas.',
+  'client.mortgage.report.today_cap':
+    'Límite de hoxe: o {porcentaje} do capital amortizado, {importe} por cada {ejemplo}.',
+  'client.mortgage.report.today_nothing': 'Límite de hoxe: 0 €. Non se pode cobrar compensación.',
+  'client.mortgage.report.today_next': 'Desde o {fecha}, o límite da lei pasa ao {porcentaje}.',
   'client.mortgage.report.flags': 'Cláusulas da túa escritura',
   'client.mortgage.report.flags_note':
     'Que din a lei ou os tribunais de cada cláusula, coa súa fonte e, se é un criterio dos tribunais, a data do seu estado. Aquí non se valora a túa cláusula.',

@@ -1,6 +1,13 @@
 import type { CivilDate } from '../date';
 import { reviewExpenses, type ExpensesReview } from './expenses';
-import { feeTotal, reviewFees, type FeeItem, type FeeTotal } from './fees';
+import {
+  feeTotal,
+  prepaymentToday,
+  reviewFees,
+  type FeeItem,
+  type FeeTotal,
+  type TodayItem,
+} from './fees';
 import { reviewFlags, type ClauseFlag } from './flags';
 import { informationBlocks, type InformationBlock } from './information';
 import { scope } from './scope';
@@ -36,6 +43,8 @@ export interface MortgageReview {
   readonly scope: Scope;
   readonly expenses: ExpensesReview;
   readonly fees: readonly FeeItem[];
+  // What repaying capital today may cost at most, by the deed and the law; null out of scope.
+  readonly prepaymentToday: TodayItem | null;
   readonly flags: readonly ClauseFlag[];
   readonly information: readonly InformationBlock[];
   readonly totals: MortgageTotals;
@@ -67,6 +76,7 @@ export function reviewMortgage(
         scope: reach,
         expenses: NO_EXPENSES,
         fees: [],
+        prepaymentToday: null,
         flags: [],
         information: [],
         totals: { ...NO_EXPENSES.totals, fees: { counted: 0, upTo: 0 } },
@@ -89,6 +99,7 @@ export function reviewMortgage(
       scope: reach,
       expenses,
       fees,
+      prepaymentToday: prepaymentToday(input, today, deps),
       flags: reviewFlags(input, today, deps),
       information: informationBlocks(input, today, deps),
       totals,

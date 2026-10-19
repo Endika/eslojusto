@@ -163,6 +163,7 @@ describe('the mortgage report', () => {
       'Tus datos',
       'Resumen',
       'Gasto por gasto',
+      'Si devolvieras capital hoy',
       'Cláusulas de tu escritura',
       'Las normas y criterios, y su estado',
       'Para que lo sepas',
@@ -171,6 +172,51 @@ describe('the mortgage report', () => {
     ]);
     expect(texts(between(model, 'Lo que esta revisión no mira'))).toContain(
       'Los plazos de tu caso',
+    );
+  });
+});
+
+describe('what repaying capital today may cost', () => {
+  it('gives the cap of today on 10.000 €, when it changes and its norm', () => {
+    const today = between(
+      report({ deedOn: d('2023-02-01'), rateType: 'fixed' }),
+      'Si devolvieras capital hoy',
+    );
+    expect(texts(today)).toEqual([
+      'Si devolvieras capital hoy',
+      'Lo más que tu banco puede cobrarte hoy como compensación por amortizar capital, con lo que dicen tu escritura y la ley. Va con un ejemplo de 10.000 € amortizados: la cifra crece en proporción a lo que devuelvas.',
+      'Tope de hoy: el 2 % del capital amortizado, 200,00 € por cada 10.000 €.',
+      'Con tipo fijo, la ley fija como tope el 2 % del capital amortizado en los 10 primeros años (art. 23.7).',
+      'La ley también limita la compensación a la pérdida que sufre el banco (art. 23.8), que aquí no se puede calcular.',
+      'Desde el 01-02-2033, el tope de la ley pasa al 1,5 %.',
+      expect.stringMatching(/^Ley de contratos de crédito inmobiliario, art\. 23\.7/),
+      expect.stringMatching(/^Ley de contratos de crédito inmobiliario, art\. 23\.8/),
+    ]);
+  });
+
+  it('says 0 € once the variable rate years are over, with no change to come', () => {
+    const today = between(
+      report({ deedOn: d('2020-03-01'), rateType: 'variable', prepaymentOption: 'a_015_5y' }),
+      'Si devolvieras capital hoy',
+    );
+    expect(texts(today)).toContain('Tope de hoy: 0 €. No se puede cobrar compensación.');
+    expect(texts(today).some((t) => t.startsWith('Desde el'))).toBe(false);
+  });
+
+  it('gives each option when the deed does not say which', () => {
+    const today = between(
+      report({ deedOn: d('2024-06-01'), rateType: 'variable', prepaymentOption: 'unknown' }),
+      'Si devolvieras capital hoy',
+    );
+    expect(texts(today)).toEqual(
+      expect.arrayContaining([
+        'Con el 0,15 % durante 5 años',
+        'Tope de hoy: el 0,15 % del capital amortizado, 15,00 € por cada 10.000 €.',
+        'Desde el 01-06-2029, el tope de la ley pasa al 0 %.',
+        'Con el 0,25 % durante 3 años',
+        'Tope de hoy: el 0,25 % del capital amortizado, 25,00 € por cada 10.000 €.',
+        'Desde el 01-06-2027, el tope de la ley pasa al 0 %.',
+      ]),
     );
   });
 });
