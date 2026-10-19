@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.92.1](https://github.com/Endika/eslojusto/compare/v1.92.0...v1.92.1) (2026-10-19)
+
+
+### Bug Fixes
+
+* **credit:** quote the Supreme Court rulings read in their PDFs ([e80e609](https://github.com/Endika/eslojusto/commit/e80e609192af40f17a1744b3a549ac78a0753f4e))
+
 ## [1.92.0](https://github.com/Endika/eslojusto/compare/v1.91.0...v1.92.0) (2026-10-19)
 
 
