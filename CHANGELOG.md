@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.89.0](https://github.com/Endika/eslojusto/compare/v1.88.1...v1.89.0) (2026-10-19)
+
+
+### Features
+
+* **i18n:** publish the nine translations ([ee8e0d1](https://github.com/Endika/eslojusto/commit/ee8e0d151a3b862c1afb1570f46c63235a4a12e7))
+
 ## [1.88.1](https://github.com/Endika/eslojusto/compare/v1.88.0...v1.88.1) (2026-10-19)
 
 
