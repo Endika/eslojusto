@@ -1,4 +1,4 @@
-// source: 3c9f4c62bcf0
+// source: c1e410557cb4
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -74,10 +74,10 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'decreto-2026',
     name: '2026年租房法令',
     crumb: '2026年租房法令',
-    title: '2026年租房法令：有哪些变化及其状态',
+    title: 'Real Decreto-ley 29/2026（租房）：有哪些变化',
     description:
       'Real Decreto-ley 29/2026 给租客带来了哪些变化，以及它目前的状态：自十月8日起生效，待众议院确认（convalidación）。',
-    h1: '2026年租房法令：有哪些变化，目前处于什么状态',
+    h1: 'Real Decreto-ley 29/2026（租房）：有哪些变化，目前处于什么状态',
   },
   fees: {
     path: '/alquiler/honorarios-inmobiliaria/',

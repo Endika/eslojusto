@@ -203,7 +203,7 @@ const structuredData = [
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr data-month={row.month}>
+                <tr data-month={row.month} id={`mes-${row.month}`}>
                   <th scope="row">
                     <time datetime={row.month}>{formatMonth(row.month, lang)}</time>
                   </th>

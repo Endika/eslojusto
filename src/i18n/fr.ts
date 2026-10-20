@@ -1345,10 +1345,12 @@ export const fr: Translation = {
   'landing.objective_dismissal.faq.4.answer':
     'Oui. La rupture pour causes objectives constitue une situation légale de chômage (situación legal de desempleo, art. 267.1.a.4.º LGSS).',
   'landing.benefit_disciplinary.name': 'Le chômage après un licenciement disciplinaire',
-  'landing.benefit_disciplinary.title': 'Le chômage après un licenciement disciplinaire',
+  'landing.benefit_disciplinary.title':
+    'Licenciement disciplinaire et chômage : oui, vous y avez droit, et combien',
   'landing.benefit_disciplinary.description':
     "Un licenciement disciplinaire ouvre droit au chômage, même s'il est justifié ou si vous ne le contestez pas (art. 268.4 LGSS). Quelles fins de contrat ouvrent droit au chômage et combien vous toucheriez avec vos données.",
-  'landing.benefit_disciplinary.h1': 'Le chômage après un licenciement disciplinaire',
+  'landing.benefit_disciplinary.h1':
+    'Un licenciement disciplinaire donne-t-il droit au chômage ? Oui',
   'landing.benefit_disciplinary.lead':
     'Un licenciement disciplinaire ouvre aussi droit au chômage si vous remplissez les autres conditions. Saisissez vos données et vous verrez combien vous toucheriez et pendant combien de temps.',
   'landing.benefit_disciplinary.guide_title': 'Le licenciement disciplinaire et le chômage',

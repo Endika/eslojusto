@@ -10,7 +10,7 @@ const PAGES = [
   },
   {
     path: 'alquiler/decreto-2026/',
-    h1: 'Decreto del alquiler 2026: qué cambia y en qué estado está',
+    h1: 'Real Decreto-ley 29/2026 del alquiler: qué cambia y en qué estado está',
     text: 'pendiente de convalidación',
   },
   {

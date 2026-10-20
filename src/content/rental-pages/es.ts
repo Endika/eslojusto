@@ -77,10 +77,10 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'decreto-2026',
     name: 'Decreto del alquiler 2026',
     crumb: 'Decreto del alquiler 2026',
-    title: 'Decreto del alquiler 2026: qué cambia y su estado',
+    title: 'Real Decreto-ley 29/2026 del alquiler: qué cambia',
     description:
       'Qué cambia para el inquilino con el Real Decreto-ley 29/2026 y en qué estado está: en vigor desde el 8 de octubre, pendiente de convalidación.',
-    h1: 'Decreto del alquiler 2026: qué cambia y en qué estado está',
+    h1: 'Real Decreto-ley 29/2026 del alquiler: qué cambia y en qué estado está',
   },
   fees: {
     path: '/alquiler/honorarios-inmobiliaria/',

@@ -1,4 +1,4 @@
-// source: 3c9f4c62bcf0
+// source: c1e410557cb4
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -75,10 +75,10 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'decreto-2026',
     name: 'مرسوم الإيجار لعام 2026',
     crumb: 'مرسوم الإيجار لعام 2026',
-    title: 'مرسوم الإيجار لعام 2026: ما الذي يتغيّر ووضعه',
+    title: 'Real Decreto-ley 29/2026 بشأن الإيجار: ما الذي يتغيّر',
     description:
       'ما الذي يغيّره Real Decreto-ley 29/2026 للمستأجِر وما وضعه: سارٍ منذ 8 أكتوبر، وبانتظار مصادقة البرلمان ⁨(Congreso)⁩.',
-    h1: 'مرسوم الإيجار لعام 2026: ما الذي يتغيّر وما وضعه',
+    h1: 'Real Decreto-ley 29/2026 بشأن الإيجار: ما الذي يتغيّر وما وضعه',
   },
   fees: {
     path: '/alquiler/honorarios-inmobiliaria/',

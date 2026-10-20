@@ -1,4 +1,4 @@
-// source: 3c9f4c62bcf0
+// source: c1e410557cb4
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -75,10 +75,10 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'decreto-2026',
     name: 'Decreto do aluguer 2026',
     crumb: 'Decreto do aluguer 2026',
-    title: 'Decreto do aluguer 2026: que cambia e o seu estado',
+    title: 'Real Decreto-ley 29/2026 do aluguer: que cambia',
     description:
       'Que cambia para o inquilino co Real Decreto-ley 29/2026 e en que estado está: en vigor desde o 8 de outubro, pendente de convalidación.',
-    h1: 'Decreto do aluguer 2026: que cambia e en que estado está',
+    h1: 'Real Decreto-ley 29/2026 do aluguer: que cambia e en que estado está',
   },
   fees: {
     path: '/alquiler/honorarios-inmobiliaria/',

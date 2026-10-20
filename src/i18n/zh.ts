@@ -1187,10 +1187,10 @@ export const zh: Translation = {
   'landing.objective_dismissal.faq.4.answer':
     '能。因客观原因终止合同属于法定失业状态（art. 267.1.a.4.º LGSS）。',
   'landing.benefit_disciplinary.name': '纪律解雇后的失业金',
-  'landing.benefit_disciplinary.title': '纪律解雇后的失业金',
+  'landing.benefit_disciplinary.title': '纪律解雇与失业金：您有权领取，以及能领多少',
   'landing.benefit_disciplinary.description':
     '纪律解雇可以领失业金，即使解雇是正当的或您没有提出异议（art. 268.4 LGSS）。哪些离职情况能领失业金，以及按您的数据能领多少。',
-  'landing.benefit_disciplinary.h1': '纪律解雇后的失业金',
+  'landing.benefit_disciplinary.h1': '纪律解雇能领失业金吗？能',
   'landing.benefit_disciplinary.lead':
     '如果满足其他条件，纪律解雇也有权领取失业金。填写您的数据，就能看到能领多少、能领多久。',
   'landing.benefit_disciplinary.guide_title': '纪律解雇与失业金',

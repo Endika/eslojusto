@@ -1,4 +1,4 @@
-// source: 3c9f4c62bcf0
+// source: c1e410557cb4
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -77,10 +77,10 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'decreto-2026',
     name: 'Décret sur la location de 2026',
     crumb: 'Décret sur la location de 2026',
-    title: 'Décret sur la location de 2026 : ce qui change et sa situation',
+    title: 'Real Decreto-ley 29/2026 sur la location : ce qui change',
     description:
       'Ce qui change pour le locataire avec le Real Decreto-ley 29/2026 et où il en est : en vigueur depuis le 8 octobre, en attente de validation par le Congrès.',
-    h1: 'Décret sur la location de 2026 : ce qui change et où il en est',
+    h1: 'Real Decreto-ley 29/2026 sur la location : ce qui change et où il en est',
   },
   fees: {
     path: '/alquiler/honorarios-inmobiliaria/',

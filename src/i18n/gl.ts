@@ -1260,10 +1260,11 @@ export const gl: Translation = {
   'landing.objective_dismissal.faq.4.answer':
     'Si. A extinción por causas obxectivas é situación legal de desemprego (art. 267.1.a.4.º LGSS).',
   'landing.benefit_disciplinary.name': 'Paro despois dun despedimento disciplinario',
-  'landing.benefit_disciplinary.title': 'Paro despois dun despedimento disciplinario',
+  'landing.benefit_disciplinary.title':
+    'Despedimento disciplinario e paro: si tes dereito, e canto',
   'landing.benefit_disciplinary.description':
     'Un despedimento disciplinario dá paro, aínda que sexa procedente ou non o impugnes (art. 268.4 LGSS). Que ceses dan paro e canto cobrarías cos teus datos.',
-  'landing.benefit_disciplinary.h1': 'Paro despois dun despedimento disciplinario',
+  'landing.benefit_disciplinary.h1': 'Un despedimento disciplinario dá dereito a paro? Si',
   'landing.benefit_disciplinary.lead':
     'Un despedimento disciplinario tamén dá dereito a paro se cumpres o resto de requisitos. Escribe os teus datos e verás canto cobrarías e durante canto tempo.',
   'landing.benefit_disciplinary.guide_title': 'O despedimento disciplinario e o paro',

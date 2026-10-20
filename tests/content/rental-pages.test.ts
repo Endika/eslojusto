@@ -60,7 +60,7 @@ describe('the rental pages', () => {
     expect(RENTAL_PAGES.charges.h1).toBe('IBI, comunidad y basura: qué puede cobrarte tu casero');
     expect(RENTAL_PAGES.rise.h1).toBe('Cuánto te pueden subir el alquiler en 2026');
     expect(RENTAL_PAGES.decree.h1).toBe(
-      'Decreto del alquiler 2026: qué cambia y en qué estado está',
+      'Real Decreto-ley 29/2026 del alquiler: qué cambia y en qué estado está',
     );
     expect(RENTAL_PAGES.fees.h1).toBe(
       '¿Puede la inmobiliaria cobrarte a ti? Honorarios en el alquiler',

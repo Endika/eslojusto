@@ -1,4 +1,4 @@
-// source: 3c9f4c62bcf0
+// source: c1e410557cb4
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -75,10 +75,10 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'decreto-2026',
     name: '2026 rental decree',
     crumb: '2026 rental decree',
-    title: '2026 rental decree: what changes and its status',
+    title: 'Real Decreto-ley 29/2026 on rentals: what changes',
     description:
       'What Real Decreto-ley 29/2026 changes for tenants and where it stands: in force since 8 October, awaiting validation by Congress.',
-    h1: '2026 rental decree: what changes and where it stands',
+    h1: 'Real Decreto-ley 29/2026 on rentals: what changes and where it stands',
   },
   fees: {
     path: '/alquiler/honorarios-inmobiliaria/',

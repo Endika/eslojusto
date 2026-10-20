@@ -1276,10 +1276,11 @@ export const ca: Translation = {
   'landing.objective_dismissal.faq.4.answer':
     'Sí. L’extinció per causes objectives és situació legal de desocupació (art. 267.1.a.4.º LGSS).',
   'landing.benefit_disciplinary.name': 'Atur després d’un acomiadament disciplinari',
-  'landing.benefit_disciplinary.title': 'Atur després d’un acomiadament disciplinari',
+  'landing.benefit_disciplinary.title':
+    'Acomiadament disciplinari i atur: sí que hi tens dret, i quant',
   'landing.benefit_disciplinary.description':
     'Un acomiadament disciplinari dona dret a atur, encara que sigui procedent o no l’impugnis (art. 268.4 LGSS). Quines extincions donen dret a atur i quant cobraries amb les teves dades.',
-  'landing.benefit_disciplinary.h1': 'Atur després d’un acomiadament disciplinari',
+  'landing.benefit_disciplinary.h1': 'Un acomiadament disciplinari dona dret a atur? Sí',
   'landing.benefit_disciplinary.lead':
     'Un acomiadament disciplinari també dona dret a atur si compleixes la resta de requisits. Escriu les teves dades i veuràs quant cobraries i durant quant de temps.',
   'landing.benefit_disciplinary.guide_title': 'L’acomiadament disciplinari i l’atur',
