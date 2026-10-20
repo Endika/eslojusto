@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.104.1](https://github.com/Endika/eslojusto/compare/v1.104.0...v1.104.1) (2026-10-20)
+
+
+### Bug Fixes
+
+* **seo:** name the 2026 rental decree by its number and answer the disciplinary dismissal question ([424f020](https://github.com/Endika/eslojusto/commit/424f0208b246db73a6f45263dd16dd2315123b72))
+
 ## [1.104.0](https://github.com/Endika/eslojusto/compare/v1.103.0...v1.104.0) (2026-10-20)
 
 
