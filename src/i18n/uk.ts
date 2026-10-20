@@ -489,6 +489,8 @@ export const uk: Translation = {
     'За цим договором у вас днів сплачених внесків: {dias}; потрібно 360 за останні 6 років (art. 269.1 LGSS). Якщо ви працювали раніше, це видно у виписці про трудовий стаж.',
   'client.unemployment.qualifying.depends_other_contracts':
     'За цими договорами у вас набирається днів сплачених внесків: {dias}; потрібно 360 за останні 6 років, які ви ще не використали для іншої допомоги (art. 269 LGSS). Це видно у виписці про трудовий стаж.',
+  'client.reveal.checked': 'Перевірено за законом: {partida}',
+  'client.reveal.summary': 'Перевірено пунктів: {partidas}. Правових посилань: {referencias}.',
   'client.item.pending_salary': 'Зарплата за місяць звільнення',
   'client.item.holiday_pay': 'Нарахована і невикористана відпустка',
   'client.item.extra_pay': 'Нараховані додаткові виплати',

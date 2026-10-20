@@ -925,6 +925,38 @@ input[type='checkbox']:checked {
   font: 400 var(--t-help) / var(--l-help) var(--f-serif);
 }
 
+/* While the review's checks go by, only the title and the checks show. */
+.result[data-revealing] > :not(.result__header, .reveal, .marks),
+.result[data-revealing] [data-lead] {
+  display: none;
+}
+.reveal {
+  max-inline-size: 46ch;
+  font: 400 var(--t-help) / var(--l-help) var(--f-serif);
+}
+.reveal__steps {
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.reveal__steps li {
+  animation: reveal-step 240ms ease-out;
+}
+.reveal__steps li::before {
+  content: '✓ ';
+  font-weight: 700;
+}
+.reveal__summary {
+  margin: 0.75rem 0 0;
+  font-weight: 700;
+}
+@keyframes reveal-step {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+}
+
 .review {
   gap: 1rem;
 }

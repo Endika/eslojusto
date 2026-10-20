@@ -382,6 +382,8 @@
   "client.unemployment.qualifying.other_contracts": "756880c2b2f9",
   "client.unemployment.qualifying.depends": "0894a0e98ffe",
   "client.unemployment.qualifying.depends_other_contracts": "6ee992ce4513",
+  "client.reveal.checked": "4864e3fbf4ca",
+  "client.reveal.summary": "35623fd5719d",
   "client.item.pending_salary": "fd66333d8061",
   "client.item.holiday_pay": "6981af1467af",
   "client.item.extra_pay": "4f45f1980a07",

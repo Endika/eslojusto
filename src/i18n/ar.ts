@@ -476,6 +476,9 @@ export const ar: Translation = {
     'بهذا العقد لديك {dias} يوم اشتراك؛ والمطلوب 360 في السنوات الـ6 الأخيرة \u2068(art. 269.1 LGSS)\u2069. إذا عملت من قبل، تجد ذلك في سجلّك المهني \u2068(vida laboral)\u2069.',
   'client.unemployment.qualifying.depends_other_contracts':
     'بهذه العقود يبلغ مجموعك {dias} يوم اشتراك؛ والمطلوب 360 في السنوات الـ6 الأخيرة لم تستخدمها بالفعل لإعانة بطالة أخرى \u2068(art. 269 LGSS)\u2069. تجد ذلك في سجلّك المهني \u2068(vida laboral)\u2069.',
+  'client.reveal.checked': 'تمّ التحقق وفق القانون: {partida}',
+  'client.reveal.summary':
+    'البنود التي تم التحقق منها: {partidas}. المراجع القانونية: {referencias}.',
   'client.item.pending_salary': 'راتب شهر انتهاء العمل',
   'client.item.holiday_pay': 'أيام الإجازة المتراكمة وغير المستفاد منها',
   'client.item.extra_pay': 'الدفعات الإضافية المتراكمة',

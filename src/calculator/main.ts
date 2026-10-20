@@ -16,6 +16,7 @@ import { setUpOtherContracts } from './other-contracts';
 import type { ItemId } from '../engine/types';
 import type { CalculatorDeps, CompletedReview } from './ports';
 import { renderErrors, renderResult, type ResultData } from './render';
+import { revealSteps, stageReveal } from './reveal';
 import { setUpSection, type SectionForm } from './section';
 import { FINAL_PAY_FLOW } from './steps';
 
@@ -23,9 +24,33 @@ import { FINAL_PAY_FLOW } from './steps';
 // unlocked. A page about one cause opens on the sheet after it.
 export function setUpCalculator(
   root: HTMLElement,
-  { events, today, tr, detail = () => 'unlocked', flow = FINAL_PAY_FLOW }: CalculatorDeps,
+  {
+    events,
+    today,
+    tr,
+    detail = () => 'unlocked',
+    flow = FINAL_PAY_FLOW,
+    reveal = 'instant',
+  }: CalculatorDeps,
 ): SectionForm {
   const form = required(root.querySelector<HTMLFormElement>('#calculator'), 'the form');
+  // Only a review the person submits shows its checks; one replayed on return from paying, or after
+  // a reading, does not. The capture runs before the section's own submit handler, which reviews
+  // synchronously; the flag is gone once that submit is over, whether it reached a review or not.
+  let asked = false;
+  form.addEventListener(
+    'submit',
+    () => {
+      asked = true;
+      // A microtask would run between the two handlers of a click's submit; a task runs after both.
+      setTimeout(() => (asked = false));
+    },
+    { capture: true },
+  );
+  let revealed = false;
+  let endReveal = () => {};
+  // Going back mid-sequence leaves the result: the sequence ends with it.
+  window.addEventListener('popstate', () => endReveal());
   const otherContracts = setUpOtherContracts(form, tr, () => applyConditions(form));
   // The last review shown, to show it again when its detail is unlocked or locked.
   let shown: ResultData | null = null;
@@ -67,6 +92,13 @@ export function setUpCalculator(
       };
       const state = detail();
       renderResult(result, shown, state === 'locked', tr);
+      endReveal();
+      const steps = revealSteps(r.review, tr);
+      if (reveal === 'staged' && asked && steps.lines.length > 0) {
+        endReveal = stageReveal(result, steps, revealed);
+        revealed = true;
+      }
+      asked = false;
       completed = {
         review: r.review,
         input: parsed.input,
@@ -86,6 +118,7 @@ export function setUpCalculator(
     },
     restarted() {
       shown = null;
+      endReveal();
       otherContracts.reset();
     },
     beforeFill(entries) {

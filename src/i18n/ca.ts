@@ -483,6 +483,8 @@ export const ca: Translation = {
     'Amb aquest contracte portes {dias} dies cotitzats; en calen 360 en els últims 6 anys (art. 269.1 LGSS). Si vas treballar abans, ho veus a la teva vida laboral.',
   'client.unemployment.qualifying.depends_other_contracts':
     'Amb aquests contractes sumes {dias} dies cotitzats; en calen 360 en els últims 6 anys que no hagis fet servir ja per a un altre atur (art. 269 LGSS). Ho veus a la teva vida laboral.',
+  'client.reveal.checked': 'Comprovat amb la llei: {partida}',
+  'client.reveal.summary': 'Partides comprovades: {partidas}. Referències legals: {referencias}.',
   'client.item.pending_salary': 'Salari del mes de la baixa',
   'client.item.holiday_pay': 'Vacances meritades i no gaudides',
   'client.item.extra_pay': 'Pagues extraordinàries meritades',

@@ -501,6 +501,9 @@ export const fr: Translation = {
     'Avec ce contrat, vous avez {dias} jours cotisés\u00a0; il en faut 360 au cours des 6 dernières années (art. 269.1 LGSS). Si vous avez travaillé avant, vous le voyez sur votre relevé de carrière.',
   'client.unemployment.qualifying.depends_other_contracts':
     'Avec ces contrats, vous totalisez {dias} jours cotisés\u00a0; il en faut 360 au cours des 6 dernières années, non encore utilisés pour une autre allocation chômage (art. 269 LGSS). Vous le voyez sur votre relevé de carrière.',
+  'client.reveal.checked': 'Vérifié selon la loi\u00a0: {partida}',
+  'client.reveal.summary':
+    'Éléments vérifiés\u00a0: {partidas}. Références légales\u00a0: {referencias}.',
   'client.item.pending_salary': 'Salaire du mois de sortie',
   'client.item.holiday_pay': 'Congés acquis et non pris',
   'client.item.extra_pay': 'Primes extraordinaires acquises',

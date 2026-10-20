@@ -38,4 +38,11 @@ export interface CalculatorDeps {
   readonly detail?: () => Detail;
   // The walk through the sheets; the final pay's own unless the page brings another.
   readonly flow?: Flow<Step>;
+  // Whether a review the person asks for shows its checks going by first; never unless told.
+  readonly reveal?: RevealArm;
 }
+
+// Half of the page views see the review's own checks go by before the result; the other half see
+// the result at once. With reduced motion there is no sequence, and that is said apart so it never
+// counts as either half.
+export type RevealArm = 'staged' | 'instant' | 'reduced';

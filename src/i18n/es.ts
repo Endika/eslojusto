@@ -864,6 +864,8 @@ export const es = {
   'client.unemployment.qualifying.depends_other_contracts':
     'Con estos contratos sumas {dias} días cotizados; hacen falta 360 en los últimos 6 años que no hayas usado ya para otro paro (art. 269 LGSS). Lo ves en tu vida laboral.',
 
+  'client.reveal.checked': 'Comprobado con la ley: {partida}',
+  'client.reveal.summary': 'Partidas comprobadas: {partidas}. Referencias legales: {referencias}.',
   'client.item.pending_salary': 'Salario del mes de la baja',
   'client.item.holiday_pay': 'Vacaciones devengadas y no disfrutadas',
   'client.item.extra_pay': 'Pagas extra devengadas',

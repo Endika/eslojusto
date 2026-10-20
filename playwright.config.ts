@@ -55,7 +55,9 @@ export default defineConfig({
   testDir: 'tests/e2e',
   // A Spanish browser, as most visitors have: any other published language gets the page's offer
   // to switch, which languages.spec.ts covers.
-  use: { baseURL: `http://localhost:${port}/`, locale: 'es-ES' },
+  // Reduced motion also keeps a review's result from showing its checks first: every spec sees the
+  // result at once unless it asks for the sequence (final-pay-reveal.spec.ts).
+  use: { baseURL: `http://localhost:${port}/`, locale: 'es-ES', reducedMotion: 'reduce' },
   webServer: {
     command: `npm run build && npm run preview -- --port ${port}`,
     url: `http://localhost:${port}/`,

@@ -60,6 +60,12 @@ const workHistoryUrl =
     </p>
   </header>
 
+  {/* The review's own checks going by, for the half of visits that see them first. */}
+  <div class="reveal" data-reveal hidden>
+    <ol class="reveal__steps" data-reveal-steps aria-hidden="true"></ol>
+    <p class="reveal__summary" data-reveal-summary role="status"></p>
+  </div>
+
   <div class="review" data-review data-benefit-first={benefitFirst}>
     {documents && <PassNotice lang={lang} />}
     <section class="item summary" data-summary hidden aria-labelledby="summary-title">
