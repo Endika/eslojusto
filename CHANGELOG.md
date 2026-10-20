@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.104.0](https://github.com/Endika/eslojusto/compare/v1.103.0...v1.104.0) (2026-10-20)
+
+
+### Features
+
+* **final-pay:** show half of visits the review's checks before the result ([3747c36](https://github.com/Endika/eslojusto/commit/3747c361f986e627bc278ec6c2837b6ae37b5336))
+
 ## [1.103.0](https://github.com/Endika/eslojusto/compare/v1.102.1...v1.103.0) (2026-10-20)
 
 
