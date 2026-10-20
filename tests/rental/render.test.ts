@@ -193,7 +193,7 @@ describe('the result', () => {
     expect(card?.getAttribute('data-state')).toBe('depends');
     expect(text(card?.querySelector('[data-total-share]'))).toContain('No se suma al total');
     const statuses = [...(card?.querySelectorAll('[data-rule-status]') ?? [])].map(text);
-    expect(statuses).toContain('derogada el 30-04-2026');
+    expect(statuses.some((s) => s.endsWith(' · derogada el 30-04-2026'))).toBe(true);
     const links = [...(card?.querySelectorAll('[data-rules] a') ?? [])];
     expect(links.some((a) => a.getAttribute('href')?.startsWith('https://www.boe.es/'))).toBe(true);
   });

@@ -100,6 +100,33 @@ function phrasesOf(input: EmploymentInput): EmploymentPhrase[] {
     .flatMap(nested);
 }
 
+describe('the rules under each point', () => {
+  const statuses = () => {
+    const root = render(belowMinimum, false);
+    const rules = card(root, 'Salario frente al SMI')?.querySelectorAll('[data-rules] li') ?? [];
+    return new Map(
+      [...rules].map((li) => [
+        text(li.querySelector('a')),
+        text(li.querySelector('[data-rule-status]')),
+      ]),
+    );
+  };
+
+  it('dates a yearly SMI decree by the days it had effect, never «en vigor»', () => {
+    expect(statuses().get('art. 3.1 (Real Decreto 126/2026, de 18 de febrero)')).toBe(
+      'con efectos del 01-01-2026 al 31-12-2026',
+    );
+  });
+
+  it('gives a rule with no end the day it took effect and that it is in force', () => {
+    const open = [...statuses().values()].filter((s) => !s.includes(' al '));
+    expect(open.length).toBeGreaterThan(0);
+    expect(open.every((s) => /^con efectos desde el \d{2}-\d{2}-\d{4} · en vigor$/.test(s))).toBe(
+      true,
+    );
+  });
+});
+
 describe('the information duty of a contract already running', () => {
   const running = (info: Partial<EmploymentInput['info']> = {}) => {
     const base = contract({ startDate: f('2026-01-07'), signedOn: f('2026-01-07') });

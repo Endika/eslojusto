@@ -245,7 +245,9 @@ for (const { name, viewport } of SIZES) {
       await expect(card.locator('.item__status')).toHaveText('Depende');
       await expect(card).toContainText(/Depende de cómo se lea una norma que ya está derogada/);
       await expect(card).toContainText('No se suma al total');
-      await expect(card.getByText('derogada el 30-04-2026', { exact: true })).toBeVisible();
+      await expect(card.locator('[data-rule-status][data-status="repealed"]')).toHaveText(
+        'con efectos del 22-03-2026 al 29-04-2026 · derogada el 30-04-2026',
+      );
       await expect(page.getByRole('region', { name: 'Resumen' })).not.toContainText('al menos');
     });
   });
