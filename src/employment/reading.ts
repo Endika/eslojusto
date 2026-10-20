@@ -12,10 +12,24 @@ export function employmentReading(
   form: HTMLFormElement,
   tr: Translate,
 ): DocumentReading<EmploymentFieldName, EmploymentListName> {
-  form.addEventListener('reset', () => removeQuotes(form));
+  const read = (part: 'name' | 'code') =>
+    form.querySelector<HTMLInputElement>(`[data-read-agreement="${part}"]`);
+  const setAgreement = (name: string | null, code: string | null) => {
+    const n = read('name');
+    const c = read('code');
+    if (n) n.value = name ?? '';
+    if (c) c.value = code ?? '';
+  };
+  // A hidden field keeps its value through a form reset: starting over empties it by hand.
+  form.addEventListener('reset', () => {
+    removeQuotes(form);
+    setAgreement(null, null);
+  });
   return {
     prefill(extraction, answers, checks) {
       const p = employmentPrefill(extraction, answers, tr, checks);
+      if (p.agreement.name !== null || p.agreement.code !== null)
+        setAgreement(p.agreement.name, p.agreement.code);
       for (const question of QUOTED) {
         const text = p.quotes[question];
         if (text)

@@ -81,6 +81,21 @@ function form(change: Values = {}, rows: RowsOf = {}): HTMLFormElement {
 }
 
 describe('the employment form', () => {
+  it('keeps the agreement a document read only while the contract is said to name it', () => {
+    const read = { agreementName: ' Convenio del metal ', agreementCode: '99000000011999' };
+    const agreementOf = (change: Values) => {
+      const r = readEmploymentForm(form({ ...read, ...change }), TODAY);
+      if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
+      return { name: r.input.agreement.name, code: r.input.agreement.code };
+    };
+    expect(agreementOf({})).toEqual({ name: 'Convenio del metal', code: '99000000011999' });
+    expect(agreementOf({ agreementNamed: 'no' })).toEqual({ name: null, code: null });
+    expect(agreementOf({ agreementName: '', agreementCode: '12ab' })).toEqual({
+      name: null,
+      code: null,
+    });
+  });
+
   it('reads a complete contract, its extra pays matching its payments', () => {
     const r = readEmploymentForm(form(), TODAY);
     if (!('input' in r)) throw new Error(JSON.stringify(r.errors));

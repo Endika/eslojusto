@@ -249,6 +249,9 @@ type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
 // What a question that is not asked reads as: never a choice the person did not make, so every
 // yes/no left out is «No lo sé» (null) and every list is empty.
+// The longest agreement name a reading keeps, as the API caps it.
+const AGREEMENT_NAME_MAX = 160;
+
 const DEFAULTS: EmploymentInput = {
   relationship: 'common',
   viaTempAgency: false,
@@ -278,6 +281,8 @@ const DEFAULTS: EmploymentInput = {
   fullTimeHours: null,
   agreement: {
     named: false,
+    name: null,
+    code: null,
     categoryAnnualSalary: null,
     annualHours: null,
     holidayDays: null,
@@ -350,6 +355,17 @@ function sheetsFor(reach: Scope | null, modality: Modality | undefined): Set<She
 
 // FormData leaves out disabled controls, so a question that does not apply never reaches the
 // engine; neither does a sheet the visit skips.
+// What a document read of the agreement, only while the person says the contract names it.
+function readAgreement(
+  named: boolean,
+  name: string | null,
+  code: string | null,
+): Pick<EmploymentInput['agreement'], 'name' | 'code'> {
+  const n = named ? (name?.trim().slice(0, AGREEMENT_NAME_MAX) ?? '') : '';
+  const c = named ? (code?.trim() ?? '') : '';
+  return { name: n === '' ? null : n, code: /^[0-9]{8,14}$/.test(c) ? c : null };
+}
+
 function read(form: HTMLFormElement): Reading {
   const data = new FormData(form);
   const partial: Partial<Mutable<EmploymentInput>> = {};
@@ -563,6 +579,7 @@ function read(form: HTMLFormElement): Reading {
       ...DEFAULTS.agreement,
       ...partial.agreement,
       named: named ?? false,
+      ...readAgreement(named === true, text('agreementName'), text('agreementCode')),
       categoryAnnualSalary: figure('categorySalary', false),
       annualHours: figure('agreementAnnualHours', false),
     };

@@ -35,6 +35,8 @@ export const contract = (change: Partial<EmploymentInput> = {}): EmploymentInput
   fullTimeHours: null,
   agreement: {
     named: false,
+    name: null,
+    code: null,
     categoryAnnualSalary: null,
     annualHours: null,
     holidayDays: null,

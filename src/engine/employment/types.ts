@@ -57,6 +57,9 @@ export interface Salary {
 
 export interface Agreement {
   readonly named: boolean;
+  // As a document read them, never typed: the agreement's name and its REGCON code.
+  readonly name: string | null;
+  readonly code: string | null;
   readonly categoryAnnualSalary: number | null;
   readonly annualHours: number | null;
   readonly holidayDays: number | null;

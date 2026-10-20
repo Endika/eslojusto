@@ -28,6 +28,8 @@ const toInput = (c: EmploymentCaseInput): EmploymentInput => ({
   startDate: f(c.startDate),
   endDate: orNull(c.endDate),
   signedOn: orNull(c.signedOn),
+  // The bank's cases carry no agreement read from a document.
+  agreement: { ...c.agreement, name: null, code: null },
   training:
     c.training === null
       ? null

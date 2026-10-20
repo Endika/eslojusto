@@ -12,6 +12,7 @@ import type { OfferComparison, OfferDifference } from '../engine/employment/offe
 import type { PermanentReference } from '../engine/employment/reference';
 import type { EmploymentReview } from '../engine/employment/review';
 import type {
+  Agreement,
   Assessed,
   EmploymentInput,
   Finding,
@@ -820,17 +821,46 @@ function referenceCard(
 
 // ---------- Information blocks and the rest ----------
 
+// The agreement a document named, in its own words, before what the block says of any agreement;
+// with none of its figures typed, which ones the review would weigh.
+function agreementLines(agreement: Agreement | null, tr: Translate): string[] {
+  if (agreement === null || (agreement.name === null && agreement.code === null)) return [];
+  const read =
+    agreement.name === null
+      ? tr('client.employment.block.agreement_read_code', { codigo: agreement.code ?? '' })
+      : tr('client.employment.block.agreement_read', {
+          convenio:
+            agreement.code === null
+              ? agreement.name
+              : tr('client.employment.documents.agreement_with_code', {
+                  nombre: agreement.name,
+                  codigo: agreement.code,
+                }),
+        });
+  const noFigures = [
+    agreement.categoryAnnualSalary,
+    agreement.annualHours,
+    agreement.holidayDays,
+    agreement.trialMonths,
+  ].every((f) => f === null);
+  return [read, ...(noFigures ? [tr('client.employment.block.agreement_figures')] : [])];
+}
+
 function renderInformation(
   container: ParentNode,
   blocks: readonly InformationBlock[],
   tr: Translate,
+  agreement: Agreement | null = null,
 ) {
   find(container, '[data-information]').replaceChildren(
     ...blocks.map((b) => {
       const frag = template(container, 'information');
       find(frag, '[data-info-title]').textContent = tr(`client.employment.block.${b.id}`);
       find(frag, '[data-info-text]').replaceChildren(
-        ...listItems(calculationLines(b.calculation, tr)),
+        ...listItems([
+          ...(b.id === 'agreement' ? agreementLines(agreement, tr) : []),
+          ...calculationLines(b.calculation, tr),
+        ]),
       );
       const links = find(frag, '[data-info-links]');
       const items = [
@@ -900,7 +930,7 @@ export function renderEmploymentResult(
     : '';
   if (unnamed) {
     find(root, '[data-items]').replaceChildren();
-    renderInformation(root, review.information, tr);
+    renderInformation(root, review.information, tr, input.agreement);
     find(root, '[data-unchecked]').replaceChildren(
       ...listItems(review.unchecked.map((code) => tr(`client.employment.unchecked.${code}`))),
     );
@@ -915,7 +945,7 @@ export function renderEmploymentResult(
     ...(review.offer === null ? [] : [offerCard(root, review.offer, locked, tr)]),
     ...(review.reference === null || locked ? [] : [referenceCard(root, review.reference, tr)]),
   );
-  renderInformation(root, review.information, tr);
+  renderInformation(root, review.information, tr, input.agreement);
   find(root, '[data-unchecked]').replaceChildren(
     ...listItems(review.unchecked.map((code) => tr(`client.employment.unchecked.${code}`))),
   );

@@ -1,4 +1,5 @@
 import { toIso } from '../engine/date';
+import { agreementScope } from '../engine/employment/agreement-code';
 import type { EmploymentPhrase } from '../engine/employment/calculation';
 import { everyAssessed, type EmploymentReview } from '../engine/employment/review';
 import type { Assessed, EmploymentInput, Finding } from '../engine/employment/types';
@@ -128,6 +129,7 @@ export function employmentReviewProps(data: {
   const wage = minimumWagePoints(review);
   // The contract and the payslips may show the same shortfall: the larger one stands for both.
   const difference = Math.max(0, ...wage.map((a) => certain(a, shortfall)));
+  const scope = agreementScope(input.agreement.code);
   return {
     start_period: startPeriod(input),
     modality: input.modality,
@@ -157,6 +159,8 @@ export function employmentReviewProps(data: {
     history: input.history !== null,
     offer: input.offer !== null,
     agreement_named: input.agreement.named,
+    agreement_authority: input.agreement.code === null ? 'none' : scope.authority,
+    agreement_level: input.agreement.code === null ? 'none' : scope.level,
     difference: differenceBucket(difference),
     offered: review.offerPass,
     detail: data.detail,

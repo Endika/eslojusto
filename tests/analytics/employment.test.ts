@@ -169,6 +169,8 @@ describe('employment events', () => {
         offer: { grossAnnual: null, net: false, weeklyHours: null, modality: null, remote: null },
         agreement: {
           named: true,
+          name: null,
+          code: null,
           categoryAnnualSalary: null,
           annualHours: null,
           holidayDays: null,
@@ -177,6 +179,23 @@ describe('employment events', () => {
       }),
     );
     expect(p).toMatchObject({ payslips: '4+', history: true, offer: true, agreement_named: true });
+  });
+
+  it('says the scope a read agreement code gives, never the code or the name', () => {
+    const read = {
+      ...belowMinimum,
+      agreement: {
+        ...belowMinimum.agreement,
+        named: true,
+        name: 'Convenio colectivo ficticio del metal',
+        code: '99004225011981',
+      },
+    };
+    const p = props(read);
+    expect(p).toMatchObject({ agreement_authority: 'state', agreement_level: 'sector' });
+    expect(JSON.stringify(p)).not.toMatch(/99004225011981|metal/);
+    expect(isValidEvent('employment_review_completed', p)).toBe(true);
+    expect(props()).toMatchObject({ agreement_authority: 'none', agreement_level: 'none' });
   });
 
   it('refuses euros, a date or free text in any key', () => {

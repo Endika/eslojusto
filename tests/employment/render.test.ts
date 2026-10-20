@@ -100,6 +100,44 @@ function phrasesOf(input: EmploymentInput): EmploymentPhrase[] {
     .flatMap(nested);
 }
 
+describe('the agreement block', () => {
+  const block = (agreement: Partial<EmploymentInput['agreement']>) => {
+    const input = { ...belowMinimum, agreement: { ...belowMinimum.agreement, ...agreement } };
+    const root = render(input, false);
+    const blocks = [...root.querySelectorAll('[data-information] [data-info-title]')];
+    const title = blocks.find((t) => text(t) === 'Tu convenio colectivo');
+    return text(title?.parentElement?.closest('details') ?? title?.parentElement ?? null);
+  };
+
+  it('names the agreement a document read, with its code', () => {
+    const shown = block({
+      named: true,
+      name: 'Convenio colectivo ficticio del metal',
+      code: '99000000011999',
+    });
+    expect(shown).toContain(
+      'Según tu documento, tu convenio es Convenio colectivo ficticio del metal (código 99000000011999).',
+    );
+    expect(shown).toContain('Si metes sus cifras, la revisión las compara con tu contrato');
+  });
+
+  it('names it by its code alone when that is all that was read', () => {
+    expect(block({ named: true, code: '99000000011999' })).toContain(
+      'Según tu documento, tu convenio es el del código 99000000011999.',
+    );
+  });
+
+  it('does not ask for figures already typed', () => {
+    const shown = block({ named: true, name: 'Convenio del metal', categoryAnnualSalary: 20000 });
+    expect(shown).toContain('Según tu documento, tu convenio es Convenio del metal.');
+    expect(shown).not.toContain('Si metes sus cifras');
+  });
+
+  it('says nothing of a document when none named the agreement', () => {
+    expect(block({ named: true })).not.toContain('Según tu documento');
+  });
+});
+
 describe('the rules under each point', () => {
   const statuses = () => {
     const root = render(belowMinimum, false);
