@@ -500,6 +500,9 @@ test('a whole pack fills every sheet; the detail waits for the pass, which unloc
     result.getByRole('region', { name: 'Contratos temporales encadenados', exact: true }),
   ).toHaveCount(0);
   await expectNoDetail(result);
+  // The agreement the contract named is named in the result, free.
+  const named = 'Según tu documento, tu convenio es Convenio colectivo ficticio del metal.';
+  await expect(result.locator('[data-information]')).toContainText(named);
 
   // The same pass as the other reviews', returning to this page.
   const offer = page.getByRole('region', {
@@ -525,6 +528,7 @@ test('a whole pack fills every sheet; the detail waits for the pass, which unloc
     'Nómina de junio de 2025: no es de un mes completo o tiene incidencias, así que no se compara.',
   );
   await expect(offer).toContainText(/Tu pase vale hasta el/);
+  await expect(result.locator('[data-information]')).toContainText(named);
 });
 
 test('a work history cut to its most recent rows never reads as within the limit', async ({

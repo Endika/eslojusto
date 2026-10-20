@@ -846,6 +846,9 @@ const ANSWERS = ['yes', 'no', 'unknown'] as const;
 const SECTION_SECONDS = ['<10', '10-30', '30-60', '60-180', '>180'] as const;
 const REVIEW_SECONDS = ['<60', '60-180', '180-600', '>600'] as const;
 const DIFFERENCE_BUCKETS = ['0', '<100', '100-500', '500-2000', '>2000'] as const;
+// What the agreement's code says of its scope (RD 713/2010, anexo 3); «none» when no code was read.
+export const AGREEMENT_AUTHORITIES = ['none', 'state', 'regional', 'province', 'unknown'] as const;
+export const AGREEMENT_LEVELS = ['none', 'sector', 'company', 'unknown'] as const;
 const ATTEMPT_BUCKETS = ['1', '2', '3+'] as const;
 
 // The first bucket holds what is below the first limit; each next one, up to its limit inclusive.
@@ -983,6 +986,9 @@ const BASE_CATALOGUE = {
     offer: { boolean: true },
     // Whether the contract names its collective agreement; never which one.
     agreement_named: { boolean: true },
+    // The scope a read agreement code gives; never the code or the name.
+    agreement_authority: oneOf(AGREEMENT_AUTHORITIES),
+    agreement_level: oneOf(AGREEMENT_LEVELS),
     difference: oneOf(DIFFERENCE_BUCKETS),
     offered: { boolean: true },
     detail: oneOf(['locked', 'unlocked']),

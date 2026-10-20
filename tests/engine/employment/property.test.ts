@@ -141,6 +141,8 @@ function generate(g: Gen): EmploymentInput {
     contractHours: { weekly, annual: weekly === null ? g.maybe(g.int(500, 1800)) : null },
     agreement: {
       named: bool(g),
+      name: null,
+      code: null,
       categoryAnnualSalary: g.maybe(g.int(12000, 30000)),
       annualHours: null,
       holidayDays: g.maybe(g.int(22, 35)),

@@ -48,6 +48,8 @@ type Quoted = (typeof QUOTED)[number];
 
 interface EmploymentPrefill extends ReadPrefill {
   readonly quotes: Readonly<Partial<Record<Quoted, string>>>;
+  // The agreement as read, for the result to name it; the form never asks for it.
+  readonly agreement: { readonly name: string | null; readonly code: string | null };
 }
 
 const RANK: Record<Confidence, number> = { high: 2, medium: 1, low: 0 };
@@ -711,5 +713,6 @@ export function employmentPrefill(
       ),
     ],
     quotes,
+    agreement: { name: agreement, code },
   };
 }

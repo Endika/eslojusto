@@ -196,6 +196,8 @@ describe('the contract documents', () => {
       fullTimeHours: 37.5,
       agreement: {
         named: true,
+        name: null,
+        code: null,
         categoryAnnualSalary: 123456.78,
         annualHours: 1700,
         holidayDays: null,

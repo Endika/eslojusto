@@ -178,6 +178,8 @@ export const corners: readonly EmploymentInput[] = [
     realWeeklyHours: 10,
     agreement: {
       named: true,
+      name: null,
+      code: null,
       categoryAnnualSalary: 20000,
       annualHours: 1750,
       holidayDays: 31,
