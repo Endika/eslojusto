@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.102.1](https://github.com/Endika/eslojusto/compare/v1.102.0...v1.102.1) (2026-10-20)
+
+
+### Bug Fixes
+
+* **sources:** date each rule under rental, contract and household items ([52c3783](https://github.com/Endika/eslojusto/commit/52c378359a0effae84612244152dee028802dab4))
+
 ## [1.102.0](https://github.com/Endika/eslojusto/compare/v1.101.0...v1.102.0) (2026-10-19)
 
 
