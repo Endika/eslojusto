@@ -7622,10 +7622,10 @@ export const es = {
     'Sí. La extinción por causas objetivas es situación legal de desempleo (art. 267.1.a.4.º LGSS).',
 
   'landing.benefit_disciplinary.name': 'Paro después de un despido disciplinario',
-  'landing.benefit_disciplinary.title': 'Paro después de un despido disciplinario',
+  'landing.benefit_disciplinary.title': 'Despido disciplinario y paro: sí tienes derecho, y cuánto',
   'landing.benefit_disciplinary.description':
     'Un despido disciplinario da paro, aunque sea procedente o no lo impugnes (art. 268.4 LGSS). Qué ceses dan paro y cuánto cobrarías con tus datos.',
-  'landing.benefit_disciplinary.h1': 'Paro después de un despido disciplinario',
+  'landing.benefit_disciplinary.h1': '¿Un despido disciplinario da derecho a paro? Sí',
   'landing.benefit_disciplinary.lead':
     'Un despido disciplinario también da derecho a paro si cumples el resto de requisitos. Escribe tus datos y verás cuánto cobrarías y durante cuánto tiempo.',
   'landing.benefit_disciplinary.guide_title': 'El despido disciplinario y el paro',

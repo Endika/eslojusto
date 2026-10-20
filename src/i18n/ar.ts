@@ -1281,10 +1281,11 @@ export const ar: Translation = {
     'نعم. إنهاء العقد لأسباب موضوعية يُعدّ وضعًا قانونيًا للبطالة \u2068(situación legal de desempleo)\u2069 \u2068(art. 267.1.a.4.º LGSS)\u2069.',
   'landing.benefit_disciplinary.name': 'إعانة البطالة بعد الفصل التأديبي',
   'landing.benefit_disciplinary.title':
-    'إعانة البطالة \u2068(paro)\u2069 بعد الفصل التأديبي \u2068(despido disciplinario)\u2069',
+    'الفصل التأديبي \u2068(despido disciplinario)\u2069 والبطالة \u2068(paro)\u2069: نعم، لك الحق فيها، وكم تتقاضى',
   'landing.benefit_disciplinary.description':
     'الفصل التأديبي يمنح الحق في إعانة البطالة، حتى لو كان مبرَّرًا \u2068(procedente)\u2069 أو لم تطعن فيه \u2068(art. 268.4 LGSS)\u2069. أيّ حالات انتهاء العمل تمنح إعانة البطالة وكم ستتقاضى ببياناتك.',
-  'landing.benefit_disciplinary.h1': 'إعانة البطالة \u2068(paro)\u2069 بعد الفصل التأديبي',
+  'landing.benefit_disciplinary.h1':
+    'هل يمنح الفصل التأديبي الحق في إعانة البطالة \u2068(paro)\u2069؟ نعم',
   'landing.benefit_disciplinary.lead':
     'الفصل التأديبي \u2068(despido disciplinario)\u2069 يمنح أيضًا الحق في إعانة البطالة إذا استوفيت باقي الشروط. اكتب بياناتك وسترى كم ستتقاضى ولأي مدة.',
   'landing.benefit_disciplinary.guide_title': 'الفصل التأديبي وإعانة البطالة',

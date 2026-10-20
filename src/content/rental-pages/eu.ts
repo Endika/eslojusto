@@ -1,4 +1,4 @@
-// source: 3c9f4c62bcf0
+// source: c1e410557cb4
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -75,10 +75,10 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'decreto-2026',
     name: '2026ko alokairu-dekretua',
     crumb: '2026ko alokairu-dekretua',
-    title: '2026ko alokairu-dekretua: zer aldatzen den eta egoera',
+    title: 'Alokairuari buruzko Real Decreto-ley 29/2026: zer aldatzen den',
     description:
       'Zer aldatzen den maizterrarentzat Real Decreto-ley 29/2026 arauarekin eta zer egoeratan dagoen: indarrean urriaren 8tik aurrera, baliozkotzeko zain.',
-    h1: '2026ko alokairu-dekretua: zer aldatzen den eta zer egoeratan dagoen',
+    h1: 'Alokairuari buruzko Real Decreto-ley 29/2026: zer aldatzen den eta zer egoeratan dagoen',
   },
   fees: {
     path: '/alquiler/honorarios-inmobiliaria/',

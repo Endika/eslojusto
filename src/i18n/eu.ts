@@ -1306,10 +1306,12 @@ export const eu: Translation = {
   'landing.objective_dismissal.faq.4.answer':
     'Bai. Kausa objektiboengatiko azkentzea legezko langabezia-egoera da (art. 267.1.a.4.º LGSS).',
   'landing.benefit_disciplinary.name': 'Langabezia-prestazioa diziplina-kaleratze baten ondoren',
-  'landing.benefit_disciplinary.title': 'Langabezia-prestazioa diziplina-kaleratze baten ondoren',
+  'landing.benefit_disciplinary.title':
+    'Diziplina-kaleratzea eta langabezia: bai, eskubidea duzu, eta zenbat',
   'landing.benefit_disciplinary.description':
     'Diziplina-kaleratze batek langabezia-prestazioa ematen du, bidezkoa izan arren edo aurkaratzen ez baduzu ere (art. 268.4 LGSS). Zer lan-amaierak ematen duten prestazioa eta zenbat kobratuko zenukeen zure datuekin.',
-  'landing.benefit_disciplinary.h1': 'Langabezia-prestazioa diziplina-kaleratze baten ondoren',
+  'landing.benefit_disciplinary.h1':
+    'Diziplina-kaleratze batek langabeziarako eskubidea ematen du? Bai',
   'landing.benefit_disciplinary.lead':
     'Diziplina-kaleratze batek ere langabezia-prestaziorako eskubidea ematen du, gainerako baldintzak betetzen badituzu. Idatzi zure datuak, eta zenbat kobratuko zenukeen eta zenbat denboran ikusiko duzu.',
   'landing.benefit_disciplinary.guide_title': 'Diziplina-kaleratzea eta langabezia-prestazioa',

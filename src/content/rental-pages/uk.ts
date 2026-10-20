@@ -1,4 +1,4 @@
-// source: 3c9f4c62bcf0
+// source: c1e410557cb4
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -75,10 +75,10 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'decreto-2026',
     name: 'Декрет про оренду 2026 р.',
     crumb: 'Декрет про оренду 2026 р.',
-    title: 'Декрет про оренду 2026 р.: що змінюється і його статус',
+    title: 'Real Decreto-ley 29/2026 про оренду: що змінюється',
     description:
       'Що змінюється для орендаря з Real Decreto-ley 29/2026 і який його статус: діє з 8 жовтня, очікує затвердження Конгресом (convalidación).',
-    h1: 'Декрет про оренду 2026 р.: що змінюється і який його статус',
+    h1: 'Real Decreto-ley 29/2026 про оренду: що змінюється і який його статус',
   },
   fees: {
     path: '/alquiler/honorarios-inmobiliaria/',

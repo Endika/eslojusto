@@ -1296,10 +1296,12 @@ export const en: Translation = {
   'landing.objective_dismissal.faq.4.answer':
     'Yes. Termination on objective grounds is a legal situation of unemployment (art. 267.1.a.4.º LGSS).',
   'landing.benefit_disciplinary.name': 'Unemployment benefit after a disciplinary dismissal',
-  'landing.benefit_disciplinary.title': 'Unemployment benefit after a disciplinary dismissal',
+  'landing.benefit_disciplinary.title':
+    'Disciplinary dismissal and unemployment benefit: yes, you are entitled, and how much',
   'landing.benefit_disciplinary.description':
     'A disciplinary dismissal gives you unemployment benefit, even if it is fair or you do not challenge it (art. 268.4 LGSS). Which ways of leaving a job give unemployment benefit and how much you would receive with your details.',
-  'landing.benefit_disciplinary.h1': 'Unemployment benefit after a disciplinary dismissal',
+  'landing.benefit_disciplinary.h1':
+    'Does a disciplinary dismissal give you unemployment benefit? Yes',
   'landing.benefit_disciplinary.lead':
     'A disciplinary dismissal also gives a right to unemployment benefit if you meet the other requirements. Type in your details and you will see how much you would receive and for how long.',
   'landing.benefit_disciplinary.guide_title': 'Disciplinary dismissal and unemployment benefit',

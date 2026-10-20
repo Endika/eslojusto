@@ -1313,10 +1313,11 @@ export const ro: Translation = {
   'landing.objective_dismissal.faq.4.answer':
     'Da. Încetarea contractului din motive obiective este situație legală de șomaj (situación legal de desempleo) (art. 267.1.a.4.º LGSS).',
   'landing.benefit_disciplinary.name': 'Indemnizația de șomaj după o concediere disciplinară',
-  'landing.benefit_disciplinary.title': 'Indemnizația de șomaj după o concediere disciplinară',
+  'landing.benefit_disciplinary.title':
+    'Concedierea disciplinară și șomajul: da, ai dreptul, și cât primești',
   'landing.benefit_disciplinary.description':
     'O concediere disciplinară dă dreptul la indemnizație de șomaj, chiar dacă este justificată sau nu o contești (art. 268.4 LGSS). Ce încetări ale contractului dau dreptul la șomaj și cât ai primi cu datele tale.',
-  'landing.benefit_disciplinary.h1': 'Indemnizația de șomaj după o concediere disciplinară',
+  'landing.benefit_disciplinary.h1': 'O concediere disciplinară dă dreptul la șomaj? Da',
   'landing.benefit_disciplinary.lead':
     'O concediere disciplinară dă și ea dreptul la indemnizație de șomaj (paro) dacă îndeplinești restul condițiilor. Scrie datele tale și vei vedea cât ai primi și cât timp.',
   'landing.benefit_disciplinary.guide_title': 'Concedierea disciplinară și indemnizația de șomaj',

@@ -1,4 +1,4 @@
-// source: 3c9f4c62bcf0
+// source: c1e410557cb4
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -75,10 +75,10 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'decreto-2026',
     name: 'Decret del lloguer 2026',
     crumb: 'Decret del lloguer 2026',
-    title: 'Decret del lloguer 2026: què canvia i el seu estat',
+    title: 'Real Decreto-ley 29/2026 del lloguer: què canvia',
     description:
       'Què canvia per al llogater amb el Real Decreto-ley 29/2026 i en quin estat és: en vigor des del 8 d’octubre, pendent de convalidació.',
-    h1: 'Decret del lloguer 2026: què canvia i en quin estat és',
+    h1: 'Real Decreto-ley 29/2026 del lloguer: què canvia i en quin estat és',
   },
   fees: {
     path: '/alquiler/honorarios-inmobiliaria/',

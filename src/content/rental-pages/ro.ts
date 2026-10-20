@@ -1,4 +1,4 @@
-// source: 3c9f4c62bcf0
+// source: c1e410557cb4
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -75,10 +75,10 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'decreto-2026',
     name: 'Decretul privind chiriile din 2026',
     crumb: 'Decretul privind chiriile din 2026',
-    title: 'Decretul privind chiriile din 2026: ce se schimbă și situația lui',
+    title: 'Real Decreto-ley 29/2026 privind chiriile: ce se schimbă',
     description:
       'Ce se schimbă pentru chiriaș cu Real Decreto-ley 29/2026 și în ce situație se află: în vigoare din 8 octombrie, în așteptarea validării.',
-    h1: 'Decretul privind chiriile din 2026: ce se schimbă și în ce situație se află',
+    h1: 'Real Decreto-ley 29/2026 privind chiriile: ce se schimbă și în ce situație se află',
   },
   fees: {
     path: '/alquiler/honorarios-inmobiliaria/',

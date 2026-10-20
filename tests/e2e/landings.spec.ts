@@ -49,7 +49,7 @@ const CASES = [
   },
   {
     path: 'paro/despido-disciplinario/',
-    h1: 'Paro después de un despido disciplinario',
+    h1: '¿Un despido disciplinario da derecho a paro? Sí',
     cause: 'Despido disciplinario',
     opens: 'fechas',
   },
