@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.103.0](https://github.com/Endika/eslojusto/compare/v1.102.1...v1.103.0) (2026-10-20)
+
+
+### Features
+
+* **employment:** name the agreement a document read and measure its scope ([348902d](https://github.com/Endika/eslojusto/commit/348902d35e851ea245b0258354059932a92d3e88))
+
 ## [1.102.1](https://github.com/Endika/eslojusto/compare/v1.102.0...v1.102.1) (2026-10-20)
 
 
