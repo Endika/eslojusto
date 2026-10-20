@@ -6,7 +6,7 @@ import { longDate } from '../documents/letter';
 import type { Block, DocumentModel } from '../documents/ports';
 import type { Translate } from '../i18n/client';
 import type { CompletedInsuranceReview } from './ports';
-import { calculationLines, civilDayText as day, normStatusText, statusText } from './render';
+import { calculationLines, civilDayText as day, sourceText, statusText } from './render';
 
 const row = (label: string, value: string): Block => ({ type: 'row', label, value });
 
@@ -46,7 +46,7 @@ function dataRows(input: InsuranceInput, tr: Translate): Block[] {
 
 const sourceBlock = (s: NormSource, tr: Translate): Block => ({
   type: 'source',
-  text: `${s.citation} · ${normStatusText(s, tr)}`,
+  text: `${s.citation} · ${sourceText(s, tr)}`,
   url: s.url,
 });
 

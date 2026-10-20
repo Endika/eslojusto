@@ -269,6 +269,10 @@ for (const { name, viewport } of SIZES) {
       const wage = card(page, 'Sueldo frente al SMI');
       await expect(wage.locator('.item__status')).toHaveText(/Podrían faltarte unos 2\.380\s€/);
       await expect(wage.getByRole('link', { name: /art\. 8\.1/ })).toBeVisible();
+      // A yearly SMI decree says the days it had effect, never «en vigor».
+      await expect(
+        wage.locator('li', { hasText: 'Real Decreto 126/2026' }).locator('[data-rule-status]'),
+      ).toHaveText('con efectos del 01-01-2026 al 31-12-2026');
       await expect(page.getByRole('region', { name: 'Resumen' })).toContainText(
         /Lo que cuenta en todas las lecturas: unos 2\.380\s€\./,
       );

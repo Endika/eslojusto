@@ -132,7 +132,7 @@ function renderRules(
 }
 
 // When a source took effect, until when, and how its norm stands today.
-function sourceText(s: NormSource, tr: Translate): string {
+export function sourceText(s: NormSource, tr: Translate): string {
   const since = dayText(s.inForceSince);
   const period =
     s.inForceUntil === null

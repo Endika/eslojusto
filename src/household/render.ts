@@ -158,7 +158,7 @@ function renderRules(
       a.textContent = s.citation;
       const status = find(li, '[data-rule-status]');
       status.dataset['status'] = s.status;
-      status.textContent = normStatusText(s, tr);
+      status.textContent = inForceText(s, tr);
       return li;
     }),
   );

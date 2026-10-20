@@ -254,7 +254,8 @@ export function rentalReport(
       { type: 'heading', text: tr('client.rental.report.norms') },
       ...norms(r).map((s): Block => ({
         type: 'source',
-        text: `${s.citation} · ${normStatusText(s, tr)}`,
+        // A wording that ended says when it applied; the rest, how the norm stands today.
+        text: `${s.citation} · ${s.inForceUntil !== null && s.status === 'in_force' ? inForceText(s, tr) : normStatusText(s, tr)}`,
         url: s.url,
       })),
       ...(review.information.length > 0
