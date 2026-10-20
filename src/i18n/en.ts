@@ -484,6 +484,8 @@ export const en: Translation = {
     'With this contract you have {dias} days of contributions; 360 are required in the last 6 years (art. 269.1 LGSS). If you worked before, you can see it in your employment history (vida laboral).',
   'client.unemployment.qualifying.depends_other_contracts':
     'With these contracts you have {dias} days of contributions; 360 are required in the last 6 years that you have not already used for another period of unemployment benefit (art. 269 LGSS). You can see this in your employment history (vida laboral).',
+  'client.reveal.checked': 'Checked against the law: {partida}',
+  'client.reveal.summary': 'Items checked: {partidas}. Legal references: {referencias}.',
   'client.item.pending_salary': 'Pay for the month you leave',
   'client.item.holiday_pay': 'Accrued untaken holiday',
   'client.item.extra_pay': 'Accrued extra payments',

@@ -487,6 +487,8 @@ export const ro: Translation = {
     'Cu acest contract ai {dias} zile de contribuție; sunt necesare 360 în ultimii 6 ani (art. 269.1 LGSS). Dacă ai lucrat înainte, vezi asta în istoricul tău de muncă (vida laboral).',
   'client.unemployment.qualifying.depends_other_contracts':
     'Cu aceste contracte ai {dias} zile de contribuție; sunt necesare 360 în ultimii 6 ani, pe care să nu le fi folosit deja pentru o altă perioadă de șomaj (art. 269 LGSS). Vezi asta în istoricul tău de muncă (vida laboral).',
+  'client.reveal.checked': 'Verificat conform legii: {partida}',
+  'client.reveal.summary': 'Elemente verificate: {partidas}. Referințe legale: {referencias}.',
   'client.item.pending_salary': 'Salariul din luna plecării',
   'client.item.holiday_pay': 'Concediu acumulat și neefectuat',
   'client.item.extra_pay': 'Plăți suplimentare acumulate',

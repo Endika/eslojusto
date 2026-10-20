@@ -2,7 +2,7 @@ import { BENEFIT_STATES, benefitState } from '../engine/benefit-state';
 import type { BenefitEstimate } from '../engine/unemployment';
 import type { EmployerFigures, Review } from '../engine/review';
 import type { Cause, FinalPayInput, HolidayUnit, ItemId, FixedTermType } from '../engine/types';
-import type { Detail } from '../calculator/ports';
+import type { Detail, RevealArm } from '../calculator/ports';
 import { FAQ_TOPICS } from '../content/faq-topics';
 import { RENTAL_FAQ_TOPICS } from '../content/rental-faq-topics';
 import type { DoubtReason } from '../engine/rental/outcome';
@@ -845,6 +845,7 @@ const ANSWERS = ['yes', 'no', 'unknown'] as const;
 
 const SECTION_SECONDS = ['<10', '10-30', '30-60', '60-180', '>180'] as const;
 const REVIEW_SECONDS = ['<60', '60-180', '180-600', '>600'] as const;
+const REVEAL_ARMS = ['staged', 'instant', 'reduced'] as const satisfies readonly RevealArm[];
 const DIFFERENCE_BUCKETS = ['0', '<100', '100-500', '500-2000', '>2000'] as const;
 // What the agreement's code says of its scope (RD 713/2010, anexo 3); «none» when no code was read.
 export const AGREEMENT_AUTHORITIES = ['none', 'state', 'regional', 'province', 'unknown'] as const;
@@ -931,6 +932,9 @@ const BASE_CATALOGUE = {
     // How the pass showed under the result: already held, offered with something to claim,
     // offered quietly or not at all.
     pass: oneOf(PASS_MODES),
+    // The half of page views this one fell in: the checks shown going by first, or the result at
+    // once; «reduced» with reduced motion, outside the comparison.
+    reveal: oneOf(REVEAL_ARMS),
   },
   detail_opened: {
     item: oneOf([...ITEM_IDS, ...RENTAL_ITEMS, ...EMPLOYMENT_ITEMS, ...HOUSEHOLD_ITEMS]),
@@ -1291,6 +1295,7 @@ export function reviewProps(data: {
   otherContracts: number;
   detail: Detail;
   pass: PassMode;
+  reveal: RevealArm;
 }): Props<'review_completed'> {
   const { review, input: e } = data;
   const countOf = (status: string) => review.items.filter((p) => p.status === status).length;
@@ -1331,5 +1336,6 @@ export function reviewProps(data: {
     unfair_reference: review.unfairReference === null ? 'none' : 'shown',
     detail: data.detail,
     pass: data.pass,
+    reveal: data.reveal,
   };
 }

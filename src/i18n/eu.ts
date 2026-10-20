@@ -487,6 +487,9 @@ export const eu: Translation = {
     'Kontratu honekin {dias} egun kotizatu dituzu; azken 6 urteetan 360 behar dira (art. 269.1 LGSS). Lehenago lan egin bazenuen, zure lan-bizitzan ikusten da.',
   'client.unemployment.qualifying.depends_other_contracts':
     'Kontratu hauekin {dias} egun kotizatu dituzu guztira; azken 6 urteetan 360 behar dira, beste langabezia-prestazio baterako erabili ez dituzunak (art. 269 LGSS). Zure lan-bizitzan ikusten da.',
+  'client.reveal.checked': 'Legearekin egiaztatua: {partida}',
+  'client.reveal.summary':
+    'Egiaztatutako partidak: {partidas}. Lege-erreferentziak: {referencias}.',
   'client.item.pending_salary': 'Baja-hilabeteko soldata',
   'client.item.holiday_pay': 'Sortutako eta hartu gabeko oporrak',
   'client.item.extra_pay': 'Sortutako aparteko ordainsariak',

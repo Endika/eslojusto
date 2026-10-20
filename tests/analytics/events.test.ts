@@ -140,6 +140,7 @@ describe('the catalogue guard', () => {
       otherContracts: 0,
       detail: 'unlocked',
       pass: 'none',
+      reveal: 'instant',
     });
     expect(isValidEvent('review_completed', props)).toBe(true);
     expect(isValidEvent('review_completed', { ...props, difference: 412.5 })).toBe(false);
@@ -476,6 +477,7 @@ describe('review_completed', () => {
         otherContracts: 0,
         detail: 'unlocked',
         pass: 'none',
+        reveal: 'instant',
       });
     expect(props(8136.99).unfair_reference).toBe('shown');
     expect(props(null).unfair_reference).toBe('none');
@@ -500,6 +502,7 @@ describe('review_completed', () => {
       otherContracts: 0,
       detail: 'locked',
       pass: 'claim',
+      reveal: 'instant',
     });
     expect(props).toEqual({
       cause: 'fixed_term_end',
@@ -523,6 +526,7 @@ describe('review_completed', () => {
       unfair_reference: 'none',
       detail: 'locked',
       pass: 'claim',
+      reveal: 'instant',
     });
     expect(isValidEvent('review_completed', props)).toBe(true);
   });
@@ -537,6 +541,7 @@ describe('review_completed', () => {
       otherContracts: 0,
       detail: 'unlocked',
       pass: 'none',
+      reveal: 'instant',
     } as const;
     const withInput = (e: Partial<FinalPayInput>) =>
       reviewProps({ ...base, input: { ...input, ...e } });
@@ -570,6 +575,7 @@ describe('review_completed', () => {
       otherContracts: 0,
       detail: 'unlocked',
       pass: 'none',
+      reveal: 'instant',
     });
     expect(isValidEvent('review_completed', props)).toBe(true);
     expect(JSON.stringify(props)).not.toMatch(/1500|40000|2010|2026/);
@@ -579,7 +585,14 @@ describe('review_completed', () => {
 describe('review_completed: the benefit', () => {
   const base = { review: review(), input, attempt: 1, changedFields: [], seconds: 1 } as const;
   const props = (p: ReturnType<typeof estimateBenefit>, otherContracts = 0) =>
-    reviewProps({ ...base, benefit: p, otherContracts, detail: 'unlocked', pass: 'none' });
+    reviewProps({
+      ...base,
+      benefit: p,
+      otherContracts,
+      detail: 'unlocked',
+      pass: 'none',
+      reveal: 'instant',
+    });
 
   it('says whether there were figures, none, or it does not apply, and nothing else', () => {
     expect(props(benefit).benefit).toBe('with_figures');

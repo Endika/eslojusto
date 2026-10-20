@@ -1,4 +1,4 @@
-import type { CalculatorEvents, CompletedReview } from '../calculator/ports';
+import type { CalculatorEvents, CompletedReview, RevealArm } from '../calculator/ports';
 import type { PassMode } from '../documents/ports';
 import {
   changedFields,
@@ -19,6 +19,7 @@ export function calculatorAnalytics(
   track: Track,
   now: () => number,
   pass: (r: CompletedReview) => PassMode,
+  reveal: RevealArm = 'instant',
 ): CalculatorEvents {
   let viewedSection: Section | null = null;
   let sectionEnteredAt = 0;
@@ -63,6 +64,7 @@ export function calculatorAnalytics(
           otherContracts,
           detail,
           pass: pass(completed),
+          reveal,
         }),
       );
       previous = answers;

@@ -226,6 +226,8 @@ test('tracks languages, steps and outcome without sending anything typed', async
     unfair_reference: 'none',
     detail: 'unlocked',
     pass: 'none',
+    // The specs run with reduced motion: outside the comparison.
+    reveal: 'reduced',
   });
   expect(keys(spy.named('review_completed')[0])).toEqual(
     [
@@ -254,6 +256,7 @@ test('tracks languages, steps and outcome without sending anything typed', async
       'unfair_reference',
       'detail',
       'pass',
+      'reveal',
     ].toSorted(),
   );
 
@@ -479,6 +482,9 @@ test('the situations of a possibly null dismissal never leave the page, not even
 });
 
 test('with the do-not-track signal nothing is sent', async ({ page }) => {
+  // Headless Chromium with reduced motion keeps painting after a sheet turns and never goes idle;
+  // this test is about the signal, not about motion.
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'globalPrivacyControl', { get: () => true });
   });

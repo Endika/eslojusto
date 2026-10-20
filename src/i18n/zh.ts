@@ -454,6 +454,8 @@ export const zh: Translation = {
     '这份合同您已缴费{dias}天；过去6年中需要360天（art. 269.1 LGSS）。如果您之前工作过，可以在您的工作履历报告（vida laboral）中查看。',
   'client.unemployment.qualifying.depends_other_contracts':
     '这些合同累计缴费{dias}天；过去6年中需要360天，且未用于领取其他失业金（art. 269 LGSS）。可以在您的工作履历报告（vida laboral）中查看。',
+  'client.reveal.checked': '已按法律核对：{partida}',
+  'client.reveal.summary': '已核对项目：{partidas}。法律依据：{referencias}。',
   'client.item.pending_salary': '离职当月的工资',
   'client.item.holiday_pay': '已累计但未休的年假',
   'client.item.extra_pay': '已累计的额外工资',

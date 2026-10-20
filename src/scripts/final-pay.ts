@@ -2,6 +2,7 @@ import { calculatorAnalytics } from '../analytics/calculator';
 import { track } from '../analytics/posthog';
 import { setUpCalculator } from '../calculator/main';
 import type { CalculatorEvents, CompletedReview, Detail } from '../calculator/ports';
+import { pickArm } from '../calculator/reveal';
 import { FINAL_PAY_FLOW, presetCauseFlow } from '../calculator/steps';
 import { pageTranslator } from '../i18n/client';
 import { DOCUMENTS_BUILD } from '../documents/config';
@@ -12,10 +13,13 @@ import { withoutDocuments } from './without-documents';
 // Until the document module says how the pass shows under a review, it shows none; without the
 // documents API there is no pass.
 let pass: (r: CompletedReview) => PassMode = () => 'none';
+// Drawn once per page view and kept nowhere: which half of the comparison this visit falls in.
+const reveal = pickArm(Math.random(), matchMedia('(prefers-reduced-motion: reduce)').matches);
 const analytics = calculatorAnalytics(
   track,
   () => performance.now(),
   (r) => pass(r),
+  reveal,
 );
 // The calculator rewrites the fragment as it opens, so the address it arrived at is kept first.
 const arrival = { hash: location.hash, search: location.search };
@@ -58,6 +62,7 @@ const calculator = setUpCalculator(document.body, {
   tr: pageTranslator(),
   detail: () => detail(),
   flow: preset ? presetCauseFlow(preset) : FINAL_PAY_FLOW,
+  reveal,
 });
 
 if (documentsBuild) {

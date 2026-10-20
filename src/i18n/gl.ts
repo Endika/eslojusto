@@ -476,6 +476,8 @@ export const gl: Translation = {
     'Con este contrato levas {dias} días cotizados; fan falta 360 nos últimos 6 anos (art. 269.1 LGSS). Se traballaches antes, vélo na túa vida laboral.',
   'client.unemployment.qualifying.depends_other_contracts':
     'Con estes contratos sumas {dias} días cotizados; fan falta 360 nos últimos 6 anos que non usases xa para outro paro (art. 269 LGSS). Vélo na túa vida laboral.',
+  'client.reveal.checked': 'Comprobado coa lei: {partida}',
+  'client.reveal.summary': 'Partidas comprobadas: {partidas}. Referencias legais: {referencias}.',
   'client.item.pending_salary': 'Salario do mes da baixa',
   'client.item.holiday_pay': 'Vacacións devindicadas e non gozadas',
   'client.item.extra_pay': 'Pagas extraordinarias devindicadas',
