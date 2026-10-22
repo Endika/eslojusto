@@ -368,10 +368,12 @@ describe('the telecom result before the pass', () => {
     const card = shown[0];
     expect(card?.querySelector<HTMLElement>('[data-verdict]')?.hidden).toBe(true);
     expect(text(card ?? root, '[data-status-text]')).toBe('');
-    expect(text(card ?? root, '[data-calculation]')).toBe(
-      'Si tu compañía te avisa de un cambio en las condiciones del contrato, la ley te deja darte de baja en el mes siguiente al aviso sin pagar la penalización por la permanencia; solo puede seguir cobrándote el terminal subvencionado que te quedes.' +
-        'El mes siguiente al aviso acaba el 10-03-2026.',
-    );
+    expect(
+      [...(card ?? root).querySelectorAll('[data-calculation] > li')].map((li) => li.textContent),
+    ).toEqual([
+      'Si tu compañía te avisa de un cambio en las condiciones del contrato, la ley te deja darte de baja en el mes siguiente al aviso sin pagar la penalización por la permanencia; solo puede seguir cobrándote el terminal subvencionado que te quedes.',
+      'El mes siguiente al aviso acaba el 10-03-2026.',
+    ]);
     expect(card?.textContent).not.toContain('€');
     expect(card?.querySelector('[data-readings]')?.children).toHaveLength(0);
     expect(text(card ?? root, '[data-rules]')).toContain('art. 67.8');
