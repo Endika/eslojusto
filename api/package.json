@@ -25,16 +25,16 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.6.5",
-    "aws-cdk": "^2.1145.0",
-    "aws-cdk-lib": "^2.273.0",
+    "aws-cdk": "^2.1146.1",
+    "aws-cdk-lib": "^2.274.0",
     "constructs": "^10.8.1",
     "esbuild": "^0.28.2",
-    "eslint": "^10.12.0",
+    "eslint": "^10.13.0",
     "globals": "^17.13.0",
     "prettier": "^3.9.10",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.71.2",
+    "typescript-eslint": "^8.72.0",
     "vitest": "^5.0.5"
   }
 }

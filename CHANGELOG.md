@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.104.2](https://github.com/Endika/eslojusto/compare/v1.104.1...v1.104.2) (2026-10-26)
+
+
+### Bug Fixes
+
+* **deps:** patch dompurify advisory and run workflows on Node 24 ([38712f1](https://github.com/Endika/eslojusto/commit/38712f19e90f0b635536710ce96a871118d70ac2))
+
 ## [1.104.1](https://github.com/Endika/eslojusto/compare/v1.104.0...v1.104.1) (2026-10-20)
 
 
