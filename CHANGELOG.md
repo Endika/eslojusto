@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.104.3](https://github.com/Endika/eslojusto/compare/v1.104.2...v1.104.3) (2026-10-27)
+
+
+### Bug Fixes
+
+* **deps:** declare @types/node instead of relying on transitive dependencies ([bdf23ed](https://github.com/Endika/eslojusto/commit/bdf23edbf048f805d9b6892924810596f0331a92))
+
 ## [1.104.2](https://github.com/Endika/eslojusto/compare/v1.104.1...v1.104.2) (2026-10-26)
 
 
