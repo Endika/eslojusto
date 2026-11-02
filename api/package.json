@@ -18,9 +18,9 @@
     "esbuild": true
   },
   "dependencies": {
-    "@aws-sdk/client-bedrock-runtime": "^3.1156.0",
-    "@aws-sdk/client-ssm": "^3.1156.0",
-    "stripe": "^23.0.1"
+    "@aws-sdk/client-bedrock-runtime": "^3.1160.0",
+    "@aws-sdk/client-ssm": "^3.1160.0",
+    "stripe": "^23.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
