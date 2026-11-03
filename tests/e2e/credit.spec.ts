@@ -523,7 +523,9 @@ test('analytics carry codes and buckets, never a typed value', async ({ page }) 
 
   await expect.poll(() => named('credit_review_completed').length, { timeout: 15_000 }).toBe(1);
   await expect.poll(() => named('help_opened').length, { timeout: 15_000 }).toBe(1);
-  expect(named('validation_error').map((e) => e.properties['field'])).toEqual(['product']);
+  expect(
+    named('validation_error').map((e) => [e.properties['field'], e.properties['code']]),
+  ).toEqual([['product', 'missing_choice']]);
   expect(named('section_viewed').map((e) => e.properties['section'])).toContain('cuota-final');
   expect(named('credit_review_completed')[0]?.properties).toMatchObject({
     product: 'personal_loan',

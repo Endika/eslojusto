@@ -17,7 +17,7 @@ import { createNavigation, type NavigationEvents } from './navigation';
 // What a visit through a section's sheets reports, for whoever listens.
 export interface SectionEvents<S extends string> extends NavigationEvents<S> {
   stepCompleted(step: S): void;
-  fieldRejected(step: S, field: string): void;
+  fieldRejected(step: S, field: string, code: string): void;
   // A frequently asked question, by the id of its <details>.
   helpOpened(topic: string): void;
   startedOver(): void;
@@ -26,7 +26,11 @@ export interface SectionEvents<S extends string> extends NavigationEvents<S> {
 // What a review section brings to the shared walk through its sheets: its form, how it checks a
 // sheet, how it stops at its gate and how it reviews the answers. The optional parts are for the
 // sections whose form does more, such as lists of rows.
-interface Section<S extends string, Sheet extends S, E extends { readonly field: string }> {
+interface Section<
+  S extends string,
+  Sheet extends S,
+  E extends { readonly field: string; readonly code: string },
+> {
   // The form's id.
   readonly formId: string;
   readonly flow: Flow<S>;
@@ -83,7 +87,7 @@ export interface SectionForm {
 export function setUpSection<
   S extends string,
   Sheet extends S,
-  E extends { readonly field: string },
+  E extends { readonly field: string; readonly code: string },
 >(root: HTMLElement, section: Section<S, Sheet, E>): SectionForm {
   const { flow, sheets, today } = section;
   const LAST_SHEET = lastSheet(flow);
@@ -114,8 +118,8 @@ export function setUpSection<
   const conditions = () => section.applyConditions(form);
 
   function trackErrors(errors: readonly E[]) {
-    for (const { field } of errors)
-      events.fieldRejected(section.sheetOfField(field), section.fieldName?.(field) ?? field);
+    for (const { field, code } of errors)
+      events.fieldRejected(section.sheetOfField(field), section.fieldName?.(field) ?? field, code);
   }
 
   function focusError(errors: readonly E[]) {

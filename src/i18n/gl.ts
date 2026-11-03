@@ -1361,7 +1361,7 @@ export const gl: Translation = {
     'No aluguer, o contrato e os demais papeis levan datos persoais teus e de terceiros, como o propietario, quen avale ou a axencia: nomes, DNI, o enderezo da vivenda ou contas bancarias. Por iso tamén che pedimos o teu consentimento explícito antes de subilos, coa mesma base xurídica. Quen sube os documentos non pode consentir por outras persoas: os seus datos trátanse por interese lexítimo (art. 6.1.f do RGPD), só mentres o modelo le, e nin se copian nin se gardan. O modelo ten orde de non copiar eses datos e o servidor descarta o que aínda os leve; non se garda nada.',
   'privacy.rental.tracked_sheets': 'Na revisión do aluguer',
   'privacy.rental.tracked_sheets_what':
-    'O mesmo que no finiquito cos seus pasos (contrato, propietario, entrada, renda, subas, gastos, saída e resultado): que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo, por exemplo «data do contrato», nunca o que escribiches. Que pregunta frecuente abres ou de que partida miras «Como se calcula», polo seu tipo (honorarios, fianza, garantía, pagamento por adiantado, suba, gasto, devolución ou xuros da fianza), nunca o seu concepto. E se premes «Comezar de novo».',
+    'O mesmo que no finiquito cos seus pasos (contrato, propietario, entrada, renda, subas, gastos, saída e resultado): que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo e que comprobación non pasou, por exemplo «data do contrato», nunca o que escribiches. Que pregunta frecuente abres ou de que partida miras «Como se calcula», polo seu tipo (honorarios, fianza, garantía, pagamento por adiantado, suba, gasto, devolución ou xuros da fianza), nunca o seu concepto. E se premes «Comezar de novo».',
   'privacy.rental.tracked_scope': 'Se o teu contrato queda fóra da revisión',
   'privacy.rental.tracked_scope_what':
     'O motivo, dunha lista pechada: asinado antes do 6 de marzo de 2019, de tempada, por cuartos, para outro uso, de vivenda protexida ou de renda antiga.',
@@ -1386,7 +1386,7 @@ export const gl: Translation = {
     'No contrato de traballo, o contrato, as nóminas e a vida laboral poden mostrar datos especialmente protexidos, como unha discapacidade, unha baixa ou a afiliación a un sindicato pola súa cota. Por iso tamén che pedimos o teu consentimento explícito antes de subilos, coa mesma base xurídica. O modelo ten orde de non copiar eses datos e o servidor descarta os textos que aínda os leven; non se garda nada.',
   'privacy.employment.tracked_sheets': 'Na revisión do contrato',
   'privacy.employment.tracked_sheets_what':
-    'O mesmo que no finiquito cos seus pasos (relación, tipo de contrato, contratos anteriores, salario, nóminas, xornada, período de proba, vacacións, cláusulas, información, oferta e resultado): que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo, por exemplo «data de inicio», nunca o que escribiches. Que pregunta frecuente abres ou de que punto miras «Como se calcula», polo seu tipo (salario, tipo de contrato, encadeamento, período de proba, xornada, tempo parcial, vacacións e pagas, cláusulas, información, oferta ou referencia), nunca o seu texto. E se premes «Comezar de novo».',
+    'O mesmo que no finiquito cos seus pasos (relación, tipo de contrato, contratos anteriores, salario, nóminas, xornada, período de proba, vacacións, cláusulas, información, oferta e resultado): que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo e que comprobación non pasou, por exemplo «data de inicio», nunca o que escribiches. Que pregunta frecuente abres ou de que punto miras «Como se calcula», polo seu tipo (salario, tipo de contrato, encadeamento, período de proba, xornada, tempo parcial, vacacións e pagas, cláusulas, información, oferta ou referencia), nunca o seu texto. E se premes «Comezar de novo».',
   'privacy.employment.tracked_scope': 'Se o teu contrato queda fóra da revisión do contrato',
   'privacy.employment.tracked_scope_what':
     'O motivo, dunha lista pechada: unha relación laboral especial, persoal funcionario, un contrato por empresa de traballo temporal, un contrato de relevo ou ter menos de 18 anos.',
@@ -1423,7 +1423,7 @@ export const gl: Translation = {
     'Só no teu navegador, mentres a páxina está aberta. As túas datas, o teu soldo, a túa xornada, as túas vacacións e as túas respostas sobre como rematou a relación calcúlanse no teu dispositivo e non se envían a ningún servidor nin se gardan. Ao pechar ou recargar a páxina, desaparecen.',
   'privacy.household.tracked_sheets': 'Na revisión de empregada do fogar',
   'privacy.household.tracked_sheets_what':
-    'O mesmo que no finiquito con cada un dos seus pasos, do traballo ao resultado: que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo, por exemplo «data de inicio», nunca o que escribiches. Que pregunta frecuente abres e de que punto do resultado abres o cálculo, polo seu tipo.',
+    'O mesmo que no finiquito con cada un dos seus pasos, do traballo ao resultado: que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo e que comprobación non pasou, por exemplo «data de inicio», nunca o que escribiches. Que pregunta frecuente abres e de que punto do resultado abres o cálculo, polo seu tipo.',
   'privacy.household.tracked_scope': 'Se o teu caso queda fóra da revisión de empregada do fogar',
   'privacy.household.tracked_scope_what':
     'O motivo, dunha lista pechada: que a relación rematou antes da reforma de setembro de 2022.',
@@ -1444,7 +1444,7 @@ export const gl: Translation = {
     'Só no teu navegador, mentres a páxina está aberta. As datas da túa póliza e do aviso de renovación e as súas primas calcúlanse no teu dispositivo e non se envían a ningún servidor nin se gardan. Ao pechar ou recargar a páxina, desaparecen.',
   'privacy.insurance.tracked_sheets': 'Na revisión do teu seguro',
   'privacy.insurance.tracked_sheets_what':
-    'O mesmo que no finiquito con cada un dos seus pasos, da póliza ao resultado: que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo, por exemplo «día no que vence», nunca o que escribiches. Que pregunta frecuente abres.',
+    'O mesmo que no finiquito con cada un dos seus pasos, da póliza ao resultado: que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo e que comprobación non pasou, por exemplo «día no que vence», nunca o que escribiches. Que pregunta frecuente abres.',
   'privacy.insurance.tracked_scope': 'Se a túa póliza queda fóra da revisión do teu seguro',
   'privacy.insurance.tracked_scope_what':
     'O motivo, dunha lista pechada: un seguro de vida, de saúde, de decesos ou outro que non é de fogar nin de coche, ou unha póliza que venceu antes do 01-01-2016.',
@@ -1476,7 +1476,7 @@ export const gl: Translation = {
     'Só no teu navegador, mentres a páxina está aberta. Os importes, os tipos de xuro, as cotas, os gastos e as datas do teu crédito calcúlanse no teu dispositivo e non se envían a ningún servidor nin se gardan. Ao pechar ou recargar a páxina, desaparecen.',
   'privacy.credit.tracked_sheets': 'Na revisión do teu crédito',
   'privacy.credit.tracked_sheets_what':
-    'O mesmo que no finiquito con cada un dos seus pasos, do tipo de crédito ao resultado: que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo, por exemplo «cando o contrataches», nunca o que escribiches. Que pregunta frecuente abres.',
+    'O mesmo que no finiquito con cada un dos seus pasos, do tipo de crédito ao resultado: que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo e que comprobación non pasou, por exemplo «cando o contrataches», nunca o que escribiches. Que pregunta frecuente abres.',
   'privacy.credit.tracked_scope': 'Se o teu crédito queda fóra da revisión',
   'privacy.credit.tracked_scope_what':
     'O motivo, dunha lista pechada: unha hipoteca, un renting sen compra, un crédito para un negocio, menos de 200 € ou un contrato anterior ao 25-09-2011.',
@@ -1508,7 +1508,7 @@ export const gl: Translation = {
     'Só no teu navegador, mentres a páxina está aberta. A data da escritura, as súas cláusulas, os importes das túas facturas e das túas amortizacións e as súas datas calcúlanse no teu dispositivo e non se envían a ningún servidor nin se gardan. Ao pechar ou recargar a páxina, desaparecen.',
   'privacy.mortgage.tracked_sheets': 'Na revisión da túa hipoteca',
   'privacy.mortgage.tracked_sheets_what':
-    'O mesmo que no finiquito con cada un dos seus pasos, da hipoteca ao resultado: que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo, por exemplo «data da escritura», nunca o que escribiches. Que pregunta frecuente abres.',
+    'O mesmo que no finiquito con cada un dos seus pasos, da hipoteca ao resultado: que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo e que comprobación non pasou, por exemplo «data da escritura», nunca o que escribiches. Que pregunta frecuente abres.',
   'privacy.mortgage.tracked_scope': 'Se a túa hipoteca queda fóra da revisión',
   'privacy.mortgage.tracked_scope_what':
     'O motivo, dunha lista pechada: pediuna unha empresa, é sobre un inmoble dun negocio, é a do promotor subrogada ao comprar, é multidivisa ou inversa, ou é un préstamo sen hipoteca.',
@@ -1545,7 +1545,7 @@ export const gl: Translation = {
     'Se revisas varias facturas da luz, cada unha coas súas respostas queda na memoria da lapela para sumalas como «o teu ano». Non se escribe no teu dispositivo nin sae del, agás durante o pagamento, como se explica máis abaixo; ao pechar ou recargar a lapela, desaparece.',
   'privacy.bills.tracked_sheets': 'Nas revisións das túas facturas',
   'privacy.bills.tracked_sheets_what':
-    'O mesmo que no finiquito con cada un dos seus pasos, da túa subministración ou a túa permanencia ao resultado: que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo, por exemplo «data de cargo», nunca o que escribiches. As preguntas do bono social que só ve quen o ten non se miden: nin que as abres nin os seus erros. Que pregunta frecuente abres.',
+    'O mesmo que no finiquito con cada un dos seus pasos, da túa subministración ou a túa permanencia ao resultado: que abres cada un, canto tardas, en tramos, e se volves atrás. Se un dato non se acepta, o nome do campo e que comprobación non pasou, por exemplo «data de cargo», nunca o que escribiches. As preguntas do bono social que só ve quen o ten non se miden: nin que as abres nin os seus erros. Que pregunta frecuente abres.',
   'privacy.bills.tracked_scope': 'Se a túa factura ou a túa baixa quedan fóra da revisión',
   'privacy.bills.tracked_scope_what':
     'O motivo, dunha lista pechada: unha subministración en Canarias, Ceuta ou Melilla, de máis de 15 kW, con outra tarifa de acceso que non sexa a 2.0TD ou con placas solares que verten á rede, ou unha factura emitida antes do 12-06-2026; ou, na permanencia, unha baixa pedida antes de 2022.',

@@ -15,6 +15,7 @@ import {
   type Props,
   type Section,
   type Track,
+  validationCode,
 } from './events';
 
 type Completed = Props<'employment_review_completed'>;
@@ -201,11 +202,12 @@ export function employmentAnalytics(
     wentBack(from, to) {
       track('went_back', { from, to });
     },
-    fieldRejected(step, field) {
+    fieldRejected(step, field, code) {
       if (!(EMPLOYMENT_TRACKABLE_FIELDS as readonly string[]).includes(field)) return;
       track('validation_error', {
         section: step,
         field: field as Props<'validation_error'>['field'],
+        code: validationCode(code) as Props<'validation_error'>['code'],
       });
     },
     outOfScope(reason) {

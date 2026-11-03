@@ -59,18 +59,40 @@ describe('employment events', () => {
   it('accept the sheets, the fields, the reasons and the items', () => {
     expect(isValidEvent('section_viewed', { section: 'nominas' })).toBe(true);
     expect(isValidEvent('went_back', { from: 'oferta', to: 'relacion' })).toBe(true);
-    expect(isValidEvent('validation_error', { section: 'relacion', field: 'startDate' })).toBe(
-      true,
-    );
-    expect(isValidEvent('validation_error', { section: 'informacion', field: 'info_o' })).toBe(
-      true,
-    );
-    expect(isValidEvent('validation_error', { section: 'nominas', field: 'payslips' })).toBe(true);
     expect(
-      isValidEvent('validation_error', { section: 'formacion-datos', field: 'disability' }),
+      isValidEvent('validation_error', {
+        section: 'relacion',
+        field: 'startDate',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'informacion',
+        field: 'info_o',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'nominas',
+        field: 'payslips',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'formacion-datos',
+        field: 'disability',
+        code: 'missing_value',
+      }),
     ).toBe(false);
     expect(
-      isValidEvent('validation_error', { section: 'nominas', field: 'payslips.0.salary' }),
+      isValidEvent('validation_error', {
+        section: 'nominas',
+        field: 'payslips.0.salary',
+        code: 'missing_value',
+      }),
     ).toBe(false);
     for (const reason of [
       'special_relationship',
@@ -236,7 +258,7 @@ describe('employment events', () => {
     events.stepShown('relacion');
     events.stepShown('relacion');
     clock = 12_000;
-    events.fieldRejected('relacion', 'startDate');
+    events.fieldRejected('relacion', 'startDate', 'invalid_date');
     events.stepCompleted('relacion');
     events.stepShown('modalidad');
     events.wentBack('modalidad', 'relacion');

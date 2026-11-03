@@ -111,7 +111,7 @@ describe('the situations of a possibly null dismissal never leave the page', () 
     for (let attempt = 0; attempt < 2; attempt++) {
       if (attempt === 1)
         f.querySelector<HTMLInputElement>('[name="situation_sick_leave"]')?.click();
-      events.fieldRejected('fechas', 'endDate');
+      events.fieldRejected('fechas', 'endDate', 'missing_endDate');
       events.reviewCompleted({
         review: r.review,
         input: input(f),

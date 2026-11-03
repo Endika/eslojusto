@@ -57,7 +57,7 @@ export interface HouseholdEvents {
   stepShown(step: Step): void;
   stepCompleted(step: Step): void;
   wentBack(from: Step, to: Step): void;
-  fieldRejected(step: Step, field: string): void;
+  fieldRejected(step: Step, field: string, code: string): void;
   outOfScope(reason: OutOfScopeReason): void;
   reviewCompleted(r: CompletedHouseholdReview): void;
   // A frequently asked question, by the id of its <details>.

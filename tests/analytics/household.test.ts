@@ -57,8 +57,16 @@ describe('household events', () => {
   it('accept the sheets, the fields, the reason and the items', () => {
     expect(isValidEvent('section_viewed', { section: 'escrito' })).toBe(true);
     expect(isValidEvent('went_back', { from: 'preaviso', to: 'trabajo' })).toBe(true);
-    expect(isValidEvent('validation_error', { section: 'sueldo', field: 'monthlyPay' })).toBe(true);
-    expect(isValidEvent('validation_error', { section: 'sueldo', field: 'IBAN' })).toBe(false);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'sueldo',
+        field: 'monthlyPay',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', { section: 'sueldo', field: 'IBAN', code: 'missing_value' }),
+    ).toBe(false);
     expect(isValidEvent('household_out_of_scope', { reason: 'before_reform' })).toBe(true);
     expect(isValidEvent('household_out_of_scope', { reason: 'before_2019' })).toBe(false);
     for (const item of HOUSEHOLD_ITEMS) expect(isValidEvent('detail_opened', { item })).toBe(true);
@@ -158,7 +166,7 @@ describe('household events', () => {
     events.stepShown('trabajo');
     events.stepShown('trabajo');
     clock = 12_000;
-    events.fieldRejected('trabajo', 'work');
+    events.fieldRejected('trabajo', 'work', 'missing_choice');
     events.stepCompleted('trabajo');
     events.stepShown('fechas');
     events.wentBack('fechas', 'trabajo');

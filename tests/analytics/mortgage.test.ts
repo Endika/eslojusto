@@ -73,8 +73,20 @@ describe('mortgage events', () => {
   it('accept the sheets, the fields and the reasons', () => {
     expect(isValidEvent('section_viewed', { section: 'clausula-gastos' })).toBe(true);
     expect(isValidEvent('went_back', { from: 'suelo', to: 'escritura' })).toBe(true);
-    expect(isValidEvent('validation_error', { section: 'escritura', field: 'deedOn' })).toBe(true);
-    expect(isValidEvent('validation_error', { section: 'escritura', field: 'IBAN' })).toBe(false);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'escritura',
+        field: 'deedOn',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'escritura',
+        field: 'IBAN',
+        code: 'missing_value',
+      }),
+    ).toBe(false);
     expect(isValidEvent('mortgage_out_of_scope', { reason: 'company' })).toBe(true);
     expect(isValidEvent('mortgage_out_of_scope', { reason: 'before_2019' })).toBe(false);
     expect(isValidEvent('help_opened', { topic: 'faq-hipoteca-suelo' })).toBe(true);
@@ -172,7 +184,7 @@ describe('mortgage events', () => {
     events.stepShown('hipoteca');
     events.stepShown('hipoteca');
     clock = 12_000;
-    events.fieldRejected('escritura', 'deedOn');
+    events.fieldRejected('escritura', 'deedOn', 'in_future');
     events.stepCompleted('hipoteca');
     events.stepShown('titular');
     events.wentBack('titular', 'hipoteca');

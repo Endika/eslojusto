@@ -54,10 +54,26 @@ describe('rental events', () => {
   it('accept the sheets, the fields, the reasons and the items', () => {
     expect(isValidEvent('section_viewed', { section: 'subidas' })).toBe(true);
     expect(isValidEvent('went_back', { from: 'salida', to: 'casero' })).toBe(true);
-    expect(isValidEvent('validation_error', { section: 'contrato', field: 'signedOn' })).toBe(true);
-    expect(isValidEvent('validation_error', { section: 'subidas', field: 'updates' })).toBe(true);
     expect(
-      isValidEvent('validation_error', { section: 'subidas', field: 'updates.0.newRent' }),
+      isValidEvent('validation_error', {
+        section: 'contrato',
+        field: 'signedOn',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'subidas',
+        field: 'updates',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'subidas',
+        field: 'updates.0.newRent',
+        code: 'missing_value',
+      }),
     ).toBe(false);
     for (const reason of ['before_2019', 'seasonal', 'room', 'other_use', 'protected', 'old_rent'])
       expect(isValidEvent('rental_out_of_scope', { reason })).toBe(true);
@@ -178,7 +194,7 @@ describe('rental events', () => {
     events.stepShown('contrato');
     events.stepShown('contrato');
     clock = 12_000;
-    events.fieldRejected('contrato', 'signedOn');
+    events.fieldRejected('contrato', 'signedOn', 'signed_in_future');
     events.stepCompleted('contrato');
     events.stepShown('casero');
     events.wentBack('casero', 'contrato');
