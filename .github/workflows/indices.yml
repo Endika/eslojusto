@@ -1,6 +1,7 @@
 name: Rent indices
 
-# A failed scheduled run emails the repository owner: that is the reminder to add the INE's row.
+# While the tables do not cover today an open issue says so, with a comment each morning, so the
+# reminder reaches the GitHub app and not only the failed-run email. It closes once they cover today.
 on:
   schedule:
     - cron: '30 6 * * *'
@@ -8,13 +9,38 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   due:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      LABEL: rent-indices
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: 24 }
-      - run: npm run indices:due
+      - shell: bash
+        run: npm run -s indices:due | tee due.txt
+      - name: Open or update the issue
+        if: failure()
+        shell: bash
+        run: |
+          gh label create "$LABEL" --color d73a4a --force
+          sed 's/^::error:://' due.txt > body.md
+          echo -e "\n[Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> body.md
+          open=$(gh issue list --label "$LABEL" --state open --json number --jq '.[0].number // empty')
+          if [ -z "$open" ]; then
+            gh issue create --title "Rent index tables no longer cover today" --label "$LABEL" --body-file body.md
+          else
+            gh issue comment "$open" --body-file body.md
+          fi
+      - name: Close the issue
+        if: success()
+        shell: bash
+        run: |
+          gh label create "$LABEL" --color d73a4a --force > /dev/null
+          gh issue list --label "$LABEL" --state open --json number --jq '.[].number' |
+            xargs -r -I{} gh issue close {} --comment "$(cat due.txt)"
