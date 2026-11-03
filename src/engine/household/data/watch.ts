@@ -43,8 +43,10 @@ export const ARTICLE_WATCH: ArticleWatch = {
     rd1620('a11', '2022-09-09', 'BOE-A-2022-14680'),
     // Added on 19-10-2026, as the API returned them: the other articles the rules cite.
     article('et', ET_ID, 'a49', '2025-05-01', 'BOE-A-2025-8567'),
+    article('lgss', LGSS_ID, 'a266', '2023-03-02', 'BOE-A-2023-5365'),
     article('lgss', LGSS_ID, 'a267', '2023-03-02', 'BOE-A-2023-5365'),
     article('lgss', LGSS_ID, 'a269', '2024-05-23', 'BOE-A-2024-10235'),
+    article('lgss', LGSS_ID, 'a270', '2023-01-01', 'BOE-A-2022-22128'),
     article('cc', CC_ID, 'art5', '1974-07-29', 'BOE-A-1974-1083'),
   ],
   matters: [{ id: 'next_minimum_wage', url: 'https://www.boe.es/buscar/boe.php' }],

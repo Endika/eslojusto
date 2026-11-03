@@ -24,7 +24,7 @@ describe('household monthlyChecklist', () => {
     const items = monthlyChecklist(parseDate('2026-10-09'), deps);
     expect(
       items.filter((i) => i.kind === 'article').map((i) => i.kind === 'article' && i.block),
-    ).toEqual(['a8', 'a9', 'a11', 'a49', 'a267', 'a269', 'art5']);
+    ).toEqual(['a8', 'a9', 'a11', 'a49', 'a266', 'a267', 'a269', 'a270', 'art5']);
     expect(
       items.filter((i) => i.kind === 'matter').map((i) => i.kind === 'matter' && i.id),
     ).toEqual(['next_minimum_wage']);
