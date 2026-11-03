@@ -1,4 +1,4 @@
-// source: c1e410557cb4
+// source: 1797cd736446
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -97,7 +97,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'fianza',
     name: 'Quel dépôt de garantie peut vous être demandé',
     crumb: 'Quel dépôt de garantie peut vous être demandé',
-    title: "Dépôt de garantie d'une location : ce qui peut vous être demandé (art. 36 LAU)",
+    title: "Dépôt de garantie d'une location : ce qui peut vous être demandé (art. 36.1 LAU)",
     description:
       "Un mois de loyer de dépôt de garantie, jusqu'à deux de plus de garantie supplémentaire et un de paiement d'avance. Vérifiez ce qui vous a été demandé, avec l'article de chaque plafond.",
     h1: "Dépôt de garantie d'une location : ce qui peut vous être demandé",

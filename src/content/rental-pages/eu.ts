@@ -1,4 +1,4 @@
-// source: c1e410557cb4
+// source: 1797cd736446
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -95,7 +95,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'fianza',
     name: 'Zenbat fidantza eska diezazuketen',
     crumb: 'Zenbat fidantza eska diezazuketen',
-    title: 'Fidantza: zenbat eska diezazuketen alokairuan (art. 36 LAU)',
+    title: 'Fidantza: zenbat eska diezazuketen alokairuan (art. 36.1 LAU)',
     description:
       'Fidantza: errenta-hileko bat; berme osagarria: beste bi, gehienez; aurretiko ordainketa: bat. Egiaztatu zenbat eskatu dizuten, mugen artikuluekin.',
     h1: 'Alokairuaren fidantza: zenbat eska diezazuketen',

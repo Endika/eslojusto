@@ -1192,8 +1192,7 @@ export const ro: Translation = {
   'landing.fixed_term_end.faq.5.answer':
     'Da, cu excepția cazului în care tu ai pus capăt contractului (art. 267.1.a.6.º LGSS). În plus, ai nevoie de 360 de zile de contribuție în ultimii 6 ani, care pot proveni de la mai multe contracte.',
   'landing.not_agreed.name': 'Semnarea lichidării finale ca «no conforme»',
-  'landing.not_agreed.title':
-    'Semnarea lichidării finale ca «no conforme» (fără acord): ce înseamnă',
+  'landing.not_agreed.title': '«Recibí no conforme» pe lichidarea finală: ce înseamnă',
   'landing.not_agreed.description':
     'Ce înseamnă să scrii «no conforme» (fără acord) când primești lichidarea finală, ce schimbă și ce nu, și termenele. Mai întâi, compară ce ți se oferă cu minimul legal.',
   'landing.not_agreed.h1': 'Semnarea lichidării finale ca «no conforme» (fără acord)',
@@ -1239,8 +1238,7 @@ export const ro: Translation = {
     'În cele 15 zile de după încetarea contractului sau de după sfârșitul zilelor de concediu neefectuat pe care ți le plătește lichidarea finală, iar înainte trebuie să te înscrii ca persoană în căutarea unui loc de muncă (demandante de empleo). Dacă o ceri mai târziu, pierzi zile de șomaj (art. 266 și 268 LGSS). Că sunt zile lucrătoare o indică SEPE.',
   'landing.benefit_duration.name':
     'Câtă indemnizație de șomaj ți se cuvine în funcție de timpul lucrat',
-  'landing.benefit_duration.title':
-    'Câtă indemnizație de șomaj primești în funcție de timpul lucrat',
+  'landing.benefit_duration.title': 'Câtă indemnizație de șomaj primești pentru fiecare an lucrat',
   'landing.benefit_duration.description':
     'Cu 360 de zile de contribuție în 6 ani ai 120 de zile de șomaj, iar fiecare 180 în plus adaugă 60, până la 720. Scara completă și calculul tău cu datele tale.',
   'landing.benefit_duration.h1':

@@ -1,4 +1,4 @@
-// source: c1e410557cb4
+// source: 1797cd736446
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -95,7 +95,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'fianza',
     name: 'كم يمكن أن يُطلب منك تأمينًا',
     crumb: 'كم يمكن أن يُطلب منك تأمينًا',
-    title: 'تأمين الإيجار ⁨(fianza)⁩: كم قد يُطلب منك ⁨(art. 36 LAU)⁩',
+    title: 'تأمين الإيجار ⁨(fianza)⁩: كم قد يُطلب منك ⁨(art. 36.1 LAU)⁩',
     description:
       'إيجار شهر واحد تأمينًا، وحتى شهرين إضافيين ضمانًا إضافيًا، وشهر واحد دفعًا مسبقًا. قارِن ما طُلب منك بمادة كل حد أقصى.',
     h1: 'تأمين الإيجار ⁨(fianza)⁩: كم يمكن أن يُطلب منك',

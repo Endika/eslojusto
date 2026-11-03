@@ -1176,8 +1176,7 @@ export const en: Translation = {
   'landing.fixed_term_end.faq.5.answer':
     'Yes, unless you were the one who ended the contract (art. 267.1.a.6.º LGSS). You also need 360 days of contributions in the last 6 years, which can come from several contracts.',
   'landing.not_agreed.name': 'Signing the final settlement as «no conforme» (not agreed)',
-  'landing.not_agreed.title':
-    'Signing the final settlement as «no conforme» (not agreed): what it means',
+  'landing.not_agreed.title': 'Writing «recibí no conforme» on the final settlement: what it means',
   'landing.not_agreed.description':
     'What writing «no conforme» (not agreed) when you receive the final settlement means, what it changes and what it does not, and the time limits. First, compare what you are being offered with the legal minimum.',
   'landing.not_agreed.h1': 'Signing the final settlement as «no conforme» (not agreed)',
@@ -1224,8 +1223,7 @@ export const en: Translation = {
     'Within the 15 days after the end of the contract, or after the end of the untaken holiday paid in the final settlement, and before that you have to register as a jobseeker (demandante de empleo). Applying later takes days off your unemployment benefit (arts. 266 and 268 LGSS). The SEPE states that these are business days (días hábiles).',
   'landing.benefit_duration.name':
     'How much unemployment benefit you are entitled to depending on the time worked',
-  'landing.benefit_duration.title':
-    'How much unemployment benefit you get depending on the time worked',
+  'landing.benefit_duration.title': 'How much unemployment benefit you get per year worked',
   'landing.benefit_duration.description':
     'With 360 days of contributions in 6 years you get 120 days of unemployment benefit, and each further 180 adds 60, up to 720. The full scale and your calculation with your dates.',
   'landing.benefit_duration.h1':

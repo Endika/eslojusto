@@ -1083,8 +1083,7 @@ export const zh: Translation = {
   'landing.fixed_term_end.faq.5.answer':
     '能，除非合同是您自己终止的（art. 267.1.a.6.º LGSS）。此外，还需要在过去6年中缴费360天，可以来自多份合同。',
   'landing.not_agreed.name': '以“不同意”的方式签署离职结算',
-  'landing.not_agreed.title':
-    '以“不同意”（no conforme）的方式签署离职结算（finiquito）：是什么意思',
+  'landing.not_agreed.title': '在离职结算（finiquito）上写“recibí no conforme”：是什么意思',
   'landing.not_agreed.description':
     '收到离职结算（finiquito）时写上“不同意”（no conforme）是什么意思，会改变什么、不会改变什么，以及相关期限。签署之前，可以先把公司给出的金额与法定最低金额对比。',
   'landing.not_agreed.h1': '以“不同意”的方式签署离职结算',
@@ -1127,7 +1126,7 @@ export const zh: Translation = {
   'landing.benefit.faq.5.answer':
     '在合同结束后的15天内申请；如果离职结算中支付了未休年假，则从这些年假结束时算起。在此之前，您需要先登记为求职者（demandante de empleo）。申请晚了会扣减失业金天数（arts. 266 y 268 LGSS）。据 SEPE 的说法，这些天按工作日计算。',
   'landing.benefit_duration.name': '按工作时间计算，您有权领取多久失业金',
-  'landing.benefit_duration.title': '按工作时间算，失业金能领多久',
+  'landing.benefit_duration.title': '每工作一年，失业金能领多久',
   'landing.benefit_duration.description':
     '6年内缴费360天可领120天失业金，每多缴180天增加60天，最多720天。完整的对照表，以及用您的日期算出的结果。',
   'landing.benefit_duration.h1': '按工作时间计算，您有权领取多久失业金',

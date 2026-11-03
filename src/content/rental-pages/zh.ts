@@ -1,4 +1,4 @@
-// source: c1e410557cb4
+// source: 1797cd736446
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -93,7 +93,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'fianza',
     name: '房东最多可以要求多少押金',
     crumb: '房东最多可以要求多少押金',
-    title: '租房押金：最多可以要求多少（art. 36 LAU）',
+    title: '租房押金：最多可以要求多少（art. 36.1 LAU）',
     description:
       '押金（fianza）为一个月的租金，额外担保最多再加两个月的租金，预付最多一个月的租金。请对照每项上限的条款，核查向您要求的金额。',
     h1: '租房押金：最多可以向您要求多少',

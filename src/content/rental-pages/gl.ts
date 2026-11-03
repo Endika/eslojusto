@@ -1,4 +1,4 @@
-// source: c1e410557cb4
+// source: 1797cd736446
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -95,7 +95,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'fianza',
     name: 'Canta fianza che poden pedir',
     crumb: 'Canta fianza che poden pedir',
-    title: 'Fianza do aluguer: canto che poden pedir (art. 36 LAU)',
+    title: 'Fianza do aluguer: canto che poden pedir (art. 36.1 LAU)',
     description:
       'Unha mensualidade de fianza, ata dúas máis de garantía adicional e unha de pagamento por adiantado. Comproba canto che pediron co artigo de cada límite.',
     h1: 'Fianza do aluguer: canto che poden pedir',
