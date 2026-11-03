@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.107.0](https://github.com/Endika/eslojusto/compare/v1.106.0...v1.107.0) (2026-11-03)
+
+
+### Features
+
+* **seo:** name the searched terms in three page titles ([dac0a50](https://github.com/Endika/eslojusto/commit/dac0a50b09061c465ab66cf0da91d785049b8937))
+
 ## [1.106.0](https://github.com/Endika/eslojusto/compare/v1.105.3...v1.106.0) (2026-11-03)
 
 
