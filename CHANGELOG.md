@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.104.4](https://github.com/Endika/eslojusto/compare/v1.104.3...v1.104.4) (2026-11-03)
+
+
+### Bug Fixes
+
+* **rental:** load the INE's October 2026 CPI flash and cover up to the next release ([20a042f](https://github.com/Endika/eslojusto/commit/20a042ffb33fe33a2034d61dcea66e02250861b9))
+
 ## [1.104.3](https://github.com/Endika/eslojusto/compare/v1.104.2...v1.104.3) (2026-10-27)
 
 
