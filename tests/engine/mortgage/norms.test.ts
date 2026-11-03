@@ -106,6 +106,14 @@ describe('mortgage norm table', () => {
 });
 
 describe('mortgage statute rules', () => {
+  it('names the norm once in the cited line', () => {
+    const cite = (id: 'restitution' | 'ajd_lender' | 'default_interest_lh114') =>
+      ruleSource(id, MORTGAGE_NORMS).citation;
+    expect(cite('restitution')).toBe('Código Civil, art. 1896, por analogía');
+    expect(cite('ajd_lender')).toBe(MORTGAGE_NORMS.trlitpajd29.citation);
+    expect(cite('default_interest_lh114')).toBe(MORTGAGE_NORMS.lh114.citation);
+  });
+
   it.each(Object.entries(STATUTE_RULES))('%s rests on its norm, within its days', (id, r) => {
     expect(r.id).toBe(id);
     expect(r.basis).toBe('statute');

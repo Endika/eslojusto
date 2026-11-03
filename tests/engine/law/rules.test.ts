@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
 import type { NormTable } from '../../../src/engine/law/norms';
-import { activeRules, ruleSource, type RuleTable } from '../../../src/engine/law/rules';
+import { activeRules, citeOnce, ruleSource, type RuleTable } from '../../../src/engine/law/rules';
 
 type TestNormId = 'base' | 'reform';
 type TestRuleId = 'old_limit' | 'new_limit' | 'temporary';
@@ -161,5 +161,21 @@ describe('rules active on a day', () => {
     expect(on('2031-06-01', notMet)).toEqual([['old_limit', null]]);
     const met = withReform({ status: 'conditional', condition: { ...condition, met: true } });
     expect(on('2031-06-01', met)).toEqual([['new_limit', null]]);
+  });
+});
+
+describe('citeOnce', () => {
+  it('puts the norm after the article', () => {
+    expect(citeOnce('art. 5', 'Ley de prueba 1/2030')).toBe('art. 5 (Ley de prueba 1/2030)');
+  });
+
+  it('names the norm once when the article already does', () => {
+    expect(citeOnce('Código Civil, art. 1896', 'Código Civil')).toBe('Código Civil, art. 1896');
+  });
+
+  it('keeps the norm alone when it already names the article', () => {
+    expect(
+      citeOnce('Ley Hipotecaria, art. 114', 'Ley Hipotecaria, art. 114, en la redacción de 2013'),
+    ).toBe('Ley Hipotecaria, art. 114, en la redacción de 2013');
   });
 });

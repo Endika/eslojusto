@@ -110,7 +110,7 @@ describe('the mortgage report', () => {
     expect(sources.length).toBeGreaterThan(4);
     expect(sources.map((s) => ('text' in s ? s.text : ''))).toEqual(
       expect.arrayContaining([
-        expect.stringMatching(/art\. 29 .* · con efectos desde el .* · en vigor$/),
+        expect.stringMatching(/art\. 29\b.* · con efectos desde el .* · en vigor$/),
         expect.stringMatching(/C-125\/18.* · estado a \d\d-\d\d-\d{4}$/),
       ]),
     );
