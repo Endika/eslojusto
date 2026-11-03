@@ -7,6 +7,7 @@ import type { HouseholdNormId, Norm, NormTable } from '../../../src/engine/house
 import { activeRules, ruleSource, RULES } from '../../../src/engine/household/rules';
 
 const BOE = 'https://www.boe.es/';
+const LGSS_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2015-11724';
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 
 const withNorm = (id: HouseholdNormId, change: Partial<Norm>): NormTable => ({
@@ -64,8 +65,10 @@ describe('household rule table', () => {
       ['rd1620_2011', 'a9'],
       ['rd1620_2011', 'a11'],
       ['et', 'a49'],
+      ['lgss', 'a266'],
       ['lgss', 'a267'],
       ['lgss', 'a269'],
+      ['lgss', 'a270'],
       ['cc', 'art5'],
     ]);
     // The versions in force the BOE API lists for each block.
@@ -76,8 +79,10 @@ describe('household rule table', () => {
       ['a9', '2013-12-22', 'BOE-A-2013-13426'],
       ['a11', '2022-09-09', 'BOE-A-2022-14680'],
       ['a49', '2025-05-01', 'BOE-A-2025-8567'],
+      ['a266', '2023-03-02', 'BOE-A-2023-5365'],
       ['a267', '2023-03-02', 'BOE-A-2023-5365'],
       ['a269', '2024-05-23', 'BOE-A-2024-10235'],
+      ['a270', '2023-01-01', 'BOE-A-2022-22128'],
       ['art5', '1974-07-29', 'BOE-A-1974-1083'],
     ]);
     // Each article a rule links to, by its BOE id and anchor, is one of them.
@@ -89,7 +94,13 @@ describe('household rule table', () => {
     const watched = new Set(
       ARTICLE_WATCH.articles.map((a) => `${a.apiUrl.split('/id/')[1]?.split('/')[0]}#${a.block}`),
     );
-    expect(watched).toEqual(cited);
+    // A rule citing several LGSS articles links only one of them; the others are watched too.
+    const named = Object.values(RULES)
+      .filter((r) => r.url.startsWith(LGSS_URL))
+      .flatMap((r) =>
+        [...r.article.matchAll(/\b(2\d\d)\b/g)].map((m) => `BOE-A-2015-11724#a${m[1]}`),
+      );
+    expect(watched).toEqual(new Set([...cited, ...named]));
   });
 
   it('every rule starts with the reform, except the unemployment contribution and benefit rules that start on 01-10-2022', () => {
