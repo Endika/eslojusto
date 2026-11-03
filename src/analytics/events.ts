@@ -6,6 +6,7 @@ import type { Detail, RevealArm } from '../calculator/ports';
 import { FAQ_TOPICS } from '../content/faq-topics';
 import { RENTAL_FAQ_TOPICS } from '../content/rental-faq-topics';
 import type { DoubtReason } from '../engine/rental/outcome';
+import type { RentUpdateUnchecked } from '../engine/rental/rent-update';
 import type { OutOfScopeReason } from '../engine/rental/scope';
 import type { ItemStatus, LandlordType, RentalInput, UpdateClause } from '../engine/rental/types';
 import {
@@ -437,6 +438,18 @@ export const DOUBT_REASONS = [
 ] as const satisfies readonly DoubtReason[];
 const _allDoubts: CoversAll<DoubtReason, (typeof DOUBT_REASONS)[number]> = true;
 void _allDoubts;
+
+export const RENT_UNCHECKED = [
+  'agreed_in_writing',
+  'other_clause_within_cap',
+  'index_not_loaded',
+  'index_publication_unknown',
+  'index_none_published',
+  'flash_not_loaded',
+  'too_many_readings',
+] as const satisfies readonly RentUpdateUnchecked[];
+const _allUnchecked: CoversAll<RentUpdateUnchecked, (typeof RENT_UNCHECKED)[number]> = true;
+void _allUnchecked;
 
 const UPDATE_CLAUSES = [
   'none',
@@ -951,6 +964,8 @@ const BASE_CATALOGUE = {
     fees: ITEM_RESULT,
     guarantees: ITEM_RESULT,
     rent_update: ITEM_RESULT,
+    // Why a rise could not be checked, each once: index_not_loaded means our tables were behind.
+    rent_unchecked: { list: RENT_UNCHECKED },
     charges: ITEM_RESULT,
     deposit_return: ITEM_RESULT,
     // The doubts that move some result, each once.
