@@ -2,6 +2,9 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { DEFAULT_LANG, LANGS, builtLangs } from './src/i18n/languages.ts';
 import { lastUpdated } from './src/content/updated.ts';
+import { wholeDatesInHtml } from './src/scripts/whole-dates.ts';
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 
 const base = process.env.BASE ?? '/';
 const root = base.replace(/\/?$/, '/');
@@ -19,6 +22,19 @@ export default defineConfig({
   },
   // An unpublished language is never indexed: ar-test under TEST_RTL=1.
   integrations: [
+    {
+      name: 'whole-dates',
+      hooks: {
+        'astro:build:done': async ({ dir }) => {
+          const root = fileURLToPath(dir);
+          const files = await readdir(root, { recursive: true });
+          for (const file of files.filter((f) => f.endsWith('.html'))) {
+            const path = `${root}${file}`;
+            await writeFile(path, wholeDatesInHtml(await readFile(path, 'utf8')));
+          }
+        },
+      },
+    },
     sitemap({
       filter: (page) =>
         !unpublished.some((lang) => new URL(page).pathname.startsWith(`${root}${lang}/`)),

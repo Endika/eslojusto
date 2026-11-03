@@ -8,6 +8,10 @@
   display: none !important;
 }
 
+.whole-date {
+  white-space: nowrap;
+}
+
 :root {
   --margin: 1rem;
   --sheet-base: #ffffff;

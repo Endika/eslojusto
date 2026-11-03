@@ -181,6 +181,9 @@ const otherLangsJson = JSON.stringify(otherLangs).replace(/</g, '\\u003c');
       import '../scripts/theme';
       import '../scripts/language-menu';
       import '../scripts/analytics';
+      import { keepDatesWhole, wholeDatesIn } from '../scripts/whole-dates';
+      wholeDatesIn(document.body);
+      keepDatesWhole(document);
     </script>
   </body>
 </html>
