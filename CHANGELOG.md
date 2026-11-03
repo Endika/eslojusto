@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.105.0](https://github.com/Endika/eslojusto/compare/v1.104.5...v1.105.0) (2026-11-03)
+
+
+### Features
+
+* **analytics:** say why a rent rise could not be checked ([a7f390b](https://github.com/Endika/eslojusto/commit/a7f390b29fb79ce7915296c8a0702a4ef4492b6e))
+
 ## [1.104.5](https://github.com/Endika/eslojusto/compare/v1.104.4...v1.104.5) (2026-11-03)
 
 
