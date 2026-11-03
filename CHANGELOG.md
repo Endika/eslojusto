@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.105.1](https://github.com/Endika/eslojusto/compare/v1.105.0...v1.105.1) (2026-11-03)
+
+
+### Bug Fixes
+
+* **household:** watch LGSS arts. 266 and 270, cited next to art. 269 ([5df1aac](https://github.com/Endika/eslojusto/commit/5df1aaceeeea4a506e16785fc26e52f4959f909a))
+
 ## [1.105.0](https://github.com/Endika/eslojusto/compare/v1.104.5...v1.105.0) (2026-11-03)
 
 
