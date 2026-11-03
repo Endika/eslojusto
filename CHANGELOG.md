@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.105.3](https://github.com/Endika/eslojusto/compare/v1.105.2...v1.105.3) (2026-11-03)
+
+
+### Bug Fixes
+
+* **site:** keep every date whole on a narrow screen ([4f5e32f](https://github.com/Endika/eslojusto/commit/4f5e32fb8d24b2a221c799fba2e3a680eaefa7cf))
+
 ## [1.105.2](https://github.com/Endika/eslojusto/compare/v1.105.1...v1.105.2) (2026-11-03)
 
 
