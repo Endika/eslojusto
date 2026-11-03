@@ -34,6 +34,13 @@ export interface RuleBase<SourceId extends string = string> {
   readonly sources: readonly SourceId[];
 }
 
+// The article and its norm, without naming the norm twice when one already holds the other.
+export function citeOnce(article: string, norm: string): string {
+  if (norm.includes(article)) return norm;
+  if (article.includes(norm)) return article;
+  return `${article} (${norm})`;
+}
+
 export function ruleSource<RuleId extends string, NormId extends string, Status extends NormStatus>(
   rules: RuleTable<RuleId, NormId>,
   id: RuleId,
@@ -45,7 +52,7 @@ export function ruleSource<RuleId extends string, NormId extends string, Status 
   const ends = [until, norm.inForceUntil].filter((d): d is string => d !== null).sort();
   return {
     id,
-    citation: `${article} (${norm.citation})`,
+    citation: citeOnce(article, norm.citation),
     url,
     inForceSince: wordingSince ?? norm.inForceSince,
     inForceUntil: ends[0] ?? null,
