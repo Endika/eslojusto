@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.105.2](https://github.com/Endika/eslojusto/compare/v1.105.1...v1.105.2) (2026-11-03)
+
+
+### Bug Fixes
+
+* **law:** name a rule's norm once when its article already cites it ([3d23e8b](https://github.com/Endika/eslojusto/commit/3d23e8b1ad4bc6b1e9f3be3aece7e74f84db5afe))
+
 ## [1.105.1](https://github.com/Endika/eslojusto/compare/v1.105.0...v1.105.1) (2026-11-03)
 
 
