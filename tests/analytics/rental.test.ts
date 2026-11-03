@@ -14,7 +14,11 @@ import { RENTAL_FAQ_TOPICS } from '../../src/content/rental-faq-topics';
 import { parseDate as f } from '../../src/engine/date';
 import { SHEET_FIELDS, SHEETS } from '../../src/rental/form';
 import { STEPS } from '../../src/rental/steps';
+import { IRAV } from '../../src/engine/rental/data/irav';
+import { RENTAL_TABLES } from '../../src/engine/rental/data/tables';
+import { reviewRental } from '../../src/engine/rental/review';
 import {
+  TODAY,
   contract,
   repealedWindow,
   review,
@@ -75,6 +79,7 @@ describe('rental events', () => {
       fees: 'none',
       guarantees: expect.any(String),
       rent_update: 'paid_over',
+      rent_unchecked: [],
       charges: 'none',
       deposit_return: 'none',
       depends: [],
@@ -96,6 +101,26 @@ describe('rental events', () => {
     expect(repealed.depends).toContain('repealed_window');
     expect(repealed.difference).toBe('0');
     expect(isValidEvent('rental_review_completed', repealed)).toBe(true);
+  });
+
+  it('tells a rise our index tables did not cover from one checked', () => {
+    const stale = reviewRental(riseAboveIrav, TODAY, {
+      ...RENTAL_TABLES,
+      indices: { ...RENTAL_TABLES.indices, irav: { ...IRAV, coveredUntil: '2025-01-01' } },
+    });
+    if (!stale.ok) throw new Error('invalid');
+    const p = rentalReviewProps({
+      review: stale.review,
+      input: riseAboveIrav,
+      attempt: 1,
+      seconds: 95,
+      detail: 'locked',
+      pass: 'none',
+    });
+    expect(p.rent_update).toBe('not_checkable');
+    expect(p.rent_unchecked).toEqual(['index_not_loaded']);
+    expect(isValidEvent('rental_review_completed', p)).toBe(true);
+    expect(props().rent_unchecked).toEqual([]);
   });
 
   it('sorts the lease by the norms on agency fees', () => {

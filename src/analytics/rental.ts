@@ -6,6 +6,7 @@ import type { CompletedRentalReview, Detail, RentalEvents } from '../rental/port
 import {
   DOUBT_REASONS,
   ITEM_STATUSES,
+  RENT_UNCHECKED,
   attemptBucket,
   differenceBucket,
   reviewSecondsBucket,
@@ -59,6 +60,14 @@ export function rentalReviewProps(data: {
   const reasons = new Set(
     review.items.flatMap((i) => (i.outcome.kind === 'depends' ? i.outcome.reasons : [])),
   );
+  const unchecked = new Set(
+    review.items.flatMap((i) => {
+      if (i.kind !== 'rent_update') return [];
+      const readings =
+        i.outcome.kind === 'single' ? [i.outcome.value] : i.outcome.readings.map((r) => r.value);
+      return readings.flatMap((r) => (r.unchecked === null ? [] : [r.unchecked]));
+    }),
+  );
   const n = input.updates.length;
   return {
     signed_period: signedPeriod(input),
@@ -69,6 +78,7 @@ export function rentalReviewProps(data: {
     fees: familyStatus(review.items, 'fees'),
     guarantees: familyStatus(review.items, 'guarantees'),
     rent_update: familyStatus(review.items, 'rent_update'),
+    rent_unchecked: RENT_UNCHECKED.filter((r) => unchecked.has(r)),
     charges: familyStatus(review.items, 'charges'),
     deposit_return: familyStatus(review.items, 'deposit_return'),
     depends: DOUBT_REASONS.filter((r) => reasons.has(r)),
