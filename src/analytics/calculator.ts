@@ -10,6 +10,8 @@ import {
   type Snapshot,
   type Track,
   type TrackableField,
+  validationCode,
+  type ValidationCode,
 } from './events';
 
 // The calculator's events as catalogue events. The catalogue's «section» is the step. Kept for this
@@ -45,8 +47,12 @@ export function calculatorAnalytics(
     wentBack(from, to) {
       track('went_back', { from, to });
     },
-    fieldRejected(step, field) {
-      track('validation_error', { section: step, field: field as TrackableField });
+    fieldRejected(step, field, code) {
+      track('validation_error', {
+        section: step,
+        field: field as TrackableField,
+        code: validationCode(code) as ValidationCode,
+      });
     },
     reviewCompleted(completed) {
       const { review, input, figures, benefit, otherContracts, detail } = completed;

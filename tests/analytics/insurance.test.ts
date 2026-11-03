@@ -54,12 +54,20 @@ describe('the catalogue follows the insurance form', () => {
 describe('insurance events', () => {
   it('accept the sheets, the fields and the reasons', () => {
     expect(isValidEvent('section_viewed', { section: 'vencimiento' })).toBe(true);
-    expect(isValidEvent('validation_error', { section: 'vencimiento', field: 'expiresOn' })).toBe(
-      true,
-    );
-    expect(isValidEvent('validation_error', { section: 'poliza', field: 'policyNumber' })).toBe(
-      false,
-    );
+    expect(
+      isValidEvent('validation_error', {
+        section: 'vencimiento',
+        field: 'expiresOn',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'poliza',
+        field: 'policyNumber',
+        code: 'missing_value',
+      }),
+    ).toBe(false);
     expect(isValidEvent('insurance_out_of_scope', { reason: 'life' })).toBe(true);
     expect(isValidEvent('insurance_out_of_scope', { reason: 'mortgage' })).toBe(false);
     expect(isValidEvent('help_opened', { topic: 'faq-seguro-no-renovar' })).toBe(true);
@@ -116,7 +124,7 @@ describe('insurance events', () => {
     const done = completed(carOnline);
     events.stepShown('poliza');
     clock = 5_000;
-    events.fieldRejected('vencimiento', 'expiresOn');
+    events.fieldRejected('vencimiento', 'expiresOn', 'after_expiry');
     events.stepCompleted('poliza');
     events.stepShown('cobertura');
     events.wentBack('cobertura', 'poliza');

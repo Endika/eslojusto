@@ -1,4 +1,10 @@
-import { sectionSecondsBucket, type Props, type Section, type Track } from './events';
+import {
+  sectionSecondsBucket,
+  validationCode,
+  type Props,
+  type Section,
+  type Track,
+} from './events';
 
 // The events every review walked through the shared sheets reports the same way: steps, field
 // names and question ids only. Kept for this page view: when each step and the whole run started,
@@ -28,10 +34,11 @@ export function sectionAnalytics<S extends Section>(track: Track, now: () => num
       wentBack(from: S, to: S) {
         track('went_back', { from, to });
       },
-      fieldRejected(step: S, field: string) {
+      fieldRejected(step: S, field: string, code: string) {
         track('validation_error', {
           section: step,
           field: field as Props<'validation_error'>['field'],
+          code: validationCode(code) as Props<'validation_error'>['code'],
         });
       },
       helpOpened(topic: string) {

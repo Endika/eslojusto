@@ -652,7 +652,7 @@ export const es = {
     'En el alquiler, el contrato y los demás papeles llevan datos personales tuyos y de terceros, como el casero, quien avale o la agencia: nombres, DNI, la dirección de la vivienda o cuentas bancarias. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. Quien sube los documentos no puede consentir por otras personas: sus datos se tratan por interés legítimo (art. 6.1.f del RGPD), solo mientras el modelo lee, y ni se copian ni se guardan. El modelo tiene orden de no copiar esos datos y el servidor descarta lo que aún los lleve; nada se guarda.',
   'privacy.rental.tracked_sheets': 'En la revisión del alquiler',
   'privacy.rental.tracked_sheets_what':
-    'Lo mismo que en el finiquito con sus hojas (contrato, casero, entrada, renta, subidas, gastos, salida y resultado): que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha del contrato», nunca lo que escribiste. Qué pregunta frecuente abres o de qué partida miras «Cómo se calcula», por su tipo (honorarios, fianza, garantía, pago por adelantado, subida, gasto, devolución o intereses de la fianza), nunca su concepto. Y si pulsas «Empezar de nuevo».',
+    'Lo mismo que en el finiquito con sus hojas (contrato, casero, entrada, renta, subidas, gastos, salida y resultado): que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo y qué comprobación no pasó, por ejemplo «fecha del contrato», nunca lo que escribiste. Qué pregunta frecuente abres o de qué partida miras «Cómo se calcula», por su tipo (honorarios, fianza, garantía, pago por adelantado, subida, gasto, devolución o intereses de la fianza), nunca su concepto. Y si pulsas «Empezar de nuevo».',
   'privacy.rental.tracked_scope': 'Si tu contrato queda fuera de la revisión',
   'privacy.rental.tracked_scope_what':
     'El motivo, de una lista cerrada: firmado antes del 6 de marzo de 2019, de temporada, por habitaciones, para otro uso, de vivienda protegida o de renta antigua.',
@@ -678,7 +678,7 @@ export const es = {
     'En el contrato de trabajo, el contrato, las nóminas y la vida laboral pueden mostrar datos especialmente protegidos, como una discapacidad, una baja o la afiliación a un sindicato por su cuota. Por eso también te pedimos tu consentimiento explícito antes de subirlos, con la misma base jurídica. El modelo tiene orden de no copiar esos datos y el servidor descarta los textos que aún los lleven; nada se guarda.',
   'privacy.employment.tracked_sheets': 'En la revisión del contrato',
   'privacy.employment.tracked_sheets_what':
-    'Lo mismo que en el finiquito con sus hojas (relación, tipo de contrato, contratos anteriores, salario, nóminas, jornada, periodo de prueba, vacaciones, cláusulas, información, oferta y resultado): que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha de inicio», nunca lo que escribiste. Qué pregunta frecuente abres o de qué punto miras «Cómo se calcula», por su tipo (salario, tipo de contrato, encadenamiento, periodo de prueba, jornada, tiempo parcial, vacaciones y pagas, cláusulas, información, oferta o referencia), nunca su texto. Y si pulsas «Empezar de nuevo».',
+    'Lo mismo que en el finiquito con sus hojas (relación, tipo de contrato, contratos anteriores, salario, nóminas, jornada, periodo de prueba, vacaciones, cláusulas, información, oferta y resultado): que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo y qué comprobación no pasó, por ejemplo «fecha de inicio», nunca lo que escribiste. Qué pregunta frecuente abres o de qué punto miras «Cómo se calcula», por su tipo (salario, tipo de contrato, encadenamiento, periodo de prueba, jornada, tiempo parcial, vacaciones y pagas, cláusulas, información, oferta o referencia), nunca su texto. Y si pulsas «Empezar de nuevo».',
   'privacy.employment.tracked_scope': 'Si tu contrato queda fuera de la revisión del contrato',
   'privacy.employment.tracked_scope_what':
     'El motivo, de una lista cerrada: una relación laboral especial, personal funcionario, un contrato por empresa de trabajo temporal, un contrato de relevo o tener menos de 18 años.',
@@ -4299,7 +4299,7 @@ export const es = {
     'Solo en tu navegador, mientras la página está abierta. Tus fechas, tu sueldo, tu jornada, tus vacaciones y tus respuestas sobre cómo terminó la relación se calculan en tu dispositivo y no se envían a ningún servidor ni se guardan. Al cerrar o recargar la página, desaparecen.',
   'privacy.household.tracked_sheets': 'En la revisión de empleada de hogar',
   'privacy.household.tracked_sheets_what':
-    'Lo mismo que en el finiquito con cada una de sus hojas, del trabajo al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha de inicio», nunca lo que escribiste. Qué pregunta frecuente abres y de qué punto del resultado abres el cálculo, por su tipo.',
+    'Lo mismo que en el finiquito con cada una de sus hojas, del trabajo al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo y qué comprobación no pasó, por ejemplo «fecha de inicio», nunca lo que escribiste. Qué pregunta frecuente abres y de qué punto del resultado abres el cálculo, por su tipo.',
   'privacy.household.tracked_scope': 'Si tu caso queda fuera de la revisión de empleada de hogar',
   'privacy.household.tracked_scope_what':
     'El motivo, de una lista cerrada: que la relación terminó antes de la reforma de septiembre de 2022.',
@@ -4320,7 +4320,7 @@ export const es = {
     'Solo en tu navegador, mientras la página está abierta. Las fechas de tu póliza y del aviso de renovación y sus primas se calculan en tu dispositivo y no se envían a ningún servidor ni se guardan. Al cerrar o recargar la página, desaparecen.',
   'privacy.insurance.tracked_sheets': 'En la revisión de tu seguro',
   'privacy.insurance.tracked_sheets_what':
-    'Lo mismo que en el finiquito con cada una de sus hojas, de la póliza al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «día en que vence», nunca lo que escribiste. Qué pregunta frecuente abres.',
+    'Lo mismo que en el finiquito con cada una de sus hojas, de la póliza al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo y qué comprobación no pasó, por ejemplo «día en que vence», nunca lo que escribiste. Qué pregunta frecuente abres.',
   'privacy.insurance.tracked_scope': 'Si tu póliza queda fuera de la revisión de tu seguro',
   'privacy.insurance.tracked_scope_what':
     'El motivo, de una lista cerrada: un seguro de vida, de salud, de decesos u otro que no es de hogar ni de coche, o una póliza que venció antes del 01-01-2016.',
@@ -4352,7 +4352,7 @@ export const es = {
     'Solo en tu navegador, mientras la página está abierta. Los importes, los tipos de interés, las cuotas, los gastos y las fechas de tu crédito se calculan en tu dispositivo y no se envían a ningún servidor ni se guardan. Al cerrar o recargar la página, desaparecen.',
   'privacy.credit.tracked_sheets': 'En la revisión de tu crédito',
   'privacy.credit.tracked_sheets_what':
-    'Lo mismo que en el finiquito con cada una de sus hojas, del tipo de crédito al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «cuándo lo contrataste», nunca lo que escribiste. Qué pregunta frecuente abres.',
+    'Lo mismo que en el finiquito con cada una de sus hojas, del tipo de crédito al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo y qué comprobación no pasó, por ejemplo «cuándo lo contrataste», nunca lo que escribiste. Qué pregunta frecuente abres.',
   'privacy.credit.tracked_scope': 'Si tu crédito queda fuera de la revisión',
   'privacy.credit.tracked_scope_what':
     'El motivo, de una lista cerrada: una hipoteca, un renting sin compra, un crédito para un negocio, menos de 200 € o un contrato anterior al 25-09-2011.',
@@ -4384,7 +4384,7 @@ export const es = {
     'Solo en tu navegador, mientras la página está abierta. La fecha de la escritura, sus cláusulas, los importes de tus facturas y de tus amortizaciones y sus fechas se calculan en tu dispositivo y no se envían a ningún servidor ni se guardan. Al cerrar o recargar la página, desaparecen.',
   'privacy.mortgage.tracked_sheets': 'En la revisión de tu hipoteca',
   'privacy.mortgage.tracked_sheets_what':
-    'Lo mismo que en el finiquito con cada una de sus hojas, de la hipoteca al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha de la escritura», nunca lo que escribiste. Qué pregunta frecuente abres.',
+    'Lo mismo que en el finiquito con cada una de sus hojas, de la hipoteca al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo y qué comprobación no pasó, por ejemplo «fecha de la escritura», nunca lo que escribiste. Qué pregunta frecuente abres.',
   'privacy.mortgage.tracked_scope': 'Si tu hipoteca queda fuera de la revisión',
   'privacy.mortgage.tracked_scope_what':
     'El motivo, de una lista cerrada: la pidió una empresa, es sobre un inmueble de un negocio, es la del promotor subrogada al comprar, es multidivisa o inversa, o es un préstamo sin hipoteca.',
@@ -6388,7 +6388,7 @@ export const es = {
     'Si revisas varias facturas de la luz, cada una con sus respuestas se queda en la memoria de la pestaña para sumarlas como «tu año». No se escribe en tu dispositivo ni sale de él, salvo durante el pago, como se explica más abajo; al cerrar o recargar la pestaña, desaparece.',
   'privacy.bills.tracked_sheets': 'En las revisiones de tus facturas',
   'privacy.bills.tracked_sheets_what':
-    'Lo mismo que en el finiquito con cada una de sus hojas, de tu suministro o tu permanencia al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo, por ejemplo «fecha de cargo», nunca lo que escribiste. Las preguntas del bono social que solo ve quien lo tiene no se miden: ni que las abres ni sus errores. Qué pregunta frecuente abres.',
+    'Lo mismo que en el finiquito con cada una de sus hojas, de tu suministro o tu permanencia al resultado: que abres cada una, cuánto tardas en tramos y si vuelves atrás. Si un dato no se acepta, el nombre del campo y qué comprobación no pasó, por ejemplo «fecha de cargo», nunca lo que escribiste. Las preguntas del bono social que solo ve quien lo tiene no se miden: ni que las abres ni sus errores. Qué pregunta frecuente abres.',
   'privacy.bills.tracked_scope': 'Si tu factura o tu baja quedan fuera de la revisión',
   'privacy.bills.tracked_scope_what':
     'El motivo, de una lista cerrada: un suministro en Canarias, Ceuta o Melilla, de más de 15 kW, con otra tarifa de acceso que la 2.0TD o con placas solares que vierten a la red, o una factura emitida antes del 12-06-2026; o, en la permanencia, una baja pedida antes de 2022.',

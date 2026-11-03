@@ -68,8 +68,20 @@ describe('credit events', () => {
   it('accept the sheets, the fields and the reasons', () => {
     expect(isValidEvent('section_viewed', { section: 'cuota-final' })).toBe(true);
     expect(isValidEvent('went_back', { from: 'tae', to: 'producto' })).toBe(true);
-    expect(isValidEvent('validation_error', { section: 'contrato', field: 'agreedOn' })).toBe(true);
-    expect(isValidEvent('validation_error', { section: 'importe', field: 'IBAN' })).toBe(false);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'contrato',
+        field: 'agreedOn',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'importe',
+        field: 'IBAN',
+        code: 'missing_value',
+      }),
+    ).toBe(false);
     expect(isValidEvent('credit_out_of_scope', { reason: 'before_lcc' })).toBe(true);
     expect(isValidEvent('credit_out_of_scope', { reason: 'before_2019' })).toBe(false);
     expect(isValidEvent('help_opened', { topic: 'faq-credito-tipo-medio' })).toBe(true);
@@ -171,7 +183,7 @@ describe('credit events', () => {
     events.stepShown('producto');
     events.stepShown('producto');
     clock = 12_000;
-    events.fieldRejected('importe', 'principal');
+    events.fieldRejected('importe', 'principal', 'amount_range');
     events.stepCompleted('producto');
     events.stepShown('uso');
     events.wentBack('uso', 'producto');

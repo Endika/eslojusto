@@ -1410,7 +1410,7 @@ export const eu: Translation = {
     'Alokairuan, kontratuak eta gainerako paperek zure eta hirugarrenen datu pertsonalak dituzte, hala nola jabearenak, abalatzailearenak edo agentziarenak: izenak, DNIak, etxebizitzaren helbidea edo banku-kontuak. Horregatik, zure baimen esplizitua ere eskatzen dizugu horiek igo aurretik, oinarri juridiko berarekin. Dokumentuak igotzen dituenak ezin du beste pertsonen izenean baimenik eman: haien datuak interes legitimoagatik tratatzen dira (art. 6.1.f RGPD), AA ereduak irakurtzen duen bitartean bakarrik, eta ez dira kopiatzen, ezta gordetzen ere. AA ereduak agindua du datu horiek ez kopiatzeko, eta zerbitzariak oraindik horiek dituena baztertzen du; ez da ezer gordetzen.',
   'privacy.rental.tracked_sheets': 'Alokairuaren berrikuspenean',
   'privacy.rental.tracked_sheets_what':
-    'Kitapenean bezala, bere urratsekin (kontratua, jabea, sarrera, errenta, igoerak, gastuak, irteera eta emaitza): bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena, adibidez «kontratuaren data», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun edo zer kontzepturen «Nola kalkulatzen den» begiratzen duzun, haren motaren arabera (agentziaren ordainsariak, fidantza, bermea, aurretiazko ordainketa, igoera, gastua, itzulketa edo fidantzaren interesak), inoiz ez haren deskribapena. Eta «Hasi berriro» sakatzen duzun.',
+    'Kitapenean bezala, bere urratsekin (kontratua, jabea, sarrera, errenta, igoerak, gastuak, irteera eta emaitza): bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena eta zein egiaztapen ez duen gainditu, adibidez «kontratuaren data», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun edo zer kontzepturen «Nola kalkulatzen den» begiratzen duzun, haren motaren arabera (agentziaren ordainsariak, fidantza, bermea, aurretiazko ordainketa, igoera, gastua, itzulketa edo fidantzaren interesak), inoiz ez haren deskribapena. Eta «Hasi berriro» sakatzen duzun.',
   'privacy.rental.tracked_scope': 'Zure kontratua berrikuspenetik kanpo geratzen bada',
   'privacy.rental.tracked_scope_what':
     'Arrazoia, zerrenda itxi batetik: 2019ko martxoaren 6a baino lehen sinatua, denboraldikoa, logelakakoa, beste erabilera baterakoa, babes ofizialeko etxebizitzarena edo errenta zaharrekoa.',
@@ -1435,7 +1435,7 @@ export const eu: Translation = {
     'Lan-kontratuan, kontratuak, nominek eta lan-bizitzak bereziki babestutako datuak erakuts ditzakete, hala nola desgaitasun bat, baja bat edo sindikatu bateko afiliazioa, haren kuotagatik. Horregatik, zure baimen esplizitua ere eskatzen dizugu horiek igo aurretik, oinarri juridiko berarekin. AA ereduak agindua du datu horiek ez kopiatzeko, eta zerbitzariak oraindik horiek dituzten testuak baztertzen ditu; ez da ezer gordetzen.',
   'privacy.employment.tracked_sheets': 'Kontratuaren berrikuspenean',
   'privacy.employment.tracked_sheets_what':
-    'Kitapenean bezala, bere urratsekin (harremana, kontratu mota, aurreko kontratuak, soldata, nominak, lanaldia, proba-aldia, oporrak, klausulak, informazioa, eskaintza eta emaitza): bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena, adibidez «hasiera-data», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun edo zer punturen «Nola kalkulatzen den» begiratzen duzun, haren motaren arabera (soldata, kontratu mota, kontratuen kateatzea, proba-aldia, lanaldia, lanaldi partziala, oporrak eta ordainsariak, klausulak, informazioa, eskaintza edo erreferentzia), inoiz ez haren testua. Eta «Hasi berriro» sakatzen duzun.',
+    'Kitapenean bezala, bere urratsekin (harremana, kontratu mota, aurreko kontratuak, soldata, nominak, lanaldia, proba-aldia, oporrak, klausulak, informazioa, eskaintza eta emaitza): bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena eta zein egiaztapen ez duen gainditu, adibidez «hasiera-data», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun edo zer punturen «Nola kalkulatzen den» begiratzen duzun, haren motaren arabera (soldata, kontratu mota, kontratuen kateatzea, proba-aldia, lanaldia, lanaldi partziala, oporrak eta ordainsariak, klausulak, informazioa, eskaintza edo erreferentzia), inoiz ez haren testua. Eta «Hasi berriro» sakatzen duzun.',
   'privacy.employment.tracked_scope':
     'Zure kontratua kontratuaren berrikuspenetik kanpo geratzen bada',
   'privacy.employment.tracked_scope_what':
@@ -1473,7 +1473,7 @@ export const eu: Translation = {
     'Zure nabigatzailean bakarrik, orria irekita dagoen bitartean. Zure datak, zure soldata, lanaldia eta oporrak, eta harremanaren amaierari buruzko zure erantzunak zure gailuan kalkulatzen dira, eta ez dira inongo zerbitzarira bidaltzen, ezta gordetzen ere. Orria ixtean edo berriro kargatzean, desagertu egiten dira.',
   'privacy.household.tracked_sheets': 'Etxeko langilearen berrikuspenean',
   'privacy.household.tracked_sheets_what':
-    'Kitapenean bezala, bere urrats bakoitzarekin, lanetik emaitzara: bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena, adibidez «hasiera-data», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun eta emaitzaren zer punturen kalkulua irekitzen duzun, haren motaren arabera.',
+    'Kitapenean bezala, bere urrats bakoitzarekin, lanetik emaitzara: bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena eta zein egiaztapen ez duen gainditu, adibidez «hasiera-data», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun eta emaitzaren zer punturen kalkulua irekitzen duzun, haren motaren arabera.',
   'privacy.household.tracked_scope':
     'Zure kasua etxeko langilearen berrikuspenetik kanpo geratzen bada',
   'privacy.household.tracked_scope_what':
@@ -1495,7 +1495,7 @@ export const eu: Translation = {
     'Zure nabigatzailean bakarrik, orria irekita dagoen bitartean. Zure polizaren eta berritze-abisuaren datak eta haren primak zure gailuan kalkulatzen dira, eta ez dira inongo zerbitzarira bidaltzen, ezta gordetzen ere. Orria ixtean edo berriro kargatzean, desagertu egiten dira.',
   'privacy.insurance.tracked_sheets': 'Zure aseguruaren berrikuspenean',
   'privacy.insurance.tracked_sheets_what':
-    'Kitapenean bezala, bere urrats bakoitzarekin, polizatik emaitzara: bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena, adibidez «iraungitze-eguna», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun.',
+    'Kitapenean bezala, bere urrats bakoitzarekin, polizatik emaitzara: bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena eta zein egiaztapen ez duen gainditu, adibidez «iraungitze-eguna», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun.',
   'privacy.insurance.tracked_scope':
     'Zure poliza zure aseguruaren berrikuspenetik kanpo geratzen bada',
   'privacy.insurance.tracked_scope_what':
@@ -1528,7 +1528,7 @@ export const eu: Translation = {
     'Zure nabigatzailean bakarrik, orria irekita dagoen bitartean. Zure kredituaren zenbatekoak, interes-tasak, kuotak, gastuak eta datak zure gailuan kalkulatzen dira, eta ez dira inongo zerbitzarira bidaltzen, ezta gordetzen ere. Orria ixtean edo berriro kargatzean, desagertu egiten dira.',
   'privacy.credit.tracked_sheets': 'Zure kredituaren berrikuspenean',
   'privacy.credit.tracked_sheets_what':
-    'Kitapenean bezala, bere urrats bakoitzarekin, kreditu motatik emaitzara: bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena, adibidez «noiz kontratatu zenuen», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun.',
+    'Kitapenean bezala, bere urrats bakoitzarekin, kreditu motatik emaitzara: bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena eta zein egiaztapen ez duen gainditu, adibidez «noiz kontratatu zenuen», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun.',
   'privacy.credit.tracked_scope': 'Zure kreditua berrikuspenetik kanpo geratzen bada',
   'privacy.credit.tracked_scope_what':
     'Arrazoia, zerrenda itxi batetik: hipoteka bat, erosketarik gabeko renting bat, negozio baterako kreditu bat, 200 € baino gutxiago edo 25-09-2011 baino lehenagoko kontratu bat.',
@@ -1560,7 +1560,7 @@ export const eu: Translation = {
     'Zure nabigatzailean bakarrik, orria irekita dagoen bitartean. Eskrituraren data, haren klausulak, zure fakturen eta amortizazioen zenbatekoak eta haien datak zure gailuan kalkulatzen dira, eta ez dira inongo zerbitzarira bidaltzen, ezta gordetzen ere. Orria ixtean edo berriro kargatzean, desagertu egiten dira.',
   'privacy.mortgage.tracked_sheets': 'Zure hipotekaren berrikuspenean',
   'privacy.mortgage.tracked_sheets_what':
-    'Kitapenean bezala, bere urrats bakoitzarekin, hipotekatik emaitzara: bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena, adibidez «eskrituraren data», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun.',
+    'Kitapenean bezala, bere urrats bakoitzarekin, hipotekatik emaitzara: bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena eta zein egiaztapen ez duen gainditu, adibidez «eskrituraren data», inoiz ez idatzi duzuna. Zer ohiko galdera irekitzen duzun.',
   'privacy.mortgage.tracked_scope': 'Zure hipoteka berrikuspenetik kanpo geratzen bada',
   'privacy.mortgage.tracked_scope_what':
     'Arrazoia, zerrenda itxi batetik: enpresa batek eskatu zuen, negozio bateko higiezin bati buruzkoa da, sustatzailearena da eta erostean subrogatu zen, dibisa anitzekoa edo alderantzizkoa da, edo hipotekarik gabeko mailegu bat da.',
@@ -1597,7 +1597,7 @@ export const eu: Translation = {
     'Argiaren hainbat faktura berrikusten badituzu, bakoitza bere erantzunekin nabigatzailearen fitxaren memorian geratzen da, «zure urtea» gisa batzeko. Ez da zure gailuan idazten, ezta handik ateratzen ere, ordainketan zehar izan ezik, beherago azaltzen den bezala; fitxa ixtean edo berriro kargatzean, desagertu egiten da.',
   'privacy.bills.tracked_sheets': 'Zure fakturen berrikuspenetan',
   'privacy.bills.tracked_sheets_what':
-    'Kitapenean bezala, bere urrats bakoitzarekin, zure horniduratik edo iraupen-konpromisotik emaitzara: bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena, adibidez «kargu-data», inoiz ez idatzi duzuna. Gizarte-bonuaren galderak, bonua duenak bakarrik ikusten dituenak, ez dira neurtzen: ez irekitzen dituzula, ez haien akatsak. Zer ohiko galdera irekitzen duzun.',
+    'Kitapenean bezala, bere urrats bakoitzarekin, zure horniduratik edo iraupen-konpromisotik emaitzara: bakoitza irekitzen duzula, zenbat denbora behar duzun, tartetan, eta atzera itzultzen zaren. Datu bat onartzen ez bada, eremuaren izena eta zein egiaztapen ez duen gainditu, adibidez «kargu-data», inoiz ez idatzi duzuna. Gizarte-bonuaren galderak, bonua duenak bakarrik ikusten dituenak, ez dira neurtzen: ez irekitzen dituzula, ez haien akatsak. Zer ohiko galdera irekitzen duzun.',
   'privacy.bills.tracked_scope': 'Zure faktura edo zure baja berrikuspenetik kanpo geratzen badira',
   'privacy.bills.tracked_scope_what':
     'Arrazoia, zerrenda itxi batetik: Kanarietan, Ceutan edo Melillan dagoen hornidura bat, 15 kW baino gehiagokoa, 2.0TD ez den beste sarbide-tarifa batekoa edo sarera isurtzen duten eguzki-plakak dituena, edo 12-06-2026 baino lehen egindako faktura bat; edo, iraupen-konpromisoan, 2022 baino lehen eskatutako baja bat.',

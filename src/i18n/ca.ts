@@ -1377,7 +1377,7 @@ export const ca: Translation = {
     'En el lloguer, el contracte i els altres papers porten dades personals teves i de terceres persones, com el propietari, qui avali o l’agència: noms, DNI, l’adreça de l’habitatge o comptes bancaris. Per això també et demanem el teu consentiment explícit abans de pujar-los, amb la mateixa base jurídica. Qui puja els documents no pot consentir per altres persones: les seves dades es tracten per interès legítim (art. 6.1.f del RGPD), només mentre el model llegeix, i ni es copien ni es desen. El model té l’ordre de no copiar aquestes dades i el servidor descarta el que encara les porti; no es desa res.',
   'privacy.rental.tracked_sheets': 'A la revisió del lloguer',
   'privacy.rental.tracked_sheets_what':
-    'El mateix que a la quitança amb els seus fulls (contracte, propietari, entrada, renda, pujades, despeses, sortida i resultat): que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp, per exemple «data del contracte», mai el que vas escriure. Quina pregunta freqüent obres o de quina partida mires «Com es calcula», pel seu tipus (honoraris, fiança, garantia, pagament per avançat, pujada, despesa, devolució o interessos de la fiança), mai el seu concepte. I si prems «Tornar a començar».',
+    'El mateix que a la quitança amb els seus fulls (contracte, propietari, entrada, renda, pujades, despeses, sortida i resultat): que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp i quina comprovació no ha passat, per exemple «data del contracte», mai el que vas escriure. Quina pregunta freqüent obres o de quina partida mires «Com es calcula», pel seu tipus (honoraris, fiança, garantia, pagament per avançat, pujada, despesa, devolució o interessos de la fiança), mai el seu concepte. I si prems «Tornar a començar».',
   'privacy.rental.tracked_scope': 'Si el teu contracte queda fora de la revisió',
   'privacy.rental.tracked_scope_what':
     'El motiu, d’una llista tancada: signat abans del 6 de març de 2019, de temporada, per habitacions, per a un altre ús, d’habitatge protegit o de renda antiga.',
@@ -1402,7 +1402,7 @@ export const ca: Translation = {
     'En el contracte de treball, el contracte, les nòmines i la vida laboral poden mostrar dades especialment protegides, com una discapacitat, una baixa o l’afiliació a un sindicat per la seva quota. Per això també et demanem el teu consentiment explícit abans de pujar-los, amb la mateixa base jurídica. El model té l’ordre de no copiar aquestes dades i el servidor descarta els textos que encara les portin; no es desa res.',
   'privacy.employment.tracked_sheets': 'A la revisió del contracte',
   'privacy.employment.tracked_sheets_what':
-    'El mateix que a la quitança amb els seus fulls (relació, tipus de contracte, contractes anteriors, salari, nòmines, jornada, període de prova, vacances, clàusules, informació, oferta i resultat): que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp, per exemple «data d’inici», mai el que vas escriure. Quina pregunta freqüent obres o de quin punt mires «Com es calcula», pel seu tipus (salari, tipus de contracte, encadenament, període de prova, jornada, temps parcial, vacances i pagues, clàusules, informació, oferta o referència), mai el seu text. I si prems «Tornar a començar».',
+    'El mateix que a la quitança amb els seus fulls (relació, tipus de contracte, contractes anteriors, salari, nòmines, jornada, període de prova, vacances, clàusules, informació, oferta i resultat): que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp i quina comprovació no ha passat, per exemple «data d’inici», mai el que vas escriure. Quina pregunta freqüent obres o de quin punt mires «Com es calcula», pel seu tipus (salari, tipus de contracte, encadenament, període de prova, jornada, temps parcial, vacances i pagues, clàusules, informació, oferta o referència), mai el seu text. I si prems «Tornar a començar».',
   'privacy.employment.tracked_scope': 'Si el teu contracte queda fora de la revisió del contracte',
   'privacy.employment.tracked_scope_what':
     'El motiu, d’una llista tancada: una relació laboral especial, personal funcionari, un contracte per empresa de treball temporal, un contracte de relleu o tenir menys de 18 anys.',
@@ -1439,7 +1439,7 @@ export const ca: Translation = {
     'Només al teu navegador, mentre la pàgina és oberta. Les teves dates, el teu sou, la teva jornada, les teves vacances i les teves respostes sobre com va acabar la relació es calculen al teu dispositiu i no s’envien a cap servidor ni es desen. En tancar o recarregar la pàgina, desapareixen.',
   'privacy.household.tracked_sheets': 'A la revisió de treballadora de la llar',
   'privacy.household.tracked_sheets_what':
-    'El mateix que a la quitança amb cadascun dels seus fulls, de la feina al resultat: que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp, per exemple «data d’inici», mai el que vas escriure. Quina pregunta freqüent obres i de quin punt del resultat obres el càlcul, pel seu tipus.',
+    'El mateix que a la quitança amb cadascun dels seus fulls, de la feina al resultat: que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp i quina comprovació no ha passat, per exemple «data d’inici», mai el que vas escriure. Quina pregunta freqüent obres i de quin punt del resultat obres el càlcul, pel seu tipus.',
   'privacy.household.tracked_scope':
     'Si el teu cas queda fora de la revisió de treballadora de la llar',
   'privacy.household.tracked_scope_what':
@@ -1461,7 +1461,7 @@ export const ca: Translation = {
     'Només al teu navegador, mentre la pàgina és oberta. Les dates de la teva pòlissa i de l’avís de renovació i les seves primes es calculen al teu dispositiu i no s’envien a cap servidor ni es desen. En tancar o recarregar la pàgina, desapareixen.',
   'privacy.insurance.tracked_sheets': 'A la revisió de la teva assegurança',
   'privacy.insurance.tracked_sheets_what':
-    'El mateix que a la quitança amb cadascun dels seus fulls, de la pòlissa al resultat: que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp, per exemple «dia en què venç», mai el que vas escriure. Quina pregunta freqüent obres.',
+    'El mateix que a la quitança amb cadascun dels seus fulls, de la pòlissa al resultat: que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp i quina comprovació no ha passat, per exemple «dia en què venç», mai el que vas escriure. Quina pregunta freqüent obres.',
   'privacy.insurance.tracked_scope':
     'Si la teva pòlissa queda fora de la revisió de la teva assegurança',
   'privacy.insurance.tracked_scope_what':
@@ -1494,7 +1494,7 @@ export const ca: Translation = {
     'Només al teu navegador, mentre la pàgina és oberta. Els imports, els tipus d’interès, les quotes, les despeses i les dates del teu crèdit es calculen al teu dispositiu i no s’envien a cap servidor ni es desen. En tancar o recarregar la pàgina, desapareixen.',
   'privacy.credit.tracked_sheets': 'A la revisió del teu crèdit',
   'privacy.credit.tracked_sheets_what':
-    'El mateix que a la quitança amb cadascun dels seus fulls, del tipus de crèdit al resultat: que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp, per exemple «quan el vas contractar», mai el que vas escriure. Quina pregunta freqüent obres.',
+    'El mateix que a la quitança amb cadascun dels seus fulls, del tipus de crèdit al resultat: que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp i quina comprovació no ha passat, per exemple «quan el vas contractar», mai el que vas escriure. Quina pregunta freqüent obres.',
   'privacy.credit.tracked_scope': 'Si el teu crèdit queda fora de la revisió',
   'privacy.credit.tracked_scope_what':
     'El motiu, d’una llista tancada: una hipoteca, un rènting sense compra, un crèdit per a un negoci, menys de 200 € o un contracte anterior al 25-09-2011.',
@@ -1526,7 +1526,7 @@ export const ca: Translation = {
     'Només al teu navegador, mentre la pàgina és oberta. La data de l’escriptura, les seves clàusules, els imports de les teves factures i de les teves amortitzacions i les seves dates es calculen al teu dispositiu i no s’envien a cap servidor ni es desen. En tancar o recarregar la pàgina, desapareixen.',
   'privacy.mortgage.tracked_sheets': 'A la revisió de la teva hipoteca',
   'privacy.mortgage.tracked_sheets_what':
-    'El mateix que a la quitança amb cadascun dels seus fulls, de la hipoteca al resultat: que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp, per exemple «data de l’escriptura», mai el que vas escriure. Quina pregunta freqüent obres.',
+    'El mateix que a la quitança amb cadascun dels seus fulls, de la hipoteca al resultat: que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp i quina comprovació no ha passat, per exemple «data de l’escriptura», mai el que vas escriure. Quina pregunta freqüent obres.',
   'privacy.mortgage.tracked_scope': 'Si la teva hipoteca queda fora de la revisió',
   'privacy.mortgage.tracked_scope_what':
     'El motiu, d’una llista tancada: la va demanar una empresa, és sobre un immoble d’un negoci, és la del promotor subrogada en comprar, és multidivisa o inversa, o és un préstec sense hipoteca.',
@@ -1563,7 +1563,7 @@ export const ca: Translation = {
     'Si revises diverses factures de la llum, cadascuna amb les seves respostes es queda a la memòria de la pestanya per sumar-les com «el teu any». No s’escriu al teu dispositiu ni en surt, excepte durant el pagament, com s’explica més avall; en tancar o recarregar la pestanya, desapareix.',
   'privacy.bills.tracked_sheets': 'A les revisions de les teves factures',
   'privacy.bills.tracked_sheets_what':
-    'El mateix que a la quitança amb cadascun dels seus fulls, del teu subministrament o la teva permanència al resultat: que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp, per exemple «data de càrrec», mai el que vas escriure. Les preguntes del bo social que només veu qui el té no es mesuren: ni que les obres ni els seus errors. Quina pregunta freqüent obres.',
+    'El mateix que a la quitança amb cadascun dels seus fulls, del teu subministrament o la teva permanència al resultat: que obres cadascun, quant trigues en trams i si tornes enrere. Si una dada no s’accepta, el nom del camp i quina comprovació no ha passat, per exemple «data de càrrec», mai el que vas escriure. Les preguntes del bo social que només veu qui el té no es mesuren: ni que les obres ni els seus errors. Quina pregunta freqüent obres.',
   'privacy.bills.tracked_scope': 'Si la teva factura o la teva baixa queden fora de la revisió',
   'privacy.bills.tracked_scope_what':
     'El motiu, d’una llista tancada: un subministrament a Canàries, Ceuta o Melilla, de més de 15 kW, amb una tarifa d’accés diferent de la 2.0TD o amb plaques solars que aboquen a la xarxa, o una factura emesa abans del 12-06-2026; o, en la permanència, una baixa demanada abans de 2022.',

@@ -108,21 +108,34 @@ describe('the catalogue guard', () => {
     expect(isValidEvent('section_viewed', { section: 'prorrateo' })).toBe(true);
     expect(isValidEvent('went_back', { from: 'resultado', to: 'prorrateo' })).toBe(true);
     expect(
-      isValidEvent('validation_error', { section: 'prorrateo', field: 'extraPayProrated' }),
+      isValidEvent('validation_error', {
+        section: 'prorrateo',
+        field: 'extraPayProrated',
+        code: 'missing_value',
+      }),
     ).toBe(true);
     // The «No lo sé» checkbox is a form control, not an engine field: it is never a tracked name.
     expect(
       isValidEvent('validation_error', {
         section: 'vacaciones',
         field: 'holidayDaysTakenUnknown',
+        code: 'missing_value',
       }),
     ).toBe(false);
-    expect(isValidEvent('validation_error', { section: 'pagas', field: 'extraPayAmount' })).toBe(
-      true,
-    );
-    expect(isValidEvent('validation_error', { section: 'salario', field: 'monthlySalary' })).toBe(
-      true,
-    );
+    expect(
+      isValidEvent('validation_error', {
+        section: 'pagas',
+        field: 'extraPayAmount',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'salario',
+        field: 'monthlySalary',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
     expect(isValidEvent('help_opened', { topic: 'faq-datos' })).toBe(true);
     expect(isValidEvent('detail_opened', { item: 'holiday_pay' })).toBe(true);
     expect(isValidEvent('started_over', {})).toBe(true);
@@ -154,10 +167,20 @@ describe('the catalogue guard', () => {
   });
 
   it('rejects a value that is not a field name', () => {
-    expect(isValidEvent('validation_error', { section: 'salario', field: '1500' })).toBe(false);
-    expect(isValidEvent('validation_error', { section: 'salario', field: '2010-03-01' })).toBe(
-      false,
-    );
+    expect(
+      isValidEvent('validation_error', {
+        section: 'salario',
+        field: '1500',
+        code: 'missing_value',
+      }),
+    ).toBe(false);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'salario',
+        field: '2010-03-01',
+        code: 'missing_value',
+      }),
+    ).toBe(false);
     expect(isValidEvent('section_viewed', { section: 'sheet' })).toBe(false);
     expect(isValidEvent('browser_language', { lang: '1500' })).toBe(false);
     expect(isValidEvent('browser_language', { lang: 'ja-JP' })).toBe(false);
@@ -624,13 +647,27 @@ describe('review_completed: the benefit', () => {
   });
 
   it('an error in an other-contracts row is tracked by the list name', () => {
-    expect(isValidEvent('validation_error', { section: 'otros', field: 'otherContracts' })).toBe(
-      true,
-    );
     expect(
-      isValidEvent('validation_error', { section: 'otros', field: 'otherContracts.0.startDate' }),
+      isValidEvent('validation_error', {
+        section: 'otros',
+        field: 'otherContracts',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'otros',
+        field: 'otherContracts.0.startDate',
+        code: 'missing_value',
+      }),
     ).toBe(false);
-    expect(isValidEvent('validation_error', { section: 'hijos', field: 'children' })).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'hijos',
+        field: 'children',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
   });
 });
 

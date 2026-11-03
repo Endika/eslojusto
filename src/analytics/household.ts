@@ -10,6 +10,7 @@ import {
   type Props,
   type Section,
   type Track,
+  validationCode,
 } from './events';
 
 type Completed = Props<'household_review_completed'>;
@@ -121,10 +122,11 @@ export function householdAnalytics(track: Track, now: () => number): HouseholdEv
     wentBack(from, to) {
       track('went_back', { from, to });
     },
-    fieldRejected(step, field) {
+    fieldRejected(step, field, code) {
       track('validation_error', {
         section: step,
         field: field as Props<'validation_error'>['field'],
+        code: validationCode(code) as Props<'validation_error'>['code'],
       });
     },
     outOfScope(reason) {

@@ -1400,7 +1400,7 @@ export const en: Translation = {
     'In a rental, the tenancy agreement and the other papers contain personal data about you and about third parties, such as the landlord, any guarantor or the agency: names, DNI numbers, the address of the property or bank accounts. That is why we also ask for your explicit consent before you upload them, with the same legal basis. The person uploading the documents cannot consent on behalf of other people: their data is processed on the basis of legitimate interest (art. 6.1.f RGPD, the GDPR), only while the model is reading, and is neither copied nor stored. The model is instructed not to copy that data and the server discards anything that still contains it; nothing is stored.',
   'privacy.rental.tracked_sheets': 'In the rental review',
   'privacy.rental.tracked_sheets_what':
-    'The same as in the final settlement review, with its sheets (agreement, landlord, move-in, rent, increases, expenses, move-out and result): that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field, for example “agreement date”, never what you typed. Which frequently asked question you open, or for which item you look at “How it is calculated”, by its type (agency fees, deposit, guarantee, advance payment, increase, expense, return or interest on the deposit), never its description. And whether you press “Start again”.',
+    'The same as in the final settlement review, with its sheets (agreement, landlord, move-in, rent, increases, expenses, move-out and result): that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field and which check it failed, for example “agreement date”, never what you typed. Which frequently asked question you open, or for which item you look at “How it is calculated”, by its type (agency fees, deposit, guarantee, advance payment, increase, expense, return or interest on the deposit), never its description. And whether you press “Start again”.',
   'privacy.rental.tracked_scope': 'If your tenancy agreement falls outside the review',
   'privacy.rental.tracked_scope_what':
     'The reason, from a closed list: signed before 6 March 2019, seasonal, a room rental, for another use, for protected (subsidised) housing or an old controlled rent (renta antigua).',
@@ -1425,7 +1425,7 @@ export const en: Translation = {
     'For an employment contract, the contract, the payslips and the employment history may show specially protected data, such as a disability, a period of sick leave or trade union membership through its subscription. That is why we also ask for your explicit consent before you upload them, with the same legal basis. The model is instructed not to copy that data and the server discards any text that still contains it; nothing is stored.',
   'privacy.employment.tracked_sheets': 'In the contract review',
   'privacy.employment.tracked_sheets_what':
-    'The same as in the final settlement review, with its sheets (relationship, type of contract, previous contracts, pay, payslips, working hours, trial period, holidays, clauses, information, offer and result): that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field, for example “start date”, never what you typed. Which frequently asked question you open, or for which point you look at “How it is calculated”, by its type (pay, type of contract, chaining of contracts, trial period, working hours, part-time work, holidays and payments, clauses, information, offer or reference), never its text. And whether you press “Start again”.',
+    'The same as in the final settlement review, with its sheets (relationship, type of contract, previous contracts, pay, payslips, working hours, trial period, holidays, clauses, information, offer and result): that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field and which check it failed, for example “start date”, never what you typed. Which frequently asked question you open, or for which point you look at “How it is calculated”, by its type (pay, type of contract, chaining of contracts, trial period, working hours, part-time work, holidays and payments, clauses, information, offer or reference), never its text. And whether you press “Start again”.',
   'privacy.employment.tracked_scope': 'If your contract falls outside the contract review',
   'privacy.employment.tracked_scope_what':
     'The reason, from a closed list: a special employment relationship, civil servant staff, a contract through a temporary employment agency (empresa de trabajo temporal), a relief contract (contrato de relevo) or being under 18.',
@@ -1462,7 +1462,7 @@ export const en: Translation = {
     'Only in your browser, while the page is open. Your dates, your pay, your working hours, your holidays and your answers on how the relationship ended are calculated on your device and are not sent to any server or stored. When you close or reload the page, they disappear.',
   'privacy.household.tracked_sheets': 'In the domestic worker review',
   'privacy.household.tracked_sheets_what':
-    'The same as in the final settlement review, with each of its sheets, from the job to the result: that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field, for example “start date”, never what you typed. Which frequently asked question you open and for which point of the result you open the calculation, by its type.',
+    'The same as in the final settlement review, with each of its sheets, from the job to the result: that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field and which check it failed, for example “start date”, never what you typed. Which frequently asked question you open and for which point of the result you open the calculation, by its type.',
   'privacy.household.tracked_scope': 'If your case falls outside the domestic worker review',
   'privacy.household.tracked_scope_what':
     'The reason, from a closed list: that the relationship ended before the September 2022 reform.',
@@ -1483,7 +1483,7 @@ export const en: Translation = {
     'Only in your browser, while the page is open. The dates of your policy and of the renewal notice, and its premiums, are calculated on your device and are not sent to any server or stored. When you close or reload the page, they disappear.',
   'privacy.insurance.tracked_sheets': 'In the review of your insurance',
   'privacy.insurance.tracked_sheets_what':
-    'The same as in the final settlement review, with each of its sheets, from the policy to the result: that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field, for example “expiry date”, never what you typed. Which frequently asked question you open.',
+    'The same as in the final settlement review, with each of its sheets, from the policy to the result: that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field and which check it failed, for example “expiry date”, never what you typed. Which frequently asked question you open.',
   'privacy.insurance.tracked_scope': 'If your policy falls outside the review of your insurance',
   'privacy.insurance.tracked_scope_what':
     'The reason, from a closed list: life, health, funeral or other insurance that is not home or car insurance, or a policy that expired before 01-01-2016.',
@@ -1515,7 +1515,7 @@ export const en: Translation = {
     'Only in your browser, while the page is open. The amounts, interest rates, instalments, charges and dates of your credit are calculated on your device and are not sent to any server or stored. When you close or reload the page, they disappear.',
   'privacy.credit.tracked_sheets': 'In the review of your credit',
   'privacy.credit.tracked_sheets_what':
-    'The same as in the final settlement review, with each of its sheets, from the type of credit to the result: that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field, for example “when you took it out”, never what you typed. Which frequently asked question you open.',
+    'The same as in the final settlement review, with each of its sheets, from the type of credit to the result: that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field and which check it failed, for example “when you took it out”, never what you typed. Which frequently asked question you open.',
   'privacy.credit.tracked_scope': 'If your credit falls outside the review',
   'privacy.credit.tracked_scope_what':
     'The reason, from a closed list: a mortgage, a lease with no purchase (renting), credit for a business, less than 200 € or an agreement before 25-09-2011.',
@@ -1547,7 +1547,7 @@ export const en: Translation = {
     'Only in your browser, while the page is open. The date of the deed, its clauses, the amounts of your invoices and of your repayments and their dates are calculated on your device and are not sent to any server or stored. When you close or reload the page, they disappear.',
   'privacy.mortgage.tracked_sheets': 'In the review of your mortgage',
   'privacy.mortgage.tracked_sheets_what':
-    'The same as in the final settlement review, with each of its sheets, from the mortgage to the result: that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field, for example “date of the deed”, never what you typed. Which frequently asked question you open.',
+    'The same as in the final settlement review, with each of its sheets, from the mortgage to the result: that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field and which check it failed, for example “date of the deed”, never what you typed. Which frequently asked question you open.',
   'privacy.mortgage.tracked_scope': 'If your mortgage falls outside the review',
   'privacy.mortgage.tracked_scope_what':
     "The reason, from a closed list: it was taken out by a company, it is on a business property, it is the developer's mortgage taken over (subrogada) when buying, it is a multi-currency or reverse mortgage, or it is a loan without a mortgage.",
@@ -1584,7 +1584,7 @@ export const en: Translation = {
     "If you review several electricity bills, each one with its answers stays in the tab's memory so they can be added up as “your year”. It is not written to your device and does not leave it, except during payment, as explained below; when you close or reload the tab, it disappears.",
   'privacy.bills.tracked_sheets': 'In the reviews of your bills',
   'privacy.bills.tracked_sheets_what':
-    'The same as in the final settlement review, with each of its sheets, from your supply or your minimum-term commitment to the result: that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field, for example “charge date”, never what you typed. The bono social (social bonus) questions that only people who have it see are not measured: neither that you open them nor their errors. Which frequently asked question you open.',
+    'The same as in the final settlement review, with each of its sheets, from your supply or your minimum-term commitment to the result: that you open each one, how long you take, in bands, and whether you go back. If a value is not accepted, the name of the field and which check it failed, for example “charge date”, never what you typed. The bono social (social bonus) questions that only people who have it see are not measured: neither that you open them nor their errors. Which frequently asked question you open.',
   'privacy.bills.tracked_scope': 'If your bill or your cancellation falls outside the review',
   'privacy.bills.tracked_scope_what':
     'The reason, from a closed list: a supply in Canarias, Ceuta or Melilla, of more than 15 kW, with an access tariff other than 2.0TD or with solar panels that feed into the grid, or a bill issued before 12-06-2026; or, for the minimum-term commitment, a cancellation requested before 2022.',

@@ -142,9 +142,9 @@ export function electricityAnalytics(
     wentBack(from, to) {
       if (from !== BONUS_ONLY_STEP && to !== BONUS_ONLY_STEP) events.wentBack(from, to);
     },
-    fieldRejected(step, field) {
+    fieldRejected(step, field, code) {
       if (step !== BONUS_ONLY_STEP && !BONUS_ONLY_FIELDS.has(field))
-        events.fieldRejected(step, field);
+        events.fieldRejected(step, field, code);
     },
     outOfScope(reason) {
       track('bills_out_of_scope', { reason });

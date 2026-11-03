@@ -98,14 +98,34 @@ describe('bills events', () => {
     expect(isValidEvent('section_viewed', { section: 'bono-social-consumo' })).toBe(true);
     expect(isValidEvent('section_viewed', { section: 'despues' })).toBe(true);
     expect(isValidEvent('went_back', { from: 'iva', to: 'contador' })).toBe(true);
-    expect(isValidEvent('validation_error', { section: 'contador', field: 'meterAmount' })).toBe(
-      true,
-    );
-    expect(isValidEvent('validation_error', { section: 'baja', field: 'exitRequestedOn' })).toBe(
-      true,
-    );
-    expect(isValidEvent('validation_error', { section: 'suministro', field: 'cups' })).toBe(false);
-    expect(isValidEvent('validation_error', { section: 'suministro', field: CUPS })).toBe(false);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'contador',
+        field: 'meterAmount',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'baja',
+        field: 'exitRequestedOn',
+        code: 'missing_value',
+      }),
+    ).toBe(true);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'suministro',
+        field: 'cups',
+        code: 'missing_value',
+      }),
+    ).toBe(false);
+    expect(
+      isValidEvent('validation_error', {
+        section: 'suministro',
+        field: CUPS,
+        code: 'missing_value',
+      }),
+    ).toBe(false);
     expect(isValidEvent('bills_out_of_scope', { reason: 'canary_ceuta_melilla' })).toBe(true);
     expect(isValidEvent('bills_out_of_scope', { reason: 'exit_before_2022' })).toBe(true);
     expect(isValidEvent('bills_out_of_scope', { reason: 'before_2019' })).toBe(false);
@@ -237,10 +257,10 @@ describe('bills events', () => {
       () => 'none',
     );
     events.stepShown('bono-social');
-    events.fieldRejected('bono-social', 'bonusCategory');
+    events.fieldRejected('bono-social', 'bonusCategory', 'missing_choice');
     events.stepCompleted('bono-social');
     events.stepShown('bono-social-consumo');
-    events.fieldRejected('bono-social-consumo', 'bonusKwhSoFar');
+    events.fieldRejected('bono-social-consumo', 'bonusKwhSoFar', 'kwh_range');
     events.stepCompleted('bono-social-consumo');
     events.wentBack('bono-social-consumo', 'bono-social');
     expect(sent.join()).not.toMatch(/bono-social-consumo|bonus(Category|Amount|KwhSoFar)/);
@@ -264,7 +284,7 @@ describe('bills events', () => {
     );
     events.stepShown('suministro');
     clock = 12_000;
-    events.fieldRejected('suministro', 'postcode');
+    events.fieldRejected('suministro', 'postcode', 'postcode');
     events.stepCompleted('suministro');
     events.outOfScope('canary_ceuta_melilla');
     events.helpOpened('faq-luz-contador');

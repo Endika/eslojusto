@@ -121,7 +121,7 @@ describe.skipIf(!built)('the final pay on the shared walk', () => {
     expect(document.activeElement).toBe(input);
     expect(focused).toEqual([{ preventScroll: true }]);
     expect(scrolled).toEqual([{ block: 'nearest' }]);
-    expect(named('fieldRejected')).toEqual([['fechas', 'endDate']]);
+    expect(named('fieldRejected')).toEqual([['fechas', 'endDate', 'end_before_start']]);
   });
 
   it('completes the last sheet before it reports the review, then shows the result', () => {
@@ -189,7 +189,7 @@ describe.skipIf(!built)('a section with none of the hooks', () => {
     const { focused, scrolled } = watchFocus('product');
     clickNext();
     expect(location.hash).toBe('#producto');
-    expect(named('fieldRejected')).toEqual([['producto', 'product']]);
+    expect(named('fieldRejected')).toEqual([['producto', 'product', 'missing_choice']]);
     expect(focused).toEqual([{ preventScroll: true }]);
     expect(scrolled).toEqual([{ block: 'nearest' }]);
   });

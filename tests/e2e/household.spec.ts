@@ -598,9 +598,11 @@ test('analytics carry codes and buckets, never a typed value', async ({ page }) 
     'vacaciones',
     'resultado',
   ]);
-  expect(named('validation_error').map((e) => e.properties['field'])).toEqual([
-    'work',
-    'startDate',
+  expect(
+    named('validation_error').map((e) => [e.properties['field'], e.properties['code']]),
+  ).toEqual([
+    ['work', 'missing_choice'],
+    ['startDate', 'missing_value'],
   ]);
   const completed = named('household_review_completed')[0]?.properties;
   expect(completed).toMatchObject({
