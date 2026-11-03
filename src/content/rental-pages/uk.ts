@@ -1,4 +1,4 @@
-// source: c1e410557cb4
+// source: 1797cd736446
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -95,7 +95,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'fianza',
     name: 'Який заставний депозит можуть від вас вимагати',
     crumb: 'Який заставний депозит можуть від вас вимагати',
-    title: 'Заставний депозит при оренді: скільки можуть вимагати (art. 36 LAU)',
+    title: 'Заставний депозит при оренді: скільки можуть вимагати (art. 36.1 LAU)',
     description:
       'Місячна орендна плата як заставний депозит, ще до двох як додаткова гарантія і одна як оплата наперед. Перевірте, скільки з вас вимагали, зі статтею для кожного граничного рівня.',
     h1: 'Заставний депозит при оренді: скільки можуть від вас вимагати',

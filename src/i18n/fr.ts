@@ -1222,7 +1222,7 @@ export const fr: Translation = {
     "Oui, sauf si c'est vous qui avez mis fin au contrat (art. 267.1.a.6.º LGSS). Il faut en outre 360 jours cotisés au cours des 6 dernières années, qui peuvent provenir de plusieurs contrats.",
   'landing.not_agreed.name': 'Signer le solde de tout compte «\u00a0non conforme\u00a0»',
   'landing.not_agreed.title':
-    'Signer le solde de tout compte (finiquito) «\u00a0non conforme\u00a0»\u00a0: ce que cela signifie',
+    'Écrire «\u00a0recibí no conforme\u00a0» sur le solde de tout compte\u00a0: ce que cela signifie',
   'landing.not_agreed.description':
     "Ce que signifie écrire «\u00a0non conforme\u00a0» (no conforme) en recevant le solde de tout compte (finiquito), ce que cela change et ne change pas, et les délais. Avant, comparez ce que l'on vous propose au minimum légal.",
   'landing.not_agreed.h1': 'Signer le solde de tout compte «\u00a0non conforme\u00a0»',
@@ -1270,7 +1270,7 @@ export const fr: Translation = {
   'landing.benefit.faq.5.answer':
     "Dans les 15 jours qui suivent la fin du contrat, ou la fin des congés non pris que paie votre solde de tout compte, et l'inscription comme demandeur d'emploi doit venir avant. La demander plus tard réduit le nombre de jours d'allocation (arts. 266 et 268 LGSS). C'est le SEPE qui précise qu'il s'agit de jours ouvrables.",
   'landing.benefit_duration.name': 'Durée du chômage selon le temps travaillé',
-  'landing.benefit_duration.title': 'Durée du chômage selon le temps travaillé',
+  'landing.benefit_duration.title': 'Durée du chômage par année travaillée',
   'landing.benefit_duration.description':
     "Avec 360 jours cotisés sur 6 ans, vous avez 120 jours de chômage, et chaque tranche de 180 jours de plus en ajoute 60, jusqu'à 720. Le barème complet et votre calcul avec vos dates.",
   'landing.benefit_duration.h1': 'Durée du chômage selon le temps travaillé',

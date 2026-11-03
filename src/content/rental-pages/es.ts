@@ -97,7 +97,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'fianza',
     name: 'Cuánta fianza pueden pedirte',
     crumb: 'Cuánta fianza pueden pedirte',
-    title: 'Fianza del alquiler: cuánto pueden pedirte (art. 36 LAU)',
+    title: 'Fianza del alquiler: cuánto pueden pedirte (art. 36.1 LAU)',
     description:
       'Una mensualidad de fianza, hasta dos más de garantía adicional y una de pago por adelantado. Comprueba cuánto te han pedido con el artículo de cada tope.',
     h1: 'Fianza del alquiler: cuánto pueden pedirte',

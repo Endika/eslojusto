@@ -1168,7 +1168,7 @@ export const ca: Translation = {
   'landing.fixed_term_end.faq.5.answer':
     'Sí, tret que el contracte l’acabessis tu (art. 267.1.a.6.º LGSS). A més, calen 360 dies cotitzats en els últims 6 anys, que poden venir de diversos contractes.',
   'landing.not_agreed.name': 'Signar la quitança com a «no conforme»',
-  'landing.not_agreed.title': 'Signar la quitança (finiquito) com a «no conforme»: què vol dir',
+  'landing.not_agreed.title': 'Recibí no conforme a la quitança (finiquito): què vol dir',
   'landing.not_agreed.description':
     'Què vol dir posar «no conforme» en rebre la quitança, què canvia i què no, i els terminis. Abans, compara el que t’ofereixen amb el mínim legal.',
   'landing.not_agreed.h1': 'Signar la quitança com a «no conforme»',
@@ -1211,7 +1211,7 @@ export const ca: Translation = {
   'landing.benefit.faq.5.answer':
     'En els 15 dies següents al final del contracte, o al final de les vacances no gaudides que et pagui la quitança, i abans t’has d’inscriure com a demandant d’ocupació. Demanar-lo més tard resta dies d’atur (arts. 266 i 268 LGSS). Que siguin dies hàbils ho indica el SEPE.',
   'landing.benefit_duration.name': 'Quant d’atur et correspon segons el temps treballat',
-  'landing.benefit_duration.title': 'Quant d’atur et toca segons el temps treballat',
+  'landing.benefit_duration.title': 'Quant d’atur et toca per any treballat',
   'landing.benefit_duration.description':
     'Amb 360 dies cotitzats en 6 anys tens 120 dies d’atur, i cada 180 més en sumen 60, fins a 720. L’escala completa i el teu càlcul amb les teves dates.',
   'landing.benefit_duration.h1': 'Quant d’atur et correspon segons el temps treballat',

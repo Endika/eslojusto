@@ -1,4 +1,4 @@
-// source: c1e410557cb4
+// source: 1797cd736446
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -95,7 +95,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'fianza',
     name: 'How much deposit you can be asked for',
     crumb: 'How much deposit you can be asked for',
-    title: 'Rental deposit: how much you can be asked for (art. 36 LAU)',
+    title: 'Rental deposit: how much you can be asked for (art. 36.1 LAU)',
     description:
       "One month's deposit, up to two more of additional guarantee and one paid in advance. Check what you were asked for, with the article for each cap.",
     h1: 'Rental deposit: how much you can be asked for',

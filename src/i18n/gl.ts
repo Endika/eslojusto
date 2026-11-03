@@ -1153,7 +1153,7 @@ export const gl: Translation = {
   'landing.fixed_term_end.faq.5.answer':
     'Si, agás que o contrato o rematases ti (art. 267.1.a.6.º LGSS). Ademais cómpren 360 días cotizados nos últimos 6 anos, que poden vir de varios contratos.',
   'landing.not_agreed.name': 'Asinar o finiquito como «non conforme»',
-  'landing.not_agreed.title': 'Asinar o finiquito como «non conforme»: que significa',
+  'landing.not_agreed.title': 'Recibín non conforme no finiquito: que significa',
   'landing.not_agreed.description':
     'Que significa poñer «non conforme» ao recibir o finiquito, que cambia e que non, e os prazos. Antes, compara o que che ofrecen co mínimo legal.',
   'landing.not_agreed.h1': 'Asinar o finiquito como «non conforme»',
@@ -1196,7 +1196,7 @@ export const gl: Translation = {
   'landing.benefit.faq.5.answer':
     'Nos 15 días seguintes ao fin do contrato, ou ao fin das vacacións non gozadas que che pague o finiquito, e antes tes que inscribirte como demandante de emprego. Pedilo máis tarde resta días de paro (arts. 266 e 268 LGSS). Que sexan días hábiles indícao o SEPE.',
   'landing.benefit_duration.name': 'Canto paro che corresponde segundo o tempo traballado',
-  'landing.benefit_duration.title': 'Canto paro che toca segundo o tempo traballado',
+  'landing.benefit_duration.title': 'Canto paro che toca por ano traballado',
   'landing.benefit_duration.description':
     'Con 360 días cotizados en 6 anos tes 120 días de paro, e cada 180 máis suman 60, ata 720. A escala completa e o teu cálculo coas túas datas.',
   'landing.benefit_duration.h1': 'Canto paro che corresponde segundo o tempo traballado',

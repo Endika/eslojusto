@@ -1166,8 +1166,7 @@ export const ar: Translation = {
   'landing.fixed_term_end.faq.5.answer':
     'نعم، إلا إذا كنت أنت من أنهى العقد \u2068(art. 267.1.a.6.º LGSS)\u2069. ويُشترط أيضًا 360 يومًا من الاشتراك \u2068(días cotizados)\u2069 في السنوات الـ6 الأخيرة، ويمكن أن تأتي من عدة عقود.',
   'landing.not_agreed.name': 'التوقيع على التسوية النهائية بعبارة «no conforme»',
-  'landing.not_agreed.title':
-    'التوقيع على التسوية النهائية بعبارة «no conforme» (غير موافق): ماذا يعني',
+  'landing.not_agreed.title': 'عبارة «recibí no conforme» على التسوية النهائية: ماذا تعني',
   'landing.not_agreed.description':
     'ماذا يعني كتابة «no conforme» (غير موافق) عند استلام التسوية النهائية \u2068(finiquito)\u2069، وما الذي يتغيّر وما الذي لا يتغيّر، والمُهَل. قبل ذلك، قارن ما يُعرض عليك بالحد الأدنى القانوني.',
   'landing.not_agreed.h1':
@@ -1212,7 +1211,7 @@ export const ar: Translation = {
   'landing.benefit.faq.5.answer':
     'خلال الـ15 يومًا التالية لانتهاء العقد، أو لانتهاء أيام الإجازة غير المستفاد منها التي تدفعها لك التسوية النهائية، ويلزم قبل ذلك التسجيل طالبَ عمل \u2068(demandante de empleo)\u2069. طلبها في وقت لاحق يُنقص أيامًا من إعانة البطالة \u2068(arts. 266 y 268 LGSS)\u2069. أما كونها أيام عمل رسمية، فتذكره SEPE.',
   'landing.benefit_duration.name': 'مدة إعانة البطالة التي تعود لك بحسب مدة العمل',
-  'landing.benefit_duration.title': 'مدة إعانة البطالة التي تعود لك بحسب مدة العمل',
+  'landing.benefit_duration.title': 'مدة إعانة البطالة التي تعود لك عن كل سنة عمل',
   'landing.benefit_duration.description':
     'مع 360 يومًا من الاشتراك في 6 سنوات لك 120 يومًا من إعانة البطالة، وكل 180 يومًا إضافية تضيف 60، حتى 720. الجدول الكامل وحسابك بتواريخك.',
   'landing.benefit_duration.h1': 'مدة إعانة البطالة التي تعود لك بحسب مدة العمل',

@@ -1,4 +1,4 @@
-// source: c1e410557cb4
+// source: 1797cd736446
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -95,7 +95,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'fianza',
     name: 'Câtă garanție ți se poate cere',
     crumb: 'Câtă garanție ți se poate cere',
-    title: 'Garanția (fianza) la închiriere: cât ți se poate cere (art. 36 LAU)',
+    title: 'Garanția (fianza) la închiriere: cât ți se poate cere (art. 36.1 LAU)',
     description:
       'O chirie lunară de garanție, până la încă două de garanție suplimentară și una de plată în avans. Verifică cât ți s-a cerut, cu articolul fiecărui plafon.',
     h1: 'Garanția la închiriere: cât ți se poate cere',

@@ -1184,7 +1184,7 @@ export const eu: Translation = {
   'landing.fixed_term_end.faq.5.answer':
     'Bai, kontratua zuk amaitu ez baduzu (art. 267.1.a.6.º LGSS). Gainera, azken 6 urteetan 360 egun kotizatuta izan behar dira, eta hainbat kontratutatik etor daitezke.',
   'landing.not_agreed.name': 'Kitapena «ados ez» (no conforme) gisa sinatzea',
-  'landing.not_agreed.title': 'Kitapena «ados ez» (no conforme) gisa sinatzea: zer esan nahi du',
+  'landing.not_agreed.title': '«Recibí no conforme» kitapenean: zer esan nahi du',
   'landing.not_agreed.description':
     'Zer esan nahi duen kitapena jasotzean «ados ez» jartzeak, zer aldatzen den eta zer ez, eta epeak. Aurretik, alderatu eskaintzen dizutena legezko gutxienekoarekin.',
   'landing.not_agreed.h1': 'Kitapena «ados ez» (no conforme) gisa sinatzea',
@@ -1231,7 +1231,7 @@ export const eu: Translation = {
   'landing.benefit_duration.name':
     'Zenbat langabezia-prestazio dagokizun lan egindako denboraren arabera',
   'landing.benefit_duration.title':
-    'Lan egindako denboraren arabera, zenbat langabezia-prestazio dagokizun',
+    'Zenbat langabezia-prestazio dagokizun lan egindako urte bakoitzeko',
   'landing.benefit_duration.description':
     '6 urtetan 360 egun kotizatuta, 120 eguneko langabezia-prestazioa duzu, eta beste 180 egun bakoitzak 60 gehitzen ditu, 720 arte. Eskala osoa eta zure kalkulua zure datekin.',
   'landing.benefit_duration.h1':

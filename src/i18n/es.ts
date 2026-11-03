@@ -7511,7 +7511,7 @@ export const es = {
     'Sí, salvo que el contrato lo terminaras tú (art. 267.1.a.6.º LGSS). Además hacen falta 360 días cotizados en los últimos 6 años, que pueden venir de varios contratos.',
 
   'landing.not_agreed.name': 'Firmar el finiquito como «no conforme»',
-  'landing.not_agreed.title': 'Firmar el finiquito como «no conforme»: qué significa',
+  'landing.not_agreed.title': 'Recibí no conforme en el finiquito: qué significa',
   'landing.not_agreed.description':
     'Qué significa poner «no conforme» al recibir el finiquito, qué cambia y qué no, y los plazos. Antes, compara lo que te ofrecen con el mínimo legal.',
   'landing.not_agreed.h1': 'Firmar el finiquito como «no conforme»',
@@ -7556,7 +7556,7 @@ export const es = {
     'En los 15 días siguientes al fin del contrato, o al fin de las vacaciones no disfrutadas que te pague el finiquito, y antes tienes que inscribirte como demandante de empleo. Pedirlo más tarde resta días de paro (arts. 266 y 268 LGSS). Que sean días hábiles lo indica el SEPE.',
 
   'landing.benefit_duration.name': 'Cuánto paro te corresponde según el tiempo trabajado',
-  'landing.benefit_duration.title': 'Cuánto paro te toca según el tiempo trabajado',
+  'landing.benefit_duration.title': 'Cuánto paro te toca por año trabajado',
   'landing.benefit_duration.description':
     'Con 360 días cotizados en 6 años tienes 120 días de paro, y cada 180 más suman 60, hasta 720. La escala completa y tu cálculo con tus fechas.',
   'landing.benefit_duration.h1': 'Cuánto paro te corresponde según el tiempo trabajado',

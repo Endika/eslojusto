@@ -1,4 +1,4 @@
-// source: c1e410557cb4
+// source: 1797cd736446
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
@@ -95,7 +95,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     slug: 'fianza',
     name: 'Quanta fiança et poden demanar',
     crumb: 'Quanta fiança et poden demanar',
-    title: 'Fiança del lloguer: quanta et poden demanar (art. 36 LAU)',
+    title: 'Fiança del lloguer: quanta et poden demanar (art. 36.1 LAU)',
     description:
       'Una mensualitat de fiança, fins a dues més de garantia addicional i una de pagament per avançat. Comprova quant t’han demanat amb l’article de cada límit.',
     h1: 'Fiança del lloguer: quanta et poden demanar',
