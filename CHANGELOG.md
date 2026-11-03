@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.106.0](https://github.com/Endika/eslojusto/compare/v1.105.3...v1.106.0) (2026-11-03)
+
+
+### Features
+
+* **analytics:** say which check a rejected answer failed ([84cdb64](https://github.com/Endika/eslojusto/commit/84cdb64b618eaea20f3863d97b59830e3fa6b33d))
+
 ## [1.105.3](https://github.com/Endika/eslojusto/compare/v1.105.2...v1.105.3) (2026-11-03)
 
 
