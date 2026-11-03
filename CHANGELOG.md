@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.104.5](https://github.com/Endika/eslojusto/compare/v1.104.4...v1.104.5) (2026-11-03)
+
+
+### Reverts
+
+* **ci:** back to the failed-run email only for the rent indices check ([3ef6c06](https://github.com/Endika/eslojusto/commit/3ef6c063336a106724121be16d755f0dda37ced2))
+
 ## [1.104.4](https://github.com/Endika/eslojusto/compare/v1.104.3...v1.104.4) (2026-11-03)
 
 
