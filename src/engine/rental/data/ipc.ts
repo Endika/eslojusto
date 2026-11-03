@@ -39,7 +39,7 @@ export const IPC: IndexSeries = {
   url: 'https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/IPC290750',
   table: 76134,
   series: 'IPC290750',
-  coveredUntil: '2026-10-29',
+  coveredUntil: '2026-11-12',
   loadedFromStart: false,
   values: [
     month('2018-12', 1.2, '2019-01-15', '2018-12-28'),
@@ -137,5 +137,10 @@ export const IPC: IndexSeries = {
     month('2026-08', 4.3, '2026-09-15', '2026-08-28', 4.3),
     month('2026-09', 4.9, '2026-10-14', '2026-09-29', 4.9),
   ],
-  pendingFlash: null,
+  pendingFlash: {
+    month: '2026-10',
+    rate: 4.9,
+    publishedOn: '2026-10-30',
+    url: flashReleaseUrl('2026-10'),
+  },
 };

@@ -75,6 +75,15 @@ describe('CPI flash estimates', () => {
     },
   );
 
+  it('include October 2026, whose definitive figure is not out yet', () => {
+    expect(IPC.pendingFlash).toEqual({
+      month: '2026-10',
+      rate: 4.9,
+      publishedOn: '2026-10-30',
+      url: 'https://www.ine.es/dyngs/Prensa/adIPC1026.htm',
+    });
+  });
+
   it('keep September 2026 with the definitive figure that followed it', () => {
     expect(IPC.values.find((v) => v.month === '2026-09')).toEqual({
       month: '2026-09',
