@@ -59,6 +59,7 @@ import {
 } from '../mortgage/ports';
 import { BILLS_FAQ_TOPICS } from '../content/bills-faq-topics';
 import type { BillsItemId, BillsStatus } from '../engine/bills/finding';
+import type { Exit, Notice } from '../engine/bills/renewal-types';
 import {
   ELECTRICITY_FIELDS,
   type ElectricityOutOfScope,
@@ -69,6 +70,11 @@ import {
   type TelecomOutOfScope,
   type Step as TelecomStep,
 } from '../bills/telecom/ports';
+import {
+  RENEWAL_FIELDS,
+  type RenewalMethod,
+  type Step as RenewalStep,
+} from '../bills/renewal/ports';
 import { DOCUMENTS_BUILD } from '../documents/config';
 import {
   DOWNLOADS,
@@ -250,7 +256,8 @@ const BILLS_SECTIONS = [
   'terminal',
   'cobros',
   'despues',
-] as const satisfies readonly (ElectricityStep | TelecomStep)[];
+  'consumo',
+] as const satisfies readonly (ElectricityStep | TelecomStep | RenewalStep)[];
 export const SECTIONS = [
   'causa',
   'temporal',
@@ -454,9 +461,11 @@ const BONUS_ONLY_FIELDS: readonly string[] = [
   'bonusKwhSoFar',
   'bonusDiscountedKwh',
 ];
-export const BILLS_TRACKABLE_FIELDS = [...ELECTRICITY_FIELDS, ...TELECOM_FIELDS].filter(
-  (f) => !BONUS_ONLY_FIELDS.includes(f),
-);
+export const BILLS_TRACKABLE_FIELDS = [
+  ...ELECTRICITY_FIELDS,
+  ...TELECOM_FIELDS,
+  ...RENEWAL_FIELDS,
+].filter((f) => !BONUS_ONLY_FIELDS.includes(f));
 
 export const HELP_TOPICS = [
   ...FAQ_TOPICS,
@@ -788,6 +797,24 @@ export const MORTGAGE_FEE_STATUSES = [
 const _allFeeStatuses: CoversAll<FeeStatus, (typeof MORTGAGE_FEE_STATUSES)[number]> = true;
 void _allFeeStatuses;
 
+const RENEWAL_METHODS = ['upload', 'manual'] as const satisfies readonly RenewalMethod[];
+const NOTICE_KINDS = [
+  'meets',
+  'short',
+  'not_checked_before',
+  'not_separate',
+  'separate_unknown',
+] as const satisfies readonly Notice['kind'][];
+const EXIT_KINDS = [
+  'free',
+  'penalty_possible',
+  'unknown',
+] as const satisfies readonly Exit['kind'][];
+const _allNoticeKinds: CoversAll<Notice['kind'], (typeof NOTICE_KINDS)[number]> = true;
+const _allExitKinds: CoversAll<Exit['kind'], (typeof EXIT_KINDS)[number]> = true;
+void _allNoticeKinds;
+void _allExitKinds;
+
 const BILLS_OUT_OF_SCOPE_REASONS = [
   'canary_ceuta_melilla',
   'over_15kw',
@@ -971,6 +998,7 @@ type Rule =
   | { readonly pattern: RegExp }
   | { readonly intRange: readonly [number, number] }
   | { readonly boolean: true }
+  | { readonly nullableBoolean: true }
   | { readonly list: readonly string[] };
 
 const oneOf = <const T extends readonly string[]>(values: T) => ({ values });
@@ -1221,6 +1249,16 @@ const billsCatalogue = () => {
       after_exit: BILLS_RESULT,
       pass: oneOf(PASS_MODES),
     },
+    renewal_review_completed: {
+      method: oneOf(RENEWAL_METHODS),
+      // Whether the letter's declared cost is more than 1 € off the recalculation, and whether
+      // tolls and charges change between the letter and the renewal (null: not known).
+      mismatch: { boolean: true },
+      regulated_change: { nullableBoolean: true },
+      vs_pvpc: oneOf(['above', 'below', 'none']),
+      notice: oneOf(NOTICE_KINDS),
+      exit: oneOf(EXIT_KINDS),
+    },
   } as const satisfies Record<string, Record<string, Rule>>;
 };
 
@@ -1320,9 +1358,11 @@ type RuleValue<R> = R extends { values: readonly (infer V)[] }
       ? number
       : R extends { boolean: true }
         ? boolean
-        : R extends { list: readonly (infer V)[] }
-          ? readonly V[]
-          : never;
+        : R extends { nullableBoolean: true }
+          ? boolean | null
+          : R extends { list: readonly (infer V)[] }
+            ? readonly V[]
+            : never;
 
 export type Props<E extends EventName> = {
   -readonly [K in keyof (typeof CATALOGUE)[E]]: RuleValue<(typeof CATALOGUE)[E][K]>;
@@ -1338,6 +1378,7 @@ function matchesRule(rule: Rule, v: unknown): boolean {
       Number.isInteger(v) && (v as number) >= rule.intRange[0] && (v as number) <= rule.intRange[1]
     );
   if ('boolean' in rule) return typeof v === 'boolean';
+  if ('nullableBoolean' in rule) return v === null || typeof v === 'boolean';
   return (
     Array.isArray(v) &&
     new Set(v).size === v.length &&

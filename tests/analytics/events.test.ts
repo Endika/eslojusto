@@ -226,6 +226,7 @@ describe('the catalogue guard', () => {
         'bills_out_of_scope',
         'electricity_bill_reviewed',
         'telecom_review_completed',
+        'renewal_review_completed',
         'basket_completed',
         'section_completed',
         'section_viewed',

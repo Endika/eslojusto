@@ -432,6 +432,45 @@ interface DocumentsHandle {
   showStart(): void;
 }
 
+// Reading documents alone, for a review that sells no pass and keeps nothing for the trip to
+// Stripe: the page has no pass offer.
+export function wireReading<F extends string, L extends string>({
+  form: calculator,
+  arrival,
+  section,
+  config,
+  tr,
+  events,
+}: Pick<DocumentsWiring<never, F, L>, 'form' | 'arrival' | 'config' | 'tr' | 'events'> & {
+  readonly section: ReadingSection<F, L>;
+}): DocumentsHandle | null {
+  const start = document.querySelector<HTMLElement>('[data-documents-start]');
+  const captchaBox = start?.querySelector<HTMLElement>('[data-captcha]');
+  if (!config || !start || !captchaBox) return null;
+  const upload = setUpReading(start, captchaBox, {
+    calculator,
+    section,
+    config,
+    api: createApi(
+      config.endpoints,
+      (url, init) => fetch(url, init),
+      section.extraction,
+      document.documentElement.lang,
+    ),
+    loadTurnstile: turnstileLoader(),
+    passes: passStore(),
+    session: storage(() => sessionStorage),
+    tr,
+    events,
+  });
+  if (section.steps.includes(stepOfHash(arrival.hash))) upload.showCalculator(false);
+  else upload.showStart();
+  return {
+    fillRead: (prefill) => upload.fillRead(prefill),
+    showStart: () => upload.showStart(true),
+  };
+}
+
 export function wireDocuments<R, F extends string, L extends string>({
   form: calculator,
   hooks,

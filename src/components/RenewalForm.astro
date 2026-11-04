@@ -1,0 +1,209 @@
+---
+import Field from './Field.astro';
+import Choice from './EmploymentChoice.astro';
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+import { ENERGY_PRICINGS, KNOWNS, POWER_UNITS, type Sheet } from '../bills/renewal/form';
+
+interface Props {
+  lang: Lang;
+  hidden?: boolean;
+}
+const { lang, hidden = false } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+
+const options = <T extends string>(values: readonly T[], label: (value: T) => Key) =>
+  values.map((value) => ({ value, label: tx(label(value)) }));
+const known = options(KNOWNS, (v) => `bills.answer.${v}`);
+
+const question = (sheet: Sheet) => tx(`bills.renewal.question.${sheet}`);
+const sheetId = (sheet: Sheet) => ({
+  id: `sheet-${sheet}`,
+  'data-sheet': sheet,
+  'aria-labelledby': `question-${sheet}`,
+});
+
+const arrow = 'M4 12h15m-6-6 6 6-6 6';
+---
+
+<form
+  class="calculator"
+  id="renewal"
+  novalidate
+  aria-label={tx('bills.renewal.form_aria')}
+  hidden={hidden}
+>
+  <div class="stack">
+    <fieldset class="sheet" {...sheetId('fechas')}>
+      <h2 class="question" id="question-fechas" tabindex="-1">
+        {question('fechas')}
+      </h2>
+      <div class="pair">
+        <Field
+          name="letterDate"
+          label={tx('bills.renewal.letter_date')}
+          hint={tx('bills.renewal.letter_date_hint')}
+          kind="date"
+        />
+        <Field
+          name="renewalDate"
+          label={tx('bills.renewal.renewal_date')}
+          hint={tx('bills.renewal.renewal_date_hint')}
+          kind="date"
+        />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('potencia')}>
+      <h2 class="question" id="question-potencia" tabindex="-1">
+        {question('potencia')}
+      </h2>
+      <div class="pair">
+        <Field name="powerKwP1" label={tx('bills.renewal.power_kw_p1')} kind="amount" />
+        <Field name="powerKwP2" label={tx('bills.renewal.power_kw_p2')} kind="amount" />
+      </div>
+      <Choice
+        name="powerUnit"
+        legend={tx('bills.renewal.power_unit')}
+        hint={tx('bills.renewal.power_unit_hint')}
+        options={options(POWER_UNITS, (v) => `bills.renewal.power_unit.${v}`)}
+        layout="pair"
+      />
+      <div class="pair">
+        <Field
+          name="currentPowerP1"
+          label={tx('bills.renewal.current_power_p1')}
+          hint={tx('bills.renewal.price_hint')}
+          kind="amount"
+        />
+        <Field
+          name="currentPowerP2"
+          label={tx('bills.renewal.current_power_p2')}
+          hint={tx('bills.renewal.price_hint')}
+          kind="amount"
+        />
+      </div>
+      <div class="pair">
+        <Field name="nextPowerP1" label={tx('bills.renewal.next_power_p1')} kind="amount" />
+        <Field name="nextPowerP2" label={tx('bills.renewal.next_power_p2')} kind="amount" />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('energia')}>
+      <h2 class="question" id="question-energia" tabindex="-1">
+        {question('energia')}
+      </h2>
+      <Choice
+        name="energyPricing"
+        legend={tx('bills.renewal.energy_pricing')}
+        options={options(ENERGY_PRICINGS, (v) => `bills.renewal.energy_pricing.${v}`)}
+        layout="list"
+      />
+      <div class="pair" data-if="energyPricing:single">
+        <Field
+          name="currentEnergy"
+          label={tx('bills.renewal.current_energy')}
+          hint={tx('bills.renewal.price_hint')}
+          kind="amount"
+        />
+        <Field name="nextEnergy" label={tx('bills.renewal.next_energy')} kind="amount" />
+      </div>
+      <div data-if="energyPricing:periods">
+        <div class="pair">
+          <Field
+            name="currentEnergyP1"
+            label={tx('bills.renewal.current_energy_p1')}
+            hint={tx('bills.renewal.price_hint')}
+            kind="amount"
+          />
+          <Field name="nextEnergyP1" label={tx('bills.renewal.next_energy_p1')} kind="amount" />
+        </div>
+        <div class="pair">
+          <Field
+            name="currentEnergyP2"
+            label={tx('bills.renewal.current_energy_p2')}
+            kind="amount"
+          />
+          <Field name="nextEnergyP2" label={tx('bills.renewal.next_energy_p2')} kind="amount" />
+        </div>
+        <div class="pair">
+          <Field
+            name="currentEnergyP3"
+            label={tx('bills.renewal.current_energy_p3')}
+            kind="amount"
+          />
+          <Field name="nextEnergyP3" label={tx('bills.renewal.next_energy_p3')} kind="amount" />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('consumo')}>
+      <h2 class="question" id="question-consumo" tabindex="-1">
+        {question('consumo')}
+      </h2>
+      <Field
+        name="annualKwh"
+        label={tx('bills.renewal.annual_kwh')}
+        hint={tx('bills.renewal.annual_kwh_hint')}
+        kind="amount"
+      />
+      <Field
+        name="declaredWithoutTax"
+        label={tx('bills.renewal.declared_without_tax')}
+        hint={tx('bills.renewal.declared_hint')}
+        kind="amount"
+      />
+      <Field name="declaredWithTax" label={tx('bills.renewal.declared_with_tax')} kind="amount" />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('contrato')}>
+      <h2 class="question" id="question-contrato" tabindex="-1">
+        {question('contrato')}
+      </h2>
+      <Choice
+        name="fixedPrice"
+        legend={tx('bills.renewal.fixed_price')}
+        options={known}
+        layout="pair"
+      />
+      <Choice
+        name="firstRenewal"
+        legend={tx('bills.renewal.first_renewal')}
+        hint={tx('bills.renewal.first_renewal_hint')}
+        options={known}
+        layout="pair"
+        attributes={{ 'data-if': 'fixedPrice:yes' }}
+      />
+      <Choice
+        name="separateFromBill"
+        legend={tx('bills.renewal.separate_from_bill')}
+        hint={tx('bills.renewal.separate_from_bill_hint')}
+        options={known}
+        layout="pair"
+      />
+    </fieldset>
+  </div>
+
+  <div class="actions">
+    <div class="actions__inner">
+      <button class="button button--back" type="button" data-back hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow} transform="rotate(180 12 12)"></path>
+        </svg>
+        {tx('form.back')}
+      </button>
+      <button class="button button--forward" type="button" data-next>
+        {tx('form.next')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+      <button class="button button--forward" type="submit" data-submit hidden>
+        {tx('form.review')}
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d={arrow}></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</form>

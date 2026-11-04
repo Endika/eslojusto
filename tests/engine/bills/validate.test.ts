@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
-import { validateElectricity, validateTelecom } from '../../../src/engine/bills/validate';
+import {
+  validateElectricity,
+  validateRenewal,
+  validateTelecom,
+} from '../../../src/engine/bills/validate';
+import type { RenewalInput } from '../../../src/engine/bills/renewal-types';
 import { juneBill, meter, telecom, TODAY } from './input';
 
 const codes = (errors: readonly { field: string; code: string }[]) =>
@@ -150,5 +155,71 @@ describe('validating a telecom exit', () => {
       TODAY,
     );
     expect(codes(errors)).toEqual(['exitRequestedOn:in_future', 'lines:not_after_start']);
+  });
+});
+
+describe('validating a renewal letter', () => {
+  const letter = (change: Partial<RenewalInput> = {}): RenewalInput => ({
+    letterDate: '2026-10-01',
+    renewalDate: '2026-11-10',
+    powerKw: { p1: 5.75, p2: 5.75 },
+    powerUnit: 'per_kw_day',
+    current: { power: { p1: 0.110283, p2: 0.033469 }, energy: { all: 0.144972 } },
+    next: { power: { p1: 0.12303, p2: 0.052329 }, energy: { all: 0.1678 } },
+    annualKwh: 4190.2,
+    declared: { withoutTax: 1071.15, withTax: 1362.36 },
+    fixedPrice: false,
+    firstRenewal: null,
+    separateFromBill: true,
+    ...change,
+  });
+
+  it('takes the Naturgy letter', () => {
+    expect(validateRenewal(letter(), TODAY)).toEqual([]);
+  });
+
+  it('refuses dates that do not exist, a letter not yet sent and a renewal before it', () => {
+    expect(codes(validateRenewal(letter({ letterDate: '2026-02-30' }), TODAY))).toEqual([
+      'letterDate:invalid_date',
+    ]);
+    expect(codes(validateRenewal(letter({ letterDate: '2026-10-20' }), TODAY))).toEqual([
+      'letterDate:in_future',
+    ]);
+    expect(codes(validateRenewal(letter({ renewalDate: '2026-09-30' }), TODAY))).toEqual([
+      'renewalDate:not_after_start',
+    ]);
+  });
+
+  it('bounds the power, the prices in their unit, the consumption and the costs', () => {
+    expect(
+      codes(
+        validateRenewal(
+          letter({
+            powerKw: { p1: 15.5, p2: 0 },
+            next: { power: { p1: 6, p2: 0.05 }, energy: { all: 5.5 } },
+            annualKwh: 300_000,
+            declared: { withoutTax: -1, withTax: 200_000 },
+          }),
+          TODAY,
+        ),
+      ),
+    ).toEqual([
+      'powerKw.p1:power_range',
+      'powerKw.p2:power_range',
+      'next.power.p1:price_range',
+      'next.energy.all:price_range',
+      'annualKwh:kwh_range',
+      'declared.withoutTax:amount_range',
+      'declared.withTax:amount_range',
+    ]);
+    expect(
+      validateRenewal(
+        letter({
+          powerUnit: 'per_kw_year',
+          next: { power: { p1: 40, p2: 19 }, energy: { p1: 0.2, p2: 0.1, p3: 0.05 } },
+        }),
+        TODAY,
+      ),
+    ).toEqual([]);
   });
 });

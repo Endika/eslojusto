@@ -10,6 +10,8 @@ import {
   basketProps,
   electricityAnalytics,
   electricityBillProps,
+  renewalAnalytics,
+  renewalReviewProps,
   telecomAnalytics,
   telecomReviewProps,
 } from '../../src/analytics/bills';
@@ -22,17 +24,30 @@ import {
   SHEET_FIELDS as TELECOM_SHEET_FIELDS,
   SHEETS as TELECOM_SHEETS,
 } from '../../src/bills/telecom/form';
+import {
+  SHEET_FIELDS as RENEWAL_SHEET_FIELDS,
+  SHEETS as RENEWAL_SHEETS,
+} from '../../src/bills/renewal/form';
+import { STEPS as RENEWAL_STEPS } from '../../src/bills/renewal/steps';
 import { STEPS as TELECOM_STEPS } from '../../src/bills/telecom/steps';
 import { BILLS_FAQ_TOPICS } from '../../src/content/bills-faq-topics';
 import { reviewBasket } from '../../src/engine/bills/basket';
 import { BILLS_SOURCES } from '../../src/engine/bills/data/sources';
 import { BILLS_TABLES } from '../../src/engine/bills/data/tables';
 import { reviewElectricityBill } from '../../src/engine/bills/electricity-review';
+import { reviewRenewal } from '../../src/engine/bills/renewal-review';
+import type { RenewalInput } from '../../src/engine/bills/renewal-types';
 import { reviewTelecom } from '../../src/engine/bills/telecom-review';
 import type { ElectricityBillInput, TelecomInput } from '../../src/engine/bills/types';
 import { parseDate } from '../../src/engine/date';
 import { TODAY, freeBill, juneBill, meter, telecom } from '../engine/bills/input';
 import { NORMS_BEFORE_FIGURE } from '../engine/bills/norms-before-figure';
+import {
+  deps as renewalDeps,
+  naturgy,
+  official as pvpcAt,
+  TODAY as RENEWAL_TODAY,
+} from '../bills/renewal-support';
 
 const electricity = (input: ElectricityBillInput) => {
   const r = reviewElectricityBill(input, TODAY, {
@@ -41,6 +56,12 @@ const electricity = (input: ElectricityBillInput) => {
   });
   if (!r.ok) throw new Error(JSON.stringify(r.errors));
   return { review: r.review, input };
+};
+
+const renewal = (input: RenewalInput = naturgy(), official = renewalDeps().official) => {
+  const r = reviewRenewal(input, RENEWAL_TODAY, { ...renewalDeps(), official });
+  if (!r.ok) throw new Error(JSON.stringify(r.errors));
+  return { review: r.review };
 };
 
 const telecomReview = (input: TelecomInput) => {
@@ -74,7 +95,8 @@ const LEAKS = [CUPS, FINGERPRINT, 0.2, 61.01, '61,01', '2026-06-30', '30-06-2026
 
 describe('the catalogue follows the bills forms', () => {
   it('every sheet of both reviews, and the result, is a trackable section, each once', () => {
-    for (const step of [...ELECTRICITY_STEPS, ...TELECOM_STEPS]) expect(SECTIONS).toContain(step);
+    for (const step of [...ELECTRICITY_STEPS, ...TELECOM_STEPS, ...RENEWAL_STEPS])
+      expect(SECTIONS).toContain(step);
     expect(new Set(SECTIONS).size).toBe(SECTIONS.length);
   });
   it('every question is a trackable field but the social bonus details', () => {
@@ -348,5 +370,90 @@ describe('bills events', () => {
       'telecom_review_completed',
     ]);
     expect(sent[2]?.[1]).toMatchObject({ pass: 'claim' });
+  });
+});
+
+describe('the renewal review', () => {
+  it('every question is a trackable field', () => {
+    for (const sheet of RENEWAL_SHEETS)
+      for (const field of RENEWAL_SHEET_FIELDS[sheet])
+        expect(BILLS_TRACKABLE_FIELDS).toContain(field);
+  });
+
+  it('leaves the Naturgy letter as codes only', () => {
+    const p = renewalReviewProps(renewal(), 'manual');
+    expect(isValidEvent('renewal_review_completed', p)).toBe(true);
+    expect(p).toEqual({
+      method: 'manual',
+      mismatch: false,
+      regulated_change: false,
+      vs_pvpc: 'above',
+      notice: 'meets',
+      exit: 'free',
+    });
+  });
+
+  it('says which way the PVPC lies, a mismatch and an unknown change in what is regulated', () => {
+    const cheap = renewal(naturgy(), pvpcAt(400));
+    expect(renewalReviewProps(cheap, 'upload')).toMatchObject({
+      method: 'upload',
+      vs_pvpc: 'below',
+    });
+    expect(renewalReviewProps(renewal(naturgy(), null), 'manual').vs_pvpc).toBe('none');
+    const odd = renewalReviewProps(
+      renewal(
+        naturgy({
+          letterDate: '2025-06-20',
+          declared: { withoutTax: 1200, withTax: null },
+          separateFromBill: null,
+        }),
+      ),
+      'manual',
+    );
+    expect(odd).toMatchObject({
+      mismatch: true,
+      regulated_change: null,
+      notice: 'not_checked_before',
+    });
+    expect(isValidEvent('renewal_review_completed', odd)).toBe(true);
+  });
+
+  it('refuses a number, a date or a free text in any key', () => {
+    const props = renewalReviewProps(renewal(), 'manual');
+    for (const key of Object.keys(props))
+      for (const value of LEAKS)
+        expect(isValidEvent('renewal_review_completed', { ...props, [key]: value }), key).toBe(
+          false,
+        );
+    expect(isValidEvent('renewal_review_completed', { ...props, regulated_change: 'yes' })).toBe(
+      false,
+    );
+    expect(isValidEvent('renewal_review_completed', { ...props, regulated_change: null })).toBe(
+      true,
+    );
+    expect(isValidEvent('renewal_review_completed', { ...props, cups: CUPS })).toBe(false);
+  });
+
+  it('renewalAnalytics names each event as the catalogue does, with the method at that time', () => {
+    const sent: [string, Record<string, unknown>][] = [];
+    let method: 'upload' | 'manual' = 'manual';
+    const events = renewalAnalytics(
+      ((name: string, p: Record<string, unknown>) => {
+        expect(isValidEvent(name, p), name).toBe(true);
+        sent.push([name, p]);
+      }) as Track,
+      () => 0,
+      () => method,
+    );
+    events.stepShown('fechas');
+    events.reviewCompleted(renewal());
+    method = 'upload';
+    events.reviewCompleted(renewal());
+    expect(sent.map(([n]) => n)).toEqual([
+      'section_viewed',
+      'renewal_review_completed',
+      'renewal_review_completed',
+    ]);
+    expect(sent.map(([, p]) => p['method'])).toEqual([undefined, 'manual', 'upload']);
   });
 });

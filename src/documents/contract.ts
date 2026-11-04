@@ -11,7 +11,8 @@ export type ReviewKind =
   | 'insurance'
   | 'mortgage'
   | 'electricity'
-  | 'telecom';
+  | 'telecom'
+  | 'renewal';
 
 // What the API says each page is; `other` is a page the review has no use for.
 export const PAGE_KINDS = [
@@ -579,6 +580,44 @@ export const TELECOM_EXTRACTION: ExtractionShape<TelecomFieldName, TelecomListNa
 };
 
 export type TelecomExtraction = Extraction<TelecomFieldName, TelecomListName>;
+
+// The fields the API merges from an electricity renewal letter (api/src/domain/renewal-merge.ts).
+// A letter states its energy price once for all the day or once per period, so only one of the
+// two sets is there. Nothing in it is a list.
+export const RENEWAL_FIELDS = [
+  'letterDate',
+  'renewalDate',
+  'powerKwP1',
+  'powerKwP2',
+  'powerUnit',
+  'currentPowerP1',
+  'currentPowerP2',
+  'nextPowerP1',
+  'nextPowerP2',
+  'currentEnergy',
+  'nextEnergy',
+  'currentEnergyP1',
+  'currentEnergyP2',
+  'currentEnergyP3',
+  'nextEnergyP1',
+  'nextEnergyP2',
+  'nextEnergyP3',
+  'annualKwh',
+  'declaredWithoutTax',
+  'declaredWithTax',
+  'fixedPrice',
+  'separateFromBill',
+  'isRenewal',
+] as const;
+export type RenewalFieldName = (typeof RENEWAL_FIELDS)[number];
+
+export const RENEWAL_EXTRACTION: ExtractionShape<RenewalFieldName, never> = {
+  review: 'renewal',
+  fields: RENEWAL_FIELDS,
+  lists: [],
+};
+
+export type RenewalExtraction = Extraction<RenewalFieldName, never>;
 
 export interface SourcedField extends ExtractedField {
   readonly source: SourceKind;
