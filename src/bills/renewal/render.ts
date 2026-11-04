@@ -108,38 +108,59 @@ function taxLines(taxes: RenewalTaxes, review: RenewalReview, norms: NormTable, 
       ]),
     ),
   ];
-  // What each norm has to do for the outcome to hold, in the words of its status.
-  const normPhrase = (id: BillsNormId, holds: boolean): string => {
+  // What each norm has to do for the outcome to hold, in the words of its status. A norm already
+  // spelled out in the block is only referred back to.
+  const spelled = new Set<BillsNormId>();
+  const normPhrase = (id: BillsNormId, holds: boolean): { text: string; plain: boolean } => {
     const norm = norms[id];
-    if (norm.status === 'pending_validation')
-      return tr(
-        holds
-          ? 'client.bills.renewal.taxes.convalidated'
-          : 'client.bills.renewal.taxes.not_convalidated',
-        { norma: norm.citation },
-      );
-    const condition =
-      norm.condition === undefined
-        ? norm.citation
-        : `${norm.citation} (${
-            norm.condition.met === null
-              ? tr('client.bills.row.condition_open', {
-                  condicion: norm.condition.text,
-                  fecha: dayText(norm.condition.decidesOn),
-                })
-              : norm.condition.text
-          })`;
-    return tr(holds ? 'client.bills.renewal.taxes.met' : 'client.bills.renewal.taxes.not_met', {
-      norma: condition,
-    });
+    const again = spelled.has(id);
+    spelled.add(id);
+    if (norm.status === 'pending_validation') {
+      const key = holds
+        ? 'client.bills.renewal.taxes.convalidated'
+        : again
+          ? 'client.bills.renewal.taxes.not_convalidated_again'
+          : 'client.bills.renewal.taxes.not_convalidated';
+      return { text: tr(key, { norma: norm.citation }), plain: true };
+    }
+    const { condition } = norm;
+    if (norm.status === 'conditional' && condition !== undefined && condition.met === null) {
+      const key = holds
+        ? 'client.bills.renewal.taxes.cond_met'
+        : again
+          ? 'client.bills.renewal.taxes.cond_again'
+          : 'client.bills.renewal.taxes.cond_not_met';
+      return {
+        text: tr(key, {
+          norma: norm.citation,
+          condicion: condition.text.charAt(0).toLowerCase() + condition.text.slice(1),
+          fecha: dayText(condition.decidesOn),
+        }),
+        plain: true,
+      };
+    }
+    return {
+      text: tr('client.bills.renewal.taxes.decided_by', { norma: norm.citation }),
+      plain: false,
+    };
   };
-  const outcomeText = ({ met, notMet }: Outcome): string =>
-    tr('client.bills.renewal.taxes.if', {
-      condiciones: [
-        ...met.map((id) => normPhrase(id, true)),
-        ...notMet.map((id) => normPhrase(id, false)),
-      ].join(tr('client.bills.renewal.taxes.and')),
-    });
+  const outcomeText = ({ met, notMet }: Outcome): string => {
+    const phrases = [
+      ...met.map((id) => normPhrase(id, true)),
+      ...notMet.map((id) => normPhrase(id, false)),
+    ];
+    const conditions = phrases.filter((p) => p.plain).map((p) => p.text);
+    return [
+      ...(conditions.length > 0
+        ? [
+            tr('client.bills.renewal.taxes.if', {
+              condiciones: conditions.join(tr('client.bills.renewal.taxes.and')),
+            }),
+          ]
+        : []),
+      ...phrases.filter((p) => !p.plain).map((p) => p.text),
+    ].join(', ');
+  };
   // The option reached by most outcomes is not listed: it is what happens in all the others.
   const widest = taxes.options.reduce(
     (best, o) => (o.when.length > best.when.length ? o : best),
@@ -156,7 +177,7 @@ function taxLines(taxes: RenewalTaxes, review: RenewalReview, norms: NormTable, 
       }),
     ),
     ...taxes.options.map((option) => {
-      const rest = taxes.options.length > 1 && option === widest;
+      const rest = taxes.options.length > 1 && taxes.unknown.length === 0 && option === widest;
       const figures = {
         importe: euros(option.withTax),
         impuesto: percent(option.electricityTaxPercent),
@@ -400,7 +421,7 @@ function exitCard(review: RenewalReview, norms: NormTable, tr: Translate): HTMLE
       null,
       tr(
         `client.bills.renewal.exit.${exit.kind}`,
-        exit.kind === 'penalty_possible' ? { porcentaje: `${exit.capPercent} %` } : undefined,
+        exit.kind === 'penalty_possible' ? { porcentaje: percent(exit.capPercent) } : undefined,
       ),
     ),
     ruleOrigin('exit_penalty', norms, tr),

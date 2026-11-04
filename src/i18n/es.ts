@@ -7093,10 +7093,15 @@ export const es = {
   'client.bills.renewal.taxes.option':
     '{importe} con impuestos, con {impuesto} de impuesto eléctrico y {iva} de IVA, en estos casos:',
   'client.bills.renewal.taxes.if': 'si {condiciones}',
-  'client.bills.renewal.taxes.met': 'se cumple {norma}',
-  'client.bills.renewal.taxes.not_met': 'no se cumple {norma}',
-  'client.bills.renewal.taxes.convalidated': 'se convalida {norma}',
-  'client.bills.renewal.taxes.not_convalidated': 'no se convalida {norma}',
+  'client.bills.renewal.taxes.cond_met':
+    'se cumple la condición de {norma}: {condicion} (se sabrá hacia el {fecha})',
+  'client.bills.renewal.taxes.cond_not_met':
+    'no se cumple la condición de {norma}: {condicion} (se sabrá hacia el {fecha})',
+  'client.bills.renewal.taxes.cond_again': 'no se cumple esa condición',
+  'client.bills.renewal.taxes.decided_by': 'según lo que se decida sobre {norma}',
+  'client.bills.renewal.taxes.convalidated': 'el Congreso convalida el {norma}',
+  'client.bills.renewal.taxes.not_convalidated': 'el Congreso no convalida el {norma}',
+  'client.bills.renewal.taxes.not_convalidated_again': 'el Congreso no lo convalida',
   'client.bills.renewal.taxes.option_rest':
     '{importe} con impuestos, con {impuesto} de impuesto eléctrico y {iva} de IVA, en los demás casos.',
   'client.bills.renewal.taxes.rates': '{impuesto} de impuesto eléctrico y {iva} de IVA',
