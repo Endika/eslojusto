@@ -67,8 +67,6 @@ export const RENEWAL_SECTIONS = {
   price_change_notice: priceChangeNotice,
 } as const satisfies Readonly<Record<string, SectionSchema>>;
 
-export type RenewalSectionKind = keyof typeof RENEWAL_SECTIONS;
-
 export const RENEWAL_SCHEMA: ReviewSchema = {
   pageKinds: RENEWAL_PAGE_KINDS,
   pageKindDescription:
