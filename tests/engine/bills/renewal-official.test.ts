@@ -169,25 +169,42 @@ describe('taxes of a renewal', () => {
 
     it('gives each way it may go and picks none', () => {
       const result = renewalTaxes(renewal, 1071.15, { tables: BILLS_TABLES, norms: open });
+      const dec = 'rdl25_2026_december';
       expect(result).toEqual({
         kind: 'conditional',
         options: [
           {
-            applies: ['rdl25_2026_december', 'rdl25_2026'],
-            unless: [],
+            when: [{ met: [dec, 'rdl25_2026'], notMet: [] }],
             electricityTaxPercent: 0.5,
             vatPercent: 10,
             withTax: 1184.16,
           },
           {
-            applies: [],
-            unless: ['rdl25_2026_december', 'rdl25_2026'],
+            when: [
+              { met: [], notMet: [dec, 'rdl25_2026'] },
+              { met: [dec], notMet: ['rdl25_2026'] },
+              { met: ['rdl25_2026'], notMet: [dec] },
+            ],
             electricityTaxPercent: 5.11269632,
             vatPercent: 21,
             withTax: 1362.36,
           },
         ],
+        unknown: [],
       });
+    });
+
+    it('lists the outcomes in which a table has no row', () => {
+      const result = renewalTaxes(renewal, 1071.15, {
+        tables: {
+          ...BILLS_TABLES,
+          electricityTax: BILLS_TABLES.electricityTax.filter((r) => r.unless === undefined),
+        },
+        norms: open,
+      });
+      if (result.kind !== 'conditional') throw new Error('conditional expected');
+      expect(result.options).toHaveLength(1);
+      expect(result.unknown).toHaveLength(3);
     });
 
     it('never mixes rows that need the opposite of the same norm', () => {
@@ -216,9 +233,13 @@ describe('taxes of a renewal', () => {
         [0.5, 21],
         [5.11269632, 21],
       ]);
-      for (const o of result.options) {
-        expect(o.applies.filter((id) => o.unless.includes(id))).toEqual([]);
+      expect(result.options.map((o) => o.when.length)).toEqual([1, 1, 2]);
+      const outcomes = result.options.flatMap((o) => o.when.map((w) => [...w.met].sort().join()));
+      expect(new Set(outcomes).size).toBe(4);
+      for (const { met, notMet } of result.options.flatMap((o) => o.when)) {
+        expect(met.filter((id) => notMet.includes(id))).toEqual([]);
       }
+      expect(result.unknown).toEqual([]);
     });
 
     it('reads the reduced VAT only up to the power limit', () => {
