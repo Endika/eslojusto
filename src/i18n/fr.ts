@@ -4254,6 +4254,12 @@ export const fr: Translation = {
   'bills.hub.telecom_situation':
     "Vous quittez votre opérateur de mobile ou d'internet\u00a0: la pénalité et ce que l'on vous facture",
   'bills.hub.telecom_citation': 'Ley 11/2022 · TRLGDCU, art. 62.5 · Real Decreto 899/2009',
+  'bills.hub.renewal': 'Renouvellement',
+  'bills.hub.renewal_situation':
+    "Vous recevez la lettre de renouvellement (carta de renovación) de votre contrat d'électricité\u00a0: ce qui change, ce qui est réglementé et ce que dit la réglementation sur le préavis",
+  'bills.hub.renewal_citation': 'Real Decreto 88/2026 · Real Decreto-ley 25/2026',
+  'bills.lead_renewal':
+    "Trois vérifications\u00a0: votre facture d'électricité, ligne par ligne\u00a0; la lettre de renouvellement (carta de renovación) de votre contrat d'électricité\u00a0; et la pénalité et la résiliation de votre contrat de mobile ou d'internet.",
   'bills.beta': 'Bêta',
   'bills.beta_note':
     'Section en test. Les chiffres proviennent de ce que vous saisissez, des barèmes officiels et de la réglementation.',
@@ -4568,6 +4574,128 @@ export const fr: Translation = {
   'bills.telecom.h1': "Votre durée d'engagement et votre résiliation du mobile ou d'internet",
   'bills.telecom.lead':
     "Avec les dates et les montants de votre contrat\u00a0: la pénalité que permet la loi si vous partez avant terme, si une modification des conditions vous permet de partir sans pénalité et si l'on vous facture des jours postérieurs à la résiliation.",
+  'bills.renewal.form_aria': "Vérification de votre lettre de renouvellement d'électricité",
+  'bills.renewal.question.fechas': 'Les dates de la lettre',
+  'bills.renewal.question.potencia': 'Votre puissance',
+  'bills.renewal.question.potencia-actual': 'Prix actuel de la puissance',
+  'bills.renewal.question.potencia-nueva': 'Nouveau prix de la puissance',
+  'bills.renewal.question.energia': "Prix de l'énergie",
+  'bills.renewal.question.energia-actual': "Prix actuel de l'énergie",
+  'bills.renewal.question.energia-nueva': "Nouveau prix de l'énergie",
+  'bills.renewal.question.consumo': 'Consommation annuelle',
+  'bills.renewal.question.carta': 'Coût indiqué dans la lettre',
+  'bills.renewal.question.contrato': 'Votre contrat',
+  'bills.renewal.question.envio': 'Comment la lettre vous est parvenue',
+  'bills.renewal.letter_date': 'Date de la lettre',
+  'bills.renewal.letter_date_hint': "Celle qui figure sur la lettre ou l'avis.",
+  'bills.renewal.renewal_date': 'Date du renouvellement',
+  'bills.renewal.renewal_date_hint': "Le jour à partir duquel s'appliquent les nouveaux prix.",
+  'bills.renewal.power_kw_p1': 'Puissance souscrite en P1 (kW)',
+  'bills.renewal.power_kw_p2': 'Puissance souscrite en P2 (kW)',
+  'bills.renewal.power_unit':
+    'Dans quelle unité la lettre donne-t-elle le prix de la puissance\u00a0?',
+  'bills.renewal.power_unit_hint': 'Elle figure à côté du prix.',
+  'bills.renewal.power_unit.per_kw_day': '€/kW par jour',
+  'bills.renewal.power_unit.per_kw_year': '€/kW par an',
+  'bills.renewal.price_hint': "Tel qu'il figure dans la lettre, avec toutes les décimales.",
+  'bills.renewal.current_power_p1': 'Prix actuel de la puissance P1',
+  'bills.renewal.current_power_p2': 'Prix actuel de la puissance P2',
+  'bills.renewal.next_power_p1': 'Nouveau prix de la puissance P1',
+  'bills.renewal.next_power_p2': 'Nouveau prix de la puissance P2',
+  'bills.renewal.energy_pricing': "Combien de prix de l'énergie la lettre donne-t-elle\u00a0?",
+  'bills.renewal.energy_pricing.single': 'Un seul, pour toutes les heures',
+  'bills.renewal.energy_pricing.periods': 'Un par période (P1, P2 et P3)',
+  'bills.renewal.current_energy': "Prix actuel de l'énergie (€/kWh)",
+  'bills.renewal.next_energy': "Nouveau prix de l'énergie (€/kWh)",
+  'bills.renewal.current_energy_p1': "Prix actuel de l'énergie P1 (€/kWh)",
+  'bills.renewal.current_energy_p2': "Prix actuel de l'énergie P2 (€/kWh)",
+  'bills.renewal.current_energy_p3': "Prix actuel de l'énergie P3 (€/kWh)",
+  'bills.renewal.next_energy_p1': "Nouveau prix de l'énergie P1 (€/kWh)",
+  'bills.renewal.next_energy_p2': "Nouveau prix de l'énergie P2 (€/kWh)",
+  'bills.renewal.next_energy_p3': "Nouveau prix de l'énergie P3 (€/kWh)",
+  'bills.renewal.annual_kwh': 'Consommation annuelle retenue par la lettre (kWh)',
+  'bills.renewal.annual_kwh_hint':
+    "Si la lettre ne l'indique pas, laissez le champ vide\u00a0: son coût ne sera pas recalculé.",
+  'bills.renewal.declared_without_tax': 'Coût annuel aux nouveaux prix, hors taxes (€)',
+  'bills.renewal.declared_with_tax': 'Coût annuel aux nouveaux prix, taxes comprises (€)',
+  'bills.renewal.declared_hint': 'Facultatif. Il est comparé à notre recalcul.',
+  'bills.renewal.fixed_price': "S'agit-il d'un contrat à prix fixe\u00a0?",
+  'bills.renewal.first_renewal': "S'agit-il du premier renouvellement annuel\u00a0?",
+  'bills.renewal.first_renewal_hint':
+    'La première reconduction (prórroga) après la première année.',
+  'bills.renewal.separate_from_bill':
+    'La lettre vous est-elle parvenue séparément de la facture\u00a0?',
+  'bills.renewal.separate_from_bill_hint':
+    'Par courrier ou par un e-mail distinct, ni dans une facture ni jointe à celle-ci.',
+  'bills.renewal.app_name':
+    "Vérification de la lettre de renouvellement de votre contrat d'électricité",
+  'bills.renewal.crumb': 'Renouvellement',
+  'bills.renewal.title': "Vérifiez la lettre de renouvellement de votre contrat d'électricité",
+  'bills.renewal.description':
+    "Recalculez ce qui change avec les nouveaux prix de votre lettre de renouvellement d'électricité (carta de renovación), la part réglementée, la comparaison avec le PVPC, les taxes à la date, le préavis et la sortie du contrat.",
+  'bills.renewal.h1': "Votre lettre de renouvellement d'électricité, calculs à l'appui",
+  'bills.renewal.lead':
+    "Avec les prix de votre lettre\u00a0: de combien change le coût d'une année hors taxes, quelle part des prix est réglementée, la comparaison avec le PVPC, les taxes à la date, si le préavis est respecté et ce que dit la réglementation sur la sortie du contrat. Pour les logements au tarif 2.0TD, jusqu'à 15 kW.",
+  'bills.renewal.tab.fechas': 'Dates',
+  'bills.renewal.tab.potencia': 'Prix',
+  'bills.renewal.tab.consumo': 'Consommation',
+  'bills.renewal.tab.resultado': 'Résultat',
+  'bills.renewal.documents.start_help':
+    'Vous pouvez envoyer la lettre de renouvellement (carta de renovación) pour remplir les données avec ce qui y est lu, ou les saisir vous-même. Avant toute vérification, vous confirmez chaque donnée.',
+  'bills.renewal.documents.upload': 'Envoyez la lettre de renouvellement',
+  'bills.renewal.documents.files_hint':
+    "Toutes les pages de la lettre ou de l'avis de changement de prix de votre contrat d'électricité. Jusqu'à 25 photos ou pages de PDF au total. Les photos et les pages des PDF sont converties en images sur votre appareil avant l'envoi.",
+  'bills.guide.renewal.title': 'Ce que contrôle la vérification de votre lettre de renouvellement',
+  'bills.guide.renewal.lead':
+    "Comment le coût est recalculé avec les prix de la lettre, quelle part des prix est réglementée, le PVPC comme point de comparaison, les taxes à la date du renouvellement, le préavis et la sortie du contrat, avec la règle d'où vient chaque élément.",
+  'bills.guide.renewal_checks.title': 'Les calculs de la lettre',
+  'bills.guide.renewal_checks.p1':
+    "La vérification recalcule deux fois une année d'électricité hors taxes, aux prix actuels et aux nouveaux prix de la lettre, avec la même puissance et la même consommation annuelle, et affiche l'écart en euros et en pourcentage. Si la lettre indique son propre coût, elle le compare au recalcul et dit s'ils concordent.",
+  'bills.guide.renewal_checks.p2':
+    "Si la lettre ne donne pas la consommation annuelle, ou donne les prix de l'énergie par période sans la consommation de chacune, le coût ne peut pas être recalculé et la vérification le dit au lieu de le supposer. Les autres contrôles restent valables.",
+  'bills.guide.renewal_regulated.title': 'Quelle part des prix est réglementée',
+  'bills.guide.renewal_regulated.p1':
+    "Les prix de la puissance et de l'énergie comprennent les péages d'accès de transport et de distribution (peajes), fixés par la CNMC, et les charges du système (cargos), fixées par le Ministère. Ils sont les mêmes chez tous les fournisseurs (comercializadora)\u00a0; ce qui reste jusqu'au prix de la lettre est fixé par le fournisseur.",
+  'bills.guide.renewal_regulated.p2':
+    "Pour chaque terme, la vérification sépare la part réglementée à la date du renouvellement de ce qu'ajoute le fournisseur, avec le prix actuel et le nouveau. On voit ainsi si une hausse vient des péages et charges ou de la marge du fournisseur.",
+  'bills.guide.renewal_pvpc.title': 'Le PVPC, comme point de comparaison',
+  'bills.guide.renewal_pvpc.p1':
+    "La vérification calcule ce qu'auraient coûté au PVPC les 12 derniers mois publiés, avec votre consommation et votre puissance, hors taxes, et le place à côté des nouveaux prix. C'est la moyenne simple de toutes les heures de la période, sans le profil de consommation de REE\u00a0: c'est donc une référence et non une prévision.",
+  'bills.guide.renewal_pvpc.p2':
+    'La marge de commercialisation du PVPC utilisée par le calcul peut être dépassée, et la vérification le signale. Le PVPC est un point de comparaison\u00a0: la vérification ne recommande aucun tarif ni aucun fournisseur.',
+  'bills.guide.renewal_taxes.title': 'Les taxes à la date',
+  'bills.guide.renewal_taxes.p1':
+    "Le coût taxes comprises est calculé avec la taxe sur l'électricité (impuesto eléctrico) et la TVA (IVA) en vigueur à la date du renouvellement. Quand cette date tombe dans une période dont les règles ne sont pas encore tranchées, comme le Real Decreto-ley 25/2026, la vérification ne choisit pas\u00a0: elle affiche chaque résultat possible et ce qui devrait se produire pour qu'il s'applique.",
+  'bills.guide.renewal_notice.title': "Le préavis d'un mois",
+  'bills.guide.renewal_notice.p1':
+    "Avec effet à compter du 12-06-2026, le Real Decreto 88/2026 reconnaît aux consommateurs d'électricité le droit suivant (art. 6.1.m)\u00a0:",
+  'bills.guide.renewal_notice.p2':
+    "La vérification compte les jours entre la date de la lettre et celle du renouvellement, et regarde si la lettre est arrivée séparément de la facture. Une lettre datée d'avant le 12-06-2026 n'est pas contrôlée selon cette règle, qui s'applique depuis ce jour-là. Le contenu que doit avoir l'avis sera fixé par un arrêté ministériel (orden ministerial) que nous n'avons pas encore trouvé, et il n'est pas contrôlé.",
+  'bills.guide.renewal_exit.title': 'Sortir du contrat',
+  'bills.guide.renewal_exit.p1':
+    "Une personne au tarif 2.0TD peut quitter son contrat à tout moment sans pénalité, sauf s'il s'agit d'un contrat à prix fixe avant sa première reconduction annuelle. Dans ce cas, la pénalité ne peut pas dépasser 5 % de l'énergie estimée restant à fournir, et c'est au fournisseur de prouver la perte (Real Decreto 88/2026, art. 28.3).",
+  'bills.guide.renewal_exit.p2':
+    'À partir de ce que vous indiquez sur votre contrat, la vérification dit si une pénalité est possible selon cette règle. Elle ne calcule pas le montant de la pénalité.',
+  'bills.guide.renewal.unchecked.gas':
+    'Le gaz\u00a0: même si la lettre en parle aussi, seule la partie électricité est vérifiée.',
+  'bills.guide.renewal.unchecked.scope':
+    "Les points de livraison de plus de 15 kW et ceux des entreprises\u00a0: la vérification s'adresse aux logements au tarif 2.0TD.",
+  'bills.faq.renewal.notice':
+    "Combien de temps à l'avance doit-on me prévenir du renouvellement\u00a0?",
+  'bills.faq.renewal.notice_answer':
+    "Si le fournisseur veut modifier les conditions du contrat, il doit prévenir par écrit et séparément de sa facture, au moins un mois à l'avance, et informer du droit de résilier le contrat sans aucun coût (Real Decreto 88/2026, art. 6.1.m, avec effet à compter du 12-06-2026). La vérification compte les jours entre la lettre et le renouvellement\u00a0; le contenu que doit avoir l'avis sera fixé par un arrêté ministériel (orden ministerial) que nous n'avons pas encore trouvé.",
+  'bills.faq.renewal.exit': 'Peut-on me facturer mon départ après la lettre\u00a0?',
+  'bills.faq.renewal.exit_answer':
+    "Une personne au tarif 2.0TD peut quitter son contrat d'électricité à tout moment sans pénalité, sauf s'il s'agit d'un contrat à prix fixe avant sa première reconduction annuelle. Dans ce cas, la pénalité ne peut pas dépasser 5 % de l'énergie estimée restant à fournir, et c'est au fournisseur de prouver la perte (Real Decreto 88/2026, art. 28.3). La vérification ne contrôle pas les délais que fixe la lettre pour signaler la résiliation ou l'opposition au renouvellement.",
+  'bills.faq.renewal.regulated': 'Quelle part du prix est réglementée\u00a0?',
+  'bills.faq.renewal.regulated_answer':
+    "Les péages d'accès de transport et de distribution (peajes), fixés par la CNMC, et les charges du système (cargos), fixées par le Ministère, sont inclus dans le prix de la puissance et de l'énergie et sont les mêmes chez tous les fournisseurs. La vérification les sépare, à la date du renouvellement, de ce qu'ajoute le fournisseur.",
+  'bills.faq.renewal.pvpc': 'Pourquoi le PVPC apparaît-il\u00a0?',
+  'bills.faq.renewal.pvpc_answer':
+    "Parce que c'est le prix réglementé de référence, publié heure par heure. La vérification calcule ce qu'auraient coûté les 12 derniers mois publiés avec votre consommation et votre puissance, comme moyenne simple des heures, et le place à côté des nouveaux prix de la lettre. C'est un point de comparaison, pas une recommandation.",
+  'bills.faq.renewal.documents': "Qu'advient-il de ma lettre\u00a0?",
+  'bills.faq.renewal.documents_answer':
+    "Si vous envoyez la lettre, elle est transmise chiffrée à un serveur d'Amazon Web Services en Espagne, qui la confie à un modèle d'IA (Claude, d'Anthropic, via Amazon Bedrock) au sein de l'Union européenne. Le modèle a pour consigne de ne recopier ni noms, ni DNI, adresses, téléphones, e-mails ou comptes. Rien n'est conservé. Cette vérification est gratuite et ne demande aucun pass. Si vous préférez ne rien envoyer, vous pouvez saisir les données et rien ne quitte votre appareil.",
   'bills.telecom.form_aria': "Vérification de votre durée d'engagement et de votre résiliation",
   'bills.telecom.tab.permanencia': 'Contrat',
   'bills.telecom.tab.baja': 'Résiliation',
@@ -4844,6 +4972,125 @@ export const fr: Translation = {
   'client.bills.telecom.deadline.rule':
     "Si votre opérateur vous informe d'une modification des conditions du contrat, la loi vous permet de résilier dans le mois qui suit l'avis sans payer la pénalité liée à la durée d'engagement ; seul le terminal subventionné que vous gardez peut encore vous être facturé.",
   'client.bills.telecom.deadline.ends': "Le mois qui suit l'avis se termine le {fecha}.",
+  'client.bills.renewal.documents.not_renewal':
+    "Le document ne ressemble pas à un renouvellement de prix\u00a0: vérifiez qu'il s'agit bien de la lettre que vous vouliez faire vérifier.",
+  'client.bills.renewal.unit.per_kw_year': '{n} €/kW·an',
+  'client.bills.renewal.unit.per_kwh': '{n} €/kWh',
+  'client.bills.renewal.lead.ok':
+    "Aux prix de la lettre, une année d'électricité hors taxes passe de {antes} à {despues} ({porcentaje}).",
+  'client.bills.renewal.lead.no_consumption':
+    'La lettre ne donne pas la consommation annuelle\u00a0: son coût ne peut donc pas être recalculé. Le reste est bien vérifié.',
+  'client.bills.renewal.lead.needs_period_use':
+    "Les prix de la lettre sont par période et nous ne savons pas combien vous consommez sur chacune\u00a0: son coût n'est donc pas recalculé. Le reste est bien vérifié.",
+  'client.bills.renewal.title.cost': 'Les calculs de la lettre',
+  'client.bills.renewal.title.split': 'Quelle part des prix est réglementée',
+  'client.bills.renewal.title.pvpc': 'Face au PVPC',
+  'client.bills.renewal.title.notice': 'Le préavis',
+  'client.bills.renewal.title.exit': 'Sortir du contrat',
+  'client.bills.renewal.title.unchecked': 'Ce que cette vérification ne contrôle pas',
+  'client.bills.renewal.cost.no_consumption':
+    'Sans la consommation annuelle, le coût de la lettre ne peut pas être recalculé.',
+  'client.bills.renewal.cost.needs_period_use':
+    "Avec des prix de l'énergie par période, il faut la consommation de chaque période, que la lettre ne donne pas. Nous ne l'inventons pas.",
+  'client.bills.renewal.cost.current': 'Coût annuel actuel, hors taxes\u00a0: {importe}.',
+  'client.bills.renewal.cost.next': 'Coût annuel aux nouveaux prix, hors taxes\u00a0: {importe}.',
+  'client.bills.renewal.cost.rise': 'Variation\u00a0: {porcentaje}.',
+  'client.bills.renewal.cost.matches':
+    'La lettre indique {declarado} hors taxes\u00a0: cela concorde avec le recalcul, à moins de 1 € près.',
+  'client.bills.renewal.cost.mismatch':
+    "La lettre indique {declarado} hors taxes et le recalcul donne {calculado}\u00a0: l'écart dépasse 1 €.",
+  'client.bills.renewal.taxes.missing':
+    "Nous n'avons pas les taux de la taxe sur l'électricité et de la TVA au {fecha}\u00a0: nous ne calculons donc pas le coût taxes comprises.",
+  'client.bills.renewal.taxes.ok':
+    "Avec les taxes du {fecha} ({impuesto} de taxe sur l'électricité et {iva} de TVA)\u00a0: {importe}.",
+  'client.bills.renewal.taxes.declared_matches':
+    'La lettre indique {importe} taxes comprises\u00a0: cela concorde.',
+  'client.bills.renewal.taxes.declared_differs':
+    'La lettre indique {importe} taxes comprises\u00a0: cela ne concorde pas avec notre calcul.',
+  'client.bills.renewal.taxes.conditional':
+    'Les taxes du {fecha} dépendent de ce qui sera décidé sur\u00a0: {normas}. Nous ne choisissons pas de résultat\u00a0: voici les résultats possibles.',
+  'client.bills.renewal.taxes.option':
+    "{importe} taxes comprises, avec {impuesto} de taxe sur l'électricité et {iva} de TVA, dans ces cas\u00a0:",
+  'client.bills.renewal.taxes.if': 'si {condiciones}',
+  'client.bills.renewal.taxes.cond_met':
+    'la condition du {norma} est remplie ({condicion}\u00a0; on le saura vers le {fecha})',
+  'client.bills.renewal.taxes.cond_not_met':
+    "la condition du {norma} n'est pas remplie ({condicion}\u00a0; on le saura vers le {fecha})",
+  'client.bills.renewal.taxes.cond_again': "cette condition n'est pas remplie",
+  'client.bills.renewal.taxes.decided_by': 'selon ce qui sera décidé sur le {norma}',
+  'client.bills.renewal.taxes.convalidated': 'le Congrès valide (convalida) le {norma}',
+  'client.bills.renewal.taxes.not_convalidated': 'le Congrès ne valide pas le {norma}',
+  'client.bills.renewal.taxes.not_convalidated_again': 'le Congrès ne le valide pas',
+  'client.bills.renewal.taxes.option_rest':
+    "{importe} taxes comprises, avec {impuesto} de taxe sur l'électricité et {iva} de TVA, dans tous les autres cas.",
+  'client.bills.renewal.taxes.rates': "{impuesto} de taxe sur l'électricité et {iva} de TVA",
+  'client.bills.renewal.taxes.or': ' ou ',
+  'client.bills.renewal.taxes.declared_option':
+    "La lettre indique {importe} taxes comprises, ce qui correspond à l'option avec {opciones}.",
+  'client.bills.renewal.taxes.declared_none':
+    'La lettre indique {importe} taxes comprises, ce qui ne correspond à aucune de ces options.',
+  'client.bills.renewal.taxes.and': ' et ',
+  'client.bills.renewal.taxes.unknown':
+    "Dans ces cas, il n'y a pas de taux à appliquer au {fecha}, et le coût taxes comprises ne peut pas être calculé\u00a0:",
+  'client.bills.renewal.split.intro':
+    'La part réglementée, ce sont les péages et charges (peajes y cargos) du {fecha}\u00a0; le reste est fixé par le fournisseur. Pour chaque terme, avec le prix actuel et le nouveau\u00a0:',
+  'client.bills.renewal.split.power_p1': 'Puissance P1',
+  'client.bills.renewal.split.power_p2': 'Puissance P2',
+  'client.bills.renewal.split.energy_p1': 'Énergie P1',
+  'client.bills.renewal.split.energy_p2': 'Énergie P2',
+  'client.bills.renewal.split.energy_p3': 'Énergie P3',
+  'client.bills.renewal.split.row':
+    '{termino}\u00a0: réglementé {regulado}\u00a0; fournisseur, de {antes} à {despues}.',
+  'client.bills.renewal.split.single_price':
+    "La lettre donne un seul prix de l'énergie\u00a0: il est comparé à la part réglementée de chaque période.",
+  'client.bills.renewal.split.regulated_changed':
+    'Les péages et charges changent entre la date de la lettre et celle du renouvellement\u00a0: une partie de la hausse vient de la part réglementée.',
+  'client.bills.renewal.split.regulated_same':
+    'La hausse ne vient pas de la part réglementée\u00a0: les péages et charges sont les mêmes aux deux dates.',
+  'client.bills.renewal.split.regulated_unknown':
+    "Nous n'avons pas les péages et charges du {fecha}\u00a0: nous ne savons donc pas si la part réglementée change entre les deux dates.",
+  'client.bills.renewal.split.missing_table':
+    "Nous n'avons pas les péages et charges du {fecha}\u00a0: la part réglementée n'est donc pas séparée de ce qu'ajoute le fournisseur.",
+  'client.bills.renewal.split.conditional_one':
+    "Les péages et charges à cette date dépendent du {normas}, qui n'a pas encore été tranché\u00a0: ils ne sont donc pas séparés.",
+  'client.bills.renewal.split.conditional_many':
+    "Les péages et charges à cette date dépendent de ces règles, qui n'ont pas encore été tranchées\u00a0: {normas}. C'est pourquoi ils ne sont pas séparés.",
+  'client.bills.renewal.pvpc.no_data': "Aucun prix du PVPC n'est chargé pour faire la comparaison.",
+  'client.bills.renewal.pvpc.no_consumption':
+    "Sans la consommation annuelle, il n'y a pas de comparaison avec le PVPC.",
+  'client.bills.renewal.pvpc.needs_period_use':
+    "Avec des prix de l'énergie par période, il faut la consommation de chaque période pour comparer avec le PVPC, et la lettre ne la donne pas.",
+  'client.bills.renewal.pvpc.annual':
+    'Avec votre consommation et votre puissance, le PVPC du {desde} au {hasta} aurait coûté {importe} par an, hors taxes.',
+  'client.bills.renewal.pvpc.next':
+    'Les nouveaux prix de la lettre coûtent {importe} par an, hors taxes.',
+  'client.bills.renewal.pvpc.difference': 'Écart (lettre moins PVPC)\u00a0: {diferencia}.',
+  'client.bills.renewal.pvpc.average':
+    "C'est la moyenne simple de toutes les heures de cette période, sans le profil de consommation de REE.",
+  'client.bills.renewal.pvpc.doubt': 'La marge du PVPC peut être dépassée\u00a0: {motivo}.',
+  'client.bills.renewal.pvpc.informative': "C'est un point de comparaison, pas une recommandation.",
+  'client.bills.renewal.notice.meets':
+    'Le préavis est respecté\u00a0: {dias} entre la lettre ({carta}) et le renouvellement ({renovacion}), et la lettre est arrivée séparément de la facture.',
+  'client.bills.renewal.notice.short':
+    "Le préavis n'atteint pas un mois\u00a0: {dias} entre la lettre ({carta}) et le renouvellement ({renovacion}).",
+  'client.bills.renewal.notice.separate_unknown':
+    'La date atteint le mois de préavis\u00a0: {dias} entre la lettre ({carta}) et le renouvellement ({renovacion}). Nous ne savons pas si la lettre est arrivée séparément de la facture\u00a0: nous ne considérons donc pas le préavis comme respecté.',
+  'client.bills.renewal.notice.not_checked_before':
+    "La lettre est datée du {carta}, avant le {desde}, date d'entrée en application de cette règle. Cette vérification ne contrôle pas le préavis des lettres antérieures à cette date.",
+  'client.bills.renewal.notice.not_separate':
+    'La lettre est arrivée avec la facture, alors que la réglementation exige un avis écrit et séparé de celle-ci.',
+  'client.bills.renewal.exit.free':
+    "D'après ce que vous avez indiqué, la résiliation n'entraîne pas de pénalité\u00a0: une personne au tarif 2.0TD peut résilier le contrat et ses reconductions à tout moment sans pénalité, sauf à prix fixe avant la première reconduction annuelle.",
+  'client.bills.renewal.exit.penalty_possible':
+    "À prix fixe et avant la première reconduction annuelle, la pénalité peut atteindre, au maximum, {porcentaje} de l'énergie restant à fournir.",
+  'client.bills.renewal.exit.unknown':
+    "Nous ne savons pas si le prix est fixe ni s'il s'agit du premier renouvellement, et c'est de cela que dépend une éventuelle pénalité\u00a0: elle n'est possible qu'à prix fixe avant la première reconduction annuelle.",
+  'client.bills.renewal.unchecked.content':
+    "Le contenu que doit avoir l'avis\u00a0: il sera fixé par un arrêté ministériel que nous n'avons pas encore trouvé.",
+  'client.bills.renewal.unchecked.deadlines':
+    "Les délais que demande la lettre pour signaler la résiliation ou l'opposition au renouvellement.",
+  'client.bills.renewal.unchecked.other':
+    'Les autres conditions du contrat, et la partie gaz si la lettre en parle aussi.',
   'client.bills.result.lead_out_of_scope':
     'Cette vérification ne couvre pas encore ce que vous avez saisi.',
   'client.bills.pass.issued':

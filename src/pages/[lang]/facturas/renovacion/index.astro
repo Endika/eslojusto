@@ -1,0 +1,19 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { RENEWAL_PUBLIC } from '../../../../content/sections';
+import { langPaths, type Lang } from '../../../../i18n/languages';
+
+// Built only in a build that asks for the review: without it the page has no route at all.
+export const getStaticPaths = (() =>
+  import.meta.env.PUBLIC_RENEWAL === 'true' ? langPaths() : []) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+
+// Imported dynamically: a static import lets the bundler merge this view's scripts into the
+// chunks other pages share, which then download them too.
+/* eslint-disable no-restricted-syntax -- a fixed path into src/views, not a boundary escape */
+const Renewal = RENEWAL_PUBLIC ? (await import('../../../../views/Renewal.astro')).default : null;
+/* eslint-enable no-restricted-syntax */
+---
+
+{Renewal && <Renewal lang={lang} />}

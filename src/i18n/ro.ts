@@ -4166,6 +4166,12 @@ export const ro: Translation = {
   'bills.hub.telecom_situation':
     'Pleci de la compania ta de telefonie mobilă sau internet: penalitatea și ce ți se percepe',
   'bills.hub.telecom_citation': 'Ley 11/2022 · TRLGDCU, art. 62.5 · Real Decreto 899/2009',
+  'bills.hub.renewal': 'Reînnoirea',
+  'bills.hub.renewal_situation':
+    'Primești scrisoarea de reînnoire (carta de renovación) a contractului tău de electricitate: ce se schimbă, ce este reglementat și ce spune norma despre notificare',
+  'bills.hub.renewal_citation': 'Real Decreto 88/2026 · Real Decreto-ley 25/2026',
+  'bills.lead_renewal':
+    'Trei verificări: factura ta la electricitate, linie cu linie; scrisoarea de reînnoire (carta de renovación) a contractului tău de electricitate; și penalitatea și rezilierea contractului tău de telefonie mobilă sau internet.',
   'bills.beta': 'Beta',
   'bills.beta_note':
     'Secțiune în testare. Cifrele rezultă din ce scrii, din tabelele oficiale și din normă.',
@@ -4478,6 +4484,124 @@ export const ro: Translation = {
     'Perioada ta minimă de contract și rezilierea pentru telefonul mobil sau internet',
   'bills.telecom.lead':
     'Cu datele și sumele din contractul tău: penalitatea pe care o permite legea dacă pleci mai devreme, dacă o modificare a condițiilor îți permite să pleci fără penalitate și dacă ți se percep zile de după reziliere.',
+  'bills.renewal.form_aria': 'Verificarea scrisorii tale de reînnoire la electricitate',
+  'bills.renewal.question.fechas': 'Datele din scrisoare',
+  'bills.renewal.question.potencia': 'Puterea ta',
+  'bills.renewal.question.potencia-actual': 'Prețul actual al puterii',
+  'bills.renewal.question.potencia-nueva': 'Prețul nou al puterii',
+  'bills.renewal.question.energia': 'Prețurile energiei',
+  'bills.renewal.question.energia-actual': 'Prețul actual al energiei',
+  'bills.renewal.question.energia-nueva': 'Prețul nou al energiei',
+  'bills.renewal.question.consumo': 'Consumul anual',
+  'bills.renewal.question.carta': 'Costul indicat în scrisoare',
+  'bills.renewal.question.contrato': 'Contractul tău',
+  'bills.renewal.question.envio': 'Cum ți-a ajuns scrisoarea',
+  'bills.renewal.letter_date': 'Data scrisorii',
+  'bills.renewal.letter_date_hint': 'Cea scrisă pe scrisoare sau pe notificare.',
+  'bills.renewal.renewal_date': 'Data reînnoirii',
+  'bills.renewal.renewal_date_hint': 'Ziua de la care se aplică prețurile noi.',
+  'bills.renewal.power_kw_p1': 'Puterea contractată în P1 (kW)',
+  'bills.renewal.power_kw_p2': 'Puterea contractată în P2 (kW)',
+  'bills.renewal.power_unit': 'În ce unitate indică scrisoarea prețul puterii?',
+  'bills.renewal.power_unit_hint': 'Apare lângă preț.',
+  'bills.renewal.power_unit.per_kw_day': '€/kW și zi',
+  'bills.renewal.power_unit.per_kw_year': '€/kW și an',
+  'bills.renewal.price_hint': 'Așa cum apare în scrisoare, cu toate zecimalele.',
+  'bills.renewal.current_power_p1': 'Prețul actual al puterii P1',
+  'bills.renewal.current_power_p2': 'Prețul actual al puterii P2',
+  'bills.renewal.next_power_p1': 'Prețul nou al puterii P1',
+  'bills.renewal.next_power_p2': 'Prețul nou al puterii P2',
+  'bills.renewal.energy_pricing': 'Câte prețuri ale energiei indică scrisoarea?',
+  'bills.renewal.energy_pricing.single': 'Unul singur, pentru toate orele',
+  'bills.renewal.energy_pricing.periods': 'Câte unul pe interval (P1, P2 și P3)',
+  'bills.renewal.current_energy': 'Prețul actual al energiei (€/kWh)',
+  'bills.renewal.next_energy': 'Prețul nou al energiei (€/kWh)',
+  'bills.renewal.current_energy_p1': 'Prețul actual al energiei P1 (€/kWh)',
+  'bills.renewal.current_energy_p2': 'Prețul actual al energiei P2 (€/kWh)',
+  'bills.renewal.current_energy_p3': 'Prețul actual al energiei P3 (€/kWh)',
+  'bills.renewal.next_energy_p1': 'Prețul nou al energiei P1 (€/kWh)',
+  'bills.renewal.next_energy_p2': 'Prețul nou al energiei P2 (€/kWh)',
+  'bills.renewal.next_energy_p3': 'Prețul nou al energiei P3 (€/kWh)',
+  'bills.renewal.annual_kwh': 'Consumul anual folosit de scrisoare (kWh)',
+  'bills.renewal.annual_kwh_hint':
+    'Dacă scrisoarea nu îl indică, lasă câmpul gol: costul ei nu va fi recalculat.',
+  'bills.renewal.declared_without_tax': 'Costul anual cu prețurile noi, fără taxe (€)',
+  'bills.renewal.declared_with_tax': 'Costul anual cu prețurile noi, cu taxe (€)',
+  'bills.renewal.declared_hint': 'Opțional. Se compară cu recalcularea noastră.',
+  'bills.renewal.fixed_price': 'Este un contract cu preț fix?',
+  'bills.renewal.first_renewal': 'Este prima reînnoire anuală?',
+  'bills.renewal.first_renewal_hint': 'Prima prelungire (prórroga) după primul an.',
+  'bills.renewal.separate_from_bill': 'Ți-a ajuns scrisoarea separat de factură?',
+  'bills.renewal.separate_from_bill_hint':
+    'Prin poștă sau printr-un e-mail separat, nu în interiorul unei facturi și nici atașată la ea.',
+  'bills.renewal.app_name':
+    'Verificarea scrisorii de reînnoire a contractului tău de electricitate',
+  'bills.renewal.crumb': 'Reînnoirea',
+  'bills.renewal.title': 'Verifică scrisoarea de reînnoire a contractului tău de electricitate',
+  'bills.renewal.description':
+    'Recalculează ce se schimbă cu prețurile noi din scrisoarea ta de reînnoire la electricitate (carta de renovación), ce parte este reglementată, cum se compară cu PVPC (tariful reglementat), taxele de la data respectivă, preavizul și ieșirea din contract.',
+  'bills.renewal.h1': 'Scrisoarea de reînnoire la electricitate, cu socotelile ei',
+  'bills.renewal.lead':
+    'Cu prețurile din scrisoarea ta: cu cât se schimbă costul unui an fără taxe, ce parte din prețuri este reglementată, cum se compară cu PVPC, taxele de la data respectivă, dacă preavizul este respectat și ce spune norma despre ieșirea din contract. Pentru locuințe cu tariful 2.0TD, până la 15 kW.',
+  'bills.renewal.tab.fechas': 'Datele',
+  'bills.renewal.tab.potencia': 'Prețuri',
+  'bills.renewal.tab.consumo': 'Consum',
+  'bills.renewal.tab.resultado': 'Rezultat',
+  'bills.renewal.documents.start_help':
+    'Poți încărca scrisoarea de reînnoire (carta de renovación) pentru a completa datele cu ce se citește din ea sau le poți scrie tu. Înainte de orice verificare, confirmi fiecare informație.',
+  'bills.renewal.documents.upload': 'Încarcă scrisoarea de reînnoire',
+  'bills.renewal.documents.files_hint':
+    'Toate paginile scrisorii sau ale notificării de modificare a prețurilor contractului tău de electricitate. Până la 25 de fotografii sau pagini PDF în total. Fotografiile și paginile din PDF-uri sunt transformate în imagini pe dispozitivul tău înainte de a fi trimise.',
+  'bills.guide.renewal.title': 'Ce verifică analiza scrisorii tale de reînnoire',
+  'bills.guide.renewal.lead':
+    'Cum se recalculează costul cu prețurile din scrisoare, ce parte din prețuri este reglementată, PVPC ca termen de comparație, taxele de la data reînnoirii, preavizul și ieșirea din contract, cu norma din care provine fiecare lucru.',
+  'bills.guide.renewal_checks.title': 'Socotelile scrisorii',
+  'bills.guide.renewal_checks.p1':
+    'Verificarea recalculează de două ori un an de electricitate fără taxe, cu prețurile actuale și cu cele noi din scrisoare, cu aceeași putere și același consum anual, și arată diferența în euro și în procente. Dacă scrisoarea își declară propriul cost, îl compară cu recalcularea și spune dacă se potrivesc.',
+  'bills.guide.renewal_checks.p2':
+    'Dacă scrisoarea nu indică consumul anual sau dă prețurile energiei pe intervale fără consumul din fiecare, costul nu poate fi recalculat, iar verificarea spune acest lucru în loc să îl presupună. Celelalte verificări rămân valabile.',
+  'bills.guide.renewal_regulated.title': 'Ce parte din prețuri este reglementată',
+  'bills.guide.renewal_regulated.p1':
+    'În prețurile puterii și ale energiei intră tarifele de acces pentru transport și distribuție (peajes), stabilite de CNMC, și taxele sistemului (cargos), stabilite de Minister. Sunt aceleași la orice furnizor (comercializadora); ce rămâne până la prețul din scrisoare este stabilit de furnizor.',
+  'bills.guide.renewal_regulated.p2':
+    'Pentru fiecare componentă, verificarea separă ce este reglementat la data reînnoirii de ce adaugă furnizorul, cu prețul actual și cu cel nou. Astfel se vede dacă o creștere vine din tarifele de acces și taxe sau din marja furnizorului.',
+  'bills.guide.renewal_pvpc.title': 'PVPC, ca termen de comparație',
+  'bills.guide.renewal_pvpc.p1':
+    'Verificarea calculează cât ar fi costat cu PVPC ultimele 12 luni publicate, cu consumul și puterea ta, fără taxe, și pune rezultatul lângă prețurile noi. Este media simplă a tuturor orelor din interval, fără profilul de consum al REE, așa că este o referință, nu o predicție.',
+  'bills.guide.renewal_pvpc.p2':
+    'Marja de furnizare a PVPC folosită în calcul poate fi depășită, iar verificarea avertizează asupra acestui lucru. PVPC este un termen de comparație: verificarea nu recomandă niciun tarif și niciun furnizor.',
+  'bills.guide.renewal_taxes.title': 'Taxele de la data respectivă',
+  'bills.guide.renewal_taxes.p1':
+    'Costul cu taxe se calculează cu impozitul pe electricitate (impuesto eléctrico) și TVA (IVA) în vigoare la data reînnoirii. Când această dată cade într-o perioadă ale cărei norme nu sunt încă decise, cum este Real Decreto-ley 25/2026, verificarea nu alege: arată fiecare rezultat posibil și ce ar fi necesar să se întâmple pentru ca el să se aplice.',
+  'bills.guide.renewal_notice.title': 'Preavizul de o lună',
+  'bills.guide.renewal_notice.p1':
+    'Cu efecte de la 12-06-2026, Real Decreto 88/2026 recunoaște consumatorului de electricitate dreptul (art. 6.1.m):',
+  'bills.guide.renewal_notice.p2':
+    'Verificarea numără zilele dintre data scrisorii și cea a reînnoirii și se uită dacă scrisoarea a sosit separat de factură. O scrisoare datată înainte de 12-06-2026 nu se verifică după această regulă, care se aplică din acea zi. Conținutul pe care trebuie să îl aibă notificarea va fi stabilit printr-un ordin ministerial (orden ministerial) pe care nu l-am găsit încă, și nu se verifică.',
+  'bills.guide.renewal_exit.title': 'Ieșirea din contract',
+  'bills.guide.renewal_exit.p1':
+    'O persoană cu tariful 2.0TD își poate rezilia contractul în orice moment fără penalitate, cu excepția unui contract cu preț fix înainte de prima lui prelungire anuală. În acest caz, penalitatea nu poate depăși 5 % din energia estimată rămasă de furnizat, iar pierderea trebuie dovedită de furnizor (Real Decreto 88/2026, art. 28.3).',
+  'bills.guide.renewal_exit.p2':
+    'Pe baza a ceea ce spui despre contractul tău, verificarea arată dacă, potrivit acelei norme, se poate aplica o penalitate. Nu calculează valoarea penalității.',
+  'bills.guide.renewal.unchecked.gas':
+    'Gazul: chiar dacă scrisoarea îl tratează și pe el, se verifică doar partea de electricitate.',
+  'bills.guide.renewal.unchecked.scope':
+    'Punctele de consum de peste 15 kW și cele ale firmelor: verificarea este pentru locuințe cu tariful 2.0TD.',
+  'bills.faq.renewal.notice': 'Cu cât timp înainte trebuie să fiu anunțat de reînnoire?',
+  'bills.faq.renewal.notice_answer':
+    'Dacă furnizorul vrea să modifice condițiile contractului, trebuie să anunțe în scris și separat de factura sa, cu cel puțin o lună înainte, și să informeze despre dreptul de a rezilia contractul fără niciun cost (Real Decreto 88/2026, art. 6.1.m, cu efecte de la 12-06-2026). Verificarea numără zilele dintre scrisoare și reînnoire; conținutul pe care trebuie să îl aibă notificarea va fi stabilit printr-un ordin ministerial (orden ministerial) pe care nu l-am găsit încă.',
+  'bills.faq.renewal.exit': 'Mi se poate percepe ceva dacă plec după scrisoare?',
+  'bills.faq.renewal.exit_answer':
+    'O persoană cu tariful 2.0TD își poate rezilia contractul de electricitate în orice moment fără penalitate, cu excepția unui contract cu preț fix înainte de prima lui prelungire anuală. În acest caz, penalitatea nu poate depăși 5 % din energia estimată rămasă de furnizat, iar pierderea trebuie dovedită de furnizor (Real Decreto 88/2026, art. 28.3). Verificarea nu controlează termenele pe care le stabilește scrisoarea pentru a comunica rezilierea sau opoziția la reînnoire.',
+  'bills.faq.renewal.regulated': 'Ce parte din preț este reglementată?',
+  'bills.faq.renewal.regulated_answer':
+    'Tarifele de acces pentru transport și distribuție (peajes), stabilite de CNMC, și taxele sistemului (cargos), stabilite de Minister, sunt incluse în prețul puterii și al energiei și sunt aceleași la orice furnizor. Verificarea le separă, la data reînnoirii, de ce adaugă furnizorul.',
+  'bills.faq.renewal.pvpc': 'De ce apare PVPC?',
+  'bills.faq.renewal.pvpc_answer':
+    'Pentru că este prețul reglementat de referință, publicat oră de oră. Verificarea calculează cât ar fi costat ultimele 12 luni publicate cu consumul și puterea ta, ca medie simplă a orelor, și pune rezultatul lângă prețurile noi din scrisoare. Este un termen de comparație, nu o recomandare.',
+  'bills.faq.renewal.documents': 'Ce se întâmplă cu scrisoarea mea?',
+  'bills.faq.renewal.documents_answer':
+    'Dacă încarci scrisoarea, ea este trimisă criptat la un server Amazon Web Services din Spania, care o transmite unui model de IA (Claude, de la Anthropic, prin Amazon Bedrock) în Uniunea Europeană. Modelul de IA are instrucțiuni să nu copieze nume, DNI, adrese, telefoane, e-mailuri sau conturi. Nu se păstrează nimic. Această verificare este gratuită și nu cere niciun permis. Dacă preferi să nu încarci nimic, poți scrie datele, iar nimic nu iese de pe dispozitivul tău.',
   'bills.telecom.form_aria': 'Verificarea perioadei tale minime de contract și a rezilierii',
   'bills.telecom.tab.permanencia': 'Contract',
   'bills.telecom.tab.baja': 'Reziliere',
@@ -4747,6 +4871,122 @@ export const ro: Translation = {
   'client.bills.telecom.deadline.rule':
     'Dacă operatorul te anunță despre o modificare a condițiilor contractului, legea îți permite să reziliezi în luna de după anunț fără să plătești penalitatea pentru perioada minimă de contract; ți se mai poate percepe doar terminalul subvenționat pe care îl păstrezi.',
   'client.bills.telecom.deadline.ends': 'Luna de după anunț se încheie pe {fecha}.',
+  'client.bills.renewal.documents.not_renewal':
+    'Documentul nu pare o reînnoire de prețuri: verifică dacă este scrisoarea pe care voiai să o analizezi.',
+  'client.bills.renewal.unit.per_kw_year': '{n} €/kW·an',
+  'client.bills.renewal.unit.per_kwh': '{n} €/kWh',
+  'client.bills.renewal.lead.ok':
+    'Cu prețurile din scrisoare, un an de electricitate fără taxe trece de la {antes} la {despues} ({porcentaje}).',
+  'client.bills.renewal.lead.no_consumption':
+    'Scrisoarea nu indică consumul anual, așa că nu i se poate recalcula costul. Restul se verifică.',
+  'client.bills.renewal.lead.needs_period_use':
+    'Prețurile din scrisoare sunt pe intervale și nu știm cât consumi în fiecare, așa că nu i se recalculează costul. Restul se verifică.',
+  'client.bills.renewal.title.cost': 'Socotelile scrisorii',
+  'client.bills.renewal.title.split': 'Ce parte din prețuri este reglementată',
+  'client.bills.renewal.title.pvpc': 'Comparat cu PVPC',
+  'client.bills.renewal.title.notice': 'Preavizul',
+  'client.bills.renewal.title.exit': 'Ieșirea din contract',
+  'client.bills.renewal.title.unchecked': 'Ce nu analizează această verificare',
+  'client.bills.renewal.cost.no_consumption':
+    'Fără consumul anual nu se poate recalcula costul din scrisoare.',
+  'client.bills.renewal.cost.needs_period_use':
+    'Cu prețuri ale energiei pe intervale este nevoie de consumul din fiecare interval, pe care scrisoarea nu îl indică. Nu îl inventăm.',
+  'client.bills.renewal.cost.current': 'Costul anual actual, fără taxe: {importe}.',
+  'client.bills.renewal.cost.next': 'Costul anual cu prețurile noi, fără taxe: {importe}.',
+  'client.bills.renewal.cost.rise': 'Variație: {porcentaje}.',
+  'client.bills.renewal.cost.matches':
+    'Scrisoarea declară {declarado} fără taxe: coincide cu recalcularea, cu o diferență mai mică de 1 €.',
+  'client.bills.renewal.cost.mismatch':
+    'Scrisoarea declară {declarado} fără taxe, iar recalcularea dă {calculado}: diferența este mai mare de 1 €.',
+  'client.bills.renewal.taxes.missing':
+    'Nu avem cotele impozitului pe electricitate și ale TVA din {fecha}, așa că nu calculăm costul cu taxe.',
+  'client.bills.renewal.taxes.ok':
+    'Cu taxele din {fecha} ({impuesto} impozit pe electricitate și {iva} TVA): {importe}.',
+  'client.bills.renewal.taxes.declared_matches': 'Scrisoarea declară {importe} cu taxe: coincide.',
+  'client.bills.renewal.taxes.declared_differs':
+    'Scrisoarea declară {importe} cu taxe: nu coincide cu calculul nostru.',
+  'client.bills.renewal.taxes.conditional':
+    'Taxele din {fecha} depind de ce se decide privind: {normas}. Nu alegem un rezultat: acestea sunt cele posibile.',
+  'client.bills.renewal.taxes.option':
+    '{importe} cu taxe, cu {impuesto} impozit pe electricitate și {iva} TVA, în aceste cazuri:',
+  'client.bills.renewal.taxes.if': 'dacă {condiciones}',
+  'client.bills.renewal.taxes.cond_met':
+    'se îndeplinește condiția din {norma} ({condicion}; se va ști în jurul datei de {fecha})',
+  'client.bills.renewal.taxes.cond_not_met':
+    'nu se îndeplinește condiția din {norma} ({condicion}; se va ști în jurul datei de {fecha})',
+  'client.bills.renewal.taxes.cond_again': 'nu se îndeplinește acea condiție',
+  'client.bills.renewal.taxes.decided_by': 'în funcție de ce se decide privind {norma}',
+  'client.bills.renewal.taxes.convalidated': 'Congresul validează {norma}',
+  'client.bills.renewal.taxes.not_convalidated': 'Congresul nu validează {norma}',
+  'client.bills.renewal.taxes.not_convalidated_again': 'Congresul nu îl validează',
+  'client.bills.renewal.taxes.option_rest':
+    '{importe} cu taxe, cu {impuesto} impozit pe electricitate și {iva} TVA, în celelalte cazuri.',
+  'client.bills.renewal.taxes.rates': '{impuesto} impozit pe electricitate și {iva} TVA',
+  'client.bills.renewal.taxes.or': ' sau ',
+  'client.bills.renewal.taxes.declared_option':
+    'Scrisoarea declară {importe} cu taxe, ceea ce coincide cu varianta cu {opciones}.',
+  'client.bills.renewal.taxes.declared_none':
+    'Scrisoarea declară {importe} cu taxe, ceea ce nu coincide cu niciuna dintre aceste variante.',
+  'client.bills.renewal.taxes.and': ' și ',
+  'client.bills.renewal.taxes.unknown':
+    'În aceste cazuri nu există o cotă de aplicat la {fecha}, iar costul cu taxe nu se poate calcula:',
+  'client.bills.renewal.split.intro':
+    'Partea reglementată sunt tarifele de acces și taxele (peajes y cargos) din {fecha}; restul îl adaugă furnizorul. Pentru fiecare componentă, cu prețul actual și cu cel nou:',
+  'client.bills.renewal.split.power_p1': 'Puterea P1',
+  'client.bills.renewal.split.power_p2': 'Puterea P2',
+  'client.bills.renewal.split.energy_p1': 'Energia P1',
+  'client.bills.renewal.split.energy_p2': 'Energia P2',
+  'client.bills.renewal.split.energy_p3': 'Energia P3',
+  'client.bills.renewal.split.row':
+    '{termino}: reglementat {regulado}; furnizorul, de la {antes} la {despues}.',
+  'client.bills.renewal.split.single_price':
+    'Scrisoarea dă un singur preț al energiei: se compară cu partea reglementată din fiecare interval.',
+  'client.bills.renewal.split.regulated_changed':
+    'Tarifele de acces și taxele se schimbă între data scrisorii și cea a reînnoirii: o parte din creștere vine din partea reglementată.',
+  'client.bills.renewal.split.regulated_same':
+    'Creșterea nu vine din partea reglementată: tarifele de acces și taxele sunt aceleași la ambele date.',
+  'client.bills.renewal.split.regulated_unknown':
+    'Nu avem tarifele de acces și taxele din {fecha}, așa că nu știm dacă partea reglementată se schimbă între cele două date.',
+  'client.bills.renewal.split.missing_table':
+    'Nu avem tarifele de acces și taxele din {fecha}, așa că partea reglementată nu se separă de ce adaugă furnizorul.',
+  'client.bills.renewal.split.conditional_one':
+    'Tarifele de acces și taxele de la acea dată depind de {normas}, care nu a fost încă decis, așa că nu se separă.',
+  'client.bills.renewal.split.conditional_many':
+    'Tarifele de acces și taxele de la acea dată depind de aceste norme, care nu au fost încă decise: {normas}. De aceea nu se separă.',
+  'client.bills.renewal.pvpc.no_data': 'Nu sunt încărcate prețuri PVPC pentru a face comparația.',
+  'client.bills.renewal.pvpc.no_consumption': 'Fără consumul anual nu se face comparația cu PVPC.',
+  'client.bills.renewal.pvpc.needs_period_use':
+    'Cu prețuri ale energiei pe intervale, pentru comparația cu PVPC este nevoie de consumul din fiecare interval, iar scrisoarea nu îl indică.',
+  'client.bills.renewal.pvpc.annual':
+    'Cu consumul și puterea ta, PVPC de la {desde} la {hasta} ar fi costat {importe} pe an, fără taxe.',
+  'client.bills.renewal.pvpc.next': 'Prețurile noi din scrisoare costă {importe} pe an, fără taxe.',
+  'client.bills.renewal.pvpc.difference': 'Diferența (scrisoarea minus PVPC): {diferencia}.',
+  'client.bills.renewal.pvpc.average':
+    'Este media simplă a tuturor orelor din acel interval, fără profilul de consum al REE.',
+  'client.bills.renewal.pvpc.doubt': 'Marja PVPC poate fi depășită: {motivo}.',
+  'client.bills.renewal.pvpc.informative': 'Este un termen de comparație, nu o recomandare.',
+  'client.bills.renewal.notice.meets':
+    'Preavizul este respectat: {dias} între scrisoare ({carta}) și reînnoire ({renovacion}), iar scrisoarea a sosit separat de factură.',
+  'client.bills.renewal.notice.short':
+    'Preavizul nu ajunge la o lună: {dias} între scrisoare ({carta}) și reînnoire ({renovacion}).',
+  'client.bills.renewal.notice.separate_unknown':
+    'Data atinge luna de preaviz: {dias} între scrisoare ({carta}) și reînnoire ({renovacion}). Nu știm dacă scrisoarea a sosit separat de factură, așa că nu considerăm notificarea respectată.',
+  'client.bills.renewal.notice.not_checked_before':
+    'Scrisoarea este din {carta}, înainte de {desde}, când a început să se aplice această normă. Această verificare nu analizează preavizul scrisorilor anterioare acelei date.',
+  'client.bills.renewal.notice.not_separate':
+    'Scrisoarea a venit împreună cu factura, iar norma cere notificarea în scris și separat de aceasta.',
+  'client.bills.renewal.exit.free':
+    'Din ce ai spus, rezilierea nu atrage penalitate: o persoană cu tariful 2.0TD poate rezilia contractul și prelungirile lui în orice moment fără penalitate, cu excepția prețului fix înainte de prima prelungire anuală.',
+  'client.bills.renewal.exit.penalty_possible':
+    'Cu preț fix și înainte de prima prelungire anuală, penalitatea poate ajunge, cel mult, la {porcentaje} din energia rămasă de furnizat.',
+  'client.bills.renewal.exit.unknown':
+    'Nu știm dacă prețul este fix și nici dacă este prima reînnoire, iar de asta depinde dacă există penalitate: ea este posibilă doar cu preț fix înainte de prima prelungire anuală.',
+  'client.bills.renewal.unchecked.content':
+    'Conținutul pe care trebuie să îl aibă notificarea: va fi stabilit printr-un ordin ministerial pe care nu l-am găsit încă.',
+  'client.bills.renewal.unchecked.deadlines':
+    'Termenele pe care le cere scrisoarea pentru a comunica rezilierea sau opoziția la reînnoire.',
+  'client.bills.renewal.unchecked.other':
+    'Alte condiții ale contractului și partea de gaz, dacă scrisoarea o tratează și pe ea.',
   'client.bills.result.lead_out_of_scope': 'Această verificare nu acoperă încă ce ai introdus.',
   'client.bills.pass.issued':
     'Plata a fost primită. Acum poți descărca raportul și, dacă verificarea ta are cifre pentru ea, scrisoarea.',

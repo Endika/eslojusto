@@ -4061,6 +4061,12 @@ export const ar: Translation = {
   'bills.hub.telecom': 'فترة الالتزام',
   'bills.hub.telecom_situation': 'تغادر شركة الهاتف المحمول أو الإنترنت: الغرامة وما يُحصَّل منك',
   'bills.hub.telecom_citation': 'Ley 11/2022 · TRLGDCU, art. 62.5 · Real Decreto 899/2009',
+  'bills.hub.renewal': 'التجديد',
+  'bills.hub.renewal_situation':
+    'تصلك رسالة تجديد عقد الكهرباء \u2068(carta de renovación)\u2069: ما الذي يتغيّر، وما هو منظَّم، وما يقوله النص القانوني عن الإشعار',
+  'bills.hub.renewal_citation': 'Real Decreto 88/2026 · Real Decreto-ley 25/2026',
+  'bills.lead_renewal':
+    'ثلاث مراجعات: فاتورة الكهرباء، سطرًا سطرًا؛ ورسالة تجديد عقد الكهرباء \u2068(carta de renovación)\u2069؛ والغرامة وإلغاء الاشتراك في عقد الهاتف المحمول أو الإنترنت.',
   'bills.beta': 'تجريبي \u2068(Beta)\u2069',
   'bills.beta_note':
     'قسم قيد التجربة. تأتي الأرقام مما تكتبه، ومن الجداول الرسمية، ومن النص القانوني.',
@@ -4363,6 +4369,123 @@ export const ar: Translation = {
   'bills.telecom.h1': 'فترة الالتزام وإلغاء الاشتراك في الهاتف المحمول أو الإنترنت',
   'bills.telecom.lead':
     'بتواريخ عقدك ومبالغه: الغرامة التي يسمح بها القانون إذا غادرت قبل الأوان، وما إذا كان تغيير في الشروط يتيح لك المغادرة دون غرامة، وما إذا كانت تُحصَّل منك أيام بعد إلغاء الاشتراك.',
+  'bills.renewal.form_aria': 'مراجعة رسالة تجديد عقد الكهرباء',
+  'bills.renewal.question.fechas': 'تواريخ الرسالة',
+  'bills.renewal.question.potencia': 'قدرتك المتعاقد عليها',
+  'bills.renewal.question.potencia-actual': 'السعر الحالي للقدرة',
+  'bills.renewal.question.potencia-nueva': 'السعر الجديد للقدرة',
+  'bills.renewal.question.energia': 'أسعار الطاقة',
+  'bills.renewal.question.energia-actual': 'السعر الحالي للطاقة',
+  'bills.renewal.question.energia-nueva': 'السعر الجديد للطاقة',
+  'bills.renewal.question.consumo': 'الاستهلاك السنوي',
+  'bills.renewal.question.carta': 'التكلفة التي تذكرها الرسالة',
+  'bills.renewal.question.contrato': 'عقدك',
+  'bills.renewal.question.envio': 'كيف وصلتك الرسالة',
+  'bills.renewal.letter_date': 'تاريخ الرسالة',
+  'bills.renewal.letter_date_hint': 'التاريخ المكتوب على الرسالة أو الإشعار.',
+  'bills.renewal.renewal_date': 'تاريخ التجديد',
+  'bills.renewal.renewal_date_hint': 'اليوم الذي تسري منه الأسعار الجديدة.',
+  'bills.renewal.power_kw_p1': 'القدرة المتعاقد عليها في P1 \u2068(kW)\u2069',
+  'bills.renewal.power_kw_p2': 'القدرة المتعاقد عليها في P2 \u2068(kW)\u2069',
+  'bills.renewal.power_unit': 'بأي وحدة تذكر الرسالة سعر القدرة؟',
+  'bills.renewal.power_unit_hint': 'تأتي بجانب السعر.',
+  'bills.renewal.power_unit.per_kw_day': '€/kW في اليوم',
+  'bills.renewal.power_unit.per_kw_year': '€/kW في السنة',
+  'bills.renewal.price_hint': 'كما يظهر في الرسالة، بكل الخانات العشرية.',
+  'bills.renewal.current_power_p1': 'السعر الحالي للقدرة P1',
+  'bills.renewal.current_power_p2': 'السعر الحالي للقدرة P2',
+  'bills.renewal.next_power_p1': 'السعر الجديد للقدرة P1',
+  'bills.renewal.next_power_p2': 'السعر الجديد للقدرة P2',
+  'bills.renewal.energy_pricing': 'كم سعرًا للطاقة تذكر الرسالة؟',
+  'bills.renewal.energy_pricing.single': 'سعر واحد فقط، لكل الساعات',
+  'bills.renewal.energy_pricing.periods': 'سعر لكل فترة \u2068(P1, P2, P3)\u2069',
+  'bills.renewal.current_energy': 'السعر الحالي للطاقة \u2068(€/kWh)\u2069',
+  'bills.renewal.next_energy': 'السعر الجديد للطاقة \u2068(€/kWh)\u2069',
+  'bills.renewal.current_energy_p1': 'السعر الحالي للطاقة P1 \u2068(€/kWh)\u2069',
+  'bills.renewal.current_energy_p2': 'السعر الحالي للطاقة P2 \u2068(€/kWh)\u2069',
+  'bills.renewal.current_energy_p3': 'السعر الحالي للطاقة P3 \u2068(€/kWh)\u2069',
+  'bills.renewal.next_energy_p1': 'السعر الجديد للطاقة P1 \u2068(€/kWh)\u2069',
+  'bills.renewal.next_energy_p2': 'السعر الجديد للطاقة P2 \u2068(€/kWh)\u2069',
+  'bills.renewal.next_energy_p3': 'السعر الجديد للطاقة P3 \u2068(€/kWh)\u2069',
+  'bills.renewal.annual_kwh': 'الاستهلاك السنوي الذي تعتمده الرسالة \u2068(kWh)\u2069',
+  'bills.renewal.annual_kwh_hint': 'إذا لم تذكره الرسالة، اتركه فارغًا: لن يُعاد حساب تكلفتها.',
+  'bills.renewal.declared_without_tax':
+    'التكلفة السنوية بالأسعار الجديدة، دون ضرائب \u2068(€)\u2069',
+  'bills.renewal.declared_with_tax': 'التكلفة السنوية بالأسعار الجديدة، مع الضرائب \u2068(€)\u2069',
+  'bills.renewal.declared_hint': 'اختياري. تُقارَن بإعادة حسابنا.',
+  'bills.renewal.fixed_price': 'هل هو عقد بسعر ثابت؟',
+  'bills.renewal.first_renewal': 'هل هو التجديد السنوي الأول؟',
+  'bills.renewal.first_renewal_hint': 'التمديد الأول \u2068(prórroga)\u2069 بعد السنة الأولى.',
+  'bills.renewal.separate_from_bill': 'هل وصلتك الرسالة منفصلة عن الفاتورة؟',
+  'bills.renewal.separate_from_bill_hint':
+    'بالبريد أو برسالة إلكترونية خاصة بها، لا داخل فاتورة ولا مرفقة بها.',
+  'bills.renewal.app_name': 'مراجعة رسالة تجديد عقد الكهرباء',
+  'bills.renewal.crumb': 'التجديد',
+  'bills.renewal.title': 'راجِع رسالة تجديد عقد الكهرباء',
+  'bills.renewal.description':
+    'أعِد حساب ما يتغيّر بالأسعار الجديدة في رسالة تجديد عقد الكهرباء \u2068(carta de renovación)\u2069، والجزء المنظَّم منها، ومقارنتها بتعرفة PVPC (التعرفة المنظَّمة)، وضرائب التاريخ، والإشعار المسبق، والخروج من العقد.',
+  'bills.renewal.h1': 'رسالة تجديد عقد الكهرباء، مع حساباتها',
+  'bills.renewal.lead':
+    'بأسعار رسالتك: كم تتغيّر تكلفة سنة دون ضرائب، وأي جزء من الأسعار منظَّم، وكيف تقارَن بتعرفة PVPC، وضرائب التاريخ، وهل يستوفي الإشعار المسبق المهلة، وما يقوله النص القانوني عن الخروج من العقد. للمنازل بتعرفة 2.0TD، حتى 15 kW.',
+  'bills.renewal.tab.fechas': 'التواريخ',
+  'bills.renewal.tab.potencia': 'الأسعار',
+  'bills.renewal.tab.consumo': 'الاستهلاك',
+  'bills.renewal.tab.resultado': 'النتيجة',
+  'bills.renewal.documents.start_help':
+    'يمكنك رفع رسالة التجديد \u2068(carta de renovación)\u2069 لملء البيانات بما يُقرأ فيها، أو كتابتها بنفسك. وقبل مراجعة أي شيء، تؤكّد كل معلومة.',
+  'bills.renewal.documents.upload': 'ارفع رسالة التجديد',
+  'bills.renewal.documents.files_hint':
+    'جميع صفحات الرسالة أو إشعار تغيير الأسعار الخاص بعقد الكهرباء. حتى 25 صورة أو صفحة PDF في المجموع. تتحوّل الصور وصفحات ملفات PDF إلى صور على جهازك قبل إرسالها.',
+  'bills.guide.renewal.title': 'ما الذي تتحقق منه مراجعة رسالة التجديد',
+  'bills.guide.renewal.lead':
+    'كيف تُعاد حساب التكلفة بأسعار الرسالة، وأي جزء من الأسعار منظَّم، وتعرفة PVPC كمعطى للمقارنة، وضرائب تاريخ التجديد، والإشعار المسبق، والخروج من العقد، مع النص القانوني الذي يأتي منه كل أمر.',
+  'bills.guide.renewal_checks.title': 'حسابات الرسالة',
+  'bills.guide.renewal_checks.p1':
+    'تعيد المراجعة حساب سنة من الكهرباء دون ضرائب مرتين، بالأسعار الحالية وبالأسعار الجديدة في الرسالة، بالقدرة نفسها والاستهلاك السنوي نفسه، وتعرض الفرق باليورو وبالنسبة المئوية. وإذا ذكرت الرسالة تكلفتها الخاصة، تقارنها بإعادة الحساب وتقول هل تتطابقان.',
+  'bills.guide.renewal_checks.p2':
+    'إذا لم تذكر الرسالة الاستهلاك السنوي، أو ذكرت أسعار الطاقة حسب الفترات دون استهلاك كل فترة، فلا يمكن إعادة حساب التكلفة، وتقول المراجعة ذلك بدل أن تفترضه. وتبقى بقية عمليات التحقق قائمة.',
+  'bills.guide.renewal_regulated.title': 'أي جزء من الأسعار منظَّم',
+  'bills.guide.renewal_regulated.p1':
+    'تتضمّن أسعار القدرة والطاقة رسوم الوصول \u2068(peajes)\u2069 للنقل والتوزيع، التي تحدّدها CNMC، وأعباء النظام \u2068(cargos)\u2069، التي تحدّدها الوزارة. وهي متساوية مع أي شركة تسويق للكهرباء \u2068(comercializadora)\u2069؛ وما يتبقّى حتى السعر المذكور في الرسالة تضعه شركة التسويق.',
+  'bills.guide.renewal_regulated.p2':
+    'تفصل المراجعة، لكل حصة، الجزء المنظَّم في تاريخ التجديد عمّا تضيفه شركة تسويق الكهرباء، بالسعر الحالي والسعر الجديد. وهكذا يتبيّن هل تأتي الزيادة من رسوم الوصول والأعباء أم من هامش شركة التسويق.',
+  'bills.guide.renewal_pvpc.title': 'تعرفة PVPC، كمعطى',
+  'bills.guide.renewal_pvpc.p1':
+    'تحسب المراجعة ما كانت ستكلّفه تعرفة PVPC (التعرفة المنظَّمة) في آخر 12 شهرًا منشورة، باستهلاكك وقدرتك، دون ضرائب، وتضعه بجانب الأسعار الجديدة. إنه المتوسط البسيط لكل ساعات الفترة، دون ملف الاستهلاك الصادر عن REE، فهو مرجع لا توقّع.',
+  'bills.guide.renewal_pvpc.p2':
+    'قد يكون هامش التسويق في تعرفة PVPC الذي يستخدمه الحساب غير محدَّث، وتنبّه المراجعة إلى ذلك. تعرفة PVPC معطى للمقارنة: لا توصي المراجعة بأي تعرفة ولا بأي شركة تسويق.',
+  'bills.guide.renewal_taxes.title': 'ضرائب التاريخ',
+  'bills.guide.renewal_taxes.p1':
+    'تُحسب التكلفة مع الضرائب بالضريبة الخاصة على الكهرباء \u2068(impuesto eléctrico)\u2069 وضريبة القيمة المضافة \u2068(IVA)\u2069 الساريتين في تاريخ التجديد. وعندما يقع هذا التاريخ في فترة لم تُحسم نصوصها القانونية بعد، مثل Real Decreto-ley 25/2026، لا تختار المراجعة: بل تعرض كل نتيجة ممكنة وما يجب أن يحدث كي تسري.',
+  'bills.guide.renewal_notice.title': 'الإشعار المسبق بشهر',
+  'bills.guide.renewal_notice.p1':
+    'اعتبارًا من 12-06-2026، يعترف Real Decreto 88/2026 لمن يستهلك الكهرباء بالحق في \u2068(art. 6.1.m)\u2069:',
+  'bills.guide.renewal_notice.p2':
+    'تعدّ المراجعة الأيام بين تاريخ الرسالة وتاريخ التجديد، وتنظر هل وصلت الرسالة منفصلة عن الفاتورة. الرسالة المؤرَّخة قبل 12-06-2026 لا يُتحقَّق منها بهذه القاعدة، التي تسري منذ ذلك اليوم. أمّا المحتوى الذي يجب أن يتضمّنه الإشعار فسيحدّده أمر وزاري \u2068(orden ministerial)\u2069 لم نعثر عليه بعد، ولا يُتحقَّق منه.',
+  'bills.guide.renewal_exit.title': 'الخروج من العقد',
+  'bills.guide.renewal_exit.p1':
+    'يمكن لمن لديه تعرفة 2.0TD أن يترك عقده في أي وقت دون غرامة، باستثناء العقد بسعر ثابت قبل تمديده السنوي الأول. وفي هذه الحالة، لا يمكن أن تتجاوز الغرامة 5 % من الطاقة المقدَّرة المتبقية للتزويد، ويقع على شركة تسويق الكهرباء إثبات الخسارة \u2068(Real Decreto 88/2026, art. 28.3)\u2069.',
+  'bills.guide.renewal_exit.p2':
+    'بناءً على ما تذكره عن عقدك، تقول المراجعة هل تنطبق غرامة وفق هذا النص. ولا تحسب مبلغ الغرامة.',
+  'bills.guide.renewal.unchecked.gas':
+    'الغاز: حتى لو تناولته الرسالة أيضًا، لا يُراجَع إلا جزء الكهرباء.',
+  'bills.guide.renewal.unchecked.scope':
+    'نقاط التزويد التي تزيد على 15 kW ونقاط تزويد الشركات: المراجعة مخصّصة للمنازل بتعرفة 2.0TD.',
+  'bills.faq.renewal.notice': 'قبل كم من الوقت يجب إشعاري بالتجديد؟',
+  'bills.faq.renewal.notice_answer':
+    'إذا أرادت شركة تسويق الكهرباء تغيير شروط العقد، يتعيّن عليها الإشعار كتابةً وبشكل منفصل عن فاتورتها، قبل شهر على الأقل، والإعلام بالحق في فسخ العقد دون أي تكلفة \u2068(Real Decreto 88/2026, art. 6.1.m)\u2069، اعتبارًا من 12-06-2026. تعدّ المراجعة الأيام بين الرسالة والتجديد؛ أمّا المحتوى الذي يجب أن يتضمّنه الإشعار فسيحدّده أمر وزاري \u2068(orden ministerial)\u2069 لم نعثر عليه بعد.',
+  'bills.faq.renewal.exit': 'هل يمكن أن يُحصَّل مني شيء إذا غادرت بعد الرسالة؟',
+  'bills.faq.renewal.exit_answer':
+    'يمكن لمن لديه تعرفة 2.0TD أن يترك عقد الكهرباء في أي وقت دون غرامة، باستثناء العقد بسعر ثابت قبل تمديده السنوي الأول. وفي هذه الحالة، لا يمكن أن تتجاوز الغرامة 5 % من الطاقة المقدَّرة المتبقية للتزويد، ويقع على شركة تسويق الكهرباء إثبات الخسارة \u2068(Real Decreto 88/2026, art. 28.3)\u2069. ولا تتحقق المراجعة من المُهَل التي تحدّدها الرسالة للإبلاغ عن إلغاء العقد أو الاعتراض على التجديد.',
+  'bills.faq.renewal.regulated': 'أي جزء من السعر منظَّم؟',
+  'bills.faq.renewal.regulated_answer':
+    'رسوم الوصول \u2068(peajes)\u2069 للنقل والتوزيع، التي تحدّدها CNMC، وأعباء النظام \u2068(cargos)\u2069، التي تحدّدها الوزارة، مُدرَجة في سعر القدرة وسعر الطاقة، وهي متساوية مع أي شركة تسويق للكهرباء. وتفصلها المراجعة، في تاريخ التجديد، عمّا تضيفه شركة التسويق.',
+  'bills.faq.renewal.pvpc': 'لماذا تظهر تعرفة PVPC؟',
+  'bills.faq.renewal.pvpc_answer':
+    'لأنها السعر المنظَّم المرجعي، وتُنشَر ساعةً بساعة. تحسب المراجعة ما كانت ستكلّفه في آخر 12 شهرًا منشورة باستهلاكك وقدرتك، كمتوسط بسيط للساعات، وتضعه بجانب الأسعار الجديدة في الرسالة. إنه معطى للمقارنة، لا توصية.',
+  'bills.faq.renewal.documents': 'ماذا يحدث لرسالتي؟',
+  'bills.faq.renewal.documents_answer':
+    'إذا رفعت الرسالة، فإنها تُرسَل مشفّرة إلى خادم تابع لـAmazon Web Services في إسبانيا، يمرّرها إلى نموذج ذكاء اصطناعي (Claude، من Anthropic، عبر Amazon Bedrock) داخل الاتحاد الأوروبي. ولدى نموذج الذكاء الاصطناعي تعليمات بألّا ينسخ الأسماء، ولا أرقام DNI، ولا العناوين، ولا الهواتف، ولا عناوين البريد الإلكتروني، ولا الحسابات. لا يُحفَظ شيء. هذه المراجعة مجانية ولا تطلب أي تصريح. إذا فضّلت ألّا ترفع شيئًا، يمكنك كتابة البيانات بنفسك، ولا يغادر جهازك شيء.',
   'bills.telecom.form_aria': 'مراجعة فترة الالتزام وإلغاء الاشتراك',
   'bills.telecom.tab.permanencia': 'العقد',
   'bills.telecom.tab.baja': 'إلغاء الاشتراك',
@@ -4628,6 +4751,124 @@ export const ar: Translation = {
   'client.bills.telecom.deadline.rule':
     'إذا أخطرتك شركتك بتغيير في شروط العقد، يسمح لك القانون بإلغاء الاشتراك خلال الشهر التالي للإخطار دون دفع غرامة فترة الالتزام؛ ولا يمكن أن يُحصَّل منك بعد ذلك إلا الجهاز المدعوم الذي تحتفظ به.',
   'client.bills.telecom.deadline.ends': 'ينتهي الشهر التالي للإخطار في {fecha}.',
+  'client.bills.renewal.documents.not_renewal':
+    'لا يبدو أن المستند تجديد للأسعار: تحقّق من أنه الرسالة التي أردت مراجعتها.',
+  'client.bills.renewal.unit.per_kw_year': '{n} €/kW·سنة',
+  'client.bills.renewal.unit.per_kwh': '{n} €/kWh',
+  'client.bills.renewal.lead.ok':
+    'بأسعار الرسالة، تنتقل تكلفة سنة من الكهرباء دون ضرائب من {antes} إلى {despues} \u2068({porcentaje})\u2069.',
+  'client.bills.renewal.lead.no_consumption':
+    'لا تذكر الرسالة الاستهلاك السنوي، ولذلك لا يمكن إعادة حساب تكلفتها. أمّا البقية فتُراجَع.',
+  'client.bills.renewal.lead.needs_period_use':
+    'أسعار الرسالة حسب الفترات ولا نعرف كم تستهلك في كل فترة، ولذلك لا تُعاد حساب تكلفتها. أمّا البقية فتُراجَع.',
+  'client.bills.renewal.title.cost': 'حسابات الرسالة',
+  'client.bills.renewal.title.split': 'أي جزء من الأسعار منظَّم',
+  'client.bills.renewal.title.pvpc': 'مقارنةً بتعرفة PVPC',
+  'client.bills.renewal.title.notice': 'الإشعار المسبق',
+  'client.bills.renewal.title.exit': 'الخروج من العقد',
+  'client.bills.renewal.title.unchecked': 'ما لا تتحقق منه هذه المراجعة',
+  'client.bills.renewal.cost.no_consumption':
+    'دون الاستهلاك السنوي لا يمكن إعادة حساب تكلفة الرسالة.',
+  'client.bills.renewal.cost.needs_period_use':
+    'مع أسعار طاقة حسب الفترات، يلزم استهلاك كل فترة، والرسالة لا تذكره. ولا نختلقه.',
+  'client.bills.renewal.cost.current': 'التكلفة السنوية الحالية، دون ضرائب: {importe}.',
+  'client.bills.renewal.cost.next': 'التكلفة السنوية بالأسعار الجديدة، دون ضرائب: {importe}.',
+  'client.bills.renewal.cost.rise': 'التغيّر: {porcentaje}.',
+  'client.bills.renewal.cost.matches':
+    'تذكر الرسالة {declarado} دون ضرائب: يتطابق مع إعادة الحساب، بفرق أقل من 1 €.',
+  'client.bills.renewal.cost.mismatch':
+    'تذكر الرسالة {declarado} دون ضرائب، وتعطي إعادة الحساب {calculado}: الفرق أكثر من 1 €.',
+  'client.bills.renewal.taxes.missing':
+    'ليست لدينا نسب الضريبة الخاصة على الكهرباء وضريبة القيمة المضافة في {fecha}، ولذلك لا نحسب التكلفة مع الضرائب.',
+  'client.bills.renewal.taxes.ok':
+    'مع ضرائب {fecha} ({impuesto} ضريبة خاصة على الكهرباء و{iva} ضريبة القيمة المضافة): {importe}.',
+  'client.bills.renewal.taxes.declared_matches': 'تذكر الرسالة {importe} مع الضرائب: يتطابق.',
+  'client.bills.renewal.taxes.declared_differs':
+    'تذكر الرسالة {importe} مع الضرائب: لا يتطابق مع حسابنا.',
+  'client.bills.renewal.taxes.conditional':
+    'تتوقّف ضرائب {fecha} على ما يُقرَّر بشأن: {normas}. لا نختار نتيجة: هذه هي النتائج الممكنة.',
+  'client.bills.renewal.taxes.option':
+    '{importe} مع الضرائب، بنسبة {impuesto} ضريبة خاصة على الكهرباء و{iva} ضريبة القيمة المضافة، في هذه الحالات:',
+  'client.bills.renewal.taxes.if': 'إذا {condiciones}',
+  'client.bills.renewal.taxes.cond_met': 'تحقّق شرط {norma} ({condicion}؛ سيُعرَف حوالي {fecha})',
+  'client.bills.renewal.taxes.cond_not_met':
+    'لم يتحقّق شرط {norma} ({condicion}؛ سيُعرَف حوالي {fecha})',
+  'client.bills.renewal.taxes.cond_again': 'لم يتحقّق ذلك الشرط',
+  'client.bills.renewal.taxes.decided_by': 'بحسب ما يُقرَّر بشأن {norma}',
+  'client.bills.renewal.taxes.convalidated': 'صادق البرلمان \u2068(Congreso)\u2069 على {norma}',
+  'client.bills.renewal.taxes.not_convalidated':
+    'لم يصادق البرلمان \u2068(Congreso)\u2069 على {norma}',
+  'client.bills.renewal.taxes.not_convalidated_again': 'لم يصادق عليه البرلمان',
+  'client.bills.renewal.taxes.option_rest':
+    '{importe} مع الضرائب، بنسبة {impuesto} ضريبة خاصة على الكهرباء و{iva} ضريبة القيمة المضافة، في بقية الحالات.',
+  'client.bills.renewal.taxes.rates':
+    '{impuesto} ضريبة خاصة على الكهرباء و{iva} ضريبة القيمة المضافة',
+  'client.bills.renewal.taxes.or': ' أو ',
+  'client.bills.renewal.taxes.declared_option':
+    'تذكر الرسالة {importe} مع الضرائب، وهو ما يتطابق مع خيار {opciones}.',
+  'client.bills.renewal.taxes.declared_none':
+    'تذكر الرسالة {importe} مع الضرائب، وهو ما لا يتطابق مع أي من هذه الخيارات.',
+  'client.bills.renewal.taxes.and': ' و',
+  'client.bills.renewal.taxes.unknown':
+    'في هذه الحالات لا توجد نسبة تُطبَّق في {fecha}، ولا يمكن حساب التكلفة مع الضرائب:',
+  'client.bills.renewal.split.intro':
+    'الجزء المنظَّم هو رسوم الوصول والأعباء \u2068(peajes y cargos)\u2069 في {fecha}؛ والباقي تضيفه شركة تسويق الكهرباء. لكل حصة، بالسعر الحالي والسعر الجديد:',
+  'client.bills.renewal.split.power_p1': 'القدرة P1',
+  'client.bills.renewal.split.power_p2': 'القدرة P2',
+  'client.bills.renewal.split.energy_p1': 'الطاقة P1',
+  'client.bills.renewal.split.energy_p2': 'الطاقة P2',
+  'client.bills.renewal.split.energy_p3': 'الطاقة P3',
+  'client.bills.renewal.split.row':
+    '{termino}: الجزء المنظَّم {regulado}؛ شركة التسويق، من {antes} إلى {despues}.',
+  'client.bills.renewal.split.single_price':
+    'تذكر الرسالة سعرًا واحدًا للطاقة: يُقارَن بالجزء المنظَّم في كل فترة.',
+  'client.bills.renewal.split.regulated_changed':
+    'تتغيّر رسوم الوصول والأعباء بين تاريخ الرسالة وتاريخ التجديد: جزء من الزيادة يأتي من الجزء المنظَّم.',
+  'client.bills.renewal.split.regulated_same':
+    'لا تأتي الزيادة من الجزء المنظَّم: رسوم الوصول والأعباء هي نفسها في التاريخين.',
+  'client.bills.renewal.split.regulated_unknown':
+    'ليست لدينا رسوم الوصول والأعباء في {fecha}، ولذلك لا نعرف هل يتغيّر الجزء المنظَّم بين التاريخين.',
+  'client.bills.renewal.split.missing_table':
+    'ليست لدينا رسوم الوصول والأعباء في {fecha}، ولذلك لا يُفصَل الجزء المنظَّم عمّا تضيفه شركة التسويق.',
+  'client.bills.renewal.split.conditional_one':
+    'تتوقّف رسوم الوصول والأعباء في ذلك التاريخ على {normas}، الذي لم يُحسَم بعد، ولذلك لا تُفصَل.',
+  'client.bills.renewal.split.conditional_many':
+    'تتوقّف رسوم الوصول والأعباء في ذلك التاريخ على هذه النصوص القانونية، التي لم تُحسَم بعد: {normas}. ولذلك لا تُفصَل.',
+  'client.bills.renewal.pvpc.no_data': 'لا توجد أسعار PVPC محمَّلة لإجراء المقارنة.',
+  'client.bills.renewal.pvpc.no_consumption': 'دون الاستهلاك السنوي لا تُجرى المقارنة بتعرفة PVPC.',
+  'client.bills.renewal.pvpc.needs_period_use':
+    'مع أسعار طاقة حسب الفترات، يلزم استهلاك كل فترة للمقارنة بتعرفة PVPC، والرسالة لا تذكره.',
+  'client.bills.renewal.pvpc.annual':
+    'باستهلاكك وقدرتك، كانت تعرفة PVPC من {desde} إلى {hasta} ستكلّف {importe} في السنة، دون ضرائب.',
+  'client.bills.renewal.pvpc.next':
+    'تكلّف الأسعار الجديدة في الرسالة {importe} في السنة، دون ضرائب.',
+  'client.bills.renewal.pvpc.difference': 'الفرق (الرسالة ناقص PVPC): {diferencia}.',
+  'client.bills.renewal.pvpc.average':
+    'إنه المتوسط البسيط لكل ساعات تلك الفترة، دون ملف الاستهلاك الصادر عن REE.',
+  'client.bills.renewal.pvpc.doubt': 'قد يكون هامش تعرفة PVPC غير محدَّث: {motivo}.',
+  'client.bills.renewal.pvpc.informative': 'إنه معطى للمقارنة، لا توصية.',
+  'client.bills.renewal.notice.meets':
+    'الإشعار المسبق يستوفي المهلة: {dias} بين الرسالة ({carta}) والتجديد ({renovacion})، ووصلت الرسالة منفصلة عن الفاتورة.',
+  'client.bills.renewal.notice.short':
+    'الإشعار المسبق أقل من شهر: {dias} بين الرسالة ({carta}) والتجديد ({renovacion}).',
+  'client.bills.renewal.notice.separate_unknown':
+    'التاريخ يبلغ شهر الإشعار المسبق: {dias} بين الرسالة ({carta}) والتجديد ({renovacion}). لكننا لا نعرف هل وصلت الرسالة منفصلة عن الفاتورة، ولذلك لا نعدّ الإشعار مستوفيًا.',
+  'client.bills.renewal.notice.not_checked_before':
+    'الرسالة مؤرَّخة في {carta}، أي قبل {desde}، حين بدأ سريان هذا النص. ولا تتحقق هذه المراجعة من الإشعار المسبق في الرسائل السابقة لذلك التاريخ.',
+  'client.bills.renewal.notice.not_separate':
+    'جاءت الرسالة مع الفاتورة، والنص القانوني يشترط الإشعار كتابةً وبشكل منفصل عنها.',
+  'client.bills.renewal.exit.free':
+    'بناءً على ما ذكرته، لا يترتّب على الفسخ غرامة: يمكن لمن لديه تعرفة 2.0TD فسخ العقد وتمديداته في أي وقت دون غرامة، باستثناء السعر الثابت قبل التمديد السنوي الأول.',
+  'client.bills.renewal.exit.penalty_possible':
+    'مع سعر ثابت وقبل التمديد السنوي الأول، يمكن أن تصل الغرامة، كحدّ أقصى، إلى {porcentaje} من الطاقة المتبقية.',
+  'client.bills.renewal.exit.unknown':
+    'لا نعرف هل السعر ثابت ولا هل هو التجديد الأول، وعلى ذلك يتوقّف وجود الغرامة: فهي لا تجوز إلا مع سعر ثابت قبل التمديد السنوي الأول.',
+  'client.bills.renewal.unchecked.content':
+    'المحتوى الذي يجب أن يتضمّنه الإشعار: سيحدّده أمر وزاري \u2068(orden ministerial)\u2069 لم نعثر عليه بعد.',
+  'client.bills.renewal.unchecked.deadlines':
+    'المُهَل التي تطلبها الرسالة للإبلاغ عن إلغاء العقد أو الاعتراض على التجديد.',
+  'client.bills.renewal.unchecked.other':
+    'شروط أخرى في العقد، وجزء الغاز إذا تناولته الرسالة أيضًا.',
   'client.bills.result.lead_out_of_scope': 'لا تشمل هذه المراجعة بعدُ ما أدخلته.',
   'client.bills.pass.issued':
     'تم استلام الدفع. يمكنك الآن تنزيل التقرير، وإذا كانت في مراجعتك أرقام تخصّها، الرسالة.',
