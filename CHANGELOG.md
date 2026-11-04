@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.112.0](https://github.com/Endika/eslojusto/compare/v1.111.2...v1.112.0) (2026-11-04)
+
+
+### Features
+
+* **bills:** publish /facturas/renovacion/ ([ae7992c](https://github.com/Endika/eslojusto/commit/ae7992c0acb5ec5f52ae3042297fcf77c3f59369))
+
 ## [1.111.2](https://github.com/Endika/eslojusto/compare/v1.111.1...v1.111.2) (2026-11-04)
 
 
