@@ -18,7 +18,7 @@ export const MORTGAGE_BETA = true;
 
 // /facturas/, a household electricity bill and the exit from a phone or internet contract, opens
 // as a beta.
-export const BILLS_BETA = true;
+export const BILLS_BETA = false;
 
 // /facturas/renovacion/, the review of an electricity renewal letter, is built only when a build
 // asks for it, and then as a beta.
