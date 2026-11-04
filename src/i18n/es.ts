@@ -7092,9 +7092,13 @@ export const es = {
     'Los impuestos del {fecha} dependen de lo que se decida sobre: {normas}. No elegimos un resultado: estos son los posibles.',
   'client.bills.renewal.taxes.option':
     '{importe} con impuestos, con {impuesto} de impuesto eléctrico y {iva} de IVA, en estos casos:',
-  'client.bills.renewal.taxes.when_met': 'si se cumple {normas}',
-  'client.bills.renewal.taxes.when_not_met': 'si no se cumple {normas}',
-  'client.bills.renewal.taxes.and_not_met': 'no se cumple {normas}',
+  'client.bills.renewal.taxes.if': 'si {condiciones}',
+  'client.bills.renewal.taxes.met': 'se cumple {norma}',
+  'client.bills.renewal.taxes.not_met': 'no se cumple {norma}',
+  'client.bills.renewal.taxes.convalidated': 'se convalida {norma}',
+  'client.bills.renewal.taxes.not_convalidated': 'no se convalida {norma}',
+  'client.bills.renewal.taxes.option_rest':
+    '{importe} con impuestos, con {impuesto} de impuesto eléctrico y {iva} de IVA, en los demás casos.',
   'client.bills.renewal.taxes.rates': '{impuesto} de impuesto eléctrico y {iva} de IVA',
   'client.bills.renewal.taxes.or': ' o ',
   'client.bills.renewal.taxes.declared_option':
@@ -7103,7 +7107,7 @@ export const es = {
     'La carta declara {importe} con impuestos, que no coincide con ninguna de estas opciones.',
   'client.bills.renewal.taxes.and': ' y ',
   'client.bills.renewal.taxes.unknown':
-    'En algún caso de esas normas no hay tipo que aplicar a ese día, y ahí no se puede calcular el coste con impuestos.',
+    'En estos casos no hay tipo que aplicar al {fecha}, y no se puede calcular el coste con impuestos:',
   'client.bills.renewal.split.intro':
     'Lo regulado son los peajes y cargos del {fecha}; lo demás lo pone la comercializadora. Para cada término, con el precio actual y el nuevo:',
   'client.bills.renewal.split.power_p1': 'Potencia P1',
@@ -7123,8 +7127,10 @@ export const es = {
     'No tenemos los peajes y cargos del {fecha}, así que no sabemos si lo regulado cambia entre las dos fechas.',
   'client.bills.renewal.split.missing_table':
     'No tenemos los peajes y cargos del {fecha}, así que no se separa lo regulado de lo que pone la comercializadora.',
-  'client.bills.renewal.split.conditional':
+  'client.bills.renewal.split.conditional_one':
     'Los peajes y cargos de esa fecha dependen de {normas}, que todavía no se ha decidido, así que no se separan.',
+  'client.bills.renewal.split.conditional_many':
+    'Los peajes y cargos de esa fecha dependen de estas normas, que todavía no se han decidido: {normas}. Por eso no se separan.',
   'client.bills.renewal.pvpc.no_data':
     'No hay precios del PVPC cargados para hacer la comparación.',
   'client.bills.renewal.pvpc.no_consumption': 'Sin el consumo anual no se compara con el PVPC.',
@@ -7152,9 +7158,9 @@ export const es = {
   'client.bills.renewal.exit.free':
     'Con lo que has contado, rescindir no lleva penalización: una persona con la tarifa 2.0TD puede rescindir el contrato y sus prórrogas en cualquier momento sin penalización, salvo precio fijo antes de la primera prórroga anual.',
   'client.bills.renewal.exit.penalty_possible':
-    'Con precio fijo y antes de la primera prórroga anual, la penalización puede llegar, como mucho, al 5 % de la energía pendiente.',
+    'Con precio fijo y antes de la primera prórroga anual, la penalización puede llegar, como mucho, al {porcentaje} de la energía pendiente.',
   'client.bills.renewal.exit.unknown':
-    'No sabemos si el precio es fijo ni si es la primera renovación, y de eso depende si hay penalización: en precio fijo antes de la primera prórroga anual, hasta un 5 % de la energía pendiente.',
+    'No sabemos si el precio es fijo ni si es la primera renovación, y de eso depende si hay penalización: solo cabe en precio fijo antes de la primera prórroga anual.',
   'client.bills.renewal.unchecked.content':
     'El contenido que debe llevar el aviso: lo fijará una orden ministerial que aún no hemos localizado.',
   'client.bills.renewal.unchecked.deadlines':

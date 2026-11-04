@@ -5,10 +5,12 @@ const DOT_DECIMAL = /^\d+(\.\d+)?$/;
 // No field takes three decimals after a whole part, so it is refused rather than guessed.
 const AMBIGUOUS = /^[1-9]\d{0,2},\d{3}$/;
 
-export function parseAmount(text: string): number | null {
+// `commaIsDecimal` is for a field whose values are never thousands («3,464» kW, «18,372» €/kW),
+// where the ambiguous comma can only be a decimal one.
+export function parseAmount(text: string, commaIsDecimal = false): number | null {
   const t = text.replace(/[\s\u00a0\u202f€]/g, '');
   if (t === '') return null;
-  if (AMBIGUOUS.test(t)) return NaN;
+  if (!commaIsDecimal && AMBIGUOUS.test(t)) return NaN;
   if (t.includes(',')) {
     return WITH_COMMA.test(t) ? Number(t.replace(/\./g, '').replace(',', '.')) : NaN;
   }

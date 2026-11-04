@@ -12,7 +12,8 @@ import { deps, naturgy, official, TODAY } from './renewal-support';
 const tr = pageTranslator('bills');
 
 // The words that would turn a figure into advice.
-const ADVICE = /\b(cámbiate|te conviene|deberías|cambia|cambiar|contrata|contratar|aprovecha)\b/i;
+const ADVICE =
+  /\b(cámbiate|cámbiese|te conviene|deberías|debes|cambia de|cambiar de|contrata|contratar|aprovecha|ahorra|elige)\b/i;
 
 function shown(input: RenewalInput, own: RenewalReviewDeps = deps(), norms = BILLS_NORMS) {
   const root = document.createElement('section');
@@ -73,10 +74,6 @@ describe('the Naturgy letter', () => {
     expect(rule).toContain('Real Decreto 88/2026, art. 6.1.m');
     expect(card(root, 'El preaviso').querySelector('a')?.getAttribute('href')).toMatch(/^https:/);
     expect(text(card(root, 'Salir del contrato'))).toContain('art. 28.3');
-  });
-
-  it('never advises', () => {
-    expect(text(root)).not.toMatch(ADVICE);
   });
 
   it('leaves the taxes to the norms still open, each option with its figures and rates', () => {
@@ -257,5 +254,66 @@ describe('the taxes of a settled norm', () => {
     expect(cost).toMatch(/Con impuestos del 10-07-2026 \(.* de impuesto eléctrico y .* de IVA\): /);
     expect(cost).not.toContain('depende');
     expect(cost).toContain('La carta declara 1.362,36 € con impuestos');
+  });
+});
+
+describe('every state', () => {
+  const states: [string, RenewalInput, RenewalReviewDeps?][] = [
+    ['Naturgy', naturgy()],
+    ['short notice', naturgy({ letterDate: '2026-11-20' })],
+    ['before the rule', naturgy({ letterDate: '2026-05-01' })],
+    ['with the bill', naturgy({ separateFromBill: false })],
+    ['unknown separation', naturgy({ separateFromBill: null })],
+    ['fixed, first renewal', naturgy({ fixedPrice: true, firstRenewal: true })],
+    ['unknown contract', naturgy({ fixedPrice: null })],
+    ['mismatch', naturgy({ declared: { withoutTax: 1100, withTax: null } })],
+    ['no consumption', naturgy({ annualKwh: null })],
+    ['PVPC below', naturgy(), deps(official(300))],
+    ['no PVPC', naturgy(), deps(null)],
+    ['no tables', naturgy({ renewalDate: '2027-01-15' })],
+    ['settled taxes', naturgy({ letterDate: '2026-05-30', renewalDate: '2026-07-10' })],
+  ];
+  it.each(states)('%s never advises', (_name, input, own) => {
+    expect(text(shown(input, own))).not.toMatch(ADVICE);
+  });
+});
+
+describe('what decides each tax figure', () => {
+  const taxes = () => text(card(shown(naturgy()), 'Las cuentas de la carta'));
+
+  it('words each norm by its status and gives the day an open condition is decided', () => {
+    const t = taxes();
+    expect(t).toContain('se convalida Real Decreto-ley 25/2026, de 29 de septiembre');
+    expect(t).toContain(
+      'se cumple Real Decreto-ley 25/2026, arts. 19 y 21 (rebaja de diciembre de 2026) (pendiente: Que el IPC de la electricidad de octubre de 2026 suba más del 15 % interanual; se sabrá hacia el 13-11-2026)',
+    );
+    expect(t).not.toContain('se cumple Real Decreto-ley 25/2026, de 29 de septiembre');
+  });
+
+  it('lists the outcomes of the narrow options and not the widest one', () => {
+    const t = taxes();
+    expect(t).toContain(
+      '1.184,16 € con impuestos, con 0,5 % de impuesto eléctrico y 10 % de IVA, en estos casos:',
+    );
+    expect(t).toContain(
+      '1.362,36 € con impuestos, con 5,11269632 % de impuesto eléctrico y 21 % de IVA, en los demás casos.',
+    );
+    expect(card(shown(naturgy()), 'Las cuentas de la carta').querySelectorAll('li')).toHaveLength(
+      3 + 1 + 1,
+    );
+  });
+
+  it('cites each source once', () => {
+    const rule = text(card(shown(naturgy()), 'El preaviso'));
+    expect(rule).toContain('Real Decreto 88/2026, art. 6.1.m · ');
+    expect(rule).not.toContain('por el que se aprueba');
+  });
+});
+
+describe('the cap on a penalty', () => {
+  it('comes from the review, not the copy', () => {
+    expect(
+      text(card(shown(naturgy({ fixedPrice: true, firstRenewal: true })), 'Salir del contrato')),
+    ).toContain('al 5 % de la energía pendiente');
   });
 });

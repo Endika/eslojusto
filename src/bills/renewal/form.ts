@@ -90,22 +90,22 @@ function read(form: HTMLFormElement): Reading {
 
   const letterDate = date('letterDate', true);
   const renewalDate = date('renewalDate', true);
-  const powerKw = { p1: figure('powerKwP1', true), p2: figure('powerKwP2', true) };
+  const powerKw = { p1: figure('powerKwP1', true, true), p2: figure('powerKwP2', true, true) };
   const powerUnit = choice('powerUnit', POWER_UNITS);
   const power = (side: 'current' | 'next') => ({
-    p1: figure(`${side}PowerP1`, true),
-    p2: figure(`${side}PowerP2`, true),
+    p1: figure(`${side}PowerP1`, true, true),
+    p2: figure(`${side}PowerP2`, true, true),
   });
   const [currentPower, nextPower] = [power('current'), power('next')];
   const pricing = choice('energyPricing', ENERGY_PRICINGS);
   const energy = (side: 'current' | 'next') =>
     pricing === 'single'
-      ? { all: figure(side === 'current' ? 'currentEnergy' : 'nextEnergy', true) }
+      ? { all: figure(side === 'current' ? 'currentEnergy' : 'nextEnergy', true, true) }
       : pricing === 'periods'
         ? {
-            p1: figure(`${side}EnergyP1`, true),
-            p2: figure(`${side}EnergyP2`, true),
-            p3: figure(`${side}EnergyP3`, true),
+            p1: figure(`${side}EnergyP1`, true, true),
+            p2: figure(`${side}EnergyP2`, true, true),
+            p3: figure(`${side}EnergyP3`, true, true),
           }
         : null;
   const [currentEnergy, nextEnergy] = [energy('current'), energy('next')];

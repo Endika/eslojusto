@@ -108,22 +108,43 @@ function taxLines(taxes: RenewalTaxes, review: RenewalReview, norms: NormTable, 
       ]),
     ),
   ];
+  // What each norm has to do for the outcome to hold, in the words of its status.
+  const normPhrase = (id: BillsNormId, holds: boolean): string => {
+    const norm = norms[id];
+    if (norm.status === 'pending_validation')
+      return tr(
+        holds
+          ? 'client.bills.renewal.taxes.convalidated'
+          : 'client.bills.renewal.taxes.not_convalidated',
+        { norma: norm.citation },
+      );
+    const condition =
+      norm.condition === undefined
+        ? norm.citation
+        : `${norm.citation} (${
+            norm.condition.met === null
+              ? tr('client.bills.row.condition_open', {
+                  condicion: norm.condition.text,
+                  fecha: dayText(norm.condition.decidesOn),
+                })
+              : norm.condition.text
+          })`;
+    return tr(holds ? 'client.bills.renewal.taxes.met' : 'client.bills.renewal.taxes.not_met', {
+      norma: condition,
+    });
+  };
   const outcomeText = ({ met, notMet }: Outcome): string =>
-    [
-      met.length > 0
-        ? tr('client.bills.renewal.taxes.when_met', { normas: citations(met, norms) })
-        : '',
-      notMet.length > 0
-        ? tr(
-            met.length > 0
-              ? 'client.bills.renewal.taxes.and_not_met'
-              : 'client.bills.renewal.taxes.when_not_met',
-            { normas: citations(notMet, norms) },
-          )
-        : '',
-    ]
-      .filter((part) => part !== '')
-      .join(tr('client.bills.renewal.taxes.and'));
+    tr('client.bills.renewal.taxes.if', {
+      condiciones: [
+        ...met.map((id) => normPhrase(id, true)),
+        ...notMet.map((id) => normPhrase(id, false)),
+      ].join(tr('client.bills.renewal.taxes.and')),
+    });
+  // The option reached by most outcomes is not listed: it is what happens in all the others.
+  const widest = taxes.options.reduce(
+    (best, o) => (o.when.length > best.when.length ? o : best),
+    taxes.options[0] ?? { when: [] },
+  );
   const declared = review.input.declared.withTax;
   const matching =
     declared === null ? [] : taxes.options.filter((o) => Math.abs(declared - o.withTax) <= 1);
@@ -134,24 +155,32 @@ function taxLines(taxes: RenewalTaxes, review: RenewalReview, norms: NormTable, 
         normas: citations(deciding, norms),
       }),
     ),
-    ...taxes.options.map((option) =>
-      el(
+    ...taxes.options.map((option) => {
+      const rest = taxes.options.length > 1 && option === widest;
+      const figures = {
+        importe: euros(option.withTax),
+        impuesto: percent(option.electricityTaxPercent),
+        iva: percent(option.vatPercent),
+      };
+      return el(
         'div',
         null,
         el(
           'p',
           null,
-          tr('client.bills.renewal.taxes.option', {
-            importe: euros(option.withTax),
-            impuesto: percent(option.electricityTaxPercent),
-            iva: percent(option.vatPercent),
-          }),
+          tr(
+            rest ? 'client.bills.renewal.taxes.option_rest' : 'client.bills.renewal.taxes.option',
+            figures,
+          ),
         ),
-        list(option.when.map(outcomeText)),
-      ),
-    ),
+        ...(rest ? [] : [list(option.when.map(outcomeText))]),
+      );
+    }),
     ...(taxes.unknown.length > 0
-      ? [note(tr('client.bills.renewal.taxes.unknown', { fecha: day }))]
+      ? [
+          note(tr('client.bills.renewal.taxes.unknown', { fecha: day })),
+          list(taxes.unknown.map(outcomeText)),
+        ]
       : []),
     ...(declared === null
       ? []
@@ -243,7 +272,14 @@ function splitCard(review: RenewalReview, norms: NormTable, tr: Translate): HTML
   if (split.kind === 'conditional')
     return card(
       title,
-      note(tr('client.bills.renewal.split.conditional', { normas: citations(split.norms, norms) })),
+      note(
+        tr(
+          split.norms.length === 1
+            ? 'client.bills.renewal.split.conditional_one'
+            : 'client.bills.renewal.split.conditional_many',
+          { normas: citations(split.norms, norms) },
+        ),
+      ),
     );
   const single = 'all' in review.input.next.energy;
   return card(
@@ -306,9 +342,20 @@ function pvpcCard(pvpc: PvpcComparison, tr: Translate): HTMLElement {
 
 // ---------- Notice and exit ----------
 
+// «Real Decreto 88/2026, art. 6.1.m (Real Decreto 88/2026, por el que…)» names its decree twice:
+// the article alone says it.
+export const citedOnce = (citation: string): string =>
+  citation.replace(/^([^,]+), ([^(]+?) \(\1, .*\)$/, '$1, $2');
+
 const ruleOrigin = (id: BillsRuleId, norms: NormTable, tr: Translate): HTMLElement => {
   const source = ruleSource(id, norms);
-  return el('p', 'literal__link', link(source.url, source.citation), ' · ', sourceText(source, tr));
+  return el(
+    'p',
+    'literal__link',
+    link(source.url, citedOnce(source.citation)),
+    ' · ',
+    sourceText(source, tr),
+  );
 };
 
 function noticeText(notice: Notice, review: RenewalReview, tr: Translate): string {
@@ -348,7 +395,14 @@ function exitCard(review: RenewalReview, norms: NormTable, tr: Translate): HTMLE
   const { exit } = review.core;
   return card(
     tr('client.bills.renewal.title.exit'),
-    el('p', null, tr(`client.bills.renewal.exit.${exit.kind}`)),
+    el(
+      'p',
+      null,
+      tr(
+        `client.bills.renewal.exit.${exit.kind}`,
+        exit.kind === 'penalty_possible' ? { porcentaje: `${exit.capPercent} %` } : undefined,
+      ),
+    ),
     ruleOrigin('exit_penalty', norms, tr),
   );
 }
