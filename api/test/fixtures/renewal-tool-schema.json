@@ -196,40 +196,6 @@
           "required": ["value", "confidence"],
           "additionalProperties": false
         },
-        "estimatedCostCurrentWithoutTax": {
-          "type": "object",
-          "description": "Estimated annual cost at the current prices, without taxes (sin impuestos).",
-          "properties": {
-            "value": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1000000
-            },
-            "confidence": {
-              "type": "string",
-              "enum": ["high", "medium", "low"]
-            }
-          },
-          "required": ["value", "confidence"],
-          "additionalProperties": false
-        },
-        "estimatedCostCurrentWithTax": {
-          "type": "object",
-          "description": "Estimated annual cost at the current prices, with taxes (con impuestos).",
-          "properties": {
-            "value": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1000000
-            },
-            "confidence": {
-              "type": "string",
-              "enum": ["high", "medium", "low"]
-            }
-          },
-          "required": ["value", "confidence"],
-          "additionalProperties": false
-        },
         "estimatedCostNewWithoutTax": {
           "type": "object",
           "description": "Estimated annual cost at the new prices, without taxes (sin impuestos).",

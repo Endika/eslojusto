@@ -91,6 +91,15 @@ describe('a renewal letter read', () => {
     expect(response.extraction.fields.currentEnergy).toBeUndefined();
   });
 
+  it('reads a notice printed on a bill as a notice that is not a letter of its own', async () => {
+    const { response } = await readRenewal('renewal-notice-on-bill');
+    if (response.code !== 'ok') throw new Error(response.code);
+    expect(response.extraction.fields).toMatchObject({
+      separateFromBill: value(false),
+      nextEnergy: value(0.1678),
+    });
+  });
+
   it('answers that a bill is not the letter', async () => {
     const { response } = await readRenewal('renewal-bill');
     expect(response).toEqual({

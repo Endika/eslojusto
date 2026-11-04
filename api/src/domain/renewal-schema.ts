@@ -40,12 +40,6 @@ const priceChangeNotice = {
       2,
       'Annual consumption the estimate is based on, in kWh (consumo anual).',
     ),
-    estimatedCostCurrentWithoutTax: money(
-      'Estimated annual cost at the current prices, without taxes (sin impuestos).',
-    ),
-    estimatedCostCurrentWithTax: money(
-      'Estimated annual cost at the current prices, with taxes (con impuestos).',
-    ),
     estimatedCostNewWithoutTax: money(
       'Estimated annual cost at the new prices, without taxes (sin impuestos).',
     ),

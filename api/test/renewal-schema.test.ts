@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LIMITS, RENEWAL_PAGE_KINDS } from '../src/domain/documents';
+import { RENEWAL_PAGE_KINDS } from '../src/domain/documents';
 import { ELECTRICITY_SECTIONS } from '../src/domain/electricity-schema';
 import { parseReading } from '../src/domain/extraction';
 import { REVIEW_SCHEMAS, toolInputSchema } from '../src/domain/extraction-schema';
@@ -79,6 +79,5 @@ describe('the renewal schema', () => {
     );
     expect(reading.sections).toEqual({});
     expect(reading.unclassified).toBe(1);
-    expect(LIMITS.maxImages).toBeGreaterThan(0);
   });
 });

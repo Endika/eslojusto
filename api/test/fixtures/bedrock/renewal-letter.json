@@ -50,14 +50,6 @@
             "value": 4190.2,
             "confidence": "high"
           },
-          "estimatedCostCurrentWithoutTax": {
-            "value": 909.16,
-            "confidence": "high"
-          },
-          "estimatedCostCurrentWithTax": {
-            "value": 1156.33,
-            "confidence": "high"
-          },
           "estimatedCostNewWithoutTax": {
             "value": 1071.15,
             "confidence": "high"
