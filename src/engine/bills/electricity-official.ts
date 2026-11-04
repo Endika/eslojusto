@@ -93,6 +93,25 @@ export function pvpcMeansBetween(
   return { p1: mean(sums.p1), p2: mean(sums.p2), p3: mean(sums.p3), all: mean(sums.all) };
 }
 
+// The plain mean of every PVPC hour over the days after `from` up to `to`, €/kWh, which needs no
+// toll holidays; null when a day is missing.
+export function pvpcMeanAllBetween(
+  from: CivilDate,
+  to: CivilDate,
+  pvpc: PvpcHourly,
+): number | null {
+  let [total, count] = [0, 0];
+  for (let i = 1; i <= ordinal(to) - ordinal(from); i++) {
+    const hours = pvpc.days[toIso(addDays(from, i))];
+    if (hours === undefined) return null;
+    for (const [, price] of hours) {
+      total += price;
+      count += 1;
+    }
+  }
+  return count === 0 ? null : round6(total / count / 1000);
+}
+
 function energyFigures(input: ElectricityBillInput, deps: OfficialDeps): EnergyFigures | null {
   if (input.energy.length === 0) return null;
   if (input.market === 'pvpc') return { kind: 'pvpc_bill' };

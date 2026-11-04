@@ -79,6 +79,7 @@ describe('comparing a renewal with the PVPC', () => {
       annual: 809.9,
       next: 1071.15,
       difference: 261.25,
+      doubt: 'ccf_not_updated_since_2016',
     });
   });
 
@@ -102,6 +103,14 @@ describe('comparing a renewal with the PVPC', () => {
         officialDeps(flat('2026-10-01', '2026-10-14', 150)),
       ),
     ).toEqual({ kind: 'no_data' });
+  });
+
+  it('compares in a year whose toll holidays are not loaded', () => {
+    const pvpc = flat('2027-01-01', '2027-01-14', 150);
+    expect(compareWithPvpc(letter(), officialDeps(pvpc))).toMatchObject({
+      kind: 'ok',
+      annual: 809.9,
+    });
   });
 
   it('asks for the consumption when the letter gives none', () => {
@@ -161,8 +170,20 @@ describe('taxes of a renewal', () => {
       expect(result).toEqual({
         kind: 'conditional',
         options: [
-          { norms: ['rdl25_2026_december', 'rdl25_2026'], withTax: 1184.16 },
-          { norms: ['rdl25_2026_december', 'rdl25_2026'], withTax: 1362.36 },
+          {
+            applies: ['rdl25_2026_december', 'rdl25_2026'],
+            unless: [],
+            electricityTaxPercent: 0.5,
+            vatPercent: 10,
+            withTax: 1184.16,
+          },
+          {
+            applies: [],
+            unless: ['rdl25_2026_december', 'rdl25_2026'],
+            electricityTaxPercent: 5.11269632,
+            vatPercent: 21,
+            withTax: 1362.36,
+          },
         ],
       });
     });
@@ -173,7 +194,10 @@ describe('taxes of a renewal', () => {
         norms: open,
       });
       expect(result).toMatchObject({
-        options: [{ withTax: round2(1071.15 * 1.005 * 1.21) }, { withTax: 1362.36 }],
+        options: [
+          { vatPercent: 21, withTax: round2(1071.15 * 1.005 * 1.21) },
+          { vatPercent: 21, withTax: 1362.36 },
+        ],
       });
     });
   });
