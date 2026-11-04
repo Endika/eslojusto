@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.108.0](https://github.com/Endika/eslojusto/compare/v1.107.0...v1.108.0) (2026-11-04)
+
+
+### Features
+
+* **bills:** review an electricity renewal letter's figures and notice ([97bc357](https://github.com/Endika/eslojusto/commit/97bc35766afe19e5c52979c4e7857fa6096acae6))
+
 ## [1.107.0](https://github.com/Endika/eslojusto/compare/v1.106.0...v1.107.0) (2026-11-03)
 
 
