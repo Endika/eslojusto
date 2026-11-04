@@ -62,6 +62,7 @@ import {
   UNDERESTIMATE_FACTOR,
 } from './tokens';
 import type { ReviewKind } from './reviews';
+import { renewalIncomplete, renewalMerge, type RenewalMerged } from './renewal-merge';
 import { telecomFailedChecks, telecomIncomplete, type TelecomCheck } from './telecom-checks';
 import { telecomMerge, type TelecomMerged } from './telecom-merge';
 import { errorName, type ErrorName } from './error-name';
@@ -104,7 +105,9 @@ type ExtractionOf<R extends ReviewKind> = R extends 'rental'
             ? Omit<ElectricityMerged, 'discarded'>
             : R extends 'telecom'
               ? Omit<TelecomMerged, 'discarded'>
-              : Omit<Merged, 'discarded'>;
+              : R extends 'renewal'
+                ? Omit<RenewalMerged, 'discarded'>
+                : Omit<Merged, 'discarded'>;
 type CheckOf<R extends ReviewKind> = R extends 'rental'
   ? RentalCheck
   : R extends 'employment'
@@ -119,7 +122,9 @@ type CheckOf<R extends ReviewKind> = R extends 'rental'
             ? ElectricityCheck
             : R extends 'telecom'
               ? TelecomCheck
-              : CoherenceCheck;
+              : R extends 'renewal'
+                ? never
+                : CoherenceCheck;
 
 type AnyMerged =
   | Merged
@@ -129,7 +134,8 @@ type AnyMerged =
   | InsuranceMerged
   | MortgageMerged
   | ElectricityMerged
-  | TelecomMerged;
+  | TelecomMerged
+  | RenewalMerged;
 type AnyCheck =
   | CoherenceCheck
   | RentalCheck
@@ -288,6 +294,11 @@ function checkTelecom(reading: Reading, toolInput: unknown): Checked {
   };
 }
 
+function checkRenewal(reading: Reading, toolInput: unknown): Checked {
+  const extraction = renewalMerge(reading, toolInput);
+  return { extraction, failed: [], incomplete: renewalIncomplete(reading, extraction) };
+}
+
 function check(reading: Reading, review: ReviewKind, toolInput: unknown): Checked {
   if (review === 'rental') return checkRental(reading);
   if (review === 'employment') return checkEmployment(reading, toolInput);
@@ -296,6 +307,7 @@ function check(reading: Reading, review: ReviewKind, toolInput: unknown): Checke
   if (review === 'mortgage') return checkMortgage(reading, toolInput);
   if (review === 'electricity') return checkElectricity(reading, toolInput);
   if (review === 'telecom') return checkTelecom(reading, toolInput);
+  if (review === 'renewal') return checkRenewal(reading, toolInput);
   return checkFinalPay(reading);
 }
 

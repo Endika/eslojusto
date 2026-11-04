@@ -53,20 +53,20 @@ export const MAX_AGREED_PRICES = 10;
 export const MAX_CONTRACT_SERVICES = 6;
 
 const field = (type: FieldSpec['type'], description: string): FieldSpec => ({ type, description });
-const date = (description: string) => field({ type: 'date' }, description);
-const money = (description: string) => field({ type: 'money' }, description);
-const flag = (description: string) => field({ type: 'boolean' }, description);
+export const date = (description: string) => field({ type: 'date' }, description);
+export const money = (description: string) => field({ type: 'money' }, description);
+export const flag = (description: string) => field({ type: 'boolean' }, description);
 const percent = (description: string) => field({ type: 'percent' }, description);
 const text = (maxLength: number, description: string) =>
   field({ type: 'text', maxLength }, description);
-const oneOf = (values: readonly string[], description: string) =>
+export const oneOf = (values: readonly string[], description: string) =>
   field({ type: 'enum', values }, description);
-const decimal = (max: number, decimals: number, description: string) =>
+export const decimal = (max: number, decimals: number, description: string) =>
   field({ type: 'decimal', min: 0, max, decimals }, description);
-const kw = (description: string) => decimal(1000, 3, description);
-const unitPrice = (description: string) => decimal(1000, 6, description);
+export const kw = (description: string) => decimal(1000, 3, description);
+export const unitPrice = (description: string) => decimal(1000, 6, description);
 
-const list = (
+export const list = (
   description: string,
   maxItems: number,
   item: Readonly<Record<string, FieldSpec>>,

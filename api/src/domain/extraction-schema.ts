@@ -41,6 +41,7 @@ import {
   RENTAL_SECTIONS,
   type RentalSectionKind,
 } from './rental-schema';
+import { RENEWAL_SCHEMA } from './renewal-schema';
 import type { ReviewKind } from './reviews';
 import {
   TELECOM_READABILITY,
@@ -440,6 +441,7 @@ export const REVIEW_SCHEMAS: Readonly<Record<ReviewKind, ReviewSchema>> = {
   mortgage: MORTGAGE_SCHEMA,
   electricity: ELECTRICITY_SCHEMA,
   telecom: TELECOM_SCHEMA,
+  renewal: RENEWAL_SCHEMA,
 };
 
 // Every review's sections, by kind.

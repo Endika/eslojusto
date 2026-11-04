@@ -1,0 +1,119 @@
+<!--
+  Renewal template «letter-es»: a retailer's letter on one sheet announcing the renewal of an
+  electricity contract, with the contracted power, the current and the new prices and the
+  estimated annual cost at both.
+  Source: written for this bank, with invented wording, layout and figures, after the items such a
+  letter lists; it copies no retailer's letter.
+  Licence: same as this repository.
+  Placeholders are filled by scripts/rental-bank/render.mjs from each case's data; a block
+  between a hash and a slash placeholder repeats once per row of that list.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1d1d1d;
+        font:
+          15px/1.5 'DejaVu Sans',
+          sans-serif;
+      }
+      .page {
+        box-sizing: border-box;
+        width: 1000px;
+        height: 1414px;
+        padding: 60px 80px 90px;
+        position: relative;
+        overflow: hidden;
+        background: #fdfdfb;
+      }
+      h1 {
+        font-size: 21px;
+        margin: 0 0 6px;
+      }
+      h2 {
+        font-size: 15px;
+        margin: 18px 0 6px;
+        text-transform: uppercase;
+      }
+      p {
+        margin: 0 0 6px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 6px 0 10px;
+      }
+      th,
+      td {
+        border: 1px solid #999;
+        padding: 5px 8px;
+        text-align: left;
+      }
+      .muted {
+        color: #555;
+        font-size: 13px;
+      }
+      .bank-footer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <h1>Renovación de tu contrato de luz</h1>
+      <p class="muted">{{retailerBlock}}</p>
+      <p>{{sentOnText}}</p>
+      <p>{{holderName}}<br />{{holderAddress}}</p>
+      <p>CUPS: {{cups}}</p>
+      <p>{{renewalText}}</p>
+      <h2>Potencia contratada</h2>
+      <p>{{powerText}}</p>
+      <h2>Precios</h2>
+      <table>
+        <tr>
+          <th>Concepto</th>
+          <th>Precio actual</th>
+          <th>Nuevo precio</th>
+        </tr>
+        {{#priceRows}}
+        <tr>
+          <td>{{concept}}</td>
+          <td>{{current}}</td>
+          <td>{{next}}</td>
+        </tr>
+        {{/priceRows}}
+      </table>
+      <h2>Estimación de coste anual</h2>
+      <p>{{consumptionText}}</p>
+      <table>
+        <tr>
+          <th></th>
+          <th>Con tus precios actuales</th>
+          <th>Con los nuevos precios</th>
+        </tr>
+        <tr>
+          <td>Sin impuestos</td>
+          <td>{{currentWithoutTax}}</td>
+          <td>{{nextWithoutTax}}</td>
+        </tr>
+        <tr>
+          <td>Con impuestos</td>
+          <td>{{currentWithTax}}</td>
+          <td>{{nextWithTax}}</td>
+        </tr>
+      </table>
+      <p class="muted">{{footnote}}</p>
+      <footer class="bank-footer">Documento ficticio · banco de pruebas</footer>
+    </section>
+  </body>
+</html>

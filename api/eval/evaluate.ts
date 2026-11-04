@@ -60,6 +60,12 @@ import {
   type TelecomTemplateId,
 } from './telecom-schema';
 import {
+  RENEWAL_PERSON_KEYS,
+  renewalPageKind,
+  type RenewalBankCase,
+  type RenewalTemplateId,
+} from './renewal-schema';
+import {
   isTemplatePage,
   pageKind,
   PERSON_KEYS,
@@ -273,6 +279,12 @@ const expectedTelecomPages = (
     sheetsOf,
   );
 
+const expectedRenewalPages = (
+  bankCase: RenewalBankCase,
+  sheetsOf: (template: RenewalTemplateId) => number,
+): readonly ExpectedPage[] =>
+  templatedPages(bankCase.pages, (p) => p.template, renewalPageKind, sheetsOf);
+
 export const rentalBank = (sheetsOf: (template: TemplateId) => number): EvalBank<BankCase> => ({
   review: 'rental',
   pagesOf: (c) => expectedPages(c, sheetsOf),
@@ -325,6 +337,14 @@ export const telecomBank = (
   review: 'telecom',
   pagesOf: (c) => expectedTelecomPages(c, sheetsOf),
   personKeys: TELECOM_PERSON_KEYS,
+});
+
+export const renewalBank = (
+  sheetsOf: (template: RenewalTemplateId) => number,
+): EvalBank<RenewalBankCase> => ({
+  review: 'renewal',
+  pagesOf: (c) => expectedRenewalPages(c, sheetsOf),
+  personKeys: RENEWAL_PERSON_KEYS,
 });
 
 function diagnose(
@@ -385,7 +405,8 @@ type AnyResponse =
   | ExtractResponse<'insurance'>
   | ExtractResponse<'mortgage'>
   | ExtractResponse<'electricity'>
-  | ExtractResponse<'telecom'>;
+  | ExtractResponse<'telecom'>
+  | ExtractResponse<'renewal'>;
 interface Scored {
   readonly fields: Readonly<Record<string, { readonly value: unknown } | undefined>>;
   readonly lists: Readonly<

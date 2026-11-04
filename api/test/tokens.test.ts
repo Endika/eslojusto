@@ -116,6 +116,11 @@ describe('cost of a read', () => {
     },
   );
 
+  it('prices a renewal letter read at 5,000 tokens of prompt and gives it no more room to write', () => {
+    expect(PROMPT_TOKENS_BY_REVIEW.renewal).toBe(5_000);
+    expect(EXTRA_OUTPUT_TOKENS_BY_REVIEW.renewal).toBe(0);
+  });
+
   it('stays at or under 0.40 USD for an insurance read', () => {
     expect(cost(SONNET_4_6, MAX_ESTIMATED_INPUT_TOKENS, 'insurance')).toBeLessThanOrEqual(0.4);
   });

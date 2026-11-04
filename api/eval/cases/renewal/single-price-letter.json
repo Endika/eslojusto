@@ -1,0 +1,74 @@
+{
+  "id": "single-price-letter",
+  "description": "Separate letter that renews a contract on 10-12-2026 with one energy price for all the day and a power price per day; it never says the price is fixed, so fixedPrice stays unread.",
+  "eval": true,
+  "pages": [
+    {
+      "template": "renewal/letter-es",
+      "data": {
+        "retailerBlock": "Ficticia Energía, S. A.",
+        "sentOnText": "Madrid, 31 de octubre de 2026",
+        "holderName": "Persona Cliente Ficticia R",
+        "holderAddress": "Calle de la Prueba Ficticia, 12, 28001 Madrid",
+        "cups": "ES0000 1111 2222 3333 BB",
+        "renewalText": "Te escribimos para informarte de que tu contrato se renueva el 10 de diciembre de 2026 con los precios que te detallamos a continuación.",
+        "powerText": "Potencia contratada: 5,75 kW en P1 y 5,75 kW en P2.",
+        "priceRows": [
+          {
+            "concept": "Potencia P1",
+            "current": "0,110283 €/kW·día",
+            "next": "0,123030 €/kW·día"
+          },
+          {
+            "concept": "Potencia P2",
+            "current": "0,033469 €/kW·día",
+            "next": "0,052329 €/kW·día"
+          },
+          {
+            "concept": "Energía todas las horas",
+            "current": "0,144972 €/kWh",
+            "next": "0,1678 €/kWh"
+          }
+        ],
+        "consumptionText": "Con tu consumo de los últimos doce meses, 4.190,20 kWh, el coste estimado para un año es:",
+        "currentWithoutTax": "909,16 €",
+        "nextWithoutTax": "1.071,15 €",
+        "currentWithTax": "1.156,33 €",
+        "nextWithTax": "1.362,36 €",
+        "footnote": "Estimación con el impuesto eléctrico y el IVA vigentes; el coste real depende de tu consumo."
+      },
+      "degrade": {
+        "rotate": 0.4,
+        "shadow": 0.08,
+        "blur": 0.3,
+        "dark": 0.03,
+        "crop": 0,
+        "jpegQuality": 0.8
+      }
+    }
+  ],
+  "expected": {
+    "extraction": {
+      "outcome": "ok",
+      "fields": {
+        "letterDate": "2026-10-31",
+        "renewalDate": "2026-12-10",
+        "separateFromBill": true,
+        "isRenewal": true,
+        "powerKwP1": 5.75,
+        "powerKwP2": 5.75,
+        "powerUnit": "per_kw_day",
+        "currentPowerP1": 0.110283,
+        "currentPowerP2": 0.033469,
+        "nextPowerP1": 0.12303,
+        "nextPowerP2": 0.052329,
+        "currentEnergy": 0.144972,
+        "nextEnergy": 0.1678,
+        "annualKwh": 4190.2,
+        "declaredWithoutTax": 1071.15,
+        "declaredWithTax": 1362.36
+      },
+      "lists": {}
+    }
+  }
+}

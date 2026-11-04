@@ -5,6 +5,7 @@ import type { ElectricityBankCase, ElectricityTemplateId } from '../../eval/elec
 import type { EmploymentBankCase, EmploymentTemplateId } from '../../eval/employment-schema';
 import type { InsuranceBankCase, InsuranceTemplateId } from '../../eval/insurance-schema';
 import type { MortgageBankCase, MortgageTemplateId } from '../../eval/mortgage-schema';
+import type { RenewalBankCase, RenewalTemplateId } from '../../eval/renewal-schema';
 import type { TelecomBankCase, TelecomTemplateId } from '../../eval/telecom-schema';
 import {
   PLACEHOLDER,
@@ -46,13 +47,15 @@ export const INSURANCE_BANK: readonly InsuranceBankCase[] = casesIn('cases/insur
 export const MORTGAGE_BANK: readonly MortgageBankCase[] = casesIn('cases/mortgage/');
 export const ELECTRICITY_BANK: readonly ElectricityBankCase[] = casesIn('cases/electricity/');
 export const TELECOM_BANK: readonly TelecomBankCase[] = casesIn('cases/telecom/');
+export const RENEWAL_BANK: readonly RenewalBankCase[] = casesIn('cases/renewal/');
 
 type BankTemplateId =
   | CreditTemplateId
   | InsuranceTemplateId
   | MortgageTemplateId
   | ElectricityTemplateId
-  | TelecomTemplateId;
+  | TelecomTemplateId
+  | RenewalTemplateId;
 
 // A template of the credit, the insurance, the mortgage or a bills bank, named with its folder.
 export const bankTemplate = (id: BankTemplateId): string =>

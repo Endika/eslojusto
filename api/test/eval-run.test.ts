@@ -142,7 +142,7 @@ describe('starting an evaluation run', () => {
   it.each([
     [
       ['--review', 'final_pay'],
-      'rental, employment, credit, insurance, mortgage, electricity or telecom',
+      'rental, employment, credit, insurance, mortgage, electricity, telecom or renewal',
     ],
     [['--review'], '--review takes a value'],
     [['--review', 'employment', '--cases'], '--cases takes a value'],

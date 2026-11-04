@@ -36,6 +36,7 @@ export const EVAL_REVIEWS = [
   'mortgage',
   'electricity',
   'telecom',
+  'renewal',
 ] as const;
 export type EvalReview = (typeof EVAL_REVIEWS)[number];
 
@@ -58,9 +59,11 @@ const DEFAULT_CASES: Readonly<Record<EvalReview, string>> = {
   mortgage: 'eval/cases/mortgage',
   electricity: 'eval/cases/electricity',
   telecom: 'eval/cases/telecom',
+  renewal: 'eval/cases/renewal',
 };
 
-// `--review rental|employment|credit|insurance|mortgage|electricity|telecom` (rental by default), `--cases <dir>` (that
+// `--review rental|employment|credit|insurance|mortgage|electricity|telecom|renewal` (rental by default),
+// `--cases <dir>` (that
 // review's bank by default) and `--only id1,id2`.
 export function parseEvalArgs(argv: readonly string[]): EvalArgs {
   const valueOf = (name: string): string | undefined => {
@@ -73,7 +76,7 @@ export function parseEvalArgs(argv: readonly string[]): EvalArgs {
   const review = valueOf('--review') ?? 'rental';
   if (!isEvalReview(review))
     throw new Error(
-      `--review is rental, employment, credit, insurance, mortgage, electricity or telecom, not ${review}`,
+      `--review is rental, employment, credit, insurance, mortgage, electricity, telecom or renewal, not ${review}`,
     );
   const cases = (valueOf('--cases') ?? DEFAULT_CASES[review]).replace(/\/+$/, '');
   const only = valueOf('--only');

@@ -74,6 +74,8 @@ export const ELECTRICITY_PAGE_KINDS = [
   'price_change_notice',
   'other',
 ] as const;
+// A renewal review reads one letter: the notice that the prices change; anything else is `other`.
+export const RENEWAL_PAGE_KINDS = ['price_change_notice', 'other'] as const;
 // A phone or internet review's documents; an electricity bill is `other`.
 export const TELECOM_PAGE_KINDS = ['telecom_bill', 'telecom_contract', 'other'] as const;
 // Every kind the final pay, the rental and the employment review can give a page.
@@ -138,6 +140,7 @@ export const ALL_PAGE_KINDS = [
   | (typeof SITE_PAGE_KINDS)[number]
   | (typeof ELECTRICITY_PAGE_KINDS)[number]
   | (typeof TELECOM_PAGE_KINDS)[number]
+  | (typeof RENEWAL_PAGE_KINDS)[number]
 )[];
 export type PageKind = (typeof ALL_PAGE_KINDS)[number];
 // The documents a value can come from.

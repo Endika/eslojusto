@@ -63,7 +63,10 @@ export type Recording =
   | 'electricity-identifiers'
   | 'telecom-mobile-bill'
   | 'telecom-contract-commitment'
-  | 'telecom-not-telecom';
+  | 'telecom-not-telecom'
+  | 'renewal-letter'
+  | 'renewal-per-period'
+  | 'renewal-bill';
 
 export const recording = (name: Recording): string =>
   readFileSync(new URL(`../fixtures/bedrock/${name}.json`, import.meta.url), 'utf8');
