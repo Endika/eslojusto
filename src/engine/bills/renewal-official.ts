@@ -1,10 +1,10 @@
 import { addDays, fromOrdinal, ordinal, parseDate, toIso } from '../date';
 import { round2 } from '../money';
-import { pvpcMeansBetween, type OfficialDeps } from './electricity-official';
+import { pvpcMeanAllBetween, type OfficialDeps } from './electricity-official';
 import type { BillsNormId } from './norms';
 import { recalculate, regulatedOn } from './renewal';
 import type { RenewalDeps, RenewalInput } from './renewal-types';
-import { valueOn, type TableRow, type VatRate } from './tables';
+import { valueOn, type RowDoubt, type TableRow, type VatRate } from './tables';
 
 const WINDOW_DAYS = 365;
 const DECLARED_TOLERANCE = 1;
@@ -20,6 +20,8 @@ export type PvpcComparison =
       readonly next: number;
       // What the letter's prices cost beyond the PVPC; negative when they cost less.
       readonly difference: number;
+      // Set when the PVPC margin rests on a row the sources leave in doubt.
+      readonly doubt: RowDoubt | null;
     }
   | { readonly kind: 'no_data' }
   | { readonly kind: 'no_consumption' }
@@ -40,17 +42,17 @@ export function compareWithPvpc(
   if (first === undefined) return { kind: 'no_data' };
   const last = parseDate(deps.pvpc.coveredUntil);
   const from = fromOrdinal(Math.max(ordinal(parseDate(first)) - 1, ordinal(last) - WINDOW_DAYS));
-  const means = pvpcMeansBetween(from, last, deps);
+  const mean = pvpcMeanAllBetween(from, last, deps.pvpc);
   const regulated = regulatedOn(input.renewalDate, deps);
   const margin = valueOn(deps.tables.pvpcMargin, input.renewalDate, deps.norms);
-  if (means === null || means.all === null || regulated.kind !== 'ok' || margin.kind !== 'ok') {
+  if (mean === null || regulated.kind !== 'ok' || margin.kind !== 'ok') {
     return { kind: 'no_data' };
   }
   const { power } = regulated.prices;
   const annual = round2(
     input.powerKw.p1 * (power.p1 + margin.row.value) +
       input.powerKw.p2 * power.p2 +
-      annualKwh * means.all,
+      annualKwh * mean,
   );
   return {
     kind: 'ok',
@@ -59,6 +61,7 @@ export function compareWithPvpc(
     annual,
     next: letter.next,
     difference: round2(letter.next - annual),
+    doubt: margin.row.doubt ?? null,
   };
 }
 
@@ -75,17 +78,23 @@ export type RenewalTaxes =
   | {
       readonly kind: 'conditional';
       readonly options: readonly {
-        readonly norms: readonly BillsNormId[];
+        // Open norms that must hold for this option, and norms that must not all hold.
+        readonly applies: readonly BillsNormId[];
+        readonly unless: readonly BillsNormId[];
+        readonly electricityTaxPercent: number;
+        readonly vatPercent: number;
         readonly withTax: number;
       }[];
     }
   | { readonly kind: 'missing' };
 
-const restsOn = (row: TableRow<unknown>): readonly BillsNormId[] => [
-  row.norm,
-  ...(row.alsoRestsOn ?? []),
-  ...(row.unless ?? []),
-];
+// The still-open norms a row needs to hold, and those that must not all hold for it to.
+function direction(row: TableRow<unknown>, open: (ids: readonly BillsNormId[]) => BillsNormId[]) {
+  return {
+    applies: open([row.norm, ...(row.alsoRestsOn ?? [])]),
+    unless: open(row.unless ?? []),
+  };
+}
 
 function vatPercent(rate: VatRate, powerKw: number): number {
   if (rate.kind === 'general') return rate.percent;
@@ -122,25 +131,41 @@ export function renewalTaxes(
       declaredMatches: declared === null ? null : Math.abs(declared - ours) <= DECLARED_TOLERANCE,
     };
   }
-  const taxRows = tax.kind === 'ok' ? [tax.row] : tax.rows;
-  const vatRows = vat.kind === 'ok' ? [vat.row] : vat.rows;
-  // Both taxes turn on the same month's figure: the reduced rate of one goes with the reduced
-  // rate of the other, not with the general one.
-  const together = (t: TableRow<unknown>, v: TableRow<unknown>) =>
-    tax.kind === 'ok' || vat.kind === 'ok' || (t.unless === undefined) === (v.unless === undefined);
   const deciding = new Set([
     ...(tax.kind === 'conditional' ? tax.norms : []),
     ...(vat.kind === 'conditional' ? vat.norms : []),
   ]);
+  const open = (ids: readonly BillsNormId[]) => ids.filter((id) => deciding.has(id));
+  const taxRows = (tax.kind === 'ok' ? [tax.row] : tax.rows).map((row) => ({
+    row,
+    ...direction(row, open),
+  }));
+  const vatRows = (vat.kind === 'ok' ? [vat.row] : vat.rows).map((row) => ({
+    row,
+    ...direction(row, open),
+  }));
+  const sameNorms = (a: readonly BillsNormId[], b: readonly BillsNormId[]) =>
+    a.length === b.length && a.every((id) => b.includes(id));
+  // Two taxes turning on the same norms go together only the same way; on different norms every
+  // pair is possible.
+  const compatible = (t: (typeof taxRows)[number], v: (typeof vatRows)[number]) =>
+    !sameNorms([...t.applies, ...t.unless], [...v.applies, ...v.unless]) ||
+    (sameNorms(t.applies, v.applies) && sameNorms(t.unless, v.unless));
   return {
     kind: 'conditional',
     options: taxRows.flatMap((t) =>
       vatRows
-        .filter((v) => together(t, v))
-        .map((v) => ({
-          norms: [...new Set([...restsOn(t), ...restsOn(v)])].filter((id) => deciding.has(id)),
-          withTax: withTax(t.value.percent, vatPercent(v.value, input.powerKw.p1)),
-        })),
+        .filter((v) => compatible(t, v))
+        .map((v) => {
+          const vatRate = vatPercent(v.row.value, input.powerKw.p1);
+          return {
+            applies: [...new Set([...t.applies, ...v.applies])],
+            unless: [...new Set([...t.unless, ...v.unless])],
+            electricityTaxPercent: t.row.value.percent,
+            vatPercent: vatRate,
+            withTax: withTax(t.row.value.percent, vatRate),
+          };
+        }),
     ),
   };
 }
