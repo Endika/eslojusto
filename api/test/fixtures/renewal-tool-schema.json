@@ -17,7 +17,7 @@
           "kind": {
             "type": "string",
             "enum": ["price_change_notice", "other"],
-            "description": "price_change_notice: a letter that the contract’s prices change or renew, with the new and the current prices. other: anything else, such as a bill or a contract."
+            "description": "price_change_notice: a notice that the contract’s prices change or renew, as a letter of its own or printed on a bill. other: a bill with no such notice, a contract, anything else."
           },
           "document": {
             "type": "integer",
