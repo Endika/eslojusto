@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.111.2](https://github.com/Endika/eslojusto/compare/v1.111.1...v1.111.2) (2026-11-04)
+
+
+### Bug Fixes
+
+* **documents:** drop «in this browser» from the daily free-read limit ([1c708fd](https://github.com/Endika/eslojusto/commit/1c708fd7b5ecffb0cd0d0685d47eb22380282333))
+
 ## [1.111.1](https://github.com/Endika/eslojusto/compare/v1.111.0...v1.111.1) (2026-11-04)
 
 
