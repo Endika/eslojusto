@@ -6,7 +6,7 @@ import { PATH as RENT_INDICES, lastChanged } from './rent-indices';
 export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/': '2026-10-14',
   '/finiquito/': '2026-10-09',
-  '/aviso-legal/': '2026-10-11',
+  '/aviso-legal/': '2026-11-04',
   '/privacidad/': '2026-11-03',
   // Moves with the INE's newest figure on the page and with each check of its norms.
   [RENT_INDICES]: lastChanged(),
@@ -33,8 +33,8 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/financiacion/': '2026-10-11',
   '/hipoteca/': '2026-10-11',
   '/facturas/': '2026-11-04',
-  '/facturas/luz/': '2026-10-14',
-  '/facturas/permanencia/': '2026-10-14',
+  '/facturas/luz/': '2026-11-04',
+  '/facturas/permanencia/': '2026-11-04',
   '/facturas/renovacion/': '2026-11-04',
 };
 
