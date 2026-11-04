@@ -279,28 +279,37 @@ describe('every state', () => {
 });
 
 describe('what decides each tax figure', () => {
-  const taxes = () => text(card(shown(naturgy()), 'Las cuentas de la carta'));
+  const lines = (root: HTMLElement) =>
+    [...card(root, 'Las cuentas de la carta').querySelectorAll('li, .sheet > p, .sheet > div > p')]
+      .map((e) => e.textContent)
+      .slice(4);
 
-  it('words each norm by its status and gives the day an open condition is decided', () => {
-    const t = taxes();
-    expect(t).toContain('se convalida Real Decreto-ley 25/2026, de 29 de septiembre');
-    expect(t).toContain(
-      'se cumple Real Decreto-ley 25/2026, arts. 19 y 21 (rebaja de diciembre de 2026) (pendiente: Que el IPC de la electricidad de octubre de 2026 suba más del 15 % interanual; se sabrá hacia el 13-11-2026)',
-    );
-    expect(t).not.toContain('se cumple Real Decreto-ley 25/2026, de 29 de septiembre');
+  it('says plainly what has to happen, and when it is known', () => {
+    expect(lines(shown(naturgy()))).toEqual([
+      'Los impuestos del 10-12-2026 dependen de lo que se decida sobre: Real Decreto-ley 25/2026, arts. 19 y 21 (rebaja de diciembre de 2026); Real Decreto-ley 25/2026, de 29 de septiembre. No elegimos un resultado: estos son los posibles.',
+      '1.184,16 € con impuestos, con 0,5 % de impuesto eléctrico y 10 % de IVA, en estos casos:',
+      'si se cumple la condición de Real Decreto-ley 25/2026, arts. 19 y 21 (rebaja de diciembre de 2026): que el IPC de la electricidad de octubre de 2026 suba más del 15 % interanual (se sabrá hacia el 13-11-2026) y el Congreso convalida el Real Decreto-ley 25/2026, de 29 de septiembre',
+      '1.362,36 € con impuestos, con 5,11269632 % de impuesto eléctrico y 21 % de IVA, en los demás casos.',
+      'La carta declara 1.362,36 € con impuestos, que coincide con la opción de 5,11269632 % de impuesto eléctrico y 21 % de IVA.',
+    ]);
   });
 
-  it('lists the outcomes of the narrow options and not the widest one', () => {
-    const t = taxes();
-    expect(t).toContain(
-      '1.184,16 € con impuestos, con 0,5 % de impuesto eléctrico y 10 % de IVA, en estos casos:',
-    );
-    expect(t).toContain(
-      '1.362,36 € con impuestos, con 5,11269632 % de impuesto eléctrico y 21 % de IVA, en los demás casos.',
-    );
-    expect(card(shown(naturgy()), 'Las cuentas de la carta').querySelectorAll('li')).toHaveLength(
-      3 + 1 + 1,
-    );
+  it('lists every option when some outcome has no rate, so «los demás casos» claims nothing', () => {
+    const [vat] = BILLS_TABLES.vat;
+    if (vat === undefined) throw new Error('fixture expected');
+    const own: RenewalReviewDeps = {
+      ...deps(),
+      tables: {
+        ...BILLS_TABLES,
+        vat: [{ ...vat, from: '2026-12-01', until: '2026-12-31', norm: 'rdl25_2026_december' }],
+      },
+    };
+    const t = text(card(shown(naturgy(), own), 'Las cuentas de la carta'));
+    const r = reviewRenewal(naturgy(), TODAY, own);
+    expect(
+      r.ok && r.review.taxes?.kind === 'conditional' && r.review.taxes.unknown.length > 0,
+    ).toBe(true);
+    expect(t).not.toContain('en los demás casos');
   });
 
   it('cites each source once', () => {
