@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.114.0](https://github.com/Endika/eslojusto/compare/v1.113.0...v1.114.0) (2026-11-04)
+
+
+### Features
+
+* **analytics:** send frames, version, message template and step with js_error ([946b959](https://github.com/Endika/eslojusto/commit/946b9597f4c2da0b5fc18c21981a5428f7d134da))
+* **scripts:** add js-error:locate to map a js_error back to source ([e87c179](https://github.com/Endika/eslojusto/commit/e87c1798d1355c257689b1ed18038c12d8f754f7))
+
 ## [1.113.0](https://github.com/Endika/eslojusto/compare/v1.112.0...v1.113.0) (2026-11-04)
 
 
