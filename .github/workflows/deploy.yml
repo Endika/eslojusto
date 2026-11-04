@@ -44,6 +44,7 @@ jobs:
           PUBLIC_API_CHECKOUT_URL: ${{ vars.PUBLIC_API_CHECKOUT_URL }}
           PUBLIC_API_PASS_URL: ${{ vars.PUBLIC_API_PASS_URL }}
           PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+          PUBLIC_RENEWAL: 'true'
       # No CI job builds with the real origins: a malformed or missing var would ship pages
       # without document reading, the pass or analytics and nothing would fail.
       - name: check the build carries the real origins
@@ -62,6 +63,9 @@ jobs:
           for url in "$PUBLIC_API_EXTRACT_URL" "$PUBLIC_API_CHECKOUT_URL" "$PUBLIC_API_PASS_URL"; do
             origins="$origins $(printf '%s' "$url" | grep -oE '^https://[^/]+')"
           done
+          html="dist/facturas/renovacion/index.html"
+          [ -f "$html" ] || fail "/facturas/renovacion/ was not built"
+          grep -q 'data-documents-start' "$html" || fail "/facturas/renovacion/ has no document reading"
           for page in finiquito paro alquiler contrato hipoteca financiacion seguros; do
             html="dist/$page/index.html"
             grep -q 'data-pass-buy' "$html" || fail "/$page/ has no pass"

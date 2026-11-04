@@ -32,7 +32,7 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/seguros/': '2026-10-11',
   '/financiacion/': '2026-10-11',
   '/hipoteca/': '2026-10-11',
-  '/facturas/': '2026-10-14',
+  '/facturas/': '2026-11-04',
   '/facturas/luz/': '2026-10-14',
   '/facturas/permanencia/': '2026-10-14',
   '/facturas/renovacion/': '2026-11-04',
