@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.113.0](https://github.com/Endika/eslojusto/compare/v1.112.0...v1.113.0) (2026-11-04)
+
+
+### Features
+
+* **bills:** take /facturas/ out of beta ([4473e07](https://github.com/Endika/eslojusto/commit/4473e07ad2d1444c0d0bacfe14237723ebdde8df))
+
 ## [1.112.0](https://github.com/Endika/eslojusto/compare/v1.111.2...v1.112.0) (2026-11-04)
 
 
