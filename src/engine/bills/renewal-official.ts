@@ -1,7 +1,7 @@
 import { addDays, fromOrdinal, ordinal, parseDate, toIso } from '../date';
 import { round2 } from '../money';
 import { pvpcMeanAllBetween, type OfficialDeps } from './electricity-official';
-import type { BillsNormId } from './norms';
+import { normStanding, type BillsNormId } from './norms';
 import { recalculate, regulatedOn } from './renewal';
 import type { RenewalDeps, RenewalInput } from './renewal-types';
 import { valueOn, type RowDoubt, type TableRow, type VatRate } from './tables';
@@ -65,6 +65,16 @@ export function compareWithPvpc(
   };
 }
 
+// One way the open norms may go: those met and those not, with the rates it leaves. When several
+// ways leave the same rates, the first is kept.
+export interface ConditionalOption {
+  readonly applies: readonly BillsNormId[];
+  readonly unless: readonly BillsNormId[];
+  readonly electricityTaxPercent: number;
+  readonly vatPercent: number;
+  readonly withTax: number;
+}
+
 export type RenewalTaxes =
   | {
       readonly kind: 'ok';
@@ -77,24 +87,9 @@ export type RenewalTaxes =
   // A tax rate on the renewal day depends on a norm not yet settled: each way it may go.
   | {
       readonly kind: 'conditional';
-      readonly options: readonly {
-        // Open norms that must hold for this option, and norms that must not all hold.
-        readonly applies: readonly BillsNormId[];
-        readonly unless: readonly BillsNormId[];
-        readonly electricityTaxPercent: number;
-        readonly vatPercent: number;
-        readonly withTax: number;
-      }[];
+      readonly options: readonly ConditionalOption[];
     }
   | { readonly kind: 'missing' };
-
-// The still-open norms a row needs to hold, and those that must not all hold for it to.
-function direction(row: TableRow<unknown>, open: (ids: readonly BillsNormId[]) => BillsNormId[]) {
-  return {
-    applies: open([row.norm, ...(row.alsoRestsOn ?? [])]),
-    unless: open(row.unless ?? []),
-  };
-}
 
 function vatPercent(rate: VatRate, powerKw: number): number {
   if (rate.kind === 'general') return rate.percent;
@@ -131,41 +126,44 @@ export function renewalTaxes(
       declaredMatches: declared === null ? null : Math.abs(declared - ours) <= DECLARED_TOLERANCE,
     };
   }
-  const deciding = new Set([
-    ...(tax.kind === 'conditional' ? tax.norms : []),
-    ...(vat.kind === 'conditional' ? vat.norms : []),
-  ]);
-  const open = (ids: readonly BillsNormId[]) => ids.filter((id) => deciding.has(id));
-  const taxRows = (tax.kind === 'ok' ? [tax.row] : tax.rows).map((row) => ({
-    row,
-    ...direction(row, open),
-  }));
-  const vatRows = (vat.kind === 'ok' ? [vat.row] : vat.rows).map((row) => ({
-    row,
-    ...direction(row, open),
-  }));
-  const sameNorms = (a: readonly BillsNormId[], b: readonly BillsNormId[]) =>
-    a.length === b.length && a.every((id) => b.includes(id));
-  // Two taxes turning on the same norms go together only the same way; on different norms every
-  // pair is possible.
-  const compatible = (t: (typeof taxRows)[number], v: (typeof vatRows)[number]) =>
-    !sameNorms([...t.applies, ...t.unless], [...v.applies, ...v.unless]) ||
-    (sameNorms(t.applies, v.applies) && sameNorms(t.unless, v.unless));
+  const deciding = [
+    ...new Set([
+      ...(tax.kind === 'conditional' ? tax.norms : []),
+      ...(vat.kind === 'conditional' ? vat.norms : []),
+    ]),
+  ];
+  const taxRows = tax.kind === 'ok' ? [tax.row] : tax.rows;
+  const vatRows = vat.kind === 'ok' ? [vat.row] : vat.rows;
+  const options = new Map<string, ConditionalOption>();
+  // Every way the open norms may go; each table then holds the row valueOn would pick.
+  for (let mask = 0; mask < 2 ** deciding.length; mask++) {
+    const met = deciding.filter((_, i) => (mask >> i) & 1);
+    const holds = (id: BillsNormId) =>
+      deciding.includes(id)
+        ? met.includes(id)
+        : normStanding(norms[id], input.renewalDate) === 'in_force';
+    const pick = <V>(rows: readonly TableRow<V>[]) =>
+      rows.find(
+        (row) =>
+          [row.norm, ...(row.alsoRestsOn ?? [])].every(
+            (id) => !deciding.includes(id) || holds(id),
+          ) && !(row.unless !== undefined && row.unless.every(holds)),
+      );
+    const [t, v] = [pick(taxRows), pick(vatRows)];
+    if (t === undefined || v === undefined) continue;
+    const vatRate = vatPercent(v.value, input.powerKw.p1);
+    const key = `${t.value.percent}/${vatRate}`;
+    if (options.has(key)) continue;
+    options.set(key, {
+      applies: met,
+      unless: deciding.filter((id) => !met.includes(id)),
+      electricityTaxPercent: t.value.percent,
+      vatPercent: vatRate,
+      withTax: withTax(t.value.percent, vatRate),
+    });
+  }
   return {
     kind: 'conditional',
-    options: taxRows.flatMap((t) =>
-      vatRows
-        .filter((v) => compatible(t, v))
-        .map((v) => {
-          const vatRate = vatPercent(v.row.value, input.powerKw.p1);
-          return {
-            applies: [...new Set([...t.applies, ...v.applies])],
-            unless: [...new Set([...t.unless, ...v.unless])],
-            electricityTaxPercent: t.row.value.percent,
-            vatPercent: vatRate,
-            withTax: withTax(t.row.value.percent, vatRate),
-          };
-        }),
-    ),
+    options: [...options.values()].sort((a, b) => a.withTax - b.withTax),
   };
 }

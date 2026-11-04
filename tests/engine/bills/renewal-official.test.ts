@@ -109,6 +109,8 @@ describe('comparing a renewal with the PVPC', () => {
     const pvpc = flat('2027-01-01', '2027-01-14', 150);
     expect(compareWithPvpc(letter(), officialDeps(pvpc))).toMatchObject({
       kind: 'ok',
+      from: '2027-01-01',
+      to: '2027-01-14',
       annual: 809.9,
     });
   });
@@ -186,6 +188,37 @@ describe('taxes of a renewal', () => {
           },
         ],
       });
+    });
+
+    it('never mixes rows that need the opposite of the same norm', () => {
+      const june = BILLS_NORMS.rdl7_2026_june;
+      const norms: NormTable = {
+        ...BILLS_NORMS,
+        rdl7_2026_june: {
+          ...june,
+          status: 'conditional',
+          condition: {
+            text: june.condition?.text ?? '',
+            decidesOn: june.condition?.decidesOn ?? '',
+            source: june.condition?.source ?? '',
+            met: null,
+          },
+        },
+        rdl10_2026: { ...BILLS_NORMS.rdl10_2026, status: 'pending_validation' },
+      };
+      const result = renewalTaxes(letter({ renewalDate: '2026-06-10' }), 1071.15, {
+        tables: BILLS_TABLES,
+        norms,
+      });
+      if (result.kind !== 'conditional') throw new Error('conditional expected');
+      expect(result.options.map((o) => [o.electricityTaxPercent, o.vatPercent])).toEqual([
+        [0.5, 10],
+        [0.5, 21],
+        [5.11269632, 21],
+      ]);
+      for (const o of result.options) {
+        expect(o.applies.filter((id) => o.unless.includes(id))).toEqual([]);
+      }
     });
 
     it('reads the reduced VAT only up to the power limit', () => {
