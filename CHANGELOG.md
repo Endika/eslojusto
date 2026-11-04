@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.110.0](https://github.com/Endika/eslojusto/compare/v1.109.0...v1.110.0) (2026-11-04)
+
+
+### Features
+
+* **api:** read an electricity renewal letter ([d3e539a](https://github.com/Endika/eslojusto/commit/d3e539afa7b39ced2a4e6ebfc3421e1355a1baeb))
+
+
+### Bug Fixes
+
+* **api:** drop an unused renewal section type ([1cfc75d](https://github.com/Endika/eslojusto/commit/1cfc75d2e4e7399725520aa9afb60497a2e2c43a))
+* **api:** flag ambiguous energy prices in the renewal read ([040e7ad](https://github.com/Endika/eslojusto/commit/040e7adf7a1ee447ec99ae4c3f0fd984a6d90705))
+* **api:** tighten the renewal letter read ([499dc4f](https://github.com/Endika/eslojusto/commit/499dc4f331eb6c60debf5fe671dc2229877a6d6e))
+
 ## [1.109.0](https://github.com/Endika/eslojusto/compare/v1.108.0...v1.109.0) (2026-11-04)
 
 
