@@ -975,7 +975,7 @@ export const eu: Translation = {
   'client.documents.error.captcha_failed':
     'Ezin izan da egiaztatu ez zarela robot bat. Saiatu berriro.',
   'client.documents.error.daily_limit_reached':
-    'Gaurko doako 2 irakurketak erabili dituzu dagoeneko nabigatzaile honetan. Eskuz bete dezakezu edo bihar itzuli.',
+    'Gaurko doako 2 irakurketak erabili dituzu dagoeneko. Eskuz bete dezakezu edo bihar itzuli.',
   'client.documents.error.pass_invalid':
     'Zure paseak ez du balio jada nabigatzaile honetan dokumentuak irakurtzeko; txostena eta gutuna eskuragarri daude iraungi arte. Saiatu berriro doako irakurketa batekin edo bete eskuz.',
   'client.documents.error.pass_expired':

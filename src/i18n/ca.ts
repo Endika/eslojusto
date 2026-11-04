@@ -964,7 +964,7 @@ export const ca: Translation = {
   'client.documents.error.captcha_failed':
     'No s’ha pogut comprovar que no ets un robot. Torna-ho a provar.',
   'client.documents.error.daily_limit_reached':
-    'Ja has fet servir les 2 lectures gratuïtes d’avui en aquest navegador. Pots escriure les dades a mà o tornar demà.',
+    'Ja has fet servir les 2 lectures gratuïtes d’avui. Pots escriure les dades a mà o tornar demà.',
   'client.documents.error.pass_invalid':
     'El teu passi ja no serveix per llegir documents en aquest navegador; l’informe i la carta continuen disponibles fins que caduqui. Torna-ho a provar amb una lectura gratuïta o escriu les dades a mà.',
   'client.documents.error.pass_expired':

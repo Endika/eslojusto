@@ -954,7 +954,7 @@ export const gl: Translation = {
   'client.documents.error.captcha_failed':
     'Non se puido comprobar que non es un robot. Proba outra vez.',
   'client.documents.error.daily_limit_reached':
-    'Xa usaches as 2 lecturas gratuítas de hoxe neste navegador. Podes escribir os datos a man ou volver mañá.',
+    'Xa usaches as 2 lecturas gratuítas de hoxe. Podes escribir os datos a man ou volver mañá.',
   'client.documents.error.pass_invalid':
     'O teu pase xa non serve para ler documentos neste navegador; o informe e a carta seguen dispoñibles ata que caduque. Proba outra vez cunha lectura gratuíta ou escribe os datos a man.',
   'client.documents.error.pass_expired':

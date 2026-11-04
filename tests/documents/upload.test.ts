@@ -800,7 +800,7 @@ describe('the start sheet', () => {
       expect(requests).toEqual([]);
       expect(listed()).toHaveLength(1);
       expect(text('[data-doc-error]')).toBe(
-        'Ya has usado las 2 lecturas gratis de hoy en este navegador. Puedes rellenar a mano o volver mañana.',
+        'Ya has usado las 2 lecturas gratis de hoy. Puedes rellenar a mano o volver mañana.',
       );
     });
 
