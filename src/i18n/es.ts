@@ -6435,6 +6435,12 @@ export const es = {
   'bills.hub.telecom_situation':
     'Te vas de tu compañía de móvil o internet: la penalización y lo que te cobran',
   'bills.hub.telecom_citation': 'Ley 11/2022 · TRLGDCU, art. 62.5 · Real Decreto 899/2009',
+  'bills.hub.renewal': 'Renovación',
+  'bills.hub.renewal_situation':
+    'Te llega la carta de renovación de tu contrato de luz: lo que cambia, qué es regulado y qué dice la norma del aviso',
+  'bills.hub.renewal_citation': 'Real Decreto 88/2026 · Real Decreto-ley 25/2026',
+  'bills.lead_renewal':
+    'Tres revisiones: tu factura de la luz, línea por línea; la carta de renovación de tu contrato de luz, y la penalización y la baja de tu contrato de móvil o internet.',
   'bills.beta': 'Beta',
   'bills.beta_note':
     'Sección en pruebas. Las cifras salen de lo que escribes, de las tablas oficiales y de la norma.',
@@ -6786,6 +6792,73 @@ export const es = {
   'bills.renewal.separate_from_bill': '¿Te llegó la carta aparte de la factura?',
   'bills.renewal.separate_from_bill_hint':
     'Por correo o email propio, no dentro de una factura ni junto a ella.',
+  'bills.renewal.app_name': 'Revisión de la carta de renovación de tu contrato de luz',
+  'bills.renewal.crumb': 'Renovación',
+  'bills.renewal.title': 'Revisa la carta de renovación de tu contrato de luz',
+  'bills.renewal.description':
+    'Recalcula lo que cambia con los precios nuevos de tu carta de renovación de la luz, qué parte es regulada, cómo queda frente al PVPC, los impuestos de la fecha, el preaviso y la salida del contrato.',
+  'bills.renewal.h1': 'La carta de renovación de tu luz, con sus cuentas',
+  'bills.renewal.lead':
+    'Con los precios de tu carta: cuánto cambia el coste de un año sin impuestos, qué parte de los precios es regulada, cómo queda frente al PVPC, los impuestos de la fecha, si el preaviso cumple y qué dice la norma de salir del contrato. Para hogares con tarifa 2.0TD, hasta 15 kW.',
+  'bills.renewal.tab.fechas': 'Fechas',
+  'bills.renewal.tab.potencia': 'Precios',
+  'bills.renewal.tab.consumo': 'Consumo',
+  'bills.renewal.tab.resultado': 'Resultado',
+  'bills.renewal.documents.start_help':
+    'Puedes subir la carta de renovación para rellenar los datos con lo que se lea en ella, o escribirlos tú. Antes de revisar nada, confirmas cada dato.',
+  'bills.renewal.documents.upload': 'Sube la carta de renovación',
+  'bills.renewal.documents.files_hint':
+    'Todas las páginas de la carta o del aviso de cambio de precios de tu contrato de luz. Hasta 25 fotos o páginas de PDF en total. Las fotos y las páginas de los PDF se convierten en imágenes en tu dispositivo antes de enviarse.',
+  'bills.guide.renewal.title': 'Qué comprueba la revisión de tu carta de renovación',
+  'bills.guide.renewal.lead':
+    'Cómo se recalcula el coste con los precios de la carta, qué parte de los precios es regulada, el PVPC como dato de comparación, los impuestos de la fecha de la renovación, el preaviso y la salida del contrato, con la norma de la que sale cada cosa.',
+  'bills.guide.renewal_checks.title': 'Las cuentas de la carta',
+  'bills.guide.renewal_checks.p1':
+    'La revisión recalcula un año de luz sin impuestos dos veces, con los precios actuales y con los nuevos de la carta, con la misma potencia y el mismo consumo anual, y enseña la diferencia en euros y en tanto por ciento. Si la carta declara su propio coste, lo compara con el recálculo y dice si coinciden.',
+  'bills.guide.renewal_checks.p2':
+    'Si la carta no da el consumo anual, o da los precios de la energía por periodos sin el consumo de cada uno, el coste no se puede recalcular y la revisión lo dice en vez de suponerlo. El resto de comprobaciones sigue en pie.',
+  'bills.guide.renewal_regulated.title': 'Qué parte de los precios es regulada',
+  'bills.guide.renewal_regulated.p1':
+    'Dentro de los precios de la potencia y de la energía van los peajes de transporte y distribución, que fija la CNMC, y los cargos del sistema, que fija el Ministerio. Son iguales con cualquier comercializadora; lo que queda hasta el precio de la carta lo pone la comercializadora.',
+  'bills.guide.renewal_regulated.p2':
+    'La revisión separa, para cada término, lo regulado en la fecha de la renovación de lo que pone la comercializadora, con el precio actual y el nuevo. Así se ve si una subida viene de los peajes y cargos o del margen de la comercializadora.',
+  'bills.guide.renewal_pvpc.title': 'El PVPC, como dato',
+  'bills.guide.renewal_pvpc.p1':
+    'La revisión calcula lo que habría costado el último año en PVPC, con tu consumo y tu potencia, sin impuestos, y lo pone al lado de los precios nuevos. Es la media simple de todas las horas del rango, sin el perfil de consumo de REE, así que es una referencia y no una predicción.',
+  'bills.guide.renewal_pvpc.p2':
+    'El margen de comercialización del PVPC que usa el cálculo puede estar desfasado, y la revisión lo avisa. El PVPC es un dato para comparar: la revisión no recomienda ninguna tarifa ni ninguna comercializadora.',
+  'bills.guide.renewal_taxes.title': 'Los impuestos de la fecha',
+  'bills.guide.renewal_taxes.p1':
+    'El coste con impuestos se calcula con el impuesto eléctrico y el IVA que rijan en la fecha de la renovación. Cuando esa fecha cae en un periodo cuyas normas aún no están decididas, como el Real Decreto-ley 25/2026, la revisión no elige: enseña cada resultado posible y lo que tendría que pasar para que valga.',
+  'bills.guide.renewal_notice.title': 'El preaviso de un mes',
+  'bills.guide.renewal_notice.p1':
+    'Con efectos desde el 12-06-2026, el Real Decreto 88/2026 reconoce a quien consume luz el derecho a (art. 6.1.m):',
+  'bills.guide.renewal_notice.p2':
+    'La revisión cuenta los días entre la fecha de la carta y la de la renovación, y mira si la carta llegó aparte de la factura. El contenido que debe llevar el aviso lo fijará una orden ministerial que aún no hemos localizado, y no se comprueba.',
+  'bills.guide.renewal_exit.title': 'Salir del contrato',
+  'bills.guide.renewal_exit.p1':
+    'Una persona con la tarifa 2.0TD puede dejar su contrato en cualquier momento sin penalización, salvo en un contrato a precio fijo antes de su primera prórroga anual. En ese caso, la penalización no puede pasar del 5 % de la energía estimada pendiente de suministro, y la pérdida la tiene que probar la comercializadora (Real Decreto 88/2026, art. 28.3).',
+  'bills.guide.renewal_exit.p2':
+    'Con lo que cuentas de tu contrato, la revisión dice si le corresponde penalización según esa norma. No calcula el importe de la penalización.',
+  'bills.guide.renewal.unchecked.gas':
+    'El gas: aunque la carta también lo trate, solo se revisa la parte de la luz.',
+  'bills.guide.renewal.unchecked.scope':
+    'Los suministros de más de 15 kW y los de empresas: la revisión es para hogares con tarifa 2.0TD.',
+  'bills.faq.renewal.notice': '¿Con cuánta antelación me tienen que avisar de la renovación?',
+  'bills.faq.renewal.notice_answer':
+    'Si la comercializadora quiere cambiar las condiciones del contrato, tiene que avisar con al menos un mes de antelación e informar del derecho a rescindir el contrato sin coste alguno (Real Decreto 88/2026, art. 6.1.m, con efectos desde el 12-06-2026). La revisión cuenta los días entre la carta y la renovación; el contenido que debe llevar el aviso lo fijará una orden ministerial que aún no hemos localizado.',
+  'bills.faq.renewal.exit': '¿Me pueden cobrar por irme tras la carta?',
+  'bills.faq.renewal.exit_answer':
+    'Una persona con la tarifa 2.0TD puede dejar su contrato de luz en cualquier momento sin penalización, salvo en un contrato a precio fijo antes de su primera prórroga anual. En ese caso, la penalización no puede pasar del 5 % de la energía estimada pendiente de suministro, y la pérdida la tiene que probar la comercializadora (Real Decreto 88/2026, art. 28.3). Los plazos que la carta fije para comunicar la baja o la oposición a la renovación no los comprueba la revisión.',
+  'bills.faq.renewal.regulated': '¿Qué parte del precio es regulada?',
+  'bills.faq.renewal.regulated_answer':
+    'Los peajes de transporte y distribución, que fija la CNMC, y los cargos del sistema, que fija el Ministerio, van dentro del precio de la potencia y de la energía y son iguales con cualquier comercializadora. La revisión los separa, en la fecha de la renovación, de lo que pone la comercializadora.',
+  'bills.faq.renewal.pvpc': '¿Por qué aparece el PVPC?',
+  'bills.faq.renewal.pvpc_answer':
+    'Porque es el precio regulado de referencia, publicado hora a hora. La revisión calcula lo que habría costado el último año con tu consumo y tu potencia, como media simple de las horas, y lo pone junto a los precios nuevos de la carta. Es un dato para comparar, no una recomendación.',
+  'bills.faq.renewal.documents': '¿Qué pasa con mi carta?',
+  'bills.faq.renewal.documents_answer':
+    'Si subes la carta, se envía cifrada a un servidor de Amazon Web Services en España, que se la pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo tiene orden de no copiar nombres, DNI, direcciones, teléfonos, correos ni cuentas. No se guarda nada. Esta revisión es gratis y no pide ningún pase. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
   'bills.telecom.form_aria': 'Revisión de tu permanencia y tu baja',
   'bills.telecom.tab.permanencia': 'Contrato',
   'bills.telecom.tab.baja': 'Baja',
@@ -7094,9 +7167,9 @@ export const es = {
     '{importe} con impuestos, con {impuesto} de impuesto eléctrico y {iva} de IVA, en estos casos:',
   'client.bills.renewal.taxes.if': 'si {condiciones}',
   'client.bills.renewal.taxes.cond_met':
-    'se cumple la condición de {norma}: {condicion} (se sabrá hacia el {fecha})',
+    'se cumple la condición del {norma} ({condicion}; se sabrá hacia el {fecha})',
   'client.bills.renewal.taxes.cond_not_met':
-    'no se cumple la condición de {norma}: {condicion} (se sabrá hacia el {fecha})',
+    'no se cumple la condición del {norma} ({condicion}; se sabrá hacia el {fecha})',
   'client.bills.renewal.taxes.cond_again': 'no se cumple esa condición',
   'client.bills.renewal.taxes.decided_by': 'según lo que se decida sobre {norma}',
   'client.bills.renewal.taxes.convalidated': 'el Congreso convalida el {norma}',

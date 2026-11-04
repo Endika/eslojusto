@@ -1,0 +1,27 @@
+---
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+---
+
+<section class="result" id="resultado" aria-labelledby="result-title" hidden>
+  <header class="result__header">
+    <h2 class="result__title" id="result-title" tabindex="-1">
+      {tx('bills.result.title')}
+    </h2>
+    <p class="result__lead" data-lead></p>
+  </header>
+
+  <div class="review" data-renewal></div>
+
+  <div class="restart">
+    <button class="button button--restart" type="button" data-restart>
+      {tx('bills.result.restart')}
+    </button>
+  </div>
+</section>

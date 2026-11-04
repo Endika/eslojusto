@@ -288,7 +288,7 @@ describe('what decides each tax figure', () => {
     expect(lines(shown(naturgy()))).toEqual([
       'Los impuestos del 10-12-2026 dependen de lo que se decida sobre: Real Decreto-ley 25/2026, arts. 19 y 21 (rebaja de diciembre de 2026); Real Decreto-ley 25/2026, de 29 de septiembre. No elegimos un resultado: estos son los posibles.',
       '1.184,16 € con impuestos, con 0,5 % de impuesto eléctrico y 10 % de IVA, en estos casos:',
-      'si se cumple la condición de Real Decreto-ley 25/2026, arts. 19 y 21 (rebaja de diciembre de 2026): que el IPC de la electricidad de octubre de 2026 suba más del 15 % interanual (se sabrá hacia el 13-11-2026) y el Congreso convalida el Real Decreto-ley 25/2026, de 29 de septiembre',
+      'si se cumple la condición del Real Decreto-ley 25/2026, arts. 19 y 21 (rebaja de diciembre de 2026) (que el IPC de la electricidad de octubre de 2026 suba más del 15 % interanual; se sabrá hacia el 13-11-2026) y el Congreso convalida el Real Decreto-ley 25/2026, de 29 de septiembre',
       '1.362,36 € con impuestos, con 5,11269632 % de impuesto eléctrico y 21 % de IVA, en los demás casos.',
       'La carta declara 1.362,36 € con impuestos, que coincide con la opción de 5,11269632 % de impuesto eléctrico y 21 % de IVA.',
     ]);

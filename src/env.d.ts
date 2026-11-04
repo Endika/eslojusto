@@ -7,4 +7,5 @@ interface ImportMetaEnv {
   readonly PUBLIC_API_CHECKOUT_URL?: string;
   readonly PUBLIC_API_PASS_URL?: string;
   readonly PUBLIC_TURNSTILE_SITE_KEY?: string;
+  readonly PUBLIC_RENEWAL?: string;
 }

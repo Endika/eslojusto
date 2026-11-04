@@ -1,0 +1,122 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import DocumentStart from '../components/DocumentStart.astro';
+import RenewalForm from '../components/RenewalForm.astro';
+import RenewalResult from '../components/RenewalResult.astro';
+import BillsGuide from '../components/BillsGuide.astro';
+import { BILLS_BETA } from '../content/sections';
+import { formatLongDay } from '../content/rent-indices';
+import { billsFaqEntries } from '../content/bills-faq';
+import { faqNode } from '../content/faq';
+import { billsApp, breadcrumbList, trail } from '../content/structured-data';
+import { LAST_UPDATED } from '../content/updated';
+import { DOCUMENTS } from '../documents/config';
+import { t, type Key } from '../i18n';
+import { link, type Lang } from '../i18n/languages';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+// With the documents API the visit opens on the choice between uploading and typing; the tabs and
+// the form wait until it is made, and the result offers the pass.
+const documents = DOCUMENTS !== null;
+
+// Each tab's share of the rail follows how much its section asks, kept close so that every name
+// still fits on a phone. The second column is the section's first step, whose id is its URL
+// fragment.
+const sections = [
+  ['cause', 'fechas', '01', 3],
+  ['salary', 'potencia', '02', 3],
+  ['settlement', 'consumo', '03', 3],
+  ['result', 'resultado', '04', 2],
+] as const;
+
+// The day the page's rules and tables were last checked.
+const checkedOn = LAST_UPDATED['/facturas/renovacion/'];
+if (!checkedOn) throw new Error('/facturas/renovacion/ needs its date in LAST_UPDATED.');
+const home = new URL(import.meta.env.BASE_URL, Astro.site);
+const page = new URL(link(lang, 'facturas/renovacion/'), Astro.site);
+const crumbs = trail(
+  lang,
+  { name: tx('bills.crumb'), path: '/facturas/' },
+  { name: tx('bills.renewal.crumb'), path: '/facturas/renovacion/' },
+);
+const structuredData = [
+  billsApp(home, page, lang, 'renewal'),
+  breadcrumbList(home, lang, crumbs),
+  faqNode(billsFaqEntries(lang, 'renewal', { documents })),
+];
+---
+
+<Base
+  title={tx('bills.renewal.title')}
+  description={tx('bills.renewal.description')}
+  path="/facturas/renovacion/"
+  lang={lang}
+  section="cause"
+  structuredData={structuredData}
+  calculator={documents}
+>
+  <nav class="tabs" slot="tabs" aria-label={tx('tabs.nav')} hidden={documents}>
+    <ol>
+      {/* Only a section already reached is a link; one still ahead is plain text until then. */}
+      {sections.map(([id, step, number, weight], i) => (
+        <li style={`--weight: ${weight}`} data-tone={id}>
+          {i === 0 ? (
+            <a
+              class="tab"
+              data-tab={id}
+              data-state="current"
+              href={`#sheet-${step}`}
+              aria-current="step"
+            >
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`bills.renewal.tab.${step}`)}</span>
+            </a>
+          ) : (
+            <span class="tab" data-tab={id} data-state="pending" aria-disabled="true">
+              <span class="tab__number">{number}</span>
+              <span class="tab__name">{tx(`bills.renewal.tab.${step}`)}</span>
+            </span>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+  <main id="content">
+    <div class="desk">
+      <header class="desk__head">
+        <Breadcrumbs lang={lang} crumbs={crumbs} />
+        <h1 class="desk__title">{tx('bills.renewal.h1')}</h1>
+        <p class="desk__lead">{tx('bills.renewal.lead')}</p>
+        {BILLS_BETA && (
+          <p class="desk__beta">
+            <span class="beta">{tx('bills.beta')}</span>
+            {tx('bills.beta_note')}
+          </p>
+        )}
+        <p class="desk__reviewed">
+          <time datetime={checkedOn}>
+            {t(lang, 'bills.reviewed', { fecha: formatLongDay(checkedOn, lang) })}
+          </time>
+        </p>
+      </header>
+      <noscript>
+        <div class="sheet sheet--notice">
+          <p class="help">{tx('bills.no_js')}</p>
+        </div>
+      </noscript>
+      {documents && <DocumentStart lang={lang} review="renewal" />}
+      <RenewalForm lang={lang} hidden={documents} />
+      <RenewalResult lang={lang} />
+    </div>
+    <BillsGuide lang={lang} review="renewal" checkedOn={checkedOn} documents={documents} />
+  </main>
+</Base>
+
+<script>
+  import '../scripts/renewal';
+</script>

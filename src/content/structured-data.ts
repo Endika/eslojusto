@@ -121,8 +121,13 @@ export const mortgageApp = (home: URL, page: URL, lang: Lang) => ({
   publisher: organization(home),
 });
 
-// The two bills reviews, each its own application on its own page.
-export const billsApp = (home: URL, page: URL, lang: Lang, review: 'electricity' | 'telecom') => ({
+// The bills reviews, each its own application on its own page.
+export const billsApp = (
+  home: URL,
+  page: URL,
+  lang: Lang,
+  review: 'electricity' | 'telecom' | 'renewal',
+) => ({
   '@type': 'WebApplication',
   name: t(lang, `bills.${review}.app_name`),
   url: page.href,

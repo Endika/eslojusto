@@ -23,7 +23,7 @@ const creditSpecs = /[\\/]credit[^\\/]*\.spec\.ts$/;
 const mortgage = process.env['TEST_MORTGAGE'] === '1';
 const mortgageSpecs = /[\\/]mortgage[^\\/]*\.spec\.ts$/;
 const bills = process.env['TEST_BILLS'] === '1';
-const billsSpecs = /[\\/]bills\.spec\.ts$/;
+const billsSpecs = /[\\/]bills(-renewal)?\.spec\.ts$/;
 const optInSpecs = [
   /(rtl|analytics|documents)\.spec\.ts/,
   rentalSpecs,
@@ -38,6 +38,8 @@ const optInSpecs = [
 const port = Number(process.env['E2E_PORT'] ?? 4321);
 
 const buildEnv = {
+  // The renewal letter review is built only when asked for; every e2e build asks.
+  PUBLIC_RENEWAL: 'true',
   // The household, insurance and credit projects also measure their own events, so their builds
   // have a test analytics key.
   ...(analytics || household || insurance || credit ? { PUBLIC_POSTHOG_KEY: 'phc_test' } : {}),
@@ -62,7 +64,7 @@ export default defineConfig({
     command: `npm run build && npm run preview -- --port ${port}`,
     url: `http://localhost:${port}/`,
     reuseExistingServer: !process.env['CI'],
-    ...(Object.keys(buildEnv).length > 0 ? { env: buildEnv } : {}),
+    env: buildEnv,
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] }, testIgnore: optInSpecs },

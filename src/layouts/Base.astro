@@ -80,7 +80,10 @@ const pageStrings = {
   insurance: path === '/seguros/',
   credit: path === '/financiacion/',
   mortgage: path === '/hipoteca/',
-  bills: path === '/facturas/luz/' || path === '/facturas/permanencia/',
+  bills:
+    path === '/facturas/luz/' ||
+    path === '/facturas/permanencia/' ||
+    path === '/facturas/renovacion/',
 };
 const clientStringsJson = JSON.stringify(clientStrings(lang, pageStrings)).replace(/</g, '\\u003c');
 // The report and the letters stay in Spanish on every page: they go to a Spanish employer,
