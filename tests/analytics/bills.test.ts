@@ -414,8 +414,17 @@ describe('the renewal review', () => {
       mismatch: true,
       regulated_change: null,
       notice: 'not_checked_before',
+      exit: 'not_checked_before',
     });
     expect(isValidEvent('renewal_review_completed', odd)).toBe(true);
+  });
+
+  it('leaves the exit as free, unchanged or not checked, and nothing else', () => {
+    const same = renewalReviewProps(renewal(naturgy({ next: naturgy().current })), 'manual');
+    expect(same.exit).toBe('no_change');
+    expect(isValidEvent('renewal_review_completed', same)).toBe(true);
+    for (const gone of ['penalty_possible', 'unknown'])
+      expect(isValidEvent('renewal_review_completed', { ...same, exit: gone }), gone).toBe(false);
   });
 
   it('refuses a number, a date or a free text in any key', () => {

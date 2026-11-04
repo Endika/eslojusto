@@ -40,6 +40,10 @@ export const LEGAL_QUOTES: Readonly<Record<string, LegalQuoteText>> = {
     source: 'rd88_6',
     text: 'Ser avisado de forma transparente y comprensible por su comercializador o agregador independiente, con al menos un mes de antelación, por escrito y de manera separada a su factura, de cualquier intención de modificar las condiciones del contrato e informado de su derecho a rescindir el contrato sin coste alguno cuando reciba el aviso.',
   },
+  bills_change_exit: {
+    source: 'rd88_30_j',
+    text: 'j) Posibilidad de rescindir el contrato sin penalización alguna en caso de que se modifiquen las cláusulas contractuales.',
+  },
   bills_commitment_proportional: {
     source: 'trlgdcu_62',
     text: 'En caso de que el usuario incumpla el compromiso de permanencia adquirido con la empresa, la penalización por baja o cese prematuro de la relación contractual, será proporcional al número de días no efectivos del compromiso de permanencia acordado.',

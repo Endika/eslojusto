@@ -43,11 +43,11 @@ const PRICES = [
   ['annualKwh', QUANTITY],
 ] as const;
 const AMOUNTS = ['declaredWithoutTax', 'declaredWithTax'] as const;
-const FLAGS = ['fixedPrice', 'separateFromBill'] as const;
+const FLAGS = ['separateFromBill'] as const;
 
-// What a reading puts into the review of a renewal letter: its dates, prices, consumption and
-// the costs it declares, and whether it says the price is fixed or came apart from the bill.
-// Whether it is the first renewal is the person's to say.
+// What a reading puts into the review of a renewal letter: its dates, prices, consumption, the
+// costs it declares and whether it came apart from the bill. Whether the price is fixed is not
+// asked, so the API's answer to it is left out.
 export function renewalPrefill(e: RenewalExtraction, tr: Translate): ReadPrefill {
   const entries: [string, string][] = [];
   const marks: ReadMark[] = [];
@@ -79,12 +79,17 @@ export function renewalPrefill(e: RenewalExtraction, tr: Translate): ReadPrefill
     const f = fields[name];
     if (f && typeof f.value === 'boolean') read(name, f, f.value ? 'yes' : 'no');
   }
-  const pricing = ENERGY_PRICINGS.find((p) =>
-    entries.some(([name]) =>
-      p === 'single' ? /^(current|next)Energy$/.test(name) : /^(current|next)EnergyP\d$/.test(name),
-    ),
-  );
-  if (pricing !== undefined) entries.push(['energyPricing', pricing]);
+  // Each side's energy as the letter gives it: once for all the day or once per period.
+  for (const side of ['current', 'next'] as const) {
+    const pricing = ENERGY_PRICINGS.find((p) =>
+      entries.some(([name]) =>
+        p === 'single'
+          ? name === `${side}Energy`
+          : name.startsWith(side) && /EnergyP\d$/.test(name),
+      ),
+    );
+    if (pricing !== undefined) entries.push([`${side}EnergyPricing`, pricing]);
+  }
 
   const low = marks.some((m) => m.confidence === 'low');
   const notes = [

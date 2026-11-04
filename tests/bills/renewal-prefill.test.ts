@@ -51,10 +51,10 @@ describe('what a read of the renewal letter fills in', () => {
       annualKwh: '4190,2',
       declaredWithoutTax: '1.071,15',
       separateFromBill: 'yes',
-      fixedPrice: 'no',
-      energyPricing: 'single',
+      currentEnergyPricing: 'single',
+      nextEnergyPricing: 'single',
     });
-    expect(p.count).toBe(13);
+    expect(p.count).toBe(12);
     expect(p.lowConfidence).toBe(false);
     expect(p.marks.find((m) => m.id === 'declaredWithoutTax')).toMatchObject({
       container: '[data-field="declaredWithoutTax"]',
@@ -70,12 +70,32 @@ describe('what a read of the renewal letter fills in', () => {
     expect(Object.fromEntries(p.entries)).toMatchObject({
       currentEnergyP1: '0,20',
       nextEnergyP3: '0,12',
-      energyPricing: 'periods',
+      currentEnergyPricing: 'periods',
+      nextEnergyPricing: 'periods',
     });
     expect(p.lowConfidence).toBe(true);
   });
 
-  it('leaves out what it cannot read, and the first renewal, which the person says', () => {
+  it('opens each side as the letter writes it, one price becoming three', () => {
+    const p = Object.fromEntries(
+      renewalPrefill(
+        read({
+          currentEnergy: field(0.144972),
+          nextEnergyP1: field(0.22),
+          nextEnergyP2: field(0.17),
+          nextEnergyP3: field(0.12),
+        }),
+        tr,
+      ).entries,
+    );
+    expect(p).toMatchObject({ currentEnergyPricing: 'single', nextEnergyPricing: 'periods' });
+  });
+
+  it('leaves out the fixed price, which the review no longer asks', () => {
+    expect(renewalPrefill(read({ fixedPrice: field(true) }), tr).entries).toEqual([]);
+  });
+
+  it('leaves out what it cannot read', () => {
     const p = renewalPrefill(
       read({ letterDate: field('31/10'), annualKwh: field(-3), powerUnit: field('per_hour') }),
       tr,

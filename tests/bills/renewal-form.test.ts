@@ -27,14 +27,13 @@ const LETTER: Values = {
   currentPowerP2: '0,033469',
   nextPowerP1: '0,12303',
   nextPowerP2: '0,052329',
-  energyPricing: 'single',
+  currentEnergyPricing: 'single',
+  nextEnergyPricing: 'single',
   currentEnergy: '0,144972',
   nextEnergy: '0,1678',
   annualKwh: '4.190,2',
   declaredWithoutTax: '1.071,15',
   declaredWithTax: '1.362,36',
-  fixedPrice: 'no',
-  firstRenewal: null,
   separateFromBill: 'yes',
 };
 
@@ -49,13 +48,14 @@ function form(change: Values = {}): HTMLFormElement {
 
 describe('the renewal form', () => {
   it('reads the Naturgy letter as the engine takes it', () => {
-    expect(readRenewalForm(form(), TODAY)).toEqual({ input: naturgy({ firstRenewal: null }) });
+    expect(readRenewalForm(form(), TODAY)).toEqual({ input: naturgy() });
   });
 
   it('takes an energy price for each period', () => {
     const r = readRenewalForm(
       form({
-        energyPricing: 'periods',
+        currentEnergyPricing: 'periods',
+        nextEnergyPricing: 'periods',
         currentEnergy: null,
         nextEnergy: null,
         currentEnergyP1: '0,2',
@@ -78,31 +78,60 @@ describe('the renewal form', () => {
         annualKwh: '',
         declaredWithoutTax: '',
         declaredWithTax: '',
-        fixedPrice: 'unknown',
         separateFromBill: 'unknown',
       }),
       TODAY,
     );
     expect(r).toEqual({
       input: naturgy({
-        firstRenewal: null,
         annualKwh: null,
         declared: { withoutTax: null, withTax: null },
-        fixedPrice: null,
         separateFromBill: null,
       }),
     });
   });
 
-  it('asks for the first renewal only on a fixed price', () => {
-    expect(readRenewalForm(form({ fixedPrice: 'yes', firstRenewal: 'yes' }), TODAY)).toEqual({
-      input: naturgy({ fixedPrice: true, firstRenewal: true }),
+  it('takes each side as the letter prices it, a single price becoming three or back', () => {
+    const toPeriods = readRenewalForm(
+      form({
+        nextEnergyPricing: 'periods',
+        nextEnergy: null,
+        nextEnergyP1: '0,22',
+        nextEnergyP2: '0,17',
+        nextEnergyP3: '0,12',
+      }),
+      TODAY,
+    );
+    if (!('input' in toPeriods)) throw new Error(JSON.stringify(toPeriods.errors));
+    expect(toPeriods.input.current.energy).toEqual({ all: 0.144972 });
+    expect(toPeriods.input.next.energy).toEqual({ p1: 0.22, p2: 0.17, p3: 0.12 });
+    const toSingle = readRenewalForm(
+      form({
+        currentEnergyPricing: 'periods',
+        currentEnergy: null,
+        currentEnergyP1: '0,2',
+        currentEnergyP2: '0,15',
+        currentEnergyP3: '0,1',
+      }),
+      TODAY,
+    );
+    if (!('input' in toSingle)) throw new Error(JSON.stringify(toSingle.errors));
+    expect(toSingle.input.current.energy).toEqual({ p1: 0.2, p2: 0.15, p3: 0.1 });
+    expect(toSingle.input.next.energy).toEqual({ all: 0.1678 });
+  });
+
+  it('asks how each side prices its energy', () => {
+    expect(readRenewalForm(form({ nextEnergyPricing: null }), TODAY)).toEqual({
+      errors: [{ field: 'nextEnergyPricing', code: 'missing_choice' }],
     });
-    expect(readRenewalForm(form({ fixedPrice: 'yes' }), TODAY)).toEqual({
-      errors: [{ field: 'firstRenewal', code: 'missing_choice' }],
-    });
-    expect(readRenewalForm(form({ fixedPrice: 'no', firstRenewal: 'yes' }), TODAY)).toEqual({
-      input: naturgy({ fixedPrice: false, firstRenewal: null }),
+  });
+
+  it('refuses a price of zero, on either side', () => {
+    expect(readRenewalForm(form({ currentPowerP2: '0', nextEnergy: '0' }), TODAY)).toEqual({
+      errors: [
+        { field: 'currentPowerP2', code: 'price_range' },
+        { field: 'nextEnergy', code: 'price_range' },
+      ],
     });
   });
 
@@ -236,7 +265,6 @@ describe('a comma followed by three digits', () => {
         currentEnergy: field(0.144972),
         nextEnergy: field(0.1678),
         annualKwh: field(4190.2),
-        fixedPrice: field(false),
         separateFromBill: field(true),
       },
     };

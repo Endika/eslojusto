@@ -4154,7 +4154,6 @@ export const zh: Translation = {
   'bills.renewal.question.energia-nueva': '新的电能价格',
   'bills.renewal.question.consumo': '年用电量',
   'bills.renewal.question.carta': '续约函所写的费用',
-  'bills.renewal.question.contrato': '您的合同',
   'bills.renewal.question.envio': '续约函是如何寄到的',
   'bills.renewal.letter_date': '续约函日期',
   'bills.renewal.letter_date_hint': '续约函或通知上写的日期。',
@@ -4171,7 +4170,8 @@ export const zh: Translation = {
   'bills.renewal.current_power_p2': 'P2 当前功率价格',
   'bills.renewal.next_power_p1': 'P1 新的功率价格',
   'bills.renewal.next_power_p2': 'P2 新的功率价格',
-  'bills.renewal.energy_pricing': '续约函给出几个电能价格？',
+  'bills.renewal.current_energy_pricing': '当前价格有几个？',
+  'bills.renewal.next_energy_pricing': '新价格有几个？',
   'bills.renewal.energy_pricing.single': '只有一个，适用于所有时段',
   'bills.renewal.energy_pricing.periods': '每个时段一个（P1、P2 和 P3）',
   'bills.renewal.current_energy': '当前电能价格（€/kWh）',
@@ -4187,9 +4187,6 @@ export const zh: Translation = {
   'bills.renewal.declared_without_tax': '按新价格计算的年费用，不含税（€）',
   'bills.renewal.declared_with_tax': '按新价格计算的年费用，含税（€）',
   'bills.renewal.declared_hint': '选填。将与我们的重新计算结果比较。',
-  'bills.renewal.fixed_price': '是固定价格合同吗？',
-  'bills.renewal.first_renewal': '是第一次按年续期吗？',
-  'bills.renewal.first_renewal_hint': '第一年之后的第一次续期（prórroga）。',
   'bills.renewal.separate_from_bill': '续约函是否与账单分开寄送？',
   'bills.renewal.separate_from_bill_hint':
     '通过邮寄或单独的电子邮件寄送，而不是放在账单里或随账单一起寄送。',
@@ -4238,9 +4235,9 @@ export const zh: Translation = {
     '核查计算续约函日期与续约日期之间的天数，并查看续约函是否与账单分开寄送。日期早于12-06-2026的续约函不按这条规定核查，因为该规定自那天起才适用。通知必须包含的内容将由一项部令（orden ministerial）规定，我们尚未找到该部令，因此不予核查。',
   'bills.guide.renewal_exit.title': '退出合同',
   'bills.guide.renewal_exit.p1':
-    '采用 2.0TD 费率的用户可以随时解除合同，不付违约金；但固定价格合同在第一次按年续期之前解约的除外。在这种情况下，违约金不得超过尚待供应的预估电能的5 %，且损失须由电力零售商举证（Real Decreto 88/2026, art. 28.3）。',
+    '自12-06-2026起，Real Decreto 88/2026 承认用电者在收到条件变更通知时有权解除合同，不产生任何费用（art. 6.1.m），并要求合同载明（art. 30.1.j）：',
   'bills.guide.renewal_exit.p2':
-    '根据您填写的合同情况，核查会说明按照该法规是否可能产生违约金。核查不计算违约金的金额。',
+    '当日期为12-06-2026或之后的续约函变更了任何价格时，核查会指出，根据上述条款，退出合同不产生费用，也没有违约金。如果续约函没有变更任何价格，核查不评估退出；12-06-2026之前的续约函不作检查。续约函本身规定的反对续约期限（例如 «15 días»）也不作检查。',
   'bills.guide.renewal.unchecked.gas': '燃气：即使续约函也涉及燃气，也只核查电力部分。',
   'bills.guide.renewal.unchecked.scope':
     '超过15 kW 的供电点和企业的供电点：本核查面向采用 2.0TD 费率的家庭用户。',
@@ -4249,7 +4246,7 @@ export const zh: Translation = {
     '如果电力零售商要变更合同条件，必须以书面形式、与其账单分开，至少提前一个月通知，并告知有权解除合同，不产生任何费用（Real Decreto 88/2026, art. 6.1.m，自12-06-2026起生效）。核查计算续约函与续约之间的天数；通知必须包含的内容将由一项部令（orden ministerial）规定，我们尚未找到该部令。',
   'bills.faq.renewal.exit': '收到续约函后解约会被收费吗？',
   'bills.faq.renewal.exit_answer':
-    '采用 2.0TD 费率的用户可以随时解除电力合同，不付违约金；但固定价格合同在第一次按年续期之前解约的除外。在这种情况下，违约金不得超过尚待供应的预估电能的5 %，且损失须由电力零售商举证（Real Decreto 88/2026, art. 28.3）。续约函为通知解约或反对续约所规定的期限，核查不予检查。',
+    '自12-06-2026起，收到电力合同条件变更通知的人有权解除合同，不产生任何费用（Real Decreto 88/2026, art. 6.1.m），而且合同必须规定，条款被修改时可以解除合同而不付违约金（art. 30.1.j）。因此，如果续约函变更了价格，核查会指出退出不产生违约金。续约函规定的反对续约期限（例如 «15 días»）不在核查范围内。',
   'bills.faq.renewal.regulated': '价格中哪部分受监管？',
   'bills.faq.renewal.regulated_answer':
     '由 CNMC 制定的输电和配电过网费（peajes），以及由部委（Ministerio）制定的系统附加费（cargos），包含在功率价格和电能价格中，无论哪家电力零售商都一样。核查会按续约日，把这部分与零售商加上的部分分开。',
@@ -4587,11 +4584,19 @@ export const zh: Translation = {
   'client.bills.renewal.split.conditional_many':
     '该日期的过网费和附加费取决于以下尚未确定的法规：{normas}。因此不作区分。',
   'client.bills.renewal.pvpc.no_data': '没有载入可用于比较的 PVPC 价格。',
+  'client.bills.renewal.pvpc.missing_table':
+    '我们没有{fecha}的过网费、附加费或 PVPC 的利润部分，因此不与 PVPC 比较。',
+  'client.bills.renewal.pvpc.conditional_one':
+    '续约日期的过网费、附加费或 PVPC 的利润部分取决于{normas}，而它尚未确定，因此不与 PVPC 比较。',
+  'client.bills.renewal.pvpc.conditional_many':
+    '续约日期的过网费、附加费或 PVPC 的利润部分取决于以下尚未确定的法规：{normas}。因此不与 PVPC 比较。',
   'client.bills.renewal.pvpc.no_consumption': '没有年用电量，就不与 PVPC 比较。',
   'client.bills.renewal.pvpc.needs_period_use':
     '电能价格按时段给出时，与 PVPC 比较需要各时段的用电量，而续约函没有给出。',
   'client.bills.renewal.pvpc.annual':
     '按您的用电量和功率，{desde}至{hasta}期间的 PVPC 每年需要{importe}，不含税。',
+  'client.bills.renewal.pvpc.annual_partial':
+    'PVPC 价格只公布了{periodo}，从{desde}至{hasta}，不是一整年。按您的用电量和功率，以这段时间的平均值计算，PVPC 每年需要{importe}，不含税。',
   'client.bills.renewal.pvpc.next': '续约函上的新价格每年需要{importe}，不含税。',
   'client.bills.renewal.pvpc.difference': '差额（续约函减 PVPC）：{diferencia}。',
   'client.bills.renewal.pvpc.average': '这是该区间内所有小时的简单平均值，未采用 REE 的用电曲线。',
@@ -4601,6 +4606,8 @@ export const zh: Translation = {
     '提前通知符合要求：续约函（{carta}）与续约（{renovacion}）之间相隔{dias}，且续约函与账单分开寄送。',
   'client.bills.renewal.notice.short':
     '提前通知不足一个月：续约函（{carta}）与续约（{renovacion}）之间相隔{dias}。',
+  'client.bills.renewal.notice.short_with_bill':
+    '提前通知不足一个月：续约函（{carta}）与续约（{renovacion}）之间相隔{dias}。此外，续约函是随账单一起寄来的，而法规要求与账单分开通知。',
   'client.bills.renewal.notice.separate_unknown':
     '从日期看已满一个月的提前通知：续约函（{carta}）与续约（{renovacion}）之间相隔{dias}。但我们不知道续约函是否与账单分开寄送，因此不认定通知符合要求。',
   'client.bills.renewal.notice.not_checked_before':
@@ -4608,11 +4615,11 @@ export const zh: Translation = {
   'client.bills.renewal.notice.not_separate':
     '续约函是随账单一起寄来的，而法规要求以书面形式、与账单分开通知。',
   'client.bills.renewal.exit.free':
-    '根据您填写的情况，解约不产生违约金：采用 2.0TD 费率的用户可以随时解除合同及其续期，不付违约金；但固定价格在第一次按年续期之前的除外。',
-  'client.bills.renewal.exit.penalty_possible':
-    '价格固定且在第一次按年续期之前，违约金最多可达尚待供应电能的{porcentaje}。',
-  'client.bills.renewal.exit.unknown':
-    '我们不知道价格是否固定，也不知道这是否是第一次续约，而是否有违约金正取决于此：只有固定价格在第一次按年续期之前才可能产生违约金。',
+    '续约函变更了价格。自12-06-2026起，收到此类通知的人有权解除合同，不产生任何费用；合同条款被修改时，合同必须允许解除合同而不付违约金。',
+  'client.bills.renewal.exit.no_change':
+    '续约函没有变更您填写的任何价格，因此本核查不评估退出合同。',
+  'client.bills.renewal.exit.not_checked_before':
+    '续约函日期为{carta}，早于这些法规开始适用的{desde}。本核查不检查该日期之前的续约函的退出合同问题。',
   'client.bills.renewal.unchecked.content':
     '通知必须包含的内容：将由一项部令规定，我们尚未找到该部令。',
   'client.bills.renewal.unchecked.deadlines': '续约函为通知解约或反对续约所要求的期限。',

@@ -20,8 +20,6 @@ export interface RenewalInput {
   readonly next: RenewalPrices;
   readonly annualKwh: number | null;
   readonly declared: { readonly withoutTax: number | null; readonly withTax: number | null };
-  readonly fixedPrice: boolean | null;
-  readonly firstRenewal: boolean | null;
   readonly separateFromBill: boolean | null;
 }
 
@@ -66,16 +64,19 @@ export type Split =
 
 export type Notice =
   | { readonly kind: 'meets'; readonly days: number }
-  | { readonly kind: 'short'; readonly days: number }
+  // Short of a month; `separate` says whether it also came apart from the bill (null: not known).
+  | { readonly kind: 'short'; readonly days: number; readonly separate: boolean | null }
   | { readonly kind: 'not_checked_before'; readonly since: '2026-06-12' }
   | { readonly kind: 'not_separate' }
   // A month or more ahead, but it is not known whether the letter came apart from the bill.
   | { readonly kind: 'separate_unknown'; readonly days: number };
 
+// Leaving is free when a letter dated from 12-06-2026 changes a price (RD 88/2026, arts. 6.1.m
+// and 30.1.j); a letter that changes none is not assessed.
 export type Exit =
   | { readonly kind: 'free' }
-  | { readonly kind: 'penalty_possible'; readonly capPercent: 5 }
-  | { readonly kind: 'unknown' };
+  | { readonly kind: 'no_change' }
+  | { readonly kind: 'not_checked_before'; readonly since: '2026-06-12' };
 
 export interface RenewalCore {
   readonly recalc: Recalc;

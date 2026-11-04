@@ -18,7 +18,8 @@ export const RENEWAL_FIELDS = [
   'currentPowerP2',
   'nextPowerP1',
   'nextPowerP2',
-  'energyPricing',
+  'currentEnergyPricing',
+  'nextEnergyPricing',
   'currentEnergy',
   'nextEnergy',
   'currentEnergyP1',
@@ -30,8 +31,6 @@ export const RENEWAL_FIELDS = [
   'annualKwh',
   'declaredWithoutTax',
   'declaredWithTax',
-  'fixedPrice',
-  'firstRenewal',
   'separateFromBill',
 ] as const;
 export type RenewalFormField = (typeof RENEWAL_FIELDS)[number];

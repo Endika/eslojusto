@@ -7,7 +7,7 @@ import type { NormTable } from '../../src/engine/bills/norms';
 import { reviewRenewal, type RenewalReviewDeps } from '../../src/engine/bills/renewal-review';
 import type { RenewalInput } from '../../src/engine/bills/renewal-types';
 import { pageTranslator } from '../support/page-strings';
-import { deps, naturgy, official, TODAY } from './renewal-support';
+import { deps, flatPvpc, naturgy, official, TODAY } from './renewal-support';
 
 const tr = pageTranslator('bills');
 
@@ -73,7 +73,12 @@ describe('the Naturgy letter', () => {
     const rule = text(card(root, 'El preaviso'));
     expect(rule).toContain('Real Decreto 88/2026, art. 6.1.m');
     expect(card(root, 'El preaviso').querySelector('a')?.getAttribute('href')).toMatch(/^https:/);
-    expect(text(card(root, 'Salir del contrato'))).toContain('art. 28.3');
+    expect(text(card(root, 'Salir del contrato'))).toContain(
+      'Real Decreto 88/2026, arts. 6.1.m y 30.1.j',
+    );
+    expect(card(root, 'Salir del contrato').querySelector('a')?.getAttribute('href')).toBe(
+      'https://www.boe.es/buscar/act.php?id=BOE-A-2026-3212#a3-2',
+    );
   });
 
   it('leaves the taxes to the norms still open, each option with its figures and rates', () => {
@@ -131,6 +136,20 @@ describe('the recalculation', () => {
       'No hay precios del PVPC',
     );
   });
+
+  it('names the missing tables of a 2027 renewal, not the PVPC prices', () => {
+    const pvpc = text(card(shown(naturgy({ renewalDate: '2027-01-15' })), 'Frente al PVPC'));
+    expect(pvpc).toBe(
+      'Frente al PVPCNo tenemos los peajes, los cargos o el margen del PVPC del 15-01-2027, así que no se compara con el PVPC.',
+    );
+  });
+
+  it('says how many months the PVPC covers when it is less than a year', () => {
+    const tenMonths = deps({ ...official(), pvpc: flatPvpc('2026-10-31', 100, 304) });
+    const pvpc = text(card(shown(naturgy(), tenMonths), 'Frente al PVPC'));
+    expect(pvpc).toContain('Solo hay 10 meses publicados del PVPC, del 01-01-2026 al 31-10-2026');
+    expect(text(card(shown(naturgy()), 'Frente al PVPC'))).not.toContain('Solo hay');
+  });
 });
 
 describe('the notice', () => {
@@ -167,20 +186,32 @@ describe('the notice', () => {
   it('says the letter came with the bill', () => {
     expect(notice(shown(naturgy({ separateFromBill: false })))).toContain('junto a la factura');
   });
+
+  it('says both when it falls short and came with the bill', () => {
+    const both = notice(shown(naturgy({ letterDate: '2026-11-20', separateFromBill: false })));
+    expect(both).toContain('no llega a un mes: 20 días');
+    expect(both).toContain('Además, la carta vino junto a la factura');
+  });
 });
 
 describe('leaving the contract', () => {
   const exit = (change: Partial<RenewalInput>) =>
     text(card(shown(naturgy(change)), 'Salir del contrato'));
 
-  it('is free at a renewal', () => {
-    expect(exit({})).toContain('rescindir no lleva penalización');
+  it('is free when the letter changes the prices', () => {
+    const free = exit({});
+    expect(free).toContain('La carta cambia los precios');
+    expect(free).toContain('rescindir el contrato sin coste alguno');
+    expect(free).toContain('sin penalización');
+    expect(free).not.toContain('5 %');
   });
-  it('may cost up to 5 % of the energy left on a fixed price before the first renewal', () => {
-    expect(exit({ fixedPrice: true, firstRenewal: true })).toContain('5 % de la energía pendiente');
+  it('is not assessed when the letter changes no price', () => {
+    expect(exit({ next: naturgy().current })).toContain('no valora la salida');
   });
-  it('does not say when the answers are unknown', () => {
-    expect(exit({ fixedPrice: null })).toContain('No sabemos si el precio es fijo');
+  it('is not checked for a letter before 12-06-2026, with the date', () => {
+    const before = exit({ letterDate: '2026-05-01' });
+    expect(before).toContain('La carta es del 01-05-2026, anterior al 12-06-2026');
+    expect(before).toContain('no comprueba la salida');
   });
 });
 
@@ -264,8 +295,8 @@ describe('every state', () => {
     ['before the rule', naturgy({ letterDate: '2026-05-01' })],
     ['with the bill', naturgy({ separateFromBill: false })],
     ['unknown separation', naturgy({ separateFromBill: null })],
-    ['fixed, first renewal', naturgy({ fixedPrice: true, firstRenewal: true })],
-    ['unknown contract', naturgy({ fixedPrice: null })],
+    ['no price change', naturgy({ next: naturgy().current })],
+    ['short with the bill', naturgy({ letterDate: '2026-11-20', separateFromBill: false })],
     ['mismatch', naturgy({ declared: { withoutTax: 1100, withTax: null } })],
     ['no consumption', naturgy({ annualKwh: null })],
     ['PVPC below', naturgy(), deps(official(300))],
@@ -316,13 +347,5 @@ describe('what decides each tax figure', () => {
     const rule = text(card(shown(naturgy()), 'El preaviso'));
     expect(rule).toContain('Real Decreto 88/2026, art. 6.1.m · ');
     expect(rule).not.toContain('por el que se aprueba');
-  });
-});
-
-describe('the cap on a penalty', () => {
-  it('comes from the review, not the copy', () => {
-    expect(
-      text(card(shown(naturgy({ fixedPrice: true, firstRenewal: true })), 'Salir del contrato')),
-    ).toContain('al 5 % de la energía pendiente');
   });
 });

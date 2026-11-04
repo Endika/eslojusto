@@ -1,5 +1,6 @@
 import { formatCalculationEuros, formatInteger } from '../../calculator/number';
 import { dayText, find } from '../../calculator/review-result';
+import { ordinal, parseDate } from '../../engine/date';
 import type { BillsNormId, NormTable } from '../../engine/bills/norms';
 import type { Outcome, PvpcComparison, RenewalTaxes } from '../../engine/bills/renewal-official';
 import type { RenewalReview } from '../../engine/bills/renewal-review';
@@ -333,17 +334,44 @@ function regulatedChangeText(
 
 // ---------- PVPC ----------
 
-function pvpcCard(pvpc: PvpcComparison, tr: Translate): HTMLElement {
+const monthsText = (n: number, tr: Translate): string =>
+  tr(n === 1 ? 'client.bills.unit.month_one' : 'client.bills.unit.month_many', {
+    n: formatInteger(n),
+  });
+
+function pvpcCard(pvpc: PvpcComparison, norms: NormTable, tr: Translate): HTMLElement {
   const title = tr('client.bills.renewal.title.pvpc');
+  if (pvpc.kind === 'missing_table')
+    return card(
+      title,
+      note(tr('client.bills.renewal.pvpc.missing_table', { fecha: dayText(pvpc.day) })),
+    );
+  if (pvpc.kind === 'conditional')
+    return card(
+      title,
+      note(
+        tr(
+          pvpc.norms.length === 1
+            ? 'client.bills.renewal.pvpc.conditional_one'
+            : 'client.bills.renewal.pvpc.conditional_many',
+          { normas: citations(pvpc.norms, norms) },
+        ),
+      ),
+    );
   if (pvpc.kind !== 'ok') return card(title, note(tr(`client.bills.renewal.pvpc.${pvpc.kind}`)));
+  const range = { desde: dayText(pvpc.from), hasta: dayText(pvpc.to), importe: euros(pvpc.annual) };
   return card(
     title,
     list([
-      tr('client.bills.renewal.pvpc.annual', {
-        desde: dayText(pvpc.from),
-        hasta: dayText(pvpc.to),
-        importe: euros(pvpc.annual),
-      }),
+      pvpc.months === null
+        ? tr('client.bills.renewal.pvpc.annual', range)
+        : tr('client.bills.renewal.pvpc.annual_partial', {
+            ...range,
+            periodo:
+              pvpc.months > 0
+                ? monthsText(pvpc.months, tr)
+                : daysText(ordinal(parseDate(pvpc.to)) - ordinal(parseDate(pvpc.from)) + 1, tr),
+          }),
       tr('client.bills.renewal.pvpc.next', { importe: euros(pvpc.next) }),
       tr('client.bills.renewal.pvpc.difference', { diferencia: signedEuros(pvpc.difference) }),
     ]),
@@ -385,8 +413,14 @@ function noticeText(notice: Notice, review: RenewalReview, tr: Translate): strin
     renovacion: dayText(review.input.renewalDate),
   };
   switch (notice.kind) {
-    case 'meets':
     case 'short':
+      return tr(
+        notice.separate === false
+          ? 'client.bills.renewal.notice.short_with_bill'
+          : 'client.bills.renewal.notice.short',
+        { ...vars, dias: daysText(notice.days, tr) },
+      );
+    case 'meets':
     case 'separate_unknown':
       return tr(`client.bills.renewal.notice.${notice.kind}`, {
         ...vars,
@@ -412,19 +446,21 @@ function noticeCard(review: RenewalReview, norms: NormTable, tr: Translate): HTM
   );
 }
 
-function exitCard(review: RenewalReview, norms: NormTable, tr: Translate): HTMLElement {
+function exitText(review: RenewalReview, tr: Translate): string {
   const { exit } = review.core;
+  if (exit.kind !== 'not_checked_before') return tr(`client.bills.renewal.exit.${exit.kind}`);
+  return tr('client.bills.renewal.exit.not_checked_before', {
+    carta: dayText(review.input.letterDate),
+    desde: dayText(exit.since),
+  });
+}
+
+// Art. 30.1.j's own words are quoted by the page beside this card.
+function exitCard(review: RenewalReview, norms: NormTable, tr: Translate): HTMLElement {
   return card(
     tr('client.bills.renewal.title.exit'),
-    el(
-      'p',
-      null,
-      tr(
-        `client.bills.renewal.exit.${exit.kind}`,
-        exit.kind === 'penalty_possible' ? { porcentaje: percent(exit.capPercent) } : undefined,
-      ),
-    ),
-    ruleOrigin('exit_penalty', norms, tr),
+    el('p', null, exitText(review, tr)),
+    ruleOrigin('renewal_exit', norms, tr),
   );
 }
 
@@ -459,7 +495,7 @@ export function renderRenewalResult(
   find(root, '[data-renewal]').replaceChildren(
     costCard(review, norms, tr),
     splitCard(review, norms, tr),
-    pvpcCard(review.pvpc, tr),
+    pvpcCard(review.pvpc, norms, tr),
     noticeCard(review, norms, tr),
     exitCard(review, norms, tr),
     card(tr('client.bills.renewal.title.unchecked'), list(UNCHECKED.map((key) => tr(key)))),

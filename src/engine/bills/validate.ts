@@ -267,6 +267,8 @@ function dayOf(iso: string): CivilDate | null {
 }
 
 const MAX_ANNUAL_KWH = MAX_KWH * 12;
+// A letter's prices are never free.
+const isPrice = (v: number, max: number): boolean => Number.isFinite(v) && v > 0 && v <= max;
 
 export function validateRenewal(
   input: RenewalInput,
@@ -286,13 +288,13 @@ export function validateRenewal(
     for (const period of ['p1', 'p2'] as const)
       check(
         `${side}.power.${period}`,
-        inRange(power[period], MAX_POWER_PRICE[input.powerUnit]),
+        isPrice(power[period], MAX_POWER_PRICE[input.powerUnit]),
         'price_range',
       );
     for (const term of ['all', 'p1', 'p2', 'p3'] as const) {
       const price = (energy as Partial<Record<EnergyTerm, number>>)[term];
       if (price !== undefined)
-        check(`${side}.energy.${term}`, inRange(price, MAX_ENERGY_PRICE), 'price_range');
+        check(`${side}.energy.${term}`, isPrice(price, MAX_ENERGY_PRICE), 'price_range');
     }
   }
   if (input.annualKwh !== null)

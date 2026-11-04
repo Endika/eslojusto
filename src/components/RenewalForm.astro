@@ -15,6 +15,7 @@ const tx = (key: Key) => t(lang, key);
 const options = <T extends string>(values: readonly T[], label: (value: T) => Key) =>
   values.map((value) => ({ value, label: tx(label(value)) }));
 const known = options(KNOWNS, (v) => `bills.answer.${v}`);
+const pricings = options(ENERGY_PRICINGS, (v) => `bills.renewal.energy_pricing.${v}`);
 
 const question = (sheet: Sheet) => tx(`bills.renewal.question.${sheet}`);
 const sheetId = (sheet: Sheet) => ({
@@ -105,19 +106,21 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
       <h2 class="question" id="question-energia" tabindex="-1">
         {question('energia')}
       </h2>
-      <Choice
-        name="energyPricing"
-        legend={tx('bills.renewal.energy_pricing')}
-        options={options(ENERGY_PRICINGS, (v) => `bills.renewal.energy_pricing.${v}`)}
-        layout="list"
-      />
+      {(['current', 'next'] as const).map((side) => (
+        <Choice
+          name={`${side}EnergyPricing`}
+          legend={tx(`bills.renewal.${side}_energy_pricing`)}
+          options={pricings}
+          layout="list"
+        />
+      ))}
     </fieldset>
 
     <fieldset class="sheet" {...sheetId('energia-actual')}>
       <h2 class="question" id="question-energia-actual" tabindex="-1">
         {question('energia-actual')}
       </h2>
-      <div data-if="energyPricing:single">
+      <div data-if="currentEnergyPricing:single">
         <Field
           name="currentEnergy"
           label={tx('bills.renewal.current_energy')}
@@ -125,7 +128,7 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           kind="amount"
         />
       </div>
-      <div data-if="energyPricing:periods">
+      <div data-if="currentEnergyPricing:periods">
         <div class="pair">
           <Field
             name="currentEnergyP1"
@@ -147,10 +150,10 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
       <h2 class="question" id="question-energia-nueva" tabindex="-1">
         {question('energia-nueva')}
       </h2>
-      <div data-if="energyPricing:single">
+      <div data-if="nextEnergyPricing:single">
         <Field name="nextEnergy" label={tx('bills.renewal.next_energy')} kind="amount" />
       </div>
-      <div data-if="energyPricing:periods">
+      <div data-if="nextEnergyPricing:periods">
         <div class="pair">
           <Field name="nextEnergyP1" label={tx('bills.renewal.next_energy_p1')} kind="amount" />
           <Field name="nextEnergyP2" label={tx('bills.renewal.next_energy_p2')} kind="amount" />
@@ -182,26 +185,6 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         kind="amount"
       />
       <Field name="declaredWithTax" label={tx('bills.renewal.declared_with_tax')} kind="amount" />
-    </fieldset>
-
-    <fieldset class="sheet" {...sheetId('contrato')}>
-      <h2 class="question" id="question-contrato" tabindex="-1">
-        {question('contrato')}
-      </h2>
-      <Choice
-        name="fixedPrice"
-        legend={tx('bills.renewal.fixed_price')}
-        options={known}
-        layout="pair"
-      />
-      <Choice
-        name="firstRenewal"
-        legend={tx('bills.renewal.first_renewal')}
-        hint={tx('bills.renewal.first_renewal_hint')}
-        options={known}
-        layout="pair"
-        attributes={{ 'data-if': 'fixedPrice:yes' }}
-      />
     </fieldset>
 
     <fieldset class="sheet" {...sheetId('envio')}>

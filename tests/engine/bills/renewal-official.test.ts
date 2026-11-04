@@ -22,8 +22,6 @@ const letter = (change: Partial<RenewalInput> = {}): RenewalInput => ({
   next: { power: { p1: 0.12303, p2: 0.052329 }, energy: { all: 0.1678 } },
   annualKwh: 4190.2,
   declared: { withoutTax: 1071.15, withTax: 1362.36 },
-  fixedPrice: false,
-  firstRenewal: false,
   separateFromBill: true,
   ...change,
 });
@@ -75,6 +73,7 @@ describe('comparing a renewal with the PVPC', () => {
       kind: 'ok',
       from: '2025-10-15',
       to: '2026-10-14',
+      months: null,
       // 5,75 kW × (27,704413 + 3,113) on P1 and × 0,725423 on P2, plus 4.190,2 kWh × 0,150.
       annual: 809.9,
       next: 1071.15,
@@ -83,26 +82,52 @@ describe('comparing a renewal with the PVPC', () => {
     });
   });
 
-  it('starts at the first day when fewer than 365 are published', () => {
-    const pvpc = flat('2026-10-01', '2026-10-14', 150);
-    expect(compareWithPvpc(letter(), officialDeps(pvpc))).toMatchObject({
-      kind: 'ok',
-      from: '2026-10-01',
-      to: '2026-10-14',
-      annual: 809.9,
-    });
+  it('starts at the first day when fewer than 365 are published, and counts its months', () => {
+    expect(
+      compareWithPvpc(letter(), officialDeps(flat('2026-10-01', '2026-10-14', 150))),
+    ).toMatchObject({ kind: 'ok', from: '2026-10-01', to: '2026-10-14', months: 0, annual: 809.9 });
+    expect(
+      compareWithPvpc(letter(), officialDeps(flat('2026-01-01', '2026-10-31', 150))),
+    ).toMatchObject({ kind: 'ok', from: '2026-01-01', to: '2026-10-31', months: 10 });
   });
 
-  it('has no data without PVPC prices or for a renewal day with no tables', () => {
+  it('has no data without PVPC prices', () => {
     expect(
       compareWithPvpc(letter(), officialDeps({ coveredUntil: '2026-10-14', days: {} })),
     ).toEqual({ kind: 'no_data' });
+  });
+
+  it('names the missing tables for a 2027 renewal, not the PVPC prices', () => {
     expect(
       compareWithPvpc(
         letter({ renewalDate: '2027-02-01' }),
         officialDeps(flat('2026-10-01', '2026-10-14', 150)),
       ),
-    ).toEqual({ kind: 'no_data' });
+    ).toEqual({ kind: 'missing_table', day: '2027-02-01' });
+  });
+
+  it('names the norms when the tables of the renewal day are still open', () => {
+    const december = BILLS_NORMS.rdl25_2026_december;
+    const [held] = BILLS_TABLES.tolls;
+    if (held === undefined || december.condition === undefined) throw new Error('fixture expected');
+    const norms: NormTable = {
+      ...BILLS_NORMS,
+      rdl25_2026_december: {
+        ...december,
+        status: 'conditional',
+        condition: { ...december.condition, met: null },
+      },
+    };
+    const tolls = [
+      { ...held, from: '2026-12-01', until: '2026-12-31', norm: 'rdl25_2026_december' as const },
+    ];
+    expect(
+      compareWithPvpc(letter({ renewalDate: '2026-12-10' }), {
+        ...officialDeps(flat('2026-10-01', '2026-10-14', 150)),
+        tables: { ...BILLS_TABLES, tolls },
+        norms,
+      }),
+    ).toEqual({ kind: 'conditional', norms: ['rdl25_2026_december'] });
   });
 
   it('compares in a year whose toll holidays are not loaded', () => {

@@ -34,7 +34,8 @@ export type BillsRuleId =
   | 'handset_after_change'
   | 'indexed_price_rise'
   | 'exit_effective'
-  | 'change_notice';
+  | 'change_notice'
+  | 'renewal_exit';
 
 type BillsRule = LawRule<BillsRuleId, BillsNormId> & RuleBase<BillsSourceId>;
 
@@ -343,6 +344,20 @@ export const RULES: Readonly<Record<BillsRuleId, BillsRule>> = {
       'rd88_2026',
       'Real Decreto 88/2026, art. 6.1.m',
       `${RD88_URL}#a6`,
+      '2026-06-12',
+      null,
+      'info',
+    ),
+    wordingSince: '2026-06-12',
+  },
+  // Arts. 6.1.m and 30.1.j: on a notice of new conditions the person may rescind without cost,
+  // and the contract has to allow it without penalty. With effects from 12-06-2026.
+  renewal_exit: {
+    ...rule(
+      'renewal_exit',
+      'rd88_2026',
+      'Real Decreto 88/2026, arts. 6.1.m y 30.1.j',
+      `${RD88_URL}#a3-2`,
       '2026-06-12',
       null,
       'info',

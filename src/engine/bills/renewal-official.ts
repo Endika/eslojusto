@@ -1,4 +1,4 @@
-import { addDays, fromOrdinal, ordinal, parseDate, toIso } from '../date';
+import { addDays, fromOrdinal, ordinal, parseDate, toIso, type CivilDate } from '../date';
 import { round2 } from '../money';
 import { pvpcMeanAllBetween, type OfficialDeps } from './electricity-official';
 import { normStanding, type BillsNormId } from './norms';
@@ -15,6 +15,8 @@ export type PvpcComparison =
       // First and last day of the PVPC prices averaged.
       readonly from: string;
       readonly to: string;
+      // Whole months the prices cover when they are fewer than the year asked for; null for a year.
+      readonly months: number | null;
       // Yearly cost without taxes at the PVPC, and at the letter's new prices.
       readonly annual: number;
       readonly next: number;
@@ -23,9 +25,19 @@ export type PvpcComparison =
       // Set when the PVPC margin rests on a row the sources leave in doubt.
       readonly doubt: RowDoubt | null;
     }
+  // No PVPC hours to average.
   | { readonly kind: 'no_data' }
+  // Tolls, charges or the PVPC margin of the renewal day are not loaded, or rest on open norms.
+  | { readonly kind: 'missing_table'; readonly day: string }
+  | { readonly kind: 'conditional'; readonly norms: readonly BillsNormId[] }
   | { readonly kind: 'no_consumption' }
   | { readonly kind: 'needs_period_use' };
+
+// Whole months from `first` to `last`, both included.
+function wholeMonths(first: CivilDate, last: CivilDate): number {
+  const end = addDays(last, 1);
+  return (end.y - first.y) * 12 + (end.m - first.m) - (end.d < first.d ? 1 : 0);
+}
 
 // The PVPC priced as the letter's consumption would have paid it over the last year of prices
 // published: tolls, charges and the fixed margin on the power, the plain mean of every hour on
@@ -38,16 +50,20 @@ export function compareWithPvpc(
   if (letter.kind !== 'ok') return letter;
   const { annualKwh } = input;
   if (annualKwh === null) return { kind: 'no_consumption' };
+  const regulated = regulatedOn(input.renewalDate, deps);
+  const margin = valueOn(deps.tables.pvpcMargin, input.renewalDate, deps.norms);
+  if (regulated.kind === 'missing_table' || margin.kind === 'missing')
+    return { kind: 'missing_table', day: input.renewalDate };
+  if (regulated.kind === 'conditional' || margin.kind === 'conditional') {
+    const deciding = [regulated, margin].flatMap((f) => (f.kind === 'conditional' ? f.norms : []));
+    return { kind: 'conditional', norms: [...new Set(deciding)] };
+  }
   const first = Object.keys(deps.pvpc.days).sort()[0];
   if (first === undefined) return { kind: 'no_data' };
   const last = parseDate(deps.pvpc.coveredUntil);
   const from = fromOrdinal(Math.max(ordinal(parseDate(first)) - 1, ordinal(last) - WINDOW_DAYS));
   const mean = pvpcMeanAllBetween(from, last, deps.pvpc);
-  const regulated = regulatedOn(input.renewalDate, deps);
-  const margin = valueOn(deps.tables.pvpcMargin, input.renewalDate, deps.norms);
-  if (mean === null || regulated.kind !== 'ok' || margin.kind !== 'ok') {
-    return { kind: 'no_data' };
-  }
+  if (mean === null) return { kind: 'no_data' };
   const { power } = regulated.prices;
   const annual = round2(
     input.powerKw.p1 * (power.p1 + margin.row.value) +
@@ -58,6 +74,8 @@ export function compareWithPvpc(
     kind: 'ok',
     from: toIso(addDays(from, 1)),
     to: deps.pvpc.coveredUntil,
+    months:
+      ordinal(last) - ordinal(from) < WINDOW_DAYS ? wholeMonths(addDays(from, 1), last) : null,
     annual,
     next: letter.next,
     difference: round2(letter.next - annual),

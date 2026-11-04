@@ -6758,7 +6758,6 @@ export const es = {
   'bills.renewal.question.energia-nueva': 'Precio nuevo de la energía',
   'bills.renewal.question.consumo': 'Consumo anual',
   'bills.renewal.question.carta': 'Coste que dice la carta',
-  'bills.renewal.question.contrato': 'Tu contrato',
   'bills.renewal.question.envio': 'Cómo te llegó la carta',
   'bills.renewal.letter_date': 'Fecha de la carta',
   'bills.renewal.letter_date_hint': 'La que lleva escrita la carta o el aviso.',
@@ -6775,7 +6774,8 @@ export const es = {
   'bills.renewal.current_power_p2': 'Precio actual de la potencia P2',
   'bills.renewal.next_power_p1': 'Precio nuevo de la potencia P1',
   'bills.renewal.next_power_p2': 'Precio nuevo de la potencia P2',
-  'bills.renewal.energy_pricing': '¿Cuántos precios de energía da la carta?',
+  'bills.renewal.current_energy_pricing': '¿Cuántos precios actuales?',
+  'bills.renewal.next_energy_pricing': '¿Cuántos precios nuevos?',
   'bills.renewal.energy_pricing.single': 'Uno solo, para todas las horas',
   'bills.renewal.energy_pricing.periods': 'Uno por periodo (P1, P2 y P3)',
   'bills.renewal.current_energy': 'Precio actual de la energía (€/kWh)',
@@ -6792,9 +6792,6 @@ export const es = {
   'bills.renewal.declared_without_tax': 'Coste anual con los precios nuevos, sin impuestos (€)',
   'bills.renewal.declared_with_tax': 'Coste anual con los precios nuevos, con impuestos (€)',
   'bills.renewal.declared_hint': 'Opcional. Se compara con nuestro recálculo.',
-  'bills.renewal.fixed_price': '¿Es un contrato de precio fijo?',
-  'bills.renewal.first_renewal': '¿Es la primera renovación anual?',
-  'bills.renewal.first_renewal_hint': 'La primera prórroga después del primer año.',
   'bills.renewal.separate_from_bill': '¿Te llegó la carta aparte de la factura?',
   'bills.renewal.separate_from_bill_hint':
     'Por correo o email propio, no dentro de una factura ni junto a ella.',
@@ -6843,9 +6840,9 @@ export const es = {
     'La revisión cuenta los días entre la fecha de la carta y la de la renovación, y mira si la carta llegó aparte de la factura. Una carta fechada antes del 12-06-2026 no se comprueba con esta regla, que rige desde ese día. El contenido que debe llevar el aviso lo fijará una orden ministerial que aún no hemos localizado, y no se comprueba.',
   'bills.guide.renewal_exit.title': 'Salir del contrato',
   'bills.guide.renewal_exit.p1':
-    'Una persona con la tarifa 2.0TD puede dejar su contrato en cualquier momento sin penalización, salvo en un contrato a precio fijo antes de su primera prórroga anual. En ese caso, la penalización no puede pasar del 5 % de la energía estimada pendiente de suministro, y la pérdida la tiene que probar la comercializadora (Real Decreto 88/2026, art. 28.3).',
+    'Con efectos desde el 12-06-2026, el Real Decreto 88/2026 reconoce a quien consume luz el derecho a rescindir el contrato sin coste alguno cuando recibe el aviso de un cambio de condiciones (art. 6.1.m), y pide que el contrato recoja (art. 30.1.j):',
   'bills.guide.renewal_exit.p2':
-    'Con lo que cuentas de tu contrato, la revisión dice si le corresponde penalización según esa norma. No calcula el importe de la penalización.',
+    'Cuando una carta fechada desde el 12-06-2026 cambia algún precio, la revisión dice que salir del contrato no lleva coste ni penalización según esos artículos. Si la carta no cambia ningún precio, no valora la salida, y una carta anterior al 12-06-2026 no se comprueba. El plazo que la propia carta fije para oponerse a la renovación, como «15 días», tampoco se comprueba.',
   'bills.guide.renewal.unchecked.gas':
     'El gas: aunque la carta también lo trate, solo se revisa la parte de la luz.',
   'bills.guide.renewal.unchecked.scope':
@@ -6855,7 +6852,7 @@ export const es = {
     'Si la comercializadora quiere cambiar las condiciones del contrato, tiene que avisar por escrito y de manera separada a su factura, con al menos un mes de antelación, e informar del derecho a rescindir el contrato sin coste alguno (Real Decreto 88/2026, art. 6.1.m, con efectos desde el 12-06-2026). La revisión cuenta los días entre la carta y la renovación; el contenido que debe llevar el aviso lo fijará una orden ministerial que aún no hemos localizado.',
   'bills.faq.renewal.exit': '¿Me pueden cobrar por irme tras la carta?',
   'bills.faq.renewal.exit_answer':
-    'Una persona con la tarifa 2.0TD puede dejar su contrato de luz en cualquier momento sin penalización, salvo en un contrato a precio fijo antes de su primera prórroga anual. En ese caso, la penalización no puede pasar del 5 % de la energía estimada pendiente de suministro, y la pérdida la tiene que probar la comercializadora (Real Decreto 88/2026, art. 28.3). Los plazos que la carta fije para comunicar la baja o la oposición a la renovación no los comprueba la revisión.',
+    'Desde el 12-06-2026, quien recibe el aviso de un cambio en las condiciones del contrato de luz tiene derecho a rescindirlo sin coste alguno (Real Decreto 88/2026, art. 6.1.m), y el contrato tiene que prever la rescisión sin penalización si se modifican sus cláusulas (art. 30.1.j). Por eso, si la carta cambia los precios, la revisión dice que salir no lleva penalización. El plazo que la carta fije para oponerse a la renovación, como «15 días», no lo comprueba la revisión.',
   'bills.faq.renewal.regulated': '¿Qué parte del precio es regulada?',
   'bills.faq.renewal.regulated_answer':
     'Los peajes de transporte y distribución, que fija la CNMC, y los cargos del sistema, que fija el Ministerio, van dentro del precio de la potencia y de la energía y son iguales con cualquier comercializadora. La revisión los separa, en la fecha de la renovación, de lo que pone la comercializadora.',
@@ -7217,11 +7214,19 @@ export const es = {
     'Los peajes y cargos de esa fecha dependen de estas normas, que todavía no se han decidido: {normas}. Por eso no se separan.',
   'client.bills.renewal.pvpc.no_data':
     'No hay precios del PVPC cargados para hacer la comparación.',
+  'client.bills.renewal.pvpc.missing_table':
+    'No tenemos los peajes, los cargos o el margen del PVPC del {fecha}, así que no se compara con el PVPC.',
+  'client.bills.renewal.pvpc.conditional_one':
+    'Los peajes, los cargos o el margen del PVPC de la fecha de la renovación dependen de {normas}, que todavía no se ha decidido, así que no se compara con el PVPC.',
+  'client.bills.renewal.pvpc.conditional_many':
+    'Los peajes, los cargos o el margen del PVPC de la fecha de la renovación dependen de estas normas, que todavía no se han decidido: {normas}. Por eso no se compara con el PVPC.',
   'client.bills.renewal.pvpc.no_consumption': 'Sin el consumo anual no se compara con el PVPC.',
   'client.bills.renewal.pvpc.needs_period_use':
     'Con precios de energía por periodos hace falta el consumo de cada periodo para comparar con el PVPC, y la carta no lo da.',
   'client.bills.renewal.pvpc.annual':
     'Con tu consumo y tu potencia, el PVPC del {desde} al {hasta} habría costado {importe} al año, sin impuestos.',
+  'client.bills.renewal.pvpc.annual_partial':
+    'Solo hay {periodo} publicados del PVPC, del {desde} al {hasta}, no un año entero. Con tu consumo y tu potencia, y la media de ese tiempo, el PVPC costaría {importe} al año, sin impuestos.',
   'client.bills.renewal.pvpc.next':
     'Los precios nuevos de la carta cuestan {importe} al año, sin impuestos.',
   'client.bills.renewal.pvpc.difference': 'Diferencia (carta menos PVPC): {diferencia}.',
@@ -7233,6 +7238,8 @@ export const es = {
     'La antelación cumple: {dias} entre la carta ({carta}) y la renovación ({renovacion}), y la carta llegó aparte de la factura.',
   'client.bills.renewal.notice.short':
     'La antelación no llega a un mes: {dias} entre la carta ({carta}) y la renovación ({renovacion}).',
+  'client.bills.renewal.notice.short_with_bill':
+    'La antelación no llega a un mes: {dias} entre la carta ({carta}) y la renovación ({renovacion}). Además, la carta vino junto a la factura, y la norma pide el aviso de manera separada a ella.',
   'client.bills.renewal.notice.separate_unknown':
     'La fecha alcanza el mes de antelación: {dias} entre la carta ({carta}) y la renovación ({renovacion}). Si la carta llegó aparte de la factura, no lo sabemos, así que no damos el aviso por cumplido.',
   'client.bills.renewal.notice.not_checked_before':
@@ -7240,11 +7247,11 @@ export const es = {
   'client.bills.renewal.notice.not_separate':
     'La carta vino junto a la factura, y la norma pide el aviso por escrito y de manera separada a ella.',
   'client.bills.renewal.exit.free':
-    'Con lo que has contado, rescindir no lleva penalización: una persona con la tarifa 2.0TD puede rescindir el contrato y sus prórrogas en cualquier momento sin penalización, salvo precio fijo antes de la primera prórroga anual.',
-  'client.bills.renewal.exit.penalty_possible':
-    'Con precio fijo y antes de la primera prórroga anual, la penalización puede llegar, como mucho, al {porcentaje} de la energía pendiente.',
-  'client.bills.renewal.exit.unknown':
-    'No sabemos si el precio es fijo ni si es la primera renovación, y de eso depende si hay penalización: solo cabe en precio fijo antes de la primera prórroga anual.',
+    'La carta cambia los precios. Desde el 12-06-2026, quien recibe un aviso así tiene derecho a rescindir el contrato sin coste alguno, y el contrato tiene que permitir rescindirlo sin penalización si se modifican sus cláusulas.',
+  'client.bills.renewal.exit.no_change':
+    'La carta no cambia ninguno de los precios que has escrito, así que esta revisión no valora la salida del contrato.',
+  'client.bills.renewal.exit.not_checked_before':
+    'La carta es del {carta}, anterior al {desde}, cuando empezaron a regir estas normas. Esta revisión no comprueba la salida del contrato con cartas anteriores a esa fecha.',
   'client.bills.renewal.unchecked.content':
     'El contenido que debe llevar el aviso: lo fijará una orden ministerial que aún no hemos localizado.',
   'client.bills.renewal.unchecked.deadlines':

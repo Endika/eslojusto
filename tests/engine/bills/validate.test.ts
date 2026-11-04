@@ -168,8 +168,6 @@ describe('validating a renewal letter', () => {
     next: { power: { p1: 0.12303, p2: 0.052329 }, energy: { all: 0.1678 } },
     annualKwh: 4190.2,
     declared: { withoutTax: 1071.15, withTax: 1362.36 },
-    fixedPrice: false,
-    firstRenewal: null,
     separateFromBill: true,
     ...change,
   });
@@ -187,6 +185,25 @@ describe('validating a renewal letter', () => {
     ]);
     expect(codes(validateRenewal(letter({ renewalDate: '2026-09-30' }), TODAY))).toEqual([
       'renewalDate:not_after_start',
+    ]);
+  });
+
+  it('refuses a price of zero, current or new, of the power or the energy', () => {
+    expect(
+      codes(
+        validateRenewal(
+          letter({
+            current: { power: { p1: 0, p2: 0.033469 }, energy: { p1: 0.2, p2: 0, p3: 0.1 } },
+            next: { power: { p1: 0.12303, p2: 0 }, energy: { all: 0 } },
+          }),
+          TODAY,
+        ),
+      ),
+    ).toEqual([
+      'current.power.p1:price_range',
+      'current.energy.p2:price_range',
+      'next.power.p2:price_range',
+      'next.energy.all:price_range',
     ]);
   });
 

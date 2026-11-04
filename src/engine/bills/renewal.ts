@@ -134,21 +134,32 @@ function split(input: RenewalInput, deps: RenewalDeps): Split {
 
 function notice(input: RenewalInput): Notice {
   if (input.letterDate < NOTICE_SINCE) return { kind: 'not_checked_before', since: NOTICE_SINCE };
-  if (input.separateFromBill === false) return { kind: 'not_separate' };
+  const separate = input.separateFromBill;
   const [letter, renewal] = [parseDate(input.letterDate), parseDate(input.renewalDate)];
   const days = ordinal(renewal) - ordinal(letter);
-  const earliest = addMonthsClamped(letter, 1);
-  if (compareDates(renewal, earliest) >= 0 && input.separateFromBill === null) {
-    return { kind: 'separate_unknown', days };
-  }
-  return compareDates(renewal, earliest) >= 0 ? { kind: 'meets', days } : { kind: 'short', days };
+  if (compareDates(renewal, addMonthsClamped(letter, 1)) < 0)
+    return { kind: 'short', days, separate };
+  if (separate === false) return { kind: 'not_separate' };
+  return separate === null ? { kind: 'separate_unknown', days } : { kind: 'meets', days };
+}
+
+const energyPrices = ({ energy }: RenewalPrices): readonly number[] =>
+  'all' in energy ? [energy.all] : [energy.p1, energy.p2, energy.p3];
+
+// Whether the letter changes any price, or how the energy is priced.
+function pricesChange({ current, next }: RenewalInput): boolean {
+  const [now, then] = [energyPrices(current), energyPrices(next)];
+  return (
+    current.power.p1 !== next.power.p1 ||
+    current.power.p2 !== next.power.p2 ||
+    now.length !== then.length ||
+    now.some((price, i) => price !== then[i])
+  );
 }
 
 function exit(input: RenewalInput): Exit {
-  if (input.fixedPrice === null) return { kind: 'unknown' };
-  if (!input.fixedPrice) return { kind: 'free' };
-  if (input.firstRenewal === null) return { kind: 'unknown' };
-  return input.firstRenewal ? { kind: 'penalty_possible', capPercent: 5 } : { kind: 'free' };
+  if (input.letterDate < NOTICE_SINCE) return { kind: 'not_checked_before', since: NOTICE_SINCE };
+  return pricesChange(input) ? { kind: 'free' } : { kind: 'no_change' };
 }
 
 export function reviewRenewalCore(input: RenewalInput, deps: RenewalDeps): RenewalCore {

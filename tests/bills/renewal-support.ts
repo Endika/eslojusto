@@ -18,8 +18,6 @@ export const naturgy = (change: Partial<RenewalInput> = {}): RenewalInput => ({
   next: { power: { p1: 0.12303, p2: 0.052329 }, energy: { all: 0.1678 } },
   annualKwh: 4190.2,
   declared: { withoutTax: 1071.15, withTax: 1362.36 },
-  fixedPrice: false,
-  firstRenewal: false,
   separateFromBill: true,
   ...change,
 });
