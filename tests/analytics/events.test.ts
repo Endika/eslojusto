@@ -62,6 +62,14 @@ function review(...statuses: [ItemId, Status, number | null, number | null][]): 
   return { items, unfairReference: null, uncheckedCodes: [], lateInterest: null };
 }
 
+const JS_ERROR = {
+  kind: 'TypeError',
+  frames: ['main.CzX1-a.js:1:4521', 'render.B1.js:1:30'],
+  version: '1.113.0',
+  message: "Cannot read properties of undefined (reading '…')",
+  step: 'contract',
+};
+
 describe('buckets', () => {
   it('difference, at each edge', () => {
     expect(differenceBucket(0)).toBe('0');
@@ -139,7 +147,7 @@ describe('the catalogue guard', () => {
     expect(isValidEvent('help_opened', { topic: 'faq-datos' })).toBe(true);
     expect(isValidEvent('detail_opened', { item: 'holiday_pay' })).toBe(true);
     expect(isValidEvent('started_over', {})).toBe(true);
-    expect(isValidEvent('js_error', { kind: 'TypeError', source: 'main.CzX1-a.js:1' })).toBe(true);
+    expect(isValidEvent('js_error', JS_ERROR)).toBe(true);
   });
 
   it('rejects a figure in place of its bucket', () => {
@@ -184,8 +192,19 @@ describe('the catalogue guard', () => {
     expect(isValidEvent('section_viewed', { section: 'sheet' })).toBe(false);
     expect(isValidEvent('browser_language', { lang: '1500' })).toBe(false);
     expect(isValidEvent('browser_language', { lang: 'ja-JP' })).toBe(false);
-    expect(isValidEvent('js_error', { kind: 'No hay 1.500 €', source: 'main.js:1' })).toBe(false);
-    expect(isValidEvent('js_error', { kind: 'TypeError', source: '1500' })).toBe(false);
+    expect(isValidEvent('js_error', { ...JS_ERROR, kind: 'No hay 1.500 €' })).toBe(false);
+    expect(isValidEvent('js_error', { ...JS_ERROR, frames: ['1500'] })).toBe(false);
+    expect(isValidEvent('js_error', { ...JS_ERROR, frames: ['main.js:1'] })).toBe(false);
+    expect(isValidEvent('js_error', { ...JS_ERROR, frames: ['_astro/main.js:1:2'] })).toBe(false);
+    expect(isValidEvent('js_error', { ...JS_ERROR, frames: Array(6).fill('main.js:1:2') })).toBe(
+      false,
+    );
+    expect(isValidEvent('js_error', { ...JS_ERROR, step: 'a'.repeat(31) })).toBe(false);
+    expect(isValidEvent('js_error', { ...JS_ERROR, version: 'v1.2' })).toBe(false);
+    expect(isValidEvent('js_error', { ...JS_ERROR, version: '1.113.0-beta' })).toBe(false);
+    expect(isValidEvent('js_error', { ...JS_ERROR, message: 'mail a ana@x.es' })).toBe(false);
+    expect(isValidEvent('js_error', { ...JS_ERROR, message: 'x'.repeat(161) })).toBe(false);
+    expect(isValidEvent('js_error', { kind: 'TypeError' })).toBe(false);
     expect(isValidEvent('help_opened', { topic: 'faq-other' })).toBe(false);
   });
 

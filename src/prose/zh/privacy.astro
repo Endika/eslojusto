@@ -1,5 +1,5 @@
 ---
-// source: 04d418a0a00a
+// source: 3ca30c81dfec
 import { t, type Key } from '../../i18n';
 import { link, type Lang } from '../../i18n/languages';
 import { DOCUMENTS } from '../../documents/config';
@@ -297,7 +297,7 @@ const tracked = [
     : []),
   {
     when: '如果页面出错',
-    what: '错误的类型，以及错误发生在代码的哪个文件和哪一行。绝不包括错误信息，因为其中可能引用您填写的内容。',
+    what: '错误的类型，以及错误发生在代码的哪些文件、哪些行和哪些列；网站版本；您当时打开的表单页；以及化为模板的错误信息：引号内的内容和数字会被替换，如果仍留有类似地址的内容，则不发送该信息。绝不包括您填写的内容。',
   },
 ];
 ---

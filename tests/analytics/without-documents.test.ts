@@ -15,6 +15,12 @@ describe('a page whose document module fails', () => {
     expect(form.hidden).toBe(false);
     expect(document.querySelector<HTMLElement>('.tabs')?.hidden).toBe(false);
     expect(document.querySelector('[data-documents-start]')).toBeNull();
-    expect(track).toHaveBeenCalledWith('js_error', { kind: 'TypeError', source: 'unknown' });
+    expect(track).toHaveBeenCalledWith('js_error', {
+      kind: 'TypeError',
+      frames: [],
+      version: '0.0.0',
+      message: 'Cannot read properties of null',
+      step: '',
+    });
   });
 });
