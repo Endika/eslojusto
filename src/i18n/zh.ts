@@ -900,7 +900,7 @@ export const zh: Translation = {
     '文件文字太多，无法一次识别。请只上传含有数据的页面。',
   'client.documents.error.captcha_failed': '未能确认您不是机器人。请重试。',
   'client.documents.error.daily_limit_reached':
-    '您今天在本浏览器中已用完2次免费识别。您可以手动填写，或明天再来。',
+    '您今天已用完2次免费识别。您可以手动填写，或明天再来。',
   'client.documents.error.pass_invalid':
     '您的通行证在本浏览器中已不能用于识别文件；报告和信函在到期前仍可下载。请用一次免费识别重试，或手动填写。',
   'client.documents.error.pass_expired':

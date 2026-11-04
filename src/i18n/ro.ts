@@ -979,7 +979,7 @@ export const ro: Translation = {
   'client.documents.error.captcha_failed':
     'Nu s-a putut verifica faptul că nu ești un robot. Încearcă din nou.',
   'client.documents.error.daily_limit_reached':
-    'Ai folosit deja cele 2 citiri gratuite de azi în acest browser. Poți completa manual sau poți reveni mâine.',
+    'Ai folosit deja cele 2 citiri gratuite de azi. Poți completa manual sau poți reveni mâine.',
   'client.documents.error.pass_invalid':
     'Permisul tău nu mai poate fi folosit pentru a citi documente în acest browser; raportul și scrisoarea rămân disponibile până la expirarea lui. Încearcă din nou cu o citire gratuită sau completează manual.',
   'client.documents.error.pass_expired':

@@ -1006,7 +1006,7 @@ export const fr: Translation = {
   'client.documents.error.captcha_failed':
     "Impossible de vérifier que vous n'êtes pas un robot. Réessayez.",
   'client.documents.error.daily_limit_reached':
-    "Vous avez déjà utilisé les 2 lectures gratuites d'aujourd'hui dans ce navigateur. Vous pouvez remplir à la main ou revenir demain.",
+    "Vous avez déjà utilisé les 2 lectures gratuites d'aujourd'hui. Vous pouvez remplir à la main ou revenir demain.",
   'client.documents.error.pass_invalid':
     "Votre pass ne permet plus de lire des documents dans ce navigateur\u00a0; le rapport et la lettre restent disponibles jusqu'à son expiration. Réessayez avec une lecture gratuite ou remplissez à la main.",
   'client.documents.error.pass_expired':

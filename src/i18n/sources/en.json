@@ -741,7 +741,7 @@
   "client.documents.error.pdf_too_large": "0738ae0181dd",
   "client.documents.error.document_too_dense": "b450ae0805cc",
   "client.documents.error.captcha_failed": "429519c86437",
-  "client.documents.error.daily_limit_reached": "147ef15afee5",
+  "client.documents.error.daily_limit_reached": "6ce472a65daf",
   "client.documents.error.pass_invalid": "8b5b87390c62",
   "client.documents.error.pass_expired": "cece823acc6d",
   "client.documents.error.pass_exhausted": "57ea8e1ad64e",

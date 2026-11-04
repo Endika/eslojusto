@@ -964,7 +964,7 @@ export const en: Translation = {
   'client.documents.error.captcha_failed':
     'It could not be checked that you are not a robot. Try again.',
   'client.documents.error.daily_limit_reached':
-    "You have already used today's 2 free readings in this browser. You can fill in by hand or come back tomorrow.",
+    "You have already used today's 2 free readings. You can fill in by hand or come back tomorrow.",
   'client.documents.error.pass_invalid':
     'Your pass no longer works for reading documents in this browser; the report and the letter are still available until it expires. Try again with a free reading or fill in by hand.',
   'client.documents.error.pass_expired':

@@ -587,7 +587,7 @@ test('an API error is worded and the manual path is still there', async ({ page 
   await page.goto('finiquito/');
   await uploadSettlement(page, { read: false });
   await expect(page.getByRole('alert')).toContainText(
-    'Ya has usado las 2 lecturas gratis de hoy en este navegador',
+    'Ya has usado las 2 lecturas gratis de hoy',
   );
   await page
     .locator('[data-start-panel="upload"]')
