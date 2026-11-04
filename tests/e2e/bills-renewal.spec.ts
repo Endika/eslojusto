@@ -25,8 +25,7 @@ async function next(page: Page) {
   );
 }
 
-// Every question the form can ask is asked when the letter gives its energy prices by period and
-// the contract is at a fixed price.
+// Every question the form can ask is asked when the letter gives its energy prices by period.
 async function fillLetter(page: Page, { longest = false } = {}) {
   await type(sheet(page, 'Las fechas de la carta'), 'Fecha de la carta', '2026-10-31');
   await type(sheet(page, 'Las fechas de la carta'), 'Fecha en que se renueva', '2026-12-10');
@@ -49,13 +48,12 @@ async function fillLetter(page: Page, { longest = false } = {}) {
   const pricing = sheet(page, 'Precios de la energía');
   const energy = sheet(page, 'Precio actual de la energía');
   const newEnergy = sheet(page, 'Precio nuevo de la energía');
+  const periods = 'Uno por periodo (P1, P2 y P3)';
+  const single = 'Uno solo, para todas las horas';
+  await choose(pricing, '¿Cuántos precios actuales?', longest ? periods : single);
+  await choose(pricing, '¿Cuántos precios nuevos?', longest ? periods : single);
+  await next(page);
   if (longest) {
-    await choose(
-      pricing,
-      '¿Cuántos precios de energía da la carta?',
-      'Uno por periodo (P1, P2 y P3)',
-    );
-    await next(page);
     await type(energy, 'Precio actual de la energía P1 (€/kWh)', '0,2');
     await type(energy, 'Precio actual de la energía P2 (€/kWh)', '0,15');
     await type(energy, 'Precio actual de la energía P3 (€/kWh)', '0,1');
@@ -64,12 +62,6 @@ async function fillLetter(page: Page, { longest = false } = {}) {
     await type(newEnergy, 'Precio nuevo de la energía P2 (€/kWh)', '0,17');
     await type(newEnergy, 'Precio nuevo de la energía P3 (€/kWh)', '0,12');
   } else {
-    await choose(
-      pricing,
-      '¿Cuántos precios de energía da la carta?',
-      'Uno solo, para todas las horas',
-    );
-    await next(page);
     await type(energy, 'Precio actual de la energía (€/kWh)', '0,144972');
     await next(page);
     await type(newEnergy, 'Precio nuevo de la energía (€/kWh)', '0,1678');
@@ -83,10 +75,6 @@ async function fillLetter(page: Page, { longest = false } = {}) {
   await type(letter, 'Coste anual con los precios nuevos, con impuestos (€)', '1.362,36');
   await next(page);
 
-  const contract = sheet(page, 'Tu contrato');
-  await choose(contract, '¿Es un contrato de precio fijo?', longest ? 'Sí' : 'No');
-  if (longest) await choose(contract, '¿Es la primera renovación anual?', 'No');
-  await next(page);
   await choose(
     sheet(page, 'Cómo te llegó la carta'),
     '¿Te llegó la carta aparte de la factura?',
@@ -108,6 +96,7 @@ for (const { name, viewport } of SIZES) {
     await expect(result.locator('[data-lead]')).toContainText('+17,8 %');
     await expect(result.locator('[data-renewal]')).toContainText('18,37 €/kW·año');
     await expect(result.locator('[data-renewal]')).toContainText('40 días');
+    await expect(result.locator('[data-renewal]')).toContainText('La carta cambia los precios');
     await noSideScroll(page);
   });
 }

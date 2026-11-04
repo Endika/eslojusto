@@ -813,8 +813,8 @@ const NOTICE_KINDS = [
 ] as const satisfies readonly Notice['kind'][];
 const EXIT_KINDS = [
   'free',
-  'penalty_possible',
-  'unknown',
+  'no_change',
+  'not_checked_before',
 ] as const satisfies readonly Exit['kind'][];
 const _allNoticeKinds: CoversAll<Notice['kind'], (typeof NOTICE_KINDS)[number]> = true;
 const _allExitKinds: CoversAll<Exit['kind'], (typeof EXIT_KINDS)[number]> = true;

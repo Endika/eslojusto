@@ -21,7 +21,6 @@ export const SHEETS = [
   'energia-nueva',
   'consumo',
   'carta',
-  'contrato',
   'envio',
 ] as const;
 export type Sheet = (typeof SHEETS)[number];
@@ -35,12 +34,11 @@ export const SHEET_FIELDS: Readonly<Record<Sheet, readonly RenewalFormField[]>> 
   potencia: ['powerKwP1', 'powerKwP2', 'powerUnit'],
   'potencia-actual': ['currentPowerP1', 'currentPowerP2'],
   'potencia-nueva': ['nextPowerP1', 'nextPowerP2'],
-  energia: ['energyPricing'],
+  energia: ['currentEnergyPricing', 'nextEnergyPricing'],
   'energia-actual': ['currentEnergy', 'currentEnergyP1', 'currentEnergyP2', 'currentEnergyP3'],
   'energia-nueva': ['nextEnergy', 'nextEnergyP1', 'nextEnergyP2', 'nextEnergyP3'],
   consumo: ['annualKwh'],
   carta: ['declaredWithoutTax', 'declaredWithTax'],
-  contrato: ['fixedPrice', 'firstRenewal'],
   envio: ['separateFromBill'],
 };
 
@@ -97,9 +95,10 @@ function read(form: HTMLFormElement): Reading {
     p2: figure(`${side}PowerP2`, true, true),
   });
   const [currentPower, nextPower] = [power('current'), power('next')];
-  const pricing = choice('energyPricing', ENERGY_PRICINGS);
-  const energy = (side: 'current' | 'next') =>
-    pricing === 'single'
+  // Each side as the letter writes it: one price may become three, or three one.
+  const energy = (side: 'current' | 'next') => {
+    const pricing = choice(`${side}EnergyPricing`, ENERGY_PRICINGS);
+    return pricing === 'single'
       ? { all: figure(side === 'current' ? 'currentEnergy' : 'nextEnergy', true, true) }
       : pricing === 'periods'
         ? {
@@ -108,14 +107,13 @@ function read(form: HTMLFormElement): Reading {
             p3: figure(`${side}EnergyP3`, true, true),
           }
         : null;
+  };
   const [currentEnergy, nextEnergy] = [energy('current'), energy('next')];
   const annualKwh = figure('annualKwh', false);
   const declared = {
     withoutTax: figure('declaredWithoutTax', false),
     withTax: figure('declaredWithTax', false),
   };
-  const fixed = known(choice('fixedPrice', KNOWNS));
-  const firstRenewal = fixed === true ? (known(choice('firstRenewal', KNOWNS)) ?? null) : null;
   const separate = known(choice('separateFromBill', KNOWNS));
 
   const numbers = (o: object | null): o is Record<string, number> =>
@@ -132,7 +130,6 @@ function read(form: HTMLFormElement): Reading {
     !numbers(nextPower) ||
     !numbers(currentEnergy) ||
     !numbers(nextEnergy) ||
-    fixed === undefined ||
     separate === undefined
   )
     return { errors, input: null };
@@ -154,8 +151,6 @@ function read(form: HTMLFormElement): Reading {
       next: prices({ p1: nextPower.p1 ?? 0, p2: nextPower.p2 ?? 0 }, nextEnergy),
       annualKwh,
       declared,
-      fixedPrice: fixed,
-      firstRenewal,
       separateFromBill: separate,
     },
   };

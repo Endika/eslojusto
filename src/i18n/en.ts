@@ -4457,7 +4457,6 @@ export const en: Translation = {
   'bills.renewal.question.energia-nueva': 'New energy price',
   'bills.renewal.question.consumo': 'Annual consumption',
   'bills.renewal.question.carta': 'Cost stated in the letter',
-  'bills.renewal.question.contrato': 'Your contract',
   'bills.renewal.question.envio': 'How the letter reached you',
   'bills.renewal.letter_date': 'Date of the letter',
   'bills.renewal.letter_date_hint': 'The one written on the letter or notice.',
@@ -4474,7 +4473,8 @@ export const en: Translation = {
   'bills.renewal.current_power_p2': 'Current power price P2',
   'bills.renewal.next_power_p1': 'New power price P1',
   'bills.renewal.next_power_p2': 'New power price P2',
-  'bills.renewal.energy_pricing': 'How many energy prices does the letter give?',
+  'bills.renewal.current_energy_pricing': 'How many current prices?',
+  'bills.renewal.next_energy_pricing': 'How many new prices?',
   'bills.renewal.energy_pricing.single': 'Just one, for every hour',
   'bills.renewal.energy_pricing.periods': 'One per period (P1, P2 and P3)',
   'bills.renewal.current_energy': 'Current energy price (€/kWh)',
@@ -4491,9 +4491,6 @@ export const en: Translation = {
   'bills.renewal.declared_without_tax': 'Annual cost at the new prices, before taxes (€)',
   'bills.renewal.declared_with_tax': 'Annual cost at the new prices, with taxes (€)',
   'bills.renewal.declared_hint': 'Optional. It is compared with our recalculation.',
-  'bills.renewal.fixed_price': 'Is it a fixed-price contract?',
-  'bills.renewal.first_renewal': 'Is it the first annual renewal?',
-  'bills.renewal.first_renewal_hint': 'The first extension (prórroga) after the first year.',
   'bills.renewal.separate_from_bill': 'Did the letter reach you separately from the bill?',
   'bills.renewal.separate_from_bill_hint':
     'By post or in an email of its own, not inside a bill or attached to one.',
@@ -4542,9 +4539,9 @@ export const en: Translation = {
     'The review counts the days between the date of the letter and the renewal date, and looks at whether the letter arrived separately from the bill. A letter dated before 12-06-2026 is not checked against this rule, which applies from that day. The content the notice must have will be set by a ministerial order (orden ministerial) we have not yet found, and it is not checked.',
   'bills.guide.renewal_exit.title': 'Leaving the contract',
   'bills.guide.renewal_exit.p1':
-    'A person on the 2.0TD tariff can leave their contract at any time without a penalty, except in a fixed-price contract before its first annual renewal. In that case, the penalty cannot exceed 5 % of the estimated energy still to be supplied, and the electricity supplier has to prove the loss (Real Decreto 88/2026, art. 28.3).',
+    'With effect from 12-06-2026, Real Decreto 88/2026 gives electricity consumers the right to terminate the contract at no cost at all when they receive notice of a change in conditions (art. 6.1.m), and requires the contract to include (art. 30.1.j):',
   'bills.guide.renewal_exit.p2':
-    'With what you tell it about your contract, the review says whether a penalty can apply under that rule. It does not calculate the amount of the penalty.',
+    'When a letter dated from 12-06-2026 changes any price, the review says that leaving the contract carries no cost or penalty under those articles. If the letter changes no price, it does not assess leaving, and a letter dated before 12-06-2026 is not checked. The period the letter itself sets for opposing the renewal, such as «15 días», is not checked either.',
   'bills.guide.renewal.unchecked.gas':
     'Gas: even if the letter also covers it, only the electricity part is reviewed.',
   'bills.guide.renewal.unchecked.scope':
@@ -4554,7 +4551,7 @@ export const en: Translation = {
     'If the electricity supplier wants to change the conditions of the contract, it has to give notice in writing and separately from its bill, at least one month in advance, and inform of the right to terminate the contract at no cost at all (Real Decreto 88/2026, art. 6.1.m, with effect from 12-06-2026). The review counts the days between the letter and the renewal; the content the notice must have will be set by a ministerial order (orden ministerial) we have not yet found.',
   'bills.faq.renewal.exit': 'Can I be charged for leaving after the letter?',
   'bills.faq.renewal.exit_answer':
-    'A person on the 2.0TD tariff can leave their electricity contract at any time without a penalty, except in a fixed-price contract before its first annual renewal. In that case, the penalty cannot exceed 5 % of the estimated energy still to be supplied, and the electricity supplier has to prove the loss (Real Decreto 88/2026, art. 28.3). The review does not check the deadlines the letter sets for giving notice of cancellation or of objecting to the renewal.',
+    'From 12-06-2026, anyone who receives notice of a change in the conditions of their electricity contract has the right to terminate it at no cost at all (Real Decreto 88/2026, art. 6.1.m), and the contract has to provide for termination without a penalty if its clauses are modified (art. 30.1.j). That is why, if the letter changes the prices, the review says leaving carries no penalty. The period the letter sets for opposing the renewal, such as «15 días», is not checked by the review.',
   'bills.faq.renewal.regulated': 'Which part of the price is regulated?',
   'bills.faq.renewal.regulated_answer':
     'The transmission and distribution access charges (peajes), set by the CNMC, and the system levies (cargos), set by the Ministry, are included in the power and energy prices and are the same with any electricity supplier. The review separates them, on the renewal date, from what the supplier adds.',
@@ -4913,12 +4910,20 @@ export const en: Translation = {
   'client.bills.renewal.split.conditional_many':
     'The access charges and levies on that date depend on these rules, which have not been decided yet: {normas}. That is why they are not separated.',
   'client.bills.renewal.pvpc.no_data': 'There are no PVPC prices loaded to make the comparison.',
+  'client.bills.renewal.pvpc.missing_table':
+    'We do not have the access charges, the levies or the PVPC margin of {fecha}, so there is no comparison with the PVPC.',
+  'client.bills.renewal.pvpc.conditional_one':
+    'The access charges, the levies or the PVPC margin on the renewal date depend on {normas}, which has not been decided yet, so there is no comparison with the PVPC.',
+  'client.bills.renewal.pvpc.conditional_many':
+    'The access charges, the levies or the PVPC margin on the renewal date depend on these rules, which have not been decided yet: {normas}. That is why there is no comparison with the PVPC.',
   'client.bills.renewal.pvpc.no_consumption':
     'Without the annual consumption, there is no comparison with the PVPC.',
   'client.bills.renewal.pvpc.needs_period_use':
     'With energy prices by period, the consumption in each period is needed to compare with the PVPC, and the letter does not give it.',
   'client.bills.renewal.pvpc.annual':
     'With your consumption and your power, the PVPC from {desde} to {hasta} would have cost {importe} a year, before taxes.',
+  'client.bills.renewal.pvpc.annual_partial':
+    'PVPC prices are published for only {periodo}, from {desde} to {hasta}, not a whole year. With your consumption and your power, at the average of that time, the PVPC would cost {importe} a year, before taxes.',
   'client.bills.renewal.pvpc.next':
     'The new prices in the letter cost {importe} a year, before taxes.',
   'client.bills.renewal.pvpc.difference': 'Difference (letter minus PVPC): {diferencia}.',
@@ -4930,6 +4935,8 @@ export const en: Translation = {
     'The notice is long enough: {dias} between the letter ({carta}) and the renewal ({renovacion}), and the letter arrived separately from the bill.',
   'client.bills.renewal.notice.short':
     'The notice is shorter than a month: {dias} between the letter ({carta}) and the renewal ({renovacion}).',
+  'client.bills.renewal.notice.short_with_bill':
+    'The notice is shorter than a month: {dias} between the letter ({carta}) and the renewal ({renovacion}). Also, the letter came with the bill, and the rule requires the notice separately from it.',
   'client.bills.renewal.notice.separate_unknown':
     "The date gives the month's notice: {dias} between the letter ({carta}) and the renewal ({renovacion}). We do not know whether the letter arrived separately from the bill, so we do not count the notice as met.",
   'client.bills.renewal.notice.not_checked_before':
@@ -4937,11 +4944,11 @@ export const en: Translation = {
   'client.bills.renewal.notice.not_separate':
     'The letter came with the bill, and the rule requires the notice in writing and separately from it.',
   'client.bills.renewal.exit.free':
-    'With what you have told us, terminating carries no penalty: a person on the 2.0TD tariff can terminate the contract and its extensions at any time without a penalty, except at a fixed price before the first annual renewal.',
-  'client.bills.renewal.exit.penalty_possible':
-    'At a fixed price and before the first annual renewal, the penalty can reach, at most, {porcentaje} of the energy still to be supplied.',
-  'client.bills.renewal.exit.unknown':
-    'We do not know whether the price is fixed or whether this is the first renewal, and whether there is a penalty depends on that: it is only possible at a fixed price before the first annual renewal.',
+    'The letter changes the prices. From 12-06-2026, anyone who receives such a notice has the right to terminate the contract at no cost at all, and the contract has to allow terminating it without a penalty if its clauses are modified.',
+  'client.bills.renewal.exit.no_change':
+    'The letter changes none of the prices you have entered, so this review does not assess leaving the contract.',
+  'client.bills.renewal.exit.not_checked_before':
+    'The letter is dated {carta}, before {desde}, when these rules began to apply. This review does not check leaving the contract for letters from before that date.',
   'client.bills.renewal.unchecked.content':
     'The content the notice must have: it will be set by a ministerial order we have not yet found.',
   'client.bills.renewal.unchecked.deadlines':

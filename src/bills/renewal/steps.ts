@@ -19,7 +19,6 @@ export const SECTION_OF_STEP: Record<Step, Tab> = {
   'energia-nueva': 'salary',
   consumo: 'settlement',
   carta: 'settlement',
-  contrato: 'settlement',
   envio: 'settlement',
   resultado: 'result',
 };

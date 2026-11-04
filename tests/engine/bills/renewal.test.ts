@@ -17,8 +17,6 @@ const letter = (change: Partial<RenewalInput> = {}): RenewalInput => ({
   next: { power: { p1: 0.12303, p2: 0.052329 }, energy: { all: 0.1678 } },
   annualKwh: 4190.2,
   declared: { withoutTax: 1071.15, withTax: 1362.36 },
-  fixedPrice: false,
-  firstRenewal: false,
   separateFromBill: true,
   ...change,
 });
@@ -157,12 +155,20 @@ describe('reviewing a renewal letter', () => {
     });
 
     it('falls short under a calendar month', () => {
-      expect(review({ letterDate: '2026-11-20' }).notice).toEqual({ kind: 'short', days: 20 });
+      expect(review({ letterDate: '2026-11-20' }).notice).toEqual({
+        kind: 'short',
+        days: 20,
+        separate: true,
+      });
     });
 
     it('counts a month as the same date of the next one, not 30 days', () => {
       expect(review({ letterDate: '2026-11-10' }).notice).toEqual({ kind: 'meets', days: 30 });
-      expect(review({ letterDate: '2026-11-11' }).notice).toEqual({ kind: 'short', days: 29 });
+      expect(review({ letterDate: '2026-11-11' }).notice).toEqual({
+        kind: 'short',
+        days: 29,
+        separate: true,
+      });
     });
 
     it('is not checked for a letter before the rule took effect', () => {
@@ -180,33 +186,50 @@ describe('reviewing a renewal letter', () => {
       expect(review({ separateFromBill: null, letterDate: '2026-11-20' }).notice).toEqual({
         kind: 'short',
         days: 20,
+        separate: null,
       });
     });
 
     it('fails when the letter came with the bill', () => {
       expect(review({ separateFromBill: false }).notice).toEqual({ kind: 'not_separate' });
     });
+
+    it('keeps both faults of a short letter that came with the bill', () => {
+      expect(review({ separateFromBill: false, letterDate: '2026-11-20' }).notice).toEqual({
+        kind: 'short',
+        days: 20,
+        separate: false,
+      });
+    });
   });
 
   describe('exit', () => {
-    it('may carry a penalty on a fixed price before the first renewal', () => {
-      expect(review({ fixedPrice: true, firstRenewal: true }).exit).toEqual({
-        kind: 'penalty_possible',
-        capPercent: 5,
+    it('is free when a letter from 12-06-2026 changes a price', () => {
+      expect(review().exit).toEqual({ kind: 'free' });
+      expect(review({ letterDate: '2026-06-12', renewalDate: '2026-07-20' }).exit).toEqual({
+        kind: 'free',
       });
     });
 
-    it('is free at a renewal or on a variable price', () => {
-      expect(review({ fixedPrice: true, firstRenewal: false }).exit).toEqual({ kind: 'free' });
-      expect(review({ fixedPrice: false }).exit).toEqual({ kind: 'free' });
+    it('is free when only one price or how the energy is priced changes', () => {
+      const same = letter().current;
+      expect(review({ next: { ...same, power: { ...same.power, p2: 0.04 } } }).exit).toEqual({
+        kind: 'free',
+      });
+      expect(
+        review({ next: { ...same, energy: { p1: 0.144972, p2: 0.144972, p3: 0.144972 } } }).exit,
+      ).toEqual({ kind: 'free' });
     });
 
-    it('is unknown when the first renewal is', () => {
-      expect(review({ fixedPrice: true, firstRenewal: null }).exit).toEqual({ kind: 'unknown' });
+    it('is not assessed when the letter changes no price', () => {
+      expect(review({ next: letter().current }).exit).toEqual({ kind: 'no_change' });
     });
 
-    it('is unknown when the price type is', () => {
-      expect(review({ fixedPrice: null }).exit).toEqual({ kind: 'unknown' });
+    it('is not checked for a letter before 12-06-2026', () => {
+      expect(review({ letterDate: '2026-06-11', renewalDate: '2026-07-20' }).exit).toEqual({
+        kind: 'not_checked_before',
+        since: '2026-06-12',
+      });
     });
   });
 });

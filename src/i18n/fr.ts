@@ -4584,7 +4584,6 @@ export const fr: Translation = {
   'bills.renewal.question.energia-nueva': "Nouveau prix de l'énergie",
   'bills.renewal.question.consumo': 'Consommation annuelle',
   'bills.renewal.question.carta': 'Coût indiqué dans la lettre',
-  'bills.renewal.question.contrato': 'Votre contrat',
   'bills.renewal.question.envio': 'Comment la lettre vous est parvenue',
   'bills.renewal.letter_date': 'Date de la lettre',
   'bills.renewal.letter_date_hint': "Celle qui figure sur la lettre ou l'avis.",
@@ -4602,7 +4601,8 @@ export const fr: Translation = {
   'bills.renewal.current_power_p2': 'Prix actuel de la puissance P2',
   'bills.renewal.next_power_p1': 'Nouveau prix de la puissance P1',
   'bills.renewal.next_power_p2': 'Nouveau prix de la puissance P2',
-  'bills.renewal.energy_pricing': "Combien de prix de l'énergie la lettre donne-t-elle\u00a0?",
+  'bills.renewal.current_energy_pricing': 'Combien de prix actuels\u00a0?',
+  'bills.renewal.next_energy_pricing': 'Combien de nouveaux prix\u00a0?',
   'bills.renewal.energy_pricing.single': 'Un seul, pour toutes les heures',
   'bills.renewal.energy_pricing.periods': 'Un par période (P1, P2 et P3)',
   'bills.renewal.current_energy': "Prix actuel de l'énergie (€/kWh)",
@@ -4619,10 +4619,6 @@ export const fr: Translation = {
   'bills.renewal.declared_without_tax': 'Coût annuel aux nouveaux prix, hors taxes (€)',
   'bills.renewal.declared_with_tax': 'Coût annuel aux nouveaux prix, taxes comprises (€)',
   'bills.renewal.declared_hint': 'Facultatif. Il est comparé à notre recalcul.',
-  'bills.renewal.fixed_price': "S'agit-il d'un contrat à prix fixe\u00a0?",
-  'bills.renewal.first_renewal': "S'agit-il du premier renouvellement annuel\u00a0?",
-  'bills.renewal.first_renewal_hint':
-    'La première reconduction (prórroga) après la première année.',
   'bills.renewal.separate_from_bill':
     'La lettre vous est-elle parvenue séparément de la facture\u00a0?',
   'bills.renewal.separate_from_bill_hint':
@@ -4673,9 +4669,9 @@ export const fr: Translation = {
     "La vérification compte les jours entre la date de la lettre et celle du renouvellement, et regarde si la lettre est arrivée séparément de la facture. Une lettre datée d'avant le 12-06-2026 n'est pas contrôlée selon cette règle, qui s'applique depuis ce jour-là. Le contenu que doit avoir l'avis sera fixé par un arrêté ministériel (orden ministerial) que nous n'avons pas encore trouvé, et il n'est pas contrôlé.",
   'bills.guide.renewal_exit.title': 'Sortir du contrat',
   'bills.guide.renewal_exit.p1':
-    "Une personne au tarif 2.0TD peut quitter son contrat à tout moment sans pénalité, sauf s'il s'agit d'un contrat à prix fixe avant sa première reconduction annuelle. Dans ce cas, la pénalité ne peut pas dépasser 5 % de l'énergie estimée restant à fournir, et c'est au fournisseur de prouver la perte (Real Decreto 88/2026, art. 28.3).",
+    "Avec effet à compter du 12-06-2026, le Real Decreto 88/2026 reconnaît aux consommateurs d'électricité le droit de résilier le contrat sans aucun coût lorsqu'ils reçoivent l'avis d'un changement de conditions (art. 6.1.m), et exige que le contrat prévoie (art. 30.1.j)\u00a0:",
   'bills.guide.renewal_exit.p2':
-    'À partir de ce que vous indiquez sur votre contrat, la vérification dit si une pénalité est possible selon cette règle. Elle ne calcule pas le montant de la pénalité.',
+    "Lorsqu'une lettre datée à partir du 12-06-2026 modifie un prix, la vérification indique que quitter le contrat n'entraîne ni coût ni pénalité selon ces articles. Si la lettre ne modifie aucun prix, elle n'évalue pas la sortie, et une lettre antérieure au 12-06-2026 n'est pas contrôlée. Le délai que la lettre fixe elle-même pour s'opposer au renouvellement, comme «15 días», n'est pas contrôlé non plus.",
   'bills.guide.renewal.unchecked.gas':
     'Le gaz\u00a0: même si la lettre en parle aussi, seule la partie électricité est vérifiée.',
   'bills.guide.renewal.unchecked.scope':
@@ -4686,7 +4682,7 @@ export const fr: Translation = {
     "Si le fournisseur veut modifier les conditions du contrat, il doit prévenir par écrit et séparément de sa facture, au moins un mois à l'avance, et informer du droit de résilier le contrat sans aucun coût (Real Decreto 88/2026, art. 6.1.m, avec effet à compter du 12-06-2026). La vérification compte les jours entre la lettre et le renouvellement\u00a0; le contenu que doit avoir l'avis sera fixé par un arrêté ministériel (orden ministerial) que nous n'avons pas encore trouvé.",
   'bills.faq.renewal.exit': 'Peut-on me facturer mon départ après la lettre\u00a0?',
   'bills.faq.renewal.exit_answer':
-    "Une personne au tarif 2.0TD peut quitter son contrat d'électricité à tout moment sans pénalité, sauf s'il s'agit d'un contrat à prix fixe avant sa première reconduction annuelle. Dans ce cas, la pénalité ne peut pas dépasser 5 % de l'énergie estimée restant à fournir, et c'est au fournisseur de prouver la perte (Real Decreto 88/2026, art. 28.3). La vérification ne contrôle pas les délais que fixe la lettre pour signaler la résiliation ou l'opposition au renouvellement.",
+    "À partir du 12-06-2026, toute personne qui reçoit l'avis d'un changement des conditions de son contrat d'électricité a le droit de le résilier sans aucun coût (Real Decreto 88/2026, art. 6.1.m), et le contrat doit prévoir la résiliation sans pénalité si ses clauses sont modifiées (art. 30.1.j). C'est pourquoi, si la lettre modifie les prix, la vérification indique que partir n'entraîne pas de pénalité. Le délai que fixe la lettre pour s'opposer au renouvellement, comme «15 días», n'est pas contrôlé par la vérification.",
   'bills.faq.renewal.regulated': 'Quelle part du prix est réglementée\u00a0?',
   'bills.faq.renewal.regulated_answer':
     "Les péages d'accès de transport et de distribution (peajes), fixés par la CNMC, et les charges du système (cargos), fixées par le Ministère, sont inclus dans le prix de la puissance et de l'énergie et sont les mêmes chez tous les fournisseurs. La vérification les sépare, à la date du renouvellement, de ce qu'ajoute le fournisseur.",
@@ -5056,12 +5052,20 @@ export const fr: Translation = {
   'client.bills.renewal.split.conditional_many':
     "Les péages et charges à cette date dépendent de ces règles, qui n'ont pas encore été tranchées\u00a0: {normas}. C'est pourquoi ils ne sont pas séparés.",
   'client.bills.renewal.pvpc.no_data': "Aucun prix du PVPC n'est chargé pour faire la comparaison.",
+  'client.bills.renewal.pvpc.missing_table':
+    "Nous n'avons pas les péages, les charges ou la marge du PVPC du {fecha}\u00a0: il n'y a donc pas de comparaison avec le PVPC.",
+  'client.bills.renewal.pvpc.conditional_one':
+    "Les péages, les charges ou la marge du PVPC à la date du renouvellement dépendent du {normas}, qui n'a pas encore été tranché\u00a0: il n'y a donc pas de comparaison avec le PVPC.",
+  'client.bills.renewal.pvpc.conditional_many':
+    "Les péages, les charges ou la marge du PVPC à la date du renouvellement dépendent de ces règles, qui n'ont pas encore été tranchées\u00a0: {normas}. C'est pourquoi il n'y a pas de comparaison avec le PVPC.",
   'client.bills.renewal.pvpc.no_consumption':
     "Sans la consommation annuelle, il n'y a pas de comparaison avec le PVPC.",
   'client.bills.renewal.pvpc.needs_period_use':
     "Avec des prix de l'énergie par période, il faut la consommation de chaque période pour comparer avec le PVPC, et la lettre ne la donne pas.",
   'client.bills.renewal.pvpc.annual':
     'Avec votre consommation et votre puissance, le PVPC du {desde} au {hasta} aurait coûté {importe} par an, hors taxes.',
+  'client.bills.renewal.pvpc.annual_partial':
+    'Les prix du PVPC ne sont publiés que pour {periodo}, du {desde} au {hasta}, et non pour une année entière. Avec votre consommation et votre puissance, à la moyenne de cette période, le PVPC coûterait {importe} par an, hors taxes.',
   'client.bills.renewal.pvpc.next':
     'Les nouveaux prix de la lettre coûtent {importe} par an, hors taxes.',
   'client.bills.renewal.pvpc.difference': 'Écart (lettre moins PVPC)\u00a0: {diferencia}.',
@@ -5073,6 +5077,8 @@ export const fr: Translation = {
     'Le préavis est respecté\u00a0: {dias} entre la lettre ({carta}) et le renouvellement ({renovacion}), et la lettre est arrivée séparément de la facture.',
   'client.bills.renewal.notice.short':
     "Le préavis n'atteint pas un mois\u00a0: {dias} entre la lettre ({carta}) et le renouvellement ({renovacion}).",
+  'client.bills.renewal.notice.short_with_bill':
+    "Le préavis n'atteint pas un mois\u00a0: {dias} entre la lettre ({carta}) et le renouvellement ({renovacion}). De plus, la lettre est arrivée avec la facture, alors que la réglementation exige un avis séparé de celle-ci.",
   'client.bills.renewal.notice.separate_unknown':
     'La date atteint le mois de préavis\u00a0: {dias} entre la lettre ({carta}) et le renouvellement ({renovacion}). Nous ne savons pas si la lettre est arrivée séparément de la facture\u00a0: nous ne considérons donc pas le préavis comme respecté.',
   'client.bills.renewal.notice.not_checked_before':
@@ -5080,11 +5086,11 @@ export const fr: Translation = {
   'client.bills.renewal.notice.not_separate':
     'La lettre est arrivée avec la facture, alors que la réglementation exige un avis écrit et séparé de celle-ci.',
   'client.bills.renewal.exit.free':
-    "D'après ce que vous avez indiqué, la résiliation n'entraîne pas de pénalité\u00a0: une personne au tarif 2.0TD peut résilier le contrat et ses reconductions à tout moment sans pénalité, sauf à prix fixe avant la première reconduction annuelle.",
-  'client.bills.renewal.exit.penalty_possible':
-    "À prix fixe et avant la première reconduction annuelle, la pénalité peut atteindre, au maximum, {porcentaje} de l'énergie restant à fournir.",
-  'client.bills.renewal.exit.unknown':
-    "Nous ne savons pas si le prix est fixe ni s'il s'agit du premier renouvellement, et c'est de cela que dépend une éventuelle pénalité\u00a0: elle n'est possible qu'à prix fixe avant la première reconduction annuelle.",
+    'La lettre modifie les prix. À partir du 12-06-2026, toute personne qui reçoit un tel avis a le droit de résilier le contrat sans aucun coût, et le contrat doit permettre de le résilier sans pénalité si ses clauses sont modifiées.',
+  'client.bills.renewal.exit.no_change':
+    "La lettre ne modifie aucun des prix que vous avez saisis\u00a0: cette vérification n'évalue donc pas la sortie du contrat.",
+  'client.bills.renewal.exit.not_checked_before':
+    "La lettre est datée du {carta}, avant le {desde}, date d'entrée en application de ces règles. Cette vérification ne contrôle pas la sortie du contrat pour les lettres antérieures à cette date.",
   'client.bills.renewal.unchecked.content':
     "Le contenu que doit avoir l'avis\u00a0: il sera fixé par un arrêté ministériel que nous n'avons pas encore trouvé.",
   'client.bills.renewal.unchecked.deadlines':

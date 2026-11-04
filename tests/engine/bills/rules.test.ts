@@ -65,8 +65,11 @@ describe('the bills rules', () => {
     anchored.filter((r) => !UNREAD_ANCHORS.includes(blockOf(r.url))).map((r) => [r.id, r] as const),
   )('%s links to the block of the BOE index headed by its article', (_, rule) => {
     const [boeId = '', anchor = ''] = blockOf(rule.url).split('#');
-    const number = /art\. (\d+)/.exec(rule.article)?.[1];
-    expect(BOE_INDEX.norms[boeId]?.blocks[anchor], `${boeId}#${anchor}`).toBe(`Artículo ${number}`);
+    // «arts. 6.1.m y 30.1.j» cites two articles; the link opens on one of them.
+    const cited = (/arts?\. (.+)$/.exec(rule.article)?.[1] ?? '')
+      .split(/, | y /)
+      .map((article) => `Artículo ${/^\d+/.exec(article)?.[0]}`);
+    expect(cited, `${boeId}#${anchor}`).toContain(BOE_INDEX.norms[boeId]?.blocks[anchor]);
   });
 
   it('only the rules whose block is not read open on a whole consolidated text', () => {

@@ -4376,7 +4376,6 @@ export const gl: Translation = {
   'bills.renewal.question.energia-nueva': 'Prezo novo da enerxía',
   'bills.renewal.question.consumo': 'Consumo anual',
   'bills.renewal.question.carta': 'Custo que di a carta',
-  'bills.renewal.question.contrato': 'O teu contrato',
   'bills.renewal.question.envio': 'Como che chegou a carta',
   'bills.renewal.letter_date': 'Data da carta',
   'bills.renewal.letter_date_hint': 'A que leva escrita a carta ou o aviso.',
@@ -4393,7 +4392,8 @@ export const gl: Translation = {
   'bills.renewal.current_power_p2': 'Prezo actual da potencia P2',
   'bills.renewal.next_power_p1': 'Prezo novo da potencia P1',
   'bills.renewal.next_power_p2': 'Prezo novo da potencia P2',
-  'bills.renewal.energy_pricing': 'Cantos prezos de enerxía dá a carta?',
+  'bills.renewal.current_energy_pricing': 'Cantos prezos actuais?',
+  'bills.renewal.next_energy_pricing': 'Cantos prezos novos?',
   'bills.renewal.energy_pricing.single': 'Un só, para todas as horas',
   'bills.renewal.energy_pricing.periods': 'Un por período (P1, P2 e P3)',
   'bills.renewal.current_energy': 'Prezo actual da enerxía (€/kWh)',
@@ -4410,9 +4410,6 @@ export const gl: Translation = {
   'bills.renewal.declared_without_tax': 'Custo anual cos prezos novos, sen impostos (€)',
   'bills.renewal.declared_with_tax': 'Custo anual cos prezos novos, con impostos (€)',
   'bills.renewal.declared_hint': 'Opcional. Compárase co noso recálculo.',
-  'bills.renewal.fixed_price': 'É un contrato de prezo fixo?',
-  'bills.renewal.first_renewal': 'É a primeira renovación anual?',
-  'bills.renewal.first_renewal_hint': 'A primeira prórroga despois do primeiro ano.',
   'bills.renewal.separate_from_bill': 'Chegouche a carta á parte da factura?',
   'bills.renewal.separate_from_bill_hint':
     'Por correo postal ou por un correo electrónico propio, non dentro dunha factura nin xunto a ela.',
@@ -4461,9 +4458,9 @@ export const gl: Translation = {
     'A revisión conta os días entre a data da carta e a da renovación, e mira se a carta chegou á parte da factura. Unha carta datada antes do 12-06-2026 non se comproba con esta regra, que rexe desde ese día. O contido que debe levar o aviso fixarao unha orde ministerial (orden ministerial) que aínda non localizamos, e non se comproba.',
   'bills.guide.renewal_exit.title': 'Saír do contrato',
   'bills.guide.renewal_exit.p1':
-    'Unha persoa coa tarifa 2.0TD pode deixar o seu contrato en calquera momento sen penalización, agás nun contrato a prezo fixo antes da súa primeira prórroga anual. Nese caso, a penalización non pode pasar do 5 % da enerxía estimada pendente de subministración, e a perda tena que probar a comercializadora (Real Decreto 88/2026, art. 28.3).',
+    'Con efectos desde o 12-06-2026, o Real Decreto 88/2026 recoñece a quen consome luz o dereito a rescindir o contrato sen custo ningún cando recibe o aviso dun cambio de condicións (art. 6.1.m), e pide que o contrato recolla (art. 30.1.j):',
   'bills.guide.renewal_exit.p2':
-    'Co que contas do teu contrato, a revisión di se lle corresponde penalización segundo esa norma. Non calcula o importe da penalización.',
+    'Cando unha carta datada desde o 12-06-2026 cambia algún prezo, a revisión di que saír do contrato non leva custo nin penalización segundo eses artigos. Se a carta non cambia ningún prezo, non valora a saída, e unha carta anterior ao 12-06-2026 non se comproba. O prazo que a propia carta fixe para oporse á renovación, como «15 días», tampouco se comproba.',
   'bills.guide.renewal.unchecked.gas':
     'O gas: aínda que a carta tamén o trate, só se revisa a parte da luz.',
   'bills.guide.renewal.unchecked.scope':
@@ -4473,7 +4470,7 @@ export const gl: Translation = {
     'Se a comercializadora quere cambiar as condicións do contrato, ten que avisar por escrito e de maneira separada da súa factura, con polo menos un mes de antelación, e informar do dereito a rescindir o contrato sen custo ningún (Real Decreto 88/2026, art. 6.1.m, con efectos desde o 12-06-2026). A revisión conta os días entre a carta e a renovación; o contido que debe levar o aviso fixarao unha orde ministerial (orden ministerial) que aínda non localizamos.',
   'bills.faq.renewal.exit': 'Poden cobrarme por marchar despois da carta?',
   'bills.faq.renewal.exit_answer':
-    'Unha persoa coa tarifa 2.0TD pode deixar o seu contrato de luz en calquera momento sen penalización, agás nun contrato a prezo fixo antes da súa primeira prórroga anual. Nese caso, a penalización non pode pasar do 5 % da enerxía estimada pendente de subministración, e a perda tena que probar a comercializadora (Real Decreto 88/2026, art. 28.3). Os prazos que a carta fixe para comunicar a baixa ou a oposición á renovación non os comproba a revisión.',
+    'Desde o 12-06-2026, quen recibe o aviso dun cambio nas condicións do contrato de luz ten dereito a rescindilo sen custo ningún (Real Decreto 88/2026, art. 6.1.m), e o contrato ten que prever a rescisión sen penalización se se modifican as súas cláusulas (art. 30.1.j). Por iso, se a carta cambia os prezos, a revisión di que saír non leva penalización. O prazo que a carta fixe para oporse á renovación, como «15 días», non o comproba a revisión.',
   'bills.faq.renewal.regulated': 'Que parte do prezo é regulada?',
   'bills.faq.renewal.regulated_answer':
     'As peaxes de transporte e distribución, que fixa a CNMC, e os cargos do sistema, que fixa o Ministerio, van dentro do prezo da potencia e da enerxía e son iguais con calquera comercializadora. A revisión sepáraos, na data da renovación, do que pon a comercializadora.',
@@ -4831,11 +4828,19 @@ export const gl: Translation = {
   'client.bills.renewal.split.conditional_many':
     'As peaxes e cargos desa data dependen destas normas, que aínda non se decidiron: {normas}. Por iso non se separan.',
   'client.bills.renewal.pvpc.no_data': 'Non hai prezos do PVPC cargados para facer a comparación.',
+  'client.bills.renewal.pvpc.missing_table':
+    'Non temos as peaxes, os cargos ou a marxe do PVPC do {fecha}, así que non se compara co PVPC.',
+  'client.bills.renewal.pvpc.conditional_one':
+    'As peaxes, os cargos ou a marxe do PVPC da data da renovación dependen do {normas}, que aínda non se decidiu, así que non se compara co PVPC.',
+  'client.bills.renewal.pvpc.conditional_many':
+    'As peaxes, os cargos ou a marxe do PVPC da data da renovación dependen destas normas, que aínda non se decidiron: {normas}. Por iso non se compara co PVPC.',
   'client.bills.renewal.pvpc.no_consumption': 'Sen o consumo anual non se compara co PVPC.',
   'client.bills.renewal.pvpc.needs_period_use':
     'Con prezos de enerxía por períodos cómpre o consumo de cada período para comparar co PVPC, e a carta non o dá.',
   'client.bills.renewal.pvpc.annual':
     'Co teu consumo e a túa potencia, o PVPC do {desde} ao {hasta} custaría {importe} ao ano, sen impostos.',
+  'client.bills.renewal.pvpc.annual_partial':
+    'Só hai {periodo} publicados do PVPC, do {desde} ao {hasta}, non un ano enteiro. Co teu consumo e a túa potencia, e a media dese tempo, o PVPC custaría {importe} ao ano, sen impostos.',
   'client.bills.renewal.pvpc.next':
     'Os prezos novos da carta custan {importe} ao ano, sen impostos.',
   'client.bills.renewal.pvpc.difference': 'Diferenza (carta menos PVPC): {diferencia}.',
@@ -4847,6 +4852,8 @@ export const gl: Translation = {
     'A antelación cumpre: {dias} entre a carta ({carta}) e a renovación ({renovacion}), e a carta chegou á parte da factura.',
   'client.bills.renewal.notice.short':
     'A antelación non chega a un mes: {dias} entre a carta ({carta}) e a renovación ({renovacion}).',
+  'client.bills.renewal.notice.short_with_bill':
+    'A antelación non chega a un mes: {dias} entre a carta ({carta}) e a renovación ({renovacion}). Ademais, a carta veu xunto á factura, e a norma pide o aviso de maneira separada dela.',
   'client.bills.renewal.notice.separate_unknown':
     'A data alcanza o mes de antelación: {dias} entre a carta ({carta}) e a renovación ({renovacion}). Non sabemos se a carta chegou á parte da factura, así que non damos o aviso por cumprido.',
   'client.bills.renewal.notice.not_checked_before':
@@ -4854,11 +4861,11 @@ export const gl: Translation = {
   'client.bills.renewal.notice.not_separate':
     'A carta veu xunto á factura, e a norma pide o aviso por escrito e de maneira separada dela.',
   'client.bills.renewal.exit.free':
-    'Co que contaches, rescindir non leva penalización: unha persoa coa tarifa 2.0TD pode rescindir o contrato e as súas prórrogas en calquera momento sen penalización, agás prezo fixo antes da primeira prórroga anual.',
-  'client.bills.renewal.exit.penalty_possible':
-    'Con prezo fixo e antes da primeira prórroga anual, a penalización pode chegar, como moito, ao {porcentaje} da enerxía pendente.',
-  'client.bills.renewal.exit.unknown':
-    'Non sabemos se o prezo é fixo nin se é a primeira renovación, e diso depende se hai penalización: só cabe en prezo fixo antes da primeira prórroga anual.',
+    'A carta cambia os prezos. Desde o 12-06-2026, quen recibe un aviso así ten dereito a rescindir o contrato sen custo ningún, e o contrato ten que permitir rescindilo sen penalización se se modifican as súas cláusulas.',
+  'client.bills.renewal.exit.no_change':
+    'A carta non cambia ningún dos prezos que escribiches, así que esta revisión non valora a saída do contrato.',
+  'client.bills.renewal.exit.not_checked_before':
+    'A carta é do {carta}, anterior ao {desde}, cando empezaron a rexer estas normas. Esta revisión non comproba a saída do contrato con cartas anteriores a esa data.',
   'client.bills.renewal.unchecked.content':
     'O contido que debe levar o aviso: fixarao unha orde ministerial que aínda non localizamos.',
   'client.bills.renewal.unchecked.deadlines':

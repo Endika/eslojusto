@@ -198,8 +198,9 @@ const RENEWAL: readonly Block[] = [
   {
     id: 'renewal_exit',
     anchor: 'g-salir',
-    paragraphs: ['bills.guide.renewal_exit.p1', 'bills.guide.renewal_exit.p2'],
-    rules: ['exit_penalty'],
+    paragraphs: ['bills.guide.renewal_exit.p1'],
+    after: ['bills.guide.renewal_exit.p2'],
+    rules: ['renewal_exit'],
   },
   {
     id: 'unchecked',
@@ -260,6 +261,9 @@ const faq = billsFaqEntries(lang, review, { documents });
         ))}
         {(id === 'changes' || id === 'renewal_notice') && (
           <LegalQuote lang={lang} source={BILLS_TEXTS.rd88_6} quote="bills_change_notice" />
+        )}
+        {id === 'renewal_exit' && (
+          <LegalQuote lang={lang} source={BILLS_TEXTS.rd88_30_j} quote="bills_change_exit" />
         )}
         {id === 'commitment' && (
           <LegalQuote

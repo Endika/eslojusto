@@ -4480,7 +4480,6 @@ export const eu: Translation = {
   'bills.renewal.question.energia-nueva': 'Energiaren prezio berria',
   'bills.renewal.question.consumo': 'Urteko kontsumoa',
   'bills.renewal.question.carta': 'Gutunak dioen kostua',
-  'bills.renewal.question.contrato': 'Zure kontratua',
   'bills.renewal.question.envio': 'Nola iritsi zitzaizun gutuna',
   'bills.renewal.letter_date': 'Gutunaren data',
   'bills.renewal.letter_date_hint': 'Gutunean edo abisuan idatzita dagoena.',
@@ -4497,7 +4496,8 @@ export const eu: Translation = {
   'bills.renewal.current_power_p2': 'Potentziaren egungo prezioa P2',
   'bills.renewal.next_power_p1': 'Potentziaren prezio berria P1',
   'bills.renewal.next_power_p2': 'Potentziaren prezio berria P2',
-  'bills.renewal.energy_pricing': 'Energiaren zenbat prezio ematen ditu gutunak?',
+  'bills.renewal.current_energy_pricing': 'Gaur egungo zenbat prezio?',
+  'bills.renewal.next_energy_pricing': 'Zenbat prezio berri?',
   'bills.renewal.energy_pricing.single': 'Bakarra, ordu guztietarako',
   'bills.renewal.energy_pricing.periods': 'Bat aldi bakoitzeko (P1, P2 eta P3)',
   'bills.renewal.current_energy': 'Energiaren egungo prezioa (€/kWh)',
@@ -4514,9 +4514,6 @@ export const eu: Translation = {
   'bills.renewal.declared_without_tax': 'Urteko kostua prezio berriekin, zergarik gabe (€)',
   'bills.renewal.declared_with_tax': 'Urteko kostua prezio berriekin, zergak barne (€)',
   'bills.renewal.declared_hint': 'Aukerakoa. Gure birkalkuluarekin alderatzen da.',
-  'bills.renewal.fixed_price': 'Prezio finkoko kontratua da?',
-  'bills.renewal.first_renewal': 'Urteko lehen berritzea da?',
-  'bills.renewal.first_renewal_hint': 'Lehen urtearen ondorengo lehen luzapena (prórroga).',
   'bills.renewal.separate_from_bill': 'Gutuna fakturatik bereizita iritsi zitzaizun?',
   'bills.renewal.separate_from_bill_hint':
     'Posta arruntez edo mezu elektroniko propio batez, ez faktura baten barruan ezta harekin batera ere.',
@@ -4565,9 +4562,9 @@ export const eu: Translation = {
     'Berrikuspenak gutunaren dataren eta berritze-dataren arteko egunak zenbatzen ditu, eta begiratzen du gutuna fakturatik bereizita iritsi zen ala ez. 12-06-2026 baino lehenagoko data duen gutun bat ez da arau honekin egiaztatzen, egun horretatik aurrera baitago indarrean. Abisuak izan behar duen edukia oraindik aurkitu ez dugun ministro-agindu batek (orden ministerial) finkatuko du, eta ez da egiaztatzen.',
   'bills.guide.renewal_exit.title': 'Kontratutik irtetea',
   'bills.guide.renewal_exit.p1':
-    '2.0TD tarifa duen pertsona batek edozein unetan utz dezake bere kontratua penalizaziorik gabe, prezio finkoko kontratu batean lehen urteko luzapena baino lehen izan ezik. Kasu horretan, penalizazioak ezin du gainditu hornitzeko falta den energia estimatuaren 5 %, eta galera merkaturatzaileak frogatu behar du (Real Decreto 88/2026, art. 28.3).',
+    '12-06-2026tik aurrerako ondorioekin, Real Decreto 88/2026 arauak eskubide hau aitortzen dio argia kontsumitzen duenari: baldintza-aldaketa baten abisua jasotzean kontratua inolako kosturik gabe suntsiaraztea (art. 6.1.m). Gainera, kontratuak hau jaso behar duela eskatzen du (art. 30.1.j):',
   'bills.guide.renewal_exit.p2':
-    'Zure kontratuaz kontatzen duzunarekin, berrikuspenak esaten du arau horren arabera penalizaziorik dagokion ala ez. Ez du penalizazioaren zenbatekoa kalkulatzen.',
+    '12-06-2026tik aurrera datatutako gutun batek prezioren bat aldatzen duenean, berrikuspenak dio kontratutik ateratzeak ez dakarrela kosturik ez penalizaziorik artikulu horien arabera. Gutunak ez badu prezio bakar bat ere aldatzen, ez du irteera baloratzen, eta 12-06-2026 baino lehenagoko gutun bat ez da egiaztatzen. Gutunak berak berritzearen aurka egiteko finkatzen duen epea, «15 días» adibidez, ez da hori ere egiaztatzen.',
   'bills.guide.renewal.unchecked.gas':
     'Gasa: gutunak hura ere jorratzen badu ere, argiaren zatia bakarrik berrikusten da.',
   'bills.guide.renewal.unchecked.scope':
@@ -4577,7 +4574,7 @@ export const eu: Translation = {
     'Merkaturatzaileak kontratuaren baldintzak aldatu nahi baditu, idatziz eta bere fakturatik bereizita abisatu behar du, gutxienez hilabete lehenago, eta kontratua inolako kosturik gabe suntsiarazteko eskubidearen berri eman (Real Decreto 88/2026, art. 6.1.m, 12-06-2026tik aurrerako ondorioekin). Berrikuspenak gutunaren eta berritzearen arteko egunak zenbatzen ditu; abisuak izan behar duen edukia oraindik aurkitu ez dugun ministro-agindu batek (orden ministerial) finkatuko du.',
   'bills.faq.renewal.exit': 'Gutunaren ondoren joateagatik kobra diezadakete?',
   'bills.faq.renewal.exit_answer':
-    '2.0TD tarifa duen pertsona batek edozein unetan utz dezake bere argiaren kontratua penalizaziorik gabe, prezio finkoko kontratu batean lehen urteko luzapena baino lehen izan ezik. Kasu horretan, penalizazioak ezin du gainditu hornitzeko falta den energia estimatuaren 5 %, eta galera merkaturatzaileak frogatu behar du (Real Decreto 88/2026, art. 28.3). Gutunak baja edo berritzearen aurkako jarrera jakinarazteko finkatzen dituen epeak ez ditu berrikuspenak egiaztatzen.',
+    '12-06-2026tik aurrera, argiaren kontratuaren baldintzen aldaketa baten abisua jasotzen duenak eskubidea du kontratua inolako kosturik gabe suntsiarazteko (Real Decreto 88/2026, art. 6.1.m), eta kontratuak aurreikusi behar du penalizaziorik gabe suntsiaraz daitekeela haren klausulak aldatzen badira (art. 30.1.j). Horregatik, gutunak prezioak aldatzen baditu, berrikuspenak dio ateratzeak ez dakarrela penalizaziorik. Gutunak berritzearen aurka egiteko finkatzen duen epea, «15 días» adibidez, ez du berrikuspenak egiaztatzen.',
   'bills.faq.renewal.regulated': 'Prezioaren zer zati dago arautua?',
   'bills.faq.renewal.regulated_answer':
     'Garraioaren eta banaketaren bidesariak (peajes), CNMCk finkatzen dituenak, eta sistemaren karguak (cargos), Ministerioak finkatzen dituenak, potentziaren eta energiaren prezioaren barruan daude, eta berdinak dira edozein merkaturatzailerekin. Berrikuspenak, berritze-datan, merkaturatzaileak jartzen duenetik bereizten ditu.',
@@ -4938,12 +4935,20 @@ export const eu: Translation = {
   'client.bills.renewal.split.conditional_many':
     'Data horretako bidesariak eta karguak oraindik erabaki ez diren arau hauen araberakoak dira: {normas}. Horregatik ez dira bereizten.',
   'client.bills.renewal.pvpc.no_data': 'Ez dago PVPCaren preziorik kargatuta alderaketa egiteko.',
+  'client.bills.renewal.pvpc.missing_table':
+    'Ez ditugu {fecha} datako bidesariak, karguak edo PVPCaren marjina; beraz, ez da PVPCarekin alderatzen.',
+  'client.bills.renewal.pvpc.conditional_one':
+    'Berritze-datako bidesariak, karguak edo PVPCaren marjina {normas} arauaren araberakoak dira, eta hura oraindik ez da erabaki; beraz, ez da PVPCarekin alderatzen.',
+  'client.bills.renewal.pvpc.conditional_many':
+    'Berritze-datako bidesariak, karguak edo PVPCaren marjina oraindik erabaki ez diren arau hauen araberakoak dira: {normas}. Horregatik ez da PVPCarekin alderatzen.',
   'client.bills.renewal.pvpc.no_consumption':
     'Urteko kontsumorik gabe, ez da PVPCarekin alderatzen.',
   'client.bills.renewal.pvpc.needs_period_use':
     'Energiaren prezioak alditan badaude, aldi bakoitzeko kontsumoa behar da PVPCarekin alderatzeko, eta gutunak ez du ematen.',
   'client.bills.renewal.pvpc.annual':
     'Zure kontsumoarekin eta zure potentziarekin, {desde} datatik {hasta} datara arteko PVPCak {importe} kostatuko zukeen urtean, zergarik gabe.',
+  'client.bills.renewal.pvpc.annual_partial':
+    'PVPCaren prezioak {periodo} baino ez daude argitaratuta, {desde} datatik {hasta} datara, ez urte oso bat. Zure kontsumoarekin eta zure potentziarekin, denbora horren batez bestekoarekin, PVPCak {importe} kostatuko luke urtean, zergarik gabe.',
   'client.bills.renewal.pvpc.next':
     'Gutuneko prezio berriek {importe} kostatzen dute urtean, zergarik gabe.',
   'client.bills.renewal.pvpc.difference': 'Aldea (gutuna ken PVPC): {diferencia}.',
@@ -4955,6 +4960,8 @@ export const eu: Translation = {
     'Aurreabisuak betetzen du: {dias} gutunaren ({carta}) eta berritzearen ({renovacion}) artean, eta gutuna fakturatik bereizita iritsi zen.',
   'client.bills.renewal.notice.short':
     'Aurreabisua ez da hilabetera iristen: {dias} gutunaren ({carta}) eta berritzearen ({renovacion}) artean.',
+  'client.bills.renewal.notice.short_with_bill':
+    'Aurreabisua ez da hilabetera iristen: {dias} gutunaren ({carta}) eta berritzearen ({renovacion}) artean. Gainera, gutuna fakturarekin batera etorri zen, eta arauak abisua hartatik bereizita eskatzen du.',
   'client.bills.renewal.notice.separate_unknown':
     'Datak hilabeteko aurreabisua betetzen du: {dias} gutunaren ({carta}) eta berritzearen ({renovacion}) artean. Ez dakigu gutuna fakturatik bereizita iritsi zen ala ez; beraz, ez dugu abisua betetzat ematen.',
   'client.bills.renewal.notice.not_checked_before':
@@ -4962,11 +4969,11 @@ export const eu: Translation = {
   'client.bills.renewal.notice.not_separate':
     'Gutuna fakturarekin batera etorri zen, eta arauak abisua idatziz eta hartatik bereizita eskatzen du.',
   'client.bills.renewal.exit.free':
-    'Kontatu duzunarekin, kontratua suntsiarazteak ez dakar penalizaziorik: 2.0TD tarifa duen pertsona batek edozein unetan suntsiaraz ditzake kontratua eta haren luzapenak penalizaziorik gabe, prezio finkoarekin lehen urteko luzapena baino lehen izan ezik.',
-  'client.bills.renewal.exit.penalty_possible':
-    'Prezio finkoarekin eta lehen urteko luzapena baino lehen, penalizazioa, gehienez ere, falta den energiaren {porcentaje} izan daiteke.',
-  'client.bills.renewal.exit.unknown':
-    'Ez dakigu prezioa finkoa den, ezta lehen berritzea den ere, eta horren araberakoa da penalizaziorik dagoen ala ez: prezio finkoarekin eta lehen urteko luzapena baino lehen bakarrik egon daiteke.',
+    'Gutunak prezioak aldatzen ditu. 12-06-2026tik aurrera, horrelako abisu bat jasotzen duenak eskubidea du kontratua inolako kosturik gabe suntsiarazteko, eta kontratuak penalizaziorik gabe suntsiarazten utzi behar du haren klausulak aldatzen badira.',
+  'client.bills.renewal.exit.no_change':
+    'Gutunak ez du aldatzen idatzi dituzun prezioetako bat ere; beraz, berrikuspen honek ez du kontratutik ateratzea baloratzen.',
+  'client.bills.renewal.exit.not_checked_before':
+    'Gutunaren data {carta} da, hau da, {desde} data baino lehenagokoa; egun horretan hasi ziren arau hauek indarrean. Berrikuspen honek ez du egiaztatzen kontratutik ateratzea data horren aurreko gutunetan.',
   'client.bills.renewal.unchecked.content':
     'Abisuak izan behar duen edukia: oraindik aurkitu ez dugun ministro-agindu batek finkatuko du.',
   'client.bills.renewal.unchecked.deadlines':

@@ -23,6 +23,20 @@ export const BILLS_TEXTS: TextTable = {
       'Ser avisado de forma transparente y comprensible por su comercializador o agregador independiente, con al menos un mes de antelación, por escrito y de manera separada a su factura, de cualquier intención de modificar las condiciones del contrato e informado de su derecho a rescindir el contrato sin coste alguno cuando reciba el aviso.',
     ],
   },
+  // 30.1.j, in force from 12-06-2026 (final provision 9.ª.4); read on the BOE block a3-2.
+  rd88_30_j: {
+    id: 'rd88_30_j',
+    basis: 'statute',
+    citation: 'Real Decreto 88/2026, art. 30.1.j',
+    article: '30.1.j',
+    url: `${ACT}BOE-A-2026-3212#a3-2`,
+    inForceSince: '2026-06-12',
+    lastVerified: '2026-11-04',
+    verified: true,
+    quotes: [
+      'j) Posibilidad de rescindir el contrato sin penalización alguna en caso de que se modifiquen las cláusulas contractuales.',
+    ],
+  },
   // 62.5, added by Real Decreto-ley 7/2021 with effects from 01-01-2022.
   trlgdcu_62: {
     id: 'trlgdcu_62',
