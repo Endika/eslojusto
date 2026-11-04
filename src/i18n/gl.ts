@@ -4054,6 +4054,12 @@ export const gl: Translation = {
   'bills.hub.telecom_situation':
     'Deixas a túa compañía de móbil ou internet: a penalización e o que che cobran',
   'bills.hub.telecom_citation': 'Ley 11/2022 · TRLGDCU, art. 62.5 · Real Decreto 899/2009',
+  'bills.hub.renewal': 'Renovación',
+  'bills.hub.renewal_situation':
+    'Chégache a carta de renovación do teu contrato de luz: o que cambia, que é regulado e que di a norma do aviso',
+  'bills.hub.renewal_citation': 'Real Decreto 88/2026 · Real Decreto-ley 25/2026',
+  'bills.lead_renewal':
+    'Tres revisións: a túa factura da luz, liña por liña; a carta de renovación do teu contrato de luz, e a penalización e a baixa do teu contrato de móbil ou internet.',
   'bills.beta': 'Beta',
   'bills.beta_note':
     'Sección en probas. As cifras saen do que escribes, das táboas oficiais e da norma.',
@@ -4360,6 +4366,123 @@ export const gl: Translation = {
   'bills.telecom.h1': 'A túa permanencia e a túa baixa do móbil ou internet',
   'bills.telecom.lead':
     'Coas datas e os importes do teu contrato: a penalización que permite a lei se marchas antes de tempo, se un cambio de condicións che permite marchar sen penalización e se che cobran días de despois da baixa.',
+  'bills.renewal.form_aria': 'Revisión da túa carta de renovación da luz',
+  'bills.renewal.question.fechas': 'As datas da carta',
+  'bills.renewal.question.potencia': 'A túa potencia',
+  'bills.renewal.question.potencia-actual': 'Prezo actual da potencia',
+  'bills.renewal.question.potencia-nueva': 'Prezo novo da potencia',
+  'bills.renewal.question.energia': 'Prezos da enerxía',
+  'bills.renewal.question.energia-actual': 'Prezo actual da enerxía',
+  'bills.renewal.question.energia-nueva': 'Prezo novo da enerxía',
+  'bills.renewal.question.consumo': 'Consumo anual',
+  'bills.renewal.question.carta': 'Custo que di a carta',
+  'bills.renewal.question.contrato': 'O teu contrato',
+  'bills.renewal.question.envio': 'Como che chegou a carta',
+  'bills.renewal.letter_date': 'Data da carta',
+  'bills.renewal.letter_date_hint': 'A que leva escrita a carta ou o aviso.',
+  'bills.renewal.renewal_date': 'Data en que se renova',
+  'bills.renewal.renewal_date_hint': 'O día desde o que valen os prezos novos.',
+  'bills.renewal.power_kw_p1': 'Potencia contratada en P1 (kW)',
+  'bills.renewal.power_kw_p2': 'Potencia contratada en P2 (kW)',
+  'bills.renewal.power_unit': 'En que unidade dá a carta o prezo da potencia?',
+  'bills.renewal.power_unit_hint': 'Vén xunto ao prezo.',
+  'bills.renewal.power_unit.per_kw_day': '€/kW e día',
+  'bills.renewal.power_unit.per_kw_year': '€/kW e ano',
+  'bills.renewal.price_hint': 'Tal como aparece na carta, con todos os decimais.',
+  'bills.renewal.current_power_p1': 'Prezo actual da potencia P1',
+  'bills.renewal.current_power_p2': 'Prezo actual da potencia P2',
+  'bills.renewal.next_power_p1': 'Prezo novo da potencia P1',
+  'bills.renewal.next_power_p2': 'Prezo novo da potencia P2',
+  'bills.renewal.energy_pricing': 'Cantos prezos de enerxía dá a carta?',
+  'bills.renewal.energy_pricing.single': 'Un só, para todas as horas',
+  'bills.renewal.energy_pricing.periods': 'Un por período (P1, P2 e P3)',
+  'bills.renewal.current_energy': 'Prezo actual da enerxía (€/kWh)',
+  'bills.renewal.next_energy': 'Prezo novo da enerxía (€/kWh)',
+  'bills.renewal.current_energy_p1': 'Prezo actual da enerxía P1 (€/kWh)',
+  'bills.renewal.current_energy_p2': 'Prezo actual da enerxía P2 (€/kWh)',
+  'bills.renewal.current_energy_p3': 'Prezo actual da enerxía P3 (€/kWh)',
+  'bills.renewal.next_energy_p1': 'Prezo novo da enerxía P1 (€/kWh)',
+  'bills.renewal.next_energy_p2': 'Prezo novo da enerxía P2 (€/kWh)',
+  'bills.renewal.next_energy_p3': 'Prezo novo da enerxía P3 (€/kWh)',
+  'bills.renewal.annual_kwh': 'Consumo anual que usa a carta (kWh)',
+  'bills.renewal.annual_kwh_hint':
+    'Se a carta non o di, déixao baleiro: non se recalculará o seu custo.',
+  'bills.renewal.declared_without_tax': 'Custo anual cos prezos novos, sen impostos (€)',
+  'bills.renewal.declared_with_tax': 'Custo anual cos prezos novos, con impostos (€)',
+  'bills.renewal.declared_hint': 'Opcional. Compárase co noso recálculo.',
+  'bills.renewal.fixed_price': 'É un contrato de prezo fixo?',
+  'bills.renewal.first_renewal': 'É a primeira renovación anual?',
+  'bills.renewal.first_renewal_hint': 'A primeira prórroga despois do primeiro ano.',
+  'bills.renewal.separate_from_bill': 'Chegouche a carta á parte da factura?',
+  'bills.renewal.separate_from_bill_hint':
+    'Por correo postal ou por un correo electrónico propio, non dentro dunha factura nin xunto a ela.',
+  'bills.renewal.app_name': 'Revisión da carta de renovación do teu contrato de luz',
+  'bills.renewal.crumb': 'Renovación',
+  'bills.renewal.title': 'Revisa a carta de renovación do teu contrato de luz',
+  'bills.renewal.description':
+    'Recalcula o que cambia cos prezos novos da túa carta de renovación da luz, que parte é regulada, como queda fronte ao PVPC, os impostos da data, o preaviso e a saída do contrato.',
+  'bills.renewal.h1': 'A carta de renovación da túa luz, coas súas contas',
+  'bills.renewal.lead':
+    'Cos prezos da túa carta: canto cambia o custo dun ano sen impostos, que parte dos prezos é regulada, como queda fronte ao PVPC, os impostos da data, se o preaviso cumpre e que di a norma de saír do contrato. Para fogares con tarifa 2.0TD, ata 15 kW.',
+  'bills.renewal.tab.fechas': 'Datas',
+  'bills.renewal.tab.potencia': 'Prezos',
+  'bills.renewal.tab.consumo': 'Consumo',
+  'bills.renewal.tab.resultado': 'Resultado',
+  'bills.renewal.documents.start_help':
+    'Podes subir a carta de renovación para cubrir os datos co que se lea nela, ou escribilos ti. Antes de revisar nada, confirmas cada dato.',
+  'bills.renewal.documents.upload': 'Sube a carta de renovación',
+  'bills.renewal.documents.files_hint':
+    'Todas as páxinas da carta ou do aviso de cambio de prezos do teu contrato de luz. Ata 25 fotos ou páxinas de PDF en total. As fotos e as páxinas dos PDF convértense en imaxes no teu dispositivo antes de enviarse.',
+  'bills.guide.renewal.title': 'Que comproba a revisión da túa carta de renovación',
+  'bills.guide.renewal.lead':
+    'Como se recalcula o custo cos prezos da carta, que parte dos prezos é regulada, o PVPC como dato de comparación, os impostos da data da renovación, o preaviso e a saída do contrato, coa norma da que sae cada cousa.',
+  'bills.guide.renewal_checks.title': 'As contas da carta',
+  'bills.guide.renewal_checks.p1':
+    'A revisión recalcula dúas veces un ano de luz sen impostos, cos prezos actuais e cos novos da carta, coa mesma potencia e o mesmo consumo anual, e amosa a diferenza en euros e en tanto por cento. Se a carta declara o seu propio custo, compárao co recálculo e di se coinciden.',
+  'bills.guide.renewal_checks.p2':
+    'Se a carta non dá o consumo anual, ou dá os prezos da enerxía por períodos sen o consumo de cada un, o custo non se pode recalcular e a revisión dio en vez de supoñelo. O resto de comprobacións segue en pé.',
+  'bills.guide.renewal_regulated.title': 'Que parte dos prezos é regulada',
+  'bills.guide.renewal_regulated.p1':
+    'Dentro dos prezos da potencia e da enerxía van as peaxes de transporte e distribución, que fixa a CNMC, e os cargos do sistema, que fixa o Ministerio. Son iguais con calquera comercializadora; o que queda ata o prezo da carta pono a comercializadora.',
+  'bills.guide.renewal_regulated.p2':
+    'A revisión separa, para cada termo, o regulado na data da renovación do que pon a comercializadora, co prezo actual e o novo. Así vese se unha suba vén das peaxes e cargos ou da marxe da comercializadora.',
+  'bills.guide.renewal_pvpc.title': 'O PVPC, como dato',
+  'bills.guide.renewal_pvpc.p1':
+    'A revisión calcula o que custarían en PVPC os últimos 12 meses publicados, co teu consumo e a túa potencia, sen impostos, e ponno ao lado dos prezos novos. É a media simple de todas as horas do rango, sen o perfil de consumo de REE, así que é unha referencia e non unha predición.',
+  'bills.guide.renewal_pvpc.p2':
+    'A marxe de comercialización do PVPC que usa o cálculo pode estar desfasada, e a revisión avísao. O PVPC é un dato para comparar: a revisión non recomenda ningunha tarifa nin ningunha comercializadora.',
+  'bills.guide.renewal_taxes.title': 'Os impostos da data',
+  'bills.guide.renewal_taxes.p1':
+    'O custo con impostos calcúlase co imposto eléctrico e o IVA que rexan na data da renovación. Cando esa data cae nun período cuxas normas aínda non están decididas, como o Real Decreto-ley 25/2026, a revisión non elixe: amosa cada resultado posible e o que tería que pasar para que valla.',
+  'bills.guide.renewal_notice.title': 'O preaviso dun mes',
+  'bills.guide.renewal_notice.p1':
+    'Con efectos desde o 12-06-2026, o Real Decreto 88/2026 recoñece a quen consome luz o dereito a (art. 6.1.m):',
+  'bills.guide.renewal_notice.p2':
+    'A revisión conta os días entre a data da carta e a da renovación, e mira se a carta chegou á parte da factura. Unha carta datada antes do 12-06-2026 non se comproba con esta regra, que rexe desde ese día. O contido que debe levar o aviso fixarao unha orde ministerial (orden ministerial) que aínda non localizamos, e non se comproba.',
+  'bills.guide.renewal_exit.title': 'Saír do contrato',
+  'bills.guide.renewal_exit.p1':
+    'Unha persoa coa tarifa 2.0TD pode deixar o seu contrato en calquera momento sen penalización, agás nun contrato a prezo fixo antes da súa primeira prórroga anual. Nese caso, a penalización non pode pasar do 5 % da enerxía estimada pendente de subministración, e a perda tena que probar a comercializadora (Real Decreto 88/2026, art. 28.3).',
+  'bills.guide.renewal_exit.p2':
+    'Co que contas do teu contrato, a revisión di se lle corresponde penalización segundo esa norma. Non calcula o importe da penalización.',
+  'bills.guide.renewal.unchecked.gas':
+    'O gas: aínda que a carta tamén o trate, só se revisa a parte da luz.',
+  'bills.guide.renewal.unchecked.scope':
+    'As subministracións de máis de 15 kW e as de empresas: a revisión é para fogares con tarifa 2.0TD.',
+  'bills.faq.renewal.notice': 'Con canta antelación me teñen que avisar da renovación?',
+  'bills.faq.renewal.notice_answer':
+    'Se a comercializadora quere cambiar as condicións do contrato, ten que avisar por escrito e de maneira separada da súa factura, con polo menos un mes de antelación, e informar do dereito a rescindir o contrato sen custo ningún (Real Decreto 88/2026, art. 6.1.m, con efectos desde o 12-06-2026). A revisión conta os días entre a carta e a renovación; o contido que debe levar o aviso fixarao unha orde ministerial (orden ministerial) que aínda non localizamos.',
+  'bills.faq.renewal.exit': 'Poden cobrarme por marchar despois da carta?',
+  'bills.faq.renewal.exit_answer':
+    'Unha persoa coa tarifa 2.0TD pode deixar o seu contrato de luz en calquera momento sen penalización, agás nun contrato a prezo fixo antes da súa primeira prórroga anual. Nese caso, a penalización non pode pasar do 5 % da enerxía estimada pendente de subministración, e a perda tena que probar a comercializadora (Real Decreto 88/2026, art. 28.3). Os prazos que a carta fixe para comunicar a baixa ou a oposición á renovación non os comproba a revisión.',
+  'bills.faq.renewal.regulated': 'Que parte do prezo é regulada?',
+  'bills.faq.renewal.regulated_answer':
+    'As peaxes de transporte e distribución, que fixa a CNMC, e os cargos do sistema, que fixa o Ministerio, van dentro do prezo da potencia e da enerxía e son iguais con calquera comercializadora. A revisión sepáraos, na data da renovación, do que pon a comercializadora.',
+  'bills.faq.renewal.pvpc': 'Por que aparece o PVPC?',
+  'bills.faq.renewal.pvpc_answer':
+    'Porque é o prezo regulado de referencia, publicado hora a hora. A revisión calcula o que custarían os últimos 12 meses publicados co teu consumo e a túa potencia, como media simple das horas, e ponno xunto aos prezos novos da carta. É un dato para comparar, non unha recomendación.',
+  'bills.faq.renewal.documents': 'Que pasa coa miña carta?',
+  'bills.faq.renewal.documents_answer':
+    'Se subes a carta, envíase cifrada a un servidor de Amazon Web Services en España, que lla pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro da Unión Europea. O modelo ten orde de non copiar nomes, DNI, enderezos, teléfonos, correos nin contas. Non se garda nada. Esta revisión é gratuíta e non pide ningún pase. Se prefires non subir nada, podes escribir os datos e nada sae do teu dispositivo.',
   'bills.telecom.form_aria': 'Revisión da túa permanencia e a túa baixa',
   'bills.telecom.tab.permanencia': 'Contrato',
   'bills.telecom.tab.baja': 'Baixa',
@@ -4624,6 +4747,124 @@ export const gl: Translation = {
   'client.bills.telecom.deadline.rule':
     'Se a túa compañía che avisa dun cambio nas condicións do contrato, a lei permíteche darte de baixa no mes seguinte ao aviso sen pagar a penalización pola permanencia; só pode seguir cobrándoche o terminal subvencionado que te quedes.',
   'client.bills.telecom.deadline.ends': 'O mes seguinte ao aviso remata o {fecha}.',
+  'client.bills.renewal.documents.not_renewal':
+    'O documento non parece unha renovación de prezos: comproba que é a carta que querías revisar.',
+  'client.bills.renewal.unit.per_kw_year': '{n} €/kW·ano',
+  'client.bills.renewal.unit.per_kwh': '{n} €/kWh',
+  'client.bills.renewal.lead.ok':
+    'Cos prezos da carta, un ano de luz sen impostos pasa de {antes} a {despues} ({porcentaje}).',
+  'client.bills.renewal.lead.no_consumption':
+    'A carta non dá o consumo anual, así que non se pode recalcular o seu custo. O demais si se revisa.',
+  'client.bills.renewal.lead.needs_period_use':
+    'Os prezos da carta son por períodos e non sabemos canto consumes en cada un, así que non se recalcula o seu custo. O demais si se revisa.',
+  'client.bills.renewal.title.cost': 'As contas da carta',
+  'client.bills.renewal.title.split': 'Que parte dos prezos é regulada',
+  'client.bills.renewal.title.pvpc': 'Fronte ao PVPC',
+  'client.bills.renewal.title.notice': 'O preaviso',
+  'client.bills.renewal.title.exit': 'Saír do contrato',
+  'client.bills.renewal.title.unchecked': 'O que esta revisión non comproba',
+  'client.bills.renewal.cost.no_consumption':
+    'Sen o consumo anual non se pode recalcular o custo da carta.',
+  'client.bills.renewal.cost.needs_period_use':
+    'Con prezos de enerxía por períodos cómpre o consumo de cada período, que a carta non dá. Non o inventamos.',
+  'client.bills.renewal.cost.current': 'Custo anual actual, sen impostos: {importe}.',
+  'client.bills.renewal.cost.next': 'Custo anual cos prezos novos, sen impostos: {importe}.',
+  'client.bills.renewal.cost.rise': 'Variación: {porcentaje}.',
+  'client.bills.renewal.cost.matches':
+    'A carta declara {declarado} sen impostos: coincide co recálculo, con menos de 1 € de diferenza.',
+  'client.bills.renewal.cost.mismatch':
+    'A carta declara {declarado} sen impostos e o recálculo dá {calculado}: hai máis de 1 € de diferenza.',
+  'client.bills.renewal.taxes.missing':
+    'Non temos os tipos de imposto eléctrico e IVA do {fecha}, así que non calculamos o custo con impostos.',
+  'client.bills.renewal.taxes.ok':
+    'Con impostos do {fecha} ({impuesto} de imposto eléctrico e {iva} de IVA): {importe}.',
+  'client.bills.renewal.taxes.declared_matches':
+    'A carta declara {importe} con impostos: coincide.',
+  'client.bills.renewal.taxes.declared_differs':
+    'A carta declara {importe} con impostos: non coincide co noso cálculo.',
+  'client.bills.renewal.taxes.conditional':
+    'Os impostos do {fecha} dependen do que se decida sobre: {normas}. Non eliximos un resultado: estes son os posibles.',
+  'client.bills.renewal.taxes.option':
+    '{importe} con impostos, con {impuesto} de imposto eléctrico e {iva} de IVA, nestes casos:',
+  'client.bills.renewal.taxes.if': 'se {condiciones}',
+  'client.bills.renewal.taxes.cond_met':
+    'cúmprese a condición do {norma} ({condicion}; saberase arredor do {fecha})',
+  'client.bills.renewal.taxes.cond_not_met':
+    'non se cumpre a condición do {norma} ({condicion}; saberase arredor do {fecha})',
+  'client.bills.renewal.taxes.cond_again': 'non se cumpre esa condición',
+  'client.bills.renewal.taxes.decided_by': 'segundo o que se decida sobre o {norma}',
+  'client.bills.renewal.taxes.convalidated': 'o Congreso convalida o {norma}',
+  'client.bills.renewal.taxes.not_convalidated': 'o Congreso non convalida o {norma}',
+  'client.bills.renewal.taxes.not_convalidated_again': 'o Congreso non o convalida',
+  'client.bills.renewal.taxes.option_rest':
+    '{importe} con impostos, con {impuesto} de imposto eléctrico e {iva} de IVA, nos demais casos.',
+  'client.bills.renewal.taxes.rates': '{impuesto} de imposto eléctrico e {iva} de IVA',
+  'client.bills.renewal.taxes.or': ' ou ',
+  'client.bills.renewal.taxes.declared_option':
+    'A carta declara {importe} con impostos, que coincide coa opción de {opciones}.',
+  'client.bills.renewal.taxes.declared_none':
+    'A carta declara {importe} con impostos, que non coincide con ningunha destas opcións.',
+  'client.bills.renewal.taxes.and': ' e ',
+  'client.bills.renewal.taxes.unknown':
+    'Nestes casos non hai tipo que aplicar ao {fecha}, e non se pode calcular o custo con impostos:',
+  'client.bills.renewal.split.intro':
+    'O regulado son as peaxes e cargos do {fecha}; o demais pono a comercializadora. Para cada termo, co prezo actual e o novo:',
+  'client.bills.renewal.split.power_p1': 'Potencia P1',
+  'client.bills.renewal.split.power_p2': 'Potencia P2',
+  'client.bills.renewal.split.energy_p1': 'Enerxía P1',
+  'client.bills.renewal.split.energy_p2': 'Enerxía P2',
+  'client.bills.renewal.split.energy_p3': 'Enerxía P3',
+  'client.bills.renewal.split.row':
+    '{termino}: regulado {regulado}; comercializadora, de {antes} a {despues}.',
+  'client.bills.renewal.split.single_price':
+    'A carta dá un só prezo de enerxía: compárase coa parte regulada de cada período.',
+  'client.bills.renewal.split.regulated_changed':
+    'As peaxes e cargos cambian entre a data da carta e a de renovación: parte da suba vén do regulado.',
+  'client.bills.renewal.split.regulated_same':
+    'A suba non vén do regulado: as peaxes e cargos son os mesmos nas dúas datas.',
+  'client.bills.renewal.split.regulated_unknown':
+    'Non temos as peaxes e cargos do {fecha}, así que non sabemos se o regulado cambia entre as dúas datas.',
+  'client.bills.renewal.split.missing_table':
+    'Non temos as peaxes e cargos do {fecha}, así que non se separa o regulado do que pon a comercializadora.',
+  'client.bills.renewal.split.conditional_one':
+    'As peaxes e cargos desa data dependen do {normas}, que aínda non se decidiu, así que non se separan.',
+  'client.bills.renewal.split.conditional_many':
+    'As peaxes e cargos desa data dependen destas normas, que aínda non se decidiron: {normas}. Por iso non se separan.',
+  'client.bills.renewal.pvpc.no_data': 'Non hai prezos do PVPC cargados para facer a comparación.',
+  'client.bills.renewal.pvpc.no_consumption': 'Sen o consumo anual non se compara co PVPC.',
+  'client.bills.renewal.pvpc.needs_period_use':
+    'Con prezos de enerxía por períodos cómpre o consumo de cada período para comparar co PVPC, e a carta non o dá.',
+  'client.bills.renewal.pvpc.annual':
+    'Co teu consumo e a túa potencia, o PVPC do {desde} ao {hasta} custaría {importe} ao ano, sen impostos.',
+  'client.bills.renewal.pvpc.next':
+    'Os prezos novos da carta custan {importe} ao ano, sen impostos.',
+  'client.bills.renewal.pvpc.difference': 'Diferenza (carta menos PVPC): {diferencia}.',
+  'client.bills.renewal.pvpc.average':
+    'É a media simple de todas as horas dese rango, sen o perfil de consumo de REE.',
+  'client.bills.renewal.pvpc.doubt': 'A marxe do PVPC pode estar desfasada: {motivo}.',
+  'client.bills.renewal.pvpc.informative': 'É un dato para comparar, non unha recomendación.',
+  'client.bills.renewal.notice.meets':
+    'A antelación cumpre: {dias} entre a carta ({carta}) e a renovación ({renovacion}), e a carta chegou á parte da factura.',
+  'client.bills.renewal.notice.short':
+    'A antelación non chega a un mes: {dias} entre a carta ({carta}) e a renovación ({renovacion}).',
+  'client.bills.renewal.notice.separate_unknown':
+    'A data alcanza o mes de antelación: {dias} entre a carta ({carta}) e a renovación ({renovacion}). Non sabemos se a carta chegou á parte da factura, así que non damos o aviso por cumprido.',
+  'client.bills.renewal.notice.not_checked_before':
+    'A carta é do {carta}, anterior ao {desde}, cando empezou a rexer esta norma. Esta revisión non comproba o preaviso de cartas anteriores a esa data.',
+  'client.bills.renewal.notice.not_separate':
+    'A carta veu xunto á factura, e a norma pide o aviso por escrito e de maneira separada dela.',
+  'client.bills.renewal.exit.free':
+    'Co que contaches, rescindir non leva penalización: unha persoa coa tarifa 2.0TD pode rescindir o contrato e as súas prórrogas en calquera momento sen penalización, agás prezo fixo antes da primeira prórroga anual.',
+  'client.bills.renewal.exit.penalty_possible':
+    'Con prezo fixo e antes da primeira prórroga anual, a penalización pode chegar, como moito, ao {porcentaje} da enerxía pendente.',
+  'client.bills.renewal.exit.unknown':
+    'Non sabemos se o prezo é fixo nin se é a primeira renovación, e diso depende se hai penalización: só cabe en prezo fixo antes da primeira prórroga anual.',
+  'client.bills.renewal.unchecked.content':
+    'O contido que debe levar o aviso: fixarao unha orde ministerial que aínda non localizamos.',
+  'client.bills.renewal.unchecked.deadlines':
+    'Os prazos que a carta pida para comunicar a baixa ou a oposición á renovación.',
+  'client.bills.renewal.unchecked.other':
+    'Outras condicións do contrato, e a parte de gas se a carta tamén a trata.',
   'client.bills.result.lead_out_of_scope': 'Esta revisión aínda non cobre o que introduciches.',
   'client.bills.pass.issued':
     'Pagamento recibido. Xa podes descargar o informe e, se a túa revisión ten cifras para ela, a carta.',

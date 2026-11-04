@@ -4156,6 +4156,12 @@ export const eu: Translation = {
   'bills.hub.telecom_situation':
     'Zure mugikorraren edo interneten konpainia uzten duzu: penalizazioa eta kobratzen dizutena',
   'bills.hub.telecom_citation': 'Ley 11/2022 · TRLGDCU, art. 62.5 · Real Decreto 899/2009',
+  'bills.hub.renewal': 'Berritzea',
+  'bills.hub.renewal_situation':
+    'Zure argiaren kontratuaren berritze-gutuna (carta de renovación) iritsi zaizu: zer aldatzen den, zer dagoen arautua eta zer dioen arauak abisuaz',
+  'bills.hub.renewal_citation': 'Real Decreto 88/2026 · Real Decreto-ley 25/2026',
+  'bills.lead_renewal':
+    'Hiru berrikuspen: zure argiaren faktura, lerroz lerro; zure argiaren kontratuaren berritze-gutuna (carta de renovación); eta zure mugikorreko edo interneteko kontratuaren penalizazioa eta baja.',
   'bills.beta': 'Beta',
   'bills.beta_note':
     'Probetan dagoen atala. Zifrak idazten duzunetik, taula ofizialetatik eta arautik ateratzen dira.',
@@ -4464,6 +4470,123 @@ export const eu: Translation = {
   'bills.telecom.h1': 'Zure mugikorraren edo interneten iraupen-konpromisoa eta baja',
   'bills.telecom.lead':
     'Zure kontratuaren datekin eta zenbatekoekin: legeak onartzen duen penalizazioa garaia baino lehen joaten bazara, baldintza-aldaketa batek penalizaziorik gabe joateko aukera ematen dizun, eta bajaren ondorengo egunak kobratzen dizkizuten.',
+  'bills.renewal.form_aria': 'Zure argiaren berritze-gutunaren berrikuspena',
+  'bills.renewal.question.fechas': 'Gutunaren datak',
+  'bills.renewal.question.potencia': 'Zure potentzia',
+  'bills.renewal.question.potencia-actual': 'Potentziaren egungo prezioa',
+  'bills.renewal.question.potencia-nueva': 'Potentziaren prezio berria',
+  'bills.renewal.question.energia': 'Energiaren prezioak',
+  'bills.renewal.question.energia-actual': 'Energiaren egungo prezioa',
+  'bills.renewal.question.energia-nueva': 'Energiaren prezio berria',
+  'bills.renewal.question.consumo': 'Urteko kontsumoa',
+  'bills.renewal.question.carta': 'Gutunak dioen kostua',
+  'bills.renewal.question.contrato': 'Zure kontratua',
+  'bills.renewal.question.envio': 'Nola iritsi zitzaizun gutuna',
+  'bills.renewal.letter_date': 'Gutunaren data',
+  'bills.renewal.letter_date_hint': 'Gutunean edo abisuan idatzita dagoena.',
+  'bills.renewal.renewal_date': 'Berritze-data',
+  'bills.renewal.renewal_date_hint': 'Prezio berriak zein egunetatik aurrera balio duten.',
+  'bills.renewal.power_kw_p1': 'P1eko potentzia kontratatua (kW)',
+  'bills.renewal.power_kw_p2': 'P2ko potentzia kontratatua (kW)',
+  'bills.renewal.power_unit': 'Zer unitatetan ematen du gutunak potentziaren prezioa?',
+  'bills.renewal.power_unit_hint': 'Prezioaren ondoan dator.',
+  'bills.renewal.power_unit.per_kw_day': '€/kW eguneko',
+  'bills.renewal.power_unit.per_kw_year': '€/kW urteko',
+  'bills.renewal.price_hint': 'Gutunean dagoen bezala, hamartar guztiekin.',
+  'bills.renewal.current_power_p1': 'Potentziaren egungo prezioa P1',
+  'bills.renewal.current_power_p2': 'Potentziaren egungo prezioa P2',
+  'bills.renewal.next_power_p1': 'Potentziaren prezio berria P1',
+  'bills.renewal.next_power_p2': 'Potentziaren prezio berria P2',
+  'bills.renewal.energy_pricing': 'Energiaren zenbat prezio ematen ditu gutunak?',
+  'bills.renewal.energy_pricing.single': 'Bakarra, ordu guztietarako',
+  'bills.renewal.energy_pricing.periods': 'Bat aldi bakoitzeko (P1, P2 eta P3)',
+  'bills.renewal.current_energy': 'Energiaren egungo prezioa (€/kWh)',
+  'bills.renewal.next_energy': 'Energiaren prezio berria (€/kWh)',
+  'bills.renewal.current_energy_p1': 'Energiaren egungo prezioa P1 (€/kWh)',
+  'bills.renewal.current_energy_p2': 'Energiaren egungo prezioa P2 (€/kWh)',
+  'bills.renewal.current_energy_p3': 'Energiaren egungo prezioa P3 (€/kWh)',
+  'bills.renewal.next_energy_p1': 'Energiaren prezio berria P1 (€/kWh)',
+  'bills.renewal.next_energy_p2': 'Energiaren prezio berria P2 (€/kWh)',
+  'bills.renewal.next_energy_p3': 'Energiaren prezio berria P3 (€/kWh)',
+  'bills.renewal.annual_kwh': 'Gutunak erabiltzen duen urteko kontsumoa (kWh)',
+  'bills.renewal.annual_kwh_hint':
+    'Gutunak ez badu esaten, utzi hutsik: ez da haren kostua berriz kalkulatuko.',
+  'bills.renewal.declared_without_tax': 'Urteko kostua prezio berriekin, zergarik gabe (€)',
+  'bills.renewal.declared_with_tax': 'Urteko kostua prezio berriekin, zergak barne (€)',
+  'bills.renewal.declared_hint': 'Aukerakoa. Gure birkalkuluarekin alderatzen da.',
+  'bills.renewal.fixed_price': 'Prezio finkoko kontratua da?',
+  'bills.renewal.first_renewal': 'Urteko lehen berritzea da?',
+  'bills.renewal.first_renewal_hint': 'Lehen urtearen ondorengo lehen luzapena (prórroga).',
+  'bills.renewal.separate_from_bill': 'Gutuna fakturatik bereizita iritsi zitzaizun?',
+  'bills.renewal.separate_from_bill_hint':
+    'Posta arruntez edo mezu elektroniko propio batez, ez faktura baten barruan ezta harekin batera ere.',
+  'bills.renewal.app_name': 'Zure argiaren kontratuaren berritze-gutunaren berrikuspena',
+  'bills.renewal.crumb': 'Berritzea',
+  'bills.renewal.title': 'Berrikusi zure argiaren kontratuaren berritze-gutuna',
+  'bills.renewal.description':
+    'Kalkulatu berriz zer aldatzen den zure argiaren berritze-gutuneko (carta de renovación) prezio berriekin, zer zati dagoen arautua, nola geratzen den PVPCarekin alderatuta, dataren zergak, aurreabisua eta kontratutik irtetea.',
+  'bills.renewal.h1': 'Zure argiaren berritze-gutuna, bere kontuekin',
+  'bills.renewal.lead':
+    'Zure gutuneko prezioekin: zenbat aldatzen den urtebeteko kostua zergarik gabe, prezioen zer zati dagoen arautua, nola geratzen den PVPCarekin alderatuta, dataren zergak, aurreabisuak betetzen duen ala ez eta zer dioen arauak kontratutik irteteaz. 2.0TD tarifa duten etxeentzat, 15 kW arte.',
+  'bills.renewal.tab.fechas': 'Datak',
+  'bills.renewal.tab.potencia': 'Prezioak',
+  'bills.renewal.tab.consumo': 'Kontsumoa',
+  'bills.renewal.tab.resultado': 'Emaitza',
+  'bills.renewal.documents.start_help':
+    'Berritze-gutuna (carta de renovación) igo dezakezu, hartan irakurtzen denarekin datuak betetzeko, edo zuk idatz ditzakezu. Ezer berrikusi aurretik, datu bakoitza berresten duzu.',
+  'bills.renewal.documents.upload': 'Igo berritze-gutuna',
+  'bills.renewal.documents.files_hint':
+    'Zure argiaren kontratuaren gutunaren edo prezio-aldaketaren abisuaren orrialde guztiak. Gehienez 25 argazki edo PDF orrialde, guztira. Argazkiak eta PDFen orrialdeak irudi bihurtzen dira zure gailuan, bidali aurretik.',
+  'bills.guide.renewal.title': 'Zer egiaztatzen duen zure berritze-gutunaren berrikuspenak',
+  'bills.guide.renewal.lead':
+    'Nola kalkulatzen den berriz kostua gutuneko prezioekin, prezioen zer zati dagoen arautua, PVPC alderatzeko datu gisa, berritze-dataren zergak, aurreabisua eta kontratutik irtetea, bakoitza zein arautatik datorren adierazita.',
+  'bills.guide.renewal_checks.title': 'Gutunaren kontuak',
+  'bills.guide.renewal_checks.p1':
+    'Berrikuspenak bi aldiz kalkulatzen du berriz urtebeteko argia zergarik gabe, egungo prezioekin eta gutuneko prezio berriekin, potentzia eta urteko kontsumo berarekin, eta aldea erakusten du eurotan eta ehunekotan. Gutunak bere kostua adierazten badu, birkalkuluarekin alderatzen du eta bat datozen ala ez esaten du.',
+  'bills.guide.renewal_checks.p2':
+    'Gutunak urteko kontsumoa ematen ez badu, edo energiaren prezioak alditan ematen baditu aldi bakoitzeko kontsumorik gabe, kostua ezin da berriz kalkulatu, eta berrikuspenak hala dio, suposatu beharrean. Gainerako egiaztapenek bere horretan jarraitzen dute.',
+  'bills.guide.renewal_regulated.title': 'Prezioen zer zati dagoen arautua',
+  'bills.guide.renewal_regulated.p1':
+    'Potentziaren eta energiaren prezioen barruan daude garraioaren eta banaketaren bidesariak (peajes), CNMCk finkatzen dituenak, eta sistemaren karguak (cargos), Ministerioak finkatzen dituenak. Berdinak dira edozein merkaturatzailerekin (comercializadora); gutuneko prezioraino falta dena merkaturatzaileak jartzen du.',
+  'bills.guide.renewal_regulated.p2':
+    'Termino bakoitzerako, berrikuspenak bereizi egiten du berritze-datan arautua dena eta merkaturatzaileak jartzen duena, egungo prezioarekin eta berriarekin. Horrela ikusten da igoera bat bidesarietatik eta karguetatik datorren edo merkaturatzailearen marjinatik.',
+  'bills.guide.renewal_pvpc.title': 'PVPC, datu gisa',
+  'bills.guide.renewal_pvpc.p1':
+    'Berrikuspenak kalkulatzen du zenbat kostatuko ziren PVPCan argitaratutako azken 12 hilabeteak, zure kontsumoarekin eta zure potentziarekin, zergarik gabe, eta prezio berrien ondoan jartzen du. Tarteko ordu guztien batez besteko soila da, REEren kontsumo-profilik gabe; beraz, erreferentzia bat da, ez iragarpen bat.',
+  'bills.guide.renewal_pvpc.p2':
+    'Kalkuluak erabiltzen duen PVPCaren merkaturatze-marjina zaharkituta egon daiteke, eta berrikuspenak hala ohartarazten du. PVPC alderatzeko datu bat da: berrikuspenak ez du tarifarik ez merkaturatzailerik gomendatzen.',
+  'bills.guide.renewal_taxes.title': 'Dataren zergak',
+  'bills.guide.renewal_taxes.p1':
+    'Zergak barneko kostua berritze-datan indarrean dauden elektrizitatearen gaineko zergarekin (impuesto eléctrico) eta IVArekin kalkulatzen da. Data hori oraindik erabaki gabeko arauak dituen aldi batean erortzen denean, Real Decreto-ley 25/2026 arauaren kasuan bezala, berrikuspenak ez du aukeratzen: emaitza posible bakoitza erakusten du, eta zer gertatu beharko litzatekeen hura aplikatzeko.',
+  'bills.guide.renewal_notice.title': 'Hilabeteko aurreabisua',
+  'bills.guide.renewal_notice.p1':
+    '12-06-2026tik aurrerako ondorioekin, Real Decreto 88/2026 arauak eskubide hau aitortzen dio argia kontsumitzen duenari (art. 6.1.m):',
+  'bills.guide.renewal_notice.p2':
+    'Berrikuspenak gutunaren dataren eta berritze-dataren arteko egunak zenbatzen ditu, eta begiratzen du gutuna fakturatik bereizita iritsi zen ala ez. 12-06-2026 baino lehenagoko data duen gutun bat ez da arau honekin egiaztatzen, egun horretatik aurrera baitago indarrean. Abisuak izan behar duen edukia oraindik aurkitu ez dugun ministro-agindu batek (orden ministerial) finkatuko du, eta ez da egiaztatzen.',
+  'bills.guide.renewal_exit.title': 'Kontratutik irtetea',
+  'bills.guide.renewal_exit.p1':
+    '2.0TD tarifa duen pertsona batek edozein unetan utz dezake bere kontratua penalizaziorik gabe, prezio finkoko kontratu batean lehen urteko luzapena baino lehen izan ezik. Kasu horretan, penalizazioak ezin du gainditu hornitzeko falta den energia estimatuaren 5 %, eta galera merkaturatzaileak frogatu behar du (Real Decreto 88/2026, art. 28.3).',
+  'bills.guide.renewal_exit.p2':
+    'Zure kontratuaz kontatzen duzunarekin, berrikuspenak esaten du arau horren arabera penalizaziorik dagokion ala ez. Ez du penalizazioaren zenbatekoa kalkulatzen.',
+  'bills.guide.renewal.unchecked.gas':
+    'Gasa: gutunak hura ere jorratzen badu ere, argiaren zatia bakarrik berrikusten da.',
+  'bills.guide.renewal.unchecked.scope':
+    '15 kW-tik gorako horniduraguneak eta enpresenak: berrikuspena 2.0TD tarifa duten etxeentzat da.',
+  'bills.faq.renewal.notice': 'Zenbat denbora lehenago abisatu behar didate berritzeaz?',
+  'bills.faq.renewal.notice_answer':
+    'Merkaturatzaileak kontratuaren baldintzak aldatu nahi baditu, idatziz eta bere fakturatik bereizita abisatu behar du, gutxienez hilabete lehenago, eta kontratua inolako kosturik gabe suntsiarazteko eskubidearen berri eman (Real Decreto 88/2026, art. 6.1.m, 12-06-2026tik aurrerako ondorioekin). Berrikuspenak gutunaren eta berritzearen arteko egunak zenbatzen ditu; abisuak izan behar duen edukia oraindik aurkitu ez dugun ministro-agindu batek (orden ministerial) finkatuko du.',
+  'bills.faq.renewal.exit': 'Gutunaren ondoren joateagatik kobra diezadakete?',
+  'bills.faq.renewal.exit_answer':
+    '2.0TD tarifa duen pertsona batek edozein unetan utz dezake bere argiaren kontratua penalizaziorik gabe, prezio finkoko kontratu batean lehen urteko luzapena baino lehen izan ezik. Kasu horretan, penalizazioak ezin du gainditu hornitzeko falta den energia estimatuaren 5 %, eta galera merkaturatzaileak frogatu behar du (Real Decreto 88/2026, art. 28.3). Gutunak baja edo berritzearen aurkako jarrera jakinarazteko finkatzen dituen epeak ez ditu berrikuspenak egiaztatzen.',
+  'bills.faq.renewal.regulated': 'Prezioaren zer zati dago arautua?',
+  'bills.faq.renewal.regulated_answer':
+    'Garraioaren eta banaketaren bidesariak (peajes), CNMCk finkatzen dituenak, eta sistemaren karguak (cargos), Ministerioak finkatzen dituenak, potentziaren eta energiaren prezioaren barruan daude, eta berdinak dira edozein merkaturatzailerekin. Berrikuspenak, berritze-datan, merkaturatzaileak jartzen duenetik bereizten ditu.',
+  'bills.faq.renewal.pvpc': 'Zergatik agertzen da PVPC?',
+  'bills.faq.renewal.pvpc_answer':
+    'Erreferentziako prezio arautua delako, orduz ordu argitaratua. Berrikuspenak kalkulatzen du zenbat kostatuko ziren argitaratutako azken 12 hilabeteak zure kontsumoarekin eta zure potentziarekin, orduen batez besteko soil gisa, eta gutuneko prezio berrien ondoan jartzen du. Alderatzeko datu bat da, ez gomendio bat.',
+  'bills.faq.renewal.documents': 'Zer gertatzen da nire gutunarekin?',
+  'bills.faq.renewal.documents_answer':
+    'Gutuna igotzen baduzu, zifratuta bidaltzen da Amazon Web Services-en Espainiako zerbitzari batera, eta hark Europar Batasunaren barruan dagoen AA eredu bati pasatzen dio (Claude, Anthropic-ena, Amazon Bedrock bidez). AA ereduak agindua du izenik, DNIrik, helbiderik, telefonorik, helbide elektronikorik edo konturik ez kopiatzeko. Ez da ezer gordetzen. Berrikuspen hau doakoa da, eta ez du inolako pasarik eskatzen. Ezer igo nahi ez baduzu, datuak idatz ditzakezu, eta ezer ez da zure gailutik ateratzen.',
   'bills.telecom.form_aria': 'Zure iraupen-konpromisoaren eta bajaren berrikuspena',
   'bills.telecom.tab.permanencia': 'Kontratua',
   'bills.telecom.tab.baja': 'Baja',
@@ -4731,6 +4854,125 @@ export const eu: Translation = {
     'Konpainiak kontratuaren baldintzetan aldaketa bat jakinarazten badizu, legeak aukera ematen dizu jakinarazpenaren hurrengo hilabetean baja emateko, iraupen-konpromisoagatiko penalizaziorik ordaindu gabe; gordetzen duzun terminal diruz lagundua bakarrik kobra diezazukete oraindik.',
   'client.bills.telecom.deadline.ends':
     'Jakinarazpenaren hurrengo hilabetea egun honetan amaitzen da: {fecha}.',
+  'client.bills.renewal.documents.not_renewal':
+    'Dokumentuak ez dirudi prezioen berritze bat: egiaztatu berrikusi nahi zenuen gutuna dela.',
+  'client.bills.renewal.unit.per_kw_year': '{n} €/kW·urte',
+  'client.bills.renewal.unit.per_kwh': '{n} €/kWh',
+  'client.bills.renewal.lead.ok':
+    'Gutuneko prezioekin, urtebeteko argia zergarik gabe {antes} izatetik {despues} izatera pasatzen da ({porcentaje}).',
+  'client.bills.renewal.lead.no_consumption':
+    'Gutunak ez du urteko kontsumoa ematen; beraz, ezin da haren kostua berriz kalkulatu. Gainerakoa berrikusten da.',
+  'client.bills.renewal.lead.needs_period_use':
+    'Gutuneko prezioak alditan daude, eta ez dakigu aldi bakoitzean zenbat kontsumitzen duzun; beraz, ez da haren kostua berriz kalkulatzen. Gainerakoa berrikusten da.',
+  'client.bills.renewal.title.cost': 'Gutunaren kontuak',
+  'client.bills.renewal.title.split': 'Prezioen zer zati dagoen arautua',
+  'client.bills.renewal.title.pvpc': 'PVPCarekin alderatuta',
+  'client.bills.renewal.title.notice': 'Aurreabisua',
+  'client.bills.renewal.title.exit': 'Kontratutik irtetea',
+  'client.bills.renewal.title.unchecked': 'Berrikuspen honek egiaztatzen ez duena',
+  'client.bills.renewal.cost.no_consumption':
+    'Urteko kontsumorik gabe, ezin da gutunaren kostua berriz kalkulatu.',
+  'client.bills.renewal.cost.needs_period_use':
+    'Energiaren prezioak alditan badaude, aldi bakoitzeko kontsumoa behar da, eta gutunak ez du ematen. Ez dugu asmatzen.',
+  'client.bills.renewal.cost.current': 'Egungo urteko kostua, zergarik gabe: {importe}.',
+  'client.bills.renewal.cost.next': 'Urteko kostua prezio berriekin, zergarik gabe: {importe}.',
+  'client.bills.renewal.cost.rise': 'Aldaketa: {porcentaje}.',
+  'client.bills.renewal.cost.matches':
+    'Gutunak {declarado} adierazten du zergarik gabe: birkalkuluarekin bat dator, 1 € baino gutxiagoko aldearekin.',
+  'client.bills.renewal.cost.mismatch':
+    'Gutunak {declarado} adierazten du zergarik gabe, eta birkalkuluak {calculado} ematen du: 1 € baino gehiagoko aldea dago.',
+  'client.bills.renewal.taxes.missing':
+    'Ez ditugu {fecha} datako elektrizitatearen gaineko zergaren eta IVAren tasak; beraz, ez dugu zergak barneko kostua kalkulatzen.',
+  'client.bills.renewal.taxes.ok':
+    '{fecha} datako zergekin ({impuesto} elektrizitatearen gaineko zerga eta {iva} IVA): {importe}.',
+  'client.bills.renewal.taxes.declared_matches':
+    'Gutunak {importe} adierazten du zergak barne: bat dator.',
+  'client.bills.renewal.taxes.declared_differs':
+    'Gutunak {importe} adierazten du zergak barne: ez dator bat gure kalkuluarekin.',
+  'client.bills.renewal.taxes.conditional':
+    '{fecha} datako zergak hauei buruz erabakitzen denaren araberakoak dira: {normas}. Ez dugu emaitza bat aukeratzen: hauek dira posibleak.',
+  'client.bills.renewal.taxes.option':
+    '{importe} zergak barne, {impuesto} elektrizitatearen gaineko zergarekin eta {iva} IVArekin, kasu hauetan:',
+  'client.bills.renewal.taxes.if': 'baldin eta hau gertatzen bada: {condiciones}',
+  'client.bills.renewal.taxes.cond_met':
+    '{norma} arauaren baldintza betetzea ({condicion}; {fecha} data inguruan jakingo da)',
+  'client.bills.renewal.taxes.cond_not_met':
+    '{norma} arauaren baldintza ez betetzea ({condicion}; {fecha} data inguruan jakingo da)',
+  'client.bills.renewal.taxes.cond_again': 'baldintza hori ez betetzea',
+  'client.bills.renewal.taxes.decided_by': '{norma} arauari buruz erabakitzen denaren arabera',
+  'client.bills.renewal.taxes.convalidated': 'Kongresuak {norma} araua baliozkotzea',
+  'client.bills.renewal.taxes.not_convalidated': 'Kongresuak {norma} araua ez baliozkotzea',
+  'client.bills.renewal.taxes.not_convalidated_again': 'Kongresuak hura ez baliozkotzea',
+  'client.bills.renewal.taxes.option_rest':
+    '{importe} zergak barne, {impuesto} elektrizitatearen gaineko zergarekin eta {iva} IVArekin, gainerako kasuetan.',
+  'client.bills.renewal.taxes.rates': '{impuesto} elektrizitatearen gaineko zerga eta {iva} IVA',
+  'client.bills.renewal.taxes.or': ' edo ',
+  'client.bills.renewal.taxes.declared_option':
+    'Gutunak {importe} adierazten du zergak barne, eta aukera honekin bat dator: {opciones}.',
+  'client.bills.renewal.taxes.declared_none':
+    'Gutunak {importe} adierazten du zergak barne, eta ez dator bat aukera horietako batekin ere.',
+  'client.bills.renewal.taxes.and': ' eta ',
+  'client.bills.renewal.taxes.unknown':
+    'Kasu hauetan ez dago {fecha} datan aplikatzeko tasarik, eta ezin da zergak barneko kostua kalkulatu:',
+  'client.bills.renewal.split.intro':
+    'Arautuak dira {fecha} datako bidesariak eta karguak (peajes y cargos); gainerakoa merkaturatzaileak jartzen du. Termino bakoitzerako, egungo prezioarekin eta berriarekin:',
+  'client.bills.renewal.split.power_p1': 'Potentzia P1',
+  'client.bills.renewal.split.power_p2': 'Potentzia P2',
+  'client.bills.renewal.split.energy_p1': 'Energia P1',
+  'client.bills.renewal.split.energy_p2': 'Energia P2',
+  'client.bills.renewal.split.energy_p3': 'Energia P3',
+  'client.bills.renewal.split.row':
+    '{termino}: arautua {regulado}; merkaturatzailea, {antes} izatetik {despues} izatera.',
+  'client.bills.renewal.split.single_price':
+    'Gutunak energiaren prezio bakarra ematen du: aldi bakoitzeko zati arautuarekin alderatzen da.',
+  'client.bills.renewal.split.regulated_changed':
+    'Bidesariak eta karguak aldatu egiten dira gutunaren dataren eta berritze-dataren artean: igoeraren zati bat arautua denetik dator.',
+  'client.bills.renewal.split.regulated_same':
+    'Igoera ez dator arautua denetik: bidesariak eta karguak berdinak dira bi datetan.',
+  'client.bills.renewal.split.regulated_unknown':
+    'Ez ditugu {fecha} datako bidesariak eta karguak; beraz, ez dakigu arautua dena aldatzen den ala ez bi daten artean.',
+  'client.bills.renewal.split.missing_table':
+    'Ez ditugu {fecha} datako bidesariak eta karguak; beraz, ez da bereizten arautua dena eta merkaturatzaileak jartzen duena.',
+  'client.bills.renewal.split.conditional_one':
+    'Data horretako bidesariak eta karguak {normas} arauaren araberakoak dira, eta hura oraindik ez da erabaki; beraz, ez dira bereizten.',
+  'client.bills.renewal.split.conditional_many':
+    'Data horretako bidesariak eta karguak oraindik erabaki ez diren arau hauen araberakoak dira: {normas}. Horregatik ez dira bereizten.',
+  'client.bills.renewal.pvpc.no_data': 'Ez dago PVPCaren preziorik kargatuta alderaketa egiteko.',
+  'client.bills.renewal.pvpc.no_consumption':
+    'Urteko kontsumorik gabe, ez da PVPCarekin alderatzen.',
+  'client.bills.renewal.pvpc.needs_period_use':
+    'Energiaren prezioak alditan badaude, aldi bakoitzeko kontsumoa behar da PVPCarekin alderatzeko, eta gutunak ez du ematen.',
+  'client.bills.renewal.pvpc.annual':
+    'Zure kontsumoarekin eta zure potentziarekin, {desde} datatik {hasta} datara arteko PVPCak {importe} kostatuko zukeen urtean, zergarik gabe.',
+  'client.bills.renewal.pvpc.next':
+    'Gutuneko prezio berriek {importe} kostatzen dute urtean, zergarik gabe.',
+  'client.bills.renewal.pvpc.difference': 'Aldea (gutuna ken PVPC): {diferencia}.',
+  'client.bills.renewal.pvpc.average':
+    'Tarte horretako ordu guztien batez besteko soila da, REEren kontsumo-profilik gabe.',
+  'client.bills.renewal.pvpc.doubt': 'PVPCaren marjina zaharkituta egon daiteke: {motivo}.',
+  'client.bills.renewal.pvpc.informative': 'Alderatzeko datu bat da, ez gomendio bat.',
+  'client.bills.renewal.notice.meets':
+    'Aurreabisuak betetzen du: {dias} gutunaren ({carta}) eta berritzearen ({renovacion}) artean, eta gutuna fakturatik bereizita iritsi zen.',
+  'client.bills.renewal.notice.short':
+    'Aurreabisua ez da hilabetera iristen: {dias} gutunaren ({carta}) eta berritzearen ({renovacion}) artean.',
+  'client.bills.renewal.notice.separate_unknown':
+    'Datak hilabeteko aurreabisua betetzen du: {dias} gutunaren ({carta}) eta berritzearen ({renovacion}) artean. Ez dakigu gutuna fakturatik bereizita iritsi zen ala ez; beraz, ez dugu abisua betetzat ematen.',
+  'client.bills.renewal.notice.not_checked_before':
+    'Gutunaren data {carta} da, hau da, {desde} data baino lehenagokoa; egun horretan sartu zen indarrean arau hau. Berrikuspen honek ez du egiaztatzen data horren aurreko gutunen aurreabisua.',
+  'client.bills.renewal.notice.not_separate':
+    'Gutuna fakturarekin batera etorri zen, eta arauak abisua idatziz eta hartatik bereizita eskatzen du.',
+  'client.bills.renewal.exit.free':
+    'Kontatu duzunarekin, kontratua suntsiarazteak ez dakar penalizaziorik: 2.0TD tarifa duen pertsona batek edozein unetan suntsiaraz ditzake kontratua eta haren luzapenak penalizaziorik gabe, prezio finkoarekin lehen urteko luzapena baino lehen izan ezik.',
+  'client.bills.renewal.exit.penalty_possible':
+    'Prezio finkoarekin eta lehen urteko luzapena baino lehen, penalizazioa, gehienez ere, falta den energiaren {porcentaje} izan daiteke.',
+  'client.bills.renewal.exit.unknown':
+    'Ez dakigu prezioa finkoa den, ezta lehen berritzea den ere, eta horren araberakoa da penalizaziorik dagoen ala ez: prezio finkoarekin eta lehen urteko luzapena baino lehen bakarrik egon daiteke.',
+  'client.bills.renewal.unchecked.content':
+    'Abisuak izan behar duen edukia: oraindik aurkitu ez dugun ministro-agindu batek finkatuko du.',
+  'client.bills.renewal.unchecked.deadlines':
+    'Gutunak baja edo berritzearen aurkako jarrera jakinarazteko eskatzen dituen epeak.',
+  'client.bills.renewal.unchecked.other':
+    'Kontratuaren beste baldintza batzuk, eta gasaren zatia, gutunak hura ere jorratzen badu.',
   'client.bills.result.lead_out_of_scope': 'Berrikuspen honek oraindik ez du hartzen sartu duzuna.',
   'client.bills.pass.issued':
     'Ordainketa jaso da. Orain txostena deskarga dezakezu eta, zure berrikuspenak horretarako zifrak baditu, gutuna.',
