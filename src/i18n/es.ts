@@ -6750,10 +6750,16 @@ export const es = {
     'Con las fechas y los importes de tu contrato: la penalización que permite la ley si te vas antes de tiempo, si un cambio de condiciones te deja irte sin penalización y si te cobran días de después de la baja.',
   'bills.renewal.form_aria': 'Revisión de tu carta de renovación de la luz',
   'bills.renewal.question.fechas': 'Las fechas de la carta',
-  'bills.renewal.question.potencia': 'Potencia y su precio',
-  'bills.renewal.question.energia': 'Precio de la energía',
-  'bills.renewal.question.consumo': 'Consumo y coste que dice la carta',
+  'bills.renewal.question.potencia': 'Tu potencia',
+  'bills.renewal.question.potencia-actual': 'Precio actual de la potencia',
+  'bills.renewal.question.potencia-nueva': 'Precio nuevo de la potencia',
+  'bills.renewal.question.energia': 'Precios de la energía',
+  'bills.renewal.question.energia-actual': 'Precio actual de la energía',
+  'bills.renewal.question.energia-nueva': 'Precio nuevo de la energía',
+  'bills.renewal.question.consumo': 'Consumo anual',
+  'bills.renewal.question.carta': 'Coste que dice la carta',
   'bills.renewal.question.contrato': 'Tu contrato',
+  'bills.renewal.question.envio': 'Cómo te llegó la carta',
   'bills.renewal.letter_date': 'Fecha de la carta',
   'bills.renewal.letter_date_hint': 'La que lleva escrita la carta o el aviso.',
   'bills.renewal.renewal_date': 'Fecha en que se renueva',
@@ -6824,7 +6830,7 @@ export const es = {
     'La revisión separa, para cada término, lo regulado en la fecha de la renovación de lo que pone la comercializadora, con el precio actual y el nuevo. Así se ve si una subida viene de los peajes y cargos o del margen de la comercializadora.',
   'bills.guide.renewal_pvpc.title': 'El PVPC, como dato',
   'bills.guide.renewal_pvpc.p1':
-    'La revisión calcula lo que habría costado el último año en PVPC, con tu consumo y tu potencia, sin impuestos, y lo pone al lado de los precios nuevos. Es la media simple de todas las horas del rango, sin el perfil de consumo de REE, así que es una referencia y no una predicción.',
+    'La revisión calcula lo que habría costado en PVPC los últimos 12 meses publicados, con tu consumo y tu potencia, sin impuestos, y lo pone al lado de los precios nuevos. Es la media simple de todas las horas del rango, sin el perfil de consumo de REE, así que es una referencia y no una predicción.',
   'bills.guide.renewal_pvpc.p2':
     'El margen de comercialización del PVPC que usa el cálculo puede estar desfasado, y la revisión lo avisa. El PVPC es un dato para comparar: la revisión no recomienda ninguna tarifa ni ninguna comercializadora.',
   'bills.guide.renewal_taxes.title': 'Los impuestos de la fecha',
@@ -6834,7 +6840,7 @@ export const es = {
   'bills.guide.renewal_notice.p1':
     'Con efectos desde el 12-06-2026, el Real Decreto 88/2026 reconoce a quien consume luz el derecho a (art. 6.1.m):',
   'bills.guide.renewal_notice.p2':
-    'La revisión cuenta los días entre la fecha de la carta y la de la renovación, y mira si la carta llegó aparte de la factura. El contenido que debe llevar el aviso lo fijará una orden ministerial que aún no hemos localizado, y no se comprueba.',
+    'La revisión cuenta los días entre la fecha de la carta y la de la renovación, y mira si la carta llegó aparte de la factura. Una carta fechada antes del 12-06-2026 no se comprueba con esta regla, que rige desde ese día. El contenido que debe llevar el aviso lo fijará una orden ministerial que aún no hemos localizado, y no se comprueba.',
   'bills.guide.renewal_exit.title': 'Salir del contrato',
   'bills.guide.renewal_exit.p1':
     'Una persona con la tarifa 2.0TD puede dejar su contrato en cualquier momento sin penalización, salvo en un contrato a precio fijo antes de su primera prórroga anual. En ese caso, la penalización no puede pasar del 5 % de la energía estimada pendiente de suministro, y la pérdida la tiene que probar la comercializadora (Real Decreto 88/2026, art. 28.3).',
@@ -6846,7 +6852,7 @@ export const es = {
     'Los suministros de más de 15 kW y los de empresas: la revisión es para hogares con tarifa 2.0TD.',
   'bills.faq.renewal.notice': '¿Con cuánta antelación me tienen que avisar de la renovación?',
   'bills.faq.renewal.notice_answer':
-    'Si la comercializadora quiere cambiar las condiciones del contrato, tiene que avisar con al menos un mes de antelación e informar del derecho a rescindir el contrato sin coste alguno (Real Decreto 88/2026, art. 6.1.m, con efectos desde el 12-06-2026). La revisión cuenta los días entre la carta y la renovación; el contenido que debe llevar el aviso lo fijará una orden ministerial que aún no hemos localizado.',
+    'Si la comercializadora quiere cambiar las condiciones del contrato, tiene que avisar por escrito y de manera separada a su factura, con al menos un mes de antelación, e informar del derecho a rescindir el contrato sin coste alguno (Real Decreto 88/2026, art. 6.1.m, con efectos desde el 12-06-2026). La revisión cuenta los días entre la carta y la renovación; el contenido que debe llevar el aviso lo fijará una orden ministerial que aún no hemos localizado.',
   'bills.faq.renewal.exit': '¿Me pueden cobrar por irme tras la carta?',
   'bills.faq.renewal.exit_answer':
     'Una persona con la tarifa 2.0TD puede dejar su contrato de luz en cualquier momento sin penalización, salvo en un contrato a precio fijo antes de su primera prórroga anual. En ese caso, la penalización no puede pasar del 5 % de la energía estimada pendiente de suministro, y la pérdida la tiene que probar la comercializadora (Real Decreto 88/2026, art. 28.3). Los plazos que la carta fije para comunicar la baja o la oposición a la renovación no los comprueba la revisión.',
@@ -6855,7 +6861,7 @@ export const es = {
     'Los peajes de transporte y distribución, que fija la CNMC, y los cargos del sistema, que fija el Ministerio, van dentro del precio de la potencia y de la energía y son iguales con cualquier comercializadora. La revisión los separa, en la fecha de la renovación, de lo que pone la comercializadora.',
   'bills.faq.renewal.pvpc': '¿Por qué aparece el PVPC?',
   'bills.faq.renewal.pvpc_answer':
-    'Porque es el precio regulado de referencia, publicado hora a hora. La revisión calcula lo que habría costado el último año con tu consumo y tu potencia, como media simple de las horas, y lo pone junto a los precios nuevos de la carta. Es un dato para comparar, no una recomendación.',
+    'Porque es el precio regulado de referencia, publicado hora a hora. La revisión calcula lo que habría costado los últimos 12 meses publicados con tu consumo y tu potencia, como media simple de las horas, y lo pone junto a los precios nuevos de la carta. Es un dato para comparar, no una recomendación.',
   'bills.faq.renewal.documents': '¿Qué pasa con mi carta?',
   'bills.faq.renewal.documents_answer':
     'Si subes la carta, se envía cifrada a un servidor de Amazon Web Services en España, que se la pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro de la Unión Europea. El modelo tiene orden de no copiar nombres, DNI, direcciones, teléfonos, correos ni cuentas. No se guarda nada. Esta revisión es gratis y no pide ningún pase. Si prefieres no subir nada, puedes escribir los datos y nada sale de tu dispositivo.',
