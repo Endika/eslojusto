@@ -39,9 +39,9 @@ const events: RenewalEvents = {
   },
 };
 
-// The PVPC prices are the one heavy table, so they are fetched before the form is wired; if they
-// cannot be, the review goes ahead and says it has no PVPC to compare with.
-async function loadOfficial(): Promise<OfficialDeps | null> {
+// The PVPC prices are the one heavy table, so they are fetched only when a review needs them; if
+// they cannot be, the review goes ahead and says it has no PVPC to compare with.
+async function importOfficial(): Promise<OfficialDeps | null> {
   try {
     const { default: raw } = (await import('../engine/bills/data/pvpc-hourly.json')) as {
       default: unknown;
@@ -52,18 +52,18 @@ async function loadOfficial(): Promise<OfficialDeps | null> {
     return null;
   }
 }
+let official: Promise<OfficialDeps | null> | null = null;
 
-void loadOfficial().then((official) => {
-  const renewal = setUpRenewal(document.body, {
-    events,
-    today: localToday,
-    tr: pageTranslator(),
-    tables: { tables: BILLS_TABLES, norms: BILLS_NORMS, official },
-  });
-  if (!documentsBuild) return;
+const renewal = setUpRenewal(document.body, {
+  events,
+  today: localToday,
+  tr: pageTranslator(),
+  tables: { tables: BILLS_TABLES, norms: BILLS_NORMS },
+  official: () => (official ??= importOfficial()),
+});
+if (documentsBuild)
   import('./renewal-documents')
     .then(({ wireRenewalDocuments }) =>
       wireRenewalDocuments(renewal, arrival, () => (method = 'upload')),
     )
     .catch((error: unknown) => withoutDocuments(renewal.form, error));
-});

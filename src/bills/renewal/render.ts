@@ -482,6 +482,11 @@ function leadText(review: RenewalReview, tr: Translate): string {
   });
 }
 
+export function clearRenewalResult(root: HTMLElement): void {
+  find(root, '[data-lead]').textContent = '';
+  find(root, '[data-renewal]').replaceChildren();
+}
+
 // The review of a renewal letter, in the order the questions came: the letter's sums, where the
 // rise comes from, the PVPC, the notice and the way out, and what is not checked. Nothing here
 // advises: every card states figures and rules.
