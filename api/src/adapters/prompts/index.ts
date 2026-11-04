@@ -5,6 +5,7 @@ import { EMPLOYMENT_SYSTEM_PROMPT } from './employment';
 import { SYSTEM_PROMPT } from './final-pay';
 import { INSURANCE_SYSTEM_PROMPT } from './insurance';
 import { MORTGAGE_SYSTEM_PROMPT } from './mortgage';
+import { RENEWAL_SYSTEM_PROMPT } from './renewal';
 import { RENTAL_SYSTEM_PROMPT } from './rental';
 import { TELECOM_SYSTEM_PROMPT } from './telecom';
 
@@ -18,4 +19,5 @@ export const SYSTEM_PROMPTS: Readonly<Record<ReviewKind, string>> = {
   mortgage: MORTGAGE_SYSTEM_PROMPT,
   electricity: ELECTRICITY_SYSTEM_PROMPT,
   telecom: TELECOM_SYSTEM_PROMPT,
+  renewal: RENEWAL_SYSTEM_PROMPT,
 };

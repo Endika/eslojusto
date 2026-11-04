@@ -137,6 +137,7 @@ const REVIEW_LABELS: Readonly<Record<string, string>> = {
   mortgage: 'hipoteca',
   electricity: 'luz',
   telecom: 'permanencia',
+  renewal: 'renovacion',
 };
 const byReview = 'fields coalesce(review, "final_pay") as revision';
 

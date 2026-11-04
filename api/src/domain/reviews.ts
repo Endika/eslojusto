@@ -8,13 +8,15 @@ export const REVIEWS = [
   'mortgage',
   'electricity',
   'telecom',
+  'renewal',
 ] as const;
 export type ReviewKind = (typeof REVIEWS)[number];
 
 export const isReview = (v: unknown): v is ReviewKind =>
   typeof v === 'string' && (REVIEWS as readonly string[]).includes(v);
 
-// The reviews a pass can be bought from: the insurance review has no figure for one to unlock.
+// The reviews a pass can be bought from: the insurance review has no figure for one to unlock, and
+// the renewal letter's reading is free.
 export const CHECKOUT_REVIEWS = [
   'final_pay',
   'rental',

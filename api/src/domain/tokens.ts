@@ -17,6 +17,7 @@ export const PROMPT_TOKENS_BY_REVIEW: Readonly<Record<ReviewKind, number>> = {
   mortgage: 14_000,
   electricity: 11_000,
   telecom: 6_000,
+  renewal: 5_000,
 };
 // Output tokens a review's record can need beyond a model's max_tokens (MODEL_SETTINGS in
 // src/config.ts), for Sonnet 5.5 as much as for Sonnet 4.6. With every employment list at its
@@ -34,6 +35,7 @@ export const EXTRA_OUTPUT_TOKENS_BY_REVIEW: Readonly<Record<ReviewKind, number>>
   mortgage: 7_000,
   electricity: 7_000,
   telecom: 7_000,
+  renewal: 0,
 };
 // One Sonnet read at this cap costs 96,000 × 3.30 + 5,000 × 16.50 USD per million = 0.40 USD,
 // and at most about 0.51 USD for an employment read with its 12,000 output tokens (api/README.md,
