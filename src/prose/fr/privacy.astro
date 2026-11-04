@@ -1,5 +1,5 @@
 ---
-// source: 04d418a0a00a
+// source: 3ca30c81dfec
 import { t, type Key } from '../../i18n';
 import { link, type Lang } from '../../i18n/languages';
 import { DOCUMENTS } from '../../documents/config';
@@ -298,7 +298,7 @@ const tracked = [
     : []),
   {
     when: 'Si la page rencontre une erreur',
-    what: "Le type d'erreur et le fichier et la ligne du code où elle s'est produite. Jamais le message d'erreur, car il pourrait citer quelque chose que vous avez saisi.",
+    what: "Le type d'erreur et les fichiers, lignes et colonnes du code où elle s'est produite ; la version du site ; la fiche du formulaire que vous aviez ouverte ; et le message d'erreur réduit à son modèle : ce qui est entre guillemets et les nombres sont remplacés, et si quelque chose ressemblant à une adresse subsiste, le message n'est pas envoyé. Jamais ce que vous avez saisi.",
   },
 ];
 ---

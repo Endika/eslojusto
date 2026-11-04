@@ -1,5 +1,5 @@
 ---
-// source: 04d418a0a00a
+// source: 3ca30c81dfec
 import { t, type Key } from '../../i18n';
 import { link, type Lang } from '../../i18n/languages';
 import { DOCUMENTS } from '../../documents/config';
@@ -297,7 +297,7 @@ const tracked = [
     : []),
   {
     when: 'If the page fails',
-    what: 'The type of error and in which file and line of the code it occurred. Never the error message, because it could quote something you typed.',
+    what: 'The type of error and in which files, lines and columns of the code it occurred; the site version; the form sheet you had open; and the error message reduced to its template: what sits between quotation marks and the numbers are replaced, and if anything resembling an address still remains, the message is not sent. Never what you typed.',
   },
 ];
 ---

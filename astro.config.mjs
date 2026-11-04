@@ -4,8 +4,10 @@ import { DEFAULT_LANG, LANGS, builtLangs } from './src/i18n/languages.ts';
 import { lastUpdated } from './src/content/updated.ts';
 import { wholeDatesInHtml } from './src/scripts/whole-dates.ts';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 const base = process.env.BASE ?? '/';
 const root = base.replace(/\/?$/, '/');
 const unpublished = Object.keys(LANGS).filter((lang) => !LANGS[lang].published);
@@ -49,7 +51,13 @@ export default defineConfig({
   // styles. Inlined fonts or scripts would land as data: or inline code that the CSP rejects.
   build: { inlineStylesheets: 'always' },
   vite: {
-    build: { assetsInlineLimit: 0 },
+    define: { 'import.meta.env.PUBLIC_SITE_VERSION': JSON.stringify(version) },
+    // Hidden maps carry no sourceMappingURL comment, so the shipped JS is the same with or
+    // without them; scripts/js-error-locate.mjs builds them locally and they are never published.
+    build: {
+      assetsInlineLimit: 0,
+      sourcemap: process.env.BUILD_SOURCEMAPS === '1' ? 'hidden' : false,
+    },
     // A face that misses the first paint stays out of that page instead of swapping in late,
     // which would reflow the text and shift everything below it.
     plugins: [

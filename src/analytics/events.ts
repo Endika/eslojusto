@@ -1005,7 +1005,8 @@ type Rule =
   | { readonly intRange: readonly [number, number] }
   | { readonly boolean: true }
   | { readonly nullableBoolean: true }
-  | { readonly list: readonly string[] };
+  | { readonly list: readonly string[] }
+  | { readonly frames: RegExp; readonly max: number };
 
 const oneOf = <const T extends readonly string[]>(values: T) => ({ values });
 const section = oneOf(SECTIONS);
@@ -1013,9 +1014,12 @@ const count = { intRange: [0, 6] } as const;
 
 // A primary language subtag (ISO 639), or 'unknown'.
 const LANGUAGE_RULE = { pattern: /^(?:[a-z]{2,3}|unknown)$/ } as const;
-// A script's file name and line; a name made only of digits or symbols is refused.
-export const SCRIPT_SOURCE = /^[\w.-]*[a-z][\w.-]*\.(?:m?js|html):\d{1,6}$/i;
-const SOURCE_RULE = { pattern: new RegExp(`${SCRIPT_SOURCE.source}|^unknown$`, 'i') } as const;
+// A script's file name, line and column; a name made only of digits or symbols is refused.
+export const SCRIPT_SOURCE = /^[\w.-]*[a-z][\w.-]*\.(?:m?js|html):\d{1,6}:\d{1,6}$/i;
+const SEMVER = /^\d{1,4}\.\d{1,4}\.\d{1,4}$/;
+// An error message reduced to its template: no quoted values, no digits, no address of any kind.
+const MESSAGE_RULE = { pattern: /^(?!.*(?:@|:\/\/|www\.)).{0,160}$/s } as const;
+const STEP_RULE = { pattern: /^[a-z0-9-]{0,30}$/ } as const;
 
 const BASE_CATALOGUE = {
   browser_language: { lang: LANGUAGE_RULE },
@@ -1157,7 +1161,13 @@ const BASE_CATALOGUE = {
     seconds: oneOf(REVIEW_SECONDS),
   },
   started_over: {},
-  js_error: { kind: oneOf(ERROR_TYPES), source: SOURCE_RULE },
+  js_error: {
+    kind: oneOf(ERROR_TYPES),
+    frames: { frames: SCRIPT_SOURCE, max: 5 },
+    version: { pattern: SEMVER },
+    message: MESSAGE_RULE,
+    step: STEP_RULE,
+  },
 } as const satisfies Record<string, Record<string, Rule>>;
 
 const creditCatalogue = () => {
@@ -1368,7 +1378,9 @@ type RuleValue<R> = R extends { values: readonly (infer V)[] }
           ? boolean | null
           : R extends { list: readonly (infer V)[] }
             ? readonly V[]
-            : never;
+            : R extends { frames: RegExp }
+              ? readonly string[]
+              : never;
 
 export type Props<E extends EventName> = {
   -readonly [K in keyof (typeof CATALOGUE)[E]]: RuleValue<(typeof CATALOGUE)[E][K]>;
@@ -1385,6 +1397,12 @@ function matchesRule(rule: Rule, v: unknown): boolean {
     );
   if ('boolean' in rule) return typeof v === 'boolean';
   if ('nullableBoolean' in rule) return v === null || typeof v === 'boolean';
+  if ('frames' in rule)
+    return (
+      Array.isArray(v) &&
+      v.length <= rule.max &&
+      v.every((x) => typeof x === 'string' && rule.frames.test(x))
+    );
   return (
     Array.isArray(v) &&
     new Set(v).size === v.length &&

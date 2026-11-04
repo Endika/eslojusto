@@ -8,4 +8,6 @@ interface ImportMetaEnv {
   readonly PUBLIC_API_PASS_URL?: string;
   readonly PUBLIC_TURNSTILE_SITE_KEY?: string;
   readonly PUBLIC_RENEWAL?: string;
+  // package.json's version, defined at build time so a js_error names the release it came from.
+  readonly PUBLIC_SITE_VERSION?: string;
 }

@@ -18,7 +18,7 @@ describe('a library that fails to load', () => {
     const onRejection = (reason: unknown) => rejections.push(reason);
     process.on('unhandledRejection', onRejection);
     try {
-      track('js_error', { kind: 'TypeError', source: 'unknown' });
+      track('js_error', { kind: 'TypeError', frames: [], version: '0.0.0', message: '', step: '' });
       await expect(startAnalytics()).resolves.toBeDefined();
       await new Promise((resolve) => setTimeout(resolve, 0));
       expect(rejections).toEqual([]);
