@@ -65,15 +65,21 @@ export function compareWithPvpc(
   };
 }
 
-// One way the open norms may go: those met and those not, with the rates it leaves. When several
-// ways leave the same rates, the first is kept.
+// One way the open norms may go: those met and those not.
+export interface Outcome {
+  readonly met: readonly BillsNormId[];
+  readonly notMet: readonly BillsNormId[];
+}
+
+// The rates left by every outcome in `when`.
 export interface ConditionalOption {
-  readonly applies: readonly BillsNormId[];
-  readonly unless: readonly BillsNormId[];
+  readonly when: readonly Outcome[];
   readonly electricityTaxPercent: number;
   readonly vatPercent: number;
   readonly withTax: number;
 }
+
+type MutableOption = Omit<ConditionalOption, 'when'> & { when: Outcome[] };
 
 export type RenewalTaxes =
   | {
@@ -88,6 +94,8 @@ export type RenewalTaxes =
   | {
       readonly kind: 'conditional';
       readonly options: readonly ConditionalOption[];
+      // Outcomes in which a table has no row to apply.
+      readonly unknown: readonly Outcome[];
     }
   | { readonly kind: 'missing' };
 
@@ -134,7 +142,8 @@ export function renewalTaxes(
   ];
   const taxRows = tax.kind === 'ok' ? [tax.row] : tax.rows;
   const vatRows = vat.kind === 'ok' ? [vat.row] : vat.rows;
-  const options = new Map<string, ConditionalOption>();
+  const options = new Map<string, MutableOption>();
+  const unknown: Outcome[] = [];
   // Every way the open norms may go; each table then holds the row valueOn would pick.
   for (let mask = 0; mask < 2 ** deciding.length; mask++) {
     const met = deciding.filter((_, i) => (mask >> i) & 1);
@@ -150,13 +159,20 @@ export function renewalTaxes(
           ) && !(row.unless !== undefined && row.unless.every(holds)),
       );
     const [t, v] = [pick(taxRows), pick(vatRows)];
-    if (t === undefined || v === undefined) continue;
+    const outcome = { met, notMet: deciding.filter((id) => !met.includes(id)) };
+    if (t === undefined || v === undefined) {
+      unknown.push(outcome);
+      continue;
+    }
     const vatRate = vatPercent(v.value, input.powerKw.p1);
     const key = `${t.value.percent}/${vatRate}`;
-    if (options.has(key)) continue;
+    const found = options.get(key);
+    if (found !== undefined) {
+      found.when.push(outcome);
+      continue;
+    }
     options.set(key, {
-      applies: met,
-      unless: deciding.filter((id) => !met.includes(id)),
+      when: [outcome],
       electricityTaxPercent: t.value.percent,
       vatPercent: vatRate,
       withTax: withTax(t.value.percent, vatRate),
@@ -165,5 +181,6 @@ export function renewalTaxes(
   return {
     kind: 'conditional',
     options: [...options.values()].sort((a, b) => a.withTax - b.withTax),
+    unknown,
   };
 }
