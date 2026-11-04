@@ -27,3 +27,16 @@ describe('parseAmount', () => {
 describe('formatEuros', () => {
   it('es-ES', () => expect(formatEuros(1234.5).replace(/\s/g, ' ')).toBe('1.234,50 €'));
 });
+
+describe('a field whose values are never thousands', () => {
+  it.each([
+    ['3,464', 3.464],
+    ['18,372', 18.372],
+    ['1,500', 1.5],
+    ['0,110283', 0.110283],
+  ])('%s reads as a decimal one', (t, n) => expect(parseAmount(t, true)).toBe(n));
+  it('does not change the default', () => {
+    expect(parseAmount('3,464')).toBeNaN();
+    expect(parseAmount('3,464', false)).toBeNaN();
+  });
+});

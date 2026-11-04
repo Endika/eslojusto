@@ -8,6 +8,9 @@ import {
   sheetOfField,
 } from '../../src/bills/renewal/form';
 import { RENEWAL_FIELDS } from '../../src/bills/renewal/ports';
+import { renewalPrefill } from '../../src/bills/renewal/prefill';
+import type { RenewalExtraction } from '../../src/documents/contract';
+import { pageTranslator } from '../support/page-strings';
 import { naturgy, TODAY } from './renewal-support';
 
 type Values = Readonly<Record<string, string | null>>;
@@ -185,5 +188,68 @@ describe('the sheets', () => {
     expect([...asked].sort()).toEqual([...RENEWAL_FIELDS].sort());
     for (const sheet of SHEETS)
       for (const field of SHEET_FIELDS[sheet]) expect(sheetOfField(field)).toBe(sheet);
+  });
+});
+
+describe('a comma followed by three digits', () => {
+  it('is a decimal one in a power and in a price, typed', () => {
+    const r = readRenewalForm(
+      form({
+        powerKwP1: '3,464',
+        powerKwP2: '3,464',
+        powerUnit: 'per_kw_year',
+        nextPowerP2: '18,372',
+      }),
+      TODAY,
+    );
+    if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
+    expect(r.input.powerKw).toEqual({ p1: 3.464, p2: 3.464 });
+    expect(r.input.next.power.p2).toBe(18.372);
+  });
+
+  it('stays ambiguous in a consumption or an amount', () => {
+    expect(readRenewalForm(form({ annualKwh: '1,500' }), TODAY)).toEqual({
+      errors: [{ field: 'annualKwh', code: 'invalid_number' }],
+    });
+  });
+
+  it('survives a read of a per kW and year letter, filled in and reviewed', () => {
+    const field = (value: string | number | boolean) => ({
+      value,
+      confidence: 'high' as const,
+      source: 'price_change_notice' as const,
+    });
+    const extraction: RenewalExtraction = {
+      pages: [],
+      documents: [],
+      conflicts: [],
+      fields: {
+        letterDate: field('2026-10-31'),
+        renewalDate: field('2026-12-10'),
+        powerKwP1: field(3.464),
+        powerKwP2: field(3.464),
+        powerUnit: field('per_kw_year'),
+        currentPowerP1: field(30.817),
+        currentPowerP2: field(0.725),
+        nextPowerP1: field(40.25),
+        nextPowerP2: field(18.372),
+        currentEnergy: field(0.144972),
+        nextEnergy: field(0.1678),
+        annualKwh: field(4190.2),
+        fixedPrice: field(false),
+        separateFromBill: field(true),
+      },
+    };
+    const entries = Object.fromEntries(renewalPrefill(extraction, pageTranslator('bills')).entries);
+    expect(entries['powerKwP1']).toBe('3,464');
+    expect(entries['nextPowerP2']).toBe('18,372');
+    const r = readRenewalForm(form(entries), TODAY);
+    if (!('input' in r)) throw new Error(JSON.stringify(r.errors));
+    expect(r.input).toMatchObject({
+      powerKw: { p1: 3.464, p2: 3.464 },
+      powerUnit: 'per_kw_year',
+      current: { power: { p1: 30.817, p2: 0.725 } },
+      next: { power: { p1: 40.25, p2: 18.372 } },
+    });
   });
 });

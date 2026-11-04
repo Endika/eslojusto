@@ -26,9 +26,10 @@ export function answers<Field extends string>(form: HTMLFormElement) {
     return v;
   };
 
-  // A figure with a decimal comma; null when left empty and optional.
-  const figure = (field: Field, required: boolean): number | null => {
-    const n = parseAmount(text(field));
+  // A figure with a decimal comma; null when left empty and optional. With `commaIsDecimal`, a
+  // comma followed by three digits is a decimal one too, as in a price or a power.
+  const figure = (field: Field, required: boolean, commaIsDecimal = false): number | null => {
+    const n = parseAmount(text(field), commaIsDecimal);
     if (n === null) {
       if (required) fail(field, 'missing_value');
       return null;
