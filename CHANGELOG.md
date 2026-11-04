@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.111.1](https://github.com/Endika/eslojusto/compare/v1.111.0...v1.111.1) (2026-11-04)
+
+
+### Bug Fixes
+
+* **bills:** free a renewal's exit on a price change and name what its review lacks ([055453d](https://github.com/Endika/eslojusto/commit/055453d2649e479da4a35af596388787e1d992ed))
+* **bills:** wire the renewal form before the PVPC prices load ([9d19457](https://github.com/Endika/eslojusto/commit/9d19457835250fb44512399982b0ff79564bf140))
+
 ## [1.111.0](https://github.com/Endika/eslojusto/compare/v1.110.0...v1.111.0) (2026-11-04)
 
 
