@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.109.0](https://github.com/Endika/eslojusto/compare/v1.108.0...v1.109.0) (2026-11-04)
+
+
+### Features
+
+* **bills:** compare a renewal with the PVPC and its taxes ([fe2c458](https://github.com/Endika/eslojusto/commit/fe2c458ec3dea7863e9ea5db908b858ca5666020))
+
+
+### Bug Fixes
+
+* **bills:** build renewal tax options from every outcome of the open norms ([54a9db2](https://github.com/Endika/eslojusto/commit/54a9db2cb47b33160bc3b1e810b9d32b19d49d24))
+* **bills:** keep a renewal's split when the letter date has no tables ([5bd20b7](https://github.com/Endika/eslojusto/commit/5bd20b7aaf68ed566a0be1d7060e1068314e8d01))
+* **bills:** list every outcome behind each renewal tax option ([8071c15](https://github.com/Endika/eslojusto/commit/8071c152f08763c9017b6be29606cf13a4a87bd7))
+* **bills:** tell renewal tax options apart and carry the PVPC margin doubt ([758e419](https://github.com/Endika/eslojusto/commit/758e41999ead8d426766999ef48b3febf0cd07bb))
+
 ## [1.108.0](https://github.com/Endika/eslojusto/compare/v1.107.0...v1.108.0) (2026-11-04)
 
 
