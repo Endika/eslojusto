@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
-import { BILLS_BETA } from '../content/sections';
+import { BILLS_BETA, RENEWAL_PUBLIC } from '../content/sections';
 import { breadcrumbList, trail } from '../content/structured-data';
 import { t, type Key } from '../i18n';
 import { link, type Lang } from '../i18n/languages';
@@ -28,6 +28,17 @@ const reviews = [
     situation: 'bills.hub.telecom_situation',
     citation: 'bills.hub.telecom_citation',
   },
+  ...(RENEWAL_PUBLIC
+    ? [
+        {
+          id: 'renewal',
+          name: 'bills.hub.renewal',
+          href: link(lang, 'facturas/renovacion/'),
+          situation: 'bills.hub.renewal_situation',
+          citation: 'bills.hub.renewal_citation',
+        } as const,
+      ]
+    : []),
 ] as const satisfies readonly {
   id: string;
   name: Key;
@@ -52,7 +63,7 @@ const crumbs = trail(lang, { name: tx('bills.crumb'), path: '/facturas/' });
     <div class="home__head">
       <Breadcrumbs lang={lang} crumbs={crumbs} />
       <h1 class="bills__title">{tx('bills.h1')}</h1>
-      <p class="home__lead">{tx('bills.lead')}</p>
+      <p class="home__lead">{tx(RENEWAL_PUBLIC ? 'bills.lead_renewal' : 'bills.lead')}</p>
     </div>
 
     <div class="index">

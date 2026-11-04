@@ -27,7 +27,8 @@ interface Props {
     | 'insurance'
     | 'mortgage'
     | 'electricity'
-    | 'telecom';
+    | 'telecom'
+    | 'renewal';
   pageGuide?: PageGuide;
 }
 const { lang, review = 'final_pay', pageGuide } = Astro.props;
@@ -73,6 +74,12 @@ const TELECOM: Partial<Record<Key, Key>> = {
   'documents.upload.files_hint': 'bills.telecom.documents.files_hint',
   'documents.upload.consent': 'bills.documents.consent',
 };
+const RENEWAL: Partial<Record<Key, Key>> = {
+  'documents.start.help': 'bills.renewal.documents.start_help',
+  'documents.start.upload': 'bills.renewal.documents.upload',
+  'documents.upload.files_hint': 'bills.renewal.documents.files_hint',
+  'documents.upload.consent': 'bills.documents.consent',
+};
 const OWN: Partial<Record<Key, Key>> = {
   final_pay: {},
   rental: RENTAL,
@@ -82,6 +89,7 @@ const OWN: Partial<Record<Key, Key>> = {
   mortgage: MORTGAGE,
   electricity: ELECTRICITY,
   telecom: TELECOM,
+  renewal: RENEWAL,
 }[review];
 const tx = (key: Key) => t(lang, OWN[key] ?? key);
 const arrow = 'M4 12h15m-6-6 6 6-6 6';

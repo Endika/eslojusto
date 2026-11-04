@@ -58,4 +58,24 @@ describe.skipIf(!built)('a build with the bills reviews', () => {
         'potencia máxima demandada',
       );
   });
+  // The renewal review is built only with PUBLIC_RENEWAL=true: the page, its sitemap entry and the
+  // card on /facturas/ all exist together or none does.
+  describe('the renewal letter review', () => {
+    const page = existsSync('dist/facturas/renovacion/index.html');
+    it('is linked, listed and built together, or not at all', () => {
+      const sitemap = read('dist/sitemap-0.xml');
+      expect(sitemap.includes('/facturas/renovacion/')).toBe(page);
+      expect(read('dist/facturas/index.html').includes('href="/facturas/renovacion/"')).toBe(page);
+    });
+    it.skipIf(!page)('carries its guide, the quoted notice and its questions', () => {
+      const html = read('dist/facturas/renovacion/index.html');
+      expect(html).toContain('Qué comprueba la revisión de tu carta de renovación');
+      expect(html).toContain('id="faq-renovacion-aviso"');
+      expect(html).toContain('"@type":"FAQPage"');
+      expect(html).toContain('"@type":"WebApplication"');
+      expect(html).toContain('data-legal-quote');
+      expect(html).toContain('client.bills.renewal.lead.ok');
+      expect(html).not.toContain('data-pass-offer');
+    });
+  });
 });

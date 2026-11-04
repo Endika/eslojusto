@@ -10,11 +10,16 @@ export const BILLS_FAQ_TOPICS = [
   ['leave', 'faq-luz-irte', 'electricity'],
   ['commitment', 'faq-permanencia-penalizacion', 'telecom'],
   ['leave', 'faq-permanencia-irte', 'telecom'],
+  ['notice', 'faq-renovacion-aviso', 'renewal'],
+  ['exit', 'faq-renovacion-baja', 'renewal'],
+  ['regulated', 'faq-renovacion-regulado', 'renewal'],
+  ['pvpc', 'faq-renovacion-pvpc', 'renewal'],
   // Only in a build that reads documents.
   ['documents', 'faq-luz-documentos', 'electricity'],
   ['pass', 'faq-luz-pase', 'electricity'],
   ['documents', 'faq-permanencia-documentos', 'telecom'],
   ['pass', 'faq-permanencia-pase', 'telecom'],
+  ['documents', 'faq-renovacion-documentos', 'renewal'],
 ] as const;
 
 type BillsFaqId = (typeof BILLS_FAQ_TOPICS)[number][0];

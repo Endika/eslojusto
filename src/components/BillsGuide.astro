@@ -11,7 +11,7 @@ import { link, type Lang } from '../i18n/languages';
 
 interface Props {
   lang: Lang;
-  review: 'electricity' | 'telecom';
+  review: 'electricity' | 'telecom' | 'renewal';
   // The day the page's rules were last checked, ISO.
   checkedOn: string;
   // Whether the build reads documents: only then are the documents and the pass asked about.
@@ -165,9 +165,58 @@ const TELECOM: readonly Block[] = [
   },
 ];
 
-const blocks = review === 'electricity' ? ELECTRICITY : TELECOM;
+const RENEWAL: readonly Block[] = [
+  {
+    id: 'renewal_checks',
+    anchor: 'g-cuentas',
+    paragraphs: ['bills.guide.renewal_checks.p1', 'bills.guide.renewal_checks.p2'],
+  },
+  {
+    id: 'renewal_regulated',
+    anchor: 'g-regulado',
+    paragraphs: ['bills.guide.renewal_regulated.p1', 'bills.guide.renewal_regulated.p2'],
+    rules: ['tolls', 'charges'],
+  },
+  {
+    id: 'renewal_pvpc',
+    anchor: 'g-pvpc',
+    paragraphs: ['bills.guide.renewal_pvpc.p1', 'bills.guide.renewal_pvpc.p2'],
+    rules: ['pvpc_margin'],
+  },
+  {
+    id: 'renewal_taxes',
+    anchor: 'g-impuestos',
+    paragraphs: ['bills.guide.renewal_taxes.p1'],
+    rules: ['electricity_tax', 'vat'],
+  },
+  {
+    id: 'renewal_notice',
+    anchor: 'g-preaviso',
+    paragraphs: ['bills.guide.renewal_notice.p1'],
+    after: ['bills.guide.renewal_notice.p2'],
+  },
+  {
+    id: 'renewal_exit',
+    anchor: 'g-salir',
+    paragraphs: ['bills.guide.renewal_exit.p1', 'bills.guide.renewal_exit.p2'],
+    rules: ['exit_penalty'],
+  },
+  {
+    id: 'unchecked',
+    anchor: 'g-sin-revisar',
+    paragraphs: [],
+    list: [
+      'client.bills.renewal.unchecked.content',
+      'client.bills.renewal.unchecked.deadlines',
+      'bills.guide.renewal.unchecked.gas',
+      'bills.guide.renewal.unchecked.scope',
+    ],
+  },
+];
+
+const blocks = { electricity: ELECTRICITY, telecom: TELECOM, renewal: RENEWAL }[review];
 const sources: readonly [Key, BillsNormId][] =
-  review === 'electricity'
+  review !== 'telecom'
     ? [
         ['bills.guide.source_rd88', 'rd88_2026'],
         ['bills.guide.source_law38', 'law38_1992'],
@@ -209,7 +258,7 @@ const faq = billsFaqEntries(lang, review, { documents });
         {paragraphs.map((key) => (
           <p>{tx(key)}</p>
         ))}
-        {id === 'changes' && (
+        {(id === 'changes' || id === 'renewal_notice') && (
           <LegalQuote lang={lang} source={BILLS_TEXTS.rd88_6} quote="bills_change_notice" />
         )}
         {id === 'commitment' && (
