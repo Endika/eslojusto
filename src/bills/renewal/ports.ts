@@ -1,6 +1,8 @@
 import type { SectionEvents } from '../../calculator/section';
 import type { CivilDate } from '../../engine/date';
-import type { RenewalReview, RenewalReviewDeps } from '../../engine/bills/renewal-review';
+import type { OfficialDeps } from '../../engine/bills/electricity-official';
+import type { RenewalReview } from '../../engine/bills/renewal-review';
+import type { RenewalDeps } from '../../engine/bills/renewal-types';
 import type { Translate } from '../../i18n/client';
 import type { Step } from './steps';
 
@@ -53,6 +55,8 @@ export interface RenewalSetup {
   readonly events: RenewalEvents;
   readonly today: () => CivilDate;
   readonly tr: Translate;
-  // The tables, norms and PVPC prices the review reads, as the composition root loads them.
-  readonly tables: RenewalReviewDeps;
+  // The tables and norms the review reads, as the composition root loads them.
+  readonly tables: RenewalDeps;
+  // The PVPC prices, fetched when a review first needs them; null when they cannot be.
+  readonly official: () => Promise<OfficialDeps | null>;
 }

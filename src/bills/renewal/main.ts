@@ -4,15 +4,17 @@ import { renderErrors } from '../result';
 import { applyConditions } from './conditions';
 import { SHEETS, onQuestions, readRenewalForm, sheetErrors, sheetOfField } from './form';
 import type { RenewalSetup } from './ports';
-import { renderRenewalResult } from './render';
+import { clearRenewalResult, renderRenewalResult } from './render';
 import { RENEWAL_FLOW as flow } from './steps';
 
-// The review of a renewal letter: its sheets and the result. The result is free and shown at
-// once, with no pass to lock any of it.
+// The review of a renewal letter: its sheets and the result. The result is free, with no pass to
+// lock any of it; it is drawn once the PVPC prices are in.
 export function setUpRenewal(
   root: HTMLElement,
-  { events, today, tr, tables }: RenewalSetup,
+  { events, today, tr, tables, official }: RenewalSetup,
 ): SectionForm {
+  // Counts the reviews asked for, so a slow load never draws one the person has moved past.
+  let asked = 0;
   return setUpSection(root, {
     formId: 'renewal',
     flow,
@@ -27,13 +29,23 @@ export function setUpRenewal(
     review(form, result, day) {
       const parsed = readRenewalForm(form, day);
       if ('errors' in parsed) return parsed.errors;
-      const r = reviewRenewal(parsed.input, day, tables);
+      const { input } = parsed;
       // The form already ran the engine's checks; this only guards against the two drifting apart.
-      if (!r.ok) return onQuestions(r.errors);
-      renderRenewalResult(result, r.review, tables.norms, tr);
-      events.reviewCompleted({ review: r.review });
+      const checked = reviewRenewal(input, day, { ...tables, official: null });
+      if (!checked.ok) return onQuestions(checked.errors);
+      const turn = ++asked;
+      clearRenewalResult(result);
+      void official().then((loaded) => {
+        const r = reviewRenewal(input, day, { ...tables, official: loaded });
+        if (turn !== asked || !r.ok) return;
+        renderRenewalResult(result, r.review, tables.norms, tr);
+        events.reviewCompleted({ review: r.review });
+      });
       return [];
     },
-    restarted: () => events.reviewCleared(),
+    restarted: () => {
+      asked++;
+      events.reviewCleared();
+    },
   });
 }
