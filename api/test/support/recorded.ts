@@ -66,6 +66,7 @@ export type Recording =
   | 'telecom-not-telecom'
   | 'renewal-letter'
   | 'renewal-per-period'
+  | 'renewal-notice-on-bill'
   | 'renewal-bill';
 
 export const recording = (name: Recording): string =>

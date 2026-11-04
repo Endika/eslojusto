@@ -59,25 +59,38 @@ export interface RenewalMerged {
 
 const SOURCE = 'price_change_notice' as const;
 
-function priceFields(reading: Reading): Partial<Record<RenewalFieldName, MergedField>> {
+// A price the letter states twice with different values, a power price the form has no place for
+// (P3, or all the day) and power rows that disagree on the unit are not guessed at: the fields
+// they touch are left out and reported as conflicts, which makes the read incomplete.
+function priceFields(reading: Reading): {
+  readonly fields: Partial<Record<RenewalFieldName, MergedField>>;
+  readonly conflicts: Conflict<RenewalFieldName>[];
+} {
   const rows = reading.sections.price_change_notice?.lists['priceChanges'] ?? [];
   const fields: Partial<Record<RenewalFieldName, MergedField>> = {};
+  const clashed = new Set<RenewalFieldName>();
   const put = (
     name: RenewalFieldName,
     value: string | number,
     confidence: MergedField['confidence'],
   ) => {
-    fields[name] ??= { value, confidence, source: SOURCE };
+    const kept = fields[name];
+    if (kept === undefined) fields[name] = { value, confidence, source: SOURCE };
+    else if (kept.value !== value) clashed.add(name);
   };
   for (const { values, confidence } of rows) {
     const { term, period, before, after, unit } = values;
     const suffix = period === 'all' ? '' : String(period).toUpperCase();
-    if (term === 'power' && (period === 'p1' || period === 'p2')) {
-      if (typeof before === 'number')
-        put(`currentPower${suffix}` as RenewalFieldName, before, confidence);
-      if (typeof after === 'number')
-        put(`nextPower${suffix}` as RenewalFieldName, after, confidence);
+    if (term === 'power') {
+      if (period !== 'p1' && period !== 'p2') clashed.add('powerUnit');
+      else {
+        if (typeof before === 'number')
+          put(`currentPower${suffix}` as RenewalFieldName, before, confidence);
+        if (typeof after === 'number')
+          put(`nextPower${suffix}` as RenewalFieldName, after, confidence);
+      }
       if (unit === 'per_kw_day' || unit === 'per_kw_year') put('powerUnit', unit, confidence);
+      else clashed.add('powerUnit');
     } else if (term === 'energy') {
       if (typeof before === 'number')
         put(`currentEnergy${suffix}` as RenewalFieldName, before, confidence);
@@ -85,23 +98,31 @@ function priceFields(reading: Reading): Partial<Record<RenewalFieldName, MergedF
         put(`nextEnergy${suffix}` as RenewalFieldName, after, confidence);
     }
   }
-  return fields;
+  return {
+    fields: Object.fromEntries(
+      Object.entries(fields).filter(([name]) => !clashed.has(name as RenewalFieldName)),
+    ),
+    conflicts: [...clashed].map((field) => ({ field, sources: [SOURCE] })),
+  };
 }
 
 export function renewalMerge(reading: Reading, toolInput: unknown): RenewalMerged {
   const { fields, conflicts, discarded } = mergeFields(reading, RENEWAL_MERGE_RULES);
+  const prices = priceFields(reading);
   return {
     pages: reading.pages,
     documents: groupDocuments(reading.pages),
-    fields: { ...fields, ...priceFields(reading) },
+    fields: { ...fields, ...prices.fields },
     lists: {},
-    conflicts,
+    conflicts: [...conflicts, ...prices.conflicts],
     truncated: listsReachedMaximum(toolInput, reading, RENEWAL_SECTIONS),
     discarded,
   };
 }
 
-// A legible letter that gave no price at all: worth a second look.
+// A legible letter that gave no price at all, or prices that contradict themselves: worth a second
+// look.
 export const renewalIncomplete = (reading: Reading, merged: RenewalMerged): boolean =>
-  reading.pages.some((p) => p.kind === 'price_change_notice' && p.readability.value === 'ok') &&
-  !PRICE_FIELDS.some((name) => name !== 'powerUnit' && merged.fields[name] !== undefined);
+  merged.conflicts.some((c) => (PRICE_FIELDS as readonly string[]).includes(c.field)) ||
+  (reading.pages.some((p) => p.kind === 'price_change_notice' && p.readability.value === 'ok') &&
+    !PRICE_FIELDS.some((name) => name !== 'powerUnit' && merged.fields[name] !== undefined));

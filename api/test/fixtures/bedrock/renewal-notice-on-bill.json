@@ -1,0 +1,97 @@
+{
+  "id": "msg_bdrk_01FICTITIOUS",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-6",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_bdrk_01FICTITIOUS",
+      "name": "record_extraction",
+      "input": {
+        "pages": [
+          {
+            "page": 1,
+            "kind": "price_change_notice",
+            "document": 1,
+            "readability": {
+              "value": "ok",
+              "confidence": "high"
+            },
+            "confidence": "high"
+          }
+        ],
+        "price_change_notice": {
+          "sentOn": {
+            "value": "2026-10-31",
+            "confidence": "high"
+          },
+          "appliesFrom": {
+            "value": "2026-12-10",
+            "confidence": "high"
+          },
+          "separateFromBill": {
+            "value": false,
+            "confidence": "high"
+          },
+          "isRenewal": {
+            "value": true,
+            "confidence": "high"
+          },
+          "contractedPowerP1": {
+            "value": 5.75,
+            "confidence": "high"
+          },
+          "contractedPowerP2": {
+            "value": 5.75,
+            "confidence": "high"
+          },
+          "annualConsumptionKwh": {
+            "value": 4190.2,
+            "confidence": "high"
+          },
+          "estimatedCostNewWithoutTax": {
+            "value": 1071.15,
+            "confidence": "high"
+          },
+          "estimatedCostNewWithTax": {
+            "value": 1362.36,
+            "confidence": "high"
+          },
+          "priceChanges": [
+            {
+              "term": "power",
+              "period": "p1",
+              "before": 0.110283,
+              "after": 0.12303,
+              "unit": "per_kw_day",
+              "confidence": "high"
+            },
+            {
+              "term": "power",
+              "period": "p2",
+              "before": 0.033469,
+              "after": 0.052329,
+              "unit": "per_kw_day",
+              "confidence": "high"
+            },
+            {
+              "term": "energy",
+              "period": "all",
+              "before": 0.144972,
+              "after": 0.1678,
+              "unit": "per_kwh",
+              "confidence": "high"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 2100,
+    "output_tokens": 420
+  }
+}

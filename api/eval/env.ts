@@ -62,9 +62,8 @@ const DEFAULT_CASES: Readonly<Record<EvalReview, string>> = {
   renewal: 'eval/cases/renewal',
 };
 
-// `--review rental|employment|credit|insurance|mortgage|electricity|telecom|renewal` (rental by default),
-// `--cases <dir>` (that
-// review's bank by default) and `--only id1,id2`.
+// `--review rental|employment|credit|insurance|mortgage|electricity|telecom|renewal` (rental by
+// default), `--cases <dir>` (that review's bank by default) and `--only id1,id2`.
 export function parseEvalArgs(argv: readonly string[]): EvalArgs {
   const valueOf = (name: string): string | undefined => {
     const i = argv.indexOf(name);
