@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.111.0](https://github.com/Endika/eslojusto/compare/v1.110.0...v1.111.0) (2026-11-04)
+
+
+### Features
+
+* **bills:** add /facturas/renovacion/ behind a switch ([89a498f](https://github.com/Endika/eslojusto/commit/89a498f7bda22d374478b4adefdf64638ed72aa0))
+* **bills:** renewal letter form and result ([e899410](https://github.com/Endika/eslojusto/commit/e899410f7d0cae1405c0a77fe181ad30f976e135))
+* **i18n:** translate the renewal review ([baa3104](https://github.com/Endika/eslojusto/commit/baa31042211828f49ab792feead5d3b27fd21cf2))
+
+
+### Bug Fixes
+
+* **bills:** say what decides each renewal tax figure ([850bd7e](https://github.com/Endika/eslojusto/commit/850bd7e051aabb89be176ffd8c78f9c87c5d4f8d))
+* **bills:** spell out what each renewal tax outcome needs ([0048785](https://github.com/Endika/eslojusto/commit/0048785368c57b64842e7ce0a2d845e896b12593))
+* **bills:** split renewal sheets to fit and limit renewal page to Spanish ([07fcaf6](https://github.com/Endika/eslojusto/commit/07fcaf604953693f46ac17ca86c379a8e0adef17))
+
 ## [1.110.0](https://github.com/Endika/eslojusto/compare/v1.109.0...v1.110.0) (2026-11-04)
 
 
