@@ -1,4 +1,5 @@
-import { compareDates, daysInMonth, ordinal, type CivilDate } from '../date';
+import { compareDates, daysInMonth, ordinal, parseDate, type CivilDate } from '../date';
+import type { RenewalInput } from './renewal-types';
 import { MAX_POWER_KW } from './scope';
 import type { ElectricityBillInput, TelecomInput } from './types';
 
@@ -36,6 +37,20 @@ export type TelecomField =
   | 'changeNotice.sentOn'
   | 'changeNotice.appliesOn'
   | 'lines';
+
+type Period = 'p1' | 'p2';
+type EnergyTerm = 'all' | 'p1' | 'p2' | 'p3';
+type Side = 'current' | 'next';
+
+export type RenewalField =
+  | 'letterDate'
+  | 'renewalDate'
+  | `powerKw.${Period}`
+  | `${Side}.power.${Period}`
+  | `${Side}.energy.${EnergyTerm}`
+  | 'annualKwh'
+  | 'declared.withoutTax'
+  | 'declared.withTax';
 
 export type ValidationCode =
   | 'invalid_date'
@@ -240,5 +255,52 @@ export function validateTelecom(
     check('lines', compareDates(line.from, line.to) <= 0, 'not_after_start');
     check('lines', isSignedAmount(line.amount), 'amount_range');
   }
+  return errors;
+}
+
+function dayOf(iso: string): CivilDate | null {
+  try {
+    return parseDate(iso);
+  } catch {
+    return null;
+  }
+}
+
+const MAX_ANNUAL_KWH = MAX_KWH * 12;
+
+export function validateRenewal(
+  input: RenewalInput,
+  today: CivilDate,
+): readonly ValidationError<RenewalField>[] {
+  const { errors, past, date, check } = collector<RenewalField>(today);
+  const [sent, renewal] = [dayOf(input.letterDate), dayOf(input.renewalDate)];
+  const letter = sent !== null && past('letterDate', sent) ? sent : null;
+  if (renewal !== null && date('renewalDate', renewal) && letter !== null)
+    check('renewalDate', compareDates(letter, renewal) <= 0, 'not_after_start');
+  if (sent === null) check('letterDate', false, 'invalid_date');
+  if (renewal === null) check('renewalDate', false, 'invalid_date');
+  for (const period of ['p1', 'p2'] as const)
+    check(`powerKw.${period}`, isPower(input.powerKw[period]), 'power_range');
+  for (const side of ['current', 'next'] as const) {
+    const { power, energy } = input[side];
+    for (const period of ['p1', 'p2'] as const)
+      check(
+        `${side}.power.${period}`,
+        inRange(power[period], MAX_POWER_PRICE[input.powerUnit]),
+        'price_range',
+      );
+    for (const term of ['all', 'p1', 'p2', 'p3'] as const) {
+      const price = (energy as Partial<Record<EnergyTerm, number>>)[term];
+      if (price !== undefined)
+        check(`${side}.energy.${term}`, inRange(price, MAX_ENERGY_PRICE), 'price_range');
+    }
+  }
+  if (input.annualKwh !== null)
+    check('annualKwh', input.annualKwh > 0 && input.annualKwh <= MAX_ANNUAL_KWH, 'kwh_range');
+  for (const [field, value] of [
+    ['declared.withoutTax', input.declared.withoutTax],
+    ['declared.withTax', input.declared.withTax],
+  ] as const)
+    if (value !== null) check(field, isAmount(value), 'amount_range');
   return errors;
 }

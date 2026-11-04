@@ -13,6 +13,12 @@ import type {
   TelecomEvents,
   Step as TelecomStep,
 } from '../bills/telecom/ports';
+import type {
+  CompletedRenewalReview,
+  RenewalEvents,
+  RenewalMethod,
+  Step as RenewalStep,
+} from '../bills/renewal/ports';
 import {
   BILLS_STATUSES,
   attemptBucket,
@@ -178,6 +184,40 @@ export function telecomAnalytics(
     },
     reviewCompleted(r) {
       track('telecom_review_completed', telecomReviewProps(r, pass(r)));
+    },
+  };
+}
+
+type RenewalCompleted = Props<'renewal_review_completed'>;
+
+// Which side of the PVPC the letter's new prices fall on; none when there is nothing to compare.
+const versusPvpc = ({ pvpc }: CompletedRenewalReview['review']): RenewalCompleted['vs_pvpc'] =>
+  pvpc.kind !== 'ok' || pvpc.difference === 0 ? 'none' : pvpc.difference > 0 ? 'above' : 'below';
+
+export const renewalReviewProps = (
+  { review }: CompletedRenewalReview,
+  method: RenewalMethod,
+): RenewalCompleted => ({
+  method,
+  mismatch: review.core.recalc.kind === 'ok' && review.core.recalc.mismatch !== null,
+  regulated_change: review.core.split.kind === 'ok' ? review.core.split.regulatedChange : null,
+  vs_pvpc: versusPvpc(review),
+  notice: review.core.notice.kind,
+  exit: review.core.exit.kind,
+});
+
+// Likewise for the renewal review: never a date, a price or an amount. `method` says whether the
+// answers came from reading the letter or from the person.
+export function renewalAnalytics(
+  track: Track,
+  now: () => number,
+  method: () => RenewalMethod,
+): Omit<RenewalEvents, 'reviewCleared'> {
+  const { events } = sectionAnalytics<RenewalStep>(track, now);
+  return {
+    ...events,
+    reviewCompleted(r) {
+      track('renewal_review_completed', renewalReviewProps(r, method()));
     },
   };
 }

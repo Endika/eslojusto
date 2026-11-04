@@ -65,7 +65,7 @@ const noPosthogAdapter = {
   message: 'Only the composition root (src/scripts) imports the PostHog adapter.',
 };
 const analyticsReach = {
-  regex: `^\\.\\./(?!engine/|content/(rental-|employment-|household-|credit-|insurance-|mortgage-|bills-)?faq-topics$|i18n/client$|calculator/ports$|rental/ports$|employment/ports$|household/ports$|credit/ports$|insurance/ports$|mortgage/ports$|bills/(electricity|telecom)/ports$|documents/ports$|documents/config$)|${notCanonical}`,
+  regex: `^\\.\\./(?!engine/|content/(rental-|employment-|household-|credit-|insurance-|mortgage-|bills-)?faq-topics$|i18n/client$|calculator/ports$|rental/ports$|employment/ports$|household/ports$|credit/ports$|insurance/ports$|mortgage/ports$|bills/(electricity|telecom|renewal)/ports$|documents/ports$|documents/config$)|${notCanonical}`,
   message:
     'src/analytics reaches only the engine, the help topics, the translator type, the calculator, rental, employment, household, credit, insurance, mortgage, bills and documents ports and the documents switch.',
 };
