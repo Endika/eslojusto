@@ -32,7 +32,7 @@ function yearlyCost(input: RenewalInput, prices: RenewalPrices, kwh: number): nu
   );
 }
 
-function recalculate(input: RenewalInput): Recalc {
+export function recalculate(input: RenewalInput): Recalc {
   if (input.annualKwh === null) return { kind: 'no_consumption' };
   const current = yearlyCost(input, input.current, input.annualKwh);
   const next = yearlyCost(input, input.next, input.annualKwh);
@@ -57,7 +57,7 @@ type Access =
   | { kind: 'conditional'; norms: readonly BillsNormId[] };
 
 // Tolls plus charges on `day`.
-function regulatedOn(day: string, { tables, norms }: RenewalDeps): Access {
+export function regulatedOn(day: string, { tables, norms }: RenewalDeps): Access {
   const tolls = valueOn(tables.tolls, day, norms);
   const charges = valueOn(tables.charges, day, norms);
   for (const found of [tolls, charges]) {

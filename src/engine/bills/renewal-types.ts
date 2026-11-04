@@ -26,7 +26,7 @@ export interface RenewalInput {
 }
 
 export interface RenewalDeps {
-  readonly tables: Pick<BillsTables, 'tolls' | 'charges'>;
+  readonly tables: Pick<BillsTables, 'tolls' | 'charges' | 'pvpcMargin' | 'electricityTax' | 'vat'>;
   readonly norms: NormTable;
 }
 
