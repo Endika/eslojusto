@@ -72,7 +72,7 @@ export type RenewalSectionKind = keyof typeof RENEWAL_SECTIONS;
 export const RENEWAL_SCHEMA: ReviewSchema = {
   pageKinds: RENEWAL_PAGE_KINDS,
   pageKindDescription:
-    'price_change_notice: a letter that the contract’s prices change or renew, with the new and the current prices. other: anything else, such as a bill or a contract.',
+    'price_change_notice: a notice that the contract’s prices change or renew, as a letter of its own or printed on a bill. other: a bill with no such notice, a contract, anything else.',
   readability: ELECTRICITY_READABILITY,
   readabilityDescription:
     'ok: legible enough to transcribe, in whatever language. Otherwise the main reason the page cannot be used: handwritten (the values are written by hand), blurry, dark, cropped (the part with the values is cut off), not_electricity_document (not about a household electricity supply), foreign_jurisdiction (a supply outside Spain; never because of its language), unknown_format (about an electricity supply, but no kind of document you know).',

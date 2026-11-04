@@ -139,6 +139,28 @@ describe('renewalMerge', () => {
       expect(flagged).toBe(true);
     });
 
+    it('leaves an energy price out when it is not in euros per kWh', () => {
+      const { merged, flagged } = incomplete([row('energy', 'all', 0.14, 0.16, 'per_kw_day')]);
+      expect(merged.fields.currentEnergy).toBeUndefined();
+      expect(merged.fields.nextEnergy).toBeUndefined();
+      expect(flagged).toBe(true);
+    });
+
+    it('leaves out the energy prices of a side given both for all the day and by period', () => {
+      const { merged, flagged } = incomplete([
+        row('energy', 'all', 0.14, 0.16, 'per_kwh'),
+        row('energy', 'p1', 0.15, 0.17, 'per_kwh'),
+      ]);
+      for (const name of [
+        'currentEnergy',
+        'currentEnergyP1',
+        'nextEnergy',
+        'nextEnergyP1',
+      ] as const)
+        expect(merged.fields[name]).toBeUndefined();
+      expect(flagged).toBe(true);
+    });
+
     it('keeps a price two rows state alike', () => {
       const { merged, flagged } = incomplete([
         row('energy', 'all', 0.14, 0.16, 'per_kwh'),

@@ -61,7 +61,8 @@ const SOURCE = 'price_change_notice' as const;
 
 // A price the letter states twice with different values, a power price the form has no place for
 // (P3, or all the day) and power rows that disagree on the unit are not guessed at: the fields
-// they touch are left out and reported as conflicts, which makes the read incomplete.
+// they touch, an energy price not in €/kWh and an energy price both for all the day and by period
+// are left out and reported as conflicts, which makes the read incomplete.
 function priceFields(reading: Reading): {
   readonly fields: Partial<Record<RenewalFieldName, MergedField>>;
   readonly conflicts: Conflict<RenewalFieldName>[];
@@ -92,11 +93,22 @@ function priceFields(reading: Reading): {
       if (unit === 'per_kw_day' || unit === 'per_kw_year') put('powerUnit', unit, confidence);
       else clashed.add('powerUnit');
     } else if (term === 'energy') {
-      if (typeof before === 'number')
-        put(`currentEnergy${suffix}` as RenewalFieldName, before, confidence);
-      if (typeof after === 'number')
-        put(`nextEnergy${suffix}` as RenewalFieldName, after, confidence);
+      const sides = [
+        ['current', before],
+        ['next', after],
+      ] as const;
+      for (const [side, price] of sides) {
+        const name = `${side}Energy${suffix}` as RenewalFieldName;
+        if (unit !== undefined && unit !== 'per_kwh') clashed.add(name);
+        else if (typeof price === 'number') put(name, price, confidence);
+      }
     }
+  }
+  for (const side of ['current', 'next'] as const) {
+    const split = (['P1', 'P2', 'P3'] as const).map((p) => `${side}Energy${p}` as RenewalFieldName);
+    const all = `${side}Energy` as RenewalFieldName;
+    if (fields[all] !== undefined && split.some((n) => fields[n] !== undefined))
+      for (const name of [all, ...split]) clashed.add(name);
   }
   return {
     fields: Object.fromEntries(
