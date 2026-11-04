@@ -586,9 +586,7 @@ test('an API error is worded and the manual path is still there', async ({ page 
   await fakeServices(page, { status: 429, body: { code: 'daily_limit_reached' } });
   await page.goto('finiquito/');
   await uploadSettlement(page, { read: false });
-  await expect(page.getByRole('alert')).toContainText(
-    'Ya has usado las 2 lecturas gratis de hoy',
-  );
+  await expect(page.getByRole('alert')).toContainText('Ya has usado las 2 lecturas gratis de hoy');
   await page
     .locator('[data-start-panel="upload"]')
     .getByRole('button', { name: 'Rellenar a mano' })
