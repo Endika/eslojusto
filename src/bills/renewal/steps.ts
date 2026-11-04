@@ -12,9 +12,15 @@ export type Tab = 'cause' | 'salary' | 'settlement' | 'result';
 export const SECTION_OF_STEP: Record<Step, Tab> = {
   fechas: 'cause',
   potencia: 'salary',
+  'potencia-actual': 'salary',
+  'potencia-nueva': 'salary',
   energia: 'salary',
+  'energia-actual': 'salary',
+  'energia-nueva': 'salary',
   consumo: 'settlement',
+  carta: 'settlement',
   contrato: 'settlement',
+  envio: 'settlement',
   resultado: 'result',
 };
 

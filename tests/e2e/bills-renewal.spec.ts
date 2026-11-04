@@ -17,51 +17,81 @@ const type = (scope: Locator, label: string, value: string) =>
 const choose = (scope: Locator, name: string, value: string) =>
   scope.getByRole('group', { name, exact: true }).getByLabel(value, { exact: true }).check();
 
-// The letter's price sheets run taller than a 360 × 640 screen, so only that nothing is wider than
-// it and that the buttons stay on screen is checked.
 async function next(page: Page) {
-  await fitsScreen(page, { whole: false });
+  await fitsScreen(page);
   await (await forwardButton(page)).click();
   await page.waitForFunction(() =>
     document.getAnimations().every((a) => a.playState !== 'running'),
   );
 }
 
-async function fillLetter(page: Page) {
-  const dates = sheet(page, 'Las fechas de la carta');
-  await type(dates, 'Fecha de la carta', '2026-10-31');
-  await type(dates, 'Fecha en que se renueva', '2026-12-10');
+// Every question the form can ask is asked when the letter gives its energy prices by period and
+// the contract is at a fixed price.
+async function fillLetter(page: Page, { longest = false } = {}) {
+  await type(sheet(page, 'Las fechas de la carta'), 'Fecha de la carta', '2026-10-31');
+  await type(sheet(page, 'Las fechas de la carta'), 'Fecha en que se renueva', '2026-12-10');
   await next(page);
 
-  const prices = sheet(page, 'Potencia y su precio');
-  await type(prices, 'Potencia contratada en P1 (kW)', '5,75');
-  await type(prices, 'Potencia contratada en P2 (kW)', '5,75');
-  await choose(prices, '¿En qué unidad da la carta el precio de la potencia?', '€/kW y día');
-  await type(prices, 'Precio actual de la potencia P1', '0,110283');
-  await type(prices, 'Precio actual de la potencia P2', '0,033469');
-  await type(prices, 'Precio nuevo de la potencia P1', '0,12303');
-  await type(prices, 'Precio nuevo de la potencia P2', '0,052329');
+  const power = sheet(page, 'Tu potencia');
+  await type(power, 'Potencia contratada en P1 (kW)', '5,75');
+  await type(power, 'Potencia contratada en P2 (kW)', '5,75');
+  await choose(power, '¿En qué unidad da la carta el precio de la potencia?', '€/kW y día');
+  await next(page);
+  const current = sheet(page, 'Precio actual de la potencia');
+  await type(current, 'Precio actual de la potencia P1', '0,110283');
+  await type(current, 'Precio actual de la potencia P2', '0,033469');
+  await next(page);
+  const fresh = sheet(page, 'Precio nuevo de la potencia');
+  await type(fresh, 'Precio nuevo de la potencia P1', '0,12303');
+  await type(fresh, 'Precio nuevo de la potencia P2', '0,052329');
   await next(page);
 
-  const energy = sheet(page, 'Precio de la energía');
-  await choose(
-    energy,
-    '¿Cuántos precios de energía da la carta?',
-    'Uno solo, para todas las horas',
-  );
-  await type(energy, 'Precio actual de la energía (€/kWh)', '0,144972');
-  await type(energy, 'Precio nuevo de la energía (€/kWh)', '0,1678');
+  const pricing = sheet(page, 'Precios de la energía');
+  const energy = sheet(page, 'Precio actual de la energía');
+  const newEnergy = sheet(page, 'Precio nuevo de la energía');
+  if (longest) {
+    await choose(
+      pricing,
+      '¿Cuántos precios de energía da la carta?',
+      'Uno por periodo (P1, P2 y P3)',
+    );
+    await next(page);
+    await type(energy, 'Precio actual de la energía P1 (€/kWh)', '0,2');
+    await type(energy, 'Precio actual de la energía P2 (€/kWh)', '0,15');
+    await type(energy, 'Precio actual de la energía P3 (€/kWh)', '0,1');
+    await next(page);
+    await type(newEnergy, 'Precio nuevo de la energía P1 (€/kWh)', '0,22');
+    await type(newEnergy, 'Precio nuevo de la energía P2 (€/kWh)', '0,17');
+    await type(newEnergy, 'Precio nuevo de la energía P3 (€/kWh)', '0,12');
+  } else {
+    await choose(
+      pricing,
+      '¿Cuántos precios de energía da la carta?',
+      'Uno solo, para todas las horas',
+    );
+    await next(page);
+    await type(energy, 'Precio actual de la energía (€/kWh)', '0,144972');
+    await next(page);
+    await type(newEnergy, 'Precio nuevo de la energía (€/kWh)', '0,1678');
+  }
   await next(page);
 
-  const use = sheet(page, 'Consumo y coste que dice la carta');
-  await type(use, 'Consumo anual que usa la carta (kWh)', '4190,2');
-  await type(use, 'Coste anual con los precios nuevos, sin impuestos (€)', '1.071,15');
-  await type(use, 'Coste anual con los precios nuevos, con impuestos (€)', '1.362,36');
+  await type(sheet(page, 'Consumo anual'), 'Consumo anual que usa la carta (kWh)', '4190,2');
+  await next(page);
+  const letter = sheet(page, 'Coste que dice la carta');
+  await type(letter, 'Coste anual con los precios nuevos, sin impuestos (€)', '1.071,15');
+  await type(letter, 'Coste anual con los precios nuevos, con impuestos (€)', '1.362,36');
   await next(page);
 
   const contract = sheet(page, 'Tu contrato');
-  await choose(contract, '¿Es un contrato de precio fijo?', 'No');
-  await choose(contract, '¿Te llegó la carta aparte de la factura?', 'Sí');
+  await choose(contract, '¿Es un contrato de precio fijo?', longest ? 'Sí' : 'No');
+  if (longest) await choose(contract, '¿Es la primera renovación anual?', 'No');
+  await next(page);
+  await choose(
+    sheet(page, 'Cómo te llegó la carta'),
+    '¿Te llegó la carta aparte de la factura?',
+    'Sí',
+  );
   await next(page);
 }
 
@@ -89,5 +119,14 @@ test('the guide quotes the notice and the page is listed from /facturas/', async
   await expect(page.getByRole('heading', { level: 1 })).toContainText('carta de renovación');
   await expect(page.locator('[data-legal-quote]').first()).toBeVisible();
   await expect(page.locator('[data-pass-offer]')).toHaveCount(0);
+  await noSideScroll(page);
+});
+
+test('every sheet of the longest path fits in 360×640', async ({ page }) => {
+  await page.clock.setFixedTime(TODAY);
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.goto('facturas/renovacion/');
+  await fillLetter(page, { longest: true });
+  await expect(page.getByRole('heading', { name: 'Resultado', level: 2 })).toBeFocused();
   await noSideScroll(page);
 });

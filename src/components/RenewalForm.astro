@@ -69,6 +69,12 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         options={options(POWER_UNITS, (v) => `bills.renewal.power_unit.${v}`)}
         layout="pair"
       />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('potencia-actual')}>
+      <h2 class="question" id="question-potencia-actual" tabindex="-1">
+        {question('potencia-actual')}
+      </h2>
       <div class="pair">
         <Field
           name="currentPowerP1"
@@ -83,6 +89,12 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
           kind="amount"
         />
       </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('potencia-nueva')}>
+      <h2 class="question" id="question-potencia-nueva" tabindex="-1">
+        {question('potencia-nueva')}
+      </h2>
       <div class="pair">
         <Field name="nextPowerP1" label={tx('bills.renewal.next_power_p1')} kind="amount" />
         <Field name="nextPowerP2" label={tx('bills.renewal.next_power_p2')} kind="amount" />
@@ -99,14 +111,19 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         options={options(ENERGY_PRICINGS, (v) => `bills.renewal.energy_pricing.${v}`)}
         layout="list"
       />
-      <div class="pair" data-if="energyPricing:single">
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('energia-actual')}>
+      <h2 class="question" id="question-energia-actual" tabindex="-1">
+        {question('energia-actual')}
+      </h2>
+      <div data-if="energyPricing:single">
         <Field
           name="currentEnergy"
           label={tx('bills.renewal.current_energy')}
           hint={tx('bills.renewal.price_hint')}
           kind="amount"
         />
-        <Field name="nextEnergy" label={tx('bills.renewal.next_energy')} kind="amount" />
       </div>
       <div data-if="energyPricing:periods">
         <div class="pair">
@@ -116,24 +133,29 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
             hint={tx('bills.renewal.price_hint')}
             kind="amount"
           />
-          <Field name="nextEnergyP1" label={tx('bills.renewal.next_energy_p1')} kind="amount" />
-        </div>
-        <div class="pair">
           <Field
             name="currentEnergyP2"
             label={tx('bills.renewal.current_energy_p2')}
             kind="amount"
           />
+        </div>
+        <Field name="currentEnergyP3" label={tx('bills.renewal.current_energy_p3')} kind="amount" />
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('energia-nueva')}>
+      <h2 class="question" id="question-energia-nueva" tabindex="-1">
+        {question('energia-nueva')}
+      </h2>
+      <div data-if="energyPricing:single">
+        <Field name="nextEnergy" label={tx('bills.renewal.next_energy')} kind="amount" />
+      </div>
+      <div data-if="energyPricing:periods">
+        <div class="pair">
+          <Field name="nextEnergyP1" label={tx('bills.renewal.next_energy_p1')} kind="amount" />
           <Field name="nextEnergyP2" label={tx('bills.renewal.next_energy_p2')} kind="amount" />
         </div>
-        <div class="pair">
-          <Field
-            name="currentEnergyP3"
-            label={tx('bills.renewal.current_energy_p3')}
-            kind="amount"
-          />
-          <Field name="nextEnergyP3" label={tx('bills.renewal.next_energy_p3')} kind="amount" />
-        </div>
+        <Field name="nextEnergyP3" label={tx('bills.renewal.next_energy_p3')} kind="amount" />
       </div>
     </fieldset>
 
@@ -147,6 +169,12 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         hint={tx('bills.renewal.annual_kwh_hint')}
         kind="amount"
       />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('carta')}>
+      <h2 class="question" id="question-carta" tabindex="-1">
+        {question('carta')}
+      </h2>
       <Field
         name="declaredWithoutTax"
         label={tx('bills.renewal.declared_without_tax')}
@@ -174,6 +202,12 @@ const arrow = 'M4 12h15m-6-6 6 6-6 6';
         layout="pair"
         attributes={{ 'data-if': 'fixedPrice:yes' }}
       />
+    </fieldset>
+
+    <fieldset class="sheet" {...sheetId('envio')}>
+      <h2 class="question" id="question-envio" tabindex="-1">
+        {question('envio')}
+      </h2>
       <Choice
         name="separateFromBill"
         legend={tx('bills.renewal.separate_from_bill')}

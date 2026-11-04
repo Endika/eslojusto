@@ -89,7 +89,7 @@ test('a renewal letter read fills the sheets and gives the same result as typing
 
   await page.getByRole('button', { name: 'Revisar los datos' }).click();
   const result = page.getByRole('heading', { name: 'Resultado', level: 2 });
-  for (let i = 0; i < 10 && !(await result.isVisible()); i += 1) {
+  for (let i = 0; i < 20 && !(await result.isVisible()); i += 1) {
     await (await forwardButton(page)).click();
     await page.waitForFunction(() =>
       document.getAnimations().every((a) => a.playState !== 'running'),

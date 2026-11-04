@@ -257,6 +257,12 @@ const BILLS_SECTIONS = [
   'cobros',
   'despues',
   'consumo',
+  'potencia-actual',
+  'potencia-nueva',
+  'energia-actual',
+  'energia-nueva',
+  'carta',
+  'envio',
 ] as const satisfies readonly (ElectricityStep | TelecomStep | RenewalStep)[];
 export const SECTIONS = [
   'causa',

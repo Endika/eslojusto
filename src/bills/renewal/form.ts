@@ -11,7 +11,19 @@ import type { RenewalFormField } from './ports';
 export type { RenewalFormField } from './ports';
 
 // The sheets in order. Step ids are also the URL fragments, so they keep their Spanish names.
-export const SHEETS = ['fechas', 'potencia', 'energia', 'consumo', 'contrato'] as const;
+export const SHEETS = [
+  'fechas',
+  'potencia',
+  'potencia-actual',
+  'potencia-nueva',
+  'energia',
+  'energia-actual',
+  'energia-nueva',
+  'consumo',
+  'carta',
+  'contrato',
+  'envio',
+] as const;
 export type Sheet = (typeof SHEETS)[number];
 
 export const POWER_UNITS: readonly PriceUnit[] = ['per_kw_day', 'per_kw_year'];
@@ -20,28 +32,16 @@ export const KNOWNS = ['yes', 'no', 'unknown'] as const;
 
 export const SHEET_FIELDS: Readonly<Record<Sheet, readonly RenewalFormField[]>> = {
   fechas: ['letterDate', 'renewalDate'],
-  potencia: [
-    'powerKwP1',
-    'powerKwP2',
-    'powerUnit',
-    'currentPowerP1',
-    'currentPowerP2',
-    'nextPowerP1',
-    'nextPowerP2',
-  ],
-  energia: [
-    'energyPricing',
-    'currentEnergy',
-    'nextEnergy',
-    'currentEnergyP1',
-    'currentEnergyP2',
-    'currentEnergyP3',
-    'nextEnergyP1',
-    'nextEnergyP2',
-    'nextEnergyP3',
-  ],
-  consumo: ['annualKwh', 'declaredWithoutTax', 'declaredWithTax'],
-  contrato: ['fixedPrice', 'firstRenewal', 'separateFromBill'],
+  potencia: ['powerKwP1', 'powerKwP2', 'powerUnit'],
+  'potencia-actual': ['currentPowerP1', 'currentPowerP2'],
+  'potencia-nueva': ['nextPowerP1', 'nextPowerP2'],
+  energia: ['energyPricing'],
+  'energia-actual': ['currentEnergy', 'currentEnergyP1', 'currentEnergyP2', 'currentEnergyP3'],
+  'energia-nueva': ['nextEnergy', 'nextEnergyP1', 'nextEnergyP2', 'nextEnergyP3'],
+  consumo: ['annualKwh'],
+  carta: ['declaredWithoutTax', 'declaredWithTax'],
+  contrato: ['fixedPrice', 'firstRenewal'],
+  envio: ['separateFromBill'],
 };
 
 export const sheetOfField = (field: RenewalFormField): Sheet =>
