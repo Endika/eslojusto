@@ -13,6 +13,12 @@
       "blocks": {
         "a62": "Artículo 62"
       }
+    },
+    "BOE-A-2026-3212": {
+      "whole": false,
+      "blocks": {
+        "a6": "Artículo 6"
+      }
     }
   }
 }

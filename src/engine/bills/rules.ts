@@ -33,7 +33,8 @@ export type BillsRuleId =
   | 'change_exit'
   | 'handset_after_change'
   | 'indexed_price_rise'
-  | 'exit_effective';
+  | 'exit_effective'
+  | 'change_notice';
 
 type BillsRule = LawRule<BillsRuleId, BillsNormId> & RuleBase<BillsSourceId>;
 
@@ -67,7 +68,7 @@ const ELECTRICITY_TAX_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-1992-287
 const VAT_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-1992-28740#a90';
 const SOCIAL_BONUS_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-6544#a1';
 const SOCIAL_BONUS_CAP_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2017-11505#ai';
-// No block of the consolidated text has been read: the link opens on the whole regulation.
+// Only the block of art. 6 has been read: other links open on the whole regulation.
 const RD88_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-3212';
 const RD216_URL = 'https://www.boe.es/buscar/act.php?id=BOE-A-2014-3376#a5';
 // Art. 62.5 in the wording of Real Decreto-ley 7/2021, in force from 01-01-2022.
@@ -334,6 +335,20 @@ export const RULES: Readonly<Record<BillsRuleId, BillsRule>> = {
     null,
     'amount',
   ),
+  // Art. 6.1.m: a change in the contract's conditions is notified at least one month ahead, in
+  // writing and apart from the bill. Takes effect on 12-06-2026 (final provision 9.ª.4).
+  change_notice: {
+    ...rule(
+      'change_notice',
+      'rd88_2026',
+      'Real Decreto 88/2026, art. 6.1.m',
+      `${RD88_URL}#a6`,
+      '2026-06-12',
+      null,
+      'info',
+    ),
+    wordingSince: '2026-06-12',
+  },
 };
 
 export function ruleSource(id: BillsRuleId, norms: NormTable): NormSource<NormStatus> {
