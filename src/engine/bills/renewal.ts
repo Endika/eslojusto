@@ -116,7 +116,6 @@ function split(input: RenewalInput, deps: RenewalDeps): Split {
   const renewal = regulatedOn(input.renewalDate, deps);
   if (renewal.kind !== 'ok') return renewal;
   const letter = regulatedOn(input.letterDate, deps);
-  if (letter.kind !== 'ok') return letter;
   const { power, energy } = renewal.prices;
   return {
     kind: 'ok',
@@ -129,7 +128,7 @@ function split(input: RenewalInput, deps: RenewalDeps): Split {
       p2: energySplit(input, energy.p2, 'p2'),
       p3: energySplit(input, energy.p3, 'p3'),
     },
-    regulatedChange: !sameRegulated(letter.prices, renewal.prices),
+    regulatedChange: letter.kind === 'ok' ? !sameRegulated(letter.prices, renewal.prices) : null,
   };
 }
 
@@ -139,6 +138,9 @@ function notice(input: RenewalInput): Notice {
   const [letter, renewal] = [parseDate(input.letterDate), parseDate(input.renewalDate)];
   const days = ordinal(renewal) - ordinal(letter);
   const earliest = addMonthsClamped(letter, 1);
+  if (compareDates(renewal, earliest) >= 0 && input.separateFromBill === null) {
+    return { kind: 'separate_unknown', days };
+  }
   return compareDates(renewal, earliest) >= 0 ? { kind: 'meets', days } : { kind: 'short', days };
 }
 

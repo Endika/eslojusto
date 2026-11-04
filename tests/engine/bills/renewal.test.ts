@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
 import { reviewRenewalCore } from '../../../src/engine/bills/renewal';
+import type { NormTable } from '../../../src/engine/bills/norms';
+import type { Table } from '../../../src/engine/bills/tables';
 import type { RenewalDeps, RenewalInput } from '../../../src/engine/bills/renewal-types';
 
 const deps: RenewalDeps = { tables: BILLS_TABLES, norms: BILLS_NORMS };
@@ -39,6 +41,12 @@ describe('reviewing a renewal letter', () => {
       mismatch: { declared: 1080, computed: 1071.15 },
     });
     expect(review({ declared: { withoutTax: 1071.9, withTax: null } }).recalc).toMatchObject({
+      mismatch: null,
+    });
+  });
+
+  it('does not compare with a declared cost it does not have', () => {
+    expect(review({ declared: { withoutTax: null, withTax: null } }).recalc).toMatchObject({
       mismatch: null,
     });
   });
@@ -91,6 +99,58 @@ describe('reviewing a renewal letter', () => {
     });
   });
 
+  it('keeps the split when the letter date has no tables', () => {
+    const result = review({ letterDate: '2025-06-20' }).split;
+    expect(result).toMatchObject({ kind: 'ok', regulatedChange: null });
+  });
+
+  it('reports a change in the regulated part between letter and renewal', () => {
+    const row = (from: string, until: string, p1: number) => ({
+      from,
+      until,
+      value: {
+        power: { p1, p2: 0.5 },
+        energy: { p1: 0.01, p2: 0.01, p3: 0.01 },
+      },
+      norm: 'law38_1992' as const,
+      url: 'https://example.test',
+    });
+    const tolls: Table<(typeof BILLS_TABLES.tolls)[number]['value']> = [
+      row('2026-01-01', '2026-11-30', 1),
+      row('2026-12-01', '2026-12-31', 2),
+    ];
+    const charges: Table<(typeof BILLS_TABLES.charges)[number]['value']> = [
+      row('2026-01-01', '2026-12-31', 0),
+    ];
+    const own: RenewalDeps = { tables: { tolls, charges }, norms: BILLS_NORMS };
+    expect(reviewRenewalCore(letter(), own).split).toMatchObject({ regulatedChange: true });
+    expect(reviewRenewalCore(letter({ letterDate: '2026-12-02' }), own).split).toMatchObject({
+      regulatedChange: false,
+    });
+  });
+
+  it('is conditional while the norm deciding the tables is unsettled', () => {
+    const december = BILLS_NORMS.rdl25_2026_december;
+    const [held] = BILLS_TABLES.tolls;
+    if (held === undefined || december.condition === undefined) throw new Error('fixture expected');
+    const open: NormTable = {
+      ...BILLS_NORMS,
+      rdl25_2026_december: {
+        ...december,
+        status: 'conditional',
+        condition: { ...december.condition, met: null },
+      },
+    };
+    const tolls = [
+      { ...held, from: '2026-12-01', until: '2026-12-31', norm: 'rdl25_2026_december' as const },
+    ];
+    const own: RenewalDeps = { tables: { tolls, charges: BILLS_TABLES.charges }, norms: open };
+    expect(reviewRenewalCore(letter(), own).split).toEqual({
+      kind: 'conditional',
+      norms: ['rdl25_2026_december'],
+    });
+  });
+
   describe('notice', () => {
     it('meets one month ahead', () => {
       expect(review().notice).toEqual({ kind: 'meets', days: 40 });
@@ -112,6 +172,17 @@ describe('reviewing a renewal letter', () => {
       });
     });
 
+    it('cannot say a month ahead is enough when the bill is unknown', () => {
+      expect(review({ separateFromBill: null }).notice).toEqual({
+        kind: 'separate_unknown',
+        days: 40,
+      });
+      expect(review({ separateFromBill: null, letterDate: '2026-11-20' }).notice).toEqual({
+        kind: 'short',
+        days: 20,
+      });
+    });
+
     it('fails when the letter came with the bill', () => {
       expect(review({ separateFromBill: false }).notice).toEqual({ kind: 'not_separate' });
     });
@@ -128,6 +199,10 @@ describe('reviewing a renewal letter', () => {
     it('is free at a renewal or on a variable price', () => {
       expect(review({ fixedPrice: true, firstRenewal: false }).exit).toEqual({ kind: 'free' });
       expect(review({ fixedPrice: false }).exit).toEqual({ kind: 'free' });
+    });
+
+    it('is unknown when the first renewal is', () => {
+      expect(review({ fixedPrice: true, firstRenewal: null }).exit).toEqual({ kind: 'unknown' });
     });
 
     it('is unknown when the price type is', () => {

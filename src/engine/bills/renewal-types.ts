@@ -58,7 +58,8 @@ export type Split =
         readonly p2: TermSplit;
         readonly p3: TermSplit;
       };
-      readonly regulatedChange: boolean;
+      // Null when the letter's own day has no tables to compare with.
+      readonly regulatedChange: boolean | null;
     }
   | { readonly kind: 'missing_table'; readonly day: string }
   | { readonly kind: 'conditional'; readonly norms: readonly BillsNormId[] };
@@ -67,7 +68,9 @@ export type Notice =
   | { readonly kind: 'meets'; readonly days: number }
   | { readonly kind: 'short'; readonly days: number }
   | { readonly kind: 'not_checked_before'; readonly since: '2026-06-12' }
-  | { readonly kind: 'not_separate' };
+  | { readonly kind: 'not_separate' }
+  // A month or more ahead, but it is not known whether the letter came apart from the bill.
+  | { readonly kind: 'separate_unknown'; readonly days: number };
 
 export type Exit =
   | { readonly kind: 'free' }
