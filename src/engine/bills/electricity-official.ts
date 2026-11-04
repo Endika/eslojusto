@@ -1,4 +1,4 @@
-import { addDays, ordinal, toIso } from '../date';
+import { addDays, ordinal, toIso, type CivilDate } from '../date';
 import { round2 } from '../money';
 import { energyPeriodAt } from './electricity-hours';
 import { billingPeriod } from './period';
@@ -61,13 +61,13 @@ export interface OfficialDeps {
 
 const round6 = (n: number): number => Math.round(n * 1e6) / 1e6;
 
-// The plain mean of the PVPC hours of each period over the billed days, €/kWh; null when a day or
-// its year's toll holidays are missing.
-function pvpcMeans(
-  input: ElectricityBillInput,
+// The plain mean of the PVPC hours of each period over the days after `from` up to `to`, €/kWh;
+// null when a day or its year's toll holidays are missing.
+export function pvpcMeansBetween(
+  from: CivilDate,
+  to: CivilDate,
   { pvpc, tollHolidays }: OfficialDeps,
 ): Readonly<Record<EnergyLinePeriod, number | null>> | null {
-  const { from, to } = billingPeriod(input);
   const sums: Record<EnergyLinePeriod, { total: number; hours: number }> = {
     p1: { total: 0, hours: 0 },
     p2: { total: 0, hours: 0 },
@@ -96,7 +96,8 @@ function pvpcMeans(
 function energyFigures(input: ElectricityBillInput, deps: OfficialDeps): EnergyFigures | null {
   if (input.energy.length === 0) return null;
   if (input.market === 'pvpc') return { kind: 'pvpc_bill' };
-  const means = pvpcMeans(input, deps);
+  const { from, to } = billingPeriod(input);
+  const means = pvpcMeansBetween(from, to, deps);
   if (means === null) return { kind: 'pending' };
   const singlePrice = input.energy.some((l) => l.period === 'all');
   const order: readonly EnergyLinePeriod[] = singlePrice ? ['all'] : ['p1', 'p2', 'p3'];

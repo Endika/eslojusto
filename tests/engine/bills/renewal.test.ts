@@ -122,7 +122,7 @@ describe('reviewing a renewal letter', () => {
     const charges: Table<(typeof BILLS_TABLES.charges)[number]['value']> = [
       row('2026-01-01', '2026-12-31', 0),
     ];
-    const own: RenewalDeps = { tables: { tolls, charges }, norms: BILLS_NORMS };
+    const own: RenewalDeps = { tables: { ...BILLS_TABLES, tolls, charges }, norms: BILLS_NORMS };
     expect(reviewRenewalCore(letter(), own).split).toMatchObject({ regulatedChange: true });
     expect(reviewRenewalCore(letter({ letterDate: '2026-12-02' }), own).split).toMatchObject({
       regulatedChange: false,
@@ -144,7 +144,7 @@ describe('reviewing a renewal letter', () => {
     const tolls = [
       { ...held, from: '2026-12-01', until: '2026-12-31', norm: 'rdl25_2026_december' as const },
     ];
-    const own: RenewalDeps = { tables: { tolls, charges: BILLS_TABLES.charges }, norms: open };
+    const own: RenewalDeps = { tables: { ...BILLS_TABLES, tolls }, norms: open };
     expect(reviewRenewalCore(letter(), own).split).toEqual({
       kind: 'conditional',
       norms: ['rdl25_2026_december'],
