@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.114.1](https://github.com/Endika/eslojusto/compare/v1.114.0...v1.114.1) (2026-11-05)
+
+
+### Bug Fixes
+
+* **api:** read confidentiality and at-will clauses as other, not exclusivity ([16126c7](https://github.com/Endika/eslojusto/commit/16126c7dd2495fa662c60b9b8e8f24f93ef54b35))
+
 ## [1.114.0](https://github.com/Endika/eslojusto/compare/v1.113.0...v1.114.0) (2026-11-04)
 
 
