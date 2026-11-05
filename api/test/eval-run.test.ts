@@ -174,14 +174,14 @@ describe('the worst case of a pack', () => {
       ...base,
       models: { primary: SONNET_4_6, escalation: SONNET_4_6 },
     });
-    expect(worst).toBeCloseTo((96_000 * 3.3 + 5000 * 16.5) / 1e6, 10);
+    expect(worst).toBeCloseTo((96_050 * 3.3 + 5000 * 16.5) / 1e6, 10);
     expect(worst).toBeLessThan(0.4);
   });
 
   it('adds the escalation read when it is another model', () => {
     const one = worstCaseUsd({ ...base, models: { primary: SONNET_4_6, escalation: SONNET_4_6 } });
     const two = worstCaseUsd({ ...base, models: { primary: SONNET_4_6, escalation: SONNET_5_5 } });
-    expect(two).toBeCloseTo(one + (96_000 * 3.3 + 16_000 * 16.5) / 1e6, 10);
+    expect(two).toBeCloseTo(one + (96_050 * 3.3 + 16_000 * 16.5) / 1e6, 10);
   });
 
   it('refuses a model without a price', () => {
@@ -267,14 +267,14 @@ describe('the spend counter of a run', () => {
   const packs = BANK.filter((c) => c.eval && c.expected.extraction.outcome === 'ok').map(packOf);
 
   it('stops before a pack whose worst case would cross the cap', async () => {
-    // 30.000 in and 2.000 out at Sonnet 4.6 prices: 0,132 USD a pack, 0,3993 USD at worst.
+    // 30.000 in and 2.000 out at Sonnet 4.6 prices: 0,132 USD a pack, 0,3995 USD at worst.
     const reader = new FixedReader(() => ({
       toolInput: null,
       inputTokens: 30_000,
       outputTokens: 2000,
     }));
     const report = await evaluate(packs, rentalBank(sheetsOf), deps(reader, 1));
-    // After five packs 0,66 USD is spent, and 0,66 + 0,3993 > 1.
+    // After five packs 0,66 USD is spent, and 0,66 + 0,3995 > 1.
     expect(reader.calls).toHaveLength(5);
     expect(report.read).toBe(5);
     expect(report.stoppedBefore).toBe(packs[5]?.bankCase.id);
@@ -429,18 +429,18 @@ describe('an evaluation run over the employment bank', () => {
       maxOutputTokens: { [SONNET_4_6]: 12_000 },
       maxInputTokens: MAX_ESTIMATED_INPUT_TOKENS,
     });
-    expect(worst).toBeCloseTo((96_000 * 3.3 + 12_000 * 16.5) / 1e6, 10);
+    expect(worst).toBeCloseTo((96_050 * 3.3 + 12_000 * 16.5) / 1e6, 10);
   });
 
   it('stops before an employment pack whose worst case would cross a 3 USD cap', async () => {
-    // 40.000 in and 6.000 out: 0,231 USD a pack, against a worst case of 0,5148 USD.
+    // 40.000 in and 6.000 out: 0,231 USD a pack, against a worst case of 0,5150 USD.
     const reader = new FixedReader(() => ({
       toolInput: null,
       inputTokens: 40_000,
       outputTokens: 6000,
     }));
     const report = await evaluate(hard.map(employmentPackOf), bank, employmentDeps(reader, 3));
-    // After eleven packs 2,541 USD is spent, and 2,541 + 0,5148 > 3.
+    // After eleven packs 2,541 USD is spent, and 2,541 + 0,5150 > 3.
     expect(reader.calls).toHaveLength(11);
     expect(report.stoppedBefore).toBe(hard[11]?.id);
     expect(report.costUsd).toBeCloseTo(2.541, 10);
@@ -620,7 +620,7 @@ describe('an evaluation run over the credit and insurance banks', () => {
 
   it('stops before a credit pack whose worst case would cross the 2 USD of its share', async () => {
     // A credit read gets the employment room to write: 60.000 in and 8.000 out is 0,33 USD a
-    // pack, against a worst case of 0,5148 USD.
+    // pack, against a worst case of 0,5150 USD.
     const hard = CREDIT_BANK.filter((c) => c.eval);
     const reader = new FixedReader(() => ({
       toolInput: null,
@@ -632,7 +632,7 @@ describe('an evaluation run over the credit and insurance banks', () => {
       creditBankOf,
       employmentDeps(reader, 2),
     );
-    // After five packs 1,65 USD is spent, and 1,65 + 0,5148 > 2.
+    // After five packs 1,65 USD is spent, and 1,65 + 0,5150 > 2.
     expect(reader.calls).toHaveLength(5);
     expect(report.stoppedBefore).toBe(hard[5]?.id);
     expect(report.costUsd).toBeCloseTo(1.65, 10);
@@ -641,7 +641,7 @@ describe('an evaluation run over the credit and insurance banks', () => {
   });
 
   it('stops before an insurance pack whose worst case would cross the 1 USD of its share', async () => {
-    // Every read at the worst case of 96.000 in and 5.000 out: 0,3993 USD a pack.
+    // Every read at the worst case of 96.050 in and 5.000 out: 0,39947 USD a pack.
     const reader = new FixedReader(() => ({
       toolInput: null,
       inputTokens: MAX_ESTIMATED_INPUT_TOKENS,
@@ -653,10 +653,10 @@ describe('an evaluation run over the credit and insurance banks', () => {
       insuranceBankOf,
       deps(reader, 1),
     );
-    // After two packs 0,7986 USD is spent, and 0,7986 + 0,3993 > 1.
+    // After two packs 0,79893 USD is spent, and 0,79893 + 0,39947 > 1.
     expect(reader.calls).toHaveLength(2);
     expect(report.stoppedBefore).toBe(hard[2]?.id);
-    expect(report.costUsd).toBeCloseTo(0.7986, 10);
+    expect(report.costUsd).toBeCloseTo(0.79893, 10);
     for (const call of reader.calls) expect(call.review).toBe('insurance');
   });
 
@@ -790,7 +790,7 @@ describe('an evaluation run over the mortgage bank', () => {
 
   it('stops before a pack whose worst case would cross the 3 USD cap', async () => {
     // A mortgage read gets the employment room to write: 60.000 in and 8.000 out is 0,33 USD a
-    // pack, against a worst case of 0,5148 USD.
+    // pack, against a worst case of 0,5150 USD.
     const reader = new FixedReader(() => ({
       toolInput: null,
       inputTokens: 60_000,
@@ -801,7 +801,7 @@ describe('an evaluation run over the mortgage bank', () => {
       mortgageBankOf,
       employmentDeps(reader, 3),
     );
-    // After eight packs 2,64 USD is spent, and 2,64 + 0,5148 > 3.
+    // After eight packs 2,64 USD is spent, and 2,64 + 0,5150 > 3.
     expect(reader.calls).toHaveLength(8);
     expect(report.stoppedBefore).toBe(hard[8]?.id);
     expect(report.costUsd).toBeCloseTo(2.64, 10);
@@ -874,7 +874,7 @@ describe('an evaluation run over the bill banks', () => {
   });
 
   it('stops before a pack whose worst case would cross the cap, and reads as its review', async () => {
-    // 60.000 in and 8.000 out is 0,33 USD a pack, against a worst case of 0,5148 USD.
+    // 60.000 in and 8.000 out is 0,33 USD a pack, against a worst case of 0,5150 USD.
     const answer = () => ({ toolInput: null, inputTokens: 60_000, outputTokens: 8000 });
     const bills = new FixedReader(answer);
     const billsReport = await evaluate(
@@ -882,7 +882,7 @@ describe('an evaluation run over the bill banks', () => {
       electricity,
       employmentDeps(bills, 3),
     );
-    // After eight packs 2,64 USD is spent, and 2,64 + 0,5148 > 3.
+    // After eight packs 2,64 USD is spent, and 2,64 + 0,5150 > 3.
     expect(bills.calls).toHaveLength(8);
     expect(billsReport.stoppedBefore).toBe(hardBills[8]?.id);
     expect(billsReport.costUsd).toBeLessThanOrEqual(3);
@@ -894,7 +894,7 @@ describe('an evaluation run over the bill banks', () => {
       telecom,
       employmentDeps(lines, 1),
     );
-    // After one pack 0,33 USD is spent, and 0,33 + 0,5148 ≤ 1 lets a second one in; not a third.
+    // After one pack 0,33 USD is spent, and 0,33 + 0,5150 ≤ 1 lets a second one in; not a third.
     expect(lines.calls).toHaveLength(2);
     expect(linesReport.stoppedBefore).toBe(hardTelecom[2]?.id);
     for (const call of lines.calls) expect(call.review).toBe('telecom');

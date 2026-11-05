@@ -632,7 +632,7 @@ domain, adapters never reach `http/` or `handlers/`, and the infrastructure read
   and a `tool_result` error naming the malformed parts (schema names only, nothing a document
   said), and the retry replaces the read only if it comes back whole. It is logged as `retried`
   and takes the place of the escalation: a request makes one second read at most. It starts only
-  before `NO_ESCALATION_AFTER_MS`, only when both reads together stay within 96,000 input tokens
+  before `NO_ESCALATION_AFTER_MS`, only when both reads together stay within 96,050 input tokens
   (Bedrock's own counts, plus 500 for the correction) and its `max_tokens` is what the first read
   left, at least as much as the first read wrote: both reads cost no more than the worst case of
   one (below, «Cost»). Strict tool use (`strict: true`), which would rule this out at the source,
@@ -677,9 +677,9 @@ Cheapest first, and nothing that parses what the person sent runs before the cap
   characters at two per token,
   `PROMPT_TOKENS_BY_REVIEW`; `test/tokens.test.ts` keeps them honest). Bedrock's CountTokens does not serve Claude models
   offered only through cross-Region profiles, so this is computed, not asked. The largest pack
-  the API accepts, twenty-five 1568 × 1568 images, comes to 14,000 + 25 × 3,279 = 95,975 (92,975
-  for a rental review); above
-  **96,000** the answer would be `document_too_dense`. Nothing in an image can add tokens
+  the API accepts, twenty-five 1568 × 1568 images, comes to 14,000 + 25 × 3,279 = 95,975 (96,050
+  for the employment review, 92,975 for a rental review); above
+  **96,050** the answer would be `document_too_dense`. Nothing in an image can add tokens
   beyond its pixels, which is why PDFs are rendered in the browser instead of read here: a PDF
   can hide text from any measure short of a full reader.
 - **With Haiku reading first** (not the default), no escalation above 43,000 real input tokens
@@ -919,11 +919,11 @@ at 5,000 with an 8,000-token prompt: its largest pack is 89,975 in, 0.38 USD.
 
 **Worst case: 0.40 USD per read** for the final pay, the rental and the insurance review (95,975 × 3.30 USD/M +
 5,000 × 16.50 USD/M = 0.399), and an upper bound of about **0.51 USD** for the employment, credit, mortgage, electricity and telecom reviews
-(95,975 × 3.30 USD/M + 12,000 × 16.50 USD/M = 0.5147), for any input: the API takes images only, priced by their pixels, and refuses anything above 96,000
+(96,050 × 3.30 USD/M + 12,000 × 16.50 USD/M = 0.5150), for any input: the API takes images only, priced by their pixels, and refuses anything above 96,050
 estimated tokens (0.40 USD) before a call. The bound counts every page at 1568 px, since the
 API accepts that size at any count; the browser stepping a large pack down only lowers it. A PDF never reaches it; the browser renders its pages
 to images of the same size as a photo. A corrective retry stays inside the bound: with it, the
-two reads take at most 96,000 input tokens and one `max_tokens` of output between them. Should Bedrock still bill more than twice the estimate,
+two reads take at most 96,050 input tokens and one `max_tokens` of output between them. Should Bedrock still bill more than twice the estimate,
 the read is logged with `underestimated`. A free read needs a fresh captcha, at most 5 reads
 run at once, and the budget action caps the month.
 
@@ -1020,8 +1020,8 @@ the read again. A run with `--only` writes its report over the last one.
 
 **How much.** 15 packs of 1 to 16 photos, one pass with Sonnet 4.6, per bank; the credit and the
 insurance banks share their 15, and their 3 USD. A rental pack is at
-most **0.40 USD** (96,000 tokens in and 5,000 out); an employment pack at most **0.51 USD**
-(96,000 in and 12,000 out, `EXTRA_OUTPUT_TOKENS_BY_REVIEW`), and so is a credit or a mortgage
+most **0.40 USD** (96,050 tokens in and 5,000 out); an employment pack at most **0.51 USD**
+(96,050 in and 12,000 out, `EXTRA_OUTPUT_TOKENS_BY_REVIEW`), and so is a credit or a mortgage
 pack; an insurance pack is at most **0.40 USD**. So `EVAL_MAX_USD=3` stops the rental, the
 employment or the mortgage run before it could pass 3 USD, and `EVAL_MAX_USD=2` for credit with
 `EVAL_MAX_USD=1` for insurance keep both runs together under 3 USD; about **2–2.50 USD** is
