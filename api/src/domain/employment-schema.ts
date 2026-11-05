@@ -247,7 +247,12 @@ const employmentContract = {
       'Every clause of one of these kinds, annexes included.',
       EMPLOYMENT_LIST_MAXIMA.clauses,
       {
-        label: oneOf(CLAUSE_LABELS, 'retention is permanencia; overtime_included, in the salary.'),
+        label: oneOf(
+          CLAUSE_LABELS,
+          'retention is permanencia; overtime_included, in the salary. ' +
+            'exclusivity only bars other jobs during the contract; confidentiality is other. ' +
+            'Ending the job at will, without cause or notice, is other.',
+        ),
         literal: text(MAX_CLAUSE_LITERAL, 'The clause, or its start if long.' + LITERAL),
         months: whole(0, 120, 'Months it lasts.'),
         compensationStated: flag('Whether it states a payment in return.'),

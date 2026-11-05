@@ -840,7 +840,7 @@
                   "remote_work_costs",
                   "other"
                 ],
-                "description": "retention is permanencia; overtime_included, in the salary."
+                "description": "retention is permanencia; overtime_included, in the salary. exclusivity only bars other jobs during the contract; confidentiality is other. Ending the job at will, without cause or notice, is other."
               },
               "literal": {
                 "type": "string",

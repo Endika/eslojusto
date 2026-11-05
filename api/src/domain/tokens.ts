@@ -6,12 +6,12 @@ import type { ReviewKind } from './reviews';
 
 // System prompt, tool schema, page labels and Anthropic's tool-use preamble of each review, priced
 // at two characters per token like document text (test/tokens.test.ts keeps it honest): about
-// 27,000 characters for the final pay, 21,000 for the rental review, 28,000 for the employment
-// and the credit review and 14,000 for the insurance review.
+// 27,000 characters for the final pay, 21,000 for the rental review, 28,150 for the employment
+// review, 28,000 for the credit review and 14,000 for the insurance review.
 export const PROMPT_TOKENS_BY_REVIEW: Readonly<Record<ReviewKind, number>> = {
   final_pay: 14_000,
   rental: 11_000,
-  employment: 14_000,
+  employment: 14_075,
   credit: 14_000,
   insurance: 8_000,
   mortgage: 14_000,
@@ -37,14 +37,14 @@ export const EXTRA_OUTPUT_TOKENS_BY_REVIEW: Readonly<Record<ReviewKind, number>>
   telecom: 7_000,
   renewal: 0,
 };
-// One Sonnet read at this cap costs 96,000 × 3.30 + 5,000 × 16.50 USD per million = 0.40 USD,
+// One Sonnet read at this cap costs 96,050 × 3.30 + 5,000 × 16.50 USD per million = 0.40 USD,
 // and at most about 0.51 USD for an employment read with its 12,000 output tokens (api/README.md,
 // «Cost»). The
 // largest pack the API accepts, twenty-five 1568 × 1568 images, comes to 14,000 + 25 × 3,279 =
-// 95,975 for the final pay and the employment review and 92,975 for a rental review, so the cap
-// is a guard rather than a limit anyone meets; for the credit review too, and 89,975 for an
+// 95,975 for the final pay and the credit review, 96,050 for the employment review and 92,975 for
+// a rental review, so the cap is a guard rather than a limit anyone meets; 89,975 for an
 // insurance review.
-export const MAX_ESTIMATED_INPUT_TOKENS = 96_000;
+export const MAX_ESTIMATED_INPUT_TOKENS = 96_050;
 // Only when a cheaper model reads first. Measured by Bedrock after the primary read, so exact;
 // above it a second, dearer read would take the worst case past 0.30 USD for the final pay and the
 // rental review; an employment read, with more room to write, could reach about 0.45 USD
