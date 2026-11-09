@@ -18,8 +18,8 @@
     "esbuild": true
   },
   "dependencies": {
-    "@aws-sdk/client-bedrock-runtime": "^3.1160.0",
-    "@aws-sdk/client-ssm": "^3.1160.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.1163.0",
+    "@aws-sdk/client-ssm": "^3.1163.0",
     "stripe": "^23.1.0"
   },
   "devDependencies": {
