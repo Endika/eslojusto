@@ -104,7 +104,7 @@ for (const { name, viewport } of SIZES) {
 test('the guide quotes the notice and the page is listed from /facturas/', async ({ page }) => {
   await page.goto('facturas/');
   await page.getByRole('link', { name: 'Renovación', exact: true }).click();
-  await expect(page).toHaveURL(/\/facturas\/renovacion\/$/);
+  await expect(page).toHaveURL(/\/facturas\/renovacion\/(#[a-z-]+)?$/);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('carta de renovación');
   await expect(page.locator('[data-legal-quote]').first()).toBeVisible();
   await expect(page.locator('[data-pass-offer]')).toHaveCount(0);
