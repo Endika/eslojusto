@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.114.2](https://github.com/Endika/eslojusto/compare/v1.114.1...v1.114.2) (2026-11-10)
+
+
+### Bug Fixes
+
+* **site:** keep a date whole when a suffix follows it ([0f97087](https://github.com/Endika/eslojusto/commit/0f97087ab1a52e409a8817244a71f0b7d413eb25))
+
 ## [1.114.1](https://github.com/Endika/eslojusto/compare/v1.114.0...v1.114.1) (2026-11-05)
 
 
