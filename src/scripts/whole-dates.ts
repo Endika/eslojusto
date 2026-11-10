@@ -1,6 +1,7 @@
 // A dd-mm-yyyy date never breaks at its hyphens on a narrow screen: each one sits in a span that
 // does not wrap, so the text keeps plain hyphens for search, copy and crawlers.
-const DATE = /\b\d{2}-\d{2}-\d{4}\b/g;
+// Bounded by digits only: a Basque suffix («31-12-2027ra») is still a date.
+const DATE = /(?<!\d)\d{2}-\d{2}-\d{4}(?!\d)/g;
 export const WHOLE_DATE_CLASS = 'whole-date';
 
 // Text inside these elements is never shown as page text, or must stay byte for byte.
