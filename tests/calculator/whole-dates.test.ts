@@ -14,6 +14,12 @@ describe('wholeDatesInHtml', () => {
     );
   });
 
+  it('wraps a date that a suffix follows', () => {
+    expect(wholeDatesInHtml('<p>31-12-2027ra arte, 20-11-2026tik aurrera</p>')).toBe(
+      `<p>${W('31-12-2027')}ra arte, ${W('20-11-2026')}tik aurrera</p>`,
+    );
+  });
+
   it('leaves tags, attributes, comments and raw elements as they were', () => {
     const page = [
       '<!doctype html><html><head><title>Antes del 16-06-2019</title>',
