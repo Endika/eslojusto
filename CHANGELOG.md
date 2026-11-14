@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.115.0](https://github.com/Endika/eslojusto/compare/v1.114.2...v1.115.0) (2026-11-14)
+
+
+### Features
+
+* **rental:** load the INE's October CPI and IRAV ([348eb17](https://github.com/Endika/eslojusto/commit/348eb1767b6c1d618c7ed42e839d9a7e6cd2d1e0))
+
 ## [1.114.2](https://github.com/Endika/eslojusto/compare/v1.114.1...v1.114.2) (2026-11-10)
 
 
