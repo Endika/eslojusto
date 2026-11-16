@@ -45,7 +45,7 @@
     "@fontsource-variable/noto-kufi-arabic": "^5.3.0",
     "@fontsource-variable/noto-naskh-arabic": "^5.3.0",
     "@fontsource-variable/source-serif-4": "^5.3.1",
-    "astro": "^7.4.7",
+    "astro": "^7.4.11",
     "pdfjs-dist": "6.5.438",
     "posthog-js": "1.447.1"
   },
