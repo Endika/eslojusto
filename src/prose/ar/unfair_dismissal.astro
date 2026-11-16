@@ -19,9 +19,9 @@ const decimal = (n: number) => String(n).replace('.', ',');
   <h3 id="di-tramos">33 يومًا عن كل سنة، بحدّ أقصى 720</h3>
   <p>
     إذا اعتُرف بأن الفصل غير مبرَّر <bdi>(despido improcedente)</bdi> أو أُعلن ذلك، يكون التعويض
-    <bdi>(indemnización)</bdi> 33 يومًا من الراتب عن كل سنة عمل، بحدّ أقصى 24 راتبًا شهريًا، أي 720
-    يومًا <bdi>(art. 56.1 ET)</bdi>. تُحسب المدة بالأشهر، وجزء الشهر يُحتسب شهرًا كاملًا: 33 يومًا
-    في السنة تساوي 2,75 يوم عن كل شهر.
+    <bdi>(indemnización)</bdi> 33 يومًا من الراتب عن كل سنة عمل، بحدّ أقصى 24 راتبًا شهريًا، أي 720 يومًا{' '}
+    <bdi>(art. 56.1 ET)</bdi>. تُحسب المدة بالأشهر، وجزء الشهر يُحتسب شهرًا كاملًا: 33 يومًا في السنة
+    تساوي 2,75 يوم عن كل شهر.
   </p>
   <p>
     راتب كل يوم هو راتبك السنوي، مع الدفعات الإضافية <bdi>(pagas extra)</bdi>، مقسومًا على 365، كما
@@ -64,9 +64,9 @@ const decimal = (n: number) => String(n).replace('.', ',');
   </p>
   <p class="example">
     <span class="example__label">عقد من 2010</span> من 1 مارس 2010 إلى 15 سبتمبر 2026. الجزء الأول:{' '}
-    {integer(first)} شهرًا × 3,75 = {decimal(first * 3.75)} يوم. الجزء الثاني: {integer(second)}{' '}
-    شهرًا × 2,75 = {decimal(second * 2.75)} يوم. المجموع: {integer(unfairBefore2012.salaryDays)}{' '}
-    يومًا، أقل من الحد الأقصى. 21.000&nbsp;€ × {integer(unfairBefore2012.salaryDays)} / 365 ={' '}
+    {integer(first)} شهرًا × 3,75 = {decimal(first * 3.75)} يوم. الجزء الثاني: {integer(second)} شهرًا
+    × 2,75 = {decimal(second * 2.75)} يوم. المجموع: {integer(unfairBefore2012.salaryDays)} يومًا، أقل
+    من الحد الأقصى. 21.000&nbsp;€ × {integer(unfairBefore2012.salaryDays)} / 365 ={' '}
     {euros(unfairBefore2012.amount)}.
   </p>
   <p>
@@ -80,13 +80,13 @@ const decimal = (n: number) => String(n).replace('.', ',');
   <p>
     عندما يُعلَن أن الفصل غير مبرَّر، تختار الشركة خلال خمسة أيام بين إعادتك إلى العمل
     <bdi>(readmisión)</bdi> أو دفع التعويض لك <bdi>(art. 56.1 ET)</bdi>. إذا أعادتك إلى العمل، تعود
-    لك أيضًا أجور فترة الإجراءات <bdi>(salarios de tramitación)</bdi>، وهي الأجور التي لم تتقاضها
-    منذ الفصل <bdi>(art. 56.2 ET)</bdi>. إذا كنت من الممثلين القانونيين للعمال أو مندوبًا نقابيًا،
+    لك أيضًا أجور فترة الإجراءات <bdi>(salarios de tramitación)</bdi>، وهي الأجور التي لم تتقاضها منذ
+    الفصل <bdi>(art. 56.2 ET)</bdi>. إذا كنت من الممثلين القانونيين للعمال أو مندوبًا نقابيًا،
     فالاختيار لك <bdi>(art. 56.4 ET)</bdi>.
   </p>
   <p>
-    هذه المراجعة لا تحسب أجور فترة الإجراءات ولا تقرّر ما إذا كان الفصل غير مبرَّر: فذلك تعلنه محكمة
-    أو تعترف به الشركة.
+    هذه المراجعة لا تحسب أجور فترة الإجراءات ولا تقرّر ما إذا كان الفصل غير مبرَّر: فذلك تعلنه محكمة أو
+    تعترف به الشركة.
   </p>
   <p class="folio">
     Art. <span>56</span> ET
@@ -96,9 +96,9 @@ const decimal = (n: number) => String(n).replace('.', ',');
 <section class="sheet sheet--text">
   <h3 id="di-otros">أنواع أخرى من الفصل</h3>
   <p>
-    الفصل لأسباب موضوعية <bdi>(despido objetivo)</bdi> يُدفع بمعدل 20 يومًا عن كل سنة، مع 15 يومًا
-    من الإشعار المسبق: تجده في صفحة <CaseLink lang={lang} id="objective_dismissal" />. أي فصل، بما
-    في ذلك الفصل التأديبي
+    الفصل لأسباب موضوعية <bdi>(despido objetivo)</bdi> يُدفع بمعدل 20 يومًا عن كل سنة، مع 15 يومًا من
+    الإشعار المسبق: تجده في صفحة <CaseLink lang={lang} id="objective_dismissal" />. أي فصل، بما في
+    ذلك الفصل التأديبي
     <bdi>(despido disciplinario)</bdi>، يُعدّ وضعًا قانونيًا للبطالة: تشرح صفحة
     <CaseLink lang={lang} id="benefit_disciplinary" /> أيّ حالات انتهاء العمل تمنح الحق في إعانة
     البطالة <bdi>(paro)</bdi>.

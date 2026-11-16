@@ -517,8 +517,7 @@ export const ar: Translation = {
     'تراكم نصف سنوي: {paga}، على افتراض أنه لم يُدفع شيء عن الفترة الجارية.',
   'client.calculation.extra_pay.unknown':
     'دون معرفة طريقة تراكم الدفعات، بين التراكم نصف السنوي والسنوي ({verano} + {navidad}؛ أو {paga}).',
-  'client.calculation.extra_pay.same_count_for_both':
-    'يُطبَّق كل حساب بالطريقة نفسها على الدفعتين.',
+  'client.calculation.extra_pay.same_count_for_both': 'يُطبَّق كل حساب بالطريقة نفسها على الدفعتين.',
   'client.calculation.extra_pay.summer_in_last_payslip':
     'دفعة الصيف تُدفع عادةً في يونيو أو يوليو: قد تكون مدرجة بالفعل في قسيمة راتب ذلك الشهر، لذا يبدأ الحد الأدنى لتلك الدفعة من 0 €.',
   'client.calculation.extra_pay.christmas_in_last_payslip':
@@ -625,8 +624,7 @@ export const ar: Translation = {
   'client.error.end_before_start': 'تاريخ انتهاء العمل سابق لتاريخ البدء',
   'client.error.end_too_far_ahead':
     'لا يمكن أن يكون تاريخ انتهاء العمل بعد أكثر من سنة في المستقبل',
-  'client.error.salary_out_of_range':
-    'يجب أن يكون الراتب الشهري أكبر من 0 وألّا يتجاوز 1.000.000 €',
+  'client.error.salary_out_of_range': 'يجب أن يكون الراتب الشهري أكبر من 0 وألّا يتجاوز 1.000.000 €',
   'client.error.extra_pay_count_out_of_range': 'يجب أن يكون عدد الدفعات بين 0 و6',
   'client.error.extra_pay_amount_out_of_range':
     'يجب أن يكون مبلغ الدفعة الإضافية أكبر من 0 وألّا يتجاوز 1.000.000 €',
@@ -741,8 +739,7 @@ export const ar: Translation = {
   'client.documents.status.preparing_n': 'جارٍ تجهيز {k} من {total}…',
   'client.documents.status.captcha': 'جارٍ التحقق من أنك لست روبوتًا…',
   'client.documents.status.locating': 'جارٍ البحث عن الصفحات المفيدة في {nombre}…',
-  'client.documents.status.locating_n':
-    'جارٍ تجهيز الصفحة {k} من {total} للبحث عن الصفحات المفيدة…',
+  'client.documents.status.locating_n': 'جارٍ تجهيز الصفحة {k} من {total} للبحث عن الصفحات المفيدة…',
   'client.documents.status.reading':
     'جارٍ قراءة المستندات. قد يستغرق ذلك حتى دقيقتين إذا كانت الصفحات كثيرة.',
   'client.documents.photo': 'الصورة {n}',
@@ -1024,8 +1021,7 @@ export const ar: Translation = {
   'client.documents.report.end': 'تاريخ انتهاء العمل \u2068(fecha de baja)\u2069',
   'client.documents.report.salary': 'الراتب الإجمالي \u2068(bruto)\u2069 الشهري',
   'client.documents.report.extra_pay': 'الدفعات الإضافية \u2068(pagas extra)\u2069',
-  'client.documents.report.extra_pay_prorated':
-    'موزّعة على قسائم الراتب \u2068(prorrateadas)\u2069',
+  'client.documents.report.extra_pay_prorated': 'موزّعة على قسائم الراتب \u2068(prorrateadas)\u2069',
   'client.documents.report.extra_pay_apart': '{n} دفعات بقيمة {importe}',
   'client.documents.report.holidays': 'الإجازة',
   'client.documents.report.holidays_text':
@@ -1076,8 +1072,7 @@ export const ar: Translation = {
   'client.documents.letter.date_blank': '____ ____________________ ________',
   'client.documents.letter.glyph_warning':
     'بعض الحروف لا يمكن كتابتها في الرسالة: يُترك السطر فارغًا لكتابته بخط اليد.',
-  'client.documents.letter.id_warning':
-    'لا يبدو رقم DNI ولا NIE: راجعه. تُنزَّل الرسالة على أي حال.',
+  'client.documents.letter.id_warning': 'لا يبدو رقم DNI ولا NIE: راجعه. تُنزَّل الرسالة على أي حال.',
   'client.documents.letter.received': 'استلمت، دون موافقة،',
   'client.documents.letter.filename': 'eslojusto-recibi-no-conforme.pdf',
   'client.documents.kind.employment_contract': 'عقد العمل',
@@ -1366,8 +1361,7 @@ export const ar: Translation = {
   'privacy.cookies': 'دون ملفات تعريف الارتباط \u2068(cookies)\u2069',
   'privacy.legal_basis': 'لماذا يُقاس',
   'privacy.controller': 'المسؤول عن المعالجة، والتواصل، والحقوق',
-  'privacy.rental.summary':
-    'تعمل مراجعة الإيجار بالطريقة نفسها: ما تكتبه يُحسَب في متصفحك ولا يُحفَظ.',
+  'privacy.rental.summary': 'تعمل مراجعة الإيجار بالطريقة نفسها: ما تكتبه يُحسَب في متصفحك ولا يُحفَظ.',
   'privacy.rental.data_review': 'ما تكتبه في مراجعة الإيجار',
   'privacy.rental.data_review_where':
     'في متصفحك فقط، ما دامت الصفحة مفتوحة. تواريخ عقدك، وإيجاراتك وزياداتها، والتأمين \u2068(fianza)\u2069، والمصاريف، وما أُعيد إليك، كلها تُحسَب على جهازك ولا تُرسَل إلى أي خادم ولا تُحفَظ. عند إغلاق الصفحة أو إعادة تحميلها، تختفي.',
@@ -1846,8 +1840,7 @@ export const ar: Translation = {
     'مثلًا: عمال الموانئ، أو المحكوم عليهم في المؤسسات العقابية، أو الممثلون التجاريون.',
   'employment.hiring.question': 'كيف تمّ توظيفك',
   'employment.relation.agency': 'هل وظّفتك شركة عمل مؤقت للعمل في شركة أخرى؟',
-  'employment.relation.agency_hint':
-    'شركة عمل مؤقت \u2068(ETT)\u2069 تضعك تحت تصرّف شركة مستخدِمة.',
+  'employment.relation.agency_hint': 'شركة عمل مؤقت \u2068(ETT)\u2069 تضعك تحت تصرّف شركة مستخدِمة.',
   'employment.relation.relief': 'هل هو عقد إحلال \u2068(relevo)\u2069؟',
   'employment.relation.relief_hint': 'العقد الذي يُبرَم ليحلّ محلّ من يتقاعد جزئيًا.',
   'employment.relation.minor': 'هل عمرك أقل من 18 سنة؟',
@@ -1860,8 +1853,7 @@ export const ar: Translation = {
   'employment.relation.end': 'تاريخ الانتهاء',
   'employment.relation.end_hint': 'إذا كان العقد مؤقتًا ويذكره. وإلا فاتركه فارغًا.',
   'employment.relation.signed': 'تاريخ العقد',
-  'employment.relation.signed_hint':
-    'اليوم الذي وُقِّع فيه العقد، إن كنت تعرفه. وإلا فاتركه فارغًا.',
+  'employment.relation.signed_hint': 'اليوم الذي وُقِّع فيه العقد، إن كنت تعرفه. وإلا فاتركه فارغًا.',
   'employment.modality.question': 'نوع عقدك',
   'employment.modality.help':
     'يذكره عنوان العقد أو بنده الأول. وإذا ظهر في قسائم راتبك رمز (100، 402، 410…)، فهو يساعد أيضًا على التعرّف عليه.',
@@ -1979,8 +1971,7 @@ export const ar: Translation = {
   'employment.agreement.named':
     'هل يذكر العقد اسم اتفاقيتك الجماعية \u2068(convenio colectivo)\u2069؟',
   'employment.agreement.full_time': 'الدوام الكامل في اتفاقيتك الجماعية، بالساعات في الأسبوع',
-  'employment.agreement.full_time_hint':
-    'إذا كنت لا تعرفه، يُعتمَد الدوام القانوني البالغ 40 ساعة.',
+  'employment.agreement.full_time_hint': 'إذا كنت لا تعرفه، يُعتمَد الدوام القانوني البالغ 40 ساعة.',
   'employment.agreement.category_salary': 'راتب فئتك في الاتفاقية الجماعية، سنويًا',
   'employment.agreement.annual_hours': 'ساعات العمل السنوية في اتفاقيتك الجماعية',
   'employment.agreement.your_figure': 'اختياري: يُستخدَم بوصفه معلومة منك.',
@@ -2334,8 +2325,7 @@ export const ar: Translation = {
   'client.employment.reading.overlap_same_contract': 'إذا كانت عقدًا واحدًا',
   'client.employment.reading.overlap_separate_contracts': 'إذا كانت عقودًا مختلفة',
   'client.employment.reading.complement_fixed': 'إذا احتُسِبت كل المكمّلات',
-  'client.employment.reading.complement_variable':
-    'إذا احتُسِب الراتب الأساسي والمكمّلات الثابتة فقط',
+  'client.employment.reading.complement_variable': 'إذا احتُسِب الراتب الأساسي والمكمّلات الثابتة فقط',
   'client.employment.reading.effective_hours': 'إذا كانت ساعات عمل فعلي',
   'client.employment.reading.with_paid_rest': 'إذا كانت تشمل الراحة المدفوعة',
   'client.employment.reading.not_technical_under_25_staff':
@@ -3228,8 +3218,7 @@ export const ar: Translation = {
   'rental.letter.address': 'عنوان المسكن',
   'rental.letter.iban': 'الحساب \u2068(IBAN)\u2069 لإرجاع التأمين \u2068(fianza)\u2069 إليك',
   'rental.letter.iban_hint': 'لا يَرِد إلا في رسالة التأمين.',
-  'rental.letter.privacy':
-    'لا تُستخدم هذه البيانات إلا لملء الرسائل على جهازك؛ لا تُرسَل ولا تُحفَظ.',
+  'rental.letter.privacy': 'لا تُستخدم هذه البيانات إلا لملء الرسائل على جهازك؛ لا تُرسَل ولا تُحفَظ.',
   'rental.title':
     'زيادة الإيجار والتأمين \u2068(fianza)\u2069: راجِع ما إذا كنت تدفع أكثر من اللازم',
   'rental.description':
@@ -4576,8 +4565,7 @@ export const ar: Translation = {
   'bills.letter.id': 'DNI أو NIE (اختياري)',
   'bills.letter.company': 'شركة تسويق الكهرباء \u2068(comercializadora)\u2069',
   'bills.letter.reference': 'رقم العقد',
-  'bills.letter.privacy':
-    'لا تُستخدَم هذه البيانات إلا لملء الرسالة على جهازك؛ ولا تُرسَل ولا تُحفَظ.',
+  'bills.letter.privacy': 'لا تُستخدَم هذه البيانات إلا لملء الرسالة على جهازك؛ ولا تُرسَل ولا تُحفَظ.',
   'bills.telecom.charges.title': 'ما يُحصَّل منك',
   'bills.telecom.charges.lead':
     'كل سطر قُرئ في فواتيرك، لكي تتعرّف على كل ما يُحصَّل منك. إذا رأيت شيئًا لم تتعاقد عليه بنفسك، اسأل شركتك.',
@@ -4725,8 +4713,7 @@ export const ar: Translation = {
   'client.bills.row.condition_not_met': 'لا يُطبَّق: لم يتحقّق الشرط \u2068({condicion})\u2069',
   'client.bills.row.doubt.ccf_not_updated_since_2016': 'قيمة من 2016 لم تُحدَّث',
   'client.bills.total.up_to': 'وما يصل إلى {importe} في القراءة الأعلى لما لم يُحسَم بعد.',
-  'client.bills.total.under':
-    'ما حُصِّل نقصًا: {importe}. يُعرَض منفصلًا ولا يُطرَح مما حُصِّل زيادةً.',
+  'client.bills.total.under': 'ما حُصِّل نقصًا: {importe}. يُعرَض منفصلًا ولا يُطرَح مما حُصِّل زيادةً.',
   'client.bills.result.lead_over':
     'بحسب ما أدخلته، تحصّل فاتورتك في سطر ما أكثر مما يحدّده النص القانوني. وفي الأسفل كل سطر مع حسابه ومصدره.',
   'client.bills.result.lead_open':
@@ -4986,8 +4973,7 @@ export const ar: Translation = {
   'client.bills.telecom.charges.kind.fixed_fee': 'أقساط خدماتك',
   'client.bills.telecom.charges.kind.premium_rate':
     'خدمات بأسعار إضافية \u2068(tarificación adicional)\u2069: أرقام 80x و90x، ورسائل SMS المميّزة \u2068(premium)\u2069',
-  'client.bills.telecom.charges.kind.third_party':
-    'خدمات أطراف ثالثة ومشتريات محمَّلة على الفاتورة',
+  'client.bills.telecom.charges.kind.third_party': 'خدمات أطراف ثالثة ومشتريات محمَّلة على الفاتورة',
   'client.bills.telecom.charges.kind.handset': 'أقساط جهاز',
   'client.bills.telecom.charges.kind.penalty': 'الغرامات',
   'client.bills.telecom.charges.kind.other': 'مبالغ أخرى محصَّلة',
@@ -5090,8 +5076,7 @@ export const ar: Translation = {
     'لا تشمل هذه المراجعة إلغاء اشتراكك بعد: فالغرامة المتناسبة تسري على حالات الإلغاء منذ 01-01-2022.',
   'client.bills.calculation.tolerance.line':
     'لا يحدّد أي نص قانوني طريقة التقريب: السطر الذي يبعد سنتيمًا واحدًا أو أقل عن الحساب يُعدّ متطابقًا.',
-  'client.bills.calculation.tolerance.total':
-    'في المجموع، يُقبَل فرق يصل إلى سنتيمين بسبب التقريب.',
+  'client.bills.calculation.tolerance.total': 'في المجموع، يُقبَل فرق يصل إلى سنتيمين بسبب التقريب.',
   'client.bills.calculation.readings.both_bases':
     'لا يقول أي نص قانوني ما إذا كانت السنة الكبيسة تُقسَم على 365 أو 366 يومًا: والسطر يتطابق مع أيٍّ من الحسابين.',
   'client.bills.calculation.arithmetic.days':
@@ -5211,8 +5196,7 @@ export const ar: Translation = {
     'مع مقياس القدرة القصوى \u2068(maxímetro)\u2069، يُفوتَر تجاوز القدرة وفق Circular 3/2020 de la CNMC؛ وهذه المراجعة لا تحسبه.',
   'client.bills.calculation.excess.maximeter_unknown':
     'دون معرفة ما إذا كان في عدّادك مقياس للقدرة القصوى \u2068(maxímetro)\u2069 لا يُتحقَّق من تجاوز القدرة.',
-  'client.bills.calculation.service.pvpc':
-    'لا يمكن لفاتورة PVPC أن تحصّل إلا عن التزويد بالكهرباء.',
+  'client.bills.calculation.service.pvpc': 'لا يمكن لفاتورة PVPC أن تحصّل إلا عن التزويد بالكهرباء.',
   'client.bills.calculation.service.requested': 'تقول إنك طلبتها: تُعرَض كمعلومة ولا يُشار إليها.',
   'client.bills.calculation.service.not_requested':
     'لا يمكن تحصيل خدمة بمعزل عن الكهرباء إلا إذا طلبتها، وتقول إنك لم تطلبها.',
@@ -5484,8 +5468,7 @@ export const ar: Translation = {
   'mortgage.default.rates_hint':
     'بالنسبة المئوية سنويًا، كما يقول الصك. إذا كنت لا تعرف، فاتركه فارغًا.',
   'mortgage.termination.question': 'الاستحقاق المبكر \u2068(vencimiento anticipado)\u2069',
-  'mortgage.termination.present':
-    'هل يسمح صكّك للبنك بأن يطلب سداد القرض كاملًا إذا توقفت عن الدفع؟',
+  'mortgage.termination.present': 'هل يسمح صكّك للبنك بأن يطلب سداد القرض كاملًا إذا توقفت عن الدفع؟',
   'mortgage.termination.instalments': 'الأقساط غير المدفوعة التي يشترطها الصك',
   'mortgage.termination.instalments_hint': 'إذا كان لا يذكر ذلك أو كنت لا تعرف، فاتركه فارغًا.',
   'mortgage.opening.question': 'عمولة فتح القرض',
@@ -5604,8 +5587,7 @@ export const ar: Translation = {
   'mortgage.letter.id': 'رقم DNI أو NIE (اختياري)',
   'mortgage.letter.company': 'البنك',
   'mortgage.letter.reference': 'رقم القرض',
-  'mortgage.letter.privacy':
-    'لا تُستخدَم هذه البيانات إلا لملء الرسائل على جهازك؛ لا تُرسَل ولا تُحفَظ.',
+  'mortgage.letter.privacy': 'لا تُستخدَم هذه البيانات إلا لملء الرسائل على جهازك؛ لا تُرسَل ولا تُحفَظ.',
   'client.mortgage.result.lead':
     'كل مصروف وعمولة وبند، مع الحساب الذي يؤدي إليه والنص القانوني أو المعيار الذي يستند إليه. ما يقوله القانون وما يتوقف على قاضٍ يُعرَضان دائمًا كلٌّ على حدة.',
   'client.mortgage.result.lead_unnamed':
@@ -5946,8 +5928,7 @@ export const ar: Translation = {
   'client.mortgage.letter.bank': 'البنك',
   'client.mortgage.letter.reference': 'رقم القرض',
   'client.mortgage.letter.regards': 'مع التحية.',
-  'client.mortgage.letter.about':
-    'أكتب إليكم بشأن قرضي العقاري، المبرَم بالصك المؤرَّخ في {fecha}.',
+  'client.mortgage.letter.about': 'أكتب إليكم بشأن قرضي العقاري، المبرَم بالصك المؤرَّخ في {fecha}.',
   'client.mortgage.letter.documents.title': 'طلب وثائق قرضي العقاري',
   'client.mortgage.letter.documents.ask': 'أطلب منكم نسخة من هذه الوثائق:',
   'client.mortgage.letter.documents.deed': 'صك القرض العقاري.',
@@ -6038,8 +6019,7 @@ export const ar: Translation = {
   'client.mortgage.report.today_cap':
     'الحد الأقصى اليوم: {porcentaje} من رأس المال المسدَّد، أي {importe} عن كل {ejemplo}.',
   'client.mortgage.report.today_nothing': 'الحد الأقصى اليوم: 0 €. لا يمكن تحصيل مقابل تعويضي.',
-  'client.mortgage.report.today_next':
-    'ابتداءً من {fecha}، يصبح الحد الأقصى القانوني {porcentaje}.',
+  'client.mortgage.report.today_next': 'ابتداءً من {fecha}، يصبح الحد الأقصى القانوني {porcentaje}.',
   'client.mortgage.report.flags': 'بنود صكّك',
   'client.mortgage.report.flags_note':
     'ماذا يقول القانون أو المحاكم عن كل بند، مع مصدره، وإذا كان معيارًا للمحاكم، تاريخ وضعه. لا يُقيَّم بندك هنا.',
@@ -6365,8 +6345,7 @@ export const ar: Translation = {
   'credit.pass.claim_title': 'ما هي النقاط وماذا يقول القانون في كل منها',
   'credit.pass.price':
     '4,99 € شاملًا ضريبة القيمة المضافة \u2068(IVA)\u2069. دفعة واحدة، دون حساب ولا اشتراك. يدوم التصريح 7 أيام ولا يصلح إلا في هذا المتصفح، وكذلك لمراجعات الموقع الأخرى: خلال تلك المدة يمكنك إعادة مراجعتك أو تصحيحها وتنزيل التقرير والرسالة مجددًا دون الدفع مرة أخرى. ويضيع إذا استخدمت جهازًا آخر أو نافذة خاصة، أو إذا حذفت بيانات التصفح.',
-  'credit.pass.download_information_letter':
-    'تنزيل الرسالة التي تطلب معلومات ائتمانك (PDF، مجانًا)',
+  'credit.pass.download_information_letter': 'تنزيل الرسالة التي تطلب معلومات ائتمانك (PDF، مجانًا)',
   'credit.pass.download_repayment_letter':
     'تنزيل الرسالة بشأن المقابل التعويضي عن السداد المبكر \u2068(PDF)\u2069',
   'credit.pass.letter_note':
@@ -6378,8 +6357,7 @@ export const ar: Translation = {
   'credit.letter.id': 'رقم DNI أو NIE (اختياري)',
   'credit.letter.company': 'الجهة التي منحتك الائتمان',
   'credit.letter.reference': 'رقم العقد',
-  'credit.letter.privacy':
-    'لا تُستخدَم هذه البيانات إلا لملء الرسائل على جهازك؛ لا تُرسَل ولا تُحفَظ.',
+  'credit.letter.privacy': 'لا تُستخدَم هذه البيانات إلا لملء الرسائل على جهازك؛ لا تُرسَل ولا تُحفَظ.',
   'client.credit.result.lead':
     'كل بند، مع الحساب الذي يؤدّي إليه والنص القانوني أو المعيار الذي يستند إليه. الأيام المتبقية تُحسَب ابتداءً من اليوم.',
   'client.credit.result.lead_out_of_scope': 'هذا الائتمان خارج ما تراجعه هذه الصفحة.',
@@ -6518,8 +6496,7 @@ export const ar: Translation = {
     'لا يُحتسَب قسط التأمين: فهو لا يدخل في تكلفة الائتمان إلا عندما يكون التأمين إلزاميًا للحصول عليه.',
   'client.credit.calculation.apr.balloon_with_last':
     'يُحتسَب القسط النهائي في اليوم نفسه الذي يُدفع فيه القسط الأخير.',
-  'client.credit.calculation.apr.balloon_month_after':
-    'يُحتسَب القسط النهائي بعد القسط الأخير بشهر.',
+  'client.credit.calculation.apr.balloon_month_after': 'يُحتسَب القسط النهائي بعد القسط الأخير بشهر.',
   'client.credit.calculation.apr.total_payable':
     'المبلغ الإجمالي الذي تدفعه، بحسب هذه الأرقام: {euros}.',
   'client.credit.calculation.apr.total_cost':
@@ -6883,8 +6860,7 @@ export const ar: Translation = {
     'لا يذكر الإشعار المكتوب السبب، والنص القانوني يشترط ذكره.',
   'client.household.calculation.termination.in_writing':
     'أُبلغ الإنهاء بإرادة صاحب العمل كتابةً ومع ذكر سببه.',
-  'client.household.calculation.termination.writing_unknown':
-    'لا يُعرَف هل أُبلغ كتابةً ومع ذكر سببه.',
+  'client.household.calculation.termination.writing_unknown': 'لا يُعرَف هل أُبلغ كتابةً ومع ذكر سببه.',
   'client.household.calculation.dismissal.no_written_notice':
     'دون الإبلاغ الكتابي، يفترض النص القانوني أن الأمر فصل \u2068(despido)\u2069 وقد تنطبق قواعده.',
   'client.household.calculation.base.minimum_wage':
@@ -6916,8 +6892,7 @@ export const ar: Translation = {
     'للتعويض حدّ أقصى قدره {months} من الرواتب الشهرية: فيصبح {amount}.',
   'client.household.calculation.severance.not_made_available':
     'لم يوضع تحت تصرفك في الوقت نفسه الذي أُبلغت فيه بانتهاء العلاقة: يعود لك كاملًا.',
-  'client.household.calculation.severance.shortfall':
-    'وُضع تحت تصرفك {offered}: ينقص {difference}.',
+  'client.household.calculation.severance.shortfall': 'وُضع تحت تصرفك {offered}: ينقص {difference}.',
   'client.household.calculation.severance.offered_unknown': 'لا يُعرَف أي مبلغ وُضع تحت تصرفك.',
   'client.household.calculation.severance.salary_unknown': 'دون أجرك النقدي لا يمكن حساب التعويض.',
   'client.household.calculation.severance.prorated_note':
@@ -7199,8 +7174,7 @@ export const ar: Translation = {
   'client.household.total.only_up_to':
     'في القراءة المعتمَدة لا ينقص شيء؛ وفي قراءة أخرى، قد ينقص حتى {maximo}.',
   'client.household.total.none': 'لا توجد مبالغ لجمعها.',
-  'client.household.total.found_without_amount':
-    'ما وُجد لا يحمل مبلغًا يُجمَع: كل نقطة تشرح السبب.',
+  'client.household.total.found_without_amount': 'ما وُجد لا يحمل مبلغًا يُجمَع: كل نقطة تشرح السبب.',
   'client.household.warning.working_time':
     'ساعات عملك تتجاوز الساعات العادية أو أوقات راحتك أقل مما يحدّده النص القانوني. إنه تنبيه: لا يضيف مبالغ.',
   'client.household.warning.holidays':
@@ -7247,8 +7221,7 @@ export const ar: Translation = {
   'client.household.error.too_far_ahead': 'هذا التاريخ بعيد جدًا.',
   'client.household.error.before_start': 'التاريخ يسبق تاريخ البدء.',
   'client.household.error.after_end': 'التاريخ يأتي بعد آخر يوم عمل.',
-  'client.household.error.amount_range':
-    'اكتب مبلغًا معقولًا ودون علامة الطرح؛ والأجر أكبر من صفر.',
+  'client.household.error.amount_range': 'اكتب مبلغًا معقولًا ودون علامة الطرح؛ والأجر أكبر من صفر.',
   'client.household.error.hours_range': 'اكتب عددًا معقولًا من الساعات.',
   'client.household.error.count_range': 'اكتب عددًا صحيحًا معقولًا.',
   'client.household.error.invalid_time': 'اكتب ساعة صالحة.',
@@ -7413,8 +7386,7 @@ export const ar: Translation = {
   'insurance.letter.id': 'DNI أو NIE (اختياري)',
   'insurance.letter.company': 'شركة التأمين',
   'insurance.letter.reference': 'رقم وثيقة التأمين',
-  'insurance.letter.privacy':
-    'تُستخدَم هذه البيانات فقط لملء الرسالة على جهازك؛ لا تُرسَل ولا تُحفَظ.',
+  'insurance.letter.privacy': 'تُستخدَم هذه البيانات فقط لملء الرسالة على جهازك؛ لا تُرسَل ولا تُحفَظ.',
   'client.insurance.result.lead':
     'كل تاريخ مع الحساب الذي يؤدي إليه والنص القانوني الذي يستند إليه. الأيام المتبقية تُحتسَب من اليوم.',
   'client.insurance.result.lead_out_of_scope': 'وثيقة التأمين هذه خارج نطاق ما تراجعه هذه الصفحة.',
