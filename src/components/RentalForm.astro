@@ -3,6 +3,8 @@ import Field from './Field.astro';
 import SelectField from './SelectField.astro';
 import { t, type Key } from '../i18n';
 import type { Lang } from '../i18n/languages';
+import type { Variables } from '../i18n/interpolate';
+import { NORMS } from '../engine/rental/data/norms';
 import { REGION_CODES } from '../engine/rental/types';
 import { RULES } from '../engine/rental/rules';
 import {
@@ -24,7 +26,7 @@ interface Props {
   hidden?: boolean;
 }
 const { lang, hidden = false } = Astro.props;
-const tx = (key: Key) => t(lang, key);
+const tx = (key: Key, vars?: Variables) => t(lang, key, vars);
 
 const yesNo = ['yes', 'no'] as const;
 const yesNoUnknown = ['yes', 'no', 'unknown'] as const;
@@ -130,7 +132,9 @@ const cross = 'M6 6l12 12M18 6 6 18';
       <fieldset class="group" data-field="largeLandlord">
         <legend>{tx('rental.landlord.large')}</legend>
         <p class="hint" id="hint-largeLandlord">
-          {tx('rental.landlord.large_hint')}
+          {tx('rental.landlord.large_hint', {
+            estado: tx(`client.rental.decree_state.${NORMS.rdl29_2026.status}`),
+          })}
         </p>
         <div class="chips">
           {yesNoUnknown.map((value) => (

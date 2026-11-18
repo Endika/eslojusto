@@ -1330,7 +1330,7 @@ export const zh: Translation = {
   'legal_notice.rental.does':
     '将您为常住住房租赁（合同签订于2019年三月6日或之后）支付或已支付的费用与法律允许的范围进行对照：中介费、押金和额外担保、年度涨租、各项费用，以及押金退还及其利息。每一项都注明其所依据的法规、有效期和状态。',
   'legal_notice.rental.pending':
-    '多项租房法规在2026年发生了变化，其中一些尚待西班牙众议院（Congreso）确认（convalidación）。每条规则都会注明其是现行有效、待确认还是已废止。当某个结果取决于一项待确认的法规时，会给出两种计算方式，总额只计入较低的那种；如果取决于一项已被众议院废止的法令，会给出两种计算方式，但不计入总额。',
+    '多项租房法规在2026年发生了变化：西班牙众议院（Congreso）确认了其中一些，废止了另一些。每条规则都会注明其是现行有效、待确认还是已废止。当某个结果取决于一项待确认的法规时，会给出两种计算方式，总额只计入较低的那种；如果取决于一项已被众议院废止的法令，会给出两种计算方式，但不计入总额。',
   'legal_notice.rental.does_not':
     '本工具不评估房屋损坏，也不评估从押金中扣款是否合理；不计算住房紧张地区（zona tensionada）的初始租金上限；不适用各自治区自己的法规；除日期外，不核查续约和提前通知。也不核查季节性租赁、按房间出租、非居住用途或2019年三月6日之前签订的合同。',
   'legal_notice.rental.beta':
@@ -3150,6 +3150,18 @@ export const zh: Translation = {
   'rental.guide.regional.lodging':
     '各自治区可以要求房东将押金存入公共机构（disposición adicional 3.ª LAU）。这是房东对行政部门的义务：不影响您支付的金额。',
   'rental.guide.pages': '指南',
+  'rental.page.rise.example_in_force_capped':
+    '您每月支付{renta}，合同将于{fecha}再满一年。按照最新公布的 IRAV（{irav}），无新约定时的上限为{tope}，而不是{irav}：您的租金最多可以涨到{maximo}。',
+  'rental.page.rise.example_in_force_open':
+    '您每月支付{renta}，合同将于{fecha}再满一年。无新约定时的上限为{tope}或 IRAV，取两者中较低者：按照最新公布的 IRAV（{irav}），您的租金最多可以涨到{maximo}。',
+  'rental.page.rise.after_in_force':
+    '众议院已确认该法令（BOE {fecha}）：适用的是这一种计算，即 Real Decreto-ley 29/2026 的 disposición final 6.ª 中无新约定时的上限。',
+  'rental.page.rise.after_repealed': '众议院已废止该法令：适用第二种计算。',
+  'rental.page.decree.lead_in_force':
+    'Real Decreto-ley 29/2026 自{desde}起生效。众议院已予以确认（BOE {fecha}），因此它不会再失效：只有另一项规范才能改变它。',
+  'rental.page.decree.faq_still_question': '它还会失效吗？',
+  'rental.page.decree.faq_still_answer':
+    '不会。众议院已予以确认（BOE {fecha}）；此后只有另一项规范才能改变它。',
   'rental.page.decree.rise':
     '{decreto}规定，在2027年十二月31日之前，如双方没有新的约定，租金涨幅不得超过2 %（disposición final 6.ª），并且所有合同都适用 IRAV（art. 4.Dos）。',
   'rental.page.decree.zones':
@@ -3235,7 +3247,7 @@ export const zh: Translation = {
   'rental.large.question': '大房东',
   'rental.landlord.large': '您的房东是大房东（gran tenedor）吗？',
   'rental.landlord.large_hint':
-    '大房东是指拥有十处以上住宅用途城市不动产或住宅用途面积超过1.500 m²的人，车位和储藏室不计在内（Ley 12/2023 art. 3.k）；在住房紧张地区，自治区可以将标准降低为五处或以上。自08-10-2026起，待确认的 Real Decreto-ley 29/2026 补充规定：须以产权登记处（Registro de la Propiedad）出具的证明为凭，且一栋楼中每个住宅用途单元都算作一处不动产，即使没有登记分户划分（división horizontal）。仅仅是公司并不够：只有少量房产的公司不是大房东。',
+    '大房东是指拥有十处以上住宅用途城市不动产或住宅用途面积超过1.500 m²的人，车位和储藏室不计在内（Ley 12/2023 art. 3.k）；在住房紧张地区，自治区可以将标准降低为五处或以上。自08-10-2026起，{estado}的 Real Decreto-ley 29/2026 补充规定：须以产权登记处（Registro de la Propiedad）出具的证明为凭，且一栋楼中每个住宅用途单元都算作一处不动产，即使没有登记分户划分（división horizontal）。仅仅是公司并不够：只有少量房产的公司不是大房东。',
   'rental.home.question': '房子在哪里',
   'rental.landlord.region': '自治区',
   'rental.landlord.region_hint': '房子所在的地方。',
@@ -3539,9 +3551,9 @@ export const zh: Translation = {
   'client.rental.out_of_scope.before_2019':
     '此版本不核查2019年三月6日之前签订的合同：这些合同的租金更新适用其他规则。',
   'client.rental.out_of_scope.seasonal':
-    '本核查暂不涵盖季节性租赁合同。对于2026年十月8日起签订的合同，待确认的 Real Decreto-ley 29/2026 规定，未载明真实且可证明的临时性原因的临时合同，按常住住房合同处理。此前签订的合同，在约定期限届满前继续适用当时的规则（《城市租赁法》（Ley de Arrendamientos Urbanos）disposición transitoria 8.ª）。',
+    '本核查暂不涵盖季节性租赁合同。对于2026年十月8日起签订的合同，{estado}的 Real Decreto-ley 29/2026 规定，未载明真实且可证明的临时性原因的临时合同，按常住住房合同处理。此前签订的合同，在约定期限届满前继续适用当时的规则（《城市租赁法》（Ley de Arrendamientos Urbanos）disposición transitoria 8.ª）。',
   'client.rental.out_of_scope.room':
-    '本核查暂不涵盖按房间出租。Real Decreto-ley 29/2026 自2026年十月8日起生效，尚待确认，它将按房间出租纳入住房租赁，并根据其满足的需求分为常住或临时租赁。',
+    '本核查暂不涵盖按房间出租。Real Decreto-ley 29/2026 自2026年十月8日起生效，{estado}，它将按房间出租纳入住房租赁，并根据其满足的需求分为常住或临时租赁。',
   'client.rental.out_of_scope.other_use': '非住房用途的合同有其自身的规则。',
   'client.rental.out_of_scope.protected': '保障性住房有其最高租金和自身的规则。',
   'client.rental.out_of_scope.old_rent': '旧租金合同（renta antigua）适用其他规则。',
@@ -3618,6 +3630,9 @@ export const zh: Translation = {
   'client.rental.share.out': '只要该不确定因素尚未解决，就不计入总额。',
   'client.rental.share.lowest': '总额只计入较低的计算方式：{importe}。',
   'client.rental.hint.company_landlord': '您的合同中房东是一家公司：可能是大房东。',
+  'client.rental.decree_state.pending_validation': '待确认',
+  'client.rental.decree_state.in_force': '已获众议院确认',
+  'client.rental.decree_state.repealed': '已被众议院废止',
   'client.rental.norm.in_force': '现行有效',
   'client.rental.norm.pending_validation': '待确认',
   'client.rental.norm.repealed': '已于{fecha}废止',
@@ -3648,7 +3663,7 @@ export const zh: Translation = {
     '如果房屋位于住房紧张地区，起始租金可能有上限（art. 17.6 y 17.7 LAU）。这些地区由各自治区宣布；参考价格见 SERPAVI。',
   'client.rental.info.reference_price.title': '参考价格',
   'client.rental.info.reference_price.text':
-    '对于2026年十月8日至2027年十二月31日之间的租金更新，待确认的 Real Decreto-ley 29/2026 规定，如果租金超过参考指数系统对其适用的价格上限，则不得上涨；该法令没有说明这一上限适用于哪些情况。本核查不计算这一上限；价格见 SERPAVI。',
+    '对于2026年十月8日至2027年十二月31日之间的租金更新，{estado}的 Real Decreto-ley 29/2026 规定，如果租金超过参考指数系统对其适用的价格上限，则不得上涨；该法令没有说明这一上限适用于哪些情况。本核查不计算这一上限；价格见 SERPAVI。',
   'client.rental.info.minimum_term.title': '您的合同到什么时候',
   'client.rental.info.minimum_term.text':
     '您的合同于{contractEnd}到期。加上强制延期，您的最短租期于{mandatoryEnd}届满。',
@@ -3657,10 +3672,10 @@ export const zh: Translation = {
     '如果双方都没有按时通知（房东须在{landlordBy}之前，您须在{tenantBy}之前），合同将逐年延续，直至{tacitUntil}。',
   'client.rental.info.extensions_rdl28.title': '2026年十一月15日起的延期',
   'client.rental.info.extensions_rdl28.text':
-    '待确认的 Real Decreto-ley 28/2026 自2026年十一月15日起改变了延期规则。您的最短租期于{mandatoryEnd}届满。',
+    '{estado}的 Real Decreto-ley 28/2026 自2026年十一月15日起改变了延期规则。您的最短租期于{mandatoryEnd}届满。',
   'client.rental.info.extension_rdl29.title': '特别延期',
   'client.rental.info.extension_rdl29.text':
-    '待确认的 Real Decreto-ley 29/2026 规定，强制延期、默示延期或默示续租（tácita reconducción）在{from}至{until}之间届满的合同，可以进行特别延期。',
+    '{estado}的 Real Decreto-ley 29/2026 规定，强制延期、默示延期或默示续租（tácita reconducción）在{from}至{until}之间届满的合同，可以进行特别延期。',
   'client.rental.info.deposit_lodging.title': '押金存放',
   'client.rental.info.deposit_lodging.text':
     '房东将押金存入自治区规定的机构（disposición adicional 3.ª LAU）。',
@@ -5614,7 +5629,9 @@ export const zh: Translation = {
   'client.mortgage.calculation.information.prior_step_439bis':
     '自03-04-2025起，在因房贷条款诉诸法院之前，法律规定了一个具体的前置程序（《民事诉讼法》（Ley de Enjuiciamiento Civil）art. 439 bis）。链接中是该法律的原文。',
   'client.mortgage.calculation.information.loan_assignment':
-    '自08-10-2026起，Real Decreto-ley 29/2026 在该法中增加了 art. 25 bis：如果银行将您的贷款转让给他人，您对原银行可以提出的主张，对新的债权人同样可以提出；而且须将转让情况告知您，除非银行经与新债权人约定，继续提供该贷款的相关服务（art. 25 bis.3）。该法令尚待众议院确认（convalidación）。',
+    '自08-10-2026起，Real Decreto-ley 29/2026 在该法中增加了 art. 25 bis：如果银行将您的贷款转让给他人，您对原银行可以提出的主张，对新的债权人同样可以提出；而且须将转让情况告知您，除非银行经与新债权人约定，继续提供该贷款的相关服务（art. 25 bis.3）。',
+  'client.mortgage.calculation.information.loan_assignment_pending':
+    '该法令尚待众议院确认（convalidación）。',
   'client.mortgage.calculation.information.complaints_service':
     '西班牙银行（Banco de España）的投诉服务处（Servicio de Reclamaciones）受理有关银行的咨询和投诉（Ley 44/2002 的 art. 30），公共消费者服务机构也免费提供信息。',
   'client.mortgage.info.fein_timing': '签订公证契约之前的信息',

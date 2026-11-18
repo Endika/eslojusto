@@ -1,11 +1,11 @@
-// source: 1797cd736446
+// source: e20a98d7779a
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
 import { checkCharges } from '../../engine/rental/charges';
 import { checkGuarantees } from '../../engine/rental/guarantees';
 import type { ItemReading, ItemResult } from '../../engine/rental/item';
-import type { NormTable } from '../../engine/rental/norms';
+import type { Norm, NormTable } from '../../engine/rental/norms';
 import { ruleSource, type RuleId } from '../../engine/rental/rules';
 import { RENTAL_TABLES } from '../../engine/rental/data/tables';
 import { NORMS } from '../../engine/rental/data/norms';
@@ -77,7 +77,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     crumb: 'Decret del lloguer 2026',
     title: 'Real Decreto-ley 29/2026 del lloguer: què canvia',
     description:
-      'Què canvia per al llogater amb el Real Decreto-ley 29/2026 i en quin estat és: en vigor des del 8 d’octubre, pendent de convalidació.',
+      'Què canvia per al llogater amb el Real Decreto-ley 29/2026: en vigor des del 8 d’octubre de 2026 i convalidat pel Congrés el 12 de novembre.',
     h1: 'Real Decreto-ley 29/2026 del lloguer: què canvia i en quin estat és',
   },
   fees: {
@@ -313,6 +313,7 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
   const decree = norms.rdl29_2026;
   const decreeEve = formatLongDay(toIso(addDays(parseDate(decree.inForceSince), -1)), 'ca');
   const since = formatLongDay(decree.inForceSince, 'ca');
+  const validatedOn = decree.statusSince ? formatLongDay(decree.statusSince, 'ca') : '';
   const caps = capsCopy('ca', norms, {
     checkedOn,
     iravRate: ctx.irav,
@@ -326,17 +327,38 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const { rent, anniversary } = RISE_EXAMPLE;
     const raise = (rate: number) => round2((rent * (100 + rate)) / 100);
     const capped = ctx.irav > DECREE_CAP;
-    const exampleDecree = capped
-      ? `Pagues ${formatEuros(rent)} al mes i el teu contracte compleix un any més el dia ${formatLongDay(anniversary, 'ca')}. ` +
-        `Amb l’últim IRAV publicat (${formatRate(ctx.irav)}), si regeix el Real Decreto-ley 29/2026, el límit sense un nou pacte ` +
-        `és un ${pct(DECREE_CAP)}, no un ${formatRate(ctx.irav)}: la teva renda pot passar a ${formatEuros(raise(DECREE_CAP))} com a màxim.`
-      : `Pagues ${formatEuros(rent)} al mes i el teu contracte compleix un any més el dia ${formatLongDay(anniversary, 'ca')}. ` +
-        `Si regeix el Real Decreto-ley 29/2026, el límit sense un nou pacte és un ${pct(DECREE_CAP)} o l’IRAV, el més baix: ` +
-        `amb l’últim IRAV publicat (${formatRate(ctx.irav)}), la teva renda pot passar a ${formatEuros(raise(ctx.irav))} com a màxim.`;
+    const validated = decree.status === 'in_force';
+    const exampleVars = {
+      renta: formatEuros(rent),
+      fecha: formatLongDay(anniversary, 'ca'),
+      irav: formatRate(ctx.irav),
+      tope: pct(DECREE_CAP),
+      maximo: formatEuros(raise(capped ? DECREE_CAP : ctx.irav)),
+    };
+    const exampleDecree = validated
+      ? tx(
+          capped
+            ? 'rental.page.rise.example_in_force_capped'
+            : 'rental.page.rise.example_in_force_open',
+          exampleVars,
+        )
+      : capped
+        ? `Pagues ${formatEuros(rent)} al mes i el teu contracte compleix un any més el dia ${formatLongDay(anniversary, 'ca')}. ` +
+          `Amb l’últim IRAV publicat (${formatRate(ctx.irav)}), si regeix el Real Decreto-ley 29/2026, el límit sense un nou pacte ` +
+          `és un ${pct(DECREE_CAP)}, no un ${formatRate(ctx.irav)}: la teva renda pot passar a ${formatEuros(raise(DECREE_CAP))} com a màxim.`
+        : `Pagues ${formatEuros(rent)} al mes i el teu contracte compleix un any més el dia ${formatLongDay(anniversary, 'ca')}. ` +
+          `Si regeix el Real Decreto-ley 29/2026, el límit sense un nou pacte és un ${pct(DECREE_CAP)} o l’IRAV, el més baix: ` +
+          `amb l’últim IRAV publicat (${formatRate(ctx.irav)}), la teva renda pot passar a ${formatEuros(raise(ctx.irav))} com a màxim.`;
     const exampleNoDecree =
       `Si el Congrés derogués el decret, el límit en un contracte signat des del 26 de maig de 2023 tornaria a ser l’IRAV o l’IPC, el més baix. ` +
       `Amb l’últim IRAV publicat (${formatRate(ctx.irav)}), serien ${formatEuros(raise(ctx.irav))} com a màxim, ` +
       `sempre que l’IPC no fos més baix. L’IRAV que compta és l’últim publicat en data ${formatLongDay(anniversary, 'ca')}, que encara no existeix.`;
+    const afterExample: Record<Norm['status'], string> = {
+      pending_validation:
+        'Mentre el decret estigui pendent de convalidació, tots dos càlculs són possibles: el primer si el Congrés el convalida i el segon si el deroga.',
+      in_force: tx('rental.page.rise.after_in_force', { fecha: validatedOn }),
+      repealed: tx('rental.page.rise.after_repealed'),
+    };
     return {
       lead: 'La pujada depèn de tres coses: que el contracte la pacti, el dia en què es compleix cada any de contracte i el límit legal d’aquell dia. Aquí tens els límits, un per un i amb el seu article.',
       sections: [
@@ -365,10 +387,8 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           id: 'ejemplo',
           heading: 'Exemple resolt',
           paragraphs: [],
-          example: [exampleDecree, exampleNoDecree],
-          after: [
-            'Mentre el decret estigui pendent de convalidació, tots dos càlculs són possibles: el primer si el Congrés el convalida i el segon si el deroga.',
-          ],
+          example: validated ? [exampleDecree] : [exampleDecree, exampleNoDecree],
+          after: [afterExample[decree.status]],
           folio: { article: '18', law: 'LAU · RDL 29/2026' },
         },
       ],
@@ -383,11 +403,15 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'Em poden apujar el lloguer si el contracte no diu res?',
           answer: tx('rent_indices.faq.no_clause_answer', { decretos: caps.faqNoClause }),
         },
-        {
-          anchor: 'faq-pendiente',
-          question: 'Què vol dir «pendent de convalidació»?',
-          answer: `${caps.status} Fins que el Congrés voti, una pujada d’un ${pct(DECREE_CAP)} i la de l’IRAV o l’IPC són els dos càlculs possibles.`,
-        },
+        ...(decree.status === 'pending_validation'
+          ? [
+              {
+                anchor: 'faq-pendiente',
+                question: 'Què vol dir «pendent de convalidació»?',
+                answer: `${caps.status} Fins que el Congrés voti, una pujada d’un ${pct(DECREE_CAP)} i la de l’IRAV o l’IPC són els dos càlculs possibles.`,
+              },
+            ]
+          : []),
         {
           anchor: 'faq-irav-o-ipc',
           question: 'Em correspon l’IRAV o l’IPC?',
@@ -414,8 +438,11 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const point = (key: Key, vars?: Record<string, string>) =>
       standing ? tx(key, { ...vars, decreto: 'el decret' }) : sentence(key, vars);
     const status = caps.status;
+    const validated = decree.status === 'in_force';
     return {
-      lead: `El Real Decreto-ley 29/2026 regeix des de ${since}. Un decret llei entra en vigor quan ell mateix ho diu (aquest, l’endemà de publicar-se), però decau si el Congrés no el convalida en 30 dies: per això cal mirar sempre en quin estat és.`,
+      lead: validated
+        ? tx('rental.page.decree.lead_in_force', { desde: since, fecha: validatedOn })
+        : `El Real Decreto-ley 29/2026 regeix des de ${since}. Un decret llei entra en vigor quan ell mateix ho diu (aquest, l’endemà de publicar-se), però decau si el Congrés no el convalida en 30 dies: per això cal mirar sempre en quin estat és.`,
       sections: [
         {
           id: 'estado',
@@ -463,11 +490,17 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'El decret està en vigor?',
           answer: status,
         },
-        {
-          anchor: 'faq-derogado',
-          question: 'Què passa si el Congrés no el convalida?',
-          answer: `Queda derogat i deixa d’aplicar-se des d’aquell dia; el que va passar mentre va regir és un cas dubtós. ${tx('rental.guide.update.doubtful')}`,
-        },
+        validated
+          ? {
+              anchor: 'faq-puede-caer',
+              question: tx('rental.page.decree.faq_still_question'),
+              answer: tx('rental.page.decree.faq_still_answer', { fecha: validatedOn }),
+            }
+          : {
+              anchor: 'faq-derogado',
+              question: 'Què passa si el Congrés no el convalida?',
+              answer: `Queda derogat i deixa d’aplicar-se des d’aquell dia; el que va passar mentre va regir és un cas dubtós. ${tx('rental.guide.update.doubtful')}`,
+            },
         {
           anchor: 'faq-anteriores',
           question: 'Quins decrets anteriors van caure?',

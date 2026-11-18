@@ -1,11 +1,11 @@
-// source: 1797cd736446
+// source: e20a98d7779a
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
 import { checkCharges } from '../../engine/rental/charges';
 import { checkGuarantees } from '../../engine/rental/guarantees';
 import type { ItemReading, ItemResult } from '../../engine/rental/item';
-import type { NormTable } from '../../engine/rental/norms';
+import type { Norm, NormTable } from '../../engine/rental/norms';
 import { ruleSource, type RuleId } from '../../engine/rental/rules';
 import { RENTAL_TABLES } from '../../engine/rental/data/tables';
 import { NORMS } from '../../engine/rental/data/norms';
@@ -76,7 +76,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     crumb: '2026年租房法令',
     title: 'Real Decreto-ley 29/2026（租房）：有哪些变化',
     description:
-      'Real Decreto-ley 29/2026 给租客带来了哪些变化，以及它目前的状态：自十月8日起生效，待众议院确认（convalidación）。',
+      'Real Decreto-ley 29/2026 给租客带来了哪些变化：自2026年十月8日起生效，并已于十一月12日获众议院确认（convalidación）。',
     h1: 'Real Decreto-ley 29/2026（租房）：有哪些变化，目前处于什么状态',
   },
   fees: {
@@ -311,6 +311,7 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
   const decree = norms.rdl29_2026;
   const decreeEve = formatLongDay(toIso(addDays(parseDate(decree.inForceSince), -1)), 'zh');
   const since = formatLongDay(decree.inForceSince, 'zh');
+  const validatedOn = decree.statusSince ? formatLongDay(decree.statusSince, 'zh') : '';
   const caps = capsCopy('zh', norms, {
     checkedOn,
     iravRate: ctx.irav,
@@ -324,17 +325,38 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const { rent, anniversary } = RISE_EXAMPLE;
     const raise = (rate: number) => round2((rent * (100 + rate)) / 100);
     const capped = ctx.irav > DECREE_CAP;
-    const exampleDecree = capped
-      ? `您每月支付${formatEuros(rent)}，合同将于${formatLongDay(anniversary, 'zh')}再满一年。` +
-        `按照最新公布的 IRAV（${formatRate(ctx.irav)}），如果 Real Decreto-ley 29/2026 适用，无新约定时的上限` +
-        `为${pct(DECREE_CAP)}，而不是${formatRate(ctx.irav)}：您的租金最多可以涨到${formatEuros(raise(DECREE_CAP))}。`
-      : `您每月支付${formatEuros(rent)}，合同将于${formatLongDay(anniversary, 'zh')}再满一年。` +
-        `如果 Real Decreto-ley 29/2026 适用，无新约定时的上限为${pct(DECREE_CAP)}或 IRAV，取两者中较低者：` +
-        `按照最新公布的 IRAV（${formatRate(ctx.irav)}），您的租金最多可以涨到${formatEuros(raise(ctx.irav))}。`;
+    const validated = decree.status === 'in_force';
+    const exampleVars = {
+      renta: formatEuros(rent),
+      fecha: formatLongDay(anniversary, 'zh'),
+      irav: formatRate(ctx.irav),
+      tope: pct(DECREE_CAP),
+      maximo: formatEuros(raise(capped ? DECREE_CAP : ctx.irav)),
+    };
+    const exampleDecree = validated
+      ? tx(
+          capped
+            ? 'rental.page.rise.example_in_force_capped'
+            : 'rental.page.rise.example_in_force_open',
+          exampleVars,
+        )
+      : capped
+        ? `您每月支付${formatEuros(rent)}，合同将于${formatLongDay(anniversary, 'zh')}再满一年。` +
+          `按照最新公布的 IRAV（${formatRate(ctx.irav)}），如果 Real Decreto-ley 29/2026 适用，无新约定时的上限` +
+          `为${pct(DECREE_CAP)}，而不是${formatRate(ctx.irav)}：您的租金最多可以涨到${formatEuros(raise(DECREE_CAP))}。`
+        : `您每月支付${formatEuros(rent)}，合同将于${formatLongDay(anniversary, 'zh')}再满一年。` +
+          `如果 Real Decreto-ley 29/2026 适用，无新约定时的上限为${pct(DECREE_CAP)}或 IRAV，取两者中较低者：` +
+          `按照最新公布的 IRAV（${formatRate(ctx.irav)}），您的租金最多可以涨到${formatEuros(raise(ctx.irav))}。`;
     const exampleNoDecree =
       `如果众议院废止该法令，2023年五月26日起签订的合同的上限将重新为 IRAV 和 IPC 中较低者。` +
       `按照最新公布的 IRAV（${formatRate(ctx.irav)}），最多为${formatEuros(raise(ctx.irav))}，` +
       `前提是 IPC 不更低。适用的 IRAV 是截至${formatLongDay(anniversary, 'zh')}最新公布的那一个，目前尚未公布。`;
+    const afterExample: Record<Norm['status'], string> = {
+      pending_validation:
+        '在该法令待众议院确认期间，两种计算都有可能：众议院予以确认则为第一种，予以废止则为第二种。',
+      in_force: tx('rental.page.rise.after_in_force', { fecha: validatedOn }),
+      repealed: tx('rental.page.rise.after_repealed'),
+    };
     return {
       lead: '涨租取决于三件事：合同是否约定涨租、合同每满一年的日期，以及当天的法定上限。以下逐项列出各项上限及其条款。',
       sections: [
@@ -363,10 +385,8 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           id: 'ejemplo',
           heading: '计算示例',
           paragraphs: [],
-          example: [exampleDecree, exampleNoDecree],
-          after: [
-            '在该法令待众议院确认期间，两种计算都有可能：众议院予以确认则为第一种，予以废止则为第二种。',
-          ],
+          example: validated ? [exampleDecree] : [exampleDecree, exampleNoDecree],
+          after: [afterExample[decree.status]],
           folio: { article: '18', law: 'LAU · RDL 29/2026' },
         },
       ],
@@ -381,11 +401,15 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: '如果合同中什么都没写，房东可以给我涨租吗？',
           answer: tx('rent_indices.faq.no_clause_answer', { decretos: caps.faqNoClause }),
         },
-        {
-          anchor: 'faq-pendiente',
-          question: '“待众议院确认”（pendiente de convalidación）是什么意思？',
-          answer: `${caps.status}在众议院表决之前，${pct(DECREE_CAP)}的涨幅和按 IRAV 或 IPC 计算的涨幅是两种可能的计算方式。`,
-        },
+        ...(decree.status === 'pending_validation'
+          ? [
+              {
+                anchor: 'faq-pendiente',
+                question: '“待众议院确认”（pendiente de convalidación）是什么意思？',
+                answer: `${caps.status}在众议院表决之前，${pct(DECREE_CAP)}的涨幅和按 IRAV 或 IPC 计算的涨幅是两种可能的计算方式。`,
+              },
+            ]
+          : []),
         {
           anchor: 'faq-irav-o-ipc',
           question: '我适用 IRAV 还是 IPC？',
@@ -412,8 +436,11 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const point = (key: Key, vars?: Record<string, string>) =>
       standing ? tx(key, { ...vars, decreto: '该法令' }) : sentence(key, vars);
     const status = caps.status;
+    const validated = decree.status === 'in_force';
     return {
-      lead: `Real Decreto-ley 29/2026 自${since}起生效。王室法令（decreto-ley）在其自身规定的日期生效（这一部是在公布后的第二天），但如果众议院未在30天内予以确认，就会失效：因此始终需要留意它处于什么状态。`,
+      lead: validated
+        ? tx('rental.page.decree.lead_in_force', { desde: since, fecha: validatedOn })
+        : `Real Decreto-ley 29/2026 自${since}起生效。王室法令（decreto-ley）在其自身规定的日期生效（这一部是在公布后的第二天），但如果众议院未在30天内予以确认，就会失效：因此始终需要留意它处于什么状态。`,
       sections: [
         {
           id: 'estado',
@@ -461,11 +488,17 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: '该法令现在有效吗？',
           answer: status,
         },
-        {
-          anchor: 'faq-derogado',
-          question: '如果众议院不予确认会怎样？',
-          answer: `该法令即被废止，从那天起不再适用；在其有效期间发生的情况属于存疑情况。${tx('rental.guide.update.doubtful')}`,
-        },
+        validated
+          ? {
+              anchor: 'faq-puede-caer',
+              question: tx('rental.page.decree.faq_still_question'),
+              answer: tx('rental.page.decree.faq_still_answer', { fecha: validatedOn }),
+            }
+          : {
+              anchor: 'faq-derogado',
+              question: '如果众议院不予确认会怎样？',
+              answer: `该法令即被废止，从那天起不再适用；在其有效期间发生的情况属于存疑情况。${tx('rental.guide.update.doubtful')}`,
+            },
         {
           anchor: 'faq-anteriores',
           question: '此前有哪些法令被废止？',

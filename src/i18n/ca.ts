@@ -1425,7 +1425,7 @@ export const ca: Translation = {
   'legal_notice.rental.does':
     'Compara el que pagues o has pagat per un lloguer d’habitatge habitual, amb contracte signat des del 6 de març de 2019, amb el que permet la llei: honoraris de l’agència, fiança i garanties, pujades anuals, despeses i devolució de la fiança amb els seus interessos. Cada partida porta la norma d’on surt, amb la seva vigència i el seu estat.',
   'legal_notice.rental.pending':
-    'Diverses normes del lloguer van canviar el 2026, i algunes estan pendents que el Congrés les convalidi. Cada regla diu si està en vigor, pendent de convalidació o derogada. Quan un resultat depèn d’una norma pendent, dona els dos càlculs i el total només suma el més baix; si depèn d’un decret que el Congrés va derogar, dona els dos càlculs i no la suma.',
+    'Diverses normes del lloguer van canviar el 2026: el Congrés en va convalidar unes i en va derogar unes altres. Cada regla diu si està en vigor, pendent de convalidació o derogada. Quan un resultat depèn d’una norma pendent, dona els dos càlculs i el total només suma el més baix; si depèn d’un decret que el Congrés va derogar, dona els dos càlculs i no la suma.',
   'legal_notice.rental.does_not':
     'No valora desperfectes ni si un descompte de la fiança és procedent, no calcula el límit de la renda inicial a les zones tensionades, no aplica les normes pròpies de cada comunitat autònoma i no comprova pròrrogues ni preavisos més enllà de les seves dates. Tampoc no revisa contractes de temporada, per habitacions, per a un altre ús ni signats abans del 6 de març de 2019.',
   'legal_notice.rental.beta':
@@ -3346,6 +3346,18 @@ export const ca: Translation = {
   'rental.guide.regional.lodging':
     'Les comunitats poden obligar el propietari a dipositar la fiança en un organisme públic (disposició addicional 3.ª LAU). És una obligació del propietari amb l’administració: no canvia el que pagues.',
   'rental.guide.pages': 'Guies',
+  'rental.page.rise.example_in_force_capped':
+    'Pagues {renta} al mes i el teu contracte compleix un any més el dia {fecha}. Amb l’últim IRAV publicat ({irav}), el límit sense un nou pacte és un {tope}, no un {irav}: la teva renda pot passar a {maximo} com a màxim.',
+  'rental.page.rise.example_in_force_open':
+    'Pagues {renta} al mes i el teu contracte compleix un any més el dia {fecha}. El límit sense un nou pacte és un {tope} o l’IRAV, el més baix: amb l’últim IRAV publicat ({irav}), la teva renda pot passar a {maximo} com a màxim.',
+  'rental.page.rise.after_in_force':
+    'El Congrés va convalidar el decret (BOE del {fecha}): aquest és el càlcul que s’aplica, amb el límit sense un nou pacte de la disposició final 6.ª del Real Decreto-ley 29/2026.',
+  'rental.page.rise.after_repealed': 'El Congrés va derogar el decret: s’aplica el segon càlcul.',
+  'rental.page.decree.lead_in_force':
+    'El Real Decreto-ley 29/2026 regeix des de {desde}. El Congrés el va convalidar (BOE del {fecha}), així que ja no pot decaure: només una altra norma el pot canviar.',
+  'rental.page.decree.faq_still_question': 'Pot decaure encara?',
+  'rental.page.decree.faq_still_answer':
+    'No. El Congrés el va convalidar (BOE del {fecha}); des d’aleshores només una altra norma el pot canviar.',
   'rental.page.decree.rise':
     '{decreto} diu que, fins al 31 de desembre de 2027 i sense un nou pacte entre les parts, la renda no pot pujar més del 2 % (disposició final 6.ª), i que l’IRAV regeix en tots els contractes (art. 4.Dos).',
   'rental.page.decree.zones':
@@ -3434,7 +3446,7 @@ export const ca: Translation = {
   'rental.large.question': 'Gran tenidor',
   'rental.landlord.large': 'El teu propietari és gran tenidor?',
   'rental.landlord.large_hint':
-    'És gran tenidor qui té més de deu immobles urbans d’ús residencial o més de 1.500 m² d’ús residencial, sense comptar garatges ni trasters (art. 3.k de la Ley 12/2023); en una zona tensionada, la comunitat autònoma pot rebaixar-ho a cinc o més immobles. Des del 08-10-2026, el Real Decreto-ley 29/2026, pendent de convalidació, afegeix que s’acredita amb una certificació del Registro de la Propiedad i que cada unitat d’ús residencial d’un edifici compta com un immoble, encara que no hi hagi divisió horitzontal inscrita. No n’hi ha prou amb ser una empresa: una societat amb pocs pisos no ho és.',
+    'És gran tenidor qui té més de deu immobles urbans d’ús residencial o més de 1.500 m² d’ús residencial, sense comptar garatges ni trasters (art. 3.k de la Ley 12/2023); en una zona tensionada, la comunitat autònoma pot rebaixar-ho a cinc o més immobles. Des del 08-10-2026, el Real Decreto-ley 29/2026, {estado}, afegeix que s’acredita amb una certificació del Registro de la Propiedad i que cada unitat d’ús residencial d’un edifici compta com un immoble, encara que no hi hagi divisió horitzontal inscrita. No n’hi ha prou amb ser una empresa: una societat amb pocs pisos no ho és.',
   'rental.home.question': 'On és l’habitatge',
   'rental.landlord.region': 'Comunitat autònoma',
   'rental.landlord.region_hint': 'On és l’habitatge.',
@@ -3759,9 +3771,9 @@ export const ca: Translation = {
   'client.rental.out_of_scope.before_2019':
     'Aquesta versió no revisa contractes signats abans del 6 de març de 2019: segueixen altres regles per actualitzar la renda.',
   'client.rental.out_of_scope.seasonal':
-    'Aquesta revisió encara no cobreix els contractes de temporada. En els signats des del 8 d’octubre de 2026, el Real Decreto-ley 29/2026, pendent de convalidació, tracta com d’habitatge habitual el contracte temporal que no recull una causa de temporalitat real i acreditable. Els signats abans continuen amb les regles d’aleshores fins que s’acaba el termini pactat (disposició transitòria 8.ª de la Ley de Arrendamientos Urbanos).',
+    'Aquesta revisió encara no cobreix els contractes de temporada. En els signats des del 8 d’octubre de 2026, el Real Decreto-ley 29/2026, {estado}, tracta com d’habitatge habitual el contracte temporal que no recull una causa de temporalitat real i acreditable. Els signats abans continuen amb les regles d’aleshores fins que s’acaba el termini pactat (disposició transitòria 8.ª de la Ley de Arrendamientos Urbanos).',
   'client.rental.out_of_scope.room':
-    'Aquesta revisió encara no cobreix els lloguers per habitacions. El Real Decreto-ley 29/2026, en vigor des del 8 d’octubre de 2026 i pendent de convalidació, els inclou en el lloguer d’habitatge, habitual o temporal segons la necessitat que cobreixin.',
+    'Aquesta revisió encara no cobreix els lloguers per habitacions. El Real Decreto-ley 29/2026, en vigor des del 8 d’octubre de 2026 i {estado}, els inclou en el lloguer d’habitatge, habitual o temporal segons la necessitat que cobreixin.',
   'client.rental.out_of_scope.other_use':
     'Un contracte per a un ús diferent del d’habitatge té les seves pròpies regles.',
   'client.rental.out_of_scope.protected':
@@ -3849,6 +3861,9 @@ export const ca: Translation = {
   'client.rental.share.lowest': 'Al total només se suma el càlcul més baix: {importe}.',
   'client.rental.hint.company_landlord':
     'Al teu contracte el propietari és una empresa: pot ser gran tenidor.',
+  'client.rental.decree_state.pending_validation': 'pendent de convalidació',
+  'client.rental.decree_state.in_force': 'convalidat pel Congrés',
+  'client.rental.decree_state.repealed': 'derogat pel Congrés',
   'client.rental.norm.in_force': 'en vigor',
   'client.rental.norm.pending_validation': 'pendent de convalidació',
   'client.rental.norm.repealed': 'derogada en data {fecha}',
@@ -3879,7 +3894,7 @@ export const ca: Translation = {
     'Si l’habitatge és en una zona tensionada, la renda inicial pot tenir límit (art. 17.6 i 17.7 LAU). Les zones les declara cada comunitat; el preu de referència és al SERPAVI.',
   'client.rental.info.reference_price.title': 'Preu de referència',
   'client.rental.info.reference_price.text':
-    'En les actualitzacions del 8 d’octubre de 2026 al 31 de desembre de 2027, el Real Decreto-ley 29/2026, pendent de convalidació, diu que no es pot aplicar cap pujada si la renda supera el límit de preu que li sigui aplicable segons el sistema d’índexs de referència; no diu en quins casos s’aplica aquest límit. Aquesta revisió no el calcula; el preu és al SERPAVI.',
+    'En les actualitzacions del 8 d’octubre de 2026 al 31 de desembre de 2027, el Real Decreto-ley 29/2026, {estado}, diu que no es pot aplicar cap pujada si la renda supera el límit de preu que li sigui aplicable segons el sistema d’índexs de referència; no diu en quins casos s’aplica aquest límit. Aquesta revisió no el calcula; el preu és al SERPAVI.',
   'client.rental.info.minimum_term.title': 'Fins quan dura el teu contracte',
   'client.rental.info.minimum_term.text':
     'El teu contracte s’acaba en data {contractEnd}. Amb la pròrroga obligatòria, el teu termini mínim s’acaba en data {mandatoryEnd}.',
@@ -3888,10 +3903,10 @@ export const ca: Translation = {
     'Si ningú no avisa a temps (el propietari, fins a {landlordBy}; tu, fins a {tenantBy}), el contracte continua any rere any fins a {tacitUntil}.',
   'client.rental.info.extensions_rdl28.title': 'Pròrrogues des del 15 de novembre de 2026',
   'client.rental.info.extensions_rdl28.text':
-    'El Real Decreto-ley 28/2026, pendent de convalidació, canvia les pròrrogues des del 15 de novembre de 2026. El teu termini mínim s’acaba en data {mandatoryEnd}.',
+    'El Real Decreto-ley 28/2026, {estado}, canvia les pròrrogues des del 15 de novembre de 2026. El teu termini mínim s’acaba en data {mandatoryEnd}.',
   'client.rental.info.extension_rdl29.title': 'Pròrroga extraordinària',
   'client.rental.info.extension_rdl29.text':
-    'El Real Decreto-ley 29/2026, pendent de convalidació, preveu una pròrroga extraordinària per als contractes la pròrroga obligatòria, pròrroga tàcita o tàcita reconducció dels quals s’acaba entre {from} i {until}.',
+    'El Real Decreto-ley 29/2026, {estado}, preveu una pròrroga extraordinària per als contractes la pròrroga obligatòria, pròrroga tàcita o tàcita reconducció dels quals s’acaba entre {from} i {until}.',
   'client.rental.info.deposit_lodging.title': 'Dipòsit de la fiança',
   'client.rental.info.deposit_lodging.text':
     'El propietari diposita la fiança a l’organisme de la comunitat autònoma que ho prevegi (disposició addicional 3.ª LAU).',
@@ -5963,7 +5978,9 @@ export const ca: Translation = {
   'client.mortgage.calculation.information.prior_step_439bis':
     'Des del 03-04-2025, la llei regula un pas previ concret abans d’anar a un jutjat per clàusules d’una hipoteca (art. 439 bis de la Ley de Enjuiciamiento Civil). A l’enllaç tens el text de la llei.',
   'client.mortgage.calculation.information.loan_assignment':
-    'Des del 08-10-2026, el Real Decreto-ley 29/2026 afegeix a la llei un art. 25 bis: si el banc cedeix el teu préstec a un altre, conserves davant del nou titular el que podies oposar al banc, i se t’ha d’informar de la cessió llevat que el banc, d’acord amb el nou titular, continuï prestant els serveis del préstec (art. 25 bis.3). Està pendent de convalidació.',
+    'Des del 08-10-2026, el Real Decreto-ley 29/2026 afegeix a la llei un art. 25 bis: si el banc cedeix el teu préstec a un altre, conserves davant del nou titular el que podies oposar al banc, i se t’ha d’informar de la cessió llevat que el banc, d’acord amb el nou titular, continuï prestant els serveis del préstec (art. 25 bis.3).',
+  'client.mortgage.calculation.information.loan_assignment_pending':
+    'Està pendent de convalidació.',
   'client.mortgage.calculation.information.complaints_service':
     'El Servicio de Reclamaciones del Banco de España atén consultes i queixes sobre bancs (art. 30 de la Ley 44/2002), i les oficines públiques de consum informen gratis.',
   'client.mortgage.info.fein_timing': 'La informació abans de l’escriptura',

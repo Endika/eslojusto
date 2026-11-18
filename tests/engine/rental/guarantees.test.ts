@@ -6,6 +6,7 @@ import { itemAmount, type ItemResult } from '../../../src/engine/rental/item';
 import { countedAmount } from '../../../src/engine/rental/outcome';
 import type { Guarantee, RentalInput } from '../../../src/engine/rental/types';
 import { contract } from './fixtures';
+import { NORMS_BEFORE_VOTE } from './norms-before-vote';
 
 const RENT = 850;
 const input = (change: Partial<RentalInput>): RentalInput =>
@@ -126,18 +127,26 @@ describe('guarantees that are not money', () => {
     expect(singleOf(r)).toEqual({ status: 'review_it', amount: null });
   });
 
+  const insured = input({
+    signedOn: f('2026-10-08'),
+    startDate: f('2026-10-15'),
+    guarantees: [{ kind: 'insurance', amount: 300 }],
+  });
+
   it('an insurance required from 08-10-2026 is over the cap with no figure, pending validation', () => {
-    const [r] = others({
-      signedOn: f('2026-10-08'),
-      startDate: f('2026-10-15'),
-      guarantees: [{ kind: 'insurance', amount: 300 }],
-    });
+    const [r] = checkGuarantees(insured, NORMS_BEFORE_VOTE).filter((x) => x.kind === 'guarantee');
     if (r?.outcome.kind !== 'depends') throw new Error('expected depends');
     expect(r.outcome.reasons).toEqual(['pending_validation']);
     expect(r.outcome.readings.map((x) => x.value.status).sort()).toEqual(['over_cap', 'review_it']);
     expect(r.outcome.readings.every((x) => x.value.amount === null)).toBe(true);
     expect(countedAmount(r.outcome, itemAmount)).toBe(0);
     expect(r.sources.find((s) => s.id === 'insurance_ban')?.status).toBe('pending_validation');
+  });
+
+  it('an insurance required from 08-10-2026 is over the cap with a single reading once validated', () => {
+    const [r] = checkGuarantees(insured, NORMS).filter((x) => x.kind === 'guarantee');
+    expect(singleOf(r)).toEqual({ status: 'over_cap', amount: null });
+    expect(r?.sources.find((s) => s.id === 'insurance_ban')?.status).toBe('in_force');
   });
 });
 

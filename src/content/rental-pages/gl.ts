@@ -1,11 +1,11 @@
-// source: 1797cd736446
+// source: e20a98d7779a
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
 import { checkCharges } from '../../engine/rental/charges';
 import { checkGuarantees } from '../../engine/rental/guarantees';
 import type { ItemReading, ItemResult } from '../../engine/rental/item';
-import type { NormTable } from '../../engine/rental/norms';
+import type { Norm, NormTable } from '../../engine/rental/norms';
 import { ruleSource, type RuleId } from '../../engine/rental/rules';
 import { RENTAL_TABLES } from '../../engine/rental/data/tables';
 import { NORMS } from '../../engine/rental/data/norms';
@@ -77,7 +77,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     crumb: 'Decreto do aluguer 2026',
     title: 'Real Decreto-ley 29/2026 do aluguer: que cambia',
     description:
-      'Que cambia para o inquilino co Real Decreto-ley 29/2026 e en que estado está: en vigor desde o 8 de outubro, pendente de convalidación.',
+      'Que cambia para o inquilino co Real Decreto-ley 29/2026: en vigor desde o 8 de outubro de 2026 e convalidado polo Congreso o 12 de novembro.',
     h1: 'Real Decreto-ley 29/2026 do aluguer: que cambia e en que estado está',
   },
   fees: {
@@ -313,6 +313,7 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
   const decree = norms.rdl29_2026;
   const decreeEve = formatLongDay(toIso(addDays(parseDate(decree.inForceSince), -1)), 'gl');
   const since = formatLongDay(decree.inForceSince, 'gl');
+  const validatedOn = decree.statusSince ? formatLongDay(decree.statusSince, 'gl') : '';
   const caps = capsCopy('gl', norms, {
     checkedOn,
     iravRate: ctx.irav,
@@ -326,17 +327,38 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const { rent, anniversary } = RISE_EXAMPLE;
     const raise = (rate: number) => round2((rent * (100 + rate)) / 100);
     const capped = ctx.irav > DECREE_CAP;
-    const exampleDecree = capped
-      ? `Pagas ${formatEuros(rent)} ao mes e o teu contrato cumpre un ano máis o ${formatLongDay(anniversary, 'gl')}. ` +
-        `Co último IRAV publicado (${formatRate(ctx.irav)}), se rexe o Real Decreto-ley 29/2026, o límite sen un novo pacto ` +
-        `é o ${pct(DECREE_CAP)}, non o ${formatRate(ctx.irav)}: a túa renda pode pasar a ${formatEuros(raise(DECREE_CAP))} como máximo.`
-      : `Pagas ${formatEuros(rent)} ao mes e o teu contrato cumpre un ano máis o ${formatLongDay(anniversary, 'gl')}. ` +
-        `Se rexe o Real Decreto-ley 29/2026, o límite sen un novo pacto é o ${pct(DECREE_CAP)} ou o IRAV, o máis baixo: ` +
-        `co último IRAV publicado (${formatRate(ctx.irav)}), a túa renda pode pasar a ${formatEuros(raise(ctx.irav))} como máximo.`;
+    const validated = decree.status === 'in_force';
+    const exampleVars = {
+      renta: formatEuros(rent),
+      fecha: formatLongDay(anniversary, 'gl'),
+      irav: formatRate(ctx.irav),
+      tope: pct(DECREE_CAP),
+      maximo: formatEuros(raise(capped ? DECREE_CAP : ctx.irav)),
+    };
+    const exampleDecree = validated
+      ? tx(
+          capped
+            ? 'rental.page.rise.example_in_force_capped'
+            : 'rental.page.rise.example_in_force_open',
+          exampleVars,
+        )
+      : capped
+        ? `Pagas ${formatEuros(rent)} ao mes e o teu contrato cumpre un ano máis o ${formatLongDay(anniversary, 'gl')}. ` +
+          `Co último IRAV publicado (${formatRate(ctx.irav)}), se rexe o Real Decreto-ley 29/2026, o límite sen un novo pacto ` +
+          `é o ${pct(DECREE_CAP)}, non o ${formatRate(ctx.irav)}: a túa renda pode pasar a ${formatEuros(raise(DECREE_CAP))} como máximo.`
+        : `Pagas ${formatEuros(rent)} ao mes e o teu contrato cumpre un ano máis o ${formatLongDay(anniversary, 'gl')}. ` +
+          `Se rexe o Real Decreto-ley 29/2026, o límite sen un novo pacto é o ${pct(DECREE_CAP)} ou o IRAV, o máis baixo: ` +
+          `co último IRAV publicado (${formatRate(ctx.irav)}), a túa renda pode pasar a ${formatEuros(raise(ctx.irav))} como máximo.`;
     const exampleNoDecree =
       `Se o Congreso derrogase o decreto, o límite nun contrato asinado desde o 26 de maio de 2023 volvería ser o IRAV ou o IPC, o máis baixo. ` +
       `Co último IRAV publicado (${formatRate(ctx.irav)}), serían ${formatEuros(raise(ctx.irav))} como máximo, ` +
       `sempre que o IPC non fose máis baixo. O IRAV que conta é o último publicado o ${formatLongDay(anniversary, 'gl')}, que aínda non existe.`;
+    const afterExample: Record<Norm['status'], string> = {
+      pending_validation:
+        'Mentres o decreto estea pendente de convalidación, os dous cálculos son posibles: o primeiro se o Congreso o convalida e o segundo se o derroga.',
+      in_force: tx('rental.page.rise.after_in_force', { fecha: validatedOn }),
+      repealed: tx('rental.page.rise.after_repealed'),
+    };
     return {
       lead: 'A suba depende de tres cousas: que o contrato a pacte, o día en que se cumpre cada ano de contrato e o límite legal dese día. Aquí están os límites, un por un e co seu artigo.',
       sections: [
@@ -365,10 +387,8 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           id: 'ejemplo',
           heading: 'Exemplo resolto',
           paragraphs: [],
-          example: [exampleDecree, exampleNoDecree],
-          after: [
-            'Mentres o decreto estea pendente de convalidación, os dous cálculos son posibles: o primeiro se o Congreso o convalida e o segundo se o derroga.',
-          ],
+          example: validated ? [exampleDecree] : [exampleDecree, exampleNoDecree],
+          after: [afterExample[decree.status]],
           folio: { article: '18', law: 'LAU · RDL 29/2026' },
         },
       ],
@@ -383,11 +403,15 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'Pódenme subir o aluguer se o contrato non di nada?',
           answer: tx('rent_indices.faq.no_clause_answer', { decretos: caps.faqNoClause }),
         },
-        {
-          anchor: 'faq-pendiente',
-          question: 'Que significa «pendente de convalidación»?',
-          answer: `${caps.status} Ata que o Congreso vote, a suba do ${pct(DECREE_CAP)} e a do IRAV ou o IPC son as dúas interpretacións posibles.`,
-        },
+        ...(decree.status === 'pending_validation'
+          ? [
+              {
+                anchor: 'faq-pendiente',
+                question: 'Que significa «pendente de convalidación»?',
+                answer: `${caps.status} Ata que o Congreso vote, a suba do ${pct(DECREE_CAP)} e a do IRAV ou o IPC son as dúas interpretacións posibles.`,
+              },
+            ]
+          : []),
         {
           anchor: 'faq-irav-o-ipc',
           question: 'Tócame o IRAV ou o IPC?',
@@ -414,8 +438,11 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const point = (key: Key, vars?: Record<string, string>) =>
       standing ? tx(key, { ...vars, decreto: 'o decreto' }) : sentence(key, vars);
     const status = caps.status;
+    const validated = decree.status === 'in_force';
     return {
-      lead: `O Real Decreto-ley 29/2026 rexe desde o ${since}. Un decreto-lei entra en vigor cando el mesmo o di (este, o día seguinte ao da súa publicación), pero decae se o Congreso non o convalida en 30 días: por iso hai que mirar sempre en que estado está.`,
+      lead: validated
+        ? tx('rental.page.decree.lead_in_force', { desde: since, fecha: validatedOn })
+        : `O Real Decreto-ley 29/2026 rexe desde o ${since}. Un decreto-lei entra en vigor cando el mesmo o di (este, o día seguinte ao da súa publicación), pero decae se o Congreso non o convalida en 30 días: por iso hai que mirar sempre en que estado está.`,
       sections: [
         {
           id: 'estado',
@@ -463,11 +490,17 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'O decreto está en vigor?',
           answer: status,
         },
-        {
-          anchor: 'faq-derogado',
-          question: 'Que pasa se o Congreso non o convalida?',
-          answer: `Queda derrogado e deixa de aplicarse desde ese día; o que pasou mentres rexeu é un caso dubidoso. ${tx('rental.guide.update.doubtful')}`,
-        },
+        validated
+          ? {
+              anchor: 'faq-puede-caer',
+              question: tx('rental.page.decree.faq_still_question'),
+              answer: tx('rental.page.decree.faq_still_answer', { fecha: validatedOn }),
+            }
+          : {
+              anchor: 'faq-derogado',
+              question: 'Que pasa se o Congreso non o convalida?',
+              answer: `Queda derrogado e deixa de aplicarse desde ese día; o que pasou mentres rexeu é un caso dubidoso. ${tx('rental.guide.update.doubtful')}`,
+            },
         {
           anchor: 'faq-anteriores',
           question: 'Que decretos anteriores caeron?',

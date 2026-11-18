@@ -1,11 +1,11 @@
-// source: 1797cd736446
+// source: e20a98d7779a
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
 import { checkCharges } from '../../engine/rental/charges';
 import { checkGuarantees } from '../../engine/rental/guarantees';
 import type { ItemReading, ItemResult } from '../../engine/rental/item';
-import type { NormTable } from '../../engine/rental/norms';
+import type { Norm, NormTable } from '../../engine/rental/norms';
 import { ruleSource, type RuleId } from '../../engine/rental/rules';
 import { RENTAL_TABLES } from '../../engine/rental/data/tables';
 import { NORMS } from '../../engine/rental/data/norms';
@@ -77,7 +77,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     crumb: '2026 rental decree',
     title: 'Real Decreto-ley 29/2026 on rentals: what changes',
     description:
-      'What Real Decreto-ley 29/2026 changes for tenants and where it stands: in force since 8 October, awaiting validation by Congress.',
+      'What Real Decreto-ley 29/2026 changes for tenants: in force since 8 October 2026 and validated by Congress on 12 November.',
     h1: 'Real Decreto-ley 29/2026 on rentals: what changes and where it stands',
   },
   fees: {
@@ -313,6 +313,7 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
   const decree = norms.rdl29_2026;
   const decreeEve = formatLongDay(toIso(addDays(parseDate(decree.inForceSince), -1)), 'en');
   const since = formatLongDay(decree.inForceSince, 'en');
+  const validatedOn = decree.statusSince ? formatLongDay(decree.statusSince, 'en') : '';
   const caps = capsCopy('en', norms, {
     checkedOn,
     iravRate: ctx.irav,
@@ -326,17 +327,38 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const { rent, anniversary } = RISE_EXAMPLE;
     const raise = (rate: number) => round2((rent * (100 + rate)) / 100);
     const capped = ctx.irav > DECREE_CAP;
-    const exampleDecree = capped
-      ? `You pay ${formatEuros(rent)} a month and your agreement completes another year on ${formatLongDay(anniversary, 'en')}. ` +
-        `With the latest IRAV published (${formatRate(ctx.irav)}), if Real Decreto-ley 29/2026 applies, the cap without a new agreement ` +
-        `is ${pct(DECREE_CAP)}, not ${formatRate(ctx.irav)}: your rent can go up to ${formatEuros(raise(DECREE_CAP))} at most.`
-      : `You pay ${formatEuros(rent)} a month and your agreement completes another year on ${formatLongDay(anniversary, 'en')}. ` +
-        `If Real Decreto-ley 29/2026 applies, the cap without a new agreement is ${pct(DECREE_CAP)} or the IRAV, whichever is lower: ` +
-        `with the latest IRAV published (${formatRate(ctx.irav)}), your rent can go up to ${formatEuros(raise(ctx.irav))} at most.`;
+    const validated = decree.status === 'in_force';
+    const exampleVars = {
+      renta: formatEuros(rent),
+      fecha: formatLongDay(anniversary, 'en'),
+      irav: formatRate(ctx.irav),
+      tope: pct(DECREE_CAP),
+      maximo: formatEuros(raise(capped ? DECREE_CAP : ctx.irav)),
+    };
+    const exampleDecree = validated
+      ? tx(
+          capped
+            ? 'rental.page.rise.example_in_force_capped'
+            : 'rental.page.rise.example_in_force_open',
+          exampleVars,
+        )
+      : capped
+        ? `You pay ${formatEuros(rent)} a month and your agreement completes another year on ${formatLongDay(anniversary, 'en')}. ` +
+          `With the latest IRAV published (${formatRate(ctx.irav)}), if Real Decreto-ley 29/2026 applies, the cap without a new agreement ` +
+          `is ${pct(DECREE_CAP)}, not ${formatRate(ctx.irav)}: your rent can go up to ${formatEuros(raise(DECREE_CAP))} at most.`
+        : `You pay ${formatEuros(rent)} a month and your agreement completes another year on ${formatLongDay(anniversary, 'en')}. ` +
+          `If Real Decreto-ley 29/2026 applies, the cap without a new agreement is ${pct(DECREE_CAP)} or the IRAV, whichever is lower: ` +
+          `with the latest IRAV published (${formatRate(ctx.irav)}), your rent can go up to ${formatEuros(raise(ctx.irav))} at most.`;
     const exampleNoDecree =
       `If Congress repealed the decree, the cap in an agreement signed on or after 26 May 2023 would again be the IRAV or the IPC, whichever is lower. ` +
       `With the latest IRAV published (${formatRate(ctx.irav)}), that would be ${formatEuros(raise(ctx.irav))} at most, ` +
       `provided the IPC was not lower. The IRAV that counts is the latest one published on ${formatLongDay(anniversary, 'en')}, which does not exist yet.`;
+    const afterExample: Record<Norm['status'], string> = {
+      pending_validation:
+        'While the decree is awaiting validation by Congress, both calculations are possible: the first if Congress validates it and the second if it repeals it.',
+      in_force: tx('rental.page.rise.after_in_force', { fecha: validatedOn }),
+      repealed: tx('rental.page.rise.after_repealed'),
+    };
     return {
       lead: 'The increase depends on three things: that the agreement provides for it, the day each year of the agreement is completed and the legal cap on that day. Here are the caps, one by one and with their article.',
       sections: [
@@ -365,10 +387,8 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           id: 'ejemplo',
           heading: 'Worked example',
           paragraphs: [],
-          example: [exampleDecree, exampleNoDecree],
-          after: [
-            'While the decree is awaiting validation by Congress, both calculations are possible: the first if Congress validates it and the second if it repeals it.',
-          ],
+          example: validated ? [exampleDecree] : [exampleDecree, exampleNoDecree],
+          after: [afterExample[decree.status]],
           folio: { article: '18', law: 'LAU · RDL 29/2026' },
         },
       ],
@@ -383,12 +403,16 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'Can my rent be raised if the agreement says nothing?',
           answer: tx('rent_indices.faq.no_clause_answer', { decretos: caps.faqNoClause }),
         },
-        {
-          anchor: 'faq-pendiente',
-          question:
-            'What does “awaiting validation by Congress” (pendiente de convalidación) mean?',
-          answer: `${caps.status} Until Congress votes, the ${pct(DECREE_CAP)} increase and the IRAV or IPC increase are the two possible readings.`,
-        },
+        ...(decree.status === 'pending_validation'
+          ? [
+              {
+                anchor: 'faq-pendiente',
+                question:
+                  'What does “awaiting validation by Congress” (pendiente de convalidación) mean?',
+                answer: `${caps.status} Until Congress votes, the ${pct(DECREE_CAP)} increase and the IRAV or IPC increase are the two possible readings.`,
+              },
+            ]
+          : []),
         {
           anchor: 'faq-irav-o-ipc',
           question: 'Does the IRAV or the IPC apply to me?',
@@ -415,8 +439,11 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const point = (key: Key, vars?: Record<string, string>) =>
       standing ? tx(key, { ...vars, decreto: 'the decree' }) : sentence(key, vars);
     const status = caps.status;
+    const validated = decree.status === 'in_force';
     return {
-      lead: `Real Decreto-ley 29/2026 has applied since ${since}. A decree-law comes into force when it says so itself (this one, the day after its publication), but it lapses if Congress does not validate it within 30 days: that is why its status always needs checking.`,
+      lead: validated
+        ? tx('rental.page.decree.lead_in_force', { desde: since, fecha: validatedOn })
+        : `Real Decreto-ley 29/2026 has applied since ${since}. A decree-law comes into force when it says so itself (this one, the day after its publication), but it lapses if Congress does not validate it within 30 days: that is why its status always needs checking.`,
       sections: [
         {
           id: 'estado',
@@ -464,11 +491,17 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'Is the decree in force?',
           answer: status,
         },
-        {
-          anchor: 'faq-derogado',
-          question: 'What happens if Congress does not validate it?',
-          answer: `It is repealed and stops applying from that day; what happened while it applied is a doubtful case. ${tx('rental.guide.update.doubtful')}`,
-        },
+        validated
+          ? {
+              anchor: 'faq-puede-caer',
+              question: tx('rental.page.decree.faq_still_question'),
+              answer: tx('rental.page.decree.faq_still_answer', { fecha: validatedOn }),
+            }
+          : {
+              anchor: 'faq-derogado',
+              question: 'What happens if Congress does not validate it?',
+              answer: `It is repealed and stops applying from that day; what happened while it applied is a doubtful case. ${tx('rental.guide.update.doubtful')}`,
+            },
         {
           anchor: 'faq-anteriores',
           question: 'Which earlier decrees were repealed?',

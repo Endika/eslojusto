@@ -126,32 +126,32 @@ export const NORMS: NormTable = {
     statusSince: '2026-10-02',
     statusUrl: 'https://www.boe.es/buscar/doc.php?id=BOE-A-2026-20526',
   },
-  // Arts. 3 and 4 and DF 5.ª and 6.ª; in force from 08-10-2026 (DF 11.ª).
+  // Arts. 3 and 4 and DF 5.ª and 6.ª; in force from 08-10-2026 (DF 11.ª). Validated on 12-11-2026, published the 13th.
   rdl29_2026: {
     id: 'rdl29_2026',
     citation: 'Real Decreto-ley 29/2026, de 6 de octubre',
     url: 'https://www.boe.es/buscar/doc.php?id=BOE-A-2026-20823',
     inForceSince: '2026-10-08',
     inForceUntil: null,
-    status: 'pending_validation',
-    statusSince: null,
-    statusUrl: null,
+    status: 'in_force',
+    statusSince: '2026-11-13',
+    statusUrl: 'https://www.boe.es/buscar/doc.php?id=BOE-A-2026-23755',
   },
-  // Art. 10 LAU rewritten; in force from 15-11-2026 (DF 2.ª).
+  // Art. 10 LAU rewritten from 15-11-2026 (DF 2.ª); repealed on 12-11-2026, published the 13th, so it
+  // never took effect.
   rdl28_2026: {
     id: 'rdl28_2026',
     citation: 'Real Decreto-ley 28/2026, de 6 de octubre',
     url: 'https://www.boe.es/buscar/doc.php?id=BOE-A-2026-20822',
     inForceSince: '2026-11-15',
-    inForceUntil: null,
-    status: 'pending_validation',
-    statusSince: null,
-    statusUrl: null,
+    inForceUntil: '2026-11-14',
+    status: 'repealed',
+    statusSince: '2026-11-13',
+    statusUrl: 'https://www.boe.es/buscar/doc.php?id=BOE-A-2026-23754',
   },
 };
 
-// Read on 19-10-2026 in the BOE open data API: none repealed since, and no validation agreement
-// published yet for RDL 28/2026 and 29/2026.
+// Read on 19-10-2026 in the BOE open data API, and RDL 28/2026 and 29/2026 again on 18-11-2026.
 export const NORM_REVIEW: NormReview = {
   lau: '2026-10-19',
   law2_2015: '2026-10-19',
@@ -164,6 +164,6 @@ export const NORM_REVIEW: NormReview = {
   pge2023: '2026-10-19',
   rdl8_2026: '2026-10-19',
   rdl26_2026: '2026-10-19',
-  rdl29_2026: '2026-10-19',
-  rdl28_2026: '2026-10-19',
+  rdl29_2026: '2026-11-18',
+  rdl28_2026: '2026-11-18',
 };

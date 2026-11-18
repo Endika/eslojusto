@@ -1,11 +1,11 @@
-// source: 1797cd736446
+// source: e20a98d7779a
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
 import { checkCharges } from '../../engine/rental/charges';
 import { checkGuarantees } from '../../engine/rental/guarantees';
 import type { ItemReading, ItemResult } from '../../engine/rental/item';
-import type { NormTable } from '../../engine/rental/norms';
+import type { Norm, NormTable } from '../../engine/rental/norms';
 import { ruleSource, type RuleId } from '../../engine/rental/rules';
 import { RENTAL_TABLES } from '../../engine/rental/data/tables';
 import { NORMS } from '../../engine/rental/data/norms';
@@ -77,7 +77,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     crumb: 'مرسوم الإيجار لعام 2026',
     title: 'Real Decreto-ley 29/2026 بشأن الإيجار: ما الذي يتغيّر',
     description:
-      'ما الذي يغيّره Real Decreto-ley 29/2026 للمستأجِر وما وضعه: سارٍ منذ 8 أكتوبر، وبانتظار مصادقة البرلمان ⁨(Congreso)⁩.',
+      'ما الذي يغيّره Real Decreto-ley 29/2026 للمستأجِر: سارٍ منذ 8 أكتوبر 2026، وصادق عليه البرلمان ⁨(Congreso)⁩ في 12 نوفمبر.',
     h1: 'Real Decreto-ley 29/2026 بشأن الإيجار: ما الذي يتغيّر وما وضعه',
   },
   fees: {
@@ -314,6 +314,7 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
   const decree = norms.rdl29_2026;
   const decreeEve = formatLongDay(toIso(addDays(parseDate(decree.inForceSince), -1)), 'ar');
   const since = formatLongDay(decree.inForceSince, 'ar');
+  const validatedOn = decree.statusSince ? formatLongDay(decree.statusSince, 'ar') : '';
   const caps = capsCopy('ar', norms, {
     checkedOn,
     iravRate: ctx.irav,
@@ -327,17 +328,38 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const { rent, anniversary } = RISE_EXAMPLE;
     const raise = (rate: number) => round2((rent * (100 + rate)) / 100);
     const capped = ctx.irav > DECREE_CAP;
-    const exampleDecree = capped
-      ? `تدفع ${formatEuros(rent)} شهريًا، ويُكمل عقدك سنة أخرى في ${formatLongDay(anniversary, 'ar')}. ` +
-        `مع آخر IRAV منشور ⁨(${formatRate(ctx.irav)})⁩، إذا طُبِّق Real Decreto-ley 29/2026، فإن الحد الأقصى دون اتفاق جديد ` +
-        `هو ${pct(DECREE_CAP)}، لا ${formatRate(ctx.irav)}: يمكن أن يصل إيجارك إلى ${formatEuros(raise(DECREE_CAP))} على الأكثر.`
-      : `تدفع ${formatEuros(rent)} شهريًا، ويُكمل عقدك سنة أخرى في ${formatLongDay(anniversary, 'ar')}. ` +
-        `إذا طُبِّق Real Decreto-ley 29/2026، فإن الحد الأقصى دون اتفاق جديد هو ${pct(DECREE_CAP)} أو IRAV، أيهما أدنى: ` +
-        `مع آخر IRAV منشور ⁨(${formatRate(ctx.irav)})⁩، يمكن أن يصل إيجارك إلى ${formatEuros(raise(ctx.irav))} على الأكثر.`;
+    const validated = decree.status === 'in_force';
+    const exampleVars = {
+      renta: formatEuros(rent),
+      fecha: formatLongDay(anniversary, 'ar'),
+      irav: formatRate(ctx.irav),
+      tope: pct(DECREE_CAP),
+      maximo: formatEuros(raise(capped ? DECREE_CAP : ctx.irav)),
+    };
+    const exampleDecree = validated
+      ? tx(
+          capped
+            ? 'rental.page.rise.example_in_force_capped'
+            : 'rental.page.rise.example_in_force_open',
+          exampleVars,
+        )
+      : capped
+        ? `تدفع ${formatEuros(rent)} شهريًا، ويُكمل عقدك سنة أخرى في ${formatLongDay(anniversary, 'ar')}. ` +
+          `مع آخر IRAV منشور ⁨(${formatRate(ctx.irav)})⁩، إذا طُبِّق Real Decreto-ley 29/2026، فإن الحد الأقصى دون اتفاق جديد ` +
+          `هو ${pct(DECREE_CAP)}، لا ${formatRate(ctx.irav)}: يمكن أن يصل إيجارك إلى ${formatEuros(raise(DECREE_CAP))} على الأكثر.`
+        : `تدفع ${formatEuros(rent)} شهريًا، ويُكمل عقدك سنة أخرى في ${formatLongDay(anniversary, 'ar')}. ` +
+          `إذا طُبِّق Real Decreto-ley 29/2026، فإن الحد الأقصى دون اتفاق جديد هو ${pct(DECREE_CAP)} أو IRAV، أيهما أدنى: ` +
+          `مع آخر IRAV منشور ⁨(${formatRate(ctx.irav)})⁩، يمكن أن يصل إيجارك إلى ${formatEuros(raise(ctx.irav))} على الأكثر.`;
     const exampleNoDecree =
       `إذا ألغى البرلمان ⁨(Congreso)⁩ المرسوم، يعود الحد الأقصى في العقد الموقَّع منذ 26 مايو 2023 إلى IRAV أو IPC، أيهما أدنى. ` +
       `ومع آخر IRAV منشور ⁨(${formatRate(ctx.irav)})⁩، يكون ${formatEuros(raise(ctx.irav))} على الأكثر، ` +
       `ما لم يكن IPC أدنى. وIRAV المعتمد هو آخر مؤشر منشور في ${formatLongDay(anniversary, 'ar')}، وهو لم يصدر بعد.`;
+    const afterExample: Record<Norm['status'], string> = {
+      pending_validation:
+        'ما دام المرسوم بانتظار مصادقة البرلمان ⁨(Congreso)⁩، فالحسبتان ممكنتان: الأولى إذا صادق عليه البرلمان، والثانية إذا ألغاه.',
+      in_force: tx('rental.page.rise.after_in_force', { fecha: validatedOn }),
+      repealed: tx('rental.page.rise.after_repealed'),
+    };
     return {
       lead: 'تتوقف الزيادة على ثلاثة أمور: أن ينصّ عليها العقد، واليوم الذي تكتمل فيه كل سنة من العقد، والحد القانوني الأقصى في ذلك اليوم. هذه هي الحدود القصوى، واحدًا واحدًا ومع مادة كل منها.',
       sections: [
@@ -366,10 +388,8 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           id: 'ejemplo',
           heading: 'مثال تطبيقي',
           paragraphs: [],
-          example: [exampleDecree, exampleNoDecree],
-          after: [
-            'ما دام المرسوم بانتظار مصادقة البرلمان ⁨(Congreso)⁩، فالحسبتان ممكنتان: الأولى إذا صادق عليه البرلمان، والثانية إذا ألغاه.',
-          ],
+          example: validated ? [exampleDecree] : [exampleDecree, exampleNoDecree],
+          after: [afterExample[decree.status]],
           folio: { article: '18', law: 'LAU · RDL 29/2026' },
         },
       ],
@@ -384,11 +404,15 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'هل يمكن أن يُرفع إيجاري إذا لم يذكر العقد شيئًا؟',
           answer: tx('rent_indices.faq.no_clause_answer', { decretos: caps.faqNoClause }),
         },
-        {
-          anchor: 'faq-pendiente',
-          question: 'ماذا يعني «بانتظار مصادقة البرلمان» ⁨(pendiente de convalidación)⁩؟',
-          answer: `${caps.status} وإلى أن يصوّت البرلمان، تبقى زيادة ${pct(DECREE_CAP)} وزيادة IRAV أو IPC القراءتين الممكنتين.`,
-        },
+        ...(decree.status === 'pending_validation'
+          ? [
+              {
+                anchor: 'faq-pendiente',
+                question: 'ماذا يعني «بانتظار مصادقة البرلمان» ⁨(pendiente de convalidación)⁩؟',
+                answer: `${caps.status} وإلى أن يصوّت البرلمان، تبقى زيادة ${pct(DECREE_CAP)} وزيادة IRAV أو IPC القراءتين الممكنتين.`,
+              },
+            ]
+          : []),
         {
           anchor: 'faq-irav-o-ipc',
           question: 'هل ينطبق عليّ IRAV أم IPC؟',
@@ -415,8 +439,11 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const point = (key: Key, vars?: Record<string, string>) =>
       standing ? tx(key, { ...vars, decreto: 'المرسوم' }) : sentence(key, vars);
     const status = caps.status;
+    const validated = decree.status === 'in_force';
     return {
-      lead: `يسري Real Decreto-ley 29/2026 منذ ${since}. يدخل المرسوم بقانون ⁨(decreto-ley)⁩ حيّز التنفيذ حين ينصّ هو نفسه على ذلك (وهذا المرسوم، في اليوم التالي لنشره)، لكنه يسقط إذا لم يصادق عليه البرلمان ⁨(Congreso)⁩ خلال 30 يومًا: لهذا يهمّ دائمًا معرفة وضعه.`,
+      lead: validated
+        ? tx('rental.page.decree.lead_in_force', { desde: since, fecha: validatedOn })
+        : `يسري Real Decreto-ley 29/2026 منذ ${since}. يدخل المرسوم بقانون ⁨(decreto-ley)⁩ حيّز التنفيذ حين ينصّ هو نفسه على ذلك (وهذا المرسوم، في اليوم التالي لنشره)، لكنه يسقط إذا لم يصادق عليه البرلمان ⁨(Congreso)⁩ خلال 30 يومًا: لهذا يهمّ دائمًا معرفة وضعه.`,
       sections: [
         {
           id: 'estado',
@@ -464,11 +491,17 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'هل المرسوم سارٍ؟',
           answer: status,
         },
-        {
-          anchor: 'faq-derogado',
-          question: 'ماذا يحدث إذا لم يصادق عليه البرلمان ⁨(Congreso)⁩؟',
-          answer: `يُلغى ويتوقف تطبيقه منذ ذلك اليوم؛ وما حدث أثناء سريانه حالة مشكوك فيها. ${tx('rental.guide.update.doubtful')}`,
-        },
+        validated
+          ? {
+              anchor: 'faq-puede-caer',
+              question: tx('rental.page.decree.faq_still_question'),
+              answer: tx('rental.page.decree.faq_still_answer', { fecha: validatedOn }),
+            }
+          : {
+              anchor: 'faq-derogado',
+              question: 'ماذا يحدث إذا لم يصادق عليه البرلمان ⁨(Congreso)⁩؟',
+              answer: `يُلغى ويتوقف تطبيقه منذ ذلك اليوم؛ وما حدث أثناء سريانه حالة مشكوك فيها. ${tx('rental.guide.update.doubtful')}`,
+            },
         {
           anchor: 'faq-anteriores',
           question: 'ما المراسيم السابقة التي سقطت؟',

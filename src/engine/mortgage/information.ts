@@ -65,6 +65,11 @@ function limitationRule(deps: MortgageDeps): readonly InformationBlock[] {
   ];
 }
 
+const loanAssignmentPhrases = (deps: MortgageDeps): readonly MortgagePhraseKey[] =>
+  deps.norms.lcci_25bis.status === 'pending_validation'
+    ? ['information.loan_assignment', 'information.loan_assignment_pending']
+    : ['information.loan_assignment'];
+
 export function informationBlocks(
   input: MortgageInput,
   today: CivilDate,
@@ -107,9 +112,9 @@ export function informationBlocks(
           ),
         ]
       : []),
-    // Still pending validation: told as what the decree-law provides.
+    // Told as what the decree-law provides, and as pending while the Congress has not voted it.
     ...(reaches('loan_assignment', today, deps)
-      ? [statute('loan_assignment', ['information.loan_assignment'], ['loan_assignment'], deps)]
+      ? [statute('loan_assignment', loanAssignmentPhrases(deps), ['loan_assignment'], deps)]
       : []),
     statute('complaints_service', ['information.complaints_service'], ['complaints_service'], deps),
   ];

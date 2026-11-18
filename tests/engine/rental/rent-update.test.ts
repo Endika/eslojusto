@@ -15,6 +15,7 @@ import {
 } from '../../../src/engine/rental/rent-update';
 import type { RentalDeps, RentalInput } from '../../../src/engine/rental/types';
 import { contract, update } from './fixtures';
+import { NORMS_BEFORE_VOTE } from './norms-before-vote';
 
 const INDICES: IndexTables = { irav: IRAV, ipc: IPC, igc: IGC };
 const DEPS: RentalDeps = { norms: NORMS, indices: INDICES };
@@ -95,6 +96,7 @@ const FUTURE: IndexTables = {
   igc: IGC,
 };
 const FUTURE_DEPS: RentalDeps = { norms: NORMS, indices: FUTURE };
+const FUTURE_BEFORE_VOTE: RentalDeps = { norms: NORMS_BEFORE_VOTE, indices: FUTURE };
 
 describe('the cap in force on each anniversary', () => {
   it('2019-2022: the CPI, and a negative CPI allows no rise', () => {
@@ -338,7 +340,7 @@ describe('the cap in force on each anniversary', () => {
     expect(v.maxRent).toBe(1015);
   });
 
-  describe('20-10-2026, under RDL 29/2026 pending validation', () => {
+  describe('20-10-2026, under RDL 29/2026', () => {
     // Synthetic: IRAV September 2026 2,50 % and IPC 4,90 %, out 15-10-2026. A 3 % clause on a
     // 2021 contract: with RDL 29/2026, IRAV and 2 % cap it at 2 %; without, the CPI leaves 3 %.
     const input = contract({
@@ -351,7 +353,7 @@ describe('the cap in force on each anniversary', () => {
     const today = f('2026-12-20');
 
     it('gives both readings and counts the lower one', () => {
-      const r = first(check(input, today, FUTURE_DEPS));
+      const r = first(check(input, today, FUTURE_BEFORE_VOTE));
       const d = depends(r);
       expect(d.reasons).toEqual(['pending_validation']);
       expect(figures(d.low)).toMatchObject({ maxRent: 1030, monthly: 10, accumulated: 30 });
@@ -370,6 +372,12 @@ describe('the cap in force on each anniversary', () => {
       });
       const r = first(check(input, today, { ...FUTURE_DEPS, norms }));
       expect(figures(single(r))).toMatchObject({ maxRent: 1020, accumulated: 60 });
+    });
+
+    it('is a single reading with the 2 % cap under the norm table as it stands', () => {
+      const v = single(first(check(input, today, FUTURE_DEPS)));
+      expect(figures(v)).toMatchObject({ maxRent: 1020, accumulated: 60 });
+      expect(v.cap?.rule).toBe('cap_2_rdl29');
     });
 
     it('falls in a repealed window if the Congress repeals it', () => {
@@ -900,7 +908,7 @@ describe('several years', () => {
         updates: [update('2026-04-15', 1000, 1024.7), update('2027-04-15', 1024.7, 1050)],
       }),
       f('2027-06-10'),
-      FUTURE_DEPS,
+      FUTURE_BEFORE_VOTE,
     );
     const [y2026, y2027] = results.map(depends);
     expect(y2026?.reasons).toEqual(['repealed_window']);
@@ -914,6 +922,25 @@ describe('several years', () => {
     ]);
     expect(y2027 && [y2027.low.accumulated, y2027.high.accumulated]).toEqual([8.28, 28.8]);
     expect(counted(results[1] as RentUpdateResult)).toBe(0);
+  });
+
+  it('a validated RDL 29/2026 leaves 2027 with the 2 % cap on either base of 2026', () => {
+    const results = check(
+      contract({
+        signedOn: f('2024-04-10'),
+        startDate: f('2024-04-15'),
+        updateClause: 'irav',
+        updates: [update('2026-04-15', 1000, 1024.7), update('2027-04-15', 1024.7, 1050)],
+      }),
+      f('2027-06-10'),
+      FUTURE_DEPS,
+    );
+    const y2027 = depends(results[1] as RentUpdateResult);
+    expect(y2027.reasons).toEqual(['repealed_window']);
+    expect(y2027.readings.map((r) => [r.value.base, r.value.maxRent]).sort()).toEqual([
+      [1020, 1040.4],
+      [1024.7, 1045.19],
+    ]);
   });
 });
 
@@ -1148,7 +1175,7 @@ describe('work bound', () => {
       }),
     });
     const startedAt = performance.now();
-    const results = check(input, f('2027-06-10'), FUTURE_DEPS);
+    const results = check(input, f('2027-06-10'), FUTURE_BEFORE_VOTE);
     const elapsed = performance.now() - startedAt;
     expect(results).toHaveLength(8);
     expect(elapsed).toBeLessThan(200);

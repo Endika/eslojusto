@@ -11,7 +11,7 @@ const PAGES = [
   {
     path: 'alquiler/decreto-2026/',
     h1: 'Real Decreto-ley 29/2026 del alquiler: qué cambia y en qué estado está',
-    text: 'pendiente de convalidación',
+    text: 'convalidado por el Congreso',
   },
   {
     path: 'alquiler/honorarios-inmobiliaria/',
@@ -87,12 +87,12 @@ for (const { path, h1, text } of PAGES) {
   });
 }
 
-test('the rise page lists the caps and the pending decree twice over', async ({ page }) => {
+test('the rise page lists the caps and the validated decree twice over', async ({ page }) => {
   await page.goto('alquiler/subida/');
   const caps = page.locator('dl.caps');
   await expect(caps.locator('dt')).toHaveCount(5);
   await expect(caps.locator('[data-cap="two"]')).toContainText('08-10-2026');
-  await expect(page.locator('.status')).toContainText('pendiente de convalidación');
+  await expect(page.locator('.status')).toContainText('el Congreso convalidó el RDL 29/2026');
   await expect(page.locator('.example').first()).toContainText('918,00');
   const latest = IRAV.values.at(-1)?.rate ?? Number.NaN;
   await expect(page.locator('.example').first()).toContainText(`no el ${formatRate(latest)}`);

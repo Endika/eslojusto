@@ -317,6 +317,8 @@ export function informationText(
     Object.entries(b.dates).map(([name, iso]) => [name, dayText(iso)]),
   );
   if (b.region) vars['comunidad'] = tr(`client.rental.region.${b.region}`);
+  const status = b.sources[0]?.status;
+  if (status) vars['estado'] = tr(`client.rental.decree_state.${status}`);
   const key: ClientKey =
     b.id === 'stressed_zone'
       ? b.answer === 'yes'
@@ -590,7 +592,12 @@ export function renderRentalResult(
 }
 
 // A contract the review does not cover: why, and nothing worked out.
-export function renderOutOfScope(root: HTMLElement, reason: OutOfScopeReason, tr: Translate): void {
+export function renderOutOfScope(
+  root: HTMLElement,
+  reason: OutOfScopeReason,
+  decree: RentalSource['status'],
+  tr: Translate,
+): void {
   for (const el of inScopeParts(root)) el.hidden = true;
   find(root, '[data-items]').replaceChildren();
   find(root, '[data-lead]').textContent = tr('client.rental.result.lead_out_of_scope');
@@ -601,7 +608,9 @@ export function renderOutOfScope(root: HTMLElement, reason: OutOfScopeReason, tr
       ? 'client.rental.out_of_scope.before_2019_status'
       : 'client.rental.out_of_scope.status',
   );
-  find(box, '[data-out-of-scope-reason]').textContent = tr(`client.rental.out_of_scope.${reason}`);
+  find(box, '[data-out-of-scope-reason]').textContent = tr(`client.rental.out_of_scope.${reason}`, {
+    estado: tr(`client.rental.decree_state.${decree}`),
+  });
 }
 
 export function renderErrors(

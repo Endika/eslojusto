@@ -3,20 +3,16 @@ import { capsCopy, REFERENCE_INDEX_URL } from '../../src/content/rent-caps';
 import { example } from '../../src/content/rent-indices';
 import { NORMS } from '../../src/engine/rental/data/norms';
 import type { NormTable } from '../../src/engine/rental/norms';
+import { NORMS_BEFORE_VOTE } from '../engine/rental/norms-before-vote';
 
-const render = (norms: NormTable) =>
-  capsCopy('es', norms, { checkedOn: '2026-10-07', iravRate: 2.47, example: example() });
+const render = (norms: NormTable, checkedOn = '2026-10-07') =>
+  capsCopy('es', norms, { checkedOn, iravRate: 2.47, example: example() });
 
 const withDecree = (patch: Partial<NormTable['rdl29_2026']>): NormTable => ({
   ...NORMS,
   rdl29_2026: { ...NORMS.rdl29_2026, ...patch },
 });
 
-const validated = withDecree({
-  status: 'in_force',
-  statusSince: '2026-11-06',
-  statusUrl: 'https://www.boe.es/',
-});
 const repealed = withDecree({
   status: 'repealed',
   inForceUntil: '2026-11-05',
@@ -28,10 +24,10 @@ const repealed = withDecree({
 const ids = (norms: NormTable) => render(norms).rows.map((r) => r.id);
 
 describe('the cap copy while RDL 29/2026 awaits validation', () => {
-  const copy = render(NORMS);
+  const copy = render(NORMS_BEFORE_VOTE);
 
   it('lists its cap as current, with the reference-index condition and its link', () => {
-    expect(ids(NORMS)).toEqual(['ipc', 'igc', 'three', 'irav', 'two']);
+    expect(ids(NORMS_BEFORE_VOTE)).toEqual(['ipc', 'igc', 'three', 'irav', 'two']);
     const two = copy.rows.at(-1);
     expect(two?.when).toBe('Desde el 08-10-2026');
     expect(two?.rule).toContain('el límite de precio que le sea aplicable');
@@ -68,13 +64,15 @@ describe('the cap copy while RDL 29/2026 awaits validation', () => {
   });
 });
 
-describe('the cap copy once RDL 29/2026 is validated', () => {
-  const copy = render(validated);
+describe('the cap copy now RDL 29/2026 is validated', () => {
+  const copy = render(NORMS, '2026-11-18');
 
-  it('keeps its cap and says it was validated', () => {
-    expect(ids(validated)).toContain('two');
-    expect(copy.status).toContain('el Congreso convalidó el RDL 29/2026');
-    expect(copy.status).toContain('06-11-2026');
+  it('keeps its cap and says it was validated, with the day the agreement was published', () => {
+    expect(ids(NORMS)).toContain('two');
+    expect(copy.status).toBe(
+      'Estado a 18 de noviembre de 2026: el Congreso convalidó el RDL 29/2026; el acuerdo se publicó el 13-11-2026.',
+    );
+    expect(copy.status).not.toContain('pendiente');
     expect(copy.faqIravOrIpc).toContain('convalidado por el Congreso');
     expect(copy.now).not.toBeNull();
   });

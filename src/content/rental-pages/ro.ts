@@ -1,11 +1,11 @@
-// source: 1797cd736446
+// source: e20a98d7779a
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
 import { checkCharges } from '../../engine/rental/charges';
 import { checkGuarantees } from '../../engine/rental/guarantees';
 import type { ItemReading, ItemResult } from '../../engine/rental/item';
-import type { NormTable } from '../../engine/rental/norms';
+import type { Norm, NormTable } from '../../engine/rental/norms';
 import { ruleSource, type RuleId } from '../../engine/rental/rules';
 import { RENTAL_TABLES } from '../../engine/rental/data/tables';
 import { NORMS } from '../../engine/rental/data/norms';
@@ -77,7 +77,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     crumb: 'Decretul privind chiriile din 2026',
     title: 'Real Decreto-ley 29/2026 privind chiriile: ce se schimbă',
     description:
-      'Ce se schimbă pentru chiriaș cu Real Decreto-ley 29/2026 și în ce situație se află: în vigoare din 8 octombrie, în așteptarea validării.',
+      'Ce se schimbă pentru chiriaș cu Real Decreto-ley 29/2026: în vigoare din 8 octombrie 2026 și validat de Congres la 12 noiembrie.',
     h1: 'Real Decreto-ley 29/2026 privind chiriile: ce se schimbă și în ce situație se află',
   },
   fees: {
@@ -313,6 +313,7 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
   const decree = norms.rdl29_2026;
   const decreeEve = formatLongDay(toIso(addDays(parseDate(decree.inForceSince), -1)), 'ro');
   const since = formatLongDay(decree.inForceSince, 'ro');
+  const validatedOn = decree.statusSince ? formatLongDay(decree.statusSince, 'ro') : '';
   const caps = capsCopy('ro', norms, {
     checkedOn,
     iravRate: ctx.irav,
@@ -326,17 +327,38 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const { rent, anniversary } = RISE_EXAMPLE;
     const raise = (rate: number) => round2((rent * (100 + rate)) / 100);
     const capped = ctx.irav > DECREE_CAP;
-    const exampleDecree = capped
-      ? `Plătești ${formatEuros(rent)} pe lună, iar contractul tău împlinește încă un an pe ${formatLongDay(anniversary, 'ro')}. ` +
-        `Cu ultimul IRAV publicat (${formatRate(ctx.irav)}), dacă se aplică Real Decreto-ley 29/2026, plafonul fără un nou acord ` +
-        `este ${pct(DECREE_CAP)}, nu ${formatRate(ctx.irav)}: chiria ta poate ajunge la cel mult ${formatEuros(raise(DECREE_CAP))}.`
-      : `Plătești ${formatEuros(rent)} pe lună, iar contractul tău împlinește încă un an pe ${formatLongDay(anniversary, 'ro')}. ` +
-        `Dacă se aplică Real Decreto-ley 29/2026, plafonul fără un nou acord este ${pct(DECREE_CAP)} sau IRAV, oricare este mai mic: ` +
-        `cu ultimul IRAV publicat (${formatRate(ctx.irav)}), chiria ta poate ajunge la cel mult ${formatEuros(raise(ctx.irav))}.`;
+    const validated = decree.status === 'in_force';
+    const exampleVars = {
+      renta: formatEuros(rent),
+      fecha: formatLongDay(anniversary, 'ro'),
+      irav: formatRate(ctx.irav),
+      tope: pct(DECREE_CAP),
+      maximo: formatEuros(raise(capped ? DECREE_CAP : ctx.irav)),
+    };
+    const exampleDecree = validated
+      ? tx(
+          capped
+            ? 'rental.page.rise.example_in_force_capped'
+            : 'rental.page.rise.example_in_force_open',
+          exampleVars,
+        )
+      : capped
+        ? `Plătești ${formatEuros(rent)} pe lună, iar contractul tău împlinește încă un an pe ${formatLongDay(anniversary, 'ro')}. ` +
+          `Cu ultimul IRAV publicat (${formatRate(ctx.irav)}), dacă se aplică Real Decreto-ley 29/2026, plafonul fără un nou acord ` +
+          `este ${pct(DECREE_CAP)}, nu ${formatRate(ctx.irav)}: chiria ta poate ajunge la cel mult ${formatEuros(raise(DECREE_CAP))}.`
+        : `Plătești ${formatEuros(rent)} pe lună, iar contractul tău împlinește încă un an pe ${formatLongDay(anniversary, 'ro')}. ` +
+          `Dacă se aplică Real Decreto-ley 29/2026, plafonul fără un nou acord este ${pct(DECREE_CAP)} sau IRAV, oricare este mai mic: ` +
+          `cu ultimul IRAV publicat (${formatRate(ctx.irav)}), chiria ta poate ajunge la cel mult ${formatEuros(raise(ctx.irav))}.`;
     const exampleNoDecree =
       `Dacă Congresul ar abroga decretul, plafonul într-un contract semnat din 26 mai 2023 ar redeveni IRAV sau IPC, oricare este mai mic. ` +
       `Cu ultimul IRAV publicat (${formatRate(ctx.irav)}), ar fi cel mult ${formatEuros(raise(ctx.irav))}, ` +
       `cu condiția ca IPC să nu fie mai mic. IRAV care contează este ultimul publicat pe ${formatLongDay(anniversary, 'ro')}, care încă nu există.`;
+    const afterExample: Record<Norm['status'], string> = {
+      pending_validation:
+        'Cât timp decretul este în așteptarea validării, ambele calcule sunt posibile: primul dacă Congresul îl validează, iar al doilea dacă îl abrogă.',
+      in_force: tx('rental.page.rise.after_in_force', { fecha: validatedOn }),
+      repealed: tx('rental.page.rise.after_repealed'),
+    };
     return {
       lead: 'Majorarea depinde de trei lucruri: să fie prevăzută în contract, ziua în care se împlinește fiecare an de contract și plafonul legal din acea zi. Aici sunt plafoanele, unul câte unul și cu articolul lor.',
       sections: [
@@ -365,10 +387,8 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           id: 'ejemplo',
           heading: 'Exemplu rezolvat',
           paragraphs: [],
-          example: [exampleDecree, exampleNoDecree],
-          after: [
-            'Cât timp decretul este în așteptarea validării, ambele calcule sunt posibile: primul dacă Congresul îl validează, iar al doilea dacă îl abrogă.',
-          ],
+          example: validated ? [exampleDecree] : [exampleDecree, exampleNoDecree],
+          after: [afterExample[decree.status]],
           folio: { article: '18', law: 'LAU · RDL 29/2026' },
         },
       ],
@@ -383,11 +403,15 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'Mi se poate majora chiria dacă contractul nu spune nimic?',
           answer: tx('rent_indices.faq.no_clause_answer', { decretos: caps.faqNoClause }),
         },
-        {
-          anchor: 'faq-pendiente',
-          question: 'Ce înseamnă „în așteptarea validării” (pendiente de convalidación)?',
-          answer: `${caps.status} Până la votul Congresului, majorarea de ${pct(DECREE_CAP)} și cea după IRAV sau IPC sunt cele două interpretări posibile.`,
-        },
+        ...(decree.status === 'pending_validation'
+          ? [
+              {
+                anchor: 'faq-pendiente',
+                question: 'Ce înseamnă „în așteptarea validării” (pendiente de convalidación)?',
+                answer: `${caps.status} Până la votul Congresului, majorarea de ${pct(DECREE_CAP)} și cea după IRAV sau IPC sunt cele două interpretări posibile.`,
+              },
+            ]
+          : []),
         {
           anchor: 'faq-irav-o-ipc',
           question: 'Mi se aplică IRAV sau IPC?',
@@ -414,8 +438,11 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const point = (key: Key, vars?: Record<string, string>) =>
       standing ? tx(key, { ...vars, decreto: 'decretul' }) : sentence(key, vars);
     const status = caps.status;
+    const validated = decree.status === 'in_force';
     return {
-      lead: `Real Decreto-ley 29/2026 se aplică din ${since}. Un decret-lege intră în vigoare când o spune chiar el (acesta, a doua zi după publicare), dar își pierde efectele dacă nu este validat de Congres în 30 de zile: de aceea trebuie verificat întotdeauna în ce situație se află.`,
+      lead: validated
+        ? tx('rental.page.decree.lead_in_force', { desde: since, fecha: validatedOn })
+        : `Real Decreto-ley 29/2026 se aplică din ${since}. Un decret-lege intră în vigoare când o spune chiar el (acesta, a doua zi după publicare), dar își pierde efectele dacă nu este validat de Congres în 30 de zile: de aceea trebuie verificat întotdeauna în ce situație se află.`,
       sections: [
         {
           id: 'estado',
@@ -463,11 +490,17 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'Este decretul în vigoare?',
           answer: status,
         },
-        {
-          anchor: 'faq-derogado',
-          question: 'Ce se întâmplă dacă Congresul nu îl validează?',
-          answer: `Este abrogat și nu se mai aplică din acea zi; ce s-a întâmplat cât timp s-a aplicat este un caz incert. ${tx('rental.guide.update.doubtful')}`,
-        },
+        validated
+          ? {
+              anchor: 'faq-puede-caer',
+              question: tx('rental.page.decree.faq_still_question'),
+              answer: tx('rental.page.decree.faq_still_answer', { fecha: validatedOn }),
+            }
+          : {
+              anchor: 'faq-derogado',
+              question: 'Ce se întâmplă dacă Congresul nu îl validează?',
+              answer: `Este abrogat și nu se mai aplică din acea zi; ce s-a întâmplat cât timp s-a aplicat este un caz incert. ${tx('rental.guide.update.doubtful')}`,
+            },
         {
           anchor: 'faq-anteriores',
           question: 'Ce decrete anterioare au fost abrogate?',

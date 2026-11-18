@@ -1446,7 +1446,7 @@ export const en: Translation = {
   'legal_notice.rental.does':
     'It compares what you pay or have paid for the rental of a main home, with an agreement signed on or after 6 March 2019, with what the law allows: agency fees, deposit and guarantees, annual increases, expenses and return of the deposit with its interest. Each item comes with the law it is taken from, with its period of validity and its status.',
   'legal_notice.rental.pending':
-    'Several rental laws changed in 2026, and some are pending validation (convalidación) by Congress. Each rule says whether it is in force, pending validation or repealed. When a result depends on a law pending validation, it gives both calculations and the total only adds the lower one; if it depends on a decree that Congress repealed, it gives both calculations and does not add them.',
+    'Several rental laws changed in 2026: Congress validated some and repealed others. Each rule says whether it is in force, pending validation or repealed. When a result depends on a law pending validation, it gives both calculations and the total only adds the lower one; if it depends on a decree that Congress repealed, it gives both calculations and does not add them.',
   'legal_notice.rental.does_not':
     'It does not assess damage or whether a deduction from the deposit is justified, it does not calculate the cap on the initial rent in stressed housing areas (zonas tensionadas), it does not apply the specific rules of each autonomous community and it does not check extensions or notice periods beyond their dates. Nor does it review seasonal agreements, room rentals, agreements for another use or agreements signed before 6 March 2019.',
   'legal_notice.rental.beta':
@@ -3385,6 +3385,19 @@ export const en: Translation = {
   'rental.guide.regional.lodging':
     'Communities can require the landlord to lodge the deposit with a public body (additional provision 3.ª LAU). It is an obligation of the landlord towards the administration: it does not change what you pay.',
   'rental.guide.pages': 'Guides',
+  'rental.page.rise.example_in_force_capped':
+    'You pay {renta} a month and your agreement completes another year on {fecha}. With the latest IRAV published ({irav}), the cap without a new agreement is {tope}, not {irav}: your rent can go up to {maximo} at most.',
+  'rental.page.rise.example_in_force_open':
+    'You pay {renta} a month and your agreement completes another year on {fecha}. The cap without a new agreement is {tope} or the IRAV, whichever is lower: with the latest IRAV published ({irav}), your rent can go up to {maximo} at most.',
+  'rental.page.rise.after_in_force':
+    'Congress validated the decree (BOE of {fecha}): this is the calculation that applies, with the cap without a new agreement in final provision 6.ª of Real Decreto-ley 29/2026.',
+  'rental.page.rise.after_repealed':
+    'Congress repealed the decree: the second calculation applies.',
+  'rental.page.decree.lead_in_force':
+    'Real Decreto-ley 29/2026 has applied since {desde}. Congress validated it (BOE of {fecha}), so it can no longer lapse: only another law can change it.',
+  'rental.page.decree.faq_still_question': 'Can it still lapse?',
+  'rental.page.decree.faq_still_answer':
+    'No. Congress validated it (BOE of {fecha}); since then only another law can change it.',
   'rental.page.decree.rise':
     '{decreto} says that, until 31 December 2027 and without a new agreement between the parties, the rent cannot go up by more than 2 % (final provision 6.ª), and that the IRAV applies to all agreements (art. 4.Dos).',
   'rental.page.decree.zones':
@@ -3476,7 +3489,7 @@ export const en: Translation = {
   'rental.large.question': 'Large landlord',
   'rental.landlord.large': 'Is your landlord a large landlord (gran tenedor)?',
   'rental.landlord.large_hint':
-    'A large landlord is anyone who owns more than ten urban residential properties or more than 1.500 m² of residential floor space, not counting garages or storage rooms (art. 3.k of Ley 12/2023); in a stressed housing area, the autonomous community can lower this to five or more properties. Since 08-10-2026, Real Decreto-ley 29/2026, awaiting validation by Congress (pendiente de convalidación), adds that it is proven with a certificate from the Registro de la Propiedad (Land Registry) and that each residential unit in a building counts as one property, even if no horizontal division (división horizontal) is registered. Being a company is not enough: a company with few flats is not one.',
+    'A large landlord is anyone who owns more than ten urban residential properties or more than 1.500 m² of residential floor space, not counting garages or storage rooms (art. 3.k of Ley 12/2023); in a stressed housing area, the autonomous community can lower this to five or more properties. Since 08-10-2026, Real Decreto-ley 29/2026, {estado}, adds that it is proven with a certificate from the Registro de la Propiedad (Land Registry) and that each residential unit in a building counts as one property, even if no horizontal division (división horizontal) is registered. Being a company is not enough: a company with few flats is not one.',
   'rental.home.question': 'Where the home is',
   'rental.landlord.region': 'Autonomous community',
   'rental.landlord.region_hint': 'Where the home is.',
@@ -3799,9 +3812,9 @@ export const en: Translation = {
   'client.rental.out_of_scope.before_2019':
     'This version does not review agreements signed before 6 March 2019: they follow other rules for updating the rent.',
   'client.rental.out_of_scope.seasonal':
-    'This review does not yet cover seasonal agreements. For those signed on or after 8 October 2026, Real Decreto-ley 29/2026, awaiting validation by Congress (pendiente de convalidación), treats as a main-home agreement any temporary agreement that does not state a real and provable reason for being temporary. Those signed earlier keep the rules of the time until the agreed term ends (transitional provision 8.ª of the Ley de Arrendamientos Urbanos).',
+    'This review does not yet cover seasonal agreements. For those signed on or after 8 October 2026, Real Decreto-ley 29/2026, {estado}, treats as a main-home agreement any temporary agreement that does not state a real and provable reason for being temporary. Those signed earlier keep the rules of the time until the agreed term ends (transitional provision 8.ª of the Ley de Arrendamientos Urbanos).',
   'client.rental.out_of_scope.room':
-    'This review does not yet cover room rentals. Real Decreto-ley 29/2026, in force since 8 October 2026 and awaiting validation by Congress (pendiente de convalidación), brings them under housing rental, as main-home or temporary according to the need they meet.',
+    'This review does not yet cover room rentals. Real Decreto-ley 29/2026, in force since 8 October 2026 and {estado}, brings them under housing rental, as main-home or temporary according to the need they meet.',
   'client.rental.out_of_scope.other_use':
     'An agreement for a use other than housing has its own rules.',
   'client.rental.out_of_scope.protected':
@@ -3891,6 +3904,10 @@ export const en: Translation = {
   'client.rental.share.lowest': 'Only the lowest calculation is added to the total: {importe}.',
   'client.rental.hint.company_landlord':
     'In your agreement the landlord is a company: it may be a large landlord (gran tenedor).',
+  'client.rental.decree_state.pending_validation':
+    'awaiting validation by Congress (pendiente de convalidación)',
+  'client.rental.decree_state.in_force': 'validated by Congress',
+  'client.rental.decree_state.repealed': 'repealed by Congress',
   'client.rental.norm.in_force': 'in force',
   'client.rental.norm.pending_validation':
     'awaiting validation by Congress (pendiente de convalidación)',
@@ -3923,7 +3940,7 @@ export const en: Translation = {
     'If the home is in a stressed housing area (zona tensionada), the initial rent may be capped (art. 17.6 and 17.7 LAU). The areas are declared by each autonomous community; the reference price is in SERPAVI.',
   'client.rental.info.reference_price.title': 'Reference price',
   'client.rental.info.reference_price.text':
-    'For updates from 8 October 2026 to 31 December 2027, Real Decreto-ley 29/2026, awaiting validation by Congress (pendiente de convalidación), says that no increase is allowed if the rent is above the price limit that applies to it under the system of reference indices; it does not say in which cases that limit applies. This review does not calculate it; the price is in SERPAVI.',
+    'For updates from 8 October 2026 to 31 December 2027, Real Decreto-ley 29/2026, {estado}, says that no increase is allowed if the rent is above the price limit that applies to it under the system of reference indices; it does not say in which cases that limit applies. This review does not calculate it; the price is in SERPAVI.',
   'client.rental.info.minimum_term.title': 'How long your agreement lasts',
   'client.rental.info.minimum_term.text':
     'Your agreement ends on {contractEnd}. With the mandatory extension (prórroga obligatoria), your minimum term ends on {mandatoryEnd}.',
@@ -3932,10 +3949,10 @@ export const en: Translation = {
     'If nobody gives notice in time (the landlord, by {landlordBy}; you, by {tenantBy}), the agreement continues year by year until {tacitUntil}.',
   'client.rental.info.extensions_rdl28.title': 'Extensions from 15 November 2026',
   'client.rental.info.extensions_rdl28.text':
-    'Real Decreto-ley 28/2026, awaiting validation by Congress (pendiente de convalidación), changes the extensions from 15 November 2026. Your minimum term ends on {mandatoryEnd}.',
+    'Real Decreto-ley 28/2026, {estado}, changes the extensions from 15 November 2026. Your minimum term ends on {mandatoryEnd}.',
   'client.rental.info.extension_rdl29.title': 'Extraordinary extension',
   'client.rental.info.extension_rdl29.text':
-    'Real Decreto-ley 29/2026, awaiting validation by Congress (pendiente de convalidación), provides for an extraordinary extension for agreements whose mandatory extension, tacit extension or tacit renewal (tácita reconducción) ends between {from} and {until}.',
+    'Real Decreto-ley 29/2026, {estado}, provides for an extraordinary extension for agreements whose mandatory extension, tacit extension or tacit renewal (tácita reconducción) ends between {from} and {until}.',
   'client.rental.info.deposit_lodging.title': 'Lodging of the deposit',
   'client.rental.info.deposit_lodging.text':
     'The landlord lodges the deposit with the body of the autonomous community that requires it (additional provision 3.ª LAU).',
@@ -6002,7 +6019,9 @@ export const en: Translation = {
   'client.mortgage.calculation.information.prior_step_439bis':
     'Since 03-04-2025, the law regulates a specific prior step before going to court over mortgage clauses (art. 439 bis of the Ley de Enjuiciamiento Civil, the Civil Procedure Act). The link takes you to the text of the law.',
   'client.mortgage.calculation.information.loan_assignment':
-    'From 08-10-2026, Real Decreto-ley 29/2026 adds an art. 25 bis to the law: if the bank assigns your loan to someone else, you keep against the new holder what you could raise against the bank, and you must be informed of the assignment unless the bank, in agreement with the new holder, continues to service the loan (art. 25 bis.3). It is awaiting validation by Congress (pendiente de convalidación).',
+    'From 08-10-2026, Real Decreto-ley 29/2026 adds an art. 25 bis to the law: if the bank assigns your loan to someone else, you keep against the new holder what you could raise against the bank, and you must be informed of the assignment unless the bank, in agreement with the new holder, continues to service the loan (art. 25 bis.3).',
+  'client.mortgage.calculation.information.loan_assignment_pending':
+    'It is awaiting validation by Congress (pendiente de convalidación).',
   'client.mortgage.calculation.information.complaints_service':
     "The Banco de España's complaints service (Servicio de Reclamaciones) handles enquiries and complaints about banks (art. 30 of Ley 44/2002), and public consumer offices give information for free.",
   'client.mortgage.info.fein_timing': 'The information before the deed',

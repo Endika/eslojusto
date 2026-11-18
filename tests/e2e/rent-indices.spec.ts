@@ -20,7 +20,7 @@ test('the rent indices page shows one row per month with its sources', async ({ 
   await expect(
     august.getByRole('link', { name: 'publicado el 15-09-2026' }).first(),
   ).toHaveAttribute('href', /^https:\/\/www\.ine\.es\//);
-  await expect(page.getByText('pendiente de convalidación')).toBeVisible();
+  await expect(page.getByText('el Congreso convalidó el RDL 29/2026').first()).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Comprueba tu subida' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Revisar mi alquiler' })).toHaveAttribute(
     'href',

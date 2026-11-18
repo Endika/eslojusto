@@ -9,6 +9,7 @@ import type { Block, DocumentModel } from '../../src/documents/ports';
 import { rentalCase } from '../../src/rental/case';
 import { depositLetter, rentalLetterKinds, rentLetter, riseLines } from '../../src/rental/letters';
 import type { CompletedRentalReview } from '../../src/rental/ports';
+import { NORMS_BEFORE_VOTE } from '../engine/rental/norms-before-vote';
 import { FORBIDDEN } from '../support/forbidden';
 import {
   contract,
@@ -66,17 +67,18 @@ const FUTURE: ReviewDeps = {
     ipc: extend(RENTAL_TABLES.indices.ipc, '2026-09', 4.9),
   },
 };
-const pendingRise = completed(
-  contract({
-    signedOn: f('2021-10-15'),
-    startDate: f('2021-10-20'),
-    updateClause: 'fixed_percent',
-    fixedPercent: 3,
-    updates: [update('2026-10-20', 1000, 1040)],
-  }),
-  f('2026-12-20'),
-  FUTURE,
-);
+const fixedPercentRise = contract({
+  signedOn: f('2021-10-15'),
+  startDate: f('2021-10-20'),
+  updateClause: 'fixed_percent',
+  fixedPercent: 3,
+  updates: [update('2026-10-20', 1000, 1040)],
+});
+const pendingRise = completed(fixedPercentRise, f('2026-12-20'), {
+  ...FUTURE,
+  norms: NORMS_BEFORE_VOTE,
+});
+const validatedRise = completed(fixedPercentRise, f('2026-12-20'), FUTURE);
 
 const details: LetterDetails = {
   ...NO_DETAILS,
@@ -292,6 +294,15 @@ describe('the rent letter', () => {
       'Esta cifra es la más baja de las dos cuentas posibles, porque una norma de la que depende está pendiente de convalidación por el Congreso: ',
     );
     expect(all).toContain('Real Decreto-ley 29/2026');
+  });
+
+  it('a rise under the validated RDL 29/2026 is one reading, not a pending one', () => {
+    const [line] = riseLines(validatedRise.review);
+    expect(line?.pending).toBe(false);
+    expect(line?.reading).toMatchObject({ maxRent: 1020, monthly: 20 });
+    const all = text(rentLetter(validatedRise, details, tr));
+    expect(all).toMatch(/la renta que resulta según el art\. 18 LAU es 1\.020,00\s€ al mes/);
+    expect(all).not.toContain('pendiente de convalidación');
   });
 
   it('leaves out a doubt whose other reading cannot be checked: nothing holds in both', () => {

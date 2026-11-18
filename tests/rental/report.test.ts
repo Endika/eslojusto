@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate as f } from '../../src/engine/date';
+import { RENTAL_TABLES } from '../../src/engine/rental/data/tables';
+import { reviewRental } from '../../src/engine/rental/review';
 import type { RentalInput } from '../../src/engine/rental/types';
 import type { Block, DocumentModel } from '../../src/documents/ports';
 import { sans } from '../../src/documents/fonts/sans';
@@ -9,6 +11,7 @@ import { STYLES } from '../../src/documents/pdf';
 import { PdfDocument } from '../../src/documents/pdf-writer';
 import { depositLetter, rentLetter } from '../../src/rental/letters';
 import { rentalReport } from '../../src/rental/report';
+import { NORMS_BEFORE_VOTE } from '../engine/rental/norms-before-vote';
 import { FORBIDDEN } from '../support/forbidden';
 import { repealedWindow, review, riseAboveIrav, TODAY, tr, update } from './fixtures';
 
@@ -99,7 +102,17 @@ describe('the rental report', () => {
           'LAU, art. 36.4 (Ley 29/1994, de 24 de noviembre, de Arrendamientos Urbanos) · en vigor',
     );
     expect(deposit).toMatchObject({ url: expect.stringMatching(/^https:\/\/www\.boe\.es\//) });
-    expect(all).toMatch(/Real Decreto-ley 28\/2026.* · pendiente de convalidación/);
+    expect(all).not.toContain('Real Decreto-ley 28/2026');
+    expect(all).not.toContain('pendiente de convalidación');
+  });
+
+  it('gives RDL 28/2026 as pending when it awaited the vote, as the report read before 12-11-2026', () => {
+    const before = reviewRental(full, TODAY, { ...RENTAL_TABLES, norms: NORMS_BEFORE_VOTE });
+    if (!before.ok) throw new Error('invalid');
+    const pending = text(
+      rentalReport({ review: before.review, input: full, detail: 'unlocked' }, tr, TODAY).blocks,
+    );
+    expect(pending).toMatch(/Real Decreto-ley 28\/2026.* · pendiente de convalidación/);
   });
 
   it('every item cites its sources with the days they had effect', () => {

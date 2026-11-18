@@ -8,6 +8,7 @@ import {
   type NormTable,
 } from '../../../src/engine/rental/norms';
 import { activeRules, ruleSource, RULES, type RuleId } from '../../../src/engine/rental/rules';
+import { NORMS_BEFORE_VOTE } from './norms-before-vote';
 
 const BOE = 'https://www.boe.es/';
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
@@ -43,7 +44,7 @@ describe('norm table', () => {
 
   it('a repealed norm says when it ended and where the repeal was published', () => {
     const repealed = Object.values(NORMS).filter((n) => n.status === 'repealed');
-    expect(repealed.map((n) => n.id).sort()).toEqual(['rdl26_2026', 'rdl8_2026']);
+    expect(repealed.map((n) => n.id).sort()).toEqual(['rdl26_2026', 'rdl28_2026', 'rdl8_2026']);
     for (const n of repealed) {
       expect(n.inForceUntil).toMatch(ISO);
       expect(n.statusSince).toMatch(ISO);
@@ -79,6 +80,14 @@ describe('rule sources', () => {
       citation: 'disposición final 6.ª (Real Decreto-ley 29/2026, de 6 de octubre)',
       inForceSince: '2026-10-08',
       inForceUntil: '2027-12-31',
+      status: 'in_force',
+      statusSince: '2026-11-13',
+      statusUrl: `${BOE}buscar/doc.php?id=BOE-A-2026-23755`,
+    });
+  });
+
+  it('carry the pending status before the vote', () => {
+    expect(ruleSource('cap_2_rdl29', NORMS_BEFORE_VOTE)).toMatchObject({
       status: 'pending_validation',
       statusSince: null,
     });
@@ -114,10 +123,14 @@ describe('rules active on a day', () => {
   });
 
   it('a rule pending validation keeps the one it would replace, both in doubt', () => {
-    expect(rulesOn('2026-10-08', NORMS, 'fees_')).toEqual([
+    expect(rulesOn('2026-10-08', NORMS_BEFORE_VOTE, 'fees_')).toEqual([
       ['fees_2023', 'pending_validation'],
       ['fees_2026', 'pending_validation'],
     ]);
+  });
+
+  it('the validated RDL 29/2026 stands alone from its first day', () => {
+    expect(rulesOn('2026-10-08', NORMS, 'fees_')).toEqual([['fees_2026', null]]);
   });
 
   it('once validated, the new rule stands alone', () => {
@@ -137,7 +150,8 @@ describe('rules active on a day', () => {
     expect(rulesOn('2026-11-06', rdl29Repealed, 'fees_')).toEqual([['fees_2023', null]]);
   });
 
-  it.each([
+  type CapDay = readonly [string, readonly (readonly [string, string | null])[]];
+  const CAP_DAYS: readonly CapDay[] = [
     ['2026-03-21', []],
     ['2026-03-22', [['cap_2_rdl8', 'repealed_window']]],
     ['2026-04-30', [['cap_2_rdl8', 'repealed_window']]],
@@ -145,32 +159,60 @@ describe('rules active on a day', () => {
     ['2026-10-01', [['cap_2_rdl26', 'repealed_window']]],
     ['2026-10-02', [['cap_2_rdl26', 'repealed_window']]],
     ['2026-10-03', []],
+  ];
+
+  it.each<CapDay>([
+    ...CAP_DAYS,
     ['2026-10-08', [['cap_2_rdl29', 'pending_validation']]],
     ['2027-12-31', [['cap_2_rdl29', 'pending_validation']]],
     ['2028-01-01', []],
-  ])('a 2 %% cap on an anniversary of %s', (day, expected) => {
+  ])('a 2 %% cap on an anniversary of %s, before the vote', (day, expected) => {
+    expect(rulesOn(day, NORMS_BEFORE_VOTE, 'cap_2_')).toEqual(expected);
+  });
+
+  it.each<CapDay>([
+    ...CAP_DAYS,
+    ['2026-10-08', [['cap_2_rdl29', null]]],
+    ['2027-12-31', [['cap_2_rdl29', null]]],
+    ['2028-01-01', []],
+  ])('a 2 %% cap on an anniversary of %s, now it is validated', (day, expected) => {
     expect(rulesOn(day, NORMS, 'cap_2_')).toEqual(expected);
   });
 
   it('a clause naming no index follows the IRAV only in the reading where RDL 29/2026 holds', () => {
-    expect(rulesOn('2026-10-07', NORMS, 'update_clause')).toEqual([['update_clause', null]]);
-    expect(rulesOn('2026-10-08', NORMS, 'update_clause')).toEqual([
+    expect(rulesOn('2026-10-07', NORMS_BEFORE_VOTE, 'update_clause')).toEqual([
+      ['update_clause', null],
+    ]);
+    expect(rulesOn('2026-10-08', NORMS_BEFORE_VOTE, 'update_clause')).toEqual([
       ['update_clause', 'pending_validation'],
       ['update_clause_rdl29', 'pending_validation'],
     ]);
   });
 
+  it('a clause naming no index follows the IRAV from 08-10-2026, validated', () => {
+    expect(rulesOn('2026-10-08', NORMS, 'update_clause')).toEqual([['update_clause_rdl29', null]]);
+  });
+
   it('the tacit renewal in force is in doubt once RDL 28/2026 takes effect', () => {
-    expect(rulesOn('2026-11-14', NORMS, 'term_')).toEqual([
+    expect(rulesOn('2026-11-14', NORMS_BEFORE_VOTE, 'term_')).toEqual([
       ['term_minimum', null],
       ['term_tacit', null],
     ]);
-    expect(rulesOn('2026-11-15', NORMS, 'term_')).toEqual([
+    expect(rulesOn('2026-11-15', NORMS_BEFORE_VOTE, 'term_')).toEqual([
       ['term_minimum', null],
       ['term_tacit', 'pending_validation'],
       ['term_rdl28', 'pending_validation'],
     ]);
   });
+
+  it.each(['2026-10-08', '2026-11-14', '2026-11-15', '2026-11-20', '2030-01-01'])(
+    'RDL 28/2026 is repealed before it took effect: the tacit renewal stands alone on %s',
+    (day) => {
+      expect(normStanding(NORMS.rdl28_2026, day)).not.toBe('in_force');
+      expect(rulesOn(day, NORMS, 'term_').map(([id]) => id)).not.toContain('term_rdl28');
+      expect(rulesOn(day, NORMS, 'term_').every(([, doubt]) => doubt === null)).toBe(true);
+    },
+  );
 
   it('a norm repealed before it took effect never applies', () => {
     const neverInForce = withNorm('rdl28_2026', {

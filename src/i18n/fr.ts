@@ -1498,7 +1498,7 @@ export const fr: Translation = {
   'legal_notice.rental.does':
     "Elle compare ce que vous payez ou avez payé pour la location de votre résidence principale, avec un bail signé depuis le 6 mars 2019, avec ce que permet la loi\u00a0: honoraires de l'agence, dépôt de garantie et garanties, augmentations annuelles, charges et restitution du dépôt de garantie avec ses intérêts. Chaque poste indique le texte de loi dont il provient, avec sa période d'application et son statut.",
   'legal_notice.rental.pending':
-    "Plusieurs règles sur la location ont changé en 2026, et certaines attendent leur validation par le Congrès (convalidación). Chaque règle indique si elle est en vigueur, en attente de validation ou abrogée. Quand un résultat dépend d'un texte en attente, la vérification donne les deux calculs et le total ne retient que le plus bas\u00a0; s'il dépend d'un décret que le Congrès a abrogé, elle donne les deux calculs sans les additionner.",
+    "Plusieurs règles sur la location ont changé en 2026\u00a0: le Congrès en a validé certaines et en a abrogé d'autres. Chaque règle indique si elle est en vigueur, en attente de validation ou abrogée. Quand un résultat dépend d'un texte en attente, la vérification donne les deux calculs et le total ne retient que le plus bas\u00a0; s'il dépend d'un décret que le Congrès a abrogé, elle donne les deux calculs sans les additionner.",
   'legal_notice.rental.does_not':
     "Elle n'apprécie pas les dégradations ni si une retenue sur le dépôt de garantie est fondée, elle ne calcule pas le plafond du loyer initial dans les zones tendues (zonas tensionadas), elle n'applique pas les règles propres à chaque communauté autonome et elle ne contrôle pas les prorogations ni les préavis au-delà de leurs dates. Elle ne vérifie pas non plus les baux saisonniers, à la chambre, pour un autre usage ni ceux signés avant le 6 mars 2019.",
   'legal_notice.rental.beta':
@@ -3487,6 +3487,19 @@ export const fr: Translation = {
   'rental.guide.regional.lodging':
     "Les communautés autonomes peuvent obliger le propriétaire à déposer le dépôt de garantie auprès d'un organisme public (disposition additionnelle 3.ª LAU). C'est une obligation du propriétaire envers l'administration\u00a0: elle ne change pas ce que vous payez.",
   'rental.guide.pages': 'Guides',
+  'rental.page.rise.example_in_force_capped':
+    'Vous payez {renta} par mois et votre bail atteint une nouvelle année le {fecha}. Avec le dernier IRAV publié ({irav}), le plafond sans nouvel accord est de {tope}, et non de {irav}\u00a0: votre loyer peut passer à {maximo} au maximum.',
+  'rental.page.rise.example_in_force_open':
+    "Vous payez {renta} par mois et votre bail atteint une nouvelle année le {fecha}. Le plafond sans nouvel accord est de {tope} ou l'IRAV, le plus bas des deux\u00a0: avec le dernier IRAV publié ({irav}), votre loyer peut passer à {maximo} au maximum.",
+  'rental.page.rise.after_in_force':
+    "Le Congrès a validé le décret (BOE du {fecha})\u00a0: c'est le calcul qui s'applique, avec le plafond sans nouvel accord de la disposición final 6.ª du Real Decreto-ley 29/2026.",
+  'rental.page.rise.after_repealed':
+    "Le Congrès a abrogé le décret\u00a0: c'est le second calcul qui s'applique.",
+  'rental.page.decree.lead_in_force':
+    "Le Real Decreto-ley 29/2026 s'applique depuis le {desde}. Le Congrès l'a validé (BOE du {fecha}), il ne peut donc plus devenir caduc\u00a0: seul un autre texte peut le modifier.",
+  'rental.page.decree.faq_still_question': 'Peut-il encore devenir caduc\u00a0?',
+  'rental.page.decree.faq_still_answer':
+    "Non. Le Congrès l'a validé (BOE du {fecha})\u00a0; depuis, seul un autre texte peut le modifier.",
   'rental.page.decree.rise':
     "{decreto} prévoit que, jusqu'au 31 décembre 2027 et sans nouvel accord entre les parties, le loyer ne peut pas augmenter de plus de 2\u00a0% (disposition finale 6.ª), et que l'IRAV s'applique à tous les baux (art. 4.Dos).",
   'rental.page.decree.zones':
@@ -3578,7 +3591,7 @@ export const fr: Translation = {
   'rental.large.question': 'Grand propriétaire',
   'rental.landlord.large': 'Votre propriétaire est-il un grand propriétaire (gran tenedor)\u00a0?',
   'rental.landlord.large_hint':
-    "Est grand propriétaire la personne qui détient plus de dix biens immobiliers urbains à usage résidentiel ou plus de 1.500 m² à usage résidentiel, sans compter les garages ni les débarras (art. 3.k de la Ley 12/2023)\u00a0; dans une zone tendue, la communauté autonome peut abaisser ce seuil à cinq biens ou plus. Depuis le 08-10-2026, le Real Decreto-ley 29/2026, en attente de validation par le Congrès (convalidación), ajoute que cette qualité se prouve par un certificat du registre foncier (Registro de la Propiedad) et que chaque unité à usage résidentiel d'un immeuble compte comme un bien, même sans division en copropriété inscrite. Être une entreprise ne suffit pas\u00a0: une société qui possède peu de logements n'est pas un grand propriétaire.",
+    "Est grand propriétaire la personne qui détient plus de dix biens immobiliers urbains à usage résidentiel ou plus de 1.500 m² à usage résidentiel, sans compter les garages ni les débarras (art. 3.k de la Ley 12/2023)\u00a0; dans une zone tendue, la communauté autonome peut abaisser ce seuil à cinq biens ou plus. Depuis le 08-10-2026, le Real Decreto-ley 29/2026, {estado}, ajoute que cette qualité se prouve par un certificat du registre foncier (Registro de la Propiedad) et que chaque unité à usage résidentiel d'un immeuble compte comme un bien, même sans division en copropriété inscrite. Être une entreprise ne suffit pas\u00a0: une société qui possède peu de logements n'est pas un grand propriétaire.",
   'rental.home.question': 'Où se trouve le logement',
   'rental.landlord.region': 'Communauté autonome',
   'rental.landlord.region_hint': 'Celle où se trouve le logement.',
@@ -3910,9 +3923,9 @@ export const fr: Translation = {
   'client.rental.out_of_scope.before_2019':
     "Cette version ne vérifie pas les baux signés avant le 6 mars 2019\u00a0: d'autres règles s'appliquent à l'actualisation de leur loyer.",
   'client.rental.out_of_scope.seasonal':
-    "Cette vérification ne couvre pas encore les baux saisonniers. Pour ceux signés depuis le 8 octobre 2026, le Real Decreto-ley 29/2026, en attente de validation, traite comme bail de résidence principale le bail temporaire qui ne mentionne pas un motif réel et justifiable de location temporaire. Ceux signés avant restent soumis aux règles de l'époque jusqu'à la fin de la durée convenue (disposition transitoire 8.ª de la Ley de Arrendamientos Urbanos).",
+    "Cette vérification ne couvre pas encore les baux saisonniers. Pour ceux signés depuis le 8 octobre 2026, le Real Decreto-ley 29/2026, {estado}, traite comme bail de résidence principale le bail temporaire qui ne mentionne pas un motif réel et justifiable de location temporaire. Ceux signés avant restent soumis aux règles de l'époque jusqu'à la fin de la durée convenue (disposition transitoire 8.ª de la Ley de Arrendamientos Urbanos).",
   'client.rental.out_of_scope.room':
-    "Cette vérification ne couvre pas encore les locations à la chambre. Le Real Decreto-ley 29/2026, en vigueur depuis le 8 octobre 2026 et en attente de validation, les inclut dans la location de logement, de résidence principale ou temporaire selon le besoin qu'elles couvrent.",
+    "Cette vérification ne couvre pas encore les locations à la chambre. Le Real Decreto-ley 29/2026, en vigueur depuis le 8 octobre 2026 et {estado}, les inclut dans la location de logement, de résidence principale ou temporaire selon le besoin qu'elles couvrent.",
   'client.rental.out_of_scope.other_use':
     "Un bail pour un usage autre que l'habitation a ses propres règles.",
   'client.rental.out_of_scope.protected':
@@ -4005,6 +4018,9 @@ export const fr: Translation = {
   'client.rental.share.lowest': 'Seul le calcul le plus bas est ajouté au total\u00a0: {importe}.',
   'client.rental.hint.company_landlord':
     "Dans votre bail, le propriétaire est une entreprise\u00a0: il peut s'agir d'un grand propriétaire.",
+  'client.rental.decree_state.pending_validation': 'en attente de validation par le Congrès',
+  'client.rental.decree_state.in_force': 'validé par le Congrès',
+  'client.rental.decree_state.repealed': 'abrogé par le Congrès',
   'client.rental.norm.in_force': 'en vigueur',
   'client.rental.norm.pending_validation':
     'en attente de validation par le Congrès (convalidación)',
@@ -4037,7 +4053,7 @@ export const fr: Translation = {
     'Si le logement se trouve dans une zone tendue, le loyer initial peut être plafonné (art. 17.6 et 17.7 LAU). Les zones sont déclarées par chaque communauté autonome\u00a0; le prix de référence figure dans le SERPAVI.',
   'client.rental.info.reference_price.title': 'Prix de référence',
   'client.rental.info.reference_price.text':
-    "Pour les actualisations du 8 octobre 2026 au 31 décembre 2027, le Real Decreto-ley 29/2026, en attente de validation, prévoit qu'aucune augmentation n'est possible si le loyer dépasse le plafond de prix qui lui est applicable selon le système d'indices de référence\u00a0; il ne dit pas dans quels cas ce plafond s'applique. Cette vérification ne le calcule pas\u00a0; le prix figure dans le SERPAVI.",
+    "Pour les actualisations du 8 octobre 2026 au 31 décembre 2027, le Real Decreto-ley 29/2026, {estado}, prévoit qu'aucune augmentation n'est possible si le loyer dépasse le plafond de prix qui lui est applicable selon le système d'indices de référence\u00a0; il ne dit pas dans quels cas ce plafond s'applique. Cette vérification ne le calcule pas\u00a0; le prix figure dans le SERPAVI.",
   'client.rental.info.minimum_term.title': "Jusqu'à quand dure votre bail",
   'client.rental.info.minimum_term.text':
     'Votre bail prend fin le {contractEnd}. Avec la prorogation obligatoire, votre durée minimale prend fin le {mandatoryEnd}.',
@@ -4046,10 +4062,10 @@ export const fr: Translation = {
     "Si personne ne donne congé à temps (le propriétaire, jusqu'au {landlordBy}\u00a0; vous, jusqu'au {tenantBy}), le bail se poursuit d'année en année jusqu'au {tacitUntil}.",
   'client.rental.info.extensions_rdl28.title': 'Prorogations à partir du 15 novembre 2026',
   'client.rental.info.extensions_rdl28.text':
-    'Le Real Decreto-ley 28/2026, en attente de validation, modifie les prorogations à partir du 15 novembre 2026. Votre durée minimale prend fin le {mandatoryEnd}.',
+    'Le Real Decreto-ley 28/2026, {estado}, modifie les prorogations à partir du 15 novembre 2026. Votre durée minimale prend fin le {mandatoryEnd}.',
   'client.rental.info.extension_rdl29.title': 'Prorogation extraordinaire',
   'client.rental.info.extension_rdl29.text':
-    'Le Real Decreto-ley 29/2026, en attente de validation, prévoit une prorogation extraordinaire pour les baux dont la prorogation obligatoire, la prorogation tacite ou la tacite reconduction prend fin entre le {from} et le {until}.',
+    'Le Real Decreto-ley 29/2026, {estado}, prévoit une prorogation extraordinaire pour les baux dont la prorogation obligatoire, la prorogation tacite ou la tacite reconduction prend fin entre le {from} et le {until}.',
   'client.rental.info.deposit_lodging.title': 'Consignation du dépôt de garantie',
   'client.rental.info.deposit_lodging.text':
     "Le propriétaire dépose le dépôt de garantie auprès de l'organisme de la communauté autonome qui le prévoit (disposition additionnelle 3.ª LAU).",
@@ -6171,7 +6187,9 @@ export const fr: Translation = {
   'client.mortgage.calculation.information.prior_step_439bis':
     "Depuis le 03-04-2025, la loi encadre une étape préalable précise avant de saisir un tribunal au sujet des clauses d'un prêt immobilier (art. 439 bis de la Ley de Enjuiciamiento Civil). Le lien mène au texte de la loi.",
   'client.mortgage.calculation.information.loan_assignment':
-    "Depuis le 08-10-2026, le Real Decreto-ley 29/2026 ajoute à la loi un art. 25 bis\u00a0: si la banque cède votre prêt à un autre établissement, vous conservez face au nouveau titulaire ce que vous pouviez opposer à la banque, et la cession doit vous être notifiée, sauf si la banque, en accord avec le nouveau titulaire, continue d'assurer la gestion du prêt (art. 25 bis.3). Il est en attente de validation par le Congrès (convalidación).",
+    "Depuis le 08-10-2026, le Real Decreto-ley 29/2026 ajoute à la loi un art. 25 bis\u00a0: si la banque cède votre prêt à un autre établissement, vous conservez face au nouveau titulaire ce que vous pouviez opposer à la banque, et la cession doit vous être notifiée, sauf si la banque, en accord avec le nouveau titulaire, continue d'assurer la gestion du prêt (art. 25 bis.3).",
+  'client.mortgage.calculation.information.loan_assignment_pending':
+    'Il est en attente de validation par le Congrès (convalidación).',
   'client.mortgage.calculation.information.complaints_service':
     "Le Servicio de Reclamaciones du Banco de España traite les demandes d'information et les réclamations concernant les banques (art. 30 de la Ley 44/2002), et les services publics de la consommation informent gratuitement.",
   'client.mortgage.info.fein_timing': "L'information avant l'acte",

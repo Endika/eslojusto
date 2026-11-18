@@ -41,7 +41,7 @@ export function setUpRental(
       const g = gate(f, tables.norms);
       if (g.inScope) return false;
       shown = null;
-      renderOutOfScope(result, g.reason, tr);
+      renderOutOfScope(result, g.reason, tables.norms.rdl29_2026.status, tr);
       events.outOfScope(g.reason);
       return true;
     },
