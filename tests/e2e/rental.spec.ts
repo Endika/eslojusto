@@ -470,3 +470,18 @@ test('the page has its title, description, heading, canonical, JSON-LD and revie
   await expect(footer).toContainText('Ley de Arrendamientos Urbanos (Ley 29/1994)');
   await expect(footer).not.toContainText('Estatuto de los Trabajadores');
 });
+
+test('the home page, the page and the legal notice show the rental review out of beta', async ({
+  page,
+}) => {
+  await page.goto('');
+  const card = page.getByRole('article', { name: 'Alquiler', exact: true });
+  await expect(card.getByRole('link', { name: 'Alquiler' })).toBeVisible();
+  await expect(card.getByText('Beta')).toHaveCount(0);
+  await page.goto('alquiler/');
+  await expect(page.locator('main')).not.toContainText('Sección en pruebas');
+  await page.goto('aviso-legal/');
+  await expect(page.getByRole('heading', { name: /La revisión del alquiler/ })).not.toContainText(
+    'Beta',
+  );
+});

@@ -6,6 +6,7 @@ import RentalResult from '../components/RentalResult.astro';
 import DocumentStart from '../components/DocumentStart.astro';
 import RentalGuide from '../components/RentalGuide.astro';
 import { DOCUMENTS } from '../documents/config';
+import { RENTAL_BETA } from '../content/sections';
 import { NORMS } from '../engine/rental/data/norms';
 import { TABS } from '../rental/steps';
 import { formatLongDay } from '../content/rent-indices';
@@ -80,10 +81,12 @@ const structuredData = [
         <Breadcrumbs lang={lang} crumbs={crumbs} />
         <h1 class="desk__title">{tx('rental.h1')}</h1>
         <p class="desk__lead">{tx('rental.lead')}</p>
-        <p class="desk__beta">
-          <span class="beta">{tx('rental.beta')}</span>
-          {tx('rental.beta_note')}
-        </p>
+        {RENTAL_BETA && (
+          <p class="desk__beta">
+            <span class="beta">{tx('rental.beta')}</span>
+            {tx('rental.beta_note')}
+          </p>
+        )}
         <p class="desk__reviewed">
           <time datetime={checkedOn}>
             {t(lang, 'rental.reviewed', { fecha: formatLongDay(checkedOn, lang) })}

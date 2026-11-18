@@ -1,6 +1,9 @@
 // /contrato/ left the beta after three real contracts read and reviewed right.
 export const EMPLOYMENT_BETA = false;
 
+// /alquiler/ left the beta once the Congress validated RDL 29/2026.
+export const RENTAL_BETA = false;
+
 // /empleada-de-hogar/ is still a beta.
 export const HOUSEHOLD_BETA = true;
 

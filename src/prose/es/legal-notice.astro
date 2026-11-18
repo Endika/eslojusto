@@ -9,6 +9,7 @@ import {
   EMPLOYMENT_BETA,
   INSURANCE_BETA,
   MORTGAGE_BETA,
+  RENTAL_BETA,
 } from '../../content/sections';
 import { ERTE_LEGAL, ERTE_PAGE } from '../../content/erte';
 
@@ -103,14 +104,16 @@ const documents = DOCUMENTS !== null;
 
   <section class="sheet sheet--text">
     <h2 id="al-alquiler">
-      {tx('legal_notice.rental')} <span class="beta">{tx('rental.beta')}</span>
+      {tx('legal_notice.rental')} {RENTAL_BETA && <span class="beta">{tx('rental.beta')}</span>}
     </h2>
     <p>{tx('legal_notice.rental.does')}</p>
     <p>{tx('legal_notice.rental.pending')}</p>
     <p>{tx('legal_notice.rental.does_not')}</p>
-    <p>
-      {tx('legal_notice.rental.beta')} <a href={`mailto:${email}`}>{email}</a>.
-    </p>
+    {RENTAL_BETA && (
+      <p>
+        {tx('legal_notice.rental.beta')} <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+    )}
   </section>
 
   <section class="sheet sheet--text">
