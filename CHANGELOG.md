@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.115.1](https://github.com/Endika/eslojusto/compare/v1.115.0...v1.115.1) (2026-11-18)
+
+
+### Bug Fixes
+
+* **bills:** record RDL 25/2026 as validated and the December reduction as not met ([7fd6684](https://github.com/Endika/eslojusto/commit/7fd6684db7c3acf3dfcc7118bfa60258e95a695b))
+
 ## [1.115.0](https://github.com/Endika/eslojusto/compare/v1.114.2...v1.115.0) (2026-11-14)
 
 
