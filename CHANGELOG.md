@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.115.2](https://github.com/Endika/eslojusto/compare/v1.115.1...v1.115.2) (2026-11-18)
+
+
+### Bug Fixes
+
+* **rental:** record RDL 29/2026 as validated and RDL 28/2026 as repealed ([18a0f60](https://github.com/Endika/eslojusto/commit/18a0f602625c6a551db595f608a29286780429ec))
+
 ## [1.115.1](https://github.com/Endika/eslojusto/compare/v1.115.0...v1.115.1) (2026-11-18)
 
 
