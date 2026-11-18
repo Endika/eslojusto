@@ -5,7 +5,7 @@ import { fitsScreen, forwardButton, noSideScroll } from '../support/sheets';
 // interest are read as loaded on this day, so the clock is fixed.
 const TODAY = '2026-10-10';
 // The day /hipoteca/ last changed (src/content/updated.ts).
-const REVIEWED = '2026-10-11';
+const REVIEWED = '2026-11-18';
 
 const SIZES = [
   { name: 'desktop', viewport: { width: 1280, height: 800 } },
@@ -437,7 +437,9 @@ test('the page shows when it was reviewed and makes no request', async ({ page }
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Los gastos, las comisiones y las cláusulas de tu hipoteca',
   );
-  await expect(page.locator('.desk__reviewed')).toContainText('Revisado el 11 de octubre de 2026');
+  await expect(page.locator('.desk__reviewed')).toContainText(
+    'Revisado el 18 de noviembre de 2026',
+  );
   await expect(page.locator('.desk__reviewed time')).toHaveAttribute('datetime', REVIEWED);
   await page.goto('');
   await page.getByRole('link', { name: 'Hipoteca', exact: true }).click();
@@ -481,7 +483,9 @@ test('the page has its title, heading, canonical, JSON-LD, guide and questions',
   await expect(page.locator('.faq-item summary')).toHaveText(questions);
 
   const guide = page.locator('.guide');
-  await expect(guide.locator('.guide__sources')).toContainText('Revisado el 11 de octubre de 2026');
+  await expect(guide.locator('.guide__sources')).toContainText(
+    'Revisado el 18 de noviembre de 2026',
+  );
   await expect(
     guide.getByRole('heading', { name: 'Desde el 16-06-2019, lo dice la ley' }),
   ).toBeVisible();
