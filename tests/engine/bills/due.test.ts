@@ -101,9 +101,12 @@ describe('the bills due list', () => {
 
   it('lists the decrees still to be validated, and the holidays of a year not loaded', () => {
     const items = billsDue(parseDate('2026-10-09'), deps);
-    expect(items.filter((i) => i.kind === 'validation_pending')).toEqual([
-      { kind: 'validation_pending', norm: 'rdl25_2026', since: '2026-10-01' },
-    ]);
+    expect(
+      billsDue(parseDate('2026-10-09'), beforeFigure).filter(
+        (i) => i.kind === 'validation_pending',
+      ),
+    ).toEqual([{ kind: 'validation_pending', norm: 'rdl25_2026', since: '2026-10-01' }]);
+    expect(items.some((i) => i.kind === 'validation_pending')).toBe(false);
     expect(items.some((i) => i.kind === 'holidays_missing')).toBe(false);
     expect(billsDue(parseDate('2027-01-04'), deps)).toContainEqual({
       kind: 'holidays_missing',
@@ -120,14 +123,10 @@ describe('the bills due list', () => {
     ).toEqual(['rdl25_2026_november', 'rdl25_2026_december']);
   });
 
-  it('leaves November out once the INE gave its figure', () => {
-    const items = billsDue(parseDate('2026-10-14'), deps);
-    expect(
-      items
-        .filter((i) => i.kind === 'condition_open')
-        .map((i) => i.kind === 'condition_open' && i.norm),
-    ).toEqual(['rdl25_2026_december']);
-    expect(items.some((i) => i.kind === 'month_conditional' && i.month === '2026-11')).toBe(false);
+  it('leaves November and December out once the INE gave their figures', () => {
+    const items = billsDue(parseDate('2026-11-18'), deps);
+    expect(items.some((i) => i.kind === 'condition_open')).toBe(false);
+    expect(items.some((i) => i.kind === 'month_conditional')).toBe(false);
   });
 
   it('a month without its rate is listed as missing', () => {

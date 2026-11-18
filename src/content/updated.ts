@@ -32,10 +32,10 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/seguros/': '2026-10-11',
   '/financiacion/': '2026-10-11',
   '/hipoteca/': '2026-10-11',
-  '/facturas/': '2026-11-04',
-  '/facturas/luz/': '2026-11-04',
+  '/facturas/': '2026-11-18',
+  '/facturas/luz/': '2026-11-18',
   '/facturas/permanencia/': '2026-11-04',
-  '/facturas/renovacion/': '2026-11-04',
+  '/facturas/renovacion/': '2026-11-18',
 };
 
 // A page in another language changes when its Spanish one does: `/eu/paro/` reads `/paro/`.

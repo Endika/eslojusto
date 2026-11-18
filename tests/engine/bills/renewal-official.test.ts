@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { TOLL_HOLIDAYS } from '../../../src/engine/bills/data/holidays-20td';
 import { BILLS_NORMS } from '../../../src/engine/bills/data/norms';
+import { NORMS_BEFORE_FIGURE } from './norms-before-figure';
 import { BILLS_TABLES } from '../../../src/engine/bills/data/tables';
 import {
   pvpcMeansBetween,
@@ -175,10 +176,18 @@ describe('taxes of a renewal', () => {
     expect(matches(null)).toBeNull();
   });
 
+  it('applies the general rates in December 2026: the October figure missed the 15 %', () => {
+    expect(renewalTaxes(letter({ renewalDate: '2026-12-10' }), 1071.15, deps)).toMatchObject({
+      kind: 'ok',
+      electricityTaxPercent: 5.11269632,
+      vatPercent: 21,
+    });
+  });
+
   describe('on a month that depends on a norm not yet settled', () => {
-    const december = BILLS_NORMS.rdl25_2026_december;
+    const december = NORMS_BEFORE_FIGURE.rdl25_2026_december;
     const open: NormTable = {
-      ...BILLS_NORMS,
+      ...NORMS_BEFORE_FIGURE,
       rdl25_2026_december: {
         ...december,
         status: 'conditional',

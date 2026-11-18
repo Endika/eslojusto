@@ -1,5 +1,5 @@
 import { TOLL_HOLIDAYS } from '../../src/engine/bills/data/holidays-20td';
-import { BILLS_NORMS } from '../../src/engine/bills/data/norms';
+import { NORMS_BEFORE_FIGURE } from '../engine/bills/norms-before-figure';
 import { BILLS_TABLES } from '../../src/engine/bills/data/tables';
 import type { OfficialDeps, PvpcHourly } from '../../src/engine/bills/electricity-official';
 import type { RenewalReviewDeps } from '../../src/engine/bills/renewal-review';
@@ -39,6 +39,6 @@ export const official = (price = 100): OfficialDeps => ({
 
 export const deps = (pvpc: OfficialDeps | null = official()): RenewalReviewDeps => ({
   tables: BILLS_TABLES,
-  norms: BILLS_NORMS,
+  norms: NORMS_BEFORE_FIGURE,
   official: pvpc,
 });

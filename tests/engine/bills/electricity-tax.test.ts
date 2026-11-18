@@ -187,7 +187,7 @@ describe('the electricity tax of a bill due in November 2026', () => {
   });
 
   it('still gives two readings once the CPI condition is met while the decree awaits validation', () => {
-    const item = check(november(2.4, 5.11269632), met(BILLS_NORMS, true));
+    const item = check(november(2.4, 5.11269632), met(NORMS_BEFORE_FIGURE, true));
     expect(item.kind).toBe('readings');
     for (const f of findingsOf(item)) expect(f.dependsOn).toEqual(['rdl25_2026']);
     expect(countedAmount(item)).toBe(0);
@@ -202,13 +202,15 @@ describe('the electricity tax of a bill due in November 2026', () => {
   });
 
   it('takes one reading once the review settles the month, changing only the norms', () => {
-    const reduced = validated(met(BILLS_NORMS, true));
+    const reduced = validated(met(NORMS_BEFORE_FIGURE, true));
     expect(only(check(november(0.25, 0.5), reduced)).status).toBe('matches');
     const item = check(november(2.4, 5.11269632), reduced);
     expect(only(item)).toMatchObject({ status: 'wrong_rate_for_date', amount: 2.15 });
     expect(countedAmount(item)).toBe(2.15);
-    expect(only(check(november(2.4), met(BILLS_NORMS, false))).status).toBe('matches');
-    expect(only(check(november(2.4), repealed(met(BILLS_NORMS, true)))).status).toBe('matches');
+    expect(only(check(november(2.4), met(NORMS_BEFORE_FIGURE, false))).status).toBe('matches');
+    expect(only(check(november(2.4), repealed(met(NORMS_BEFORE_FIGURE, true)))).status).toBe(
+      'matches',
+    );
   });
 });
 

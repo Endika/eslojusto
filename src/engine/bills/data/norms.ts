@@ -161,17 +161,17 @@ export const BILLS_NORMS: NormTable = {
       met: false,
     },
   },
-  // Arts. 18 to 21: VAT and the electricity tax reduced in November and December. Still awaiting
-  // the Congress's validation: its reductions stand only while it does.
+  // Arts. 18 to 21: VAT and the electricity tax reduced in November and December. Validated on
+  // 16-10-2026.
   rdl25_2026: {
     id: 'rdl25_2026',
     citation: 'Real Decreto-ley 25/2026, de 29 de septiembre',
     url: `${ACT}BOE-A-2026-20265`,
     inForceSince: '2026-10-01',
     inForceUntil: null,
-    status: 'pending_validation',
-    statusSince: null,
-    statusUrl: null,
+    status: 'in_force',
+    statusSince: '2026-10-16',
+    statusUrl: `${DOC}BOE-A-2026-21788`,
   },
   // «De acuerdo con la información que publique en octubre el Instituto Nacional de Estadística»:
   // on 14-10-2026 the INE gave the electricity CPI of September 2026 at 11,4 % over a year earlier.
@@ -191,7 +191,7 @@ export const BILLS_NORMS: NormTable = {
       met: false,
     },
   },
-  // The October CPI comes out on 13-11-2026.
+  // On 13-11-2026 the INE gave the electricity CPI of October 2026 at 11,1 % over a year earlier.
   rdl25_2026_december: {
     id: 'rdl25_2026_december',
     citation: 'Real Decreto-ley 25/2026, arts. 19 y 21 (rebaja de diciembre de 2026)',
@@ -199,13 +199,13 @@ export const BILLS_NORMS: NormTable = {
     inForceSince: '2026-12-01',
     inForceUntil: '2026-12-31',
     status: 'conditional',
-    statusSince: null,
-    statusUrl: null,
+    statusSince: '2026-11-13',
+    statusUrl: 'https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/IPC291482',
     condition: {
       text: 'Que el IPC de la electricidad de octubre de 2026 suba más del 15 % interanual',
       decidesOn: '2026-11-13',
       source: 'ine_cpi_electricity',
-      met: null,
+      met: false,
     },
   },
   // Transitional provision: the regulated rent of meters, «hasta que se apruebe el precio
@@ -291,9 +291,9 @@ export const NORM_REVIEW: NormReview = {
   rdl18_2026: '2026-10-14',
   rdl18_2026_august: '2026-10-14',
   rdl18_2026_september: '2026-10-14',
-  rdl25_2026: '2026-10-14',
-  rdl25_2026_november: '2026-10-14',
-  rdl25_2026_december: '2026-10-14',
+  rdl25_2026: '2026-11-18',
+  rdl25_2026_november: '2026-11-18',
+  rdl25_2026_december: '2026-11-18',
   order_iet1491_2013: '2026-10-14',
   rd897_2017: '2026-10-14',
   rd88_2026: '2026-10-14',

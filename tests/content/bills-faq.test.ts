@@ -46,14 +46,13 @@ describe('the electricity answers', () => {
     expect(answer).toContain('Orden IET/1491/2013');
   });
 
-  it('dates VAT by the day the bill falls due, settles November and leaves December open', () => {
+  it('dates VAT by the day the bill falls due and settles November and December', () => {
     const answer = answerOf(entries, 'faq-luz-iva');
     expect(answer).toContain('arts. 75 y 90.Dos');
     expect(answer).toContain(
-      '11,4 %, por debajo del 15 % que pide el Real Decreto-ley 25/2026 (art. 18)',
+      'septiembre subió un 11,4 % y el de octubre un 11,1 %, por debajo del 15 % que pide el Real Decreto-ley 25/2026 (arts. 18 y 19)',
     );
-    expect(answer).toContain('(art. 19)');
-    expect(answer).toContain('no suma ninguna diferencia que dependa de ello');
+    expect(answer).not.toContain('no suma ninguna diferencia que dependa de ello');
   });
 
   it('gives the 2026 social bonus discounts beside the permanent ones', () => {
