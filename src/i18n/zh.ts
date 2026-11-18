@@ -3900,7 +3900,7 @@ export const zh: Translation = {
   'bills.guide.taxes.p3':
     'Real Decreto-ley 18/2026 规定，如果六月和七月的电力 IPC 上涨超过15 %，八月和九月将适用同样的减税。西班牙税务局于01-09-2026确认，电力税不适用该减税；IVA 的条件相同，因此核查在这两个月适用5,11269632 %和21 %，与七月和十月相同。',
   'bills.guide.taxes.p4':
-    'Real Decreto-ley 25/2026 规定：如果九月的电力 IPC 比2025年九月上涨超过15 %，十一月这些合同的电力税为0,5 %、IVA 为10 %；十二月则以十月的 IPC 为准（arts. 18 a 21）。INE 于14-10-2026公布，九月的电力 IPC 上涨了11,4 %，因此核查在十一月适用5,11269632 %和21 %。十二月取决于十月的 IPC，INE 将于13-11-2026公布：在此之前，核查按两种税率分别计算，不计入任何取决于该结果的差额。',
+    'Real Decreto-ley 25/2026 规定：如果九月的电力 IPC 比2025年九月上涨超过15 %，十一月这些合同的电力税为0,5 %、IVA 为10 %；十二月则以十月的 IPC 为准（arts. 18 a 21）。西班牙众议院（Congreso）已于16-10-2026确认该法令。INE 于14-10-2026公布，九月的电力 IPC 上涨了11,4 %，并于13-11-2026公布十月上涨了11,1 %：均未超过15 %，因此核查在十一月和十二月适用5,11269632 %和21 %。',
   'bills.guide.meter.title': '电表租金',
   'bills.guide.meter.p1':
     '如果您向配电公司租用电表，受监管的价格为：单相电表每月0,81 €，三相电表每月1,36 €，«hasta que se apruebe el precio definitivo»（在最终价格获批之前）（Orden IET/1491/2013, disposición transitoria única）。在 PVPC 中，账单必须单独列出该价格，并注明规定该价格的法规（Real Decreto 216/2014, art. 5.6）。',
@@ -3957,7 +3957,7 @@ export const zh: Translation = {
     '如果您向配电公司租用电表，受监管的价格为：单相电表每月0,81 €，三相电表每月1,36 €（Orden IET/1491/2013, disposición transitoria única）。如果电表归您所有，就没有租金。核查将该价格换算为您账单的天数，计算公式为月价 × 12 / 365 × 天数，并允许一分钱的误差。',
   'bills.faq.electricity.vat': '我的账单适用多少 IVA？',
   'bills.faq.electricity.vat_answer':
-    '21 %（Ley 37/1992, art. 90），并且按账单可收取之日的税率计算，而不是按用电期间的税率（arts. 75 y 90.Dos）。22-03-2026至31-05-2026期间，签约功率不超过10 kW 的合同以及作为严重弱势消费者享受社会电费补贴的用户，IVA 为10 %（Real Decreto-ley 7/2026, art. 42，并由 Real Decreto-ley 10/2026 作出澄清）。2026年十一月仍为21 %：九月的电力 IPC 上涨了11,4 %，低于 Real Decreto-ley 25/2026 要求的15 %（art. 18）。十二月，只有十月的电力 IPC 比上一年同期上涨超过15 %，这些合同的 IVA 才为10 %（art. 19）。在 INE 于13-11-2026公布之前，核查按两种税率分别计算，不计入任何取决于该结果的差额。',
+    '21 %（Ley 37/1992, art. 90），并且按账单可收取之日的税率计算，而不是按用电期间的税率（arts. 75 y 90.Dos）。22-03-2026至31-05-2026期间，签约功率不超过10 kW 的合同以及作为严重弱势消费者享受社会电费补贴的用户，IVA 为10 %（Real Decreto-ley 7/2026, art. 42，并由 Real Decreto-ley 10/2026 作出澄清）。2026年十一月和十二月仍为21 %：九月的电力 IPC 上涨了11,4 %，十月上涨了11,1 %，均低于 Real Decreto-ley 25/2026 要求的15 %（arts. 18 y 19）。',
   'bills.faq.electricity.pvpc': '什么是 PVPC？',
   'bills.faq.electricity.pvpc_answer':
     '小用户自愿价格（precio voluntario para el pequeño consumidor）：受监管的电价，只有参考零售商提供。各时段签约功率均不超过10 kW 的个人和微型企业可以选择（Real Decreto 216/2014, art. 5.3）。其电能价格每小时都不同。核查会用过网费、附加费和固定利润来检查其功率费用，但不按小时重新计算电能费用：这需要您每小时的用电量。',
@@ -4227,7 +4227,7 @@ export const zh: Translation = {
     '计算中采用的 PVPC 零售利润可能已经过时，核查会对此作出提示。PVPC 只是用来比较的数据：核查不推荐任何费率，也不推荐任何电力零售商。',
   'bills.guide.renewal_taxes.title': '当日的税费',
   'bills.guide.renewal_taxes.p1':
-    '含税费用按续约日适用的电力税（impuesto eléctrico）和 IVA 计算。如果该日期落在相关法规尚未确定的期间内，例如 Real Decreto-ley 25/2026，核查不作选择：而是列出每一种可能的结果，以及需要发生什么情况才会适用该结果。',
+    '含税费用按续约日适用的电力税（impuesto eléctrico）和 IVA 计算。如果该日期落在相关法规尚未确定的期间内，核查不作选择：而是列出每一种可能的结果，以及需要发生什么情况才会适用该结果。',
   'bills.guide.renewal_notice.title': '提前一个月通知',
   'bills.guide.renewal_notice.p1':
     '自12-06-2026起，Real Decreto 88/2026 承认用电者享有以下权利（art. 6.1.m）：',

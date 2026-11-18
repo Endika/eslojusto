@@ -7,6 +7,7 @@ import type { NormTable } from '../../src/engine/bills/norms';
 import { reviewRenewal, type RenewalReviewDeps } from '../../src/engine/bills/renewal-review';
 import type { RenewalInput } from '../../src/engine/bills/renewal-types';
 import { pageTranslator } from '../support/page-strings';
+import { NORMS_BEFORE_FIGURE } from '../engine/bills/norms-before-figure';
 import { deps, flatPvpc, naturgy, official, TODAY } from './renewal-support';
 
 const tr = pageTranslator('bills');
@@ -15,7 +16,7 @@ const tr = pageTranslator('bills');
 const ADVICE =
   /\b(cámbiate|cámbiese|te conviene|deberías|debes|cambia de|cambiar de|contrata|contratar|aprovecha|ahorra|elige)\b/i;
 
-function shown(input: RenewalInput, own: RenewalReviewDeps = deps(), norms = BILLS_NORMS) {
+function shown(input: RenewalInput, own: RenewalReviewDeps = deps(), norms = NORMS_BEFORE_FIGURE) {
   const root = document.createElement('section');
   root.innerHTML = '<p data-lead></p><div data-renewal></div>';
   const r = reviewRenewal(input, TODAY, own);

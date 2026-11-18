@@ -22,10 +22,11 @@ const settled = (norm: Norm, met: boolean): Norm => {
   return { ...norm, condition: { ...norm.condition, met } };
 };
 
+// From the norms as they stood before the INE figures and the validation of RDL 25/2026.
 const withSettled = (met: Partial<Record<BillsNormId, boolean>>): NormTable => {
-  const norms: Record<string, Norm> = { ...BILLS_NORMS };
+  const norms: Record<string, Norm> = { ...NORMS_BEFORE_FIGURE };
   for (const [id, value] of Object.entries(met))
-    norms[id] = settled(BILLS_NORMS[id as BillsNormId], value);
+    norms[id] = settled(NORMS_BEFORE_FIGURE[id as BillsNormId], value);
   return norms as NormTable;
 };
 
@@ -113,7 +114,7 @@ describe('looking a value up by day', () => {
   });
 
   it('opens both rows while the decree holding a met condition awaits validation', () => {
-    const decree: Norm = { ...BILLS_NORMS.rdl25_2026, inForceSince: '2030-01-15' };
+    const decree: Norm = { ...NORMS_BEFORE_FIGURE.rdl25_2026, inForceSince: '2030-01-15' };
     const held: Table<number> = [
       row({
         from: '2030-02-01',
@@ -237,11 +238,12 @@ describe('the tax rates of 2026, by the day the bill falls due', () => {
     ['2026-06-15', 'rdl7_2026_june'],
     ['2026-08-15', 'rdl18_2026_august'],
     ['2026-09-15', 'rdl18_2026_september'],
+    ['2026-12-15', 'rdl25_2026_december'],
   ] as const)('on %s apply the general rates: %s was settled as not met', (day, norm) => {
     expect(BILLS_NORMS[norm].condition?.met).toBe(false);
     expect(valueOf(tax(day)).percent).toBe(5.11269632);
     expect(valueOf(vat(day)).percent).toBe(21);
-    const met = withSettled({ [norm]: true });
+    const met = validated(withSettled({ [norm]: true }));
     expect(valueOf(tax(day, met)).percent).toBe(0.5);
     expect(valueOf(vat(day, met))).toMatchObject({ percent: 10, severeVulnerable: true });
   });
@@ -375,8 +377,16 @@ describe('the bills norm table', () => {
     expect(Object.keys(BILLS_NORMS).filter((id) => !cited.has(id as BillsNormId))).toEqual([]);
   });
 
-  it('RDL 25/2026 awaits validation, and its two reductions their CPI figure', () => {
-    expect(BILLS_NORMS.rdl25_2026.status).toBe('pending_validation');
+  it('RDL 25/2026 was validated on 16-10-2026', () => {
+    expect(BILLS_NORMS.rdl25_2026).toMatchObject({
+      status: 'in_force',
+      statusSince: '2026-10-16',
+      statusUrl: 'https://www.boe.es/buscar/doc.php?id=BOE-A-2026-21788',
+    });
+  });
+
+  it('before the figures, its two reductions awaited their CPI figure', () => {
+    expect(NORMS_BEFORE_FIGURE.rdl25_2026.status).toBe('pending_validation');
     const open = Object.values(NORMS_BEFORE_FIGURE).filter(
       (n) => n.status === 'conditional' && n.condition?.met === null,
     );
@@ -397,6 +407,7 @@ describe('the bills norm table', () => {
       ['rdl18_2026_august', '2026-07-15', '2026-09-01'],
       ['rdl18_2026_september', '2026-08-13', '2026-09-01'],
       ['rdl25_2026_november', '2026-10-14', '2026-10-14'],
+      ['rdl25_2026_december', '2026-11-13', '2026-11-13'],
     ]);
     for (const n of settledOnes) {
       expect(n.inForceUntil !== null && n.inForceUntil >= n.inForceSince).toBe(true);
