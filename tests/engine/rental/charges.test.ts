@@ -10,6 +10,7 @@ import { itemAmount, type ItemResult } from '../../../src/engine/rental/item';
 import { countedAmount, highestAmount } from '../../../src/engine/rental/outcome';
 import type { Charge, RentalDeps, RentalInput } from '../../../src/engine/rental/types';
 import { contract } from './fixtures';
+import { NORMS_BEFORE_VOTE } from './norms-before-vote';
 
 const DEPS: RentalDeps = { norms: NORMS, indices: { irav: IRAV, ipc: IPC, igc: IGC } };
 
@@ -28,6 +29,8 @@ const FUTURE: RentalDeps = {
   norms: NORMS,
   indices: { irav: withSeptember(IRAV, 2.5), ipc: withSeptember(IPC, 4.9), igc: IGC },
 };
+
+const FUTURE_BEFORE_VOTE: RentalDeps = { ...FUTURE, norms: NORMS_BEFORE_VOTE };
 
 const community = (change: Partial<Charge> = {}): Charge => ({
   kind: 'community',
@@ -134,19 +137,27 @@ describe('a charge agreed with its yearly amount', () => {
     expect(singleOf(company).status).toBe('within_limit');
   });
 
+  // Anniversary 20-10-2026, synthetic IRAV September 2026 2,5 %. Where RDL 29/2026 holds and
+  // its 2 % cap (DF 6.ª) counts for charges: 600 × 1,04 = 624; otherwise 600 × 1,05 = 630.
+  // 640 charged.
+  const risen = () =>
+    input([community({ charged: [{ year: 2026, amount: 640 }] })], {
+      signedOn: f('2025-10-15'),
+      startDate: f('2025-10-20'),
+    });
+
   it('a rise still pending validation gives both readings and counts the lower', () => {
-    // Anniversary 20-10-2026, synthetic IRAV September 2026 2,5 %. Where RDL 29/2026 holds and
-    // its 2 % cap (DF 6.ª) counts for charges: 600 × 1,04 = 624; otherwise 600 × 1,05 = 630.
-    // 640 charged.
-    const [r] = checkCharges(
-      input([community({ charged: [{ year: 2026, amount: 640 }] })], {
-        signedOn: f('2025-10-15'),
-        startDate: f('2025-10-20'),
-      }),
-      FUTURE,
-    );
+    const [r] = checkCharges(risen(), FUTURE_BEFORE_VOTE);
     if (r?.outcome.kind !== 'depends') throw new Error('expected depends');
     expect(r.outcome.reasons).toEqual(['pending_validation', 'extraordinary_cap_reach']);
+    expect(countedAmount(r.outcome, itemAmount)).toBe(10);
+    expect(highestAmount(r.outcome, itemAmount)).toBe(16);
+  });
+
+  it('a rise under the validated RDL 29/2026 no longer waits on its validation', () => {
+    const [r] = checkCharges(risen(), FUTURE);
+    if (r?.outcome.kind !== 'depends') throw new Error('expected depends');
+    expect(r.outcome.reasons).toEqual(['extraordinary_cap_reach']);
     expect(countedAmount(r.outcome, itemAmount)).toBe(10);
     expect(highestAmount(r.outcome, itemAmount)).toBe(16);
   });
@@ -254,25 +265,30 @@ describe('property tax (IBI)', () => {
     }
   });
 
-  it('in a contract signed in November 2026 gives both readings, pending validation', () => {
-    const [r] = checkCharges(
-      input(
-        [
-          community({
-            kind: 'property_tax',
-            annualAgreed: 300,
-            charged: [{ year: 2026, amount: 300 }],
-          }),
-        ],
-        { signedOn: f('2026-11-02'), startDate: f('2026-11-02') },
-      ),
-      DEPS,
+  const taxCharged = () =>
+    input(
+      [
+        community({
+          kind: 'property_tax',
+          annualAgreed: 300,
+          charged: [{ year: 2026, amount: 300 }],
+        }),
+      ],
+      { signedOn: f('2026-11-02'), startDate: f('2026-11-02') },
     );
+
+  it('in a contract signed in November 2026 gives both readings, pending validation', () => {
+    const [r] = checkCharges(taxCharged(), { ...DEPS, norms: NORMS_BEFORE_VOTE });
     if (r?.outcome.kind !== 'depends') throw new Error('expected depends');
     expect(r.outcome.reasons).toEqual(['pending_validation']);
     expect(r.outcome.low).toMatchObject({ status: 'not_checkable' });
     expect(r.outcome.high).toMatchObject({ status: 'paid_over', amount: 300 });
     expect(countedAmount(r.outcome, itemAmount)).toBe(0);
+  });
+
+  it('in a contract signed in November 2026 is paid over with a single reading once validated', () => {
+    const [r] = checkCharges(taxCharged(), DEPS);
+    expect(singleOf(r)).toEqual({ status: 'paid_over', amount: 300 });
   });
 });
 

@@ -9,6 +9,7 @@ import {
 import type { Norm, NormTable } from '../../../src/engine/rental/norms';
 import type { RentalInput } from '../../../src/engine/rental/types';
 import { contract } from './fixtures';
+import { NORMS_BEFORE_VOTE } from './norms-before-vote';
 
 const blocks = (change: Partial<RentalInput> = {}, norms: NormTable = NORMS) =>
   informationBlocks(contract(change), norms);
@@ -55,8 +56,14 @@ describe('stressed zones', () => {
 
 describe('the RDL 29/2026 reference price', () => {
   it('is named, pending validation, for a contract with an anniversary in its window', () => {
-    const b = find(blocks(), 'reference_price');
+    const b = find(blocks({}, NORMS_BEFORE_VOTE), 'reference_price');
     expect(b.sources.map((s) => [s.id, s.status])).toEqual([['cap_2_rdl29', 'pending_validation']]);
+  });
+
+  it('is named as in force, with the day it was validated', () => {
+    const b = find(blocks(), 'reference_price');
+    expect(b.sources.map((s) => [s.id, s.status])).toEqual([['cap_2_rdl29', 'in_force']]);
+    expect(b.sources[0]?.statusSince).toBe('2026-11-13');
   });
 
   it('not once the keys are back before any such anniversary', () => {
@@ -94,20 +101,32 @@ describe('term and extensions, dates only', () => {
     expect(find(bs, 'minimum_term').dates.mandatoryEnd).toBe('2028-03-20');
   });
 
+  const endsIn2027 = { signedOn: f('2022-01-05'), startDate: f('2022-01-10'), agreedMonths: 12 };
+
   it('a term ending after 15-11-2026 names RDL 28/2026 and RDL 29/2026, both pending', () => {
-    const bs = blocks({ signedOn: f('2022-01-05'), startDate: f('2022-01-10'), agreedMonths: 12 });
+    const bs = blocks(endsIn2027, NORMS_BEFORE_VOTE);
     expect(find(bs, 'minimum_term').dates.mandatoryEnd).toBe('2027-01-10');
     expect(find(bs, 'extensions_rdl28').sources[0]?.status).toBe('pending_validation');
     expect(find(bs, 'extension_rdl29').sources[0]?.status).toBe('pending_validation');
     expect(ids(bs)).toContain('notice_windows');
   });
 
+  it('a term ending after 15-11-2026 never names RDL 28/2026, repealed before it took effect', () => {
+    const bs = blocks(endsIn2027);
+    expect(find(bs, 'minimum_term').dates.mandatoryEnd).toBe('2027-01-10');
+    expect(ids(bs)).not.toContain('extensions_rdl28');
+    expect(ids(bs)).toContain('notice_windows');
+    expect(find(bs, 'extension_rdl29').sources[0]?.status).toBe('in_force');
+    expect(JSON.stringify(bs)).not.toContain('rdl28');
+  });
+
   it('once RDL 28/2026 is validated, its art. 10 replaces the tacit extension', () => {
-    const validated = withNorm('rdl28_2026', { status: 'in_force', statusSince: '2026-11-20' });
-    const bs = blocks(
-      { signedOn: f('2022-01-05'), startDate: f('2022-01-10'), agreedMonths: 12 },
-      validated,
-    );
+    const validated = withNorm('rdl28_2026', {
+      inForceUntil: null,
+      status: 'in_force',
+      statusSince: '2026-11-20',
+    });
+    const bs = blocks(endsIn2027, validated);
     expect(ids(bs)).not.toContain('notice_windows');
     expect(find(bs, 'extensions_rdl28').sources[0]?.status).toBe('in_force');
   });
@@ -131,8 +150,18 @@ describe('moving out', () => {
 
   it('the closing document from 08-10-2026, pending validation', () => {
     expect(
-      find(blocks({ moveOut: moveOut('2026-10-20') }), 'closing_document').sources[0],
+      find(blocks({ moveOut: moveOut('2026-10-20') }, NORMS_BEFORE_VOTE), 'closing_document')
+        .sources[0],
     ).toMatchObject({ id: 'closing_document', status: 'pending_validation' });
+    expect(ids(blocks({ moveOut: moveOut('2026-09-30') }, NORMS_BEFORE_VOTE))).not.toContain(
+      'closing_document',
+    );
+  });
+
+  it('the closing document from 08-10-2026 applies without doubt once validated', () => {
+    expect(
+      find(blocks({ moveOut: moveOut('2026-10-20') }), 'closing_document').sources[0],
+    ).toMatchObject({ id: 'closing_document', status: 'in_force', statusSince: '2026-11-13' });
     expect(ids(blocks({ moveOut: moveOut('2026-09-30') }))).not.toContain('closing_document');
   });
 

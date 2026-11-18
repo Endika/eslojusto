@@ -1462,7 +1462,7 @@ export const ro: Translation = {
   'legal_notice.rental.does':
     'Compară ce plătești sau ai plătit pentru închirierea locuinței principale (vivienda habitual), cu contract semnat din 6 martie 2019, cu ce permite legea: onorariile agenției, garanția (fianza) și garanțiile suplimentare, majorările anuale, cheltuielile și returnarea garanției cu dobânzile ei. Fiecare componentă indică norma din care provine, cu perioada de aplicare și starea ei.',
   'legal_notice.rental.pending':
-    'Mai multe norme privind închirierea s-au schimbat în 2026, iar unele așteaptă validarea (convalidación) Congresului. Fiecare regulă spune dacă este în vigoare, în așteptarea validării sau abrogată. Când un rezultat depinde de o normă în așteptare, dă ambele calcule, iar totalul adună doar valoarea mai mică; dacă depinde de un decret pe care Congresul l-a abrogat, dă ambele calcule și nu le adună.',
+    'Mai multe norme privind închirierea s-au schimbat în 2026: Congresul a validat unele și a abrogat altele. Fiecare regulă spune dacă este în vigoare, în așteptarea validării sau abrogată. Când un rezultat depinde de o normă în așteptare, dă ambele calcule, iar totalul adună doar valoarea mai mică; dacă depinde de un decret pe care Congresul l-a abrogat, dă ambele calcule și nu le adună.',
   'legal_notice.rental.does_not':
     'Nu evaluează deteriorările și nici dacă o reținere din garanție este întemeiată, nu calculează plafonul chiriei inițiale în zonele cu piață locativă tensionată (zonas tensionadas), nu aplică normele proprii ale fiecărei comunități autonome și nu verifică prelungirile sau preavizele dincolo de datele lor. Nici nu verifică contractele de sezon, pe camere, pentru altă utilizare sau semnate înainte de 6 martie 2019.',
   'legal_notice.rental.beta':
@@ -3413,6 +3413,18 @@ export const ro: Translation = {
   'rental.guide.regional.lodging':
     'Comunitățile îl pot obliga pe proprietar să depună garanția la un organism public (disposición adicional 3.ª LAU). Este o obligație a proprietarului față de administrație: nu schimbă ce plătești.',
   'rental.guide.pages': 'Ghiduri',
+  'rental.page.rise.example_in_force_capped':
+    'Plătești {renta} pe lună, iar contractul tău împlinește încă un an pe {fecha}. Cu ultimul IRAV publicat ({irav}), plafonul fără un nou acord este {tope}, nu {irav}: chiria ta poate ajunge la cel mult {maximo}.',
+  'rental.page.rise.example_in_force_open':
+    'Plătești {renta} pe lună, iar contractul tău împlinește încă un an pe {fecha}. Plafonul fără un nou acord este {tope} sau IRAV, oricare este mai mic: cu ultimul IRAV publicat ({irav}), chiria ta poate ajunge la cel mult {maximo}.',
+  'rental.page.rise.after_in_force':
+    'Congresul a validat decretul (BOE din {fecha}): acesta este calculul care se aplică, cu plafonul fără un nou acord din disposición final 6.ª a Real Decreto-ley 29/2026.',
+  'rental.page.rise.after_repealed': 'Congresul a abrogat decretul: se aplică al doilea calcul.',
+  'rental.page.decree.lead_in_force':
+    'Real Decreto-ley 29/2026 se aplică din {desde}. Congresul l-a validat (BOE din {fecha}), așa că nu mai poate să-și piardă efectele: doar o altă normă îl poate modifica.',
+  'rental.page.decree.faq_still_question': 'Mai poate să-și piardă efectele?',
+  'rental.page.decree.faq_still_answer':
+    'Nu. Congresul l-a validat (BOE din {fecha}); de atunci, doar o altă normă îl poate modifica.',
   'rental.page.decree.rise':
     '{decreto} spune că, până la 31 decembrie 2027 și fără un nou acord între părți, chiria nu poate crește cu mai mult de 2 % (disposición final 6.ª) și că IRAV se aplică în toate contractele (art. 4.Dos).',
   'rental.page.decree.zones':
@@ -3502,7 +3514,7 @@ export const ro: Translation = {
   'rental.large.question': 'Mare proprietar',
   'rental.landlord.large': 'Proprietarul tău este mare proprietar (gran tenedor)?',
   'rental.landlord.large_hint':
-    'Este mare proprietar cine are mai mult de zece imobile urbane cu destinație de locuință sau mai mult de 1.500 de m² cu destinație de locuință, fără garaje și boxe (art. 3.k din Ley 12/2023); într-o zonă cu piață locativă tensionată, comunitatea autonomă poate coborî pragul la cinci sau mai multe imobile. Din 08-10-2026, Real Decreto-ley 29/2026, în așteptarea validării, adaugă că acest lucru se dovedește cu un certificat de la Registro de la Propiedad (registrul de proprietate) și că fiecare unitate cu destinație de locuință dintr-o clădire se socotește ca un imobil, chiar dacă nu există o împărțire pe proprietăți (división horizontal) înscrisă. Faptul că este o firmă nu ajunge: o societate cu puține apartamente nu este mare proprietar.',
+    'Este mare proprietar cine are mai mult de zece imobile urbane cu destinație de locuință sau mai mult de 1.500 de m² cu destinație de locuință, fără garaje și boxe (art. 3.k din Ley 12/2023); într-o zonă cu piață locativă tensionată, comunitatea autonomă poate coborî pragul la cinci sau mai multe imobile. Din 08-10-2026, Real Decreto-ley 29/2026, {estado}, adaugă că acest lucru se dovedește cu un certificat de la Registro de la Propiedad (registrul de proprietate) și că fiecare unitate cu destinație de locuință dintr-o clădire se socotește ca un imobil, chiar dacă nu există o împărțire pe proprietăți (división horizontal) înscrisă. Faptul că este o firmă nu ajunge: o societate cu puține apartamente nu este mare proprietar.',
   'rental.home.question': 'Unde se află locuința',
   'rental.landlord.region': 'Comunitatea autonomă',
   'rental.landlord.region_hint': 'Cea în care se află locuința.',
@@ -3828,9 +3840,9 @@ export const ro: Translation = {
   'client.rental.out_of_scope.before_2019':
     'Această versiune nu verifică contractele semnate înainte de 6 martie 2019: acestea urmează alte reguli pentru actualizarea chiriei.',
   'client.rental.out_of_scope.seasonal':
-    'Această verificare nu acoperă încă contractele de sezon. Pentru cele semnate din 8 octombrie 2026, Real Decreto-ley 29/2026, în așteptarea validării, tratează ca închiriere a locuinței principale (vivienda habitual) contractul pe durată determinată care nu menționează un motiv real și dovedibil pentru durata lui limitată. Cele semnate înainte urmează regulile de atunci până la sfârșitul termenului convenit (disposición transitoria 8.ª din Ley de Arrendamientos Urbanos).',
+    'Această verificare nu acoperă încă contractele de sezon. Pentru cele semnate din 8 octombrie 2026, Real Decreto-ley 29/2026, {estado}, tratează ca închiriere a locuinței principale (vivienda habitual) contractul pe durată determinată care nu menționează un motiv real și dovedibil pentru durata lui limitată. Cele semnate înainte urmează regulile de atunci până la sfârșitul termenului convenit (disposición transitoria 8.ª din Ley de Arrendamientos Urbanos).',
   'client.rental.out_of_scope.room':
-    'Această verificare nu acoperă încă închirierile pe camere. Real Decreto-ley 29/2026, în vigoare din 8 octombrie 2026 și în așteptarea validării, le include în închirierea de locuințe, ca locuință principală sau ca închiriere temporară, în funcție de nevoia pe care o acoperă.',
+    'Această verificare nu acoperă încă închirierile pe camere. Real Decreto-ley 29/2026, în vigoare din 8 octombrie 2026 și {estado}, le include în închirierea de locuințe, ca locuință principală sau ca închiriere temporară, în funcție de nevoia pe care o acoperă.',
   'client.rental.out_of_scope.other_use':
     'Un contract pentru o altă utilizare decât locuința are propriile reguli.',
   'client.rental.out_of_scope.protected':
@@ -3920,6 +3932,9 @@ export const ro: Translation = {
   'client.rental.share.lowest': 'La total se adună doar calculul cel mai mic: {importe}.',
   'client.rental.hint.company_landlord':
     'În contractul tău proprietarul este o firmă: poate fi mare proprietar (gran tenedor).',
+  'client.rental.decree_state.pending_validation': 'în așteptarea validării',
+  'client.rental.decree_state.in_force': 'validat de Congres',
+  'client.rental.decree_state.repealed': 'abrogat de Congres',
   'client.rental.norm.in_force': 'în vigoare',
   'client.rental.norm.pending_validation': 'în așteptarea validării',
   'client.rental.norm.repealed': 'abrogată la {fecha}',
@@ -3951,7 +3966,7 @@ export const ro: Translation = {
     'Dacă locuința se află într-o zonă cu piață locativă tensionată (zona tensionada), chiria inițială poate avea un plafon (art. 17.6 și 17.7 LAU). Zonele sunt declarate de fiecare comunitate autonomă; prețul de referință se găsește în SERPAVI.',
   'client.rental.info.reference_price.title': 'Prețul de referință',
   'client.rental.info.reference_price.text':
-    'Pentru actualizările de la 8 octombrie 2026 până la 31 decembrie 2027, Real Decreto-ley 29/2026, în așteptarea validării, spune că nu este posibilă nicio majorare dacă chiria depășește limita de preț care i se aplică potrivit sistemului de indici de referință; nu spune în ce cazuri se aplică această limită. Această verificare nu o calculează; prețul se găsește în SERPAVI.',
+    'Pentru actualizările de la 8 octombrie 2026 până la 31 decembrie 2027, Real Decreto-ley 29/2026, {estado}, spune că nu este posibilă nicio majorare dacă chiria depășește limita de preț care i se aplică potrivit sistemului de indici de referință; nu spune în ce cazuri se aplică această limită. Această verificare nu o calculează; prețul se găsește în SERPAVI.',
   'client.rental.info.minimum_term.title': 'Până când durează contractul tău',
   'client.rental.info.minimum_term.text':
     'Contractul tău se încheie la {contractEnd}. Cu prelungirea obligatorie, termenul tău minim se încheie la {mandatoryEnd}.',
@@ -3960,10 +3975,10 @@ export const ro: Translation = {
     'Dacă nimeni nu anunță la timp (proprietarul, până la {landlordBy}; tu, până la {tenantBy}), contractul continuă de la an la an până la {tacitUntil}.',
   'client.rental.info.extensions_rdl28.title': 'Prelungirile din 15 noiembrie 2026',
   'client.rental.info.extensions_rdl28.text':
-    'Real Decreto-ley 28/2026, în așteptarea validării, modifică prelungirile din 15 noiembrie 2026. Termenul tău minim se încheie la {mandatoryEnd}.',
+    'Real Decreto-ley 28/2026, {estado}, modifică prelungirile din 15 noiembrie 2026. Termenul tău minim se încheie la {mandatoryEnd}.',
   'client.rental.info.extension_rdl29.title': 'Prelungirea extraordinară',
   'client.rental.info.extension_rdl29.text':
-    'Real Decreto-ley 29/2026, în așteptarea validării, prevede o prelungire extraordinară pentru contractele a căror prelungire obligatorie, prelungire tacită sau reînnoire tacită (tácita reconducción) se încheie între {from} și {until}.',
+    'Real Decreto-ley 29/2026, {estado}, prevede o prelungire extraordinară pentru contractele a căror prelungire obligatorie, prelungire tacită sau reînnoire tacită (tácita reconducción) se încheie între {from} și {until}.',
   'client.rental.info.deposit_lodging.title': 'Depunerea garanției',
   'client.rental.info.deposit_lodging.text':
     'Proprietarul depune garanția (fianza) la organismul comunității autonome care prevede acest lucru (disposición adicional 3.ª LAU).',
@@ -6052,7 +6067,9 @@ export const ro: Translation = {
   'client.mortgage.calculation.information.prior_step_439bis':
     'Din 03-04-2025, legea reglementează un pas prealabil concret înainte de a te adresa instanței pentru clauze ale unui credit ipotecar (art. 439 bis din Ley de Enjuiciamiento Civil, codul de procedură civilă). În link găsești textul legii.',
   'client.mortgage.calculation.information.loan_assignment':
-    'Din 08-10-2026, Real Decreto-ley 29/2026 adaugă în lege un art. 25 bis: dacă banca îți cedează împrumutul altcuiva, păstrezi față de noul titular ce puteai opune băncii, iar cesiunea trebuie să ți se comunice, cu excepția cazului în care banca, de acord cu noul titular, continuă să administreze împrumutul (art. 25 bis.3). Este în așteptarea validării (convalidación).',
+    'Din 08-10-2026, Real Decreto-ley 29/2026 adaugă în lege un art. 25 bis: dacă banca îți cedează împrumutul altcuiva, păstrezi față de noul titular ce puteai opune băncii, iar cesiunea trebuie să ți se comunice, cu excepția cazului în care banca, de acord cu noul titular, continuă să administreze împrumutul (art. 25 bis.3).',
+  'client.mortgage.calculation.information.loan_assignment_pending':
+    'Este în așteptarea validării (convalidación).',
   'client.mortgage.calculation.information.complaints_service':
     'Servicio de Reclamaciones del Banco de España (serviciul de reclamații al Băncii Spaniei) răspunde la întrebări și plângeri despre bănci (art. 30 din Ley 44/2002), iar birourile publice pentru consumatori informează gratuit.',
   'client.mortgage.info.fein_timing': 'Informațiile dinaintea semnării actului notarial',

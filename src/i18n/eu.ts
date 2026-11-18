@@ -1459,7 +1459,7 @@ export const eu: Translation = {
   'legal_notice.rental.does':
     'Ohiko etxebizitza baten alokairuagatik ordaintzen duzuna edo ordaindu duzuna, 2019ko martxoaren 6tik aurrera sinatutako kontratuarekin, legeak onartzen duenarekin alderatzen du: agentziaren ordainsariak, fidantza eta bermeak, urteko igoerak, gastuak eta fidantzaren itzulketa, haren interesekin. Kontzeptu bakoitzak zein arautatik ateratzen den adierazten du, haren indarraldiarekin eta egoerarekin.',
   'legal_notice.rental.pending':
-    'Alokairuaren hainbat arau aldatu ziren 2026an, eta horietako batzuk Kongresuak baliozkotzeko zain daude. Arau bakoitzak adierazten du indarrean dagoen, baliozkotzeko zain dagoen edo indargabetuta dagoen. Emaitza bat baliozkotzeko zain dagoen arau baten araberakoa denean, bi kalkuluak ematen ditu, eta guztizkoak kalkulu txikiena bakarrik batzen du; Kongresuak indargabetutako dekretu baten araberakoa bada, bi kalkuluak ematen ditu, eta ez du batzen.',
+    'Alokairuaren hainbat arau aldatu ziren 2026an: Kongresuak batzuk baliozkotu zituen, eta beste batzuk indargabetu. Arau bakoitzak adierazten du indarrean dagoen, baliozkotzeko zain dagoen edo indargabetuta dagoen. Emaitza bat baliozkotzeko zain dagoen arau baten araberakoa denean, bi kalkuluak ematen ditu, eta guztizkoak kalkulu txikiena bakarrik batzen du; Kongresuak indargabetutako dekretu baten araberakoa bada, bi kalkuluak ematen ditu, eta ez du batzen.',
   'legal_notice.rental.does_not':
     'Ez ditu kalteak baloratzen, ezta fidantzatik egindako kenkari bat bidezkoa den ere; ez du hasierako errentaren muga kalkulatzen tentsionatutako eremuetan, ez ditu autonomia-erkidego bakoitzaren arau propioak aplikatzen, eta ez ditu luzapenak ezta aurreabisuak egiaztatzen, haien datetatik harago. Ez ditu berrikusten, gainera, denboraldiko kontratuak, logelakakoak, beste erabilera baterakoak, ezta 2019ko martxoaren 6a baino lehen sinatutakoak ere.',
   'legal_notice.rental.beta':
@@ -3404,6 +3404,19 @@ export const eu: Translation = {
   'rental.guide.regional.lodging':
     'Erkidegoek jabea behartu dezakete fidantza erakunde publiko batean gordailutzera (LAU, disposición adicional 3.ª). Jabeak administrazioarekin duen betebehar bat da: ez du aldatzen zuk ordaintzen duzuna.',
   'rental.guide.pages': 'Gidak',
+  'rental.page.rise.example_in_force_capped':
+    'Hilean {renta} ordaintzen dituzu, eta zure kontratuak beste urte bat betetzen du {fecha} datan. Argitaratutako azken IRAVarekin ({irav}), itun berririk gabeko muga {tope} da, ez {irav}: zure errenta gehienez {maximo} izan daiteke.',
+  'rental.page.rise.example_in_force_open':
+    'Hilean {renta} ordaintzen dituzu, eta zure kontratuak beste urte bat betetzen du {fecha} datan. Itun berririk gabeko muga {tope} edo IRAV da, txikiena: argitaratutako azken IRAVarekin ({irav}), zure errenta gehienez {maximo} izan daiteke.',
+  'rental.page.rise.after_in_force':
+    'Kongresuak dekretua baliozkotu zuen ({fecha} datako BOE): hau da aplikatzen den kalkulua, Real Decreto-ley 29/2026 arauaren disposición final 6.ª xedapenean itun berririk gabe ezarritako mugarekin.',
+  'rental.page.rise.after_repealed':
+    'Kongresuak dekretua indargabetu zuen: bigarren kalkulua aplikatzen da.',
+  'rental.page.decree.lead_in_force':
+    'Real Decreto-ley 29/2026 araua {desde} datatik aurrera dago indarrean. Kongresuak baliozkotu zuen ({fecha} datako BOE), beraz, ezin du jada indarra galdu: beste arau batek bakarrik alda dezake.',
+  'rental.page.decree.faq_still_question': 'Oraindik indarra gal dezake?',
+  'rental.page.decree.faq_still_answer':
+    'Ez. Kongresuak baliozkotu zuen ({fecha} datako BOE); ordutik, beste arau batek bakarrik alda dezake.',
   'rental.page.decree.rise':
     '{decreto} arauak dio, 2027ko abenduaren 31ra arte eta alderdien arteko itun berririk gabe, errenta ezin dela 2 % baino gehiago igo (disposición final 6.ª), eta IRAV kontratu guztietan aplikatzen dela (art. 4.Dos).',
   'rental.page.decree.zones':
@@ -3493,7 +3506,7 @@ export const eu: Translation = {
   'rental.large.question': 'Etxebizitza-edukitzaile handia',
   'rental.landlord.large': 'Zure jabea etxebizitza-edukitzaile handia da?',
   'rental.landlord.large_hint':
-    'Etxebizitza-edukitzaile handia da bizitegi-erabilerako hamar hiri-higiezin baino gehiago edo bizitegi-erabilerako 1.500 m² baino gehiago dituena, garajeak eta trastelekuak kontatu gabe (Ley 12/2023, art. 3.k); tentsionatutako eremu batean, autonomia-erkidegoak bost higiezin edo gehiagora jaits dezake. 08-10-2026tik aurrera, Real Decreto-ley 29/2026 arauak, baliozkotzeko zain dagoenak, gehitzen du Jabetza Erregistroaren (Registro de la Propiedad) ziurtagiri batekin egiaztatzen dela, eta eraikin bateko bizitegi-erabilerako unitate bakoitza higiezin bat dela, jabetza horizontaleko banaketa inskribaturik ez egon arren. Enpresa bat izatea ez da nahikoa: pisu gutxi dituen sozietate bat ez da etxebizitza-edukitzaile handia.',
+    'Etxebizitza-edukitzaile handia da bizitegi-erabilerako hamar hiri-higiezin baino gehiago edo bizitegi-erabilerako 1.500 m² baino gehiago dituena, garajeak eta trastelekuak kontatu gabe (Ley 12/2023, art. 3.k); tentsionatutako eremu batean, autonomia-erkidegoak bost higiezin edo gehiagora jaits dezake. 08-10-2026tik aurrera, Real Decreto-ley 29/2026 arauak, {estado}, gehitzen du Jabetza Erregistroaren (Registro de la Propiedad) ziurtagiri batekin egiaztatzen dela, eta eraikin bateko bizitegi-erabilerako unitate bakoitza higiezin bat dela, jabetza horizontaleko banaketa inskribaturik ez egon arren. Enpresa bat izatea ez da nahikoa: pisu gutxi dituen sozietate bat ez da etxebizitza-edukitzaile handia.',
   'rental.home.question': 'Non dago etxebizitza',
   'rental.landlord.region': 'Autonomia-erkidegoa',
   'rental.landlord.region_hint': 'Etxebizitza dagoen erkidegoa.',
@@ -3821,9 +3834,9 @@ export const eu: Translation = {
   'client.rental.out_of_scope.before_2019':
     'Bertsio honek ez ditu 2019ko martxoaren 6a baino lehen sinatutako kontratuak berrikusten: beste arau batzuk dituzte errenta eguneratzeko.',
   'client.rental.out_of_scope.seasonal':
-    'Berrikuspen honek oraindik ez ditu denboraldiko kontratuak hartzen. 2026ko urriaren 8tik aurrera sinatutakoetan, Real Decreto-ley 29/2026 arauak, baliozkotzeko zain dagoenak, ohiko etxebizitzakotzat hartzen du denboraldi-kausa erreal eta egiaztagarririk jasotzen ez duen aldi baterako kontratua. Lehenago sinatutakoek orduko arauekin jarraitzen dute itundutako epea amaitu arte (Ley de Arrendamientos Urbanos, disposición transitoria 8.ª).',
+    'Berrikuspen honek oraindik ez ditu denboraldiko kontratuak hartzen. 2026ko urriaren 8tik aurrera sinatutakoetan, Real Decreto-ley 29/2026 arauak, {estado}, ohiko etxebizitzakotzat hartzen du denboraldi-kausa erreal eta egiaztagarririk jasotzen ez duen aldi baterako kontratua. Lehenago sinatutakoek orduko arauekin jarraitzen dute itundutako epea amaitu arte (Ley de Arrendamientos Urbanos, disposición transitoria 8.ª).',
   'client.rental.out_of_scope.room':
-    'Berrikuspen honek oraindik ez ditu logelakako alokairuak hartzen. Real Decreto-ley 29/2026 arauak, 2026ko urriaren 8tik indarrean dagoenak eta baliozkotzeko zain dagoenak, etxebizitza-alokairuaren barruan sartzen ditu, ohikoan edo denboraldikoan, betetzen duten beharraren arabera.',
+    'Berrikuspen honek oraindik ez ditu logelakako alokairuak hartzen. Real Decreto-ley 29/2026 arauak, 2026ko urriaren 8tik indarrean dagoenak eta {estado}, etxebizitza-alokairuaren barruan sartzen ditu, ohikoan edo denboraldikoan, betetzen duten beharraren arabera.',
   'client.rental.out_of_scope.other_use':
     'Etxebizitzaz bestelako erabilera baterako kontratu batek bere arauak ditu.',
   'client.rental.out_of_scope.protected':
@@ -3913,6 +3926,9 @@ export const eu: Translation = {
   'client.rental.share.lowest': 'Guztizkoari kalkulu txikiena bakarrik batzen zaio: {importe}.',
   'client.rental.hint.company_landlord':
     'Zure kontratuan jabea enpresa bat da: etxebizitza-edukitzaile handia izan daiteke.',
+  'client.rental.decree_state.pending_validation': 'baliozkotzeko zain dagoenak',
+  'client.rental.decree_state.in_force': 'Kongresuak baliozkotu duenak',
+  'client.rental.decree_state.repealed': 'Kongresuak indargabetu duenak',
   'client.rental.norm.in_force': 'indarrean',
   'client.rental.norm.pending_validation': 'baliozkotzeko zain',
   'client.rental.norm.repealed': 'indargabetuta {fecha} datan',
@@ -3945,7 +3961,7 @@ export const eu: Translation = {
     'Etxebizitza tentsionatutako eremu batean badago, hasierako errentak muga izan dezake (art. 17.6 eta 17.7 LAU). Erkidego bakoitzak deklaratzen ditu eremuak; erreferentziako prezioa SERPAVIn dago.',
   'client.rental.info.reference_price.title': 'Erreferentziako prezioa',
   'client.rental.info.reference_price.text':
-    '2026ko urriaren 8tik 2027ko abenduaren 31ra bitarteko eguneratzeetan, Real Decreto-ley 29/2026 arauak, baliozkotzeko zain dagoenak, dio ezin dela inolako igoerarik egin errentak erreferentziako indizeen sistemaren arabera aplika dakiokeen prezio-muga gainditzen badu; ez du esaten zer kasutan aplikatzen den muga hori. Berrikuspen honek ez du kalkulatzen; prezioa SERPAVIn dago.',
+    '2026ko urriaren 8tik 2027ko abenduaren 31ra bitarteko eguneratzeetan, Real Decreto-ley 29/2026 arauak, {estado}, dio ezin dela inolako igoerarik egin errentak erreferentziako indizeen sistemaren arabera aplika dakiokeen prezio-muga gainditzen badu; ez du esaten zer kasutan aplikatzen den muga hori. Berrikuspen honek ez du kalkulatzen; prezioa SERPAVIn dago.',
   'client.rental.info.minimum_term.title': 'Noiz arte irauten duen zure kontratuak',
   'client.rental.info.minimum_term.text':
     'Zure kontratua {contractEnd} datan amaitzen da. Nahitaezko luzapenarekin, zure gutxieneko epea {mandatoryEnd} datan amaitzen da.',
@@ -3954,10 +3970,10 @@ export const eu: Translation = {
     'Inork garaiz abisatzen ez badu (jabeak, {landlordBy} arte; zuk, {tenantBy} arte), kontratuak urtez urte jarraitzen du {tacitUntil} arte.',
   'client.rental.info.extensions_rdl28.title': 'Luzapenak 2026ko azaroaren 15etik aurrera',
   'client.rental.info.extensions_rdl28.text':
-    'Real Decreto-ley 28/2026 arauak, baliozkotzeko zain dagoenak, luzapenak aldatzen ditu 2026ko azaroaren 15etik aurrera. Zure gutxieneko epea {mandatoryEnd} datan amaitzen da.',
+    'Real Decreto-ley 28/2026 arauak, {estado}, luzapenak aldatzen ditu 2026ko azaroaren 15etik aurrera. Zure gutxieneko epea {mandatoryEnd} datan amaitzen da.',
   'client.rental.info.extension_rdl29.title': 'Aparteko luzapena',
   'client.rental.info.extension_rdl29.text':
-    'Real Decreto-ley 29/2026 arauak, baliozkotzeko zain dagoenak, aparteko luzapen bat aurreikusten du nahitaezko luzapena, isilbidezko luzapena edo isilbidezko berritzea (tácita reconducción) {from} datatik {until} datara amaitzen zaien kontratuetarako.',
+    'Real Decreto-ley 29/2026 arauak, {estado}, aparteko luzapen bat aurreikusten du nahitaezko luzapena, isilbidezko luzapena edo isilbidezko berritzea (tácita reconducción) {from} datatik {until} datara amaitzen zaien kontratuetarako.',
   'client.rental.info.deposit_lodging.title': 'Fidantzaren gordailua',
   'client.rental.info.deposit_lodging.text':
     'Jabeak fidantza gordailutzen du hala aurreikusten duen autonomia-erkidegoaren erakundean (LAU, disposición adicional 3.ª).',
@@ -6033,7 +6049,8 @@ export const eu: Translation = {
   'client.mortgage.calculation.information.prior_step_439bis':
     '03-04-2025etik aurrera, legeak aurretiazko pauso zehatz bat arautzen du hipoteka baten klausulengatik epaitegi batera jo aurretik (Ley de Enjuiciamiento Civil, art. 439 bis). Estekan duzu legearen testua.',
   'client.mortgage.calculation.information.loan_assignment':
-    '08-10-2026tik aurrera, Real Decreto-ley 29/2026 arauak art. 25 bis gehitzen dio legeari: bankuak zure mailegua beste bati lagatzen badio, bankuari aurka zenezakeena titular berriaren aurrean ere gordetzen duzu, eta lagapenaren berri eman behar zaizu, salbu eta bankuak, titular berriarekin ados, maileguaren zerbitzuak ematen jarraitzen badu (art. 25 bis.3). Baliozkotzeko zain dago.',
+    '08-10-2026tik aurrera, Real Decreto-ley 29/2026 arauak art. 25 bis gehitzen dio legeari: bankuak zure mailegua beste bati lagatzen badio, bankuari aurka zenezakeena titular berriaren aurrean ere gordetzen duzu, eta lagapenaren berri eman behar zaizu, salbu eta bankuak, titular berriarekin ados, maileguaren zerbitzuak ematen jarraitzen badu (art. 25 bis.3).',
+  'client.mortgage.calculation.information.loan_assignment_pending': 'Baliozkotzeko zain dago.',
   'client.mortgage.calculation.information.complaints_service':
     'Banco de España erakundearen Servicio de Reclamaciones zerbitzuak bankuei buruzko kontsultak eta kexak artatzen ditu (Ley 44/2002, art. 30), eta kontsumoko bulego publikoek doan informatzen dute.',
   'client.mortgage.info.fein_timing': 'Eskrituraren aurreko informazioa',

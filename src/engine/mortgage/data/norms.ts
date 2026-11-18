@@ -98,8 +98,8 @@ export const MORTGAGE_NORMS: NormTable = {
     ...inForce,
   },
   // Final provision 1.ª added art. 25 bis to the LCCI from 08-10-2026, for assignments made from
-  // that day. RDL 26/2026 had added it on 01-10-2026 and was repealed on 02-10-2026; this one still
-  // awaits the Congress's validation.
+  // that day. RDL 26/2026 had added it on 01-10-2026 and was repealed on 02-10-2026; this one was
+  // validated on 12-11-2026.
   lcci_25bis: {
     id: 'lcci_25bis',
     citation:
@@ -107,13 +107,14 @@ export const MORTGAGE_NORMS: NormTable = {
     url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-20823',
     inForceSince: '2026-10-08',
     inForceUntil: null,
-    status: 'pending_validation',
-    statusSince: null,
-    statusUrl: null,
+    status: 'in_force',
+    statusSince: '2026-11-13',
+    statusUrl: 'https://www.boe.es/buscar/doc.php?id=BOE-A-2026-23755',
   },
 };
 
-// Read in the BOE on 13-10-2026, in the review of the published section.
+// Read in the BOE on 13-10-2026, in the review of the published section, and lcci_25bis again on
+// 18-11-2026.
 export const NORM_REVIEW: NormReview = {
   lcci: '2026-10-13',
   trlitpajd29: '2026-10-13',
@@ -125,5 +126,5 @@ export const NORM_REVIEW: NormReview = {
   cc: '2026-10-13',
   lo1_2025: '2026-10-13',
   law44_2002: '2026-10-13',
-  lcci_25bis: '2026-10-13',
+  lcci_25bis: '2026-11-18',
 };

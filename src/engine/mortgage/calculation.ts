@@ -105,6 +105,7 @@ export type MortgagePhraseKey =
   | 'information.limitation_rule'
   | 'information.prior_step_439bis'
   | 'information.loan_assignment'
+  | 'information.loan_assignment_pending'
   | 'information.complaints_service';
 
 // The UI words a phrase through the dictionary key `client.mortgage.calculation.<key>`.

@@ -1,6 +1,6 @@
 {
   "id": "signed-after-rdl29",
-  "description": "Signed 09-10-2026, under RDL 29/2026 (pending validation): agency fees are the landlord's either way (LAU art. 20.1), while a solvency check under another name, a rent-default insurance (art. 36.5) and IBI passed on (art. 20.1) are read with and without it, so none is counted.",
+  "description": "Signed 09-10-2026, under RDL 29/2026 (validated on 12-11-2026): agency fees are the landlord's (LAU art. 20.1), and so are a solvency check under another name and IBI passed on (art. 20.1), while a rent-default insurance (art. 36.5) is over the cap with no figure.",
   "eval": true,
   "today": "2026-10-20",
   "pages": [
@@ -207,10 +207,8 @@
         },
         {
           "id": "fee:1",
-          "status": "depends",
-          "amount": 0,
-          "upTo": 250,
-          "reasons": ["pending_validation"]
+          "status": "paid_over",
+          "amount": 250
         },
         {
           "id": "guarantees",
@@ -218,10 +216,7 @@
         },
         {
           "id": "guarantee:0",
-          "status": "depends",
-          "amount": 0,
-          "upTo": 0,
-          "reasons": ["pending_validation"]
+          "status": "over_cap"
         },
         {
           "id": "advance",
@@ -229,10 +224,8 @@
         },
         {
           "id": "charge:0:2026",
-          "status": "depends",
-          "amount": 0,
-          "upTo": 26,
-          "reasons": ["pending_validation"]
+          "status": "paid_over",
+          "amount": 26
         }
       ]
     }

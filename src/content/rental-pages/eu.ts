@@ -1,11 +1,11 @@
-// source: 1797cd736446
+// source: e20a98d7779a
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
 import { checkCharges } from '../../engine/rental/charges';
 import { checkGuarantees } from '../../engine/rental/guarantees';
 import type { ItemReading, ItemResult } from '../../engine/rental/item';
-import type { NormTable } from '../../engine/rental/norms';
+import type { Norm, NormTable } from '../../engine/rental/norms';
 import { ruleSource, type RuleId } from '../../engine/rental/rules';
 import { RENTAL_TABLES } from '../../engine/rental/data/tables';
 import { NORMS } from '../../engine/rental/data/norms';
@@ -77,7 +77,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     crumb: '2026ko alokairu-dekretua',
     title: 'Alokairuari buruzko Real Decreto-ley 29/2026: zer aldatzen den',
     description:
-      'Zer aldatzen den maizterrarentzat Real Decreto-ley 29/2026 arauarekin eta zer egoeratan dagoen: indarrean urriaren 8tik aurrera, baliozkotzeko zain.',
+      'Zer aldatzen den maizterrarentzat Real Decreto-ley 29/2026 arauarekin: indarrean 2026ko urriaren 8tik aurrera, eta Kongresuak azaroaren 12an baliozkotu zuen.',
     h1: 'Alokairuari buruzko Real Decreto-ley 29/2026: zer aldatzen den eta zer egoeratan dagoen',
   },
   fees: {
@@ -313,6 +313,7 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
   const decree = norms.rdl29_2026;
   const decreeEve = formatLongDay(toIso(addDays(parseDate(decree.inForceSince), -1)), 'eu');
   const since = formatLongDay(decree.inForceSince, 'eu');
+  const validatedOn = decree.statusSince ? formatLongDay(decree.statusSince, 'eu') : '';
   const caps = capsCopy('eu', norms, {
     checkedOn,
     iravRate: ctx.irav,
@@ -326,17 +327,38 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const { rent, anniversary } = RISE_EXAMPLE;
     const raise = (rate: number) => round2((rent * (100 + rate)) / 100);
     const capped = ctx.irav > DECREE_CAP;
-    const exampleDecree = capped
-      ? `Hilean ${formatEuros(rent)} ordaintzen dituzu, eta zure kontratuak beste urte bat betetzen du ${formatLongDay(anniversary, 'eu')} datan. ` +
-        `Argitaratutako azken IRAVarekin (${formatRate(ctx.irav)}), Real Decreto-ley 29/2026 araua aplikatzen bada, itun berririk gabeko muga ` +
-        `${pct(DECREE_CAP)} da, ez ${formatRate(ctx.irav)}: zure errenta gehienez ${formatEuros(raise(DECREE_CAP))} izan daiteke.`
-      : `Hilean ${formatEuros(rent)} ordaintzen dituzu, eta zure kontratuak beste urte bat betetzen du ${formatLongDay(anniversary, 'eu')} datan. ` +
-        `Real Decreto-ley 29/2026 araua aplikatzen bada, itun berririk gabeko muga ${pct(DECREE_CAP)} edo IRAV da, txikiena: ` +
-        `argitaratutako azken IRAVarekin (${formatRate(ctx.irav)}), zure errenta gehienez ${formatEuros(raise(ctx.irav))} izan daiteke.`;
+    const validated = decree.status === 'in_force';
+    const exampleVars = {
+      renta: formatEuros(rent),
+      fecha: formatLongDay(anniversary, 'eu'),
+      irav: formatRate(ctx.irav),
+      tope: pct(DECREE_CAP),
+      maximo: formatEuros(raise(capped ? DECREE_CAP : ctx.irav)),
+    };
+    const exampleDecree = validated
+      ? tx(
+          capped
+            ? 'rental.page.rise.example_in_force_capped'
+            : 'rental.page.rise.example_in_force_open',
+          exampleVars,
+        )
+      : capped
+        ? `Hilean ${formatEuros(rent)} ordaintzen dituzu, eta zure kontratuak beste urte bat betetzen du ${formatLongDay(anniversary, 'eu')} datan. ` +
+          `Argitaratutako azken IRAVarekin (${formatRate(ctx.irav)}), Real Decreto-ley 29/2026 araua aplikatzen bada, itun berririk gabeko muga ` +
+          `${pct(DECREE_CAP)} da, ez ${formatRate(ctx.irav)}: zure errenta gehienez ${formatEuros(raise(DECREE_CAP))} izan daiteke.`
+        : `Hilean ${formatEuros(rent)} ordaintzen dituzu, eta zure kontratuak beste urte bat betetzen du ${formatLongDay(anniversary, 'eu')} datan. ` +
+          `Real Decreto-ley 29/2026 araua aplikatzen bada, itun berririk gabeko muga ${pct(DECREE_CAP)} edo IRAV da, txikiena: ` +
+          `argitaratutako azken IRAVarekin (${formatRate(ctx.irav)}), zure errenta gehienez ${formatEuros(raise(ctx.irav))} izan daiteke.`;
     const exampleNoDecree =
       `Kongresuak dekretua indargabetuko balu, 2023ko maiatzaren 26tik aurrera sinatutako kontratu batean muga IRAV edo IPC izango litzateke berriro, txikiena. ` +
       `Argitaratutako azken IRAVarekin (${formatRate(ctx.irav)}), gehienez ${formatEuros(raise(ctx.irav))} izango lirateke, ` +
       `IPC txikiagoa ez balitz. Kontuan hartzen den IRAV ${formatLongDay(anniversary, 'eu')} datan argitaratuta dagoen azkena da, eta oraindik ez dago.`;
+    const afterExample: Record<Norm['status'], string> = {
+      pending_validation:
+        'Dekretua baliozkotzeko zain dagoen bitartean, bi kalkuluak dira posible: lehena, Kongresuak baliozkotzen badu, eta bigarrena, indargabetzen badu.',
+      in_force: tx('rental.page.rise.after_in_force', { fecha: validatedOn }),
+      repealed: tx('rental.page.rise.after_repealed'),
+    };
     return {
       lead: 'Igoera hiru gauzaren araberakoa da: kontratuak hala itundu izana, kontratuaren urte bakoitza betetzen den eguna eta egun horretako legezko muga. Hemen dituzu mugak, banan-banan eta bakoitza bere artikuluarekin.',
       sections: [
@@ -365,10 +387,8 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           id: 'ejemplo',
           heading: 'Adibide ebatzia',
           paragraphs: [],
-          example: [exampleDecree, exampleNoDecree],
-          after: [
-            'Dekretua baliozkotzeko zain dagoen bitartean, bi kalkuluak dira posible: lehena, Kongresuak baliozkotzen badu, eta bigarrena, indargabetzen badu.',
-          ],
+          example: validated ? [exampleDecree] : [exampleDecree, exampleNoDecree],
+          after: [afterExample[decree.status]],
           folio: { article: '18', law: 'LAU · RDL 29/2026' },
         },
       ],
@@ -383,11 +403,15 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'Alokairua igo diezadakete kontratuak ezer esaten ez badu?',
           answer: tx('rent_indices.faq.no_clause_answer', { decretos: caps.faqNoClause }),
         },
-        {
-          anchor: 'faq-pendiente',
-          question: 'Zer esan nahi du «baliozkotzeko zain» egoteak?',
-          answer: `${caps.status} Kongresuak bozkatu arte, bi interpretazio daude: gehienez ${pct(DECREE_CAP)} igotzea, edo IRAVaren edo IPCaren arabera igotzea.`,
-        },
+        ...(decree.status === 'pending_validation'
+          ? [
+              {
+                anchor: 'faq-pendiente',
+                question: 'Zer esan nahi du «baliozkotzeko zain» egoteak?',
+                answer: `${caps.status} Kongresuak bozkatu arte, bi interpretazio daude: gehienez ${pct(DECREE_CAP)} igotzea, edo IRAVaren edo IPCaren arabera igotzea.`,
+              },
+            ]
+          : []),
         {
           anchor: 'faq-irav-o-ipc',
           question: 'IRAV ala IPC dagokit?',
@@ -414,8 +438,11 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const point = (key: Key, vars?: Record<string, string>) =>
       standing ? tx(key, { ...vars, decreto: 'dekretu horren' }) : sentence(key, vars);
     const status = caps.status;
+    const validated = decree.status === 'in_force';
     return {
-      lead: `Real Decreto-ley 29/2026 araua ${since} datatik aurrera dago indarrean. Errege lege-dekretu bat berak dioenean sartzen da indarrean (hau, argitaratu eta hurrengo egunean), baina indarra galtzen du Kongresuak 30 egunetan baliozkotzen ez badu: horregatik, beti begiratu behar da zer egoeratan dagoen.`,
+      lead: validated
+        ? tx('rental.page.decree.lead_in_force', { desde: since, fecha: validatedOn })
+        : `Real Decreto-ley 29/2026 araua ${since} datatik aurrera dago indarrean. Errege lege-dekretu bat berak dioenean sartzen da indarrean (hau, argitaratu eta hurrengo egunean), baina indarra galtzen du Kongresuak 30 egunetan baliozkotzen ez badu: horregatik, beti begiratu behar da zer egoeratan dagoen.`,
       sections: [
         {
           id: 'estado',
@@ -463,11 +490,17 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'Dekretua indarrean dago?',
           answer: status,
         },
-        {
-          anchor: 'faq-derogado',
-          question: 'Zer gertatzen da Kongresuak baliozkotzen ez badu?',
-          answer: `Indargabetuta geratzen da, eta egun horretatik aurrera ez da aplikatzen; indarrean egon zen bitartean gertatutakoa kasu zalantzazkoa da. ${tx('rental.guide.update.doubtful')}`,
-        },
+        validated
+          ? {
+              anchor: 'faq-puede-caer',
+              question: tx('rental.page.decree.faq_still_question'),
+              answer: tx('rental.page.decree.faq_still_answer', { fecha: validatedOn }),
+            }
+          : {
+              anchor: 'faq-derogado',
+              question: 'Zer gertatzen da Kongresuak baliozkotzen ez badu?',
+              answer: `Indargabetuta geratzen da, eta egun horretatik aurrera ez da aplikatzen; indarrean egon zen bitartean gertatutakoa kasu zalantzazkoa da. ${tx('rental.guide.update.doubtful')}`,
+            },
         {
           anchor: 'faq-anteriores',
           question: 'Aurreko zer dekretu erori ziren?',

@@ -703,7 +703,7 @@ export const es = {
   'legal_notice.rental.does':
     'Compara lo que pagas o has pagado por un alquiler de vivienda habitual, con contrato firmado desde el 6 de marzo de 2019, con lo que permite la ley: honorarios de la agencia, fianza y garantías, subidas anuales, gastos y devolución de la fianza con sus intereses. Cada partida lleva la norma de la que sale, con su vigencia y su estado.',
   'legal_notice.rental.pending':
-    'Varias normas del alquiler cambiaron en 2026, y algunas están pendientes de que el Congreso las convalide. Cada regla dice si está en vigor, pendiente de convalidación o derogada. Cuando un resultado depende de una norma pendiente, da las dos cuentas y el total solo suma la más baja; si depende de un decreto que el Congreso derogó, da las dos cuentas y no la suma.',
+    'Varias normas del alquiler cambiaron en 2026: el Congreso convalidó unas y derogó otras. Cada regla dice si está en vigor, pendiente de convalidación o derogada. Cuando un resultado depende de una norma pendiente, da las dos cuentas y el total solo suma la más baja; si depende de un decreto que el Congreso derogó, da las dos cuentas y no la suma.',
   'legal_notice.rental.does_not':
     'No valora desperfectos ni si un descuento de la fianza procede, no calcula el tope de la renta inicial en las zonas tensionadas, no aplica las normas propias de cada comunidad autónoma y no comprueba prórrogas ni preavisos más allá de sus fechas. Tampoco revisa contratos de temporada, por habitaciones, para otro uso ni firmados antes del 6 de marzo de 2019.',
   'legal_notice.rental.beta':
@@ -3065,6 +3065,18 @@ export const es = {
     'Las comunidades pueden obligar al casero a depositar la fianza en un organismo público (disposición adicional 3.ª LAU). Es una obligación del casero con la administración: no cambia lo que pagas.',
 
   'rental.guide.pages': 'Guías',
+  'rental.page.rise.example_in_force_capped':
+    'Pagas {renta} al mes y tu contrato cumple un año más el {fecha}. Con el último IRAV publicado ({irav}), el tope sin nuevo pacto es el {tope}, no el {irav}: tu renta puede pasar a {maximo} como mucho.',
+  'rental.page.rise.example_in_force_open':
+    'Pagas {renta} al mes y tu contrato cumple un año más el {fecha}. El tope sin nuevo pacto es el {tope} o el IRAV, el más bajo: con el último IRAV publicado ({irav}), tu renta puede pasar a {maximo} como mucho.',
+  'rental.page.rise.after_in_force':
+    'El Congreso convalidó el decreto (BOE del {fecha}): esta es la cuenta que se aplica, con el tope sin nuevo pacto de la disposición final 6.ª del Real Decreto-ley 29/2026.',
+  'rental.page.rise.after_repealed': 'El Congreso derogó el decreto: se aplica la segunda cuenta.',
+  'rental.page.decree.lead_in_force':
+    'El Real Decreto-ley 29/2026 rige desde el {desde}. El Congreso lo convalidó (BOE del {fecha}), así que ya no puede decaer: solo otra norma puede cambiarlo.',
+  'rental.page.decree.faq_still_question': '¿Puede caer todavía?',
+  'rental.page.decree.faq_still_answer':
+    'No. El Congreso lo convalidó (BOE del {fecha}); desde entonces solo otra norma puede cambiarlo.',
   'rental.page.decree.rise':
     '{decreto} dice que, hasta el 31 de diciembre de 2027 y sin un nuevo pacto entre las partes, la renta no puede subir más del 2 % (disposición final 6.ª), y que el IRAV rige en todos los contratos (art. 4.Dos).',
   'rental.page.decree.zones':
@@ -3157,7 +3169,7 @@ export const es = {
   'rental.large.question': 'Gran tenedor',
   'rental.landlord.large': '¿Tu casero es gran tenedor?',
   'rental.landlord.large_hint':
-    'Es gran tenedor quien tiene más de diez inmuebles urbanos de uso residencial o más de 1.500 m² de uso residencial, sin contar garajes ni trasteros (art. 3.k de la Ley 12/2023); en una zona tensionada, la comunidad autónoma puede bajarlo a cinco o más inmuebles. Desde el 08-10-2026, el Real Decreto-ley 29/2026, pendiente de convalidación, añade que se acredita con una certificación del Registro de la Propiedad y que cada unidad de uso residencial de un edificio cuenta como un inmueble, aunque no haya división horizontal inscrita. Ser una empresa no basta: una sociedad con pocos pisos no lo es.',
+    'Es gran tenedor quien tiene más de diez inmuebles urbanos de uso residencial o más de 1.500 m² de uso residencial, sin contar garajes ni trasteros (art. 3.k de la Ley 12/2023); en una zona tensionada, la comunidad autónoma puede bajarlo a cinco o más inmuebles. Desde el 08-10-2026, el Real Decreto-ley 29/2026, {estado}, añade que se acredita con una certificación del Registro de la Propiedad y que cada unidad de uso residencial de un edificio cuenta como un inmueble, aunque no haya división horizontal inscrita. Ser una empresa no basta: una sociedad con pocos pisos no lo es.',
   'rental.home.question': 'Dónde está la vivienda',
   'rental.landlord.region': 'Comunidad autónoma',
   'rental.landlord.region_hint': 'Donde está la vivienda.',
@@ -3487,9 +3499,9 @@ export const es = {
   'client.rental.out_of_scope.before_2019':
     'Esta versión no revisa contratos firmados antes del 6 de marzo de 2019: siguen otras reglas para actualizar la renta.',
   'client.rental.out_of_scope.seasonal':
-    'Esta revisión aún no cubre los contratos de temporada. En los firmados desde el 8 de octubre de 2026, el Real Decreto-ley 29/2026, pendiente de convalidación, trata como de vivienda habitual el contrato temporal que no recoge una causa de temporalidad real y acreditable. Los firmados antes siguen con las reglas de entonces hasta que acaba el plazo pactado (disposición transitoria 8.ª de la Ley de Arrendamientos Urbanos).',
+    'Esta revisión aún no cubre los contratos de temporada. En los firmados desde el 8 de octubre de 2026, el Real Decreto-ley 29/2026, {estado}, trata como de vivienda habitual el contrato temporal que no recoge una causa de temporalidad real y acreditable. Los firmados antes siguen con las reglas de entonces hasta que acaba el plazo pactado (disposición transitoria 8.ª de la Ley de Arrendamientos Urbanos).',
   'client.rental.out_of_scope.room':
-    'Esta revisión aún no cubre los alquileres por habitaciones. El Real Decreto-ley 29/2026, en vigor desde el 8 de octubre de 2026 y pendiente de convalidación, los incluye en el alquiler de vivienda, habitual o temporal según la necesidad que cubran.',
+    'Esta revisión aún no cubre los alquileres por habitaciones. El Real Decreto-ley 29/2026, en vigor desde el 8 de octubre de 2026 y {estado}, los incluye en el alquiler de vivienda, habitual o temporal según la necesidad que cubran.',
   'client.rental.out_of_scope.other_use':
     'Un contrato para un uso distinto del de vivienda tiene sus propias reglas.',
   'client.rental.out_of_scope.protected':
@@ -3583,6 +3595,9 @@ export const es = {
   'client.rental.norm.in_force': 'en vigor',
   'client.rental.norm.pending_validation': 'pendiente de convalidación',
   'client.rental.norm.repealed': 'derogada el {fecha}',
+  'client.rental.decree_state.pending_validation': 'pendiente de convalidación',
+  'client.rental.decree_state.in_force': 'convalidado por el Congreso',
+  'client.rental.decree_state.repealed': 'derogado por el Congreso',
   'client.rental.source.since': 'con efectos desde el {desde}',
   'client.rental.source.between': 'con efectos del {desde} al {hasta}',
 
@@ -3613,7 +3628,7 @@ export const es = {
     'Si la vivienda está en una zona tensionada, la renta inicial puede tener tope (art. 17.6 y 17.7 LAU). Las zonas las declara cada comunidad; el precio de referencia está en SERPAVI.',
   'client.rental.info.reference_price.title': 'Precio de referencia',
   'client.rental.info.reference_price.text':
-    'En las actualizaciones del 8 de octubre de 2026 al 31 de diciembre de 2027, el Real Decreto-ley 29/2026, pendiente de convalidación, dice que no cabe ninguna subida si la renta supera el límite de precio que le sea aplicable según el sistema de índices de referencia; no dice en qué casos se aplica ese límite. Esta revisión no lo calcula; el precio está en SERPAVI.',
+    'En las actualizaciones del 8 de octubre de 2026 al 31 de diciembre de 2027, el Real Decreto-ley 29/2026, {estado}, dice que no cabe ninguna subida si la renta supera el límite de precio que le sea aplicable según el sistema de índices de referencia; no dice en qué casos se aplica ese límite. Esta revisión no lo calcula; el precio está en SERPAVI.',
   'client.rental.info.minimum_term.title': 'Hasta cuándo dura tu contrato',
   'client.rental.info.minimum_term.text':
     'Tu contrato acaba el {contractEnd}. Con la prórroga obligatoria, tu plazo mínimo acaba el {mandatoryEnd}.',
@@ -3622,10 +3637,10 @@ export const es = {
     'Si nadie avisa a tiempo (el casero, hasta el {landlordBy}; tú, hasta el {tenantBy}), el contrato sigue año a año hasta el {tacitUntil}.',
   'client.rental.info.extensions_rdl28.title': 'Prórrogas desde el 15 de noviembre de 2026',
   'client.rental.info.extensions_rdl28.text':
-    'El Real Decreto-ley 28/2026, pendiente de convalidación, cambia las prórrogas desde el 15 de noviembre de 2026. Tu plazo mínimo acaba el {mandatoryEnd}.',
+    'El Real Decreto-ley 28/2026, {estado}, cambia las prórrogas desde el 15 de noviembre de 2026. Tu plazo mínimo acaba el {mandatoryEnd}.',
   'client.rental.info.extension_rdl29.title': 'Prórroga extraordinaria',
   'client.rental.info.extension_rdl29.text':
-    'El Real Decreto-ley 29/2026, pendiente de convalidación, prevé una prórroga extraordinaria para los contratos cuya prórroga obligatoria, prórroga tácita o tácita reconducción acaba entre el {from} y el {until}.',
+    'El Real Decreto-ley 29/2026, {estado}, prevé una prórroga extraordinaria para los contratos cuya prórroga obligatoria, prórroga tácita o tácita reconducción acaba entre el {from} y el {until}.',
   'client.rental.info.deposit_lodging.title': 'Depósito de la fianza',
   'client.rental.info.deposit_lodging.text':
     'El casero deposita la fianza en el organismo de la comunidad autónoma que lo prevea (disposición adicional 3.ª LAU).',
@@ -6159,7 +6174,9 @@ export const es = {
   'client.mortgage.calculation.information.prior_step_439bis':
     'Desde el 03-04-2025, la ley regula un paso previo concreto antes de acudir a un juzgado por cláusulas de una hipoteca (art. 439 bis de la Ley de Enjuiciamiento Civil). En el enlace tienes el texto de la ley.',
   'client.mortgage.calculation.information.loan_assignment':
-    'Desde el 08-10-2026, el Real Decreto-ley 29/2026 añade a la ley un art. 25 bis: si el banco cede tu préstamo a otro, conservas frente al nuevo titular lo que podías oponer al banco, y se te tiene que informar de la cesión salvo que el banco, de acuerdo con el nuevo titular, siga prestando los servicios del préstamo (art. 25 bis.3). Está pendiente de convalidación.',
+    'Desde el 08-10-2026, el Real Decreto-ley 29/2026 añade a la ley un art. 25 bis: si el banco cede tu préstamo a otro, conservas frente al nuevo titular lo que podías oponer al banco, y se te tiene que informar de la cesión salvo que el banco, de acuerdo con el nuevo titular, siga prestando los servicios del préstamo (art. 25 bis.3).',
+  'client.mortgage.calculation.information.loan_assignment_pending':
+    'Está pendiente de convalidación.',
   'client.mortgage.calculation.information.complaints_service':
     'El Servicio de Reclamaciones del Banco de España atiende consultas y quejas sobre bancos (art. 30 de la Ley 44/2002), y las oficinas públicas de consumo informan gratis.',
 

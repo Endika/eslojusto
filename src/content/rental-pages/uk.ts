@@ -1,11 +1,11 @@
-// source: 1797cd736446
+// source: e20a98d7779a
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
 import { checkCharges } from '../../engine/rental/charges';
 import { checkGuarantees } from '../../engine/rental/guarantees';
 import type { ItemReading, ItemResult } from '../../engine/rental/item';
-import type { NormTable } from '../../engine/rental/norms';
+import type { Norm, NormTable } from '../../engine/rental/norms';
 import { ruleSource, type RuleId } from '../../engine/rental/rules';
 import { RENTAL_TABLES } from '../../engine/rental/data/tables';
 import { NORMS } from '../../engine/rental/data/norms';
@@ -77,7 +77,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     crumb: 'Декрет про оренду 2026 р.',
     title: 'Real Decreto-ley 29/2026 про оренду: що змінюється',
     description:
-      'Що змінюється для орендаря з Real Decreto-ley 29/2026 і який його статус: діє з 8 жовтня, очікує затвердження Конгресом (convalidación).',
+      'Що змінюється для орендаря з Real Decreto-ley 29/2026: діє з 8 жовтня 2026 р. і затверджений Конгресом 12 листопада.',
     h1: 'Real Decreto-ley 29/2026 про оренду: що змінюється і який його статус',
   },
   fees: {
@@ -314,6 +314,7 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
   const decree = norms.rdl29_2026;
   const decreeEve = formatLongDay(toIso(addDays(parseDate(decree.inForceSince), -1)), 'uk');
   const since = formatLongDay(decree.inForceSince, 'uk');
+  const validatedOn = decree.statusSince ? formatLongDay(decree.statusSince, 'uk') : '';
   const caps = capsCopy('uk', norms, {
     checkedOn,
     iravRate: ctx.irav,
@@ -327,17 +328,38 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const { rent, anniversary } = RISE_EXAMPLE;
     const raise = (rate: number) => round2((rent * (100 + rate)) / 100);
     const capped = ctx.irav > DECREE_CAP;
-    const exampleDecree = capped
-      ? `Ви платите ${formatEuros(rent)} на місяць, і ще один рік вашого договору виповнюється ${formatLongDay(anniversary, 'uk')}. ` +
-        `За останнім опублікованим IRAV (${formatRate(ctx.irav)}), якщо діє Real Decreto-ley 29/2026, граничний рівень без нової домовленості ` +
-        `становить ${pct(DECREE_CAP)}, а не ${formatRate(ctx.irav)}: ваша орендна плата може зрости щонайбільше до ${formatEuros(raise(DECREE_CAP))}.`
-      : `Ви платите ${formatEuros(rent)} на місяць, і ще один рік вашого договору виповнюється ${formatLongDay(anniversary, 'uk')}. ` +
-        `Якщо діє Real Decreto-ley 29/2026, граничний рівень без нової домовленості — ${pct(DECREE_CAP)} або IRAV, залежно від того, що нижче: ` +
-        `за останнім опублікованим IRAV (${formatRate(ctx.irav)}) ваша орендна плата може зрости щонайбільше до ${formatEuros(raise(ctx.irav))}.`;
+    const validated = decree.status === 'in_force';
+    const exampleVars = {
+      renta: formatEuros(rent),
+      fecha: formatLongDay(anniversary, 'uk'),
+      irav: formatRate(ctx.irav),
+      tope: pct(DECREE_CAP),
+      maximo: formatEuros(raise(capped ? DECREE_CAP : ctx.irav)),
+    };
+    const exampleDecree = validated
+      ? tx(
+          capped
+            ? 'rental.page.rise.example_in_force_capped'
+            : 'rental.page.rise.example_in_force_open',
+          exampleVars,
+        )
+      : capped
+        ? `Ви платите ${formatEuros(rent)} на місяць, і ще один рік вашого договору виповнюється ${formatLongDay(anniversary, 'uk')}. ` +
+          `За останнім опублікованим IRAV (${formatRate(ctx.irav)}), якщо діє Real Decreto-ley 29/2026, граничний рівень без нової домовленості ` +
+          `становить ${pct(DECREE_CAP)}, а не ${formatRate(ctx.irav)}: ваша орендна плата може зрости щонайбільше до ${formatEuros(raise(DECREE_CAP))}.`
+        : `Ви платите ${formatEuros(rent)} на місяць, і ще один рік вашого договору виповнюється ${formatLongDay(anniversary, 'uk')}. ` +
+          `Якщо діє Real Decreto-ley 29/2026, граничний рівень без нової домовленості — ${pct(DECREE_CAP)} або IRAV, залежно від того, що нижче: ` +
+          `за останнім опублікованим IRAV (${formatRate(ctx.irav)}) ваша орендна плата може зрости щонайбільше до ${formatEuros(raise(ctx.irav))}.`;
     const exampleNoDecree =
       `Якби Конгрес скасував декрет, граничним рівнем у договорі, підписаному з 26 травня 2023 р., знову став би IRAV або IPC, залежно від того, що нижче. ` +
       `За останнім опублікованим IRAV (${formatRate(ctx.irav)}) це було б щонайбільше ${formatEuros(raise(ctx.irav))}, ` +
       `за умови, що IPC не нижчий. Враховується IRAV, останній опублікований на ${formatLongDay(anniversary, 'uk')}, а його ще немає.`;
+    const afterExample: Record<Norm['status'], string> = {
+      pending_validation:
+        'Поки декрет очікує затвердження Конгресом, можливі обидва розрахунки: перший, якщо Конгрес його затвердить, і другий, якщо скасує.',
+      in_force: tx('rental.page.rise.after_in_force', { fecha: validatedOn }),
+      repealed: tx('rental.page.rise.after_repealed'),
+    };
     return {
       lead: 'Підвищення залежить від трьох речей: чи передбачене воно договором, від дня, коли виповнюється кожен рік договору, і від граничного рівня, установленого законом на цей день. Тут наведено граничні рівні, один за одним і зі статтею для кожного.',
       sections: [
@@ -366,10 +388,8 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           id: 'ejemplo',
           heading: 'Приклад розрахунку',
           paragraphs: [],
-          example: [exampleDecree, exampleNoDecree],
-          after: [
-            'Поки декрет очікує затвердження Конгресом, можливі обидва розрахунки: перший, якщо Конгрес його затвердить, і другий, якщо скасує.',
-          ],
+          example: validated ? [exampleDecree] : [exampleDecree, exampleNoDecree],
+          after: [afterExample[decree.status]],
           folio: { article: '18', law: 'LAU · RDL 29/2026' },
         },
       ],
@@ -385,11 +405,16 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
             'Чи можуть мені підвищити орендну плату, якщо в договорі про це нічого не сказано?',
           answer: tx('rent_indices.faq.no_clause_answer', { decretos: caps.faqNoClause }),
         },
-        {
-          anchor: 'faq-pendiente',
-          question: 'Що означає «очікує затвердження Конгресом» (pendiente de convalidación)?',
-          answer: `${caps.status} До голосування підвищення на ${pct(DECREE_CAP)} і підвищення за IRAV або IPC — два можливі розрахунки.`,
-        },
+        ...(decree.status === 'pending_validation'
+          ? [
+              {
+                anchor: 'faq-pendiente',
+                question:
+                  'Що означає «очікує затвердження Конгресом» (pendiente de convalidación)?',
+                answer: `${caps.status} До голосування підвищення на ${pct(DECREE_CAP)} і підвищення за IRAV або IPC — два можливі розрахунки.`,
+              },
+            ]
+          : []),
         {
           anchor: 'faq-irav-o-ipc',
           question: 'Що застосовується до мене: IRAV чи IPC?',
@@ -416,8 +441,11 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const point = (key: Key, vars?: Record<string, string>) =>
       standing ? tx(key, { ...vars, decreto: 'декрет' }) : sentence(key, vars);
     const status = caps.status;
+    const validated = decree.status === 'in_force';
     return {
-      lead: `Real Decreto-ley 29/2026 діє з ${since}. Декрет-закон набирає чинності тоді, коли визначає він сам (цей — наступного дня після публікації), але втрачає чинність, якщо Конгрес не затвердить його протягом 30 днів: тому завжди треба дивитися, який його статус.`,
+      lead: validated
+        ? tx('rental.page.decree.lead_in_force', { desde: since, fecha: validatedOn })
+        : `Real Decreto-ley 29/2026 діє з ${since}. Декрет-закон набирає чинності тоді, коли визначає він сам (цей — наступного дня після публікації), але втрачає чинність, якщо Конгрес не затвердить його протягом 30 днів: тому завжди треба дивитися, який його статус.`,
       sections: [
         {
           id: 'estado',
@@ -465,11 +493,17 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'Чи діє декрет?',
           answer: status,
         },
-        {
-          anchor: 'faq-derogado',
-          question: 'Що буде, якщо Конгрес його не затвердить?',
-          answer: `Його скасовано, і він перестає застосовуватися з цього дня; те, що відбувалося, поки він діяв, — неоднозначний випадок. ${tx('rental.guide.update.doubtful')}`,
-        },
+        validated
+          ? {
+              anchor: 'faq-puede-caer',
+              question: tx('rental.page.decree.faq_still_question'),
+              answer: tx('rental.page.decree.faq_still_answer', { fecha: validatedOn }),
+            }
+          : {
+              anchor: 'faq-derogado',
+              question: 'Що буде, якщо Конгрес його не затвердить?',
+              answer: `Його скасовано, і він перестає застосовуватися з цього дня; те, що відбувалося, поки він діяв, — неоднозначний випадок. ${tx('rental.guide.update.doubtful')}`,
+            },
         {
           anchor: 'faq-anteriores',
           question: 'Які попередні декрети втратили чинність?',

@@ -5,6 +5,7 @@ import { legalInterestSummary, rentalGuide } from '../../src/content/rental-guid
 import { LEGAL_INTEREST } from '../../src/engine/law/data/legal-interest';
 import { NORMS } from '../../src/engine/rental/data/norms';
 import type { NormTable } from '../../src/engine/rental/norms';
+import { NORMS_BEFORE_VOTE } from '../engine/rental/norms-before-vote';
 
 const CHECKED = '2026-10-08';
 const legalInterest = legalInterestSummary(LEGAL_INTEREST);
@@ -58,17 +59,32 @@ describe('the rental guide', () => {
     expect(new Set(blocks.map((b) => b.anchor)).size).toBe(blocks.length);
   });
 
-  it('marks the 2026 decrees as pending, as the norm table has them', () => {
-    const all = text(NORMS);
+  it('marks the 2026 decrees as pending while they await the vote', () => {
+    const all = text(NORMS_BEFORE_VOTE);
     expect(all).toContain(
       'el Real Decreto-ley 29/2026, en vigor desde el 8 de octubre de 2026 y pendiente de que el Congreso lo convalide,',
     );
     expect(all).toContain(
       'el Real Decreto-ley 28/2026, que entra en vigor el 15 de noviembre de 2026 y está pendiente de que el Congreso lo convalide,',
     );
-    const statuses = guide(NORMS).flatMap((b) => b.sources.map((s) => s.status));
+    const statuses = guide(NORMS_BEFORE_VOTE).flatMap((b) => b.sources.map((s) => s.status));
     expect(statuses).toContain('pendiente de convalidación');
     expect(statuses).toContain('en vigor');
+  });
+
+  it('tells RDL 29/2026 as validated and RDL 28/2026 as never applied, as the norm table has them', () => {
+    const all = text(NORMS);
+    expect(all).toContain(
+      'el Real Decreto-ley 29/2026, en vigor desde el 8 de octubre de 2026 y convalidado por el Congreso,',
+    );
+    expect(all).toContain(
+      'El Real Decreto-ley 28/2026 no llegó a aplicarse: el Congreso lo derogó antes de que entrara en vigor.',
+    );
+    expect(all).not.toContain('pendiente de que el Congreso');
+    expect(all).not.toContain('15 de noviembre de 2026');
+    const sources = guide(NORMS).flatMap((b) => b.sources);
+    expect(sources.find((s) => s.citation.includes('29/2026'))?.status).toBe('en vigor');
+    expect(sources.map((s) => s.statusCode)).not.toContain('pending_validation');
   });
 
   it('follows a validation or a repeal of RDL 29/2026 without touching the copy', () => {
@@ -128,7 +144,7 @@ describe('the rental guide', () => {
 
   it('names the RDL 29/2026 extension in the RDL 28/2026 sentence, also once RDL 29 is repealed', () => {
     const term =
-      guide(repealed)
+      guide({ ...repealed, rdl28_2026: NORMS_BEFORE_VOTE.rdl28_2026 })
         .find((b) => b.id === 'term')
         ?.paragraphs.join(' ') ?? '';
     expect(term).toContain('la prórroga extraordinaria del Real Decreto-ley 29/2026');
@@ -175,13 +191,23 @@ describe('the rental FAQ', () => {
     const answer = (norms: NormTable) =>
       entries(norms, false).find((e) => e.anchor === 'faq-alquiler-normas-pendientes')?.answer ??
       '';
-    expect(answer(NORMS)).toContain(
+    expect(answer(NORMS_BEFORE_VOTE)).toContain(
       'A 8 de octubre de 2026 están pendientes de convalidación el Real Decreto-ley 29/2026, en vigor desde el 8 de octubre de 2026, y el Real Decreto-ley 28/2026, que entra en vigor el 15 de noviembre de 2026.',
     );
-    expect(answer(NORMS)).toContain('Real Decreto-ley 8/2026, del 22-03-2026');
+    expect(answer(NORMS_BEFORE_VOTE)).toContain('Real Decreto-ley 8/2026, del 22-03-2026');
     const after = answer(repealed);
     expect(after).not.toContain('pendientes de convalidación el Real Decreto-ley 29/2026');
     expect(after).toContain('Real Decreto-ley 29/2026, del 08-10-2026');
+  });
+
+  it('has no decree pending and says RDL 28/2026 never applied, as the norm table stands', () => {
+    const now = entries(NORMS, false).find((e) => e.anchor === 'faq-alquiler-normas-pendientes');
+    expect(now?.answer).toContain('A 8 de octubre de 2026 no hay ninguna pendiente.');
+    expect(now?.answer).toContain(
+      'El Congreso derogó el Real Decreto-ley 28/2026 antes de que entrara en vigor, así que no llegó a aplicarse.',
+    );
+    expect(now?.answer).toContain('Real Decreto-ley 8/2026, del 22-03-2026');
+    expect(now?.answer).not.toContain('15 de noviembre');
   });
 
   it('every answer is filled in', () => {

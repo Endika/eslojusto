@@ -1,11 +1,11 @@
-// source: 1797cd736446
+// source: e20a98d7779a
 import { addDays, parseDate, toIso } from '../../engine/date';
 import { round2 } from '../../engine/money';
 import { checkDepositReturn } from '../../engine/rental/deposit-return';
 import { checkCharges } from '../../engine/rental/charges';
 import { checkGuarantees } from '../../engine/rental/guarantees';
 import type { ItemReading, ItemResult } from '../../engine/rental/item';
-import type { NormTable } from '../../engine/rental/norms';
+import type { Norm, NormTable } from '../../engine/rental/norms';
 import { ruleSource, type RuleId } from '../../engine/rental/rules';
 import { RENTAL_TABLES } from '../../engine/rental/data/tables';
 import { NORMS } from '../../engine/rental/data/norms';
@@ -79,7 +79,7 @@ export const RENTAL_PAGES: Record<RentalPageId, PageMeta> = {
     crumb: 'Décret sur la location de 2026',
     title: 'Real Decreto-ley 29/2026 sur la location : ce qui change',
     description:
-      'Ce qui change pour le locataire avec le Real Decreto-ley 29/2026 et où il en est : en vigueur depuis le 8 octobre, en attente de validation par le Congrès.',
+      'Ce qui change pour le locataire avec le Real Decreto-ley 29/2026 : en vigueur depuis le 8 octobre 2026 et validé par le Congrès le 12 novembre.',
     h1: 'Real Decreto-ley 29/2026 sur la location : ce qui change et où il en est',
   },
   fees: {
@@ -319,6 +319,7 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
   const decree = norms.rdl29_2026;
   const decreeEve = formatLongDay(toIso(addDays(parseDate(decree.inForceSince), -1)), 'fr');
   const since = formatLongDay(decree.inForceSince, 'fr');
+  const validatedOn = decree.statusSince ? formatLongDay(decree.statusSince, 'fr') : '';
   const caps = capsCopy('fr', norms, {
     checkedOn,
     iravRate: ctx.irav,
@@ -332,17 +333,38 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const { rent, anniversary } = RISE_EXAMPLE;
     const raise = (rate: number) => round2((rent * (100 + rate)) / 100);
     const capped = ctx.irav > DECREE_CAP;
-    const exampleDecree = capped
-      ? `Vous payez ${formatEuros(rent)} par mois et votre bail atteint une nouvelle année le ${formatLongDay(anniversary, 'fr')}. ` +
-        `Avec le dernier IRAV publié (${formatRate(ctx.irav)}), si le Real Decreto-ley 29/2026 s'applique, le plafond sans nouvel accord ` +
-        `est de ${pct(DECREE_CAP)}, et non de ${formatRate(ctx.irav)}${NBSP}: votre loyer peut passer à ${formatEuros(raise(DECREE_CAP))} au maximum.`
-      : `Vous payez ${formatEuros(rent)} par mois et votre bail atteint une nouvelle année le ${formatLongDay(anniversary, 'fr')}. ` +
-        `Si le Real Decreto-ley 29/2026 s'applique, le plafond sans nouvel accord est de ${pct(DECREE_CAP)} ou l'IRAV, le plus bas des deux${NBSP}: ` +
-        `avec le dernier IRAV publié (${formatRate(ctx.irav)}), votre loyer peut passer à ${formatEuros(raise(ctx.irav))} au maximum.`;
+    const validated = decree.status === 'in_force';
+    const exampleVars = {
+      renta: formatEuros(rent),
+      fecha: formatLongDay(anniversary, 'fr'),
+      irav: formatRate(ctx.irav),
+      tope: pct(DECREE_CAP),
+      maximo: formatEuros(raise(capped ? DECREE_CAP : ctx.irav)),
+    };
+    const exampleDecree = validated
+      ? tx(
+          capped
+            ? 'rental.page.rise.example_in_force_capped'
+            : 'rental.page.rise.example_in_force_open',
+          exampleVars,
+        )
+      : capped
+        ? `Vous payez ${formatEuros(rent)} par mois et votre bail atteint une nouvelle année le ${formatLongDay(anniversary, 'fr')}. ` +
+          `Avec le dernier IRAV publié (${formatRate(ctx.irav)}), si le Real Decreto-ley 29/2026 s'applique, le plafond sans nouvel accord ` +
+          `est de ${pct(DECREE_CAP)}, et non de ${formatRate(ctx.irav)}${NBSP}: votre loyer peut passer à ${formatEuros(raise(DECREE_CAP))} au maximum.`
+        : `Vous payez ${formatEuros(rent)} par mois et votre bail atteint une nouvelle année le ${formatLongDay(anniversary, 'fr')}. ` +
+          `Si le Real Decreto-ley 29/2026 s'applique, le plafond sans nouvel accord est de ${pct(DECREE_CAP)} ou l'IRAV, le plus bas des deux${NBSP}: ` +
+          `avec le dernier IRAV publié (${formatRate(ctx.irav)}), votre loyer peut passer à ${formatEuros(raise(ctx.irav))} au maximum.`;
     const exampleNoDecree =
       `Si le Congrès abrogeait le décret, le plafond dans un bail signé depuis le 26 mai 2023 redeviendrait l'IRAV ou l'IPC, le plus bas des deux. ` +
       `Avec le dernier IRAV publié (${formatRate(ctx.irav)}), ce serait ${formatEuros(raise(ctx.irav))} au maximum, ` +
       `à condition que l'IPC ne soit pas plus bas. L'IRAV qui compte est le dernier publié le ${formatLongDay(anniversary, 'fr')}, qui n'existe pas encore.`;
+    const afterExample: Record<Norm['status'], string> = {
+      pending_validation:
+        "Tant que le décret est en attente de validation, les deux calculs sont possibles : le premier si le Congrès le valide, le second s'il l'abroge.",
+      in_force: tx('rental.page.rise.after_in_force', { fecha: validatedOn }),
+      repealed: tx('rental.page.rise.after_repealed'),
+    };
     return {
       lead: "L'augmentation dépend de trois choses : que le bail la prévoie, le jour où le bail atteint chaque nouvelle année et le plafond légal de ce jour-là. Voici les plafonds, un par un et avec leur article.",
       sections: [
@@ -371,10 +393,8 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           id: 'ejemplo',
           heading: 'Exemple détaillé',
           paragraphs: [],
-          example: [exampleDecree, exampleNoDecree],
-          after: [
-            "Tant que le décret est en attente de validation, les deux calculs sont possibles : le premier si le Congrès le valide, le second s'il l'abroge.",
-          ],
+          example: validated ? [exampleDecree] : [exampleDecree, exampleNoDecree],
+          after: [afterExample[decree.status]],
           folio: { article: '18', law: 'LAU · RDL 29/2026' },
         },
       ],
@@ -389,11 +409,16 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'Mon loyer peut-il augmenter si le bail ne prévoit rien ?',
           answer: tx('rent_indices.faq.no_clause_answer', { decretos: caps.faqNoClause }),
         },
-        {
-          anchor: 'faq-pendiente',
-          question: 'Que signifie « en attente de validation » (pendiente de convalidación) ?',
-          answer: `${caps.status} Jusqu'au vote du Congrès, l'augmentation de ${pct(DECREE_CAP)} et celle selon l'IRAV ou l'IPC sont les deux calculs possibles.`,
-        },
+        ...(decree.status === 'pending_validation'
+          ? [
+              {
+                anchor: 'faq-pendiente',
+                question:
+                  'Que signifie « en attente de validation » (pendiente de convalidación) ?',
+                answer: `${caps.status} Jusqu'au vote du Congrès, l'augmentation de ${pct(DECREE_CAP)} et celle selon l'IRAV ou l'IPC sont les deux calculs possibles.`,
+              },
+            ]
+          : []),
         {
           anchor: 'faq-irav-o-ipc',
           question: "Est-ce l'IRAV ou l'IPC qui s'applique à mon bail ?",
@@ -420,8 +445,11 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
     const point = (key: Key, vars?: Record<string, string>) =>
       standing ? tx(key, { ...vars, decreto: 'le décret' }) : sentence(key, vars);
     const status = caps.status;
+    const validated = decree.status === 'in_force';
     return {
-      lead: `Le Real Decreto-ley 29/2026 s'applique depuis le ${since}. Un décret-loi entre en vigueur à la date qu'il fixe lui-même (celui-ci, le lendemain de sa publication), mais il devient caduc si le Congrès ne le valide pas dans les 30 jours${NBSP}: c'est pourquoi il faut toujours vérifier où il en est.`,
+      lead: validated
+        ? tx('rental.page.decree.lead_in_force', { desde: since, fecha: validatedOn })
+        : `Le Real Decreto-ley 29/2026 s'applique depuis le ${since}. Un décret-loi entre en vigueur à la date qu'il fixe lui-même (celui-ci, le lendemain de sa publication), mais il devient caduc si le Congrès ne le valide pas dans les 30 jours${NBSP}: c'est pourquoi il faut toujours vérifier où il en est.`,
       sections: [
         {
           id: 'estado',
@@ -469,11 +497,17 @@ function guideBody(id: 'rise' | 'decree' | 'fees', ctx: PageContext): PageBody {
           question: 'Le décret est-il en vigueur ?',
           answer: status,
         },
-        {
-          anchor: 'faq-derogado',
-          question: 'Que se passe-t-il si le Congrès ne le valide pas ?',
-          answer: `Il est abrogé et cesse de s'appliquer à partir de ce jour${NBSP}; ce qui s'est passé pendant qu'il s'appliquait est un cas douteux. ${tx('rental.guide.update.doubtful')}`,
-        },
+        validated
+          ? {
+              anchor: 'faq-puede-caer',
+              question: tx('rental.page.decree.faq_still_question'),
+              answer: tx('rental.page.decree.faq_still_answer', { fecha: validatedOn }),
+            }
+          : {
+              anchor: 'faq-derogado',
+              question: 'Que se passe-t-il si le Congrès ne le valide pas ?',
+              answer: `Il est abrogé et cesse de s'appliquer à partir de ce jour${NBSP}; ce qui s'est passé pendant qu'il s'appliquait est un cas douteux. ${tx('rental.guide.update.doubtful')}`,
+            },
         {
           anchor: 'faq-anteriores',
           question: 'Quels décrets antérieurs ont été abrogés ?',

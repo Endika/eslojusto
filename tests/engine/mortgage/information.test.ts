@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parseDate } from '../../../src/engine/date';
 import { informationBlocks } from '../../../src/engine/mortgage/information';
 import { DEPS, mortgage, TODAY } from './input';
+import { MORTGAGE_NORMS_BEFORE_VOTE } from './norms-before-vote';
 
 const d = parseDate;
 
@@ -67,10 +68,27 @@ describe('information blocks', () => {
     expect(brief('2012-05-10').map((b) => b[0])).not.toContain('handwritten_statement');
   });
 
-  it('art. 25 bis is told only from 08-10-2026, with its pending status', () => {
+  it('art. 25 bis is told only from 08-10-2026', () => {
     expect(brief('2021-05-10', d('2026-10-07')).map((b) => b[0])).not.toContain('loan_assignment');
-    const block = blocksOf('2021-05-10').find((b) => b.id === 'loan_assignment');
+    expect(brief('2021-05-10', d('2026-10-08')).map((b) => b[0])).toContain('loan_assignment');
+  });
+
+  it('art. 25 bis is told with its pending status while RDL 29/2026 awaits the vote', () => {
+    const block = informationBlocks(mortgage({ deedOn: d('2021-05-10') }), TODAY, {
+      ...DEPS,
+      norms: MORTGAGE_NORMS_BEFORE_VOTE,
+    }).find((b) => b.id === 'loan_assignment');
     expect(block?.sources[0]).toMatchObject({ status: 'pending_validation' });
+    expect(block?.calculation.map((c) => c.key)).toEqual([
+      'information.loan_assignment',
+      'information.loan_assignment_pending',
+    ]);
+  });
+
+  it('art. 25 bis is told as in force, with the day RDL 29/2026 was validated', () => {
+    const block = blocksOf('2021-05-10').find((b) => b.id === 'loan_assignment');
+    expect(block?.sources[0]).toMatchObject({ status: 'in_force', statusSince: '2026-11-13' });
+    expect(block?.calculation.map((c) => c.key)).toEqual(['information.loan_assignment']);
   });
 
   it('the step of art. 439 bis exists from 03-04-2025', () => {

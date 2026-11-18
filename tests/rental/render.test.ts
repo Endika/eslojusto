@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   dependsPieces,
+  informationText,
   reasonsText,
   renderOutOfScope,
   renderRentalResult,
@@ -9,6 +10,9 @@ import {
 } from '../../src/rental/render';
 import { summarise } from '../../src/rental/summary';
 import { parseDate as f } from '../../src/engine/date';
+import { NORMS } from '../../src/engine/rental/data/norms';
+import { informationBlocks, type InformationBlock } from '../../src/engine/rental/information';
+import { NORMS_BEFORE_VOTE } from '../engine/rental/norms-before-vote';
 import {
   contract,
   repealedWindow,
@@ -237,12 +241,53 @@ describe('the result', () => {
 
   it('out of scope, it says why and works nothing out', () => {
     const root = render(riseAboveIrav, true);
-    renderOutOfScope(root, 'before_2019', tr);
+    renderOutOfScope(root, 'before_2019', NORMS.rdl29_2026.status, tr);
     expect(root.querySelector<HTMLElement>('[data-out-of-scope]')?.hidden).toBe(false);
     expect(root.querySelector<HTMLElement>('[data-summary]')?.hidden).toBe(true);
     expect(root.querySelector('[data-items]')?.children).toHaveLength(0);
     expect(text(root.querySelector('[data-out-of-scope-reason]'))).toContain(
       'Esta versión no revisa contratos firmados antes del 6 de marzo de 2019',
+    );
+  });
+
+  it('out of scope for a room rental, it tells RDL 29/2026 as validated', () => {
+    const root = render(riseAboveIrav, true);
+    renderOutOfScope(root, 'room', NORMS.rdl29_2026.status, tr);
+    const reason = text(root.querySelector('[data-out-of-scope-reason]'));
+    expect(reason).toContain(
+      'en vigor desde el 8 de octubre de 2026 y convalidado por el Congreso',
+    );
+    expect(reason).not.toContain('pendiente');
+  });
+
+  it('out of scope for a room rental, it tells RDL 29/2026 as pending while it awaits the vote', () => {
+    const root = render(riseAboveIrav, true);
+    renderOutOfScope(root, 'room', NORMS_BEFORE_VOTE.rdl29_2026.status, tr);
+    expect(text(root.querySelector('[data-out-of-scope-reason]'))).toContain(
+      'en vigor desde el 8 de octubre de 2026 y pendiente de convalidación',
+    );
+  });
+});
+
+describe('the information blocks tell each decree as the norm table has it', () => {
+  const block = (id: InformationBlock['id'], norms: typeof NORMS) =>
+    informationBlocks(
+      contract({ signedOn: f('2022-01-05'), startDate: f('2022-01-10'), agreedMonths: 12 }),
+      norms,
+    ).find((b) => b.id === id);
+
+  it('RDL 29/2026 as validated', () => {
+    const b = block('extension_rdl29', NORMS);
+    expect(b && informationText(b, tr).text).toContain(
+      'El Real Decreto-ley 29/2026, convalidado por el Congreso, prevé una prórroga extraordinaria',
+    );
+  });
+
+  it('RDL 28/2026 only while it awaits the vote, never once repealed before it took effect', () => {
+    expect(block('extensions_rdl28', NORMS)).toBeUndefined();
+    const b = block('extensions_rdl28', NORMS_BEFORE_VOTE);
+    expect(b && informationText(b, tr).text).toContain(
+      'El Real Decreto-ley 28/2026, pendiente de convalidación, cambia las prórrogas',
     );
   });
 });

@@ -7,6 +7,7 @@ import type { Norm, NormTable } from '../../../src/engine/rental/norms';
 import { countedAmount } from '../../../src/engine/rental/outcome';
 import type { Fee, FeeKind, LandlordType } from '../../../src/engine/rental/types';
 import { contract } from './fixtures';
+import { NORMS_BEFORE_VOTE } from './norms-before-vote';
 
 const fee = (kind: FeeKind, change: Partial<Fee> = {}): Fee => ({
   kind,
@@ -99,7 +100,7 @@ describe('a charge under another name', () => {
   });
 
   it('from 08-10-2026 is paid over only where RDL 29/2026 holds, so it counts nothing yet', () => {
-    const r = only(check('2026-10-20', 'person', [fee('solvency_check')]));
+    const r = only(check('2026-10-20', 'person', [fee('solvency_check')], NORMS_BEFORE_VOTE));
     if (r.outcome.kind !== 'depends') throw new Error('expected depends');
     expect(r.outcome.reasons).toEqual(['pending_validation']);
     expect(r.outcome.low).toMatchObject({ status: 'review_it', amount: null });
@@ -110,7 +111,14 @@ describe('a charge under another name', () => {
   });
 
   it('asked for in writing as an optional service is not checked under RDL 29/2026', () => {
-    const r = only(check('2026-10-20', 'person', [fee('other', { requestedInWriting: true })]));
+    const r = only(
+      check(
+        '2026-10-20',
+        'person',
+        [fee('other', { requestedInWriting: true })],
+        NORMS_BEFORE_VOTE,
+      ),
+    );
     if (r.outcome.kind !== 'depends') throw new Error('expected depends');
     expect(r.outcome.readings.map((x) => x.value.status).sort()).toEqual([
       'not_checkable',
@@ -121,12 +129,28 @@ describe('a charge under another name', () => {
 
   it('with «No lo sé» on the written request, gives both and counts nothing', () => {
     const r = only(
-      check('2026-10-20', 'person', [fee('management', { requestedInWriting: null })]),
+      check(
+        '2026-10-20',
+        'person',
+        [fee('management', { requestedInWriting: null })],
+        NORMS_BEFORE_VOTE,
+      ),
     );
     if (r.outcome.kind !== 'depends') throw new Error('expected depends');
     expect(r.outcome.reasons).toEqual(['pending_validation', 'agreement_unknown']);
     expect(r.outcome.high).toMatchObject({ status: 'paid_over', amount: 726 });
     expect(countedAmount(r.outcome, itemAmount)).toBe(0);
+  });
+
+  it('from 08-10-2026 is paid over with a single reading now that RDL 29/2026 is validated', () => {
+    expect(singleOf(only(check('2026-10-20', 'person', [fee('solvency_check')])))).toEqual({
+      status: 'paid_over',
+      amount: 726,
+    });
+    expect(singleOf(only(check('2026-12-01', 'company', [fee('agency_fee')])))).toEqual({
+      status: 'paid_over',
+      amount: 726,
+    });
   });
 
   it('follows the status of RDL 29/2026 with no change to the rule', () => {

@@ -464,7 +464,7 @@ test('the page has its title, description, heading, canonical, JSON-LD and revie
     'href',
     /\/alquiler\/irav-ipc\/$/,
   );
-  await expect(guide).toContainText('pendiente de convalidación');
+  await expect(guide).toContainText('convalidado por el Congreso');
   // The footer names the rental norms, not the labour ones.
   const footer = page.locator('.footer__note');
   await expect(footer).toContainText('Ley de Arrendamientos Urbanos (Ley 29/1994)');

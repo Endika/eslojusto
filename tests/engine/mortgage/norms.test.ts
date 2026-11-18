@@ -17,6 +17,7 @@ import {
   type CaseLawRuleId,
   type StatuteRuleId,
 } from '../../../src/engine/mortgage/rules';
+import { MORTGAGE_NORMS_BEFORE_VOTE } from './norms-before-vote';
 
 // Block ids of the consolidated texts as the BOE open data index gives them: the whole index of
 // each norm, or only the cited blocks of the codes.
@@ -60,15 +61,17 @@ describe('mortgage norm table', () => {
     expect(n.url).toMatch(BOE_ACT);
     expect(n.inForceSince).toMatch(ISO);
     expect(n.inForceUntil).toBeNull();
-    expect(n.status).toBe(id === 'lcci_25bis' ? 'pending_validation' : 'in_force');
+    expect(n.status).toBe('in_force');
     expect(NORM_REVIEW[id as MortgageNormId]).toMatch(ISO);
   });
 
-  it('art. 25 bis rests on RDL 29/2026, pending validation, and is only explained', () => {
+  it('art. 25 bis rests on RDL 29/2026, validated on 12-11-2026 (BOE of 13-11), and is only explained', () => {
     expect(MORTGAGE_NORMS.lcci_25bis).toMatchObject({
       url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-20823',
       inForceSince: '2026-10-08',
-      status: 'pending_validation',
+      status: 'in_force',
+      statusSince: '2026-11-13',
+      statusUrl: 'https://www.boe.es/buscar/doc.php?id=BOE-A-2026-23755',
     });
     expect(STATUTE_RULES.loan_assignment).toMatchObject({
       norm: 'lcci_25bis',
@@ -77,7 +80,13 @@ describe('mortgage norm table', () => {
       output: 'info',
     });
     expect(applies('loan_assignment', '2026-10-07')).toBe(false);
-    expect(ruleSource('loan_assignment', MORTGAGE_NORMS).status).toBe('pending_validation');
+    expect(ruleSource('loan_assignment', MORTGAGE_NORMS).status).toBe('in_force');
+  });
+
+  it('art. 25 bis reads as pending validation before the vote', () => {
+    expect(ruleSource('loan_assignment', MORTGAGE_NORMS_BEFORE_VOTE).status).toBe(
+      'pending_validation',
+    );
   });
 
   it.each([
