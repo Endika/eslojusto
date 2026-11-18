@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.116.0](https://github.com/Endika/eslojusto/compare/v1.115.2...v1.116.0) (2026-11-18)
+
+
+### Features
+
+* **rental:** take the rental review out of beta ([b30e358](https://github.com/Endika/eslojusto/commit/b30e35822c62533009cc63692c8b2d40f62d834c))
+
 ## [1.115.2](https://github.com/Endika/eslojusto/compare/v1.115.1...v1.115.2) (2026-11-18)
 
 
