@@ -11,6 +11,7 @@ import {
   HOUSEHOLD_BETA,
   INSURANCE_BETA,
   MORTGAGE_BETA,
+  RENTAL_BETA,
 } from '../content/sections';
 
 interface Props {
@@ -86,7 +87,7 @@ const groups: Group[] = [
         href: link(lang, 'alquiler/'),
         situation: 'home.rent_situation',
         citation: 'home.rent_citation',
-        beta: true,
+        beta: RENTAL_BETA,
       },
       {
         id: 'mortgage',
