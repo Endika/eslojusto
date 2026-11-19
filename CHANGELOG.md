@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.117.0](https://github.com/Endika/eslojusto/compare/v1.116.0...v1.117.0) (2026-11-19)
+
+
+### Features
+
+* **rental:** load the INE's September IGC ([7347364](https://github.com/Endika/eslojusto/commit/7347364244640e312f4aff6251151be7c31898da))
+
 ## [1.116.0](https://github.com/Endika/eslojusto/compare/v1.115.2...v1.116.0) (2026-11-18)
 
 
