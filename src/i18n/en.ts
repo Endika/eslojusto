@@ -332,6 +332,7 @@ export const en: Translation = {
   'not_found.h1': "We can't find this page",
   'not_found.lead': 'The link may be mistyped or the page may have moved to a different address.',
   'not_found.home': 'Go to the home page',
+  'not_found.languages': 'The home page in other languages:',
   'client.theme.to_dark': 'Theme: switch to dark',
   'client.theme.to_light': 'Theme: switch to light',
   'client.month.1': 'January',

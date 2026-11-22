@@ -614,6 +614,7 @@ export const es = {
   'not_found.lead':
     'Puede que el enlace esté mal escrito o que la página haya cambiado de dirección.',
   'not_found.home': 'Ir a la portada',
+  'not_found.languages': 'La portada, en otros idiomas:',
   'privacy.title': 'Privacidad · eslojusto.es',
   'privacy.description':
     'Lo que escribes al revisar tu finiquito no sale de tu navegador. No hay cookies y los pasos se miden sin identificarte, con PostHog en la Unión Europea.',

@@ -325,6 +325,7 @@ export const gl: Translation = {
   'not_found.h1': 'Non atopamos esta páxina',
   'not_found.lead': 'Pode que a ligazón estea mal escrita ou que a páxina cambiase de enderezo.',
   'not_found.home': 'Ir á portada',
+  'not_found.languages': 'A portada, noutros idiomas:',
   'client.theme.to_dark': 'Tema: pasar a escuro',
   'client.theme.to_light': 'Tema: pasar a claro',
   'client.month.1': 'xaneiro',

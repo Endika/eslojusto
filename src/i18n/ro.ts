@@ -332,6 +332,7 @@ export const ro: Translation = {
   'not_found.h1': 'Nu găsim această pagină',
   'not_found.lead': 'Poate că linkul este scris greșit sau că pagina și-a schimbat adresa.',
   'not_found.home': 'Mergi la pagina principală',
+  'not_found.languages': 'Pagina principală în alte limbi:',
   'client.theme.to_dark': 'Temă: treci la întunecat',
   'client.theme.to_light': 'Temă: treci la luminos',
   'client.month.1': 'ianuarie',

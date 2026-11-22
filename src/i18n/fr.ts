@@ -345,6 +345,7 @@ export const fr: Translation = {
   'not_found.h1': 'Nous ne trouvons pas cette page',
   'not_found.lead': "Le lien est peut-être mal écrit, ou la page a changé d'adresse.",
   'not_found.home': "Aller à l'accueil",
+  'not_found.languages': "L'accueil dans d'autres langues\u00a0:",
   'client.theme.to_dark': 'Thème\u00a0: passer en sombre',
   'client.theme.to_light': 'Thème\u00a0: passer en clair',
   'client.month.1': 'janvier',

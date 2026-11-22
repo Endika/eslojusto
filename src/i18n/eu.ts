@@ -334,6 +334,7 @@ export const eu: Translation = {
   'not_found.h1': 'Ez dugu orri hau aurkitu',
   'not_found.lead': 'Baliteke esteka gaizki idatzita egotea edo orriak helbidez aldatu izana.',
   'not_found.home': 'Joan hasierako orrira',
+  'not_found.languages': 'Hasierako orria, beste hizkuntza batzuetan:',
   'client.theme.to_dark': 'Gaia: aldatu ilunera',
   'client.theme.to_light': 'Gaia: aldatu argira',
   'client.month.1': 'urtarrila',

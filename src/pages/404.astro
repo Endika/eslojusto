@@ -2,10 +2,14 @@
 import Base from '../layouts/Base.astro';
 import ReviewIndex from '../components/ReviewIndex.astro';
 import { t, type Key } from '../i18n';
-import { link } from '../i18n/languages';
+import { DEFAULT_LANG, LANGS, link, type Lang } from '../i18n/languages';
 
 // GitHub Pages serves this file for any address it doesn't know, so it is never indexed.
 const tx = (key: Key) => t('es', key);
+// One file answers every address, so it can't tell the visitor's language: it offers them all.
+const others = (Object.keys(LANGS) as Lang[]).filter(
+  (lang) => lang !== DEFAULT_LANG && LANGS[lang].published,
+);
 ---
 
 <Base
@@ -23,6 +27,18 @@ const tx = (key: Key) => t('es', key);
       <p class="home__back">
         <a href={link('es')}>{tx('not_found.home')}</a>
       </p>
+      <p class="home__langs-label" id="not-found-langs">
+        {tx('not_found.languages')}
+      </p>
+      <ul class="home__langs" aria-labelledby="not-found-langs">
+        {others.map((lang) => (
+          <li>
+            <a href={link(lang)} hreflang={lang} lang={lang} dir={LANGS[lang].dir}>
+              {LANGS[lang].name}
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
 
     <ReviewIndex lang="es" />
