@@ -325,15 +325,11 @@ export const ca: Translation = {
     'Si puges els teus documents (la carta d’acomiadament, la quitança, les teves nòmines, el certificat d’empresa o la teva vida laboral), s’envien xifrats a un servidor d’Amazon Web Services a Espanya, que els passa a un model d’IA (Claude, d’Anthropic, a través d’Amazon Bedrock) dins de la Unió Europea. El model indica què és cada pàgina, copia només les dades que necessita el formulari i no calcula res. Ni el servidor ni el model desen el document: es processa en memòria i es descarta. Abans de pujar-lo et demanem el consentiment, perquè una nòmina pot mostrar dades sensibles. Si prefereixes no pujar res, pots escriure les dades i res no surt del teu dispositiu.',
   'not_found.title': 'Pàgina no trobada · eslojusto.es',
   'not_found.description':
-    'Aquesta adreça no porta a cap pàgina d’eslojusto.es. Des d’aquí pots anar a la revisió de la quitança o a la portada.',
+    'Aquesta adreça no porta a cap pàgina d’eslojusto.es. Des d’aquí pots anar a qualsevol de les seves revisions o a la portada.',
   'not_found.h1': 'No trobem aquesta pàgina',
   'not_found.lead':
     'Pot ser que l’enllaç estigui mal escrit o que la pàgina hagi canviat d’adreça.',
-  'not_found.index': 'Pàgines d’eslojusto.es',
-  'not_found.final_pay_text':
-    'Calcula el mínim legal de la teva quitança (finiquito) i compara’l amb el que t’ofereix l’empresa.',
-  'not_found.home': 'Portada',
-  'not_found.home_text': 'Què revisa eslojusto.es i què vindrà després.',
+  'not_found.home': 'Anar a la portada',
   'client.theme.to_dark': 'Tema: passar a fosc',
   'client.theme.to_light': 'Tema: passar a clar',
   'client.month.1': 'gener',

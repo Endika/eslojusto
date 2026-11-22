@@ -1,137 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
+import ReviewIndex from '../components/ReviewIndex.astro';
 import { t, type Key } from '../i18n';
-import { link, type Lang } from '../i18n/languages';
+import type { Lang } from '../i18n/languages';
 import { homeGraph } from '../content/structured-data';
 import { DOCUMENTS } from '../documents/config';
-import {
-  BILLS_BETA,
-  CREDIT_BETA,
-  EMPLOYMENT_BETA,
-  HOUSEHOLD_BETA,
-  INSURANCE_BETA,
-  MORTGAGE_BETA,
-  RENTAL_BETA,
-} from '../content/sections';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
 const tx = (key: Key) => t(lang, key);
-
-interface Review {
-  id: string;
-  name: Key;
-  href: string;
-  situation: Key;
-  citation: Key;
-  beta: boolean;
-}
-interface Group {
-  id: string;
-  tone: string;
-  label: Key;
-  sections: Review[];
-  more?: { href: string; label: Key };
-}
-
-const groups: Group[] = [
-  {
-    id: 'work',
-    tone: 'cause',
-    label: 'home.group_work',
-    sections: [
-      {
-        id: 'final-pay',
-        name: 'home.final_pay',
-        href: link(lang, 'finiquito/'),
-        situation: 'home.final_pay_situation',
-        citation: 'home.final_pay_citation',
-        beta: false,
-      },
-      {
-        id: 'benefit',
-        name: 'home.benefit',
-        href: link(lang, 'paro/'),
-        situation: 'home.benefit_situation',
-        citation: 'home.benefit_citation',
-        beta: false,
-      },
-      {
-        id: 'employment',
-        name: 'home.contract',
-        href: link(lang, 'contrato/'),
-        situation: 'home.contract_situation',
-        citation: 'home.contract_citation',
-        beta: EMPLOYMENT_BETA,
-      },
-      {
-        id: 'household',
-        name: 'home.household',
-        href: link(lang, 'empleada-de-hogar/'),
-        situation: 'home.household_situation',
-        citation: 'home.household_citation',
-        beta: HOUSEHOLD_BETA,
-      },
-    ],
-  },
-  {
-    id: 'housing',
-    tone: 'settlement',
-    label: 'home.group_housing',
-    sections: [
-      {
-        id: 'rental',
-        name: 'home.rent',
-        href: link(lang, 'alquiler/'),
-        situation: 'home.rent_situation',
-        citation: 'home.rent_citation',
-        beta: RENTAL_BETA,
-      },
-      {
-        id: 'mortgage',
-        name: 'home.mortgage',
-        href: link(lang, 'hipoteca/'),
-        situation: 'home.mortgage_situation',
-        citation: 'home.mortgage_citation',
-        beta: MORTGAGE_BETA,
-      },
-    ],
-    more: { href: link(lang, 'alquiler/irav-ipc/'), label: 'home.rent_indices' },
-  },
-  {
-    id: 'money',
-    tone: 'salary',
-    label: 'home.group_money',
-    sections: [
-      {
-        id: 'insurance',
-        name: 'home.insurance',
-        href: link(lang, 'seguros/'),
-        situation: 'home.insurance_situation',
-        citation: 'home.insurance_citation',
-        beta: INSURANCE_BETA,
-      },
-      {
-        id: 'credit',
-        name: 'home.credit',
-        href: link(lang, 'financiacion/'),
-        situation: 'home.credit_situation',
-        citation: 'home.credit_citation',
-        beta: CREDIT_BETA,
-      },
-      {
-        id: 'bills',
-        name: 'home.bills',
-        href: link(lang, 'facturas/'),
-        situation: 'home.bills_situation',
-        citation: 'home.bills_citation',
-        beta: BILLS_BETA,
-      },
-    ],
-  },
-];
 
 const home = new URL(import.meta.env.BASE_URL, Astro.site);
 const documents = DOCUMENTS !== null;
@@ -151,45 +30,7 @@ const documents = DOCUMENTS !== null;
       <p class="home__lead">{tx('home.lead')}</p>
     </div>
 
-    <div class="index">
-      {groups.map((group) => (
-        <section class="group" data-tone={group.tone} aria-labelledby={`group-${group.id}`}>
-          <h2 class="group__label" id={`group-${group.id}`}>
-            {tx(group.label)}
-          </h2>
-          <ul class="group__cards">
-            {group.sections.map((review) => (
-              <li class="card">
-                <article class="sheet" data-tone="dates" aria-labelledby={`card-${review.id}`}>
-                  <h3 class="card__name" id={`card-${review.id}`}>
-                    <a href={review.href}>{tx(review.name)}</a>
-                  </h3>
-                  <p class="card__situation">{tx(review.situation)}</p>
-                  <p class="card__meta">
-                    <span class="card__citation">{tx(review.citation)}</span>
-                    <span class="card__go">
-                      {review.beta && <span class="beta">{tx('home.beta')}</span>}
-                      <span class="card__review" aria-hidden="true">
-                        {tx('home.review')}
-                        <svg viewBox="0 0 24 24" focusable="false">
-                          <path d="M4 12h15m-6-6 6 6-6 6" />
-                        </svg>
-                      </span>
-                    </span>
-                  </p>
-                </article>
-                <span class="card__tab" aria-hidden="true" />
-              </li>
-            ))}
-          </ul>
-          {group.more && (
-            <p class="group__more">
-              <a href={group.more.href}>{tx(group.more.label)}</a>
-            </p>
-          )}
-        </section>
-      ))}
-    </div>
+    <ReviewIndex lang={lang} />
 
     <p class="home__note">{tx(documents ? 'home.note_documents' : 'home.note')}</p>
   </main>

@@ -328,14 +328,10 @@ export const ro: Translation = {
     'Dacă îți încarci documentele (scrisoarea de concediere, lichidarea finală, fluturașii de salariu, adeverința de la firmă sau istoricul de muncă), ele sunt trimise criptat la un server Amazon Web Services din Spania, care le transmite unui model de IA (Claude, de la Anthropic, prin Amazon Bedrock) în Uniunea Europeană. Modelul de IA indică ce este fiecare pagină, copiază doar datele de care are nevoie formularul și nu calculează nimic. Nici serverul, nici modelul de IA nu păstrează documentul: este procesat în memorie și apoi șters. Înainte să îl încarci îți cerem consimțământul, pentru că un fluturaș de salariu poate arăta date sensibile. Dacă preferi să nu încarci nimic, poți scrie datele, iar nimic nu iese de pe dispozitivul tău.',
   'not_found.title': 'Pagina nu a fost găsită · eslojusto.es',
   'not_found.description':
-    'Această adresă nu duce la nicio pagină de pe eslojusto.es. De aici poți merge la verificarea lichidării finale sau la pagina principală.',
+    'Această adresă nu duce la nicio pagină de pe eslojusto.es. De aici poți merge la oricare dintre verificările sale sau la pagina principală.',
   'not_found.h1': 'Nu găsim această pagină',
   'not_found.lead': 'Poate că linkul este scris greșit sau că pagina și-a schimbat adresa.',
-  'not_found.index': 'Paginile eslojusto.es',
-  'not_found.final_pay_text':
-    'Calculează minimul legal al lichidării finale și compară-l cu ce îți oferă firma.',
-  'not_found.home': 'Pagina principală',
-  'not_found.home_text': 'Ce verifică eslojusto.es și ce urmează.',
+  'not_found.home': 'Mergi la pagina principală',
   'client.theme.to_dark': 'Temă: treci la întunecat',
   'client.theme.to_light': 'Temă: treci la luminos',
   'client.month.1': 'ianuarie',

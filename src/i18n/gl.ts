@@ -321,14 +321,10 @@ export const gl: Translation = {
     'Se subes os teus documentos (a carta de despedimento, o finiquito, as túas nóminas, o certificado de empresa ou a túa vida laboral), envíanse cifrados a un servidor de Amazon Web Services en España, que llos pasa a un modelo de IA (Claude, de Anthropic, a través de Amazon Bedrock) dentro da Unión Europea. O modelo indica que é cada páxina, copia só os datos que necesita o formulario e non calcula nada. Nin o servidor nin o modelo gardan o documento: procésase en memoria e descártase. Antes de subilo pedímosche o teu consentimento, porque unha nómina pode mostrar datos sensibles. Se prefires non subir nada, podes escribir os datos e nada sae do teu dispositivo.',
   'not_found.title': 'Páxina non atopada · eslojusto.es',
   'not_found.description':
-    'Este enderezo non leva a ningunha páxina de eslojusto.es. Desde aquí podes ir á revisión do finiquito ou á portada.',
+    'Este enderezo non leva a ningunha páxina de eslojusto.es. Desde aquí podes ir a calquera das súas revisións ou á portada.',
   'not_found.h1': 'Non atopamos esta páxina',
   'not_found.lead': 'Pode que a ligazón estea mal escrita ou que a páxina cambiase de enderezo.',
-  'not_found.index': 'Páxinas de eslojusto.es',
-  'not_found.final_pay_text':
-    'Calcula o mínimo legal do teu finiquito e compárao co que che ofrece a empresa.',
-  'not_found.home': 'Portada',
-  'not_found.home_text': 'Que revisa eslojusto.es e que chegará despois.',
+  'not_found.home': 'Ir á portada',
   'client.theme.to_dark': 'Tema: pasar a escuro',
   'client.theme.to_light': 'Tema: pasar a claro',
   'client.month.1': 'xaneiro',

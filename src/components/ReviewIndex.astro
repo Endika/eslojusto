@@ -1,0 +1,51 @@
+---
+import { t, type Key } from '../i18n';
+import type { Lang } from '../i18n/languages';
+import { reviewGroups } from '../content/reviews';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const tx = (key: Key) => t(lang, key);
+---
+
+<div class="index">
+  {reviewGroups(lang).map((group) => (
+    <section class="group" data-tone={group.tone} aria-labelledby={`group-${group.id}`}>
+      <h2 class="group__label" id={`group-${group.id}`}>
+        {tx(group.label)}
+      </h2>
+      <ul class="group__cards">
+        {group.sections.map((review) => (
+          <li class="card">
+            <article class="sheet" data-tone="dates" aria-labelledby={`card-${review.id}`}>
+              <h3 class="card__name" id={`card-${review.id}`}>
+                <a href={review.href}>{tx(review.name)}</a>
+              </h3>
+              <p class="card__situation">{tx(review.situation)}</p>
+              <p class="card__meta">
+                <span class="card__citation">{tx(review.citation)}</span>
+                <span class="card__go">
+                  {review.beta && <span class="beta">{tx('home.beta')}</span>}
+                  <span class="card__review" aria-hidden="true">
+                    {tx('home.review')}
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <path d="M4 12h15m-6-6 6 6-6 6" />
+                    </svg>
+                  </span>
+                </span>
+              </p>
+            </article>
+            <span class="card__tab" aria-hidden="true" />
+          </li>
+        ))}
+      </ul>
+      {group.more && (
+        <p class="group__more">
+          <a href={group.more.href}>{tx(group.more.label)}</a>
+        </p>
+      )}
+    </section>
+  ))}
+</div>
