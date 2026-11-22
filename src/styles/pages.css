@@ -413,8 +413,22 @@
   margin: -0.5rem 0 0;
   font: 620 var(--t-help) / 1.4 var(--f-grotesque);
 }
+.home__langs-label {
+  margin: 0.75rem 0 0;
+  font: 400 1rem / 1.5 var(--f-serif);
+}
+.home__langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 620 var(--t-help) / 1.4 var(--f-grotesque);
+}
 .group__more a,
-.home__back a {
+.home__back a,
+.home__langs a {
   display: inline-flex;
   align-items: center;
   min-block-size: 2.75rem;

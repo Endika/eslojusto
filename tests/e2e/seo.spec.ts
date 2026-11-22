@@ -153,6 +153,7 @@ test('an address that does not exist gives the 404 page, unindexed and with a wa
   );
   await expect(main.getByRole('link', { name: 'Facturas' })).toHaveAttribute('href', '/facturas/');
   await expect(main.getByRole('link', { name: 'Ir a la portada' })).toHaveAttribute('href', '/');
+  await expect(main.getByRole('link', { name: 'Euskara' })).toHaveAttribute('href', '/eu/');
 });
 
 test('robots.txt points to the sitemap', async ({ request }) => {

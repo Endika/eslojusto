@@ -330,6 +330,7 @@ export const ca: Translation = {
   'not_found.lead':
     'Pot ser que l’enllaç estigui mal escrit o que la pàgina hagi canviat d’adreça.',
   'not_found.home': 'Anar a la portada',
+  'not_found.languages': 'La portada, en altres idiomes:',
   'client.theme.to_dark': 'Tema: passar a fosc',
   'client.theme.to_light': 'Tema: passar a clar',
   'client.month.1': 'gener',

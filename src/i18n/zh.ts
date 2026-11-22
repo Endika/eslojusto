@@ -314,6 +314,7 @@ export const zh: Translation = {
   'not_found.h1': '找不到这个页面',
   'not_found.lead': '可能是链接写错了，或者页面的地址已经变更。',
   'not_found.home': '前往首页',
+  'not_found.languages': '其他语言的首页：',
   'client.theme.to_dark': '主题：切换为深色',
   'client.theme.to_light': '主题：切换为浅色',
   'client.month.1': '一月',

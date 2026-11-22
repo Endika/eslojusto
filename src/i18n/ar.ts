@@ -328,6 +328,7 @@ export const ar: Translation = {
   'not_found.h1': 'لم نعثر على هذه الصفحة',
   'not_found.lead': 'ربما كُتب الرابط بشكل خاطئ، أو تغيّر عنوان الصفحة.',
   'not_found.home': 'الذهاب إلى الصفحة الرئيسية',
+  'not_found.languages': 'الصفحة الرئيسية بلغات أخرى:',
   'client.theme.to_dark': 'المظهر: التحويل إلى الداكن',
   'client.theme.to_light': 'المظهر: التحويل إلى الفاتح',
   'client.month.1': 'يناير',

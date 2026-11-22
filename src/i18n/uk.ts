@@ -337,6 +337,7 @@ export const uk: Translation = {
   'not_found.h1': 'Ми не знайшли цю сторінку',
   'not_found.lead': 'Можливо, посилання написано з помилкою або сторінка змінила адресу.',
   'not_found.home': 'Перейти на головну',
+  'not_found.languages': 'Головна іншими мовами:',
   'client.theme.to_dark': 'Тема: увімкнути темну',
   'client.theme.to_light': 'Тема: увімкнути світлу',
   'client.month.1': 'січень',
