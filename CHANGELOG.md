@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.118.0](https://github.com/Endika/eslojusto/compare/v1.117.1...v1.118.0) (2026-11-22)
+
+
+### Features
+
+* **not-found:** link the home page in every language ([243e383](https://github.com/Endika/eslojusto/commit/243e383cb74e3c15cb41fef91c6c91acc5ca8735))
+
 ## [1.117.1](https://github.com/Endika/eslojusto/compare/v1.117.0...v1.117.1) (2026-11-22)
 
 
