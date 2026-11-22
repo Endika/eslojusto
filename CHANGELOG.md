@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.117.1](https://github.com/Endika/eslojusto/compare/v1.117.0...v1.117.1) (2026-11-22)
+
+
+### Bug Fixes
+
+* **not-found:** list every review and keep the title's words whole ([12c201a](https://github.com/Endika/eslojusto/commit/12c201a22e172bc4bf3f4c688cfa9c61a973bc9e))
+
 ## [1.117.0](https://github.com/Endika/eslojusto/compare/v1.116.0...v1.117.0) (2026-11-19)
 
 
