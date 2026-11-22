@@ -609,15 +609,11 @@ export const es = {
   'legal_notice.seller_address': 'Su domicilio es {domicilio}.',
   'not_found.title': 'Página no encontrada · eslojusto.es',
   'not_found.description':
-    'Esta dirección no lleva a ninguna página de eslojusto.es. Desde aquí puedes ir a la revisión del finiquito o a la portada.',
+    'Esta dirección no lleva a ninguna página de eslojusto.es. Desde aquí puedes ir a cualquiera de sus revisiones o a la portada.',
   'not_found.h1': 'No encontramos esta página',
   'not_found.lead':
     'Puede que el enlace esté mal escrito o que la página haya cambiado de dirección.',
-  'not_found.index': 'Páginas de eslojusto.es',
-  'not_found.final_pay_text':
-    'Calcula el mínimo legal de tu finiquito y compáralo con lo que te ofrece la empresa.',
-  'not_found.home': 'Portada',
-  'not_found.home_text': 'Qué revisa eslojusto.es y qué llegará después.',
+  'not_found.home': 'Ir a la portada',
   'privacy.title': 'Privacidad · eslojusto.es',
   'privacy.description':
     'Lo que escribes al revisar tu finiquito no sale de tu navegador. No hay cookies y los pasos se miden sin identificarte, con PostHog en la Unión Europea.',

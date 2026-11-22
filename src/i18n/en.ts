@@ -328,14 +328,10 @@ export const en: Translation = {
     "If you upload your documents (the dismissal letter, the final settlement, your payslips, the employer's certificate or your employment history), they are sent encrypted to an Amazon Web Services server in Spain, which passes them to an AI model (Claude, by Anthropic, through Amazon Bedrock) within the European Union. The model identifies what each page is, copies only the details the form needs and does not calculate anything. Neither the server nor the model stores the document: it is processed in memory and discarded. Before you upload it we ask for your consent, because a payslip can show sensitive data. If you prefer not to upload anything, you can type in the details and nothing leaves your device.",
   'not_found.title': 'Page not found · eslojusto.es',
   'not_found.description':
-    'This address does not lead to any page on eslojusto.es. From here you can go to the final settlement review or to the home page.',
+    'This address does not lead to any page on eslojusto.es. From here you can go to any of its reviews or to the home page.',
   'not_found.h1': "We can't find this page",
   'not_found.lead': 'The link may be mistyped or the page may have moved to a different address.',
-  'not_found.index': 'eslojusto.es pages',
-  'not_found.final_pay_text':
-    'Calculate the legal minimum of your final settlement and compare it with what your employer is offering.',
-  'not_found.home': 'Home page',
-  'not_found.home_text': 'What eslojusto.es reviews and what is coming next.',
+  'not_found.home': 'Go to the home page',
   'client.theme.to_dark': 'Theme: switch to dark',
   'client.theme.to_light': 'Theme: switch to light',
   'client.month.1': 'January',

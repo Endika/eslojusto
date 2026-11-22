@@ -330,14 +330,10 @@ export const eu: Translation = {
     'Zure dokumentuak igotzen badituzu (kaleratze-gutuna, kitapena, nominak, enpresa-ziurtagiria edo lan-bizitza), zifratuta bidaltzen dira Amazon Web Services-en Espainiako zerbitzari batera, eta hark Europar Batasunaren barruan dagoen AA eredu bati pasatzen dizkio (Claude, Anthropic-ena, Amazon Bedrock bidez). AA ereduak orrialde bakoitza zer den adierazten du, formularioak behar dituen datuak bakarrik kopiatzen ditu eta ez du ezer kalkulatzen. Ez zerbitzariak ez ereduak ez dute dokumentua gordetzen: memorian prozesatzen da eta baztertu egiten da. Igo aurretik zure baimena eskatzen dizugu, nomina batek datu sentikorrak erakuts ditzakeelako. Ezer igo nahi ez baduzu, datuak idatz ditzakezu, eta ezer ez da zure gailutik ateratzen.',
   'not_found.title': 'Ez da orria aurkitu · eslojusto.es',
   'not_found.description':
-    'Helbide honek ez darama eslojusto.es-eko inongo orrira. Hemendik kitapenaren berrikuspenera edo hasierako orrira joan zaitezke.',
+    'Helbide honek ez darama eslojusto.es-eko inongo orrira. Hemendik bere edozein berrikuspenera edo hasierako orrira joan zaitezke.',
   'not_found.h1': 'Ez dugu orri hau aurkitu',
   'not_found.lead': 'Baliteke esteka gaizki idatzita egotea edo orriak helbidez aldatu izana.',
-  'not_found.index': 'eslojusto.es-eko orriak',
-  'not_found.final_pay_text':
-    'Kalkulatu zure kitapenaren legezko gutxienekoa eta alderatu enpresak eskaintzen dizunarekin.',
-  'not_found.home': 'Hasierako orria',
-  'not_found.home_text': 'Zer berrikusten duen eslojusto.es-ek eta zer etorriko den gero.',
+  'not_found.home': 'Joan hasierako orrira',
   'client.theme.to_dark': 'Gaia: aldatu ilunera',
   'client.theme.to_light': 'Gaia: aldatu argira',
   'client.month.1': 'urtarrila',

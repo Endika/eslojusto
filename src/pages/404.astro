@@ -1,20 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import ReviewIndex from '../components/ReviewIndex.astro';
 import { t, type Key } from '../i18n';
 import { link } from '../i18n/languages';
 
 // GitHub Pages serves this file for any address it doesn't know, so it is never indexed.
 const tx = (key: Key) => t('es', key);
-const pages = [
-  [
-    'final-pay',
-    'cause',
-    link('es', 'finiquito/'),
-    tx('home.final_pay'),
-    tx('not_found.final_pay_text'),
-  ],
-  ['home', 'settlement', link('es'), tx('not_found.home'), tx('not_found.home_text')],
-] as const;
 ---
 
 <Base
@@ -27,22 +18,13 @@ const pages = [
 >
   <main class="home" id="content">
     <div class="home__head">
-      <h1 class="home__title">{tx('not_found.h1')}</h1>
+      <h1 class="home__title home__title--long">{tx('not_found.h1')}</h1>
       <p class="home__lead">{tx('not_found.lead')}</p>
+      <p class="home__back">
+        <a href={link('es')}>{tx('not_found.home')}</a>
+      </p>
     </div>
 
-    <ul class="index" aria-label={tx('not_found.index')}>
-      {pages.map(([id, tone, href, name, text]) => (
-        <li class="item index__live" data-tone={tone}>
-          <section class="sheet" data-tone="dates" aria-labelledby={`index-${id}`}>
-            <h2 class="index__name" id={`index-${id}`}>
-              <a href={href}>{name}</a>
-            </h2>
-            <p class="index__text">{text}</p>
-          </section>
-          <span class="item__tab" aria-hidden="true"></span>
-        </li>
-      ))}
-    </ul>
+    <ReviewIndex lang="es" />
   </main>
 </Base>

@@ -341,14 +341,10 @@ export const fr: Translation = {
     "Si vous envoyez vos documents (la lettre de licenciement, le solde de tout compte, vos bulletins de paie, l'attestation employeur ou votre relevé de carrière), ils sont transmis chiffrés à un serveur d'Amazon Web Services en Espagne, qui les confie à un modèle d'IA (Claude, d'Anthropic, via Amazon Bedrock) au sein de l'Union européenne. Le modèle indique ce qu'est chaque page, recopie uniquement les données dont le formulaire a besoin et ne calcule rien. Ni le serveur ni le modèle ne conservent le document\u00a0: il est traité en mémoire puis supprimé. Avant l'envoi, nous vous demandons votre consentement, car un bulletin de paie peut faire apparaître des données sensibles. Si vous préférez ne rien envoyer, vous pouvez saisir les données et rien ne quitte votre appareil.",
   'not_found.title': 'Page introuvable · eslojusto.es',
   'not_found.description':
-    "Cette adresse ne mène à aucune page d'eslojusto.es. D'ici, vous pouvez aller à la vérification du solde de tout compte ou à l'accueil.",
+    "Cette adresse ne mène à aucune page d'eslojusto.es. D'ici, vous pouvez aller à n'importe laquelle de ses vérifications ou à l'accueil.",
   'not_found.h1': 'Nous ne trouvons pas cette page',
   'not_found.lead': "Le lien est peut-être mal écrit, ou la page a changé d'adresse.",
-  'not_found.index': "Pages d'eslojusto.es",
-  'not_found.final_pay_text':
-    "Calculez le minimum légal de votre solde de tout compte et comparez-le à ce que vous propose l'entreprise.",
-  'not_found.home': 'Accueil',
-  'not_found.home_text': 'Ce que vérifie eslojusto.es et ce qui arrivera ensuite.',
+  'not_found.home': "Aller à l'accueil",
   'client.theme.to_dark': 'Thème\u00a0: passer en sombre',
   'client.theme.to_light': 'Thème\u00a0: passer en clair',
   'client.month.1': 'janvier',
