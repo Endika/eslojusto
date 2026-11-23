@@ -47,7 +47,7 @@
     "@fontsource-variable/source-serif-4": "^5.3.1",
     "astro": "^7.4.13",
     "pdfjs-dist": "6.5.438",
-    "posthog-js": "1.448.0"
+    "posthog-js": "1.453.0"
   },
   "allowScripts": {
     "esbuild": true
