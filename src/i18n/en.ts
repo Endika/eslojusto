@@ -1714,14 +1714,14 @@ export const en: Translation = {
     'When the calculation depends on something that is not known, such as which pre-reform contract counts, the review gives both readings and does not quote the conversion to permanent status until they agree.',
   'employment.guide.trial.title': 'Trial period',
   'employment.guide.trial.lead':
-    'A trial period (período de prueba) is only allowed if it is agreed in writing, within the limits set by your collective agreement. If the agreement says nothing, these are the maximums (art. 14.1):',
+    'A trial period (período de prueba) is only allowed if it is agreed in writing. In a contract that started on or after 19 November 2026, these are the maximums, and your collective agreement can only set a longer one if it is justified by the nature of the job, by your interest or to assess you after a suspension of the contract. In an earlier one, the limits of your collective agreement apply and, if it says nothing, these (art. 14.1):',
   'employment.guide.trial.technicians':
     '6 months for qualified technical staff (técnicos titulados).',
   'employment.guide.trial.others': '2 months for everyone else.',
   'employment.guide.trial.small_company':
     '3 months for those who are not qualified technical staff in a company with fewer than 25 people on the payroll.',
   'employment.guide.trial.temporary':
-    '1 month in a temporary contract of 6 months or less, unless the collective agreement says otherwise.',
+    'In a temporary contract from 19 November 2026, 1 month if it lasts 6 months or more, and a proportional part if it lasts less: in one of 3 months, half a month. In an earlier one, 1 month if it lasted 6 months or less, unless the collective agreement says otherwise.',
   'employment.guide.trial.void':
     'No trial period is allowed if you had already done the same duties at the company, under any contract (art. 14.1).',
   'employment.guide.trial.training':
@@ -1766,7 +1766,7 @@ export const en: Translation = {
   'employment.guide.clauses.non_compete':
     'Non-compete after the contract: no more than 2 years for technical staff and 6 months for everyone else, and only if the company has an effective interest and pays you adequate financial compensation (art. 21.2).',
   'employment.guide.clauses.exclusivity':
-    'Full dedication to a single company: agreed with express financial compensation (art. 21.1).',
+    'Full dedication to a single company: agreed with express financial compensation (art. 21.1). Outside such an agreement, from 19 November 2026 the company cannot prohibit or limit you from working for others, except for objective reasons such as safety, confidentiality or a conflict of interest.',
   'employment.guide.clauses.retention':
     'Retention commitment (permanencia): only after professional specialisation paid for by the company, for no more than 2 years and always in writing (art. 21.4).',
   'employment.guide.clauses.waiver':
@@ -1805,7 +1805,7 @@ export const en: Translation = {
     'For production circumstances, up to 6 months, or up to one year if your sectoral collective agreement extends it, with a single extension within that maximum; for occasional, foreseeable situations, the company can use it for up to 90 days in the calendar year, not consecutive. A replacement contract lasts while the absence of the person you are replacing lasts, or up to 3 months to cover a post during a selection process (art. 15). If in 24 months you have had contracts for more than 18 with the same company or group, through two or more contracts for production circumstances, article 15.5 of the Estatuto de los Trabajadores says that those people «adquirirán la condición de personas trabajadoras fijas» (“will acquire the status of permanent workers”).',
   'employment.faq.trial': 'How long can the trial period last?',
   'employment.faq.trial_answer':
-    'Your collective agreement sets it, and it is only allowed if agreed in writing. If the agreement says nothing, at most 6 months for qualified technical staff and 2 months for everyone else, or 3 in companies with fewer than 25 people. In a temporary contract of 6 months or less, 1 month, unless the collective agreement says otherwise. If you had already done the same duties at the company, it is not allowed (art. 14.1). In a work-and-study training contract (formación en alternancia) there is no trial period (art. 11.2.l).',
+    'It is only allowed if agreed in writing. At most 6 months for qualified technical staff and 2 months for everyone else, or 3 in companies with fewer than 25 people; in a temporary contract, 1 month if it lasts 6 months or more and a proportional part if it lasts less. From 19 November 2026, your collective agreement can only lengthen it if it is justified. In earlier contracts, the limits were set by the collective agreement, and in a temporary one of 6 months or less it was 1 month. If you had already done the same duties at the company, it is not allowed (art. 14.1). In a work-and-study training contract (formación en alternancia) there is no trial period (art. 11.2.l).',
   'employment.faq.holidays': 'How much holiday am I entitled to?',
   'employment.faq.holidays_answer':
     'At least 30 calendar days a year, paid; your collective agreement or your contract may give more (art. 38.1). If your contract lasts less than a year, you are entitled to the proportional part, although art. 38.1 does not say so expressly. While the contract continues, holiday cannot be exchanged for money.',

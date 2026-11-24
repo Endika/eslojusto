@@ -1693,13 +1693,13 @@ export const ca: Translation = {
     'Quan el càlcul depèn d’una cosa que no se sap, com ara quin contracte anterior a la reforma compta, la revisió dona els dos càlculs i no cita el pas a fix fins que coincideixen.',
   'employment.guide.trial.title': 'Període de prova',
   'employment.guide.trial.lead':
-    'El període de prova només és possible si es pacta per escrit, dins dels límits que fixi el teu conveni. Si el conveni no diu res, aquests són els màxims (art. 14.1):',
+    'El període de prova només és possible si es pacta per escrit. En un contracte que va començar a partir del 19 de novembre de 2026, aquests són els màxims, i el teu conveni només en pot fixar un de més llarg si ho justifica la naturalesa del lloc, el teu interès o la valoració de la teva persona després d’una suspensió del contracte. En un d’anterior, valen els límits del teu conveni i, si no diu res, aquests (art. 14.1):',
   'employment.guide.trial.technicians': '6 mesos per als tècnics titulats.',
   'employment.guide.trial.others': '2 mesos per a la resta.',
   'employment.guide.trial.small_company':
     '3 mesos per a qui no és tècnic titulat en una empresa de menys de 25 persones en plantilla.',
   'employment.guide.trial.temporary':
-    '1 mes en un contracte temporal de 6 mesos o menys, tret que el conveni digui una altra cosa.',
+    'En un contracte temporal a partir del 19 de novembre de 2026, 1 mes si dura 6 mesos o més, i la part proporcional si dura menys: en un de 3 mesos, mig mes. En un d’anterior, 1 mes si durava 6 mesos o menys, tret que el conveni digui una altra cosa.',
   'employment.guide.trial.void':
     'No hi pot haver període de prova si ja havies fet les mateixes funcions a l’empresa, amb qualsevol contracte (art. 14.1).',
   'employment.guide.trial.training':
@@ -1744,7 +1744,7 @@ export const ca: Translation = {
   'employment.guide.clauses.non_compete':
     'No competència després del contracte: com a màxim 2 anys per als tècnics i 6 mesos per a la resta, i només si l’empresa hi té un interès efectiu i et paga una compensació econòmica adequada (art. 21.2).',
   'employment.guide.clauses.exclusivity':
-    'Plena dedicació a una sola empresa: es pacta amb una compensació econòmica expressa (art. 21.1).',
+    'Plena dedicació a una sola empresa: es pacta amb una compensació econòmica expressa (art. 21.1). Fora d’aquest pacte, a partir del 19 de novembre de 2026 l’empresa no et pot prohibir ni limitar treballar per a unes altres, tret de causes objectives com la seguretat, la confidencialitat o un conflicte d’interessos.',
   'employment.guide.clauses.retention':
     'Permanència: només després d’una especialització professional pagada per l’empresa, com a màxim 2 anys i sempre per escrit (art. 21.4).',
   'employment.guide.clauses.waiver':
@@ -1783,7 +1783,7 @@ export const ca: Translation = {
     'Per circumstàncies de la producció, fins a 6 mesos, o fins a un any si l’amplia el teu conveni sectorial, amb una sola pròrroga dins d’aquest màxim; per a situacions ocasionals i previsibles, l’empresa el pot fer servir fins a 90 dies l’any natural, no seguits. De substitució, mentre dura l’absència de la persona a qui substitueixes, o fins a 3 mesos per cobrir un lloc durant un procés de selecció (art. 15). Si en 24 mesos has tingut contractes durant més de 18 amb la mateixa empresa o grup, mitjançant dos o més contractes per circumstàncies de la producció, l’article 15.5 de l’Estatuto de los Trabajadores diu que aquestes persones «adquirirán la condición de personas trabajadoras fijas» (adquiriran la condició de persones treballadores fixes).',
   'employment.faq.trial': 'Quant pot durar el període de prova?',
   'employment.faq.trial_answer':
-    'El fixa el teu conveni, i només és possible si es pacta per escrit. Si el conveni no diu res, com a màxim 6 mesos per als tècnics titulats i 2 mesos per a la resta, o 3 en empreses de menys de 25 persones. En un contracte temporal de 6 mesos o menys, 1 mes, tret que el conveni digui una altra cosa. Si ja havies fet les mateixes funcions a l’empresa, no n’hi pot haver (art. 14.1). En un contracte de formació en alternança no hi ha període de prova (art. 11.2.l).',
+    'Només és possible si es pacta per escrit. Com a màxim 6 mesos per als tècnics titulats i 2 mesos per a la resta, o 3 en empreses de menys de 25 persones; en un contracte temporal, 1 mes si dura 6 mesos o més i la part proporcional si dura menys. A partir del 19 de novembre de 2026, el teu conveni només el pot allargar si ho justifica. En els contractes anteriors, els límits els fixava el conveni, i en un de temporal de 6 mesos o menys era 1 mes. Si ja havies fet les mateixes funcions a l’empresa, no n’hi pot haver (art. 14.1). En un contracte de formació en alternança no hi ha període de prova (art. 11.2.l).',
   'employment.faq.holidays': 'Quantes vacances em corresponen?',
   'employment.faq.holidays_answer':
     'Almenys 30 dies naturals l’any, retribuïts; el teu conveni o el teu contracte en poden donar més (art. 38.1). Si el teu contracte dura menys d’un any, et correspon la part proporcional, encara que l’art. 38.1 no ho diu expressament. Mentre continua el contracte, les vacances no es poden canviar per diners.',

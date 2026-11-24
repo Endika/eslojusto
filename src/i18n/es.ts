@@ -1508,13 +1508,13 @@ export const es = {
 
   'employment.guide.trial.title': 'Periodo de prueba',
   'employment.guide.trial.lead':
-    'El periodo de prueba solo cabe si se pacta por escrito, dentro de los límites que fije tu convenio. Si el convenio no dice nada, estos son los máximos (art. 14.1):',
+    'El periodo de prueba solo cabe si se pacta por escrito. En un contrato que empezó desde el 19 de noviembre de 2026, estos son los máximos, y tu convenio solo puede fijar uno más largo si lo justifica por la naturaleza del puesto, por tu interés o para valorarte tras una suspensión del contrato. En uno anterior, valen los límites de tu convenio y, si no dice nada, estos (art. 14.1):',
   'employment.guide.trial.technicians': '6 meses para técnicos titulados.',
   'employment.guide.trial.others': '2 meses para el resto.',
   'employment.guide.trial.small_company':
     '3 meses para quien no es técnico titulado en una empresa de menos de 25 personas en plantilla.',
   'employment.guide.trial.temporary':
-    '1 mes en un contrato temporal de 6 meses o menos, salvo que el convenio diga otra cosa.',
+    'En un contrato temporal desde el 19 de noviembre de 2026, 1 mes si dura 6 meses o más, y la parte proporcional si dura menos: en uno de 3 meses, medio mes. En uno anterior, 1 mes si duraba 6 meses o menos, salvo que el convenio diga otra cosa.',
   'employment.guide.trial.void':
     'No cabe periodo de prueba si ya habías hecho las mismas funciones en la empresa, con cualquier contrato (art. 14.1).',
   'employment.guide.trial.training':
@@ -1563,7 +1563,7 @@ export const es = {
   'employment.guide.clauses.non_compete':
     'No competencia después del contrato: como mucho 2 años para técnicos y 6 meses para el resto, y solo si la empresa tiene un interés efectivo y te paga una compensación económica adecuada (art. 21.2).',
   'employment.guide.clauses.exclusivity':
-    'Plena dedicación a una sola empresa: se pacta con una compensación económica expresa (art. 21.1).',
+    'Plena dedicación a una sola empresa: se pacta con una compensación económica expresa (art. 21.1). Fuera de ese pacto, desde el 19 de noviembre de 2026 la empresa no puede prohibirte ni limitarte trabajar para otras, salvo por causas objetivas como la seguridad, la confidencialidad o un conflicto de intereses.',
   'employment.guide.clauses.retention':
     'Permanencia: solo tras una especialización profesional pagada por la empresa, como mucho 2 años y siempre por escrito (art. 21.4).',
   'employment.guide.clauses.waiver':
@@ -1605,7 +1605,7 @@ export const es = {
     'Por circunstancias de la producción, hasta 6 meses, o hasta un año si lo amplía tu convenio sectorial, con una sola prórroga dentro de ese máximo; para situaciones ocasionales y previsibles, la empresa puede usarlo hasta 90 días en el año natural, no seguidos. De sustitución, mientras dura la ausencia de la persona a la que sustituyes, o hasta 3 meses para cubrir un puesto durante un proceso de selección (art. 15). Si en 24 meses has tenido contratos durante más de 18 con la misma empresa o grupo, mediante dos o más contratos por circunstancias de la producción, el artículo 15.5 del Estatuto de los Trabajadores dice que esas personas «adquirirán la condición de personas trabajadoras fijas».',
   'employment.faq.trial': '¿Cuánto puede durar el periodo de prueba?',
   'employment.faq.trial_answer':
-    'Lo fija tu convenio, y solo cabe si se pacta por escrito. Si el convenio no dice nada, como mucho 6 meses para técnicos titulados y 2 meses para el resto, o 3 en empresas de menos de 25 personas. En un contrato temporal de 6 meses o menos, 1 mes, salvo que el convenio diga otra cosa. Si ya habías hecho las mismas funciones en la empresa, no cabe (art. 14.1). En un contrato de formación en alternancia no hay periodo de prueba (art. 11.2.l).',
+    'Solo cabe si se pacta por escrito. Como mucho 6 meses para técnicos titulados y 2 meses para el resto, o 3 en empresas de menos de 25 personas; en un contrato temporal, 1 mes si dura 6 meses o más y la parte proporcional si dura menos. Desde el 19 de noviembre de 2026, tu convenio solo puede alargarlo si lo justifica. En los contratos anteriores, los límites los fijaba el convenio, y en uno temporal de 6 meses o menos era 1 mes. Si ya habías hecho las mismas funciones en la empresa, no cabe (art. 14.1). En un contrato de formación en alternancia no hay periodo de prueba (art. 11.2.l).',
   'employment.faq.holidays': '¿Cuántas vacaciones me corresponden?',
   'employment.faq.holidays_answer':
     'Al menos 30 días naturales al año, retribuidos; tu convenio o tu contrato pueden dar más (art. 38.1). Si tu contrato dura menos de un año, te corresponde la parte proporcional, aunque el art. 38.1 no lo dice expresamente. Mientras sigue el contrato, las vacaciones no se pueden cambiar por dinero.',

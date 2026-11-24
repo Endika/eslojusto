@@ -1775,14 +1775,14 @@ export const fr: Translation = {
     "Quand le calcul dépend d'un élément inconnu, comme le fait de savoir quel contrat antérieur à la réforme compte, la vérification donne les deux calculs et ne cite le passage à durée indéterminée que lorsqu'ils concordent.",
   'employment.guide.trial.title': "La période d'essai",
   'employment.guide.trial.lead':
-    "La période d'essai n'est possible que si elle est convenue par écrit, dans les limites fixées par votre convention collective. Si la convention ne dit rien, voici les maximums (art. 14.1)\u00a0:",
+    "La période d'essai n'est possible que si elle est convenue par écrit. Dans un contrat commencé à partir du 19 novembre 2026, voici les maximums, et votre convention collective ne peut en fixer une plus longue que si elle se justifie par la nature du poste, par votre intérêt ou par l'évaluation de vos aptitudes après une suspension du contrat. Dans un contrat antérieur, les limites de votre convention collective s'appliquent et, si elle ne dit rien, celles-ci (art. 14.1)\u00a0:",
   'employment.guide.trial.technicians':
     '6 mois pour les techniciens diplômés (técnicos titulados).',
   'employment.guide.trial.others': '2 mois pour les autres.',
   'employment.guide.trial.small_company':
     '3 mois pour les personnes qui ne sont pas techniciens diplômés dans une entreprise de moins de 25 personnes.',
   'employment.guide.trial.temporary':
-    '1 mois dans un contrat à durée déterminée de 6 mois ou moins, sauf disposition contraire de la convention collective.',
+    "Dans un contrat à durée déterminée à partir du 19 novembre 2026, 1 mois s'il dure 6 mois ou plus, et la part proportionnelle s'il dure moins\u00a0: dans un contrat de 3 mois, un demi-mois. Dans un contrat antérieur, 1 mois s'il durait 6 mois ou moins, sauf disposition contraire de la convention collective.",
   'employment.guide.trial.void':
     "Aucune période d'essai n'est possible si vous aviez déjà exercé les mêmes fonctions dans l'entreprise, quel que soit le contrat (art. 14.1).",
   'employment.guide.trial.training':
@@ -1827,7 +1827,7 @@ export const fr: Translation = {
   'employment.guide.clauses.non_compete':
     "Non-concurrence après le contrat\u00a0: au plus 2 ans pour les techniciens et 6 mois pour les autres, et seulement si l'entreprise y a un intérêt effectif et vous verse une compensation financière adéquate (art. 21.2).",
   'employment.guide.clauses.exclusivity':
-    "Exclusivité au service d'une seule entreprise\u00a0: elle est convenue avec une compensation financière expresse (art. 21.1).",
+    "Exclusivité au service d'une seule entreprise\u00a0: elle est convenue avec une compensation financière expresse (art. 21.1). En dehors de ce pacte, à partir du 19 novembre 2026, l'entreprise ne peut ni vous interdire ni vous limiter de travailler pour d'autres, sauf pour des raisons objectives comme la sécurité, la confidentialité ou un conflit d'intérêts.",
   'employment.guide.clauses.retention':
     "Clause de maintien dans l'entreprise (permanencia)\u00a0: seulement après une spécialisation professionnelle payée par l'entreprise, pour 2 ans au plus et toujours par écrit (art. 21.4).",
   'employment.guide.clauses.waiver':
@@ -1866,7 +1866,7 @@ export const fr: Translation = {
     "Pour circonstances de la production, jusqu'à 6 mois, ou jusqu'à un an si votre convention collective de branche l'allonge, avec une seule prolongation dans ce maximum\u00a0; pour des situations occasionnelles et prévisibles, l'entreprise peut l'utiliser jusqu'à 90 jours par année civile, non consécutifs. Un contrat de remplacement dure tant que dure l'absence de la personne que vous remplacez, ou jusqu'à 3 mois pour pourvoir un poste pendant une procédure de recrutement (art. 15). Si, sur 24 mois, vous avez été sous contrat pendant plus de 18 mois avec la même entreprise ou le même groupe, au moyen de deux contrats ou plus pour circonstances de la production, l'article 15.5 de l'Estatuto de los Trabajadores dit que ces personnes «adquirirán la condición de personas trabajadoras fijas» («\u00a0acquerront la qualité de travailleurs permanents\u00a0»).",
   'employment.faq.trial': "Combien de temps peut durer la période d'essai\u00a0?",
   'employment.faq.trial_answer':
-    "Elle est fixée par votre convention collective, et n'est possible que si elle est convenue par écrit. Si la convention ne dit rien, au plus 6 mois pour les techniciens diplômés et 2 mois pour les autres, ou 3 dans les entreprises de moins de 25 personnes. Dans un contrat à durée déterminée de 6 mois ou moins, 1 mois, sauf disposition contraire de la convention. Si vous aviez déjà exercé les mêmes fonctions dans l'entreprise, elle n'est pas possible (art. 14.1). Un contrat de formation en alternance ne comporte pas de période d'essai (art. 11.2.l).",
+    "Elle n'est possible que si elle est convenue par écrit. Au plus 6 mois pour les techniciens diplômés et 2 mois pour les autres, ou 3 dans les entreprises de moins de 25 personnes\u00a0; dans un contrat à durée déterminée, 1 mois s'il dure 6 mois ou plus et la part proportionnelle s'il dure moins. À partir du 19 novembre 2026, votre convention collective ne peut l'allonger que si cela se justifie. Pour les contrats antérieurs, les limites étaient fixées par la convention collective, et dans un contrat à durée déterminée de 6 mois ou moins, c'était 1 mois. Si vous aviez déjà exercé les mêmes fonctions dans l'entreprise, elle n'est pas possible (art. 14.1). Un contrat de formation en alternance ne comporte pas de période d'essai (art. 11.2.l).",
   'employment.faq.holidays': 'À combien de jours de congé ai-je droit\u00a0?',
   'employment.faq.holidays_answer':
     "Au moins 30 jours calendaires par an, rémunérés\u00a0; votre convention collective ou votre contrat peut en prévoir davantage (art. 38.1). Si votre contrat dure moins d'un an, vous avez droit à la part proportionnelle, même si l'art. 38.1 ne le dit pas expressément. Tant que le contrat est en cours, les congés ne peuvent pas être remplacés par de l'argent.",

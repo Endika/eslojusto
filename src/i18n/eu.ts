@@ -1730,13 +1730,13 @@ export const eu: Translation = {
     'Kontua jakiten ez den zerbaiten araberakoa denean, adibidez erreformaren aurreko zer kontratu zenbatzen den, berrikuspenak bi kalkuluak ematen ditu, eta ez du finko bihurtzea aipatzen bat etorri arte.',
   'employment.guide.trial.title': 'Proba-aldia',
   'employment.guide.trial.lead':
-    'Proba-aldia idatziz itundu bada bakarrik egin daiteke, zure hitzarmenak finkatzen dituen mugen barruan. Hitzarmenak ezer esaten ez badu, hauek dira gehienekoak (art. 14.1):',
+    'Proba-aldia idatziz itundu bada bakarrik egin daiteke. 2026ko azaroaren 19tik aurrera hasi den kontratu batean, hauek dira gehienekoak, eta zure hitzarmenak luzeagoa bakarrik finka dezake lanpostuaren izaerak, zure interesak edo kontratuaren etenaldi baten ondoren zu baloratzeko beharrak justifikatzen badute. Lehenagoko batean, zure hitzarmenaren mugak balio dute eta, hark ezer esaten ez badu, hauek (art. 14.1):',
   'employment.guide.trial.technicians': '6 hilabete titulazioa duten teknikarientzat.',
   'employment.guide.trial.others': '2 hilabete gainerakoentzat.',
   'employment.guide.trial.small_company':
     '3 hilabete titulazioa duen teknikaria ez denarentzat, 25 pertsona baino gutxiagoko langileria duen enpresa batean.',
   'employment.guide.trial.temporary':
-    'Hilabete 1, 6 hilabeteko edo gutxiagoko aldi baterako kontratu batean, hitzarmenak bestelakorik esaten ez badu.',
+    '2026ko azaroaren 19tik aurrerako aldi baterako kontratu batean, hilabete 1 6 hilabete edo gehiago irauten badu, eta zati proportzionala gutxiago irauten badu: 3 hilabetekoan, hilabete erdi. Lehenagoko batean, hilabete 1 6 hilabeteko edo gutxiagoko iraupena bazuen, hitzarmenak bestelakorik esaten ez badu.',
   'employment.guide.trial.void':
     'Ez dago proba-aldirik egiterik enpresan eginkizun berak lehenago egin bazenituen, edozein kontraturekin (art. 14.1).',
   'employment.guide.trial.training':
@@ -1781,7 +1781,7 @@ export const eu: Translation = {
   'employment.guide.clauses.non_compete':
     'Lehiarik ez egitea kontratuaren ondoren: gehienez 2 urte teknikarientzat eta 6 hilabete gainerakoentzat, eta enpresak benetako interesa badu eta konpentsazio ekonomiko egokia ordaintzen badizu bakarrik (art. 21.2).',
   'employment.guide.clauses.exclusivity':
-    'Enpresa bakar bati dedikazio osoa: berariazko konpentsazio ekonomiko batekin itundu behar da (art. 21.1).',
+    'Enpresa bakar bati dedikazio osoa: berariazko konpentsazio ekonomiko batekin itundu behar da (art. 21.1). Itun horretatik kanpo, 2026ko azaroaren 19tik aurrera enpresak ezin dizu besteentzat lan egitea debekatu edo mugatu, arrazoi objektiboak daudenean izan ezik, hala nola segurtasuna, konfidentzialtasuna edo interes-gatazka.',
   'employment.guide.clauses.retention':
     'Iraupen-konpromisoa (permanencia): enpresak ordaindutako espezializazio profesional baten ondoren bakarrik, gehienez 2 urtez eta beti idatziz (art. 21.4).',
   'employment.guide.clauses.waiver':
@@ -1820,7 +1820,7 @@ export const eu: Translation = {
     'Ekoizpen-zirkunstantziengatik, gehienez 6 hilabete, edo urtebete zure sektoreko hitzarmenak luzatzen badu, gehieneko horren barruan luzapen bakarrarekin; aurreikus daitezkeen egoera okasionaletarako, enpresak urte naturalean 90 egunez erabil dezake gehienez, jarraian ez. Ordezkapen-kontratua, ordezten duzun pertsonaren absentziak irauten duen bitartean, edo gehienez 3 hilabetez hautaketa-prozesu batean lanpostu bat betetzeko (art. 15). 24 hilabetean 18 baino gehiagoz izan badituzu kontratuak enpresa edo talde berarekin, ekoizpen-zirkunstantziengatiko bi kontratu edo gehiagoren bidez, Estatuto de los Trabajadores legearen 15.5 artikuluak dio pertsona horiek «adquirirán la condición de personas trabajadoras fijas» (langile finko izatera igaroko direla).',
   'employment.faq.trial': 'Zenbat iraun dezake proba-aldiak?',
   'employment.faq.trial_answer':
-    'Zure hitzarmenak finkatzen du, eta idatziz itundu bada bakarrik egin daiteke. Hitzarmenak ezer esaten ez badu, gehienez 6 hilabete titulazioa duten teknikarientzat eta 2 hilabete gainerakoentzat, edo 3, 25 pertsona baino gutxiagoko enpresetan. 6 hilabeteko edo gutxiagoko aldi baterako kontratu batean, hilabete 1, hitzarmenak bestelakorik esaten ez badu. Enpresan eginkizun berak lehenago egin bazenituen, ez dago proba-aldirik egiterik (art. 14.1). Txandakako prestakuntza-kontratu batean ez dago proba-aldirik (art. 11.2.l).',
+    'Idatziz itundu bada bakarrik egin daiteke. Gehienez 6 hilabete titulazioa duten teknikarientzat eta 2 hilabete gainerakoentzat, edo 3, 25 pertsona baino gutxiagoko enpresetan; aldi baterako kontratu batean, hilabete 1 6 hilabete edo gehiago irauten badu, eta zati proportzionala gutxiago irauten badu. 2026ko azaroaren 19tik aurrera, zure hitzarmenak justifikatzen badu bakarrik luza dezake. Lehenagoko kontratuetan, hitzarmenak finkatzen zituen mugak, eta 6 hilabeteko edo gutxiagoko aldi baterako batean hilabete 1 zen. Enpresan eginkizun berak lehenago egin bazenituen, ez dago proba-aldirik egiterik (art. 14.1). Txandakako prestakuntza-kontratu batean ez dago proba-aldirik (art. 11.2.l).',
   'employment.faq.holidays': 'Zenbat opor dagozkit?',
   'employment.faq.holidays_answer':
     'Gutxienez urtean 30 egun natural, ordainduak; zure hitzarmenak edo zure kontratuak gehiago eman ditzakete (art. 38.1). Zure kontratuak urtebete baino gutxiago irauten badu, zati proportzionala dagokizu, art. 38.1ek berariaz esaten ez badu ere. Kontratuak irauten duen bitartean, oporrak ezin dira diruaren truke aldatu.',

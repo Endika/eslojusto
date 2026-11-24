@@ -26,7 +26,7 @@ export const LAST_UPDATED: Readonly<Record<string, string>> = {
   '/alquiler/fianza/': '2026-11-18',
   '/alquiler/devolucion-fianza/': '2026-11-18',
   '/alquiler/gastos/': '2026-11-18',
-  '/contrato/': '2026-10-09',
+  '/contrato/': '2026-11-24',
   '/paro/erte/': '2026-10-09',
   '/empleada-de-hogar/': '2026-10-09',
   '/seguros/': '2026-10-11',

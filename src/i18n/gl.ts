@@ -1674,13 +1674,13 @@ export const gl: Translation = {
     'Cando a conta depende de algo que non se sabe, como que contrato anterior á reforma conta, a revisión dá os dous cálculos e non cita o paso a fixo ata que coinciden.',
   'employment.guide.trial.title': 'Período de proba',
   'employment.guide.trial.lead':
-    'O período de proba só é posible se se pacta por escrito, dentro dos límites que fixe o teu convenio. Se o convenio non di nada, estes son os máximos (art. 14.1):',
+    'O período de proba só é posible se se pacta por escrito. Nun contrato que comezou a partir do 19 de novembro de 2026, estes son os máximos, e o teu convenio só pode fixar un máis longo se o xustifica a natureza do posto, o teu interese ou valorarte tras unha suspensión do contrato. Nun anterior, valen os límites do teu convenio e, se non di nada, estes (art. 14.1):',
   'employment.guide.trial.technicians': '6 meses para técnicos titulados.',
   'employment.guide.trial.others': '2 meses para o resto.',
   'employment.guide.trial.small_company':
     '3 meses para quen non é técnico titulado nunha empresa de menos de 25 persoas no cadro de persoal.',
   'employment.guide.trial.temporary':
-    '1 mes nun contrato temporal de 6 meses ou menos, agás que o convenio diga outra cousa.',
+    'Nun contrato temporal a partir do 19 de novembro de 2026, 1 mes se dura 6 meses ou máis, e a parte proporcional se dura menos: nun de 3 meses, medio mes. Nun anterior, 1 mes se durase 6 meses ou menos, agás que o convenio diga outra cousa.',
   'employment.guide.trial.void':
     'Non é posible un período de proba se xa fixeras as mesmas funcións na empresa, con calquera contrato (art. 14.1).',
   'employment.guide.trial.training':
@@ -1725,7 +1725,7 @@ export const gl: Translation = {
   'employment.guide.clauses.non_compete':
     'Non competencia despois do contrato: como moito 2 anos para técnicos e 6 meses para o resto, e só se a empresa ten un interese efectivo e che paga unha compensación económica adecuada (art. 21.2).',
   'employment.guide.clauses.exclusivity':
-    'Plena dedicación a unha soa empresa: páctase cunha compensación económica expresa (art. 21.1).',
+    'Plena dedicación a unha soa empresa: páctase cunha compensación económica expresa (art. 21.1). Fóra dese pacto, a partir do 19 de novembro de 2026 a empresa non che pode prohibir nin limitar traballar para outras, salvo por causas obxectivas como a seguridade, a confidencialidade ou un conflito de intereses.',
   'employment.guide.clauses.retention':
     'Permanencia: só tras unha especialización profesional pagada pola empresa, como moito 2 anos e sempre por escrito (art. 21.4).',
   'employment.guide.clauses.waiver':
@@ -1764,7 +1764,7 @@ export const gl: Translation = {
     'Por circunstancias da produción, ata 6 meses, ou ata un ano se o amplía o teu convenio sectorial, cunha soa prórroga dentro dese máximo; para situacións ocasionais e previsibles, a empresa pode usalo ata 90 días no ano natural, non seguidos. De substitución, mentres dura a ausencia da persoa á que substitúes, ou ata 3 meses para cubrir un posto durante un proceso de selección (art. 15). Se en 24 meses tiveches contratos durante máis de 18 coa mesma empresa ou grupo, mediante dous ou máis contratos por circunstancias da produción, o artigo 15.5 do Estatuto de los Trabajadores di que esas persoas «adquirirán la condición de personas trabajadoras fijas».',
   'employment.faq.trial': 'Canto pode durar o período de proba?',
   'employment.faq.trial_answer':
-    'Fíxao o teu convenio, e só é posible se se pacta por escrito. Se o convenio non di nada, como moito 6 meses para técnicos titulados e 2 meses para o resto, ou 3 en empresas de menos de 25 persoas. Nun contrato temporal de 6 meses ou menos, 1 mes, agás que o convenio diga outra cousa. Se xa fixeras as mesmas funcións na empresa, non é posible (art. 14.1). Nun contrato de formación en alternancia non hai período de proba (art. 11.2.l).',
+    'Só é posible se se pacta por escrito. Como moito 6 meses para técnicos titulados e 2 meses para o resto, ou 3 en empresas de menos de 25 persoas; nun contrato temporal, 1 mes se dura 6 meses ou máis e a parte proporcional se dura menos. A partir do 19 de novembro de 2026, o teu convenio só pode alongalo se o xustifica. Nos contratos anteriores, os límites fixábaos o convenio, e nun temporal de 6 meses ou menos era 1 mes. Se xa fixeras as mesmas funcións na empresa, non é posible (art. 14.1). Nun contrato de formación en alternancia non hai período de proba (art. 11.2.l).',
   'employment.faq.holidays': 'Cantas vacacións me corresponden?',
   'employment.faq.holidays_answer':
     'Polo menos 30 días naturais ao ano, retribuídos; o teu convenio ou o teu contrato poden dar máis (art. 38.1). Se o teu contrato dura menos dun ano, correspóndeche a parte proporcional, aínda que o art. 38.1 non o di expresamente. Mentres segue o contrato, as vacacións non se poden cambiar por diñeiro.',
