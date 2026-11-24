@@ -2458,6 +2458,8 @@ export const ar: Translation = {
   'client.employment.finding.written_form': 'العقد المكتوب',
   'client.employment.finding.trial_limits': 'فترة التجربة',
   'client.employment.finding.trial_temporary_1_month': 'فترة التجربة',
+  'client.employment.finding.trial_limits_2026': 'فترة التجربة',
+  'client.employment.finding.trial_temporary_proportional': 'فترة التجربة',
   'client.employment.finding.trial_void_same_duties': 'فترة التجربة',
   'client.employment.finding.weekly_40': 'الساعات في الأسبوع',
   'client.employment.finding.daily_9': 'الساعات في اليوم',
@@ -2721,6 +2723,16 @@ export const ar: Translation = {
     'فترة تجربة مدتها {trial}؛ ووفق المعلومة التي أدخلتها، تسمح اتفاقيتك الجماعية بـ{months}، وهي تتجاوزها.',
   'client.employment.calculation.trial.temporary_end_unknown':
     'بلا تاريخ انتهاء لا يُعرَف ما إذا كانت مدة العقد 6 أشهر أو أقل؛ وإن كانت كذلك، فالحد {months}.',
+  'client.employment.calculation.trial.over_legal_limit_justified':
+    'فترة تجربة مدتها {trial}؛ تتجاوز الحد القانوني البالغ {months}، ولا يسمح بأكثر منه إلا اتفاقية جماعية تبرّر فترة أطول.',
+  'client.employment.calculation.trial.within_legal_limit_days':
+    'فترة تجربة مدتها {trial}؛ في العقد الذي تقل مدته عن 6 أشهر يكون الحد القانوني {days}، أي الجزء المتناسب من 1 شهر.',
+  'client.employment.calculation.trial.over_legal_limit_days':
+    'فترة تجربة مدتها {trial}؛ في العقد الذي تقل مدته عن 6 أشهر يكون الحد القانوني {days}، أي الجزء المتناسب من 1 شهر، ولا يسمح بأكثر منه إلا اتفاقية جماعية تبرّر فترة أطول.',
+  'client.employment.calculation.trial.agreement_above_legal_limit':
+    'فترة تجربة مدتها {trial}؛ ووفق المعلومة التي أدخلتها، تسمح اتفاقيتك الجماعية بـ{months}، وهو أكثر من الحد القانوني، ولا يصح ذلك إلا إذا كانت الاتفاقية تبرّره.',
+  'client.employment.calculation.trial.end_unknown_proportional':
+    'بلا تاريخ انتهاء لا يُعرَف كم تبلغ مدة العقد؛ وإن كانت أقل من 6 أشهر، فالحد القانوني أقل من 1 شهر، بما يتناسب مع مدته.',
   'client.employment.calculation.trial.void_alternance':
     'في عقد التكوين بالتناوب لا تجوز فترة التجربة، وعقدك يذكر {trial}.',
   'client.employment.calculation.trial.void_after_training':

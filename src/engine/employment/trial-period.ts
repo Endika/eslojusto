@@ -1,10 +1,17 @@
-import { addDays, addMonthsClamped, calendarDays, type CivilDate } from '../date';
+import {
+  addDays,
+  addMonthsClamped,
+  calendarDays,
+  compareDates,
+  parseDate,
+  type CivilDate,
+} from '../date';
 import { phrase, type EmploymentPhrase } from './calculation';
 import { findingOf, single } from './finding';
 import type { NormTable } from './norms';
 import { assessAcross, worldsOf } from './readings';
 import type { EmploymentRuleId } from './rules';
-import { isFixedTerm, lastsAtMostMonths } from './term';
+import { agreedDays, isFixedTerm, lastsAtMostMonths, lastsLessThanMonths } from './term';
 import type { Assessed, EmploymentInput, Finding, ReadingCode, Trial } from './types';
 
 // Art. 14.1 ET, failing a limit in the collective agreement: six months for qualified technicians,
@@ -16,6 +23,33 @@ const OTHERS_SMALL_COMPANY_MONTHS = 3;
 // training contracts: one month unless the agreement says otherwise.
 const SHORT_TERM_MONTHS = 6;
 const ONE_MONTH = 1;
+
+// RDL 39/2026 rewrote art. 14.1 ET for contracts starting from this day, with no transitional rule.
+const RDL39_START = parseDate('2026-11-19');
+
+interface Regime {
+  readonly fromRdl39: boolean;
+  readonly limits: EmploymentRuleId;
+  readonly temporary: EmploymentRuleId;
+  readonly overPhrase: 'trial.over_legal_limit' | 'trial.over_legal_limit_justified';
+}
+
+const BEFORE_RDL39: Regime = {
+  fromRdl39: false,
+  limits: 'trial_limits',
+  temporary: 'trial_temporary_1_month',
+  overPhrase: 'trial.over_legal_limit',
+};
+
+const FROM_RDL39: Regime = {
+  fromRdl39: true,
+  limits: 'trial_limits_2026',
+  temporary: 'trial_temporary_proportional',
+  overPhrase: 'trial.over_legal_limit_justified',
+};
+
+const regimeOf = (input: EmploymentInput): Regime =>
+  compareDates(input.startDate, RDL39_START) >= 0 ? FROM_RDL39 : BEFORE_RDL39;
 
 const othersMonths = (smallCompany: boolean): number =>
   smallCompany ? OTHERS_SMALL_COMPANY_MONTHS : OTHERS_MONTHS;
@@ -36,7 +70,15 @@ function exceeds(trial: Trial, months: number, start: CivilDate): boolean {
   return days > calendarDays(start, addDays(addMonthsClamped(start, months), -1));
 }
 
+// The trial in calendar days, counting a trial in months from the start day.
+function trialDays(trial: Trial, start: CivilDate): number {
+  if (trial.unit === 'months')
+    return calendarDays(start, addDays(addMonthsClamped(start, trial.amount), -1));
+  return trial.unit === 'weeks' ? trial.amount * 7 : trial.amount;
+}
+
 interface LimitContext {
+  readonly regime: Regime;
   readonly input: EmploymentInput;
   readonly trial: Trial;
   readonly norms: NormTable;
@@ -49,16 +91,13 @@ function againstLimit(
   rule: EmploymentRuleId,
   months: number,
   basedOnYourAnswer: boolean,
-  { input, trial, norms, notes }: LimitContext,
+  { regime, input, trial, norms, notes }: LimitContext,
 ): Finding {
   const over = exceeds(trial, months, input.startDate);
   const vars = { trial: trialPhrase(trial), months };
   return findingOf(rule, 'trial_period', norms, {
     status: over ? 'depends_on_agreement' : 'within_limit',
-    calculation: [
-      phrase(over ? 'trial.over_legal_limit' : 'trial.within_legal_limit', vars),
-      ...notes,
-    ],
+    calculation: [phrase(over ? regime.overPhrase : 'trial.within_legal_limit', vars), ...notes],
     basedOnYourAnswer,
   });
 }
@@ -67,7 +106,7 @@ function againstLimit(
 // opens one reading per limit that could apply, reduced to one when they all agree.
 function generalLimit(context: LimitContext): Assessed {
   const { technical, smallCompany } = context.input;
-  const limit = (months: number) => againstLimit('trial_limits', months, true, context);
+  const limit = (months: number) => againstLimit(context.regime.limits, months, true, context);
   if (technical === true) return single(limit(TECHNICAL_MONTHS));
   if (technical === false) {
     if (smallCompany !== null) return single(limit(othersMonths(smallCompany)));
@@ -99,6 +138,69 @@ function collapse(assessed: Assessed): Assessed {
   return tightest === undefined ? assessed : single(tightest.finding);
 }
 
+// From RDL 39/2026 a trial in a fixed-term contract is at most one month, and in a contract of less
+// than six months the same proportion of it. Over it, only an agreement that justifies it allows more.
+function fixedTermFromRdl39(context: LimitContext): Assessed {
+  const { regime, input, trial, norms } = context;
+  const days = agreedDays(input);
+  const oneMonth = (notes: readonly EmploymentPhrase[]) =>
+    single(againstLimit(regime.temporary, ONE_MONTH, false, { ...context, notes }));
+  if (days === null) {
+    const unknownEnd = phrase('trial.end_unknown_proportional');
+    return oneMonth(exceeds(trial, ONE_MONTH, input.startDate) ? [] : [unknownEnd]);
+  }
+  if (lastsLessThanMonths(input, SHORT_TERM_MONTHS) !== true) return oneMonth([]);
+  const over = trialDays(trial, input.startDate) * SHORT_TERM_MONTHS > days;
+  return single(
+    findingOf(regime.temporary, 'trial_period', norms, {
+      status: over ? 'depends_on_agreement' : 'within_limit',
+      calculation: [
+        phrase(over ? 'trial.over_legal_limit_days' : 'trial.within_legal_limit_days', {
+          trial: trialPhrase(trial),
+          days: Math.floor(days / SHORT_TERM_MONTHS),
+        }),
+      ],
+    }),
+  );
+}
+
+// Up to RDL 39/2026: one month in contracts of six months or less, whose end date may be unknown.
+function fixedTermBeforeRdl39(context: LimitContext): Assessed | null {
+  const { regime, input, trial } = context;
+  const short = lastsAtMostMonths(input, SHORT_TERM_MONTHS);
+  if (short === true) return single(againstLimit(regime.temporary, ONE_MONTH, false, context));
+  if (short === null) {
+    if (!exceeds(trial, ONE_MONTH, input.startDate))
+      return single(againstLimit(regime.temporary, ONE_MONTH, false, context));
+    return generalLimit({
+      ...context,
+      notes: [phrase('trial.temporary_end_unknown', { months: ONE_MONTH })],
+    });
+  }
+  return null;
+}
+
+function legalLimit(context: LimitContext): Assessed {
+  const { regime, input } = context;
+  if (input.modality === 'training_practice')
+    return single(
+      againstLimit('training_practice_trial', ONE_MONTH, false, {
+        ...context,
+        regime: BEFORE_RDL39,
+      }),
+    );
+  if (isFixedTerm(input.modality)) {
+    if (regime.fromRdl39) return fixedTermFromRdl39(context);
+    return fixedTermBeforeRdl39(context) ?? generalLimit(context);
+  }
+  return generalLimit(context);
+}
+
+const staysWithinLaw = (assessed: Assessed): boolean =>
+  assessed.kind === 'single'
+    ? assessed.finding.status === 'within_limit'
+    : assessed.readings.every((r) => r.finding.status === 'within_limit');
+
 const VOID_PHRASE = {
   training_alternance_no_trial: 'trial.void_alternance',
   training_no_new_trial: 'trial.void_after_training',
@@ -117,8 +219,9 @@ function voidTrial(input: EmploymentInput): keyof typeof VOID_PHRASE | null {
 
 export function assessTrialPeriod(input: EmploymentInput, norms: NormTable): Assessed {
   const { trial } = input;
+  const regime = regimeOf(input);
   if (trial === null)
-    return single(findingOf('trial_limits', 'trial_period', norms, { status: 'not_entered' }));
+    return single(findingOf(regime.limits, 'trial_period', norms, { status: 'not_entered' }));
 
   const voidRule = voidTrial(input);
   if (voidRule !== null)
@@ -133,7 +236,7 @@ export function assessTrialPeriod(input: EmploymentInput, norms: NormTable): Ass
   // Art. 14.1 ET: a trial period «podrá concertarse por escrito».
   if (input.writtenContract === false)
     return single(
-      findingOf('trial_limits', 'trial_period', norms, {
+      findingOf(regime.limits, 'trial_period', norms, {
         status: 'missing_requirement',
         calculation: [phrase('trial.not_in_writing', { trial: trialPhrase(trial) })],
         alsoCites: ['written_form'],
@@ -141,14 +244,28 @@ export function assessTrialPeriod(input: EmploymentInput, norms: NormTable): Ass
       }),
     );
 
-  const context: LimitContext = { input, trial, norms, notes: [] };
+  const context: LimitContext = { regime, input, trial, norms, notes: [] };
   const agreed = input.agreement.trialMonths;
   if (agreed !== null) {
     const over = exceeds(trial, agreed, input.startDate);
     const vars = { trial: trialPhrase(trial), months: agreed };
+    // Within an agreement that allows more than the law, the agreement has to justify it.
+    if (
+      !over &&
+      regime.fromRdl39 &&
+      input.modality !== 'training_practice' &&
+      !staysWithinLaw(legalLimit(context))
+    )
+      return single(
+        findingOf(regime.limits, 'trial_period', norms, {
+          status: 'depends_on_agreement',
+          calculation: [phrase('trial.agreement_above_legal_limit', vars)],
+          basedOnYourAnswer: true,
+        }),
+      );
     // The agreement's own limit, as the person gave it: nothing further to defer to.
     return single(
-      findingOf('trial_limits', 'trial_period', norms, {
+      findingOf(regime.limits, 'trial_period', norms, {
         status: over ? 'over_legal_limit' : 'within_limit',
         calculation: [
           phrase(over ? 'trial.over_your_agreement' : 'trial.within_your_agreement', vars),
@@ -158,22 +275,5 @@ export function assessTrialPeriod(input: EmploymentInput, norms: NormTable): Ass
     );
   }
 
-  if (input.modality === 'training_practice')
-    return single(againstLimit('training_practice_trial', ONE_MONTH, false, context));
-
-  if (isFixedTerm(input.modality)) {
-    const short = lastsAtMostMonths(input, SHORT_TERM_MONTHS);
-    if (short === true)
-      return single(againstLimit('trial_temporary_1_month', ONE_MONTH, false, context));
-    // Without an end date the one-month limit may or may not apply; within it nothing changes.
-    if (short === null) {
-      if (!exceeds(trial, ONE_MONTH, input.startDate))
-        return single(againstLimit('trial_temporary_1_month', ONE_MONTH, false, context));
-      return generalLimit({
-        ...context,
-        notes: [phrase('trial.temporary_end_unknown', { months: ONE_MONTH })],
-      });
-    }
-  }
-  return generalLimit(context);
+  return legalLimit(context);
 }

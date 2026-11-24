@@ -385,6 +385,8 @@ export function employmentGuide(
       rules: [
         'trial_limits',
         'trial_temporary_1_month',
+        'trial_limits_2026',
+        'trial_temporary_proportional',
         'trial_void_same_duties',
         'training_practice_trial',
         'training_alternance_no_trial',

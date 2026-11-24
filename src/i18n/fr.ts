@@ -2597,6 +2597,8 @@ export const fr: Translation = {
   'client.employment.finding.written_form': 'Contrat écrit',
   'client.employment.finding.trial_limits': "Période d'essai",
   'client.employment.finding.trial_temporary_1_month': "Période d'essai",
+  'client.employment.finding.trial_limits_2026': "Période d'essai",
+  'client.employment.finding.trial_temporary_proportional': "Période d'essai",
   'client.employment.finding.trial_void_same_duties': "Période d'essai",
   'client.employment.finding.weekly_40': 'Heures par semaine',
   'client.employment.finding.daily_9': 'Heures par jour',
@@ -2864,6 +2866,16 @@ export const fr: Translation = {
     "Période d'essai de {trial}\u00a0; d'après la donnée saisie, votre convention collective permet {months}, et elle le dépasse.",
   'client.employment.calculation.trial.temporary_end_unknown':
     "Sans date de fin, on ne sait pas si le contrat dure 6 mois ou moins\u00a0; si c'est le cas, la limite est de {months}.",
+  'client.employment.calculation.trial.over_legal_limit_justified':
+    "Période d'essai de {trial}\u00a0; elle dépasse la limite légale de {months}, et seule une convention collective qui justifie une période plus longue peut le permettre.",
+  'client.employment.calculation.trial.within_legal_limit_days':
+    "Période d'essai de {trial}\u00a0; dans un contrat de moins de 6 mois, la limite légale est de {days}, la part proportionnelle de 1 mois.",
+  'client.employment.calculation.trial.over_legal_limit_days':
+    "Période d'essai de {trial}\u00a0; dans un contrat de moins de 6 mois, la limite légale est de {days}, la part proportionnelle de 1 mois, et seule une convention collective qui justifie une période plus longue peut permettre davantage.",
+  'client.employment.calculation.trial.agreement_above_legal_limit':
+    "Période d'essai de {trial}\u00a0; selon votre donnée, votre convention collective permet {months}, plus que la limite légale, et cela ne vaut que si la convention le justifie.",
+  'client.employment.calculation.trial.end_unknown_proportional':
+    "Sans date de fin, on ne sait pas combien de temps dure le contrat\u00a0; s'il dure moins de 6 mois, la limite légale est inférieure à 1 mois, proportionnellement à sa durée.",
   'client.employment.calculation.trial.void_alternance':
     "Un contrat de formation en alternance n'admet pas de période d'essai, et le vôtre prévoit {trial}.",
   'client.employment.calculation.trial.void_after_training':

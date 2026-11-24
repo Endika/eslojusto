@@ -45,6 +45,8 @@ export type EmploymentRuleId =
   | 'written_form'
   | 'trial_limits'
   | 'trial_temporary_1_month'
+  | 'trial_limits_2026'
+  | 'trial_temporary_proportional'
   | 'trial_void_same_duties'
   | 'weekly_40'
   | 'daily_9'
@@ -141,6 +143,15 @@ const et = (id: EmploymentRuleId, article: string, anchor: EtArticle): Rule =>
 const reform = (id: EmploymentRuleId, article: string, anchor: EtArticle): Rule =>
   etRule(id, article, anchor, REFORM_SINCE);
 
+const rdl39Trial = (id: EmploymentRuleId): Rule =>
+  rule(
+    id,
+    'rdl39_2026',
+    'Estatuto de los Trabajadores, art. 14.1, según el Real Decreto-ley 39/2026',
+    `${ET}#a14`,
+    RDL39_SINCE,
+  );
+
 const rd723 = (id: EmploymentRuleId, article: string, anchor: string): Rule =>
   rule(id, 'rd723_2026', article, `${RD723_2026}#${anchor}`, RD723_SINCE);
 
@@ -226,9 +237,14 @@ export const RULES: Readonly<Record<EmploymentRuleId, Rule>> = {
   // 8.2: contracts that must be written are presumed full-time and open-ended otherwise.
   written_form: et('written_form', '8.2', 'a8'),
   // 14.1: six months for qualified technicians, two otherwise, three in companies under 25.
-  trial_limits: et('trial_limits', '14.1', 'a14'),
+  trial_limits: { ...et('trial_limits', '14.1', 'a14'), until: '2026-11-18' },
   // 14.1: one month in fixed-term contracts of up to six months.
-  trial_temporary_1_month: et('trial_temporary_1_month', '14.1', 'a14'),
+  trial_temporary_1_month: { ...et('trial_temporary_1_month', '14.1', 'a14'), until: '2026-11-18' },
+  // 14.1 as reworded by RDL 39/2026: the same maxima, exceeded only if the agreement justifies it.
+  trial_limits_2026: rdl39Trial('trial_limits_2026'),
+  // 14.1 as reworded by RDL 39/2026: one month in fixed-term contracts of six months or more, and
+  // the proportional part in shorter ones.
+  trial_temporary_proportional: rdl39Trial('trial_temporary_proportional'),
   // 14.1: void when the same duties were already performed in the company.
   trial_void_same_duties: et('trial_void_same_duties', '14.1', 'a14'),
   // 34.1: forty hours a week on average over the year.

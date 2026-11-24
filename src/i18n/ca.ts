@@ -2460,6 +2460,8 @@ export const ca: Translation = {
   'client.employment.finding.written_form': 'Contracte per escrit',
   'client.employment.finding.trial_limits': 'Període de prova',
   'client.employment.finding.trial_temporary_1_month': 'Període de prova',
+  'client.employment.finding.trial_limits_2026': 'Període de prova',
+  'client.employment.finding.trial_temporary_proportional': 'Període de prova',
   'client.employment.finding.trial_void_same_duties': 'Període de prova',
   'client.employment.finding.weekly_40': 'Hores a la setmana',
   'client.employment.finding.daily_9': 'Hores al dia',
@@ -2726,6 +2728,16 @@ export const ca: Translation = {
     'Període de prova de {trial}; segons la teva dada, el teu conveni en permet {months}, i en passa.',
   'client.employment.calculation.trial.temporary_end_unknown':
     'Sense data de finalització no se sap si el contracte dura 6 mesos o menys; si és així, el límit és de {months}.',
+  'client.employment.calculation.trial.over_legal_limit_justified':
+    'Període de prova de {trial}; passa del límit legal de {months}, i només un conveni que justifiqui un període més llarg ho pot permetre.',
+  'client.employment.calculation.trial.within_legal_limit_days':
+    "Període de prova de {trial}; en un contracte de menys de 6 mesos el límit legal és de {days}, la part proporcional d'1 mes.",
+  'client.employment.calculation.trial.over_legal_limit_days':
+    "Període de prova de {trial}; en un contracte de menys de 6 mesos el límit legal és de {days}, la part proporcional d'1 mes, i només un conveni que justifiqui un període més llarg en pot permetre més.",
+  'client.employment.calculation.trial.agreement_above_legal_limit':
+    'Període de prova de {trial}; segons la teva dada, el teu conveni en permet {months}, més que el límit legal, i només val si el conveni ho justifica.',
+  'client.employment.calculation.trial.end_unknown_proportional':
+    'Sense data de finalització no se sap quant dura el contracte; si dura menys de 6 mesos, el límit legal és inferior a 1 mes, en proporció a la seva durada.',
   'client.employment.calculation.trial.void_alternance':
     'En un contracte de formació en alternança no hi pot haver període de prova, i el teu en posa {trial}.',
   'client.employment.calculation.trial.void_after_training':

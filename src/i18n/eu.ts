@@ -2517,6 +2517,8 @@ export const eu: Translation = {
   'client.employment.finding.written_form': 'Idatzizko kontratua',
   'client.employment.finding.trial_limits': 'Proba-aldia',
   'client.employment.finding.trial_temporary_1_month': 'Proba-aldia',
+  'client.employment.finding.trial_limits_2026': 'Proba-aldia',
+  'client.employment.finding.trial_temporary_proportional': 'Proba-aldia',
   'client.employment.finding.trial_void_same_duties': 'Proba-aldia',
   'client.employment.finding.weekly_40': 'Asteko orduak',
   'client.employment.finding.daily_9': 'Eguneko orduak',
@@ -2783,6 +2785,16 @@ export const eu: Translation = {
     'Proba-aldia: {trial}; zure datuaren arabera, zure hitzarmenak {months} onartzen ditu, eta gainditu egiten ditu.',
   'client.employment.calculation.trial.temporary_end_unknown':
     'Amaiera-datarik gabe ez da jakiten kontratuak 6 hilabete edo gutxiago irauten duen; hala bada, muga {months} da.',
+  'client.employment.calculation.trial.over_legal_limit_justified':
+    'Proba-aldia: {trial}; legezko muga ({months}) gainditzen du, eta aldi luzeagoa justifikatzen duen hitzarmen batek bakarrik onar dezake.',
+  'client.employment.calculation.trial.within_legal_limit_days':
+    'Proba-aldia: {trial}; 6 hilabete baino gutxiagoko kontratu batean legezko muga {days} da, hilabete 1en zati proportzionala.',
+  'client.employment.calculation.trial.over_legal_limit_days':
+    'Proba-aldia: {trial}; 6 hilabete baino gutxiagoko kontratu batean legezko muga {days} da, hilabete 1en zati proportzionala, eta aldi luzeagoa justifikatzen duen hitzarmen batek bakarrik onar dezake gehiago.',
+  'client.employment.calculation.trial.agreement_above_legal_limit':
+    'Proba-aldia: {trial}; zure datuaren arabera, zure hitzarmenak {months} onartzen ditu, legezko muga baino gehiago, eta hitzarmenak justifikatzen badu bakarrik balio du.',
+  'client.employment.calculation.trial.end_unknown_proportional':
+    'Amaiera-datarik gabe ez da jakiten kontratuak zenbat irauten duen; 6 hilabete baino gutxiago badu, legezko muga hilabete 1 baino txikiagoa da, kontratuaren iraupenaren proportzioan.',
   'client.employment.calculation.trial.void_alternance':
     'Txandakako prestakuntza-kontratu batean ez dago proba-aldirik, eta zurean {trial} ageri da.',
   'client.employment.calculation.trial.void_after_training':

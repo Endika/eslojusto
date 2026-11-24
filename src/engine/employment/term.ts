@@ -25,8 +25,20 @@ export const isOpenEnded = (modality: Modality): boolean =>
 export const agreedDays = (input: EmploymentInput): number | null =>
   input.endDate === null ? null : calendarDays(input.startDate, input.endDate);
 
-// Whether the agreed term fits within `months` counted from the start day.
-export const lastsAtMostMonths = (input: EmploymentInput, months: number): boolean | null =>
+// Where the agreed end falls against `months` counted from the start day; null without an end date.
+const againstMonths = (input: EmploymentInput, months: number): number | null =>
   input.endDate === null
     ? null
-    : compareDates(input.endDate, addDays(addMonthsClamped(input.startDate, months), -1)) <= 0;
+    : compareDates(input.endDate, addDays(addMonthsClamped(input.startDate, months), -1));
+
+// Whether the agreed term fits within `months` counted from the start day.
+export const lastsAtMostMonths = (input: EmploymentInput, months: number): boolean | null => {
+  const against = againstMonths(input, months);
+  return against === null ? null : against <= 0;
+};
+
+// Whether the agreed term ends before `months` counted from the start day are complete.
+export const lastsLessThanMonths = (input: EmploymentInput, months: number): boolean | null => {
+  const against = againstMonths(input, months);
+  return against === null ? null : against < 0;
+};

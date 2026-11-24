@@ -2307,6 +2307,8 @@ export const zh: Translation = {
   'client.employment.finding.written_form': '书面合同',
   'client.employment.finding.trial_limits': '试用期',
   'client.employment.finding.trial_temporary_1_month': '试用期',
+  'client.employment.finding.trial_limits_2026': '试用期',
+  'client.employment.finding.trial_temporary_proportional': '试用期',
   'client.employment.finding.trial_void_same_duties': '试用期',
   'client.employment.finding.weekly_40': '每周小时数',
   'client.employment.finding.daily_9': '每天小时数',
@@ -2563,6 +2565,16 @@ export const zh: Translation = {
     '试用期为{trial}；根据您的数据，您的集体协议允许{months}，试用期超过了这一期限。',
   'client.employment.calculation.trial.temporary_end_unknown':
     '没有结束日期，无法知道合同期限是否为6个月或以下；如果是，上限为{months}。',
+  'client.employment.calculation.trial.over_legal_limit_justified':
+    '试用期为{trial}；超过了{months}的法定上限，只有能说明理由的集体协议才可以允许更长的期限。',
+  'client.employment.calculation.trial.within_legal_limit_days':
+    '试用期为{trial}；合同期限不满6个月的，法定上限为{days}，即1个月按比例折算的部分。',
+  'client.employment.calculation.trial.over_legal_limit_days':
+    '试用期为{trial}；合同期限不满6个月的，法定上限为{days}，即1个月按比例折算的部分，只有能说明理由的集体协议才可以允许更长的期限。',
+  'client.employment.calculation.trial.agreement_above_legal_limit':
+    '试用期为{trial}；根据您的数据，您的集体协议允许{months}，高于法定上限，只有协议说明了理由才有效。',
+  'client.employment.calculation.trial.end_unknown_proportional':
+    '没有结束日期，无法知道合同期限有多长；如果不满6个月，法定上限不足1个月，按合同期限比例计算。',
   'client.employment.calculation.trial.void_alternance':
     '工学交替培训合同不得设立试用期，而您的合同规定了{trial}。',
   'client.employment.calculation.trial.void_after_training':

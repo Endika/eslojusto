@@ -2524,6 +2524,8 @@ export const ro: Translation = {
   'client.employment.finding.written_form': 'Contractul în scris',
   'client.employment.finding.trial_limits': 'Perioada de probă',
   'client.employment.finding.trial_temporary_1_month': 'Perioada de probă',
+  'client.employment.finding.trial_limits_2026': 'Perioada de probă',
+  'client.employment.finding.trial_temporary_proportional': 'Perioada de probă',
   'client.employment.finding.trial_void_same_duties': 'Perioada de probă',
   'client.employment.finding.weekly_40': 'Ore pe săptămână',
   'client.employment.finding.daily_9': 'Ore pe zi',
@@ -2791,6 +2793,16 @@ export const ro: Translation = {
     'Perioadă de probă de {trial}; potrivit informației tale, contractul tău colectiv permite {months}, iar aceasta o depășește.',
   'client.employment.calculation.trial.temporary_end_unknown':
     'Fără dată de sfârșit nu se știe dacă contractul durează 6 luni sau mai puțin; dacă da, limita este de {months}.',
+  'client.employment.calculation.trial.over_legal_limit_justified':
+    'Perioadă de probă de {trial}; depășește limita legală de {months}, iar o perioadă mai lungă o poate permite doar un contract colectiv care o justifică.',
+  'client.employment.calculation.trial.within_legal_limit_days':
+    'Perioadă de probă de {trial}; într-un contract de mai puțin de 6 luni, limita legală este de {days}, partea proporțională din 1 lună.',
+  'client.employment.calculation.trial.over_legal_limit_days':
+    'Perioadă de probă de {trial}; într-un contract de mai puțin de 6 luni, limita legală este de {days}, partea proporțională din 1 lună, iar mai mult poate permite doar un contract colectiv care justifică o perioadă mai lungă.',
+  'client.employment.calculation.trial.agreement_above_legal_limit':
+    'Perioadă de probă de {trial}; potrivit informației tale, contractul tău colectiv permite {months}, mai mult decât limita legală, și asta e valabil doar dacă acel contract o justifică.',
+  'client.employment.calculation.trial.end_unknown_proportional':
+    'Fără dată de sfârșit nu se știe cât durează contractul; dacă durează mai puțin de 6 luni, limita legală este sub 1 lună, proporțional cu durata lui.',
   'client.employment.calculation.trial.void_alternance':
     'La un contract de formare în alternanță nu este posibilă perioada de probă, iar al tău prevede {trial}.',
   'client.employment.calculation.trial.void_after_training':
