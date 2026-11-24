@@ -18,7 +18,7 @@ export const PATH = '/alquiler/irav-ipc/';
 export const FIRST_MONTH = '2024-11';
 
 // The day the norms' status on this page was last checked against the BOE.
-export const NORMS_CHECKED_ON = '2026-10-12';
+export const NORMS_CHECKED_ON = '2026-11-24';
 
 // Each month the norms are read again; a check older than this is due.
 const NORMS_REVIEW_DAYS = 35;
