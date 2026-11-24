@@ -49,7 +49,7 @@ describe('the final pay FAQ', () => {
     expect(answer).toContain('art. 55.5 ET');
     expect(answer).toContain('Ley 15/2022, arts. 2.1 y 26');
     expect(answer).toContain('sin dar cifras');
-    expect(answer).toContain('20 días hábiles (art. 59.3 ET)');
+    expect(answer).toContain('20 días hábiles (art. 59.4 ET)');
   });
 
   it('puts late interest on salary only, at the engine rate, with a year to claim', () => {

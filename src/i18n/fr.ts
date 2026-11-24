@@ -307,10 +307,10 @@ export const fr: Translation = {
   'faq.deadlines':
     'De quel délai est-ce que je dispose pour demander ce qui manque dans mon solde de tout compte\u00a0?',
   'faq.deadlines_answer':
-    "Pour des sommes comme le salaire restant dû, les congés, les primes extraordinaires ou l'indemnité de fin de contrat à durée déterminée, un an (art. 59.1 ET). En cas de licenciement (pour motif objectif, collectif, injustifié ou disciplinaire), le délai pour le contester est de 20 jours ouvrables (art. 59.3 ET), et la personne en désaccord avec son indemnité la conteste en général par cette même voie. Le délai est court, et un cabinet d'avocats en droit du travail, un cabinet de graduado social ou un syndicat peuvent vous dire lequel s'applique à votre cas.",
+    "Pour des sommes comme le salaire restant dû, les congés, les primes extraordinaires ou l'indemnité de fin de contrat à durée déterminée, un an (art. 59.1 ET). En cas de licenciement (pour motif objectif, collectif, injustifié ou disciplinaire), le délai pour le contester est de 20 jours ouvrables (art. 59.4 ET), et la personne en désaccord avec son indemnité la conteste en général par cette même voie. Le délai est court, et un cabinet d'avocats en droit du travail, un cabinet de graduado social ou un syndicat peuvent vous dire lequel s'applique à votre cas.",
   'faq.null_dismissal': 'Quand un licenciement peut-il être nul\u00a0?',
   'faq.null_dismissal_answer':
-    "Si le licenciement intervient pendant une grossesse, pendant un congé de naissance, d'adoption, de garde ou d'accueil familial ou dans les 12 mois qui suivent le retour de ce congé, alors que vous aviez ou aviez demandé un congé, une réduction ou une adaptation du temps de travail ou un congé pour s'occuper d'un proche (excedencia por cuidado), ou si vous êtes victime de violence de genre ou sexuelle, il pourrait être nul, sauf si le motif n'a rien à voir avec cette situation (art. 55.5 ET). En arrêt maladie, il pourrait l'être si le motif est la maladie (Ley 15/2022, arts. 2.1 et 26), même si les tribunaux ne l'appliquent pas encore de manière uniforme. La vérification vous avertit si vous le cochez, sans donner de chiffres pour ce cas. Pour contester le licenciement, le délai est de 20 jours ouvrables (art. 59.3 ET).",
+    "Si le licenciement intervient pendant une grossesse, pendant un congé de naissance, d'adoption, de garde ou d'accueil familial ou dans les 12 mois qui suivent le retour de ce congé, alors que vous aviez ou aviez demandé un congé, une réduction ou une adaptation du temps de travail ou un congé pour s'occuper d'un proche (excedencia por cuidado), ou si vous êtes victime de violence de genre ou sexuelle, il pourrait être nul, sauf si le motif n'a rien à voir avec cette situation (art. 55.5 ET). En arrêt maladie, il pourrait l'être si le motif est la maladie (Ley 15/2022, arts. 2.1 et 26), même si les tribunaux ne l'appliquent pas encore de manière uniforme. La vérification vous avertit si vous le cochez, sans donner de chiffres pour ce cas. Pour contester le licenciement, le délai est de 20 jours ouvrables (art. 59.4 ET).",
   'faq.late_interest': "Et si l'on ne m'a pas encore versé le solde de tout compte\u00a0?",
   'faq.late_interest_answer':
     "Ce qui relève du salaire porte des intérêts de retard de 10 % par an à compter de la date de sortie (art. 29.3 ET), même si le montant est contesté (STS du 17 juin 2014, rcud 1315/2013). La vérification les calcule sur le minimum légal du salaire du mois de sortie et des primes extraordinaires. L'indemnité n'en porte pas, et les congés non pris ne sont pas ajoutés, car il est douteux qu'ils en portent. Le délai pour demander les sommes du solde de tout compte est d'un an à compter de la date de sortie (art. 59.1 et 59.2 ET).",
@@ -405,9 +405,9 @@ export const fr: Translation = {
   'client.summary.benefit_unknown':
     "Le chômage dépend du motif\u00a0: un licenciement ou la fin d'un contrat à durée déterminée y ouvrent droit si vous totalisez au moins 360 jours cotisés au cours des 6 dernières années\u00a0; une démission, non.",
   'client.summary.dismissal_deadline':
-    'Le délai pour contester un licenciement est de 20 jours ouvrables (art. 59.3 ET).',
+    'Le délai pour contester un licenciement est de 20 jours ouvrables (art. 59.4 ET).',
   'client.summary.dismissal_deadline_if':
-    "S'il s'agit d'un licenciement, le délai pour le contester est de 20 jours ouvrables (art. 59.3 ET).",
+    "S'il s'agit d'un licenciement, le délai pour le contester est de 20 jours ouvrables (art. 59.4 ET).",
   'client.summary.benefit_deadline':
     "Pour toucher le chômage, il faut vous inscrire comme demandeur d'emploi et en faire la demande dans les 15 jours qui suivent la fin du contrat (jours ouvrables, selon le SEPE). Si votre solde de tout compte paie des congés non pris, le délai court à partir de la fin de ces jours (arts. 266 et 268 LGSS).",
   'client.status.below_minimum': 'En dessous du minimum légal\u00a0: il manque {importe}',
@@ -420,7 +420,7 @@ export const fr: Translation = {
     "Vous n'avez pas saisi le chiffre de votre solde de tout compte",
   'client.status.no_severance': "La loi ne prévoit pas d'indemnité dans ce cas",
   'client.status.no_severance_disciplinary':
-    "Si le licenciement est justifié, il n'y a pas d'indemnité (art. 55.7 ET). S'il était déclaré injustifié, la référence serait de {importe}\u00a0; le délai pour contester un licenciement est de 20 jours ouvrables (art. 59.3 ET).",
+    "Si le licenciement est justifié, il n'y a pas d'indemnité (art. 55.7 ET). S'il était déclaré injustifié, la référence serait de {importe}\u00a0; le délai pour contester un licenciement est de 20 jours ouvrables (art. 59.4 ET).",
   'client.status.not_checkable_days':
     'Impossible à vérifier sans les jours de congé que vous avez pris',
   'client.status.not_checkable_cause': "Sans le motif, l'indemnité n'est pas calculée",
@@ -604,7 +604,7 @@ export const fr: Translation = {
   'client.warning.null_dismissal.effects':
     "Si un tribunal le déclarait nul, l'entreprise devrait vous réintégrer et vous verser les salaires que vous n'avez pas perçus (arts. 55.6 et 53.5 ET). Cette vérification ne calcule pas de chiffres pour ce cas.",
   'client.warning.null_dismissal.deadline':
-    "Pour contester le licenciement, le délai est de 20 jours ouvrables à compter de la date de sortie (art. 59.3 ET)\u00a0; le dépôt de la demande de conciliation (papeleta de conciliación) interrompt le délai. Un cabinet d'avocats en droit du travail, un cabinet de conseil en droit social ou un syndicat peuvent vous dire comment il s'applique à votre cas.",
+    "Pour contester le licenciement, le délai est de 20 jours ouvrables à compter de la date de sortie (art. 59.4 ET)\u00a0; le dépôt de la demande de conciliation (papeleta de conciliación) interrompt le délai. Un cabinet d'avocats en droit du travail, un cabinet de conseil en droit social ou un syndicat peuvent vous dire comment il s'applique à votre cas.",
   'client.warning.erte_unknown.title': 'Si vous étiez en ERTE',
   'client.warning.erte_unknown':
     "Avec un ERTE, l'indemnité devrait être calculée avec le salaire complet d'avant l'ERTE\u00a0: avec un temps de travail réduit, celui d'avant la réduction (STS 678/2018)\u00a0; avec le contrat suspendu, ce qui a été perçu pendant les mois travaillés (STS 638/2022). Si l'un de vos derniers bulletins de paie correspond à un ERTE, l'indemnité de cette vérification peut être trop basse.",
@@ -622,7 +622,7 @@ export const fr: Translation = {
   'client.warning.late_interest.lapsed':
     "Plus d'un an s'est écoulé depuis la date de sortie\u00a0: le droit peut donc être prescrit (art. 59.1 et 59.2 ET), sauf si quelque chose a interrompu le délai. C'est pourquoi les intérêts ne sont pas calculés.",
   'client.warning.late_interest.other_deadline':
-    "C'est un délai différent des 20 jours ouvrables pour contester un licenciement (art. 59.3 ET).",
+    "C'est un délai différent des 20 jours ouvrables pour contester un licenciement (art. 59.4 ET).",
   'client.unchecked.net_pay': "Le net\u00a0: retenues d'IRPF (impôt sur le revenu) et cotisations",
   'client.unchecked.bonuses':
     'Primes, compléments de salaire, heures supplémentaires et commissions prévus par votre convention collective ou votre contrat',
@@ -1187,7 +1187,7 @@ export const fr: Translation = {
   'landing.unfair_dismissal.faq.5.question':
     'Quel est le délai pour contester un licenciement\u00a0?',
   'landing.unfair_dismissal.faq.5.answer':
-    "20 jours ouvrables à compter du licenciement (art. 59.3 ET). C'est court, et un cabinet d'avocats en droit du travail, un cabinet de graduado social (conseil en droit social) ou un syndicat peuvent vous dire comment il s'applique à votre cas.",
+    "20 jours ouvrables à compter du licenciement (art. 59.4 ET). C'est court, et un cabinet d'avocats en droit du travail, un cabinet de graduado social (conseil en droit social) ou un syndicat peuvent vous dire comment il s'applique à votre cas.",
   'landing.fixed_term_end.name': 'Solde de tout compte en fin de contrat à durée déterminée',
   'landing.fixed_term_end.title':
     'Solde de tout compte (finiquito) en fin de contrat 2026\u00a0: calculez-le et comparez-le',
@@ -1240,7 +1240,7 @@ export const fr: Translation = {
     "Oui. La personne salariée peut demander la présence d'un représentant légal du personnel au moment de signer le solde de tout compte, et si elle ne le demande pas, le document le mentionne (art. 49.2 ET).",
   'landing.not_agreed.faq.4.question': 'Quel est le délai si un montant ne correspond pas\u00a0?',
   'landing.not_agreed.faq.4.answer':
-    "Pour le salaire restant à percevoir, les congés, les primes extraordinaires ou l'indemnité de fin de contrat à durée déterminée, un an (art. 59.1 ET). En cas de licenciement, le délai pour le contester est de 20 jours ouvrables (art. 59.3 ET).",
+    "Pour le salaire restant à percevoir, les congés, les primes extraordinaires ou l'indemnité de fin de contrat à durée déterminée, un an (art. 59.1 ET). En cas de licenciement, le délai pour le contester est de 20 jours ouvrables (art. 59.4 ET).",
   'landing.benefit.name': 'Calculez le montant de votre allocation chômage',
   'landing.benefit.title':
     'Calculer le chômage (paro) 2026\u00a0: combien vous toucherez chaque mois',

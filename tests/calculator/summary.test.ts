@@ -226,7 +226,7 @@ const data = (r: ReturnType<typeof completed>) => ({
 describe('the deadlines in the summary', () => {
   it('a dismissal: the 20 days to challenge it and the 15 to ask for the benefit', () => {
     expect(summaryOf(completed()).deadlines).toEqual([
-      'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
+      'El plazo para impugnar un despido es de 20 días hábiles (art. 59.4 ET).',
       'Para cobrar el paro tienes que inscribirte como demandante de empleo y pedirlo en los 15 días siguientes al fin del contrato (hábiles, según el SEPE). Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (arts. 266 y 268 LGSS).',
     ]);
   });
@@ -245,7 +245,7 @@ describe('the deadlines in the summary', () => {
   it('«No lo sé»: the 20 days in case it was a dismissal', () => {
     const unknown = completed({ ...unfairDismissal, cause: 'unknown' });
     expect(summaryOf(unknown).deadlines[0]).toBe(
-      'Si fue un despido, el plazo para impugnarlo es de 20 días hábiles (art. 59.3 ET).',
+      'Si fue un despido, el plazo para impugnarlo es de 20 días hábiles (art. 59.4 ET).',
     );
   });
 });

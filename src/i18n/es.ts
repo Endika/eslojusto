@@ -453,10 +453,10 @@ export const es = {
     'Marca «No lo sé». Se revisan las partidas que no dependen de la causa: el salario del mes de la baja, las vacaciones y las pagas extra. La indemnización depende de la causa y sin ella no se calcula. La causa está en la carta de despido y en el certificado de empresa, en la casilla «causa de la situación legal de desempleo».',
   'faq.deadlines': '¿Qué plazo tengo para pedir lo que falta en mi finiquito?',
   'faq.deadlines_answer':
-    'Para cantidades como el salario pendiente, las vacaciones, las pagas extra o la indemnización por fin de contrato temporal, un año (art. 59.1 ET). En un despido (objetivo, colectivo, improcedente o disciplinario), el plazo para impugnarlo es de 20 días hábiles (art. 59.3 ET), y quien no esté de acuerdo con su indemnización suele plantearlo por esa misma vía. El plazo es corto, y un despacho laboralista, un despacho de graduado social o un sindicato pueden decirte cuál se aplica a tu caso.',
+    'Para cantidades como el salario pendiente, las vacaciones, las pagas extra o la indemnización por fin de contrato temporal, un año (art. 59.1 ET). En un despido (objetivo, colectivo, improcedente o disciplinario), el plazo para impugnarlo es de 20 días hábiles (art. 59.4 ET), y quien no esté de acuerdo con su indemnización suele plantearlo por esa misma vía. El plazo es corto, y un despacho laboralista, un despacho de graduado social o un sindicato pueden decirte cuál se aplica a tu caso.',
   'faq.null_dismissal': '¿Cuándo puede ser nulo un despido?',
   'faq.null_dismissal_answer':
-    'Si te despiden estando embarazada, de permiso por nacimiento, adopción, guarda o acogimiento o en los 12 meses después de volver de él, teniendo o habiendo pedido un permiso, una reducción o una adaptación de jornada o una excedencia por cuidado, o siendo víctima de violencia de género o sexual, el despido podría ser nulo, salvo que el motivo no tenga nada que ver con esa situación (art. 55.5 ET). Estando de baja médica, podría serlo si el motivo es la enfermedad (Ley 15/2022, arts. 2.1 y 26), aunque los tribunales todavía no lo aplican de forma uniforme. La revisión te avisa si lo marcas, sin dar cifras para ese caso. Para impugnar el despido hay 20 días hábiles (art. 59.3 ET).',
+    'Si te despiden estando embarazada, de permiso por nacimiento, adopción, guarda o acogimiento o en los 12 meses después de volver de él, teniendo o habiendo pedido un permiso, una reducción o una adaptación de jornada o una excedencia por cuidado, o siendo víctima de violencia de género o sexual, el despido podría ser nulo, salvo que el motivo no tenga nada que ver con esa situación (art. 55.5 ET). Estando de baja médica, podría serlo si el motivo es la enfermedad (Ley 15/2022, arts. 2.1 y 26), aunque los tribunales todavía no lo aplican de forma uniforme. La revisión te avisa si lo marcas, sin dar cifras para ese caso. Para impugnar el despido hay 20 días hábiles (art. 59.4 ET).',
   'faq.late_interest': '¿Y si todavía no me han pagado el finiquito?',
   'faq.late_interest_answer':
     'Lo que es salario lleva un interés por el retraso del 10 % al año desde la baja (art. 29.3 ET), aunque la cantidad se discuta (STS de 17 de junio de 2014, rcud 1315/2013). La revisión lo cuenta sobre el mínimo legal del salario del mes de la baja y de las pagas extra. La indemnización no lo lleva, y las vacaciones no disfrutadas no se suman porque es dudoso que lo lleven. Para reclamar las cantidades del finiquito hay un año desde la baja (art. 59.1 y 59.2 ET).',
@@ -767,9 +767,9 @@ export const es = {
   'client.summary.benefit_unknown':
     'El paro depende de la causa: un despido o el fin de un contrato temporal dan derecho si sumas al menos 360 días cotizados en los últimos 6 años; una baja voluntaria, no.',
   'client.summary.dismissal_deadline':
-    'El plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
+    'El plazo para impugnar un despido es de 20 días hábiles (art. 59.4 ET).',
   'client.summary.dismissal_deadline_if':
-    'Si fue un despido, el plazo para impugnarlo es de 20 días hábiles (art. 59.3 ET).',
+    'Si fue un despido, el plazo para impugnarlo es de 20 días hábiles (art. 59.4 ET).',
   'client.summary.benefit_deadline':
     'Para cobrar el paro tienes que inscribirte como demandante de empleo y pedirlo en los 15 días siguientes al fin del contrato (hábiles, según el SEPE). Si tu finiquito paga vacaciones no disfrutadas, el plazo cuenta desde que terminan esos días (arts. 266 y 268 LGSS).',
 
@@ -782,7 +782,7 @@ export const es = {
   'client.status.no_employer_figure': 'No has metido la cifra de tu finiquito',
   'client.status.no_severance': 'No te corresponde indemnización por ley en este caso',
   'client.status.no_severance_disciplinary':
-    'Si el despido es procedente, no hay indemnización (art. 55.7 ET). Si se declarara improcedente, la referencia sería {importe}; el plazo para impugnar un despido es de 20 días hábiles (art. 59.3 ET).',
+    'Si el despido es procedente, no hay indemnización (art. 55.7 ET). Si se declarara improcedente, la referencia sería {importe}; el plazo para impugnar un despido es de 20 días hábiles (art. 59.4 ET).',
   'client.status.not_checkable_days': 'No se puede comprobar sin los días que has disfrutado',
   'client.status.not_checkable_cause': 'Sin la causa no se calcula la indemnización',
   'client.status.not_checkable_erte': 'No se puede comprobar sin tu salario de antes del ERTE',
@@ -969,7 +969,7 @@ export const es = {
   'client.warning.null_dismissal.effects':
     'Si un juzgado lo declarase nulo, la empresa tendría que readmitirte y pagarte los salarios que dejaste de cobrar (arts. 55.6 y 53.5 ET). Esta revisión no calcula cifras para ese caso.',
   'client.warning.null_dismissal.deadline':
-    'Para impugnar el despido hay 20 días hábiles desde la fecha de baja (art. 59.3 ET); presentar la papeleta de conciliación interrumpe el plazo. Un despacho laboralista, una asesoría laboral o un sindicato pueden decirte cómo se aplica a tu caso.',
+    'Para impugnar el despido hay 20 días hábiles desde la fecha de baja (art. 59.4 ET); presentar la papeleta de conciliación interrumpe el plazo. Un despacho laboralista, una asesoría laboral o un sindicato pueden decirte cómo se aplica a tu caso.',
   'client.warning.erte_unknown.title': 'Si estabas en un ERTE',
   'client.warning.erte_unknown':
     'Con un ERTE, la indemnización debería calcularse con el salario completo de antes del ERTE: con jornada reducida, el de antes de la reducción (STS 678/2018); con el contrato suspendido, lo cobrado en los meses trabajados (STS 638/2022). Si alguna de tus últimas nóminas es de un ERTE, la indemnización de esta revisión puede quedarse corta.',
@@ -987,7 +987,7 @@ export const es = {
   'client.warning.late_interest.lapsed':
     'Ha pasado más de un año desde la baja, así que puede haber prescrito (art. 59.1 y 59.2 ET), salvo que algo interrumpiera el plazo. Por eso no se cuenta el interés.',
   'client.warning.late_interest.other_deadline':
-    'Es un plazo distinto de los 20 días hábiles para impugnar un despido (art. 59.3 ET).',
+    'Es un plazo distinto de los 20 días hábiles para impugnar un despido (art. 59.4 ET).',
 
   'client.unchecked.net_pay': 'El neto: retenciones de IRPF y cotizaciones',
   'client.unchecked.bonuses':
@@ -7746,7 +7746,7 @@ export const es = {
     'Sí. Cualquier despido es situación legal de desempleo (art. 267.1.a.3.º LGSS). Además hacen falta 360 días cotizados en los últimos 6 años, entre otros requisitos.',
   'landing.unfair_dismissal.faq.5.question': '¿Qué plazo hay para impugnar un despido?',
   'landing.unfair_dismissal.faq.5.answer':
-    '20 días hábiles desde el despido (art. 59.3 ET). Es corto, y un despacho laboralista, un despacho de graduado social o un sindicato pueden decirte cómo se aplica a tu caso.',
+    '20 días hábiles desde el despido (art. 59.4 ET). Es corto, y un despacho laboralista, un despacho de graduado social o un sindicato pueden decirte cómo se aplica a tu caso.',
 
   'landing.fixed_term_end.name': 'Finiquito por fin de contrato temporal',
   'landing.fixed_term_end.title': 'Finiquito por fin de contrato 2026: calcúlalo y compáralo',
@@ -7792,7 +7792,7 @@ export const es = {
     'Sí. La persona trabajadora puede pedir la presencia de un representante legal de la plantilla en el momento de firmar el finiquito, y si no lo pide, el documento lo hace constar (art. 49.2 ET).',
   'landing.not_agreed.faq.4.question': '¿Qué plazo hay si una cantidad no cuadra?',
   'landing.not_agreed.faq.4.answer':
-    'Para el salario pendiente, las vacaciones, las pagas extra o la indemnización por fin de contrato temporal, un año (art. 59.1 ET). En un despido, el plazo para impugnarlo es de 20 días hábiles (art. 59.3 ET).',
+    'Para el salario pendiente, las vacaciones, las pagas extra o la indemnización por fin de contrato temporal, un año (art. 59.1 ET). En un despido, el plazo para impugnarlo es de 20 días hábiles (art. 59.4 ET).',
 
   'landing.benefit.name': 'Calcula cuánto paro vas a cobrar',
   'landing.benefit.title': 'Calcular el paro 2026: cuánto cobrarás cada mes',

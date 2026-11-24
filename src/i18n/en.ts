@@ -296,10 +296,10 @@ export const en: Translation = {
     "Choose “I don't know”. The items that do not depend on the reason are reviewed: pay for the month you leave, holiday and extra payments. Severance pay depends on the reason and is not calculated without it. The reason is in the dismissal letter and in the employer's certificate (certificado de empresa), in the box «causa de la situación legal de desempleo» (reason for the legal situation of unemployment).",
   'faq.deadlines': 'What time limit do I have to ask for what is missing from my final settlement?',
   'faq.deadlines_answer':
-    'For amounts such as outstanding pay, holiday, extra payments or severance pay at the end of a fixed-term contract, one year (art. 59.1 ET). In a dismissal (objective-grounds, collective, unfair or disciplinary), the time limit to challenge it is 20 business days (días hábiles) (art. 59.3 ET), and anyone who disagrees with their severance pay usually raises it through that same route. The time limit is short, and an employment law firm, a graduado social (labour relations adviser) office or a trade union can tell you which one applies to your case.',
+    'For amounts such as outstanding pay, holiday, extra payments or severance pay at the end of a fixed-term contract, one year (art. 59.1 ET). In a dismissal (objective-grounds, collective, unfair or disciplinary), the time limit to challenge it is 20 business days (días hábiles) (art. 59.4 ET), and anyone who disagrees with their severance pay usually raises it through that same route. The time limit is short, and an employment law firm, a graduado social (labour relations adviser) office or a trade union can tell you which one applies to your case.',
   'faq.null_dismissal': 'When can a dismissal be void?',
   'faq.null_dismissal_answer':
-    'If you are dismissed while pregnant, on leave for birth, adoption, guardianship or foster care or in the 12 months after returning from it, while having or having requested leave, reduced or adjusted working hours or a leave of absence for caring for someone, or while being a victim of gender-based or sexual violence, the dismissal could be void (nulo), unless the reason has nothing to do with that situation (art. 55.5 ET). While on sick leave, it could be void if the reason is the illness (Ley 15/2022, arts. 2.1 and 26), although the courts do not yet apply this consistently. The review warns you if you tick it, without giving figures for that case. There are 20 business days (días hábiles) to challenge the dismissal (art. 59.3 ET).',
+    'If you are dismissed while pregnant, on leave for birth, adoption, guardianship or foster care or in the 12 months after returning from it, while having or having requested leave, reduced or adjusted working hours or a leave of absence for caring for someone, or while being a victim of gender-based or sexual violence, the dismissal could be void (nulo), unless the reason has nothing to do with that situation (art. 55.5 ET). While on sick leave, it could be void if the reason is the illness (Ley 15/2022, arts. 2.1 and 26), although the courts do not yet apply this consistently. The review warns you if you tick it, without giving figures for that case. There are 20 business days (días hábiles) to challenge the dismissal (art. 59.4 ET).',
   'faq.late_interest': 'What if I have not been paid the final settlement yet?',
   'faq.late_interest_answer':
     'Whatever is pay carries late-payment interest of 10 % a year from the leaving date (art. 29.3 ET), even if the amount is disputed (STS of 17 June 2014, rcud 1315/2013). The review counts it on the legal minimum of the pay for the month you leave and of the extra payments. Severance pay does not carry it, and untaken holiday is not added because it is doubtful whether it carries it. The time limit for claiming the final settlement amounts is one year from the leaving date (art. 59.1 and 59.2 ET).',
@@ -390,9 +390,9 @@ export const en: Translation = {
   'client.summary.benefit_unknown':
     'Unemployment benefit depends on the reason: a dismissal or the end of a fixed-term contract gives entitlement if you have at least 360 days of contributions in the last 6 years; a resignation does not.',
   'client.summary.dismissal_deadline':
-    'The time limit to challenge a dismissal is 20 business days (días hábiles) (art. 59.3 ET).',
+    'The time limit to challenge a dismissal is 20 business days (días hábiles) (art. 59.4 ET).',
   'client.summary.dismissal_deadline_if':
-    'If it was a dismissal, the time limit to challenge it is 20 business days (días hábiles) (art. 59.3 ET).',
+    'If it was a dismissal, the time limit to challenge it is 20 business days (días hábiles) (art. 59.4 ET).',
   'client.summary.benefit_deadline':
     'To receive unemployment benefit you have to register as a jobseeker and apply within the 15 days after the contract ends (business days, according to SEPE). If your final settlement pays untaken holiday, the time limit runs from when those days end (arts. 266 and 268 LGSS).',
   'client.status.below_minimum': 'Below the legal minimum: {importe} short',
@@ -404,7 +404,7 @@ export const en: Translation = {
   'client.status.no_employer_figure': 'You have not entered the figure from your final settlement',
   'client.status.no_severance': 'No severance pay applies by law in this case',
   'client.status.no_severance_disciplinary':
-    'If the dismissal is fair (procedente), there is no severance pay (art. 55.7 ET). If it were ruled unfair, the reference figure would be {importe}; the time limit to challenge a dismissal is 20 business days (días hábiles) (art. 59.3 ET).',
+    'If the dismissal is fair (procedente), there is no severance pay (art. 55.7 ET). If it were ruled unfair, the reference figure would be {importe}; the time limit to challenge a dismissal is 20 business days (días hábiles) (art. 59.4 ET).',
   'client.status.not_checkable_days': "Can't be checked without the days you have taken",
   'client.status.not_checkable_cause': 'Severance pay is not calculated without the reason',
   'client.status.not_checkable_erte': "Can't be checked without your pay from before the ERTE",
@@ -587,7 +587,7 @@ export const en: Translation = {
   'client.warning.null_dismissal.effects':
     'If a court ruled it void, the employer would have to reinstate you and pay you the wages you did not receive (arts. 55.6 and 53.5 ET). This review does not calculate figures for that case.',
   'client.warning.null_dismissal.deadline':
-    'There are 20 business days (días hábiles) from the leaving date to challenge the dismissal (art. 59.3 ET); filing the conciliation request (papeleta de conciliación) interrupts the time limit. An employment law firm, an employment advisory firm or a trade union can tell you how it applies to your case.',
+    'There are 20 business days (días hábiles) from the leaving date to challenge the dismissal (art. 59.4 ET); filing the conciliation request (papeleta de conciliación) interrupts the time limit. An employment law firm, an employment advisory firm or a trade union can tell you how it applies to your case.',
   'client.warning.erte_unknown.title': 'If you were in an ERTE',
   'client.warning.erte_unknown':
     'With an ERTE, severance pay should be calculated on the full pay from before the ERTE: with reduced hours, the pay from before the reduction (STS 678/2018); with the contract suspended, what was earned in the months worked (STS 638/2022). If any of your latest payslips is from an ERTE, the severance pay in this review may fall short.',
@@ -605,7 +605,7 @@ export const en: Translation = {
   'client.warning.late_interest.lapsed':
     'More than a year has passed since the leaving date, so it may be time-barred (art. 59.1 and 59.2 ET), unless something interrupted the time limit. That is why the interest is not counted.',
   'client.warning.late_interest.other_deadline':
-    'This is a different time limit from the 20 business days (días hábiles) to challenge a dismissal (art. 59.3 ET).',
+    'This is a different time limit from the 20 business days (días hábiles) to challenge a dismissal (art. 59.4 ET).',
   'client.unchecked.net_pay': 'Net pay: IRPF (income tax) withholdings and contributions',
   'client.unchecked.bonuses':
     'Bonuses, supplements, overtime and commissions under your collective agreement or contract',
@@ -1143,7 +1143,7 @@ export const en: Translation = {
     'Yes. Any dismissal is a legal situation of unemployment (art. 267.1.a.3.º LGSS). You also need 360 days of contributions in the last 6 years, among other requirements.',
   'landing.unfair_dismissal.faq.5.question': 'What is the time limit to challenge a dismissal?',
   'landing.unfair_dismissal.faq.5.answer':
-    '20 business days (días hábiles) from the dismissal (art. 59.3 ET). It is short, and an employment law firm, a graduado social (labour relations adviser) office or a trade union can tell you how it applies to your case.',
+    '20 business days (días hábiles) from the dismissal (art. 59.4 ET). It is short, and an employment law firm, a graduado social (labour relations adviser) office or a trade union can tell you how it applies to your case.',
   'landing.fixed_term_end.name': 'Final settlement at the end of a fixed-term contract',
   'landing.fixed_term_end.title':
     'Final settlement at the end of a contract 2026: calculate it and compare it',
@@ -1192,7 +1192,7 @@ export const en: Translation = {
     "Yes. The worker can ask for a workers' legal representative to be present when signing the final settlement, and if they do not ask, the document records this (art. 49.2 ET).",
   'landing.not_agreed.faq.4.question': 'What is the time limit if an amount does not add up?',
   'landing.not_agreed.faq.4.answer':
-    'For outstanding pay, holiday, extra payments or severance pay at the end of a fixed-term contract, one year (art. 59.1 ET). For a dismissal, the time limit to challenge it is 20 business days (días hábiles) (art. 59.3 ET).',
+    'For outstanding pay, holiday, extra payments or severance pay at the end of a fixed-term contract, one year (art. 59.1 ET). For a dismissal, the time limit to challenge it is 20 business days (días hábiles) (art. 59.4 ET).',
   'landing.benefit.name': 'Calculate how much unemployment benefit you will receive',
   'landing.benefit.title':
     'Calculate unemployment benefit 2026: how much you will receive each month',
