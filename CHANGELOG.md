@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.118.3](https://github.com/Endika/eslojusto/compare/v1.118.2...v1.118.3) (2026-11-24)
+
+
+### Bug Fixes
+
+* **employment:** give the information of short relations from 19-11-2026 ([c9935d8](https://github.com/Endika/eslojusto/commit/c9935d8047820b457d87a392e067f4d4af631649))
+
 ## [1.118.2](https://github.com/Endika/eslojusto/compare/v1.118.1...v1.118.2) (2026-11-24)
 
 
