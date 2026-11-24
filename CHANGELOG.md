@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.118.4](https://github.com/Endika/eslojusto/compare/v1.118.3...v1.118.4) (2026-11-24)
+
+
+### Bug Fixes
+
+* **employment:** apply the trial period limits of RDL 39/2026 ([cd95457](https://github.com/Endika/eslojusto/commit/cd9545723c4cd6cb3922e89d095873c58240c86f))
+
 ## [1.118.3](https://github.com/Endika/eslojusto/compare/v1.118.2...v1.118.3) (2026-11-24)
 
 
