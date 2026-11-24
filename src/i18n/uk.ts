@@ -2538,6 +2538,8 @@ export const uk: Translation = {
   'client.employment.finding.written_form': 'Письмовий договір',
   'client.employment.finding.trial_limits': 'Випробувальний строк',
   'client.employment.finding.trial_temporary_1_month': 'Випробувальний строк',
+  'client.employment.finding.trial_limits_2026': 'Випробувальний строк',
+  'client.employment.finding.trial_temporary_proportional': 'Випробувальний строк',
   'client.employment.finding.trial_void_same_duties': 'Випробувальний строк',
   'client.employment.finding.weekly_40': 'Години на тиждень',
   'client.employment.finding.daily_9': 'Години на день',
@@ -2805,6 +2807,16 @@ export const uk: Translation = {
     'Випробувальний строк — {trial}; за вашими даними, ваш колективний договір дозволяє {months}, і строк це перевищує.',
   'client.employment.calculation.trial.temporary_end_unknown':
     'Без дати закінчення невідомо, чи договір триває 6 місяців або менше; якщо так, межа — {months}.',
+  'client.employment.calculation.trial.over_legal_limit_justified':
+    'Випробувальний строк — {trial}; він перевищує законну межу ({months}), а довший строк може дозволити лише колективний договір, який це обґрунтовує.',
+  'client.employment.calculation.trial.within_legal_limit_days':
+    'Випробувальний строк — {trial}; у договорі коротше за 6 місяців законна межа — {days}, пропорційна частина 1 місяця.',
+  'client.employment.calculation.trial.over_legal_limit_days':
+    'Випробувальний строк — {trial}; у договорі коротше за 6 місяців законна межа — {days}, пропорційна частина 1 місяця, а більше може дозволити лише колективний договір, який обґрунтовує довший строк.',
+  'client.employment.calculation.trial.agreement_above_legal_limit':
+    'Випробувальний строк — {trial}; за вашими даними, ваш колективний договір дозволяє {months}, більше за законну межу, і це діє лише якщо договір це обґрунтовує.',
+  'client.employment.calculation.trial.end_unknown_proportional':
+    'Без дати закінчення невідомо, скільки триває договір; якщо менше 6 місяців, законна межа менша за 1 місяць, пропорційно до його тривалості.',
   'client.employment.calculation.trial.void_alternance':
     'У договорі про навчання з чергуванням роботи й навчання випробувальний строк неможливий, а у вашому зазначено {trial}.',
   'client.employment.calculation.trial.void_after_training':

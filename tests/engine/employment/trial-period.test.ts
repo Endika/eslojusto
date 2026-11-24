@@ -237,3 +237,105 @@ describe('void and unwritten trial periods', () => {
 function single(finding: Finding): Assessed {
   return { kind: 'single', finding };
 }
+
+describe('trial period from RDL 39/2026', () => {
+  const from = (day: string, change: Partial<EmploymentInput>) =>
+    only(assess({ startDate: parseDate(day), technical: false, smallCompany: false, ...change }));
+  const days = (amount: number) => ({ amount, unit: 'days' as const });
+  const production = (start: string, end: string | null) => ({
+    modality: 'production' as const,
+    startDate: parseDate(start),
+    endDate: end === null ? null : parseDate(end),
+  });
+
+  it('keeps the old rules for a contract that started on 18-11-2026', () => {
+    expect(from('2026-11-18', { trial: months(3) })).toMatchObject({
+      id: 'trial_limits',
+      status: 'depends_on_agreement',
+      calculation: [phrase('trial.over_legal_limit', { trial: monthsPhrase(3), months: 2 })],
+    });
+  });
+
+  it('applies the new wording to a contract that starts on 19-11-2026', () => {
+    const finding = from('2026-11-19', { trial: months(3) });
+    expect(finding).toMatchObject({
+      id: 'trial_limits_2026',
+      status: 'depends_on_agreement',
+      calculation: [
+        phrase('trial.over_legal_limit_justified', { trial: monthsPhrase(3), months: 2 }),
+      ],
+    });
+    expect(finding.sources.map((s) => s.id)).toEqual(['trial_limits_2026']);
+  });
+
+  it('allows one month in a fixed-term contract of exactly six months and not five weeks', () => {
+    const six = production('2026-12-01', '2027-05-31');
+    expect(from('2026-12-01', { ...six, trial: months(1) })).toMatchObject({
+      id: 'trial_temporary_proportional',
+      status: 'within_limit',
+    });
+    expect(from('2026-12-01', { ...six, trial: { amount: 5, unit: 'weeks' } }).status).toBe(
+      'depends_on_agreement',
+    );
+  });
+
+  it('reduces the limit in proportion in a contract of less than six months', () => {
+    const three = production('2027-01-01', '2027-03-31');
+    expect(from('2027-01-01', { ...three, trial: days(15) })).toMatchObject({
+      status: 'within_limit',
+      calculation: [
+        phrase('trial.within_legal_limit_days', {
+          trial: phrase('trial.amount_days', { amount: 15 }),
+          days: 15,
+        }),
+      ],
+    });
+    expect(from('2027-01-01', { ...three, trial: days(16) })).toMatchObject({
+      status: 'depends_on_agreement',
+      calculation: [
+        phrase('trial.over_legal_limit_days', {
+          trial: phrase('trial.amount_days', { amount: 16 }),
+          days: 15,
+        }),
+      ],
+    });
+  });
+
+  it('without an end date, one month is within the limit with a note and six weeks is over', () => {
+    const open = production('2026-12-01', null);
+    expect(from('2026-12-01', { ...open, trial: months(1) })).toMatchObject({
+      status: 'within_limit',
+      calculation: expect.arrayContaining([phrase('trial.end_unknown_proportional')]),
+    });
+    expect(from('2026-12-01', { ...open, trial: { amount: 6, unit: 'weeks' } })).toMatchObject({
+      id: 'trial_temporary_proportional',
+      status: 'depends_on_agreement',
+    });
+  });
+
+  it('an indefinite contract allows two months, and three in a company of 25 or more depends', () => {
+    expect(from('2026-12-01', { trial: months(2) }).status).toBe('within_limit');
+    expect(from('2026-12-01', { trial: months(3) }).status).toBe('depends_on_agreement');
+  });
+
+  it('an agreement above the legal limit has to justify it, and one below it is over', () => {
+    const agreement = (trialMonths: number) => ({ ...contract().agreement, trialMonths });
+    expect(from('2026-12-01', { agreement: agreement(4), trial: months(3) })).toMatchObject({
+      id: 'trial_limits_2026',
+      status: 'depends_on_agreement',
+      basedOnYourAnswer: true,
+      calculation: [
+        phrase('trial.agreement_above_legal_limit', { trial: monthsPhrase(3), months: 4 }),
+      ],
+    });
+    expect(from('2026-12-01', { agreement: agreement(4), trial: months(5) }).status).toBe(
+      'over_legal_limit',
+    );
+    expect(from('2026-12-01', { agreement: agreement(1), trial: months(2) }).status).toBe(
+      'over_legal_limit',
+    );
+    expect(from('2026-12-01', { agreement: agreement(4), trial: months(2) }).status).toBe(
+      'within_limit',
+    );
+  });
+});

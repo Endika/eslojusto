@@ -46,6 +46,12 @@ describe('employment norm table', () => {
   });
 });
 
+const ENDED_ON_18_NOV_2026: ReadonlySet<string> = new Set([
+  'info_short_relations',
+  'trial_limits',
+  'trial_temporary_1_month',
+]);
+
 describe('employment rule table', () => {
   it.each(Object.entries(RULES))('%s rests on a norm in force when it starts', (id, r) => {
     expect(r.id).toBe(id);
@@ -53,7 +59,7 @@ describe('employment rule table', () => {
     expect(norm).toBeDefined();
     expect(r.from >= norm.inForceSince).toBe(true);
     expect(r.url.startsWith(BOE)).toBe(true);
-    expect(r.until).toBe(id === 'info_short_relations' ? '2026-11-18' : null);
+    expect(r.until).toBe(ENDED_ON_18_NOV_2026.has(id) ? '2026-11-18' : null);
     expect(r.supersededBy).toBeNull();
   });
 

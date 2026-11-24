@@ -2499,6 +2499,8 @@ export const en: Translation = {
   'client.employment.finding.written_form': 'Contract in writing',
   'client.employment.finding.trial_limits': 'Trial period',
   'client.employment.finding.trial_temporary_1_month': 'Trial period',
+  'client.employment.finding.trial_limits_2026': 'Trial period',
+  'client.employment.finding.trial_temporary_proportional': 'Trial period',
   'client.employment.finding.trial_void_same_duties': 'Trial period',
   'client.employment.finding.weekly_40': 'Hours a week',
   'client.employment.finding.daily_9': 'Hours a day',
@@ -2765,6 +2767,16 @@ export const en: Translation = {
     'Trial period of {trial}; according to your figure, your collective agreement allows {months}, and it exceeds that.',
   'client.employment.calculation.trial.temporary_end_unknown':
     'With no end date it is not known whether the contract lasts 6 months or less; if so, the limit is {months}.',
+  'client.employment.calculation.trial.over_legal_limit_justified':
+    'Trial period of {trial}; it exceeds the legal limit of {months}, and only a collective agreement that justifies a longer period can allow it.',
+  'client.employment.calculation.trial.within_legal_limit_days':
+    'Trial period of {trial}; in a contract of less than 6 months the legal limit is {days}, the proportional part of 1 month.',
+  'client.employment.calculation.trial.over_legal_limit_days':
+    'Trial period of {trial}; in a contract of less than 6 months the legal limit is {days}, the proportional part of 1 month, and only a collective agreement that justifies a longer period can allow more.',
+  'client.employment.calculation.trial.agreement_above_legal_limit':
+    'Trial period of {trial}; according to your data, your collective agreement allows {months}, more than the legal limit, and that only holds if the agreement justifies it.',
+  'client.employment.calculation.trial.end_unknown_proportional':
+    'With no end date it is not known how long the contract lasts; if it lasts less than 6 months, the legal limit is under 1 month, in proportion to its length.',
   'client.employment.calculation.trial.void_alternance':
     'In a work-and-study training contract no trial period is allowed, and yours states {trial}.',
   'client.employment.calculation.trial.void_after_training':

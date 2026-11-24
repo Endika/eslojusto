@@ -2438,6 +2438,8 @@ export const gl: Translation = {
   'client.employment.finding.written_form': 'Contrato por escrito',
   'client.employment.finding.trial_limits': 'Período de proba',
   'client.employment.finding.trial_temporary_1_month': 'Período de proba',
+  'client.employment.finding.trial_limits_2026': 'Período de proba',
+  'client.employment.finding.trial_temporary_proportional': 'Período de proba',
   'client.employment.finding.trial_void_same_duties': 'Período de proba',
   'client.employment.finding.weekly_40': 'Horas á semana',
   'client.employment.finding.daily_9': 'Horas ao día',
@@ -2704,6 +2706,16 @@ export const gl: Translation = {
     'Período de proba de {trial}; segundo o teu dato, o teu convenio permite {months}, e pásao.',
   'client.employment.calculation.trial.temporary_end_unknown':
     'Sen data de fin non se sabe se o contrato dura 6 meses ou menos; se é así, o límite é de {months}.',
+  'client.employment.calculation.trial.over_legal_limit_justified':
+    'Período de proba de {trial}; pasa do límite legal de {months}, e só un convenio que xustifique un período máis longo pode permitilo.',
+  'client.employment.calculation.trial.within_legal_limit_days':
+    'Período de proba de {trial}; nun contrato de menos de 6 meses o límite legal é de {days}, a parte proporcional de 1 mes.',
+  'client.employment.calculation.trial.over_legal_limit_days':
+    'Período de proba de {trial}; nun contrato de menos de 6 meses o límite legal é de {days}, a parte proporcional de 1 mes, e só un convenio que xustifique un período máis longo pode permitir máis.',
+  'client.employment.calculation.trial.agreement_above_legal_limit':
+    'Período de proba de {trial}; segundo o teu dato, o teu convenio permite {months}, máis que o límite legal, e só vale se o convenio o xustifica.',
+  'client.employment.calculation.trial.end_unknown_proportional':
+    'Sen data de fin non se sabe canto dura o contrato; se dura menos de 6 meses, o límite legal é inferior a 1 mes, en proporción á súa duración.',
   'client.employment.calculation.trial.void_alternance':
     'Nun contrato de formación en alternancia non é posible un período de proba, e o teu pon {trial}.',
   'client.employment.calculation.trial.void_after_training':
