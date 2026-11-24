@@ -2332,7 +2332,7 @@ export const gl: Translation = {
   'client.employment.source.between': 'con efectos do {desde} ao {hasta}',
   'client.employment.duty.title': 'Información obrigatoria por escrito',
   'client.employment.duty.short_relation':
-    'Non se aplica: o teu contrato dura catro semanas ou menos.',
+    'Non se aplica: o teu contrato dura catro semanas ou menos e rematou antes do 19 de novembro de 2026.',
   'client.employment.duty.ended_before_decree':
     'Non se aplica: o teu contrato rematou antes do 5 de outubro de 2026.',
   'client.employment.duty.missing_one': 'Falta {n} punto dos que pide a lei',
@@ -2344,6 +2344,8 @@ export const gl: Translation = {
     'O teu contrato comezou desde o 5 de outubro de 2026: a empresa tiña que darche esta información por escrito antes de comezar.',
   'client.employment.duty.on_request':
     'O teu contrato xa estaba en marcha o 5 de outubro de 2026: podes pedir esta información por escrito e a empresa ten 30 días hábiles.',
+  'client.employment.duty.short_on_request':
+    'O teu contrato dura catro semanas ou menos e xa estaba en marcha o 19 de novembro de 2026: podes pedir esta información por escrito e a empresa ten 10 días hábiles.',
   'client.employment.duty.temp_agency_only': 'Só para contratos por ETT',
   'client.employment.duty.no_trial': 'Só se hai período de proba',
   'client.employment.offer.title': 'A oferta fronte ao contrato',
@@ -2466,6 +2468,8 @@ export const gl: Translation = {
   'client.employment.finding.info_before_start': 'Información antes de comezar',
   'client.employment.finding.info_on_request': 'Información a petición',
   'client.employment.finding.info_short_relations': 'Relacións de catro semanas ou menos',
+  'client.employment.finding.info_short_on_request':
+    'Información a petición en relacións de catro semanas ou menos',
   'client.employment.finding.info_model': 'Modelo de documento informativo',
   'client.employment.finding.public_holidays': 'Festivos',
   'client.employment.finding.minors_work': 'Traballo de menores',
@@ -2857,6 +2861,8 @@ export const gl: Translation = {
     'A empresa tiña que darcho por escrito antes de que comezases (art. 7.1).',
   'client.employment.calculation.information.missing_on_request':
     'Podes pedilo por escrito e a empresa ten 30 días hábiles para darcho.',
+  'client.employment.calculation.information.missing_short_on_request':
+    'Podes pedilo por escrito e a empresa ten 10 días hábiles para darcho.',
   'client.employment.calculation.information.protocol_always':
     'O plan de igualdade só fai falta se a empresa ten un, pero o protocolo contra o acoso sexual e por razón de sexo hai que dalo sempre (art. 3.2.l).',
   'client.employment.calculation.information.only_if_used':
@@ -3037,6 +3043,8 @@ export const gl: Translation = {
   'client.employment.letter.information.title': 'Información do meu contrato por escrito',
   'client.employment.letter.information.on_request':
     'Segundo {norma} (art. 3 e disposición transitoria única), podo pedir por escrito a información da miña relación laboral e a empresa ten 30 días hábiles para dala. Pídolle por escrito a que non atopo no meu contrato:',
+  'client.employment.letter.information.short_on_request':
+    'Segundo {norma} (disposición transitoria segunda), podo pedir por escrito a información da miña relación laboral e a empresa ten 10 días hábiles para dala. Pídolle por escrito a que non atopo no meu contrato:',
   'client.employment.letter.information.before_start':
     'Segundo {norma} (arts. 3 e 7.1), esta información dáse por escrito antes de comezar a traballar. Como non a atopo no meu contrato, pídolla por escrito:',
   'client.employment.letter.information.filename': 'eslojusto-carta-informacion.pdf',

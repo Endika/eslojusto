@@ -69,7 +69,7 @@ describe('information duty (RD 723/2026)', () => {
     const d = duty(
       withInfo(
         { o: 'absent' },
-        started('2026-11-02', { modality: 'production', endDate: parseDate('2026-11-22') }),
+        started('2026-10-26', { modality: 'production', endDate: parseDate('2026-11-15') }),
       ),
     );
     expect(d).toEqual(expect.objectContaining({ applies: false, reason: 'short_relation' }));
@@ -79,10 +79,53 @@ describe('information duty (RD 723/2026)', () => {
   it('exactly four weeks is still outside; one day more is inside', () => {
     const term = (end: string) =>
       duty(
-        withInfo({}, started('2026-11-02', { modality: 'production', endDate: parseDate(end) })),
+        withInfo({}, started('2026-10-05', { modality: 'production', endDate: parseDate(end) })),
       );
-    expect(term('2026-11-29').applies).toBe(false);
-    expect(term('2026-11-30').applies).toBe(true);
+    expect(term('2026-11-01').applies).toBe(false);
+    expect(term('2026-11-02').applies).toBe(true);
+  });
+
+  describe('a relationship of four weeks or less (RDL 39/2026)', () => {
+    const short = (
+      start: string,
+      end: string,
+      info: Partial<Record<InfoElement, InfoPresence>> = {},
+    ) => duty(withInfo(info, started(start, { modality: 'production', endDate: parseDate(end) })));
+
+    it('ended on 18-11-2026: still outside, citing art. 2.2 with its last day', () => {
+      const d = short('2026-11-02', '2026-11-18');
+      expect(d).toEqual(expect.objectContaining({ applies: false, reason: 'short_relation' }));
+      expect(!d.applies && d.sources.map((s) => [s.id, s.inForceUntil])).toEqual([
+        ['info_short_relations', '2026-11-18'],
+      ]);
+    });
+
+    it('in force on 19-11-2026 but started before: on request within ten working days', () => {
+      const d = short('2026-11-10', '2026-11-19', { o: 'absent' });
+      expect(d.applies && d.moment).toBe('short_on_request');
+      const o = elementOf(d, 'o');
+      expect(keys(o)).toContain('information.missing_short_on_request');
+      expect(keys(o)).not.toContain('information.missing_on_request');
+      expect(cited(o)).toEqual(['info_elements', 'info_short_on_request']);
+      expect(o.sources.at(-1)).toEqual(
+        expect.objectContaining({
+          citation:
+            'disposición transitoria segunda (Real Decreto-ley 39/2026, de 17 de noviembre)',
+          inForceSince: '2026-11-19',
+        }),
+      );
+    });
+
+    it('started on 19-11-2026: owed before starting like any other contract', () => {
+      const d = short('2026-11-19', '2026-12-10', { o: 'absent' });
+      expect(d.applies && d.moment).toBe('before_start');
+      expect(cited(elementOf(d, 'o'))).toEqual(['info_elements', 'info_before_start']);
+    });
+
+    it('started on 18-11-2026 and running the next day: on request, not before starting', () => {
+      const d = short('2026-11-18', '2026-12-09');
+      expect(d.applies && d.moment).toBe('short_on_request');
+    });
   });
 
   it('a relationship that ended before the decree took effect is outside it', () => {

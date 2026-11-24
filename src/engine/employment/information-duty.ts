@@ -1,4 +1,4 @@
-import { compareDates, parseDate } from '../date';
+import { compareDates, parseDate, type CivilDate } from '../date';
 import type { NormSource } from '../law/sources';
 import { phrase, type EmploymentPhraseKey } from './calculation';
 import { findingsFor } from './finding';
@@ -13,10 +13,11 @@ import {
   type InfoPresence,
 } from './types';
 
-// Art. 2.2 RD 723/2026: chapter II covers only relationships of over four weeks.
+// Art. 2.2 RD 723/2026 left relationships of four weeks or less out of chapter II until RDL 39/2026.
 const SHORT_RELATION_DAYS = 4 * 7;
 
 const DECREE_DAY = parseDate(RULES.info_before_start.from);
+const SHORT_RELATIONS_DAY = parseDate(RULES.info_short_on_request.from);
 
 // Art. 3.3: these may be given by a precise reference to the law or the collective agreement.
 const BY_REFERENCE: ReadonlySet<InfoElement> = new Set(['h', 'i', 'n', 'p']);
@@ -47,8 +48,9 @@ const ORDER: readonly InfoElement[] = [
 ];
 
 // Art. 7.1 for relationships that start once the decree is in force; its transitional provision,
-// on request within thirty working days, for those already running.
-export type InformationMoment = 'before_start' | 'on_request';
+// on request within thirty working days, for those already running. Relationships of four weeks or
+// less already running on 19-11-2026 have ten working days (DT 2.ª RDL 39/2026).
+export type InformationMoment = 'before_start' | 'on_request' | 'short_on_request';
 
 export type ElementCheck =
   | { readonly element: InfoElement; readonly applies: true; readonly finding: Finding }
@@ -77,6 +79,10 @@ const MOMENT: Readonly<
 > = {
   before_start: { rule: 'info_before_start', key: 'information.missing_before_start' },
   on_request: { rule: 'info_on_request', key: 'information.missing_on_request' },
+  short_on_request: {
+    rule: 'info_short_on_request',
+    key: 'information.missing_short_on_request',
+  },
 };
 
 function check(
@@ -128,25 +134,36 @@ function check(
   }
 }
 
+const endedBefore = (input: EmploymentInput, day: CivilDate) =>
+  input.endDate !== null && compareDates(input.endDate, day) < 0;
+
+function momentOf(input: EmploymentInput, short: boolean): InformationMoment {
+  if (short)
+    return compareDates(input.startDate, SHORT_RELATIONS_DAY) >= 0
+      ? 'before_start'
+      : 'short_on_request';
+  return compareDates(input.startDate, DECREE_DAY) >= 0 ? 'before_start' : 'on_request';
+}
+
 // The elements of art. 3.2 RD 723/2026 the person found in the contract or a separate document;
 // only whether each is there, never whether what it says is right.
 export function reviewInformationDuty(input: EmploymentInput, norms: NormTable): InformationDuty {
   // A fixed-term contract without an end date may still last four weeks or less; it is listed.
   const days = agreedDays(input);
-  if (days !== null && days <= SHORT_RELATION_DAYS)
+  const short = days !== null && days <= SHORT_RELATION_DAYS;
+  if (short && endedBefore(input, SHORT_RELATIONS_DAY))
     return {
       applies: false,
       reason: 'short_relation',
       sources: [ruleSource('info_short_relations', norms)],
     };
-  if (input.endDate !== null && compareDates(input.endDate, DECREE_DAY) < 0)
+  if (endedBefore(input, DECREE_DAY))
     return {
       applies: false,
       reason: 'ended_before_decree',
       sources: [ruleSource('info_on_request', norms)],
     };
-  const moment: InformationMoment =
-    compareDates(input.startDate, DECREE_DAY) >= 0 ? 'before_start' : 'on_request';
+  const moment = momentOf(input, short);
   return {
     applies: true,
     moment,

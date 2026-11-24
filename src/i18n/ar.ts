@@ -2347,7 +2347,8 @@ export const ar: Translation = {
   'client.employment.source.since': 'يسري أثره منذ {desde}',
   'client.employment.source.between': 'يسري أثره من {desde} إلى {hasta}',
   'client.employment.duty.title': 'المعلومات الإلزامية كتابةً',
-  'client.employment.duty.short_relation': 'لا ينطبق: مدة عقدك أربعة أسابيع أو أقل.',
+  'client.employment.duty.short_relation':
+    'لا ينطبق: مدة عقدك أربعة أسابيع أو أقل وانتهى قبل 19 نوفمبر 2026.',
   'client.employment.duty.ended_before_decree': 'لا ينطبق: انتهى عقدك قبل 5 أكتوبر 2026.',
   'client.employment.duty.missing_one': 'تنقص {n} نقطة من النقاط التي يشترطها القانون',
   'client.employment.duty.missing_many': 'تنقص {n} من النقاط التي يشترطها القانون',
@@ -2358,6 +2359,8 @@ export const ar: Translation = {
     'بدأ عقدك منذ 5 أكتوبر 2026: كان على الشركة أن تقدّم لك هذه المعلومات كتابةً قبل أن تبدأ.',
   'client.employment.duty.on_request':
     'كان عقدك جاريًا بالفعل في 5 أكتوبر 2026: يمكنك أن تطلب هذه المعلومات كتابةً ولدى الشركة 30 يوم عمل رسمي.',
+  'client.employment.duty.short_on_request':
+    'مدة عقدك أربعة أسابيع أو أقل وكان جاريًا بالفعل في 19 نوفمبر 2026: يمكنك أن تطلب هذه المعلومات كتابةً ولدى الشركة 10 أيام عمل رسمية.',
   'client.employment.duty.temp_agency_only': 'فقط للعقود عن طريق شركة عمل مؤقت \u2068(ETT)\u2069',
   'client.employment.duty.no_trial': 'فقط إذا كانت هناك فترة تجربة',
   'client.employment.offer.title': 'العرض مقابل العقد',
@@ -2485,6 +2488,8 @@ export const ar: Translation = {
   'client.employment.finding.info_before_start': 'المعلومات قبل البدء',
   'client.employment.finding.info_on_request': 'المعلومات عند الطلب',
   'client.employment.finding.info_short_relations': 'العلاقات التي مدتها أربعة أسابيع أو أقل',
+  'client.employment.finding.info_short_on_request':
+    'المعلومات عند الطلب في العلاقات التي مدتها أربعة أسابيع أو أقل',
   'client.employment.finding.info_model': 'نموذج وثيقة المعلومات',
   'client.employment.finding.public_holidays': 'العطل الرسمية',
   'client.employment.finding.minors_work': 'عمل القاصرين',
@@ -2871,6 +2876,8 @@ export const ar: Translation = {
     'كان على الشركة أن تقدّمها لك كتابةً قبل أن تبدأ \u2068(art. 7.1)\u2069.',
   'client.employment.calculation.information.missing_on_request':
     'يمكنك أن تطلبها كتابةً ولدى الشركة 30 يوم عمل رسمي لتقديمها.',
+  'client.employment.calculation.information.missing_short_on_request':
+    'يمكنك أن تطلبها كتابةً ولدى الشركة 10 أيام عمل رسمية لتقديمها.',
   'client.employment.calculation.information.protocol_always':
     'لا تلزم خطة المساواة إلا إذا كانت لدى الشركة خطة، لكن بروتوكول مكافحة التحرّش الجنسي والتحرّش على أساس الجنس يجب تقديمه دائمًا \u2068(art. 3.2.l)\u2069.',
   'client.employment.calculation.information.only_if_used':
@@ -3044,6 +3051,8 @@ export const ar: Translation = {
   'client.employment.letter.information.title': 'معلومات عقدي كتابةً',
   'client.employment.letter.information.on_request':
     'وفق {norma} \u2068(art. 3 y disposición transitoria única)\u2069، يمكنني أن أطلب كتابةً معلومات علاقة عملي، ولدى الشركة 30 يوم عمل رسمي لتقديمها. أطلب منكم كتابةً المعلومات التي لا أجدها في عقدي:',
+  'client.employment.letter.information.short_on_request':
+    'وفق {norma} \u2068(disposición transitoria segunda)\u2069، يمكنني أن أطلب كتابةً معلومات علاقة عملي، ولدى الشركة 10 أيام عمل رسمية لتقديمها. أطلب منكم كتابةً المعلومات التي لا أجدها في عقدي:',
   'client.employment.letter.information.before_start':
     'وفق {norma} \u2068(arts. 3 y 7.1)\u2069، تُقدَّم هذه المعلومات كتابةً قبل البدء في العمل. وبما أنني لا أجدها في عقدي، أطلبها منكم كتابةً:',
   'client.employment.letter.information.filename': 'eslojusto-carta-informacion.pdf',

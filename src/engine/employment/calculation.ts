@@ -237,6 +237,7 @@ type InformationPhraseKey =
   | 'information.reference_covers_part'
   | 'information.missing_before_start'
   | 'information.missing_on_request'
+  | 'information.missing_short_on_request'
   | 'information.only_if_used'
   | 'information.protocol_always'
   | 'information.unknown'

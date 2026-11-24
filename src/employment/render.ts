@@ -656,7 +656,7 @@ function dutyCard(
   const complete = missing === 0 && toReview === 0;
   note(
     find(el, '[data-answer-note]'),
-    complete && duty.moment === 'on_request' ? null : tr(`client.employment.duty.${duty.moment}`),
+    complete && duty.moment !== 'before_start' ? null : tr(`client.employment.duty.${duty.moment}`),
   );
   renderRules(
     container,

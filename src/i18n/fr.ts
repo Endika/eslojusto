@@ -2479,7 +2479,7 @@ export const fr: Translation = {
   'client.employment.source.between': 'avec effet du {desde} au {hasta}',
   'client.employment.duty.title': 'Information obligatoire par écrit',
   'client.employment.duty.short_relation':
-    "Ne s'applique pas\u00a0: votre contrat dure quatre semaines ou moins.",
+    "Ne s'applique pas\u00a0: votre contrat dure quatre semaines ou moins et a pris fin avant le 19 novembre 2026.",
   'client.employment.duty.ended_before_decree':
     "Ne s'applique pas\u00a0: votre contrat a pris fin avant le 5 octobre 2026.",
   'client.employment.duty.missing_one': "Il manque {n} point parmi ceux qu'exige la loi",
@@ -2491,6 +2491,8 @@ export const fr: Translation = {
     "Votre contrat a commencé le 5 octobre 2026 ou après\u00a0: l'entreprise devait vous remettre cette information par écrit avant le début du travail.",
   'client.employment.duty.on_request':
     "Votre contrat était déjà en cours le 5 octobre 2026\u00a0: vous pouvez demander cette information par écrit, et l'entreprise dispose de 30 jours ouvrables.",
+  'client.employment.duty.short_on_request':
+    "Votre contrat dure quatre semaines ou moins et était déjà en cours le 19 novembre 2026\u00a0: vous pouvez demander cette information par écrit, et l'entreprise dispose de 10 jours ouvrables.",
   'client.employment.duty.temp_agency_only': 'Uniquement pour les contrats par une ETT',
   'client.employment.duty.no_trial': "Uniquement s'il y a une période d'essai",
   'client.employment.offer.title': "L'offre face au contrat",
@@ -2625,6 +2627,8 @@ export const fr: Translation = {
   'client.employment.finding.info_before_start': 'Information avant le début du travail',
   'client.employment.finding.info_on_request': 'Information sur demande',
   'client.employment.finding.info_short_relations': 'Relations de quatre semaines ou moins',
+  'client.employment.finding.info_short_on_request':
+    'Information sur demande dans les relations de quatre semaines ou moins',
   'client.employment.finding.info_model': "Modèle de document d'information",
   'client.employment.finding.public_holidays': 'Jours fériés',
   'client.employment.finding.minors_work': 'Travail des mineurs',
@@ -3017,6 +3021,8 @@ export const fr: Translation = {
     "L'entreprise devait vous la remettre par écrit avant le début du travail (art. 7.1).",
   'client.employment.calculation.information.missing_on_request':
     "Vous pouvez la demander par écrit, et l'entreprise dispose de 30 jours ouvrables pour vous la remettre.",
+  'client.employment.calculation.information.missing_short_on_request':
+    "Vous pouvez la demander par écrit, et l'entreprise dispose de 10 jours ouvrables pour vous la remettre.",
   'client.employment.calculation.information.protocol_always':
     "Le plan d'égalité n'est nécessaire que si l'entreprise en a un, mais le protocole contre le harcèlement sexuel et le harcèlement fondé sur le sexe doit toujours être remis (art. 3.2.l).",
   'client.employment.calculation.information.only_if_used':
@@ -3199,6 +3205,8 @@ export const fr: Translation = {
   'client.employment.letter.information.title': 'Information sur mon contrat par écrit',
   'client.employment.letter.information.on_request':
     "Conformément au {norma} (art. 3 et disposition transitoire unique), je peux demander par écrit l'information sur ma relation de travail, et l'entreprise dispose de 30 jours ouvrables pour la fournir. Je vous demande par écrit celle que je ne trouve pas dans mon contrat\u00a0:",
+  'client.employment.letter.information.short_on_request':
+    "Conformément au {norma} (disposition transitoire deuxième), je peux demander par écrit l'information sur ma relation de travail, et l'entreprise dispose de 10 jours ouvrables pour la fournir. Je vous demande par écrit celle que je ne trouve pas dans mon contrat\u00a0:",
   'client.employment.letter.information.before_start':
     'Conformément au {norma} (arts. 3 et 7.1), cette information est remise par écrit avant le début du travail. Comme je ne la trouve pas dans mon contrat, je vous la demande par écrit\u00a0:',
   'client.employment.letter.information.filename': 'eslojusto-carta-informacion.pdf',

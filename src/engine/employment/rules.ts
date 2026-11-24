@@ -75,6 +75,7 @@ export type EmploymentRuleId =
   | 'info_before_start'
   | 'info_on_request'
   | 'info_short_relations'
+  | 'info_short_on_request'
   | 'info_model'
   | 'public_holidays'
   | 'minors_work'
@@ -89,6 +90,8 @@ const RDL32_2021 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2021-21788';
 const LAW10_2021 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2021-11472';
 const RD723_2026 = 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-19200';
 const RD723_SINCE = '2026-10-05';
+const RDL39_2026 = 'https://www.boe.es/buscar/doc.php?id=BOE-A-2026-24121';
+const RDL39_SINCE = '2026-11-19';
 
 const rule = (
   id: EmploymentRuleId,
@@ -298,8 +301,20 @@ export const RULES: Readonly<Record<EmploymentRuleId, Rule>> = {
   info_before_start: rd723('info_before_start', 'art. 7.1', 'a7'),
   // Transitional provision: contracts already running get it on request, within thirty working days.
   info_on_request: rd723('info_on_request', 'disposición transitoria única', 'dt'),
-  // 2.2: chapter II only for relationships of over four weeks.
-  info_short_relations: rd723('info_short_relations', 'art. 2.2', 'a2'),
+  // 2.2: chapter II only for relationships of over four weeks, until RDL 39/2026 lifted the limit.
+  info_short_relations: {
+    ...rd723('info_short_relations', 'art. 2.2', 'a2'),
+    until: '2026-11-18',
+  },
+  // RDL 39/2026, second transitional provision: relationships of four weeks or less already running
+  // on 19-11-2026 get it on request, within ten working days.
+  info_short_on_request: rule(
+    'info_short_on_request',
+    'rdl39_2026',
+    'disposición transitoria segunda',
+    RDL39_2026,
+    RDL39_SINCE,
+  ),
   // Additional provision 1.ª: the public employment service publishes a model information document.
   info_model: rd723('info_model', 'disposición adicional primera', 'da'),
   // 37.2: up to fourteen paid public holidays a year.

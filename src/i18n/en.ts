@@ -2386,7 +2386,7 @@ export const en: Translation = {
   'client.employment.source.between': 'with effect from {desde} to {hasta}',
   'client.employment.duty.title': 'Mandatory information in writing',
   'client.employment.duty.short_relation':
-    'Does not apply: your contract lasts four weeks or less.',
+    'Does not apply: your contract lasts four weeks or less and ended before 19 November 2026.',
   'client.employment.duty.ended_before_decree':
     'Does not apply: your contract ended before 5 October 2026.',
   'client.employment.duty.missing_one': '{n} of the points the law requires is missing',
@@ -2398,6 +2398,8 @@ export const en: Translation = {
     'Your contract started on or after 5 October 2026: the company had to give you this information in writing before you started.',
   'client.employment.duty.on_request':
     'Your contract was already under way on 5 October 2026: you can ask for this information in writing and the company has 30 business days.',
+  'client.employment.duty.short_on_request':
+    'Your contract lasts four weeks or less and was already under way on 19 November 2026: you can ask for this information in writing and the company has 10 business days.',
   'client.employment.duty.temp_agency_only': 'Only for contracts through an ETT',
   'client.employment.duty.no_trial': 'Only if there is a trial period',
   'client.employment.offer.title': 'The job offer against the contract',
@@ -2527,6 +2529,8 @@ export const en: Translation = {
   'client.employment.finding.info_before_start': 'Information before starting',
   'client.employment.finding.info_on_request': 'Information on request',
   'client.employment.finding.info_short_relations': 'Employment of four weeks or less',
+  'client.employment.finding.info_short_on_request':
+    'Information on request in employment of four weeks or less',
   'client.employment.finding.info_model': 'Model information document',
   'client.employment.finding.public_holidays': 'Public holidays',
   'client.employment.finding.minors_work': 'Work by minors',
@@ -2919,6 +2923,8 @@ export const en: Translation = {
     'The company had to give it to you in writing before you started (art. 7.1).',
   'client.employment.calculation.information.missing_on_request':
     'You can ask for it in writing and the company has 30 business days to give it to you.',
+  'client.employment.calculation.information.missing_short_on_request':
+    'You can ask for it in writing and the company has 10 business days to give it to you.',
   'client.employment.calculation.information.protocol_always':
     'The equality plan is only needed if the company has one, but the protocol against sexual and sex-based harassment must always be given (art. 3.2.l).',
   'client.employment.calculation.information.only_if_used':
@@ -3100,6 +3106,8 @@ export const en: Translation = {
   'client.employment.letter.information.title': 'Information about my contract in writing',
   'client.employment.letter.information.on_request':
     'Under the {norma} (art. 3 and sole transitional provision), I can request in writing the information about my employment relationship and the company has 30 business days to provide it. I am requesting in writing the information I cannot find in my contract:',
+  'client.employment.letter.information.short_on_request':
+    'Under the second transitional provision of the {norma}, I can request in writing the information about my employment relationship and the company has 10 business days to provide it. I am requesting in writing the information I cannot find in my contract:',
   'client.employment.letter.information.before_start':
     'Under the {norma} (arts. 3 and 7.1), this information is given in writing before starting work. As I cannot find it in my contract, I am requesting it in writing:',
   'client.employment.letter.information.filename': 'eslojusto-carta-informacion.pdf',
