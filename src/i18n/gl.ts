@@ -289,10 +289,10 @@ export const gl: Translation = {
     'Marca «Non o sei». Revísanse as partidas que non dependen da causa: o salario do mes da baixa, as vacacións e as pagas extraordinarias. A indemnización depende da causa e sen ela non se calcula. A causa está na carta de despedimento e no certificado de empresa, no recadro «causa de la situación legal de desempleo».',
   'faq.deadlines': 'Que prazo teño para pedir o que falta no meu finiquito?',
   'faq.deadlines_answer':
-    'Para cantidades como o salario pendente, as vacacións, as pagas extraordinarias ou a indemnización por fin dun contrato temporal, un ano (art. 59.1 ET). Nun despedimento (obxectivo, colectivo, improcedente ou disciplinario), o prazo para impugnalo é de 20 días hábiles (art. 59.3 ET), e quen non estea de acordo coa súa indemnización adoita expoñelo por esa mesma vía. O prazo é curto, e un despacho laboralista, un despacho de graduado social ou un sindicato poden dicirche cal se aplica ao teu caso.',
+    'Para cantidades como o salario pendente, as vacacións, as pagas extraordinarias ou a indemnización por fin dun contrato temporal, un ano (art. 59.1 ET). Nun despedimento (obxectivo, colectivo, improcedente ou disciplinario), o prazo para impugnalo é de 20 días hábiles (art. 59.4 ET), e quen non estea de acordo coa súa indemnización adoita expoñelo por esa mesma vía. O prazo é curto, e un despacho laboralista, un despacho de graduado social ou un sindicato poden dicirche cal se aplica ao teu caso.',
   'faq.null_dismissal': 'Cando pode ser nulo un despedimento?',
   'faq.null_dismissal_answer':
-    'Se te despiden estando embarazada, de permiso por nacemento, adopción, garda ou acollemento ou nos 12 meses despois de volver del, tendo ou tendo pedido un permiso, unha redución ou unha adaptación de xornada ou unha excedencia por coidado, ou sendo vítima de violencia de xénero ou sexual, o despedimento podería ser nulo, agás que o motivo non teña nada que ver con esa situación (art. 55.5 ET). Estando de baixa médica, podería selo se o motivo é a enfermidade (Ley 15/2022, arts. 2.1 e 26), aínda que os tribunais non o aplican aínda de forma uniforme. A revisión avísate se o marcas, sen dar cifras para ese caso. Para impugnar o despedimento hai 20 días hábiles (art. 59.3 ET).',
+    'Se te despiden estando embarazada, de permiso por nacemento, adopción, garda ou acollemento ou nos 12 meses despois de volver del, tendo ou tendo pedido un permiso, unha redución ou unha adaptación de xornada ou unha excedencia por coidado, ou sendo vítima de violencia de xénero ou sexual, o despedimento podería ser nulo, agás que o motivo non teña nada que ver con esa situación (art. 55.5 ET). Estando de baixa médica, podería selo se o motivo é a enfermidade (Ley 15/2022, arts. 2.1 e 26), aínda que os tribunais non o aplican aínda de forma uniforme. A revisión avísate se o marcas, sen dar cifras para ese caso. Para impugnar o despedimento hai 20 días hábiles (art. 59.4 ET).',
   'faq.late_interest': 'E se aínda non me pagaron o finiquito?',
   'faq.late_interest_answer':
     'O que é salario leva un xuro polo atraso do 10 % ao ano desde a baixa (art. 29.3 ET), aínda que a cantidade se discuta (STS de 17 de xuño de 2014, rcud 1315/2013). A revisión cóntao sobre o mínimo legal do salario do mes da baixa e das pagas extraordinarias. A indemnización non o leva, e as vacacións non gozadas non se suman porque é dubidoso que o leven. Para reclamar as cantidades do finiquito hai un ano desde a baixa (art. 59.1 e 59.2 ET).',
@@ -384,9 +384,9 @@ export const gl: Translation = {
   'client.summary.benefit_unknown':
     'O paro depende da causa: un despedimento ou o fin dun contrato temporal dan dereito se sumas polo menos 360 días cotizados nos últimos 6 anos; unha baixa voluntaria, non.',
   'client.summary.dismissal_deadline':
-    'O prazo para impugnar un despedimento é de 20 días hábiles (art. 59.3 ET).',
+    'O prazo para impugnar un despedimento é de 20 días hábiles (art. 59.4 ET).',
   'client.summary.dismissal_deadline_if':
-    'Se foi un despedimento, o prazo para impugnalo é de 20 días hábiles (art. 59.3 ET).',
+    'Se foi un despedimento, o prazo para impugnalo é de 20 días hábiles (art. 59.4 ET).',
   'client.summary.benefit_deadline':
     'Para cobrar o paro tes que inscribirte como demandante de emprego e pedilo nos 15 días seguintes ao fin do contrato (hábiles, segundo o SEPE). Se o teu finiquito paga vacacións non gozadas, o prazo conta desde que rematan eses días (arts. 266 e 268 LGSS).',
   'client.status.below_minimum': 'Por debaixo do mínimo legal: faltan {importe}',
@@ -398,7 +398,7 @@ export const gl: Translation = {
   'client.status.no_employer_figure': 'Non introduciches a cifra do teu finiquito',
   'client.status.no_severance': 'Non che corresponde indemnización por lei neste caso',
   'client.status.no_severance_disciplinary':
-    'Se o despedimento é procedente, non hai indemnización (art. 55.7 ET). Se se declarase improcedente, a referencia sería {importe}; o prazo para impugnar un despedimento é de 20 días hábiles (art. 59.3 ET).',
+    'Se o despedimento é procedente, non hai indemnización (art. 55.7 ET). Se se declarase improcedente, a referencia sería {importe}; o prazo para impugnar un despedimento é de 20 días hábiles (art. 59.4 ET).',
   'client.status.not_checkable_days': 'Non se pode comprobar sen os días que gozaches',
   'client.status.not_checkable_cause': 'Sen a causa non se calcula a indemnización',
   'client.status.not_checkable_erte': 'Non se pode comprobar sen o teu salario de antes do ERTE',
@@ -577,7 +577,7 @@ export const gl: Translation = {
   'client.warning.null_dismissal.effects':
     'Se un xulgado o declarase nulo, a empresa tería que readmitirte e pagarche os salarios que deixaches de cobrar (arts. 55.6 e 53.5 ET). Esta revisión non calcula cifras para ese caso.',
   'client.warning.null_dismissal.deadline':
-    'Para impugnar o despedimento hai 20 días hábiles desde a data de baixa (art. 59.3 ET); presentar a papeleta de conciliación interrompe o prazo. Un despacho laboralista, unha asesoría laboral ou un sindicato poden dicirche como se aplica ao teu caso.',
+    'Para impugnar o despedimento hai 20 días hábiles desde a data de baixa (art. 59.4 ET); presentar a papeleta de conciliación interrompe o prazo. Un despacho laboralista, unha asesoría laboral ou un sindicato poden dicirche como se aplica ao teu caso.',
   'client.warning.erte_unknown.title': 'Se estabas nun ERTE',
   'client.warning.erte_unknown':
     'Cun ERTE, a indemnización debería calcularse co salario completo de antes do ERTE: con xornada reducida, o de antes da redución (STS 678/2018); co contrato suspendido, o cobrado nos meses traballados (STS 638/2022). Se algunha das túas últimas nóminas é dun ERTE, a indemnización desta revisión pode quedar curta.',
@@ -595,7 +595,7 @@ export const gl: Translation = {
   'client.warning.late_interest.lapsed':
     'Pasou máis dun ano desde a baixa, así que pode ter prescrito (art. 59.1 e 59.2 ET), agás que algo interrompese o prazo. Por iso non se conta o xuro.',
   'client.warning.late_interest.other_deadline':
-    'É un prazo distinto dos 20 días hábiles para impugnar un despedimento (art. 59.3 ET).',
+    'É un prazo distinto dos 20 días hábiles para impugnar un despedimento (art. 59.4 ET).',
   'client.unchecked.net_pay': 'O neto: retencións de IRPF e cotizacións',
   'client.unchecked.bonuses':
     'Plus, complementos, horas extraordinarias e comisións do teu convenio ou contrato',
@@ -1124,7 +1124,7 @@ export const gl: Translation = {
     'Si. Calquera despedimento é situación legal de desemprego (art. 267.1.a.3.º LGSS). Ademais cómpren 360 días cotizados nos últimos 6 anos, entre outros requisitos.',
   'landing.unfair_dismissal.faq.5.question': 'Que prazo hai para impugnar un despedimento?',
   'landing.unfair_dismissal.faq.5.answer':
-    '20 días hábiles desde o despedimento (art. 59.3 ET). É curto, e un despacho laboralista, un despacho de graduado social ou un sindicato poden dicirche como se aplica ao teu caso.',
+    '20 días hábiles desde o despedimento (art. 59.4 ET). É curto, e un despacho laboralista, un despacho de graduado social ou un sindicato poden dicirche como se aplica ao teu caso.',
   'landing.fixed_term_end.name': 'Finiquito por fin dun contrato temporal',
   'landing.fixed_term_end.title': 'Finiquito por fin de contrato 2026: calcúlao e compárao',
   'landing.fixed_term_end.description':
@@ -1168,7 +1168,7 @@ export const gl: Translation = {
     'Si. A persoa traballadora pode pedir a presenza dun representante legal do persoal no momento de asinar o finiquito, e se non a pide, o documento faino constar (art. 49.2 ET).',
   'landing.not_agreed.faq.4.question': 'Que prazo hai se unha cantidade non cadra?',
   'landing.not_agreed.faq.4.answer':
-    'Para o salario pendente, as vacacións, as pagas extraordinarias ou a indemnización por fin dun contrato temporal, un ano (art. 59.1 ET). Nun despedimento, o prazo para impugnalo é de 20 días hábiles (art. 59.3 ET).',
+    'Para o salario pendente, as vacacións, as pagas extraordinarias ou a indemnización por fin dun contrato temporal, un ano (art. 59.1 ET). Nun despedimento, o prazo para impugnalo é de 20 días hábiles (art. 59.4 ET).',
   'landing.benefit.name': 'Calcula canto paro vas cobrar',
   'landing.benefit.title': 'Calcular o paro 2026: canto cobrarás cada mes',
   'landing.benefit.description':

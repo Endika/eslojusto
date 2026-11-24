@@ -297,10 +297,10 @@ export const eu: Translation = {
     'Markatu «Ez dakit». Kausaren mende ez dauden kontzeptuak berrikusten dira: baja-hilabeteko soldata, oporrak eta aparteko ordainsariak. Kalte-ordaina kausaren mende dago, eta hura gabe ez da kalkulatzen. Kausa kaleratze-gutunean eta enpresa-ziurtagirian dago, «causa de la situación legal de desempleo» (legezko langabezia-egoeraren kausa) laukian.',
   'faq.deadlines': 'Zer epe dut nire kitapenean falta dena eskatzeko?',
   'faq.deadlines_answer':
-    'Ordaindu gabeko soldata, oporrak, aparteko ordainsariak edo aldi baterako kontratuaren amaierako kalte-ordaina bezalako zenbatekoetarako, urtebete (art. 59.1 ET). Kaleratze batean (objektiboa, kolektiboa, bidegabea edo diziplinarioa), hura aurkaratzeko epea 20 egun baliodunekoa da (art. 59.3 ET), eta bere kalte-ordainarekin ados ez dagoenak bide beretik planteatu ohi du. Epea laburra da, eta lan-zuzenbideko bulego batek, graduatu sozialaren bulego batek edo sindikatu batek esan diezazuke zein den zure kasuan aplikatzen dena.',
+    'Ordaindu gabeko soldata, oporrak, aparteko ordainsariak edo aldi baterako kontratuaren amaierako kalte-ordaina bezalako zenbatekoetarako, urtebete (art. 59.1 ET). Kaleratze batean (objektiboa, kolektiboa, bidegabea edo diziplinarioa), hura aurkaratzeko epea 20 egun baliodunekoa da (art. 59.4 ET), eta bere kalte-ordainarekin ados ez dagoenak bide beretik planteatu ohi du. Epea laburra da, eta lan-zuzenbideko bulego batek, graduatu sozialaren bulego batek edo sindikatu batek esan diezazuke zein den zure kasuan aplikatzen dena.',
   'faq.null_dismissal': 'Noiz izan daiteke deusez kaleratze bat?',
   'faq.null_dismissal_answer':
-    'Kaleratzen bazaituzte haurdun zaudela, jaiotzagatiko, adopzioagatiko, zaintzagatiko edo harreragatiko baimenean zaudela edo baimen horretatik itzuli eta hurrengo 12 hilabeteetan, baimen bat, lanaldi-murrizketa edo -egokitzapen bat edo zaintzagatiko eszedentzia bat izanda edo eskatuta, edo genero-indarkeriaren edo indarkeria sexualaren biktima izanda, kaleratzea deusez izan liteke, salbu eta arrazoiak egoera horrekin zerikusirik ez badu (art. 55.5 ET). Baja medikoan zaudela, deusez izan liteke arrazoia gaixotasuna bada (Ley 15/2022, arts. 2.1 eta 26), nahiz eta auzitegiek oraindik ez duten modu bateratuan aplikatzen. Berrikuspenak abisua ematen dizu markatzen baduzu, kasu horretarako zifrarik eman gabe. Kaleratzea aurkaratzeko 20 egun baliodun daude (art. 59.3 ET).',
+    'Kaleratzen bazaituzte haurdun zaudela, jaiotzagatiko, adopzioagatiko, zaintzagatiko edo harreragatiko baimenean zaudela edo baimen horretatik itzuli eta hurrengo 12 hilabeteetan, baimen bat, lanaldi-murrizketa edo -egokitzapen bat edo zaintzagatiko eszedentzia bat izanda edo eskatuta, edo genero-indarkeriaren edo indarkeria sexualaren biktima izanda, kaleratzea deusez izan liteke, salbu eta arrazoiak egoera horrekin zerikusirik ez badu (art. 55.5 ET). Baja medikoan zaudela, deusez izan liteke arrazoia gaixotasuna bada (Ley 15/2022, arts. 2.1 eta 26), nahiz eta auzitegiek oraindik ez duten modu bateratuan aplikatzen. Berrikuspenak abisua ematen dizu markatzen baduzu, kasu horretarako zifrarik eman gabe. Kaleratzea aurkaratzeko 20 egun baliodun daude (art. 59.4 ET).',
   'faq.late_interest': 'Eta oraindik ez badidate kitapena ordaindu?',
   'faq.late_interest_answer':
     'Soldata denak berandutze-interesa sortzen du, urtean 10 %, baja-datatik aurrera (art. 29.3 ET), nahiz eta zenbatekoa eztabaidatu (2014ko ekainaren 17ko STS, rcud 1315/2013). Berrikuspenak baja-hilabeteko soldataren eta aparteko ordainsarien legezko gutxienekoaren gainean zenbatzen du. Kalte-ordainak ez du interes hori sortzen, eta hartu gabeko oporrak ez dira batzen, zalantzazkoa delako interes hori sortzen duten. Kitapeneko zenbatekoak erreklamatzeko urtebete dago baja-datatik aurrera (art. 59.1 eta 59.2 ET).',
@@ -393,9 +393,9 @@ export const eu: Translation = {
   'client.summary.benefit_unknown':
     'Langabezia-prestazioa kausaren araberakoa da: kaleratze batek edo aldi baterako kontratu baten amaierak eskubidea ematen dute, azken 6 urteetan gutxienez 360 egun kotizatuta badituzu; borondatezko baja batek, ez.',
   'client.summary.dismissal_deadline':
-    'Kaleratze bat aurkaratzeko epea 20 egun baliodunekoa da (art. 59.3 ET).',
+    'Kaleratze bat aurkaratzeko epea 20 egun baliodunekoa da (art. 59.4 ET).',
   'client.summary.dismissal_deadline_if':
-    'Kaleratzea izan bazen, hura aurkaratzeko epea 20 egun baliodunekoa da (art. 59.3 ET).',
+    'Kaleratzea izan bazen, hura aurkaratzeko epea 20 egun baliodunekoa da (art. 59.4 ET).',
   'client.summary.benefit_deadline':
     'Langabezia-prestazioa kobratzeko, enplegu-eskatzaile gisa izena eman behar duzu, eta kontratua amaitu eta hurrengo 15 egunetan eskatu (baliodunak, SEPEren arabera). Zure kitapenak hartu gabeko oporrak ordaintzen baditu, epea egun horiek amaitzen direnetik zenbatzen da (arts. 266 eta 268 LGSS).',
   'client.status.below_minimum': 'Legezko gutxienekoaren azpitik. Falta dena: {importe}',
@@ -407,7 +407,7 @@ export const eu: Translation = {
   'client.status.no_employer_figure': 'Ez duzu sartu zure kitapeneko zifra',
   'client.status.no_severance': 'Kasu honetan ez dagokizu kalte-ordainik legez',
   'client.status.no_severance_disciplinary':
-    'Kaleratzea bidezkoa bada, ez dago kalte-ordainik (art. 55.7 ET). Bidegabea deklaratuko balitz, erreferentzia hau izango litzateke: {importe}; kaleratze bat aurkaratzeko epea 20 egun baliodunekoa da (art. 59.3 ET).',
+    'Kaleratzea bidezkoa bada, ez dago kalte-ordainik (art. 55.7 ET). Bidegabea deklaratuko balitz, erreferentzia hau izango litzateke: {importe}; kaleratze bat aurkaratzeko epea 20 egun baliodunekoa da (art. 59.4 ET).',
   'client.status.not_checkable_days': 'Ezin da egiaztatu hartu dituzun egunak jakin gabe',
   'client.status.not_checkable_cause': 'Kausarik gabe ez da kalte-ordaina kalkulatzen',
   'client.status.not_checkable_erte': 'Ezin da egiaztatu ERTEaren aurreko zure soldatarik gabe',
@@ -591,7 +591,7 @@ export const eu: Translation = {
   'client.warning.null_dismissal.effects':
     'Epaitegi batek deusez deklaratuko balu, enpresak zu berriro onartu beharko zintuzke eta kobratu ez zenituen soldatak ordaindu beharko lizkizuke (arts. 55.6 eta 53.5 ET). Berrikuspen honek ez du kasu horretarako zifrarik kalkulatzen.',
   'client.warning.null_dismissal.deadline':
-    'Kaleratzea aurkaratzeko 20 egun baliodun daude baja-datatik aurrera (art. 59.3 ET); adiskidetze-eskaera (papeleta de conciliación) aurkezteak epea eteten du. Lan-zuzenbideko bulego batek, lan-aholkularitza batek edo sindikatu batek esan diezazuke nola aplikatzen den zure kasuan.',
+    'Kaleratzea aurkaratzeko 20 egun baliodun daude baja-datatik aurrera (art. 59.4 ET); adiskidetze-eskaera (papeleta de conciliación) aurkezteak epea eteten du. Lan-zuzenbideko bulego batek, lan-aholkularitza batek edo sindikatu batek esan diezazuke nola aplikatzen den zure kasuan.',
   'client.warning.erte_unknown.title': 'ERTE batean bazeunden',
   'client.warning.erte_unknown':
     'ERTE batekin, kalte-ordaina ERTEaren aurreko soldata osoarekin kalkulatu beharko litzateke: lanaldi murriztuarekin, murrizketaren aurrekoarekin (STS 678/2018); kontratua etenda, lan egindako hilabeteetan kobratutakoarekin (STS 638/2022). Zure azken nominetakoren bat ERTE batekoa bada, berrikuspen honetako kalte-ordaina laburregia gera daiteke.',
@@ -609,7 +609,7 @@ export const eu: Translation = {
   'client.warning.late_interest.lapsed':
     'Urtebete baino gehiago igaro da baja-datatik; beraz, preskribatuta egon daiteke (art. 59.1 eta 59.2 ET), zerbaitek epea eten ez badu behintzat. Horregatik, ez da interesa zenbatzen.',
   'client.warning.late_interest.other_deadline':
-    'Kaleratze bat aurkaratzeko 20 egun baliodunetatik bestelako epea da (art. 59.3 ET).',
+    'Kaleratze bat aurkaratzeko 20 egun baliodunetatik bestelako epea da (art. 59.4 ET).',
   'client.unchecked.net_pay': 'Soldata garbia: IRPFaren atxikipenak eta kotizazioak',
   'client.unchecked.bonuses':
     'Zure hitzarmeneko edo kontratuko plusak, osagarriak, aparteko orduak eta komisioak',
@@ -1153,7 +1153,7 @@ export const eu: Translation = {
     'Bai. Edozein kaleratze legezko langabezia-egoera da (art. 267.1.a.3.º LGSS). Gainera, azken 6 urteetan 360 egun kotizatuta izan behar dira, beste baldintza batzuen artean.',
   'landing.unfair_dismissal.faq.5.question': 'Zer epe dago kaleratze bat aurkaratzeko?',
   'landing.unfair_dismissal.faq.5.answer':
-    '20 egun baliodun, kaleratzetik aurrera (art. 59.3 ET). Epe laburra da, eta lan-zuzenbideko bulego batek, graduatu sozialaren bulego batek edo sindikatu batek esan diezazuke nola aplikatzen den zure kasuan.',
+    '20 egun baliodun, kaleratzetik aurrera (art. 59.4 ET). Epe laburra da, eta lan-zuzenbideko bulego batek, graduatu sozialaren bulego batek edo sindikatu batek esan diezazuke nola aplikatzen den zure kasuan.',
   'landing.fixed_term_end.name': 'Kitapena aldi baterako kontratua amaitzean',
   'landing.fixed_term_end.title': 'Kitapena kontratua amaitzean 2026: kalkulatu eta alderatu',
   'landing.fixed_term_end.description':
@@ -1200,7 +1200,7 @@ export const eu: Translation = {
     'Bai. Langileak langileen legezko ordezkari bat bertan egotea eska dezake kitapena sinatzeko unean, eta eskatzen ez badu, agiriak hala jasotzen du (art. 49.2 ET).',
   'landing.not_agreed.faq.4.question': 'Zenbateko bat ez badator bat, zer epe dago?',
   'landing.not_agreed.faq.4.answer':
-    'Ordaindu gabeko soldatarako, oporretarako, aparteko ordainsarietarako edo aldi baterako kontratuaren amaierako kalte-ordainerako, urtebete (art. 59.1 ET). Kaleratze batean, hura aurkaratzeko epea 20 egun baliodunekoa da (art. 59.3 ET).',
+    'Ordaindu gabeko soldatarako, oporretarako, aparteko ordainsarietarako edo aldi baterako kontratuaren amaierako kalte-ordainerako, urtebete (art. 59.1 ET). Kaleratze batean, hura aurkaratzeko epea 20 egun baliodunekoa da (art. 59.4 ET).',
   'landing.benefit.name': 'Kalkulatu zenbat langabezia-prestazio kobratuko duzun',
   'landing.benefit.title': 'Kalkulatu langabezia-prestazioa 2026: zenbat kobratuko duzun hilero',
   'landing.benefit.description':

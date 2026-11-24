@@ -278,10 +278,10 @@ export const zh: Translation = {
     '请选择“不知道”。核查会检查与原因无关的项目：离职当月的工资、年假和额外工资。补偿金取决于原因，没有原因就不计算。原因写在解雇信和公司离职证明（certificado de empresa）上的“causa de la situación legal de desempleo”一栏。',
   'faq.deadlines': '离职结算少付的部分，我有多长时间可以主张？',
   'faq.deadlines_answer':
-    '对于未付工资、年假、额外工资或定期合同到期补偿金等款项，期限为一年（art. 59.1 ET）。如果是解雇（客观原因、集体、不当或纪律解雇），对解雇提出异议的期限为20个工作日（art. 59.3 ET），对补偿金有异议的人通常也通过同一途径提出。期限很短，劳动法律师事务所、社会事务师（graduado social）事务所或工会可以告诉您适用于您情况的是哪一个。',
+    '对于未付工资、年假、额外工资或定期合同到期补偿金等款项，期限为一年（art. 59.1 ET）。如果是解雇（客观原因、集体、不当或纪律解雇），对解雇提出异议的期限为20个工作日（art. 59.4 ET），对补偿金有异议的人通常也通过同一途径提出。期限很短，劳动法律师事务所、社会事务师（graduado social）事务所或工会可以告诉您适用于您情况的是哪一个。',
   'faq.null_dismissal': '什么情况下解雇可能无效？',
   'faq.null_dismissal_answer':
-    '如果您在怀孕期间、休生育、收养、监护或寄养假期间或休完回来后的12个月内被解雇，或在享有或申请过照护假、缩短工时、工时调整或照护停薪留职时被解雇，或您是性别暴力或性暴力的受害者，解雇可能无效（nulo），除非解雇理由与该情况毫无关系（art. 55.5 ET）。在病假期间被解雇，如果理由是疾病，也可能无效（Ley 15/2022, arts. 2.1 y 26），不过法院目前的适用还不统一。如果您勾选了这种情况，核查会提醒您，但不会给出这种情况下的金额。对解雇提出异议的期限为20个工作日（art. 59.3 ET）。',
+    '如果您在怀孕期间、休生育、收养、监护或寄养假期间或休完回来后的12个月内被解雇，或在享有或申请过照护假、缩短工时、工时调整或照护停薪留职时被解雇，或您是性别暴力或性暴力的受害者，解雇可能无效（nulo），除非解雇理由与该情况毫无关系（art. 55.5 ET）。在病假期间被解雇，如果理由是疾病，也可能无效（Ley 15/2022, arts. 2.1 y 26），不过法院目前的适用还不统一。如果您勾选了这种情况，核查会提醒您，但不会给出这种情况下的金额。对解雇提出异议的期限为20个工作日（art. 59.4 ET）。',
   'faq.late_interest': '如果公司还没有支付离职结算呢？',
   'faq.late_interest_answer':
     '属于工资的部分，从离职之日起按每年10 %计算延迟利息（art. 29.3 ET），即使金额存在争议也是如此（STS de 17 de junio de 2014, rcud 1315/2013）。核查按离职当月工资和额外工资的法定最低金额计算利息。补偿金不计这种利息；未休年假是否计息存疑，因此不计入。主张离职结算款项的期限为离职后一年（art. 59.1 y 59.2 ET）。',
@@ -368,9 +368,9 @@ export const zh: Translation = {
     '主动辞职不能领取失业金，但有例外，例如调岗异地、对您不利的工作条件重大变更、公司严重违约，或性别暴力或性暴力（art. 267.1.a.5.º LGSS）。',
   'client.summary.benefit_unknown':
     '失业金取决于原因：解雇或定期合同到期，如果您在过去6年中累计缴费至少360天，就可以领取；主动辞职则不能。',
-  'client.summary.dismissal_deadline': '对解雇提出异议的期限为20个工作日（art. 59.3 ET）。',
+  'client.summary.dismissal_deadline': '对解雇提出异议的期限为20个工作日（art. 59.4 ET）。',
   'client.summary.dismissal_deadline_if':
-    '如果是解雇，对其提出异议的期限为20个工作日（art. 59.3 ET）。',
+    '如果是解雇，对其提出异议的期限为20个工作日（art. 59.4 ET）。',
   'client.summary.benefit_deadline':
     '要领取失业金，您需要登记为求职者，并在合同结束后的15天内提出申请（据 SEPE 的说法，按工作日计算）。如果您的离职结算中支付了未休年假，期限从这些年假天数结束时开始计算（arts. 266 y 268 LGSS）。',
   'client.status.below_minimum': '低于法定最低金额：少了{importe}',
@@ -382,7 +382,7 @@ export const zh: Translation = {
   'client.status.no_employer_figure': '您没有填写离职结算单上的数字',
   'client.status.no_severance': '这种情况下，法律没有规定您可获得补偿金',
   'client.status.no_severance_disciplinary':
-    '如果解雇被认定为正当，就没有补偿金（art. 55.7 ET）。如果被判定为不当解雇，参考金额为{importe}；对解雇提出异议的期限为20个工作日（art. 59.3 ET）。',
+    '如果解雇被认定为正当，就没有补偿金（art. 55.7 ET）。如果被判定为不当解雇，参考金额为{importe}；对解雇提出异议的期限为20个工作日（art. 59.4 ET）。',
   'client.status.not_checkable_days': '没有您已休的年假天数无法核查',
   'client.status.not_checkable_cause': '没有原因就无法计算补偿金',
   'client.status.not_checkable_erte': '没有您 ERTE 之前的工资无法核查',
@@ -552,7 +552,7 @@ export const zh: Translation = {
   'client.warning.null_dismissal.effects':
     '如果法院判定解雇无效，公司须让您复职，并支付您未领到的工资（arts. 55.6 y 53.5 ET）。本核查不计算这种情况下的金额。',
   'client.warning.null_dismissal.deadline':
-    '对解雇提出异议的期限为自离职之日起20个工作日（art. 59.3 ET）；提交调解申请（papeleta de conciliación）会中断这一期限。劳动法律师事务所、劳动咨询机构或工会可以告诉您如何适用于您的情况。',
+    '对解雇提出异议的期限为自离职之日起20个工作日（art. 59.4 ET）；提交调解申请（papeleta de conciliación）会中断这一期限。劳动法律师事务所、劳动咨询机构或工会可以告诉您如何适用于您的情况。',
   'client.warning.erte_unknown.title': '如果您当时处于 ERTE 中',
   'client.warning.erte_unknown':
     '在 ERTE 中，补偿金应按 ERTE 之前的全额工资计算：缩短工时的，按缩短之前的工资（STS 678/2018）；合同中止的，按工作月份实际领取的工资（STS 638/2022）。如果您最近的某张工资单属于 ERTE 期间，本核查算出的补偿金可能偏低。',
@@ -570,7 +570,7 @@ export const zh: Translation = {
   'client.warning.late_interest.lapsed':
     '离职已超过一年，因此可能已过时效（art. 59.1 y 59.2 ET），除非有情况中断了期限。所以不计算利息。',
   'client.warning.late_interest.other_deadline':
-    '这与对解雇提出异议的20个工作日期限不同（art. 59.3 ET）。',
+    '这与对解雇提出异议的20个工作日期限不同（art. 59.4 ET）。',
   'client.unchecked.net_pay': '税后金额：IRPF 预扣和社保缴费',
   'client.unchecked.bonuses': '您的集体协议或合同中的津贴、补贴、加班费和提成',
   'client.unchecked.additional_extra_pay': '两份常规额外工资之外的额外工资',
@@ -1056,7 +1056,7 @@ export const zh: Translation = {
     '能。任何解雇都属于法定失业状态（situación legal de desempleo，art. 267.1.a.3.º LGSS）。此外，还需要在过去6年中缴费360天，以及满足其他条件。',
   'landing.unfair_dismissal.faq.5.question': '对解雇提出异议的期限是多久？',
   'landing.unfair_dismissal.faq.5.answer':
-    '自解雇之日起20个工作日（art. 59.3 ET）。期限很短，劳动法律师事务所、社会事务师（graduado social）事务所或工会可以告诉您它如何适用于您的情况。',
+    '自解雇之日起20个工作日（art. 59.4 ET）。期限很短，劳动法律师事务所、社会事务师（graduado social）事务所或工会可以告诉您它如何适用于您的情况。',
   'landing.fixed_term_end.name': '定期合同到期的离职结算',
   'landing.fixed_term_end.title': '2026年合同到期的离职结算（finiquito）：计算并对比',
   'landing.fixed_term_end.description':
@@ -1099,7 +1099,7 @@ export const zh: Translation = {
     '可以。劳动者在签署离职结算时可以要求一名员工法定代表在场；如果没有提出要求，文件中会注明这一点（art. 49.2 ET）。',
   'landing.not_agreed.faq.4.question': '如果某项金额不一致，期限是多久？',
   'landing.not_agreed.faq.4.answer':
-    '对于未付工资、年假、额外工资或定期合同到期补偿金，期限为一年（art. 59.1 ET）。如果是解雇，对解雇提出异议的期限为20个工作日（art. 59.3 ET）。',
+    '对于未付工资、年假、额外工资或定期合同到期补偿金，期限为一年（art. 59.1 ET）。如果是解雇，对解雇提出异议的期限为20个工作日（art. 59.4 ET）。',
   'landing.benefit.name': '计算您能领多少失业金',
   'landing.benefit.title': '2026年失业金计算：每月能领多少',
   'landing.benefit.description':

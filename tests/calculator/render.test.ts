@@ -66,7 +66,7 @@ describe('zero severance by cause', () => {
     if (!p) throw new Error('no severance');
     const text = statusText(p, trV, rev.unfairReference);
     expect(text).toMatch(/^Si el despido es procedente, no hay indemnización \(art\. 55\.7 ET\)/);
-    expect(text).toContain('20 días hábiles (art. 59.3 ET)');
+    expect(text).toContain('20 días hábiles (art. 59.4 ET)');
     expect(text).toMatch(/la referencia sería \d{1,3}(\.\d{3})*,\d{2}\s€/);
     expect(text).not.toContain('No te corresponde');
   });

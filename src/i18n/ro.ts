@@ -295,10 +295,10 @@ export const ro: Translation = {
     'Alege „Nu știu”. Se verifică acele componente care nu depind de motiv: salariul din luna plecării, concediul și plățile suplimentare. Indemnizația depinde de motiv și fără el nu se calculează. Motivul apare în scrisoarea de concediere și în adeverința de la firmă (certificado de empresa), în căsuța «causa de la situación legal de desempleo» (motivul situației legale de șomaj).',
   'faq.deadlines': 'Ce termen am ca să cer ce lipsește din lichidarea mea finală?',
   'faq.deadlines_answer':
-    'Pentru sume precum salariul rămas de plătit, concediul, plățile suplimentare sau indemnizația la încetarea contractului pe durată determinată, un an (art. 59.1 ET). La o concediere (din motive obiective, colectivă, nejustificată sau disciplinară), termenul pentru a o contesta este de 20 de zile lucrătoare (días hábiles) (art. 59.3 ET), iar cine nu este de acord cu indemnizația o contestă de obicei pe aceeași cale. Termenul este scurt, iar un cabinet de avocatură specializat în dreptul muncii, un consilier în dreptul muncii (graduado social) sau un sindicat îți pot spune care se aplică în cazul tău.',
+    'Pentru sume precum salariul rămas de plătit, concediul, plățile suplimentare sau indemnizația la încetarea contractului pe durată determinată, un an (art. 59.1 ET). La o concediere (din motive obiective, colectivă, nejustificată sau disciplinară), termenul pentru a o contesta este de 20 de zile lucrătoare (días hábiles) (art. 59.4 ET), iar cine nu este de acord cu indemnizația o contestă de obicei pe aceeași cale. Termenul este scurt, iar un cabinet de avocatură specializat în dreptul muncii, un consilier în dreptul muncii (graduado social) sau un sindicat îți pot spune care se aplică în cazul tău.',
   'faq.null_dismissal': 'Când poate fi nulă o concediere?',
   'faq.null_dismissal_answer':
-    'Dacă te concediază când ești însărcinată, când ești în concediu pentru naștere, adopție, tutelă sau plasament familial ori în cele 12 luni de după întoarcerea din el, ai sau ai cerut un concediu, o reducere sau o adaptare a programului ori un concediu fără plată pentru îngrijire, sau ești victimă a violenței de gen sau sexuale, concedierea ar putea fi nulă (nulo), cu excepția cazului în care motivul nu are nicio legătură cu acea situație (art. 55.5 ET). Dacă ești în concediu medical (baja médica), ar putea fi nulă dacă motivul este boala (Ley 15/2022, art. 2.1 și 26), deși instanțele încă nu aplică acest lucru în mod unitar. Verificarea te avertizează dacă bifezi această opțiune, fără să dea sume pentru acel caz. Pentru a contesta concedierea există un termen de 20 de zile lucrătoare (art. 59.3 ET).',
+    'Dacă te concediază când ești însărcinată, când ești în concediu pentru naștere, adopție, tutelă sau plasament familial ori în cele 12 luni de după întoarcerea din el, ai sau ai cerut un concediu, o reducere sau o adaptare a programului ori un concediu fără plată pentru îngrijire, sau ești victimă a violenței de gen sau sexuale, concedierea ar putea fi nulă (nulo), cu excepția cazului în care motivul nu are nicio legătură cu acea situație (art. 55.5 ET). Dacă ești în concediu medical (baja médica), ar putea fi nulă dacă motivul este boala (Ley 15/2022, art. 2.1 și 26), deși instanțele încă nu aplică acest lucru în mod unitar. Verificarea te avertizează dacă bifezi această opțiune, fără să dea sume pentru acel caz. Pentru a contesta concedierea există un termen de 20 de zile lucrătoare (art. 59.4 ET).',
   'faq.late_interest': 'Și dacă încă nu mi s-a plătit lichidarea finală?',
   'faq.late_interest_answer':
     'Partea care este salariu produce o dobândă pentru întârziere de 10 % pe an de la data plecării (art. 29.3 ET), chiar dacă suma este contestată (STS din 17 iunie 2014, rcud 1315/2013). Verificarea o calculează pe minimul legal al salariului din luna plecării și al plăților suplimentare. Indemnizația nu produce această dobândă, iar zilele de concediu neefectuat nu se adaugă, pentru că nu este sigur că o produc. Pentru a cere sumele din lichidarea finală există un termen de un an de la data plecării (art. 59.1 și 59.2 ET).',
@@ -392,9 +392,9 @@ export const ro: Translation = {
   'client.summary.benefit_unknown':
     'Indemnizația de șomaj depinde de motiv: o concediere sau încetarea unui contract pe durată determinată dau acest drept dacă ai cel puțin 360 de zile de contribuție în ultimii 6 ani; o demisie, nu.',
   'client.summary.dismissal_deadline':
-    'Termenul pentru a contesta o concediere este de 20 de zile lucrătoare (días hábiles) (art. 59.3 ET).',
+    'Termenul pentru a contesta o concediere este de 20 de zile lucrătoare (días hábiles) (art. 59.4 ET).',
   'client.summary.dismissal_deadline_if':
-    'Dacă a fost o concediere, termenul pentru a o contesta este de 20 de zile lucrătoare (días hábiles) (art. 59.3 ET).',
+    'Dacă a fost o concediere, termenul pentru a o contesta este de 20 de zile lucrătoare (días hábiles) (art. 59.4 ET).',
   'client.summary.benefit_deadline':
     'Pentru a primi indemnizația de șomaj trebuie să te înscrii ca persoană în căutarea unui loc de muncă (demandante de empleo) și să o ceri în cele 15 zile de după încetarea contractului (zile lucrătoare, potrivit SEPE). Dacă lichidarea ta finală plătește zile de concediu neefectuat, termenul curge de la sfârșitul acelor zile (art. 266 și 268 LGSS).',
   'client.status.below_minimum': 'Sub minimul legal: lipsesc {importe}',
@@ -406,7 +406,7 @@ export const ro: Translation = {
   'client.status.no_employer_figure': 'Nu ai introdus suma din lichidarea ta finală',
   'client.status.no_severance': 'În acest caz legea nu prevede indemnizație',
   'client.status.no_severance_disciplinary':
-    'Dacă concedierea este justificată (procedente), nu există indemnizație (art. 55.7 ET). Dacă ar fi declarată nejustificată, suma de referință ar fi {importe}; termenul pentru a contesta o concediere este de 20 de zile lucrătoare (días hábiles) (art. 59.3 ET).',
+    'Dacă concedierea este justificată (procedente), nu există indemnizație (art. 55.7 ET). Dacă ar fi declarată nejustificată, suma de referință ar fi {importe}; termenul pentru a contesta o concediere este de 20 de zile lucrătoare (días hábiles) (art. 59.4 ET).',
   'client.status.not_checkable_days':
     'Nu se poate verifica fără zilele de concediu pe care le-ai efectuat',
   'client.status.not_checkable_cause': 'Fără motiv nu se calculează indemnizația',
@@ -589,7 +589,7 @@ export const ro: Translation = {
   'client.warning.null_dismissal.effects':
     'Dacă o instanță ar declara-o nulă, firma ar fi obligată să te reintegreze (readmisión) și să îți plătească salariile pe care nu le-ai primit (art. 55.6 și 53.5 ET). Această verificare nu calculează sume pentru acel caz.',
   'client.warning.null_dismissal.deadline':
-    'Pentru a contesta concedierea există un termen de 20 de zile lucrătoare (días hábiles) de la data plecării (art. 59.3 ET); depunerea cererii de conciliere (papeleta de conciliación) întrerupe termenul. Un cabinet de avocatură specializat în dreptul muncii, o firmă de consultanță în dreptul muncii (asesoría laboral) sau un sindicat îți pot spune cum se aplică în cazul tău.',
+    'Pentru a contesta concedierea există un termen de 20 de zile lucrătoare (días hábiles) de la data plecării (art. 59.4 ET); depunerea cererii de conciliere (papeleta de conciliación) întrerupe termenul. Un cabinet de avocatură specializat în dreptul muncii, o firmă de consultanță în dreptul muncii (asesoría laboral) sau un sindicat îți pot spune cum se aplică în cazul tău.',
   'client.warning.erte_unknown.title': 'Dacă erai într-un ERTE',
   'client.warning.erte_unknown':
     'Cu un ERTE, potrivit Curții Supreme (Tribunal Supremo), indemnizația se calculează cu salariul complet de dinainte de ERTE: cu program redus, cel de dinainte de reducere (STS 678/2018); cu contractul suspendat, ce s-a câștigat în lunile lucrate (STS 638/2022). Dacă vreunul dintre ultimii tăi fluturași de salariu este dintr-un ERTE, indemnizația din această verificare poate ieși mai mică decât cea reală.',
@@ -607,7 +607,7 @@ export const ro: Translation = {
   'client.warning.late_interest.lapsed':
     'A trecut mai mult de un an de la data plecării, așa că dreptul poate fi prescris (art. 59.1 și 59.2 ET), cu excepția cazului în care ceva a întrerupt termenul. De aceea dobânda nu se calculează.',
   'client.warning.late_interest.other_deadline':
-    'Este un termen diferit de cele 20 de zile lucrătoare (días hábiles) pentru a contesta o concediere (art. 59.3 ET).',
+    'Este un termen diferit de cele 20 de zile lucrătoare (días hábiles) pentru a contesta o concediere (art. 59.4 ET).',
   'client.unchecked.net_pay':
     'Salariul net: reținerile de impozit pe venit (IRPF) și contribuțiile',
   'client.unchecked.bonuses':
@@ -1157,7 +1157,7 @@ export const ro: Translation = {
     'Da. Orice concediere este situație legală de șomaj (situación legal de desempleo) (art. 267.1.a.3.º LGSS). În plus, ai nevoie de 360 de zile de contribuție în ultimii 6 ani, printre alte condiții.',
   'landing.unfair_dismissal.faq.5.question': 'Ce termen există pentru a contesta o concediere?',
   'landing.unfair_dismissal.faq.5.answer':
-    '20 de zile lucrătoare (días hábiles) de la concediere (art. 59.3 ET). Este un termen scurt, iar un cabinet de avocatură specializat în dreptul muncii, un consilier în dreptul muncii (graduado social) sau un sindicat îți pot spune cum se aplică în cazul tău.',
+    '20 de zile lucrătoare (días hábiles) de la concediere (art. 59.4 ET). Este un termen scurt, iar un cabinet de avocatură specializat în dreptul muncii, un consilier în dreptul muncii (graduado social) sau un sindicat îți pot spune cum se aplică în cazul tău.',
   'landing.fixed_term_end.name':
     'Lichidarea finală la încetarea contractului pe durată determinată',
   'landing.fixed_term_end.title':
@@ -1208,7 +1208,7 @@ export const ro: Translation = {
     'Da. Persoana angajată poate cere prezența unui reprezentant legal al angajaților în momentul semnării lichidării finale, iar dacă nu o cere, documentul menționează acest lucru (art. 49.2 ET).',
   'landing.not_agreed.faq.4.question': 'Ce termen există dacă o sumă nu se potrivește?',
   'landing.not_agreed.faq.4.answer':
-    'Pentru salariul rămas de plătit, concediu, plățile suplimentare sau indemnizația la încetarea contractului pe durată determinată, un an (art. 59.1 ET). La o concediere, termenul pentru a o contesta este de 20 de zile lucrătoare (días hábiles) (art. 59.3 ET).',
+    'Pentru salariul rămas de plătit, concediu, plățile suplimentare sau indemnizația la încetarea contractului pe durată determinată, un an (art. 59.1 ET). La o concediere, termenul pentru a o contesta este de 20 de zile lucrătoare (días hábiles) (art. 59.4 ET).',
   'landing.benefit.name': 'Calculează câtă indemnizație de șomaj vei primi',
   'landing.benefit.title': 'Calculul indemnizației de șomaj 2026: cât vei primi în fiecare lună',
   'landing.benefit.description':

@@ -293,10 +293,10 @@ export const ca: Translation = {
     'Marca «No ho sé». Es revisen les partides que no depenen de la causa: el salari del mes de la baixa, les vacances i les pagues extraordinàries. La indemnització depèn de la causa i sense ella no es calcula. La causa consta a la carta d’acomiadament i al certificat d’empresa, a la casella «causa de la situación legal de desempleo».',
   'faq.deadlines': 'Quin termini tinc per demanar el que falta a la meva quitança?',
   'faq.deadlines_answer':
-    'Per a quantitats com ara el salari pendent, les vacances, les pagues extraordinàries o la indemnització per final de contracte temporal, un any (art. 59.1 ET). En un acomiadament (objectiu, col·lectiu, improcedent o disciplinari), el termini per impugnar-lo és de 20 dies hàbils (art. 59.3 ET), i qui no està d’acord amb la seva indemnització sol plantejar-ho per aquesta mateixa via. El termini és curt, i un despatx laboralista, un despatx de graduat social o un sindicat et poden dir quin s’aplica al teu cas.',
+    'Per a quantitats com ara el salari pendent, les vacances, les pagues extraordinàries o la indemnització per final de contracte temporal, un any (art. 59.1 ET). En un acomiadament (objectiu, col·lectiu, improcedent o disciplinari), el termini per impugnar-lo és de 20 dies hàbils (art. 59.4 ET), i qui no està d’acord amb la seva indemnització sol plantejar-ho per aquesta mateixa via. El termini és curt, i un despatx laboralista, un despatx de graduat social o un sindicat et poden dir quin s’aplica al teu cas.',
   'faq.null_dismissal': 'Quan pot ser nul un acomiadament?',
   'faq.null_dismissal_answer':
-    'Si t’acomiaden quan estàs embarassada, de permís per naixement, adopció, guarda o acolliment o en els 12 mesos després de tornar-ne, quan tens o has demanat un permís, una reducció o una adaptació de jornada o una excedència per cura, o quan ets víctima de violència de gènere o sexual, l’acomiadament podria ser nul, tret que el motiu no tingui res a veure amb aquesta situació (art. 55.5 ET). Si estàs de baixa mèdica, podria ser-ho si el motiu és la malaltia (Ley 15/2022, arts. 2.1 i 26), tot i que els tribunals encara no ho apliquen de manera uniforme. La revisió t’avisa si ho marques, sense donar xifres per a aquest cas. Per impugnar l’acomiadament hi ha 20 dies hàbils (art. 59.3 ET).',
+    'Si t’acomiaden quan estàs embarassada, de permís per naixement, adopció, guarda o acolliment o en els 12 mesos després de tornar-ne, quan tens o has demanat un permís, una reducció o una adaptació de jornada o una excedència per cura, o quan ets víctima de violència de gènere o sexual, l’acomiadament podria ser nul, tret que el motiu no tingui res a veure amb aquesta situació (art. 55.5 ET). Si estàs de baixa mèdica, podria ser-ho si el motiu és la malaltia (Ley 15/2022, arts. 2.1 i 26), tot i que els tribunals encara no ho apliquen de manera uniforme. La revisió t’avisa si ho marques, sense donar xifres per a aquest cas. Per impugnar l’acomiadament hi ha 20 dies hàbils (art. 59.4 ET).',
   'faq.late_interest': 'I si encara no m’han pagat la quitança?',
   'faq.late_interest_answer':
     'El que és salari porta un interès per demora del 10 % l’any des de la baixa (art. 29.3 ET), encara que la quantitat es discuteixi (STS de 17 de juny de 2014, rcud 1315/2013). La revisió el compta sobre el mínim legal del salari del mes de la baixa i de les pagues extraordinàries. La indemnització no en porta, i les vacances no gaudides no se sumen perquè és dubtós que en portin. Per reclamar les quantitats de la quitança hi ha un any des de la baixa (art. 59.1 i 59.2 ET).',
@@ -389,9 +389,9 @@ export const ca: Translation = {
   'client.summary.benefit_unknown':
     'L’atur depèn de la causa: un acomiadament o el final d’un contracte temporal hi donen dret si sumes almenys 360 dies cotitzats en els últims 6 anys; una baixa voluntària, no.',
   'client.summary.dismissal_deadline':
-    'El termini per impugnar un acomiadament és de 20 dies hàbils (art. 59.3 ET).',
+    'El termini per impugnar un acomiadament és de 20 dies hàbils (art. 59.4 ET).',
   'client.summary.dismissal_deadline_if':
-    'Si va ser un acomiadament, el termini per impugnar-lo és de 20 dies hàbils (art. 59.3 ET).',
+    'Si va ser un acomiadament, el termini per impugnar-lo és de 20 dies hàbils (art. 59.4 ET).',
   'client.summary.benefit_deadline':
     'Per cobrar l’atur t’has d’inscriure com a demandant d’ocupació i demanar-lo en els 15 dies següents al final del contracte (hàbils, segons el SEPE). Si la teva quitança paga vacances no gaudides, el termini compta des que acaben aquests dies (arts. 266 i 268 LGSS).',
   'client.status.below_minimum': 'Per sota del mínim legal: falten {importe}',
@@ -403,7 +403,7 @@ export const ca: Translation = {
   'client.status.no_employer_figure': 'No has introduït la xifra de la teva quitança',
   'client.status.no_severance': 'En aquest cas la llei no preveu cap indemnització',
   'client.status.no_severance_disciplinary':
-    'Si l’acomiadament és procedent, no hi ha indemnització (art. 55.7 ET). Si es declarés improcedent, la referència seria {importe}; el termini per impugnar un acomiadament és de 20 dies hàbils (art. 59.3 ET).',
+    'Si l’acomiadament és procedent, no hi ha indemnització (art. 55.7 ET). Si es declarés improcedent, la referència seria {importe}; el termini per impugnar un acomiadament és de 20 dies hàbils (art. 59.4 ET).',
   'client.status.not_checkable_days': 'No es pot comprovar sense els dies que has gaudit',
   'client.status.not_checkable_cause': 'Sense la causa no es calcula la indemnització',
   'client.status.not_checkable_erte': 'No es pot comprovar sense el teu salari d’abans de l’ERTE',
@@ -585,7 +585,7 @@ export const ca: Translation = {
   'client.warning.null_dismissal.effects':
     'Si un jutjat el declarés nul, l’empresa t’hauria de readmetre i pagar-te els salaris que vas deixar de cobrar (arts. 55.6 i 53.5 ET). Aquesta revisió no calcula xifres per a aquest cas.',
   'client.warning.null_dismissal.deadline':
-    'Per impugnar l’acomiadament hi ha 20 dies hàbils des de la data de baixa (art. 59.3 ET); presentar la papereta de conciliació interromp el termini. Un despatx laboralista, una assessoria laboral o un sindicat et poden dir com s’aplica al teu cas.',
+    'Per impugnar l’acomiadament hi ha 20 dies hàbils des de la data de baixa (art. 59.4 ET); presentar la papereta de conciliació interromp el termini. Un despatx laboralista, una assessoria laboral o un sindicat et poden dir com s’aplica al teu cas.',
   'client.warning.erte_unknown.title': 'Si estaves en un ERTE',
   'client.warning.erte_unknown':
     'Amb un ERTE, la indemnització s’hauria de calcular amb el salari complet d’abans de l’ERTE: amb jornada reduïda, el d’abans de la reducció (STS 678/2018); amb el contracte suspès, el que s’ha cobrat en els mesos treballats (STS 638/2022). Si alguna de les teves últimes nòmines és d’un ERTE, la indemnització d’aquesta revisió pot quedar curta.',
@@ -603,7 +603,7 @@ export const ca: Translation = {
   'client.warning.late_interest.lapsed':
     'Ha passat més d’un any des de la baixa, així que pot haver prescrit (art. 59.1 i 59.2 ET), tret que alguna cosa interrompés el termini. Per això no es compta l’interès.',
   'client.warning.late_interest.other_deadline':
-    'És un termini diferent dels 20 dies hàbils per impugnar un acomiadament (art. 59.3 ET).',
+    'És un termini diferent dels 20 dies hàbils per impugnar un acomiadament (art. 59.4 ET).',
   'client.unchecked.net_pay': 'El net: retencions d’IRPF i cotitzacions',
   'client.unchecked.bonuses':
     'Plusos, complements, hores extraordinàries i comissions del teu conveni o contracte',
@@ -1137,7 +1137,7 @@ export const ca: Translation = {
     'Sí. Qualsevol acomiadament és situació legal de desocupació (art. 267.1.a.3.º LGSS). A més, calen 360 dies cotitzats en els últims 6 anys, entre altres requisits.',
   'landing.unfair_dismissal.faq.5.question': 'Quin termini hi ha per impugnar un acomiadament?',
   'landing.unfair_dismissal.faq.5.answer':
-    '20 dies hàbils des de l’acomiadament (art. 59.3 ET). És curt, i un despatx laboralista, un despatx de graduat social o un sindicat et poden dir com s’aplica al teu cas.',
+    '20 dies hàbils des de l’acomiadament (art. 59.4 ET). És curt, i un despatx laboralista, un despatx de graduat social o un sindicat et poden dir com s’aplica al teu cas.',
   'landing.fixed_term_end.name': 'Quitança per final d’un contracte temporal',
   'landing.fixed_term_end.title':
     'Quitança (finiquito) per final de contracte 2026: calcula-la i compara-la',
@@ -1183,7 +1183,7 @@ export const ca: Translation = {
     'Sí. La persona treballadora pot demanar la presència d’un representant legal de la plantilla en el moment de signar la quitança, i si no ho demana, el document ho fa constar (art. 49.2 ET).',
   'landing.not_agreed.faq.4.question': 'Quin termini hi ha si una quantitat no quadra?',
   'landing.not_agreed.faq.4.answer':
-    'Per al salari pendent, les vacances, les pagues extraordinàries o la indemnització per final d’un contracte temporal, un any (art. 59.1 ET). En un acomiadament, el termini per impugnar-lo és de 20 dies hàbils (art. 59.3 ET).',
+    'Per al salari pendent, les vacances, les pagues extraordinàries o la indemnització per final d’un contracte temporal, un any (art. 59.1 ET). En un acomiadament, el termini per impugnar-lo és de 20 dies hàbils (art. 59.4 ET).',
   'landing.benefit.name': 'Calcula quant d’atur cobraràs',
   'landing.benefit.title': 'Calcular l’atur 2026: quant cobraràs cada mes',
   'landing.benefit.description':

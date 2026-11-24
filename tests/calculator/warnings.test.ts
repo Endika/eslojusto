@@ -174,7 +174,7 @@ describe('the null dismissal warning', () => {
     expect(text).toEqual([
       'Por lo que has marcado, el despido podría ser nulo (art. 55.5 ET), salvo que el motivo no tenga nada que ver con esa situación.',
       'Si un juzgado lo declarase nulo, la empresa tendría que readmitirte y pagarte los salarios que dejaste de cobrar (arts. 55.6 y 53.5 ET). Esta revisión no calcula cifras para ese caso.',
-      'Para impugnar el despido hay 20 días hábiles desde la fecha de baja (art. 59.3 ET); presentar la papeleta de conciliación interrumpe el plazo. Un despacho laboralista, una asesoría laboral o un sindicato pueden decirte cómo se aplica a tu caso.',
+      'Para impugnar el despido hay 20 días hábiles desde la fecha de baja (art. 59.4 ET); presentar la papeleta de conciliación interrumpe el plazo. Un despacho laboralista, una asesoría laboral o un sindicato pueden decirte cómo se aplica a tu caso.',
     ]);
     expect(n?.sources.map((s) => s.id)).toEqual(['et55_5', 'et53', 'et59']);
     expect(n?.calculation).toBeNull();
@@ -226,7 +226,7 @@ describe('the other warnings', () => {
     expect(n ? textOf(n) : []).toEqual([
       'Lo que es salario lleva un interés por el retraso del 10 % al año (art. 29.3 ET): unos 30 € desde la baja hasta hoy. La indemnización no lo lleva, y las vacaciones no disfrutadas no se suman porque es dudoso que lo lleven.',
       'Para reclamar las cantidades del finiquito hay un año desde la baja (art. 59.1 y 59.2 ET): te quedan 328 días para reclamarlo.',
-      'Es un plazo distinto de los 20 días hábiles para impugnar un despido (art. 59.3 ET).',
+      'Es un plazo distinto de los 20 días hábiles para impugnar un despido (art. 59.4 ET).',
     ]);
     expect(n?.calculation).toContain('10 % al año × 3.000,00 € × 37 días');
     expect(n?.sources.map((s) => s.id)).toEqual(['et29', 'et59']);
@@ -245,7 +245,7 @@ describe('the other warnings', () => {
     );
     expect(n ? textOf(n) : []).toEqual([
       'Ha pasado más de un año desde la baja, así que puede haber prescrito (art. 59.1 y 59.2 ET), salvo que algo interrumpiera el plazo. Por eso no se cuenta el interés.',
-      'Es un plazo distinto de los 20 días hábiles para impugnar un despido (art. 59.3 ET).',
+      'Es un plazo distinto de los 20 días hábiles para impugnar un despido (art. 59.4 ET).',
     ]);
     expect(n?.calculation).toBeNull();
   });
