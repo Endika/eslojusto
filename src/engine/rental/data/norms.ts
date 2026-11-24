@@ -151,19 +151,20 @@ export const NORMS: NormTable = {
   },
 };
 
-// Read on 19-10-2026 in the BOE open data API, and RDL 28/2026 and 29/2026 again on 18-11-2026.
+// Read in the BOE open data API on 24-11-2026: no cited article changed since 19-10-2026 but art. 10 LAU,
+// back to its 2019 wording after RDL 28/2026 was repealed.
 export const NORM_REVIEW: NormReview = {
-  lau: '2026-10-19',
-  law2_2015: '2026-10-19',
-  rdl7_2019: '2026-10-19',
-  rdl6_2022: '2026-10-19',
-  rdl11_2022: '2026-10-19',
-  rdl20_2022: '2026-10-19',
-  law12_2023: '2026-10-19',
-  ineIravResolution: '2026-10-19',
-  pge2023: '2026-10-19',
-  rdl8_2026: '2026-10-19',
-  rdl26_2026: '2026-10-19',
-  rdl29_2026: '2026-11-18',
-  rdl28_2026: '2026-11-18',
+  lau: '2026-11-24',
+  law2_2015: '2026-11-24',
+  rdl7_2019: '2026-11-24',
+  rdl6_2022: '2026-11-24',
+  rdl11_2022: '2026-11-24',
+  rdl20_2022: '2026-11-24',
+  law12_2023: '2026-11-24',
+  ineIravResolution: '2026-11-24',
+  pge2023: '2026-11-24',
+  rdl8_2026: '2026-11-24',
+  rdl26_2026: '2026-11-24',
+  rdl29_2026: '2026-11-24',
+  rdl28_2026: '2026-11-24',
 };
