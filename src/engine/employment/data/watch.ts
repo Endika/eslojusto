@@ -12,20 +12,20 @@ const et = (block: string, versionInForceSince: string, lastAmendedBy: string): 
   lastAmendedBy,
 });
 
-// Versions as returned by the API on 07-10-2026.
+// Versions as returned by the API on 07-10-2026, updated on 24-11-2026 after RDL 39/2026.
 export const ARTICLE_WATCH: ArticleWatch = {
   articles: [
     et('a34', '2023-06-30', 'BOE-A-2023-15135'),
-    et('a15', '2025-01-02', 'BOE-A-2025-6597'),
-    et('a14', '2023-03-02', 'BOE-A-2023-5366'),
-    et('a12', '2025-04-01', 'BOE-A-2024-26917'),
+    et('a15', '2026-11-19', 'BOE-A-2026-24121'),
+    et('a14', '2026-11-19', 'BOE-A-2026-24121'),
+    et('a12', '2026-11-19', 'BOE-A-2026-24121'),
     et('a11', '2023-03-02', 'BOE-A-2023-5366'),
     et('a38', '2015-11-13', ET_ID),
     et('a31', '2015-11-13', ET_ID),
-    et('a21', '2015-11-13', ET_ID),
+    et('a21', '2026-11-19', 'BOE-A-2026-24121'),
     et('a26', '2015-11-13', ET_ID),
-    et('a16', '2022-03-30', 'BOE-A-2021-21788'),
-    et('a8', '2020-06-27', 'BOE-A-2020-6838'),
+    et('a16', '2026-11-19', 'BOE-A-2026-24121'),
+    et('a8', '2026-11-19', 'BOE-A-2026-24121'),
     // Added on 13-10-2026: every other article the rules cite.
     et('a3', '2015-11-13', ET_ID),
     et('a6', '2015-11-13', ET_ID),
@@ -35,7 +35,7 @@ export const ARTICLE_WATCH: ArticleWatch = {
     et('a35', '2015-11-13', ET_ID),
     et('a36', '2015-11-13', ET_ID),
     et('a37', '2026-10-23', 'BOE-A-2026-20528'),
-    et('a59', '2015-11-13', ET_ID),
+    et('a59', '2026-11-19', 'BOE-A-2026-24121'),
     et('a82', '2015-11-13', ET_ID),
     {
       norm: 'rd723_2026',
@@ -43,6 +43,13 @@ export const ARTICLE_WATCH: ArticleWatch = {
       apiUrl: `${API}/${RD723_ID}/texto/bloque/a3`,
       versionInForceSince: '2026-10-05',
       lastAmendedBy: RD723_ID,
+    },
+    {
+      norm: 'rd723_2026',
+      block: 'a2',
+      apiUrl: `${API}/${RD723_ID}/texto/bloque/a2`,
+      versionInForceSince: '2026-11-19',
+      lastAmendedBy: 'BOE-A-2026-24121',
     },
   ],
   matters: [

@@ -28,7 +28,7 @@ describe('employment norm table', () => {
     expect(n.url.startsWith(BOE)).toBe(true);
     expect(n.inForceSince).toMatch(ISO);
     if (n.inForceUntil !== null) expect(n.inForceUntil >= n.inForceSince).toBe(true);
-    expect(n.status).toBe('in_force');
+    expect(n.status).toBe(id === 'rdl39_2026' ? 'pending_validation' : 'in_force');
     expect(NORM_REVIEW[id as EmploymentNormId]).toMatch(ISO);
   });
 
