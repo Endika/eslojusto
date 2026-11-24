@@ -1593,11 +1593,12 @@ export const zh: Translation = {
     '当计算取决于某个未知因素（例如改革前的哪份合同计入）时，本核查会给出两种计算方式，在两者一致之前不会引用转为固定合同的规定。',
   'employment.guide.trial.title': '试用期',
   'employment.guide.trial.lead':
-    '试用期只有以书面约定、且在您的集体协议规定的限度内才可设立。如果集体协议没有规定，最长期限如下（art. 14.1）：',
+    '试用期只有以书面约定才可设立。对于2026年十一月19日起开始的合同，最长期限如下；只有因岗位性质、您的利益或在合同中止后对您进行考察而有正当理由时，集体协议才可规定更长的期限。对于此前的合同，适用您的集体协议规定的限度，如果集体协议没有规定，则适用以下期限（art. 14.1）：',
   'employment.guide.trial.technicians': '有学历的技术人员：6个月。',
   'employment.guide.trial.others': '其他人员：2个月。',
   'employment.guide.trial.small_company': '在员工少于25人的公司中，非有学历技术人员：3个月。',
-  'employment.guide.trial.temporary': '期限为6个月或以下的定期合同：1个月，除非集体协议另有规定。',
+  'employment.guide.trial.temporary':
+    '2026年十一月19日起的定期合同：期限为6个月或以上的为1个月，不足的按比例计算：3个月的合同为半个月。此前的合同：期限为6个月或以下的为1个月，除非集体协议另有规定。',
   'employment.guide.trial.void':
     '如果您此前已在该公司从事过相同的工作，无论签订的是何种合同，都不得设立试用期（art. 14.1）。',
   'employment.guide.trial.training':
@@ -1639,7 +1640,8 @@ export const zh: Translation = {
   'employment.guide.clauses.lead': '法律对某些条款设有限制：',
   'employment.guide.clauses.non_compete':
     '合同结束后的竞业限制：技术人员最长2年，其他人员最长6个月，且仅在公司有实际利益并向您支付适当经济补偿时才可约定（art. 21.2）。',
-  'employment.guide.clauses.exclusivity': '专职服务于一家公司：须约定明确的经济补偿（art. 21.1）。',
+  'employment.guide.clauses.exclusivity':
+    '专职服务于一家公司：须约定明确的经济补偿（art. 21.1）。除此约定外，自2026年十一月19日起，公司不得禁止或限制您为其他公司工作，但出于安全、保密或利益冲突等客观原因的除外。',
   'employment.guide.clauses.retention':
     '服务期（permanencia）：仅限于公司出资提供专业培训之后，最长2年，并且必须采用书面形式（art. 21.4）。',
   'employment.guide.clauses.waiver':
@@ -1678,7 +1680,7 @@ export const zh: Translation = {
     '因生产情况签订的，最长6个月；如果您的行业集体协议延长，最长一年，在此上限内只能延期一次；对于可预见的偶发情况，公司在一个自然年内最多可使用90天，且不得连续。替岗合同的期限为被替代者缺勤的期间；在招聘程序期间填补职位的，最长3个月（art. 15）。如果在24个月内，您与同一家公司或集团通过两份或以上因生产情况签订的合同累计工作超过18个月，《劳动者法》（Estatuto de los Trabajadores）art. 15.5 规定，这些人员«adquirirán la condición de personas trabajadoras fijas»（将获得固定员工身份）。',
   'employment.faq.trial': '试用期最长可以多久？',
   'employment.faq.trial_answer':
-    '由您的集体协议规定，且只有书面约定才可设立。如果集体协议没有规定，有学历的技术人员最长6个月，其他人员2个月，员工少于25人的公司为3个月。期限为6个月或以下的定期合同为1个月，除非集体协议另有规定。如果您此前已在该公司从事过相同的工作，则不得设立（art. 14.1）。工学交替培训合同不设试用期（art. 11.2.l）。',
+    '只有以书面约定才可设立。有学历的技术人员最长6个月，其他人员2个月，员工少于25人的公司为3个月；定期合同期限为6个月或以上的为1个月，不足的按比例计算。自2026年十一月19日起，集体协议只有在有正当理由时才可延长。此前的合同由集体协议规定限度，期限为6个月或以下的定期合同为1个月。如果您此前已在该公司从事过相同的工作，则不得设立（art. 14.1）。工学交替培训合同不设试用期（art. 11.2.l）。',
   'employment.faq.holidays': '我有权享受多少年假？',
   'employment.faq.holidays_answer':
     '每年至少30个自然日，带薪；您的集体协议或合同可以规定更多（art. 38.1）。如果您的合同不足一年，您有权按比例享有，尽管 art. 38.1 没有明确规定这一点。合同存续期间，年假不得折换成现金。',

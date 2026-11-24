@@ -1730,14 +1730,14 @@ export const ro: Translation = {
     'Când calculul depinde de ceva ce nu se știe, de exemplu care contract dinainte de reformă contează, verificarea dă ambele variante și nu citează trecerea la contract permanent până când acestea nu coincid.',
   'employment.guide.trial.title': 'Perioada de probă',
   'employment.guide.trial.lead':
-    'Perioada de probă este posibilă doar dacă se convine în scris, în limitele stabilite de contractul tău colectiv. Dacă acesta nu spune nimic, acestea sunt maximele (art. 14.1):',
+    'Perioada de probă este posibilă doar dacă se convine în scris. Într-un contract început de la 19 noiembrie 2026, acestea sunt maximele, iar contractul tău colectiv poate stabili una mai lungă doar dacă o justifică natura postului, interesul tău sau evaluarea ta după o suspendare a contractului. Într-unul anterior, se aplică limitele contractului tău colectiv și, dacă acesta nu spune nimic, acestea (art. 14.1):',
   'employment.guide.trial.technicians':
     '6 luni pentru tehnicienii cu diplomă (técnicos titulados).',
   'employment.guide.trial.others': '2 luni pentru restul.',
   'employment.guide.trial.small_company':
     '3 luni pentru cine nu este tehnician cu diplomă, într-o firmă cu mai puțin de 25 de angajați.',
   'employment.guide.trial.temporary':
-    '1 lună la un contract pe durată determinată de 6 luni sau mai puțin, cu excepția cazului în care contractul colectiv prevede altceva.',
+    'La un contract pe durată determinată de la 19 noiembrie 2026, 1 lună dacă durează 6 luni sau mai mult și o parte proporțională dacă durează mai puțin: la unul de 3 luni, jumătate de lună. La unul anterior, 1 lună dacă dura 6 luni sau mai puțin, cu excepția cazului în care contractul colectiv prevede altceva.',
   'employment.guide.trial.void':
     'Perioada de probă nu este posibilă dacă ai îndeplinit deja aceleași sarcini în firmă, cu orice tip de contract (art. 14.1).',
   'employment.guide.trial.training':
@@ -1782,7 +1782,7 @@ export const ro: Translation = {
   'employment.guide.clauses.non_compete':
     'Neconcurența după încetarea contractului: cel mult 2 ani pentru tehnicieni și 6 luni pentru restul și doar dacă firma are un interes real și îți plătește o compensație financiară adecvată (art. 21.2).',
   'employment.guide.clauses.exclusivity':
-    'Exclusivitatea față de o singură firmă (plena dedicación): se convine cu o compensație financiară expresă (art. 21.1).',
+    'Exclusivitatea față de o singură firmă (plena dedicación): se convine cu o compensație financiară expresă (art. 21.1). În afara unui astfel de acord, din 19 noiembrie 2026 firma nu îți poate interzice și nici limita să lucrezi pentru altele, cu excepția unor motive obiective precum securitatea, confidențialitatea sau un conflict de interese.',
   'employment.guide.clauses.retention':
     'Obligația de a rămâne în firmă (permanencia): doar după o specializare profesională plătită de firmă, cel mult 2 ani și întotdeauna în scris (art. 21.4).',
   'employment.guide.clauses.waiver':
@@ -1821,7 +1821,7 @@ export const ro: Translation = {
     'Pentru circumstanțe de producție, până la 6 luni sau până la un an dacă perioada este extinsă de contractul colectiv al sectorului tău, cu o singură prelungire în cadrul acestui maxim; pentru situații ocazionale și previzibile, firma îl poate folosi până la 90 de zile pe an calendaristic, neconsecutive. Cel de înlocuire, cât durează absența persoanei pe care o înlocuiești sau până la 3 luni pentru a acoperi un post pe durata unui proces de selecție (art. 15). Dacă în 24 de luni ai avut contracte timp de peste 18 cu aceeași firmă sau același grup, prin două sau mai multe contracte pentru circumstanțe de producție, articolul 15.5 din Estatuto de los Trabajadores spune că aceste persoane «adquirirán la condición de personas trabajadoras fijas» (vor dobândi statutul de angajați permanenți).',
   'employment.faq.trial': 'Cât poate dura perioada de probă?',
   'employment.faq.trial_answer':
-    'O stabilește contractul tău colectiv și este posibilă doar dacă se convine în scris. Dacă acesta nu spune nimic, cel mult 6 luni pentru tehnicienii cu diplomă și 2 luni pentru restul sau 3 în firmele cu mai puțin de 25 de angajați. La un contract pe durată determinată de 6 luni sau mai puțin, 1 lună, cu excepția cazului în care contractul colectiv prevede altceva. Dacă ai îndeplinit deja aceleași sarcini în firmă, nu este posibilă (art. 14.1). La un contract de formare în alternanță nu există perioadă de probă (art. 11.2.l).',
+    'Este posibilă doar dacă se convine în scris. Cel mult 6 luni pentru tehnicienii cu diplomă și 2 luni pentru restul, sau 3 în firmele cu mai puțin de 25 de angajați; la un contract pe durată determinată, 1 lună dacă durează 6 luni sau mai mult și o parte proporțională dacă durează mai puțin. Din 19 noiembrie 2026, contractul tău colectiv o poate prelungi doar dacă o justifică. La contractele anterioare, limitele le stabilea contractul colectiv, iar la unul pe durată determinată de 6 luni sau mai puțin era de 1 lună. Dacă ai îndeplinit deja aceleași sarcini în firmă, nu este posibilă (art. 14.1). La un contract de formare în alternanță nu există perioadă de probă (art. 11.2.l).',
   'employment.faq.holidays': 'Câte zile de concediu mi se cuvin?',
   'employment.faq.holidays_answer':
     'Cel puțin 30 de zile calendaristice pe an, plătite; contractul tău colectiv sau contractul tău pot acorda mai mult (art. 38.1). Dacă contractul tău durează mai puțin de un an, ți se cuvine partea proporțională, deși art. 38.1 nu o spune în mod expres. Cât timp contractul este în vigoare, concediul nu poate fi schimbat pe bani.',
