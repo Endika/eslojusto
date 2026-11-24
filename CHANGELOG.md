@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.118.1](https://github.com/Endika/eslojusto/compare/v1.118.0...v1.118.1) (2026-11-24)
+
+
+### Bug Fixes
+
+* **rental:** record the November BOE review of the rental norms ([0098b94](https://github.com/Endika/eslojusto/commit/0098b949efe2f092bace20053a6c32a1c2b24185))
+
 ## [1.118.0](https://github.com/Endika/eslojusto/compare/v1.117.1...v1.118.0) (2026-11-22)
 
 
