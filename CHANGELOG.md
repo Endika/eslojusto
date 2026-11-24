@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.118.2](https://github.com/Endika/eslojusto/compare/v1.118.1...v1.118.2) (2026-11-24)
+
+
+### Bug Fixes
+
+* **final-pay:** cite art. 59.4 ET for the 20 days to challenge a dismissal ([1acb7f0](https://github.com/Endika/eslojusto/commit/1acb7f09103721f3e3885e6b5e0a0aba0a114687))
+
 ## [1.118.1](https://github.com/Endika/eslojusto/compare/v1.118.0...v1.118.1) (2026-11-24)
 
 
