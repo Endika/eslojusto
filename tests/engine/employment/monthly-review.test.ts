@@ -46,7 +46,7 @@ const describeItem = (item: ChecklistItem): string => {
 
 // The provision a rule's anchor must lead to: `Artículo N` for «art. N.x», or the provision named.
 const expectedHeading = (article: string): string => {
-  const number = /\bart\. (\d+)/.exec(article);
+  const number = /\barts?\. (\d+)/.exec(article);
   if (number !== null) return `Artículo ${number[1]}.`;
   return article.charAt(0).toUpperCase() + article.slice(1);
 };

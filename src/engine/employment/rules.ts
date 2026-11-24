@@ -261,7 +261,7 @@ export const RULES: Readonly<Record<EmploymentRuleId, Rule>> = {
     'special_working_time',
     'rd1561_1995',
     'arts. 2 a 10 bis, 19 a 21 y 32',
-    'https://www.boe.es/buscar/act.php?id=BOE-A-1995-21346#a19',
+    'https://www.boe.es/buscar/act.php?id=BOE-A-1995-21346#a2',
     '1995-09-27',
   ),
   // 12.4.a: the contract states the hours and their distribution.

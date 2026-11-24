@@ -96,6 +96,18 @@ export const EMPLOYMENT_NORMS: NormTable = {
     inForceSince: '2026-10-05',
     ...inForce,
   },
+  // Rewrote arts. 4, 8, 12, 14, 15, 16, 17, 21, 28 and 59 ET and art. 2 RD 723/2026 from 19-11-2026;
+  // the Congreso has yet to validate it.
+  rdl39_2026: {
+    id: 'rdl39_2026',
+    citation: 'Real Decreto-ley 39/2026, de 17 de noviembre',
+    url: 'https://www.boe.es/buscar/doc.php?id=BOE-A-2026-24121',
+    inForceSince: '2026-11-19',
+    inForceUntil: null,
+    status: 'pending_validation',
+    statusSince: null,
+    statusUrl: null,
+  },
   // Special working-time regimes under arts. 34.7, 36.1 and 37.1 ET: shorter rests between days
   // and split weekly rests for some activities and for shift changes.
   rd1561_1995: {
@@ -107,17 +119,19 @@ export const EMPLOYMENT_NORMS: NormTable = {
   },
 };
 
+// Read again in the BOE open data API on 24-11-2026; RDL 39/2026 rewrote the ET articles in watch.ts.
 export const NORM_REVIEW: NormReview = {
-  et: '2026-10-07',
-  rdl8_2019: '2026-10-07',
-  law10_2021: '2026-10-07',
-  rdl32_2021: '2026-10-07',
-  law4_2023: '2026-10-07',
-  law1_2025: '2026-10-07',
-  rd99_2023: '2026-10-07',
-  rd145_2024: '2026-10-07',
-  rd87_2025: '2026-10-07',
-  rd126_2026: '2026-10-07',
-  rd723_2026: '2026-10-07',
-  rd1561_1995: '2026-10-07',
+  et: '2026-11-24',
+  rdl8_2019: '2026-11-24',
+  law10_2021: '2026-11-24',
+  rdl32_2021: '2026-11-24',
+  law4_2023: '2026-11-24',
+  law1_2025: '2026-11-24',
+  rd99_2023: '2026-11-24',
+  rd145_2024: '2026-11-24',
+  rd87_2025: '2026-11-24',
+  rd126_2026: '2026-11-24',
+  rd723_2026: '2026-11-24',
+  rdl39_2026: '2026-11-24',
+  rd1561_1995: '2026-11-24',
 };
