@@ -30,7 +30,8 @@ export const INSURANCE_NORMS: NormTable = {
   },
 };
 
+// Read again in the BOE open data API on 24-11-2026: no article changed.
 export const NORM_REVIEW: NormReview = {
-  lcs: '2026-10-13',
-  law22_2007: '2026-10-13',
+  lcs: '2026-11-24',
+  law22_2007: '2026-11-24',
 };

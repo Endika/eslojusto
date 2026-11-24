@@ -80,14 +80,15 @@ export const CREDIT_NORMS: NormTable = {
   },
 };
 
-// Read in the BOE on 13-10-2026; the directive (EUR-Lex refused the download) and the bill (its PDF
-// would not download) have not been read.
+// Read in the BOE on 13-10-2026 and again in the BOE open data API on 24-11-2026, no article changed;
+// the directive (EUR-Lex refused the download) and the bill (its PDF would not download) have not
+// been read.
 export const NORM_REVIEW: NormReview = {
-  lcc: '2026-10-13',
-  lcc_annex_2013: '2026-10-13',
-  lru: '2026-10-13',
-  oeha: '2026-10-13',
-  cc: '2026-10-13',
+  lcc: '2026-11-24',
+  lcc_annex_2013: '2026-11-24',
+  lru: '2026-11-24',
+  oeha: '2026-11-24',
+  cc: '2026-11-24',
   dcc_2023: null,
   consumer_credit_bill: null,
 };

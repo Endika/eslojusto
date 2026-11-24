@@ -89,14 +89,16 @@ export const HOUSEHOLD_NORMS: NormTable = {
   },
 };
 
+// Read again in the BOE open data API on 24-11-2026: RDL 39/2026 and RDL 31/2026 change the ET and
+// the LGSS, but not arts. 49 ET and 266 to 270 LGSS, the ones the rules cite.
 export const NORM_REVIEW: NormReview = {
-  rd1620_2011: '2026-10-09',
-  rdl16_2022: '2026-10-09',
-  et: '2026-10-09',
-  lgss: '2026-10-09',
-  cc: '2026-10-09',
-  rd99_2023: '2026-10-07',
-  rd145_2024: '2026-10-07',
-  rd87_2025: '2026-10-07',
-  rd126_2026: '2026-10-07',
+  rd1620_2011: '2026-11-24',
+  rdl16_2022: '2026-11-24',
+  et: '2026-11-24',
+  lgss: '2026-11-24',
+  cc: '2026-11-24',
+  rd99_2023: '2026-11-24',
+  rd145_2024: '2026-11-24',
+  rd87_2025: '2026-11-24',
+  rd126_2026: '2026-11-24',
 };
