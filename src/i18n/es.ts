@@ -2198,7 +2198,8 @@ export const es = {
   'client.employment.source.between': 'con efectos del {desde} al {hasta}',
 
   'client.employment.duty.title': 'Información obligatoria por escrito',
-  'client.employment.duty.short_relation': 'No aplica: tu contrato dura cuatro semanas o menos.',
+  'client.employment.duty.short_relation':
+    'No aplica: tu contrato dura cuatro semanas o menos y terminó antes del 19 de noviembre de 2026.',
   'client.employment.duty.ended_before_decree':
     'No aplica: tu contrato terminó antes del 5 de octubre de 2026.',
   'client.employment.duty.missing_one': 'Falta {n} punto de los que pide la ley',
@@ -2210,6 +2211,8 @@ export const es = {
     'Tu contrato empezó desde el 5 de octubre de 2026: la empresa tenía que darte esta información por escrito antes de empezar.',
   'client.employment.duty.on_request':
     'Tu contrato ya estaba en marcha el 5 de octubre de 2026: puedes pedir esta información por escrito y la empresa tiene 30 días hábiles.',
+  'client.employment.duty.short_on_request':
+    'Tu contrato dura cuatro semanas o menos y ya estaba en marcha el 19 de noviembre de 2026: puedes pedir esta información por escrito y la empresa tiene 10 días hábiles.',
   'client.employment.duty.temp_agency_only': 'Solo para contratos por ETT',
   'client.employment.duty.no_trial': 'Solo si hay periodo de prueba',
 
@@ -2338,6 +2341,8 @@ export const es = {
   'client.employment.finding.info_before_start': 'Información antes de empezar',
   'client.employment.finding.info_on_request': 'Información a petición',
   'client.employment.finding.info_short_relations': 'Relaciones de cuatro semanas o menos',
+  'client.employment.finding.info_short_on_request':
+    'Información a petición en relaciones de cuatro semanas o menos',
   'client.employment.finding.info_model': 'Modelo de documento informativo',
   'client.employment.finding.public_holidays': 'Festivos',
   'client.employment.finding.minors_work': 'Trabajo de menores',
@@ -2730,6 +2735,8 @@ export const es = {
     'La empresa tenía que dártelo por escrito antes de que empezaras (art. 7.1).',
   'client.employment.calculation.information.missing_on_request':
     'Puedes pedirlo por escrito y la empresa tiene 30 días hábiles para dártelo.',
+  'client.employment.calculation.information.missing_short_on_request':
+    'Puedes pedirlo por escrito y la empresa tiene 10 días hábiles para dártelo.',
   'client.employment.calculation.information.protocol_always':
     'El plan de igualdad solo hace falta si la empresa tiene uno, pero el protocolo contra el acoso sexual y por razón de sexo hay que darlo siempre (art. 3.2.l).',
   'client.employment.calculation.information.only_if_used':
@@ -2916,6 +2923,8 @@ export const es = {
   'client.employment.letter.information.title': 'Información de mi contrato por escrito',
   'client.employment.letter.information.on_request':
     'Según el {norma} (art. 3 y disposición transitoria única), puedo pedir por escrito la información de mi relación laboral y la empresa tiene 30 días hábiles para darla. Te pido por escrito la que no encuentro en mi contrato:',
+  'client.employment.letter.information.short_on_request':
+    'Según la disposición transitoria segunda del {norma}, puedo pedir por escrito la información de mi relación laboral y la empresa tiene 10 días hábiles para darla. Te pido por escrito la que no encuentro en mi contrato:',
   'client.employment.letter.information.before_start':
     'Según el {norma} (arts. 3 y 7.1), esta información se da por escrito antes de empezar a trabajar. Como no la encuentro en mi contrato, te la pido por escrito:',
   'client.employment.letter.information.filename': 'eslojusto-carta-informacion.pdf',

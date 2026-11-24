@@ -2206,7 +2206,8 @@ export const zh: Translation = {
   'client.employment.source.since': '自{desde}起生效',
   'client.employment.source.between': '自{desde}至{hasta}有效',
   'client.employment.duty.title': '必须以书面形式提供的信息',
-  'client.employment.duty.short_relation': '不适用：您的合同期限为四周或以下。',
+  'client.employment.duty.short_relation':
+    '不适用：您的合同期限为四周或以下，且在2026年十一月19日之前已结束。',
   'client.employment.duty.ended_before_decree': '不适用：您的合同在2026年十月5日之前已结束。',
   'client.employment.duty.missing_one': '缺少法律要求的{n}项',
   'client.employment.duty.missing_many': '缺少法律要求的{n}项',
@@ -2217,6 +2218,8 @@ export const zh: Translation = {
     '您的合同自2026年十月5日起开始：公司须在您开始工作之前以书面形式向您提供这些信息。',
   'client.employment.duty.on_request':
     '您的合同在2026年十月5日时已在履行中：您可以书面要求提供这些信息，公司有30个工作日（hábiles）提供。',
+  'client.employment.duty.short_on_request':
+    '您的合同期限为四周或以下，在2026年十一月19日时已在履行中：您可以书面要求提供这些信息，公司有10个工作日（hábiles）提供。',
   'client.employment.duty.temp_agency_only': '仅适用于通过临时用工公司（ETT）签订的合同',
   'client.employment.duty.no_trial': '仅在设有试用期时适用',
   'client.employment.offer.title': '招聘信息与合同对比',
@@ -2334,6 +2337,7 @@ export const zh: Translation = {
   'client.employment.finding.info_before_start': '开始工作之前提供的信息',
   'client.employment.finding.info_on_request': '应要求提供的信息',
   'client.employment.finding.info_short_relations': '四周或以下的劳动关系',
+  'client.employment.finding.info_short_on_request': '四周或以下劳动关系中应要求提供的信息',
   'client.employment.finding.info_model': '信息文件模板',
   'client.employment.finding.public_holidays': '节假日',
   'client.employment.finding.minors_work': '未成年人工作',
@@ -2710,6 +2714,8 @@ export const zh: Translation = {
     '公司须在您开始工作之前以书面形式向您提供（art. 7.1）。',
   'client.employment.calculation.information.missing_on_request':
     '您可以书面要求提供，公司有30个工作日（hábiles）提供。',
+  'client.employment.calculation.information.missing_short_on_request':
+    '您可以书面要求提供，公司有10个工作日（hábiles）提供。',
   'client.employment.calculation.information.protocol_always':
     '平等计划只有在公司制定了的情况下才需要提供，但防止性骚扰和基于性别的骚扰规程必须始终提供（art. 3.2.l）。',
   'client.employment.calculation.information.only_if_used':
@@ -2880,6 +2886,8 @@ export const zh: Translation = {
   'client.employment.letter.information.title': '请求以书面形式提供本人合同的信息',
   'client.employment.letter.information.on_request':
     '根据{norma}（art. 3 y disposición transitoria única），本人可以书面要求提供本人劳动关系的信息，公司有30个工作日提供。现书面请求您提供本人在合同中未找到的以下信息：',
+  'client.employment.letter.information.short_on_request':
+    '根据{norma}（disposición transitoria segunda），本人可以书面要求提供本人劳动关系的信息，公司有10个工作日提供。现书面请求您提供本人在合同中未找到的以下信息：',
   'client.employment.letter.information.before_start':
     '根据{norma}（arts. 3 y 7.1），这些信息须在开始工作之前以书面形式提供。由于本人在合同中未找到这些信息，现书面请求您提供：',
   'client.employment.letter.information.filename': 'eslojusto-carta-informacion.pdf',

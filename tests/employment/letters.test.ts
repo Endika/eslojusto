@@ -259,6 +259,27 @@ describe('the request for the information owed in writing', () => {
     );
   });
 
+  it('gives a short contract in force on 19-11-2026 ten working days and the decree-law', () => {
+    const r = completed(
+      contract({
+        ...absentInfo('o'),
+        modality: 'production',
+        causeStated: true,
+        circumstancesStated: true,
+        startDate: f('2026-11-10'),
+        endDate: f('2026-11-30'),
+        signedOn: null,
+      }),
+    );
+    const letter = text(companyLetter(r, 'information', TODAY, TABLES, NO_DETAILS, tr));
+    expect(letter).toContain(
+      'Según la disposición transitoria segunda del Real Decreto-ley 39/2026, de 17 de noviembre, puedo pedir por escrito',
+    );
+    expect(letter).toContain('10 días hábiles');
+    expect(letter).not.toContain('30 días hábiles');
+    expect(letter).not.toContain('transitoria única');
+  });
+
   it('carries no figures nor points even when the review has them', () => {
     const r = completed({ ...belowMinimum, ...absentInfo('o') });
     expect(kindsOf(r)).toEqual({ paid: ['employment'], free: ['information_request'] });

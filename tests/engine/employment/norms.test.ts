@@ -53,7 +53,7 @@ describe('employment rule table', () => {
     expect(norm).toBeDefined();
     expect(r.from >= norm.inForceSince).toBe(true);
     expect(r.url.startsWith(BOE)).toBe(true);
-    expect(r.until).toBeNull();
+    expect(r.until).toBe(id === 'info_short_relations' ? '2026-11-18' : null);
     expect(r.supersededBy).toBeNull();
   });
 

@@ -2355,7 +2355,7 @@ export const ca: Translation = {
   'client.employment.source.between': 'amb efectes des de {desde} fins a {hasta}',
   'client.employment.duty.title': 'Informació obligatòria per escrit',
   'client.employment.duty.short_relation':
-    'No s’aplica: el teu contracte dura quatre setmanes o menys.',
+    'No s’aplica: el teu contracte dura quatre setmanes o menys i va acabar abans del 19 de novembre de 2026.',
   'client.employment.duty.ended_before_decree':
     'No s’aplica: el teu contracte va acabar abans del 5 d’octubre de 2026.',
   'client.employment.duty.missing_one': 'Falta {n} punt dels que demana la llei',
@@ -2367,6 +2367,8 @@ export const ca: Translation = {
     'El teu contracte va començar a partir del 5 d’octubre de 2026: l’empresa t’havia de donar aquesta informació per escrit abans de començar.',
   'client.employment.duty.on_request':
     'El teu contracte ja estava en marxa el 5 d’octubre de 2026: pots demanar aquesta informació per escrit i l’empresa té 30 dies hàbils.',
+  'client.employment.duty.short_on_request':
+    'El teu contracte dura quatre setmanes o menys i ja estava en marxa el 19 de novembre de 2026: pots demanar aquesta informació per escrit i l’empresa té 10 dies hàbils.',
   'client.employment.duty.temp_agency_only': 'Només per a contractes per ETT',
   'client.employment.duty.no_trial': 'Només si hi ha període de prova',
   'client.employment.offer.title': 'L’oferta davant del contracte',
@@ -2488,6 +2490,8 @@ export const ca: Translation = {
   'client.employment.finding.info_before_start': 'Informació abans de començar',
   'client.employment.finding.info_on_request': 'Informació a petició',
   'client.employment.finding.info_short_relations': 'Relacions de quatre setmanes o menys',
+  'client.employment.finding.info_short_on_request':
+    'Informació a petició en relacions de quatre setmanes o menys',
   'client.employment.finding.info_model': 'Model de document informatiu',
   'client.employment.finding.public_holidays': 'Festius',
   'client.employment.finding.minors_work': 'Treball de menors',
@@ -2879,6 +2883,8 @@ export const ca: Translation = {
     'L’empresa t’ho havia de donar per escrit abans que comencessis (art. 7.1).',
   'client.employment.calculation.information.missing_on_request':
     'Ho pots demanar per escrit i l’empresa té 30 dies hàbils per donar-t’ho.',
+  'client.employment.calculation.information.missing_short_on_request':
+    'Ho pots demanar per escrit i l’empresa té 10 dies hàbils per donar-t’ho.',
   'client.employment.calculation.information.protocol_always':
     'El pla d’igualtat només cal si l’empresa en té un, però el protocol contra l’assetjament sexual i per raó de sexe s’ha de donar sempre (art. 3.2.l).',
   'client.employment.calculation.information.only_if_used':
@@ -3061,6 +3067,8 @@ export const ca: Translation = {
   'client.employment.letter.information.title': 'Informació del meu contracte per escrit',
   'client.employment.letter.information.on_request':
     'Segons {norma} (art. 3 i disposició transitòria única), puc demanar per escrit la informació de la meva relació laboral i l’empresa té 30 dies hàbils per donar-la. Li demano per escrit la que no trobo al meu contracte:',
+  'client.employment.letter.information.short_on_request':
+    'Segons {norma} (disposició transitòria segona), puc demanar per escrit la informació de la meva relació laboral i l’empresa té 10 dies hàbils per donar-la. Li demano per escrit la que no trobo al meu contracte:',
   'client.employment.letter.information.before_start':
     'Segons {norma} (arts. 3 i 7.1), aquesta informació es dona per escrit abans de començar a treballar. Com que no la trobo al meu contracte, la hi demano per escrit:',
   'client.employment.letter.information.filename': 'eslojusto-carta-informacion.pdf',

@@ -2425,7 +2425,7 @@ export const uk: Translation = {
   'client.employment.source.between': 'діє в період {desde} – {hasta}',
   'client.employment.duty.title': 'Обов’язкова письмова інформація',
   'client.employment.duty.short_relation':
-    'Не застосовується: ваш договір триває чотири тижні або менше.',
+    'Не застосовується: ваш договір триває чотири тижні або менше і закінчився до 19 листопада 2026 р.',
   'client.employment.duty.ended_before_decree':
     'Не застосовується: ваш договір закінчився до 5 жовтня 2026 р.',
   'client.employment.duty.missing_one': 'Бракує {n} пункту з тих, яких вимагає закон',
@@ -2437,6 +2437,8 @@ export const uk: Translation = {
     'Ваш договір почався 5 жовтня 2026 р. або пізніше: компанія мала надати вам цю інформацію письмово до початку роботи.',
   'client.employment.duty.on_request':
     'Ваш договір уже діяв 5 жовтня 2026 р.: ви можете письмово попросити цю інформацію, і компанія має на це 30 робочих днів (hábiles).',
+  'client.employment.duty.short_on_request':
+    'Ваш договір триває чотири тижні або менше і вже діяв 19 листопада 2026 р.: ви можете письмово попросити цю інформацію, і компанія має на це 10 робочих днів (hábiles).',
   'client.employment.duty.temp_agency_only': 'Лише для договорів через ETT',
   'client.employment.duty.no_trial': 'Лише якщо є випробувальний строк',
   'client.employment.offer.title': 'Вакансія порівняно з договором',
@@ -2567,6 +2569,8 @@ export const uk: Translation = {
   'client.employment.finding.info_before_start': 'Інформація до початку роботи',
   'client.employment.finding.info_on_request': 'Інформація на запит',
   'client.employment.finding.info_short_relations': 'Відносини тривалістю чотири тижні або менше',
+  'client.employment.finding.info_short_on_request':
+    'Інформація на запит у відносинах тривалістю чотири тижні або менше',
   'client.employment.finding.info_model': 'Зразок інформаційного документа',
   'client.employment.finding.public_holidays': 'Святкові дні',
   'client.employment.finding.minors_work': 'Праця неповнолітніх',
@@ -2958,6 +2962,8 @@ export const uk: Translation = {
     'Компанія мала надати вам це письмово до початку роботи (art. 7.1).',
   'client.employment.calculation.information.missing_on_request':
     'Ви можете попросити це письмово, і компанія має 30 робочих днів, щоб це надати.',
+  'client.employment.calculation.information.missing_short_on_request':
+    'Ви можете попросити це письмово, і компанія має 10 робочих днів, щоб це надати.',
   'client.employment.calculation.information.protocol_always':
     'План рівності потрібен, лише якщо він у компанії є, але протокол проти сексуальних домагань і домагань за ознакою статі треба надавати завжди (art. 3.2.l).',
   'client.employment.calculation.information.only_if_used':
@@ -3140,6 +3146,8 @@ export const uk: Translation = {
   'client.employment.letter.information.title': 'Письмова інформація про мій договір',
   'client.employment.letter.information.on_request':
     'Відповідно до {norma} (art. 3 і єдине перехідне положення), я можу письмово попросити інформацію про свої трудові відносини, і компанія має 30 робочих днів, щоб її надати. Прошу Вас надати письмово ту інформацію, якої я не знаходжу у своєму договорі:',
+  'client.employment.letter.information.short_on_request':
+    'Відповідно до {norma} (disposición transitoria segunda), я можу письмово попросити інформацію про свої трудові відносини, і компанія має 10 робочих днів, щоб її надати. Прошу Вас надати письмово ту інформацію, якої я не знаходжу у своєму договорі:',
   'client.employment.letter.information.before_start':
     'Відповідно до {norma} (arts. 3 і 7.1), ця інформація надається письмово до початку роботи. Оскільки я не знаходжу її у своєму договорі, прошу Вас надати її письмово:',
   'client.employment.letter.information.filename': 'eslojusto-carta-informacion.pdf',

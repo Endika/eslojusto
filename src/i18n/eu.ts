@@ -2406,7 +2406,7 @@ export const eu: Translation = {
   'client.employment.source.between': 'ondorioak {desde} datatik {hasta} datara',
   'client.employment.duty.title': 'Idatziz eman beharreko informazioa',
   'client.employment.duty.short_relation':
-    'Ez da aplikatzen: zure kontratuak lau aste edo gutxiago irauten du.',
+    'Ez da aplikatzen: zure kontratuak lau aste edo gutxiago irauten du eta 2026ko azaroaren 19a baino lehen amaitu zen.',
   'client.employment.duty.ended_before_decree':
     'Ez da aplikatzen: zure kontratua 2026ko urriaren 5a baino lehen amaitu zen.',
   'client.employment.duty.missing_one': 'Legeak eskatzen dituen puntuetatik {n} falta da',
@@ -2418,6 +2418,8 @@ export const eu: Translation = {
     'Zure kontratua 2026ko urriaren 5etik aurrera hasi zen: enpresak informazio hau idatziz eman behar zizun, hasi aurretik.',
   'client.employment.duty.on_request':
     '2026ko urriaren 5ean zure kontratua martxan zegoen jada: informazio hau idatziz eska dezakezu, eta enpresak 30 egun balioduneko epea du.',
+  'client.employment.duty.short_on_request':
+    'Zure kontratuak lau aste edo gutxiago irauten du, eta 2026ko azaroaren 19an martxan zegoen jada: informazio hau idatziz eska dezakezu, eta enpresak 10 egun balioduneko epea du.',
   'client.employment.duty.temp_agency_only': 'ETT bidezko kontratuetarako bakarrik',
   'client.employment.duty.no_trial': 'Proba-aldia badago bakarrik',
   'client.employment.offer.title': 'Eskaintza kontratuaren aurrean',
@@ -2545,6 +2547,8 @@ export const eu: Translation = {
   'client.employment.finding.info_before_start': 'Informazioa hasi aurretik',
   'client.employment.finding.info_on_request': 'Informazioa eskatuta',
   'client.employment.finding.info_short_relations': 'Lau aste edo gutxiagoko harremanak',
+  'client.employment.finding.info_short_on_request':
+    'Informazioa eskatuta, lau aste edo gutxiagoko harremanetan',
   'client.employment.finding.info_model': 'Informazio-agiriaren eredua',
   'client.employment.finding.public_holidays': 'Jaiegunak',
   'client.employment.finding.minors_work': 'Adingabeen lana',
@@ -2936,6 +2940,8 @@ export const eu: Translation = {
     'Enpresak idatziz eman behar zizun, hasi aurretik (art. 7.1).',
   'client.employment.calculation.information.missing_on_request':
     'Idatziz eska dezakezu, eta enpresak 30 egun balioduneko epea du emateko.',
+  'client.employment.calculation.information.missing_short_on_request':
+    'Idatziz eska dezakezu, eta enpresak 10 egun balioduneko epea du emateko.',
   'client.employment.calculation.information.protocol_always':
     'Berdintasun-plana enpresak bat badu bakarrik behar da, baina sexu-jazarpenaren eta sexuan oinarritutako jazarpenaren aurkako protokoloa beti eman behar da (art. 3.2.l).',
   'client.employment.calculation.information.only_if_used':
@@ -3119,6 +3125,8 @@ export const eu: Translation = {
   'client.employment.letter.information.title': 'Nire kontratuaren informazioa, idatziz',
   'client.employment.letter.information.on_request':
     '{norma} arauaren arabera (art. 3 eta disposición transitoria única), nire lan-harremanaren informazioa idatziz eska dezaket, eta enpresak 30 egun balioduneko epea du hura emateko. Nire kontratuan aurkitzen ez dudana idatziz eskatzen dizuet:',
+  'client.employment.letter.information.short_on_request':
+    '{norma} arauaren arabera (disposición transitoria segunda), nire lan-harremanaren informazioa idatziz eska dezaket, eta enpresak 10 egun balioduneko epea du hura emateko. Nire kontratuan aurkitzen ez dudana idatziz eskatzen dizuet:',
   'client.employment.letter.information.before_start':
     '{norma} arauaren arabera (arts. 3 eta 7.1), informazio hau idatziz ematen da lanean hasi aurretik. Nire kontratuan aurkitzen ez dudanez, idatziz eskatzen dizuet:',
   'client.employment.letter.information.filename': 'eslojusto-carta-informacion.pdf',

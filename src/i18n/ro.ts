@@ -2410,7 +2410,7 @@ export const ro: Translation = {
   'client.employment.source.between': 'cu efecte de la {desde} până la {hasta}',
   'client.employment.duty.title': 'Informații obligatorii în scris',
   'client.employment.duty.short_relation':
-    'Nu se aplică: contractul tău durează patru săptămâni sau mai puțin.',
+    'Nu se aplică: contractul tău durează patru săptămâni sau mai puțin și s-a încheiat înainte de 19 noiembrie 2026.',
   'client.employment.duty.ended_before_decree':
     'Nu se aplică: contractul tău s-a încheiat înainte de 5 octombrie 2026.',
   'client.employment.duty.missing_one': 'Lipsește {n} punct dintre cele cerute de lege',
@@ -2422,6 +2422,8 @@ export const ro: Translation = {
     'Contractul tău a început din 5 octombrie 2026: firma trebuia să îți dea aceste informații în scris înainte să începi.',
   'client.employment.duty.on_request':
     'Contractul tău era deja în desfășurare la 5 octombrie 2026: poți cere aceste informații în scris, iar firma are 30 de zile lucrătoare.',
+  'client.employment.duty.short_on_request':
+    'Contractul tău durează patru săptămâni sau mai puțin și era deja în desfășurare la 19 noiembrie 2026: poți cere aceste informații în scris, iar firma are 10 zile lucrătoare.',
   'client.employment.duty.temp_agency_only': 'Doar pentru contractele printr-un ETT',
   'client.employment.duty.no_trial': 'Doar dacă există perioadă de probă',
   'client.employment.offer.title': 'Oferta față de contract',
@@ -2553,6 +2555,8 @@ export const ro: Translation = {
   'client.employment.finding.info_on_request': 'Informații la cerere',
   'client.employment.finding.info_short_relations':
     'Relații de muncă de patru săptămâni sau mai puțin',
+  'client.employment.finding.info_short_on_request':
+    'Informații la cerere în relații de muncă de patru săptămâni sau mai puțin',
   'client.employment.finding.info_model': 'Modelul de document informativ',
   'client.employment.finding.public_holidays': 'Zile de sărbătoare legală',
   'client.employment.finding.minors_work': 'Munca minorilor',
@@ -2944,6 +2948,8 @@ export const ro: Translation = {
     'Firma trebuia să ți le dea în scris înainte să începi (art. 7.1).',
   'client.employment.calculation.information.missing_on_request':
     'Le poți cere în scris, iar firma are 30 de zile lucrătoare ca să ți le dea.',
+  'client.employment.calculation.information.missing_short_on_request':
+    'Le poți cere în scris, iar firma are 10 zile lucrătoare ca să ți le dea.',
   'client.employment.calculation.information.protocol_always':
     'Planul de egalitate este necesar doar dacă firma are unul, dar protocolul împotriva hărțuirii sexuale și a hărțuirii pe criterii de sex trebuie dat întotdeauna (art. 3.2.l).',
   'client.employment.calculation.information.only_if_used':
@@ -3126,6 +3132,8 @@ export const ro: Translation = {
   'client.employment.letter.information.title': 'Informațiile despre contractul meu, în scris',
   'client.employment.letter.information.on_request':
     'Potrivit {norma} (art. 3 și disposición transitoria única), pot cere în scris informațiile despre relația mea de muncă, iar firma are 30 de zile lucrătoare ca să le dea. Vă cer în scris informațiile pe care nu le găsesc în contractul meu:',
+  'client.employment.letter.information.short_on_request':
+    'Potrivit {norma} (disposición transitoria segunda), pot cere în scris informațiile despre relația mea de muncă, iar firma are 10 zile lucrătoare ca să le dea. Vă cer în scris informațiile pe care nu le găsesc în contractul meu:',
   'client.employment.letter.information.before_start':
     'Potrivit {norma} (art. 3 și 7.1), aceste informații se dau în scris înainte de începerea muncii. Cum nu le găsesc în contractul meu, vi le cer în scris:',
   'client.employment.letter.information.filename': 'eslojusto-carta-informacion.pdf',

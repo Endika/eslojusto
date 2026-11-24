@@ -234,7 +234,7 @@ function dutyBlocks(duty: InformationDuty, tr: Translate): Block[] {
   );
   return [
     title,
-    ...(complete && duty.moment === 'on_request'
+    ...(complete && duty.moment !== 'before_start'
       ? []
       : [{ type: 'text' as const, text: tr(`client.employment.duty.${duty.moment}`) }]),
     ...duty.elements.flatMap((e): Block[] => [

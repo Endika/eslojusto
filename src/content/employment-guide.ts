@@ -469,7 +469,13 @@ export function employmentGuide(
           : []),
       ],
       list: rd723Stands ? INFO_ELEMENTS.map((e) => tx(`client.employment.info.${e}`)) : [],
-      rules: ['info_elements', 'info_before_start', 'info_on_request', 'info_short_relations'],
+      rules: [
+        'info_elements',
+        'info_before_start',
+        'info_on_request',
+        'info_short_relations',
+        'info_short_on_request',
+      ],
     }),
     block('agreement', 'g-convenio', {
       paragraphs: [

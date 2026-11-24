@@ -173,7 +173,9 @@ function informationBlocks(
     {
       type: 'text',
       text: tr(`client.employment.letter.information.${missing.moment}`, {
-        norma: tables.norms.rd723_2026.citation,
+        norma:
+          tables.norms[missing.moment === 'short_on_request' ? 'rdl39_2026' : 'rd723_2026']
+            .citation,
       }),
     },
     ...missing.elements.map((e): Block => ({
