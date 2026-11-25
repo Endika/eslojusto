@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.118.5](https://github.com/Endika/eslojusto/compare/v1.118.4...v1.118.5) (2026-11-25)
+
+
+### Bug Fixes
+
+* **engine:** round an exact half cent up instead of down ([2518f15](https://github.com/Endika/eslojusto/commit/2518f159cfd12aaa0f63bc5b4e647daec67574a0))
+
 ## [1.118.4](https://github.com/Endika/eslojusto/compare/v1.118.3...v1.118.4) (2026-11-24)
 
 
