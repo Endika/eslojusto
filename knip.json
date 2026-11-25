@@ -12,5 +12,6 @@
   "ignoreExportsUsedInFile": true,
   "rules": {
     "duplicates": "off"
-  }
+  },
+  "ignore": ["stryker/**"]
 }
