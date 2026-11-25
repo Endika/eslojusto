@@ -10,17 +10,21 @@ const filesUnder = (dir: string, ext: string): string[] =>
     return statSync(p).isDirectory() ? filesUnder(p, ext) : p.endsWith(ext) ? [p] : [];
   });
 
-const check = (where: string, text: string) => {
-  expect(forbiddenIn(where, text).map(String), where).toEqual([]);
-};
+// One test per kind of copy, listing every place that breaks a rule, so a failure names them all.
+const advice = (copy: [where: string, text: string][]): string[] =>
+  copy.flatMap(([where, text]) => forbiddenIn(where, text).map((rule) => `${where}: ${rule}`));
 
 if (!existsSync('dist')) {
   console.warn('published copy: no dist/; run `npm run build` first to check it.');
 }
 
 describe.skipIf(!existsSync('dist'))('published copy', () => {
-  it.each(existsSync('dist') ? filesUnder('dist', '.html') : [])('%s gives no advice', (file) => {
-    check(file, publishedCopy(readFileSync(file, 'utf8')));
+  it('gives no advice on any built page', () => {
+    const pages = filesUnder('dist', '.html');
+    expect(pages.length).toBeGreaterThan(0);
+    expect(advice(pages.map((file) => [file, publishedCopy(readFileSync(file, 'utf8'))]))).toEqual(
+      [],
+    );
   });
 });
 
@@ -41,19 +45,18 @@ const sources = [
 ];
 
 describe('result copy', () => {
-  it.each(sources)('%s gives no advice', (file) => {
-    check(file, readFileSync(file, 'utf8'));
+  it('gives no advice in any source file', () => {
+    expect(advice(sources.map((file) => [file, readFileSync(file, 'utf8')]))).toEqual([]);
   });
 });
 
 // Each translation key a section claims is read with that section's words too.
 describe('section copy', () => {
-  it.each(Object.entries(es).filter(([key]) => hasSectionWords(key)))(
-    '%s informs without asserting',
-    (key, text) => {
-      check(key, text);
-    },
-  );
+  it('informs without asserting in every key a section claims', () => {
+    const claimed = Object.entries(es).filter(([key]) => hasSectionWords(key));
+    expect(claimed.length).toBeGreaterThan(0);
+    expect(advice(claimed)).toEqual([]);
+  });
 });
 
 describe('forbidden words', () => {
@@ -184,10 +187,9 @@ describe('forbidden words', () => {
 
 // Each home card carries one line: it must fit an index, not explain the review.
 describe('home situation lines', () => {
-  it.each(Object.entries(es).filter(([key]) => /^home\..+_situation$/.test(key)))(
-    '%s fits in 70 characters',
-    (_, text) => {
-      expect([...text].length).toBeLessThanOrEqual(70);
-    },
-  );
+  it('each fits in 70 characters', () => {
+    const lines = Object.entries(es).filter(([key]) => /^home\..+_situation$/.test(key));
+    expect(lines.length).toBeGreaterThan(0);
+    expect(lines.filter(([, text]) => [...text].length > 70).map(([key]) => key)).toEqual([]);
+  });
 });
