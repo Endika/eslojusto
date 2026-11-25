@@ -4,15 +4,22 @@
 # copy, translations and prose are covered by the e2e and copy tests instead and stay out.
 set -euo pipefail
 base="$1"
-git diff --name-only --diff-filter=AMR "$base"...HEAD -- src tests |
+# A deleted test counts too: removing it can leave its source with surviving mutants.
+git diff --name-only --diff-filter=AMRD "$base"...HEAD -- src tests |
   while read -r f; do
     case "$f" in
       tests/*.test.ts | tests/*.test.tsx)
-        src="src/${f#tests/}"
-        src="${src%.test.ts*}"
-        for ext in .ts .tsx; do [ -f "$src$ext" ] && echo "$src$ext"; done
+        stem="src/${f#tests/}"
+        stem="${stem%.test.ts*}"
+        # Event.restore.test.ts belongs to Event.ts: drop dotted parts until a source exists.
+        while :; do
+          src=""
+          for ext in .ts .tsx; do [ -f "$stem$ext" ] && src="$stem$ext"; done
+          if [ -n "$src" ]; then echo "$src"; break; fi
+          case "$(basename "$stem")" in *.*) stem="${stem%.*}" ;; *) break ;; esac
+        done
         ;;
-      *) echo "$f" ;;
+      *) [ -f "$f" ] && echo "$f" ;;
     esac
   done |
   grep -E '^src/.*\.tsx?$' |
