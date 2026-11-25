@@ -81,14 +81,14 @@ describe('a translation stays faithful to its Spanish', () => {
   );
 
   // Prose and copy modules keep their code, so a whole file keeps the Spanish file's figures.
-  it.each(TRANSLATED_FILES.length > 0 ? TRANSLATED_FILES : [['', ''] as const])(
-    '%s keeps the figures of its Spanish file',
-    (path, spanish) => {
-      if (path === '') return;
-      const text = (p: string) => readFileSync(p, 'utf8').replace(SOURCE_LINE, '');
-      expect(figures(text(path))).toEqual(figures(text(spanish)));
-    },
-  );
+  it('every translated file keeps the figures of its Spanish file', () => {
+    const text = (p: string) => readFileSync(p, 'utf8').replace(SOURCE_LINE, '');
+    const differ = TRANSLATED_FILES.filter(
+      ([path, spanish]) =>
+        JSON.stringify(figures(text(path))) !== JSON.stringify(figures(text(spanish))),
+    ).map(([path]) => path);
+    expect(differ).toEqual([]);
+  });
 });
 
 describe('a translation stays on today’s Spanish', () => {
@@ -107,15 +107,15 @@ describe('a translation stays on today’s Spanish', () => {
     },
   );
 
-  it.each(TRANSLATED_FILES.length > 0 ? TRANSLATED_FILES : [['', ''] as const])(
-    '%s was stamped on its Spanish file as it reads now',
-    (path, spanish) => {
-      if (path === '') return;
-      const stamp = SOURCE_LINE.exec(readFileSync(path, 'utf8'))?.[1];
-      // Run `npm run i18n:stamp -- <path>` once it is translated anew.
-      expect(stamp).toBe(sourceHash(readFileSync(spanish, 'utf8')));
-    },
-  );
+  it('every translated file was stamped on its Spanish file as it reads now', () => {
+    const stale = TRANSLATED_FILES.filter(
+      ([path, spanish]) =>
+        SOURCE_LINE.exec(readFileSync(path, 'utf8'))?.[1] !==
+        sourceHash(readFileSync(spanish, 'utf8')),
+    ).map(([path]) => path);
+    // Run `npm run i18n:stamp -- <path>` once each is translated anew.
+    expect(stale).toEqual([]);
+  });
 });
 
 describe('the spans of the example tables', () => {
@@ -154,7 +154,9 @@ const gluedBreaks = (path: string): string[] => {
 };
 
 describe('a line break beside an expression', () => {
-  it.each(PROSE_FILES)('%s keeps the space Astro would drop', (path) => {
-    expect(gluedBreaks(path)).toEqual([]);
+  it('every prose file keeps the space Astro would drop', () => {
+    expect(PROSE_FILES.flatMap((path) => gluedBreaks(path).map((at) => `${path}: ${at}`))).toEqual(
+      [],
+    );
   });
 });
