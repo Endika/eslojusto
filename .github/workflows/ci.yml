@@ -40,6 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        # The mutation step diffs against the base branch.
+        with: { fetch-depth: 0 }
       - uses: actions/setup-node@v7
         with: { node-version: 24, cache: npm }
       - run: npm ci
@@ -53,6 +55,20 @@ jobs:
       # The copy tests read the built pages.
       - run: npm run build
       - run: npm run test:run
+      - name: Mutation targets
+        if: github.event_name == 'pull_request'
+        id: targets
+        env:
+          BASE: origin/${{ github.base_ref }}
+        run: echo "files=$(scripts/mutation-targets.sh "$BASE")" >> "$GITHUB_OUTPUT"
+      - name: Mutation test the changed logic
+        if: github.event_name == 'pull_request' && steps.targets.outputs.files != ''
+        timeout-minutes: 40
+        env:
+          FILES: ${{ steps.targets.outputs.files }}
+        run: |
+          npm i --no-save @stryker-mutator/core@10.1.1 @stryker-mutator/vitest-runner@10.1.1
+          npx stryker run --mutate "$FILES"
   # One job per Playwright project: each needs its own build, and a failure reruns alone.
   e2e:
     name: e2e (${{ matrix.project }})

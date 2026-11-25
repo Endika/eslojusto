@@ -26,3 +26,7 @@ pnpm-debug.log*
 # test output
 playwright-report/
 test-results/
+
+# mutation testing sandbox
+.stryker-tmp/
+reports/mutation/
