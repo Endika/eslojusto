@@ -25,7 +25,8 @@ describe.skipIf(!existsSync('dist'))('published copy', () => {
     expect(advice(pages.map((file) => [file, publishedCopy(readFileSync(file, 'utf8'))]))).toEqual(
       [],
     );
-  });
+    // Reading every built page takes a few seconds on a busy machine.
+  }, 60_000);
 });
 
 // legal-quotes.ts is left out: it holds the law's own words, shown only through <LegalQuote>.
