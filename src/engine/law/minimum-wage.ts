@@ -43,9 +43,11 @@ export function minimumWageFor<Id extends string>(
   const row = table.find((r) => r.year === year);
   if (row !== undefined) return { kind: 'published', row };
   const latest = table.reduce<MinimumWageRow<Id> | null>(
+    // Stryker disable next-line EqualityOperator: a tie needs two rows of one year, which a table never has
     (last, r) => (last === null || r.year > last.year ? r : last),
     null,
   );
+  // Stryker disable next-line EqualityOperator: a year equal to the latest one was already found above
   if (latest !== null && year > latest.year) {
     return { kind: 'not_published', year, reference: latest };
   }

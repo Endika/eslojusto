@@ -60,6 +60,7 @@ export function normStanding<Id extends string>(norm: Norm<Id>, day: string): No
   if (status === 'draft' || day < norm.inForceSince) return 'not_in_force';
   const lastDay =
     status === 'repealed' ? (norm.endUncertainUntil ?? norm.inForceUntil) : norm.inForceUntil;
+  // Stryker disable next-line ConditionalExpression: comparing a day with null is always false, so the null check only narrows the type
   if (lastDay !== null && day > lastDay) return 'not_in_force';
   if (status === 'repealed') return 'repealed_window';
   if (status === 'conditional') {

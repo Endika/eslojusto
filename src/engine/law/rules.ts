@@ -49,6 +49,7 @@ export function ruleSource<RuleId extends string, NormId extends string, Status 
   const { article, url, norm: normId, wordingSince, until } = rules[id];
   const norm = norms[normId];
   // The earlier end of the rule's wording and of its norm.
+  // Stryker disable next-line MethodExpression,ConditionalExpression: a null sorts after any ISO day, so keeping the nulls changes nothing
   const ends = [until, norm.inForceUntil].filter((d): d is string => d !== null).sort();
   return {
     id,
@@ -91,6 +92,7 @@ export function activeRules<
 ): readonly ActiveRule<RuleId, NormId, Status>[] {
   const day = toIso(date);
   const standing = (r: Rule<RuleId, NormId>) => {
+    // Stryker disable next-line ConditionalExpression: comparing a day with null is always false, so the null check only narrows the type
     if (day < r.from || (r.until !== null && day > r.until)) return 'not_in_force';
     return normStanding(norms[r.norm], day);
   };

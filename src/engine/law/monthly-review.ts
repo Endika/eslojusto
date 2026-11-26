@@ -1,4 +1,4 @@
-import { ordinal, parseDate, type CivilDate } from '../date';
+import { daysBetween, parseDate, type CivilDate } from '../date';
 import { minimumWageFor, type MinimumWageTable } from './minimum-wage';
 import type { NormReview, NormTable } from './norms';
 
@@ -51,7 +51,7 @@ export function monthlyChecklist<NormId extends string, MatterId extends string>
   const due: ChecklistItem<NormId, MatterId>[] = [];
   for (const norm of Object.values<NormTable<NormId>[NormId]>(deps.norms)) {
     const reviewedOn = deps.review[norm.id];
-    if (ordinal(today) - ordinal(parseDate(reviewedOn)) > REVIEW_INTERVAL_DAYS)
+    if (daysBetween(parseDate(reviewedOn), today) > REVIEW_INTERVAL_DAYS)
       due.push({ kind: 'norm_review_due', norm: norm.id, reviewedOn, url: norm.url });
   }
   const wage: readonly ChecklistItem<NormId, MatterId>[] =

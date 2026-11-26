@@ -84,6 +84,14 @@ describe('rule sources', () => {
     });
   });
 
+  it.each([
+    ['the norm ends first', '2030-06-30', '2030-06-30'],
+    ['the rule ends first', '2031-06-30', '2030-12-31'],
+  ])('end where the earlier of the rule and its norm does: %s', (_, normEnd, expected) => {
+    const norms = { ...NORMS, base: { ...NORMS.base, inForceUntil: normEnd } };
+    expect(ruleSource(RULES, 'temporary', norms).inForceUntil).toBe(expected);
+  });
+
   it('follow the norm table they are given', () => {
     const repealed = withReform({
       status: 'repealed',
@@ -102,6 +110,11 @@ describe('rule sources', () => {
 });
 
 describe('rules active on a day', () => {
+  it('a rule is not active before its own start, even when its norm already is', () => {
+    const earlier = { ...NORMS, base: { ...NORMS.base, inForceSince: '2029-01-01' } };
+    expect(on('2029-12-31', earlier)).toEqual([]);
+  });
+
   it.each([
     ['2029-12-31', []],
     [
