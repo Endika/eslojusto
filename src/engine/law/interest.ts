@@ -55,8 +55,9 @@ const periodOn = (day: CivilDate, table: LegalInterestTable): LegalInterestPerio
   return table.find((p) => p.from <= iso && iso <= p.until);
 };
 
-export const rateOn = (day: CivilDate, table: LegalInterestTable): number | undefined =>
-  periodOn(day, table)?.rate;
+export function rateOn(day: CivilDate, table: LegalInterestTable): number | undefined {
+  return periodOn(day, table)?.rate;
+}
 
 // The legal interest on `amount` from `from` (the first day that accrues) to `to` (which does
 // not), split by calendar year and by change of rate.
