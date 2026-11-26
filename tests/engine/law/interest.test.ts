@@ -134,11 +134,24 @@ describe('interestByYear', () => {
     expect(result).toMatchObject({ kind: 'complete', interest });
   });
 
-  it('gives nothing when it stops on the day it starts', () => {
-    expect(interestByYear(1000, d('2020-05-05'), d('2020-05-05'), LEGAL_INTEREST, 365)).toEqual({
+  it.each([
+    ['before the table', '1994-06-01'],
+    ['inside the table', '2020-05-05'],
+  ])('gives nothing when it stops on the day it starts, %s', (_, day) => {
+    expect(interestByYear(1000, d(day), d(day), LEGAL_INTEREST, 365)).toEqual({
       kind: 'complete',
       segments: [],
       interest: 0,
     });
+  });
+
+  it('has no table to start from when the table is empty', () => {
+    expect(interestByYear(1000, d('2020-05-05'), d('2020-06-05'), [], 365)).toEqual({
+      kind: 'before_table',
+      segments: [],
+      tableFrom: '2020-05-05',
+      missingYear: 2020,
+    });
+    expect(interestByYear(1000, d('2020-05-05'), d('2020-05-05'), [], 365).kind).toBe('complete');
   });
 });

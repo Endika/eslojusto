@@ -1,4 +1,4 @@
-import { ordinal, parseDate } from '../date';
+import { daysBetween, parseDate } from '../date';
 import type { Norm } from './norms';
 import type { RuleBase } from './rules';
 import type { LawSource } from './sources';
@@ -45,10 +45,10 @@ export function staleCaseLaw(
   sources: Readonly<Record<string, LawSource>>,
   today: string,
 ): readonly LawSource[] {
-  const day = ordinal(parseDate(today));
+  const day = parseDate(today);
   return Object.values(sources).filter(
     (s) =>
-      s.basis === 'case_law' && day - ordinal(parseDate(s.lastVerified)) > CASE_LAW_REVIEW_DAYS,
+      s.basis === 'case_law' && daysBetween(parseDate(s.lastVerified), day) > CASE_LAW_REVIEW_DAYS,
   );
 }
 
@@ -69,7 +69,7 @@ export function conditionBreaches(
   today: string,
 ): readonly ConditionBreach[] {
   const breaches: ConditionBreach[] = [];
-  const day = ordinal(parseDate(today));
+  const day = parseDate(today);
   for (const norm of Object.values(norms)) {
     if (norm.status !== 'conditional') continue;
     const { condition } = norm;
@@ -81,7 +81,7 @@ export function conditionBreaches(
       breaches.push({ norm: norm.id, reason: 'unknown_source', source: condition.source });
     if (
       condition.met === null &&
-      day - ordinal(parseDate(condition.decidesOn)) > CONDITION_GRACE_DAYS
+      daysBetween(parseDate(condition.decidesOn), day) > CONDITION_GRACE_DAYS
     )
       breaches.push({ norm: norm.id, reason: 'overdue', decidesOn: condition.decidesOn });
   }

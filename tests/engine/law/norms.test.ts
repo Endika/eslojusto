@@ -81,4 +81,13 @@ describe('norm standing', () => {
   it.each(['2030-02-28', '2030-03-01', '2099-12-31'])('a draft never stands, on %s', (day) => {
     expect(normStanding(norm({ status: 'draft' }), day)).toBe('not_in_force');
   });
+
+  it('only a repealed norm is widened to its uncertain end', () => {
+    const inForce = norm({ inForceUntil: '2030-06-30', endUncertainUntil: '2030-07-05' });
+    expect(normStanding(inForce, '2030-07-01')).toBe('not_in_force');
+  });
+
+  it('a conditional norm with no condition recorded is still open', () => {
+    expect(normStanding(norm({ status: 'conditional' }), '2030-03-01')).toBe('conditional');
+  });
 });

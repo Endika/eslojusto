@@ -271,6 +271,7 @@ export default tseslint.config(
       'playwright-report',
       'test-results',
       '.superpowers',
+      '.stryker-tmp',
       'api',
     ],
   },

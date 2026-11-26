@@ -39,4 +39,8 @@ describe('minimumWageFor', () => {
     expect(minimumWageFor(2023, TABLE)).toEqual({ kind: 'not_loaded', year: 2023 });
     expect(minimumWageFor(2023, [])).toEqual({ kind: 'not_loaded', year: 2023 });
   });
+
+  it('takes the latest year as the reference whatever the order of the table', () => {
+    expect(minimumWageFor(2026, [row(2025), row(2024)])).toMatchObject({ reference: row(2025) });
+  });
 });

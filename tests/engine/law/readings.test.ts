@@ -37,4 +37,24 @@ describe('assessAcross', () => {
   it('refuses to assess no world', () => {
     expect(() => assessAcross('q', [], () => 1)).toThrow(RangeError);
   });
+
+  it.each<[string, unknown, unknown]>([
+    ['numbers', 1, 2],
+    ['a number and an object', 1, {}],
+    ['an object and a number', {}, 1],
+    ['null and an object', null, {}],
+    ['an object and null', {}, null],
+    ['an array and an object', [], {}],
+    ['an object and an array', {}, []],
+    ['objects of different size', { a: 1, b: 2 }, { a: 1 }],
+    ['objects of different keys', { a: undefined }, { b: undefined }],
+  ])('tells %s apart', (_, low, high) => {
+    const result = assessAcross('q', ['low', 'high'] as const, (w) => (w === 'low' ? low : high));
+    expect(result.kind).toBe('readings');
+  });
+
+  it('is not single when only the last world differs', () => {
+    const result = assessAcross('q', ['a', 'b', 'c'], (w) => (w === 'c' ? 2 : 1));
+    expect(result.kind).toBe('readings');
+  });
 });
