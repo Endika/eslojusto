@@ -1,5 +1,5 @@
 import { phrase, type Calculation } from './calculation';
-import { addMonthsClamped, ordinal, type CivilDate } from './date';
+import { addMonthsClamped, daysBetween, type CivilDate } from './date';
 import { round2 } from './money';
 import { SOURCES, type Source } from './sources';
 import type { Item, ItemId } from './types';
@@ -34,8 +34,8 @@ export function lateInterest(
       .filter((i) => SALARY_ITEMS.includes(i.id) && i.direction === 'credit')
       .reduce((sum, i) => sum + (i.range?.min ?? 0), 0),
   );
-  const daysLate = Math.max(0, ordinal(today) - ordinal(endDate));
-  const daysLeft = ordinal(addMonthsClamped(endDate, 12)) - ordinal(today);
+  const daysLate = Math.max(0, daysBetween(endDate, today));
+  const daysLeft = daysBetween(today, addMonthsClamped(endDate, 12));
   const amount = daysLeft < 0 ? 0 : round2((LATE_INTEREST_RATE * base * daysLate) / 365);
   return {
     base,
