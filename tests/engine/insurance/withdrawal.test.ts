@@ -15,17 +15,42 @@ const summary = (today: string, change: Parameters<typeof policy>[0] = {}) =>
     daysLeft: f.daysLeft,
   }));
 
+const phrases = (today: string, change: Parameters<typeof policy>[0] = {}) =>
+  distanceWithdrawal(online(change), parseDate(today), INSURANCE_NORMS).map((f) => ({
+    calculation: f.calculation,
+    sources: f.sources.map((s) => s.id),
+  }));
+
 describe('withdrawal from a policy contracted at a distance (art. 10 Ley 22/2007)', () => {
   it('fourteen calendar days from the conclusion, the first day left out', () => {
     expect(summary('2026-10-09')).toEqual([
       { id: 'distance_withdrawal', status: 'open', lastDay: '2026-10-15', daysLeft: 6 },
     ]);
+    expect(phrases('2026-10-09')[0]).toEqual({
+      calculation: [
+        { key: 'withdrawal.start', vars: { day: { date: '2026-10-01' } } },
+        {
+          key: 'withdrawal.days_left',
+          vars: { days: { days: 6 }, day: { date: '2026-10-15' } },
+        },
+        { key: 'withdrawal.receipt_unknown' },
+      ],
+      sources: ['distance_withdrawal'],
+    });
   });
 
   it('counts from the receipt of the contract terms when they came later', () => {
-    expect(summary('2026-10-09', { policyReceivedOn: parseDate('2026-10-05') })).toEqual([
+    const received = { policyReceivedOn: parseDate('2026-10-05') };
+    expect(summary('2026-10-09', received)).toEqual([
       { id: 'distance_withdrawal', status: 'open', lastDay: '2026-10-19', daysLeft: 10 },
     ]);
+    expect(phrases('2026-10-09', received)[0]?.calculation[0]).toEqual({
+      key: 'withdrawal.start_on_terms',
+      vars: { day: { date: '2026-10-05' } },
+    });
+    expect(phrases('2026-10-09', received)[0]?.calculation.map((p) => p.key)).not.toContain(
+      'withdrawal.receipt_unknown',
+    );
   });
 
   it('a receipt on the day of the conclusion counts from the conclusion', () => {
@@ -41,6 +66,10 @@ describe('withdrawal from a policy contracted at a distance (art. 10 Ley 22/2007
     expect(summary('2026-10-16')).toEqual([
       { id: 'distance_withdrawal', status: 'ended', lastDay: '2026-10-15', daysLeft: null },
     ]);
+    expect(phrases('2026-10-16')[0]?.calculation[1]).toEqual({
+      key: 'withdrawal.ended',
+      vars: { day: { date: '2026-10-15' } },
+    });
   });
 
   it('crosses a leap day', () => {
@@ -58,6 +87,31 @@ describe('withdrawal from a policy contracted at a distance (art. 10 Ley 22/2007
   it('without a day of receipt it counts from the conclusion and says so', () => {
     const [f] = distanceWithdrawal(online(), parseDate('2026-10-09'), INSURANCE_NORMS);
     expect(f?.calculation.map((p) => p.key)).toContain('withdrawal.receipt_unknown');
+  });
+
+  it.each<[string, Parameters<typeof policy>[0], string]>([
+    ['the terms have not arrived', { policyReceived: false }, 'withdrawal.not_started'],
+    ['it was contracted in person', { distance: false }, 'withdrawal.not_distance'],
+    ['the channel is not known', { distance: null }, 'withdrawal.channel_unknown'],
+    ['the day of the conclusion is missing', { concludedOn: null }, 'item.not_entered'],
+    ['it predates the law', { concludedOn: parseDate('2007-07-11') }, 'withdrawal.before_law'],
+  ])('says so when %s, citing the withdrawal rule', (_, change, key) => {
+    expect(phrases('2026-10-09', change)).toEqual([
+      { calculation: [{ key }], sources: ['distance_withdrawal'] },
+    ]);
+  });
+
+  it('a motor policy says why each part is as it is', () => {
+    expect(phrases('2026-10-09', { line: 'car', carCover: 'with_voluntary' })).toEqual([
+      {
+        calculation: [{ key: 'withdrawal.compulsory_excluded' }],
+        sources: ['distance_withdrawal_excluded'],
+      },
+      {
+        calculation: [{ key: 'withdrawal.voluntary_unverified' }],
+        sources: ['distance_withdrawal', 'distance_withdrawal_excluded'],
+      },
+    ]);
   });
 
   it('does not apply to a policy contracted in person', () => {

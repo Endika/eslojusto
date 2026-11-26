@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseDate, type CivilDate } from '../../../src/engine/date';
 import { INSURANCE_NORMS } from '../../../src/engine/insurance/data/norms';
+import { informationBlocks } from '../../../src/engine/insurance/information';
 import { reviewInsurance } from '../../../src/engine/insurance/review';
 import { scope } from '../../../src/engine/insurance/scope';
 import type { InsuranceInput, InsuranceLine } from '../../../src/engine/insurance/types';
@@ -68,8 +69,44 @@ describe('validation', () => {
     ],
     [{ notice: notice({ previousPremium: 0 }) }, 'notice.previousPremium', 'amount_range'],
     [{ notice: notice({ newPremium: Number.NaN }) }, 'notice.newPremium', 'amount_range'],
-  ])('rejects %o', (change, field, code) => {
-    expect(errors(change)).toContainEqual({ field, code });
+    [{ concludedOn: { y: 2026, m: 2, d: 30 } }, 'concludedOn', 'invalid_date'],
+    [{ concludedOn: { y: 2030, m: 2, d: 30 } }, 'concludedOn', 'invalid_date'],
+    [
+      { notice: notice({ receivedOn: { y: 2030, m: 2, d: 30 } }) },
+      'notice.receivedOn',
+      'invalid_date',
+    ],
+    [{ policyReceivedOn: { y: 1990, m: 2, d: 30 } }, 'policyReceivedOn', 'invalid_date'],
+    [
+      {
+        notice: notice({ receivedOn: parseDate('2026-10-10') }),
+        expiresOn: parseDate('2026-10-01'),
+      },
+      'notice.receivedOn',
+      'in_future',
+    ],
+    [{ notice: notice({ newPremium: 1_000_001 }) }, 'notice.newPremium', 'amount_range'],
+    [{ notice: notice({ newPremium: Infinity }) }, 'notice.newPremium', 'amount_range'],
+    [{ notice: notice({ previousPremium: -5 }) }, 'notice.previousPremium', 'amount_range'],
+  ])('rejects %o with that error alone', (change, field, code) => {
+    expect(errors(change)).toEqual([{ field, code }]);
+  });
+
+  it.each<[string, Partial<InsuranceInput>]>([
+    [
+      'today for every past date',
+      {
+        concludedOn: TODAY,
+        policyReceivedOn: TODAY,
+        expiresOn: TODAY,
+        notice: notice({ receivedOn: TODAY }),
+      },
+    ],
+    ['two years ahead for the end', { expiresOn: parseDate('2028-10-09') }],
+    ['the largest premium', { notice: notice({ newPremium: 1_000_000 }) }],
+    ['a receipt on the day of the conclusion', { policyReceivedOn: parseDate('2024-03-01') }],
+  ])('accepts %s', (_, change) => {
+    expect(errors(change)).toEqual([]);
   });
 
   it('a review with errors carries no findings', () => {
@@ -192,6 +229,47 @@ describe('information blocks', () => {
       policy({ concludedOn: parseDate('2024-01-15'), distance: false, policyReceived: null }),
     ).information[0];
     expect(block?.calculation.map((p) => p.key)).toEqual(['information.policy_correction']);
+  });
+
+  it.each([
+    ['the conclusion, when the policy came earlier', '2024-01-15', '2024-01-10', '2024-02-15'],
+    ['the receipt, when the conclusion is not given', null, '2024-01-10', '2024-02-10'],
+  ])('counts the month from %s', (_, concludedOn, receivedOn, until) => {
+    const [block] = informationBlocks(
+      policy({
+        distance: true,
+        concludedOn: concludedOn === null ? null : parseDate(concludedOn),
+        policyReceivedOn: parseDate(receivedOn),
+      }),
+      INSURANCE_NORMS,
+    );
+    expect(block?.calculation[1]?.vars).toEqual({ day: { date: until } });
+  });
+
+  it('gives no date from a receipt day when the policy is not known to have arrived', () => {
+    const block = review(
+      policy({ distance: true, policyReceived: null, policyReceivedOn: parseDate('2024-03-05') }),
+    ).information[0];
+    expect(block?.calculation[1]?.key).toBe('information.policy_correction.delivery_unknown');
+  });
+
+  it('names what each block says and the rule it rests on', () => {
+    expect(
+      review(policy()).information.map((b) => [
+        b.id,
+        b.calculation.map((p) => p.key),
+        b.sources.map((s) => s.id),
+      ]),
+    ).toEqual([
+      ['policy_correction', ['information.policy_correction'], ['policy_correction']],
+      ['questionnaire', ['information.questionnaire'], ['questionnaire']],
+      [
+        'proportional_rule',
+        ['information.proportional_rule', 'information.proportional_rule.example'],
+        ['proportional_rule'],
+      ],
+      ['overinsurance', ['information.overinsurance'], ['overinsurance']],
+    ]);
   });
 
   it('works the proportional rule through an example', () => {
