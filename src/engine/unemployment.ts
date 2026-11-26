@@ -120,6 +120,7 @@ export function contributedDays(
   let total = 0;
   let end = -Infinity;
   for (const [a, b] of bounds) {
+    // Stryker disable next-line EqualityOperator: a period ending on `end` adds b - end = 0 days either way
     if (b <= end) continue;
     total += b - Math.max(a, end + 1) + 1;
     end = b;
@@ -174,11 +175,13 @@ export function estimateBenefit(
 
   const d = contractContributedDays(e.startDate, e.endDate);
   const rows = others?.contracts ?? [];
+  // Stryker disable ConditionalExpression: with no other contract the union is this one, d days
   const total =
     rows.length === 0
       ? d
       : contributedDays(e.endDate, [{ startDate: e.startDate, endDate: e.endDate }, ...rows]);
-  const noBenefitSince = rows.length > 0 && others?.benefitDrawnSince === false;
+  // Stryker restore ConditionalExpression
+  const noBenefitSince = others?.benefitDrawnSince === false;
   const duration: BenefitDuration =
     rows.length === 0
       ? { kind: 'at_least', days: durationForDays(d) }

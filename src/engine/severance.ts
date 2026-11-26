@@ -61,8 +61,7 @@ function monthsRange(from: CivilDate, to: CivilDate): MonthsRange {
   const { whole, rest } = wholeMonthsAndRest(from, to);
   const g = rest > 0 ? whole + 1 : whole;
   if (rest === 1 || rest === 2) return { g, lo: whole, hi: g };
-  if (rest === 0 && from.d !== 1) return { g, lo: g, hi: whole + 1 };
-  return { g, lo: g, hi: g };
+  return { g, lo: g, hi: from.d === 1 ? g : whole + 1 };
 }
 
 interface Computation {
@@ -88,7 +87,7 @@ function unfairComputation(
     const months = monthsRange(startDate, endDate)[pick];
     const gross = months * 2.75;
     const days = Math.min(gross, UNFAIR_CAP_DAYS);
-    const capped = gross > UNFAIR_CAP_DAYS;
+    const capped = days < gross;
     return {
       days,
       capped,
@@ -122,7 +121,7 @@ function unfairComputation(
   }
   const gross = d1 + d2;
   const days = Math.min(gross, UNFAIR_CAP_DAYS);
-  const capped = gross > UNFAIR_CAP_DAYS;
+  const capped = days < gross;
   return {
     days,
     capped,
@@ -139,7 +138,7 @@ function objectiveComputation(
   const months = monthsRange(startDate, endDate)[pick];
   const gross = (months * 20) / 12;
   const days = Math.min(gross, OBJECTIVE_CAP_DAYS);
-  const capped = gross > OBJECTIVE_CAP_DAYS;
+  const capped = days < gross;
   return {
     days,
     capped,
@@ -200,11 +199,9 @@ function collective(startDate: CivilDate, endDate: CivilDate, sd: number): Sever
   return { ...r, calculation: [phrase('severance.collective'), ...r.calculation] };
 }
 
-function fixedTermDaysPerYear(startDate: CivilDate): number {
-  if (startDate.y <= 2011) return 8;
-  if (startDate.y >= 2015) return 12;
-  return startDate.y - 2003;
-}
+// 8 days a year up to 2011, one more each year from 2012, 12 from 2015.
+const fixedTermDaysPerYear = (startDate: CivilDate): number =>
+  Math.min(12, Math.max(8, startDate.y - 2003));
 
 function fixedTermEnd(
   startDate: CivilDate,

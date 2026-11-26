@@ -21,14 +21,13 @@ export const CALENDAR_MINIMUM = 30;
 export const DEFAULT_WORK_WEEK = 5;
 
 // The legal minimum is 30 calendar days a year (art. 38 ET). In working days that is 22 for a
-// Monday-to-Friday week, the usual equivalence, and 26 for a Monday-to-Saturday one, as six-day
-// agreements state it; any other week gets 30 × days / 7, rounded. Accrual and days taken stay in
+// Monday-to-Friday week, the usual equivalence; any other week gets 30 × days / 7, rounded (26 for
+// a Monday-to-Saturday one, as six-day agreements state it). Accrual and days taken stay in
 // the person's unit; only the days left are turned into calendar days, the unit the daily pay is
 // for, at 30 to that minimum.
 export function minimumHolidays(unit: HolidayUnit, workDaysPerWeek = DEFAULT_WORK_WEEK): number {
   if (unit === 'calendar') return CALENDAR_MINIMUM;
   if (workDaysPerWeek === 5) return 22;
-  if (workDaysPerWeek === 6) return 26;
   return Math.round((CALENDAR_MINIMUM * workDaysPerWeek) / 7);
 }
 export const calendarDaysPer = (unit: HolidayUnit, workDaysPerWeek?: number): number =>
@@ -73,6 +72,7 @@ const METHODS: readonly Method[] = ['days', 'months', 'anniversary'];
 
 // Counting months from the start date only differs from calendar months when the start falls mid-month inside the period.
 const countsFromStart = (start: CivilDate, startDate: CivilDate): boolean =>
+  // Stryker disable next-line EqualityOperator: period starts fall on the 1st, so an equal date fails the next condition
   compareDates(startDate, start) > 0 && startDate.d !== 1;
 
 const methodsNote = (fromStart: boolean): Phrase =>
@@ -230,12 +230,11 @@ function accrued(e: FinalPayInput, accrual: Scheme): Share[] {
   const periodMonths = accrual === 'annual' ? 12 : 6;
   return periods(e, accrual).map((p) => {
     const from = max(p.start, e.startDate);
-    const to = compareDates(e.endDate, p.end) < 0 ? e.endDate : p.end;
-    const d = calendarDays(from, to);
+    const d = calendarDays(from, e.endDate);
     const total = calendarDays(p.start, p.end);
-    const months = accrualMonths(from, to);
+    const months = accrualMonths(from, e.endDate);
     const fromStart = countsFromStart(p.start, e.startDate);
-    const monthsFromStart = fromStart ? anniversaryMonths(from, to) : months;
+    const monthsFromStart = fromStart ? anniversaryMonths(from, e.endDate) : months;
     const amount = {
       days: (e.extraPayAmount * d) / total,
       months: (e.extraPayAmount * months) / periodMonths,
@@ -291,6 +290,7 @@ const ALREADY_PAID_NOTE: Record<ExtraPayment, PhraseKey> = {
 };
 
 // The annual accrual has a summer and a Christmas share, in that order; the semiannual one, a single share.
+// Stryker disable ConditionalExpression,LogicalOperator,ArrayDeclaration,CallExpression: the guards and the defaults only narrow the shares for the type checker; every accrual scheme has its shares
 function accrualPhrase(accrual: Accrual, accruals: readonly (readonly Share[])[]): Phrase {
   const [first = [], second = []] = accruals.map((shares) => shares.map((p) => p.text));
   const [a, b] = first;
@@ -301,11 +301,13 @@ function accrualPhrase(accrual: Accrual, accruals: readonly (readonly Share[])[]
   if (accrual === 'semiannual' && a) return phrase('extra_pay.semiannual', { paga: a });
   throw new Error(`No shares for the ${accrual} accrual`);
 }
+// Stryker restore ConditionalExpression,LogicalOperator,ArrayDeclaration,CallExpression
 
 export function extraPayItem(e: FinalPayInput): Item | null {
   if (e.extraPayProrated || e.extraPayCount <= 0) return null;
   const single = e.extraPayCount === 1;
   const schemes: readonly Scheme[] =
+    // Stryker disable next-line StringLiteral: periods and accrued read any scheme but 'annual' as the semiannual one
     e.extraPayAccrual === 'unknown' ? ['annual', 'semiannual'] : [e.extraPayAccrual];
   const accruals = schemes.map((x) => accrued(e, x));
   const options = accruals.flatMap((shares) => scenarios(shares, single));

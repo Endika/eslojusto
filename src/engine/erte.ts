@@ -83,8 +83,7 @@ function limited(amount: number, regime: ErteRegime, children: 0 | 1 | 2): numbe
 // its proportion of that (art. 270.5). Without an answer on children it spans the three.
 function monthly(rate: number, input: ErteInput): Range {
   const share = shareOf(input.measure);
-  const options: readonly (0 | 1 | 2)[] =
-    input.regime === 'red' ? [0] : input.children === null ? [0, 1, 2] : [input.children];
+  const options: readonly (0 | 1 | 2)[] = input.children === null ? [0, 1, 2] : [input.children];
   const full = trunc2(input.base * rate);
   const figures = options.map((children) => trunc2(limited(full, input.regime, children) * share));
   return between(Math.min(...figures), Math.max(...figures));
